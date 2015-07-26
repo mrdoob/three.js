@@ -76,7 +76,7 @@ THREE.StereoEffect = function ( renderer ) {
 
 	this.render = function ( scene, camera ) {
 
-		scene.updateMatrixWorld();
+		scene.updateMatrixWorld( true );
 
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 	

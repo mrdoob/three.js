@@ -61,11 +61,11 @@ THREE.Object3D = function () {
 
 	this.rotationAutoUpdate = true;
 
-	this.matrix = new THREE.Matrix4();
-	this.matrixWorld = new THREE.Matrix4();
+	this._matrix = new THREE.Matrix4();
+	this._matrixWorld = new THREE.Matrix4();
 
 	this.matrixAutoUpdate = true;
-	this.matrixWorldNeedsUpdate = false;
+	this._matrixWorldNeedsUpdate = false;
 
 	this.visible = true;
 
@@ -76,7 +76,10 @@ THREE.Object3D = function () {
 	this.renderOrder = 0;
 
 	this.userData = {};
-
+	
+	this._position = this.position.clone();
+	this._quaternion = this.quaternion.clone();
+	this._scale = this.scale.clone();
 };
 
 THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 1, 0 );
@@ -117,6 +120,31 @@ THREE.Object3D.prototype = {
 
 		console.warn( 'THREE.Object3D: .renderDepth has been removed. Use .renderOrder, instead.' );
 
+	},
+	
+	get matrix () {
+		
+		if ( this.matrixAutoUpdate === true ) {
+	    	
+			return this.updateMatrix();
+	        
+		} else {
+	    	
+			return this._matrix;
+	        
+		}
+
+	},
+	set matrix ( value ) {
+		
+		this._matrix = value;
+	    
+	},
+	
+	get matrixWorld () {
+		
+		return this.updateMatrixWorld();
+	
 	},
 
 	applyMatrix: function ( matrix ) {
@@ -422,8 +450,6 @@ THREE.Object3D.prototype = {
 
 		var result = optionalTarget || new THREE.Vector3();
 
-		this.updateMatrixWorld( true );
-
 		return result.setFromMatrixPosition( this.matrixWorld );
 
 	},
@@ -436,8 +462,6 @@ THREE.Object3D.prototype = {
 		return function ( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Quaternion();
-
-			this.updateMatrixWorld( true );
 
 			this.matrixWorld.decompose( position, result, scale );
 
@@ -471,8 +495,6 @@ THREE.Object3D.prototype = {
 		return function ( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Vector3();
-
-			this.updateMatrixWorld( true );
 
 			this.matrixWorld.decompose( position, quaternion, result );
 
@@ -538,44 +560,95 @@ THREE.Object3D.prototype = {
 
 	},
 
-	updateMatrix: function () {
+	updateMatrix: ( function () {
+		
+		function updateMatrixWorldNeedsUpdate( o ) {
+			
+			o._matrixWorldNeedsUpdate = true;
+			
+		};
+		
+		return function() {
 
-		this.matrix.compose( this.position, this.quaternion, this.scale );
+			var position = this.position;
+			var quaternion = this.quaternion;
+			var scale = this.scale;
+			var _position = this._position;
+			var _quaternion = this._quaternion;
+			var _scale = this._scale;
+			
+			if ( ! _position.equals( position ) || ! _quaternion.equals( quaternion ) || ! _scale.equals( scale )  ) {
 
-		this.matrixWorldNeedsUpdate = true;
+				this._matrix.compose( position, quaternion, scale );
+				this.traverse( updateMatrixWorldNeedsUpdate );
+				_position.copy( position );
+				_quaternion.copy( quaternion );
+				_scale.copy( scale );
+			}
+			return this._matrix;
 
-	},
+		};
 
-	updateMatrixWorld: function ( force ) {
+	} )(),
 
-		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
+	updateMatrixWorld: function ( updateChildren, updateParents ) {
 
-		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+		var parent = this.parent; 
+		
+		//check own matrix
+		if ( this.matrixAutoUpdate === true ) {
+			
+			this.updateMatrix();
+			
+		} else {
+			
+			this._matrixWorldNeedsUpdate = true;
+			
+		} 
+		
+		if ( parent === undefined ) {
 
-			if ( this.parent === undefined ) {
+			// update own matrixWOrld
+			if ( this._matrixWorldNeedsUpdate === true ) {
+				
+				this._matrixWorld.copy( this._matrix );
+				
+			}
+			
+		} else {
+		
+			// first update parents before check matrixWorldNeedsUpdate
+			if ( updateParents !== false ) {
 
-				this.matrixWorld.copy( this.matrix );
-
-			} else {
-
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+				parent.updateMatrixWorld( );
 
 			}
-
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
+			
+			// update own matrixWOrld
+			if ( this._matrixWorldNeedsUpdate === true ) {
+	
+				this._matrixWorld.multiplyMatrices( parent._matrixWorld, this._matrix );
+				
+			}
 
 		}
+		
+		this._matrixWorldNeedsUpdate = false;
 
 		// update children
+		if ( updateChildren === true ) { 
+			
+			var children = this.children;
+			for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+				children[ i ].updateMatrixWorld( true, false );
 
-			this.children[ i ].updateMatrixWorld( force );
-
+			}
+			
 		}
-
+		
+		return this._matrixWorld;
+		
 	},
 
 	toJSON: function ( meta ) {
@@ -691,7 +764,7 @@ THREE.Object3D.prototype = {
 		this.matrixWorld.copy( source.matrixWorld );
 
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
-		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
+		this._matrixWorldNeedsUpdate = source._matrixWorldNeedsUpdate;
 
 		this.visible = source.visible;
 

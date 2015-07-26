@@ -1593,11 +1593,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// update scene graph
 
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld( true );
 
 		// update camera matrices and frustum
 
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === undefined ) camera.updateMatrixWorld( true );
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 

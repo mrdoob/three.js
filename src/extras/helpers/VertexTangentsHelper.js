@@ -59,8 +59,6 @@ THREE.VertexTangentsHelper.prototype.update = ( function ( object ) {
 
 		var keys = [ 'a', 'b', 'c' ];
 
-		this.object.updateMatrixWorld( true );
-
 		var matrixWorld = this.object.matrixWorld;
 
 		var position = this.geometry.attributes.position;

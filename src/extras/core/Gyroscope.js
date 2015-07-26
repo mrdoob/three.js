@@ -21,45 +21,29 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 	var quaternionWorld = new THREE.Quaternion();
 	var scaleWorld = new THREE.Vector3();
 
-	return function updateMatrixWorld( force ) {
+	return function updateMatrixWorld( updateChildren, updateParents ) {
 
-		this.matrixAutoUpdate && this.updateMatrix();
+		THREE.Object3D.prototype.updateMatrixWorld.call( this, false, updateParents );
 
-		// update matrixWorld
+		this._matrixWorld.decompose( translationWorld, quaternionWorld, scaleWorld );
+		this._matrix.decompose( translationObject, quaternionObject, scaleObject );
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
-
-			if ( this.parent ) {
-
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
-
-				this.matrixWorld.decompose( translationWorld, quaternionWorld, scaleWorld );
-				this.matrix.decompose( translationObject, quaternionObject, scaleObject );
-
-				this.matrixWorld.compose( translationWorld, quaternionObject, scaleWorld );
-
-
-			} else {
-
-				this.matrixWorld.copy( this.matrix );
-
-			}
-
-
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
-
-		}
+		this._matrixWorld.compose( translationWorld, quaternionObject, scaleWorld );
 
 		// update children
+		if ( updateChildren === true ) { 
+			
+			var children = this.children;
+			for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+				children[ i ].updateMatrixWorld( true, false );
 
-			this.children[ i ].updateMatrixWorld( force );
-
+			}
+			
 		}
+		
+		return this._matrixWorld;
 
 	};
-
+	
 }() );

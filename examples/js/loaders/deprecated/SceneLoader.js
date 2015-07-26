@@ -134,13 +134,6 @@ THREE.SceneLoader.prototype = {
 
 			}
 
-			if ( position || rotation || scale ) {
-
-				result.scene.updateMatrix();
-				result.scene.updateMatrixWorld();
-
-			}
-
 		}
 
 		function get_url( source_url, url_type ) {

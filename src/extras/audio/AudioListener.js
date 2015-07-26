@@ -23,20 +23,22 @@ THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 
 	var orientation = new THREE.Vector3();
 
-	return function updateMatrixWorld( force ) {
+	return function updateMatrixWorld( updateChildren, updateParents ) {
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+		THREE.Object3D.prototype.updateMatrixWorld.call( this, updateChildren, updateParents );
 
 		var listener = this.context.listener;
 		var up = this.up;
 
-		this.matrixWorld.decompose( position, quaternion, scale );
+		this._matrixWorld.decompose( position, quaternion, scale );
 
 		orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
 		listener.setPosition( position.x, position.y, position.z );
 		listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
-
+		
+		return this._matrixWorld;
+		
 	};
 
 } )();

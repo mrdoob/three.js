@@ -42,7 +42,6 @@ THREE.KeyFrameAnimation = function ( data ) {
 
 			obj.matrixAutoUpdate = false;
 			this.data.hierarchy[ h ].node.updateMatrix();
-			obj.matrixWorldNeedsUpdate = true;
 
 		}
 
@@ -192,7 +191,6 @@ THREE.KeyFrameAnimation.prototype = {
 				}
 
 				this.data.hierarchy[ h ].node.updateMatrix();
-				object.matrixWorldNeedsUpdate = true;
 
 			}
 

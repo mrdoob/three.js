@@ -1017,7 +1017,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	if (m) {
 		threeNode.applyMatrix(new THREE.Matrix4().fromArray( m ));
 		threeNode.matrixAutoUpdate = false;
-		threeNode.matrixWorldNeedsUpdate = true;
 	}
 	else {
 		var t = description.translation;
@@ -1037,7 +1036,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 		var matrix = new THREE.Matrix4;
 		matrix.compose(position, rotation, scale);
 		threeNode.matrixAutoUpdate = false;
-		threeNode.matrixWorldNeedsUpdate = true;
 		threeNode.applyMatrix(matrix);
 	}
 

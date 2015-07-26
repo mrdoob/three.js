@@ -202,7 +202,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				scene.add( light.shadowCamera );
 
-				if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+				if ( scene.autoUpdate === true ) scene.updateMatrixWorld( true );
 
 			}
 
@@ -228,7 +228,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			shadowCamera.position.setFromMatrixPosition( light.matrixWorld );
 			_matrixPosition.setFromMatrixPosition( light.target.matrixWorld );
 			shadowCamera.lookAt( _matrixPosition );
-			shadowCamera.updateMatrixWorld();
+			shadowCamera.updateMatrixWorld( true );
 
 			shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 

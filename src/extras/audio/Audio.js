@@ -123,14 +123,16 @@ THREE.Audio.prototype.updateMatrixWorld = ( function () {
 
 	var position = new THREE.Vector3();
 
-	return function updateMatrixWorld( force ) {
+	return function updateMatrixWorld( updateChildren, updateParents ) {
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+		THREE.Object3D.prototype.updateMatrixWorld.call( this,  updateChildren, updateParents );
 
-		position.setFromMatrixPosition( this.matrixWorld );
+		position.setFromMatrixPosition( this._matrixWorld );
 
 		this.panner.setPosition( position.x, position.y, position.z );
-
+		
+		return this._matrixWorld;
+		
 	};
 
 } )();
