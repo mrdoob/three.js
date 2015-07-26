@@ -24,13 +24,13 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		} else if ( geometry instanceof THREE.Geometry ) {
 
-			if ( object._bufferGeometry === undefined ) {
+			if ( geometry._bufferGeometry === undefined ) {
 
-				object._bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
+				geometry._bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
 
 			}
 
-			geometries[ geometry.id ] = object._bufferGeometry;
+			geometries[ geometry.id ] = geometry._bufferGeometry;
 
 		}
 
