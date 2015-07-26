@@ -160,12 +160,12 @@ THREE.AnimationClip.prototype = {
 
 // TODO: Fix this for loops.
 // TODO: Test this
-THREE.AnimationClip.CreateMorphAnimation = function( morphTargetNames, duration ) {
+THREE.AnimationClip.CreateMorphAnimation = function( morphTargets, duration ) {
 
 	var tracks = [];
-	var frameStep = duration / morphTargetNames;
+	var frameStep = duration / morphTargets.length;
 
-	for( var i = 0; i < morphTargetNames.length; i ++ ) {
+	for( var i = 0; i < morphTargets.length; i ++ ) {
 
 		var keys = [];
 
@@ -177,13 +177,13 @@ THREE.AnimationClip.CreateMorphAnimation = function( morphTargetNames, duration 
 
 		keys.push( { time: i * frameStep, value: 1 } );
 
-		if( ( i + 1 ) <= morphTargetNames.length ) {
+		if( ( i + 1 ) <= morphTargets.length ) {
 
 			keys.push( { time: ( i + 1 ) * frameStep, value: 0 } );
 
 		}
 
-		var morphName = morphTargetNames[i];
+		var morphName = morphTargets[i].name;
 		var trackName = '.morphTargetInfluences[' + morphName + ']';
 		var track = new THREE.KeyframeTrack( trackName, keys );
 
@@ -323,3 +323,4 @@ THREE.AnimationClip.CreateMaterialColorAnimation = function( duration, colors, l
 
 	return clip;
 };
+

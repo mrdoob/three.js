@@ -119,10 +119,17 @@ THREE.PropertyBinding.prototype = {
 					// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
 					
 					// support resolving morphTarget names into indices.
-					console.log( "  resolving morphTargetInfluence name: ", this.propertyIndex );
-					for( var i = 0; i < this.node.morphTargets.length; i ++ ) {
-						if( this.node.morphTargets[i].name === this.propertyIndex ) {
-							console.log( "  resolved to index: ", i );
+					//console.log( "  resolving morphTargetInfluence name: ", this.propertyIndex );
+					if( this.node.geometry ) {
+						console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );				
+					}
+					if( this.node.geometry.morphTargets ) {
+						console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );				
+					}
+					
+					for( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
+						if( this.node.geometry.morphTargets[i].name === this.propertyIndex ) {
+							//console.log( "  resolved to index: ", i );
 							this.propertyIndex = i;
 							break;
 						}
