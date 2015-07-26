@@ -282,21 +282,24 @@ THREE.AnimationClip.CreatePulsationAnimation = function( duration, pulseScale ) 
 THREE.AnimationClip.CreateVisibilityAnimation = function( duration ) {
 
 	var keys = [];
+	keys.push( {
+		time: 0,
+		value: true
+	} );
+	keys.push( {
+		time: duration - 1,
+		value: false
+	} );
+	keys.push( {
+		time: duration,
+		value: true
+	} );
 
-	for( var i = 0; i < duration * 10; i ++ ) {
-
-		keys.push( {
-			time: ( i / 10.0 ),
-			value: ( Math.random() > 0.5 )
-		} );
-
-	}
-
-	var trackName = '.visibility';
+	var trackName = '.visible';
 
 	var track = new THREE.KeyframeTrack( trackName, keys );
 
-	var clip = new THREE.AnimationClip( 'visibility' + duration, duration, [ track ] );
+	var clip = new THREE.AnimationClip( 'visible' + duration, duration, [ track ] );
 	//console.log( 'scaleClip', clip );
 
 	return clip;
