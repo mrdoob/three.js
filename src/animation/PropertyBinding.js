@@ -120,10 +120,10 @@ THREE.PropertyBinding.prototype = {
 					
 					// support resolving morphTarget names into indices.
 					//console.log( "  resolving morphTargetInfluence name: ", this.propertyIndex );
-					if( this.node.geometry ) {
+					if( ! this.node.geometry ) {
 						console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );				
 					}
-					if( this.node.geometry.morphTargets ) {
+					if( ! this.node.geometry.morphTargets ) {
 						console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );				
 					}
 					
