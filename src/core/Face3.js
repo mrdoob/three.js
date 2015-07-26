@@ -23,32 +23,40 @@ THREE.Face3.prototype = {
 
 	constructor: THREE.Face3,
 
+	copy: function ( source ) {
+
+		this.a = source.a;
+		this.b = source.b;
+		this.c = source.c;
+
+		this.normal.copy( source.normal );
+		this.color.copy( source.color );
+
+		for ( var i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
+
+			this.vertexNormals[ i ] = source.vertexNormals[ i ].clone();
+
+		}
+
+		for ( var i = 0, il = source.vertexColors.length; i < il; i ++ ) {
+
+			this.vertexColors[ i ] = source.vertexColors[ i ].clone();
+
+		}
+
+		for ( var i = 0, il = source.vertexTangents.length; i < il; i ++ ) {
+
+			this.vertexTangents[ i ] = source.vertexTangents[ i ].clone();
+
+		}
+
+		return this;
+
+	},
+
 	clone: function () {
 
-		var face = new THREE.Face3( this.a, this.b, this.c );
-
-		face.normal.copy( this.normal );
-		face.color.copy( this.color );
-
-		for ( var i = 0, il = this.vertexNormals.length; i < il; i ++ ) {
-
-			face.vertexNormals[ i ] = this.vertexNormals[ i ].clone();
-
-		}
-
-		for ( var i = 0, il = this.vertexColors.length; i < il; i ++ ) {
-
-			face.vertexColors[ i ] = this.vertexColors[ i ].clone();
-
-		}
-
-		for ( var i = 0, il = this.vertexTangents.length; i < il; i ++ ) {
-
-			face.vertexTangents[ i ] = this.vertexTangents[ i ].clone();
-
-		}
-
-		return face;
+		return new THREE.Face3().copy( this );
 
 	}
 
