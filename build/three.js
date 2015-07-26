@@ -796,7 +796,7 @@ THREE.Color.prototype = {
 
 	clone: function () {
 
-		return new THREE.Color().setRGB( this.r, this.g, this.b );
+		return new THREE.Color().copy( this );
 
 	}
 
@@ -8404,8 +8404,7 @@ THREE.Object3D.prototype = {
 
 	clone: function ( recursive ) {
 
-		var object = new THREE.Object3D();
-		return object.copy( this, recursive );
+		return new THREE.Object3D().copy( this, recursive );
 
 	},
 
@@ -8487,32 +8486,40 @@ THREE.Face3.prototype = {
 
 	constructor: THREE.Face3,
 
+	copy: function ( source ) {
+
+		this.a = source.a;
+		this.b = source.b;
+		this.c = source.c;
+
+		this.normal.copy( source.normal );
+		this.color.copy( source.color );
+
+		for ( var i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
+
+			this.vertexNormals[ i ] = source.vertexNormals[ i ].clone();
+
+		}
+
+		for ( var i = 0, il = source.vertexColors.length; i < il; i ++ ) {
+
+			this.vertexColors[ i ] = source.vertexColors[ i ].clone();
+
+		}
+
+		for ( var i = 0, il = source.vertexTangents.length; i < il; i ++ ) {
+
+			this.vertexTangents[ i ] = source.vertexTangents[ i ].clone();
+
+		}
+
+		return this;
+
+	},
+
 	clone: function () {
 
-		var face = new THREE.Face3( this.a, this.b, this.c );
-
-		face.normal.copy( this.normal );
-		face.color.copy( this.color );
-
-		for ( var i = 0, il = this.vertexNormals.length; i < il; i ++ ) {
-
-			face.vertexNormals[ i ] = this.vertexNormals[ i ].clone();
-
-		}
-
-		for ( var i = 0, il = this.vertexColors.length; i < il; i ++ ) {
-
-			face.vertexColors[ i ] = this.vertexColors[ i ].clone();
-
-		}
-
-		for ( var i = 0, il = this.vertexTangents.length; i < il; i ++ ) {
-
-			face.vertexTangents[ i ] = this.vertexTangents[ i ].clone();
-
-		}
-
-		return face;
+		return new THREE.Face3().copy( this );
 
 	}
 
@@ -10208,8 +10215,7 @@ THREE.Geometry.prototype = {
 
 	clone: function () {
 
-		var geometry = new THREE.Geometry();
-		return geometry.copy( this );
+		return new THREE.Geometry().copy( this );
 
 	},
 
@@ -10304,7 +10310,6 @@ THREE.DirectGeometry = function () {
 
 	this.indices = [];
 	this.vertices = [];
-	this.colors = [];
 	this.normals = [];
 	this.colors = [];
 	this.uvs = [];
@@ -10697,7 +10702,7 @@ THREE.BufferGeometry.prototype = {
 
 	setFromObject: function ( object ) {
 
-		console.log( 'THREE.BufferGeometry.setFromObject(). Converting', object, this );
+		// console.log( 'THREE.BufferGeometry.setFromObject(). Converting', object, this );
 
 		var geometry = object.geometry;
 
@@ -11689,8 +11694,7 @@ THREE.BufferGeometry.prototype = {
 
 	clone: function () {
 
-		var geometry = new THREE.BufferGeometry();
-		return geometry.copy( this );
+		return new THREE.BufferGeometry().copy( this );
 
 	},
 
@@ -15084,8 +15088,7 @@ THREE.Material.prototype = {
 
 	clone: function () {
 
-		var material = new THREE.Material();
-		return material.copy( this );
+		return new THREE.Material().copy( this );
 
 	},
 
@@ -15642,60 +15645,64 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 THREE.MeshPhongMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.MeshPhongMaterial.prototype.constructor = THREE.MeshPhongMaterial;
 
+THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
+
+	THREE.Material.prototype.copy.call( this, source );
+
+	this.color.copy( source.color );
+	this.emissive.copy( source.emissive );
+	this.specular.copy( source.specular );
+	this.shininess = source.shininess;
+
+	this.metal = source.metal;
+
+	this.map = source.map;
+
+	this.lightMap = source.lightMap;
+	this.lightMapIntensity = source.lightMapIntensity;
+
+	this.aoMap = source.aoMap;
+	this.aoMapIntensity = source.aoMapIntensity;
+
+	this.emissiveMap = source.emissiveMap;
+
+	this.bumpMap = source.bumpMap;
+	this.bumpScale = source.bumpScale;
+
+	this.normalMap = source.normalMap;
+	this.normalScale.copy( source.normalScale );
+
+	this.specularMap = source.specularMap;
+
+	this.alphaMap = source.alphaMap;
+
+	this.envMap = source.envMap;
+	this.combine = source.combine;
+	this.reflectivity = source.reflectivity;
+	this.refractionRatio = source.refractionRatio;
+
+	this.fog = source.fog;
+
+	this.shading = source.shading;
+
+	this.wireframe = source.wireframe;
+	this.wireframeLinewidth = source.wireframeLinewidth;
+	this.wireframeLinecap = source.wireframeLinecap;
+	this.wireframeLinejoin = source.wireframeLinejoin;
+
+	this.vertexColors = source.vertexColors;
+
+	this.skinning = source.skinning;
+	this.morphTargets = source.morphTargets;
+	this.morphNormals = source.morphNormals;
+
+	return this;
+
+};
+
 THREE.MeshPhongMaterial.prototype.clone = function () {
 
-	var material = new THREE.MeshPhongMaterial();
-
-	material.copy( this );
-
-	material.color.copy( this.color );
-	material.emissive.copy( this.emissive );
-	material.specular.copy( this.specular );
-	material.shininess = this.shininess;
-
-	material.metal = this.metal;
-
-	material.map = this.map;
-
-	material.lightMap = this.lightMap;
-	material.lightMapIntensity = this.lightMapIntensity;
-
-	material.aoMap = this.aoMap;
-	material.aoMapIntensity = this.aoMapIntensity;
-
-	material.emissiveMap = this.emissiveMap;
-
-	material.bumpMap = this.bumpMap;
-	material.bumpScale = this.bumpScale;
-
-	material.normalMap = this.normalMap;
-	material.normalScale.copy( this.normalScale );
-
-	material.specularMap = this.specularMap;
-
-	material.alphaMap = this.alphaMap;
-
-	material.envMap = this.envMap;
-	material.combine = this.combine;
-	material.reflectivity = this.reflectivity;
-	material.refractionRatio = this.refractionRatio;
-
-	material.fog = this.fog;
-
-	material.shading = this.shading;
-
-	material.wireframe = this.wireframe;
-	material.wireframeLinewidth = this.wireframeLinewidth;
-	material.wireframeLinecap = this.wireframeLinecap;
-	material.wireframeLinejoin = this.wireframeLinejoin;
-
-	material.vertexColors = this.vertexColors;
-
-	material.skinning = this.skinning;
-	material.morphTargets = this.morphTargets;
-	material.morphNormals = this.morphNormals;
-
-	return material;
+	return new THREE.MeshPhongMaterial().copy( this );
 
 };
 
@@ -16233,8 +16240,7 @@ THREE.Texture.prototype = {
 
 	clone: function () {
 
-		var texture = new THREE.Texture();
-		return texture.copy( this );
+		return new THREE.Texture().copy( this );
 
 	},
 
@@ -23842,32 +23848,39 @@ THREE.WebGLRenderTarget.prototype = {
 
 	},
 
+	copy: function ( source ) {
+
+		this.width = source.width;
+		this.height = source.height;
+
+		this.wrapS = source.wrapS;
+		this.wrapT = source.wrapT;
+
+		this.magFilter = source.magFilter;
+		this.minFilter = source.minFilter;
+
+		this.anisotropy = source.anisotropy;
+
+		this.offset.copy( source.offset );
+		this.repeat.copy( source.repeat );
+
+		this.format = source.format;
+		this.type = source.type;
+
+		this.depthBuffer = source.depthBuffer;
+		this.stencilBuffer = source.stencilBuffer;
+
+		this.generateMipmaps = source.generateMipmaps;
+
+		this.shareDepthFrom = source.shareDepthFrom;
+
+		return this;
+
+	},
+
 	clone: function () {
 
-		var tmp = new THREE.WebGLRenderTarget( this.width, this.height );
-
-		tmp.wrapS = this.wrapS;
-		tmp.wrapT = this.wrapT;
-
-		tmp.magFilter = this.magFilter;
-		tmp.minFilter = this.minFilter;
-
-		tmp.anisotropy = this.anisotropy;
-
-		tmp.offset.copy( this.offset );
-		tmp.repeat.copy( this.repeat );
-
-		tmp.format = this.format;
-		tmp.type = this.type;
-
-		tmp.depthBuffer = this.depthBuffer;
-		tmp.stencilBuffer = this.stencilBuffer;
-
-		tmp.generateMipmaps = this.generateMipmaps;
-
-		tmp.shareDepthFrom = this.shareDepthFrom;
-
-		return tmp;
+		return new THREE.WebGLRenderTarget().copy( this );
 
 	},
 
