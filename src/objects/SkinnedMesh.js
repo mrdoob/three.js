@@ -154,3 +154,56 @@ THREE.SkinnedMesh.prototype.copy = function( source ) {
 	return this;
 
 };
+
+THREE.SkinnedMesh.prototype.makeVertexGetter = function () {
+
+	// calculate transformed vertex in the getter
+
+	var result = new THREE.Vector3(), skinIndices = new THREE.Vector4(), skinWeights = new THREE.Vector4();
+	var temp = new THREE.Vector3(), tempMatrix = new THREE.Matrix4(), properties = [ 'x', 'y', 'z', 'w' ];
+
+	if ( this.geometry.attributes ) {
+		var positions = this.geometry.attributes.position.array;
+		var skinIndicesArray = this.geometry.attributes.skinIndex.array;
+		var skinWeightsArray = this.geometry.attributes.skinWeights.array;
+
+		this.getVertex = function getVertex( vector, index ) {
+			var index4 = index << 2;
+			skinIndices.fromArray( skinIndicesArray, index4 );
+			skinWeights.fromArray( skinWeightsArray, index4 );
+			vector.fromArray( positions, index * 3 );
+
+			vector.applyMatrix4( this.bindMatrix ); result.set( 0, 0, 0 );
+			for ( var i = 0; i < 4; i++ ) {
+				var skinWeight = skinWeights[ properties[ i ] ];
+				if (skinWeight != 0) {
+					var boneIndex = skinIndices[ properties[ i ] ];
+					tempMatrix.multiplyMatrices( this.skeleton.bones[ boneIndex ].matrixWorld, this.skeleton.boneInverses[ boneIndex ]);
+					result.add( temp.copy( vector ).applyMatrix4( tempMatrix ).multiplyScalar( skinWeight ) );
+				}
+			}
+			vector.copy( result.applyMatrix4( this.bindMatrixInverse ) );
+		};
+	} else {
+		var vertices = this.geometry.vertices;
+		var skinIndicesArray = this.geometry.skinIndices;
+		var skinWeightsArray = this.geometry.skinWeights;
+
+		this.getVertex = function getVertex( vector, index ) {
+			vector.copy( vertices[ index ] );
+			skinIndices.copy( skinIndicesArray[ index ] );
+			skinWeights.copy( skinWeightsArray[ index ] );
+
+			vector.applyMatrix4( this.bindMatrix ); result.set( 0, 0, 0 );
+			for ( var i = 0; i < 4; i++ ) {
+				var skinWeight = skinWeights[ properties[ i ] ];
+				if (skinWeight != 0) {
+					var boneIndex = skinIndices[ properties[ i ] ];
+					tempMatrix.multiplyMatrices( this.skeleton.bones[ boneIndex ].matrixWorld, this.skeleton.boneInverses[ boneIndex ]);
+					result.add( temp.copy( vector ).applyMatrix4( tempMatrix ).multiplyScalar( skinWeight ) );
+				}
+			}
+			vector.copy( result.applyMatrix4( this.bindMatrixInverse ) );
+		};
+	}
+};
