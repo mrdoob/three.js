@@ -395,8 +395,7 @@ THREE.SEA3D.AnimationHandler = {
 			mesh.previousAnimation.weight = 1 - mesh.currentAnimation.weight;
 
 		}
-
-		THREE.AnimationHandler.update( dt );
+		
 		SEA3D.AnimationHandler.update( dt ); 
 
 	},

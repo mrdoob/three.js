@@ -438,13 +438,13 @@
 				// Sound3D Spatial Transform Update
 				loader.audioListener.position.copy( audioPos.setFromMatrixPosition( camera.matrixWorld ) );
 				loader.audioListener.rotation.copy( audioRot.setFromRotationMatrix( camera.matrixWorld ) );
-				
+
 				// Update sound filter from raycaster intersecting				
 				updateSoundFilter( collisionArea, soundArea );
-				
-				// SEA3D Keyframe Update		
-				SEA3D.AnimationHandler.update( delta ); 
-				
+
+				// Update SEA3D Animations
+				THREE.SEA3D.AnimationHandler.update( delta );				
+
 				render( delta );
 
 				stats.update();

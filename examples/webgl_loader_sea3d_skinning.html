@@ -201,8 +201,11 @@
 				
 				requestAnimationFrame( animate );
 
-				// update Three.JS+SEA3D animation
+				// Update SEA3D Animations
 				THREE.SEA3D.AnimationHandler.update( delta );
+				
+				// Update Three.JS Animations
+				THREE.AnimationHandler.update( delta ); 
 				
 				controls.update();
 
