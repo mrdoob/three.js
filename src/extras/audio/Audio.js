@@ -69,11 +69,11 @@ THREE.Audio.prototype.play = function () {
 	source.onended = this.source.onended;
 	source.start( 0, this.startTime );
 	source.playbackRate.value = this.playbackRate;
-	
+
 	this.isPlaying = true;
 
 	this.source = source;
-	
+
 	this.connect();
 
 };
@@ -95,13 +95,13 @@ THREE.Audio.prototype.stop = function () {
 THREE.Audio.prototype.connect = function () {
 
 	if ( this.filter !== undefined ) {
-			
+
 		this.source.connect( this.filter );
 		this.filter.connect( this.panner );
 
 	} else {
 
-		this.source.connect( this.panner );		
+		this.source.connect( this.panner );
 
 	}
 
@@ -110,23 +110,23 @@ THREE.Audio.prototype.connect = function () {
 THREE.Audio.prototype.disconnect = function () {
 
 	if ( this.filter !== undefined ) {
-			
+
 		this.source.disconnect( this.filter );
 		this.filter.disconnect( this.panner );
 
 	} else {
 
-		this.source.disconnect( this.panner );		
+		this.source.disconnect( this.panner );
 
 	}
 
 };
 
 THREE.Audio.prototype.setFilter = function ( value ) {
-	
-	if (this.isPlaying) {
 
-		this.disconnect();		
+	if ( this.isPlaying === true ) {
+
+		this.disconnect();
 		this.filter = value;
 		this.connect();
 
@@ -148,7 +148,11 @@ THREE.Audio.prototype.setPlaybackRate = function ( value ) {
 
 	this.playbackRate = value;
 
-	if (this.isPlaying) this.source.playbackRate.value = this.playbackRate;
+	if ( this.isPlaying === true ) {
+
+		this.source.playbackRate.value = this.playbackRate;
+
+	}
 
 };
 
