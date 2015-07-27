@@ -40,22 +40,28 @@ THREE.PropertyBinding.prototype = {
 
 	accumulate: function( value, weight ) {
 		
-		if( this.cumulativeWeight === 0 ) {
+		var lerp = THREE.AnimationUtils.getLerpFunc( this.cumulativeValue, true );
 
-			this.cumulativeValue = value;
-			this.cumulativeWeight = weight;
+		this.accumulate = function( value, weight ) {
 
+			if( this.cumulativeWeight === 0 ) {
+
+				this.cumulativeValue = value;
+				this.cumulativeWeight = weight;
+
+			}
+			else {
+
+				var lerpAlpha = weight / ( this.cumulativeWeight + weight );
+				this.cumulativeValue = lerp( this.cumulativeValue, value, lerpAlpha );
+				this.cumulativeWeight += weight;
+
+			}
 		}
-		else {
 
-			var lerpAlpha = weight / ( this.cumulativeWeight + weight );
-			this.cumulativeValue = THREE.AnimationUtils.lerp( this.cumulativeValue, value, lerpAlpha );
-			this.cumulativeWeight += weight;
-
-		}
+		this.accumulate( value, weight );
 
 	},
-
 
 	apply: function() {
 

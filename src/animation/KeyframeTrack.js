@@ -13,9 +13,9 @@ THREE.KeyframeTrack = function ( name, keys ) {
 	this.name = name;
 	this.keys = keys || [];	// time in seconds, value as value
 
-	// TODO: sort keys via their times
-	//this.keys.sort( function( a, b ) { return a.time < b.time; } );
-
+	this.sort();
+	this.validate();
+	this.optimize();
 };
 
 THREE.KeyframeTrack.prototype = {
@@ -52,7 +52,7 @@ THREE.KeyframeTrack.prototype = {
 				// linear interpolation to start with
 				var alpha = ( time - this.keys[ i - 1 ].time ) / ( this.keys[ i ].time - this.keys[ i - 1 ].time );
 
-				var interpolatedValue = THREE.AnimationUtils.lerp( this.keys[ i - 1 ].value, this.keys[ i ].value, alpha );
+				var interpolatedValue = this.lerp( this.keys[ i - 1 ].value, this.keys[ i ].value, alpha );
 
 				/*console.log( '   interpolated: ', {
 					value: interpolatedValue, 
@@ -69,6 +69,139 @@ THREE.KeyframeTrack.prototype = {
 		}
 
 		throw new Error( "should never get here." );
+
+	},
+
+	// memoization of the lerp function for speed.
+	// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
+	lerp: function( value0, value1, alpha ) {
+
+		this.lerp = THREE.AnimationUtils.getLerpFunc( value0, false );
+
+		return this.lerp( value0, value1, alpha );
+
+	},
+
+	// sort in ascending order
+	sort: function() {
+
+		var keyComparator = function(key0, key1) {
+			return key0.time - key1.time;
+		};
+
+		return function() {
+
+			this.keys.sort( keyComparator );
+		}
+
+	}();
+
+	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
+	// TODO: ensure that all key.values in a track are all of the same type (otherwise interpolation makes no sense.)
+	validate: function() {
+
+		var prevKey = null;
+
+		if( this.keys.length === 0 ) {
+			console.error( "  track is empty, no keys", this );
+			return;
+		}
+
+		for( var i = 0; i < this.keys.length; i ++ ) {
+
+			var currKey = this.keys[i];
+
+			if( ! currKey ) {
+				console.error( "  key is null in track", this, i );
+				return;
+			}
+
+			if( ( typeof currKey.time ) !== 'Number' || currKey.time == NaN ) {
+				console.error( "  key.time is not a valid number", this, i, currKey );
+				return;
+			}
+
+			if( currKey.value === undefined || currKey.value === null) {
+				console.error( "  key.value is null in track", this, i, currKey );
+				return;
+			}
+
+			if( prevKey && prevKey.time > currKey.time ) {
+				console.error( "  key.time is less than previous key time, out of order keys", this, i, currKey, prevKey );
+				return;
+			}
+
+			prevKey = currKey;
+
+		}
+
+	},
+
+	// currently only removes equivalent sequential keys (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0), which are common in morph target animations
+	// TODO: linear based interpolation optimization with an error threshold.
+	optimize: function() {
+
+		var newKeys = [];
+		var prevKey = this.keys[0];
+		newKeys.push( prevKey );
+
+		var equalsFunc = THREE.AnimationUtils.equalsFunc( prevKey.value );
+
+		for( var i = 1; i < this.keys.length - 1; i ++ ) {
+			var currKey = this.keys[i];
+			var nextKey = this.keys[i+1];
+
+			// if prevKey & currKey are the same time, remove currKey.  If you want immediate adjacent keys, use an epsilon offset
+			// it is not possible to have two keys at the same time as we sort them.  The sort is not stable on keys with the same time.
+			if( ( prevKey.time === currKey.time ) ) {
+				console.log(  'removing key at the same time', currKey );
+				continue;
+			}
+
+			// remove completely unnecessary keyframes that are the same as their prev and next keys
+			if( equalsFunc( prevKey.value, currKey.value ) && equals( currKey.value, nextKey.value ) ) {
+				console.log(  'removing key identical to prev and next', currKey );
+				continue;
+			}
+
+			// TODO:add here a check for linear interpolation optimization.
+
+			newKeys.push( currKey );
+			prevKey = currKey;
+		}
+
+		console.log( '  track optimization removed keys:', ( this.keys.length - newKeys.length ), this.name );
+		this.keys = newKeys;
+
+	},
+
+	// removes keyframes before and after animation without changing any values within the range [0,duration].
+	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
+ 	trim: function( duration ) {
+		
+		var firstKeysToRemove = 0;
+		for( var i = 1; i < this.keys.length; i ++ ) {
+			if( this.keys[i] <= 0 ) {
+				firstKeysToRemove ++;
+			}
+		}
+
+		var lastKeysToRemove = 0;
+		for( var i = this.keys.length - 2; i > 0; i ++ ) {
+			if( this.keys[i] >= duration ) {
+				lastKeysToRemove ++;
+			}
+			else {
+				break;
+			}
+		}
+
+		// remove last keys first because it doesn't affect the position of the first keys (the otherway around doesn't work as easily)
+		// TODO: Figure out if there is an array subarray function... might be faster
+		var keysWithoutLastKeys = this.keys.splice( this.keys.length - lastKeysToRemove, lastKeysToRemove );
+		var keysWithoutFirstKeys = keysWithoutLastKeys.splice( 0, firstKeysToRemove );
+		this.keys = keysWithoutFirstKeys;
+
 
 	}
 

@@ -46,8 +46,8 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-
 		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/AnimationClipCreator.js"></script>
 
 		<script>
 
@@ -257,21 +257,21 @@
 
 				mixer = new THREE.AnimationMixer( mesh );
 
-				var clip1 = THREE.AnimationClip.CreateShakeAnimation( 10, new THREE.Vector3( 10, 10, 10 ) );
+				var clip1 = THREE.AnimationClipCreator.CreateShakeAnimation( 10, new THREE.Vector3( 10, 10, 10 ) );
 				//mixer.addAction( new THREE.AnimationAction( clip1, 0, 1, 1, true ) );
-				var clip2 = THREE.AnimationClip.CreatePulsationAnimation( 10, 100 );
+				var clip2 = THREE.AnimationClipCreator.CreatePulsationAnimation( 10, 100 );
 				//mixer.addAction( new THREE.AnimationAction( clip2, 0, 1, 1, true ) );
-				var clip3 = THREE.AnimationClip.CreateRotationAnimation( 100, 'y' );
+				var clip3 = THREE.AnimationClipCreator.CreateRotationAnimation( 100, 'y' );
 				//mixer.addAction( new THREE.AnimationAction( clip3, 0, 1, 1, true ) );
-				var clip4 = THREE.AnimationClip.CreateScaleAxisAnimation( 10, 'x' );
+				var clip4 = THREE.AnimationClipCreator.CreateScaleAxisAnimation( 10, 'x' );
 				//mixer.addAction( new THREE.AnimationAction( clip4, 0, 1, 1, true ) );
-				var clip5 = THREE.AnimationClip.CreateMaterialColorAnimation( 10, [ new THREE.Color( 0xffffff ), new THREE.Color( 0xff0000 ), new THREE.Color( 0xff00ff ) ] );
+				var clip5 = THREE.AnimationClipCreator.CreateMaterialColorAnimation( 10, [ new THREE.Color( 0xffffff ), new THREE.Color( 0xff0000 ), new THREE.Color( 0xff00ff ) ] );
 				//mixer.addAction( new THREE.AnimationAction( clip5, 0, 1, 1, true ) );
 
 				//var clip6 = THREE.AnimationClip.CreateVisibilityAnimation( 10 );
 				//mixer.addAction( new THREE.AnimationAction( clip6, 0, 1, 1, true ) );
 				
-				var clip7 = THREE.AnimationClip.CreateMorphAnimation( mesh.geometry.morphTargets, 3 );
+				var clip7 = THREE.AnimationClipCreator.CreateMorphAnimation( mesh.geometry.morphTargets, 3 );
 				mixer.addAction( new THREE.AnimationAction( clip7, 0, 1, 1, true ) );
 			}
 

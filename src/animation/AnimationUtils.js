@@ -5,43 +5,79 @@
 
  THREE.AnimationUtils = {
 
- 	// TODO/OPTIMIZATION: do the switch statement once per user of this and cache the resulting function and call it directly.
- 	// TODO/OPTIMIZATION: Accumulator should be writable and it will get rid of the *.clone() calls that are likely slow.
- 	lerp: function( accumulator, b, alpha, interTrack ) {
+ 	equalsFunc: function( exemplarValue ) {
 
-		var typeName = typeof accumulator;
+		if( exemplarValue.equals ) {
+			return function( a, b ) {
+				return a.equals( b );
+			}
+		}
+
+		return function( a, b ) {
+			return ( a === b );	
+		};
+
+	},
+
+
+ 	lerp: function( a, b, alpha, interTrack ) {
+
+		var lerpFunc = THREE.AnimationUtils.getLerpFunc( a, interTrack );
+
+		return lerpFunc( a, b, alpha );
+
+	},
+
+ 	// TODO/OPTIMIZATION: Accumulator should be writable and it will get rid of the *.clone() calls that are likely slow.
+	getLerpFunc: function( exemplarValue, interTrack ) {
+
+		var typeName = typeof exemplarValue;
 		switch( typeName ) {
 		 	case "object": {
 
-				if( accumulator.lerp ) {
+				if( exemplarValue.lerp ) {
 
-					return accumulator.clone().lerp( b, alpha );
+					return function( a, b, alpha ) {
+						return a.clone().lerp( b, alpha );
+					}
 
 				}
-				if( accumulator.slerp ) {
+				if( exemplarValue.slerp ) {
 
-					return accumulator.clone().slerp( b, alpha );
+					return function( a, b, alpha ) {
+						return a.clone().slerp( b, alpha );
+					}
 
 				}
 				break;
 			}
 		 	case "number": {
-				return accumulator * ( 1 - alpha ) + b * alpha;
+				return function( a, b, alpha ) {
+					return a * ( 1 - alpha ) + b * alpha;
+				}
 		 	}	
 		 	case "boolean": {
 		 		if( interTrack ) {
-		 			return ( alpha < 0.5 ) ? accumulator : b;
+					return function( a, b, alpha ) {
+			 			return ( alpha < 0.5 ) ? a : b;
+			 		}
 		 		}
 		 		else {
-		 			return accumulator;
+					return function( a, b, alpha ) {
+			 			return a;
+			 		}
 		 		}
 		 	}
 		 	case "string": {
 		 		if( interTrack ) {
-		 			return ( alpha < 0.5 ) ? accumulator : b;
+					return function( a, b, alpha ) {
+			 			return ( alpha < 0.5 ) ? a : b;
+			 		}
 		 		}
 		 		else {
-			 		return accumulator;		 		
+					return function( a, b, alpha ) {
+				 		return a;		 		
+				 	}
 			 	}
 		 	}
 		};
