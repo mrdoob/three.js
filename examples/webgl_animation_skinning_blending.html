@@ -47,6 +47,7 @@
 			var container, stats;
 
 			var blendMesh, helper, camera, scene, renderer, controls;
+			var ball, mouse, raycaster;
 
 			var clock = new THREE.Clock();
 			var gui = null;
@@ -99,6 +100,33 @@
 
 				blendMesh = new THREE.BlendCharacter();
 				blendMesh.load( "models/skinned/marine/marine_anims.js", start );
+
+				ball = new THREE.Mesh( new THREE.SphereGeometry( 4, 3, 2 ), new THREE.MeshBasicMaterial( { color: 255 } ) );
+				scene.add( ball );
+
+				mouse = { x: 0, y: 0 };
+				raycaster = new THREE.Raycaster();
+
+				window.addEventListener( 'mousemove', onTouchMove );
+				window.addEventListener( 'touchmove', onTouchMove );
+
+				function onTouchMove( event ) {
+
+					if ( event.changedTouches ) {
+
+						x = event.changedTouches[ 0 ].pageX;
+						y = event.changedTouches[ 0 ].pageY;
+
+					} else {
+
+						x = event.clientX;
+						y = event.clientY;
+
+					}
+
+					mouse.x = ( x / window.innerWidth ) * 2 - 1;
+					mouse.y = - ( y / window.innerHeight ) * 2 + 1;
+				}
 
 			}
 
@@ -248,6 +276,17 @@
 				gui.update();
 
 				THREE.AnimationHandler.update( stepSize );
+
+				// raycast
+
+				raycaster.setFromCamera( mouse, camera );
+				var intersects = raycaster.intersectObjects( [ blendMesh ] );
+				if ( intersects.length > 0 ) {
+					ball.visible = true;
+					ball.position.copy( intersects[ 0 ].point );
+				} else {
+					ball.visible = false;
+				}
 
 				renderer.render( scene, camera );
 				stats.update();
