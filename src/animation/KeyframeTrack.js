@@ -11,7 +11,11 @@
 THREE.KeyframeTrack = function ( name, keys ) {
 
 	this.name = name;
-	this.keys = keys || [];	// time in seconds, value as value
+	this.keys = keys;	// time in seconds, value as value
+
+	// local cache of value type to avoid allocations during runtime.
+	this.result = THREE.AnimationUtils.clone( this.keys[0].value );
+	//console.log( 'constructor result', this.result )
 
 	this.sort();
 	this.validate();
@@ -22,6 +26,8 @@ THREE.KeyframeTrack.prototype = {
 
 	constructor: THREE.KeyframeTrack,
 
+	// TODO: this is a straight forward linear search for the key that corresponds to this time, this
+	//    should be optimized.
 	getAt: function( time ) {
 		//console.log( 'KeyframeTrack[' + this.name + '].getAt( ' + time + ' )' );
 
@@ -32,7 +38,11 @@ THREE.KeyframeTrack.prototype = {
 		if( this.keys[0].time >= time ) {
 
 			//console.log( '   before: ' + this.keys[0].value );
-			return this.keys[0].value;
+			this.setResult( this.keys[0].value );
+
+			//console.log( 'first result', this.result )
+
+			return this.result;
 
 		}
 
@@ -40,11 +50,16 @@ THREE.KeyframeTrack.prototype = {
 		if( this.keys[ this.keys.length - 1 ].time <= time ) {
 
 			//console.log( '   after: ' + this.keys[ this.keys.length - 1 ].value );
-			return this.keys[ this.keys.length - 1 ].value;
+			this.setResult( this.keys[ this.keys.length - 1 ].value );
+
+			//console.log( 'last result', this.result )
+
+			return this.result;
 
 		}
 
 		// interpolate to the required time
+		// TODO: Optimize this better than a linear search for each key.
 		for( var i = 1; i < this.keys.length; i ++ ) {
 
 			if( time <= this.keys[ i ].time ) {
@@ -52,8 +67,10 @@ THREE.KeyframeTrack.prototype = {
 				// linear interpolation to start with
 				var alpha = ( time - this.keys[ i - 1 ].time ) / ( this.keys[ i ].time - this.keys[ i - 1 ].time );
 
-				var interpolatedValue = this.lerp( this.keys[ i - 1 ].value, this.keys[ i ].value, alpha );
+				this.setResult( this.keys[ i - 1 ].value );
 
+				this.result = this.lerp( this.result, this.keys[ i ].value, alpha );
+				//console.log( 'lerp result', this.result )
 				/*console.log( '   interpolated: ', {
 					value: interpolatedValue, 
 					alpha: alpha,
@@ -63,13 +80,21 @@ THREE.KeyframeTrack.prototype = {
 					value1: this.keys[ i ].value
 				} );*/
 
-				return interpolatedValue;
+				return this.result;
 
 			}
 		}
 
 		throw new Error( "should never get here." );
 
+	},
+	setResult: function( value ) {
+		if( this.result.copy ) {
+			this.result.copy( value );
+		}
+		else {
+			this.result = value;
+		}
 	},
 
 	// memoization of the lerp function for speed.

@@ -19,6 +19,19 @@
 
 	},
 
+ 	clone: function( exemplarValue ) {
+
+ 		var typeName = typeof exemplarValue;
+		if( typeName === "object" ) {
+			if( exemplarValue.clone ) {
+				return exemplarValue.clone();
+			}
+			console.error( "can not figure out how to copy exemplarValue", exemplarValue );
+		}
+
+		return exemplarValue;
+
+	},
 
  	lerp: function( a, b, alpha, interTrack ) {
 
@@ -41,7 +54,7 @@
 
 					return function( a, b, alpha ) {
 						//console.log( a, b );
-						return a.clone().lerp( b, alpha );
+						return a.lerp( b, alpha );
 					}
 
 				}
@@ -49,7 +62,7 @@
 
 					return function( a, b, alpha ) {
 						//console.log( a, b );
-						return a.clone().slerp( b, alpha );
+						return a.slerp( b, alpha );
 					}
 
 				}

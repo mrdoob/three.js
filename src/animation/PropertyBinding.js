@@ -46,15 +46,19 @@ THREE.PropertyBinding.prototype = {
 
 			if( this.cumulativeWeight === 0 ) {
 
-				this.cumulativeValue = value;
+				if( this.cumulativeValue === null ) {
+					this.cumulativeValue = THREE.AnimationUtils.clone( value );
+				}
 				this.cumulativeWeight = weight;
-
+				//console.log( this );
+	
 			}
 			else {
 
 				var lerpAlpha = weight / ( this.cumulativeWeight + weight );
 				this.cumulativeValue = lerp( this.cumulativeValue, value, lerpAlpha );
 				this.cumulativeWeight += weight;
+				//console.log( this );
 
 			}
 		}
