@@ -24,36 +24,28 @@ THREE.AnimationAction.prototype = {
 
 		//console.log( 'AnimationAction[' + this.clip.name + '].toAnimationClipTime( ' + time + ' )' );
 
-		var clipTime = time - this.startTime;
+		var clipTime = ( time - this.startTime ) * this.timeScale;
 		//console.log( '   clipTime: ' + clipTime );
 
-		clipTime *= this.timeScale;
-		//console.log( '   clipTime: ' + clipTime );
+		var duration = this.clip.duration;
 
 		if( this.loop ) {
 
 			if( clipTime < 0 ) {
 
-				clipTime = clipTime - Math.floor( clipTime / this.clip.duration ) * this.clip.duration;
+				clipTime -= Math.floor( clipTime / duration ) * duration;
 				//console.log( '   clipTime: ' + clipTime );
 
 			}
 
-	   		clipTime = clipTime % this.clip.duration;
-			//console.log( '   clipTime: ' + clipTime );
+	   		return clipTime % duration;
 
 	   	}
 	   	else {
 
-	   		clipTime = Math.min( clipTime, this.clip.duration );
-	   		clipTime = Math.max( clipTime, 0 );
-			//console.log( '   clipTime: ' + clipTime );
+	   		return Math.min( clipTime, Math.max( duration, 0 ) );
 
 	   	}
-
-		//console.log( '   clipTime: ' + clipTime );
-
-   		return clipTime;
 	},
 
 	getAt: function( time ) {
