@@ -37,26 +37,172 @@ THREE.AnimationClip.prototype = {
 
 		return results;
 	},
+
+	clean: function() {
+		// sort all keys by time
+		// move any keys before 0 to zero
+
+		// remove minus times
+
+		if ( data.hierarchy[ h ].keys[ k ].time < 0 ) {
+
+			 data.hierarchy[ h ].keys[ k ].time = 0;
+
+		}
+
+		// remove second key if there is more than one key at the same time
+		// remove all keys that are on the same time
+
+		for ( var k = 1; k < data.hierarchy[ h ].keys.length; k ++ ) {
+
+			if ( data.hierarchy[ h ].keys[ k ].time === data.hierarchy[ h ].keys[ k - 1 ].time ) {
+
+				data.hierarchy[ h ].keys.splice( k, 1 );
+				k --;
+
+			}
+
+		}
+
+
+		// set index
+
+		for ( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
+
+			data.hierarchy[ h ].keys[ k ].index = k;
+
+		}
+	}
+
 /*
-/	importFromData: function( data ) {
+	"animation" : {
+	    "name"      : "Action",
+        "fps"       : 25,
+        "length"    : 2.0,
+        "hierarchy" : [
+            {
+                "parent" : -1,
+                "keys"   : [
+                    {
+                        "time":0,
+                        "pos" :[0.532239,5.88733,-0.119685],
+                        "rot" :[-0.451519,0.544179,0.544179,0.451519],
+                        "scl" :[1,1,1]
+                    },
+*/
+	importFromData: function( data ) {
 
-		// TODO: Convert this copy-paste code from AnimationHandler into an importer into Tracks and AnimationClips with some improvements to the track names
+		var convertTrack = function( trackName, dataKeys, dataKeyToValueFunc ) {
 
-		if ( data.initialized === true ) return data;
+			var keys = [];
+
+			for( var k = 0; k < dataKeys.length; k ++ ) {
+
+				var dataKey = dataKeys[k];
+				keys.push( { time: dataKey.time, value: dataKeyToValueFunc( dataKey ) } );
+		
+			}
+
+			return new THREE.KeyframeTrack( trackName, keys );
+
+		};
+
+		var clipName = data.name;
+		var duration = data.length;
+		var fps = data.fps;
+
+		var tracks = [];
+
+		var dataTracks = data.hierarchy;
+
+		for ( var h = 0; h < dataTracks.length; h ++ ) {
+
+			var boneName = '.bone[' + h + ']';
+			var dataKeys = dataTracks[ h ].keys;
+
+			// skip empty tracks
+			if( ! dataKeys || dataKeys.length == 0 ) {
+				continue;
+			}
+
+			// process morph targets in a way exactly compatible with AnimationHandler.init( data )
+			if( dataKeys[0].morphTargets ) {
+
+				// figure out all morph targets used in this track
+				var morphTargetNames = {};
+				for( var k = 0; k < dataKeys.length; k ++ ) {
+
+					if( dataKeys[k].morphTargets ) {
+						for( var m = 0; m < dataKeys[k].morphTargets.length; m ++ ) {
+
+							morphTagetNames[ dataKeys[k].morphTargets[m] ] = -1;
+						}
+					}
+
+				}
+
+				// create a track for each morph target with all zero morphTargetInfluences except for the keys in which the morphTarget is named.
+				for( var morphTargetName in morphTargetNames ) {
+
+					var keys = [];
+
+					for( var m = 0; m < dataKeys[k].morphTargets.length; m ++ ) {
+
+						var dataKey = dataKeys[k];
+
+						keys.push( {
+								time: dataKey.time,
+								value: (( dataKey.morphTarget === morphTargetName ) ? 1 : 0 )
+							});
+					
+					}
+
+					tracks.push( new THREE.KeyframeTrack( '.morphTargetInfluence[' + morphTargetName + ']', keys ) );
+
+				}
+
+			}
+			
+			// track contains positions...
+			if( dataKeys[0].pos ) {
+
+				tracks.push( convertTracks( boneName + '.position', dataKeys, function( dataValue ) {
+						return new THREE.Vector3().fromArray( dataKey.pos )
+					} );
+
+			}
+			
+			// track contains quaternions...
+			if( dataKeys[0].rot ) {
+
+				tracks.push( convertTracks( boneName + '.quaternion', dataKeys, function( dataValue ) {
+						return new THREE.Quaternion().fromArray( dataKey.rot )
+					} );
+
+			}
+
+			// track contains quaternions...
+			if( dataKeys[0].scl ) {
+
+				tracks.push( convertTracks( boneName + '.quaternion', dataKeys, function( dataValue ) {
+						return new THREE.Vector3().fromArray( dataKey.scl )
+					} );
+
+			}
+		}
+
+		var clip = new THREE.AnimationClip( clipName, duration, tracks );
+		console.log( 'clipFromHierarchy', clip );
+
+		return clip;
+
+	}
 
 		// loop through all keys
 
 		for ( var h = 0; h < data.hierarchy.length; h ++ ) {
 
 			for ( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
-
-				// remove minus times
-
-				if ( data.hierarchy[ h ].keys[ k ].time < 0 ) {
-
-					 data.hierarchy[ h ].keys[ k ].time = 0;
-
-				}
 
 				// create quaternions
 
@@ -122,29 +268,6 @@ THREE.AnimationClip.prototype = {
 					data.hierarchy[ h ].keys[ k ].morphTargetsInfluences = influences;
 
 				}
-
-			}
-
-
-			// remove all keys that are on the same time
-
-			for ( var k = 1; k < data.hierarchy[ h ].keys.length; k ++ ) {
-
-				if ( data.hierarchy[ h ].keys[ k ].time === data.hierarchy[ h ].keys[ k - 1 ].time ) {
-
-					data.hierarchy[ h ].keys.splice( k, 1 );
-					k --;
-
-				}
-
-			}
-
-
-			// set index
-
-			for ( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
-
-				data.hierarchy[ h ].keys[ k ].index = k;
 
 			}
 
