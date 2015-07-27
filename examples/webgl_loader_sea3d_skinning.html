@@ -35,7 +35,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -90,13 +90,14 @@
 
 				// get meshes
 				player = loader.getMesh("Player");
+
 				hat = loader.getMesh("Hat");
-				
+
 				// events
-				
+
 				window.addEventListener( 'click', onMouseClick, false );
 				window.addEventListener( 'contextmenu', onRightClick, false );
-				
+
 				animate();
 
 			};
@@ -115,10 +116,7 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 1000, - 300, 1000 );
 
-				controls = new THREE.TrackballControls( camera, document );
-				controls.noZoom = true;
-				controls.noPan = true;
-				controls.dynamicDampingFactor = 0.05;
+				controls = new THREE.OrbitControls( camera );				
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -195,28 +193,29 @@
 
 			//
 
+			var clock = new THREE.Clock();
+
 			function animate() {
 
+				var delta = clock.getDelta();
+				
 				requestAnimationFrame( animate );
 
+				// update Three.JS+SEA3D animation
+				THREE.SEA3D.AnimationHandler.update( delta );
+				
 				controls.update();
 
-				render();
+				render( delta );
 
 				stats.update();
 
 			}
 
-			var clock = new THREE.Clock();
-
-			function render() {
-
-				var delta = clock.getDelta();
-
-				THREE.AnimationHandler.update( delta );
+			function render( dlt ) {
 
 				//renderer.render( scene, camera );
-				composer.render( delta );
+				composer.render( dlt );
 
 			}
 
