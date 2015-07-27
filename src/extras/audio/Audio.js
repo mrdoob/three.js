@@ -148,7 +148,7 @@ THREE.Audio.prototype.setPlaybackRate = function ( value ) {
 
 	this.playbackRate = value;
 
-	if (this.isPlaying) source.playbackRate.value = this.playbackRate;
+	if (this.isPlaying) this.source.playbackRate.value = this.playbackRate;
 
 };
 
