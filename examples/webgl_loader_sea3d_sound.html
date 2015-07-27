@@ -22,7 +22,7 @@
 				display:block;
 
 			}
-			
+
 			#blocker {
 
 				position: absolute;
@@ -79,19 +79,19 @@
 			</div>
 
 		</div>
-		
+
 		<script src="../build/three.min.js"></script>
-		
+
 		<script src="js/controls/PointerLockControls.js"></script>
-		
+
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script> 
+		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/ColorCorrectionShader.js"></script>
 		<script src="js/shaders/VignetteShader.js"></script>
-		
+
 		<script src="js/loaders/sea3d/SEA3D.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
@@ -110,16 +110,16 @@
 			var moveLeft, moveForward, moveBackward, moveRight;
 
 			initKeyDown
-			
+
 			var loader;
-			var audioListener, soundFilter;			
+			var audioListener, soundFilter;
 			var soundArea, collisionArea;
 
 			// Initialize Three.JS
 
 			initPointerLock();
 			initKeyDown();
-			init(); 
+			init();
 
 			//
 			// SEA3D Loader
@@ -141,7 +141,7 @@
 				soundFilter = audioListener.context.createBiquadFilter();
 				soundFilter.type = 'lowpass';
 				soundFilter.Q.value = 10;
-				soundFilter.frequency.value = 440;	
+				soundFilter.frequency.value = 440;
 
 				soundArea = loader.getSound3D("Point002");
 				collisionArea = loader.getMesh("Torus003");
@@ -158,7 +158,7 @@
 
 				blocker = document.getElementById( 'blocker' );
 				instructions = document.getElementById( 'instructions' );
-			
+
 				// http://www.html5rocks.com/en/tutorials/pointerlock/intro/
 
 				var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
@@ -248,7 +248,7 @@
 				}
 
 			}
-			
+
 			function initKeyDown() {
 
 				var onKeyDown = function ( event ) {
@@ -262,7 +262,7 @@
 
 						case 37: // left
 						case 65: // a
-							moveLeft = true; 
+							moveLeft = true;
 							break;
 
 						case 40: // down
@@ -309,27 +309,27 @@
 
 				document.addEventListener( 'keydown', onKeyDown, false );
 				document.addEventListener( 'keyup', onKeyUp, false );
-			
+
 			}
-			
+
 			function init() {
 
 				raycaster = new THREE.Raycaster();
 
 				scene = new THREE.Scene();
 				velocity = new THREE.Vector3();
-				
+
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );				
-				
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+
 				controls = new THREE.PointerLockControls( camera );
 				scene.add( controls.getObject() );
-				
-				controls.getObject().translateX( 250 );				
+
+				controls.getObject().translateX( 250 );
 				controls.getObject().translateZ( 250 );
-				
+
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -382,7 +382,7 @@
 			//
 
 			function animateCamera( delta ) {
-				
+
 				var scale = 1400;
 
 				velocity.x -= velocity.x * 10.0 * delta;
@@ -396,19 +396,19 @@
 				if ( moveLeft ) velocity.x -= scale * delta;
 				if ( moveRight ) velocity.x += scale * delta;
 
-				controls.getObject().translateX( velocity.x * delta );				
+				controls.getObject().translateX( velocity.x * delta );
 				controls.getObject().translateZ( velocity.z * delta );
 
 			}
 
 			var clock = new THREE.Clock();
-			var audioPos = new THREE.Vector3();			
+			var audioPos = new THREE.Vector3();
 			var audioRot = new THREE.Euler();
 
 			function updateSoundFilter( collision, sound3d ) {
 
 				// difference position between sound and listener
-				var difPos = new THREE.Vector3().setFromMatrixPosition( sound3d.matrixWorld ).sub(audioPos);	
+				var difPos = new THREE.Vector3().setFromMatrixPosition( sound3d.matrixWorld ).sub(audioPos);
 				var length = difPos.length();
 
 				// pick a vector from camera to sound
@@ -432,23 +432,23 @@
 			function animate() {
 
 				var delta = clock.getDelta();
-				
+
 				animateCamera( delta );
 
 				// Sound3D Spatial Transform Update
 				loader.audioListener.position.copy( audioPos.setFromMatrixPosition( camera.matrixWorld ) );
 				loader.audioListener.rotation.copy( audioRot.setFromRotationMatrix( camera.matrixWorld ) );
 
-				// Update sound filter from raycaster intersecting				
+				// Update sound filter from raycaster intersecting
 				updateSoundFilter( collisionArea, soundArea );
 
 				// Update SEA3D Animations
-				THREE.SEA3D.AnimationHandler.update( delta );				
+				THREE.SEA3D.AnimationHandler.update( delta );
 
 				render( delta );
 
 				stats.update();
-				
+
 				requestAnimationFrame( animate );
 
 			}

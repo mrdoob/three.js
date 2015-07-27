@@ -38,11 +38,11 @@
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script> 
+		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/ColorCorrectionShader.js"></script>
 		<script src="js/shaders/VignetteShader.js"></script>
-		
+
 		<script src="js/loaders/sea3d/SEA3D.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
@@ -62,7 +62,7 @@
 
 			// Initialize Three.JS
 
-			init(); 
+			init();
 
 			//
 			// SEA3D Loader
@@ -88,11 +88,11 @@
 
 				// get mesh
 				teapot = loader.getMesh("Teapot01");
-				
+
 				// events
-				
+
 				window.addEventListener( 'mousemove', onMouseMove, false );
-				
+
 				animate();
 
 			};
@@ -167,7 +167,7 @@
 				teapot.setWeight("Sphere", mouseY / window.innerHeight);
 
 			}
-			
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -184,7 +184,7 @@
 			function animate() {
 
 				var delta = clock.getDelta();
-				
+
 				requestAnimationFrame( animate );
 
 				render( delta );

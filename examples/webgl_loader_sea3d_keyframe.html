@@ -39,11 +39,11 @@
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script> 
+		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/ColorCorrectionShader.js"></script>
 		<script src="js/shaders/VignetteShader.js"></script>
-		
+
 		<script src="js/loaders/sea3d/SEA3D.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
@@ -63,7 +63,7 @@
 
 			// Initialize Three.JS
 
-			init(); 
+			init();
 
 			//
 			// SEA3D Loader
@@ -89,11 +89,11 @@
 
 				// reset global animation time
 				SEA3D.AnimationHandler.setTime( 0 );
-				
+
 				// events
-				
+
 				window.addEventListener('click', onMouseClick, false);
-				
+
 				animate();
 
 			};
@@ -116,26 +116,26 @@
 				}
 
 			}
-			
-			function setTimeScale( timeScale ) {		
-			
+
+			function setTimeScale( timeScale ) {
+
 				// set in all active animations
-				for(var i in SEA3D.AnimationHandler.animations) {		
+				for(var i in SEA3D.AnimationHandler.animations) {
 					SEA3D.AnimationHandler.animations[i].timeScale = timeScale;
 				}
 
 			}
-			
+
 			function stopAll() {
 
 				// reset global time
 				SEA3D.AnimationHandler.setTime( 0 );
-				
+
 				// stop all active animations
 				SEA3D.AnimationHandler.stop();
-				
+
 			}
-			
+
 			//
 
 			function init() {
@@ -188,7 +188,7 @@
 				scene.add( new THREE.AmbientLight( 0x333333 ) );
 
 				// events
-				
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -210,18 +210,18 @@
 				document.getElementById('description').innerHTML = (demoAt + 1) + " - " + msg;
 
 			}
-			
+
 			function onMouseClick( e ) {
 
 				// 0 at 3 demos
 
-				switch( demoAt = ++demoAt % 4 ) {				
+				switch( demoAt = ++demoAt % 4 ) {
 
 					// play all animation to sequence "crash#1"
 
 					case 0:
 
-						playAll("crash#1", .5);	
+						playAll("crash#1", .5);
 						setTimeScale(1);
 
 						description("crash#1 - crossfade 0.5 seconds");
@@ -232,11 +232,11 @@
 
 					case 1:
 
-						playAll("crash#2", .5);	
-						
+						playAll("crash#2", .5);
+
 						description("crash#2 - crossfade 0.5 seconds");
 
-						break;		
+						break;
 
 					// play animation in single object
 
@@ -247,17 +247,17 @@
 						var fracture99 = loader.getMesh("Object099");
 
 						//fracture99.animation.time = 0;
-						//fracture99.animation.timeScale = 1;						
-						//fracture99.animation.playing								
-						//fracture99.animation.states ...	
-						//fracture99.animation.currentState ...						
+						//fracture99.animation.timeScale = 1;
+						//fracture99.animation.playing
+						//fracture99.animation.states ...
+						//fracture99.animation.currentState ...
 
 						//fracture99.animation.node ...
 						//fracture99.animation.node.duration
 
 						fracture99.animation.play("crash#2", .5, 0);
 						//fracture99.animation.pause();
-						//fracture99.animation.stop();						
+						//fracture99.animation.stop();
 
 						description("crash#2 in single object - crossfade 0.5 seconds");
 
@@ -268,11 +268,11 @@
 					case 3:
 
 						playAll("crash#2", .5);
-						setTimeScale(.1);	
+						setTimeScale(.1);
 
 						description("time scale / 10 - crossfade 0.5 seconds");
 
-						break;							
+						break;
 				}
 			}
 
@@ -283,7 +283,7 @@
 			function animate() {
 
 				var delta = clock.getDelta();
-				
+
 				requestAnimationFrame( animate );
 
 				// Update SEA3D Animations
