@@ -305,19 +305,21 @@
 
 				var folder = gui.addFolder( "Animations" );
 
-				var generateCallback = function( animationName ) {
+				var generateCallback = function( animationClip ) {
 
-					return function () { character.setAnimation( animationName ); };
+					return function () { character.setAnimation( animationClip.name ); };
 
 				};
 
 				var i = 0, guiItems = [];
-				var animations = character.meshBody.geometry.animations;
+				var animationClips = character.meshBody.animationClips;
 
-				for ( var a in animations ) {
+				for ( var i = 0; i < animationClips.length; i ++ ) {
 
-					playbackConfig[ a ] = generateCallback( a );
-					guiItems[ i ] = folder.add( playbackConfig, a, a );
+					var animationClip = animationClips[i];
+
+					playbackConfig[ animationClip.name ] = generateCallback( animationClip );
+					guiItems[ i ] = folder.add( playbackConfig, animationClip.name, animationClip.name );
 
 					i ++;
 

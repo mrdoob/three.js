@@ -223,7 +223,7 @@ THREE.MD2Character = function () {
 
 		mesh.parseAnimations();
 
-		mesh.playAnimation( geometry.firstAnimation, scope.animationFPS );
+		mesh.playAnimation( mesh.firstAnimationClip.name, scope.animationFPS );
 		mesh.baseDuration = mesh.duration;
 
 		return mesh;

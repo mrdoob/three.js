@@ -81,6 +81,113 @@ THREE.AnimationClip.prototype = {
                     },
 */
 
+THREE.AnimationClip.CreateMorphAnimationFromNames = function( morphTargetNames, duration ) {
+	//console.log( morphTargetNames, duration );
+
+	var tracks = [];
+	var frameStep = duration / morphTargetNames.length;
+	//console.log( 'frameStep', frameStep );
+
+	for( var i = 0; i < morphTargetNames.length; i ++ ) {
+
+		var keys = [];
+
+		if( ( i - 1 ) >= 0 ) {
+
+			keys.push( { time: ( i - 1 ) * frameStep, value: 0 } );
+
+		}
+
+		keys.push( { time: i * frameStep, value: 1 } );
+
+		if( ( i + 1 ) <= morphTargetNames.length ) {
+
+			keys.push( { time: ( i + 1 ) * frameStep, value: 0 } );
+
+		}
+
+		if( ( i - 1 ) < 0 ) {
+			
+			keys.push( { time: ( morphTargetNames.length - 1 ) * frameStep, value: 0 } );
+			keys.push( { time: morphTargetNames.length * frameStep, value: 1 } );
+
+		}
+
+		//console.log( 'keys', keys );
+
+		var morphName = morphTargetNames[i];
+		var trackName = '.morphTargetInfluences[' + morphName + ']';
+		var track = new THREE.KeyframeTrack( trackName, keys );
+
+		tracks.push( track );
+	}
+
+	var clip = new THREE.AnimationClip( 'morphAnimation', duration, tracks );
+	//console.log( 'morphAnimationClip', clip );
+
+	return clip;
+};
+
+THREE.AnimationClip.CreateMorphAnimation = function( morphTargets, duration ) {
+
+	var morphTargetNames = [];
+
+	for( var i = 0; i < morphTargets.length; i ++ ) {
+
+		morphTargetNames.push( morphTargets[i].name );
+
+	}
+
+	return THREE.AnimationClip.CreateMorphAnimationFromNames( morphTargetNames, duration );
+
+};
+
+
+THREE.AnimationClip.FromImplicitMorphTargetAnimations = function( morphTargets, fps ) {
+	
+	var animations = {};
+	var animationsArray = [];
+
+	var pattern = /([a-z]+)_?(\d+)/;
+
+	for ( var i = 0, il = morphTargets.length; i < il; i ++ ) {
+
+		var morphTarget = morphTargets[ i ];
+		var parts = morphTarget.name.match( pattern );
+
+		if ( parts && parts.length > 1 ) {
+
+			var animationName = parts[ 1 ];
+
+			var animation = animations[ animationName ];
+			if ( ! animation ) {
+				animations[ animationName ] = animation = { name: animationName, morphTargetNames: [] };
+				animationsArray.push( animation );
+			}
+
+			animation.morphTargetNames.push( morphTarget.name );
+		}
+
+	}
+
+	//console.log( animations );
+
+	var clips = [];
+
+	for( var i = 0; i < animationsArray.length; i ++ ) {
+
+		var animation = animationsArray[i];
+
+		var clip = new THREE.AnimationClip.CreateMorphAnimationFromNames( animation.morphTargetNames, animation.morphTargetNames.length * fps );
+		clip.name = animation.name;
+
+		clips.push( clip );
+	}
+
+	return clips;
+
+};
+
 THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader, nodeName ) {
 
 	var animation = jsonLoader.animation;

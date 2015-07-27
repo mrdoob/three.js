@@ -46,6 +46,12 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
+	removeAllActions: function() {
+
+		this.actions = [];
+
+	},
+
 	removeAction: function( action ) {
 		//console.log( this.root.name + ".AnimationMixer.addRemove( " + action.name + " )" );
 

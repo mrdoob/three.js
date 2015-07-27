@@ -224,11 +224,11 @@ THREE.PropertyBinding.prototype = {
 				this.triggerDirty();
 			}
 
-		}
+			// reset accumulator
+			this.cumulativeValue = null;
+			this.cumulativeWeight = 0;
 
-		// reset accumulator
-		this.cumulativeValue = null;
-		this.cumulativeWeight = 0;
+		}
 	},
 
 	get: function() {
