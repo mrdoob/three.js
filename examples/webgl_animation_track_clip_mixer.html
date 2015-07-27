@@ -273,6 +273,10 @@
 				
 				var clip7 = THREE.AnimationClipCreator.CreateMorphAnimation( mesh.geometry.morphTargets, 3 );
 				mixer.addAction( new THREE.AnimationAction( clip7, 0, 1, 1, true ) );
+
+				var clip8 = THREE.AnimationClip.FromJSONLoaderAnimation( geometry );
+				mixer.addAction( new THREE.AnimationAction( clip8, 0, 1, 1, true ) );
+				
 			}
 
 			function initGUI() {

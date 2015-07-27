@@ -40,7 +40,7 @@ THREE.PropertyBinding.prototype = {
 
 	accumulate: function( value, weight ) {
 		
-		var lerp = THREE.AnimationUtils.getLerpFunc( this.cumulativeValue, true );
+		var lerp = THREE.AnimationUtils.getLerpFunc( value, true );
 
 		this.accumulate = function( value, weight ) {
 
@@ -78,44 +78,62 @@ THREE.PropertyBinding.prototype = {
 				return;
 			}
 
-			if( this.material ) {
-				targetObject = targetObject.material;
-				if( this.materialIndex !== undefined ) {
-					if( targetObject.materials ) {
-						targetObject = targetObject.materials[ this.materialIndex ];
-					}
-					else {
-						console.error( "  trying to submaterial via index, but no materials exist:", targetObject );
+			if( this.objectName ) {
+				// special case were we need to reach deeper into the hierarchy to get the face materials....
+				if( this.objectName === "materials" ) {
+					if( ! targetObject.material ) {
+						console.error( '  can not bind to material as node does not have a material', this );
 						return;				
 					}
+					if( ! targetObject.material.materials ) {
+						console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
+						return;				
+					}
+					targetObject = targetObject.material.materials;
 				}
+				else if( this.objectName === "bones" ) {
+					if( ! targetObject.skeleton ) {
+						console.error( '  can not bind to bones as node does not have a skeleton', this );
+					}
+					targetObject = targetObject.skeleton.bones;
+
+					// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
+					
+					// support resolving morphTarget names into indices.
+					console.log( "  resolving bone name: ", this.objectIndex );
+					for( var i = 0; i < this.node.skeleton.bones.length; i ++ ) {
+						if( this.node.skeleton.bones[i].name === this.objectIndex ) {
+							console.log( "  resolved to index: ", i );
+							this.objectIndex = i;
+							break;
+						}
+					}
+				}
+				else {
+
+					if( targetObject[ this.objectName ] === undefined ) {
+						console.error( '  can not bind to objectName of node, undefined', this );			
+						return;
+					}
+					targetObject = targetObject[ this.objectName ];
+				}
+				
+				if( this.objectIndex !== undefined ) {
+					if( targetObject[ this.objectIndex ] === undefined ) {
+						console.error( "  trying to bind to objectIndex of objectName, but is undefined:", this, targetObject );
+						return;				
+					}
+
+					targetObject = targetObject[ this.objectIndex ];
+				}
+
 			}
 
 	 		// special case mappings
-	 		var nodeProperty = null;
-			if( this.propertyName === "materials" ) {
-				if( ! targetObject.material ) {
-					console.error( '  can not bind to material as node does not have a material', this );
-					return;				
-				}
-				if( ! targetObject.material.materials ) {
-					console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
-					return;				
-				}
-				nodeProperty = targetObject.material.materials;
-			}
-			if( this.propertyName === "bones" ) {
-				if( ! targetObject.skeleton ) {
-					console.error( '  can not bind to bones as node does not have a skeleton', this );
-				}
-				nodeProperty = targetObject.skeleton.bones;
-			}
-			else {
-				nodeProperty = targetObject[ this.propertyName ];
-				if( ! nodeProperty ) {
-					console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );				
-					return;
-				}
+	 		var nodeProperty = targetObject[ this.propertyName ];
+			if( ! nodeProperty ) {
+				console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );				
+				return;
 			}
 
 			// access a sub element of the property array (only primitives are supported right now)
@@ -141,20 +159,6 @@ THREE.PropertyBinding.prototype = {
 						}
 					}
 				}
-				else if( this.propertyName === "bones" ) {
-					// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
-					
-					// support resolving morphTarget names into indices.
-					console.log( "  resolving bone name: ", this.propertyIndex );
-					for( var i = 0; i < this.node.skeleton.bones.length; i ++ ) {
-						if( this.node.skeleton.bones[i].name === this.propertyIndex ) {
-							console.log( "  resolved to index: ", i );
-							this.propertyIndex = i;
-							break;
-						}
-					}
-				}
-
 
 				//console.log( '  update property array ' + this.propertyName + '[' + this.propertyIndex + '] via assignment.' );				
 				this.internalApply = function() {
@@ -221,12 +225,12 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	//    nodeName.property[accessor]
 	//    nodeName.material.property[accessor]
 	//    uuid.property[accessor]
-	//    uuid.material.property[accessor]
+	//    uuid.objectName[objectIndex].propertyName[propertyIndex]
 	//    parentName/nodeName.property
 	//    parentName/parentName/nodeName.property[index]
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w-]+)?(\.material(\[([\w]+)\])?)?(\.([\w]+)(\[([\w]+)\])?)?$/; 
+	var re = /^(([\w]+\/)*)([\w-]+)?(\.([\w]+)(\[([\w]+)\])?)?(\.([\w]+)(\[([\w]+)\])?)$/; 
 	var matches = re.exec(trackName);
 
 	if( ! matches ) {
@@ -238,12 +242,12 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
     }
 
 	var results = {
-		directoryName: matches[0],
+		directoryName: matches[1],
 		nodeName: matches[3], 	// allowed to be null, specified root node.
-		material: ( matches[4] && matches[4].length > 0 ),
-		materialIndex: matches[6],
-		propertyName: matches[8],
-		propertyIndex: matches[10]	// allowed to be null, specifies that the whole property is set.
+		objectName: matches[5],
+		objectIndex: matches[7],
+		propertyName: matches[9],
+		propertyIndex: matches[11]	// allowed to be null, specifies that the whole property is set.
 	};
 
 	//console.log( "PropertyBinding.parseTrackName", trackName, results, matches );

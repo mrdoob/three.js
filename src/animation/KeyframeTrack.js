@@ -94,7 +94,7 @@ THREE.KeyframeTrack.prototype = {
 			this.keys.sort( keyComparator );
 		}
 
-	}();
+	}(),
 
 	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
 	// TODO: ensure that all key.values in a track are all of the same type (otherwise interpolation makes no sense.)
@@ -116,7 +116,7 @@ THREE.KeyframeTrack.prototype = {
 				return;
 			}
 
-			if( ( typeof currKey.time ) !== 'Number' || currKey.time == NaN ) {
+			if( ( typeof currKey.time ) !== 'number' || Number.isNaN( currKey.time ) ) {
 				console.error( "  key.time is not a valid number", this, i, currKey );
 				return;
 			}
@@ -150,6 +150,7 @@ THREE.KeyframeTrack.prototype = {
 		for( var i = 1; i < this.keys.length - 1; i ++ ) {
 			var currKey = this.keys[i];
 			var nextKey = this.keys[i+1];
+			//console.log( prevKey, currKey, nextKey );
 
 			// if prevKey & currKey are the same time, remove currKey.  If you want immediate adjacent keys, use an epsilon offset
 			// it is not possible to have two keys at the same time as we sort them.  The sort is not stable on keys with the same time.
@@ -159,7 +160,7 @@ THREE.KeyframeTrack.prototype = {
 			}
 
 			// remove completely unnecessary keyframes that are the same as their prev and next keys
-			if( equalsFunc( prevKey.value, currKey.value ) && equals( currKey.value, nextKey.value ) ) {
+			if( equalsFunc( prevKey.value, currKey.value ) && equalsFunc( currKey.value, nextKey.value ) ) {
 				console.log(  'removing key identical to prev and next', currKey );
 				continue;
 			}
@@ -169,8 +170,11 @@ THREE.KeyframeTrack.prototype = {
 			newKeys.push( currKey );
 			prevKey = currKey;
 		}
+		newKeys.push( this.keys[ this.keys.length - 1 ] );
 
-		console.log( '  track optimization removed keys:', ( this.keys.length - newKeys.length ), this.name );
+		if( ( this.keys.length - newKeys.length ) > 0 ) {
+			console.log( '  optimizing removed keys:', ( this.keys.length - newKeys.length ), this.name );
+		}
 		this.keys = newKeys;
 
 	},
@@ -198,10 +202,11 @@ THREE.KeyframeTrack.prototype = {
 
 		// remove last keys first because it doesn't affect the position of the first keys (the otherway around doesn't work as easily)
 		// TODO: Figure out if there is an array subarray function... might be faster
-		var keysWithoutLastKeys = this.keys.splice( this.keys.length - lastKeysToRemove, lastKeysToRemove );
-		var keysWithoutFirstKeys = keysWithoutLastKeys.splice( 0, firstKeysToRemove );
-		this.keys = keysWithoutFirstKeys;
-
+		if( ( firstKeysToRemove + lastKeysToRemove ) > 0 ) {
+			console.log(  '  triming removed keys: first and last', firstKeysToRemove, lastKeysToRemove, this.keys );
+			this.keys = this.keys.splice( firstKeysToRemove, this.keys.length - lastKeysToRemove - firstKeysToRemove );;
+			console.log(  '  result', this.keys );
+		}
 
 	}
 

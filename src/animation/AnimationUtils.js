@@ -31,6 +31,8 @@
  	// TODO/OPTIMIZATION: Accumulator should be writable and it will get rid of the *.clone() calls that are likely slow.
 	getLerpFunc: function( exemplarValue, interTrack ) {
 
+		if( exemplarValue === undefined || exemplarValue === null ) throw new Error( "examplarValue is null" );
+
 		var typeName = typeof exemplarValue;
 		switch( typeName ) {
 		 	case "object": {
@@ -38,6 +40,7 @@
 				if( exemplarValue.lerp ) {
 
 					return function( a, b, alpha ) {
+						//console.log( a, b );
 						return a.clone().lerp( b, alpha );
 					}
 
@@ -45,6 +48,7 @@
 				if( exemplarValue.slerp ) {
 
 					return function( a, b, alpha ) {
+						//console.log( a, b );
 						return a.clone().slerp( b, alpha );
 					}
 
