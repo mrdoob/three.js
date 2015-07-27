@@ -509,11 +509,11 @@
 
 				if ( dollyDelta.y > 0 ) {
 
-					contraint.dollyIn( getZoomScale() );
+					constraint.dollyIn( getZoomScale() );
 
 				} else if ( dollyDelta.y < 0 ) {
 
-					contraint.dollyOut( getZoomScale() );
+					constraint.dollyOut( getZoomScale() );
 
 				}
 
