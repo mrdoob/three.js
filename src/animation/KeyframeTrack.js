@@ -19,7 +19,7 @@ THREE.KeyframeTrack = function ( name, keys ) {
 
 	this.sort();
 	this.validate();
-	//this.optimize();
+	this.optimize();
 };
 
 THREE.KeyframeTrack.prototype = {
