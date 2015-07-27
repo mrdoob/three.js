@@ -5,7 +5,7 @@
 
  THREE.AnimationUtils = {
 
- 	equalsFunc: function( exemplarValue ) {
+ 	getEqualsFunc: function( exemplarValue ) {
 
 		if( exemplarValue.equals ) {
 			return function( a, b ) {

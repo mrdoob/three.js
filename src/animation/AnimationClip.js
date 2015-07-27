@@ -16,6 +16,8 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 	// but leaving these here during development as this ensures a lot of testing of these functions
 	//this.trim();
 	//this.optimize();
+
+	this.results = {};
 	
 };
 
@@ -27,25 +29,23 @@ THREE.AnimationClip.prototype = {
 
 		clipTime = Math.max( 0, Math.min( clipTime, this.duration ) );
 
-		var results = {};
+		for( var i = 0; i < this.tracks.length; i ++ ) {
 
-		for( var trackIndex in this.tracks ) {
-
-			var track = this.tracks[ trackIndex ];
+			var track = this.tracks[ i ];
 			//console.log( 'track', track );
 
-			results[ track.name ] = track.getAt( clipTime );
+			this.results[ track.name ] = track.getAt( clipTime );
 
 		}
 
-		return results;
+		return this.results;
 	},
 
 	trim: function() {
 
-		for( var trackIndex in this.tracks ) {
+		for( var i = 0; i < this.tracks.length; i ++ ) {
 
-			this.tracks[ trackIndex ].trim( this.duration );
+			this.tracks[ i ].trim( this.duration );
 
 		}
 
@@ -53,9 +53,9 @@ THREE.AnimationClip.prototype = {
 
 	optimize: function() {
 
-		for( var trackIndex in this.tracks ) {	
+		for( var i = 0; i < this.tracks.length; i ++ ) {
 
-			this.tracks[ trackIndex ].optimize();
+			this.tracks[ i ].optimize();
 
 		}
 
@@ -83,7 +83,7 @@ THREE.AnimationClip.prototype = {
 
 THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader ) {
 
-	var animation = jsonLoader['animation'];
+	var animation = jsonLoader.animation;
 	if( ! animation ) {
 		console.error( "  no animation in JSONLoader data" );
 		return null;
@@ -121,11 +121,11 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader ) {
 
 	var tracks = [];
 
+	var boneList = jsonLoader.bones;
 	var animationTracks = animation.hierarchy;
 
 	for ( var h = 0; h < animationTracks.length; h ++ ) {
 
-		var boneName = '.bone[' + h + ']';
 		var animationKeys = animationTracks[ h ].keys;
 
 		// skip empty tracks
@@ -170,28 +170,33 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader ) {
 			}
 
 		}
+		else {
+
+			var boneName = '.bone[' + boneList[ h ].name + ']';
+			console.log( 'boneName', boneName );
 		
-		// track contains positions...
-		var positionTrack = convertTrack( boneName + '.position', animationKeys, 'pos', function( animationKey ) {
-				return new THREE.Vector3().fromArray( animationKey.pos )
-			} );
+			// track contains positions...
+			var positionTrack = convertTrack( boneName + '.position', animationKeys, 'pos', function( animationKey ) {
+					return new THREE.Vector3().fromArray( animationKey.pos )
+				} );
 
-		if( positionTrack ) tracks.push( positionTrack );
+			if( positionTrack ) tracks.push( positionTrack );
+			
+			// track contains quaternions...
+			var quaternionTrack = convertTrack( boneName + '.quaternion', animationKeys, 'rot', function( animationKey ) {
+					return new THREE.Quaternion().fromArray( animationKey.rot )
+				} );
 
-		
-		// track contains quaternions...
-		var quaternionTrack = convertTrack( boneName + '.quaternion', animationKeys, 'rot', function( animationKey ) {
-				return new THREE.Quaternion().fromArray( animationKey.rot )
-			} );
+			if( quaternionTrack ) tracks.push( quaternionTrack );
 
-		if( quaternionTrack ) tracks.push( quaternionTrack );
+			// track contains quaternions...
+			var scaleTrack = convertTrack( boneName + '.scale', animationKeys, 'scl', function( animationKey ) {
+					return new THREE.Vector3().fromArray( animationKey.scl )
+				} );
 
-		// track contains quaternions...
-		var scaleTrack = convertTrack( boneName + '.quaternion', animationKeys, 'scl', function( animationKey ) {
-				return new THREE.Vector3().fromArray( animationKey.scl )
-			} );
+			if( scaleTrack ) tracks.push( scaleTrack );
 
-		if( scaleTrack ) tracks.push( scaleTrack );
+		}
 	}
 
 	var clip = new THREE.AnimationClip( clipName, duration, tracks );

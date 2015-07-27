@@ -276,7 +276,9 @@
 
 				var clip8 = THREE.AnimationClip.FromJSONLoaderAnimation( geometry );
 				mixer.addAction( new THREE.AnimationAction( clip8, 0, 1, 1, true ) );
-				
+
+				console.log( clip8.getAt( 0 ) );
+
 			}
 
 			function initGUI() {

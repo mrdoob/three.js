@@ -70,6 +70,8 @@ THREE.PropertyBinding.prototype = {
 
 			 //console.log( "PropertyBinding.set( " + value + ")" );
 
+			 var equalsFunc = THREE.AnimationUtils.getEqualsFunc( this.cumulativeValue );
+
 			 var targetObject = this.node;
 
 	 		// ensure there is a value node
@@ -162,14 +164,22 @@ THREE.PropertyBinding.prototype = {
 
 				//console.log( '  update property array ' + this.propertyName + '[' + this.propertyIndex + '] via assignment.' );				
 				this.internalApply = function() {
-					nodeProperty[ this.propertyIndex ] = this.cumulativeValue;
+					if( ! equalsFunc( nodeProperty[ this.propertyIndex ], this.cumulativeValue ) ) {
+						nodeProperty[ this.propertyIndex ] = this.cumulativeValue;
+						return true;
+					}
+					return false;
 				};
 			}
 			// must use copy for Object3D.Euler/Quaternion		
 			else if( nodeProperty.copy ) {
 				//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via a set() function.' );				
 				this.internalApply = function() {
-					nodeProperty.copy( this.cumulativeValue );
+					if( ! equalsFunc( nodeProperty, this.cumulativeValue ) ) {
+						nodeProperty.copy( this.cumulativeValue );
+						return true;
+					}
+					return false;
 				}
 			}
 			// otherwise just set the property directly on the node (do not use nodeProperty as it may not be a reference object)
@@ -177,7 +187,11 @@ THREE.PropertyBinding.prototype = {
 
 				//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via assignment.' );				
 				this.internalApply = function() {
-					targetObject[ this.propertyName ] = this.cumulativeValue;	
+					if( ! equalsFunc( targetObject[ this.propertyName ], this.cumulativeValue ) ) {
+						targetObject[ this.propertyName ] = this.cumulativeValue;	
+						return true;
+					}
+					return false;
 				}
 			}
 
@@ -202,9 +216,9 @@ THREE.PropertyBinding.prototype = {
 			return;
 		}
 
-		this.internalApply();
+		var valueChanged = this.internalApply();
 
-		if( this.triggerDirty ) {
+		if( valueChanged && this.triggerDirty ) {
 			this.triggerDirty();
 		}
 	},
@@ -228,9 +242,10 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	//    uuid.objectName[objectIndex].propertyName[propertyIndex]
 	//    parentName/nodeName.property
 	//    parentName/parentName/nodeName.property[index]
+	//	  .bone[Armature.DEF_cog].position
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w-]+)?(\.([\w]+)(\[([\w]+)\])?)?(\.([\w]+)(\[([\w]+)\])?)$/; 
+	var re = /^(([\w]+\/)*)([\w-]+)?(\.([\w]+)(\[([\w.]+)\])?)?(\.([\w.]+)(\[([\w]+)\])?)$/; 
 	var matches = re.exec(trackName);
 
 	if( ! matches ) {

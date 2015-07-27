@@ -15,6 +15,7 @@ THREE.AnimationMixer = function( root ) {
 	this.timeScale = 1.0;
 	this.actions = [];
 	this.propertyBindings = {};
+	this.propertyBindingsArray = [];
 
 };
 
@@ -27,12 +28,18 @@ THREE.AnimationMixer.prototype = {
 
 		this.actions.push( action );
 
-		for( var trackID in action.clip.tracks ) {
+		var tracks = action.clip.tracks;
 
-			var track = action.clip.tracks[ trackID ];
+		for( var i = 0; i < tracks.length; i ++ ) {
+
+			var track = tracks[ i ];
+
 			if( ! this.propertyBindings[ track.name ] ) {
 			
-				this.propertyBindings[ track.name ] = new THREE.PropertyBinding( this.root, track.name );
+				var propertyBinding = new THREE.PropertyBinding( this.root, track.name );
+				this.propertyBindings[ track.name ] = propertyBinding;
+
+				this.propertyBindingsArray.push( propertyBinding );
 			
 			}
 		}
@@ -57,9 +64,9 @@ THREE.AnimationMixer.prototype = {
 
 		//console.log( this.root.name + ".AnimationMixer.update( " + time + " )" );
 
-		for ( var name in this.propertyBindings ) {
+		for ( var i = 0; i < this.propertyBindingsArray.length; i ++ ) {
 
-			this.propertyBindings[ name ].reset();
+			this.propertyBindingsArray[ i ].reset();
 
 		}
 
@@ -80,9 +87,9 @@ THREE.AnimationMixer.prototype = {
 		}
 	
 		// apply to nodes
-		for ( var name in this.propertyBindings ) {
+		for ( var i = 0; i < this.propertyBindingsArray.length; i ++ ) {
 
-			this.propertyBindings[ name ].apply();
+			this.propertyBindingsArray[ i ].apply();
 			
 		}
 	}

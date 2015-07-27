@@ -145,7 +145,7 @@ THREE.KeyframeTrack.prototype = {
 		var prevKey = this.keys[0];
 		newKeys.push( prevKey );
 
-		var equalsFunc = THREE.AnimationUtils.equalsFunc( prevKey.value );
+		var equalsFunc = THREE.AnimationUtils.getEqualsFunc( prevKey.value );
 
 		for( var i = 1; i < this.keys.length - 1; i ++ ) {
 			var currKey = this.keys[i];
