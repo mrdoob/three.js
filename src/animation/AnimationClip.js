@@ -81,7 +81,7 @@ THREE.AnimationClip.prototype = {
                     },
 */
 
-THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader ) {
+THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader, nodeName ) {
 
 	var animation = jsonLoader.animation;
 	if( ! animation ) {
@@ -165,14 +165,14 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader ) {
 				
 				}
 
-				tracks.push( new THREE.KeyframeTrack( '.morphTargetInfluence[' + morphTargetName + ']', keys ) );
+				tracks.push( new THREE.KeyframeTrack( nodeName + '.morphTargetInfluence[' + morphTargetName + ']', keys ) );
 
 			}
 
 		}
 		else {
 
-			var boneName = '.bones[' + boneList[ h ].name + ']';
+			var boneName = nodeName + '.bones[' + boneList[ h ].name + ']';
 			//console.log( 'boneName', boneName );
 		
 			// track contains positions...

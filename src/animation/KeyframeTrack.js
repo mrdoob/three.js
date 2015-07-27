@@ -17,6 +17,8 @@ THREE.KeyframeTrack = function ( name, keys ) {
 	this.result = THREE.AnimationUtils.clone( this.keys[0].value );
 	//console.log( 'constructor result', this.result )
 
+	this.lastIndex = -1;
+
 	this.sort();
 	this.validate();
 	this.optimize();
@@ -32,7 +34,26 @@ THREE.KeyframeTrack.prototype = {
 		//console.log( 'KeyframeTrack[' + this.name + '].getAt( ' + time + ' )' );
 
 		if( this.keys.length == 0 ) throw new Error( "no keys in track named " + this.name );
-		
+
+		// fast early exit	
+		if( this.lastIndex >= 0 ) {
+			if( ( time <= this.keys[this.lastIndex].time ) && ( this.keys[this.lastIndex-1].time < time ) ) {
+
+				var i = this.lastIndex;
+
+				var alpha = ( time - this.keys[ i - 1 ].time ) / ( this.keys[ i ].time - this.keys[ i - 1 ].time );
+
+				this.setResult( this.keys[ i - 1 ].value );
+
+				this.result = this.lerp( this.result, this.keys[ i ].value, alpha );
+
+				return this.result;
+
+			}
+
+			this.lastIndex = -1;
+		}
+
 		//console.log( "keys", this.keys );
 		// before the start of the track, return the first key value
 		if( this.keys[0].time >= time ) {
@@ -79,6 +100,8 @@ THREE.KeyframeTrack.prototype = {
 					value0: this.keys[ i - 1 ].value,
 					value1: this.keys[ i ].value
 				} );*/
+
+				this.lastIndex = i;
 
 				return this.result;
 
