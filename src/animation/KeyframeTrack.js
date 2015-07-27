@@ -155,13 +155,13 @@ THREE.KeyframeTrack.prototype = {
 			// if prevKey & currKey are the same time, remove currKey.  If you want immediate adjacent keys, use an epsilon offset
 			// it is not possible to have two keys at the same time as we sort them.  The sort is not stable on keys with the same time.
 			if( ( prevKey.time === currKey.time ) ) {
-				console.log(  'removing key at the same time', currKey );
+				//console.log(  'removing key at the same time', currKey );
 				continue;
 			}
 
 			// remove completely unnecessary keyframes that are the same as their prev and next keys
 			if( equalsFunc( prevKey.value, currKey.value ) && equalsFunc( currKey.value, nextKey.value ) ) {
-				console.log(  'removing key identical to prev and next', currKey );
+				//console.log(  'removing key identical to prev and next', currKey );
 				continue;
 			}
 
@@ -205,7 +205,7 @@ THREE.KeyframeTrack.prototype = {
 		if( ( firstKeysToRemove + lastKeysToRemove ) > 0 ) {
 			console.log(  '  triming removed keys: first and last', firstKeysToRemove, lastKeysToRemove, this.keys );
 			this.keys = this.keys.splice( firstKeysToRemove, this.keys.length - lastKeysToRemove - firstKeysToRemove );;
-			console.log(  '  result', this.keys );
+			//console.log(  '  result', this.keys );
 		}
 
 	}

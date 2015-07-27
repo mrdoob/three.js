@@ -14,8 +14,8 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 
 	// TODO: maybe only do these on demand, as doing them here could potentially slow down loading
 	// but leaving these here during development as this ensures a lot of testing of these functions
-	//this.trim();
-	//this.optimize();
+	this.trim();
+	this.optimize();
 
 	this.results = {};
 	
@@ -172,8 +172,8 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader ) {
 		}
 		else {
 
-			var boneName = '.bone[' + boneList[ h ].name + ']';
-			console.log( 'boneName', boneName );
+			var boneName = '.bones[' + boneList[ h ].name + ']';
+			//console.log( 'boneName', boneName );
 		
 			// track contains positions...
 			var positionTrack = convertTrack( boneName + '.position', animationKeys, 'pos', function( animationKey ) {
@@ -184,7 +184,12 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader ) {
 			
 			// track contains quaternions...
 			var quaternionTrack = convertTrack( boneName + '.quaternion', animationKeys, 'rot', function( animationKey ) {
-					return new THREE.Quaternion().fromArray( animationKey.rot )
+					if( animationKey.rot.slerp ) {
+						return animationKey.rot.clone();
+					}
+					else {
+						return new THREE.Quaternion().fromArray( animationKey.rot );
+					}
 				} );
 
 			if( quaternionTrack ) tracks.push( quaternionTrack );
@@ -200,7 +205,7 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader ) {
 	}
 
 	var clip = new THREE.AnimationClip( clipName, duration, tracks );
-	console.log( 'clipFromJSONLoaderAnimation', clip );
+	//console.log( 'clipFromJSONLoaderAnimation', clip );
 
 	return clip;
 

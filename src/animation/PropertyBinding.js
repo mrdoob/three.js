@@ -13,11 +13,11 @@ THREE.PropertyBinding = function ( rootNode, trackName ) {
 
 	var parseResults = THREE.PropertyBinding.parseTrackName( trackName );
 
-	console.log( parseResults );
+	//console.log( parseResults );
 	this.directoryName = parseResults.directoryName;
 	this.nodeName = parseResults.nodeName;
-	this.material = parseResults.material;
-	this.materialIndex = parseResults.materialIndex;
+	this.objectName = parseResults.objectName;
+	this.objectIndex = parseResults.objectIndex;
 	this.propertyName = parseResults.propertyName;
 	this.propertyIndex = parseResults.propertyIndex;
 
@@ -68,7 +68,7 @@ THREE.PropertyBinding.prototype = {
 		// for speed capture the setter pattern as a closure (sort of a memoization pattern: https://en.wikipedia.org/wiki/Memoization)
 		if( ! this.internalApply ) {
 
-			 //console.log( "PropertyBinding.set( " + value + ")" );
+			 //console.log( "PropertyBinding", this );
 
 			 var equalsFunc = THREE.AnimationUtils.getEqualsFunc( this.cumulativeValue );
 
@@ -102,10 +102,10 @@ THREE.PropertyBinding.prototype = {
 					// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
 					
 					// support resolving morphTarget names into indices.
-					console.log( "  resolving bone name: ", this.objectIndex );
+					//console.log( "  resolving bone name: ", this.objectIndex );
 					for( var i = 0; i < this.node.skeleton.bones.length; i ++ ) {
 						if( this.node.skeleton.bones[i].name === this.objectIndex ) {
-							console.log( "  resolved to index: ", i );
+							//console.log( "  resolved to index: ", i );
 							this.objectIndex = i;
 							break;
 						}
@@ -212,15 +212,19 @@ THREE.PropertyBinding.prototype = {
 		}
 
 		// early exit if there is nothing to apply.
-		if( this.cumulativeWeight <= 0 ) {
-			return;
+		if( this.cumulativeWeight > 0 ) {
+		
+			var valueChanged = this.internalApply();
+
+			if( valueChanged && this.triggerDirty ) {
+				this.triggerDirty();
+			}
+
 		}
 
-		var valueChanged = this.internalApply();
-
-		if( valueChanged && this.triggerDirty ) {
-			this.triggerDirty();
-		}
+		// reset accumulator
+		this.cumulativeValue = null;
+		this.cumulativeWeight = 0;
 	},
 
 	get: function() {

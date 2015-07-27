@@ -64,12 +64,6 @@ THREE.AnimationMixer.prototype = {
 
 		//console.log( this.root.name + ".AnimationMixer.update( " + time + " )" );
 
-		for ( var i = 0; i < this.propertyBindingsArray.length; i ++ ) {
-
-			this.propertyBindingsArray[ i ].reset();
-
-		}
-
 		for( var i = 0; i < this.actions.length; i ++ ) {
 
 			var action = this.actions[i];
@@ -90,7 +84,7 @@ THREE.AnimationMixer.prototype = {
 		for ( var i = 0; i < this.propertyBindingsArray.length; i ++ ) {
 
 			this.propertyBindingsArray[ i ].apply();
-			
+
 		}
 	}
 
