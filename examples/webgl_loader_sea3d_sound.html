@@ -103,7 +103,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+			var container, raycaster, stats;
 
 			var camera, scene, renderer, composer, controls, velocity;
 			var blocker, instructions;
@@ -112,6 +112,8 @@
 			initKeyDown
 			
 			var loader;
+			var audioListener, soundFilter;			
+			var soundArea, collisionArea;
 
 			// Initialize Three.JS
 
@@ -133,7 +135,17 @@
 			} );
 
 			loader.onComplete = function( e ) {
-				
+
+				audioListener = loader.audioListener;
+
+				soundFilter = audioListener.context.createBiquadFilter();
+				soundFilter.type = 'lowpass';
+				soundFilter.Q.value = 10;
+				soundFilter.frequency.value = 440;	
+
+				soundArea = loader.getSound3D("Point002");
+				collisionArea = loader.getMesh("Torus003");
+
 				animate();
 
 			};
@@ -302,6 +314,8 @@
 			
 			function init() {
 
+				raycaster = new THREE.Raycaster();
+
 				scene = new THREE.Scene();
 				velocity = new THREE.Vector3();
 				
@@ -386,13 +400,51 @@
 				controls.getObject().translateZ( velocity.z * delta );
 
 			}
-			
+
+			var clock = new THREE.Clock();
+			var audioPos = new THREE.Vector3();			
+			var audioRot = new THREE.Euler();
+
+			function updateSoundFilter( collision, sound3d ) {
+
+				// difference position between sound and listener
+				var difPos = new THREE.Vector3().setFromMatrixPosition( sound3d.matrixWorld ).sub(audioPos);	
+				var length = difPos.length();
+
+				// pick a vector from camera to sound
+				raycaster.set( audioPos, difPos.normalize() );
+
+				// intersecting sound1
+				if ( length > 50 && raycaster.intersectObjects( [collision] ).length ) {
+
+					if ( sound3d.getFilter() !== soundFilter ) sound3d.setFilter( soundFilter );
+
+				} else if ( sound3d.getFilter() !== undefined ) {
+
+					sound3d.setFilter();
+
+				}
+
+			}
+
+			//
+
 			function animate() {
 
 				var delta = clock.getDelta();
 				
 				animateCamera( delta );
-				
+
+				// Sound3D Spatial Transform Update
+				loader.audioListener.position.copy( audioPos.setFromMatrixPosition( camera.matrixWorld ) );
+				loader.audioListener.rotation.copy( audioRot.setFromRotationMatrix( camera.matrixWorld ) );
+
+				// Update sound filter from raycaster intersecting				
+				updateSoundFilter( collisionArea, soundArea );
+
+				// Update SEA3D Animations
+				THREE.SEA3D.AnimationHandler.update( delta );				
+
 				render( delta );
 
 				stats.update();
@@ -401,17 +453,7 @@
 
 			}
 
-			var clock = new THREE.Clock();
-
 			function render( delta ) {
-
-				THREE.AnimationHandler.update( delta );
-
-				// SEA3D Keyframe Update		
-				SEA3D.AnimationHandler.update( delta ); 
-
-				// Sound Update
-				THREE.Sound3D.update( camera );
 
 				//renderer.render( scene, camera );
 				composer.render( delta );
