@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Face3 = function ( a, b, c, normal, color ) {
+THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 
 	this.a = a;
 	this.b = b;
@@ -16,6 +16,8 @@ THREE.Face3 = function ( a, b, c, normal, color ) {
 	this.vertexColors = Array.isArray( color ) ? color : [];
 
 	this.vertexTangents = [];
+
+	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
 };
 
@@ -31,6 +33,8 @@ THREE.Face3.prototype = {
 
 		this.normal.copy( source.normal );
 		this.color.copy( source.color );
+
+		this.materialIndex = source.materialIndex;
 
 		for ( var i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
 

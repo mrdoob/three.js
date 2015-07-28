@@ -91,7 +91,7 @@ THREE.JSONLoader.prototype = {
 
 			offset, zLength,
 
-		colorIndex, normalIndex, uvIndex,
+		colorIndex, normalIndex, uvIndex, materialIndex,
 
 			type,
 			isQuad,
@@ -178,7 +178,9 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasMaterial ) {
 
-						offset ++;
+						materialIndex = faces[ offset ++ ];
+						faceA.materialIndex = materialIndex;
+						faceB.materialIndex = materialIndex;
 
 					}
 
@@ -285,7 +287,8 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasMaterial ) {
 
-						offset ++;
+						materialIndex = faces[ offset ++ ];
+						face.materialIndex = materialIndex;
 
 					}
 

@@ -645,7 +645,7 @@ THREE.Geometry.prototype = {
 
 	},
 
-	merge: function ( geometry, matrix ) {
+	merge: function ( geometry, matrix, materialIndexOffset ) {
 
 		if ( geometry instanceof THREE.Geometry === false ) {
 
@@ -662,6 +662,8 @@ THREE.Geometry.prototype = {
 		faces2 = geometry.faces,
 		uvs1 = this.faceVertexUvs[ 0 ],
 		uvs2 = geometry.faceVertexUvs[ 0 ];
+
+		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
 		if ( matrix !== undefined ) {
 
@@ -722,6 +724,8 @@ THREE.Geometry.prototype = {
 				faceCopy.vertexColors.push( color.clone() );
 
 			}
+
+			faceCopy.materialIndex = face.materialIndex + materialIndexOffset;
 
 			faces1.push( faceCopy );
 

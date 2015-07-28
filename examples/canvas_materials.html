@@ -80,6 +80,15 @@
 
 				];
 
+				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
+
+					var face = geometry.faces[ i ];
+					if ( Math.random() > 0.5 ) face.materialIndex = Math.floor( Math.random() * materials.length );
+
+				}
+
+				materials.push( new THREE.MeshFaceMaterial( materials ) );
+
 				objects = [];
 
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
