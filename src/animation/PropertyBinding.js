@@ -10,6 +10,8 @@ THREE.PropertyBinding = function ( rootNode, trackName ) {
 
 	this.rootNode = rootNode;
 	this.trackName = trackName;
+	this.referenceCount = 0;
+	this.originalValue = null; // the value of the property before it was controlled by this binding
 
 	var parseResults = THREE.PropertyBinding.parseTrackName( trackName );
 
@@ -40,185 +42,229 @@ THREE.PropertyBinding.prototype = {
 
 	accumulate: function( value, weight ) {
 		
-		var lerp = THREE.AnimationUtils.getLerpFunc( value, true );
+		if( this.cumulativeWeight === 0 ) {
 
-		this.accumulate = function( value, weight ) {
+			if( this.cumulativeValue === null ) {
+				this.cumulativeValue = THREE.AnimationUtils.clone( value );
+			}
+			this.cumulativeWeight = weight;
+			//console.log( this );
 
-			if( this.cumulativeWeight === 0 ) {
+		}
+		else {
 
-				if( this.cumulativeValue === null ) {
-					this.cumulativeValue = THREE.AnimationUtils.clone( value );
+			var lerpAlpha = weight / ( this.cumulativeWeight + weight );
+			this.cumulativeValue = this.lerp( this.cumulativeValue, value, lerpAlpha );
+			this.cumulativeWeight += weight;
+			//console.log( this );
+
+		}
+
+	},
+
+	unbind: function() {
+
+		if( ! this.setValue ) throw new Error( "can not unbind if not bound in the first place." );
+
+		this.setValue( this.originalValue );
+	},
+
+	// creates the member functions:
+	//	- setValue( value )
+	//  - getValue()
+	//  - triggerDirty()
+
+	bind: function() {
+
+		if( this.setValue ) throw new Error( "can not bind if already bound." );
+		
+		//console.log( "PropertyBinding", this );
+
+		var equalsFunc = THREE.AnimationUtils.getEqualsFunc( this.cumulativeValue );
+
+		var targetObject = this.node;
+
+ 		// ensure there is a value node
+		if( ! targetObject ) {
+			console.error( "  trying to update node for track: " + this.trackName + " but it wasn't found." );
+			return;
+		}
+
+		if( this.objectName ) {
+			// special case were we need to reach deeper into the hierarchy to get the face materials....
+			if( this.objectName === "materials" ) {
+				if( ! targetObject.material ) {
+					console.error( '  can not bind to material as node does not have a material', this );
+					return;				
 				}
-				this.cumulativeWeight = weight;
-				//console.log( this );
-	
+				if( ! targetObject.material.materials ) {
+					console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
+					return;				
+				}
+				targetObject = targetObject.material.materials;
+			}
+			else if( this.objectName === "bones" ) {
+				if( ! targetObject.skeleton ) {
+					console.error( '  can not bind to bones as node does not have a skeleton', this );
+				}
+				targetObject = targetObject.skeleton.bones;
+
+				// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
+				
+				// support resolving morphTarget names into indices.
+				//console.log( "  resolving bone name: ", this.objectIndex );
+				for( var i = 0; i < this.node.skeleton.bones.length; i ++ ) {
+					if( this.node.skeleton.bones[i].name === this.objectIndex ) {
+						//console.log( "  resolved to index: ", i );
+						this.objectIndex = i;
+						break;
+					}
+				}
 			}
 			else {
 
-				var lerpAlpha = weight / ( this.cumulativeWeight + weight );
-				this.cumulativeValue = lerp( this.cumulativeValue, value, lerpAlpha );
-				this.cumulativeWeight += weight;
-				//console.log( this );
-
+				if( targetObject[ this.objectName ] === undefined ) {
+					console.error( '  can not bind to objectName of node, undefined', this );			
+					return;
+				}
+				targetObject = targetObject[ this.objectName ];
 			}
+			
+			if( this.objectIndex !== undefined ) {
+				if( targetObject[ this.objectIndex ] === undefined ) {
+					console.error( "  trying to bind to objectIndex of objectName, but is undefined:", this, targetObject );
+					return;				
+				}
+
+				targetObject = targetObject[ this.objectIndex ];
+			}
+
 		}
 
-		this.accumulate( value, weight );
+ 		// special case mappings
+ 		var nodeProperty = targetObject[ this.propertyName ];
+		if( ! nodeProperty ) {
+			console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );				
+			return;
+		}
+
+		// access a sub element of the property array (only primitives are supported right now)
+		if( this.propertyIndex !== undefined ) {
+
+			if( this.propertyName === "morphTargetInfluences" ) {
+				// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
+				
+				// support resolving morphTarget names into indices.
+				//console.log( "  resolving morphTargetInfluence name: ", this.propertyIndex );
+				if( ! this.node.geometry ) {
+					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );				
+				}
+				if( ! this.node.geometry.morphTargets ) {
+					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );				
+				}
+				
+				for( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
+					if( this.node.geometry.morphTargets[i].name === this.propertyIndex ) {
+						//console.log( "  resolved to index: ", i );
+						this.propertyIndex = i;
+						break;
+					}
+				}
+			}
+
+			//console.log( '  update property array ' + this.propertyName + '[' + this.propertyIndex + '] via assignment.' );				
+			this.setValue = function( value ) {
+				if( ! equalsFunc( nodeProperty[ this.propertyIndex ], value ) ) {
+					nodeProperty[ this.propertyIndex ] = value;
+					return true;
+				}
+				return false;
+			};
+
+			this.getValue = function() {
+				return nodeProperty[ this.propertyIndex ];
+			};
+
+		}
+		// must use copy for Object3D.Euler/Quaternion		
+		else if( nodeProperty.copy ) {
+			
+			//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via a set() function.' );				
+			this.setValue = function( value ) {
+				if( ! equalsFunc( nodeProperty, value ) ) {
+					nodeProperty.copy( value );
+					return true;
+				}
+				return false;
+			}
+
+			this.getValue = function() {
+				return nodeProperty;
+			};
+
+		}
+		// otherwise just set the property directly on the node (do not use nodeProperty as it may not be a reference object)
+		else {
+
+			//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via assignment.' );				
+			this.setValue = function( value ) {
+				if( ! equalsFunc( targetObject[ this.propertyName ], value ) ) {
+					targetObject[ this.propertyName ] = value;	
+					return true;
+				}
+				return false;
+			}
+
+			this.getValue = function() {
+				return targetObject[ this.propertyName ];
+			};
+
+		}
+
+		// trigger node dirty			
+		if( targetObject.needsUpdate !== undefined ) { // material
+			
+			//console.log( '  triggering material as dirty' );
+			this.triggerDirty = function() {
+				this.node.needsUpdate = true;
+			}
+
+		}			
+		else if( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
+			
+			//console.log( '  triggering node as dirty' );
+			this.triggerDirty = function() {
+				targetObject.matrixWorldNeedsUpdate = true;
+			}
+
+		}
+
+		this.originalValue = this.getValue();
+
+		this.lerp = THREE.AnimationUtils.getLerpFunc( value, true );
 
 	},
 
 	apply: function() {
 
 		// for speed capture the setter pattern as a closure (sort of a memoization pattern: https://en.wikipedia.org/wiki/Memoization)
-		if( ! this.internalApply ) {
-
-			 //console.log( "PropertyBinding", this );
-
-			 var equalsFunc = THREE.AnimationUtils.getEqualsFunc( this.cumulativeValue );
-
-			 var targetObject = this.node;
-
-	 		// ensure there is a value node
-			if( ! targetObject ) {
-				console.error( "  trying to update node for track: " + this.trackName + " but it wasn't found." );
-				return;
-			}
-
-			if( this.objectName ) {
-				// special case were we need to reach deeper into the hierarchy to get the face materials....
-				if( this.objectName === "materials" ) {
-					if( ! targetObject.material ) {
-						console.error( '  can not bind to material as node does not have a material', this );
-						return;				
-					}
-					if( ! targetObject.material.materials ) {
-						console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
-						return;				
-					}
-					targetObject = targetObject.material.materials;
-				}
-				else if( this.objectName === "bones" ) {
-					if( ! targetObject.skeleton ) {
-						console.error( '  can not bind to bones as node does not have a skeleton', this );
-					}
-					targetObject = targetObject.skeleton.bones;
-
-					// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
-					
-					// support resolving morphTarget names into indices.
-					//console.log( "  resolving bone name: ", this.objectIndex );
-					for( var i = 0; i < this.node.skeleton.bones.length; i ++ ) {
-						if( this.node.skeleton.bones[i].name === this.objectIndex ) {
-							//console.log( "  resolved to index: ", i );
-							this.objectIndex = i;
-							break;
-						}
-					}
-				}
-				else {
-
-					if( targetObject[ this.objectName ] === undefined ) {
-						console.error( '  can not bind to objectName of node, undefined', this );			
-						return;
-					}
-					targetObject = targetObject[ this.objectName ];
-				}
-				
-				if( this.objectIndex !== undefined ) {
-					if( targetObject[ this.objectIndex ] === undefined ) {
-						console.error( "  trying to bind to objectIndex of objectName, but is undefined:", this, targetObject );
-						return;				
-					}
-
-					targetObject = targetObject[ this.objectIndex ];
-				}
-
-			}
-
-	 		// special case mappings
-	 		var nodeProperty = targetObject[ this.propertyName ];
-			if( ! nodeProperty ) {
-				console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );				
-				return;
-			}
-
-			// access a sub element of the property array (only primitives are supported right now)
-			if( this.propertyIndex !== undefined ) {
-
-				if( this.propertyName === "morphTargetInfluences" ) {
-					// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
-					
-					// support resolving morphTarget names into indices.
-					//console.log( "  resolving morphTargetInfluence name: ", this.propertyIndex );
-					if( ! this.node.geometry ) {
-						console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );				
-					}
-					if( ! this.node.geometry.morphTargets ) {
-						console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );				
-					}
-					
-					for( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
-						if( this.node.geometry.morphTargets[i].name === this.propertyIndex ) {
-							//console.log( "  resolved to index: ", i );
-							this.propertyIndex = i;
-							break;
-						}
-					}
-				}
-
-				//console.log( '  update property array ' + this.propertyName + '[' + this.propertyIndex + '] via assignment.' );				
-				this.internalApply = function() {
-					if( ! equalsFunc( nodeProperty[ this.propertyIndex ], this.cumulativeValue ) ) {
-						nodeProperty[ this.propertyIndex ] = this.cumulativeValue;
-						return true;
-					}
-					return false;
-				};
-			}
-			// must use copy for Object3D.Euler/Quaternion		
-			else if( nodeProperty.copy ) {
-				//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via a set() function.' );				
-				this.internalApply = function() {
-					if( ! equalsFunc( nodeProperty, this.cumulativeValue ) ) {
-						nodeProperty.copy( this.cumulativeValue );
-						return true;
-					}
-					return false;
-				}
-			}
-			// otherwise just set the property directly on the node (do not use nodeProperty as it may not be a reference object)
-			else {
-
-				//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via assignment.' );				
-				this.internalApply = function() {
-					if( ! equalsFunc( targetObject[ this.propertyName ], this.cumulativeValue ) ) {
-						targetObject[ this.propertyName ] = this.cumulativeValue;	
-						return true;
-					}
-					return false;
-				}
-			}
-
-			// trigger node dirty			
-			if( targetObject.needsUpdate !== undefined ) { // material
-				//console.log( '  triggering material as dirty' );
-				this.triggerDirty = function() {
-					this.node.needsUpdate = true;
-				}
-			}			
-			else if( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
-				//console.log( '  triggering node as dirty' );
-				this.triggerDirty = function() {
-					targetObject.matrixWorldNeedsUpdate = true;
-				}
-			}
-
+		if( ! this.setValue ) {
+			this.bind();
 		}
 
 		// early exit if there is nothing to apply.
 		if( this.cumulativeWeight > 0 ) {
 		
-			var valueChanged = this.internalApply();
+			// blend with original value
+			if( this.cumulativeWeight < 1 ) {
+
+				var remainingWeight = 1 - this.cumulativeWeight;
+				var lerpAlpha = remainingWeight / ( this.cumulativeWeight + remainingWeight );
+				this.cumulativeValue = this.lerp( this.cumulativeValue, this.originalValue, lerpAlpha );
+
+			}
+
+			var valueChanged = this.setValue( this.cumulativeValue );
 
 			if( valueChanged && this.triggerDirty ) {
 				this.triggerDirty();
@@ -229,12 +275,6 @@ THREE.PropertyBinding.prototype = {
 			this.cumulativeWeight = 0;
 
 		}
-	},
-
-	get: function() {
-
-		throw new Error( "TODO" );
-
 	}
 
 };

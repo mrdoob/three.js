@@ -34,21 +34,35 @@ THREE.AnimationMixer.prototype = {
 
 			var track = tracks[ i ];
 
+			var propertyBinding = this.propertyBindings[ track.name ];
+
 			if( ! this.propertyBindings[ track.name ] ) {
 			
-				var propertyBinding = new THREE.PropertyBinding( this.root, track.name );
+				propertyBinding = new THREE.PropertyBinding( this.root, track.name );
 				this.propertyBindings[ track.name ] = propertyBinding;
-
 				this.propertyBindingsArray.push( propertyBinding );
 			
 			}
+
+			// track usages of shared property bindings, because if we leave too many around, the mixer can get slow
+			propertyBinding.referenceCount += 1;
+
 		}
 
 	},
 
 	removeAllActions: function() {
 
+		// unbind all property bindings
+		for( var i = 0; i < this.propertyBindingsArray.length; i ++ ) {
+
+			this.propertyBindingsArray[i].unbind();
+
+		}
+
 		this.actions = [];
+		this.propertyBindings = {};
+		this.propertyBindingsArray = [];
 
 	},
 
@@ -62,6 +76,27 @@ THREE.AnimationMixer.prototype = {
 			this.actions.splice( index, 1 );
 
 		}
+
+		// remove unused property bindings because if we leave them around the mixer can get slow
+		var tracks = action.clip.tracks;
+
+		for( var i = 0; i < tracks.length; i ++ ) {
+		
+			var track = tracks[ i ];
+			var propertyBinding = this.propertyBindings[ track.name ];
+
+			propertyBinding.referenceCount -= 1;
+
+			if( propertyBinding.referenceCount <= 0 ) {
+
+				propertyBinding.unbind();
+
+				delete this.propertyBindings[ track.name ];
+				this.propertyBindingArray.splice( this.propertyBindingArray.indexOf( propertyBinding ), 1 );
+
+			}
+		}
+
 	},
 
 	fadeOut: function( action, duration ) {
@@ -83,6 +118,13 @@ THREE.AnimationMixer.prototype = {
 		
 		action.weight = new THREE.KeyframeTrack( "weight", keys );
 
+	},
+
+	crossFade: function( fadeOutAction, faceInAction, duration ) {
+
+		this.fadeOut( fadeOutAction, duration );
+		this.fadeIn( fadeInAction, duration );
+		
 	},
 
 	update: function( deltaTime ) {
