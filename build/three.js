@@ -8481,7 +8481,7 @@ THREE.Object3DIdCount = 0;
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Face3 = function ( a, b, c, normal, color ) {
+THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 
 	this.a = a;
 	this.b = b;
@@ -8494,6 +8494,8 @@ THREE.Face3 = function ( a, b, c, normal, color ) {
 	this.vertexColors = Array.isArray( color ) ? color : [];
 
 	this.vertexTangents = [];
+
+	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
 };
 
@@ -8509,6 +8511,8 @@ THREE.Face3.prototype = {
 
 		this.normal.copy( source.normal );
 		this.color.copy( source.color );
+
+		this.materialIndex = source.materialIndex;
 
 		for ( var i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
 
@@ -9823,7 +9827,7 @@ THREE.Geometry.prototype = {
 
 	},
 
-	merge: function ( geometry, matrix ) {
+	merge: function ( geometry, matrix, materialIndexOffset ) {
 
 		if ( geometry instanceof THREE.Geometry === false ) {
 
@@ -9840,6 +9844,8 @@ THREE.Geometry.prototype = {
 		faces2 = geometry.faces,
 		uvs1 = this.faceVertexUvs[ 0 ],
 		uvs2 = geometry.faceVertexUvs[ 0 ];
+
+		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
 		if ( matrix !== undefined ) {
 
@@ -9900,6 +9906,8 @@ THREE.Geometry.prototype = {
 				faceCopy.vertexColors.push( color.clone() );
 
 			}
+
+			faceCopy.materialIndex = face.materialIndex + materialIndexOffset;
 
 			faces1.push( faceCopy );
 
@@ -13381,7 +13389,7 @@ THREE.JSONLoader.prototype = {
 
 			offset, zLength,
 
-		colorIndex, normalIndex, uvIndex,
+		colorIndex, normalIndex, uvIndex, materialIndex,
 
 			type,
 			isQuad,
@@ -13468,7 +13476,9 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasMaterial ) {
 
-						offset ++;
+						materialIndex = faces[ offset ++ ];
+						faceA.materialIndex = materialIndex;
+						faceB.materialIndex = materialIndex;
 
 					}
 
@@ -13575,7 +13585,8 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasMaterial ) {
 
-						offset ++;
+						materialIndex = faces[ offset ++ ];
+						face.materialIndex = materialIndex;
 
 					}
 
@@ -17629,7 +17640,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 	this.normalizeSkinWeights();
 
 	this.updateMatrixWorld( true );
-	this.bind( new THREE.Skeleton( bones, undefined, useVertexTexture ) );
+	this.bind( new THREE.Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
 
 };
 
@@ -17644,6 +17655,8 @@ THREE.SkinnedMesh.prototype.bind = function( skeleton, bindMatrix ) {
 	if ( bindMatrix === undefined ) {
 
 		this.updateMatrixWorld( true );
+		
+		this.skeleton.calculateInverses();
 
 		bindMatrix = this.matrixWorld;
 
@@ -31475,14 +31488,14 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 	var height_half = height / 2;
 	var depth_half = depth / 2;
 
-	buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half ); // px
-	buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half ); // nx
-	buildPlane( 'x', 'z',   1,   1, width, depth, height_half ); // py
-	buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half ); // ny
-	buildPlane( 'x', 'y',   1, - 1, width, height, depth_half ); // pz
-	buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half ); // nz
+	buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, 0 ); // px
+	buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, 1 ); // nx
+	buildPlane( 'x', 'z',   1,   1, width, depth, height_half, 2 ); // py
+	buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, 3 ); // ny
+	buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, 4 ); // pz
+	buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, 5 ); // nz
 
-	function buildPlane( u, v, udir, vdir, width, height, depth ) {
+	function buildPlane( u, v, udir, vdir, width, height, depth, materialIndex ) {
 
 		var w, ix, iy,
 		gridX = scope.widthSegments,
@@ -31547,6 +31560,7 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 				var face = new THREE.Face3( a + offset, b + offset, d + offset );
 				face.normal.copy( normal );
 				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+				face.materialIndex = materialIndex;
 
 				scope.faces.push( face );
 				scope.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
@@ -31554,6 +31568,7 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 				face = new THREE.Face3( b + offset, c + offset, d + offset );
 				face.normal.copy( normal );
 				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+				face.materialIndex = materialIndex;
 
 				scope.faces.push( face );
 				scope.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
