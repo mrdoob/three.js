@@ -36,6 +36,8 @@ var Viewport = function ( editor ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
+	var matrix = new THREE.Matrix4();
+
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
@@ -58,12 +60,37 @@ var Viewport = function ( editor ) {
 	} );
 	transformControls.addEventListener( 'mouseDown', function () {
 
+		var object = transformControls.object;
+
+		matrix.copy( object.matrix );
+
 		controls.enabled = false;
 
 	} );
 	transformControls.addEventListener( 'mouseUp', function () {
 
-		signals.objectChanged.dispatch( transformControls.object );
+		var object = transformControls.object;
+
+		if ( matrix.equals( object.matrix ) === false ) {
+
+			( function ( matrix1, matrix2 ) {
+
+				editor.history.add(
+					function () {
+						matrix1.decompose( object.position, object.quaternion, object.scale );
+						signals.objectChanged.dispatch( object );
+					},
+					function () {
+						matrix2.decompose( object.position, object.quaternion, object.scale );
+						signals.objectChanged.dispatch( object );
+					}
+				);
+
+			} )( matrix.clone(), object.matrix.clone() );
+
+		}
+
+		signals.objectChanged.dispatch( object );
 		controls.enabled = true;
 
 	} );
@@ -375,6 +402,7 @@ var Viewport = function ( editor ) {
 
 	signals.objectChanged.add( function ( object ) {
 
+		selectionBox.update( object );
 		transformControls.update();
 
 		if ( object instanceof THREE.PerspectiveCamera ) {

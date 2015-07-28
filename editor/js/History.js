@@ -51,8 +51,7 @@ History.prototype = {
 
 		this.isRecording = false;
 
-		this.array[ this.current ].undo();
-		this.current --;
+		this.array[ this.current -- ].undo();
 
 		this.isRecording = true;
 
@@ -64,8 +63,7 @@ History.prototype = {
 
 		this.isRecording = false;
 
-		this.current ++;
-		this.array[ this.current ].redo();
+		this.array[ ++ this.current ].redo();
 
 		this.isRecording = true;
 
