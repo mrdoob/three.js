@@ -16,6 +16,34 @@ Menubar.Edit = function ( editor ) {
 	options.setClass( 'options' );
 	container.add( options );
 
+	// Undo
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Undo' );
+	option.onClick( function () {
+
+		editor.history.undo();
+
+	} );
+	options.add( option );
+
+	// Redo
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Redo' );
+	option.onClick( function () {
+
+		editor.history.redo();
+
+	} );
+	options.add( option );
+
+	// ---
+
+	options.add( new UI.HorizontalRule() );
+
 	// Clone
 
 	var option = new UI.Panel();
