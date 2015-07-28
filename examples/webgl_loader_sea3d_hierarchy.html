@@ -94,6 +94,11 @@
 				var cam = loader.cameras[0];
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
+				
+				controls = new THREE.OrbitControls( camera );
+				controls.noZoom = true;
+				controls.noPan = true;
+				controls.dynamicDampingFactor = 0.05;
 
 				animate();
 
@@ -111,12 +116,6 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 1000, - 300, 1000 );
-
-				controls = new THREE.OrbitControls( camera );
-				controls.noZoom = true;
-				controls.noPan = true;
-				controls.dynamicDampingFactor = 0.05;
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
