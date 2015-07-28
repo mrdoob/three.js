@@ -64,6 +64,27 @@ THREE.AnimationMixer.prototype = {
 		}
 	},
 
+	fadeOut: function( action, duration ) {
+
+		var keys = [];
+
+		keys.push( { time: this.time, value: action.getWeightAt( this.time ) } );
+		keys.push( { time: this.time + duration, value: 0 } );
+		
+		action.weight = new THREE.KeyframeTrack( "weight", keys );
+	},
+
+	fadeIn: function( action, duration ) {
+		
+		var keys = [];
+		
+		keys.push( { time: this.time, value: action.getWeightAt( this.time ) } );
+		keys.push( { time: this.time + duration, value: 1 } );
+		
+		action.weight = new THREE.KeyframeTrack( "weight", keys );
+
+	},
+
 	update: function( deltaTime ) {
 
 		this.time += deltaTime * this.timeScale;
@@ -74,13 +95,15 @@ THREE.AnimationMixer.prototype = {
 
 			var action = this.actions[i];
 
+			var weight = action.getWeightAt( this.time );
+			
 			if( action.weight <= 0 || ! action.enabled ) continue;
 
 			var actionResults = action.getAt( this.time );
 
 			for( var name in actionResults ) {
 
-				this.propertyBindings[name].accumulate( actionResults[name], action.weight );
+				this.propertyBindings[name].accumulate( actionResults[name], weight );
 
 			}
 

@@ -62,4 +62,16 @@ THREE.AnimationAction.prototype = {
 		
 	}
 
+	getWeightAt: function( time ) {
+
+		if( this.weight.getAt ) {
+			// pass in time, not clip time, allows for fadein/fadeout across multiple loops of the clip
+			return this.weight.getAt( time );
+
+		}
+
+		return this.weight;
+
+	}
+
 };
