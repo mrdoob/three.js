@@ -120,10 +120,31 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
-	crossFade: function( fadeOutAction, faceInAction, duration ) {
+	wrap: function( action, startTimeScale, endTimeScale, duration ) {
+
+		var keys = [];
+		
+		keys.push( { time: this.time, value: startTimeScale } );
+		keys.push( { time: this.time + duration, value: endTimeScale } );
+		
+		action.timeScale = new THREE.KeyframeTrack( "timeScale", keys );
+
+	}
+
+	crossFade: function( fadeOutAction, fadeInAction, duration, wrapTimeScales ) {
 
 		this.fadeOut( fadeOutAction, duration );
 		this.fadeIn( fadeInAction, duration );
+
+		if( wrapTimeScales ) {
+	
+			var startEndRatio = fadeOutAction.duration / fadeInAction.duration;
+			var endStartRatio = 1.0 / startEndRatio;
+
+			this.wrap( fadeOutAction, 1.0, startEndRatio, duration );
+			this.wrap( fadeInAction, endStartRatio, 1.0, duration );
+
+		}
 		
 	},
 

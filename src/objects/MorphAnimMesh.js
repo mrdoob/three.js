@@ -90,7 +90,7 @@ THREE.MorphAnimMesh.prototype.clone = function () {
 
 THREE.MorphAnimMesh.prototype.copy = function ( source ) {
 
-	this.mixer.copy( source.mixer );
+	this.mixer = new THREE.AnimationMixer( this );
 	this.animationClips = source.animationClips;
 	this.firstAnimationClips = source.firstAnimationClips;
 

@@ -1,4 +1,4 @@
-THREE.UCSCharacter = function() {
+THREE.UCSCharacterMixer = function() {
 
 	var scope = this;
 	
@@ -14,6 +14,8 @@ THREE.UCSCharacter = function() {
 	this.skins = [];
 	this.materials = [];
 	this.morphs = [];
+
+	this.mixer = new THREE.AnimationMixer( this.root );
 
 	this.onLoadComplete = function () {};
 	
@@ -41,10 +43,9 @@ THREE.UCSCharacter = function() {
 
 			geometry.computeBoundingBox();
 			geometry.computeVertexNormals();
-
-			//THREE.AnimationHandler.add( geometry.animation );
-
+			
 			mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshFaceMaterial() );
+			mesh.name = config.character;
 			scope.root.add( mesh );
 			
 			var bb = geometry.boundingBox;
@@ -54,8 +55,9 @@ THREE.UCSCharacter = function() {
 			mesh.castShadow = true;
 			mesh.receiveShadow = true;
 
-			animation = new THREE.Animation( mesh, geometry.animation );
-			animation.play();
+			var clipBones = THREE.AnimationClip.FromJSONLoaderAnimation( geometry, mesh.uuid );
+
+			scope.mixer.addAction( new THREE.AnimationAction( clipBones, 0, 1, 1, true ) );
 			
 			scope.setSkin( 0 );
 			

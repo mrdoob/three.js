@@ -60,7 +60,7 @@ THREE.AnimationAction.prototype = {
 
 		return clipResults;
 		
-	}
+	},
 
 	getWeightAt: function( time ) {
 

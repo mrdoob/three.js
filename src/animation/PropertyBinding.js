@@ -64,9 +64,16 @@ THREE.PropertyBinding.prototype = {
 
 	unbind: function() {
 
-		if( ! this.setValue ) throw new Error( "can not unbind if not bound in the first place." );
+		if( this.setValue ) {
 
-		this.setValue( this.originalValue );
+			this.setValue( this.originalValue );
+
+			this.setValue = null;
+			this.getValue = null;
+			this.lerp = null;
+			this.triggerDirty = null;
+			
+		}
 	},
 
 	// creates the member functions:
@@ -80,7 +87,7 @@ THREE.PropertyBinding.prototype = {
 		
 		//console.log( "PropertyBinding", this );
 
-		var equalsFunc = THREE.AnimationUtils.getEqualsFunc( this.cumulativeValue );
+		var equalsFunc = THREE.AnimationUtils.getEqualsFunc( this.originalValue );
 
 		var targetObject = this.node;
 
@@ -241,7 +248,7 @@ THREE.PropertyBinding.prototype = {
 
 		this.originalValue = this.getValue();
 
-		this.lerp = THREE.AnimationUtils.getLerpFunc( value, true );
+		this.lerp = THREE.AnimationUtils.getLerpFunc( this.originalValue, true );
 
 	},
 
