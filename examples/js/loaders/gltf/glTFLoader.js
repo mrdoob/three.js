@@ -1209,7 +1209,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 								}
 							}
 
-							threeMesh.bind(new THREE.Skeleton(bones, boneInverses, false));
+							threeMesh.bind( new THREE.Skeleton( bones, boneInverses, false ), threeMesh.matrixWorld );
 						}
 
 						if (threeMesh) {
