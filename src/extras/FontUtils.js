@@ -30,6 +30,7 @@ THREE.FontUtils = {
 	style: 'normal',
 	size: 150,
 	divisions: 10,
+	format: "truetype",
 
 	getFace: function () {
 
@@ -72,6 +73,17 @@ THREE.FontUtils = {
 			offset = 0,
 			chars = String( text ).split( '' ),
 			length = chars.length;
+
+		if ( face.format !== undefined ) {
+
+			THREE.FontUtils.format = face.format;
+
+		}
+		else {
+
+			THREE.FontUtils.format = "truetype";
+
+		}
 
 		var fontPaths = [];
 
@@ -257,10 +269,11 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 	var paths = data.paths;
 	var shapes = [];
+	var isCCw = ( THREE.FontUtils.format === "truetype") ? false : true ;
 
 	for ( var p = 0, pl = paths.length; p < pl; p ++ ) {
 
-		Array.prototype.push.apply( shapes, paths[ p ].toShapes() );
+		Array.prototype.push.apply( shapes, paths[ p ].toShapes( isCCw ) );
 
 	}
 

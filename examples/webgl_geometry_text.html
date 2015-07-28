@@ -38,7 +38,7 @@
 		</div>
 
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/utils/GeometryUtils.js"></script>
 
 		<script src="js/shaders/ConvolutionShader.js"></script>
@@ -68,7 +68,9 @@
 		<script src="fonts/droid/droid_sans_bold.typeface.js"></script>
 		<script src="fonts/droid/droid_serif_regular.typeface.js"></script>
 		<script src="fonts/droid/droid_serif_bold.typeface.js"></script>
-
+		<script src="fonts/courier_bold.typeface.js"></script>
+		<script src="fonts/courier_regular.typeface.js"></script>
+        
 		<!-- todo async loader for fonts -->
 
 		<script>
@@ -99,7 +101,7 @@
 				bevelSegments = 3,
 				bevelEnabled = true,
 
-				font = "optimer", // helvetiker, optimer, gentilis, droid sans, droid serif
+				font = "optimer", // helvetiker, optimer, gentilis, droid sans, droid serif, courier
 				weight = "bold", // normal bold
 				style = "normal"; // normal italic
 
@@ -111,7 +113,8 @@
 				"optimer": 1,
 				"gentilis": 2,
 				"droid sans": 3,
-				"droid serif": 4
+				"droid serif": 4,
+                "courier": 5
 
 			};
 
@@ -292,6 +295,10 @@
 					} else if ( font == "droid sans" ) {
 
 						font = "droid serif";
+
+					} else if ( font == "droid serif" ) {
+
+						font = "courier";
 
 					} else {
 
