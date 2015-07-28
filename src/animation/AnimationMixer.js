@@ -142,7 +142,7 @@ THREE.AnimationMixer.prototype = {
 			var endStartRatio = 1.0 / startEndRatio;
 
 			this.wrap( fadeOutAction, 1.0, startEndRatio, duration );
-			this.wrap( fadeInAction, endStartRatio, 1.0, duration );
+			this.wrap( action, endStartRatio, 1.0, duration );
 
 		}
 		

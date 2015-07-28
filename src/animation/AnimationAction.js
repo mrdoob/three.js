@@ -14,6 +14,8 @@ THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 	this.weight = weight || 1;
 	this.loop = loop || clip.loop || false;
 	this.enabled = true;	// allow for easy disabling of the action.
+
+	this.time = 0;
 };
 
 THREE.AnimationAction.prototype = {
@@ -24,7 +26,7 @@ THREE.AnimationAction.prototype = {
 
 		//console.log( 'AnimationAction[' + this.clip.name + '].toAnimationClipTime( ' + time + ' )' );
 
-		var clipTime = ( time - this.startTime ) * this.timeScale;
+		var clipTime = ( time - this.startTime ) * this.getTimeScaleAt( time );
 		//console.log( '   clipTime: ' + clipTime );
 
 		var duration = this.clip.duration;
@@ -48,11 +50,19 @@ THREE.AnimationAction.prototype = {
 	   	}
 	},
 
-	getAt: function( time ) {
+	init: function( time ) {
+
+		this.time = time;
+
+	},
+
+	update: function( deltaTime ) {
 
 		//console.log( 'AnimationAction[' + this.clip.name + '].getAt( ' + time + ' )' );
 
-		var clipTime = this.toAnimationClipTime( time );
+		this.time += deltaTime;
+
+		var clipTime = this.toAnimationClipTime( this.time );
 
 		var clipResults = this.clip.getAt( clipTime );
 
@@ -60,6 +70,18 @@ THREE.AnimationAction.prototype = {
 
 		return clipResults;
 		
+	},
+
+	getTimeScaleAt: function( time ) {
+
+		if( this.timeScale.getAt ) {
+			// pass in time, not clip time, allows for fadein/fadeout across multiple loops of the clip
+			return this.timeScale.getAt( time );
+
+		}
+
+		return this.timeScale;
+
 	},
 
 	getWeightAt: function( time ) {
