@@ -10339,9 +10339,7 @@ THREE.DirectGeometry = function () {
 	this.uvs2 = [];
 	this.tangents = [];
 
-	this.morphTargets = [];
-	this.morphColors = [];
-	this.morphNormals = [];
+	this.morphTargets = { position: [], normal: [] };
 
 	this.skinWeights = [];
 	this.skinIndices = [];
@@ -10406,27 +10404,22 @@ THREE.DirectGeometry.prototype = {
 		var morphTargets = geometry.morphTargets;
 		var morphTargetsLength = morphTargets.length;
 
+		var morphTargetsPosition = this.morphTargets.position;
+
 		for ( var i = 0; i < morphTargetsLength; i ++ ) {
 
-			this.morphTargets[ i ] = [];
+			morphTargetsPosition[ i ] = [];
 
 		}
 
 		var morphNormals = geometry.morphNormals;
 		var morphNormalsLength = morphNormals.length;
 
+		var morphTargetsNormal = this.morphTargets.normal;
+
 		for ( var i = 0; i < morphNormalsLength; i ++ ) {
 
-			this.morphNormals[ i ] = [];
-
-		}
-
-		var morphColors = geometry.morphColors;
-		var morphColorsLength = morphColors.length;
-
-		for ( var i = 0; i < morphColorsLength; i ++ ) {
-
-			this.morphColors[ i ] = [];
+			morphTargetsNormal[ i ] = [];
 
 		}
 
@@ -10534,26 +10527,17 @@ THREE.DirectGeometry.prototype = {
 
 				var morphTarget = morphTargets[ j ].vertices;
 
-				this.morphTargets[ j ].push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
+				morphTargetsPosition[ j ].push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
 
 			}
-			/*
+
 			for ( var j = 0; j < morphNormalsLength; j ++ ) {
 
 				var morphNormal = morphNormals[ j ].vertexNormals[ i ];
 
-				this.morphNormals[ j ].push( morphNormal.a, morphNormal.b, morphNormal.c );
+				morphTargetsNormal[ j ].push( morphNormal.a, morphNormal.b, morphNormal.c );
 
 			}
-
-			for ( var j = 0; j < morphColorsLength; j ++ ) {
-
-				var morphColor = morphColors[ j ].colors;
-
-				this.morphColors[ j ].push( morphColor[ face.a ], morphColor[ face.b ], morphColor[ face.c ] );
-
-			}
-			*/
 
 			// skins
 
@@ -10609,7 +10593,7 @@ THREE.BufferGeometry = function () {
 
 	this.attributes = {};
 
-	this.morphAttributes = [];
+	this.morphAttributes = {};
 
 	this.drawcalls = [];
 
@@ -10937,9 +10921,10 @@ THREE.BufferGeometry.prototype = {
 
 		// morphs
 
-		if ( geometry.morphTargets.length > 0 ) {
+		for ( var name in geometry.morphTargets ) {
 
-			var morphTargets = geometry.morphTargets;
+			var array = [];
+			var morphTargets = geometry.morphTargets[ name ];
 
 			for ( var i = 0, l = morphTargets.length; i < l; i ++ ) {
 
@@ -10947,11 +10932,11 @@ THREE.BufferGeometry.prototype = {
 
 				var attribute = new THREE.Float32Attribute( morphTarget.length * 3, 3 );
 
-				this.morphAttributes.push( attribute.copyVector3sArray( morphTarget ) );
+				array.push( attribute.copyVector3sArray( morphTarget ) );
 
 			}
 
-			// TODO normals, colors
+			this.morphAttributes[ name ] = array;
 
 		}
 
@@ -20593,6 +20578,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			var morphAttributes = geometry.morphAttributes;
+
 			for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
 
 				var influence = activeInfluences[ i ];
@@ -20600,13 +20587,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( influence[ 0 ] !== 0 ) {
 
-					var attribute = geometry.morphAttributes[ influence[ 1 ] ];
+					var index = influence[ 1 ];
 
-					geometry.addAttribute( 'morphTarget' + i, attribute );
+					if ( material.morphTargets === true ) geometry.addAttribute( 'morphTarget' + i, morphAttributes.position[ index ] );
+					if ( material.morphNormals === true ) geometry.addAttribute( 'morphNormal' + i, morphAttributes.normal[ index ] );
 
 				} else {
 
-					geometry.removeAttribute( 'morphTarget' + i );
+					if ( material.morphTargets === true ) geometry.removeAttribute( 'morphTarget' + i );
+					if ( material.morphNormals === true ) geometry.removeAttribute( 'morphNormal' + i );
 
 				}
 
@@ -22921,8 +22910,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setMaterialFaces = setMaterialFaces;
-
 	// Textures
 
 	function setTextureParameters ( textureType, texture, isImagePowerOfTwo ) {
@@ -24194,9 +24181,15 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		var morphAttributes = geometry.morphAttributes;
 
-		for ( var i = 0, l = morphAttributes.length; i < l; i ++ ) {
+		for ( var name in morphAttributes ) {
 
-			updateAttribute( morphAttributes[ i ], i );
+			var array = morphAttributes[ name ];
+
+			for ( var i = 0, l = array.length; i < l; i ++ ) {
+
+				updateAttribute( array[ i ], i );
+
+			}
 
 		}
 
