@@ -93,7 +93,7 @@
 					morphColorsToFaceColors( geometry );
 					geometry.computeMorphNormals();
 
-					var material = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
 					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
 
 					meshAnim.duration = 5000;
