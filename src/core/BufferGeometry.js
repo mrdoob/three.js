@@ -14,7 +14,7 @@ THREE.BufferGeometry = function () {
 
 	this.attributes = {};
 
-	this.morphAttributes = [];
+	this.morphAttributes = {};
 
 	this.drawcalls = [];
 
@@ -344,6 +344,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( geometry.morphTargets.length > 0 ) {
 
+			var position = [];
 			var morphTargets = geometry.morphTargets;
 
 			for ( var i = 0, l = morphTargets.length; i < l; i ++ ) {
@@ -352,9 +353,11 @@ THREE.BufferGeometry.prototype = {
 
 				var attribute = new THREE.Float32Attribute( morphTarget.length * 3, 3 );
 
-				this.morphAttributes.push( attribute.copyVector3sArray( morphTarget ) );
+				position.push( attribute.copyVector3sArray( morphTarget ) );
 
 			}
+
+			this.morphAttributes.position = position;
 
 			// TODO normals, colors
 

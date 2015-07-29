@@ -99,9 +99,15 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		var morphAttributes = geometry.morphAttributes;
 
-		for ( var i = 0, l = morphAttributes.length; i < l; i ++ ) {
+		for ( var name in morphAttributes ) {
 
-			updateAttribute( morphAttributes[ i ], i );
+			var array = morphAttributes[ name ];
+
+			for ( var i = 0, l = array.length; i < l; i ++ ) {
+
+				updateAttribute( array[ i ], i );
+
+			}
 
 		}
 

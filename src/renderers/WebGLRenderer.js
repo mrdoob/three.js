@@ -919,7 +919,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( influence[ 0 ] !== 0 ) {
 
-					var attribute = geometry.morphAttributes[ influence[ 1 ] ];
+					var attribute = geometry.morphAttributes.position[ influence[ 1 ] ];
 
 					geometry.addAttribute( 'morphTarget' + i, attribute );
 
