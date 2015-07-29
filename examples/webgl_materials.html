@@ -26,10 +26,10 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, objects;
+			var camera, scene, renderer;
 			var particleLight;
 
-			var materials = [];
+			var objects = [], materials = [];
 
 			init();
 			animate();
@@ -100,35 +100,25 @@
 
 				}
 
-				geometry_pieces.materials = materials;
-
-				materials.push( new THREE.MeshFaceMaterial( materials ) );
-
 				objects = [];
-
-				var sphere, geometry, material;
 
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
-					material = materials[ i ];
+					var material = materials[ i ];
 
-					geometry = material instanceof THREE.MeshFaceMaterial ? geometry_pieces :
-							   ( material.shading == THREE.FlatShading ? geometry_flat : geometry_smooth );
+					if ( material.shading == THREE.FlatShading ) {
 
-					sphere = new THREE.Mesh( geometry, material );
+						addMesh( geometry_flat, material );
 
-					sphere.position.x = ( i % 4 ) * 200 - 400;
-					sphere.position.z = Math.floor( i / 4 ) * 200 - 200;
+					} else {
 
-					sphere.rotation.x = Math.random() * 200 - 100;
-					sphere.rotation.y = Math.random() * 200 - 100;
-					sphere.rotation.z = Math.random() * 200 - 100;
+						addMesh( geometry_smooth, material );
 
-					objects.push( sphere );
-
-					scene.add( sphere );
+					}
 
 				}
+
+				addMesh( geometry_pieces, new THREE.MeshFaceMaterial( materials ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
@@ -168,6 +158,23 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function addMesh( geometry, material ) {
+
+				var mesh = new THREE.Mesh( geometry, material );
+
+				mesh.position.x = ( objects.length % 4 ) * 200 - 400;
+				mesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
+
+				mesh.rotation.x = Math.random() * 200 - 100;
+				mesh.rotation.y = Math.random() * 200 - 100;
+				mesh.rotation.z = Math.random() * 200 - 100;
+
+				objects.push( mesh );
+
+				scene.add( mesh );
 
 			}
 
@@ -238,8 +245,8 @@
 
 				}
 
-				materials[ materials.length - 3 ].emissive.setHSL( 0.54, 1, 0.35 * ( 0.5 + 0.5 * Math.sin( 35 * timer ) ) );
-				materials[ materials.length - 4 ].emissive.setHSL( 0.04, 1, 0.35 * ( 0.5 + 0.5 * Math.cos( 35 * timer ) ) );
+				materials[ materials.length - 2 ].emissive.setHSL( 0.54, 1, 0.35 * ( 0.5 + 0.5 * Math.sin( 35 * timer ) ) );
+				materials[ materials.length - 3 ].emissive.setHSL( 0.04, 1, 0.35 * ( 0.5 + 0.5 * Math.cos( 35 * timer ) ) );
 
 				particleLight.position.x = Math.sin( timer * 7 ) * 300;
 				particleLight.position.y = Math.cos( timer * 5 ) * 400;
