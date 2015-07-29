@@ -19,7 +19,7 @@ THREE.DirectGeometry = function () {
 	this.uvs2 = [];
 	this.tangents = [];
 
-	this.morphTargets = { position: [], normal: [] };
+	this.morphTargets = {};
 
 	this.skinWeights = [];
 	this.skinIndices = [];
@@ -84,22 +84,34 @@ THREE.DirectGeometry.prototype = {
 		var morphTargets = geometry.morphTargets;
 		var morphTargetsLength = morphTargets.length;
 
-		var morphTargetsPosition = this.morphTargets.position;
+		if ( morphTargetsLength > 0 ) {
 
-		for ( var i = 0; i < morphTargetsLength; i ++ ) {
+			var morphTargetsPosition = [];
 
-			morphTargetsPosition[ i ] = [];
+			for ( var i = 0; i < morphTargetsLength; i ++ ) {
+
+				morphTargetsPosition[ i ] = [];
+
+			}
+
+			this.morphTargets.position = morphTargetsPosition;
 
 		}
 
 		var morphNormals = geometry.morphNormals;
 		var morphNormalsLength = morphNormals.length;
 
-		var morphTargetsNormal = this.morphTargets.normal;
+		if ( morphNormalsLength > 0 ) {
 
-		for ( var i = 0; i < morphNormalsLength; i ++ ) {
+			var morphTargetsNormal = [];
 
-			morphTargetsNormal[ i ] = [];
+			for ( var i = 0; i < morphNormalsLength; i ++ ) {
+
+				morphTargetsNormal[ i ] = [];
+
+			}
+
+			this.morphTargets.normal = morphTargetsNormal;
 
 		}
 
