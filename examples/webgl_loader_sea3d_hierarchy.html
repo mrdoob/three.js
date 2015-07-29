@@ -94,11 +94,10 @@
 				var cam = loader.cameras[0];
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
-				
+
 				controls = new THREE.OrbitControls( camera );
 				controls.noZoom = true;
 				controls.noPan = true;
-				controls.dynamicDampingFactor = 0.05;
 
 				animate();
 
