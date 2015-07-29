@@ -912,6 +912,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			var morphAttributes = geometry.morphAttributes;
+
 			for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
 
 				var influence = activeInfluences[ i ];
@@ -919,13 +921,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( influence[ 0 ] !== 0 ) {
 
-					var attribute = geometry.morphAttributes.position[ influence[ 1 ] ];
+					var index = influence[ 1 ];
 
-					geometry.addAttribute( 'morphTarget' + i, attribute );
+					if ( material.morphTargets === true ) geometry.addAttribute( 'morphTarget' + i, morphAttributes.position[ index ] );
+					if ( material.morphNormals === true ) geometry.addAttribute( 'morphNormal' + i, morphAttributes.normal[ index ] );
 
 				} else {
 
-					geometry.removeAttribute( 'morphTarget' + i );
+					if ( material.morphTargets === true ) geometry.removeAttribute( 'morphTarget' + i );
+					if ( material.morphNormals === true ) geometry.removeAttribute( 'morphNormal' + i );
 
 				}
 

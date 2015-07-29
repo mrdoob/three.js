@@ -19,9 +19,7 @@ THREE.DirectGeometry = function () {
 	this.uvs2 = [];
 	this.tangents = [];
 
-	this.morphTargets = [];
-	this.morphColors = [];
-	this.morphNormals = [];
+	this.morphTargets = { position: [], normal: [] };
 
 	this.skinWeights = [];
 	this.skinIndices = [];
@@ -86,27 +84,22 @@ THREE.DirectGeometry.prototype = {
 		var morphTargets = geometry.morphTargets;
 		var morphTargetsLength = morphTargets.length;
 
+		var morphTargetsPosition = this.morphTargets.position;
+
 		for ( var i = 0; i < morphTargetsLength; i ++ ) {
 
-			this.morphTargets[ i ] = [];
+			morphTargetsPosition[ i ] = [];
 
 		}
 
 		var morphNormals = geometry.morphNormals;
 		var morphNormalsLength = morphNormals.length;
 
+		var morphTargetsNormal = this.morphTargets.normal;
+
 		for ( var i = 0; i < morphNormalsLength; i ++ ) {
 
-			this.morphNormals[ i ] = [];
-
-		}
-
-		var morphColors = geometry.morphColors;
-		var morphColorsLength = morphColors.length;
-
-		for ( var i = 0; i < morphColorsLength; i ++ ) {
-
-			this.morphColors[ i ] = [];
+			morphTargetsNormal[ i ] = [];
 
 		}
 
@@ -214,26 +207,17 @@ THREE.DirectGeometry.prototype = {
 
 				var morphTarget = morphTargets[ j ].vertices;
 
-				this.morphTargets[ j ].push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
+				morphTargetsPosition[ j ].push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
 
 			}
-			/*
+
 			for ( var j = 0; j < morphNormalsLength; j ++ ) {
 
 				var morphNormal = morphNormals[ j ].vertexNormals[ i ];
 
-				this.morphNormals[ j ].push( morphNormal.a, morphNormal.b, morphNormal.c );
+				morphTargetsNormal[ j ].push( morphNormal.a, morphNormal.b, morphNormal.c );
 
 			}
-
-			for ( var j = 0; j < morphColorsLength; j ++ ) {
-
-				var morphColor = morphColors[ j ].colors;
-
-				this.morphColors[ j ].push( morphColor[ face.a ], morphColor[ face.b ], morphColor[ face.c ] );
-
-			}
-			*/
 
 			// skins
 
