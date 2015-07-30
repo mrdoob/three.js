@@ -278,12 +278,12 @@
 
 					case 72: /*h*/
 
-					hemiLight.visible = !hemiLight.visible;
+					hemiLight.intensity = 0.6 - hemiLight.intensity;
 					break;
 
 					case 68: /*d*/
 
-					dirLight.visible = !dirLight.visible;
+					dirLight.intensity = 1 - dirLight.intensity;
 					break;
 
 				}
