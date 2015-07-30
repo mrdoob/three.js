@@ -21,26 +21,14 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 	var quaternionWorld = new THREE.Quaternion();
 	var scaleWorld = new THREE.Vector3();
 
-	return function updateMatrixWorld( updateChildren, updateParents ) {
+	return function updateMatrixWorld( ) {
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, false, updateParents );
+		THREE.Object3D.prototype.updateMatrixWorld.call( this );
 
 		this._matrixWorld.decompose( translationWorld, quaternionWorld, scaleWorld );
 		this._matrix.decompose( translationObject, quaternionObject, scaleObject );
 
 		this._matrixWorld.compose( translationWorld, quaternionObject, scaleWorld );
-
-		// update children
-		if ( updateChildren === true ) { 
-			
-			var children = this.children;
-			for ( var i = 0, l = children.length; i < l; i ++ ) {
-
-				children[ i ].updateMatrixWorld( true, false );
-
-			}
-			
-		}
 		
 		return this._matrixWorld;
 

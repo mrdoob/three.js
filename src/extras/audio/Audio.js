@@ -123,9 +123,9 @@ THREE.Audio.prototype.updateMatrixWorld = ( function () {
 
 	var position = new THREE.Vector3();
 
-	return function updateMatrixWorld( updateChildren, updateParents ) {
+	return function updateMatrixWorld() {
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this,  updateChildren, updateParents );
+		THREE.Object3D.prototype.updateMatrixWorld.call( this );
 
 		position.setFromMatrixPosition( this._matrixWorld );
 

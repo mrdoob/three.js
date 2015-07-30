@@ -59,7 +59,6 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	this.normalizeSkinWeights();
 
-	this.updateMatrixWorld( true );
 	this.bind( new THREE.Skeleton( bones, undefined, useVertexTexture ) );
 
 };
@@ -119,9 +118,9 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 };
 
-THREE.SkinnedMesh.prototype.updateMatrixWorld = function( updateChildren, updateParents ) {
+THREE.SkinnedMesh.prototype.updateMatrixWorld = function() {
 
-	THREE.Mesh.prototype.updateMatrixWorld.call( this, updateChildren, updateParents );
+	THREE.Mesh.prototype.updateMatrixWorld.call( this );
 
 	if ( this.bindMode === "attached" ) {
 

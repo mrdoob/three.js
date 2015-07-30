@@ -225,10 +225,6 @@ THREE.CSS3DRenderer = function () {
 
 		}
 
-		scene.updateMatrixWorld( true );
-
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
-
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		var style = "translate3d(0,0," + fov + "px)" + getCameraCSSMatrix( camera.matrixWorldInverse ) +

@@ -1004,7 +1004,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// (both color and normalDepth passes use exactly the same scene state)
 
 		scene.autoUpdate = false;
-		scene.updateMatrixWorld( true );
 
 		// 1) g-buffer normals + depth pass
 

@@ -487,14 +487,6 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		cancelAnimationFrame( animationFrameId );
 
-		// update scene graph
-
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld( true );
-
-		// update camera matrices
-
-		if ( camera.parent === undefined ) camera.updateMatrixWorld( true );
-
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 		cameraPosition.setFromMatrixPosition( camera.matrixWorld );
 

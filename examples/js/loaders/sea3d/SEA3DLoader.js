@@ -60,15 +60,15 @@ THREE.MeshPhongMaterial.prototype.__defineGetter__("__webglShader", function(){
 
 // Local Animation
 THREE.Object3D.prototype.UPDATEMATRIXWORLD = THREE.Mesh.prototype.updateMatrixWorld;
-THREE.Object3D.prototype.updateMatrixWorld = function( updateChildren, updateParents ) {
+THREE.Object3D.prototype.updateMatrixWorld = function() {
 	if (this.animateMatrix) {
-		this.UPDATEMATRIXWORLD( updateChildren, updateParents );
+		this.UPDATEMATRIXWORLD();
 		
 		this.animateMatrix.compose( this.animatePosition, this.animateQuaternion, this.animateScale );
 		
 		this._matrixWorld.multiplyMatrices( this._matrixWorld, this.animateMatrix );
 	}
-	else this.UPDATEMATRIXWORLD( updateChildren, updateParents );
+	else this.UPDATEMATRIXWORLD();
 
 	return this._matrixWorld;
 	

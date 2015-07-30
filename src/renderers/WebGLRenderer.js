@@ -1591,14 +1591,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentCamera = null;
 		_lightsNeedUpdate = true;
 
-		// update scene graph
-
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld( true );
-
-		// update camera matrices and frustum
-
-		if ( camera.parent === undefined ) camera.updateMatrixWorld( true );
-
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );

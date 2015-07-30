@@ -252,10 +252,6 @@ THREE.CSS3DStereoRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		scene.updateMatrixWorld( true );
-
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
-
 		camera.matrixWorld.decompose( _position, _quaternion, _scale );
 
 		_target.set( 0, 0, - this.targetDistance );
@@ -276,7 +272,6 @@ THREE.CSS3DStereoRenderer = function () {
 		_cameraL.position.copy( _position );
 		_cameraL.translateX( - this.separation );
 		_cameraL.lookAt( _target );
-		_cameraL.updateMatrixWorld();
 
 		domElementL.style.WebkitPerspective = fov + "px";
 		domElementL.style.MozPerspective = fov + "px";
@@ -305,7 +300,6 @@ THREE.CSS3DStereoRenderer = function () {
 		_cameraR.position.copy( _position );
 		_cameraR.translateX( this.separation );
 		_cameraR.lookAt( _target );
-		_cameraR.updateMatrixWorld();
 
 		domElementR.style.WebkitPerspective = fov + "px";
 		domElementR.style.MozPerspective = fov + "px";
