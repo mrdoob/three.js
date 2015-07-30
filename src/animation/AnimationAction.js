@@ -27,7 +27,7 @@ THREE.AnimationAction.prototype = {
 
 		//console.log( 'AnimationAction[' + this.clip.name + '].toAnimationClipTime( ' + time + ' )' );
 		this.time += deltaTime;
-		this.clipTime += deltaTime * this.getTimeScaleAt( time );
+		this.clipTime += deltaTime * this.getTimeScaleAt( this.time );
 
 		//console.log( '   clipTime: ' + clipTime );
 
@@ -37,12 +37,12 @@ THREE.AnimationAction.prototype = {
 
 			if( this.clipTime < 0 ) {
 
-				this.clipTime -= Math.floor( clipTime / duration ) * duration;
+				this.clipTime -= Math.floor( this.clipTime / duration ) * duration;
 				//console.log( '   clipTime: ' + clipTime );
 
 			}
 
-	   		this.clipTime = clipTime % duration;
+	   		this.clipTime = this.clipTime % duration;
 
 	   	}
 	   	else {
