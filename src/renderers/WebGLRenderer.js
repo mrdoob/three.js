@@ -875,9 +875,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var materials = material.materials;
 
-			for ( var j = 0, jl = materials.length; j < jl; j ++ ) {
+			for ( var i = 0, il = materials.length; i < il; i ++ ) {
 
-				_this.renderBufferDirect( camera, lights, fog, materials[ j ], object );
+				_this.renderBufferDirect( camera, lights, fog, materials[ i ], object );
 
 			}
 
