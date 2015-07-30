@@ -33,7 +33,9 @@ THREE.KeyframeTrack.prototype = {
 	// TODO: this is a straight forward linear search for the key that corresponds to this time, this
 	//    should be optimized.
 	getAt: function( time ) {
-		//console.log( 'KeyframeTrack[' + this.name + '].getAt( ' + time + ' )' );
+		//if( /morph/i.test( this.name ) ) {
+		//	console.log( 'KeyframeTrack[' + this.name + '].getAt( ' + time + ' )' );
+		//}
 		
 		// this can not go higher than this.keys.length.
 		while( ( this.lastIndex < this.keys.length ) && ( time >= this.keys[this.lastIndex].time ) ) {
@@ -65,18 +67,22 @@ THREE.KeyframeTrack.prototype = {
 		this.setResult( this.keys[ this.lastIndex - 1 ].value );
 		this.result = this.lerp( this.result, this.keys[ this.lastIndex ].value, alpha );
 		//console.log( 'lerp result', this.result )
-		/*console.log( '   interpolated: ', {
-			value: interpolatedValue, 
-			alpha: alpha,
-			time0: this.keys[ i - 1 ].time,
-			time1: this.keys[ i ].time,
-			value0: this.keys[ i - 1 ].value,
-			value1: this.keys[ i ].value
-		} );*/
+		/*if( /morph/i.test( this.name ) ) {
+			console.log( '   interpolated: ', {
+				index: this.lastIndex, 
+				value: this.result, 
+				alpha: alpha,
+				time0: this.keys[ this.lastIndex - 1 ].time,
+				time1: this.keys[ this.lastIndex ].time,
+				value0: this.keys[ this.lastIndex - 1 ].value,
+				value1: this.keys[ this.lastIndex ].value
+			} );
+		}*/
 
 		return this.result;
 
 	},
+
 	setResult: function( value ) {
 		if( this.result.copy ) {
 			this.result.copy( value );
