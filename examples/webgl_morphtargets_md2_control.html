@@ -117,14 +117,6 @@
 				light.shadowCameraRight = 900;
 				light.shadowCameraLeft = -1000;
 
-				// cascaded shadows don't appear to be working, and add little
-				// light.shadowCascade = true;
-				//light.shadowCascadeCount = 3;
-				//light.shadowCascadeNearZ = [ -1.000, 0.995, 0.998 ];
-				//light.shadowCascadeFarZ  = [  0.995, 0.998, 1.000 ];
-				//light.shadowCascadeWidth = [ 1024, 1024, 1024 ];
-				//light.shadowCascadeHeight = [ 1024, 1024, 1024 ];
-
 				scene.add( light );
 
 
@@ -157,7 +149,6 @@
 				renderer.gammaOutput = true;
 				renderer.shadowMap.enabled = true;
 
-				//renderer.shadowMap.cascade = true;
 				//renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				//renderer.shadowMap.debug = true;
 

@@ -1939,7 +1939,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			shadowMapEnabled: shadowMap.enabled && object.receiveShadow && maxShadows > 0,
 			shadowMapType: shadowMap.type,
 			shadowMapDebug: shadowMap.debug,
-			shadowMapCascade: shadowMap.cascade,
 
 			alphaTest: material.alphaTest,
 			metal: material.metal,
@@ -2616,7 +2615,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.castShadow ) continue;
 
-				if ( light instanceof THREE.SpotLight || ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) ) {
+				if ( light instanceof THREE.SpotLight || ( light instanceof THREE.DirectionalLight ) ) {
 
 					uniforms.shadowMap.value[ j ] = light.shadowMap;
 					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
@@ -4037,7 +4036,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( ! light.castShadow ) continue;
 
 			if ( light instanceof THREE.SpotLight ) maxShadows ++;
-			if ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) maxShadows ++;
+			if ( light instanceof THREE.DirectionalLight ) maxShadows ++;
 
 		}
 
@@ -4121,19 +4120,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				console.warn( 'THREE.WebGLRenderer: .shadowMapDebug is now .shadowMap.debug.' );
 				shadowMap.debug = value;
-
-			}
-		},
-		shadowMapCascade: {
-			get: function () {
-
-				return shadowMap.cascade;
-
-			},
-			set: function ( value ) {
-
-				console.warn( 'THREE.WebGLRenderer: .shadowMapCascade is now .shadowMap.cascade.' );
-				shadowMap.cascade = value;
 
 			}
 		}

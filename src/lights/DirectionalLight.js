@@ -37,22 +37,6 @@ THREE.DirectionalLight = function ( color, intensity ) {
 
 	//
 
-	this.shadowCascade = false;
-
-	this.shadowCascadeOffset = new THREE.Vector3( 0, 0, - 1000 );
-	this.shadowCascadeCount = 2;
-
-	this.shadowCascadeBias = [ 0, 0, 0 ];
-	this.shadowCascadeWidth = [ 512, 512, 512 ];
-	this.shadowCascadeHeight = [ 512, 512, 512 ];
-
-	this.shadowCascadeNearZ = [ - 1.000, 0.990, 0.998 ];
-	this.shadowCascadeFarZ = [ 0.990, 0.998, 1.000 ];
-
-	this.shadowCascadeArray = [];
-
-	//
-
 	this.shadowMap = null;
 	this.shadowMapSize = null;
 	this.shadowCamera = null;
@@ -93,20 +77,6 @@ THREE.DirectionalLight.prototype.clone = function () {
 
 	light.shadowMapWidth = this.shadowMapWidth;
 	light.shadowMapHeight = this.shadowMapHeight;
-
-	//
-
-	light.shadowCascade = this.shadowCascade;
-
-	light.shadowCascadeOffset.copy( this.shadowCascadeOffset );
-	light.shadowCascadeCount = this.shadowCascadeCount;
-
-	light.shadowCascadeBias = this.shadowCascadeBias.slice( 0 );
-	light.shadowCascadeWidth = this.shadowCascadeWidth.slice( 0 );
-	light.shadowCascadeHeight = this.shadowCascadeHeight.slice( 0 );
-
-	light.shadowCascadeNearZ = this.shadowCascadeNearZ.slice( 0 );
-	light.shadowCascadeFarZ = this.shadowCascadeFarZ.slice( 0 );
 
 	return light;
 
