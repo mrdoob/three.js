@@ -268,10 +268,8 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
-					morphMaterial.shading = THREE.FlatShading;
+					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, shading: THREE.FlatShading } );
 
-					geometry.computeMorphNormals();
 					morph = new THREE.MorphAnimMesh( geometry, morphMaterial );
 
 					var s = 200;
@@ -389,7 +387,7 @@
 				gui = new dat.GUI();
 
 				shadowGUI = gui.addFolder( "Shadow" );
-    	
+
     			shadowGUI.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
 
 					sunLight.shadowCameraVisible = shadowConfig.shadowCameraVisible;
@@ -429,7 +427,7 @@
 				shadowGUI.open();
 
 				gammaGUI = gui.addFolder( "Gamma" );
-    
+
 				gammaGUI.add( gamma, 'gammaFactor', 0.1, 4.0 ).onChange( function() {
 
 					renderer.gammaFactor = gamma.gammaFactor;

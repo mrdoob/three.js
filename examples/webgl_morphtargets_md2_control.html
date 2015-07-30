@@ -18,13 +18,11 @@
 			}
 
 			#info {
-				color:#000;
-				position: relative;
-				margin: 0 auto -2.1em;
-				top: 0px;
-
-				padding: 5px;
-				z-index:100;
+				position: absolute;
+				padding: 10px;
+				width: 100%;
+				text-align: center;
+				color: #000;
 			}
 
 			a { color: skyblue; }
@@ -40,7 +38,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - morphtargets -
 			Ogro by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=556">Magarnigal</a> -
-			converted by <a href="https://twitter.com/#!/oosmoxiecode">@oosmoxiecode</a>'s <a href="http://oos.moxiecode.com/blog/2012/01/md2-to-json-converter/">MD2 converter</a> -
+			converted by <a href="https://twitter.com/#!/oosmoxiecode">@oosmoxiecode</a>'s <a href="http://oos.moxiecode.com/blog/2012/01/md2-to-json-converter/">MD2 converter</a><br />
 			use arrows to control characters, mouse for camera
 		</div>
 
@@ -280,6 +278,8 @@
 
 			function onKeyDown ( event ) {
 
+				event.stopPropagation();
+
 				switch( event.keyCode ) {
 
 					case 38: /*up*/
@@ -303,6 +303,8 @@
 			}
 
 			function onKeyUp ( event ) {
+
+				event.stopPropagation();
 
 				switch( event.keyCode ) {
 

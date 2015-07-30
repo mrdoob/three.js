@@ -522,12 +522,8 @@ THREE.MD2CharacterComplex = function () {
 
 	function createPart( geometry, skinMap ) {
 
-		geometry.computeMorphNormals();
-
-		var whiteMap = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
-		var materialWireframe = new THREE.MeshPhongMaterial( { color: 0xffaa00, specular: 0x111111, shininess: 50, wireframe: true, shading: THREE.SmoothShading, map: whiteMap, morphTargets: true, morphNormals: true, metal: true } );
-
-		var materialTexture = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 50, wireframe: false, shading: THREE.SmoothShading, map: skinMap, morphTargets: true, morphNormals: true, metal: true } );
+		var materialWireframe = new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true, shading: THREE.SmoothShading, morphTargets: true } );
+		var materialTexture = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: false, shading: THREE.SmoothShading, map: skinMap, morphTargets: true } );
 
 		//
 
