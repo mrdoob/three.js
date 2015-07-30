@@ -493,12 +493,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var texture = new THREE.SoftwareRenderer.Texture();
 					texture.fromImage( material.map.image );
 
-					material.map.addEventListener( 'update', function ( event ) {
-
-						texture.fromImage( event.target.image );
-
-					} );
-
 					textures[ material.map.id ] = texture;
 
 					if ( material instanceof THREE.MeshBasicMaterial
