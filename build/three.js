@@ -10339,7 +10339,7 @@ THREE.DirectGeometry = function () {
 	this.uvs2 = [];
 	this.tangents = [];
 
-	this.morphTargets = { position: [], normal: [] };
+	this.morphTargets = {};
 
 	this.skinWeights = [];
 	this.skinIndices = [];
@@ -10404,22 +10404,34 @@ THREE.DirectGeometry.prototype = {
 		var morphTargets = geometry.morphTargets;
 		var morphTargetsLength = morphTargets.length;
 
-		var morphTargetsPosition = this.morphTargets.position;
+		if ( morphTargetsLength > 0 ) {
 
-		for ( var i = 0; i < morphTargetsLength; i ++ ) {
+			var morphTargetsPosition = [];
 
-			morphTargetsPosition[ i ] = [];
+			for ( var i = 0; i < morphTargetsLength; i ++ ) {
+
+				morphTargetsPosition[ i ] = [];
+
+			}
+
+			this.morphTargets.position = morphTargetsPosition;
 
 		}
 
 		var morphNormals = geometry.morphNormals;
 		var morphNormalsLength = morphNormals.length;
 
-		var morphTargetsNormal = this.morphTargets.normal;
+		if ( morphNormalsLength > 0 ) {
 
-		for ( var i = 0; i < morphNormalsLength; i ++ ) {
+			var morphTargetsNormal = [];
 
-			morphTargetsNormal[ i ] = [];
+			for ( var i = 0; i < morphNormalsLength; i ++ ) {
+
+				morphTargetsNormal[ i ] = [];
+
+			}
+
+			this.morphTargets.normal = morphTargetsNormal;
 
 		}
 
@@ -13726,7 +13738,7 @@ THREE.JSONLoader.prototype = {
 					geometry.morphTargets[ i ].vertices = [];
 
 					dstVertices = geometry.morphTargets[ i ].vertices;
-					srcVertices = json.morphTargets [ i ].vertices;
+					srcVertices = json.morphTargets[ i ].vertices;
 
 					for ( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
 
@@ -13754,7 +13766,7 @@ THREE.JSONLoader.prototype = {
 					geometry.morphColors[ i ].colors = [];
 
 					dstColors = geometry.morphColors[ i ].colors;
-					srcColors = json.morphColors [ i ].colors;
+					srcColors = json.morphColors[ i ].colors;
 
 					for ( c = 0, cl = srcColors.length; c < cl; c += 3 ) {
 
@@ -20537,6 +20549,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBufferDirect = function ( camera, lights, fog, material, object ) {
 
+		if ( material instanceof THREE.MeshFaceMaterial ) {
+
+			var materials = material.materials;
+
+			for ( var i = 0, il = materials.length; i < il; i ++ ) {
+
+				_this.renderBufferDirect( camera, lights, fog, materials[ i ], object );
+
+			}
+
+			return;
+
+		}
+
 		if ( material.visible === false ) return;
 
 		setMaterial( material );
@@ -21473,20 +21499,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			setupMatrices( object, camera );
 
 			if ( overrideMaterial === null ) material = object.material;
-
-			if ( material instanceof THREE.MeshFaceMaterial ) {
-
-				var materials = material.materials;
-
-				for ( var j = 0, jl = materials.length; j < jl; j ++ ) {
-
-					_this.renderBufferDirect( camera, lights, fog, materials[ j ], object );
-
-				}
-
-				continue;
-
-			}
 
 			_this.renderBufferDirect( camera, lights, fog, material, object );
 
@@ -24515,7 +24527,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.useVertexTexture ? '#define BONE_TEXTURE' : '',
 
 				parameters.morphTargets ? '#define USE_MORPHTARGETS' : '',
-				parameters.morphNormals ? '#define USE_MORPHNORMALS' : '',
+				parameters.morphNormals && parameters.flatShading === false ? '#define USE_MORPHNORMALS' : '',
 				parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
 				parameters.flipSided ? '#define FLIP_SIDED' : '',
 
