@@ -269,7 +269,7 @@ THREE.PropertyBinding.prototype = {
 
 				var remainingWeight = 1 - this.cumulativeWeight;
 				var lerpAlpha = remainingWeight / ( this.cumulativeWeight + remainingWeight );
-				this.cumulativeValue = this.lerpValueler( this.cumulativeValue, this.originalValue, lerpAlpha );
+				this.cumulativeValue = this.lerpValue( this.cumulativeValue, this.originalValue, lerpAlpha );
 
 			}
 

@@ -10,6 +10,8 @@
 
 THREE.KeyframeTrack = function ( name, keys ) {
 
+	if( keys === undefined || keys.length === 0 ) throw new Error( "no keys in track named " + name );
+
 	this.name = name;
 	this.keys = keys;	// time in seconds, value as value
 
@@ -17,7 +19,7 @@ THREE.KeyframeTrack = function ( name, keys ) {
 	this.result = THREE.AnimationUtils.clone( this.keys[0].value );
 	//console.log( 'constructor result', this.result )
 
-	this.lastIndex = -1;
+	this.lastIndex = 0;
 
 	this.sort();
 	this.validate();
@@ -32,83 +34,47 @@ THREE.KeyframeTrack.prototype = {
 	//    should be optimized.
 	getAt: function( time ) {
 		//console.log( 'KeyframeTrack[' + this.name + '].getAt( ' + time + ' )' );
+		
+		// this can not go higher than this.keys.length.
+		while( ( this.lastIndex < this.keys.length ) && ( time >= this.keys[this.lastIndex].time ) ) {
+			this.lastIndex ++;
+		};
 
-		if( this.keys.length == 0 ) throw new Error( "no keys in track named " + this.name );
+		if( this.lastIndex >= this.keys.length ) {
 
-		// fast early exit	
-		if( this.lastIndex >= 0 ) {
-			if( ( time <= this.keys[this.lastIndex].time ) && ( this.keys[this.lastIndex-1].time < time ) ) {
-
-				var i = this.lastIndex;
-
-				var alpha = ( time - this.keys[ i - 1 ].time ) / ( this.keys[ i ].time - this.keys[ i - 1 ].time );
-
-				this.setResult( this.keys[ i - 1 ].value );
-
-				this.result = this.lerp( this.result, this.keys[ i ].value, alpha );
-
-				return this.result;
-
-			}
-
-			this.lastIndex = -1;
-		}
-
-		//console.log( "keys", this.keys );
-		// before the start of the track, return the first key value
-		if( this.keys[0].time >= time ) {
-
-			//console.log( '   before: ' + this.keys[0].value );
-			this.setResult( this.keys[0].value );
-
-			//console.log( 'first result', this.result )
-
+			this.setResult( this.keys[ this.lastIndex - 1 ].value );
 			return this.result;
 
 		}
 
-		// past the end of the track, return the last key value
-		if( this.keys[ this.keys.length - 1 ].time <= time ) {
+		// this can not go lower than 0.
+		while( ( this.lastIndex > 0 ) && ( time < this.keys[this.lastIndex - 1].time ) ) {
+			this.lastIndex --;			
+		}
 
-			//console.log( '   after: ' + this.keys[ this.keys.length - 1 ].value );
-			this.setResult( this.keys[ this.keys.length - 1 ].value );
+		if( this.lastIndex === 0 ) {
 
-			//console.log( 'last result', this.result )
-
+			this.setResult( this.keys[ 0 ].value );
 			return this.result;
 
 		}
 
-		// interpolate to the required time
-		// TODO: Optimize this better than a linear search for each key.
-		for( var i = 1; i < this.keys.length; i ++ ) {
+		// linear interpolation to start with
+		var alpha = ( time - this.keys[ this.lastIndex - 1 ].time ) / ( this.keys[ this.lastIndex ].time - this.keys[ this.lastIndex - 1 ].time );
 
-			if( time <= this.keys[ i ].time ) {
+		this.setResult( this.keys[ this.lastIndex - 1 ].value );
+		this.result = this.lerp( this.result, this.keys[ this.lastIndex ].value, alpha );
+		//console.log( 'lerp result', this.result )
+		/*console.log( '   interpolated: ', {
+			value: interpolatedValue, 
+			alpha: alpha,
+			time0: this.keys[ i - 1 ].time,
+			time1: this.keys[ i ].time,
+			value0: this.keys[ i - 1 ].value,
+			value1: this.keys[ i ].value
+		} );*/
 
-				// linear interpolation to start with
-				var alpha = ( time - this.keys[ i - 1 ].time ) / ( this.keys[ i ].time - this.keys[ i - 1 ].time );
-
-				this.setResult( this.keys[ i - 1 ].value );
-
-				this.result = this.lerp( this.result, this.keys[ i ].value, alpha );
-				//console.log( 'lerp result', this.result )
-				/*console.log( '   interpolated: ', {
-					value: interpolatedValue, 
-					alpha: alpha,
-					time0: this.keys[ i - 1 ].time,
-					time1: this.keys[ i ].time,
-					value0: this.keys[ i - 1 ].value,
-					value1: this.keys[ i ].value
-				} );*/
-
-				this.lastIndex = i;
-
-				return this.result;
-
-			}
-		}
-
-		throw new Error( "should never get here." );
+		return this.result;
 
 	},
 	setResult: function( value ) {
