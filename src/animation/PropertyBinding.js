@@ -42,6 +42,8 @@ THREE.PropertyBinding.prototype = {
 
 	accumulate: function( value, weight ) {
 		
+		if( ! this.isBound ) this.bind();
+
 		if( this.cumulativeWeight === 0 ) {
 
 			if( this.cumulativeValue === null ) {
@@ -54,7 +56,7 @@ THREE.PropertyBinding.prototype = {
 		else {
 
 			var lerpAlpha = weight / ( this.cumulativeWeight + weight );
-			this.cumulativeValue = this.lerp( this.cumulativeValue, value, lerpAlpha );
+			this.cumulativeValue = this.lerpValue( this.cumulativeValue, value, lerpAlpha );
 			this.cumulativeWeight += weight;
 			//console.log( this );
 
@@ -64,16 +66,17 @@ THREE.PropertyBinding.prototype = {
 
 	unbind: function() {
 
-		if( this.setValue ) {
+		if( ! this.isBound ) return;
 
-			this.setValue( this.originalValue );
+		this.setValue( this.originalValue );
 
-			this.setValue = null;
-			this.getValue = null;
-			this.lerp = null;
-			this.triggerDirty = null;
-			
-		}
+		this.setValue = null;
+		this.getValue = null;
+		this.lerpValue = null;
+		this.equalsValue = null;
+		this.triggerDirty = null;	
+		this.isBound = false;
+
 	},
 
 	// creates the member functions:
@@ -83,11 +86,9 @@ THREE.PropertyBinding.prototype = {
 
 	bind: function() {
 
-		if( this.setValue ) throw new Error( "can not bind if already bound." );
+		if( this.isBound ) return;
 		
 		//console.log( "PropertyBinding", this );
-
-		var equalsFunc = THREE.AnimationUtils.getEqualsFunc( this.originalValue );
 
 		var targetObject = this.node;
 
@@ -181,7 +182,7 @@ THREE.PropertyBinding.prototype = {
 
 			//console.log( '  update property array ' + this.propertyName + '[' + this.propertyIndex + '] via assignment.' );				
 			this.setValue = function( value ) {
-				if( ! equalsFunc( nodeProperty[ this.propertyIndex ], value ) ) {
+				if( ! this.equalsValue( nodeProperty[ this.propertyIndex ], value ) ) {
 					nodeProperty[ this.propertyIndex ] = value;
 					return true;
 				}
@@ -198,7 +199,7 @@ THREE.PropertyBinding.prototype = {
 			
 			//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via a set() function.' );				
 			this.setValue = function( value ) {
-				if( ! equalsFunc( nodeProperty, value ) ) {
+				if( ! this.equalsValue( nodeProperty, value ) ) {
 					nodeProperty.copy( value );
 					return true;
 				}
@@ -215,7 +216,7 @@ THREE.PropertyBinding.prototype = {
 
 			//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via assignment.' );				
 			this.setValue = function( value ) {
-				if( ! equalsFunc( targetObject[ this.propertyName ], value ) ) {
+				if( ! this.equalsValue( targetObject[ this.propertyName ], value ) ) {
 					targetObject[ this.propertyName ] = value;	
 					return true;
 				}
@@ -248,16 +249,17 @@ THREE.PropertyBinding.prototype = {
 
 		this.originalValue = this.getValue();
 
-		this.lerp = THREE.AnimationUtils.getLerpFunc( this.originalValue, true );
+		this.equalsValue = THREE.AnimationUtils.getEqualsFunc( this.originalValue );
+		this.lerpValue = THREE.AnimationUtils.getLerpFunc( this.originalValue, true );
+
+		this.isBound = true;
 
 	},
 
 	apply: function() {
 
 		// for speed capture the setter pattern as a closure (sort of a memoization pattern: https://en.wikipedia.org/wiki/Memoization)
-		if( ! this.setValue ) {
-			this.bind();
-		}
+		if( ! this.isBound ) this.bind();
 
 		// early exit if there is nothing to apply.
 		if( this.cumulativeWeight > 0 ) {
@@ -267,7 +269,7 @@ THREE.PropertyBinding.prototype = {
 
 				var remainingWeight = 1 - this.cumulativeWeight;
 				var lerpAlpha = remainingWeight / ( this.cumulativeWeight + remainingWeight );
-				this.cumulativeValue = this.lerp( this.cumulativeValue, this.originalValue, lerpAlpha );
+				this.cumulativeValue = this.lerpValueler( this.cumulativeValue, this.originalValue, lerpAlpha );
 
 			}
 

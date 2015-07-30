@@ -150,7 +150,8 @@ THREE.AnimationMixer.prototype = {
 
 	update: function( deltaTime ) {
 
-		this.time += deltaTime * this.timeScale;
+		var mixerDeltaTime = deltaTime * this.timeScale;
+		this.time += mixerDeltaTime;
 
 		//console.log( this.root.name + ".AnimationMixer.update( " + time + " )" );
 
@@ -162,7 +163,7 @@ THREE.AnimationMixer.prototype = {
 			
 			if( action.weight <= 0 || ! action.enabled ) continue;
 
-			var actionResults = action.getAt( this.time );
+			var actionResults = action.update( mixerDeltaTime );
 
 			for( var name in actionResults ) {
 
