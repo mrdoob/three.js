@@ -871,6 +871,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBufferDirect = function ( camera, lights, fog, material, object ) {
 
+		if ( material instanceof THREE.MeshFaceMaterial ) {
+
+			var materials = material.materials;
+
+			for ( var j = 0, jl = materials.length; j < jl; j ++ ) {
+
+				_this.renderBufferDirect( camera, lights, fog, materials[ j ], object );
+
+			}
+
+			return;
+
+		}
+
 		if ( material.visible === false ) return;
 
 		setMaterial( material );
@@ -1807,20 +1821,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			setupMatrices( object, camera );
 
 			if ( overrideMaterial === null ) material = object.material;
-
-			if ( material instanceof THREE.MeshFaceMaterial ) {
-
-				var materials = material.materials;
-
-				for ( var j = 0, jl = materials.length; j < jl; j ++ ) {
-
-					_this.renderBufferDirect( camera, lights, fog, materials[ j ], object );
-
-				}
-
-				continue;
-
-			}
 
 			_this.renderBufferDirect( camera, lights, fog, material, object );
 
