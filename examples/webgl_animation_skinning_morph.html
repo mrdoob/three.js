@@ -38,7 +38,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - skinning + morphing
+		<a href="http://threejs.org" target="_blank">three.js</a> webgl - clip system
 		- knight by <a href="http://vimeo.com/36113323">apendua</a>
 		</div>
 
@@ -46,7 +46,6 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
@@ -62,6 +61,8 @@
 
 			var mesh, helper;
 
+			var mixer;
+		
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -183,26 +184,9 @@
 
 			}
 
-			function ensureLoop( animation ) {
-
-				for ( var i = 0; i < animation.hierarchy.length; i ++ ) {
-
-					var bone = animation.hierarchy[ i ];
-
-					var first = bone.keys[ 0 ];
-					var last = bone.keys[ bone.keys.length - 1 ];
-
-					last.pos = first.pos;
-					last.rot = first.rot;
-					last.scl = first.scl;
-
-				}
-
-			}
-
 			function createScene( geometry, materials, x, y, z, s ) {
 
-				ensureLoop( geometry.animation );
+				//ensureLoop( geometry.animation );
 
 				geometry.computeBoundingBox();
 				var bb = geometry.boundingBox;
@@ -214,14 +198,6 @@
 						path + 'posy' + format, path + 'negy' + format,
 						path + 'posz' + format, path + 'negz' + format
 					];
-
-
-				//var envMap = THREE.ImageUtils.loadTextureCube( urls );
-
-				//var map = THREE.ImageUtils.loadTexture( "textures/UV_Grid_Sm.jpg" );
-
-				//var bumpMap = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color() );
-				//var bumpMap = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
 
 				for ( var i = 0; i < materials.length; i ++ ) {
 
@@ -256,9 +232,13 @@
 				helper.visible = false;
 				scene.add( helper );
 
-				var animation = new THREE.Animation( mesh, geometry.animation );
-				animation.play();
+				mixer = new THREE.AnimationMixer( mesh );
+		
+				var clipMorpher = THREE.AnimationClip.CreateMorphAnimation( mesh.geometry.morphTargets, 3 );
+				mixer.addAction( new THREE.AnimationAction( clipMorpher, 0, 1, 1, true ) );
 
+				var clipBones = THREE.AnimationClip.FromJSONLoaderAnimation( geometry );
+				mixer.addAction( new THREE.AnimationAction( clipBones, 0, 1, 1, true ) );
 			}
 
 			function initGUI() {
@@ -303,30 +283,8 @@
 
 				camera.lookAt( scene.position );
 
-				// update skinning
-
-				THREE.AnimationHandler.update( delta );
-
-				if ( helper !== undefined ) helper.update();
-
-				// update morphs
-
-				if ( mesh ) {
-
-					var time = Date.now() * 0.001;
-
-					// mouth
-
-					mesh.morphTargetInfluences[ 1 ] = ( 1 + Math.sin( 4 * time ) ) / 2;
-
-					// frown ?
-
-					mesh.morphTargetInfluences[ 2 ] = ( 1 + Math.sin( 2 * time ) ) / 2;
-
-					// eyes
-
-					mesh.morphTargetInfluences[ 3 ] = ( 1 + Math.cos( 4 * time ) ) / 2;
-
+				if( mixer ) {
+					mixer.update( delta );
 				}
 
 				renderer.render( scene, camera );

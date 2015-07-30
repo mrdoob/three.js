@@ -90,7 +90,7 @@ THREE.PropertyBinding.prototype = {
 		
 		//console.log( "PropertyBinding", this );
 
-		var targetObject = this.node;
+		var targetObject = this.rootNode;
 
  		// ensure there is a value node
 		if( ! targetObject ) {
@@ -115,14 +115,14 @@ THREE.PropertyBinding.prototype = {
 				if( ! targetObject.skeleton ) {
 					console.error( '  can not bind to bones as node does not have a skeleton', this );
 				}
-				targetObject = targetObject.skeleton.bones;
-
 				// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
 				
+				targetObject = targetObject.skeleton.bones;
+
 				// support resolving morphTarget names into indices.
 				//console.log( "  resolving bone name: ", this.objectIndex );
-				for( var i = 0; i < this.node.skeleton.bones.length; i ++ ) {
-					if( this.node.skeleton.bones[i].name === this.objectIndex ) {
+				for( var i = 0; i < targetObject.length; i ++ ) {
+					if( targetObject[i].name === this.objectIndex ) {
 						//console.log( "  resolved to index: ", i );
 						this.objectIndex = i;
 						break;
@@ -164,15 +164,15 @@ THREE.PropertyBinding.prototype = {
 				
 				// support resolving morphTarget names into indices.
 				//console.log( "  resolving morphTargetInfluence name: ", this.propertyIndex );
-				if( ! this.node.geometry ) {
+				if( ! targetObject.geometry ) {
 					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );				
 				}
-				if( ! this.node.geometry.morphTargets ) {
+				if( ! targetObject.geometry.morphTargets ) {
 					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );				
 				}
 				
 				for( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
-					if( this.node.geometry.morphTargets[i].name === this.propertyIndex ) {
+					if( targetObject.geometry.morphTargets[i].name === this.propertyIndex ) {
 						//console.log( "  resolved to index: ", i );
 						this.propertyIndex = i;
 						break;
