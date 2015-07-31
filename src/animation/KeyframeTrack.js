@@ -42,16 +42,20 @@ THREE.KeyframeTrack.prototype = {
 			this.lastIndex ++;
 		};
 
-		if( this.lastIndex >= this.keys.length ) {
-
-			this.setResult( this.keys[ this.lastIndex - 1 ].value );
-			return this.result;
-
-		}
-
 		// this can not go lower than 0.
 		while( ( this.lastIndex > 0 ) && ( time < this.keys[this.lastIndex - 1].time ) ) {
 			this.lastIndex --;			
+		}
+
+		//if( /morph/i.test( this.name ) ) {
+		//	console.log( "lastIndex: ", this.lastIndex );
+		//}
+		
+		if( this.lastIndex >= this.keys.length ) {
+
+			this.setResult( this.keys[ this.keys.length - 1 ].value );
+			return this.result;
+
 		}
 
 		if( this.lastIndex === 0 ) {
