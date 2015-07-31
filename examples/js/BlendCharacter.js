@@ -40,18 +40,20 @@ THREE.BlendCharacter = function () {
 
 	this.update = function( dt ) {
 
-		scope.mixer.update( dt );
+		this.mixer.update( dt );
 
 	};
 
 	this.play = function( animName, weight ) {
 
-		this.removeAllActions();
+		this.mixer.removeAllActions();
 		this.mixer.play( new THREE.AnimationAction( this.animations[ animName ], 0, 1, 1, true ) );
 
 	};
 
 	this.crossfade = function( fromAnimName, toAnimName, duration ) {
+
+		this.mixer.removeAllActions();
 
 		var fromAction = new THREE.AnimationAction( this.animations[ fromAnimName ], 0, 1, 1, true );
 		var toAction = new THREE.AnimationAction( this.animations[ toAnimName ], 0, 1, 1, true );
@@ -64,6 +66,8 @@ THREE.BlendCharacter = function () {
 	};
 
 	this.warp = function( fromAnimName, toAnimName, duration ) {
+
+		this.mixer.removeAllActions();
 
 		var fromAction = new THREE.AnimationAction( this.animations[ fromAnimName ], 0, 1, 1, true );
 		var toAction = new THREE.AnimationAction( this.animations[ toAnimName ], 0, 1, 1, true );
@@ -98,7 +102,7 @@ THREE.BlendCharacter = function () {
 
 	this.stopAll = function() {
 
-		this.removeAllActions();
+		this.mixer.removeAllActions();
 
 	};
 
