@@ -48,7 +48,7 @@ THREE.KeyframeTrack.prototype = {
 		//if( /morph/i.test( this.name ) ) {
 		//	console.log( "lastIndex: ", this.lastIndex );
 		//}
-		
+
 		if( this.lastIndex >= this.keys.length ) {
 
 			this.setResult( this.keys[ this.keys.length - 1 ].value );
@@ -63,11 +63,19 @@ THREE.KeyframeTrack.prototype = {
 
 		}
 
-		// linear interpolation to start with
-		var alpha = ( time - this.keys[ this.lastIndex - 1 ].time ) / ( this.keys[ this.lastIndex ].time - this.keys[ this.lastIndex - 1 ].time );
+		var prevKey = this.keys[ this.lastIndex - 1 ];
+		this.setResult( prevKey.value );
 
-		this.setResult( this.keys[ this.lastIndex - 1 ].value );
-		this.result = this.lerp( this.result, this.keys[ this.lastIndex ].value, alpha );
+		if( prevKey.constantToNext ) {
+
+			return this.result;
+
+		}
+
+		// linear interpolation to start with
+		var currentKey = this.keys[ this.lastIndex ];
+		var alpha = ( time - prevKey.time ) / ( currentKey.time - prevKey.time );
+		this.result = this.lerp( this.result, currentKey.value, alpha );
 		//console.log( 'lerp result', this.result )
 		/*if( /morph/i.test( this.name ) ) {
 			console.log( '   interpolated: ', {
@@ -188,6 +196,9 @@ THREE.KeyframeTrack.prototype = {
 			}
 
 			// TODO:add here a check for linear interpolation optimization.
+
+			// determine if interpolation is required
+			prevKey.constantToNext = equalsFunc( prevKey.value, currKey.value );
 
 			newKeys.push( currKey );
 			prevKey = currKey;
