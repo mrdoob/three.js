@@ -41,6 +41,7 @@
 
 	},
 
+	// NOTE: this is an accumulator function that modifies the first argument (e.g. a).  This is to minimize memory alocations.
 	getLerpFunc: function( exemplarValue, interTrack ) {
 
 		if( exemplarValue === undefined || exemplarValue === null ) throw new Error( "examplarValue is null" );

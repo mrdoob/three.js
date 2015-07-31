@@ -188,9 +188,9 @@ THREE.AnimationClip.FromImplicitMorphTargetAnimations = function( morphTargets, 
 
 };
 
-THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader, nodeName ) {
+THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeName ) {
 
-	var animation = jsonLoader.animation;
+	//var animation = jsonLoader.animation;
 	if( ! animation ) {
 		console.error( "  no animation in JSONLoader data" );
 		return null;
@@ -228,7 +228,7 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader, nodeName ) {
 
 	var tracks = [];
 
-	var boneList = jsonLoader.bones;
+	//var boneList = jsonLoader.bones;
 	var animationTracks = animation.hierarchy;
 
 	for ( var h = 0; h < animationTracks.length; h ++ ) {
@@ -279,7 +279,7 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( jsonLoader, nodeName ) {
 		}
 		else {
 
-			var boneName = nodeName + '.bones[' + boneList[ h ].name + ']';
+			var boneName = nodeName + '.bones[' + bones[ h ].name + ']';
 			//console.log( 'boneName', boneName );
 		
 			// track contains positions...

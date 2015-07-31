@@ -99,6 +99,13 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
+	play: function( action, optionalFadeInDuration ) {
+
+		action.startTime = this.time;
+		this.addAction( action );
+
+	},
+
 	fadeOut: function( action, duration ) {
 
 		var keys = [];

@@ -237,7 +237,7 @@
 				var clipMorpher = THREE.AnimationClip.CreateMorphAnimation( mesh.geometry.morphTargets, 3 );
 				mixer.addAction( new THREE.AnimationAction( clipMorpher, 0, 1, 1, true ) );
 
-				var clipBones = THREE.AnimationClip.FromJSONLoaderAnimation( geometry );
+				var clipBones = THREE.AnimationClip.FromJSONLoaderAnimation( geometry.animation, geometry.bones );
 				mixer.addAction( new THREE.AnimationAction( clipBones, 0, 1, 1, true ) );
 			}
 
