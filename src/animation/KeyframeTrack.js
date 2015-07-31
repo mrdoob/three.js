@@ -30,8 +30,6 @@ THREE.KeyframeTrack.prototype = {
 
 	constructor: THREE.KeyframeTrack,
 
-	// TODO: this is a straight forward linear search for the key that corresponds to this time, this
-	//    should be optimized.
 	getAt: function( time ) {
 		//if( /morph/i.test( this.name ) ) {
 		//	console.log( 'KeyframeTrack[' + this.name + '].getAt( ' + time + ' )' );

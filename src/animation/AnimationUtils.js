@@ -41,7 +41,6 @@
 
 	},
 
- 	// TODO/OPTIMIZATION: Accumulator should be writable and it will get rid of the *.clone() calls that are likely slow.
 	getLerpFunc: function( exemplarValue, interTrack ) {
 
 		if( exemplarValue === undefined || exemplarValue === null ) throw new Error( "examplarValue is null" );
