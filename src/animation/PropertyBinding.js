@@ -46,10 +46,14 @@ THREE.PropertyBinding.prototype = {
 
 		if( this.cumulativeWeight === 0 ) {
 
-			if( this.cumulativeValue === null ) {
-				this.cumulativeValue = THREE.AnimationUtils.clone( value );
+			if( weight > 0 ) {
+				
+				if( this.cumulativeValue === null ) {
+					this.cumulativeValue = THREE.AnimationUtils.clone( value );
+				}
+				this.cumulativeWeight = weight;
+
 			}
-			this.cumulativeWeight = weight;
 			//console.log( this );
 
 		}

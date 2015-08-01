@@ -15,7 +15,6 @@ THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 	this.loop = loop || clip.loop || false;
 	this.enabled = true;	// allow for easy disabling of the action.
 
-	this.time = 0;
 	this.clipTime = 0;
 };
 
@@ -23,12 +22,12 @@ THREE.AnimationAction.prototype = {
 
 	constructor: THREE.AnimationAction,
 
-	updateTime: function( deltaTime ) {
+	updateTime: function( clipDeltaTime ) {
 
 		//console.log( 'AnimationAction[' + this.clip.name + '].toAnimationClipTime( ' + time + ' )' );
-		this.time += deltaTime;
-		this.clipTime += deltaTime * this.getTimeScaleAt( this.time );
+		this.clipTime += clipDeltaTime;
 
+		//console.log( this.clip.name, '.getTimeScaleAt( ' + this.time + ' )', this.getTimeScaleAt( this.time ) );
 		//console.log( '   clipTime: ' + clipTime );
 
 		var duration = this.clip.duration;
@@ -51,22 +50,22 @@ THREE.AnimationAction.prototype = {
 
 	   	}
 
+	
 	   	return this.clipTime;
 
 	},
 
 	init: function( time ) {
 
-		this.time = time;
 		this.clipTime = time - this.startTime;
 
 	},
 
-	update: function( deltaTime ) {
+	update: function( clipDeltaTime ) {
 
 		//console.log( 'AnimationAction[' + this.clip.name + '].getAt( ' + time + ' )' );
 
-		this.updateTime( deltaTime );
+		this.updateTime( clipDeltaTime );
 
 		var clipResults = this.clip.getAt( this.clipTime );
 

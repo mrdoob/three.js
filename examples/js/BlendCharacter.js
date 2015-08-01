@@ -47,6 +47,7 @@ THREE.BlendCharacter = function () {
 	this.play = function( animName, weight ) {
 
 		this.mixer.removeAllActions();
+		
 		this.mixer.play( new THREE.AnimationAction( this.animations[ animName ], 0, 1, 1, true ) );
 
 	};
@@ -54,7 +55,7 @@ THREE.BlendCharacter = function () {
 	this.crossfade = function( fromAnimName, toAnimName, duration ) {
 
 		this.mixer.removeAllActions();
-
+ 
 		var fromAction = new THREE.AnimationAction( this.animations[ fromAnimName ], 0, 1, 1, true );
 		var toAction = new THREE.AnimationAction( this.animations[ toAnimName ], 0, 1, 1, true );
 

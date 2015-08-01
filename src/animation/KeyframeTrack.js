@@ -205,9 +205,9 @@ THREE.KeyframeTrack.prototype = {
 		}
 		newKeys.push( this.keys[ this.keys.length - 1 ] );
 
-		if( ( this.keys.length - newKeys.length ) > 0 ) {
-			console.log( '  optimizing removed keys:', ( this.keys.length - newKeys.length ), this.name );
-		}
+		//if( ( this.keys.length - newKeys.length ) > 0 ) {
+			//console.log( '  optimizing removed keys:', ( this.keys.length - newKeys.length ), this.name );
+		//}
 		this.keys = newKeys;
 
 	},
@@ -234,9 +234,8 @@ THREE.KeyframeTrack.prototype = {
 		}
 
 		// remove last keys first because it doesn't affect the position of the first keys (the otherway around doesn't work as easily)
-		// TODO: Figure out if there is an array subarray function... might be faster
 		if( ( firstKeysToRemove + lastKeysToRemove ) > 0 ) {
-			console.log(  '  triming removed keys: first and last', firstKeysToRemove, lastKeysToRemove, this.keys );
+			//console.log(  '  triming removed keys: first and last', firstKeysToRemove, lastKeysToRemove, this.keys );
 			this.keys = this.keys.splice( firstKeysToRemove, this.keys.length - lastKeysToRemove - firstKeysToRemove );;
 			//console.log(  '  result', this.keys );
 		}

@@ -110,7 +110,7 @@ THREE.AnimationMixer.prototype = {
 
 		var keys = [];
 
-		keys.push( { time: this.time, value: action.getWeightAt( this.time ) } );
+		keys.push( { time: this.time, value: 1 } );
 		keys.push( { time: this.time + duration, value: 0 } );
 		
 		action.weight = new THREE.KeyframeTrack( "weight", keys );
@@ -120,7 +120,7 @@ THREE.AnimationMixer.prototype = {
 		
 		var keys = [];
 		
-		keys.push( { time: this.time, value: action.getWeightAt( this.time ) } );
+		keys.push( { time: this.time, value: 0 } );
 		keys.push( { time: this.time + duration, value: 1 } );
 		
 		action.weight = new THREE.KeyframeTrack( "weight", keys );
@@ -138,14 +138,14 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
-	crossFade: function( fadeOutAction, fadeInAction, duration, wrapTimeScales ) {
+	crossFade: function( fadeOutAction, fadeInAction, duration, warp ) {
 
 		this.fadeOut( fadeOutAction, duration );
 		this.fadeIn( fadeInAction, duration );
 
-		if( wrapTimeScales ) {
+		if( warp ) {
 	
-			var startEndRatio = fadeOutAction.duration / fadeInAction.duration;
+			var startEndRatio = fadeOutAction.clip.duration / fadeInAction.clip.duration;
 			var endStartRatio = 1.0 / startEndRatio;
 
 			this.warp( fadeOutAction, 1.0, startEndRatio, duration );
@@ -167,10 +167,14 @@ THREE.AnimationMixer.prototype = {
 			var action = this.actions[i];
 
 			var weight = action.getWeightAt( this.time );
-			
-			if( action.weight <= 0 || ! action.enabled ) continue;
+			//console.log( action.clip.name, weight, this.time );
 
-			var actionResults = action.update( mixerDeltaTime );
+			var actionTimeScale = action.getTimeScaleAt( this.time );
+			var actionDeltaTime = mixerDeltaTime * actionTimeScale;
+		
+			var actionResults = action.update( actionDeltaTime );
+
+			if( action.weight <= 0 || ! action.enabled ) continue;
 
 			for( var name in actionResults ) {
 
