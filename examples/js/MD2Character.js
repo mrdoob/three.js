@@ -52,7 +52,7 @@ THREE.MD2Character = function () {
 			scope.root.add( mesh );
 
 			scope.meshBody = mesh;
-			scope.activeAnimationClipName = geo.firstAnimationClip.name;
+			scope.activeAnimationClipName = mesh.firstAnimationClip.name;
 
 			checkLoadingComplete();
 

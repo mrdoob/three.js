@@ -23,8 +23,8 @@ THREE.PropertyBinding = function ( rootNode, trackName ) {
 	this.propertyName = parseResults.propertyName;
 	this.propertyIndex = parseResults.propertyIndex;
 
-	this.node = THREE.PropertyBinding.findNode( rootNode, this.nodeName );
-
+	this.node = THREE.PropertyBinding.findNode( rootNode, this.nodeName ) || rootNode;
+	
 	this.cumulativeValue = null;
 	this.cumulativeWeight = 0;
 };
@@ -340,7 +340,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 // TODO: Cache this at some point
 THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
-	//console.log( 'AnimationUtils.findNode( ' + root.name + ', nodeName: ' + nodeName + ')');
+	//console.log( 'AnimationUtils.findNode( ' + root.name + ', nodeName: ' + nodeName + ')', root );
 	
 	if( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
 

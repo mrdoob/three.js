@@ -36,7 +36,7 @@ THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 
 };
 
-THREE.MorphAnimMesh.prototype.playAnimation = function ( label ) {
+THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	this.mixer.removeAllActions();
 
@@ -50,7 +50,9 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label ) {
 	
 	if ( clip ) {
 
-		this.mixer.addAction( new THREE.AnimationAction( clip, 0, 1, 1, true ) );
+		var action = new THREE.AnimationAction( clip, 0, 1, 1, true );
+		action.timeScale = ( clip.tracks.length * fps ) / clip.duration;
+		this.mixer.addAction( action );
 
 	} else {
 
