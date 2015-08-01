@@ -14,16 +14,16 @@ from . import (
 
 class Scene(base_classes.BaseScene):
     """Class that handles the contruction of a Three scene"""
-    _defaults = {
-        constants.METADATA: constants.DEFAULT_METADATA.copy(),
-        constants.GEOMETRIES: [],
-        constants.MATERIALS: [],
-        constants.IMAGES: [],
-        constants.TEXTURES: []
-    }
 
     def __init__(self, filepath, options=None):
         logger.debug("Scene().__init__(%s, %s)", filepath, options)
+        self._defaults = {
+            constants.METADATA: constants.DEFAULT_METADATA.copy(),
+            constants.GEOMETRIES: [],
+            constants.MATERIALS: [],
+            constants.IMAGES: [],
+            constants.TEXTURES: []
+        }
         base_classes.BaseScene.__init__(self, filepath, options or {})
 
         source_file = api.scene_name()
