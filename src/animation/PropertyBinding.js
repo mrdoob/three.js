@@ -47,7 +47,7 @@ THREE.PropertyBinding.prototype = {
 		if( this.cumulativeWeight === 0 ) {
 
 			if( weight > 0 ) {
-				
+
 				if( this.cumulativeValue === null ) {
 					this.cumulativeValue = THREE.AnimationUtils.clone( value );
 				}
@@ -94,7 +94,7 @@ THREE.PropertyBinding.prototype = {
 		
 		//console.log( "PropertyBinding", this );
 
-		var targetObject = this.rootNode;
+		var targetObject = this.node;
 
  		// ensure there is a value node
 		if( ! targetObject ) {
@@ -118,6 +118,7 @@ THREE.PropertyBinding.prototype = {
 			else if( this.objectName === "bones" ) {
 				if( ! targetObject.skeleton ) {
 					console.error( '  can not bind to bones as node does not have a skeleton', this );
+					return;
 				}
 				// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
 				

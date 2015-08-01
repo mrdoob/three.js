@@ -16,14 +16,14 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
-
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/AnimationClipCreator.js"></script>
 
 		<script>
 
 			var container, stats;
 			var camera, scene, projector, renderer;
-			var mesh, animation;
+			var mesh, mixer;
 
 			init();
 			animate();
@@ -66,8 +66,10 @@
 					mesh.scale.set( 1.5, 1.5, 1.5 );
 					scene.add( mesh );
 
-					animation = new THREE.MorphAnimation( mesh );
-					animation.play();
+					mixer = new THREE.AnimationMixer( mesh );
+
+					var clipMorphTargets = THREE.AnimationClipCreator.CreateMorphAnimation( geometry.morphTargets, 1.0 );
+					mixer.addAction( new THREE.AnimationAction( clipMorphTargets, 0, 1, 1, true ) );
 
 				} );
 
@@ -126,11 +128,11 @@
 
 				camera.lookAt( camera.target );
 
-				if ( animation ) {
+				if ( mixer ) {
 
 					var time = Date.now();
 
-					animation.update( time - prevTime );
+					mixer.update( ( time - prevTime ) * 0.001 );
 
 					prevTime = time;
 

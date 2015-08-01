@@ -1,4 +1,4 @@
-THREE.UCSCharacterMixer = function() {
+THREE.UCSCharacter = function() {
 
 	var scope = this;
 	
@@ -55,7 +55,8 @@ THREE.UCSCharacterMixer = function() {
 			mesh.castShadow = true;
 			mesh.receiveShadow = true;
 
-			var clipBones = THREE.AnimationClip.FromJSONLoaderAnimation( geometry, mesh.uuid );
+			console.log( geometry );
+			var clipBones = THREE.AnimationClip.FromJSONLoaderAnimation( geometry.animation, geometry.bones, mesh.uuid );
 
 			scope.mixer.addAction( new THREE.AnimationAction( clipBones, 0, 1, 1, true ) );
 			
