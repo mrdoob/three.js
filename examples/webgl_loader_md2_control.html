@@ -36,9 +36,8 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - morphtargets -
-			Ogro by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=556">Magarnigal</a> -
-			converted by <a href="https://twitter.com/#!/oosmoxiecode">@oosmoxiecode</a>'s <a href="http://oos.moxiecode.com/blog/2012/01/md2-to-json-converter/">MD2 converter</a><br />
+			<a href="http://threejs.org" target="_blank">three.js</a> - MD2 Loader -
+			Ogro by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=556">Magarnigal</a><br />
 			use arrows to control characters, mouse for camera
 		</div>
 
@@ -46,6 +45,7 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
+		<script src='js/loaders/MD2Loader.js'></script>
 		<script src='js/MD2CharacterComplex.js'></script>
 		<script src='js/Gyroscope.js'></script>
 
@@ -173,13 +173,13 @@
 
 				var configOgro = {
 
-					baseUrl: "models/animated/ogro/",
+					baseUrl: "models/md2/ogro/",
 
-					body: "ogro-light.js",
+					body: "ogro.md2",
 					skins: [ "grok.jpg", "ogrobase.png", "arboshak.png", "ctf_r.png", "ctf_b.png", "darkam.png", "freedom.png",
 							 "gib.png", "gordogh.png", "igdosh.png", "khorne.png", "nabogro.png",
 							 "sharokh.png" ],
-					weapons:  [ [ "weapon-light.js", "weapon.jpg" ] ],
+					weapons:  [ [ "weapon.md2", "weapon.jpg" ] ],
 					animations: {
 						move: "run",
 						idle: "stand",

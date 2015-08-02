@@ -36,15 +36,15 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - morphtargets -
-			MD2 character by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=368">Brian Collins</a><br />
-			converted by <a href="https://twitter.com/#!/oosmoxiecode">@oosmoxiecode</a>'s <a href="http://oos.moxiecode.com/blog/2012/01/md2-to-json-converter/">MD2 converter<a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - MD2 Loader -
+			Character by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=368">Brian Collins</a>
 		</div>
 
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
+		<script src='js/loaders/MD2Loader.js'></script>
 		<script src='js/MD2Character.js'></script>
 
 		<script src='js/Detector.js'></script>
@@ -179,21 +179,21 @@
 
 				var config = {
 
-					baseUrl: "models/animated/ratamahatta/",
+					baseUrl: "models/md2/ratamahatta/",
 
-					body: "ratamahatta.js",
+					body: "ratamahatta.md2",
 					skins: [ "ratamahatta.png", "ctf_b.png", "ctf_r.png", "dead.png", "gearwhore.png" ],
-					weapons:  [  [ "weapon.js", "weapon.png" ],
-								 [ "w_bfg.js", "w_bfg.png" ],
-								 [ "w_blaster.js", "w_blaster.png" ],
-								 [ "w_chaingun.js", "w_chaingun.png" ],
-								 [ "w_glauncher.js", "w_glauncher.png" ],
-								 [ "w_hyperblaster.js", "w_hyperblaster.png" ],
-								 [ "w_machinegun.js", "w_machinegun.png" ],
-								 [ "w_railgun.js", "w_railgun.png" ],
-								 [ "w_rlauncher.js", "w_rlauncher.png" ],
-								 [ "w_shotgun.js", "w_shotgun.png" ],
-								 [ "w_sshotgun.js", "w_sshotgun.png" ]
+					weapons:  [  [ "weapon.md2", "weapon.png" ],
+								 [ "w_bfg.md2", "w_bfg.png" ],
+								 [ "w_blaster.md2", "w_blaster.png" ],
+								 [ "w_chaingun.md2", "w_chaingun.png" ],
+								 [ "w_glauncher.md2", "w_glauncher.png" ],
+								 [ "w_hyperblaster.md2", "w_hyperblaster.png" ],
+								 [ "w_machinegun.md2", "w_machinegun.png" ],
+								 [ "w_railgun.md2", "w_railgun.png" ],
+								 [ "w_rlauncher.md2", "w_rlauncher.png" ],
+								 [ "w_shotgun.md2", "w_shotgun.png" ],
+								 [ "w_sshotgun.md2", "w_sshotgun.png" ]
 								]
 
 				};

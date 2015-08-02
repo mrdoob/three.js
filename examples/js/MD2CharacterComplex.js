@@ -152,7 +152,7 @@ THREE.MD2CharacterComplex = function () {
 
 		// BODY
 
-		var loader = new THREE.JSONLoader();
+		var loader = new THREE.MD2Loader();
 
 		loader.load( config.baseUrl + config.body, function( geo ) {
 
@@ -522,8 +522,8 @@ THREE.MD2CharacterComplex = function () {
 
 	function createPart( geometry, skinMap ) {
 
-		var materialWireframe = new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true, shading: THREE.SmoothShading, morphTargets: true } );
-		var materialTexture = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: false, shading: THREE.SmoothShading, map: skinMap, morphTargets: true } );
+		var materialWireframe = new THREE.MeshLambertMaterial( { color: 0xffaa00, wireframe: true, shading: THREE.SmoothShading, morphTargets: true, morphNormals: true } );
+		var materialTexture = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: false, shading: THREE.SmoothShading, map: skinMap, morphTargets: true, morphNormals: true } );
 
 		//
 
