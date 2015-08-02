@@ -53,7 +53,6 @@
 				if( exemplarValue.lerp ) {
 
 					return function( a, b, alpha ) {
-						//console.log( a, b );
 						return a.lerp( b, alpha );
 					}
 
@@ -61,7 +60,6 @@
 				if( exemplarValue.slerp ) {
 
 					return function( a, b, alpha ) {
-						//console.log( a, b );
 						return a.slerp( b, alpha );
 					}
 

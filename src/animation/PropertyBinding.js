@@ -15,7 +15,6 @@ THREE.PropertyBinding = function ( rootNode, trackName ) {
 
 	var parseResults = THREE.PropertyBinding.parseTrackName( trackName );
 
-	//console.log( parseResults );
 	this.directoryName = parseResults.directoryName;
 	this.nodeName = parseResults.nodeName;
 	this.objectName = parseResults.objectName;
@@ -54,7 +53,6 @@ THREE.PropertyBinding.prototype = {
 				this.cumulativeWeight = weight;
 
 			}
-			//console.log( this );
 
 		}
 		else {
@@ -62,7 +60,6 @@ THREE.PropertyBinding.prototype = {
 			var lerpAlpha = weight / ( this.cumulativeWeight + weight );
 			this.cumulativeValue = this.lerpValue( this.cumulativeValue, value, lerpAlpha );
 			this.cumulativeWeight += weight;
-			//console.log( this );
 
 		}
 
@@ -83,16 +80,10 @@ THREE.PropertyBinding.prototype = {
 
 	},
 
-	// creates the member functions:
-	//	- setValue( value )
-	//  - getValue()
-	//  - triggerDirty()
-
+	// bind to the real property in the scene graph, remember original value, memorize various accessors for speed/inefficiency
 	bind: function() {
 
 		if( this.isBound ) return;
-		
-		//console.log( "PropertyBinding", this );
 
 		var targetObject = this.node;
 
@@ -120,15 +111,13 @@ THREE.PropertyBinding.prototype = {
 					console.error( '  can not bind to bones as node does not have a skeleton', this );
 					return;
 				}
-				// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
+				// potential future optimization: skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
 				
 				targetObject = targetObject.skeleton.bones;
 
 				// support resolving morphTarget names into indices.
-				//console.log( "  resolving bone name: ", this.objectIndex );
 				for( var i = 0; i < targetObject.length; i ++ ) {
 					if( targetObject[i].name === this.objectIndex ) {
-						//console.log( "  resolved to index: ", i );
 						this.objectIndex = i;
 						break;
 					}
@@ -165,10 +154,9 @@ THREE.PropertyBinding.prototype = {
 		if( this.propertyIndex !== undefined ) {
 
 			if( this.propertyName === "morphTargetInfluences" ) {
-				// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
+				// potential optimization, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
 				
 				// support resolving morphTarget names into indices.
-				//console.log( "  resolving morphTargetInfluence name: ", this.propertyIndex );
 				if( ! targetObject.geometry ) {
 					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );				
 				}
@@ -178,14 +166,12 @@ THREE.PropertyBinding.prototype = {
 				
 				for( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
 					if( targetObject.geometry.morphTargets[i].name === this.propertyIndex ) {
-						//console.log( "  resolved to index: ", i );
 						this.propertyIndex = i;
 						break;
 					}
 				}
 			}
 
-			//console.log( '  update property array ' + this.propertyName + '[' + this.propertyIndex + '] via assignment.' );				
 			this.setValue = function( value ) {
 				if( ! this.equalsValue( nodeProperty[ this.propertyIndex ], value ) ) {
 					nodeProperty[ this.propertyIndex ] = value;
@@ -202,7 +188,6 @@ THREE.PropertyBinding.prototype = {
 		// must use copy for Object3D.Euler/Quaternion		
 		else if( nodeProperty.copy ) {
 			
-			//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via a set() function.' );				
 			this.setValue = function( value ) {
 				if( ! this.equalsValue( nodeProperty, value ) ) {
 					nodeProperty.copy( value );
@@ -219,7 +204,6 @@ THREE.PropertyBinding.prototype = {
 		// otherwise just set the property directly on the node (do not use nodeProperty as it may not be a reference object)
 		else {
 
-			//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via assignment.' );				
 			this.setValue = function( value ) {
 				if( ! this.equalsValue( targetObject[ this.propertyName ], value ) ) {
 					targetObject[ this.propertyName ] = value;	
@@ -237,7 +221,6 @@ THREE.PropertyBinding.prototype = {
 		// trigger node dirty			
 		if( targetObject.needsUpdate !== undefined ) { // material
 			
-			//console.log( '  triggering material as dirty' );
 			this.triggerDirty = function() {
 				this.node.needsUpdate = true;
 			}
@@ -245,7 +228,6 @@ THREE.PropertyBinding.prototype = {
 		}			
 		else if( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
 			
-			//console.log( '  triggering node as dirty' );
 			this.triggerDirty = function() {
 				targetObject.matrixWorldNeedsUpdate = true;
 			}
@@ -327,8 +309,6 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 		propertyIndex: matches[11]	// allowed to be null, specifies that the whole property is set.
 	};
 
-	//console.log( "PropertyBinding.parseTrackName", trackName, results, matches );
-
 	if( results.propertyName === null || results.propertyName.length === 0 ) {
 		throw new Error( "can not parse propertyName from trackName: " + trackName );
 	}
@@ -340,11 +320,8 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 // TODO: Cache this at some point
 THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
-	//console.log( 'AnimationUtils.findNode( ' + root.name + ', nodeName: ' + nodeName + ')', root );
-	
 	if( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
 
-		//console.log( '  root.' );
 		return root;
 
 	}
@@ -373,7 +350,6 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 		if( bone ) {
 
-			//console.log( '  bone: ' + bone.name + '.' );
 			return bone;
 
 		}
@@ -408,14 +384,11 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 		if( subTreeNode ) {
 
-			//console.log( '  node: ' + subTreeNode.name + '.' );
 			return subTreeNode;
 
 		}
 
 	}
-
-	//console.log( "   <null>.  No node found for name: " + nodeName );
 
 	return null;
 }

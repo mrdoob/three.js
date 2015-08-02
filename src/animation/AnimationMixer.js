@@ -2,7 +2,6 @@
  *
  * Mixes together the AnimationClips scheduled by AnimationActions and applies them to the root and subtree
  *
- * TODO: MUST add support for blending between AnimationActions based on their weights, right now only the last AnimationAction is applied at full weight.
  *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
@@ -24,7 +23,6 @@ THREE.AnimationMixer.prototype = {
 	constructor: THREE.AnimationMixer,
 
 	addAction: function( action ) {
-		//console.log( this.root.name + ".AnimationMixer.addAnimationAction( " + action.name + " )" );
 
 		this.actions.push( action );
 
@@ -67,7 +65,6 @@ THREE.AnimationMixer.prototype = {
 	},
 
 	removeAction: function( action ) {
-		//console.log( this.root.name + ".AnimationMixer.addRemove( " + action.name + " )" );
 
 		var index = this.actions.indexOf( action );
 
@@ -160,14 +157,11 @@ THREE.AnimationMixer.prototype = {
 		var mixerDeltaTime = deltaTime * this.timeScale;
 		this.time += mixerDeltaTime;
 
-		//console.log( this.root.name + ".AnimationMixer.update( " + time + " )" );
-
 		for( var i = 0; i < this.actions.length; i ++ ) {
 
 			var action = this.actions[i];
 
 			var weight = action.getWeightAt( this.time );
-			//console.log( action.clip.name, weight, this.time );
 
 			var actionTimeScale = action.getTimeScaleAt( this.time );
 			var actionDeltaTime = mixerDeltaTime * actionTimeScale;

@@ -12,7 +12,7 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 	this.tracks = tracks;
 	this.duration = duration || 1;
 
-	// TODO: maybe only do these on demand, as doing them here could potentially slow down loading
+	// maybe only do these on demand, as doing them here could potentially slow down loading
 	// but leaving these here during development as this ensures a lot of testing of these functions
 	this.trim();
 	this.optimize();
@@ -32,7 +32,6 @@ THREE.AnimationClip.prototype = {
 		for( var i = 0; i < this.tracks.length; i ++ ) {
 
 			var track = this.tracks[ i ];
-			//console.log( 'track', track );
 
 			this.results[ track.name ] = track.getAt( clipTime );
 
@@ -64,29 +63,10 @@ THREE.AnimationClip.prototype = {
 };
 
 
-/*
-	"animation" : {
-	    "name"      : "Action",
-        "fps"       : 25,
-        "length"    : 2.0,
-        "hierarchy" : [
-            {
-                "parent" : -1,
-                "keys"   : [
-                    {
-                        "time":0,
-                        "pos" :[0.532239,5.88733,-0.119685],
-                        "rot" :[-0.451519,0.544179,0.544179,0.451519],
-                        "scl" :[1,1,1]
-                    },
-*/
-
 THREE.AnimationClip.CreateMorphAnimationFromNames = function( morphTargetNames, duration ) {
-	//console.log( morphTargetNames, duration );
 
 	var tracks = [];
 	var frameStep = duration / morphTargetNames.length;
-	//console.log( 'frameStep', frameStep );
 
 	for( var i = 0; i < morphTargetNames.length; i ++ ) {
 
@@ -113,8 +93,6 @@ THREE.AnimationClip.CreateMorphAnimationFromNames = function( morphTargetNames, 
 
 		}
 
-		//console.log( 'keys', keys );
-
 		var morphName = morphTargetNames[i];
 		var trackName = '.morphTargetInfluences[' + morphName + ']';
 		var track = new THREE.KeyframeTrack( trackName, keys );
@@ -123,7 +101,6 @@ THREE.AnimationClip.CreateMorphAnimationFromNames = function( morphTargetNames, 
 	}
 
 	var clip = new THREE.AnimationClip( 'morphAnimation', duration, tracks );
-	//console.log( 'morphAnimationClip', clip );
 
 	return clip;
 };
@@ -170,8 +147,6 @@ THREE.AnimationClip.FromImplicitMorphTargetAnimations = function( morphTargets, 
 
 	}
 
-	//console.log( animations );
-
 	var clips = [];
 
 	for( var i = 0; i < animationsArray.length; i ++ ) {
@@ -190,7 +165,6 @@ THREE.AnimationClip.FromImplicitMorphTargetAnimations = function( morphTargets, 
 
 THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeName ) {
 
-	//var animation = jsonLoader.animation;
 	if( ! animation ) {
 		console.error( "  no animation in JSONLoader data" );
 		return null;
@@ -228,7 +202,6 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeNa
 
 	var tracks = [];
 
-	//var boneList = jsonLoader.bones;
 	var animationTracks = animation.hierarchy;
 
 	for ( var h = 0; h < animationTracks.length; h ++ ) {
@@ -282,7 +255,6 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeNa
 		else {
 
 			var boneName = nodeName + '.bones[' + bones[ h ].name + ']';
-			//console.log( 'boneName', boneName );
 		
 			// track contains positions...
 			var positionTrack = convertTrack( boneName + '.position', animationKeys, 'pos', function( animationKey ) {
@@ -314,7 +286,6 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeNa
 	}
 
 	var clip = new THREE.AnimationClip( clipName, duration, tracks );
-	//console.log( 'clipFromJSONLoaderAnimation', clip );
 
 	return clip;
 
