@@ -24,11 +24,7 @@ THREE.AnimationAction.prototype = {
 
 	updateTime: function( clipDeltaTime ) {
 
-		//console.log( 'AnimationAction[' + this.clip.name + '].toAnimationClipTime( ' + time + ' )' );
 		this.clipTime += clipDeltaTime;
-
-		//console.log( this.clip.name, '.getTimeScaleAt( ' + this.time + ' )', this.getTimeScaleAt( this.time ) );
-		//console.log( '   clipTime: ' + clipTime );
 
 		var duration = this.clip.duration;
 
@@ -37,7 +33,6 @@ THREE.AnimationAction.prototype = {
 			if( this.clipTime < 0 ) {
 
 				this.clipTime -= Math.floor( this.clipTime / duration ) * duration;
-				//console.log( '   clipTime: ' + clipTime );
 
 			}
 
@@ -63,13 +58,9 @@ THREE.AnimationAction.prototype = {
 
 	update: function( clipDeltaTime ) {
 
-		//console.log( 'AnimationAction[' + this.clip.name + '].getAt( ' + time + ' )' );
-
 		this.updateTime( clipDeltaTime );
 
 		var clipResults = this.clip.getAt( this.clipTime );
-
-		//console.log( "  clipResults: ", clipResults );
 
 		return clipResults;
 		
