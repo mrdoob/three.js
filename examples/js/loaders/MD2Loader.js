@@ -331,8 +331,12 @@ THREE.MD2Loader.prototype = {
 						y * scale.y + translation.y
 					);
 
+					var normal = new THREE.Vector3(
+						normals[ n ][ 0 ], normals[ n ][ 2 ], normals[ n ][ 1 ]
+					);
+
 					frame.vertices.push( vertex );
-					frame.normals.push( new THREE.Vector3().fromArray( normals[ n ] ) )
+					frame.normals.push( normal );
 
 				}
 
@@ -340,12 +344,52 @@ THREE.MD2Loader.prototype = {
 
 			}
 
+			// Static
+
 			geometry.vertices = geometry.morphTargets[ 0 ].vertices;
+
+			var morphTarget = geometry.morphTargets[ 0 ];
+
+			for ( var j = 0, jl = geometry.faces.length; j < jl; j ++ ) {
+
+				var face = geometry.faces[ j ];
+
+				face.vertexNormals = [
+					morphTarget.normals[ face.a ],
+					morphTarget.normals[ face.b ],
+					morphTarget.normals[ face.c ]
+				];
+
+			}
+
+
+			// Convert to geometry.morphNormals
+
+			for ( var i = 0, l = geometry.morphTargets.length; i < l; i ++ ) {
+
+				var morphTarget = geometry.morphTargets[ i ];
+				var vertexNormals = [];
+
+				for ( var j = 0, jl = geometry.faces.length; j < jl; j ++ ) {
+
+					var face = geometry.faces[ j ];
+
+					vertexNormals.push( {
+						a: morphTarget.normals[ face.a ],
+						b: morphTarget.normals[ face.b ],
+						c: morphTarget.normals[ face.c ]
+					} );
+
+				}
+
+				geometry.morphNormals.push( { vertexNormals: vertexNormals } );
+
+			}
 
 			return geometry;
 
 		}
 
-	})()
+	} )()
 
 }
