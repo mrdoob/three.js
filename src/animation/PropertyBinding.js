@@ -317,7 +317,6 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 
 };
 
-// TODO: Cache this at some point
 THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 	if( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
@@ -326,7 +325,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 	}
 
-	// (2) search into skeleton bones.
+	// search into skeleton bones.
 	if( root.skeleton ) {
 
 		var searchSkeleton = function( skeleton ) {
@@ -355,7 +354,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 		}
 	}
 
-	// (3) search into node subtree.
+	// search into node subtree.
 	if( root.children ) {
 
 		var searchNodeSubtree = function( children ) {
