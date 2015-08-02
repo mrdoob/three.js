@@ -276,6 +276,8 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeNa
 
 			}
 
+			duration = morphTargetNames.length * ( fps || 1.0 );
+
 		}
 		else {
 
