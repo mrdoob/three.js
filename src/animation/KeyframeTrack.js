@@ -101,14 +101,14 @@ THREE.KeyframeTrack.prototype = {
 
 		if( this.result.copy ) {
 
-			setResult = function( value ) {
+			this.setResult = function( value ) {
 				this.result.copy( value );
 			}
 
 		}
 		else {
 
-			setResult = function( value ) {
+			this.setResult = function( value ) {
 				this.result = value;
 			}
 
