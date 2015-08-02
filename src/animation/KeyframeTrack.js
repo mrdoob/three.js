@@ -19,6 +19,8 @@ THREE.KeyframeTrack = function ( name, keys ) {
 	this.result = THREE.AnimationUtils.clone( this.keys[0].value );
 	//console.log( 'constructor result', this.result )
 
+	// the index of the last result, used as a starting point for local search.
+	// TODO: this is okay in the keyframetrack, but it would be better stored in AnimationAction eventually.
 	this.lastIndex = 0;
 
 	this.sort();
@@ -66,8 +68,9 @@ THREE.KeyframeTrack.prototype = {
 		var prevKey = this.keys[ this.lastIndex - 1 ];
 		this.setResult( prevKey.value );
 
+		// if true, means that prev/current keys are identical, thus no interpolation required.
 		if( prevKey.constantToNext ) {
-
+			
 			return this.result;
 
 		}
@@ -76,6 +79,7 @@ THREE.KeyframeTrack.prototype = {
 		var currentKey = this.keys[ this.lastIndex ];
 		var alpha = ( time - prevKey.time ) / ( currentKey.time - prevKey.time );
 		this.result = this.lerp( this.result, currentKey.value, alpha );
+
 		//console.log( 'lerp result', this.result )
 		/*if( /morph/i.test( this.name ) ) {
 			console.log( '   interpolated: ', {
@@ -94,12 +98,24 @@ THREE.KeyframeTrack.prototype = {
 	},
 
 	setResult: function( value ) {
+
 		if( this.result.copy ) {
-			this.result.copy( value );
+
+			setResult = function( value ) {
+				this.result.copy( value );
+			}
+
 		}
 		else {
-			this.result = value;
+
+			setResult = function( value ) {
+				this.result = value;
+			}
+
 		}
+
+		this.setResult( value );
+
 	},
 
 	// memoization of the lerp function for speed.
