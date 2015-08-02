@@ -38,10 +38,11 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - webgl physically based shading testbed
 		</div>
-
+-
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/AnimationClipCreator.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -73,7 +74,7 @@
 
 			var sunLight, pointLight, ambientLight;
 
-			var morph;
+			var morph, mixer;
 
 			var parameters, tweenDirection, tweenDay, tweenNight;
 
@@ -274,11 +275,16 @@
 					geometry.computeMorphNormals();
 					morph = new THREE.MorphAnimMesh( geometry, morphMaterial );
 
+					mixer = new THREE.AnimationMixer( morph );
+
+					var clipMorphTargets = THREE.AnimationClipCreator.CreateMorphAnimation( geometry.morphTargets, 8.0 );
+					mixer.addAction( new THREE.AnimationAction( clipMorphTargets, 0, 1, 1, true ) );
+
 					var s = 200;
 					morph.scale.set( s, s, s );
 
-					morph.duration = 8000;
-					morph.mirroredLoop = true;
+					//morph.duration = 8000;
+					//morph.mirroredLoop = true;
 
 					morph.castShadow = true;
 					morph.receiveShadow = true;
@@ -522,7 +528,11 @@
 				TWEEN.update();
 				controls.update();
 
-				if ( morph ) morph.updateAnimation( delta );
+				if ( mixer ) {
+
+					mixer.update( delta * 0.001 );
+
+				}
 
 				scene.fog.color.setHSL( 0.63, 0.05, parameters.control );
 				renderer.setClearColor( scene.fog.color );
