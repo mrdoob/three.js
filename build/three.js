@@ -6,13 +6,18 @@
 
 var THREE = { REVISION: '72dev' };
 
-// browserify support
+//
 
-if ( typeof module === 'object' ) {
+if ( typeof define === 'function' && define.amd ) {
 
-	module.exports = THREE;
+    define( 'three', THREE );
+
+} else if ( 'undefined' !== typeof exports && 'undefined' !== typeof module ) {
+
+    module.exports = THREE;
 
 }
+
 
 // polyfills
 
