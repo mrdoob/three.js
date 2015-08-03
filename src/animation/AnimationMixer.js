@@ -13,8 +13,7 @@ THREE.AnimationMixer = function( root ) {
 	this.time = 0;
 	this.timeScale = 1.0;
 	this.actions = [];
-	this.propertyBindings = {};
-	this.propertyBindingsArray = [];
+	this.propertyBindings = [];
 
 };
 
@@ -33,15 +32,20 @@ THREE.AnimationMixer.prototype = {
 
 			var track = tracks[ i ];
 
-			var propertyBinding = this.propertyBindings[ track.name ];
+			var j = this.getPropertyBindingIndex( track.name )
 
-			if( ! this.propertyBindings[ track.name ] ) {
+			var propertyBinding;
+
+			if( j < 0 ) {
 			
 				propertyBinding = new THREE.PropertyBinding( this.root, track.name );
-				this.propertyBindingsArray.push( propertyBinding );
+				this.propertyBindings.push( propertyBinding );
 			
 			}
-
+			else {
+				propertyBinding = this.propertyBindings[ j ];
+			}
+			
 			// track usages of shared property bindings, because if we leave too many around, the mixer can get slow
 			propertyBinding.referenceCount += 1;
 
@@ -92,7 +96,7 @@ THREE.AnimationMixer.prototype = {
 		}
 
 		// unbind all property bindings
-		for( var i = 0; i < this.propertyBindingsArray.length; i ++ ) {
+		for( var i = 0; i < this.propertyBindings.length; i ++ ) {
 
 			this.propertyBindings[i].unbind();
 
