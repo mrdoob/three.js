@@ -48,6 +48,32 @@ THREE.AnimationMixer.prototype = {
 
 		}
 
+		this.updatePropertyBindingIndices();
+
+	},
+
+	updatePropertyBindingIndices: function() {
+
+		for( var i = 0; i < this.actions.length; i++ ) {
+
+			var action = this.actions[i];
+
+			var propertyBindingIndices = [];
+
+			for( var j = 0; j < action.clip.tracks.length; j ++ ) {
+				var trackName = action.clip.tracks[j].name;
+
+				for( var k = 0; k < this.propertyBindingsArray.length; k ++ ) {
+					if( this.propertyBindingsArray[k].trackName === trackName ) {
+						propertyBindingIndices.push( k );
+						break;
+					}
+				}	
+			}
+
+			action.propertyBindingIndices = propertyBindingIndices;
+		}
+
 	},
 
 	removeAllActions: function() {
@@ -101,6 +127,8 @@ THREE.AnimationMixer.prototype = {
 
 			}
 		}
+
+		this.updatePropertyBindingIndices();
 
 	},
 
@@ -182,7 +210,7 @@ THREE.AnimationMixer.prototype = {
 
 				var name = action.clip.tracks[j].name;
 
-				this.propertyBindings[name].accumulate( actionResults[j], weight );
+				this.propertyBindingsArray[ action.propertyBindingIndices[ j ] ].accumulate( actionResults[j], weight );
 
 			}
 
