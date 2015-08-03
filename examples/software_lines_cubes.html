@@ -84,7 +84,7 @@
 				container.appendChild( renderer.domElement );
 
 				var geometry = new THREE.Geometry(),
-					points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 4, 0, 1, 2, 3, 4, 5, 6, 7 );
+				points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 4, 0, 1, 2, 3, 4, 5, 6, 7 );
 
 				for ( i = 0; i < points.length; i ++ ) {
 
@@ -92,21 +92,21 @@
 
 				}
 
-
 				// lines
 
-				var line, p, scale = 0.3, d = 125, c1 = 0x553300, c2 = 0x555555, c3 = 0x992800, g1 = geometry,
-					m1 = new THREE.LineBasicMaterial( { color: c1, opacity: 1, blending: THREE.AdditiveBlending, transparent: true } ),
-					m2 = new THREE.LineBasicMaterial( { color: c2, opacity: 1, blending: THREE.AdditiveBlending, transparent: true } ),
-					m3 = new THREE.LineBasicMaterial( { color: c3, opacity: 1, blending: THREE.AdditiveBlending, transparent: true } ),
-					parameters = [ [ m3, scale*0.5, [0,0,0],  g1 ], [ m2, scale*0.5, [d, 0, 0],  g1 ], [ m2, scale*0.5, [-d, 0, 0],  g1 ],
-								   [ m2, scale*0.5, [0,d,0],  g1 ], [ m2, scale*0.5, [d, d, 0],  g1 ], [ m2, scale*0.5, [-d, d, 0],  g1 ],
-								   [ m2, scale*0.5, [0,-d,0], g1 ], [ m2, scale*0.5, [d, -d, 0], g1 ], [ m2, scale*0.5, [-d, -d, 0], g1 ],
-
-								   [ m1, scale*0.5, [2*d, 0, 0],  g1 ], [ m1, scale*0.5, [-2*d, 0, 0],  g1 ],
-								   [ m1, scale*0.5, [2*d, d, 0],  g1 ], [ m1, scale*0.5, [-2*d, d, 0],  g1 ],
-								   [ m1, scale*0.5, [2*d, -d, 0], g1 ], [ m1, scale*0.5, [-2*d, -d, 0], g1 ],
-								   ];
+				var line, p, scale = 0.3, d = 125, c1 = 0x553300, c2 = 0x555555, c3 = 0x992800, 
+				g1 = geometry,
+				m1 = new THREE.LineBasicMaterial( { color: c1, opacity: 1, blending: THREE.AdditiveBlending, transparent: true } ),
+				m2 = new THREE.LineBasicMaterial( { color: c2, opacity: 1, blending: THREE.AdditiveBlending, transparent: true } ),
+				m3 = new THREE.LineBasicMaterial( { color: c3, opacity: 1, blending: THREE.AdditiveBlending, transparent: true } ),
+				parameters = [ [ m3, scale*0.5, [0,0,0],  g1 ], [ m2, scale*0.5, [d, 0, 0],  g1 ], 
+						[ m2, scale*0.5, [-d, 0, 0],  g1 ], [ m2, scale*0.5, [0,d,0],  g1 ],
+						[ m2, scale*0.5, [d, d, 0],  g1 ], [ m2, scale*0.5, [-d, d, 0],  g1 ],
+						[ m2, scale*0.5, [0,-d,0], g1 ], [ m2, scale*0.5, [d, -d, 0], g1 ], 
+						[ m2, scale*0.5, [-d, -d, 0], g1 ], [ m1, scale*0.5, [2*d, 0, 0],  g1 ],
+						[ m1, scale*0.5, [-2*d, 0, 0],  g1 ], [ m1, scale*0.5, [2*d, d, 0],  g1 ],
+						[ m1, scale*0.5, [-2*d, d, 0],  g1 ], [ m1, scale*0.5, [2*d, -d, 0], g1 ], 
+						[ m1, scale*0.5, [-2*d, -d, 0], g1 ]];
 
 				for ( i = 0; i < parameters.length; i ++ ) {
 
@@ -128,8 +128,6 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -145,8 +143,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-
-			//
 
 			function onDocumentMouseMove(event) {
 
@@ -179,8 +175,6 @@
 				}
 
 			}
-
-			//
 
 			function animate() {
 

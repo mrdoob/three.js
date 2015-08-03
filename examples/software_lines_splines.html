@@ -85,10 +85,10 @@
 				container.appendChild( renderer.domElement );
 
 				var geometry = new THREE.Geometry(),
-                    geometry2 = new THREE.Geometry(),
-                    geometry3 = new THREE.Geometry(),
-                    points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 ),
-                    colors = [], colors2 = [], colors3 = [];
+				geometry2 = new THREE.Geometry(),
+				geometry3 = new THREE.Geometry(),
+				points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 ),
+				colors = [], colors2 = [], colors3 = [];
 
 				n_sub = 6;
 
@@ -111,7 +111,6 @@
 
 					colors3[ i ] = new THREE.Color( 0xffffff );
 					colors3[ i ].setHSL( i / ( points.length * n_sub ), 1.0, 0.5 );
-
 
 				}
 
@@ -144,18 +143,13 @@
 
 				}
 
-
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				//container.appendChild(stats.domElement);
-
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-
-				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -172,8 +166,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-
-			//
 
 			function onDocumentMouseMove( event ) {
 
@@ -203,8 +195,6 @@
 				}
 
 			}
-
-			//
 
 			function animate() {
 
