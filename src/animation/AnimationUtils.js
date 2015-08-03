@@ -41,6 +41,34 @@
 
 	},
 
+	lerp_object: function( a, b, alpha ) {
+		return a.lerp( b, alpha );
+	},
+	
+	slerp_object: function( a, b, alpha ) {
+		return a.slerp( b, alpha );
+	},
+
+	lerp_number: function( a, b, alpha ) {
+		return a * ( 1 - alpha ) + b * alpha;
+	},
+
+	lerp_boolean: function( a, b, alpha ) {
+		return ( alpha < 0.5 ) ? a : b;
+	},
+
+	lerp_boolean_immediate: function( a, b, alpha ) {
+		return a;
+	},
+	
+	lerp_string: function( a, b, alpha ) {
+		return ( alpha < 0.5 ) ? a : b;
+	},
+	
+	lerp_string_immediate: function( a, b, alpha ) {
+ 		return a;		 		
+ 	},
+
 	// NOTE: this is an accumulator function that modifies the first argument (e.g. a).  This is to minimize memory alocations.
 	getLerpFunc: function( exemplarValue, interTrack ) {
 
@@ -52,47 +80,33 @@
 
 				if( exemplarValue.lerp ) {
 
-					return function lerp_object( a, b, alpha ) {
-						return a.lerp( b, alpha );
-					}
+					return THREE.AnimationUtils.lerp_object;
 
 				}
 				if( exemplarValue.slerp ) {
 
-					return function slerp_object( a, b, alpha ) {
-						return a.slerp( b, alpha );
-					}
+					return THREE.AnimationUtils.slerp_object;
 
 				}
 				break;
 			}
 		 	case "number": {
-				return function lerp_number( a, b, alpha ) {
-					return a * ( 1 - alpha ) + b * alpha;
-				}
+				return THREE.AnimationUtils.lerp_number;
 		 	}	
 		 	case "boolean": {
 		 		if( interTrack ) {
-					return function lerp_boolean( a, b, alpha ) {
-			 			return ( alpha < 0.5 ) ? a : b;
-			 		}
+					return THREE.AnimationUtils.lerp_boolean;
 		 		}
 		 		else {
-					return function lerp_boolean_immediate( a, b, alpha ) {
-			 			return a;
-			 		}
+					return THREE.AnimationUtils.lerp_boolean_immediate;
 		 		}
 		 	}
 		 	case "string": {
 		 		if( interTrack ) {
-					return function lerp_string( a, b, alpha ) {
-			 			return ( alpha < 0.5 ) ? a : b;
-			 		}
+					return THREE.AnimationUtils.lerp_string;
 		 		}
 		 		else {
-					return function lerp_string_immediate( a, b, alpha ) {
-				 		return a;		 		
-				 	}
+					return THREE.AnimationUtils.lerp_string_immediate;
 			 	}
 		 	}
 		};
