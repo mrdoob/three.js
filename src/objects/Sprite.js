@@ -40,7 +40,7 @@ THREE.Sprite.prototype.raycast = ( function () {
 
 		var distance = raycaster.ray.distanceToPoint( matrixPosition );
 
-		if ( distance > this.scale.x ) {
+		if ( distance > Math.abs(this.scale.x) ) {
 
 			return;
 
