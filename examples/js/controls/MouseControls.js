@@ -50,6 +50,12 @@ THREE.MouseControls = function ( object ) {
 
 	};
 
+	this.dispose = function() {
+
+		document.removeEventListener( 'mousemove', onMouseMove, false );
+
+	}
+
 	document.addEventListener( 'mousemove', onMouseMove, false );
 
 };
