@@ -13,6 +13,7 @@ THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 	this.timeScale = timeScale || 1;
 	this.weight = weight || 1;
 	this.loop = loop || clip.loop || false;
+	this.loopCount = 0;
 	this.enabled = true;	// allow for easy disabling of the action.
 
 	this.clipTime = 0;
@@ -24,27 +25,63 @@ THREE.AnimationAction.prototype = {
 
 	updateTime: function( clipDeltaTime ) {
 
-		this.clipTime += clipDeltaTime;
-
+		var newClipTime = this.clipTime + clipDeltaTime;
 		var duration = this.clip.duration;
 
-		if( this.loop ) {
+		if( newClipTime <= 0 ) {
 
-			if( this.clipTime < 0 ) {
+			if( this.loop ) {
 
-				this.clipTime -= Math.floor( this.clipTime / duration ) * duration;
+				newClipTime -= Math.floor( newClipTime / duration ) * duration;
+		   		this.clipTime = newClipTime % duration;
+
+		   		this.loopCount --;
+
+	   			this.mixer.dispatchEvent( { type: 'loop', action: this, direction: -1 } );
+
+			}
+			else {
+
+		   		if( this.clipTime > 0 ) {
+
+		   			this.mixer.dispatchEvent( { type: 'finished', action: this, direction: -1 } );
+
+		   		}
+
+				this.clipTime = Math.min( newClipTime, Math.max( duration, 0 ) );
 
 			}
 
-	   		this.clipTime = this.clipTime % duration;
+		}
+		else if( newClipTime >= duration ) {
+
+			if( this.loop ) {
+	
+				this.clipTime = newClipTime % duration;
+
+		   		this.loopCount ++;
+	
+	 			this.mixer.dispatchEvent( { type: 'loop', action: this, direction: +1 } );
+
+			}
+			else {
+
+		   		if( this.clipTime < duration ) {
+
+		   			this.mixer.dispatchEvent( { type: 'finished', action: this, direction: +1 } );
+
+		   		}
+
+				this.clipTime = Math.min( newClipTime, Math.max( duration, 0 ) );
+
+		   	}
 
 	   	}
 	   	else {
 
-	   		this.clipTime = Math.min( this.clipTime, Math.max( duration, 0 ) );
-
+	   		this.clipTime = newClipTime;
+	   		
 	   	}
-
 	
 	   	return this.clipTime;
 

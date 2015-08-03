@@ -25,6 +25,7 @@ THREE.AnimationMixer.prototype = {
 	addAction: function( action ) {
 
 		this.actions.push( action );
+		action.mixer = this;
 
 		var tracks = action.clip.tracks;
 
@@ -51,6 +52,12 @@ THREE.AnimationMixer.prototype = {
 
 	removeAllActions: function() {
 
+		for( var i = 0; i < this.actions.length; i ++ ) {
+
+			this.actions[i].mixer = null;
+			
+		}
+
 		// unbind all property bindings
 		for( var i = 0; i < this.propertyBindingsArray.length; i ++ ) {
 
@@ -71,6 +78,7 @@ THREE.AnimationMixer.prototype = {
 		if ( index !== - 1 ) {
 
 			this.actions.splice( index, 1 );
+			action.mixer = null;
 
 		}
 
@@ -187,3 +195,5 @@ THREE.AnimationMixer.prototype = {
 	}
 
 };
+
+THREE.EventDispatcher.prototype.apply( THREE.AnimationMixer.prototype );
