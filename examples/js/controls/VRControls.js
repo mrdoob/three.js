@@ -116,4 +116,10 @@ THREE.VRControls = function ( object, onError ) {
 
 	};
 
+	this.dispose = function () {
+
+		vrInputs = [];
+
+	};
+
 };
