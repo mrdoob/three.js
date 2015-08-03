@@ -38,7 +38,6 @@ THREE.AnimationMixer.prototype = {
 			if( ! this.propertyBindings[ track.name ] ) {
 			
 				propertyBinding = new THREE.PropertyBinding( this.root, track.name );
-				this.propertyBindings[ track.name ] = propertyBinding;
 				this.propertyBindingsArray.push( propertyBinding );
 			
 			}
@@ -52,6 +51,18 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
+	getPropertyBindingIndex: function( trackName ) {
+		
+		for( var k = 0; k < this.propertyBindings.length; k ++ ) {
+			if( this.propertyBindings[k].trackName === trackName ) {
+				return k;
+			}
+		}	
+
+		return -1;
+
+	},
+
 	updatePropertyBindingIndices: function() {
 
 		for( var i = 0; i < this.actions.length; i++ ) {
@@ -61,14 +72,10 @@ THREE.AnimationMixer.prototype = {
 			var propertyBindingIndices = [];
 
 			for( var j = 0; j < action.clip.tracks.length; j ++ ) {
-				var trackName = action.clip.tracks[j].name;
 
-				for( var k = 0; k < this.propertyBindingsArray.length; k ++ ) {
-					if( this.propertyBindingsArray[k].trackName === trackName ) {
-						propertyBindingIndices.push( k );
-						break;
-					}
-				}	
+				var trackName = action.clip.tracks[j].name;
+				propertyBindingIndices.push( this.getPropertyBindingIndex( trackName ) );
+			
 			}
 
 			action.propertyBindingIndices = propertyBindingIndices;
@@ -87,13 +94,12 @@ THREE.AnimationMixer.prototype = {
 		// unbind all property bindings
 		for( var i = 0; i < this.propertyBindingsArray.length; i ++ ) {
 
-			this.propertyBindingsArray[i].unbind();
+			this.propertyBindings[i].unbind();
 
 		}
 
 		this.actions = [];
-		this.propertyBindings = {};
-		this.propertyBindingsArray = [];
+		this.propertyBindings = [];
 
 	},
 
@@ -114,7 +120,8 @@ THREE.AnimationMixer.prototype = {
 		for( var i = 0; i < tracks.length; i ++ ) {
 		
 			var track = tracks[ i ];
-			var propertyBinding = this.propertyBindings[ track.name ];
+			var propertyBindingIndex = this.getPropertyBindingIndex( track.name );
+			var propertyBinding = this.propertyBindings[ propertyBindingIndex ];
 
 			propertyBinding.referenceCount -= 1;
 
@@ -122,8 +129,7 @@ THREE.AnimationMixer.prototype = {
 
 				propertyBinding.unbind();
 
-				delete this.propertyBindings[ track.name ];
-				this.propertyBindingArray.splice( this.propertyBindingArray.indexOf( propertyBinding ), 1 );
+				this.propertyBindings.splice( this.propertyBindings.indexOf( propertyBinding ), 1 );
 
 			}
 		}
@@ -210,16 +216,16 @@ THREE.AnimationMixer.prototype = {
 
 				var name = action.clip.tracks[j].name;
 
-				this.propertyBindingsArray[ action.propertyBindingIndices[ j ] ].accumulate( actionResults[j], weight );
+				this.propertyBindings[ action.propertyBindingIndices[ j ] ].accumulate( actionResults[j], weight );
 
 			}
 
 		}
 	
 		// apply to nodes
-		for ( var i = 0; i < this.propertyBindingsArray.length; i ++ ) {
+		for ( var i = 0; i < this.propertyBindings.length; i ++ ) {
 
-			this.propertyBindingsArray[ i ].apply();
+			this.propertyBindings[ i ].apply();
 
 		}
 	}
