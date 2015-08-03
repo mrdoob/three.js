@@ -17,7 +17,7 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 	this.trim();
 	this.optimize();
 
-	this.results = {};
+	this.results = [];
 	
 };
 
@@ -33,7 +33,7 @@ THREE.AnimationClip.prototype = {
 
 			var track = this.tracks[ i ];
 
-			this.results[ track.name ] = track.getAt( clipTime );
+			this.results[ i ] = track.getAt( clipTime );
 
 		}
 

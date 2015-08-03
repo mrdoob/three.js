@@ -178,9 +178,11 @@ THREE.AnimationMixer.prototype = {
 
 			if( action.weight <= 0 || ! action.enabled ) continue;
 
-			for( var name in actionResults ) {
+			for( var j = 0; j < actionResults.length; j ++ ) {
 
-				this.propertyBindings[name].accumulate( actionResults[name], weight );
+				var name = action.clip.tracks[j].name;
+
+				this.propertyBindings[name].accumulate( actionResults[j], weight );
 
 			}
 
