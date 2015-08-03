@@ -8,12 +8,12 @@
  	getEqualsFunc: function( exemplarValue ) {
 
 		if( exemplarValue.equals ) {
-			return function( a, b ) {
+			return function equals_object( a, b ) {
 				return a.equals( b );
 			}
 		}
 
-		return function( a, b ) {
+		return function equals_primitive( a, b ) {
 			return ( a === b );	
 		};
 
@@ -52,14 +52,14 @@
 
 				if( exemplarValue.lerp ) {
 
-					return function( a, b, alpha ) {
+					return function lerp_object( a, b, alpha ) {
 						return a.lerp( b, alpha );
 					}
 
 				}
 				if( exemplarValue.slerp ) {
 
-					return function( a, b, alpha ) {
+					return function slerp_object( a, b, alpha ) {
 						return a.slerp( b, alpha );
 					}
 
@@ -67,30 +67,30 @@
 				break;
 			}
 		 	case "number": {
-				return function( a, b, alpha ) {
+				return function lerp_number( a, b, alpha ) {
 					return a * ( 1 - alpha ) + b * alpha;
 				}
 		 	}	
 		 	case "boolean": {
 		 		if( interTrack ) {
-					return function( a, b, alpha ) {
+					return function lerp_boolean( a, b, alpha ) {
 			 			return ( alpha < 0.5 ) ? a : b;
 			 		}
 		 		}
 		 		else {
-					return function( a, b, alpha ) {
+					return function lerp_boolean_immediate( a, b, alpha ) {
 			 			return a;
 			 		}
 		 		}
 		 	}
 		 	case "string": {
 		 		if( interTrack ) {
-					return function( a, b, alpha ) {
+					return function lerp_string( a, b, alpha ) {
 			 			return ( alpha < 0.5 ) ? a : b;
 			 		}
 		 		}
 		 		else {
-					return function( a, b, alpha ) {
+					return function lerp_string_immediate( a, b, alpha ) {
 				 		return a;		 		
 				 	}
 			 	}

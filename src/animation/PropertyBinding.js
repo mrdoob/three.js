@@ -172,7 +172,7 @@ THREE.PropertyBinding.prototype = {
 				}
 			}
 
-			this.setValue = function( value ) {
+			this.setValue = function setValue_propertyIndexed( value ) {
 				if( ! this.equalsValue( nodeProperty[ this.propertyIndex ], value ) ) {
 					nodeProperty[ this.propertyIndex ] = value;
 					return true;
@@ -180,7 +180,7 @@ THREE.PropertyBinding.prototype = {
 				return false;
 			};
 
-			this.getValue = function() {
+			this.getValue = function getValue_propertyIndexed() {
 				return nodeProperty[ this.propertyIndex ];
 			};
 
@@ -188,7 +188,7 @@ THREE.PropertyBinding.prototype = {
 		// must use copy for Object3D.Euler/Quaternion		
 		else if( nodeProperty.copy ) {
 			
-			this.setValue = function( value ) {
+			this.setValue = function setValue_propertyObject( value ) {
 				if( ! this.equalsValue( nodeProperty, value ) ) {
 					nodeProperty.copy( value );
 					return true;
@@ -196,7 +196,7 @@ THREE.PropertyBinding.prototype = {
 				return false;
 			}
 
-			this.getValue = function() {
+			this.getValue = function getValue_propertyObject() {
 				return nodeProperty;
 			};
 
@@ -204,7 +204,7 @@ THREE.PropertyBinding.prototype = {
 		// otherwise just set the property directly on the node (do not use nodeProperty as it may not be a reference object)
 		else {
 
-			this.setValue = function( value ) {
+			this.setValue = function setValue_property( value ) {
 				if( ! this.equalsValue( targetObject[ this.propertyName ], value ) ) {
 					targetObject[ this.propertyName ] = value;	
 					return true;
@@ -212,7 +212,7 @@ THREE.PropertyBinding.prototype = {
 				return false;
 			}
 
-			this.getValue = function() {
+			this.getValue = function getValue_property() {
 				return targetObject[ this.propertyName ];
 			};
 
@@ -221,14 +221,14 @@ THREE.PropertyBinding.prototype = {
 		// trigger node dirty			
 		if( targetObject.needsUpdate !== undefined ) { // material
 			
-			this.triggerDirty = function() {
+			this.triggerDirty = function triggerDirty_needsUpdate() {
 				this.node.needsUpdate = true;
 			}
 
 		}			
 		else if( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
 			
-			this.triggerDirty = function() {
+			this.triggerDirty = function triggerDirty_matrixWorldNeedsUpdate() {
 				targetObject.matrixWorldNeedsUpdate = true;
 			}
 
