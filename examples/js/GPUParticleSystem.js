@@ -10,7 +10,7 @@
  *
  * Currently uses a static wrapping perlin noise texture for turbulence, and a small png texture for
  * particles, but adding support for a particle texture atlas or changing to a different type of turbulence
- * would be a fairly light day's work. 
+ * would be a fairly light day's work.
  *
  * Shader and javascript packing code derrived from several Stack Overflow examples.
  *
@@ -106,8 +106,6 @@ THREE.GPUParticleSystem = function( options ) {
       'varying vec4 vColor;',
       'varying float lifeLeft;',
 
-      'varying vec2 vUv;',
-
       'void main() {',
 
         '// unpack things from our attributes',
@@ -117,7 +115,6 @@ THREE.GPUParticleSystem = function( options ) {
         'vec4 velTurb = encode_float( particleVelColSizeLife.x );',
         'vec3 velocity = vec3( velTurb.xyz );',
         'float turbulence = velTurb.w;',
-        'vUv = uv;',
 
         'vec3 newPosition;',
 
@@ -169,7 +166,6 @@ THREE.GPUParticleSystem = function( options ) {
 
         'varying vec4 vColor;',
         'varying float lifeLeft;',
-        'varying vec2 vUv;',
 
         'uniform sampler2D tSprite;',
 
