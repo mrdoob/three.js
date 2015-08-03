@@ -52,7 +52,10 @@
 
       scene = new THREE.Scene();
 
-      // setup particle system
+      // The GPU Particle system extends THREE.Object3D, and so you can use it
+      // as you would any other scene graph component.  Particle positions will be
+      // relative to the position of the particle system, but you will probably only need one
+      // system for your whole scene
       particleSystem = new THREE.GPUParticleSystem({
         maxParticles: 250000
       });
