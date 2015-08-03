@@ -78,8 +78,8 @@
 
       spawnerOptions = {
         spawnRate: 15000,
-        horizontalSpeed: 1,
-        verticalSpeed: .5,
+        horizontalSpeed: 1.5,
+        verticalSpeed: 1.33,
         timeScale: 1
       }
 
@@ -131,8 +131,8 @@
       if (tick < 0) tick = 0;
 
       if (delta > 0) {
-        options.position.x = Math.sin(tick * spawnerOptions.horizontalSpeed) * 15;
-        options.position.y = Math.sin(tick * spawnerOptions.verticalSpeed) * 25;
+        options.position.x = Math.sin(tick * spawnerOptions.horizontalSpeed) * 20;
+        options.position.y = Math.sin(tick * spawnerOptions.verticalSpeed) * 10;
         options.position.z = Math.sin(tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed) * 5;
 
         for (var x = 0; x < spawnerOptions.spawnRate * delta; x++) {
