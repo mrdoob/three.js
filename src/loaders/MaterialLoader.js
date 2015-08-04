@@ -50,8 +50,8 @@ THREE.MaterialLoader.prototype = {
 		if ( json.side !== undefined ) material.side = json.side;
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
-		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
+		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 
 		// for PointCloudMaterial
 		if ( json.size !== undefined ) material.size = json.size;
