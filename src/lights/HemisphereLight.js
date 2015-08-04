@@ -37,6 +37,7 @@ THREE.HemisphereLight.prototype.toJSON = function ( meta ) {
 
 	data.object.color = this.color.getHex();
 	data.object.groundColor = this.groundColor.getHex();
+	data.object.intensity = this.intensity;
 
 	return data;
 
