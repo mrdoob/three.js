@@ -2,13 +2,14 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Line] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<div class="desc">Renders [page:ArrowHelper arrows] to visualize an object's vertex tangent vectors. Requires that tangents have been specified in a [page:BufferAttribute custom attribute] or have been computed using [page:Geometry.computeTangents computeTangents]. </div>
@@ -42,11 +43,11 @@
 		<h3>[property:Object3D object]</h3>
 		<div>
 		The attached object
-		</div> 
+		</div>
 
 
 		<h2>Methods</h2>
-		
+
 
 		<h3>[method:null update]()</h3>
 		<div>Updates the vertex tangent preview arrows based on the new position and tangents of the object.</div>

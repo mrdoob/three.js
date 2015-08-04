@@ -128,9 +128,7 @@
 					normalScale: new THREE.Vector2( 0.8, 0.8 )
 				} );
 
-				loader = new THREE.JSONLoader( true );
-				document.body.appendChild( loader.statusDomElement );
-
+				loader = new THREE.JSONLoader();
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
@@ -200,8 +198,6 @@
 				mesh1.scale.x = mesh1.scale.y = mesh1.scale.z = scale;
 
 				scene.add( mesh1 );
-
-				loader.statusDomElement.style.display = "none";
 
 			}
 

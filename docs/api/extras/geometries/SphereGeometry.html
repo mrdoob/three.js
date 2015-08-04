@@ -2,21 +2,22 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Geometry] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<div class="desc">A class for generating sphere geometries</div>
 
 		<h2>Example</h2>
 
-		<iframe src='../../../scenes/geometry-browser.html#SphereGeometry'></iframe>
-		
+		<iframe src='scenes/geometry-browser.html#SphereGeometry'></iframe>
+
 		<code>var geometry = new THREE.SphereGeometry( 5, 32, 32 );
 		var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
 		var sphere = new THREE.Mesh( geometry, material );
@@ -37,18 +38,18 @@
 		thetaStart — specify vertical starting angle. Default is 0.<br />
 		thetaLength — specify vertical sweep angle size. Default is Math.PI.<br />
 		</div>
-		
+
 		<div>
 		The geometry is created by sweeping and calculating vertexes around the Y axis (horizontal sweep) and the Z axis (vertical sweep). Thus, incomplete spheres (akin to <em>'sphere slices'</em>) can be created through the use of different values of phiStart, phiLength, thetaStart and thetaLength, in order to define the points in which we start (or end) calculating those vertices.
 		</div>
 
 
 		<h2>Properties</h2>
-		
+
 		<div>
 		Each of the contructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
 		</div>
-		
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

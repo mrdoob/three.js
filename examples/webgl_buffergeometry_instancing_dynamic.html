@@ -213,7 +213,7 @@
             var offsets = new THREE.InstancedBufferAttribute( new Float32Array( instances * 3 ), 3, 1, false );
 
             var vector = new THREE.Vector4();
-            for ( var i = 0, ul = offsets.length; i < ul; i++ ) {
+            for ( var i = 0, ul = offsets.count; i < ul; i++ ) {
                 var x = Math.random() * 100 - 50;
                 var y = Math.random() * 100 - 50;
                 var z = Math.random() * 100 - 50;
@@ -228,7 +228,7 @@
 
             orientations = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1, true );
 
-            for ( var i = 0, ul = orientations.length; i < ul; i++ ) {
+            for ( var i = 0, ul = orientations.count; i < ul; i++ ) {
 
                 vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
                 vector.normalize();
@@ -318,7 +318,7 @@
             var delta = ( time - lastTime ) / 5000;
             tmpQ.set( moveQ.x * delta, moveQ.y * delta, moveQ.z * delta, 1 ).normalize();
 
-            for ( var i = 0, ul = orientations.length; i < ul; i++ ) {
+            for ( var i = 0, ul = orientations.count; i < ul; i++ ) {
                 var index = i * 4;
                 currentQ.set( orientations.array[index], orientations.array[index + 1], orientations.array[index + 2], orientations.array[index + 3] );
                 currentQ.multiply( tmpQ );

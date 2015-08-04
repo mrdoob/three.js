@@ -18,8 +18,6 @@ THREE.Quaternion.prototype = {
 
 	constructor: THREE.Quaternion,
 
-	_x: 0,_y: 0, _z: 0, _w: 0,
-
 	get x () {
 
 		return this._x;
@@ -103,6 +101,7 @@ THREE.Quaternion.prototype = {
 		if ( euler instanceof THREE.Euler === false ) {
 
 			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
+
 		}
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/

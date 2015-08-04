@@ -30,7 +30,7 @@ THREE.VerticalBlurShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -57,6 +57,6 @@ THREE.VerticalBlurShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

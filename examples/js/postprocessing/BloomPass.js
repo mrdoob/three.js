@@ -5,8 +5,8 @@
 THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 	strength = ( strength !== undefined ) ? strength : 1;
-	kernelSize = ( kernelSize !== undefined ) ? kernelSize : 25;
-	sigma = ( sigma !== undefined ) ? sigma : 4.0;
+	kernelSize = ( kernelSize !== undefined ) ? kernelSize : 37;
+	sigma = ( sigma !== undefined ) ? sigma : 6.0;
 	resolution = ( resolution !== undefined ) ? resolution : 256;
 
 	// render targets
@@ -66,10 +66,10 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	this.clear = false;
 
 
-	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene  = new THREE.Scene();
 
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
 	this.scene.add( this.quad );
 
 };
@@ -107,6 +107,10 @@ THREE.BloomPass.prototype = {
 
 		renderer.render( this.scene, this.camera, readBuffer, this.clear );
 
+	},
+
+	setStrength: function( strength ) {
+		this.copyUniforms[ "opacity" ].value = strength;
 	}
 
 };

@@ -103,7 +103,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		}
 
-		return function ( rayOrigin, rayDirection, outputColor, recursionDepth ) {
+		return function spawnRay( rayOrigin, rayDirection, outputColor, recursionDepth ) {
 
 			var ray = raycaster.ray;
 
@@ -355,7 +355,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 		var tmpVec2 = new THREE.Vector3();
 		var tmpVec3 = new THREE.Vector3();
 
-		return function ( outputVector, point, shading, face, vertices ) {
+		return function computePixelNormal( outputVector, point, shading, face, vertices ) {
 
 			var faceNormal = face.normal;
 			var vertexNormals = face.vertexNormals;
@@ -424,7 +424,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		var pixelColor = new THREE.Color();
 
-		return function ( blockX, blockY ) {
+		return function renderBlock( blockX, blockY ) {
 
 			var index = 0;
 
@@ -543,4 +543,4 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 };
 
-THREE.EventDispatcher.prototype.apply(THREE.RaytracingRenderer.prototype);
+THREE.EventDispatcher.prototype.apply( THREE.RaytracingRenderer.prototype );

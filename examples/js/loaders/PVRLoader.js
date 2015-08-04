@@ -8,9 +8,12 @@
  *   TODO : implement loadMipmaps option
  */
 
+THREE.PVRLoader = function ( manager ) {
 
-THREE.PVRLoader = function () {
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
 	this._parser = THREE.PVRLoader.parse;
+
 };
 
 THREE.PVRLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
@@ -18,6 +21,7 @@ THREE.PVRLoader.prototype.constructor = THREE.PVRLoader;
 
 
 THREE.PVRLoader.parse = function ( buffer, loadMipmaps ) {
+
 	var headerLengthInt = 13;
 	var header = new Uint32Array( buffer, 0, headerLengthInt );
 
@@ -28,15 +32,20 @@ THREE.PVRLoader.parse = function ( buffer, loadMipmaps ) {
 	};
 
 	// PVR v3
-	if ( header[0] === 0x03525650 ) {
+	if ( header[ 0 ] === 0x03525650 ) {
+
 		return THREE.PVRLoader._parseV3( pvrDatas );
+
 	} 
 	// PVR v2
-	else if ( header[11] === 0x21525650) {
+	else if ( header[ 11 ] === 0x21525650 ) {
+
 		return THREE.PVRLoader._parseV2( pvrDatas );
 
 	} else {
+
 		throw new Error( "[THREE.PVRLoader] Unknown PVR format" );
+
 	}
 
 };
@@ -47,13 +56,13 @@ THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 	var bpp, format;
 	
 
-	var metaLen 	  = header[12],
-		pixelFormat   =  header[2],
-		height        =  header[6],
-		width         =  header[7],
-		numSurfs      =  header[9],
-		numFaces      =  header[10],
-		numMipmaps    =  header[11];
+	var metaLen 	  = header[ 12 ],
+		pixelFormat   =  header[ 2 ],
+		height        =  header[ 6 ],
+		width         =  header[ 7 ],
+		numSurfs      =  header[ 9 ],
+		numFaces      =  header[ 10 ],
+		numMipmaps    =  header[ 11 ];
 
 	switch ( pixelFormat ) {
 		case 0 : // PVRTC 2bpp RGB
@@ -73,7 +82,7 @@ THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 			format = THREE.RGBA_PVRTC_4BPPV1_Format;
 			break;
 		default :
-			throw new Error( "pvrtc - unsupported PVR format " + pixelFormat);
+			throw new Error( "pvrtc - unsupported PVR format " + pixelFormat );
 	}
 
 	pvrDatas.dataPtr 	 = 52 + metaLen;
@@ -84,28 +93,29 @@ THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 	pvrDatas.numSurfaces = numFaces;
 	pvrDatas.numMipmaps  = numMipmaps;
 
-	pvrDatas.isCubemap 	= (numFaces === 6);
+	pvrDatas.isCubemap 	= ( numFaces === 6 );
 
 	return THREE.PVRLoader._extract( pvrDatas );
+
 };
 
 THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 
 	var header = pvrDatas.header;
 
-	var headerLength  =  header[0],
-		height        =  header[1],
-		width         =  header[2],
-		numMipmaps    =  header[3],
-		flags         =  header[4],
-		dataLength    =  header[5],
-		bpp           =  header[6],
-		bitmaskRed    =  header[7],
-		bitmaskGreen  =  header[8],
-		bitmaskBlue   =  header[9],
-		bitmaskAlpha  =  header[10],
-		pvrTag        =  header[11],
-		numSurfs      =  header[12];
+	var headerLength  =  header[ 0 ],
+		height        =  header[ 1 ],
+		width         =  header[ 2 ],
+		numMipmaps    =  header[ 3 ],
+		flags         =  header[ 4 ],
+		dataLength    =  header[ 5 ],
+		bpp           =  header[ 6 ],
+		bitmaskRed    =  header[ 7 ],
+		bitmaskGreen  =  header[ 8 ],
+		bitmaskBlue   =  header[ 9 ],
+		bitmaskAlpha  =  header[ 10 ],
+		pvrTag        =  header[ 11 ],
+		numSurfs      =  header[ 12 ];
 
 
 	var TYPE_MASK = 0xff;
@@ -119,16 +129,18 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 	var bpp, format;
 	var _hasAlpha = bitmaskAlpha > 0;
 
-	if (formatFlags === PVRTC_4 ) {
+	if ( formatFlags === PVRTC_4 ) {
+
 		format = _hasAlpha ? THREE.RGBA_PVRTC_4BPPV1_Format : THREE.RGB_PVRTC_4BPPV1_Format;
 		bpp = 4;
-	}
-	else if ( formatFlags === PVRTC_2) {
+
+	} else if ( formatFlags === PVRTC_2 ) {
+
 		format = _hasAlpha ? THREE.RGBA_PVRTC_2BPPV1_Format : THREE.RGB_PVRTC_2BPPV1_Format;
 		bpp = 2;
-	}
-	else
-		throw new Error( "pvrtc - unknown format " + formatFlags);
+
+	} else
+		throw new Error( "pvrtc - unknown format " + formatFlags );
 	
 
 
@@ -140,9 +152,9 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 	pvrDatas.numSurfaces = numSurfs;
 	pvrDatas.numMipmaps  = numMipmaps + 1;
 
-  	// guess cubemap type seems tricky in v2
-  	// it juste a pvr containing 6 surface (no explicit cubemap type)
-	pvrDatas.isCubemap 	= (numSurfs === 6);
+	// guess cubemap type seems tricky in v2
+	// it juste a pvr containing 6 surface (no explicit cubemap type)
+	pvrDatas.isCubemap 	= ( numSurfs === 6 );
 
 	return THREE.PVRLoader._extract( pvrDatas );
 
@@ -196,20 +208,24 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 
 
 	if ( bpp === 2 ) {
+
 		blockWidth = 8;
 		blockHeight = 4;
+
 	} else {
+
 		blockWidth = 4;
 		blockHeight = 4;
+
 	}
 
-	blockSize = (blockWidth * blockHeight) * bpp / 8;
+	blockSize = ( blockWidth * blockHeight ) * bpp / 8;
 
 	pvr.mipmaps.length = pvrDatas.numMipmaps * numSurfs;
 
 	var mipLevel = 0;
 
-	while (mipLevel < pvrDatas.numMipmaps) {
+	while ( mipLevel < pvrDatas.numMipmaps ) {
 
 		var sWidth = pvrDatas.width >> mipLevel,
 		sHeight = pvrDatas.height >> mipLevel;
@@ -218,9 +234,9 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 		heightBlocks = sHeight / blockHeight;
 
 		// Clamp to minimum number of blocks
-		if (widthBlocks < 2)
+		if ( widthBlocks < 2 )
 			widthBlocks = 2;
-		if (heightBlocks < 2)
+		if ( heightBlocks < 2 )
 			heightBlocks = 2;
 
 		dataSize = widthBlocks * heightBlocks * blockSize;
@@ -236,7 +252,7 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 				height: sHeight 
 			};
 
-			pvr.mipmaps[ surfIndex * pvrDatas.numMipmaps + mipLevel] = mipmap;
+			pvr.mipmaps[ surfIndex * pvrDatas.numMipmaps + mipLevel ] = mipmap;
 
 			dataOffset += dataSize;
 
@@ -249,4 +265,5 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 
 
 	return pvr;
+
 };

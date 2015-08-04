@@ -2,23 +2,24 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Geometry] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<div class="desc">Creates a one-sided polygonal geometry from one or more path shapes. Similar to [page:ExtrudeGeometry]</div>
 
 		<h2>Example</h2>
-		
-		
+
+
 		<code>
 var rectLength = 120, rectWidth = 40;
-		
+
 var rectShape = new THREE.Shape();
 rectShape.moveTo( 0,0 );
 rectShape.lineTo( 0, rectWidth );
@@ -27,11 +28,11 @@ rectShape.lineTo( rectLength, 0 );
 rectShape.lineTo( 0, 0 );
 
 var rectGeom = new THREE.ShapeGeometry( rectShape );
-var rectMesh = new THREE.Mesh( rectGeom, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ) ;		
-	
+var rectMesh = new THREE.Mesh( rectGeom, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ) ;
+
 scene.add( rectMesh );
 		</code>
-	
+
 		<h2>Constructor</h2>
 
 

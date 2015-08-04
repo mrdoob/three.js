@@ -26,16 +26,13 @@ THREE.EdgeShader2 = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
 		"uniform sampler2D tDiffuse;",
 		"varying vec2 vUv;",
 		"uniform vec2 aspect;",
-
-
-		"vec2 texel = vec2(1.0 / aspect.x, 1.0 / aspect.y);",
 
 		"mat3 G[2];",
 
@@ -45,6 +42,7 @@ THREE.EdgeShader2 = {
 
 		"void main(void)",
 		"{",
+			"vec2 texel = vec2(1.0 / aspect.x, 1.0 / aspect.y);",
 			"mat3 I;",
 			"float cnv[2];",
 			"vec3 sample;",
@@ -68,6 +66,6 @@ THREE.EdgeShader2 = {
 			"gl_FragColor = vec4(0.5 * sqrt(cnv[0]*cnv[0]+cnv[1]*cnv[1]));",
 		"} ",
 
-	].join("\n")
+	].join( "\n" )
 
 };

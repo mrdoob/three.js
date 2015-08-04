@@ -17,6 +17,7 @@
 		<script src="../examples/js/loaders/AWDLoader.js"></script>
 		<script src="../examples/js/loaders/BabylonLoader.js"></script>
 		<script src="../examples/js/loaders/ColladaLoader.js"></script>
+		<script src="../examples/js/loaders/MD2Loader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
 		<script src="../examples/js/loaders/PLYLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
@@ -44,6 +45,7 @@
 		<script src="js/libs/codemirror/mode/javascript.js"></script>
 		<script src="js/libs/esprima.js"></script>
 		<script src="js/libs/jsonlint.js"></script>
+		<script src="js/libs/glslprep.min.js"></script>
 
 		<script src="js/libs/codemirror/mode/glsl.js"></script>
 
@@ -82,6 +84,7 @@
 
 		<script src="js/Editor.js"></script>
 		<script src="js/Config.js"></script>
+		<script src="js/History.js"></script>
 		<script src="js/Loader.js"></script>
 		<script src="js/Menubar.js"></script>
 		<script src="js/Menubar.File.js"></script>
@@ -309,6 +312,13 @@
 				}
 
 			}
+
+			window.addEventListener( 'message', function ( event ) {
+
+				editor.clear();
+				editor.fromJSON( event.data );
+
+			}, false );
 
 		</script>
 	</body>

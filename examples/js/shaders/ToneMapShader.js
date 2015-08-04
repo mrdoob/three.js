@@ -26,7 +26,7 @@ THREE.ToneMapShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -36,18 +36,33 @@ THREE.ToneMapShader = {
 
 		"uniform float middleGrey;",
 		"uniform float maxLuminance;",
-		"#ifdef ADAPTED_LUMINANCE",
+		"#ifdef SAMPLE_LUMINANCE",
 			"uniform sampler2D luminanceMap;",
 		"#else",
 			"uniform float averageLuminance;",
 		"#endif",
+
+		THREE.ShaderChunk['hdr_decode_pars_fragment'],
+		THREE.ShaderChunk['hdr_encode_pars_fragment'],
 		
 		"const vec3 LUM_CONVERT = vec3(0.299, 0.587, 0.114);",
 
 		"vec3 ToneMap( vec3 vColor ) {",
-			"#ifdef ADAPTED_LUMINANCE",
+			"#ifdef SAMPLE_LUMINANCE",
 				// Get the calculated average luminance 
-				"float fLumAvg = texture2D(luminanceMap, vec2(0.5, 0.5)).r;",
+				"vec4 lumAvg = texture2D(luminanceMap, vec2(0.5, 0.5));",
+				"float fLumAvg = lumAvg.r;",
+				"#if defined( HDR_INPUT ) && defined( HDR_INPUT_TYPE )",
+					"#if ( HDR_INPUT_TYPE == HDR_TYPE_LOGLUV )",
+						"fLumAvg = HDRDecodeLOGLUV( lumAvg ).r;",
+					"#elif ( HDR_INPUT_TYPE == HDR_TYPE_RGBM )",
+						"fLumAvg = HDRDecodeRGBM( lumAvg ).r;",
+					"#elif ( HDR_INPUT_TYPE == HDR_TYPE_RGBD )",
+						"fLumAvg = HDRDecodeRGBD( lumAvg ).r;",
+					"#elif ( HDR_INPUT_TYPE == HDR_TYPE_RGBE )",
+						"fLumAvg = HDRDecodeRGBE( lumAvg ).r;",
+					"#endif",
+				"#endif",
 			"#else",
 				"float fLumAvg = averageLuminance;",
 			"#endif",
@@ -65,11 +80,25 @@ THREE.ToneMapShader = {
 		"void main() {",
 
 			"vec4 texel = texture2D( tDiffuse, vUv );",
-			
-			"gl_FragColor = vec4( ToneMap( texel.xyz ), texel.w );",
+
+			"#if defined( HDR_INPUT ) && defined( HDR_INPUT_TYPE )",
+				"#if ( HDR_INPUT_TYPE == HDR_TYPE_LOGLUV )",
+					"gl_FragColor = vec4( ToneMap( HDRDecodeLOGLUV( texel ) ), 1.0 );",
+				"#elif ( HDR_INPUT_TYPE == HDR_TYPE_RGBM )",
+					"gl_FragColor = vec4( ToneMap( HDRDecodeRGBM( texel ) ), 1.0 );",
+				"#elif ( HDR_INPUT_TYPE == HDR_TYPE_RGBD )",
+					"gl_FragColor = vec4( ToneMap( HDRDecodeRGBD( texel ) ), 1.0 );",
+				"#elif ( HDR_INPUT_TYPE == HDR_TYPE_RGBE )",
+					"gl_FragColor = vec4( ToneMap( HDRDecodeRGBE( texel ) ), 1.0 );",
+				"#else",
+					"gl_FragColor = vec4( ToneMap( texel.xyz ), texel.w );",
+				"#endif",
+			"#else",
+				"gl_FragColor = vec4( ToneMap( texel.xyz ), texel.w );",
+			"#endif",
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

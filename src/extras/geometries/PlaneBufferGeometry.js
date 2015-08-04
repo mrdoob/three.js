@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegments ) {
+THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegments, uvMult, uvOffset ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -35,27 +35,32 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 	var offset = 0;
 	var offset2 = 0;
 
+	
+	var uvy = uvOffset ? Math.floor(gridY1 * -uvOffset ) : gridY;
+	uvMult = uvMult ? uvMult : 1.0;
+
 	for ( var iy = 0; iy < gridY1; iy ++ ) {
 
 		var y = iy * segment_height - height_half;
+		var uvx = uvOffset ? Math.floor(gridX1 * uvOffset ) : 0;
 
 		for ( var ix = 0; ix < gridX1; ix ++ ) {
 
 			var x = ix * segment_width - width_half;
 
-			vertices[ offset     ] = x;
+			vertices[ offset ] = x;
 			vertices[ offset + 1 ] = - y;
 
 			normals[ offset + 2 ] = 1;
 
-			uvs[ offset2     ] = ix / gridX;
+			uvs[ offset2 ] = ix / gridX;
 			uvs[ offset2 + 1 ] = 1 - ( iy / gridY );
 
 			offset += 3;
 			offset2 += 2;
-
+			uvx++;
 		}
-
+		uvy--;
 	}
 
 	offset = 0;
@@ -71,7 +76,7 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
 			var d = ( ix + 1 ) + gridX1 * iy;
 
-			indices[ offset     ] = a;
+			indices[ offset ] = a;
 			indices[ offset + 1 ] = b;
 			indices[ offset + 2 ] = d;
 
@@ -94,3 +99,18 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 THREE.PlaneBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.PlaneBufferGeometry.prototype.constructor = THREE.PlaneBufferGeometry;
+
+THREE.PlaneBufferGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.PlaneBufferGeometry(
+		this.parameters.width,
+		this.parameters.height,
+		this.parameters.widthSegments,
+		this.parameters.heightSegments
+	);
+
+	geometry.copy( this );
+
+	return geometry;
+
+};

@@ -47,24 +47,17 @@ var list = {
 
 
 		"Loaders": [
-			[ "BabylonLoader", "api/loaders/BabylonLoader" ],
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
-			[ "ColladaLoader", "api/loaders/ColladaLoader" ],
-			[ "glTFLoader", "api/loaders/glTFLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
 			[ "Loader", "api/loaders/Loader" ],
 			[ "LoadingManager", "api/loaders/LoadingManager" ],
 			[ "MaterialLoader", "api/loaders/MaterialLoader" ],
-			[ "MTLLoader", "api/loaders/MTLLoader" ],
-			[ "OBJLoader", "api/loaders/OBJLoader" ],
-			[ "OBJMTLLoader", "api/loaders/OBJMTLLoader" ],
 			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
 			[ "PDBLoader", "api/loaders/PDBLoader" ],
 			[ "SVGLoader", "api/loaders/SVGLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
-			[ "TGALoader", "api/loaders/TGALoader" ],
 			[ "XHRLoader", "api/loaders/XHRLoader" ]
 		],
 
@@ -136,7 +129,8 @@ var list = {
 
 		"Renderers / WebGL": [
 			[ "WebGLProgram", "api/renderers/webgl/WebGLProgram" ],
-			[ "WebGLShader", "api/renderers/webgl/WebGLShader" ]
+			[ "WebGLShader", "api/renderers/webgl/WebGLShader" ],
+			[ "WebGLState", "api/renderers/webgl/WebGLState" ]
 		],
 
 		"Renderers / WebGL / Plugins": [
@@ -169,6 +163,11 @@ var list = {
 			[ "Animation", "api/extras/animation/Animation" ],
 			[ "AnimationHandler", "api/extras/animation/AnimationHandler" ],
 			[ "KeyFrameAnimation", "api/extras/animation/KeyFrameAnimation" ]
+		],
+
+		"Extras / Cameras": [
+			[ "CombinedCamera", "api/extras/cameras/CombinedCamera" ],
+			[ "CubeCamera", "api/extras/cameras/CubeCamera" ]
 		],
 
 		"Extras / Core": [

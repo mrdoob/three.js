@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -16,7 +17,7 @@
 		<h2>Constructor</h2>
 		<h3>[name]([page:Array array], [page:Integer itemSize])</h3>
 		<div>
-		Instantiates this attibute with data from the associated buffer. The array can either be a regular Array or a Typed Array. 
+		Instantiates this attribute with data from the associated buffer. The array can either be a regular Array or a Typed Array.
 		itemSize gives the number of values of the array that should be associated with a particular vertex.
 		</div>
 
@@ -24,7 +25,7 @@
 
 		<h3>[property:Array array]</h3>
 		<div>
-		Stores the data associated with this attribute; can be an Array or a Typed Array. This element should have <code>itemSize * numVertices</code> elements, where numVertices is the number of vertices in the associated [page:BufferGeometry geometry]. 
+		Stores the data associated with this attribute; can be an Array or a Typed Array. This element should have <code>itemSize * numVertices</code> elements, where numVertices is the number of vertices in the associated [page:BufferGeometry geometry].
 		</div>
 
 		<h3>[property:Integer itemSize]</h3>
@@ -43,10 +44,14 @@
 		Flag to indicate that this attribute has changed and should be re-send to the GPU. Set this to true when you modify the value of the array.
 		</div>
 
+		<h3>[property:Integer version]</h3>
+		<div>
+		A version number, incremented every time the needsUpdate property is set to true.
+		</div>
 
 
 		<h2>Methods</h2>
-		
+
 		<h3>[method:null copyAt] ( [page:Integer index1], attribute, [page:Integer index2] ) </h3>
 		<div>
 		Copies itemSize values in the array from the vertex at index2 to the vertex at index1.
@@ -74,7 +79,7 @@
 
 		<h3>[method:null setXY]( index, x, y ) </h3>
 		<div>
-		Sets the value of the array at <code>index * itemSize</code> to x and 
+		Sets the value of the array at <code>index * itemSize</code> to x and
 		sets the value of the array at <code>index * itemSize + 1</code> to y
 		</div>
 
@@ -88,7 +93,7 @@
 		<h3>[method:null setXYZW]( index, x, y, z, w ) </h3>
 		<div>
 		Sets the value of the array at <code>index * itemSize</code> to x,
-		the value of the array at <code>index * itemSize + 1</code> to y, 
+		the value of the array at <code>index * itemSize + 1</code> to y,
 		the value of the array at <code>index * itemSize + 2</code> to z, and
 		the value of the array at <code>index * itemSize + 3</code> to w.
 		</div>

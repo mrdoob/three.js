@@ -26,7 +26,7 @@ THREE.EdgeShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -34,9 +34,6 @@ THREE.EdgeShader = {
 		"varying vec2 vUv;",
 
 		"uniform vec2 aspect;",
-
-		"vec2 texel = vec2(1.0 / aspect.x, 1.0 / aspect.y);",
-
 
 		"mat3 G[9];",
 
@@ -54,6 +51,7 @@ THREE.EdgeShader = {
 
 		"void main(void)",
 		"{",
+			"vec2 texel = vec2(1.0 / aspect.x, 1.0 / aspect.y);",
 
 			"G[0] = g0,",
 			"G[1] = g1,",
@@ -89,5 +87,5 @@ THREE.EdgeShader = {
 			"gl_FragColor = vec4(vec3(sqrt(M/S)), 1.0);",
 		"}",
 
-	].join("\n")
+	].join( "\n" )
 };

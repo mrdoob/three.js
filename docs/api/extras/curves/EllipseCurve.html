@@ -2,13 +2,14 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Curve] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<div class="desc">Creates a 2d curve in the shape of an ellipse.</div>
@@ -43,7 +44,7 @@ var ellipse = new THREE.Line( geometry, material );
 			aStartAngle – The start angle of the curve in radians starting from the middle right side<br/>
 			aEndAngle – The end angle of the curve in radians starting from the middle right side<br/>
 			aClockwise – Whether the ellipse is clockwise<br/><br/>
-			
+
 			<strong>Note:</strong> When going clockwise it's best to set the start angle to (Math.PI * 2) and then work towards lower numbers.
 		</div>
 
@@ -59,9 +60,9 @@ var ellipse = new THREE.Line( geometry, material );
 		<h3>[property:Boolean aClockwise]</h3>
 
 		<h2>Methods</h2>
-		
+
 		<h3>See [page:Curve] for inherited methods</h3>
-		
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

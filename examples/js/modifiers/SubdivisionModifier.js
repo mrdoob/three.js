@@ -17,7 +17,7 @@
 
 THREE.SubdivisionModifier = function ( subdivisions ) {
 
-	this.subdivisions = (subdivisions === undefined ) ? 1 : subdivisions;
+	this.subdivisions = ( subdivisions === undefined ) ? 1 : subdivisions;
 
 };
 
@@ -27,7 +27,9 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	var repeats = this.subdivisions;
 
 	while ( repeats -- > 0 ) {
+
 		this.smooth( geometry );
+
 	}
 
 	delete geometry.__tmpVertices;
@@ -37,10 +39,10 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 };
 
-(function() {
+( function() {
 
 	// Some constants
-	var WARNINGS = !true; // Set to true for development
+	var WARNINGS = ! true; // Set to true for development
 	var ABC = [ 'a', 'b', 'c' ];
 	
 
@@ -102,10 +104,13 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		var i, il, face, edge;
 
 		for ( i = 0, il = vertices.length; i < il; i ++ ) {
+
 			metaVertices[ i ] = { edges: [] };
+
 		}
 		
 		for ( i = 0, il = faces.length; i < il; i ++ ) {
+
 			face = faces[ i ];
 
 			processEdge( face.a, face.b, vertices, edges, face, metaVertices );
@@ -113,6 +118,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 			processEdge( face.c, face.a, vertices, edges, face, metaVertices );
 
 		}
+
 	}
 
 	function newFace( newFaces, a, b, c ) {
@@ -150,7 +156,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		metaVertices = new Array( oldVertices.length );
 		sourceEdges = {}; // Edge => { oldVertex1, oldVertex2, faces[]  }
 
-		generateLookups(oldVertices, oldFaces, metaVertices, sourceEdges);
+		generateLookups( oldVertices, oldFaces, metaVertices, sourceEdges );
 
 
 		/******************************************************
@@ -184,7 +190,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 				if ( connectedFaces != 1 ) {
 					
-					if (WARNINGS) console.warn('Subdivision Modifier: Number of connected faces != 2, is: ', connectedFaces, currentEdge);
+					if ( WARNINGS ) console.warn( 'Subdivision Modifier: Number of connected faces != 2, is: ', connectedFaces, currentEdge );
 			
 				}
 
@@ -200,8 +206,8 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 				
 				for ( k = 0; k < 3; k ++ ) {
 
-					other = oldVertices[ face[ ABC[k] ] ];
-					if (other !== currentEdge.a && other !== currentEdge.b ) break;
+					other = oldVertices[ face[ ABC[ k ] ] ];
+					if ( other !== currentEdge.a && other !== currentEdge.b ) break;
 
 				}
 
@@ -213,9 +219,10 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 			newEdge.add( tmp );
 
 			currentEdge.newEdge = newEdgeVertices.length;
-			newEdgeVertices.push(newEdge);
+			newEdgeVertices.push( newEdge );
 
 			// console.log(currentEdge, newEdge);
+
 		}
 
 		/******************************************************
@@ -261,7 +268,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 				if ( n == 2 ) {
 
-					if (WARNINGS) console.warn('2 connecting edges', connectingEdges);
+					if ( WARNINGS ) console.warn( '2 connecting edges', connectingEdges );
 					sourceVertexWeight = 3 / 4;
 					connectingVertexWeight = 1 / 8;
 
@@ -270,11 +277,11 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 				} else if ( n == 1 ) {
 
-					if (WARNINGS) console.warn('only 1 connecting edge');
+					if ( WARNINGS ) console.warn( 'only 1 connecting edge' );
 
 				} else if ( n == 0 ) {
 
-					if (WARNINGS) console.warn('0 connecting edges');
+					if ( WARNINGS ) console.warn( '0 connecting edges' );
 			
 				}
 			
@@ -340,4 +347,4 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	};
 
 
-})();
+} )();

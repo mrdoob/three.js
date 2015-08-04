@@ -8,9 +8,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.CTMLoader = function ( showStatus ) {
+THREE.CTMLoader = function () {
 
-	THREE.Loader.call( this, showStatus );
+	THREE.Loader.call( this );
 
 };
 

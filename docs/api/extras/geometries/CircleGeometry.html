@@ -2,30 +2,31 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Geometry] &rarr;
-	
+
 		<h1>[name]</h1>
 
 		<div class="desc">CircleGeometry is a simple shape of Euclidean geometry.  It is contructed from a number of triangular segments that are oriented around a central point and extend as far out as a given radius.  It is built counter-clockwise from a start angle and a given central angle.  It can also be used to create regular polygons, where the number of segments determines the number of sides.
 		</div>
-		
+
 		<h2>Example</h2>
 
-		<iframe src='../../../scenes/geometry-browser.html#CircleGeometry'></iframe>
+		<iframe src='scenes/geometry-browser.html#CircleGeometry'></iframe>
 
 		<code>var material = new THREE.MeshBasicMaterial({
 			color: 0x0000ff
 		});
-		
+
 		var radius = 5;
 		var segments = 32;
-		
-		var circleGeometry = new THREE.CircleGeometry( radius, segments );				
+
+		var circleGeometry = new THREE.CircleGeometry( radius, segments );
 		var circle = new THREE.Mesh( circleGeometry, material );
 		scene.add( circle );
 		</code>
@@ -40,7 +41,7 @@
 		thetaStart — Start angle for first segment, default = 0 (three o'clock position).<br />
 		thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete circle.
 		</div>
-		
+
 
 		<h2>Source</h2>
 

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - cube</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+		<script id="fragmentShader" type="x-shader/x-fragment">
+			uniform vec3 diffuseColor;
+
+			uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];
+
+			uniform vec3 fogColor;
+			uniform float fogDensity;
+			varying vec3 worldNormal;
+
+			void main() {
+
+				vec3 totalDiffuse = vec3( 0.0, 0.0, 0.0 );
+					
+				vec3 dirDiffuse[ MAX_DIR_LIGHTS ];
+					
+			    for ( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {
+			        float NdotL = dot( worldNormal, directionalLightDirection[ i ] );
+			        
+			        float diffuseWeight = clamp( NdotL, 0.0, 1.0 );
+			        dirDiffuse[ i ] = diffuseColor * diffuseWeight;
+			    }
+
+			    for (int i = 0; i < MAX_DIR_LIGHTS; i++ ) {
+			        totalDiffuse += vec3(dirDiffuse[i]);
+			    }
+
+			    //Removing the following lines makes the output correct, even though
+			    //the value, 'fogFactor', isn't even used. What's going on?
+			    // float depth = gl_FragCoord.z / gl_FragCoord.w;
+			    // float fogFactor = 1.0 - 1.0 / exp(depth * 0.001);
+					
+					//If the fog is used in the output, the rendered colour is still not correct
+					//on Nexus phones.
+					//gl_FragColor = vec4( mix( totalDiffuse, fogColor, fogFactor), 1.0 );
+					gl_FragColor = vec4( totalDiffuse, 1.0 );
+			}
+		</script>
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			varying vec2 vUv;
+			varying vec3 worldNormal;
+
+			void main() {
+
+				vUv = uv;
+				
+				worldNormal = normalize( (vec4( normalMatrix * normal, 0) * viewMatrix).xyz );
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+
+		</script>
+		<script>
+
+			var camera, scene, renderer;
+			var mesh;
+
+			init();
+			animate();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				var light = new THREE.DirectionalLight( {color: new THREE.Color(1.0,1.0,0.0)});
+				light.position.set( 200,200,200);
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 400;
+
+				scene = new THREE.Scene();
+				scene.add( light );
+				var geometry = new THREE.CubeGeometry( 200, 200, 200 );
+
+				// var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif' );
+				// texture.anisotropy = renderer.getMaxAnisotropy();
+
+				var material = new THREE.ShaderMaterial( { fog: true, lights: true, 
+					
+					uniforms: THREE.UniformsUtils.merge( [
+
+						THREE.UniformsLib[ "common" ],
+						THREE.UniformsLib[ "fog" ],
+						THREE.UniformsLib[ "lights" ],
+						{
+							"diffuseColor"  : { type: "c", value: new THREE.Color( 0x881111 ) },
+						}
+
+					] ),
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent, } );
+				scene.fog = new THREE.FogExp2( 0xffff00, 0.0015);
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				mesh.rotation.x += 0.005;
+				mesh.rotation.y += 0.01;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

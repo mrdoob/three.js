@@ -39,7 +39,7 @@ THREE.MD2Character = function () {
 
 		// BODY
 
-		var loader = new THREE.JSONLoader();
+		var loader = new THREE.MD2Loader();
 
 		loader.load( config.baseUrl + config.body, function( geo ) {
 
@@ -199,17 +199,13 @@ THREE.MD2Character = function () {
 
 	function createPart( geometry, skinMap ) {
 
-		geometry.computeMorphNormals();
-
-		var whiteMap = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
-		var materialWireframe = new THREE.MeshPhongMaterial( { color: 0xffaa00, specular: 0x111111, shininess: 50, wireframe: true, shading: THREE.SmoothShading, map: whiteMap, morphTargets: true, morphNormals: true, metal: false } );
-
-		var materialTexture = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 50, wireframe: false, shading: THREE.SmoothShading, map: skinMap, morphTargets: true, morphNormals: true, metal: false } );
+		var materialWireframe = new THREE.MeshLambertMaterial( { color: 0xffaa00, wireframe: true, shading: THREE.SmoothShading, morphTargets: true, morphNormals: true } );
+		var materialTexture = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: false, shading: THREE.SmoothShading, map: skinMap, morphTargets: true, morphNormals: true } );
 
 		//
 
 		var mesh = new THREE.MorphAnimMesh( geometry, materialTexture );
-		mesh.rotation.y = -Math.PI / 2;
+		mesh.rotation.y = - Math.PI / 2;
 
 		mesh.castShadow = true;
 		mesh.receiveShadow = true;

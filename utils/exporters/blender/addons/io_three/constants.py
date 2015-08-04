@@ -32,6 +32,26 @@ MAPPING_TYPES = type('Mapping', (), {
     'SPHERICAL_REFLECTION': 'SphericalReflectionMapping'
 })
 
+NUMERIC = {
+    'UVMapping': 300,
+    'CubeReflectionMapping': 301,
+    'CubeRefractionMapping': 302,
+    'EquirectangularReflectionMapping': 303,
+    'EquirectangularRefractionMapping': 304,
+    'SphericalReflectionMapping': 305,
+
+    'RepeatWrapping': 1000,
+    'ClampToEdgeWrapping': 1001,
+    'MirroredRepeatWrapping': 1002,
+
+    'NearestFilter': 1003,
+    'NearestMipMapNearestFilter': 1004,
+    'NearestMipMapLinearFilter': 1005,
+    'LinearFilter': 1006,
+    'LinearMipMapNearestFilter': 1007,
+    'LinearMipMapLinearFilter': 1008
+}
+
 JSON = 'json'
 EXTENSION = '.%s' % JSON
 INDENT = 'indent'
@@ -49,7 +69,7 @@ COLORS = 'colors'
 MIX_COLORS = 'mixColors'
 EXTRA_VGROUPS = 'extraVertexGroups'
 INDEX = 'index'
-DRAW_CALLS = 'offsets'
+DRAW_CALLS = 'drawcalls'
 DC_START = 'start'
 DC_COUNT = 'count'
 DC_INDEX = 'index'
@@ -301,6 +321,8 @@ NORMAL_BLENDING = 0
 
 VERTEX_COLORS_ON = 2
 VERTEX_COLORS_OFF = 0
+
+SIDE_DOUBLE = 2
 
 THREE_BASIC = 'MeshBasicMaterial'
 THREE_LAMBERT = 'MeshLambertMaterial'

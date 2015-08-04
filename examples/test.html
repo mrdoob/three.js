@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - morphtargets - MD2</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+		    body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+		    }
+
+		    #info {
+				color:#fff;
+				position: relative;
+				margin: 0 auto -2.1em;
+				top: 0px;
+				width: 70em;
+
+				padding: 5px;
+				z-index:100;
+		    }
+
+		    a { color: skyblue; }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - morphtargets -
+			Test showing shadowing artifacts on iOS 8
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src='js/Detector.js'></script>
+		<!-- <script src='js/libs/stats.min.js'></script> -->
+		<!-- <script src='js/libs/dat.gui.min.js'></script> -->
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+
+			var container, camera, scene, renderer;
+
+			var controls;
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 10000 );
+				camera.position.set( 0, 6, 16 );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				// scene.fog = new THREE.Fog( 0x050505, 400, 1000 );
+
+				// LIGHTS
+
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				light.position.set( 3, 7, 3 );
+
+				light.castShadow = true;
+				light.shadowMapWidth = 512;
+				light.shadowMapHeight = 512;
+				// light.shadowMapDarkness = 0.95;
+				// light.shadowCameraVisible = true;
+				light.shadowCameraBottom = -12;
+				light.shadowCameraTop = 12;
+				light.shadowCameraLeft = -12;
+				light.shadowCameraRight = 12;
+				light.shadowCameraNear = 1.0;
+				light.shadowCameraFar = 12;
+				light.shadowBias = -0.0002;
+
+				scene.add( light );
+
+				//  GROUND
+
+				//var gt = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg" );
+				var gg = new THREE.PlaneGeometry( 10, 10 );
+				var gm = new THREE.MeshPhongMaterial( { color: 0x22aa22 } );
+
+				var ground = new THREE.Mesh( gg, gm );
+				ground.rotation.x = - Math.PI / 2;
+				// ground.material.map.repeat.set( 8, 8 );
+				// ground.material.map.wrapS = ground.material.map.wrapT = THREE.RepeatWrapping;
+				ground.receiveShadow = true;
+				ground.scale.set(10,10,10);
+
+				scene.add( ground );
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, devicePixelRatio: 1.0 } );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				// renderer.setClearColor( scene.fog.color, 1 );
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				renderer.gammaInput = false;
+				renderer.gammaOutput = false;
+				renderer.shadowMapEnabled = true;
+				renderer.shadowMapType = THREE.BasicShadowMap;
+				renderer.shadowMapCullFace = THREE.CullFaceBack;
+
+				// STATS
+
+				// stats = new Stats();
+				// container.appendChild( stats.domElement );
+
+				// EVENTS
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// CONTROLS
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2.5, 0 );
+
+				var sphereMat = new THREE.MeshPhongMaterial({color: 0xeecc22});
+				var sphereGeo = new THREE.SphereGeometry( 5.0, 24, 24 );
+				var sphereMesh = new THREE.Mesh( sphereGeo, sphereMat );
+				sphereMesh.castShadow = true;
+				sphereMesh.receiveShadow = true;
+				sphereMesh.position.y = 2.5;
+				scene.add( sphereMesh );
+
+			}
+
+			// EVENT HANDLERS
+
+			function onWindowResize( event ) {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = SCREEN_WIDTH/ SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+			}
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+				// stats.update();
+
+			}
+
+			function render() {
+
+				var delta = clock.getDelta();
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

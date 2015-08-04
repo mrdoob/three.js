@@ -125,6 +125,24 @@ def depth_write(material):
 
 
 @_material
+def double_sided(material):
+    """
+
+    :param material:
+    :return: THREE_double_sided value
+    :rtype: bool
+
+    """
+    logger.debug("material.double_sided(%s)", material)
+    try:
+        write = material.THREE_double_sided
+    except AttributeError:
+        logger.debug("No THREE_double_sided attribute found")
+        write = False
+    return write
+
+
+@_material
 def diffuse_color(material):
     """
 

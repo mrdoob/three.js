@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
@@ -14,20 +15,20 @@
 		<div class="desc">Creates 6 cameras that render to a [page:WebGLRenderTargetCube].</div>
 
 		<h2>Examples</h2>
-		
+
 		<div>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</div>
 		<div>[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]</div>
 		<div>[example:webgl_shading_physical shading / physical ]</div>
-		
+
 		<code>//Create cube camera
 		var cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );
 		scene.add( cubeCamera );
-		
+
 		//Create car
 		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget } );
 		var car = new Mesh( carGeometry, chromeMaterial );
 		scene.add( car );
-		
+
 		//Update the render target cube
 		car.setVisible( false );
 		cubeCamera.position.copy( car.position );
@@ -37,7 +38,7 @@
 		car.setVisible( true );
 		renderer.render( scene, camera );
 		</code>
-		
+
 
 		<h2>Constructor</h2>
 
@@ -61,7 +62,7 @@
 		<h3>[property:WebGLRenderTargetCube renderTarget]</h3>
 		<div>
 		The cube texture that gets generated.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 

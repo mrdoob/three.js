@@ -2,7 +2,7 @@
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedBufferAttribute = function (array, itemSize, meshPerAttribute, dynamic) {
+THREE.InstancedBufferAttribute = function ( array, itemSize, meshPerAttribute, dynamic ) {
 
 	THREE.DynamicBufferAttribute.call( this, array, itemSize );
 

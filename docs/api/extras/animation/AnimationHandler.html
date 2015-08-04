@@ -2,15 +2,16 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
 
 		<div class="desc">
-		The AnimationHandler handles the initialisation of the Animation data and 
+		The AnimationHandler handles the initialisation of the Animation data and
 		the animations itself. It keeps track of every animation and if it's active or not.
 		It also update all animations which are active if its method *update* is called.
 		</div>
@@ -30,17 +31,17 @@
 		<h3>[property:number CATMULLROM]</h3>
 		<div>
 		Enum Value to indicate that the animation needs to be interpolated as CATMULLROM.
-		</div> 
+		</div>
 
 		<h3>[property:number CATMULLROM_FORWARD]</h3>
 		<div>
 		Enum Value to indicate that the animation needs to be interpolated as CATMULLROM_FORWARD.
-		</div> 
+		</div>
 
 		<h3>[property:number LINEAR]</h3>
 		<div>
 		Enum Value to indicate that the animation needs to be interpolated as LINEAR.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 
@@ -48,7 +49,7 @@
 
 		<h3>[method:null removeFromUpdate]([page:Animation animation])</h3>
 		<div>
-		animation -- The Animation to remove from the update. 
+		animation -- The Animation to remove from the update.
 		</div>
 		<div>
 		Removes the animation from the update cycle. This gets called when the animation stops. This shouldn't be called by usercode.
@@ -88,7 +89,7 @@
 
 		<h3>[method:null addToUpdate]([page:Animation animation]) </h3>
 		<div>
-		animation -- The Animation to add from the update. 
+		animation -- The Animation to add from the update.
 		</div>
 		<div>
 		Adds the animation from the update cycle. This gets called when the animation starts. This shouldn't be called by user code.

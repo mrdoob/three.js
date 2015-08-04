@@ -93,6 +93,22 @@ test( "distanceToPoint", function() {
 	ok( d === 0, "Passed!" );
 });
 
+test( "distanceSqToPoint", function() {
+	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
+
+	// behind the ray
+	var b = a.distanceSqToPoint( zero3 );
+	ok( b === 3, "Passed!" );
+
+	// front of the ray
+	var c = a.distanceSqToPoint( new THREE.Vector3( 0, 0, 50 ) );
+	ok( c === 2, "Passed!" );
+
+	// exactly on the ray
+	var d = a.distanceSqToPoint( one3 );
+	ok( d === 0, "Passed!" );
+});
+
 test( "isIntersectionSphere", function() {
 	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 	var b = new THREE.Sphere( zero3, 0.5 );

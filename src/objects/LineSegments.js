@@ -12,3 +12,13 @@ THREE.LineSegments = function ( geometry, material ) {
 
 THREE.LineSegments.prototype = Object.create( THREE.Line.prototype );
 THREE.LineSegments.prototype.constructor = THREE.LineSegments;
+
+THREE.LineSegments.prototype.clone = function () {
+
+	var line = new THREE.LineSegments( this.geometry, this.material );
+
+	line.copy( this );
+
+	return line;
+
+};

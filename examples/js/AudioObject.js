@@ -118,7 +118,7 @@ THREE.AudioObject = function ( url, volume, playbackRate, loop ) {
 
 		cameraUp.copy( camera.up );
 
-		cameraFront.set( 0, 0, -1 );
+		cameraFront.set( 0, 0, - 1 );
 		cameraFront.transformDirection( camera.matrixWorld );
 
 		this.listener.setPosition( cameraPosition.x, cameraPosition.y, cameraPosition.z );
@@ -130,7 +130,7 @@ THREE.AudioObject = function ( url, volume, playbackRate, loop ) {
 
 		if ( this.directionalSource ) {
 
-			soundFront.set( 0, 0, -1 );
+			soundFront.set( 0, 0, - 1 );
 			soundFront.transformDirection( this.matrixWorld );
 
 			soundUp.copy( this.up );
