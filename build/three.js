@@ -12475,6 +12475,7 @@ THREE.HemisphereLight.prototype.toJSON = function ( meta ) {
 
 	data.object.color = this.color.getHex();
 	data.object.groundColor = this.groundColor.getHex();
+	data.object.intensity = this.intensity;
 
 	return data;
 
@@ -15077,8 +15078,8 @@ THREE.Material.prototype = {
 		if ( this.side !== undefined && this.side !== THREE.FrontSide ) data.side = this.side;
 
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
-		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.transparent === true ) data.transparent = this.transparent;
+		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 
 		return data;
@@ -25077,6 +25078,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				//  depth materials per each chunk instead of just once per object)
 
 				objectMaterial = getObjectMaterial( object );
+
+				if ( objectMaterial.visible === false ) continue;
 
 				useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
 				useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
