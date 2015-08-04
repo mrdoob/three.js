@@ -218,6 +218,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				objectMaterial = getObjectMaterial( object );
 
+				if ( objectMaterial.visible === false ) continue;
+
 				useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
 				useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
 
