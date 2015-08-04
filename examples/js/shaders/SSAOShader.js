@@ -38,7 +38,7 @@ THREE.SSAOShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -225,6 +225,6 @@ THREE.SSAOShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

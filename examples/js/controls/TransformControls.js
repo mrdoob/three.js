@@ -3,7 +3,7 @@
  */
  /*jshint sub:true*/
 
-(function () {
+( function () {
 
 	'use strict';
 
@@ -95,9 +95,9 @@
 			this.pickers = new THREE.Object3D();
 			this.planes = new THREE.Object3D();
 
-			this.add(this.handles);
-			this.add(this.pickers);
-			this.add(this.planes);
+			this.add( this.handles );
+			this.add( this.pickers );
+			this.add( this.planes );
 
 			//// PLANES
 
@@ -111,15 +111,17 @@
 				"XYZE": new THREE.Mesh( planeGeometry, planeMaterial )
 			};
 
-			this.activePlane = planes["XYZE"];
+			this.activePlane = planes[ "XYZE" ];
 
-			planes["YZ"].rotation.set( 0, Math.PI / 2, 0 );
-			planes["XZ"].rotation.set( -Math.PI / 2, 0, 0 );
+			planes[ "YZ" ].rotation.set( 0, Math.PI / 2, 0 );
+			planes[ "XZ" ].rotation.set( - Math.PI / 2, 0, 0 );
 
-			for (var i in planes) {
-				planes[i].name = i;
-				this.planes.add(planes[i]);
-				this.planes[i] = planes[i];
+			for ( var i in planes ) {
+
+				planes[ i ].name = i;
+				this.planes.add( planes[ i ] );
+				this.planes[ i ] = planes[ i ];
+
 			}
 
 			//// HANDLES AND PICKERS
@@ -128,16 +130,16 @@
 
 				for ( var name in gizmoMap ) {
 
-					for ( i = gizmoMap[name].length; i --;) {
+					for ( i = gizmoMap[ name ].length; i --; ) {
 
-						var object = gizmoMap[name][i][0];
-						var position = gizmoMap[name][i][1];
-						var rotation = gizmoMap[name][i][2];
+						var object = gizmoMap[ name ][ i ][ 0 ];
+						var position = gizmoMap[ name ][ i ][ 1 ];
+						var rotation = gizmoMap[ name ][ i ][ 2 ];
 
 						object.name = name;
 
-						if ( position ) object.position.set( position[0], position[1], position[2] );
-						if ( rotation ) object.rotation.set( rotation[0], rotation[1], rotation[2] );
+						if ( position ) object.position.set( position[ 0 ], position[ 1 ], position[ 2 ] );
+						if ( rotation ) object.rotation.set( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ] );
 
 						parent.add( object );
 
@@ -147,14 +149,14 @@
 
 			};
 
-			setupGizmos(this.handleGizmos, this.handles);
-			setupGizmos(this.pickerGizmos, this.pickers);
+			setupGizmos( this.handleGizmos, this.handles );
+			setupGizmos( this.pickerGizmos, this.pickers );
 
 			// reset Transformations
 
-			this.traverse(function ( child ) {
+			this.traverse( function ( child ) {
 
-				if (child instanceof THREE.Mesh) {
+				if ( child instanceof THREE.Mesh ) {
 
 					child.updateMatrix();
 
@@ -168,7 +170,7 @@
 
 				}
 
-			});
+			} );
 
 		};
 
@@ -205,13 +207,13 @@
 		var vec2 = new THREE.Vector3( 0, 1, 0 );
 		var lookAtMatrix = new THREE.Matrix4();
 
-		this.traverse( function(child) {
+		this.traverse( function( child ) {
 
-			if ( child.name.search("E") !== -1 ) {
+			if ( child.name.search( "E" ) !== - 1 ) {
 
 				child.quaternion.setFromRotationMatrix( lookAtMatrix.lookAt( eye, vec1, vec2 ) );
 
-			} else if ( child.name.search("X") !== -1 || child.name.search("Y") !== -1 || child.name.search("Z") !== -1 ) {
+			} else if ( child.name.search( "X" ) !== - 1 || child.name.search( "Y" ) !== - 1 || child.name.search( "Z" ) !== - 1 ) {
 
 				child.quaternion.setFromEuler( rotation );
 
@@ -244,7 +246,7 @@
 		this.handleGizmos = {
 
 			X: [
-				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0xff0000 } ) ), [ 0.5, 0, 0 ], [ 0, 0, -Math.PI / 2 ] ],
+				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0xff0000 } ) ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ] ],
 				[ new THREE.Line( lineXGeometry, new GizmoLineMaterial( { color: 0xff0000 } ) ) ]
 			],
 
@@ -271,7 +273,7 @@
 			],
 
 			XZ: [
-				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), new GizmoMaterial( { color: 0xff00ff, opacity: 0.25 } ) ), [ 0.15, 0, 0.15 ], [ -Math.PI / 2, 0, 0 ] ]
+				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), new GizmoMaterial( { color: 0xff00ff, opacity: 0.25 } ) ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ] ]
 			]
 
 		};
@@ -279,7 +281,7 @@
 		this.pickerGizmos = {
 
 			X: [
-				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), pickerMaterial ), [ 0.6, 0, 0 ], [ 0, 0, -Math.PI / 2 ] ]
+				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), pickerMaterial ), [ 0.6, 0, 0 ], [ 0, 0, - Math.PI / 2 ] ]
 			],
 
 			Y: [
@@ -303,7 +305,7 @@
 			],
 
 			XZ: [
-				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.4, 0.4 ), pickerMaterial ), [ 0.2, 0, 0.2 ], [ -Math.PI / 2, 0, 0 ] ]
+				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.4, 0.4 ), pickerMaterial ), [ 0.2, 0, 0.2 ], [ - Math.PI / 2, 0, 0 ] ]
 			]
 
 		};
@@ -317,7 +319,7 @@
 
 				this.activePlane = this.planes[ "XY" ];
 
-				if ( Math.abs(eye.y) > Math.abs(eye.z) ) this.activePlane = this.planes[ "XZ" ];
+				if ( Math.abs( eye.y ) > Math.abs( eye.z ) ) this.activePlane = this.planes[ "XZ" ];
 
 			}
 
@@ -325,7 +327,7 @@
 
 				this.activePlane = this.planes[ "XY" ];
 
-				if ( Math.abs(eye.x) > Math.abs(eye.z) ) this.activePlane = this.planes[ "YZ" ];
+				if ( Math.abs( eye.x ) > Math.abs( eye.z ) ) this.activePlane = this.planes[ "YZ" ];
 
 			}
 
@@ -333,7 +335,7 @@
 
 				this.activePlane = this.planes[ "XZ" ];
 
-				if ( Math.abs(eye.x) > Math.abs(eye.y) ) this.activePlane = this.planes[ "YZ" ];
+				if ( Math.abs( eye.x ) > Math.abs( eye.y ) ) this.activePlane = this.planes[ "YZ" ];
 
 			}
 
@@ -380,23 +382,23 @@
 		this.handleGizmos = {
 
 			X: [
-				[ new THREE.Line( new CircleGeometry(1,'x',0.5), new GizmoLineMaterial( { color: 0xff0000 } ) ) ]
+				[ new THREE.Line( new CircleGeometry( 1, 'x', 0.5 ), new GizmoLineMaterial( { color: 0xff0000 } ) ) ]
 			],
 
 			Y: [
-				[ new THREE.Line( new CircleGeometry(1,'y',0.5), new GizmoLineMaterial( { color: 0x00ff00 } ) ) ]
+				[ new THREE.Line( new CircleGeometry( 1, 'y', 0.5 ), new GizmoLineMaterial( { color: 0x00ff00 } ) ) ]
 			],
 
 			Z: [
-				[ new THREE.Line( new CircleGeometry(1,'z',0.5), new GizmoLineMaterial( { color: 0x0000ff } ) ) ]
+				[ new THREE.Line( new CircleGeometry( 1, 'z', 0.5 ), new GizmoLineMaterial( { color: 0x0000ff } ) ) ]
 			],
 
 			E: [
-				[ new THREE.Line( new CircleGeometry(1.25,'z',1), new GizmoLineMaterial( { color: 0xcccc00 } ) ) ]
+				[ new THREE.Line( new CircleGeometry( 1.25, 'z', 1 ), new GizmoLineMaterial( { color: 0xcccc00 } ) ) ]
 			],
 
 			XYZE: [
-				[ new THREE.Line( new CircleGeometry(1,'z',1), new GizmoLineMaterial( { color: 0x787878 } ) ) ]
+				[ new THREE.Line( new CircleGeometry( 1, 'z', 1 ), new GizmoLineMaterial( { color: 0x787878 } ) ) ]
 			]
 
 		};
@@ -404,7 +406,7 @@
 		this.pickerGizmos = {
 
 			X: [
-				[ new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), pickerMaterial ), [ 0, 0, 0 ], [ 0, -Math.PI / 2, -Math.PI / 2 ] ]
+				[ new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), pickerMaterial ), [ 0, 0, 0 ], [ 0, - Math.PI / 2, - Math.PI / 2 ] ]
 			],
 
 			Y: [
@@ -412,7 +414,7 @@
 			],
 
 			Z: [
-				[ new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), pickerMaterial ), [ 0, 0, 0 ], [ 0, 0, -Math.PI / 2 ] ]
+				[ new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), pickerMaterial ), [ 0, 0, 0 ], [ 0, 0, - Math.PI / 2 ] ]
 			],
 
 			E: [
@@ -443,8 +445,8 @@
 
 			var group = {
 
-				handles: this["handles"],
-				pickers: this["pickers"],
+				handles: this[ "handles" ],
+				pickers: this[ "pickers" ],
 
 			};
 
@@ -459,19 +461,19 @@
 			var quaternionZ = new THREE.Quaternion();
 			var eye = eye2.clone();
 
-			worldRotation.copy( this.planes["XY"].rotation );
+			worldRotation.copy( this.planes[ "XY" ].rotation );
 			tempQuaternion.setFromEuler( worldRotation );
 
 			tempMatrix.makeRotationFromQuaternion( tempQuaternion ).getInverse( tempMatrix );
 			eye.applyMatrix4( tempMatrix );
 
-			this.traverse(function(child) {
+			this.traverse( function( child ) {
 
 				tempQuaternion.setFromEuler( worldRotation );
 
 				if ( child.name === "X" ) {
 
-					quaternionX.setFromAxisAngle( unitX, Math.atan2( -eye.y, eye.z ) );
+					quaternionX.setFromAxisAngle( unitX, Math.atan2( - eye.y, eye.z ) );
 					tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionX );
 					child.quaternion.copy( tempQuaternion );
 
@@ -493,7 +495,7 @@
 
 				}
 
-			});
+			} );
 
 		};
 
@@ -527,7 +529,7 @@
 		this.handleGizmos = {
 
 			X: [
-				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0xff0000 } ) ), [ 0.5, 0, 0 ], [ 0, 0, -Math.PI / 2 ] ],
+				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0xff0000 } ) ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ] ],
 				[ new THREE.Line( lineXGeometry, new GizmoLineMaterial( { color: 0xff0000 } ) ) ]
 			],
 
@@ -550,7 +552,7 @@
 		this.pickerGizmos = {
 
 			X: [
-				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), pickerMaterial ), [ 0.6, 0, 0 ], [ 0, 0, -Math.PI / 2 ] ]
+				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), pickerMaterial ), [ 0.6, 0, 0 ], [ 0, 0, - Math.PI / 2 ] ]
 			],
 
 			Y: [
@@ -573,18 +575,24 @@
 			eye.applyMatrix4( tempMatrix.getInverse( tempMatrix.extractRotation( this.planes[ "XY" ].matrixWorld ) ) );
 
 			if ( axis === "X" ) {
+
 				this.activePlane = this.planes[ "XY" ];
-				if ( Math.abs(eye.y) > Math.abs(eye.z) ) this.activePlane = this.planes[ "XZ" ];
+				if ( Math.abs( eye.y ) > Math.abs( eye.z ) ) this.activePlane = this.planes[ "XZ" ];
+
 			}
 
 			if ( axis === "Y" ) {
+
 				this.activePlane = this.planes[ "XY" ];
-				if ( Math.abs(eye.x) > Math.abs(eye.z) ) this.activePlane = this.planes[ "YZ" ];
+				if ( Math.abs( eye.x ) > Math.abs( eye.z ) ) this.activePlane = this.planes[ "YZ" ];
+
 			}
 
 			if ( axis === "Z" ) {
+
 				this.activePlane = this.planes[ "XZ" ];
-				if ( Math.abs(eye.x) > Math.abs(eye.y) ) this.activePlane = this.planes[ "YZ" ];
+				if ( Math.abs( eye.x ) > Math.abs( eye.y ) ) this.activePlane = this.planes[ "YZ" ];
+
 			}
 
 			if ( axis === "XYZ" ) this.activePlane = this.planes[ "XYZE" ];
@@ -626,9 +634,9 @@
 			"scale": new THREE.TransformGizmoScale()
 		};
 
-		for (var type in _gizmo) {
+		for ( var type in _gizmo ) {
 
-			var gizmoObj = _gizmo[type];
+			var gizmoObj = _gizmo[ type ];
 
 			gizmoObj.visible = ( type === _mode );
 			this.add( gizmoObj );
@@ -735,7 +743,7 @@
 
 			if ( _mode === "scale" ) scope.space = "local";
 
-			for (var type in _gizmo) _gizmo[type].visible = ( type === _mode );
+			for ( var type in _gizmo ) _gizmo[ type ].visible = ( type === _mode );
 
 			this.update();
 			scope.dispatchEvent( changeEvent );
@@ -784,15 +792,15 @@
 
 			if ( scope.space === "local" ) {
 
-				_gizmo[_mode].update( worldRotation, eye );
+				_gizmo[ _mode ].update( worldRotation, eye );
 
 			} else if ( scope.space === "world" ) {
 
-				_gizmo[_mode].update( new THREE.Euler(), eye );
+				_gizmo[ _mode ].update( new THREE.Euler(), eye );
 
 			}
 
-			_gizmo[_mode].highlight( scope.axis );
+			_gizmo[ _mode ].highlight( scope.axis );
 
 		};
 
@@ -802,7 +810,7 @@
 
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
-			var intersect = intersectObjects( pointer, _gizmo[_mode].pickers.children );
+			var intersect = intersectObjects( pointer, _gizmo[ _mode ].pickers.children );
 
 			var axis = null;
 
@@ -832,7 +840,7 @@
 
 			if ( pointer.button === 0 || pointer.button === undefined ) {
 
-				var intersect = intersectObjects( pointer, _gizmo[_mode].pickers.children );
+				var intersect = intersectObjects( pointer, _gizmo[ _mode ].pickers.children );
 
 				if ( intersect ) {
 
@@ -847,9 +855,9 @@
 
 					eye.copy( camPosition ).sub( worldPosition ).normalize();
 
-					_gizmo[_mode].setActivePlane( scope.axis, eye );
+					_gizmo[ _mode ].setActivePlane( scope.axis, eye );
 
-					var planeIntersect = intersectObjects( pointer, [ _gizmo[_mode].activePlane ] );
+					var planeIntersect = intersectObjects( pointer, [ _gizmo[ _mode ].activePlane ] );
 
 					if ( planeIntersect ) {
 
@@ -878,9 +886,9 @@
 
 			if ( scope.object === undefined || scope.axis === null || _dragging === false ) return;
 
-			var pointer = event.changedTouches ? event.changedTouches[0] : event;
+			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
-			var planeIntersect = intersectObjects( pointer, [ _gizmo[_mode].activePlane ] );
+			var planeIntersect = intersectObjects( pointer, [ _gizmo[ _mode ].activePlane ] );
 
 			if ( planeIntersect === false ) return;
 
@@ -892,15 +900,15 @@
 			if ( _mode === "translate" ) {
 
 				point.sub( offset );
-				point.multiply(parentScale);
+				point.multiply( parentScale );
 
 				if ( scope.space === "local" ) {
 
 					point.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
 
-					if ( scope.axis.search("X") === -1 ) point.x = 0;
-					if ( scope.axis.search("Y") === -1 ) point.y = 0;
-					if ( scope.axis.search("Z") === -1 ) point.z = 0;
+					if ( scope.axis.search( "X" ) === - 1 ) point.x = 0;
+					if ( scope.axis.search( "Y" ) === - 1 ) point.y = 0;
+					if ( scope.axis.search( "Z" ) === - 1 ) point.z = 0;
 
 					point.applyMatrix4( oldRotationMatrix );
 
@@ -909,11 +917,11 @@
 
 				}
 
-				if ( scope.space === "world" || scope.axis.search("XYZ") !== -1 ) {
+				if ( scope.space === "world" || scope.axis.search( "XYZ" ) !== - 1 ) {
 
-					if ( scope.axis.search("X") === -1 ) point.x = 0;
-					if ( scope.axis.search("Y") === -1 ) point.y = 0;
-					if ( scope.axis.search("Z") === -1 ) point.z = 0;
+					if ( scope.axis.search( "X" ) === - 1 ) point.x = 0;
+					if ( scope.axis.search( "Y" ) === - 1 ) point.y = 0;
+					if ( scope.axis.search( "Z" ) === - 1 ) point.z = 0;
 
 					point.applyMatrix4( tempMatrix.getInverse( parentRotationMatrix ) );
 
@@ -924,20 +932,20 @@
 
 				if ( scope.snap !== null ) {
 
-					if ( scope.axis.search("X") !== -1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
-					if ( scope.axis.search("Y") !== -1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
-					if ( scope.axis.search("Z") !== -1 ) scope.object.position.z = Math.round( scope.object.position.z / scope.snap ) * scope.snap;
+					if ( scope.axis.search( "X" ) !== - 1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
+					if ( scope.axis.search( "Y" ) !== - 1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
+					if ( scope.axis.search( "Z" ) !== - 1 ) scope.object.position.z = Math.round( scope.object.position.z / scope.snap ) * scope.snap;
 
 				}
 
 			} else if ( _mode === "scale" ) {
 
 				point.sub( offset );
-				point.multiply(parentScale);
+				point.multiply( parentScale );
 
 				if ( scope.space === "local" ) {
 
-					if ( scope.axis === "XYZ") {
+					if ( scope.axis === "XYZ" ) {
 
 						scale = 1 + ( ( point.y ) / 50 );
 
@@ -984,10 +992,10 @@
 
 				} else if ( scope.axis === "XYZE" ) {
 
-					quaternionE.setFromEuler( point.clone().cross(tempVector).normalize() ); // rotation axis
+					quaternionE.setFromEuler( point.clone().cross( tempVector ).normalize() ); // rotation axis
 
 					tempQuaternion.setFromRotationMatrix( tempMatrix.getInverse( parentRotationMatrix ) );
-					quaternionX.setFromAxisAngle( quaternionE, - point.clone().angleTo(tempVector) );
+					quaternionX.setFromAxisAngle( quaternionE, - point.clone().angleTo( tempVector ) );
 					quaternionXYZ.setFromRotationMatrix( worldRotationMatrix );
 
 					tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionX );
@@ -1069,7 +1077,7 @@
 			ray.setFromCamera( pointerVector, camera );
 
 			var intersections = ray.intersectObjects( objects, true );
-			return intersections[0] ? intersections[0] : false;
+			return intersections[ 0 ] ? intersections[ 0 ] : false;
 
 		}
 
@@ -1078,4 +1086,4 @@
 	THREE.TransformControls.prototype = Object.create( THREE.Object3D.prototype );
 	THREE.TransformControls.prototype.constructor = THREE.TransformControls;
 
-}());
+}() );

@@ -79,20 +79,26 @@ THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
 
 			switch ( total ) {
 				case 0: {
+
 					outVertices.push( inVertices[ j ] );
 					outVertices.push( inVertices[ j + 1 ] );
 					outVertices.push( inVertices[ j + 2 ] );
 					break;
+
 				}
 				case 1: {
+
 					var nV1, nV2, nV3;
 					if ( v1Out ) {
+
 						nV1 = inVertices[ j + 1 ]; 
 						nV2 = inVertices[ j + 2 ];
 						nV3 = clip( inVertices[ j ], nV1, plane );
 						nV4 = clip( inVertices[ j ], nV2, plane );
+
 					}
 					if ( v2Out ) { 
+
 						nV1 = inVertices[ j ]; 
 						nV2 = inVertices[ j + 2 ];
 						nV3 = clip( inVertices[ j + 1 ], nV1, plane );
@@ -106,12 +112,15 @@ THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
 						outVertices.push( nV3.clone() );
 						outVertices.push( nV4 );
 						break;
+
 					}
 					if ( v3Out ) { 
+
 						nV1 = inVertices[ j ]; 
 						nV2 = inVertices[ j + 1 ];
 						nV3 = clip( inVertices[ j + 2 ], nV1, plane );
 						nV4 = clip( inVertices[ j + 2 ], nV2, plane );
+
 					}
 
 					outVertices.push( nV1.clone() );
@@ -123,38 +132,49 @@ THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
 					outVertices.push( nV2.clone() );
 
 					break;
+
 				}
 				case 2: {
+
 					var nV1, nV2, nV3;
-					if ( !v1Out ) { 
+					if ( ! v1Out ) { 
+
 						nV1 = inVertices[ j ].clone();
 						nV2 = clip( nV1, inVertices[ j + 1 ], plane );
 						nV3 = clip( nV1, inVertices[ j + 2 ], plane ); 
 						outVertices.push( nV1 );
 						outVertices.push( nV2 );
 						outVertices.push( nV3 );
+
 					}
-					if ( !v2Out ) { 
+					if ( ! v2Out ) { 
+
 						nV1 = inVertices[ j + 1 ].clone();
 						nV2 = clip( nV1, inVertices[ j + 2 ], plane );
 						nV3 = clip( nV1, inVertices[ j ], plane );
 						outVertices.push( nV1 );
 						outVertices.push( nV2 );
 						outVertices.push( nV3 );
+
 					}
-					if ( !v3Out ) {
+					if ( ! v3Out ) {
+
 						nV1 = inVertices[ j + 2 ].clone();
 						nV2 = clip( nV1, inVertices[ j ], plane );
 						nV3 = clip( nV1, inVertices[ j + 1 ], plane );
 						outVertices.push( nV1 );
 						outVertices.push( nV2 );
 						outVertices.push( nV3 );
+
 					}
 
 					break;
+
 				}
 				case 3: {
+
 					break;
+
 				}
 			}
 
@@ -187,16 +207,22 @@ THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
 			this.pushVertex( vertices, f[ this.faceIndices[ 2 ] ], f.vertexNormals[ 2 ] );
 
 			if ( check.x ) {
+
 				vertices = this.clipFace( vertices, new THREE.Vector3( 1, 0, 0 ) );
-				vertices = this.clipFace( vertices, new THREE.Vector3( -1, 0, 0 ) );
+				vertices = this.clipFace( vertices, new THREE.Vector3( - 1, 0, 0 ) );
+
 			}
 			if ( check.y ) {
+
 				vertices = this.clipFace( vertices, new THREE.Vector3( 0, 1, 0 ) );
-				vertices = this.clipFace( vertices, new THREE.Vector3( 0, -1, 0 ) );
+				vertices = this.clipFace( vertices, new THREE.Vector3( 0, - 1, 0 ) );
+
 			}
 			if ( check.z ) {
+
 				vertices = this.clipFace( vertices, new THREE.Vector3( 0, 0, 1 ) );
-				vertices = this.clipFace( vertices, new THREE.Vector3( 0, 0, -1 ) );
+				vertices = this.clipFace( vertices, new THREE.Vector3( 0, 0, - 1 ) );
+
 			}
 
 			for ( var j = 0; j < vertices.length; j ++ ) {

@@ -17,7 +17,7 @@ THREE.DataTexture.prototype.clone = function () {
 
 	var texture = new THREE.DataTexture();
 
-	THREE.Texture.prototype.clone.call( this, texture );
+	texture.copy( this );
 
 	return texture;
 

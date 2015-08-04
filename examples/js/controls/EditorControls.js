@@ -19,7 +19,7 @@ THREE.EditorControls = function ( object, domElement ) {
 	var scope = this;
 	var vector = new THREE.Vector3();
 
-	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };
+	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2 };
 	var state = STATE.NONE;
 
 	var center = this.center;
@@ -39,7 +39,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		if ( frame && target.geometry ) {
 
 			scale = ( scale.x + scale.y + scale.z ) / 3;
-			center.add(target.geometry.boundingSphere.center.clone().multiplyScalar( scale ));
+			center.add( target.geometry.boundingSphere.center.clone().multiplyScalar( scale ) );
 			var radius = target.geometry.boundingSphere.radius * ( scale );
 			var pos = object.position.clone().sub( center ).normalize().multiplyScalar( radius * 2 );
 			object.position.copy( center ).add( pos );
@@ -185,11 +185,15 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		var delta = 0;
 
-		if ( event.wheelDelta ) { // WebKit / Opera / Explorer 9
+		if ( event.wheelDelta ) {
+
+			// WebKit / Opera / Explorer 9
 
 			delta = - event.wheelDelta;
 
-		} else if ( event.detail ) { // Firefox
+		} else if ( event.detail ) {
+
+			// Firefox
 
 			delta = event.detail * 10;
 
@@ -199,7 +203,30 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	}
 
-	domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	function contextmenu( event ) {
+
+		event.preventDefault();
+
+	}
+
+	this.dispose = function() {
+
+		domElement.removeEventListener( 'contextmenu', contextmenu, false );
+		domElement.removeEventListener( 'mousedown', onMouseDown, false );
+		domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
+		domElement.removeEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+
+		domElement.removeEventListener( 'mousemove', onMouseMove, false );
+		domElement.removeEventListener( 'mouseup', onMouseUp, false );
+		domElement.removeEventListener( 'mouseout', onMouseUp, false );
+		domElement.removeEventListener( 'dblclick', onMouseUp, false );
+
+		domElement.removeEventListener( 'touchstart', touchStart, false );
+		domElement.removeEventListener( 'touchmove', touchMove, false );
+
+	}
+
+	domElement.addEventListener( 'contextmenu', contextmenu, false );
 	domElement.addEventListener( 'mousedown', onMouseDown, false );
 	domElement.addEventListener( 'mousewheel', onMouseWheel, false );
 	domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
@@ -250,7 +277,9 @@ THREE.EditorControls = function ( object, domElement ) {
 			var closest = touches[ 0 ];
 
 			for ( var i in touches ) {
-				if ( closest.distanceTo(touch) > touches[ i ].distanceTo(touch) ) closest = touches[ i ];
+
+				if ( closest.distanceTo( touch ) > touches[ i ].distanceTo( touch ) ) closest = touches[ i ];
+
 			}
 
 			return closest;
@@ -275,8 +304,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 				var offset0 = touches[ 0 ].clone().sub( getClosest( touches[ 0 ], prevTouches ) );
 				var offset1 = touches[ 1 ].clone().sub( getClosest( touches[ 1 ], prevTouches ) );
-				offset0.x = -offset0.x;
-				offset1.x = -offset1.x;
+				offset0.x = - offset0.x;
+				offset1.x = - offset1.x;
 
 				scope.pan( offset0.add( offset1 ).multiplyScalar( 0.5 ) );
 

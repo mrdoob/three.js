@@ -392,7 +392,7 @@ THREE.Projector = function () {
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
 					var attributes = geometry.attributes;
-					var offsets = geometry.offsets;
+					var offsets = geometry.drawcalls;
 
 					if ( attributes.position === undefined ) continue;
 
@@ -533,8 +533,10 @@ THREE.Projector = function () {
 						var visible = renderList.checkBackfaceCulling( v1, v2, v3 );
 
 						if ( side !== THREE.DoubleSide ) {
+
 							if ( side === THREE.FrontSide && visible === false ) continue;
 							if ( side === THREE.BackSide && visible === true ) continue;
+
 						}
 
 						_face = getNextFaceInPool();
@@ -825,7 +827,7 @@ THREE.Projector = function () {
 
 	function painterSort( a, b ) {
 
-		if ( a.renderOrder !== b.renderOrder) {
+		if ( a.renderOrder !== b.renderOrder ) {
 
 			return a.renderOrder - b.renderOrder;
 

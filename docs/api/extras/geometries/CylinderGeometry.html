@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Geometry] &rarr;
@@ -16,8 +17,8 @@
 
 		<h2>Example</h2>
 
-		<iframe src='../../../scenes/geometry-browser.html#CylinderGeometry'></iframe>
-		
+		<iframe src='scenes/geometry-browser.html#CylinderGeometry'></iframe>
+
 		<code>var geometry = new THREE.CylinderGeometry( 5, 5, 20, 32 );
 		var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
 		var cylinder = new THREE.Mesh( geometry, material );

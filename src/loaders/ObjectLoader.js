@@ -111,11 +111,24 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'CircleBufferGeometry':
+
+						geometry = new THREE.CircleBufferGeometry(
+							data.radius,
+							data.segments,
+							data.thetaStart,
+							data.thetaLength
+						);
+
+						break;
+
 					case 'CircleGeometry':
 
 						geometry = new THREE.CircleGeometry(
 							data.radius,
-							data.segments
+							data.segments,
+							data.thetaStart,
+							data.thetaLength
 						);
 
 						break;
@@ -128,7 +141,9 @@ THREE.ObjectLoader.prototype = {
 							data.height,
 							data.radialSegments,
 							data.heightSegments,
-							data.openEnded
+							data.openEnded,
+							data.thetaStart,
+							data.thetaLength
 						);
 
 						break;
@@ -147,11 +162,65 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'SphereBufferGeometry':
+
+						geometry = new THREE.SphereBufferGeometry(
+							data.radius,
+							data.widthSegments,
+							data.heightSegments,
+							data.phiStart,
+							data.phiLength,
+							data.thetaStart,
+							data.thetaLength
+						);
+
+						break;
+
+					case 'DodecahedronGeometry':
+
+						geometry = new THREE.DodecahedronGeometry(
+							data.radius,
+							data.detail
+						);
+
+						break;
+
 					case 'IcosahedronGeometry':
 
 						geometry = new THREE.IcosahedronGeometry(
 							data.radius,
 							data.detail
+						);
+
+						break;
+
+					case 'OctahedronGeometry':
+
+						geometry = new THREE.OctahedronGeometry(
+							data.radius,
+							data.detail
+						);
+
+						break;
+
+					case 'TetrahedronGeometry':
+
+						geometry = new THREE.TetrahedronGeometry(
+							data.radius,
+							data.detail
+						);
+
+						break;
+
+					case 'RingGeometry':
+
+						geometry = new THREE.RingGeometry(
+							data.innerRadius,
+							data.outerRadius,
+							data.thetaSegments,
+							data.phiSegments,
+							data.thetaStart,
+							data.thetaLength
 						);
 
 						break;

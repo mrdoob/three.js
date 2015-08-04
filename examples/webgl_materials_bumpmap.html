@@ -171,9 +171,7 @@
 
 				var material = new THREE.MeshPhongMaterial( { color: 0x552811, specular: 0x333333, shininess: 25, bumpMap: mapHeight, bumpScale: 19, metal: false } );
 
-				loader = new THREE.JSONLoader( true );
-				document.body.appendChild( loader.statusDomElement );
-
+				loader = new THREE.JSONLoader();
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
@@ -217,8 +215,6 @@
 				mesh.receiveShadow = true;
 
 				scene.add( mesh );
-
-				loader.statusDomElement.style.display = "none";
 
 			}
 

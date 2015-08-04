@@ -29,7 +29,7 @@ THREE.BrightnessContrastShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -53,6 +53,6 @@ THREE.BrightnessContrastShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

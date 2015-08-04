@@ -8,13 +8,17 @@ THREE.WebGLProperties = function () {
 
 	this.get = function ( object ) {
 
-		if ( properties[ object.uuid ] === undefined ) {
+		var uuid = object.uuid;
+		var map = properties[ uuid ];
 
-			properties[ object.uuid ] = {};
+		if ( map === undefined ) {
+
+			map = {};
+			properties[ uuid ] = map;
 
 		}
 
-		return properties[ object.uuid ];
+		return map;
 
 	};
 

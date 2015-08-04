@@ -2,21 +2,22 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Geometry] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<div class="desc">A class for generating a two-dimensional ring geometry.</div>
 
-		<iframe src='../../../scenes/geometry-browser.html#RingGeometry'></iframe>
+		<iframe src='scenes/geometry-browser.html#RingGeometry'></iframe>
 
 		<h2>Example</h2>
-		
+
 		<code>var geometry = new THREE.RingGeometry( 1, 5, 32 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide } );
 		var mesh = new THREE.Mesh( geometry, material );

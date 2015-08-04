@@ -77,7 +77,7 @@
 		<script>
 			THREE.Shape.Utils.triangulateShape = ( function () {
 				var pnlTriangulator = new PNLTRI.Triangulator();
-				return function ( contour, holes ) {
+				return function triangulateShape( contour, holes ) {
 					// console.log("new Triangulation: PnlTri.js " + PNLTRI.REVISION );
 					return pnlTriangulator.triangulate_polygon( [ contour ].concat(holes) );
 				};

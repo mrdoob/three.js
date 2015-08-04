@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Camera] &rarr;
@@ -17,13 +18,13 @@
  		both an Orthographic and Perspective Camera</div>
 
 		<h2>Examples</h2>
-		
+
 		<div>[example:canvas_camera_orthographic2 camera / orthographic2 ]</div>
-		
+
 		<code>//Create combined camera
 		camera = new THREE.CombinedCamera( window.innerWidth / 2, window.innerHeight / 2, 70, 1, 1000, - 500, 1000 );
 		</code>
-		
+
 		<h2>Constructor</h2>
 
 
@@ -38,7 +39,7 @@
 		orthoFar — Camera frustum far plane in orthographic view.
 		</div>
 		<div>
-		Creates a [name]. This initializes 2 cameras, an OrthographicCamera and a PerspectiveCamera. The default is the perspective Camera. 
+		Creates a [name]. This initializes 2 cameras, an OrthographicCamera and a PerspectiveCamera. The default is the perspective Camera.
 		</div>
 
 
@@ -49,67 +50,67 @@
 		<h3>[property:Number fov]</h3>
 		<div>
 		Gets or sets the camera frustum vertical field of view in perspective view.
-		</div> 
+		</div>
 
 		<h3>[property:number left]</h3>
 		<div>
 		Gets or sets the camera frustum left plane in orthographic view.
-		</div> 
+		</div>
 
 		<h3>[property:Number right]</h3>
 		<div>
-		Gets or sets the camera frustum right plane in orthographic view. 
-		</div> 
+		Gets or sets the camera frustum right plane in orthographic view.
+		</div>
 
 		<h3>[property:number top]</h3>
 		<div>
 		Gets or sets the camera frustum top plane in orthographic view.
-		</div> 
+		</div>
 
 		<h3>[property:Number bottom]</h3>
 		<div>
 		Gets or sets the camera frustum bottom plane in orthographic view.
-		</div> 
+		</div>
 
 		<h3>[property:number zoom]</h3>
 		<div>
 		Gets or sets the zoom factor of the camera.
-		</div> 
+		</div>
 
 		<h3>[property:number near]</h3>
 		<div>
 		Gets camera frustum near plane.
-		</div> 
+		</div>
 
 		<h3>[property:number far]</h3>
 		<div>
 		Gets camera frustum far plane.
-		</div> 
+		</div>
 
 		<h3>[property:Matrix4 projectionMatrix]</h3>
 		<div>
 		This is the matrix which contains the projection.
 		</div>
-		
+
 		<h3>[property:OrthographicCamera cameraO]</h3>
 		<div>
 		Gets or sets the internal OrthographicCamera used as camera.
-		</div> 
+		</div>
 
 		<h3>[property:PerspectiveCamera cameraP]</h3>
 		<div>
 		Gets or sets the internal PerspectiveCamera used as camera.
-		</div> 
+		</div>
 
 		<h3>[property:boolean inOrthographicMode]</h3>
 		<div>
 		Gets whether the combinedCamera is in Orthographic Mode.
-		</div> 
+		</div>
 
 		<h3>[property:boolean inPerspectiveMode]</h3>
 		<div>
 		Gets whether the combinedCamera is in Perspective Mode.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 

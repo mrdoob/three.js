@@ -98,6 +98,7 @@ THREE.Box2.prototype = {
 		this.max.max( point );
 
 		return this;
+
 	},
 
 	expandByVector: function ( vector ) {
@@ -106,6 +107,7 @@ THREE.Box2.prototype = {
 		this.max.add( vector );
 
 		return this;
+
 	},
 
 	expandByScalar: function ( scalar ) {
@@ -114,6 +116,7 @@ THREE.Box2.prototype = {
 		this.max.addScalar( scalar );
 
 		return this;
+
 	},
 
 	containsPoint: function ( point ) {

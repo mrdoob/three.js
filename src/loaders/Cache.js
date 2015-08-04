@@ -4,9 +4,13 @@
 
 THREE.Cache = {
 
+	enabled: false,
+
 	files: {},
 
 	add: function ( key, file ) {
+
+		if ( this.enabled === false ) return;
 
 		// console.log( 'THREE.Cache', 'Adding key:', key );
 
@@ -15,6 +19,8 @@ THREE.Cache = {
 	},
 
 	get: function ( key ) {
+
+		if ( this.enabled === false ) return;
 
 		// console.log( 'THREE.Cache', 'Checking key:', key );
 

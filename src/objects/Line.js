@@ -28,7 +28,7 @@ THREE.Line.prototype.raycast = ( function () {
 	var ray = new THREE.Ray();
 	var sphere = new THREE.Sphere();
 
-	return function ( raycaster, intersects ) {
+	return function raycast( raycaster, intersects ) {
 
 		var precision = raycaster.linePrecision;
 		var precisionSq = precision * precision;
@@ -65,7 +65,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 				var indices = attributes.index.array;
 				var positions = attributes.position.array;
-				var offsets = geometry.offsets;
+				var offsets = geometry.drawcalls;
 
 				if ( offsets.length === 0 ) {
 
@@ -73,7 +73,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 				}
 
-				for ( var oi = 0; oi < offsets.length; oi ++) {
+				for ( var oi = 0; oi < offsets.length; oi ++ ) {
 
 					var start = offsets[ oi ].start;
 					var count = offsets[ oi ].count;
@@ -183,13 +183,17 @@ THREE.Line.prototype.raycast = ( function () {
 
 }() );
 
-THREE.Line.prototype.clone = function ( object ) {
+THREE.Line.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE[ this.type ]( this.geometry, this.material );
+	var line = new THREE.Line( this.geometry, this.material );
+	return line.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+};
 
-	return object;
+THREE.Line.prototype.copy = function ( source ) {
+
+	THREE.Object3D.prototype.copy.call( this, source );
+	return this;
 
 };
 
@@ -199,12 +203,16 @@ THREE.Line.prototype.toJSON = function ( meta ) {
 
 	// only serialize if not in meta geometries cache
 	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
+
 		meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON();
+
 	}
 
 	// only serialize if not in meta materials cache
 	if ( meta.materials[ this.material.uuid ] === undefined ) {
+
 		meta.materials[ this.material.uuid ] = this.material.toJSON();
+
 	}
 
 	data.object.geometry = this.geometry.uuid;

@@ -29,14 +29,6 @@ THREE.BlendCharacter = function () {
 
 			}
 
-			// Create the debug visualization
-
-			scope.skeletonHelper = new THREE.SkeletonHelper( scope );
-			scope.skeletonHelper.material.linewidth = 3;
-			scope.add( scope.skeletonHelper );
-
-			scope.showSkeleton( false );
-
 			// Loading is complete, fire the callback
 			if ( onLoad !== undefined ) onLoad();
 
@@ -70,14 +62,13 @@ THREE.BlendCharacter = function () {
 
 				// interpolate the weight for the current time
 
-				data.anim.weight = data.startWeight + (data.endWeight - data.startWeight) * data.timeElapsed / data.duration;
+				data.anim.weight = data.startWeight + ( data.endWeight - data.startWeight ) * data.timeElapsed / data.duration;
 
 			}
 
 		}
 
 		this.updateWarps( dt );
-		this.skeletonHelper.update();
 
 	};
 
@@ -126,7 +117,7 @@ THREE.BlendCharacter = function () {
 
 	};
 
-	this.play = function(animName, weight) {
+	this.play = function( animName, weight ) {
 
 		this.animations[ animName ].play( 0, weight );
 
@@ -181,7 +172,7 @@ THREE.BlendCharacter = function () {
 
 	};
 
-	this.applyWeight = function(animName, weight) {
+	this.applyWeight = function( animName, weight ) {
 
 		this.animations[ animName ].weight = weight;
 
@@ -221,7 +212,9 @@ THREE.BlendCharacter = function () {
 		for ( a in this.animations ) {
 
 			if ( this.animations[ a ].isPlaying ) {
-				this.animations[ a ].stop(0);
+
+				this.animations[ a ].stop( 0 );
+
 			}
 
 			this.animations[ a ].weight = 0;
@@ -230,12 +223,6 @@ THREE.BlendCharacter = function () {
 
 		this.weightSchedule.length = 0;
 		this.warpSchedule.length = 0;
-
-	};
-
-	this.showSkeleton = function( boolean ) {
-
-		this.skeletonHelper.visible = boolean;
 
 	};
 
@@ -259,12 +246,14 @@ THREE.BlendCharacter.prototype.getForward = function() {
 
 		// pull the character's forward basis vector out of the matrix
 		forward.set(
-			-this.matrix.elements[ 8 ],
-			-this.matrix.elements[ 9 ],
-			-this.matrix.elements[ 10 ]
+			- this.matrix.elements[ 8 ],
+			- this.matrix.elements[ 9 ],
+			- this.matrix.elements[ 10 ]
 		);
 
 		return forward;
+
 	}
+
 };
 

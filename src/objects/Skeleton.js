@@ -30,6 +30,8 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 
 		var size = THREE.Math.nextPowerOfTwo( Math.sqrt( this.bones.length * 4 ) ); // 4 pixels needed for 1 matrix
 
+		if ( size === 0 ) size = 2; // Avoid creating empty texture
+
 		this.boneTextureWidth = size;
 		this.boneTextureHeight = size;
 
@@ -145,7 +147,7 @@ THREE.Skeleton.prototype.update = ( function () {
 
 	var offsetMatrix = new THREE.Matrix4();
 
-	return function () {
+	return function update() {
 
 		// flatten bone matrices to array
 

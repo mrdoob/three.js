@@ -4,11 +4,9 @@
  * @author angelxuanchang
  */
 
-THREE.MTLLoader = function( baseUrl, options, crossOrigin ) {
+THREE.MTLLoader = function( manager ) {
 
-	this.baseUrl = baseUrl;
-	this.options = options;
-	this.crossOrigin = crossOrigin;
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
@@ -20,13 +18,31 @@ THREE.MTLLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader();
+		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setBaseUrl: function( value ) {
+
+		this.baseUrl = value;
+
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
+	setMaterialOptions: function ( value ) {
+
+		this.materialOptions = value;
 
 	},
 
@@ -74,7 +90,7 @@ THREE.MTLLoader.prototype = {
 				if ( key === "ka" || key === "kd" || key === "ks" ) {
 
 					var ss = value.split( delimiter_pattern, 3 );
-					info[ key ] = [ parseFloat( ss[0] ), parseFloat( ss[1] ), parseFloat( ss[2] ) ];
+					info[ key ] = [ parseFloat( ss[ 0 ] ), parseFloat( ss[ 1 ] ), parseFloat( ss[ 2 ] ) ];
 
 				} else {
 
@@ -86,8 +102,9 @@ THREE.MTLLoader.prototype = {
 
 		}
 
-		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.baseUrl, this.options );
-		materialCreator.crossOrigin = this.crossOrigin;
+		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.baseUrl, this.materialOptions );
+		materialCreator.setCrossOrigin( this.crossOrigin );
+		materialCreator.setManager( this.manager );
 		materialCreator.setMaterials( materialsInfo );
 		return materialCreator;
 
@@ -130,6 +147,18 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 	constructor: THREE.MTLLoader.MaterialCreator,
 
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
+	setManager: function ( value ) {
+
+		this.manager = value;
+
+	},
+
 	setMaterials: function( materialsInfo ) {
 
 		this.materialsInfo = this.convert( materialsInfo );
@@ -141,7 +170,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 	convert: function( materialsInfo ) {
 
-		if ( !this.options ) return materialsInfo;
+		if ( ! this.options ) return materialsInfo;
 
 		var converted = {};
 
@@ -184,6 +213,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 								save = false;
 
 							}
+
 						}
 
 						break;
@@ -321,7 +351,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					// The specular exponent (defines the focus of the specular highlight)
 					// A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
 
-					params['shininess'] = value;
+					params[ 'shininess' ] = value;
 
 					break;
 
@@ -333,8 +363,8 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					if ( value < 1 ) {
 
-						params['transparent'] = true;
-						params['opacity'] = value;
+						params[ 'transparent' ] = true;
+						params[ 'opacity' ] = value;
 
 					}
 
@@ -372,10 +402,11 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 	},
 
 
-	loadTexture: function ( url, mapping, onLoad, onError ) {
+	loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
 
 		var texture;
 		var loader = THREE.Loader.Handlers.get( url );
+		var manager = ( this.manager !== undefined ) ? this.manager : THREE.DefaultLoadingManager;
 
 		if ( loader !== null ) {
 
@@ -385,8 +416,8 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 			texture = new THREE.Texture();
 
-			loader = new THREE.ImageLoader();
-			loader.crossOrigin = this.crossOrigin;
+			loader = new THREE.ImageLoader( manager );
+			loader.setCrossOrigin( this.crossOrigin );
 			loader.load( url, function ( image ) {
 
 				texture.image = THREE.MTLLoader.ensurePowerOfTwo_( image );
@@ -394,7 +425,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 				if ( onLoad ) onLoad( texture );
 
-			} );
+			}, onProgress, onError );
 
 		}
 
@@ -414,7 +445,7 @@ THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
 		canvas.width = THREE.MTLLoader.nextHighestPowerOfTwo_( image.width );
 		canvas.height = THREE.MTLLoader.nextHighestPowerOfTwo_( image.height );
 
-		var ctx = canvas.getContext("2d");
+		var ctx = canvas.getContext( "2d" );
 		ctx.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
 		return canvas;
 

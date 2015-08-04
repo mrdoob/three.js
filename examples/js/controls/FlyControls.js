@@ -7,7 +7,7 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.object = object;
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
-	if ( domElement ) this.domElement.setAttribute( 'tabindex', -1 );
+	if ( domElement ) this.domElement.setAttribute( 'tabindex', - 1 );
 
 	// API
 
@@ -141,7 +141,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.mousemove = function( event ) {
 
-		if ( !this.dragToLook || this.mouseStatus > 0 ) {
+		if ( ! this.dragToLook || this.mouseStatus > 0 ) {
 
 			var container = this.getContainerDimensions();
 			var halfWidth  = container.size[ 0 ] / 2;
@@ -204,11 +204,11 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.updateMovementVector = function() {
 
-		var forward = ( this.moveState.forward || ( this.autoForward && !this.moveState.back ) ) ? 1 : 0;
+		var forward = ( this.moveState.forward || ( this.autoForward && ! this.moveState.back ) ) ? 1 : 0;
 
-		this.moveVector.x = ( -this.moveState.left    + this.moveState.right );
-		this.moveVector.y = ( -this.moveState.down    + this.moveState.up );
-		this.moveVector.z = ( -forward + this.moveState.back );
+		this.moveVector.x = ( - this.moveState.left    + this.moveState.right );
+		this.moveVector.y = ( - this.moveState.down    + this.moveState.up );
+		this.moveVector.z = ( - forward + this.moveState.back );
 
 		//console.log( 'move:', [ this.moveVector.x, this.moveVector.y, this.moveVector.z ] );
 
@@ -216,9 +216,9 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.updateRotationVector = function() {
 
-		this.rotationVector.x = ( -this.moveState.pitchDown + this.moveState.pitchUp );
-		this.rotationVector.y = ( -this.moveState.yawRight  + this.moveState.yawLeft );
-		this.rotationVector.z = ( -this.moveState.rollRight + this.moveState.rollLeft );
+		this.rotationVector.x = ( - this.moveState.pitchDown + this.moveState.pitchUp );
+		this.rotationVector.y = ( - this.moveState.yawRight  + this.moveState.yawLeft );
+		this.rotationVector.z = ( - this.moveState.rollRight + this.moveState.rollLeft );
 
 		//console.log( 'rotate:', [ this.rotationVector.x, this.rotationVector.y, this.rotationVector.z ] );
 
@@ -254,14 +254,38 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	}
 
-	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	function contextmenu( event ) {
 
-	this.domElement.addEventListener( 'mousemove', bind( this, this.mousemove ), false );
-	this.domElement.addEventListener( 'mousedown', bind( this, this.mousedown ), false );
-	this.domElement.addEventListener( 'mouseup',   bind( this, this.mouseup ), false );
+		event.preventDefault();
 
-	window.addEventListener( 'keydown', bind( this, this.keydown ), false );
-	window.addEventListener( 'keyup',   bind( this, this.keyup ), false );
+	}
+
+	this.dispose = function() {
+
+		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
+		this.domElement.removeEventListener( 'mousedown', _mousedown, false );
+		this.domElement.removeEventListener( 'mousemove', _mousemove, false );
+		this.domElement.removeEventListener( 'mouseup', _mouseup, false );
+
+		window.removeEventListener( 'keydown', _keydown, false );
+		window.removeEventListener( 'keyup', _keyup, false );
+
+	}
+
+	var _mousemove = bind( this, this.mousemove );
+	var _mousedown = bind( this, this.mousedown );
+	var _mouseup = bind( this, this.mouseup );
+	var _keydown = bind( this, this.keydown );
+	var _keyup = bind( this, this.keyup );
+
+	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
+
+	this.domElement.addEventListener( 'mousemove', _mousemove, false );
+	this.domElement.addEventListener( 'mousedown', _mousedown, false );
+	this.domElement.addEventListener( 'mouseup',   _mouseup, false );
+
+	window.addEventListener( 'keydown', _keydown, false );
+	window.addEventListener( 'keyup',   _keyup, false );
 
 	this.updateMovementVector();
 	this.updateRotationVector();

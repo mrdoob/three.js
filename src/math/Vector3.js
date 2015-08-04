@@ -126,6 +126,16 @@ THREE.Vector3.prototype = {
 
 	},
 
+	addScaledVector: function ( v, s ) {
+
+		this.x += v.x * s;
+		this.y += v.y * s;
+		this.z += v.z * s;
+
+		return this;
+
+	},
+
 	sub: function ( v, w ) {
 
 		if ( w !== undefined ) {
@@ -142,7 +152,7 @@ THREE.Vector3.prototype = {
 		return this;
 
 	},
-	
+
 	subScalar: function ( s ) {
 
 		this.x -= s;
@@ -204,7 +214,7 @@ THREE.Vector3.prototype = {
 
 		var quaternion;
 
-		return function ( euler ) {
+		return function applyEuler( euler ) {
 
 			if ( euler instanceof THREE.Euler === false ) {
 
@@ -226,7 +236,7 @@ THREE.Vector3.prototype = {
 
 		var quaternion;
 
-		return function ( axis, angle ) {
+		return function applyAxisAngle( axis, angle ) {
 
 			if ( quaternion === undefined ) quaternion = new THREE.Quaternion();
 
@@ -319,7 +329,7 @@ THREE.Vector3.prototype = {
 
 		var matrix;
 
-		return function ( camera ) {
+		return function project( camera ) {
 
 			if ( matrix === undefined ) matrix = new THREE.Matrix4();
 
@@ -334,7 +344,7 @@ THREE.Vector3.prototype = {
 
 		var matrix;
 
-		return function ( camera ) {
+		return function unproject( camera ) {
 
 			if ( matrix === undefined ) matrix = new THREE.Matrix4();
 
@@ -482,11 +492,11 @@ THREE.Vector3.prototype = {
 
 	},
 
-	clampScalar: ( function () {
+	clampScalar: function () {
 
 		var min, max;
 
-		return function ( minVal, maxVal ) {
+		return function clampScalar( minVal, maxVal ) {
 
 			if ( min === undefined ) {
 
@@ -502,7 +512,7 @@ THREE.Vector3.prototype = {
 
 		};
 
-	} )(),
+	}(),
 
 	floor: function () {
 
@@ -591,6 +601,7 @@ THREE.Vector3.prototype = {
 		if ( oldLength !== 0 && l !== oldLength  ) {
 
 			this.multiplyScalar( l / oldLength );
+
 		}
 
 		return this;
@@ -651,7 +662,7 @@ THREE.Vector3.prototype = {
 
 		var v1, dot;
 
-		return function ( vector ) {
+		return function projectOnVector( vector ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 
@@ -669,7 +680,7 @@ THREE.Vector3.prototype = {
 
 		var v1;
 
-		return function ( planeNormal ) {
+		return function projectOnPlane( planeNormal ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 
@@ -688,7 +699,7 @@ THREE.Vector3.prototype = {
 
 		var v1;
 
-		return function ( normal ) {
+		return function reflect( normal ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 
@@ -749,6 +760,7 @@ THREE.Vector3.prototype = {
 		console.warn( 'THREE.Vector3: .getScaleFromMatrix() has been renamed to .setFromMatrixScale().' );
 
 		return this.setFromMatrixScale( m );
+
 	},
 
 	getColumnFromMatrix: function ( index, matrix ) {
@@ -771,8 +783,8 @@ THREE.Vector3.prototype = {
 
 	setFromMatrixScale: function ( m ) {
 
-		var sx = this.set( m.elements[ 0 ], m.elements[ 1 ], m.elements[  2 ] ).length();
-		var sy = this.set( m.elements[ 4 ], m.elements[ 5 ], m.elements[  6 ] ).length();
+		var sx = this.set( m.elements[ 0 ], m.elements[ 1 ], m.elements[ 2 ] ).length();
+		var sy = this.set( m.elements[ 4 ], m.elements[ 5 ], m.elements[ 6 ] ).length();
 		var sz = this.set( m.elements[ 8 ], m.elements[ 9 ], m.elements[ 10 ] ).length();
 
 		this.x = sx;
@@ -780,10 +792,11 @@ THREE.Vector3.prototype = {
 		this.z = sz;
 
 		return this;
+
 	},
 
 	setFromMatrixColumn: function ( index, matrix ) {
-		
+
 		var offset = index * 4;
 
 		var me = matrix.elements;

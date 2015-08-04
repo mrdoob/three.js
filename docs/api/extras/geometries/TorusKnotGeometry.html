@@ -2,22 +2,23 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Geometry] &rarr;
-	
+
 		<h1>[name]</h1>
 
 		<div class="desc">Creates a torus knot, the particular shape of which is defined by a pair of coprime integers, p and q.  If p and q are not coprime, the result will be a torus link.</div>
 
-		<iframe src='../../../scenes/geometry-browser.html#TorusKnotGeometry'></iframe>
+		<iframe src='scenes/geometry-browser.html#TorusKnotGeometry'></iframe>
 
 
 		<h2>Example</h2>
-		
+
 		<code>var geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 		var torusKnot = new THREE.Mesh( geometry, material );
@@ -42,7 +43,7 @@
 
 		<h2>Properties</h2>
 
-		
+
 		<div>
 		Each of the contructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
 		</div>

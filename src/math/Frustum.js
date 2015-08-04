@@ -143,9 +143,11 @@ THREE.Frustum.prototype = {
 					return false;
 
 				}
+
 			}
 
 			return true;
+
 		};
 
 	}(),

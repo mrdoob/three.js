@@ -2,13 +2,14 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Mesh] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<div class="desc">This displays a helper object for a [page:PointLight] </div>
@@ -19,7 +20,7 @@
 		<code>var pointLight = new THREE.PointLight( 0xff0000, 1, 100 );
 		pointLight.position.set( 10, 10, 10 );
 		scene.add( pointLight );
-		
+
 		var sphereSize = 1;
 		var pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
 		scene.add( pointLightHelper );
@@ -41,7 +42,7 @@
 		<h3>[property:PointLight light]</h3>
 		<div>
 		The [page:PointLight] that is being represented.
-		</div> 
+		</div>
 
 
 		<h2>Methods</h2>

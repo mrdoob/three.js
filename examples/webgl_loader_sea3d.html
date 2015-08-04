@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - sea3d</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+
+			}
+
+			a { color: white }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/ColorCorrectionShader.js"></script>
+		<script src="js/shaders/VignetteShader.js"></script>
+
+		<script src="js/loaders/sea3d/SEA3D.js"></script>
+		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
+		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer, composer, controls;
+
+			var loader;
+
+			// Initialize Three.JS
+
+			init();
+
+			//
+			// SEA3D Loader
+			//
+
+			loader = new THREE.SEA3D( {
+
+				autoPlay : true, // Auto play animations
+				container : scene, // Container to add models
+				parser : THREE.SEA3D.AUTO, // Auto choose THREE.BufferGeometry and THREE.Geometry
+				multiplier : 1 // Light multiplier
+
+			} );
+
+			loader.onComplete = function( e ) {
+
+				// Get camera from 3ds Max
+				// use loader.get... to get others objects
+
+				var cam = loader.getCamera( "Camera007" );
+				camera.position.copy( cam.position );
+				camera.rotation.copy( cam.rotation );
+
+				animate();
+
+			};
+
+			loader.load( './models/sea3d/mascot.sea' );
+
+			//
+
+			function init() {
+
+				scene = new THREE.Scene();
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 1000, - 300, 1000 );
+
+				controls = new THREE.OrbitControls( camera );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x333333, 1 );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				// post-processing
+
+				composer = new THREE.EffectComposer( renderer );
+
+				var renderPass = new THREE.RenderPass( scene, camera );
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				composer.addPass( renderPass );
+
+				var vh = 1.4, vl = 1.2;
+
+				var colorCorrectionPass = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
+				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
+				composer.addPass( colorCorrectionPass );
+
+				var vignettePass = new THREE.ShaderPass( THREE.VignetteShader );
+				vignettePass.uniforms[ "darkness" ].value = 1.0;
+				composer.addPass( vignettePass );
+
+				composer.addPass( copyPass );
+				copyPass.renderToScreen = true;
+
+				// extra lights
+
+				scene.add( new THREE.AmbientLight( 0x333333 ) );
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			var clock = new THREE.Clock();
+
+			function animate() {
+
+				var delta = clock.getDelta();
+
+				requestAnimationFrame( animate );
+
+				// Update SEA3D Animations
+				THREE.SEA3D.AnimationHandler.update( delta );
+
+				// Update Three.JS Animations
+				THREE.AnimationHandler.update( delta );
+
+				render( delta );
+
+				stats.update();
+
+			}
+
+			function render( dlt ) {
+
+				//renderer.render( scene, camera );
+				composer.render( dlt );
+
+			}
+
+		</script>
+	</body>
+</html>
