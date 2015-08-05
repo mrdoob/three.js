@@ -10,6 +10,8 @@ THREE.DirectionalLight = function ( color, intensity ) {
 	this.type = 'DirectionalLight';
 
 	this.position.set( 0, 1, 0 );
+	this.updateMatrix();
+
 	this.target = new THREE.Object3D();
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
