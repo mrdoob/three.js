@@ -33,6 +33,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.linejoin = 'round';
 
 	this.vertexColors = THREE.NoColors;
+	this.skinning = false;
 
 	this.fog = true;
 
@@ -56,6 +57,7 @@ THREE.LineBasicMaterial.prototype.clone = function () {
 	material.linejoin = this.linejoin;
 
 	material.vertexColors = this.vertexColors;
+	material.skinning = this.skinning;
 
 	material.fog = this.fog;
 

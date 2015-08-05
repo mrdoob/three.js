@@ -9,6 +9,7 @@ function BlendCharacterGui( animations ) {
 		gui: null,
 		"Show Model": true,
 		"Show Skeleton": false,
+		"Show Wireframe": false,
 		"Time Scale": 1.0,
 		"Step Size": 0.016,
 		"Crossfade Time": 3.5,
@@ -29,6 +30,12 @@ function BlendCharacterGui( animations ) {
 	this.showSkeleton = function() {
 
 		return controls[ 'Show Skeleton' ];
+
+	};
+
+	this.showWireframe = function() {
+
+		return controls[ 'Show Wireframe' ];
 
 	};
 
@@ -56,6 +63,7 @@ function BlendCharacterGui( animations ) {
 
 		settings.add( controls, "Show Model" ).onChange( controls.showModelChanged );
 		settings.add( controls, "Show Skeleton" ).onChange( controls.showSkeletonChanged );
+		settings.add( controls, "Show Wireframe" ).onChange( controls.showWireframeChanged );
 		settings.add( controls, "Time Scale", 0, 1, 0.01 );
 		settings.add( controls, "Step Size", 0.01, 0.1, 0.01 );
 		settings.add( controls, "Crossfade Time", 0.1, 6.0, 0.05 );
@@ -198,6 +206,18 @@ function BlendCharacterGui( animations ) {
 		};
 
 		window.dispatchEvent( new CustomEvent( 'toggle-show-model', data ) );
+
+	};
+
+	controls.showWireframeChanged = function() {
+
+		var data = {
+			detail: {
+				shouldShow: controls[ 'Show Wireframe' ]
+			}
+		};
+
+		window.dispatchEvent( new CustomEvent( 'toggle-show-wireframe', data ) );
 
 	};
 
