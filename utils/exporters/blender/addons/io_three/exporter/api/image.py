@@ -49,4 +49,4 @@ def file_path(image):
 
     """
     logger.debug("image.file_path(%s)", image)
-    return os.path.normpath(image.filepath_from_user())
+    return os.path.normpath(image.filepath())
