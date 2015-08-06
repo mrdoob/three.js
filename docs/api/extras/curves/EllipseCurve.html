@@ -21,8 +21,7 @@ var curve = new THREE.EllipseCurve(
 	0,  0,            // ax, aY
 	10, 10,           // xRadius, yRadius
 	0,  2 * Math.PI,  // aStartAngle, aEndAngle
-	false,            // aClockwise
-	0                 // aRotation
+	false             // aClockwise
 );
 
 var path = new THREE.Path( curve.getPoints( 50 ) );
@@ -36,7 +35,7 @@ var ellipse = new THREE.Line( geometry, material );
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Float aX], [page:Float aY], [page:Float xRadius], [page:Float yRadius], [page:Radians aStartAngle], [page:Radians aEndAngle], [page:Boolean aClockwise], [page:Radians aRotation] )</h3>
+		<h3>[name]( [page:Float aX], [page:Float aY], [page:Float xRadius], [page:Float yRadius], [page:Radians aStartAngle], [page:Radians aEndAngle], [page:Boolean aClockwise] )</h3>
 		<div>
 			aX – The X center of the ellipse<br/>
 			aY – The Y center of the ellipse<br/>
@@ -44,8 +43,7 @@ var ellipse = new THREE.Line( geometry, material );
 			yRadius – The radius of the ellipse in the y direction<br/>
 			aStartAngle – The start angle of the curve in radians starting from the middle right side<br/>
 			aEndAngle – The end angle of the curve in radians starting from the middle right side<br/>
-			aClockwise – Whether the ellipse is clockwise<br/>
-			aRotation – The rotation angle of the ellipse in radians, counterclockwise from the positive X axis (optional)<br/><br/>
+			aClockwise – Whether the ellipse is clockwise<br/><br/>
 
 			<strong>Note:</strong> When going clockwise it's best to set the start angle to (Math.PI * 2) and then work towards lower numbers.
 		</div>
@@ -60,7 +58,6 @@ var ellipse = new THREE.Line( geometry, material );
 		<h3>[property:Float aStartAngle]</h3>
 		<h3>[property:Float aEndAngle]</h3>
 		<h3>[property:Boolean aClockwise]</h3>
-		<h3>[property:Radians aRotation]</h3>
 
 		<h2>Methods</h2>
 
