@@ -891,7 +891,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var geometry = objects.geometries.get( object );
 		var program = setProgram( camera, lights, fog, material, object );
-
+		
+		if ( !( program instanceof THREE.WebGLProgram ) ) {
+			return;
+		}
+		
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
 			geometryProgram = geometry.id + '_' + program.id + '_' + wireframeBit;
@@ -2035,7 +2039,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var programInfo = _programs[ p ];
 
-			if ( programInfo.code === code ) {
+			if ( programInfo && programInfo.code === code ) {
 
 				program = programInfo;
 
@@ -2054,11 +2058,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( program === undefined ) {
 
 			material.__webglShader = materialProperties.__webglShader;
-			program = new THREE.WebGLProgram( _this, code, material, parameters );
+			try {
+				program = new THREE.WebGLProgram( _this, code, material, parameters );
+			}
+			catch ( err ) {
+				material.dispatchEvent( { type: err.message }, err );
+				program = {'error' : err, 'code': code };
+			}
 			_programs.push( program );
 
 			_infoMemory.programs = _programs.length;
-
+		}
+		
+		if ( !( program instanceof THREE.WebGLProgram ) ) {
+			return;
 		}
 
 		materialProperties.program = program;
@@ -2153,7 +2166,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			initMaterial( material, lights, fog, object );
 			material.needsUpdate = false;
+			
+		}
 
+		if ( !( materialProperties.program instanceof THREE.WebGLProgram ) ) {
+			return;
 		}
 
 		var refreshProgram = false;
