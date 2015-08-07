@@ -269,22 +269,22 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	function projectObject( object, camera ) {
 
-		if ( object.visible === true ) {
+		if ( object.visible === false ) return;
 
-			var webglObject = _objects.objects[ object.id ];
+		var webglObject = _objects.objects[ object.id ];
 
-			if ( webglObject && object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+		if ( webglObject && object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-				_renderList.push( webglObject );
+			object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			_renderList.push( webglObject );
 
-			}
+		}
 
-			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+		var children = object.children;
 
-				projectObject( object.children[ i ], camera );
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			}
+			projectObject( children[ i ], camera );
 
 		}
 

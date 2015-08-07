@@ -1717,81 +1717,79 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function projectObject( object ) {
 
-		if ( object.visible === true ) {
+		if ( object.visible === false ) return;
 
-			if ( object instanceof THREE.Scene || object instanceof THREE.Group ) {
+		if ( object instanceof THREE.Scene || object instanceof THREE.Group ) {
 
-				// skip
+			// skip
 
-			} else {
+		} else {
 
-				// update Skeleton objects
-				if ( object instanceof THREE.SkinnedMesh ) {
+			// update Skeleton objects
+			if ( object instanceof THREE.SkinnedMesh ) {
 
-					object.skeleton.update();
+				object.skeleton.update();
 
-				}
+			}
 
-				objects.init( object );
+			objects.init( object );
 
-				if ( object instanceof THREE.Light ) {
+			if ( object instanceof THREE.Light ) {
 
-					lights.push( object );
+				lights.push( object );
 
-				} else if ( object instanceof THREE.Sprite ) {
+			} else if ( object instanceof THREE.Sprite ) {
 
-					sprites.push( object );
+				sprites.push( object );
 
-				} else if ( object instanceof THREE.LensFlare ) {
+			} else if ( object instanceof THREE.LensFlare ) {
 
-					lensFlares.push( object );
+				lensFlares.push( object );
 
-				} else if ( object instanceof THREE.ImmediateRenderObject ) {
+			} else if ( object instanceof THREE.ImmediateRenderObject ) {
 
-					var material = object.material;
+				var material = object.material;
 
-					if ( material.transparent ) {
+				if ( material.transparent ) {
 
-						transparentImmediateObjects.push( object );
-
-					} else {
-
-						opaqueImmediateObjects.push( object );
-
-					}
+					transparentImmediateObjects.push( object );
 
 				} else {
 
-					var webglObject = objects.objects[ object.id ];
+					opaqueImmediateObjects.push( object );
 
-					if ( webglObject && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+				}
 
-						var material = object.material;
+			} else {
 
-						if ( properties.get( material ) ) {
+				var webglObject = objects.objects[ object.id ];
 
-							material.program = properties.get( material ).program;
+				if ( webglObject && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-						}
+					var material = object.material;
 
-						if ( material.transparent ) {
+					if ( properties.get( material ) ) {
 
-							transparentObjects.push( webglObject );
+						material.program = properties.get( material ).program;
 
-						} else {
+					}
 
-							opaqueObjects.push( webglObject );
+					if ( material.transparent ) {
 
-						}
+						transparentObjects.push( webglObject );
 
-						if ( _this.sortObjects === true ) {
+					} else {
 
-							_vector3.setFromMatrixPosition( object.matrixWorld );
-							_vector3.applyProjection( _projScreenMatrix );
+						opaqueObjects.push( webglObject );
 
-							webglObject.z = _vector3.z;
+					}
 
-						}
+					if ( _this.sortObjects === true ) {
+
+						_vector3.setFromMatrixPosition( object.matrixWorld );
+						_vector3.applyProjection( _projScreenMatrix );
+
+						webglObject.z = _vector3.z;
 
 					}
 
@@ -1799,11 +1797,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+		}
 
-				projectObject( object.children[ i ] );
+		var children = object.children;
 
-			}
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			projectObject( children[ i ] );
 
 		}
 
