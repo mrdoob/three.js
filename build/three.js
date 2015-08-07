@@ -7927,7 +7927,7 @@ THREE.Object3D.prototype = {
 
 			return this;
 
-		}
+		};
 
 	}(),
 
@@ -7982,7 +7982,7 @@ THREE.Object3D.prototype = {
 
 			return this;
 
-		}
+		};
 
 	}(),
 
@@ -8198,7 +8198,7 @@ THREE.Object3D.prototype = {
 
 			return result;
 
-		}
+		};
 
 	}(),
 
@@ -8214,7 +8214,7 @@ THREE.Object3D.prototype = {
 
 			return result.setFromQuaternion( quaternion, this.rotation.order, false );
 
-		}
+		};
 
 	}(),
 
@@ -8233,7 +8233,7 @@ THREE.Object3D.prototype = {
 
 			return result;
 
-		}
+		};
 
 	}(),
 
@@ -8249,7 +8249,7 @@ THREE.Object3D.prototype = {
 
 			return result.set( 0, 0, 1 ).applyQuaternion( quaternion );
 
-		}
+		};
 
 	}(),
 
@@ -12351,6 +12351,8 @@ THREE.DirectionalLight = function ( color, intensity ) {
 	this.type = 'DirectionalLight';
 
 	this.position.set( 0, 1, 0 );
+	this.updateMatrix();
+
 	this.target = new THREE.Object3D();
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
@@ -12447,6 +12449,7 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 	this.type = 'HemisphereLight';
 
 	this.position.set( 0, 100, 0 );
+	this.updateMatrix();
 
 	this.groundColor = new THREE.Color( groundColor );
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
@@ -12542,6 +12545,8 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay 
 	this.type = 'SpotLight';
 
 	this.position.set( 0, 1, 0 );
+	this.updateMatrix();
+
 	this.target = new THREE.Object3D();
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
@@ -14529,6 +14534,13 @@ THREE.ObjectLoader.prototype = {
 				case 'AmbientLight':
 
 					object = new THREE.AmbientLight( data.color );
+
+					break;
+
+
+				case 'AreaLight':
+
+					object = new THREE.AreaLight( data.color, data.intensity );
 
 					break;
 
