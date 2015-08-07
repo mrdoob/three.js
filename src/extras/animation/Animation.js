@@ -92,6 +92,12 @@ THREE.Animation.prototype = {
 				var prevKey = this.data.hierarchy[ h ].keys[ 0 ];
 				var nextKey = this.getNextKeyWith( type, h, 1 );
 
+				// START_VEROLD_MOD - robust keyframes
+				if ( !prevKey || !prevKey[ type ] || !nextKey || !nextKey[ type ] ) {
+					continue;
+				}
+				// END_VEROLD_MOD - robust keyframes
+
 				while ( nextKey.time < this.currentTime && nextKey.index > prevKey.index ) {
 
 					prevKey = nextKey;
@@ -226,6 +232,14 @@ THREE.Animation.prototype = {
 					var prevKey = animationCache.prevKey[ type ];
 					var nextKey = animationCache.nextKey[ type ];
 
+					// START_VEROLD_MOD - robust keyframes
+					if ( !prevKey || !prevKey[ type ] || !nextKey || !nextKey[ type ] ) {
+
+						continue;
+
+					}
+					// END_VEROLD_MOD - robust keyframes
+
 					if ( ( this.timeScale > 0 && nextKey.time <= this.currentTime ) ||
 						( this.timeScale < 0 && prevKey.time >= this.currentTime ) ) {
 
@@ -349,59 +363,100 @@ THREE.Animation.prototype = {
 
 		var keys = this.data.hierarchy[ h ].keys;
 
-		if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-			 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+		// START_VEROLD_MOD - robust keyframes
+		if ( keys !== undefined && keys.length > 0 ) {
+		// END_VEROLD_MOD - robust keyframes
 
-			key = key < keys.length - 1 ? key : keys.length - 1;
+			if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
+				 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
-		} else {
+				key = key < keys.length - 1 ? key : keys.length - 1;
 
-			key = key % keys.length;
+			} else {
 
-		}
-
-		for ( ; key < keys.length; key ++ ) {
-
-			if ( keys[ key ][ type ] !== undefined ) {
-
-				return keys[ key ];
+				key = key % keys.length;
 
 			}
 
+			for ( ; key < keys.length; key ++ ) {
+
+				if ( keys[ key ][ type ] !== undefined ) {
+
+					return keys[ key ];
+
+				} else {
+			
+					key = key % keys.length;
+			
+				}
+			
+				// for ( ; key < keys.length; key++ ) {
+			
+					if ( keys[ key ][ type ] !== undefined ) {
+			
+						return keys[ key ];
+			
+					}
+			
+				// }
+			}
+
+			return this.data.hierarchy[ h ].keys[ 0 ];
+
+		// START_VEROLD_MOD - robust keyframes
 		}
-
-		return this.data.hierarchy[ h ].keys[ 0 ];
-
+		return null;
+		// END_VEROLD_MOD - robust keyframes
 	},
 
 	getPrevKeyWith: function ( type, h, key ) {
 
 		var keys = this.data.hierarchy[ h ].keys;
 
-		if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-			this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+		// START_VEROLD_MOD - robust keyframes
+		if ( keys !== undefined && keys.length > 0 ) {
+		// END_VEROLD_MOD - robust keyframes
+			
+			if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
+				this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
-			key = key > 0 ? key : 0;
+				key = key > 0 ? key : 0;
 
-		} else {
+			} else {
 
-			key = key >= 0 ? key : key + keys.length;
-
-		}
-
-
-		for ( ; key >= 0; key -- ) {
-
-			if ( keys[ key ][ type ] !== undefined ) {
-
-				return keys[ key ];
+				key = key >= 0 ? key : key + keys.length;
 
 			}
 
+
+			for ( ; key >= 0; key -- ) {
+
+				if ( keys[ key ][ type ] !== undefined ) {
+
+					return keys[ key ];
+
+				}
+
+			}
+		
+		
+			for ( ; key >= 0; key -- ) {
+		
+				if ( keys[ key ][ type ] !== undefined ) {
+		
+					return keys[ key ];
+		
+				}
+		
+			}
+		
+			return this.data.hierarchy[ h ].keys[ keys.length - 1 ];
+			
+		// START_VEROLD_MOD - robust keyframes
 		}
 
-		return this.data.hierarchy[ h ].keys[ keys.length - 1 ];
-
+		return null;
+		// END_VEROLD_MOD - robust keyframes
 	}
 
 };

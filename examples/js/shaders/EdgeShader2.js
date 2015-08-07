@@ -34,9 +34,6 @@ THREE.EdgeShader2 = {
 		"varying vec2 vUv;",
 		"uniform vec2 aspect;",
 
-
-		"vec2 texel = vec2(1.0 / aspect.x, 1.0 / aspect.y);",
-
 		"mat3 G[2];",
 
 		"const mat3 g0 = mat3( 1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0 );",
@@ -45,6 +42,7 @@ THREE.EdgeShader2 = {
 
 		"void main(void)",
 		"{",
+			"vec2 texel = vec2(1.0 / aspect.x, 1.0 / aspect.y);",
 			"mat3 I;",
 			"float cnv[2];",
 			"vec3 sample;",

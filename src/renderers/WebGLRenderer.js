@@ -517,6 +517,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	//START_VEROLD_MOD
+	this.getViewport = function () {
+		var viewport = {
+			x: _viewportX / pixelRatio,
+			y: _viewportY / pixelRatio,
+			width: _viewportWidth / pixelRatio,
+			height: _viewportHeight / pixelRatio,
+		};
+		return viewport;
+	};
+	//END_VEROLD_MOD
+
 	this.setScissor = function ( x, y, width, height ) {
 
 		_gl.scissor(
@@ -643,6 +655,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function onRenderTargetDispose( event ) {
 
 		var renderTarget = event.target;
+
+		// START_VEROLD_MOD
+		if ( window.VAPI ) {
+			window.VAPI.globalEvents.trigger("veroldEngine:textureDebugger:unregisterTexture", renderTarget );
+		}
+		// END_VEROLD_MOD
 
 		renderTarget.removeEventListener( 'dispose', onRenderTargetDispose );
 

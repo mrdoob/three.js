@@ -192,12 +192,14 @@ THREE.BufferGeometry.prototype = {
 
 			direct.verticesNeedUpdate = geometry.verticesNeedUpdate;
 			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
+			direct.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
 			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
 			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
 			direct.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
 
 			geometry.verticesNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
+			geometry.tangentsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
 			geometry.uvsNeedUpdate = false;
 			geometry.tangentsNeedUpdate = false;
@@ -233,6 +235,21 @@ THREE.BufferGeometry.prototype = {
 			}
 
 			geometry.normalsNeedUpdate = false;
+
+		}
+
+		if ( geometry.tangentsNeedUpdate === true ) {
+
+			var attribute = this.attributes.tangent;
+
+			if ( attribute !== undefined ) {
+
+				attribute.copyVector4sArray( geometry.tangents );
+				attribute.needsUpdate = true;
+
+			}
+
+			geometry.tangentsNeedUpdate = false;
 
 		}
 
@@ -302,6 +319,13 @@ THREE.BufferGeometry.prototype = {
 
 			var normals = new Float32Array( geometry.normals.length * 3 );
 			this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
+
+		}
+
+		if ( geometry.tangents.length > 0 ) {
+
+			var tangents = new Float32Array( geometry.tangents.length * 4 );
+			this.addAttribute( 'tangent', new THREE.BufferAttribute( tangents, 4 ).copyVector4sArray( geometry.tangents ) );
 
 		}
 
@@ -702,19 +726,24 @@ THREE.BufferGeometry.prototype = {
 			t1 = uvB.y - uvA.y;
 			t2 = uvC.y - uvA.y;
 
-			r = 1.0 / ( s1 * t2 - s2 * t1 );
+			// START_VEROLD_MOD - tangents
+			r = s1 * t2 - s2 * t1;
 
 			sdir.set(
-				( t2 * x1 - t1 * x2 ) * r,
-				( t2 * y1 - t1 * y2 ) * r,
-				( t2 * z1 - t1 * z2 ) * r
+				t2 * x1 - t1 * x2,
+				t2 * y1 - t1 * y2,
+				t2 * z1 - t1 * z2
 			);
 
 			tdir.set(
-				( s1 * x2 - s2 * x1 ) * r,
-				( s1 * y2 - s2 * y1 ) * r,
-				( s1 * z2 - s2 * z1 ) * r
+				s1 * x2 - s2 * x1,
+				s1 * y2 - s2 * y1,
+				s1 * z2 - s2 * z1
 			);
+
+			sdir.divideScalar( r );
+			tdir.divideScalar( r );
+			// END_VEROLD_MOD - tangents
 
 			tan1[ a ].add( sdir );
 			tan1[ b ].add( sdir );

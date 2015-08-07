@@ -109,6 +109,14 @@ THREE.BasicShadowMap = 0;
 THREE.PCFShadowMap = 1;
 THREE.PCFSoftShadowMap = 2;
 
+// HDR TYPE CONSTANTS
+
+THREE.HDRFull = 0;
+THREE.HDRRGBM = 1;
+THREE.HDRRGBD = 2;
+THREE.HDRLOGLUV = 3;
+THREE.HDRRGBE = 4;
+
 // MATERIAL CONSTANTS
 
 // side
@@ -244,6 +252,13 @@ THREE.LuminanceAlphaFormat = 1023;
 // THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
 THREE.RGBEFormat = THREE.RGBAFormat; //1024;
 
+// HDR formats
+
+THREE.RGBMHDRFormat = 1024;
+THREE.RGBDHDRFormat = 1025;
+THREE.RGBEHDRFormat = 1026;
+THREE.LogLuvHDRFormat = 1027;
+
 // DDS / ST3C Compressed texture formats
 
 THREE.RGB_S3TC_DXT1_Format = 2001;
@@ -259,6 +274,10 @@ THREE.RGB_PVRTC_2BPPV1_Format = 2101;
 THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 
+// ATC compressed texture formats
+THREE.RGB_ATC_Format = 2200;
+THREE.RGBA_ATC_EXPLICIT_ALPHA_Format = 2201;
+THREE.RGBA_ATC_INTERP_ALPHA_Format = 2202;
 
 // DEPRECATED
 

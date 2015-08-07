@@ -359,6 +359,14 @@ THREE.Vector2.prototype = {
 
 	},
 
+	//START_VEROLD_MOD
+	angleTo: function ( v ) {
+
+		return Math.acos( this.dot( v ) / this.length() / v.length() );
+
+	},
+	//END_VEROLD_MOD
+
 	distanceTo: function ( v ) {
 
 		return Math.sqrt( this.distanceToSquared( v ) );

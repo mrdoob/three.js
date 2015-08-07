@@ -108,7 +108,8 @@ THREE.Object3D.prototype = {
 	},
 
 	set useQuaternion ( value ) {
-
+		//Firefox doesn't like when setters don't have a parameter and minifiers strip unused parameters out. So, let's use 'value'.
+		var tmp = value;
 		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},

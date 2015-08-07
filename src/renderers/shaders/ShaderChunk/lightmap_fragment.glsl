@@ -1,5 +1,18 @@
 #ifdef USE_LIGHTMAP
 
-	totalAmbientLight += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
+  vec4 lightMapColor = texture2D( lightMap, vUv2 );
+  #ifdef LIGHTMAP_HDR_INPUT
+    #if LIGHTMAP_HDR_INPUT == HDR_TYPE_RGBM
+      lightMapColor.xyz = HDRDecodeRGBM( lightMapColor );
+    #elif LIGHTMAP_HDR_INPUT == HDR_TYPE_RGBD
+      lightMapColor.xyz = HDRDecodeRGBD( lightMapColor );
+    #elif LIGHTMAP_HDR_INPUT == HDR_TYPE_LOGLUV
+      lightMapColor.xyz = HDRDecodeLOGLUV( lightMapColor );
+    #elif LIGHTMAP_HDR_INPUT == HDR_TYPE_RGBE
+      lightMapColor.xyz = HDRDecodeRGBE( lightMapColor );
+    #endif
+  #endif
+
+	totalAmbientLight += lightMapColor.xyz * lightMapIntensity;
 
 #endif

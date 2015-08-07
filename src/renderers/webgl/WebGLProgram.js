@@ -97,6 +97,25 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
+		var hdrOutputTypeDefine = null;
+		if ( renderer.hdrOutputEnabled ) {
+			if ( parameters.hdrOutputEnabled !== false ) {
+				var outputType = parameters.hdrOutputType ? parameters.hdrOutputType : renderer.hdrOutputType;
+				if ( outputType === THREE.HDRRGBM ) {
+					hdrOutputTypeDefine = "HDR_OUTPUT_RGBM";
+				}
+				else if ( outputType === THREE.HDRRGBD ) {
+					hdrOutputTypeDefine = "HDR_OUTPUT_RGBD";
+				}
+				else if ( outputType === THREE.HDRLOGLUV ) {
+					hdrOutputTypeDefine = "HDR_OUTPUT_LOGLUV";
+				}
+				else if ( outputType === THREE.HDRRGBE ) {
+					hdrOutputTypeDefine = "HDR_OUTPUT_RGBE";
+				}
+			}
+		}
+
 		var envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
 		var envMapModeDefine = 'ENVMAP_MODE_REFLECTION';
 		var envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
@@ -289,6 +308,13 @@ THREE.WebGLProgram = ( function () {
 
 				customDefines,
 
+				"#define HDR_TYPE_RGBM " + THREE.HDRRGBM,
+				"#define HDR_TYPE_RGBD " + THREE.HDRRGBD,
+				"#define HDR_TYPE_RGBE " + THREE.HDRRGBE,
+				"#define HDR_TYPE_LOGLUV " + THREE.HDRLOGLUV,
+
+				renderer.hdrInputEnabled && parameters.hdrInputEnabled !== false ? "#define HDR_INPUT" : "",
+
 				'#define MAX_DIR_LIGHTS ' + parameters.maxDirLights,
 				'#define MAX_POINT_LIGHTS ' + parameters.maxPointLights,
 				'#define MAX_SPOT_LIGHTS ' + parameters.maxSpotLights,
@@ -301,6 +327,8 @@ THREE.WebGLProgram = ( function () {
 				renderer.gammaInput ? '#define GAMMA_INPUT' : '',
 				renderer.gammaOutput ? '#define GAMMA_OUTPUT' : '',
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
+
+				hdrOutputTypeDefine ? "#define " + hdrOutputTypeDefine : "",
 
 				( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
 				( parameters.useFog && parameters.fogExp ) ? '#define FOG_EXP2' : '',

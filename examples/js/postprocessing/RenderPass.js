@@ -6,7 +6,7 @@ THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clear
 
 	this.scene = scene;
 	this.camera = camera;
-
+	
 	this.overrideMaterial = overrideMaterial;
 
 	this.clearColor = clearColor;
@@ -27,6 +27,10 @@ THREE.RenderPass.prototype = {
 
 		this.scene.overrideMaterial = this.overrideMaterial;
 
+		//START_VEROLD_MOD
+		this.scene.overrideUniforms = this.overrideUniforms;
+		//END_VEROLD_MOD
+
 		if ( this.clearColor ) {
 
 			this.oldClearColor.copy( renderer.getClearColor() );
@@ -36,7 +40,16 @@ THREE.RenderPass.prototype = {
 
 		}
 
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+		//renderer.render( this.scene, this.camera, readBuffer, this.clear );
+		if ( this.renderToScreen ) {
+
+			renderer.render( this.scene, this.camera );
+
+		} else {
+
+			renderer.render( this.scene, this.camera, readBuffer, this.clear );
+
+		}
 
 		if ( this.clearColor ) {
 
