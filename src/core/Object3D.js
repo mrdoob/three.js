@@ -172,7 +172,7 @@ THREE.Object3D.prototype = {
 
 			return this;
 
-		}
+		};
 
 	}(),
 
@@ -227,7 +227,7 @@ THREE.Object3D.prototype = {
 
 			return this;
 
-		}
+		};
 
 	}(),
 
@@ -443,7 +443,7 @@ THREE.Object3D.prototype = {
 
 			return result;
 
-		}
+		};
 
 	}(),
 
@@ -459,7 +459,7 @@ THREE.Object3D.prototype = {
 
 			return result.setFromQuaternion( quaternion, this.rotation.order, false );
 
-		}
+		};
 
 	}(),
 
@@ -478,7 +478,7 @@ THREE.Object3D.prototype = {
 
 			return result;
 
-		}
+		};
 
 	}(),
 
@@ -494,7 +494,7 @@ THREE.Object3D.prototype = {
 
 			return result.set( 0, 0, 1 ).applyQuaternion( quaternion );
 
-		}
+		};
 
 	}(),
 

@@ -40,7 +40,7 @@ bl_info = {
     'name': "Three.js Format",
     'author': "repsac, mrdoob, yomotsu, mpk, jpweeks, rkusa, tschw",
     'version': (1, 4, 0),
-    'blender': (2, 7, 3),
+    'blender': (2, 73, 0),
     'location': "File > Export",
     'description': "Export Three.js formatted JSON files.",
     'warning': "Importer not included.",
