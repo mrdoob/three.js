@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
+THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments, normal, center ) {
 
 	THREE.Geometry.call( this );
 
@@ -14,9 +14,11 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 		height: height,
 		widthSegments: widthSegments,
 		heightSegments: heightSegments
+		normal: normal,
+		center: center
 	};
 
-	this.fromBufferGeometry( new THREE.PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
+	this.fromBufferGeometry( new THREE.PlaneBufferGeometry( width, height, widthSegments, heightSegments, normal, center ) );
 
 };
 
@@ -29,7 +31,9 @@ THREE.PlaneGeometry.prototype.clone = function () {
 		this.parameters.width,
 		this.parameters.height,
 		this.parameters.widthSegments,
-		this.parameters.heightSegments
+		this.parameters.heightSegments,
+		this.parameters.normal.clone(),
+		this.parameters.center.clone()
 	);
 
 	return geometry;
