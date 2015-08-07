@@ -206,17 +206,18 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				webglObject = _renderList[ j ];
 
 				object = webglObject.object;
+				objectMaterial = object.material;
 
-				// culling is overridden globally for all objects
-				// while rendering depth map
+				if ( objectMaterial instanceof THREE.MeshFaceMaterial ) {
 
-				// need to deal with MeshFaceMaterial somehow
-				// in that case just use the first of material.materials for now
-				// (proper solution would require to break objects by materials
-				//  similarly to regular rendering and then set corresponding
-				//  depth materials per each chunk instead of just once per object)
+					// For the moment just ignore objects that have multiple materials with different animation methods
+					// Only the first material will be taken into account for deciding which depth material to use for shadow maps
 
-				objectMaterial = getObjectMaterial( object );
+					objectMaterial = object.material.materials[ 0 ];
+
+					if ( objectMaterial.visible === false ) continue;
+
+				}
 
 				useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
 				useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
@@ -291,17 +292,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			projectObject( children[ i ], camera );
 
 		}
-
-	}
-
-	// For the moment just ignore objects that have multiple materials with different animation methods
-	// Only the first material will be taken into account for deciding which depth material to use for shadow maps
-
-	function getObjectMaterial( object ) {
-
-		return object.material instanceof THREE.MeshFaceMaterial
-			? object.material.materials[ 0 ]
-			: object.material;
 
 	}
 
