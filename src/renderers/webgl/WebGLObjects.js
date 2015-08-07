@@ -198,13 +198,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		for ( var i = 0, ul = renderList.length; i < ul; i ++ ) {
 
-			var object = renderList[ i ].object;
-
-			if ( object.material.visible !== false ) {
-
-				updateObject( object );
-
-			}
+			updateObject( renderList[ i ].object );
 
 		}
 

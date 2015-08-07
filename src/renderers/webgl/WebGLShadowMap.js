@@ -218,8 +218,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				objectMaterial = getObjectMaterial( object );
 
-				if ( objectMaterial.visible === false ) continue;
-
 				useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
 				useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
 
@@ -275,8 +273,14 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		if ( webglObject && object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-			object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-			_renderList.push( webglObject );
+			var material = object.material;
+
+			if ( material.visible === true ) {
+
+				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+				_renderList.push( webglObject );
+
+			}
 
 		}
 

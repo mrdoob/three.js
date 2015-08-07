@@ -347,7 +347,9 @@ THREE.Projector = function () {
 
 			} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Sprite ) {
 
-				if ( object.material.visible === false ) return;
+				var material = object.material;
+
+				if ( material.visible === false ) return;
 
 				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 

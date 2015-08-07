@@ -877,15 +877,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( var i = 0, il = materials.length; i < il; i ++ ) {
 
-				_this.renderBufferDirect( camera, lights, fog, materials[ i ], object );
+				material = materials[ i ];
+
+				if ( material.visible === false ) continue;
+
+				_this.renderBufferDirect( camera, lights, fog, material, object );
 
 			}
 
 			return;
 
 		}
-
-		if ( material.visible === false ) return;
 
 		setMaterial( material );
 
@@ -1768,28 +1770,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var material = object.material;
 
-					if ( properties.get( material ) ) {
+					if ( material.visible === true ) {
 
-						material.program = properties.get( material ).program;
+						if ( properties.get( material ) ) {
 
-					}
+							material.program = properties.get( material ).program;
 
-					if ( material.transparent ) {
+						}
 
-						transparentObjects.push( webglObject );
+						if ( material.transparent ) {
 
-					} else {
+							transparentObjects.push( webglObject );
 
-						opaqueObjects.push( webglObject );
+						} else {
 
-					}
+							opaqueObjects.push( webglObject );
 
-					if ( _this.sortObjects === true ) {
+						}
 
-						_vector3.setFromMatrixPosition( object.matrixWorld );
-						_vector3.applyProjection( _projScreenMatrix );
+						if ( _this.sortObjects === true ) {
 
-						webglObject.z = _vector3.z;
+							_vector3.setFromMatrixPosition( object.matrixWorld );
+							_vector3.applyProjection( _projScreenMatrix );
+
+							webglObject.z = _vector3.z;
+
+						}
 
 					}
 
