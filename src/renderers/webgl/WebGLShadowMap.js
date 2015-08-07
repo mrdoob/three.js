@@ -215,7 +215,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 					objectMaterial = object.material.materials[ 0 ];
 
-					if ( objectMaterial.visible === false ) continue;
+					if ( objectMaterial === null || objectMaterial.visible === false ) continue;
 
 				}
 
@@ -276,7 +276,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			var material = object.material;
 
-			if ( material.visible === true ) {
+			if ( material !== null && material.visible === true ) {
 
 				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 				_renderList.push( webglObject );

@@ -349,7 +349,7 @@ THREE.Projector = function () {
 
 				var material = object.material;
 
-				if ( material.visible === false ) return;
+				if ( material === null || material.visible === false ) return;
 
 				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 

@@ -879,7 +879,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				material = materials[ i ];
 
-				if ( material.visible === false ) continue;
+				if ( material === null || material.visible === false ) continue;
 
 				_this.renderBufferDirect( camera, lights, fog, material, object );
 
@@ -1770,7 +1770,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var material = object.material;
 
-					if ( material.visible === true ) {
+					if ( material !== null && material.visible === true ) {
 
 						if ( properties.get( material ) ) {
 
