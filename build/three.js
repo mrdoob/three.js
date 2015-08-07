@@ -8259,9 +8259,11 @@ THREE.Object3D.prototype = {
 
 		callback( this );
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+		var children = this.children;
 
-			this.children[ i ].traverse( callback );
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].traverse( callback );
 
 		}
 
@@ -8273,9 +8275,11 @@ THREE.Object3D.prototype = {
 
 		callback( this );
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+		var children = this.children;
 
-			this.children[ i ].traverseVisible( callback );
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].traverseVisible( callback );
 
 		}
 
@@ -8283,11 +8287,13 @@ THREE.Object3D.prototype = {
 
 	traverseAncestors: function ( callback ) {
 
-		if ( this.parent ) {
+		var parent = this.parent;
 
-			callback( this.parent );
+		if ( parent !== undefined ) {
 
-			this.parent.traverseAncestors( callback );
+			callback( parent );
+
+			parent.traverseAncestors( callback );
 
 		}
 
@@ -15829,6 +15835,8 @@ THREE.MeshFaceMaterial = function ( materials ) {
 
 	this.materials = materials instanceof Array ? materials : [];
 
+	this.visible = true;
+
 };
 
 THREE.MeshFaceMaterial.prototype = {
@@ -15854,6 +15862,8 @@ THREE.MeshFaceMaterial.prototype = {
 
 		}
 
+		output.visible = this.visible;
+
 		return output;
 
 	},
@@ -15867,6 +15877,8 @@ THREE.MeshFaceMaterial.prototype = {
 			material.materials.push( this.materials[ i ].clone() );
 
 		}
+
+		material.visible = this.visible;
 
 		return material;
 
@@ -19850,17 +19862,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_canvas.addEventListener( 'webglcontextlost', function ( event ) {
-
-			event.preventDefault();
-
-			resetGLState();
-			setDefaultGLState();
-
-			objects.clear();
-			properties.clear();
-
-		}, false );
+		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 
 	} catch ( error ) {
 
@@ -20284,7 +20286,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.resetGLState = resetGLState;
 
+	this.dispose = function() {
+
+		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
+
+	};
+
 	// Events
+
+	function onContextLost( event ) {
+
+		event.preventDefault();
+
+		resetGLState();
+		setDefaultGLState();
+
+		objects.clear();
+		properties.clear();
+
+	};
 
 	function onTextureDispose( event ) {
 
@@ -20544,15 +20564,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( var i = 0, il = materials.length; i < il; i ++ ) {
 
-				_this.renderBufferDirect( camera, lights, fog, materials[ i ], object );
+				material = materials[ i ];
+
+				if ( material === null || material.visible === false ) continue;
+
+				_this.renderBufferDirect( camera, lights, fog, material, object );
 
 			}
 
 			return;
 
 		}
-
-		if ( material.visible === false ) return;
 
 		setMaterial( material );
 
@@ -21384,56 +21406,58 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function projectObject( object ) {
 
-		if ( object.visible === true ) {
+		if ( object.visible === false ) return;
 
-			if ( object instanceof THREE.Scene || object instanceof THREE.Group ) {
+		if ( object instanceof THREE.Scene || object instanceof THREE.Group ) {
 
-				// skip
+			// skip
 
-			} else {
+		} else {
 
-				// update Skeleton objects
-				if ( object instanceof THREE.SkinnedMesh ) {
+			// update Skeleton objects
+			if ( object instanceof THREE.SkinnedMesh ) {
 
-					object.skeleton.update();
+				object.skeleton.update();
 
-				}
+			}
 
-				objects.init( object );
+			objects.init( object );
 
-				if ( object instanceof THREE.Light ) {
+			if ( object instanceof THREE.Light ) {
 
-					lights.push( object );
+				lights.push( object );
 
-				} else if ( object instanceof THREE.Sprite ) {
+			} else if ( object instanceof THREE.Sprite ) {
 
-					sprites.push( object );
+				sprites.push( object );
 
-				} else if ( object instanceof THREE.LensFlare ) {
+			} else if ( object instanceof THREE.LensFlare ) {
 
-					lensFlares.push( object );
+				lensFlares.push( object );
 
-				} else if ( object instanceof THREE.ImmediateRenderObject ) {
+			} else if ( object instanceof THREE.ImmediateRenderObject ) {
 
-					var material = object.material;
+				var material = object.material;
 
-					if ( material.transparent ) {
+				if ( material.transparent ) {
 
-						transparentImmediateObjects.push( object );
-
-					} else {
-
-						opaqueImmediateObjects.push( object );
-
-					}
+					transparentImmediateObjects.push( object );
 
 				} else {
 
-					var webglObject = objects.objects[ object.id ];
+					opaqueImmediateObjects.push( object );
 
-					if ( webglObject && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+				}
 
-						var material = object.material;
+			} else {
+
+				var webglObject = objects.objects[ object.id ];
+
+				if ( webglObject && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+
+					var material = object.material;
+
+					if ( material !== null && material.visible === true ) {
 
 						if ( properties.get( material ) ) {
 
@@ -21466,11 +21490,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+		}
 
-				projectObject( object.children[ i ] );
+		var children = object.children;
 
-			}
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			projectObject( children[ i ] );
 
 		}
 
@@ -24267,13 +24293,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		for ( var i = 0, ul = renderList.length; i < ul; i ++ ) {
 
-			var object = renderList[ i ].object;
-
-			if ( object.material.visible !== false ) {
-
-				updateObject( object );
-
-			}
+			updateObject( renderList[ i ].object );
 
 		}
 
@@ -25079,19 +25099,18 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				webglObject = _renderList[ j ];
 
 				object = webglObject.object;
+				objectMaterial = object.material;
 
-				// culling is overridden globally for all objects
-				// while rendering depth map
+				if ( objectMaterial instanceof THREE.MeshFaceMaterial ) {
 
-				// need to deal with MeshFaceMaterial somehow
-				// in that case just use the first of material.materials for now
-				// (proper solution would require to break objects by materials
-				//  similarly to regular rendering and then set corresponding
-				//  depth materials per each chunk instead of just once per object)
+					// For the moment just ignore objects that have multiple materials with different animation methods
+					// Only the first material will be taken into account for deciding which depth material to use for shadow maps
 
-				objectMaterial = getObjectMaterial( object );
+					objectMaterial = object.material.materials[ 0 ];
 
-				if ( objectMaterial.visible === false ) continue;
+					if ( objectMaterial === null || objectMaterial.visible === false ) continue;
+
+				}
 
 				useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
 				useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
@@ -25142,35 +25161,30 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	function projectObject( object, camera ) {
 
-		if ( object.visible === true ) {
+		if ( object.visible === false ) return;
 
-			var webglObject = _objects.objects[ object.id ];
+		var webglObject = _objects.objects[ object.id ];
 
-			if ( webglObject && object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+		if ( webglObject && object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+
+			var material = object.material;
+
+			if ( material !== null && material.visible === true ) {
 
 				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 				_renderList.push( webglObject );
 
 			}
 
-			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
-
-				projectObject( object.children[ i ], camera );
-
-			}
-
 		}
 
-	}
+		var children = object.children;
 
-	// For the moment just ignore objects that have multiple materials with different animation methods
-	// Only the first material will be taken into account for deciding which depth material to use for shadow maps
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-	function getObjectMaterial( object ) {
+			projectObject( children[ i ], camera );
 
-		return object.material instanceof THREE.MeshFaceMaterial
-			? object.material.materials[ 0 ]
-			: object.material;
+		}
 
 	}
 
