@@ -18,22 +18,33 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 		cetner: center
 	};
 	
-	if( normal === undefined ) {
+	if ( normal === undefined ) {
+		
 		normal = new THREE.Vector3( 0, 0, 1 );
+		
 	} else {
+		
 		normal = normal.normalize( );
+		
 	}
 	
-	if( center === undefined ) {
+	if ( center === undefined ) {
+		
 		center = new THREE.Vector3( 0, 0, 0 );
+		
 	}
 	
 	// create an arbitrary (but nonparalell) vector to cross with the normal to get a vector in the desired plane.
 	var nonParallel;
-	if( normal.x === 0 && normal.z === 0 ) {
+	
+	if ( normal.x === 0 && normal.z === 0 ) {
+		
 		nonParallel = new THREE.Vector3( 0, 0, 1 );
+		
 	} else {
+		
 		nonParallel = new THREE.Vector3( 0, 1, 0 );
+		
 	}
 	
 	// note that the primaryVector will be ( 1, 0, 0 ) if the normal is not passed, resulting in the 
