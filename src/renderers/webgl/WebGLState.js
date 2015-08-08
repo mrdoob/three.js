@@ -126,7 +126,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) ||
 			     extensions.get( 'WEBGL_compressed_texture_s3tc' ) ) {
 
-				var formats = gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS );
+				var formats = gl.getParameter( gl.COMPRESSED_TEXTURE_FORMATS );
 
 				for ( var i = 0; i < formats.length; i ++ ) {
 
