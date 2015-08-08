@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegments ) {
+THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegments, normal, center ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -13,8 +13,51 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 		width: width,
 		height: height,
 		widthSegments: widthSegments,
-		heightSegments: heightSegments
+		heightSegments: heightSegments,
+		normal: normal,
+		cetner: center
 	};
+	
+	if ( normal === undefined ) {
+		
+		normal = new THREE.Vector3( 0, 0, 1 );
+		
+	} else {
+		
+		normal = normal.normalize( );
+		
+	}
+	
+	if ( center === undefined ) {
+		
+		center = new THREE.Vector3( 0, 0, 0 );
+		
+	}
+	
+	// create an arbitrary (but nonparalell) vector to cross with the normal to get a vector in the desired plane.
+	var nonParallel;
+	
+	if ( normal.x === 0 && normal.z === 0 ) {
+		
+		nonParallel = new THREE.Vector3( 0, 0, 1 );
+		
+	} else {
+		
+		nonParallel = new THREE.Vector3( 0, 1, 0 );
+		
+	}
+	
+	// note that the primaryVector will be ( 1, 0, 0 ) if the normal is not passed, resulting in the 
+	// same behaviour as before the option to change the normal was added.
+	var primaryVector = nonParallel.cross( normal ).normalize( );
+	
+	// as above, this will be ( 0, -1, 0 ) if the normal is not passed, resulting in the previous behaviour.
+	// primary and normal are perpendicular unit vectors, so this is already normalized.
+	var secondaryVector = primaryVector.clone( ).cross( normal );
+	
+	// scratch vectors for calculating vertex position
+	var primaryScratch = new THREE.Vector3( );
+	var secondaryScratch = new THREE.Vector3( );
 
 	var width_half = width / 2;
 	var height_half = height / 2;
@@ -42,11 +85,18 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 		for ( var ix = 0; ix < gridX1; ix ++ ) {
 
 			var x = ix * segment_width - width_half;
+			
+			primaryScratch.copy( primaryVector ).multiplyScalar( x );
+			secondaryScratch.copy( secondaryVector ).multiplyScalar( y );
+			primaryScratch.add( secondaryScratch ).add( center );
 
-			vertices[ offset ] = x;
-			vertices[ offset + 1 ] = - y;
+			vertices[ offset     ] = primaryScratch.x;
+			vertices[ offset + 1 ] = primaryScratch.y;
+			vertices[ offset + 2 ] = primaryScratch.z;
 
-			normals[ offset + 2 ] = 1;
+			normals[ offset     ] = normal.x;
+			normals[ offset + 1 ] = normal.y;
+			normals[ offset + 2 ] = normal.z;
 
 			uvs[ offset2 ] = ix / gridX;
 			uvs[ offset2 + 1 ] = 1 - ( iy / gridY );
@@ -101,7 +151,9 @@ THREE.PlaneBufferGeometry.prototype.clone = function () {
 		this.parameters.width,
 		this.parameters.height,
 		this.parameters.widthSegments,
-		this.parameters.heightSegments
+		this.parameters.heightSegments,
+		this.parameters.normal.clone(),
+		this.parameters.center.clone()
 	);
 
 	geometry.copy( this );
