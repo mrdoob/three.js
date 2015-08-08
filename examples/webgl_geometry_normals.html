@@ -174,7 +174,7 @@
 				geometry.computeBoundingSphere();
 
 				var scaleFactor = 160 / geometry.boundingSphere.radius;
-				geometry.applyMatrix( new THREE.Matrix4().makeScale( scaleFactor, scaleFactor, scaleFactor ) );
+				geometry.scale( scaleFactor, scaleFactor, scaleFactor );
 
 				var originalGeometry = geometry.clone();
 				originalGeometry.computeFaceNormals();

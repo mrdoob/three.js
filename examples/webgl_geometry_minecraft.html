@@ -95,31 +95,31 @@
 				var pxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				pxGeometry.attributes.uv.array[ 1 ] = 0.5;
 				pxGeometry.attributes.uv.array[ 3 ] = 0.5;
-				pxGeometry.applyMatrix( matrix.makeRotationY( Math.PI / 2 ) );
-				pxGeometry.applyMatrix( matrix.makeTranslation( 50, 0, 0 ) );
+				pxGeometry.rotateY( Math.PI / 2 );
+				pxGeometry.translate( 50, 0, 0 );
 
 				var nxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				nxGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nxGeometry.attributes.uv.array[ 3 ] = 0.5;
-				nxGeometry.applyMatrix( matrix.makeRotationY( - Math.PI / 2 ) );
-				nxGeometry.applyMatrix( matrix.makeTranslation( - 50, 0, 0 ) );
+				nxGeometry.rotateY( - Math.PI / 2 );
+				nxGeometry.translate( - 50, 0, 0 );
 
 				var pyGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				pyGeometry.attributes.uv.array[ 5 ] = 0.5;
 				pyGeometry.attributes.uv.array[ 7 ] = 0.5;
-				pyGeometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
-				pyGeometry.applyMatrix( matrix.makeTranslation( 0, 50, 0 ) );
+				pyGeometry.rotateX( - Math.PI / 2 );
+				pyGeometry.translate( 0, 50, 0 );
 
 				var pzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				pzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				pzGeometry.attributes.uv.array[ 3 ] = 0.5;
-				pzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, 50 ) );
+				pzGeometry.translate( 0, 0, 50 );
 
 				var nzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				nzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nzGeometry.attributes.uv.array[ 3 ] = 0.5;
-				nzGeometry.applyMatrix( matrix.makeRotationY( Math.PI ) );
-				nzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, -50 ) );
+				nzGeometry.rotateY( Math.PI );
+				nzGeometry.translate( 0, 0, -50 );
 
 				//
 

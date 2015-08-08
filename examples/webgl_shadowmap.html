@@ -217,7 +217,7 @@
 				var hudWidth = hudHeight * SHADOW_MAP_WIDTH / SHADOW_MAP_HEIGHT;
 
 				var hudGeo = new THREE.PlaneBufferGeometry( hudWidth, hudHeight );
-				hudGeo.applyMatrix( new THREE.Matrix4().makeTranslation( hudWidth / 2, hudHeight / 2, 0 ) );
+				hudGeo.translate( hudWidth / 2, hudHeight / 2, 0 );
 
 				hudMesh = new THREE.Mesh( hudGeo, hudMaterial );
 

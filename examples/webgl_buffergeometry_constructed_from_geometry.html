@@ -111,9 +111,8 @@
 				bevelThickness: 1
 			};
 			var geom = new THREE.ExtrudeGeometry( heart_shape, extrudeSettings );
-			geom.applyMatrix( new THREE.Matrix4().makeRotationX( -THREE.Math.degToRad( 90 ) ) );
-			geom.applyMatrix( new THREE.Matrix4().makeScale( 0.1, 0.1, 0.1 ) );
-			geom.applyMatrix( new THREE.Matrix4().makeScale( 4, 4, 4 ) );
+			geom.rotateX( - Math.PI / 2 );
+			geom.scale( 0.4, 0.4, 0.4 );
 			return geom;
 
 		}
@@ -149,10 +148,10 @@
 
 					var geometry = createGeometry();
 
-					geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, height / 2, 0 ) );
-					geometry.applyMatrix( new THREE.Matrix4().makeRotationX( -THREE.Math.degToRad( 90 ) ) );
-					geometry.applyMatrix( new THREE.Matrix4().lookAt( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( x, y, z ), new THREE.Vector3( 0, 1, 0 ) ) );
-					geometry.applyMatrix( new THREE.Matrix4().makeTranslation( x, y, z ) );
+					geometry.translate( 0, height / 2, 0 );
+					geometry.rotateX( - Math.PI / 2 );
+					geometry.lookAt( new THREE.Vector3( - x, - y, - z ) );
+					geometry.translate( x, y, z );
 
 					var color = new THREE.Color( 0xffffff );
 					color.setHSL( lat / 180.0, 1.0, 0.7 );
