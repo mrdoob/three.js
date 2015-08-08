@@ -395,7 +395,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 			var tdivisions = divisions * 2;
 
 			var cos, sin;
-			if ( aRotation ) {
+			if ( aRotation !== 0 ) {
 		
 				cos = Math.cos( aRotation );
 				sin = Math.sin( aRotation );
@@ -417,7 +417,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 				tx = aX + xRadius * Math.cos( angle );
 				ty = aY + yRadius * Math.sin( angle );
 
-				if ( aRotation ) {
+				if ( aRotation !== 0 ) {
 
 					// Rotate the point about the center of the ellipse.
 					tx = ( tx - aX ) * cos - ( ty - aY ) * sin + aX;

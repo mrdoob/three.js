@@ -44,7 +44,7 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 	var x = this.aX + this.xRadius * Math.cos( angle );
 	var y = this.aY + this.yRadius * Math.sin( angle );
 
-	if ( this.aRotation ) {
+	if ( this.aRotation !== 0 ) {
 
 		var cos = Math.cos( this.aRotation );
 		var sin = Math.sin( this.aRotation );
