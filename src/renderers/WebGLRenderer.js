@@ -1882,10 +1882,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var maxLightCount = allocateLights( lights );
 		var maxShadows = allocateShadows( lights );
 		var maxBones = allocateBones( object );
+		var precision = _precision;
+
+		if ( material.precision !== null ) {
+
+			precision = state.getMaxPrecision( material.precision );
+
+			if ( precision !== material.precision ) {
+
+				console.warn( 'THREE.WebGLRenderer.initMaterial:', material.precision, 'not supported, using', precision, 'instead.' );
+
+			}
+
+		}
 
 		var parameters = {
 
-			precision: _precision,
+			precision: precision,
 			supportsVertexTextures: _supportsVertexTextures,
 
 			map: !! material.map,
