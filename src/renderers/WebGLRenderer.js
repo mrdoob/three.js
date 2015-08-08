@@ -191,10 +191,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	var state = new THREE.WebGLState( _gl, paramThreeToGL );
-	var properties = new THREE.WebGLProperties();
-	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
-
 	var extensions = new THREE.WebGLExtensions( _gl );
 
 	extensions.get( 'OES_texture_float' );
@@ -215,6 +211,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		extensions.get( 'EXT_frag_depth' );
 
 	}
+
+	var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
+	var properties = new THREE.WebGLProperties();
+	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
 
 	//
 
@@ -279,37 +279,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
-	var getCompressedTextureFormats = ( function () {
 
-		var array;
-
-		return function getCompressedTextureFormats() {
-
-			if ( array !== undefined ) {
-
-				return array;
-
-			}
-
-			array = [];
-
-			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) || extensions.get( 'WEBGL_compressed_texture_s3tc' ) ) {
-
-				var formats = _gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS );
-
-				for ( var i = 0; i < formats.length; i ++ ) {
-
-					array.push( formats[ i ] );
-
-				}
-
-			}
-
-			return array;
-
-		};
-
-	} )();
 
 	//
 
@@ -3348,7 +3318,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
-					if ( getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+					if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
 
 						state.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -3532,7 +3502,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
-								if ( getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+								if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
 
 									state.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
