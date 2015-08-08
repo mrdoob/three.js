@@ -294,12 +294,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
-	var _vertexShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.HIGH_FLOAT );
-	var _vertexShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.MEDIUM_FLOAT );
-
-	var _fragmentShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.HIGH_FLOAT );
-	var _fragmentShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.MEDIUM_FLOAT );
-
 	var getCompressedTextureFormats = ( function () {
 
 		var array;
@@ -332,31 +326,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	} )();
 
-	// clamp precision to maximum available
+	//
 
-	var highpAvailable = _vertexShaderPrecisionHighpFloat.precision > 0 && _fragmentShaderPrecisionHighpFloat.precision > 0;
-	var mediumpAvailable = _vertexShaderPrecisionMediumpFloat.precision > 0 && _fragmentShaderPrecisionMediumpFloat.precision > 0;
+	var _maxPrecision = state.getMaxPrecision( _precision );
 
-	if ( _precision === 'highp' && ! highpAvailable ) {
+	if ( _maxPrecision !== _precision ) {
 
-		if ( mediumpAvailable ) {
-
-			_precision = 'mediump';
-			console.warn( 'THREE.WebGLRenderer: highp not supported, using mediump.' );
-
-		} else {
-
-			_precision = 'lowp';
-			console.warn( 'THREE.WebGLRenderer: highp and mediump not supported, using lowp.' );
-
-		}
-
-	}
-
-	if ( _precision === 'mediump' && ! mediumpAvailable ) {
-
-		_precision = 'lowp';
-		console.warn( 'THREE.WebGLRenderer: mediump not supported, using lowp.' );
+		console.warn( 'THREE.WebGLRenderer:', _precision, 'not supported, using', _maxPrecision, 'instead.' );
+		_precision = _maxPrecision;
 
 	}
 
