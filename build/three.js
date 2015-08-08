@@ -14968,6 +14968,8 @@ THREE.Material = function () {
 
 	this.colorWrite = true;
 
+	this.precision = null; // override the renderer's default precision for this material
+
 	this.polygonOffset = false;
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
@@ -15131,6 +15133,8 @@ THREE.Material.prototype = {
 		this.depthFunc = source.depthFunc;
 		this.depthTest = source.depthTest;
 		this.depthWrite = source.depthWrite;
+
+		this.precision = source.precision;
 
 		this.polygonOffset = source.polygonOffset;
 		this.polygonOffsetFactor = source.polygonOffsetFactor;
@@ -18543,7 +18547,7 @@ THREE.ShaderChunk[ 'logdepthbuf_fragment'] = "#if defined(USE_LOGDEPTHBUF) && de
 
 // File:src/renderers/shaders/ShaderChunk/logdepthbuf_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'logdepthbuf_pars_fragment'] = "#ifdef USE_LOGDEPTHBUF\n\n	uniform float logDepthBufFC;\n\n	#ifdef USE_LOGDEPTHBUF_EXT\n\n		#extension GL_EXT_frag_depth : enable\n		varying float vFragDepth;\n\n	#endif\n\n#endif";
+THREE.ShaderChunk[ 'logdepthbuf_pars_fragment'] = "#ifdef USE_LOGDEPTHBUF\n\n	uniform float logDepthBufFC;\n\n	#ifdef USE_LOGDEPTHBUF_EXT\n\n		varying float vFragDepth;\n\n	#endif\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/logdepthbuf_pars_vertex.glsl
 
@@ -19870,25 +19874,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	var state = new THREE.WebGLState( _gl, paramThreeToGL );
-
-	if ( _gl.getShaderPrecisionFormat === undefined ) {
-
-		_gl.getShaderPrecisionFormat = function () {
-
-			return {
-				'rangeMin': 1,
-				'rangeMax': 1,
-				'precision': 1
-			};
-
-		}
-
-	}
-
-	var properties = new THREE.WebGLProperties();
-	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
-
 	var extensions = new THREE.WebGLExtensions( _gl );
 
 	extensions.get( 'OES_texture_float' );
@@ -19909,6 +19894,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		extensions.get( 'EXT_frag_depth' );
 
 	}
+
+	var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
+	var properties = new THREE.WebGLProperties();
+	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
 
 	//
 
@@ -19973,69 +19962,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
-	var _vertexShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.HIGH_FLOAT );
-	var _vertexShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.MEDIUM_FLOAT );
 
-	var _fragmentShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.HIGH_FLOAT );
-	var _fragmentShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.MEDIUM_FLOAT );
 
-	var getCompressedTextureFormats = ( function () {
+	//
 
-		var array;
+	var _maxPrecision = state.getMaxPrecision( _precision );
 
-		return function getCompressedTextureFormats() {
+	if ( _maxPrecision !== _precision ) {
 
-			if ( array !== undefined ) {
-
-				return array;
-
-			}
-
-			array = [];
-
-			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) || extensions.get( 'WEBGL_compressed_texture_s3tc' ) ) {
-
-				var formats = _gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS );
-
-				for ( var i = 0; i < formats.length; i ++ ) {
-
-					array.push( formats[ i ] );
-
-				}
-
-			}
-
-			return array;
-
-		};
-
-	} )();
-
-	// clamp precision to maximum available
-
-	var highpAvailable = _vertexShaderPrecisionHighpFloat.precision > 0 && _fragmentShaderPrecisionHighpFloat.precision > 0;
-	var mediumpAvailable = _vertexShaderPrecisionMediumpFloat.precision > 0 && _fragmentShaderPrecisionMediumpFloat.precision > 0;
-
-	if ( _precision === 'highp' && ! highpAvailable ) {
-
-		if ( mediumpAvailable ) {
-
-			_precision = 'mediump';
-			console.warn( 'THREE.WebGLRenderer: highp not supported, using mediump.' );
-
-		} else {
-
-			_precision = 'lowp';
-			console.warn( 'THREE.WebGLRenderer: highp and mediump not supported, using lowp.' );
-
-		}
-
-	}
-
-	if ( _precision === 'mediump' && ! mediumpAvailable ) {
-
-		_precision = 'lowp';
-		console.warn( 'THREE.WebGLRenderer: mediump not supported, using lowp.' );
+		console.warn( 'THREE.WebGLRenderer:', _precision, 'not supported, using', _maxPrecision, 'instead.' );
+		_precision = _maxPrecision;
 
 	}
 
@@ -20073,42 +20009,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.supportsInstancedArrays = function () {
 
 		return _supportsInstancedArrays;
-
-	};
-
-	this.supportsFloatTextures = function () {
-
-		return extensions.get( 'OES_texture_float' );
-
-	};
-
-	this.supportsHalfFloatTextures = function () {
-
-		return extensions.get( 'OES_texture_half_float' );
-
-	};
-
-	this.supportsStandardDerivatives = function () {
-
-		return extensions.get( 'OES_standard_derivatives' );
-
-	};
-
-	this.supportsCompressedTextureS3TC = function () {
-
-		return extensions.get( 'WEBGL_compressed_texture_s3tc' );
-
-	};
-
-	this.supportsCompressedTexturePVRTC = function () {
-
-		return extensions.get( 'WEBGL_compressed_texture_pvrtc' );
-
-	};
-
-	this.supportsBlendMinMax = function () {
-
-		return extensions.get( 'EXT_blend_minmax' );
 
 	};
 
@@ -21584,10 +21484,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var maxLightCount = allocateLights( lights );
 		var maxShadows = allocateShadows( lights );
 		var maxBones = allocateBones( object );
+		var precision = _precision;
+
+		if ( material.precision !== null ) {
+
+			precision = state.getMaxPrecision( material.precision );
+
+			if ( precision !== material.precision ) {
+
+				console.warn( 'THREE.WebGLRenderer.initMaterial:', material.precision, 'not supported, using', precision, 'instead.' );
+
+			}
+
+		}
 
 		var parameters = {
 
-			precision: _precision,
+			precision: precision,
 			supportsVertexTextures: _supportsVertexTextures,
 
 			map: !! material.map,
@@ -23052,7 +22965,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
-					if ( getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+					if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
 
 						state.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -23236,7 +23149,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
-								if ( getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+								if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
 
 									state.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -23738,6 +23651,48 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	// DEPRECATED
+
+	this.supportsFloatTextures = function () {
+
+		console.warn( 'THREE.WebGLRenderer: .supportsFloatTextures() is now .extensions.get( \'OES_texture_float\' ).' );
+		return extensions.get( 'OES_texture_float' );
+
+	};
+
+	this.supportsHalfFloatTextures = function () {
+
+		console.warn( 'THREE.WebGLRenderer: .supportsHalfFloatTextures() is now .extensions.get( \'OES_texture_half_float\' ).' );
+		return extensions.get( 'OES_texture_half_float' );
+
+	};
+
+	this.supportsStandardDerivatives = function () {
+
+		console.warn( 'THREE.WebGLRenderer: .supportsStandardDerivatives() is now .extensions.get( \'OES_standard_derivatives\' ).' );
+		return extensions.get( 'OES_standard_derivatives' );
+
+	};
+
+	this.supportsCompressedTextureS3TC = function () {
+
+		console.warn( 'THREE.WebGLRenderer: .supportsCompressedTextureS3TC() is now .extensions.get( \'WEBGL_compressed_texture_s3tc\' ).' );
+		return extensions.get( 'WEBGL_compressed_texture_s3tc' );
+
+	};
+
+	this.supportsCompressedTexturePVRTC = function () {
+
+		console.warn( 'THREE.WebGLRenderer: .supportsCompressedTexturePVRTC() is now .extensions.get( \'WEBGL_compressed_texture_pvrtc\' ).' );
+		return extensions.get( 'WEBGL_compressed_texture_pvrtc' );
+
+	};
+
+	this.supportsBlendMinMax = function () {
+
+		console.warn( 'THREE.WebGLRenderer: .supportsBlendMinMax() is now .extensions.get( \'EXT_blend_minmax\' ).' );
+		return extensions.get( 'EXT_blend_minmax' );
+
+	};
 
 	this.initMaterial = function () {
 
@@ -24591,7 +24546,8 @@ THREE.WebGLProgram = ( function () {
 
 			prefixFragment = [
 
-				( parameters.bumpMap || parameters.normalMap || parameters.flatShading || material.derivatives ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+				parameters.bumpMap || parameters.normalMap || parameters.flatShading || material.derivatives ? '#extension GL_OES_standard_derivatives : enable' : '',
+				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
@@ -25196,7 +25152,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLState = function ( gl, paramThreeToGL ) {
+THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var _this = this;
 
@@ -25204,6 +25160,8 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var enabledAttributes = new Uint8Array( 16 );
 
 	var capabilities = {};
+
+	var compressedTextureFormats = null;
 
 	var currentBlending = null;
 	var currentBlendEquation = null;
@@ -25306,6 +25264,61 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 			capabilities[ id ] = false;
 
 		}
+
+	};
+
+	this.getCompressedTextureFormats = function () {
+
+		if ( compressedTextureFormats === null ) {
+
+			compressedTextureFormats = [];
+
+			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) ||
+			     extensions.get( 'WEBGL_compressed_texture_s3tc' ) ) {
+
+				var formats = gl.getParameter( gl.COMPRESSED_TEXTURE_FORMATS );
+
+				for ( var i = 0; i < formats.length; i ++ ) {
+
+					compressedTextureFormats.push( formats[ i ] );
+
+				}
+
+			}
+
+		}
+
+		return compressedTextureFormats;
+
+	};
+
+	this.getMaxPrecision = function ( precision ) {
+
+		if ( precision === 'highp' ) {
+
+			if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.HIGH_FLOAT ).precision > 0 &&
+			     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.HIGH_FLOAT ).precision > 0 ) {
+
+				return 'highp';
+
+			}
+
+			precision = 'mediump';
+
+		}
+
+		if ( precision === 'mediump' ) {
+
+			if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.MEDIUM_FLOAT ).precision > 0 &&
+			     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT ).precision > 0 ) {
+
+				return 'mediump';
+
+			}
+
+		}
+
+		return 'lowp';
 
 	};
 
@@ -25652,6 +25665,8 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 		}
 
 		capabilities = {};
+
+		compressedTextureFormats = null;
 
 		currentBlending = null;
 
