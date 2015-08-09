@@ -267,7 +267,7 @@
 				// floor
 
 				geometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				geometry.rotateX( - Math.PI / 2 );
 
 				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 

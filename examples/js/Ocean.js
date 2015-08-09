@@ -210,7 +210,7 @@ THREE.Ocean.prototype.generateMesh = function () {
 
 	var geometry = new THREE.PlaneBufferGeometry( this.geometrySize, this.geometrySize, this.geometryResolution, this.geometryResolution );
 
-	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+	geometry.rotateX( - Math.PI / 2 );
 
 	this.oceanMesh = new THREE.Mesh( geometry, this.materialOcean );
 

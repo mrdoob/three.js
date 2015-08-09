@@ -170,14 +170,12 @@
 
 				var materialargs = {
 					color: 0xffffff,
-					specular: 0xffaa00,
+					specular: 0x050505,
 					shininess: 50,
 					shading: THREE.SmoothShading,
 					emissive: 0x000000
 				};
 
-				var geomtransform = new THREE.Matrix4();
-				var tmpvec = new THREE.Vector3();
 				var meshes = [];
 				var coloroffset = 0;
 				var colorskip = ['black', 'antiquewhite', 'bisque', 'beige', 'blanchedalmond', 'darkblue', 'darkcyan'];
@@ -195,8 +193,7 @@
 					labelgeo.computeBoundingSphere();
 
 					// center text
-					geomtransform.setPosition( tmpvec.set( -labelgeo.boundingSphere.radius, 0, 0 ) );
-					labelgeo.applyMatrix( geomtransform );
+					labelgeo.translate( - labelgeo.boundingSphere.radius, 0, 0 );
 
 					// Pick a color at "random".  Exclude black, because it looks bad.
 					while ( colorskip.indexOf( colorkeys[ i + coloroffset ] ) != -1 ) {
