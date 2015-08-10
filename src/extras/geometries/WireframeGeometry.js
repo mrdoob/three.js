@@ -13,13 +13,18 @@ THREE.WireframeGeometry = function ( geometry ) {
 	};
 
 	var keys = [ 'a', 'b', 'c' ];
-	var vertices, skinWeights, skinIndices, wireSkinIndices, wireSkinWeights;
+	var vertices,
+		skinWeights, 
+		skinIndices,
+		wireSkinIndices,
+		wireSkinWeights,
+		drawcalls;
 	var i, j, il, l, index;
 	this.skinning = false;
 
 	if ( geometry instanceof THREE.Geometry ) {
     
-    geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+		geometry = new THREE.BufferGeometry().fromGeometry( geometry );
 	
 	}
 
@@ -30,7 +35,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 		vertices = geometry.attributes.position.array;
 
 		var indices = geometry.attributes.index.array;
-		var drawcalls = geometry.drawcalls;
+		drawcalls = geometry.drawcalls;
 		
 		if ( drawcalls.length === 0 ) {
 			drawcalls = [ { count : indices.length, index : 0, start : 0 } ];
@@ -59,7 +64,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 		this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'index', new THREE.BufferAttribute( wireframeIndices, 1 ) );
-
+		this.drawcalls = drawcalls;
 		if ( geometry.attributes.skinIndex && geometry.attributes.skinWeight ) {
 			skinIndices = geometry.attributes.skinIndex.array;
 			skinWeights = geometry.attributes.skinWeight.array;

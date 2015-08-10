@@ -16,9 +16,13 @@ THREE.WireframeHelper = function ( object, hex ) {
 	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: color, skinning: skinning } ) );
 
 	this.matrix = object.matrixWorld;
-	this.matrixAutoUpdate = true;
-
+	this.matrixAutoUpdate = false;
+	this.object = object;
 };
 
 THREE.WireframeHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREE.WireframeHelper.prototype.constructor = THREE.WireframeHelper;
+
+THREE.WireframeHelper.prototype.update = function() {
+	this.skeleton.update();
+};
