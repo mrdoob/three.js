@@ -1526,6 +1526,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 	function ExportScene =
 	(
+		slidertime = animationrange.start
 
 		-- Extract meshes
 
