@@ -24,5 +24,7 @@ THREE.WireframeHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREE.WireframeHelper.prototype.constructor = THREE.WireframeHelper;
 
 THREE.WireframeHelper.prototype.update = function() {
-	this.skeleton.update();
+	if ( this.skeleton ) {
+		this.skeleton.update();
+	}
 };
