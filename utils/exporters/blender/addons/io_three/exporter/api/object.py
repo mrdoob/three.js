@@ -354,6 +354,8 @@ def extract_mesh(obj, options, recalculate=False):
                      original_mesh.name,
                      mesh_node.name)
 
+        hidden_state = obj.hide
+        obj.hide = False
         bpy.ops.object.mode_set(mode='OBJECT')
         obj.select = True
         bpy.context.scene.objects.active = obj
@@ -363,6 +365,7 @@ def extract_mesh(obj, options, recalculate=False):
                                       modifier='Triangulate')
         obj.data = original_mesh
         obj.select = False
+        obj.hide = hidden_state
 
     # recalculate the normals to face outwards, this is usually
     # best after applying a modifiers, especialy for something
