@@ -6,12 +6,6 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 	THREE.BufferGeometry.call( this );
 
-	var sortFunction = function ( a, b ) {
-
-		return a - b;
-
-	};
-
 	var keys = [ 'a', 'b', 'c' ];
 	var vertices,
 		skinWeights, 
