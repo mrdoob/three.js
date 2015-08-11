@@ -51,6 +51,8 @@ THREE.LineBasicMaterial.prototype.copy = function ( source ) {
 	THREE.Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
+	
+	this.linewidth = source.linewidth;
 
 	this.scale = source.scale;
 	this.dashSize = source.dashSize;
