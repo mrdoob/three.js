@@ -20693,7 +20693,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.renderBufferDirect = function ( camera, lights, fog, material, object ) {
+	this.renderBufferDirect = function ( camera, lights, fog, material, object, materialIndex ) {
 
 		if ( material instanceof THREE.MeshFaceMaterial ) {
 
@@ -20705,7 +20705,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( material === null || material.visible === false ) continue;
 
-				_this.renderBufferDirect( camera, lights, fog, material, object );
+				_this.renderBufferDirect( camera, lights, fog, material, object, i );
 
 			}
 
@@ -20789,15 +20789,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			renderMesh( material, geometry, object, program, updateBuffers );
+			renderMesh( material, geometry, object, program, updateBuffers, materialIndex );
 
 		} else if ( object instanceof THREE.Line ) {
 
-			renderLine( material, geometry, object, program, updateBuffers );
+			renderLine( material, geometry, object, program, updateBuffers, materialIndex );
 
 		} else if ( object instanceof THREE.PointCloud ) {
 
-			renderPointCloud( material, geometry, object, program, updateBuffers );
+			renderPointCloud( material, geometry, object, program, updateBuffers, materialIndex );
 
 		}
 
@@ -20934,7 +20934,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderMesh( material, geometry, object, program, updateBuffers ) {
+	function renderMesh( material, geometry, object, program, updateBuffers, materialIndex ) {
 
 		var mode = _gl.TRIANGLES;
 
@@ -21011,6 +21011,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
 					var startIndex = offsets[ i ].index;
+
+					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
 
 					if ( updateBuffers ) {
 
@@ -21121,6 +21123,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// render non-indexed triangles
 
+					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
+
 					if ( geometry instanceof THREE.InstancedBufferGeometry ) {
 
 						console.error( 'THREE.WebGLRenderer.renderMesh: cannot use drawCalls with THREE.InstancedBufferGeometry.' );
@@ -21144,7 +21148,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderLine( material, geometry, object, program, updateBuffers ) {
+	function renderLine( material, geometry, object, program, updateBuffers, materialIndex ) {
 
 		var mode = object instanceof THREE.LineSegments ? _gl.LINES : _gl.LINE_STRIP;
 
@@ -21203,6 +21207,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var startIndex = offsets[ i ].index;
 
+					if ( materialIndex !== undefined && offsets[ i ].materialIndex === materialIndex ) continue;
+
 					if ( updateBuffers ) {
 
 						setupVertexAttributes( material, program, geometry, startIndex );
@@ -21245,6 +21251,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
+					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
+
 					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
 
 					_infoRender.calls ++;
@@ -21258,7 +21266,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderPointCloud( material, geometry, object, program, updateBuffers ) {
+	function renderPointCloud( material, geometry, object, program, updateBuffers, materialIndex ) {
 
 		var mode = _gl.POINTS;
 
@@ -21312,6 +21320,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var startIndex = offsets[ i ].index;
 
+					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
+
 					if ( updateBuffers ) {
 
 						setupVertexAttributes( material, program, geometry, startIndex );
@@ -21353,6 +21363,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
 
 					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
 
@@ -28641,24 +28653,24 @@ THREE.Path.prototype.arc = function ( aX, aY, aRadius,
  };
 
 THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius,
-									  aStartAngle, aEndAngle, aClockwise ) {
+									  aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
 	var lastargs = this.actions[ this.actions.length - 1 ].args;
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
 
 	this.absellipse( aX + x0, aY + y0, xRadius, yRadius,
-		aStartAngle, aEndAngle, aClockwise );
+		aStartAngle, aEndAngle, aClockwise, aRotation );
 
  };
 
 
 THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
-									  aStartAngle, aEndAngle, aClockwise ) {
+									  aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
 	var args = Array.prototype.slice.call( arguments );
 	var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius,
-									aStartAngle, aEndAngle, aClockwise );
+									aStartAngle, aEndAngle, aClockwise, aRotation );
 	this.curves.push( curve );
 
 	var lastPoint = curve.getPoint( 1 );
@@ -28874,12 +28886,21 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 				xRadius = args[ 2 ],
 				yRadius = args[ 3 ],
 				aStartAngle = args[ 4 ], aEndAngle = args[ 5 ],
-				aClockwise = !! args[ 6 ];
+				aClockwise = !! args[ 6 ],
+				aRotation = args[ 7 ] || 0;
 
 
 			var deltaAngle = aEndAngle - aStartAngle;
 			var angle;
 			var tdivisions = divisions * 2;
+
+			var cos, sin;
+			if ( aRotation !== 0 ) {
+		
+				cos = Math.cos( aRotation );
+				sin = Math.sin( aRotation );
+
+			}
 
 			for ( j = 1; j <= tdivisions; j ++ ) {
 
@@ -28895,6 +28916,14 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				tx = aX + xRadius * Math.cos( angle );
 				ty = aY + yRadius * Math.sin( angle );
+
+				if ( aRotation !== 0 ) {
+
+					// Rotate the point about the center of the ellipse.
+					tx = ( tx - aX ) * cos - ( ty - aY ) * sin + aX;
+					ty = ( tx - aX ) * sin + ( ty - aY ) * cos + aY;
+
+				}
 
 				//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
 
@@ -30067,7 +30096,7 @@ THREE.SplineCurve.prototype.getPoint = function ( t ) {
  *	Ellipse curve
  **************************************************************/
 
-THREE.EllipseCurve = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise ) {
+THREE.EllipseCurve = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
 	this.aX = aX;
 	this.aY = aY;
@@ -30079,6 +30108,8 @@ THREE.EllipseCurve = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle
 	this.aEndAngle = aEndAngle;
 
 	this.aClockwise = aClockwise;
+	
+	this.aRotation = aRotation || 0;
 
 };
 
@@ -30104,12 +30135,21 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 
 	}
 	
-	var vector = new THREE.Vector2();
+	var x = this.aX + this.xRadius * Math.cos( angle );
+	var y = this.aY + this.yRadius * Math.sin( angle );
 
-	vector.x = this.aX + this.xRadius * Math.cos( angle );
-	vector.y = this.aY + this.yRadius * Math.sin( angle );
+	if ( this.aRotation !== 0 ) {
 
-	return vector;
+		var cos = Math.cos( this.aRotation );
+		var sin = Math.sin( this.aRotation );
+
+		// Rotate the point about the center of the ellipse.
+		x = ( x - this.aX ) * cos - ( y - this.aY ) * sin + this.aX;
+		y = ( x - this.aX ) * sin + ( y - this.aY ) * cos + this.aY;
+
+	}
+
+	return new THREE.Vector2( x, y );
 
 };
 
