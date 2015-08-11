@@ -57,14 +57,28 @@ THREE.Texture.prototype = {
 
 	clone: function () {
 
-		var texture = new this.constructor( this.image, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter, this.format, this.type, this.anisotropy );
+		var texture = new this.constructor();
 		return texture.copy( this );
 
 	},
 
 	copy: function ( source ) {
 
+		this.image = source.image;
 		this.mipmaps = source.mipmaps.slice( 0 );
+		
+		this.mapping = source.mapping;		
+		
+		this.wrapS = source.wrapS;		
+		this.wrapT = source.wrapT;		
+		
+		this.magFilter = source.magFilter;		
+		this.minFilter = source.minFilter;		
+		
+		this.anisotropy = source.anisotropy;		
+		
+		this.format = source.format;		
+		this.type = source.type;
 
 		this.offset.copy( source.offset );
 		this.repeat.copy( source.repeat );
