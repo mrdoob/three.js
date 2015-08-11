@@ -52,6 +52,13 @@ THREE.Matrix3.prototype = {
 
 	},
 
+	clone: function () {
+
+		var matrix = new this.constructor();
+		return matrix.fromArray( this.elements );
+
+	},
+
 	copy: function ( m ) {
 
 		var me = m.elements;
@@ -283,12 +290,6 @@ THREE.Matrix3.prototype = {
 			te[ 3 ], te[ 4 ], te[ 5 ],
 			te[ 6 ], te[ 7 ], te[ 8 ]
 		];
-
-	},
-
-	clone: function () {
-
-		return new THREE.Matrix3().fromArray( this.elements );
 
 	}
 

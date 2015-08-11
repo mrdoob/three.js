@@ -13,9 +13,3 @@ THREE.DynamicBufferAttribute = function ( array, itemSize ) {
 
 THREE.DynamicBufferAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 THREE.DynamicBufferAttribute.prototype.constructor = THREE.DynamicBufferAttribute;
-
-THREE.DynamicBufferAttribute.prototype.clone = function () {
-
-	return new THREE.DynamicBufferAttribute( new this.array.constructor( this.array ), this.itemSize );
-
-};

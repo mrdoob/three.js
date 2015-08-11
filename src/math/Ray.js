@@ -22,6 +22,13 @@ THREE.Ray.prototype = {
 
 	},
 
+	clone: function () {
+
+		var ray = new this.constructor();
+		return ray.copy( this );
+
+	},
+
 	copy: function ( ray ) {
 
 		this.origin.copy( ray.origin );
@@ -520,12 +527,6 @@ THREE.Ray.prototype = {
 	equals: function ( ray ) {
 
 		return ray.origin.equals( this.origin ) && ray.direction.equals( this.direction );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Ray().copy( this );
 
 	}
 

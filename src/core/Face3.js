@@ -25,6 +25,13 @@ THREE.Face3.prototype = {
 
 	constructor: THREE.Face3,
 
+	clone: function () {
+
+		var face = new this.constructor();
+		return face.copy( this );
+
+	},
+
 	copy: function ( source ) {
 
 		this.a = source.a;
@@ -55,12 +62,6 @@ THREE.Face3.prototype = {
 		}
 
 		return this;
-
-	},
-
-	clone: function () {
-
-		return new THREE.Face3().copy( this );
 
 	}
 

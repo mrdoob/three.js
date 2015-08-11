@@ -90,6 +90,12 @@ THREE.Vector4.prototype = {
 
 	},
 
+	clone: function () {
+
+		return new this.constructor( this.x, this.y, this.z, this.w );
+
+	},
+
 	copy: function ( v ) {
 
 		this.x = v.x;
@@ -696,12 +702,6 @@ THREE.Vector4.prototype = {
 		this.w = attribute.array[ index + 3 ];
 
 		return this;
-
-	},
-
-	clone: function () {
-
-		return new THREE.Vector4( this.x, this.y, this.z, this.w );
 
 	}
 

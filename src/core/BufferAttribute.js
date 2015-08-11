@@ -281,7 +281,7 @@ THREE.BufferAttribute.prototype = {
 
 	clone: function () {
 
-		return new THREE.BufferAttribute( new this.array.constructor( this.array ), this.itemSize );
+		return new this.constructor( new this.array.constructor( this.array ), this.itemSize );
 
 	}
 

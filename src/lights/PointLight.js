@@ -19,15 +19,8 @@ THREE.PointLight.prototype.constructor = THREE.PointLight;
 
 THREE.PointLight.prototype.clone = function () {
 
-	var light = new THREE.PointLight();
-
-	light.copy( this );
-
-	light.intensity = this.intensity;
-	light.distance = this.distance;
-	light.decay = this.decay;
-
-	return light;
+	var light = new this.constructor( this.color, this.intensity, this.distance, this.decay );
+	return light.copy( this );
 
 };
 

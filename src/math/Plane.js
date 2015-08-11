@@ -59,6 +59,12 @@ THREE.Plane.prototype = {
 
 	}(),
 
+	clone: function () {
+
+		var plane = new this.constructor();
+		return plane.copy( this );
+
+	},
 
 	copy: function ( plane ) {
 
@@ -211,12 +217,6 @@ THREE.Plane.prototype = {
 	equals: function ( plane ) {
 
 		return plane.normal.equals( this.normal ) && ( plane.constant === this.constant );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Plane().copy( this );
 
 	}
 

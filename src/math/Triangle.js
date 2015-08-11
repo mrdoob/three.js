@@ -118,6 +118,13 @@ THREE.Triangle.prototype = {
 
 	},
 
+	clone: function () {
+
+		var triangle = new this.constructor();
+		return triangle.copy( this );
+
+	},
+
 	copy: function ( triangle ) {
 
 		this.a.copy( triangle.a );
@@ -180,12 +187,6 @@ THREE.Triangle.prototype = {
 	equals: function ( triangle ) {
 
 		return triangle.a.equals( this.a ) && triangle.b.equals( this.b ) && triangle.c.equals( this.c );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Triangle().copy( this );
 
 	}
 

@@ -52,6 +52,13 @@ THREE.WebGLRenderTarget.prototype = {
 
 	},
 
+	clone: function () {
+
+		var renderTarget = new this.constructor();
+		return renderTarget.copy( this );
+
+	},
+
 	copy: function ( source ) {
 
 		this.width = source.width;
@@ -79,12 +86,6 @@ THREE.WebGLRenderTarget.prototype = {
 		this.shareDepthFrom = source.shareDepthFrom;
 
 		return this;
-
-	},
-
-	clone: function () {
-
-		return new THREE.WebGLRenderTarget().copy( this );
 
 	},
 

@@ -21,14 +21,8 @@ THREE.HemisphereLight.prototype.constructor = THREE.HemisphereLight;
 
 THREE.HemisphereLight.prototype.clone = function () {
 
-	var light = new THREE.HemisphereLight();
-
-	light.copy( this );
-
-	light.groundColor.copy( this.groundColor );
-	light.intensity = this.intensity;
-
-	return light;
+	var light = new this.constructor( this.color, this.groundColor, this.intensity );
+	return light.copy(this);
 
 };
 

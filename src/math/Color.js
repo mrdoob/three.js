@@ -271,6 +271,12 @@ THREE.Color.prototype = {
 
 	},
 
+	clone: function () {
+
+		return new this.constructor( this.color );
+
+	},
+
 	copy: function ( color ) {
 
 		this.r = color.r;
@@ -490,12 +496,6 @@ THREE.Color.prototype = {
 		array[ offset + 2 ] = this.b;
 
 		return array;
-
-	},
-
-	clone: function () {
-
-		return new THREE.Color().copy( this );
 
 	}
 

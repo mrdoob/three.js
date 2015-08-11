@@ -172,7 +172,8 @@ THREE.Material.prototype = {
 
 	clone: function () {
 
-		return new THREE.Material().copy( this );
+		var material = new this.constructor();
+		return material.copy( this );
 
 	},
 

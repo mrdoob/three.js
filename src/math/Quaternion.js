@@ -83,6 +83,12 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	clone: function () {
+
+		return new this.constructor( this._x, this._y, this._z, this._w );
+
+	},
+
 	copy: function ( quaternion ) {
 
 		this._x = quaternion.x;
@@ -504,13 +510,7 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	onChangeCallback: function () {},
-
-	clone: function () {
-
-		return new THREE.Quaternion( this._x, this._y, this._z, this._w );
-
-	}
+	onChangeCallback: function () {}
 
 };
 

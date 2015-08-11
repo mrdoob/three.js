@@ -86,6 +86,12 @@ THREE.Euler.prototype = {
 
 	},
 
+	clone: function () {
+
+		return new this.constructor( this._x, this._y, this._z, this._order);
+
+	},
+
 	copy: function ( euler ) {
 
 		this._x = euler._x;
@@ -314,12 +320,6 @@ THREE.Euler.prototype = {
 
 	},
 
-	onChangeCallback: function () {},
-
-	clone: function () {
-
-		return new THREE.Euler( this._x, this._y, this._z, this._order );
-
-	}
+	onChangeCallback: function () {}
 
 };

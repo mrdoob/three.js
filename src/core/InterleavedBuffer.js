@@ -65,7 +65,7 @@ THREE.InterleavedBuffer.prototype = {
 
 	clone: function () {
 
-		return new THREE.InterleavedBuffer( new this.array.constructor( this.array ), this.stride, this.dynamic );
+		return new this.constructor( new this.array.constructor( this.array ), this.stride, this.dynamic );
 
 	}
 

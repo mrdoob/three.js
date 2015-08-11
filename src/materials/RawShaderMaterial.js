@@ -12,13 +12,3 @@ THREE.RawShaderMaterial = function ( parameters ) {
 
 THREE.RawShaderMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
 THREE.RawShaderMaterial.prototype.constructor = THREE.RawShaderMaterial;
-
-THREE.RawShaderMaterial.prototype.clone = function () {
-
-	var material = new THREE.RawShaderMaterial();
-
-	material.copy( this );
-
-	return material;
-
-};
