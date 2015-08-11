@@ -45,16 +45,11 @@ THREE.DirectionalLight = function ( color, intensity ) {
 THREE.DirectionalLight.prototype = Object.create( THREE.Light.prototype );
 THREE.DirectionalLight.prototype.constructor = THREE.DirectionalLight;
 
-THREE.DirectionalLight.prototype.clone = function() {
-	
-	var light = new this.constructor( this.color, this.intensity );
-	return light.copy( this );
-}
-
 THREE.DirectionalLight.prototype.copy = function ( source ) {
 
-	THREE.Object3D.prototype.copy.call( this, source );
+	THREE.Light.prototype.copy.call( this, source );
 
+	this.intensity = source.intensity;
 	this.target = source.target.clone();
 
 	this.castShadow = source.castShadow;

@@ -17,10 +17,15 @@ THREE.PointLight = function ( color, intensity, distance, decay ) {
 THREE.PointLight.prototype = Object.create( THREE.Light.prototype );
 THREE.PointLight.prototype.constructor = THREE.PointLight;
 
-THREE.PointLight.prototype.clone = function () {
+THREE.PointLight.prototype.copy = function ( source ) {
 
-	var light = new this.constructor( this.color, this.intensity, this.distance, this.decay );
-	return light.copy( this );
+	THREE.Light.prototype.copy.call( this, source );
+
+	this.intensity = source.intensity;
+	this.distance = source.distance;
+	this.decay = source.decay;
+
+	return this;
 
 };
 

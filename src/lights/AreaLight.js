@@ -27,17 +27,11 @@ THREE.AreaLight = function ( color, intensity ) {
 THREE.AreaLight.prototype = Object.create( THREE.Light.prototype );
 THREE.AreaLight.prototype.constructor = THREE.AreaLight;
 
-THREE.PointLight.prototype.clone = function () {
-
-	var light = new this.constructor( this.color, this.intensity );
-	return light.copy( this );
-
-};
-
 THREE.AreaLight.prototype.copy = function ( source ) {
 
-	THREE.Object3D.prototype.copy.call( this, source );
+	THREE.Light.prototype.copy.call( this, source );
 
+	this.intensity = source.intensity;
 	this.normal.copy( source.normal );
 	this.right.copy( source.right );
 	this.width = source.width;

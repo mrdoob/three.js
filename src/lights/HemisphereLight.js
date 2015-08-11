@@ -19,10 +19,14 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 THREE.HemisphereLight.prototype = Object.create( THREE.Light.prototype );
 THREE.HemisphereLight.prototype.constructor = THREE.HemisphereLight;
 
-THREE.HemisphereLight.prototype.clone = function () {
+THREE.HemisphereLight.prototype.copy = function ( source ) {
 
-	var light = new this.constructor( this.color, this.groundColor, this.intensity );
-	return light.copy(this);
+	THREE.Light.prototype.copy.call( this, source );
+
+	this.groundColor.copy( source.groundColor );
+	this.intensity = source.intensity;
+
+	return this;
 
 };
 
