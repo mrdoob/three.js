@@ -45,14 +45,15 @@ THREE.SpotLight.prototype = Object.create( THREE.Light.prototype );
 THREE.SpotLight.prototype.constructor = THREE.SpotLight;
 
 THREE.SpotLight.prototype.copy = function ( source ) {
-	
+
 	THREE.Light.prototype.copy.call( this, source );
-	
+
 	this.intensity = source.intensity;
 	this.distance = source.distance;
 	this.angle = source.angle;
+	this.exponent = source.exponent;
 	this.decay = source.decay;
-	
+
 	this.target = source.target.clone();
 
 	this.castShadow = source.castShadow;
