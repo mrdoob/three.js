@@ -168,7 +168,13 @@ THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius,
 THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
 									  aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
-	var args = Array.prototype.slice.call( arguments );
+	var args = [
+		aX, aY,
+		xRadius, yRadius,
+		aStartAngle, aEndAngle,
+		aClockwise,
+		aRotation || 0 // aRotation is optional.
+	];
 	var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius,
 									aStartAngle, aEndAngle, aClockwise, aRotation );
 	this.curves.push( curve );
@@ -387,7 +393,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 				yRadius = args[ 3 ],
 				aStartAngle = args[ 4 ], aEndAngle = args[ 5 ],
 				aClockwise = !! args[ 6 ],
-				aRotation = args[ 7 ] || 0;
+				aRotation = args[ 7 ];
 
 
 			var deltaAngle = aEndAngle - aStartAngle;
@@ -419,9 +425,11 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				if ( aRotation !== 0 ) {
 
+					var x = tx, y = ty;
+
 					// Rotate the point about the center of the ellipse.
-					tx = ( tx - aX ) * cos - ( ty - aY ) * sin + aX;
-					ty = ( tx - aX ) * sin + ( ty - aY ) * cos + aY;
+					tx = ( x - aX ) * cos - ( y - aY ) * sin + aX;
+					ty = ( x - aX ) * sin + ( y - aY ) * cos + aY;
 
 				}
 

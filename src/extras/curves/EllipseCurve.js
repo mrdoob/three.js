@@ -49,9 +49,11 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 		var cos = Math.cos( this.aRotation );
 		var sin = Math.sin( this.aRotation );
 
+		var tx = x, ty = y;
+
 		// Rotate the point about the center of the ellipse.
-		x = ( x - this.aX ) * cos - ( y - this.aY ) * sin + this.aX;
-		y = ( x - this.aX ) * sin + ( y - this.aY ) * cos + this.aY;
+		x = ( tx - this.aX ) * cos - ( ty - this.aY ) * sin + this.aX;
+		y = ( tx - this.aX ) * sin + ( ty - this.aY ) * cos + this.aY;
 
 	}
 
