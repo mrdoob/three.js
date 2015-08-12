@@ -101,7 +101,7 @@ var APP = {
 
 			if ( vr === true ) {
 
-				if ( camera.parent === undefined ) {
+				if ( camera.parent === null ) {
 
 					// camera needs to be in the scene so camera2 matrix updates
 

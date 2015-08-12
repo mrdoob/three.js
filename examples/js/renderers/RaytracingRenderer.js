@@ -493,7 +493,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		// update camera matrices
 
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 		cameraPosition.setFromMatrixPosition( camera.matrixWorld );

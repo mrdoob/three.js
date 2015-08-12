@@ -1533,7 +1533,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// update camera matrices and frustum
 
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 

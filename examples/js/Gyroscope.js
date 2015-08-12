@@ -29,7 +29,7 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 
 		if ( this.matrixWorldNeedsUpdate || force ) {
 
-			if ( this.parent ) {
+			if ( this.parent !== null ) {
 
 				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 

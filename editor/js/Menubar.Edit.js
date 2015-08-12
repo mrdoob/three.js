@@ -53,7 +53,7 @@ Menubar.Edit = function ( editor ) {
 
 		var object = editor.selected;
 
-		if ( object.parent === undefined ) return; // avoid cloning the camera or scene
+		if ( object.parent === null ) return; // avoid cloning the camera or scene
 
 		object = object.clone();
 

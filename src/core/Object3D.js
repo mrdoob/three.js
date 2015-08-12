@@ -15,7 +15,7 @@ THREE.Object3D = function () {
 	this.name = '';
 	this.type = 'Object3D';
 
-	this.parent = undefined;
+	this.parent = null;
 	this.children = [];
 
 	this.up = THREE.Object3D.DefaultUp.clone();
@@ -331,7 +331,7 @@ THREE.Object3D.prototype = {
 
 		if ( object instanceof THREE.Object3D ) {
 
-			if ( object.parent !== undefined ) {
+			if ( object.parent !== null ) {
 
 				object.parent.remove( object );
 
@@ -368,7 +368,7 @@ THREE.Object3D.prototype = {
 
 		if ( index !== - 1 ) {
 
-			object.parent = undefined;
+			object.parent = null;
 
 			object.dispatchEvent( { type: 'removed' } );
 
@@ -534,7 +534,7 @@ THREE.Object3D.prototype = {
 
 		var parent = this.parent;
 
-		if ( parent !== undefined ) {
+		if ( parent !== null ) {
 
 			callback( parent );
 
@@ -558,7 +558,7 @@ THREE.Object3D.prototype = {
 
 		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
 
-			if ( this.parent === undefined ) {
+			if ( this.parent === null ) {
 
 				this.matrixWorld.copy( this.matrix );
 
