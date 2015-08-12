@@ -46,7 +46,7 @@ THREE.LineDashedMaterial = function ( parameters ) {
 THREE.LineDashedMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.LineDashedMaterial.prototype.constructor = THREE.LineDashedMaterial;
 
-THREE.LineBasicMaterial.prototype.copy = function ( source ) {
+THREE.LineDashedMaterial.prototype.copy = function ( source ) {
 
 	THREE.Material.prototype.copy.call( this, source );
 
