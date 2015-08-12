@@ -158,3 +158,20 @@ test( "containsPoint", function() {
 	ok( a.containsPoint( a.midpoint() ), "Passed!" );
 	ok( ! a.containsPoint( new THREE.Vector3( -1, -1, -1 ) ), "Passed!" );
 });
+
+test( "distanceToPointSquared", function() {
+	var a = new THREE.Triangle(new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ) );
+	var cloestPoint = new THREE.Vector3();
+
+	ok( a.distanceToPointSquared(a.a, cloestPoint) == 0, "Passed");
+	ok( a.distanceToPointSquared(a.b, cloestPoint) == 0, "Passed");
+	ok( a.distanceToPointSquared(a.c, cloestPoint) == 0, "Passed");
+
+	var point = new THREE.Vector3(0, 5, 0);
+	ok( a.distanceToPointSquared(point, cloestPoint) == 25, "Passed");
+	point = new THREE.Vector3(-1, 5, 0);
+	ok( a.distanceToPointSquared(point, cloestPoint) == 26, "Passed");
+	point = new THREE.Vector3(1, 5, 1);
+	ok( a.distanceToPointSquared(point, cloestPoint) == 25.5, "Passed");
+
+});

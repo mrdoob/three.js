@@ -94,6 +94,56 @@ THREE.Triangle.containsPoint = function () {
 
 }();
 
+THREE.Triangle.distanceToPointSquared = function () {
+
+	var v0 = new THREE.Vector3();
+	var normal = new THREE.Vector3();
+	var projected = new THREE.Vector3();
+	var closest = new THREE.Vector3();
+	var line = new THREE.Line3();
+
+	return function (point, a, b, c, optionalTarget) {
+		//project the point to the triangle
+		normal = THREE.Triangle.normal(a, b, c);
+		v0.subVectors(point, a);
+		var s = v0.dot(normal);
+		normal.multiplyScalar(s);
+		projected.subVectors(point, normal);
+		//if the point is inside the triangle
+		if(THREE.Triangle.containsPoint( point, a, b, c )){
+			optionalTarget.copy(projected);
+			return projected.distanceToSquared(point);
+		} else {//calculate the closet point on the triangle edges
+			var dis_squared = Number.MAX_VALUE;
+			var temp;
+			line.set(a, b);
+			closest = line.closestPointToPoint(projected, true);
+			temp = closest.distanceToSquared(projected);
+			if(temp < dis_squared){
+				dis_squared = temp;
+				optionalTarget.copy(closest);
+			}
+			line.set(b, c);
+			closest = line.closestPointToPoint(projected, true);
+			temp = closest.distanceToSquared(projected);
+			if(temp < dis_squared){
+				dis_squared = temp;
+				optionalTarget.copy(closest);
+			}
+			line.set(c, a);
+			closest = line.closestPointToPoint(projected, true);
+			temp = closest.distanceToSquared(projected);
+			if(temp < dis_squared){
+				dis_squared = temp;
+				optionalTarget.copy(closest);
+			}
+			return dis_squared + projected.distanceToSquared(point);
+		}
+		return Infinity;
+	};
+
+}();
+
 THREE.Triangle.prototype = {
 
 	constructor: THREE.Triangle,
@@ -187,6 +237,8 @@ THREE.Triangle.prototype = {
 
 		return new THREE.Triangle().copy( this );
 
+	},
+	distanceToPointSquared: function( point, optionalTarget){
+		return THREE.Triangle.distanceToPointSquared( point, this.a, this.b, this.c, optionalTarget );
 	}
-
 };
