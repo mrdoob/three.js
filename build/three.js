@@ -7770,7 +7770,7 @@ THREE.Object3D = function () {
 	this.name = '';
 	this.type = 'Object3D';
 
-	this.parent = undefined;
+	this.parent = null;
 	this.children = [];
 
 	this.up = THREE.Object3D.DefaultUp.clone();
@@ -8086,7 +8086,7 @@ THREE.Object3D.prototype = {
 
 		if ( object instanceof THREE.Object3D ) {
 
-			if ( object.parent !== undefined ) {
+			if ( object.parent !== null ) {
 
 				object.parent.remove( object );
 
@@ -8123,7 +8123,7 @@ THREE.Object3D.prototype = {
 
 		if ( index !== - 1 ) {
 
-			object.parent = undefined;
+			object.parent = null;
 
 			object.dispatchEvent( { type: 'removed' } );
 
@@ -8289,7 +8289,7 @@ THREE.Object3D.prototype = {
 
 		var parent = this.parent;
 
-		if ( parent !== undefined ) {
+		if ( parent !== null ) {
 
 			callback( parent );
 
@@ -8313,7 +8313,7 @@ THREE.Object3D.prototype = {
 
 		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
 
-			if ( this.parent === undefined ) {
+			if ( this.parent === null ) {
 
 				this.matrixWorld.copy( this.matrix );
 
@@ -12176,7 +12176,7 @@ THREE.CubeCamera = function ( near, far, cubeResolution ) {
 
 	this.updateCubeMap = function ( renderer, scene ) {
 
-		if ( this.parent === undefined ) this.updateMatrixWorld();
+		if ( this.parent === null ) this.updateMatrixWorld();
 
 		var renderTarget = this.renderTarget;
 		var generateMipmaps = renderTarget.generateMipmaps;
@@ -21453,7 +21453,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// update camera matrices and frustum
 
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
@@ -28668,7 +28668,13 @@ THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius,
 THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
 									  aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
-	var args = Array.prototype.slice.call( arguments );
+	var args = [
+		aX, aY,
+		xRadius, yRadius,
+		aStartAngle, aEndAngle,
+		aClockwise,
+		aRotation || 0 // aRotation is optional.
+	];
 	var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius,
 									aStartAngle, aEndAngle, aClockwise, aRotation );
 	this.curves.push( curve );
@@ -28887,7 +28893,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 				yRadius = args[ 3 ],
 				aStartAngle = args[ 4 ], aEndAngle = args[ 5 ],
 				aClockwise = !! args[ 6 ],
-				aRotation = args[ 7 ] || 0;
+				aRotation = args[ 7 ];
 
 
 			var deltaAngle = aEndAngle - aStartAngle;
@@ -28919,9 +28925,11 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				if ( aRotation !== 0 ) {
 
+					var x = tx, y = ty;
+
 					// Rotate the point about the center of the ellipse.
-					tx = ( tx - aX ) * cos - ( ty - aY ) * sin + aX;
-					ty = ( tx - aX ) * sin + ( ty - aY ) * cos + aY;
+					tx = ( x - aX ) * cos - ( y - aY ) * sin + aX;
+					ty = ( x - aX ) * sin + ( y - aY ) * cos + aY;
 
 				}
 
@@ -30143,9 +30151,11 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 		var cos = Math.cos( this.aRotation );
 		var sin = Math.sin( this.aRotation );
 
+		var tx = x, ty = y;
+
 		// Rotate the point about the center of the ellipse.
-		x = ( x - this.aX ) * cos - ( y - this.aY ) * sin + this.aX;
-		y = ( x - this.aX ) * sin + ( y - this.aY ) * cos + this.aY;
+		x = ( tx - this.aX ) * cos - ( ty - this.aY ) * sin + this.aX;
+		y = ( tx - this.aX ) * sin + ( ty - this.aY ) * cos + this.aY;
 
 	}
 
