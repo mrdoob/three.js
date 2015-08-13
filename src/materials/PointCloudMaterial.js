@@ -44,24 +44,22 @@ THREE.PointCloudMaterial = function ( parameters ) {
 THREE.PointCloudMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.PointCloudMaterial.prototype.constructor = THREE.PointCloudMaterial;
 
-THREE.PointCloudMaterial.prototype.clone = function () {
+THREE.PointCloudMaterial.prototype.copy = function ( source ) {
 
-	var material = new THREE.PointCloudMaterial();
+	THREE.Material.prototype.copy.call( this, source );
 
-	material.copy( this );
+	this.color.copy( source.color );
 
-	material.color.copy( this.color );
+	this.map = source.map;
 
-	material.map = this.map;
+	this.size = source.size;
+	this.sizeAttenuation = source.sizeAttenuation;
 
-	material.size = this.size;
-	material.sizeAttenuation = this.sizeAttenuation;
+	this.vertexColors = source.vertexColors;
 
-	material.vertexColors = this.vertexColors;
-
-	material.fog = this.fog;
-
-	return material;
+	this.fog = source.fog;
+	
+	return this;
 
 };
 

@@ -22,8 +22,6 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay 
 	this.castShadow = false;
 	this.onlyShadow = false;
 
-	//
-
 	this.shadowCameraNear = 50;
 	this.shadowCameraFar = 5000;
 	this.shadowCameraFov = 50;
@@ -36,8 +34,6 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay 
 	this.shadowMapWidth = 512;
 	this.shadowMapHeight = 512;
 
-	//
-
 	this.shadowMap = null;
 	this.shadowMapSize = null;
 	this.shadowCamera = null;
@@ -48,40 +44,35 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay 
 THREE.SpotLight.prototype = Object.create( THREE.Light.prototype );
 THREE.SpotLight.prototype.constructor = THREE.SpotLight;
 
-THREE.SpotLight.prototype.clone = function () {
+THREE.SpotLight.prototype.copy = function ( source ) {
 
-	var light = new THREE.SpotLight();
+	THREE.Light.prototype.copy.call( this, source );
 
-	light.copy( this );
+	this.intensity = source.intensity;
+	this.distance = source.distance;
+	this.angle = source.angle;
+	this.exponent = source.exponent;
+	this.decay = source.decay;
 
-	light.target = this.target.clone();
+	this.target = source.target.clone();
 
-	light.intensity = this.intensity;
-	light.distance = this.distance;
-	light.angle = this.angle;
-	light.exponent = this.exponent;
-	light.decay = this.decay;
+	this.castShadow = source.castShadow;
+	this.onlyShadow = source.onlyShadow;
 
-	light.castShadow = this.castShadow;
-	light.onlyShadow = this.onlyShadow;
+	this.shadowCameraNear = source.shadowCameraNear;
+	this.shadowCameraFar = source.shadowCameraFar;
+	this.shadowCameraFov = source.shadowCameraFov;
 
-	//
+	this.shadowCameraVisible = source.shadowCameraVisible;
 
-	light.shadowCameraNear = this.shadowCameraNear;
-	light.shadowCameraFar = this.shadowCameraFar;
-	light.shadowCameraFov = this.shadowCameraFov;
+	this.shadowBias = source.shadowBias;
+	this.shadowDarkness = source.shadowDarkness;
 
-	light.shadowCameraVisible = this.shadowCameraVisible;
+	this.shadowMapWidth = source.shadowMapWidth;
+	this.shadowMapHeight = source.shadowMapHeight;
 
-	light.shadowBias = this.shadowBias;
-	light.shadowDarkness = this.shadowDarkness;
-
-	light.shadowMapWidth = this.shadowMapWidth;
-	light.shadowMapHeight = this.shadowMapHeight;
-
-	return light;
-
-};
+	return this;
+}
 
 THREE.SpotLight.prototype.toJSON = function ( meta ) {
 

@@ -79,42 +79,40 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.MeshBasicMaterial.prototype.constructor = THREE.MeshBasicMaterial;
 
-THREE.MeshBasicMaterial.prototype.clone = function () {
+THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
+	
+	THREE.Material.prototype.copy.call( this, source );
 
-	var material = new THREE.MeshBasicMaterial();
+	this.color.copy( source.color );
 
-	material.copy( this );
+	this.map = source.map;
 
-	material.color.copy( this.color );
+	this.aoMap = source.aoMap;
+	this.aoMapIntensity = source.aoMapIntensity;
 
-	material.map = this.map;
+	this.specularMap = source.specularMap;
 
-	material.aoMap = this.aoMap;
-	material.aoMapIntensity = this.aoMapIntensity;
+	this.alphaMap = source.alphaMap;
 
-	material.specularMap = this.specularMap;
+	this.envMap = source.envMap;
+	this.combine = source.combine;
+	this.reflectivity = source.reflectivity;
+	this.refractionRatio = source.refractionRatio;
 
-	material.alphaMap = this.alphaMap;
+	this.fog = source.fog;
 
-	material.envMap = this.envMap;
-	material.combine = this.combine;
-	material.reflectivity = this.reflectivity;
-	material.refractionRatio = this.refractionRatio;
+	this.shading = source.shading;
 
-	material.fog = this.fog;
+	this.wireframe = source.wireframe;
+	this.wireframeLinewidth = source.wireframeLinewidth;
+	this.wireframeLinecap = source.wireframeLinecap;
+	this.wireframeLinejoin = source.wireframeLinejoin;
 
-	material.shading = this.shading;
+	this.vertexColors = source.vertexColors;
 
-	material.wireframe = this.wireframe;
-	material.wireframeLinewidth = this.wireframeLinewidth;
-	material.wireframeLinecap = this.wireframeLinecap;
-	material.wireframeLinejoin = this.wireframeLinejoin;
-
-	material.vertexColors = this.vertexColors;
-
-	material.skinning = this.skinning;
-	material.morphTargets = this.morphTargets;
-
-	return material;
+	this.skinning = source.skinning;
+	this.morphTargets = source.morphTargets;
+	
+	return this;
 
 };

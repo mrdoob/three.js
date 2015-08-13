@@ -65,6 +65,12 @@ THREE.Vector2.prototype = {
 
 	},
 
+	clone: function () {
+
+		return new this.constructor( this.x, this.y );
+
+	},
+
 	copy: function ( v ) {
 
 		this.x = v.x;
@@ -442,12 +448,6 @@ THREE.Vector2.prototype = {
 		this.y = attribute.array[ index + 1 ];
 
 		return this;
-
-	},
-
-	clone: function () {
-
-		return new THREE.Vector2( this.x, this.y );
 
 	}
 

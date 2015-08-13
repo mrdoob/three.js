@@ -19,8 +19,6 @@ THREE.DirectionalLight = function ( color, intensity ) {
 	this.castShadow = false;
 	this.onlyShadow = false;
 
-	//
-
 	this.shadowCameraNear = 50;
 	this.shadowCameraFar = 5000;
 
@@ -37,8 +35,6 @@ THREE.DirectionalLight = function ( color, intensity ) {
 	this.shadowMapWidth = 512;
 	this.shadowMapHeight = 512;
 
-	//
-
 	this.shadowMap = null;
 	this.shadowMapSize = null;
 	this.shadowCamera = null;
@@ -49,38 +45,33 @@ THREE.DirectionalLight = function ( color, intensity ) {
 THREE.DirectionalLight.prototype = Object.create( THREE.Light.prototype );
 THREE.DirectionalLight.prototype.constructor = THREE.DirectionalLight;
 
-THREE.DirectionalLight.prototype.clone = function () {
+THREE.DirectionalLight.prototype.copy = function ( source ) {
 
-	var light = new THREE.DirectionalLight();
+	THREE.Light.prototype.copy.call( this, source );
 
-	light.copy( this );
+	this.intensity = source.intensity;
+	this.target = source.target.clone();
 
-	light.target = this.target.clone();
+	this.castShadow = source.castShadow;
+	this.onlyShadow = source.onlyShadow;
 
-	light.intensity = this.intensity;
+	this.shadowCameraNear = source.shadowCameraNear;
+	this.shadowCameraFar = source.shadowCameraFar;
 
-	light.castShadow = this.castShadow;
-	light.onlyShadow = this.onlyShadow;
+	this.shadowCameraLeft = source.shadowCameraLeft;
+	this.shadowCameraRight = source.shadowCameraRight;
+	this.shadowCameraTop = source.shadowCameraTop;
+	this.shadowCameraBottom = source.shadowCameraBottom;
 
-	//
+	this.shadowCameraVisible = source.shadowCameraVisible;
 
-	light.shadowCameraNear = this.shadowCameraNear;
-	light.shadowCameraFar = this.shadowCameraFar;
+	this.shadowBias = source.shadowBias;
+	this.shadowDarkness = source.shadowDarkness;
 
-	light.shadowCameraLeft = this.shadowCameraLeft;
-	light.shadowCameraRight = this.shadowCameraRight;
-	light.shadowCameraTop = this.shadowCameraTop;
-	light.shadowCameraBottom = this.shadowCameraBottom;
+	this.shadowMapWidth = source.shadowMapWidth;
+	this.shadowMapHeight = source.shadowMapHeight;
 
-	light.shadowCameraVisible = this.shadowCameraVisible;
-
-	light.shadowBias = this.shadowBias;
-	light.shadowDarkness = this.shadowDarkness;
-
-	light.shadowMapWidth = this.shadowMapWidth;
-	light.shadowMapHeight = this.shadowMapHeight;
-
-	return light;
+	return this;
 
 };
 

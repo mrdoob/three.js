@@ -132,14 +132,6 @@ THREE.LOD.prototype.update = function () {
 
 }();
 
-THREE.LOD.prototype.clone = function () {
-
-	var lod = new THREE.LOD();
-	return lod.copy( this );
-
-};
-
-
 THREE.LOD.prototype.copy = function ( source ) {
 
 	THREE.Object3D.prototype.copy.call( this, source, false );

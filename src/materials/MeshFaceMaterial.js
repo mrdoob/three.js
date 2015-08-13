@@ -45,7 +45,7 @@ THREE.MeshFaceMaterial.prototype = {
 
 	clone: function () {
 
-		var material = new THREE.MeshFaceMaterial();
+		var material = new this.constructor();
 
 		for ( var i = 0; i < this.materials.length; i ++ ) {
 

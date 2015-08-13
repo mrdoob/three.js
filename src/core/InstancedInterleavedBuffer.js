@@ -15,6 +15,6 @@ THREE.InstancedInterleavedBuffer.prototype.constructor = THREE.InstancedInterlea
 
 THREE.InstancedInterleavedBuffer.prototype.clone = function () {
 
-	return new THREE.InstancedInterleavedBuffer( new this.array.constructor( this.array ), this.stride, this.dynamic, this.meshPerAttribute );
+	return new this.constructor( new this.array.constructor( this.array ), this.stride, this.dynamic, this.meshPerAttribute );
 
 };

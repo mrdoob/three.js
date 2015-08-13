@@ -307,15 +307,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 THREE.Mesh.prototype.clone = function () {
 
-	var mesh = new THREE.Mesh( this.geometry, this.material );
-	return mesh.copy( this );
-
-};
-
-THREE.Mesh.prototype.copy = function ( source ) {
-
-	THREE.Object3D.prototype.copy.call( this, source );
-	return this;
+	return new this.constructor( this.geometry, this.material ).copy( this );
 
 };
 
