@@ -592,7 +592,7 @@
 			if ( effectController.resolution !== resolution ) {
 
 				resolution = effectController.resolution;
-				effect.init( resolution );
+				effect.init( Math.floor( resolution ) );
 
 			}
 
