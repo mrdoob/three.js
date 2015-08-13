@@ -76,7 +76,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	};
 
-	this.update = function ( object ) {
+	function update( object ) {
 
 		// TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
 
@@ -196,6 +196,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		return properties.get( attribute ).__webglBuffer;
 
 	};
+
+	this.update = update;
+	this.updateAttribute = updateAttribute;
 
 	this.clear = function () {
 

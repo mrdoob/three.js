@@ -1022,6 +1022,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 			mode = _gl.LINES;
 			state.setLineWidth( material.wireframeLinewidth * pixelRatio );
 
+			if ( geometry._wireframe === undefined ) {
+
+				geometry._wireframe = new THREE.WireframeGeometry( geometry );
+				objects.updateAttribute( geometry._wireframe.attributes.position );
+
+			}
+
+			geometry = geometry._wireframe;
+
 		}
 
 		var index = geometry.attributes.index;
