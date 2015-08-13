@@ -54,8 +54,7 @@ THREE.Box2.prototype = {
 	
 	clone: function () {
 
-		var box = new this.constructor();
-		return box.copy( this );
+		return new this.constructor().copy( this );
 
 	},
 

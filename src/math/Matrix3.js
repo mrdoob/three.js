@@ -54,8 +54,7 @@ THREE.Matrix3.prototype = {
 
 	clone: function () {
 
-		var matrix = new this.constructor();
-		return matrix.fromArray( this.elements );
+		return new this.constructor().fromArray( this.elements );
 
 	},
 

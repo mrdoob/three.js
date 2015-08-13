@@ -40,8 +40,7 @@ THREE.Frustum.prototype = {
 
 	clone: function () {
 
-		var frustum = new this.constructor();
-		return frustum.copy( this );
+		return new this.constructor().copy( this );
 
 	},
 

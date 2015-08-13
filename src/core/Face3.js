@@ -27,8 +27,7 @@ THREE.Face3.prototype = {
 
 	clone: function () {
 
-		var face = new this.constructor();
-		return face.copy( this );
+		return new this.constructor().copy( this );
 
 	},
 

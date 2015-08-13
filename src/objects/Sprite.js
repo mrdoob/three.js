@@ -62,8 +62,7 @@ THREE.Sprite.prototype.raycast = ( function () {
 
 THREE.Sprite.prototype.clone = function () {
 
-	var sprite = new this.constructor( this.material );
-	return sprite.copy( this );
+	return new this.constructor( this.material ).copy( this );
 
 };
 

@@ -24,8 +24,7 @@ THREE.Line3.prototype = {
 
 	clone: function () {
 
-		var line = new this.constructor();
-		return line.copy( this );
+		return new this.constructor().copy( this );
 
 	},
 

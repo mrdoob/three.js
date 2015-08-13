@@ -185,8 +185,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 THREE.Line.prototype.clone = function () {
 
-	var line = new this.constructor( this.geometry, this.material );
-	return line.copy( this );
+	return new this.constructor( this.geometry, this.material ).copy( this );
 
 };
 

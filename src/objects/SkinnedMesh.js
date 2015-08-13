@@ -145,7 +145,6 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
 
 THREE.SkinnedMesh.prototype.clone = function() {
 
-	var skinMesh = new this.constructor( this.geometry, this.material, this.useVertexTexture );
-	return skinMesh.copy( this );
+	return new this.constructor( this.geometry, this.material, this.useVertexTexture ).copy( this );
 
 };

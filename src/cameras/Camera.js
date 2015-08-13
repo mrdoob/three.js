@@ -52,8 +52,7 @@ THREE.Camera.prototype.lookAt = function () {
 
 THREE.Camera.prototype.clone = function () {
 
-	var camera = new this.constructor();
-	return camera.copy( this );
+	return new this.constructor().copy( this );
 
 };
 

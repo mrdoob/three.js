@@ -1174,8 +1174,7 @@ THREE.Geometry.prototype = {
 
 	clone: function () {
 
-		var geometry = new this.constructor();
-		return geometry.copy( this );
+		return new this.constructor().copy( this );
 
 	},
 

@@ -24,8 +24,7 @@ THREE.Ray.prototype = {
 
 	clone: function () {
 
-		var ray = new this.constructor();
-		return ray.copy( this );
+		return new this.constructor().copy( this );
 
 	},
 

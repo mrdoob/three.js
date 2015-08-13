@@ -1241,8 +1241,7 @@ THREE.BufferGeometry.prototype = {
 
 	clone: function () {
 
-		var bufferGeometry = new this.constructor();
-		return bufferGeometry.copy( this );
+		return new this.constructor().copy( this );
 
 	},
 

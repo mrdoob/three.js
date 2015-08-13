@@ -61,8 +61,7 @@ THREE.Plane.prototype = {
 
 	clone: function () {
 
-		var plane = new this.constructor();
-		return plane.copy( this );
+		return new this.constructor().copy( this );
 
 	},
 

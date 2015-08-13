@@ -54,8 +54,7 @@ THREE.WebGLRenderTarget.prototype = {
 
 	clone: function () {
 
-		var renderTarget = new this.constructor();
-		return renderTarget.copy( this );
+		return new this.constructor().copy( this );
 
 	},
 

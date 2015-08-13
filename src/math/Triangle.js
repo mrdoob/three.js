@@ -120,8 +120,7 @@ THREE.Triangle.prototype = {
 
 	clone: function () {
 
-		var triangle = new this.constructor();
-		return triangle.copy( this );
+		return new this.constructor().copy( this );
 
 	},
 

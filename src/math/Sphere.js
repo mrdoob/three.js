@@ -59,8 +59,7 @@ THREE.Sphere.prototype = {
 
 	clone: function () {
 
-		var sphere = new this.constructor();
-		return sphere.copy( this );
+		return new this.constructor().copy( this );
 
 	},
 
