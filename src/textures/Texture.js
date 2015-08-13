@@ -65,17 +65,17 @@ THREE.Texture.prototype = {
 
 		this.image = source.image;
 		this.mipmaps = source.mipmaps.slice( 0 );
-		
-		this.mapping = source.mapping;		
-		
-		this.wrapS = source.wrapS;		
-		this.wrapT = source.wrapT;		
-		
-		this.magFilter = source.magFilter;		
-		this.minFilter = source.minFilter;		
-		
-		this.anisotropy = source.anisotropy;		
-		
+
+		this.mapping = source.mapping;
+
+		this.wrapS = source.wrapS;
+		this.wrapT = source.wrapT;
+
+		this.magFilter = source.magFilter;
+		this.minFilter = source.minFilter;
+
+		this.anisotropy = source.anisotropy;
+
 		this.format = source.format;		
 		this.type = source.type;
 
