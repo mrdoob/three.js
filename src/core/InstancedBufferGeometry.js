@@ -32,14 +32,14 @@ THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
 	for ( var attr in source.attributes ) {
 
 		var sourceAttr = source.attributes[ attr ];
-		geometry.addAttribute( attr, sourceAttr.clone() );
+		this.addAttribute( attr, sourceAttr.clone() );
 
 	}
 
 	for ( var i = 0, il = source.drawcalls.length; i < il; i ++ ) {
 
 		var offset = source.drawcalls[ i ];
-		geometry.addDrawCall( offset.start, offset.count, offset.index, offset.instances );
+		this.addDrawCall( offset.start, offset.count, offset.index, offset.instances );
 
 	}
 	
