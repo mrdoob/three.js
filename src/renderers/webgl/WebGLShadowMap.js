@@ -240,6 +240,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				}
 
+				material.wireframe = objectMaterial.wireframe;
+
 				_renderer.renderBufferDirect( shadowCamera, _lights, null, material, object );
 
 			}
