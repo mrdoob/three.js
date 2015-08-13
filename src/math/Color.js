@@ -273,7 +273,7 @@ THREE.Color.prototype = {
 
 	clone: function () {
 
-		return new this.constructor( this.color );
+		return new this.constructor( this.r, this.g, this.b );
 
 	},
 
