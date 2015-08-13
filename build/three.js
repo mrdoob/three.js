@@ -21,46 +21,52 @@ if ( typeof define === 'function' && define.amd ) {
 
 // polyfills
 
-( function () {
+if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === undefined ) {
 
-	var lastTime = 0;
-	var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
+  // Missing in Android stock browser.
 
-	for ( var x = 0; x < vendors.length && ! self.requestAnimationFrame; ++ x ) {
+  ( function () {
 
-		self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
-		self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
+  	var lastTime = 0;
+  	var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
 
-	}
+  	for ( var x = 0; x < vendors.length && ! self.requestAnimationFrame; ++ x ) {
 
-	if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
+  		self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
+  		self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
 
-		self.requestAnimationFrame = function ( callback ) {
+  	}
 
-			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-			var id = self.setTimeout( function () {
+  	if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
 
-				callback( currTime + timeToCall );
+  		self.requestAnimationFrame = function ( callback ) {
 
-			}, timeToCall );
-			lastTime = currTime + timeToCall;
-			return id;
+  			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
+  			var id = self.setTimeout( function () {
 
-		};
+  				callback( currTime + timeToCall );
 
-	}
+  			}, timeToCall );
+  			lastTime = currTime + timeToCall;
+  			return id;
 
-	if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
+  		};
 
-		self.cancelAnimationFrame = function ( id ) {
+  	}
 
-			self.clearTimeout( id );
+  	if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
 
-		};
+  		self.cancelAnimationFrame = function ( id ) {
 
-	}
+  			self.clearTimeout( id );
 
-}() );
+  		};
+
+  	}
+
+  }() );
+
+}
 
 if ( Math.sign === undefined ) {
 
@@ -20715,7 +20721,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		setMaterial( material );
 
-		var geometry = objects.geometries.get( object );
+		var geometry = objects.update( object );
 		var program = setProgram( camera, lights, fog, material, object );
 
 		var updateBuffers = false,
@@ -21479,9 +21485,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			transparentObjects.sort( reversePainterSortStable );
 
 		}
-
-		objects.update( opaqueObjects );
-		objects.update( transparentObjects );
 
 		//
 
@@ -24342,7 +24345,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 	//
 
 	this.objects = objects;
-	this.geometries = geometries;
 
 	this.init = function ( object ) {
 
@@ -24376,7 +24378,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	};
 
-	function updateObject( object ) {
+	this.update = function ( object ) {
+
+		// TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
 
 		var geometry = geometries.get( object );
 
@@ -24409,6 +24413,8 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 			}
 
 		}
+
+		return geometry;
 
 	}
 
@@ -24490,16 +24496,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		}
 
 		return properties.get( attribute ).__webglBuffer;
-
-	};
-
-	this.update = function ( renderList ) {
-
-		for ( var i = 0, ul = renderList.length; i < ul; i ++ ) {
-
-			updateObject( renderList[ i ].object );
-
-		}
 
 	};
 
