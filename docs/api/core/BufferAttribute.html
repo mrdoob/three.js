@@ -41,12 +41,13 @@
 
 		<h3>[property:Boolean needsUpdate]</h3>
 		<div>
-		Flag to indicate that this attribute has changed and should be re-send to the GPU. Set this to true when you modify the value of the array.
+		Flag to indicate that this attribute has changed and should be re-sent to the GPU. Set this to true when you modify the value of the array.<br/>
+		This property is deprecated---instead, you should use the [page:BufferAttribute.setNeedsUpdate setNeedsUpdate] method.
 		</div>
 
 		<h3>[property:Integer version]</h3>
 		<div>
-		A version number, incremented every time the needsUpdate property is set to true.
+		A version number, incremented every time the [page:BufferAttribute.setNeedsUpdate setNeedsUpdate] method is called.
 		</div>
 
 
@@ -96,6 +97,11 @@
 		the value of the array at <code>index * itemSize + 1</code> to y,
 		the value of the array at <code>index * itemSize + 2</code> to z, and
 		the value of the array at <code>index * itemSize + 3</code> to w.
+		</div>
+
+		<h3>[method:null setNeedsUpdate]() </h3>
+		<div>
+		Increases the version number for the buffer, indicating that this attribute has changed and should be re-sent to the GPU. Call this method when you modify the value of the array.
 		</div>
 
 		<h3>[method:BufferAttribute clone]() </h3>

@@ -72,7 +72,7 @@
 
 						var tex = texture1.clone();
 
-						tex.needsUpdate = true; // cloning does not set this
+						tex.setNeedsUpdate(); // cloning does not set this
 
 						tex.offset.x = 0.1 * THREE.Math.randInt( 0, 7 );
 						tex.offset.y = 0.1 * THREE.Math.randInt( 0, 7 );

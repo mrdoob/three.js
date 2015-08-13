@@ -275,10 +275,10 @@
 
 
 				linesMesh.geometry.drawcalls[ 0 ].count = numConnected * 2;
-				linesMesh.geometry.attributes.position.needsUpdate = true;
-				linesMesh.geometry.attributes.color.needsUpdate = true;
+				linesMesh.geometry.attributes.position.setNeedsUpdate();
+				linesMesh.geometry.attributes.color.setNeedsUpdate();
 
-				pointCloud.geometry.attributes.position.needsUpdate = true;
+				pointCloud.geometry.attributes.position.setNeedsUpdate();
 
 				requestAnimationFrame( animate );
 

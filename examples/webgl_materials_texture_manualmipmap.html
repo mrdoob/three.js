@@ -130,14 +130,14 @@
 				textureCanvas1.mipmaps[ 5 ] = mipmap( 4,  '#004' );
 				textureCanvas1.mipmaps[ 6 ] = mipmap( 2,  '#044' );
 				textureCanvas1.mipmaps[ 7 ] = mipmap( 1,  '#404' );
-				textureCanvas1.needsUpdate = true;
+				textureCanvas1.setNeedsUpdate();
 
 				materialCanvas1 = new THREE.MeshBasicMaterial( { map: textureCanvas1 } );
 
 				var textureCanvas2 = textureCanvas1.clone();
 				textureCanvas2.magFilter = THREE.NearestFilter;
 				textureCanvas2.minFilter = THREE.NearestMipMapNearestFilter;
-				textureCanvas2.needsUpdate = true;
+				textureCanvas2.setNeedsUpdate();
 				materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
@@ -158,7 +158,7 @@
 					var image = texturePainting1.image;
 
 					texturePainting2.image = image;
-					texturePainting2.needsUpdate = true;
+					texturePainting2.setNeedsUpdate();
 
 					scene1.add( meshCanvas1 );
 					scene2.add( meshCanvas2 );

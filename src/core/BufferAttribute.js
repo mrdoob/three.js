@@ -32,7 +32,9 @@ THREE.BufferAttribute.prototype = {
 
 	set needsUpdate( value ) {
 
-		if ( value === true ) this.version ++;
+		console.warn( 'THREE.BufferAttribute: .needsUpdate is deprecated. Use .setNeedsUpdate() instead.' );
+
+		if ( value === true ) this.setNeedsUpdate();
 
 	},
 
@@ -276,6 +278,12 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index + 3 ] = w;
 
 		return this;
+
+	},
+
+	setNeedsUpdate: function () {
+
+		this.version ++;
 
 	},
 

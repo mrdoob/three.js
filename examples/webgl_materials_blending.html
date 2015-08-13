@@ -56,7 +56,7 @@
 				mapBg = new THREE.Texture( x );
 				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
 				mapBg.repeat.set( 128, 64 );
-				mapBg.needsUpdate = true;
+				mapBg.setNeedsUpdate();
 
 				/*
 				var mapBg = THREE.ImageUtils.loadTexture( "textures/disturb.jpg" );
@@ -158,7 +158,7 @@
 				xc.fillText( text, 10, 22 );
 
 				var map = new THREE.Texture( x );
-				map.needsUpdate = true;
+				map.setNeedsUpdate();
 
 				var material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
 				return material;
@@ -168,7 +168,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				
+
 				var time = Date.now() * 0.00025;
 				var ox = ( time * -0.01 * mapBg.repeat.x ) % 1;
 				var oy = ( time * -0.01 * mapBg.repeat.y ) % 1;

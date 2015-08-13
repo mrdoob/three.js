@@ -4314,7 +4314,7 @@
 		loader.load( url, function ( image ) {
 
 			texture.image = image;
-			texture.needsUpdate = true;
+			texture.setNeedsUpdate();
 
 		} );
 

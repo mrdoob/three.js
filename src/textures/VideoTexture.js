@@ -16,7 +16,7 @@ THREE.VideoTexture = function ( video, mapping, wrapS, wrapT, magFilter, minFilt
 
 		if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
 
-			scope.needsUpdate = true;
+			scope.setNeedsUpdate();
 
 		}
 

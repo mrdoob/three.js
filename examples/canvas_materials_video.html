@@ -208,8 +208,8 @@
 
 					imageContext.drawImage( video, 0, 0 );
 
-					if ( texture ) texture.needsUpdate = true;
-					if ( textureReflection ) textureReflection.needsUpdate = true;
+					if ( texture ) texture.setNeedsUpdate();
+					if ( textureReflection ) textureReflection.setNeedsUpdate();
 
 				}
 

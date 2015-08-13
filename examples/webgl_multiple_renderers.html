@@ -145,7 +145,7 @@
 				context.fillRect( 0, 0, canvas.width, canvas.height );
 
 				var shadowTexture = new THREE.Texture( canvas );
-				shadowTexture.needsUpdate = true;
+				shadowTexture.setNeedsUpdate();
 
 				var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
 				var shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );

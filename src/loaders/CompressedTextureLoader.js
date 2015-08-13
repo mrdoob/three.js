@@ -56,7 +56,7 @@ THREE.CompressedTextureLoader.prototype = {
  							texture.minFilter = THREE.LinearFilter;
 
 						texture.format = texDatas.format;
-						texture.needsUpdate = true;
+						texture.setNeedsUpdate();
 
 						if ( onLoad ) onLoad( texture );
 
@@ -114,7 +114,7 @@ THREE.CompressedTextureLoader.prototype = {
 				}
 
 				texture.format = texDatas.format;
-				texture.needsUpdate = true;
+				texture.setNeedsUpdate();
 
 				if ( onLoad ) onLoad( texture );
 

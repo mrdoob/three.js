@@ -56,7 +56,7 @@ UI.Texture = function ( mapping ) {
 
 					var texture = new THREE.Texture( this, mapping );
 					texture.sourceFile = file.name;
-					texture.needsUpdate = true;
+					texture.setNeedsUpdate();
 
 					scope.setValue( texture );
 

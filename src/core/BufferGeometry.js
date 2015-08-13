@@ -87,7 +87,7 @@ THREE.BufferGeometry.prototype = {
 		if ( position !== undefined ) {
 
 			matrix.applyToVector3Array( position.array );
-			position.needsUpdate = true;
+			position.setNeedsUpdate();
 
 		}
 
@@ -98,7 +98,7 @@ THREE.BufferGeometry.prototype = {
 			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
 			normalMatrix.applyToVector3Array( normal.array );
-			normal.needsUpdate = true;
+			normal.setNeedsUpdate();
 
 		}
 
@@ -331,7 +331,7 @@ THREE.BufferGeometry.prototype = {
 			if ( attribute !== undefined ) {
 
 				attribute.copyVector3sArray( geometry.vertices );
-				attribute.needsUpdate = true;
+				attribute.setNeedsUpdate();
 
 			}
 
@@ -346,7 +346,7 @@ THREE.BufferGeometry.prototype = {
 			if ( attribute !== undefined ) {
 
 				attribute.copyVector3sArray( geometry.normals );
-				attribute.needsUpdate = true;
+				attribute.setNeedsUpdate();
 
 			}
 
@@ -361,7 +361,7 @@ THREE.BufferGeometry.prototype = {
 			if ( attribute !== undefined ) {
 
 				attribute.copyColorsArray( geometry.colors );
-				attribute.needsUpdate = true;
+				attribute.setNeedsUpdate();
 
 			}
 
@@ -376,7 +376,7 @@ THREE.BufferGeometry.prototype = {
 			if ( attribute !== undefined ) {
 
 				attribute.copyVector4sArray( geometry.tangents );
-				attribute.needsUpdate = true;
+				attribute.setNeedsUpdate();
 
 			}
 
@@ -391,7 +391,7 @@ THREE.BufferGeometry.prototype = {
 			if ( attribute !== undefined ) {
 
 				attribute.copyArray( geometry.lineDistances );
-				attribute.needsUpdate = true;
+				attribute.setNeedsUpdate();
 
 			}
 
@@ -737,7 +737,7 @@ THREE.BufferGeometry.prototype = {
 
 			this.normalizeNormals();
 
-			attributes.normal.needsUpdate = true;
+			attributes.normal.setNeedsUpdate();
 
 		}
 

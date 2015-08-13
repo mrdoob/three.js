@@ -218,7 +218,7 @@
 						// set the alpha according to distance
 						alphas[ objectIndex ] = 1.0 / maxDistance * object[1];
 						// update the attribute
-						_particleGeom.attributes.alpha.needsUpdate = true;
+						_particleGeom.attributes.alpha.setNeedsUpdate();
 					}
 				}
 			}

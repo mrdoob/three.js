@@ -116,7 +116,7 @@ THREE.Loader.prototype = {
 
 						}
 
-						texture.needsUpdate = true;
+						texture.setNeedsUpdate();
 
 					} );
 

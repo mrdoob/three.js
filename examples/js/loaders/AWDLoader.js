@@ -469,7 +469,7 @@
 			loader.load( this._baseDir + url, function( image ) {
 
 				tex.image = image;
-				tex.needsUpdate = true;
+				tex.setNeedsUpdate();
 
 			} );
 

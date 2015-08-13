@@ -1697,7 +1697,7 @@ THREE.SEA3D.prototype.readImage = function(sea) {
 		}
 		
 		texture.image = image;
-		texture.needsUpdate = true; 	
+		texture.setNeedsUpdate(); 	
 	}
 	
 	image.src = this.bufferToTexture( sea.data.buffer );	
@@ -1735,7 +1735,7 @@ THREE.SEA3D.prototype.readCubeMap = function(sea) {
 		
 		cubeImage.onload = function () {			
 			if (++images.loadedCount == 6)
-				texture.needsUpdate = true;			
+				texture.setNeedsUpdate();			
 		}
 
 		cubeImage.src = this.bufferToTexture( faces[i].buffer );

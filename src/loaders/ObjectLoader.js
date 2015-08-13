@@ -434,7 +434,7 @@ THREE.ObjectLoader.prototype = {
 				}
 
 				var texture = new THREE.Texture( images[ data.image ] );
-				texture.needsUpdate = true;
+				texture.setNeedsUpdate();
 
 				texture.uuid = data.uuid;
 

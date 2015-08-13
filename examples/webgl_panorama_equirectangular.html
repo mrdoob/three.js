@@ -112,7 +112,7 @@
 					reader.addEventListener( 'load', function ( event ) {
 
 						material.map.image.src = event.target.result;
-						material.map.needsUpdate = true;
+						material.map.setNeedsUpdate();
 
 					}, false );
 					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );

@@ -196,7 +196,7 @@ THREE.Lut.prototype = {
 		}
 
 		this.legend.ctx.putImageData( imageData, 0, 0 );
-		this.legend.texture.needsUpdate = true;
+		this.legend.texture.setNeedsUpdate();
 
 		this.legend.legendGeometry = new THREE.PlaneBufferGeometry( this.legend.dimensions.width, this.legend.dimensions.height );
 		this.legend.legendMaterial = new THREE.MeshBasicMaterial( { map : this.legend.texture, side : THREE.DoubleSide } );
@@ -329,7 +329,7 @@ THREE.Lut.prototype = {
 
 		var txtTitle = new THREE.Texture( canvasTitle );
 		txtTitle.minFilter = THREE.LinearFilter;
-		txtTitle.needsUpdate = true;
+		txtTitle.setNeedsUpdate();
 
 		var spriteMaterialTitle = new THREE.SpriteMaterial( { map: txtTitle, useScreenCoordinates: false } );
 
@@ -410,7 +410,7 @@ THREE.Lut.prototype = {
 
 				var txtTick = new THREE.Texture( canvasTick );
 				txtTick.minFilter = THREE.LinearFilter;
-				txtTick.needsUpdate = true;
+				txtTick.setNeedsUpdate();
 
 				var spriteMaterialTick = new THREE.SpriteMaterial( { map: txtTick, useScreenCoordinates: false } );
 

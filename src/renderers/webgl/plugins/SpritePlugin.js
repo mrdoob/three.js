@@ -81,7 +81,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 		context.fillRect( 0, 0, 8, 8 );
 
 		texture = new THREE.Texture( canvas );
-		texture.needsUpdate = true;
+		texture.setNeedsUpdate();
 
 	};
 
