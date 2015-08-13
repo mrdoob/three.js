@@ -43,7 +43,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 	//
 
 	this.objects = objects;
-	this.geometries = geometries;
 
 	this.init = function ( object ) {
 
@@ -77,7 +76,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	};
 
-	function updateObject( object ) {
+	this.update = function ( object ) {
+
+		// TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
 
 		var geometry = geometries.get( object );
 
@@ -110,6 +111,8 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 			}
 
 		}
+
+		return geometry;
 
 	}
 
@@ -191,16 +194,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		}
 
 		return properties.get( attribute ).__webglBuffer;
-
-	};
-
-	this.update = function ( renderList ) {
-
-		for ( var i = 0, ul = renderList.length; i < ul; i ++ ) {
-
-			updateObject( renderList[ i ].object );
-
-		}
 
 	};
 

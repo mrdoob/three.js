@@ -795,7 +795,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		setMaterial( material );
 
-		var geometry = objects.geometries.get( object );
+		var geometry = objects.update( object );
 		var program = setProgram( camera, lights, fog, material, object );
 
 		var updateBuffers = false,
@@ -1559,9 +1559,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			transparentObjects.sort( reversePainterSortStable );
 
 		}
-
-		objects.update( opaqueObjects );
-		objects.update( transparentObjects );
 
 		//
 
