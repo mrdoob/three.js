@@ -20503,9 +20503,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var geometry = objects.update( object );
 		var program = setProgram( camera, lights, fog, material, object );
 
-		var updateBuffers = false,
-			wireframeBit = material.wireframe ? 1 : 0,
-			geometryProgram = geometry.id + '_' + program.id + '_' + wireframeBit;
+		var updateBuffers = false;
+		var geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
 
 		if ( geometryProgram !== _currentGeometryProgram ) {
 
@@ -20574,7 +20573,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			renderMesh( material, geometry, object, program, updateBuffers, materialIndex );
+			renderMesh( material, geometry, program, updateBuffers, materialIndex );
 
 		} else if ( object instanceof THREE.Line ) {
 
@@ -20582,7 +20581,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.PointCloud ) {
 
-			renderPointCloud( material, geometry, object, program, updateBuffers, materialIndex );
+			renderPointCloud( material, geometry, program, updateBuffers, materialIndex );
 
 		}
 
@@ -20719,7 +20718,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderMesh( material, geometry, object, program, updateBuffers, materialIndex ) {
+	function renderMesh( material, geometry, program, updateBuffers, materialIndex ) {
 
 		var mode = _gl.TRIANGLES;
 
@@ -20727,6 +20726,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			mode = _gl.LINES;
 			state.setLineWidth( material.wireframeLinewidth * pixelRatio );
+
+			if ( geometry._wireframe === undefined ) {
+
+				geometry._wireframe = new THREE.WireframeGeometry( geometry );
+				objects.updateAttribute( geometry._wireframe.attributes.position );
+
+			}
+
+			geometry = geometry._wireframe;
 
 		}
 
@@ -21051,7 +21059,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderPointCloud( material, geometry, object, program, updateBuffers, materialIndex ) {
+	function renderPointCloud( material, geometry, program, updateBuffers, materialIndex ) {
 
 		var mode = _gl.POINTS;
 
@@ -24147,7 +24155,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	};
 
-	this.update = function ( object ) {
+	function update( object ) {
 
 		// TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
 
@@ -24267,6 +24275,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		return properties.get( attribute ).__webglBuffer;
 
 	};
+
+	this.update = update;
+	this.updateAttribute = updateAttribute;
 
 	this.clear = function () {
 
