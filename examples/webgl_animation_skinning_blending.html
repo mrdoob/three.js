@@ -30,7 +30,7 @@
 			<br><br> Adjust blend weights to affect the animations that are currently playing.
 			<br> Cross fades (and warping) blend between 2 animations and end with a single animation.
 		</div>
-
+		
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -46,7 +46,7 @@
 
 			var container, stats;
 
-			var blendMesh, helper, camera, scene, renderer, controls;
+			var blendMesh, helper, camera, scene, renderer, controls, wireframeHelper;
 
 			var clock = new THREE.Clock();
 			var gui = null;
@@ -96,6 +96,7 @@
 				window.addEventListener( 'warp', onWarp );
 				window.addEventListener( 'toggle-show-skeleton', onShowSkeleton );
 				window.addEventListener( 'toggle-show-model', onShowModel );
+				window.addEventListener( 'toggle-show-wireframe', onShowWireframe );
 
 				blendMesh = new THREE.BlendCharacter();
 				blendMesh.load( "models/skinned/marine/marine_anims.js", start );
@@ -197,6 +198,16 @@
 
 			}
 
+			function onShowWireframe( event ) {
+				var shouldShow = event.detail.shouldShow;
+				if ( blendMesh )
+				if ( !wireframeHelper ) {
+					wireframeHelper = new THREE.WireframeHelper( blendMesh, 0xffffff );
+					scene.add( wireframeHelper );
+				}
+				wireframeHelper.visible = shouldShow;
+			}
+
 			function start() {
 
 				blendMesh.rotation.y = Math.PI * -135 / 180;
@@ -246,6 +257,9 @@
 				blendMesh.update( stepSize );
 				helper.update();
 				gui.update();
+				if ( wireframeHelper && wireframeHelper.visible && !blendMesh.visible ) {
+					wireframeHelper.update();
+				}
 
 				THREE.AnimationHandler.update( stepSize );
 
