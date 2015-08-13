@@ -30,13 +30,9 @@ OR (for 2.6)
 
 ### OSX
 
-Depends on where blender.app is. Assuming you copied it to your Applications folder:
+In your user's library for user installed Blender addons:
 
-    /Applications/blender.app/Contents/Resources/2.7X/scripts/addons
-    
-OR (for 2.6)
-
-    /Applications/blender.app/Contents/MacOS/2.6X/scripts/addons
+    /Users/(myuser)/Library/Application Support/Blender/2.7X/scripts/addons
 
 ### Linux
 
