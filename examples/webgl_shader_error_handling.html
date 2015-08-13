@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - shader [Monjori]</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #ffffff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #ffffff;
+			}
+
+			#oldie a { color:#da0 }
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - shader demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank">Monjori by Mic</a></div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script id="vertexShaderCompileError" type="x-shader/x-vertex">
+			varying vec3 temp;
+			void main()	{
+				gl_Position = vec4( position_typo, 1.0 );
+
+			}
+
+		</script>
+
+		<script id="vertexShaderLinkError" type="x-shader/x-vertex">
+		varying vec3 temp;
+			void main()	{
+				temp = vec3(position.xy, 0.0);
+				gl_Position = vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script id="fragmentShaderLinkError" type="x-shader/x-fragment">
+		varying vec2 temp;
+			void main()	{
+				gl_FragColor = vec4( temp, 0.0, 1.0 );
+
+			}
+
+		</script>
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+			attribute float instanceData;
+	    varying vec3 vColour;
+	    uniform mat4 worldTransforms[ NUM_INSTANCES_PER_RENDER ];
+	    uniform vec3 instanceColours[ NUM_INSTANCES_PER_RENDER ];
+	    
+	    void main() {
+	    	
+	      vec4 worldPosition = worldTransforms[ int(instanceData) ] * vec4( position, 1.0 );
+	      gl_Position = projectionMatrix * viewMatrix * worldPosition;
+
+	      vColour = instanceColours[ int(instanceData) ];
+	    }
+    </script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+
+			varying vec3 vColour;
+			void main()	{
+
+				gl_FragColor = vec4( vColour, 1.0 );
+
+			}
+
+		</script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var instanceUniforms = [];
+			var instanceMaterials = [];
+			var instanceMeshes = [];
+			var instanceObjects = [];
+			var instanceRotations = [];
+			var INSTANCE_SPREAD = 15;
+			var NUM_INSTANCES = 2048;
+			var NUM_INSTANCES_PER_RENDER = NUM_INSTANCES;
+
+			var vertexShaders = [];
+			var fragmentShaders = [];
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.position.z = 12;
+				controls = new THREE.OrbitControls( camera );
+				controls.target.set( 0, 0, 0 );
+				controls.update();
+
+				scene = new THREE.Scene();
+				window.scene = scene;
+
+				var geometry = new THREE.SphereBufferGeometry( 0.25, 16, 16 );
+
+				uniformsTemplate = {
+					worldTransforms: { type: "m4v", value: [] },
+					instanceColours: { type: "v3v", value: [] }
+				};
+
+				var material = new THREE.ShaderMaterial( {
+
+					vertexShader: document.getElementById( 'vertexShaderCompileError' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+				} );
+
+				material.addEventListener('shaderCompileError', function(err) {
+					console.log('Shader failed to compile');
+					material.vertexShader = document.getElementById( 'vertexShaderLinkError' ).textContent;
+					material.fragmentShader = document.getElementById( 'fragmentShaderLinkError' ).textContent;
+					material.needsUpdate = true;
+				});
+
+				var linkFailed = true;
+				material.addEventListener('programLinkError', function(err) {
+					console.log('Program failed to link');
+					targetMesh.material = new THREE.MeshBasicMaterial( { color: 0x226666 } );
+				});
+
+				var targetMesh = new THREE.Mesh( geometry, material );
+				scene.add( targetMesh );
+
+				boxGeometry = new THREE.BoxGeometry(0.25, 0.25, 0.25);
+				boxBufferGeometry = new THREE.BufferGeometry().fromGeometry( boxGeometry );
+				
+				initializeInstanceObjects();
+				initializeInstanceData();
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				onWindowResize();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function cleanupInstanceData() {
+				for ( var i = 0; i < instanceMeshes.length; i++ ) {
+					scene.remove( instanceMeshes[i] );
+				}
+				instanceUniforms = [];
+				instanceMaterials = [];
+				instanceMeshes = [];
+			}
+
+			function initializeInstanceObjects() {
+				var object, rotation;
+				for ( var i = 0; i < NUM_INSTANCES; i++ ) {
+					object = new THREE.Object3D();
+					object.position.x = (Math.random() - 0.5 ) * INSTANCE_SPREAD;
+					object.position.y = (Math.random() - 0.5 ) * INSTANCE_SPREAD;
+					object.position.z = (Math.random() - 0.5 ) * INSTANCE_SPREAD;
+
+					object.color = new THREE.Vector3();
+					object.color.x = Math.random();
+					object.color.y = Math.random();
+					object.color.z = Math.random();
+					instanceObjects.push( object );
+					scene.add( object );
+
+					rotation = new THREE.Vector3( Math.random(), Math.random(), Math.random() );
+					instanceRotations.push( rotation );
+				}
+			}
+
+			function initializeInstanceData() {
+				cleanupInstanceData();
+
+				var numMeshes = Math.floor( NUM_INSTANCES / NUM_INSTANCES_PER_RENDER );
+				var remainder = NUM_INSTANCES - numMeshes * NUM_INSTANCES_PER_RENDER;
+				if ( remainder ) {
+					numMeshes++;
+				}
+
+				for ( var m = 0; m < numMeshes; m++ ) {
+					uniforms = THREE.UniformsUtils.clone( uniformsTemplate );
+					for ( var i = 0; i < NUM_INSTANCES_PER_RENDER; i++ ) {
+						uniforms.worldTransforms.value[ i ] = instanceObjects[ m * NUM_INSTANCES_PER_RENDER + i ].matrixWorld;
+						uniforms.instanceColours.value[ i ] = instanceObjects[ m * NUM_INSTANCES_PER_RENDER + i ].color;
+					}
+					instanceUniforms.push( uniforms );
+					instanceMaterials.push( initInstanceMaterial( m ) );
+					instanceMeshes.push( initInstanceMesh( m ) );
+					instanceMeshes[ m ].name = 'Instance Mesh #' + m;
+
+					scene.add( instanceMeshes[ m ] );
+				}
+
+				instanceMaterials[0].addEventListener( 'shaderCompileError', onInstanceCompileError );
+			}
+
+			function initInstanceMaterial( instanceId ) {
+				var params = {};
+				params.vertexShader = document.getElementById( 'vertexShader' ).textContent;
+				params.fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
+				params.uniforms = instanceUniforms[ instanceId ];
+				params.attributes = {
+			    "instanceData" : { type: "f", value: null }
+			  };
+				params.defines = { 'NUM_INSTANCES_PER_RENDER' : NUM_INSTANCES_PER_RENDER };
+				return new THREE.ShaderMaterial( params );
+			}
+
+			function initInstanceMesh( instanceId ) {
+				
+				var instancesGeometry = new THREE.BufferGeometry();
+				var positions = boxBufferGeometry.getAttribute( 'position' );
+				var normals = boxBufferGeometry.getAttribute( 'normal' );
+				var numVertices = positions.array.length / positions.itemSize;
+				var instancePositions = new THREE.BufferAttribute( new Float32Array( NUM_INSTANCES_PER_RENDER * positions.array.length  ), 3 );
+				// var instanceNormals = new THREE.BufferAttribute( new Float32Array( NUM_INSTANCES_PER_RENDER * positions.array.length  ), 3 );
+				var instanceData = new THREE.BufferAttribute( new Float32Array( NUM_INSTANCES_PER_RENDER * numVertices ), 1 );
+				
+				for ( var inst = 0; inst < NUM_INSTANCES_PER_RENDER; inst++ ) {
+					for ( var vert = 0; vert < numVertices; vert++ ) {
+						var boxIndex = vert * 3;
+						var instIndex = inst * positions.array.length + vert * 3;
+						instancePositions.array[instIndex] = positions.array[boxIndex];
+						instancePositions.array[instIndex + 1] = positions.array[boxIndex + 1];
+						instancePositions.array[instIndex + 2] = positions.array[boxIndex + 2];
+
+						// instanceNormals.array[instIndex] = normals.array[boxIndex];
+						// instanceNormals.array[instIndex + 1] = normals.array[boxIndex + 1];
+						// instanceNormals.array[instIndex + 2] = normals.array[boxIndex + 2];
+
+						instanceData.array[inst * numVertices + vert] = inst;
+					}
+				}
+
+				instancesGeometry.addAttribute( 'position', instancePositions );
+				// instancesGeometry.addAttribute( 'normal', instanceNormals );
+				instancesGeometry.addAttribute( 'instanceData', instanceData );
+
+
+				return new THREE.Mesh( instancesGeometry, instanceMaterials[ instanceId ] );
+			}
+
+			function onInstanceCompileError( event ) {
+				NUM_INSTANCES_PER_RENDER = Math.round( NUM_INSTANCES_PER_RENDER / 2 );
+				initializeInstanceData();
+			}
+
+			function updateInstanceData( delta ) {
+				for ( var i = 0; i < instanceObjects.length; i++ ) {
+					instanceObjects[i].rotation.x += delta * instanceRotations[i].x;
+					instanceObjects[i].rotation.y += delta * instanceRotations[i].y;
+					instanceObjects[i].rotation.z += delta * instanceRotations[i].z;
+				}
+			}
+
+			function onWindowResize( event ) {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				updateInstanceData( 0.017 );
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

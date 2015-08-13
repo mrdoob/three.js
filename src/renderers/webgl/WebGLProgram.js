@@ -379,6 +379,8 @@ THREE.WebGLProgram = ( function () {
 
 			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexLog, fragmentLog );
 
+			throw new Error( 'programLinkError' );
+
 		} else if ( programLog !== '' ) {
 
 			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
