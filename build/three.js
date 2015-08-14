@@ -20761,9 +20761,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			var offsets = geometry.drawcalls;
+			var drawcall = geometry.drawcalls;
 
-			if ( offsets.length === 0 ) {
+			if ( drawcall.length === 0 ) {
 
 				if ( updateBuffers ) {
 
@@ -20797,14 +20797,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				// if there is more than 1 chunk
-				// must set attribute pointers to use new offsets for each chunk
+				// must set attribute pointers to use new drawcall for each chunk
 				// even if geometry and materials didn't change
 
 				updateBuffers = true;
 
-				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+				for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
 
-					var startIndex = offsets[ i ].index;
+					var startIndex = drawcall[ i ].index;
 
 					if ( updateBuffers ) {
 
@@ -20815,7 +20815,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// render indexed triangles
 
-					if ( geometry instanceof THREE.InstancedBufferGeometry && offsets[ i ].instances > 0 ) {
+					if ( geometry instanceof THREE.InstancedBufferGeometry && drawcall[ i ].instances > 0 ) {
 
 						var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -20826,17 +20826,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
-						extension.drawElementsInstancedANGLE( mode, offsets[ i ].count, type, offsets[ i ].start * size, offsets[ i ].count, type, offsets[ i ].instances ); // Draw the instanced meshes
+						extension.drawElementsInstancedANGLE( mode, drawcall[ i ].count, type, drawcall[ i ].start * size, drawcall[ i ].count, type, drawcall[ i ].instances ); // Draw the instanced meshes
 
 					} else {
 
-						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+						_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size );
 
 					}
 
 					_infoRender.calls ++;
-					_infoRender.vertices += offsets[ i ].count; // not really true, here vertices can be shared
-					_infoRender.faces += offsets[ i ].count / 3;
+					_infoRender.vertices += drawcall[ i ].count; // not really true, here vertices can be shared
+					_infoRender.faces += drawcall[ i ].count / 3;
 
 				}
 
@@ -20844,17 +20844,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
+			if ( updateBuffers ) {
+
+				setupVertexAttributes( material, program, geometry, 0 );
+
+			}
+
 			// non-indexed triangles
 
-			var offsets = geometry.drawcalls;
+			var drawcall = geometry.drawcalls;
 
-			if ( offsets.length === 0 ) {
-
-				if ( updateBuffers ) {
-
-					setupVertexAttributes( material, program, geometry, 0 );
-
-				}
+			if ( drawcall.length === 0 ) {
 
 				var position = geometry.attributes.position;
 
@@ -20901,17 +20901,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				// if there is more than 1 chunk
-				// must set attribute pointers to use new offsets for each chunk
-				// even if geometry and materials didn't change
-
-				if ( updateBuffers ) {
-
-					setupVertexAttributes( material, program, geometry, 0 );
-
-				}
-
-				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+				for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
 
 					// render non-indexed triangles
 
@@ -20922,13 +20912,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					} else {
 
-						_gl.drawArrays( mode, offsets[ i ].start, offsets[ i ].count );
+						_gl.drawArrays( mode, drawcall[ i ].start, drawcall[ i ].count );
 
 					}
 
 					_infoRender.calls ++;
-					_infoRender.vertices += offsets[ i ].count;
-					_infoRender.faces += ( offsets[ i ].count  ) / 3;
+					_infoRender.vertices += drawcall[ i ].count;
+					_infoRender.faces += ( drawcall[ i ].count  ) / 3;
 
 				}
 
@@ -20969,9 +20959,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			var offsets = geometry.drawcalls;
+			var drawcall = geometry.drawcalls;
 
-			if ( offsets.length === 0 ) {
+			if ( drawcall.length === 0 ) {
 
 				if ( updateBuffers ) {
 
@@ -20988,14 +20978,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				// if there is more than 1 chunk
-				// must set attribute pointers to use new offsets for each chunk
+				// must set attribute pointers to use new drawcall for each chunk
 				// even if geometry and materials didn't change
 
-				if ( offsets.length > 1 ) updateBuffers = true;
+				if ( drawcall.length > 1 ) updateBuffers = true;
 
-				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+				for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
 
-					var startIndex = offsets[ i ].index;
+					var startIndex = drawcall[ i ].index;
 
 					if ( updateBuffers ) {
 
@@ -21006,10 +20996,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// render indexed lines
 
-					_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16Array
+					_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size ); // 2 bytes per Uint16Array
 
 					_infoRender.calls ++;
-					_infoRender.vertices += offsets[ i ].count; // not really true, here vertices can be shared
+					_infoRender.vertices += drawcall[ i ].count; // not really true, here vertices can be shared
 
 				}
 
@@ -21026,9 +21016,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			var position = geometry.attributes.position;
-			var offsets = geometry.drawcalls;
+			var drawcall = geometry.drawcalls;
 
-			if ( offsets.length === 0 ) {
+			if ( drawcall.length === 0 ) {
 
 				_gl.drawArrays( mode, 0, position.array.length / 3 );
 
@@ -21037,12 +21027,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+				for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
 
-					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
+					_gl.drawArrays( mode, drawcall[ i ].index, drawcall[ i ].count );
 
 					_infoRender.calls ++;
-					_infoRender.vertices += offsets[ i ].count;
+					_infoRender.vertices += drawcall[ i ].count;
 
 				}
 
@@ -21078,9 +21068,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			var offsets = geometry.drawcalls;
+			var drawcall = geometry.drawcalls;
 
-			if ( offsets.length === 0 ) {
+			if ( drawcall.length === 0 ) {
 
 				if ( updateBuffers ) {
 
@@ -21097,14 +21087,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				// if there is more than 1 chunk
-				// must set attribute pointers to use new offsets for each chunk
+				// must set attribute pointers to use new drawcall for each chunk
 				// even if geometry and materials didn't change
 
-				if ( offsets.length > 1 ) updateBuffers = true;
+				if ( drawcall.length > 1 ) updateBuffers = true;
 
-				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+				for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
 
-					var startIndex = offsets[ i ].index;
+					var startIndex = drawcall[ i ].index;
 
 					if ( updateBuffers ) {
 
@@ -21115,10 +21105,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// render indexed points
 
-					_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+					_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size );
 
 					_infoRender.calls ++;
-					_infoRender.points += offsets[ i ].count;
+					_infoRender.points += drawcall[ i ].count;
 
 				}
 
@@ -21135,9 +21125,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			var position = geometry.attributes.position;
-			var offsets = geometry.drawcalls;
+			var drawcall = geometry.drawcalls;
 
-			if ( offsets.length === 0 ) {
+			if ( drawcall.length === 0 ) {
 
 				_gl.drawArrays( mode, 0, position.array.length / 3 );
 
@@ -21146,12 +21136,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+				for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
 
-					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
+					_gl.drawArrays( mode, drawcall[ i ].index, drawcall[ i ].count );
 
 					_infoRender.calls ++;
-					_infoRender.points += offsets[ i ].count;
+					_infoRender.points += drawcall[ i ].count;
 
 				}
 
