@@ -1715,7 +1715,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var object = webglObject.object;
 			var geometry = objects.update( object );
 
-			setupMatrices( object, camera );
+			object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
 
 			if ( overrideMaterial === undefined ) material = object.material;
 
@@ -1753,7 +1754,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var object = renderList[ i ];
 
-			setupMatrices( object, camera );
+			object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
 
 			if ( overrideMaterial === undefined ) material = object.material;
 
@@ -2920,13 +2922,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
-
-	}
-
-	function setupMatrices( object, camera ) {
-
-		object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-		object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
 
 	}
 
