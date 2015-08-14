@@ -7824,7 +7824,7 @@ THREE.Object3D = function () {
 	this.matrix = new THREE.Matrix4();
 	this.matrixWorld = new THREE.Matrix4();
 
-	this.matrixAutoUpdate = true;
+	this.matrixAutoUpdate = THREE.Object3D.DefaultMatrixAutoUpdate;
 	this.matrixWorldNeedsUpdate = false;
 
 	this.visible = true;
@@ -7840,6 +7840,7 @@ THREE.Object3D = function () {
 };
 
 THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 1, 0 );
+THREE.Object3D.DefaultMatrixAutoUpdate = true;
 
 THREE.Object3D.prototype = {
 
@@ -20478,29 +20479,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.renderBufferDirect = function ( camera, lights, fog, material, object, materialIndex ) {
-
-		if ( material instanceof THREE.MeshFaceMaterial ) {
-
-			var materials = material.materials;
-
-			for ( var i = 0, il = materials.length; i < il; i ++ ) {
-
-				material = materials[ i ];
-
-				if ( material === null || material.visible === false ) continue;
-
-				_this.renderBufferDirect( camera, lights, fog, material, object, i );
-
-			}
-
-			return;
-
-		}
+	this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object ) {
 
 		setMaterial( material );
 
-		var geometry = objects.update( object );
 		var program = setProgram( camera, lights, fog, material, object );
 
 		var updateBuffers = false;
@@ -20573,15 +20555,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			renderMesh( material, geometry, program, updateBuffers, materialIndex );
+			renderMesh( material, geometry, program, updateBuffers );
 
 		} else if ( object instanceof THREE.Line ) {
 
-			renderLine( material, geometry, object, program, updateBuffers, materialIndex );
+			renderLine( material, geometry, object, program, updateBuffers );
 
 		} else if ( object instanceof THREE.PointCloud ) {
 
-			renderPointCloud( material, geometry, program, updateBuffers, materialIndex );
+			renderPointCloud( material, geometry, program, updateBuffers );
 
 		}
 
@@ -20718,7 +20700,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderMesh( material, geometry, program, updateBuffers, materialIndex ) {
+	function renderMesh( material, geometry, program, updateBuffers ) {
 
 		var mode = _gl.TRIANGLES;
 
@@ -20804,8 +20786,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
 					var startIndex = offsets[ i ].index;
-
-					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
 
 					if ( updateBuffers ) {
 
@@ -20916,8 +20896,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// render non-indexed triangles
 
-					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
-
 					if ( geometry instanceof THREE.InstancedBufferGeometry ) {
 
 						console.error( 'THREE.WebGLRenderer.renderMesh: cannot use drawCalls with THREE.InstancedBufferGeometry.' );
@@ -20941,7 +20919,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderLine( material, geometry, object, program, updateBuffers, materialIndex ) {
+	function renderLine( material, geometry, object, program, updateBuffers ) {
 
 		var mode = object instanceof THREE.LineSegments ? _gl.LINES : _gl.LINE_STRIP;
 
@@ -21000,8 +20978,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var startIndex = offsets[ i ].index;
 
-					if ( materialIndex !== undefined && offsets[ i ].materialIndex === materialIndex ) continue;
-
 					if ( updateBuffers ) {
 
 						setupVertexAttributes( material, program, geometry, startIndex );
@@ -21044,8 +21020,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
-					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
-
 					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
 
 					_infoRender.calls ++;
@@ -21059,7 +21033,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderPointCloud( material, geometry, program, updateBuffers, materialIndex ) {
+	function renderPointCloud( material, geometry, program, updateBuffers ) {
 
 		var mode = _gl.POINTS;
 
@@ -21113,8 +21087,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var startIndex = offsets[ i ].index;
 
-					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
-
 					if ( updateBuffers ) {
 
 						setupVertexAttributes( material, program, geometry, startIndex );
@@ -21156,8 +21128,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
-
-					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
 
 					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
 
@@ -21449,12 +21419,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var webglObject = renderList[ i ];
 			var object = webglObject.object;
+			var geometry = objects.update( object );
 
 			setupMatrices( object, camera );
 
 			if ( overrideMaterial === undefined ) material = object.material;
 
-			_this.renderBufferDirect( camera, lights, fog, material, object );
+			if ( material instanceof THREE.MeshFaceMaterial ) {
+
+				var materials = material.materials;
+
+				for ( var j = 0, jl = materials.length; j < jl; j ++ ) {
+
+					material = materials[ j ];
+
+					if ( material.visible ) {
+
+						_this.renderBufferDirect( camera, lights, fog, geometry, material, object );
+
+					}
+
+				}
+
+			} else {
+
+				_this.renderBufferDirect( camera, lights, fog, geometry, material, object );
+
+			}
 
 		}
 
@@ -25072,49 +25063,37 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			// render regular objects
 
-			var webglObject, object, material;
-			var objectMaterial, useMorphing, useSkinning;
+			var webglObject, object, geometry, material;
 
 			for ( var j = 0, jl = _renderList.length; j < jl; j ++ ) {
 
 				webglObject = _renderList[ j ];
 
 				object = webglObject.object;
-				objectMaterial = object.material;
+				geometry = _objects.update( object );
+				material = object.material;
 
-				if ( objectMaterial instanceof THREE.MeshFaceMaterial ) {
+				if ( material instanceof THREE.MeshFaceMaterial ) {
 
-					// For the moment just ignore objects that have multiple materials with different animation methods
-					// Only the first material will be taken into account for deciding which depth material to use for shadow maps
+					var materials = material.materials;
 
-					objectMaterial = object.material.materials[ 0 ];
+					for ( var k = 0, kl = materials.length; k < kl; k ++ ) {
 
-					if ( objectMaterial === null || objectMaterial.visible === false ) continue;
+						material = materials[ k ];
 
-				}
+						if ( material.visible ) {
 
-				useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
-				useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
+							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, material ), object );
 
-				if ( object.customDepthMaterial ) {
+						}
 
-					material = object.customDepthMaterial;
-
-				} else if ( useSkinning ) {
-
-					material = useMorphing ? _depthMaterialMorphSkin : _depthMaterialSkin;
-
-				} else if ( useMorphing ) {
-
-					material = _depthMaterialMorph;
+					}
 
 				} else {
 
-					material = _depthMaterial;
+					_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, material ), object );
 
 				}
-
-				_renderer.renderBufferDirect( shadowCamera, _lights, null, material, object );
 
 			}
 
@@ -25139,6 +25118,39 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		scope.needsUpdate = false;
 
 	};
+
+	function getDepthMaterial( object, material ) {
+
+		var geometry = object.geometry;
+
+		var useMorphing = geometry.morphTargets !== undefined && geometry.morphTargets.length > 0 && material.morphTargets;
+		var useSkinning = object instanceof THREE.SkinnedMesh && material.skinning;
+
+		var depthMaterial;
+
+		if ( object.customDepthMaterial ) {
+
+			depthMaterial = object.customDepthMaterial;
+
+		} else if ( useSkinning ) {
+
+			depthMaterial = useMorphing ? _depthMaterialMorphSkin : _depthMaterialSkin;
+
+		} else if ( useMorphing ) {
+
+			depthMaterial = _depthMaterialMorph;
+
+		} else {
+
+			depthMaterial = _depthMaterial;
+
+		}
+
+		depthMaterial.wireframe = material.wireframe;
+
+		return depthMaterial;
+
+	}
 
 	function projectObject( object, camera ) {
 
