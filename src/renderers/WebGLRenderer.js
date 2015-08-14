@@ -1733,9 +1733,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-			}
+			} else {
 
-			_this.renderBufferDirect( camera, lights, fog, geometry, material, object );
+				_this.renderBufferDirect( camera, lights, fog, geometry, material, object );
+
+			}
 
 		}
 
