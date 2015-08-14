@@ -217,7 +217,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 					objectMaterial = object.material.materials[ 0 ];
 
-					if ( objectMaterial === null || objectMaterial.visible === false ) continue;
+					if ( objectMaterial.visible === false ) continue;
 
 				}
 
