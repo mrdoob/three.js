@@ -76,7 +76,7 @@ THREE.Texture.prototype = {
 
 		this.anisotropy = source.anisotropy;
 
-		this.format = source.format;		
+		this.format = source.format;
 		this.type = source.type;
 
 		this.offset.copy( source.offset );
