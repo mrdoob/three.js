@@ -773,7 +773,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.renderBufferDirect = function ( camera, lights, fog, material, object, materialIndex ) {
+	this.renderBufferDirect = function ( camera, lights, fog, material, object ) {
 
 		if ( material instanceof THREE.MeshFaceMaterial ) {
 
@@ -785,7 +785,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( material === null || material.visible === false ) continue;
 
-				_this.renderBufferDirect( camera, lights, fog, material, object, i );
+				_this.renderBufferDirect( camera, lights, fog, material, object );
 
 			}
 
@@ -868,15 +868,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			renderMesh( material, geometry, program, updateBuffers, materialIndex );
+			renderMesh( material, geometry, program, updateBuffers );
 
 		} else if ( object instanceof THREE.Line ) {
 
-			renderLine( material, geometry, object, program, updateBuffers, materialIndex );
+			renderLine( material, geometry, object, program, updateBuffers );
 
 		} else if ( object instanceof THREE.PointCloud ) {
 
-			renderPointCloud( material, geometry, program, updateBuffers, materialIndex );
+			renderPointCloud( material, geometry, program, updateBuffers );
 
 		}
 
@@ -1013,7 +1013,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderMesh( material, geometry, program, updateBuffers, materialIndex ) {
+	function renderMesh( material, geometry, program, updateBuffers ) {
 
 		var mode = _gl.TRIANGLES;
 
@@ -1099,8 +1099,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
 					var startIndex = offsets[ i ].index;
-
-					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
 
 					if ( updateBuffers ) {
 
@@ -1211,8 +1209,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// render non-indexed triangles
 
-					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
-
 					if ( geometry instanceof THREE.InstancedBufferGeometry ) {
 
 						console.error( 'THREE.WebGLRenderer.renderMesh: cannot use drawCalls with THREE.InstancedBufferGeometry.' );
@@ -1236,7 +1232,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderLine( material, geometry, object, program, updateBuffers, materialIndex ) {
+	function renderLine( material, geometry, object, program, updateBuffers ) {
 
 		var mode = object instanceof THREE.LineSegments ? _gl.LINES : _gl.LINE_STRIP;
 
@@ -1295,8 +1291,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var startIndex = offsets[ i ].index;
 
-					if ( materialIndex !== undefined && offsets[ i ].materialIndex === materialIndex ) continue;
-
 					if ( updateBuffers ) {
 
 						setupVertexAttributes( material, program, geometry, startIndex );
@@ -1339,8 +1333,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
-					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
-
 					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
 
 					_infoRender.calls ++;
@@ -1354,7 +1346,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderPointCloud( material, geometry, program, updateBuffers, materialIndex ) {
+	function renderPointCloud( material, geometry, program, updateBuffers ) {
 
 		var mode = _gl.POINTS;
 
@@ -1408,8 +1400,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var startIndex = offsets[ i ].index;
 
-					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
-
 					if ( updateBuffers ) {
 
 						setupVertexAttributes( material, program, geometry, startIndex );
@@ -1451,8 +1441,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
-
-					if ( materialIndex !== undefined && offsets[ i ].materialIndex !== materialIndex ) continue;
 
 					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
 
