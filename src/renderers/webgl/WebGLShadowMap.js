@@ -218,7 +218,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 						if ( material.visible ) {
 
-							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( material ), object );
+							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, material ), object );
 
 						}
 
@@ -226,7 +226,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				} else {
 
-					_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( material ), object );
+					_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, material ), object );
 
 				}
 
@@ -254,37 +254,36 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	};
 
-	function getDepthMaterial( object ) {
+	function getDepthMaterial( object, material ) {
 
-		var material;
+		var geometry = object.geometry;
 
-		var objectGeometry = object.geometry;
-		var objectMaterial = object.material;
+		var useMorphing = geometry.morphTargets !== undefined && geometry.morphTargets.length > 0 && material.morphTargets;
+		var useSkinning = object instanceof THREE.SkinnedMesh && material.skinning;
 
-		var useMorphing = objectGeometry.morphTargets !== undefined && objectGeometry.morphTargets.length > 0 && objectMaterial.morphTargets;
-		var useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
+		var depthMaterial;
 
 		if ( object.customDepthMaterial ) {
 
-			material = object.customDepthMaterial;
+			depthMaterial = object.customDepthMaterial;
 
 		} else if ( useSkinning ) {
 
-			material = useMorphing ? _depthMaterialMorphSkin : _depthMaterialSkin;
+			depthMaterial = useMorphing ? _depthMaterialMorphSkin : _depthMaterialSkin;
 
 		} else if ( useMorphing ) {
 
-			material = _depthMaterialMorph;
+			depthMaterial = _depthMaterialMorph;
 
 		} else {
 
-			material = _depthMaterial;
+			depthMaterial = _depthMaterial;
 
 		}
 
-		material.wireframe = objectMaterial.wireframe;
+		depthMaterial.wireframe = material.wireframe;
 
-		return material;
+		return depthMaterial;
 
 	}
 
