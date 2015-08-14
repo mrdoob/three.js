@@ -1727,9 +1727,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					material = materials[ j ];
 
-					if ( material.visible === false ) continue;
+					if ( material.visible ) {
 
-					_this.renderBufferDirect( camera, lights, fog, geometry, material, object );
+						_this.renderBufferDirect( camera, lights, fog, geometry, material, object );
+
+					}
 
 				}
 
