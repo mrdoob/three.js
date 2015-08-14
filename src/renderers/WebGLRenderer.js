@@ -1121,17 +1121,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
+			if ( updateBuffers ) {
+
+				setupVertexAttributes( material, program, geometry, 0 );
+
+			}
+			
 			// non-indexed triangles
 
 			var offsets = geometry.drawcalls;
 
 			if ( offsets.length === 0 ) {
-
-				if ( updateBuffers ) {
-
-					setupVertexAttributes( material, program, geometry, 0 );
-
-				}
 
 				var position = geometry.attributes.position;
 
@@ -1177,16 +1177,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_infoRender.faces += position.array.length / 3;
 
 			} else {
-
-				// if there is more than 1 chunk
-				// must set attribute pointers to use new offsets for each chunk
-				// even if geometry and materials didn't change
-
-				if ( updateBuffers ) {
-
-					setupVertexAttributes( material, program, geometry, 0 );
-
-				}
 
 				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
