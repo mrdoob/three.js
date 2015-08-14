@@ -16433,7 +16433,7 @@ THREE.Texture.prototype = {
 
 		this.anisotropy = source.anisotropy;
 
-		this.format = source.format;		
+		this.format = source.format;
 		this.type = source.type;
 
 		this.offset.copy( source.offset );
@@ -16549,6 +16549,23 @@ THREE.Texture.prototype = {
 THREE.EventDispatcher.prototype.apply( THREE.Texture.prototype );
 
 THREE.TextureIdCount = 0;
+
+// File:src/textures/CanvasTexture.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.CanvasTexture = function ( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+
+	THREE.Texture.call( this, canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+	this.needsUpdate = true;
+
+};
+
+THREE.CanvasTexture.prototype = Object.create( THREE.Texture.prototype );
+THREE.CanvasTexture.prototype.constructor = THREE.CanvasTexture;
 
 // File:src/textures/CubeTexture.js
 
@@ -20709,6 +20726,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			mode = _gl.LINES;
 			state.setLineWidth( material.wireframeLinewidth * pixelRatio );
 
+			/*
 			if ( geometry._wireframe === undefined ) {
 
 				geometry._wireframe = new THREE.WireframeGeometry( geometry );
@@ -20717,6 +20735,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			geometry = geometry._wireframe;
+			*/
 
 		}
 
@@ -21421,7 +21440,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var object = webglObject.object;
 			var geometry = objects.update( object );
 
-			setupMatrices( object, camera );
+			object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
 
 			if ( overrideMaterial === undefined ) material = object.material;
 
@@ -21459,7 +21479,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var object = renderList[ i ];
 
-			setupMatrices( object, camera );
+			object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
 
 			if ( overrideMaterial === undefined ) material = object.material;
 
@@ -22626,13 +22647,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
-
-	}
-
-	function setupMatrices( object, camera ) {
-
-		object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-		object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
 
 	}
 
