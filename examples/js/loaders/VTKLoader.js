@@ -30,6 +30,8 @@ THREE.VTKLoader.prototype = {
 
 		var indices = [];
 		var positions = [];
+		var pointData = [];
+		var cellData = [];
 
 		var result;
 
@@ -38,10 +40,18 @@ THREE.VTKLoader.prototype = {
 		var pat3Floats = /([\-]?[\d]+[\.]?[\d|\-|e]*)[ ]+([\-]?[\d]+[\.]?[\d|\-|e]*)[ ]+([\-]?[\d]+[\.]?[\d|\-|e]*)/g;
 		var patTriangle = /^3[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/;
 		var patQuad = /^4[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/;
+		var patFloat = /([\-]?[\d]+[\.]?[\d|\-|e]*)/;
 		var patPOINTS = /^POINTS /;
 		var patPOLYGONS = /^POLYGONS /;
+		var patPOINT_DATA = /^POINT_DATA[ ]+([\d]+)/;
+		var patCELL_DATA = /^CELL_DATA[ ]+([\d]+)/;
+		var patSCALARS = /^SCALARS[ ]+([\w]+)[ ]+([\w]+)[ ]+([\d]+)/;
 		var inPointsSection = false;
 		var inPolygonsSection = false;
+		var inPointDataSection = false;
+		var inCellDataSection = false;
+		var numPointDataComps = 1;
+		var numCellDataComps = 1;
 
 		var lines = data.split('\n');
 		for ( var i = 0; i < lines.length; ++i ) {
@@ -83,20 +93,58 @@ THREE.VTKLoader.prototype = {
 				}
 
 			}
-
-			if ( patPOLYGONS.exec(line) !== null ) {
-				inPointsSection = false;
-				inPolygonsSection = true;
+			else if ( inPointDataSection ) {
+			
+				result = patFloat.exec(line);
+				
+				if ( result !== null ) {
+				
+					pointData.push( parseFloat( result[ 1 ] ) );
+					
+				}
 			}
-			if ( patPOINTS.exec(line) !== null ) {
+			else if ( inCellDataSection ) {
+			
+				result = patFloat.exec(line);
+				
+				if ( result !== null ) {
+				
+					cellData.push( parseFloat( result[ 1 ] ) );
+					
+				}
+			}
+
+			if ( patPOLYGONS.exec( line ) !== null ) {
+				inPolygonsSection = true;
+				inPointsSection = false;
+				inPointDataSection = false;
+				inCellDataSection = false;
+			}
+			else if ( patPOINTS.exec( line ) !== null ) {
 				inPolygonsSection = false;
 				inPointsSection = true;
+				inPointDataSection = false;
+				inCellDataSection = false;
+			}
+			else if ( ( result = patPOINT_DATA.exec( line ) ) !== null ) {
+				inPolygonsSection = false;
+				inPointsSection = false;
+				inPointDataSection = true;
+				inCellDataSection = false;
+			}
+			else if ( ( result = patCELL_DATA.exec( line ) ) !== null ) {
+				inPolygonsSection = false;
+				inPointsSection = false;
+				inPointDataSection = false;
+				inCellDataSection = true;
 			}
 		}
 
 		var geometry = new THREE.BufferGeometry();
 		geometry.addAttribute( 'index', new THREE.BufferAttribute( new ( indices.length > 65535 ? Uint32Array : Uint16Array )( indices ), 1 ) );
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
+		geometry.addAttribute( 'point_data', new THREE.BufferAttribute( new Float32Array( pointData ), 1 ) );
+		geometry.addAttribute( 'cell_data', new THREE.BufferAttribute( new Float32Array( cellData ), 1 ) );
 
 		return geometry;
 
