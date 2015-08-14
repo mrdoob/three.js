@@ -133,10 +133,11 @@
 				xc.fillStyle = "#555";
 				xc.fillRect(96, 96, 32, 32);
 
-				var texturePattern = new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
-				texturePattern.needsUpdate = true;
-				texturePattern.repeat.set( 1000, 1000 );
+				var texturePattern = new THREE.CanvasTexture( x )
 				texturePattern.format = THREE.RGBFormat;
+				texturePattern.repeat.set( 1000, 1000 );
+				texturePattern.wrapS = THREE.RepeatWrapping;
+				texturePattern.wrapT = THREE.RepeatWrapping;
 
 				var textureSquares = THREE.ImageUtils.loadTexture( "textures/patterns/bright_squares256.png" );
 				textureSquares.repeat.set( 50, 50 );

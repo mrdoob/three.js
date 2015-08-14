@@ -69,9 +69,7 @@
 				scene = new THREE.Scene();
 
 				var data = generateHeight( 1024, 1024 );
-				var texture = new THREE.Texture( generateTexture( data, 1024, 1024 ) );
-				texture.needsUpdate = true;
-
+				var texture = new THREE.CanvasTexture( generateTexture( data, 1024, 1024 ) );
 				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
 				var quality = 16, step = 1024 / quality;
