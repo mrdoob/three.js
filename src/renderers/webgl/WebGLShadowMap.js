@@ -198,7 +198,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			// render regular objects
 
-			var webglObject, object, material;
+			var webglObject, object, geometry, material;
 			var objectMaterial, useMorphing, useSkinning;
 
 			for ( var j = 0, jl = _renderList.length; j < jl; j ++ ) {
@@ -206,6 +206,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				webglObject = _renderList[ j ];
 
 				object = webglObject.object;
+				geometry = _objects.update( object );
+
 				objectMaterial = object.material;
 
 				if ( objectMaterial instanceof THREE.MeshFaceMaterial ) {
@@ -242,7 +244,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				material.wireframe = objectMaterial.wireframe;
 
-				_renderer.renderBufferDirect( shadowCamera, _lights, null, material, object );
+				_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, material, object );
 
 			}
 
