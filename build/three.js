@@ -19938,6 +19938,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
 	var properties = new THREE.WebGLProperties();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
+	var renderer = new THREE.WebGLBufferRenderer( _gl, extensions, _infoRender );
 
 	//
 
@@ -20415,44 +20416,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 
-			if ( material instanceof THREE.MeshPhongMaterial === false && material.shading === THREE.FlatShading ) {
+			if ( material.type !== 'MeshPhongMaterial' && material.shading === THREE.FlatShading ) {
 
-				var nx, ny, nz,
-					nax, nbx, ncx, nay, nby, ncy, naz, nbz, ncz,
-					normalArray,
-					i, il = object.count * 3;
+				for ( var i = 0, l = object.count * 3; i < l; i += 9 ) {
 
-				for ( i = 0; i < il; i += 9 ) {
+					var array = object.normalArray;
 
-					normalArray = object.normalArray;
+					var nx = ( array[ i + 0 ] + array[ i + 3 ] + array[ i + 6 ] ) / 3;
+					var ny = ( array[ i + 1 ] + array[ i + 4 ] + array[ i + 7 ] ) / 3;
+					var nz = ( array[ i + 2 ] + array[ i + 5 ] + array[ i + 8 ] ) / 3;
 
-					nax = normalArray[ i ];
-					nay = normalArray[ i + 1 ];
-					naz = normalArray[ i + 2 ];
+					array[ i + 0 ] = nx;
+					array[ i + 1 ] = ny;
+					array[ i + 2 ] = nz;
 
-					nbx = normalArray[ i + 3 ];
-					nby = normalArray[ i + 4 ];
-					nbz = normalArray[ i + 5 ];
+					array[ i + 3 ] = nx;
+					array[ i + 4 ] = ny;
+					array[ i + 5 ] = nz;
 
-					ncx = normalArray[ i + 6 ];
-					ncy = normalArray[ i + 7 ];
-					ncz = normalArray[ i + 8 ];
-
-					nx = ( nax + nbx + ncx ) / 3;
-					ny = ( nay + nby + ncy ) / 3;
-					nz = ( naz + nbz + ncz ) / 3;
-
-					normalArray[ i ] = nx;
-					normalArray[ i + 1 ] = ny;
-					normalArray[ i + 2 ] = nz;
-
-					normalArray[ i + 3 ] = nx;
-					normalArray[ i + 4 ] = ny;
-					normalArray[ i + 5 ] = nz;
-
-					normalArray[ i + 6 ] = nx;
-					normalArray[ i + 7 ] = ny;
-					normalArray[ i + 8 ] = nz;
+					array[ i + 6 ] = nx;
+					array[ i + 7 ] = ny;
+					array[ i + 8 ] = nz;
 
 				}
 
@@ -20495,6 +20479,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		object.count = 0;
 
 	};
+
+	function getDefaultGroups( position ) {
+
+	}
 
 	this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object ) {
 
@@ -20571,6 +20559,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var index = geometry.attributes.index;
+		var position = geometry.attributes.position;
+
+		var groups = geometry.drawcalls;
 
 		if ( index !== undefined ) {
 
@@ -20598,7 +20589,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.PointCloud ) {
 
-				renderIndexedPointCloud( type, size, material, geometry, program, updateBuffers );
+				renderIndexedPoints( type, size, material, geometry, program, updateBuffers );
 
 			}
 
@@ -20610,17 +20601,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			if ( groups.length === 0 ) {
+
+				groups = [ {
+					start: 0,
+					count: position.array.length / 3,
+					index: 0
+				} ];
+
+			}
+
 			if ( object instanceof THREE.Mesh ) {
 
 				if ( material.wireframe === true ) {
 
 					state.setLineWidth( material.wireframeLinewidth * pixelRatio );
-
-					renderMesh( _gl.LINES, geometry, material );
+					renderer.setMode( _gl.LINES );
 
 				} else {
 
-					renderMesh( _gl.TRIANGLES, geometry, material );
+					renderer.setMode( _gl.TRIANGLES );
+
+				}
+
+				if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
+
+					renderer.renderInstances( geometry );
+
+				} else if ( position instanceof THREE.InterleavedBufferAttribute ) {
+
+					renderer.renderMesh( 0, position.data.count );
+
+				} else {
+
+					renderer.renderGroups( groups );
 
 				}
 
@@ -20634,17 +20648,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( object instanceof THREE.LineSegments ) {
 
-					renderLine( _gl.LINES, geometry );
+					renderer.setMode( _gl.LINES );
 
 				} else {
 
-					renderLine( _gl.LINE_STRIP, geometry );
+					renderer.setMode( _gl.LINE_STRIP );
 
 				}
 
+				renderer.renderGroups( groups );
+
 			} else if ( object instanceof THREE.PointCloud ) {
 
-				renderPointCloud( _gl.POINTS, geometry );
+				renderer.setMode( _gl.POINTS );
+				renderer.renderGroups( groups );
 
 			}
 
@@ -20880,82 +20897,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderMesh( mode, geometry ) {
-
-		var drawcall = geometry.drawcalls;
-
-		if ( drawcall.length === 0 ) {
-
-			var position = geometry.attributes.position;
-
-			// render non-indexed triangles
-
-			if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
-
-				var extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-				if ( extension === null ) {
-
-					console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-					return;
-
-				}
-
-				if ( position instanceof THREE.InterleavedBufferAttribute ) {
-
-					extension.drawArraysInstancedANGLE( mode, 0, position.data.count, geometry.maxInstancedCount ); // Draw the instanced meshes
-
-				} else {
-
-					extension.drawArraysInstancedANGLE( mode, 0, position.count, geometry.maxInstancedCount ); // Draw the instanced meshes
-
-				}
-
-			} else {
-
-				if ( position instanceof THREE.InterleavedBufferAttribute ) {
-
-					_gl.drawArrays( mode, 0, position.data.count );
-
-				} else {
-
-					_gl.drawArrays( mode, 0, position.count );
-
-				}
-
-			}
-
-			_infoRender.calls ++;
-			_infoRender.vertices += position.count;
-			_infoRender.faces += position.array.length / 3;
-
-		} else {
-
-			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-				// render non-indexed triangles
-
-				if ( geometry instanceof THREE.InstancedBufferGeometry ) {
-
-					console.error( 'THREE.WebGLRenderer.renderMesh: cannot use drawCalls with THREE.InstancedBufferGeometry.' );
-					return;
-
-				} else {
-
-					_gl.drawArrays( mode, drawcall[ i ].start, drawcall[ i ].count );
-
-				}
-
-				_infoRender.calls ++;
-				_infoRender.vertices += drawcall[ i ].count;
-				_infoRender.faces += ( drawcall[ i ].count  ) / 3;
-
-			}
-
-		}
-
-	}
-
 	function renderIndexedLine( type, size, material, geometry, object, program, updateBuffers ) {
 
 		var mode = object instanceof THREE.LineSegments ? _gl.LINES : _gl.LINE_STRIP;
@@ -21014,34 +20955,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderLine( mode, geometry ) {
-
-		var position = geometry.attributes.position;
-		var drawcall = geometry.drawcalls;
-
-		if ( drawcall.length === 0 ) {
-
-			_gl.drawArrays( mode, 0, position.array.length / 3 );
-
-			_infoRender.calls ++;
-			_infoRender.vertices += position.array.length / 3;
-
-		} else {
-
-			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-				_gl.drawArrays( mode, drawcall[ i ].index, drawcall[ i ].count );
-
-				_infoRender.calls ++;
-				_infoRender.vertices += drawcall[ i ].count;
-
-			}
-
-		}
-
-	}
-
-	function renderIndexedPointCloud( type, size, material, geometry, program, updateBuffers ) {
+	function renderIndexedPoints( type, size, material, geometry, program, updateBuffers ) {
 
 		var mode = _gl.POINTS;
 
@@ -21084,33 +20998,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size );
-
-				_infoRender.calls ++;
-				_infoRender.points += drawcall[ i ].count;
-
-			}
-
-		}
-
-	}
-
-	function renderPointCloud( mode, geometry ) {
-
-		var position = geometry.attributes.position;
-		var drawcall = geometry.drawcalls;
-
-		if ( drawcall.length === 0 ) {
-
-			_gl.drawArrays( mode, 0, position.array.length / 3 );
-
-			_infoRender.calls ++;
-			_infoRender.points += position.array.length / 3;
-
-		} else {
-
-			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-				_gl.drawArrays( mode, drawcall[ i ].index, drawcall[ i ].count );
 
 				_infoRender.calls ++;
 				_infoRender.points += drawcall[ i ].count;
@@ -23887,6 +23774,68 @@ THREE.WebGLRenderTargetCube = function ( width, height, options ) {
 
 THREE.WebGLRenderTargetCube.prototype = Object.create( THREE.WebGLRenderTarget.prototype );
 THREE.WebGLRenderTargetCube.prototype.constructor = THREE.WebGLRenderTargetCube;
+
+// File:src/renderers/webgl/WebGLBufferRenderer.js
+
+/**
+* @author mrdoob / http://mrdoob.com/
+*/
+
+THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
+
+	var mode;
+
+	this.setMode = function ( value ) {
+
+		mode = value;
+
+	};
+
+	this.renderGroups = function ( groups ) {
+
+		for ( var i = 0, il = groups.length; i < il; i ++ ) {
+
+			var group = groups[ i ];
+
+			var start = group.start;
+			var count = group.count;
+
+			_gl.drawArrays( mode, start, count );
+
+			_infoRender.calls ++;
+			_infoRender.vertices += count;
+			if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+
+		}
+
+	};
+
+	this.renderInstances = function ( geometry ) {
+
+		var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+		if ( extension === null ) {
+
+			console.error( 'THREE.WebGLBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+			return;
+
+		}
+
+		var position = geometry.attributes.position;
+
+		if ( position instanceof THREE.InterleavedBufferAttribute ) {
+
+			extension.drawArraysInstancedANGLE( mode, 0, position.data.count, geometry.maxInstancedCount );
+
+		} else {
+
+			extension.drawArraysInstancedANGLE( mode, 0, position.count, geometry.maxInstancedCount );
+
+		}
+
+	};
+
+};
 
 // File:src/renderers/webgl/WebGLExtensions.js
 
