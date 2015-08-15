@@ -6,7 +6,7 @@
 
 THREE.Path = function ( points ) {
 
-	THREE.CurvePath.call(this);
+	THREE.CurvePath.call( this );
 
 	this.actions = [];
 
@@ -27,7 +27,7 @@ THREE.PathActions = {
 	LINE_TO: 'lineTo',
 	QUADRATIC_CURVE_TO: 'quadraticCurveTo', // Bezier quadratic curve
 	BEZIER_CURVE_TO: 'bezierCurveTo', 		// Bezier cubic curve
-	CSPLINE_THRU: 'splineThru',				// Catmull-rom spline
+	CSPLINE_THRU: 'splineThru',				// Catmull-Rom spline
 	ARC: 'arc',								// Circle
 	ELLIPSE: 'ellipse'
 };
@@ -45,7 +45,7 @@ THREE.Path.prototype.fromPoints = function ( vectors ) {
 
 		this.lineTo( vectors[ v ].x, vectors[ v ].y );
 
-	};
+	}
 
 };
 
@@ -120,7 +120,7 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
-//---
+	//---
 	var npts = [ new THREE.Vector2( x0, y0 ) ];
 	Array.prototype.push.apply( npts, pts );
 
@@ -136,44 +136,52 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 									  aStartAngle, aEndAngle, aClockwise ) {
 
-	var lastargs = this.actions[ this.actions.length - 1].args;
+	var lastargs = this.actions[ this.actions.length - 1 ].args;
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
 
-	this.absarc(aX + x0, aY + y0, aRadius,
+	this.absarc( aX + x0, aY + y0, aRadius,
 		aStartAngle, aEndAngle, aClockwise );
 
  };
 
  THREE.Path.prototype.absarc = function ( aX, aY, aRadius,
 									  aStartAngle, aEndAngle, aClockwise ) {
-	this.absellipse(aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise);
+
+	this.absellipse( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
+
  };
 
 THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius,
-									  aStartAngle, aEndAngle, aClockwise ) {
+									  aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
-	var lastargs = this.actions[ this.actions.length - 1].args;
+	var lastargs = this.actions[ this.actions.length - 1 ].args;
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
 
-	this.absellipse(aX + x0, aY + y0, xRadius, yRadius,
-		aStartAngle, aEndAngle, aClockwise );
+	this.absellipse( aX + x0, aY + y0, xRadius, yRadius,
+		aStartAngle, aEndAngle, aClockwise, aRotation );
 
  };
 
 
 THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
-									  aStartAngle, aEndAngle, aClockwise ) {
+									  aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
-	var args = Array.prototype.slice.call( arguments );
+	var args = [
+		aX, aY,
+		xRadius, yRadius,
+		aStartAngle, aEndAngle,
+		aClockwise,
+		aRotation || 0 // aRotation is optional.
+	];
 	var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius,
-									aStartAngle, aEndAngle, aClockwise );
+									aStartAngle, aEndAngle, aClockwise, aRotation );
 	this.curves.push( curve );
 
-	var lastPoint = curve.getPoint(1);
-	args.push(lastPoint.x);
-	args.push(lastPoint.y);
+	var lastPoint = curve.getPoint( 1 );
+	args.push( lastPoint.x );
+	args.push( lastPoint.y );
 
 	this.actions.push( { action: THREE.PathActions.ELLIPSE, args: args } );
 
@@ -207,9 +215,10 @@ THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
 THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
-	if (this.useSpacedPoints) {
-		console.log('tata');
+	if ( this.useSpacedPoints ) {
+
 		return this.getSpacedPoints( divisions, closedPath );
+
 	}
 
 	divisions = divisions || 12;
@@ -335,7 +344,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			for ( j = 1; j <= n; j ++ ) {
 
-				points.push( spline.getPointAt( j / n ) ) ;
+				points.push( spline.getPointAt( j / n ) );
 
 			}
 
@@ -376,19 +385,28 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 			//console.log(points);
 
 			break;
-		  
+
 		case THREE.PathActions.ELLIPSE:
 
 			var aX = args[ 0 ], aY = args[ 1 ],
 				xRadius = args[ 2 ],
 				yRadius = args[ 3 ],
 				aStartAngle = args[ 4 ], aEndAngle = args[ 5 ],
-				aClockwise = !! args[ 6 ];
+				aClockwise = !! args[ 6 ],
+				aRotation = args[ 7 ];
 
 
 			var deltaAngle = aEndAngle - aStartAngle;
 			var angle;
 			var tdivisions = divisions * 2;
+
+			var cos, sin;
+			if ( aRotation !== 0 ) {
+		
+				cos = Math.cos( aRotation );
+				sin = Math.sin( aRotation );
+
+			}
 
 			for ( j = 1; j <= tdivisions; j ++ ) {
 
@@ -404,6 +422,16 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				tx = aX + xRadius * Math.cos( angle );
 				ty = aY + yRadius * Math.sin( angle );
+
+				if ( aRotation !== 0 ) {
+
+					var x = tx, y = ty;
+
+					// Rotate the point about the center of the ellipse.
+					tx = ( x - aX ) * cos - ( y - aY ) * sin + aX;
+					ty = ( x - aX ) * sin + ( y - aY ) * cos + aY;
+
+				}
 
 				//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
 
@@ -422,11 +450,11 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 
 	// Normalize to remove the closing point by default.
-	var lastPoint = points[ points.length - 1];
+	var lastPoint = points[ points.length - 1 ];
 	var EPSILON = 0.0000000001;
-	if ( Math.abs(lastPoint.x - points[ 0 ].x) < EPSILON &&
-			 Math.abs(lastPoint.y - points[ 0 ].y) < EPSILON)
-		points.splice( points.length - 1, 1);
+	if ( Math.abs( lastPoint.x - points[ 0 ].x ) < EPSILON &&
+			 Math.abs( lastPoint.y - points[ 0 ].y ) < EPSILON )
+		points.splice( points.length - 1, 1 );
 	if ( closedPath ) {
 
 		points.push( points[ 0 ] );
@@ -464,9 +492,9 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			args = item.args;
 			action = item.action;
 
-			if ( action == THREE.PathActions.MOVE_TO ) {
+			if ( action === THREE.PathActions.MOVE_TO ) {
 
-				if ( lastPath.actions.length != 0 ) {
+				if ( lastPath.actions.length !== 0 ) {
 
 					subPaths.push( lastPath );
 					lastPath = new THREE.Path();
@@ -479,7 +507,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 		}
 
-		if ( lastPath.actions.length != 0 ) {
+		if ( lastPath.actions.length !== 0 ) {
 
 			subPaths.push( lastPath );
 
@@ -488,6 +516,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 		// console.log(subPaths);
 
 		return	subPaths;
+
 	}
 
 	function toShapesNoHoles( inSubpaths ) {
@@ -503,14 +532,17 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			tmpShape.curves = tmpPath.curves;
 
 			shapes.push( tmpShape );
+
 		}
 
 		//console.log("shape", shapes);
 
 		return shapes;
-	};
+
+	}
 
 	function isPointInsidePolygon( inPt, inPolygon ) {
+
 		var EPSILON = 0.0000000001;
 
 		var polyLen = inPolygon.length;
@@ -521,52 +553,67 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 		//  not counting lowerY endpoints of edges and whole edges on that line
 		var inside = false;
 		for ( var p = polyLen - 1, q = 0; q < polyLen; p = q ++ ) {
+
 			var edgeLowPt  = inPolygon[ p ];
 			var edgeHighPt = inPolygon[ q ];
 
 			var edgeDx = edgeHighPt.x - edgeLowPt.x;
 			var edgeDy = edgeHighPt.y - edgeLowPt.y;
 
-			if ( Math.abs(edgeDy) > EPSILON ) {			// not parallel
+			if ( Math.abs( edgeDy ) > EPSILON ) {
+
+				// not parallel
 				if ( edgeDy < 0 ) {
+
 					edgeLowPt  = inPolygon[ q ]; edgeDx = - edgeDx;
 					edgeHighPt = inPolygon[ p ]; edgeDy = - edgeDy;
+
 				}
 				if ( ( inPt.y < edgeLowPt.y ) || ( inPt.y > edgeHighPt.y ) ) 		continue;
 
-				if ( inPt.y == edgeLowPt.y ) {
-					if ( inPt.x == edgeLowPt.x )		return	true;		// inPt is on contour ?
+				if ( inPt.y === edgeLowPt.y ) {
+
+					if ( inPt.x === edgeLowPt.x )		return	true;		// inPt is on contour ?
 					// continue;				// no intersection or edgeLowPt => doesn't count !!!
+
 				} else {
-					var perpEdge = edgeDy * (inPt.x - edgeLowPt.x) - edgeDx * (inPt.y - edgeLowPt.y);
-					if ( perpEdge == 0 )				return	true;		// inPt is on contour ?
+
+					var perpEdge = edgeDy * ( inPt.x - edgeLowPt.x ) - edgeDx * ( inPt.y - edgeLowPt.y );
+					if ( perpEdge === 0 )				return	true;		// inPt is on contour ?
 					if ( perpEdge < 0 ) 				continue;
 					inside = ! inside;		// true intersection left of inPt
+
 				}
-			} else {		// parallel or colinear
-				if ( inPt.y != edgeLowPt.y ) 		continue;			// parallel
-				// egde lies on the same horizontal line as inPt
+
+			} else {
+
+				// parallel or collinear
+				if ( inPt.y !== edgeLowPt.y ) 		continue;			// parallel
+				// edge lies on the same horizontal line as inPt
 				if ( ( ( edgeHighPt.x <= inPt.x ) && ( inPt.x <= edgeLowPt.x ) ) ||
 					 ( ( edgeLowPt.x <= inPt.x ) && ( inPt.x <= edgeHighPt.x ) ) )		return	true;	// inPt: Point on contour !
 				// continue;
+
 			}
+
 		}
 
 		return	inside;
+
 	}
 
 
 	var subPaths = extractSubpaths( this.actions );
-	if ( subPaths.length == 0 ) return [];
+	if ( subPaths.length === 0 ) return [];
 
 	if ( noHoles === true )	return	toShapesNoHoles( subPaths );
 
 
 	var solid, tmpPath, tmpShape, shapes = [];
 
-	if ( subPaths.length == 1) {
+	if ( subPaths.length === 1 ) {
 
-		tmpPath = subPaths[0];
+		tmpPath = subPaths[ 0 ];
 		tmpShape = new THREE.Shape();
 		tmpShape.actions = tmpPath.actions;
 		tmpShape.curves = tmpPath.curves;
@@ -579,15 +626,15 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 	holesFirst = isCCW ? ! holesFirst : holesFirst;
 
 	// console.log("Holes first", holesFirst);
-	
+
 	var betterShapeHoles = [];
 	var newShapes = [];
 	var newShapeHoles = [];
 	var mainIdx = 0;
 	var tmpPoints;
 
-	newShapes[mainIdx] = undefined;
-	newShapeHoles[mainIdx] = [];
+	newShapes[ mainIdx ] = undefined;
+	newShapeHoles[ mainIdx ] = [];
 
 	var i, il;
 
@@ -600,20 +647,20 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 		if ( solid ) {
 
-			if ( (! holesFirst ) && ( newShapes[mainIdx] ) )	mainIdx ++;
+			if ( ( ! holesFirst ) && ( newShapes[ mainIdx ] ) )	mainIdx ++;
 
-			newShapes[mainIdx] = { s: new THREE.Shape(), p: tmpPoints };
-			newShapes[mainIdx].s.actions = tmpPath.actions;
-			newShapes[mainIdx].s.curves = tmpPath.curves;
-			
+			newShapes[ mainIdx ] = { s: new THREE.Shape(), p: tmpPoints };
+			newShapes[ mainIdx ].s.actions = tmpPath.actions;
+			newShapes[ mainIdx ].s.curves = tmpPath.curves;
+
 			if ( holesFirst )	mainIdx ++;
-			newShapeHoles[mainIdx] = [];
+			newShapeHoles[ mainIdx ] = [];
 
 			//console.log('cw', i);
 
 		} else {
 
-			newShapeHoles[mainIdx].push( { h: tmpPath, p: tmpPoints[0] } );
+			newShapeHoles[ mainIdx ].push( { h: tmpPath, p: tmpPoints[ 0 ] } );
 
 			//console.log('ccw', i);
 
@@ -622,50 +669,76 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 	}
 
 	// only Holes? -> probably all Shapes with wrong orientation
-	if ( ! newShapes[0] )	return	toShapesNoHoles( subPaths );
+	if ( ! newShapes[ 0 ] )	return	toShapesNoHoles( subPaths );
 
 
 	if ( newShapes.length > 1 ) {
-		var ambigious = false;
+
+		var ambiguous = false;
 		var toChange = [];
 
-		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
-			betterShapeHoles[sIdx] = [];
+		for ( var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
+
+			betterShapeHoles[ sIdx ] = [];
+
 		}
-		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
-			var sho = newShapeHoles[sIdx];
-			for (var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
-				var ho = sho[hIdx];
+		for ( var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
+
+			var sho = newShapeHoles[ sIdx ];
+			for ( var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
+
+				var ho = sho[ hIdx ];
 				var hole_unassigned = true;
-				for (var s2Idx = 0; s2Idx < newShapes.length; s2Idx ++ ) {
-					if ( isPointInsidePolygon( ho.p, newShapes[s2Idx].p ) ) {
-						if ( sIdx != s2Idx )		toChange.push( { froms: sIdx, tos: s2Idx, hole: hIdx } );
+				for ( var s2Idx = 0; s2Idx < newShapes.length; s2Idx ++ ) {
+
+					if ( isPointInsidePolygon( ho.p, newShapes[ s2Idx ].p ) ) {
+
+						if ( sIdx !== s2Idx )	toChange.push( { froms: sIdx, tos: s2Idx, hole: hIdx } );
 						if ( hole_unassigned ) {
+
 							hole_unassigned = false;
-							betterShapeHoles[s2Idx].push( ho );
+							betterShapeHoles[ s2Idx ].push( ho );
+
 						} else {
-							ambigious = true;
+
+							ambiguous = true;
+
 						}
+
 					}
+
 				}
-				if ( hole_unassigned ) { betterShapeHoles[sIdx].push( ho ); }
+				if ( hole_unassigned ) {
+
+					betterShapeHoles[ sIdx ].push( ho );
+
+				}
+
 			}
+
 		}
-		// console.log("ambigious: ", ambigious);
+		// console.log("ambiguous: ", ambiguous);
 		if ( toChange.length > 0 ) {
+
 			// console.log("to change: ", toChange);
-			if (! ambigious)	newShapeHoles = betterShapeHoles;
+			if ( ! ambiguous )	newShapeHoles = betterShapeHoles;
+
 		}
+
 	}
 
 	var tmpHoles, j, jl;
 	for ( i = 0, il = newShapes.length; i < il; i ++ ) {
-		tmpShape = newShapes[i].s;
+
+		tmpShape = newShapes[ i ].s;
 		shapes.push( tmpShape );
-		tmpHoles = newShapeHoles[i];
+		tmpHoles = newShapeHoles[ i ];
 		for ( j = 0, jl = tmpHoles.length; j < jl; j ++ ) {
-			tmpShape.holes.push( tmpHoles[j].h );
+
+			tmpShape.holes.push( tmpHoles[ j ].h );
+
 		}
+
 	}
 
 	//console.log("shape", shapes);

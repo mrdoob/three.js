@@ -120,8 +120,7 @@
 				}
 
 				var canvas = mipmap( 128, '#f00' );
-				var textureCanvas1 = new THREE.Texture( canvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
-				textureCanvas1.repeat.set( 1000, 1000 );
+				var textureCanvas1 = new THREE.CanvasTexture( canvas );
 				textureCanvas1.mipmaps[ 0 ] = canvas;
 				textureCanvas1.mipmaps[ 1 ] = mipmap( 64, '#0f0' );
 				textureCanvas1.mipmaps[ 2 ] = mipmap( 32, '#00f' );
@@ -130,14 +129,15 @@
 				textureCanvas1.mipmaps[ 5 ] = mipmap( 4,  '#004' );
 				textureCanvas1.mipmaps[ 6 ] = mipmap( 2,  '#044' );
 				textureCanvas1.mipmaps[ 7 ] = mipmap( 1,  '#404' );
-				textureCanvas1.needsUpdate = true;
-
-				materialCanvas1 = new THREE.MeshBasicMaterial( { map: textureCanvas1 } );
+				textureCanvas1.repeat.set( 1000, 1000 );
+				textureCanvas1.wrapS = THREE.RepeatWrapping;
+				textureCanvas1.wrapT = THREE.RepeatWrapping;
 
 				var textureCanvas2 = textureCanvas1.clone();
 				textureCanvas2.magFilter = THREE.NearestFilter;
 				textureCanvas2.minFilter = THREE.NearestMipMapNearestFilter;
-				textureCanvas2.needsUpdate = true;
+
+				materialCanvas1 = new THREE.MeshBasicMaterial( { map: textureCanvas1 } );
 				materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );

@@ -47,19 +47,19 @@ def main(argv=None):
 	sources = []
 		
 	if args.amd:
-		tmp.write('( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n')
+		tmp.write(u'( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n')
 
 	for include in args.include:
 		with open('includes/' + include + '.json','r', encoding='utf-8') as f:
 			files = json.load(f)
 		for filename in files:
-			tmp.write('// File:' + filename)
+			tmp.write(u'// File:' + filename)
 			tmp.write(u'\n\n')
 			filename = '../../' + filename
 			sources.append(filename)
 			with open(filename, 'r', encoding='utf-8') as f:
 				if filename.endswith(".glsl"):
-					tmp.write('THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + '\'] = "')
+					tmp.write(u'THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + u'\'] = "')
 					tmp.write(f.read().replace('\n','\\n'))
 					tmp.write(u'";\n\n')
 				else:
@@ -67,7 +67,7 @@ def main(argv=None):
 					tmp.write(u'\n')
 
 	if args.amd:
-		tmp.write('exports.THREE = THREE;\n\n} ) );')
+		tmp.write(u'exports.THREE = THREE;\n\n} ) );')
 
 	tmp.close()
 

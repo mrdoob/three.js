@@ -46,7 +46,7 @@
 
 			var container, stats;
 
-			var blendMesh, camera, scene, renderer, controls;
+			var blendMesh, helper, camera, scene, renderer, controls;
 
 			var clock = new THREE.Clock();
 			var gui = null;
@@ -94,7 +94,6 @@
 				window.addEventListener( 'weight-animation', onWeightAnimation );
 				window.addEventListener( 'crossfade', onCrossfade );
 				window.addEventListener( 'warp', onWarp );
-				window.addEventListener( 'toggle-lock-camera', onLockCameraToggle );
 				window.addEventListener( 'toggle-show-skeleton', onShowSkeleton );
 				window.addEventListener( 'toggle-show-model', onShowModel );
 
@@ -184,18 +183,10 @@
 
 			}
 
-
-			function onLockCameraToggle( event ) {
-
-				var shouldLock = event.detail.shouldLock;
-				controls.enabled = !shouldLock;
-
-			}
-
 			function onShowSkeleton( event ) {
 
 				var shouldShow = event.detail.shouldShow;
-				blendMesh.showSkeleton( shouldShow );
+				helper.visible = shouldShow;
 
 			}
 
@@ -218,7 +209,7 @@
 				camera.position.set( 0.0, radius, radius * 3.5 );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target = new THREE.Vector3( 0, radius, 0 );
+				controls.target.set( 0, radius, 0 );
 				controls.update();
 
 				// Set default weights
@@ -228,6 +219,14 @@
 				blendMesh.animations[ 'run' ].weight = 1 / 3;
 
 				gui = new BlendCharacterGui(blendMesh.animations);
+
+				// Create the debug visualization
+
+				helper = new THREE.SkeletonHelper( blendMesh );
+				helper.material.linewidth = 3;
+				scene.add( helper );
+
+				helper.visible = false;
 
 				animate();
 			}
@@ -245,6 +244,7 @@
 				// modify blend weights
 
 				blendMesh.update( stepSize );
+				helper.update();
 				gui.update();
 
 				THREE.AnimationHandler.update( stepSize );

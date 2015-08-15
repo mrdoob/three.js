@@ -26,48 +26,78 @@ THREE.VTKLoader.prototype = {
 
 	},
 
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
 	parse: function ( data ) {
 
 		var indices = [];
 		var positions = [];
 
-		var pattern, result;
+		var result;
 
 		// float float float
 
-		pattern = /([\+|\-]?[\d]+[\.][\d|\-|e]+)[ ]+([\+|\-]?[\d]+[\.][\d|\-|e]+)[ ]+([\+|\-]?[\d]+[\.][\d|\-|e]+)/g;
+		var pat3Floats = /([\-]?[\d]+[\.]?[\d|\-|e]*)[ ]+([\-]?[\d]+[\.]?[\d|\-|e]*)[ ]+([\-]?[\d]+[\.]?[\d|\-|e]*)/g;
+		var patTriangle = /^3[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/;
+		var patQuad = /^4[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/;
+		var patPOINTS = /^POINTS /;
+		var patPOLYGONS = /^POLYGONS /;
+		var inPointsSection = false;
+		var inPolygonsSection = false;
 
-		while ( ( result = pattern.exec( data ) ) !== null ) {
+		var lines = data.split('\n');
+		for ( var i = 0; i < lines.length; ++i ) {
 
-			// ["1.0 2.0 3.0", "1.0", "2.0", "3.0"]
+			line = lines[i];
 
-			positions.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
+			if ( inPointsSection ) {
 
-		}
+				// get the vertices
 
-		// 3 int int int
+				while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+					positions.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
+				}
+			}
+			else if ( inPolygonsSection ) {
 
-		pattern = /3[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/g;
+				result = patTriangle.exec(line);
 
-		while ( ( result = pattern.exec( data ) ) !== null ) {
+				if ( result !== null ) {
 
-			// ["3 1 2 3", "1", "2", "3"]
+					// 3 int int int
+					// triangle
 
-			indices.push( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 3 ] ) );
+					indices.push( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 3 ] ) );
+				}
+				else {
 
-		}
+					result = patQuad.exec(line);
 
-		// 4 int int int int
+					if ( result !== null ) {
 
-		pattern = /4[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/g;
+						// 4 int int int int
+						// break quad into two triangles
 
-		while ( ( result = pattern.exec( data ) ) !== null ) {
+						indices.push( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 4 ] ) );
+						indices.push( parseInt( result[ 2 ] ), parseInt( result[ 3 ] ), parseInt( result[ 4 ] ) );
+					}
 
-			// ["4 1 2 3 4", "1", "2", "3", "4"]
+				}
 
-			indices.push( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 4 ] ) );
-			indices.push( parseInt( result[ 2 ] ), parseInt( result[ 3 ] ), parseInt( result[ 4 ] ) );
+			}
 
+			if ( patPOLYGONS.exec(line) !== null ) {
+				inPointsSection = false;
+				inPolygonsSection = true;
+			}
+			if ( patPOINTS.exec(line) !== null ) {
+				inPolygonsSection = false;
+				inPointsSection = true;
+			}
 		}
 
 		var geometry = new THREE.BufferGeometry();

@@ -9,12 +9,6 @@
 
 	#endif
 
-	#ifdef SHADOWMAP_CASCADE
-
-		int inFrustumCount = 0;
-
-	#endif
-
 	float fDepth;
 	vec3 shadowColor = vec3( 1.0 );
 
@@ -28,20 +22,7 @@
 		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
 		bool inFrustum = all( inFrustumVec );
 
-				// don't shadow pixels outside of light frustum
-				// use just first frustum (for cascades)
-				// don't shadow pixels behind far plane of light frustum
-
-		#ifdef SHADOWMAP_CASCADE
-
-			inFrustumCount += int( inFrustum );
-			bvec3 frustumTestVec = bvec3( inFrustum, inFrustumCount == 1, shadowCoord.z <= 1.0 );
-
-		#else
-
-			bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
-
-		#endif
+		bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
 
 		bool frustumTest = all( frustumTestVec );
 
@@ -195,22 +176,11 @@
 
 		#ifdef SHADOWMAP_DEBUG
 
-			#ifdef SHADOWMAP_CASCADE
-
-				if ( inFrustum && inFrustumCount == 1 ) outgoingLight *= frustumColors[ i ];
-
-			#else
-
-				if ( inFrustum ) outgoingLight *= frustumColors[ i ];
-
-			#endif
+			if ( inFrustum ) outgoingLight *= frustumColors[ i ];
 
 		#endif
 
 	}
-
-	// NOTE: I am unsure if this is correct in linear space.  -bhouston, Dec 29, 2014
-	shadowColor = inputToLinear( shadowColor );
 
 	outgoingLight = outgoingLight * shadowColor;
 

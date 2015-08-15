@@ -145,19 +145,22 @@
 
 				// SPRITES
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/sprite.png' );
-				var material = new THREE.SpriteMaterial( { map: texture, transparent: true } );
+				THREE.ImageUtils.loadTexture( 'textures/sprite.png', null, function ( texture ) {
 
-				for ( var i = 0; i < 50; i ++ ) {
+					var material = new THREE.SpriteMaterial( { map: texture, transparent: true } );
 
-					var sprite = new THREE.Sprite( material );
-					sprite.position.x = Math.random() * 1000 - 500;
-					sprite.position.y = Math.random() * 1000 - 500;
-					sprite.position.z = Math.random() * 1000 - 500;
-					sprite.scale.set( 64, 64, 1 );
-					scene.add( sprite );
+					for ( var i = 0; i < 50; i ++ ) {
 
-				}
+						var sprite = new THREE.Sprite( material );
+						sprite.position.x = Math.random() * 1000 - 500;
+						sprite.position.y = Math.random() * 1000 - 500;
+						sprite.position.z = Math.random() * 1000 - 500;
+						sprite.scale.set( 64, 64, 1 );
+						scene.add( sprite );
+
+					}
+					
+				} );
 
 				for ( var i = 0; i < 50; i ++ ) {
 

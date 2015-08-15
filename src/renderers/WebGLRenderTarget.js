@@ -5,6 +5,8 @@
 
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
+	this.uuid = THREE.Math.generateUUID();
+
 	this.width = width;
 	this.height = height;
 
@@ -39,37 +41,50 @@ THREE.WebGLRenderTarget.prototype = {
 
 	setSize: function ( width, height ) {
 
-		this.width = width;
-		this.height = height;
+		if ( this.width !== width || this.height !== height ) {
+
+			this.width = width;
+			this.height = height;
+
+			this.dispose();
+
+		}
 
 	},
 
 	clone: function () {
 
-		var tmp = new THREE.WebGLRenderTarget( this.width, this.height );
+		return new this.constructor().copy( this );
 
-		tmp.wrapS = this.wrapS;
-		tmp.wrapT = this.wrapT;
+	},
 
-		tmp.magFilter = this.magFilter;
-		tmp.minFilter = this.minFilter;
+	copy: function ( source ) {
 
-		tmp.anisotropy = this.anisotropy;
+		this.width = source.width;
+		this.height = source.height;
 
-		tmp.offset.copy( this.offset );
-		tmp.repeat.copy( this.repeat );
+		this.wrapS = source.wrapS;
+		this.wrapT = source.wrapT;
 
-		tmp.format = this.format;
-		tmp.type = this.type;
+		this.magFilter = source.magFilter;
+		this.minFilter = source.minFilter;
 
-		tmp.depthBuffer = this.depthBuffer;
-		tmp.stencilBuffer = this.stencilBuffer;
+		this.anisotropy = source.anisotropy;
 
-		tmp.generateMipmaps = this.generateMipmaps;
+		this.offset.copy( source.offset );
+		this.repeat.copy( source.repeat );
 
-		tmp.shareDepthFrom = this.shareDepthFrom;
+		this.format = source.format;
+		this.type = source.type;
 
-		return tmp;
+		this.depthBuffer = source.depthBuffer;
+		this.stencilBuffer = source.stencilBuffer;
+
+		this.generateMipmaps = source.generateMipmaps;
+
+		this.shareDepthFrom = source.shareDepthFrom;
+
+		return this;
 
 	},
 

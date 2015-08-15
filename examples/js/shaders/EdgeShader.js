@@ -26,7 +26,7 @@ THREE.EdgeShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -89,5 +89,5 @@ THREE.EdgeShader = {
 			"gl_FragColor = vec4(vec3(sqrt(M/S)), 1.0);",
 		"}",
 
-	].join("\n")
+	].join( "\n" )
 };

@@ -37,15 +37,9 @@ uniform vec3 ambientLightColor;
 
 #endif
 
-#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )
+#if MAX_SPOT_LIGHTS > 0 || defined( USE_ENVMAP )
 
 	varying vec3 vWorldPosition;
-
-#endif
-
-#ifdef WRAP_AROUND
-
-	uniform vec3 wrapRGB;
 
 #endif
 

@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Geometry] &rarr;
@@ -12,6 +13,8 @@
 		<h1>[name]</h1>
 
 		<div class="desc">BoxGeometry is the quadrilateral primitive geometry class. It is typically used for creating a cube or irregular quadrilateral of the dimensions provided with the 'width', 'height', and 'depth' constructor arguments.</div>
+
+		<iframe src='scenes/geometry-browser.html#BoxGeometry'></iframe>
 
 		<h2>Example</h2>
 
@@ -37,9 +40,16 @@
 
 		<h2>Properties</h2>
 
-		<div>
-		Each of the constructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
-		</div>
+		<h3>.parameters</h3>
+ 		<div>
+			<p>Using the above example code above as our basis:</p>
+			<code>
+				geometry.parameters; // outputs an object {width: 1, height: 1, depth: 1, widthSegments: undefined, heightSegments: undefined}
+				cube.geometry.parameters; // as above
+				cube.geometry.parameters.width; // === 1
+				cube.geometry.parameters.widthSegments // === undefined.
+			</code>
+ 		</div>
 
 		<h2>Source</h2>
 

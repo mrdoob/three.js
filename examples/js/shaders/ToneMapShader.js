@@ -26,7 +26,7 @@ THREE.ToneMapShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -67,11 +67,9 @@ THREE.ToneMapShader = {
 			"vec4 texel = texture2D( tDiffuse, vUv );",
 			
 			"gl_FragColor = vec4( ToneMap( texel.xyz ), texel.w );",
-			//Gamma 2.0
-			"gl_FragColor.xyz = sqrt( gl_FragColor.xyz );",
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

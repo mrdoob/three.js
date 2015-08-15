@@ -55,13 +55,13 @@
 
 					_goal = target;
 
-				}
+				};
 
 				this.setAvoidWalls = function ( value ) {
 
 					_avoidWalls = value;
 
-				}
+				};
 
 				this.setWorldSize = function ( width, height, depth ) {
 
@@ -69,7 +69,7 @@
 					_height = height;
 					_depth = depth;
 
-				}
+				};
 
 				this.run = function ( boids ) {
 
@@ -120,7 +120,7 @@
 
 					this.move();
 
-				}
+				};
 
 				this.flock = function ( boids ) {
 
@@ -134,7 +134,7 @@
 					_acceleration.add( this.cohesion( boids ) );
 					_acceleration.add( this.separation( boids ) );
 
-				}
+				};
 
 				this.move = function () {
 
@@ -151,7 +151,7 @@
 					this.position.add( this.velocity );
 					_acceleration.set( 0, 0, 0 );
 
-				}
+				};
 
 				this.checkBounds = function () {
 
@@ -162,7 +162,7 @@
 					if ( this.position.z >  _depth ) this.position.z = - _depth;
 					if ( this.position.z < - _depth ) this.position.z =  _depth;
 
-				}
+				};
 
 				//
 
@@ -177,7 +177,7 @@
 
 					return steer;
 
-				}
+				};
 
 				this.repulse = function ( target ) {
 
@@ -194,7 +194,7 @@
 
 					}
 
-				}
+				};
 
 				this.reach = function ( target, amount ) {
 
@@ -205,7 +205,7 @@
 
 					return steer;
 
-				}
+				};
 
 				this.alignment = function ( boids ) {
 
@@ -245,7 +245,7 @@
 
 					return velSum;
 
-				}
+				};
 
 				this.cohesion = function ( boids ) {
 
@@ -288,7 +288,7 @@
 
 					return steer;
 
-				}
+				};
 
 				this.separation = function ( boids ) {
 

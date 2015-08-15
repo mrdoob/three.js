@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -22,13 +23,15 @@
 
 		<div>
 		canvas — A [page:Canvas] where the renderer draws its output.<br />
-		precision — shader precision. Can be *"highp"*, *"mediump"* or *"lowp"*.<br />
+		context — The [page:RenderingContext] context to use.<br />
+		precision — Shader precision. Can be *"highp"*, *"mediump"* or *"lowp"*. Defaults to *"highp"* if supported by the device.<br />
 		alpha — [page:Boolean], default is *false*.<br />
 		premultipliedAlpha — [page:Boolean], default is *true*.<br />
 		antialias — [page:Boolean], default is *false*.<br />
 		stencil — [page:Boolean], default is *true*.<br />
 		preserveDrawingBuffer — [page:Boolean], default is *false*.<br />
-		maxLights — [page:Integer], default is *4*.<br />
+		depth — [page:Boolean], default is *true*.<br />
+		logarithmicDepthBuffer — [page:Boolean], default is *false*.<br />
 		</div>
 
 		<h2>Properties</h2>
@@ -68,10 +71,6 @@
 
 		<div>Note: Sorting is used to attempt to properly render objects that have some degree of transparency.  By definition, sorting objects may not work in all cases.  Depending on the needs of application, it may be neccessary to turn off sorting and use other methods to deal with transparency rendering e.g. manually determining the object rendering order.</div>
 
-
-		<h3>[property:Boolean autoUpdateObjects]</h3>
-
-		<div>Defines whether the renderer should auto update objects. Default is true.</div>
 
 		<h3>[property:Boolean gammaInput]</h3>
 
@@ -160,11 +159,15 @@
 		Return the WebGL context.
 		</div>
 
+		<h3>[method:WebGLContextAttributes getContextAttributes]()</h3>
+		<div>
+		Returns an object that describes the attributes set on the WebGL context when it was created.
+		</div>
+
 		<h3>[method:Boolean supportsVertexTextures]()</h3>
 		<div>
 		Return a [page:Boolean] true if the context supports vertex textures.
 		</div>
-
 
 		<h3>[method:null setSize]( [page:Integer width], [page:Integer height] )</h3>
 		<div>Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0).</div>
@@ -234,34 +237,6 @@
 		<div>Used for setting the gl frontFace, cullFace states in the GPU, thus enabling/disabling face culling when rendering.</div>
 		<div>If cullFace is false, culling will be disabled.</div>
 
-
-		<h3>[method:null setDepthTest]( [page:boolean depthTest] )</h3>
-		<div>
-		depthTest -- The boolean to decide if depth of a fragment needs to be tested against the depth buffer . <br />
-		</div>
-		<div>
-		This sets, based on depthTest, whether or not the depth data needs to be tested against the depth buffer.
-		</div>
-
-		<h3>[method:null setDepthWrite]( [page:boolean depthWrite] )</h3>
-		<div>
-		depthWrite -- The boolean to decide if depth of a fragment needs to be kept. <br />
-		</div>
-		<div>
-		This sets, based on depthWrite, whether or not the depth data needs to be written in the depth buffer.
-		</div>
-
-
-		<h3>[method:null setBlending]( [page:number blending], [page:number blendEquation], [page:number blendSrc], [page:number blendDst] )</h3>
-		<div>
-		blending -- A number indicating the blending mode. Possible value are THREE.NoBlending, THREE.NormalBlending, THREE.AdditiveBlending, THREE.SubtractiveBlending, THREE.MultiplyBlending or THREE.CustomBlending <br />
-		blendEquation -- When blending is THREE.CustomBlending, then you can set the blendEquation. Possible values are THREE.AddEquation, THREE.SubtractEquation or THREE.ReverseSubtractEquation.<br />
-		blendSrc -- When blending is THREE.CustomBlending, then you can set the blendSrc. Possible values are THREE.ZeroFactor, THREE.OneFactor,THREE.SrcColorFactor, THREE.OneMinusSrcColorFactor, THREE.SrcAlphaFactor, THREE.OneMinusSrcAlphaFactor, THREE.DstAlphaFactor, THREE.OneMinusDstAlphaFactor, THREE.DstColorFactor,THREE.OneMinusDstColorFactor or THREE.SrcAlphaSaturateFactor<br />
-		blendDst -- When blending is THREE.CustomBlending, then you can set the blendDst. Possible values are THREE.ZeroFactor, THREE.OneFactor,THREE.SrcColorFactor, THREE.OneMinusSrcColorFactor, THREE.SrcAlphaFactor, THREE.OneMinusSrcAlphaFactor, THREE.DstAlphaFactor, THREE.OneMinusDstAlphaFactor, THREE.DstColorFactor,THREE.OneMinusDstColorFactor or THREE.SrcAlphaSaturateFactor
-		</div>
-		<div>
-		This method sets the correct blending.
-		</div>
 
 		<h3>[method:null setTexture]( [page:Texture texture], [page:number slot] )</h3>
 		<div>

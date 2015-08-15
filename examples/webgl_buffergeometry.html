@@ -200,17 +200,15 @@
 				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
-				var offsets = triangles / chunkSize;
+				var num_offsets = triangles / chunkSize;
 
-				for ( var i = 0; i < offsets; i ++ ) {
+				for ( var i = 0; i < num_offsets; i ++ ) {
 
-					var offset = {
-						start: i * chunkSize * 3,
-						index: i * chunkSize * 3,
-						count: Math.min( triangles - ( i * chunkSize ), chunkSize ) * 3
-					};
+					var indexStart = i * chunkSize * 3;
+					var indexCount = Math.min( triangles - ( i * chunkSize ), chunkSize ) * 3;
+					var indexOffset = i * chunkSize * 3;
 
-					geometry.offsets.push( offset );
+					geometry.addDrawCall( indexStart, indexCount, indexOffset );
 
 				}
 

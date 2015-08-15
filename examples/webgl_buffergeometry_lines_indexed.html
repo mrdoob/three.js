@@ -187,7 +187,7 @@
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 				geometry.computeBoundingSphere();
 
-				mesh = new THREE.Line( geometry, material, THREE.LinePieces );
+				mesh = new THREE.LineSegments( geometry, material );
 				mesh.position.x -= 1200;
 				mesh.position.y -= 1200;
 

@@ -23,7 +23,7 @@ THREE.DeferredShaderChunk = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	computeVertexPositionVS: [
 
@@ -41,13 +41,13 @@ THREE.DeferredShaderChunk = {
 		"vertexPositionVS.xyz /= vertexPositionVS.w;",
 		"vertexPositionVS.w = 1.0;"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	computeNormal: [
 
 		"vec3 normal = normalDepth.xyz * 2.0 - 1.0;"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	unpackColorMap: [
 
@@ -59,7 +59,7 @@ THREE.DeferredShaderChunk = {
 		"float wrapAround = sign( colorMap.z );",
 		"float additiveSpecular = sign( colorMap.y );"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	computeDiffuse: [
 
@@ -85,7 +85,7 @@ THREE.DeferredShaderChunk = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	computeSpecular: [
 
@@ -103,14 +103,14 @@ THREE.DeferredShaderChunk = {
 		"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightVector, halfVector ), 5.0 );",
 		"vec3 specular = schlick * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse * specularNormalization;"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	combine: [
 
 		"vec3 light = lightIntensity * lightColor;",
 		"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), attenuation );"
 
-	].join("\n")
+	].join( "\n" )
 
 };
 
@@ -149,8 +149,9 @@ THREE.ShaderDeferred = {
 
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "color_pars_fragment" ],
+			THREE.ShaderChunk[ "uv_pars_fragment" ],
+			THREE.ShaderChunk[ "uv2_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
-			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
 
 			"#ifdef USE_ENVMAP",
 
@@ -304,13 +305,13 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader : [
 
 			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "map_pars_vertex" ],
-			THREE.ShaderChunk[ "lightmap_pars_vertex" ],
+			THREE.ShaderChunk[ "uv_pars_vertex" ],
+			THREE.ShaderChunk[ "uv2_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
@@ -324,8 +325,8 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.ShaderChunk[ "map_vertex" ],
-				THREE.ShaderChunk[ "lightmap_vertex" ],
+				THREE.ShaderChunk[ "uv_vertex" ],
+				THREE.ShaderChunk[ "uv2_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
 				THREE.ShaderChunk[ "skinbase_vertex" ],
@@ -345,7 +346,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -390,7 +391,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader : [
 
@@ -433,7 +434,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -527,7 +528,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader : [
 
@@ -541,7 +542,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -555,7 +556,7 @@ THREE.ShaderDeferred = {
 			viewWidth: 		{ type: "f", value: 800 },
 			viewHeight: 	{ type: "f", value: 600 },
 
-			lightPositionVS:{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
+			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
 			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
 			lightIntensity: { type: "f", value: 1.0 },
 			lightRadius: 	{ type: "f", value: 1.0 }
@@ -613,7 +614,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader : [
 
@@ -626,7 +627,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -640,8 +641,8 @@ THREE.ShaderDeferred = {
 			viewWidth: 		{ type: "f", value: 800 },
 			viewHeight: 	{ type: "f", value: 600 },
 
-			lightPositionVS :{ type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightDirectionVS:{ type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
+			lightPositionVS : { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
+			lightDirectionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
 			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
 			lightIntensity: { type: "f", value: 1.0 },
 			lightDistance: 	{ type: "f", value: 1.0 },
@@ -717,7 +718,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader : [
 
@@ -729,7 +730,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -787,7 +788,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader : [
 
@@ -799,7 +800,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -885,7 +886,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader : [
 
@@ -897,7 +898,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -912,7 +913,7 @@ THREE.ShaderDeferred = {
 			viewHeight: 	{ type: "f", value: 600 },
 
 			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightNormalVS: 	 { type: "v3", value: new THREE.Vector3( 0, -1, 0 ) },
+			lightNormalVS: 	 { type: "v3", value: new THREE.Vector3( 0, - 1, 0 ) },
 			lightRightVS:  	 { type: "v3", value: new THREE.Vector3( 1, 0, 0 ) },
 			lightUpVS:  	 { type: "v3", value: new THREE.Vector3( 1, 0, 0 ) },
 
@@ -1040,7 +1041,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader : [
 
@@ -1052,7 +1053,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -1086,7 +1087,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader : [
 
@@ -1098,7 +1099,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	}
 
