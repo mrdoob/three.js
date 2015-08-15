@@ -847,19 +847,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( geometry.attributes.index !== undefined ) {
+		var index = geometry.attributes.index;
+
+		if ( index !== undefined ) {
+
+			var type, size;
+
+			if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
+
+				type = _gl.UNSIGNED_INT;
+				size = 4;
+
+			} else {
+
+				type = _gl.UNSIGNED_SHORT;
+				size = 2;
+
+			}
 
 			if ( object instanceof THREE.Mesh ) {
 
-				renderIndexedMesh( material, geometry, program, updateBuffers );
+				renderIndexedMesh( type, size, material, geometry, program, updateBuffers );
 
 			} else if ( object instanceof THREE.Line ) {
 
-				renderIndexedLine( material, geometry, object, program, updateBuffers );
+				renderIndexedLine( type, size, material, geometry, object, program, updateBuffers );
 
 			} else if ( object instanceof THREE.PointCloud ) {
 
-				renderIndexedPointCloud( material, geometry, program, updateBuffers );
+				renderIndexedPointCloud( type, size, material, geometry, program, updateBuffers );
 
 			}
 
@@ -1014,7 +1030,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderIndexedMesh( material, geometry, program, updateBuffers ) {
+	function renderIndexedMesh( type, size, material, geometry, program, updateBuffers ) {
 
 		var mode = _gl.TRIANGLES;
 
@@ -1027,20 +1043,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var index = geometry.attributes.index;
 		var indexBuffer = objects.getAttributeBuffer( index );
-
-		var type, size;
-
-		if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
-
-			type = _gl.UNSIGNED_INT;
-			size = 4;
-
-		} else {
-
-			type = _gl.UNSIGNED_SHORT;
-			size = 2;
-
-		}
 
 		var drawcall = geometry.drawcalls;
 
@@ -1218,7 +1220,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderIndexedLine( material, geometry, object, program, updateBuffers ) {
+	function renderIndexedLine( type, size, material, geometry, object, program, updateBuffers ) {
 
 		var mode = object instanceof THREE.LineSegments ? _gl.LINES : _gl.LINE_STRIP;
 
@@ -1229,20 +1231,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var index = geometry.attributes.index;
 		var indexBuffer = objects.getAttributeBuffer( index );
-
-		var type, size;
-
-		if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
-
-			type = _gl.UNSIGNED_INT;
-			size = 4;
-
-		} else {
-
-			type = _gl.UNSIGNED_SHORT;
-			size = 2;
-
-		}
 
 		var drawcall = geometry.drawcalls;
 
@@ -1330,26 +1318,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderIndexedPointCloud( material, geometry, program, updateBuffers ) {
+	function renderIndexedPointCloud( type, size, material, geometry, program, updateBuffers ) {
 
 		var mode = _gl.POINTS;
 
 		var index = geometry.attributes.index;
 		var indexBuffer = objects.getAttributeBuffer( index );
-
-		var type, size;
-
-		if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
-
-			type = _gl.UNSIGNED_INT;
-			size = 4;
-
-		} else {
-
-			type = _gl.UNSIGNED_SHORT;
-			size = 2;
-
-		}
 
 		var drawcall = geometry.drawcalls;
 
