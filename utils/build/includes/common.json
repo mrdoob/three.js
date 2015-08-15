@@ -157,6 +157,7 @@
 	"src/renderers/WebGLRenderer.js",
 	"src/renderers/WebGLRenderTarget.js",
 	"src/renderers/WebGLRenderTargetCube.js",
+	"src/renderers/webgl/WebGLBufferRenderer.js",
 	"src/renderers/webgl/WebGLExtensions.js",
 	"src/renderers/webgl/WebGLGeometries.js",
 	"src/renderers/webgl/WebGLObjects.js",
