@@ -875,7 +875,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.PointCloud ) {
 
-				renderIndexedPointCloud( type, size, material, geometry, program, updateBuffers );
+				renderIndexedPoints( type, size, material, geometry, program, updateBuffers );
 
 			}
 
@@ -927,7 +927,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.PointCloud ) {
 
-				renderPointCloud( _gl.POINTS, geometry );
+				renderPoints( _gl.POINTS, geometry );
 
 			}
 
@@ -1320,7 +1320,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderIndexedPointCloud( type, size, material, geometry, program, updateBuffers ) {
+	function renderIndexedPoints( type, size, material, geometry, program, updateBuffers ) {
 
 		var mode = _gl.POINTS;
 
@@ -1373,7 +1373,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderPointCloud( mode, geometry ) {
+	function renderPoints( mode, geometry ) {
 
 		var position = geometry.attributes.position;
 		var drawcall = geometry.drawcalls;
