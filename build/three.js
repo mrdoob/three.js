@@ -18567,15 +18567,15 @@ THREE.ShaderChunk[ 'lights_phong_fragment'] = "#ifndef FLAT_SHADED\n\n	vec3 norm
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_phong_pars_fragment'] = "uniform vec3 ambientLightColor;\n\n#if MAX_DIR_LIGHTS > 0\n\n	uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];\n	uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];\n\n	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];\n	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];\n	uniform float pointLightDecay[ MAX_POINT_LIGHTS ];\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightDecay[ MAX_SPOT_LIGHTS ];\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )\n\n	varying vec3 vWorldPosition;\n\n#endif\n\nvarying vec3 vViewPosition;\n\n#ifndef FLAT_SHADED\n\n	varying vec3 vNormal;\n\n#endif\n";
+THREE.ShaderChunk[ 'lights_phong_pars_fragment'] = "uniform vec3 ambientLightColor;\n\n#if MAX_DIR_LIGHTS > 0\n\n	uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];\n	uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];\n\n	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];\n	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];\n	uniform float pointLightDecay[ MAX_POINT_LIGHTS ];\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightDecay[ MAX_SPOT_LIGHTS ];\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0 || defined( USE_ENVMAP )\n\n	varying vec3 vWorldPosition;\n\n#endif\n\nvarying vec3 vViewPosition;\n\n#ifndef FLAT_SHADED\n\n	varying vec3 vNormal;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_pars_vertex.glsl
 
-THREE.ShaderChunk[ 'lights_phong_pars_vertex'] = "#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )\n\n	varying vec3 vWorldPosition;\n\n#endif\n";
+THREE.ShaderChunk[ 'lights_phong_pars_vertex'] = "#if MAX_SPOT_LIGHTS > 0 || defined( USE_ENVMAP )\n\n	varying vec3 vWorldPosition;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_vertex.glsl
 
-THREE.ShaderChunk[ 'lights_phong_vertex'] = "#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )\n\n	vWorldPosition = worldPosition.xyz;\n\n#endif";
+THREE.ShaderChunk[ 'lights_phong_vertex'] = "#if MAX_SPOT_LIGHTS > 0 || defined( USE_ENVMAP )\n\n	vWorldPosition = worldPosition.xyz;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/linear_to_gamma_fragment.glsl
 
@@ -20570,17 +20570,53 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( object instanceof THREE.Mesh ) {
+		var index = geometry.attributes.index;
 
-			renderMesh( material, geometry, program, updateBuffers );
+		if ( index !== undefined ) {
 
-		} else if ( object instanceof THREE.Line ) {
+			var type, size;
 
-			renderLine( material, geometry, object, program, updateBuffers );
+			if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
 
-		} else if ( object instanceof THREE.PointCloud ) {
+				type = _gl.UNSIGNED_INT;
+				size = 4;
 
-			renderPointCloud( material, geometry, program, updateBuffers );
+			} else {
+
+				type = _gl.UNSIGNED_SHORT;
+				size = 2;
+
+			}
+
+			if ( object instanceof THREE.Mesh ) {
+
+				renderIndexedMesh( type, size, material, geometry, program, updateBuffers );
+
+			} else if ( object instanceof THREE.Line ) {
+
+				renderIndexedLine( type, size, material, geometry, object, program, updateBuffers );
+
+			} else if ( object instanceof THREE.PointCloud ) {
+
+				renderIndexedPointCloud( type, size, material, geometry, program, updateBuffers );
+
+			}
+
+		}	else {
+
+			if ( object instanceof THREE.Mesh ) {
+
+				renderMesh( material, geometry, program, updateBuffers );
+
+			} else if ( object instanceof THREE.Line ) {
+
+				renderLine( material, geometry, object, program, updateBuffers );
+
+			} else if ( object instanceof THREE.PointCloud ) {
+
+				renderPointCloud( material, geometry, program, updateBuffers );
+
+			}
 
 		}
 
@@ -20717,6 +20753,103 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function renderIndexedMesh( type, size, material, geometry, program, updateBuffers ) {
+
+		var mode = _gl.TRIANGLES;
+
+		if ( material.wireframe === true ) {
+
+			mode = _gl.LINES;
+			state.setLineWidth( material.wireframeLinewidth * pixelRatio );
+
+		}
+
+		var index = geometry.attributes.index;
+		var indexBuffer = objects.getAttributeBuffer( index );
+
+		var drawcall = geometry.drawcalls;
+
+		if ( drawcall.length === 0 ) {
+
+			if ( updateBuffers ) {
+
+				setupVertexAttributes( material, program, geometry, 0 );
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
+
+			}
+
+			if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
+
+				var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+				if ( extension === null ) {
+
+					console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+					return;
+
+				}
+
+				extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount ); // Draw the instanced meshes
+
+			} else {
+
+				_gl.drawElements( mode, index.array.length, type, 0 );
+
+			}
+			_infoRender.calls ++;
+			_infoRender.vertices += index.array.length; // not really true, here vertices can be shared
+			_infoRender.faces += index.array.length / 3;
+
+		} else {
+
+			// if there is more than 1 chunk
+			// must set attribute pointers to use new drawcall for each chunk
+			// even if geometry and materials didn't change
+
+			updateBuffers = true;
+
+			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
+
+				var startIndex = drawcall[ i ].index;
+
+				if ( updateBuffers ) {
+
+					setupVertexAttributes( material, program, geometry, startIndex );
+					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
+
+				}
+
+				// render indexed triangles
+
+				if ( geometry instanceof THREE.InstancedBufferGeometry && drawcall[ i ].instances > 0 ) {
+
+					var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+					if ( extension === null ) {
+
+						console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+						return;
+
+					}
+
+					extension.drawElementsInstancedANGLE( mode, drawcall[ i ].count, type, drawcall[ i ].start * size, drawcall[ i ].count, type, drawcall[ i ].instances ); // Draw the instanced meshes
+
+				} else {
+
+					_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size );
+
+				}
+
+				_infoRender.calls ++;
+				_infoRender.vertices += drawcall[ i ].count; // not really true, here vertices can be shared
+				_infoRender.faces += drawcall[ i ].count / 3;
+
+			}
+
+		}
+
+	}
+
 	function renderMesh( material, geometry, program, updateBuffers ) {
 
 		var mode = _gl.TRIANGLES;
@@ -20726,201 +20859,141 @@ THREE.WebGLRenderer = function ( parameters ) {
 			mode = _gl.LINES;
 			state.setLineWidth( material.wireframeLinewidth * pixelRatio );
 
-			/*
-			if ( geometry._wireframe === undefined ) {
+		}
 
-				geometry._wireframe = new THREE.WireframeGeometry( geometry );
-				objects.updateAttribute( geometry._wireframe.attributes.position );
+		if ( updateBuffers ) {
 
-			}
-
-			geometry = geometry._wireframe;
-			*/
+			setupVertexAttributes( material, program, geometry, 0 );
 
 		}
 
-		var index = geometry.attributes.index;
+		// non-indexed triangles
 
-		if ( index ) {
+		var drawcall = geometry.drawcalls;
 
-			// indexed triangles
+		if ( drawcall.length === 0 ) {
 
-			var type, size;
+			var position = geometry.attributes.position;
 
-			var indexBuffer = objects.getAttributeBuffer( index );
+			// render non-indexed triangles
 
-			if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
+			if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
-				type = _gl.UNSIGNED_INT;
-				size = 4;
+				var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
-			} else {
+				if ( extension === null ) {
 
-				type = _gl.UNSIGNED_SHORT;
-				size = 2;
-
-			}
-
-			var drawcall = geometry.drawcalls;
-
-			if ( drawcall.length === 0 ) {
-
-				if ( updateBuffers ) {
-
-					setupVertexAttributes( material, program, geometry, 0 );
-					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
+					console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+					return;
 
 				}
 
-				if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
+				if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-					var extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-					if ( extension === null ) {
-
-						console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-						return;
-
-					}
-
-					extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount ); // Draw the instanced meshes
+					extension.drawArraysInstancedANGLE( mode, 0, position.data.count, geometry.maxInstancedCount ); // Draw the instanced meshes
 
 				} else {
 
-					_gl.drawElements( mode, index.array.length, type, 0 );
+					extension.drawArraysInstancedANGLE( mode, 0, position.count, geometry.maxInstancedCount ); // Draw the instanced meshes
 
 				}
-				_infoRender.calls ++;
-				_infoRender.vertices += index.array.length; // not really true, here vertices can be shared
-				_infoRender.faces += index.array.length / 3;
 
 			} else {
 
-				// if there is more than 1 chunk
-				// must set attribute pointers to use new drawcall for each chunk
-				// even if geometry and materials didn't change
+				if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-				updateBuffers = true;
+					_gl.drawArrays( mode, 0, position.data.count );
 
-				for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
+				} else {
 
-					var startIndex = drawcall[ i ].index;
-
-					if ( updateBuffers ) {
-
-						setupVertexAttributes( material, program, geometry, startIndex );
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
-
-					}
-
-					// render indexed triangles
-
-					if ( geometry instanceof THREE.InstancedBufferGeometry && drawcall[ i ].instances > 0 ) {
-
-						var extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-						if ( extension === null ) {
-
-							console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-							return;
-
-						}
-
-						extension.drawElementsInstancedANGLE( mode, drawcall[ i ].count, type, drawcall[ i ].start * size, drawcall[ i ].count, type, drawcall[ i ].instances ); // Draw the instanced meshes
-
-					} else {
-
-						_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size );
-
-					}
-
-					_infoRender.calls ++;
-					_infoRender.vertices += drawcall[ i ].count; // not really true, here vertices can be shared
-					_infoRender.faces += drawcall[ i ].count / 3;
+					_gl.drawArrays( mode, 0, position.count );
 
 				}
 
 			}
 
+			_infoRender.calls ++;
+			_infoRender.vertices += position.count;
+			_infoRender.faces += position.array.length / 3;
+
 		} else {
+
+			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
+
+				// render non-indexed triangles
+
+				if ( geometry instanceof THREE.InstancedBufferGeometry ) {
+
+					console.error( 'THREE.WebGLRenderer.renderMesh: cannot use drawCalls with THREE.InstancedBufferGeometry.' );
+					return;
+
+				} else {
+
+					_gl.drawArrays( mode, drawcall[ i ].start, drawcall[ i ].count );
+
+				}
+
+				_infoRender.calls ++;
+				_infoRender.vertices += drawcall[ i ].count;
+				_infoRender.faces += ( drawcall[ i ].count  ) / 3;
+
+			}
+
+		}
+
+	}
+
+	function renderIndexedLine( type, size, material, geometry, object, program, updateBuffers ) {
+
+		var mode = object instanceof THREE.LineSegments ? _gl.LINES : _gl.LINE_STRIP;
+
+		// In case user is not using Line*Material by mistake
+		var lineWidth = material.linewidth !== undefined ? material.linewidth : 1;
+
+		state.setLineWidth( lineWidth * pixelRatio );
+
+		var index = geometry.attributes.index;
+		var indexBuffer = objects.getAttributeBuffer( index );
+
+		var drawcall = geometry.drawcalls;
+
+		if ( drawcall.length === 0 ) {
 
 			if ( updateBuffers ) {
 
 				setupVertexAttributes( material, program, geometry, 0 );
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
 
 			}
 
-			// non-indexed triangles
+			_gl.drawElements( mode, index.array.length, type, 0 ); // 2 bytes per Uint16Array
 
-			var drawcall = geometry.drawcalls;
+			_infoRender.calls ++;
+			_infoRender.vertices += index.array.length; // not really true, here vertices can be shared
 
-			if ( drawcall.length === 0 ) {
+		} else {
 
-				var position = geometry.attributes.position;
+			// if there is more than 1 chunk
+			// must set attribute pointers to use new drawcall for each chunk
+			// even if geometry and materials didn't change
 
-				// render non-indexed triangles
+			if ( drawcall.length > 1 ) updateBuffers = true;
 
-				if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
+			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
 
-					var extension = extensions.get( 'ANGLE_instanced_arrays' );
+				var startIndex = drawcall[ i ].index;
 
-					if ( extension === null ) {
+				if ( updateBuffers ) {
 
-						console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-						return;
-
-					}
-
-					if ( position instanceof THREE.InterleavedBufferAttribute ) {
-
-						extension.drawArraysInstancedANGLE( mode, 0, position.data.count, geometry.maxInstancedCount ); // Draw the instanced meshes
-
-					} else {
-
-						extension.drawArraysInstancedANGLE( mode, 0, position.count, geometry.maxInstancedCount ); // Draw the instanced meshes
-
-					}
-
-				} else {
-
-					if ( position instanceof THREE.InterleavedBufferAttribute ) {
-
-						_gl.drawArrays( mode, 0, position.data.count );
-
-					} else {
-
-						_gl.drawArrays( mode, 0, position.count );
-
-					}
+					setupVertexAttributes( material, program, geometry, startIndex );
+					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
 
 				}
+
+				_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size ); // 2 bytes per Uint16Array
 
 				_infoRender.calls ++;
-				_infoRender.vertices += position.count;
-				_infoRender.faces += position.array.length / 3;
-
-			} else {
-
-				for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-					// render non-indexed triangles
-
-					if ( geometry instanceof THREE.InstancedBufferGeometry ) {
-
-						console.error( 'THREE.WebGLRenderer.renderMesh: cannot use drawCalls with THREE.InstancedBufferGeometry.' );
-						return;
-
-					} else {
-
-						_gl.drawArrays( mode, drawcall[ i ].start, drawcall[ i ].count );
-
-					}
-
-					_infoRender.calls ++;
-					_infoRender.vertices += drawcall[ i ].count;
-					_infoRender.faces += ( drawcall[ i ].count  ) / 3;
-
-				}
+				_infoRender.vertices += drawcall[ i ].count; // not really true, here vertices can be shared
 
 			}
 
@@ -20937,104 +21010,83 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.setLineWidth( lineWidth * pixelRatio );
 
-		var index = geometry.attributes.index;
+		if ( updateBuffers ) {
 
-		if ( index ) {
+			setupVertexAttributes( material, program, geometry, 0 );
 
-			// indexed lines
+		}
 
-			var type, size;
+		var position = geometry.attributes.position;
+		var drawcall = geometry.drawcalls;
 
-			var indexBuffer = objects.getAttributeBuffer( index );
+		if ( drawcall.length === 0 ) {
 
-			if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
+			_gl.drawArrays( mode, 0, position.array.length / 3 );
 
-				type = _gl.UNSIGNED_INT;
-				size = 4;
-
-			} else {
-
-				type = _gl.UNSIGNED_SHORT;
-				size = 2;
-
-			}
-
-			var drawcall = geometry.drawcalls;
-
-			if ( drawcall.length === 0 ) {
-
-				if ( updateBuffers ) {
-
-					setupVertexAttributes( material, program, geometry, 0 );
-					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
-
-				}
-
-				_gl.drawElements( mode, index.array.length, type, 0 ); // 2 bytes per Uint16Array
-
-				_infoRender.calls ++;
-				_infoRender.vertices += index.array.length; // not really true, here vertices can be shared
-
-			} else {
-
-				// if there is more than 1 chunk
-				// must set attribute pointers to use new drawcall for each chunk
-				// even if geometry and materials didn't change
-
-				if ( drawcall.length > 1 ) updateBuffers = true;
-
-				for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-					var startIndex = drawcall[ i ].index;
-
-					if ( updateBuffers ) {
-
-						setupVertexAttributes( material, program, geometry, startIndex );
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
-
-					}
-
-					// render indexed lines
-
-					_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size ); // 2 bytes per Uint16Array
-
-					_infoRender.calls ++;
-					_infoRender.vertices += drawcall[ i ].count; // not really true, here vertices can be shared
-
-				}
-
-			}
+			_infoRender.calls ++;
+			_infoRender.vertices += position.array.length / 3;
 
 		} else {
 
-			// non-indexed lines
+			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
+
+				_gl.drawArrays( mode, drawcall[ i ].index, drawcall[ i ].count );
+
+				_infoRender.calls ++;
+				_infoRender.vertices += drawcall[ i ].count;
+
+			}
+
+		}
+
+	}
+
+	function renderIndexedPointCloud( type, size, material, geometry, program, updateBuffers ) {
+
+		var mode = _gl.POINTS;
+
+		var index = geometry.attributes.index;
+		var indexBuffer = objects.getAttributeBuffer( index );
+
+		var drawcall = geometry.drawcalls;
+
+		if ( drawcall.length === 0 ) {
 
 			if ( updateBuffers ) {
 
 				setupVertexAttributes( material, program, geometry, 0 );
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
 
 			}
 
-			var position = geometry.attributes.position;
-			var drawcall = geometry.drawcalls;
+			_gl.drawElements( mode, index.array.length, type, 0 );
 
-			if ( drawcall.length === 0 ) {
+			_infoRender.calls ++;
+			_infoRender.points += index.array.length;
 
-				_gl.drawArrays( mode, 0, position.array.length / 3 );
+		} else {
 
-				_infoRender.calls ++;
-				_infoRender.vertices += position.array.length / 3;
+			// if there is more than 1 chunk
+			// must set attribute pointers to use new drawcall for each chunk
+			// even if geometry and materials didn't change
 
-			} else {
+			if ( drawcall.length > 1 ) updateBuffers = true;
 
-				for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
+			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
 
-					_gl.drawArrays( mode, drawcall[ i ].index, drawcall[ i ].count );
+				var startIndex = drawcall[ i ].index;
 
-					_infoRender.calls ++;
-					_infoRender.vertices += drawcall[ i ].count;
+				if ( updateBuffers ) {
+
+					setupVertexAttributes( material, program, geometry, startIndex );
+					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
 
 				}
+
+				_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size );
+
+				_infoRender.calls ++;
+				_infoRender.points += drawcall[ i ].count;
 
 			}
 
@@ -21046,104 +21098,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var mode = _gl.POINTS;
 
-		var index = geometry.attributes.index;
+		if ( updateBuffers ) {
 
-		if ( index ) {
+			setupVertexAttributes( material, program, geometry, 0 );
 
-			// indexed points
+		}
 
-			var type, size;
+		var position = geometry.attributes.position;
+		var drawcall = geometry.drawcalls;
 
-			var indexBuffer = objects.getAttributeBuffer( index );
+		if ( drawcall.length === 0 ) {
 
-			if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
+			_gl.drawArrays( mode, 0, position.array.length / 3 );
 
-				type = _gl.UNSIGNED_INT;
-				size = 4;
-
-			} else {
-
-				type = _gl.UNSIGNED_SHORT;
-				size = 2;
-
-			}
-
-			var drawcall = geometry.drawcalls;
-
-			if ( drawcall.length === 0 ) {
-
-				if ( updateBuffers ) {
-
-					setupVertexAttributes( material, program, geometry, 0 );
-					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
-
-				}
-
-				_gl.drawElements( mode, index.array.length, type, 0 );
-
-				_infoRender.calls ++;
-				_infoRender.points += index.array.length;
-
-			} else {
-
-				// if there is more than 1 chunk
-				// must set attribute pointers to use new drawcall for each chunk
-				// even if geometry and materials didn't change
-
-				if ( drawcall.length > 1 ) updateBuffers = true;
-
-				for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-					var startIndex = drawcall[ i ].index;
-
-					if ( updateBuffers ) {
-
-						setupVertexAttributes( material, program, geometry, startIndex );
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
-
-					}
-
-					// render indexed points
-
-					_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size );
-
-					_infoRender.calls ++;
-					_infoRender.points += drawcall[ i ].count;
-
-				}
-
-			}
+			_infoRender.calls ++;
+			_infoRender.points += position.array.length / 3;
 
 		} else {
 
-			// non-indexed points
+			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
 
-			if ( updateBuffers ) {
-
-				setupVertexAttributes( material, program, geometry, 0 );
-
-			}
-
-			var position = geometry.attributes.position;
-			var drawcall = geometry.drawcalls;
-
-			if ( drawcall.length === 0 ) {
-
-				_gl.drawArrays( mode, 0, position.array.length / 3 );
+				_gl.drawArrays( mode, drawcall[ i ].index, drawcall[ i ].count );
 
 				_infoRender.calls ++;
-				_infoRender.points += position.array.length / 3;
-
-			} else {
-
-				for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-					_gl.drawArrays( mode, drawcall[ i ].index, drawcall[ i ].count );
-
-					_infoRender.calls ++;
-					_infoRender.points += drawcall[ i ].count;
-
-				}
+				_infoRender.points += drawcall[ i ].count;
 
 			}
 
