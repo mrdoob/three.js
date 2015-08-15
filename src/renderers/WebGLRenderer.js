@@ -756,6 +756,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function getDefaultGroups( position ) {
+
+	}
+
 	this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object ) {
 
 		setMaterial( material );
@@ -831,6 +835,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var index = geometry.attributes.index;
+		var position = geometry.attributes.position;
+
+		var groups = geometry.drawcalls;
 
 		if ( index !== undefined ) {
 
@@ -870,6 +877,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			if ( groups.length === 0 ) {
+
+				groups.push( {
+					start: 0,
+					count: position.array.length / 3
+				} );
+
+			}
+
 			var mode;
 
 			if ( object instanceof THREE.Mesh ) {
@@ -886,7 +902,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				renderMesh( mode, geometry );
+				if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
+
+					renderInstancedMesh( mode, geometry );
+
+				} else if ( position instanceof THREE.InterleavedBufferAttribute ) {
+
+					renderMesh( mode, 0, position.data.count );
+
+				} else {
+
+					renderGroups( groups, renderMesh, mode );
+
+				}
 
 			} else if ( object instanceof THREE.Line ) {
 
@@ -906,11 +934,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				renderLine( mode, geometry );
+				renderGroups( groups, renderLine, mode );
 
 			} else if ( object instanceof THREE.PointCloud ) {
 
-				renderPoints( _gl.POINTS, geometry );
+				renderGroups( groups, renderPoints, _gl.POINTS );
 
 			}
 
@@ -1049,6 +1077,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function renderGroups( groups, renderFunction, mode ) {
+
+		for ( var i = 0, il = groups.length; i < il; i ++ ) {
+
+			var group = groups[ i ];
+			renderFunction( mode, group.start, group.count );
+
+		}
+
+	}
+
 	function renderIndexedMesh( type, size, material, geometry, program, updateBuffers ) {
 
 		var mode = _gl.TRIANGLES;
@@ -1146,75 +1185,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderMesh( mode, geometry ) {
+	function renderInstancedMesh( mode, geometry ) {
 
-		var drawcall = geometry.drawcalls;
+		var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
-		if ( drawcall.length === 0 ) {
+		if ( extension === null ) {
 
-			var position = geometry.attributes.position;
+			console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+			return;
 
-			// render non-indexed triangles
+		}
 
-			if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
+		var position = geometry.attributes.position;
 
-				var extension = extensions.get( 'ANGLE_instanced_arrays' );
+		if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-				if ( extension === null ) {
-
-					console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-					return;
-
-				}
-
-				if ( position instanceof THREE.InterleavedBufferAttribute ) {
-
-					extension.drawArraysInstancedANGLE( mode, 0, position.data.count, geometry.maxInstancedCount ); // Draw the instanced meshes
-
-				} else {
-
-					extension.drawArraysInstancedANGLE( mode, 0, position.count, geometry.maxInstancedCount ); // Draw the instanced meshes
-
-				}
-
-			} else {
-
-				if ( position instanceof THREE.InterleavedBufferAttribute ) {
-
-					_gl.drawArrays( mode, 0, position.data.count );
-
-				} else {
-
-					_gl.drawArrays( mode, 0, position.count );
-
-				}
-
-			}
-
-			_infoRender.calls ++;
-			_infoRender.vertices += position.count;
-			_infoRender.faces += position.array.length / 3;
+			extension.drawArraysInstancedANGLE( mode, 0, position.data.count, geometry.maxInstancedCount );
 
 		} else {
 
-			if ( geometry instanceof THREE.InstancedBufferGeometry ) {
-
-				console.error( 'THREE.WebGLRenderer.renderMesh: cannot use drawCalls with THREE.InstancedBufferGeometry.' );
-				return;
-
-			}
-
-			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-				_gl.drawArrays( mode, drawcall[ i ].start, drawcall[ i ].count );
-
-				_infoRender.calls ++;
-				_infoRender.vertices += drawcall[ i ].count;
-				_infoRender.faces += ( drawcall[ i ].count  ) / 3;
-
-			}
+			extension.drawArraysInstancedANGLE( mode, 0, position.count, geometry.maxInstancedCount );
 
 		}
+
+	}
+
+	function renderMesh( mode, start, count ) {
+
+		_gl.drawArrays( mode, start, count );
+
+		_infoRender.calls ++;
+		_infoRender.vertices += count;
+		_infoRender.faces += count / 3;
 
 	}
 
@@ -1276,30 +1278,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderLine( mode, geometry ) {
+	function renderLine( mode, start, count ) {
 
-		var position = geometry.attributes.position;
-		var drawcall = geometry.drawcalls;
+		_gl.drawArrays( mode, start, count );
 
-		if ( drawcall.length === 0 ) {
-
-			_gl.drawArrays( mode, 0, position.array.length / 3 );
-
-			_infoRender.calls ++;
-			_infoRender.vertices += position.array.length / 3;
-
-		} else {
-
-			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-				_gl.drawArrays( mode, drawcall[ i ].index, drawcall[ i ].count );
-
-				_infoRender.calls ++;
-				_infoRender.vertices += drawcall[ i ].count;
-
-			}
-
-		}
+		_infoRender.calls ++;
+		_infoRender.vertices += count;
 
 	}
 
@@ -1356,30 +1340,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderPoints( mode, geometry ) {
+	function renderPoints( mode, start, count ) {
 
-		var position = geometry.attributes.position;
-		var drawcall = geometry.drawcalls;
+		_gl.drawArrays( mode, start, count );
 
-		if ( drawcall.length === 0 ) {
-
-			_gl.drawArrays( mode, 0, position.array.length / 3 );
-
-			_infoRender.calls ++;
-			_infoRender.points += position.array.length / 3;
-
-		} else {
-
-			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-				_gl.drawArrays( mode, drawcall[ i ].index, drawcall[ i ].count );
-
-				_infoRender.calls ++;
-				_infoRender.points += drawcall[ i ].count;
-
-			}
-
-		}
+		_infoRender.calls ++;
+		_infoRender.points += count;
 
 	}
 
