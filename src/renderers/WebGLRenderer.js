@@ -1061,7 +1061,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( extension === null ) {
 
-					console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+					console.error( 'THREE.WebGLRenderer.renderIndexedMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 					return;
 
 				}
@@ -1104,7 +1104,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( extension === null ) {
 
-						console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+						console.error( 'THREE.WebGLRenderer.renderIndexedMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 						return;
 
 					}
