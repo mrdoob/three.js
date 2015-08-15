@@ -833,6 +833,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		//
+
 		var index = geometry.attributes.index;
 		var position = geometry.attributes.position;
 
@@ -845,18 +847,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			renderer = indexedBufferRenderer;
 			renderer.setIndex( index );
 
-			setupVertexAttributes( material, program, geometry, 0 );
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, objects.getAttributeBuffer( index ) );
-
 		} else {
 
 			renderer = bufferRenderer;
-
-			if ( updateBuffers ) {
-
-				setupVertexAttributes( material, program, geometry, 0 );
-
-			}
 
 		}
 
