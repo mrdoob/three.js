@@ -19938,7 +19938,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
 	var properties = new THREE.WebGLProperties();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
-	var renderer = new THREE.WebGLBufferRenderer( _gl, extensions, _infoRender );
+
+	var bufferRenderer = new THREE.WebGLBufferRenderer( _gl, extensions, _infoRender );
+	var indexedBufferRenderer = new THREE.WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
 
 	//
 
@@ -20480,10 +20482,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function getDefaultGroups( position ) {
-
-	}
-
 	this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object ) {
 
 		setMaterial( material );
@@ -20558,112 +20556,115 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		//
+
 		var index = geometry.attributes.index;
 		var position = geometry.attributes.position;
 
 		var groups = geometry.drawcalls;
 
+		var renderer;
+
 		if ( index !== undefined ) {
 
-			var type, size;
+			renderer = indexedBufferRenderer;
+			renderer.setIndex( index );
 
-			if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
+		} else {
 
-				type = _gl.UNSIGNED_INT;
-				size = 4;
+			renderer = bufferRenderer;
+
+		}
+
+		if ( updateBuffers ) {
+
+			setupVertexAttributes( material, program, geometry, 0 );
+
+			if ( index !== undefined ) {
+
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, objects.getAttributeBuffer( index ) );
+
+			}
+
+		}
+
+		if ( groups.length === 0 ) {
+
+			var count;
+
+			if ( index !== undefined ) {
+
+				count = index.array.length;
+
+			} else if ( position instanceof THREE.InterleavedBufferAttribute ) {
+
+				count = position.data.array.length / 3;
 
 			} else {
 
-				type = _gl.UNSIGNED_SHORT;
-				size = 2;
+				count = position.array.length / 3;
 
 			}
 
-			if ( object instanceof THREE.Mesh ) {
+			groups = [ {
+				start: 0,
+				count: count,
+				index: 0
+			} ];
 
-				renderIndexedMesh( type, size, material, geometry, program, updateBuffers );
+		}
 
-			} else if ( object instanceof THREE.Line ) {
+		if ( object instanceof THREE.Mesh ) {
 
-				renderIndexedLine( type, size, material, geometry, object, program, updateBuffers );
+			if ( material.wireframe === true ) {
 
-			} else if ( object instanceof THREE.PointCloud ) {
+				state.setLineWidth( material.wireframeLinewidth * pixelRatio );
+				renderer.setMode( _gl.LINES );
 
-				renderIndexedPoints( type, size, material, geometry, program, updateBuffers );
+			} else {
 
-			}
-
-		}	else {
-
-			if ( updateBuffers ) {
-
-				setupVertexAttributes( material, program, geometry, 0 );
-
-			}
-
-			if ( groups.length === 0 ) {
-
-				groups = [ {
-					start: 0,
-					count: position.array.length / 3,
-					index: 0
-				} ];
+				renderer.setMode( _gl.TRIANGLES );
 
 			}
 
-			if ( object instanceof THREE.Mesh ) {
+			if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
-				if ( material.wireframe === true ) {
+				renderer.renderInstances( geometry );
 
-					state.setLineWidth( material.wireframeLinewidth * pixelRatio );
-					renderer.setMode( _gl.LINES );
+			} else if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-				} else {
+				renderer.render( 0, position.data.count );
 
-					renderer.setMode( _gl.TRIANGLES );
-
-				}
-
-				if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
-
-					renderer.renderInstances( geometry );
-
-				} else if ( position instanceof THREE.InterleavedBufferAttribute ) {
-
-					renderer.renderMesh( 0, position.data.count );
-
-				} else {
-
-					renderer.renderGroups( groups );
-
-				}
-
-			} else if ( object instanceof THREE.Line ) {
-
-				var lineWidth = material.linewidth;
-
-				if ( lineWidth === undefined ) lineWidth = 1; // Not using Line*Material
-
-				state.setLineWidth( lineWidth * pixelRatio );
-
-				if ( object instanceof THREE.LineSegments ) {
-
-					renderer.setMode( _gl.LINES );
-
-				} else {
-
-					renderer.setMode( _gl.LINE_STRIP );
-
-				}
+			} else {
 
 				renderer.renderGroups( groups );
 
-			} else if ( object instanceof THREE.PointCloud ) {
+			}
 
-				renderer.setMode( _gl.POINTS );
-				renderer.renderGroups( groups );
+		} else if ( object instanceof THREE.Line ) {
+
+			var lineWidth = material.linewidth;
+
+			if ( lineWidth === undefined ) lineWidth = 1; // Not using Line*Material
+
+			state.setLineWidth( lineWidth * pixelRatio );
+
+			if ( object instanceof THREE.LineSegments ) {
+
+				renderer.setMode( _gl.LINES );
+
+			} else {
+
+				renderer.setMode( _gl.LINE_STRIP );
 
 			}
+
+			renderer.renderGroups( groups );
+
+		} else if ( object instanceof THREE.PointCloud ) {
+
+			renderer.setMode( _gl.POINTS );
+			renderer.renderGroups( groups );
 
 		}
 
@@ -20797,214 +20798,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		state.disableUnusedAttributes();
-
-	}
-
-	function renderIndexedMesh( type, size, material, geometry, program, updateBuffers ) {
-
-		var mode = _gl.TRIANGLES;
-
-		if ( material.wireframe === true ) {
-
-			mode = _gl.LINES;
-			state.setLineWidth( material.wireframeLinewidth * pixelRatio );
-
-		}
-
-		var index = geometry.attributes.index;
-		var indexBuffer = objects.getAttributeBuffer( index );
-
-		var drawcall = geometry.drawcalls;
-
-		if ( drawcall.length === 0 ) {
-
-			if ( updateBuffers ) {
-
-				setupVertexAttributes( material, program, geometry, 0 );
-				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
-
-			}
-
-			if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
-
-				var extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-				if ( extension === null ) {
-
-					console.error( 'THREE.WebGLRenderer.renderIndexedMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-					return;
-
-				}
-
-				extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount ); // Draw the instanced meshes
-
-			} else {
-
-				_gl.drawElements( mode, index.array.length, type, 0 );
-
-			}
-			_infoRender.calls ++;
-			_infoRender.vertices += index.array.length; // not really true, here vertices can be shared
-			_infoRender.faces += index.array.length / 3;
-
-		} else {
-
-			// if there is more than 1 chunk
-			// must set attribute pointers to use new drawcall for each chunk
-			// even if geometry and materials didn't change
-
-			updateBuffers = true;
-
-			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-				var startIndex = drawcall[ i ].index;
-
-				if ( updateBuffers ) {
-
-					setupVertexAttributes( material, program, geometry, startIndex );
-					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
-
-				}
-
-				// render indexed triangles
-
-				if ( geometry instanceof THREE.InstancedBufferGeometry && drawcall[ i ].instances > 0 ) {
-
-					var extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-					if ( extension === null ) {
-
-						console.error( 'THREE.WebGLRenderer.renderIndexedMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-						return;
-
-					}
-
-					extension.drawElementsInstancedANGLE( mode, drawcall[ i ].count, type, drawcall[ i ].start * size, drawcall[ i ].count, type, drawcall[ i ].instances ); // Draw the instanced meshes
-
-				} else {
-
-					_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size );
-
-				}
-
-				_infoRender.calls ++;
-				_infoRender.vertices += drawcall[ i ].count; // not really true, here vertices can be shared
-				_infoRender.faces += drawcall[ i ].count / 3;
-
-			}
-
-		}
-
-	}
-
-	function renderIndexedLine( type, size, material, geometry, object, program, updateBuffers ) {
-
-		var mode = object instanceof THREE.LineSegments ? _gl.LINES : _gl.LINE_STRIP;
-
-		// In case user is not using Line*Material by mistake
-		var lineWidth = material.linewidth !== undefined ? material.linewidth : 1;
-
-		state.setLineWidth( lineWidth * pixelRatio );
-
-		var index = geometry.attributes.index;
-		var indexBuffer = objects.getAttributeBuffer( index );
-
-		var drawcall = geometry.drawcalls;
-
-		if ( drawcall.length === 0 ) {
-
-			if ( updateBuffers ) {
-
-				setupVertexAttributes( material, program, geometry, 0 );
-				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
-
-			}
-
-			_gl.drawElements( mode, index.array.length, type, 0 ); // 2 bytes per Uint16Array
-
-			_infoRender.calls ++;
-			_infoRender.vertices += index.array.length; // not really true, here vertices can be shared
-
-		} else {
-
-			// if there is more than 1 chunk
-			// must set attribute pointers to use new drawcall for each chunk
-			// even if geometry and materials didn't change
-
-			if ( drawcall.length > 1 ) updateBuffers = true;
-
-			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-				var startIndex = drawcall[ i ].index;
-
-				if ( updateBuffers ) {
-
-					setupVertexAttributes( material, program, geometry, startIndex );
-					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
-
-				}
-
-				_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size ); // 2 bytes per Uint16Array
-
-				_infoRender.calls ++;
-				_infoRender.vertices += drawcall[ i ].count; // not really true, here vertices can be shared
-
-			}
-
-		}
-
-	}
-
-	function renderIndexedPoints( type, size, material, geometry, program, updateBuffers ) {
-
-		var mode = _gl.POINTS;
-
-		var index = geometry.attributes.index;
-		var indexBuffer = objects.getAttributeBuffer( index );
-
-		var drawcall = geometry.drawcalls;
-
-		if ( drawcall.length === 0 ) {
-
-			if ( updateBuffers ) {
-
-				setupVertexAttributes( material, program, geometry, 0 );
-				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
-
-			}
-
-			_gl.drawElements( mode, index.array.length, type, 0 );
-
-			_infoRender.calls ++;
-			_infoRender.points += index.array.length;
-
-		} else {
-
-			// if there is more than 1 chunk
-			// must set attribute pointers to use new drawcall for each chunk
-			// even if geometry and materials didn't change
-
-			if ( drawcall.length > 1 ) updateBuffers = true;
-
-			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
-
-				var startIndex = drawcall[ i ].index;
-
-				if ( updateBuffers ) {
-
-					setupVertexAttributes( material, program, geometry, startIndex );
-					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
-
-				}
-
-				_gl.drawElements( mode, drawcall[ i ].count, type, drawcall[ i ].start * size );
-
-				_infoRender.calls ++;
-				_infoRender.points += drawcall[ i ].count;
-
-			}
-
-		}
 
 	}
 
@@ -23785,32 +23578,34 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	var mode;
 
-	this.setMode = function ( value ) {
+	function setMode( value ) {
 
 		mode = value;
 
-	};
+	}
 
-	this.renderGroups = function ( groups ) {
+	function render( start, count ) {
+
+		_gl.drawArrays( mode, start, count );
+
+		_infoRender.calls ++;
+		_infoRender.vertices += count;
+		if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+
+	}
+
+	function renderGroups( groups ) {
 
 		for ( var i = 0, il = groups.length; i < il; i ++ ) {
 
 			var group = groups[ i ];
-
-			var start = group.start;
-			var count = group.count;
-
-			_gl.drawArrays( mode, start, count );
-
-			_infoRender.calls ++;
-			_infoRender.vertices += count;
-			if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+			render( group.start, group.count );
 
 		}
 
-	};
+	}
 
-	this.renderInstances = function ( geometry ) {
+	function renderInstances( geometry ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -23833,7 +23628,92 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		}
 
-	};
+	}
+
+	this.setMode = setMode;
+	this.render = render;
+	this.renderGroups = renderGroups;
+	this.renderInstances = renderInstances;
+
+};
+
+// File:src/renderers/webgl/WebGLIndexedBufferRenderer.js
+
+/**
+* @author mrdoob / http://mrdoob.com/
+*/
+
+THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
+
+	var mode;
+
+	function setMode( value ) {
+
+		mode = value;
+
+	}
+
+	var type, size;
+
+	function setIndex( index ) {
+
+		if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
+
+			type = _gl.UNSIGNED_INT;
+			size = 4;
+
+		} else {
+
+			type = _gl.UNSIGNED_SHORT;
+			size = 2;
+
+		}
+
+	}
+
+	function render( start, count ) {
+
+		_gl.drawElements( mode, count, type, start * size );
+
+		_infoRender.calls ++;
+		_infoRender.vertices += count;
+		if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+
+	}
+
+	function renderGroups( groups ) {
+
+		for ( var i = 0, il = groups.length; i < il; i ++ ) {
+
+			var group = groups[ i ];
+			render( group.start, group.count );
+
+		}
+
+	}
+
+	function renderInstances( geometry ) {
+
+		var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+		if ( extension === null ) {
+
+			console.error( 'THREE.WebGLBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+			return;
+
+		}
+
+		var index = geometry.attributes.index;
+
+		extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount );
+
+	}
+
+	this.setMode = setMode;
+	this.setIndex = setIndex;
+	this.render = render;
+	this.renderGroups = renderGroups;
+	this.renderInstances = renderInstances;
 
 };
 
