@@ -881,17 +881,47 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}	else {
 
+			if ( updateBuffers ) {
+
+				setupVertexAttributes( material, program, geometry, 0 );
+
+			}
+
 			if ( object instanceof THREE.Mesh ) {
 
-				renderMesh( material, geometry, program, updateBuffers );
+				if ( material.wireframe === true ) {
+
+					state.setLineWidth( material.wireframeLinewidth * pixelRatio );
+
+					renderMesh( _gl.LINES, geometry, material );
+
+				} else {
+
+					renderMesh( _gl.TRIANGLES, geometry, material );
+
+				}
 
 			} else if ( object instanceof THREE.Line ) {
 
-				renderLine( material, geometry, object, program, updateBuffers );
+				var lineWidth = material.linewidth;
+
+				if ( lineWidth === undefined ) lineWidth = 1; // Not using Line*Material
+
+				state.setLineWidth( lineWidth * pixelRatio );
+
+				if ( object instanceof THREE.LineSegments ) {
+
+					renderLine( _gl.LINES, geometry );
+
+				} else {
+
+					renderLine( _gl.LINE_STRIP, geometry );
+
+				}
 
 			} else if ( object instanceof THREE.PointCloud ) {
 
-				renderPointCloud( material, geometry, program, updateBuffers );
+				renderPointCloud( _gl.POINTS, geometry );
 
 			}
 
@@ -1127,24 +1157,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderMesh( material, geometry, program, updateBuffers ) {
-
-		var mode = _gl.TRIANGLES;
-
-		if ( material.wireframe === true ) {
-
-			mode = _gl.LINES;
-			state.setLineWidth( material.wireframeLinewidth * pixelRatio );
-
-		}
-
-		if ( updateBuffers ) {
-
-			setupVertexAttributes( material, program, geometry, 0 );
-
-		}
-
-		// non-indexed triangles
+	function renderMesh( mode, geometry ) {
 
 		var drawcall = geometry.drawcalls;
 
@@ -1278,20 +1291,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderLine( material, geometry, object, program, updateBuffers ) {
-
-		var mode = object instanceof THREE.LineSegments ? _gl.LINES : _gl.LINE_STRIP;
-
-		// In case user is not using Line*Material by mistake
-		var lineWidth = material.linewidth !== undefined ? material.linewidth : 1;
-
-		state.setLineWidth( lineWidth * pixelRatio );
-
-		if ( updateBuffers ) {
-
-			setupVertexAttributes( material, program, geometry, 0 );
-
-		}
+	function renderLine( mode, geometry ) {
 
 		var position = geometry.attributes.position;
 		var drawcall = geometry.drawcalls;
@@ -1371,15 +1371,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderPointCloud( material, geometry, program, updateBuffers ) {
-
-		var mode = _gl.POINTS;
-
-		if ( updateBuffers ) {
-
-			setupVertexAttributes( material, program, geometry, 0 );
-
-		}
+	function renderPointCloud( mode, geometry ) {
 
 		var position = geometry.attributes.position;
 		var drawcall = geometry.drawcalls;
