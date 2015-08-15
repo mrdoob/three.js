@@ -6,32 +6,34 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	var mode;
 
-	this.setMode = function ( value ) {
+	function setMode( value ) {
 
 		mode = value;
 
-	};
+	}
 
-	this.renderGroups = function ( groups ) {
+	function render( start, count ) {
+
+		_gl.drawArrays( mode, start, count );
+
+		_infoRender.calls ++;
+		_infoRender.vertices += count;
+		if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+
+	}
+
+	function renderGroups( groups ) {
 
 		for ( var i = 0, il = groups.length; i < il; i ++ ) {
 
 			var group = groups[ i ];
-
-			var start = group.start;
-			var count = group.count;
-
-			_gl.drawArrays( mode, start, count );
-
-			_infoRender.calls ++;
-			_infoRender.vertices += count;
-			if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+			render( group.start, group.count );
 
 		}
 
-	};
+	}
 
-	this.renderInstances = function ( geometry ) {
+	function renderInstances( geometry ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -54,6 +56,11 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		}
 
-	};
+	}
+
+	this.setMode = setMode;
+	this.render = render;
+	this.renderGroups = renderGroups;
+	this.renderInstances = renderInstances;
 
 };

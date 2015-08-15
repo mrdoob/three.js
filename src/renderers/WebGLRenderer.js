@@ -907,7 +907,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-					renderer.renderMesh( 0, position.data.count );
+					renderer.render( 0, position.data.count );
 
 				} else {
 
