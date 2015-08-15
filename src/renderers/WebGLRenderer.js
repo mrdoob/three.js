@@ -1214,20 +1214,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
+			if ( geometry instanceof THREE.InstancedBufferGeometry ) {
+
+				console.error( 'THREE.WebGLRenderer.renderMesh: cannot use drawCalls with THREE.InstancedBufferGeometry.' );
+				return;
+
+			}
+
 			for ( var i = 0, il = drawcall.length; i < il; i ++ ) {
 
-				// render non-indexed triangles
-
-				if ( geometry instanceof THREE.InstancedBufferGeometry ) {
-
-					console.error( 'THREE.WebGLRenderer.renderMesh: cannot use drawCalls with THREE.InstancedBufferGeometry.' );
-					return;
-
-				} else {
-
-					_gl.drawArrays( mode, drawcall[ i ].start, drawcall[ i ].count );
-
-				}
+				_gl.drawArrays( mode, drawcall[ i ].start, drawcall[ i ].count );
 
 				_infoRender.calls ++;
 				_infoRender.vertices += drawcall[ i ].count;
