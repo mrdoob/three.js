@@ -887,19 +887,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			var mode;
+
 			if ( object instanceof THREE.Mesh ) {
 
 				if ( material.wireframe === true ) {
 
 					state.setLineWidth( material.wireframeLinewidth * pixelRatio );
 
-					renderMesh( _gl.LINES, geometry, material );
+					mode = _gl.LINES;
 
 				} else {
 
-					renderMesh( _gl.TRIANGLES, geometry, material );
+					mode = _gl.TRIANGLES;
 
 				}
+
+				renderMesh( mode, geometry );
 
 			} else if ( object instanceof THREE.Line ) {
 
@@ -911,13 +915,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( object instanceof THREE.LineSegments ) {
 
-					renderLine( _gl.LINES, geometry );
+					mode = _gl.LINES;
 
 				} else {
 
-					renderLine( _gl.LINE_STRIP, geometry );
+					mode = _gl.LINE_STRIP;
 
 				}
+
+				renderLine( mode, geometry );
 
 			} else if ( object instanceof THREE.PointCloud ) {
 
