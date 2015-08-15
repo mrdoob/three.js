@@ -1,5 +1,5 @@
 /**
- * @author mrdoob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/ and Alex Pletzer
  */
 
 THREE.VTKLoader = function ( manager ) {
@@ -30,17 +30,15 @@ THREE.VTKLoader.prototype = {
 
 		var indices = [];
 		var positions = [];
-		var pointData = [];
-		var cellData = [];
-
+		var scalars = {};
+		var dataArray = [];
+		var scalarName = "";
+		var stagger = "";
 		var result;
-
-		// float float float
-
-		var pat3Floats = /([\-]?[\d]+[\.]?[\d|\-|e]*)[ ]+([\-]?[\d]+[\.]?[\d|\-|e]*)[ ]+([\-]?[\d]+[\.]?[\d|\-|e]*)/g;
+		var pat3Floats = /([\-]?[\d]+[\.]?[\d|\-|\+|e]*)[ ]+([\-]?[\d]+[\.]?[\d|\-|\+|e]*)[ ]+([\-]?[\d]+[\.]?[\d|\-|\+|e]*)/g;
 		var patTriangle = /^3[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/;
 		var patQuad = /^4[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/;
-		var patFloat = /([\-]?[\d]+[\.]?[\d|\-|e]*)/;
+		var patFloat = /([\-]?[\d]+[\.]?[\d|\-|\+|e]*)/g;
 		var patPOINTS = /^POINTS /;
 		var patPOLYGONS = /^POLYGONS /;
 		var patPOINT_DATA = /^POINT_DATA[ ]+([\d]+)/;
@@ -50,8 +48,7 @@ THREE.VTKLoader.prototype = {
 		var inPolygonsSection = false;
 		var inPointDataSection = false;
 		var inCellDataSection = false;
-		var numPointDataComps = 1;
-		var numCellDataComps = 1;
+		var pastScalarsDecl = false;
 
 		var lines = data.split('\n');
 		for ( var i = 0; i < lines.length; ++i ) {
@@ -68,7 +65,7 @@ THREE.VTKLoader.prototype = {
 			}
 			else if ( inPolygonsSection ) {
 
-				result = patTriangle.exec(line);
+				result = patTriangle.exec( line );
 
 				if ( result !== null ) {
 
@@ -79,7 +76,7 @@ THREE.VTKLoader.prototype = {
 				}
 				else {
 
-					result = patQuad.exec(line);
+					result = patQuad.exec( line );
 
 					if ( result !== null ) {
 
@@ -93,23 +90,11 @@ THREE.VTKLoader.prototype = {
 				}
 
 			}
-			else if ( inPointDataSection ) {
+			else if (  pastScalarsDecl && ( inPointDataSection || inCellDataSection )  ) {
 			
-				result = patFloat.exec(line);
+				while ( ( result = patFloat.exec( line ) ) !== null ) {
 				
-				if ( result !== null ) {
-				
-					pointData.push( parseFloat( result[ 1 ] ) );
-					
-				}
-			}
-			else if ( inCellDataSection ) {
-			
-				result = patFloat.exec(line);
-				
-				if ( result !== null ) {
-				
-					cellData.push( parseFloat( result[ 1 ] ) );
+					dataArray.push( parseFloat( result[ 1 ] ) );
 					
 				}
 			}
@@ -127,25 +112,59 @@ THREE.VTKLoader.prototype = {
 				inCellDataSection = false;
 			}
 			else if ( ( result = patPOINT_DATA.exec( line ) ) !== null ) {
+			
+			    // new data section 
+			    
+			    if ( scalarName != "" && dataArray.length > 0) {
+			    
+			        // save the scalars read so far
+			        
+			        scalars[stagger][scalarName] = new THREE.BufferAttribute( new Float32Array( dataArray ), 1 );
+			        dataArray = [];
+			    }
 				inPolygonsSection = false;
 				inPointsSection = false;
 				inPointDataSection = true;
 				inCellDataSection = false;
+				stagger = "point";
+				scalars[ stagger ] = {};
+				pastScalarsDecl = false;
 			}
 			else if ( ( result = patCELL_DATA.exec( line ) ) !== null ) {
+			
+				// new data section 
+				
+			    if ( scalarName != "" && dataArray.length > 0) {
+			    
+			      	// save the scalars read so far
+			      	
+			        scalars[stagger][scalarName] = new THREE.BufferAttribute( new Float32Array( dataArray ), 1 );
+			        dataArray = [];
+			    }
 				inPolygonsSection = false;
 				inPointsSection = false;
 				inPointDataSection = false;
 				inCellDataSection = true;
+				stagger = "cell";
+				scalars[ stagger ] = {};
+				pastScalarsDecl = false;
+			}
+			else if ( stagger != "" && ( result = patSCALARS.exec( line ) ) !== null ) {
+			
+			  	// get the scalar field name 
+			  	
+			  	window.alert('scalar name: ' + result[1] + ' scalar type: ' + result[2] + ' scalar num components: ' + result[3]);
+			    scalarName = result[ 1 ];
+			    scalars[stagger][scalarName] = dataArray;
+			    pastScalarsDecl = true;
 			}
 		}
 
 		var geometry = new THREE.BufferGeometry();
 		geometry.addAttribute( 'index', new THREE.BufferAttribute( new ( indices.length > 65535 ? Uint32Array : Uint16Array )( indices ), 1 ) );
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
-		geometry.addAttribute( 'point_data', new THREE.BufferAttribute( new Float32Array( pointData ), 1 ) );
-		geometry.addAttribute( 'cell_data', new THREE.BufferAttribute( new Float32Array( cellData ), 1 ) );
-
+		geometry.addAttribute( 'scalars', scalars );
+		
 		return geometry;
 
 	}
