@@ -140,10 +140,10 @@ THREE.Plane.prototype = {
 
 			var denominator = this.normal.dot( direction );
 
-			if ( denominator == 0 ) {
+			if ( denominator === 0 ) {
 
 				// line is coplanar, return origin
-				if ( this.distanceToPoint( line.start ) == 0 ) {
+				if ( this.distanceToPoint( line.start ) === 0 ) {
 
 					return result.copy( line.start );
 
@@ -210,7 +210,7 @@ THREE.Plane.prototype = {
 
 	equals: function ( plane ) {
 
-		return plane.normal.equals( this.normal ) && ( plane.constant == this.constant );
+		return plane.normal.equals( this.normal ) && ( plane.constant === this.constant );
 
 	},
 

@@ -38,9 +38,9 @@ logging.basicConfig(
 
 bl_info = {
     'name': "Three.js Format",
-    'author': "repsac, mrdoob, yomotsu, mpk, jpweeks, rkusa",
+    'author': "repsac, mrdoob, yomotsu, mpk, jpweeks, rkusa, tschw",
     'version': (1, 4, 0),
-    'blender': (2, 7, 3),
+    'blender': (2, 73, 0),
     'location': "File > Export",
     'description': "Export Three.js formatted JSON files.",
     'warning': "Importer not included.",
@@ -116,6 +116,7 @@ bpy.types.Material.THREE_blending_type = EnumProperty(
 
 bpy.types.Material.THREE_depth_write = BoolProperty(default=True)
 bpy.types.Material.THREE_depth_test = BoolProperty(default=True)
+bpy.types.Material.THREE_double_sided = BoolProperty(default=False)
 
 class ThreeMaterial(bpy.types.Panel):
     """Adds custom properties to the Materials of an object"""
@@ -149,6 +150,10 @@ class ThreeMaterial(bpy.types.Panel):
             row = layout.row()
             row.prop(mat, 'THREE_depth_test',
                      text="Enable depth testing")
+
+            row = layout.row()
+            row.prop(mat, 'THREE_double_sided',
+                     text="Double-sided")
 
 def _mag_filters(index):
     """Three.js mag filters
@@ -301,9 +306,21 @@ def restore_export_settings(properties, settings):
         constants.INFLUENCES_PER_VERTEX,
         constants.EXPORT_OPTIONS[constants.INFLUENCES_PER_VERTEX])
 
+    properties.option_apply_modifiers = settings.get(
+        constants.APPLY_MODIFIERS,
+        constants.EXPORT_OPTIONS[constants.APPLY_MODIFIERS])
+
+    properties.option_extra_vgroups = settings.get(
+        constants.EXTRA_VGROUPS,
+        constants.EXPORT_OPTIONS[constants.EXTRA_VGROUPS])
+
     properties.option_geometry_type = settings.get(
         constants.GEOMETRY_TYPE,
         constants.EXPORT_OPTIONS[constants.GEOMETRY_TYPE])
+
+    properties.option_index_type = settings.get(
+        constants.INDEX_TYPE,
+        constants.EXPORT_OPTIONS[constants.INDEX_TYPE])
     ## }
 
     ## Materials {
@@ -424,7 +441,10 @@ def set_settings(properties):
         constants.NORMALS: properties.option_normals,
         constants.SKINNING: properties.option_skinning,
         constants.BONES: properties.option_bones,
+        constants.EXTRA_VGROUPS: properties.option_extra_vgroups,
+        constants.APPLY_MODIFIERS: properties.option_apply_modifiers,
         constants.GEOMETRY_TYPE: properties.option_geometry_type,
+        constants.INDEX_TYPE: properties.option_index_type,
 
         constants.MATERIALS: properties.option_materials,
         constants.UVS: properties.option_uv_coords,
@@ -555,6 +575,28 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Export bones",
         default=constants.EXPORT_OPTIONS[constants.BONES])
 
+    option_extra_vgroups = StringProperty(
+        name="Extra Vertex Groups",
+        description="Non-skinning vertex groups to export (comma-separated, w/ star wildcard, BufferGeometry only).",
+        default=constants.EXPORT_OPTIONS[constants.EXTRA_VGROUPS])
+
+    option_apply_modifiers = BoolProperty(
+        name="Apply Modifiers",
+        description="Apply Modifiers to mesh objects",
+        default=constants.EXPORT_OPTIONS[constants.APPLY_MODIFIERS]
+    )
+
+    index_buffer_types = [
+        (constants.NONE,) * 3,
+        (constants.UINT_16,) * 3,
+        (constants.UINT_32,) * 3]
+
+    option_index_type = EnumProperty(
+        name="Index Buffer",
+        description="Index buffer type that will be used for BufferGeometry objects.",
+        items=index_buffer_types,
+        default=constants.EXPORT_OPTIONS[constants.INDEX_TYPE])
+
     option_scale = FloatProperty(
         name="Scale",
         description="Scale vertices",
@@ -593,7 +635,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         name="Type",
         description="Geometry type",
         items=_geometry_types()[1:],
-        default=constants.GEOMETRY)
+        default=constants.EXPORT_OPTIONS[constants.GEOMETRY_TYPE])
 
     option_export_scene = BoolProperty(
         name="Scene",
@@ -752,8 +794,16 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_skinning')
 
         row = layout.row()
+        row.prop(self.properties, 'option_extra_vgroups')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_apply_modifiers')
+
+        row = layout.row()
         row.prop(self.properties, 'option_geometry_type')
 
+        row = layout.row()
+        row.prop(self.properties, 'option_index_type')
         ## }
 
         layout.separator()

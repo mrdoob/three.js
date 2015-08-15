@@ -162,8 +162,7 @@
 				bcanvas.addEventListener( "click", toggleCanvas, false );
 				bwebgl.addEventListener( "click", toggleWebGL, false );
 
-				loader = new THREE.BinaryLoader( true );
-				document.body.appendChild( loader.statusDomElement );
+				loader = new THREE.BinaryLoader();
 
 				var start = Date.now();
 
@@ -173,8 +172,6 @@
 					addMesh( geometry, 0.75, 300, 0, 0,  0,0,0, new THREE.MeshFaceMaterial( materials ) );
 					addMesh( geometry, 0.75, -300, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { color: 0x111111, specular: 0xffaa00, shininess: 10 } ) );
 					addMesh( geometry, 0.75, -900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0x666666, shininess: 10 } ) );
-
-					loader.statusDomElement.style.display = "none";
 
 					log( "geometry.vertices: " + geometry.vertices.length );
 					log( "geometry.faces: " + geometry.faces.length );

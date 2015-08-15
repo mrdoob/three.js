@@ -21,8 +21,6 @@ THREE.Euler.prototype = {
 
 	constructor: THREE.Euler,
 
-	_x: 0, _y: 0, _z: 0, _order: THREE.Euler.DefaultOrder,
-
 	get x () {
 
 		return this._x;
@@ -212,7 +210,7 @@ THREE.Euler.prototype = {
 
 		} else {
 
-			THREE.warn( 'THREE.Euler: .setFromRotationMatrix() given unsupported order: ' + order )
+			console.warn( 'THREE.Euler: .setFromRotationMatrix() given unsupported order: ' + order )
 
 		}
 
@@ -291,6 +289,7 @@ THREE.Euler.prototype = {
 		array[ offset + 3 ] = this._order;
 
 		return array;
+
 	},
 
 	toVector3: function ( optionalResult ) {

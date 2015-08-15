@@ -21,12 +21,25 @@ THREE.PointLight.prototype.clone = function () {
 
 	var light = new THREE.PointLight();
 
-	THREE.Light.prototype.clone.call( this, light );
+	light.copy( this );
 
 	light.intensity = this.intensity;
 	light.distance = this.distance;
 	light.decay = this.decay;
 
 	return light;
+
+};
+
+THREE.PointLight.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+	data.object.color = this.color.getHex();
+	data.object.intensity = this.intensity;
+	data.object.distance = this.distance;
+	data.object.decay = this.decay;
+
+	return data;
 
 };

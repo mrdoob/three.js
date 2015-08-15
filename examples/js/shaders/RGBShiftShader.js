@@ -31,7 +31,7 @@ THREE.RGBShiftShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -51,6 +51,6 @@ THREE.RGBShiftShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

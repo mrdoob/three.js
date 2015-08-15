@@ -7,8 +7,10 @@ THREE.MeshFaceMaterial = function ( materials ) {
 	this.uuid = THREE.Math.generateUUID();
 
 	this.type = 'MeshFaceMaterial';
-	
+
 	this.materials = materials instanceof Array ? materials : [];
+
+	this.visible = true;
 
 };
 
@@ -35,6 +37,8 @@ THREE.MeshFaceMaterial.prototype = {
 
 		}
 
+		output.visible = this.visible;
+
 		return output;
 
 	},
@@ -48,6 +52,8 @@ THREE.MeshFaceMaterial.prototype = {
 			material.materials.push( this.materials[ i ].clone() );
 
 		}
+
+		material.visible = this.visible;
 
 		return material;
 

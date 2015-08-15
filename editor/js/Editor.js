@@ -70,6 +70,7 @@ var Editor = function () {
 	};
 
 	this.config = new Config();
+	this.history = new History( this );
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
@@ -411,6 +412,8 @@ Editor.prototype = {
 
 	clear: function () {
 
+		this.history.clear();
+
 		this.camera.position.set( 500, 250, 500 );
 		this.camera.lookAt( new THREE.Vector3() );
 
@@ -443,10 +446,7 @@ Editor.prototype = {
 
 		if ( json.scene === undefined ) {
 
-			var scene = loader.parse( json );
-
-			this.setScene( scene );
-
+			this.setScene( loader.parse( json ) );
 			return;
 
 		}

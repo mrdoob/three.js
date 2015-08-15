@@ -111,8 +111,7 @@
 				directionalLight.position.set( 0, -0.1, 1 ).normalize();
 				sceneModel.add( directionalLight );
 
-				loader = new THREE.JSONLoader( true );
-				document.body.appendChild( loader.statusDomElement );
+				loader = new THREE.JSONLoader();
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createMesh( geometry, sceneModel, 100 ) } );
 
 				//
@@ -348,8 +347,6 @@
 				mesh.scale.set( scale, scale, scale );
 
 				scene.add( mesh );
-
-				loader.statusDomElement.style.display = "none";
 
 			}
 

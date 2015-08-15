@@ -19,20 +19,28 @@ THREE.StereoEffect = function ( renderer ) {
 	Object.defineProperties( this, {
 		separation: {
 			get: function () {
+
 				return scope.eyeSeparation;
+
 			},
 			set: function ( value ) {
+
 				console.warn( 'THREE.StereoEffect: .separation is now .eyeSeparation.' );
 				scope.eyeSeparation = value;
+
 			}
 		},
 		targetDistance: {
 			get: function () {
+
 				return scope.focalLength;
+
 			},
 			set: function ( value ) {
+
 				console.warn( 'THREE.StereoEffect: .targetDistance is now .focalLength.' );
 				scope.focalLength = value;
+
 			}
 		}
 	} );
@@ -83,7 +91,7 @@ THREE.StereoEffect = function ( renderer ) {
 		_halfFocalWidth = _halfFocalHeight * 0.5 * camera.aspect;
 
 		_top = _halfFocalHeight * _ndfl;
-		_bottom = -_top;
+		_bottom = - _top;
 		_innerFactor = ( _halfFocalWidth + this.eyeSeparation / 2.0 ) / ( _halfFocalWidth * 2.0 );
 		_outerFactor = 1.0 - _innerFactor;
 
@@ -93,7 +101,7 @@ THREE.StereoEffect = function ( renderer ) {
 		// left
 
 		_cameraL.projectionMatrix.makeFrustum(
-			-_outer,
+			- _outer,
 			_inner,
 			_bottom,
 			_top,
@@ -108,7 +116,7 @@ THREE.StereoEffect = function ( renderer ) {
 		// right
 
 		_cameraR.projectionMatrix.makeFrustum(
-			-_inner,
+			- _inner,
 			_outer,
 			_bottom,
 			_top,

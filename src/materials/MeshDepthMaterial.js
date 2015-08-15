@@ -35,7 +35,7 @@ THREE.MeshDepthMaterial.prototype.clone = function () {
 
 	var material = new THREE.MeshDepthMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	material.copy( this );
 
 	material.wireframe = this.wireframe;
 	material.wireframeLinewidth = this.wireframeLinewidth;

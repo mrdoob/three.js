@@ -137,7 +137,7 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
 
 	processResourceDelegate.handleError = function(errorCode, info) {
 		request.delegate.handleError(errorCode, info);
-	}
+	};
 
 	this._loadStream(request.path, request.type, processResourceDelegate);
         }

@@ -36,7 +36,7 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	this.defines = {};
 	this.uniforms = {};
-	this.attributes = null;
+	this.attributes = [];
 
 	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
 	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
@@ -59,6 +59,8 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.morphTargets = false; // set to use morph targets
 	this.morphNormals = false; // set to use morph normals
 
+	this.derivatives = false; // set to use derivatives
+
 	// When rendered geometry doesn't include these attributes but the material does,
 	// use these default values in WebGL. This avoids errors when buffer data is missing.
 	this.defaultAttributeValues = {
@@ -69,7 +71,18 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	this.index0AttributeName = undefined;
 
-	this.setValues( parameters );
+	if ( parameters !== undefined ) {
+
+		if ( parameters.attributes !== undefined && Array.isArray( parameters.attributes ) === false ) {
+
+			console.warn( 'THREE.ShaderMaterial: attributes should now be an array of attribute names.' );
+			parameters.attributes = Object.keys( parameters.attributes );
+
+		}
+
+		this.setValues( parameters );
+
+	}
 
 };
 
@@ -79,33 +92,51 @@ THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
 THREE.ShaderMaterial.prototype.clone = function () {
 
 	var material = new THREE.ShaderMaterial();
+	return material.copy( this );
 
-	THREE.Material.prototype.clone.call( this, material );
+};
 
-	material.fragmentShader = this.fragmentShader;
-	material.vertexShader = this.vertexShader;
+THREE.ShaderMaterial.prototype.copy = function ( source ) {
 
-	material.uniforms = THREE.UniformsUtils.clone( this.uniforms );
+	THREE.Material.prototype.copy.call( this, source );
 
-	material.attributes = this.attributes;
-	material.defines = this.defines;
+	this.fragmentShader = source.fragmentShader;
+	this.vertexShader = source.vertexShader;
 
-	material.shading = this.shading;
+	this.uniforms = THREE.UniformsUtils.clone( source.uniforms );
 
-	material.wireframe = this.wireframe;
-	material.wireframeLinewidth = this.wireframeLinewidth;
+	this.attributes = source.attributes;
+	this.defines = source.defines;
 
-	material.fog = this.fog;
+	this.shading = source.shading;
 
-	material.lights = this.lights;
+	this.wireframe = source.wireframe;
+	this.wireframeLinewidth = source.wireframeLinewidth;
 
-	material.vertexColors = this.vertexColors;
+	this.fog = source.fog;
 
-	material.skinning = this.skinning;
+	this.lights = source.lights;
 
-	material.morphTargets = this.morphTargets;
-	material.morphNormals = this.morphNormals;
+	this.vertexColors = source.vertexColors;
 
-	return material;
+	this.skinning = source.skinning;
+
+	this.morphTargets = source.morphTargets;
+	this.morphNormals = source.morphNormals;
+
+	return this;
+
+};
+
+THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Material.prototype.toJSON.call( this, meta );
+
+	data.uniforms = this.uniforms;
+	data.attributes = this.attributes;
+	data.vertexShader = this.vertexShader;
+	data.fragmentShader = this.fragmentShader;
+
+	return data;
 
 };

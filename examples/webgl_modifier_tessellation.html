@@ -64,7 +64,7 @@
 				vNormal = normal;
 				vColor = customColor;
 
-				vec3 newPosition = position + amplitude * displacement;
+				vec3 newPosition = position + normal * amplitude * displacement;
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 
 			}
@@ -78,7 +78,7 @@
 
 			void main() {
 
-				const float ambient = 0.005;
+				const float ambient = 0.4;
 
 				vec3 light = vec3( 1.0 );
 				light = normalize( light );
@@ -86,7 +86,6 @@
 				float directional = max( dot( vNormal, light ), 0.0 );
 
 				gl_FragColor = vec4( ( directional + ambient ) * vColor, 1.0 );
-				gl_FragColor.xyz = sqrt( gl_FragColor.xyz );
 
 			}
 
@@ -109,39 +108,14 @@
 
 		function init() {
 
-			camera = new THREE.PerspectiveCamera( 25, WIDTH / HEIGHT, 1, 10000 );
-			camera.position.z = 350;
+			camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
+			camera.position.set( -100, 100, 200 );
 
 			controls = new THREE.TrackballControls( camera );
 
 			scene = new THREE.Scene();
 
 			//
-
-			attributes = {
-
-				displacement: {	type: 'v3', value: [] },
-				customColor:  {	type: 'c', value: [] }
-
-			};
-
-			uniforms = {
-
-				amplitude: { type: "f", value: 0.0 }
-
-			};
-
-			var shaderMaterial = new THREE.ShaderMaterial( {
-
-				uniforms: 		uniforms,
-				attributes:     attributes,
-				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
-				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-				shading: 		THREE.FlatShading,
-				side: 			THREE.DoubleSide
-
-			});
-
 
 			var geometry = new THREE.TextGeometry( "THREE.JS", {
 
@@ -159,8 +133,6 @@
 
 			});
 
-			geometry.dynamic = true;
-
 			geometry.center();
 
 			var tessellateModifier = new THREE.TessellateModifier( 8 );
@@ -174,57 +146,68 @@
 			var explodeModifier = new THREE.ExplodeModifier();
 			explodeModifier.modify( geometry );
 
-			var vertices = geometry.vertices;
+			var numFaces = geometry.faces.length;
 
-			var colors = attributes.customColor.value;
-			var displacement = attributes.displacement.value;
+			//
 
-			var nv, v = 0;
+			geometry = new THREE.BufferGeometry().fromGeometry( geometry );
 
-			for ( var f = 0; f < geometry.faces.length; f ++ ) {
+			var colors = new Float32Array( numFaces * 3 * 3 );
+			var displacement = new Float32Array( numFaces * 3 * 3 );
 
-				var face = geometry.faces[ f ];
+			var color = new THREE.Color();
 
-				if ( face instanceof THREE.Face3 ) {
+			for ( var f = 0; f < numFaces; f ++ ) {
 
-					nv = 3;
+				var index = 9 * f;
 
-				} else {
-
-					nv = 4;
-
-				}
-
-				var h = 0.15 * Math.random();
+				var h = 0.2 * Math.random();
 				var s = 0.5 + 0.5 * Math.random();
 				var l = 0.5 + 0.5 * Math.random();
 
+				color.setHSL( h, s, l );
+
 				var d = 10 * ( 0.5 - Math.random() );
 
-				var x = 2 * ( 0.5 - Math.random() );
-				var y = 2 * ( 0.5 - Math.random() );
-				var z = 2 * ( 0.5 - Math.random() );
+				for ( var i = 0; i < 3; i ++ ) {
 
-				for ( var i = 0; i < nv; i ++ ) {
+					colors[ index + ( 3 * i )     ] = color.r;
+					colors[ index + ( 3 * i ) + 1 ] = color.g;
+					colors[ index + ( 3 * i ) + 2 ] = color.b;
 
-					colors[ v ] = new THREE.Color();
-					displacement[ v ] = new THREE.Vector3();
-
-					colors[ v ].setHSL( h, s, l );
-					colors[ v ].convertGammaToLinear();
-
-					displacement[ v ].set( x, y, z );
-
-					v += 1;
+					displacement[ index + ( 3 * i )     ] = d;
+					displacement[ index + ( 3 * i ) + 1 ] = d;
+					displacement[ index + ( 3 * i ) + 2 ] = d;
 
 				}
 
 			}
 
-			console.log( "faces", geometry.faces.length );
+			geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+			geometry.addAttribute( 'displacement', new THREE.BufferAttribute( displacement, 3 ) );
+
+			//
+
+			attributes = [ `displacement`, `customColor` ];
+
+			uniforms = {
+
+				amplitude: { type: "f", value: 0.0 }
+
+			};
+
+			var shaderMaterial = new THREE.ShaderMaterial( {
+
+				uniforms: 		uniforms,
+				attributes:     attributes,
+				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+
+			});
+
+			//
 
 			mesh = new THREE.Mesh( geometry, shaderMaterial );
-			mesh.rotation.set( 0.5, 0.5, 0 );
 
 			scene.add( mesh );
 
@@ -259,6 +242,7 @@
 			requestAnimationFrame( animate );
 
 			render();
+
 			stats.update();
 
 		}
@@ -267,9 +251,10 @@
 
 			var time = Date.now() * 0.001;
 
-			uniforms.amplitude.value = Math.sin( time * 0.5 );
+			uniforms.amplitude.value = 1.0 + Math.sin( time * 0.5 );
 
 			controls.update();
+
 			renderer.render( scene, camera );
 
 		}

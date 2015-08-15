@@ -44,7 +44,7 @@ THREE.FilmShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -99,6 +99,6 @@ THREE.FilmShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

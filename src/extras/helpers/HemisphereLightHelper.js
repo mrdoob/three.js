@@ -37,8 +37,10 @@ THREE.HemisphereLightHelper.prototype = Object.create( THREE.Object3D.prototype 
 THREE.HemisphereLightHelper.prototype.constructor = THREE.HemisphereLightHelper;
 
 THREE.HemisphereLightHelper.prototype.dispose = function () {
+
 	this.lightSphere.geometry.dispose();
 	this.lightSphere.material.dispose();
+
 };
 
 THREE.HemisphereLightHelper.prototype.update = function () {

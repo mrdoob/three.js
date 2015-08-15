@@ -189,7 +189,7 @@ THREE.SceneExporter.prototype = {
 
 				if ( THREE[ constants[ i ] ] === c ) return LabelString( constants[ i ] );
 
-			};
+			}
 
 			return "";
 
@@ -402,10 +402,10 @@ THREE.SceneExporter.prototype = {
 
 				'\t' + LabelString( getGeometryName( g ) ) + ': {',
 				'	"type"    : "plane",',
-				'	"width"  : '  + g.width  + ',',
-				'	"height"  : ' + g.height + ',',
-				'	"widthSegments"  : ' + g.widthSegments + ',',
-				'	"heightSegments" : ' + g.heightSegments,
+				'	"width"  : '  + g.parameters.width  + ',',
+				'	"height"  : ' + g.parameters.height + ',',
+				'	"widthSegments"  : ' + g.parameters.widthSegments + ',',
+				'	"heightSegments" : ' + g.parameters.heightSegments,
 				'}'
 
 				];
@@ -751,4 +751,4 @@ THREE.SceneExporter.prototype = {
 
 	}
 
-}
+};

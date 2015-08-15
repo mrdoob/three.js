@@ -38,7 +38,7 @@
 
 				    return klass.apply( this, args );
 
-				}
+				};
 
 				F.prototype = klass.prototype;
 
@@ -242,7 +242,7 @@
 				scene.add( group );
 
 				var material = new THREE.MeshBasicMaterial( { color: 0xfefefe, wireframe: true, opacity: 0.5 } );
-				var mesh = new THREE.Mesh( geometry, material )
+				var mesh = new THREE.Mesh( geometry, material );
 				group.add( mesh );
 
 				var meshmaterials = [

@@ -10,7 +10,7 @@ THREE.Color = function ( color ) {
 
 	}
 
-	return this.set( color )
+	return this.set( color );
 
 };
 
@@ -62,104 +62,212 @@ THREE.Color.prototype = {
 
 	},
 
-	setHSL: function ( h, s, l ) {
+	setHSL: function () {
 
-		// h,s,l ranges are in 0.0 - 1.0
+		function hue2rgb ( p, q, t ) {
 
-		if ( s === 0 ) {
+			if ( t < 0 ) t += 1;
+			if ( t > 1 ) t -= 1;
+			if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
+			if ( t < 1 / 2 ) return q;
+			if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
+			return p;
 
-			this.r = this.g = this.b = l;
+		}
 
-		} else {
+		return function ( h, s, l ) {
 
-			var hue2rgb = function ( p, q, t ) {
+			// h,s,l ranges are in 0.0 - 1.0
+			h = THREE.Math.euclideanModulo( h, 1 );
+			s = THREE.Math.clamp( s, 0, 1 );
+			l = THREE.Math.clamp( l, 0, 1 );
 
-				if ( t < 0 ) t += 1;
-				if ( t > 1 ) t -= 1;
-				if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
-				if ( t < 1 / 2 ) return q;
-				if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
-				return p;
+			if ( s === 0 ) {
 
-			};
+				this.r = this.g = this.b = l;
 
-			var p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
-			var q = ( 2 * l ) - p;
+			} else {
 
-			this.r = hue2rgb( q, p, h + 1 / 3 );
-			this.g = hue2rgb( q, p, h );
-			this.b = hue2rgb( q, p, h - 1 / 3 );
+				var p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
+				var q = ( 2 * l ) - p;
+
+				this.r = hue2rgb( q, p, h + 1 / 3 );
+				this.g = hue2rgb( q, p, h );
+				this.b = hue2rgb( q, p, h - 1 / 3 );
+
+			}
+
+			return this;
+
+		};
+
+	}(),
+
+	setStyle: function ( style ) {
+
+		var parseAlpha = function ( strAlpha ) {
+
+			var alpha = parseFloat( strAlpha );
+
+			if ( alpha < 1 ) {
+
+				console.warn( 'THREE.Color: Alpha component of color ' + style + ' will be ignored.' );
+
+			}
+
+			return alpha;
+
+		}
+
+
+		var m;
+
+		if ( m = /^((?:rgb|hsl)a?)\(\s*([^\)]*)\)/.exec( style ) ) {
+
+			// rgb / hsl
+
+			var color;
+			var name = m[ 1 ];
+			var components = m[ 2 ];
+
+			switch ( name ) {
+
+				case 'rgb':
+
+					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*$/.exec( components ) ) {
+
+						// rgb(255,0,0)
+						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
+						this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
+						this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
+
+						return this;
+
+					}
+
+					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*$/.exec( components ) ) {
+
+						// rgb(100%,0%,0%)
+						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
+						this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
+						this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
+
+						return this;
+
+					}
+
+					break;
+
+				case 'rgba':
+
+					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9]*\.?[0-9]+)\s*$/.exec( components ) ) {
+
+						// rgba(255,0,0,0.5)
+						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
+						this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
+						this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
+						parseAlpha( color[ 4 ] );
+
+						return this;
+
+					}
+
+					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*([0-9]*\.?[0-9]+)\s*$/.exec( components ) ) {
+
+						// rgba(100%,0%,0%,0.5)
+						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
+						this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
+						this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
+						parseAlpha( color[ 4 ] );
+
+						return this;
+
+					}
+
+					break;
+
+				case 'hsl':
+
+					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*$/.exec( components ) ) {
+
+						// hsl(120,50%,50%)
+						var h = parseFloat( color[ 1 ] );
+						var s = parseInt( color[ 2 ], 10 ) / 100;
+						var l = parseInt( color[ 3 ], 10 ) / 100;
+
+						return this.setHSL( h, s, l );
+
+					}
+
+					break;
+
+				case 'hsla':
+
+					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*([0-9]*\.?[0-9]+)\s*$/.exec( components ) ) {
+
+						// hsla(120,50%,50%,0.5)
+						var h = parseFloat( color[ 1 ] );
+						var s = parseInt( color[ 2 ], 10 ) / 100;
+						var l = parseInt( color[ 3 ], 10 ) / 100;
+						parseAlpha( color[ 4 ] );
+
+						return this.setHSL( h, s, l );
+
+					}
+
+					break;
+
+			}
+
+		} else if ( m = /^\#([A-Fa-f0-9]+)$/.exec( style ) ) {
+
+			// hex color
+
+			var hex = m[ 1 ];
+			var size = hex.length;
+
+			if ( size === 3 ) {
+
+				// #ff0
+				this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 0 ), 16 ) / 255;
+				this.g = parseInt( hex.charAt( 1 ) + hex.charAt( 1 ), 16 ) / 255;
+				this.b = parseInt( hex.charAt( 2 ) + hex.charAt( 2 ), 16 ) / 255;
+
+				return this;
+
+			} else if ( size === 6 ) {
+
+				// #ff0000
+				this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 1 ), 16 ) / 255;
+				this.g = parseInt( hex.charAt( 2 ) + hex.charAt( 3 ), 16 ) / 255;
+				this.b = parseInt( hex.charAt( 4 ) + hex.charAt( 5 ), 16 ) / 255;
+
+				return this;
+
+			}
+
+		}
+
+		if ( style && style.length > 0 ) {
+
+			// color keywords
+			var hex = THREE.ColorKeywords[ style ];
+
+			if ( hex !== undefined ) {
+
+				// red
+				this.setHex( hex );
+
+			} else {
+
+				// unknown color
+				console.warn( 'THREE.Color: Unknown color ' + style );
+
+			}
 
 		}
 
 		return this;
-
-	},
-
-	setStyle: function ( style ) {
-
-		// rgb(255,0,0)
-
-		if ( /^rgb\((\d+), ?(\d+), ?(\d+)\)$/i.test( style ) ) {
-
-			var color = /^rgb\((\d+), ?(\d+), ?(\d+)\)$/i.exec( style );
-
-			this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
-			this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
-			this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
-
-			return this;
-
-		}
-
-		// rgb(100%,0%,0%)
-
-		if ( /^rgb\((\d+)\%, ?(\d+)\%, ?(\d+)\%\)$/i.test( style ) ) {
-
-			var color = /^rgb\((\d+)\%, ?(\d+)\%, ?(\d+)\%\)$/i.exec( style );
-
-			this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
-			this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
-			this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
-
-			return this;
-
-		}
-
-		// #ff0000
-
-		if ( /^\#([0-9a-f]{6})$/i.test( style ) ) {
-
-			var color = /^\#([0-9a-f]{6})$/i.exec( style );
-
-			this.setHex( parseInt( color[ 1 ], 16 ) );
-
-			return this;
-
-		}
-
-		// #f00
-
-		if ( /^\#([0-9a-f])([0-9a-f])([0-9a-f])$/i.test( style ) ) {
-
-			var color = /^\#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec( style );
-
-			this.setHex( parseInt( color[ 1 ] + color[ 1 ] + color[ 2 ] + color[ 2 ] + color[ 3 ] + color[ 3 ], 16 ) );
-
-			return this;
-
-		}
-
-		// red
-
-		if ( /^(\w+)$/i.test( style ) ) {
-
-			this.setHex( THREE.ColorKeywords[ style ] );
-
-			return this;
-
-		}
-
 
 	},
 
@@ -382,11 +490,12 @@ THREE.Color.prototype = {
 		array[ offset + 2 ] = this.b;
 
 		return array;
+
 	},
 
 	clone: function () {
 
-		return new THREE.Color().setRGB( this.r, this.g, this.b );
+		return new THREE.Color().copy( this );
 
 	}
 

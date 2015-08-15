@@ -9,6 +9,8 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay 
 	this.type = 'SpotLight';
 
 	this.position.set( 0, 1, 0 );
+	this.updateMatrix();
+
 	this.target = new THREE.Object3D();
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
@@ -50,7 +52,7 @@ THREE.SpotLight.prototype.clone = function () {
 
 	var light = new THREE.SpotLight();
 
-	THREE.Light.prototype.clone.call( this, light );
+	light.copy( this );
 
 	light.target = this.target.clone();
 
@@ -78,5 +80,20 @@ THREE.SpotLight.prototype.clone = function () {
 	light.shadowMapHeight = this.shadowMapHeight;
 
 	return light;
+
+};
+
+THREE.SpotLight.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+	data.object.color = this.color.getHex();
+	data.object.intensity = this.intensity;
+	data.object.distance = this.distance;
+	data.object.angle = this.angle;
+	data.object.exponent = this.exponent;
+	data.object.decay = this.decay;
+
+	return data;
 
 };
