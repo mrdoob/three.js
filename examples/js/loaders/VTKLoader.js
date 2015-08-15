@@ -28,22 +28,47 @@ THREE.VTKLoader.prototype = {
 
 	parse: function ( data ) {
 
+		// connectivity of the triangles
 		var indices = [];
+		
+		// triangles vertices
 		var positions = [];
+		
+		// scalar field container
 		var scalars = {};
+		
 		var dataArray = [];
 		var scalarName = "";
 		var stagger = "";
 		var result;
+		
+		// pattern for reading vertices
 		var pat3Floats = /([\-]?[\d]+[\.]?[\d|\-|\+|e]*)[ ]+([\-]?[\d]+[\.]?[\d|\-|\+|e]*)[ ]+([\-]?[\d]+[\.]?[\d|\-|\+|e]*)/g;
+		
+		// pattern for reading triangle connectivity
 		var patTriangle = /^3[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/;
+		
+		// pattern for reading quads
 		var patQuad = /^4[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/;
+		
+		// pattern for reading scalar field values
 		var patFloat = /([\-]?[\d]+[\.]?[\d|\-|\+|e]*)/g;
+		
+		// indicates start of vertex data section
 		var patPOINTS = /^POINTS /;
+		
+		// indicates start of polygon connectivity section 
 		var patPOLYGONS = /^POLYGONS /;
+		
+		// POINT_DATA number_of_values 
 		var patPOINT_DATA = /^POINT_DATA[ ]+([\d]+)/;
+		
+		// CELL_DATA number_of_polys
 		var patCELL_DATA = /^CELL_DATA[ ]+([\d]+)/;
+		
+		// SCALARS name type number_of_components
 		var patSCALARS = /^SCALARS[ ]+([\w]+)[ ]+([\w]+)[ ]+([\d]+)/;
+		
 		var inPointsSection = false;
 		var inPolygonsSection = false;
 		var inPointDataSection = false;
@@ -65,9 +90,7 @@ THREE.VTKLoader.prototype = {
 			}
 			else if ( inPolygonsSection ) {
 
-				result = patTriangle.exec( line );
-
-				if ( result !== null ) {
+				if ( ( result = patTriangle.exec( line ) ) !== null ) {
 
 					// 3 int int int
 					// triangle
@@ -76,9 +99,7 @@ THREE.VTKLoader.prototype = {
 				}
 				else {
 
-					result = patQuad.exec( line );
-
-					if ( result !== null ) {
+					if ( ( result = patQuad.exec( line ) ) !== null ) {
 
 						// 4 int int int int
 						// break quad into two triangles
@@ -91,6 +112,8 @@ THREE.VTKLoader.prototype = {
 
 			}
 			else if (  pastScalarsDecl && ( inPointDataSection || inCellDataSection )  ) {
+			
+				// read scalar field values
 			
 				while ( ( result = patFloat.exec( line ) ) !== null ) {
 				
@@ -117,9 +140,12 @@ THREE.VTKLoader.prototype = {
 			    
 			    if ( scalarName != "" && dataArray.length > 0) {
 			    
-			        // save the scalars read so far
+			        // save the scalars read so far. Assume float32 type for simplicity
 			        
 			        scalars[stagger][scalarName] = new THREE.BufferAttribute( new Float32Array( dataArray ), 1 );
+			        
+			        // start with an empty container 
+			        
 			        dataArray = [];
 			    }
 				inPolygonsSection = false;
@@ -153,7 +179,6 @@ THREE.VTKLoader.prototype = {
 			
 			  	// get the scalar field name 
 			  	
-			  	window.alert('scalar name: ' + result[1] + ' scalar type: ' + result[2] + ' scalar num components: ' + result[3]);
 			    scalarName = result[ 1 ];
 			    scalars[stagger][scalarName] = dataArray;
 			    pastScalarsDecl = true;
@@ -163,6 +188,9 @@ THREE.VTKLoader.prototype = {
 		var geometry = new THREE.BufferGeometry();
 		geometry.addAttribute( 'index', new THREE.BufferAttribute( new ( indices.length > 65535 ? Uint32Array : Uint16Array )( indices ), 1 ) );
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
+		
+		// add field data 
+		
 		geometry.addAttribute( 'scalars', scalars );
 		
 		return geometry;
