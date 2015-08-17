@@ -855,7 +855,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( updateBuffers ) {
 
-			setupVertexAttributes( material, program, geometry, 0 );
+			setupVertexAttributes( material, program, geometry );
 
 			if ( index !== undefined ) {
 
@@ -963,6 +963,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+		if ( startIndex === undefined ) startIndex = 0;
 
 		state.initAttributes();
 

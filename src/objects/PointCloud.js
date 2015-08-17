@@ -84,7 +84,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 				if ( offsets.length === 0 ) {
 
-					offsets = [ { start: 0, count: indices.length, index: 0 } ];
+					geometry.addDrawCall( 0, indices.length );
 
 				}
 
@@ -94,11 +94,10 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 					var start = offset.start;
 					var count = offset.count;
-					var index = offset.index;
 
 					for ( var i = start, il = start + count; i < il; i ++ ) {
 
-						var a = index + indices[ i ];
+						var a = indices[ i ];
 
 						position.fromArray( positions, a * 3 );
 

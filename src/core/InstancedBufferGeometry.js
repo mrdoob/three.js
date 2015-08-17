@@ -14,13 +14,12 @@ THREE.InstancedBufferGeometry = function () {
 THREE.InstancedBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.InstancedBufferGeometry.prototype.constructor = THREE.InstancedBufferGeometry;
 
-THREE.InstancedBufferGeometry.prototype.addDrawCall = function ( start, count, indexOffset, instances ) {
+THREE.InstancedBufferGeometry.prototype.addDrawCall = function ( start, count, instances ) {
 
 	this.drawcalls.push( {
 
 		start: start,
 		count: count,
-		index: indexOffset !== undefined ? indexOffset : 0,
 		instances: instances
 
 	} );
@@ -28,7 +27,7 @@ THREE.InstancedBufferGeometry.prototype.addDrawCall = function ( start, count, i
 };
 
 THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
-	
+
 	for ( var attr in source.attributes ) {
 
 		var sourceAttr = source.attributes[ attr ];
@@ -39,12 +38,12 @@ THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
 	for ( var i = 0, il = source.drawcalls.length; i < il; i ++ ) {
 
 		var offset = source.drawcalls[ i ];
-		this.addDrawCall( offset.start, offset.count, offset.index, offset.instances );
+		this.addDrawCall( offset.start, offset.count, offset.instances );
 
 	}
-	
+
 	return this;
-	
+
 };
 
 THREE.EventDispatcher.prototype.apply( THREE.InstancedBufferGeometry.prototype );

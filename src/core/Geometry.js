@@ -309,11 +309,10 @@ THREE.Geometry.prototype = {
 
 					var start = drawcall.start;
 					var count = drawcall.count;
-					var index = drawcall.index;
 
 					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
-						addFace( index + indices[ j ], index + indices[ j + 1 ], index + indices[ j + 2 ] );
+						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ] );
 
 					}
 

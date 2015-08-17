@@ -439,11 +439,10 @@ THREE.Projector = function () {
 							for ( var o = 0; o < offsets.length; o ++ ) {
 
 								var offset = offsets[ o ];
-								var index = offset.index;
 
 								for ( var i = offset.start, l = offset.start + offset.count; i < l; i += 3 ) {
 
-									renderList.pushTriangle( indices[ i ] + index, indices[ i + 1 ] + index, indices[ i + 2 ] + index );
+									renderList.pushTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
 
 								}
 
