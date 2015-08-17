@@ -13,9 +13,6 @@ THREE.KeyframeTrack = function ( name, keys ) {
 	this.name = name;
 	this.keys = keys;	// time in seconds, value as value
 
-	// local cache of value type to avoid allocations during runtime.
-	this.result = THREE.AnimationUtils.clone( this.keys[0].value );
-
 	// the index of the last result, used as a starting point for local search.
 	this.lastIndex = 0;
 
@@ -73,6 +70,7 @@ THREE.KeyframeTrack.prototype = {
 
 	},
 
+	// required implementations:
 	setResult: function( value ) {
 
 		if( this.result.copy ) {
@@ -181,14 +179,14 @@ THREE.KeyframeTrack.prototype = {
 			}
 
 			// remove completely unnecessary keyframes that are the same as their prev and next keys
-			if( equalsFunc( prevKey.value, currKey.value ) && equalsFunc( currKey.value, nextKey.value ) ) {
+			if( this.compareValues( prevKey.value, currKey.value ) && this.compareValues( currKey.value, nextKey.value ) ) {
 
 				continue;
 
 			}
 
 			// determine if interpolation is required
-			prevKey.constantToNext = equalsFunc( prevKey.value, currKey.value );
+			prevKey.constantToNext = this.compareValues( prevKey.value, currKey.value );
 
 			newKeys.push( currKey );
 			prevKey = currKey;
@@ -197,34 +195,37 @@ THREE.KeyframeTrack.prototype = {
 
 		this.keys = newKeys;
 
-	},
-
-	// removes keyframes before and after animation without changing any values within the range [0,duration].
-	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
- 	trim: function( duration ) {
-		
-		var firstKeysToRemove = 0;
-		for( var i = 1; i < this.keys.length; i ++ ) {
-			if( this.keys[i] <= 0 ) {
-				firstKeysToRemove ++;
-			}
-		}
-
-		var lastKeysToRemove = 0;
-		for( var i = this.keys.length - 2; i > 0; i ++ ) {
-			if( this.keys[i] >= duration ) {
-				lastKeysToRemove ++;
-			}
-			else {
-				break;
-			}
-		}
-
-		// remove last keys first because it doesn't affect the position of the first keys (the otherway around doesn't work as easily)
-		if( ( firstKeysToRemove + lastKeysToRemove ) > 0 ) {
-			this.keys = this.keys.splice( firstKeysToRemove, this.keys.length - lastKeysToRemove - firstKeysToRemove );;
-		}
-
 	}
 
+};
+
+
+THREE.KeyframeTrack.GetTrackTypeForValue = function( value ) {
+	switch( typeof value ) {
+	 	case "object": {
+
+			if( value.lerp ) {
+
+				return THREE.VectorKeyframeTrack;
+
+			}
+			if( value.slerp ) {
+
+				return THREE.QuaternionKeyframeTrack;
+
+			}
+			break;
+		}
+	 	case "number": {
+			return THREE.NumberKeyframeTrack;
+	 	}	
+	 	case "boolean": {
+			return THREE.BooleanKeyframeTrack;
+	 	}
+	 	case "string": {
+	 		return THREE.StringKeyframeTrack;
+	 	}
+	};
+
+	throw new Error( "Unsupported value type" );
 };

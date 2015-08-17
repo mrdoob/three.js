@@ -34,7 +34,7 @@ THREE.AnimationClipCreator.CreateMorphAnimation = function( morphTargets, durati
 
 		var morphName = morphTargets[i].name;
 		var trackName = '.morphTargetInfluences[' + morphName + ']';
-		var track = new THREE.KeyframeTrack( trackName, keys );
+		var track = new THREE.NumberKeyframeTrack( trackName, keys );
 
 		tracks.push( track );
 	}
@@ -54,7 +54,7 @@ THREE.AnimationClipCreator.CreateRotationAnimation = function( period, axis ) {
 	axis = axis || 'x';
 	var trackName = '.rotation[' + axis + ']';
 
-	var track = new THREE.KeyframeTrack( trackName, keys );
+	var track = new THREE.NumberKeyframeTrack( trackName, keys );
 
 	var clip = new THREE.AnimationClip( 'rotate.x', 10, [ track ] );
 	//console.log( 'rotateClip', clip );
@@ -71,7 +71,7 @@ THREE.AnimationClipCreator.CreateScaleAxisAnimation = function( period, axis ) {
 	axis = axis || 'x';
 	var trackName = '.scale[' + axis + ']';
 
-	var track = new THREE.KeyframeTrack( trackName, keys );
+	var track = new THREE.NumberKeyframeTrack( trackName, keys );
 
 	var clip = new THREE.AnimationClip( 'scale.x', 10, [ track ] );
 	//console.log( 'scaleClip', clip );
@@ -94,7 +94,7 @@ THREE.AnimationClipCreator.CreateShakeAnimation = function( duration, shakeScale
 
 	var trackName = '.position';
 
-	var track = new THREE.KeyframeTrack( trackName, keys );
+	var track = new THREE.VectorKeyframeTrack( trackName, keys );
 
 	var clip = new THREE.AnimationClip( 'shake' + duration, duration, [ track ] );
 	//console.log( 'shakeClip', clip );
@@ -119,7 +119,7 @@ THREE.AnimationClipCreator.CreatePulsationAnimation = function( duration, pulseS
 
 	var trackName = '.scale';
 
-	var track = new THREE.KeyframeTrack( trackName, keys );
+	var track = new THREE.VectorKeyframeTrack( trackName, keys );
 
 	var clip = new THREE.AnimationClip( 'scale' + duration, duration, [ track ] );
 	//console.log( 'scaleClip', clip );
@@ -146,7 +146,7 @@ THREE.AnimationClipCreator.CreateVisibilityAnimation = function( duration ) {
 
 	var trackName = '.visible';
 
-	var track = new THREE.KeyframeTrack( trackName, keys );
+	var track = new THREE.BooleanKeyframeTrack( trackName, keys );
 
 	var clip = new THREE.AnimationClip( 'visible' + duration, duration, [ track ] );
 	//console.log( 'scaleClip', clip );
@@ -165,7 +165,7 @@ THREE.AnimationClipCreator.CreateMaterialColorAnimation = function( duration, co
 
 	var trackName = '.material[0].color';
 
-	var track = new THREE.KeyframeTrack( trackName, keys );
+	var track = new THREE.ColorKeyframeTrack( trackName, keys );
 
 	var clip = new THREE.AnimationClip( 'colorDiffuse', 10, [ track ] );
 	//console.log( 'diffuseClip', clip );

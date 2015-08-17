@@ -95,7 +95,7 @@ THREE.AnimationClip.CreateMorphAnimationFromNames = function( morphTargetNames, 
 
 		var morphName = morphTargetNames[i];
 		var trackName = '.morphTargetInfluences[' + morphName + ']';
-		var track = new THREE.KeyframeTrack( trackName, keys );
+		var track = new THREE.NumberKeyframeTrack( trackName, keys );
 
 		tracks.push( track );
 	}
@@ -170,7 +170,7 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeNa
 		return null;
 	}
 
-	var convertTrack = function( trackName, animationKeys, propertyName, animationKeyToValueFunc ) {
+	var convertTrack = function( trackName, animationKeys, propertyName, trackType, animationKeyToValueFunc ) {
 
 		var keys = [];
 
@@ -187,8 +187,8 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeNa
 
 		// only return track if there are actually keys.
 		if( keys.length > 0 ) {
-
-			return new THREE.KeyframeTrack( trackName, keys );
+		
+			return new trackType( trackName, keys );
 
 		}
 
@@ -245,7 +245,7 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeNa
 				
 				}
 
-				tracks.push( new THREE.KeyframeTrack( nodeName + '.morphTargetInfluence[' + morphTargetName + ']', keys ) );
+				tracks.push( new THREE.NumberKeyframeTrack( nodeName + '.morphTargetInfluence[' + morphTargetName + ']', keys ) );
 
 			}
 
@@ -257,14 +257,14 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeNa
 			var boneName = nodeName + '.bones[' + bones[ h ].name + ']';
 		
 			// track contains positions...
-			var positionTrack = convertTrack( boneName + '.position', animationKeys, 'pos', function( animationKey ) {
+			var positionTrack = convertTrack( boneName + '.position', animationKeys, 'pos', THREE.VectorKeyframeTrack, function( animationKey ) {
 					return new THREE.Vector3().fromArray( animationKey.pos )
 				} );
 
 			if( positionTrack ) tracks.push( positionTrack );
 			
 			// track contains quaternions...
-			var quaternionTrack = convertTrack( boneName + '.quaternion', animationKeys, 'rot', function( animationKey ) {
+			var quaternionTrack = convertTrack( boneName + '.quaternion', animationKeys, 'rot', THREE.QuaternionKeyframeTrack, function( animationKey ) {
 					if( animationKey.rot.slerp ) {
 						return animationKey.rot.clone();
 					}
@@ -276,7 +276,7 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeNa
 			if( quaternionTrack ) tracks.push( quaternionTrack );
 
 			// track contains quaternions...
-			var scaleTrack = convertTrack( boneName + '.scale', animationKeys, 'scl', function( animationKey ) {
+			var scaleTrack = convertTrack( boneName + '.scale', animationKeys, 'scl', THREE.VectorKeyframeTrack, function( animationKey ) {
 					return new THREE.Vector3().fromArray( animationKey.scl )
 				} );
 
