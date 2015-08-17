@@ -107,7 +107,7 @@ THREE.KeyframeTrack.prototype = {
 	// sort in ascending order
 	sort: function() {
 
-		var keyComparator = function keyComparator(key0, key1) {
+		function keyComparator(key0, key1) {
 			return key0.time - key1.time;
 		};
 
