@@ -838,6 +838,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var index = geometry.attributes.index;
 		var position = geometry.attributes.position;
 
+		if ( material.wireframe === true ) {
+
+			index = geometry.attributes.wireframe;
+
+		}
+
 		var groups = geometry.drawcalls;
 
 		var renderer;

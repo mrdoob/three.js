@@ -82,18 +82,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		var geometry = geometries.get( object );
 
-		if ( object.material.wireframe === true ) {
-
-			if ( geometry._wireframe === undefined ) {
-
-				geometry._wireframe = new THREE.WireframeBufferGeometry( geometry );
-
-			}
-
-			geometry = geometry._wireframe;
-
-		}
-
 		if ( object.geometry instanceof THREE.Geometry ) {
 
 			geometry.updateFromObject( object );
@@ -130,7 +118,17 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function updateAttribute( attribute, name ) {
 
-		var bufferType = ( name === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
+		var bufferType;
+
+		if ( name === 'index' || name === 'wireframe' ) {
+
+			bufferType = gl.ELEMENT_ARRAY_BUFFER;
+
+		} else {
+
+			bufferType = gl.ARRAY_BUFFER;
+
+		}
 
 		var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
