@@ -82,6 +82,18 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		var geometry = geometries.get( object );
 
+		if ( object.material.wireframe === true ) {
+
+			if ( geometry._wireframe === undefined ) {
+
+				geometry._wireframe = new THREE.WireframeBufferGeometry( geometry );
+
+			}
+
+			geometry = geometry._wireframe;
+
+		}
+
 		if ( object.geometry instanceof THREE.Geometry ) {
 
 			geometry.updateFromObject( object );

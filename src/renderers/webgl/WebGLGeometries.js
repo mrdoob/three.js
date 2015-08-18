@@ -45,17 +45,11 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 		var geometry = event.target;
 		var buffergeometry = geometries[ geometry.id ];
 
-		for ( var name in buffergeometry.attributes ) {
+		deleteAttributes( buffergeometry.attributes );
 
-			var attribute = buffergeometry.attributes[ name ];
-			var buffer = getAttributeBuffer( attribute );
+		if ( buffergeometry._wireframe !== undefined ) {
 
-			if ( buffer !== undefined ) {
-
-				gl.deleteBuffer( buffer );
-				removeAttributeBuffer( attribute );
-
-			}
+			deleteAttributes( buffergeometry._wireframe.attributes );
 
 		}
 
@@ -76,6 +70,24 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 		}
 
 		return properties.get( attribute ).__webglBuffer;
+
+	}
+
+	function deleteAttributes( attributes ) {
+
+		for ( var name in attributes ) {
+
+			var attribute = attributes[ name ];
+			var buffer = getAttributeBuffer( attribute );
+
+			if ( buffer !== undefined ) {
+
+				gl.deleteBuffer( buffer );
+				removeAttributeBuffer( attribute );
+
+			}
+
+		}
 
 	}
 
