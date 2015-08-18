@@ -885,8 +885,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			groups = [ {
 				start: 0,
-				count: count,
-				index: 0
+				count: count
 			} ];
 
 		}
