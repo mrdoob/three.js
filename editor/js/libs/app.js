@@ -167,7 +167,7 @@ var APP = {
 
 				} catch (e) {
 
-					console.error(e.stack || e);
+					console.error( ( e.message || e ), ( e.stack || "" ) );
 
 				}
 
