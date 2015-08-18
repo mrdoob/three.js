@@ -50,19 +50,31 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	};
 
+	function checkEdge( edges, a, b ) {
+
+		if ( edges[ a + '|' + b ] === true ) return false;
+
+		edges[ a + '|' + b ] = true;
+		edges[ b + '|' + a ] = true;
+
+		return true;
+
+	}
+
 	function createWireframeIndexBuffer( geometry ) {
 
 		var attributes = geometry.attributes;
-
-		// create wireframe indices
 
 		var indices = [];
 
 		var index = attributes.index;
 		var position = attributes.position;
 
+		console.time( 'wireframe' );
+
 		if ( index !== undefined ) {
 
+			var edges = {};
 			var array = index.array;
 
 			for ( var i = 0, j = 0, l = array.length; i < l; i += 3 ) {
@@ -71,9 +83,9 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 				var b = array[ i + 1 ];
 				var c = array[ i + 2 ];
 
-				// TODO: Check for duplicates
-
-				indices.push( a, b, b, c, c, a );
+				if ( checkEdge( edges, a, b ) ) indices.push( a, b );
+				if ( checkEdge( edges, b, c ) ) indices.push( b, c );
+				if ( checkEdge( edges, c, a ) ) indices.push( c, a );
 
 			}
 
@@ -92,6 +104,8 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 			}
 
 		}
+
+		console.timeEnd( 'wireframe' );
 
 		var TypeArray = position.array.length > 65535 ? Uint32Array : Uint16Array;
 
