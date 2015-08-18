@@ -282,6 +282,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		}
 
 		depthMaterial.wireframe = material.wireframe;
+		depthMaterial.wireframeLinewidth = material.wireframeLinewidth;
 
 		return depthMaterial;
 
