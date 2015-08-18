@@ -212,7 +212,7 @@ var APP = {
 			dispatch( events.start, arguments );
 
 			request = requestAnimationFrame( animate );
-			prevTime = performance.now();
+			prevTime = ( window.performance || Date ).now();
 		};
 
 		this.stop = function () {
