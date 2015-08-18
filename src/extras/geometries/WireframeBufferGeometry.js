@@ -51,8 +51,6 @@ THREE.WireframeBufferGeometry = function ( geometry ) {
 			var b = i + 1;
 			var c = i + 2;
 
-			// TODO: Check for duplicates
-
 			indices.push( a, b, b, c, c, a );
 
 		}
