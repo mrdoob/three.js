@@ -14061,6 +14061,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
 		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
+		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 
 		// for PointCloudMaterial
 		if ( json.size !== undefined ) material.size = json.size;
@@ -15163,6 +15164,7 @@ THREE.Material.prototype = {
 		if ( this.transparent === true ) data.transparent = this.transparent;
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
+		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
 
 		return data;
 
@@ -34262,8 +34264,6 @@ THREE.WireframeBufferGeometry = function ( geometry ) {
 			var a = i + 0;
 			var b = i + 1;
 			var c = i + 2;
-
-			// TODO: Check for duplicates
 
 			indices.push( a, b, b, c, c, a );
 
