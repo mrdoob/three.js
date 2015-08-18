@@ -11845,18 +11845,20 @@ THREE.BufferGeometry.prototype = {
 
 	copy: function ( source ) {
 
-		for ( var attr in source.attributes ) {
+		var attributes = source.attributes;
+		var drawcalls = source.drawcalls;
 
-			var sourceAttr = source.attributes[ attr ];
-			this.addAttribute( attr, sourceAttr.clone() );
+		for ( var name in attributes ) {
+
+			var attribute = attributes[ name ];
+			this.addAttribute( name, attribute.clone() );
 
 		}
 
-		for ( var i = 0, il = source.drawcalls.length; i < il; i ++ ) {
+		for ( var i = 0, l = drawcalls.length; i < l; i ++ ) {
 
-			var offset = source.drawcalls[ i ];
-
-			this.addDrawCall( offset.start, offset.count );
+			var drawcall = drawcalls[ i ];
+			this.addDrawCall( drawcall.start, drawcall.count );
 
 		}
 
@@ -20483,8 +20485,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			groups = [ {
 				start: 0,
-				count: count,
-				index: 0
+				count: count
 			} ];
 
 		}
@@ -23696,17 +23697,11 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 		var geometry = event.target;
 		var buffergeometry = geometries[ geometry.id ];
 
-		for ( var name in buffergeometry.attributes ) {
+		deleteAttributes( buffergeometry.attributes );
 
-			var attribute = buffergeometry.attributes[ name ];
-			var buffer = getAttributeBuffer( attribute );
+		if ( buffergeometry._wireframe !== undefined ) {
 
-			if ( buffer !== undefined ) {
-
-				gl.deleteBuffer( buffer );
-				removeAttributeBuffer( attribute );
-
-			}
+			deleteAttributes( buffergeometry._wireframe.attributes );
 
 		}
 
@@ -23727,6 +23722,24 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 		}
 
 		return properties.get( attribute ).__webglBuffer;
+
+	}
+
+	function deleteAttributes( attributes ) {
+
+		for ( var name in attributes ) {
+
+			var attribute = attributes[ name ];
+			var buffer = getAttributeBuffer( attribute );
+
+			if ( buffer !== undefined ) {
+
+				gl.deleteBuffer( buffer );
+				removeAttributeBuffer( attribute );
+
+			}
+
+		}
 
 	}
 
@@ -23831,6 +23844,18 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		// TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
 
 		var geometry = geometries.get( object );
+
+		if ( object.material.wireframe === true ) {
+
+			if ( geometry._wireframe === undefined ) {
+
+				geometry._wireframe = new THREE.WireframeBufferGeometry( geometry );
+
+			}
+
+			geometry = geometry._wireframe;
+
+		}
 
 		if ( object.geometry instanceof THREE.Geometry ) {
 
@@ -24827,6 +24852,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		}
 
 		depthMaterial.wireframe = material.wireframe;
+		depthMaterial.wireframeLinewidth = material.wireframeLinewidth;
 
 		return depthMaterial;
 
@@ -34181,6 +34207,78 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 
 THREE.ParametricGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.ParametricGeometry.prototype.constructor = THREE.ParametricGeometry;
+
+// File:src/extras/geometries/WireframeBufferGeometry.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.WireframeBufferGeometry = function ( geometry ) {
+
+	THREE.BufferGeometry.call( this );
+
+	var attributes = geometry.attributes;
+
+	// link attributes
+
+	for ( var name in attributes ) {
+
+		this.addAttribute( name, attributes[ name ] );
+
+	}
+
+	this.morphAttributes = geometry.morphAttributes;
+
+	// create wireframe indices
+
+	var indices = [];
+
+	var index = attributes.index;
+	var position = attributes.position;
+
+	if ( index !== undefined ) {
+
+		var array = index.array;
+
+		for ( var i = 0, j = 0, l = array.length; i < l; i += 3 ) {
+
+			var a = array[ i + 0 ];
+			var b = array[ i + 1 ];
+			var c = array[ i + 2 ];
+
+			// TODO: Check for duplicates
+
+			indices.push( a, b, b, c, c, a );
+
+		}
+
+	} else {
+
+		var array = position.array;
+
+		for ( var i = 0, j = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
+
+			var a = i + 0;
+			var b = i + 1;
+			var c = i + 2;
+
+			// TODO: Check for duplicates
+
+			indices.push( a, b, b, c, c, a );
+
+		}
+
+	}
+
+	var TypeArray = position.array.length > 65535 ? Uint32Array : Uint16Array;
+
+	this.addAttribute( 'index', new THREE.BufferAttribute( new TypeArray( indices ), 1 ) );
+
+};
+
+THREE.WireframeBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.WireframeBufferGeometry.prototype.constructor = THREE.WireframeBufferGeometry;
 
 // File:src/extras/geometries/WireframeGeometry.js
 
