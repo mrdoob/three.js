@@ -1127,18 +1127,20 @@ THREE.BufferGeometry.prototype = {
 
 	copy: function ( source ) {
 
-		for ( var attr in source.attributes ) {
+		var attributes = source.attributes;
+		var drawcalls = source.drawcalls;
 
-			var sourceAttr = source.attributes[ attr ];
-			this.addAttribute( attr, sourceAttr.clone() );
+		for ( var name in attributes ) {
+
+			var attribute = attributes[ name ];
+			this.addAttribute( name, attribute.clone() );
 
 		}
 
-		for ( var i = 0, il = source.drawcalls.length; i < il; i ++ ) {
+		for ( var i = 0, l = drawcalls.length; i < l; i ++ ) {
 
-			var offset = source.drawcalls[ i ];
-
-			this.addDrawCall( offset.start, offset.count );
+			var drawcall = drawcalls[ i ];
+			this.addDrawCall( drawcall.start, drawcall.count );
 
 		}
 
