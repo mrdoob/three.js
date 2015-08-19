@@ -271,10 +271,11 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function checkEdge( edges, a, b ) {
 
-		if ( edges[ a + '|' + b ] === true ) return false;
+		var hash = a < b ? a + '_' + b : b + '_' + a;
 
-		edges[ a + '|' + b ] = true;
-		edges[ b + '|' + a ] = true;
+		if ( edges.hasOwnProperty( hash ) ) return false;
+
+		edges[ hash ] = 1;
 
 		return true;
 
