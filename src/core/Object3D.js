@@ -15,7 +15,7 @@ THREE.Object3D = function () {
 	this.name = '';
 	this.type = 'Object3D';
 
-	this.parent = null;
+	this.parent = undefined;
 	this.children = [];
 
 	this.up = THREE.Object3D.DefaultUp.clone();
