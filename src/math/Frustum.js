@@ -89,7 +89,7 @@ THREE.Frustum.prototype = {
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
 			sphere.copy( geometry.boundingSphere );
-			sphere.applyMatrix4( object.matrixWorld );
+			sphere.applyMatrix4( object._matrixWorld );
 
 			return this.intersectsSphere( sphere );
 

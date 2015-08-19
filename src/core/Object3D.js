@@ -15,9 +15,9 @@ THREE.Object3D = function () {
 	this.name = '';
 	this.type = 'Object3D';
 
-	this.parent = undefined;
+	this.parent = null;
 	this.children = [];
-
+	
 	this.up = THREE.Object3D.DefaultUp.clone();
 
 	var position = new THREE.Vector3();
@@ -615,7 +615,7 @@ THREE.Object3D.prototype = {
 
         if ( this._matrixWorldNeedsUpdate === true ) {
 
-            if ( parent === undefined ) {
+            if ( parent === null ) {
 
                 this._matrixWorld.copy( this._matrix );             
 
@@ -637,7 +637,7 @@ THREE.Object3D.prototype = {
 
         var parent = this.parent; 
 
-        if ( parent !== undefined ) {
+        if ( parent !== null ) {
 
             parent.updateMatrixWorld();
 
@@ -669,8 +669,10 @@ THREE.Object3D.prototype = {
 
         var parent = this.parent; 
 
-        if ( parent !== undefined ) {
+        if ( parent !== null ) {
+        	
             parent.updateMatrixWorld();
+            
         }
 
         this._updateChildrenMatrixWorld();
