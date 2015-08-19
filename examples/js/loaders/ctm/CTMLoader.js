@@ -219,7 +219,7 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
 		}
 
-		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+		this.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 		if ( normals !== undefined ) {
@@ -246,7 +246,7 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 	Model.prototype.constructor = Model;
 
 	var geometry = new Model();
-	
+
 	// compute vertex normals if not present in the CTM model
 	if ( geometry.attributes.normal === undefined ) {
 		geometry.computeVertexNormals();

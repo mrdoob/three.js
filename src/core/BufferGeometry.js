@@ -39,6 +39,13 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		if ( name === 'index' && attribute instanceof THREE.IndexBufferAttribute === false ) {
+
+			console.warn( 'THREE.BufferGeometry.addAttribute: Use THREE.IndexBufferAttribute for index attribute.' );
+			attribute = new THREE.IndexBufferAttribute( attribute.array, attribute.itemSize );
+
+		}
+
 		this.attributes[ name ] = attribute;
 
 	},
@@ -458,8 +465,9 @@ THREE.BufferGeometry.prototype = {
 
 		if ( geometry.indices.length > 0 ) {
 
-			var indices = new Uint16Array( geometry.indices.length * 3 );
-			this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
+			var TypeArray = geometry.vertices.length > 65535 ? Uint32Array : Uint16Array;
+			var indices = new TypeArray( geometry.indices.length * 3 );
+			this.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 		}
 

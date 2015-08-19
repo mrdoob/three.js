@@ -87,7 +87,7 @@ THREE.BabylonLoader.prototype = {
 
 		var indices = new Uint16Array( json.indices );
 
-		geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+		geometry.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
 
 		// positions
 

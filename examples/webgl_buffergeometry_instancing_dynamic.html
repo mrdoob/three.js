@@ -54,9 +54,9 @@
 
     <script id="vertexShader" type="x-shader/x-vertex">
         precision highp float;
-        
-        uniform mat4 modelViewMatrix; 
-        uniform mat4 projectionMatrix; 
+
+        uniform mat4 modelViewMatrix;
+        uniform mat4 projectionMatrix;
 
         attribute vec3 position;
         attribute vec3 offset;
@@ -207,7 +207,7 @@
                 22, 21, 23
             ] );
 
-            geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+            geometry.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
 
             // per instance data
             var offsets = new THREE.InstancedBufferAttribute( new Float32Array( instances * 3 ), 3, 1, false );
@@ -322,7 +322,7 @@
                 var index = i * 4;
                 currentQ.set( orientations.array[index], orientations.array[index + 1], orientations.array[index + 2], orientations.array[index + 3] );
                 currentQ.multiply( tmpQ );
-                
+
                 orientations.setXYZW( i, currentQ.x, currentQ.y, currentQ.z, currentQ.w );
 
             }
