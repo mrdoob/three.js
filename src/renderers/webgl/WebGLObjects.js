@@ -194,8 +194,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	}
 
-	// returns the webgl buffer for a specified attribute
-	this.getAttributeBuffer = function ( attribute ) {
+	function getAttributeBuffer( attribute ) {
 
 		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
 
@@ -205,7 +204,84 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		return properties.get( attribute ).__webglBuffer;
 
-	};
+	}
+
+	function getWireframeAttribute( geometry ) {
+
+		var attributes = geometry.attributes;
+
+		if ( attributes.wireframe !== undefined ) {
+
+			return attributes.wireframe;
+
+		}
+
+		var indices = [];
+
+		var index = attributes.index;
+		var position = attributes.position;
+
+		console.time( 'wireframe' );
+
+		if ( index !== undefined ) {
+
+			var edges = {};
+			var array = index.array;
+
+			for ( var i = 0, j = 0, l = array.length; i < l; i += 3 ) {
+
+				var a = array[ i + 0 ];
+				var b = array[ i + 1 ];
+				var c = array[ i + 2 ];
+
+				if ( checkEdge( edges, a, b ) ) indices.push( a, b );
+				if ( checkEdge( edges, b, c ) ) indices.push( b, c );
+				if ( checkEdge( edges, c, a ) ) indices.push( c, a );
+
+			}
+
+		} else {
+
+			var array = position.array;
+
+			for ( var i = 0, j = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
+
+				var a = i + 0;
+				var b = i + 1;
+				var c = i + 2;
+
+				indices.push( a, b, b, c, c, a );
+
+			}
+
+		}
+
+		console.timeEnd( 'wireframe' );
+
+		var TypeArray = position.array.length > 65535 ? Uint32Array : Uint16Array;
+		var attribute = new THREE.BufferAttribute( new TypeArray( indices ), 1 );
+
+		updateAttribute( attribute, 'wireframe' );
+
+		geometry.addAttribute( 'wireframe', attribute );
+
+		return attribute;
+
+	}
+
+	function checkEdge( edges, a, b ) {
+
+		if ( edges[ a + '|' + b ] === true ) return false;
+
+		edges[ a + '|' + b ] = true;
+		edges[ b + '|' + a ] = true;
+
+		return true;
+
+	}
+
+	this.getAttributeBuffer = getAttributeBuffer;
+	this.getWireframeAttribute = getWireframeAttribute;
 
 	this.update = update;
 	this.updateAttribute = updateAttribute;

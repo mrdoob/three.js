@@ -840,7 +840,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.wireframe === true ) {
 
-			index = geometry.attributes.wireframe;
+			index = objects.getWireframeAttribute( geometry );
 
 		}
 

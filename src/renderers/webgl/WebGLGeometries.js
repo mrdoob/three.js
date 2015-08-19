@@ -6,7 +6,7 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	var geometries = {};
 
-	this.get = function ( object ) {
+	function get( object ) {
 
 		var geometry = object.geometry;
 
@@ -36,80 +36,11 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		}
 
-		if ( object instanceof THREE.Mesh ) {
-
-			buffergeometry.addAttribute( 'wireframe', createWireframeIndexBuffer( buffergeometry ) );
-
-		}
-
 		geometries[ geometry.id ] = buffergeometry;
 
 		info.memory.geometries ++;
 
 		return buffergeometry;
-
-	};
-
-	function checkEdge( edges, a, b ) {
-
-		if ( edges[ a + '|' + b ] === true ) return false;
-
-		edges[ a + '|' + b ] = true;
-		edges[ b + '|' + a ] = true;
-
-		return true;
-
-	}
-
-	function createWireframeIndexBuffer( geometry ) {
-
-		var attributes = geometry.attributes;
-
-		var indices = [];
-
-		var index = attributes.index;
-		var position = attributes.position;
-
-		console.time( 'wireframe' );
-
-		if ( index !== undefined ) {
-
-			var edges = {};
-			var array = index.array;
-
-			for ( var i = 0, j = 0, l = array.length; i < l; i += 3 ) {
-
-				var a = array[ i + 0 ];
-				var b = array[ i + 1 ];
-				var c = array[ i + 2 ];
-
-				if ( checkEdge( edges, a, b ) ) indices.push( a, b );
-				if ( checkEdge( edges, b, c ) ) indices.push( b, c );
-				if ( checkEdge( edges, c, a ) ) indices.push( c, a );
-
-			}
-
-		} else {
-
-			var array = position.array;
-
-			for ( var i = 0, j = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
-
-				var a = i + 0;
-				var b = i + 1;
-				var c = i + 2;
-
-				indices.push( a, b, b, c, c, a );
-
-			}
-
-		}
-
-		console.timeEnd( 'wireframe' );
-
-		var TypeArray = position.array.length > 65535 ? Uint32Array : Uint16Array;
-
-		return new THREE.BufferAttribute( new TypeArray( indices ), 1 );
 
 	}
 
@@ -171,5 +102,7 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 		}
 
 	}
+
+	this.get = get;
 
 };
