@@ -999,57 +999,6 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	/*
-		reoderBuffers:
-		Reorder attributes based on a new indexBuffer and indexMap.
-		indexBuffer - Uint16Array of the new ordered indices.
-		indexMap - Int32Array where the position is the new vertex ID and the value the old vertex ID for each vertex.
-		vertexCount - Amount of total vertices considered in this reordering (in case you want to grow the vertex stack).
-	*/
-	reorderBuffers: function ( indexBuffer, indexMap, vertexCount ) {
-
-		/* Create a copy of all attributes for reordering. */
-		var sortedAttributes = {};
-		for ( var attr in this.attributes ) {
-
-			if ( attr === 'index' )
-				continue;
-			var sourceArray = this.attributes[ attr ].array;
-			sortedAttributes[ attr ] = new sourceArray.constructor( this.attributes[ attr ].itemSize * vertexCount );
-
-		}
-
-		/* Move attribute positions based on the new index map */
-		for ( var new_vid = 0; new_vid < vertexCount; new_vid ++ ) {
-
-			var vid = indexMap[ new_vid ];
-			for ( var attr in this.attributes ) {
-
-				if ( attr === 'index' )
-					continue;
-				var attrArray = this.attributes[ attr ].array;
-				var attrSize = this.attributes[ attr ].itemSize;
-				var sortedAttr = sortedAttributes[ attr ];
-				for ( var k = 0; k < attrSize; k ++ )
-					sortedAttr[ new_vid * attrSize + k ] = attrArray[ vid * attrSize + k ];
-
-			}
-
-		}
-
-		/* Carry the new sorted buffers locally */
-		this.attributes[ 'index' ].array = indexBuffer;
-		for ( var attr in this.attributes ) {
-
-			if ( attr === 'index' )
-				continue;
-			this.attributes[ attr ].array = sortedAttributes[ attr ];
-			this.attributes[ attr ].numItems = this.attributes[ attr ].itemSize * vertexCount;
-
-		}
-
-	},
-
 	toJSON: function () {
 
 		var data = {
