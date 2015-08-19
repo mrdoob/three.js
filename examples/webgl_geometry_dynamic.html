@@ -86,7 +86,7 @@
 				scene.fog = new THREE.FogExp2( 0xaaccff, 0.0007 );
 
 				geometry = new THREE.PlaneGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				geometry.rotateX( - Math.PI / 2 );
 
 				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 

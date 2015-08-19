@@ -115,6 +115,12 @@ THREE.Box3.prototype = {
 
 	}(),
 
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
 	copy: function ( box ) {
 
 		this.min.copy( box.min );
@@ -342,12 +348,6 @@ THREE.Box3.prototype = {
 	equals: function ( box ) {
 
 		return box.min.equals( this.min ) && box.max.equals( this.max );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Box3().copy( this );
 
 	}
 

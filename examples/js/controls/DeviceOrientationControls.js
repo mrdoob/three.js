@@ -88,6 +88,12 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	};
 
+	this.dispose = function () {
+
+		this.disconnect();
+
+	};
+
 	this.connect();
 
 };

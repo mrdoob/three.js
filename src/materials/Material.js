@@ -32,6 +32,8 @@ THREE.Material = function () {
 
 	this.colorWrite = true;
 
+	this.precision = null; // override the renderer's default precision for this material
+
 	this.polygonOffset = false;
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
@@ -161,7 +163,9 @@ THREE.Material.prototype = {
 
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
 		if ( this.transparent === true ) data.transparent = this.transparent;
+		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
+		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
 
 		return data;
 
@@ -169,8 +173,7 @@ THREE.Material.prototype = {
 
 	clone: function () {
 
-		var material = new THREE.Material();
-		return material.copy( this );
+		return new this.constructor().copy( this );
 
 	},
 
@@ -195,6 +198,8 @@ THREE.Material.prototype = {
 		this.depthFunc = source.depthFunc;
 		this.depthTest = source.depthTest;
 		this.depthWrite = source.depthWrite;
+
+		this.precision = source.precision;
 
 		this.polygonOffset = source.polygonOffset;
 		this.polygonOffsetFactor = source.polygonOffsetFactor;

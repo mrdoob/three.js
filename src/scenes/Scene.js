@@ -18,13 +18,6 @@ THREE.Scene = function () {
 THREE.Scene.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Scene.prototype.constructor = THREE.Scene;
 
-THREE.Scene.prototype.clone = function () {
-
-	var scene = new THREE.Scene();
-	return scene.copy( this );
-
-};
-
 THREE.Scene.prototype.copy = function ( source ) {
 
 	THREE.Object3D.prototype.copy.call( this, source );

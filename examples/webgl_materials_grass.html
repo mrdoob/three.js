@@ -40,8 +40,7 @@
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
-				var texture = new THREE.Texture( generateTexture() );
-				texture.needsUpdate = true;
+				var texture = new THREE.CanvasTexture( generateTexture() );
 
 				for ( var i = 0; i < 15; i ++ ) {
 

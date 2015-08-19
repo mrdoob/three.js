@@ -82,21 +82,6 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				// break geometry into
-				// chunks of 21,845 triangles (3 unique vertices per triangle)
-				// for indices to fit into 16 bit integer number
-				// floor(2^16 / 3) = 21845
-
-				var chunkSize = 21845;
-
-				var indices = new Uint16Array( triangles * 3 );
-
-				for ( var i = 0; i < indices.length; i ++ ) {
-
-					indices[ i ] = i % ( 3 * chunkSize );
-
-				}
-
 				var positions = new Float32Array( triangles * 3 * 3 );
 				var normals = new Float32Array( triangles * 3 * 3 );
 				var colors = new Float32Array( triangles * 3 * 3 );
@@ -195,22 +180,9 @@
 
 				}
 
-				geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
-
-				var num_offsets = triangles / chunkSize;
-
-				for ( var i = 0; i < num_offsets; i ++ ) {
-
-					var indexStart = i * chunkSize * 3;
-					var indexCount = Math.min( triangles - ( i * chunkSize ), chunkSize ) * 3;
-					var indexOffset = i * chunkSize * 3;
-
-					geometry.addDrawCall( indexStart, indexCount, indexOffset );
-
-				}
 
 				geometry.computeBoundingSphere();
 

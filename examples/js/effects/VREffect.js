@@ -133,7 +133,7 @@ THREE.VREffect = function ( renderer, onError ) {
 			renderer.enableScissorTest( true );
 			renderer.clear();
 
-			if ( camera.parent === undefined ) camera.updateMatrixWorld();
+			if ( camera.parent === null ) camera.updateMatrixWorld();
 
 			cameraL.projectionMatrix = fovToProjection( eyeFOVL, true, camera.near, camera.far );
 			cameraR.projectionMatrix = fovToProjection( eyeFOVR, true, camera.near, camera.far );

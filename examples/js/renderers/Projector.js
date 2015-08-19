@@ -325,7 +325,7 @@ THREE.Projector = function () {
 		_renderData.elements.length = 0;
 
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
@@ -347,7 +347,9 @@ THREE.Projector = function () {
 
 			} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Sprite ) {
 
-				if ( object.material.visible === false ) return;
+				var material = object.material;
+
+				if ( material.visible === false ) return;
 
 				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
@@ -437,11 +439,10 @@ THREE.Projector = function () {
 							for ( var o = 0; o < offsets.length; o ++ ) {
 
 								var offset = offsets[ o ];
-								var index = offset.index;
 
 								for ( var i = offset.start, l = offset.start + offset.count; i < l; i += 3 ) {
 
-									renderList.pushTriangle( indices[ i ] + index, indices[ i + 1 ] + index, indices[ i + 2 ] + index );
+									renderList.pushTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
 
 								}
 
@@ -517,7 +518,7 @@ THREE.Projector = function () {
 						var face = faces[ f ];
 
 						material = isFaceMaterial === true
-							 ? objectMaterials.materials[ 0 ] // objectMaterials.materials[ face.materialIndex ]
+							 ? objectMaterials.materials[ face.materialIndex ]
 							 : object.material;
 
 						if ( material === undefined ) continue;

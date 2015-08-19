@@ -83,20 +83,13 @@ THREE.MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
 
 };
 
-THREE.MorphAnimMesh.prototype.clone = function () {
-
-	var morph = new THREE.MorphAnimMesh( this.geometry, this.material );
-	return morph.copy( this );
-
-};
-
 THREE.MorphAnimMesh.prototype.copy = function ( source ) {
+
+	THREE.Object3D.prototype.copy.call( this, source );
 
 	this.mixer = new THREE.AnimationMixer( this );
 	this.animationClips = source.animationClips;
 	this.firstAnimationClips = source.firstAnimationClips;
-
-	THREE.Mesh.prototype.copy.call( this, source );
 
 	return this;
 

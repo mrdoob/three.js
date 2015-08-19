@@ -57,6 +57,12 @@ THREE.Sphere.prototype = {
 
 	}(),
 
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
 	copy: function ( sphere ) {
 
 		this.center.copy( sphere.center );
@@ -141,12 +147,6 @@ THREE.Sphere.prototype = {
 	equals: function ( sphere ) {
 
 		return sphere.center.equals( this.center ) && ( sphere.radius === this.radius );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Sphere().copy( this );
 
 	}
 

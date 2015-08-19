@@ -69,20 +69,21 @@ THREE.Line.prototype.raycast = ( function () {
 
 				if ( offsets.length === 0 ) {
 
-					offsets = [ { start: 0, count: indices.length, index: 0 } ];
+					geometry.addDrawCall( 0, indices.length );
 
 				}
 
 				for ( var oi = 0; oi < offsets.length; oi ++ ) {
 
-					var start = offsets[ oi ].start;
-					var count = offsets[ oi ].count;
-					var index = offsets[ oi ].index;
+					var offset = offsets[ oi ];
+
+					var start = offset.start;
+					var count = offset.count;
 
 					for ( var i = start; i < start + count - 1; i += step ) {
 
-						var a = index + indices[ i ];
-						var b = index + indices[ i + 1 ];
+						var a = indices[ i ];
+						var b = indices[ i + 1 ];
 
 						vStart.fromArray( positions, a * 3 );
 						vEnd.fromArray( positions, b * 3 );
@@ -185,15 +186,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 THREE.Line.prototype.clone = function () {
 
-	var line = new THREE.Line( this.geometry, this.material );
-	return line.copy( this );
-
-};
-
-THREE.Line.prototype.copy = function ( source ) {
-
-	THREE.Object3D.prototype.copy.call( this, source );
-	return this;
+	return new this.constructor( this.geometry, this.material ).copy( this );
 
 };
 

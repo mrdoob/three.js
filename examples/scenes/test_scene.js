@@ -597,7 +597,7 @@
 
 		"phong_morph": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.125, "combine": "MixOperation", "shading": "flat", "side": "double", "morphTargets": true, "morphNormals" : true }
+			"parameters": { "color": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.125, "combine": "MixOperation", "shading": "flat", "side": "double", "morphTargets": true }
 		},
 
 		"phong_skin": {

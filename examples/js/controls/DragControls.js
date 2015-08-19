@@ -96,6 +96,12 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 	
 	};
 
+	this.dispose = function() {
+
+		me.deactivate();
+
+	};
+
 	this.activate();
 
 	function onDocumentMouseMove( event ) {

@@ -89,7 +89,7 @@
 				camera.position.x = 2000;
 
 				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				geometry.rotateX( - Math.PI / 2 );
 
 				var vertices = geometry.attributes.position.array;
 
@@ -101,15 +101,16 @@
 
 				geometry.computeFaceNormals();
 
-				texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
-				texture.needsUpdate = true;
+				texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
+				texture.wrapS = THREE.ClampToEdgeWrapping;
+				texture.wrapT = THREE.ClampToEdgeWrapping;
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
 
 				var geometry = new THREE.CylinderGeometry( 0, 20, 100, 3 );
-				geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 50, 0 ) );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
+				geometry.translate( 0, 50, 0 );
+				geometry.rotateX( Math.PI / 2 );
 				helper = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial() );
 				scene.add( helper );
 

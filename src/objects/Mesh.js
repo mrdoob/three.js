@@ -119,21 +119,22 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				if ( offsets.length === 0 ) {
 
-					offsets = [ { start: 0, count: indices.length, index: 0 } ];
+					geometry.addDrawCall( 0, indices.length );
 
 				}
 
 				for ( var oi = 0, ol = offsets.length; oi < ol; ++ oi ) {
 
-					var start = offsets[ oi ].start;
-					var count = offsets[ oi ].count;
-					var index = offsets[ oi ].index;
+					var offset = offsets[ oi ];
+
+					var start = offset.start;
+					var count = offset.count;
 
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
-						a = index + indices[ i ];
-						b = index + indices[ i + 1 ];
-						c = index + indices[ i + 2 ];
+						a = indices[ i ];
+						b = indices[ i + 1 ];
+						c = indices[ i + 2 ];
 
 						vA.fromArray( positions, a * 3 );
 						vB.fromArray( positions, b * 3 );
@@ -307,15 +308,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 THREE.Mesh.prototype.clone = function () {
 
-	var mesh = new THREE.Mesh( this.geometry, this.material );
-	return mesh.copy( this );
-
-};
-
-THREE.Mesh.prototype.copy = function ( source ) {
-
-	THREE.Object3D.prototype.copy.call( this, source );
-	return this;
+	return new this.constructor( this.geometry, this.material ).copy( this );
 
 };
 

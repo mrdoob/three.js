@@ -22,6 +22,12 @@ THREE.Line3.prototype = {
 
 	},
 
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
 	copy: function ( line ) {
 
 		this.start.copy( line.start );
@@ -114,12 +120,6 @@ THREE.Line3.prototype = {
 	equals: function ( line ) {
 
 		return line.start.equals( this.start ) && line.end.equals( this.end );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Line3().copy( this );
 
 	}
 

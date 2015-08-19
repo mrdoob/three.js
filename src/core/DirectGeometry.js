@@ -13,16 +13,13 @@ THREE.DirectGeometry = function () {
 
 	this.indices = [];
 	this.vertices = [];
-	this.colors = [];
 	this.normals = [];
 	this.colors = [];
 	this.uvs = [];
 	this.uvs2 = [];
 	this.tangents = [];
 
-	this.morphTargets = [];
-	this.morphColors = [];
-	this.morphNormals = [];
+	this.morphTargets = {};
 
 	this.skinWeights = [];
 	this.skinIndices = [];
@@ -87,27 +84,34 @@ THREE.DirectGeometry.prototype = {
 		var morphTargets = geometry.morphTargets;
 		var morphTargetsLength = morphTargets.length;
 
-		for ( var i = 0; i < morphTargetsLength; i ++ ) {
+		if ( morphTargetsLength > 0 ) {
 
-			this.morphTargets[ i ] = [];
+			var morphTargetsPosition = [];
+
+			for ( var i = 0; i < morphTargetsLength; i ++ ) {
+
+				morphTargetsPosition[ i ] = [];
+
+			}
+
+			this.morphTargets.position = morphTargetsPosition;
 
 		}
 
 		var morphNormals = geometry.morphNormals;
 		var morphNormalsLength = morphNormals.length;
 
-		for ( var i = 0; i < morphNormalsLength; i ++ ) {
+		if ( morphNormalsLength > 0 ) {
 
-			this.morphNormals[ i ] = [];
+			var morphTargetsNormal = [];
 
-		}
+			for ( var i = 0; i < morphNormalsLength; i ++ ) {
 
-		var morphColors = geometry.morphColors;
-		var morphColorsLength = morphColors.length;
+				morphTargetsNormal[ i ] = [];
 
-		for ( var i = 0; i < morphColorsLength; i ++ ) {
+			}
 
-			this.morphColors[ i ] = [];
+			this.morphTargets.normal = morphTargetsNormal;
 
 		}
 
@@ -215,26 +219,17 @@ THREE.DirectGeometry.prototype = {
 
 				var morphTarget = morphTargets[ j ].vertices;
 
-				this.morphTargets[ j ].push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
+				morphTargetsPosition[ j ].push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
 
 			}
-			/*
+
 			for ( var j = 0; j < morphNormalsLength; j ++ ) {
 
 				var morphNormal = morphNormals[ j ].vertexNormals[ i ];
 
-				this.morphNormals[ j ].push( morphNormal.a, morphNormal.b, morphNormal.c );
+				morphTargetsNormal[ j ].push( morphNormal.a, morphNormal.b, morphNormal.c );
 
 			}
-
-			for ( var j = 0; j < morphColorsLength; j ++ ) {
-
-				var morphColor = morphColors[ j ].colors;
-
-				this.morphColors[ j ].push( morphColor[ face.a ], morphColor[ face.b ], morphColor[ face.c ] );
-
-			}
-			*/
 
 			// skins
 

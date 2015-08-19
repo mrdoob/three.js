@@ -39,7 +39,6 @@
 			var camera, controls, scene, renderer;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -51,13 +50,6 @@
 				// scene
 
 				scene = new THREE.Scene();
-
-				var ambient = new THREE.AmbientLight( 0x101030 );
-				scene.add( ambient );
-
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 );
-				scene.add( directionalLight );
 
 				// texture
 
@@ -91,13 +83,17 @@
 
 						if ( object instanceof THREE.Mesh ) {
 
-							object.material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );
+							object.material = new THREE.MeshPhongMaterial( {
+								color: Math.random() * 0xffffff
+							} );
 
 						}
 
 					} );
 
-					scene.add( babylonScene );
+					scene = babylonScene;
+
+					animate();
 
 				}, onProgress, onError );
 

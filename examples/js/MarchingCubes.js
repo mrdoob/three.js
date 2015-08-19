@@ -47,8 +47,6 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		this.vlist = new Float32Array( 12 * 3 );
 		this.nlist = new Float32Array( 12 * 3 );
 
-		this.firstDraw = true;
-
 		// immediate render mode simulator
 
 		this.maxCount = 4096; // TODO: find the fastest size for this buffer
@@ -430,11 +428,13 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 	this.end = function( renderCallback ) {
 
-		if ( this.count === 0 )
-			return;
+		if ( this.count === 0 ) return;
 
-		for ( var i = this.count * 3; i < this.positionArray.length; i ++ )
+		for ( var i = this.count * 3; i < this.positionArray.length; i ++ ) {
+
 			this.positionArray[ i ] = 0.0;
+
+		}
 
 		this.hasPositions = true;
 		this.hasNormals = true;
@@ -657,22 +657,22 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 		// Triangulate. Yeah, this is slow.
 
-		var q, x, y, z, fx, fy, fz, y_offset, z_offset, smin2 = this.size - 2;
+		var smin2 = this.size - 2;
 
-		for ( z = 1; z < smin2; z ++ ) {
+		for ( var z = 1; z < smin2; z ++ ) {
 
-			z_offset = this.size2 * z;
-			fz = ( z - this.halfsize ) / this.halfsize; //+ 1
+			var z_offset = this.size2 * z;
+			var fz = ( z - this.halfsize ) / this.halfsize; //+ 1
 
-			for ( y = 1; y < smin2; y ++ ) {
+			for ( var y = 1; y < smin2; y ++ ) {
 
-				y_offset = z_offset + this.size * y;
-				fy = ( y - this.halfsize ) / this.halfsize; //+ 1
+				var y_offset = z_offset + this.size * y;
+				var fy = ( y - this.halfsize ) / this.halfsize; //+ 1
 
-				for ( x = 1; x < smin2; x ++ ) {
+				for ( var x = 1; x < smin2; x ++ ) {
 
-					fx = ( x - this.halfsize ) / this.halfsize; //+ 1
-					q = y_offset + x;
+					var fx = ( x - this.halfsize ) / this.halfsize; //+ 1
+					var q = y_offset + x;
 
 					this.polygonize( fx, fy, fz, q, this.isolation, renderCallback );
 

@@ -327,9 +327,8 @@ THREE.Lut.prototype = {
 
 		contextTitle.fillText( this.legend.labels.title.toString() + this.legend.labels.um.toString(), borderThickness, this.legend.labels.fontsize + borderThickness );
 
-		var txtTitle = new THREE.Texture( canvasTitle );
+		var txtTitle = new THREE.CanvasTexture( canvasTitle );
 		txtTitle.minFilter = THREE.LinearFilter;
-		txtTitle.needsUpdate = true;
 
 		var spriteMaterialTitle = new THREE.SpriteMaterial( { map: txtTitle, useScreenCoordinates: false } );
 
@@ -408,9 +407,8 @@ THREE.Lut.prototype = {
 
 				contextTick.fillText( value.toString(), borderThickness, this.legend.labels.fontsize + borderThickness );
 
-				var txtTick = new THREE.Texture( canvasTick );
+				var txtTick = new THREE.CanvasTexture( canvasTick );
 				txtTick.minFilter = THREE.LinearFilter;
-				txtTick.needsUpdate = true;
 
 				var spriteMaterialTick = new THREE.SpriteMaterial( { map: txtTick, useScreenCoordinates: false } );
 

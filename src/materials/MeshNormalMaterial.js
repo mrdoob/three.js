@@ -32,15 +32,13 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 THREE.MeshNormalMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.MeshNormalMaterial.prototype.constructor = THREE.MeshNormalMaterial;
 
-THREE.MeshNormalMaterial.prototype.clone = function () {
+THREE.MeshNormalMaterial.prototype.copy = function ( source ) {
 
-	var material = new THREE.MeshNormalMaterial();
+	THREE.Material.prototype.copy.call( this, source );
 
-	material.copy( this );
+	this.wireframe = source.wireframe;
+	this.wireframeLinewidth = source.wireframeLinewidth;
 
-	material.wireframe = this.wireframe;
-	material.wireframeLinewidth = this.wireframeLinewidth;
-
-	return material;
+	return this;
 
 };

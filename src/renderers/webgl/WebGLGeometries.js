@@ -6,7 +6,7 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	var geometries = {};
 
-	this.get = function ( object ) {
+	function get( object ) {
 
 		var geometry = object.geometry;
 
@@ -18,46 +18,38 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		geometry.addEventListener( 'dispose', onGeometryDispose );
 
+		var buffergeometry;
+
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			geometries[ geometry.id ] = geometry;
+			buffergeometry = geometry;
 
 		} else if ( geometry instanceof THREE.Geometry ) {
 
-			if ( object._bufferGeometry === undefined ) {
+			if ( geometry._bufferGeometry === undefined ) {
 
-				object._bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
+				geometry._bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
 
 			}
 
-			geometries[ geometry.id ] = object._bufferGeometry;
+			buffergeometry = geometry._bufferGeometry;
 
 		}
 
+		geometries[ geometry.id ] = buffergeometry;
+
 		info.memory.geometries ++;
 
-		return geometries[ geometry.id ];
+		return buffergeometry;
 
-	};
+	}
 
 	function onGeometryDispose( event ) {
 
 		var geometry = event.target;
 		var buffergeometry = geometries[ geometry.id ];
 
-		for ( var name in buffergeometry.attributes ) {
-
-			var attribute = buffergeometry.attributes[ name ];
-			var buffer = getAttributeBuffer( attribute );
-
-			if ( buffer !== undefined ) {
-
-				gl.deleteBuffer( buffer );
-				removeAttributeBuffer( attribute );
-
-			}
-
-		}
+		deleteAttributes( buffergeometry.attributes );
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
@@ -79,6 +71,24 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	}
 
+	function deleteAttributes( attributes ) {
+
+		for ( var name in attributes ) {
+
+			var attribute = attributes[ name ];
+			var buffer = getAttributeBuffer( attribute );
+
+			if ( buffer !== undefined ) {
+
+				gl.deleteBuffer( buffer );
+				removeAttributeBuffer( attribute );
+
+			}
+
+		}
+
+	}
+
 	function removeAttributeBuffer( attribute ) {
 
 		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
@@ -92,5 +102,7 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 		}
 
 	}
+
+	this.get = get;
 
 };

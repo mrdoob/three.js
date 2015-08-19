@@ -10,6 +10,8 @@ THREE.MeshFaceMaterial = function ( materials ) {
 
 	this.materials = materials instanceof Array ? materials : [];
 
+	this.visible = true;
+
 };
 
 THREE.MeshFaceMaterial.prototype = {
@@ -35,19 +37,23 @@ THREE.MeshFaceMaterial.prototype = {
 
 		}
 
+		output.visible = this.visible;
+
 		return output;
 
 	},
 
 	clone: function () {
 
-		var material = new THREE.MeshFaceMaterial();
+		var material = new this.constructor();
 
 		for ( var i = 0; i < this.materials.length; i ++ ) {
 
 			material.materials.push( this.materials[ i ].clone() );
 
 		}
+
+		material.visible = this.visible;
 
 		return material;
 

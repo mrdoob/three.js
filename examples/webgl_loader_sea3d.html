@@ -33,16 +33,16 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script> 
+		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/ColorCorrectionShader.js"></script>
 		<script src="js/shaders/VignetteShader.js"></script>
-		
+
 		<script src="js/loaders/sea3d/SEA3D.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
@@ -62,7 +62,7 @@
 
 			// Initialize Three.JS
 
-			init(); 
+			init();
 
 			//
 			// SEA3D Loader
@@ -101,13 +101,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 1000, - 300, 1000 );
 
-				controls = new THREE.TrackballControls( camera, document );
-				controls.noZoom = true;
-				controls.noPan = true;
-				controls.dynamicDampingFactor = 0.05;
+				controls = new THREE.OrbitControls( camera );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -164,28 +161,30 @@
 
 			//
 
+			var clock = new THREE.Clock();
+
 			function animate() {
+
+				var delta = clock.getDelta();
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				// Update SEA3D Animations
+				THREE.SEA3D.AnimationHandler.update( delta );
 
-				render();
+				// Update Three.JS Animations
+				THREE.AnimationHandler.update( delta );
+
+				render( delta );
 
 				stats.update();
 
 			}
 
-			var clock = new THREE.Clock();
-
-			function render() {
-
-				var delta = clock.getDelta();
-
-				THREE.AnimationHandler.update( delta );
+			function render( dlt ) {
 
 				//renderer.render( scene, camera );
-				composer.render( delta );
+				composer.render( dlt );
 
 			}
 

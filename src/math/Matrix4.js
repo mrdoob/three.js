@@ -62,6 +62,12 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	clone: function () {
+
+		return new THREE.Matrix4().fromArray( this.elements );
+
+	},
+
 	copy: function ( m ) {
 
 		this.elements.set( m.elements );
@@ -991,6 +997,21 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	equals: function ( matrix ) {
+
+		var te = this.elements;
+		var me = matrix.elements;
+
+		for ( var i = 0; i < 16; i ++ ) {
+
+			if ( te[ i ] !== me[ i ] ) return false;
+
+		}
+
+		return true;
+
+	},
+
 	fromArray: function ( array ) {
 
 		this.elements.set( array );
@@ -1009,12 +1030,6 @@ THREE.Matrix4.prototype = {
 			te[ 8 ], te[ 9 ], te[ 10 ], te[ 11 ],
 			te[ 12 ], te[ 13 ], te[ 14 ], te[ 15 ]
 		];
-
-	},
-
-	clone: function () {
-
-		return new THREE.Matrix4().fromArray( this.elements );
 
 	}
 

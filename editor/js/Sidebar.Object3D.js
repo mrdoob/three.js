@@ -342,7 +342,7 @@ Sidebar.Object3D = function ( editor ) {
 
 		if ( object !== null ) {
 
-			if ( object.parent !== undefined ) {
+			if ( object.parent !== null ) {
 
 				var newParentId = parseInt( objectParent.getValue() );
 
@@ -535,7 +535,7 @@ Sidebar.Object3D = function ( editor ) {
 		objectUUID.setValue( object.uuid );
 		objectName.setValue( object.name );
 
-		if ( object.parent !== undefined ) {
+		if ( object.parent !== null ) {
 
 			objectParent.setValue( object.parent.id );
 

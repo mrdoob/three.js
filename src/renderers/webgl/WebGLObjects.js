@@ -43,7 +43,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 	//
 
 	this.objects = objects;
-	this.geometries = geometries;
 
 	this.init = function ( object ) {
 
@@ -77,7 +76,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	};
 
-	function updateObject( object ) {
+	function update( object ) {
+
+		// TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
 
 		var geometry = geometries.get( object );
 
@@ -87,8 +88,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		//
-
 		var attributes = geometry.attributes;
 
 		for ( var name in attributes ) {
@@ -97,11 +96,39 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
+		// morph targets
+
+		var morphAttributes = geometry.morphAttributes;
+
+		for ( var name in morphAttributes ) {
+
+			var array = morphAttributes[ name ];
+
+			for ( var i = 0, l = array.length; i < l; i ++ ) {
+
+				updateAttribute( array[ i ], i );
+
+			}
+
+		}
+
+		return geometry;
+
 	}
 
 	function updateAttribute( attribute, name ) {
 
-		var bufferType = ( name === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
+		var bufferType;
+
+		if ( name === 'index' || name === 'wireframe' ) {
+
+			bufferType = gl.ELEMENT_ARRAY_BUFFER;
+
+		} else {
+
+			bufferType = gl.ARRAY_BUFFER;
+
+		}
 
 		var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
@@ -167,8 +194,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	}
 
-	// returns the webgl buffer for a specified attribute
-	this.getAttributeBuffer = function ( attribute ) {
+	function getAttributeBuffer( attribute ) {
 
 		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
 
@@ -178,24 +204,87 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		return properties.get( attribute ).__webglBuffer;
 
-	};
+	}
 
-	this.update = function ( renderList ) {
+	function getWireframeAttribute( geometry ) {
 
-		for ( var i = 0, ul = renderList.length; i < ul; i ++ ) {
+		var attributes = geometry.attributes;
 
-			var object = renderList[ i ].object;
+		if ( attributes.wireframe !== undefined ) {
 
-			if ( object.material.visible !== false ) {
+			return attributes.wireframe;
 
-				updateObject( object );
+		}
+
+		var indices = [];
+
+		var index = attributes.index;
+		var position = attributes.position;
+
+		console.time( 'wireframe' );
+
+		if ( index !== undefined ) {
+
+			var edges = {};
+			var array = index.array;
+
+			for ( var i = 0, j = 0, l = array.length; i < l; i += 3 ) {
+
+				var a = array[ i + 0 ];
+				var b = array[ i + 1 ];
+				var c = array[ i + 2 ];
+
+				if ( checkEdge( edges, a, b ) ) indices.push( a, b );
+				if ( checkEdge( edges, b, c ) ) indices.push( b, c );
+				if ( checkEdge( edges, c, a ) ) indices.push( c, a );
+
+			}
+
+		} else {
+
+			var array = position.array;
+
+			for ( var i = 0, j = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
+
+				var a = i + 0;
+				var b = i + 1;
+				var c = i + 2;
+
+				indices.push( a, b, b, c, c, a );
 
 			}
 
 		}
 
-	};
+		console.timeEnd( 'wireframe' );
 
+		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
+		var attribute = new THREE.BufferAttribute( new TypeArray( indices ), 1 );
+
+		updateAttribute( attribute, 'wireframe' );
+
+		geometry.addAttribute( 'wireframe', attribute );
+
+		return attribute;
+
+	}
+
+	function checkEdge( edges, a, b ) {
+
+		var hash = a < b ? a + '_' + b : b + '_' + a;
+
+		if ( edges.hasOwnProperty( hash ) ) return false;
+
+		edges[ hash ] = 1;
+
+		return true;
+
+	}
+
+	this.getAttributeBuffer = getAttributeBuffer;
+	this.getWireframeAttribute = getWireframeAttribute;
+
+	this.update = update;
 	this.updateAttribute = updateAttribute;
 
 	this.clear = function () {

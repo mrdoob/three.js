@@ -184,6 +184,26 @@ var Loader = function ( editor ) {
 
 				break;
 
+				case 'md2':
+
+					var reader = new FileReader();
+					reader.addEventListener( 'load', function ( event ) {
+
+						var contents = event.target.result;
+
+						var geometry = new THREE.MD2Loader().parse( contents );
+						geometry.name = filename;
+
+						var object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
+
+						editor.addObject( object );
+						editor.select( object );
+
+					}, false );
+					reader.readAsArrayBuffer( file );
+
+					break;
+
 			case 'obj':
 
 				var reader = new FileReader();

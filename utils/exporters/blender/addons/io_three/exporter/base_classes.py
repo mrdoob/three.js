@@ -14,6 +14,7 @@ class BaseClass(constants.BASE_DICT):
         self._parent = parent
 
         constants.BASE_DICT.update(self, self._defaults.copy())
+        BaseClass._defaults = {}
 
     def __setitem__(self, key, value):
         if not isinstance(value, constants.VALID_DATA_TYPES):

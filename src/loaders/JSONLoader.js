@@ -91,7 +91,7 @@ THREE.JSONLoader.prototype = {
 
 			offset, zLength,
 
-		colorIndex, normalIndex, uvIndex,
+		colorIndex, normalIndex, uvIndex, materialIndex,
 
 			type,
 			isQuad,
@@ -178,7 +178,9 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasMaterial ) {
 
-						offset ++;
+						materialIndex = faces[ offset ++ ];
+						faceA.materialIndex = materialIndex;
+						faceB.materialIndex = materialIndex;
 
 					}
 
@@ -285,7 +287,8 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasMaterial ) {
 
-						offset ++;
+						materialIndex = faces[ offset ++ ];
+						face.materialIndex = materialIndex;
 
 					}
 
@@ -440,7 +443,7 @@ THREE.JSONLoader.prototype = {
 					geometry.morphTargets[ i ].vertices = [];
 
 					dstVertices = geometry.morphTargets[ i ].vertices;
-					srcVertices = json.morphTargets [ i ].vertices;
+					srcVertices = json.morphTargets[ i ].vertices;
 
 					for ( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
 
@@ -468,7 +471,7 @@ THREE.JSONLoader.prototype = {
 					geometry.morphColors[ i ].colors = [];
 
 					dstColors = geometry.morphColors[ i ].colors;
-					srcColors = json.morphColors [ i ].colors;
+					srcColors = json.morphColors[ i ].colors;
 
 					for ( c = 0, cl = srcColors.length; c < cl; c += 3 ) {
 
