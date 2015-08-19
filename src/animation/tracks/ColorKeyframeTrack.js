@@ -15,28 +15,26 @@ THREE.ColorKeyframeTrack = function ( name, keys ) {
 
 };
 
-THREE.ColorKeyframeTrack.prototype = {
+THREE.ColorKeyframeTrack.prototype = Object.create( THREE.KeyframeTrack.prototype );
 
-	constructor: THREE.ColorKeyframeTrack,
+THREE.ColorKeyframeTrack.prototype.constructor = THREE.ColorKeyframeTrack;
 
-	setResult: function( value ) {
+THREE.ColorKeyframeTrack.prototype.setResult = function( value ) {
 
-		this.result.copy( value );
+	this.result.copy( value );
 
-	},
+};
 
-	// memoization of the lerp function for speed.
-	// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
-	lerpValues: function( value0, value1, alpha ) {
+// memoization of the lerp function for speed.
+// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
+THREE.ColorKeyframeTrack.prototype.lerpValues = function( value0, value1, alpha ) {
 
-		return value0.slerp( value1, alpha );
+	return value0.lerp( value1, alpha );
 
-	},
+};
 
-	compareValues: function( value0, value1 ) {
+THREE.ColorKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
 
-		return value0.equals( value1 );
-
-	}
+	return value0.equals( value1 );
 
 };

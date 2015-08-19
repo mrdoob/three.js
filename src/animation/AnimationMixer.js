@@ -156,7 +156,7 @@ THREE.AnimationMixer.prototype = {
 		keys.push( { time: this.time, value: 1 } );
 		keys.push( { time: this.time + duration, value: 0 } );
 		
-		action.weight = new THREE.KeyframeTrack( "weight", keys );
+		action.weight = new THREE.NumberKeyframeTrack( "weight", keys );
 	},
 
 	fadeIn: function( action, duration ) {
@@ -166,7 +166,7 @@ THREE.AnimationMixer.prototype = {
 		keys.push( { time: this.time, value: 0 } );
 		keys.push( { time: this.time + duration, value: 1 } );
 		
-		action.weight = new THREE.KeyframeTrack( "weight", keys );
+		action.weight = new THREE.NumberKeyframeTrack( "weight", keys );
 
 	},
 
@@ -177,7 +177,7 @@ THREE.AnimationMixer.prototype = {
 		keys.push( { time: this.time, value: startTimeScale } );
 		keys.push( { time: this.time + duration, value: endTimeScale } );
 		
-		action.timeScale = new THREE.KeyframeTrack( "timeScale", keys );
+		action.timeScale = new THREE.NumberKeyframeTrack( "timeScale", keys );
 
 	},
 

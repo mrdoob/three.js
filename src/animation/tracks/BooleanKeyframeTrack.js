@@ -15,28 +15,26 @@ THREE.BooleanKeyframeTrack = function ( name, keys ) {
 
 };
 
-THREE.BooleanKeyframeTrack.prototype = {
+THREE.BooleanKeyframeTrack.prototype = Object.create( THREE.KeyframeTrack.prototype );
 
-	constructor: THREE.BooleanKeyframeTrack,
+THREE.BooleanKeyframeTrack.prototype.constructor = THREE.BooleanKeyframeTrack;
 
-	setResult: function( value ) {
+THREE.BooleanKeyframeTrack.prototype.setResult = function( value ) {
 
-		this.result = value;
+	this.result = value;
 
-	},
+};
 
-	// memoization of the lerp function for speed.
-	// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
-	lerpValues: function( value0, value1, alpha ) {
+// memoization of the lerp function for speed.
+// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
+THREE.BooleanKeyframeTrack.prototype.lerpValues = function( value0, value1, alpha ) {
 
-		return ( alpha < 1.0 ) ? value0 : value1;
+	return ( alpha < 1.0 ) ? value0 : value1;
 
-	},
+};
 
-	compareValues: function( value0, value1 ) {
+THREE.BooleanKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
 
-		return ( value0 === value1 );
-
-	}
+	return ( value0 === value1 );
 
 };

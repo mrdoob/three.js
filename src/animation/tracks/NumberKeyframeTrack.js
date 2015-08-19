@@ -15,28 +15,26 @@ THREE.NumberKeyframeTrack = function ( name, keys ) {
 
 };
 
-THREE.NumberKeyframeTrack.prototype = {
+THREE.NumberKeyframeTrack.prototype = Object.create( THREE.KeyframeTrack.prototype );
 
-	constructor: THREE.NumberKeyframeTrack,
+THREE.NumberKeyframeTrack.prototype.constructor = THREE.NumberKeyframeTrack;
 
-	setResult: function( value ) {
+THREE.NumberKeyframeTrack.prototype.setResult = function( value ) {
 
-		this.result = value;
+	this.result = value;
 
-	},
+};
 
-	// memoization of the lerp function for speed.
-	// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
-	lerpValues: function( value0, value1, alpha ) {
+// memoization of the lerp function for speed.
+// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
+THREE.NumberKeyframeTrack.prototype.lerpValues = function( value0, value1, alpha ) {
 
-		return value0 * ( 1 - alpha ) + value1 * alpha;
+	return value0 * ( 1 - alpha ) + value1 * alpha;
 
-	},
+};
 
-	compareValues: function( value0, value1 ) {
+THREE.NumberKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
 
-		return ( value0 === value1 );
-
-	}
+	return ( value0 === value1 );
 
 };

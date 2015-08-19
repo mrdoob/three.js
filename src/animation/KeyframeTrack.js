@@ -64,43 +64,38 @@ THREE.KeyframeTrack.prototype = {
 		// linear interpolation to start with
 		var currentKey = this.keys[ this.lastIndex ];
 		var alpha = ( time - prevKey.time ) / ( currentKey.time - prevKey.time );
-		this.result = this.lerp( this.result, currentKey.value, alpha );
+		this.result = this.lerpValues( this.result, currentKey.value, alpha );
 
 		return this.result;
 
 	},
 
-	// required implementations:
-	setResult: function( value ) {
-
-		if( this.result.copy ) {
-
-			this.setResult = function( value ) {
-				this.result.copy( value );
+	// removes keyframes before and after animation without changing any values within the range [0,duration].
+	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
+ 	trim: function( duration ) {
+		
+		var firstKeysToRemove = 0;
+		for( var i = 1; i < this.keys.length; i ++ ) {
+			if( this.keys[i] <= 0 ) {
+				firstKeysToRemove ++;
 			}
-
 		}
-		else {
-
-			this.setResult = function( value ) {
-				this.result = value;
+ 
+		var lastKeysToRemove = 0;
+		for( var i = this.keys.length - 2; i > 0; i ++ ) {
+			if( this.keys[i] >= duration ) {
+				lastKeysToRemove ++;
 			}
-
+			else {
+				break;
+			}
 		}
-
-		this.setResult( value );
-
-	},
-
-	// memoization of the lerp function for speed.
-	// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
-	lerp: function( value0, value1, alpha ) {
-
-		this.lerp = THREE.AnimationUtils.getLerpFunc( value0, false );
-
-		return this.lerp( value0, value1, alpha );
-
-	},
+ 
+		// remove last keys first because it doesn't affect the position of the first keys (the otherway around doesn't work as easily)
+		if( ( firstKeysToRemove + lastKeysToRemove ) > 0 ) {
+			this.keys = this.keys.splice( firstKeysToRemove, this.keys.length - lastKeysToRemove - firstKeysToRemove );;
+		}
+	},	
 
 	// sort in ascending order
 	sort: function() {

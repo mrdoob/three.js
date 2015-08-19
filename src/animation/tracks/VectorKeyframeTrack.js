@@ -15,28 +15,26 @@ THREE.VectorKeyframeTrack = function ( name, keys ) {
 
 };
 
-THREE.VectorKeyframeTrack.prototype = {
+THREE.VectorKeyframeTrack.prototype = Object.create( THREE.KeyframeTrack.prototype );
 
-	constructor: THREE.VectorKeyframeTrack,
+THREE.VectorKeyframeTrack.prototype.constructor = THREE.VectorKeyframeTrack;
 
-	setResult: function( value ) {
+THREE.VectorKeyframeTrack.prototype.setResult = function( value ) {
 
-		this.result.copy( value );
+	this.result.copy( value );
 
-	},
+};
 
-	// memoization of the lerp function for speed.
-	// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
-	lerpValues: function( value0, value1, alpha ) {
+// memoization of the lerp function for speed.
+// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
+THREE.VectorKeyframeTrack.prototype.lerpValues = function( value0, value1, alpha ) {
 
-		return value0.slerp( value1, alpha );
+	return value0.lerp( value1, alpha );
 
-	},
+};
 
-	compareValues: function( value0, value1 ) {
+THREE.VectorKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
 
-		return value0.equals( value1 );
-
-	}
+	return value0.equals( value1 );
 
 };

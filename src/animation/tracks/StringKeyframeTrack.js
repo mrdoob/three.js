@@ -15,28 +15,26 @@ THREE.StringKeyframeTrack = function ( name, keys ) {
 
 };
 
-THREE.StringKeyframeTrack.prototype = {
+THREE.StringKeyframeTrack.prototype = Object.create( THREE.KeyframeTrack.prototype );
 
-	constructor: THREE.StringKeyframeTrack,
+THREE.StringKeyframeTrack.prototype.constructor = THREE.StringKeyframeTrack;
 
-	setResult: function( value ) {
+THREE.StringKeyframeTrack.prototype.setResult = function( value ) {
 
-		this.result = value;
+	this.result = value;
 
-	},
+};
 
-	// memoization of the lerp function for speed.
-	// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
-	lerpValues: function( value0, value1, alpha ) {
+// memoization of the lerp function for speed.
+// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
+THREE.StringKeyframeTrack.prototype.lerpValues = function( value0, value1, alpha ) {
 
-		return ( alpha < 1.0 ) ? value0 : value1;
+	return ( alpha < 1.0 ) ? value0 : value1;
 
-	},
+};
 
-	compareValues: function( value0, value1 ) {
+THREE.StringKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
 
-		return ( value0 === value1 );
-
-	}
+	return ( value0 === value1 );
 
 };
