@@ -35,6 +35,10 @@
 		this.minAzimuthAngle = - Infinity; // radians
 		this.maxAzimuthAngle = Infinity; // radians
 
+		// Set to true to disable damping (inertia)
+		this.staticMoving = false;
+		this.dynamicDampingFactor = 0.2;
+
 		////////////
 		// internals
 
@@ -249,8 +253,18 @@
 
 				this.object.lookAt( this.target );
 
-				thetaDelta = 0;
-				phiDelta = 0;
+				if ( this.staticMoving ) {
+
+					thetaDelta = 0;
+					phiDelta = 0;
+
+				} else {
+
+					thetaDelta *= ( 1 - this.dynamicDampingFactor );
+					phiDelta *= ( 1 - this.dynamicDampingFactor );
+
+				}
+
 				scale = 1;
 				panOffset.set( 0, 0, 0 );
 
@@ -946,6 +960,38 @@
 			set: function ( value ) {
 
 				this.constraint.maxAzimuthAngle = value;
+
+			}
+
+		},
+
+		staticMoving : {
+
+			get: function () {
+
+				return this.constraint.staticMoving;
+
+			},
+
+			set: function ( value ) {
+
+				this.constraint.staticMoving = value;
+
+			}
+
+		},
+
+		dynamicDampingFactor : {
+
+			get: function () {
+
+				return this.constraint.dynamicDampingFactor;
+
+			},
+
+			set: function ( value ) {
+
+				this.constraint.dynamicDampingFactor = value;
 
 			}
 
