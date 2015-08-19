@@ -198,9 +198,11 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function getWireframeAttribute( geometry ) {
 
-		if ( geometry._wireframe !== undefined ) {
+		var property = properties.get( geometry );
 
-			return geometry._wireframe;
+		if ( property.wireframe !== undefined ) {
+
+			return property.wireframe;
 
 		}
 
@@ -253,7 +255,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		updateAttribute( attribute, 'index' );
 
-		geometry._wireframe = attribute;
+		property.wireframe = attribute;
 
 		return attribute;
 
