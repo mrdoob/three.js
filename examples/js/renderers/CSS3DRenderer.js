@@ -225,7 +225,7 @@ THREE.CSS3DRenderer = function () {
 
 		}
 
-		scene.updateMatrixWorld();
+		scene.updateChildrenMatrixWorld();
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 

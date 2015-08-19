@@ -102,10 +102,6 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 	this.render = function ( scene, camera ) {
 
-		scene.updateMatrixWorld();
-
-		if ( camera.parent === null ) camera.updateMatrixWorld();
-
 		var hasCameraChanged = ( _aspect !== camera.aspect ) || ( _near !== camera.near ) || ( _far !== camera.far ) || ( _fov !== camera.fov );
 
 		if ( hasCameraChanged ) {
@@ -161,8 +157,6 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 		_cameraR.far = camera.far;
 
 		renderer.render( scene, _cameraR, _renderTargetR, true );
-
-		_scene.updateMatrixWorld();
 
 		renderer.render( _scene, _camera );
 

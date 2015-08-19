@@ -168,8 +168,6 @@
 			
 			if ( this.undeferred ) {
 				
-				this.updateObject( object );
-				
 				this.addDeferred( object, options );
 				
 			} else {
@@ -421,46 +419,6 @@
 				// add object to tree root
 				
 				this.root.addObject( objectData );
-				
-			}
-			
-		},
-		
-		updateObject: function ( object ) {
-			
-			var i, l,
-				parentCascade = [ object ],
-				parent,
-				parentUpdate;
-			
-			// search all parents between object and root for world matrix update
-			
-			parent = object.parent;
-			
-			while ( parent ) {
-				
-				parentCascade.push( parent );
-				parent = parent.parent;
-				
-			}
-			
-			for ( i = 0, l = parentCascade.length; i < l; i ++ ) {
-				
-				parent = parentCascade[ i ];
-				
-				if ( parent.matrixWorldNeedsUpdate === true ) {
-					
-					parentUpdate = parent;
-					
-				}
-				
-			}
-			
-			// update world matrix starting at uppermost parent that needs update
-			
-			if ( typeof parentUpdate !== 'undefined' ) {
-				
-				parentUpdate.updateMatrixWorld();
 				
 			}
 			

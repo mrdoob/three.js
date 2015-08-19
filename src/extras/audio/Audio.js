@@ -216,15 +216,15 @@ THREE.Audio.prototype.getVolume = function () {
 
 };
 
-THREE.Audio.prototype.updateMatrixWorld = ( function () {
+THREE.Audio.prototype._updateMatrixWorld = ( function () {
 
 	var position = new THREE.Vector3();
 
-	return function updateMatrixWorld( force ) {
+	return function _updateMatrixWorld( force ) {
 
 		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
 
-		position.setFromMatrixPosition( this.matrixWorld );
+		position.setFromMatrixPosition( this._matrixWorld );
 
 		this.panner.setPosition( position.x, position.y, position.z );
 

@@ -11,7 +11,7 @@ THREE.Gyroscope = function () {
 THREE.Gyroscope.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Gyroscope.prototype.constructor = THREE.Gyroscope;
 
-THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
+THREE.Gyroscope.prototype._updateMatrixWorld = ( function () {
 
 	var translationObject = new THREE.Vector3();
 	var quaternionObject = new THREE.Quaternion();
@@ -21,44 +21,42 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 	var quaternionWorld = new THREE.Quaternion();
 	var scaleWorld = new THREE.Vector3();
 
-	return function updateMatrixWorld( force ) {
+	return function _updateMatrixWorld( force ) {
 
-		this.matrixAutoUpdate && this.updateMatrix();
+		if ( this.matrixAutoUpdate === true ) {
 
-		// update matrixWorld
+            this.updateMatrix();
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
+        } else {
 
-			if ( this.parent !== null ) {
+            this._matrixWorldNeedsUpdate = true;
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+        } 
 
+        var parent = this.parent; 
+
+        if ( this._matrixWorldNeedsUpdate === true ) {
+
+            if ( parent === undefined ) {
+
+                this._matrixWorld.copy( this._matrix );             
+
+            } else {
+
+                this._matrixWorld.multiplyMatrices( parent._matrixWorld, this._matrix );
 				this.matrixWorld.decompose( translationWorld, quaternionWorld, scaleWorld );
 				this.matrix.decompose( translationObject, quaternionObject, scaleObject );
 
 				this.matrixWorld.compose( translationWorld, quaternionObject, scaleWorld );
+            }
+            
+            
 
+        }
 
-			} else {
+        this._matrixWorldNeedsUpdate = false;
 
-				this.matrixWorld.copy( this.matrix );
-
-			}
-
-
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
-
-		}
-
-		// update children
-
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-			this.children[ i ].updateMatrixWorld( force );
-
-		}
+        return this._matrixWorld;
 
 	};
 
