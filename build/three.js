@@ -24029,7 +24029,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		console.timeEnd( 'wireframe' );
 
-		var TypeArray = position.array.length > 65535 ? Uint32Array : Uint16Array;
+		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
 		var attribute = new THREE.BufferAttribute( new TypeArray( indices ), 1 );
 
 		updateAttribute( attribute, 'wireframe' );
@@ -24042,10 +24042,11 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function checkEdge( edges, a, b ) {
 
-		if ( edges[ a + '|' + b ] === true ) return false;
+		var hash = a < b ? a + '_' + b : b + '_' + a;
 
-		edges[ a + '|' + b ] = true;
-		edges[ b + '|' + a ] = true;
+		if ( edges.hasOwnProperty( hash ) ) return false;
+
+		edges[ hash ] = 1;
 
 		return true;
 
