@@ -23889,17 +23889,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function updateAttribute( attribute, name ) {
 
-		var bufferType;
-
-		if ( name === 'index' || name === 'wireframe' ) {
-
-			bufferType = gl.ELEMENT_ARRAY_BUFFER;
-
-		} else {
-
-			bufferType = gl.ARRAY_BUFFER;
-
-		}
+		var bufferType = name === 'index' ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
 
 		var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
@@ -23979,15 +23969,15 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function getWireframeAttribute( geometry ) {
 
-		var attributes = geometry.attributes;
+		if ( geometry._wireframe !== undefined ) {
 
-		if ( attributes.wireframe !== undefined ) {
-
-			return attributes.wireframe;
+			return geometry._wireframe;
 
 		}
 
 		var indices = [];
+
+		var attributes = geometry.attributes;
 
 		var index = attributes.index;
 		var position = attributes.position;
@@ -23999,7 +23989,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 			var edges = {};
 			var array = index.array;
 
-			for ( var i = 0, j = 0, l = array.length; i < l; i += 3 ) {
+			for ( var i = 0, l = array.length; i < l; i += 3 ) {
 
 				var a = array[ i + 0 ];
 				var b = array[ i + 1 ];
@@ -24015,7 +24005,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 			var array = position.array;
 
-			for ( var i = 0, j = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
+			for ( var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
 
 				var a = i + 0;
 				var b = i + 1;
@@ -24032,9 +24022,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
 		var attribute = new THREE.BufferAttribute( new TypeArray( indices ), 1 );
 
-		updateAttribute( attribute, 'wireframe' );
+		updateAttribute( attribute, 'index' );
 
-		geometry.addAttribute( 'wireframe', attribute );
+		geometry._wireframe = attribute;
 
 		return attribute;
 
