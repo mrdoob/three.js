@@ -113,14 +113,12 @@ var Loader = function ( editor ) {
 					var xml = parser.parseFromString( contents, 'text/xml' );
 
 					var loader = new THREE.ColladaLoader();
-					loader.parse( xml, function ( collada ) {
+					var collada = loader.parse( xml );
 
-						collada.scene.name = filename;
+					collada.scene.name = filename;
 
-						editor.addObject( collada.scene );
-						editor.select( collada.scene );
-
-					} );
+					editor.addObject( collada.scene );
+					editor.select( collada.scene );
 
 				}, false );
 				reader.readAsText( file );
