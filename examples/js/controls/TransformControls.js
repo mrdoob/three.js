@@ -615,6 +615,7 @@
 
 		domElement = ( domElement !== undefined ) ? domElement : document;
 
+		this.enabled = true;
 		this.object = undefined;
 		this.visible = false;
 		this.snap = null;
@@ -721,11 +722,31 @@
 
 		};
 
+		this.enable = function () {
+
+			this.enabled = true;
+			this.visible = true;
+			this.update();
+
+		};
+
+		this.disable = function () {
+
+			this.enabled = false;
+			this.visible = false;
+			this.axis = null;
+
+		};
+
 		this.attach = function ( object ) {
 
 			this.object = object;
-			this.visible = true;
-			this.update();
+			if (this.enabled) {
+
+				this.visible = true;
+				this.update();
+
+			}
 
 		};
 
@@ -774,7 +795,7 @@
 
 		this.update = function () {
 
-			if ( scope.object === undefined ) return;
+			if ( !scope.enabled || scope.object === undefined ) return;
 
 			scope.object.updateMatrixWorld();
 			worldPosition.setFromMatrixPosition( scope.object.matrixWorld );
@@ -806,7 +827,7 @@
 
 		function onPointerHover( event ) {
 
-			if ( scope.object === undefined || _dragging === true ) return;
+			if ( !scope.enabled || scope.object === undefined || _dragging === true ) return;
 
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
@@ -834,7 +855,7 @@
 
 		function onPointerDown( event ) {
 
-			if ( scope.object === undefined || _dragging === true ) return;
+			if ( !scope.enabled || scope.object === undefined || _dragging === true ) return;
 
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
@@ -884,7 +905,7 @@
 
 		function onPointerMove( event ) {
 
-			if ( scope.object === undefined || scope.axis === null || _dragging === false ) return;
+			if ( !scope.enabled || scope.object === undefined || scope.axis === null || _dragging === false ) return;
 
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
