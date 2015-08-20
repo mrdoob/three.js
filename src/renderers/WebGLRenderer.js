@@ -1309,23 +1309,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var material = object.material;
 
-					if ( material !== null && material.visible === true ) {
+					if ( material.visible === true ) {
 
 						if ( material instanceof THREE.MeshFaceMaterial ) {
-							for ( var i = 0, l = material.materials.length; i < l; i ++ ) {
-								if ( properties.get( material.materials[ i ] ) ) {
 
-									material.materials[ i ].program = properties.get( material.materials[ i ] ).program;
+							var materials = material.materials;
 
-								}
-							}
-						}
-						else {
-							if ( properties.get( material ) ) {
+							for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
-								material.program = properties.get( material ).program;
+								materials[ i ].program = properties.get( materials[ i ] ).program;
 
 							}
+
+						} else {
+
+							material.program = properties.get( material ).program;
+
 						}
 
 						if ( material.transparent ) {
