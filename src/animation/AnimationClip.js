@@ -10,7 +10,15 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 
 	this.name = name;
 	this.tracks = tracks;
-	this.duration = duration || 1;
+	this.duration = duration;
+
+	// this means it should figure out its duration by scanning the tracks
+	if( this.duration < 0 ) {
+		for( var i = 0; i < this.tracks.length; i ++ ) {
+			var track = this.tracks[i];
+			this.duration = Math.max( track.keys[ track.keys.length - 1 ].time );
+		}
+	}
 
 	// maybe only do these on demand, as doing them here could potentially slow down loading
 	// but leaving these here during development as this ensures a lot of testing of these functions
