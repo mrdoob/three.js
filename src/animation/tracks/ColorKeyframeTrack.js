@@ -38,3 +38,21 @@ THREE.ColorKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
 	return value0.equals( value1 );
 
 };
+
+THREE.ColorKeyframeTrack.parse = function( name, jsonKeys ) {
+
+	var keys = [];
+
+	for( var i = 0; i < jsonKeys.length; i ++ ) {
+		var jsonKey = jsonKeys[i];
+		var key = {
+			value: new THREE.Color().fromArray( jsonKey.value ),
+			time: jsonKey.time
+		};
+		keys.push( key );
+	}
+
+	return new THREE.ColorKeyframeTrack( name, keys );
+
+};
+ 

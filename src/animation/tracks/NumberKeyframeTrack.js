@@ -38,3 +38,10 @@ THREE.NumberKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
 	return ( value0 === value1 );
 
 };
+
+THREE.NumberKeyframeTrack.parse = function( name, jsonKeys ) {
+
+	return new THREE.NumberKeyframeTrack( name, jsonKeys );
+
+};
+ 
