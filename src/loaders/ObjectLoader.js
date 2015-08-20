@@ -633,13 +633,13 @@ THREE.ObjectLoader.prototype = {
 
 				if( dataTracks.quaternion ) {
 
-					object.tracks.add( THREE.QuaternionKeyframeTrack.parse( object.uuid + '.quaternion', dataTracks.position ) );
+					object.tracks.add( THREE.QuaternionKeyframeTrack.parse( object.uuid + '.quaternion', dataTracks.quaternion ) );
 
 				}
 
 				if( dataTracks.scale ) {
 
-					object.tracks.add( THREE.VectorKeyframeTrack.parse( object.uuid + '.scale', dataTracks.position ) );
+					object.tracks.add( THREE.VectorKeyframeTrack.parse( object.uuid + '.scale', dataTracks.scale ) );
 
 				}
 			}
