@@ -57,6 +57,7 @@ THREE.ObjectLoader.prototype = {
 
 		var textures  = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
+
 		var object = this.parseObject( json.object, geometries, materials );
 
 		if ( json.images === undefined || json.images.length === 0 ) {
@@ -616,6 +617,31 @@ THREE.ObjectLoader.prototype = {
 
 				}
 
+			}
+
+			if( data.animations ) {
+
+				var dataTracks = data.animations.tracks;
+
+				object.tracks = [];
+
+				if( dataTracks.position ) {
+
+					object.tracks.add( THREE.VectorKeyframeTrack.parse( object.uuid + '.position', dataTracks.position ) );
+
+				}
+
+				if( dataTracks.quaternion ) {
+
+					object.tracks.add( THREE.QuaternionKeyframeTrack.parse( object.uuid + '.quaternion', dataTracks.position ) );
+
+				}
+
+				if( dataTracks.scale ) {
+
+					object.tracks.add( THREE.VectorKeyframeTrack.parse( object.uuid + '.scale', dataTracks.position ) );
+
+				}
 			}
 
 			return object;
