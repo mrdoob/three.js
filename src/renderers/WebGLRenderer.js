@@ -1305,6 +1305,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( material !== null && material.visible === true ) {
 
+						if ( material instanceof THREE.MeshFaceMaterial ) {
+							for ( var i = 0, l = material.materials.length; i < l; i ++ ) {
+								if ( properties.get( material.materials[ i ] ) ) {
+
+									material.materials[ i ].program = properties.get( material.materials[ i ] ).program;
+
+								}
+							}
+						}
+
 						if ( properties.get( material ) ) {
 
 							material.program = properties.get( material ).program;
