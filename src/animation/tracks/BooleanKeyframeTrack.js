@@ -38,3 +38,10 @@ THREE.BooleanKeyframeTrack.prototype.compareValues = function( value0, value1 ) 
 	return ( value0 === value1 );
 
 };
+
+THREE.BooleanKeyframeTrack.parse = function( name, jsonKeys ) {
+
+	return new THREE.BooleanKeyframeTrack( name, jsonKeys );
+
+};
+ 

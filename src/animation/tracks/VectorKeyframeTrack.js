@@ -38,3 +38,24 @@ THREE.VectorKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
 	return value0.equals( value1 );
 
 };
+
+THREE.VectorKeyframeTrack.parse = function( name, jsonKeys ) {
+
+	var elementCount = jsonKeys[0].value.length;
+	var valueType = THREE[ 'Vector' + elementCount ];
+
+	var keys = [];
+
+	for( var i = 0; i < jsonKeys.length; i ++ ) {
+		var jsonKey = jsonKeys[i];
+		var key = {
+			value: new valueType().fromArray( jsonKey.value ),
+			time: jsonKey.time
+		};
+		keys.push( key );
+	}
+
+	return new THREE.VectorKeyframeTrack( name, keys );
+
+};
+ 
