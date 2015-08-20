@@ -58,7 +58,15 @@ THREE.ObjectLoader.prototype = {
 		var textures  = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
 
-		var object = this.parseObject( json.object, geometries, materials );
+		var tracks = [];
+
+		var object = this.parseObject( json.object, geometries, materials, tracks );
+
+		if( tracks.length > 0 ) {
+
+			object.animationClips = [ new THREE.AnimationClip( "default", -1, tracks ) ];
+
+		}
 
 		if ( json.images === undefined || json.images.length === 0 ) {
 
@@ -466,7 +474,7 @@ THREE.ObjectLoader.prototype = {
 
 		var matrix = new THREE.Matrix4();
 
-		return function ( data, geometries, materials ) {
+		return function ( data, geometries, materials, tracks ) {
 
 			var object;
 
@@ -623,23 +631,21 @@ THREE.ObjectLoader.prototype = {
 
 				var dataTracks = data.animations.tracks;
 
-				object.tracks = [];
-
 				if( dataTracks.position ) {
 
-					object.tracks.add( THREE.VectorKeyframeTrack.parse( object.uuid + '.position', dataTracks.position ) );
+					tracks.add( THREE.VectorKeyframeTrack.parse( object.uuid + '.position', dataTracks.position ) );
 
 				}
 
 				if( dataTracks.quaternion ) {
 
-					object.tracks.add( THREE.QuaternionKeyframeTrack.parse( object.uuid + '.quaternion', dataTracks.quaternion ) );
+					tracks.add( THREE.QuaternionKeyframeTrack.parse( object.uuid + '.quaternion', dataTracks.quaternion ) );
 
 				}
 
 				if( dataTracks.scale ) {
 
-					object.tracks.add( THREE.VectorKeyframeTrack.parse( object.uuid + '.scale', dataTracks.scale ) );
+					tracks.add( THREE.VectorKeyframeTrack.parse( object.uuid + '.scale', dataTracks.scale ) );
 
 				}
 			}
