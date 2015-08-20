@@ -1302,7 +1302,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var webglObject = objects.objects[ object.id ];
 
-				if ( webglObject && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+				if ( webglObject && ( object.frustumCulled === false || _frustum.intersectsGeometry( object.geometry, object._matrixWorld ) === true ) ) {
 
 					var material = object.material;
 
