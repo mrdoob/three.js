@@ -1314,11 +1314,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 								}
 							}
 						}
+						else {
+							if ( properties.get( material ) ) {
 
-						if ( properties.get( material ) ) {
+								material.program = properties.get( material ).program;
 
-							material.program = properties.get( material ).program;
-
+							}
 						}
 
 						if ( material.transparent ) {
