@@ -1098,9 +1098,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			return a.object.renderOrder - b.object.renderOrder;
 
-		} else if ( a.object.material.id !== b.object.material.id ) {
+		} else if ( a.material.id !== b.material.id ) {
 
-			return a.object.material.id - b.object.material.id;
+			return a.material.id - b.material.id;
 
 		} else if ( a.z !== b.z ) {
 
@@ -1299,6 +1299,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( material.visible === true ) {
 
+					if ( _this.sortObjects === true ) {
+
+						_vector3.setFromMatrixPosition( object.matrixWorld );
+						_vector3.applyProjection( _projScreenMatrix );
+
+					}
+
 					if ( material instanceof THREE.MeshFaceMaterial ) {
 
 						var materials = material.materials;
@@ -1315,16 +1322,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					if ( _this.sortObjects === true ) {
-
-						_vector3.setFromMatrixPosition( object.matrixWorld );
-						_vector3.applyProjection( _projScreenMatrix );
-
-					}
-
 					var renderItem = {
 						id: object.id,
 						object: object,
+						material: object.material,
 						z: _vector3.z
 					};
 
