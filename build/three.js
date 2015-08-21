@@ -7816,6 +7816,12 @@ THREE.Object3D = function () {
 		scale: {
 			enumerable: true,
 			value: scale
+		},
+		modelViewMatrix: {
+			value: new THREE.Matrix4()
+		},
+		normalMatrix: {
+			value: new THREE.Matrix3()
 		}
 	} );
 
@@ -21014,8 +21020,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var object = webglObject.object;
 			var geometry = objects.update( object );
 
-			object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-			object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
+			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 			if ( overrideMaterial === undefined ) material = object.material;
 
@@ -21055,8 +21061,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var object = renderList[ i ];
 
-			object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-			object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
+			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 			if ( overrideMaterial === undefined ) material = object.material;
 
@@ -21862,11 +21868,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsMatrices ( uniforms, object ) {
 
-		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrix.elements );
+		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object.modelViewMatrix.elements );
 
 		if ( uniforms.normalMatrix ) {
 
-			_gl.uniformMatrix3fv( uniforms.normalMatrix, false, object._normalMatrix.elements );
+			_gl.uniformMatrix3fv( uniforms.normalMatrix, false, object.normalMatrix.elements );
 
 		}
 
@@ -23838,9 +23844,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		delete object._modelViewMatrix;
-		delete object._normalMatrix;
-
 		properties.delete( object );
 
 	}
@@ -23856,8 +23859,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		if ( objectProperties.__webglInit === undefined ) {
 
 			objectProperties.__webglInit = true;
-			object._modelViewMatrix = new THREE.Matrix4();
-			object._normalMatrix = new THREE.Matrix3();
 
 			object.addEventListener( 'removed', onObjectRemoved );
 
@@ -24991,7 +24992,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			if ( material !== null && material.visible === true ) {
 
-				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+				object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 				_renderList.push( webglObject );
 
 			}
