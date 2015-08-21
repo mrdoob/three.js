@@ -9507,16 +9507,16 @@ THREE.Geometry.prototype = {
 
 		if ( indices !== undefined ) {
 
-			var drawcalls = geometry.drawcalls;
+			var groups = geometry.groups;
 
-			if ( drawcalls.length > 0 ) {
+			if ( groups.length > 0 ) {
 
-				for ( var i = 0; i < drawcalls.length; i ++ ) {
+				for ( var i = 0; i < groups.length; i ++ ) {
 
-					var drawcall = drawcalls[ i ];
+					var group = groups[ i ];
 
-					var start = drawcall.start;
-					var count = drawcall.count;
+					var start = group.start;
+					var count = group.count;
 
 					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
@@ -10482,6 +10482,8 @@ THREE.DirectGeometry = function () {
 	this.uvs2 = [];
 	this.tangents = [];
 
+	this.groups = [];
+
 	this.morphTargets = {};
 
 	this.skinWeights = [];
@@ -10530,7 +10532,6 @@ THREE.DirectGeometry.prototype = {
 
 	},
 
-
 	fromGeometry: function ( geometry ) {
 
 		var faces = geometry.faces;
@@ -10541,6 +10542,9 @@ THREE.DirectGeometry.prototype = {
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
 		var hasTangents = geometry.hasTangents;
+
+		var group;
+		var materialIndex;
 
 		// morphs
 
@@ -10588,7 +10592,7 @@ THREE.DirectGeometry.prototype = {
 
 		//
 
-		for ( var i = 0; i < faces.length; i ++ ) {
+		for ( var i = 0, i3 = 0; i < faces.length; i ++, i3 += 3 ) {
 
 			var face = faces[ i ];
 
@@ -10658,6 +10662,28 @@ THREE.DirectGeometry.prototype = {
 
 			}
 
+			// materials
+
+			if ( face.materialIndex !== materialIndex ) {
+
+				materialIndex = face.materialIndex;
+
+				if ( group !== undefined ) {
+
+					group.count = i3 - group.start;
+					this.groups.push( group );
+
+				}
+
+				group = {
+					start: i3,
+					materialIndex: materialIndex
+				};
+
+			}
+
+			// tangents
+
 			if ( hasTangents === true ) {
 
 				var vertexTangents = face.vertexTangents;
@@ -10710,6 +10736,15 @@ THREE.DirectGeometry.prototype = {
 
 		}
 
+		//
+
+		if ( group !== undefined ) {
+
+			group.count = i3 - group.start;
+			this.groups.push( group );
+
+		}
+
 		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
 		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
 		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
@@ -10750,7 +10785,7 @@ THREE.BufferGeometry = function () {
 
 	this.morphAttributes = {};
 
-	this.drawcalls = [];
+	this.groups = [];
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -10796,10 +10831,17 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	get drawcalls() {
+
+		console.error( 'THREE.BufferGeometry: .drawcalls has been renamed to .groups.' );
+		return this.groups;
+
+	},
+
 	get offsets() {
 
-		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .drawcalls.' );
-		return this.drawcalls;
+		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .groups.' );
+		return this.groups;
 
 	},
 
@@ -10811,18 +10853,33 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		this.drawcalls.push( {
-
-			start: start,
-			count: count
-
-		} );
+		console.warn( 'THREE.BufferGeometry: .addDrawCall() is now .addGroup().' );
+		this.addGroup( start, count );
 
 	},
 
 	clearDrawCalls: function () {
 
-		this.drawcalls = [];
+		console.warn( 'THREE.BufferGeometry: .clearDrawCalls() is now .clearGroups().' );
+		this.clearGroups();
+
+	},
+
+	addGroup: function ( start, count, materialIndex ) {
+
+		this.groups.push( {
+
+			start: start,
+			count: count,
+			materialIndex: materialIndex !== undefined ? materialIndex : 0
+
+		} );
+
+	},
+
+	clearGroups: function () {
+
+		this.groups = [];
 
 	},
 
@@ -11204,6 +11261,10 @@ THREE.BufferGeometry.prototype = {
 			this.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 		}
+
+		// groups
+
+		this.groups = geometry.groups;
 
 		// morphs
 
@@ -15844,17 +15905,17 @@ THREE.MeshNormalMaterial.prototype.copy = function ( source ) {
 
 };
 
-// File:src/materials/MeshFaceMaterial.js
+// File:src/materials/MultiMaterial.js
 
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MeshFaceMaterial = function ( materials ) {
+THREE.MultiMaterial = function ( materials ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
-	this.type = 'MeshFaceMaterial';
+	this.type = 'MultiMaterial';
 
 	this.materials = materials instanceof Array ? materials : [];
 
@@ -15862,9 +15923,9 @@ THREE.MeshFaceMaterial = function ( materials ) {
 
 };
 
-THREE.MeshFaceMaterial.prototype = {
+THREE.MultiMaterial.prototype = {
 
-	constructor: THREE.MeshFaceMaterial,
+	constructor: THREE.MultiMaterial,
 
 	toJSON: function () {
 
@@ -15908,6 +15969,10 @@ THREE.MeshFaceMaterial.prototype = {
 	}
 
 };
+
+// backwards compatibility
+
+THREE.MeshFaceMaterial = THREE.MultiMaterial;
 
 // File:src/materials/PointCloudMaterial.js
 
@@ -20334,7 +20399,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object ) {
+	this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object, group ) {
+
+		if ( material.visible === false ) return;
 
 		setMaterial( material );
 
@@ -20419,8 +20486,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		var groups = geometry.drawcalls;
-
 		var renderer;
 
 		if ( index !== undefined ) {
@@ -20446,7 +20511,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( groups.length === 0 ) {
+		if ( group === undefined ) {
 
 			var count;
 
@@ -20464,10 +20529,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			groups = [ {
+			group = {
 				start: 0,
 				count: count
-			} ];
+			};
 
 		}
 
@@ -20494,7 +20559,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				renderer.renderGroups( groups );
+				renderer.render( group.start, group.count );
 
 			}
 
@@ -20516,12 +20581,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			renderer.renderGroups( groups );
+			renderer.render( group.start, group.count );
 
 		} else if ( object instanceof THREE.PointCloud ) {
 
 			renderer.setMode( _gl.POINTS );
-			renderer.renderGroups( groups );
+			renderer.render( group.start, group.count );
 
 		}
 
@@ -20884,9 +20949,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var material = object.material;
 
-					if ( material !== null && material.visible === true ) {
+					if ( material.visible === true ) {
 
-						if ( properties.get( material ) ) {
+						if ( material instanceof THREE.MeshFaceMaterial ) {
+
+							var materials = material.materials;
+
+							for ( var i = 0, l = materials.length; i < l; i ++ ) {
+
+								materials[ i ].program = properties.get( materials[ i ] ).program;
+
+							}
+
+						} else {
 
 							material.program = properties.get( material ).program;
 
@@ -20946,15 +21021,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.MeshFaceMaterial ) {
 
+				var groups = geometry.groups;
 				var materials = material.materials;
 
-				for ( var j = 0, jl = materials.length; j < jl; j ++ ) {
+				for ( var j = 0, jl = groups.length; j < jl; j ++ ) {
 
-					material = materials[ j ];
+					var group = groups[ j ];
+					var groupMaterial = materials[ group.materialIndex ];
 
-					if ( material.visible ) {
+					if ( groupMaterial !== undefined ) {
 
-						_this.renderBufferDirect( camera, lights, fog, geometry, material, object );
+						_this.renderBufferDirect( camera, lights, fog, geometry, groupMaterial, object, group );
 
 					}
 
@@ -23453,17 +23530,6 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	}
 
-	function renderGroups( groups ) {
-
-		for ( var i = 0, il = groups.length; i < il; i ++ ) {
-
-			var group = groups[ i ];
-			render( group.start, group.count );
-
-		}
-
-	}
-
 	function renderInstances( geometry ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
@@ -23491,7 +23557,6 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	this.setMode = setMode;
 	this.render = render;
-	this.renderGroups = renderGroups;
 	this.renderInstances = renderInstances;
 
 };
@@ -23540,17 +23605,6 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	}
 
-	function renderGroups( groups ) {
-
-		for ( var i = 0, il = groups.length; i < il; i ++ ) {
-
-			var group = groups[ i ];
-			render( group.start, group.count );
-
-		}
-
-	}
-
 	function renderInstances( geometry ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
@@ -23571,7 +23625,6 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 	this.setMode = setMode;
 	this.setIndex = setIndex;
 	this.render = render;
-	this.renderGroups = renderGroups;
 	this.renderInstances = renderInstances;
 
 };
@@ -24845,15 +24898,17 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				if ( material instanceof THREE.MeshFaceMaterial ) {
 
+					var groups = geometry.groups;
 					var materials = material.materials;
 
-					for ( var k = 0, kl = materials.length; k < kl; k ++ ) {
+					for ( var j = 0, jl = groups.length; j < jl; j ++ ) {
 
-						material = materials[ k ];
+						var group = groups[ j ];
+						var groupMaterial = materials[ group.materialIndex ];
 
-						if ( material.visible ) {
+						if ( groupMaterial !== undefined ) {
 
-							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, material ), object );
+							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, groupMaterial ), object, group );
 
 						}
 
@@ -24916,6 +24971,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
+		depthMaterial.visible = material.visible;
 		depthMaterial.wireframe = material.wireframe;
 		depthMaterial.wireframeLinewidth = material.wireframeLinewidth;
 
