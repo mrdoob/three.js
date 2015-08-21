@@ -155,7 +155,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		var index = attributes.index;
 		var position = attributes.position;
 
-		console.time( 'wireframe' );
+		// console.time( 'wireframe' );
 
 		if ( index !== undefined ) {
 
@@ -190,7 +190,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		console.timeEnd( 'wireframe' );
+		// console.timeEnd( 'wireframe' );
 
 		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
 		var attribute = new THREE.IndexBufferAttribute( new TypeArray( indices ), 1 );
