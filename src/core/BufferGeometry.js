@@ -1125,7 +1125,7 @@ THREE.BufferGeometry.prototype = {
 
 			var group = groups[ i ];
 
-			this.addGorup( group.start, group.count );
+			this.addGroup( group.start, group.count );
 
 		}
 
