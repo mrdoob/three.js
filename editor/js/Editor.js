@@ -75,6 +75,8 @@ var Editor = function () {
 	this.loader = new Loader( this );
 
 	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 100000 );
+	this.camera.position.set( 500, 250, 500 );
+	this.camera.lookAt( new THREE.Vector3() );
 	this.camera.name = 'Camera';
 
 	this.scene = new THREE.Scene();
