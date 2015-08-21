@@ -20167,7 +20167,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		resetGLState();
 		setDefaultGLState();
 
-		objects.clear();
 		properties.clear();
 
 	};
@@ -20906,91 +20905,82 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object instanceof THREE.Scene || object instanceof THREE.Group ) {
+		if ( object instanceof THREE.Light ) {
 
-			// skip
+			lights.push( object );
 
-		} else {
+		} else if ( object instanceof THREE.Sprite ) {
 
-			// update Skeleton objects
+			sprites.push( object );
+
+		} else if ( object instanceof THREE.LensFlare ) {
+
+			lensFlares.push( object );
+
+		} else if ( object instanceof THREE.ImmediateRenderObject ) {
+
+			var material = object.material;
+
+			if ( material.transparent ) {
+
+				transparentImmediateObjects.push( object );
+
+			} else {
+
+				opaqueImmediateObjects.push( object );
+
+			}
+
+		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ){
+
 			if ( object instanceof THREE.SkinnedMesh ) {
 
 				object.skeleton.update();
 
 			}
 
-			objects.init( object );
-
-			if ( object instanceof THREE.Light ) {
-
-				lights.push( object );
-
-			} else if ( object instanceof THREE.Sprite ) {
-
-				sprites.push( object );
-
-			} else if ( object instanceof THREE.LensFlare ) {
-
-				lensFlares.push( object );
-
-			} else if ( object instanceof THREE.ImmediateRenderObject ) {
+			if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
 				var material = object.material;
 
-				if ( material.transparent ) {
+				if ( material.visible === true ) {
 
-					transparentImmediateObjects.push( object );
+					if ( material instanceof THREE.MeshFaceMaterial ) {
 
-				} else {
+						var materials = material.materials;
 
-					opaqueImmediateObjects.push( object );
+						for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
-				}
-
-			} else {
-
-				var webglObject = objects.objects[ object.id ];
-
-				if ( webglObject && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
-
-					var material = object.material;
-
-					if ( material.visible === true ) {
-
-						if ( material instanceof THREE.MeshFaceMaterial ) {
-
-							var materials = material.materials;
-
-							for ( var i = 0, l = materials.length; i < l; i ++ ) {
-
-								materials[ i ].program = properties.get( materials[ i ] ).program;
-
-							}
-
-						} else {
-
-							material.program = properties.get( material ).program;
+							materials[ i ].program = properties.get( materials[ i ] ).program;
 
 						}
 
-						if ( material.transparent ) {
+					} else {
 
-							transparentObjects.push( webglObject );
+						material.program = properties.get( material ).program;
 
-						} else {
+					}
 
-							opaqueObjects.push( webglObject );
+					if ( _this.sortObjects === true ) {
 
-						}
+						_vector3.setFromMatrixPosition( object.matrixWorld );
+						_vector3.applyProjection( _projScreenMatrix );
 
-						if ( _this.sortObjects === true ) {
+					}
 
-							_vector3.setFromMatrixPosition( object.matrixWorld );
-							_vector3.applyProjection( _projScreenMatrix );
+					var renderItem = {
+						id: object.id,
+						object: object,
+						z: _vector3.z
+					};
 
-							webglObject.z = _vector3.z;
+					if ( material.transparent ) {
 
-						}
+						transparentObjects.push( renderItem );
+
+					} else {
+
+						opaqueObjects.push( renderItem );
 
 					}
 
@@ -21016,8 +21006,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
-			var webglObject = renderList[ i ];
-			var object = webglObject.object;
+			var renderItem = renderList[ i ];
+			var object = renderItem.object;
 			var geometry = objects.update( object );
 
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
@@ -23815,72 +23805,9 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 THREE.WebGLObjects = function ( gl, properties, info ) {
 
-	var objects = {};
-
 	var geometries = new THREE.WebGLGeometries( gl, properties, info );
 
 	//
-
-	function onObjectRemoved( event ) {
-
-		var object = event.target;
-
-		object.traverse( function ( child ) {
-
-			child.removeEventListener( 'remove', onObjectRemoved );
-			removeObject( child );
-
-		} );
-
-	}
-
-	function removeObject( object ) {
-
-		if ( object instanceof THREE.Mesh ||
-			 object instanceof THREE.PointCloud ||
-			 object instanceof THREE.Line ) {
-
-			delete objects[ object.id ];
-
-		}
-
-		properties.delete( object );
-
-	}
-
-	//
-
-	this.objects = objects;
-
-	this.init = function ( object ) {
-
-		var objectProperties = properties.get( object );
-
-		if ( objectProperties.__webglInit === undefined ) {
-
-			objectProperties.__webglInit = true;
-
-			object.addEventListener( 'removed', onObjectRemoved );
-
-		}
-
-		if ( objectProperties.__webglActive === undefined ) {
-
-			objectProperties.__webglActive = true;
-
-			if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
-
-				objects[ object.id ] = {
-					id: object.id,
-					object: object,
-					z: 0
-				};
-
-			}
-
-		}
-
-	};
 
 	function update( object ) {
 
@@ -24029,7 +23956,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		var index = attributes.index;
 		var position = attributes.position;
 
-		console.time( 'wireframe' );
+		// console.time( 'wireframe' );
 
 		if ( index !== undefined ) {
 
@@ -24064,7 +23991,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		console.timeEnd( 'wireframe' );
+		// console.timeEnd( 'wireframe' );
 
 		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
 		var attribute = new THREE.IndexBufferAttribute( new TypeArray( indices ), 1 );
@@ -24093,12 +24020,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 	this.getWireframeAttribute = getWireframeAttribute;
 
 	this.update = update;
-
-	this.clear = function () {
-
-		objects = {};
-
-	};
 
 };
 
@@ -24887,15 +24808,11 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			// render regular objects
 
-			var webglObject, object, geometry, material;
-
 			for ( var j = 0, jl = _renderList.length; j < jl; j ++ ) {
 
-				webglObject = _renderList[ j ];
-
-				object = webglObject.object;
-				geometry = _objects.update( object );
-				material = object.material;
+				var object = _renderList[ j ];
+				var geometry = _objects.update( object );
+				var material = object.material;
 
 				if ( material instanceof THREE.MeshFaceMaterial ) {
 
@@ -24984,16 +24901,18 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		if ( object.visible === false ) return;
 
-		var webglObject = _objects.objects[ object.id ];
+		if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
 
-		if ( webglObject && object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+			if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-			var material = object.material;
+				var material = object.material;
 
-			if ( material !== null && material.visible === true ) {
+				if ( material.visible === true ) {
 
-				object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-				_renderList.push( webglObject );
+					object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+					_renderList.push( object );
+
+				}
 
 			}
 
@@ -26185,8 +26104,8 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 			var sprite = sprites[ i ];
 
-			sprite._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
-			sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
+			sprite.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
+			sprite.z = - sprite.modelViewMatrix.elements[ 14 ];
 
 		}
 
@@ -26202,7 +26121,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			var material = sprite.material;
 
 			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
-			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
+			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix.elements );
 
 			sprite.matrixWorld.decompose( spritePosition, spriteRotation, spriteScale );
 
@@ -35149,9 +35068,6 @@ THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 	//
 
 	this.matrixAutoUpdate = false;
-
-	this.normalMatrix = new THREE.Matrix3();
-
 	this.update();
 
 };
@@ -35163,12 +35079,13 @@ THREE.FaceNormalsHelper.prototype.update = ( function () {
 
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
+	var normalMatrix = new THREE.Matrix3();
 
 	return function update() {
 
 		this.object.updateMatrixWorld( true );
 
-		this.normalMatrix.getNormalMatrix( this.object.matrixWorld );
+		normalMatrix.getNormalMatrix( this.object.matrixWorld );
 
 		var matrixWorld = this.object.matrixWorld;
 
@@ -35196,7 +35113,7 @@ THREE.FaceNormalsHelper.prototype.update = ( function () {
 				.divideScalar( 3 )
 				.applyMatrix4( matrixWorld );
 
-			v2.copy( normal ).applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
+			v2.copy( normal ).applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
 
 			position.setXYZ( idx, v1.x, v1.y, v1.z );
 
@@ -35613,8 +35530,6 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	this.matrixAutoUpdate = false;
 
-	this.normalMatrix = new THREE.Matrix3();
-
 	this.update();
 
 };
@@ -35626,6 +35541,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
+	var normalMatrix = new THREE.Matrix3();
 
 	return function update() {
 
@@ -35633,7 +35549,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 		this.object.updateMatrixWorld( true );
 
-		this.normalMatrix.getNormalMatrix( this.object.matrixWorld );
+		normalMatrix.getNormalMatrix( this.object.matrixWorld );
 
 		var matrixWorld = this.object.matrixWorld;
 
@@ -35663,7 +35579,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 					v1.copy( vertex ).applyMatrix4( matrixWorld );
 
-					v2.copy( normal ).applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
+					v2.copy( normal ).applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
 
 					position.setXYZ( idx, v1.x, v1.y, v1.z );
 
@@ -35693,7 +35609,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 				v2.set( objNorm.getX( j ), objNorm.getY( j ), objNorm.getZ( j ) );
 
-				v2.applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
+				v2.applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
 
 				position.setXYZ( idx, v1.x, v1.y, v1.z );
 
