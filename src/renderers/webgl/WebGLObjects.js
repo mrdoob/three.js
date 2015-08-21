@@ -33,9 +33,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		delete object._modelViewMatrix;
-		delete object._normalMatrix;
-
 		properties.delete( object );
 
 	}
@@ -51,8 +48,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		if ( objectProperties.__webglInit === undefined ) {
 
 			objectProperties.__webglInit = true;
-			object._modelViewMatrix = new THREE.Matrix4();
-			object._normalMatrix = new THREE.Matrix3();
 
 			object.addEventListener( 'removed', onObjectRemoved );
 
