@@ -759,7 +759,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object ) {
+	this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object, group ) {
+
+		if ( material.visible === false ) return;
 
 		setMaterial( material );
 
@@ -844,8 +846,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		var groups = geometry.drawcalls;
-
 		var renderer;
 
 		if ( index !== undefined ) {
@@ -871,7 +871,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( groups.length === 0 ) {
+		if ( group === undefined ) {
 
 			var count;
 
@@ -889,10 +889,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			groups = [ {
+			group = {
 				start: 0,
 				count: count
-			} ];
+			};
 
 		}
 
@@ -919,7 +919,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				renderer.renderGroups( groups );
+				renderer.render( group.start, group.count );
 
 			}
 
@@ -941,12 +941,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			renderer.renderGroups( groups );
+			renderer.render( group.start, group.count );
 
 		} else if ( object instanceof THREE.PointCloud ) {
 
 			renderer.setMode( _gl.POINTS );
-			renderer.renderGroups( groups );
+			renderer.render( group.start, group.count );
 
 		}
 
@@ -1381,15 +1381,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.MeshFaceMaterial ) {
 
+				var groups = geometry.groups;
 				var materials = material.materials;
 
-				for ( var j = 0, jl = materials.length; j < jl; j ++ ) {
+				for ( var j = 0, jl = groups.length; j < jl; j ++ ) {
 
-					material = materials[ j ];
+					var group = groups[ j ];
+					var groupMaterial = materials[ group.materialIndex ];
 
-					if ( material.visible ) {
+					if ( groupMaterial !== undefined ) {
 
-						_this.renderBufferDirect( camera, lights, fog, geometry, material, object );
+						_this.renderBufferDirect( camera, lights, fog, geometry, groupMaterial, object, group );
 
 					}
 

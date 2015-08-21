@@ -16,7 +16,7 @@ THREE.BufferGeometry = function () {
 
 	this.morphAttributes = {};
 
-	this.drawcalls = [];
+	this.groups = [];
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -62,10 +62,17 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	get drawcalls() {
+
+		console.error( 'THREE.BufferGeometry: .drawcalls has been renamed to .groups.' );
+		return this.groups;
+
+	},
+
 	get offsets() {
 
-		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .drawcalls.' );
-		return this.drawcalls;
+		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .groups.' );
+		return this.groups;
 
 	},
 
@@ -77,18 +84,33 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		this.drawcalls.push( {
-
-			start: start,
-			count: count
-
-		} );
+		console.warn( 'THREE.BufferGeometry: .addDrawCall() is now .addGroup().' );
+		this.addGroup( start, count );
 
 	},
 
 	clearDrawCalls: function () {
 
-		this.drawcalls = [];
+		console.warn( 'THREE.BufferGeometry: .clearDrawCalls() is now .clearGroups().' );
+		this.clearGroups();
+
+	},
+
+	addGroup: function ( start, count, materialIndex ) {
+
+		this.groups.push( {
+
+			start: start,
+			count: count,
+			materialIndex: materialIndex !== undefined ? materialIndex : 0
+
+		} );
+
+	},
+
+	clearGroups: function () {
+
+		this.groups = [];
 
 	},
 
@@ -470,6 +492,10 @@ THREE.BufferGeometry.prototype = {
 			this.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 		}
+
+		// groups
+
+		this.groups = geometry.groups;
 
 		// morphs
 

@@ -210,15 +210,17 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				if ( material instanceof THREE.MeshFaceMaterial ) {
 
+					var groups = geometry.groups;
 					var materials = material.materials;
 
-					for ( var k = 0, kl = materials.length; k < kl; k ++ ) {
+					for ( var j = 0, jl = groups.length; j < jl; j ++ ) {
 
-						material = materials[ k ];
+						var group = groups[ j ];
+						var groupMaterial = materials[ group.materialIndex ];
 
-						if ( material.visible ) {
+						if ( groupMaterial !== undefined ) {
 
-							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, material ), object );
+							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, groupMaterial ), object, group );
 
 						}
 
@@ -281,6 +283,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
+		depthMaterial.visible = material.visible;
 		depthMaterial.wireframe = material.wireframe;
 		depthMaterial.wireframeLinewidth = material.wireframeLinewidth;
 

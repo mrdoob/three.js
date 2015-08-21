@@ -19,6 +19,8 @@ THREE.DirectGeometry = function () {
 	this.uvs2 = [];
 	this.tangents = [];
 
+	this.groups = [];
+
 	this.morphTargets = {};
 
 	this.skinWeights = [];
@@ -67,7 +69,6 @@ THREE.DirectGeometry.prototype = {
 
 	},
 
-
 	fromGeometry: function ( geometry ) {
 
 		var faces = geometry.faces;
@@ -78,6 +79,9 @@ THREE.DirectGeometry.prototype = {
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
 		var hasTangents = geometry.hasTangents;
+
+		var group;
+		var materialIndex;
 
 		// morphs
 
@@ -125,7 +129,7 @@ THREE.DirectGeometry.prototype = {
 
 		//
 
-		for ( var i = 0; i < faces.length; i ++ ) {
+		for ( var i = 0, i3 = 0; i < faces.length; i ++, i3 += 3 ) {
 
 			var face = faces[ i ];
 
@@ -195,6 +199,28 @@ THREE.DirectGeometry.prototype = {
 
 			}
 
+			// materials
+
+			if ( face.materialIndex !== materialIndex ) {
+
+				materialIndex = face.materialIndex;
+
+				if ( group !== undefined ) {
+
+					group.count = i3 - group.start;
+					this.groups.push( group );
+
+				}
+
+				group = {
+					start: i3,
+					materialIndex: materialIndex
+				};
+
+			}
+
+			// tangents
+
 			if ( hasTangents === true ) {
 
 				var vertexTangents = face.vertexTangents;
@@ -244,6 +270,15 @@ THREE.DirectGeometry.prototype = {
 				this.skinWeights.push( skinWeights[ face.a ], skinWeights[ face.b ], skinWeights[ face.c ] );
 
 			}
+
+		}
+
+		//
+
+		if ( group !== undefined ) {
+
+			group.count = i3 - group.start;
+			this.groups.push( group );
 
 		}
 
