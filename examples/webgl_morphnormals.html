@@ -26,6 +26,7 @@
 		<script src="../build/three.min.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/AnimationClipCreator.js"></script>
 
 		<script>
 
@@ -37,7 +38,7 @@
 			var container, stats;
 			var camera, scene1, scene2, renderer;
 
-			var morphs = [];
+			var mixers = [];
 			var clock = new THREE.Clock();
 
 			init();
@@ -93,15 +94,19 @@
 					morphColorsToFaceColors( geometry );
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, morphTargets: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
-					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 
-					meshAnim.duration = 5000;
+					mesh.scale.set( 1.5, 1.5, 1.5 );
+					mesh.position.y = 150;
 
-					meshAnim.scale.set( 1.5, 1.5, 1.5 );
-					meshAnim.position.y = 150;
+					scene1.add( mesh );
 
-					scene1.add( meshAnim );
-					morphs.push( meshAnim );
+					var mixer = new THREE.AnimationMixer( mesh );
+
+					var clipMorphTargets = THREE.AnimationClipCreator.CreateMorphAnimation( geometry.morphTargets, 5.0 );
+					mixer.addAction( new THREE.AnimationAction( clipMorphTargets, 0, 1, 1, true ) );
+
+					mixers.push( mixer );
 
 				} );
 
@@ -111,15 +116,19 @@
 					geometry.computeMorphNormals();
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading } );
-					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 
-					meshAnim.duration = 5000;
+					mesh.scale.set( 1.5, 1.5, 1.5 );
+					mesh.position.y = 150;
 
-					meshAnim.scale.set( 1.5, 1.5, 1.5 );
-					meshAnim.position.y = 150;
+					scene2.add( mesh );
+					
+					var mixer = new THREE.AnimationMixer( mesh );
 
-					scene2.add( meshAnim );
-					morphs.push( meshAnim );
+					var clipMorphTargets = THREE.AnimationClipCreator.CreateMorphAnimation( geometry.morphTargets, 5.0 );
+					mixer.addAction( new THREE.AnimationAction( clipMorphTargets, 0, 1, 1, true ) );
+
+					mixers.push( mixer );
 
 				} );
 
@@ -203,11 +212,18 @@
 				camera.lookAt( camera.target );
 
 				var delta = clock.getDelta();
-
+/*
 				for ( var i = 0; i < morphs.length; i ++ ) {
 
 					morph = morphs[ i ];
 					morph.updateAnimation( 1000 * delta );
+
+				}*/
+
+
+				for( var i = 0; i < mixers.length; i ++ ) {
+
+					mixers[i].update( delta );
 
 				}
 
