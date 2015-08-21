@@ -227,7 +227,7 @@
 
 					geometry.computeMorphNormals();
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x333333, shininess: 20, wrapAround: true, morphTargets: true, morphNormals: true, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x333333, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
 					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
 
 					meshAnim.duration = 3000;
@@ -259,9 +259,6 @@
 						originalMaterial.color.setHSL( 0.01, 0.3, 0.3 );
 						originalMaterial.specular.setHSL( 0, 0, 0.1 );
 						originalMaterial.shininess = 75;
-
-						originalMaterial.wrapAround = true;
-						originalMaterial.wrapRGB.set( 1, 0.5, 0.5 );
 
 					}
 

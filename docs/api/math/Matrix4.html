@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -71,12 +72,12 @@
 		Copies the translation component of the supplied matrix *m* into this matrix translation component.
 		</div>
 
-		<h3>[method:Matrix4 makeBasis]( [page:Vector3 xAxis], [page:Vector3 zAxis], [page:Vector3 zAxis] ) [page:Matrix4 this]</h3>
+		<h3>[method:Matrix4 makeBasis]( [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] ) [page:Matrix4 this]</h3>
 		<div>
 		Creates the basis matrix consisting of the three provided axis vectors.  Returns the current matrix.
 		</div>
 
-		<h3>[method:Matrix4 extractBasis]( [page:Vector3 xAxis], [page:Vector3 zAxis], [page:Vector3 zAxis] ) [page:Matrix4 this]</h3>
+		<h3>[method:Matrix4 extractBasis]( [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] ) [page:Matrix4 this]</h3>
 		<div>
 		Extracts basis of into the three axis vectors provided.  Returns the current matrix.
 		</div>

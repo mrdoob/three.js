@@ -103,7 +103,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		}
 
-		return function ( rayOrigin, rayDirection, outputColor, recursionDepth ) {
+		return function spawnRay( rayOrigin, rayDirection, outputColor, recursionDepth ) {
 
 			var ray = raycaster.ray;
 
@@ -302,7 +302,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 					var eta = material.refractionRatio;
 
-					var dotNI = rayDirection.dot( normalVector )
+					var dotNI = rayDirection.dot( normalVector );
 					var k = 1.0 - eta * eta * ( 1.0 - dotNI * dotNI );
 
 					if ( k < 0.0 ) {
@@ -355,7 +355,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 		var tmpVec2 = new THREE.Vector3();
 		var tmpVec3 = new THREE.Vector3();
 
-		return function ( outputVector, point, shading, face, vertices ) {
+		return function computePixelNormal( outputVector, point, shading, face, vertices ) {
 
 			var faceNormal = face.normal;
 			var vertexNormals = face.vertexNormals;
@@ -424,7 +424,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		var pixelColor = new THREE.Color();
 
-		return function ( blockX, blockY ) {
+		return function renderBlock( blockX, blockY ) {
 
 			var index = 0;
 
@@ -493,7 +493,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		// update camera matrices
 
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 		cameraPosition.setFromMatrixPosition( camera.matrixWorld );
@@ -528,7 +528,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 			}
 
-			modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld )
+			modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 
 			var _object = cache[ object.id ];
 
@@ -543,4 +543,4 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 };
 
-THREE.EventDispatcher.prototype.apply(THREE.RaytracingRenderer.prototype);
+THREE.EventDispatcher.prototype.apply( THREE.RaytracingRenderer.prototype );

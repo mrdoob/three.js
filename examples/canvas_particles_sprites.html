@@ -12,7 +12,7 @@
 			}
 
 			a {
-				color:#0078ff;
+				color: #0078ff;
 			}
 		</style>
 	</head>
@@ -49,7 +49,7 @@
 				scene = new THREE.Scene();
 
 				var material = new THREE.SpriteMaterial( {
-					map: new THREE.Texture( generateSprite() ),
+					map: new THREE.CanvasTexture( generateSprite() ),
 					blending: THREE.AdditiveBlending
 				} );
 
@@ -120,7 +120,7 @@
 				var particle = this instanceof THREE.Sprite ? this : particle;
 				var delay = delay !== undefined ? delay : 0;
 
-				particle.position.set( 0, 0, 0 )
+				particle.position.set( 0, 0, 0 );
 				particle.scale.x = particle.scale.y = Math.random() * 32 + 16;
 
 				new TWEEN.Tween( particle )
@@ -136,7 +136,7 @@
 
 				new TWEEN.Tween( particle.scale )
 					.delay( delay )
-					.to( { x: 0, y: 0 }, 10000 )
+					.to( { x: 0.01, y: 0.01 }, 10000 )
 					.start();
 
 			}

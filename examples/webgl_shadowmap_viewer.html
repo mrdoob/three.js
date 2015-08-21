@@ -163,8 +163,8 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000 );
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapType = THREE.BasicShadowMap;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.BasicShadowMap;
 
 				// Mouse control
 				controls = new THREE.OrbitControls( camera, renderer.domElement );

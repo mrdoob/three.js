@@ -101,9 +101,12 @@
 				xc.fillStyle = "#555";
 				xc.fillRect(96, 96, 32, 32);
 
-				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
-				xm.map.needsUpdate = true;
-				xm.map.repeat.set( 10, 10 );
+				var texture = new THREE.CanvasTexture( x );
+				texture.repeat.set( 10, 10 );
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+
+				var xm = new THREE.MeshBasicMaterial( { map: texture } );
 
 				geometry = new THREE.PlaneBufferGeometry( 100, 100, 15, 10 );
 
@@ -249,8 +252,7 @@
 					xc.font = "50pt arial bold";
 					xc.fillText( i, 10, 64 );
 
-					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ), transparent: true } );
-					xm.map.needsUpdate = true;
+					var xm = new THREE.MeshBasicMaterial( { map: new THREE.CanvasTexture( x ), transparent: true } );
 
 					mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( size, size ), xm );
 					mesh.position.x = i * ( size + 5 ) - ( ( materials.length - 1 )* ( size + 5 )/2);

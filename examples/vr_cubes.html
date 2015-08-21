@@ -43,12 +43,10 @@
 	</head>
 	<body>
 		<div class="menu">
-			<div class="button mouse-look">Enable Mouse Look</div>
 			<div class="button full-screen">Start VR Mode</div>
 		</div>
 
 		<script src="../build/three.min.js"></script>
-		<script src="js/controls/MouseControls.js"></script>
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -59,11 +57,11 @@
 			var camera, scene, raycaster, renderer;
 			var vrEffect;
 			var vrControls;
-			var mouseControls;
-			var headControls;
 
-			var mouse = new THREE.Vector2(), INTERSECTED;
+			var cubes = [];
+			var INTERSECTED;
 			var radius = 100, theta = 0;
+			var crosshair;
 
 			init();
 			animate();
@@ -84,6 +82,16 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				scene = new THREE.Scene();
+
+				crosshair = new THREE.Mesh(
+					new THREE.RingGeometry( 0.5, 1, 32 ),
+					new THREE.MeshBasicMaterial( {
+						color: 0x00bb00,
+						transparent: true,
+						opacity: 0.5
+					} )
+				);
+				scene.add( crosshair );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 ).normalize();
@@ -108,6 +116,7 @@
 					object.scale.z = Math.random() + 0.5;
 
 					scene.add( object );
+					cubes.push( object );
 
 				}
 
@@ -117,36 +126,27 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 
 				var fullScreenButton = document.querySelector( '.full-screen' );
-				var mouseLookButton = document.querySelector( '.mouse-look' );
-				var mouseLook = false;
+
+				if ( navigator.getVRDevices === undefined ) {
+
+					fullScreenButton.innerHTML = 'Your browser doesn\'t support WebVR';
+					fullScreenButton.classList.add('error');
+
+				}
+
+				vrControls = new THREE.VRControls( camera );
+				vrEffect = new THREE.VREffect( renderer, function ( error ) {
+
+					fullScreenButton.innerHTML = error;
+					fullScreenButton.classList.add('error');
+
+				} );
 
 				fullScreenButton.onclick = function() {
+
 					vrEffect.setFullScreen( true );
+
 				};
-
-				vrControls = new THREE.VRControls(camera);
-				mouseControls = new THREE.MouseControls(camera);
-				headControls = vrControls;
-
-				mouseLookButton.onclick = function() {
-					mouseLook = !mouseLook;
-
-					if (mouseLook) {
-						headControls = mouseControls;
-						mouseLookButton.classList.add('enabled');
-					} else {
-						headControls = vrControls;
-						mouseLookButton.classList.remove('enabled');
-					}
-				}
-
-				vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
-				function VREffectLoaded(error) {
-					if (error) {
-						fullScreenButton.innerHTML = error;
-						fullScreenButton.classList.add('error');
-					}
-				}
 
 				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -157,8 +157,6 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 				//
 
@@ -175,15 +173,6 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
-
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-			}
-
 			//
 
 			function animate() {
@@ -197,20 +186,11 @@
 
 			function render() {
 
-				theta += 0.1;
-
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
-				camera.lookAt( scene.position );
-
-				camera.updateMatrixWorld();
-
 				// find intersections
 
-				raycaster.setFromCamera( mouse, camera );
+				raycaster.setFromCamera( { x: 0, y: 0 }, camera );
 
-				var intersects = raycaster.intersectObjects( scene.children );
+				var intersects = raycaster.intersectObjects( cubes );
 
 				if ( intersects.length > 0 ) {
 
@@ -232,7 +212,25 @@
 
 				}
 
-				headControls.update();
+				vrControls.update();
+
+				crosshair.quaternion.copy( camera.quaternion );
+				crosshair.position.set( 0, 0, 0 );
+
+				if ( INTERSECTED ) {
+
+					crosshair.translateZ(
+						-scene.position.distanceTo( INTERSECTED.position ) +
+						INTERSECTED.geometry.boundingSphere.radius + 5
+					);
+
+				}
+				else {
+
+					crosshair.translateZ(-40);
+
+				}
+
 				vrEffect.render( scene, camera );
 
 			}

@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr; [page:Light] &rarr;
@@ -17,39 +18,52 @@
 
 
 		<h2>Example</h2>
+		<div>[example:webgl_interactive_cubes_gpu interactive / cubes / gpu ]</div>
+		<div>[example:webgl_interactive_draggablecubes interactive / draggablecubes ]</div>
+		<div>[example:webgl_materials_bumpmap_skin materials / bumpmap / skin ]</div>
+		<div>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</div>
+		<div>[example:webgl_morphtargets_md2 morphtargets / md2 ]</div>
+		<div>[example:webgl_shading_physical shading / physical ]</div>
+		
+		<code>
+		// white spotlight shining from the side, casting shadow
 
-		<code>// white spotlight shining from the side, casting shadow
+		var spotLight = new THREE.SpotLight( 0xffffff );
+		spotLight.position.set( 100, 1000, 100 );
 
-var spotLight = new THREE.SpotLight( 0xffffff );
-spotLight.position.set( 100, 1000, 100 );
+		spotLight.castShadow = true;
 
-spotLight.castShadow = true;
+		spotLight.shadowMapWidth = 1024;
+		spotLight.shadowMapHeight = 1024;
 
-spotLight.shadowMapWidth = 1024;
-spotLight.shadowMapHeight = 1024;
+		spotLight.shadowCameraNear = 500;
+		spotLight.shadowCameraFar = 4000;
+		spotLight.shadowCameraFov = 30;
 
-spotLight.shadowCameraNear = 500;
-spotLight.shadowCameraFar = 4000;
-spotLight.shadowCameraFov = 30;
+		scene.add( spotLight );
+		</code>
 
-scene.add( spotLight );</code>
+		<div>
+		[example:webgl_materials_bumpmap materials / bumpmap]<br/>
+		[example:webgl_shading_physical shading / physical]<br/>
+		[example:webgl_shadowmap shadowmap]<br/>
+		[example:webgl_shadowmap_viewer shadowmap / performance]<br/>
+		[example:webgl_shadowmap_viewer shadowmap / viewer]
+		</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Integer hex], [page:Float intensity], [page:todo distance], [page:todo angle], [page:todo exponent])</h3>
+		<h3>[name]([page:Integer hex], [page:Float intensity], [page:Float distance], [page:Radians angle], [page:Float exponent], [page:Float decay])</h3>
 		<div>
 		[page:Integer hex] — Numeric value of the RGB component of the color. <br />
 		[page:Float intensity] — Numeric value of the light's strength/intensity. <br />
-		distance -- Maximum distance from origin where light will shine whose intensity is attenuated linearly based on distance from origin. <br />
-		angle -- Maximum angle of light dispersion from its direction whose upper bound is Math.PI/2.  <br />
-		exponent -- todo
+		[page:Float distance] -- Maximum distance from origin where light will shine whose intensity is attenuated linearly based on distance from origin. <br />
+		[page:Radians angle] -- Maximum angle of light dispersion from its direction whose upper bound is Math.PI/2.<br />
+		[page:Float exponent] -- Rapidity of the falloff of light from its target direction.<br />
+		[page:Float decay] -- The amount the light dims along the distance of the light.
 		</div>
-		<div>
-		todo
-		</div>
-		
 
 		<h2>Properties</h2>
 
@@ -79,8 +93,15 @@ scene.add( spotLight );</code>
 	
 		<h3>[property:Float exponent]</h3>
 		<div>
-			Rapidity of the falloff of light from its target direction.<br />
+			Rapidity of the falloff of light from its target direction. A lower value spreads out the light, while a higher
+			focuses it towards the center.<br />
 			Default — *10.0*.
+		</div>
+		
+		<h3>[property:Float decay]</h3>
+		<div>
+			The amount the light dims along the distance of the light<br />
+			Default — *1*.
 		</div>
 	
 		<h3>[property:Boolean castShadow]</h3>
@@ -164,7 +185,16 @@ scene.add( spotLight );</code>
 		</div> 
 
 		<h2>Methods</h2>		
+		<h3>[method:SpotLight clone]()</h3>
+		<div>
+		<br />
+		It returns a clone of SpotLight.
+		</div>
 		
+		<h3>[method:JSON toJSON]()</h3>
+		<div>
+		Return SpotLight data in JSON format.
+		</div>
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

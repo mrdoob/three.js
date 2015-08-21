@@ -94,12 +94,12 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 
 	}
 
-	geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+	geometry.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 	geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 	geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
-	geometry.offsets.push( { start: 0, count: indices.length, index: 0 } );
+	geometry.addDrawCall( 0, indices.length );
 
 	geometry.computeBoundingSphere();
 
@@ -577,7 +577,7 @@ THREE.UTF8Loader.prototype.downloadMesh = function ( path, name, meshEntry, deco
 
 		}
 
-	};
+	}
 
 	getHttpRequest( path, function( req, e ) {
 

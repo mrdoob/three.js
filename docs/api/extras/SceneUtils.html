@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -32,7 +33,7 @@
 		parent -- The parent to attach the object from.
 		</div>
 		<div>
-		Attaches the object to the parent without the moving the object in the worldspace.
+		Attaches the object to the parent without the moving the object in the worldspace. Beware that to do this the matrixWorld needs to be updated, this can be done by calling the updateMatrixWorld method on the parent object.
 		</div>
 
 		<h3>[method:null detach]([page:Object3D child], [page:Object3D parent], [page:Object3D scene])</h3>
@@ -42,7 +43,7 @@
 		parent -- The parent to detach the object from.
 		</div>
 		<div>
-		Detaches the object from the parent and adds it back to the scene without moving in worldspace.
+		Detaches the object from the parent and adds it back to the scene without moving in worldspace. Beware that to do this the matrixWorld needs to be updated, this can be done by calling the updateMatrixWorld method on the parent object.
 		</div>
 
 		<h2>Source</h2>

@@ -1,5 +1,5 @@
 #ifdef USE_COLOR
 
-	vColor.xyz = inputToLinear( color.xyz );
+	vColor.xyz = color.xyz;
 
 #endif

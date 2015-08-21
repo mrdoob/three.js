@@ -71,7 +71,7 @@ THREE.ShaderGodRays = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -157,7 +157,7 @@ THREE.ShaderGodRays = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -203,7 +203,7 @@ THREE.ShaderGodRays = {
 
 			"}"
 
-			].join("\n"),
+			].join( "\n" ),
 
 		fragmentShader: [
 
@@ -226,7 +226,7 @@ THREE.ShaderGodRays = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -273,7 +273,7 @@ THREE.ShaderGodRays = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -301,7 +301,7 @@ THREE.ShaderGodRays = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	}
 

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc"></div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null enable]( [page:integer id], [page:boolean boolean] )</h3>
+		<div>
+		TODO
+		</div>
+
+		<h3>[method:null disable]( [page:integer id], [page:boolean boolean] )</h3>
+		<div>
+		TODO
+		</div>
+
+		<h3>[method:null setDepthTest]( [page:boolean depthTest] )</h3>
+		<div>
+		depthTest -- The boolean to decide if depth of a fragment needs to be tested against the depth buffer . <br />
+		</div>
+		<div>
+		This sets, based on depthTest, whether or not the depth data needs to be tested against the depth buffer.
+		</div>
+
+		<h3>[method:null setDepthWrite]( [page:boolean depthWrite] )</h3>
+		<div>
+		depthWrite -- The boolean to decide if depth of a fragment needs to be kept. <br />
+		</div>
+		<div>
+		This sets, based on depthWrite, whether or not the depth data needs to be written in the depth buffer.
+		</div>
+
+		<h3>[method:null setBlending]( [page:number blending], [page:number blendEquation], [page:number blendSrc], [page:number blendDst] )</h3>
+		<div>
+		blending -- A number indicating the blending mode. Possible value are THREE.NoBlending, THREE.NormalBlending, THREE.AdditiveBlending, THREE.SubtractiveBlending, THREE.MultiplyBlending or THREE.CustomBlending <br />
+		blendEquation -- When blending is THREE.CustomBlending, then you can set the blendEquation. Possible values are THREE.AddEquation, THREE.SubtractEquation or THREE.ReverseSubtractEquation.<br />
+		blendSrc -- When blending is THREE.CustomBlending, then you can set the blendSrc. Possible values are THREE.ZeroFactor, THREE.OneFactor,THREE.SrcColorFactor, THREE.OneMinusSrcColorFactor, THREE.SrcAlphaFactor, THREE.OneMinusSrcAlphaFactor, THREE.DstAlphaFactor, THREE.OneMinusDstAlphaFactor, THREE.DstColorFactor,THREE.OneMinusDstColorFactor or THREE.SrcAlphaSaturateFactor<br />
+		blendDst -- When blending is THREE.CustomBlending, then you can set the blendDst. Possible values are THREE.ZeroFactor, THREE.OneFactor,THREE.SrcColorFactor, THREE.OneMinusSrcColorFactor, THREE.SrcAlphaFactor, THREE.OneMinusSrcAlphaFactor, THREE.DstAlphaFactor, THREE.OneMinusDstAlphaFactor, THREE.DstColorFactor,THREE.OneMinusDstColorFactor or THREE.SrcAlphaSaturateFactor
+		</div>
+		<div>
+		This method sets the correct blending.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -8,9 +8,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.CTMLoader = function ( showStatus ) {
+THREE.CTMLoader = function () {
 
-	THREE.Loader.call( this, showStatus );
+	THREE.Loader.call( this );
 
 };
 
@@ -72,7 +72,7 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 
 		}
 
-	}
+	};
 
 	xhr.open( "GET", url, true );
 	xhr.setRequestHeader( "Content-Type", "text/plain" );
@@ -179,7 +179,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 		}
 
-	}
+	};
 
 	xhr.open( "GET", url, true );
 	xhr.responseType = "arraybuffer";
@@ -219,7 +219,7 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
 		}
 
-		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+		this.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 		if ( normals !== undefined ) {
@@ -240,14 +240,12 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
 		}
 
-	}
+	};
 
 	Model.prototype = Object.create( THREE.BufferGeometry.prototype );
 	Model.prototype.constructor = Model;
 
 	var geometry = new Model();
-
-	geometry.computeOffsets();
 
 	// compute vertex normals if not present in the CTM model
 	if ( geometry.attributes.normal === undefined ) {

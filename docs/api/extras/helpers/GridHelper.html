@@ -2,13 +2,14 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Line] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<div class="desc">The GridHelper is an object to define grids. Grids are two-dimensional arrays of lines.</div>
@@ -19,7 +20,7 @@
 		<code>var size = 10;
 		var step = 1;
 
-		var gridHelper = new THREE.GridHelper( size, step );		
+		var gridHelper = new THREE.GridHelper( size, step );
 		scene.add( gridHelper );
 		</code>
 		[example:webgl_helpers Example using various helpers]
@@ -30,12 +31,12 @@
 		<h3>[name]([page:number size], [page:Number step])</h3>
 		<div>
 		size -- The size of the grid <br />
-		step -- The size of the step between 2 lines 
+		step -- The size of the step between 2 lines
 		</div>
 		<div>
 		Creates a new [name] of size 'size' and with steps of size 'step'.
 		</div>
-		
+
 		<h2>Methods</h2>
 
 		<h3>[method:null setColors]([page:number colorCenterLine], [page:Number colorGrid])</h3>

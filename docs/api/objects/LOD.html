@@ -2,25 +2,43 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Level of Detail - Show meshes with more or less geometry based on distance.</div>
 
+		<h2>Example</h2>
+		
+		<div>
+		[example:webgl_lod LOD]
+		</div>
+		
+		<code>
+		var lod = new THREE.LOD();
+		
+		//Create 5 levels of spheres
+		for( var i = 0; i < 5; i++ ) {
+			
+			var geometry = new THREE.IcosahedronGeometry( 10, 5 - i )
+			
+			new THREE.Mesh( geometry, material );
+			
+			lod.addLevel( mesh, i * 50 );
+			
+		}
+		</code>
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]()</h3>
-		<div>
-		todo
-		</div>
 
 
 		<h2>Properties</h2>
@@ -29,36 +47,42 @@
 
 		<h3>[property:array objects]</h3>
 		<div>
-		todo
+		An array of [page:Object3D Object3Ds]
 		</div>
 
 		<h2>Methods</h2>
 
 
 
-		<h3>[method:todo addLevel]([page:todo object], [page:todo distance])</h3>
+		<h3>[method:null addLevel]([page:Object3D mesh], [page:Float distance])</h3>
 		<div>
-		object -- todo <br />
-		distance -- todo
+		mesh -- The Object3D to display <br />
+		distance -- The distance at which to display this level of detail
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>[method:todo getObjectForDistance]([page:todo distance])</h3>
-		<div>
-		distance -- todo
-		</div>
-		<div>
-		todo
+		Adds a mesh that will display at a certain distance and greater. Typically the further away the distance,
+		the lower the detail on the mesh.
 		</div>
 
-		<h3>[method:todo update]([page:todo camera])</h3>
+		<h3>[method:Object3D getObjectForDistance]([page:Float distance])</h3>
 		<div>
-		camera -- todo
+		Get a reference to the first [page:Object3D] (mesh) that is greater than supplied distance.
+		</div>
+
+		<h3>[method:null update]([page:Camera camera])</h3>
+		<div>
+		camera -- The current camera
 		</div>
 		<div>
-		todo
+		Update the visiblility of the level of detail based on the distance from the camera.
+		</div>
+		
+		<h3>[method:Object3D clone]([page:Object3D object])</h3>
+		<div>
+		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned LOD Object.
+		</div>
+		<div>
+		Clone a LOD Object.
 		</div>
 
 		<h2>Source</h2>

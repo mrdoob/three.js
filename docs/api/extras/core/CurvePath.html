@@ -2,16 +2,20 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Curve] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">
+		An abstract base class further extending [page:Curve]. A CurvePath is simply an array of connected curves,
+		but retains the api of a curve.
+		</div>
 
 
 		<h2>Constructor</h2>
@@ -19,116 +23,116 @@
 
 		<h3>[name]()</h3>
 		<div>
-		todo
+		The constructor take no parameters.
 		</div>
 
 
 		<h2>Properties</h2>
-		
+
 
 		<h3>[property:array curves]</h3>
 		<div>
-		todo
-		</div> 
+		The array of [page:Curve]s
+		</div>
 
 		<h3>[property:array bends]</h3>
 		<div>
-		todo
-		</div> 
+		An array of [page:Curve]s used to transform and bend the curve using [page:CurvePath.getWrapPoints].
+		</div>
 
 		<h3>[property:boolean autoClose]</h3>
 		<div>
-		todo
-		</div> 
+		Whether or not to automatically close the path.
+		</div>
 
 		<h2>Methods</h2>
 
 
-		<h3>[method:todo getWrapPoints]([page:todo oldPts], [page:todo path])</h3>
+		<h3>[method:Array getWrapPoints]([page:Array vertices], [page:Curve curve])</h3>
 		<div>
-		oldPts -- todo <br />
-		path -- todo
+		vertices -- An array of [page:Vector2]s to modify<br />
+		curve -- An array of 2d [page:Curve]s
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>[method:todo createPointsGeometry]([page:todo divisions])</h3>
-		<div>
-		divisions -- todo
-		</div>
-		<div>
-		todo
+		Modifies the array of vertices by warping it by the curve. The curve parameter also accepts objects with similar
+		interfaces such as [page:CurvePath], [page:Path], [page:SplineCurve], etc. Returns the original vertices after
+		modification.
 		</div>
 
-		<h3>[method:todo addWrapPath]([page:todo bendpath])</h3>
+		<h3>[method:null addWrapPath]([page:Curve curve])</h3>
 		<div>
-		bendpath -- todo
+		curve -- A [page:Curve] or object with a similar interface.
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>[method:todo createGeometry]([page:todo points])</h3>
-		<div>
-		points -- todo
-		</div>
-		<div>
-		todo
+		Pushes a curve onto the bends array.
 		</div>
 
-		<h3>[method:todo add]([page:todo curve])</h3>
+		<h3>[method:Geometry createGeometry]([page:Vector3 points])</h3>
 		<div>
-		curve -- todo
+		points -- An array of [page:Vector3]s
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>[method:todo getTransformedSpacedPoints]([page:todo segments], [page:todo bends])</h3>
-		<div>
-		segments -- todo <br />
-		bends -- todo
-		</div>
-		<div>
-		todo
+		Creates a geometry from points
 		</div>
 
-		<h3>[method:todo createSpacedPointsGeometry]([page:todo divisions])</h3>
+		<h3>[method:Geometry createPointsGeometry]([page:Integer divisions])</h3>
 		<div>
-		divisions -- todo
+		divisions -- How many segments to create with [page:Vector3]s. Defaults to 12.
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>[method:todo closePath]()</h3>
-		<div>
-		todo
+		Creates a [page:Geometry] object comprised of [page:Vector3]s
 		</div>
 
-		<h3>[method:todo getBoundingBox]()</h3>
+		<h3>[method:Geometry createSpacedPointsGeometry]([page:Integer divisions])</h3>
 		<div>
-		todo
+		divisions -- How many segments to create with [page:Vector3]s. Defaults to 12.
+		</div>
+		<div>
+		Creates a [page:Geometry] object comprised of [page:Vector3]s that are equidistant.
 		</div>
 
-		<h3>[method:todo getCurveLengths]()</h3>
+
+		<h3>[method:null add]([page:Curve curve])</h3>
 		<div>
-		todo
+		curve -- The [page:Curve curve] to add
+		</div>
+		<div>
+		Pushes a curve onto the curves array.
 		</div>
 
-		<h3>[method:todo getTransformedPoints]([page:todo segments], [page:todo bends])</h3>
+		<h3>[method:null closePath]()</h3>
 		<div>
-		segments -- todo <br />
-		bends -- todo
-		</div>
-		<div>
-		todo
+		Adds a curve to close the path.
 		</div>
 
-		<h3>[method:todo checkConnection]()</h3>
+		<h3>[method:Object getBoundingBox]()</h3>
 		<div>
-		todo
+		Returns an object with the keys minX, minY, maxX, maxY, (if 3d: maxZ, minZ)
+		</div>
+
+		<h3>[method:Float getCurveLengths]()</h3>
+		<div>
+		Adds together the length of the curves
+		</div>
+
+		<h3>[method:Array getTransformedPoints]([page:Integer segments], [page:Array bends])</h3>
+		<div>
+		segments -- The number of segments to create using the getPoints()<br />
+		bends -- (optional) An array of [page:Curve]s used to transform the points. Defaults to this.bends if blank.
+		</div>
+		<div>
+		Uses this CurvePath to generate a series of points transformed by the curves in the bends array. Returns an
+		array of [page:Vector2]s.
+		</div>
+
+		<h3>[method:Array getTransformedSpacedPoints]([page:Integer segments], [page:Array bends])</h3>
+		<div>
+		segments -- The number of segments to create using the getPoints()<br />
+		bends -- (optional) Defaults to this.bends if blank. An array of [page:Curve]s used to transform the points.
+		</div>
+		<div>
+		Uses this CurvePath to generate a series equidistant points that are then transformed by the curves in the bends.
+	    Returns an array of [page:Vector2]s.
 		</div>
 
 		<h2>Source</h2>

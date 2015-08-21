@@ -35,21 +35,7 @@ Sidebar.Geometry.Modifiers = function ( signals, object ) {
 
 	var isBufferGeometry = geometry instanceof THREE.BufferGeometry;
 
-	if ( geometry instanceof THREE.BufferGeometry ) {
-
-		var button = new UI.Button( 'Convert to Geometry' );
-		button.onClick( function () {
-
-			if ( confirm( 'Are you sure?' ) === false ) return;
-
-			object.geometry = new THREE.Geometry().fromBufferGeometry( object.geometry );
-
-			signals.geometryChanged.dispatch( object );
-
-		} );
-		container.add( button );
-
-	} else {
+	if ( geometry instanceof THREE.Geometry ) {
 
 		var button = new UI.Button( 'Convert to BufferGeometry' );
 		button.onClick( function () {

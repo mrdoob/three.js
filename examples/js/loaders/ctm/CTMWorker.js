@@ -16,4 +16,4 @@ self.onmessage = function( event ) {
 	self.postMessage( files );
 	self.close();
 
-}
+};

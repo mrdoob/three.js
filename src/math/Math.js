@@ -17,11 +17,11 @@ THREE.Math = {
 
 			for ( var i = 0; i < 36; i ++ ) {
 
-				if ( i == 8 || i == 13 || i == 18 || i == 23 ) {
+				if ( i === 8 || i === 13 || i === 18 || i === 23 ) {
 
 					uuid[ i ] = '-';
 
-				} else if ( i == 14 ) {
+				} else if ( i === 14 ) {
 
 					uuid[ i ] = '4';
 
@@ -30,9 +30,10 @@ THREE.Math = {
 					if ( rnd <= 0x02 ) rnd = 0x2000000 + ( Math.random() * 0x1000000 ) | 0;
 					r = rnd & 0xf;
 					rnd = rnd >> 4;
-					uuid[ i ] = chars[ ( i == 19 ) ? ( r & 0x3 ) | 0x8 : r ];
+					uuid[ i ] = chars[ ( i === 19 ) ? ( r & 0x3 ) | 0x8 : r ];
 
 				}
+
 			}
 
 			return uuid.join( '' );
@@ -54,6 +55,15 @@ THREE.Math = {
 	clampBottom: function ( x, a ) {
 
 		return x < a ? a : x;
+
+	},
+
+	// compute euclidian modulo of m % n
+	// https://en.wikipedia.org/wiki/Modulo_operation
+
+	euclideanModulo: function ( n, m ) {
+
+		return ( ( n % m ) + m ) % m;
 
 	},
 
@@ -102,7 +112,7 @@ THREE.Math = {
 
 	randInt: function ( low, high ) {
 
-		return Math.floor( this.randFloat( low, high ) );
+		return low + Math.floor( Math.random() * ( high - low + 1 ) );
 
 	},
 
