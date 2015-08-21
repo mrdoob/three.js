@@ -115,11 +115,11 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				var indices = attributes.index.array;
 				var positions = attributes.position.array;
-				var offsets = geometry.drawcalls;
+				var offsets = geometry.groups;
 
 				if ( offsets.length === 0 ) {
 
-					geometry.addDrawCall( 0, indices.length );
+					geometry.addGroup( 0, indices.length );
 
 				}
 
