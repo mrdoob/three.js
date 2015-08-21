@@ -521,7 +521,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		resetGLState();
 		setDefaultGLState();
 
-		objects.clear();
 		properties.clear();
 
 	};
@@ -1260,91 +1259,82 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object instanceof THREE.Scene || object instanceof THREE.Group ) {
+		if ( object instanceof THREE.Light ) {
 
-			// skip
+			lights.push( object );
 
-		} else {
+		} else if ( object instanceof THREE.Sprite ) {
 
-			// update Skeleton objects
+			sprites.push( object );
+
+		} else if ( object instanceof THREE.LensFlare ) {
+
+			lensFlares.push( object );
+
+		} else if ( object instanceof THREE.ImmediateRenderObject ) {
+
+			var material = object.material;
+
+			if ( material.transparent ) {
+
+				transparentImmediateObjects.push( object );
+
+			} else {
+
+				opaqueImmediateObjects.push( object );
+
+			}
+
+		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ){
+
 			if ( object instanceof THREE.SkinnedMesh ) {
 
 				object.skeleton.update();
 
 			}
 
-			objects.init( object );
-
-			if ( object instanceof THREE.Light ) {
-
-				lights.push( object );
-
-			} else if ( object instanceof THREE.Sprite ) {
-
-				sprites.push( object );
-
-			} else if ( object instanceof THREE.LensFlare ) {
-
-				lensFlares.push( object );
-
-			} else if ( object instanceof THREE.ImmediateRenderObject ) {
+			if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
 				var material = object.material;
 
-				if ( material.transparent ) {
+				if ( material.visible === true ) {
 
-					transparentImmediateObjects.push( object );
+					if ( material instanceof THREE.MeshFaceMaterial ) {
 
-				} else {
+						var materials = material.materials;
 
-					opaqueImmediateObjects.push( object );
+						for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
-				}
-
-			} else {
-
-				var webglObject = objects.objects[ object.id ];
-
-				if ( webglObject && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
-
-					var material = object.material;
-
-					if ( material.visible === true ) {
-
-						if ( material instanceof THREE.MeshFaceMaterial ) {
-
-							var materials = material.materials;
-
-							for ( var i = 0, l = materials.length; i < l; i ++ ) {
-
-								materials[ i ].program = properties.get( materials[ i ] ).program;
-
-							}
-
-						} else {
-
-							material.program = properties.get( material ).program;
+							materials[ i ].program = properties.get( materials[ i ] ).program;
 
 						}
 
-						if ( material.transparent ) {
+					} else {
 
-							transparentObjects.push( webglObject );
+						material.program = properties.get( material ).program;
 
-						} else {
+					}
 
-							opaqueObjects.push( webglObject );
+					if ( _this.sortObjects === true ) {
 
-						}
+						_vector3.setFromMatrixPosition( object.matrixWorld );
+						_vector3.applyProjection( _projScreenMatrix );
 
-						if ( _this.sortObjects === true ) {
+					}
 
-							_vector3.setFromMatrixPosition( object.matrixWorld );
-							_vector3.applyProjection( _projScreenMatrix );
+					var renderItem = {
+						id: object.id,
+						object: object,
+						z: _vector3.z
+					};
 
-							webglObject.z = _vector3.z;
+					if ( material.transparent ) {
 
-						}
+						transparentObjects.push( renderItem );
+
+					} else {
+
+						opaqueObjects.push( renderItem );
 
 					}
 
@@ -1370,8 +1360,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
-			var webglObject = renderList[ i ];
-			var object = webglObject.object;
+			var renderItem = renderList[ i ];
+			var object = renderItem.object;
 			var geometry = objects.update( object );
 
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );

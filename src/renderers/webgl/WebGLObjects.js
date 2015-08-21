@@ -4,72 +4,9 @@
 
 THREE.WebGLObjects = function ( gl, properties, info ) {
 
-	var objects = {};
-
 	var geometries = new THREE.WebGLGeometries( gl, properties, info );
 
 	//
-
-	function onObjectRemoved( event ) {
-
-		var object = event.target;
-
-		object.traverse( function ( child ) {
-
-			child.removeEventListener( 'remove', onObjectRemoved );
-			removeObject( child );
-
-		} );
-
-	}
-
-	function removeObject( object ) {
-
-		if ( object instanceof THREE.Mesh ||
-			 object instanceof THREE.PointCloud ||
-			 object instanceof THREE.Line ) {
-
-			delete objects[ object.id ];
-
-		}
-
-		properties.delete( object );
-
-	}
-
-	//
-
-	this.objects = objects;
-
-	this.init = function ( object ) {
-
-		var objectProperties = properties.get( object );
-
-		if ( objectProperties.__webglInit === undefined ) {
-
-			objectProperties.__webglInit = true;
-
-			object.addEventListener( 'removed', onObjectRemoved );
-
-		}
-
-		if ( objectProperties.__webglActive === undefined ) {
-
-			objectProperties.__webglActive = true;
-
-			if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
-
-				objects[ object.id ] = {
-					id: object.id,
-					object: object,
-					z: 0
-				};
-
-			}
-
-		}
-
-	};
 
 	function update( object ) {
 
@@ -282,11 +219,5 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 	this.getWireframeAttribute = getWireframeAttribute;
 
 	this.update = update;
-
-	this.clear = function () {
-
-		objects = {};
-
-	};
 
 };
