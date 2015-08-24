@@ -1671,6 +1671,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		materialProperties.uniformsList = [];
 
 		var uniformLocations = materialProperties.program.getUniforms();
+
 		for ( var u in materialProperties.__webglShader.uniforms ) {
 
 			var location = uniformLocations[ u ];
@@ -2238,7 +2239,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsGeneric ( uniforms ) {
 
-		var texture, textureUnit, offset;
+		var texture, textureUnit;
 
 		for ( var j = 0, jl = uniforms.length; j < jl; j ++ ) {
 
@@ -2387,12 +2388,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					for ( var i = 0, il = value.length; i < il; i ++ ) {
+					for ( var i = 0, i2 = 0, il = value.length; i < il; i ++, i2 += 2 ) {
 
-						offset = i * 2;
-
-						uniform._array[ offset + 0 ] = value[ i ].x;
-						uniform._array[ offset + 1 ] = value[ i ].y;
+						uniform._array[ i2 + 0 ] = value[ i ].x;
+						uniform._array[ i2 + 1 ] = value[ i ].y;
 
 					}
 
@@ -2410,13 +2409,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					for ( var i = 0, il = value.length; i < il; i ++ ) {
+					for ( var i = 0, i3 = 0, il = value.length; i < il; i ++, i3 += 3 ) {
 
-						offset = i * 3;
-
-						uniform._array[ offset + 0 ] = value[ i ].x;
-						uniform._array[ offset + 1 ] = value[ i ].y;
-						uniform._array[ offset + 2 ] = value[ i ].z;
+						uniform._array[ i3 + 0 ] = value[ i ].x;
+						uniform._array[ i3 + 1 ] = value[ i ].y;
+						uniform._array[ i3 + 2 ] = value[ i ].z;
 
 					}
 
@@ -2434,14 +2431,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					for ( var i = 0, il = value.length; i < il; i ++ ) {
+					for ( var i = 0, i4 = 0, il = value.length; i < il; i ++, i4 += 4 ) {
 
-						offset = i * 4;
-
-						uniform._array[ offset + 0 ] = value[ i ].x;
-						uniform._array[ offset + 1 ] = value[ i ].y;
-						uniform._array[ offset + 2 ] = value[ i ].z;
-						uniform._array[ offset + 3 ] = value[ i ].w;
+						uniform._array[ i4 + 0 ] = value[ i ].x;
+						uniform._array[ i4 + 1 ] = value[ i ].y;
+						uniform._array[ i4 + 2 ] = value[ i ].z;
+						uniform._array[ i4 + 3 ] = value[ i ].w;
 
 					}
 
