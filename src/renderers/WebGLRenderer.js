@@ -760,8 +760,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object, group ) {
 
-		if ( material.visible === false ) return;
-
 		setMaterial( material );
 
 		var program = setProgram( camera, lights, fog, material, object );
@@ -1255,6 +1253,45 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function pushImmediateRenderItem( object ) {
+
+		if ( object.material.transparent ) {
+
+			transparentImmediateObjects.push( object );
+
+		} else {
+
+			opaqueImmediateObjects.push( object );
+
+		}
+
+	}
+
+	function pushRenderItem( object, geometry, material, z, group ) {
+
+		var renderItem = {
+			id: object.id,
+			object: object,
+			geometry: geometry,
+			material: material,
+			z: _vector3.z,
+			group: group
+		};
+
+		if ( material.transparent ) {
+
+			transparentObjects.push( renderItem );
+
+		} else {
+
+			opaqueObjects.push( renderItem );
+
+		}
+
+		material.program = properties.get( material ).program; // TODO: Do this at compile time
+
+	}
+
 	function projectObject( object ) {
 
 		if ( object.visible === false ) return;
@@ -1273,17 +1310,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.ImmediateRenderObject ) {
 
-			var material = object.material;
-
-			if ( material.transparent ) {
-
-				transparentImmediateObjects.push( object );
-
-			} else {
-
-				opaqueImmediateObjects.push( object );
-
-			}
+			pushImmediateRenderItem( object );
 
 		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ){
 
@@ -1306,36 +1333,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
+					var geometry = objects.update( object );
+
 					if ( material instanceof THREE.MeshFaceMaterial ) {
 
+						var groups = geometry.groups;
 						var materials = material.materials;
 
-						for ( var i = 0, l = materials.length; i < l; i ++ ) {
+						for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
-							materials[ i ].program = properties.get( materials[ i ] ).program;
+							var group = groups[ i ];
+							var groupMaterial = materials[ group.materialIndex ];
+
+							if ( groupMaterial.visible === true ) {
+
+								pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
+
+							}
 
 						}
 
 					} else {
 
-						material.program = properties.get( material ).program;
-
-					}
-
-					var renderItem = {
-						id: object.id,
-						object: object,
-						material: object.material,
-						z: _vector3.z
-					};
-
-					if ( material.transparent ) {
-
-						transparentObjects.push( renderItem );
-
-					} else {
-
-						opaqueObjects.push( renderItem );
+						pushRenderItem( object, geometry, material, _vector3.z );
 
 					}
 
@@ -1357,42 +1377,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
 
-		var material = overrideMaterial;
-
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
 			var renderItem = renderList[ i ];
+
 			var object = renderItem.object;
-			var geometry = objects.update( object );
+			var geometry = renderItem.geometry;
+			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
+			var group = renderItem.group;
 
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
-			if ( overrideMaterial === undefined ) material = object.material;
-
-			if ( material instanceof THREE.MeshFaceMaterial ) {
-
-				var groups = geometry.groups;
-				var materials = material.materials;
-
-				for ( var j = 0, jl = groups.length; j < jl; j ++ ) {
-
-					var group = groups[ j ];
-					var groupMaterial = materials[ group.materialIndex ];
-
-					if ( groupMaterial !== undefined ) {
-
-						_this.renderBufferDirect( camera, lights, fog, geometry, groupMaterial, object, group );
-
-					}
-
-				}
-
-			} else {
-
-				_this.renderBufferDirect( camera, lights, fog, geometry, material, object );
-
-			}
+			_this.renderBufferDirect( camera, lights, fog, geometry, material, object, group );
 
 		}
 
