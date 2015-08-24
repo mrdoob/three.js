@@ -72,9 +72,10 @@
 				camera.position.z = 500;
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				//controls.addEventListener( 'change', render ); // only add this if there is no animation loop and no damping
-				controls.dynamicDampingFactor = 0.2;
-				controls.noZoom = true;
+				//controls.addEventListener( 'change', render ); // add this only if there is no animation loop (requestAnimationFrame)
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.25;
+				controls.enableZoom = false;
 
 				// world
 
@@ -133,7 +134,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update(); // required if there is damping or if autoRotate = true
+				controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
 
 				stats.update();
 
