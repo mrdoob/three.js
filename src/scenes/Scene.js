@@ -2,13 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Scene = function () {
+THREE.Scene = function ( fog ) {
 
 	THREE.Object3D.call( this );
 
 	this.type = 'Scene';
 
-	this.fog = null;
+	this.fog =  ( fog !== undefined ) ? fog : null;
 	this.overrideMaterial = null;
 
 	this.autoUpdate = true; // checked by the renderer
