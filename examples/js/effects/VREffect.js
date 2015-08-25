@@ -74,6 +74,10 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
+	// Focal length
+
+	this.focalLength = Infinity;
+
 	// fullscreen
 
 	var isFullscreen = false;
@@ -135,8 +139,8 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
-			cameraL.projectionMatrix = fovToProjection( eyeFOVL, true, camera.near, camera.far );
-			cameraR.projectionMatrix = fovToProjection( eyeFOVR, true, camera.near, camera.far );
+			cameraL.projectionMatrix = fovToProjection( eyeFOVL, true, camera.near, camera.far, this.focalLength, eyeTranslationL.x );
+			cameraR.projectionMatrix = fovToProjection( eyeFOVR, true, camera.near, camera.far, this.focalLength, eyeTranslationR.x );
 
 			camera.matrixWorld.decompose( cameraL.position, cameraL.quaternion, cameraL.scale );
 			camera.matrixWorld.decompose( cameraR.position, cameraR.quaternion, cameraR.scale );
@@ -227,7 +231,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	}
 
-	function fovToProjection( fov, rightHanded, zNear, zFar ) {
+	function fovToProjection( fov, rightHanded, zNear, zFar, focalLength, eyeTranslation ) {
 
 		var DEG2RAD = Math.PI / 180.0;
 
@@ -237,6 +241,11 @@ THREE.VREffect = function ( renderer, onError ) {
 			leftTan: Math.tan( fov.leftDegrees * DEG2RAD ),
 			rightTan: Math.tan( fov.rightDegrees * DEG2RAD )
 		};
+
+		if (focalLength < Infinity) {
+			fovPort.leftTan = (focalLength * fovPort.leftTan + eyeTranslation) / focalLength;
+			fovPort.rightTan = (focalLength * fovPort.rightTan - eyeTranslation) / focalLength;
+		}
 
 		return fovPortToProjection( fovPort, rightHanded, zNear, zFar );
 
