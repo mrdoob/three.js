@@ -9258,6 +9258,7 @@ THREE.Geometry = function () {
 	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.lineDistancesNeedUpdate = false;
+	this.groupsNeedUpdate = false;
 
 };
 
@@ -10449,14 +10450,6 @@ THREE.Geometry.prototype = {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
-	},
-
-	// Backwards compatibility
-
-	set groupsNeedUpdate ( value ) {
-
-		if ( value === true ) this.dispose();
-
 	}
 
 };
@@ -10507,6 +10500,7 @@ THREE.DirectGeometry = function () {
 	this.colorsNeedUpdate = false;
 	this.uvsNeedUpdate = false;
 	this.tangentsNeedUpdate = false;
+	this.groupsNeedUpdate = false;
 
 };
 
@@ -10538,6 +10532,51 @@ THREE.DirectGeometry.prototype = {
 
 	},
 
+	computeGroups: function ( geometry ) {
+
+		var group;
+		var groups = [];
+		var materialIndex;
+
+		var faces = geometry.faces;
+
+		for ( var i = 0; i < faces.length; i ++ ) {
+
+			var face = faces[ i ];
+
+			// materials
+
+			if ( face.materialIndex !== materialIndex ) {
+
+				materialIndex = face.materialIndex;
+
+				if ( group !== undefined ) {
+
+					group.count = ( i * 3 ) - group.start;
+					groups.push( group );
+
+				}
+
+				group = {
+					start: i * 3,
+					materialIndex: materialIndex
+				};
+
+			}
+
+		}
+
+		if ( group !== undefined ) {
+
+			group.count = ( i * 3 ) - group.start;
+			groups.push( group );
+
+		}
+
+		this.groups = groups;
+
+	},
+
 	fromGeometry: function ( geometry ) {
 
 		var faces = geometry.faces;
@@ -10548,9 +10587,6 @@ THREE.DirectGeometry.prototype = {
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
 		var hasTangents = geometry.hasTangents;
-
-		var group;
-		var materialIndex;
 
 		// morphs
 
@@ -10598,7 +10634,7 @@ THREE.DirectGeometry.prototype = {
 
 		//
 
-		for ( var i = 0, i3 = 0; i < faces.length; i ++, i3 += 3 ) {
+		for ( var i = 0; i < faces.length; i ++ ) {
 
 			var face = faces[ i ];
 
@@ -10668,26 +10704,6 @@ THREE.DirectGeometry.prototype = {
 
 			}
 
-			// materials
-
-			if ( face.materialIndex !== materialIndex ) {
-
-				materialIndex = face.materialIndex;
-
-				if ( group !== undefined ) {
-
-					group.count = i3 - group.start;
-					this.groups.push( group );
-
-				}
-
-				group = {
-					start: i3,
-					materialIndex: materialIndex
-				};
-
-			}
-
 			// tangents
 
 			if ( hasTangents === true ) {
@@ -10742,20 +10758,14 @@ THREE.DirectGeometry.prototype = {
 
 		}
 
-		//
-
-		if ( group !== undefined ) {
-
-			group.count = i3 - group.start;
-			this.groups.push( group );
-
-		}
+		this.computeGroups( geometry );
 
 		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
 		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
 		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
 		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
 		this.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
+		this.groupsNeedUpdate = geometry.groupsNeedUpdate;
 
 		return this;
 
@@ -11122,12 +11132,14 @@ THREE.BufferGeometry.prototype = {
 			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
 			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
 			direct.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
+			direct.groupsNeedUpdate = geometry.groupsNeedUpdate;
 
 			geometry.verticesNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
 			geometry.uvsNeedUpdate = false;
 			geometry.tangentsNeedUpdate = false;
+			geometry.groupsNeedUpdate = false;
 
 			geometry = direct;
 
@@ -11205,6 +11217,15 @@ THREE.BufferGeometry.prototype = {
 			}
 
 			geometry.lineDistancesNeedUpdate = false;
+
+		}
+
+		if ( geometry.groupsNeedUpdate ) {
+
+			geometry.computeGroups( object.geometry );
+			this.groups = geometry.groups;
+
+			geometry.groupsNeedUpdate = false;
 
 		}
 
