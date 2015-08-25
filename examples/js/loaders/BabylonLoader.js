@@ -137,13 +137,9 @@ THREE.BabylonLoader.prototype = {
 
 				var subMesh = subMeshes[ j ];
 
-				geometry.addDrawCall( subMesh.indexStart, subMesh.indexCount );
+				geometry.addGroup( subMesh.indexStart, subMesh.indexCount );
 
 			}
-
-		} else {
-
-			geometry.addDrawCall( 0, json.indices.length );
 
 		}
 

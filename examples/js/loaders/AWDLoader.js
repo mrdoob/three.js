@@ -766,8 +766,6 @@
 						attrib = new THREE.IndexBufferAttribute( buffer, 1 );
 						geom.addAttribute( 'index', attrib );
 
-						geom.addDrawCall( 0, str_len / 2 );
-
 						idx = 0;
 
 						while ( this._ptr < str_end ) {

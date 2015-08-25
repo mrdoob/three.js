@@ -99,8 +99,6 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 	geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 	geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
-	geometry.addDrawCall( 0, indices.length );
-
 	geometry.computeBoundingSphere();
 
 	return geometry;
