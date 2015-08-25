@@ -39,6 +39,25 @@ THREE.BooleanKeyframeTrack.prototype.compareValues = function( value0, value1 ) 
 
 };
 
+THREE.BooleanKeyframeTrack.prototype.clone = function() {
+
+	var clonedKeys = [];
+
+	for( var i = 0; i < this.keys.length; i ++ ) {
+		
+		var key = this.keys[i];
+		clonedKeys.push( {
+			time: key.time
+			value: key.value
+		} );
+	}
+
+	var result = new THREE.BooleanKeyframeTrack( this.name );
+	return ( value0 === value1 );
+
+};
+
+
 THREE.BooleanKeyframeTrack.parse = function( name, jsonKeys ) {
 
 	return new THREE.BooleanKeyframeTrack( name, jsonKeys );
