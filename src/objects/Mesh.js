@@ -173,7 +173,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 						if ( intersectionPoint === null ) continue;
 
-						pInter.copy(intersectionPoint);
+						pInter.copy( intersectionPoint );
 						intersectionPoint.applyMatrix4( this.matrixWorld );
 
 						var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
@@ -229,7 +229,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 					if ( intersectionPoint === null ) continue;
 
-					pInter.copy(intersectionPoint);
+					pInter.copy( intersectionPoint );
 					intersectionPoint.applyMatrix4( this.matrixWorld );
 
 					var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
@@ -331,7 +331,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				if ( intersectionPoint === null ) continue;
 
-				pInter.copy(intersectionPoint);
+				pInter.copy( intersectionPoint );
 				intersectionPoint.applyMatrix4( this.matrixWorld );
 
 				var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
