@@ -621,7 +621,7 @@ THREE.ObjectLoader.prototype = {
 
 				for ( var child in data.children ) {
 
-					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+					object.add( this.parseObject( data.children[ child ], geometries, materials, tracks ) );
 
 				}
 
@@ -633,19 +633,19 @@ THREE.ObjectLoader.prototype = {
 
 				if( dataTracks.position ) {
 
-					tracks.add( THREE.VectorKeyframeTrack.parse( object.uuid + '.position', dataTracks.position ) );
+					tracks.push( THREE.VectorKeyframeTrack.parse( object.uuid + '.position', dataTracks.position ) );
 
 				}
 
 				if( dataTracks.quaternion ) {
 
-					tracks.add( THREE.QuaternionKeyframeTrack.parse( object.uuid + '.quaternion', dataTracks.quaternion ) );
+					tracks.push( THREE.QuaternionKeyframeTrack.parse( object.uuid + '.quaternion', dataTracks.quaternion ) );
 
 				}
 
 				if( dataTracks.scale ) {
 
-					tracks.add( THREE.VectorKeyframeTrack.parse( object.uuid + '.scale', dataTracks.scale ) );
+					tracks.push( THREE.VectorKeyframeTrack.parse( object.uuid + '.scale', dataTracks.scale ) );
 
 				}
 			}
