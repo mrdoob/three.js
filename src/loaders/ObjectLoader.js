@@ -497,7 +497,7 @@ THREE.ObjectLoader.prototype = {
 
 				case 'Scene':
 
-					object = new THREE.Scene();
+					object = new THREE.Scene( data.fog );
 
 					break;
 
