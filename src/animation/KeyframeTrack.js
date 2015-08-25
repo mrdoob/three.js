@@ -70,6 +70,15 @@ THREE.KeyframeTrack.prototype = {
 
 	},
 
+	// move all keyframes either forwards or backwards in time
+	shift: function( timeOffset ) {
+
+		for( var i = 1; i < this.keys.length; i ++ ) {
+			this.keys[i].time += timeOffset;
+		}
+
+	},
+
 	// removes keyframes before and after animation without changing any values within the range [0,duration].
 	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
  	trim: function( duration ) {
