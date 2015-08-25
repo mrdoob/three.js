@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 # @author zfedoran / http://github.com/zfedoran
 
 import os
