@@ -57,8 +57,8 @@
 
         uniform float sineTime;
 
-        uniform mat4 modelViewMatrix; 
-        uniform mat4 projectionMatrix; 
+        uniform mat4 modelViewMatrix;
+        uniform mat4 projectionMatrix;
 
         attribute vec3 position;
         attribute vec3 offset;
@@ -202,8 +202,7 @@
                 vertexShader: document.getElementById( 'vertexShader' ).textContent,
                 fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
                 side: THREE.DoubleSide,
-                transparent: true,
-                attributes: { 'position': 0, 'offset': 1, 'color': 2, 'orientationStart': 3, 'orientationEnd': 4 }
+                transparent: true
 
             } );
 

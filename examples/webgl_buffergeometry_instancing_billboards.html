@@ -95,7 +95,7 @@
 			vec4 diffuseColor = texture2D( map, vUv );
 			gl_FragColor = vec4( diffuseColor.xyz * vColor, diffuseColor.w );
 
-			if ( diffuseColor.w < 0.5 ) discard; 
+			if ( diffuseColor.w < 0.5 ) discard;
 
 		}
 	</script>
@@ -170,8 +170,7 @@
 				vertexShader: document.getElementById( 'vshader' ).textContent,
 				fragmentShader: document.getElementById( 'fshader' ).textContent,
 				depthTest: true,
-				depthWrite: true,
-				attributes: { 'translateScale': 1, 'color': 2 }
+				depthWrite: true
 
 			} );
 

@@ -225,16 +225,6 @@ THREE.GPUParticleSystem = function(options) {
         value: self.particleSpriteTex
       }
     },
-    attributes: {
-      "particlePositionsStartTime": {
-        type: "v4",
-        value: []
-      },
-      "particleVelColSizeLife": {
-        type: "v4",
-        value: []
-      }
-    },
     blending: THREE.AdditiveBlending,
     vertexShader: GPUParticleShader.vertexShader,
     fragmentShader: GPUParticleShader.fragmentShader
