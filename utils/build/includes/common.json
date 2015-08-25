@@ -83,6 +83,7 @@
 	"src/loaders/LoadingManager.js",
 	"src/loaders/BufferGeometryLoader.js",
 	"src/loaders/MaterialLoader.js",
+	"src/loaders/Reference.js",
 	"src/loaders/ObjectLoader.js",
 	"src/loaders/TextureLoader.js",
 	"src/loaders/CubeTextureLoader.js",
