@@ -10808,7 +10808,7 @@ THREE.BufferGeometry.prototype = {
 
 			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
-			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
+			this.addAttribute( name, new THREE.BufferAttribute( arguments[ 1 ], arguments[ 2 ] ) );
 
 			return;
 
@@ -16106,7 +16106,6 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	this.defines = {};
 	this.uniforms = {};
-	this.attributes = [];
 
 	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
 	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
@@ -16143,10 +16142,9 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	if ( parameters !== undefined ) {
 
-		if ( parameters.attributes !== undefined && Array.isArray( parameters.attributes ) === false ) {
+		if ( parameters.attributes !== undefined ) {
 
-			console.warn( 'THREE.ShaderMaterial: attributes should now be an array of attribute names.' );
-			parameters.attributes = Object.keys( parameters.attributes );
+			console.error( 'THREE.ShaderMaterial: attributes should now be defined in THREE.BufferGeometry instead.' );
 
 		}
 
@@ -16698,11 +16696,14 @@ THREE.PointCloud.prototype.raycast = ( function () {
 			if ( attributes.index !== undefined ) {
 
 				var indices = attributes.index.array;
-				var offsets = geometry.drawcalls;
+				var offsets = geometry.groups;
 
 				if ( offsets.length === 0 ) {
 
-					geometry.addDrawCall( 0, indices.length );
+					offsets = [ {
+						start: 0,
+						count: indices.length
+					} ];
 
 				}
 
@@ -16862,11 +16863,14 @@ THREE.Line.prototype.raycast = ( function () {
 
 				var indices = attributes.index.array;
 				var positions = attributes.position.array;
-				var offsets = geometry.drawcalls;
+				var offsets = geometry.groups;
 
 				if ( offsets.length === 0 ) {
 
-					geometry.addDrawCall( 0, indices.length );
+					offsets = [ {
+						start: 0,
+						count: indices.length
+					} ];
 
 				}
 
@@ -17153,11 +17157,14 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				var indices = attributes.index.array;
 				var positions = attributes.position.array;
-				var offsets = geometry.drawcalls;
+				var offsets = geometry.groups;
 
 				if ( offsets.length === 0 ) {
 
-					geometry.addDrawCall( 0, indices.length );
+					offsets = [ {
+						start: 0,
+						count: indices.length
+					} ];
 
 				}
 
