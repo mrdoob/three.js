@@ -62,9 +62,6 @@ THREE.ShaderLib[ 'sky' ] = {
 		"uniform float mieCoefficient;",
 		"uniform float mieDirectionalG;",
 
-		"vec3 sunDirection = normalize(sunPosition);",
-		"float reileighCoefficient = reileigh;",
-
 		"// constants for atmospheric scattering",
 		"const float e = 2.71828182845904523536028747135266249775724709369995957;",
 		"const float pi = 3.141592653589793238462643383279502884197169;",
@@ -160,7 +157,9 @@ THREE.ShaderLib[ 'sky' ] = {
 
 			 "// gl_FragColor = vec4(sunfade, sunfade, sunfade, 1.0);",
 
-			"reileighCoefficient = reileighCoefficient - (1.0* (1.0-sunfade));",
+			"float reileighCoefficient = reileigh - (1.0* (1.0-sunfade));",
+
+			"vec3 sunDirection = normalize(sunPosition);",
 
 			"float sunE = sunIntensity(dot(sunDirection, up));",
 
