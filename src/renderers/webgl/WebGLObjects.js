@@ -83,15 +83,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		attributeProperties.__webglBuffer = gl.createBuffer();
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		var usage = gl.STATIC_DRAW;
-
-		if ( data instanceof THREE.DynamicBufferAttribute
-			 || ( data instanceof THREE.InstancedBufferAttribute && data.dynamic === true )
-			 || ( data instanceof THREE.InterleavedBuffer && data.dynamic === true ) ) {
-
-			usage = gl.DYNAMIC_DRAW;
-
-		}
+		var usage = data.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
 
 		gl.bufferData( bufferType, data.array, usage );
 
@@ -103,7 +95,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.updateRange === undefined || data.updateRange.count === - 1 ) {
+		if ( data.dynamic === false || data.updateRange.count === - 1 ) {
 
 			// Not using update ranges
 
@@ -111,7 +103,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		} else if ( data.updateRange.count === 0 ) {
 
-			console.error( 'THREE.WebGLObjects.updateBuffer: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
+			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
 
 		} else {
 

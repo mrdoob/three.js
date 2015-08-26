@@ -2,7 +2,7 @@
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InterleavedBuffer = function ( array, stride, dynamic ) {
+THREE.InterleavedBuffer = function ( array, stride ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -11,7 +11,7 @@ THREE.InterleavedBuffer = function ( array, stride, dynamic ) {
 
 	this.version = 0;
 
-	this.dynamic = dynamic || false;
+	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
 
 };
@@ -35,6 +35,14 @@ THREE.InterleavedBuffer.prototype = {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
+
+	},
+
+	setDynamic: function ( value ) {
+
+		this.dynamic = value;
+
+		return this;
 
 	},
 

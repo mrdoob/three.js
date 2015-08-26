@@ -9,6 +9,9 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.array = array;
 	this.itemSize = itemSize;
 
+	this.dynamic = false;
+	this.updateRange = { offset: 0, count: - 1 };
+
 	this.version = 0;
 
 };
@@ -33,6 +36,14 @@ THREE.BufferAttribute.prototype = {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
+
+	},
+
+	setDynamic: function ( value ) {
+
+		this.dynamic = value;
+
+		return this;
 
 	},
 
