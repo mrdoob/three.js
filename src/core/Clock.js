@@ -31,15 +31,21 @@ THREE.Clock.prototype = {
 
 	stop: function () {
 
-		this.getElapsedTime();
+		this.updateElapsedTime();
 		this.running = false;
 
 	},
 
 	getElapsedTime: function () {
 
-		this.getDelta();
+		this.updateElapsedTime();
 		return this.elapsedTime;
+
+	},
+
+	updateElapsedTime: function () {
+
+		this.elapsedTime += this.getDelta();
 
 	},
 
@@ -61,8 +67,6 @@ THREE.Clock.prototype = {
 
 			diff = 0.001 * ( newTime - this.oldTime );
 			this.oldTime = newTime;
-
-			this.elapsedTime += diff;
 
 		}
 
