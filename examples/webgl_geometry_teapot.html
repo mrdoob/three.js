@@ -75,10 +75,15 @@
 			var shading;
 			var wireMaterial, flatGouraudMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
 
+			// allocate these just once
+			var diffuseColor = new THREE.Color();
+			var specularColor = new THREE.Color();
+
 			init();
 			animate();
 
 			function init() {
+
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -114,7 +119,7 @@
 
 				// CONTROLS
 				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
-				cameraControls.target.set(0, 0, 0);
+				cameraControls.target.set( 0, 0, 0 );
 
 				// TEXTURE MAP
 				var textureMap = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
@@ -123,9 +128,9 @@
 
 				// REFLECTION MAP
 				var path = "textures/cube/skybox/";
-				var urls = [path + "px.jpg", path + "nx.jpg",
-							path + "py.jpg", path + "ny.jpg",
-							path + "pz.jpg", path + "nz.jpg" ];
+				var urls = [ path + "px.jpg", path + "nx.jpg",
+							 path + "py.jpg", path + "ny.jpg",
+							 path + "pz.jpg", path + "nz.jpg" ];
 
 				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
 
@@ -179,8 +184,9 @@
 
 				renderer.setSize( canvasWidth, canvasHeight );
 
-				camera.aspect = canvasWidth/ canvasHeight;
+				camera.aspect = canvasWidth / canvasHeight;
 				camera.updateProjectionMatrix();
+
 			}
 
 			function setupGui() {
@@ -223,46 +229,47 @@
 
 				h = gui.addFolder( "Material control" );
 
-				h.add( effectController, "shininess", 1.0, 400.0, 1.0 ).name("Shininess");
-				h.add( effectController, "ka", 0.0, 1.0, 0.025 ).name("Ka");
-				h.add( effectController, "kd", 0.0, 1.0, 0.025 ).name("Kd");
-				h.add( effectController, "ks", 0.0, 1.0, 0.025 ).name("Ks");
+				h.add( effectController, "shininess", 1.0, 400.0, 1.0 ).name( "shininess" );
+				h.add( effectController, "kd", 0.0, 1.0, 0.025 ).name( "diffuse strength" );
+				h.add( effectController, "ks", 0.0, 1.0, 0.025 ).name( "specular strength" );
 				h.add( effectController, "metallic" );
 
 				// material (color)
 
 				h = gui.addFolder( "Material color" );
 
-				h.add( effectController, "hue", 0.0, 1.0, 0.025 ).name("Hue");
-				h.add( effectController, "saturation", 0.0, 1.0, 0.025 ).name("Saturation");
-				h.add( effectController, "lightness", 0.0, 1.0, 0.025 ).name("Lightness");
+				h.add( effectController, "hue", 0.0, 1.0, 0.025 ).name( "hue" );
+				h.add( effectController, "saturation", 0.0, 1.0, 0.025 ).name( "saturation" );
+				h.add( effectController, "lightness", 0.0, 1.0, 0.025 ).name( "lightness" );
 
 				// light (point)
 
-				h = gui.addFolder( "Light color" );
+				h = gui.addFolder( "Lighting" );
 
-				h.add( effectController, "lhue", 0.0, 1.0, 0.025 ).name("Hue");
-				h.add( effectController, "lsaturation", 0.0, 1.0, 0.025 ).name("Saturation");
-				h.add( effectController, "llightness", 0.0, 1.0, 0.025 ).name("Lightness");
+				h.add( effectController, "lhue", 0.0, 1.0, 0.025 ).name( "hue" );
+				h.add( effectController, "lsaturation", 0.0, 1.0, 0.025 ).name( "saturation" );
+				h.add( effectController, "llightness", 0.0, 1.0, 0.025 ).name( "lightness" );
+				h.add( effectController, "ka", 0.0, 1.0, 0.025 ).name( "ambient" );
 
 				// light (directional)
 
 				h = gui.addFolder( "Light direction" );
 
-				h.add( effectController, "lx", -1.0, 1.0, 0.025 ).name("x");
-				h.add( effectController, "ly", -1.0, 1.0, 0.025 ).name("y");
-				h.add( effectController, "lz", -1.0, 1.0, 0.025 ).name("z");
+				h.add( effectController, "lx", -1.0, 1.0, 0.025 ).name( "x" );
+				h.add( effectController, "ly", -1.0, 1.0, 0.025 ).name( "y" );
+				h.add( effectController, "lz", -1.0, 1.0, 0.025 ).name( "z" );
 
 				h = gui.addFolder( "Tessellation control" );
-				h.add(effectController, "newTess", [2,3,4,5,6,8,10,15,20,30,40,50] ).name("Tessellation Level");
-				h.add(effectController, "lid").name("display lid");
-				h.add(effectController, "body").name("display body");
-				h.add(effectController, "bottom").name("display bottom");
-				h.add(effectController, "fitLid").name("snug lid");
-				h.add(effectController, "nonblinn").name("original scale");
+				h.add( effectController, "newTess", [ 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 40, 50 ] ).name( "Tessellation Level" );
+				h.add( effectController, "lid" ).name( "display lid" );
+				h.add( effectController, "body" ).name( "display body" );
+				h.add( effectController, "bottom" ).name( "display bottom" );
+				h.add( effectController, "fitLid" ).name( "snug lid" );
+				h.add( effectController, "nonblinn" ).name( "original scale" );
 
 				// shading
-				h = gui.add(effectController, "newShading", ["wireframe","flat","smooth","glossy","textured","reflective"] ).name("Shading");
+				h = gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "reflective" ] ).name( "Shading" );
+
 			}
 
 
@@ -288,8 +295,9 @@
 					effectController.body !== bBody ||
 					effectController.fitLid !== bFitLid ||
 					effectController.nonblinn !== bNonBlinn ||
-					effectController.newShading !== shading)
+					effectController.newShading !== shading )
 				{
+
 					tess = effectController.newTess;
 					bBottom = effectController.bottom;
 					bLid = effectController.lid;
@@ -299,32 +307,37 @@
 					shading = effectController.newShading;
 
 					fillScene();
+
 				}
 
+				// We're a bit lazy here. We could check to see if any material attributes changed and update
+				// only if they have. But, these calls are cheap enough and this is just a demo.
 				phongMaterial.shininess = effectController.shininess;
 				texturedMaterial.shininess = effectController.shininess;
 
-				var diffuseColor = new THREE.Color();
 				diffuseColor.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
-				var specularColor = new THREE.Color();
 				if ( effectController.metallic )
 				{
+
 					// make colors match to give a more metallic look
 					specularColor.copy( diffuseColor );
+
 				}
 				else
 				{
+
 					// more of a plastic look
-					specularColor.setRGB(1,1,1);
+					specularColor.setRGB( 1, 1, 1 );
+
 				}
 
-				diffuseColor.multiplyScalar(effectController.kd);
+				diffuseColor.multiplyScalar( effectController.kd );
 				flatGouraudMaterial.color.copy( diffuseColor );
 				gouraudMaterial.color.copy( diffuseColor );
 				phongMaterial.color.copy( diffuseColor );
 				texturedMaterial.color.copy( diffuseColor );
 
-				specularColor.multiplyScalar(effectController.ks);
+				specularColor.multiplyScalar( effectController.ks );
 				phongMaterial.specular.copy( specularColor );
 				texturedMaterial.specular.copy( specularColor );
 
@@ -333,29 +346,33 @@
 
 				light.position.set( effectController.lx, effectController.ly, effectController.lz );
 				light.color.setHSL( effectController.lhue, effectController.lsaturation, effectController.llightness );
-				
+
 				// skybox is rendered separately, so that it is always behind the teapot.
 				if ( shading === "reflective" )
 				{
+
 					// clear to skybox
 					renderer.autoClear = false;
 					skybox.position.copy( camera.position );
 					renderer.render( sceneCube, camera );
+
 				}
 				else
 				{
+
 					// clear to regular background color
 					renderer.autoClear = true;
+
 				}
 
 				renderer.render( scene, camera );
+
 			}
 
+			// Whenever the teapot changes, the scene is rebuilt from scratch (not much to it).
 			function fillScene() {
-				scene = new THREE.Scene();
-				//scene.fog = new THREE.Fog( 0x808080, 2000, 4000 );
 
-				// LIGHTS
+				scene = new THREE.Scene();
 
 				scene.add( ambientLight );
 				scene.add( light );
@@ -367,14 +384,15 @@
 							effectController.lid,
 							effectController.body,
 							effectController.fitLid,
-							!effectController.nonblinn ),
+							! effectController.nonblinn ),
 					shading === "wireframe" ? wireMaterial : (
 					shading === "flat" ? flatGouraudMaterial : (
 					shading === "smooth" ? gouraudMaterial : (
 					shading === "glossy" ? phongMaterial : (
-					shading === "textured" ? texturedMaterial : reflectiveMaterial )))));	// if no match, pick Phong
+					shading === "textured" ? texturedMaterial : reflectiveMaterial ) ) ) ) );	// if no match, pick Phong
 
 				scene.add( teapot );
+
 			}
 
 		</script>

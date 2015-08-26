@@ -53,6 +53,7 @@
 /*global THREE */
 
 THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn ) {
+
 	"use strict";
 
 	// 32 * 4 * 4 Bezier spline patches
@@ -403,7 +404,7 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 	this.bottom = bottom === undefined ? true : bottom;
 	this.lid = lid === undefined ? true : lid;
 	this.body = body === undefined ? true : body;
-	
+
 	// Should the lid be snug? It's not traditional, so off by default
 	this.fitLid = fitLid === undefined ? false : fitLid;
 
@@ -418,7 +419,7 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 	this.blinn = blinn === undefined ? true : blinn;
 
 	// scale the size to be the real scaling factor
-	var maxHeight = 3.15 * (this.blinn ? 1 : blinnScale);
+	var maxHeight = 3.15 * ( this.blinn ? 1 : blinnScale );
 
 	var maxHeight2 = maxHeight / 2;
 	var trueSize = this.size / maxHeight2;
@@ -468,116 +469,139 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 	// internal function: test if triangle has any matching vertices;
 	// if so, don't save triangle, since it won't display anything.
 	var notDegenerate = function ( vtx1, vtx2, vtx3 ) {
-		if ( vtx1.equals( vtx2 ) ) { return false; }
-		if ( vtx1.equals( vtx3 ) ) { return false; }
-		if ( vtx2.equals( vtx3 ) ) { return false; }
-		return true;
+
+		// if any vertex matches, return false
+		return ! ( vtx1.equals( vtx2 ) || vtx1.equals( vtx3 ) || vtx2.equals( vtx3 ) );
+
 	};
 
 
-	for ( i = 0; i < 3; i++ )
+	for ( i = 0; i < 3; i ++ )
 	{
-		mgm[i] = new THREE.Matrix4();
+
+		mgm[ i ] = new THREE.Matrix4();
+
 	}
 
 	var minPatches = this.body ? 0 : 20;
 	var maxPatches = this.bottom ? 32 : 28;
 
-	vertPerRow = (this.segments+1);
+	vertPerRow = this.segments + 1;
 
 	eps = 0.0000001;
 
 	var surfCount = 0;
 
-	for ( var surf = minPatches ; surf < maxPatches ; surf++ ) {
+	for ( var surf = minPatches ; surf < maxPatches ; surf ++ ) {
+
 		// lid is in the middle of the data, patches 20-27,
 		// so ignore it for this part of the loop if the lid is not desired
-		if ( this.lid || (surf < 20 || surf >= 28) ) {
+		if ( this.lid || ( surf < 20 || surf >= 28 ) ) {
 
 			// get M * G * M matrix for x,y,z
-			for ( i = 0 ; i < 3 ; i++ ) {
+			for ( i = 0 ; i < 3 ; i ++ ) {
+
 				// get control patches
-				for ( r = 0 ; r < 4 ; r++ ) {
-					for ( c = 0 ; c < 4 ; c++ ) {
+				for ( r = 0 ; r < 4 ; r ++ ) {
+
+					for ( c = 0 ; c < 4 ; c ++ ) {
+
 						// transposed
-						g[c*4+r] = teapotVertices[teapotPatches[surf*16 + r*4 + c]*3 + i] ;
+						g[ c * 4 + r ] = teapotVertices[ teapotPatches[ surf * 16 + r * 4 + c ] * 3 + i ] ;
 
 						// is the lid to be made larger, and is this a point on the lid
 						// that is X or Y?
-						if ( this.fitLid && (surf >= 20 && surf < 28) && (i !== 2) ) {
+						if ( this.fitLid && ( surf >= 20 && surf < 28 ) && ( i !== 2 ) ) {
+
 							// increase XY size by 7.7%, found empirically. I don't
 							// increase Z so that the teapot will continue to fit in the
 							// space -1 to 1 for Y (Y is up for the final model).
-							g[c*4+r] *= 1.077;
+							g[ c * 4 + r ] *= 1.077;
+
 						}
 
 						// Blinn "fixed" the teapot by dividing Z by blinnScale, and that's the
 						// data we now use. The original teapot is taller. Fix it:
-						if ( !this.blinn && (i === 2) ) {
-							g[c*4+r] *= blinnScale;
+						if ( ! this.blinn && ( i === 2 ) ) {
+
+							g[ c * 4 + r ] *= blinnScale;
+
 						}
+
 					}
+
 				}
 
 				gmx = new THREE.Matrix4();
-				gmx.set( g[0], g[1], g[2], g[3], g[4], g[5], g[6], g[7], g[8], g[9], g[10], g[11], g[12], g[13], g[14], g[15] );
+				gmx.set( g[ 0 ], g[ 1 ], g[ 2 ], g[ 3 ], g[ 4 ], g[ 5 ], g[ 6 ], g[ 7 ], g[ 8 ], g[ 9 ], g[ 10 ], g[ 11 ], g[ 12 ], g[ 13 ], g[ 14 ], g[ 15 ] );
 
 				tmtx = new THREE.Matrix4();
 				tmtx.multiplyMatrices( gmx, ms );
-				mgm[i].multiplyMatrices( mst, tmtx );
+				mgm[ i ].multiplyMatrices( mst, tmtx );
+
 			}
 
 			// step along, get points, and output
-			for ( sstep = 0 ; sstep <= this.segments ; sstep++ ) {
+			for ( sstep = 0 ; sstep <= this.segments ; sstep ++ ) {
+
 				s = sstep / this.segments;
 
-				for ( tstep = 0 ; tstep <= this.segments ; tstep++ ) {
+				for ( tstep = 0 ; tstep <= this.segments ; tstep ++ ) {
+
 					t = tstep / this.segments;
 
 					// point from basis
 					// get power vectors and their derivatives
-					for ( p = 4, sval = tval = 1.0 ; p-- ; ) {
-						sp[p] = sval ;
-						tp[p] = tval ;
+					for ( p = 4, sval = tval = 1.0 ; p -- ; ) {
+
+						sp[ p ] = sval ;
+						tp[ p ] = tval ;
 						sval *= s ;
 						tval *= t ;
 
 						if ( p === 3 ) {
-							dsp[p] = dtp[p] = 0.0 ;
+
+							dsp[ p ] = dtp[ p ] = 0.0 ;
 							dsval = dtval = 1.0 ;
+
 						} else {
-							dsp[p] = dsval * (3-p) ;
-							dtp[p] = dtval * (3-p) ;
+
+							dsp[ p ] = dsval * ( 3 - p ) ;
+							dtp[ p ] = dtval * ( 3 - p ) ;
 							dsval *= s ;
 							dtval *= t ;
+
 						}
+
 					}
 
-					vsp = new THREE.Vector4( sp[0], sp[1], sp[2], sp[3] );
-					vtp = new THREE.Vector4( tp[0], tp[1], tp[2], tp[3] );
-					vdsp = new THREE.Vector4( dsp[0], dsp[1], dsp[2], dsp[3] );
-					vdtp = new THREE.Vector4( dtp[0], dtp[1], dtp[2], dtp[3] );
+					vsp = new THREE.Vector4( sp[ 0 ], sp[ 1 ], sp[ 2 ], sp[ 3 ] );
+					vtp = new THREE.Vector4( tp[ 0 ], tp[ 1 ], tp[ 2 ], tp[ 3 ] );
+					vdsp = new THREE.Vector4( dsp[ 0 ], dsp[ 1 ], dsp[ 2 ], dsp[ 3 ] );
+					vdtp = new THREE.Vector4( dtp[ 0 ], dtp[ 1 ], dtp[ 2 ], dtp[ 3 ] );
 
 					// do for x,y,z
-					for ( i = 0 ; i < 3 ; i++ ) {
+					for ( i = 0 ; i < 3 ; i ++ ) {
+
 						// multiply power vectors times matrix to get value
 						tcoord = vsp.clone();
-						tcoord.applyMatrix4( mgm[i] );
-						vert[i] = tcoord.dot( vtp );
+						tcoord.applyMatrix4( mgm[ i ] );
+						vert[ i ] = tcoord.dot( vtp );
 
 						// get s and t tangent vectors
 						tcoord = vdsp.clone();
-						tcoord.applyMatrix4( mgm[i] );
-						sdir[i] = tcoord.dot( vtp ) ;
+						tcoord.applyMatrix4( mgm[ i ] );
+						sdir[ i ] = tcoord.dot( vtp ) ;
 
 						tcoord = vsp.clone();
-						tcoord.applyMatrix4( mgm[i] );
-						tdir[i] = tcoord.dot( vdtp ) ;
+						tcoord.applyMatrix4( mgm[ i ] );
+						tdir[ i ] = tcoord.dot( vdtp ) ;
+
 					}
 
 					// find normal
-					vsdir = new THREE.Vector3( sdir[0], sdir[1], sdir[2] );
-					vtdir = new THREE.Vector3( tdir[0], tdir[1], tdir[2] );
+					vsdir = new THREE.Vector3( sdir[ 0 ], sdir[ 1 ], sdir[ 2 ] );
+					vtdir = new THREE.Vector3( tdir[ 0 ], tdir[ 1 ], tdir[ 2 ] );
 					norm.crossVectors( vtdir, vsdir );
 					norm.normalize();
 
@@ -585,48 +609,65 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 					normOut = new THREE.Vector3( norm.x, norm.z, -norm.y );
 
 					// if X and Z length is 0, at the cusp, so point the normal up or down, depending on patch number
-					if ( vert[0] === 0 && vert[1] === 0 )
+					if ( vert[ 0 ] === 0 && vert[ 1 ] === 0 )
 					{
+
 						// if above the middle of the teapot, normal points up, else down
-						normOut.set( 0, vert[2] > maxHeight2 ? 1 : -1, 0 );
+						normOut.set( 0, vert[ 2 ] > maxHeight2 ? 1 : -1, 0 );
+
 					}
 					normals.push( normOut );
 
-					uvs.push( new THREE.Vector2( 1-t, 1-s ) );
+					uvs.push( new THREE.Vector2( 1 - t, 1 - s ) );
 
 					// three.js uses Y up, the code makes Z up, so time for a trick:
 					// rotate on X axis, and offset down on Y axis so object ranges from -1 to 1 in Y
-					vertOut = new THREE.Vector3( trueSize*vert[0], trueSize*(vert[2] - maxHeight2), -trueSize*vert[1] );
+					vertOut = new THREE.Vector3( trueSize * vert[ 0 ], trueSize * ( vert[ 2 ] - maxHeight2 ), -trueSize * vert[ 1 ] );
 
 					this.vertices.push( vertOut );
 
 				}
+
 			}
 
 			// save the faces
-			for ( sstep = 0 ; sstep < this.segments ; sstep++ ) {
-				for ( tstep = 0 ; tstep < this.segments ; tstep++ ) {
+			for ( sstep = 0 ; sstep < this.segments ; sstep ++ ) {
+
+				for ( tstep = 0 ; tstep < this.segments ; tstep ++ ) {
+
 					v1 = surfCount * vertPerRow * vertPerRow + sstep * vertPerRow + tstep;
 					v2 = v1 + 1;
 					v3 = v2 + vertPerRow;
 					v4 = v1 + vertPerRow;
 
-					if ( notDegenerate ( this.vertices[v1], this.vertices[v2], this.vertices[v3] ) ) {
-						this.faces.push( new THREE.Face3( v1, v2, v3, [ normals[v1], normals[v2], normals[v3] ] ) );
-						this.faceVertexUvs[ 0 ].push( [ uvs[v1], uvs[v2], uvs[v3] ] );
+					// Normals and UVs cannot be shared. Without clone(), you can see the consequences
+					// of sharing if you call geometry.applyMatrix( matrix ).
+					if ( notDegenerate ( this.vertices[ v1 ], this.vertices[ v2 ], this.vertices[ v3 ] ) ) {
+
+						this.faces.push( new THREE.Face3( v1, v2, v3, [ normals[ v1 ].clone(), normals[ v2 ].clone(), normals[ v3 ].clone() ] ) );
+						this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v2 ].clone(), uvs[ v3 ].clone() ] );
+
 					}
-					if ( notDegenerate ( this.vertices[v1], this.vertices[v3], this.vertices[v4] ) ) {
-						this.faces.push( new THREE.Face3( v1, v3, v4, [ normals[v1], normals[v3], normals[v4] ] ) );
-						this.faceVertexUvs[ 0 ].push( [ uvs[v1], uvs[v3], uvs[v4] ] );
+					if ( notDegenerate ( this.vertices[ v1 ], this.vertices[ v3 ], this.vertices[ v4 ] ) ) {
+
+						this.faces.push( new THREE.Face3( v1, v3, v4, [ normals[ v1 ].clone(), normals[ v3 ].clone(), normals[ v4 ].clone() ] ) );
+						this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v3 ].clone(), uvs[ v4 ].clone() ] );
+
 					}
+
 				}
+
 			}
+
 			// increment only if a surface was used
-			surfCount++;
+			surfCount ++;
+
 		}
+
 	}
 
 	this.computeFaceNormals();
+
 };
 
 
