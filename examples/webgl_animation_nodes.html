@@ -80,13 +80,13 @@
 				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 30, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
-				camera.position.z = 50;
+				camera.position.z = 150;
 
 				scene = new THREE.Scene();
 
 				scene.fog = new THREE.Fog( 0x000000, 2000, 10000 );
 
-				scene.add( camera );
+				//scene.add( camera );
 
 				// GROUND
 
@@ -96,7 +96,7 @@
 				var ground = new THREE.Mesh( geometry, material );
 				ground.position.set( 0, FLOOR, 0 );
 				ground.rotation.x = -Math.PI/2;
-				scene.add( ground );
+				/*scene.add( ground );*/
 
 				ground.receiveShadow = true;
 
@@ -125,17 +125,13 @@
 				//
 
 				var loader = new THREE.ObjectLoader();
-				loader.load( "models/json/sceneNodeAnimation.json", function ( loadedScene ) {
+				loader.load( "models/json/three-gears-node-animation5.json", function ( loadedScene ) {
 
 					console.log( loadedScene );
 					sceneAnimationClip = loadedScene.animationClips[0];
-					for( var i = 0; i < loadedScene.children.length; i ++ ) {
-						var mesh = loadedScene.children[i];
-						mesh.material = new THREE.MeshPhongMaterial();
-						console.log( mesh );
-						scene.add( mesh );
-					}
-
+					scene = loadedScene;
+					scene.add( camera );
+				
 					mixer = new THREE.AnimationMixer( scene );
 			
 					mixer.addAction( new THREE.AnimationAction( sceneAnimationClip, 0, 1, 1, true ) );
