@@ -8593,6 +8593,9 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.array = array;
 	this.itemSize = itemSize;
 
+	this.dynamic = false;
+	this.updateRange = { offset: 0, count: - 1 };
+
 	this.version = 0;
 
 };
@@ -8617,6 +8620,25 @@ THREE.BufferAttribute.prototype = {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
+
+	},
+
+	setDynamic: function ( value ) {
+
+		this.dynamic = value;
+
+		return this;
+
+	},
+
+	copy: function ( source ) {
+
+		this.array = new source.array.constructor( source.array );
+		this.itemSize = source.itemSize;
+
+		this.dynamic = source.dynamic;
+
+		return this;
 
 	},
 
@@ -8865,7 +8887,7 @@ THREE.BufferAttribute.prototype = {
 
 	clone: function () {
 
-		return new this.constructor( new this.array.constructor( this.array ), this.itemSize );
+		return new this.constructor().copy( this );
 
 	}
 
@@ -8927,24 +8949,6 @@ THREE.Float64Attribute = function ( array, itemSize ) {
 
 };
 
-// File:src/core/DynamicBufferAttribute.js
-
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.DynamicBufferAttribute = function ( array, itemSize ) {
-
-	THREE.BufferAttribute.call( this, array, itemSize );
-
-	this.updateRange = { offset: 0, count: - 1 };
-
-};
-
-THREE.DynamicBufferAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
-THREE.DynamicBufferAttribute.prototype.constructor = THREE.DynamicBufferAttribute;
-
 // File:src/core/IndexBufferAttribute.js
 
 /**
@@ -8966,21 +8970,22 @@ THREE.IndexBufferAttribute.prototype.constructor = THREE.IndexBufferAttribute;
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedBufferAttribute = function ( array, itemSize, meshPerAttribute, dynamic ) {
+THREE.InstancedBufferAttribute = function ( array, itemSize, meshPerAttribute ) {
 
-	THREE.DynamicBufferAttribute.call( this, array, itemSize );
+	THREE.BufferAttribute.call( this, array, itemSize );
 
-	this.dynamic = dynamic || false;
 	this.meshPerAttribute = meshPerAttribute || 1;
 
 };
 
-THREE.InstancedBufferAttribute.prototype = Object.create( THREE.DynamicBufferAttribute.prototype );
+THREE.InstancedBufferAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 THREE.InstancedBufferAttribute.prototype.constructor = THREE.InstancedBufferAttribute;
 
-THREE.InstancedBufferAttribute.prototype.clone = function () {
+THREE.InstancedBufferAttribute.prototype.copy = function ( source ) {
 
-	return new THREE.InstancedBufferAttribute( new this.array.constructor( this.array ), this.itemSize, this.meshPerAttribute, this.dynamic );
+	THREE.BufferAttribute.prototype.copy.call( this, source );
+
+	this.meshPerAttribute = source.meshPerAttribute;
 
 };
 
@@ -8990,17 +8995,17 @@ THREE.InstancedBufferAttribute.prototype.clone = function () {
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InterleavedBuffer = function ( array, stride, dynamic ) {
+THREE.InterleavedBuffer = function ( array, stride ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
 	this.array = array;
 	this.stride = stride;
 
-	this.version = 0;
-
-	this.dynamic = dynamic || false;
+	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
+
+	this.version = 0;
 
 };
 
@@ -9023,6 +9028,22 @@ THREE.InterleavedBuffer.prototype = {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
+
+	},
+
+	setDynamic: function ( value ) {
+
+		this.dynamic = value;
+
+		return this;
+
+	},
+
+	copy: function ( source ) {
+
+		this.array = new source.array.constructor( source.array );
+		this.stride = source.stride;
+		this.dynamic = source.dynamic;
 
 	},
 
@@ -9053,7 +9074,7 @@ THREE.InterleavedBuffer.prototype = {
 
 	clone: function () {
 
-		return new this.constructor( new this.array.constructor( this.array ), this.stride, this.dynamic );
+		return new this.constructor().copy( this );
 
 	}
 
@@ -9065,9 +9086,9 @@ THREE.InterleavedBuffer.prototype = {
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedInterleavedBuffer = function ( array, stride, dynamic, meshPerAttribute ) {
+THREE.InstancedInterleavedBuffer = function ( array, stride, meshPerAttribute ) {
 
-	THREE.InterleavedBuffer.call( this, array, stride, dynamic );
+	THREE.InterleavedBuffer.call( this, array, stride );
 
 	this.meshPerAttribute = meshPerAttribute || 1;
 
@@ -9076,9 +9097,11 @@ THREE.InstancedInterleavedBuffer = function ( array, stride, dynamic, meshPerAtt
 THREE.InstancedInterleavedBuffer.prototype = Object.create( THREE.InterleavedBuffer.prototype );
 THREE.InstancedInterleavedBuffer.prototype.constructor = THREE.InstancedInterleavedBuffer;
 
-THREE.InstancedInterleavedBuffer.prototype.clone = function () {
+THREE.InstancedInterleavedBuffer.prototype.copy = function ( source ) {
 
-	return new this.constructor( new this.array.constructor( this.array ), this.stride, this.dynamic, this.meshPerAttribute );
+	THREE.InterleavedBuffer.prototype.copy.call( this, source );
+
+	this.meshPerAttribute = source.meshPerAttribute;
 
 };
 
@@ -23913,15 +23936,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		attributeProperties.__webglBuffer = gl.createBuffer();
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		var usage = gl.STATIC_DRAW;
-
-		if ( data instanceof THREE.DynamicBufferAttribute
-			 || ( data instanceof THREE.InstancedBufferAttribute && data.dynamic === true )
-			 || ( data instanceof THREE.InterleavedBuffer && data.dynamic === true ) ) {
-
-			usage = gl.DYNAMIC_DRAW;
-
-		}
+		var usage = data.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
 
 		gl.bufferData( bufferType, data.array, usage );
 
@@ -23933,7 +23948,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.updateRange === undefined || data.updateRange.count === - 1 ) {
+		if ( data.dynamic === false || data.updateRange.count === - 1 ) {
 
 			// Not using update ranges
 
@@ -23941,7 +23956,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		} else if ( data.updateRange.count === 0 ) {
 
-			console.error( 'THREE.WebGLObjects.updateBuffer: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
+			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
 
 		} else {
 
