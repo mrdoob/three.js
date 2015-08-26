@@ -26,7 +26,8 @@ THREE.KeyframeTrack.prototype = {
 	constructor: THREE.KeyframeTrack,
 
 	getAt: function( time ) {
-		
+
+
 		// this can not go higher than this.keys.length.
 		while( ( this.lastIndex < this.keys.length ) && ( time >= this.keys[this.lastIndex].time ) ) {
 			this.lastIndex ++;
@@ -40,6 +41,7 @@ THREE.KeyframeTrack.prototype = {
 		if( this.lastIndex >= this.keys.length ) {
 
 			this.setResult( this.keys[ this.keys.length - 1 ].value );
+
 			return this.result;
 
 		}
@@ -47,6 +49,7 @@ THREE.KeyframeTrack.prototype = {
 		if( this.lastIndex === 0 ) {
 
 			this.setResult( this.keys[ 0 ].value );
+
 			return this.result;
 
 		}
@@ -75,7 +78,7 @@ THREE.KeyframeTrack.prototype = {
 
 		if( timeOffset !== 0.0 ) {
 
-			for( var i = 1; i < this.keys.length; i ++ ) {
+			for( var i = 0; i < this.keys.length; i ++ ) {
 				this.keys[i].time += timeOffset;
 			}
 
@@ -90,7 +93,7 @@ THREE.KeyframeTrack.prototype = {
 
 		if( timeScale !== 1.0 ) {
 
-			for( var i = 1; i < this.keys.length; i ++ ) {
+			for( var i = 0; i < this.keys.length; i ++ ) {
 				this.keys[i].time *= timeScale;
 			}
 
