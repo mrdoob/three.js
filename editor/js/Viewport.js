@@ -505,26 +505,6 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	var animations = [];
-
-	signals.playAnimation.add( function ( animation ) {
-
-		animations.push( animation );
-
-	} );
-
-	signals.stopAnimation.add( function ( animation ) {
-
-		var index = animations.indexOf( animation );
-
-		if ( index !== -1 ) {
-
-			animations.splice( index, 1 );
-
-		}
-
-	} );
-
 	//
 
 	var renderer = null;

@@ -190,9 +190,13 @@ var Loader = function ( editor ) {
 						var contents = event.target.result;
 
 						var geometry = new THREE.MD2Loader().parse( contents );
-						geometry.name = filename;
+						var material = new THREE.MeshPhongMaterial( {
+							morphTargets: true,
+							morphNormals: true
+						} );
 
-						var object = new THREE.MorphAnimMesh( geometry, new THREE.MeshPhongMaterial() );
+						var object = new THREE.MorphAnimMesh( geometry, material );
+						object.name = filename;
 
 						editor.addObject( object );
 						editor.select( object );

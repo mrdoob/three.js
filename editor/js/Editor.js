@@ -19,9 +19,6 @@ var Editor = function () {
 
 		// actions
 
-		playAnimation: new SIGNALS.Signal(),
-		stopAnimation: new SIGNALS.Signal(),
-
 		// showDialog: new SIGNALS.Signal(),
 
 		// notifications
