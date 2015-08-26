@@ -241,7 +241,7 @@ THREE.MD2Loader.prototype = {
 					var x = data.getUint8( offset ++, true );
 					var y = data.getUint8( offset ++, true );
 					var z = data.getUint8( offset ++, true );
-					var n = data.getUint8( offset ++, true );
+					var n = normals[ data.getUint8( offset ++, true ) ];
 
 					var vertex = new THREE.Vector3(
 						x * scale.x + translation.x,
@@ -249,7 +249,7 @@ THREE.MD2Loader.prototype = {
 						y * scale.y + translation.y
 					);
 
-					var normal = new THREE.Vector3().fromArray( normals[ n ] );
+					var normal = new THREE.Vector3( n[ 0 ], n[ 2 ], n[ 1 ] );
 
 					frame.vertices.push( vertex );
 					frame.normals.push( normal );
