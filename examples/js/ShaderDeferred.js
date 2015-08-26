@@ -364,8 +364,6 @@ THREE.ShaderDeferred = {
 
 			"#ifdef USE_BUMPMAP",
 
-				"#extension GL_OES_standard_derivatives : enable\n",
-
 				"varying vec2 vUv;",
 				"varying vec3 vViewPosition;",
 

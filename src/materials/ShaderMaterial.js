@@ -115,6 +115,8 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
 
+	this.derivatives = source.derivatives;
+
 	return this;
 
 };
