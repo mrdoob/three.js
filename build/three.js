@@ -11959,9 +11959,9 @@ THREE.InstancedBufferGeometry = function () {
 THREE.InstancedBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.InstancedBufferGeometry.prototype.constructor = THREE.InstancedBufferGeometry;
 
-THREE.InstancedBufferGeometry.prototype.addDrawCall = function ( start, count, instances ) {
+THREE.InstancedBufferGeometry.prototype.addGroup = function ( start, count, instances ) {
 
-	this.drawcalls.push( {
+	this.groups.push( {
 
 		start: start,
 		count: count,
@@ -11973,17 +11973,21 @@ THREE.InstancedBufferGeometry.prototype.addDrawCall = function ( start, count, i
 
 THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
 
-	for ( var attr in source.attributes ) {
+	var attributes = source.attributes;
 
-		var sourceAttr = source.attributes[ attr ];
-		this.addAttribute( attr, sourceAttr.clone() );
+	for ( var name in attributes ) {
+
+		var attribute = attributes[ name ];
+		this.addAttribute( name, attribute.clone() );
 
 	}
 
-	for ( var i = 0, il = source.drawcalls.length; i < il; i ++ ) {
+	var groups = source.groups;
 
-		var offset = source.drawcalls[ i ];
-		this.addDrawCall( offset.start, offset.count, offset.instances );
+	for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+		var group = groups[ i ];
+		this.addGroup( group.start, group.count, group.instances );
 
 	}
 
