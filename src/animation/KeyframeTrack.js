@@ -88,7 +88,7 @@ THREE.KeyframeTrack.prototype = {
 	// scale all keyframe times by a factor (useful for frame <-> seconds conversions)
 	scale: function( timeScale ) {
 
-		if( timeTime !== 1.0 ) {
+		if( timeScale !== 1.0 ) {
 
 			for( var i = 1; i < this.keys.length; i ++ ) {
 				this.keys[i].time *= timeScale;

@@ -47,16 +47,14 @@ THREE.BooleanKeyframeTrack.prototype.clone = function() {
 		
 		var key = this.keys[i];
 		clonedKeys.push( {
-			time: key.time
+			time: key.time,
 			value: key.value
 		} );
 	}
 
-	var result = new THREE.BooleanKeyframeTrack( this.name );
-	return ( value0 === value1 );
+	return new THREE.BooleanKeyframeTrack( this.name );
 
 };
-
 
 THREE.BooleanKeyframeTrack.parse = function( name, jsonKeys ) {
 

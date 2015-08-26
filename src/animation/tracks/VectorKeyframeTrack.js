@@ -39,6 +39,23 @@ THREE.VectorKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
 
 };
 
+THREE.VectorKeyframeTrack.prototype.clone = function() {
+
+	var clonedKeys = [];
+
+	for( var i = 0; i < this.keys.length; i ++ ) {
+		
+		var key = this.keys[i];
+		clonedKeys.push( {
+			time: key.time,
+			value: key.value.clone()
+		} );
+	}
+
+	return new THREE.VectorKeyframeTrack( this.name );
+
+};
+
 THREE.VectorKeyframeTrack.parse = function( name, jsonKeys ) {
 
 	var elementCount = jsonKeys[0].value.length;

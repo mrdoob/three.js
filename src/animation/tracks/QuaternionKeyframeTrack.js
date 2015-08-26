@@ -39,6 +39,23 @@ THREE.QuaternionKeyframeTrack.prototype.compareValues = function( value0, value1
 
 };
 
+THREE.QuaternionKeyframeTrack.prototype.clone = function() {
+
+	var clonedKeys = [];
+
+	for( var i = 0; i < this.keys.length; i ++ ) {
+		
+		var key = this.keys[i];
+		clonedKeys.push( {
+			time: key.time,
+			value: key.value.clone()
+		} );
+	}
+
+	return new THREE.QuaternionKeyframeTrack( this.name );
+
+};
+
 THREE.QuaternionKeyframeTrack.parse = function( name, jsonKeys ) {
 
 	var keys = [];

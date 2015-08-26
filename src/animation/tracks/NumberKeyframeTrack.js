@@ -39,6 +39,23 @@ THREE.NumberKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
 
 };
 
+THREE.NumberKeyframeTrack.prototype.clone = function() {
+
+	var clonedKeys = [];
+
+	for( var i = 0; i < this.keys.length; i ++ ) {
+		
+		var key = this.keys[i];
+		clonedKeys.push( {
+			time: key.time,
+			value: key.value
+		} );
+	}
+
+	return new THREE.NumberKeyframeTrack( this.name );
+
+};
+
 THREE.NumberKeyframeTrack.parse = function( name, jsonKeys ) {
 
 	return new THREE.NumberKeyframeTrack( name, jsonKeys );

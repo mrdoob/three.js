@@ -39,6 +39,23 @@ THREE.ColorKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
 
 };
 
+THREE.ColorKeyframeTrack.prototype.clone = function() {
+
+	var clonedKeys = [];
+
+	for( var i = 0; i < this.keys.length; i ++ ) {
+		
+		var key = this.keys[i];
+		clonedKeys.push( {
+			time: key.time,
+			value: key.value.clone()
+		} );
+	}
+
+	return new THREE.ColorKeyframeTrack( this.name );
+
+};
+
 THREE.ColorKeyframeTrack.parse = function( name, jsonKeys ) {
 
 	var keys = [];
