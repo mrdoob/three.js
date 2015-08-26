@@ -8987,6 +8987,8 @@ THREE.InstancedBufferAttribute.prototype.copy = function ( source ) {
 
 	this.meshPerAttribute = source.meshPerAttribute;
 
+	return this;
+
 };
 
 // File:src/core/InterleavedBuffer.js
@@ -9102,6 +9104,8 @@ THREE.InstancedInterleavedBuffer.prototype.copy = function ( source ) {
 	THREE.InterleavedBuffer.prototype.copy.call( this, source );
 
 	this.meshPerAttribute = source.meshPerAttribute;
+
+	return this;
 
 };
 
