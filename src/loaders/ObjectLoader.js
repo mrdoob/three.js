@@ -631,21 +631,23 @@ THREE.ObjectLoader.prototype = {
 
 				var dataTracks = data.animations.tracks;
 
+				var fpsToSeconds = ( data.animations.fps !== undefined ) ? ( 1.0 / data.animations.fps ) : 1.0;
+
 				if( dataTracks.position ) {
 
-					tracks.push( THREE.VectorKeyframeTrack.parse( object.uuid + '.position', dataTracks.position ) );
+					tracks.push( THREE.VectorKeyframeTrack.parse( object.uuid + '.position', dataTracks.position ).scale( fpsToSeconds ) );
 
 				}
 
 				if( dataTracks.quaternion ) {
 
-					tracks.push( THREE.QuaternionKeyframeTrack.parse( object.uuid + '.quaternion', dataTracks.quaternion ) );
+					tracks.push( THREE.QuaternionKeyframeTrack.parse( object.uuid + '.quaternion', dataTracks.quaternion ).scale( fpsToSeconds ) );
 
 				}
 
 				if( dataTracks.scale ) {
 
-					tracks.push( THREE.VectorKeyframeTrack.parse( object.uuid + '.scale', dataTracks.scale ) );
+					tracks.push( THREE.VectorKeyframeTrack.parse( object.uuid + '.scale', dataTracks.scale ).scale( fpsToSeconds ) );
 
 				}
 			}

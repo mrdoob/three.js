@@ -105,6 +105,8 @@ THREE.AnimationMixer.prototype = {
 		this.actions = [];
 		this.propertyBindings = [];
 
+		return this;
+
 	},
 
 	removeAction: function( action ) {
@@ -140,12 +142,16 @@ THREE.AnimationMixer.prototype = {
 
 		this.updatePropertyBindingIndices();
 
+		return this;
+
 	},
 
 	play: function( action, optionalFadeInDuration ) {
 
 		action.startTime = this.time;
 		this.addAction( action );
+
+		return this;
 
 	},
 
@@ -157,6 +163,9 @@ THREE.AnimationMixer.prototype = {
 		keys.push( { time: this.time + duration, value: 0 } );
 		
 		action.weight = new THREE.NumberKeyframeTrack( "weight", keys );
+
+		return this;
+
 	},
 
 	fadeIn: function( action, duration ) {
@@ -168,6 +177,8 @@ THREE.AnimationMixer.prototype = {
 		
 		action.weight = new THREE.NumberKeyframeTrack( "weight", keys );
 
+		return this;
+
 	},
 
 	warp: function( action, startTimeScale, endTimeScale, duration ) {
@@ -178,6 +189,8 @@ THREE.AnimationMixer.prototype = {
 		keys.push( { time: this.time + duration, value: endTimeScale } );
 		
 		action.timeScale = new THREE.NumberKeyframeTrack( "timeScale", keys );
+
+		return this;
 
 	},
 
@@ -195,6 +208,8 @@ THREE.AnimationMixer.prototype = {
 			this.warp( fadeInAction, endStartRatio, 1.0, duration );
 
 		}
+
+		return this;
 		
 	},
 
@@ -232,6 +247,9 @@ THREE.AnimationMixer.prototype = {
 			this.propertyBindings[ i ].apply();
 
 		}
+
+		return this;
+		
 	}
 
 };

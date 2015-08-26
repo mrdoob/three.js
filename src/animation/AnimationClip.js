@@ -52,9 +52,11 @@ THREE.AnimationClip.prototype = {
 
 		for( var i = 0; i < this.tracks.length; i ++ ) {
 
-			this.tracks[ i ].trim( this.duration );
+			this.tracks[ i ].trim( 0, this.duration );
 
 		}
+
+		return this;
 
 	},
 
@@ -65,6 +67,8 @@ THREE.AnimationClip.prototype = {
 			this.tracks[ i ].optimize();
 
 		}
+
+		return this;
 
 	}
 

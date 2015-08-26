@@ -73,26 +73,47 @@ THREE.KeyframeTrack.prototype = {
 	// move all keyframes either forwards or backwards in time
 	shift: function( timeOffset ) {
 
-		for( var i = 1; i < this.keys.length; i ++ ) {
-			this.keys[i].time += timeOffset;
+		if( timeOffset !== 0.0 ) {
+
+			for( var i = 1; i < this.keys.length; i ++ ) {
+				this.keys[i].time += timeOffset;
+			}
+
 		}
+
+		return this;
 
 	},
 
-	// removes keyframes before and after animation without changing any values within the range [0,duration].
+	// scale all keyframe times by a factor (useful for frame <-> seconds conversions)
+	scale: function( timeScale ) {
+
+		if( timeTime !== 1.0 ) {
+
+			for( var i = 1; i < this.keys.length; i ++ ) {
+				this.keys[i].time *= timeScale;
+			}
+
+		}
+
+		return this;
+
+	},
+
+	// removes keyframes before and after animation without changing any values within the range [startTime, endTime].
 	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
- 	trim: function( duration ) {
+ 	trim: function( startTime, endTime ) {
 		
 		var firstKeysToRemove = 0;
 		for( var i = 1; i < this.keys.length; i ++ ) {
-			if( this.keys[i] <= 0 ) {
+			if( this.keys[i] <= startTime ) {
 				firstKeysToRemove ++;
 			}
 		}
  
 		var lastKeysToRemove = 0;
 		for( var i = this.keys.length - 2; i > 0; i ++ ) {
-			if( this.keys[i] >= duration ) {
+			if( this.keys[i] >= endTime ) {
 				lastKeysToRemove ++;
 			}
 			else {
@@ -104,6 +125,9 @@ THREE.KeyframeTrack.prototype = {
 		if( ( firstKeysToRemove + lastKeysToRemove ) > 0 ) {
 			this.keys = this.keys.splice( firstKeysToRemove, this.keys.length - lastKeysToRemove - firstKeysToRemove );;
 		}
+
+		return this;
+
 	},	
 
 	// sort in ascending order
@@ -116,7 +140,11 @@ THREE.KeyframeTrack.prototype = {
 		return function() {
 
 			this.keys.sort( keyComparator );
+
+			return this;
+
 		}
+
 
 	}(),
 
@@ -159,6 +187,8 @@ THREE.KeyframeTrack.prototype = {
 
 		}
 
+		return this;
+
 	},
 
 	// currently only removes equivalent sequential keys (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0), which are common in morph target animations
@@ -198,6 +228,8 @@ THREE.KeyframeTrack.prototype = {
 		newKeys.push( this.keys[ this.keys.length - 1 ] );
 
 		this.keys = newKeys;
+
+		return this;
 
 	}
 
