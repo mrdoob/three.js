@@ -149,7 +149,7 @@
 
 			geometry.addAttribute( "translate", new THREE.InstancedBufferAttribute( translateArray, 3, 1 ) );
 			geometry.addAttribute( "scale", new THREE.InstancedBufferAttribute( scaleArray, 1, 1 ).setDynamic( true ) );
-			geometry.addAttribute( "color", new THREE.InstancedBufferAttribute( colorsArray, 3, 1 ).setDynamic( true ) ) );
+			geometry.addAttribute( "color", new THREE.InstancedBufferAttribute( colorsArray, 3, 1 ).setDynamic( true ) );
 
 			material = new THREE.RawShaderMaterial( {
 				uniforms: {
