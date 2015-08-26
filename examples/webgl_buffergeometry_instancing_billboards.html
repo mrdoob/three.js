@@ -51,7 +51,6 @@
 	<script src="js/Detector.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 
-
 	<script id="vshader" type="x-shader/x-vertex">
 		precision highp float;
 		uniform mat4 modelViewMatrix;
@@ -61,7 +60,8 @@
 		attribute vec2 uv;
 		attribute vec3 normal;
 
-		attribute vec4 translateScale;
+		attribute vec3 translate;
+		attribute float scale;
 		attribute vec3 color;
 
 		varying vec2 vUv;
@@ -69,10 +69,9 @@
 
 		void main()	{
 
-			vec4 positionAdj = vec4( translateScale.xyz, 1.0 );
-			vec4 mvPosition = modelViewMatrix * positionAdj;
+			vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 );
 
-			mvPosition.xyz += position * translateScale.w;
+			mvPosition.xyz += position * scale;
 
 			vUv = uv;
 			vColor = color;
@@ -105,11 +104,7 @@
 		var container, stats;
 
 		var camera, scene, renderer;
-		var particles, geometry, material, sprite;
-		var mouseX = 0, mouseY = 0;
-
-		var windowHalfX = window.innerWidth / 2;
-		var windowHalfY = window.innerHeight / 2;
+		var geometry, material, mesh;
 
 		function init() {
 
@@ -130,53 +125,45 @@
 			container = document.createElement( 'div' );
 			document.body.appendChild( container );
 
-			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 3000 );
+			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 			camera.position.z = 1400;
 
 			scene = new THREE.Scene();
 
-			geometry = new THREE.InstancedBufferGeometry().copy( new THREE.CircleBufferGeometry( 1, 16 ) );
+			geometry = new THREE.InstancedBufferGeometry();
+			geometry.copy( new THREE.CircleBufferGeometry( 1, 6 ) );
 
-			sprite = THREE.ImageUtils.loadTexture( "textures/sprites/ball.png" );
+			var particleCount = 75000;
 
-			var particleCount = 5000;
+			var translateArray = new Float32Array( particleCount * 3 );
+			var scaleArray = new Float32Array( particleCount );
+			var colorsArray = new Float32Array( particleCount * 3 );
 
-			var translateScaleArray = new Float32Array( 4 * particleCount );
-			var colorsArray = new Float32Array( 3 * particleCount );
+			for ( var i = 0, i3 = 0, l = particleCount; i < l; i ++, i3 += 3 ) {
 
-			var color = new THREE.Color( 0xffffff );
-			for ( i = 0, ii = 0, ul = particleCount * 4; i < ul; i += 4, ii += 3 ) {
-
-				translateScaleArray[i] = 2000 * Math.random() - 1000;
-				translateScaleArray[i + 1] = 2000 * Math.random() - 1000;
-				translateScaleArray[i + 2] = 2000 * Math.random() - 1000;
-				translateScaleArray[i + 3] = 24;
-
-				color.setHSL(( translateScaleArray[i] + 1000 ) / 2000, 1, 0.5 );
-
-				colorsArray[ii] = color.r;
-				colorsArray[ii + 1] = color.g;
-				colorsArray[ii + 2] = color.b;
+				translateArray[ i3 + 0 ] = Math.random() * 2 - 1;
+				translateArray[ i3 + 1 ] = Math.random() * 2 - 1;
+				translateArray[ i3 + 2 ] = Math.random() * 2 - 1;
 
 			}
 
-			geometry.addAttribute( "translateScale", new THREE.InstancedBufferAttribute( translateScaleArray, 4, 1 ) );
-			geometry.addAttribute( "color", new THREE.InstancedBufferAttribute( colorsArray, 3, 1 ) );
+			geometry.addAttribute( "translate", new THREE.InstancedBufferAttribute( translateArray, 3, 1 ) );
+			geometry.addAttribute( "scale", new THREE.InstancedBufferAttribute( scaleArray, 1, 1, true ) );
+			geometry.addAttribute( "color", new THREE.InstancedBufferAttribute( colorsArray, 3, 1, true ) );
 
 			material = new THREE.RawShaderMaterial( {
 				uniforms: {
-					map: { type: "t", value: sprite }
+					map: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/circle.png" ) }
 				},
 				vertexShader: document.getElementById( 'vshader' ).textContent,
 				fragmentShader: document.getElementById( 'fshader' ).textContent,
 				depthTest: true,
 				depthWrite: true
-
 			} );
 
-			scene.add( new THREE.Mesh( geometry, material ) );
-
-
+			mesh = new THREE.Mesh( geometry, material );
+			mesh.scale.set( 500, 500, 500 );
+			scene.add( mesh );
 
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -189,54 +176,13 @@
 			stats.domElement.style.top = '0px';
 			container.appendChild( stats.domElement );
 
-			//
-
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-			document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-			document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-
 			window.addEventListener( 'resize', onWindowResize, false );
 
 			return true;
-		}
-
-		function onDocumentMouseMove( event ) {
-
-			mouseX = event.clientX - windowHalfX;
-			mouseY = event.clientY - windowHalfY;
-
-		}
-
-		function onDocumentTouchStart( event ) {
-
-			if ( event.touches.length === 1 ) {
-
-				event.preventDefault();
-
-				mouseX = event.touches[0].pageX - windowHalfX;
-				mouseY = event.touches[0].pageY - windowHalfY;
-
-			}
-
-		}
-
-		function onDocumentTouchMove( event ) {
-
-			if ( event.touches.length === 1 ) {
-
-				event.preventDefault();
-
-				mouseX = event.touches[0].pageX - windowHalfX;
-				mouseY = event.touches[0].pageY - windowHalfY;
-
-			}
 
 		}
 
 		function onWindowResize( event ) {
-
-			windowHalfX = window.innerWidth / 2;
-			windowHalfY = window.innerHeight / 2;
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
@@ -256,17 +202,43 @@
 
 		}
 
-		var lastTime = 0;
-
 		function render() {
 
-			var time = Date.now() * 0.00005;
+			var time = performance.now() * 0.0005;
 
-			camera.position.x += ( mouseX - camera.position.x ) * 0.05;
-			camera.position.y += ( -mouseY - camera.position.y ) * 0.05;
+			mesh.rotation.x = time * 0.2;
+			mesh.rotation.y = time * 0.4;
 
-			camera.lookAt( scene.position );
+			var translates = geometry.getAttribute( 'translate' );
+			var translatesArray = translates.array;
 
+			var scales = geometry.getAttribute( 'scale' );
+			var scalesArray = scales.array;
+
+			var colors = geometry.getAttribute( 'color' );
+			var colorsArray = colors.array;
+
+			var color = new THREE.Color( 0xffffff );
+
+			for ( var i = 0, i3 = 0, l = scalesArray.length; i < l; i ++, i3 += 3 ) {
+
+				var x = translatesArray[ i3 + 0 ] + time;
+				var y = translatesArray[ i3 + 1 ] + time;
+				var z = translatesArray[ i3 + 2 ] + time;
+				var scale = Math.sin( x * 2.1 ) + Math.sin( y * 3.2 ) + Math.sin( z * 4.3 );
+
+				scalesArray[ i ] = scale * 10 + 10;
+
+				color.setHSL( scale / 5, 1, 0.5 );
+
+				colorsArray[ i3 + 0 ] = color.r;
+				colorsArray[ i3 + 1 ] = color.g;
+				colorsArray[ i3 + 2 ] = color.b;
+
+			}
+
+			scales.needsUpdate = true;
+			colors.needsUpdate = true;
 
 			renderer.render( scene, camera );
 
