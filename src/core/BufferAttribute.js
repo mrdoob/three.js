@@ -47,6 +47,17 @@ THREE.BufferAttribute.prototype = {
 
 	},
 
+	copy: function ( source ) {
+
+		this.array = new source.array.constructor( source.array );
+		this.itemSize = source.itemSize;
+
+		this.dynamic = source.dynamic;
+
+		return this;
+
+	},
+
 	copyAt: function ( index1, attribute, index2 ) {
 
 		index1 *= this.itemSize;
@@ -292,7 +303,7 @@ THREE.BufferAttribute.prototype = {
 
 	clone: function () {
 
-		return new this.constructor( new this.array.constructor( this.array ), this.itemSize );
+		return new this.constructor().copy( this );
 
 	}
 

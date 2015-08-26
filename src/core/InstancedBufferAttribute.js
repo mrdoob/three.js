@@ -13,8 +13,12 @@ THREE.InstancedBufferAttribute = function ( array, itemSize, meshPerAttribute ) 
 THREE.InstancedBufferAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 THREE.InstancedBufferAttribute.prototype.constructor = THREE.InstancedBufferAttribute;
 
-THREE.InstancedBufferAttribute.prototype.clone = function () {
+THREE.InstancedBufferAttribute.prototype.copy = function ( source ) {
 
-	return new THREE.InstancedBufferAttribute( new this.array.constructor( this.array ), this.itemSize, this.meshPerAttribute );
+	THREE.BufferAttribute.prototype.copy.call( this, source );
+
+	this.meshPerAttribute = source.meshPerAttribute;
+
+	return this;
 
 };
