@@ -192,7 +192,7 @@ var Loader = function ( editor ) {
 						var geometry = new THREE.MD2Loader().parse( contents );
 						geometry.name = filename;
 
-						var object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
+						var object = new THREE.MorphAnimMesh( geometry, new THREE.MeshPhongMaterial() );
 
 						editor.addObject( object );
 						editor.select( object );
