@@ -154,7 +154,7 @@
             -1, -1, 1, 0, 0, 0, 0, 0,
             1, -1, -1, 0, 1, 1, 0, 0,
             -1, -1, -1, 0, 0, 1, 0, 0,
-        ] ), 8, false );
+        ] ), 8 );
 
         // Use vertexBuffer, starting at offset 0, 3 items in position attribute
         var positions = new THREE.InterleavedBufferAttribute( vertexBuffer, 3, 0 );
@@ -181,7 +181,7 @@
         geometry.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
 
         // per instance data
-        instanceBuffer = new THREE.InstancedInterleavedBuffer( new Float32Array( instances * 8 ), 8, true, 1 );
+        instanceBuffer = new THREE.InstancedInterleavedBuffer( new Float32Array( instances * 8 ), 8, 1 ).setDynamic( true );
         var offsets = new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 0 );
 
         var vector = new THREE.Vector4();

@@ -210,7 +210,7 @@
 			geometry.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
 
 			// per instance data
-			var offsets = new THREE.InstancedBufferAttribute( new Float32Array( instances * 3 ), 3, 1, false );
+			var offsets = new THREE.InstancedBufferAttribute( new Float32Array( instances * 3 ), 3, 1 );
 
 			var vector = new THREE.Vector4();
 			for ( var i = 0, ul = offsets.count; i < ul; i++ ) {
@@ -226,7 +226,7 @@
 			geometry.addAttribute( 'offset', offsets ); // per mesh translation
 
 
-			orientations = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1, true );
+			orientations = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 ).setDynamic( true );
 
 			for ( var i = 0, ul = orientations.count; i < ul; i++ ) {
 
