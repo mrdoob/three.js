@@ -108,14 +108,12 @@
 				light.shadowMapWidth = 1024;
 				light.shadowMapHeight = 1024;
 				light.shadowMapDarkness = 0.95;
-				// by turning on the frustum, you can see where the light's
-				// shadow volume is located:
-				//light.shadowCameraVisible = true;
+				// light.shadowCameraVisible = true;
 				light.shadowCameraNear = 100;
 				light.shadowCameraFar = 1200;
-				light.shadowCameraTop = 400;
-				light.shadowCameraBottom = -250;
-				light.shadowCameraRight = 900;
+				light.shadowCameraTop = 350;
+				light.shadowCameraBottom = -350;
+				light.shadowCameraRight = 1000;
 				light.shadowCameraLeft = -1000;
 
 				scene.add( light );
@@ -130,7 +128,8 @@
 				var ground = new THREE.Mesh( gg, gm );
 				ground.rotation.x = - Math.PI / 2;
 				ground.material.map.repeat.set( 64, 64 );
-				ground.material.map.wrapS = ground.material.map.wrapT = THREE.RepeatWrapping;
+				ground.material.map.wrapS = THREE.RepeatWrapping;
+				ground.material.map.wrapT = THREE.RepeatWrapping;
 				// note that because the ground does not cast a shadow, .castShadow is left false
 				ground.receiveShadow = true;
 
@@ -150,8 +149,8 @@
 				renderer.gammaOutput = true;
 				renderer.shadowMap.enabled = true;
 
-				//renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-				//renderer.shadowMap.debug = true;
+				// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				// renderer.shadowMap.debug = true;
 
 				// STATS
 
@@ -205,9 +204,7 @@
 					var character = new THREE.MD2CharacterComplex();
 					character.scale = 3;
 					character.controls = controls;
-
 					characters.push( character );
-
 
 				}
 
@@ -245,8 +242,9 @@
 
 					var gyro = new THREE.Gyroscope();
 					gyro.add( camera );
+					gyro.add( light, light.target );
 
-					characters[ Math.floor( nSkins/2 ) ].root.add( gyro );
+					characters[ Math.floor( nSkins / 2 ) ].root.add( gyro );
 
 				};
 
