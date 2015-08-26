@@ -627,7 +627,7 @@ THREE.ObjectLoader.prototype = {
 
 			}
 
-			if( data.animations ) {
+			if( data.animations && data.animations.tracks ) {
 
 				var dataTracks = data.animations.tracks;
 
