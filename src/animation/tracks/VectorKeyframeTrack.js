@@ -52,7 +52,7 @@ THREE.VectorKeyframeTrack.prototype.clone = function() {
 		} );
 	}
 
-	return new THREE.VectorKeyframeTrack( this.name );
+	return new THREE.VectorKeyframeTrack( this.name, clonedKeys );
 
 };
 

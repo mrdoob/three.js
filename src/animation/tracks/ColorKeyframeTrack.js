@@ -52,7 +52,7 @@ THREE.ColorKeyframeTrack.prototype.clone = function() {
 		} );
 	}
 
-	return new THREE.ColorKeyframeTrack( this.name );
+	return new THREE.ColorKeyframeTrack( this.name, clonedKeys );
 
 };
 

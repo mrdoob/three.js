@@ -52,7 +52,7 @@ THREE.NumberKeyframeTrack.prototype.clone = function() {
 		} );
 	}
 
-	return new THREE.NumberKeyframeTrack( this.name );
+	return new THREE.NumberKeyframeTrack( this.name, clonedKeys );
 
 };
 

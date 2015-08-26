@@ -52,7 +52,7 @@ THREE.BooleanKeyframeTrack.prototype.clone = function() {
 		} );
 	}
 
-	return new THREE.BooleanKeyframeTrack( this.name );
+	return new THREE.BooleanKeyframeTrack( this.name, clonedKeys );
 
 };
 
