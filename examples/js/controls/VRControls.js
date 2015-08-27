@@ -9,7 +9,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	var vrInputs = [];
 
-	var basePosition = new THREE.Vector3().copy(object.position); 
+	var basePosition = new THREE.Vector3().copy( object.position ); 
 
 	function filterInvalidDevices( devices ) {
 
@@ -83,7 +83,7 @@ THREE.VRControls = function ( object, onError ) {
 
 			if ( state.position !== null ) {
 
-				object.position.copy( state.position ).multiplyScalar( scope.scale ).addVector(basePosition); 
+				object.position.copy( state.position ).multiplyScalar( scope.scale ).addVector( basePosition ); 
 
 			}
 
