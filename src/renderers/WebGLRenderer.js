@@ -815,7 +815,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
-		var index = geometry.attributes.index;
+		var index = geometry.index;
 		var position = geometry.attributes.position;
 
 		if ( material.wireframe === true ) {
@@ -826,7 +826,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var renderer;
 
-		if ( index !== undefined ) {
+		if ( index !== null ) {
 
 			renderer = indexedBufferRenderer;
 			renderer.setIndex( index );
@@ -841,7 +841,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			setupVertexAttributes( material, program, geometry );
 
-			if ( index !== undefined ) {
+			if ( index !== null ) {
 
 				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, objects.getAttributeBuffer( index ) );
 
@@ -853,7 +853,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var count;
 
-			if ( index !== undefined ) {
+			if ( index !== null ) {
 
 				count = index.array.length;
 

@@ -28,6 +28,14 @@ THREE.InstancedBufferGeometry.prototype.addGroup = function ( start, count, inst
 
 THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
 
+	var index = source.index;
+
+	if ( index !== null ) {
+
+		this.addIndex( index.clone() );
+
+	}
+
 	var attributes = source.attributes;
 
 	for ( var name in attributes ) {

@@ -20,11 +20,18 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
+		var index = geometry.index;
 		var attributes = geometry.attributes;
+
+		if ( index !== null ) {
+
+			updateAttribute( index, gl.ELEMENT_ARRAY_BUFFER );
+
+		}
 
 		for ( var name in attributes ) {
 
-			updateAttribute( attributes[ name ] );
+			updateAttribute( attributes[ name ], gl.ARRAY_BUFFER );
 
 		}
 
@@ -38,7 +45,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-				updateAttribute( array[ i ] );
+				updateAttribute( array[ i ], gl.ARRAY_BUFFER );
 
 			}
 
@@ -48,19 +55,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	}
 
-	function updateAttribute( attribute ) {
-
-		var bufferType;
-
-		if ( attribute instanceof THREE.IndexBufferAttribute ) {
-
-			bufferType = gl.ELEMENT_ARRAY_BUFFER;
-
-		} else {
-
-			bufferType = gl.ARRAY_BUFFER;
-
-		}
+	function updateAttribute( attribute, bufferType ) {
 
 		var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
@@ -142,14 +137,13 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		var indices = [];
 
+		var index = geometry.index;
 		var attributes = geometry.attributes;
-
-		var index = attributes.index;
 		var position = attributes.position;
 
 		// console.time( 'wireframe' );
 
-		if ( index !== undefined ) {
+		if ( index !== null ) {
 
 			var edges = {};
 			var array = index.array;
@@ -168,7 +162,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		} else {
 
-			var array = position.array;
+			var array = attributes.position.array;
 
 			for ( var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
 
@@ -185,9 +179,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		// console.timeEnd( 'wireframe' );
 
 		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
-		var attribute = new THREE.IndexBufferAttribute( new TypeArray( indices ), 1 );
+		var attribute = new THREE.BufferAttribute( new TypeArray( indices ), 1 );
 
-		updateAttribute( attribute );
+		updateAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );
 
 		property.wireframe = attribute;
 

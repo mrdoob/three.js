@@ -12,6 +12,7 @@ THREE.BufferGeometry = function () {
 	this.name = '';
 	this.type = 'BufferGeometry';
 
+	this.index = null;
 	this.attributes = {};
 
 	this.morphAttributes = {};
@@ -27,6 +28,12 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
+	addIndex: function ( attribute ) {
+
+		this.index = attribute;
+
+	},
+
 	addAttribute: function ( name, attribute ) {
 
 		if ( attribute instanceof THREE.BufferAttribute === false && attribute instanceof THREE.InterleavedBufferAttribute === false ) {
@@ -39,10 +46,10 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( name === 'index' && attribute instanceof THREE.IndexBufferAttribute === false ) {
+		if ( name === 'index' ) {
 
-			console.warn( 'THREE.BufferGeometry.addAttribute: Use THREE.IndexBufferAttribute for index attribute.' );
-			attribute = new THREE.IndexBufferAttribute( attribute.array, attribute.itemSize );
+			console.warn( 'THREE.BufferGeometry.addAttribute: Use .addIndex() for index attribute.' );
+			this.addIndex( attribute );
 
 		}
 
@@ -500,7 +507,7 @@ THREE.BufferGeometry.prototype = {
 
 			var TypeArray = geometry.vertices.length > 65535 ? Uint32Array : Uint16Array;
 			var indices = new TypeArray( geometry.indices.length * 3 );
-			this.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
+			this.addIndex( new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 		}
 
@@ -672,6 +679,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeVertexNormals: function () {
 
+		var index = this.index;
 		var attributes = this.attributes;
 		var groups = this.groups;
 
@@ -710,9 +718,9 @@ THREE.BufferGeometry.prototype = {
 
 			// indexed elements
 
-			if ( attributes.index ) {
+			if ( index ) {
 
-				var indices = attributes.index.array;
+				var indices = index.array;
 
 				if ( groups.length === 0 ) {
 
@@ -800,7 +808,7 @@ THREE.BufferGeometry.prototype = {
 		// based on http://www.terathon.com/code/tangent.html
 		// (per vertex tangents)
 
-		if ( this.attributes.index === undefined ||
+		if ( this.index === undefined ||
 			 this.attributes.position === undefined ||
 			 this.attributes.normal === undefined ||
 			 this.attributes.uv === undefined ) {
@@ -810,7 +818,7 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		var indices = this.attributes.index.array;
+		var indices = this.index.array;
 		var positions = this.attributes.position.array;
 		var normals = this.attributes.normal.array;
 		var uvs = this.attributes.uv.array;
@@ -1122,8 +1130,15 @@ THREE.BufferGeometry.prototype = {
 
 	copy: function ( source ) {
 
+		var index = source.index;
+
+		if ( index !== null ) {
+
+			this.addIndex( index.clone() );
+
+		}
+
 		var attributes = source.attributes;
-		var groups = source.groups;
 
 		for ( var name in attributes ) {
 
@@ -1132,10 +1147,11 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		var groups = source.groups;
+
 		for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
 			var group = groups[ i ];
-
 			this.addGroup( group.start, group.count );
 
 		}
