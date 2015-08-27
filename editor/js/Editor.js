@@ -242,7 +242,7 @@ Editor.prototype = {
 	addHelper: function () {
 
 		var geometry = new THREE.SphereGeometry( 20, 4, 2 );
-		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
 
 		return function ( object ) {
 
@@ -282,7 +282,6 @@ Editor.prototype = {
 			var picker = new THREE.Mesh( geometry, material );
 			picker.name = 'picker';
 			picker.userData.object = object;
-			picker.visible = false;
 			helper.add( picker );
 
 			this.sceneHelpers.add( helper );
