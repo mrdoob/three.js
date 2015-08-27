@@ -116,6 +116,7 @@
 				var data = event.detail;
 
 				blendMesh.stopAll();
+				blendMesh.unPauseAll();
 
 				// the blend mesh will combine 1 or more animations
 				for ( var i = 0; i < data.anims.length; ++i ) {
@@ -155,7 +156,14 @@
 				var data = event.detail;
 				for ( var i = 0; i < data.anims.length; ++i ) {
 
-					blendMesh.applyWeight(data.anims[i], data.weights[i]);
+					for( var j = 0; j < blendMesh.mixer.actions.length; j ++ ) {
+						var action = blendMesh.mixer.actions[j];
+						if( action.clip.name === data.anims[i] ) {
+							if( action.getWeightAt( blendMesh.mixer.time ) !== data.weights[i] ) {
+								action.weight = data.weights[i];
+							}
+						}
+					}
 
 				}
 
@@ -218,7 +226,7 @@
 				blendMesh.animations[ 'walk' ].weight = 1 / 3;
 				blendMesh.animations[ 'run' ].weight = 1 / 3;
 
-				gui = new BlendCharacterGui(blendMesh.animations);
+				gui = new BlendCharacterGui(blendMesh);
 
 				// Create the debug visualization
 
@@ -245,9 +253,7 @@
 
 				blendMesh.update( stepSize );
 				helper.update();
-				gui.update();
-
-				THREE.AnimationHandler.update( stepSize );
+				gui.update( blendMesh.mixer.time );
 
 				renderer.render( scene, camera );
 				stats.update();
