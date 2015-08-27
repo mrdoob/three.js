@@ -134,7 +134,7 @@
 
 			geometry.maxInstancedCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
 			var gui = new dat.GUI();
-			gui.add( geometry, "maxInstancedCount", 0, 65000 );
+			gui.add( geometry, "maxInstancedCount", 0, instances );
 
 			var vertices = new THREE.BufferAttribute( new Float32Array( triangles * 3 * 3 ), 3 );
 
@@ -254,7 +254,6 @@
 		function render() {
 
 			var time = performance.now();
-
 
 			var object = scene.children[0];
 
