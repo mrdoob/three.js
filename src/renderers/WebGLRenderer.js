@@ -116,13 +116,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lightsNeedUpdate = true,
 
 	_lights = {
-
+		
+		useTexture: true,
 		ambient: [ 0, 0, 0 ],
 		directional: { length: 0, colors: [], positions: [] },
 		point: { length: 0, colors: [], positions: [], distances: [], decays: [] },
 		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [], decays: [] },
-		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
-
+		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] },
 	},
 
 	// info
@@ -524,7 +524,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		objects.clear();
 		properties.clear();
 
-	};
+	}
 
 	function onTextureDispose( event ) {
 
@@ -575,7 +575,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			// 2D texture
+			// 2D textur
 
 			if ( textureProperties.__webglInit === undefined ) return;
 
@@ -1501,6 +1501,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			maxMorphTargets: _this.maxMorphTargets,
 			maxMorphNormals: _this.maxMorphNormals,
 
+			lightUseTexture: _lights.useTexture,
 			maxDirLights: maxLightCount.directional,
 			maxPointLights: maxLightCount.point,
 			maxSpotLights: maxLightCount.spot,
@@ -1878,11 +1879,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( refreshLights ) {
 
 					refreshUniformsLights( m_uniforms, _lights );
-					markUniformsLightsNeedsUpdate( m_uniforms, true );
+					markUniformsLightsNeedsUpdate( _lights, m_uniforms, true );
 
 				} else {
 
-					markUniformsLightsNeedsUpdate( m_uniforms, false );
+					markUniformsLightsNeedsUpdate( _lights, m_uniforms, false );
 
 				}
 
@@ -2121,56 +2122,150 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	function refreshUniformsLights ( uniforms, lights ) {
-
-		uniforms.ambientLightColor.value = lights.ambient;
-
-		uniforms.directionalLightColor.value = lights.directional.colors;
-		uniforms.directionalLightDirection.value = lights.directional.positions;
-
-		uniforms.pointLightColor.value = lights.point.colors;
-		uniforms.pointLightPosition.value = lights.point.positions;
-		uniforms.pointLightDistance.value = lights.point.distances;
-		uniforms.pointLightDecay.value = lights.point.decays;
-
-		uniforms.spotLightColor.value = lights.spot.colors;
-		uniforms.spotLightPosition.value = lights.spot.positions;
-		uniforms.spotLightDistance.value = lights.spot.distances;
-		uniforms.spotLightDirection.value = lights.spot.directions;
-		uniforms.spotLightAngleCos.value = lights.spot.anglesCos;
-		uniforms.spotLightExponent.value = lights.spot.exponents;
-		uniforms.spotLightDecay.value = lights.spot.decays;
-
-		uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
-		uniforms.hemisphereLightGroundColor.value = lights.hemi.groundColors;
-		uniforms.hemisphereLightDirection.value = lights.hemi.positions;
+		
+		if ( lights.useTexture ) {
+			
+			uniforms.ambientLightColor.value = lights.ambient;
+			uniforms.lightTexture.value.flipY = false;
+			uniforms.lightTexture.value.version++;
+			
+			var i; 
+			var startpoint = 0;
+			
+			for (i = 0; i < lights.directional.length; i++ ){
+				
+				uniforms.lightTexture.value.image.data[ startpoint + 0 ] =  lights.directional.colors[ i * 3 + 0 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 1 ] =  lights.directional.colors[ i * 3 + 1 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 2 ] =  lights.directional.colors[ i * 3 + 2 ];
+				
+				uniforms.lightTexture.value.image.data[ startpoint + 3 ] =  lights.directional.positions[ i * 3 + 0 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 4 ] =  lights.directional.positions[ i * 3 + 1 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 5 ] =  lights.directional.positions[ i * 3 + 2 ];
+				
+				startpoint += 16;
+				
+			}
+			
+			for (i = 0; i < lights.point.length; i++ ){
+				
+				uniforms.lightTexture.value.image.data[ startpoint + 0 ] =  lights.point.colors[ i * 3 + 0 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 1 ] =  lights.point.colors[ i * 3 + 1 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 2 ] =  lights.point.colors[ i * 3 + 2 ];
+				
+				uniforms.lightTexture.value.image.data[ startpoint + 3 ] =  lights.point.positions[ i * 3 + 0 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 4 ] =  lights.point.positions[ i * 3 + 1 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 5 ] =  lights.point.positions[ i * 3 + 2 ];
+				
+				uniforms.lightTexture.value.image.data[ startpoint + 6 ] =  lights.point.distances[i];
+				uniforms.lightTexture.value.image.data[ startpoint + 7 ] =  lights.point.decays[i];
+								
+				startpoint += 16;
+				
+			}
+			
+			for (i = 0; i < lights.spot.length; i++ ){
+				
+				uniforms.lightTexture.value.image.data[ startpoint + 0 ] =  lights.spot.colors[ i * 3 + 0 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 1 ] =  lights.spot.colors[ i * 3 + 1 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 2 ] =  lights.spot.colors[ i * 3 + 2 ];
+				
+				uniforms.lightTexture.value.image.data[ startpoint + 3 ] =  lights.spot.positions[ i * 3 + 0 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 4 ] =  lights.spot.positions[ i * 3 + 1 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 5 ] =  lights.spot.positions[ i * 3 + 2 ];
+				
+				uniforms.lightTexture.value.image.data[ startpoint + 6 ] =  lights.spot.directions[ i * 3 + 0 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 7 ] =  lights.spot.directions[ i * 3 + 1 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 8 ] =  lights.spot.directions[ i * 3 + 2 ];
+				
+				uniforms.lightTexture.value.image.data[ startpoint + 9 ] =  lights.spot.distances[i];
+				uniforms.lightTexture.value.image.data[ startpoint + 10 ] =  lights.spot.decays[i];
+				uniforms.lightTexture.value.image.data[ startpoint + 11 ] =  lights.spot.anglesCos[i];
+				uniforms.lightTexture.value.image.data[ startpoint + 12 ] =  lights.spot.exponents[i];
+								
+				startpoint += 16;
+				
+			}
+			
+			for (i = 0; i < lights.hemi.length; i++ ){
+				
+				uniforms.lightTexture.value.image.data[ startpoint + 0 ] =  lights.hemi.skyColors[ i * 3 + 0 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 1 ] =  lights.hemi.skyColors[ i * 3 + 1 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 2 ] =  lights.hemi.skyColors[ i * 3 + 2 ];
+				
+				uniforms.lightTexture.value.image.data[ startpoint + 3 ] =  lights.hemi.groundColors[ i * 3 + 0 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 4 ] =  lights.hemi.groundColors[ i * 3 + 1 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 5 ] =  lights.hemi.groundColors[ i * 3 + 2 ];
+				
+				uniforms.lightTexture.value.image.data[ startpoint + 6 ] =  lights.hemi.positions[ i * 3 + 0 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 7 ] =  lights.hemi.positions[ i * 3 + 1 ];
+				uniforms.lightTexture.value.image.data[ startpoint + 8 ] =  lights.hemi.positions[ i * 3 + 2 ];
+								
+				startpoint += 16;
+				
+			}
+			
+		} else {
+			
+			uniforms.ambientLightColor.value = lights.ambient;
+	
+			uniforms.directionalLightColor.value = lights.directional.colors;
+			uniforms.directionalLightDirection.value = lights.directional.positions;
+	
+			uniforms.pointLightColor.value = lights.point.colors;
+			uniforms.pointLightPosition.value = lights.point.positions;
+			uniforms.pointLightDistance.value = lights.point.distances;
+			uniforms.pointLightDecay.value = lights.point.decays;
+	
+			uniforms.spotLightColor.value = lights.spot.colors;
+			uniforms.spotLightPosition.value = lights.spot.positions;
+			uniforms.spotLightDistance.value = lights.spot.distances;
+			uniforms.spotLightDirection.value = lights.spot.directions;
+			uniforms.spotLightAngleCos.value = lights.spot.anglesCos;
+			uniforms.spotLightExponent.value = lights.spot.exponents;
+			uniforms.spotLightDecay.value = lights.spot.decays;
+	
+			uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
+			uniforms.hemisphereLightGroundColor.value = lights.hemi.groundColors;
+			uniforms.hemisphereLightDirection.value = lights.hemi.positions;
+			
+		}
 
 	}
 
 	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
 
-	function markUniformsLightsNeedsUpdate ( uniforms, value ) {
+	function markUniformsLightsNeedsUpdate ( lights, uniforms, value ) {
+		
+		if ( lights.useTexture ){
+			
+			uniforms.ambientLightColor.needsUpdate = value;
+			uniforms.lightTexture.needsUpdate = value;
+			
+		} else {
 
-		uniforms.ambientLightColor.needsUpdate = value;
-
-		uniforms.directionalLightColor.needsUpdate = value;
-		uniforms.directionalLightDirection.needsUpdate = value;
-
-		uniforms.pointLightColor.needsUpdate = value;
-		uniforms.pointLightPosition.needsUpdate = value;
-		uniforms.pointLightDistance.needsUpdate = value;
-		uniforms.pointLightDecay.needsUpdate = value;
-
-		uniforms.spotLightColor.needsUpdate = value;
-		uniforms.spotLightPosition.needsUpdate = value;
-		uniforms.spotLightDistance.needsUpdate = value;
-		uniforms.spotLightDirection.needsUpdate = value;
-		uniforms.spotLightAngleCos.needsUpdate = value;
-		uniforms.spotLightExponent.needsUpdate = value;
-		uniforms.spotLightDecay.needsUpdate = value;
-
-		uniforms.hemisphereLightSkyColor.needsUpdate = value;
-		uniforms.hemisphereLightGroundColor.needsUpdate = value;
-		uniforms.hemisphereLightDirection.needsUpdate = value;
+			uniforms.ambientLightColor.needsUpdate = value;
+	
+			uniforms.directionalLightColor.needsUpdate = value;
+			uniforms.directionalLightDirection.needsUpdate = value;
+	
+			uniforms.pointLightColor.needsUpdate = value;
+			uniforms.pointLightPosition.needsUpdate = value;
+			uniforms.pointLightDistance.needsUpdate = value;
+			uniforms.pointLightDecay.needsUpdate = value;
+	
+			uniforms.spotLightColor.needsUpdate = value;
+			uniforms.spotLightPosition.needsUpdate = value;
+			uniforms.spotLightDistance.needsUpdate = value;
+			uniforms.spotLightDirection.needsUpdate = value;
+			uniforms.spotLightAngleCos.needsUpdate = value;
+			uniforms.spotLightExponent.needsUpdate = value;
+			uniforms.spotLightDecay.needsUpdate = value;
+	
+			uniforms.hemisphereLightSkyColor.needsUpdate = value;
+			uniforms.hemisphereLightGroundColor.needsUpdate = value;
+			uniforms.hemisphereLightDirection.needsUpdate = value;
+			
+		}
 
 	}
 

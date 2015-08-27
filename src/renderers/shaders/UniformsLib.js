@@ -66,6 +66,7 @@ THREE.UniformsLib = {
 
 	lights: {
 
+		"lightTexture" : { type: "t", value: new THREE.DataTexture( new Float32Array( 128 * 4 * 4 ), 4, 128, THREE.RGBAFormat, THREE.FloatType ) },
 		"ambientLightColor" : { type: "fv", value: [] },
 
 		"directionalLightDirection" : { type: "fv", value: [] },
