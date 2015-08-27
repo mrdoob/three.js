@@ -193,7 +193,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var extensions = new THREE.WebGLExtensions( _gl );
 
-	extensions.get( 'OES_texture_float' );
+	if (!extensions.get( 'OES_texture_float' )) {
+		
+		_lights.useTexture = false;
+		
+	};
 	extensions.get( 'OES_texture_float_linear' );
 	extensions.get( 'OES_texture_half_float' );
 	extensions.get( 'OES_texture_half_float_linear' );
