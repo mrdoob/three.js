@@ -9,6 +9,8 @@ THREE.VRControls = function ( object, onError ) {
 
 	var vrInputs = [];
 
+	var basePosition = new THREE.Vector3().copy(object.position); 
+
 	function filterInvalidDevices( devices ) {
 
 		// Exclude Cardboard position sensor if Oculus exists.
@@ -81,7 +83,7 @@ THREE.VRControls = function ( object, onError ) {
 
 			if ( state.position !== null ) {
 
-				object.position.copy( state.position ).multiplyScalar( scope.scale );
+				object.position.copy( state.position ).multiplyScalar( scope.scale ).addVectors(basePosition, object.position); 
 
 			}
 
