@@ -117,7 +117,7 @@
 
 			renderer = new THREE.WebGLRenderer();
 
-			if ( !renderer.supportsInstancedArrays ) {
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
 				document.getElementById( "notSupported" ).style.display = "";
 				return false;
 			}
