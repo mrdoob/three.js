@@ -83,7 +83,7 @@ THREE.VRControls = function ( object, onError ) {
 
 			if ( state.position !== null ) {
 
-				object.position.copy( state.position ).multiplyScalar( scope.scale ).addVectors(basePosition, object.position); 
+				object.position.copy( state.position ).multiplyScalar( scope.scale ).addVector(basePosition); 
 
 			}
 
