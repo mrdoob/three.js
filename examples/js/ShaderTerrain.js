@@ -168,8 +168,7 @@ THREE.ShaderTerrain = {
 
 					"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-						"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] + vViewPosition.xyz;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
@@ -198,7 +197,7 @@ THREE.ShaderTerrain = {
 
 					"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
-						"vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );",
+						"vec3 dirVector = directionalLightDirection[ i ];",
 						"vec3 dirHalfVector = normalize( dirVector + viewPosition );",
 
 						"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
@@ -222,7 +221,7 @@ THREE.ShaderTerrain = {
 
 					"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-						"vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );",
+						"vec3 lVector = hemisphereLightDirection[ i ];",
 
 						// diffuse
 

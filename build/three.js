@@ -7816,6 +7816,12 @@ THREE.Object3D = function () {
 		scale: {
 			enumerable: true,
 			value: scale
+		},
+		modelViewMatrix: {
+			value: new THREE.Matrix4()
+		},
+		normalMatrix: {
+			value: new THREE.Matrix3()
 		}
 	} );
 
@@ -9507,16 +9513,16 @@ THREE.Geometry.prototype = {
 
 		if ( indices !== undefined ) {
 
-			var drawcalls = geometry.drawcalls;
+			var groups = geometry.groups;
 
-			if ( drawcalls.length > 0 ) {
+			if ( groups.length > 0 ) {
 
-				for ( var i = 0; i < drawcalls.length; i ++ ) {
+				for ( var i = 0; i < groups.length; i ++ ) {
 
-					var drawcall = drawcalls[ i ];
+					var group = groups[ i ];
 
-					var start = drawcall.start;
-					var count = drawcall.count;
+					var start = group.start;
+					var count = group.count;
 
 					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
@@ -10482,6 +10488,8 @@ THREE.DirectGeometry = function () {
 	this.uvs2 = [];
 	this.tangents = [];
 
+	this.groups = [];
+
 	this.morphTargets = {};
 
 	this.skinWeights = [];
@@ -10530,7 +10538,6 @@ THREE.DirectGeometry.prototype = {
 
 	},
 
-
 	fromGeometry: function ( geometry ) {
 
 		var faces = geometry.faces;
@@ -10541,6 +10548,9 @@ THREE.DirectGeometry.prototype = {
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
 		var hasTangents = geometry.hasTangents;
+
+		var group;
+		var materialIndex;
 
 		// morphs
 
@@ -10588,7 +10598,7 @@ THREE.DirectGeometry.prototype = {
 
 		//
 
-		for ( var i = 0; i < faces.length; i ++ ) {
+		for ( var i = 0, i3 = 0; i < faces.length; i ++, i3 += 3 ) {
 
 			var face = faces[ i ];
 
@@ -10658,6 +10668,28 @@ THREE.DirectGeometry.prototype = {
 
 			}
 
+			// materials
+
+			if ( face.materialIndex !== materialIndex ) {
+
+				materialIndex = face.materialIndex;
+
+				if ( group !== undefined ) {
+
+					group.count = i3 - group.start;
+					this.groups.push( group );
+
+				}
+
+				group = {
+					start: i3,
+					materialIndex: materialIndex
+				};
+
+			}
+
+			// tangents
+
 			if ( hasTangents === true ) {
 
 				var vertexTangents = face.vertexTangents;
@@ -10710,6 +10742,15 @@ THREE.DirectGeometry.prototype = {
 
 		}
 
+		//
+
+		if ( group !== undefined ) {
+
+			group.count = i3 - group.start;
+			this.groups.push( group );
+
+		}
+
 		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
 		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
 		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
@@ -10750,7 +10791,7 @@ THREE.BufferGeometry = function () {
 
 	this.morphAttributes = {};
 
-	this.drawcalls = [];
+	this.groups = [];
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -10796,10 +10837,17 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	get drawcalls() {
+
+		console.error( 'THREE.BufferGeometry: .drawcalls has been renamed to .groups.' );
+		return this.groups;
+
+	},
+
 	get offsets() {
 
-		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .drawcalls.' );
-		return this.drawcalls;
+		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .groups.' );
+		return this.groups;
 
 	},
 
@@ -10811,18 +10859,33 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		this.drawcalls.push( {
-
-			start: start,
-			count: count
-
-		} );
+		console.warn( 'THREE.BufferGeometry: .addDrawCall() is now .addGroup().' );
+		this.addGroup( start, count );
 
 	},
 
 	clearDrawCalls: function () {
 
-		this.drawcalls = [];
+		console.warn( 'THREE.BufferGeometry: .clearDrawCalls() is now .clearGroups().' );
+		this.clearGroups();
+
+	},
+
+	addGroup: function ( start, count, materialIndex ) {
+
+		this.groups.push( {
+
+			start: start,
+			count: count,
+			materialIndex: materialIndex !== undefined ? materialIndex : 0
+
+		} );
+
+	},
+
+	clearGroups: function () {
+
+		this.groups = [];
 
 	},
 
@@ -11205,6 +11268,10 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		// groups
+
+		this.groups = geometry.groups;
+
 		// morphs
 
 		for ( var name in geometry.morphTargets ) {
@@ -11370,7 +11437,7 @@ THREE.BufferGeometry.prototype = {
 	computeVertexNormals: function () {
 
 		var attributes = this.attributes;
-		var drawcalls = this.drawcalls;
+		var groups = this.groups;
 
 		if ( attributes.position ) {
 
@@ -11411,18 +11478,18 @@ THREE.BufferGeometry.prototype = {
 
 				var indices = attributes.index.array;
 
-				if ( drawcalls.length === 0 ) {
+				if ( groups.length === 0 ) {
 
-					this.addDrawCall( 0, indices.length );
+					this.addGroup( 0, indices.length );
 
 				}
 
-				for ( var j = 0, jl = drawcalls.length; j < jl; ++ j ) {
+				for ( var j = 0, jl = groups.length; j < jl; ++ j ) {
 
-					var drawcall = drawcalls[ j ];
+					var group = groups[ j ];
 
-					var start = drawcall.start;
-					var count = drawcall.count;
+					var start = group.start;
+					var count = group.count;
 
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
@@ -11597,20 +11664,20 @@ THREE.BufferGeometry.prototype = {
 		var j, jl;
 		var iA, iB, iC;
 
-		if ( this.drawcalls.length === 0 ) {
+		if ( this.groups.length === 0 ) {
 
-			this.addDrawCall( 0, indices.length );
+			this.addGroup( 0, indices.length );
 
 		}
 
-		var drawcalls = this.drawcalls;
+		var groups = this.groups;
 
-		for ( j = 0, jl = drawcalls.length; j < jl; ++ j ) {
+		for ( j = 0, jl = groups.length; j < jl; ++ j ) {
 
-			var drawcall = drawcalls[ j ];
+			var group = groups[ j ];
 
-			var start = drawcall.start;
-			var count = drawcall.count;
+			var start = group.start;
+			var count = group.count;
 
 			for ( i = start, il = start + count; i < il; i += 3 ) {
 
@@ -11653,12 +11720,12 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		for ( j = 0, jl = drawcalls.length; j < jl; ++ j ) {
+		for ( j = 0, jl = groups.length; j < jl; ++ j ) {
 
-			var drawcall = drawcalls[ j ];
+			var group = groups[ j ];
 
-			var start = drawcall.start;
-			var count = drawcall.count;
+			var start = group.start;
+			var count = group.count;
 
 			for ( i = start, il = start + count; i < il; i += 3 ) {
 
@@ -11774,7 +11841,8 @@ THREE.BufferGeometry.prototype = {
 		data.data = { attributes: {} };
 
 		var attributes = this.attributes;
-		var drawcalls = this.drawcalls;
+		var groups = this.groups;
+
 		var boundingSphere = this.boundingSphere;
 
 		for ( var key in attributes ) {
@@ -11791,9 +11859,9 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( drawcalls.length > 0 ) {
+		if ( groups.length > 0 ) {
 
-			data.data.drawcalls = JSON.parse( JSON.stringify( drawcalls ) );
+			data.data.groups = JSON.parse( JSON.stringify( groups ) );
 
 		}
 
@@ -11819,7 +11887,7 @@ THREE.BufferGeometry.prototype = {
 	copy: function ( source ) {
 
 		var attributes = source.attributes;
-		var drawcalls = source.drawcalls;
+		var groups = source.groups;
 
 		for ( var name in attributes ) {
 
@@ -11828,10 +11896,11 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		for ( var i = 0, l = drawcalls.length; i < l; i ++ ) {
+		for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
-			var drawcall = drawcalls[ i ];
-			this.addDrawCall( drawcall.start, drawcall.count );
+			var group = groups[ i ];
+
+			this.addGroup( group.start, group.count );
 
 		}
 
@@ -13943,14 +14012,15 @@ THREE.BufferGeometryLoader.prototype = {
 
 		}
 
-		var drawcalls = json.data.drawcalls || json.data.offsets;
+		var groups = json.data.groups || json.data.drawcalls || json.data.offsets;
 
-		if ( drawcalls !== undefined ) {
+		if ( groups !== undefined ) {
 
-			for ( var i = 0, n = drawcalls.length; i !== n; ++ i ) {
+			for ( var i = 0, n = groups.length; i !== n; ++ i ) {
 
-				var drawcall = drawcalls[ i ];
-				geometry.addDrawcall( drawcall.start, drawcall.count );
+				var group = groups[ i ];
+
+				geometry.addGroup( group.start, group.count );
 
 			}
 
@@ -15844,17 +15914,17 @@ THREE.MeshNormalMaterial.prototype.copy = function ( source ) {
 
 };
 
-// File:src/materials/MeshFaceMaterial.js
+// File:src/materials/MultiMaterial.js
 
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MeshFaceMaterial = function ( materials ) {
+THREE.MultiMaterial = function ( materials ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
-	this.type = 'MeshFaceMaterial';
+	this.type = 'MultiMaterial';
 
 	this.materials = materials instanceof Array ? materials : [];
 
@@ -15862,9 +15932,9 @@ THREE.MeshFaceMaterial = function ( materials ) {
 
 };
 
-THREE.MeshFaceMaterial.prototype = {
+THREE.MultiMaterial.prototype = {
 
-	constructor: THREE.MeshFaceMaterial,
+	constructor: THREE.MultiMaterial,
 
 	toJSON: function () {
 
@@ -15908,6 +15978,10 @@ THREE.MeshFaceMaterial.prototype = {
 	}
 
 };
+
+// backwards compatibility
+
+THREE.MeshFaceMaterial = THREE.MultiMaterial;
 
 // File:src/materials/PointCloudMaterial.js
 
@@ -20096,7 +20170,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		resetGLState();
 		setDefaultGLState();
 
-		objects.clear();
 		properties.clear();
 
 	};
@@ -20334,7 +20407,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object ) {
+	this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object, group ) {
+
+		if ( material.visible === false ) return;
 
 		setMaterial( material );
 
@@ -20419,8 +20494,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		var groups = geometry.drawcalls;
-
 		var renderer;
 
 		if ( index !== undefined ) {
@@ -20446,7 +20519,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( groups.length === 0 ) {
+		if ( group === undefined ) {
 
 			var count;
 
@@ -20464,10 +20537,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			groups = [ {
+			group = {
 				start: 0,
 				count: count
-			} ];
+			};
 
 		}
 
@@ -20494,7 +20567,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				renderer.renderGroups( groups );
+				renderer.render( group.start, group.count );
 
 			}
 
@@ -20516,12 +20589,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			renderer.renderGroups( groups );
+			renderer.render( group.start, group.count );
 
 		} else if ( object instanceof THREE.PointCloud ) {
 
 			renderer.setMode( _gl.POINTS );
-			renderer.renderGroups( groups );
+			renderer.render( group.start, group.count );
 
 		}
 
@@ -20674,9 +20747,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			return a.object.renderOrder - b.object.renderOrder;
 
-		} else if ( a.object.material.id !== b.object.material.id ) {
+		} else if ( a.material.id !== b.material.id ) {
 
-			return a.object.material.id - b.object.material.id;
+			return a.material.id - b.material.id;
 
 		} else if ( a.z !== b.z ) {
 
@@ -20835,81 +20908,83 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object instanceof THREE.Scene || object instanceof THREE.Group ) {
+		if ( object instanceof THREE.Light ) {
 
-			// skip
+			lights.push( object );
 
-		} else {
+		} else if ( object instanceof THREE.Sprite ) {
 
-			// update Skeleton objects
+			sprites.push( object );
+
+		} else if ( object instanceof THREE.LensFlare ) {
+
+			lensFlares.push( object );
+
+		} else if ( object instanceof THREE.ImmediateRenderObject ) {
+
+			var material = object.material;
+
+			if ( material.transparent ) {
+
+				transparentImmediateObjects.push( object );
+
+			} else {
+
+				opaqueImmediateObjects.push( object );
+
+			}
+
+		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ){
+
 			if ( object instanceof THREE.SkinnedMesh ) {
 
 				object.skeleton.update();
 
 			}
 
-			objects.init( object );
-
-			if ( object instanceof THREE.Light ) {
-
-				lights.push( object );
-
-			} else if ( object instanceof THREE.Sprite ) {
-
-				sprites.push( object );
-
-			} else if ( object instanceof THREE.LensFlare ) {
-
-				lensFlares.push( object );
-
-			} else if ( object instanceof THREE.ImmediateRenderObject ) {
+			if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
 				var material = object.material;
 
-				if ( material.transparent ) {
+				if ( material.visible === true ) {
 
-					transparentImmediateObjects.push( object );
+					if ( _this.sortObjects === true ) {
 
-				} else {
+						_vector3.setFromMatrixPosition( object.matrixWorld );
+						_vector3.applyProjection( _projScreenMatrix );
 
-					opaqueImmediateObjects.push( object );
+					}
 
-				}
+					if ( material instanceof THREE.MeshFaceMaterial ) {
 
-			} else {
+						var materials = material.materials;
 
-				var webglObject = objects.objects[ object.id ];
+						for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
-				if ( webglObject && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
-
-					var material = object.material;
-
-					if ( material !== null && material.visible === true ) {
-
-						if ( properties.get( material ) ) {
-
-							material.program = properties.get( material ).program;
+							materials[ i ].program = properties.get( materials[ i ] ).program;
 
 						}
 
-						if ( material.transparent ) {
+					} else {
 
-							transparentObjects.push( webglObject );
+						material.program = properties.get( material ).program;
 
-						} else {
+					}
 
-							opaqueObjects.push( webglObject );
+					var renderItem = {
+						id: object.id,
+						object: object,
+						material: object.material,
+						z: _vector3.z
+					};
 
-						}
+					if ( material.transparent ) {
 
-						if ( _this.sortObjects === true ) {
+						transparentObjects.push( renderItem );
 
-							_vector3.setFromMatrixPosition( object.matrixWorld );
-							_vector3.applyProjection( _projScreenMatrix );
+					} else {
 
-							webglObject.z = _vector3.z;
-
-						}
+						opaqueObjects.push( renderItem );
 
 					}
 
@@ -20935,26 +21010,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
-			var webglObject = renderList[ i ];
-			var object = webglObject.object;
+			var renderItem = renderList[ i ];
+			var object = renderItem.object;
 			var geometry = objects.update( object );
 
-			object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-			object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
+			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 			if ( overrideMaterial === undefined ) material = object.material;
 
 			if ( material instanceof THREE.MeshFaceMaterial ) {
 
+				var groups = geometry.groups;
 				var materials = material.materials;
 
-				for ( var j = 0, jl = materials.length; j < jl; j ++ ) {
+				for ( var j = 0, jl = groups.length; j < jl; j ++ ) {
 
-					material = materials[ j ];
+					var group = groups[ j ];
+					var groupMaterial = materials[ group.materialIndex ];
 
-					if ( material.visible ) {
+					if ( groupMaterial !== undefined ) {
 
-						_this.renderBufferDirect( camera, lights, fog, geometry, material, object );
+						_this.renderBufferDirect( camera, lights, fog, geometry, groupMaterial, object, group );
 
 					}
 
@@ -20978,8 +21055,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var object = renderList[ i ];
 
-			object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-			object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
+			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 			if ( overrideMaterial === undefined ) material = object.material;
 
@@ -21785,11 +21862,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsMatrices ( uniforms, object ) {
 
-		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrix.elements );
+		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object.modelViewMatrix.elements );
 
 		if ( uniforms.normalMatrix ) {
 
-			_gl.uniformMatrix3fv( uniforms.normalMatrix, false, object._normalMatrix.elements );
+			_gl.uniformMatrix3fv( uniforms.normalMatrix, false, object.normalMatrix.elements );
 
 		}
 
@@ -23453,17 +23530,6 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	}
 
-	function renderGroups( groups ) {
-
-		for ( var i = 0, il = groups.length; i < il; i ++ ) {
-
-			var group = groups[ i ];
-			render( group.start, group.count );
-
-		}
-
-	}
-
 	function renderInstances( geometry ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
@@ -23491,7 +23557,6 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	this.setMode = setMode;
 	this.render = render;
-	this.renderGroups = renderGroups;
 	this.renderInstances = renderInstances;
 
 };
@@ -23540,17 +23605,6 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	}
 
-	function renderGroups( groups ) {
-
-		for ( var i = 0, il = groups.length; i < il; i ++ ) {
-
-			var group = groups[ i ];
-			render( group.start, group.count );
-
-		}
-
-	}
-
 	function renderInstances( geometry ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
@@ -23571,7 +23625,6 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 	this.setMode = setMode;
 	this.setIndex = setIndex;
 	this.render = render;
-	this.renderGroups = renderGroups;
 	this.renderInstances = renderInstances;
 
 };
@@ -23688,6 +23741,9 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		delete geometries[ geometry.id ];
 
+		var property = properties.get( geometry );
+		if ( property.wireframe ) deleteAttribute( property.wireframe );
+
 		info.memory.geometries --;
 
 	}
@@ -23704,19 +23760,24 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	}
 
+	function deleteAttribute( attribute ) {
+
+		var buffer = getAttributeBuffer( attribute );
+
+		if ( buffer !== undefined ) {
+
+			gl.deleteBuffer( buffer );
+			removeAttributeBuffer( attribute );
+
+		}
+
+	}
+
 	function deleteAttributes( attributes ) {
 
 		for ( var name in attributes ) {
 
-			var attribute = attributes[ name ];
-			var buffer = getAttributeBuffer( attribute );
-
-			if ( buffer !== undefined ) {
-
-				gl.deleteBuffer( buffer );
-				removeAttributeBuffer( attribute );
-
-			}
+			deleteAttribute( attributes[ name ] );
 
 		}
 
@@ -23748,77 +23809,9 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 THREE.WebGLObjects = function ( gl, properties, info ) {
 
-	var objects = {};
-
 	var geometries = new THREE.WebGLGeometries( gl, properties, info );
 
 	//
-
-	function onObjectRemoved( event ) {
-
-		var object = event.target;
-
-		object.traverse( function ( child ) {
-
-			child.removeEventListener( 'remove', onObjectRemoved );
-			removeObject( child );
-
-		} );
-
-	}
-
-	function removeObject( object ) {
-
-		if ( object instanceof THREE.Mesh ||
-			 object instanceof THREE.PointCloud ||
-			 object instanceof THREE.Line ) {
-
-			delete objects[ object.id ];
-
-		}
-
-		delete object._modelViewMatrix;
-		delete object._normalMatrix;
-
-		properties.delete( object );
-
-	}
-
-	//
-
-	this.objects = objects;
-
-	this.init = function ( object ) {
-
-		var objectProperties = properties.get( object );
-
-		if ( objectProperties.__webglInit === undefined ) {
-
-			objectProperties.__webglInit = true;
-			object._modelViewMatrix = new THREE.Matrix4();
-			object._normalMatrix = new THREE.Matrix3();
-
-			object.addEventListener( 'removed', onObjectRemoved );
-
-		}
-
-		if ( objectProperties.__webglActive === undefined ) {
-
-			objectProperties.__webglActive = true;
-
-			if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
-
-				objects[ object.id ] = {
-					id: object.id,
-					object: object,
-					z: 0
-				};
-
-			}
-
-		}
-
-	};
 
 	function update( object ) {
 
@@ -23967,7 +23960,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		var index = attributes.index;
 		var position = attributes.position;
 
-		console.time( 'wireframe' );
+		// console.time( 'wireframe' );
 
 		if ( index !== undefined ) {
 
@@ -24002,7 +23995,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		console.timeEnd( 'wireframe' );
+		// console.timeEnd( 'wireframe' );
 
 		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
 		var attribute = new THREE.IndexBufferAttribute( new TypeArray( indices ), 1 );
@@ -24031,12 +24024,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 	this.getWireframeAttribute = getWireframeAttribute;
 
 	this.update = update;
-
-	this.clear = function () {
-
-		objects = {};
-
-	};
 
 };
 
@@ -24825,27 +24812,25 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			// render regular objects
 
-			var webglObject, object, geometry, material;
-
 			for ( var j = 0, jl = _renderList.length; j < jl; j ++ ) {
 
-				webglObject = _renderList[ j ];
-
-				object = webglObject.object;
-				geometry = _objects.update( object );
-				material = object.material;
+				var object = _renderList[ j ];
+				var geometry = _objects.update( object );
+				var material = object.material;
 
 				if ( material instanceof THREE.MeshFaceMaterial ) {
 
+					var groups = geometry.groups;
 					var materials = material.materials;
 
-					for ( var k = 0, kl = materials.length; k < kl; k ++ ) {
+					for ( var j = 0, jl = groups.length; j < jl; j ++ ) {
 
-						material = materials[ k ];
+						var group = groups[ j ];
+						var groupMaterial = materials[ group.materialIndex ];
 
-						if ( material.visible ) {
+						if ( groupMaterial !== undefined ) {
 
-							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, material ), object );
+							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, groupMaterial ), object, group );
 
 						}
 
@@ -24908,6 +24893,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
+		depthMaterial.visible = material.visible;
 		depthMaterial.wireframe = material.wireframe;
 		depthMaterial.wireframeLinewidth = material.wireframeLinewidth;
 
@@ -24919,16 +24905,18 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		if ( object.visible === false ) return;
 
-		var webglObject = _objects.objects[ object.id ];
+		if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
 
-		if ( webglObject && object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+			if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-			var material = object.material;
+				var material = object.material;
 
-			if ( material !== null && material.visible === true ) {
+				if ( material.visible === true ) {
 
-				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-				_renderList.push( webglObject );
+					object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+					_renderList.push( object );
+
+				}
 
 			}
 
@@ -26120,8 +26108,8 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 			var sprite = sprites[ i ];
 
-			sprite._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
-			sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
+			sprite.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
+			sprite.z = - sprite.modelViewMatrix.elements[ 14 ];
 
 		}
 
@@ -26137,7 +26125,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			var material = sprite.material;
 
 			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
-			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
+			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix.elements );
 
 			sprite.matrixWorld.decompose( spritePosition, spriteRotation, spriteScale );
 
@@ -35084,9 +35072,6 @@ THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 	//
 
 	this.matrixAutoUpdate = false;
-
-	this.normalMatrix = new THREE.Matrix3();
-
 	this.update();
 
 };
@@ -35098,12 +35083,13 @@ THREE.FaceNormalsHelper.prototype.update = ( function () {
 
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
+	var normalMatrix = new THREE.Matrix3();
 
 	return function update() {
 
 		this.object.updateMatrixWorld( true );
 
-		this.normalMatrix.getNormalMatrix( this.object.matrixWorld );
+		normalMatrix.getNormalMatrix( this.object.matrixWorld );
 
 		var matrixWorld = this.object.matrixWorld;
 
@@ -35131,7 +35117,7 @@ THREE.FaceNormalsHelper.prototype.update = ( function () {
 				.divideScalar( 3 )
 				.applyMatrix4( matrixWorld );
 
-			v2.copy( normal ).applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
+			v2.copy( normal ).applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
 
 			position.setXYZ( idx, v1.x, v1.y, v1.z );
 
@@ -35548,8 +35534,6 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	this.matrixAutoUpdate = false;
 
-	this.normalMatrix = new THREE.Matrix3();
-
 	this.update();
 
 };
@@ -35561,6 +35545,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
+	var normalMatrix = new THREE.Matrix3();
 
 	return function update() {
 
@@ -35568,7 +35553,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 		this.object.updateMatrixWorld( true );
 
-		this.normalMatrix.getNormalMatrix( this.object.matrixWorld );
+		normalMatrix.getNormalMatrix( this.object.matrixWorld );
 
 		var matrixWorld = this.object.matrixWorld;
 
@@ -35598,7 +35583,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 					v1.copy( vertex ).applyMatrix4( matrixWorld );
 
-					v2.copy( normal ).applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
+					v2.copy( normal ).applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
 
 					position.setXYZ( idx, v1.x, v1.y, v1.z );
 
@@ -35628,7 +35613,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 				v2.set( objNorm.getX( j ), objNorm.getY( j ), objNorm.getZ( j ) );
 
-				v2.applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
+				v2.applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
 
 				position.setXYZ( idx, v1.x, v1.y, v1.z );
 
@@ -36137,8 +36122,16 @@ THREE.MorphBlendMesh.prototype.update = function ( delta ) {
 
 		if ( animation.directionBackwards ) mix = 1 - mix;
 
-		this.morphTargetInfluences[ animation.currentFrame ] = mix * weight;
-		this.morphTargetInfluences[ animation.lastFrame ] = ( 1 - mix ) * weight;
+		if ( animation.currentFrame !== animation.lastFrame ) {
+
+			this.morphTargetInfluences[ animation.currentFrame ] = mix * weight;
+			this.morphTargetInfluences[ animation.lastFrame ] = ( 1 - mix ) * weight;
+
+		} else {
+
+			this.morphTargetInfluences[ animation.currentFrame ] = weight;
+
+		}
 
 	}
 

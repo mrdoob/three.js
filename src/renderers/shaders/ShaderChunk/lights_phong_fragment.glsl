@@ -34,7 +34,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 #if MAX_POINT_LIGHTS > 0
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
-		
+
 		#ifdef LIGHT_USE_TEXTURE
 			
 			vec4 point1 = texture2D(lightTexture, vec2( 1.0/8.0 ,float(MAX_DIR_LIGHTS + i) * 1.0 / 128.0 - 1.0 / 256.0 ));
@@ -57,8 +57,8 @@ vec3 totalSpecularLight = vec3( 0.0 );
 		vec3 lightColor = pointLightColorI;
 
 		vec3 lightPosition = pointLightPositionI;
-		vec4 lPosition = viewMatrix * vec4( lightPosition, 1.0 );
-		vec3 lVector = lPosition.xyz + vViewPosition.xyz;
+		vec3 lVector = lightPosition + vViewPosition.xyz;
+
 		vec3 lightDir = normalize( lVector );
 
 		// attenuation
@@ -85,8 +85,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 #if MAX_SPOT_LIGHTS > 0
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
-		
-			
+
 		#ifdef LIGHT_USE_TEXTURE
 			
 			vec4 point1 = texture2D(lightTexture, vec2( 1.0/8.0 ,float(MAX_DIR_LIGHTS + MAX_POINT_LIGHTS + i) * 1.0 / 128.0 + 1.0 / 256.0));
@@ -117,11 +116,10 @@ vec3 totalSpecularLight = vec3( 0.0 );
 		vec3 lightColor = spotLightColorI;
 
 		vec3 lightPosition = spotLightPositionI;
-		vec4 lPosition = viewMatrix * vec4( lightPosition, 1.0 );
-		vec3 lVector = lPosition.xyz + vViewPosition.xyz;
+		vec3 lVector = lightPosition + vViewPosition.xyz;
 		vec3 lightDir = normalize( lVector );
 
-		float spotEffect = dot( spotLightDirectionI, normalize( lightPosition - vWorldPosition ) );
+		float spotEffect = dot( spotLightDirectionI, lightDir );
 
 		if ( spotEffect > spotLightAngleCosI ) {
 
@@ -170,9 +168,10 @@ vec3 totalSpecularLight = vec3( 0.0 );
 			
 		#endif
 
+
 		vec3 lightColor = directionalLightColorI;
 
-		vec3 lightDir = transformDirection( directionalLightDirectionI, viewMatrix );
+		vec3 lightDir = directionalLightDirectionI;
 
 		// diffuse
 
@@ -212,7 +211,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 		#endif
 
-		vec3 lightDir = transformDirection( hemisphereLightDirectionI, viewMatrix );
+		vec3 lightDir = hemisphereLightDirectionI;
 
 		// diffuse
 

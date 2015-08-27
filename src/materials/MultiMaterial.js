@@ -2,11 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MeshFaceMaterial = function ( materials ) {
+THREE.MultiMaterial = function ( materials ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
-	this.type = 'MeshFaceMaterial';
+	this.type = 'MultiMaterial';
 
 	this.materials = materials instanceof Array ? materials : [];
 
@@ -14,9 +14,9 @@ THREE.MeshFaceMaterial = function ( materials ) {
 
 };
 
-THREE.MeshFaceMaterial.prototype = {
+THREE.MultiMaterial.prototype = {
 
-	constructor: THREE.MeshFaceMaterial,
+	constructor: THREE.MultiMaterial,
 
 	toJSON: function () {
 
@@ -60,3 +60,7 @@ THREE.MeshFaceMaterial.prototype = {
 	}
 
 };
+
+// backwards compatibility
+
+THREE.MeshFaceMaterial = THREE.MultiMaterial;

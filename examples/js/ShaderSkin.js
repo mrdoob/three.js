@@ -197,9 +197,7 @@ THREE.ShaderSkin = {
 
 					"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
-						"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] + vViewPosition.xyz;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
@@ -628,9 +626,7 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
-						"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] - mvPosition.xyz;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
@@ -717,9 +713,7 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
-						"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] - mvPosition.xyz;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
