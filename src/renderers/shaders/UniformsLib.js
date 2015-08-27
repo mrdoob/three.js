@@ -66,7 +66,7 @@ THREE.UniformsLib = {
 
 	lights: {
 
-		"lightTexture" : { type: "t", value: new THREE.DataTexture( new Float32Array( 128 * 4 * 4 ), 4, 128, THREE.RGBAFormat, THREE.FloatType ) },
+		"lightTexture" : { type: "t", value: new THREE.DataTexture( new Float32Array( 128 * 4 * 4 ), 4, 128, THREE.RGBAFormat, THREE.FloatType, undefined, undefined, THREE.NearestFilter,  THREE.NearestFilter, 0 ) },
 		"ambientLightColor" : { type: "fv", value: [] },
 
 		"directionalLightDirection" : { type: "fv", value: [] },
@@ -120,3 +120,6 @@ THREE.UniformsLib = {
 	}
 
 };
+
+THREE.UniformsLib.lights.lightTexture.flipY = false;
+THREE.UniformsLib.lights.lightTexture.generateMipmaps = false;

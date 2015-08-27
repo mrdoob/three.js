@@ -2126,12 +2126,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsLights ( uniforms, vertexuniforms, lights ) {
 		
-		if ( lights.useTexture && ! vertexuniforms) {
+		if ( lights.useTexture && ! vertexuniforms ) {
 			
 			uniforms.ambientLightColor.value = lights.ambient;
-			uniforms.lightTexture.value.flipY = false;
-			uniforms.lightTexture.value.generateMipmaps = false;
-			uniforms.lightTexture.value.minFilter = THREE.LinearFilter;
 			uniforms.lightTexture.value.version++;
 			
 			var i; 
