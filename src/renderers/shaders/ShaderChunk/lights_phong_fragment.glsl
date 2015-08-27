@@ -155,8 +155,8 @@ vec3 totalSpecularLight = vec3( 0.0 );
 		
 		#ifdef LIGHT_USE_TEXTURE
 			
-			vec4 point1 = texture2D(lightTexture, vec2( 1.0/8.0 ,float(MAX_DIR_LIGHTS + i) * 1.0 / 128.0 - 1.0 / 256.0 ));
-			vec4 point2 = texture2D(lightTexture, vec2( 3.0/8.0 ,float(MAX_DIR_LIGHTS + i) * 1.0 / 128.0 - 1.0 / 256.0 ));
+			vec4 point1 = texture2D(lightTexture, vec2( 1.0/8.0 ,float(i) * 1.0 / 128.0 - 1.0 / 256.0 ));
+			vec4 point2 = texture2D(lightTexture, vec2( 3.0/8.0 ,float(i) * 1.0 / 128.0 - 1.0 / 256.0 ));
 			
 			vec3 directionalLightColorI =  point1.xyz;
 			vec3 directionalLightDirectionI = vec3( point1.w, point2.x, point2.y );
@@ -195,9 +195,9 @@ vec3 totalSpecularLight = vec3( 0.0 );
 		
 		#ifdef LIGHT_USE_TEXTURE
 			
-			vec4 point1 = texture2D(lightTexture, vec2( 1.0/8.0 ,float(MAX_DIR_LIGHTS + MAX_POINT_LIGHTS + i) * 1.0 / 128.0 + 1.0 / 256.0));
-			vec4 point2 = texture2D(lightTexture, vec2( 3.0/8.0 ,float(MAX_DIR_LIGHTS + MAX_POINT_LIGHTS + i) * 1.0 / 128.0 + 1.0 / 256.0));
-			vec4 point3 = texture2D(lightTexture, vec2( 5.0/8.0 ,float(MAX_DIR_LIGHTS + MAX_POINT_LIGHTS + i) * 1.0 / 128.0 + 1.0 / 256.0));
+			vec4 point1 = texture2D(lightTexture, vec2( 1.0/8.0 ,float(MAX_DIR_LIGHTS + MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS + i) * 1.0 / 128.0 + 1.0 / 256.0));
+			vec4 point2 = texture2D(lightTexture, vec2( 3.0/8.0 ,float(MAX_DIR_LIGHTS + MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS + i) * 1.0 / 128.0 + 1.0 / 256.0));
+			vec4 point3 = texture2D(lightTexture, vec2( 5.0/8.0 ,float(MAX_DIR_LIGHTS + MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS + i) * 1.0 / 128.0 + 1.0 / 256.0));
 			
 			vec3 hemisphereLightSkyColorI =  point1.xyz;
 			vec3 hemisphereLightGroundColorI = vec3( point1.w, point2.x, point2.y );
