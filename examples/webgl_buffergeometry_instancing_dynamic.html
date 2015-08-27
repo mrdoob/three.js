@@ -66,15 +66,15 @@
 
 		varying vec2 vUv;
 
-		void main()	{
+		void main() {
 
-		vec3 vPosition = position;
-		vec3 vcV = cross(orientation.xyz, vPosition);
-		vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition);
+			vec3 vPosition = position;
+			vec3 vcV = cross(orientation.xyz, vPosition);
+			vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition);
 
-		vUv = uv;
+			vUv = uv;
 
-		gl_Position = projectionMatrix * modelViewMatrix * vec4( offset + vPosition, 1.0 );
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( offset + vPosition, 1.0 );
 
 		}
 
@@ -87,9 +87,9 @@
 
 		varying vec2 vUv;
 
-		void main()	{
+		void main() {
 
-		gl_FragColor = texture2D(map, vUv);
+			gl_FragColor = texture2D(map, vUv);
 
 		}
 

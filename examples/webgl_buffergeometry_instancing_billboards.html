@@ -67,7 +67,7 @@
 		varying vec2 vUv;
 		varying vec3 vColor;
 
-		void main()	{
+		void main() {
 
 			vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 );
 
@@ -89,7 +89,7 @@
 		varying vec2 vUv;
 		varying vec3 vColor;
 
-		void main()	{
+		void main() {
 
 			vec4 diffuseColor = texture2D( map, vUv );
 			gl_FragColor = vec4( diffuseColor.xyz * vColor, diffuseColor.w );
