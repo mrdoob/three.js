@@ -19987,13 +19987,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _supportsVertexTextures = _maxVertexTextures > 0;
 	var _supportsBoneTextures = _supportsVertexTextures && extensions.get( 'OES_texture_float' );
-	var _supportsInstancedArrays = extensions.get( 'ANGLE_instanced_arrays' );
-
-	//
-
-
-
-	//
 
 	var _maxPrecision = state.getMaxPrecision( _precision );
 
@@ -20026,18 +20019,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.forceContextLoss = function () {
 
 		extensions.get( 'WEBGL_lose_context' ).loseContext();
-
-	};
-
-	this.supportsVertexTextures = function () {
-
-		return _supportsVertexTextures;
-
-	};
-
-	this.supportsInstancedArrays = function () {
-
-		return _supportsInstancedArrays;
 
 	};
 
@@ -23355,6 +23336,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 		return extensions.get( 'EXT_blend_minmax' );
 
 	};
+
+	this.supportsVertexTextures = function () {
+
+		return _supportsVertexTextures;
+
+	};
+
+	this.supportsInstancedArrays = function () {
+
+		console.warn( 'THREE.WebGLRenderer: .supportsInstancedArrays() is now .extensions.get( \'ANGLE_instanced_arrays\' ).' );
+		return extensions.get( 'ANGLE_instanced_arrays' );
+
+	};
+
+	//
 
 	this.initMaterial = function () {
 
