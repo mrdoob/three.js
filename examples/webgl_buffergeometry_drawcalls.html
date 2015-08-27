@@ -81,7 +81,7 @@
 				gui.add( effectController, "particleCount", 0, maxParticleCount, 1 ).onChange( function( value ) {
 
 					particleCount = parseInt( value );
-					particles.drawcalls[ 0 ].count = particleCount;
+					particles.groups[ 0 ].count = particleCount;
 
 				});
 
@@ -146,11 +146,11 @@
 
 				}
 
-				particles.addDrawCall( 0, particleCount );
+				particles.addGroup( 0, particleCount );
 				particles.addAttribute( 'position', new THREE.BufferAttribute( particlePositions, 3 ).setDynamic( true ) );
 
 				// create the particle system
-				pointCloud = new THREE.PointCloud( particles, pMaterial );
+				pointCloud = new THREE.PointCloud( particles, new THREE.MultiMaterial( [ pMaterial ] ) );
 				group.add( pointCloud );
 
 				var geometry = new THREE.BufferGeometry();
@@ -160,7 +160,7 @@
 
 				geometry.computeBoundingSphere();
 
-				geometry.addDrawCall( 0, 0 );
+				geometry.addGroup( 0, 0 );
 
 				var material = new THREE.LineBasicMaterial( {
 					vertexColors: THREE.VertexColors,
@@ -168,7 +168,7 @@
 					transparent: true
 				} );
 
-				linesMesh = new THREE.LineSegments( geometry, material );
+				linesMesh = new THREE.LineSegments( geometry, new THREE.MultiMaterial( [ material ] ) );
 				group.add( linesMesh );
 
 				//
@@ -273,7 +273,7 @@
 				}
 
 
-				linesMesh.geometry.drawcalls[ 0 ].count = numConnected * 2;
+				linesMesh.geometry.groups[ 0 ].count = numConnected * 2;
 				linesMesh.geometry.attributes.position.needsUpdate = true;
 				linesMesh.geometry.attributes.color.needsUpdate = true;
 
