@@ -643,8 +643,8 @@ THREE.ObjectLoader.prototype = {
 
 					var trackQuaternion = THREE.QuaternionKeyframeTrack.parse( object.uuid + '.quaternion', dataTracks.quaternion ).scale( fpsToSeconds );
 				
-					trackQuaternion.multiply( trackQuaternion.keys[0].value.clone().inverse() );
-					trackQuaternion.multiply( object.quaternion );
+					//trackQuaternion.multiply( trackQuaternion.keys[0].value.clone().inverse() );
+					//trackQuaternion.multiply( object.quaternion );
 					
 					tracks.push( trackQuaternion );
 
