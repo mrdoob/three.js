@@ -117,6 +117,14 @@ THREE.VRControls = function ( object, onError ) {
 		this.resetSensor();
 
 	};
+	
+	this.getBasePosition = function () {
+		return basePosition; 
+	}; 
+
+	this.setBasePosition = function ( position ) {
+		basePosition.copy( position ); 
+	}; 
 
 	this.dispose = function () {
 
