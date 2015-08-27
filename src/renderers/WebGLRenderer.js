@@ -1881,7 +1881,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( refreshLights ) {
 
-					refreshUniformsLights( m_uniforms, _lights );
+					refreshUniformsLights( m_uniforms, material instanceof THREE.MeshLambertMaterial, _lights );
 					markUniformsLightsNeedsUpdate( _lights, m_uniforms, true );
 
 				} else {
@@ -2124,12 +2124,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function refreshUniformsLights ( uniforms, lights ) {
+	function refreshUniformsLights ( uniforms, vertexuniforms, lights ) {
 		
-		if ( lights.useTexture ) {
+		if ( lights.useTexture && ! vertexuniforms) {
 			
 			uniforms.ambientLightColor.value = lights.ambient;
 			uniforms.lightTexture.value.flipY = false;
+			uniforms.lightTexture.value.generateMipmaps = false;
+			uniforms.lightTexture.value.minFilter = THREE.LinearFilter;
 			uniforms.lightTexture.value.version++;
 			
 			var i; 
