@@ -226,8 +226,6 @@ function SimulationRenderer( WIDTH, renderer ) {
 		}
 
 		var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBFormat, THREE.FloatType );
-		texture.minFilter = THREE.NearestFilter;
-		texture.magFilter = THREE.NearestFilter;
 		texture.needsUpdate = true;
 
 		return texture;
