@@ -38,10 +38,6 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 
 		this.boneMatrices = new Float32Array( this.boneTextureWidth * this.boneTextureHeight * 4 ); // 4 floats per RGBA pixel
 		this.boneTexture = new THREE.DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, THREE.RGBAFormat, THREE.FloatType );
-		this.boneTexture.minFilter = THREE.NearestFilter;
-		this.boneTexture.magFilter = THREE.NearestFilter;
-		this.boneTexture.generateMipmaps = false;
-		this.boneTexture.flipY = false;
 
 	} else {
 

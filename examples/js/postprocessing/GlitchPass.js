@@ -113,7 +113,6 @@ THREE.GlitchPass.prototype = {
 		texture.minFilter = THREE.NearestFilter;
 		texture.magFilter = THREE.NearestFilter;
 		texture.needsUpdate = true;
-		texture.flipY = false;
 		return texture;
 
 	}
