@@ -92,8 +92,8 @@ def cast_shadow(obj):
         if obj.data.type in (SPOT, SUN):
             ret = obj.data.shadow_method != NO_SHADOW
         else:
-            logger.info("%s is a lamp but this lamp type does not "
-                        "have supported shadows in ThreeJS", obj.name)
+            logger.info('%s is a lamp but this lamp type does not '\
+                'have supported shadows in ThreeJS', obj.name)
             ret = None
         return ret
     elif obj.type == MESH:
@@ -131,6 +131,82 @@ def material(obj):
     except IndexError:
         pass
 
+QUAT_CONVERSION = axis_conversion(from_forward='Y', from_up='Z', to_forward='Z', to_up='Y')
+
+def __swap_quaternions(track):
+    for t in track:
+        a = t["value"]
+        q = mathutils.Quaternion(a)
+        q = (QUAT_CONVERSION*q.to_matrix()).to_quaternion()
+        a[0] =-q.x
+        a[1] =-q.y
+        a[2] =-q.z
+        a[3] =-q.w
+    pass
+
+def __swap_vector3(track):
+    for t in track:
+        v = t["value"]
+        tmp = v[1]
+        v[1] = v[2]
+        v[2] = tmp
+    pass
+
+def __parse_tracked_vector(fcurves, start_index, nb_curves):
+    track = []
+    for xx in fcurves[start_index].keyframe_points:
+        track.append({ "time": xx.co.x, "value": [xx.co.y] })
+
+    swapFunction = __swap_vector3 if nb_curves == 3 else __swap_quaternions
+
+    nb_curves += start_index
+    start_index += 1
+    while start_index < nb_curves:
+        i = 0
+        for xx in fcurves[start_index].keyframe_points:
+            track[i]["value"].append(xx.co.y)
+            i += 1
+        start_index += 1
+    swapFunction(track)
+    return track
+
+# trackable transform fields ( <output field>, <nb fcurve>, <type> )
+TRACKABLE_FIELDS = {
+    "location": ( "position", 3, "vector3" ),
+    "scale": ( "scale", 3, "vector3" ),
+    "rotation_euler": ( "rotation", 3, "vector3" ),
+    "rotation_quaternion": ( "quaternion", 4, "quaternion" )
+}
+
+@_object
+def animated_xform(obj):
+    fcurves = obj.animation_data
+    if not fcurves:
+        return {}
+    fcurves = fcurves.action.fcurves
+
+    tracks = []
+    i = 0
+    nb_curves = len(fcurves)
+    while i < nb_curves:
+        field_info = TRACKABLE_FIELDS.get(fcurves[i].data_path)
+        if field_info:
+            nb_curves = field_info[1]
+            tracks.append({
+                constants.NAME: field_info[0],
+                constants.TYPE: field_info[2],
+                constants.KEYS: __parse_tracked_vector(fcurves, i, nb_curves)
+            })
+            i += nb_curves
+        else:
+            i += 1
+
+    animation = {
+        constants.KEYFRAMES: tracks,
+        constants.FPS: context.scene.render.fps,
+        constants.NAME: obj.name
+    }
+    return animation
 
 @_object
 def mesh(obj, options):
@@ -217,7 +293,6 @@ def nodes(valid_types, options):
         if _valid_node(obj, valid_types, options):
             yield obj.name
 
-
 @_object
 def position(obj, options):
     """
@@ -245,9 +320,7 @@ def receive_shadow(obj):
         else:
             return False
 
-
 AXIS_CONVERSION = axis_conversion(to_forward='Z', to_up='Y').to_4x4()
-
 
 @_object
 def matrix(obj, options):
@@ -331,10 +404,7 @@ def extract_mesh(obj, options, recalculate=False):
 
     """
     logger.debug('object.extract_mesh(%s, %s)', obj, options)
-    apply_modifiers = options.get(constants.APPLY_MODIFIERS, True)
-    if apply_modifiers:
-        bpy.ops.object.mode_set(mode='OBJECT')
-    mesh_node = obj.to_mesh(context.scene, apply_modifiers, RENDER)
+    mesh_node = obj.to_mesh(context.scene, True, RENDER)
 
     # transfer the geometry type to the extracted mesh
     mesh_node.THREE_geometry_type = obj.data.THREE_geometry_type
@@ -346,6 +416,8 @@ def extract_mesh(obj, options, recalculate=False):
     opt_buffer = opt_buffer == constants.BUFFER_GEOMETRY
     prop_buffer = mesh_node.THREE_geometry_type == constants.BUFFER_GEOMETRY
 
+    bpy.context.scene.objects.active = obj
+
     # if doing buffer geometry it is imperative to triangulate the mesh
     if opt_buffer or prop_buffer:
         original_mesh = obj.data
@@ -354,6 +426,8 @@ def extract_mesh(obj, options, recalculate=False):
                      original_mesh.name,
                      mesh_node.name)
 
+        hidden_state = obj.hide
+        obj.hide = False
         bpy.ops.object.mode_set(mode='OBJECT')
         obj.select = True
         bpy.context.scene.objects.active = obj
@@ -363,6 +437,7 @@ def extract_mesh(obj, options, recalculate=False):
                                       modifier='Triangulate')
         obj.data = original_mesh
         obj.select = False
+        obj.hide = hidden_state
 
     # recalculate the normals to face outwards, this is usually
     # best after applying a modifiers, especialy for something
@@ -383,6 +458,43 @@ def extract_mesh(obj, options, recalculate=False):
     if not options.get(constants.SCENE):
         xrot = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
         mesh_node.transform(xrot * obj.matrix_world)
+
+    # blend shapes
+    if options.get(constants.BLEND_SHAPES) and not options.get(constants.MORPH_TARGETS):
+        original_mesh = obj.data
+        if original_mesh.shape_keys:
+            logger.info('Using blend shapes')
+            obj.data = mesh_node  # swap to be able to add the shape keys
+            shp = original_mesh.shape_keys
+
+            animCurves = shp.animation_data
+            if animCurves:
+                animCurves = animCurves.action.fcurves
+
+            src_kbs = shp.key_blocks
+            for key in src_kbs.keys():
+                logger.info("-- Parsing key %s", key)
+                obj.shape_key_add(name=key, from_mix=False)
+                src_kb = src_kbs[key].data
+                if key == 'Basis':
+                    dst_kb = mesh_node.vertices
+                else:
+                    dst_kb = mesh_node.shape_keys.key_blocks[key].data
+                for idx in range(len(src_kb)):
+                    dst_kb[idx].co = src_kb[idx].co
+
+                if animCurves:
+                    data_path = 'key_blocks["'+key+'"].value'
+                    for fcurve in animCurves:
+                        if fcurve.data_path == data_path:
+                            dst_kb = mesh_node.shape_keys.key_blocks[key]
+                            for xx in fcurve.keyframe_points:
+                                dst_kb.value = xx.co.y
+                                dst_kb.keyframe_insert("value",frame=xx.co.x)
+                            pass
+                            break  # no need to continue to loop
+                    pass
+            obj.data = original_mesh
 
     # now generate a unique name
     index = 0
