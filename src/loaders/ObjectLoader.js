@@ -390,6 +390,8 @@ THREE.ObjectLoader.prototype = {
 				if ( data.aoMap !== undefined ) material.aoMap = getTexture( data.aoMap );
 				if ( data.aoMapIntensity !== undefined ) material.aoMapIntensity = data.aoMapIntensity;
 
+				if ( data.emissiveMap !== undefined ) material.emissiveMap = getTexture( data.emissiveMap );
+
 				if ( data.referencedMaterials !== undefined ) material.referencedMaterials = data.referencedMaterials;
 
 				materials[ data.uuid ] = material;
