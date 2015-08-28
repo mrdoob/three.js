@@ -198,27 +198,25 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			// render regular objects
 
-			var webglObject, object, geometry, material;
-
 			for ( var j = 0, jl = _renderList.length; j < jl; j ++ ) {
 
-				webglObject = _renderList[ j ];
-
-				object = webglObject.object;
-				geometry = _objects.update( object );
-				material = object.material;
+				var object = _renderList[ j ];
+				var geometry = _objects.update( object );
+				var material = object.material;
 
 				if ( material instanceof THREE.MeshFaceMaterial ) {
 
+					var groups = geometry.groups;
 					var materials = material.materials;
 
-					for ( var k = 0, kl = materials.length; k < kl; k ++ ) {
+					for ( var j = 0, jl = groups.length; j < jl; j ++ ) {
 
-						material = materials[ k ];
+						var group = groups[ j ];
+						var groupMaterial = materials[ group.materialIndex ];
 
-						if ( material.visible ) {
+						if ( groupMaterial.visible === true ) {
 
-							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, material ), object );
+							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, groupMaterial ), object, group );
 
 						}
 
@@ -281,6 +279,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
+		depthMaterial.visible = material.visible;
 		depthMaterial.wireframe = material.wireframe;
 		depthMaterial.wireframeLinewidth = material.wireframeLinewidth;
 
@@ -292,16 +291,18 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		if ( object.visible === false ) return;
 
-		var webglObject = _objects.objects[ object.id ];
+		if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
 
-		if ( webglObject && object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+			if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-			var material = object.material;
+				var material = object.material;
 
-			if ( material !== null && material.visible === true ) {
+				if ( material.visible === true ) {
 
-				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-				_renderList.push( webglObject );
+					object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+					_renderList.push( object );
+
+				}
 
 			}
 

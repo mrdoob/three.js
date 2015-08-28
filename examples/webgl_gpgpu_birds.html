@@ -563,39 +563,25 @@
 
 				var geometry = new THREE.BirdGeometry();
 
-				// For Vertex Shaders
-				birdAttributes = {
-					// index: { type: 'i', value: [] },
-					birdColor: { type: 'c', value: null },
-					reference: { type: 'v2', value: null },
-					birdVertex: { type: 'f', value: null }
-				};
-
 				// For Vertex and Fragment
 				birdUniforms = {
-
 					color: { type: "c", value: new THREE.Color( 0xff2200 ) },
 					texturePosition: { type: "t", value: null },
 					textureVelocity: { type: "t", value: null },
 					time: { type: "f", value: 1.0 },
-					delta: { type: "f", value: 0.0 },
-
+					delta: { type: "f", value: 0.0 }
 				};
 
 				// ShaderMaterial
-				var shaderMaterial = new THREE.ShaderMaterial( {
-
-					uniforms: 		birdUniforms,
-					attributes:     birdAttributes,
+				var material = new THREE.ShaderMaterial( {
+					uniforms:       birdUniforms,
 					vertexShader:   document.getElementById( 'birdVS' ).textContent,
 					fragmentShader: document.getElementById( 'birdFS' ).textContent,
 					side: THREE.DoubleSide
 
 				});
 
-
-				// var
-				birdMesh = new THREE.Mesh( geometry, shaderMaterial );
+				birdMesh = new THREE.Mesh( geometry, material );
 				birdMesh.rotation.y = Math.PI / 2;
 				birdMesh.matrixAutoUpdate = false;
 				birdMesh.updateMatrix();

@@ -12,11 +12,12 @@ THREE.BufferGeometry = function () {
 	this.name = '';
 	this.type = 'BufferGeometry';
 
+	this.index = null;
 	this.attributes = {};
 
 	this.morphAttributes = {};
 
-	this.drawcalls = [];
+	this.groups = [];
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -27,15 +28,28 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
+	addIndex: function ( attribute ) {
+
+		this.index = attribute;
+
+	},
+
 	addAttribute: function ( name, attribute ) {
 
 		if ( attribute instanceof THREE.BufferAttribute === false && attribute instanceof THREE.InterleavedBufferAttribute === false ) {
 
 			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
-			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
+			this.addAttribute( name, new THREE.BufferAttribute( arguments[ 1 ], arguments[ 2 ] ) );
 
 			return;
+
+		}
+
+		if ( name === 'index' ) {
+
+			console.warn( 'THREE.BufferGeometry.addAttribute: Use .addIndex() for index attribute.' );
+			this.addIndex( attribute );
 
 		}
 
@@ -55,10 +69,17 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	get drawcalls() {
+
+		console.error( 'THREE.BufferGeometry: .drawcalls has been renamed to .groups.' );
+		return this.groups;
+
+	},
+
 	get offsets() {
 
-		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .drawcalls.' );
-		return this.drawcalls;
+		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .groups.' );
+		return this.groups;
 
 	},
 
@@ -70,18 +91,33 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		this.drawcalls.push( {
-
-			start: start,
-			count: count
-
-		} );
+		console.warn( 'THREE.BufferGeometry: .addDrawCall() is now .addGroup().' );
+		this.addGroup( start, count );
 
 	},
 
 	clearDrawCalls: function () {
 
-		this.drawcalls = [];
+		console.warn( 'THREE.BufferGeometry: .clearDrawCalls() is now .clearGroups().' );
+		this.clearGroups();
+
+	},
+
+	addGroup: function ( start, count, materialIndex ) {
+
+		this.groups.push( {
+
+			start: start,
+			count: count,
+			materialIndex: materialIndex !== undefined ? materialIndex : 0
+
+		} );
+
+	},
+
+	clearGroups: function () {
+
+		this.groups = [];
 
 	},
 
@@ -318,12 +354,14 @@ THREE.BufferGeometry.prototype = {
 			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
 			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
 			direct.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
+			direct.groupsNeedUpdate = geometry.groupsNeedUpdate;
 
 			geometry.verticesNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
 			geometry.uvsNeedUpdate = false;
 			geometry.tangentsNeedUpdate = false;
+			geometry.groupsNeedUpdate = false;
 
 			geometry = direct;
 
@@ -404,6 +442,15 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		if ( geometry.groupsNeedUpdate ) {
+
+			geometry.computeGroups( object.geometry );
+			this.groups = geometry.groups;
+
+			geometry.groupsNeedUpdate = false;
+
+		}
+
 		return this;
 
 	},
@@ -458,10 +505,15 @@ THREE.BufferGeometry.prototype = {
 
 		if ( geometry.indices.length > 0 ) {
 
-			var indices = new Uint16Array( geometry.indices.length * 3 );
-			this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
+			var TypeArray = geometry.vertices.length > 65535 ? Uint32Array : Uint16Array;
+			var indices = new TypeArray( geometry.indices.length * 3 );
+			this.addIndex( new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 		}
+
+		// groups
+
+		this.groups = geometry.groups;
 
 		// morphs
 
@@ -627,8 +679,9 @@ THREE.BufferGeometry.prototype = {
 
 	computeVertexNormals: function () {
 
+		var index = this.index;
 		var attributes = this.attributes;
-		var drawcalls = this.drawcalls;
+		var groups = this.groups;
 
 		if ( attributes.position ) {
 
@@ -665,22 +718,22 @@ THREE.BufferGeometry.prototype = {
 
 			// indexed elements
 
-			if ( attributes.index ) {
+			if ( index ) {
 
-				var indices = attributes.index.array;
+				var indices = index.array;
 
-				if ( drawcalls.length === 0 ) {
+				if ( groups.length === 0 ) {
 
-					this.addDrawCall( 0, indices.length );
+					this.addGroup( 0, indices.length );
 
 				}
 
-				for ( var j = 0, jl = drawcalls.length; j < jl; ++ j ) {
+				for ( var j = 0, jl = groups.length; j < jl; ++ j ) {
 
-					var drawcall = drawcalls[ j ];
+					var group = groups[ j ];
 
-					var start = drawcall.start;
-					var count = drawcall.count;
+					var start = group.start;
+					var count = group.count;
 
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
@@ -755,7 +808,7 @@ THREE.BufferGeometry.prototype = {
 		// based on http://www.terathon.com/code/tangent.html
 		// (per vertex tangents)
 
-		if ( this.attributes.index === undefined ||
+		if ( this.index === undefined ||
 			 this.attributes.position === undefined ||
 			 this.attributes.normal === undefined ||
 			 this.attributes.uv === undefined ) {
@@ -765,7 +818,7 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		var indices = this.attributes.index.array;
+		var indices = this.index.array;
 		var positions = this.attributes.position.array;
 		var normals = this.attributes.normal.array;
 		var uvs = this.attributes.uv.array;
@@ -855,20 +908,20 @@ THREE.BufferGeometry.prototype = {
 		var j, jl;
 		var iA, iB, iC;
 
-		if ( this.drawcalls.length === 0 ) {
+		if ( this.groups.length === 0 ) {
 
-			this.addDrawCall( 0, indices.length );
+			this.addGroup( 0, indices.length );
 
 		}
 
-		var drawcalls = this.drawcalls;
+		var groups = this.groups;
 
-		for ( j = 0, jl = drawcalls.length; j < jl; ++ j ) {
+		for ( j = 0, jl = groups.length; j < jl; ++ j ) {
 
-			var drawcall = drawcalls[ j ];
+			var group = groups[ j ];
 
-			var start = drawcall.start;
-			var count = drawcall.count;
+			var start = group.start;
+			var count = group.count;
 
 			for ( i = start, il = start + count; i < il; i += 3 ) {
 
@@ -911,12 +964,12 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		for ( j = 0, jl = drawcalls.length; j < jl; ++ j ) {
+		for ( j = 0, jl = groups.length; j < jl; ++ j ) {
 
-			var drawcall = drawcalls[ j ];
+			var group = groups[ j ];
 
-			var start = drawcall.start;
-			var count = drawcall.count;
+			var start = group.start;
+			var count = group.count;
 
 			for ( i = start, il = start + count; i < il; i += 3 ) {
 
@@ -999,57 +1052,6 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	/*
-		reoderBuffers:
-		Reorder attributes based on a new indexBuffer and indexMap.
-		indexBuffer - Uint16Array of the new ordered indices.
-		indexMap - Int32Array where the position is the new vertex ID and the value the old vertex ID for each vertex.
-		vertexCount - Amount of total vertices considered in this reordering (in case you want to grow the vertex stack).
-	*/
-	reorderBuffers: function ( indexBuffer, indexMap, vertexCount ) {
-
-		/* Create a copy of all attributes for reordering. */
-		var sortedAttributes = {};
-		for ( var attr in this.attributes ) {
-
-			if ( attr === 'index' )
-				continue;
-			var sourceArray = this.attributes[ attr ].array;
-			sortedAttributes[ attr ] = new sourceArray.constructor( this.attributes[ attr ].itemSize * vertexCount );
-
-		}
-
-		/* Move attribute positions based on the new index map */
-		for ( var new_vid = 0; new_vid < vertexCount; new_vid ++ ) {
-
-			var vid = indexMap[ new_vid ];
-			for ( var attr in this.attributes ) {
-
-				if ( attr === 'index' )
-					continue;
-				var attrArray = this.attributes[ attr ].array;
-				var attrSize = this.attributes[ attr ].itemSize;
-				var sortedAttr = sortedAttributes[ attr ];
-				for ( var k = 0; k < attrSize; k ++ )
-					sortedAttr[ new_vid * attrSize + k ] = attrArray[ vid * attrSize + k ];
-
-			}
-
-		}
-
-		/* Carry the new sorted buffers locally */
-		this.attributes[ 'index' ].array = indexBuffer;
-		for ( var attr in this.attributes ) {
-
-			if ( attr === 'index' )
-				continue;
-			this.attributes[ attr ].array = sortedAttributes[ attr ];
-			this.attributes[ attr ].numItems = this.attributes[ attr ].itemSize * vertexCount;
-
-		}
-
-	},
-
 	toJSON: function () {
 
 		var data = {
@@ -1083,7 +1085,8 @@ THREE.BufferGeometry.prototype = {
 		data.data = { attributes: {} };
 
 		var attributes = this.attributes;
-		var drawcalls = this.drawcalls;
+		var groups = this.groups;
+
 		var boundingSphere = this.boundingSphere;
 
 		for ( var key in attributes ) {
@@ -1100,9 +1103,9 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( drawcalls.length > 0 ) {
+		if ( groups.length > 0 ) {
 
-			data.data.drawcalls = JSON.parse( JSON.stringify( drawcalls ) );
+			data.data.groups = JSON.parse( JSON.stringify( groups ) );
 
 		}
 
@@ -1127,8 +1130,15 @@ THREE.BufferGeometry.prototype = {
 
 	copy: function ( source ) {
 
+		var index = source.index;
+
+		if ( index !== null ) {
+
+			this.addIndex( index.clone() );
+
+		}
+
 		var attributes = source.attributes;
-		var drawcalls = source.drawcalls;
 
 		for ( var name in attributes ) {
 
@@ -1137,10 +1147,12 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		for ( var i = 0, l = drawcalls.length; i < l; i ++ ) {
+		var groups = source.groups;
 
-			var drawcall = drawcalls[ i ];
-			this.addDrawCall( drawcall.start, drawcall.count );
+		for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+			var group = groups[ i ];
+			this.addGroup( group.start, group.count );
 
 		}
 

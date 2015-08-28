@@ -38,8 +38,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 		vec3 lightColor = pointLightColor[ i ];
 
 		vec3 lightPosition = pointLightPosition[ i ];
-		vec4 lPosition = viewMatrix * vec4( lightPosition, 1.0 );
-		vec3 lVector = lPosition.xyz + vViewPosition.xyz;
+		vec3 lVector = lightPosition + vViewPosition.xyz;
 		vec3 lightDir = normalize( lVector );
 
 		// attenuation
@@ -70,11 +69,10 @@ vec3 totalSpecularLight = vec3( 0.0 );
 		vec3 lightColor = spotLightColor[ i ];
 
 		vec3 lightPosition = spotLightPosition[ i ];
-		vec4 lPosition = viewMatrix * vec4( lightPosition, 1.0 );
-		vec3 lVector = lPosition.xyz + vViewPosition.xyz;
+		vec3 lVector = lightPosition + vViewPosition.xyz;
 		vec3 lightDir = normalize( lVector );
 
-		float spotEffect = dot( spotLightDirection[ i ], normalize( lightPosition - vWorldPosition ) );
+		float spotEffect = dot( spotLightDirection[ i ], lightDir );
 
 		if ( spotEffect > spotLightAngleCos[ i ] ) {
 
@@ -110,7 +108,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 		vec3 lightColor = directionalLightColor[ i ];
 
-		vec3 lightDir = transformDirection( directionalLightDirection[ i ], viewMatrix );
+		vec3 lightDir = directionalLightDirection[ i ];
 
 		// diffuse
 
@@ -132,7 +130,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		vec3 lightDir = transformDirection( hemisphereLightDirection[ i ], viewMatrix );
+		vec3 lightDir = hemisphereLightDirection[ i ];
 
 		// diffuse
 

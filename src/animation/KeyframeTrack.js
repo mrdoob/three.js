@@ -1,7 +1,7 @@
 /**
  *
- * A Track that returns a keyframe interpolated value, currently linearly interpolated 
- * 
+ * A Track that returns a keyframe interpolated value, currently linearly interpolated
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
@@ -35,7 +35,7 @@ THREE.KeyframeTrack.prototype = {
 
 		// this can not go lower than 0.
 		while( ( this.lastIndex > 0 ) && ( time < this.keys[this.lastIndex - 1].time ) ) {
-			this.lastIndex --;			
+			this.lastIndex --;
 		}
 
 		if( this.lastIndex >= this.keys.length ) {
@@ -59,7 +59,7 @@ THREE.KeyframeTrack.prototype = {
 
 		// if true, means that prev/current keys are identical, thus no interpolation required.
 		if( prevKey.constantToNext ) {
-			
+
 			return this.result;
 
 		}
@@ -106,14 +106,14 @@ THREE.KeyframeTrack.prototype = {
 	// removes keyframes before and after animation without changing any values within the range [startTime, endTime].
 	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
  	trim: function( startTime, endTime ) {
-		
+
 		var firstKeysToRemove = 0;
 		for( var i = 1; i < this.keys.length; i ++ ) {
 			if( this.keys[i] <= startTime ) {
 				firstKeysToRemove ++;
 			}
 		}
- 
+
 		var lastKeysToRemove = 0;
 		for( var i = this.keys.length - 2; i > 0; i ++ ) {
 			if( this.keys[i] >= endTime ) {
@@ -123,7 +123,7 @@ THREE.KeyframeTrack.prototype = {
 				break;
 			}
 		}
- 
+
 		// remove last keys first because it doesn't affect the position of the first keys (the otherway around doesn't work as easily)
 		if( ( firstKeysToRemove + lastKeysToRemove ) > 0 ) {
 			this.keys = this.keys.splice( firstKeysToRemove, this.keys.length - lastKeysToRemove - firstKeysToRemove );;
@@ -131,7 +131,7 @@ THREE.KeyframeTrack.prototype = {
 
 		return this;
 
-	},	
+	},
 
 	/* NOTE: This is commented out because we really shouldn't have to handle unsorted key lists
 	         Tracks with out of order keys should be considered to be invalid.  - bhouston
@@ -238,7 +238,7 @@ THREE.KeyframeTrack.prototype = {
 
 };
 
-THREE.KeyframeTrack.parse( json ) {
+THREE.KeyframeTrack.parse = function( json ) {
 
 	if( json.type === undefined ) throw new Error( "track type undefined, can not parse" );
 

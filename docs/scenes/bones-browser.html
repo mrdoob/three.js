@@ -61,7 +61,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				orbit = new THREE.OrbitControls( camera, renderer.domElement );
-				orbit.noZoom = true;
+				orbit.enableZoom = false;
 
 				ambientLight = new THREE.AmbientLight( 0x000000 );
 				scene.add( ambientLight );

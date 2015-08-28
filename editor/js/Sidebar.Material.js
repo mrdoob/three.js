@@ -435,12 +435,6 @@ Sidebar.Material = function ( editor ) {
 
 				if ( material.vertexColors !== vertexColors ) {
 
-					if ( geometry instanceof THREE.Geometry ) {
-
-						geometry.groupsNeedUpdate = true;
-
-					}
-
 					material.vertexColors = vertexColors;
 					material.needsUpdate = true;
 

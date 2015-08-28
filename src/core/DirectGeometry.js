@@ -19,6 +19,8 @@ THREE.DirectGeometry = function () {
 	this.uvs2 = [];
 	this.tangents = [];
 
+	this.groups = [];
+
 	this.morphTargets = {};
 
 	this.skinWeights = [];
@@ -36,6 +38,7 @@ THREE.DirectGeometry = function () {
 	this.colorsNeedUpdate = false;
 	this.uvsNeedUpdate = false;
 	this.tangentsNeedUpdate = false;
+	this.groupsNeedUpdate = false;
 
 };
 
@@ -67,6 +70,50 @@ THREE.DirectGeometry.prototype = {
 
 	},
 
+	computeGroups: function ( geometry ) {
+
+		var group;
+		var groups = [];
+		var materialIndex;
+
+		var faces = geometry.faces;
+
+		for ( var i = 0; i < faces.length; i ++ ) {
+
+			var face = faces[ i ];
+
+			// materials
+
+			if ( face.materialIndex !== materialIndex ) {
+
+				materialIndex = face.materialIndex;
+
+				if ( group !== undefined ) {
+
+					group.count = ( i * 3 ) - group.start;
+					groups.push( group );
+
+				}
+
+				group = {
+					start: i * 3,
+					materialIndex: materialIndex
+				};
+
+			}
+
+		}
+
+		if ( group !== undefined ) {
+
+			group.count = ( i * 3 ) - group.start;
+			groups.push( group );
+
+		}
+
+		this.groups = groups;
+
+	},
 
 	fromGeometry: function ( geometry ) {
 
@@ -195,6 +242,8 @@ THREE.DirectGeometry.prototype = {
 
 			}
 
+			// tangents
+
 			if ( hasTangents === true ) {
 
 				var vertexTangents = face.vertexTangents;
@@ -247,11 +296,14 @@ THREE.DirectGeometry.prototype = {
 
 		}
 
+		this.computeGroups( geometry );
+
 		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
 		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
 		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
 		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
 		this.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
+		this.groupsNeedUpdate = geometry.groupsNeedUpdate;
 
 		return this;
 

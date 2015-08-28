@@ -113,14 +113,12 @@ var Loader = function ( editor ) {
 					var xml = parser.parseFromString( contents, 'text/xml' );
 
 					var loader = new THREE.ColladaLoader();
-					loader.parse( xml, function ( collada ) {
+					var collada = loader.parse( xml );
 
-						collada.scene.name = filename;
+					collada.scene.name = filename;
 
-						editor.addObject( collada.scene );
-						editor.select( collada.scene );
-
-					} );
+					editor.addObject( collada.scene );
+					editor.select( collada.scene );
 
 				}, false );
 				reader.readAsText( file );
@@ -192,9 +190,13 @@ var Loader = function ( editor ) {
 						var contents = event.target.result;
 
 						var geometry = new THREE.MD2Loader().parse( contents );
-						geometry.name = filename;
+						var material = new THREE.MeshPhongMaterial( {
+							morphTargets: true,
+							morphNormals: true
+						} );
 
-						var object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
+						var object = new THREE.MorphAnimMesh( geometry, material );
+						object.name = filename;
 
 						editor.addObject( object );
 						editor.select( object );

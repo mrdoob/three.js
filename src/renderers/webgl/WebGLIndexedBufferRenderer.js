@@ -40,17 +40,6 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	}
 
-	function renderGroups( groups ) {
-
-		for ( var i = 0, il = groups.length; i < il; i ++ ) {
-
-			var group = groups[ i ];
-			render( group.start, group.count );
-
-		}
-
-	}
-
 	function renderInstances( geometry ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
@@ -62,7 +51,7 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		}
 
-		var index = geometry.attributes.index;
+		var index = geometry.index;
 
 		extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount );
 
@@ -71,7 +60,6 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 	this.setMode = setMode;
 	this.setIndex = setIndex;
 	this.render = render;
-	this.renderGroups = renderGroups;
 	this.renderInstances = renderInstances;
 
 };

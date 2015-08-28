@@ -186,8 +186,7 @@ THREE.NormalDisplacementShader = {
 
 		"		for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-		"			vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-		"			vec3 pointVector = lPosition.xyz + vViewPosition.xyz;",
+		"			vec3 pointVector = pointLightPosition[ i ] + vViewPosition.xyz;",
 
 		"			float pointDistance = 1.0;",
 		"			if ( pointLightDistance[ i ] > 0.0 )",
@@ -222,8 +221,7 @@ THREE.NormalDisplacementShader = {
 
 		"		for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
 
-		"			vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
-		"			vec3 spotVector = lPosition.xyz + vViewPosition.xyz;",
+		"			vec3 spotVector = spotLightPosition[ i ] + vViewPosition.xyz;",
 
 		"			float spotDistance = 1.0;",
 		"			if ( spotLightDistance[ i ] > 0.0 )",
@@ -231,7 +229,7 @@ THREE.NormalDisplacementShader = {
 
 		"			spotVector = normalize( spotVector );",
 
-		"			float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
+		"			float spotEffect = dot( spotLightDirection[ i ], spotVector );",
 
 		"			if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
@@ -267,8 +265,7 @@ THREE.NormalDisplacementShader = {
 
 		"		for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
 
-		"			vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-		"			vec3 dirVector = normalize( lDirection.xyz );",
+		"			vec3 dirVector = directionalLightDirection[ i ];",
 
 					// diffuse
 
@@ -297,8 +294,7 @@ THREE.NormalDisplacementShader = {
 
 		"		for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-		"			vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
-		"			vec3 lVector = normalize( lDirection.xyz );",
+		"			vec3 lVector = hemisphereLightDirection[ i ];",
 
 					// diffuse
 

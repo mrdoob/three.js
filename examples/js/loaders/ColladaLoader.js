@@ -96,6 +96,10 @@
 				loader.setCrossOrigin( this.crossOrigin );
 				loader.load( url, function ( text ) {
 
+					var parts = url.split( '/' );
+					parts.pop();
+					baseUrl = ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
+
 					var xmlParser = new DOMParser();
 					var responseXML = xmlParser.parseFromString( text, "application/xml" );
 					onLoad( scope.parse( responseXML, url ) );
@@ -116,17 +120,9 @@
 
 		},
 
-		parse: function( doc, url ) {
+		parse: function( doc ) {
 
 			COLLADA = doc;
-
-			if ( url !== undefined ) {
-
-				var parts = url.split( '/' );
-				parts.pop();
-				baseUrl = ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
-
-			}
 
 			this.parseAsset();
 			this.setUpConversion();
@@ -2816,7 +2812,7 @@
 
 									var image = images[ surface.init_from ];
 
-									if ( image ) {
+									if ( image && baseUrl ) {
 
 										var url = baseUrl + image.init_from;
 

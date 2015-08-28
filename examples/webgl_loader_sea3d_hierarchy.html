@@ -96,8 +96,8 @@
 				camera.rotation.copy( cam.rotation );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.noZoom = true;
-				controls.noPan = true;
+				controls.enableZoom = false;
+				controls.enablePan = false;
 
 				animate();
 

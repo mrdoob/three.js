@@ -313,7 +313,7 @@
 				mapHeight3.format = THREE.RGBFormat;
 
 				var geoPlane = new THREE.PlaneBufferGeometry( 40, 20 );
-				
+
 				var matPlaneSide   = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x222222, shininess: 75, bumpMap: mapHeight2, bumpScale: 0.5 } );
 				var matPlaneBottom = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x222222, shininess: 75, bumpMap: mapHeight3, bumpScale: 0.5 } );
 				var matPlaneTop    = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x222222, shininess: 75, bumpMap: mapHeight3, bumpScale: 1 } );
@@ -372,7 +372,7 @@
 				windowHalfY = window.innerHeight / 2;
 
 				WIDTH = window.innerWidth;
-				HEIGHT = window.innerHeight - 2 * MARGIN;
+				HEIGHT = window.innerHeight;
 
 				renderer.setSize( WIDTH, HEIGHT );
 
