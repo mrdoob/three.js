@@ -44,6 +44,7 @@ THREE.Geometry = function () {
 	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.lineDistancesNeedUpdate = false;
+	this.groupsNeedUpdate = false;
 
 };
 
@@ -214,10 +215,10 @@ THREE.Geometry.prototype = {
 
 		var scope = this;
 
+		var indices = geometry.index !== null ? geometry.index.array : undefined;
 		var attributes = geometry.attributes;
 
 		var vertices = attributes.position.array;
-		var indices = attributes.index !== undefined ? attributes.index.array : undefined;
 		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
 		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
@@ -1234,14 +1235,6 @@ THREE.Geometry.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
-
-	},
-
-	// Backwards compatibility
-
-	set groupsNeedUpdate ( value ) {
-
-		if ( value === true ) this.dispose();
 
 	}
 

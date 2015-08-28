@@ -121,6 +121,8 @@ THREE.MD2Loader.prototype = {
 
 		return function ( buffer ) {
 
+			console.time( 'MD2Loader' );
+
 			var data = new DataView( buffer );
 
 			// http://tfc.duke.free.fr/coding/md2-specs-en.html
@@ -163,14 +165,14 @@ THREE.MD2Loader.prototype = {
 			var uvs = [];
 			var offset = header.offset_st;
 
-			for ( var i = 0; i < header.num_st; i ++, offset += 4 ) {
+			for ( var i = 0, l = header.num_st; i < l; i ++ ) {
 
 				var u = data.getInt16( offset + 0, true );
 				var v = data.getInt16( offset + 2, true );
 
-				var uv = new THREE.Vector2( u / header.skinwidth, 1 - ( v / header.skinheight ) );
+				uvs.push( new THREE.Vector2( u / header.skinwidth, 1 - ( v / header.skinheight ) ) );
 
-				uvs.push( uv );
+				offset += 4;
 
 			}
 
@@ -178,15 +180,13 @@ THREE.MD2Loader.prototype = {
 
 			var offset = header.offset_tris;
 
-			for ( var i = 0; i < header.num_tris; i ++ ) {
+			for ( var i = 0, l = header.num_tris; i < l; i ++ ) {
 
 				var a = data.getUint16( offset + 0, true );
 				var b = data.getUint16( offset + 2, true );
 				var c = data.getUint16( offset + 4, true );
 
-				var face = new THREE.Face3( a, b, c );
-
-				geometry.faces.push( face );
+				geometry.faces.push( new THREE.Face3( a, b, c ) );
 
 				geometry.faceVertexUvs[ 0 ].push( [
 					uvs[ data.getUint16( offset + 6, true ) ],
@@ -202,10 +202,11 @@ THREE.MD2Loader.prototype = {
 
 			var translation = new THREE.Vector3();
 			var scale = new THREE.Vector3();
+			var string = [];
 
 			var offset = header.offset_frames;
 
-			for ( var i = 0; i < header.num_frames; i ++ ) {
+			for ( var i = 0, l = header.num_frames; i < l; i ++ ) {
 
 				scale.set(
 					data.getFloat32( offset + 0, true ),
@@ -220,8 +221,6 @@ THREE.MD2Loader.prototype = {
 				);
 
 				offset += 24;
-
-				var string = [];
 
 				for ( var j = 0; j < 16; j ++ ) {
 
@@ -242,7 +241,7 @@ THREE.MD2Loader.prototype = {
 					var x = data.getUint8( offset ++, true );
 					var y = data.getUint8( offset ++, true );
 					var z = data.getUint8( offset ++, true );
-					var n = data.getUint8( offset ++, true );
+					var n = normals[ data.getUint8( offset ++, true ) ];
 
 					var vertex = new THREE.Vector3(
 						x * scale.x + translation.x,
@@ -250,9 +249,7 @@ THREE.MD2Loader.prototype = {
 						y * scale.y + translation.y
 					);
 
-					var normal = new THREE.Vector3(
-						normals[ n ][ 0 ], normals[ n ][ 2 ], normals[ n ][ 1 ]
-					);
+					var normal = new THREE.Vector3( n[ 0 ], n[ 2 ], n[ 1 ] );
 
 					frame.vertices.push( vertex );
 					frame.normals.push( normal );
@@ -304,6 +301,8 @@ THREE.MD2Loader.prototype = {
 				geometry.morphNormals.push( { vertexNormals: vertexNormals } );
 
 			}
+
+			console.timeEnd( 'MD2Loader' );
 
 			return geometry;
 

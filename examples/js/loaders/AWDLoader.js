@@ -763,10 +763,8 @@
 					else if ( str_type === 2 ) {
 
 						buffer = new Uint16Array( str_len / 2 );
-						attrib = new THREE.IndexBufferAttribute( buffer, 1 );
-						geom.addAttribute( 'index', attrib );
-
-						geom.addDrawCall( 0, str_len / 2 );
+						attrib = new THREE.BufferAttribute( buffer, 1 );
+						geom.addIndex( attrib );
 
 						idx = 0;
 

@@ -430,9 +430,9 @@ THREE.Projector = function () {
 
 					}
 
-					if ( attributes.index !== undefined ) {
+					if ( geometry.index !== null ) {
 
-						var indices = attributes.index.array;
+						var indices = geometry.index.array;
 
 						if ( groups.length > 0 ) {
 

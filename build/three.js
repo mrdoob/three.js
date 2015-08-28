@@ -8593,6 +8593,9 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.array = array;
 	this.itemSize = itemSize;
 
+	this.dynamic = false;
+	this.updateRange = { offset: 0, count: - 1 };
+
 	this.version = 0;
 
 };
@@ -8617,6 +8620,25 @@ THREE.BufferAttribute.prototype = {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
+
+	},
+
+	setDynamic: function ( value ) {
+
+		this.dynamic = value;
+
+		return this;
+
+	},
+
+	copy: function ( source ) {
+
+		this.array = new source.array.constructor( source.array );
+		this.itemSize = source.itemSize;
+
+		this.dynamic = source.dynamic;
+
+		return this;
 
 	},
 
@@ -8865,7 +8887,7 @@ THREE.BufferAttribute.prototype = {
 
 	clone: function () {
 
-		return new this.constructor( new this.array.constructor( this.array ), this.itemSize );
+		return new this.constructor().copy( this );
 
 	}
 
@@ -8927,60 +8949,30 @@ THREE.Float64Attribute = function ( array, itemSize ) {
 
 };
 
-// File:src/core/DynamicBufferAttribute.js
-
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.DynamicBufferAttribute = function ( array, itemSize ) {
-
-	THREE.BufferAttribute.call( this, array, itemSize );
-
-	this.updateRange = { offset: 0, count: - 1 };
-
-};
-
-THREE.DynamicBufferAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
-THREE.DynamicBufferAttribute.prototype.constructor = THREE.DynamicBufferAttribute;
-
-// File:src/core/IndexBufferAttribute.js
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.IndexBufferAttribute = function ( array, itemSize ) {
-
-	THREE.BufferAttribute.call( this, array, itemSize );
-
-};
-
-THREE.IndexBufferAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
-THREE.IndexBufferAttribute.prototype.constructor = THREE.IndexBufferAttribute;
-
 // File:src/core/InstancedBufferAttribute.js
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedBufferAttribute = function ( array, itemSize, meshPerAttribute, dynamic ) {
+THREE.InstancedBufferAttribute = function ( array, itemSize, meshPerAttribute ) {
 
-	THREE.DynamicBufferAttribute.call( this, array, itemSize );
+	THREE.BufferAttribute.call( this, array, itemSize );
 
-	this.dynamic = dynamic || false;
 	this.meshPerAttribute = meshPerAttribute || 1;
 
 };
 
-THREE.InstancedBufferAttribute.prototype = Object.create( THREE.DynamicBufferAttribute.prototype );
+THREE.InstancedBufferAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 THREE.InstancedBufferAttribute.prototype.constructor = THREE.InstancedBufferAttribute;
 
-THREE.InstancedBufferAttribute.prototype.clone = function () {
+THREE.InstancedBufferAttribute.prototype.copy = function ( source ) {
 
-	return new THREE.InstancedBufferAttribute( new this.array.constructor( this.array ), this.itemSize, this.meshPerAttribute, this.dynamic );
+	THREE.BufferAttribute.prototype.copy.call( this, source );
+
+	this.meshPerAttribute = source.meshPerAttribute;
+
+	return this;
 
 };
 
@@ -8990,17 +8982,17 @@ THREE.InstancedBufferAttribute.prototype.clone = function () {
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InterleavedBuffer = function ( array, stride, dynamic ) {
+THREE.InterleavedBuffer = function ( array, stride ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
 	this.array = array;
 	this.stride = stride;
 
-	this.version = 0;
-
-	this.dynamic = dynamic || false;
+	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
+
+	this.version = 0;
 
 };
 
@@ -9023,6 +9015,22 @@ THREE.InterleavedBuffer.prototype = {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
+
+	},
+
+	setDynamic: function ( value ) {
+
+		this.dynamic = value;
+
+		return this;
+
+	},
+
+	copy: function ( source ) {
+
+		this.array = new source.array.constructor( source.array );
+		this.stride = source.stride;
+		this.dynamic = source.dynamic;
 
 	},
 
@@ -9053,7 +9061,7 @@ THREE.InterleavedBuffer.prototype = {
 
 	clone: function () {
 
-		return new this.constructor( new this.array.constructor( this.array ), this.stride, this.dynamic );
+		return new this.constructor().copy( this );
 
 	}
 
@@ -9065,9 +9073,9 @@ THREE.InterleavedBuffer.prototype = {
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedInterleavedBuffer = function ( array, stride, dynamic, meshPerAttribute ) {
+THREE.InstancedInterleavedBuffer = function ( array, stride, meshPerAttribute ) {
 
-	THREE.InterleavedBuffer.call( this, array, stride, dynamic );
+	THREE.InterleavedBuffer.call( this, array, stride );
 
 	this.meshPerAttribute = meshPerAttribute || 1;
 
@@ -9076,9 +9084,13 @@ THREE.InstancedInterleavedBuffer = function ( array, stride, dynamic, meshPerAtt
 THREE.InstancedInterleavedBuffer.prototype = Object.create( THREE.InterleavedBuffer.prototype );
 THREE.InstancedInterleavedBuffer.prototype.constructor = THREE.InstancedInterleavedBuffer;
 
-THREE.InstancedInterleavedBuffer.prototype.clone = function () {
+THREE.InstancedInterleavedBuffer.prototype.copy = function ( source ) {
 
-	return new this.constructor( new this.array.constructor( this.array ), this.stride, this.dynamic, this.meshPerAttribute );
+	THREE.InterleavedBuffer.prototype.copy.call( this, source );
+
+	this.meshPerAttribute = source.meshPerAttribute;
+
+	return this;
 
 };
 
@@ -9258,6 +9270,7 @@ THREE.Geometry = function () {
 	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.lineDistancesNeedUpdate = false;
+	this.groupsNeedUpdate = false;
 
 };
 
@@ -9428,10 +9441,10 @@ THREE.Geometry.prototype = {
 
 		var scope = this;
 
+		var indices = geometry.index !== null ? geometry.index.array : undefined;
 		var attributes = geometry.attributes;
 
 		var vertices = attributes.position.array;
-		var indices = attributes.index !== undefined ? attributes.index.array : undefined;
 		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
 		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
@@ -10449,14 +10462,6 @@ THREE.Geometry.prototype = {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
-	},
-
-	// Backwards compatibility
-
-	set groupsNeedUpdate ( value ) {
-
-		if ( value === true ) this.dispose();
-
 	}
 
 };
@@ -10507,6 +10512,7 @@ THREE.DirectGeometry = function () {
 	this.colorsNeedUpdate = false;
 	this.uvsNeedUpdate = false;
 	this.tangentsNeedUpdate = false;
+	this.groupsNeedUpdate = false;
 
 };
 
@@ -10538,6 +10544,51 @@ THREE.DirectGeometry.prototype = {
 
 	},
 
+	computeGroups: function ( geometry ) {
+
+		var group;
+		var groups = [];
+		var materialIndex;
+
+		var faces = geometry.faces;
+
+		for ( var i = 0; i < faces.length; i ++ ) {
+
+			var face = faces[ i ];
+
+			// materials
+
+			if ( face.materialIndex !== materialIndex ) {
+
+				materialIndex = face.materialIndex;
+
+				if ( group !== undefined ) {
+
+					group.count = ( i * 3 ) - group.start;
+					groups.push( group );
+
+				}
+
+				group = {
+					start: i * 3,
+					materialIndex: materialIndex
+				};
+
+			}
+
+		}
+
+		if ( group !== undefined ) {
+
+			group.count = ( i * 3 ) - group.start;
+			groups.push( group );
+
+		}
+
+		this.groups = groups;
+
+	},
+
 	fromGeometry: function ( geometry ) {
 
 		var faces = geometry.faces;
@@ -10548,9 +10599,6 @@ THREE.DirectGeometry.prototype = {
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
 		var hasTangents = geometry.hasTangents;
-
-		var group;
-		var materialIndex;
 
 		// morphs
 
@@ -10598,7 +10646,7 @@ THREE.DirectGeometry.prototype = {
 
 		//
 
-		for ( var i = 0, i3 = 0; i < faces.length; i ++, i3 += 3 ) {
+		for ( var i = 0; i < faces.length; i ++ ) {
 
 			var face = faces[ i ];
 
@@ -10668,26 +10716,6 @@ THREE.DirectGeometry.prototype = {
 
 			}
 
-			// materials
-
-			if ( face.materialIndex !== materialIndex ) {
-
-				materialIndex = face.materialIndex;
-
-				if ( group !== undefined ) {
-
-					group.count = i3 - group.start;
-					this.groups.push( group );
-
-				}
-
-				group = {
-					start: i3,
-					materialIndex: materialIndex
-				};
-
-			}
-
 			// tangents
 
 			if ( hasTangents === true ) {
@@ -10742,20 +10770,14 @@ THREE.DirectGeometry.prototype = {
 
 		}
 
-		//
-
-		if ( group !== undefined ) {
-
-			group.count = i3 - group.start;
-			this.groups.push( group );
-
-		}
+		this.computeGroups( geometry );
 
 		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
 		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
 		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
 		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
 		this.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
+		this.groupsNeedUpdate = geometry.groupsNeedUpdate;
 
 		return this;
 
@@ -10787,6 +10809,7 @@ THREE.BufferGeometry = function () {
 	this.name = '';
 	this.type = 'BufferGeometry';
 
+	this.index = null;
 	this.attributes = {};
 
 	this.morphAttributes = {};
@@ -10802,22 +10825,28 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
+	addIndex: function ( attribute ) {
+
+		this.index = attribute;
+
+	},
+
 	addAttribute: function ( name, attribute ) {
 
 		if ( attribute instanceof THREE.BufferAttribute === false && attribute instanceof THREE.InterleavedBufferAttribute === false ) {
 
 			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
-			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
+			this.addAttribute( name, new THREE.BufferAttribute( arguments[ 1 ], arguments[ 2 ] ) );
 
 			return;
 
 		}
 
-		if ( name === 'index' && attribute instanceof THREE.IndexBufferAttribute === false ) {
+		if ( name === 'index' ) {
 
-			console.warn( 'THREE.BufferGeometry.addAttribute: Use THREE.IndexBufferAttribute for index attribute.' );
-			attribute = new THREE.IndexBufferAttribute( attribute.array, attribute.itemSize );
+			console.warn( 'THREE.BufferGeometry.addAttribute: Use .addIndex() for index attribute.' );
+			this.addIndex( attribute );
 
 		}
 
@@ -11122,12 +11151,14 @@ THREE.BufferGeometry.prototype = {
 			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
 			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
 			direct.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
+			direct.groupsNeedUpdate = geometry.groupsNeedUpdate;
 
 			geometry.verticesNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
 			geometry.uvsNeedUpdate = false;
 			geometry.tangentsNeedUpdate = false;
+			geometry.groupsNeedUpdate = false;
 
 			geometry = direct;
 
@@ -11208,6 +11239,15 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		if ( geometry.groupsNeedUpdate ) {
+
+			geometry.computeGroups( object.geometry );
+			this.groups = geometry.groups;
+
+			geometry.groupsNeedUpdate = false;
+
+		}
+
 		return this;
 
 	},
@@ -11264,7 +11304,7 @@ THREE.BufferGeometry.prototype = {
 
 			var TypeArray = geometry.vertices.length > 65535 ? Uint32Array : Uint16Array;
 			var indices = new TypeArray( geometry.indices.length * 3 );
-			this.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
+			this.addIndex( new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 		}
 
@@ -11436,6 +11476,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeVertexNormals: function () {
 
+		var index = this.index;
 		var attributes = this.attributes;
 		var groups = this.groups;
 
@@ -11474,9 +11515,9 @@ THREE.BufferGeometry.prototype = {
 
 			// indexed elements
 
-			if ( attributes.index ) {
+			if ( index ) {
 
-				var indices = attributes.index.array;
+				var indices = index.array;
 
 				if ( groups.length === 0 ) {
 
@@ -11564,7 +11605,7 @@ THREE.BufferGeometry.prototype = {
 		// based on http://www.terathon.com/code/tangent.html
 		// (per vertex tangents)
 
-		if ( this.attributes.index === undefined ||
+		if ( this.index === undefined ||
 			 this.attributes.position === undefined ||
 			 this.attributes.normal === undefined ||
 			 this.attributes.uv === undefined ) {
@@ -11574,7 +11615,7 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		var indices = this.attributes.index.array;
+		var indices = this.index.array;
 		var positions = this.attributes.position.array;
 		var normals = this.attributes.normal.array;
 		var uvs = this.attributes.uv.array;
@@ -11886,8 +11927,15 @@ THREE.BufferGeometry.prototype = {
 
 	copy: function ( source ) {
 
+		var index = source.index;
+
+		if ( index !== null ) {
+
+			this.addIndex( index.clone() );
+
+		}
+
 		var attributes = source.attributes;
-		var groups = source.groups;
 
 		for ( var name in attributes ) {
 
@@ -11896,10 +11944,11 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		var groups = source.groups;
+
 		for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
 			var group = groups[ i ];
-
 			this.addGroup( group.start, group.count );
 
 		}
@@ -11938,9 +11987,9 @@ THREE.InstancedBufferGeometry = function () {
 THREE.InstancedBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.InstancedBufferGeometry.prototype.constructor = THREE.InstancedBufferGeometry;
 
-THREE.InstancedBufferGeometry.prototype.addDrawCall = function ( start, count, instances ) {
+THREE.InstancedBufferGeometry.prototype.addGroup = function ( start, count, instances ) {
 
-	this.drawcalls.push( {
+	this.groups.push( {
 
 		start: start,
 		count: count,
@@ -11952,17 +12001,29 @@ THREE.InstancedBufferGeometry.prototype.addDrawCall = function ( start, count, i
 
 THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
 
-	for ( var attr in source.attributes ) {
+	var index = source.index;
 
-		var sourceAttr = source.attributes[ attr ];
-		this.addAttribute( attr, sourceAttr.clone() );
+	if ( index !== null ) {
+
+		this.addIndex( index.clone() );
 
 	}
 
-	for ( var i = 0, il = source.drawcalls.length; i < il; i ++ ) {
+	var attributes = source.attributes;
 
-		var offset = source.drawcalls[ i ];
-		this.addDrawCall( offset.start, offset.count, offset.instances );
+	for ( var name in attributes ) {
+
+		var attribute = attributes[ name ];
+		this.addAttribute( name, attribute.clone() );
+
+	}
+
+	var groups = source.groups;
+
+	for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+		var group = groups[ i ];
+		this.addGroup( group.start, group.count, group.instances );
 
 	}
 
@@ -16106,7 +16167,6 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	this.defines = {};
 	this.uniforms = {};
-	this.attributes = [];
 
 	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
 	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
@@ -16143,10 +16203,9 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	if ( parameters !== undefined ) {
 
-		if ( parameters.attributes !== undefined && Array.isArray( parameters.attributes ) === false ) {
+		if ( parameters.attributes !== undefined ) {
 
-			console.warn( 'THREE.ShaderMaterial: attributes should now be an array of attribute names.' );
-			parameters.attributes = Object.keys( parameters.attributes );
+			console.error( 'THREE.ShaderMaterial: attributes should now be defined in THREE.BufferGeometry instead.' );
 
 		}
 
@@ -16186,6 +16245,8 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
+
+	this.derivatives = source.derivatives;
 
 	return this;
 
@@ -16692,17 +16753,21 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
+			var index = geometry.index;
 			var attributes = geometry.attributes;
 			var positions = attributes.position.array;
 
-			if ( attributes.index !== undefined ) {
+			if ( index !== null ) {
 
-				var indices = attributes.index.array;
-				var offsets = geometry.drawcalls;
+				var indices = index.array;
+				var offsets = geometry.groups;
 
 				if ( offsets.length === 0 ) {
 
-					geometry.addDrawCall( 0, indices.length );
+					offsets = [ {
+						start: 0,
+						count: indices.length
+					} ];
 
 				}
 
@@ -16803,7 +16868,8 @@ THREE.Line = function ( geometry, material, mode ) {
 
 	if ( mode === 1 ) {
 
-		console.error( 'THREE.Line: THREE.LinePieces mode has been removed. Use THREE.LineSegments instead.' );
+		console.warn( 'THREE.Line: parameter THREE.LinePieces no longer supported. Created THREE.LineSegments instead.' );
+		return new THREE.LineSegments( geometry, material );
 
 	}
 
@@ -16856,17 +16922,21 @@ THREE.Line.prototype.raycast = ( function () {
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
+			var index = geometry.index;
 			var attributes = geometry.attributes;
 
-			if ( attributes.index !== undefined ) {
+			if ( index !== null ) {
 
-				var indices = attributes.index.array;
+				var indices = index.array;
 				var positions = attributes.position.array;
-				var offsets = geometry.drawcalls;
+				var offsets = geometry.groups;
 
 				if ( offsets.length === 0 ) {
 
-					geometry.addDrawCall( 0, indices.length );
+					offsets = [ {
+						start: 0,
+						count: indices.length
+					} ];
 
 				}
 
@@ -17064,7 +17134,6 @@ THREE.Mesh.prototype.updateMorphTargets = function () {
 	if ( this.geometry.morphTargets !== undefined && this.geometry.morphTargets.length > 0 ) {
 
 		this.morphTargetBase = - 1;
-		this.morphTargetForcedOrder = [];
 		this.morphTargetInfluences = [];
 		this.morphTargetDictionary = {};
 
@@ -17147,17 +17216,21 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
+			var index = geometry.index;
 			var attributes = geometry.attributes;
 
-			if ( attributes.index !== undefined ) {
+			if ( index !== null ) {
 
-				var indices = attributes.index.array;
+				var indices = index.array;
 				var positions = attributes.position.array;
-				var offsets = geometry.drawcalls;
+				var offsets = geometry.groups;
 
 				if ( offsets.length === 0 ) {
 
-					geometry.addDrawCall( 0, indices.length );
+					offsets = [ {
+						start: 0,
+						count: indices.length
+					} ];
 
 				}
 
@@ -17941,7 +18014,7 @@ THREE.MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
 
 THREE.MorphAnimMesh.prototype.copy = function ( source ) {
 
-	THREE.Object3D.prototype.copy.call( this, source );
+	THREE.Mesh.prototype.copy.call( this, source );
 
 	this.duration = source.duration;
 	this.mirroredLoop = source.mirroredLoop;
@@ -18125,7 +18198,7 @@ THREE.Sprite = ( function () {
 	var uvs = new Float32Array( [ 0, 0,   1, 0,   1, 1,   0, 1 ] );
 
 	var geometry = new THREE.BufferGeometry();
-	geometry.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
+	geometry.addIndex( new THREE.BufferAttribute( indices, 1 ) );
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 	geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
@@ -18429,7 +18502,7 @@ THREE.ShaderChunk[ 'color_vertex'] = "#ifdef USE_COLOR\n\n	vColor.xyz = color.xy
 
 // File:src/renderers/shaders/ShaderChunk/common.glsl
 
-THREE.ShaderChunk[ 'common'] = "#define PI 3.14159\n#define PI2 6.28318\n#define RECIPROCAL_PI2 0.15915494\n#define LOG2 1.442695\n#define EPSILON 1e-6\n\n#define saturate(a) clamp( a, 0.0, 1.0 )\n#define whiteCompliment(a) ( 1.0 - saturate( a ) )\n\nvec3 transformDirection( in vec3 normal, in mat4 matrix ) {\n\n	return normalize( ( matrix * vec4( normal, 0.0 ) ).xyz );\n\n}\n\n// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations\nvec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {\n\n	return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );\n\n}\n\nvec3 projectOnPlane(in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\n	float distance = dot( planeNormal, point - pointOnPlane );\n\n	return - distance * planeNormal + point;\n\n}\n\nfloat sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\n	return sign( dot( point - pointOnPlane, planeNormal ) );\n\n}\n\nvec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\n	return lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;\n\n}\n\nfloat calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {\n\n	if ( decayExponent > 0.0 ) {\n\n	  return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );\n\n	}\n\n	return 1.0;\n\n}\n\nvec3 F_Schlick( in vec3 specularColor, in float dotLH ) {\n\n	return ( 1.0 - specularColor ) * pow( 1.0 - dotLH, 5.0 ) + specularColor;\n\n}\n\nfloat G_BlinnPhong_Implicit( /* in float dotNL, in float dotNV */ ) {\n\n	// geometry term is (n⋅l)(n⋅v) / 4(n⋅l)(n⋅v)\n\n	return 0.25;\n\n}\n\nfloat D_BlinnPhong( in float shininess, in float dotNH ) {\n\n	// factor of 1/PI in distribution term omitted\n\n	return ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n\n}\n\nvec3 BRDF_BlinnPhong( in vec3 specularColor, in float shininess, in vec3 normal, in vec3 lightDir, in vec3 viewDir ) {\n\n	vec3 halfDir = normalize( lightDir + viewDir );\n\n	//float dotNL = saturate( dot( normal, lightDir ) );\n	//float dotNV = saturate( dot( normal, viewDir ) );\n	float dotNH = saturate( dot( normal, halfDir ) );\n	float dotLH = saturate( dot( lightDir, halfDir ) );\n\n	vec3 F = F_Schlick( specularColor, dotLH );\n\n	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );\n\n	float D = D_BlinnPhong( shininess, dotNH );\n\n	return F * G * D;\n\n}\n\nvec3 inputToLinear( in vec3 a ) {\n\n	#ifdef GAMMA_INPUT\n\n		return pow( a, vec3( float( GAMMA_FACTOR ) ) );\n\n	#else\n\n		return a;\n\n	#endif\n\n}\n\nvec3 linearToOutput( in vec3 a ) {\n\n	#ifdef GAMMA_OUTPUT\n\n		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );\n\n	#else\n\n		return a;\n\n	#endif\n\n}\n";
+THREE.ShaderChunk[ 'common'] = "#define PI 3.14159\n#define PI2 6.28318\n#define RECIPROCAL_PI2 0.15915494\n#define LOG2 1.442695\n#define EPSILON 1e-6\n\n#define saturate(a) clamp( a, 0.0, 1.0 )\n#define whiteCompliment(a) ( 1.0 - saturate( a ) )\n\nvec3 transformDirection( in vec3 normal, in mat4 matrix ) {\n\n	return normalize( ( matrix * vec4( normal, 0.0 ) ).xyz );\n\n}\n\n// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations\nvec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {\n\n	return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );\n\n}\n\nvec3 projectOnPlane(in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\n	float distance = dot( planeNormal, point - pointOnPlane );\n\n	return - distance * planeNormal + point;\n\n}\n\nfloat sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\n	return sign( dot( point - pointOnPlane, planeNormal ) );\n\n}\n\nvec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\n	return lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;\n\n}\n\nfloat calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {\n\n	if ( decayExponent > 0.0 ) {\n\n	  return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );\n\n	}\n\n	return 1.0;\n\n}\n\nvec3 F_Schlick( in vec3 specularColor, in float dotLH ) {\n\n	// Original approximation by Christophe Schlick '94\n	//;float fresnel = pow( 1.0 - dotLH, 5.0 );\n\n	// Optimized variant (presented by Epic at SIGGRAPH '13)\n	float fresnel = exp2( ( -5.55437 * dotLH - 6.98316 ) * dotLH );\n\n	return ( 1.0 - specularColor ) * fresnel + specularColor;\n\n}\n\nfloat G_BlinnPhong_Implicit( /* in float dotNL, in float dotNV */ ) {\n\n	// geometry term is (n⋅l)(n⋅v) / 4(n⋅l)(n⋅v)\n\n	return 0.25;\n\n}\n\nfloat D_BlinnPhong( in float shininess, in float dotNH ) {\n\n	// factor of 1/PI in distribution term omitted\n\n	return ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n\n}\n\nvec3 BRDF_BlinnPhong( in vec3 specularColor, in float shininess, in vec3 normal, in vec3 lightDir, in vec3 viewDir ) {\n\n	vec3 halfDir = normalize( lightDir + viewDir );\n\n	//float dotNL = saturate( dot( normal, lightDir ) );\n	//float dotNV = saturate( dot( normal, viewDir ) );\n	float dotNH = saturate( dot( normal, halfDir ) );\n	float dotLH = saturate( dot( lightDir, halfDir ) );\n\n	vec3 F = F_Schlick( specularColor, dotLH );\n\n	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );\n\n	float D = D_BlinnPhong( shininess, dotNH );\n\n	return F * G * D;\n\n}\n\nvec3 inputToLinear( in vec3 a ) {\n\n	#ifdef GAMMA_INPUT\n\n		return pow( a, vec3( float( GAMMA_FACTOR ) ) );\n\n	#else\n\n		return a;\n\n	#endif\n\n}\n\nvec3 linearToOutput( in vec3 a ) {\n\n	#ifdef GAMMA_OUTPUT\n\n		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );\n\n	#else\n\n		return a;\n\n	#endif\n\n}\n";
 
 // File:src/renderers/shaders/ShaderChunk/default_vertex.glsl
 
@@ -18485,11 +18558,11 @@ THREE.ShaderChunk[ 'lights_lambert_pars_vertex'] = "uniform vec3 ambientLightCol
 
 // File:src/renderers/shaders/ShaderChunk/lights_lambert_vertex.glsl
 
-THREE.ShaderChunk[ 'lights_lambert_vertex'] = "vLightFront = vec3( 0.0 );\n\n#ifdef DOUBLE_SIDED\n\n	vLightBack = vec3( 0.0 );\n\n#endif\n\nvec3 normal = normalize( transformedNormal );\n\n#if MAX_POINT_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n\n		vec3 lightColor = pointLightColor[ i ];\n\n		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz - mvPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n\n		// attenuation\n\n		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );\n\n		// diffuse\n\n		float dotProduct = dot( normal, lightDir );\n\n		vLightFront += lightColor * attenuation * saturate( dotProduct );\n\n		#ifdef DOUBLE_SIDED\n\n			vLightBack += lightColor * attenuation * saturate( - dotProduct );\n\n		#endif\n\n	}\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n\n		vec3 lightColor = spotLightColor[ i ];\n\n		vec3 lightPosition = spotLightPosition[ i ];\n		vec4 lPosition = viewMatrix * vec4( lightPosition, 1.0 );\n		vec3 lVector = lPosition.xyz - mvPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n\n		float spotEffect = dot( spotLightDirection[ i ], normalize( lightPosition - worldPosition.xyz ) );\n\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n\n			spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ i ] ) );\n\n			// attenuation\n\n			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );\n\n			attenuation *= spotEffect;\n\n			// diffuse\n\n			float dotProduct = dot( normal, lightDir );\n\n			vLightFront += lightColor * attenuation * saturate( dotProduct );\n\n			#ifdef DOUBLE_SIDED\n\n				vLightBack += lightColor * attenuation * saturate( - dotProduct );\n\n			#endif\n\n		}\n\n	}\n\n#endif\n\n#if MAX_DIR_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n\n		vec3 lightColor = directionalLightColor[ i ];\n\n		vec3 lightDir = transformDirection( directionalLightDirection[ i ], viewMatrix );\n\n		// diffuse\n\n		float dotProduct = dot( normal, lightDir );\n\n		vLightFront += lightColor * saturate( dotProduct );\n\n		#ifdef DOUBLE_SIDED\n\n			vLightBack += lightColor * saturate( - dotProduct );\n\n		#endif\n\n	}\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n\n		vec3 lightDir = transformDirection( hemisphereLightDirection[ i ], viewMatrix );\n\n		// diffuse\n\n		float dotProduct = dot( normal, lightDir );\n\n		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;\n\n		vLightFront += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );\n\n		#ifdef DOUBLE_SIDED\n\n			float hemiDiffuseWeightBack = - 0.5 * dotProduct + 0.5;\n\n			vLightBack += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeightBack );\n\n		#endif\n\n	}\n\n#endif\n\nvLightFront += ambientLightColor;\n\n#ifdef DOUBLE_SIDED\n\n	vLightBack += ambientLightColor;\n\n#endif\n";
+THREE.ShaderChunk[ 'lights_lambert_vertex'] = "vLightFront = vec3( 0.0 );\n\n#ifdef DOUBLE_SIDED\n\n	vLightBack = vec3( 0.0 );\n\n#endif\n\nvec3 normal = normalize( transformedNormal );\n\n#if MAX_POINT_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n\n		vec3 lightColor = pointLightColor[ i ];\n\n		vec3 lVector = pointLightPosition[ i ] - mvPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n\n		// attenuation\n\n		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );\n\n		// diffuse\n\n		float dotProduct = dot( normal, lightDir );\n\n		vLightFront += lightColor * attenuation * saturate( dotProduct );\n\n		#ifdef DOUBLE_SIDED\n\n			vLightBack += lightColor * attenuation * saturate( - dotProduct );\n\n		#endif\n\n	}\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n\n		vec3 lightColor = spotLightColor[ i ];\n\n		vec3 lightPosition = spotLightPosition[ i ];\n		vec3 lVector = lightPosition - mvPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n\n		float spotEffect = dot( spotLightDirection[ i ], lightDir );\n\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n\n			spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ i ] ) );\n\n			// attenuation\n\n			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );\n\n			attenuation *= spotEffect;\n\n			// diffuse\n\n			float dotProduct = dot( normal, lightDir );\n\n			vLightFront += lightColor * attenuation * saturate( dotProduct );\n\n			#ifdef DOUBLE_SIDED\n\n				vLightBack += lightColor * attenuation * saturate( - dotProduct );\n\n			#endif\n\n		}\n\n	}\n\n#endif\n\n#if MAX_DIR_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n\n		vec3 lightColor = directionalLightColor[ i ];\n\n		vec3 lightDir = directionalLightDirection[ i ];\n\n		// diffuse\n\n		float dotProduct = dot( normal, lightDir );\n\n		vLightFront += lightColor * saturate( dotProduct );\n\n		#ifdef DOUBLE_SIDED\n\n			vLightBack += lightColor * saturate( - dotProduct );\n\n		#endif\n\n	}\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n\n		vec3 lightDir = hemisphereLightDirection[ i ];\n\n		// diffuse\n\n		float dotProduct = dot( normal, lightDir );\n\n		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;\n\n		vLightFront += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );\n\n		#ifdef DOUBLE_SIDED\n\n			float hemiDiffuseWeightBack = - 0.5 * dotProduct + 0.5;\n\n			vLightBack += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeightBack );\n\n		#endif\n\n	}\n\n#endif\n\nvLightFront += ambientLightColor;\n\n#ifdef DOUBLE_SIDED\n\n	vLightBack += ambientLightColor;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_phong_fragment'] = "#ifndef FLAT_SHADED\n\n	vec3 normal = normalize( vNormal );\n\n	#ifdef DOUBLE_SIDED\n\n		normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );\n\n	#endif\n\n#else\n\n	vec3 fdx = dFdx( vViewPosition );\n	vec3 fdy = dFdy( vViewPosition );\n	vec3 normal = normalize( cross( fdx, fdy ) );\n\n#endif\n\n#ifdef USE_NORMALMAP\n\n	normal = perturbNormal2Arb( -vViewPosition, normal );\n\n#elif defined( USE_BUMPMAP )\n\n	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );\n\n#endif\n\nvec3 viewDir = normalize( vViewPosition );\n\nvec3 totalDiffuseLight = vec3( 0.0 );\nvec3 totalSpecularLight = vec3( 0.0 );\n\n#if MAX_POINT_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n\n		vec3 lightColor = pointLightColor[ i ];\n\n		vec3 lightPosition = pointLightPosition[ i ];\n		vec4 lPosition = viewMatrix * vec4( lightPosition, 1.0 );\n		vec3 lVector = lPosition.xyz + vViewPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n\n		// attenuation\n\n		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );\n\n		// diffuse\n\n		float cosineTerm = saturate( dot( normal, lightDir ) );\n\n		totalDiffuseLight += lightColor * attenuation * cosineTerm;\n\n		// specular\n\n		vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );\n\n		totalSpecularLight += brdf * specularStrength * lightColor * attenuation * cosineTerm;\n\n\n	}\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n\n		vec3 lightColor = spotLightColor[ i ];\n\n		vec3 lightPosition = spotLightPosition[ i ];\n		vec4 lPosition = viewMatrix * vec4( lightPosition, 1.0 );\n		vec3 lVector = lPosition.xyz + vViewPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n\n		float spotEffect = dot( spotLightDirection[ i ], normalize( lightPosition - vWorldPosition ) );\n\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n\n			spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ i ] ) );\n\n			// attenuation\n\n			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );\n\n			attenuation *= spotEffect;\n\n			// diffuse\n\n			float cosineTerm = saturate( dot( normal, lightDir ) );\n\n			totalDiffuseLight += lightColor * attenuation * cosineTerm;\n\n			// specular\n\n			vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );\n\n			totalSpecularLight += brdf * specularStrength * lightColor * attenuation * cosineTerm;\n\n		}\n\n	}\n\n#endif\n\n#if MAX_DIR_LIGHTS > 0\n\n	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n\n		vec3 lightColor = directionalLightColor[ i ];\n\n		vec3 lightDir = transformDirection( directionalLightDirection[ i ], viewMatrix );\n\n		// diffuse\n\n		float cosineTerm = saturate( dot( normal, lightDir ) );\n\n		totalDiffuseLight += lightColor * cosineTerm;\n\n		// specular\n\n		vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );\n\n		totalSpecularLight += brdf * specularStrength * lightColor * cosineTerm;\n\n	}\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n\n		vec3 lightDir = transformDirection( hemisphereLightDirection[ i ], viewMatrix );\n\n		// diffuse\n\n		float dotProduct = dot( normal, lightDir );\n\n		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;\n\n		vec3 lightColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );\n\n		totalDiffuseLight += lightColor;\n\n		// specular (sky term only)\n\n		vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );\n\n		totalSpecularLight += brdf * specularStrength * lightColor * max( dotProduct, 0.0 );\n\n	}\n\n#endif\n\n#ifdef METAL\n\n	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + totalEmissiveLight;\n\n#else\n\n	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;\n\n#endif\n";
+THREE.ShaderChunk[ 'lights_phong_fragment'] = "#ifndef FLAT_SHADED\n\n	vec3 normal = normalize( vNormal );\n\n	#ifdef DOUBLE_SIDED\n\n		normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );\n\n	#endif\n\n#else\n\n	vec3 fdx = dFdx( vViewPosition );\n	vec3 fdy = dFdy( vViewPosition );\n	vec3 normal = normalize( cross( fdx, fdy ) );\n\n#endif\n\n#ifdef USE_NORMALMAP\n\n	normal = perturbNormal2Arb( -vViewPosition, normal );\n\n#elif defined( USE_BUMPMAP )\n\n	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );\n\n#endif\n\nvec3 viewDir = normalize( vViewPosition );\n\nvec3 totalDiffuseLight = vec3( 0.0 );\nvec3 totalSpecularLight = vec3( 0.0 );\n\n#if MAX_POINT_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n\n		vec3 lightColor = pointLightColor[ i ];\n\n		vec3 lightPosition = pointLightPosition[ i ];\n		vec3 lVector = lightPosition + vViewPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n\n		// attenuation\n\n		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );\n\n		// diffuse\n\n		float cosineTerm = saturate( dot( normal, lightDir ) );\n\n		totalDiffuseLight += lightColor * attenuation * cosineTerm;\n\n		// specular\n\n		vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );\n\n		totalSpecularLight += brdf * specularStrength * lightColor * attenuation * cosineTerm;\n\n\n	}\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n\n		vec3 lightColor = spotLightColor[ i ];\n\n		vec3 lightPosition = spotLightPosition[ i ];\n		vec3 lVector = lightPosition + vViewPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n\n		float spotEffect = dot( spotLightDirection[ i ], lightDir );\n\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n\n			spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ i ] ) );\n\n			// attenuation\n\n			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );\n\n			attenuation *= spotEffect;\n\n			// diffuse\n\n			float cosineTerm = saturate( dot( normal, lightDir ) );\n\n			totalDiffuseLight += lightColor * attenuation * cosineTerm;\n\n			// specular\n\n			vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );\n\n			totalSpecularLight += brdf * specularStrength * lightColor * attenuation * cosineTerm;\n\n		}\n\n	}\n\n#endif\n\n#if MAX_DIR_LIGHTS > 0\n\n	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n\n		vec3 lightColor = directionalLightColor[ i ];\n\n		vec3 lightDir = directionalLightDirection[ i ];\n\n		// diffuse\n\n		float cosineTerm = saturate( dot( normal, lightDir ) );\n\n		totalDiffuseLight += lightColor * cosineTerm;\n\n		// specular\n\n		vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );\n\n		totalSpecularLight += brdf * specularStrength * lightColor * cosineTerm;\n\n	}\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n\n		vec3 lightDir = hemisphereLightDirection[ i ];\n\n		// diffuse\n\n		float dotProduct = dot( normal, lightDir );\n\n		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;\n\n		vec3 lightColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );\n\n		totalDiffuseLight += lightColor;\n\n		// specular (sky term only)\n\n		vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );\n\n		totalSpecularLight += brdf * specularStrength * lightColor * max( dotProduct, 0.0 );\n\n	}\n\n#endif\n\n#ifdef METAL\n\n	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + totalEmissiveLight;\n\n#else\n\n	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_pars_fragment.glsl
 
@@ -19927,13 +20000,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _supportsVertexTextures = _maxVertexTextures > 0;
 	var _supportsBoneTextures = _supportsVertexTextures && extensions.get( 'OES_texture_float' );
-	var _supportsInstancedArrays = extensions.get( 'ANGLE_instanced_arrays' );
-
-	//
-
-
-
-	//
 
 	var _maxPrecision = state.getMaxPrecision( _precision );
 
@@ -19966,18 +20032,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.forceContextLoss = function () {
 
 		extensions.get( 'WEBGL_lose_context' ).loseContext();
-
-	};
-
-	this.supportsVertexTextures = function () {
-
-		return _supportsVertexTextures;
-
-	};
-
-	this.supportsInstancedArrays = function () {
-
-		return _supportsInstancedArrays;
 
 	};
 
@@ -20409,8 +20463,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object, group ) {
 
-		if ( material.visible === false ) return;
-
 		setMaterial( material );
 
 		var program = setProgram( camera, lights, fog, material, object );
@@ -20459,8 +20511,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var index = influence[ 1 ];
 
-					if ( material.morphTargets === true ) geometry.addAttribute( 'morphTarget' + i, morphAttributes.position[ index ] );
-					if ( material.morphNormals === true ) geometry.addAttribute( 'morphNormal' + i, morphAttributes.normal[ index ] );
+					if ( material.morphTargets === true && morphAttributes.position ) geometry.addAttribute( 'morphTarget' + i, morphAttributes.position[ index ] );
+					if ( material.morphNormals === true && morphAttributes.normal ) geometry.addAttribute( 'morphNormal' + i, morphAttributes.normal[ index ] );
 
 				} else {
 
@@ -20485,7 +20537,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
-		var index = geometry.attributes.index;
+		var index = geometry.index;
 		var position = geometry.attributes.position;
 
 		if ( material.wireframe === true ) {
@@ -20496,7 +20548,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var renderer;
 
-		if ( index !== undefined ) {
+		if ( index !== null ) {
 
 			renderer = indexedBufferRenderer;
 			renderer.setIndex( index );
@@ -20511,7 +20563,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			setupVertexAttributes( material, program, geometry );
 
-			if ( index !== undefined ) {
+			if ( index !== null ) {
 
 				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, objects.getAttributeBuffer( index ) );
 
@@ -20523,7 +20575,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var count;
 
-			if ( index !== undefined ) {
+			if ( index !== null ) {
 
 				count = index.array.length;
 
@@ -20904,6 +20956,45 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function pushImmediateRenderItem( object ) {
+
+		if ( object.material.transparent ) {
+
+			transparentImmediateObjects.push( object );
+
+		} else {
+
+			opaqueImmediateObjects.push( object );
+
+		}
+
+	}
+
+	function pushRenderItem( object, geometry, material, z, group ) {
+
+		var renderItem = {
+			id: object.id,
+			object: object,
+			geometry: geometry,
+			material: material,
+			z: _vector3.z,
+			group: group
+		};
+
+		if ( material.transparent ) {
+
+			transparentObjects.push( renderItem );
+
+		} else {
+
+			opaqueObjects.push( renderItem );
+
+		}
+
+		material.program = properties.get( material ).program; // TODO: Do this at compile time
+
+	}
+
 	function projectObject( object ) {
 
 		if ( object.visible === false ) return;
@@ -20922,17 +21013,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.ImmediateRenderObject ) {
 
-			var material = object.material;
-
-			if ( material.transparent ) {
-
-				transparentImmediateObjects.push( object );
-
-			} else {
-
-				opaqueImmediateObjects.push( object );
-
-			}
+			pushImmediateRenderItem( object );
 
 		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ){
 
@@ -20955,36 +21036,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
+					var geometry = objects.update( object );
+
 					if ( material instanceof THREE.MeshFaceMaterial ) {
 
+						var groups = geometry.groups;
 						var materials = material.materials;
 
-						for ( var i = 0, l = materials.length; i < l; i ++ ) {
+						for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
-							materials[ i ].program = properties.get( materials[ i ] ).program;
+							var group = groups[ i ];
+							var groupMaterial = materials[ group.materialIndex ];
+
+							if ( groupMaterial.visible === true ) {
+
+								pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
+
+							}
 
 						}
 
 					} else {
 
-						material.program = properties.get( material ).program;
-
-					}
-
-					var renderItem = {
-						id: object.id,
-						object: object,
-						material: object.material,
-						z: _vector3.z
-					};
-
-					if ( material.transparent ) {
-
-						transparentObjects.push( renderItem );
-
-					} else {
-
-						opaqueObjects.push( renderItem );
+						pushRenderItem( object, geometry, material, _vector3.z );
 
 					}
 
@@ -21006,42 +21080,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
 
-		var material = overrideMaterial;
-
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
 			var renderItem = renderList[ i ];
+
 			var object = renderItem.object;
-			var geometry = objects.update( object );
+			var geometry = renderItem.geometry;
+			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
+			var group = renderItem.group;
 
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
-			if ( overrideMaterial === undefined ) material = object.material;
-
-			if ( material instanceof THREE.MeshFaceMaterial ) {
-
-				var groups = geometry.groups;
-				var materials = material.materials;
-
-				for ( var j = 0, jl = groups.length; j < jl; j ++ ) {
-
-					var group = groups[ j ];
-					var groupMaterial = materials[ group.materialIndex ];
-
-					if ( groupMaterial !== undefined ) {
-
-						_this.renderBufferDirect( camera, lights, fog, geometry, groupMaterial, object, group );
-
-					}
-
-				}
-
-			} else {
-
-				_this.renderBufferDirect( camera, lights, fog, geometry, material, object );
-
-			}
+			_this.renderBufferDirect( camera, lights, fog, geometry, material, object, group );
 
 		}
 
@@ -21323,6 +21374,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		materialProperties.uniformsList = [];
 
 		var uniformLocations = materialProperties.program.getUniforms();
+
 		for ( var u in materialProperties.__webglShader.uniforms ) {
 
 			var location = uniformLocations[ u ];
@@ -21522,7 +21574,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( _lightsNeedUpdate ) {
 
 					refreshLights = true;
-					setupLights( lights );
+					setupLights( lights, camera );
 					_lightsNeedUpdate = false;
 
 				}
@@ -21890,7 +21942,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsGeneric ( uniforms ) {
 
-		var texture, textureUnit, offset;
+		var texture, textureUnit;
 
 		for ( var j = 0, jl = uniforms.length; j < jl; j ++ ) {
 
@@ -22039,12 +22091,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					for ( var i = 0, il = value.length; i < il; i ++ ) {
+					for ( var i = 0, i2 = 0, il = value.length; i < il; i ++, i2 += 2 ) {
 
-						offset = i * 2;
-
-						uniform._array[ offset + 0 ] = value[ i ].x;
-						uniform._array[ offset + 1 ] = value[ i ].y;
+						uniform._array[ i2 + 0 ] = value[ i ].x;
+						uniform._array[ i2 + 1 ] = value[ i ].y;
 
 					}
 
@@ -22062,13 +22112,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					for ( var i = 0, il = value.length; i < il; i ++ ) {
+					for ( var i = 0, i3 = 0, il = value.length; i < il; i ++, i3 += 3 ) {
 
-						offset = i * 3;
-
-						uniform._array[ offset + 0 ] = value[ i ].x;
-						uniform._array[ offset + 1 ] = value[ i ].y;
-						uniform._array[ offset + 2 ] = value[ i ].z;
+						uniform._array[ i3 + 0 ] = value[ i ].x;
+						uniform._array[ i3 + 1 ] = value[ i ].y;
+						uniform._array[ i3 + 2 ] = value[ i ].z;
 
 					}
 
@@ -22086,14 +22134,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					for ( var i = 0, il = value.length; i < il; i ++ ) {
+					for ( var i = 0, i4 = 0, il = value.length; i < il; i ++, i4 += 4 ) {
 
-						offset = i * 4;
-
-						uniform._array[ offset + 0 ] = value[ i ].x;
-						uniform._array[ offset + 1 ] = value[ i ].y;
-						uniform._array[ offset + 2 ] = value[ i ].z;
-						uniform._array[ offset + 3 ] = value[ i ].w;
+						uniform._array[ i4 + 0 ] = value[ i ].x;
+						uniform._array[ i4 + 1 ] = value[ i ].y;
+						uniform._array[ i4 + 2 ] = value[ i ].z;
+						uniform._array[ i4 + 3 ] = value[ i ].w;
 
 					}
 
@@ -22234,7 +22280,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setupLights ( lights ) {
+	function setupLights ( lights, camera ) {
 
 		var l, ll, light,
 		r = 0, g = 0, b = 0,
@@ -22243,6 +22289,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		distance,
 
 		zlights = _lights,
+
+		viewMatrix = camera.matrixWorldInverse,
 
 		dirColors = zlights.directional.colors,
 		dirPositions = zlights.directional.positions,
@@ -22306,7 +22354,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
 				_direction.sub( _vector3 );
-				_direction.normalize();
+				_direction.transformDirection( viewMatrix );
 
 				dirOffset = dirLength * 3;
 
@@ -22329,6 +22377,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				setColorLinear( pointColors, pointOffset, color, intensity );
 
 				_vector3.setFromMatrixPosition( light.matrixWorld );
+				_vector3.applyMatrix4( viewMatrix );
 
 				pointPositions[ pointOffset + 0 ] = _vector3.x;
 				pointPositions[ pointOffset + 1 ] = _vector3.y;
@@ -22351,16 +22400,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 				setColorLinear( spotColors, spotOffset, color, intensity );
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
+				_vector3.copy( _direction ).applyMatrix4( viewMatrix );
 
-				spotPositions[ spotOffset + 0 ] = _direction.x;
-				spotPositions[ spotOffset + 1 ] = _direction.y;
-				spotPositions[ spotOffset + 2 ] = _direction.z;
+				spotPositions[ spotOffset + 0 ] = _vector3.x;
+				spotPositions[ spotOffset + 1 ] = _vector3.y;
+				spotPositions[ spotOffset + 2 ] = _vector3.z;
 
 				spotDistances[ spotLength ] = distance;
 
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
 				_direction.sub( _vector3 );
-				_direction.normalize();
+				_direction.transformDirection( viewMatrix );
 
 				spotDirections[ spotOffset + 0 ] = _direction.x;
 				spotDirections[ spotOffset + 1 ] = _direction.y;
@@ -22379,7 +22429,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( ! light.visible ) continue;
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
-				_direction.normalize();
+				_direction.transformDirection( viewMatrix );
 
 				hemiOffset = hemiLength * 3;
 
@@ -23304,6 +23354,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.supportsVertexTextures = function () {
+
+		return _supportsVertexTextures;
+
+	};
+
+	this.supportsInstancedArrays = function () {
+
+		console.warn( 'THREE.WebGLRenderer: .supportsInstancedArrays() is now .extensions.get( \'ANGLE_instanced_arrays\' ).' );
+		return extensions.get( 'ANGLE_instanced_arrays' );
+
+	};
+
+	//
+
 	this.initMaterial = function () {
 
 		console.warn( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );
@@ -23616,7 +23681,7 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		}
 
-		var index = geometry.attributes.index;
+		var index = geometry.index;
 
 		extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount );
 
@@ -23825,11 +23890,18 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
+		var index = geometry.index;
 		var attributes = geometry.attributes;
+
+		if ( index !== null ) {
+
+			updateAttribute( index, gl.ELEMENT_ARRAY_BUFFER );
+
+		}
 
 		for ( var name in attributes ) {
 
-			updateAttribute( attributes[ name ] );
+			updateAttribute( attributes[ name ], gl.ARRAY_BUFFER );
 
 		}
 
@@ -23843,7 +23915,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-				updateAttribute( array[ i ] );
+				updateAttribute( array[ i ], gl.ARRAY_BUFFER );
 
 			}
 
@@ -23853,19 +23925,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	}
 
-	function updateAttribute( attribute ) {
-
-		var bufferType;
-
-		if ( attribute instanceof THREE.IndexBufferAttribute ) {
-
-			bufferType = gl.ELEMENT_ARRAY_BUFFER;
-
-		} else {
-
-			bufferType = gl.ARRAY_BUFFER;
-
-		}
+	function updateAttribute( attribute, bufferType ) {
 
 		var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
@@ -23888,15 +23948,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		attributeProperties.__webglBuffer = gl.createBuffer();
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		var usage = gl.STATIC_DRAW;
-
-		if ( data instanceof THREE.DynamicBufferAttribute
-			 || ( data instanceof THREE.InstancedBufferAttribute && data.dynamic === true )
-			 || ( data instanceof THREE.InterleavedBuffer && data.dynamic === true ) ) {
-
-			usage = gl.DYNAMIC_DRAW;
-
-		}
+		var usage = data.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
 
 		gl.bufferData( bufferType, data.array, usage );
 
@@ -23908,7 +23960,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.updateRange === undefined || data.updateRange.count === - 1 ) {
+		if ( data.dynamic === false || data.updateRange.count === - 1 ) {
 
 			// Not using update ranges
 
@@ -23916,7 +23968,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		} else if ( data.updateRange.count === 0 ) {
 
-			console.error( 'THREE.WebGLObjects.updateBuffer: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
+			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
 
 		} else {
 
@@ -23955,14 +24007,13 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		var indices = [];
 
+		var index = geometry.index;
 		var attributes = geometry.attributes;
-
-		var index = attributes.index;
 		var position = attributes.position;
 
 		// console.time( 'wireframe' );
 
-		if ( index !== undefined ) {
+		if ( index !== null ) {
 
 			var edges = {};
 			var array = index.array;
@@ -23981,7 +24032,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		} else {
 
-			var array = position.array;
+			var array = attributes.position.array;
 
 			for ( var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
 
@@ -23998,9 +24049,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		// console.timeEnd( 'wireframe' );
 
 		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
-		var attribute = new THREE.IndexBufferAttribute( new TypeArray( indices ), 1 );
+		var attribute = new THREE.BufferAttribute( new TypeArray( indices ), 1 );
 
-		updateAttribute( attribute );
+		updateAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );
 
 		property.wireframe = attribute;
 
@@ -24828,7 +24879,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 						var group = groups[ j ];
 						var groupMaterial = materials[ group.materialIndex ];
 
-						if ( groupMaterial !== undefined ) {
+						if ( groupMaterial.visible === true ) {
 
 							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, groupMaterial ), object, group );
 
@@ -30279,7 +30330,7 @@ THREE.AnimationHandler = {
 
 		for ( var i = 0; i < this.animations.length; i ++ ) {
 
-			this.animations[ i ].resetBlendWeights( );
+			this.animations[ i ].resetBlendWeights();
 
 		}
 
@@ -31305,7 +31356,7 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 
 	}
 
-	this.addAttribute( 'index', new THREE.IndexBufferAttribute( new Uint16Array( indices ), 1 ) );
+	this.addIndex( new THREE.BufferAttribute( new Uint16Array( indices ), 1 ) );
 	this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
@@ -32702,7 +32753,7 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 	}
 
-	this.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
+	this.addIndex( new THREE.BufferAttribute( indices, 1 ) );
 	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
@@ -33063,7 +33114,7 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 	}
 
-	this.addAttribute( 'index', new THREE.IndexBufferAttribute( new Uint16Array( indices ), 1 ) );
+	this.addIndex( new THREE.BufferAttribute( new Uint16Array( indices ), 1 ) );
 	this.addAttribute( 'position', positions );
 	this.addAttribute( 'normal', normals );
 	this.addAttribute( 'uv', uvs );
@@ -34331,12 +34382,12 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 	} else if ( geometry instanceof THREE.BufferGeometry ) {
 
-		if ( geometry.attributes.index !== undefined ) {
+		if ( geometry.index !== null ) {
 
 			// Indexed BufferGeometry
 
+			var indices = geometry.index.array;
 			var vertices = geometry.attributes.position;
-			var indices = geometry.attributes.index.array;
 			var drawcalls = geometry.drawcalls;
 			var numEdges = 0;
 
@@ -34594,8 +34645,12 @@ THREE.ArrowHelper.prototype.setColor = function ( color ) {
 
 THREE.BoxHelper = function ( object ) {
 
+	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
+	var positions = new Float32Array( 8 * 3 );
+
 	var geometry = new THREE.BufferGeometry();
-	geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 72 ), 3 ) );
+	geometry.addIndex( new THREE.BufferAttribute( indices, 1 ) );
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
 
@@ -34639,49 +34694,19 @@ THREE.BoxHelper.prototype.update = ( function () {
 		7: max.x, min.y, min.z
 		*/
 
-		var vertices = this.geometry.attributes.position.array;
+		var position = this.geometry.attributes.position;
+		var array = position.array;
 
-		vertices[ 0 ] = max.x; vertices[ 1 ] = max.y; vertices[ 2 ] = max.z;
-		vertices[ 3 ] = min.x; vertices[ 4 ] = max.y; vertices[ 5 ] = max.z;
+		array[  0 ] = max.x; array[  1 ] = max.y; array[  2 ] = max.z;
+		array[  3 ] = min.x; array[  4 ] = max.y; array[  5 ] = max.z;
+		array[  6 ] = min.x; array[  7 ] = min.y; array[  8 ] = max.z;
+		array[  9 ] = max.x; array[ 10 ] = min.y; array[ 11 ] = max.z;
+		array[ 12 ] = max.x; array[ 13 ] = max.y; array[ 14 ] = min.z;
+		array[ 15 ] = min.x; array[ 16 ] = max.y; array[ 17 ] = min.z;
+		array[ 18 ] = min.x; array[ 19 ] = min.y; array[ 20 ] = min.z;
+		array[ 21 ] = max.x; array[ 22 ] = min.y; array[ 23 ] = min.z;
 
-		vertices[ 6 ] = min.x; vertices[ 7 ] = max.y; vertices[ 8 ] = max.z;
-		vertices[ 9 ] = min.x; vertices[ 10 ] = min.y; vertices[ 11 ] = max.z;
-
-		vertices[ 12 ] = min.x; vertices[ 13 ] = min.y; vertices[ 14 ] = max.z;
-		vertices[ 15 ] = max.x; vertices[ 16 ] = min.y; vertices[ 17 ] = max.z;
-
-		vertices[ 18 ] = max.x; vertices[ 19 ] = min.y; vertices[ 20 ] = max.z;
-		vertices[ 21 ] = max.x; vertices[ 22 ] = max.y; vertices[ 23 ] = max.z;
-
-		//
-
-		vertices[ 24 ] = max.x; vertices[ 25 ] = max.y; vertices[ 26 ] = min.z;
-		vertices[ 27 ] = min.x; vertices[ 28 ] = max.y; vertices[ 29 ] = min.z;
-
-		vertices[ 30 ] = min.x; vertices[ 31 ] = max.y; vertices[ 32 ] = min.z;
-		vertices[ 33 ] = min.x; vertices[ 34 ] = min.y; vertices[ 35 ] = min.z;
-
-		vertices[ 36 ] = min.x; vertices[ 37 ] = min.y; vertices[ 38 ] = min.z;
-		vertices[ 39 ] = max.x; vertices[ 40 ] = min.y; vertices[ 41 ] = min.z;
-
-		vertices[ 42 ] = max.x; vertices[ 43 ] = min.y; vertices[ 44 ] = min.z;
-		vertices[ 45 ] = max.x; vertices[ 46 ] = max.y; vertices[ 47 ] = min.z;
-
-		//
-
-		vertices[ 48 ] = max.x; vertices[ 49 ] = max.y; vertices[ 50 ] = max.z;
-		vertices[ 51 ] = max.x; vertices[ 52 ] = max.y; vertices[ 53 ] = min.z;
-
-		vertices[ 54 ] = min.x; vertices[ 55 ] = max.y; vertices[ 56 ] = max.z;
-		vertices[ 57 ] = min.x; vertices[ 58 ] = max.y; vertices[ 59 ] = min.z;
-
-		vertices[ 60 ] = min.x; vertices[ 61 ] = min.y; vertices[ 62 ] = max.z;
-		vertices[ 63 ] = min.x; vertices[ 64 ] = min.y; vertices[ 65 ] = min.z;
-
-		vertices[ 66 ] = max.x; vertices[ 67 ] = min.y; vertices[ 68 ] = max.z;
-		vertices[ 69 ] = max.x; vertices[ 70 ] = min.y; vertices[ 71 ] = min.z;
-
-		this.geometry.attributes.position.needsUpdate = true;
+		position.needsUpdate = true;
 
 		this.geometry.computeBoundingSphere();
 

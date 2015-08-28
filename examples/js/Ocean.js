@@ -3,19 +3,19 @@
 	// flag used to trigger parameter changes
 	this.changed = true;
 	this.initial = true;
-	
+
 	// Assign required parameters as object properties
 	this.oceanCamera = new THREE.OrthographicCamera(); //camera.clone();
 	this.oceanCamera.position.z = 1;
 	this.renderer = renderer;
 	this.renderer.clearColor( 0xffffff );
-	
+
 	this.scene = new THREE.Scene();
-	
+
 	// Enable necessary extensions
 	this.renderer.context.getExtension( 'OES_texture_float' );
 	this.renderer.context.getExtension( 'OES_texture_float_linear' );
-	
+
 	// Assign optional parameters as variables and object properties
 	function optionalParameter( value, defaultValue ) {
 
@@ -39,10 +39,10 @@
 	this.windY = optionalParameter( options.INITIAL_WIND[ 1 ], 10.0 ),
 	this.size = optionalParameter( options.INITIAL_SIZE, 250.0 ),
 	this.choppiness = optionalParameter( options.INITIAL_CHOPPINESS, 1.5 );
-	
-	// 
+
+	//
 	this.matrixNeedsUpdate = false;
-	
+
 	// Setup framebuffer pipeline
 	var renderTargetType = optionalParameter( options.USE_HALF_FLOAT, false ) ? THREE.HalfFloatType : THREE.FloatType;
 	var LinearClampParams = {
@@ -86,13 +86,13 @@
 	this.pongTransformFramebuffer = new THREE.WebGLRenderTarget( this.resolution, this.resolution, NearestClampParams );
 	this.displacementMapFramebuffer = new THREE.WebGLRenderTarget( this.resolution, this.resolution, LinearClampParams );
 	this.normalMapFramebuffer = new THREE.WebGLRenderTarget( this.resolution, this.resolution, LinearClampParams );
-	
+
 	// Define shaders and constant uniforms
 	////////////////////////////////////////
-	
+
 	// 0 - The vertex shader used in all of the simulation steps
 	var fullscreeenVertexShader = THREE.ShaderLib[ "ocean_sim_vertex" ];
-		
+
 	// 1 - Horizontal wave vertices used for FFT
 	var oceanHorizontalShader = THREE.ShaderLib[ "ocean_subtransform" ];
 	var oceanHorizontalUniforms = THREE.UniformsUtils.clone( oceanHorizontalShader.uniforms );
@@ -105,7 +105,7 @@
 	this.materialOceanHorizontal.uniforms.u_subtransformSize = { type: "f", value: null };
 	this.materialOceanHorizontal.uniforms.u_input = { type: "t", value: null };
 	this.materialOceanHorizontal.depthTest = false;
-	
+
 	// 2 - Vertical wave vertices used for FFT
 	var oceanVerticalShader = THREE.ShaderLib[ "ocean_subtransform" ];
 	var oceanVerticalUniforms = THREE.UniformsUtils.clone( oceanVerticalShader.uniforms );
@@ -118,7 +118,7 @@
 	this.materialOceanVertical.uniforms.u_subtransformSize = { type: "f", value: null };
 	this.materialOceanVertical.uniforms.u_input = { type: "t", value: null };
 	this.materialOceanVertical.depthTest = false;
-	
+
 	// 3 - Initial spectrum used to generate height map
 	var initialSpectrumShader = THREE.ShaderLib[ "ocean_initial_spectrum" ];
 	var initialSpectrumUniforms = THREE.UniformsUtils.clone( initialSpectrumShader.uniforms );
@@ -130,7 +130,7 @@
 	this.materialInitialSpectrum.uniforms.u_wind = { type: "v2", value: new THREE.Vector2() };
 	this.materialInitialSpectrum.uniforms.u_resolution = { type: "f", value: this.resolution };
 	this.materialInitialSpectrum.depthTest = false;
-	
+
 	// 4 - Phases used to animate heightmap
 	var phaseShader = THREE.ShaderLib[ "ocean_phase" ];
 	var phaseUniforms = THREE.UniformsUtils.clone( phaseShader.uniforms );
@@ -141,7 +141,7 @@
 	} );
 	this.materialPhase.uniforms.u_resolution = { type: "f", value: this.resolution };
 	this.materialPhase.depthTest = false;
-	
+
 	// 5 - Shader used to update spectrum
 	var spectrumShader = THREE.ShaderLib[ "ocean_spectrum" ];
 	var spectrumUniforms = THREE.UniformsUtils.clone( spectrumShader.uniforms );
@@ -169,9 +169,7 @@
 	// 7 - Shader used to update normals
 	var oceanShader = THREE.ShaderLib[ "ocean_main" ];
 	var oceanUniforms = THREE.UniformsUtils.clone( oceanShader.uniforms );
-	var oceanAttributes = THREE.UniformsUtils.clone( oceanShader.attributes );
 	this.materialOcean = new THREE.ShaderMaterial( {
-		attributes: oceanAttributes,
 		uniforms: oceanUniforms,
 		vertexShader: oceanShader.vertexShader,
 		fragmentShader: oceanShader.fragmentShader
@@ -179,8 +177,8 @@
 	// this.materialOcean.wireframe = true;
 	this.materialOcean.uniforms.u_geometrySize = { type: "f", value: this.resolution };
 	this.materialOcean.uniforms.u_displacementMap = { type: "t", value: this.displacementMapFramebuffer };
-	this.materialOcean.uniforms.u_normalMap = { type: "t", value: this.normalMapFramebuffer }; 
-	this.materialOcean.uniforms.u_oceanColor = { type: "v3", value: this.oceanColor }; 
+	this.materialOcean.uniforms.u_normalMap = { type: "t", value: this.normalMapFramebuffer };
+	this.materialOcean.uniforms.u_oceanColor = { type: "v3", value: this.oceanColor };
 	this.materialOcean.uniforms.u_skyColor = { type: "v3", value: this.skyColor };
 	this.materialOcean.uniforms.u_sunDirection = { type: "v3", value: new THREE.Vector3( this.sunDirectionX, this.sunDirectionY, this.sunDirectionZ ) };
 	this.materialOcean.uniforms.u_exposure = { type: "f", value: this.exposure };
@@ -219,10 +217,10 @@ THREE.Ocean.prototype.generateMesh = function () {
 THREE.Ocean.prototype.render = function () {
 
 	this.scene.overrideMaterial = null;
-	
+
 	if ( this.changed )
 		this.renderInitialSpectrum();
-	
+
 	this.renderWavePhase();
 	this.renderSpectrum();
 	this.renderSpectrumFFT();
@@ -248,10 +246,8 @@ THREE.Ocean.prototype.generateSeedPhaseTexture = function() {
 		}
 
 	}
-	
+
 	this.pingPhaseTexture = new THREE.DataTexture( phaseArray, this.resolution, this.resolution, THREE.RGBAFormat );
-	this.pingPhaseTexture.minFilter = THREE.NearestFilter;
-	this.pingPhaseTexture.magFilter = THREE.NearestFilter;
 	this.pingPhaseTexture.wrapS = THREE.ClampToEdgeWrapping;
 	this.pingPhaseTexture.wrapT = THREE.ClampToEdgeWrapping;
 	this.pingPhaseTexture.type = THREE.FloatType;
@@ -304,7 +300,7 @@ THREE.Ocean.prototype.renderSpectrumFFT = function() {
 
 	// GPU FFT using Stockham formulation
 	var iterations = Math.log( this.resolution ) / Math.log( 2 ); // log2
-	
+
 	this.scene.overrideMaterial = this.materialOceanHorizontal;
 
 	for ( var i = 0; i < iterations; i ++ ) {

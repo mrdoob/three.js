@@ -214,7 +214,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 						var group = groups[ j ];
 						var groupMaterial = materials[ group.materialIndex ];
 
-						if ( groupMaterial !== undefined ) {
+						if ( groupMaterial.visible === true ) {
 
 							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, groupMaterial ), object, group );
 
