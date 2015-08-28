@@ -1922,9 +1922,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+		}
+
+		if( object.uniformValues && object.uniformValues.length > 0 ){
+
+			// temporarily overwrite uniforms with values from object
+
+			overwriteUniformsObject( material, object );
+
+		}else if( refreshMaterial || material.needsRefresh ){
+
 			// load common uniforms
 
 			loadUniformsGeneric( materialProperties.uniformsList );
+
+			if( material.needsRefresh ){
+
+				// unset flags
+
+				markUniformsNeedsUpdate( material.uniformsList, undefined );
+				material.needsRefresh = undefined;
+
+			}
 
 		}
 
@@ -2187,6 +2206,54 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function markUniformsNeedsUpdate ( uniforms, flag ){
+
+		for ( var j = 0, jl = uniforms.length; j < jl; j ++ ) {
+
+			uniforms[ j ][ 0 ].needsUpdate = flag;
+
+		}
+
+	}
+
+	function overwriteUniformsObject ( material, object ) {
+
+		// overwrite uniforms with values from object
+
+		var m_uniforms = material.__webglShader.uniforms;
+		var m_values = [];
+		var o_values = object.uniformValues;
+
+		for ( var u, j = 0, jl = o_values.length; j < jl; j ++ ) {
+
+			u = o_values[ j ];
+
+			// save material value
+			m_values[ j ] = [ u[ 0 ], m_uniforms[ u[ 0 ] ].value ];
+
+			// overwrite with object value
+			m_uniforms[ u[ 0 ] ].value = u[ 1 ];
+
+		}
+
+		loadUniformsGeneric( material.uniformsList );
+
+		markUniformsNeedsUpdate( material.uniformsList, false );
+
+		for ( var u, j = 0, jl = m_values.length; j < jl; j ++ ) {
+
+			u = m_values[ j ];
+
+			// recover saved material value
+			m_uniforms[ u[ 0 ] ].value = u[ 1 ];
+			m_uniforms[ u[ 0 ] ].needsUpdate = true;
+
+		}
+
+		material.needsRefresh = true;
+
+	}
+
 	// Uniforms (load to GPU)
 
 	function loadUniformsMatrices ( uniforms, object ) {
@@ -2221,12 +2288,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var texture, textureUnit;
 
+		var k = 0;
+
 		for ( var j = 0, jl = uniforms.length; j < jl; j ++ ) {
 
 			var uniform = uniforms[ j ][ 0 ];
 
 			// needsUpdate property is not added to all uniforms.
 			if ( uniform.needsUpdate === false ) continue;
+
+			k += 1;
 
 			var type = uniform.type;
 			var value = uniform.value;
@@ -2546,6 +2617,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+		// console.log( k, uniforms.length )
 
 	}
 
