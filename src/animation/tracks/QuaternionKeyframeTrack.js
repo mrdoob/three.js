@@ -68,20 +68,19 @@ THREE.QuaternionKeyframeTrack.prototype.clone = function() {
 
 };
 
-THREE.QuaternionKeyframeTrack.parse = function( name, jsonKeys ) {
+THREE.QuaternionKeyframeTrack.parse = function( json ) {
 
 	var keys = [];
 
-	for( var i = 0; i < jsonKeys.length; i ++ ) {
-		var jsonKey = jsonKeys[i];
-		var key = {
+	for( var i = 0; i < json.keys.length; i ++ ) {
+		var jsonKey = json.keys[i];
+		keys.push( {
 			value: new THREE.Quaternion().fromArray( jsonKey.value ),
 			time: jsonKey.time
-		};
-		keys.push( key );
+		} );
 	}
 
-	return new THREE.QuaternionKeyframeTrack( name, keys );
+	return new THREE.QuaternionKeyframeTrack( json.name, keys );
 
 };
  

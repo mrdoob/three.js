@@ -56,9 +56,9 @@ THREE.BooleanKeyframeTrack.prototype.clone = function() {
 
 };
 
-THREE.BooleanKeyframeTrack.parse = function( name, jsonKeys ) {
+THREE.BooleanKeyframeTrack.parse = function( json ) {
 
-	return new THREE.BooleanKeyframeTrack( name, jsonKeys );
+	return new THREE.BooleanKeyframeTrack( json.name, json.keys );
 
 };
  

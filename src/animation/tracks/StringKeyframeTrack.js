@@ -56,9 +56,9 @@ THREE.StringKeyframeTrack.prototype.clone = function() {
 
 };
 
-THREE.StringKeyframeTrack.parse = function( name, jsonKeys ) {
+THREE.StringKeyframeTrack.parse = function( json ) {
 
-	return new THREE.StringKeyframeTrack( name, jsonKeys );
+	return new THREE.StringKeyframeTrack( json.name, json.keys );
 
 };
  

@@ -56,23 +56,22 @@ THREE.VectorKeyframeTrack.prototype.clone = function() {
 
 };
 
-THREE.VectorKeyframeTrack.parse = function( name, jsonKeys ) {
+THREE.VectorKeyframeTrack.parse = function( json ) {
 
-	var elementCount = jsonKeys[0].value.length;
+	var elementCount = json.keys[0].value.length;
 	var valueType = THREE[ 'Vector' + elementCount ];
 
 	var keys = [];
 
-	for( var i = 0; i < jsonKeys.length; i ++ ) {
-		var jsonKey = jsonKeys[i];
-		var key = {
+	for( var i = 0; i < json.keys.length; i ++ ) {
+		var jsonKey = json.keys[i];
+		keys.push( {
 			value: new valueType().fromArray( jsonKey.value ),
 			time: jsonKey.time
-		};
-		keys.push( key );
+		} );
 	}
 
-	return new THREE.VectorKeyframeTrack( name, keys );
+	return new THREE.VectorKeyframeTrack( json.keys, keys );
 
 };
  

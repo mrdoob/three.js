@@ -56,9 +56,9 @@ THREE.NumberKeyframeTrack.prototype.clone = function() {
 
 };
 
-THREE.NumberKeyframeTrack.parse = function( name, jsonKeys ) {
+THREE.NumberKeyframeTrack.parse = function( json ) {
 
-	return new THREE.NumberKeyframeTrack( name, jsonKeys );
+	return new THREE.NumberKeyframeTrack( json.name, json.keys );
 
 };
  

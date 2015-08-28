@@ -56,20 +56,19 @@ THREE.ColorKeyframeTrack.prototype.clone = function() {
 
 };
 
-THREE.ColorKeyframeTrack.parse = function( name, jsonKeys ) {
+THREE.ColorKeyframeTrack.parse = function( json ) {
 
 	var keys = [];
 
-	for( var i = 0; i < jsonKeys.length; i ++ ) {
-		var jsonKey = jsonKeys[i];
-		var key = {
+	for( var i = 0; i < json.keys.length; i ++ ) {
+		var jsonKey = json.keys[i];
+		keys.push( {
 			value: new THREE.Color().fromArray( jsonKey.value ),
 			time: jsonKey.time
-		};
-		keys.push( key );
+		} );
 	}
 
-	return new THREE.ColorKeyframeTrack( name, keys );
+	return new THREE.ColorKeyframeTrack( json.name, keys );
 
 };
  

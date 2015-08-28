@@ -8,6 +8,7 @@
 
 THREE.KeyframeTrack = function ( name, keys ) {
 
+	if( name === undefined ) throw new Error( "track name is undefined" );
 	if( keys === undefined || keys.length === 0 ) throw new Error( "no keys in track named " + name );
 
 	this.name = name;
@@ -16,7 +17,6 @@ THREE.KeyframeTrack = function ( name, keys ) {
 	// the index of the last result, used as a starting point for local search.
 	this.lastIndex = 0;
 
-	this.sort();
 	this.validate();
 	this.optimize();
 };
@@ -133,7 +133,8 @@ THREE.KeyframeTrack.prototype = {
 
 	},	
 
-	// sort in ascending order
+	/* NOTE: This is commented out because we really shouldn't have to handle unsorted key lists
+	         Tracks with out of order keys should be considered to be invalid.  - bhouston
 	sort: function() {
 
 		function keyComparator(key0, key1) {
@@ -148,8 +149,7 @@ THREE.KeyframeTrack.prototype = {
 
 		}
 
-
-	}(),
+	}(),*/
 
 	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
 	// One could eventually ensure that all key.values in a track are all of the same type (otherwise interpolation makes no sense.)
@@ -238,33 +238,41 @@ THREE.KeyframeTrack.prototype = {
 
 };
 
+THREE.KeyframeTrack.parse( json ) {
 
-THREE.KeyframeTrack.GetTrackTypeForValue = function( value ) {
-	switch( typeof value ) {
-	 	case "object": {
+	if( json.type === undefined ) throw new Error( "track type undefined, can not parse" );
 
-			if( value.lerp ) {
+	var trackType = THREE.KeyframeTrack.GetTrackTypeForTypeName( json.type );
 
-				return THREE.VectorKeyframeTrack;
+	return trackType.parse( json );
 
-			}
-			if( value.slerp ) {
+};
 
-				return THREE.QuaternionKeyframeTrack;
+THREE.KeyframeTrack.GetTrackTypeForTypeName = function( typeName ) {
+	switch( typeName.toLower() ) {
+	 	case "vector":
+	 	case "vector2":
+	 	case "vector3":
+	 	case "vector4":
+			return THREE.VectorKeyframeTrack;
 
-			}
-			break;
-		}
-	 	case "number": {
+	 	case "quaternion":
+			return THREE.QuaternionKeyframeTrack;
+
+	 	case "integer":
+	 	case "scalar":
+	 	case "double":
+	 	case "float":
+	 	case "number":
 			return THREE.NumberKeyframeTrack;
-	 	}	
-	 	case "boolean": {
+
+	 	case "bool":
+	 	case "boolean":
 			return THREE.BooleanKeyframeTrack;
-	 	}
-	 	case "string": {
+
+	 	case "string":
 	 		return THREE.StringKeyframeTrack;
-	 	}
 	};
 
-	throw new Error( "Unsupported value type" );
+	throw new Error( "Unsupported typeName: " + typeName );
 };
