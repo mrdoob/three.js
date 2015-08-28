@@ -248,8 +248,6 @@ THREE.Ocean.prototype.generateSeedPhaseTexture = function() {
 	}
 
 	this.pingPhaseTexture = new THREE.DataTexture( phaseArray, this.resolution, this.resolution, THREE.RGBAFormat );
-	this.pingPhaseTexture.minFilter = THREE.NearestFilter;
-	this.pingPhaseTexture.magFilter = THREE.NearestFilter;
 	this.pingPhaseTexture.wrapS = THREE.ClampToEdgeWrapping;
 	this.pingPhaseTexture.wrapT = THREE.ClampToEdgeWrapping;
 	this.pingPhaseTexture.type = THREE.FloatType;
