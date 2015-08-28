@@ -1269,8 +1269,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		material.program = properties.get( material ).program; // TODO: Do this at compile time
-
 	}
 
 	function projectObject( object ) {
@@ -1614,6 +1612,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		materialProperties.program = program;
+		material.program = program;
 
 		var attributes = program.getAttributes();
 
