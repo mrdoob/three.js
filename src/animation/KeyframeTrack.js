@@ -238,7 +238,7 @@ THREE.KeyframeTrack.prototype = {
 
 };
 
-THREE.KeyframeTrack.parse = ( json ) {
+THREE.KeyframeTrack.parse = function( json ) {
 
 	if( json.type === undefined ) throw new Error( "track type undefined, can not parse" );
 
