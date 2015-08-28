@@ -633,28 +633,15 @@ THREE.ObjectLoader.prototype = {
 
 				var fpsToSeconds = ( data.animations.fps !== undefined ) ? ( 1.0 / data.animations.fps ) : 1.0;
 
-				if( dataTracks.position ) {
+				for( var i = 0; i < data.animations.tracks.length; i ++ ) {
 
-					tracks.push( THREE.VectorKeyframeTrack.parse( object.uuid + '.position', dataTracks.position ).scale( fpsToSeconds ) );
-
-				}
-
-				if( dataTracks.quaternion ) {
-
-					var trackQuaternion = THREE.QuaternionKeyframeTrack.parse( object.uuid + '.quaternion', dataTracks.quaternion ).scale( fpsToSeconds );
-				
-					//trackQuaternion.multiply( trackQuaternion.keys[0].value.clone().inverse() );
-					//trackQuaternion.multiply( object.quaternion );
+					var track = THREE.KeyframeTrack.parse( data.animations.tracks[i] );
+					track.name = object.uuid + '.' + track.name;
+					track.scale( fpsToSeconds );
+					tracks.push( track );
 					
-					tracks.push( trackQuaternion );
-
 				}
 
-				if( dataTracks.scale ) {
-
-					tracks.push( THREE.VectorKeyframeTrack.parse( object.uuid + '.scale', dataTracks.scale ).scale( fpsToSeconds ) );
-
-				}
 			}
 
 			return object;
