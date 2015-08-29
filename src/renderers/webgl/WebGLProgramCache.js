@@ -15,7 +15,7 @@ THREE.WebGLProgramCache = function ( renderer1, gl, extensions ) {
 		PointCloudMaterial: 'particle_basic'
 	};
 
-	var parameterNames = [ "	precision", "supportsVertexTextures", "map", "envMap", "envMapMode", "lightMap", "aoMap", "emissiveMap", "bumpMap", "normalMap", "specularMap", "alphaMap", "combine",
+	var parameterNames = [ "precision", "supportsVertexTextures", "map", "envMap", "envMapMode", "lightMap", "aoMap", "emissiveMap", "bumpMap", "normalMap", "specularMap", "alphaMap", "combine",
 	                        "vertexColors", "fog", "useFog", "fogExp", "flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning", "maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 	                        "maxMorphTargets", "maxMorphNormals", "maxDirLights", "maxPointLights", "maxSpotLights", "maxHemiLights", "maxShadows", "shadowMapEnabled", "shadowMapType", "shadowMapDebug",
 	                        "alphaTest", "metal", "doubleSided", "flipSided" ];
