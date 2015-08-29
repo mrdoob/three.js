@@ -1,9 +1,9 @@
-THREE.WebGLProgramCache = function (renderer1,gl, extensions) {
-   
-    var programs = [];
-    var supportsVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) > 0;
-    var supportsBoneTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) > 0 && extensions.get( 'OES_texture_float' );
-    
+THREE.WebGLProgramCache = function ( renderer1, gl, extensions ) {
+
+	var programs = [];
+	var supportsVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) > 0;
+	var supportsBoneTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) > 0 && extensions.get( 'OES_texture_float' );
+
 	var shaderIDs = {
 		MeshDepthMaterial: 'depth',
 		MeshNormalMaterial: 'normal',
@@ -14,13 +14,13 @@ THREE.WebGLProgramCache = function (renderer1,gl, extensions) {
 		LineDashedMaterial: 'dashed',
 		PointCloudMaterial: 'particle_basic'
 	};
-	
-	var parameterNames = ["	precision","supportsVertexTextures","map","envMap","envMapMode","lightMap","aoMap","emissiveMap","bumpMap","normalMap","specularMap","alphaMap","combine",
-	                        "vertexColors","fog","useFog","fogExp","flatShading","sizeAttenuation","logarithmicDepthBuffer","skinning","maxBones","useVertexTexture","morphTargets","morphNormals",
-	                        "maxMorphTargets","maxMorphNormals","maxDirLights","maxPointLights","maxSpotLights","maxHemiLights","maxShadows","shadowMapEnabled","shadowMapType","shadowMapDebug",
-	                        "alphaTest","metal","doubleSided","flipSided"];
-    
-    
+
+	var parameterNames = [ "	precision", "supportsVertexTextures", "map", "envMap", "envMapMode", "lightMap", "aoMap", "emissiveMap", "bumpMap", "normalMap", "specularMap", "alphaMap", "combine",
+	                        "vertexColors", "fog", "useFog", "fogExp", "flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning", "maxBones", "useVertexTexture", "morphTargets", "morphNormals",
+	                        "maxMorphTargets", "maxMorphNormals", "maxDirLights", "maxPointLights", "maxSpotLights", "maxHemiLights", "maxShadows", "shadowMapEnabled", "shadowMapType", "shadowMapDebug",
+	                        "alphaTest", "metal", "doubleSided", "flipSided" ];
+
+
 	function allocateBones ( object ) {
 
 		if ( supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
@@ -58,7 +58,7 @@ THREE.WebGLProgramCache = function (renderer1,gl, extensions) {
 		}
 
 	}
-  
+
 	function allocateLights( lights ) {
 
 		var dirLights = 0;
@@ -82,7 +82,7 @@ THREE.WebGLProgramCache = function (renderer1,gl, extensions) {
 		return { 'directional': dirLights, 'point': pointLights, 'spot': spotLights, 'hemi': hemiLights };
 
 	}
-	
+
 	function allocateShadows( lights ) {
 
 		var maxShadows = 0;
@@ -101,14 +101,14 @@ THREE.WebGLProgramCache = function (renderer1,gl, extensions) {
 		return maxShadows;
 
 	};
-	
-	this.getParameters = function(material, lights, fog, object){
-	    
-	    var shaderID = shaderIDs[ material.type ];
-	    // heuristics to create shader parameters according to lights in the scene
+
+	this.getParameters = function( material, lights, fog, object ) {
+
+		var shaderID = shaderIDs[ material.type ];
+		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
 
-	    var maxLightCount = allocateLights( lights );
+		var maxLightCount = allocateLights( lights );
 		var maxShadows = allocateShadows( lights );
 		var maxBones = allocateBones( object );
 		var precision = renderer1.getPrecision();
@@ -126,8 +126,8 @@ THREE.WebGLProgramCache = function (renderer1,gl, extensions) {
 		}
 
 		var parameters = {
-		    
-		    shaderID: shaderID,
+
+			shaderID: shaderID,
 
 			precision: precision,
 			supportsVertexTextures: supportsVertexTextures,
@@ -181,13 +181,13 @@ THREE.WebGLProgramCache = function (renderer1,gl, extensions) {
 			flipSided: material.side === THREE.BackSide
 
 		};
-		
+
 		return parameters;
-	    
+
 	};
-  
-    this.getProgramCode = function(material, parameters){
-        
+
+	this.getProgramCode = function( material, parameters ) {
+
 		var chunks = [];
 
 		if ( parameters.shaderID ) {
@@ -212,23 +212,23 @@ THREE.WebGLProgramCache = function (renderer1,gl, extensions) {
 
 		}
 
-		for ( var i = 0; i < parameterNames.length; i++ ) {
-		    
-            var parameterName = parameterNames[i];
+		for ( var i = 0; i < parameterNames.length; i ++ ) {
+
+			var parameterName = parameterNames[ i ];
 			chunks.push( parameterName );
 			chunks.push( parameters[ parameterName ] );
 
 		}
 
 		return chunks.join();
-      
-    };
-    
-    this.getProgram = function(material,parameters,code){
-        
-        var program; 
-        
-        // Check if code has been already compiled
+
+	};
+
+	this.getProgram = function( material, parameters, code ) {
+
+		var program;
+
+		// Check if code has been already compiled
 		for ( var p = 0, pl = programs.length; p < pl; p ++ ) {
 
 			var programInfo = programs[ p ];
@@ -244,14 +244,14 @@ THREE.WebGLProgramCache = function (renderer1,gl, extensions) {
 		}
 
 		if ( program === undefined ) {
-		    
+
 			program = new THREE.WebGLProgram( renderer1, code, material, parameters );
 			programs.push( program );
-			
+
 		}
-		
+
 		return program ;
-        
-    }
-  
+
+	}
+
 };

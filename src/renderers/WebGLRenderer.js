@@ -1293,7 +1293,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			pushImmediateRenderItem( object );
 
-		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ){
+		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
 
 			if ( object instanceof THREE.SkinnedMesh ) {
 
@@ -1404,14 +1404,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	}
-	
+
 	function initMaterial( material, lights, fog, object ) {
 
 		var materialProperties = properties.get( material );
-		
-		var parameters = programCache.getParameters( material, lights, fog, object);
+
+		var parameters = programCache.getParameters( material, lights, fog, object );
 		var code = programCache.getProgramCode( material, parameters );
-		
+
 		var programChange = true;
 
 		if ( ! materialProperties.program ) {
@@ -1457,11 +1457,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			};
 
 		}
-		
+
 		material.__webglShader = materialProperties.__webglShader;
-		
-		var program = programCache.getProgram(material,parameters,code);
-		
+
+		var program = programCache.getProgram( material, parameters, code );
+
 		if ( programChange ) {
 
 			program.usedTimes ++;
