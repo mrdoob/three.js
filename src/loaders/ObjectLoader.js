@@ -649,7 +649,17 @@ THREE.ObjectLoader.prototype = {
 			} else {
 
 				if ( data.position !== undefined ) object.position.fromArray( data.position );
-				if ( data.rotation !== undefined ) object.rotation.fromArray( data.rotation );
+
+				if ( data.rotation !== undefined ) {
+
+					object.rotation.fromArray( data.rotation );
+
+				} else if ( data.quaternion !== undefined ) {
+
+					object.quaternion.fromArray( data.quaternion );
+
+				}
+
 				if ( data.scale !== undefined ) object.scale.fromArray( data.scale );
 
 			}
