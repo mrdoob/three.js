@@ -395,18 +395,28 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 
 	this.type = 'TeapotGeometry';
 
-	this.size = size || 50;
+	this.parameters = {
+		size: size,
+		segments: segments,
+		bottom: bottom,
+		lid: lid,
+		body: body,
+		fitLid: fitLid,
+		blinn: blinn
+	};
+
+	size = size || 50;
 
 	// number of segments per patch
-	this.segments = Math.max( 2, Math.floor( segments ) || 10 );
+	segments = segments !== undefined ? Math.max( 2, Math.floor( segments ) || 10 ) : 10;
 
 	// which parts should be visible
-	this.bottom = bottom === undefined ? true : bottom;
-	this.lid = lid === undefined ? true : lid;
-	this.body = body === undefined ? true : body;
+	bottom = bottom === undefined ? true : bottom;
+	lid = lid === undefined ? true : lid;
+	body = body === undefined ? true : body;
 
 	// Should the lid be snug? It's not traditional, so off by default
-	this.fitLid = fitLid === undefined ? false : fitLid;
+	fitLid = fitLid === undefined ? false : fitLid;
 
 	// Jim Blinn scaled the teapot down in size by about 1.3 for
 	// some rendering tests. He liked the new proportions that he kept
@@ -416,13 +426,13 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 	// real teapot is more like 1.25, but since 1.3 is the traditional
 	// value given, we use it here.
 	var blinnScale = 1.3;
-	this.blinn = blinn === undefined ? true : blinn;
+	blinn = blinn === undefined ? true : blinn;
 
 	// scale the size to be the real scaling factor
-	var maxHeight = 3.15 * ( this.blinn ? 1 : blinnScale );
+	var maxHeight = 3.15 * ( blinn ? 1 : blinnScale );
 
 	var maxHeight2 = maxHeight / 2;
-	var trueSize = this.size / maxHeight2;
+	var trueSize = size / maxHeight2;
 
 	var normals = [], uvs = [];
 	// Bezier form
@@ -483,10 +493,10 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 
 	}
 
-	var minPatches = this.body ? 0 : 20;
-	var maxPatches = this.bottom ? 32 : 28;
+	var minPatches = body ? 0 : 20;
+	var maxPatches = bottom ? 32 : 28;
 
-	vertPerRow = this.segments + 1;
+	vertPerRow = segments + 1;
 
 	eps = 0.0000001;
 
@@ -496,7 +506,7 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 
 		// lid is in the middle of the data, patches 20-27,
 		// so ignore it for this part of the loop if the lid is not desired
-		if ( this.lid || ( surf < 20 || surf >= 28 ) ) {
+		if ( lid || ( surf < 20 || surf >= 28 ) ) {
 
 			// get M * G * M matrix for x,y,z
 			for ( i = 0 ; i < 3 ; i ++ ) {
@@ -511,7 +521,7 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 
 						// is the lid to be made larger, and is this a point on the lid
 						// that is X or Y?
-						if ( this.fitLid && ( surf >= 20 && surf < 28 ) && ( i !== 2 ) ) {
+						if ( fitLid && ( surf >= 20 && surf < 28 ) && ( i !== 2 ) ) {
 
 							// increase XY size by 7.7%, found empirically. I don't
 							// increase Z so that the teapot will continue to fit in the
@@ -522,7 +532,7 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 
 						// Blinn "fixed" the teapot by dividing Z by blinnScale, and that's the
 						// data we now use. The original teapot is taller. Fix it:
-						if ( ! this.blinn && ( i === 2 ) ) {
+						if ( ! blinn && ( i === 2 ) ) {
 
 							g[ c * 4 + r ] *= blinnScale;
 
@@ -542,13 +552,13 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 			}
 
 			// step along, get points, and output
-			for ( sstep = 0 ; sstep <= this.segments ; sstep ++ ) {
+			for ( sstep = 0 ; sstep <= segments ; sstep ++ ) {
 
-				s = sstep / this.segments;
+				s = sstep / segments;
 
-				for ( tstep = 0 ; tstep <= this.segments ; tstep ++ ) {
+				for ( tstep = 0 ; tstep <= segments ; tstep ++ ) {
 
-					t = tstep / this.segments;
+					t = tstep / segments;
 
 					// point from basis
 					// get power vectors and their derivatives
@@ -631,9 +641,9 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 			}
 
 			// save the faces
-			for ( sstep = 0 ; sstep < this.segments ; sstep ++ ) {
+			for ( sstep = 0 ; sstep < segments ; sstep ++ ) {
 
-				for ( tstep = 0 ; tstep < this.segments ; tstep ++ ) {
+				for ( tstep = 0 ; tstep < segments ; tstep ++ ) {
 
 					v1 = surfCount * vertPerRow * vertPerRow + sstep * vertPerRow + tstep;
 					v2 = v1 + 1;
@@ -673,3 +683,19 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 
 THREE.TeapotGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TeapotGeometry.prototype.constructor = THREE.TeapotGeometry;
+
+THREE.TeapotGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.TeapotGeometry(
+		this.parameters.size,
+		this.parameters.segments,
+		this.parameters.bottom,
+		this.parameters.lid,
+		this.parameters.body,
+		this.parameters.fitLid,
+		this.parameters.blinn
+	);
+
+	return geometry;
+
+};
