@@ -27,7 +27,7 @@ THREE.Car = function () {
 	// car "feel" parameters
 
 	this.MAX_SPEED = 2200;
-	this.MAX_REVERSE_SPEED = -1500;
+	this.MAX_REVERSE_SPEED = - 1500;
 
 	this.MAX_WHEEL_ROTATION = 0.6;
 
@@ -107,8 +107,16 @@ THREE.Car = function () {
 
 		var loader = new THREE.JSONLoader();
 
-		loader.load( bodyURL, function( geometry, materials ) { createBody( geometry, materials ) } );
-		loader.load( wheelURL, function( geometry, materials ) { createWheels( geometry, materials ) } );
+		loader.load( bodyURL, function( geometry, materials ) {
+
+			createBody( geometry, materials )
+
+		} );
+		loader.load( wheelURL, function( geometry, materials ) {
+
+			createWheels( geometry, materials )
+
+		} );
 
 	};
 
@@ -116,8 +124,16 @@ THREE.Car = function () {
 
 		var loader = new THREE.BinaryLoader();
 
-		loader.load( bodyURL, function( geometry, materials ) { createBody( geometry, materials ) } );
-		loader.load( wheelURL, function( geometry, materials ) { createWheels( geometry, materials ) } );
+		loader.load( bodyURL, function( geometry, materials ) {
+
+			createBody( geometry, materials )
+
+		} );
+		loader.load( wheelURL, function( geometry, materials ) {
+
+			createWheels( geometry, materials )
+
+		} );
 
 	};
 
@@ -128,7 +144,7 @@ THREE.Car = function () {
 		if ( controls.moveForward ) {
 
 			this.speed = THREE.Math.clamp( this.speed + delta * this.FRONT_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
-			this.acceleration = THREE.Math.clamp( this.acceleration + delta, -1, 1 );
+			this.acceleration = THREE.Math.clamp( this.acceleration + delta, - 1, 1 );
 
 		}
 
@@ -136,7 +152,7 @@ THREE.Car = function () {
 
 
 			this.speed = THREE.Math.clamp( this.speed - delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
-			this.acceleration = THREE.Math.clamp( this.acceleration - delta, -1, 1 );
+			this.acceleration = THREE.Math.clamp( this.acceleration - delta, - 1, 1 );
 
 		}
 
@@ -168,7 +184,7 @@ THREE.Car = function () {
 				var k = exponentialEaseOut( this.speed / this.MAX_REVERSE_SPEED );
 
 				this.speed = THREE.Math.clamp( this.speed + k * delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, 0 );
-				this.acceleration = THREE.Math.clamp( this.acceleration + k * delta, -1, 0 );
+				this.acceleration = THREE.Math.clamp( this.acceleration + k * delta, - 1, 0 );
 
 			}
 
@@ -307,7 +323,7 @@ THREE.Car = function () {
 
 			// front right wheel
 
-			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( -s, s, s ) );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( - s, s, s ) );
 
 			scope.frontRightWheelRoot.position.add( delta );
 
@@ -321,7 +337,7 @@ THREE.Car = function () {
 
 			// back left wheel
 
-			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( s, s, -s ) );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( s, s, - s ) );
 			delta.z -= scope.backWheelOffset;
 
 			scope.backLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
@@ -333,7 +349,7 @@ THREE.Car = function () {
 
 			// back right wheel
 
-			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( -s, s, -s ) );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( - s, s, - s ) );
 			delta.z -= scope.backWheelOffset;
 
 			scope.backRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
@@ -362,10 +378,30 @@ THREE.Car = function () {
 
 	}
 
-	function quadraticEaseOut( k ) { return - k * ( k - 2 ); }
-	function cubicEaseOut( k ) { return -- k * k * k + 1; }
-	function circularEaseOut( k ) { return Math.sqrt( 1 - -- k * k ); }
-	function sinusoidalEaseOut( k ) { return Math.sin( k * Math.PI / 2 ); }
-	function exponentialEaseOut( k ) { return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1; }
+	function quadraticEaseOut( k ) {
+
+		return - k * ( k - 2 );
+
+	}
+	function cubicEaseOut( k ) {
+
+		return -- k * k * k + 1;
+
+	}
+	function circularEaseOut( k ) {
+
+		return Math.sqrt( 1 - -- k * k );
+
+	}
+	function sinusoidalEaseOut( k ) {
+
+		return Math.sin( k * Math.PI / 2 );
+
+	}
+	function exponentialEaseOut( k ) {
+
+		return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1;
+
+	}
 
 };

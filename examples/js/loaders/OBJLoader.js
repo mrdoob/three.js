@@ -352,11 +352,15 @@ THREE.OBJLoader.prototype = {
 			buffergeometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( geometry.vertices ), 3 ) );
 
 			if ( geometry.normals.length > 0 ) {
+
 				buffergeometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( geometry.normals ), 3 ) );
+
 			}
 
 			if ( geometry.uvs.length > 0 ) {
+
 				buffergeometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geometry.uvs ), 2 ) );
+
 			}
 
 			material = new THREE.MeshLambertMaterial();

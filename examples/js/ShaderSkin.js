@@ -30,27 +30,27 @@ THREE.ShaderSkin = {
 
 			{
 
-			"enableBump"	: { type: "i", value: 0 },
-			"enableSpecular": { type: "i", value: 0 },
+				"enableBump"	: { type: "i", value: 0 },
+				"enableSpecular": { type: "i", value: 0 },
 
-			"tDiffuse"	: { type: "t", value: null },
-			"tBeckmann"	: { type: "t", value: null },
+				"tDiffuse"	: { type: "t", value: null },
+				"tBeckmann"	: { type: "t", value: null },
 
-			"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
-			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"opacity": 	  { type: "f", value: 1 },
+				"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
+				"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
+				"opacity": 	  { type: "f", value: 1 },
 
-			"uRoughness": 	  		{ type: "f", value: 0.15 },
-			"uSpecularBrightness": 	{ type: "f", value: 0.75 },
+				"uRoughness": 	  		{ type: "f", value: 0.15 },
+				"uSpecularBrightness": 	{ type: "f", value: 0.75 },
 
-			"bumpMap"	: { type: "t", value: null },
-			"bumpScale" : { type: "f", value: 1 },
+				"bumpMap"	: { type: "t", value: null },
+				"bumpScale" : { type: "f", value: 1 },
 
-			"specularMap" : { type: "t", value: null },
+				"specularMap" : { type: "t", value: null },
 
-			"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+				"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
-			"uWrapRGB":	{ type: "v3", value: new THREE.Vector3( 0.75, 0.375, 0.1875 ) }
+				"uWrapRGB":	{ type: "v3", value: new THREE.Vector3( 0.75, 0.375, 0.1875 ) }
 
 			}
 
@@ -197,9 +197,7 @@ THREE.ShaderSkin = {
 
 					"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
-						"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] + vViewPosition.xyz;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
@@ -279,7 +277,7 @@ THREE.ShaderSkin = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader: [
 
@@ -338,26 +336,26 @@ THREE.ShaderSkin = {
 
 			{
 
-			"passID": { type: "i", value: 0 },
+				"passID": { type: "i", value: 0 },
 
-			"tDiffuse"	: { type: "t", value: null },
-			"tNormal"	: { type: "t", value: null },
+				"tDiffuse"	: { type: "t", value: null },
+				"tNormal"	: { type: "t", value: null },
 
-			"tBlur1"	: { type: "t", value: null },
-			"tBlur2"	: { type: "t", value: null },
-			"tBlur3"	: { type: "t", value: null },
-			"tBlur4"	: { type: "t", value: null },
+				"tBlur1"	: { type: "t", value: null },
+				"tBlur2"	: { type: "t", value: null },
+				"tBlur3"	: { type: "t", value: null },
+				"tBlur4"	: { type: "t", value: null },
 
-			"tBeckmann"	: { type: "t", value: null },
+				"tBeckmann"	: { type: "t", value: null },
 
-			"uNormalScale": { type: "f", value: 1.0 },
+				"uNormalScale": { type: "f", value: 1.0 },
 
-			"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
-			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"opacity": 	  { type: "f", value: 1 },
+				"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
+				"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
+				"opacity": 	  { type: "f", value: 1 },
 
-			"uRoughness": 	  		{ type: "f", value: 0.15 },
-			"uSpecularBrightness": 	{ type: "f", value: 0.75 }
+				"uRoughness": 	  		{ type: "f", value: 0.15 },
+				"uSpecularBrightness": 	{ type: "f", value: 0.75 }
 
 			}
 
@@ -570,7 +568,7 @@ THREE.ShaderSkin = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader: [
 
@@ -628,9 +626,7 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
-						"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] - mvPosition.xyz;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
@@ -659,7 +655,7 @@ THREE.ShaderSkin = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShaderUV: [
 
@@ -717,9 +713,7 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
-						"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] - mvPosition.xyz;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
@@ -735,7 +729,7 @@ THREE.ShaderSkin = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -762,7 +756,7 @@ THREE.ShaderSkin = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -794,7 +788,7 @@ THREE.ShaderSkin = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	}
 

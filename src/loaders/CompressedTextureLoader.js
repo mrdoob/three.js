@@ -52,7 +52,7 @@ THREE.CompressedTextureLoader.prototype = {
 
 					if ( loaded === 6 ) {
 
-						if (texDatas.mipmapCount === 1)
+						if ( texDatas.mipmapCount === 1 )
  							texture.minFilter = THREE.LinearFilter;
 
 						texture.format = texDatas.format;

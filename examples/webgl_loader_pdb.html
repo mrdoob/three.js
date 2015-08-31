@@ -197,7 +197,7 @@
 					var sphereGeometry = new THREE.IcosahedronGeometry( 1, 2 );
 
 					var offset = geometry.center();
-					geometryBonds.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
+					geometryBonds.translate( offset.x, offset.y, offset.z );
 
 					for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 

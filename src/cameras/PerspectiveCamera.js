@@ -122,21 +122,19 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
 };
 
-THREE.PerspectiveCamera.prototype.clone = function () {
-
-	var camera = new THREE.PerspectiveCamera();
-
-	THREE.Camera.prototype.clone.call( this, camera );
-
-	camera.zoom = this.zoom;
-
-	camera.fov = this.fov;
-	camera.aspect = this.aspect;
-	camera.near = this.near;
-	camera.far = this.far;
-
-	return camera;
-
+THREE.PerspectiveCamera.prototype.copy = function ( source ) {
+	
+	THREE.Camera.prototype.copy.call( this, source );
+	
+	this.fov = source.fov;
+	this.aspect = source.aspect;
+	this.near = source.near;
+	this.far = source.far;
+	
+	this.zoom = source.zoom;
+	
+	return this;
+		
 };
 
 THREE.PerspectiveCamera.prototype.toJSON = function ( meta ) {

@@ -21,7 +21,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 	var inverseMatrix = new THREE.Matrix4();
 	var ray = new THREE.Ray();
 
-	return function ( raycaster, intersects ) {
+	return function raycast( raycaster, intersects ) {
 
 		var object = this;
 		var geometry = object.geometry;
@@ -74,17 +74,21 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
+			var index = geometry.index;
 			var attributes = geometry.attributes;
 			var positions = attributes.position.array;
 
-			if ( attributes.index !== undefined ) {
+			if ( index !== null ) {
 
-				var indices = attributes.index.array;
-				var offsets = geometry.drawcalls;
+				var indices = index.array;
+				var offsets = geometry.groups;
 
 				if ( offsets.length === 0 ) {
 
-					offsets = [ { start: 0, count: indices.length, index: 0 } ];
+					offsets = [ {
+						start: 0,
+						count: indices.length
+					} ];
 
 				}
 
@@ -94,11 +98,10 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 					var start = offset.start;
 					var count = offset.count;
-					var index = offset.index;
 
 					for ( var i = start, il = start + count; i < il; i ++ ) {
 
-						var a = index + indices[ i ];
+						var a = indices[ i ];
 
 						position.fromArray( positions, a * 3 );
 
@@ -136,13 +139,9 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 }() );
 
-THREE.PointCloud.prototype.clone = function ( object ) {
+THREE.PointCloud.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.PointCloud( this.geometry, this.material );
-
-	THREE.Object3D.prototype.clone.call( this, object );
-
-	return object;
+	return new this.constructor( this.geometry, this.material ).copy( this );
 
 };
 
@@ -152,12 +151,16 @@ THREE.PointCloud.prototype.toJSON = function ( meta ) {
 
 	// only serialize if not in meta geometries cache
 	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
+
 		meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON();
+
 	}
 
 	// only serialize if not in meta materials cache
 	if ( meta.materials[ this.material.uuid ] === undefined ) {
+
 		meta.materials[ this.material.uuid ] = this.material.toJSON();
+
 	}
 
 	data.object.geometry = this.geometry.uuid;

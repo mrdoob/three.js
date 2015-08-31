@@ -60,7 +60,7 @@ THREE.Loader.prototype = {
 
 		var imageLoader;
 
-		return function ( m, texturePath, crossOrigin ) {
+		return function createMaterial( m, texturePath, crossOrigin ) {
 
 			var scope = this;
 
@@ -95,8 +95,8 @@ THREE.Loader.prototype = {
 					loader.setCrossOrigin( crossOrigin );
 					loader.load( fullPath, function ( image ) {
 
-					if ( THREE.Math.isPowerOfTwo( image.width ) === false ||
-						 THREE.Math.isPowerOfTwo( image.height ) === false ) {
+						if ( THREE.Math.isPowerOfTwo( image.width ) === false ||
+							THREE.Math.isPowerOfTwo( image.height ) === false ) {
 
 							var width = nearest_pow2( image.width );
 							var height = nearest_pow2( image.height );

@@ -27,22 +27,20 @@ THREE.AreaLight = function ( color, intensity ) {
 THREE.AreaLight.prototype = Object.create( THREE.Light.prototype );
 THREE.AreaLight.prototype.constructor = THREE.AreaLight;
 
-THREE.AreaLight.prototype.clone = function () {
+THREE.AreaLight.prototype.copy = function ( source ) {
 
-	var light = new THREE.AreaLight();
+	THREE.Light.prototype.copy.call( this, source );
 
-	THREE.Light.prototype.clone.call( this, light );
+	this.intensity = source.intensity;
+	this.normal.copy( source.normal );
+	this.right.copy( source.right );
+	this.width = source.width;
+	this.height = source.height;
+	this.constantAttenuation = source.constantAttenuation;
+	this.linearAttenuation = source.linearAttenuation;
+	this.quadraticAttenuation = source.quadraticAttenuation;
 
-	light.normal.copy(this.normal);
-	light.right.copy(this.right);
-	light.intensity = this.intensity;
-	light.width = this.width;
-	light.height = this.height;
-	light.constantAttenuation = this.constantAttenuation;
-	light.linearAttenuation = this.linearAttenuation;
-	light.quadraticAttenuation = this.quadraticAttenuation
-
-	return light;
+	return this;
 
 };
 
@@ -54,4 +52,5 @@ THREE.AreaLight.prototype.toJSON = function ( meta ) {
 	data.object.intensity = this.intensity;
 
 	return data;
+
 };

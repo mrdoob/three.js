@@ -17,34 +17,34 @@ THREE.NormalDisplacementShader = {
 
 		{
 
-		"enableAO"          : { type: "i", value: 0 },
-		"enableDiffuse"     : { type: "i", value: 0 },
-		"enableSpecular"    : { type: "i", value: 0 },
-		"enableReflection"  : { type: "i", value: 0 },
-		"enableDisplacement": { type: "i", value: 0 },
+			"enableAO"          : { type: "i", value: 0 },
+			"enableDiffuse"     : { type: "i", value: 0 },
+			"enableSpecular"    : { type: "i", value: 0 },
+			"enableReflection"  : { type: "i", value: 0 },
+			"enableDisplacement": { type: "i", value: 0 },
 
-		"tDisplacement": { type: "t", value: null }, // must go first as this is vertex texture
-		"tDiffuse"     : { type: "t", value: null },
-		"tCube"        : { type: "t", value: null },
-		"tNormal"      : { type: "t", value: null },
-		"tSpecular"    : { type: "t", value: null },
-		"tAO"          : { type: "t", value: null },
+			"tDisplacement": { type: "t", value: null }, // must go first as this is vertex texture
+			"tDiffuse"     : { type: "t", value: null },
+			"tCube"        : { type: "t", value: null },
+			"tNormal"      : { type: "t", value: null },
+			"tSpecular"    : { type: "t", value: null },
+			"tAO"          : { type: "t", value: null },
 
-		"uNormalScale": { type: "v2", value: new THREE.Vector2( 1, 1 ) },
+			"uNormalScale": { type: "v2", value: new THREE.Vector2( 1, 1 ) },
 
-		"uDisplacementBias": { type: "f", value: 0.0 },
-		"uDisplacementScale": { type: "f", value: 1.0 },
+			"uDisplacementBias": { type: "f", value: 0.0 },
+			"uDisplacementScale": { type: "f", value: 1.0 },
 
-		"diffuse": { type: "c", value: new THREE.Color( 0xffffff ) },
-		"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-		"shininess": { type: "f", value: 30 },
-		"opacity": { type: "f", value: 1 },
+			"diffuse": { type: "c", value: new THREE.Color( 0xffffff ) },
+			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
+			"shininess": { type: "f", value: 30 },
+			"opacity": { type: "f", value: 1 },
 
-		"refractionRatio": { type: "f", value: 0.98 },
-		"reflectivity": { type: "f", value: 0.5 },
+			"refractionRatio": { type: "f", value: 0.98 },
+			"reflectivity": { type: "f", value: 0.5 },
 
-		"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
-		"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
+			"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
+			"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
 
 		}
 
@@ -186,8 +186,7 @@ THREE.NormalDisplacementShader = {
 
 		"		for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-		"			vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-		"			vec3 pointVector = lPosition.xyz + vViewPosition.xyz;",
+		"			vec3 pointVector = pointLightPosition[ i ] + vViewPosition.xyz;",
 
 		"			float pointDistance = 1.0;",
 		"			if ( pointLightDistance[ i ] > 0.0 )",
@@ -222,8 +221,7 @@ THREE.NormalDisplacementShader = {
 
 		"		for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
 
-		"			vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
-		"			vec3 spotVector = lPosition.xyz + vViewPosition.xyz;",
+		"			vec3 spotVector = spotLightPosition[ i ] + vViewPosition.xyz;",
 
 		"			float spotDistance = 1.0;",
 		"			if ( spotLightDistance[ i ] > 0.0 )",
@@ -231,7 +229,7 @@ THREE.NormalDisplacementShader = {
 
 		"			spotVector = normalize( spotVector );",
 
-		"			float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
+		"			float spotEffect = dot( spotLightDirection[ i ], spotVector );",
 
 		"			if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
@@ -267,8 +265,7 @@ THREE.NormalDisplacementShader = {
 
 		"		for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
 
-		"			vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-		"			vec3 dirVector = normalize( lDirection.xyz );",
+		"			vec3 dirVector = directionalLightDirection[ i ];",
 
 					// diffuse
 
@@ -297,8 +294,7 @@ THREE.NormalDisplacementShader = {
 
 		"		for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-		"			vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
-		"			vec3 lVector = normalize( lDirection.xyz );",
+		"			vec3 lVector = hemisphereLightDirection[ i ];",
 
 					// diffuse
 
@@ -372,7 +368,7 @@ THREE.NormalDisplacementShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	vertexShader: [
 
@@ -514,6 +510,6 @@ THREE.NormalDisplacementShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

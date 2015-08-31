@@ -2280,8 +2280,6 @@ SEA3D.Morph = function(name, data, sea) {
 	var useVertex = (this.attrib & 2) != 0;
 	var useNormal = (this.attrib & 4) != 0;
 	
-	var len = this.numVertex * 3;
-	
 	var nodeCount = data.readUShort();
 	
 	this.node = [];
@@ -2295,7 +2293,7 @@ SEA3D.Morph = function(name, data, sea) {
 			var verts = [];
 			
 			j = 0;
-			while(j < len)
+			while(j < this.length)
 				verts[j++] = data.readFloat();
 		}
 		
@@ -2303,7 +2301,7 @@ SEA3D.Morph = function(name, data, sea) {
 			var norms = [];
 			
 			j = 0;
-			while(j < len)
+			while(j < this.length)
 				norms[j++] = data.readFloat();
 		}
 		
@@ -2312,6 +2310,56 @@ SEA3D.Morph = function(name, data, sea) {
 }
 
 SEA3D.Morph.prototype.type = "mph";
+
+//
+//	Vertex Animation
+//
+
+SEA3D.VertexAnimation = function(name, data, sea) {
+	this.name = name;
+	this.data = data;
+	this.sea = sea;
+	
+	SEA3D.AnimationBase.read(this);
+	
+	var flags = data.readUByte();
+	
+	this.isBigMesh = (flags & 1) != 0;	
+	
+	data.readVInt = this.isBigMesh ? data.readUInt : data.readUShort;
+
+	this.numVertex = data.readVInt();
+	this.length = this.numVertex * 3;
+	
+	var useVertex = (flags & 2) != 0;
+	var useNormal = (flags & 4) != 0;
+	
+	this.frame = [];
+
+	var i, j;
+	
+	for(i = 0; i < this.numFrames; i++) {
+		if (useVertex) {				
+			var verts = [];
+			
+			j = 0;
+			while(j < this.length)
+				verts[j++] = data.readFloat();
+		}
+		
+		if (useNormal) {
+			var norms = [];
+			
+			j = 0;
+			while(j < this.length)
+				norms[j++] = data.readFloat();
+		}
+		
+		this.frame[i] = {vertex:verts, normal:norms}
+	}	
+}
+
+SEA3D.VertexAnimation.prototype.type = "vtxa";
 
 //
 //	Camera
@@ -2942,6 +2990,7 @@ SEA3D.File = function(data) {
 	this.addClass(SEA3D.JointObject);
 	this.addClass(SEA3D.Camera);
 	this.addClass(SEA3D.Morph);
+	this.addClass(SEA3D.VertexAnimation);
 	this.addClass(SEA3D.CubeMap);
 	this.addClass(SEA3D.Animation);	
 	this.addClass(SEA3D.Dummy);

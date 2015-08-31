@@ -26,7 +26,7 @@ THREE.ToneMapShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -70,6 +70,6 @@ THREE.ToneMapShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

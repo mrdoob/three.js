@@ -14,38 +14,47 @@ THREE.InstancedBufferGeometry = function () {
 THREE.InstancedBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.InstancedBufferGeometry.prototype.constructor = THREE.InstancedBufferGeometry;
 
-THREE.InstancedBufferGeometry.prototype.addDrawCall = function ( start, count, indexOffset, instances ) {
+THREE.InstancedBufferGeometry.prototype.addGroup = function ( start, count, instances ) {
 
-	this.drawcalls.push( {
+	this.groups.push( {
 
 		start: start,
 		count: count,
-		index: indexOffset !== undefined ? indexOffset : 0,
 		instances: instances
 
 	} );
 
-},
+};
 
-THREE.InstancedBufferGeometry.prototype.clone = function () {
+THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
 
-	var geometry = new THREE.InstancedBufferGeometry();
+	var index = source.index;
 
-	for ( var attr in this.attributes ) {
+	if ( index !== null ) {
 
-		var sourceAttr = this.attributes[attr];
-		geometry.addAttribute( attr, sourceAttr.clone() );
-
-	}
-
-	for ( var i = 0, il = this.drawcalls.length; i < il; i++ ) {
-
-		var offset = this.drawcalls[i];
-		geometry.addDrawCall( offset.start, offset.count, offset.index, offset.instances );
+		this.addIndex( index.clone() );
 
 	}
 
-	return geometry;
+	var attributes = source.attributes;
+
+	for ( var name in attributes ) {
+
+		var attribute = attributes[ name ];
+		this.addAttribute( name, attribute.clone() );
+
+	}
+
+	var groups = source.groups;
+
+	for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+		var group = groups[ i ];
+		this.addGroup( group.start, group.count, group.instances );
+
+	}
+
+	return this;
 
 };
 

@@ -25,7 +25,7 @@ THREE.UnpackDepthRGBAShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -52,6 +52,6 @@ THREE.UnpackDepthRGBAShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

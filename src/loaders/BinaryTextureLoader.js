@@ -21,7 +21,7 @@ THREE.BinaryTextureLoader.prototype = {
 
 		var scope = this;
 
-		var texture = new THREE.DataTexture( );
+		var texture = new THREE.DataTexture();
 
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
@@ -31,7 +31,7 @@ THREE.BinaryTextureLoader.prototype = {
 
 			var texData = scope._parser( buffer );
 
-			if ( !texData ) return;
+			if ( ! texData ) return;
 
 			if ( undefined !== texData.image ) {
 

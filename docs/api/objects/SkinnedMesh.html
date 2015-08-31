@@ -43,9 +43,6 @@
 		// Bind the skeleton to the mesh
 		mesh.bind( armSkeleton );
 		
-		// Update the inverse matrices in the skeleton to reflect the newly bound skeleton
-		armSkeleton.calculateInverses();
-		
 		// Move the bones and manipulate the model
 		armSkeleton.bones[ 0 ].rotation.x = -0.1;
 		armSkeleton.bones[ 1 ].rotation.x = 0.2;

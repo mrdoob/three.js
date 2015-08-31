@@ -66,12 +66,14 @@ THREE.PLYLoader.prototype = {
 
 	},
 
-	bin2str: function (buf) {
+	bin2str: function ( buf ) {
 
-		var array_buffer = new Uint8Array(buf);
+		var array_buffer = new Uint8Array( buf );
 		var str = '';
-		for (var i = 0; i < buf.byteLength; i ++) {
-			str += String.fromCharCode(array_buffer[i]); // implicitly assumes little-endian
+		for ( var i = 0; i < buf.byteLength; i ++ ) {
+
+			str += String.fromCharCode( array_buffer[ i ] ); // implicitly assumes little-endian
+
 		}
 
 		return str;
@@ -109,8 +111,10 @@ THREE.PLYLoader.prototype = {
 		var headerLength = 0;
 		var result = patternHeader.exec( data );
 		if ( result !== null ) {
+
 			headerText = result [ 1 ];
 			headerLength = result[ 0 ].length;
+
 		}
 
 		var header = {
@@ -155,37 +159,41 @@ THREE.PLYLoader.prototype = {
 
 			var line = lines[ i ];
 			line = line.trim();
-			if ( line === "" ) { continue; }
+			if ( line === "" ) {
+
+				continue;
+
+			}
 			lineValues = line.split( /\s+/ );
 			lineType = lineValues.shift();
-			line = lineValues.join(" ");
+			line = lineValues.join( " " );
 
 			switch ( lineType ) {
 
 			case "format":
 
-				header.format = lineValues[0];
-				header.version = lineValues[1];
+				header.format = lineValues[ 0 ];
+				header.version = lineValues[ 1 ];
 
 				break;
 
 			case "comment":
 
-				header.comments.push(line);
+				header.comments.push( line );
 
 				break;
 
 			case "element":
 
-				if ( !(currentElement === undefined) ) {
+				if ( ! ( currentElement === undefined ) ) {
 
-					header.elements.push(currentElement);
+					header.elements.push( currentElement );
 
 				}
 
 				currentElement = Object();
-				currentElement.name = lineValues[0];
-				currentElement.count = parseInt( lineValues[1] );
+				currentElement.name = lineValues[ 0 ];
+				currentElement.count = parseInt( lineValues[ 1 ] );
 				currentElement.properties = [];
 
 				break;
@@ -199,15 +207,15 @@ THREE.PLYLoader.prototype = {
 
 			default:
 
-				console.log("unhandled", lineType, lineValues);
+				console.log( "unhandled", lineType, lineValues );
 
 			}
 
 		}
 
-		if ( !(currentElement === undefined) ) {
+		if ( ! ( currentElement === undefined ) ) {
 
-			header.elements.push(currentElement);
+			header.elements.push( currentElement );
 
 		}
 
@@ -240,22 +248,22 @@ THREE.PLYLoader.prototype = {
 
 		for ( var i = 0; i < properties.length; i ++ ) {
 
-			if ( properties[i].type === "list" ) {
+			if ( properties[ i ].type === "list" ) {
 
 				var list = [];
-				var n = this.parseASCIINumber( values.shift(), properties[i].countType );
+				var n = this.parseASCIINumber( values.shift(), properties[ i ].countType );
 
 				for ( var j = 0; j < n; j ++ ) {
 
-					list.push( this.parseASCIINumber( values.shift(), properties[i].itemType ) );
+					list.push( this.parseASCIINumber( values.shift(), properties[ i ].itemType ) );
 
 				}
 
-				element[ properties[i].name ] = list;
+				element[ properties[ i ].name ] = list;
 
 			} else {
 
-				element[ properties[i].name ] = this.parseASCIINumber( values.shift(), properties[i].type );
+				element[ properties[ i ].name ] = this.parseASCIINumber( values.shift(), properties[ i ].type );
 
 			}
 
@@ -278,7 +286,9 @@ THREE.PLYLoader.prototype = {
 		var patternBody = /end_header\s([\s\S]*)$/;
 		var body = "";
 		if ( ( result = patternBody.exec( data ) ) !== null ) {
+
 			body = result [ 1 ];
+
 		}
 
 		var lines = body.split( '\n' );
@@ -290,18 +300,22 @@ THREE.PLYLoader.prototype = {
 
 			var line = lines[ i ];
 			line = line.trim();
-			if ( line === "" ) { continue; }
+			if ( line === "" ) {
 
-			if ( currentElementCount >= header.elements[currentElement].count ) {
+				continue;
+
+			}
+
+			if ( currentElementCount >= header.elements[ currentElement ].count ) {
 
 				currentElement ++;
 				currentElementCount = 0;
 
 			}
 
-			var element = this.parseASCIIElement( header.elements[currentElement].properties, line );
+			var element = this.parseASCIIElement( header.elements[ currentElement ].properties, line );
 
-			this.handleElement( geometry, header.elements[currentElement].name, element );
+			this.handleElement( geometry, header.elements[ currentElement ].name, element );
 
 			currentElementCount ++;
 
@@ -317,10 +331,10 @@ THREE.PLYLoader.prototype = {
 
 			for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
-				geometry.faces[i].vertexColors = [
-					geometry.colors[geometry.faces[i].a],
-					geometry.colors[geometry.faces[i].b],
-					geometry.colors[geometry.faces[i].c]
+				geometry.faces[ i ].vertexColors = [
+					geometry.colors[ geometry.faces[ i ].a ],
+					geometry.colors[ geometry.faces[ i ].b ],
+					geometry.colors[ geometry.faces[ i ].c ]
 				];
 
 			}
@@ -408,29 +422,29 @@ THREE.PLYLoader.prototype = {
 
 		for ( var i = 0; i < properties.length; i ++ ) {
 
-			if ( properties[i].type === "list" ) {
+			if ( properties[ i ].type === "list" ) {
 
 				var list = [];
 
-				result = this.binaryRead( dataview, at + read, properties[i].countType, little_endian );
-				var n = result[0];
-				read += result[1];
+				result = this.binaryRead( dataview, at + read, properties[ i ].countType, little_endian );
+				var n = result[ 0 ];
+				read += result[ 1 ];
 
 				for ( var j = 0; j < n; j ++ ) {
 
-					result = this.binaryRead( dataview, at + read, properties[i].itemType, little_endian );
-					list.push( result[0] );
-					read += result[1];
+					result = this.binaryRead( dataview, at + read, properties[ i ].itemType, little_endian );
+					list.push( result[ 0 ] );
+					read += result[ 1 ];
 
 				}
 
-				element[ properties[i].name ] = list;
+				element[ properties[ i ].name ] = list;
 
 			} else {
 
-				result = this.binaryRead( dataview, at + read, properties[i].type, little_endian );
-				element[ properties[i].name ] = result[0];
-				read += result[1];
+				result = this.binaryRead( dataview, at + read, properties[ i ].type, little_endian );
+				element[ properties[ i ].name ] = result[ 0 ];
+				read += result[ 1 ];
 
 			}
 
@@ -445,19 +459,19 @@ THREE.PLYLoader.prototype = {
 		var geometry = new THREE.Geometry();
 
 		var header = this.parseHeader( this.bin2str( data ) );
-		var little_endian = (header.format === "binary_little_endian");
+		var little_endian = ( header.format === "binary_little_endian" );
 		var body = new DataView( data, header.headerLength );
 		var result, loc = 0;
 
 		for ( var currentElement = 0; currentElement < header.elements.length; currentElement ++ ) {
 
-			for ( var currentElementCount = 0; currentElementCount < header.elements[currentElement].count; currentElementCount ++ ) {
+			for ( var currentElementCount = 0; currentElementCount < header.elements[ currentElement ].count; currentElementCount ++ ) {
 
-				result = this.binaryReadElement( body, loc, header.elements[currentElement].properties, little_endian );
-				loc += result[1];
-				var element = result[0];
+				result = this.binaryReadElement( body, loc, header.elements[ currentElement ].properties, little_endian );
+				loc += result[ 1 ];
+				var element = result[ 0 ];
 
-				this.handleElement( geometry, header.elements[currentElement].name, element );
+				this.handleElement( geometry, header.elements[ currentElement ].name, element );
 
 			}
 

@@ -91,7 +91,7 @@ THREE.JSONLoader.prototype = {
 
 			offset, zLength,
 
-		colorIndex, normalIndex, uvIndex,
+		colorIndex, normalIndex, uvIndex, materialIndex,
 
 			type,
 			isQuad,
@@ -178,7 +178,9 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasMaterial ) {
 
-					offset ++;
+						materialIndex = faces[ offset ++ ];
+						faceA.materialIndex = materialIndex;
+						faceB.materialIndex = materialIndex;
 
 					}
 
@@ -193,7 +195,7 @@ THREE.JSONLoader.prototype = {
 							uvLayer = json.uvs[ i ];
 
 							geometry.faceVertexUvs[ i ][ fi ] = [];
-						geometry.faceVertexUvs[ i ][ fi + 1 ] = [];
+							geometry.faceVertexUvs[ i ][ fi + 1 ] = [];
 
 							for ( j = 0; j < 4; j ++ ) {
 
@@ -285,7 +287,8 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasMaterial ) {
 
-					offset ++;
+						materialIndex = faces[ offset ++ ];
+						face.materialIndex = materialIndex;
 
 					}
 
@@ -377,13 +380,14 @@ THREE.JSONLoader.prototype = {
 		};
 
 		function parseSkin() {
+
 			var influencesPerVertex = ( json.influencesPerVertex !== undefined ) ? json.influencesPerVertex : 2;
 
 			if ( json.skinWeights ) {
 
 				for ( var i = 0, l = json.skinWeights.length; i < l; i += influencesPerVertex ) {
 
-					var x =                               json.skinWeights[ i     ];
+					var x =                               json.skinWeights[ i ];
 					var y = ( influencesPerVertex > 1 ) ? json.skinWeights[ i + 1 ] : 0;
 					var z = ( influencesPerVertex > 2 ) ? json.skinWeights[ i + 2 ] : 0;
 					var w = ( influencesPerVertex > 3 ) ? json.skinWeights[ i + 3 ] : 0;
@@ -398,7 +402,7 @@ THREE.JSONLoader.prototype = {
 
 				for ( var i = 0, l = json.skinIndices.length; i < l; i += influencesPerVertex ) {
 
-					var a =                               json.skinIndices[ i     ];
+					var a =                               json.skinIndices[ i ];
 					var b = ( influencesPerVertex > 1 ) ? json.skinIndices[ i + 1 ] : 0;
 					var c = ( influencesPerVertex > 2 ) ? json.skinIndices[ i + 2 ] : 0;
 					var d = ( influencesPerVertex > 3 ) ? json.skinIndices[ i + 3 ] : 0;
@@ -413,8 +417,8 @@ THREE.JSONLoader.prototype = {
 
 			if ( geometry.bones && geometry.bones.length > 0 && ( geometry.skinWeights.length !== geometry.skinIndices.length || geometry.skinIndices.length !== geometry.vertices.length ) ) {
 
-					console.warn( 'When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
-						geometry.skinIndices.length + '), and skinWeights (' + geometry.skinWeights.length + ') should match.' );
+				console.warn( 'When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
+					geometry.skinIndices.length + '), and skinWeights (' + geometry.skinWeights.length + ') should match.' );
 
 			}
 
@@ -439,7 +443,7 @@ THREE.JSONLoader.prototype = {
 					geometry.morphTargets[ i ].vertices = [];
 
 					dstVertices = geometry.morphTargets[ i ].vertices;
-					srcVertices = json.morphTargets [ i ].vertices;
+					srcVertices = json.morphTargets[ i ].vertices;
 
 					for ( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
 
@@ -467,7 +471,7 @@ THREE.JSONLoader.prototype = {
 					geometry.morphColors[ i ].colors = [];
 
 					dstColors = geometry.morphColors[ i ].colors;
-					srcColors = json.morphColors [ i ].colors;
+					srcColors = json.morphColors[ i ].colors;
 
 					for ( c = 0, cl = srcColors.length; c < cl; c += 3 ) {
 

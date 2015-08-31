@@ -2,7 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLState = function ( gl, paramThreeToGL ) {
+THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var _this = this;
 
@@ -10,6 +10,8 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var enabledAttributes = new Uint8Array( 16 );
 
 	var capabilities = {};
+
+	var compressedTextureFormats = null;
 
 	var currentBlending = null;
 	var currentBlendEquation = null;
@@ -112,6 +114,61 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 			capabilities[ id ] = false;
 
 		}
+
+	};
+
+	this.getCompressedTextureFormats = function () {
+
+		if ( compressedTextureFormats === null ) {
+
+			compressedTextureFormats = [];
+
+			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) ||
+			     extensions.get( 'WEBGL_compressed_texture_s3tc' ) ) {
+
+				var formats = gl.getParameter( gl.COMPRESSED_TEXTURE_FORMATS );
+
+				for ( var i = 0; i < formats.length; i ++ ) {
+
+					compressedTextureFormats.push( formats[ i ] );
+
+				}
+
+			}
+
+		}
+
+		return compressedTextureFormats;
+
+	};
+
+	this.getMaxPrecision = function ( precision ) {
+
+		if ( precision === 'highp' ) {
+
+			if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.HIGH_FLOAT ).precision > 0 &&
+			     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.HIGH_FLOAT ).precision > 0 ) {
+
+				return 'highp';
+
+			}
+
+			precision = 'mediump';
+
+		}
+
+		if ( precision === 'mediump' ) {
+
+			if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.MEDIUM_FLOAT ).precision > 0 &&
+			     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT ).precision > 0 ) {
+
+				return 'mediump';
+
+			}
+
+		}
+
+		return 'lowp';
 
 	};
 
@@ -458,6 +515,8 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 		}
 
 		capabilities = {};
+
+		compressedTextureFormats = null;
 
 		currentBlending = null;
 

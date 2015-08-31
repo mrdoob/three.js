@@ -14,9 +14,6 @@ var Config = function () {
 		'project/renderer/antialias': true,
 		'project/vr': false,
 
-		'camera/position': [ 500, 250, 500 ],
-		'camera/target': [ 0, 0, 0 ],
-
 		'ui/sidebar/animation/collapsed': true,
 		'ui/sidebar/geometry/collapsed': true,
 		'ui/sidebar/material/collapsed': true,

@@ -325,7 +325,7 @@ THREE.Projector = function () {
 		_renderData.elements.length = 0;
 
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
@@ -347,7 +347,9 @@ THREE.Projector = function () {
 
 			} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Sprite ) {
 
-				if ( object.material.visible === false ) return;
+				var material = object.material;
+
+				if ( material.visible === false ) return;
 
 				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
@@ -392,7 +394,7 @@ THREE.Projector = function () {
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
 					var attributes = geometry.attributes;
-					var offsets = geometry.drawcalls;
+					var groups = geometry.groups;
 
 					if ( attributes.position === undefined ) continue;
 
@@ -428,20 +430,19 @@ THREE.Projector = function () {
 
 					}
 
-					if ( attributes.index !== undefined ) {
+					if ( geometry.index !== null ) {
 
-						var indices = attributes.index.array;
+						var indices = geometry.index.array;
 
-						if ( offsets.length > 0 ) {
+						if ( groups.length > 0 ) {
 
-							for ( var o = 0; o < offsets.length; o ++ ) {
+							for ( var o = 0; o < groups.length; o ++ ) {
 
-								var offset = offsets[ o ];
-								var index = offset.index;
+								var group = groups[ o ];
 
-								for ( var i = offset.start, l = offset.start + offset.count; i < l; i += 3 ) {
+								for ( var i = group.start, l = group.start + group.count; i < l; i += 3 ) {
 
-									renderList.pushTriangle( indices[ i ] + index, indices[ i + 1 ] + index, indices[ i + 2 ] + index );
+									renderList.pushTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
 
 								}
 
@@ -533,8 +534,10 @@ THREE.Projector = function () {
 						var visible = renderList.checkBackfaceCulling( v1, v2, v3 );
 
 						if ( side !== THREE.DoubleSide ) {
+
 							if ( side === THREE.FrontSide && visible === false ) continue;
 							if ( side === THREE.BackSide && visible === true ) continue;
+
 						}
 
 						_face = getNextFaceInPool();
@@ -825,7 +828,7 @@ THREE.Projector = function () {
 
 	function painterSort( a, b ) {
 
-		if ( a.renderOrder !== b.renderOrder) {
+		if ( a.renderOrder !== b.renderOrder ) {
 
 			return a.renderOrder - b.renderOrder;
 

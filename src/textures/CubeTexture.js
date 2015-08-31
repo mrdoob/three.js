@@ -16,14 +16,12 @@ THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilt
 THREE.CubeTexture.prototype = Object.create( THREE.Texture.prototype );
 THREE.CubeTexture.prototype.constructor = THREE.CubeTexture;
 
-THREE.CubeTexture.clone = function ( texture ) {
+THREE.CubeTexture.prototype.copy = function ( source ) {
 
-	if ( texture === undefined ) texture = new THREE.CubeTexture();
-
-	THREE.Texture.prototype.clone.call( this, texture );
-
-	texture.images = this.images;
-
-	return texture;
+	THREE.Texture.prototype.copy.call( this, source );
+	
+	this.images = source.images;
+	
+	return this;
 
 };

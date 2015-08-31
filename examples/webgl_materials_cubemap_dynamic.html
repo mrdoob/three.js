@@ -545,8 +545,7 @@
 
 			//
 
-			var shadowTexture = new THREE.Texture( canvas );
-			shadowTexture.needsUpdate = true;
+			var shadowTexture = new THREE.CanvasTexture( canvas );
 
 			var shadowPlane = new THREE.PlaneBufferGeometry( 400, 400 );
 			var shadowMaterial = new THREE.MeshBasicMaterial( {

@@ -96,7 +96,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		uniforms:       THREE.UniformsUtils.clone( normalDepthShader.uniforms ),
 		vertexShader:   normalDepthShader.vertexShader,
 		fragmentShader: normalDepthShader.fragmentShader,
-		blending:		THREE.NoBlending
+		blending:       THREE.NoBlending,
+		derivatives:    true
 
 	} );
 
@@ -185,8 +186,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		var specular = originalMaterial.specular !== undefined ? originalMaterial.specular : black;
 		var shininess = originalMaterial.shininess !== undefined ? originalMaterial.shininess : 1;
-		var wrapAround = originalMaterial.wrapAround !== undefined ? ( originalMaterial.wrapAround ? -1 : 1 ) : 1;
-		var additiveSpecular = originalMaterial.metal !== undefined ? ( originalMaterial.metal ? 1 : -1 ) : -1;
+		var wrapAround = originalMaterial.wrapAround !== undefined ? ( originalMaterial.wrapAround ? - 1 : 1 ) : 1;
+		var additiveSpecular = originalMaterial.metal !== undefined ? ( originalMaterial.metal ? 1 : - 1 ) : - 1;
 
 		uniforms.emissive.value.copyGammaToLinear( emissive );
 		uniforms.diffuse.value.copyGammaToLinear( diffuse );
@@ -200,11 +201,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		if ( originalMaterial.envMap ) {
 
 			uniforms.envMap.value = originalMaterial.envMap;
-			uniforms.useRefract.value = originalMaterial.envMap.mapping instanceof THREE.CubeRefractionMapping;
 			uniforms.refractionRatio.value = originalMaterial.refractionRatio;
-			uniforms.combine.value = originalMaterial.combine;
 			uniforms.reflectivity.value = originalMaterial.reflectivity;
-			uniforms.flipEnvMap.value = ( originalMaterial.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : -1;
+			uniforms.flipEnvMap.value = ( originalMaterial.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
 
 			uniforms.samplerNormalDepth.value = compNormalDepth.renderTarget2;
 			uniforms.viewWidth.value = scaledWidth;
@@ -270,16 +269,17 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		if ( originalMaterial.morphTargets || originalMaterial.skinning || originalMaterial.bumpMap ) {
 
 			var uniforms = THREE.UniformsUtils.clone( normalDepthShader.uniforms );
-			var defines = { "USE_BUMPMAP": !!originalMaterial.bumpMap };
+			var defines = { "USE_BUMPMAP": !! originalMaterial.bumpMap };
 
 			var normalDepthMaterial = new THREE.ShaderMaterial( {
 
 				uniforms:       uniforms,
 				vertexShader:   normalDepthShader.vertexShader,
 				fragmentShader: normalDepthShader.fragmentShader,
-				shading:		originalMaterial.shading,
-				defines:		defines,
-				blending:		THREE.NoBlending
+				shading:        originalMaterial.shading,
+				defines:        defines,
+				blending:       THREE.NoBlending,
+				derivatives:    true
 
 			} );
 
@@ -848,6 +848,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			effectFXAA.enabled = false;
 			compositePass.renderToScreen = true;
+
 		}
 
 	};
@@ -873,7 +874,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-		compFinal.insertPass( effect, -1 );
+		compFinal.insertPass( effect, - 1 );
 
 	};
 
@@ -990,7 +991,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		passColor.camera = currentCamera;
 		passNormalDepth.camera = currentCamera;
 		passLightProxy.camera = currentCamera;
-		passLightFullscreen.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+		passLightFullscreen.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 		passColor.scene = scene;
 		passNormalDepth.scene = scene;

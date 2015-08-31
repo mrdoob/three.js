@@ -346,6 +346,16 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialTransparentRow );
 
+	// alpha test
+
+	var materialAlphaTestRow = new UI.Panel();
+	var materialAlphaTest = new UI.Number().setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+
+	materialAlphaTestRow.add( new UI.Text( 'Alpha Test' ).setWidth( '90px' ) );
+	materialAlphaTestRow.add( materialAlphaTest );
+
+	container.add( materialAlphaTestRow );
+
 	// wireframe
 
 	var materialWireframeRow = new UI.Panel();
@@ -424,12 +434,6 @@ Sidebar.Material = function ( editor ) {
 				var vertexColors = parseInt( materialVertexColors.getValue() );
 
 				if ( material.vertexColors !== vertexColors ) {
-
-					if ( geometry instanceof THREE.Geometry ) {
-
-						geometry.groupsNeedUpdate = true;
-
-					}
 
 					material.vertexColors = vertexColors;
 					material.needsUpdate = true;
@@ -606,6 +610,12 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.alphaTest !== undefined ) {
+
+				material.alphaTest = materialAlphaTest.getValue();
+
+			}
+
 			if ( material.wireframe !== undefined ) {
 
 				material.wireframe = materialWireframe.getValue();
@@ -658,6 +668,7 @@ Sidebar.Material = function ( editor ) {
 			'blending': materialBlendingRow,
 			'opacity': materialOpacityRow,
 			'transparent': materialTransparentRow,
+			'alphaTest': materialAlphaTestRow,
 			'wireframe': materialWireframeRow
 		};
 
@@ -855,6 +866,12 @@ Sidebar.Material = function ( editor ) {
 		if ( material.transparent !== undefined ) {
 
 			materialTransparent.setValue( material.transparent );
+
+		}
+
+		if ( material.alphaTest !== undefined ) {
+
+			materialAlphaTest.setValue( material.alphaTest );
 
 		}
 
