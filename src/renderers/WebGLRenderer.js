@@ -1249,6 +1249,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var array, index;
 
+		// allocate the next position in the appropriate array
+
 		if ( object.material.transparent ) {
 
 			array = transparentImmediateObjects;
@@ -1260,6 +1262,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			index = ++ opaqueImmediateObjectsLastIndex;
 
 		}
+
+		// recycle existing position or grow the array
 
 		if ( index < array.length ) {
 
@@ -1279,6 +1283,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var array, index;
 
+		// allocate the next position in the appropriate array
+
 		if ( material.transparent ) {
 
 			array = transparentObjects;
@@ -1290,6 +1296,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			index = ++ opaqueObjectsLastIndex;
 
 		}
+
+		// recycle existing render item or grow the array
 
 		var renderItem = array[ index ];
 
