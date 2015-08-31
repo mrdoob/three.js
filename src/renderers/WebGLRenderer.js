@@ -190,7 +190,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var extensions = new THREE.WebGLExtensions( _gl );
 	var capabilities = new THREE.WebGLCapabilities(_gl, extensions, parameters )
-
+	
+	this.capabilities = capabilities;
+	
 	extensions.get( 'OES_texture_float' );
 	extensions.get( 'OES_texture_float_linear' );
 	extensions.get( 'OES_texture_half_float' );
