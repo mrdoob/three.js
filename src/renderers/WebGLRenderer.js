@@ -19,15 +19,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	pixelRatio = 1,
 
-	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
-
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 	_depth = parameters.depth !== undefined ? parameters.depth : true,
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
-	_logarithmicDepthBuffer = parameters.logarithmicDepthBuffer !== undefined ? parameters.logarithmicDepthBuffer : false,
 
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
@@ -192,6 +189,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	var extensions = new THREE.WebGLExtensions( _gl );
+	var capabilities = new THREE.WebGLCapabilities(_gl, extensions, parameters )
 
 	extensions.get( 'OES_texture_float' );
 	extensions.get( 'OES_texture_float_linear' );
@@ -206,12 +204,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	if ( _logarithmicDepthBuffer ) {
+	if ( capabilities.logarithmicDepthBuffer ) {
 
 		extensions.get( 'EXT_frag_depth' );
 
 	}
-
+	
 	var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
 	var properties = new THREE.WebGLProperties();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
@@ -269,24 +267,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.shadowMap = shadowMap;
 
-	// GPU capabilities
-
-	var _maxTextures = _gl.getParameter( _gl.MAX_TEXTURE_IMAGE_UNITS );
-	var _maxVertexTextures = _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
-	var _maxTextureSize = _gl.getParameter( _gl.MAX_TEXTURE_SIZE );
-	var _maxCubemapSize = _gl.getParameter( _gl.MAX_CUBE_MAP_TEXTURE_SIZE );
-
-	var _supportsVertexTextures = _maxVertexTextures > 0;
-	var _supportsBoneTextures = _supportsVertexTextures && extensions.get( 'OES_texture_float' );
-
-	var _maxPrecision = state.getMaxPrecision( _precision );
-
-	if ( _maxPrecision !== _precision ) {
-
-		console.warn( 'THREE.WebGLRenderer:', _precision, 'not supported, using', _maxPrecision, 'instead.' );
-		_precision = _maxPrecision;
-
-	}
 
 	// Plugins
 
@@ -341,7 +321,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.getPrecision = function () {
 
-		return _precision;
+		return capabilities.precision;
 
 	};
 
@@ -1428,11 +1408,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var maxLightCount = allocateLights( lights );
 		var maxShadows = allocateShadows( lights );
 		var maxBones = allocateBones( object );
-		var precision = _precision;
+		var precision = capabilities.precision;
 
 		if ( material.precision !== null ) {
 
-			precision = state.getMaxPrecision( material.precision );
+			precision = capabilities.getMaxPrecision( material.precision );
 
 			if ( precision !== material.precision ) {
 
@@ -1445,7 +1425,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var parameters = {
 
 			precision: precision,
-			supportsVertexTextures: _supportsVertexTextures,
+			supportsVertexTextures: capabilities.supportsVertexTextures,
 
 			map: !! material.map,
 			envMap: !! material.envMap,
@@ -1469,11 +1449,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			flatShading: material.shading === THREE.FlatShading,
 
 			sizeAttenuation: material.sizeAttenuation,
-			logarithmicDepthBuffer: _logarithmicDepthBuffer,
+			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
 
 			skinning: material.skinning,
 			maxBones: maxBones,
-			useVertexTexture: _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture,
+			useVertexTexture: capabilities.supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
@@ -1740,7 +1720,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
 
-			if ( _logarithmicDepthBuffer ) {
+			if ( capabilities.logarithmicDepthBuffer ) {
 
 				_gl.uniform1f( p_uniforms.logDepthBufFC, 2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
 
@@ -1799,7 +1779,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( _supportsBoneTextures && object.skeleton && object.skeleton.useVertexTexture ) {
+			if ( capabilities.supportsBoneTextures && object.skeleton && object.skeleton.useVertexTexture ) {
 
 				if ( p_uniforms.boneTexture !== undefined ) {
 
@@ -2205,9 +2185,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var textureUnit = _usedTextureUnits;
 
-		if ( textureUnit >= _maxTextures ) {
+		if ( textureUnit >= capabilities.maxTextures ) {
 
-			console.warn( 'WebGLRenderer: trying to use ' + textureUnit + ' texture units while this GPU supports only ' + _maxTextures );
+			console.warn( 'WebGLRenderer: trying to use ' + textureUnit + ' texture units while this GPU supports only ' + capabilities.maxTextures );
 
 		}
 
@@ -2860,7 +2840,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
-		texture.image = clampToMaxSize( texture.image, _maxTextureSize );
+		texture.image = clampToMaxSize( texture.image, capabilities.maxTextureSize );
 
 		var image = texture.image,
 		isImagePowerOfTwo = THREE.Math.isPowerOfTwo( image.width ) && THREE.Math.isPowerOfTwo( image.height ),
@@ -3045,7 +3025,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( _this.autoScaleCubemaps && ! isCompressed && ! isDataTexture ) {
 
-						cubeImage[ i ] = clampToMaxSize( texture.image[ i ], _maxCubemapSize );
+						cubeImage[ i ] = clampToMaxSize( texture.image[ i ], capabilities.maxCubemapSize );
 
 					} else {
 
@@ -3508,7 +3488,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function allocateBones ( object ) {
 
-		if ( _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
+		if ( capabilities.supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
 
 			return 1024;
 
@@ -3633,7 +3613,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.supportsVertexTextures = function () {
 
-		return _supportsVertexTextures;
+		return capabilities.supportsVertexTextures;
 
 	};
 
