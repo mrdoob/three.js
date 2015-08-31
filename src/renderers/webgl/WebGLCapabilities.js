@@ -1,34 +1,34 @@
-THREE.WebGLCapabilities = function( gl, extensions, parameters ){
-    
-    this.getMaxPrecision = function ( precision ) {
-    
-    	if ( precision === 'highp' ) {
-    
-    		if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.HIGH_FLOAT ).precision > 0 &&
-    		     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.HIGH_FLOAT ).precision > 0 ) {
-    
-    			return 'highp';
-    
-    		}
-    
-    		precision = 'mediump';
-    
-    	}
-    
-    	if ( precision === 'mediump' ) {
-    
-    		if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.MEDIUM_FLOAT ).precision > 0 &&
-    		     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT ).precision > 0 ) {
-    
-    			return 'mediump';
-    
-    		}
-    
-    	}
-    
-    	return 'lowp';
-    
-    };
+THREE.WebGLCapabilities = function( gl, extensions, parameters ) {
+
+	this.getMaxPrecision = function ( precision ) {
+
+		if ( precision === 'highp' ) {
+
+			if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.HIGH_FLOAT ).precision > 0 &&
+			gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.HIGH_FLOAT ).precision > 0 ) {
+
+				return 'highp';
+
+			}
+
+			precision = 'mediump';
+
+		}
+
+		if ( precision === 'mediump' ) {
+
+			if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.MEDIUM_FLOAT ).precision > 0 &&
+			gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT ).precision > 0 ) {
+
+				return 'mediump';
+
+			}
+
+		}
+
+		return 'lowp';
+
+	};
 
 	// GPU capabilities
 	this.precision = parameters.precision !== undefined ? parameters.precision : 'highp',
@@ -38,17 +38,17 @@ THREE.WebGLCapabilities = function( gl, extensions, parameters ){
 	this.maxVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
 	this.maxTextureSize = gl.getParameter( gl.MAX_TEXTURE_SIZE );
 	this.maxCubemapSize = gl.getParameter( gl.MAX_CUBE_MAP_TEXTURE_SIZE );
-	
-	this.maxAttributes = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
-	this.maxVertexUniforms = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS);
-	this.maxVaryings = gl.getParameter(gl.MAX_VARYING_VECTORS);
-	this.maxFragmentUniforms= gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
+
+	this.maxAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
+	this.maxVertexUniforms = gl.getParameter( gl.MAX_VERTEX_UNIFORM_VECTORS );
+	this.maxVaryings = gl.getParameter( gl.MAX_VARYING_VECTORS );
+	this.maxFragmentUniforms = gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS );
 
 
 	this.supportsVertexTextures = this.maxVertexTextures > 0;
-	this.supportsFloatFragmentTextures = !!extensions.get( 'OES_texture_float' );
+	this.supportsFloatFragmentTextures = !! extensions.get( 'OES_texture_float' );
 	this.supportsFloatVertexTextures = this.supportsVertexTextures && this.supportsFloatFragmentTextures;
-	
+
 
 	var _maxPrecision = this.getMaxPrecision( this.precision );
 
@@ -58,13 +58,11 @@ THREE.WebGLCapabilities = function( gl, extensions, parameters ){
 		this.precision = _maxPrecision;
 
 	}
-	
+
 	if ( this.logarithmicDepthBuffer ) {
 
-		this.logarithmicDepthBuffer = !!extensions.get( 'EXT_frag_depth' );
+		this.logarithmicDepthBuffer = !! extensions.get( 'EXT_frag_depth' );
 
 	}
-    
-    
-    
+
 };
