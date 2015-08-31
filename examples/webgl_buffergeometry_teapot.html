@@ -367,7 +367,7 @@
 					
 				}
 
-				var teapotMesh = new THREE.TeapotBufferGeometry( teapotSize,
+				var teapotGeometry = new THREE.TeapotBufferGeometry( teapotSize,
 					tess,
 					effectController.bottom,
 					effectController.lid,
@@ -376,7 +376,7 @@
 					! effectController.nonblinn );
 
 				teapot = new THREE.Mesh(
-					teapotMesh,
+					teapotGeometry,
 					shading === "wireframe" ? wireMaterial : (
 					shading === "flat" ? flatMaterial : (
 					shading === "smooth" ? gouraudMaterial : (
