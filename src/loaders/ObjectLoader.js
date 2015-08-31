@@ -347,7 +347,7 @@ THREE.ObjectLoader.prototype = {
 
 				if ( data.image === undefined ) {
 
-					THREE.warn( 'THREE.ObjectLoader: No "image" speficied for', data.uuid );
+					THREE.warn( 'THREE.ObjectLoader: No "image" specified for', data.uuid );
 
 				}
 
