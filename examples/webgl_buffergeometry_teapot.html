@@ -70,7 +70,7 @@
 			var shading;
 			var wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
 
-			var teapot, teapotMesh;
+			var teapot;
 
 			// allocate these just once
 			var diffuseColor = new THREE.Color();
@@ -132,7 +132,7 @@
 
 				wireMaterial = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true } ) ;
 
-				flatMaterial = new THREE.MeshPhongMaterial( { color: materialColor, shading: THREE.FlatShading, side: THREE.DoubleSide } );
+				flatMaterial = new THREE.MeshPhongMaterial( { color: materialColor, specular: 0x0, shading: THREE.FlatShading, side: THREE.DoubleSide } );
 
 				gouraudMaterial = new THREE.MeshLambertMaterial( { color: materialColor, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
 
@@ -161,6 +161,12 @@
 				// skybox scene - keep camera centered here
 				sceneCube = new THREE.Scene();
 				sceneCube.add( skybox );
+				
+				// scene itself
+				scene = new THREE.Scene();
+
+				scene.add( ambientLight );
+				scene.add( light );
 
 				// GUI
 				setupGui();
@@ -288,7 +294,7 @@
 					bNonBlinn = effectController.nonblinn;
 					shading = effectController.newShading;
 
-					fillScene();
+					createNewTeapot();
 
 				}
 
@@ -352,20 +358,16 @@
 			}
 
 			// Whenever the teapot changes, the scene is rebuilt from scratch (not much to it).
-			function fillScene() {
+			function createNewTeapot() {
 
-				scene = new THREE.Scene();
+				if ( teapot !== undefined ) {
 
-				scene.add( ambientLight );
-				scene.add( light );
-				
-				if ( teapotMesh !== undefined ) {
-
-					teapotMesh.dispose();
+					teapot.geometry.dispose();
+					scene.remove( teapot );
 					
 				}
 
-				teapotMesh = new THREE.TeapotBufferGeometry( teapotSize,
+				var teapotMesh = new THREE.TeapotBufferGeometry( teapotSize,
 					tess,
 					effectController.bottom,
 					effectController.lid,
