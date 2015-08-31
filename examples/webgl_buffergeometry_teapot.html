@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - teapot geometry</title>
+		<title>three.js webgl - teapot buffer geometry</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -47,7 +47,7 @@
 
 		<script src='js/libs/dat.gui.min.js'></script>
 
-		<script src='js/geometries/TeapotGeometry.js'></script>
+		<script src='js/geometries/TeapotBufferGeometry.js'></script>
 
 		<script>
 
@@ -73,7 +73,7 @@
 			var bFitLid;
 			var bNonBlinn;
 			var shading;
-			var wireMaterial, flatGouraudMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
+			var wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
 
 			// allocate these just once
 			var diffuseColor = new THREE.Color();
@@ -140,7 +140,7 @@
 
 				wireMaterial = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true } ) ;
 
-				flatGouraudMaterial = new THREE.MeshLambertMaterial( { color: materialColor, shading: THREE.FlatShading, side: THREE.DoubleSide } );
+				flatMaterial = new THREE.MeshPhongMaterial( { color: materialColor, shading: THREE.FlatShading, side: THREE.DoubleSide } );
 
 				gouraudMaterial = new THREE.MeshLambertMaterial( { color: materialColor, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
 
@@ -332,7 +332,7 @@
 				}
 
 				diffuseColor.multiplyScalar( effectController.kd );
-				flatGouraudMaterial.color.copy( diffuseColor );
+				flatMaterial.color.copy( diffuseColor );
 				gouraudMaterial.color.copy( diffuseColor );
 				phongMaterial.color.copy( diffuseColor );
 				texturedMaterial.color.copy( diffuseColor );
@@ -378,7 +378,7 @@
 				scene.add( light );
 
 				var teapot = new THREE.Mesh(
-					new THREE.TeapotGeometry( teapotSize,
+					new THREE.TeapotBufferGeometry( teapotSize,
 							tess,
 							effectController.bottom,
 							effectController.lid,
@@ -386,7 +386,7 @@
 							effectController.fitLid,
 							! effectController.nonblinn ),
 					shading === "wireframe" ? wireMaterial : (
-					shading === "flat" ? flatGouraudMaterial : (
+					shading === "flat" ? flatMaterial : (
 					shading === "smooth" ? gouraudMaterial : (
 					shading === "glossy" ? phongMaterial : (
 					shading === "textured" ? texturedMaterial : reflectiveMaterial ) ) ) ) );	// if no match, pick Phong

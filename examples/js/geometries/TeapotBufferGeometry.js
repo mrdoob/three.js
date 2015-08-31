@@ -2,8 +2,8 @@
  * @author Eric Haines / http://erichaines.com/
  *
  * Tessellates the famous Utah teapot database by Martin Newell into triangles.
- * 
- * THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn )
+ *
+ * THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn )
  *
  * defaults: size = 50, segments = 10, bottom = true, lid = true, body = true,
  *   fitLid = false, blinn = true
@@ -52,7 +52,7 @@
  */
 /*global THREE */
 
-THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn ) {
+THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn ) {
 
 	"use strict";
 
@@ -391,9 +391,9 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 1.5,-0.84,0.075
 	] ;
 
-	THREE.Geometry.call( this );
+	THREE.BufferGeometry.call( this );
 
-	this.type = 'TeapotGeometry';
+	this.type = 'TeapotBufferGeometry';
 
 	this.parameters = {
 		size: size,
@@ -434,7 +434,23 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 	var maxHeight2 = maxHeight / 2;
 	var trueSize = size / maxHeight2;
 
-	var normals = [], uvs = [];
+	// Number of elements depends on what is needed. Subtract degenerate
+	// triangles at tip of bottom and lid out in advance.
+	var numTriangles = bottom ? ( 8 * segments - 4 ) * segments : 0;
+	numTriangles += lid ? ( 16 * segments - 4 ) * segments : 0;
+	numTriangles += body ? 40 * segments * segments : 0;
+
+	var indices = new Uint32Array( numTriangles * 3 );
+
+	var numVertices = bottom ? 4 : 0;
+	numVertices += lid ? 8 : 0;
+	numVertices += body ? 20 : 0;
+	numVertices *= ( segments + 1 ) * ( segments + 1 );
+
+	var vertices = new Float32Array( numVertices * 3 );
+	var normals = new Float32Array( numVertices * 3 );
+	var uvs = new Float32Array( numVertices * 2 );
+
 	// Bezier form
 	var ms = new THREE.Matrix4();
 	ms.set( -1.0,  3.0, -3.0,  1.0,
@@ -463,15 +479,23 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 	var tcoord;
 
 	var sstep, tstep;
-	var gmx, tmtx;
-
 	var vertPerRow, eps;
 
 	var s, t, sval, tval, p, dsval, dtval;
 
-	var vsp, vtp, vdsp, vdtp;
-	var vsdir, vtdir, normOut, vertOut;
+	var normOut = new THREE.Vector3();
 	var v1, v2, v3, v4;
+
+	var gmx = new THREE.Matrix4();
+	var tmtx = new THREE.Matrix4();
+
+	var vsp = new THREE.Vector4();
+	var vtp = new THREE.Vector4();
+	var vdsp = new THREE.Vector4();
+	var vdtp = new THREE.Vector4();
+
+	var vsdir = new THREE.Vector3();
+	var vtdir = new THREE.Vector3();
 
 	var mst = ms.clone();
 	mst.transpose();
@@ -481,7 +505,15 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 	var notDegenerate = function ( vtx1, vtx2, vtx3 ) {
 
 		// if any vertex matches, return false
-		return ! ( vtx1.equals( vtx2 ) || vtx1.equals( vtx3 ) || vtx2.equals( vtx3 ) );
+		return ! ( ( ( vertices[ vtx1 * 3 ]     === vertices[ vtx2 * 3 ] ) && 
+					 ( vertices[ vtx1 * 3 + 1 ] === vertices[ vtx2 * 3 + 1 ] ) &&
+					 ( vertices[ vtx1 * 3 + 2 ] === vertices[ vtx2 * 3 + 2 ] ) ) ||
+				   ( ( vertices[ vtx1 * 3 ]     === vertices[ vtx3 * 3 ] ) && 
+					 ( vertices[ vtx1 * 3 + 1 ] === vertices[ vtx3 * 3 + 1 ] ) &&
+					 ( vertices[ vtx1 * 3 + 2 ] === vertices[ vtx3 * 3 + 2 ] ) ) ||
+				   ( ( vertices[ vtx2 * 3 ]     === vertices[ vtx3 * 3 ] ) && 
+					 ( vertices[ vtx2 * 3 + 1 ] === vertices[ vtx3 * 3 + 1 ] ) &&
+					 ( vertices[ vtx2 * 3 + 2 ] === vertices[ vtx3 * 3 + 2 ] ) ) );
 
 	};
 
@@ -501,6 +533,12 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 	eps = 0.0000001;
 
 	var surfCount = 0;
+
+	var vertCount = 0;
+	var normCount = 0;
+	var uvCount = 0;
+
+	var indexCount = 0;
 
 	for ( var surf = minPatches ; surf < maxPatches ; surf ++ ) {
 
@@ -542,10 +580,8 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 
 				}
 
-				gmx = new THREE.Matrix4();
 				gmx.set( g[ 0 ], g[ 1 ], g[ 2 ], g[ 3 ], g[ 4 ], g[ 5 ], g[ 6 ], g[ 7 ], g[ 8 ], g[ 9 ], g[ 10 ], g[ 11 ], g[ 12 ], g[ 13 ], g[ 14 ], g[ 15 ] );
 
-				tmtx = new THREE.Matrix4();
 				tmtx.multiplyMatrices( gmx, ms );
 				mgm[ i ].multiplyMatrices( mst, tmtx );
 
@@ -585,10 +621,10 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 
 					}
 
-					vsp = new THREE.Vector4( sp[ 0 ], sp[ 1 ], sp[ 2 ], sp[ 3 ] );
-					vtp = new THREE.Vector4( tp[ 0 ], tp[ 1 ], tp[ 2 ], tp[ 3 ] );
-					vdsp = new THREE.Vector4( dsp[ 0 ], dsp[ 1 ], dsp[ 2 ], dsp[ 3 ] );
-					vdtp = new THREE.Vector4( dtp[ 0 ], dtp[ 1 ], dtp[ 2 ], dtp[ 3 ] );
+					vsp.fromArray( sp );
+					vtp.fromArray( tp );
+					vdsp.fromArray( dsp );
+					vdtp.fromArray( dtp );
 
 					// do for x,y,z
 					for ( i = 0 ; i < 3 ; i ++ ) {
@@ -610,31 +646,38 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 					}
 
 					// find normal
-					vsdir = new THREE.Vector3( sdir[ 0 ], sdir[ 1 ], sdir[ 2 ] );
-					vtdir = new THREE.Vector3( tdir[ 0 ], tdir[ 1 ], tdir[ 2 ] );
+					vsdir.fromArray( sdir );
+					vtdir.fromArray( tdir );
 					norm.crossVectors( vtdir, vsdir );
 					norm.normalize();
-
-					// rotate on X axis
-					normOut = new THREE.Vector3( norm.x, norm.z, -norm.y );
 
 					// if X and Z length is 0, at the cusp, so point the normal up or down, depending on patch number
 					if ( vert[ 0 ] === 0 && vert[ 1 ] === 0 )
 					{
 
 						// if above the middle of the teapot, normal points up, else down
-						normOut.set( 0, vert[ 2 ] > maxHeight2 ? 1 : -1, 0 );
+						normOut.set( 0, vert[ 2 ] > maxHeight2 ? 1 : - 1, 0 );
 
 					}
-					normals.push( normOut );
+					else
+					{
 
-					uvs.push( new THREE.Vector2( 1 - t, 1 - s ) );
+						// standard output: rotate on X axis
+						normOut.set( norm.x, norm.z, - norm.y );
 
-					// three.js uses Y up, the code makes Z up, so time for a trick:
-					// rotate on X axis, and offset down on Y axis so object ranges from -1 to 1 in Y
-					vertOut = new THREE.Vector3( trueSize * vert[ 0 ], trueSize * ( vert[ 2 ] - maxHeight2 ), -trueSize * vert[ 1 ] );
+					}
 
-					this.vertices.push( vertOut );
+					// store it all
+					vertices[ vertCount ++ ] = trueSize * vert[ 0 ];
+					vertices[ vertCount ++ ] = trueSize * ( vert[ 2 ] - maxHeight2 );
+					vertices[ vertCount ++ ] = - trueSize * vert[ 1 ];
+
+					normals[ normCount ++ ] = normOut.x;
+					normals[ normCount ++ ] = normOut.y;
+					normals[ normCount ++ ] = normOut.z;
+
+					uvs[ uvCount ++ ] = 1 - t;
+					uvs[ uvCount ++ ] = 1 - s;
 
 				}
 
@@ -652,16 +695,18 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 
 					// Normals and UVs cannot be shared. Without clone(), you can see the consequences
 					// of sharing if you call geometry.applyMatrix( matrix ).
-					if ( notDegenerate ( this.vertices[ v1 ], this.vertices[ v2 ], this.vertices[ v3 ] ) ) {
+					if ( notDegenerate ( v1, v2, v3 ) ) {
 
-						this.faces.push( new THREE.Face3( v1, v2, v3, [ normals[ v1 ].clone(), normals[ v2 ].clone(), normals[ v3 ].clone() ] ) );
-						this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v2 ].clone(), uvs[ v3 ].clone() ] );
+						indices[ indexCount ++ ] = v1;
+						indices[ indexCount ++ ] = v2;
+						indices[ indexCount ++ ] = v3;
 
 					}
-					if ( notDegenerate ( this.vertices[ v1 ], this.vertices[ v3 ], this.vertices[ v4 ] ) ) {
+					if ( notDegenerate ( v1, v3, v4 ) ) {
 
-						this.faces.push( new THREE.Face3( v1, v3, v4, [ normals[ v1 ].clone(), normals[ v3 ].clone(), normals[ v4 ].clone() ] ) );
-						this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v3 ].clone(), uvs[ v4 ].clone() ] );
+						indices[ indexCount ++ ] = v1;
+						indices[ indexCount ++ ] = v3;
+						indices[ indexCount ++ ] = v4;
 
 					}
 
@@ -676,17 +721,22 @@ THREE.TeapotGeometry = function ( size, segments, bottom, lid, body, fitLid, bli
 
 	}
 
-	this.computeFaceNormals();
+	this.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
+	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+	this.computeBoundingSphere();
 
 };
 
 
-THREE.TeapotGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.TeapotGeometry.prototype.constructor = THREE.TeapotGeometry;
+THREE.TeapotBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.TeapotBufferGeometry.prototype.constructor = THREE.TeapotBufferGeometry;
 
-THREE.TeapotGeometry.prototype.clone = function () {
+THREE.TeapotBufferGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.TeapotGeometry(
+	var bufferGeometry = new THREE.TeapotBufferGeometry(
 		this.parameters.size,
 		this.parameters.segments,
 		this.parameters.bottom,
@@ -696,6 +746,6 @@ THREE.TeapotGeometry.prototype.clone = function () {
 		this.parameters.blinn
 	);
 
-	return geometry;
+	return bufferGeometry;
 
 };
