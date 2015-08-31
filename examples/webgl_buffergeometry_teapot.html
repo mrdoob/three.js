@@ -28,9 +28,6 @@
 
 			a { color: blue; }
 
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #444 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
@@ -43,7 +40,6 @@
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
 
@@ -54,14 +50,13 @@
 			////////////////////////////////////////////////////////////////////////////////
 			// Utah/Newell Teapot demo
 			////////////////////////////////////////////////////////////////////////////////
-			/*global THREE, requestAnimationFrame, Detector, container, Stats, dat, window */
+			/*global THREE, Detector, container, dat, window */
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, sceneCube, renderer, stats;
+			var camera, scene, sceneCube, renderer;
 			var cameraControls;
 			var effectController;
-			var clock = new THREE.Clock();
 			var teapotSize = 400;
 			var ambientLight, light;
 			var skybox;
@@ -75,12 +70,14 @@
 			var shading;
 			var wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
 
+			var teapot, teapotMesh;
+
 			// allocate these just once
 			var diffuseColor = new THREE.Color();
 			var specularColor = new THREE.Color();
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -108,18 +105,13 @@
 				renderer.gammaOutput = true;
 				container.appendChild( renderer.domElement );
 
-				// STATS
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
-
 				// EVENTS
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				// CONTROLS
 				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
 				cameraControls.target.set( 0, 0, 0 );
+				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
 				var textureMap = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
@@ -187,6 +179,8 @@
 				camera.aspect = canvasWidth / canvasHeight;
 				camera.updateProjectionMatrix();
 
+				render();
+
 			}
 
 			function setupGui() {
@@ -229,65 +223,53 @@
 
 				h = gui.addFolder( "Material control" );
 
-				h.add( effectController, "shininess", 1.0, 400.0, 1.0 ).name( "shininess" );
-				h.add( effectController, "kd", 0.0, 1.0, 0.025 ).name( "diffuse strength" );
-				h.add( effectController, "ks", 0.0, 1.0, 0.025 ).name( "specular strength" );
-				h.add( effectController, "metallic" );
+				h.add( effectController, "shininess", 1.0, 400.0, 1.0 ).name( "shininess" ).onChange( render );
+				h.add( effectController, "kd", 0.0, 1.0, 0.025 ).name( "diffuse strength" ).onChange( render );
+				h.add( effectController, "ks", 0.0, 1.0, 0.025 ).name( "specular strength" ).onChange( render );
+				h.add( effectController, "metallic" ).onChange( render );
 
 				// material (color)
 
 				h = gui.addFolder( "Material color" );
 
-				h.add( effectController, "hue", 0.0, 1.0, 0.025 ).name( "hue" );
-				h.add( effectController, "saturation", 0.0, 1.0, 0.025 ).name( "saturation" );
-				h.add( effectController, "lightness", 0.0, 1.0, 0.025 ).name( "lightness" );
+				h.add( effectController, "hue", 0.0, 1.0, 0.025 ).name( "hue" ).onChange( render );
+				h.add( effectController, "saturation", 0.0, 1.0, 0.025 ).name( "saturation" ).onChange( render );
+				h.add( effectController, "lightness", 0.0, 1.0, 0.025 ).name( "lightness" ).onChange( render );
 
 				// light (point)
 
 				h = gui.addFolder( "Lighting" );
 
-				h.add( effectController, "lhue", 0.0, 1.0, 0.025 ).name( "hue" );
-				h.add( effectController, "lsaturation", 0.0, 1.0, 0.025 ).name( "saturation" );
-				h.add( effectController, "llightness", 0.0, 1.0, 0.025 ).name( "lightness" );
-				h.add( effectController, "ka", 0.0, 1.0, 0.025 ).name( "ambient" );
+				h.add( effectController, "lhue", 0.0, 1.0, 0.025 ).name( "hue" ).onChange( render );
+				h.add( effectController, "lsaturation", 0.0, 1.0, 0.025 ).name( "saturation" ).onChange( render );
+				h.add( effectController, "llightness", 0.0, 1.0, 0.025 ).name( "lightness" ).onChange( render );
+				h.add( effectController, "ka", 0.0, 1.0, 0.025 ).name( "ambient" ).onChange( render );
 
 				// light (directional)
 
 				h = gui.addFolder( "Light direction" );
 
-				h.add( effectController, "lx", -1.0, 1.0, 0.025 ).name( "x" );
-				h.add( effectController, "ly", -1.0, 1.0, 0.025 ).name( "y" );
-				h.add( effectController, "lz", -1.0, 1.0, 0.025 ).name( "z" );
+				h.add( effectController, "lx", -1.0, 1.0, 0.025 ).name( "x" ).onChange( render );
+				h.add( effectController, "ly", -1.0, 1.0, 0.025 ).name( "y" ).onChange( render );
+				h.add( effectController, "lz", -1.0, 1.0, 0.025 ).name( "z" ).onChange( render );
 
 				h = gui.addFolder( "Tessellation control" );
-				h.add( effectController, "newTess", [ 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 40, 50 ] ).name( "Tessellation Level" );
-				h.add( effectController, "lid" ).name( "display lid" );
-				h.add( effectController, "body" ).name( "display body" );
-				h.add( effectController, "bottom" ).name( "display bottom" );
-				h.add( effectController, "fitLid" ).name( "snug lid" );
-				h.add( effectController, "nonblinn" ).name( "original scale" );
+				h.add( effectController, "newTess", [ 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 40, 50 ] ).name( "Tessellation Level" ).onChange( render );
+				h.add( effectController, "lid" ).name( "display lid" ).onChange( render );
+				h.add( effectController, "body" ).name( "display body" ).onChange( render );
+				h.add( effectController, "bottom" ).name( "display bottom" ).onChange( render );
+				h.add( effectController, "fitLid" ).name( "snug lid" ).onChange( render );
+				h.add( effectController, "nonblinn" ).name( "original scale" ).onChange( render );
 
 				// shading
-				h = gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "reflective" ] ).name( "Shading" );
+				h = gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "reflective" ] ).name( "Shading" ).onChange( render );
 
 			}
 
 
 			//
 
-			function animate() {
-
-				requestAnimationFrame( animate );
-				render();
-				stats.update();
-
-			}
-
 			function render() {
-
-				var delta = clock.getDelta();
-
-				cameraControls.update( delta );
 
 				if ( effectController.newTess !== tess ||
 					effectController.bottom !== bBottom ||
@@ -376,15 +358,23 @@
 
 				scene.add( ambientLight );
 				scene.add( light );
+				
+				if ( teapotMesh !== undefined ) {
 
-				var teapot = new THREE.Mesh(
-					new THREE.TeapotBufferGeometry( teapotSize,
-							tess,
-							effectController.bottom,
-							effectController.lid,
-							effectController.body,
-							effectController.fitLid,
-							! effectController.nonblinn ),
+					teapotMesh.dispose();
+					
+				}
+
+				teapotMesh = new THREE.TeapotBufferGeometry( teapotSize,
+					tess,
+					effectController.bottom,
+					effectController.lid,
+					effectController.body,
+					effectController.fitLid,
+					! effectController.nonblinn );
+
+				teapot = new THREE.Mesh(
+					teapotMesh,
 					shading === "wireframe" ? wireMaterial : (
 					shading === "flat" ? flatMaterial : (
 					shading === "smooth" ? gouraudMaterial : (
