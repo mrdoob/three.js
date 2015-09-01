@@ -96,7 +96,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		uniforms:       THREE.UniformsUtils.clone( normalDepthShader.uniforms ),
 		vertexShader:   normalDepthShader.vertexShader,
 		fragmentShader: normalDepthShader.fragmentShader,
-		blending:		THREE.NoBlending
+		blending:       THREE.NoBlending,
+		derivatives:    true
 
 	} );
 
@@ -200,9 +201,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		if ( originalMaterial.envMap ) {
 
 			uniforms.envMap.value = originalMaterial.envMap;
-			uniforms.useRefract.value = originalMaterial.envMap.mapping instanceof THREE.CubeRefractionMapping;
 			uniforms.refractionRatio.value = originalMaterial.refractionRatio;
-			uniforms.combine.value = originalMaterial.combine;
 			uniforms.reflectivity.value = originalMaterial.reflectivity;
 			uniforms.flipEnvMap.value = ( originalMaterial.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
 
@@ -277,9 +276,10 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 				uniforms:       uniforms,
 				vertexShader:   normalDepthShader.vertexShader,
 				fragmentShader: normalDepthShader.fragmentShader,
-				shading:		originalMaterial.shading,
-				defines:		defines,
-				blending:		THREE.NoBlending
+				shading:        originalMaterial.shading,
+				defines:        defines,
+				blending:       THREE.NoBlending,
+				derivatives:    true
 
 			} );
 

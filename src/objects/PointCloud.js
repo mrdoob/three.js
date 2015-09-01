@@ -74,17 +74,21 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
+			var index = geometry.index;
 			var attributes = geometry.attributes;
 			var positions = attributes.position.array;
 
-			if ( attributes.index !== undefined ) {
+			if ( index !== null ) {
 
-				var indices = attributes.index.array;
-				var offsets = geometry.drawcalls;
+				var indices = index.array;
+				var offsets = geometry.groups;
 
 				if ( offsets.length === 0 ) {
 
-					geometry.addDrawCall( 0, indices.length );
+					offsets = [ {
+						start: 0,
+						count: indices.length
+					} ];
 
 				}
 

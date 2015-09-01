@@ -108,6 +108,7 @@
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
+					geometry.computeVertexNormals();
 					geometry.computeMorphNormals();
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading } );

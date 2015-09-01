@@ -35,6 +35,11 @@
 		this.minAzimuthAngle = - Infinity; // radians
 		this.maxAzimuthAngle = Infinity; // radians
 
+		// Set to true to enable damping (inertia)
+		// If damping is enabled, you must call controls.update() in your animation loop
+		this.enableDamping = false;
+		this.dampingFactor = 0.25;
+
 		////////////
 		// internals
 
@@ -249,8 +254,18 @@
 
 				this.object.lookAt( this.target );
 
-				thetaDelta = 0;
-				phiDelta = 0;
+				if ( this.enableDamping === true ) {
+
+					thetaDelta *= ( 1 - this.dampingFactor );
+					phiDelta *= ( 1 - this.dampingFactor );
+
+				} else {
+
+					thetaDelta = 0;
+					phiDelta = 0;
+
+				}
+
 				scale = 1;
 				panOffset.set( 0, 0, 0 );
 
@@ -307,13 +322,13 @@
 
 		this.getPolarAngle = function () {
 
-			return constraint.phi;
+			return constraint.getPolarAngle();
 
 		};
 
 		this.getAzimuthalAngle = function () {
 
-			return constraint.theta;
+			return constraint.getAzimuthalAngle();
 
 		};
 
@@ -324,24 +339,26 @@
 		this.center = this.target;
 
 		// This option actually enables dollying in and out; left as "zoom" for
-		// backwards compatibility
-		this.noZoom = false;
+		// backwards compatibility.
+		// Set to false to disable zooming
+		this.enableZoom = true;
 		this.zoomSpeed = 1.0;
 
-		// Set to true to disable this control
-		this.noRotate = false;
+		// Set to false to disable rotating
+		this.enableRotate = true;
 		this.rotateSpeed = 1.0;
 
-		// Set to true to disable this control
-		this.noPan = false;
+		// Set to false to disable panning
+		this.enablePan = true;
 		this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
 		// Set to true to automatically rotate around the target
+		// If auto-rotate is enabled, you must call controls.update() in your animation loop
 		this.autoRotate = false;
 		this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
-		// Set to true to disable use of the keys
-		this.noKeys = false;
+		// Set to false to disable use of the keys
+		this.enableKeys = true;
 
 		// The four arrow keys
 		this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
@@ -443,7 +460,7 @@
 
 			if ( event.button === scope.mouseButtons.ORBIT ) {
 
-				if ( scope.noRotate === true ) return;
+				if ( scope.enableRotate === false ) return;
 
 				state = STATE.ROTATE;
 
@@ -451,7 +468,7 @@
 
 			} else if ( event.button === scope.mouseButtons.ZOOM ) {
 
-				if ( scope.noZoom === true ) return;
+				if ( scope.enableZoom === false ) return;
 
 				state = STATE.DOLLY;
 
@@ -459,7 +476,7 @@
 
 			} else if ( event.button === scope.mouseButtons.PAN ) {
 
-				if ( scope.noPan === true ) return;
+				if ( scope.enablePan === false ) return;
 
 				state = STATE.PAN;
 
@@ -487,7 +504,7 @@
 
 			if ( state === STATE.ROTATE ) {
 
-				if ( scope.noRotate === true ) return;
+				if ( scope.enableRotate === false ) return;
 
 				rotateEnd.set( event.clientX, event.clientY );
 				rotateDelta.subVectors( rotateEnd, rotateStart );
@@ -502,7 +519,7 @@
 
 			} else if ( state === STATE.DOLLY ) {
 
-				if ( scope.noZoom === true ) return;
+				if ( scope.enableZoom === false ) return;
 
 				dollyEnd.set( event.clientX, event.clientY );
 				dollyDelta.subVectors( dollyEnd, dollyStart );
@@ -521,7 +538,7 @@
 
 			} else if ( state === STATE.PAN ) {
 
-				if ( scope.noPan === true ) return;
+				if ( scope.enablePan === false ) return;
 
 				panEnd.set( event.clientX, event.clientY );
 				panDelta.subVectors( panEnd, panStart );
@@ -549,7 +566,7 @@
 
 		function onMouseWheel( event ) {
 
-			if ( scope.enabled === false || scope.noZoom === true || state !== STATE.NONE ) return;
+			if ( scope.enabled === false || scope.enableZoom === false || state !== STATE.NONE ) return;
 
 			event.preventDefault();
 			event.stopPropagation();
@@ -588,7 +605,7 @@
 
 		function onKeyDown( event ) {
 
-			if ( scope.enabled === false || scope.noKeys === true || scope.noPan === true ) return;
+			if ( scope.enabled === false || scope.enableKeys === false || scope.enablePan === false ) return;
 
 			switch ( event.keyCode ) {
 
@@ -624,7 +641,7 @@
 
 				case 1:	// one-fingered touch: rotate
 
-					if ( scope.noRotate === true ) return;
+					if ( scope.enableRotate === false ) return;
 
 					state = STATE.TOUCH_ROTATE;
 
@@ -633,7 +650,7 @@
 
 				case 2:	// two-fingered touch: dolly
 
-					if ( scope.noZoom === true ) return;
+					if ( scope.enableZoom === false ) return;
 
 					state = STATE.TOUCH_DOLLY;
 
@@ -645,7 +662,7 @@
 
 				case 3: // three-fingered touch: pan
 
-					if ( scope.noPan === true ) return;
+					if ( scope.enablePan === false ) return;
 
 					state = STATE.TOUCH_PAN;
 
@@ -675,7 +692,7 @@
 
 				case 1: // one-fingered touch: rotate
 
-					if ( scope.noRotate === true ) return;
+					if ( scope.enableRotate === false ) return;
 					if ( state !== STATE.TOUCH_ROTATE ) return;
 
 					rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
@@ -693,7 +710,7 @@
 
 				case 2: // two-fingered touch: dolly
 
-					if ( scope.noZoom === true ) return;
+					if ( scope.enableZoom === false ) return;
 					if ( state !== STATE.TOUCH_DOLLY ) return;
 
 					var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
@@ -720,7 +737,7 @@
 
 				case 3: // three-fingered touch: pan
 
-					if ( scope.noPan === true ) return;
+					if ( scope.enablePan === false ) return;
 					if ( state !== STATE.TOUCH_PAN ) return;
 
 					panEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
@@ -946,6 +963,148 @@
 			set: function ( value ) {
 
 				this.constraint.maxAzimuthAngle = value;
+
+			}
+
+		},
+
+		enableDamping : {
+
+			get: function () {
+
+				return this.constraint.enableDamping;
+
+			},
+
+			set: function ( value ) {
+
+				this.constraint.enableDamping = value;
+
+			}
+
+		},
+
+		dampingFactor : {
+
+			get: function () {
+
+				return this.constraint.dampingFactor;
+
+			},
+
+			set: function ( value ) {
+
+				this.constraint.dampingFactor = value;
+
+			}
+
+		},
+
+		// backward compatibility
+
+		noZoom: {
+
+			get: function () {
+
+				console.warn( 'THREE.OrbitControls: .noZoom has been deprecated. Use .enableZoom instead.' );
+				return ! this.enableZoom;
+
+			},
+
+			set: function ( value ) {
+
+				console.warn( 'THREE.OrbitControls: .noZoom has been deprecated. Use .enableZoom instead.' );
+				this.enableZoom = ! value;
+
+			}
+
+		},
+
+		noRotate: {
+
+			get: function () {
+
+				console.warn( 'THREE.OrbitControls: .noRotate has been deprecated. Use .enableRotate instead.' );
+				return ! this.enableRotate;
+
+			},
+
+			set: function ( value ) {
+
+				console.warn( 'THREE.OrbitControls: .noRotate has been deprecated. Use .enableRotate instead.' );
+				this.enableRotate = ! value;
+
+			}
+
+		},
+
+		noPan: {
+
+			get: function () {
+
+				console.warn( 'THREE.OrbitControls: .noPan has been deprecated. Use .enablePan instead.' );
+				return ! this.enablePan;
+
+			},
+
+			set: function ( value ) {
+
+				console.warn( 'THREE.OrbitControls: .noPan has been deprecated. Use .enablePan instead.' );
+				this.enablePan = ! value;
+
+			}
+
+		},
+
+		noKeys: {
+
+			get: function () {
+
+				console.warn( 'THREE.OrbitControls: .noKeys has been deprecated. Use .enableKeys instead.' );
+				return ! this.enableKeys;
+
+			},
+
+			set: function ( value ) {
+
+				console.warn( 'THREE.OrbitControls: .noKeys has been deprecated. Use .enableKeys instead.' );
+				this.enableKeys = ! value;
+
+			}
+
+		},
+
+		staticMoving : {
+
+			get: function () {
+
+				console.warn( 'THREE.OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
+				return ! this.constraint.enableDamping;
+
+			},
+
+			set: function ( value ) {
+
+				console.warn( 'THREE.OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
+				this.constraint.enableDamping = ! value;
+
+			}
+
+		},
+
+		dynamicDampingFactor : {
+
+			get: function () {
+
+				console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
+				return this.constraint.dampingFactor;
+
+			},
+
+			set: function ( value ) {
+
+				console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
+				this.constraint.dampingFactor = value;
 
 			}
 

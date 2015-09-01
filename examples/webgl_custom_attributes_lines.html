@@ -104,7 +104,6 @@
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms:       uniforms,
-				attributes:     [ 'displacement', 'customColor' ],
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 				blending:       THREE.AdditiveBlending,

@@ -25,8 +25,6 @@ var Viewport = function ( editor ) {
 	//
 
 	var camera = editor.camera;
-	camera.position.fromArray( editor.config.getKey( 'camera/position' ) );
-	camera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera/target' ) ) );
 
 	//
 
@@ -238,7 +236,6 @@ var Viewport = function ( editor ) {
 	// otherwise controls.enabled doesn't work.
 
 	var controls = new THREE.EditorControls( camera, container.dom );
-	controls.center.fromArray( editor.config.getKey( 'camera/target' ) );
 	controls.addEventListener( 'change', function () {
 
 		transformControls.update();
@@ -327,21 +324,6 @@ var Viewport = function ( editor ) {
 	var saveTimeout;
 
 	signals.cameraChanged.add( function () {
-
-		if ( saveTimeout !== undefined ) {
-
-			clearTimeout( saveTimeout );
-
-		}
-
-		saveTimeout = setTimeout( function () {
-
-			editor.config.setKey(
-				'camera/position', camera.position.toArray(),
-				'camera/target', controls.center.toArray()
-			);
-
-		}, 1000 );
 
 		render();
 
@@ -520,26 +502,6 @@ var Viewport = function ( editor ) {
 
 		grid.visible = showGrid;
 		render();
-
-	} );
-
-	var animations = [];
-
-	signals.playAnimation.add( function ( animation ) {
-
-		animations.push( animation );
-
-	} );
-
-	signals.stopAnimation.add( function ( animation ) {
-
-		var index = animations.indexOf( animation );
-
-		if ( index !== -1 ) {
-
-			animations.splice( index, 1 );
-
-		}
 
 	} );
 

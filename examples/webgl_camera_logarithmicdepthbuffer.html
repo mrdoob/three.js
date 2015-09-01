@@ -137,9 +137,11 @@
 
 				container = document.getElementById( 'container' );
 
+				var scene = initScene();
+
 				// Initialize two copies of the same scene, one with normal z-buffer and one with logarithmic z-buffer
-				objects.normal = initScene('normal', false);
-				objects.logzbuf = initScene('logzbuf', true);
+				objects.normal = initView( scene, 'normal', false );
+				objects.logzbuf = initView( scene, 'logzbuf', true );
 
 				stats = new Stats();
 				container.appendChild(stats.domElement);
@@ -156,13 +158,27 @@
 				render();
 			}
 
-			function initScene(name, logDepthBuf) {
+			function initView( scene, name, logDepthBuf ) {
 
-				var scene = new THREE.Scene();
 				var framecontainer = document.getElementById('container_' + name);
 
 				var camera = new THREE.PerspectiveCamera( 50, screensplit * SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
 				scene.add(camera);
+
+				var renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: logDepthBuf });
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize(SCREEN_WIDTH/2, SCREEN_HEIGHT);
+				renderer.domElement.style.position = "relative";
+				renderer.domElement.id = 'renderer_' + name;
+				framecontainer.appendChild(renderer.domElement);
+
+				return { container: framecontainer, renderer: renderer, scene: scene, camera: camera }
+
+			}
+
+			function initScene() {
+
+				var scene = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight(0xffffff, 1);
 				light.position.set(100,100,100);
@@ -220,14 +236,8 @@
 
 				}
 
-				var renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: logDepthBuf });
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize(SCREEN_WIDTH/2, SCREEN_HEIGHT);
-				renderer.domElement.style.position = "relative";
-				renderer.domElement.id = 'renderer_' + name;
-				framecontainer.appendChild(renderer.domElement);
+				return scene;
 
-				return { container: framecontainer, renderer: renderer, scene: scene, camera: camera }
 			}
 
 			function updateRendererSizes() {
