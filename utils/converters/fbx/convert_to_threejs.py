@@ -54,6 +54,12 @@ FBX_TEXTURE_BINDINGS = {
   'AmbientFactor': 'aoMap'
 }
 
+THREE_REPEAT_WRAPPING = 1000
+THREE_CLAMP_TO_EDGE_WRAPPING = 1001
+
+THREE_LINEAR_FILTER = 1006
+THREE_LINEAR_MIP_MAP_LINEAR_FILTER = 1008
+
 # #####################################################
 # Pretty Printing Hacks
 # #####################################################
@@ -565,6 +571,11 @@ def generate_texture_data(texture, image_dict, texture_list, texture_dict):
         image_uuid = str(uuid.uuid4())
         image_dict[relative_path] = image_uuid
 
+    wrap_mode_s = THREE_REPEAT_WRAPPING if texture.GetWrapModeU() == FbxTexture.eRepeat else THREE_CLAMP_TO_EDGE_WRAPPING
+    wrap_mode_t = THREE_REPEAT_WRAPPING if texture.GetWrapModeV() == FbxTexture.eRepeat else THREE_CLAMP_TO_EDGE_WRAPPING
+    repeat_s = 1.0 if wrap_mode_s == THREE_CLAMP_TO_EDGE_WRAPPING else texture.GetScaleU()
+    repeat_t = 1.0 if wrap_mode_t == THREE_CLAMP_TO_EDGE_WRAPPING else texture.GetScaleV()
+
     texture_uuid = str(uuid.uuid4())
     texture_name = get_texture_name(texture)
 
@@ -572,10 +583,11 @@ def generate_texture_data(texture, image_dict, texture_list, texture_dict):
       uuid_key: texture_uuid,
       name_key: texture_name,
       'image': image_uuid,
-      'repeat': serialize_vector2((1,1)),
+      'wrap': [wrap_mode_s, wrap_mode_t],
+      'repeat': serialize_vector2((repeat_s, repeat_t)),
       'offset': serialize_vector2(texture.GetUVTranslation()),
-      'magFilter': 1006, # THREE.LinearFilter
-      'minFilter': 1008, # THREE.LinearMipMapLinearFilter
+      'magFilter': THREE_LINEAR_FILTER,
+      'minFilter': THREE_LINEAR_MIP_MAP_LINEAR_FILTER,
       'anisotropy': True
     })
     texture_dict[texture_name] = texture_uuid
