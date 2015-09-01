@@ -35,12 +35,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var lights = [];
 
 	var opaqueObjects = [];
+	var opaqueObjectsLastIndex = -1;
 	var transparentObjects = [];
+	var transparentObjectsLastIndex = -1;
 
 	var opaqueImmediateObjects = [];
+	var opaqueImmediateObjectsLastIndex = -1;
 	var transparentImmediateObjects = [];
+	var transparentImmediateObjectsLastIndex = -1;
 
 	var morphInfluences = new Float32Array( 8 );
+
 
 	var sprites = [];
 	var lensFlares = [];
@@ -623,7 +628,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( newReferenceCount === 0 ) {
 
-					// the last meterial that has been using the program let
+					// the last material that has been using the program let
 					// go of it, so remove it from the (unordered) _programs
 					// set and deallocate the GL resource
 
@@ -1146,16 +1151,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		lights.length = 0;
 
-		opaqueObjects.length = 0;
-		transparentObjects.length = 0;
+		opaqueObjectsLastIndex = -1;
+		transparentObjectsLastIndex = -1;
 
-		opaqueImmediateObjects.length = 0;
-		transparentImmediateObjects.length = 0;
+		opaqueImmediateObjectsLastIndex = -1;
+		transparentImmediateObjectsLastIndex = -1;
 
 		sprites.length = 0;
 		lensFlares.length = 0;
 
 		projectObject( scene );
+
+		opaqueObjects.length = opaqueObjectsLastIndex + 1;
+		transparentObjects.length = transparentObjectsLastIndex + 1;
+
+		opaqueImmediateObjects.length = opaqueImmediateObjectsLastIndex + 1;
+		transparentImmediateObjects.length = transparentImmediateObjectsLastIndex + 1;
 
 		if ( _this.sortObjects === true ) {
 
@@ -1236,36 +1247,82 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function pushImmediateRenderItem( object ) {
 
+		var array, index;
+
+		// allocate the next position in the appropriate array
+
 		if ( object.material.transparent ) {
 
-			transparentImmediateObjects.push( object );
+			array = transparentImmediateObjects;
+			index = ++ transparentImmediateObjectsLastIndex;
 
 		} else {
 
-			opaqueImmediateObjects.push( object );
+			array = opaqueImmediateObjects;
+			index = ++ opaqueImmediateObjectsLastIndex;
 
 		}
+
+		// recycle existing position or grow the array
+
+		if ( index < array.length ) {
+
+			array[ index ] = object;
+
+		} else {
+
+			// assert( index === array.length );
+			array.push( object );
+
+		}
+
 
 	}
 
 	function pushRenderItem( object, geometry, material, z, group ) {
 
-		var renderItem = {
-			id: object.id,
-			object: object,
-			geometry: geometry,
-			material: material,
-			z: _vector3.z,
-			group: group
-		};
+		var array, index;
+
+		// allocate the next position in the appropriate array
 
 		if ( material.transparent ) {
 
-			transparentObjects.push( renderItem );
+			array = transparentObjects;
+			index = ++ transparentObjectsLastIndex;
 
 		} else {
 
-			opaqueObjects.push( renderItem );
+			array = opaqueObjects;
+			index = ++ opaqueObjectsLastIndex;
+
+		}
+
+		// recycle existing render item or grow the array
+
+		var renderItem = array[ index ];
+
+		if ( renderItem !== undefined ) {
+
+			renderItem.id = object.id;
+			renderItem.object = object;
+			renderItem.geometry = geometry;
+			renderItem.material = material;
+			renderItem.z = _vector3.z;
+			renderItem.group = group;
+
+		} else {
+
+			renderItem = {
+				id: object.id,
+				object: object,
+				geometry: geometry,
+				material: material,
+				z: _vector3.z,
+				group: group
+			};
+
+			// assert( index === array.length );
+			array.push( renderItem );
 
 		}
 
