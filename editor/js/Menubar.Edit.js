@@ -18,27 +18,65 @@ Menubar.Edit = function ( editor ) {
 
 	// Undo
 
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Undo' );
-	option.onClick( function () {
+	var undo = new UI.Panel();
+	undo.setClass( 'option' );
+	undo.setTextContent( 'Undo (Ctrl+Z)' );
+	undo.onClick( function () {
 
-		editor.history.undo();
+		editor.undo();
 
 	} );
-	options.add( option );
+	options.add( undo );
 
 	// Redo
 
+	var redo = new UI.Panel();
+	redo.setClass( 'option' );
+	redo.setTextContent( 'Redo (Ctrl+Shift+Z)' );
+	redo.onClick( function () {
+
+		editor.redo();
+
+	} );
+	options.add( redo );
+
+	// Clear History
+
 	var option = new UI.Panel();
 	option.setClass( 'option' );
-	option.setTextContent( 'Redo' );
+	option.setTextContent( 'Clear History' );
 	option.onClick( function () {
 
-		editor.history.redo();
+		if ( confirm( 'The Undo/Redo History will be cleared. Are you sure?' ) ) {
+
+			editor.history.clear();
+
+		}
 
 	} );
 	options.add( option );
+
+
+	editor.signals.historyChanged.add( function () {
+
+		var history = editor.history;
+
+		undo.setClass( 'option' );
+		redo.setClass( 'option' );
+
+		if ( history.undos.length == 0 ) {
+
+			undo.setClass( 'inactive' );
+
+		}
+
+		if ( history.redos.length == 0 ) {
+
+			redo.setClass( 'inactive' );
+
+		}
+
+	} );
 
 	// ---
 
@@ -57,7 +95,7 @@ Menubar.Edit = function ( editor ) {
 
 		object = object.clone();
 
-		editor.addObject( object );
+		editor.execute( new CmdAddObject( object ) );
 		editor.select( object );
 
 	} );
@@ -75,7 +113,9 @@ Menubar.Edit = function ( editor ) {
 		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
 		var parent = object.parent;
-		editor.removeObject( object );
+		if ( parent === undefined ) return; // avoid deleting the camera or scene
+
+		editor.execute( new CmdRemoveObject( object ) );
 		editor.select( parent );
 
 	} );

@@ -40,7 +40,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Group();
 		mesh.name = 'Group ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
+		editor.execute( new CmdAddObject( mesh ) );
 		editor.select( mesh );
 
 	} );
@@ -68,7 +68,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, material );
 		mesh.name = 'Plane ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
+		editor.execute( new CmdAddObject( mesh ) );
 		editor.select( mesh );
 
 	} );
@@ -93,7 +93,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Box ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
+		editor.execute( new CmdAddObject( mesh ) );
 		editor.select( mesh );
 
 	} );
@@ -113,7 +113,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Circle ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
+		editor.execute( new CmdAddObject( mesh ) );
 		editor.select( mesh );
 
 	} );
@@ -137,7 +137,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Cylinder ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
+		editor.execute( new CmdAddObject( mesh ) );
 		editor.select( mesh );
 
 	} );
@@ -162,7 +162,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Sphere ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
+		editor.execute( new CmdAddObject( mesh ) );
 		editor.select( mesh );
 
 	} );
@@ -182,7 +182,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Icosahedron ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
+		editor.execute( new CmdAddObject( mesh ) );
 		editor.select( mesh );
 
 	} );
@@ -205,7 +205,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Torus ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
+		editor.execute( new CmdAddObject( mesh ) );
 		editor.select( mesh );
 
 	} );
@@ -230,7 +230,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'TorusKnot ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
+		editor.execute( new CmdAddObject( mesh ) );
 		editor.select( mesh );
 
 	} );
@@ -246,7 +246,7 @@ Menubar.Add = function ( editor ) {
 		var sprite = new THREE.Sprite( new THREE.SpriteMaterial() );
 		sprite.name = 'Sprite ' + ( ++ meshCount );
 
-		editor.addObject( sprite );
+		editor.execute( new CmdAddObject( sprite ) );
 		editor.select( sprite );
 
 	} );
@@ -270,7 +270,7 @@ Menubar.Add = function ( editor ) {
 		var light = new THREE.PointLight( color, intensity, distance );
 		light.name = 'PointLight ' + ( ++ lightCount );
 
-		editor.addObject( light );
+		editor.execute( new CmdAddObject( light ) );
 		editor.select( light );
 
 	} );
@@ -295,7 +295,7 @@ Menubar.Add = function ( editor ) {
 
 		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
-		editor.addObject( light );
+		editor.execute( new CmdAddObject( light ) );
 		editor.select( light );
 
 	} );
@@ -317,7 +317,7 @@ Menubar.Add = function ( editor ) {
 
 		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
-		editor.addObject( light );
+		editor.execute( new CmdAddObject( light ) );
 		editor.select( light );
 
 	} );
@@ -339,7 +339,7 @@ Menubar.Add = function ( editor ) {
 
 		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
-		editor.addObject( light );
+		editor.execute( new CmdAddObject( light ) );
 		editor.select( light );
 
 	} );
@@ -357,7 +357,7 @@ Menubar.Add = function ( editor ) {
 		var light = new THREE.AmbientLight( color );
 		light.name = 'AmbientLight ' + ( ++ lightCount );
 
-		editor.addObject( light );
+		editor.execute( new CmdAddObject( light ) );
 		editor.select( light );
 
 	} );
@@ -377,7 +377,7 @@ Menubar.Add = function ( editor ) {
 		var camera = new THREE.PerspectiveCamera( 50, 1, 1, 10000 );
 		camera.name = 'PerspectiveCamera ' + ( ++ cameraCount );
 
-		editor.addObject( camera );
+		editor.execute( new CmdAddObject( camera ) );
 		editor.select( camera );
 
 	} );

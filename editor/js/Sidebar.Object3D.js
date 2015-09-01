@@ -41,15 +41,15 @@ Sidebar.Object3D = function ( editor ) {
 		switch ( this.getValue() ) {
 
 			case 'Reset Position':
-				object.position.set( 0, 0, 0 );
+				editor.execute( new CmdSetPosition( object, new THREE.Vector3( 0, 0, 0 ) ) );
 				break;
 
 			case 'Reset Rotation':
-				object.rotation.set( 0, 0, 0 );
+				editor.execute( new CmdSetRotation( object, new THREE.Euler( 0, 0, 0 ) ) );
 				break;
 
 			case 'Reset Scale':
-				object.scale.set( 1, 1, 1 );
+				editor.execute( new CmdSetScale( object, new THREE.Vector3( 1, 1, 1 ) ) );
 				break;
 
 		}
@@ -71,7 +71,7 @@ Sidebar.Object3D = function ( editor ) {
 
 		objectUUID.setValue( THREE.Math.generateUUID() );
 
-		editor.selected.uuid = objectUUID.getValue();
+		editor.execute( new CmdSetUuid( editor.selected, objectUUID.getValue() ) );
 
 	} );
 
@@ -86,7 +86,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectNameRow = new UI.Panel();
 	var objectName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-		editor.nameObject( editor.selected, objectName.getValue() );
+		editor.execute( new CmdSetValue( editor.selected, 'name', objectName.getValue() ) );
 
 	} );
 
@@ -342,96 +342,114 @@ Sidebar.Object3D = function ( editor ) {
 
 		if ( object !== null ) {
 
-			if ( object.parent !== null ) {
+			if ( object.parent !== undefined ) {
 
 				var newParentId = parseInt( objectParent.getValue() );
 
 				if ( object.parent.id !== newParentId && object.id !== newParentId ) {
 
-					editor.moveObject( object, editor.scene.getObjectById( newParentId ) );
+					editor.execute( new CmdMoveObject( object, editor.scene.getObjectById( newParentId ) ) );
 
 				}
 
 			}
 
-			object.position.x = objectPositionX.getValue();
-			object.position.y = objectPositionY.getValue();
-			object.position.z = objectPositionZ.getValue();
+			var newPosition = new THREE.Vector3( objectPositionX.getValue(), objectPositionY.getValue(), objectPositionZ.getValue() );
+			if ( object.position.distanceTo( newPosition ) >= 0.01 ) {
 
-			object.rotation.x = objectRotationX.getValue();
-			object.rotation.y = objectRotationY.getValue();
-			object.rotation.z = objectRotationZ.getValue();
+				editor.execute( new CmdSetPosition( object, newPosition ) );
 
-			object.scale.x = objectScaleX.getValue();
-			object.scale.y = objectScaleY.getValue();
-			object.scale.z = objectScaleZ.getValue();
+			}
 
-			if ( object.fov !== undefined ) {
+			var newRotation = new THREE.Euler( objectRotationX.getValue(), objectRotationY.getValue(), objectRotationZ.getValue() );
+			if ( object.rotation.toVector3().distanceTo( newRotation.toVector3() ) >= 0.01 ) {
 
-				object.fov = objectFov.getValue();
+				editor.execute( new CmdSetRotation( object, newRotation ) );
+
+			}
+
+			var newScale = new THREE.Vector3( objectScaleX.getValue(), objectScaleY.getValue(), objectScaleZ.getValue() );
+			if ( object.scale.distanceTo( newScale ) >= 0.01 ) {
+
+				editor.execute( new CmdSetScale( object, newScale ) );
+
+			}
+
+			if ( object.fov !== undefined && Math.abs( object.fov - objectFov.getValue() ) >= 0.01 ) {
+
+				editor.execute( new CmdSetValue( object, 'fov', objectFov.getValue() ) );
 				object.updateProjectionMatrix();
 
 			}
 
-			if ( object.near !== undefined ) {
+			if ( object.near !== undefined && Math.abs( object.near - objectNear.getValue() ) >= 0.01 ) {
 
-				object.near = objectNear.getValue();
-
-			}
-
-			if ( object.far !== undefined ) {
-
-				object.far = objectFar.getValue();
+				editor.execute( new CmdSetValue( object, 'near', objectNear.getValue() ) );
 
 			}
 
-			if ( object.intensity !== undefined ) {
+			if ( object.far !== undefined && Math.abs( object.far - objectFar.getValue() ) >= 0.01 ) {
 
-				object.intensity = objectIntensity.getValue();
-
-			}
-
-			if ( object.color !== undefined ) {
-
-				object.color.setHex( objectColor.getHexValue() );
+				editor.execute( new CmdSetValue( object, 'far', objectFar.getValue() ) );
 
 			}
 
-			if ( object.groundColor !== undefined ) {
+			if ( object.intensity !== undefined && Math.abs( object.intensity - objectIntensity.getValue() ) >= 0.01 ) {
 
-				object.groundColor.setHex( objectGroundColor.getHexValue() );
-
-			}
-
-			if ( object.distance !== undefined ) {
-
-				object.distance = objectDistance.getValue();
+				editor.execute( new CmdSetValue( object, 'intensity', objectIntensity.getValue() ) );
 
 			}
 
-			if ( object.angle !== undefined ) {
+			if ( object.color !== undefined && object.color.getHex() !== objectColor.getHexValue() ) {
 
-				object.angle = objectAngle.getValue();
-
-			}
-
-			if ( object.exponent !== undefined ) {
-
-				object.exponent = objectExponent.getValue();
+				editor.execute( new CmdSetColor( object, 'color', objectColor.getHexValue() ) );
 
 			}
 
-			if ( object.decay !== undefined ) {
+			if ( object.groundColor !== undefined && object.groundColor.getHex() !== objectGroundColor.getHexValue() ) {
 
-				object.decay = objectDecay.getValue();
+				editor.execute( new CmdSetColor( object, 'groundColor', objectGroundColor.getHexValue() ) );
 
 			}
 
-			object.visible = objectVisible.getValue();
+			if ( object.distance !== undefined && Math.abs( object.distance - objectDistance.getValue() ) >= 0.01 ) {
+
+				editor.execute( new CmdSetValue( object, 'distance', objectDistance.getValue() ) );
+
+			}
+
+			if ( object.angle !== undefined && Math.abs( object.angle - objectAngle.getValue() ) >= 0.01 ) {
+
+				editor.execute( new CmdSetValue( object, 'angle', objectAngle.getValue() ) );
+
+			}
+
+			if ( object.exponent !== undefined && Math.abs( object.exponent - objectExponent.getValue() ) >= 0.01 ) {
+
+				editor.execute( new CmdSetValue( object, 'exponent', objectExponent.getValue() ) );
+
+			}
+
+			if ( object.decay !== undefined && Math.abs( object.decay - objectDecay.getValue() ) >= 0.01 ) {
+
+				editor.execute( new CmdSetValue( object, 'decay', objectDecay.getValue() ) );
+
+			}
+
+			if ( object.visible !== objectVisible.getValue() ) {
+
+				editor.execute( new CmdToggleBoolean( object, 'visible' ) );
+
+			}
 
 			try {
 
-				object.userData = JSON.parse( objectUserData.getValue() );
+				var userData = JSON.parse( objectUserData.getValue() );
+				if ( JSON.stringify( object.userData ) != JSON.stringify( userData ) ) {
+
+					editor.execute( new CmdSetValue( object, 'userData', userData ) );
+
+				}
 
 			} catch ( exception ) {
 
@@ -521,6 +539,14 @@ Sidebar.Object3D = function ( editor ) {
 	} );
 
 	signals.objectChanged.add( function ( object ) {
+
+		if ( object !== editor.selected ) return;
+
+		updateUI( object );
+
+	} );
+
+	signals.updateSidebar.add( function ( object ) {
 
 		if ( object !== editor.selected ) return;
 

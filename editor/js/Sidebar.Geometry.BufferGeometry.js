@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.BufferGeometry = function ( signals ) {
+Sidebar.Geometry.BufferGeometry = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ThreeJS Unit Tests - Using Files in /editor</title>
+  <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.18.0.css">
+</head>
+<body>
+<div id="qunit"></div>
+<script src="../unit/qunit-1.18.0.js"></script>
+
+<!-- add sources to test below -->
+<script src="../../build/three.min.js"></script>
+
+<script src="../../editor/js/libs/codemirror/codemirror.js"></script>
+<script src="../../editor/js/libs/codemirror/mode/javascript.js"></script>
+<script src="../../editor/js/libs/esprima.js"></script>
+
+<script src="../../editor/js/libs/jszip.min.js"></script>
+<script src="../../editor/js/libs/sortable.min.js"></script>
+<script src="../../editor/js/libs/signals.min.js"></script>
+<script src="../../editor/js/libs/ui.js"></script>
+<script src="../../editor/js/libs/ui.three.js"></script>
+
+<script src="../../editor/js/libs/app.js"></script>
+<script src="../../editor/js/Player.js"></script>
+<script src="../../editor/js/Script.js"></script>
+
+<!--
+<script src="../examples/js/effects/VREffect.js"></script>
+<script src="../examples/js/controls/VRControls.js"></script>
+-->
+
+<script src="../../editor/js/Storage.js"></script>
+
+<script src="../../editor/js/Editor.js"></script>
+<script src="../../editor/js/Config.js"></script>
+<script src="../../editor/js/Loader.js"></script>
+<script src="../../editor/js/Menubar.js"></script>
+<script src="../../editor/js/Menubar.File.js"></script>
+<script src="../../editor/js/Menubar.Edit.js"></script>
+<script src="../../editor/js/Menubar.Add.js"></script>
+<script src="../../editor/js/Menubar.Play.js"></script>
+<script src="../../editor/js/Menubar.View.js"></script>
+<script src="../../editor/js/Menubar.Examples.js"></script>
+<script src="../../editor/js/Menubar.Help.js"></script>
+<script src="../../editor/js/Menubar.Status.js"></script>
+<script src="../../editor/js/Sidebar.js"></script>
+<script src="../../editor/js/Sidebar.Project.js"></script>
+<script src="../../editor/js/Sidebar.Scene.js"></script>
+<script src="../../editor/js/Sidebar.Object3D.js"></script>
+<script src="../../editor/js/Sidebar.Animation.js"></script>
+<script src="../../editor/js/Sidebar.Geometry.js"></script>
+<script src="../../editor/js/Sidebar.Geometry.Geometry.js"></script>
+<script src="../../editor/js/Sidebar.Geometry.BufferGeometry.js"></script>
+<script src="../../editor/js/Sidebar.Geometry.Modifiers.js"></script>
+<script src="../../editor/js/Sidebar.Geometry.BoxGeometry.js"></script>
+<script src="../../editor/js/Sidebar.Geometry.CircleGeometry.js"></script>
+<script src="../../editor/js/Sidebar.Geometry.CylinderGeometry.js"></script>
+<script src="../../editor/js/Sidebar.Geometry.IcosahedronGeometry.js"></script>
+<script src="../../editor/js/Sidebar.Geometry.PlaneGeometry.js"></script>
+<script src="../../editor/js/Sidebar.Geometry.SphereGeometry.js"></script>
+<script src="../../editor/js/Sidebar.Geometry.TorusGeometry.js"></script>
+<script src="../../editor/js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
+<script src="../../editor/js/Sidebar.Material.js"></script>
+<script src="../../editor/js/Sidebar.Script.js"></script>
+<script src="../../editor/js/Toolbar.js"></script>
+<script src="../../editor/js/Viewport.js"></script>
+<script src="../../editor/js/Viewport.Info.js"></script>
+<script src="../../editor/js/History.js"></script>
+
+<!-- command object classes -->
+<script src="../../editor/js/Cmd.js"></script>
+<script src="../../editor/js/CmdAddObject.js"></script>
+<script src="../../editor/js/CmdAddScript.js"></script>
+<script src="../../editor/js/CmdMoveObject.js"></script>
+<script src="../../editor/js/CmdRemoveObject.js"></script>
+<script src="../../editor/js/CmdRemoveScript.js"></script>
+<script src="../../editor/js/CmdSetColor.js"></script>
+<script src="../../editor/js/CmdSetPosition.js"></script>
+<script src="../../editor/js/CmdSetRotation.js"></script>
+<script src="../../editor/js/CmdSetScale.js"></script>
+<script src="../../editor/js/CmdSetScriptName.js"></script>
+<script src="../../editor/js/CmdSetScriptSource.js"></script>
+<script src="../../editor/js/CmdSetUuid.js"></script>
+<script src="../../editor/js/CmdSetValue.js"></script>
+<script src="../../editor/js/CmdToggleBoolean.js"></script>
+
+
+<!-- add class-based unit tests below -->
+<script src="editor/CommonUtilities.js"></script>
+
+<!-- Undo-Redo tests -->
+<script src="editor/TestCmdAddObject.js"></script>
+<script src="editor/TestCmdAddScript.js"></script>
+<script src="editor/TestCmdMoveObject.js"></script>
+<script src="editor/TestCmdRemoveObject.js"></script>
+<script src="editor/TestCmdRemoveScript.js"></script>
+<script src="editor/TestCmdSetColor.js"></script>
+<script src="editor/TestCmdSetPosition.js"></script>
+<script src="editor/TestCmdSetRotation.js"></script>
+<script src="editor/TestCmdSetScale.js"></script>
+<script src="editor/TestCmdSetScriptName.js"></script>
+<script src="editor/TestCmdSetScriptSource.js"></script>
+<script src="editor/TestCmdSetUuid.js"></script>
+<script src="editor/TestCmdSetValue.js"></script>
+<script src="editor/TestCmdToggleBoolean.js"></script>
+<script src="editor/TestNestedDoUndoRedo.js"></script>
+
+</body>
+</html>

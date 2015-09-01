@@ -114,9 +114,30 @@
 		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
 		<script src="js/Sidebar.Material.js"></script>
 		<script src="js/Sidebar.Script.js"></script>
+		<script src="js/Sidebar.History.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
+		<script src="js/Cmd.js"></script>
+		<script src="js/CmdAddObject.js"></script>
+		<script src="js/CmdRemoveObject.js"></script>
+		<script src="js/CmdMoveObject.js"></script>
+		<script src="js/CmdSetPosition.js"></script>
+		<script src="js/CmdSetRotation.js"></script>
+		<script src="js/CmdSetScale.js"></script>
+		<script src="js/CmdToggleBoolean.js"></script>
+		<script src="js/CmdSetValue.js"></script>
+		<script src="js/CmdSetUuid.js"></script>
+		<script src="js/CmdSetColor.js"></script>
+		<script src="js/CmdSetGeometry.js"></script>
+		<script src="js/CmdSetGeometryValue.js"></script>
+		<script src="js/CmdMultiCmds.js"></script>
+		<script src="js/CmdAddScript.js"></script>
+		<script src="js/CmdRemoveScript.js"></script>
+		<script src="js/CmdSetScriptName.js"></script>
+		<script src="js/CmdSetScriptSource.js"></script>
+		<script src="js/CmdSetMaterialValue.js"></script>
+		<script src="js/CmdSetScene.js"></script>
 
 		<script>
 
@@ -218,6 +239,7 @@
 				signals.materialChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );
 				signals.scriptChanged.add( saveState );
+				signals.historyChanged.add( saveState );
 
 				/*
 				var showDialog = function ( content ) {
@@ -270,6 +292,19 @@
 						editor.removeObject( object );
 						editor.select( parent );
 
+						break;
+						
+					case 90: // Register Ctrl-Z for Undo, Ctrl-Shift-Z for Redo
+
+						if ( event.ctrlKey && event.shiftKey ) {
+
+							editor.redo();
+
+						} else if ( event.ctrlKey ) {
+
+							editor.undo();
+
+						}
 						break;
 
 				}

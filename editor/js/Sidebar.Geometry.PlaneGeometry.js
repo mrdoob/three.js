@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
+Sidebar.Geometry.PlaneGeometry = function ( editor, object ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 
@@ -52,19 +54,13 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 	//
 
 	function update() {
-		
-		object.geometry.dispose();
 
-		object.geometry = new THREE.PlaneGeometry(
+		editor.execute( new CmdSetGeometry( object, new THREE.PlaneGeometry(
 			width.getValue(),
 			height.getValue(),
 			widthSegments.getValue(),
 			heightSegments.getValue()
-		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.geometryChanged.dispatch( object );
+		) ) );
 
 	}
 

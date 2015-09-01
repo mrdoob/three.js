@@ -48,22 +48,29 @@ Sidebar.Geometry = function ( editor ) {
 
 				var offset = geometry.center();
 
-				object.position.sub( offset );
+				var newPosition = object.position.clone();
+				newPosition.sub( offset );
+				editor.execute( new CmdSetPosition( object, newPosition ) );
 
-				editor.signals.geometryChanged.dispatch( geometry );
+				editor.signals.geometryChanged.dispatch( object );
 				editor.signals.objectChanged.dispatch( object );
 
 				break;
 
 			case 'Flatten':
 
-				geometry.applyMatrix( object.matrix );
+				var newGeometry = geometry.clone();
+				newGeometry.uuid = geometry.uuid;
+				newGeometry.applyMatrix( object.matrix );
 
-				object.position.set( 0, 0, 0 );
-				object.rotation.set( 0, 0, 0 );
-				object.scale.set( 1, 1, 1 );
+				var cmds = [ new CmdSetGeometry( object, newGeometry ),
+					new CmdSetPosition( object, new THREE.Vector3( 0, 0, 0 ) ),
+					new CmdSetRotation( object, new THREE.Euler( 0, 0, 0 ) ),
+					new CmdSetScale( object, new THREE.Vector3( 1, 1, 1 ) ) ];
 
-				editor.signals.geometryChanged.dispatch( geometry );
+				editor.execute( new CmdMultiCmds( cmds ) );
+
+				editor.signals.geometryChanged.dispatch( object );
 				editor.signals.objectChanged.dispatch( object );
 
 				break;
@@ -87,7 +94,7 @@ Sidebar.Geometry = function ( editor ) {
 
 		geometryUUID.setValue( THREE.Math.generateUUID() );
 
-		editor.selected.geometry.uuid = geometryUUID.getValue();
+		editor.execute( new CmdSetGeometryValue( editor.selected, 'uuid', geometryUUID.getValue() ) );
 
 	} );
 
@@ -102,7 +109,7 @@ Sidebar.Geometry = function ( editor ) {
 	var geometryNameRow = new UI.Panel();
 	var geometryName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-		editor.setGeometryName( editor.selected.geometry, geometryName.getValue() );
+		editor.execute( new CmdSetGeometryValue( editor.selected, 'name', geometryName.getValue() ) );
 
 	} );
 
@@ -113,11 +120,11 @@ Sidebar.Geometry = function ( editor ) {
 
 	// geometry
 
-	container.add( new Sidebar.Geometry.Geometry( signals ) );
+	container.add( new Sidebar.Geometry.Geometry( editor ) );
 
 	// buffergeometry
 
-	container.add( new Sidebar.Geometry.BufferGeometry( signals ) );
+	container.add( new Sidebar.Geometry.BufferGeometry( editor ) );
 
 	// parameters
 
@@ -148,11 +155,11 @@ Sidebar.Geometry = function ( editor ) {
 
 			if ( geometry.type === 'BufferGeometry' || geometry.type === 'Geometry' ) {
 
-				parameters.add( new Sidebar.Geometry.Modifiers( signals, object ) );
+				parameters.add( new Sidebar.Geometry.Modifiers( editor, object ) );
 
 			} else if ( Sidebar.Geometry[ geometry.type ] !== undefined ) {
 
-				parameters.add( new Sidebar.Geometry[ geometry.type ]( signals, object ) );
+				parameters.add( new Sidebar.Geometry[ geometry.type ]( editor, object ) );
 
 			}
 
@@ -166,6 +173,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	signals.objectSelected.add( build );
 	signals.geometryChanged.add( build );
+	signals.updateSidebar.add( build );
 
 	return container;
 

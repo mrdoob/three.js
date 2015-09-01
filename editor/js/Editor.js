@@ -62,7 +62,10 @@ var Editor = function () {
 		fogParametersChanged: new SIGNALS.Signal(),
 		windowResize: new SIGNALS.Signal(),
 
-		showGridChanged: new SIGNALS.Signal()
+		showGridChanged: new SIGNALS.Signal(),
+		updateSidebar: new SIGNALS.Signal(),
+		historyChanged: new SIGNALS.Signal(),
+		refreshScriptEditor: new SIGNALS.Signal()
 
 	};
 
@@ -430,6 +433,8 @@ Editor.prototype = {
 
 		this.deselect();
 
+		this.history.clear();
+
 		this.signals.editorCleared.dispatch();
 
 	},
@@ -461,6 +466,7 @@ Editor.prototype = {
 
 		this.setScene( loader.parse( json.scene ) );
 		this.scripts = json.scripts;
+		this.history.fromJSON( json.history );
 
 	},
 
@@ -473,9 +479,34 @@ Editor.prototype = {
 			},
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
-			scripts: this.scripts
+			scripts: this.scripts,
+			history: this.history.toJSON()
 
 		};
+
+	},
+
+	objectByUuid: function ( uuid ) {
+
+		return this.scene.getObjectByProperty( 'uuid', uuid, true );
+
+	},
+
+	execute: function ( command ) {
+
+		this.history.execute( command );
+
+	},
+
+	undo: function () {
+
+		this.history.undo();
+
+	},
+
+	redo: function () {
+
+		this.history.redo();
 
 	}
 

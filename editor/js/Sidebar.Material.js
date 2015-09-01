@@ -42,7 +42,7 @@ Sidebar.Material = function ( editor ) {
 	var materialNameRow = new UI.Panel();
 	var materialName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-		editor.setMaterialName( editor.selected.material, materialName.getValue() );
+		editor.execute( new CmdSetMaterialValue( editor.selected, 'name', materialName.getValue() ) );
 
 	} );
 
@@ -386,9 +386,9 @@ Sidebar.Material = function ( editor ) {
 
 		if ( material ) {
 
-			if ( material.uuid !== undefined ) {
+			if ( material.uuid !== undefined && material.uuid !== materialUUID.getValue() ) {
 
-				material.uuid = materialUUID.getValue();
+				editor.execute( new CmdSetMaterialValue( editor.selected, 'uuid', materialUUID.getValue() ) );
 
 			}
 

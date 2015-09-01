@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.Modifiers = function ( signals, object ) {
+Sidebar.Geometry.Modifiers = function ( editor, object ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel().setPaddingLeft( '90px' );
 
@@ -42,9 +44,7 @@ Sidebar.Geometry.Modifiers = function ( signals, object ) {
 
 			if ( confirm( 'Are you sure?' ) === false ) return;
 
-			object.geometry = new THREE.BufferGeometry().fromGeometry( object.geometry );
-
-			signals.geometryChanged.dispatch( object );
+			editor.execute( new CmdSetGeometry( object, new THREE.BufferGeometry().fromGeometry( object.geometry ) ) );
 
 		} );
 		container.add( button );

@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.Geometry = function ( signals ) {
+Sidebar.Geometry.Geometry = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 

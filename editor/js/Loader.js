@@ -22,7 +22,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.AWDLoader();
 					var scene = loader.parse( event.target.result );
 
-					editor.setScene( scene );
+					editor.execute( new CmdSetScene( editor.scene, scene ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -40,7 +40,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.BabylonLoader();
 					var scene = loader.parse( json );
 
-					editor.setScene( scene );
+					editor.execute( new CmdSetScene( editor.scene, scene ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -63,7 +63,7 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.addObject( mesh );
+					editor.execute( new CmdAddObject( mesh ) );
 					editor.select( mesh );
 
 				}, false );
@@ -92,7 +92,7 @@ var Loader = function ( editor ) {
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.name = filename;
 
-						editor.addObject( mesh );
+						editor.execute( new CmdAddObject( mesh ) );
 						editor.select( mesh );
 
 					} );
@@ -117,7 +117,7 @@ var Loader = function ( editor ) {
 
 					collada.scene.name = filename;
 
-					editor.addObject( collada.scene );
+					editor.execute( new CmdAddObject( collada.scene ) );
 					editor.select( collada.scene );
 
 				}, false );
@@ -198,7 +198,7 @@ var Loader = function ( editor ) {
 						var object = new THREE.MorphAnimMesh( geometry, material );
 						object.name = filename;
 
-						editor.addObject( object );
+						editor.execute( new CmdAddObject( object ) );
 						editor.select( object );
 
 					}, false );
@@ -216,7 +216,7 @@ var Loader = function ( editor ) {
 					var object = new THREE.OBJLoader().parse( contents );
 					object.name = filename;
 
-					editor.addObject( object );
+					editor.execute( new CmdAddObject( object ) );
 					editor.select( object );
 
 				}, false );
@@ -240,7 +240,7 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.addObject( mesh );
+					editor.execute( new CmdAddObject( mesh ) );
 					editor.select( mesh );
 
 				}, false );
@@ -264,7 +264,7 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.addObject( mesh );
+					editor.execute( new CmdAddObject( mesh ) );
 					editor.select( mesh );
 
 				}, false );
@@ -294,7 +294,7 @@ var Loader = function ( editor ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
 
-					editor.addObject( mesh );
+					editor.execute( new CmdAddObject( mesh ) );
 					editor.select( mesh );
 
 				}, false );
@@ -319,7 +319,7 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.addObject( mesh );
+					editor.execute( new CmdAddObject( mesh ) );
 					editor.select( mesh );
 
 				}, false );
@@ -336,7 +336,7 @@ var Loader = function ( editor ) {
 
 					var result = new THREE.VRMLLoader().parse( contents );
 
-					editor.setScene( result );
+					editor.execute( new CmdSetScene( editor.scene, result ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -380,7 +380,7 @@ var Loader = function ( editor ) {
 
 			var mesh = new THREE.Mesh( result );
 
-			editor.addObject( mesh );
+			editor.execute( new CmdAddObject( mesh ) );
 			editor.select( mesh );
 
 		} else if ( data.metadata.type.toLowerCase() === 'geometry' ) {
@@ -426,7 +426,7 @@ var Loader = function ( editor ) {
 
 			mesh.name = filename;
 
-			editor.addObject( mesh );
+			editor.execute( new CmdAddObject( mesh ) );
 			editor.select( mesh );
 
 		} else if ( data.metadata.type.toLowerCase() === 'object' ) {
@@ -436,11 +436,11 @@ var Loader = function ( editor ) {
 
 			if ( result instanceof THREE.Scene ) {
 
-				editor.setScene( result );
+				editor.execute( new CmdSetScene( editor.scene, result ) );
 
 			} else {
 
-				editor.addObject( result );
+				editor.execute( new CmdAddObject( result ) );
 				editor.select( result );
 
 			}
@@ -452,7 +452,7 @@ var Loader = function ( editor ) {
 			var loader = new THREE.SceneLoader();
 			loader.parse( data, function ( result ) {
 
-				editor.setScene( result.scene );
+				editor.execute( new CmdSetScene( editor.scene, result.scene ) );
 
 			}, '' );
 
