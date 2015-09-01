@@ -1775,7 +1775,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( capabilities.supportsBoneTextures && object.skeleton && object.skeleton.useVertexTexture ) {
+			if ( capabilities.floatVertexTextures && object.skeleton && object.skeleton.useVertexTexture ) {
 
 				if ( p_uniforms.boneTexture !== undefined ) {
 
@@ -3484,7 +3484,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function allocateBones ( object ) {
 
-		if ( capabilities.supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
+		if ( capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
 
 			return 1024;
 
