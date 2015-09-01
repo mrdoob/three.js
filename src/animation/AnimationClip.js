@@ -175,7 +175,7 @@ THREE.AnimationClip.FromImplicitMorphTargetAnimations = function( morphTargets, 
 
 };
 
-THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeName ) {
+THREE.AnimationClip.FromGeometryAnimation = function( animation, bones, nodeName ) {
 
 	if( ! animation ) {
 		console.error( "  no animation in JSONLoader data" );
@@ -208,13 +208,30 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeNa
 
 	};
 
-	var clipName = animation.name;
-	var duration = animation.length;
-	var fps = animation.fps;
-
 	var tracks = [];
 
-	var animationTracks = animation.hierarchy;
+	// new style morph animations
+	var re = /^morphTargets\[([\w\d\[\]\_. ]+)\]$/;
+	for( var name in animation ) {
+		// get any variables named morphTarget
+		var matches = re.exec(name);
+
+		if( ! matches ) continue;
+
+	    if (matches.index === re.lastIndex) {
+	        re.lastIndex++;
+	    }
+
+		var morphTargetName = matches[1];
+
+		tracks.push( new THREE.NumberKeyframeTrack( nodeName + '.morphTargetInfluence[' + morphTargetName + ']', animation[name] ) );
+
+	}
+
+	var clipName = animation.name || 'default';
+	var duration = animation.length || -1; // automatic length determination in AnimationClip.
+	var fps = animation.fps || 30;
+	var animationTracks = animation.hierarchy || [];
 
 	for ( var h = 0; h < animationTracks.length; h ++ ) {
 
@@ -295,6 +312,15 @@ THREE.AnimationClip.FromJSONLoaderAnimation = function( animation, bones, nodeNa
 			if( scaleTrack ) tracks.push( scaleTrack );
 
 		}
+	}
+
+
+	console.log( 'input animation', animation, 'resulting tracks', tracks );
+
+	if( tracks.length === 0 ) {
+
+		return null;
+
 	}
 
 	var clip = new THREE.AnimationClip( clipName, duration, tracks );

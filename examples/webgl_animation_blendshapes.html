@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - blendShapes + animation tracks [boxes]</title>
+		<title>three.js webgl - blendshapes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -39,7 +39,7 @@
 
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> webgl - clip system
-		- three gears
+		- blend shapes
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -125,9 +125,8 @@
 				//
 
 				var loader = new THREE.ObjectLoader();
-				loader.load( "models/json/three-gears-node-animation5.json", function ( loadedScene ) {
+				loader.load( "models/json/blendshape-animation.json", function ( loadedScene ) {
 
-					sceneAnimationClip = loadedScene.animationClips[0];
 					scene = loadedScene;
 					scene.add( camera );
 				

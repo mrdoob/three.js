@@ -422,11 +422,26 @@ THREE.JSONLoader.prototype = {
 
 			}
 
+			console.log( json );
 
-			// could change this to json.animations[0] or remove completely
+			var animations = [];
+			if( json.animations ) {
+				for( animationName in animations ) {
+					animations.push( animations[animationName] );
+				}
+			}
+			if( json.animation ) {
+				animations.push( json.animation );
+			}
 
-			geometry.animation = json.animation;
-			geometry.animations = json.animations;
+			for( var animation in animations ) {
+
+				var clip = THREE.AnimationClip.FromGeometryAnimation( animation );
+
+				if( clip ) {
+					geometry.animationClips.push( clip );		
+				}
+			}
 
 		};
 
