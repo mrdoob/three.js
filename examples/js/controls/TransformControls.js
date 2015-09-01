@@ -752,7 +752,7 @@
 
 		function onPointerDown( event ) {
 
-			if ( scope.object === undefined || _dragging === true ) return;
+			if ( scope.object === undefined || _dragging === true || event.button !== 0 ) return;
 
 			event.preventDefault();
 			event.stopPropagation();
@@ -798,7 +798,7 @@
 
 		function onPointerMove( event ) {
 
-			if ( scope.object === undefined || scope.axis === null || _dragging === false ) return;
+			if ( scope.object === undefined || scope.axis === null || _dragging === false || event.button !== 0 ) return;
 
 			event.preventDefault();
 			event.stopPropagation();
@@ -966,6 +966,8 @@
 		}
 
 		function onPointerUp( event ) {
+
+			if ( event.button !== 0 ) return;
 
 			if ( _dragging && ( scope.axis !== null ) ) {
 				mouseUpEvent.mode = _mode;
