@@ -1421,7 +1421,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var parameters = {
 
 			precision: precision,
-			supportsVertexTextures: capabilities.supportsVertexTextures,
+			supportsVertexTextures: capabilities.vertexTextures,
 
 			map: !! material.map,
 			envMap: !! material.envMap,
@@ -1449,7 +1449,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			skinning: material.skinning,
 			maxBones: maxBones,
-			useVertexTexture: capabilities.supportsFloatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture,
+			useVertexTexture: capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
@@ -3609,7 +3609,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.supportsVertexTextures = function () {
 
-		return capabilities.supportsVertexTextures;
+		return capabilities.vertexTextures;
 
 	};
 
