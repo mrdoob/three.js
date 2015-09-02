@@ -38,9 +38,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - clip system
-		- three gears
-		</div>
+		<a href="http://threejs.org" target="_blank">three.js</a> webgl - scene animation - <a href="https://clara.io/view/96106133-2e99-40cf-8abd-64defd153e61">Three Gears Scene</a> courtesy of David Sarno</div>
 
 		<script src="../build/three.min.js"></script>
 
@@ -125,9 +123,9 @@
 				//
 
 				var loader = new THREE.ObjectLoader();
-				loader.load( "models/json/three-gears-node-animation5.json", function ( loadedScene ) {
+				loader.load( "models/json/scene-animation.json", function ( loadedScene ) {
 
-					sceneAnimationClip = loadedScene.animationClips[0];
+					sceneAnimationClip = loadedScene.clips[0];
 					scene = loadedScene;
 					scene.add( camera );
 				

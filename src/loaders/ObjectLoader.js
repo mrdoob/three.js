@@ -626,7 +626,6 @@ THREE.ObjectLoader.prototype = {
 				}
 
 			}
-
 			if( data.clips ) {
 
 				// NOTE: only reading the first clip if it exists.  We can add multiple clip support in the future with this design.
@@ -640,10 +639,8 @@ THREE.ObjectLoader.prototype = {
 
 					for( var i = 0; i < dataTracks.length; i ++ ) {
 
-						console.log( dataTracks[i] );
 						var track = THREE.KeyframeTrack.parse( dataTracks[i] ).scale( fpsToSeconds );
 						track.name = object.uuid + '.' + track.name;
-						console.log( track );
 						tracks.push( track );
 						
 					}
