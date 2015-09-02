@@ -1,11 +1,11 @@
-THREE.WebGLCapabilities = function( gl, extensions, parameters ) {
+THREE.WebGLCapabilities = function ( gl, extensions, parameters ) {
 
-	this.getMaxPrecision = function ( precision ) {
+	function getMaxPrecision( precision ) {
 
 		if ( precision === 'highp' ) {
 
 			if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.HIGH_FLOAT ).precision > 0 &&
-			gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.HIGH_FLOAT ).precision > 0 ) {
+			     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.HIGH_FLOAT ).precision > 0 ) {
 
 				return 'highp';
 
@@ -18,7 +18,7 @@ THREE.WebGLCapabilities = function( gl, extensions, parameters ) {
 		if ( precision === 'mediump' ) {
 
 			if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.MEDIUM_FLOAT ).precision > 0 &&
-			gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT ).precision > 0 ) {
+			     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT ).precision > 0 ) {
 
 				return 'mediump';
 
@@ -28,9 +28,10 @@ THREE.WebGLCapabilities = function( gl, extensions, parameters ) {
 
 		return 'lowp';
 
-	};
+	}
 
-	// GPU capabilities
+	this.getMaxPrecision = getMaxPrecision;
+
 	this.precision = parameters.precision !== undefined ? parameters.precision : 'highp',
 	this.logarithmicDepthBuffer = parameters.logarithmicDepthBuffer !== undefined ? parameters.logarithmicDepthBuffer : false;
 
@@ -44,12 +45,11 @@ THREE.WebGLCapabilities = function( gl, extensions, parameters ) {
 	this.maxVaryings = gl.getParameter( gl.MAX_VARYING_VECTORS );
 	this.maxFragmentUniforms = gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS );
 
-
 	this.vertexTextures = this.maxVertexTextures > 0;
 	this.floatFragmentTextures = !! extensions.get( 'OES_texture_float' );
 	this.floatVertexTextures = this.vertexTextures && this.floatFragmentTextures;
 
-	var _maxPrecision = this.getMaxPrecision( this.precision );
+	var _maxPrecision = getMaxPrecision( this.precision );
 
 	if ( _maxPrecision !== this.precision ) {
 
