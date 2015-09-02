@@ -47,7 +47,7 @@ THREE.WebGLCapabilities = function( gl, extensions, parameters ) {
 
 	this.vertexTextures = this.maxVertexTextures > 0;
 	this.floatFragmentTextures = !! extensions.get( 'OES_texture_float' );
-	this.floatVertexTextures = this.supportsVertexTextures && this.supportsFloatFragmentTextures;
+	this.floatVertexTextures = this.vertexTextures && this.floatFragmentTextures;
 
 	var _maxPrecision = this.getMaxPrecision( this.precision );
 
