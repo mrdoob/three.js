@@ -191,7 +191,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function checkEdge( edges, a, b ) {
 
-		if ( a > b ){
+		if ( a > b ) {
 
 			var tmp = a;
 			a = b;
@@ -201,12 +201,12 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		var list = edges[ a ];
 
-		if( list === undefined ){
+		if ( list === undefined ) {
 
 			edges[ a ] = [ b ];
 			return true;
 
-		}else if( list.indexOf( b ) === -1 ){
+		} else if ( list.indexOf( b ) === -1 ) {
 
 			list.push( b );
 			return true;
