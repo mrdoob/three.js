@@ -178,6 +178,7 @@ THREE.AnimationClip.FromImplicitMorphTargetAnimations = function( morphTargets, 
 // parse the standard JSON format for clips
 THREE.AnimationClip.parse = function( json ) {
 
+	optionalPrefix = optionalPrefix || "";
 	var name = json.name || "default";
 	var duration = json.duration || -1;
 	var fps = json.fps || 30;
@@ -187,7 +188,38 @@ THREE.AnimationClip.parse = function( json ) {
 
 	for( var i = 0; i < animationTracks.length; i ++ ) {
 
-		tracks.push( THREE.KeyframeTrack.parse( animationTracks[i] ).scale( 1 / fps ) );
+		var track = THREE.KeyframeTrack.parse( animationTracks[i] ).scale( 1 / fps );
+		tracks.push( track );
+
+	}
+
+	if( tracks.length === 0 ) return null;
+
+	return new THREE.AnimationClip( name, duration, tracks );
+
+};
+
+
+// parse the JSON format for THREE.Geometry clips
+THREE.AnimationClip.parseGeometryClip = function( json ) {
+
+	var name = json.name || "default";
+	var duration = json.duration || -1;
+	var fps = json.fps || 30;
+	var animationTracks = json.tracks || [];
+
+	var tracks = [];
+
+	for( var i = 0; i < animationTracks.length; i ++ ) {
+
+		var track = THREE.KeyframeTrack.parse( animationTracks[i] ).scale( 1 / fps );
+		if( track.name.indexOf('morphTargets') >= 0 ) {
+			track.name = track.name.replace('morphTargets', 'morphTargetInfluences' );
+		}
+		if( track.name.indexOf('.') !== 0 ) {
+			track.name = '.' + track.name;			
+		}
+		tracks.push( track );
 
 	}
 
@@ -321,7 +353,7 @@ THREE.AnimationClip.parseAnimationHierarchy = function( animation, bones, nodeNa
 	}
 
 
-	console.log( 'input animation', animation, 'resulting tracks', tracks );
+	//console.log( 'input animation', animation, 'resulting tracks', tracks );
 
 	if( tracks.length === 0 ) {
 

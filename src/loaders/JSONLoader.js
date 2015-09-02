@@ -429,8 +429,8 @@ THREE.JSONLoader.prototype = {
 
 			if( animation ) {
 
-				var clip = THREE.AnimationClip.parseAnimationHierarchy( animation );
-				if( clip ) this.clips.push( clip );
+				var clip = THREE.AnimationClip.parseAnimationHierarchy( animation, geometry.bones );
+				if( clip ) geometry.clips.push( clip );
 
 			}
 
@@ -439,8 +439,8 @@ THREE.JSONLoader.prototype = {
 
 			for( var i = 0; i < clips.length; i ++ ) {
 
-				var clip = THREE.AnimationClip.parse( clips[i] );
-				if( clip ) this.clips.push( clip );
+				var clip = THREE.AnimationClip.parseGeometryClip( clips[i] );
+				if( clip ) geometry.clips.push( clip );
 
 			}
 

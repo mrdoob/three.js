@@ -8,6 +8,7 @@
 
 THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 
+	if( clip === undefined ) throw new Error( 'clip is null' );
 	this.clip = clip;
 	this.startTime = startTime || 0;
 	this.timeScale = timeScale || 1;
