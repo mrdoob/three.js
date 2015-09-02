@@ -164,10 +164,10 @@ THREE.LOD.prototype.toJSON = function ( meta ) {
 
 		var level = levels[ i ];
 
-		data.object.levels.push({
-			distance: level.distance,
-			object: level.object.uuid
-		});
+		data.object.levels.push( {
+			object: level.object.uuid,
+			distance: level.distance
+		} );
 
 	}
 
