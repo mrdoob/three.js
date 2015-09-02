@@ -272,6 +272,12 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					default:
+
+						console.warn( 'THREE.ObjectLoader: Unsupported geometry type "' + data.type + '"' );
+
+						continue;
+
 				}
 
 				geometry.uuid = data.uuid;
