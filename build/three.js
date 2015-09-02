@@ -24261,13 +24261,29 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function checkEdge( edges, a, b ) {
 
-		var hash = a < b ? a + '_' + b : b + '_' + a;
+		if ( a > b ) {
 
-		if ( edges.hasOwnProperty( hash ) ) return false;
+			var tmp = a;
+			a = b;
+			b = tmp;
 
-		edges[ hash ] = 1;
+		}
 
-		return true;
+		var list = edges[ a ];
+
+		if ( list === undefined ) {
+
+			edges[ a ] = [ b ];
+			return true;
+
+		} else if ( list.indexOf( b ) === -1 ) {
+
+			list.push( b );
+			return true;
+
+		}
+
+		return false;
 
 	}
 
