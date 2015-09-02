@@ -191,13 +191,13 @@ def animated_xform(obj):
     while i < nb_curves:
         field_info = TRACKABLE_FIELDS.get(fcurves[i].data_path)
         if field_info:
-            nb_curves = field_info[1]
+            nb_curves_local = field_info[1]
             tracks.append({
                 constants.NAME: field_info[0],
                 constants.TYPE: field_info[2],
-                constants.KEYS: __parse_tracked_vector(fcurves, i, nb_curves)
+                constants.KEYS: __parse_tracked_vector(fcurves, i, nb_curves_local)
             })
-            i += nb_curves
+            i += nb_curves_local
         else:
             i += 1
 
