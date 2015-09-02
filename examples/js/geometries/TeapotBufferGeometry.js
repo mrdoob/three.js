@@ -26,7 +26,7 @@
  *
  * Note that the bottom (the last four patches) is not flat - blame Frank Crow, not me.
  *
- * The teapot should normally be rendered as a double sided object, since for some 
+ * The teapot should normally be rendered as a double sided object, since for some
  * patches both sides can be seen, e.g., the gap around the lid and inside the spout.
  *
  * Segments 'n' determines the number of triangles output.
@@ -505,13 +505,13 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 	var notDegenerate = function ( vtx1, vtx2, vtx3 ) {
 
 		// if any vertex matches, return false
-		return ! ( ( ( vertices[ vtx1 * 3 ]     === vertices[ vtx2 * 3 ] ) && 
+		return ! ( ( ( vertices[ vtx1 * 3 ]     === vertices[ vtx2 * 3 ] ) &&
 					 ( vertices[ vtx1 * 3 + 1 ] === vertices[ vtx2 * 3 + 1 ] ) &&
 					 ( vertices[ vtx1 * 3 + 2 ] === vertices[ vtx2 * 3 + 2 ] ) ) ||
-				   ( ( vertices[ vtx1 * 3 ]     === vertices[ vtx3 * 3 ] ) && 
+				   ( ( vertices[ vtx1 * 3 ]     === vertices[ vtx3 * 3 ] ) &&
 					 ( vertices[ vtx1 * 3 + 1 ] === vertices[ vtx3 * 3 + 1 ] ) &&
 					 ( vertices[ vtx1 * 3 + 2 ] === vertices[ vtx3 * 3 + 2 ] ) ) ||
-				   ( ( vertices[ vtx2 * 3 ]     === vertices[ vtx3 * 3 ] ) && 
+				   ( ( vertices[ vtx2 * 3 ]     === vertices[ vtx3 * 3 ] ) &&
 					 ( vertices[ vtx2 * 3 + 1 ] === vertices[ vtx3 * 3 + 1 ] ) &&
 					 ( vertices[ vtx2 * 3 + 2 ] === vertices[ vtx3 * 3 + 2 ] ) ) );
 
@@ -721,7 +721,7 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 
 	}
 
-	this.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
+	this.addIndex( new THREE.BufferAttribute( indices, 1 ) );
 	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
