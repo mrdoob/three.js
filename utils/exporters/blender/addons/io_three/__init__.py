@@ -38,7 +38,7 @@ logging.basicConfig(
 
 bl_info = {
     'name': "Three.js Format",
-    'author': "repsac, mrdoob, yomotsu, mpk, jpweeks, rkusa, tschw",
+    'author': "repsac, mrdoob, yomotsu, mpk, jpweeks, rkusa, tschw, jackcaron, bhouston",
     'version': (1, 5, 0),
     'blender': (2, 74, 0),
     'location': "File > Export",
