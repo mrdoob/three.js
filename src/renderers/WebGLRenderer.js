@@ -2858,6 +2858,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 
 		if ( extension ) {
+
 			if ( texture.type === THREE.FloatType && extensions.get( 'OES_texture_float_linear' ) === null ) return;
 			if ( texture.type === THREE.HalfFloatType && extensions.get( 'OES_texture_half_float_linear' ) === null ) return;
 
