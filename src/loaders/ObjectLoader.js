@@ -626,22 +626,16 @@ THREE.ObjectLoader.prototype = {
 
 			if ( data.type === 'LOD' ) {
 
-				for ( var l = 0; l < data.levels.length; l ++ ) {
+				var levels = data.levels;
 
-					var level = data.levels[l];
+				for ( var l = 0; l < levels.length; l ++ ) {
 
-					for ( var c = 0; c < object.children.length; c ++ ) {
+					var level = levels[ l ];
+					var child = object.getObjectByProperty( 'uuid', level.object );
 
-						var child = object.children[c];
+					if ( child !== undefined ) {
 
-						if ( child.uuid === level.object ) {
-
-							object.levels.push({
-								distance: level.distance,
-								object: child
-							});
-
-						}
+						object.addLevel( child, level.distance );
 
 					}
 
