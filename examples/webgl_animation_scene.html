@@ -82,7 +82,7 @@
 
 				scene = new THREE.Scene();
 
-				scene.fog = new THREE.Fog( 0x000000, 2000, 10000 );
+				scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
 
 				//scene.add( camera );
 
@@ -128,7 +128,8 @@
 					sceneAnimationClip = loadedScene.clips[0];
 					scene = loadedScene;
 					scene.add( camera );
-				
+					scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
+		
 					mixer = new THREE.AnimationMixer( scene );
 			
 					mixer.addAction( new THREE.AnimationAction( sceneAnimationClip, 0, 1, 1, true ) );
