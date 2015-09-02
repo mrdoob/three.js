@@ -209,9 +209,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 					var groups = geometry.groups;
 					var materials = material.materials;
 
-					for ( var j = 0, jl = groups.length; j < jl; j ++ ) {
+					for ( var k = 0, kl = groups.length; k < kl; k ++ ) {
 
-						var group = groups[ j ];
+						var group = groups[ k ];
 						var groupMaterial = materials[ group.materialIndex ];
 
 						if ( groupMaterial.visible === true ) {
