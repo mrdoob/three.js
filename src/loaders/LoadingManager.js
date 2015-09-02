@@ -12,9 +12,23 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 	this.onProgress = onProgress;
 	this.onError = onError;
 
+	this.items = {};
+
 	this.itemStart = function ( url ) {
 
 		itemsTotal ++;
+
+		if( this.items[url] === undefined ) {
+
+			this.items[url] = {
+				numStarts: 0,
+				numLoaded: 0,
+				numFails: 0
+			};
+
+		}
+
+		this.items[url].numStarts ++;
 
 		if ( isLoading === false ) {
 
@@ -33,6 +47,8 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 	this.itemEnd = function ( url ) {
 
 		itemsLoaded ++;
+
+		this.items[url].numLoaded ++;
 
 		if ( scope.onProgress !== undefined ) {
 
@@ -57,6 +73,8 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 	this.itemFailed = function ( url ) {
 
 		itemsFailed ++;
+
+		this.items[url].numFails ++;
 	
 		if ( scope.onError !== undefined ) {
 
