@@ -44,7 +44,6 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -136,12 +135,6 @@
 
 				} );
 
-				// GUI
-
-				initGUI();
-
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -158,20 +151,6 @@
 
 			}
 
-			function initGUI() {
-
-				var API = {
-					'show model'    : true,
-					'show skeleton' : false
-				};
-
-				var gui = new dat.GUI();
-
-				gui.add( API, 'show model' ).onChange( function() { mesh.visible = API[ 'show model' ]; } );
-
-				gui.add( API, 'show skeleton' ).onChange( function() { helper.visible = API[ 'show skeleton' ]; } );
-
-			}
 
 			function onDocumentMouseMove( event ) {
 
