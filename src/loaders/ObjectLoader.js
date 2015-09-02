@@ -251,6 +251,15 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'TextGeometry':
+
+						geometry = new THREE.TextGeometry(
+							data.text,
+							data.data
+						);
+
+						break;
+
 					case 'BufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
@@ -260,15 +269,6 @@ THREE.ObjectLoader.prototype = {
 					case 'Geometry':
 
 						geometry = geometryLoader.parse( data.data, this.texturePath ).geometry;
-
-						break;
-
-					case 'TextGeometry':
-
-						geometry = new THREE.TextGeometry(
-							data.text,
-							data.data
-						);
 
 						break;
 
