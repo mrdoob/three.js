@@ -352,9 +352,6 @@ THREE.AnimationClip.parseAnimationHierarchy = function( animation, bones, nodeNa
 		}
 	}
 
-
-	//console.log( 'input animation', animation, 'resulting tracks', tracks );
-
 	if( tracks.length === 0 ) {
 
 		return null;
