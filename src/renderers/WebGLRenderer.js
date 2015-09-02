@@ -194,10 +194,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	var extensions = new THREE.WebGLExtensions( _gl );
-	var capabilities = new THREE.WebGLCapabilities(_gl, extensions, parameters )
-	
-	this.capabilities = capabilities;
-	
+
 	extensions.get( 'OES_texture_float' );
 	extensions.get( 'OES_texture_float_linear' );
 	extensions.get( 'OES_texture_half_float' );
@@ -210,7 +207,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		THREE.BufferGeometry.MaxIndex = 4294967296;
 
 	}
-	
+
+	var capabilities = new THREE.WebGLCapabilities( _gl, extensions, parameters );
+
 	var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
 	var properties = new THREE.WebGLProperties();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
@@ -259,6 +258,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	setDefaultGLState();
 
 	this.context = _gl;
+	this.capabilities = capabilities;
 	this.extensions = extensions;
 	this.state = state;
 
