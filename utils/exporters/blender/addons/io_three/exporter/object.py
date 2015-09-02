@@ -46,8 +46,10 @@ class Object(base_classes.BaseNode):
         self[constants.COLOR] = api.light.color(self.data)
         self[constants.INTENSITY] = api.light.intensity(self.data)
 
-        if self[constants.TYPE] != constants.DIRECTIONAL_LIGHT:
-            self[constants.DISTANCE] = api.light.distance(self.data)
+        # Commented out because Blender's distance is not a cutoff value.
+        #if self[constants.TYPE] != constants.DIRECTIONAL_LIGHT:
+        #    self[constants.DISTANCE] = api.light.distance(self.data)
+        self[constants.DISTANCE] = 0;
 
         if self[constants.TYPE] == constants.SPOT_LIGHT:
             self[constants.ANGLE] = api.light.angle(self.data)
