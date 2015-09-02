@@ -551,7 +551,7 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs ) {
 
-					material.lightMap = specularMapEnabled ? materialLightMap.getValue() : null;
+					material.lightMap = lightMapEnabled ? materialLightMap.getValue() : null;
 					material.needsUpdate = true;
 
 				} else {
@@ -683,7 +683,7 @@ Sidebar.Material = function ( editor ) {
 	};
 
 
-	function refreshUi(resetTextureSelectors) {
+	function refreshUi( resetTextureSelectors ) {
 
 		var material = currentObject.material;
 
