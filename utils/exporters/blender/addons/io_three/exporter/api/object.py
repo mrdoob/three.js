@@ -201,11 +201,11 @@ def animated_xform(obj):
         else:
             i += 1
 
-    animation = {
+    animation = [{
         constants.KEYFRAMES: tracks,
         constants.FPS: context.scene.render.fps,
         constants.NAME: obj.name
-    }
+    }]
     return animation
 
 @_object
@@ -667,3 +667,6 @@ def _valid_node(obj, valid_types, options):
 
     # if we get this far assume that the mesh is valid
     return True
+
+
+

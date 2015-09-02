@@ -119,6 +119,11 @@ class Object(base_classes.BaseNode):
         elif self[constants.TYPE] in lights:
             self._init_light()
 
+        no_anim = (None, False, constants.OFF)
+        if self.options.get(constants.KEYFRAMES) not in no_anim:
+            logger.info("Export Transform Animation for %s", self.node)
+            self[constants.CLIPS] = api.object.animated_xform(self.node)
+
         if self.options.get(constants.HIERARCHY, False):
             for child in api.object.children(self.node, self.scene.valid_types):
                 if not self.get(constants.CHILDREN):
