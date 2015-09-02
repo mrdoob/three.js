@@ -55,9 +55,9 @@ Viewport.Info = function ( editor ) {
 
 						vertices += geometry.attributes.position.array.length / 3;
 
-						if ( geometry.attributes.index !== undefined ) {
+						if ( geometry.index !== undefined ) {
 
-							triangles += geometry.attributes.index.array.length / 3;
+							triangles += geometry.index.array.length / 3;
 
 						} else {
 
