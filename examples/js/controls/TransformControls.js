@@ -806,7 +806,7 @@
 
 		function onPointerHover( event ) {
 
-			if ( scope.object === undefined || _dragging === true ) return;
+			if ( scope.object === undefined || _dragging === true || ( event.button !== undefined && event.button !== 0 ) ) return;
 
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
@@ -834,7 +834,7 @@
 
 		function onPointerDown( event ) {
 
-			if ( scope.object === undefined || _dragging === true ) return;
+			if ( scope.object === undefined || _dragging === true || ( event.button !== undefined && event.button !== 0 ) ) return;
 
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
@@ -884,7 +884,7 @@
 
 		function onPointerMove( event ) {
 
-			if ( scope.object === undefined || scope.axis === null || _dragging === false ) return;
+			if ( scope.object === undefined || scope.axis === null || _dragging === false || ( event.button !== undefined && event.button !== 0 ) ) return;
 
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
@@ -1054,6 +1054,8 @@
 		}
 
 		function onPointerUp( event ) {
+
+			if ( event.button !== undefined && event.button !== 0 ) return;
 
 			if ( _dragging && ( scope.axis !== null ) ) {
 
