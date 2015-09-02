@@ -165,7 +165,7 @@ EXPORT_OPTIONS = {
 }
 
 
-FORMAT_VERSION = 4.3
+FORMAT_VERSION = 4.4
 VERSION = 'version'
 THREE = 'io_three'
 GENERATOR = 'generator'
