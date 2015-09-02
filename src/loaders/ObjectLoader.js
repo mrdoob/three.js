@@ -64,7 +64,7 @@ THREE.ObjectLoader.prototype = {
 
 		if( tracks.length > 0 ) {
 
-			object.animationClips = [ new THREE.AnimationClip( "default", -1, tracks ) ];
+			object.clips = [ new THREE.AnimationClip( "default", -1, tracks ) ];
 
 		}
 
@@ -627,20 +627,29 @@ THREE.ObjectLoader.prototype = {
 
 			}
 
-			if( data.animations && data.animations.tracks ) {
+			if( data.clips ) {
 
-				var dataTracks = data.animations.tracks;
+				// NOTE: only reading the first clip if it exists.  We can add multiple clip support in the future with this design.
+				//  For multiple clip support we should merge clips on different nodes with the clips that have the same names.  Thus
+				//  One will end up with a few named clips for the scene composed of merged tracks from individual nodes.
+				for( var i = 0; i < Math.min( 1, data.clips.length ); i ++ ) {
 
-				var fpsToSeconds = ( data.animations.fps !== undefined ) ? ( 1.0 / data.animations.fps ) : 1.0;
+					var dataTracks = data.clips[i].tracks;
 
-				for( var i = 0; i < data.animations.tracks.length; i ++ ) {
+					var fpsToSeconds = ( data.clips[i].fps !== undefined ) ? ( 1.0 / data.clips[i].fps ) : 1.0;
 
-					var track = THREE.KeyframeTrack.parse( data.animations.tracks[i] );
-					track.name = object.uuid + '.' + track.name;
-					track.scale( fpsToSeconds );
-					tracks.push( track );
-					
+					for( var i = 0; i < dataTracks.length; i ++ ) {
+
+						console.log( dataTracks[i] );
+						var track = THREE.KeyframeTrack.parse( dataTracks[i] ).scale( fpsToSeconds );
+						track.name = object.uuid + '.' + track.name;
+						console.log( track );
+						tracks.push( track );
+						
+					}
+
 				}
+				if( data.clips.length > 1 ) console.warn( "THREE.ObjectLoader: more than one clip specified on node, not yet supported" );
 
 			}
 

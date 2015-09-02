@@ -422,26 +422,29 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-			console.log( json );
+			geometry.clips = [];
 
-			var animations = [];
-			if( json.animations ) {
-				for( animationName in animations ) {
-					animations.push( animations[animationName] );
-				}
+			// parse old style Bone/Hierarchy animations
+			var animation = json.animations || json.animation;
+
+			if( animation ) {
+
+				var clip = THREE.AnimationClip.parseAnimationHierarchy( animation );
+				if( clip ) this.clips.push( clip );
+
 			}
-			if( json.animation ) {
-				animations.push( json.animation );
+
+			// parse new style Clips
+			var clips = json.clips || [];
+
+			for( var i = 0; i < clips.length; i ++ ) {
+
+				var clip = THREE.AnimationClip.parse( clips[i] );
+				if( clip ) this.clips.push( clip );
+
 			}
 
-			for( var animation in animations ) {
-
-				var clip = THREE.AnimationClip.FromGeometryAnimation( animation );
-
-				if( clip ) {
-					geometry.animationClips.push( clip );		
-				}
-			}
+			console.log( geometry.clips );
 
 		};
 

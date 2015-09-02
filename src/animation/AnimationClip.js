@@ -175,7 +175,30 @@ THREE.AnimationClip.FromImplicitMorphTargetAnimations = function( morphTargets, 
 
 };
 
-THREE.AnimationClip.FromGeometryAnimation = function( animation, bones, nodeName ) {
+// parse the standard JSON format for clips
+THREE.AnimationClip.parse = function( json ) {
+
+	var name = json.name || "default";
+	var duration = json.duration || -1;
+	var fps = json.fps || 30;
+	var animationTracks = json.tracks || [];
+
+	var tracks = [];
+
+	for( var i = 0; i < animationTracks.length; i ++ ) {
+
+		tracks.push( THREE.KeyframeTrack.parse( animationTracks[i] ).scale( 1 / fps ) );
+
+	}
+
+	if( tracks.length === 0 ) return null;
+
+	return new THREE.AnimationClip( name, duration, tracks );
+
+};
+
+// parse the old animation.hierarchy format
+THREE.AnimationClip.parseAnimationHierarchy = function( animation, bones, nodeName ) {
 
 	if( ! animation ) {
 		console.error( "  no animation in JSONLoader data" );
@@ -210,32 +233,15 @@ THREE.AnimationClip.FromGeometryAnimation = function( animation, bones, nodeName
 
 	var tracks = [];
 
-	// new style morph animations
-	var re = /^morphTargets\[([\w\d\[\]\_. ]+)\]$/;
-	for( var name in animation ) {
-		// get any variables named morphTarget
-		var matches = re.exec(name);
-
-		if( ! matches ) continue;
-
-	    if (matches.index === re.lastIndex) {
-	        re.lastIndex++;
-	    }
-
-		var morphTargetName = matches[1];
-
-		tracks.push( new THREE.NumberKeyframeTrack( nodeName + '.morphTargetInfluence[' + morphTargetName + ']', animation[name] ) );
-
-	}
-
 	var clipName = animation.name || 'default';
 	var duration = animation.length || -1; // automatic length determination in AnimationClip.
 	var fps = animation.fps || 30;
-	var animationTracks = animation.hierarchy || [];
 
-	for ( var h = 0; h < animationTracks.length; h ++ ) {
+	var hierarchyTracks = animation.hierarchy || [];
 
-		var animationKeys = animationTracks[ h ].keys;
+	for ( var h = 0; h < hierarchyTracks.length; h ++ ) {
+
+		var animationKeys = hierarchyTracks[ h ].keys;
 
 		// skip empty tracks
 		if( ! animationKeys || animationKeys.length == 0 ) {

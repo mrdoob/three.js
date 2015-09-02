@@ -71,7 +71,7 @@ THREE.VectorKeyframeTrack.parse = function( json ) {
 		} );
 	}
 
-	return new THREE.VectorKeyframeTrack( json.keys, keys );
+	return new THREE.VectorKeyframeTrack( json.name, keys );
 
 };
  

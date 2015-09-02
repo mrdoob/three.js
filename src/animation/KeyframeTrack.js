@@ -249,7 +249,7 @@ THREE.KeyframeTrack.parse = function( json ) {
 };
 
 THREE.KeyframeTrack.GetTrackTypeForTypeName = function( typeName ) {
-	switch( typeName.toLower() ) {
+	switch( typeName.toLowerCase() ) {
 	 	case "vector":
 	 	case "vector2":
 	 	case "vector3":
