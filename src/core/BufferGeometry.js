@@ -1084,10 +1084,20 @@ THREE.BufferGeometry.prototype = {
 
 		data.data = { attributes: {} };
 
-		var attributes = this.attributes;
-		var groups = this.groups;
+		var index = this.index;
 
-		var boundingSphere = this.boundingSphere;
+		if ( index !== null ) {
+
+			var array = Array.prototype.slice.call( index.array );
+
+			data.data.index = {
+				type: index.array.constructor.name,
+				array: array
+			};
+
+		}
+
+		var attributes = this.attributes;
 
 		for ( var key in attributes ) {
 
@@ -1103,11 +1113,15 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		var groups = this.groups;
+
 		if ( groups.length > 0 ) {
 
 			data.data.groups = JSON.parse( JSON.stringify( groups ) );
 
 		}
+
+		var boundingSphere = this.boundingSphere;
 
 		if ( boundingSphere !== null ) {
 
