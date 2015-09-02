@@ -62,6 +62,8 @@ THREE.ImageLoader.prototype = {
 
 				onError( event );
 
+				scope.manager.itemFailed( url );
+
 			}, false );
 
 		}
