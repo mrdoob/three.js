@@ -55,6 +55,16 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 
 	};
 
+	this.itemError = function ( url ) {
+
+		if ( scope.onError !== undefined ) {
+
+			scope.onError( url );
+
+		}
+
+	};
+
 };
 
 THREE.DefaultLoadingManager = new THREE.LoadingManager();
