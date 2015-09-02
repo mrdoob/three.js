@@ -683,7 +683,7 @@ Sidebar.Material = function ( editor ) {
 	};
 
 
-	function refreshUi(resetTextureSelectors) {
+	function refreshUi( resetTextureSelectors ) {
 
 		var material = currentObject.material;
 
