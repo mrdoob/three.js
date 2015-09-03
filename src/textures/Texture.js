@@ -185,6 +185,83 @@ THREE.Texture.prototype = {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
+	},
+
+	transformUv: function ( uv ) {
+
+		if ( this.mapping !== THREE.UVMapping )  return;
+
+		uv.multiply( this.repeat );
+		uv.add( this.offset );
+
+		if ( uv.x < 0 || uv.x > 1 ) {
+
+			switch ( this.wrapS ) {
+
+				case THREE.RepeatWrapping:
+
+					uv.x = uv.x - Math.floor( uv.x );
+					break;
+
+				case THREE.ClampToEdgeWrapping:
+
+					uv.x = uv.x < 0 ? 0 : 1;
+					break;
+
+				case THREE.MirroredRepeatWrapping:
+
+					if ( Math.abs( Math.floor( uv.x ) % 2 ) === 1 ) {
+
+						uv.x = Math.ceil( uv.x ) - uv.x;
+
+					} else {
+
+						uv.x = uv.x - Math.floor( uv.x );
+
+					}
+					break;
+
+			}
+
+		}
+
+		if ( uv.y < 0 || uv.y > 1 ) {
+
+			switch ( this.wrapT ) {
+
+				case THREE.RepeatWrapping:
+
+					uv.y = uv.y - Math.floor( uv.y );
+					break;
+
+				case THREE.ClampToEdgeWrapping:
+
+					uv.y = uv.y < 0 ? 0 : 1;
+					break;
+
+				case THREE.MirroredRepeatWrapping:
+
+					if ( Math.abs( Math.floor( uv.y ) % 2 ) === 1 ) {
+
+						uv.y = Math.ceil( uv.y ) - uv.y;
+
+					} else {
+
+						uv.y = uv.y - Math.floor( uv.y );
+
+					}
+					break;
+
+			}
+
+		}
+
+		if ( this.flipY ) {
+
+			uv.y = 1 - uv.y;
+
+		}
+
 	}
 
 };

@@ -69,6 +69,12 @@ THREE.Mesh.prototype.raycast = ( function () {
 	var tempB = new THREE.Vector3();
 	var tempC = new THREE.Vector3();
 
+	var uvA = new THREE.Vector2();
+	var uvB = new THREE.Vector2();
+	var uvC = new THREE.Vector2();
+	var bary = new THREE.Vector3();
+	var pInter = new THREE.Vector3();
+
 	return function raycast( raycaster, intersects ) {
 
 		var geometry = this.geometry;
@@ -105,6 +111,21 @@ THREE.Mesh.prototype.raycast = ( function () {
 		}
 
 		var a, b, c;
+
+		var textureIntersection = function ( pIntersection, p1, p2, p3, uv1, uv2, uv3 ) {
+
+			THREE.Triangle.barycoordFromPoint( pIntersection, p1, p2, p3, bary );
+
+			uv1.multiplyScalar( bary.x );
+			uv2.multiplyScalar( bary.y );
+			uv3.multiplyScalar( bary.z );
+
+			uv1.add( uv2 );
+			uv1.add( uv3 );
+
+			return uv1.clone();
+
+		};
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -155,16 +176,30 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 						if ( intersectionPoint === null ) continue;
 
+						pInter.copy( intersectionPoint );
 						intersectionPoint.applyMatrix4( this.matrixWorld );
 
 						var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
 						if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
+						// intersectionPoint in UV coordinates.
+						var uv = undefined;
+						if ( material.map && attributes.uv !== undefined ) {
+
+							var uvs = attributes.uv.array;
+							uvA.fromArray( uvs, a * 2 );
+							uvB.fromArray( uvs, b * 2 );
+							uvC.fromArray( uvs, c * 2 );
+							uv = textureIntersection( pInter, vA, vB, vC, uvA, uvB, uvC );
+
+						}
+
 						intersects.push( {
 
 							distance: distance,
 							point: intersectionPoint,
+							uv: uv,
 							face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
 							faceIndex: Math.floor( i / 3 ), // triangle number in indices buffer semantics
 							object: this
@@ -197,11 +232,24 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 					if ( intersectionPoint === null ) continue;
 
+					pInter.copy( intersectionPoint );
 					intersectionPoint.applyMatrix4( this.matrixWorld );
 
 					var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
 					if ( distance < raycaster.near || distance > raycaster.far ) continue;
+
+					// intersectionPoint in UV coordinates.
+					var uv = undefined;
+					if ( material.map && attributes.uv !== undefined ) {
+
+						var uvs = attributes.uv.array;
+						uvA.fromArray( uvs, i );
+						uvB.fromArray( uvs, i + 2 );
+						uvC.fromArray( uvs, i + 4 );
+						uv = textureIntersection( pInter, vA, vB, vC, uvA, uvB, uvC );
+
+					}
 
 					a = i / 3;
 					b = a + 1;
@@ -211,6 +259,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 						distance: distance,
 						point: intersectionPoint,
+						uv: uv,
 						face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
 						index: a, // triangle number in positions buffer semantics
 						object: this
@@ -285,16 +334,30 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				if ( intersectionPoint === null ) continue;
 
+				pInter.copy( intersectionPoint );
 				intersectionPoint.applyMatrix4( this.matrixWorld );
 
 				var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
 				if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
+				// intersectionPoint in UV coordinates.
+				var uv = undefined;
+				if ( material.map && geometry.faceVertexUvs[ 0 ] !== undefined ) {
+
+					var uvs = geometry.faceVertexUvs[ 0 ][ f ];
+					uvA.copy( uvs[ 0 ] );
+					uvB.copy( uvs[ 1 ] );
+					uvC.copy( uvs[ 2 ] );
+					uv = textureIntersection( pInter, a, b, c, uvA, uvB, uvC );
+
+				}
+
 				intersects.push( {
 
 					distance: distance,
 					point: intersectionPoint,
+					uv: uv,
 					face: face,
 					faceIndex: f,
 					object: this
