@@ -121,42 +121,44 @@ THREE.Quaternion.prototype = {
 		var s2 = Math.sin( euler._y / 2 );
 		var s3 = Math.sin( euler._z / 2 );
 
-		if ( euler.order === 'XYZ' ) {
+		var order = euler.order;
+
+		if ( order === 'XYZ' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
 			this._z = c1 * c2 * s3 + s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( euler.order === 'YXZ' ) {
+		} else if ( order === 'YXZ' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( euler.order === 'ZXY' ) {
+		} else if ( order === 'ZXY' ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 + s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( euler.order === 'ZYX' ) {
+		} else if ( order === 'ZYX' ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( euler.order === 'YZX' ) {
+		} else if ( order === 'YZX' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( euler.order === 'XZY' ) {
+		} else if ( order === 'XZY' ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
