@@ -15,6 +15,7 @@ THREE.Mesh = function ( geometry, material ) {
 	this.material = material !== undefined ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
 	this.updateMorphTargets();
+	this.makeVertexGetter();
 
 };
 
@@ -54,6 +55,24 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 
 };
 
+THREE.Mesh.prototype.makeVertexGetter = function () {
+
+	// we need this to avoid geometry type checks in actual getter
+
+	if ( this.geometry.attributes ) {
+		var positions = this.geometry.attributes.position.array;
+
+		this.getVertex = function getVertex( vector, index ) {
+			vector.fromArray( positions, index * 3 );
+		};
+	} else {
+		var vertices = this.geometry.vertices;
+
+		this.getVertex = function getVertex( vector, index ) {
+			vector.copy( vertices[ index ] );
+		};
+	}
+};
 
 THREE.Mesh.prototype.raycast = ( function () {
 
@@ -70,6 +89,8 @@ THREE.Mesh.prototype.raycast = ( function () {
 	var tempC = new THREE.Vector3();
 
 	return function raycast( raycaster, intersects ) {
+
+		this.makeVertexGetter();
 
 		var geometry = this.geometry;
 		var material = this.material;
@@ -139,9 +160,9 @@ THREE.Mesh.prototype.raycast = ( function () {
 						b = indices[ i + 1 ];
 						c = indices[ i + 2 ];
 
-						vA.fromArray( positions, a * 3 );
-						vB.fromArray( positions, b * 3 );
-						vC.fromArray( positions, c * 3 );
+						this.getVertex( vA, a );
+						this.getVertex( vB, b );
+						this.getVertex( vC, c );
 
 						if ( material.side === THREE.BackSide ) {
 
@@ -181,9 +202,11 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				for ( var i = 0, il = positions.length; i < il; i += 9 ) {
 
-					vA.fromArray( positions, i );
-					vB.fromArray( positions, i + 3 );
-					vC.fromArray( positions, i + 6 );
+					a = i / 3;
+
+					this.getVertex( vA, a );
+					this.getVertex( vB, a + 1 );
+					this.getVertex( vC, a + 2 );
 
 					if ( material.side === THREE.BackSide ) {
 
@@ -203,7 +226,6 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
-					a = i / 3;
 					b = a + 1;
 					c = a + 2;
 
@@ -223,6 +245,10 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		} else if ( geometry instanceof THREE.Geometry ) {
 
+			a = new THREE.Vector3();
+			b = new THREE.Vector3();
+			c = new THREE.Vector3();
+
 			var isFaceMaterial = material instanceof THREE.MeshFaceMaterial;
 			var materials = isFaceMaterial === true ? material.materials : null;
 
@@ -236,9 +262,9 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				if ( faceMaterial === undefined ) continue;
 
-				a = vertices[ face.a ];
-				b = vertices[ face.b ];
-				c = vertices[ face.c ];
+				this.getVertex( a, face.a );
+				this.getVertex( b, face.b );
+				this.getVertex( c, face.c );
 
 				if ( faceMaterial.morphTargets === true ) {
 
@@ -267,9 +293,9 @@ THREE.Mesh.prototype.raycast = ( function () {
 					vB.add( b );
 					vC.add( c );
 
-					a = vA;
-					b = vB;
-					c = vC;
+					a.copy( vA );
+					b.copy( vB );
+					c.copy( vC );
 
 				}
 
