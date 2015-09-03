@@ -52,7 +52,7 @@ THREE.MD2Character = function () {
 			scope.root.add( mesh );
 
 			scope.meshBody = mesh;
-			scope.activeAnimation = geo.firstAnimation;
+			scope.activeAnimationClipName = mesh.firstAnimationClip.name;
 
 			checkLoadingComplete();
 
@@ -133,7 +133,7 @@ THREE.MD2Character = function () {
 			activeWeapon.visible = true;
 			this.meshWeapon = activeWeapon;
 
-			activeWeapon.playAnimation( this.activeAnimation, this.animationFPS );
+			activeWeapon.playAnimation( this.activeAnimationClipName, this.animationFPS );
 
 			this.meshWeapon.baseDuration = this.meshWeapon.duration;
 
@@ -219,7 +219,7 @@ THREE.MD2Character = function () {
 
 		mesh.parseAnimations();
 
-		mesh.playAnimation( geometry.firstAnimation, scope.animationFPS );
+		mesh.playAnimation( mesh.firstAnimationClip.name, scope.animationFPS );
 		mesh.baseDuration = mesh.duration;
 
 		return mesh;

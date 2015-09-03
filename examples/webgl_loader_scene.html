@@ -125,11 +125,12 @@
 
 			var mouseX = 0, mouseY = 0;
 
+			var mixers = [];
+
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
 			var rotatingObjects = [];
-			var morphAnimatedObjects = [];
 
 			var clock = new THREE.Clock();
 
@@ -204,18 +205,13 @@
 
 						}
 
-						if ( object instanceof THREE.MorphAnimMesh ) {
+						if ( object instanceof THREE.Mesh ) {
 
-							morphAnimatedObjects.push( object );
+							if( object.geometry && object.geometry.clips && object.geometry.clips.length > 0 ) {
 
-						}
-
-						if ( object instanceof THREE.SkinnedMesh ) {
-
-							if ( object.geometry.animation ) {
-
-								var animation = new THREE.Animation( object, object.geometry.animation );
-								animation.play();
+								var mixer = new THREE.AnimationMixer( object );
+								mixer.addAction( new THREE.AnimationAction( object.geometry.clips[0] ) );
+								mixers.push( mixer );
 
 							}
 
@@ -361,11 +357,10 @@
 
 				}
 
-				for ( var i = 0; i < morphAnimatedObjects.length; i ++ ) {
+				
+				for ( var i = 0; i < mixers.length; i ++ ) {
 
-					var object = morphAnimatedObjects[ i ];
-
-					object.updateAnimation( 1000 * delta );
+					mixers[ i ].update( delta );
 
 				}
 
