@@ -966,15 +966,26 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	makePerspective: function ( fov, aspect, near, far ) {
+	makePerspective: function ( fov, aspect, near, far, projectionPlaneSize, projectionPlaneOffset ) {
 
 		var ymax = near * Math.tan( THREE.Math.degToRad( fov * 0.5 ) );
 		var ymin = - ymax;
 		var xmin = ymin * aspect;
 		var xmax = ymax * aspect;
 
-		return this.makeFrustum( xmin, xmax, ymin, ymax, near, far );
+		var projectionMatrix = this.makeFrustum( xmin, xmax, ymin, ymax, near, far );
 
+		if( projectionPlaneOffset && projectionPlaneSize ) {
+			// shift principle point, details: http://ksimek.github.io/2013/08/13/intrinsic/
+			if( projectionPlaneSize.x !== 0 ) {
+				projectionMatrix.elements[8] = 2 * projectionPlaneOffset.x / projectionPlaneSize.x;
+			}
+			if( projectionPlaneSize.y !== 0 ) {
+				projectionMatrix.elements[9] = 2 * projectionPlaneOffset.y / projectionPlaneSize.y;
+			}
+		}
+
+		return projectionMatrix;
 	},
 
 	makeOrthographic: function ( left, right, top, bottom, near, far ) {
