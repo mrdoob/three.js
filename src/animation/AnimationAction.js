@@ -10,6 +10,7 @@ THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 
 	if( clip === undefined ) throw new Error( 'clip is null' );
 	this.clip = clip;
+	this.localRoot = null;
 	this.startTime = startTime || 0;
 	this.timeScale = timeScale || 1;
 	this.weight = weight || 1;
@@ -25,6 +26,14 @@ THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 THREE.AnimationAction.prototype = {
 
 	constructor: THREE.AnimationAction,
+
+	setLocalRoot: function( localRoot ) {
+
+		this.localRoot = localRoot;
+
+		return this;
+		
+	},
 
 	updateTime: function( clipDeltaTime ) {
 

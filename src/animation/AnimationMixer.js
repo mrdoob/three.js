@@ -30,6 +30,8 @@ THREE.AnimationMixer.prototype = {
 
 		var tracks = action.clip.tracks;
 
+		var root = action.localRoot || this.root;
+
 		for( var i = 0; i < tracks.length; i ++ ) {
 
 			var track = tracks[ i ];
@@ -40,7 +42,7 @@ THREE.AnimationMixer.prototype = {
 
 			if( j < 0 ) {
 			
-				propertyBinding = new THREE.PropertyBinding( this.root, track.name );
+				propertyBinding = new THREE.PropertyBinding( root, track.name );
 				this.propertyBindings.push( propertyBinding );
 			
 			}

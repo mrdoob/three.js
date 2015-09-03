@@ -55,9 +55,7 @@ THREE.UCSCharacter = function() {
 			mesh.castShadow = true;
 			mesh.receiveShadow = true;
 
-			var clipBones = THREE.AnimationClip.FromJSONLoaderAnimation( geometry.animation, geometry.bones, mesh.uuid );
-
-			scope.mixer.addAction( new THREE.AnimationAction( clipBones, 0, 1, 1, true ) );
+			scope.mixer.addAction( new THREE.AnimationAction( geometry.clips[0], 0, 1, 1, true ).setLocalRoot( mesh ) );
 			
 			scope.setSkin( 0 );
 			
