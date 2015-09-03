@@ -276,8 +276,7 @@
 
 					mixer = new THREE.AnimationMixer( mesh );
 
-					var clipMorphTargets = THREE.AnimationClipCreator.CreateMorphAnimation( geometry.morphTargets, 8.0 );
-					mixer.addAction( new THREE.AnimationAction( clipMorphTargets, 0, 1, 1, true ) );
+					mixer.addAction( new THREE.AnimationAction( geometry.clips[0] ).warpToDuration( 10 ) );
 
 					var s = 200;
 					mesh.scale.set( s, s, s );
@@ -522,14 +521,14 @@
 
 				// update
 
-				var delta = 1000 * clock.getDelta();
+				var delta = clock.getDelta();
 
 				TWEEN.update();
 				controls.update();
 
 				if ( mixer ) {
 
-					mixer.update( delta * 0.001 );
+					mixer.update( delta );
 
 				}
 
