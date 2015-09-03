@@ -495,12 +495,6 @@ THREE.JSONLoader.prototype = {
 
 			var materials = THREE.Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
 
-			if ( THREE.Loader.prototype.needsTangents( materials ) ) {
-
-				geometry.computeTangents();
-
-			}
-
 			return { geometry: geometry, materials: materials };
 
 		}

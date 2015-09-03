@@ -230,7 +230,6 @@ var list = {
 			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
 			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
 			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ],
-			[ "VertexTangentsHelper", "api/extras/helpers/VertexTangentsHelper" ],
 			[ "WireframeHelper", "api/extras/helpers/WireframeHelper" ]
 		],
 

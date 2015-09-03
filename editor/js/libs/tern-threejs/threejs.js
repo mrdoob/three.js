@@ -225,10 +225,6 @@
           "!type": "[]",
           "!doc": "Array of morph targets. Each morph target is a Javascript object:\n\t\t<code>{ name: \"targetName\", vertices: [ new THREE.Vertex(), ... ] }</code>\n\t\tMorph vertices match number and order of primary vertices."
         },
-        "hasTangents": {
-          "!type": "boolean",
-          "!doc": "True if BufferGeometry has tangents. Set in [page:.computeTangents]."
-        },
         "addAttribute": {
           "!type": "null",
           "!doc": "Adds an attribute to this geometry. Use this rather than the attributes property, \n\t\tbecause an internal array of attributes is maintained to speed up iterating over\n\t\tattributes."
@@ -244,10 +240,6 @@
         "computeVertexNormals": {
           "!type": "fn()",
           "!doc": "Computes vertex normals by averaging face normals.<br>"
-        },
-        "computeTangents": {
-          "!type": "fn()",
-          "!doc": "Computes vertex tangents.<br>\n\t\tBased on [link:http://www.terathon.com/code/tangent.html]<br>\n\t\tGeometry must have vertex [page:UV UVs] (layer 0 will be used)."
         },
         "computeBoundingBox": {
           "!type": "fn()",
@@ -374,10 +366,6 @@
           "!type": "[]",
           "!doc": "Array of 3 vertex colors."
         },
-        "vertexTangents": {
-          "!type": "[]",
-          "!doc": "Array of 3 vertex tangents."
-        },
         "materialIndex": {
           "!type": "number",
           "!doc": "Material index (points to [page:MeshFaceMaterial MeshFaceMaterial.materials])."
@@ -445,10 +433,6 @@
           "!type": "object",
           "!doc": "Bounding sphere.\n\t\t<code>{ radius: float }</code>"
         },
-        "hasTangents": {
-          "!type": "bool",
-          "!doc": "True if geometry has tangents. Set in [page:Geometry Geometry.computeTangents]."
-        },
         "dynamic": {
           "!type": "bool",
           "!doc": "Set to *true* if attribute buffers will need to change in runtime (using \"dirty\" flags).<br>\n\t\tUnless set to true internal typed arrays corresponding to buffers will be deleted once sent to GPU.<br>\n\t\tDefaults to true."
@@ -468,10 +452,6 @@
         "normalsNeedUpdate": {
           "!type": "bool",
           "!doc": "Set to *true* if the normals array has been updated."
-        },
-        "tangentsNeedUpdate": {
-          "!type": "bool",
-          "!doc": "Set to *true* if the tangents in the faces has been updated."
         },
         "colorsNeedUpdate": {
           "!type": "bool",
@@ -500,10 +480,6 @@
         "computeMorphNormals": {
           "!type": "fn()",
           "!doc": "Computes morph normals."
-        },
-        "computeTangents": {
-          "!type": "fn()",
-          "!doc": "Computes vertex tangents.<br>\n\t\tBased on [link:http://www.terathon.com/code/tangent.html]<br>\n\t\tGeometry must have vertex [page:UV UVs] (layer 0 will be used)."
         },
         "computeBoundingBox": {
           "!type": "fn()",
@@ -2005,22 +1981,6 @@
       "!doc": "Renders [page:ArrowHelper arrows] to visualize an object's vertex normal vectors. Requires that normals have been specified in a [page:BufferAttribute custom attribute] or have been calculated using [page:Geometry.computeVertexNormals computeVertexNormals].",
       "!type": "fn(object: +THREE.Object3D, size: number, color: +THREE.Color, linewidth: number)"
     },
-    "VertexTangentsHelper": {
-      "!url": "http://threejs.org/docs/#Reference/extras/helpers/VertexTangentsHelper",
-      "prototype": {
-        "!proto": "THREE.Line.prototype",
-        "object": {
-          "!type": "+THREE.Object3D",
-          "!doc": "The attached object"
-        },
-        "update": {
-          "!type": "fn()",
-          "!doc": "Updates the vertex tangent preview arrows based on the new position and tangents of the object."
-        }
-      },
-      "!doc": "Renders [page:ArrowHelper arrows] to visualize an object's vertex tangent vectors. Requires that tangents have been specified in a [page:BufferAttribute custom attribute] or have been computed using [page:Geometry.computeTangents computeTangents].",
-      "!type": "fn(object: +THREE.Object3D, size: number, color: +THREE.Color, linewidth: number)"
-    },
     "WireframeHelper": {
       "!url": "http://threejs.org/docs/#Reference/extras/helpers/WireframeHelper",
       "prototype": {
@@ -2504,10 +2464,6 @@
           "!type": "fn(json: object, texturePath: string) -> +THREE.Object3D",
           "!doc": "Parse a <em>JSON</em> structure and return an [page:Object] containing the parsed .[page:Geometry] and .[page:Array materials]."
         },
-        "needsTangents": {
-          "!type": "fn(materials: []) -> bool",
-          "!doc": "Checks if the loaded object needs tangents based on its materials."
-        },
         "updateProgress": {
           "!type": "fn(progress: object)",
           "!doc": "Updates the DOM object with the progress made."
@@ -2558,10 +2514,6 @@
         "crossOrigin": {
           "!type": "string",
           "!doc": "The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS."
-        },
-        "needsTangents": {
-          "!type": "fn(materials: []) -> bool",
-          "!doc": "Checks if the loaded object needs tangents based on its materials."
         },
         "updateProgress": {
           "!type": "fn(progress: object)",
