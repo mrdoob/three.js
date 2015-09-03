@@ -74,14 +74,13 @@
 
 				autoPlay : true, // Auto play animations
 				container : scene, // Container to add models
-				parser : THREE.SEA3D.AUTO, // Auto choose THREE.BufferGeometry and THREE.Geometry
 				multiplier : 1 // Light multiplier
 
 			} );
 
 			loader.onComplete = function( e ) {
 
-				// Get the first camera from 3ds Max
+				// Get the first camera from SEA3D Studio
 				// use loader.get... to get others objects
 
 				var cam = loader.cameras[0];

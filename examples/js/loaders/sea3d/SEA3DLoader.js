@@ -12,7 +12,6 @@ THREE.SEA3D = function( config ) {
 	this.config = config || {};
 
 	if ( this.config.autoPlay === undefined ) this.config.autoPlay = false;
-	if ( this.config.parser == undefined ) this.config.parser = THREE.SEA3D.AUTO;
 	if ( this.config.multiplier == undefined ) this.config.multiplier = 1;
 	if ( this.config.tangent == undefined ) this.config.tangent = true;
 	if ( this.config.bounding == undefined ) this.config.bounding = true;
