@@ -316,22 +316,19 @@
 					}
 
 					var mesh = new THREE.Mesh( geometry, material );
-
 					mesh.speed = speed;
 
 					var mixer = new THREE.AnimationMixer( mesh );
 					mixer.addAction( new THREE.AnimationAction( geometry.clips[0] ).warpToDuration( duration ) );
-					console.log( mixer );
 					mixer.update( 600 * Math.random() );
+					mesh.mixer = mixer;
 
 					mesh.position.set( x, y, z );
 					mesh.rotation.y = Math.PI/2;
 
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
-
-					mesh.mixer = mixer;
-
+				
 					scene.add( mesh );
 
 					morphs.push( mesh );
