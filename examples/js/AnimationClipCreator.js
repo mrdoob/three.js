@@ -9,42 +9,6 @@
 THREE.AnimationClipCreator = function() {
 };
 
-THREE.AnimationClipCreator.CreateMorphAnimation = function( morphTargets, duration ) {
-
-	var tracks = [];
-	var frameStep = duration / morphTargets.length;
-
-	for( var i = 0; i < morphTargets.length; i ++ ) {
-
-		var keys = [];
-
-		if( ( i - 1 ) >= 0 ) {
-
-			keys.push( { time: ( i - 1 ) * frameStep, value: 0 } );
-
-		}
-
-		keys.push( { time: i * frameStep, value: 1 } );
-
-		if( ( i + 1 ) <= morphTargets.length ) {
-
-			keys.push( { time: ( i + 1 ) * frameStep, value: 0 } );
-
-		}
-
-		var morphName = morphTargets[i].name;
-		var trackName = '.morphTargetInfluences[' + morphName + ']';
-		var track = new THREE.NumberKeyframeTrack( trackName, keys );
-
-		tracks.push( track );
-	}
-
-	var clip = new THREE.AnimationClip( 'morphAnimation', duration, tracks );
-	//console.log( 'morphAnimationClip', clip );
-
-	return clip;
-};
-
 THREE.AnimationClipCreator.CreateRotationAnimation = function( period, axis ) {
 
 	var keys = [];
