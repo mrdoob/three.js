@@ -339,7 +339,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				var uv;
 
-				if ( geometry.faceVertexUvs[ 0 ] !== undefined ) {
+				if ( geometry.faceVertexUvs[ 0 ].length > 0 ) {
 
 					var uvs = geometry.faceVertexUvs[ 0 ][ f ];
 					uvA.copy( uvs[ 0 ] );
