@@ -13,7 +13,7 @@ THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 	this.startTime = startTime || 0;
 	this.timeScale = timeScale || 1;
 	this.weight = weight || 1;
-	this.loop = loop || clip.loop || false;
+	this.loop = loop || clip.loop || true;
 	this.loopCount = 0;
 	this.enabled = true;	// allow for easy disabling of the action.
 

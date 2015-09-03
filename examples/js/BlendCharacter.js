@@ -4,7 +4,7 @@
 
 THREE.BlendCharacter = function () {
 
-	this.animations = {};
+	this.clips = {};
 	this.weightSchedule = [];
 	this.warpSchedule = [];
 
@@ -23,11 +23,12 @@ THREE.BlendCharacter = function () {
 			scope.mixer = new THREE.AnimationMixer( scope );
 
 			// Create the animations
+			console.log( geometry );
+			
+			for ( var i = 0; i < geometry.clips.length; ++ i ) {
 
-			for ( var i = 0; i < geometry.animations.length; ++ i ) {
-
-				var animName = geometry.animations[ i ].name;
-				scope.animations[ animName ] = THREE.AnimationClip.FromJSONLoaderAnimation( geometry.animations[ i ], geometry.bones );
+				var animName = geometry.clips[ i ].name;
+				scope.clips[ animName ] = geometry.clips[ i ];
 
 			}
 
@@ -48,7 +49,7 @@ THREE.BlendCharacter = function () {
 
 		this.mixer.removeAllActions();
 		
-		this.mixer.play( new THREE.AnimationAction( this.animations[ animName ], 0, 1, 1, true ) );
+		this.mixer.play( new THREE.AnimationAction( this.clips[ animName ], 0, 1, 1, true ) );
 
 	};
 
@@ -56,8 +57,8 @@ THREE.BlendCharacter = function () {
 
 		this.mixer.removeAllActions();
  
-		var fromAction = new THREE.AnimationAction( this.animations[ fromAnimName ], 0, 1, 1, true );
-		var toAction = new THREE.AnimationAction( this.animations[ toAnimName ], 0, 1, 1, true );
+		var fromAction = new THREE.AnimationAction( this.clips[ fromAnimName ], 0, 1, 1, true );
+		var toAction = new THREE.AnimationAction( this.clips[ toAnimName ], 0, 1, 1, true );
 
 		this.mixer.play( fromAction );
 		this.mixer.play( toAction );
@@ -70,8 +71,8 @@ THREE.BlendCharacter = function () {
 
 		this.mixer.removeAllActions();
 
-		var fromAction = new THREE.AnimationAction( this.animations[ fromAnimName ], 0, 1, 1, true );
-		var toAction = new THREE.AnimationAction( this.animations[ toAnimName ], 0, 1, 1, true );
+		var fromAction = new THREE.AnimationAction( this.clips[ fromAnimName ], 0, 1, 1, true );
+		var toAction = new THREE.AnimationAction( this.clips[ toAnimName ], 0, 1, 1, true );
 
 		this.mixer.play( fromAction );
 		this.mixer.play( toAction );
@@ -82,8 +83,9 @@ THREE.BlendCharacter = function () {
 
 	this.applyWeight = function( animName, weight ) {
 
-		if( this.mixer[ animName ] ) {
-			this.mixer[ animName ].weight = weight;
+		var action = this.mixer.findActionByName( animName );
+		if( action ) {
+			action.weight = weight;
 		}
 
 	};

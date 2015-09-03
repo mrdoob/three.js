@@ -75,6 +75,7 @@ THREE.JSONLoader.prototype = {
 
 		parseSkin();
 		parseMorphing( scale );
+		parseClips();
 
 		geometry.computeFaceNormals();
 		geometry.computeBoundingSphere();
@@ -422,41 +423,6 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-			geometry.clips = [];
-
-			// parse old style Bone/Hierarchy animations
-			var animations = [];
-			if( json.animation !== undefined ) {
-				animations.push( json.animation );
-			}
-			if( json.animations !== undefined ) {
-				if( json.animations.length ) {
-					animations = animations.concat( json.animations );
-				}
-				else {
-					animations.push( json.animations );
-				}
-			}
-
-			for( var i = 0; i < animations.length; i ++ ) {
-
-				var clip = THREE.AnimationClip.parseAnimation( animations[i], geometry.bones );
-				if( clip ) geometry.clips.push( clip );
-
-			}
-
-			// parse new style Clips
-			var clips = json.clips || [];
-
-			for( var i = 0; i < clips.length; i ++ ) {
-
-				var clip = THREE.AnimationClip.parse( clips[i] );
-				if( clip ) geometry.clips.push( clip );
-
-			}
-
-			console.log( geometry.clips );
-
 		};
 
 		function parseMorphing( scale ) {
@@ -511,6 +477,50 @@ THREE.JSONLoader.prototype = {
 					}
 
 				}
+
+			}
+		}
+
+		function parseClips() {
+
+			geometry.clips = [];
+
+			// parse new style Clips
+			var clips = json.clips || [];
+
+			for( var i = 0; i < clips.length; i ++ ) {
+
+				var clip = THREE.AnimationClip.parse( clips[i] );
+				if( clip ) geometry.clips.push( clip );
+
+			}
+
+			// parse old style Bone/Hierarchy animations
+			var animations = [];
+			if( json.animation !== undefined ) {
+				animations.push( json.animation );
+			}
+			if( json.animations !== undefined ) {
+				if( json.animations.length ) {
+					animations = animations.concat( json.animations );
+				}
+				else {
+					animations.push( json.animations );
+				}
+			}
+
+			for( var i = 0; i < animations.length; i ++ ) {
+
+				var clip = THREE.AnimationClip.parseAnimation( animations[i], geometry.bones );
+				if( clip ) geometry.clips.push( clip );
+
+			}
+
+			// parse implicit morph animations
+			if( geometry.morphTargets ) {
+
+				var morphAnimationClips = THREE.AnimationClip.CreateClipsFromMorphTargetSequences( geometry.morphTargets, 10 );
+				geometry.clips = geometry.clips.concat( morphAnimationClips );
 
 			}
 

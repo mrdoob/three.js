@@ -110,7 +110,8 @@ THREE.AnimationClip.CreateClipsFromMorphTargetSequences = function( morphTargets
 	
 	var animationToMorphTargets = {};
 
-	var pattern = /([a-z]+)_?(\d+)/;
+	// tested with https://regex101.com/ on trick sequences such flamingo_flyA_003 and flamingo_run1_003
+	var pattern = /^([\w-]*[a-zA-Z-_]+)([\d]+)$/;
 
 	// sort morph target names into animation groups based patterns like Walk_001, Walk_002, Run_001, Run_002
 	for ( var i = 0, il = morphTargets.length; i < il; i ++ ) {

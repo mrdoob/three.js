@@ -8,8 +8,6 @@ THREE.MorphAnimMesh = function ( geometry, material ) {
 
 	this.type = 'MorphAnimMesh';
 
-	// API
-
 	this.mixer = new THREE.AnimationMixer( this );
 
 };
@@ -29,21 +27,14 @@ THREE.MorphAnimMesh.prototype.setDirectionBackward = function () {
 
 };
 
-THREE.MorphAnimMesh.prototype.parseAnimations = function () {
-
-	this.animationClips = THREE.AnimationClip.FromImplicitMorphTargetAnimations( this.geometry.morphTargets, 20 );
-	this.firstAnimationClip = this.animationClips[0];
-
-};
-
 THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	this.mixer.removeAllActions();
 
 	var clip = null;
-	for( var i = 0; i < this.animationClips.length; i ++ ) {
-		if( this.animationClips[ i ].name === label ) {
-			clip = this.animationClips[ i ];
+	for( var i = 0; i < this.geometry.clips.length; i ++ ) {
+		if( this.geometry.clips[ i ].name === label ) {
+			clip = this.geometry.clips[ i ];
 			break;
 		}
 	}
@@ -56,7 +47,7 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	} else {
 
-		throw new Error( 'THREE.MorphAnimMesh: animationClips[' + label + '] undefined in .playAnimation()' );
+		throw new Error( 'THREE.MorphAnimMesh: clips[' + label + '] undefined in .playAnimation()' );
 
 	}
 
@@ -88,8 +79,6 @@ THREE.MorphAnimMesh.prototype.copy = function ( source ) {
 	THREE.Mesh.prototype.copy.call( this, source );
 
 	this.mixer = new THREE.AnimationMixer( this );
-	this.animationClips = source.animationClips;
-	this.firstAnimationClips = source.firstAnimationClips;
 
 	return this;
 
