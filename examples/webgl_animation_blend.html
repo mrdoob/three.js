@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - blendshapes</title>
+		<title>three.js webgl - scene animation</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -38,15 +38,12 @@
 		<div id="container"></div>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - clip system
-		- blend shapes
-		</div>
+		<a href="http://threejs.org" target="_blank">three.js</a> webgl - scene animation - <a href="https://clara.io/view/b06c3d56-b301-4f03-9295-482c61642d82">Tree Blend</a> courtesy of David Sarno</div>
 
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -84,7 +81,7 @@
 
 				scene = new THREE.Scene();
 
-				scene.fog = new THREE.Fog( 0x000000, 2000, 10000 );
+				scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
 
 				//scene.add( camera );
 
@@ -127,21 +124,21 @@
 				var loader = new THREE.ObjectLoader();
 				loader.load( "models/json/blend-animation.json", function ( loadedScene ) {
 
+					//sceneAnimationClip = loadedScene.clips[0];
 					scene = loadedScene;
+					console.log( scene );
 					scene.add( camera );
-					scene.rotation.y = Math.PI / 2.0;
+					scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
+		
 				
-					mixer = new THREE.AnimationMixer( scene );
-			
-					mixer.addAction( new THREE.AnimationAction( sceneAnimationClip, 0, 1, 1, true ) );
+					var blendObject = scene.getObjectByName( 'tree-morph' );
+					console.log( blendObject );
+					var clip = blendObject.geometry.clips[0];
+					console.log( clip );
+					mixer = new THREE.AnimationMixer( blendObject );
+					mixer.addAction( new THREE.AnimationAction( clip, 0, 1, 1, true ) );
 
 				} );
-
-				// GUI
-
-				initGUI();
-
-				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -159,20 +156,6 @@
 
 			}
 
-			function initGUI() {
-
-				var API = {
-					'show model'    : true,
-					'show skeleton' : false
-				};
-
-				var gui = new dat.GUI();
-
-				gui.add( API, 'show model' ).onChange( function() { mesh.visible = API[ 'show model' ]; } );
-
-				gui.add( API, 'show skeleton' ).onChange( function() { helper.visible = API[ 'show skeleton' ]; } );
-
-			}
 
 			function onDocumentMouseMove( event ) {
 
@@ -202,7 +185,7 @@
 				camera.lookAt( scene.position );
 
 				if( mixer ) {
-					//console.log( "updating mixer by " + delta );
+					console.log( "updating mixer by " + delta, mixer.time );
 					mixer.update( delta );
 				}
 
