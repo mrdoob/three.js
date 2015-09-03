@@ -11604,33 +11604,36 @@ THREE.BufferGeometry.prototype = {
 
 	computeTangents: function () {
 
+		var index = this.index;
+		var attributes = this.attributes;
+
 		// based on http://www.terathon.com/code/tangent.html
 		// (per vertex tangents)
 
-		if ( this.index === undefined ||
-			 this.attributes.position === undefined ||
-			 this.attributes.normal === undefined ||
-			 this.attributes.uv === undefined ) {
+		if ( index === undefined ||
+			 attributes.position === undefined ||
+			 attributes.normal === undefined ||
+			 attributes.uv === undefined ) {
 
 			console.warn( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
 			return;
 
 		}
 
-		var indices = this.index.array;
-		var positions = this.attributes.position.array;
-		var normals = this.attributes.normal.array;
-		var uvs = this.attributes.uv.array;
+		var indices = index.array;
+		var positions = attributes.position.array;
+		var normals = attributes.normal.array;
+		var uvs = attributes.uv.array;
 
 		var nVertices = positions.length / 3;
 
-		if ( this.attributes.tangent === undefined ) {
+		if ( attributes.tangent === undefined ) {
 
 			this.addAttribute( 'tangent', new THREE.BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
 
 		}
 
-		var tangents = this.attributes.tangent.array;
+		var tangents = attributes.tangent.array;
 
 		var tan1 = [], tan2 = [];
 
@@ -11649,10 +11652,8 @@ THREE.BufferGeometry.prototype = {
 			uvB = new THREE.Vector2(),
 			uvC = new THREE.Vector2(),
 
-			x1, x2, y1, y2, z1, z2,
-			s1, s2, t1, t2, r;
-
-		var sdir = new THREE.Vector3(), tdir = new THREE.Vector3();
+			sdir = new THREE.Vector3(),
+			tdir = new THREE.Vector3();
 
 		function handleTriangle( a, b, c ) {
 
@@ -11664,22 +11665,22 @@ THREE.BufferGeometry.prototype = {
 			uvB.fromArray( uvs, b * 2 );
 			uvC.fromArray( uvs, c * 2 );
 
-			x1 = vB.x - vA.x;
-			x2 = vC.x - vA.x;
+			var x1 = vB.x - vA.x;
+			var x2 = vC.x - vA.x;
 
-			y1 = vB.y - vA.y;
-			y2 = vC.y - vA.y;
+			var y1 = vB.y - vA.y;
+			var y2 = vC.y - vA.y;
 
-			z1 = vB.z - vA.z;
-			z2 = vC.z - vA.z;
+			var z1 = vB.z - vA.z;
+			var z2 = vC.z - vA.z;
 
-			s1 = uvB.x - uvA.x;
-			s2 = uvC.x - uvA.x;
+			var s1 = uvB.x - uvA.x;
+			var s2 = uvC.x - uvA.x;
 
-			t1 = uvB.y - uvA.y;
-			t2 = uvC.y - uvA.y;
+			var t1 = uvB.y - uvA.y;
+			var t2 = uvC.y - uvA.y;
 
-			r = 1.0 / ( s1 * t2 - s2 * t1 );
+			var r = 1.0 / ( s1 * t2 - s2 * t1 );
 
 			sdir.set(
 				( t2 * x1 - t1 * x2 ) * r,
@@ -11703,32 +11704,31 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		var i, il;
-		var j, jl;
-		var iA, iB, iC;
+		var groups = this.groups;
 
-		if ( this.groups.length === 0 ) {
+		if ( groups.length === 0 ) {
 
-			this.addGroup( 0, indices.length );
+			groups = [ {
+				start: 0,
+				count: indices.length
+			} ];
 
 		}
 
-		var groups = this.groups;
-
-		for ( j = 0, jl = groups.length; j < jl; ++ j ) {
+		for ( var j = 0, jl = groups.length; j < jl; ++ j ) {
 
 			var group = groups[ j ];
 
 			var start = group.start;
 			var count = group.count;
 
-			for ( i = start, il = start + count; i < il; i += 3 ) {
+			for ( var i = start, il = start + count; i < il; i += 3 ) {
 
-				iA = indices[ i + 0 ];
-				iB = indices[ i + 1 ];
-				iC = indices[ i + 2 ];
-
-				handleTriangle( iA, iB, iC );
+				handleTriangle(
+					indices[ i + 0 ],
+					indices[ i + 1 ],
+					indices[ i + 2 ]
+				);
 
 			}
 
@@ -11763,22 +11763,18 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		for ( j = 0, jl = groups.length; j < jl; ++ j ) {
+		for ( var j = 0, jl = groups.length; j < jl; ++ j ) {
 
 			var group = groups[ j ];
 
 			var start = group.start;
 			var count = group.count;
 
-			for ( i = start, il = start + count; i < il; i += 3 ) {
+			for ( var i = start, il = start + count; i < il; i += 3 ) {
 
-				iA = indices[ i + 0 ];
-				iB = indices[ i + 1 ];
-				iC = indices[ i + 2 ];
-
-				handleVertex( iA );
-				handleVertex( iB );
-				handleVertex( iC );
+				handleVertex( indices[ i + 0 ] );
+				handleVertex( indices[ i + 1 ] );
+				handleVertex( indices[ i + 2 ] );
 
 			}
 
@@ -17600,7 +17596,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				var uv;
 
-				if ( geometry.faceVertexUvs[ 0 ] !== undefined ) {
+				if ( geometry.faceVertexUvs[ 0 ].length > 0 ) {
 
 					var uvs = geometry.faceVertexUvs[ 0 ][ f ];
 					uvA.copy( uvs[ 0 ] );
