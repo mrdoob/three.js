@@ -131,82 +131,109 @@ def material(obj):
     except IndexError:
         pass
 
-QUAT_CONVERSION = axis_conversion(from_forward='Y', from_up='Z', to_forward='Z', to_up='Y')
-
-def __swap_quaternions(track):
-    for t in track:
-        a = t["value"]
-        q = mathutils.Quaternion(a)
-        q = (QUAT_CONVERSION*q.to_matrix()).to_quaternion()
-        a[0] =-q.x
-        a[1] =-q.y
-        a[2] =-q.z
-        a[3] =-q.w
-    pass
-
-def __swap_vector3(track):
-    for t in track:
-        v = t["value"]
-        tmp = v[1]
-        v[1] = v[2]
-        v[2] = tmp
-    pass
-
-def __parse_tracked_vector(fcurves, start_index, nb_curves):
-    track = []
+def extract_time(fcurves, start_index):
+    time = []
     for xx in fcurves[start_index].keyframe_points:
-        track.append({ "time": xx.co.x, "value": [xx.co.y] })
+        time.append(xx.co.x)
+    return time
 
-    swapFunction = __swap_vector3 if nb_curves == 3 else __swap_quaternions
+def merge_sorted_lists(l1, l2):
+  sorted_list = []
+  l1 = l1[:]
+  l2 = l2[:]
+  while (l1 and l2):
+    h1 = l1[0]
+    h2 = l2[0]
+    if h1 == h2:
+      sorted_list.append(h1)
+      l1.pop(0)
+      l2.pop(0)
+    elif h1 < h2:
+      l1.pop(0)
+      sorted_list.append(h1)
+    else:
+      l2.pop(0)
+      sorted_list.append(h2)
+  # Add the remaining of the lists
+  sorted_list.extend(l1 if l1 else l2)
+  return sorted_list
 
-    nb_curves += start_index
-    start_index += 1
-    while start_index < nb_curves:
-        i = 0
-        for xx in fcurves[start_index].keyframe_points:
-            track[i]["value"].append(xx.co.y)
-            i += 1
-        start_index += 1
-    swapFunction(track)
-    return track
+def appendVec3(track, time, vec3):
+    track.append({ "time": time, "value": [ vec3.x, vec3.y, vec3.z ] })
 
-# trackable transform fields ( <output field>, <nb fcurve>, <type> )
+def appendQuat(track, time, quat):
+    track.append({ "time": time, "value": [ quat.x, quat.y, quat.z, quat.w ] })
+
+# trackable transform fields ( <output field>, <nb fcurve> )
 TRACKABLE_FIELDS = {
     "location": ( ".position", 3, "vector3" ),
     "scale": ( ".scale", 3, "vector3" ),
     "rotation_euler": ( ".rotation", 3, "vector3" ),
     "rotation_quaternion": ( ".quaternion", 4, "quaternion" )
 }
+EXPORTED_TRACKABLE_FIELDS = [ "location", "scale", "rotation_quaternion" ]
 
 @_object
-def animated_xform(obj):
+def animated_xform(obj, options):
     fcurves = obj.animation_data
     if not fcurves:
-        return {}
+        return []
     fcurves = fcurves.action.fcurves
 
     tracks = []
     i = 0
     nb_curves = len(fcurves)
+
+    # extract unique frames
+    times = None
     while i < nb_curves:
         field_info = TRACKABLE_FIELDS.get(fcurves[i].data_path)
         if field_info:
-            nb_curves_local = field_info[1]
-            tracks.append({
-                constants.NAME: field_info[0],
-                constants.TYPE: field_info[2],
-                constants.KEYS: __parse_tracked_vector(fcurves, i, nb_curves_local)
-            })
-            i += nb_curves_local
+            newTimes = extract_time(fcurves, i)
+            times = merge_sorted_lists(times, newTimes) if times else newTimes  # merge list
+            i += field_info[1]
         else:
             i += 1
 
-    animation = [{
+    # init tracks
+    track_loc = []
+    for fld in EXPORTED_TRACKABLE_FIELDS:
+        field_info = TRACKABLE_FIELDS[fld]
+        track = []
+        track_loc.append(track)
+        tracks.append({
+            constants.NAME: field_info[0],
+            constants.TYPE: field_info[2],
+            constants.KEYS: track
+        })
+
+    # track arrays
+    track_sca = track_loc[1]
+    track_qua = track_loc[2]
+    track_loc = track_loc[0]
+    use_inverted = options.get(constants.HIERARCHY, False) and obj.parent
+
+    # for each frame
+    inverted_fallback = mathutils.Matrix() if use_inverted else None
+    convert_matrix = AXIS_CONVERSION    # matrix to convert the exported matrix
+    original_frame = context.scene.frame_current
+    for time in times:
+        context.scene.frame_set(time, 0.0)
+        if use_inverted:  # need to use the inverted, parent matrix might have chance
+            convert_matrix = obj.parent.matrix_world.inverted(inverted_fallback)
+        wm = convert_matrix * obj.matrix_world
+        appendVec3(track_loc, time, wm.to_translation())
+        appendVec3(track_sca, time, wm.to_scale()      )
+        appendQuat(track_qua, time, wm.to_quaternion() )
+    context.scene.frame_set(original_frame, 0.0)  # restore to original frame
+
+    # TODO: remove duplicated key frames
+
+    return [{
         constants.KEYFRAMES: tracks,
         constants.FPS: context.scene.render.fps,
         constants.NAME: obj.name
     }]
-    return animation
 
 @_object
 def mesh(obj, options):
