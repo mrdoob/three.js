@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js ray cast - texture - canvas</title>
+		<title>three.js raycast - texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -41,7 +41,7 @@
 	</head>
 	<body>
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - texture intersection<br>Left to right: buffer geometry - geometry - indexed buffer geometry</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - raycast texture<br>Left to right: buffer geometry - geometry - indexed buffer geometry</div>
 		<fieldset id="controls">
 			<legend>Circle</legend>
 			<div class="control">
@@ -187,7 +187,6 @@
 			var height = window.innerHeight;
 
 			var canvas;
-			var objects = [];
 			var planeTexture, cubeTexture, circleTexture;
 
 			var container;
@@ -240,7 +239,6 @@
 				cube.position.x = 4;
 				cube.position.y = - 5;
 				cube.position.z = 0;
-				objects.push( cube );
 				scene.add( cube );
 
 				// A plane on the left.
@@ -259,7 +257,6 @@
 				plane.position.x = - 16;
 				plane.position.y = - 5;
 				plane.position.z = 0;
-				objects.push( plane );
 				scene.add( plane );
 
 				// A circle on the right.
@@ -278,11 +275,10 @@
 				circle.position.x = 24;
 				circle.position.y = - 5;
 				circle.position.z = 0;
-				objects.push( circle );
 				scene.add( circle );
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				container.addEventListener( 'click', onClick, false );
+				container.addEventListener( 'mousemove', onMouseMove, false );
 
 			}
 
@@ -295,14 +291,15 @@
 
 			};
 
-			function onClick( evt ) {
+			function onMouseMove( evt ) {
 
 				evt.preventDefault();
 
 				var array = getMousePosition( container, evt.clientX, evt.clientY );
 				onClickPosition.fromArray( array );
 
-				var intersects = getIntersects( onClickPosition, objects );
+				var intersects = getIntersects( onClickPosition, scene.children );
+
 				if ( intersects.length > 0 && intersects[ 0 ].uv ) {
 
 					var uv = intersects[ 0 ].uv;
