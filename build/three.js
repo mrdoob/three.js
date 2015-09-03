@@ -8518,8 +8518,6 @@ THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 	this.color = color instanceof THREE.Color ? color : new THREE.Color();
 	this.vertexColors = Array.isArray( color ) ? color : [];
 
-	this.vertexTangents = [];
-
 	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
 };
@@ -8554,12 +8552,6 @@ THREE.Face3.prototype = {
 		for ( var i = 0, il = source.vertexColors.length; i < il; i ++ ) {
 
 			this.vertexColors[ i ] = source.vertexColors[ i ].clone();
-
-		}
-
-		for ( var i = 0, il = source.vertexTangents.length; i < il; i ++ ) {
-
-			this.vertexTangents[ i ] = source.vertexTangents[ i ].clone();
 
 		}
 
@@ -9261,15 +9253,12 @@ THREE.Geometry = function () {
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
-	this.hasTangents = false;
-
 	// update flags
 
 	this.verticesNeedUpdate = false;
 	this.elementsNeedUpdate = false;
 	this.uvsNeedUpdate = false;
 	this.normalsNeedUpdate = false;
-	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.lineDistancesNeedUpdate = false;
 	this.groupsNeedUpdate = false;
@@ -9451,15 +9440,12 @@ THREE.Geometry.prototype = {
 		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
 		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
-		var tangents = attributes.tangent !== undefined ? attributes.tangent.array : undefined;
 
 		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
-		if ( tangents !== undefined ) this.hasTangents = true;
 
 		var tempNormals = [];
 		var tempUVs = [];
 		var tempUVs2 = [];
-		var tempTangents = [];
 
 		for ( var i = 0, j = 0, k = 0; i < vertices.length; i += 3, j += 2, k += 4 ) {
 
@@ -9489,12 +9475,6 @@ THREE.Geometry.prototype = {
 
 			}
 
-			if ( tangents !== undefined ) {
-
-				tempTangents.push( new THREE.Vector4( tangents[ k ], tangents[ k + 1 ], tangents[ k + 2 ], tangents[ k + 3 ] ) );
-
-			}
-
 		}
 
 		var addFace = function ( a, b, c ) {
@@ -9515,12 +9495,6 @@ THREE.Geometry.prototype = {
 			if ( uvs2 !== undefined ) {
 
 				scope.faceVertexUvs[ 1 ].push( [ tempUVs2[ a ].clone(), tempUVs2[ b ].clone(), tempUVs2[ c ].clone() ] );
-
-			}
-
-			if ( tangents !== undefined ) {
-
-				face.vertexTangents.push( tempTangents[ a ].clone(), tempTangents[ b ].clone(), tempTangents[ c ].clone() );
 
 			}
 
@@ -9845,106 +9819,7 @@ THREE.Geometry.prototype = {
 
 	computeTangents: function () {
 
-		// based on http://www.terathon.com/code/tangent.html
-		// tangents go to vertices
-
-		var f, fl, v, vl, i, vertexIndex,
-			face, uv, vA, vB, vC, uvA, uvB, uvC,
-			x1, x2, y1, y2, z1, z2,
-			s1, s2, t1, t2, r, t, test,
-			tan1 = [], tan2 = [],
-			sdir = new THREE.Vector3(), tdir = new THREE.Vector3(),
-			tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(),
-			n = new THREE.Vector3(), w;
-
-		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
-
-			tan1[ v ] = new THREE.Vector3();
-			tan2[ v ] = new THREE.Vector3();
-
-		}
-
-		function handleTriangle( context, a, b, c, ua, ub, uc ) {
-
-			vA = context.vertices[ a ];
-			vB = context.vertices[ b ];
-			vC = context.vertices[ c ];
-
-			uvA = uv[ ua ];
-			uvB = uv[ ub ];
-			uvC = uv[ uc ];
-
-			x1 = vB.x - vA.x;
-			x2 = vC.x - vA.x;
-			y1 = vB.y - vA.y;
-			y2 = vC.y - vA.y;
-			z1 = vB.z - vA.z;
-			z2 = vC.z - vA.z;
-
-			s1 = uvB.x - uvA.x;
-			s2 = uvC.x - uvA.x;
-			t1 = uvB.y - uvA.y;
-			t2 = uvC.y - uvA.y;
-
-			r = 1.0 / ( s1 * t2 - s2 * t1 );
-			sdir.set( ( t2 * x1 - t1 * x2 ) * r,
-					  ( t2 * y1 - t1 * y2 ) * r,
-					  ( t2 * z1 - t1 * z2 ) * r );
-			tdir.set( ( s1 * x2 - s2 * x1 ) * r,
-					  ( s1 * y2 - s2 * y1 ) * r,
-					  ( s1 * z2 - s2 * z1 ) * r );
-
-			tan1[ a ].add( sdir );
-			tan1[ b ].add( sdir );
-			tan1[ c ].add( sdir );
-
-			tan2[ a ].add( tdir );
-			tan2[ b ].add( tdir );
-			tan2[ c ].add( tdir );
-
-		}
-
-		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-
-			face = this.faces[ f ];
-			uv = this.faceVertexUvs[ 0 ][ f ]; // use UV layer 0 for tangents
-
-			handleTriangle( this, face.a, face.b, face.c, 0, 1, 2 );
-
-		}
-
-		var faceIndex = [ 'a', 'b', 'c', 'd' ];
-
-		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-
-			face = this.faces[ f ];
-
-			for ( i = 0; i < Math.min( face.vertexNormals.length, 3 ); i ++ ) {
-
-				n.copy( face.vertexNormals[ i ] );
-
-				vertexIndex = face[ faceIndex[ i ] ];
-
-				t = tan1[ vertexIndex ];
-
-				// Gram-Schmidt orthogonalize
-
-				tmp.copy( t );
-				tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
-
-				// Calculate handedness
-
-				tmp2.crossVectors( face.vertexNormals[ i ], t );
-				test = tmp2.dot( tan2[ vertexIndex ] );
-				w = ( test < 0.0 ) ? - 1.0 : 1.0;
-
-				face.vertexTangents[ i ] = new THREE.Vector4( tmp.x, tmp.y, tmp.z, w );
-
-			}
-
-		}
-
-		this.hasTangents = true;
+		console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
 
 	},
 
@@ -10493,7 +10368,6 @@ THREE.DirectGeometry = function () {
 	this.colors = [];
 	this.uvs = [];
 	this.uvs2 = [];
-	this.tangents = [];
 
 	this.groups = [];
 
@@ -10513,7 +10387,6 @@ THREE.DirectGeometry = function () {
 	this.normalsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.uvsNeedUpdate = false;
-	this.tangentsNeedUpdate = false;
 	this.groupsNeedUpdate = false;
 
 };
@@ -10528,21 +10401,12 @@ THREE.DirectGeometry.prototype = {
 	computeFaceNormals: function () {
 
 		console.warn( 'THREE.DirectGeometry: computeFaceNormals() is not a method of this type of geometry.' );
-		return this;
 
 	},
 
 	computeVertexNormals: function () {
 
 		console.warn( 'THREE.DirectGeometry: computeVertexNormals() is not a method of this type of geometry.' );
-		return this;
-
-	},
-
-	computeTangents: function () {
-
-		console.warn( 'THREE.DirectGeometry: computeTangents() is not a method of this type of geometry.' );
-		return this;
 
 	},
 
@@ -10599,8 +10463,6 @@ THREE.DirectGeometry.prototype = {
 
 		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
-
-		var hasTangents = geometry.hasTangents;
 
 		// morphs
 
@@ -10718,26 +10580,6 @@ THREE.DirectGeometry.prototype = {
 
 			}
 
-			// tangents
-
-			if ( hasTangents === true ) {
-
-				var vertexTangents = face.vertexTangents;
-
-				if ( vertexTangents.length === 3 ) {
-
-					this.tangents.push( vertexTangents[ 0 ], vertexTangents[ 1 ], vertexTangents[ 2 ] );
-
-				} else {
-
-					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined tangents ', i );
-
-					this.tangents.push( new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4() );
-
-				}
-
-			}
-
 			// morphs
 
 			for ( var j = 0; j < morphTargetsLength; j ++ ) {
@@ -10778,7 +10620,6 @@ THREE.DirectGeometry.prototype = {
 		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
 		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
 		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
-		this.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
 		this.groupsNeedUpdate = geometry.groupsNeedUpdate;
 
 		return this;
@@ -11152,14 +10993,12 @@ THREE.BufferGeometry.prototype = {
 			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
 			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
 			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
-			direct.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
 			direct.groupsNeedUpdate = geometry.groupsNeedUpdate;
 
 			geometry.verticesNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
 			geometry.uvsNeedUpdate = false;
-			geometry.tangentsNeedUpdate = false;
 			geometry.groupsNeedUpdate = false;
 
 			geometry = direct;
@@ -11208,21 +11047,6 @@ THREE.BufferGeometry.prototype = {
 			}
 
 			geometry.colorsNeedUpdate = false;
-
-		}
-
-		if ( geometry.tangentsNeedUpdate === true ) {
-
-			var attribute = this.attributes.tangent;
-
-			if ( attribute !== undefined ) {
-
-				attribute.copyVector4sArray( geometry.tangents );
-				attribute.needsUpdate = true;
-
-			}
-
-			geometry.tangentsNeedUpdate = false;
 
 		}
 
@@ -11292,13 +11116,6 @@ THREE.BufferGeometry.prototype = {
 
 			var uvs2 = new Float32Array( geometry.uvs2.length * 2 );
 			this.addAttribute( 'uv2', new THREE.BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 ) );
-
-		}
-
-		if ( geometry.tangents.length > 0 ) {
-
-			var tangents = new Float32Array( geometry.tangents.length * 4 );
-			this.addAttribute( 'tangent', new THREE.BufferAttribute( tangents, 4 ).copyVector4sArray( geometry.tangents ) );
 
 		}
 
@@ -11604,181 +11421,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeTangents: function () {
 
-		var index = this.index;
-		var attributes = this.attributes;
-
-		// based on http://www.terathon.com/code/tangent.html
-		// (per vertex tangents)
-
-		if ( index === undefined ||
-			 attributes.position === undefined ||
-			 attributes.normal === undefined ||
-			 attributes.uv === undefined ) {
-
-			console.warn( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
-			return;
-
-		}
-
-		var indices = index.array;
-		var positions = attributes.position.array;
-		var normals = attributes.normal.array;
-		var uvs = attributes.uv.array;
-
-		var nVertices = positions.length / 3;
-
-		if ( attributes.tangent === undefined ) {
-
-			this.addAttribute( 'tangent', new THREE.BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
-
-		}
-
-		var tangents = attributes.tangent.array;
-
-		var tan1 = [], tan2 = [];
-
-		for ( var k = 0; k < nVertices; k ++ ) {
-
-			tan1[ k ] = new THREE.Vector3();
-			tan2[ k ] = new THREE.Vector3();
-
-		}
-
-		var vA = new THREE.Vector3(),
-			vB = new THREE.Vector3(),
-			vC = new THREE.Vector3(),
-
-			uvA = new THREE.Vector2(),
-			uvB = new THREE.Vector2(),
-			uvC = new THREE.Vector2(),
-
-			sdir = new THREE.Vector3(),
-			tdir = new THREE.Vector3();
-
-		function handleTriangle( a, b, c ) {
-
-			vA.fromArray( positions, a * 3 );
-			vB.fromArray( positions, b * 3 );
-			vC.fromArray( positions, c * 3 );
-
-			uvA.fromArray( uvs, a * 2 );
-			uvB.fromArray( uvs, b * 2 );
-			uvC.fromArray( uvs, c * 2 );
-
-			var x1 = vB.x - vA.x;
-			var x2 = vC.x - vA.x;
-
-			var y1 = vB.y - vA.y;
-			var y2 = vC.y - vA.y;
-
-			var z1 = vB.z - vA.z;
-			var z2 = vC.z - vA.z;
-
-			var s1 = uvB.x - uvA.x;
-			var s2 = uvC.x - uvA.x;
-
-			var t1 = uvB.y - uvA.y;
-			var t2 = uvC.y - uvA.y;
-
-			var r = 1.0 / ( s1 * t2 - s2 * t1 );
-
-			sdir.set(
-				( t2 * x1 - t1 * x2 ) * r,
-				( t2 * y1 - t1 * y2 ) * r,
-				( t2 * z1 - t1 * z2 ) * r
-			);
-
-			tdir.set(
-				( s1 * x2 - s2 * x1 ) * r,
-				( s1 * y2 - s2 * y1 ) * r,
-				( s1 * z2 - s2 * z1 ) * r
-			);
-
-			tan1[ a ].add( sdir );
-			tan1[ b ].add( sdir );
-			tan1[ c ].add( sdir );
-
-			tan2[ a ].add( tdir );
-			tan2[ b ].add( tdir );
-			tan2[ c ].add( tdir );
-
-		}
-
-		var groups = this.groups;
-
-		if ( groups.length === 0 ) {
-
-			groups = [ {
-				start: 0,
-				count: indices.length
-			} ];
-
-		}
-
-		for ( var j = 0, jl = groups.length; j < jl; ++ j ) {
-
-			var group = groups[ j ];
-
-			var start = group.start;
-			var count = group.count;
-
-			for ( var i = start, il = start + count; i < il; i += 3 ) {
-
-				handleTriangle(
-					indices[ i + 0 ],
-					indices[ i + 1 ],
-					indices[ i + 2 ]
-				);
-
-			}
-
-		}
-
-		var tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
-		var n = new THREE.Vector3(), n2 = new THREE.Vector3();
-		var w, t, test;
-
-		function handleVertex( v ) {
-
-			n.fromArray( normals, v * 3 );
-			n2.copy( n );
-
-			t = tan1[ v ];
-
-			// Gram-Schmidt orthogonalize
-
-			tmp.copy( t );
-			tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
-
-			// Calculate handedness
-
-			tmp2.crossVectors( n2, t );
-			test = tmp2.dot( tan2[ v ] );
-			w = ( test < 0.0 ) ? - 1.0 : 1.0;
-
-			tangents[ v * 4 ] = tmp.x;
-			tangents[ v * 4 + 1 ] = tmp.y;
-			tangents[ v * 4 + 2 ] = tmp.z;
-			tangents[ v * 4 + 3 ] = w;
-
-		}
-
-		for ( var j = 0, jl = groups.length; j < jl; ++ j ) {
-
-			var group = groups[ j ];
-
-			var start = group.start;
-			var count = group.count;
-
-			for ( var i = start, il = start + count; i < il; i += 3 ) {
-
-				handleVertex( indices[ i + 0 ] );
-				handleVertex( indices[ i + 1 ] );
-				handleVertex( indices[ i + 2 ] );
-
-			}
-
-		}
+		console.warn( 'THREE.BufferGeometry: .computeTangents() has been removed.' );
 
 	},
 
@@ -12854,20 +12497,6 @@ THREE.Loader.prototype = {
 
 	},
 
-	needsTangents: function ( materials ) {
-
-		for ( var i = 0, il = materials.length; i < il; i ++ ) {
-
-			var m = materials[ i ];
-
-			if ( m instanceof THREE.ShaderMaterial ) return true;
-
-		}
-
-		return false;
-
-	},
-
 	createMaterial: ( function () {
 
 		var imageLoader;
@@ -13894,12 +13523,6 @@ THREE.JSONLoader.prototype = {
 		} else {
 
 			var materials = THREE.Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
-
-			if ( THREE.Loader.prototype.needsTangents( materials ) ) {
-
-				geometry.computeTangents();
-
-			}
 
 			return { geometry: geometry, materials: materials };
 
@@ -35893,153 +35516,6 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 				v2.set( objNorm.getX( j ), objNorm.getY( j ), objNorm.getZ( j ) );
 
 				v2.applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
-
-				position.setXYZ( idx, v1.x, v1.y, v1.z );
-
-				idx = idx + 1;
-
-				position.setXYZ( idx, v2.x, v2.y, v2.z );
-
-				idx = idx + 1;
-
-			}
-
-		}
-
-		position.needsUpdate = true;
-
-		return this;
-
-	}
-
-}() );
-
-// File:src/extras/helpers/VertexTangentsHelper.js
-
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
-*/
-
-THREE.VertexTangentsHelper = function ( object, size, hex, linewidth ) {
-
-	this.object = object;
-
-	this.size = ( size !== undefined ) ? size : 1;
-
-	var color = ( hex !== undefined ) ? hex : 0x0000ff;
-
-	var width = ( linewidth !== undefined ) ? linewidth : 1;
-
-	//
-
-	var nTangents = 0;
-
-	var objGeometry = this.object.geometry;
-
-	if ( objGeometry instanceof THREE.Geometry ) {
-
-		nTangents = objGeometry.faces.length * 3;
-
-	} else if ( objGeometry instanceof THREE.BufferGeometry ) {
-
-		nTangents = objGeometry.attributes.tangent.count
-
-	}
-
-	//
-
-	var geometry = new THREE.BufferGeometry();
-
-	var positions = new THREE.Float32Attribute( nTangents * 2 * 3, 3 );
-
-	geometry.addAttribute( 'position', positions );
-
-	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ) );
-
-	//
-
-	this.matrixAutoUpdate = false;
-
-	this.update();
-
-};
-
-THREE.VertexTangentsHelper.prototype = Object.create( THREE.LineSegments.prototype );
-THREE.VertexTangentsHelper.prototype.constructor = THREE.VertexTangentsHelper;
-
-THREE.VertexTangentsHelper.prototype.update = ( function ( object ) {
-
-	var v1 = new THREE.Vector3();
-	var v2 = new THREE.Vector3();
-
-	return function() {
-
-		var keys = [ 'a', 'b', 'c' ];
-
-		this.object.updateMatrixWorld( true );
-
-		var matrixWorld = this.object.matrixWorld;
-
-		var position = this.geometry.attributes.position;
-
-		//
-
-		var objGeometry = this.object.geometry;
-
-		if ( objGeometry instanceof THREE.Geometry ) {
-
-			var vertices = objGeometry.vertices;
-
-			var faces = objGeometry.faces;
-
-			var idx = 0;
-
-			for ( var i = 0, l = faces.length; i < l; i ++ ) {
-
-				var face = faces[ i ];
-
-				for ( var j = 0, jl = face.vertexTangents.length; j < jl; j ++ ) {
-
-					var vertex = vertices[ face[ keys[ j ] ] ];
-
-					var tangent = face.vertexTangents[ j ];
-
-					v1.copy( vertex ).applyMatrix4( matrixWorld );
-
-					v2.set( tangent.x, tangent.y, tangent.z ); // tangent.w used for bitangents only
-
-					v2.transformDirection( matrixWorld ).multiplyScalar( this.size ).add( v1 );
-
-					position.setXYZ( idx, v1.x, v1.y, v1.z );
-
-					idx = idx + 1;
-
-					position.setXYZ( idx, v2.x, v2.y, v2.z );
-
-					idx = idx + 1;
-
-				}
-
-			}
-
-		} else if ( objGeometry instanceof THREE.BufferGeometry ) {
-
-			var objPos = objGeometry.attributes.position;
-
-			var objTan = objGeometry.attributes.tangent;
-
-			var idx = 0;
-
-			// for simplicity, ignore index and drawcalls, and render every tangent
-
-			for ( var j = 0, jl = objPos.count; j < jl; j ++ ) {
-
-				v1.set( objPos.getX( j ), objPos.getY( j ), objPos.getZ( j ) ).applyMatrix4( matrixWorld );
-
-				v2.set( objTan.getX( j ), objTan.getY( j ), objTan.getZ( j ) ); // tangent.w used for bitangents only
-
-				v2.transformDirection( matrixWorld ).multiplyScalar( this.size ).add( v1 );
 
 				position.setXYZ( idx, v1.x, v1.y, v1.z );
 
