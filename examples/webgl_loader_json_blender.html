@@ -135,7 +135,7 @@
 						scene.add( mesh );
 						
 						var mixer = new THREE.AnimationMixer( mesh );
-						mixer.addAction( new THREE.AnimationAction( geometry.clips[0] ).wrapToDuration( 1000 ) );
+						mixer.addAction( new THREE.AnimationAction( geometry.clips[0] ).warpToDuration( 1 ) );
 
 						// random animation offset
 						mixer.update( 1000 * Math.random() );
