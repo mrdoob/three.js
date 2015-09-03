@@ -69,7 +69,7 @@
 					mixer = new THREE.AnimationMixer( mesh );
 
 					var clip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'gallop', geometry.morphTargets, 30 );
-					mixer.addAction( new THREE.AnimationAction( clip, 0, 1, 1, true ) );
+					mixer.addAction( new THREE.AnimationAction( clip ).wrapToDuration( 3000 ) );
 
 				} );
 

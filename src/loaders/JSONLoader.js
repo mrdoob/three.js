@@ -519,6 +519,7 @@ THREE.JSONLoader.prototype = {
 			// parse implicit morph animations
 			if( geometry.morphTargets ) {
 
+				// TODO: Figure out what an appropraite FPS is for morph target animations -- defaulting to 10, but really it is completely arbitrary.
 				var morphAnimationClips = THREE.AnimationClip.CreateClipsFromMorphTargetSequences( geometry.morphTargets, 10 );
 				geometry.clips = geometry.clips.concat( morphAnimationClips );
 

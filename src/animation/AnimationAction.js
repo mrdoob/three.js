@@ -90,9 +90,18 @@ THREE.AnimationAction.prototype = {
 
 	},
 
+	warpToDuration: function( duration ) {
+
+		this.timeScale = this.clip.duration / duration;
+
+		return this;
+	},
+
 	init: function( time ) {
 
 		this.clipTime = time - this.startTime;
+
+		return this;
 
 	},
 

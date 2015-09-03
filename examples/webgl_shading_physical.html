@@ -74,7 +74,7 @@
 
 			var sunLight, pointLight, ambientLight;
 
-			var morph, mixer;
+			var mixer;
 
 			var parameters, tweenDirection, tweenDay, tweenNight;
 
@@ -272,23 +272,23 @@
 
 					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, shading: THREE.FlatShading } );
 
-					morph = new THREE.MorphAnimMesh( geometry, morphMaterial );
+					mesh = new THREE.Mesh( geometry, morphMaterial );
 
-					mixer = new THREE.AnimationMixer( morph );
+					mixer = new THREE.AnimationMixer( mesh );
 
 					var clipMorphTargets = THREE.AnimationClipCreator.CreateMorphAnimation( geometry.morphTargets, 8.0 );
 					mixer.addAction( new THREE.AnimationAction( clipMorphTargets, 0, 1, 1, true ) );
 
 					var s = 200;
-					morph.scale.set( s, s, s );
+					mesh.scale.set( s, s, s );
 
 					//morph.duration = 8000;
 					//morph.mirroredLoop = true;
 
-					morph.castShadow = true;
-					morph.receiveShadow = true;
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
 
-					scene.add( morph );
+					scene.add( mesh );
 
 				} );
 
