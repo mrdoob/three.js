@@ -232,12 +232,12 @@
 				helper.visible = false;
 				scene.add( helper );
 
-				mixer = new THREE.AnimationMixer( mesh );
-		
-				var clipMorpher = THREE.AnimationClip.CreateMorphAnimation( mesh.geometry.morphTargets, 3 );
-				mixer.addAction( new THREE.AnimationAction( clipMorpher, 0, 1, 1, true ) );
-
+	
+				var clipMorpher = THREE.AnimationClip.CreateFromMorphTargetSequence( 'facialExpressions', mesh.geometry.morphTargets, 3 );
 				var clipBones = geometry.clips[0];
+
+				mixer = new THREE.AnimationMixer( mesh );
+				mixer.addAction( new THREE.AnimationAction( clipMorpher, 0, 1, 1, true ) );
 				mixer.addAction( new THREE.AnimationAction( clipBones, 0, 1, 1, true ) );
 			}
 

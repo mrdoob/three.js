@@ -425,11 +425,22 @@ THREE.JSONLoader.prototype = {
 			geometry.clips = [];
 
 			// parse old style Bone/Hierarchy animations
-			var animation = json.animations || json.animation;
+			var animations = [];
+			if( json.animation !== undefined ) {
+				animations.push( json.animation );
+			}
+			if( json.animations !== undefined ) {
+				if( json.animations.length ) {
+					animations = animations.concat( json.animations );
+				}
+				else {
+					animations.push( json.animations );
+				}
+			}
 
-			if( animation ) {
+			for( var i = 0; i < animations.length; i ++ ) {
 
-				var clip = THREE.AnimationClip.parseAnimationHierarchy( animation, geometry.bones );
+				var clip = THREE.AnimationClip.parseAnimation( animations[i], geometry.bones );
 				if( clip ) geometry.clips.push( clip );
 
 			}

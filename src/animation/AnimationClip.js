@@ -99,10 +99,10 @@ THREE.AnimationClip.CreateFromMorphTargetSequence = function( name, morphTargetS
 			});
 		}
 
-		tracks.push( new THREE.NumberKeyframeTrack( '.morphTargetInfluences[' + morphTargetSequence[i].name + ']', keys ) );
+		tracks.push( new THREE.NumberKeyframeTrack( '.morphTargetInfluences[' + morphTargetSequence[i].name + ']', keys ).scale( 1.0 / fps ) );
 	}
 
-	return new THREE.AnimationClip( name, -1, tracks ).scale( 1.0 / fps );
+	return new THREE.AnimationClip( name, -1, tracks );
 
 };
 
@@ -148,7 +148,7 @@ THREE.AnimationClip.CreateClipsFromMorphTargetSequences = function( morphTargets
 THREE.AnimationClip.parse = function( json ) {
 
 	var tracks = [];
-	
+
 	for( var i = 0; i < json.tracks.length; i ++ ) {
 
 		tracks.push( THREE.KeyframeTrack.parse( json.tracks[i] ).scale( 1.0 / json.fps ) );
@@ -160,8 +160,8 @@ THREE.AnimationClip.parse = function( json ) {
 };
 
 
-// parse the old animation.hierarchy format
-THREE.AnimationClip.parseAnimationHierarchy = function( animation, bones, nodeName ) {
+// parse the animation.hierarchy format
+THREE.AnimationClip.parseAnimation = function( animation, bones, nodeName ) {
 
 	if( ! animation ) {
 		console.error( "  no animation in JSONLoader data" );

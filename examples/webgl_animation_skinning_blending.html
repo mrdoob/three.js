@@ -221,10 +221,9 @@
 				controls.update();
 
 				// Set default weights
-
-				blendMesh.animations[ 'idle' ].weight = 1 / 3;
-				blendMesh.animations[ 'walk' ].weight = 1 / 3;
-				blendMesh.animations[ 'run' ].weight = 1 / 3;
+				blendMesh.applyWeight( 'idle', 1 / 3 );
+				blendMesh.applyWeight( 'walk', 1 / 3 );
+				blendMesh.applyWeight( 'run', 1 / 3 );
 
 				gui = new BlendCharacterGui(blendMesh);
 

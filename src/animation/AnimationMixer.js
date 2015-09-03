@@ -23,6 +23,8 @@ THREE.AnimationMixer.prototype = {
 
 	addAction: function( action ) {
 
+		// TODO: check for duplicate action names?  Or provide each action with a UUID?
+
 		this.actions.push( action );
 		action.mixer = this;
 
@@ -143,6 +145,19 @@ THREE.AnimationMixer.prototype = {
 		this.updatePropertyBindingIndices();
 
 		return this;
+
+	},
+
+	// can be optimized if needed
+	findActionByName: function( name ) {
+
+		for( var i = 0; i < this.actions.length; i ++ ) {
+
+			if( this.actions[i].name === name ) return this.actions[i];
+
+		}
+
+		return null;
 
 	},
 
