@@ -346,7 +346,7 @@ THREE.SceneLoader.prototype = {
 
 					} else if ( objJSON.type === "AmbientLight" || objJSON.type === "PointLight" ||
 						objJSON.type === "DirectionalLight" || objJSON.type === "SpotLight" ||
-						objJSON.type === "HemisphereLight" || objJSON.type === "AreaLight" ) {
+						objJSON.type === "HemisphereLight" ) {
 
 						var color = objJSON.color;
 						var intensity = objJSON.intensity;
@@ -382,13 +382,6 @@ THREE.SceneLoader.prototype = {
 								light = new THREE.DirectionalLight( color, intensity, distance );
 								light.target.set( position[ 0 ], position[ 1 ] - distance, position[ 2 ] );
 								light.target.applyEuler( new THREE.Euler( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ], 'XYZ' ) );
-								break;
-
-							case 'AreaLight':
-								light = new THREE.AreaLight( color, intensity );
-								light.position.fromArray( position );
-								light.width = objJSON.size;
-								light.height = objJSON.size_y;
 								break;
 
 						}

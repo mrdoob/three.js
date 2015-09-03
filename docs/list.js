@@ -37,7 +37,6 @@ var list = {
 
 		"Lights": [
 			[ "AmbientLight", "api/lights/AmbientLight" ],
-			[ "AreaLight", "api/lights/AreaLight" ],
 			[ "DirectionalLight", "api/lights/DirectionalLight" ],
 			[ "HemisphereLight", "api/lights/HemisphereLight" ],
 			[ "Light", "api/lights/Light" ],

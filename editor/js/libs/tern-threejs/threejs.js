@@ -2117,46 +2117,6 @@
       "!doc": "This light's color gets applied to all the objects in the scene globally.",
       "!type": "fn(hex: number)"
     },
-    "AreaLight": {
-      "!url": "http://threejs.org/docs/#Reference/lights/AreaLight",
-      "prototype": {
-        "!proto": "THREE.Light.prototype",
-        "right": {
-          "!type": "+THREE.Vector3",
-          "!doc": "Sets or gets an unit vector that indicates the right side of the light. This is calculated in local space."
-        },
-        "normal": {
-          "!type": "+THREE.Vector3",
-          "!doc": "Sets or gets an unit vectorSets or gets an unit vector that indicates the right side of the light. This is calculated in local space."
-        },
-        "height": {
-          "!type": "number",
-          "!doc": "Sets or gets the height of the illuminating plane."
-        },
-        "width": {
-          "!type": "number",
-          "!doc": "Sets or gets the width of the illuminating plane."
-        },
-        "intensity": {
-          "!type": "number",
-          "!doc": "Light's intensity.<br>\n\t\tDefault — *1.0*."
-        },
-        "constantAttenuation": {
-          "!type": "number",
-          "!doc": "Sets or gets the attention of the light in constant space. This is independant of the distance of the light."
-        },
-        "linearAttenuation": {
-          "!type": "number",
-          "!doc": "Sets or gets the attention of the light in linear space. This increases the attenuation linearly with the distance from the light."
-        },
-        "quadraticAttenuation": {
-          "!type": "number",
-          "!doc": "Sets or gets the attention of the light in linear space. This increases the attenuation quadratic with the distance from the light."
-        }
-      },
-      "!doc": "This illuminates the scene from a complete surface. This light only works in the [page:WebGLDeferredRenderer deferredrenderer].",
-      "!type": "fn(hex: number, intensity: number)"
-    },
     "DirectionalLight": {
       "!url": "http://threejs.org/docs/#Reference/lights/DirectionalLight",
       "prototype": {

@@ -525,13 +525,6 @@ THREE.ObjectLoader.prototype = {
 
 					break;
 
-
-				case 'AreaLight':
-
-					object = new THREE.AreaLight( data.color, data.intensity );
-
-					break;
-
 				case 'DirectionalLight':
 
 					object = new THREE.DirectionalLight( data.color, data.intensity );
