@@ -122,12 +122,12 @@ THREE.AnimationClip.CreateClipsFromMorphTargetSequences = function( morphTargets
 
 			var name = parts[ 1 ];
 
-			var animationToMorphTargets = animationToMorphTargets[ name ] || [];
-			if( ! animationToMorphTargets ) {
-				animationToMorphTargets = [];
+			var animationMorphTargets = animationToMorphTargets[ name ];
+			if( ! animationMorphTargets ) {
+				animationToMorphTargets[ name ] = animationMorphTargets = [];
 			}
 
-			animationToMorphTargets.push( morphTarget );
+			animationMorphTargets.push( morphTarget );
 
 		}
 
@@ -147,6 +147,8 @@ THREE.AnimationClip.CreateClipsFromMorphTargetSequences = function( morphTargets
 // parse the standard JSON format for clips
 THREE.AnimationClip.parse = function( json ) {
 
+	var tracks = [];
+	
 	for( var i = 0; i < json.tracks.length; i ++ ) {
 
 		tracks.push( THREE.KeyframeTrack.parse( json.tracks[i] ).scale( 1.0 / json.fps ) );
