@@ -473,7 +473,7 @@ def animated_blend_shapes(mesh, options):
         animCurves = animCurves.action.fcurves
 
     for key in shp.key_blocks.keys()[1:]:    # skip "Basis"
-        key_name = constants.MORPH_TARGETS+"["+key+"]"
+        key_name = ".morphTargetInfluences["+key+"]"
         found_animation = False
         data_path = 'key_blocks["'+key+'"].value'
         values = []

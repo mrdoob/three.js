@@ -633,9 +633,9 @@ THREE.ObjectLoader.prototype = {
 				//  One will end up with a few named clips for the scene composed of merged tracks from individual nodes.
 				for( var i = 0; i < Math.min( 1, data.clips.length ); i ++ ) {
 
-					var dataTracks = data.clips[i].tracks;
-
-					var fpsToSeconds = ( data.clips[i].fps !== undefined ) ? ( 1.0 / data.clips[i].fps ) : 1.0;
+					var dataClips = data.clips[i];
+					var dataTracks = dataClips.tracks || [];
+					var fpsToSeconds = 1.0 / ( dataClips.fps || 30 );
 
 					for( var i = 0; i < dataTracks.length; i ++ ) {
 

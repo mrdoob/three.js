@@ -439,7 +439,7 @@ THREE.JSONLoader.prototype = {
 
 			for( var i = 0; i < clips.length; i ++ ) {
 
-				var clip = THREE.AnimationClip.parseGeometryClip( clips[i] );
+				var clip = THREE.AnimationClip.parse( clips[i] );
 				if( clip ) geometry.clips.push( clip );
 
 			}

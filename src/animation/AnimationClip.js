@@ -75,70 +75,44 @@ THREE.AnimationClip.prototype = {
 };
 
 
-THREE.AnimationClip.CreateMorphAnimationFromNames = function( morphTargetNames, duration ) {
+THREE.AnimationClip.CreateFromMorphTargetSequence = function( name, morphTargetSequence, fps ) {
 
+
+	var numMorphTargets = morphTargetSequence.length;
 	var tracks = [];
-	var frameStep = duration / morphTargetNames.length;
 
-	for( var i = 0; i < morphTargetNames.length; i ++ ) {
+	for( var i = 0; i < numMorphTargets; i ++ ) {
 
 		var keys = [];
 
-		if( ( i - 1 ) >= 0 ) {
+		keys.push( { time: ( i + numMorphTargets - 1 ) % numMorphTargets, value: 0 } );
+		keys.push( { time: i, value: 1 } );
+		keys.push( { time: ( i + 1 ) % numMorphTargets, value: 0 } );
 
-			keys.push( { time: ( i - 1 ) * frameStep, value: 0 } );
+		keys.sort( THREE.KeyframeTrack.keyComparer );
 
+		// if there is a key at the first frame, duplicate it as the last frame as well for perfect loop.
+		if( keys[0].time === 0 ) {
+			keys.push( {
+				time: numMorphTargets,
+				value: keys[0].value
+			});
 		}
 
-		keys.push( { time: i * frameStep, value: 1 } );
-
-		if( ( i + 1 ) <= morphTargetNames.length ) {
-
-			keys.push( { time: ( i + 1 ) * frameStep, value: 0 } );
-
-		}
-
-		if( ( i - 1 ) < 0 ) {
-			
-			keys.push( { time: ( morphTargetNames.length - 1 ) * frameStep, value: 0 } );
-			keys.push( { time: morphTargetNames.length * frameStep, value: 1 } );
-
-		}
-
-		var morphName = morphTargetNames[i];
-		var trackName = '.morphTargetInfluences[' + morphName + ']';
-		var track = new THREE.NumberKeyframeTrack( trackName, keys );
-
-		tracks.push( track );
+		tracks.push( new THREE.NumberKeyframeTrack( '.morphTargetInfluences[' + morphTargetSequence[i].name + ']', keys ) );
 	}
 
-	var clip = new THREE.AnimationClip( 'morphAnimation', duration, tracks );
-
-	return clip;
-};
-
-THREE.AnimationClip.CreateMorphAnimation = function( morphTargets, duration ) {
-
-	var morphTargetNames = [];
-
-	for( var i = 0; i < morphTargets.length; i ++ ) {
-
-		morphTargetNames.push( morphTargets[i].name );
-
-	}
-
-	return THREE.AnimationClip.CreateMorphAnimationFromNames( morphTargetNames, duration );
+	return new THREE.AnimationClip( name, -1, tracks ).scale( 1.0 / fps );
 
 };
 
-
-THREE.AnimationClip.FromImplicitMorphTargetAnimations = function( morphTargets, fps ) {
+THREE.AnimationClip.CreateClipsFromMorphTargetSequences = function( morphTargets, fps ) {
 	
-	var animations = {};
-	var animationsArray = [];
+	var animationToMorphTargets = {};
 
 	var pattern = /([a-z]+)_?(\d+)/;
 
+	// sort morph target names into animation groups based patterns like Walk_001, Walk_002, Run_001, Run_002
 	for ( var i = 0, il = morphTargets.length; i < il; i ++ ) {
 
 		var morphTarget = morphTargets[ i ];
@@ -146,29 +120,24 @@ THREE.AnimationClip.FromImplicitMorphTargetAnimations = function( morphTargets, 
 
 		if ( parts && parts.length > 1 ) {
 
-			var animationName = parts[ 1 ];
+			var name = parts[ 1 ];
 
-			var animation = animations[ animationName ];
-			if ( ! animation ) {
-				animations[ animationName ] = animation = { name: animationName, morphTargetNames: [] };
-				animationsArray.push( animation );
+			var animationToMorphTargets = animationToMorphTargets[ name ] || [];
+			if( ! animationToMorphTargets ) {
+				animationToMorphTargets = [];
 			}
 
-			animation.morphTargetNames.push( morphTarget.name );
+			animationToMorphTargets.push( morphTarget );
+
 		}
 
 	}
 
 	var clips = [];
 
-	for( var i = 0; i < animationsArray.length; i ++ ) {
+	for( var name in animationToMorphTargets ) {
 
-		var animation = animationsArray[i];
-
-		var clip = new THREE.AnimationClip.CreateMorphAnimationFromNames( animation.morphTargetNames, animation.morphTargetNames.length * fps );
-		clip.name = animation.name;
-
-		clips.push( clip );
+		clips.push( THREE.AnimationClip.CreateFromMorphTargetSequence( name, animationToMorphTargets[ name ], fps ) );
 	}
 
 	return clips;
@@ -178,56 +147,16 @@ THREE.AnimationClip.FromImplicitMorphTargetAnimations = function( morphTargets, 
 // parse the standard JSON format for clips
 THREE.AnimationClip.parse = function( json ) {
 
-	optionalPrefix = optionalPrefix || "";
-	var name = json.name || "default";
-	var duration = json.duration || -1;
-	var fps = json.fps || 30;
-	var animationTracks = json.tracks || [];
+	for( var i = 0; i < json.tracks.length; i ++ ) {
 
-	var tracks = [];
-
-	for( var i = 0; i < animationTracks.length; i ++ ) {
-
-		var track = THREE.KeyframeTrack.parse( animationTracks[i] ).scale( 1 / fps );
-		tracks.push( track );
+		tracks.push( THREE.KeyframeTrack.parse( json.tracks[i] ).scale( 1.0 / json.fps ) );
 
 	}
 
-	if( tracks.length === 0 ) return null;
-
-	return new THREE.AnimationClip( name, duration, tracks );
+	return new THREE.AnimationClip( json.name, json.duration, tracks );
 
 };
 
-
-// parse the JSON format for THREE.Geometry clips
-THREE.AnimationClip.parseGeometryClip = function( json ) {
-
-	var name = json.name || "default";
-	var duration = json.duration || -1;
-	var fps = json.fps || 30;
-	var animationTracks = json.tracks || [];
-
-	var tracks = [];
-
-	for( var i = 0; i < animationTracks.length; i ++ ) {
-
-		var track = THREE.KeyframeTrack.parse( animationTracks[i] ).scale( 1 / fps );
-		if( track.name.indexOf('morphTargets') >= 0 ) {
-			track.name = track.name.replace('morphTargets', 'morphTargetInfluences' );
-		}
-		if( track.name.indexOf('.') !== 0 ) {
-			track.name = '.' + track.name;			
-		}
-		tracks.push( track );
-
-	}
-
-	if( tracks.length === 0 ) return null;
-
-	return new THREE.AnimationClip( name, duration, tracks );
-
-};
 
 // parse the old animation.hierarchy format
 THREE.AnimationClip.parseAnimationHierarchy = function( animation, bones, nodeName ) {

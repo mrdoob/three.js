@@ -137,19 +137,11 @@ THREE.KeyframeTrack.prototype = {
 	         Tracks with out of order keys should be considered to be invalid.  - bhouston
 	sort: function() {
 
-		function keyComparator(key0, key1) {
-			return key0.time - key1.time;
-		};
+		this.keys.sort( THREE.KeyframeTrack.keyComparer );
 
-		return function() {
+		return this;
 
-			this.keys.sort( keyComparator );
-
-			return this;
-
-		}
-
-	}(),*/
+	},*/
 
 	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
 	// One could eventually ensure that all key.values in a track are all of the same type (otherwise interpolation makes no sense.)
@@ -236,6 +228,10 @@ THREE.KeyframeTrack.prototype = {
 
 	}
 
+};
+
+THREE.KeyframeTrack.keyComparer = function keyComparator(key0, key1) {
+	return key0.time - key1.time;
 };
 
 THREE.KeyframeTrack.parse = function( json ) {

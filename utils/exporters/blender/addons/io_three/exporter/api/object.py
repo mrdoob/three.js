@@ -172,10 +172,10 @@ def __parse_tracked_vector(fcurves, start_index, nb_curves):
 
 # trackable transform fields ( <output field>, <nb fcurve>, <type> )
 TRACKABLE_FIELDS = {
-    "location": ( "position", 3, "vector3" ),
-    "scale": ( "scale", 3, "vector3" ),
-    "rotation_euler": ( "rotation", 3, "vector3" ),
-    "rotation_quaternion": ( "quaternion", 4, "quaternion" )
+    "location": ( ".position", 3, "vector3" ),
+    "scale": ( ".scale", 3, "vector3" ),
+    "rotation_euler": ( ".rotation", 3, "vector3" ),
+    "rotation_quaternion": ( ".quaternion", 4, "quaternion" )
 }
 
 @_object
