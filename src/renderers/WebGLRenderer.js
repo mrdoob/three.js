@@ -872,10 +872,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				renderer.renderInstances( geometry );
 
-			} else if ( position instanceof THREE.InterleavedBufferAttribute ) {
-
-				renderer.render( 0, position.data.count );
-
 			} else {
 
 				renderer.render( group.start, group.count );
