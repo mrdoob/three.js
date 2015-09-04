@@ -20871,10 +20871,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					var geometry = objects.update( object );
-					var groups = geometry.groups;
 
 					if ( material instanceof THREE.MeshFaceMaterial ) {
 
+						var groups = geometry.groups;
 						var materials = material.materials;
 
 						for ( var i = 0, l = groups.length; i < l; i ++ ) {
@@ -20887,14 +20887,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 								pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
 
 							}
-
-						}
-
-					} else if ( groups.length > 0 ) {
-
-						for ( var i = 0, l = groups.length; i < l; i ++ ) {
-
-							pushRenderItem( object, geometry, material, _vector3.z, groups[ i ] );
 
 						}
 
@@ -26533,7 +26525,7 @@ THREE.SceneUtils = {
 
 	createMultiMaterialObject: function ( geometry, materials ) {
 
-		var group = new THREE.Object3D();
+		var group = new THREE.Group();
 
 		for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
