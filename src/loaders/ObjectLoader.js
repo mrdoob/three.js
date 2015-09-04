@@ -341,6 +341,9 @@ THREE.ObjectLoader.prototype = {
 				if ( data.normalMap !== undefined ) material.normalMap = getTexture( data.normalMap );
 				if ( data.normalScale )	material.normalScale = new THREE.Vector2( data.normalScale, data.normalScale );
 
+				if ( data.displacementMap !== undefined ) material.displacementMap = getTexture( data.displacementMap );
+				if ( data.displacementScale !== undefined ) material.displacementScale = data.displacementScale;
+
 				if ( data.specularMap !== undefined ) material.specularMap = getTexture( data.specularMap );
 
 				if ( data.envMap !== undefined ) {
