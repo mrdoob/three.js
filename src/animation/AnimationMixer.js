@@ -26,6 +26,7 @@ THREE.AnimationMixer.prototype = {
 		// TODO: check for duplicate action names?  Or provide each action with a UUID?
 
 		this.actions.push( action );
+		action.init( this.time );
 		action.mixer = this;
 
 		var tracks = action.clip.tracks;
