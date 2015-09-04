@@ -49,7 +49,7 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 				THREE.ShaderChunk[ "worldpos_vertex" ],
@@ -160,7 +160,7 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 				THREE.ShaderChunk[ "worldpos_vertex" ],
@@ -302,7 +302,7 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 			"	vViewPosition = - mvPosition.xyz;",
@@ -555,7 +555,7 @@ THREE.ShaderLib = {
 			"void main() {",
 
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 			"}"
@@ -615,7 +615,7 @@ THREE.ShaderLib = {
 			"	vNormal = normalize( normalMatrix * normal );",
 
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 			"}"
@@ -775,7 +775,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 			"}"

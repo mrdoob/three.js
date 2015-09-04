@@ -101,7 +101,7 @@
 	"src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/color_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/common.glsl",
-	"src/renderers/shaders/ShaderChunk/default_vertex.glsl",
+	"src/renderers/shaders/ShaderChunk/project_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/defaultnormal_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/emissivemap_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/emissivemap_pars_fragment.glsl",
