@@ -13034,6 +13034,13 @@ THREE.ImageLoader.prototype = {
 
 THREE.JSONLoader = function ( manager ) {
 
+	if ( typeof manager === 'boolean' ) {
+
+		console.warn( 'THREE.JSONLoader: showStatus parameter has been removed from constructor.' );
+		manager = undefined;
+
+	}
+
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 	this.withCredentials = false;
@@ -13043,6 +13050,19 @@ THREE.JSONLoader = function ( manager ) {
 THREE.JSONLoader.prototype = {
 
 	constructor: THREE.JSONLoader,
+
+	get statusDomElement () {
+
+		if ( this._statusDomElement === undefined ) {
+
+			this._statusDomElement = document.createElement( 'div' );
+
+		}
+
+		console.warn( 'THREE.JSONLoader: .statusDomElement has been removed.' );
+		return this._statusDomElement;
+
+	},
 
 	load: function( url, onLoad, onProgress, onError ) {
 
@@ -20851,10 +20871,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					var geometry = objects.update( object );
+					var groups = geometry.groups;
 
 					if ( material instanceof THREE.MeshFaceMaterial ) {
 
-						var groups = geometry.groups;
 						var materials = material.materials;
 
 						for ( var i = 0, l = groups.length; i < l; i ++ ) {
@@ -20867,6 +20887,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 								pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
 
 							}
+
+						}
+
+					} else if ( groups.length > 0 ) {
+
+						for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+							pushRenderItem( object, geometry, material, _vector3.z, groups[ i ] );
 
 						}
 
