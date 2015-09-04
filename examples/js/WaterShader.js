@@ -9,17 +9,21 @@
 
 THREE.ShaderLib[ 'water' ] = {
 
-	uniforms: { "normalSampler":	{ type: "t", value: null },
-				"mirrorSampler":	{ type: "t", value: null },
-				"alpha":			{ type: "f", value: 1.0 },
-				"time":				{ type: "f", value: 0.0 },
-				"distortionScale":	{ type: "f", value: 20.0 },
-				"textureMatrix" :	{ type: "m4", value: new THREE.Matrix4() },
-				"sunColor":			{ type: "c", value: new THREE.Color( 0x7F7F7F ) },
-				"sunDirection":		{ type: "v3", value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
-				"eye":				{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
-				"waterColor":		{ type: "c", value: new THREE.Color( 0x555555 ) }
-	},
+	uniforms: THREE.UniformsUtils.merge( [
+		THREE.UniformsLib[ "fog" ], { 
+			"normalSampler":    { type: "t", value: null },
+			"mirrorSampler":    { type: "t", value: null },
+			"alpha":            { type: "f", value: 1.0 },
+			"time":             { type: "f", value: 0.0 },
+			"distortionScale":  { type: "f", value: 20.0 },
+			"noiseScale":       { type: "f", value: 1.0 },
+			"textureMatrix" :   { type: "m4", value: new THREE.Matrix4() },
+			"sunColor":         { type: "c", value: new THREE.Color(0x7F7F7F) },
+			"sunDirection":     { type: "v3", value: new THREE.Vector3(0.70707, 0.70707, 0) },
+			"eye":              { type: "v3", value: new THREE.Vector3(0, 0, 0) },
+			"waterColor":       { type: "c", value: new THREE.Color(0x555555) }
+		}
+	] ),
 
 	vertexShader: [
 		'uniform mat4 textureMatrix;',
@@ -73,7 +77,10 @@ THREE.ShaderLib[ 'water' ] = {
 		'	specularColor += pow( direction, shiny ) * sunColor * spec;',
 		'	diffuseColor += max( dot( sunDirection, surfaceNormal ), 0.0 ) * sunColor * diffuse;',
 		'}',
-		
+
+		THREE.ShaderChunk[ "common" ],
+		THREE.ShaderChunk[ "fog_pars_fragment" ],		
+
 		'void main()',
 		'{',
 		'	vec4 noise = getNoise( worldPosition.xz );',
@@ -96,7 +103,9 @@ THREE.ShaderLib[ 'water' ] = {
 		'	float reflectance = rf0 + ( 1.0 - rf0 ) * pow( ( 1.0 - theta ), 5.0 );',
 		'	vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;',
 		'	vec3 albedo = mix( sunColor * diffuseLight * 0.3 + scatter, ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance );',
-		'	gl_FragColor = vec4( albedo, alpha );',
+		'	vec3 outgoingLight = albedo;',
+			THREE.ShaderChunk[ "fog_fragment" ],
+		'	gl_FragColor = vec4( outgoingLight, alpha );',		
 		'}'
 	].join( '\n' )
 
@@ -128,7 +137,9 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.waterColor = new THREE.Color( optionalParameter( options.waterColor, 0x7F7F7F ) );
 	this.eye = optionalParameter( options.eye, new THREE.Vector3( 0, 0, 0 ) );
 	this.distortionScale = optionalParameter( options.distortionScale, 20.0 );
-	
+	this.side = optionalParameter(options.side, THREE.FrontSide);
+	this.fog = optionalParameter(options.fog, false);
+
 	this.renderer = renderer;
 	this.scene = scene;
 	this.mirrorPlane = new THREE.Plane();
@@ -162,7 +173,9 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 		fragmentShader: mirrorShader.fragmentShader, 
 		vertexShader: mirrorShader.vertexShader, 
 		uniforms: mirrorUniforms,
-		transparent: true
+		transparent: true,
+		side: this.side,
+		fog: this.fog		
 	} );
 
 	this.material.uniforms.mirrorSampler.value = this.texture;
