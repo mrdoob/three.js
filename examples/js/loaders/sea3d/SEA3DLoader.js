@@ -13,7 +13,6 @@ THREE.SEA3D = function( config ) {
 
 	if ( this.config.autoPlay === undefined ) this.config.autoPlay = false;
 	if ( this.config.multiplier == undefined ) this.config.multiplier = 1;
-	if ( this.config.tangent == undefined ) this.config.tangent = true;
 	if ( this.config.bounding == undefined ) this.config.bounding = true;
 	if ( this.config.standardMaterial == undefined ) this.config.standardMaterial = true;
 	if ( this.config.audioRolloffFactor == undefined ) this.config.audioRolloffFactor = 10;
@@ -1028,7 +1027,6 @@ THREE.SEA3D.prototype.readGeometryBuffer = function( sea ) {
 	else geo.computeVertexNormals();
 
 	if ( sea.tangent4 ) geo.addAttribute( 'tangent', new THREE.BufferAttribute( new Float32Array( sea.tangent4 ), 4 ) );
-	else if ( this.config.tangent ) geo.computeTangents();
 
 	if ( sea.color ) geo.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( sea.color ), 4 ) );
 
