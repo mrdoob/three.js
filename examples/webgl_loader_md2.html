@@ -309,14 +309,14 @@
 				};
 
 				var i = 0, guiItems = [];
-				var animationClips = character.meshBody.animationClips;
+				var clips = character.meshBody.geometry.clips;
 
-				for ( var i = 0; i < animationClips.length; i ++ ) {
+				for ( var i = 0; i < clips.length; i ++ ) {
 
-					var animationClip = animationClips[i];
+					var clip = clips[i];
 
-					playbackConfig[ animationClip.name ] = generateCallback( animationClip );
-					guiItems[ i ] = folder.add( playbackConfig, animationClip.name, animationClip.name );
+					playbackConfig[ clip.name ] = generateCallback( clip );
+					guiItems[ i ] = folder.add( playbackConfig, clip.name, clip.name );
 
 					i ++;
 

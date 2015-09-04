@@ -106,19 +106,34 @@ THREE.AnimationClip.CreateFromMorphTargetSequence = function( name, morphTargetS
 
 };
 
+THREE.AnimationClip.findByName = function( clipArray, name ) {
+
+	for( var i = 0; i < clipArray.length; i ++ ) {
+
+		if( clipArray[i].name === name ) {
+
+			return clipArray[i];
+
+		}
+	}
+
+	return null;
+
+};
+
 THREE.AnimationClip.CreateClipsFromMorphTargetSequences = function( morphTargets, fps ) {
 	
 	var animationToMorphTargets = {};
 
-	// tested with https://regex101.com/ on trick sequences such flamingo_flyA_003 and flamingo_run1_003
-	var pattern = /^([\w-]*[a-zA-Z-_]+)([\d]+)$/;
+	// tested with https://regex101.com/ on trick sequences such flamingo_flyA_003, flamingo_run1_003, crdeath0059
+	var pattern = /^([\w-]*?)([\d]+)$/;
 
 	// sort morph target names into animation groups based patterns like Walk_001, Walk_002, Run_001, Run_002
 	for ( var i = 0, il = morphTargets.length; i < il; i ++ ) {
 
 		var morphTarget = morphTargets[ i ];
 		var parts = morphTarget.name.match( pattern );
-
+	
 		if ( parts && parts.length > 1 ) {
 
 			var name = parts[ 1 ];

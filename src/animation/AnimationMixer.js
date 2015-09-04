@@ -36,7 +36,7 @@ THREE.AnimationMixer.prototype = {
 
 			var track = tracks[ i ];
 
-			var j = this.getPropertyBindingIndex( track.name )
+			var j = this.getPropertyBindingIndex( root, track.name )
 
 			var propertyBinding;
 
@@ -127,13 +127,15 @@ THREE.AnimationMixer.prototype = {
 
 		}
 
+
 		// remove unused property bindings because if we leave them around the mixer can get slow
+		var root = action.localRoot || this.root;
 		var tracks = action.clip.tracks;
 
 		for( var i = 0; i < tracks.length; i ++ ) {
 		
 			var track = tracks[ i ];
-			var propertyBindingIndex = this.getPropertyBindingIndex( track.name );
+			var propertyBindingIndex = this.getPropertyBindingIndex( root, track.name );
 			var propertyBinding = this.propertyBindings[ propertyBindingIndex ];
 
 			propertyBinding.referenceCount -= 1;

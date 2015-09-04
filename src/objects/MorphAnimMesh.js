@@ -9,7 +9,7 @@ THREE.MorphAnimMesh = function ( geometry, material ) {
 	this.type = 'MorphAnimMesh';
 
 	this.mixer = new THREE.AnimationMixer( this );
-
+	this.activeAction = null;
 };
 
 THREE.MorphAnimMesh.prototype = Object.create( THREE.Mesh.prototype );
@@ -29,21 +29,21 @@ THREE.MorphAnimMesh.prototype.setDirectionBackward = function () {
 
 THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
-	this.mixer.removeAllActions();
+	if( this.activeAction ) {
 
-	var clip = null;
-	for( var i = 0; i < this.geometry.clips.length; i ++ ) {
-		if( this.geometry.clips[ i ].name === label ) {
-			clip = this.geometry.clips[ i ];
-			break;
-		}
+		this.mixer.removeAction( this.activeAction );
+		this.activeAction = null;
+		
 	}
-	
+
+	var clip = THREE.AnimationClip.findByName( this.geometry.clips, label );
+
 	if ( clip ) {
 
 		var action = new THREE.AnimationAction( clip, 0, 1, 1, true );
 		action.timeScale = ( clip.tracks.length * fps ) / clip.duration;
 		this.mixer.addAction( action );
+		this.activeAction = action;
 
 	} else {
 
@@ -56,21 +56,6 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 	this.mixer.update( delta );
-
-};
-
-THREE.MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
-
-	var influences = this.morphTargetInfluences;
-
-	for ( var i = 0, l = influences.length; i < l; i ++ ) {
-
-		influences[ i ] = 0;
-
-	}
-
-	if ( a > - 1 ) influences[ a ] = 1 - t;
-	if ( b > - 1 ) influences[ b ] = t;
 
 };
 
