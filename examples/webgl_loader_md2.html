@@ -207,6 +207,8 @@
 					setupWeaponsGUI( character );
 					setupGUIAnimations( character );
 
+					character.setAnimation( character.meshBody.geometry.clips[0].name )
+
 				};
 
 				character.loadParts( config );
