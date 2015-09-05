@@ -185,7 +185,8 @@ THREE.Object3D.prototype = {
 
 	rotateX: function () {
 
-		var v1 = new THREE.Vector3( 1, 0, 0 );
+		var v1 = THREE.Object3D.chachedVector;
+		v1.set(1, 0, 0);
 
 		return function ( angle ) {
 
@@ -197,7 +198,8 @@ THREE.Object3D.prototype = {
 
 	rotateY: function () {
 
-		var v1 = new THREE.Vector3( 0, 1, 0 );
+		var v1 = THREE.Object3D.chachedVector;
+		v1.set(0, 1, 0);
 
 		return function ( angle ) {
 
@@ -209,7 +211,8 @@ THREE.Object3D.prototype = {
 
 	rotateZ: function () {
 
-		var v1 = new THREE.Vector3( 0, 0, 1 );
+		var v1 = THREE.Object3D.chachedVector;
+		v1.set(0, 0, 1);
 
 		return function ( angle ) {
 
@@ -224,7 +227,8 @@ THREE.Object3D.prototype = {
 		// translate object by distance along axis in object space
 		// axis is assumed to be normalized
 
-		var v1 = new THREE.Vector3();
+		var v1 = THREE.Object3D.chachedVector;
+		v1.set(0, 0, 0);
 
 		return function ( axis, distance ) {
 
@@ -247,7 +251,8 @@ THREE.Object3D.prototype = {
 
 	translateX: function () {
 
-		var v1 = new THREE.Vector3( 1, 0, 0 );
+		var v1 = THREE.Object3D.chachedVector;
+		v1.set(1, 0, 0);
 
 		return function ( distance ) {
 
@@ -259,7 +264,8 @@ THREE.Object3D.prototype = {
 
 	translateY: function () {
 
-		var v1 = new THREE.Vector3( 0, 1, 0 );
+		var v1 = THREE.Object3D.chachedVector;
+		v1.set(0, 1, 0);
 
 		return function ( distance ) {
 
@@ -271,7 +277,8 @@ THREE.Object3D.prototype = {
 
 	translateZ: function () {
 
-		var v1 = new THREE.Vector3( 0, 0, 1 );
+		var v1 = THREE.Object3D.chachedVector;
+		v1.set(0, 0, 1);
 
 		return function ( distance ) {
 
@@ -289,7 +296,13 @@ THREE.Object3D.prototype = {
 
 	worldToLocal: function () {
 
-		var m1 = new THREE.Matrix4();
+		var m1 = THREE.Object3D.chachedMatrix;
+		m1.set(
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
+		);
 
 		return function ( vector ) {
 
@@ -303,7 +316,13 @@ THREE.Object3D.prototype = {
 
 		// This routine does not support objects with rotated and/or translated parent(s)
 
-		var m1 = new THREE.Matrix4();
+		var m1 = THREE.Object3D.chachedMatrix;
+		m1.set(
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
+		);
 
 		return function ( vector ) {
 
@@ -437,8 +456,8 @@ THREE.Object3D.prototype = {
 
 	getWorldQuaternion: function () {
 
-		var position = new THREE.Vector3();
-		var scale = new THREE.Vector3();
+		// position and scale are only used for decompose and so they can have the same entity
+		var position = var scale = THREE.Object3D.chachedVector;
 
 		return function ( optionalTarget ) {
 
@@ -456,7 +475,7 @@ THREE.Object3D.prototype = {
 
 	getWorldRotation: function () {
 
-		var quaternion = new THREE.Quaternion();
+		var quaternion = THREE.Object3D.chachedQuaternion;
 
 		return function ( optionalTarget ) {
 
@@ -472,8 +491,8 @@ THREE.Object3D.prototype = {
 
 	getWorldScale: function () {
 
-		var position = new THREE.Vector3();
-		var quaternion = new THREE.Quaternion();
+		var position = THREE.Object3D.chachedVector;
+		var quaternion = THREE.Object3D.chachedQuaternion;
 
 		return function ( optionalTarget ) {
 
@@ -491,7 +510,7 @@ THREE.Object3D.prototype = {
 
 	getWorldDirection: function () {
 
-		var quaternion = new THREE.Quaternion();
+		var quaternion = THREE.Object3D.chachedQuaternion;
 
 		return function ( optionalTarget ) {
 
@@ -734,5 +753,8 @@ THREE.Object3D.prototype = {
 };
 
 THREE.EventDispatcher.prototype.apply( THREE.Object3D.prototype );
+THREE.Object3D.chachedVector = new THREE.Vector3(0, 0, 0);
+THREE.Object3D.chachedMatrix = new THREE.Matrix4();
+THREE.Object3D.chachedQuaternion = new THREE.Quaternion();
 
 THREE.Object3DIdCount = 0;

@@ -38,7 +38,7 @@ THREE.Camera.prototype.lookAt = function () {
 
 	// This routine does not support cameras with rotated and/or translated parent(s)
 
-	var m1 = new THREE.Matrix4();
+	var m1 = THREE.Object3D.cachedMatrix;
 
 	return function ( vector ) {
 
