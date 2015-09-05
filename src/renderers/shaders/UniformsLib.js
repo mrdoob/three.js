@@ -55,6 +55,14 @@ THREE.UniformsLib = {
 		"normalScale" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
 	},
 
+	displacementmap: {
+
+		"displacementMap" : { type: "t", value: null },
+		"displacementScale" : { type: "f", value: 1 },
+		"displacementBias" : { type: "f", value: 0 }
+
+	},
+
 	fog : {
 
 		"fogDensity" : { type: "f", value: 0.00025 },

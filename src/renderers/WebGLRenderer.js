@@ -1494,6 +1494,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			normalMap: !! material.normalMap,
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
+			displacementMap: !! material.displacementMap,
 
 			combine: material.combine,
 
@@ -2120,6 +2121,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.aoMap.value = material.aoMap;
 		uniforms.aoMapIntensity.value = material.aoMapIntensity;
+
+		uniforms.displacementMap.value = material.displacementMap;
+		uniforms.displacementScale.value = material.displacementScale;
+		uniforms.displacementBias.value = material.displacementBias;
 
 		uniforms.emissiveMap.value = material.emissiveMap;
 

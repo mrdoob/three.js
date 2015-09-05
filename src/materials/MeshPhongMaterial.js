@@ -12,10 +12,10 @@
  *  map: new THREE.Texture( <Image> ),
  *
  *  lightMap: new THREE.Texture( <Image> ),
- *  lightMapIntensity: <float>
+ *  lightMapIntensity: <float>,
  *
  *  aoMap: new THREE.Texture( <Image> ),
- *  aoMapIntensity: <float>
+ *  aoMapIntensity: <float>,
  *
  *  emissiveMap: new THREE.Texture( <Image> ),
  *
@@ -28,6 +28,10 @@
  *  specularMap: new THREE.Texture( <Image> ),
  *
  *  alphaMap: new THREE.Texture( <Image> ),
+ *
+ *  displacementMap: new THREE.Texture( <Image> ),
+ *  displacementScale: <float>,
+ *  displacementBias: <float>,
  *
  *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
  *  combine: THREE.Multiply,
@@ -84,6 +88,10 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.specularMap = null;
 
 	this.alphaMap = null;
+
+	this.displacementMap = null;
+	this.displacementScale = 1;
+	this.displacementBias = 0;
 
 	this.envMap = null;
 	this.combine = THREE.MultiplyOperation;
@@ -142,6 +150,10 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.specularMap = source.specularMap;
 
 	this.alphaMap = source.alphaMap;
+
+	this.displacementMap = source.displacementMap;
+	this.displacementScale = source.displacementScale;
+	this.displacementBias = source.displacementBias;
 
 	this.envMap = source.envMap;
 	this.combine = source.combine;

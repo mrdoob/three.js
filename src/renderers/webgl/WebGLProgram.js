@@ -203,6 +203,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.normalMap ? '#define USE_NORMALMAP' : '',
 				parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 				parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
+				( parameters.displacementMap && parameters.supportsVertexTextures ) ? '#define USE_DISPLACEMENTMAP' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
 
 				parameters.flatShading ? '#define FLAT_SHADED' : '',
