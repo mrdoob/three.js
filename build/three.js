@@ -10,11 +10,11 @@ var THREE = { REVISION: '72dev' };
 
 if ( typeof define === 'function' && define.amd ) {
 
-    define( 'three', THREE );
+		define( 'three', THREE );
 
 } else if ( 'undefined' !== typeof exports && 'undefined' !== typeof module ) {
 
-    module.exports = THREE;
+		module.exports = THREE;
 
 }
 
@@ -23,48 +23,48 @@ if ( typeof define === 'function' && define.amd ) {
 
 if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === undefined ) {
 
-  // Missing in Android stock browser.
+	// Missing in Android stock browser.
 
-  ( function () {
+	( function () {
 
-  	var lastTime = 0;
-  	var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
+		var lastTime = 0;
+		var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
 
-  	for ( var x = 0; x < vendors.length && ! self.requestAnimationFrame; ++ x ) {
+		for ( var x = 0; x < vendors.length && ! self.requestAnimationFrame; ++ x ) {
 
-  		self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
-  		self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
+			self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
+			self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
 
-  	}
+		}
 
-  	if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
+		if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
 
-  		self.requestAnimationFrame = function ( callback ) {
+			self.requestAnimationFrame = function ( callback ) {
 
-  			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-  			var id = self.setTimeout( function () {
+				var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
+				var id = self.setTimeout( function () {
 
-  				callback( currTime + timeToCall );
+					callback( currTime + timeToCall );
 
-  			}, timeToCall );
-  			lastTime = currTime + timeToCall;
-  			return id;
+				}, timeToCall );
+				lastTime = currTime + timeToCall;
+				return id;
 
-  		};
+			};
 
-  	}
+		}
 
-  	if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
+		if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
 
-  		self.cancelAnimationFrame = function ( id ) {
+			self.cancelAnimationFrame = function ( id ) {
 
-  			self.clearTimeout( id );
+				self.clearTimeout( id );
 
-  		};
+			};
 
-  	}
+		}
 
-  }() );
+	}() );
 
 }
 
@@ -148,7 +148,7 @@ THREE.CustomBlending = 5;
 
 // custom blending equations
 // (numbers start from 100 not to clash with other
-//  mappings to OpenGL constants defined in Texture.js)
+// mappings to OpenGL constants defined in Texture.js)
 
 THREE.AddEquation = 100;
 THREE.SubtractEquation = 101;
@@ -18308,6 +18308,10 @@ THREE.ShaderChunk[ 'aomap_pars_fragment'] = "#ifdef USE_AOMAP\n\n	uniform sample
 
 THREE.ShaderChunk[ 'begin_vertex'] = "\nvec3 transformed = vec3( position );\n";
 
+// File:src/renderers/shaders/ShaderChunk/beginnormal_vertex.glsl
+
+THREE.ShaderChunk[ 'beginnormal_vertex'] = "\nvec3 objectNormal = vec3( normal );\n";
+
 // File:src/renderers/shaders/ShaderChunk/bumpmap_pars_fragment.glsl
 
 THREE.ShaderChunk[ 'bumpmap_pars_fragment'] = "#ifdef USE_BUMPMAP\n\n	uniform sampler2D bumpMap;\n	uniform float bumpScale;\n\n	// Derivative maps - bump mapping unparametrized surfaces by Morten Mikkelsen\n	// http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html\n\n	// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)\n\n	vec2 dHdxy_fwd() {\n\n		vec2 dSTdx = dFdx( vUv );\n		vec2 dSTdy = dFdy( vUv );\n\n		float Hll = bumpScale * texture2D( bumpMap, vUv ).x;\n		float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;\n		float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;\n\n		return vec2( dBx, dBy );\n\n	}\n\n	vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {\n\n		vec3 vSigmaX = dFdx( surf_pos );\n		vec3 vSigmaY = dFdy( surf_pos );\n		vec3 vN = surf_norm;		// normalized\n\n		vec3 R1 = cross( vSigmaY, vN );\n		vec3 R2 = cross( vN, vSigmaX );\n\n		float fDet = dot( vSigmaX, R1 );\n\n		vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );\n		return normalize( abs( fDet ) * surf_norm - vGrad );\n\n	}\n\n#endif\n";
@@ -18334,11 +18338,11 @@ THREE.ShaderChunk[ 'common'] = "#define PI 3.14159\n#define PI2 6.28318\n#define
 
 // File:src/renderers/shaders/ShaderChunk/defaultnormal_vertex.glsl
 
-THREE.ShaderChunk[ 'defaultnormal_vertex'] = "#ifdef USE_SKINNING\n\n	vec3 objectNormal = skinnedNormal.xyz;\n\n#elif defined( USE_MORPHNORMALS )\n\n	vec3 objectNormal = morphedNormal;\n\n#else\n\n	vec3 objectNormal = normal;\n\n#endif\n\n#ifdef FLIP_SIDED\n\n	objectNormal = -objectNormal;\n\n#endif\n\nvec3 transformedNormal = normalMatrix * objectNormal;\n";
+THREE.ShaderChunk[ 'defaultnormal_vertex'] = "#ifdef FLIP_SIDED\n\n	objectNormal = -objectNormal;\n\n#endif\n\nvec3 transformedNormal = normalMatrix * objectNormal;\n";
 
 // File:src/renderers/shaders/ShaderChunk/displacementmap_vertex.glsl
 
-THREE.ShaderChunk[ 'displacementmap_vertex'] = "#ifdef USE_DISPLACEMENTMAP\n\n	transformed += objectNormal * texture2D( displacementMap, uv ).x * displacementScale;\n\n#endif\n";
+THREE.ShaderChunk[ 'displacementmap_vertex'] = "#ifdef USE_DISPLACEMENTMAP\n\n	transformed += normal * texture2D( displacementMap, uv ).x * displacementScale;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/displacementmap_pars_vertex.glsl
 
@@ -18446,7 +18450,7 @@ THREE.ShaderChunk[ 'map_particle_pars_fragment'] = "#ifdef USE_MAP\n\n	uniform v
 
 // File:src/renderers/shaders/ShaderChunk/morphnormal_vertex.glsl
 
-THREE.ShaderChunk[ 'morphnormal_vertex'] = "#ifdef USE_MORPHNORMALS\n\n	vec3 morphedNormal = vec3( normal );\n	morphedNormal += ( morphNormal0 - normal ) * morphTargetInfluences[ 0 ];\n	morphedNormal += ( morphNormal1 - normal ) * morphTargetInfluences[ 1 ];\n	morphedNormal += ( morphNormal2 - normal ) * morphTargetInfluences[ 2 ];\n	morphedNormal += ( morphNormal3 - normal ) * morphTargetInfluences[ 3 ];\n\n#endif\n";
+THREE.ShaderChunk[ 'morphnormal_vertex'] = "#ifdef USE_MORPHNORMALS\n\n	objectNormal += ( morphNormal0 - normal ) * morphTargetInfluences[ 0 ];\n	objectNormal += ( morphNormal1 - normal ) * morphTargetInfluences[ 1 ];\n	objectNormal += ( morphNormal2 - normal ) * morphTargetInfluences[ 2 ];\n	objectNormal += ( morphNormal3 - normal ) * morphTargetInfluences[ 3 ];\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/morphtarget_pars_vertex.glsl
 
@@ -18494,7 +18498,7 @@ THREE.ShaderChunk[ 'skinning_vertex'] = "#ifdef USE_SKINNING\n\n	vec4 skinVertex
 
 // File:src/renderers/shaders/ShaderChunk/skinnormal_vertex.glsl
 
-THREE.ShaderChunk[ 'skinnormal_vertex'] = "#ifdef USE_SKINNING\n\n	mat4 skinMatrix = mat4( 0.0 );\n	skinMatrix += skinWeight.x * boneMatX;\n	skinMatrix += skinWeight.y * boneMatY;\n	skinMatrix += skinWeight.z * boneMatZ;\n	skinMatrix += skinWeight.w * boneMatW;\n	skinMatrix  = bindMatrixInverse * skinMatrix * bindMatrix;\n\n	#ifdef USE_MORPHNORMALS\n\n	vec4 skinnedNormal = skinMatrix * vec4( morphedNormal, 0.0 );\n\n	#else\n\n	vec4 skinnedNormal = skinMatrix * vec4( normal, 0.0 );\n\n	#endif\n\n#endif\n";
+THREE.ShaderChunk[ 'skinnormal_vertex'] = "#ifdef USE_SKINNING\n\n	mat4 skinMatrix = mat4( 0.0 );\n	skinMatrix += skinWeight.x * boneMatX;\n	skinMatrix += skinWeight.y * boneMatY;\n	skinMatrix += skinWeight.z * boneMatZ;\n	skinMatrix += skinWeight.w * boneMatW;\n	skinMatrix  = bindMatrixInverse * skinMatrix * bindMatrix;\n\n	objectNormal = vec4( skinMatrix * vec4( objectNormal, 0.0 ) ).xyz;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/specularmap_fragment.glsl
 
@@ -18779,6 +18783,7 @@ THREE.ShaderLib = {
 
 			"	#ifdef USE_ENVMAP",
 
+				THREE.ShaderChunk[ "beginnormal_vertex" ],
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
@@ -18892,6 +18897,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "uv2_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
+				THREE.ShaderChunk[ "beginnormal_vertex" ],
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
@@ -19031,6 +19037,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "uv2_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
+				THREE.ShaderChunk[ "beginnormal_vertex" ],
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
@@ -24266,7 +24273,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
 				parameters.bumpMap ? '#define USE_BUMPMAP' : '',
 				parameters.normalMap ? '#define USE_NORMALMAP' : '',
-				parameters.displacementMap ? '#define USE_DISPLACEMENTMAP' : '',
+				parameters.displacementMap && parameters.supportsVertexTextures ? '#define USE_DISPLACEMENTMAP' : '',
 				parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 				parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
