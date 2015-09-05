@@ -96,6 +96,7 @@
 	"src/renderers/shaders/ShaderChunk/aomap_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/aomap_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/begin_vertex.glsl",
+	"src/renderers/shaders/ShaderChunk/beginnormal_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/bumpmap_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/color_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/color_pars_fragment.glsl",
