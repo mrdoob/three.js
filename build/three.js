@@ -15387,6 +15387,7 @@ THREE.MeshLambertMaterial.prototype.copy = function ( source ) {
  *
  *  displacementMap: new THREE.Texture( <Image> ),
  *  displacementScale: <float>,
+ *  displacementBias: <float>,
  *
  *  specularMap: new THREE.Texture( <Image> ),
  *
@@ -15446,6 +15447,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	this.displacementMap = null;
 	this.displacementScale = 1;
+	this.displacementBias = 0;
 
 	this.specularMap = null;
 
@@ -15507,6 +15509,7 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 
 	this.displacementMap = source.displacementMap;
 	this.displacementScale = source.displacementScale;
+	this.displacementBias = source.displacementBias;
 
 	this.specularMap = source.specularMap;
 
@@ -18342,11 +18345,11 @@ THREE.ShaderChunk[ 'defaultnormal_vertex'] = "#ifdef FLIP_SIDED\n\n	objectNormal
 
 // File:src/renderers/shaders/ShaderChunk/displacementmap_vertex.glsl
 
-THREE.ShaderChunk[ 'displacementmap_vertex'] = "#ifdef USE_DISPLACEMENTMAP\n\n	transformed += normal * texture2D( displacementMap, uv ).x * displacementScale;\n\n#endif\n";
+THREE.ShaderChunk[ 'displacementmap_vertex'] = "#ifdef USE_DISPLACEMENTMAP\n\n	transformed += normal * ( texture2D( displacementMap, uv ).x * displacementScale + displacementBias );\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/displacementmap_pars_vertex.glsl
 
-THREE.ShaderChunk[ 'displacementmap_pars_vertex'] = "#ifdef USE_DISPLACEMENTMAP\n\n	uniform sampler2D displacementMap;\n	uniform float displacementScale;\n\n#endif\n";
+THREE.ShaderChunk[ 'displacementmap_pars_vertex'] = "#ifdef USE_DISPLACEMENTMAP\n\n	uniform sampler2D displacementMap;\n	uniform float displacementScale;\n	uniform float displacementBias;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/emissivemap_fragment.glsl
 
@@ -18669,7 +18672,8 @@ THREE.UniformsLib = {
 	displacementmap: {
 
 		"displacementMap" : { type: "t", value: null },
-		"displacementScale" : { type: "f", value: 1 }
+		"displacementScale" : { type: "f", value: 1 },
+		"displacementBias" : { type: "f", value: 0 }
 
 	},
 
@@ -21583,6 +21587,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			uniforms.displacementMap.value = material.displacementMap;
 			uniforms.displacementScale.value = material.displacementScale;
+			uniforms.displacementBias.value = material.displacementBias;
 
 		}
 
