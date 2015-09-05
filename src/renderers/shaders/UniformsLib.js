@@ -59,7 +59,8 @@ THREE.UniformsLib = {
 	displacementmap: {
 
 		"displacementMap" : { type: "t", value: null },
-		"displacementScale" : { type: "f", value: 1 }
+		"displacementScale" : { type: "f", value: 1 },
+		"displacementBias" : { type: "f", value: 0 }
 
 	},
 

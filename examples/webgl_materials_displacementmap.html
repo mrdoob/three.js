@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - displacement map</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			a {	color: #ffffff;	}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				z-index:1000;
+			}
+
+			#vt { display:none }
+			#vt, #vt a { color:orange; }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
+
+		</style>
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - (<span id="description">normal + ao + displacement + environment</span>) map demo.
+			ninja head from <a href="http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/amd-gpu-meshmapper/" target="_blank">AMD GPU MeshMapper</a>
+
+			<div id="vt">displacement mapping requires vertex textures</div>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+
+		<script src="js/loaders/BinaryLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var stats, loader;
+
+			var camera, scene, renderer, controls;
+
+			var mesh;
+
+			var pointLight;
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var height = 500; // of camera frustum
+
+			var r = 0.0;
+
+			init();
+			animate();
+
+			function init() {
+
+				var container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				//
+
+				scene = new THREE.Scene();
+
+				var aspect = window.innerWidth / window.innerHeight;
+				camera = new THREE.OrthographicCamera( - height * aspect, height * aspect, height, - height, 1, 10000 );
+				camera.position.z = 1500;
+				scene.add( camera );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
+				controls.enableDamping = true;
+
+				// lights
+
+				var ambientLight = new THREE.AmbientLight( 0x111111 );
+				scene.add( ambientLight );
+
+				pointLight = new THREE.PointLight( 0xff0000, 0.5 );
+				pointLight.position.z = 2500;
+				scene.add( pointLight );
+
+				var pointLight2 = new THREE.PointLight( 0xff6666, 1 );
+				camera.add( pointLight2 );
+
+				var pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
+				pointLight3.position.x = - 1000;
+				pointLight3.position.z = 1000;
+				scene.add( pointLight3 );
+
+				// env map
+
+				var path = "textures/cube/SwedishRoyalCastle/";
+				var format = '.jpg';
+				var urls = [
+						path + 'px' + format, path + 'nx' + format,
+						path + 'py' + format, path + 'ny' + format,
+						path + 'pz' + format, path + 'nz' + format
+					];
+
+				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeReflectionMapping );
+
+				// material
+
+				var normalMap = THREE.ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
+
+				var aoMap = THREE.ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
+
+				var displacementMap = THREE.ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
+
+				var material = new THREE.MeshPhongMaterial( {
+
+					color: 0x0a0100,
+					specular: 0xffffff,
+					shininess: 10,
+
+					normalMap: normalMap,
+					normalScale: new THREE.Vector2( 1, - 1 ), // why does the normal map require negation in this case?
+
+					aoMap: aoMap,
+					aoMapIntensity: 1,
+
+					displacementMap: displacementMap,
+					displacementScale: 2.436143,
+					displacementBias: - 0.428408,
+
+					envMap: reflectionCube,
+					combine: THREE.AddOperation,
+					reflectivity: 0.2,
+
+					side: THREE.DoubleSide
+
+				} );
+
+				//
+
+				loader = new THREE.BinaryLoader();
+
+				loader.load( "obj/ninja/NinjaLo_bin.js", function( geometry ) {
+
+					geometry.faceVertexUvs[ 1 ] = geometry.faceVertexUvs[ 0 ]; // 2nd set of UVs required for aoMap and displacementMap with MeshPhongMaterial
+
+					mesh = new THREE.Mesh( geometry, material );
+					mesh.scale.multiplyScalar( 25 );
+					scene.add( mesh );
+
+				} );
+
+				//
+
+				var description = "normal + ao" + ( renderer.supportsVertexTextures() ? " + displacement + environment" : " + <strike>displacement</strike>" );
+				document.getElementById( "description" ).innerHTML = description;
+				document.getElementById( "vt" ).style.display = renderer.supportsVertexTextures() ? "none" : "block";
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				var aspect = window.innerWidth / window.innerHeight;
+
+				camera.left = - height * aspect;
+				camera.right = height * aspect;
+				camera.top = height;
+				camera.bottom = - height;
+
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+
+				render();
+
+				stats.update();
+
+			}
+
+			function render() {
+
+				pointLight.position.x = 2500 * Math.cos( r );
+				pointLight.position.z = 2500 * Math.sin( r );
+
+				r += 0.01;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+
+</html>

@@ -27,6 +27,7 @@
  *
  *  displacementMap: new THREE.Texture( <Image> ),
  *  displacementScale: <float>,
+ *  displacementBias: <float>,
  *
  *  specularMap: new THREE.Texture( <Image> ),
  *
@@ -86,6 +87,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	this.displacementMap = null;
 	this.displacementScale = 1;
+	this.displacementBias = 0;
 
 	this.specularMap = null;
 
@@ -147,6 +149,7 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 
 	this.displacementMap = source.displacementMap;
 	this.displacementScale = source.displacementScale;
+	this.displacementBias = source.displacementBias;
 
 	this.specularMap = source.specularMap;
 
