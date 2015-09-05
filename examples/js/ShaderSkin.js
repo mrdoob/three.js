@@ -355,7 +355,9 @@ THREE.ShaderSkin = {
 				"opacity": 	  { type: "f", value: 1 },
 
 				"uRoughness": 	  		{ type: "f", value: 0.15 },
-				"uSpecularBrightness": 	{ type: "f", value: 0.75 }
+				"uSpecularBrightness": 	{ type: "f", value: 0.75 },
+
+				"uPixelSize":	{ type: "f", value: 0.01 }
 
 			}
 
@@ -383,9 +385,8 @@ THREE.ShaderSkin = {
 			"uniform sampler2D tBeckmann;",
 
 			"uniform float uNormalScale;",
+			"uniform float uPixelSize;",
 
-			"varying vec3 vTangent;",
-			"varying vec3 vBinormal;",
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
@@ -453,16 +454,26 @@ THREE.ShaderSkin = {
 
 				"vec4 mSpecular = vec4( specular, opacity );",
 
-				"vec3 normalTex = texture2D( tNormal, vUv ).xyz * 2.0 - 1.0;",
-				"normalTex.xy *= uNormalScale;",
-				"normalTex = normalize( normalTex );",
-
 				"vec4 colDiffuse = texture2D( tDiffuse, vUv );",
 				"colDiffuse *= colDiffuse;",
 
 				"diffuseColor *= colDiffuse;",
 
-				"mat3 tsb = mat3( vTangent, vBinormal, vNormal );",
+				// normal mapping
+
+				"vec2 uz = vec2( vUv.x, vViewPosition.z );",
+				"vec2 uzDx = dFdx( uz ), uzDy = dFdy( uz );",
+				"vec2 tangent2D = normalize( vec2( uzDx.x, uzDy.x ) );",
+				"vec2 zVec2D = vec2( uzDx.y, uzDy.y );",
+				"vec3 tangent = vec3( tangent2D * uPixelSize, dot( tangent2D, zVec2D ) );",
+				"vec3 binormal = normalize( cross( vNormal, tangent ) );",
+				"tangent = cross( binormal, vNormal );",
+				"mat3 tsb = mat3( tangent, binormal, vNormal );",
+
+				"vec3 normalTex = texture2D( tNormal, vUv ).xyz * 2.0 - 1.0;",
+				"normalTex.xy *= uNormalScale;",
+				"normalTex = normalize( normalTex );",
+
 				"vec3 finalNormal = tsb * normalTex;",
 
 				"vec3 normal = normalize( finalNormal );",
@@ -572,8 +583,6 @@ THREE.ShaderSkin = {
 
 		vertexShader: [
 
-			"attribute vec4 tangent;",
-
 			"#ifdef VERTEX_TEXTURES",
 
 				"uniform sampler2D tDisplacement;",
@@ -582,8 +591,6 @@ THREE.ShaderSkin = {
 
 			"#endif",
 
-			"varying vec3 vTangent;",
-			"varying vec3 vBinormal;",
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
@@ -610,13 +617,6 @@ THREE.ShaderSkin = {
 				"vViewPosition = -mvPosition.xyz;",
 
 				"vNormal = normalize( normalMatrix * normal );",
-
-				// tangent and binormal vectors
-
-				"vTangent = normalize( normalMatrix * tangent.xyz );",
-
-				"vBinormal = cross( vNormal, vTangent ) * tangent.w;",
-				"vBinormal = normalize( vBinormal );",
 
 				"vUv = uv;",
 
@@ -659,8 +659,6 @@ THREE.ShaderSkin = {
 
 		vertexShaderUV: [
 
-			"attribute vec4 tangent;",
-
 			"#ifdef VERTEX_TEXTURES",
 
 				"uniform sampler2D tDisplacement;",
@@ -669,8 +667,6 @@ THREE.ShaderSkin = {
 
 			"#endif",
 
-			"varying vec3 vTangent;",
-			"varying vec3 vBinormal;",
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
@@ -697,13 +693,6 @@ THREE.ShaderSkin = {
 				"vViewPosition = -mvPosition.xyz;",
 
 				"vNormal = normalize( normalMatrix * normal );",
-
-				// tangent and binormal vectors
-
-				"vTangent = normalize( normalMatrix * tangent.xyz );",
-
-				"vBinormal = cross( vNormal, vTangent ) * tangent.w;",
-				"vBinormal = normalize( vBinormal );",
 
 				"vUv = uv;",
 
