@@ -87,6 +87,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var pixelSizeUniform = { type: 'f', value: 0.001 };
+
 			var firstPass = true;
 
 			init();
@@ -134,14 +136,18 @@
 				uniformsUV[ "uRoughness" ].value = 0.185;
 				uniformsUV[ "uSpecularBrightness" ].value = 0.8;
 
+
 				var uniforms = THREE.UniformsUtils.clone( uniformsUV );
 				uniforms[ "tDiffuse" ].value = uniformsUV[ "tDiffuse" ].value;
 				uniforms[ "tNormal" ].value = uniformsUV[ "tNormal" ].value;
 				uniforms[ "passID" ].value = 1;
 
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
-				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true };
+				// let those refer to the same object for central control
+				uniformsUV[ "pixelSize" ] = pixelSizeUniform;
+				uniforms[ "pixelSize" ] = pixelSizeUniform;
 
+				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, derivatives: true };
+				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true, derivatives: true };
 
 				material = new THREE.ShaderMaterial( parameters );
 				var materialUV = new THREE.ShaderMaterial( parametersUV );
@@ -156,8 +162,9 @@
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setClearColor( 0x050505 );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
+
+				onWindowResize(); // sets size
 
 				container.appendChild( renderer.domElement );
 
@@ -267,13 +274,16 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
+				var projection00 = camera.projectionMatrix.elements[0];
+				// == 1 / windowHalfX, in view space, assuming near == 1
+
+				pixelSizeUniform.value = 1 / ( projection00 * windowHalfX );
+
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
 			function createScene( geometry, scale, material ) {
-
-				geometry.computeTangents();
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 50;
