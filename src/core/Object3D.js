@@ -472,19 +472,11 @@ THREE.Object3D.prototype = {
 
 	getWorldScale: function () {
 
-		var position = new THREE.Vector3();
-		var quaternion = new THREE.Quaternion();
-
 		return function ( optionalTarget ) {
-
-			var result = optionalTarget || new THREE.Vector3();
 
 			this.updateMatrixWorld( true );
 
-			this.matrixWorld.decompose( position, quaternion, result );
-
-			return result;
-
+			return result.setFromMatrixScale( this.matrixWorld );
 		};
 
 	}(),

@@ -100,3 +100,68 @@ function checkIfFloatsAreEqual(f1, f2) {
 
 	ok( f1Rounded === f2Rounded, "passed" );
 }
+
+test( "getWorldScale", function() {
+	var obj = new THREE.Object3D();
+
+	checkIfDecomposeAndGetWorldScaleAreEqual(obj);
+
+	obj.scale.set(1, 1, 1);
+	checkIfDecomposeAndGetWorldScaleAreEqual(obj);
+
+	obj.scale.set(-1, -12.4324, 32456323);
+	checkIfDecomposeAndGetWorldScaleAreEqual(obj);
+});
+
+test( "getWorldScale with hierarchy", function() {
+	var obj = new THREE.Object3D();
+	var parent1 = new THREE.Object3D();
+	var parent2 = new THREE.Object3D();
+
+	parent2.add(parent1);
+	parent1.add(obj);
+
+	checkIfDecomposeAndGetWorldScaleAreEqual(obj);
+
+	obj.scale.set(1, 1, 1);
+	parent2.scale.set(-1, -12.4324, 32456323);
+	parent1.scale.set(10, 20, -234);
+
+	checkIfDecomposeAndGetWorldScaleAreEqual(obj);
+
+	obj.scale.set(1, 0.00123, -1);
+	parent2.scale.set(-1, -12.4324, 32456323);
+	parent1.scale.set(10, 20, -234);
+
+	checkIfDecomposeAndGetWorldScaleAreEqual(obj);
+
+	obj.position.set(1, 0.00123, -1);
+	parent2.position.set(-1, -12.4324, 32456323);
+	parent1.position.set(10, 20, -234);
+
+	checkIfDecomposeAndGetWorldScaleAreEqual(obj);
+});
+
+function checkIfDecomposeAndGetWorldScaleAreEqual(obj) {
+	var result = new THREE.Vector3();
+
+	// this is the reference way for comparing. We decompose the hole matrix and
+	// extract the scale part
+	var position = new THREE.Vector3();
+	var quaternion = new THREE.Quaternion();
+
+	var parent = obj;
+	while(parent) {
+		parent.updateMatrixWorld( true );
+		parent = parent.parent;
+	}
+
+	obj.matrixWorld.decompose( position, quaternion, result );
+
+	// here we extract the scale by using vector.setFromMatrixScale(m) which should
+	// lead to the same result
+	var worldScale = obj.getWorldScale();
+
+	// both ways should be equal
+	checkIfPropsAreEqual(result, worldScale);
+}
