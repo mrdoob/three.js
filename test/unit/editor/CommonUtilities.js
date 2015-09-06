@@ -1,38 +1,106 @@
 // module( "CommonUtilities" );
 
-function aBox( name ) {
+function mergeParams( defaults, customParams ) {
 
-	var width = 100;
-	var height = 100;
-	var depth = 100;
+	if ( typeof customParams == "undefined" ) return defaults;
 
-	var widthSegments = 1;
-	var heightSegments = 1;
-	var depthSegments = 1;
+	var defaultKeys = Object.keys( defaults );
+	var params = {};
 
-	var geometry = new THREE.BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
-	var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
-	mesh.name = name || "Box 1";
+	defaultKeys.map( function( key ) {
+		params[ key ] = customParams[ key ] || defaultKeys[ key ];
+	});
 
-	return mesh;
+	return params;
 
 }
 
-function aSphere( name ) {
 
-	var width = 100;
-	var height = 100;
-	var depth = 100;
+function getParams( type, customParams ) {
 
-	var widthSegments = 1;
-	var heightSegments = 1;
-	var depthSegments = 1;
+	var defaults = {};
 
-	var geometry = new THREE.SphereGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
-	var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
-	mesh.name = name || "Sphere 1";
+	switch ( type ) {
 
-	return mesh;
+		case "Box":
+
+			defaults = { width: 100, height: 100, depth: 100, widthSegments: 1, heightSegments: 1, depthSegments: 1 };
+			break;
+
+		case "Sphere":
+
+			defaults = { radius: 75, widthSegments: 32, heightSegments: 16, phiStart: 0, phiLength: 6.28, thetaStart: 0.00, thetaLength: 3.14 };
+			break;
+
+		default:
+
+			console.error( "Type '" + type + "' is not known while creating params" );
+			return false;
+
+	}
+
+	return mergeParams( defaults, customParams );
+
+}
+
+function getGeometry( type, customParams ) {
+
+	var params = getParams( type, customParams );
+
+	switch ( type ) {
+
+		case "Box":
+
+			return new THREE.BoxGeometry(
+				params['width'],
+				params['height'],
+				params['depth'],
+				params['widthSegments'],
+				params['heightSegments'],
+				params['depthSegments']
+			);
+
+		case "Sphere":
+
+			return new THREE.SphereGeometry(
+				params['radius'],
+				params['widthSegments'],
+				params['heightSegments'],
+				params['phiStart'],
+				params['phiLength'],
+				params['thetaStart'],
+				params['thetaLength']
+			);
+
+		default:
+
+			console.error( "Type '" + type + "' is not known while creating geometry " );
+			return false;
+
+	}
+
+}
+
+function getObject( name, type, customParams ) {
+
+	var geometry = getGeometry( type, customParams );
+
+	var object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
+	object.name = name || type + " 1";
+
+	return object;
+
+}
+
+
+function aBox( name, customParams ) {
+
+	return getObject( name, "Box", customParams );
+}
+
+function aSphere( name, customParams ) {
+
+	return getObject( name, "Sphere", customParams );
 
 }
 
