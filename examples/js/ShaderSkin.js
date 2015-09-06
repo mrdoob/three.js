@@ -222,7 +222,7 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
-						"vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );",
+						"vec3 dirVector = directionalLightDirection[ i ];",
 
 						"float dirDiffuseWeightFull = max( dot( normal, dirVector ), 0.0 );",
 						"float dirDiffuseWeightHalf = max( 0.5 * dot( normal, dirVector ) + 0.5, 0.0 );",
@@ -243,7 +243,7 @@ THREE.ShaderSkin = {
 
 					"for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-						"vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );",
+						"vec3 lVector = hemisphereLightDirection[ i ];",
 
 						"float dotProduct = dot( normal, lVector );",
 						"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
@@ -497,7 +497,7 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
-						"vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );",
+						"vec3 dirVector = directionalLightDirection[ i ];",
 
 						"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
 
@@ -626,7 +626,7 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
 
-						"vec3 lVector = pointLightPosition[ i ] - mvPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] - vViewPosition;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
@@ -713,7 +713,7 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
 
-						"vec3 lVector = pointLightPosition[ i ] - mvPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] - vViewPosition;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
