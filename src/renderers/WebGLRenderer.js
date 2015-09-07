@@ -1325,7 +1325,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+			if ( object.frustumCulled === false || _frustum.intersectsGeometry( object.geometry, object._matrixWorld ) === true ) {
 
 				var material = object.material;
 
@@ -1333,7 +1333,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( _this.sortObjects === true ) {
 
-						_vector3.setFromMatrixPosition( object.matrixWorld );
+						_vector3.setFromMatrixPosition( object._matrixWorld );
 						_vector3.applyProjection( _projScreenMatrix );
 
 					}
@@ -1391,7 +1391,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
 			var group = renderItem.group;
 
-			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object._matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 			_this.renderBufferDirect( camera, lights, fog, geometry, material, object, group );
