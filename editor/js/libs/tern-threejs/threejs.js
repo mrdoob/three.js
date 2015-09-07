@@ -2399,7 +2399,7 @@
         },
         "setPreferredShading": {
           "!type": "fn(shading: number)",
-          "!doc": "Set the .[page:Integer shading] property on the resource's materials.<br>\n\t\tOptions are [page:Materials THREE.SmoothShading], [page:Materials THREE.FlatShading], [page:Materials THREE.NoShading]."
+          "!doc": "Set the .[page:Integer shading] property on the resource's materials.<br>\n\t\tOptions are [page:Materials THREE.SmoothShading], [page:Materials THREE.FlatShading]."
         },
         "applySkin": {
           "!type": "fn(geometry: +THREE.Geometry, instanceCtrl: object, frame: number)",
@@ -3068,7 +3068,7 @@
         },
         "shading": {
           "!type": "number",
-          "!doc": "Options are [page:Materials THREE.SmoothShading] (default), [page:Materials THREE.FlatShading], [page:Materials THREE.NoShading]."
+          "!doc": "Options are [page:Materials THREE.SmoothShading] (default), [page:Materials THREE.FlatShading]."
         },
         "wireframe": {
           "!type": "bool",
@@ -3212,7 +3212,7 @@
         },
         "shading": {
           "!type": "number",
-          "!doc": "Options are [page:Materials THREE.SmoothShading] (default), [page:Materials THREE.FlatShading], [page:Materials THREE.NoShading]."
+          "!doc": "Options are [page:Materials THREE.SmoothShading] (default), [page:Materials THREE.FlatShading]."
         },
         "wireframe": {
           "!type": "bool",
