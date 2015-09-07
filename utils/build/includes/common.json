@@ -50,7 +50,6 @@
 	"src/cameras/PerspectiveCamera.js",
 	"src/lights/Light.js",
 	"src/lights/AmbientLight.js",
-	"src/lights/AreaLight.js",
 	"src/lights/DirectionalLight.js",
 	"src/lights/HemisphereLight.js",
 	"src/lights/PointLight.js",

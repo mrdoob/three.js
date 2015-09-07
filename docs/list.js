@@ -37,7 +37,6 @@ var list = {
 
 		"Lights": [
 			[ "AmbientLight", "api/lights/AmbientLight" ],
-			[ "AreaLight", "api/lights/AreaLight" ],
 			[ "DirectionalLight", "api/lights/DirectionalLight" ],
 			[ "HemisphereLight", "api/lights/HemisphereLight" ],
 			[ "Light", "api/lights/Light" ],
@@ -231,7 +230,6 @@ var list = {
 			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
 			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
 			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ],
-			[ "VertexTangentsHelper", "api/extras/helpers/VertexTangentsHelper" ],
 			[ "WireframeHelper", "api/extras/helpers/WireframeHelper" ]
 		],
 

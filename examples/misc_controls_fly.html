@@ -108,20 +108,19 @@
 				scene.add( dirLight );
 
 				var materialNormalMap = new THREE.MeshPhongMaterial( {
-				
+
 					specular: 0x333333,
 					shininess: 15,
 					map: THREE.ImageUtils.loadTexture( "textures/planets/earth_atmos_2048.jpg" ),
 					specularMap: THREE.ImageUtils.loadTexture( "textures/planets/earth_specular_2048.jpg" ),
 					normalMap: THREE.ImageUtils.loadTexture( "textures/planets/earth_normal_2048.jpg" ),
 					normalScale: new THREE.Vector2( 0.85, 0.85 )
-				
+
 				} );
 
 				// planet
 
 				geometry = new THREE.SphereGeometry( radius, 100, 50 );
-				geometry.computeTangents();
 
 				meshPlanet = new THREE.Mesh( geometry, materialNormalMap );
 				meshPlanet.rotation.y = 0;
@@ -131,10 +130,10 @@
 				// clouds
 
 				var materialClouds = new THREE.MeshLambertMaterial( {
-				
+
 					map: THREE.ImageUtils.loadTexture( "textures/planets/earth_clouds_1024.png" ),
 					transparent: true
-				
+
 				} );
 
 				meshClouds = new THREE.Mesh( geometry, materialClouds );
@@ -145,9 +144,9 @@
 				// moon
 
 				var materialMoon = new THREE.MeshPhongMaterial( {
-				
+
 					map: THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" )
-				
+
 				} );
 
 				meshMoon = new THREE.Mesh( geometry, materialMoon );
