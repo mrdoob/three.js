@@ -213,7 +213,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
 	var properties = new THREE.WebGLProperties();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
-	var programCache = new THREE.WebGLProgramCache( this, _gl, extensions );
+	var programCache = new THREE.WebGLPrograms( this, _gl, extensions );
 
 	var bufferRenderer = new THREE.WebGLBufferRenderer( _gl, extensions, _infoRender );
 	var indexedBufferRenderer = new THREE.WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );

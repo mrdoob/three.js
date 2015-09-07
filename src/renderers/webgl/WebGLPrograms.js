@@ -1,8 +1,6 @@
-THREE.WebGLProgramCache = function ( renderer1, gl, extensions ) {
+THREE.WebGLPrograms = function ( renderer1, capabilities ) {
 
 	var programs = [];
-	var supportsVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) > 0;
-	var supportsBoneTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) > 0 && extensions.get( 'OES_texture_float' );
 
 	var shaderIDs = {
 		MeshDepthMaterial: 'depth',
@@ -23,7 +21,7 @@ THREE.WebGLProgramCache = function ( renderer1, gl, extensions ) {
 
 	function allocateBones ( object ) {
 
-		if ( supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
+		if ( capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
 
 			return 1024;
 
@@ -36,7 +34,7 @@ THREE.WebGLProgramCache = function ( renderer1, gl, extensions ) {
 			//  - limit here is ANGLE's 254 max uniform vectors
 			//    (up to 54 should be safe)
 
-			var nVertexUniforms = gl.getParameter( gl.MAX_VERTEX_UNIFORM_VECTORS );
+			var nVertexUniforms = capabilities.maxVertexUniforms;
 			var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
 
 			var maxBones = nVertexMatrices;
@@ -100,7 +98,7 @@ THREE.WebGLProgramCache = function ( renderer1, gl, extensions ) {
 
 		return maxShadows;
 
-	};
+	}
 
 	this.getParameters = function( material, lights, fog, object ) {
 
@@ -115,7 +113,7 @@ THREE.WebGLProgramCache = function ( renderer1, gl, extensions ) {
 
 		if ( material.precision !== null ) {
 
-			precision = renderer1.state.getMaxPrecision( material.precision );
+			precision = capabilities.getMaxPrecision( material.precision );
 
 			if ( precision !== material.precision ) {
 
@@ -130,7 +128,7 @@ THREE.WebGLProgramCache = function ( renderer1, gl, extensions ) {
 			shaderID: shaderID,
 
 			precision: precision,
-			supportsVertexTextures: supportsVertexTextures,
+			supportsVertexTextures: capabilities.vertexTextures,
 
 			map: !! material.map,
 			envMap: !! material.envMap,
@@ -158,7 +156,7 @@ THREE.WebGLProgramCache = function ( renderer1, gl, extensions ) {
 
 			skinning: material.skinning,
 			maxBones: maxBones,
-			useVertexTexture: supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture,
+			useVertexTexture: capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,

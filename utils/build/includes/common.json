@@ -166,7 +166,7 @@
 	"src/renderers/webgl/WebGLGeometries.js",
 	"src/renderers/webgl/WebGLObjects.js",
 	"src/renderers/webgl/WebGLProgram.js",
-	"src/renderers/webgl/WebGLProgramCache.js",
+	"src/renderers/webgl/WebGLPrograms.js",
 	"src/renderers/webgl/WebGLProperties.js",
 	"src/renderers/webgl/WebGLShader.js",
 	"src/renderers/webgl/WebGLShadowMap.js",
