@@ -4,59 +4,36 @@
 
 module( "Object3D" );
 
+var RadToDeg = 180 / Math.PI;
+
 test( "rotateX", function() {
   var obj = new THREE.Object3D();
 
-  // get a reference object for comparing
-	var reference = obj.rotateOnAxis(new THREE.Vector3(1, 0, 0), 45).rotation;
-  obj.rotateX(45);
+  var angleInRad = 1.562;
+  obj.rotateX(angleInRad);
 
-	checkIfPropsAreEqual(reference, obj.rotation);
+  // should calculate the correct rotation on x
+  checkIfFloatsAreEqual(obj.rotation.x, angleInRad);
 });
 
 test( "rotateY", function() {
   var obj = new THREE.Object3D();
 
-  // get a reference object for comparing
-	var reference = obj.rotateOnAxis(new THREE.Vector3(0, 1, 0), -25).rotation;
-  obj.rotateY(45);
+  var angleInRad = -0.346;
+  obj.rotateY(angleInRad);
 
-  checkIfPropsAreEqual(reference, obj.rotation);
+  // should calculate the correct rotation on y
+  checkIfFloatsAreEqual(obj.rotation.y, angleInRad);
 });
 
 test( "rotateZ", function() {
   var obj = new THREE.Object3D();
 
-  // get a reference object for comparing
-	var reference = obj.rotateOnAxis(new THREE.Vector3(0, 0, 1), 41.5324).rotation;
-  obj.rotateZ(45);
+  var angleInRad = 1;
+  obj.rotateZ(angleInRad);
 
-	checkIfPropsAreEqual(reference, obj.rotation);
-});
-
-test( "rotateX -> y -> z -> x", function() {
-  var obj = new THREE.Object3D();
-
-  // get a reference object for comparing
-	var reference = obj.rotateOnAxis(new THREE.Vector3(1, 0, 0), 10).rotation;
-  obj.rotateX(10);
-
-	checkIfPropsAreEqual(reference, obj.rotation);
-
-  var reference = obj.rotateOnAxis(new THREE.Vector3(0, 1, 0), -32.324).rotation;
-  obj.rotateY(-32.324);
-
-  checkIfPropsAreEqual(reference, obj.rotation);
-
-  var reference = obj.rotateOnAxis(new THREE.Vector3(0, 0, 1), 12.4).rotation;
-  obj.rotateZ(12.4);
-
-  checkIfPropsAreEqual(reference, obj.rotation);
-
-  var reference = obj.rotateOnAxis(new THREE.Vector3(1, 0, 0), 23).rotation;
-  obj.rotateX(23);
-
-  checkIfPropsAreEqual(reference, obj.rotation);
+  // should calculate the correct rotation on y
+  checkIfFloatsAreEqual(obj.rotation.z, angleInRad);
 });
 
 test( "translateOnAxis", function() {
@@ -96,21 +73,30 @@ test( "lookAt", function() {
   var obj = new THREE.Object3D();
   obj.lookAt(new THREE.Vector3(0, -1, 1));
 
-  ok( obj.rotation.x * (180 / Math.PI) === 45 , "x is equal" );
+  ok( obj.rotation.x * RadToDeg === 45 , "x is equal" );
 });
 
 test( "getWorldQuaternion", function() {
   var obj = new THREE.Object3D();
 
   obj.lookAt(new THREE.Vector3(0, -1, 1));
-  ok( obj.getWorldRotation().x * (180 / Math.PI) === 45 , "x is equal" );
+  ok( obj.getWorldRotation().x * RadToDeg === 45 , "x is equal" );
 
   obj.lookAt(new THREE.Vector3(1, 0, 0));
-  ok( obj.getWorldRotation().y * (180 / Math.PI) === 90 , "y is equal" );
+  ok( obj.getWorldRotation().y * RadToDeg === 90 , "y is equal" );
 });
 
 function checkIfPropsAreEqual(reference, obj) {
   ok( obj.x === reference.x , "x is equal" );
   ok( obj.y === reference.y , "y is equal!" );
   ok( obj.z === reference.z , "z is equal!" );
+}
+
+// since float equal checking is a mess in js, one solution is to cut off
+// decimal places
+function checkIfFloatsAreEqual(f1, f2) {
+  var f1Rounded = ((f1 * 1000) | 0) / 1000;
+  var f2Rounded = ((f2 * 1000) | 0) / 1000;
+
+  ok( f1Rounded === f2Rounded, "passed" );
 }
