@@ -14144,6 +14144,7 @@ THREE.ObjectLoader.prototype = {
 
 				if ( data.displacementMap !== undefined ) material.displacementMap = getTexture( data.displacementMap );
 				if ( data.displacementScale !== undefined ) material.displacementScale = data.displacementScale;
+				if ( data.displacementBias !== undefined ) material.displacementBias = data.displacementBias;
 
 				if ( data.specularMap !== undefined ) material.specularMap = getTexture( data.specularMap );
 
@@ -14890,6 +14891,7 @@ THREE.Material.prototype = {
 
 			data.displacementMap = this.displacementMap.toJSON( meta ).uuid;
 			data.displacementScale = this.displacementScale;
+			data.displacementBias = this.displacementBias;
 
 		}
 		if ( this.specularMap instanceof THREE.Texture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
@@ -24729,7 +24731,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		// set GL state for depth map
 
-		_gl.clearColor( 1, 1, 1, 1 );
+		_renderer.clearColor( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
 
 		_state.enable( _gl.CULL_FACE );
@@ -24892,7 +24894,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var clearColor = _renderer.getClearColor(),
 		clearAlpha = _renderer.getClearAlpha();
 
-		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
+		_renderer.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
 		_state.enable( _gl.BLEND );
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
