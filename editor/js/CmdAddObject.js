@@ -32,6 +32,7 @@ CmdAddObject = function ( object ) {
 
 			this.objectJSON.materials = [];
 			this.objectJSON.materials.push( object.material.toJSON( meta ) );
+
 		}
 
 	}
