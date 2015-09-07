@@ -8,17 +8,34 @@ CmdRemoveObject = function ( object ) {
 
 	this.type = 'CmdRemoveObject';
 
-	meta = {
-		geometries: {},
-		materials: {},
-		textures: {},
-		images: {}
-	};
-
 	this.object = object;
 	this.parent = object !== undefined ? object.parent : undefined;
-	this.objectJSON = object !== undefined ? object.toJSON( meta ) : undefined;
 	this.parentUuid = object !== undefined ? object.parent.uuid : undefined;
+
+	if ( object !== undefined ) {
+
+		meta = {
+			geometries: {},
+			materials: {},
+			textures: {},
+			images: {}
+		};
+		this.objectJSON = object.toJSON( meta );
+
+		if ( object.geometry !== undefined ) {
+
+			this.objectJSON.geometries = [];
+			this.objectJSON.geometries.push( object.geometry.toJSON( meta ) );
+
+		}
+
+		if ( object.material !== undefined ) {
+
+			this.objectJSON.materials = [];
+			this.objectJSON.materials.push( object.material.toJSON( meta ) );
+		}
+
+	}
 
 };
 

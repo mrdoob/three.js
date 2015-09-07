@@ -12,6 +12,7 @@ CmdAddObject = function ( object ) {
 	if ( object !== undefined ) {
 
 		object.updateMatrixWorld( true );
+
 		meta = {
 			geometries: {},
 			materials: {},
@@ -19,6 +20,19 @@ CmdAddObject = function ( object ) {
 			images: {}
 		};
 		this.objectJSON = object.toJSON( meta );
+
+		if ( object.geometry !== undefined ) {
+
+			this.objectJSON.geometries = [];
+			this.objectJSON.geometries.push( object.geometry.toJSON( meta ) );
+
+		}
+
+		if ( object.material !== undefined ) {
+
+			this.objectJSON.materials = [];
+			this.objectJSON.materials.push( object.material.toJSON( meta ) );
+		}
 
 	}
 
