@@ -46,7 +46,7 @@
 	</head>
 	<body>
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - save/restore of texture using canvas<br>Left and right: same canvas, different mapping - middle : an other canvas</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - save/restore of texture using canvas<br>Left and right: same canvas, different mapping - middle : an other canvas<br><br>Use your mouse to draw lines in the textures</div>
 		<fieldset id="controls">
 			<legend>Editor</legend>
 			<div class="control">
@@ -363,7 +363,7 @@
 				// For demonstration purpose, use the same canvas with a different texture mapping.
 				// As uv are not saved with the geometry, we use offset and repeat.
 				circleTexture = new THREE.CanvasTexture( undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
-				circleTexture.offset.x = circleTexture.offset.y = -0.5;
+				circleTexture.offset.x = circleTexture.offset.y = - 0.5;
 				circleTexture.repeat.x = circleTexture.repeat.y = 2;
 				canvas1.bindToTexture( circleTexture );
 				circleTexture.canvasManager = canvas1;

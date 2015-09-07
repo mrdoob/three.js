@@ -27,7 +27,7 @@ THREE.CanvasTexture.copy = function ( source ) {
 	} else if ( source.canvasManager.bindToTexture !== undefined ) {
 
 		this.canvasManager = source.canvasManager;
-		this.canvasManager.bindToTexture(this);
+		this.canvasManager.bindToTexture( this );
 
 	} else {
 
