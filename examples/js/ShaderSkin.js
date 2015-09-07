@@ -357,9 +357,7 @@ THREE.ShaderSkin = {
 				"opacity": 	  { type: "f", value: 1 },
 
 				"uRoughness": 	  		{ type: "f", value: 0.15 },
-				"uSpecularBrightness": 	{ type: "f", value: 0.75 },
-
-				"uPixelSize":	{ type: "f", value: 0.01 }
+				"uSpecularBrightness": 	{ type: "f", value: 0.75 }
 
 			}
 
@@ -387,7 +385,6 @@ THREE.ShaderSkin = {
 			"uniform sampler2D tBeckmann;",
 
 			"uniform float uNormalScale;",
-			"uniform float uPixelSize;",
 
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
@@ -463,22 +460,21 @@ THREE.ShaderSkin = {
 
 				// normal mapping
 
-				"vec2 uz = vec2( vUv.x, vViewPosition.z );",
-				"vec2 uzDx = dFdx( uz ), uzDy = dFdy( uz );",
-				"vec2 tangent2D = normalize( vec2( uzDx.x, uzDy.x ) );",
-				"vec2 zVec2D = vec2( uzDx.y, uzDy.y );",
-				"vec3 tangent = vec3( tangent2D * uPixelSize, dot( tangent2D, zVec2D ) );",
-				"vec3 binormal = normalize( cross( vNormal, tangent ) );",
-				"tangent = cross( binormal, vNormal );",
-				"mat3 tsb = mat3( tangent, binormal, vNormal );",
+				"vec4 posAndU = vec4( -vViewPosition, vUv.x );",
+				"vec4 posAndU_dx = dFdx( posAndU ),  posAndU_dy = dFdy( posAndU );",
+				"vec3 tangent = posAndU_dx.w * posAndU_dx.xyz + posAndU_dy.w * posAndU_dy.xyz;",
+				"vec3 normal = normalize( vNormal );",
+				"vec3 binormal = normalize( cross( tangent, normal ) );",
+				"tangent = cross( normal, binormal );",	// no normalization required
+				"mat3 tsb = mat3( tangent, binormal, normal );",
 
 				"vec3 normalTex = texture2D( tNormal, vUv ).xyz * 2.0 - 1.0;",
 				"normalTex.xy *= uNormalScale;",
 				"normalTex = normalize( normalTex );",
 
 				"vec3 finalNormal = tsb * normalTex;",
+				"normal = normalize( finalNormal );",
 
-				"vec3 normal = normalize( finalNormal );",
 				"vec3 viewerDirection = normalize( vViewPosition );",
 
 				// point lights
