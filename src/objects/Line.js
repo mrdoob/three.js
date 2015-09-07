@@ -6,7 +6,8 @@ THREE.Line = function ( geometry, material, mode ) {
 
 	if ( mode === 1 ) {
 
-		console.error( 'THREE.Line: THREE.LinePieces mode has been removed. Use THREE.LineSegments instead.' );
+		console.warn( 'THREE.Line: parameter THREE.LinePieces no longer supported. Created THREE.LineSegments instead.' );
+		return new THREE.LineSegments( geometry, material );
 
 	}
 
@@ -59,17 +60,21 @@ THREE.Line.prototype.raycast = ( function () {
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
+			var index = geometry.index;
 			var attributes = geometry.attributes;
 
-			if ( attributes.index !== undefined ) {
+			if ( index !== null ) {
 
-				var indices = attributes.index.array;
+				var indices = index.array;
 				var positions = attributes.position.array;
-				var offsets = geometry.drawcalls;
+				var offsets = geometry.groups;
 
 				if ( offsets.length === 0 ) {
 
-					geometry.addDrawCall( 0, indices.length );
+					offsets = [ {
+						start: 0,
+						count: indices.length
+					} ];
 
 				}
 
@@ -92,7 +97,9 @@ THREE.Line.prototype.raycast = ( function () {
 
 						if ( distSq > precisionSq ) continue;
 
-						var distance = ray.origin.distanceTo( interRay );
+						interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
+
+						var distance = raycaster.ray.origin.distanceTo( interRay );
 
 						if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
@@ -127,7 +134,9 @@ THREE.Line.prototype.raycast = ( function () {
 
 					if ( distSq > precisionSq ) continue;
 
-					var distance = ray.origin.distanceTo( interRay );
+					interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
+
+					var distance = raycaster.ray.origin.distanceTo( interRay );
 
 					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
@@ -158,8 +167,10 @@ THREE.Line.prototype.raycast = ( function () {
 				var distSq = ray.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 
 				if ( distSq > precisionSq ) continue;
+				
+				interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
-				var distance = ray.origin.distanceTo( interRay );
+				var distance = raycaster.ray.origin.distanceTo( interRay );
 
 				if ( distance < raycaster.near || distance > raycaster.far ) continue;
 

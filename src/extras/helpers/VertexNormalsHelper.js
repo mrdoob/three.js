@@ -43,8 +43,6 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	this.matrixAutoUpdate = false;
 
-	this.normalMatrix = new THREE.Matrix3();
-
 	this.update();
 
 };
@@ -56,12 +54,13 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
+	var normalMatrix = new THREE.Matrix3();
 
 	return function update() {
 
 		var keys = [ 'a', 'b', 'c' ];
 
-		this.normalMatrix.getNormalMatrix( this.object.matrixWorld );
+		normalMatrix.getNormalMatrix( this.object.matrixWorld );
 
 		var matrixWorld = this.object.matrixWorld;
 
@@ -91,7 +90,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 					v1.copy( vertex ).applyMatrix4( matrixWorld );
 
-					v2.copy( normal ).applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
+					v2.copy( normal ).applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
 
 					position.setXYZ( idx, v1.x, v1.y, v1.z );
 
@@ -121,7 +120,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 				v2.set( objNorm.getX( j ), objNorm.getY( j ), objNorm.getZ( j ) );
 
-				v2.applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
+				v2.applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
 
 				position.setXYZ( idx, v1.x, v1.y, v1.z );
 

@@ -134,14 +134,15 @@
 				uniformsUV[ "uRoughness" ].value = 0.185;
 				uniformsUV[ "uSpecularBrightness" ].value = 0.8;
 
+
 				var uniforms = THREE.UniformsUtils.clone( uniformsUV );
 				uniforms[ "tDiffuse" ].value = uniformsUV[ "tDiffuse" ].value;
 				uniforms[ "tNormal" ].value = uniformsUV[ "tNormal" ].value;
 				uniforms[ "passID" ].value = 1;
 
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
-				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true };
 
+				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, derivatives: true };
+				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true, derivatives: true };
 
 				material = new THREE.ShaderMaterial( parameters );
 				var materialUV = new THREE.ShaderMaterial( parametersUV );
@@ -272,8 +273,6 @@
 			}
 
 			function createScene( geometry, scale, material ) {
-
-				geometry.computeTangents();
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 50;

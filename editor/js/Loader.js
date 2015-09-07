@@ -7,6 +7,8 @@ var Loader = function ( editor ) {
 	var scope = this;
 	var signals = editor.signals;
 
+	this.texturePath = '';
+
 	this.loadFile = function ( file ) {
 
 		var filename = file.name;
@@ -190,9 +192,13 @@ var Loader = function ( editor ) {
 						var contents = event.target.result;
 
 						var geometry = new THREE.MD2Loader().parse( contents );
-						geometry.name = filename;
+						var material = new THREE.MeshPhongMaterial( {
+							morphTargets: true,
+							morphNormals: true
+						} );
 
-						var object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
+						var object = new THREE.MorphAnimMesh( geometry, material );
+						object.name = filename;
 
 						editor.addObject( object );
 						editor.select( object );
@@ -382,6 +388,8 @@ var Loader = function ( editor ) {
 		} else if ( data.metadata.type.toLowerCase() === 'geometry' ) {
 
 			var loader = new THREE.JSONLoader();
+			loader.setTexturePath( scope.texturePath );
+
 			var result = loader.parse( data );
 
 			var geometry = result.geometry;
@@ -428,6 +436,8 @@ var Loader = function ( editor ) {
 		} else if ( data.metadata.type.toLowerCase() === 'object' ) {
 
 			var loader = new THREE.ObjectLoader();
+			loader.setTexturePath( scope.texturePath );
+
 			var result = loader.parse( data );
 
 			if ( result instanceof THREE.Scene ) {

@@ -12,11 +12,12 @@ THREE.BufferGeometry = function () {
 	this.name = '';
 	this.type = 'BufferGeometry';
 
+	this.index = null;
 	this.attributes = {};
 
 	this.morphAttributes = {};
 
-	this.drawcalls = [];
+	this.groups = [];
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -27,22 +28,28 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
+	addIndex: function ( attribute ) {
+
+		this.index = attribute;
+
+	},
+
 	addAttribute: function ( name, attribute ) {
 
 		if ( attribute instanceof THREE.BufferAttribute === false && attribute instanceof THREE.InterleavedBufferAttribute === false ) {
 
 			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
-			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
+			this.addAttribute( name, new THREE.BufferAttribute( arguments[ 1 ], arguments[ 2 ] ) );
 
 			return;
 
 		}
 
-		if ( name === 'index' && attribute instanceof THREE.IndexBufferAttribute === false ) {
+		if ( name === 'index' ) {
 
-			console.warn( 'THREE.BufferGeometry.addAttribute: Use THREE.IndexBufferAttribute for index attribute.' );
-			attribute = new THREE.IndexBufferAttribute( attribute.array, attribute.itemSize );
+			console.warn( 'THREE.BufferGeometry.addAttribute: Use .addIndex() for index attribute.' );
+			this.addIndex( attribute );
 
 		}
 
@@ -62,10 +69,17 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	get drawcalls() {
+
+		console.error( 'THREE.BufferGeometry: .drawcalls has been renamed to .groups.' );
+		return this.groups;
+
+	},
+
 	get offsets() {
 
-		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .drawcalls.' );
-		return this.drawcalls;
+		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .groups.' );
+		return this.groups;
 
 	},
 
@@ -77,18 +91,33 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		this.drawcalls.push( {
-
-			start: start,
-			count: count
-
-		} );
+		console.warn( 'THREE.BufferGeometry: .addDrawCall() is now .addGroup().' );
+		this.addGroup( start, count );
 
 	},
 
 	clearDrawCalls: function () {
 
-		this.drawcalls = [];
+		console.warn( 'THREE.BufferGeometry: .clearDrawCalls() is now .clearGroups().' );
+		this.clearGroups();
+
+	},
+
+	addGroup: function ( start, count, materialIndex ) {
+
+		this.groups.push( {
+
+			start: start,
+			count: count,
+			materialIndex: materialIndex !== undefined ? materialIndex : 0
+
+		} );
+
+	},
+
+	clearGroups: function () {
+
+		this.groups = [];
 
 	},
 
@@ -324,13 +353,13 @@ THREE.BufferGeometry.prototype = {
 			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
 			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
 			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
-			direct.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
+			direct.groupsNeedUpdate = geometry.groupsNeedUpdate;
 
 			geometry.verticesNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
 			geometry.uvsNeedUpdate = false;
-			geometry.tangentsNeedUpdate = false;
+			geometry.groupsNeedUpdate = false;
 
 			geometry = direct;
 
@@ -381,21 +410,6 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( geometry.tangentsNeedUpdate === true ) {
-
-			var attribute = this.attributes.tangent;
-
-			if ( attribute !== undefined ) {
-
-				attribute.copyVector4sArray( geometry.tangents );
-				attribute.needsUpdate = true;
-
-			}
-
-			geometry.tangentsNeedUpdate = false;
-
-		}
-
 		if ( geometry.lineDistancesNeedUpdate ) {
 
 			var attribute = this.attributes.lineDistance;
@@ -408,6 +422,15 @@ THREE.BufferGeometry.prototype = {
 			}
 
 			geometry.lineDistancesNeedUpdate = false;
+
+		}
+
+		if ( geometry.groupsNeedUpdate ) {
+
+			geometry.computeGroups( object.geometry );
+			this.groups = geometry.groups;
+
+			geometry.groupsNeedUpdate = false;
 
 		}
 
@@ -456,20 +479,17 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( geometry.tangents.length > 0 ) {
-
-			var tangents = new Float32Array( geometry.tangents.length * 4 );
-			this.addAttribute( 'tangent', new THREE.BufferAttribute( tangents, 4 ).copyVector4sArray( geometry.tangents ) );
-
-		}
-
 		if ( geometry.indices.length > 0 ) {
 
 			var TypeArray = geometry.vertices.length > 65535 ? Uint32Array : Uint16Array;
 			var indices = new TypeArray( geometry.indices.length * 3 );
-			this.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
+			this.addIndex( new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 		}
+
+		// groups
+
+		this.groups = geometry.groups;
 
 		// morphs
 
@@ -635,8 +655,9 @@ THREE.BufferGeometry.prototype = {
 
 	computeVertexNormals: function () {
 
+		var index = this.index;
 		var attributes = this.attributes;
-		var drawcalls = this.drawcalls;
+		var groups = this.groups;
 
 		if ( attributes.position ) {
 
@@ -673,22 +694,22 @@ THREE.BufferGeometry.prototype = {
 
 			// indexed elements
 
-			if ( attributes.index ) {
+			if ( index ) {
 
-				var indices = attributes.index.array;
+				var indices = index.array;
 
-				if ( drawcalls.length === 0 ) {
+				if ( groups.length === 0 ) {
 
-					this.addDrawCall( 0, indices.length );
+					this.addGroup( 0, indices.length );
 
 				}
 
-				for ( var j = 0, jl = drawcalls.length; j < jl; ++ j ) {
+				for ( var j = 0, jl = groups.length; j < jl; ++ j ) {
 
-					var drawcall = drawcalls[ j ];
+					var group = groups[ j ];
 
-					var start = drawcall.start;
-					var count = drawcall.count;
+					var start = group.start;
+					var count = group.count;
 
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
@@ -760,185 +781,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeTangents: function () {
 
-		// based on http://www.terathon.com/code/tangent.html
-		// (per vertex tangents)
-
-		if ( this.attributes.index === undefined ||
-			 this.attributes.position === undefined ||
-			 this.attributes.normal === undefined ||
-			 this.attributes.uv === undefined ) {
-
-			console.warn( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
-			return;
-
-		}
-
-		var indices = this.attributes.index.array;
-		var positions = this.attributes.position.array;
-		var normals = this.attributes.normal.array;
-		var uvs = this.attributes.uv.array;
-
-		var nVertices = positions.length / 3;
-
-		if ( this.attributes.tangent === undefined ) {
-
-			this.addAttribute( 'tangent', new THREE.BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
-
-		}
-
-		var tangents = this.attributes.tangent.array;
-
-		var tan1 = [], tan2 = [];
-
-		for ( var k = 0; k < nVertices; k ++ ) {
-
-			tan1[ k ] = new THREE.Vector3();
-			tan2[ k ] = new THREE.Vector3();
-
-		}
-
-		var vA = new THREE.Vector3(),
-			vB = new THREE.Vector3(),
-			vC = new THREE.Vector3(),
-
-			uvA = new THREE.Vector2(),
-			uvB = new THREE.Vector2(),
-			uvC = new THREE.Vector2(),
-
-			x1, x2, y1, y2, z1, z2,
-			s1, s2, t1, t2, r;
-
-		var sdir = new THREE.Vector3(), tdir = new THREE.Vector3();
-
-		function handleTriangle( a, b, c ) {
-
-			vA.fromArray( positions, a * 3 );
-			vB.fromArray( positions, b * 3 );
-			vC.fromArray( positions, c * 3 );
-
-			uvA.fromArray( uvs, a * 2 );
-			uvB.fromArray( uvs, b * 2 );
-			uvC.fromArray( uvs, c * 2 );
-
-			x1 = vB.x - vA.x;
-			x2 = vC.x - vA.x;
-
-			y1 = vB.y - vA.y;
-			y2 = vC.y - vA.y;
-
-			z1 = vB.z - vA.z;
-			z2 = vC.z - vA.z;
-
-			s1 = uvB.x - uvA.x;
-			s2 = uvC.x - uvA.x;
-
-			t1 = uvB.y - uvA.y;
-			t2 = uvC.y - uvA.y;
-
-			r = 1.0 / ( s1 * t2 - s2 * t1 );
-
-			sdir.set(
-				( t2 * x1 - t1 * x2 ) * r,
-				( t2 * y1 - t1 * y2 ) * r,
-				( t2 * z1 - t1 * z2 ) * r
-			);
-
-			tdir.set(
-				( s1 * x2 - s2 * x1 ) * r,
-				( s1 * y2 - s2 * y1 ) * r,
-				( s1 * z2 - s2 * z1 ) * r
-			);
-
-			tan1[ a ].add( sdir );
-			tan1[ b ].add( sdir );
-			tan1[ c ].add( sdir );
-
-			tan2[ a ].add( tdir );
-			tan2[ b ].add( tdir );
-			tan2[ c ].add( tdir );
-
-		}
-
-		var i, il;
-		var j, jl;
-		var iA, iB, iC;
-
-		if ( this.drawcalls.length === 0 ) {
-
-			this.addDrawCall( 0, indices.length );
-
-		}
-
-		var drawcalls = this.drawcalls;
-
-		for ( j = 0, jl = drawcalls.length; j < jl; ++ j ) {
-
-			var drawcall = drawcalls[ j ];
-
-			var start = drawcall.start;
-			var count = drawcall.count;
-
-			for ( i = start, il = start + count; i < il; i += 3 ) {
-
-				iA = indices[ i + 0 ];
-				iB = indices[ i + 1 ];
-				iC = indices[ i + 2 ];
-
-				handleTriangle( iA, iB, iC );
-
-			}
-
-		}
-
-		var tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
-		var n = new THREE.Vector3(), n2 = new THREE.Vector3();
-		var w, t, test;
-
-		function handleVertex( v ) {
-
-			n.fromArray( normals, v * 3 );
-			n2.copy( n );
-
-			t = tan1[ v ];
-
-			// Gram-Schmidt orthogonalize
-
-			tmp.copy( t );
-			tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
-
-			// Calculate handedness
-
-			tmp2.crossVectors( n2, t );
-			test = tmp2.dot( tan2[ v ] );
-			w = ( test < 0.0 ) ? - 1.0 : 1.0;
-
-			tangents[ v * 4 ] = tmp.x;
-			tangents[ v * 4 + 1 ] = tmp.y;
-			tangents[ v * 4 + 2 ] = tmp.z;
-			tangents[ v * 4 + 3 ] = w;
-
-		}
-
-		for ( j = 0, jl = drawcalls.length; j < jl; ++ j ) {
-
-			var drawcall = drawcalls[ j ];
-
-			var start = drawcall.start;
-			var count = drawcall.count;
-
-			for ( i = start, il = start + count; i < il; i += 3 ) {
-
-				iA = indices[ i + 0 ];
-				iB = indices[ i + 1 ];
-				iC = indices[ i + 2 ];
-
-				handleVertex( iA );
-				handleVertex( iB );
-				handleVertex( iC );
-
-			}
-
-		}
+		console.warn( 'THREE.BufferGeometry: .computeTangents() has been removed.' );
 
 	},
 
@@ -1039,9 +882,20 @@ THREE.BufferGeometry.prototype = {
 
 		data.data = { attributes: {} };
 
+		var index = this.index;
+
+		if ( index !== null ) {
+
+			var array = Array.prototype.slice.call( index.array );
+
+			data.data.index = {
+				type: index.array.constructor.name,
+				array: array
+			};
+
+		}
+
 		var attributes = this.attributes;
-		var drawcalls = this.drawcalls;
-		var boundingSphere = this.boundingSphere;
 
 		for ( var key in attributes ) {
 
@@ -1057,11 +911,15 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( drawcalls.length > 0 ) {
+		var groups = this.groups;
 
-			data.data.drawcalls = JSON.parse( JSON.stringify( drawcalls ) );
+		if ( groups.length > 0 ) {
+
+			data.data.groups = JSON.parse( JSON.stringify( groups ) );
 
 		}
+
+		var boundingSphere = this.boundingSphere;
 
 		if ( boundingSphere !== null ) {
 
@@ -1084,8 +942,15 @@ THREE.BufferGeometry.prototype = {
 
 	copy: function ( source ) {
 
+		var index = source.index;
+
+		if ( index !== null ) {
+
+			this.addIndex( index.clone() );
+
+		}
+
 		var attributes = source.attributes;
-		var drawcalls = source.drawcalls;
 
 		for ( var name in attributes ) {
 
@@ -1094,10 +959,12 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		for ( var i = 0, l = drawcalls.length; i < l; i ++ ) {
+		var groups = source.groups;
 
-			var drawcall = drawcalls[ i ];
-			this.addDrawCall( drawcall.start, drawcall.count );
+		for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+			var group = groups[ i ];
+			this.addGroup( group.start, group.count );
 
 		}
 

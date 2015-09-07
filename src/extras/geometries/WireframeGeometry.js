@@ -70,12 +70,12 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 	} else if ( geometry instanceof THREE.BufferGeometry ) {
 
-		if ( geometry.attributes.index !== undefined ) {
+		if ( geometry.index !== null ) {
 
 			// Indexed BufferGeometry
 
+			var indices = geometry.index.array;
 			var vertices = geometry.attributes.position;
-			var indices = geometry.attributes.index.array;
 			var drawcalls = geometry.drawcalls;
 			var numEdges = 0;
 

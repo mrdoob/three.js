@@ -251,6 +251,15 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'TextGeometry':
+
+						geometry = new THREE.TextGeometry(
+							data.text,
+							data.data
+						);
+
+						break;
+
 					case 'BufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
@@ -263,14 +272,11 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
-					case 'TextGeometry':
+					default:
 
-						geometry = new THREE.TextGeometry(
-							data.text,
-							data.data
-						);
+						console.warn( 'THREE.ObjectLoader: Unsupported geometry type "' + data.type + '"' );
 
-						break;
+						continue;
 
 				}
 
@@ -334,6 +340,10 @@ THREE.ObjectLoader.prototype = {
 
 				if ( data.normalMap !== undefined ) material.normalMap = getTexture( data.normalMap );
 				if ( data.normalScale )	material.normalScale = new THREE.Vector2( data.normalScale, data.normalScale );
+
+				if ( data.displacementMap !== undefined ) material.displacementMap = getTexture( data.displacementMap );
+				if ( data.displacementScale !== undefined ) material.displacementScale = data.displacementScale;
+				if ( data.displacementBias !== undefined ) material.displacementBias = data.displacementBias;
 
 				if ( data.specularMap !== undefined ) material.specularMap = getTexture( data.specularMap );
 
@@ -440,6 +450,7 @@ THREE.ObjectLoader.prototype = {
 
 				if ( data.name !== undefined ) texture.name = data.name;
 				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping );
+				if ( data.offset !== undefined ) texture.offset = new THREE.Vector2( data.offset[ 0 ], data.offset[ 1 ] );
 				if ( data.repeat !== undefined ) texture.repeat = new THREE.Vector2( data.repeat[ 0 ], data.repeat[ 1 ] );
 				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter );
 				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter );
@@ -519,13 +530,6 @@ THREE.ObjectLoader.prototype = {
 
 					break;
 
-
-				case 'AreaLight':
-
-					object = new THREE.AreaLight( data.color, data.intensity );
-
-					break;
-
 				case 'DirectionalLight':
 
 					object = new THREE.DirectionalLight( data.color, data.intensity );
@@ -553,6 +557,12 @@ THREE.ObjectLoader.prototype = {
 				case 'Mesh':
 
 					object = new THREE.Mesh( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+					break;
+
+				case 'LOD':
+
+					object = new THREE.LOD();
 
 					break;
 
@@ -613,6 +623,25 @@ THREE.ObjectLoader.prototype = {
 				for ( var child in data.children ) {
 
 					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+
+				}
+
+			}
+
+			if ( data.type === 'LOD' ) {
+
+				var levels = data.levels;
+
+				for ( var l = 0; l < levels.length; l ++ ) {
+
+					var level = levels[ l ];
+					var child = object.getObjectByProperty( 'uuid', level.object );
+
+					if ( child !== undefined ) {
+
+						object.addLevel( child, level.distance );
+
+					}
 
 				}
 

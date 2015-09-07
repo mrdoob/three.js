@@ -225,16 +225,6 @@ THREE.GPUParticleSystem = function(options) {
         value: self.particleSpriteTex
       }
     },
-    attributes: {
-      "particlePositionsStartTime": {
-        type: "v4",
-        value: []
-      },
-      "particleVelColSizeLife": {
-        type: "v4",
-        value: []
-      }
-    },
     blending: THREE.AdditiveBlending,
     vertexShader: GPUParticleShader.vertexShader,
     fragmentShader: GPUParticleShader.fragmentShader
@@ -371,8 +361,8 @@ THREE.GPUParticleContainer = function(maxParticles, particleSystem) {
   }
 
   self.particleShaderGeo.addAttribute('position', new THREE.BufferAttribute(self.particleVertices, 3));
-  self.particleShaderGeo.addAttribute('particlePositionsStartTime', new THREE.DynamicBufferAttribute(self.particlePositionsStartTime, 4));
-  self.particleShaderGeo.addAttribute('particleVelColSizeLife', new THREE.DynamicBufferAttribute(self.particleVelColSizeLife, 4));
+  self.particleShaderGeo.addAttribute('particlePositionsStartTime', new THREE.BufferAttribute(self.particlePositionsStartTime, 4).setDynamic(true));
+  self.particleShaderGeo.addAttribute('particleVelColSizeLife', new THREE.BufferAttribute(self.particleVelColSizeLife, 4).setDynamic(true));
 
   self.posStart = self.particleShaderGeo.getAttribute('particlePositionsStartTime')
   self.velCol = self.particleShaderGeo.getAttribute('particleVelColSizeLife');

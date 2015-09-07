@@ -45,7 +45,7 @@
 		<div>
 		Example:<br>
 		materials.push( new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ) );
-	
+
 		</div>
 
 
@@ -75,7 +75,7 @@
 			If set to true the shader multiplies the specular highlight by the underlying color of the object, making
 			it appear to be more metal-like and darker. If set to false the specular highlight is added ontop of the
 			underlying colors.
-		</div> 
+		</div>
 
 		<h3>[property:Texture map]</h3>
 		<div>Set color texture map. Default is null. The texture map color is modulated by the diffuse color.</div>
@@ -95,7 +95,7 @@
 			Bump doesn't actually affect the geometry of the object, only the lighting. If a normal map is defined this will
 			be ignored.
 		</div>
-		
+
 		<h3>[property:Float bumpScale]</h3>
 		<div>
 			How much the bump map affects the material. Typical ranges are 0-1. Default is 1.
@@ -106,11 +106,11 @@
 			The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change
 			the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting.
 		</div>
-		
+
 		<h3>[property:Vector2 normalScale]</h3>
 		<div>
 			How much the normal map affects the material. Typical ranges are 0-1. Default is (1,1).
-		</div> 
+		</div>
 
 		<h3>[property:Texture specularMap]</h3>
 		<div>The specular map value affects both how much the specular surface highlight contributes and how much of the environment map affects the surface. Default is null.</div>
@@ -121,14 +121,14 @@
 
 		<h3>[property:TextureCube envMap]</h3>
 		<div>Set env map. Default is null.</div>
-		
+
 		<h3>[property:Integer combine]</h3>
-		<div>How to combine the result of the surface's color with the environment map, if any.</div> 
-		 
+		<div>How to combine the result of the surface's color with the environment map, if any.</div>
+
 		<div>Options are [page:Textures THREE.MultiplyOperation] (default), [page:Textures THREE.MixOperation], [page:Textures THREE.AddOperation]. If mix is chosen, the reflectivity is used to blend between the two colors.</div>
-		 
+
 		<h3>[property:Float reflectivity]</h3>
-		<div>How much the environment map affects the surface; also see "combine".</div> 
+		<div>How much the environment map affects the surface; also see "combine".</div>
 
 		<h3>[property:Float refractionRatio]</h3>
 		<div>The index of refraction for an environment map using [page:Textures THREE.CubeRefractionMapping]. Default is *0.98*.</div>
@@ -140,11 +140,11 @@
 		<h3>[property:Integer shading]</h3>
 		<div>How the triangles of a curved surface are rendered: as a smooth surface, as flat separate facets, or no shading at all.</div>
 
-		<div>Options are [page:Materials THREE.SmoothShading] (default), [page:Materials THREE.FlatShading], [page:Materials THREE.NoShading].</div>
-		
+		<div>Options are [page:Materials THREE.SmoothShading] (default), [page:Materials THREE.FlatShading].</div>
+
 		<h3>[property:Boolean wireframe]</h3>
 		<div>Whether the triangles' edges are displayed instead of surfaces. Default is *false*.</div>
-		
+
 		<h3>[property:Float wireframeLinewidth]</h3>
 		<div>Line thickness for wireframe mode. Default is *1.0*.</div>
 		<div>Due to limitations in the <a href="https://code.google.com/p/angleproject/" target="_blank">ANGLE layer</a>, on Windows platforms linewidth will always be 1 regardless of the set value.</div>
@@ -163,9 +163,9 @@
 
 		<h3>[property:Boolean skinning]</h3>
 		<div>Define whether the material uses skinning. Default is *false*.</div>
-	
+
 		<h3>[property:Boolean morphTargets]</h3>
-		<div>Define whether the material uses morphTargets. Default is *false*.</div>	
+		<div>Define whether the material uses morphTargets. Default is *false*.</div>
 
 		<h3>[property:boolean morphNormals]</h3>
 		<div>

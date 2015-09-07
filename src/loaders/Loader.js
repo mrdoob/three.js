@@ -42,20 +42,6 @@ THREE.Loader.prototype = {
 
 	},
 
-	needsTangents: function ( materials ) {
-
-		for ( var i = 0, il = materials.length; i < il; i ++ ) {
-
-			var m = materials[ i ];
-
-			if ( m instanceof THREE.ShaderMaterial ) return true;
-
-		}
-
-		return false;
-
-	},
-
 	createMaterial: ( function () {
 
 		var imageLoader;

@@ -211,10 +211,7 @@ THREE.SceneLoader.prototype = {
 
 						if ( geometry ) {
 
-							var needsTangents = false;
-
 							material = result.materials[ objJSON.material ];
-							needsTangents = material instanceof THREE.ShaderMaterial;
 
 							pos = objJSON.position;
 							rot = objJSON.rotation;
@@ -238,22 +235,6 @@ THREE.SceneLoader.prototype = {
 							if ( ( material instanceof THREE.MeshFaceMaterial ) && material.materials.length === 0 ) {
 
 								material = new THREE.MeshFaceMaterial( result.face_materials[ objJSON.geometry ] );
-
-							}
-
-							if ( material instanceof THREE.MeshFaceMaterial ) {
-
-								for ( var i = 0; i < material.materials.length; i ++ ) {
-
-									needsTangents = needsTangents || ( material.materials[ i ] instanceof THREE.ShaderMaterial );
-
-								}
-
-							}
-
-							if ( needsTangents ) {
-
-								geometry.computeTangents();
 
 							}
 
@@ -339,7 +320,7 @@ THREE.SceneLoader.prototype = {
 
 					} else if ( objJSON.type === "AmbientLight" || objJSON.type === "PointLight" ||
 						objJSON.type === "DirectionalLight" || objJSON.type === "SpotLight" ||
-						objJSON.type === "HemisphereLight" || objJSON.type === "AreaLight" ) {
+						objJSON.type === "HemisphereLight" ) {
 
 						var color = objJSON.color;
 						var intensity = objJSON.intensity;
@@ -375,13 +356,6 @@ THREE.SceneLoader.prototype = {
 								light = new THREE.DirectionalLight( color, intensity, distance );
 								light.target.set( position[ 0 ], position[ 1 ] - distance, position[ 2 ] );
 								light.target.applyEuler( new THREE.Euler( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ], 'XYZ' ) );
-								break;
-
-							case 'AreaLight':
-								light = new THREE.AreaLight( color, intensity );
-								light.position.fromArray( position );
-								light.width = objJSON.size;
-								light.height = objJSON.size_y;
 								break;
 
 						}

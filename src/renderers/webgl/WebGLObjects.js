@@ -4,77 +4,9 @@
 
 THREE.WebGLObjects = function ( gl, properties, info ) {
 
-	var objects = {};
-
 	var geometries = new THREE.WebGLGeometries( gl, properties, info );
 
 	//
-
-	function onObjectRemoved( event ) {
-
-		var object = event.target;
-
-		object.traverse( function ( child ) {
-
-			child.removeEventListener( 'remove', onObjectRemoved );
-			removeObject( child );
-
-		} );
-
-	}
-
-	function removeObject( object ) {
-
-		if ( object instanceof THREE.Mesh ||
-			 object instanceof THREE.PointCloud ||
-			 object instanceof THREE.Line ) {
-
-			delete objects[ object.id ];
-
-		}
-
-		delete object._modelViewMatrix;
-		delete object._normalMatrix;
-
-		properties.delete( object );
-
-	}
-
-	//
-
-	this.objects = objects;
-
-	this.init = function ( object ) {
-
-		var objectProperties = properties.get( object );
-
-		if ( objectProperties.__webglInit === undefined ) {
-
-			objectProperties.__webglInit = true;
-			object._modelViewMatrix = new THREE.Matrix4();
-			object._normalMatrix = new THREE.Matrix3();
-
-			object.addEventListener( 'removed', onObjectRemoved );
-
-		}
-
-		if ( objectProperties.__webglActive === undefined ) {
-
-			objectProperties.__webglActive = true;
-
-			if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
-
-				objects[ object.id ] = {
-					id: object.id,
-					object: object,
-					z: 0
-				};
-
-			}
-
-		}
-
-	};
 
 	function update( object ) {
 
@@ -88,11 +20,18 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
+		var index = geometry.index;
 		var attributes = geometry.attributes;
+
+		if ( index !== null ) {
+
+			updateAttribute( index, gl.ELEMENT_ARRAY_BUFFER );
+
+		}
 
 		for ( var name in attributes ) {
 
-			updateAttribute( attributes[ name ] );
+			updateAttribute( attributes[ name ], gl.ARRAY_BUFFER );
 
 		}
 
@@ -106,7 +45,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-				updateAttribute( array[ i ] );
+				updateAttribute( array[ i ], gl.ARRAY_BUFFER );
 
 			}
 
@@ -116,19 +55,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	}
 
-	function updateAttribute( attribute ) {
-
-		var bufferType;
-
-		if ( attribute instanceof THREE.IndexBufferAttribute ) {
-
-			bufferType = gl.ELEMENT_ARRAY_BUFFER;
-
-		} else {
-
-			bufferType = gl.ARRAY_BUFFER;
-
-		}
+	function updateAttribute( attribute, bufferType ) {
 
 		var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
@@ -151,15 +78,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		attributeProperties.__webglBuffer = gl.createBuffer();
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		var usage = gl.STATIC_DRAW;
-
-		if ( data instanceof THREE.DynamicBufferAttribute
-			 || ( data instanceof THREE.InstancedBufferAttribute && data.dynamic === true )
-			 || ( data instanceof THREE.InterleavedBuffer && data.dynamic === true ) ) {
-
-			usage = gl.DYNAMIC_DRAW;
-
-		}
+		var usage = data.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
 
 		gl.bufferData( bufferType, data.array, usage );
 
@@ -171,7 +90,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.updateRange === undefined || data.updateRange.count === - 1 ) {
+		if ( data.dynamic === false || data.updateRange.count === - 1 ) {
 
 			// Not using update ranges
 
@@ -179,7 +98,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		} else if ( data.updateRange.count === 0 ) {
 
-			console.error( 'THREE.WebGLObjects.updateBuffer: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
+			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
 
 		} else {
 
@@ -218,14 +137,13 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		var indices = [];
 
+		var index = geometry.index;
 		var attributes = geometry.attributes;
-
-		var index = attributes.index;
 		var position = attributes.position;
 
-		console.time( 'wireframe' );
+		// console.time( 'wireframe' );
 
-		if ( index !== undefined ) {
+		if ( index !== null ) {
 
 			var edges = {};
 			var array = index.array;
@@ -244,7 +162,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		} else {
 
-			var array = position.array;
+			var array = attributes.position.array;
 
 			for ( var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
 
@@ -258,12 +176,12 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		console.timeEnd( 'wireframe' );
+		// console.timeEnd( 'wireframe' );
 
 		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
-		var attribute = new THREE.IndexBufferAttribute( new TypeArray( indices ), 1 );
+		var attribute = new THREE.BufferAttribute( new TypeArray( indices ), 1 );
 
-		updateAttribute( attribute );
+		updateAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );
 
 		property.wireframe = attribute;
 
@@ -273,13 +191,29 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function checkEdge( edges, a, b ) {
 
-		var hash = a < b ? a + '_' + b : b + '_' + a;
+		if ( a > b ) {
 
-		if ( edges.hasOwnProperty( hash ) ) return false;
+			var tmp = a;
+			a = b;
+			b = tmp;
 
-		edges[ hash ] = 1;
+		}
 
-		return true;
+		var list = edges[ a ];
+
+		if ( list === undefined ) {
+
+			edges[ a ] = [ b ];
+			return true;
+
+		} else if ( list.indexOf( b ) === -1 ) {
+
+			list.push( b );
+			return true;
+
+		}
+
+		return false;
 
 	}
 
@@ -287,11 +221,5 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 	this.getWireframeAttribute = getWireframeAttribute;
 
 	this.update = update;
-
-	this.clear = function () {
-
-		objects = {};
-
-	};
 
 };

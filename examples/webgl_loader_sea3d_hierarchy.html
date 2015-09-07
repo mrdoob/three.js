@@ -71,9 +71,7 @@
 			loader = new THREE.SEA3D( {
 
 				autoPlay : false, // Auto play animations
-				container : scene, // Container to add models
-				parser : THREE.SEA3D.BUFFER, // THREE.BufferGeometry
-				multiplier : 1 // Light multiplier
+				container : scene // Container to add models
 
 			} );
 
@@ -88,7 +86,7 @@
 						loader.meshes[i].animation.play("root");
 				}
 
-				// Get the first camera from 3ds Max
+				// Get the first camera from SEA3D Studio
 				// use loader.get... to get others objects
 
 				var cam = loader.cameras[0];
@@ -96,14 +94,12 @@
 				camera.rotation.copy( cam.rotation );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.noZoom = true;
-				controls.noPan = true;
 
 				animate();
 
 			};
 
-			loader.load( './models/sea3d/robot.sea' );
+			loader.load( './models/sea3d/robot.tjs.sea' );
 
 			//
 

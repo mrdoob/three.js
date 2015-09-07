@@ -391,7 +391,7 @@ THREE.Projector = function () {
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
 					var attributes = geometry.attributes;
-					var offsets = geometry.drawcalls;
+					var groups = geometry.groups;
 
 					if ( attributes.position === undefined ) continue;
 
@@ -427,17 +427,17 @@ THREE.Projector = function () {
 
 					}
 
-					if ( attributes.index !== undefined ) {
+					if ( geometry.index !== null ) {
 
-						var indices = attributes.index.array;
+						var indices = geometry.index.array;
 
-						if ( offsets.length > 0 ) {
+						if ( groups.length > 0 ) {
 
-							for ( var o = 0; o < offsets.length; o ++ ) {
+							for ( var o = 0; o < groups.length; o ++ ) {
 
-								var offset = offsets[ o ];
+								var group = groups[ o ];
 
-								for ( var i = offset.start, l = offset.start + offset.count; i < l; i += 3 ) {
+								for ( var i = group.start, l = group.start + group.count; i < l; i += 3 ) {
 
 									renderList.pushTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
 

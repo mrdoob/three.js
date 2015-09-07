@@ -219,7 +219,7 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
 		}
 
-		this.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
+		this.addIndex( new THREE.BufferAttribute( indices, 1 ) );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 		if ( normals !== undefined ) {

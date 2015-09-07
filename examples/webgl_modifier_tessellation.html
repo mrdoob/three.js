@@ -98,7 +98,7 @@
 
 		var renderer, scene, camera, stats;
 
-		var mesh, uniforms, attributes;
+		var mesh, uniforms;
 
 		var WIDTH = window.innerWidth,
 			HEIGHT = window.innerHeight;
@@ -188,8 +188,6 @@
 
 			//
 
-			attributes = [ `displacement`, `customColor` ];
-
 			uniforms = {
 
 				amplitude: { type: "f", value: 0.0 }
@@ -198,8 +196,7 @@
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms: 		uniforms,
-				attributes:     attributes,
+				uniforms:       uniforms,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
 

@@ -56,15 +56,13 @@ THREE.ImageLoader.prototype = {
 
 		}
 
-		if ( onError !== undefined ) {
+		image.addEventListener( 'error', function ( event ) {
 
-			image.addEventListener( 'error', function ( event ) {
+			if ( onError ) onError( event );
 
-				onError( event );
+			scope.manager.itemError( url );
 
-			}, false );
-
-		}
+		}, false );
 
 		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
 

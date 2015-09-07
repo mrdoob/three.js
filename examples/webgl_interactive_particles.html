@@ -83,7 +83,7 @@
 
 			var renderer, scene, camera, stats;
 
-			var particles, uniforms, attributes;
+			var particles, uniforms;
 
 			var PARTICLE_SIZE = 20;
 
@@ -104,24 +104,41 @@
 
 				//
 
-				attributes = {
+				var geometry1 = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 );
+				var vertices = geometry1.vertices;
 
-					size:        { type: 'f', value: [] },
-					customColor: { type: 'c', value: [] }
+				var positions = new Float32Array( vertices.length * 3 );
+				var colors = new Float32Array( vertices.length * 3 );
+				var sizes = new Float32Array( vertices.length );
 
-				};
+				var vertex;
+				var color = new THREE.Color();
 
-				uniforms = {
+				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
 
-					color:   { type: "c", value: new THREE.Color( 0xffffff ) },
-					texture: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/disc.png" ) }
+					vertex = vertices[ i ];
+					vertex.toArray( positions, i * 3 );
 
-				};
+					color.setHSL( 0.01 + 0.1 * ( i / l ), 1.0, 0.5 )
+					color.toArray( colors, i * 3 );
 
-				var shaderMaterial = new THREE.ShaderMaterial( {
+					sizes[ i ] = PARTICLE_SIZE * 0.5;
 
-					uniforms: uniforms,
-					attributes: attributes,
+				}
+
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
+
+				//
+
+				var material = new THREE.ShaderMaterial( {
+
+					uniforms: {
+						color:   { type: "c", value: new THREE.Color( 0xffffff ) },
+						texture: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/disc.png" ) }
+					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
@@ -129,23 +146,9 @@
 
 				} );
 
-				var geometry = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 );
+				//
 
-				particles = new THREE.PointCloud( geometry, shaderMaterial );
-
-				var values_size = attributes.size.value;
-				var values_color = attributes.customColor.value;
-
-				var vertices = particles.geometry.vertices;
-
-				for( var v = 0,  vl = vertices.length; v < vl; v++ ) {
-
-					values_size[ v ] = PARTICLE_SIZE * 0.5;
-
-					values_color[ v ] = new THREE.Color().setHSL( 0.01 + 0.1 * ( v / vl ), 1.0, 0.5 );
-
-				}
-
+				particles = new THREE.PointCloud( geometry, material );
 				scene.add( particles );
 
 				//
@@ -206,6 +209,9 @@
 				particles.rotation.x += 0.0005;
 				particles.rotation.y += 0.001;
 
+				var geometry = particles.geometry;
+				var attributes = geometry.attributes;
+
 				raycaster.setFromCamera( mouse, camera );
 
 				intersects = raycaster.intersectObject( particles );
@@ -214,18 +220,18 @@
 
 					if ( INTERSECTED != intersects[ 0 ].index ) {
 
-						attributes.size.value[ INTERSECTED ] = PARTICLE_SIZE;
+						attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE;
 
 						INTERSECTED = intersects[ 0 ].index;
 
-						attributes.size.value[ INTERSECTED ] = PARTICLE_SIZE * 1.25;
+						attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE * 1.25;
 						attributes.size.needsUpdate = true;
 
 					}
 
 				} else if ( INTERSECTED !== null ) {
 
-					attributes.size.value[ INTERSECTED ] = PARTICLE_SIZE;
+					attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE;
 					attributes.size.needsUpdate = true;
 					INTERSECTED = null;
 

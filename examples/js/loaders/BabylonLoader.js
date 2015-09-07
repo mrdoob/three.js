@@ -87,7 +87,7 @@ THREE.BabylonLoader.prototype = {
 
 		var indices = new Uint16Array( json.indices );
 
-		geometry.addAttribute( 'index', new THREE.IndexBufferAttribute( indices, 1 ) );
+		geometry.addIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 		// positions
 
@@ -137,13 +137,9 @@ THREE.BabylonLoader.prototype = {
 
 				var subMesh = subMeshes[ j ];
 
-				geometry.addDrawCall( subMesh.indexStart, subMesh.indexCount );
+				geometry.addGroup( subMesh.indexStart, subMesh.indexCount );
 
 			}
-
-		} else {
-
-			geometry.addDrawCall( 0, json.indices.length );
 
 		}
 

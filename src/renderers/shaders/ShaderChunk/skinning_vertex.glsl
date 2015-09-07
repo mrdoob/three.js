@@ -1,14 +1,6 @@
 #ifdef USE_SKINNING
 
-	#ifdef USE_MORPHTARGETS
-
-	vec4 skinVertex = bindMatrix * vec4( morphed, 1.0 );
-
-	#else
-
-	vec4 skinVertex = bindMatrix * vec4( position, 1.0 );
-
-	#endif
+	vec4 skinVertex = bindMatrix * vec4( transformed, 1.0 );
 
 	vec4 skinned = vec4( 0.0 );
 	skinned += boneMatX * skinVertex * skinWeight.x;

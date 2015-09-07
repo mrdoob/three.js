@@ -223,6 +223,20 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialNormalMapRow );
 
+	// displacement map
+
+	var materialDisplacementMapRow = new UI.Panel();
+	var materialDisplacementMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialDisplacementMap = new UI.Texture().onChange( update );
+	var materialDisplacementScale = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
+
+	materialDisplacementMapRow.add( new UI.Text( 'Displace Map' ).setWidth( '90px' ) );
+	materialDisplacementMapRow.add( materialDisplacementMapEnabled );
+	materialDisplacementMapRow.add( materialDisplacementMap );
+	materialDisplacementMapRow.add( materialDisplacementScale );
+
+	container.add( materialDisplacementMapRow );
+
 	// specular map
 
 	var materialSpecularMapRow = new UI.Panel();
@@ -435,12 +449,6 @@ Sidebar.Material = function ( editor ) {
 
 				if ( material.vertexColors !== vertexColors ) {
 
-					if ( geometry instanceof THREE.Geometry ) {
-
-						geometry.groupsNeedUpdate = true;
-
-					}
-
 					material.vertexColors = vertexColors;
 					material.needsUpdate = true;
 
@@ -523,6 +531,24 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.displacementMap !== undefined ) {
+
+				var displacementMapEnabled = materialDisplacementMapEnabled.getValue() === true;
+
+				if ( objectHasUvs ) {
+
+					material.displacementMap = displacementMapEnabled ? materialDisplacementMap.getValue() : null;
+					material.displacementScale = materialDisplacementScale.getValue();
+					material.needsUpdate = true;
+
+				} else {
+
+					if ( displacementMapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
 			if ( material.specularMap !== undefined ) {
 
 				var specularMapEnabled = materialSpecularMapEnabled.getValue() === true;
@@ -557,7 +583,7 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs ) {
 
-					material.lightMap = specularMapEnabled ? materialLightMap.getValue() : null;
+					material.lightMap = lightMapEnabled ? materialLightMap.getValue() : null;
 					material.needsUpdate = true;
 
 				} else {
@@ -665,6 +691,7 @@ Sidebar.Material = function ( editor ) {
 			'alphaMap': materialAlphaMapRow,
 			'bumpMap': materialBumpMapRow,
 			'normalMap': materialNormalMapRow,
+			'displacementMap': materialDisplacementMapRow,
 			'specularMap': materialSpecularMapRow,
 			'envMap': materialEnvMapRow,
 			'lightMap': materialLightMapRow,
@@ -689,7 +716,7 @@ Sidebar.Material = function ( editor ) {
 	};
 
 
-	function refreshUi(resetTextureSelectors) {
+	function refreshUi( resetTextureSelectors ) {
 
 		var material = currentObject.material;
 
@@ -790,6 +817,20 @@ Sidebar.Material = function ( editor ) {
 				materialNormalMap.setValue( material.normalMap );
 
 			}
+
+		}
+
+		if ( material.displacementMap !== undefined ) {
+
+			materialDisplacementMapEnabled.setValue( material.displacementMap !== null );
+
+			if ( material.displacementMap !== null || resetTextureSelectors ) {
+
+				materialDisplacementMap.setValue( material.displacementMap );
+
+			}
+
+			materialDisplacementScale.setValue( material.displacementScale );
 
 		}
 

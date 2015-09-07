@@ -56,6 +56,12 @@ THREE.Object3D = function () {
 		scale: {
 			enumerable: true,
 			value: scale
+		},
+		modelViewMatrix: {
+			value: new THREE.Matrix4()
+		},
+		normalMatrix: {
+			value: new THREE.Matrix3()
 		}
 	} );
 

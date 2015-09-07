@@ -25,6 +25,7 @@ Sidebar.Geometry = function ( editor ) {
 
 		'Actions': 'Actions',
 		'Center': 'Center',
+		'Convert': 'Convert',
 		'Flatten': 'Flatten'
 
 	} );
@@ -52,6 +53,18 @@ Sidebar.Geometry = function ( editor ) {
 
 				editor.signals.geometryChanged.dispatch( geometry );
 				editor.signals.objectChanged.dispatch( object );
+
+				break;
+
+			case 'Convert':
+
+				if ( geometry instanceof THREE.Geometry ) {
+
+					object.geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+
+					signals.geometryChanged.dispatch( object );
+
+				}
 
 				break;
 
