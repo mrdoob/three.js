@@ -59,10 +59,11 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
-	getPropertyBindingIndex: function( trackName ) {
+	getPropertyBindingIndex: function( rootNode, trackName ) {
 		
 		for( var k = 0; k < this.propertyBindings.length; k ++ ) {
-			if( this.propertyBindings[k].trackName === trackName ) {
+			if( this.propertyBindings[k].trackName === trackName &&
+				this.propertyBindings[k].rootNode === rootNode ) {
 				return k;
 			}
 		}	
@@ -77,12 +78,14 @@ THREE.AnimationMixer.prototype = {
 
 			var action = this.actions[i];
 
+			var root = action.localRoot || this.root;
+
 			var propertyBindingIndices = [];
 
 			for( var j = 0; j < action.clip.tracks.length; j ++ ) {
 
 				var trackName = action.clip.tracks[j].name;
-				propertyBindingIndices.push( this.getPropertyBindingIndex( trackName ) );
+				propertyBindingIndices.push( this.getPropertyBindingIndex( root, trackName ) );
 			
 			}
 
