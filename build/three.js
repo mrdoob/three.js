@@ -127,7 +127,6 @@ THREE.DoubleSide = 2;
 
 // shading
 
-THREE.NoShading = 0;
 THREE.FlatShading = 1;
 THREE.SmoothShading = 2;
 
@@ -15259,7 +15258,6 @@ THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *
- *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
@@ -15299,8 +15297,6 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 	this.fog = true;
 
-	this.shading = THREE.SmoothShading;
-
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 	this.wireframeLinecap = 'round';
@@ -15338,8 +15334,6 @@ THREE.MeshLambertMaterial.prototype.copy = function ( source ) {
 	this.refractionRatio = source.refractionRatio;
 
 	this.fog = source.fog;
-
-	this.shading = source.shading;
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
