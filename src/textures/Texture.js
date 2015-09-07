@@ -137,6 +137,7 @@ THREE.Texture.prototype = {
 			},
 
 			uuid: this.uuid,
+			type: "Texture",
 			name: this.name,
 
 			mapping: this.mapping,
@@ -164,10 +165,21 @@ THREE.Texture.prototype = {
 
 			if ( meta.images[ image.uuid ] === undefined ) {
 
-				meta.images[ image.uuid ] = {
-					uuid: image.uuid,
-					url: getDataURL( image )
-				};
+				if ( image.src !== undefined ) {
+
+					meta.images[ image.uuid ] = {
+						uuid: image.uuid,
+						url: image.src
+					};
+
+				} else {
+
+					meta.images[ image.uuid ] = {
+						uuid: image.uuid,
+						url: getDataURL( image )
+					};
+
+				}
 
 			}
 

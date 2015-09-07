@@ -410,6 +410,27 @@ THREE.ObjectLoader.prototype = {
 
 	},
 
+	stringToFunction: function( str ) {
+
+		var arr = str.split( "." );
+
+		var fn = ( window || this );
+		for ( var i = 0, len = arr.length; i < len; i ++ ) {
+
+			fn = fn[ arr[ i ] ];
+
+		}
+
+		if ( typeof fn !== "function" ) {
+
+			fn = null;
+
+		}
+
+		return fn;
+
+	},
+
 	parseTextures: function ( json, images ) {
 
 		function parseConstant( value ) {
@@ -423,6 +444,7 @@ THREE.ObjectLoader.prototype = {
 		}
 
 		var textures = {};
+		var canvasManagers = {};
 
 		if ( json !== undefined ) {
 
@@ -442,7 +464,8 @@ THREE.ObjectLoader.prototype = {
 
 				}
 
-				var texture = new THREE.Texture( images[ data.image ] );
+				data.type = data.type || "Texture";
+				var texture = new THREE[ data.type ]( images[ data.image ] );
 				texture.needsUpdate = true;
 
 				texture.uuid = data.uuid;
@@ -458,6 +481,35 @@ THREE.ObjectLoader.prototype = {
 
 					texture.wrapS = parseConstant( data.wrap[ 0 ] );
 					texture.wrapT = parseConstant( data.wrap[ 1 ] );
+
+				}
+
+				if ( texture instanceof THREE.CanvasTexture ) {
+
+					// For user canvas management class.
+					texture.canvasManager = data.canvasManager;
+
+					// Revive the object if possible.
+					if ( data.canvasManager && data.canvasManager.type ) {
+
+						var func = this.stringToFunction( data.canvasManager.type );
+						if ( func && func.prototype.revive ) {
+
+							if ( data.canvasManager.uuid && canvasManagers[ data.canvasManager.uuid ] ) {
+
+								texture.canvasManager = canvasManagers[ data.canvasManager.uuid ];
+								texture.canvasManager.bindToTexture( texture );
+
+							} else {
+
+								texture.canvasManager = func.prototype.revive( data.canvasManager, texture );
+								canvasManagers[ data.canvasManager.uuid ] = texture.canvasManager;
+
+							}
+
+						}
+
+					}
 
 				}
 
