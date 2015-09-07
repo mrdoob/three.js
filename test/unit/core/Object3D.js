@@ -76,7 +76,7 @@ test( "lookAt", function() {
 	ok( obj.rotation.x * RadToDeg === 45 , "x is equal" );
 });
 
-test( "getWorldQuaternion", function() {
+test( "getWorldRotation", function() {
 	var obj = new THREE.Object3D();
 
 	obj.lookAt(new THREE.Vector3(0, -1, 1));
