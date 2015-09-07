@@ -14,6 +14,7 @@ THREE.AnimationMixer = function( root ) {
 	this.timeScale = 1.0;
 	this.actions = [];
 	this.propertyBindings = [];
+	this.propertyBindingNamesToIndex = {};
 
 };
 
@@ -45,6 +46,7 @@ THREE.AnimationMixer.prototype = {
 			
 				propertyBinding = new THREE.PropertyBinding( root, track.name );
 				this.propertyBindings.push( propertyBinding );
+				this.propertyBindingNamesToIndex[ root.uuid + '-' + track.name ] = this.propertyBindings.length - 1;
 			
 			}
 			else {
@@ -56,43 +58,42 @@ THREE.AnimationMixer.prototype = {
 
 		}
 
-		this.updatePropertyBindingIndices();
+		this.propertyBindingIndicesDirty = true;
 
 	},
 
 	getPropertyBindingIndex: function( rootNode, trackName ) {
 		
-		for( var k = 0; k < this.propertyBindings.length; k ++ ) {
-			if( this.propertyBindings[k].trackName === trackName &&
-				this.propertyBindings[k].rootNode === rootNode ) {
-				return k;
-			}
-		}	
-
-		return -1;
+		var index = this.propertyBindingNamesToIndex[ rootNode.uuid + '-' + trackName ];
+		return ( index !== undefined ) ? index : -1;
 
 	},
 
 	updatePropertyBindingIndices: function() {
 
-		for( var i = 0; i < this.actions.length; i++ ) {
+		if( this.propertyBindingIndicesDirty ) {
 
-			var action = this.actions[i];
+			for( var i = 0; i < this.actions.length; i++ ) {
 
-			var root = action.localRoot || this.root;
+				var action = this.actions[i];
 
-			var propertyBindingIndices = [];
+				var root = action.localRoot || this.root;
 
-			for( var j = 0; j < action.clip.tracks.length; j ++ ) {
+				var propertyBindingIndices = [];
 
-				var trackName = action.clip.tracks[j].name;
-				propertyBindingIndices.push( this.getPropertyBindingIndex( root, trackName ) );
-			
+				for( var j = 0; j < action.clip.tracks.length; j ++ ) {
+
+					var trackName = action.clip.tracks[j].name;
+					propertyBindingIndices.push( this.getPropertyBindingIndex( root, trackName ) );
+				
+				}
+
+				action.propertyBindingIndices = propertyBindingIndices;
 			}
 
-			action.propertyBindingIndices = propertyBindingIndices;
-		}
+			this.propertyBindingIndicesDirty = false;
 
+		}
 	},
 
 	removeAllActions: function() {
@@ -150,7 +151,7 @@ THREE.AnimationMixer.prototype = {
 			}
 		}
 
-		this.updatePropertyBindingIndices();
+		this.propertyBindingIndicesDirty = true;
 
 		return this;
 
@@ -237,6 +238,8 @@ THREE.AnimationMixer.prototype = {
 	},
 
 	update: function( deltaTime ) {
+
+		this.updatePropertyBindingIndices();
 
 		var mixerDeltaTime = deltaTime * this.timeScale;
 		this.time += mixerDeltaTime;
