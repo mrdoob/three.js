@@ -8,6 +8,7 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 
 	var isLoading = false, itemsLoaded = 0, itemsTotal = 0;
 
+	this.onStart = undefined;
 	this.onLoad = onLoad;
 	this.onProgress = onProgress;
 	this.onError = onError;
@@ -49,6 +50,16 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 				scope.onLoad();
 
 			}
+
+		}
+
+	};
+
+	this.itemError = function ( url ) {
+
+		if ( scope.onError !== undefined ) {
+
+			scope.onError( url );
 
 		}
 

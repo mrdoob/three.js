@@ -353,14 +353,12 @@ THREE.BufferGeometry.prototype = {
 			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
 			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
 			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
-			direct.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
 			direct.groupsNeedUpdate = geometry.groupsNeedUpdate;
 
 			geometry.verticesNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
 			geometry.uvsNeedUpdate = false;
-			geometry.tangentsNeedUpdate = false;
 			geometry.groupsNeedUpdate = false;
 
 			geometry = direct;
@@ -409,21 +407,6 @@ THREE.BufferGeometry.prototype = {
 			}
 
 			geometry.colorsNeedUpdate = false;
-
-		}
-
-		if ( geometry.tangentsNeedUpdate === true ) {
-
-			var attribute = this.attributes.tangent;
-
-			if ( attribute !== undefined ) {
-
-				attribute.copyVector4sArray( geometry.tangents );
-				attribute.needsUpdate = true;
-
-			}
-
-			geometry.tangentsNeedUpdate = false;
 
 		}
 
@@ -493,13 +476,6 @@ THREE.BufferGeometry.prototype = {
 
 			var uvs2 = new Float32Array( geometry.uvs2.length * 2 );
 			this.addAttribute( 'uv2', new THREE.BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 ) );
-
-		}
-
-		if ( geometry.tangents.length > 0 ) {
-
-			var tangents = new Float32Array( geometry.tangents.length * 4 );
-			this.addAttribute( 'tangent', new THREE.BufferAttribute( tangents, 4 ).copyVector4sArray( geometry.tangents ) );
 
 		}
 
@@ -805,185 +781,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeTangents: function () {
 
-		// based on http://www.terathon.com/code/tangent.html
-		// (per vertex tangents)
-
-		if ( this.index === undefined ||
-			 this.attributes.position === undefined ||
-			 this.attributes.normal === undefined ||
-			 this.attributes.uv === undefined ) {
-
-			console.warn( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
-			return;
-
-		}
-
-		var indices = this.index.array;
-		var positions = this.attributes.position.array;
-		var normals = this.attributes.normal.array;
-		var uvs = this.attributes.uv.array;
-
-		var nVertices = positions.length / 3;
-
-		if ( this.attributes.tangent === undefined ) {
-
-			this.addAttribute( 'tangent', new THREE.BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
-
-		}
-
-		var tangents = this.attributes.tangent.array;
-
-		var tan1 = [], tan2 = [];
-
-		for ( var k = 0; k < nVertices; k ++ ) {
-
-			tan1[ k ] = new THREE.Vector3();
-			tan2[ k ] = new THREE.Vector3();
-
-		}
-
-		var vA = new THREE.Vector3(),
-			vB = new THREE.Vector3(),
-			vC = new THREE.Vector3(),
-
-			uvA = new THREE.Vector2(),
-			uvB = new THREE.Vector2(),
-			uvC = new THREE.Vector2(),
-
-			x1, x2, y1, y2, z1, z2,
-			s1, s2, t1, t2, r;
-
-		var sdir = new THREE.Vector3(), tdir = new THREE.Vector3();
-
-		function handleTriangle( a, b, c ) {
-
-			vA.fromArray( positions, a * 3 );
-			vB.fromArray( positions, b * 3 );
-			vC.fromArray( positions, c * 3 );
-
-			uvA.fromArray( uvs, a * 2 );
-			uvB.fromArray( uvs, b * 2 );
-			uvC.fromArray( uvs, c * 2 );
-
-			x1 = vB.x - vA.x;
-			x2 = vC.x - vA.x;
-
-			y1 = vB.y - vA.y;
-			y2 = vC.y - vA.y;
-
-			z1 = vB.z - vA.z;
-			z2 = vC.z - vA.z;
-
-			s1 = uvB.x - uvA.x;
-			s2 = uvC.x - uvA.x;
-
-			t1 = uvB.y - uvA.y;
-			t2 = uvC.y - uvA.y;
-
-			r = 1.0 / ( s1 * t2 - s2 * t1 );
-
-			sdir.set(
-				( t2 * x1 - t1 * x2 ) * r,
-				( t2 * y1 - t1 * y2 ) * r,
-				( t2 * z1 - t1 * z2 ) * r
-			);
-
-			tdir.set(
-				( s1 * x2 - s2 * x1 ) * r,
-				( s1 * y2 - s2 * y1 ) * r,
-				( s1 * z2 - s2 * z1 ) * r
-			);
-
-			tan1[ a ].add( sdir );
-			tan1[ b ].add( sdir );
-			tan1[ c ].add( sdir );
-
-			tan2[ a ].add( tdir );
-			tan2[ b ].add( tdir );
-			tan2[ c ].add( tdir );
-
-		}
-
-		var i, il;
-		var j, jl;
-		var iA, iB, iC;
-
-		if ( this.groups.length === 0 ) {
-
-			this.addGroup( 0, indices.length );
-
-		}
-
-		var groups = this.groups;
-
-		for ( j = 0, jl = groups.length; j < jl; ++ j ) {
-
-			var group = groups[ j ];
-
-			var start = group.start;
-			var count = group.count;
-
-			for ( i = start, il = start + count; i < il; i += 3 ) {
-
-				iA = indices[ i + 0 ];
-				iB = indices[ i + 1 ];
-				iC = indices[ i + 2 ];
-
-				handleTriangle( iA, iB, iC );
-
-			}
-
-		}
-
-		var tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
-		var n = new THREE.Vector3(), n2 = new THREE.Vector3();
-		var w, t, test;
-
-		function handleVertex( v ) {
-
-			n.fromArray( normals, v * 3 );
-			n2.copy( n );
-
-			t = tan1[ v ];
-
-			// Gram-Schmidt orthogonalize
-
-			tmp.copy( t );
-			tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
-
-			// Calculate handedness
-
-			tmp2.crossVectors( n2, t );
-			test = tmp2.dot( tan2[ v ] );
-			w = ( test < 0.0 ) ? - 1.0 : 1.0;
-
-			tangents[ v * 4 ] = tmp.x;
-			tangents[ v * 4 + 1 ] = tmp.y;
-			tangents[ v * 4 + 2 ] = tmp.z;
-			tangents[ v * 4 + 3 ] = w;
-
-		}
-
-		for ( j = 0, jl = groups.length; j < jl; ++ j ) {
-
-			var group = groups[ j ];
-
-			var start = group.start;
-			var count = group.count;
-
-			for ( i = start, il = start + count; i < il; i += 3 ) {
-
-				iA = indices[ i + 0 ];
-				iB = indices[ i + 1 ];
-				iC = indices[ i + 2 ];
-
-				handleVertex( iA );
-				handleVertex( iB );
-				handleVertex( iC );
-
-			}
-
-		}
+		console.warn( 'THREE.BufferGeometry: .computeTangents() has been removed.' );
 
 	},
 
@@ -1084,10 +882,20 @@ THREE.BufferGeometry.prototype = {
 
 		data.data = { attributes: {} };
 
-		var attributes = this.attributes;
-		var groups = this.groups;
+		var index = this.index;
 
-		var boundingSphere = this.boundingSphere;
+		if ( index !== null ) {
+
+			var array = Array.prototype.slice.call( index.array );
+
+			data.data.index = {
+				type: index.array.constructor.name,
+				array: array
+			};
+
+		}
+
+		var attributes = this.attributes;
 
 		for ( var key in attributes ) {
 
@@ -1103,11 +911,15 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		var groups = this.groups;
+
 		if ( groups.length > 0 ) {
 
 			data.data.groups = JSON.parse( JSON.stringify( groups ) );
 
 		}
+
+		var boundingSphere = this.boundingSphere;
 
 		if ( boundingSphere !== null ) {
 

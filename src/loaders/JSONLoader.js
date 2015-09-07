@@ -5,6 +5,13 @@
 
 THREE.JSONLoader = function ( manager ) {
 
+	if ( typeof manager === 'boolean' ) {
+
+		console.warn( 'THREE.JSONLoader: showStatus parameter has been removed from constructor.' );
+		manager = undefined;
+
+	}
+
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 	this.withCredentials = false;
@@ -14,6 +21,19 @@ THREE.JSONLoader = function ( manager ) {
 THREE.JSONLoader.prototype = {
 
 	constructor: THREE.JSONLoader,
+
+	get statusDomElement () {
+
+		if ( this._statusDomElement === undefined ) {
+
+			this._statusDomElement = document.createElement( 'div' );
+
+		}
+
+		console.warn( 'THREE.JSONLoader: .statusDomElement has been removed.' );
+		return this._statusDomElement;
+
+	},
 
 	load: function( url, onLoad, onProgress, onError ) {
 
@@ -494,12 +514,6 @@ THREE.JSONLoader.prototype = {
 		} else {
 
 			var materials = THREE.Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
-
-			if ( THREE.Loader.prototype.needsTangents( materials ) ) {
-
-				geometry.computeTangents();
-
-			}
 
 			return { geometry: geometry, materials: materials };
 

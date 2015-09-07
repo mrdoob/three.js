@@ -7,6 +7,8 @@ var Loader = function ( editor ) {
 	var scope = this;
 	var signals = editor.signals;
 
+	this.texturePath = '';
+
 	this.loadFile = function ( file ) {
 
 		var filename = file.name;
@@ -386,6 +388,8 @@ var Loader = function ( editor ) {
 		} else if ( data.metadata.type.toLowerCase() === 'geometry' ) {
 
 			var loader = new THREE.JSONLoader();
+			loader.setTexturePath( scope.texturePath );
+
 			var result = loader.parse( data );
 
 			var geometry = result.geometry;
@@ -432,6 +436,8 @@ var Loader = function ( editor ) {
 		} else if ( data.metadata.type.toLowerCase() === 'object' ) {
 
 			var loader = new THREE.ObjectLoader();
+			loader.setTexturePath( scope.texturePath );
+
 			var result = loader.parse( data );
 
 			if ( result instanceof THREE.Scene ) {

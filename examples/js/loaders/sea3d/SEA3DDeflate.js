@@ -318,7 +318,6 @@ var zip_GET_BYTE = function() {
     if(zip_inflate_data.length == zip_inflate_pos)
 	return -1;
 	return zip_inflate_data[zip_inflate_pos++];
-    //return zip_inflate_data.charCodeAt(zip_inflate_pos++) & 0xff;
 }
 
 var zip_NEEDBITS = function(n) {
@@ -730,11 +729,11 @@ var zip_inflate_internal = function(buff, off, size) {
     return n;
 }
 
-var zip_inflate = function(str) {
+var zip_inflate = function(data) {
     var i, j, pos = 0;
 
     zip_inflate_start();
-    zip_inflate_data = str;
+    zip_inflate_data = new Uint8Array(data);
     zip_inflate_pos = 0;
 	
     var buff = new Uint8Array(1024);
@@ -745,7 +744,7 @@ var zip_inflate = function(str) {
 			out[pos++] = buff[j];		    
 	
     zip_inflate_data = null; // G.C.
-    return new Uint8Array(out);
+    return new Uint8Array(out).buffer;
 }
 
 if (! ctx.RawDeflate) ctx.RawDeflate = {};
@@ -754,14 +753,14 @@ ctx.RawDeflate.inflate = zip_inflate;
 })(this);
 
 /**
- * 	SEA3D.js - SEA3D SDK ( Deflate )
- * 	Copyright (C) 2013 Sunag Entertainment 
- * 
- * 	http://code.google.com/p/sea3d/
+ * 	SEA3D DEFLATE
+ * 	@author Sunag / http://www.sunag.com.br/
  */
- 
-SEA3D.File.DeflateUncompress = function(data) {	
-	return RawDeflate.inflate(data);
+
+SEA3D.File.DeflateUncompress = function( data ) {
+
+	return RawDeflate.inflate( data );
+
 }
 
-SEA3D.File.setDecompressionEngine(1, "deflate", SEA3D.File.DeflateUncompress);
+SEA3D.File.setDecompressionEngine( 1, "deflate", SEA3D.File.DeflateUncompress );

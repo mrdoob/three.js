@@ -71,20 +71,20 @@
 			loader = new THREE.SEA3D( {
 
 				autoPlay : true, // Auto play animations
-				container : scene, // Container to add models
-				parser : THREE.SEA3D.DEFAULT, // Auto choose THREE.BufferGeometry and THREE.Geometry
-				multiplier : 1 // Light multiplier
+				container : scene // Container to add models
 
 			} );
 
 			loader.onComplete = function( e ) {
 
-				// Get the first camera from 3ds Max
+				// Get the first camera from SEA3D Studio
 				// use loader.get... to get others objects
 
 				var cam = loader.cameras[0];
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
+
+				controls = new THREE.OrbitControls( camera );
 
 				// get mesh
 				teapot = loader.getMesh("Teapot01");
@@ -97,7 +97,7 @@
 
 			};
 
-			loader.load( './models/sea3d/morph.sea' );
+			loader.load( './models/sea3d/morph.tjs.sea' );
 
 			//
 
@@ -110,8 +110,6 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 1000, - 300, 1000 );
-
-				controls = new THREE.OrbitControls( camera );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
