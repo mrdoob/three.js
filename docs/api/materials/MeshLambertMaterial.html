@@ -30,7 +30,6 @@
 		alphaMap — Set alpha map. Default is null.<br />
 		envMap — Set env map. Default is null.<br />
 		fog — Define whether the material color is affected by global fog settings. Default is false.<br />
-		shading — How the triangles of a curved surface are rendered. Default is [page:Materials THREE.SmoothShading].<br/>
 		wireframe — Render geometry as wireframe. Default is false (i.e. render as smooth shaded).<br/>
 		wireframeLinewidth — Controls wireframe thickness. Default is 1.<br/>
 		wireframeLinecap — Define appearance of line ends. Default is 'round'.<br />
@@ -81,11 +80,6 @@
 		<h3>[property:Boolean fog]</h3>
 		<div>Define whether the material color is affected by global fog settings. Default is *true*.</div>
 		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
-
-		<h3>[property:Integer shading]</h3>
-		<div>How the triangles of a curved surface are rendered: as a smooth surface, as flat separate facets, or no shading at all.</div>
-
-		<div>Options are [page:Materials THREE.SmoothShading] (default), [page:Materials THREE.FlatShading].</div>
 
 		<h3>[property:Boolean wireframe]</h3>
 		<div>Whether the triangles' edges are displayed instead of surfaces. Default is *false*.</div>
