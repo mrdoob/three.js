@@ -23,15 +23,13 @@ CmdAddObject = function ( object ) {
 
 		if ( object.geometry !== undefined ) {
 
-			this.objectJSON.geometries = [];
-			this.objectJSON.geometries.push( object.geometry.toJSON( meta ) );
+			this.objectJSON.geometries = [ object.geometry.toJSON( meta ) ];
 
 		}
 
 		if ( object.material !== undefined ) {
 
-			this.objectJSON.materials = [];
-			this.objectJSON.materials.push( object.material.toJSON( meta ) );
+			this.objectJSON.materials = [ object.material.toJSON( meta ) ];
 
 		}
 
