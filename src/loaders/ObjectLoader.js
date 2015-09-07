@@ -343,6 +343,7 @@ THREE.ObjectLoader.prototype = {
 
 				if ( data.displacementMap !== undefined ) material.displacementMap = getTexture( data.displacementMap );
 				if ( data.displacementScale !== undefined ) material.displacementScale = data.displacementScale;
+				if ( data.displacementBias !== undefined ) material.displacementBias = data.displacementBias;
 
 				if ( data.specularMap !== undefined ) material.specularMap = getTexture( data.specularMap );
 

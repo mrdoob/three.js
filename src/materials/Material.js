@@ -149,6 +149,7 @@ THREE.Material.prototype = {
 
 			data.displacementMap = this.displacementMap.toJSON( meta ).uuid;
 			data.displacementScale = this.displacementScale;
+			data.displacementBias = this.displacementBias;
 
 		}
 		if ( this.specularMap instanceof THREE.Texture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
