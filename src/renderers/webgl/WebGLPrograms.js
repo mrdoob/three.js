@@ -145,6 +145,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			emissiveMap: !! material.emissiveMap,
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
+			displacementMap: !! material.displacementMap,
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
 
