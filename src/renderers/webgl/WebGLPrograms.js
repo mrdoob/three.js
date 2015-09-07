@@ -1,4 +1,4 @@
-THREE.WebGLPrograms = function ( renderer1, capabilities ) {
+THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 	var programs = [];
 
@@ -13,10 +13,17 @@ THREE.WebGLPrograms = function ( renderer1, capabilities ) {
 		PointCloudMaterial: 'particle_basic'
 	};
 
-	var parameterNames = [ "precision", "supportsVertexTextures", "map", "envMap", "envMapMode", "lightMap", "aoMap", "emissiveMap", "bumpMap", "normalMap", "specularMap", "alphaMap", "combine",
-	                        "vertexColors", "fog", "useFog", "fogExp", "flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning", "maxBones", "useVertexTexture", "morphTargets", "morphNormals",
-	                        "maxMorphTargets", "maxMorphNormals", "maxDirLights", "maxPointLights", "maxSpotLights", "maxHemiLights", "maxShadows", "shadowMapEnabled", "shadowMapType", "shadowMapDebug",
-	                        "alphaTest", "metal", "doubleSided", "flipSided" ];
+	var parameterNames = [
+		"precision", "supportsVertexTextures", "map", "envMap", "envMapMode",
+		"lightMap", "aoMap", "emissiveMap", "bumpMap", "normalMap", "specularMap",
+		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
+		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
+		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
+		"maxMorphTargets", "maxMorphNormals", "maxDirLights", "maxPointLights",
+		"maxSpotLights", "maxHemiLights", "maxShadows", "shadowMapEnabled",
+		"shadowMapType", "shadowMapDebug", "alphaTest", "metal", "doubleSided",
+		"flipSided"
+	];
 
 
 	function allocateBones ( object ) {
@@ -100,7 +107,7 @@ THREE.WebGLPrograms = function ( renderer1, capabilities ) {
 
 	}
 
-	this.getParameters = function( material, lights, fog, object ) {
+	this.getParameters = function ( material, lights, fog, object ) {
 
 		var shaderID = shaderIDs[ material.type ];
 		// heuristics to create shader parameters according to lights in the scene
@@ -109,7 +116,7 @@ THREE.WebGLPrograms = function ( renderer1, capabilities ) {
 		var maxLightCount = allocateLights( lights );
 		var maxShadows = allocateShadows( lights );
 		var maxBones = allocateBones( object );
-		var precision = renderer1.getPrecision();
+		var precision = renderer.getPrecision();
 
 		if ( material.precision !== null ) {
 
@@ -152,7 +159,7 @@ THREE.WebGLPrograms = function ( renderer1, capabilities ) {
 			flatShading: material.shading === THREE.FlatShading,
 
 			sizeAttenuation: material.sizeAttenuation,
-			logarithmicDepthBuffer: renderer1.logarithmicDepthBuffer,
+			logarithmicDepthBuffer: renderer.logarithmicDepthBuffer,
 
 			skinning: material.skinning,
 			maxBones: maxBones,
@@ -160,8 +167,8 @@ THREE.WebGLPrograms = function ( renderer1, capabilities ) {
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
-			maxMorphTargets: renderer1.maxMorphTargets,
-			maxMorphNormals: renderer1.maxMorphNormals,
+			maxMorphTargets: renderer.maxMorphTargets,
+			maxMorphNormals: renderer.maxMorphNormals,
 
 			maxDirLights: maxLightCount.directional,
 			maxPointLights: maxLightCount.point,
@@ -169,9 +176,9 @@ THREE.WebGLPrograms = function ( renderer1, capabilities ) {
 			maxHemiLights: maxLightCount.hemi,
 
 			maxShadows: maxShadows,
-			shadowMapEnabled: renderer1.shadowMap.enabled && object.receiveShadow && maxShadows > 0,
-			shadowMapType: renderer1.shadowMap.type,
-			shadowMapDebug: renderer1.shadowMap.debug,
+			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && maxShadows > 0,
+			shadowMapType: renderer.shadowMap.type,
+			shadowMapDebug: renderer.shadowMap.debug,
 
 			alphaTest: material.alphaTest,
 			metal: material.metal,
@@ -184,7 +191,7 @@ THREE.WebGLPrograms = function ( renderer1, capabilities ) {
 
 	};
 
-	this.getProgramCode = function( material, parameters ) {
+	this.getProgramCode = function ( material, parameters ) {
 
 		var chunks = [];
 
@@ -222,7 +229,7 @@ THREE.WebGLPrograms = function ( renderer1, capabilities ) {
 
 	};
 
-	this.getProgram = function( material, parameters, code ) {
+	this.getProgram = function ( material, parameters, code ) {
 
 		var program;
 
@@ -243,7 +250,7 @@ THREE.WebGLPrograms = function ( renderer1, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new THREE.WebGLProgram( renderer1, code, material, parameters );
+			program = new THREE.WebGLProgram( renderer, code, material, parameters );
 			programs.push( program );
 
 		}
