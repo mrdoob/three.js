@@ -13,8 +13,7 @@ THREE.AnimationMixer = function( root ) {
 	this.time = 0;
 	this.timeScale = 1.0;
 	this.actions = [];
-	this.propertyBindings = [];
-	this.propertyBindingNamesToIndex = {};
+	this.propertyBindingMap = {};
 
 };
 
@@ -38,19 +37,14 @@ THREE.AnimationMixer.prototype = {
 
 			var track = tracks[ i ];
 
-			var j = this.getPropertyBindingIndex( root, track.name )
+			var propertyBindingKey = root.uuid + '-' + track.name;			
+			var propertyBinding = this.propertyBindingMap[ propertyBindingKey ];
 
-			var propertyBinding;
-
-			if( j < 0 ) {
+			if( propertyBinding === undefined ) {
 			
 				propertyBinding = new THREE.PropertyBinding( root, track.name );
-				this.propertyBindings.push( propertyBinding );
-				this.propertyBindingNamesToIndex[ root.uuid + '-' + track.name ] = this.propertyBindings.length - 1;
+				this.propertyBindingMap[ propertyBindingKey ] = propertyBinding;
 			
-			}
-			else {
-				propertyBinding = this.propertyBindings[ j ];
 			}
 
 			// push in the same order as the tracks.
@@ -63,13 +57,6 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
-	getPropertyBindingIndex: function( rootNode, trackName ) {
-		
-		var index = this.propertyBindingNamesToIndex[ rootNode.uuid + '-' + trackName ];
-		return ( index !== undefined ) ? index : -1;
-
-	},
-
 	removeAllActions: function() {
 
 		for( var i = 0; i < this.actions.length; i ++ ) {
@@ -79,15 +66,14 @@ THREE.AnimationMixer.prototype = {
 		}
 
 		// unbind all property bindings
-		for( var i = 0; i < this.propertyBindings.length; i ++ ) {
+		for( var properyBindingKey in this.propertyBindingMap ) {
 
-			this.propertyBindings[i].unbind();
+			this.propertyBindingMap[ properyBindingKey ].unbind();
 
 		}
 
 		this.actions = [];
-		this.propertyBindings = [];
-		this.propertyBindingNamesToIndex = {};
+		this.propertyBindingMap = {};
 
 		return this;
 
@@ -112,16 +98,17 @@ THREE.AnimationMixer.prototype = {
 		for( var i = 0; i < tracks.length; i ++ ) {
 		
 			var track = tracks[ i ];
-			var propertyBindingIndex = this.getPropertyBindingIndex( root, track.name );
-			var propertyBinding = this.propertyBindings[ propertyBindingIndex ];
 
+			var propertyBindingKey = root.uuid + '-' + track.name;			
+			var propertyBinding = this.propertyBindingMap[ propertyBindingKey ];
+	
 			propertyBinding.referenceCount -= 1;
 
 			if( propertyBinding.referenceCount <= 0 ) {
 
 				propertyBinding.unbind();
 
-				this.propertyBindings.splice( this.propertyBindings.indexOf( propertyBinding ), 1 );
+				delete this.propertyBindingMap[ propertyBindingKey ];
 
 			}
 		}
@@ -239,9 +226,9 @@ THREE.AnimationMixer.prototype = {
 		}
 	
 		// apply to nodes
-		for ( var i = 0; i < this.propertyBindings.length; i ++ ) {
+		for( var propertyBindingKey in this.propertyBindingMap ) {
 
-			this.propertyBindings[ i ].apply();
+			this.propertyBindingMap[ propertyBindingKey ].apply();
 
 		}
 
