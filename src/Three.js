@@ -1,306 +1,258 @@
 /**
- * @author mrdoob / http://mrdoob.com/
+ * Library compilation.
+ *
+ * @author vanruesc
  */
 
-var THREE = { REVISION: '72dev' };
+var Constants = require( "./Constants" );
 
-//
+require( "./Polyfills" )();
 
-if ( typeof define === 'function' && define.amd ) {
+module.exports = {
 
-		define( 'three', THREE );
+	// Cameras
+	Camera: require( "./cameras/Camera" ),
+	CubeCamera: require( "./cameras/CubeCamera" ),
+	OrthographicCamera: require( "./cameras/OrthographicCamera" ),
+	PerspectiveCamera: require( "./cameras/PerspectiveCamera" ),
 
-} else if ( 'undefined' !== typeof exports && 'undefined' !== typeof module ) {
+	// Core
+	BufferAttribute: require( "./core/BufferAttribute" ),
+	BufferGeometry: require( "./core/BufferGeometry" ),
+	Clock: require( "./core/Clock" ),
+	DirectGeometry: require( "./core/DirectGeometry" ),
+	EventDispatcher: require( "./core/EventDispatcher" ),
+	Face3: require( "./core/Face3" ),
+	Face4: require( "./core/Face4" ),
+	Geometry: require( "./core/Geometry" ),
+	InstancedBufferAttribute: require( "./core/InstancedBufferAttribute" ),
+	InstancedBufferGeometry: require( "./core/InstancedBufferGeometry" ),
+	InstancedInterleavedBuffer: require( "./core/InstancedInterleavedBuffer" ),
+	InterleavedBuffer: require( "./core/InterleavedBuffer" ),
+	InterleavedBufferAttribute: require( "./core/InterleavedBufferAttribute" ),
+	Object3D: require( "./core/Object3D" ),
+	Raycaster: require( "./core/Raycaster" ),
 
-		module.exports = THREE;
+	// Extras
+	FontUtils: require( "./extras/FontUtils" ),
+	GeometryUtils: require( "./extras/GeometryUtils" ),
+	ImageUtils: require( "./extras/ImageUtils" ),
+	SceneUtils: require( "./extras/SceneUtils" ),
+	ShapeUtils: require( "./extras/ShapeUtils" ),
+
+	// > Animation
+	Animation: require( "./extras/animation/Animation" ),
+	AnimationHandler: require( "./extras/animation/AnimationHandler" ),
+	KeyFrameAnimation: require( "./extras/animation/KeyFrameAnimation" ),
+	MorphAnimation: require( "./extras/animation/MorphAnimation" ),
+
+	// > Audio
+	Audio: require( "./extras/audio/Audio" ),
+	AudioListener: require( "./extras/audio/AudioListener" ),
+
+	// > Core
+	Curve: require( "./extras/core/Curve" ),
+	CurvePath: require( "./extras/core/CurvePath" ),
+	Path: require( "./extras/core/Path" ),
+	Shape: require( "./extras/core/Shape" ),
+
+	// > Curves
+	ArcCurve: require( "./extras/curves/ArcCurve" ),
+	CatmullRomCurve3: require( "./extras/curves/CatmullRomCurve3" ),
+	ClosedSplineCurve3: require( "./extras/curves/ClosedSplineCurve3" ),
+	CubicBezierCurve: require( "./extras/curves/CubicBezierCurve" ),
+	CubicBezierCurve3: require( "./extras/curves/CubicBezierCurve3" ),
+	EllipseCurve: require( "./extras/curves/EllipseCurve" ),
+	LineCurve: require( "./extras/curves/LineCurve" ),
+	LineCurve3: require( "./extras/curves/LineCurve3" ),
+	QuadraticBezierCurve: require( "./extras/curves/QuadraticBezierCurve" ),
+	QuadraticBezierCurve3: require( "./extras/curves/QuadraticBezierCurve3" ),
+	SplineCurve: require( "./extras/curves/SplineCurve" ),
+	SplineCurve3: require( "./extras/curves/SplineCurve3" ),
+
+	// > Geometries
+	BoxGeometry: require( "./extras/geometries/BoxGeometry" ),
+	CircleBufferGeometry: require( "./extras/geometries/CircleBufferGeometry" ),
+	CircleGeometry: require( "./extras/geometries/CircleGeometry" ),
+	CylinderGeometry: require( "./extras/geometries/CylinderGeometry" ),
+	DodecahedronGeometry: require( "./extras/geometries/DodecahedronGeometry" ),
+	EdgesGeometry: require( "./extras/geometries/EdgesGeometry" ),
+	ExtrudeGeometry: require( "./extras/geometries/ExtrudeGeometry" ),
+	IcosahedronGeometry: require( "./extras/geometries/IcosahedronGeometry" ),
+	LatheGeometry: require( "./extras/geometries/LatheGeometry" ),
+	OctahedronGeometry: require( "./extras/geometries/OctahedronGeometry" ),
+	ParametricGeometry: require( "./extras/geometries/ParametricGeometry" ),
+	PlaneBufferGeometry: require( "./extras/geometries/PlaneBufferGeometry" ),
+	PlaneGeometry: require( "./extras/geometries/PlaneGeometry" ),
+	PolyhedronGeometry: require( "./extras/geometries/PolyhedronGeometry" ),
+	RingGeometry: require( "./extras/geometries/RingGeometry" ),
+	ShapeGeometry: require( "./extras/geometries/ShapeGeometry" ),
+	SphereBufferGeometry: require( "./extras/geometries/SphereBufferGeometry" ),
+	SphereGeometry: require( "./extras/geometries/SphereGeometry" ),
+	TetrahedronGeometry: require( "./extras/geometries/TetrahedronGeometry" ),
+	TextGeometry: require( "./extras/geometries/TextGeometry" ),
+	TorusGeometry: require( "./extras/geometries/TorusGeometry" ),
+	TorusKnotGeometry: require( "./extras/geometries/TorusKnotGeometry" ),
+	TubeGeometry: require( "./extras/geometries/TubeGeometry" ),
+	WireframeGeometry: require( "./extras/geometries/WireframeGeometry" ),
+
+	// > Helpers
+	ArrowHelper: require( "./extras/helpers/ArrowHelper" ),
+	AxisHelper: require( "./extras/helpers/AxisHelper" ),
+	BoundingBoxHelper: require( "./extras/helpers/BoundingBoxHelper" ),
+	BoxHelper: require( "./extras/helpers/BoxHelper" ),
+	CameraHelper: require( "./extras/helpers/CameraHelper" ),
+	DirectionalLightHelper: require( "./extras/helpers/DirectionalLightHelper" ),
+	EdgesHelper: require( "./extras/helpers/EdgesHelper" ),
+	FaceNormalsHelper: require( "./extras/helpers/FaceNormalsHelper" ),
+	GridHelper: require( "./extras/helpers/GridHelper" ),
+	HemisphereLightHelper: require( "./extras/helpers/HemisphereLightHelper" ),
+	PointLightHelper: require( "./extras/helpers/PointLightHelper" ),
+	SkeletonHelper: require( "./extras/helpers/SkeletonHelper" ),
+	SpotLightHelper: require( "./extras/helpers/SpotLightHelper" ),
+	VertexNormalsHelper: require( "./extras/helpers/VertexNormalsHelper" ),
+	WireframeHelper: require( "./extras/helpers/WireframeHelper" ),
+
+	// > Objects
+	ImmediateRenderObject: require( "./extras/objects/ImmediateRenderObject" ),
+	MorphBlendMesh: require( "./extras/objects/MorphBlendMesh" ),
+
+	// Lights
+	AmbientLight: require( "./lights/AmbientLight" ),
+	DirectionalLight: require( "./lights/DirectionalLight" ),
+	HemisphereLight: require( "./lights/HemisphereLight" ),
+	Light: require( "./lights/Light" ),
+	PointLight: require( "./lights/PointLight" ),
+	SpotLight: require( "./lights/SpotLight" ),
+
+	// Loaders
+	BinaryTextureLoader: require( "./loaders/BinaryTextureLoader" ),
+	BufferGeometryLoader: require( "./loaders/BufferGeometryLoader" ),
+	Cache: require( "./loaders/Cache" ),
+	CompressedTextureLoader: require( "./loaders/CompressedTextureLoader" ),
+	ImageLoader: require( "./loaders/ImageLoader" ),
+	JSONLoader: require( "./loaders/JSONLoader" ),
+	Loader: require( "./loaders/Loader" ),
+	LoadingManager: require( "./loaders/LoadingManager" ),
+	MaterialLoader: require( "./loaders/MaterialLoader" ),
+	ObjectLoader: require( "./loaders/ObjectLoader" ),
+	TextureLoader: require( "./loaders/TextureLoader" ),
+	XHRLoader: require( "./loaders/XHRLoader" ),
+
+	// Materials
+	LineBasicMaterial: require( "./materials/LineBasicMaterial" ),
+	LineDashedMaterial: require( "./materials/LineDashedMaterial" ),
+	Material: require( "./materials/Material" ),
+	MeshBasicMaterial: require( "./materials/MeshBasicMaterial" ),
+	MeshDepthMaterial: require( "./materials/MeshDepthMaterial" ),
+	MeshLambertMaterial: require( "./materials/MeshLambertMaterial" ),
+	MeshNormalMaterial: require( "./materials/MeshNormalMaterial" ),
+	MeshPhongMaterial: require( "./materials/MeshPhongMaterial" ),
+	MultiMaterial: require( "./materials/MultiMaterial" ),
+	PointCloudMaterial: require( "./materials/PointCloudMaterial" ),
+	RawShaderMaterial: require( "./materials/RawShaderMaterial" ),
+	ShaderMaterial: require( "./materials/ShaderMaterial" ),
+	SpriteMaterial: require( "./materials/SpriteMaterial" ),
+
+	// Math
+	Box2: require( "./math/Box2" ),
+	Box3: require( "./math/Box3" ),
+	Color: require( "./math/Color" ),
+	Euler: require( "./math/Euler" ),
+	Frustum: require( "./math/Frustum" ),
+	Line3: require( "./math/Line3" ),
+	Math: require( "./math/Math" ),
+	Matrix3: require( "./math/Matrix3" ),
+	Matrix4: require( "./math/Matrix4" ),
+	Plane: require( "./math/Plane" ),
+	Quaternion: require( "./math/Quaternion" ),
+	Ray: require( "./math/Ray" ),
+	Sphere: require( "./math/Sphere" ),
+	Spline: require( "./math/Spline" ),
+	Triangle: require( "./math/Triangle" ),
+	Vector2: require( "./math/Vector2" ),
+	Vector3: require( "./math/Vector3" ),
+	Vector4: require( "./math/Vector4" ),
+
+	// Objects
+	Bone: require( "./objects/Bone" ),
+	Group: require( "./objects/Group" ),
+	LensFlare: require( "./objects/LensFlare" ),
+	Line: require( "./objects/Line" ),
+	LineSegments: require( "./objects/LineSegments" ),
+	LOD: require( "./objects/LOD" ),
+	Mesh: require( "./objects/Mesh" ),
+	MorphAnimMesh: require( "./objects/MorphAnimMesh" ),
+	PointCloud: require( "./objects/PointCloud" ),
+	Skeleton: require( "./objects/Skeleton" ),
+	SkinnedMesh: require( "./objects/SkinnedMesh" ),
+	Sprite: require( "./objects/Sprite" ),
+
+	// Renderers
+	WebGLRenderer: require( "./renderers/WebGLRenderer" ),
+	WebGLRenderTarget: require( "./renderers/WebGLRenderTarget" ),
+	WebGLRenderTargetCube: require( "./renderers/WebGLRenderTargetCube" ),
+
+	// > Shaders
+	ShaderChunk: require( "./renderers/shaders/ShaderChunk" ),
+	ShaderLib: require( "./renderers/shaders/ShaderLib" ),
+	UniformsLib: require( "./renderers/shaders/UniformsLib" ),
+	UniformsUtils: require( "./renderers/shaders/UniformsUtils" ),
+
+	// > WebGL
+	WebGLBufferRenderer: require( "./renderers/webgl/WebGLBufferRenderer" ),
+	WebGLCapabilities: require( "./renderers/webgl/WebGLCapabilities" ),
+	WebGLExtensions: require( "./renderers/webgl/WebGLExtensions" ),
+	WebGLGeometries: require( "./renderers/webgl/WebGLGeometries" ),
+	WebGLIndexedBufferRenderer: require( "./renderers/webgl/WebGLIndexedBufferRenderer" ),
+	WebGLObjects: require( "./renderers/webgl/WebGLObjects" ),
+	WebGLProgram: require( "./renderers/webgl/WebGLProgram" ),
+	WebGLPrograms: require( "./renderers/webgl/WebGLPrograms" ),
+	WebGLProperties: require( "./renderers/webgl/WebGLProperties" ),
+	WebGLShader: require( "./renderers/webgl/WebGLShader" ),
+	WebGLShadowMap: require( "./renderers/webgl/WebGLShadowMap" ),
+	WebGLState: require( "./renderers/webgl/WebGLState" ),
+
+	// > WebGL > Plugins
+	LensFlarePlugin: require( "./renderers/webgl/plugins/LensFlarePlugin" ),
+	SpritePlugin: require( "./renderers/webgl/plugins/SpritePlugin" ),
+
+	// Scenes
+	Fog: require( "./scenes/Fog" ),
+	FogExp2: require( "./scenes/FogExp2" ),
+	Scene: require( "./scenes/Scene" ),
+
+	// Textures
+	CanvasTexture: require( "./textures/CanvasTexture" ),
+	CompressedTexture: require( "./textures/CompressedTexture" ),
+	CubeTexture: require( "./textures/CubeTexture" ),
+	DataTexture: require( "./textures/DataTexture" ),
+	Texture: require( "./textures/Texture" ),
+	VideoTexture: require( "./textures/VideoTexture" )
+
+};
+
+// Define getters and setters for all internal constants.
+
+function makeGetter ( key ) {
+
+	return function () { return Constants[ key ]; };
 
 }
 
+function makeSetter ( key ) {
 
-// polyfills
-
-if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === undefined ) {
-
-	// Missing in Android stock browser.
-
-	( function () {
-
-		var lastTime = 0;
-		var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
-
-		for ( var x = 0; x < vendors.length && ! self.requestAnimationFrame; ++ x ) {
-
-			self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
-			self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
-
-		}
-
-		if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
-
-			self.requestAnimationFrame = function ( callback ) {
-
-				var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-				var id = self.setTimeout( function () {
-
-					callback( currTime + timeToCall );
-
-				}, timeToCall );
-				lastTime = currTime + timeToCall;
-				return id;
-
-			};
-
-		}
-
-		if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
-
-			self.cancelAnimationFrame = function ( id ) {
-
-				self.clearTimeout( id );
-
-			};
-
-		}
-
-	}() );
+	return function ( value ) { Constants[ key ] = value; };
 
 }
 
-if ( Math.sign === undefined ) {
+for( var key in Constants ) {
 
-	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
-
-	Math.sign = function ( x ) {
-
-		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : + x;
-
-	};
-
-}
-
-if ( Function.prototype.name === undefined && Object.defineProperty !== undefined ) {
-
-	// Missing in IE9-11.
-	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
-
-	Object.defineProperty( Function.prototype, 'name', {
-
-		get: function () {
-
-			return this.toString().match( /^\s*function\s*(\S*)\s*\(/ )[ 1 ];
-
-		}
-
+	Object.defineProperty( module.exports, key, {
+		get: makeGetter( key ),
+		set: makeSetter( key )
 	} );
 
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
-
-THREE.MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
-
-// GL STATE CONSTANTS
-
-THREE.CullFaceNone = 0;
-THREE.CullFaceBack = 1;
-THREE.CullFaceFront = 2;
-THREE.CullFaceFrontBack = 3;
-
-THREE.FrontFaceDirectionCW = 0;
-THREE.FrontFaceDirectionCCW = 1;
-
-// SHADOWING TYPES
-
-THREE.BasicShadowMap = 0;
-THREE.PCFShadowMap = 1;
-THREE.PCFSoftShadowMap = 2;
-
-// MATERIAL CONSTANTS
-
-// side
-
-THREE.FrontSide = 0;
-THREE.BackSide = 1;
-THREE.DoubleSide = 2;
-
-// shading
-
-THREE.FlatShading = 1;
-THREE.SmoothShading = 2;
-
-// colors
-
-THREE.NoColors = 0;
-THREE.FaceColors = 1;
-THREE.VertexColors = 2;
-
-// blending modes
-
-THREE.NoBlending = 0;
-THREE.NormalBlending = 1;
-THREE.AdditiveBlending = 2;
-THREE.SubtractiveBlending = 3;
-THREE.MultiplyBlending = 4;
-THREE.CustomBlending = 5;
-
-// custom blending equations
-// (numbers start from 100 not to clash with other
-// mappings to OpenGL constants defined in Texture.js)
-
-THREE.AddEquation = 100;
-THREE.SubtractEquation = 101;
-THREE.ReverseSubtractEquation = 102;
-THREE.MinEquation = 103;
-THREE.MaxEquation = 104;
-
-// custom blending destination factors
-
-THREE.ZeroFactor = 200;
-THREE.OneFactor = 201;
-THREE.SrcColorFactor = 202;
-THREE.OneMinusSrcColorFactor = 203;
-THREE.SrcAlphaFactor = 204;
-THREE.OneMinusSrcAlphaFactor = 205;
-THREE.DstAlphaFactor = 206;
-THREE.OneMinusDstAlphaFactor = 207;
-
-// custom blending source factors
-
-//THREE.ZeroFactor = 200;
-//THREE.OneFactor = 201;
-//THREE.SrcAlphaFactor = 204;
-//THREE.OneMinusSrcAlphaFactor = 205;
-//THREE.DstAlphaFactor = 206;
-//THREE.OneMinusDstAlphaFactor = 207;
-THREE.DstColorFactor = 208;
-THREE.OneMinusDstColorFactor = 209;
-THREE.SrcAlphaSaturateFactor = 210;
-
-// depth modes
-
-THREE.NeverDepth = 0;
-THREE.AlwaysDepth = 1;
-THREE.LessDepth = 2;
-THREE.LessEqualDepth = 3;
-THREE.EqualDepth = 4;
-THREE.GreaterEqualDepth = 5;
-THREE.GreaterDepth = 6;
-THREE.NotEqualDepth = 7;
-
-
-// TEXTURE CONSTANTS
-
-THREE.MultiplyOperation = 0;
-THREE.MixOperation = 1;
-THREE.AddOperation = 2;
-
-// Mapping modes
-
-THREE.UVMapping = 300;
-
-THREE.CubeReflectionMapping = 301;
-THREE.CubeRefractionMapping = 302;
-
-THREE.EquirectangularReflectionMapping = 303;
-THREE.EquirectangularRefractionMapping = 304;
-
-THREE.SphericalReflectionMapping = 305;
-
-// Wrapping modes
-
-THREE.RepeatWrapping = 1000;
-THREE.ClampToEdgeWrapping = 1001;
-THREE.MirroredRepeatWrapping = 1002;
-
-// Filters
-
-THREE.NearestFilter = 1003;
-THREE.NearestMipMapNearestFilter = 1004;
-THREE.NearestMipMapLinearFilter = 1005;
-THREE.LinearFilter = 1006;
-THREE.LinearMipMapNearestFilter = 1007;
-THREE.LinearMipMapLinearFilter = 1008;
-
-// Data types
-
-THREE.UnsignedByteType = 1009;
-THREE.ByteType = 1010;
-THREE.ShortType = 1011;
-THREE.UnsignedShortType = 1012;
-THREE.IntType = 1013;
-THREE.UnsignedIntType = 1014;
-THREE.FloatType = 1015;
-THREE.HalfFloatType = 1025;
-
-// Pixel types
-
-//THREE.UnsignedByteType = 1009;
-THREE.UnsignedShort4444Type = 1016;
-THREE.UnsignedShort5551Type = 1017;
-THREE.UnsignedShort565Type = 1018;
-
-// Pixel formats
-
-THREE.AlphaFormat = 1019;
-THREE.RGBFormat = 1020;
-THREE.RGBAFormat = 1021;
-THREE.LuminanceFormat = 1022;
-THREE.LuminanceAlphaFormat = 1023;
-// THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
-THREE.RGBEFormat = THREE.RGBAFormat; //1024;
-
-// DDS / ST3C Compressed texture formats
-
-THREE.RGB_S3TC_DXT1_Format = 2001;
-THREE.RGBA_S3TC_DXT1_Format = 2002;
-THREE.RGBA_S3TC_DXT3_Format = 2003;
-THREE.RGBA_S3TC_DXT5_Format = 2004;
-
-
-// PVRTC compressed texture formats
-
-THREE.RGB_PVRTC_4BPPV1_Format = 2100;
-THREE.RGB_PVRTC_2BPPV1_Format = 2101;
-THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
-THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
-
-
-// DEPRECATED
-
-THREE.Projector = function () {
-
-	console.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
-
-	this.projectVector = function ( vector, camera ) {
-
-		console.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
-		vector.project( camera );
-
-	};
-
-	this.unprojectVector = function ( vector, camera ) {
-
-		console.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
-		vector.unproject( camera );
-
-	};
-
-	this.pickingRay = function ( vector, camera ) {
-
-		console.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
-
-	};
-
-};
-
-THREE.CanvasRenderer = function () {
-
-	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
-
-	this.domElement = document.createElement( 'canvas' );
-	this.clear = function () {};
-	this.render = function () {};
-	this.setClearColor = function () {};
-	this.setSize = function () {};
-
-};
+require( "./BackwardsCompatibility" )( module.exports );
