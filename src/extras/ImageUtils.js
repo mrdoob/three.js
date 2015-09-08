@@ -4,27 +4,33 @@
  * @author Daosheng Mu / https://github.com/DaoshengMu/
  */
 
-THREE.ImageUtils = {
+var Constants = require( "../Constants" ),
+	ImageLoader = require( "../loaders/ImageLoader" ),
+	Texture = require( "../textures/Texture" ),
+	CubeTexture = require( "../textures/CubeTexture" ),
+	DataTexture = require( "../textures/DataTexture" );
+	
+module.exports = {
 
 	crossOrigin: undefined,
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
 
-		var loader = new THREE.ImageLoader();
+		var loader = new ImageLoader();
 		loader.crossOrigin = this.crossOrigin;
 
-		var texture = new THREE.Texture( undefined, mapping );
+		var texture = new Texture( undefined, mapping );
 
 		loader.load( url, function ( image ) {
 
 			texture.image = image;
 			texture.needsUpdate = true;
 
-			if ( onLoad ) onLoad( texture );
+			if ( onLoad ) { onLoad( texture ); }
 
 		}, undefined, function ( event ) {
 
-			if ( onError ) onError( event );
+			if ( onError ) { onError( event ); }
 
 		} );
 
@@ -38,10 +44,10 @@ THREE.ImageUtils = {
 
 		var images = [];
 
-		var loader = new THREE.ImageLoader();
+		var loader = new ImageLoader();
 		loader.crossOrigin = this.crossOrigin;
 
-		var texture = new THREE.CubeTexture( images, mapping );
+		var texture = new CubeTexture( images, mapping );
 
 		var loaded = 0;
 
@@ -57,7 +63,7 @@ THREE.ImageUtils = {
 
 					texture.needsUpdate = true;
 
-					if ( onLoad ) onLoad( texture );
+					if ( onLoad ) { onLoad( texture ); }
 
 				}
 
@@ -77,13 +83,13 @@ THREE.ImageUtils = {
 
 	loadCompressedTexture: function () {
 
-		console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' )
+		console.error( "ImageUtils.loadCompressedTexture has been removed. Use DDSLoader instead." );
 
 	},
 
 	loadCompressedTextureCube: function () {
 
-		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' )
+		console.error( "ImageUtils.loadCompressedTextureCube has been removed. Use DDSLoader instead." );
 
 	},
 
@@ -115,28 +121,33 @@ THREE.ImageUtils = {
 		var width = image.width;
 		var height = image.height;
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = document.createElement( "canvas" );
 		canvas.width = width;
 		canvas.height = height;
 
-		var context = canvas.getContext( '2d' );
+		var context = canvas.getContext( "2d" );
 		context.drawImage( image, 0, 0 );
 
 		var data = context.getImageData( 0, 0, width, height ).data;
 		var imageData = context.createImageData( width, height );
 		var output = imageData.data;
 
-		for ( var x = 0; x < width; x ++ ) {
+		var x, y, ly, uy, lx, ux,
+			points, origin,	i,
+			normals, num_points,
+			v1, v2, normal, idx;
 
-			for ( var y = 0; y < height; y ++ ) {
+		for ( x = 0; x < width; x ++ ) {
 
-				var ly = y - 1 < 0 ? 0 : y - 1;
-				var uy = y + 1 > height - 1 ? height - 1 : y + 1;
-				var lx = x - 1 < 0 ? 0 : x - 1;
-				var ux = x + 1 > width - 1 ? width - 1 : x + 1;
+			for ( y = 0; y < height; y ++ ) {
 
-				var points = [];
-				var origin = [ 0, 0, data[ ( y * width + x ) * 4 ] / 255 * depth ];
+				ly = y - 1 < 0 ? 0 : y - 1;
+				uy = y + 1 > height - 1 ? height - 1 : y + 1;
+				lx = x - 1 < 0 ? 0 : x - 1;
+				ux = x + 1 > width - 1 ? width - 1 : x + 1;
+
+				points = [];
+				origin = [ 0, 0, data[ ( y * width + x ) * 4 ] / 255 * depth ];
 				points.push( [ - 1, 0, data[ ( y * width + lx ) * 4 ] / 255 * depth ] );
 				points.push( [ - 1, - 1, data[ ( ly * width + lx ) * 4 ] / 255 * depth ] );
 				points.push( [ 0, - 1, data[ ( ly * width + x ) * 4 ] / 255 * depth ] );
@@ -146,22 +157,22 @@ THREE.ImageUtils = {
 				points.push( [ 0, 1, data[ ( uy * width + x ) * 4 ] / 255 * depth ] );
 				points.push( [ - 1, 1, data[ ( uy * width + lx ) * 4 ] / 255 * depth ] );
 
-				var normals = [];
-				var num_points = points.length;
+				normals = [];
+				num_points = points.length;
 
-				for ( var i = 0; i < num_points; i ++ ) {
+				for ( i = 0; i < num_points; i ++ ) {
 
-					var v1 = points[ i ];
-					var v2 = points[ ( i + 1 ) % num_points ];
+					v1 = points[ i ];
+					v2 = points[ ( i + 1 ) % num_points ];
 					v1 = subtract( v1, origin );
 					v2 = subtract( v2, origin );
 					normals.push( normalize( cross( v1, v2 ) ) );
 
 				}
 
-				var normal = [ 0, 0, 0 ];
+				normal = [ 0, 0, 0 ];
 
-				for ( var i = 0; i < normals.length; i ++ ) {
+				for ( i = 0; i < normals.length; i ++ ) {
 
 					normal[ 0 ] += normals[ i ][ 0 ];
 					normal[ 1 ] += normals[ i ][ 1 ];
@@ -173,7 +184,7 @@ THREE.ImageUtils = {
 				normal[ 1 ] /= normals.length;
 				normal[ 2 ] /= normals.length;
 
-				var idx = ( y * width + x ) * 4;
+				idx = ( y * width + x ) * 4;
 
 				output[ idx ] = ( ( normal[ 0 ] + 1.0 ) / 2.0 * 255 ) | 0;
 				output[ idx + 1 ] = ( ( normal[ 1 ] + 1.0 ) / 2.0 * 255 ) | 0;
@@ -201,13 +212,13 @@ THREE.ImageUtils = {
 
 		for ( var i = 0; i < size; i ++ ) {
 
-			data[ i * 3 ] 	   = r;
+			data[ i * 3 ] = r;
 			data[ i * 3 + 1 ] = g;
 			data[ i * 3 + 2 ] = b;
 
 		}
 
-		var texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
+		var texture = new DataTexture( data, width, height, Constants.RGBFormat );
 		texture.needsUpdate = true;
 
 		return texture;
