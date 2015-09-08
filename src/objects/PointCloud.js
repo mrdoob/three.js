@@ -2,24 +2,34 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.PointCloud = function ( geometry, material ) {
+module.exports = PointCloud;
 
-	THREE.Object3D.call( this );
+var BufferGeometry = require( "../core/BufferGeometry" ),
+	Geometry = require( "../core/Geometry" ),
+	Object3D = require( "../core/Object3D" ),
+	PointCloudMaterial = require( "../materials/PointCloudMaterial" ),
+	Matrix4 = require( "../math/Matrix4" ),
+	Ray = require( "../math/Ray" ),
+	Vector3 = require( "../math/Vector3" );
 
-	this.type = 'PointCloud';
+function PointCloud( geometry, material ) {
 
-	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
-	this.material = material !== undefined ? material : new THREE.PointCloudMaterial( { color: Math.random() * 0xffffff } );
+	Object3D.call( this );
 
-};
+	this.type = "PointCloud";
 
-THREE.PointCloud.prototype = Object.create( THREE.Object3D.prototype );
-THREE.PointCloud.prototype.constructor = THREE.PointCloud;
+	this.geometry = geometry !== undefined ? geometry : new Geometry();
+	this.material = material !== undefined ? material : new PointCloudMaterial( { color: Math.random() * 0xffffff } );
 
-THREE.PointCloud.prototype.raycast = ( function () {
+}
 
-	var inverseMatrix = new THREE.Matrix4();
-	var ray = new THREE.Ray();
+PointCloud.prototype = Object.create( Object3D.prototype );
+PointCloud.prototype.constructor = PointCloud;
+
+PointCloud.prototype.raycast = ( function () {
+
+	var inverseMatrix = new Matrix4();
+	var ray = new Ray();
 
 	return function raycast( raycaster, intersects ) {
 
@@ -42,46 +52,49 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 		var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 		var localThresholdSq = localThreshold * localThreshold;
-		var position = new THREE.Vector3();
+		var position = new Vector3();
+		var rayPointDistanceSq, intersectPoint, distance;
 
-		var testPoint = function ( point, index ) {
+		function testPoint( point, index ) {
 
-			var rayPointDistanceSq = ray.distanceSqToPoint( point );
+			rayPointDistanceSq = ray.distanceSqToPoint( point );
 
 			if ( rayPointDistanceSq < localThresholdSq ) {
 
-				var intersectPoint = ray.closestPointToPoint( point );
+				intersectPoint = ray.closestPointToPoint( point );
 				intersectPoint.applyMatrix4( object.matrixWorld );
 
-				var distance = raycaster.ray.origin.distanceTo( intersectPoint );
+				distance = raycaster.ray.origin.distanceTo( intersectPoint );
 
-				if ( distance < raycaster.near || distance > raycaster.far ) return;
+				if ( distance < raycaster.near || distance > raycaster.far ) { return; }
 
 				intersects.push( {
-
 					distance: distance,
 					distanceToRay: Math.sqrt( rayPointDistanceSq ),
 					point: intersectPoint.clone(),
 					index: index,
 					face: null,
 					object: object
-
 				} );
 
 			}
 
-		};
+		}
 
-		if ( geometry instanceof THREE.BufferGeometry ) {
+		var i, oi, l, il, ol, a,
+			vertices, offset, start, count, index,
+			attributes, positions, indices, offsets;
 
-			var index = geometry.index;
-			var attributes = geometry.attributes;
-			var positions = attributes.position.array;
+		if ( geometry instanceof BufferGeometry ) {
+
+			index = geometry.index;
+			attributes = geometry.attributes;
+			positions = attributes.position.array;
 
 			if ( index !== null ) {
 
-				var indices = index.array;
-				var offsets = geometry.groups;
+				indices = index.array;
+				offsets = geometry.groups;
 
 				if ( offsets.length === 0 ) {
 
@@ -92,16 +105,16 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 				}
 
-				for ( var oi = 0, ol = offsets.length; oi < ol; ++ oi ) {
+				for ( oi = 0, ol = offsets.length; oi < ol; ++ oi ) {
 
-					var offset = offsets[ oi ];
+					offset = offsets[ oi ];
 
-					var start = offset.start;
-					var count = offset.count;
+					start = offset.start;
+					count = offset.count;
 
-					for ( var i = start, il = start + count; i < il; i ++ ) {
+					for ( i = start, il = start + count; i < il; i ++ ) {
 
-						var a = indices[ i ];
+						a = indices[ i ];
 
 						position.fromArray( positions, a * 3 );
 
@@ -113,7 +126,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 			} else {
 
-				for ( var i = 0, l = positions.length / 3; i < l; i ++ ) {
+				for ( i = 0, l = positions.length / 3; i < l; i ++ ) {
 
 					position.fromArray( positions, i * 3 );
 
@@ -125,9 +138,9 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 		} else {
 
-			var vertices = geometry.vertices;
+			vertices = geometry.vertices;
 
-			for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+			for ( i = 0, l = vertices.length; i < l; i ++ ) {
 
 				testPoint( vertices[ i ], i );
 
@@ -139,15 +152,15 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 }() );
 
-THREE.PointCloud.prototype.clone = function () {
+PointCloud.prototype.clone = function () {
 
 	return new this.constructor( this.geometry, this.material ).copy( this );
 
 };
 
-THREE.PointCloud.prototype.toJSON = function ( meta ) {
+PointCloud.prototype.toJSON = function ( meta ) {
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	var data = Object3D.prototype.toJSON.call( this, meta );
 
 	// only serialize if not in meta geometries cache
 	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
@@ -172,9 +185,9 @@ THREE.PointCloud.prototype.toJSON = function ( meta ) {
 
 // Backwards compatibility
 
-THREE.ParticleSystem = function ( geometry, material ) {
+PointCloud.ParticleSystem = function ( geometry, material ) {
 
-	console.warn( 'THREE.ParticleSystem has been renamed to THREE.PointCloud.' );
-	return new THREE.PointCloud( geometry, material );
+	console.warn( "ParticleSystem has been renamed to PointCloud." );
+	return new PointCloud( geometry, material );
 
 };

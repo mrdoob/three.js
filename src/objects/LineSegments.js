@@ -2,13 +2,17 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LineSegments = function ( geometry, material ) {
+module.exports = LineSegments;
 
-	THREE.Line.call( this, geometry, material );
+var Line = require( "./Line" );
 
-	this.type = 'LineSegments';
+function LineSegments( geometry, material ) {
 
-};
+	Line.call( this, geometry, material );
 
-THREE.LineSegments.prototype = Object.create( THREE.Line.prototype );
-THREE.LineSegments.prototype.constructor = THREE.LineSegments;
+	this.type = "LineSegments";
+
+}
+
+LineSegments.prototype = Object.create( Line.prototype );
+LineSegments.prototype.constructor = LineSegments;

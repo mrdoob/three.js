@@ -2,11 +2,16 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.MorphAnimMesh = function ( geometry, material ) {
+module.exports = MorphAnimMesh;
 
-	THREE.Mesh.call( this, geometry, material );
+var Mesh = require( "./Mesh" ),
+	_Math = require( "../math/Math" );
 
-	this.type = 'MorphAnimMesh';
+function MorphAnimMesh( geometry, material ) {
+
+	Mesh.call( this, geometry, material );
+
+	this.type = "MorphAnimMesh";
 
 	// API
 
@@ -24,12 +29,12 @@ THREE.MorphAnimMesh = function ( geometry, material ) {
 
 	this.setFrameRange( 0, geometry.morphTargets.length - 1 );
 
-};
+}
 
-THREE.MorphAnimMesh.prototype = Object.create( THREE.Mesh.prototype );
-THREE.MorphAnimMesh.prototype.constructor = THREE.MorphAnimMesh;
+MorphAnimMesh.prototype = Object.create( Mesh.prototype );
+MorphAnimMesh.prototype.constructor = MorphAnimMesh;
 
-THREE.MorphAnimMesh.prototype.setFrameRange = function ( start, end ) {
+MorphAnimMesh.prototype.setFrameRange = function ( start, end ) {
 
 	this.startKeyframe = start;
 	this.endKeyframe = end;
@@ -38,47 +43,52 @@ THREE.MorphAnimMesh.prototype.setFrameRange = function ( start, end ) {
 
 };
 
-THREE.MorphAnimMesh.prototype.setDirectionForward = function () {
+MorphAnimMesh.prototype.setDirectionForward = function () {
 
 	this.direction = 1;
 	this.directionBackwards = false;
 
 };
 
-THREE.MorphAnimMesh.prototype.setDirectionBackward = function () {
+MorphAnimMesh.prototype.setDirectionBackward = function () {
 
 	this.direction = - 1;
 	this.directionBackwards = true;
 
 };
 
-THREE.MorphAnimMesh.prototype.parseAnimations = function () {
+MorphAnimMesh.prototype.parseAnimations = function () {
 
 	var geometry = this.geometry;
 
-	if ( ! geometry.animations ) geometry.animations = {};
+	var i, il,
+		pattern, firstAnimation,
+		animations, morph,
+		parts, animation;
 
-	var firstAnimation, animations = geometry.animations;
+	if ( ! geometry.animations ) { geometry.animations = {}; }
 
-	var pattern = /([a-z]+)_?(\d+)/;
+	animations = geometry.animations;
 
-	for ( var i = 0, il = geometry.morphTargets.length; i < il; i ++ ) {
+	pattern = /([a-z]+)_?(\d+)/;
 
-		var morph = geometry.morphTargets[ i ];
-		var parts = morph.name.match( pattern );
+	for ( i = 0, il = geometry.morphTargets.length; i < il; i ++ ) {
+
+		morph = geometry.morphTargets[ i ];
+		parts = morph.name.match( pattern );
 
 		if ( parts && parts.length > 1 ) {
 
 			var label = parts[ 1 ];
 
-			if ( ! animations[ label ] ) animations[ label ] = { start: Infinity, end: - Infinity };
+			if ( ! animations[ label ] ) { animations[ label ] = { start: Infinity, end: - Infinity }; }
 
-			var animation = animations[ label ];
+			animation = animations[ label ];
 
-			if ( i < animation.start ) animation.start = i;
-			if ( i > animation.end ) animation.end = i;
+			if ( i < animation.start ) { animation.start = i; }
+			if ( i > animation.end ) { animation.end = i; }
 
-			if ( ! firstAnimation ) firstAnimation = label;
+			if ( ! firstAnimation ) { firstAnimation = label; }
 
 		}
 
@@ -88,15 +98,15 @@ THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 
 };
 
-THREE.MorphAnimMesh.prototype.setAnimationLabel = function ( label, start, end ) {
+MorphAnimMesh.prototype.setAnimationLabel = function ( label, start, end ) {
 
-	if ( ! this.geometry.animations ) this.geometry.animations = {};
+	if ( ! this.geometry.animations ) { this.geometry.animations = {}; }
 
 	this.geometry.animations[ label ] = { start: start, end: end };
 
 };
 
-THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
+MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	var animation = this.geometry.animations[ label ];
 
@@ -108,13 +118,13 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	} else {
 
-		console.warn( 'THREE.MorphAnimMesh: animation[' + label + '] undefined in .playAnimation()' );
+		console.warn( "MorphAnimMesh: animation[" + label + "] undefined in .playAnimation()" );
 
 	}
 
 };
 
-THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
+MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 	var frameTime = this.duration / this.length;
 
@@ -146,11 +156,11 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 		this.time = this.time % this.duration;
 
-		if ( this.time < 0 ) this.time += this.duration;
+		if ( this.time < 0 ) { this.time += this.duration; }
 
 	}
 
-	var keyframe = this.startKeyframe + THREE.Math.clamp( Math.floor( this.time / frameTime ), 0, this.length - 1 );
+	var keyframe = this.startKeyframe + _Math.clamp( Math.floor( this.time / frameTime ), 0, this.length - 1 );
 
 	var influences = this.morphTargetInfluences;
 
@@ -178,7 +188,7 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 };
 
-THREE.MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
+MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
 
 	var influences = this.morphTargetInfluences;
 
@@ -188,14 +198,14 @@ THREE.MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
 
 	}
 
-	if ( a > - 1 ) influences[ a ] = 1 - t;
-	if ( b > - 1 ) influences[ b ] = t;
+	if ( a > - 1 ) { influences[ a ] = 1 - t; }
+	if ( b > - 1 ) { influences[ b ] = t; }
 
 };
 
-THREE.MorphAnimMesh.prototype.copy = function ( source ) {
+MorphAnimMesh.prototype.copy = function ( source ) {
 
-	THREE.Mesh.prototype.copy.call( this, source );
+	Mesh.prototype.copy.call( this, source );
 
 	this.duration = source.duration;
 	this.mirroredLoop = source.mirroredLoop;

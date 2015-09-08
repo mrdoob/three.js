@@ -3,36 +3,42 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Sprite = ( function () {
+var BufferAttribute = require( "../core/BufferAttribute" ),
+	BufferGeometry = require( "../core/BufferGeometry" ),
+	Object3D = require( "../core/Object3D" ),
+	SpriteMaterial = require( "../materials/SpriteMaterial" ),
+	Vector3 = require( "../math/Vector3" );
+
+module.exports = ( function () {
 
 	var indices = new Uint16Array( [ 0, 1, 2,  0, 2, 3 ] );
 	var vertices = new Float32Array( [ - 0.5, - 0.5, 0,   0.5, - 0.5, 0,   0.5, 0.5, 0,   - 0.5, 0.5, 0 ] );
 	var uvs = new Float32Array( [ 0, 0,   1, 0,   1, 1,   0, 1 ] );
 
-	var geometry = new THREE.BufferGeometry();
-	geometry.addIndex( new THREE.BufferAttribute( indices, 1 ) );
-	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-	geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	var geometry = new BufferGeometry();
+	geometry.addIndex( new BufferAttribute( indices, 1 ) );
+	geometry.addAttribute( "position", new BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( "uv", new BufferAttribute( uvs, 2 ) );
 
-	return function Sprite( material ) {
+	return function ( material ) {
 
-		THREE.Object3D.call( this );
+		Object3D.call( this );
 
-		this.type = 'Sprite';
+		this.type = "Sprite";
 
 		this.geometry = geometry;
-		this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
+		this.material = ( material !== undefined ) ? material : new SpriteMaterial();
 
 	};
 
-} )();
+}() );
 
-THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Sprite.prototype.constructor = THREE.Sprite;
+module.exports.prototype = Object.create( Object3D.prototype );
+module.exports.prototype.constructor = module.exports;
 
-THREE.Sprite.prototype.raycast = ( function () {
+module.exports.prototype.raycast = ( function () {
 
-	var matrixPosition = new THREE.Vector3();
+	var matrixPosition = new Vector3();
 
 	return function raycast( raycaster, intersects ) {
 
@@ -48,27 +54,25 @@ THREE.Sprite.prototype.raycast = ( function () {
 		}
 
 		intersects.push( {
-
 			distance: Math.sqrt( distanceSq ),
 			point: this.position,
 			face: null,
 			object: this
-
 		} );
 
 	};
 
 }() );
 
-THREE.Sprite.prototype.clone = function () {
+module.exports.prototype.clone = function () {
 
 	return new this.constructor( this.material ).copy( this );
 
 };
 
-THREE.Sprite.prototype.toJSON = function ( meta ) {
+module.exports.prototype.toJSON = function ( meta ) {
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	var data = Object3D.prototype.toJSON.call( this, meta );
 
 	// only serialize if not in meta materials cache
 	if ( meta.materials[ this.material.uuid ] === undefined ) {
@@ -82,7 +86,3 @@ THREE.Sprite.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
-
-// Backwards compatibility
-
-THREE.Particle = THREE.Sprite;
