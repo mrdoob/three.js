@@ -2,30 +2,40 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AudioListener = function () {
+module.exports = AudioListener;
 
-	THREE.Object3D.call( this );
+var Object3D = require( "../../core/Object3D" ),
+	Quaternion = require( "../../math/Quaternion" ),
+	Vector3 = require( "../../math/Vector3" );
 
-	this.type = 'AudioListener';
+function AudioListener() {
 
-	this.context = new ( window.AudioContext || window.webkitAudioContext )();
+	Object3D.call( this );
 
-};
+	this.type = "AudioListener";
 
-THREE.AudioListener.prototype = Object.create( THREE.Object3D.prototype );
-THREE.AudioListener.prototype.constructor = THREE.AudioListener;
+	this.context = ( self.AudioContext !== undefined ) ? new self.AudioContext() : new self.webkitAudioContext();
 
-THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
+}
 
-	var position = new THREE.Vector3();
-	var quaternion = new THREE.Quaternion();
-	var scale = new THREE.Vector3();
+AudioListener.prototype = Object.create( Object3D.prototype );
+AudioListener.prototype.constructor = AudioListener;
 
-	var orientation = new THREE.Vector3();
+AudioListener.prototype.updateMatrixWorld = ( function () {
 
-	return function updateMatrixWorld( force ) {
+	var position;
+	var quaternion;
+	var scale;
+	var orientation;
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+	return function ( force ) {
+
+		if ( position === undefined ) { position = new Vector3(); }
+		if ( quaternion === undefined ) { quaternion = new Quaternion(); }
+		if ( scale === undefined ) { scale = new Vector3(); }
+		if ( orientation === undefined ) { orientation = new Vector3(); }
+
+		Object3D.prototype.updateMatrixWorld.call( this, force );
 
 		var listener = this.context.listener;
 		var up = this.up;
@@ -39,4 +49,4 @@ THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 
 	};
 
-} )();
+}() );
