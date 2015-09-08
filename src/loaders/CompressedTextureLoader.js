@@ -4,19 +4,25 @@
  * Abstract Base class to block based textures loader (dds, pvr, ...)
  */
 
-THREE.CompressedTextureLoader = function ( manager ) {
+module.exports = CompressedTextureLoader;
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+var DefaultLoadingManager = require( "./LoadingManager" ).DefaultLoadingManager,
+	XHRLoader = require( "./XHRLoader" ),
+	Constants = require( "../Constants" ),
+	CompressedTexture = require( "../textures/CompressedTexture" );
+
+function CompressedTextureLoader( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 	// override in sub classes
 	this._parser = null;
 
-};
+}
 
+CompressedTextureLoader.prototype = {
 
-THREE.CompressedTextureLoader.prototype = {
-
-	constructor: THREE.CompressedTextureLoader,
+	constructor: CompressedTextureLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -24,12 +30,12 @@ THREE.CompressedTextureLoader.prototype = {
 
 		var images = [];
 
-		var texture = new THREE.CompressedTexture();
+		var texture = new CompressedTexture();
 		texture.image = images;
 
-		var loader = new THREE.XHRLoader( this.manager );
+		var loader = new XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
-		loader.setResponseType( 'arraybuffer' );
+		loader.setResponseType( "arraybuffer" );
 
 		if ( Array.isArray( url ) ) {
 
@@ -52,13 +58,12 @@ THREE.CompressedTextureLoader.prototype = {
 
 					if ( loaded === 6 ) {
 
-						if ( texDatas.mipmapCount === 1 )
- 							texture.minFilter = THREE.LinearFilter;
+						if ( texDatas.mipmapCount === 1 ) {	texture.minFilter = Constants.LinearFilter; }
 
 						texture.format = texDatas.format;
 						texture.needsUpdate = true;
 
-						if ( onLoad ) onLoad( texture );
+						if ( onLoad ) { onLoad( texture ); }
 
 					}
 
@@ -109,14 +114,14 @@ THREE.CompressedTextureLoader.prototype = {
 
 				if ( texDatas.mipmapCount === 1 ) {
 
-					texture.minFilter = THREE.LinearFilter;
+					texture.minFilter = Constants.LinearFilter;
 
 				}
 
 				texture.format = texDatas.format;
 				texture.needsUpdate = true;
 
-				if ( onLoad ) onLoad( texture );
+				if ( onLoad ) { onLoad( texture ); }
 
 			}, onProgress, onError );
 

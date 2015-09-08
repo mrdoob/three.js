@@ -2,21 +2,30 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BufferGeometryLoader = function ( manager ) {
+module.exports = BufferGeometryLoader;
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+var DefaultLoadingManager = require( "./LoadingManager" ).DefaultLoadingManager,
+	XHRLoader = require( "./XHRLoader" ),
+	BufferAttribute = require( "../core/BufferAttribute" ),
+	BufferGeometry = require( "../core/BufferGeometry" ),
+	Sphere = require( "../math/Sphere" ),
+	Vector3 = require( "../math/Vector3" );
 
-};
+function BufferGeometryLoader( manager ) {
 
-THREE.BufferGeometryLoader.prototype = {
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-	constructor: THREE.BufferGeometryLoader,
+}
+
+BufferGeometryLoader.prototype = {
+
+	constructor: BufferGeometryLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new XHRLoader( scope.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
@@ -34,35 +43,36 @@ THREE.BufferGeometryLoader.prototype = {
 
 	parse: function ( json ) {
 
-		var geometry = new THREE.BufferGeometry();
+		var geometry = new BufferGeometry();
 
-		var index = json.data.index;
+		var index = json.data.index, typedArray;
 
 		if ( index !== undefined ) {
 
-			var typedArray = new self[ index.type ]( index.array );
-			geometry.addIndex( new THREE.BufferAttribute( typedArray, 1 ) );
+			typedArray = new self[ index.type ]( index.array );
+			geometry.addIndex( new BufferAttribute( typedArray, 1 ) );
 
 		}
 
-		var attributes = json.data.attributes;
+		var key, attribute, attributes = json.data.attributes;
 
-		for ( var key in attributes ) {
+		for ( key in attributes ) {
 
-			var attribute = attributes[ key ];
-			var typedArray = new self[ attribute.type ]( attribute.array );
+			attribute = attributes[ key ];
+			typedArray = new self[ attribute.type ]( attribute.array );
 
-			geometry.addAttribute( key, new THREE.BufferAttribute( typedArray, attribute.itemSize ) );
+			geometry.addAttribute( key, new BufferAttribute( typedArray, attribute.itemSize ) );
 
 		}
 
 		var groups = json.data.groups || json.data.drawcalls || json.data.offsets;
+		var i, n, group;
 
 		if ( groups !== undefined ) {
 
-			for ( var i = 0, n = groups.length; i !== n; ++ i ) {
+			for ( i = 0, n = groups.length; i !== n; ++ i ) {
 
-				var group = groups[ i ];
+				group = groups[ i ];
 
 				geometry.addGroup( group.start, group.count );
 
@@ -71,10 +81,11 @@ THREE.BufferGeometryLoader.prototype = {
 		}
 
 		var boundingSphere = json.data.boundingSphere;
+		var center;
 
 		if ( boundingSphere !== undefined ) {
 
-			var center = new THREE.Vector3();
+			center = new Vector3();
 
 			if ( boundingSphere.center !== undefined ) {
 
@@ -82,7 +93,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 			}
 
-			geometry.boundingSphere = new THREE.Sphere( center, boundingSphere.radius );
+			geometry.boundingSphere = new Sphere( center, boundingSphere.radius );
 
 		}
 

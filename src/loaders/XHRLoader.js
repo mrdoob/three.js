@@ -2,21 +2,26 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.XHRLoader = function ( manager ) {
+module.exports = XHRLoader;
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+var Cache = require( "./Cache" ),
+	DefaultLoadingManager = require( "./LoadingManager" ).DefaultLoadingManager;
 
-};
+function XHRLoader( manager ) {
 
-THREE.XHRLoader.prototype = {
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-	constructor: THREE.XHRLoader,
+}
+
+XHRLoader.prototype = {
+
+	constructor: XHRLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var cached = THREE.Cache.get( url );
+		var cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -35,13 +40,13 @@ THREE.XHRLoader.prototype = {
 		}
 
 		var request = new XMLHttpRequest();
-		request.open( 'GET', url, true );
+		request.open( "GET", url, true );
 
-		request.addEventListener( 'load', function ( event ) {
+		request.addEventListener( "load", function () {
 
-			THREE.Cache.add( url, this.response );
+			Cache.add( url, this.response );
 
-			if ( onLoad ) onLoad( this.response );
+			if ( onLoad ) { onLoad( this.response ); }
 
 			scope.manager.itemEnd( url );
 
@@ -49,7 +54,7 @@ THREE.XHRLoader.prototype = {
 
 		if ( onProgress !== undefined ) {
 
-			request.addEventListener( 'progress', function ( event ) {
+			request.addEventListener( "progress", function ( event ) {
 
 				onProgress( event );
 
@@ -57,17 +62,17 @@ THREE.XHRLoader.prototype = {
 
 		}
 
-		request.addEventListener( 'error', function ( event ) {
+		request.addEventListener( "error", function ( event ) {
 
-			if ( onError ) onError( event );
+			if ( onError ) { onError( event ); }
 
 			scope.manager.itemError( url );
 
 		}, false );
 
-		if ( this.crossOrigin !== undefined ) request.crossOrigin = this.crossOrigin;
-		if ( this.responseType !== undefined ) request.responseType = this.responseType;
-		if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
+		if ( this.crossOrigin !== undefined ) { request.crossOrigin = this.crossOrigin; }
+		if ( this.responseType !== undefined ) { request.responseType = this.responseType; }
+		if ( this.withCredentials !== undefined ) { request.withCredentials = this.withCredentials; }
 
 		request.send( null );
 
