@@ -16,18 +16,24 @@ function mergeParams( defaults, customParams ) {
 }
 
 
-function getParams( type, customParams ) {
+function getGeometryParams( type, customParams ) {
+
+	if ( typeof customParams != "undefined" &&
+		 typeof customParams.geometry != "undefined" &&
+		 typeof customParams.geometry.parameters != "undefined" ) {
+		var customGeometryParams = customParams.geometry.parameters;
+	}
 
 	var defaults = {};
 
 	switch ( type ) {
 
-		case "Box":
+		case "BoxGeometry":
 
 			defaults = { width: 100, height: 100, depth: 100, widthSegments: 1, heightSegments: 1, depthSegments: 1 };
 			break;
 
-		case "Sphere":
+		case "SphereGeometry":
 
 			defaults = { radius: 75, widthSegments: 32, heightSegments: 16, phiStart: 0, phiLength: 6.28, thetaStart: 0.00, thetaLength: 3.14 };
 			break;
@@ -39,17 +45,17 @@ function getParams( type, customParams ) {
 
 	}
 
-	return mergeParams( defaults, customParams );
+	return mergeParams( defaults, customGeometryParams );
 
 }
 
 function getGeometry( type, customParams ) {
 
-	var params = getParams( type, customParams );
+	var params = getGeometryParams( type, customParams );
 
 	switch ( type ) {
 
-		case "Box":
+		case "BoxGeometry":
 
 			return new THREE.BoxGeometry(
 				params['width'],
@@ -60,7 +66,7 @@ function getGeometry( type, customParams ) {
 				params['depthSegments']
 			);
 
-		case "Sphere":
+		case "SphereGeometry":
 
 			return new THREE.SphereGeometry(
 				params['radius'],
@@ -95,12 +101,12 @@ function getObject( name, type, customParams ) {
 
 function aBox( name, customParams ) {
 
-	return getObject( name, "Box", customParams );
+	return getObject( name, "BoxGeometry", customParams );
 }
 
 function aSphere( name, customParams ) {
 
-	return getObject( name, "Sphere", customParams );
+	return getObject( name, "SphereGeometry", customParams );
 
 }
 
