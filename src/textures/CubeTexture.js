@@ -2,23 +2,28 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+module.exports = CubeTexture;
 
-	mapping = mapping !== undefined ? mapping : THREE.CubeReflectionMapping;
+var Texture = require( "./Texture" ),
+	Constants = require( "../Constants" );
 
-	THREE.Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+function CubeTexture( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+
+	mapping = mapping !== undefined ? mapping : Constants.CubeReflectionMapping;
+
+	Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.images = images;
 	this.flipY = false;
 
-};
+}
 
-THREE.CubeTexture.prototype = Object.create( THREE.Texture.prototype );
-THREE.CubeTexture.prototype.constructor = THREE.CubeTexture;
+CubeTexture.prototype = Object.create( Texture.prototype );
+CubeTexture.prototype.constructor = CubeTexture;
 
-THREE.CubeTexture.prototype.copy = function ( source ) {
+CubeTexture.prototype.copy = function ( source ) {
 
-	THREE.Texture.prototype.copy.call( this, source );
+	Texture.prototype.copy.call( this, source );
 	
 	this.images = source.images;
 	
