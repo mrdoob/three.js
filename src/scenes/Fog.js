@@ -3,19 +3,23 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Fog = function ( color, near, far ) {
+module.exports = Fog;
 
-	this.name = '';
+var Color = require( "../math/Color" );
 
-	this.color = new THREE.Color( color );
+function Fog( color, near, far ) {
+
+	this.name = "";
+
+	this.color = new Color( color );
 
 	this.near = ( near !== undefined ) ? near : 1;
 	this.far = ( far !== undefined ) ? far : 1000;
 
-};
+}
 
-THREE.Fog.prototype.clone = function () {
+Fog.prototype.clone = function () {
 
-	return new THREE.Fog( this.color.getHex(), this.near, this.far );
+	return new Fog( this.color.getHex(), this.near, this.far );
 
 };
