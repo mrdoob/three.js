@@ -2,24 +2,27 @@
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InterleavedBufferAttribute = function ( interleavedBuffer, itemSize, offset ) {
+module.exports = InterleavedBufferAttribute;
 
-	this.uuid = THREE.Math.generateUUID();
+var _Math = require( "../math/Math" );
+
+function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset ) {
+
+	this.uuid = _Math.generateUUID();
 
 	this.data = interleavedBuffer;
 	this.itemSize = itemSize;
 	this.offset = offset;
 
-};
+}
 
+InterleavedBufferAttribute.prototype = {
 
-THREE.InterleavedBufferAttribute.prototype = {
-
-	constructor: THREE.InterleavedBufferAttribute,
+	constructor: InterleavedBufferAttribute,
 
 	get length() {
 
-		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
+		console.warn( "BufferAttribute: .length has been deprecated. Please use .count." );
 		return this.array.length;
 
 	},

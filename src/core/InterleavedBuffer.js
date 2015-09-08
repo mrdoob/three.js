@@ -2,9 +2,13 @@
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InterleavedBuffer = function ( array, stride ) {
+module.exports = InterleavedBuffer;
 
-	this.uuid = THREE.Math.generateUUID();
+var _Math = require( "../math/Math" );
+
+function InterleavedBuffer( array, stride ) {
+
+	this.uuid = _Math.generateUUID();
 
 	this.array = array;
 	this.stride = stride;
@@ -14,27 +18,33 @@ THREE.InterleavedBuffer = function ( array, stride ) {
 
 	this.version = 0;
 
-};
+}
 
-THREE.InterleavedBuffer.prototype = {
+InterleavedBuffer.prototype = {
 
-	constructor: THREE.InterleavedBuffer,
+	constructor: InterleavedBuffer,
 
-	get length () {
+	get length() {
 
 		return this.array.length;
 
 	},
 
-	get count () {
+	get count() {
 
 		return this.array.length / this.stride;
 
 	},
 
+	get needsUpdate() {
+
+		return undefined;
+
+	},
+
 	set needsUpdate( value ) {
 
-		if ( value === true ) this.version ++;
+		if ( value === true ) { this.version ++; }
 
 	},
 
@@ -71,7 +81,7 @@ THREE.InterleavedBuffer.prototype = {
 
 	set: function ( value, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) { offset = 0; }
 
 		this.array.set( value, offset );
 
