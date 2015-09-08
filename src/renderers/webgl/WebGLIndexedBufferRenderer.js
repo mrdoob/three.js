@@ -2,7 +2,9 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
+module.exports = WebGLIndexedBufferRenderer;
+
+function WebGLIndexedBufferRenderer( _gl, extensions, _infoRender ) {
 
 	var mode;
 
@@ -16,7 +18,7 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	function setIndex( index ) {
 
-		if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
+		if ( index.array instanceof Uint32Array && extensions.get( "OES_element_index_uint" ) ) {
 
 			type = _gl.UNSIGNED_INT;
 			size = 4;
@@ -36,17 +38,17 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		_infoRender.calls ++;
 		_infoRender.vertices += count;
-		if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+		if ( mode === _gl.TRIANGLES ) { _infoRender.faces += count / 3; }
 
 	}
 
 	function renderInstances( geometry ) {
 
-		var extension = extensions.get( 'ANGLE_instanced_arrays' );
+		var extension = extensions.get( "ANGLE_instanced_arrays" );
 
 		if ( extension === null ) {
 
-			console.error( 'THREE.WebGLBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+			console.error( "WebGLBufferRenderer: using InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays." );
 			return;
 
 		}
@@ -62,4 +64,4 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 	this.render = render;
 	this.renderInstances = renderInstances;
 
-};
+}

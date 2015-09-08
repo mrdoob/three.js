@@ -3,7 +3,15 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpritePlugin = function ( renderer, sprites ) {
+module.exports = SpritePlugin;
+
+var Quaternion = require( "../../../math/Quaternion" ),
+	Vector3 = require( "../../../math/Vector3" ),
+	Fog = require( "../../../scenes/Fog" ),
+	FogExp2 = require( "../../../scenes/FogExp2" ),
+	Texture = require( "../../../textures/Texture" );
+
+function SpritePlugin( renderer, sprites ) {
 
 	var gl = renderer.context;
 	var state = renderer.state;
@@ -15,9 +23,9 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 	// decompose matrixWorld
 
-	var spritePosition = new THREE.Vector3();
-	var spriteRotation = new THREE.Quaternion();
-	var spriteScale = new THREE.Vector3();
+	var spritePosition = new Vector3();
+	var spriteRotation = new Quaternion();
+	var spriteScale = new Vector3();
 
 	var init = function () {
 
@@ -45,49 +53,49 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 		program = createProgram();
 
 		attributes = {
-			position:			gl.getAttribLocation ( program, 'position' ),
-			uv:					gl.getAttribLocation ( program, 'uv' )
+			position:         gl.getAttribLocation ( program, "position" ),
+			uv:               gl.getAttribLocation ( program, "uv" )
 		};
 
 		uniforms = {
-			uvOffset:			gl.getUniformLocation( program, 'uvOffset' ),
-			uvScale:			gl.getUniformLocation( program, 'uvScale' ),
+			uvOffset:         gl.getUniformLocation( program, "uvOffset" ),
+			uvScale:          gl.getUniformLocation( program, "uvScale" ),
 
-			rotation:			gl.getUniformLocation( program, 'rotation' ),
-			scale:				gl.getUniformLocation( program, 'scale' ),
+			rotation:         gl.getUniformLocation( program, "rotation" ),
+			scale:            gl.getUniformLocation( program, "scale" ),
 
-			color:				gl.getUniformLocation( program, 'color' ),
-			map:				gl.getUniformLocation( program, 'map' ),
-			opacity:			gl.getUniformLocation( program, 'opacity' ),
+			color:            gl.getUniformLocation( program, "color" ),
+			map:              gl.getUniformLocation( program, "map" ),
+			opacity:          gl.getUniformLocation( program, "opacity" ),
 
-			modelViewMatrix: 	gl.getUniformLocation( program, 'modelViewMatrix' ),
-			projectionMatrix:	gl.getUniformLocation( program, 'projectionMatrix' ),
+			modelViewMatrix:  gl.getUniformLocation( program, "modelViewMatrix" ),
+			projectionMatrix: gl.getUniformLocation( program, "projectionMatrix" ),
 
-			fogType:			gl.getUniformLocation( program, 'fogType' ),
-			fogDensity:			gl.getUniformLocation( program, 'fogDensity' ),
-			fogNear:			gl.getUniformLocation( program, 'fogNear' ),
-			fogFar:				gl.getUniformLocation( program, 'fogFar' ),
-			fogColor:			gl.getUniformLocation( program, 'fogColor' ),
+			fogType:          gl.getUniformLocation( program, "fogType" ),
+			fogDensity:       gl.getUniformLocation( program, "fogDensity" ),
+			fogNear:          gl.getUniformLocation( program, "fogNear" ),
+			fogFar:           gl.getUniformLocation( program, "fogFar" ),
+			fogColor:         gl.getUniformLocation( program, "fogColor" ),
 
-			alphaTest:			gl.getUniformLocation( program, 'alphaTest' )
+			alphaTest:        gl.getUniformLocation( program, "alphaTest" )
 		};
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = document.createElement( "canvas" );
 		canvas.width = 8;
 		canvas.height = 8;
 
-		var context = canvas.getContext( '2d' );
-		context.fillStyle = 'white';
+		var context = canvas.getContext( "2d" );
+		context.fillStyle = "white";
 		context.fillRect( 0, 0, 8, 8 );
 
-		texture = new THREE.Texture( canvas );
+		texture = new Texture( canvas );
 		texture.needsUpdate = true;
 
 	};
 
 	this.render = function ( scene, camera ) {
 
-		if ( sprites.length === 0 ) return;
+		if ( sprites.length === 0 ) { return; }
 
 		// setup gl
 
@@ -126,7 +134,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 			gl.uniform3f( uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
 
-			if ( fog instanceof THREE.Fog ) {
+			if ( fog instanceof Fog ) {
 
 				gl.uniform1f( uniforms.fogNear, fog.near );
 				gl.uniform1f( uniforms.fogFar, fog.far );
@@ -135,7 +143,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 				oldFogType = 1;
 				sceneFogType = 1;
 
-			} else if ( fog instanceof THREE.FogExp2 ) {
+			} else if ( fog instanceof FogExp2 ) {
 
 				gl.uniform1f( uniforms.fogDensity, fog.density );
 
@@ -153,12 +161,13 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		}
 
-
 		// update positions and sort
 
-		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
+		var i, l, sprite;
 
-			var sprite = sprites[ i ];
+		for ( i = 0, l = sprites.length; i < l; i ++ ) {
+
+			sprite = sprites[ i ];
 
 			sprite.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
 			sprite.z = - sprite.modelViewMatrix.elements[ 14 ];
@@ -171,10 +180,12 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		var scale = [];
 
-		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
+		var material, fogType;
 
-			var sprite = sprites[ i ];
-			var material = sprite.material;
+		for ( i = 0, l = sprites.length; i < l; i ++ ) {
+
+			sprite = sprites[ i ];
+			material = sprite.material;
 
 			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
 			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix.elements );
@@ -184,7 +195,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			scale[ 0 ] = spriteScale.x;
 			scale[ 1 ] = spriteScale.y;
 
-			var fogType = 0;
+			fogType = 0;
 
 			if ( scene.fog && material.fog ) {
 
@@ -252,91 +263,91 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		gl.shaderSource( vertexShader, [
 
-			'precision ' + renderer.getPrecision() + ' float;',
+			"precision " + renderer.getPrecision() + " float;",
 
-			'uniform mat4 modelViewMatrix;',
-			'uniform mat4 projectionMatrix;',
-			'uniform float rotation;',
-			'uniform vec2 scale;',
-			'uniform vec2 uvOffset;',
-			'uniform vec2 uvScale;',
+			"uniform mat4 modelViewMatrix;",
+			"uniform mat4 projectionMatrix;",
+			"uniform float rotation;",
+			"uniform vec2 scale;",
+			"uniform vec2 uvOffset;",
+			"uniform vec2 uvScale;",
 
-			'attribute vec2 position;',
-			'attribute vec2 uv;',
+			"attribute vec2 position;",
+			"attribute vec2 uv;",
 
-			'varying vec2 vUV;',
+			"varying vec2 vUV;",
 
-			'void main() {',
+			"void main() {",
 
-				'vUV = uvOffset + uv * uvScale;',
+				"vUV = uvOffset + uv * uvScale;",
 
-				'vec2 alignedPosition = position * scale;',
+				"vec2 alignedPosition = position * scale;",
 
-				'vec2 rotatedPosition;',
-				'rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;',
-				'rotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;',
+				"vec2 rotatedPosition;",
+				"rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;",
+				"rotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;",
 
-				'vec4 finalPosition;',
+				"vec4 finalPosition;",
 
-				'finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );',
-				'finalPosition.xy += rotatedPosition;',
-				'finalPosition = projectionMatrix * finalPosition;',
+				"finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );",
+				"finalPosition.xy += rotatedPosition;",
+				"finalPosition = projectionMatrix * finalPosition;",
 
-				'gl_Position = finalPosition;',
+				"gl_Position = finalPosition;",
 
-			'}'
+			"}"
 
-		].join( '\n' ) );
+		].join( "\n" ) );
 
 		gl.shaderSource( fragmentShader, [
 
-			'precision ' + renderer.getPrecision() + ' float;',
+			"precision " + renderer.getPrecision() + " float;",
 
-			'uniform vec3 color;',
-			'uniform sampler2D map;',
-			'uniform float opacity;',
+			"uniform vec3 color;",
+			"uniform sampler2D map;",
+			"uniform float opacity;",
 
-			'uniform int fogType;',
-			'uniform vec3 fogColor;',
-			'uniform float fogDensity;',
-			'uniform float fogNear;',
-			'uniform float fogFar;',
-			'uniform float alphaTest;',
+			"uniform int fogType;",
+			"uniform vec3 fogColor;",
+			"uniform float fogDensity;",
+			"uniform float fogNear;",
+			"uniform float fogFar;",
+			"uniform float alphaTest;",
 
-			'varying vec2 vUV;',
+			"varying vec2 vUV;",
 
-			'void main() {',
+			"void main() {",
 
-				'vec4 texture = texture2D( map, vUV );',
+				"vec4 texture = texture2D( map, vUV );",
 
-				'if ( texture.a < alphaTest ) discard;',
+				"if ( texture.a < alphaTest ) discard;",
 
-				'gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );',
+				"gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );",
 
-				'if ( fogType > 0 ) {',
+				"if ( fogType > 0 ) {",
 
-					'float depth = gl_FragCoord.z / gl_FragCoord.w;',
-					'float fogFactor = 0.0;',
+					"float depth = gl_FragCoord.z / gl_FragCoord.w;",
+					"float fogFactor = 0.0;",
 
-					'if ( fogType == 1 ) {',
+					"if ( fogType == 1 ) {",
 
-						'fogFactor = smoothstep( fogNear, fogFar, depth );',
+						"fogFactor = smoothstep( fogNear, fogFar, depth );",
 
-					'} else {',
+					"} else {",
 
-						'const float LOG2 = 1.442695;',
-						'fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );',
-						'fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );',
+						"const float LOG2 = 1.442695;",
+						"fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );",
+						"fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );",
 
-					'}',
+					"}",
 
-					'gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );',
+					"gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );",
 
-				'}',
+				"}",
 
-			'}'
+			"}"
 
-		].join( '\n' ) );
+		].join( "\n" ) );
 
 		gl.compileShader( vertexShader );
 		gl.compileShader( fragmentShader );
@@ -364,4 +375,4 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 	}
 
-};
+}

@@ -2,9 +2,17 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLObjects = function ( gl, properties, info ) {
+module.exports = WebGLObjects;
 
-	var geometries = new THREE.WebGLGeometries( gl, properties, info );
+var WebGLGeometries = require( "./WebGLGeometries" ),
+	BufferAttribute = require( "../../core/BufferAttribute" ),
+	BufferGeometry = require( "../../core/BufferGeometry" ),
+	Geometry = require( "../../core/Geometry" ),
+	InterleavedBufferAttribute = require( "../../core/InterleavedBufferAttribute" );
+
+function WebGLObjects( gl, properties, info ) {
+
+	var geometries = new WebGLGeometries( gl, properties, info );
 
 	//
 
@@ -14,7 +22,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		var geometry = geometries.get( object );
 
-		if ( object.geometry instanceof THREE.Geometry ) {
+		if ( object.geometry instanceof Geometry ) {
 
 			geometry.updateFromObject( object );
 
@@ -29,7 +37,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		for ( var name in attributes ) {
+		var name;
+
+		for ( name in attributes ) {
 
 			updateAttribute( attributes[ name ], gl.ARRAY_BUFFER );
 
@@ -39,11 +49,13 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		var morphAttributes = geometry.morphAttributes;
 
-		for ( var name in morphAttributes ) {
+		var array, i, l;
 
-			var array = morphAttributes[ name ];
+		for ( name in morphAttributes ) {
 
-			for ( var i = 0, l = array.length; i < l; i ++ ) {
+			array = morphAttributes[ name ];
+
+			for ( i = 0, l = array.length; i < l; i ++ ) {
 
 				updateAttribute( array[ i ], gl.ARRAY_BUFFER );
 
@@ -57,7 +69,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function updateAttribute( attribute, bufferType ) {
 
-		var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
+		var data = ( attribute instanceof InterleavedBufferAttribute ) ? attribute.data : attribute;
 
 		var attributeProperties = properties.get( data );
 
@@ -98,12 +110,12 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		} else if ( data.updateRange.count === 0 ) {
 
-			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
+			console.error( "WebGLObjects.updateBuffer: dynamic BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually." );
 
 		} else {
 
 			gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
-							  data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
+				data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
 
 			data.updateRange.count = 0; // reset range
 
@@ -115,7 +127,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function getAttributeBuffer( attribute ) {
 
-		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+		if ( attribute instanceof InterleavedBufferAttribute ) {
 
 			return properties.get( attribute.data ).__webglBuffer;
 
@@ -141,34 +153,36 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		var attributes = geometry.attributes;
 		var position = attributes.position;
 
-		// console.time( 'wireframe' );
+		// console.time( "wireframe" );
+
+		var edges, array, a, b, c, i, l;
 
 		if ( index !== null ) {
 
-			var edges = {};
-			var array = index.array;
+			edges = {};
+			array = index.array;
 
-			for ( var i = 0, l = array.length; i < l; i += 3 ) {
+			for ( i = 0, l = array.length; i < l; i += 3 ) {
 
-				var a = array[ i + 0 ];
-				var b = array[ i + 1 ];
-				var c = array[ i + 2 ];
+				a = array[ i + 0 ];
+				b = array[ i + 1 ];
+				c = array[ i + 2 ];
 
-				if ( checkEdge( edges, a, b ) ) indices.push( a, b );
-				if ( checkEdge( edges, b, c ) ) indices.push( b, c );
-				if ( checkEdge( edges, c, a ) ) indices.push( c, a );
+				if ( checkEdge( edges, a, b ) ) { indices.push( a, b ); }
+				if ( checkEdge( edges, b, c ) ) { indices.push( b, c ); }
+				if ( checkEdge( edges, c, a ) ) { indices.push( c, a ); }
 
 			}
 
 		} else {
 
-			var array = attributes.position.array;
+			array = attributes.position.array;
 
-			for ( var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
+			for ( i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
 
-				var a = i + 0;
-				var b = i + 1;
-				var c = i + 2;
+				a = i + 0;
+				b = i + 1;
+				c = i + 2;
 
 				indices.push( a, b, b, c, c, a );
 
@@ -176,10 +190,10 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		// console.timeEnd( 'wireframe' );
+		// console.timeEnd( "wireframe" );
 
-		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
-		var attribute = new THREE.BufferAttribute( new TypeArray( indices ), 1 );
+		var TypeArray = position.count > BufferGeometry.MaxIndex ? Uint32Array : Uint16Array;
+		var attribute = new BufferAttribute( new TypeArray( indices ), 1 );
 
 		updateAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );
 
@@ -191,9 +205,11 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function checkEdge( edges, a, b ) {
 
+		var tmp;
+
 		if ( a > b ) {
 
-			var tmp = a;
+			tmp = a;
 			a = b;
 			b = tmp;
 
@@ -222,4 +238,4 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	this.update = update;
 
-};
+}
