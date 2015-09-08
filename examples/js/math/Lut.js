@@ -330,7 +330,7 @@ THREE.Lut.prototype = {
 		var txtTitle = new THREE.CanvasTexture( canvasTitle );
 		txtTitle.minFilter = THREE.LinearFilter;
 
-		var spriteMaterialTitle = new THREE.SpriteMaterial( { map: txtTitle, useScreenCoordinates: false } );
+		var spriteMaterialTitle = new THREE.SpriteMaterial( { map: txtTitle } );
 
 		var spriteTitle = new THREE.Sprite( spriteMaterialTitle );
 
