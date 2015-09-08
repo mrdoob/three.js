@@ -6,11 +6,15 @@
  * @author erik kitson
  */
 
-THREE.KeyFrameAnimation = function ( data ) {
+module.exports = KeyFrameAnimation;
+
+var AnimationHandler = require( "./AnimationHandler" );
+
+function KeyFrameAnimation( data ) {
 
 	this.root = data.node;
-	this.data = THREE.AnimationHandler.init( data );
-	this.hierarchy = THREE.AnimationHandler.parse( this.root );
+	this.data = AnimationHandler.init( data );
+	this.hierarchy = AnimationHandler.parse( this.root );
 	this.currentTime = 0;
 	this.timeScale = 0.001;
 	this.isPlaying = false;
@@ -48,11 +52,11 @@ THREE.KeyFrameAnimation = function ( data ) {
 
 	}
 
-};
+}
 
-THREE.KeyFrameAnimation.prototype = {
+KeyFrameAnimation.prototype = {
 
-	constructor: THREE.KeyFrameAnimation,
+	constructor: KeyFrameAnimation,
 
 	play: function ( startTime ) {
 
@@ -102,7 +106,7 @@ THREE.KeyFrameAnimation.prototype = {
 
 		this.isPaused = false;
 
-		THREE.AnimationHandler.play( this );
+		AnimationHandler.play( this );
 
 	},
 
@@ -111,7 +115,7 @@ THREE.KeyFrameAnimation.prototype = {
 		this.isPlaying = false;
 		this.isPaused  = false;
 
-		THREE.AnimationHandler.stop( this );
+		AnimationHandler.stop( this );
 
 		// reset JIT matrix and remove cache
 
@@ -137,7 +141,7 @@ THREE.KeyFrameAnimation.prototype = {
 
 	update: function ( delta ) {
 
-		if ( this.isPlaying === false ) return;
+		if ( this.isPlaying === false ) { return; }
 
 		this.currentTime += delta * this.timeScale;
 
@@ -203,6 +207,7 @@ THREE.KeyFrameAnimation.prototype = {
 	getNextKeyWith: function ( sid, h, key ) {
 
 		var keys = this.data.hierarchy[ h ].keys;
+
 		key = key % keys.length;
 
 		for ( ; key < keys.length; key ++ ) {
@@ -222,6 +227,7 @@ THREE.KeyFrameAnimation.prototype = {
 	getPrevKeyWith: function ( sid, h, key ) {
 
 		var keys = this.data.hierarchy[ h ].keys;
+
 		key = key >= 0 ? key : key + keys.length;
 
 		for ( ; key >= 0; key -- ) {

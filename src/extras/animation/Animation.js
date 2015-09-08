@@ -4,11 +4,17 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Animation = function ( root, data ) {
+module.exports = Animation;
+
+var AnimationHandler = require( "./AnimationHandler" ),
+	Quaternion = require( "../../math/Quaternion" ),
+	Vector3 = require( "../../math/Vector3" );
+
+function Animation( root, data ) {
 
 	this.root = root;
-	this.data = THREE.AnimationHandler.init( data );
-	this.hierarchy = THREE.AnimationHandler.parse( root );
+	this.data = AnimationHandler.init( data );
+	this.hierarchy = AnimationHandler.parse( root );
 
 	this.currentTime = 0;
 	this.timeScale = 1;
@@ -17,13 +23,13 @@ THREE.Animation = function ( root, data ) {
 	this.loop = true;
 	this.weight = 0;
 
-	this.interpolationType = THREE.AnimationHandler.LINEAR;
+	this.interpolationType = AnimationHandler.LINEAR;
 
-};
+}
 
-THREE.Animation.prototype = {
+Animation.prototype = {
 
-	constructor: THREE.Animation,
+	constructor: Animation,
 
 	keyTypes:  [ "pos", "rot", "scl" ],
 
@@ -36,7 +42,7 @@ THREE.Animation.prototype = {
 
 		this.reset();
 
-		THREE.AnimationHandler.play( this );
+		AnimationHandler.play( this );
 
 	},
 
@@ -44,7 +50,7 @@ THREE.Animation.prototype = {
 
 		this.isPlaying = false;
 
-		THREE.AnimationHandler.stop( this );
+		AnimationHandler.stop( this );
 
 	},
 
@@ -132,17 +138,21 @@ THREE.Animation.prototype = {
 	update: ( function() {
 
 		var points = [];
-		var target = new THREE.Vector3();
-		var newVector = new THREE.Vector3();
-		var newQuat = new THREE.Quaternion();
+		var target;
+		var newVector;
+		var newQuat;
 
 		// Catmull-Rom spline
 
-		var interpolateCatmullRom = function ( points, scale ) {
+		function interpolateCatmullRom( points, scale ) {
 
 			var c = [], v3 = [],
-			point, intPoint, weight, w2, w3,
-			pa, pb, pc, pd;
+				point, intPoint, weight, w2, w3,
+				pa, pb, pc, pd;
+
+			if ( target === undefined ) { target = new Vector3(); }
+			if ( newVector === undefined ) { newVector = new Vector3(); }
+			if ( newQuat === undefined ) { newQuat = new Quaternion(); }
 
 			point = ( points.length - 1 ) * scale;
 			intPoint = Math.floor( point );
@@ -167,25 +177,28 @@ THREE.Animation.prototype = {
 
 			return v3;
 
-		};
+		}
 
-		var interpolate = function ( p0, p1, p2, p3, t, t2, t3 ) {
+		function interpolate( p0, p1, p2, p3, t, t2, t3 ) {
 
 			var v0 = ( p2 - p0 ) * 0.5,
 				v1 = ( p3 - p1 ) * 0.5;
 
 			return ( 2 * ( p1 - p2 ) + v0 + v1 ) * t3 + ( - 3 * ( p1 - p2 ) - 2 * v0 - v1 ) * t2 + v0 * t + p1;
 
-		};
+		}
 
 		return function ( delta ) {
 
-			if ( this.isPlaying === false ) return;
+			if ( this.isPlaying === false ) { return; }
+
+			if ( target === undefined ) { target = new Vector3(); }
+			if ( newVector === undefined ) { newVector = new Vector3(); }
+			if ( newQuat === undefined ) { newQuat = new Quaternion(); }
 
 			this.currentTime += delta * this.timeScale;
 
-			if ( this.weight === 0 )
-				return;
+			if ( this.weight === 0 ) { return; }
 
 			//
 
@@ -197,8 +210,7 @@ THREE.Animation.prototype = {
 
 					this.currentTime %= duration;
 
-					if ( this.currentTime < 0 )
-						this.currentTime += duration;
+					if ( this.currentTime < 0 ) { this.currentTime += duration; }
 
 					this.reset();
 
@@ -249,26 +261,28 @@ THREE.Animation.prototype = {
 					var prevXYZ = prevKey[ type ];
 					var nextXYZ = nextKey[ type ];
 
-					if ( scale < 0 ) scale = 0;
-					if ( scale > 1 ) scale = 1;
+					if ( scale < 0 ) { scale = 0; }
+					if ( scale > 1 ) { scale = 1; }
 
 					// interpolate
 
+					var proportionalWeight;
+
 					if ( type === "pos" ) {
 
-						if ( this.interpolationType === THREE.AnimationHandler.LINEAR ) {
+						if ( this.interpolationType === AnimationHandler.LINEAR ) {
 
 							newVector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
 							newVector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
 							newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
 							// blend
-							var proportionalWeight = this.weight / ( this.weight + blending.positionWeight );
+							proportionalWeight = this.weight / ( this.weight + blending.positionWeight );
 							object.position.lerp( newVector, proportionalWeight );
 							blending.positionWeight += this.weight;
 
-						} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-									this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+						} else if ( this.interpolationType === AnimationHandler.CATMULLROM ||
+									this.interpolationType === AnimationHandler.CATMULLROM_FORWARD ) {
 
 							points[ 0 ] = this.getPrevKeyWith( "pos", h, prevKey.index - 1 )[ "pos" ];
 							points[ 1 ] = prevXYZ;
@@ -278,7 +292,7 @@ THREE.Animation.prototype = {
 							scale = scale * 0.33 + 0.33;
 
 							var currentPoint = interpolateCatmullRom( points, scale );
-							var proportionalWeight = this.weight / ( this.weight + blending.positionWeight );
+							proportionalWeight = this.weight / ( this.weight + blending.positionWeight );
 							blending.positionWeight += this.weight;
 
 							// blend
@@ -289,7 +303,7 @@ THREE.Animation.prototype = {
 							vector.y = vector.y + ( currentPoint[ 1 ] - vector.y ) * proportionalWeight;
 							vector.z = vector.z + ( currentPoint[ 2 ] - vector.z ) * proportionalWeight;
 
-							if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+							if ( this.interpolationType === AnimationHandler.CATMULLROM_FORWARD ) {
 
 								var forwardPoint = interpolateCatmullRom( points, scale * 1.01 );
 
@@ -307,7 +321,7 @@ THREE.Animation.prototype = {
 
 					} else if ( type === "rot" ) {
 
-						THREE.Quaternion.slerp( prevXYZ, nextXYZ, newQuat, scale );
+						Quaternion.slerp( prevXYZ, nextXYZ, newQuat, scale );
 
 						// Avoid paying the cost of an additional slerp if we don't have to
 						if ( blending.quaternionWeight === 0 ) {
@@ -317,8 +331,8 @@ THREE.Animation.prototype = {
 
 						} else {
 
-							var proportionalWeight = this.weight / ( this.weight + blending.quaternionWeight );
-							THREE.Quaternion.slerp( object.quaternion, newQuat, object.quaternion, proportionalWeight );
+							proportionalWeight = this.weight / ( this.weight + blending.quaternionWeight );
+							Quaternion.slerp( object.quaternion, newQuat, object.quaternion, proportionalWeight );
 							blending.quaternionWeight += this.weight;
 
 						}
@@ -329,7 +343,7 @@ THREE.Animation.prototype = {
 						newVector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
 						newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
-						var proportionalWeight = this.weight / ( this.weight + blending.scaleWeight );
+						proportionalWeight = this.weight / ( this.weight + blending.scaleWeight );
 						object.scale.lerp( newVector, proportionalWeight );
 						blending.scaleWeight += this.weight;
 
@@ -343,14 +357,14 @@ THREE.Animation.prototype = {
 
 		};
 
-	} )(),
+	}() ),
 
 	getNextKeyWith: function ( type, h, key ) {
 
 		var keys = this.data.hierarchy[ h ].keys;
 
-		if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-			 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+		if ( this.interpolationType === AnimationHandler.CATMULLROM ||
+			 this.interpolationType === AnimationHandler.CATMULLROM_FORWARD ) {
 
 			key = key < keys.length - 1 ? key : keys.length - 1;
 
@@ -378,8 +392,8 @@ THREE.Animation.prototype = {
 
 		var keys = this.data.hierarchy[ h ].keys;
 
-		if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-			this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+		if ( this.interpolationType === AnimationHandler.CATMULLROM ||
+			this.interpolationType === AnimationHandler.CATMULLROM_FORWARD ) {
 
 			key = key > 0 ? key : 0;
 
