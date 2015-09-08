@@ -5,7 +5,7 @@
  * parameters = {
  *  opacity: <float>,
  *
- *  blending: THREE.NormalBlending,
+ *  blending: Constants.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -14,11 +14,15 @@
  * }
  */
 
-THREE.MeshDepthMaterial = function ( parameters ) {
+module.exports = MeshDepthMaterial;
 
-	THREE.Material.call( this );
+var Material = require( "../materials/Material" );
 
-	this.type = 'MeshDepthMaterial';
+function MeshDepthMaterial( parameters ) {
+
+	Material.call( this );
+
+	this.type = "MeshDepthMaterial";
 
 	this.morphTargets = false;
 	this.wireframe = false;
@@ -26,14 +30,14 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.MeshDepthMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshDepthMaterial.prototype.constructor = THREE.MeshDepthMaterial;
+MeshDepthMaterial.prototype = Object.create( Material.prototype );
+MeshDepthMaterial.prototype.constructor = MeshDepthMaterial;
 
-THREE.MeshDepthMaterial.prototype.copy = function ( source ) {
+MeshDepthMaterial.prototype.copy = function ( source ) {
 
-	THREE.Material.prototype.copy.call( this, source );
+	Material.prototype.copy.call( this, source );
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;

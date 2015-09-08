@@ -4,8 +4,8 @@
  * parameters = {
  *  opacity: <float>,
  *
- *  shading: THREE.FlatShading,
- *  blending: THREE.NormalBlending,
+ *  shading: Constants.FlatShading,
+ *  blending: Constants.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -14,11 +14,15 @@
  * }
  */
 
-THREE.MeshNormalMaterial = function ( parameters ) {
+module.exports = MeshNormalMaterial;
 
-	THREE.Material.call( this, parameters );
+var Material = require( "../materials/Material" );
 
-	this.type = 'MeshNormalMaterial';
+function MeshNormalMaterial( parameters ) {
+
+	Material.call( this, parameters );
+
+	this.type = "MeshNormalMaterial";
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -27,14 +31,14 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.MeshNormalMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshNormalMaterial.prototype.constructor = THREE.MeshNormalMaterial;
+MeshNormalMaterial.prototype = Object.create( Material.prototype );
+MeshNormalMaterial.prototype.constructor = MeshNormalMaterial;
 
-THREE.MeshNormalMaterial.prototype.copy = function ( source ) {
+MeshNormalMaterial.prototype.copy = function ( source ) {
 
-	THREE.Material.prototype.copy.call( this, source );
+	Material.prototype.copy.call( this, source );
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;

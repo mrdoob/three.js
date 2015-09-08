@@ -7,25 +7,26 @@
  *  emissive: <hex>,
  *  opacity: <float>,
  *
- *  map: new THREE.Texture( <Image> ),
+ *  map: new Texture( <Image> ),
  *
- *  specularMap: new THREE.Texture( <Image> ),
+ *  specularMap: new Texture( <Image> ),
  *
- *  alphaMap: new THREE.Texture( <Image> ),
+ *  alphaMap: new Texture( <Image> ),
  *
- *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
- *  combine: THREE.Multiply,
+ *  envMap: new TextureCube( [posx, negx, posy, negy, posz, negz] ),
+ *  combine: Constants.MultiplyOperation,
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *
- *  blending: THREE.NormalBlending,
+ *  shading: Constants.SmoothShading,
+ *  blending: Constants.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
+ *  vertexColors: Constants.NoColors / Constants.VertexColors / Constants.FaceColors,
  *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
@@ -35,14 +36,20 @@
  * }
  */
 
-THREE.MeshLambertMaterial = function ( parameters ) {
+module.exports = MeshLambertMaterial;
 
-	THREE.Material.call( this );
+var Constants = require( "../Constants" ),
+	Material = require( "../materials/Material" ),
+	Color = require( "../math/Color" );
 
-	this.type = 'MeshLambertMaterial';
+function MeshLambertMaterial( parameters ) {
 
-	this.color = new THREE.Color( 0xffffff ); // diffuse
-	this.emissive = new THREE.Color( 0x000000 );
+	Material.call( this );
+
+	this.type = "MeshLambertMaterial";
+
+	this.color = new Color( 0xffffff ); // diffuse
+	this.emissive = new Color( 0x000000 );
 
 	this.map = null;
 
@@ -51,7 +58,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.alphaMap = null;
 
 	this.envMap = null;
-	this.combine = THREE.MultiplyOperation;
+	this.combine = Constants.MultiplyOperation;
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
 
@@ -59,10 +66,10 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
-	this.wireframeLinecap = 'round';
-	this.wireframeLinejoin = 'round';
+	this.wireframeLinecap = "round";
+	this.wireframeLinejoin = "round";
 
-	this.vertexColors = THREE.NoColors;
+	this.vertexColors = Constants.NoColors;
 
 	this.skinning = false;
 	this.morphTargets = false;
@@ -70,14 +77,14 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.MeshLambertMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshLambertMaterial.prototype.constructor = THREE.MeshLambertMaterial;
+MeshLambertMaterial.prototype = Object.create( Material.prototype );
+MeshLambertMaterial.prototype.constructor = MeshLambertMaterial;
 
-THREE.MeshLambertMaterial.prototype.copy = function ( source ) {
+MeshLambertMaterial.prototype.copy = function ( source ) {
 
-	THREE.Material.prototype.copy.call( this, source );
+	Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 	this.emissive.copy( source.emissive );

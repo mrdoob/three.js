@@ -9,44 +9,43 @@
  *  shininess: <float>,
  *  opacity: <float>,
  *
- *  map: new THREE.Texture( <Image> ),
+ *  map: new Texture( <Image> ),
  *
- *  lightMap: new THREE.Texture( <Image> ),
+ *  lightMap: new Texture( <Image> ),
  *  lightMapIntensity: <float>
  *
- *  aoMap: new THREE.Texture( <Image> ),
+ *  aoMap: new Texture( <Image> ),
  *  aoMapIntensity: <float>
  *
- *  emissiveMap: new THREE.Texture( <Image> ),
+ *  emissiveMap: new Texture( <Image> ),
  *
- *  bumpMap: new THREE.Texture( <Image> ),
+ *  bumpMap: new Texture( <Image> ),
  *  bumpScale: <float>,
  *
- *  normalMap: new THREE.Texture( <Image> ),
+ *  normalMap: new Texture( <Image> ),
  *  normalScale: <Vector2>,
  *
- *  displacementMap: new THREE.Texture( <Image> ),
+ *  displacementMap: new Texture( <Image> ),
  *  displacementScale: <float>,
- *  displacementBias: <float>,
  *
- *  specularMap: new THREE.Texture( <Image> ),
+ *  specularMap: new Texture( <Image> ),
  *
- *  alphaMap: new THREE.Texture( <Image> ),
+ *  alphaMap: new Texture( <Image> ),
  *
- *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
- *  combine: THREE.Multiply,
+ *  envMap: new TextureCube( [posx, negx, posy, negy, posz, negz] ),
+ *  combine: Constants.MultiplyOperation,
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *
- *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
+ *  shading: Constants.SmoothShading,
+ *  blending: Constants.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
+ *  vertexColors: Constants.NoColors / Constants.VertexColors / Constants.FaceColors,
  *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
@@ -56,15 +55,22 @@
  * }
  */
 
-THREE.MeshPhongMaterial = function ( parameters ) {
+module.exports = MeshPhongMaterial;
 
-	THREE.Material.call( this );
+var Constants = require( "../Constants" ),
+	Color = require( "../math/Color" ),
+	Material = require( "../materials/Material" ),
+	Vector2 = require( "../math/Vector2" );
 
-	this.type = 'MeshPhongMaterial';
+function MeshPhongMaterial( parameters ) {
 
-	this.color = new THREE.Color( 0xffffff ); // diffuse
-	this.emissive = new THREE.Color( 0x000000 );
-	this.specular = new THREE.Color( 0x111111 );
+	Material.call( this );
+
+	this.type = "MeshPhongMaterial";
+
+	this.color = new Color( 0xffffff ); // diffuse
+	this.emissive = new Color( 0x000000 );
+	this.specular = new Color( 0x111111 );
 	this.shininess = 30;
 
 	this.metal = false;
@@ -83,7 +89,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.bumpScale = 1;
 
 	this.normalMap = null;
-	this.normalScale = new THREE.Vector2( 1, 1 );
+	this.normalScale = new Vector2( 1, 1 );
 
 	this.displacementMap = null;
 	this.displacementScale = 1;
@@ -94,20 +100,20 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.alphaMap = null;
 
 	this.envMap = null;
-	this.combine = THREE.MultiplyOperation;
+	this.combine = Constants.MultiplyOperation;
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
 
 	this.fog = true;
 
-	this.shading = THREE.SmoothShading;
+	this.shading = Constants.SmoothShading;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
-	this.wireframeLinecap = 'round';
-	this.wireframeLinejoin = 'round';
+	this.wireframeLinecap = "round";
+	this.wireframeLinejoin = "round";
 
-	this.vertexColors = THREE.NoColors;
+	this.vertexColors = Constants.NoColors;
 
 	this.skinning = false;
 	this.morphTargets = false;
@@ -115,14 +121,14 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.MeshPhongMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshPhongMaterial.prototype.constructor = THREE.MeshPhongMaterial;
+MeshPhongMaterial.prototype = Object.create( Material.prototype );
+MeshPhongMaterial.prototype.constructor = MeshPhongMaterial;
 
-THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
+MeshPhongMaterial.prototype.copy = function ( source ) {
 
-	THREE.Material.prototype.copy.call( this, source );
+	Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 	this.emissive.copy( source.emissive );

@@ -8,8 +8,8 @@
  *  fragmentShader: <string>,
  *  vertexShader: <string>,
  *
- *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
+ *  shading: Constants.SmoothShading,
+ *  blending: Constants.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -18,7 +18,7 @@
  *
  *  lights: <bool>,
  *
- *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
+ *  vertexColors: Constants.NoColors / Constants.VertexColors / Constants.FaceColors,
  *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
@@ -28,19 +28,25 @@
  * }
  */
 
-THREE.ShaderMaterial = function ( parameters ) {
+module.exports = ShaderMaterial;
 
-	THREE.Material.call( this );
+var Constants = require( "../Constants" ),
+	Material = require( "../materials/Material" ),
+	UniformsUtils = require( "../renderers/shaders/UniformsUtils" );
 
-	this.type = 'ShaderMaterial';
+function ShaderMaterial( parameters ) {
+
+	Material.call( this );
+
+	this.type = "ShaderMaterial";
 
 	this.defines = {};
 	this.uniforms = {};
 
-	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
-	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
+	this.vertexShader = "void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}";
+	this.fragmentShader = "void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}";
 
-	this.shading = THREE.SmoothShading;
+	this.shading = Constants.SmoothShading;
 
 	this.linewidth = 1;
 
@@ -51,7 +57,7 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	this.lights = false; // set to use scene lights
 
-	this.vertexColors = THREE.NoColors; // set to use "color" attribute stream
+	this.vertexColors = Constants.NoColors; // set to use "color" attribute stream
 
 	this.skinning = false; // set to use skinning attribute streams
 
@@ -63,9 +69,9 @@ THREE.ShaderMaterial = function ( parameters ) {
 	// When rendered geometry doesn't include these attributes but the material does,
 	// use these default values in WebGL. This avoids errors when buffer data is missing.
 	this.defaultAttributeValues = {
-		'color': [ 1, 1, 1 ],
-		'uv': [ 0, 0 ],
-		'uv2': [ 0, 0 ]
+		"color": [ 1, 1, 1 ],
+		"uv": [ 0, 0 ],
+		"uv2": [ 0, 0 ]
 	};
 
 	this.index0AttributeName = undefined;
@@ -74,7 +80,7 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 		if ( parameters.attributes !== undefined ) {
 
-			console.error( 'THREE.ShaderMaterial: attributes should now be defined in THREE.BufferGeometry instead.' );
+			console.error( "ShaderMaterial: attributes should now be defined in BufferGeometry instead." );
 
 		}
 
@@ -82,19 +88,19 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	}
 
-};
+}
 
-THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
+ShaderMaterial.prototype = Object.create( Material.prototype );
+ShaderMaterial.prototype.constructor = ShaderMaterial;
 
-THREE.ShaderMaterial.prototype.copy = function ( source ) {
+ShaderMaterial.prototype.copy = function ( source ) {
 
-	THREE.Material.prototype.copy.call( this, source );
+	Material.prototype.copy.call( this, source );
 
 	this.fragmentShader = source.fragmentShader;
 	this.vertexShader = source.vertexShader;
 
-	this.uniforms = THREE.UniformsUtils.clone( source.uniforms );
+	this.uniforms = UniformsUtils.clone( source.uniforms );
 
 	this.attributes = source.attributes;
 	this.defines = source.defines;
@@ -121,9 +127,9 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 
 };
 
-THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
+ShaderMaterial.prototype.toJSON = function ( meta ) {
 
-	var data = THREE.Material.prototype.toJSON.call( this, meta );
+	var data = Material.prototype.toJSON.call( this, meta );
 
 	data.uniforms = this.uniforms;
 	data.attributes = this.attributes;
