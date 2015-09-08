@@ -6,16 +6,15 @@
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loopStyle ) {
+THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 
 	if( clip === undefined ) throw new Error( 'clip is null' );
-	if( loopStyle === true || loopStyle === false ) console.error( "loopStyle isn't set properly" );
 	this.clip = clip;
 	this.localRoot = null;
 	this.startTime = startTime || 0;
 	this.timeScale = timeScale || 1;
 	this.weight = weight || 1;
-	this.loopStyle = loopStyle || THREE.LoopRepeat;
+	this.loop = loop || THREE.LoopRepeat;
 	this.loopCount = 0;
 	this.enabled = true;	// allow for easy disabling of the action.
 
@@ -57,7 +56,7 @@ THREE.AnimationAction.prototype = {
 		console.log( 'this.timeScale', this.timeScale );
 		console.log( 'duration', duration );
 
-		if( this.loopStyle === THREE.LoopOnce ) {
+		if( this.loop === THREE.LoopOnce ) {
 
 			this.loopCount = 0;
 			this.clipTime = Math.min( Math.max( this.actionTime, 0 ), duration );
@@ -88,7 +87,7 @@ THREE.AnimationAction.prototype = {
 		newClipTime = newClipTime % duration;
 
 		// if we are ping pong looping, ensure that we go backwards when appropriate
-		if( this.loopStyle == THREE.LoopPingPong ) {
+		if( this.loop == THREE.LoopPingPong ) {
 
 			if( Math.abs( this.loopCount % 2 ) === 1 ) {
 
