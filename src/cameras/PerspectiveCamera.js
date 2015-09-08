@@ -4,11 +4,17 @@
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
-THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
+module.exports = PerspectiveCamera;
 
-	THREE.Camera.call( this );
+var Camera = require( "./Camera" ),
+  _Math = require( "../math/Math" ),
+	Object3D = require( "../core/Object3D" );
 
-	this.type = 'PerspectiveCamera';
+function PerspectiveCamera( fov, aspect, near, far ) {
+
+	Camera.call( this );
+
+	this.type = "PerspectiveCamera";
 
 	this.zoom = 1;
 
@@ -19,10 +25,10 @@ THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 
 	this.updateProjectionMatrix();
 
-};
+}
 
-THREE.PerspectiveCamera.prototype = Object.create( THREE.Camera.prototype );
-THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
+PerspectiveCamera.prototype = Object.create( Camera.prototype );
+PerspectiveCamera.prototype.constructor = PerspectiveCamera;
 
 
 /**
@@ -31,11 +37,11 @@ THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
  * Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
  */
 
-THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight ) {
+PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight ) {
 
-	if ( frameHeight === undefined ) frameHeight = 24;
+	if ( frameHeight === undefined ) { frameHeight = 24; }
 
-	this.fov = 2 * THREE.Math.radToDeg( Math.atan( frameHeight / ( focalLength * 2 ) ) );
+	this.fov = 2 * _Math.radToDeg( Math.atan( frameHeight / ( focalLength * 2 ) ) );
 	this.updateProjectionMatrix();
 
 };
@@ -77,7 +83,7 @@ THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight 
  *   Note there is no reason monitors have to be the same size or in a grid.
  */
 
-THREE.PerspectiveCamera.prototype.setViewOffset = function ( fullWidth, fullHeight, x, y, width, height ) {
+PerspectiveCamera.prototype.setViewOffset = function ( fullWidth, fullHeight, x, y, width, height ) {
 
 	this.fullWidth = fullWidth;
 	this.fullHeight = fullHeight;
@@ -91,14 +97,14 @@ THREE.PerspectiveCamera.prototype.setViewOffset = function ( fullWidth, fullHeig
 };
 
 
-THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
+PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
-	var fov = THREE.Math.radToDeg( 2 * Math.atan( Math.tan( THREE.Math.degToRad( this.fov ) * 0.5 ) / this.zoom ) );
+	var fov = _Math.radToDeg( 2 * Math.atan( Math.tan( _Math.degToRad( this.fov ) * 0.5 ) / this.zoom ) );
 
 	if ( this.fullWidth ) {
 
 		var aspect = this.fullWidth / this.fullHeight;
-		var top = Math.tan( THREE.Math.degToRad( fov * 0.5 ) ) * this.near;
+		var top = Math.tan( _Math.degToRad( fov * 0.5 ) ) * this.near;
 		var bottom = - top;
 		var left = aspect * bottom;
 		var right = aspect * top;
@@ -122,9 +128,9 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
 };
 
-THREE.PerspectiveCamera.prototype.copy = function ( source ) {
+PerspectiveCamera.prototype.copy = function ( source ) {
 	
-	THREE.Camera.prototype.copy.call( this, source );
+	Camera.prototype.copy.call( this, source );
 	
 	this.fov = source.fov;
 	this.aspect = source.aspect;
@@ -137,9 +143,9 @@ THREE.PerspectiveCamera.prototype.copy = function ( source ) {
 		
 };
 
-THREE.PerspectiveCamera.prototype.toJSON = function ( meta ) {
+PerspectiveCamera.prototype.toJSON = function ( meta ) {
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	var data = Object3D.prototype.toJSON.call( this, meta );
 
 	data.object.zoom = this.zoom;
 	data.object.fov = this.fov;
