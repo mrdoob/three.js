@@ -3,25 +3,30 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Light = function ( color ) {
+module.exports = Light;
 
-	THREE.Object3D.call( this );
+var Color = require( "../math/Color" ),
+	Object3D = require( "../core/Object3D" );
 
-	this.type = 'Light';
+function Light( color ) {
 
-	this.color = new THREE.Color( color );
+	Object3D.call( this );
 
-};
+	this.type = "Light";
 
-THREE.Light.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Light.prototype.constructor = THREE.Light;
+	this.color = new Color( color );
 
-THREE.Light.prototype.copy = function ( source ) {
-	
-	THREE.Object3D.prototype.copy.call( this, source );
-	
+}
+
+Light.prototype = Object.create( Object3D.prototype );
+Light.prototype.constructor = Light;
+
+Light.prototype.copy = function ( source ) {
+
+	Object3D.prototype.copy.call( this, source );
+
 	this.color.copy( source.color );
-	
+
 	return this;
 
 };

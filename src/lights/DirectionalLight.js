@@ -3,16 +3,21 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.DirectionalLight = function ( color, intensity ) {
+module.exports = DirectionalLight;
 
-	THREE.Light.call( this, color );
+var Light = require( "./Light" ),
+	Object3D = require( "../core/Object3D" );
 
-	this.type = 'DirectionalLight';
+function DirectionalLight( color, intensity ) {
+
+	Light.call( this, color );
+
+	this.type = "DirectionalLight";
 
 	this.position.set( 0, 1, 0 );
 	this.updateMatrix();
 
-	this.target = new THREE.Object3D();
+	this.target = new Object3D();
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 
@@ -40,14 +45,14 @@ THREE.DirectionalLight = function ( color, intensity ) {
 	this.shadowCamera = null;
 	this.shadowMatrix = null;
 
-};
+}
 
-THREE.DirectionalLight.prototype = Object.create( THREE.Light.prototype );
-THREE.DirectionalLight.prototype.constructor = THREE.DirectionalLight;
+DirectionalLight.prototype = Object.create( Light.prototype );
+DirectionalLight.prototype.constructor = DirectionalLight;
 
-THREE.DirectionalLight.prototype.copy = function ( source ) {
+DirectionalLight.prototype.copy = function ( source ) {
 
-	THREE.Light.prototype.copy.call( this, source );
+	Light.prototype.copy.call( this, source );
 
 	this.intensity = source.intensity;
 	this.target = source.target.clone();
@@ -75,9 +80,9 @@ THREE.DirectionalLight.prototype.copy = function ( source ) {
 
 };
 
-THREE.DirectionalLight.prototype.toJSON = function ( meta ) {
+DirectionalLight.prototype.toJSON = function ( meta ) {
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	var data = Object3D.prototype.toJSON.call( this, meta );
 
 	data.object.color = this.color.getHex();
 	data.object.intensity = this.intensity;
