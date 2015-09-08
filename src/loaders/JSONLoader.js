@@ -22,6 +22,8 @@ THREE.JSONLoader.prototype = {
 
 	constructor: THREE.JSONLoader,
 
+	// Deprecated
+	
 	get statusDomElement () {
 
 		if ( this._statusDomElement === undefined ) {
