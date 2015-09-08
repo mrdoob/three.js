@@ -190,7 +190,7 @@ THREE.MD2Character = function () {
 			var clip = THREE.AnimationClip.findByName( this.meshWeapon.geometry.clips, clipName );
 			if( clip ) {
 
-				var action = new THREE.AnimationAction( clip, this.meshBody.activeAction.startTime ).setLocalRoot( this.meshWeapon );
+				var action = new THREE.AnimationAction( clip ).syncWith( this.meshBody.activeAction ).setLocalRoot( this.meshWeapon );
 				scope.mixer.addAction( action );
 
 				this.meshWeapon.activeAction = action;

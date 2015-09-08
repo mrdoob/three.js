@@ -106,6 +106,14 @@ THREE.AnimationAction.prototype = {
 
 	},
 
+	syncWith: function( action ) {
+
+		this.actionTime = action.actionTime;
+		this.timeScale = action.timeScale;
+
+		return this;
+	},
+
 	warpToDuration: function( duration ) {
 
 		this.timeScale = this.clip.duration / duration;
