@@ -158,8 +158,10 @@ THREE.WebGLProgram = ( function () {
 
 			prefix_vertex = [
 
+				'#ifdef GL_ES',
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
+				'#endif',
 
 				customDefines,
 
@@ -266,8 +268,10 @@ THREE.WebGLProgram = ( function () {
 
 			prefix_fragment = [
 
+				'#ifdef GL_ES',
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
+				'#endif',
 
 				( parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 

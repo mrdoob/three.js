@@ -249,7 +249,9 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		gl.shaderSource( vertexShader, [
 
+			'#ifdef GL_ES',
 			'precision ' + renderer.getPrecision() + ' float;',
+			'#endif',
 
 			'uniform mat4 modelViewMatrix;',
 			'uniform mat4 projectionMatrix;',
