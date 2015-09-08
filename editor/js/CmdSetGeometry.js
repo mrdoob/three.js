@@ -77,7 +77,7 @@ CmdSetGeometry.prototype = {
 	parseGeometry: function ( data ) {
 
 		var loader = new THREE.ObjectLoader();
-		return loader.parseGeometries( [data] )[ data.uuid ];
+		return loader.parseGeometries( [ data ] )[ data.uuid ];
 
 	}
 
