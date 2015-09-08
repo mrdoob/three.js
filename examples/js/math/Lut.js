@@ -410,7 +410,7 @@ THREE.Lut.prototype = {
 				var txtTick = new THREE.CanvasTexture( canvasTick );
 				txtTick.minFilter = THREE.LinearFilter;
 
-				var spriteMaterialTick = new THREE.SpriteMaterial( { map: txtTick, useScreenCoordinates: false } );
+				var spriteMaterialTick = new THREE.SpriteMaterial( { map: txtTick } );
 
 				var spriteTick = new THREE.Sprite( spriteMaterialTick );
 
