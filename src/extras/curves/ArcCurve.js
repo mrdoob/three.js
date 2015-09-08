@@ -1,12 +1,16 @@
-/**************************************************************
- *	Arc curve
- **************************************************************/
+/**
+ * Arc curve
+ */
 
-THREE.ArcCurve = function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
+module.exports = ArcCurve;
 
-	THREE.EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
+var EllipseCurve = require( "./EllipseCurve" );
 
-};
+function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
-THREE.ArcCurve.prototype = Object.create( THREE.EllipseCurve.prototype );
-THREE.ArcCurve.prototype.constructor = THREE.ArcCurve;
+	EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
+
+}
+
+ArcCurve.prototype = Object.create( EllipseCurve.prototype );
+ArcCurve.prototype.constructor = ArcCurve;
