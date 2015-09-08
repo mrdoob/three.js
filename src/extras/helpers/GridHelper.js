@@ -2,19 +2,28 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GridHelper = function ( size, step ) {
+module.exports = GridHelper;
 
-	var geometry = new THREE.Geometry();
-	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
+var Constants = require( "../../Constants" ),
+	Geometry = require( "../../core/Geometry" ),
+	LineBasicMaterial = require( "../../materials/LineBasicMaterial" ),
+	Color = require( "../../math/Color" ),
+	Vector3 = require( "../../math/Vector3" ),
+	LineSegments = require( "../../objects/LineSegments" );
 
-	this.color1 = new THREE.Color( 0x444444 );
-	this.color2 = new THREE.Color( 0x888888 );
+function GridHelper( size, step ) {
+
+	var geometry = new Geometry();
+	var material = new LineBasicMaterial( { vertexColors: Constants.VertexColors } );
+
+	this.color1 = new Color( 0x444444 );
+	this.color2 = new Color( 0x888888 );
 
 	for ( var i = - size; i <= size; i += step ) {
 
 		geometry.vertices.push(
-			new THREE.Vector3( - size, 0, i ), new THREE.Vector3( size, 0, i ),
-			new THREE.Vector3( i, 0, - size ), new THREE.Vector3( i, 0, size )
+			new Vector3( - size, 0, i ), new Vector3( size, 0, i ),
+			new Vector3( i, 0, - size ), new Vector3( i, 0, size )
 		);
 
 		var color = i === 0 ? this.color1 : this.color2;
@@ -23,14 +32,14 @@ THREE.GridHelper = function ( size, step ) {
 
 	}
 
-	THREE.LineSegments.call( this, geometry, material );
+	LineSegments.call( this, geometry, material );
 
-};
+}
 
-THREE.GridHelper.prototype = Object.create( THREE.LineSegments.prototype );
-THREE.GridHelper.prototype.constructor = THREE.GridHelper;
+GridHelper.prototype = Object.create( LineSegments.prototype );
+GridHelper.prototype.constructor = GridHelper;
 
-THREE.GridHelper.prototype.setColors = function( colorCenterLine, colorGrid ) {
+GridHelper.prototype.setColors = function( colorCenterLine, colorGrid ) {
 
 	this.color1.set( colorCenterLine );
 	this.color2.set( colorGrid );

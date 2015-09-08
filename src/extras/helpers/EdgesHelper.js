@@ -1,6 +1,6 @@
 /**
  * @author WestLangley / http://github.com/WestLangley
- * @param object THREE.Mesh whose geometry will be used
+ * @param object Mesh whose geometry will be used
  * @param hex line color
  * @param thresholdAngle the minimum angle (in degrees),
  * between the face normals of adjacent faces,
@@ -8,16 +8,22 @@
  * an edge is only rendered if the angle is at least 10 degrees.
  */
 
-THREE.EdgesHelper = function ( object, hex, thresholdAngle ) {
+module.exports = EdgesHelper;
+
+var EdgesGeometry = require( "../geometries/EdgesGeometry" ),
+	LineBasicMaterial = require( "../../materials/LineBasicMaterial" ),
+	LineSegments = require( "../../objects/LineSegments" );
+
+function EdgesHelper( object, hex, thresholdAngle ) {
 
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
 
-	THREE.LineSegments.call( this, new THREE.EdgesGeometry( object.geometry, thresholdAngle ), new THREE.LineBasicMaterial( { color: color } ) );
+	LineSegments.call( this, new EdgesGeometry( object.geometry, thresholdAngle ), new LineBasicMaterial( { color: color } ) );
 
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-};
+}
 
-THREE.EdgesHelper.prototype = Object.create( THREE.LineSegments.prototype );
-THREE.EdgesHelper.prototype.constructor = THREE.EdgesHelper;
+EdgesHelper.prototype = Object.create( LineSegments.prototype );
+EdgesHelper.prototype.constructor = EdgesHelper;

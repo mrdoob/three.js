@@ -4,9 +4,17 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.DirectionalLightHelper = function ( light, size ) {
+module.exports = DirectionalLightHelper;
 
-	THREE.Object3D.call( this );
+var Geometry = require( "../../core/Geometry" ),
+	Object3D = require( "../../core/Object3D" ),
+	LineBasicMaterial = require( "../../materials/LineBasicMaterial" ),
+	Vector3 = require( "../../math/Vector3" ),
+	Line = require( "../../objects/Line" );
+
+function DirectionalLightHelper( light, size ) {
+
+	Object3D.call( this );
 
 	this.light = light;
 	this.light.updateMatrixWorld();
@@ -16,41 +24,41 @@ THREE.DirectionalLightHelper = function ( light, size ) {
 
 	size = size || 1;
 
-	var geometry = new THREE.Geometry();
+	var geometry = new Geometry();
 	geometry.vertices.push(
-		new THREE.Vector3( - size,   size, 0 ),
-		new THREE.Vector3(   size,   size, 0 ),
-		new THREE.Vector3(   size, - size, 0 ),
-		new THREE.Vector3( - size, - size, 0 ),
-		new THREE.Vector3( - size,   size, 0 )
+		new Vector3( - size,   size, 0 ),
+		new Vector3(   size,   size, 0 ),
+		new Vector3(   size, - size, 0 ),
+		new Vector3( - size, - size, 0 ),
+		new Vector3( - size,   size, 0 )
 	);
 
-	var material = new THREE.LineBasicMaterial( { fog: false } );
+	var material = new LineBasicMaterial( { fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	this.lightPlane = new THREE.Line( geometry, material );
+	this.lightPlane = new Line( geometry, material );
 	this.add( this.lightPlane );
 
-	geometry = new THREE.Geometry();
+	geometry = new Geometry();
 	geometry.vertices.push(
-		new THREE.Vector3(),
-		new THREE.Vector3()
+		new Vector3(),
+		new Vector3()
 	);
 
-	material = new THREE.LineBasicMaterial( { fog: false } );
+	material = new LineBasicMaterial( { fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	this.targetLine = new THREE.Line( geometry, material );
+	this.targetLine = new Line( geometry, material );
 	this.add( this.targetLine );
 
 	this.update();
 
-};
+}
 
-THREE.DirectionalLightHelper.prototype = Object.create( THREE.Object3D.prototype );
-THREE.DirectionalLightHelper.prototype.constructor = THREE.DirectionalLightHelper;
+DirectionalLightHelper.prototype = Object.create( Object3D.prototype );
+DirectionalLightHelper.prototype.constructor = DirectionalLightHelper;
 
-THREE.DirectionalLightHelper.prototype.dispose = function () {
+DirectionalLightHelper.prototype.dispose = function () {
 
 	this.lightPlane.geometry.dispose();
 	this.lightPlane.material.dispose();
@@ -59,13 +67,15 @@ THREE.DirectionalLightHelper.prototype.dispose = function () {
 
 };
 
-THREE.DirectionalLightHelper.prototype.update = function () {
+DirectionalLightHelper.prototype.update = ( function () {
 
-	var v1 = new THREE.Vector3();
-	var v2 = new THREE.Vector3();
-	var v3 = new THREE.Vector3();
+	var v1, v2, v3;
 
 	return function () {
+
+		if ( v1 === undefined ) { v1 = new Vector3(); }
+		if ( v2 === undefined ) { v2 = new Vector3(); }
+		if ( v3 === undefined ) { v3 = new Vector3(); }
 
 		v1.setFromMatrixPosition( this.light.matrixWorld );
 		v2.setFromMatrixPosition( this.light.target.matrixWorld );
@@ -80,4 +90,4 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 
 	};
 
-}();
+}() );

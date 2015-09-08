@@ -3,26 +3,33 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PointLightHelper = function ( light, sphereSize ) {
+module.exports = PointLightHelper;
+
+var SphereGeometry = require( "../geometries/SphereGeometry" ),
+	/*IcosahedronGeometry = require( "../geometries/IcosahedronGeometry" ),*/
+	MeshBasicMaterial = require( "../../materials/MeshBasicMaterial" ),
+	Mesh = require( "../../objects/Mesh" );
+
+function PointLightHelper( light, sphereSize ) {
 
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
-	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
+	var geometry = new SphereGeometry( sphereSize, 4, 2 );
+	var material = new MeshBasicMaterial( { wireframe: true, fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	THREE.Mesh.call( this, geometry, material );
+	Mesh.call( this, geometry, material );
 
 	this.matrix = this.light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	/*
-	var distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
-	var distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
+	var distanceGeometry = new IcosahedronGeometry( 1, 2 );
+	var distanceMaterial = new MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
 
-	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
-	this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
+	this.lightSphere = new Mesh( bulbGeometry, bulbMaterial );
+	this.lightDistance = new Mesh( distanceGeometry, distanceMaterial );
 
 	var d = light.distance;
 
@@ -39,19 +46,18 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 	this.add( this.lightDistance );
 	*/
 
-};
+}
 
-THREE.PointLightHelper.prototype = Object.create( THREE.Mesh.prototype );
-THREE.PointLightHelper.prototype.constructor = THREE.PointLightHelper;
+PointLightHelper.prototype = Object.create( Mesh.prototype );
+PointLightHelper.prototype.constructor = PointLightHelper;
 
-THREE.PointLightHelper.prototype.dispose = function () {
+PointLightHelper.prototype.dispose = function () {
 
 	this.geometry.dispose();
 	this.material.dispose();
-
 };
 
-THREE.PointLightHelper.prototype.update = function () {
+PointLightHelper.prototype.update = function () {
 
 	this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 

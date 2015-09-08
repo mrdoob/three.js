@@ -1,9 +1,19 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author WestLangley / http://github.com/WestLangley
-*/
+ */
 
-THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
+module.exports = VertexNormalsHelper;
+
+var BufferAttribute = require( "../../core/BufferAttribute" ),
+	BufferGeometry = require( "../../core/BufferGeometry" ),
+	Geometry = require( "../../core/Geometry" ),
+	LineSegments = require( "../../objects/LineSegments" ),
+	LineBasicMaterial = require( "../../materials/LineBasicMaterial" ),
+	Matrix3 = require( "../../math/Matrix3" ),
+	Vector3 = require( "../../math/Vector3" );
+
+function VertexNormalsHelper( object, size, hex, linewidth ) {
 
 	this.object = object;
 
@@ -19,25 +29,25 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	var objGeometry = this.object.geometry;
 
-	if ( objGeometry instanceof THREE.Geometry ) {
+	if ( objGeometry instanceof Geometry ) {
 
 		nNormals = objGeometry.faces.length * 3;
 
-	} else if ( objGeometry instanceof THREE.BufferGeometry ) {
+	} else if ( objGeometry instanceof BufferGeometry ) {
 
-		nNormals = objGeometry.attributes.normal.count
+		nNormals = objGeometry.attributes.normal.count;
 
 	}
 
 	//
 
-	var geometry = new THREE.BufferGeometry();
+	var geometry = new BufferGeometry();
 
-	var positions = new THREE.Float32Attribute( nNormals * 2 * 3, 3 );
+	var positions = new BufferAttribute.Float32Attribute( nNormals * 2 * 3, 3 );
 
-	geometry.addAttribute( 'position', positions );
+	geometry.addAttribute( "position", positions );
 
-	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ) );
+	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
 
 	//
 
@@ -45,20 +55,20 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	this.update();
 
-};
+}
 
-THREE.VertexNormalsHelper.prototype = Object.create( THREE.LineSegments.prototype );
-THREE.VertexNormalsHelper.prototype.constructor = THREE.VertexNormalsHelper;
+VertexNormalsHelper.prototype = Object.create( LineSegments.prototype );
+VertexNormalsHelper.prototype.constructor = VertexNormalsHelper;
 
-THREE.VertexNormalsHelper.prototype.update = ( function () {
+VertexNormalsHelper.prototype.update = ( function () {
 
-	var v1 = new THREE.Vector3();
-	var v2 = new THREE.Vector3();
-	var normalMatrix = new THREE.Matrix3();
+	var v1 = new Vector3();
+	var v2 = new Vector3();
+	var normalMatrix = new Matrix3();
 
 	return function update() {
 
-		var keys = [ 'a', 'b', 'c' ];
+		var keys = [ "a", "b", "c" ];
 
 		this.object.updateMatrixWorld( true );
 
@@ -72,23 +82,28 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 		var objGeometry = this.object.geometry;
 
-		if ( objGeometry instanceof THREE.Geometry ) {
+		var vertices, faces, face, idx,
+			i, j, l, jl,
+			vertex, normal,
+			objPos, objNorm;
 
-			var vertices = objGeometry.vertices;
+		if ( objGeometry instanceof Geometry ) {
 
-			var faces = objGeometry.faces;
+			vertices = objGeometry.vertices;
 
-			var idx = 0;
+			faces = objGeometry.faces;
 
-			for ( var i = 0, l = faces.length; i < l; i ++ ) {
+			idx = 0;
 
-				var face = faces[ i ];
+			for ( i = 0, l = faces.length; i < l; i ++ ) {
 
-				for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
+				face = faces[ i ];
 
-					var vertex = vertices[ face[ keys[ j ] ] ];
+				for ( j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
 
-					var normal = face.vertexNormals[ j ];
+					vertex = vertices[ face[ keys[ j ] ] ];
+
+					normal = face.vertexNormals[ j ];
 
 					v1.copy( vertex ).applyMatrix4( matrixWorld );
 
@@ -106,17 +121,17 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 			}
 
-		} else if ( objGeometry instanceof THREE.BufferGeometry ) {
+		} else if ( objGeometry instanceof BufferGeometry ) {
 
-			var objPos = objGeometry.attributes.position;
+			objPos = objGeometry.attributes.position;
 
-			var objNorm = objGeometry.attributes.normal;
+			objNorm = objGeometry.attributes.normal;
 
-			var idx = 0;
+			idx = 0;
 
 			// for simplicity, ignore index and drawcalls, and render every normal
 
-			for ( var j = 0, jl = objPos.count; j < jl; j ++ ) {
+			for ( j = 0, jl = objPos.count; j < jl; j ++ ) {
 
 				v1.set( objPos.getX( j ), objPos.getY( j ), objPos.getZ( j ) ).applyMatrix4( matrixWorld );
 
@@ -140,6 +155,6 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 		return this;
 
-	}
+	};
 
 }() );

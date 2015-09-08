@@ -2,16 +2,24 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BoxHelper = function ( object ) {
+module.exports = BoxHelper;
+
+var BufferAttribute = require( "../../core/BufferAttribute" ),
+	BufferGeometry = require( "../../core/BufferGeometry" ),
+	LineBasicMaterial = require( "../../materials/LineBasicMaterial" ),
+	Box3 = require( "../../math/Box3" ),
+	LineSegments = require( "../../objects/LineSegments" );
+
+function BoxHelper( object ) {
 
 	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 	var positions = new Float32Array( 8 * 3 );
 
-	var geometry = new THREE.BufferGeometry();
-	geometry.addIndex( new THREE.BufferAttribute( indices, 1 ) );
-	geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+	var geometry = new BufferGeometry();
+	geometry.addIndex( new BufferAttribute( indices, 1 ) );
+	geometry.addAttribute( "position", new BufferAttribute( positions, 3 ) );
 
-	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
+	LineSegments.call( this, geometry, new LineBasicMaterial( { color: 0xffff00 } ) );
 
 	if ( object !== undefined ) {
 
@@ -19,20 +27,20 @@ THREE.BoxHelper = function ( object ) {
 
 	}
 
-};
+}
 
-THREE.BoxHelper.prototype = Object.create( THREE.LineSegments.prototype );
-THREE.BoxHelper.prototype.constructor = THREE.BoxHelper;
+BoxHelper.prototype = Object.create( LineSegments.prototype );
+BoxHelper.prototype.constructor = BoxHelper;
 
-THREE.BoxHelper.prototype.update = ( function () {
+BoxHelper.prototype.update = ( function () {
 
-	var box = new THREE.Box3();
+	var box = new Box3();
 
 	return function ( object ) {
 
 		box.setFromObject( object );
 
-		if ( box.empty() ) return;
+		if ( box.empty() ) { return; }
 
 		var min = box.min;
 		var max = box.max;
@@ -69,6 +77,6 @@ THREE.BoxHelper.prototype.update = ( function () {
 
 		this.geometry.computeBoundingSphere();
 
-	}
+	};
 
-} )();
+}() );
