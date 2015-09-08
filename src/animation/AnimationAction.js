@@ -6,22 +6,30 @@
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
+THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loopStyle ) {
 
 	if( clip === undefined ) throw new Error( 'clip is null' );
+	if( loopStyle === true || loopStyle === false ) console.error( "loopStyle isn't set properly" );
 	this.clip = clip;
 	this.localRoot = null;
 	this.startTime = startTime || 0;
 	this.timeScale = timeScale || 1;
 	this.weight = weight || 1;
-	this.loop = loop || clip.loop || true;
+	this.loopStyle = loopStyle || THREE.LoopRepeat;
 	this.loopCount = 0;
 	this.enabled = true;	// allow for easy disabling of the action.
 
+	this.actionTime = - this.startTime;
 	this.clipTime = 0;
 
 	this.propertyBindingIndices = [];
 };
+
+/*
+THREE.LoopOnce = 2200;
+THREE.LoopRepeat = 2201;
+THREE.LoopPingPing = 2202;
+*/
 
 THREE.AnimationAction.prototype = {
 
@@ -37,63 +45,68 @@ THREE.AnimationAction.prototype = {
 
 	updateTime: function( clipDeltaTime ) {
 
-		var newClipTime = this.clipTime + clipDeltaTime;
+		var previousClipTime = this.clipTime;
+   		var previousLoopCount = this.loopCount;
+   		var previousActionTime = this.actionTime;
+
 		var duration = this.clip.duration;
 
-		if( newClipTime <= 0 ) {
+		this.actionTime = this.actionTime + clipDeltaTime * this.timeScale;
+		console.log( 'actionTime1', this.actionTime );
+		console.log( 'clipDeltaTime', clipDeltaTime );
+		console.log( 'this.timeScale', this.timeScale );
+		console.log( 'duration', duration );
 
-			if( this.loop ) {
+		if( this.loopStyle === THREE.LoopOnce ) {
 
-				newClipTime -= Math.floor( newClipTime / duration ) * duration;
-		   		this.clipTime = newClipTime % duration;
+			this.loopCount = 0;
+			this.clipTime = Math.min( Math.max( this.actionTime, 0 ), duration );
 
-		   		this.loopCount --;
+			// if time is changed since last time, see if we have hit a start/end limit
+			if( this.clipTime !== previousClipTime ) {
 
-	   			this.mixer.dispatchEvent( { type: 'loop', action: this, direction: -1 } );
+				if( this.clipTime === duration ) {
+
+					this.mixer.dispatchEvent( { type: 'finished', action: this, direction: 1 } );
+
+				}
+				else if( this.clipTime === 0 ) {
+
+					this.mixer.dispatchEvent( { type: 'finished', action: this, direction: -1 } );
+
+				}
 
 			}
-			else {
 
-		   		if( this.clipTime > 0 ) {
+		
+			return this.clipTime;
 
-		   			this.mixer.dispatchEvent( { type: 'finished', action: this, direction: -1 } );
+		}
+		
+		this.loopCount = Math.floor( this.actionTime / duration );
+		var newClipTime = this.actionTime - this.loopCount * duration;
+		newClipTime = newClipTime % duration;
 
-		   		}
+		// if we are ping pong looping, ensure that we go backwards when appropriate
+		if( this.loopStyle == THREE.LoopPingPong ) {
 
-				this.clipTime = Math.min( newClipTime, Math.max( duration, 0 ) );
+			if( Math.abs( this.loopCount % 2 ) === 1 ) {
+
+				newClipTime = duration - newClipTime;
 
 			}
 
 		}
-		else if( newClipTime >= duration ) {
 
-			if( this.loop ) {
-	
-				this.clipTime = newClipTime % duration;
+		this.clipTime = newClipTime;
 
-		   		this.loopCount ++;
-	
-	 			this.mixer.dispatchEvent( { type: 'loop', action: this, direction: +1 } );
+		console.log( 'actionTime', this.actionTime, 'loopCount', this.loopCount, 'clipTime', this.clipTime );
 
-			}
-			else {
+   		if( this.loopCount !== previousLoopCount ) {
 
-		   		if( this.clipTime < duration ) {
+   			this.mixer.dispatchEvent( { type: 'loop', action: this, loopDelta: ( this.loopCount - this.loopCount ) } );
 
-		   			this.mixer.dispatchEvent( { type: 'finished', action: this, direction: +1 } );
-
-		   		}
-
-				this.clipTime = Math.min( newClipTime, Math.max( duration, 0 ) );
-
-		   	}
-
-	   	}
-	   	else {
-
-	   		this.clipTime = newClipTime;
-	   		
-	   	}
+   		}
 	
 	   	return this.clipTime;
 

@@ -237,8 +237,8 @@
 				var clipBones = geometry.clips[0];
 
 				mixer = new THREE.AnimationMixer( mesh );
-				mixer.addAction( new THREE.AnimationAction( clipMorpher, 0, 1, 1, true ) );
-				mixer.addAction( new THREE.AnimationAction( clipBones, 0, 1, 1, true ) );
+				mixer.addAction( new THREE.AnimationAction( clipMorpher ) );
+				mixer.addAction( new THREE.AnimationAction( clipBones ) );
 			}
 
 			function initGUI() {

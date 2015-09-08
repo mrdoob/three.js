@@ -49,7 +49,7 @@ THREE.BlendCharacter = function () {
 
 		this.mixer.removeAllActions();
 		
-		this.mixer.play( new THREE.AnimationAction( this.clips[ animName ], 0, 1, 1, true ) );
+		this.mixer.play( new THREE.AnimationAction( this.clips[ animName ] ) );
 
 	};
 
@@ -57,8 +57,8 @@ THREE.BlendCharacter = function () {
 
 		this.mixer.removeAllActions();
  
-		var fromAction = new THREE.AnimationAction( this.clips[ fromAnimName ], 0, 1, 1, true );
-		var toAction = new THREE.AnimationAction( this.clips[ toAnimName ], 0, 1, 1, true );
+		var fromAction = new THREE.AnimationAction( this.clips[ fromAnimName ] );
+		var toAction = new THREE.AnimationAction( this.clips[ toAnimName ] );
 
 		this.mixer.play( fromAction );
 		this.mixer.play( toAction );
@@ -71,8 +71,8 @@ THREE.BlendCharacter = function () {
 
 		this.mixer.removeAllActions();
 
-		var fromAction = new THREE.AnimationAction( this.clips[ fromAnimName ], 0, 1, 1, true );
-		var toAction = new THREE.AnimationAction( this.clips[ toAnimName ], 0, 1, 1, true );
+		var fromAction = new THREE.AnimationAction( this.clips[ fromAnimName ] );
+		var toAction = new THREE.AnimationAction( this.clips[ toAnimName ] );
 
 		this.mixer.play( fromAction );
 		this.mixer.play( toAction );

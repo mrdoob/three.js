@@ -136,7 +136,7 @@
 					var clip = blendObject.geometry.clips[0];
 					console.log( clip );
 					mixer = new THREE.AnimationMixer( blendObject );
-					mixer.addAction( new THREE.AnimationAction( clip, 0, 1, 1, true ) );
+					mixer.addAction( new THREE.AnimationAction( clip ) );
 
 				} );
 

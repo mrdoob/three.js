@@ -40,7 +40,7 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	if ( clip ) {
 
-		var action = new THREE.AnimationAction( clip, 0, 1, 1, true );
+		var action = new THREE.AnimationAction( clip );
 		action.timeScale = ( clip.tracks.length * fps ) / clip.duration;
 		this.mixer.addAction( action );
 		this.activeAction = action;
