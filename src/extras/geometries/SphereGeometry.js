@@ -2,11 +2,16 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+module.exports = SphereGeometry;
 
-	THREE.Geometry.call( this );
+var SphereBufferGeometry = require( "./SphereBufferGeometry" ),
+	Geometry = require( "../../core/Geometry" );
 
-	this.type = 'SphereGeometry';
+function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+
+	Geometry.call( this );
+
+	this.type = "SphereGeometry";
 
 	this.parameters = {
 		radius: radius,
@@ -18,16 +23,16 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 		thetaLength: thetaLength
 	};
 
-	this.fromBufferGeometry( new THREE.SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
+	this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
 
-};
+}
 
-THREE.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.SphereGeometry.prototype.constructor = THREE.SphereGeometry;
+SphereGeometry.prototype = Object.create( Geometry.prototype );
+SphereGeometry.prototype.constructor = SphereGeometry;
 
-THREE.SphereGeometry.prototype.clone = function () {
+SphereGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.SphereGeometry(
+	var geometry = new SphereGeometry(
 		this.parameters.radius,
 		this.parameters.widthSegments,
 		this.parameters.heightSegments,

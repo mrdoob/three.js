@@ -3,15 +3,20 @@
  * Parametric Surfaces Geometry
  * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
  *
- * new THREE.ParametricGeometry( parametricFunction, uSegments, ySegements );
- *
+ * new ParametricGeometry( parametricFunction, uSegments, ySegements );
  */
 
-THREE.ParametricGeometry = function ( func, slices, stacks ) {
+module.exports = ParametricGeometry;
 
-	THREE.Geometry.call( this );
+var Face3 = require( "../../core/Face3" ),
+	Geometry = require( "../../core/Geometry" ),
+	Vector2 = require( "../../math/Vector2" );
 
-	this.type = 'ParametricGeometry';
+function ParametricGeometry( func, slices, stacks ) {
+
+	Geometry.call( this );
+
+	this.type = "ParametricGeometry";
 
 	this.parameters = {
 		func: func,
@@ -55,15 +60,15 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 			c = ( i + 1 ) * sliceCount + j + 1;
 			d = ( i + 1 ) * sliceCount + j;
 
-			uva = new THREE.Vector2( j / slices, i / stacks );
-			uvb = new THREE.Vector2( ( j + 1 ) / slices, i / stacks );
-			uvc = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
-			uvd = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
+			uva = new Vector2( j / slices, i / stacks );
+			uvb = new Vector2( ( j + 1 ) / slices, i / stacks );
+			uvc = new Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
+			uvd = new Vector2( j / slices, ( i + 1 ) / stacks );
 
-			faces.push( new THREE.Face3( a, b, d ) );
+			faces.push( new Face3( a, b, d ) );
 			uvs.push( [ uva, uvb, uvd ] );
 
-			faces.push( new THREE.Face3( b, c, d ) );
+			faces.push( new Face3( b, c, d ) );
 			uvs.push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
@@ -79,7 +84,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 
-};
+}
 
-THREE.ParametricGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ParametricGeometry.prototype.constructor = THREE.ParametricGeometry;
+ParametricGeometry.prototype = Object.create( Geometry.prototype );
+ParametricGeometry.prototype.constructor = ParametricGeometry;

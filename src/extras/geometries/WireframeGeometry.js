@@ -2,39 +2,53 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.WireframeGeometry = function ( geometry ) {
+module.exports = WireframeGeometry;
 
-	THREE.BufferGeometry.call( this );
+var BufferAttribute = require( "../../core/BufferAttribute" ),
+	BufferGeometry = require( "../../core/BufferGeometry" ),
+	Geometry = require( "../../core/Geometry" );
+
+function WireframeGeometry( geometry ) {
+
+	BufferGeometry.call( this );
+
+	var i, j, o, il, ol, l,
+		start, count, coords, faces, face,
+		numEdges, edges, numTris,
+		drawcalls, drawcall,
+		vertices, vertex, key,
+		indices, index, index1, index2;
 
 	var edge = [ 0, 0 ], hash = {};
+
 	var sortFunction = function ( a, b ) {
 
 		return a - b;
 
 	};
 
-	var keys = [ 'a', 'b', 'c' ];
+	var keys = [ "a", "b", "c" ];
 
-	if ( geometry instanceof THREE.Geometry ) {
+	if ( geometry instanceof Geometry ) {
 
-		var vertices = geometry.vertices;
-		var faces = geometry.faces;
-		var numEdges = 0;
+		vertices = geometry.vertices;
+		faces = geometry.faces;
+		numEdges = 0;
 
 		// allocate maximal size
-		var edges = new Uint32Array( 6 * faces.length );
+		edges = new Uint32Array( 6 * faces.length );
 
-		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+		for ( i = 0, l = faces.length; i < l; i ++ ) {
 
-			var face = faces[ i ];
+			face = faces[ i ];
 
-			for ( var j = 0; j < 3; j ++ ) {
+			for ( j = 0; j < 3; j ++ ) {
 
 				edge[ 0 ] = face[ keys[ j ] ];
 				edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
 				edge.sort( sortFunction );
 
-				var key = edge.toString();
+				key = edge.toString();
 
 				if ( hash[ key ] === undefined ) {
 
@@ -49,15 +63,15 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 		}
 
-		var coords = new Float32Array( numEdges * 2 * 3 );
+		coords = new Float32Array( numEdges * 2 * 3 );
 
-		for ( var i = 0, l = numEdges; i < l; i ++ ) {
+		for ( i = 0, l = numEdges; i < l; i ++ ) {
 
-			for ( var j = 0; j < 2; j ++ ) {
+			for ( j = 0; j < 2; j ++ ) {
 
-				var vertex = vertices[ edges [ 2 * i + j ] ];
+				vertex = vertices[ edges [ 2 * i + j ] ];
 
-				var index = 6 * i + 3 * j;
+				index = 6 * i + 3 * j;
 				coords[ index + 0 ] = vertex.x;
 				coords[ index + 1 ] = vertex.y;
 				coords[ index + 2 ] = vertex.z;
@@ -66,18 +80,18 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 		}
 
-		this.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
+		this.addAttribute( "position", new BufferAttribute( coords, 3 ) );
 
-	} else if ( geometry instanceof THREE.BufferGeometry ) {
+	} else if ( geometry instanceof BufferGeometry ) {
 
 		if ( geometry.index !== null ) {
 
 			// Indexed BufferGeometry
 
-			var indices = geometry.index.array;
-			var vertices = geometry.attributes.position;
-			var drawcalls = geometry.drawcalls;
-			var numEdges = 0;
+			vertices = geometry.attributes.position;
+			indices = geometry.attributes.index.array;
+			drawcalls = geometry.drawcalls;
+			numEdges = 0;
 
 			if ( drawcalls.length === 0 ) {
 
@@ -86,24 +100,24 @@ THREE.WireframeGeometry = function ( geometry ) {
 			}
 
 			// allocate maximal size
-			var edges = new Uint32Array( 2 * indices.length );
+			edges = new Uint32Array( 2 * indices.length );
 
-			for ( var o = 0, ol = drawcalls.length; o < ol; ++ o ) {
+			for ( o = 0, ol = drawcalls.length; o < ol; ++ o ) {
 
-				var drawcall = drawcalls[ o ];
+				drawcall = drawcalls[ o ];
 
-				var start = drawcall.start;
-				var count = drawcall.count;
+				start = drawcall.start;
+				count = drawcall.count;
 
-				for ( var i = start, il = start + count; i < il; i += 3 ) {
+				for ( i = start, il = start + count; i < il; i += 3 ) {
 
-					for ( var j = 0; j < 3; j ++ ) {
+					for ( j = 0; j < 3; j ++ ) {
 
 						edge[ 0 ] = indices[ i + j ];
 						edge[ 1 ] = indices[ i + ( j + 1 ) % 3 ];
 						edge.sort( sortFunction );
 
-						var key = edge.toString();
+						key = edge.toString();
 
 						if ( hash[ key ] === undefined ) {
 
@@ -120,14 +134,14 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 			}
 
-			var coords = new Float32Array( numEdges * 2 * 3 );
+			coords = new Float32Array( numEdges * 2 * 3 );
 
-			for ( var i = 0, l = numEdges; i < l; i ++ ) {
+			for ( i = 0, l = numEdges; i < l; i ++ ) {
 
-				for ( var j = 0; j < 2; j ++ ) {
+				for ( j = 0; j < 2; j ++ ) {
 
-					var index = 6 * i + 3 * j;
-					var index2 = edges[ 2 * i + j ];
+					index = 6 * i + 3 * j;
+					index2 = edges[ 2 * i + j ];
 
 					coords[ index + 0 ] = vertices.getX( index2 );
 					coords[ index + 1 ] = vertices.getY( index2 );
@@ -137,30 +151,30 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 			}
 
-			this.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
+			this.addAttribute( "position", new BufferAttribute( coords, 3 ) );
 
 		} else {
 
 			// non-indexed BufferGeometry
 
-			var vertices = geometry.attributes.position.array;
-			var numEdges = vertices.length / 3;
-			var numTris = numEdges / 3;
+			vertices = geometry.attributes.position.array;
+			numEdges = vertices.length / 3;
+			numTris = numEdges / 3;
 
-			var coords = new Float32Array( numEdges * 2 * 3 );
+			coords = new Float32Array( numEdges * 2 * 3 );
 
-			for ( var i = 0, l = numTris; i < l; i ++ ) {
+			for ( i = 0, l = numTris; i < l; i ++ ) {
 
-				for ( var j = 0; j < 3; j ++ ) {
+				for ( j = 0; j < 3; j ++ ) {
 
-					var index = 18 * i + 6 * j;
+					index = 18 * i + 6 * j;
 
-					var index1 = 9 * i + 3 * j;
+					index1 = 9 * i + 3 * j;
 					coords[ index + 0 ] = vertices[ index1 ];
 					coords[ index + 1 ] = vertices[ index1 + 1 ];
 					coords[ index + 2 ] = vertices[ index1 + 2 ];
 
-					var index2 = 9 * i + 3 * ( ( j + 1 ) % 3 );
+					index2 = 9 * i + 3 * ( ( j + 1 ) % 3 );
 					coords[ index + 3 ] = vertices[ index2 ];
 					coords[ index + 4 ] = vertices[ index2 + 1 ];
 					coords[ index + 5 ] = vertices[ index2 + 2 ];
@@ -169,13 +183,13 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 			}
 
-			this.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
+			this.addAttribute( "position", new BufferAttribute( coords, 3 ) );
 
 		}
 
 	}
 
-};
+}
 
-THREE.WireframeGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.WireframeGeometry.prototype.constructor = THREE.WireframeGeometry;
+WireframeGeometry.prototype = Object.create( BufferGeometry.prototype );
+WireframeGeometry.prototype.constructor = WireframeGeometry;

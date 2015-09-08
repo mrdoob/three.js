@@ -2,13 +2,20 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
+module.exports = EdgesGeometry;
 
-	THREE.BufferGeometry.call( this );
+var BufferAttribute = require( "../../core/BufferAttribute" ),
+	BufferGeometry = require( "../../core/BufferGeometry" ),
+	_Math = require( "../../math/Math" ),
+	Geometry = require( "../../core/Geometry" );
+
+function EdgesGeometry( geometry, thresholdAngle ) {
+
+	BufferGeometry.call( this );
 
 	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
 
-	var thresholdDot = Math.cos( THREE.Math.degToRad( thresholdAngle ) );
+	var thresholdDot = Math.cos( _Math.degToRad( thresholdAngle ) );
 
 	var edge = [ 0, 0 ], hash = {};
 	var sortFunction = function ( a, b ) {
@@ -17,13 +24,13 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 	};
 
-	var keys = [ 'a', 'b', 'c' ];
+	var keys = [ "a", "b", "c" ];
 
 	var geometry2;
 
-	if ( geometry instanceof THREE.BufferGeometry ) {
+	if ( geometry instanceof BufferGeometry ) {
 
-		geometry2 = new THREE.Geometry();
+		geometry2 = new Geometry();
 		geometry2.fromBufferGeometry( geometry );
 
 	} else {
@@ -37,18 +44,19 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 	var vertices = geometry2.vertices;
 	var faces = geometry2.faces;
+	var i, j, l, h, face, key, vertex;
 
-	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+	for ( i = 0, l = faces.length; i < l; i ++ ) {
 
-		var face = faces[ i ];
+		face = faces[ i ];
 
-		for ( var j = 0; j < 3; j ++ ) {
+		for ( j = 0; j < 3; j ++ ) {
 
 			edge[ 0 ] = face[ keys[ j ] ];
 			edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
 			edge.sort( sortFunction );
 
-			var key = edge.toString();
+			key = edge.toString();
 
 			if ( hash[ key ] === undefined ) {
 
@@ -66,13 +74,13 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 	var coords = [];
 
-	for ( var key in hash ) {
+	for ( key in hash ) {
 
-		var h = hash[ key ];
+		h = hash[ key ];
 
 		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
 
-			var vertex = vertices[ h.vert1 ];
+			vertex = vertices[ h.vert1 ];
 			coords.push( vertex.x );
 			coords.push( vertex.y );
 			coords.push( vertex.z );
@@ -86,9 +94,9 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 	}
 
-	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( coords ), 3 ) );
+	this.addAttribute( "position", new BufferAttribute( new Float32Array( coords ), 3 ) );
 
-};
+}
 
-THREE.EdgesGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.EdgesGeometry.prototype.constructor = THREE.EdgesGeometry;
+EdgesGeometry.prototype = Object.create( BufferGeometry.prototype );
+EdgesGeometry.prototype.constructor = EdgesGeometry;

@@ -11,11 +11,18 @@
 // phiLength - the radian (0 to 2*PI) range of the lathed section
 //    2*pi is a closed lathe, less than 2PI is a portion.
 
-THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
+module.exports = LatheGeometry;
 
-	THREE.Geometry.call( this );
+var Face3 = require( "../../core/Face3" ),
+	Geometry = require( "../../core/Geometry" ),
+	Vector2 = require( "../../math/Vector2" ),
+	Vector3 = require( "../../math/Vector3" );
 
-	this.type = 'LatheGeometry';
+function LatheGeometry( points, segments, phiStart, phiLength ) {
+
+	Geometry.call( this );
+
+	this.type = "LatheGeometry";
 
 	this.parameters = {
 		points: points,
@@ -31,18 +38,24 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 	var inversePointLength = 1.0 / ( points.length - 1 );
 	var inverseSegments = 1.0 / segments;
 
-	for ( var i = 0, il = segments; i <= il; i ++ ) {
+	var s, i, j, il, jl,
+		phi, pt, vertex,
+		np, base,
+		a, b, c, d,
+		u0, v0, u1, v1;
 
-		var phi = phiStart + i * inverseSegments * phiLength;
+	for ( i = 0, il = segments; i <= il; i ++ ) {
 
-		var c = Math.cos( phi ),
-			s = Math.sin( phi );
+		phi = phiStart + i * inverseSegments * phiLength;
 
-		for ( var j = 0, jl = points.length; j < jl; j ++ ) {
+		c = Math.cos( phi );
+		s = Math.sin( phi );
 
-			var pt = points[ j ];
+		for ( j = 0, jl = points.length; j < jl; j ++ ) {
 
-			var vertex = new THREE.Vector3();
+			pt = points[ j ];
+
+			vertex = new Vector3();
 
 			vertex.x = c * pt.x - s * pt.y;
 			vertex.y = s * pt.x + c * pt.y;
@@ -54,43 +67,42 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 
 	}
 
-	var np = points.length;
+	np = points.length;
 
-	for ( var i = 0, il = segments; i < il; i ++ ) {
+	for ( i = 0, il = segments; i < il; i ++ ) {
 
-		for ( var j = 0, jl = points.length - 1; j < jl; j ++ ) {
+		for ( j = 0, jl = points.length - 1; j < jl; j ++ ) {
 
-			var base = j + np * i;
-			var a = base;
-			var b = base + np;
-			var c = base + 1 + np;
-			var d = base + 1;
+			base = j + np * i;
+			a = base;
+			b = base + np;
+			c = base + 1 + np;
+			d = base + 1;
 
-			var u0 = i * inverseSegments;
-			var v0 = j * inversePointLength;
-			var u1 = u0 + inverseSegments;
-			var v1 = v0 + inversePointLength;
+			u0 = i * inverseSegments;
+			v0 = j * inversePointLength;
+			u1 = u0 + inverseSegments;
+			v1 = v0 + inversePointLength;
 
-			this.faces.push( new THREE.Face3( a, b, d ) );
-
-			this.faceVertexUvs[ 0 ].push( [
-
-				new THREE.Vector2( u0, v0 ),
-				new THREE.Vector2( u1, v0 ),
-				new THREE.Vector2( u0, v1 )
-
-			] );
-
-			this.faces.push( new THREE.Face3( b, c, d ) );
+			this.faces.push( new Face3( a, b, d ) );
 
 			this.faceVertexUvs[ 0 ].push( [
 
-				new THREE.Vector2( u1, v0 ),
-				new THREE.Vector2( u1, v1 ),
-				new THREE.Vector2( u0, v1 )
+				new Vector2( u0, v0 ),
+				new Vector2( u1, v0 ),
+				new Vector2( u0, v1 )
 
 			] );
 
+			this.faces.push( new Face3( b, c, d ) );
+
+			this.faceVertexUvs[ 0 ].push( [
+
+				new Vector2( u1, v0 ),
+				new Vector2( u1, v1 ),
+				new Vector2( u0, v1 )
+
+			] );
 
 		}
 
@@ -100,7 +112,7 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 
-};
+}
 
-THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.LatheGeometry.prototype.constructor = THREE.LatheGeometry;
+LatheGeometry.prototype = Object.create( Geometry.prototype );
+LatheGeometry.prototype.constructor = LatheGeometry;

@@ -30,17 +30,21 @@
 
 	// Complete manner
 
-	var textShapes = THREE.FontUtils.generateShapes( text, options );
+	var textShapes = FontUtils.generateShapes( text, options );
 	var text3d = new ExtrudeGeometry( textShapes, options );
 
 */
 
+module.exports = TextGeometry;
 
-THREE.TextGeometry = function ( text, parameters ) {
+var ExtrudeGeometry = require( "./ExtrudeGeometry" ),
+	FontUtils = require( "../FontUtils" );
+
+function TextGeometry( text, parameters ) {
 
 	parameters = parameters || {};
 
-	var textShapes = THREE.FontUtils.generateShapes( text, parameters );
+	var textShapes = FontUtils.generateShapes( text, parameters );
 
 	// translate parameters to ExtrudeGeometry API
 
@@ -48,15 +52,15 @@ THREE.TextGeometry = function ( text, parameters ) {
 
 	// defaults
 
-	if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
-	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
-	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
+	if ( parameters.bevelThickness === undefined ) { parameters.bevelThickness = 10; }
+	if ( parameters.bevelSize === undefined ) { parameters.bevelSize = 8; }
+	if ( parameters.bevelEnabled === undefined ) { parameters.bevelEnabled = false; }
 
-	THREE.ExtrudeGeometry.call( this, textShapes, parameters );
+	ExtrudeGeometry.call( this, textShapes, parameters );
 
-	this.type = 'TextGeometry';
+	this.type = "TextGeometry";
 
-};
+}
 
-THREE.TextGeometry.prototype = Object.create( THREE.ExtrudeGeometry.prototype );
-THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
+TextGeometry.prototype = Object.create( ExtrudeGeometry.prototype );
+TextGeometry.prototype.constructor = TextGeometry;

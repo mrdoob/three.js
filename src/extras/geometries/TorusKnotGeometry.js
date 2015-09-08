@@ -3,11 +3,18 @@
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3D/src/away3d/primitives/TorusKnot.as?spec=svn2473&r=2473
  */
 
-THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegments, p, q, heightScale ) {
+module.exports = TorusKnotGeometry;
 
-	THREE.Geometry.call( this );
+var Face3 = require( "../../core/Face3" ),
+	Geometry = require( "../../core/Geometry" ),
+	Vector2 = require( "../../math/Vector2" ),
+	Vector3 = require( "../../math/Vector3" );
 
-	this.type = 'TorusKnotGeometry';
+function TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale ) {
+
+	Geometry.call( this );
+
+	this.type = "TorusKnotGeometry";
 
 	this.parameters = {
 		radius: radius,
@@ -28,16 +35,20 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 	heightScale = heightScale || 1;
 
 	var grid = new Array( radialSegments );
-	var tang = new THREE.Vector3();
-	var n = new THREE.Vector3();
-	var bitan = new THREE.Vector3();
+	var tang = new Vector3();
+	var n = new Vector3();
+	var bitan = new Vector3();
+	var i, j, u, p1, p2,
+		v, cx, cy, pos,
+		ip, jp, a, b, c, d,
+		uva, uvb, uvc, uvd;
 
-	for ( var i = 0; i < radialSegments; ++ i ) {
+	for ( i = 0; i < radialSegments; ++ i ) {
 
 		grid[ i ] = new Array( tubularSegments );
-		var u = i / radialSegments * 2 * p * Math.PI;
-		var p1 = getPos( u, q, p, radius, heightScale );
-		var p2 = getPos( u + 0.01, q, p, radius, heightScale );
+		u = i / radialSegments * 2 * p * Math.PI;
+		p1 = getPos( u, q, p, radius, heightScale );
+		p2 = getPos( u + 0.01, q, p, radius, heightScale );
 		tang.subVectors( p2, p1 );
 		n.addVectors( p2, p1 );
 
@@ -46,13 +57,13 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 		bitan.normalize();
 		n.normalize();
 
-		for ( var j = 0; j < tubularSegments; ++ j ) {
+		for ( j = 0; j < tubularSegments; ++ j ) {
 
-			var v = j / tubularSegments * 2 * Math.PI;
-			var cx = - tube * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
-			var cy = tube * Math.sin( v );
+			v = j / tubularSegments * 2 * Math.PI;
+			cx = - tube * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
+			cy = tube * Math.sin( v );
 
-			var pos = new THREE.Vector3();
+			pos = new Vector3();
 			pos.x = p1.x + cx * n.x + cy * bitan.x;
 			pos.y = p1.y + cx * n.y + cy * bitan.y;
 			pos.z = p1.z + cx * n.z + cy * bitan.z;
@@ -63,27 +74,27 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 
 	}
 
-	for ( var i = 0; i < radialSegments; ++ i ) {
+	for ( i = 0; i < radialSegments; ++ i ) {
 
-		for ( var j = 0; j < tubularSegments; ++ j ) {
+		for ( j = 0; j < tubularSegments; ++ j ) {
 
-			var ip = ( i + 1 ) % radialSegments;
-			var jp = ( j + 1 ) % tubularSegments;
+			ip = ( i + 1 ) % radialSegments;
+			jp = ( j + 1 ) % tubularSegments;
 
-			var a = grid[ i ][ j ];
-			var b = grid[ ip ][ j ];
-			var c = grid[ ip ][ jp ];
-			var d = grid[ i ][ jp ];
+			a = grid[ i ][ j ];
+			b = grid[ ip ][ j ];
+			c = grid[ ip ][ jp ];
+			d = grid[ i ][ jp ];
 
-			var uva = new THREE.Vector2( i / radialSegments, j / tubularSegments );
-			var uvb = new THREE.Vector2( ( i + 1 ) / radialSegments, j / tubularSegments );
-			var uvc = new THREE.Vector2( ( i + 1 ) / radialSegments, ( j + 1 ) / tubularSegments );
-			var uvd = new THREE.Vector2( i / radialSegments, ( j + 1 ) / tubularSegments );
+			uva = new Vector2( i / radialSegments, j / tubularSegments );
+			uvb = new Vector2( ( i + 1 ) / radialSegments, j / tubularSegments );
+			uvc = new Vector2( ( i + 1 ) / radialSegments, ( j + 1 ) / tubularSegments );
+			uvd = new Vector2( i / radialSegments, ( j + 1 ) / tubularSegments );
 
-			this.faces.push( new THREE.Face3( a, b, d ) );
+			this.faces.push( new Face3( a, b, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
 
-			this.faces.push( new THREE.Face3( b, c, d ) );
+			this.faces.push( new Face3( b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
@@ -104,18 +115,18 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 		var ty = radius * ( 2 + cs ) * su * 0.5;
 		var tz = heightScale * radius * Math.sin( quOverP ) * 0.5;
 
-		return new THREE.Vector3( tx, ty, tz );
+		return new Vector3( tx, ty, tz );
 
 	}
 
-};
+}
 
-THREE.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.TorusKnotGeometry.prototype.constructor = THREE.TorusKnotGeometry;
+TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
+TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
 
-THREE.TorusKnotGeometry.prototype.clone = function () {
+TorusKnotGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.TorusKnotGeometry(
+	var geometry = new TorusKnotGeometry(
 		this.parameters.radius,
 		this.parameters.tube,
 		this.parameters.radialSegments,
