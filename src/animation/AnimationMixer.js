@@ -113,6 +113,7 @@ THREE.AnimationMixer.prototype = {
 
 		this.actions = [];
 		this.propertyBindings = [];
+		this.propertyBindingNamesToIndex = {};
 
 		return this;
 
@@ -151,6 +152,7 @@ THREE.AnimationMixer.prototype = {
 			}
 		}
 
+		
 		this.propertyBindingIndicesDirty = true;
 
 		return this;

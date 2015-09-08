@@ -51,11 +51,7 @@ THREE.AnimationAction.prototype = {
 		var duration = this.clip.duration;
 
 		this.actionTime = this.actionTime + clipDeltaTime * this.timeScale;
-		console.log( 'actionTime1', this.actionTime );
-		console.log( 'clipDeltaTime', clipDeltaTime );
-		console.log( 'this.timeScale', this.timeScale );
-		console.log( 'duration', duration );
-
+	
 		if( this.loop === THREE.LoopOnce ) {
 
 			this.loopCount = 0;
@@ -99,9 +95,7 @@ THREE.AnimationAction.prototype = {
 
 		this.clipTime = newClipTime;
 
-		console.log( 'actionTime', this.actionTime, 'loopCount', this.loopCount, 'clipTime', this.clipTime );
-
-   		if( this.loopCount !== previousLoopCount ) {
+		if( this.loopCount !== previousLoopCount ) {
 
    			this.mixer.dispatchEvent( { type: 'loop', action: this, loopDelta: ( this.loopCount - this.loopCount ) } );
 
