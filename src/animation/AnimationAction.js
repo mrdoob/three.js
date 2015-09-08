@@ -21,7 +21,7 @@ THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 	this.actionTime = - this.startTime;
 	this.clipTime = 0;
 
-	this.propertyBindingIndices = [];
+	this.propertyBindings = [];
 };
 
 /*

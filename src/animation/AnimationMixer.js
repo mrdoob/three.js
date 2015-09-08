@@ -52,13 +52,14 @@ THREE.AnimationMixer.prototype = {
 			else {
 				propertyBinding = this.propertyBindings[ j ];
 			}
+
+			// push in the same order as the tracks.
+			action.propertyBindings.push( propertyBinding );
 			
 			// track usages of shared property bindings, because if we leave too many around, the mixer can get slow
 			propertyBinding.referenceCount += 1;
 
 		}
-
-		this.propertyBindingIndicesDirty = true;
 
 	},
 
@@ -67,33 +68,6 @@ THREE.AnimationMixer.prototype = {
 		var index = this.propertyBindingNamesToIndex[ rootNode.uuid + '-' + trackName ];
 		return ( index !== undefined ) ? index : -1;
 
-	},
-
-	updatePropertyBindingIndices: function() {
-
-		if( this.propertyBindingIndicesDirty ) {
-
-			for( var i = 0; i < this.actions.length; i++ ) {
-
-				var action = this.actions[i];
-
-				var root = action.localRoot || this.root;
-
-				var propertyBindingIndices = [];
-
-				for( var j = 0; j < action.clip.tracks.length; j ++ ) {
-
-					var trackName = action.clip.tracks[j].name;
-					propertyBindingIndices.push( this.getPropertyBindingIndex( root, trackName ) );
-				
-				}
-
-				action.propertyBindingIndices = propertyBindingIndices;
-			}
-
-			this.propertyBindingIndicesDirty = false;
-
-		}
 	},
 
 	removeAllActions: function() {
@@ -151,9 +125,6 @@ THREE.AnimationMixer.prototype = {
 
 			}
 		}
-
-		
-		this.propertyBindingIndicesDirty = true;
 
 		return this;
 
@@ -241,8 +212,6 @@ THREE.AnimationMixer.prototype = {
 
 	update: function( deltaTime ) {
 
-		this.updatePropertyBindingIndices();
-
 		var mixerDeltaTime = deltaTime * this.timeScale;
 		this.time += mixerDeltaTime;
 
@@ -263,7 +232,7 @@ THREE.AnimationMixer.prototype = {
 
 				var name = action.clip.tracks[j].name;
 
-				this.propertyBindings[ action.propertyBindingIndices[ j ] ].accumulate( actionResults[j], weight );
+				action.propertyBindings[ j ].accumulate( actionResults[j], weight );
 
 			}
 
