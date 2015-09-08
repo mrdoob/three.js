@@ -8597,7 +8597,7 @@ THREE.BufferAttribute.prototype = {
 
 	constructor: THREE.BufferAttribute,
 
-	get length () {
+	get length() {
 
 		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
 		return this.array.length;
@@ -8939,6 +8939,16 @@ THREE.Float32Attribute = function ( array, itemSize ) {
 THREE.Float64Attribute = function ( array, itemSize ) {
 
 	return new THREE.BufferAttribute( new Float64Array( array ), itemSize );
+
+};
+
+
+// Deprecated
+
+THREE.DynamicBufferAttribute = function ( array, itemSize ) {
+
+	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
+	return new THREE.BufferAttribute( array, itemSize ).setDynamic( true );
 
 };
 
@@ -12610,7 +12620,7 @@ THREE.Loader.prototype = {
 			// defaults
 
 			var mtype = 'MeshLambertMaterial';
-			var mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, normalMap: null, bumpMap: null, wireframe: false };
+			var mpars = {};
 
 			// parameters from model file
 
@@ -12703,15 +12713,25 @@ THREE.Loader.prototype = {
 
 			}
 
-			if ( m.colorSpecular ) {
-
-				mpars.specular = rgb2hex( m.colorSpecular );
-
-			}
-
 			if ( m.colorEmissive ) {
 
 				mpars.emissive = rgb2hex( m.colorEmissive );
+
+			}
+
+			if ( mtype === 'MeshPhongMaterial' ) {
+
+				if ( m.colorSpecular ) {
+
+					mpars.specular = rgb2hex( m.colorSpecular );
+
+				}
+
+				if ( m.specularCoef ) {
+
+					mpars.shininess = m.specularCoef;
+
+				}
 
 			}
 
@@ -12730,53 +12750,51 @@ THREE.Loader.prototype = {
 
 			}
 
-			if ( m.specularCoef ) {
-
-				mpars.shininess = m.specularCoef;
-
-			}
-
 			// textures
 
-			if ( m.mapDiffuse && texturePath ) {
+			if ( texturePath ) {
 
-				create_texture( mpars, 'map', m.mapDiffuse, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
+				if ( m.mapDiffuse ) {
 
-			}
+					create_texture( mpars, 'map', m.mapDiffuse, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
 
-			if ( m.mapLight && texturePath ) {
+				}
 
-				create_texture( mpars, 'lightMap', m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
+				if ( m.mapLight ) {
 
-			}
+					create_texture( mpars, 'lightMap', m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
 
-			if ( m.mapAO && texturePath ) {
+				}
 
-				create_texture( mpars, 'aoMap', m.mapAO, m.mapAORepeat, m.mapAOOffset, m.mapAOWrap, m.mapAOAnisotropy );
+				if ( m.mapAO ) {
 
-			}
+					create_texture( mpars, 'aoMap', m.mapAO, m.mapAORepeat, m.mapAOOffset, m.mapAOWrap, m.mapAOAnisotropy );
 
-			if ( m.mapBump && texturePath ) {
+				}
 
-				create_texture( mpars, 'bumpMap', m.mapBump, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy );
+				if ( m.mapBump ) {
 
-			}
+					create_texture( mpars, 'bumpMap', m.mapBump, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy );
 
-			if ( m.mapNormal && texturePath ) {
+				}
 
-				create_texture( mpars, 'normalMap', m.mapNormal, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy );
+				if ( m.mapNormal ) {
 
-			}
+					create_texture( mpars, 'normalMap', m.mapNormal, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy );
 
-			if ( m.mapSpecular && texturePath ) {
+				}
 
-				create_texture( mpars, 'specularMap', m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy );
+				if ( m.mapSpecular ) {
 
-			}
+					create_texture( mpars, 'specularMap', m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy );
 
-			if ( m.mapAlpha && texturePath ) {
+				}
 
-				create_texture( mpars, 'alphaMap', m.mapAlpha, m.mapAlphaRepeat, m.mapAlphaOffset, m.mapAlphaWrap, m.mapAlphaAnisotropy );
+				if ( m.mapAlpha ) {
+
+					create_texture( mpars, 'alphaMap', m.mapAlpha, m.mapAlphaRepeat, m.mapAlphaOffset, m.mapAlphaWrap, m.mapAlphaAnisotropy );
+
+				}
 
 			}
 
@@ -13050,6 +13068,8 @@ THREE.JSONLoader.prototype = {
 
 	constructor: THREE.JSONLoader,
 
+	// Deprecated
+	
 	get statusDomElement () {
 
 		if ( this._statusDomElement === undefined ) {
@@ -14976,6 +14996,27 @@ THREE.Material.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
+
+	},
+
+	// Deprecated
+
+	get wrapAround () {
+
+		console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+
+	},
+
+	set wrapAround ( boolean ) {
+
+		console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+
+	},
+
+	get wrapRGB () {
+
+		console.warn( 'THREE.' + this.type + ': .wrapRGB has been removed.' );
+		return new THREE.Color();
 
 	}
 
