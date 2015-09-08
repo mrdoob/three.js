@@ -22,9 +22,7 @@ THREE.BlendCharacter = function () {
 
 			scope.mixer = new THREE.AnimationMixer( scope );
 
-			// Create the animations
-			console.log( geometry );
-			
+			// Create the animations		
 			for ( var i = 0; i < geometry.clips.length; ++ i ) {
 
 				var animName = geometry.clips[ i ].name;
