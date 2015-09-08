@@ -312,6 +312,44 @@ THREE.ObjectLoader.prototype = {
 
 			};
 
+			var resolveReferences = function ( material, uuidStack ) {
+
+				if ( material.referencedMaterials !== undefined ) {
+
+					for ( var i = 0, l = material.referencedMaterials.length; i < l; i ++ ) {
+
+						var uuid = material.referencedMaterials[ i ];
+
+						if ( uuidStack.indexOf( uuid ) < 0 ) {
+
+							material.materials.push( materials[ uuid ].clone() );
+
+						} else {
+
+							console.error( 'Cyclic material reference detected.' );
+
+						}
+
+					}
+
+					delete material.referencedMaterials;
+
+				}
+
+				if ( material.materials !== undefined ) {
+
+					for ( var i = 0, l = material.materials.length; i < l; i ++ ) {
+
+						var submaterial = material.materials[ i ];
+						var submaterialUuidStack = submaterial.uuid !== undefined ? uuidStack.concat( submaterial.uuid ) : uuidStack;
+						resolveReferences( submaterial, submaterialUuidStack );
+
+					}
+
+				}
+
+			};
+
 			var loader = new THREE.MaterialLoader();
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
@@ -362,7 +400,21 @@ THREE.ObjectLoader.prototype = {
 				if ( data.aoMap !== undefined ) material.aoMap = getTexture( data.aoMap );
 				if ( data.aoMapIntensity !== undefined ) material.aoMapIntensity = data.aoMapIntensity;
 
+				if ( data.emissiveMap !== undefined ) material.emissiveMap = getTexture( data.emissiveMap );
+
+				if ( data.referencedMaterials !== undefined ) material.referencedMaterials = data.referencedMaterials;
+
 				materials[ data.uuid ] = material;
+
+			}
+
+			for ( var key in materials ) {
+
+				if ( materials.hasOwnProperty( key ) ) {
+
+					resolveReferences( materials[ key ], [ key ] );
+
+				}
 
 			}
 
@@ -508,7 +560,7 @@ THREE.ObjectLoader.prototype = {
 
 				case 'Scene':
 
-					object = new THREE.Scene();
+					object = new THREE.Scene( data.fog );
 
 					break;
 
@@ -607,7 +659,17 @@ THREE.ObjectLoader.prototype = {
 			} else {
 
 				if ( data.position !== undefined ) object.position.fromArray( data.position );
-				if ( data.rotation !== undefined ) object.rotation.fromArray( data.rotation );
+
+				if ( data.rotation !== undefined ) {
+
+					object.rotation.fromArray( data.rotation );
+
+				} else if ( data.quaternion !== undefined ) {
+
+					object.quaternion.fromArray( data.quaternion );
+
+				}
+
 				if ( data.scale !== undefined ) object.scale.fromArray( data.scale );
 
 			}

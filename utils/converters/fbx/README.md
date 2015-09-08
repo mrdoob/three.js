@@ -12,16 +12,31 @@ Utility for converting model files to the Three.js JSON format
 ## Usage 
 
 ```
-convert_to_threejs.py [source_file] [output_file] [options]
+convert_to_threejs.py [source_file.fbx] [output_file.js] [options]
 
 Options:
-  -t, --triangulate       force non-triangle geometry into triangles
-  -x, --ignore-textures   don't include texture references in output file
-  -u, --force-prefix      prefix all object names in output file to ensure uniqueness
-  -f, --flatten-scene     merge all geometries and apply node transforms
-  -c, --add-camera        include default camera in output scene
-  -l, --add-light         include default light in output scene
-  -p, --pretty-print      prefix all object names in output file
+  -h, --help            show this help message and exit
+  -t, --triangulate     force quad geometry into triangles
+  -x, --ignore-textures
+                        don't include texture references in output file
+  -n, --no-texture-copy
+                        don't copy texture files
+  -i, --ignore-texture-collisions
+                        Allow copied textures with the same filename to
+                        overwrite each other
+  -o DIR, --texture-output-dir=DIR
+                        write copied textures to specified directory (relative
+                        to the output .js file)
+  -a, --no-transparency-detection
+                        don't automatically enable transparency for materials
+                        with diffuse maps containing alpha
+  -u, --force-prefix    prefix all object names in output file to ensure
+                        uniqueness
+  -f, --flatten-scene   merge all geometries and apply node transforms
+  -y, --force-y-up      ensure that the y axis shows up
+  -c, --add-camera      include default camera in output scene
+  -l, --add-light       include default light in output scene
+  -p, --pretty-print    nicely format the output JSON
 ```
 
 ## Current Limitations
@@ -31,7 +46,6 @@ Options:
 * Some camera properties are not converted correctly
 * Some light properties are not converted correctly
 * Some material properties are not converted correctly
-* Textures must be put in asset's folder, and use relative path in the material
 
 ## Dependencies
 
