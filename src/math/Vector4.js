@@ -6,18 +6,20 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.Vector4 = function ( x, y, z, w ) {
+module.exports = Vector4;
+
+function Vector4( x, y, z, w ) {
 
 	this.x = x || 0;
 	this.y = y || 0;
 	this.z = z || 0;
 	this.w = ( w !== undefined ) ? w : 1;
 
-};
+}
 
-THREE.Vector4.prototype = {
+Vector4.prototype = {
 
-	constructor: THREE.Vector4,
+	constructor: Vector4,
 
 	set: function ( x, y, z, w ) {
 
@@ -70,7 +72,7 @@ THREE.Vector4.prototype = {
 			case 1: this.y = value; break;
 			case 2: this.z = value; break;
 			case 3: this.w = value; break;
-			default: throw new Error( 'index is out of range: ' + index );
+			default: throw new Error( "index is out of range: " + index );
 
 		}
 
@@ -84,7 +86,7 @@ THREE.Vector4.prototype = {
 			case 1: return this.y;
 			case 2: return this.z;
 			case 3: return this.w;
-			default: throw new Error( 'index is out of range: ' + index );
+			default: throw new Error( "index is out of range: " + index );
 
 		}
 
@@ -111,7 +113,7 @@ THREE.Vector4.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'THREE.Vector4: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( "Vector4: .add() now only accepts one argument. Use .addVectors( a, b ) instead." );
 			return this.addVectors( v, w );
 
 		}
@@ -162,7 +164,7 @@ THREE.Vector4.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'THREE.Vector4: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( "Vector4: .sub() now only accepts one argument. Use .subVectors( a, b ) instead." );
 			return this.subVectors( v, w );
 
 		}
@@ -285,9 +287,9 @@ THREE.Vector4.prototype = {
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
-		var angle, x, y, z,		// variables for result
-			epsilon = 0.01,		// margin to allow for rounding errors
-			epsilon2 = 0.1,		// margin to distinguish between 0 and 180 degrees
+		var angle, x, y, z, // variables for result
+			epsilon = 0.01, // margin to allow for rounding errors
+			epsilon2 = 0.1, // margin to distinguish between 0 and 180 degrees
 
 			te = m.elements,
 
@@ -295,18 +297,18 @@ THREE.Vector4.prototype = {
 			m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ],
 			m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ];
 
-		if ( ( Math.abs( m12 - m21 ) < epsilon )
-		   && ( Math.abs( m13 - m31 ) < epsilon )
-		   && ( Math.abs( m23 - m32 ) < epsilon ) ) {
+		if ( ( Math.abs( m12 - m21 ) < epsilon ) &&
+		   ( Math.abs( m13 - m31 ) < epsilon ) &&
+		   ( Math.abs( m23 - m32 ) < epsilon ) ) {
 
 			// singularity found
 			// first check for identity matrix which must have +1 for all terms
 			// in leading diagonal and zero in other terms
 
-			if ( ( Math.abs( m12 + m21 ) < epsilon2 )
-			   && ( Math.abs( m13 + m31 ) < epsilon2 )
-			   && ( Math.abs( m23 + m32 ) < epsilon2 )
-			   && ( Math.abs( m11 + m22 + m33 - 3 ) < epsilon2 ) ) {
+			if ( ( Math.abs( m12 + m21 ) < epsilon2 ) &&
+			   ( Math.abs( m13 + m31 ) < epsilon2 ) &&
+			   ( Math.abs( m23 + m32 ) < epsilon2 ) &&
+			   ( Math.abs( m11 + m22 + m33 - 3 ) < epsilon2 ) ) {
 
 				// this singularity is identity matrix so angle = 0
 
@@ -391,11 +393,11 @@ THREE.Vector4.prototype = {
 
 		// as we have reached here there are no singularities so we can handle normally
 
-		var s = Math.sqrt( ( m32 - m23 ) * ( m32 - m23 )
-						  + ( m13 - m31 ) * ( m13 - m31 )
-						  + ( m21 - m12 ) * ( m21 - m12 ) ); // used to normalize
+		var s = Math.sqrt( ( m32 - m23 ) * ( m32 - m23 ) +
+			( m13 - m31 ) * ( m13 - m31 ) +
+			( m21 - m12 ) * ( m21 - m12 ) ); // used to normalize
 
-		if ( Math.abs( s ) < 0.001 ) s = 1;
+		if ( Math.abs( s ) < 0.001 ) { s = 1; }
 
 		// prevent divide by zero, should not happen if matrix is orthogonal and should be
 		// caught by singularity test above, but I've left it in just in case
@@ -517,7 +519,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	clampScalar: function () {
+	clampScalar: ( function () {
 
 		var min, max;
 
@@ -525,8 +527,8 @@ THREE.Vector4.prototype = {
 
 			if ( min === undefined ) {
 
-				min = new THREE.Vector4();
-				max = new THREE.Vector4();
+				min = new Vector4();
+				max = new Vector4();
 
 			}
 
@@ -537,7 +539,7 @@ THREE.Vector4.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	floor: function () {
 
@@ -665,7 +667,7 @@ THREE.Vector4.prototype = {
 
 	fromArray: function ( array, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) { offset = 0; }
 
 		this.x = array[ offset ];
 		this.y = array[ offset + 1 ];
@@ -678,8 +680,8 @@ THREE.Vector4.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+		if ( array === undefined ) { array = []; }
+		if ( offset === undefined ) { offset = 0; }
 
 		array[ offset ] = this.x;
 		array[ offset + 1 ] = this.y;
@@ -692,7 +694,7 @@ THREE.Vector4.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) { offset = 0; }
 
 		index = index * attribute.itemSize + offset;
 

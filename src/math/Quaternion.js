@@ -5,18 +5,23 @@
  * @author bhouston / http://exocortex.com
  */
 
-THREE.Quaternion = function ( x, y, z, w ) {
+module.exports = Quaternion;
+
+var Euler = require( "./Euler" ),
+	Vector3 = require( "./Vector3" );
+
+function Quaternion( x, y, z, w ) {
 
 	this._x = x || 0;
 	this._y = y || 0;
 	this._z = z || 0;
 	this._w = ( w !== undefined ) ? w : 1;
 
-};
+}
 
-THREE.Quaternion.prototype = {
+Quaternion.prototype = {
 
-	constructor: THREE.Quaternion,
+	constructor: Quaternion,
 
 	get x () {
 
@@ -104,9 +109,9 @@ THREE.Quaternion.prototype = {
 
 	setFromEuler: function ( euler, update ) {
 
-		if ( euler instanceof THREE.Euler === false ) {
+		if ( euler instanceof Euler === false ) {
 
-			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
+			throw new Error( "Quaternion: .setFromEuler() now expects a Euler rotation rather than a Vector3 and order." );
 
 		}
 
@@ -123,42 +128,42 @@ THREE.Quaternion.prototype = {
 
 		var order = euler.order;
 
-		if ( order === 'XYZ' ) {
+		if ( order === "XYZ" ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
 			this._z = c1 * c2 * s3 + s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( order === 'YXZ' ) {
+		} else if ( order === "YXZ" ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( order === 'ZXY' ) {
+		} else if ( order === "ZXY" ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 + s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( order === 'ZYX' ) {
+		} else if ( order === "ZYX" ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( order === 'YZX' ) {
+		} else if ( order === "YZX" ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( order === 'XZY' ) {
+		} else if ( order === "XZY" ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
@@ -167,7 +172,7 @@ THREE.Quaternion.prototype = {
 
 		}
 
-		if ( update !== false ) this.onChangeCallback();
+		if ( update !== false ) { this.onChangeCallback(); }
 
 		return this;
 
@@ -251,7 +256,7 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	setFromUnitVectors: function () {
+	setFromUnitVectors: ( function () {
 
 		// http://lolengine.net/blog/2014/02/24/quaternion-from-two-vectors-final
 
@@ -263,7 +268,7 @@ THREE.Quaternion.prototype = {
 
 		return function ( vFrom, vTo ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) { v1 = new Vector3(); }
 
 			r = vFrom.dot( vTo ) + 1;
 
@@ -296,9 +301,9 @@ THREE.Quaternion.prototype = {
 
 			return this;
 
-		}
+		};
 
-	}(),
+	}() ),
 
 	inverse: function () {
 
@@ -370,7 +375,7 @@ THREE.Quaternion.prototype = {
 
 		if ( p !== undefined ) {
 
-			console.warn( 'THREE.Quaternion: .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
+			console.warn( "Quaternion: .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead." );
 			return this.multiplyQuaternions( q, p );
 
 		}
@@ -399,15 +404,15 @@ THREE.Quaternion.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
+		console.warn( "Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead." );
 		return vector.applyQuaternion( this );
 
 	},
 
 	slerp: function ( qb, t ) {
 
-		if ( t === 0 ) return this;
-		if ( t === 1 ) return this.copy( qb );
+		if ( t === 0 ) { return this; }
+		if ( t === 1 ) { return this.copy( qb ); }
 
 		var x = this._x, y = this._y, z = this._z, w = this._w;
 
@@ -477,7 +482,7 @@ THREE.Quaternion.prototype = {
 
 	fromArray: function ( array, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) { offset = 0; }
 
 		this._x = array[ offset ];
 		this._y = array[ offset + 1 ];
@@ -492,8 +497,8 @@ THREE.Quaternion.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+		if ( array === undefined ) { array = []; }
+		if ( offset === undefined ) { offset = 0; }
 
 		array[ offset ] = this._x;
 		array[ offset + 1 ] = this._y;
@@ -516,7 +521,7 @@ THREE.Quaternion.prototype = {
 
 };
 
-THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
+Quaternion.slerp = function ( qa, qb, qm, t ) {
 
 	return qm.copy( qa ).slerp( qb, t );
 

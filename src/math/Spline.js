@@ -6,7 +6,11 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Spline = function ( points ) {
+module.exports = Spline;
+
+var Vector3 = require( "./Vector3" );
+
+function Spline( points ) {
 
 	this.points = points;
 
@@ -34,8 +38,8 @@ THREE.Spline = function ( points ) {
 
 		c[ 0 ] = intPoint === 0 ? intPoint : intPoint - 1;
 		c[ 1 ] = intPoint;
-		c[ 2 ] = intPoint  > this.points.length - 2 ? this.points.length - 1 : intPoint + 1;
-		c[ 3 ] = intPoint  > this.points.length - 3 ? this.points.length - 1 : intPoint + 2;
+		c[ 2 ] = intPoint > this.points.length - 2 ? this.points.length - 1 : intPoint + 1;
+		c[ 3 ] = intPoint > this.points.length - 3 ? this.points.length - 1 : intPoint + 2;
 
 		pa = this.points[ c[ 0 ] ];
 		pb = this.points[ c[ 1 ] ];
@@ -75,8 +79,8 @@ THREE.Spline = function ( points ) {
 
 		var i, index, nSamples, position,
 			point = 0, intPoint = 0, oldIntPoint = 0,
-			oldPosition = new THREE.Vector3(),
-			tmpVec = new THREE.Vector3(),
+			oldPosition = new Vector3(),
+			tmpVec = new Vector3(),
 			chunkLengths = [],
 			totalLength = 0;
 
@@ -84,7 +88,7 @@ THREE.Spline = function ( points ) {
 
 		chunkLengths[ 0 ] = 0;
 
-		if ( ! nSubDivisions ) nSubDivisions = 100;
+		if ( ! nSubDivisions ) { nSubDivisions = 100; }
 
 		nSamples = this.points.length * nSubDivisions;
 
@@ -128,7 +132,7 @@ THREE.Spline = function ( points ) {
 			realDistance,
 			sampling, position,
 			newpoints = [],
-			tmpVec = new THREE.Vector3(),
+			tmpVec = new Vector3(),
 			sl = this.getLength();
 
 		newpoints.push( tmpVec.copy( this.points[ 0 ] ).clone() );
@@ -173,4 +177,4 @@ THREE.Spline = function ( points ) {
 
 	}
 
-};
+}

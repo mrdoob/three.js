@@ -2,16 +2,21 @@
  * @author bhouston / http://exocortex.com
  */
 
-THREE.Line3 = function ( start, end ) {
+module.exports = Line3;
 
-	this.start = ( start !== undefined ) ? start : new THREE.Vector3();
-	this.end = ( end !== undefined ) ? end : new THREE.Vector3();
+var _Math = require( "./Math" ),
+	Vector3 = require( "./Vector3" );
 
-};
+function Line3( start, end ) {
 
-THREE.Line3.prototype = {
+	this.start = ( start !== undefined ) ? start : new Vector3();
+	this.end = ( end !== undefined ) ? end : new Vector3();
 
-	constructor: THREE.Line3,
+}
+
+Line3.prototype = {
+
+	constructor: Line3,
 
 	set: function ( start, end ) {
 
@@ -39,14 +44,14 @@ THREE.Line3.prototype = {
 
 	center: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 		return result.addVectors( this.start, this.end ).multiplyScalar( 0.5 );
 
 	},
 
 	delta: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 		return result.subVectors( this.end, this.start );
 
 	},
@@ -65,16 +70,16 @@ THREE.Line3.prototype = {
 
 	at: function ( t, optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 
 		return this.delta( result ).multiplyScalar( t ).add( this.start );
 
 	},
 
-	closestPointToPointParameter: function () {
+	closestPointToPointParameter: ( function () {
 
-		var startP = new THREE.Vector3();
-		var startEnd = new THREE.Vector3();
+		var startP = new Vector3();
+		var startEnd = new Vector3();
 
 		return function ( point, clampToLine ) {
 
@@ -88,7 +93,7 @@ THREE.Line3.prototype = {
 
 			if ( clampToLine ) {
 
-				t = THREE.Math.clamp( t, 0, 1 );
+				t = _Math.clamp( t, 0, 1 );
 
 			}
 
@@ -96,13 +101,13 @@ THREE.Line3.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	closestPointToPoint: function ( point, clampToLine, optionalTarget ) {
 
 		var t = this.closestPointToPointParameter( point, clampToLine );
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 
 		return this.delta( result ).multiplyScalar( t ).add( this.start );
 

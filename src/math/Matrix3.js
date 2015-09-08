@@ -4,7 +4,11 @@
  * @author bhouston / http://exocortex.com
  */
 
-THREE.Matrix3 = function () {
+module.exports = Matrix3;
+
+var Vector3 = require( "./Vector3" );
+
+function Matrix3() {
 
 	this.elements = new Float32Array( [
 
@@ -16,15 +20,15 @@ THREE.Matrix3 = function () {
 
 	if ( arguments.length > 0 ) {
 
-		console.error( 'THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.' );
+		console.error( "Matrix3: the constructor no longer reads arguments. use .set() instead." );
 
 	}
 
-};
+}
 
-THREE.Matrix3.prototype = {
+Matrix3.prototype = {
 
-	constructor: THREE.Matrix3,
+	constructor: Matrix3,
 
 	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
@@ -41,11 +45,9 @@ THREE.Matrix3.prototype = {
 	identity: function () {
 
 		this.set(
-
 			1, 0, 0,
 			0, 1, 0,
 			0, 0, 1
-
 		);
 
 		return this;
@@ -63,11 +65,9 @@ THREE.Matrix3.prototype = {
 		var me = m.elements;
 
 		this.set(
-
 			me[ 0 ], me[ 3 ], me[ 6 ],
 			me[ 1 ], me[ 4 ], me[ 7 ],
 			me[ 2 ], me[ 5 ], me[ 8 ]
-
 		);
 
 		return this;
@@ -76,27 +76,27 @@ THREE.Matrix3.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'THREE.Matrix3: .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.' );
+		console.warn( "Matrix3: .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead." );
 		return vector.applyMatrix3( this );
 
 	},
 
 	multiplyVector3Array: function ( a ) {
 
-		console.warn( 'THREE.Matrix3: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
+		console.warn( "Matrix3: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead." );
 		return this.applyToVector3Array( a );
 
 	},
 
-	applyToVector3Array: function () {
+	applyToVector3Array: ( function () {
 
 		var v1;
 
 		return function ( array, offset, length ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
-			if ( offset === undefined ) offset = 0;
-			if ( length === undefined ) length = array.length;
+			if ( v1 === undefined ) { v1 = new Vector3(); }
+			if ( offset === undefined ) { offset = 0; }
+			if ( length === undefined ) { length = array.length; }
 
 			for ( var i = 0, j = offset; i < length; i += 3, j += 3 ) {
 
@@ -110,17 +110,17 @@ THREE.Matrix3.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
-	applyToBuffer: function () {
+	applyToBuffer: ( function () {
 
 		var v1;
 
 		return function applyToBuffer( buffer, offset, length ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
-			if ( offset === undefined ) offset = 0;
-			if ( length === undefined ) length = buffer.length / buffer.itemSize;
+			if ( v1 === undefined ) { v1 = new Vector3(); }
+			if ( offset === undefined ) { offset = 0; }
+			if ( length === undefined ) { length = buffer.length / buffer.itemSize; }
 
 			for ( var i = 0, j = offset; i < length; i ++, j ++ ) {
 
@@ -138,7 +138,7 @@ THREE.Matrix3.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	multiplyScalar: function ( s ) {
 
@@ -174,13 +174,13 @@ THREE.Matrix3.prototype = {
 
 		te[ 0 ] =   me[ 10 ] * me[ 5 ] - me[ 6 ] * me[ 9 ];
 		te[ 1 ] = - me[ 10 ] * me[ 1 ] + me[ 2 ] * me[ 9 ];
-		te[ 2 ] =   me[ 6 ] * me[ 1 ] - me[ 2 ] * me[ 5 ];
+		te[ 2 ] =   me[ 6 ]  * me[ 1 ] - me[ 2 ] * me[ 5 ];
 		te[ 3 ] = - me[ 10 ] * me[ 4 ] + me[ 6 ] * me[ 8 ];
 		te[ 4 ] =   me[ 10 ] * me[ 0 ] - me[ 2 ] * me[ 8 ];
-		te[ 5 ] = - me[ 6 ] * me[ 0 ] + me[ 2 ] * me[ 4 ];
-		te[ 6 ] =   me[ 9 ] * me[ 4 ] - me[ 5 ] * me[ 8 ];
-		te[ 7 ] = - me[ 9 ] * me[ 0 ] + me[ 1 ] * me[ 8 ];
-		te[ 8 ] =   me[ 5 ] * me[ 0 ] - me[ 1 ] * me[ 4 ];
+		te[ 5 ] = - me[ 6 ]  * me[ 0 ] + me[ 2 ] * me[ 4 ];
+		te[ 6 ] =   me[ 9 ]  * me[ 4 ] - me[ 5 ] * me[ 8 ];
+		te[ 7 ] = - me[ 9 ]  * me[ 0 ] + me[ 1 ] * me[ 8 ];
+		te[ 8 ] =   me[ 5 ]  * me[ 0 ] - me[ 1 ] * me[ 4 ];
 
 		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 3 ] + me[ 2 ] * te[ 6 ];
 
@@ -246,7 +246,7 @@ THREE.Matrix3.prototype = {
 
 	getNormalMatrix: function ( m ) {
 
-		// input: THREE.Matrix4
+		// input: Matrix4
 
 		this.getInverse( m ).transpose();
 

@@ -3,13 +3,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Math = {
+module.exports = {
 
-	generateUUID: function () {
+	generateUUID: ( function () {
 
 		// http://www.broofa.com/Tools/Math.uuid.htm
 
-		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split( '' );
+		var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split( "" );
 		var uuid = new Array( 36 );
 		var rnd = 0, r;
 
@@ -19,15 +19,15 @@ THREE.Math = {
 
 				if ( i === 8 || i === 13 || i === 18 || i === 23 ) {
 
-					uuid[ i ] = '-';
+					uuid[ i ] = "-";
 
 				} else if ( i === 14 ) {
 
-					uuid[ i ] = '4';
+					uuid[ i ] = "4";
 
 				} else {
 
-					if ( rnd <= 0x02 ) rnd = 0x2000000 + ( Math.random() * 0x1000000 ) | 0;
+					if ( rnd <= 0x02 ) { rnd = 0x2000000 + ( Math.random() * 0x1000000 ) | 0; }
 					r = rnd & 0xf;
 					rnd = rnd >> 4;
 					uuid[ i ] = chars[ ( i === 19 ) ? ( r & 0x3 ) | 0x8 : r ];
@@ -36,11 +36,11 @@ THREE.Math = {
 
 			}
 
-			return uuid.join( '' );
+			return uuid.join( "" );
 
 		};
 
-	}(),
+	}() ),
 
 	// Clamp value to range <a, b>
 
@@ -79,8 +79,8 @@ THREE.Math = {
 
 	smoothstep: function ( x, min, max ) {
 
-		if ( x <= min ) return 0;
-		if ( x >= max ) return 1;
+		if ( x <= min ) { return 0; }
+		if ( x >= max ) { return 1; }
 
 		x = ( x - min ) / ( max - min );
 
@@ -90,8 +90,8 @@ THREE.Math = {
 
 	smootherstep: function ( x, min, max ) {
 
-		if ( x <= min ) return 0;
-		if ( x >= max ) return 1;
+		if ( x <= min ) { return 0; }
+		if ( x >= max ) { return 1; }
 
 		x = ( x - min ) / ( max - min );
 
@@ -132,7 +132,7 @@ THREE.Math = {
 
 	},
 
-	degToRad: function () {
+	degToRad: ( function () {
 
 		var degreeToRadiansFactor = Math.PI / 180;
 
@@ -142,9 +142,9 @@ THREE.Math = {
 
 		};
 
-	}(),
+	}() ),
 
-	radToDeg: function () {
+	radToDeg: ( function () {
 
 		var radianToDegreesFactor = 180 / Math.PI;
 
@@ -154,7 +154,7 @@ THREE.Math = {
 
 		};
 
-	}(),
+	}() ),
 
 	isPowerOfTwo: function ( value ) {
 

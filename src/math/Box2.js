@@ -2,16 +2,20 @@
  * @author bhouston / http://exocortex.com
  */
 
-THREE.Box2 = function ( min, max ) {
+module.exports = Box2;
 
-	this.min = ( min !== undefined ) ? min : new THREE.Vector2( Infinity, Infinity );
-	this.max = ( max !== undefined ) ? max : new THREE.Vector2( - Infinity, - Infinity );
+var Vector2 = require( "./Vector2" );
 
-};
+function Box2( min, max ) {
 
-THREE.Box2.prototype = {
+	this.min = ( min !== undefined ) ? min : new Vector2( Infinity, Infinity );
+	this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
 
-	constructor: THREE.Box2,
+}
+
+Box2.prototype = {
+
+	constructor: Box2,
 
 	set: function ( min, max ) {
 
@@ -28,7 +32,7 @@ THREE.Box2.prototype = {
 
 		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-			this.expandByPoint( points[ i ] )
+			this.expandByPoint( points[ i ] );
 
 		}
 
@@ -36,9 +40,9 @@ THREE.Box2.prototype = {
 
 	},
 
-	setFromCenterAndSize: function () {
+	setFromCenterAndSize: ( function () {
 
-		var v1 = new THREE.Vector2();
+		var v1 = new Vector2();
 
 		return function ( center, size ) {
 
@@ -50,7 +54,7 @@ THREE.Box2.prototype = {
 
 		};
 
-	}(),
+	}() ),
 	
 	clone: function () {
 
@@ -86,14 +90,14 @@ THREE.Box2.prototype = {
 
 	center: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector2();
+		var result = optionalTarget || new Vector2();
 		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
 	size: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector2();
+		var result = optionalTarget || new Vector2();
 		return result.subVectors( this.max, this.min );
 
 	},
@@ -156,7 +160,7 @@ THREE.Box2.prototype = {
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		var result = optionalTarget || new THREE.Vector2();
+		var result = optionalTarget || new Vector2();
 
 		return result.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
@@ -182,14 +186,14 @@ THREE.Box2.prototype = {
 
 	clampPoint: function ( point, optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector2();
+		var result = optionalTarget || new Vector2();
 		return result.copy( point ).clamp( this.min, this.max );
 
 	},
 
-	distanceToPoint: function () {
+	distanceToPoint: ( function () {
 
-		var v1 = new THREE.Vector2();
+		var v1 = new Vector2();
 
 		return function ( point ) {
 
@@ -198,7 +202,7 @@ THREE.Box2.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	intersect: function ( box ) {
 
