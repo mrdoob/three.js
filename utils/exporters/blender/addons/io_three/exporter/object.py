@@ -109,7 +109,7 @@ class Object(base_classes.BaseNode):
 
         lights = (constants.AMBIENT_LIGHT,
                   constants.DIRECTIONAL_LIGHT,
-                  constants.AREA_LIGHT, constants.POINT_LIGHT,
+                  constants.POINT_LIGHT,
                   constants.SPOT_LIGHT, constants.HEMISPHERE_LIGHT)
 
         if self[constants.TYPE] == constants.MESH:
