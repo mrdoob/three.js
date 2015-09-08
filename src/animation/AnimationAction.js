@@ -49,14 +49,14 @@ THREE.AnimationAction.prototype = {
    		var previousActionTime = this.actionTime;
 
 		var duration = this.clip.duration;
-
-		this.actionTime = this.actionTime + clipDeltaTime * this.timeScale;
+	
+		this.actionTime = this.actionTime + clipDeltaTime;
 	
 		if( this.loop === THREE.LoopOnce ) {
 
 			this.loopCount = 0;
 			this.clipTime = Math.min( Math.max( this.actionTime, 0 ), duration );
-
+	
 			// if time is changed since last time, see if we have hit a start/end limit
 			if( this.clipTime !== previousClipTime ) {
 
@@ -79,9 +79,10 @@ THREE.AnimationAction.prototype = {
 		}
 		
 		this.loopCount = Math.floor( this.actionTime / duration );
+	
 		var newClipTime = this.actionTime - this.loopCount * duration;
 		newClipTime = newClipTime % duration;
-
+	
 		// if we are ping pong looping, ensure that we go backwards when appropriate
 		if( this.loop == THREE.LoopPingPong ) {
 
