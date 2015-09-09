@@ -12,10 +12,11 @@ var BufferGeometryLoader = require( "./BufferGeometryLoader" ),
 	MaterialLoader = require( "./MaterialLoader" ),
 	XHRLoader = require( "./XHRLoader" ),
 
+	Constants = require( "../Constants" ),
+
 	OrthographicCamera = require( "../cameras/OrthographicCamera" ),
 	PerspectiveCamera = require( "../cameras/PerspectiveCamera" ),
 
-	Constants = require( "../Constants" ),
 	Object3D = require( "../core/Object3D" ),
 
 	BoxGeometry = require( "../extras/geometries/BoxGeometry" ),
@@ -642,8 +643,8 @@ ObjectLoader.prototype = {
 
 				for ( l = 0; l < levels.length; l ++ ) {
 
-					 level = levels[ l ];
-					 child = object.getObjectByProperty( "uuid", level.object );
+					level = levels[ l ];
+					child = object.getObjectByProperty( "uuid", level.object );
 
 					if ( child !== undefined ) {
 

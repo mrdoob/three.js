@@ -1,13 +1,6 @@
 /**
- * Defines a 2d shape plane using paths.
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
-
-// STEP 1 Create a path.
-// STEP 2 Turn path into shape.
-// STEP 3 ExtrudeGeometry takes in Shape/Shapes
-// STEP 3a - Extract points from each shape, turn to vertices
-// STEP 3b - Triangulate each shape, add faces.
 
 module.exports = {};
 

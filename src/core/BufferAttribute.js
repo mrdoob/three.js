@@ -379,12 +379,11 @@ BufferAttribute.Float64Attribute = function ( array, itemSize ) {
 
 };
 
-
 // Deprecated
 
-THREE.DynamicBufferAttribute = function ( array, itemSize ) {
+BufferAttribute.DynamicBufferAttribute = function ( array, itemSize ) {
 
-	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
-	return new THREE.BufferAttribute( array, itemSize ).setDynamic( true );
+	console.warn( "DynamicBufferAttribute has been removed. Use new BufferAttribute().setDynamic( true ) instead." );
+	return new BufferAttribute( array, itemSize ).setDynamic( true );
 
 };

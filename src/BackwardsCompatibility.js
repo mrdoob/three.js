@@ -3,108 +3,108 @@
  * @author vanruesc
  */
 
-// using lowercase here lets uglify mangle more
-module.exports = function ( three ) {
+module.exports = function ( API ) {
 
 	// Core
-	three.Int8Attribute = three.BufferAttribute.Int8Attribute;
-	three.Uint8Attribute = three.BufferAttribute.Uint8Attribute;
-	three.Uint8ClampedAttribute = three.BufferAttribute.Uint8ClampedAttribute;
-	three.Int16Attribute = three.BufferAttribute.Int16Attribute;
-	three.Uint16Attribute = three.BufferAttribute.Uint16Attribute;
-	three.Int32Attribute = three.BufferAttribute.Int32Attribute;
-	three.Uint32Attribute = three.BufferAttribute.Uint32Attribute;
-	three.Float32Attribute = three.BufferAttribute.Float32Attribute;
-	three.Float64Attribute = three.BufferAttribute.Float64Attribute;
+	API.Int8Attribute = API.BufferAttribute.Int8Attribute;
+	API.Uint8Attribute = API.BufferAttribute.Uint8Attribute;
+	API.Uint8ClampedAttribute = API.BufferAttribute.Uint8ClampedAttribute;
+	API.Int16Attribute = API.BufferAttribute.Int16Attribute;
+	API.Uint16Attribute = API.BufferAttribute.Uint16Attribute;
+	API.Int32Attribute = API.BufferAttribute.Int32Attribute;
+	API.Uint32Attribute = API.BufferAttribute.Uint32Attribute;
+	API.Float32Attribute = API.BufferAttribute.Float32Attribute;
+	API.Float64Attribute = API.BufferAttribute.Float64Attribute;
+	API.DynamicBufferAttribute = API.BufferAttribute.DynamicBufferAttribute;
 
-	Object.defineProperties( three, {
+	Object.defineProperties( API, {
 		Object3DIdCount: {
 			get: function () {
 
-				return three.Object3D.IdCount;
+				return API.Object3D.IdCount;
 
 			},
 			set: function ( count ) {
 
-				three.Object3D.IdCount = count;
+				API.Object3D.IdCount = count;
 
 			}
 		},
 		GeometryIdCount: {
 			get: function () {
 
-				return three.Geometry.IdCount;
+				return API.Geometry.IdCount;
 
 			},
 			set: function ( count ) {
 
-				three.Geometry.IdCount = count;
+				API.Geometry.IdCount = count;
 
 			}
 		}
 	} );
 
 	// Extras
-	three.typeface_js = three.FontUtils.typeface_js;
+	API.typeface_js = API.FontUtils.typeface_js;
 
 	// Extras > Core
-	three.Shape.Utils = three.ShapeUtils;
+	API.Shape.Utils = API.ShapeUtils;
 
 	// Extras > Geometries
-	three.CubeGeometry = three.BoxGeometry;
+	API.CubeGeometry = API.BoxGeometry;
 
 	// Extras > Core
-	three.PathActions = three.Path.Actions;
+	API.PathActions = API.Path.Actions;
 
 	// Loaders
-	three.DataTextureLoader = three.BinaryTextureLoader;
-	three.DefaultLoadingManager = three.LoadingManager.DefaultLoadingManager;
+	API.DataTextureLoader = API.BinaryTextureLoader;
+	API.DefaultLoadingManager = API.LoadingManager.DefaultLoadingManager;
 
 	// Math
-	three.ColorKeywords = three.Color.Keywords;
+	API.ColorKeywords = API.Color.Keywords;
 
 	// Materials
-	three.MeshFaceMaterial = three.MultiMaterial;
-	three.ParticleBasicMaterial = three.PointCloudMaterial.ParticleBasicMaterial;
-	three.ParticleSystemMaterial = three.PointCloudMaterial.ParticleSystemMaterial;
+	API.MeshFaceMaterial = API.MultiMaterial;
+	API.ParticleBasicMaterial = API.PointCloudMaterial.ParticleBasicMaterial;
+	API.ParticleSystemMaterial = API.PointCloudMaterial.ParticleSystemMaterial;
 
-	Object.defineProperties( three, {
+	Object.defineProperties( API, {
 		MaterialIdCount: {
 			get: function () {
 
-				return three.Material.IdCount;
+				return API.Material.IdCount;
 
 			},
 			set: function ( count ) {
 
-				three.Material.IdCount = count;
+				API.Material.IdCount = count;
 
 			}
 		}
 	} );
 
 	// Objects
-	three.Particle = three.Sprite;
-	three.ParticleSystem = three.PointCloud.ParticleSystem;
+	API.Particle = API.Sprite;
+	API.ParticleSystem = API.PointCloud.ParticleSystem;
 
 	// Textures
-	Object.defineProperties( three, {
+	Object.defineProperties( API, {
 		TextureIdCount: {
 			get: function () {
 
-				return three.Texture.IdCount;
+				return API.Texture.IdCount;
 
 			},
 			set: function ( count ) {
 
-				three.Texture.IdCount = count;
+				API.Texture.IdCount = count;
 
 			}
 		}
 	} );
 
 	// Other
-	three.Projector = function () {
+	API.Projector = function () {
 
 		console.error( "Projector has been moved to /examples/js/renderers/Projector.js." );
 
@@ -130,7 +130,7 @@ module.exports = function ( three ) {
 
 	};
 
-	three.CanvasRenderer = function () {
+	API.CanvasRenderer = function () {
 
 		console.error( "CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js" );
 

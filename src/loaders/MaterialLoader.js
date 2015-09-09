@@ -6,6 +6,7 @@ module.exports = MaterialLoader;
 
 var DefaultLoadingManager = require( "./LoadingManager" ).DefaultLoadingManager,
 	XHRLoader = require( "./XHRLoader" ),
+	Constants = require( "../Constants" ),
 	LineBasicMaterial = require( "../materials/LineBasicMaterial" ),
 	LineDashedMaterial = require( "../materials/LineDashedMaterial" ),
 	Material = require( "../materials/Material" ),
@@ -18,7 +19,8 @@ var DefaultLoadingManager = require( "./LoadingManager" ).DefaultLoadingManager,
 	PointCloudMaterial = require( "../materials/PointCloudMaterial" ),
 	RawShaderMaterial = require( "../materials/RawShaderMaterial" ),
 	ShaderMaterial = require( "../materials/ShaderMaterial" ),
-	SpriteMaterial = require( "../materials/SpriteMaterial" );
+	SpriteMaterial = require( "../materials/SpriteMaterial" ),
+	Vector2 = require( "../math/Vector2" );
 
 function MaterialLoader( manager ) {
 
@@ -146,6 +148,7 @@ MaterialLoader.prototype = {
 
 		material.uuid = json.uuid;
 
+		if ( json.name !== undefined ) { material.name = json.name; }
 		if ( json.color !== undefined ) { material.color.setHex( json.color ); }
 		if ( json.emissive !== undefined ) { material.emissive.setHex( json.emissive ); }
 		if ( json.specular !== undefined ) { material.specular.setHex( json.specular ); }
@@ -160,6 +163,8 @@ MaterialLoader.prototype = {
 		if ( json.opacity !== undefined ) { material.opacity = json.opacity; }
 		if ( json.transparent !== undefined ) { material.transparent = json.transparent; }
 		if ( json.alphaTest !== undefined ) { material.alphaTest = json.alphaTest; }
+		if ( json.depthTest !== undefined ) { material.depthTest = json.depthTest; }
+		if ( json.depthWrite !== undefined ) { material.depthWrite = json.depthWrite; }
 		if ( json.wireframe !== undefined ) { material.wireframe = json.wireframe; }
 		if ( json.wireframeLinewidth !== undefined ) { material.wireframeLinewidth = json.wireframeLinewidth; }
 
@@ -193,7 +198,7 @@ MaterialLoader.prototype = {
 		if ( json.envMap !== undefined ) {
 
 			material.envMap = this.getTexture( json.envMap );
-			material.combine = MultiplyOperation;
+			material.combine = Constants.MultiplyOperation;
 
 		}
 

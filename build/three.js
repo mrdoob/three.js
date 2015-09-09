@@ -1,5 +1,5 @@
 /**
- * three v1.0.0 build 08.09.2015
+ * three v1.0.0 build 09.09.2015
  * http://threejs.org/
  * Copyright 2015 three.js contributors, MIT
  */
@@ -23,6 +23,7 @@ module.exports = function ( three ) {
 	three.Uint32Attribute = three.BufferAttribute.Uint32Attribute;
 	three.Float32Attribute = three.BufferAttribute.Float32Attribute;
 	three.Float64Attribute = three.BufferAttribute.Float64Attribute;
+	three.DynamicBufferAttribute = three.BufferAttribute.DynamicBufferAttribute;
 
 	Object.defineProperties( three, {
 		Object3DIdCount: {
@@ -1097,7 +1098,7 @@ BufferAttribute.prototype = {
 
 	constructor: BufferAttribute,
 
-	get length () {
+	get length() {
 
 		console.warn( "BufferAttribute: .length has been deprecated. Please use .count." );
 		return this.array.length;
@@ -1445,6 +1446,15 @@ BufferAttribute.Float32Attribute = function ( array, itemSize ) {
 BufferAttribute.Float64Attribute = function ( array, itemSize ) {
 
 	return new BufferAttribute( new Float64Array( array ), itemSize );
+
+};
+
+// Deprecated
+
+BufferAttribute.DynamicBufferAttribute = function ( array, itemSize ) {
+
+	console.warn( "DynamicBufferAttribute has been removed. Use new BufferAttribute().setDynamic( true ) instead." );
+	return new BufferAttribute( array, itemSize ).setDynamic( true );
 
 };
 
@@ -8227,7 +8237,7 @@ Curve.prototype.getLength = function () {
 
 Curve.prototype.getLengths = function ( divisions ) {
 
-	if ( ! divisions ) { divisions = (this.__arcLengthDivisions) ? (this.__arcLengthDivisions) : 200; }
+	if ( ! divisions ) { divisions = this.__arcLengthDivisions ? this.__arcLengthDivisions : 200; }
 
 	if ( this.cacheArcLengths && ( this.cacheArcLengths.length === divisions + 1 ) && ! this.needsUpdate) {
 
@@ -13838,10 +13848,12 @@ module.exports = ( function () {
 		if ( headWidth === undefined ) { headWidth = 0.2 * headLength; }
 
 		this.position.copy( origin );
-
-		this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
-		this.line.matrixAutoUpdate = false;
-		this.add( this.line );
+		
+		if ( headLength < length ) {
+			this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
+			this.line.matrixAutoUpdate = false;
+			this.add( this.line );
+		}
 
 		this.cone = new Mesh( coneGeometry, new MeshBasicMaterial( { color: color } ) );
 		this.cone.matrixAutoUpdate = false;
@@ -13893,8 +13905,10 @@ module.exports.prototype.setLength = function ( length, headLength, headWidth ) 
 	if ( headLength === undefined ) { headLength = 0.2 * length; }
 	if ( headWidth === undefined ) { headWidth = 0.2 * headLength; }
 
-	this.line.scale.set( 1, length - headLength, 1 );
-	this.line.updateMatrix();
+	if ( headLength < length ){
+		this.line.scale.set( 1, length - headLength, 1 );
+		this.line.updateMatrix();
+	}
 
 	this.cone.scale.set( headWidth, headLength, headWidth );
 	this.cone.position.y = length;
@@ -13904,7 +13918,7 @@ module.exports.prototype.setLength = function ( length, headLength, headWidth ) 
 
 module.exports.prototype.setColor = function ( color ) {
 
-	this.line.material.color.set( color );
+	if ( this.line !== undefined ) { this.line.material.color.set( color ); }
 	this.cone.material.color.set( color );
 
 };
@@ -16336,6 +16350,8 @@ JSONLoader.prototype = {
 
 	constructor: JSONLoader,
 
+	// Deprecated
+	
 	get statusDomElement () {
 
 		if ( this._statusDomElement === undefined ) {
@@ -17012,7 +17028,7 @@ Loader.prototype = {
 			// defaults
 
 			var mtype = "MeshLambertMaterial";
-			var mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, normalMap: null, bumpMap: null, wireframe: false };
+			var mpars = {};
 
 			// parameters from model file
 
@@ -17105,15 +17121,25 @@ Loader.prototype = {
 
 			}
 
-			if ( m.colorSpecular ) {
-
-				mpars.specular = rgb2hex( m.colorSpecular );
-
-			}
-
 			if ( m.colorEmissive ) {
 
 				mpars.emissive = rgb2hex( m.colorEmissive );
+
+			}
+
+			if ( mtype === "MeshPhongMaterial" ) {
+
+				if ( m.colorSpecular ) {
+
+					mpars.specular = rgb2hex( m.colorSpecular );
+
+				}
+
+				if ( m.specularCoef ) {
+
+					mpars.shininess = m.specularCoef;
+
+				}
 
 			}
 
@@ -17132,53 +17158,51 @@ Loader.prototype = {
 
 			}
 
-			if ( m.specularCoef ) {
-
-				mpars.shininess = m.specularCoef;
-
-			}
-
 			// textures
 
-			if ( m.mapDiffuse && texturePath ) {
+			if ( texturePath ) {
 
-				create_texture( mpars, "map", m.mapDiffuse, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
+				if ( m.mapDiffuse ) {
 
-			}
+					create_texture( mpars, "map", m.mapDiffuse, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
 
-			if ( m.mapLight && texturePath ) {
+				}
 
-				create_texture( mpars, "lightMap", m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
+				if ( m.mapLight ) {
 
-			}
+					create_texture( mpars, "lightMap", m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
 
-			if ( m.mapAO && texturePath ) {
+				}
 
-				create_texture( mpars, "aoMap", m.mapAO, m.mapAORepeat, m.mapAOOffset, m.mapAOWrap, m.mapAOAnisotropy );
+				if ( m.mapAO ) {
 
-			}
+					create_texture( mpars, "aoMap", m.mapAO, m.mapAORepeat, m.mapAOOffset, m.mapAOWrap, m.mapAOAnisotropy );
 
-			if ( m.mapBump && texturePath ) {
+				}
 
-				create_texture( mpars, "bumpMap", m.mapBump, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy );
+				if ( m.mapBump ) {
 
-			}
+					create_texture( mpars, "bumpMap", m.mapBump, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy );
 
-			if ( m.mapNormal && texturePath ) {
+				}
 
-				create_texture( mpars, "normalMap", m.mapNormal, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy );
+				if ( m.mapNormal ) {
 
-			}
+					create_texture( mpars, "normalMap", m.mapNormal, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy );
 
-			if ( m.mapSpecular && texturePath ) {
+				}
 
-				create_texture( mpars, "specularMap", m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy );
+				if ( m.mapSpecular ) {
 
-			}
+					create_texture( mpars, "specularMap", m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy );
 
-			if ( m.mapAlpha && texturePath ) {
+				}
 
-				create_texture( mpars, "alphaMap", m.mapAlpha, m.mapAlphaRepeat, m.mapAlphaOffset, m.mapAlphaWrap, m.mapAlphaAnisotropy );
+				if ( m.mapAlpha ) {
+
+					create_texture( mpars, "alphaMap", m.mapAlpha, m.mapAlphaRepeat, m.mapAlphaOffset, m.mapAlphaWrap, m.mapAlphaAnisotropy );
+
+				}
 
 			}
 
@@ -17341,6 +17365,7 @@ module.exports = MaterialLoader;
 
 var DefaultLoadingManager = require( "./LoadingManager" ).DefaultLoadingManager,
 	XHRLoader = require( "./XHRLoader" ),
+	Constants = require( "../Constants" ),
 	LineBasicMaterial = require( "../materials/LineBasicMaterial" ),
 	LineDashedMaterial = require( "../materials/LineDashedMaterial" ),
 	Material = require( "../materials/Material" ),
@@ -17353,11 +17378,13 @@ var DefaultLoadingManager = require( "./LoadingManager" ).DefaultLoadingManager,
 	PointCloudMaterial = require( "../materials/PointCloudMaterial" ),
 	RawShaderMaterial = require( "../materials/RawShaderMaterial" ),
 	ShaderMaterial = require( "../materials/ShaderMaterial" ),
-	SpriteMaterial = require( "../materials/SpriteMaterial" );
+	SpriteMaterial = require( "../materials/SpriteMaterial" ),
+	Vector2 = require( "../math/Vector2" );
 
 function MaterialLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	this.textures = {};
 
 }
 
@@ -17382,6 +17409,26 @@ MaterialLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+
+	},
+
+	setTextures: function ( value ) {
+
+		this.textures = value;
+
+	},
+
+	getTexture: function ( name ) {
+
+		var textures = this.textures;
+
+		if ( textures[ name ] === undefined ) {
+
+			console.warn( "MaterialLoader: Undefined texture", name );
+
+		}
+
+		return textures[ name ];
 
 	},
 
@@ -17458,6 +17505,9 @@ MaterialLoader.prototype = {
 
 		}
 
+		material.uuid = json.uuid;
+
+		if ( json.name !== undefined ) { material.name = json.name; }
 		if ( json.color !== undefined ) { material.color.setHex( json.color ); }
 		if ( json.emissive !== undefined ) { material.emissive.setHex( json.emissive ); }
 		if ( json.specular !== undefined ) { material.specular.setHex( json.specular ); }
@@ -17472,12 +17522,54 @@ MaterialLoader.prototype = {
 		if ( json.opacity !== undefined ) { material.opacity = json.opacity; }
 		if ( json.transparent !== undefined ) { material.transparent = json.transparent; }
 		if ( json.alphaTest !== undefined ) { material.alphaTest = json.alphaTest; }
+		if ( json.depthTest !== undefined ) { material.depthTest = json.depthTest; }
+		if ( json.depthWrite !== undefined ) { material.depthWrite = json.depthWrite; }
 		if ( json.wireframe !== undefined ) { material.wireframe = json.wireframe; }
 		if ( json.wireframeLinewidth !== undefined ) { material.wireframeLinewidth = json.wireframeLinewidth; }
 
 		// for PointCloudMaterial
 		if ( json.size !== undefined ) { material.size = json.size; }
 		if ( json.sizeAttenuation !== undefined ) { material.sizeAttenuation = json.sizeAttenuation; }
+
+		// maps
+
+		if ( json.map !== undefined ) { material.map = this.getTexture( json.map ); }
+
+		if ( json.alphaMap !== undefined ) {
+
+			material.alphaMap = this.getTexture( json.alphaMap );
+			material.transparent = true;
+
+		}
+
+		if ( json.bumpMap !== undefined ) { material.bumpMap = this.getTexture( json.bumpMap ); }
+		if ( json.bumpScale !== undefined ) { material.bumpScale = json.bumpScale; }
+
+		if ( json.normalMap !== undefined ) { material.normalMap = this.getTexture( json.normalMap ); }
+		if ( json.normalScale ) {	material.normalScale = new Vector2( json.normalScale, json.normalScale ); }
+
+		if ( json.displacementMap !== undefined ) { material.displacementMap = this.getTexture( json.displacementMap ); }
+		if ( json.displacementScale !== undefined ) { material.displacementScale = json.displacementScale; }
+		if ( json.displacementBias !== undefined ) { material.displacementBias = json.displacementBias; }
+
+		if ( json.specularMap !== undefined ) { material.specularMap = this.getTexture( json.specularMap ); }
+
+		if ( json.envMap !== undefined ) {
+
+			material.envMap = this.getTexture( json.envMap );
+			material.combine = Constants.MultiplyOperation;
+
+		}
+
+		if ( json.reflectivity ) { material.reflectivity = json.reflectivity; }
+
+		if ( json.lightMap !== undefined ) { material.lightMap = this.getTexture( json.lightMap ); }
+		if ( json.lightMapIntensity !== undefined ) { material.lightMapIntensity = json.lightMapIntensity; }
+
+		if ( json.aoMap !== undefined ) { material.aoMap = this.getTexture( json.aoMap ); }
+		if ( json.aoMapIntensity !== undefined ) { material.aoMapIntensity = json.aoMapIntensity; }
+
+		// MeshFaceMaterial
 
 		if ( json.materials !== undefined ) {
 
@@ -17495,7 +17587,7 @@ MaterialLoader.prototype = {
 
 };
 
-},{"../materials/LineBasicMaterial":110,"../materials/LineDashedMaterial":111,"../materials/Material":112,"../materials/MeshBasicMaterial":113,"../materials/MeshDepthMaterial":114,"../materials/MeshLambertMaterial":115,"../materials/MeshNormalMaterial":116,"../materials/MeshPhongMaterial":117,"../materials/MultiMaterial":118,"../materials/PointCloudMaterial":119,"../materials/RawShaderMaterial":120,"../materials/ShaderMaterial":121,"../materials/SpriteMaterial":122,"./LoadingManager":105,"./XHRLoader":109}],107:[function(require,module,exports){
+},{"../Constants":2,"../materials/LineBasicMaterial":110,"../materials/LineDashedMaterial":111,"../materials/Material":112,"../materials/MeshBasicMaterial":113,"../materials/MeshDepthMaterial":114,"../materials/MeshLambertMaterial":115,"../materials/MeshNormalMaterial":116,"../materials/MeshPhongMaterial":117,"../materials/MultiMaterial":118,"../materials/PointCloudMaterial":119,"../materials/RawShaderMaterial":120,"../materials/ShaderMaterial":121,"../materials/SpriteMaterial":122,"../math/Vector2":138,"./LoadingManager":105,"./XHRLoader":109}],107:[function(require,module,exports){
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -17510,10 +17602,11 @@ var BufferGeometryLoader = require( "./BufferGeometryLoader" ),
 	MaterialLoader = require( "./MaterialLoader" ),
 	XHRLoader = require( "./XHRLoader" ),
 
+	Constants = require( "../Constants" ),
+
 	OrthographicCamera = require( "../cameras/OrthographicCamera" ),
 	PerspectiveCamera = require( "../cameras/PerspectiveCamera" ),
 
-	Constants = require( "../Constants" ),
 	Object3D = require( "../core/Object3D" ),
 
 	BoxGeometry = require( "../extras/geometries/BoxGeometry" ),
@@ -17860,69 +17953,13 @@ ObjectLoader.prototype = {
 
 		if ( json !== undefined ) {
 
-			var getTexture = function ( name ) {
-
-				if ( textures[ name ] === undefined ) {
-
-					console.warn( "ObjectLoader: Undefined texture", name );
-
-				}
-
-				return textures[ name ];
-
-			};
-
 			var loader = new MaterialLoader();
+			loader.setTextures( textures );
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
-				var data = json[ i ];
-				var material = loader.parse( data );
-
-				material.uuid = data.uuid;
-
-				if ( data.depthTest !== undefined ) { material.depthTest = data.depthTest; }
-				if ( data.depthWrite !== undefined ) { material.depthWrite = data.depthWrite; }
-
-				if ( data.name !== undefined ) { material.name = data.name; }
-
-				if ( data.map !== undefined ) { material.map = getTexture( data.map ); }
-
-				if ( data.alphaMap !== undefined ) {
-
-					material.alphaMap = getTexture( data.alphaMap );
-					material.transparent = true;
-
-				}
-
-				if ( data.bumpMap !== undefined ) { material.bumpMap = getTexture( data.bumpMap ); }
-				if ( data.bumpScale !== undefined ) { material.bumpScale = data.bumpScale; }
-
-				if ( data.normalMap !== undefined ) { material.normalMap = getTexture( data.normalMap ); }
-				if ( data.normalScale ) { material.normalScale = new Vector2( data.normalScale, data.normalScale ); }
-
-				if ( data.displacementMap !== undefined ) { material.displacementMap = getTexture( data.displacementMap ); }
-				if ( data.displacementScale !== undefined ) { material.displacementScale = data.displacementScale; }
-				if ( data.displacementBias !== undefined ) { material.displacementBias = data.displacementBias; }
-
-				if ( data.specularMap !== undefined ) { material.specularMap = getTexture( data.specularMap ); }
-
-				if ( data.envMap !== undefined ) {
-
-					material.envMap = getTexture( data.envMap );
-					material.combine = Constants.MultiplyOperation;
-
-				}
-
-				if ( data.reflectivity ) { material.reflectivity = data.reflectivity; }
-
-				if ( data.lightMap !== undefined ) { material.lightMap = getTexture( data.lightMap ); }
-				if ( data.lightMapIntensity !== undefined ) { material.lightMapIntensity = data.lightMapIntensity; }
-
-				if ( data.aoMap !== undefined ) { material.aoMap = getTexture( data.aoMap ); }
-				if ( data.aoMapIntensity !== undefined ) { material.aoMapIntensity = data.aoMapIntensity; }
-
-				materials[ data.uuid ] = material;
+				var material = loader.parse( json[ i ] );
+				materials[ material.uuid ] = material;
 
 			}
 
@@ -18196,8 +18233,8 @@ ObjectLoader.prototype = {
 
 				for ( l = 0; l < levels.length; l ++ ) {
 
-					 level = levels[ l ];
-					 child = object.getObjectByProperty( "uuid", level.object );
+					level = levels[ l ];
+					child = object.getObjectByProperty( "uuid", level.object );
 
 					if ( child !== undefined ) {
 
@@ -18764,6 +18801,33 @@ Material.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: "dispose" } );
+
+	},
+
+	// Deprecated
+
+	get wrapAround () {
+
+		console.warn( this.type + ": .wrapAround has been removed." );
+
+	},
+
+	set wrapAround ( bool ) {
+
+		console.warn( this.type + ": .wrapAround has been removed.", bool );
+
+	},
+
+	get wrapRGB () {
+
+		console.warn( this.type + ": .wrapRGB has been removed." );
+		return new Color();
+
+	},
+
+	set wrapRGB ( color ) {
+
+		console.warn( this.type + ": .wrapRGB has been removed.", color );
 
 	}
 

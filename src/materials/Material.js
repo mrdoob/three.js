@@ -252,20 +252,26 @@ Material.prototype = {
 
 	get wrapAround () {
 
-		console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+		console.warn( this.type + ": .wrapAround has been removed." );
 
 	},
 
-	set wrapAround ( boolean ) {
+	set wrapAround ( bool ) {
 
-		console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+		console.warn( this.type + ": .wrapAround has been removed.", bool );
 
 	},
 
 	get wrapRGB () {
 
-		console.warn( 'THREE.' + this.type + ': .wrapRGB has been removed.' );
-		return new THREE.Color();
+		console.warn( this.type + ": .wrapRGB has been removed." );
+		return new Color();
+
+	},
+
+	set wrapRGB ( color ) {
+
+		console.warn( this.type + ": .wrapRGB has been removed.", color );
 
 	}
 

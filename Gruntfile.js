@@ -111,8 +111,7 @@ module.exports = function( grunt ) {
 	grunt.loadNpmTasks( "grunt-contrib-uglify" );
 
 	// Task definitions.
-	grunt.registerTask( "default", [ "jshint", "qunit", "browserify", "uglify" ] );
-	grunt.registerTask( "test", [ "jshint", "qunit" ] );
+	grunt.registerTask( "default", [ "jshint", "browserify", "uglify", "qunit" ] );
 	grunt.registerTask( "build", [ "browserify", "uglify" ] );
 
 };
