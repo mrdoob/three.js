@@ -34,6 +34,8 @@ JSONLoader.prototype = {
 
 	constructor: JSONLoader,
 
+	// Deprecated
+	
 	get statusDomElement () {
 
 		if ( this._statusDomElement === undefined ) {

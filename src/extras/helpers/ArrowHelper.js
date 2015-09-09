@@ -43,10 +43,12 @@ module.exports = ( function () {
 		if ( headWidth === undefined ) { headWidth = 0.2 * headLength; }
 
 		this.position.copy( origin );
-
-		this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
-		this.line.matrixAutoUpdate = false;
-		this.add( this.line );
+		
+		if ( headLength < length ) {
+			this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
+			this.line.matrixAutoUpdate = false;
+			this.add( this.line );
+		}
 
 		this.cone = new Mesh( coneGeometry, new MeshBasicMaterial( { color: color } ) );
 		this.cone.matrixAutoUpdate = false;
@@ -98,8 +100,10 @@ module.exports.prototype.setLength = function ( length, headLength, headWidth ) 
 	if ( headLength === undefined ) { headLength = 0.2 * length; }
 	if ( headWidth === undefined ) { headWidth = 0.2 * headLength; }
 
-	this.line.scale.set( 1, length - headLength, 1 );
-	this.line.updateMatrix();
+	if ( headLength < length ){
+		this.line.scale.set( 1, length - headLength, 1 );
+		this.line.updateMatrix();
+	}
 
 	this.cone.scale.set( headWidth, headLength, headWidth );
 	this.cone.position.y = length;
@@ -109,7 +113,7 @@ module.exports.prototype.setLength = function ( length, headLength, headWidth ) 
 
 module.exports.prototype.setColor = function ( color ) {
 
-	this.line.material.color.set( color );
+	if ( this.line !== undefined ) { this.line.material.color.set( color ); }
 	this.cone.material.color.set( color );
 
 };

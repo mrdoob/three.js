@@ -362,69 +362,13 @@ ObjectLoader.prototype = {
 
 		if ( json !== undefined ) {
 
-			var getTexture = function ( name ) {
-
-				if ( textures[ name ] === undefined ) {
-
-					console.warn( "ObjectLoader: Undefined texture", name );
-
-				}
-
-				return textures[ name ];
-
-			};
-
 			var loader = new MaterialLoader();
+			loader.setTextures( textures );
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
-				var data = json[ i ];
-				var material = loader.parse( data );
-
-				material.uuid = data.uuid;
-
-				if ( data.depthTest !== undefined ) { material.depthTest = data.depthTest; }
-				if ( data.depthWrite !== undefined ) { material.depthWrite = data.depthWrite; }
-
-				if ( data.name !== undefined ) { material.name = data.name; }
-
-				if ( data.map !== undefined ) { material.map = getTexture( data.map ); }
-
-				if ( data.alphaMap !== undefined ) {
-
-					material.alphaMap = getTexture( data.alphaMap );
-					material.transparent = true;
-
-				}
-
-				if ( data.bumpMap !== undefined ) { material.bumpMap = getTexture( data.bumpMap ); }
-				if ( data.bumpScale !== undefined ) { material.bumpScale = data.bumpScale; }
-
-				if ( data.normalMap !== undefined ) { material.normalMap = getTexture( data.normalMap ); }
-				if ( data.normalScale ) { material.normalScale = new Vector2( data.normalScale, data.normalScale ); }
-
-				if ( data.displacementMap !== undefined ) { material.displacementMap = getTexture( data.displacementMap ); }
-				if ( data.displacementScale !== undefined ) { material.displacementScale = data.displacementScale; }
-				if ( data.displacementBias !== undefined ) { material.displacementBias = data.displacementBias; }
-
-				if ( data.specularMap !== undefined ) { material.specularMap = getTexture( data.specularMap ); }
-
-				if ( data.envMap !== undefined ) {
-
-					material.envMap = getTexture( data.envMap );
-					material.combine = Constants.MultiplyOperation;
-
-				}
-
-				if ( data.reflectivity ) { material.reflectivity = data.reflectivity; }
-
-				if ( data.lightMap !== undefined ) { material.lightMap = getTexture( data.lightMap ); }
-				if ( data.lightMapIntensity !== undefined ) { material.lightMapIntensity = data.lightMapIntensity; }
-
-				if ( data.aoMap !== undefined ) { material.aoMap = getTexture( data.aoMap ); }
-				if ( data.aoMapIntensity !== undefined ) { material.aoMapIntensity = data.aoMapIntensity; }
-
-				materials[ data.uuid ] = material;
+				var material = loader.parse( json[ i ] );
+				materials[ material.uuid ] = material;
 
 			}
 
