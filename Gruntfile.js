@@ -34,7 +34,10 @@ module.exports = function( grunt ) {
 
 		qunit: {
 
-			bundle: ["test/unit/unittests_three.min.html"]
+			bundles: [
+				"test/unit/unittests_three.html",
+				"test/unit/unittests_three.min.html"
+			]
 
 		},
 
