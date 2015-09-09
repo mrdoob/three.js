@@ -23,7 +23,7 @@ CmdXXX = function ( object ) {
 
 };
 
-CmdAddObject.prototype = {
+CmdXXX.prototype = {
 
 	execute: function () {
 
@@ -41,7 +41,7 @@ CmdAddObject.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		// TODO: serialize relevant information so that 
+		// TODO: serialize relevant information to json so that 
 		// it can be restored in 'fromJSON'
 	
 		return output;
@@ -52,10 +52,21 @@ CmdAddObject.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 		
-		// TODO: restore command from serialized information
+		// TODO: restore command from json
 		
 	}
 
 };
 
+```
+
+### Executing a command ###
+
+To execute a command we need an instance of the main editor-object.
+On **editor** we then call **.execute(...)*** with the new command-object which in turn calls **history.execute(...)** and adds the command to the undo-stack.
+
+```javascript
+	
+editor.execute( new CmdXXX( object ) );
+		
 ```
