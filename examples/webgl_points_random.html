@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - particles - billboards</title>
+		<title>three.js webgl - particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -21,11 +21,11 @@
 			}
 
 			#info {
-				color:#fff;
+				color: #fff;
 				position: absolute;
 				top: 0px; width: 100%;
 				padding: 5px;
-				z-index:100;
+				z-index: 100;
 			}
 
 		</style>
@@ -33,7 +33,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl particle billboards example
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl particles example
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -46,7 +46,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
-			var camera, scene, renderer, particles, geometry, material, i, h, color, sprite, size;
+			var camera, scene, renderer, particles, geometry, materials = [], parameters, i, h, color, size;
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -60,48 +60,59 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 2, 2000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0x000000, 0.001 );
+				scene.fog = new THREE.FogExp2( 0x000000, 0.0007 );
 
 				geometry = new THREE.Geometry();
 
-				sprite = THREE.ImageUtils.loadTexture( "textures/sprites/disc.png" );
-
-				for ( i = 0; i < 10000; i ++ ) {
+				for ( i = 0; i < 20000; i ++ ) {
 
 					var vertex = new THREE.Vector3();
-					vertex.x = 2000 * Math.random() - 1000;
-					vertex.y = 2000 * Math.random() - 1000;
-					vertex.z = 2000 * Math.random() - 1000;
+					vertex.x = Math.random() * 2000 - 1000;
+					vertex.y = Math.random() * 2000 - 1000;
+					vertex.z = Math.random() * 2000 - 1000;
 
 					geometry.vertices.push( vertex );
 
 				}
 
-				material = new THREE.PointCloudMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
-				material.color.setHSL( 1.0, 0.3, 0.7 );
+				parameters = [
+					[ [1, 1, 0.5], 5 ],
+					[ [0.95, 1, 0.5], 4 ],
+					[ [0.90, 1, 0.5], 3 ],
+					[ [0.85, 1, 0.5], 2 ],
+					[ [0.80, 1, 0.5], 1 ]
+				];
 
-				particles = new THREE.PointCloud( geometry, material );
-				scene.add( particles );
+				for ( i = 0; i < parameters.length; i ++ ) {
 
-				//
+					color = parameters[i][0];
+					size  = parameters[i][1];
+
+					materials[i] = new THREE.PointsMaterial( { size: size } );
+
+					particles = new THREE.Points( geometry, materials[i] );
+
+					particles.rotation.x = Math.random() * 6;
+					particles.rotation.y = Math.random() * 6;
+					particles.rotation.z = Math.random() * 6;
+
+					scene.add( particles );
+
+				}
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				//
-
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
-
-				//
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -134,7 +145,7 @@
 
 			function onDocumentTouchStart( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -142,11 +153,12 @@
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -177,12 +189,31 @@
 
 				camera.lookAt( scene.position );
 
-				h = ( 360 * ( 1.0 + time ) % 360 ) / 360;
-				material.color.setHSL( h, 0.5, 0.5 );
+				for ( i = 0; i < scene.children.length; i ++ ) {
+
+					var object = scene.children[ i ];
+
+					if ( object instanceof THREE.Points ) {
+
+						object.rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
+
+					}
+
+				}
+
+				for ( i = 0; i < materials.length; i ++ ) {
+
+					color = parameters[i][0];
+
+					h = ( 360 * ( color[0] + time ) % 360 ) / 360;
+					materials[i].color.setHSL( h, color[1], color[2] );
+
+				}
 
 				renderer.render( scene, camera );
 
 			}
+
 
 		</script>
 	</body>

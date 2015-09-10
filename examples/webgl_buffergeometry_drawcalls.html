@@ -117,7 +117,7 @@
 				positions = new Float32Array( segments * 3 );
 				colors = new Float32Array( segments * 3 );
 
-				var pMaterial = new THREE.PointCloudMaterial( {
+				var pMaterial = new THREE.PointsMaterial( {
 					color: 0xFFFFFF,
 					size: 3,
 					blending: THREE.AdditiveBlending,
@@ -150,7 +150,7 @@
 				particles.addAttribute( 'position', new THREE.BufferAttribute( particlePositions, 3 ).setDynamic( true ) );
 
 				// create the particle system
-				pointCloud = new THREE.PointCloud( particles, new THREE.MultiMaterial( [ pMaterial ] ) );
+				pointCloud = new THREE.Points( particles, new THREE.MultiMaterial( [ pMaterial ] ) );
 				group.add( pointCloud );
 
 				var geometry = new THREE.BufferGeometry();

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - custom attributes [particles][billboards]</title>
+		<title>three.js webgl - custom attributes [particles]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -23,12 +23,12 @@
 				padding: 5px;
 				z-index:100;
 			}
-
+			a { color: #ff0000 }
 		</style>
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example - particles - billboards</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example - particles</div>
 		<div id="container"></div>
 
 		<script src="../build/three.min.js"></script>
@@ -38,14 +38,15 @@
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
+			uniform float amplitude;
 			attribute float size;
-			attribute vec3 ca;
+			attribute vec3 customColor;
 
 			varying vec3 vColor;
 
 			void main() {
 
-				vColor = ca;
+				vColor = customColor;
 
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
@@ -67,22 +68,23 @@
 
 			void main() {
 
-				vec4 color = vec4( color * vColor, 1.0 ) * texture2D( texture, gl_PointCoord );
-
-				if ( color.w < 0.5 ) discard;
-
-				gl_FragColor = color;
+				gl_FragColor = vec4( color * vColor, 1.0 );
+				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
 
 			}
 
 		</script>
+
 
 		<script>
 
 		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 		var renderer, scene, camera, stats;
-		var sphere, vertices1;
+
+		var sphere;
+
+		var noise = [];
 
 		var WIDTH = window.innerWidth;
 		var HEIGHT = window.innerHeight;
@@ -92,75 +94,70 @@
 
 		function init() {
 
-			camera = new THREE.PerspectiveCamera( 45, WIDTH / HEIGHT, 1, 10000 );
+			camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
 			camera.position.z = 300;
 
 			scene = new THREE.Scene();
 
-			var radius = 100, segments = 68, rings = 38;
+			var amount = 100000;
+			var radius = 200;
 
-			var geometry1 = new THREE.SphereGeometry( radius, segments, rings );
-			var geometry2 = new THREE.BoxGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 );
+			var positions = new Float32Array( amount * 3 );
+			var colors = new Float32Array( amount * 3 );
+			var sizes = new Float32Array( amount );
 
-			vertices1 = geometry1.vertices.length;
+			var vertex = new THREE.Vector3();
+			var color = new THREE.Color( 0xffffff );
 
-			var vertices = geometry1.vertices.concat( geometry2.vertices );
+			for ( var i = 0; i < amount; i ++ ) {
 
-			var positions = new Float32Array( vertices.length * 3 );
-			var colors = new Float32Array( vertices.length * 3 );
-			var sizes = new Float32Array( vertices.length );
-
-			var vertex;
-			var color = new THREE.Color();
-
-			for ( var i = 0, l = vertices.length; i < l; i ++ ) {
-
-				vertex = vertices[ i ];
+				vertex.x = ( Math.random() * 2 - 1 ) * radius;
+				vertex.y = ( Math.random() * 2 - 1 ) * radius;
+				vertex.z = ( Math.random() * 2 - 1 ) * radius;
 				vertex.toArray( positions, i * 3 );
 
-				if ( i < vertices1 ) {
+				if ( vertex.x < 0 ) {
 
-					color.setHSL( 0.01 + 0.1 * ( i / vertices1 ), 0.99, ( vertex.y + radius ) / ( 4 * radius ) );
+					color.setHSL( 0.5 + 0.1 * ( i / amount ), 0.7, 0.5 );
 
 				} else {
 
-					color.setHSL( 0.6, 0.75, 0.25 + vertex.y / ( 2 * radius ) );
+					color.setHSL( 0.0 + 0.1 * ( i / amount ), 0.9, 0.5 );
 
 				}
 
 				color.toArray( colors, i * 3 );
 
-				sizes[ i ] = i < vertices1 ? 10 : 40;
+				sizes[ i ] = 10;
 
 			}
 
 			var geometry = new THREE.BufferGeometry();
 			geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+			geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
 			geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
-			geometry.addAttribute( 'ca', new THREE.BufferAttribute( colors, 3 ) );
 
 			//
-
-			var texture = THREE.ImageUtils.loadTexture( "textures/sprites/disc.png" );
-			texture.wrapS = THREE.RepeatWrapping;
-			texture.wrapT = THREE.RepeatWrapping;
 
 			var material = new THREE.ShaderMaterial( {
 
 				uniforms: {
 					amplitude: { type: "f", value: 1.0 },
 					color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-					texture:   { type: "t", value: texture }
+					texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/spark1.png" ) }
 				},
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+
+				blending:       THREE.AdditiveBlending,
+				depthTest:      false,
 				transparent:    true
 
 			});
 
 			//
 
-			sphere = new THREE.PointCloud( geometry, material );
+			sphere = new THREE.Points( geometry, material );
 			scene.add( sphere );
 
 			//
@@ -205,19 +202,14 @@
 
 			var time = Date.now() * 0.005;
 
-			sphere.rotation.y = 0.02 * time;
-			sphere.rotation.z = 0.02 * time;
+			sphere.rotation.z = 0.01 * time;
 
 			var geometry = sphere.geometry;
 			var attributes = geometry.attributes;
 
-			for ( var i = 0; i < attributes.size.array.length; i ++ ) {
+			for ( var i = 0; i < attributes.size.array.length; i++ ) {
 
-				if ( i < vertices1 ) {
-
-					attributes.size.array[ i ] = 16 + 12 * Math.sin( 0.1 * i + time );
-
-				}
+				attributes.size.array[ i ] = 14 + 13 * Math.sin( 0.1 * i + time );
 
 			}
 

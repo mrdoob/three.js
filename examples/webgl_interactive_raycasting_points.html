@@ -105,8 +105,8 @@
 
 				var geometry = generatePointCloudGeometry( color, width, length );
 
-				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
-				var pointcloud = new THREE.PointCloud( geometry, material );
+				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
+				var pointcloud = new THREE.Points( geometry, material );
 
 				return pointcloud;
 
@@ -133,8 +133,8 @@
 
 				geometry.addIndex( new THREE.BufferAttribute( indices, 1 ) );
 
-				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
-				var pointcloud = new THREE.PointCloud( geometry, material );
+				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
+				var pointcloud = new THREE.Points( geometry, material );
 
 				return pointcloud;
 
@@ -162,8 +162,8 @@
 				geometry.addIndex( new THREE.BufferAttribute( indices, 1 ) );
 				geometry.addDrawCall( 0, indices.length );
 
-				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
-				var pointcloud = new THREE.PointCloud( geometry, material );
+				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
+				var pointcloud = new THREE.Points( geometry, material );
 
 				return pointcloud;
 
@@ -205,8 +205,8 @@
 				geometry.colors = colors;
 				geometry.computeBoundingBox();
 
-				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
-				var pointcloud = new THREE.PointCloud( geometry, material );
+				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
+				var pointcloud = new THREE.Points( geometry, material );
 
 				return pointcloud;
 

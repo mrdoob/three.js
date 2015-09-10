@@ -59,9 +59,9 @@
 
 				}
 
-				var material = new THREE.PointCloudMaterial( { size: 1, vertexColors: THREE. VertexColors, depthTest: false, opacity: 0.5, sizeAttenuation: false, transparent: true } );
+				var material = new THREE.PointsMaterial( { size: 1, vertexColors: THREE. VertexColors, depthTest: false, opacity: 0.5, sizeAttenuation: false, transparent: true } );
 
-				var mesh = new THREE.PointCloud( geometry, material );
+				var mesh = new THREE.Points( geometry, material );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
