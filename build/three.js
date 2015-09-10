@@ -10680,6 +10680,8 @@ THREE.BufferGeometry = function () {
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
+	this.drawRange = { start: 0, count: Infinity };
+
 };
 
 THREE.BufferGeometry.prototype = {
@@ -10776,6 +10778,13 @@ THREE.BufferGeometry.prototype = {
 	clearGroups: function () {
 
 		this.groups = [];
+
+	},
+
+	setDrawRange: function ( start, count ) {
+
+		this.drawRange.start = start;
+		this.drawRange.count = count;
 
 	},
 
@@ -20439,7 +20448,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( index !== null ) {
 
-				count = index.array.length;
+				count = index.count;
 
 			} else if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
@@ -20447,13 +20456,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				count = position.array.length / 3;
+				count = position.count;
 
 			}
 
+			var drawRange = geometry.drawRange;
+
 			group = {
-				start: 0,
-				count: count
+				start: drawRange.start,
+				count: Math.min( drawRange.count, count )
 			};
 
 		}
