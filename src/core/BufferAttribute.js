@@ -2,9 +2,17 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BufferAttribute = function ( array, itemSize ) {
+module.exports = BufferAttribute;
 
-	this.uuid = THREE.Math.generateUUID();
+var Color = require( "../math/Color" ),
+	_Math = require( "../math/Math" ),
+	Vector2 = require( "../math/Vector2" ),
+	Vector3 = require( "../math/Vector3" ),
+	Vector4 = require( "../math/Vector4" );
+
+function BufferAttribute( array, itemSize ) {
+
+	this.uuid = _Math.generateUUID();
 
 	this.array = array;
 	this.itemSize = itemSize;
@@ -14,15 +22,15 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 
 	this.version = 0;
 
-};
+}
 
-THREE.BufferAttribute.prototype = {
+BufferAttribute.prototype = {
 
-	constructor: THREE.BufferAttribute,
+	constructor: BufferAttribute,
 
 	get length() {
 
-		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
+		console.warn( "BufferAttribute: .length has been deprecated. Please use .count." );
 		return this.array.length;
 
 	},
@@ -33,9 +41,15 @@ THREE.BufferAttribute.prototype = {
 
 	},
 
+	get needsUpdate() {
+
+		return undefined;
+
+	},
+
 	set needsUpdate( value ) {
 
-		if ( value === true ) this.version ++;
+		if ( value === true ) { this.version ++; }
 
 	},
 
@@ -91,8 +105,8 @@ THREE.BufferAttribute.prototype = {
 
 			if ( color === undefined ) {
 
-				console.warn( 'THREE.BufferAttribute.copyColorsArray(): color is undefined', i );
-				color = new THREE.Color();
+				console.warn( "BufferAttribute.copyColorsArray(): color is undefined", i );
+				color = new Color();
 
 			}
 
@@ -126,16 +140,16 @@ THREE.BufferAttribute.prototype = {
 
 	copyVector2sArray: function ( vectors ) {
 
-		var array = this.array, offset = 0;
+		var array = this.array, offset = 0, vector;
 
 		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
-			var vector = vectors[ i ];
+			vector = vectors[ i ];
 
 			if ( vector === undefined ) {
 
-				console.warn( 'THREE.BufferAttribute.copyVector2sArray(): vector is undefined', i );
-				vector = new THREE.Vector2();
+				console.warn( "BufferAttribute.copyVector2sArray(): vector is undefined", i );
+				vector = new Vector2();
 
 			}
 
@@ -158,8 +172,8 @@ THREE.BufferAttribute.prototype = {
 
 			if ( vector === undefined ) {
 
-				console.warn( 'THREE.BufferAttribute.copyVector3sArray(): vector is undefined', i );
-				vector = new THREE.Vector3();
+				console.warn( "BufferAttribute.copyVector3sArray(): vector is undefined", i );
+				vector = new Vector3();
 
 			}
 
@@ -175,16 +189,16 @@ THREE.BufferAttribute.prototype = {
 
 	copyVector4sArray: function ( vectors ) {
 
-		var array = this.array, offset = 0;
+		var array = this.array, offset = 0, vector;
 
 		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
-			var vector = vectors[ i ];
+			vector = vectors[ i ];
 
 			if ( vector === undefined ) {
 
-				console.warn( 'THREE.BufferAttribute.copyVector4sArray(): vector is undefined', i );
-				vector = new THREE.Vector4();
+				console.warn( "BufferAttribute.copyVector4sArray(): vector is undefined", i );
+				vector = new Vector4();
 
 			}
 
@@ -201,7 +215,7 @@ THREE.BufferAttribute.prototype = {
 
 	set: function ( value, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) { offset = 0; }
 
 		this.array.set( value, offset );
 
@@ -311,66 +325,65 @@ THREE.BufferAttribute.prototype = {
 
 //
 
-THREE.Int8Attribute = function ( array, itemSize ) {
+BufferAttribute.Int8Attribute = function ( array, itemSize ) {
 
-	return new THREE.BufferAttribute( new Int8Array( array ), itemSize );
-
-};
-
-THREE.Uint8Attribute = function ( array, itemSize ) {
-
-	return new THREE.BufferAttribute( new Uint8Array( array ), itemSize );
+	return new BufferAttribute( new Int8Array( array ), itemSize );
 
 };
 
-THREE.Uint8ClampedAttribute = function ( array, itemSize ) {
+BufferAttribute.Uint8Attribute = function ( array, itemSize ) {
 
-	return new THREE.BufferAttribute( new Uint8ClampedArray( array ), itemSize );
-
-};
-
-THREE.Int16Attribute = function ( array, itemSize ) {
-
-	return new THREE.BufferAttribute( new Int16Array( array ), itemSize );
+	return new BufferAttribute( new Uint8Array( array ), itemSize );
 
 };
 
-THREE.Uint16Attribute = function ( array, itemSize ) {
+BufferAttribute.Uint8ClampedAttribute = function ( array, itemSize ) {
 
-	return new THREE.BufferAttribute( new Uint16Array( array ), itemSize );
-
-};
-
-THREE.Int32Attribute = function ( array, itemSize ) {
-
-	return new THREE.BufferAttribute( new Int32Array( array ), itemSize );
+	return new BufferAttribute( new Uint8ClampedArray( array ), itemSize );
 
 };
 
-THREE.Uint32Attribute = function ( array, itemSize ) {
+BufferAttribute.Int16Attribute = function ( array, itemSize ) {
 
-	return new THREE.BufferAttribute( new Uint32Array( array ), itemSize );
-
-};
-
-THREE.Float32Attribute = function ( array, itemSize ) {
-
-	return new THREE.BufferAttribute( new Float32Array( array ), itemSize );
+	return new BufferAttribute( new Int16Array( array ), itemSize );
 
 };
 
-THREE.Float64Attribute = function ( array, itemSize ) {
+BufferAttribute.Uint16Attribute = function ( array, itemSize ) {
 
-	return new THREE.BufferAttribute( new Float64Array( array ), itemSize );
+	return new BufferAttribute( new Uint16Array( array ), itemSize );
 
 };
 
+BufferAttribute.Int32Attribute = function ( array, itemSize ) {
+
+	return new BufferAttribute( new Int32Array( array ), itemSize );
+
+};
+
+BufferAttribute.Uint32Attribute = function ( array, itemSize ) {
+
+	return new BufferAttribute( new Uint32Array( array ), itemSize );
+
+};
+
+BufferAttribute.Float32Attribute = function ( array, itemSize ) {
+
+	return new BufferAttribute( new Float32Array( array ), itemSize );
+
+};
+
+BufferAttribute.Float64Attribute = function ( array, itemSize ) {
+
+	return new BufferAttribute( new Float64Array( array ), itemSize );
+
+};
 
 // Deprecated
 
-THREE.DynamicBufferAttribute = function ( array, itemSize ) {
+BufferAttribute.DynamicBufferAttribute = function ( array, itemSize ) {
 
-	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
-	return new THREE.BufferAttribute( array, itemSize ).setDynamic( true );
+	console.warn( "DynamicBufferAttribute has been removed. Use new BufferAttribute().setDynamic( true ) instead." );
+	return new BufferAttribute( array, itemSize ).setDynamic( true );
 
 };

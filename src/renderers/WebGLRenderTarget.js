@@ -3,28 +3,35 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.WebGLRenderTarget = function ( width, height, options ) {
+module.exports = WebGLRenderTarget;
 
-	this.uuid = THREE.Math.generateUUID();
+var Constants = require( "../Constants" ),
+	EventDispatcher = require( "../core/EventDispatcher" ),
+	_Math = require( "../math/Math" ),
+	Vector2 = require( "../math/Vector2" );
+
+function WebGLRenderTarget( width, height, options ) {
+
+	this.uuid = _Math.generateUUID();
 
 	this.width = width;
 	this.height = height;
 
 	options = options || {};
 
-	this.wrapS = options.wrapS !== undefined ? options.wrapS : THREE.ClampToEdgeWrapping;
-	this.wrapT = options.wrapT !== undefined ? options.wrapT : THREE.ClampToEdgeWrapping;
+	this.wrapS = options.wrapS !== undefined ? options.wrapS : Constants.ClampToEdgeWrapping;
+	this.wrapT = options.wrapT !== undefined ? options.wrapT : Constants.ClampToEdgeWrapping;
 
-	this.magFilter = options.magFilter !== undefined ? options.magFilter : THREE.LinearFilter;
-	this.minFilter = options.minFilter !== undefined ? options.minFilter : THREE.LinearMipMapLinearFilter;
+	this.magFilter = options.magFilter !== undefined ? options.magFilter : Constants.LinearFilter;
+	this.minFilter = options.minFilter !== undefined ? options.minFilter : Constants.LinearMipMapLinearFilter;
 
 	this.anisotropy = options.anisotropy !== undefined ? options.anisotropy : 1;
 
-	this.offset = new THREE.Vector2( 0, 0 );
-	this.repeat = new THREE.Vector2( 1, 1 );
+	this.offset = new Vector2( 0, 0 );
+	this.repeat = new Vector2( 1, 1 );
 
-	this.format = options.format !== undefined ? options.format : THREE.RGBAFormat;
-	this.type = options.type !== undefined ? options.type : THREE.UnsignedByteType;
+	this.format = options.format !== undefined ? options.format : Constants.RGBAFormat;
+	this.type = options.type !== undefined ? options.type : Constants.UnsignedByteType;
 
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
@@ -33,11 +40,11 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.shareDepthFrom = options.shareDepthFrom !== undefined ? options.shareDepthFrom : null;
 
-};
+}
 
-THREE.WebGLRenderTarget.prototype = {
+WebGLRenderTarget.prototype = {
 
-	constructor: THREE.WebGLRenderTarget,
+	constructor: WebGLRenderTarget,
 
 	setSize: function ( width, height ) {
 
@@ -90,10 +97,10 @@ THREE.WebGLRenderTarget.prototype = {
 
 	dispose: function () {
 
-		this.dispatchEvent( { type: 'dispose' } );
+		this.dispatchEvent( { type: "dispose" } );
 
 	}
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.WebGLRenderTarget.prototype );
+EventDispatcher.prototype.apply( WebGLRenderTarget.prototype );

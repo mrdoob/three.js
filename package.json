@@ -1,34 +1,48 @@
 {
-  "name": "three.js",
-  "version": "0.71.0",
-  "description": "JavaScript 3D library",
-  "main": "build/three.js",
-  "directories": {
-    "doc": "docs",
-    "example": "examples",
-    "test": "test"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "@mrdoob/three.js",
+  "description": "A lightweight 3D library.",
+  "keywords": [
+    "three",
+    "threejs",
+    "three.js",
+    "3d",
+    "rendering",
+    "library",
+    "webgl",
+    "canvas",
+    "css3d",
+    "svg"
+  ],
+  "version": "1.0.0",
+  "homepage": "http://threejs.org/",
+  "author": {
+    "name": "three.js contributors",
+    "email": ""
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/mrdoob/three.js"
   },
-  "keywords": [
-    "three",
-    "three.js",
-    "3d",
-    "webgl"
-  ],
-  "author": "mrdoob",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/mrdoob/three.js/issues"
   },
-  "homepage": "http://threejs.org/",
+  "license": "MIT",
+  "main": "src/Three",
+  "scripts": {
+    "test": "grunt"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "dependencies": {},
   "devDependencies": {
-    "jscs": "^1.13.1",
-    "lodash": "^3.10.0"
+    "brfs": "1.x.x",
+    "grunt": "0.4.x",
+    "grunt-browserify": "3.x.x",
+    "grunt-contrib-clean": "0.x.x",
+    "grunt-contrib-jshint": "0.11.x",
+    "grunt-contrib-qunit": "0.7.x",
+    "grunt-contrib-uglify": "0.9.x",
+    "lodash": "3.x.x"
   }
 }

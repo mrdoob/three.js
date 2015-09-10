@@ -4,22 +4,29 @@
  * @author bhouston / http://exocortex.com
  */
 
-THREE.Euler = function ( x, y, z, order ) {
+module.exports = Euler;
+
+var _Math = require( "./Math" ),
+	Matrix4 = require( "./Matrix4" ),
+	Quaternion = require( "./Quaternion" ),
+	Vector3 = require( "./Vector3" );
+
+function Euler( x, y, z, order ) {
 
 	this._x = x || 0;
 	this._y = y || 0;
 	this._z = z || 0;
-	this._order = order || THREE.Euler.DefaultOrder;
+	this._order = order || Euler.DefaultOrder;
 
-};
+}
 
-THREE.Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+Euler.RotationOrders = [ "XYZ", "YZX", "ZXY", "XZY", "YXZ", "ZYX" ];
 
-THREE.Euler.DefaultOrder = 'XYZ';
+Euler.DefaultOrder = "XYZ";
 
-THREE.Euler.prototype = {
+Euler.prototype = {
 
-	constructor: THREE.Euler,
+	constructor: Euler,
 
 	get x () {
 
@@ -107,7 +114,7 @@ THREE.Euler.prototype = {
 
 	setFromRotationMatrix: function ( m, order, update ) {
 
-		var clamp = THREE.Math.clamp;
+		var clamp = _Math.clamp;
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
@@ -118,7 +125,7 @@ THREE.Euler.prototype = {
 
 		order = order || this._order;
 
-		if ( order === 'XYZ' ) {
+		if ( order === "XYZ" ) {
 
 			this._y = Math.asin( clamp( m13, - 1, 1 ) );
 
@@ -134,7 +141,7 @@ THREE.Euler.prototype = {
 
 			}
 
-		} else if ( order === 'YXZ' ) {
+		} else if ( order === "YXZ" ) {
 
 			this._x = Math.asin( - clamp( m23, - 1, 1 ) );
 
@@ -150,7 +157,7 @@ THREE.Euler.prototype = {
 
 			}
 
-		} else if ( order === 'ZXY' ) {
+		} else if ( order === "ZXY" ) {
 
 			this._x = Math.asin( clamp( m32, - 1, 1 ) );
 
@@ -166,7 +173,7 @@ THREE.Euler.prototype = {
 
 			}
 
-		} else if ( order === 'ZYX' ) {
+		} else if ( order === "ZYX" ) {
 
 			this._y = Math.asin( - clamp( m31, - 1, 1 ) );
 
@@ -182,7 +189,7 @@ THREE.Euler.prototype = {
 
 			}
 
-		} else if ( order === 'YZX' ) {
+		} else if ( order === "YZX" ) {
 
 			this._z = Math.asin( clamp( m21, - 1, 1 ) );
 
@@ -198,7 +205,7 @@ THREE.Euler.prototype = {
 
 			}
 
-		} else if ( order === 'XZY' ) {
+		} else if ( order === "XZY" ) {
 
 			this._z = Math.asin( - clamp( m12, - 1, 1 ) );
 
@@ -216,25 +223,25 @@ THREE.Euler.prototype = {
 
 		} else {
 
-			console.warn( 'THREE.Euler: .setFromRotationMatrix() given unsupported order: ' + order )
+			console.warn( "Euler: .setFromRotationMatrix() given unsupported order: " + order );
 
 		}
 
 		this._order = order;
 
-		if ( update !== false ) this.onChangeCallback();
+		if ( update !== false ) { this.onChangeCallback(); }
 
 		return this;
 
 	},
 
-	setFromQuaternion: function () {
+	setFromQuaternion: ( function () {
 
 		var matrix;
 
 		return function ( q, order, update ) {
 
-			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+			if ( matrix === undefined ) { matrix = new Matrix4(); }
 			matrix.makeRotationFromQuaternion( q );
 			this.setFromRotationMatrix( matrix, order, update );
 
@@ -242,7 +249,7 @@ THREE.Euler.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	setFromVector3: function ( v, order ) {
 
@@ -250,11 +257,11 @@ THREE.Euler.prototype = {
 
 	},
 
-	reorder: function () {
+	reorder: ( function () {
 
 		// WARNING: this discards revolution information -bhouston
 
-		var q = new THREE.Quaternion();
+		var q = new Quaternion();
 
 		return function ( newOrder ) {
 
@@ -263,7 +270,7 @@ THREE.Euler.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	equals: function ( euler ) {
 
@@ -276,7 +283,7 @@ THREE.Euler.prototype = {
 		this._x = array[ 0 ];
 		this._y = array[ 1 ];
 		this._z = array[ 2 ];
-		if ( array[ 3 ] !== undefined ) this._order = array[ 3 ];
+		if ( array[ 3 ] !== undefined ) { this._order = array[ 3 ]; }
 
 		this.onChangeCallback();
 
@@ -286,8 +293,8 @@ THREE.Euler.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+		if ( array === undefined ) { array = []; }
+		if ( offset === undefined ) { offset = 0; }
 
 		array[ offset ] = this._x;
 		array[ offset + 1 ] = this._y;
@@ -306,7 +313,7 @@ THREE.Euler.prototype = {
 
 		} else {
 
-			return new THREE.Vector3( this._x, this._y, this._z );
+			return new Vector3( this._x, this._y, this._z );
 
 		}
 

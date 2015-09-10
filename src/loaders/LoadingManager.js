@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
+module.exports = LoadingManager;
+
+function LoadingManager( onLoad, onProgress, onError ) {
 
 	var scope = this;
 
@@ -65,6 +67,6 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 
 	};
 
-};
+}
 
-THREE.DefaultLoadingManager = new THREE.LoadingManager();
+LoadingManager.DefaultLoadingManager = new LoadingManager();

@@ -2,29 +2,38 @@
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
  * @author WestLangley / http://github.com/WestLangley
-*/
+ */
 
-THREE.Camera = function () {
+module.exports = Camera;
 
-	THREE.Object3D.call( this );
+var Object3D = require( "../core/Object3D" ),
+  Matrix4 = require( "../math/Matrix4" ),
+  Quaternion = require( "../math/Quaternion" ),
+  Vector3 = require( "../math/Vector3" );
 
-	this.type = 'Camera';
+function Camera() {
 
-	this.matrixWorldInverse = new THREE.Matrix4();
-	this.projectionMatrix = new THREE.Matrix4();
+	Object3D.call( this );
 
-};
+	this.type = "Camera";
 
-THREE.Camera.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Camera.prototype.constructor = THREE.Camera;
+	this.matrixWorldInverse = new Matrix4();
+	this.projectionMatrix = new Matrix4();
 
-THREE.Camera.prototype.getWorldDirection = function () {
+}
 
-	var quaternion = new THREE.Quaternion();
+Camera.prototype = Object.create( Object3D.prototype );
+Camera.prototype.constructor = Camera;
+
+Camera.prototype.getWorldDirection = ( function () {
+
+	var quaternion;
 
 	return function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		if ( quaternion === undefined ) { quaternion = new Quaternion(); }
+
+		var result = optionalTarget || new Vector3();
 
 		this.getWorldQuaternion( quaternion );
 
@@ -32,15 +41,17 @@ THREE.Camera.prototype.getWorldDirection = function () {
 
 	};
 
-}();
+}() );
 
-THREE.Camera.prototype.lookAt = function () {
+Camera.prototype.lookAt = ( function () {
 
 	// This routine does not support cameras with rotated and/or translated parent(s)
 
-	var m1 = new THREE.Matrix4();
+	var m1;
 
 	return function ( vector ) {
+
+		if ( m1 === undefined ) { m1 = new Matrix4(); }
 
 		m1.lookAt( this.position, vector, this.up );
 
@@ -48,17 +59,17 @@ THREE.Camera.prototype.lookAt = function () {
 
 	};
 
-}();
+}() );
 
-THREE.Camera.prototype.clone = function () {
+Camera.prototype.clone = function () {
 
 	return new this.constructor().copy( this );
 
 };
 
-THREE.Camera.prototype.copy = function ( source ) {
+Camera.prototype.copy = function ( source ) {
 
-	THREE.Object3D.prototype.copy.call( this, source );
+	Object3D.prototype.copy.call( this, source );
 
 	this.matrixWorldInverse.copy( source.matrixWorldInverse );
 	this.projectionMatrix.copy( source.projectionMatrix );

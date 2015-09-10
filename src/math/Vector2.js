@@ -5,16 +5,18 @@
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
-THREE.Vector2 = function ( x, y ) {
+module.exports = Vector2;
+
+function Vector2( x, y ) {
 
 	this.x = x || 0;
 	this.y = y || 0;
 
-};
+}
 
-THREE.Vector2.prototype = {
+Vector2.prototype = {
 
-	constructor: THREE.Vector2,
+	constructor: Vector2,
 
 	set: function ( x, y ) {
 
@@ -47,7 +49,7 @@ THREE.Vector2.prototype = {
 
 			case 0: this.x = value; break;
 			case 1: this.y = value; break;
-			default: throw new Error( 'index is out of range: ' + index );
+			default: throw new Error( "index is out of range: " + index );
 
 		}
 
@@ -59,7 +61,7 @@ THREE.Vector2.prototype = {
 
 			case 0: return this.x;
 			case 1: return this.y;
-			default: throw new Error( 'index is out of range: ' + index );
+			default: throw new Error( "index is out of range: " + index );
 
 		}
 
@@ -84,7 +86,7 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( "Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead." );
 			return this.addVectors( v, w );
 
 		}
@@ -127,7 +129,7 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( "Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead." );
 			return this.subVectors( v, w );
 
 		}
@@ -268,7 +270,7 @@ THREE.Vector2.prototype = {
 
 	},
 
-	clampScalar: function () {
+	clampScalar: ( function () {
 
 		var min, max;
 
@@ -276,8 +278,8 @@ THREE.Vector2.prototype = {
 
 			if ( min === undefined ) {
 
-				min = new THREE.Vector2();
-				max = new THREE.Vector2();
+				min = new Vector2();
+				max = new Vector2();
 
 			}
 
@@ -288,7 +290,7 @@ THREE.Vector2.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	floor: function () {
 
@@ -417,7 +419,7 @@ THREE.Vector2.prototype = {
 
 	fromArray: function ( array, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) { offset = 0; }
 
 		this.x = array[ offset ];
 		this.y = array[ offset + 1 ];
@@ -428,8 +430,8 @@ THREE.Vector2.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+		if ( array === undefined ) { array = []; }
+		if ( offset === undefined ) { offset = 0; }
 
 		array[ offset ] = this.x;
 		array[ offset + 1 ] = this.y;
@@ -440,7 +442,7 @@ THREE.Vector2.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) { offset = 0; }
 
 		index = index * attribute.itemSize + offset;
 

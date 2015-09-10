@@ -2,15 +2,19 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SceneUtils = {
+var Group = require( "../objects/Group" ),
+	Matrix4 = require( "../math/Matrix4" ),
+	Mesh = require( "../objects/Mesh" );
+
+module.exports = {
 
 	createMultiMaterialObject: function ( geometry, materials ) {
 
-		var group = new THREE.Group();
+		var group = new Group();
 
 		for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
-			group.add( new THREE.Mesh( geometry, materials[ i ] ) );
+			group.add( new Mesh( geometry, materials[ i ] ) );
 
 		}
 
@@ -28,7 +32,7 @@ THREE.SceneUtils = {
 
 	attach: function ( child, scene, parent ) {
 
-		var matrixWorldInverse = new THREE.Matrix4();
+		var matrixWorldInverse = new Matrix4();
 		matrixWorldInverse.getInverse( parent.matrixWorld );
 		child.applyMatrix( matrixWorldInverse );
 

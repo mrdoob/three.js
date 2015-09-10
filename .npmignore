@@ -1,6 +1,6 @@
-examples/
-src/
-test/
-utils/
-docs/
-editor/
+build
+docs
+editor
+examples
+test
+utils

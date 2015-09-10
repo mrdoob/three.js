@@ -2,16 +2,20 @@
  * @author bhouston / http://exocortex.com
  */
 
-THREE.Ray = function ( origin, direction ) {
+module.exports = Ray;
 
-	this.origin = ( origin !== undefined ) ? origin : new THREE.Vector3();
-	this.direction = ( direction !== undefined ) ? direction : new THREE.Vector3();
+var Vector3 = require( "./Vector3" );
 
-};
+function Ray( origin, direction ) {
 
-THREE.Ray.prototype = {
+	this.origin = ( origin !== undefined ) ? origin : new Vector3();
+	this.direction = ( direction !== undefined ) ? direction : new Vector3();
 
-	constructor: THREE.Ray,
+}
+
+Ray.prototype = {
+
+	constructor: Ray,
 
 	set: function ( origin, direction ) {
 
@@ -39,15 +43,15 @@ THREE.Ray.prototype = {
 
 	at: function ( t, optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 
 		return result.copy( this.direction ).multiplyScalar( t ).add( this.origin );
 
 	},
 
-	recast: function () {
+	recast: ( function () {
 
-		var v1 = new THREE.Vector3();
+		var v1 = new Vector3();
 
 		return function ( t ) {
 
@@ -57,11 +61,11 @@ THREE.Ray.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	closestPointToPoint: function ( point, optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 		result.subVectors( point, this.origin );
 		var directionDistance = result.dot( this.direction );
 
@@ -81,9 +85,9 @@ THREE.Ray.prototype = {
 
 	},
 
-	distanceSqToPoint: function () {
+	distanceSqToPoint: ( function () {
 
-		var v1 = new THREE.Vector3();
+		var v1 = new Vector3();
 
 		return function ( point ) {
 
@@ -103,13 +107,13 @@ THREE.Ray.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
-	distanceSqToSegment: function () {
+	distanceSqToSegment: ( function () {
 
-		var segCenter = new THREE.Vector3();
-		var segDir = new THREE.Vector3();
-		var diff = new THREE.Vector3();
+		var segCenter = new Vector3();
+		var segDir = new Vector3();
+		var diff = new Vector3();
 
 		return function ( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
@@ -230,7 +234,7 @@ THREE.Ray.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 
 	isIntersectionSphere: function ( sphere ) {
@@ -239,11 +243,11 @@ THREE.Ray.prototype = {
 
 	},
 
-	intersectSphere: function () {
+	intersectSphere: ( function () {
 
 		// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
 
-		var v1 = new THREE.Vector3();
+		var v1 = new Vector3();
 
 		return function ( sphere, optionalTarget ) {
 
@@ -255,7 +259,7 @@ THREE.Ray.prototype = {
 
 			var radius2 = sphere.radius * sphere.radius;
 
-			if ( d2 > radius2 ) return null;
+			if ( d2 > radius2 ) { return null; }
 
 			var thc = Math.sqrt( radius2 - d2 );
 
@@ -266,19 +270,19 @@ THREE.Ray.prototype = {
 			var t1 = tca + thc;
 
 			// test to see if both t0 and t1 are behind the ray - if so, return null
-			if ( t0 < 0 && t1 < 0 ) return null;
+			if ( t0 < 0 && t1 < 0 ) { return null; }
 
 			// test to see if t0 is behind the ray:
 			// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
 			// in order to always return an intersect point that is in front of the ray.
-			if ( t0 < 0 ) return this.at( t1, optionalTarget );
+			if ( t0 < 0 ) { return this.at( t1, optionalTarget ); }
 
 			// else t0 is in front of the ray, so return the first collision point scaled by t0
 			return this.at( t0, optionalTarget );
 
-		}
+		};
 
-	}(),
+	}() ),
 
 	isIntersectionPlane: function ( plane ) {
 
@@ -346,9 +350,9 @@ THREE.Ray.prototype = {
 
 	},
 
-	isIntersectionBox: function () {
+	isIntersectionBox: ( function () {
 
-		var v = new THREE.Vector3();
+		var v = new Vector3();
 
 		return function ( box ) {
 
@@ -356,7 +360,7 @@ THREE.Ray.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	intersectBox: function ( box, optionalTarget ) {
 
@@ -394,14 +398,14 @@ THREE.Ray.prototype = {
 
 		}
 
-		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
+		if ( ( tmin > tymax ) || ( tymin > tmax ) ) { return null; }
 
 		// These lines also handle the case where tmin or tmax is NaN
 		// (result of 0 * Infinity). x !== x returns true if x is NaN
 
-		if ( tymin > tmin || tmin !== tmin ) tmin = tymin;
+		if ( tymin > tmin || tmin !== tmin ) { tmin = tymin; }
 
-		if ( tymax < tmax || tmax !== tmax ) tmax = tymax;
+		if ( tymax < tmax || tmax !== tmax ) { tmax = tymax; }
 
 		if ( invdirz >= 0 ) {
 
@@ -415,27 +419,27 @@ THREE.Ray.prototype = {
 
 		}
 
-		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
+		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) { return null; }
 
-		if ( tzmin > tmin || tmin !== tmin ) tmin = tzmin;
+		if ( tzmin > tmin || tmin !== tmin ) { tmin = tzmin; }
 
-		if ( tzmax < tmax || tmax !== tmax ) tmax = tzmax;
+		if ( tzmax < tmax || tmax !== tmax ) { tmax = tzmax; }
 
 		//return point closest to the ray (positive side)
 
-		if ( tmax < 0 ) return null;
+		if ( tmax < 0 ) { return null; }
 
 		return this.at( tmin >= 0 ? tmin : tmax, optionalTarget );
 
 	},
 
-	intersectTriangle: function () {
+	intersectTriangle: ( function () {
 
 		// Compute the offset origin, edges, and normal.
-		var diff = new THREE.Vector3();
-		var edge1 = new THREE.Vector3();
-		var edge2 = new THREE.Vector3();
-		var normal = new THREE.Vector3();
+		var diff = new Vector3();
+		var edge1 = new Vector3();
+		var edge2 = new Vector3();
+		var normal = new Vector3();
 
 		return function ( a, b, c, backfaceCulling, optionalTarget ) {
 
@@ -455,7 +459,7 @@ THREE.Ray.prototype = {
 
 			if ( DdN > 0 ) {
 
-				if ( backfaceCulling ) return null;
+				if ( backfaceCulling ) { return null; }
 				sign = 1;
 
 			} else if ( DdN < 0 ) {
@@ -510,7 +514,7 @@ THREE.Ray.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	applyMatrix4: function ( matrix4 ) {
 

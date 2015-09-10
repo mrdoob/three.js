@@ -6,7 +6,7 @@
  *  color: <hex>,
  *  opacity: <float>,
  *
- *  blending: THREE.NormalBlending,
+ *  blending: Constants.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -20,32 +20,38 @@
  * }
  */
 
-THREE.LineBasicMaterial = function ( parameters ) {
+module.exports = LineBasicMaterial;
 
-	THREE.Material.call( this );
+var Constants = require( "../Constants" ),
+	Material = require( "../materials/Material" ),
+	Color = require( "../math/Color" );
 
-	this.type = 'LineBasicMaterial';
+function LineBasicMaterial( parameters ) {
 
-	this.color = new THREE.Color( 0xffffff );
+	Material.call( this );
+
+	this.type = "LineBasicMaterial";
+
+	this.color = new Color( 0xffffff );
 
 	this.linewidth = 1;
-	this.linecap = 'round';
-	this.linejoin = 'round';
+	this.linecap = "round";
+	this.linejoin = "round";
 
-	this.vertexColors = THREE.NoColors;
+	this.vertexColors = Constants.NoColors;
 
 	this.fog = true;
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.LineBasicMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.LineBasicMaterial.prototype.constructor = THREE.LineBasicMaterial;
+LineBasicMaterial.prototype = Object.create( Material.prototype );
+LineBasicMaterial.prototype.constructor = LineBasicMaterial;
 
-THREE.LineBasicMaterial.prototype.copy = function ( source ) {
+LineBasicMaterial.prototype.copy = function ( source ) {
 
-	THREE.Material.prototype.copy.call( this, source );
+	Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 

@@ -2,13 +2,17 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ImmediateRenderObject = function () {
+module.exports = ImmediateRenderObject;
 
-	THREE.Object3D.call( this );
+var Object3D = require( "../../core/Object3D" );
 
-	this.render = function ( renderCallback ) {};
+function ImmediateRenderObject() {
 
-};
+	Object3D.call( this );
 
-THREE.ImmediateRenderObject.prototype = Object.create( THREE.Object3D.prototype );
-THREE.ImmediateRenderObject.prototype.constructor = THREE.ImmediateRenderObject;
+	this.render = function () {};
+
+}
+
+ImmediateRenderObject.prototype = Object.create( Object3D.prototype );
+ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;

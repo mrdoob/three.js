@@ -2,17 +2,19 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GeometryUtils = {
+var Mesh = require( "../objects/Mesh" );
+
+module.exports = {
 
 	merge: function ( geometry1, geometry2, materialIndexOffset ) {
 
-		console.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
+		console.warn( "GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead." );
 
 		var matrix;
 
-		if ( geometry2 instanceof THREE.Mesh ) {
+		if ( geometry2 instanceof Mesh ) {
 
-			geometry2.matrixAutoUpdate && geometry2.updateMatrix();
+			if( geometry2.matrixAutoUpdate ) { geometry2.updateMatrix(); }
 
 			matrix = geometry2.matrix;
 			geometry2 = geometry2.geometry;
@@ -25,7 +27,7 @@ THREE.GeometryUtils = {
 
 	center: function ( geometry ) {
 
-		console.warn( 'THREE.GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead.' );
+		console.warn( "GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead." );
 		return geometry.center();
 
 	}

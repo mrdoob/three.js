@@ -2,11 +2,16 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
+module.exports = OrthographicCamera;
 
-	THREE.Camera.call( this );
+var Camera = require( "./Camera" ),
+	Object3D = require( "../core/Object3D" );
 
-	this.type = 'OrthographicCamera';
+function OrthographicCamera( left, right, top, bottom, near, far ) {
+
+	Camera.call( this );
+
+	this.type = "OrthographicCamera";
 
 	this.zoom = 1;
 
@@ -20,12 +25,12 @@ THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
 
 	this.updateProjectionMatrix();
 
-};
+}
 
-THREE.OrthographicCamera.prototype = Object.create( THREE.Camera.prototype );
-THREE.OrthographicCamera.prototype.constructor = THREE.OrthographicCamera;
+OrthographicCamera.prototype = Object.create( Camera.prototype );
+OrthographicCamera.prototype.constructor = OrthographicCamera;
 
-THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
+OrthographicCamera.prototype.updateProjectionMatrix = function () {
 
 	var dx = ( this.right - this.left ) / ( 2 * this.zoom );
 	var dy = ( this.top - this.bottom ) / ( 2 * this.zoom );
@@ -36,9 +41,9 @@ THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 
 };
 
-THREE.OrthographicCamera.prototype.copy = function ( source ) {
+OrthographicCamera.prototype.copy = function ( source ) {
 	
-	THREE.Camera.prototype.copy.call( this, source );
+	Camera.prototype.copy.call( this, source );
 	
 	this.left = source.left;
 	this.right = source.right;
@@ -53,9 +58,9 @@ THREE.OrthographicCamera.prototype.copy = function ( source ) {
 		
 };
 
-THREE.OrthographicCamera.prototype.toJSON = function ( meta ) {
+OrthographicCamera.prototype.toJSON = function ( meta ) {
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	var data = Object3D.prototype.toJSON.call( this, meta );
 
 	data.object.zoom = this.zoom;
 	data.object.left = this.left;

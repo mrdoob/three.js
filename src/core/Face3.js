@@ -3,25 +3,30 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
+module.exports = Face3;
+
+var Color = require( "../math/Color" ),
+	Vector3 = require( "../math/Vector3" );
+
+function Face3( a, b, c, normal, color, materialIndex ) {
 
 	this.a = a;
 	this.b = b;
 	this.c = c;
 
-	this.normal = normal instanceof THREE.Vector3 ? normal : new THREE.Vector3();
+	this.normal = normal instanceof Vector3 ? normal : new Vector3();
 	this.vertexNormals = Array.isArray( normal ) ? normal : [];
 
-	this.color = color instanceof THREE.Color ? color : new THREE.Color();
+	this.color = color instanceof Color ? color : new Color();
 	this.vertexColors = Array.isArray( color ) ? color : [];
 
 	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
-};
+}
 
-THREE.Face3.prototype = {
+Face3.prototype = {
 
-	constructor: THREE.Face3,
+	constructor: Face3,
 
 	clone: function () {
 
@@ -30,6 +35,8 @@ THREE.Face3.prototype = {
 	},
 
 	copy: function ( source ) {
+
+		var i, il;
 
 		this.a = source.a;
 		this.b = source.b;
@@ -40,13 +47,13 @@ THREE.Face3.prototype = {
 
 		this.materialIndex = source.materialIndex;
 
-		for ( var i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
+		for ( i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
 
 			this.vertexNormals[ i ] = source.vertexNormals[ i ].clone();
 
 		}
 
-		for ( var i = 0, il = source.vertexColors.length; i < il; i ++ ) {
+		for ( i = 0, il = source.vertexColors.length; i < il; i ++ ) {
 
 			this.vertexColors[ i ] = source.vertexColors[ i ].clone();
 

@@ -5,7 +5,7 @@
  *  color: <hex>,
  *  opacity: <float>,
  *
- *  blending: THREE.NormalBlending,
+ *  blending: Constants.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -21,13 +21,18 @@
  * }
  */
 
-THREE.LineDashedMaterial = function ( parameters ) {
+module.exports = LineDashedMaterial;
 
-	THREE.Material.call( this );
+var Color = require( "../math/Color" ),
+	Material = require( "../materials/Material" );
 
-	this.type = 'LineDashedMaterial';
+function LineDashedMaterial( parameters ) {
 
-	this.color = new THREE.Color( 0xffffff );
+	Material.call( this );
+
+	this.type = "LineDashedMaterial";
+
+	this.color = new Color( 0xffffff );
 
 	this.linewidth = 1;
 
@@ -41,14 +46,14 @@ THREE.LineDashedMaterial = function ( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.LineDashedMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.LineDashedMaterial.prototype.constructor = THREE.LineDashedMaterial;
+LineDashedMaterial.prototype = Object.create( Material.prototype );
+LineDashedMaterial.prototype.constructor = LineDashedMaterial;
 
-THREE.LineDashedMaterial.prototype.copy = function ( source ) {
+LineDashedMaterial.prototype.copy = function ( source ) {
 
-	THREE.Material.prototype.copy.call( this, source );
+	Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 	

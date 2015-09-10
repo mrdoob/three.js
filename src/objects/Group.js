@@ -2,13 +2,17 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Group = function () {
+module.exports = Group;
 
-	THREE.Object3D.call( this );
+var Object3D = require( "../core/Object3D" );
 
-	this.type = 'Group';
+function Group() {
 
-};
+	Object3D.call( this );
 
-THREE.Group.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Group.prototype.constructor = THREE.Group;
+	this.type = "Group";
+
+}
+
+Group.prototype = Object.create( Object3D.prototype );
+Group.prototype.constructor = Group;

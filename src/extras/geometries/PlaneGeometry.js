@@ -3,11 +3,16 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
+module.exports = PlaneGeometry;
 
-	THREE.Geometry.call( this );
+var PlaneBufferGeometry = require( "./PlaneBufferGeometry" ),
+	Geometry = require( "../../core/Geometry" );
 
-	this.type = 'PlaneGeometry';
+function PlaneGeometry( width, height, widthSegments, heightSegments ) {
+
+	Geometry.call( this );
+
+	this.type = "PlaneGeometry";
 
 	this.parameters = {
 		width: width,
@@ -16,16 +21,16 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 		heightSegments: heightSegments
 	};
 
-	this.fromBufferGeometry( new THREE.PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
+	this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
 
-};
+}
 
-THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.PlaneGeometry.prototype.constructor = THREE.PlaneGeometry;
+PlaneGeometry.prototype = Object.create( Geometry.prototype );
+PlaneGeometry.prototype.constructor = PlaneGeometry;
 
-THREE.PlaneGeometry.prototype.clone = function () {
+PlaneGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.PlaneGeometry(
+	var geometry = new PlaneGeometry(
 		this.parameters.width,
 		this.parameters.height,
 		this.parameters.widthSegments,

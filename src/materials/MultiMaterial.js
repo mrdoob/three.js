@@ -2,29 +2,33 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MultiMaterial = function ( materials ) {
+module.exports = MultiMaterial;
 
-	this.uuid = THREE.Math.generateUUID();
+var _Math = require( "../math/Math" );
 
-	this.type = 'MultiMaterial';
+function MultiMaterial( materials ) {
+
+	this.uuid = _Math.generateUUID();
+
+	this.type = "MultiMaterial";
 
 	this.materials = materials instanceof Array ? materials : [];
 
 	this.visible = true;
 
-};
+}
 
-THREE.MultiMaterial.prototype = {
+MultiMaterial.prototype = {
 
-	constructor: THREE.MultiMaterial,
+	constructor: MultiMaterial,
 
 	toJSON: function () {
 
 		var output = {
 			metadata: {
 				version: 4.2,
-				type: 'material',
-				generator: 'MaterialExporter'
+				type: "material",
+				generator: "MaterialExporter"
 			},
 			uuid: this.uuid,
 			type: this.type,
@@ -60,7 +64,3 @@ THREE.MultiMaterial.prototype = {
 	}
 
 };
-
-// backwards compatibility
-
-THREE.MeshFaceMaterial = THREE.MultiMaterial;

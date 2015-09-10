@@ -2,16 +2,21 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay ) {
+module.exports = SpotLight;
 
-	THREE.Light.call( this, color );
+var Light = require( "./Light" ),
+	Object3D = require( "../core/Object3D" );
 
-	this.type = 'SpotLight';
+function SpotLight( color, intensity, distance, angle, exponent, decay ) {
+
+	Light.call( this, color );
+
+	this.type = "SpotLight";
 
 	this.position.set( 0, 1, 0 );
 	this.updateMatrix();
 
-	this.target = new THREE.Object3D();
+	this.target = new Object3D();
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;
@@ -39,14 +44,14 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay 
 	this.shadowCamera = null;
 	this.shadowMatrix = null;
 
-};
+}
 
-THREE.SpotLight.prototype = Object.create( THREE.Light.prototype );
-THREE.SpotLight.prototype.constructor = THREE.SpotLight;
+SpotLight.prototype = Object.create( Light.prototype );
+SpotLight.prototype.constructor = SpotLight;
 
-THREE.SpotLight.prototype.copy = function ( source ) {
+SpotLight.prototype.copy = function ( source ) {
 
-	THREE.Light.prototype.copy.call( this, source );
+	Light.prototype.copy.call( this, source );
 
 	this.intensity = source.intensity;
 	this.distance = source.distance;
@@ -72,11 +77,12 @@ THREE.SpotLight.prototype.copy = function ( source ) {
 	this.shadowMapHeight = source.shadowMapHeight;
 
 	return this;
-}
 
-THREE.SpotLight.prototype.toJSON = function ( meta ) {
+};
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+SpotLight.prototype.toJSON = function ( meta ) {
+
+	var data = Object3D.prototype.toJSON.call( this, meta );
 
 	data.object.color = this.color.getHex();
 	data.object.intensity = this.intensity;

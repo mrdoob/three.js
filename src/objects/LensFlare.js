@@ -3,13 +3,20 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.LensFlare = function ( texture, size, distance, blending, color ) {
+module.exports = LensFlare;
 
-	THREE.Object3D.call( this );
+var Constants = require( "../Constants" ),
+	Object3D = require( "../core/Object3D" ),
+	Color = require( "../math/Color" ),
+	Vector3 = require( "../math/Vector3" );
+
+function LensFlare( texture, size, distance, blending, color ) {
+
+	Object3D.call( this );
 
 	this.lensFlares = [];
 
-	this.positionScreen = new THREE.Vector3();
+	this.positionScreen = new Vector3();
 	this.customUpdateCallback = undefined;
 
 	if ( texture !== undefined ) {
@@ -18,36 +25,35 @@ THREE.LensFlare = function ( texture, size, distance, blending, color ) {
 
 	}
 
-};
+}
 
-THREE.LensFlare.prototype = Object.create( THREE.Object3D.prototype );
-THREE.LensFlare.prototype.constructor = THREE.LensFlare;
-
+LensFlare.prototype = Object.create( Object3D.prototype );
+LensFlare.prototype.constructor = LensFlare;
 
 /*
  * Add: adds another flare
  */
 
-THREE.LensFlare.prototype.add = function ( texture, size, distance, blending, color, opacity ) {
+LensFlare.prototype.add = function ( texture, size, distance, blending, color, opacity ) {
 
-	if ( size === undefined ) size = - 1;
-	if ( distance === undefined ) distance = 0;
-	if ( opacity === undefined ) opacity = 1;
-	if ( color === undefined ) color = new THREE.Color( 0xffffff );
-	if ( blending === undefined ) blending = THREE.NormalBlending;
+	if ( size === undefined ) { size = - 1; }
+	if ( distance === undefined ) { distance = 0; }
+	if ( opacity === undefined ) { opacity = 1; }
+	if ( color === undefined ) { color = new Color( 0xffffff ); }
+	if ( blending === undefined ) { blending = Constants.NormalBlending; }
 
 	distance = Math.min( distance, Math.max( 0, distance ) );
 
 	this.lensFlares.push( {
-		texture: texture,	// THREE.Texture
-		size: size, 		// size in pixels (-1 = use texture.width)
-		distance: distance, 	// distance (0-1) from light source (0=at light source)
-		x: 0, y: 0, z: 0,	// screen position (-1 => 1) z = 0 is in front z = 1 is back
-		scale: 1, 		// scale
-		rotation: 0, 		// rotation
-		opacity: opacity,	// opacity
-		color: color,		// color
-		blending: blending	// blending
+		texture: texture, // Texture instance
+		size: size, // size in pixels (-1 = use texture.width)
+		distance: distance, // distance (0-1) from light source (0=at light source)
+		x: 0, y: 0, z: 0, // screen position (-1 => 1) z = 0 is in front z = 1 is back
+		scale: 1,
+		rotation: 0,
+		opacity: opacity,
+		color: color,
+		blending: blending
 	} );
 
 };
@@ -57,7 +63,7 @@ THREE.LensFlare.prototype.add = function ( texture, size, distance, blending, co
  * Set myLensFlare.customUpdateCallback to alter the flares in your project specific way.
  */
 
-THREE.LensFlare.prototype.updateLensFlares = function () {
+LensFlare.prototype.updateLensFlares = function () {
 
 	var f, fl = this.lensFlares.length;
 	var flare;
@@ -78,9 +84,9 @@ THREE.LensFlare.prototype.updateLensFlares = function () {
 
 };
 
-THREE.LensFlare.prototype.copy = function ( source ) {
+LensFlare.prototype.copy = function ( source ) {
 
-	THREE.Object3D.prototype.copy.call( this, source );
+	Object3D.prototype.copy.call( this, source );
 
 	this.positionScreen.copy( source.positionScreen );
 	this.customUpdateCallback = source.customUpdateCallback;

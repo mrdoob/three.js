@@ -2,20 +2,25 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AmbientLight = function ( color ) {
+module.exports = AmbientLight;
 
-	THREE.Light.call( this, color );
+var Light = require( "./Light" ),
+	Object3D = require( "../core/Object3D" );
 
-	this.type = 'AmbientLight';
+function AmbientLight( color ) {
 
-};
+	Light.call( this, color );
 
-THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
-THREE.AmbientLight.prototype.constructor = THREE.AmbientLight;
+	this.type = "AmbientLight";
 
-THREE.AmbientLight.prototype.toJSON = function ( meta ) {
+}
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+AmbientLight.prototype = Object.create( Light.prototype );
+AmbientLight.prototype.constructor = AmbientLight;
+
+AmbientLight.prototype.toJSON = function ( meta ) {
+
+	var data = Object3D.prototype.toJSON.call( this, meta );
 
 	data.object.color = this.color.getHex();
 

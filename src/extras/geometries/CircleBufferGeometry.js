@@ -2,11 +2,18 @@
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLength ) {
+module.exports = CircleBufferGeometry;
 
-	THREE.BufferGeometry.call( this );
+var BufferAttribute = require( "../../core/BufferAttribute" ),
+	BufferGeometry = require( "../../core/BufferGeometry" ),
+	Sphere = require( "../../math/Sphere" ),
+	Vector3 = require( "../../math/Vector3" );
 
-	this.type = 'CircleBufferGeometry';
+function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
+
+	BufferGeometry.call( this );
+
+	this.type = "CircleBufferGeometry";
 
 	this.parameters = {
 		radius: radius,
@@ -32,9 +39,11 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 	uvs[ 0 ] = 0.5;
 	uvs[ 1 ] = 0.5;
 
-	for ( var s = 0, i = 3, ii = 2 ; s <= segments; s ++, i += 3, ii += 2 ) {
+	var s, i, ii, segment;
 
-		var segment = thetaStart + s / segments * thetaLength;
+	for ( s = 0, i = 3, ii = 2 ; s <= segments; s ++, i += 3, ii += 2 ) {
+
+		segment = thetaStart + s / segments * thetaLength;
 
 		positions[ i ] = radius * Math.cos( segment );
 		positions[ i + 1 ] = radius * Math.sin( segment );
@@ -48,7 +57,7 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 
 	var indices = [];
 
-	for ( var i = 1; i <= segments; i ++ ) {
+	for ( i = 1; i <= segments; i ++ ) {
 
 		indices.push( i );
 		indices.push( i + 1 );
@@ -56,21 +65,21 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 
 	}
 
-	this.addIndex( new THREE.BufferAttribute( new Uint16Array( indices ), 1 ) );
-	this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	this.addIndex( new BufferAttribute( new Uint16Array( indices ), 1 ) );
+	this.addAttribute( "position", new BufferAttribute( positions, 3 ) );
+	this.addAttribute( "normal", new BufferAttribute( normals, 3 ) );
+	this.addAttribute( "uv", new BufferAttribute( uvs, 2 ) );
 
-	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
+	this.boundingSphere = new Sphere( new Vector3(), radius );
 
-};
+}
 
-THREE.CircleBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.CircleBufferGeometry.prototype.constructor = THREE.CircleBufferGeometry;
+CircleBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
 
-THREE.CircleBufferGeometry.prototype.clone = function () {
+CircleBufferGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.CircleBufferGeometry(
+	var geometry = new CircleBufferGeometry(
 		this.parameters.radius,
 		this.parameters.segments,
 		this.parameters.thetaStart,

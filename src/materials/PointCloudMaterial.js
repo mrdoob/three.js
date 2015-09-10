@@ -5,12 +5,12 @@
  * parameters = {
  *  color: <hex>,
  *  opacity: <float>,
- *  map: new THREE.Texture( <Image> ),
+ *  map: new Texture( <Image> ),
  *
  *  size: <float>,
  *  sizeAttenuation: <bool>,
  *
- *  blending: THREE.NormalBlending,
+ *  blending: Constants.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -20,33 +20,39 @@
  * }
  */
 
-THREE.PointCloudMaterial = function ( parameters ) {
+module.exports = PointCloudMaterial;
 
-	THREE.Material.call( this );
+var Constants = require( "../Constants" ),
+	Color = require( "../math/Color" ),
+	Material = require( "../materials/Material" );
 
-	this.type = 'PointCloudMaterial';
+function PointCloudMaterial( parameters ) {
 
-	this.color = new THREE.Color( 0xffffff );
+	Material.call( this );
+
+	this.type = "PointCloudMaterial";
+
+	this.color = new Color( 0xffffff );
 
 	this.map = null;
 
 	this.size = 1;
 	this.sizeAttenuation = true;
 
-	this.vertexColors = THREE.NoColors;
+	this.vertexColors = Constants.NoColors;
 
 	this.fog = true;
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.PointCloudMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.PointCloudMaterial.prototype.constructor = THREE.PointCloudMaterial;
+PointCloudMaterial.prototype = Object.create( Material.prototype );
+PointCloudMaterial.prototype.constructor = PointCloudMaterial;
 
-THREE.PointCloudMaterial.prototype.copy = function ( source ) {
+PointCloudMaterial.prototype.copy = function ( source ) {
 
-	THREE.Material.prototype.copy.call( this, source );
+	Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 
@@ -63,18 +69,18 @@ THREE.PointCloudMaterial.prototype.copy = function ( source ) {
 
 };
 
-// backwards compatibility
+// Backwards Compatibility
 
-THREE.ParticleBasicMaterial = function ( parameters ) {
+PointCloudMaterial.ParticleBasicMaterial = function ( parameters ) {
 
-	console.warn( 'THREE.ParticleBasicMaterial has been renamed to THREE.PointCloudMaterial.' );
-	return new THREE.PointCloudMaterial( parameters );
+	console.warn( "ParticleBasicMaterial has been renamed to PointCloudMaterial." );
+	return new PointCloudMaterial( parameters );
 
 };
 
-THREE.ParticleSystemMaterial = function ( parameters ) {
+PointCloudMaterial.ParticleSystemMaterial = function ( parameters ) {
 
-	console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointCloudMaterial.' );
-	return new THREE.PointCloudMaterial( parameters );
+	console.warn( "ParticleSystemMaterial has been renamed to PointCloudMaterial." );
+	return new PointCloudMaterial( parameters );
 
 };

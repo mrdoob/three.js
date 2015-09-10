@@ -1,68 +1,156 @@
-three.js
-========
+# three.js 
 
-#### JavaScript 3D library ####
+[![Build Status](https://travis-ci.org/vanruesc/three.js.svg?branch=dev)](https://travis-ci.org/vanruesc/three.js) 
+[![GitHub version](https://badge.fury.io/gh/mrdoob%2Fthree.js.svg)](http://badge.fury.io/gh/mrdoob%2Fthree.js) 
+[![npm version](https://badge.fury.io/js/%40mrdoob%2Fthree.js.svg)](http://badge.fury.io/js/%40mrdoob%2Fthree.js) 
+[![Dependencies](https://david-dm.org/mrdoob/three.js.svg?branch=master)](https://david-dm.org/mrdoob/three.js)
 
-The aim of the project is to create a lightweight 3D library with a very low level of complexity — in other words, for dummies. The library provides &lt;canvas&gt;, &lt;svg&gt;, CSS3D and WebGL renderers.
+Three.js is a lightweight 3D library which can easily be integrated in your projects by using browserify with grunt or a similar tool. 
+The library supports a &lt;canvas&gt;, an &lt;svg&gt;, a CSS3D and a WebGL renderer. The latter is included in the library by default whereas 
+the other renderers are available as [plugins](https://github.com/mrdoob/three.js/tree/master/examples/js/renderers).  
 
-[Examples](http://threejs.org/examples/) — [Documentation](http://threejs.org/docs/) — [Migrating](https://github.com/mrdoob/three.js/wiki/Migration) — [Help](http://stackoverflow.com/questions/tagged/three.js)
+[Examples](http://threejs.org/examples/) — 
+[Documentation](http://threejs.org/docs/) — 
+[Migrating](https://github.com/mrdoob/three.js/wiki/Migration) — 
+[Help](http://stackoverflow.com/questions/tagged/three.js)
 
 
-### Usage ###
+## Installation
 
-Download the [minified library](http://threejs.org/build/three.min.js) and include it in your html.
-Alternatively see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/build.py,-or-how-to-generate-a-compressed-Three.js-file).
+The complete [minified library](https://mrdoob.github.io/three.js/build/three.min.js) offers the standard functionality in the form of 
+an isolated bundle:
 
 ```html
-<script src="js/three.min.js"></script>
+<script src="/js/three.min.js"></script>
 ```
 
-This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a `WebGL` renderer for the scene and camera, and it adds that viewport to the document.body element. Finally it animates the cube within the scene for the camera.
+The advanced approach is to install this module with [npm](https://www.npmjs.com) and aim to create a single JavaScript file that contains 
+the code of three.js together with your own code. You install three.js as follows:
 
-```html
-<script>
+```sh
+$ npm install @mrdoob/three.js
+``` 
 
-	var scene, camera, renderer;
-	var geometry, material, mesh;
 
-	init();
-	animate();
+## Usage
 
-	function init() {
+This code creates a scene, a camera and a geometric cube and it adds the cube to the scene. 
+It then creates a WebGL renderer for the scene and camera and it adds that viewport to the body element. 
+Finally it animates the cube within the scene for the camera.
 
-		scene = new THREE.Scene();
-		
-		camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-		camera.position.z = 1000;
+```javascript
+// Note: using require is not necessary with the browser bundle.
+var THREE = require("@mrdoob/three.js");
 
-		geometry = new THREE.BoxGeometry( 200, 200, 200 );
-		material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+var scene, camera, renderer,
+	geometry, material, mesh;
 
-		mesh = new THREE.Mesh( geometry, material );
-		scene.add( mesh );
+function init() {
 
-		renderer = new THREE.WebGLRenderer();
-		renderer.setSize( window.innerWidth, window.innerHeight );
+	var ratio = window.innerWidth / window.innerHeight;
 
-		document.body.appendChild( renderer.domElement );
+	scene = new THREE.Scene();
 
-	}
+	camera = new THREE.PerspectiveCamera( 75, ratio, 1, 10000 );
+	camera.position.z = 1000;
 
-	function animate() {
+	geometry = new THREE.BoxGeometry( 200, 200, 200 );
+	material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
 
-		requestAnimationFrame( animate );
+	mesh = new THREE.Mesh( geometry, material );
+	scene.add( mesh );
 
-		mesh.rotation.x += 0.01;
-		mesh.rotation.y += 0.02;
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
 
-		renderer.render( scene, camera );
+	document.body.appendChild( renderer.domElement );
 
-	}
+}
 
-</script>
+function animate() {
+
+	mesh.rotation.x += 0.01;
+	mesh.rotation.y += 0.02;
+
+	renderer.render( scene, camera);
+
+	requestAnimationFrame( animate );
+
+}
+
+init();
+animate();
 ```
+
 If everything went well you should see [this](http://jsfiddle.net/f17Lz5ux/).
 
-### Change log ###
 
-[releases](https://github.com/mrdoob/three.js/releases)
+## Using three.js as a module
+
+The bundled library already contains all the necessary shaders thanks to the brfs transform step in 
+the browserify build process. If you want to integrate three.js as a dependency in your own project, 
+you'll need a build tool like [Grunt](https://github.com/gruntjs/grunt) or [Gulp](https://github.com/gulpjs/gulp). 
+Install the following dev-dependencies for your build process:
+
+```sh
+$ npm install grunt --save-dev
+$ npm install grunt-browserify --save-dev
+$ npm install brfs --save-dev
+```
+
+Then configure your build file. A [Gruntfile.js](https://github.com/mrdoob/three.js/tree/master/Gruntfile.js), for instance, would contain something like this:
+
+```javascript
+// Your project configuration.
+grunt.initConfig( {
+
+	...
+
+	browserify: {
+
+		build: {
+
+			src: [ "src/<%= pkg.name %>.js" ],
+
+			dest: "build/<%= pkg.name %>.js",
+
+			options: {
+
+				transform: [ "brfs" ]
+
+			}
+
+		}
+
+	},
+
+	...
+
+} );
+
+// Plugins.
+grunt.loadNpmTasks( "grunt-browserify" );
+...
+
+// Task definitions.
+grunt.registerTask( "default", [ "browserify:build" ] );
+...
+```
+
+This setup makes sure that browserify properly includes the full shader code of the three.js library!
+
+
+## Contributing
+
+[Guidelines](https://github.com/mrdoob/three.js/tree/master/CONTRIBUTING.md)
+
+
+## Release History
+
+[Releases](https://github.com/mrdoob/three.js/releases)
+
+
+## License
+
+Copyright © 2010-2015 three.js authors  
+Licensed under the MIT license.

@@ -3,7 +3,9 @@
  * @author willy-vvu / http://willy-vvu.github.io
  */
 
-THREE.MorphAnimation = function ( mesh ) {
+module.exports = MorphAnimation;
+
+function MorphAnimation( mesh ) {
 
 	this.mesh = mesh;
 	this.frames = mesh.morphTargetInfluences.length;
@@ -15,11 +17,11 @@ THREE.MorphAnimation = function ( mesh ) {
 
 	this.isPlaying = false;
 
-};
+}
 
-THREE.MorphAnimation.prototype = {
+MorphAnimation.prototype = {
 
-	constructor: THREE.MorphAnimation,
+	constructor: MorphAnimation,
 
 	play: function () {
 
@@ -35,7 +37,7 @@ THREE.MorphAnimation.prototype = {
 
 	update: function ( delta ) {
 
-		if ( this.isPlaying === false ) return;
+		if ( this.isPlaying === false ) { return; }
 
 		this.currentTime += delta;
 

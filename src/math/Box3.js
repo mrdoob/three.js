@@ -3,16 +3,23 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.Box3 = function ( min, max ) {
+module.exports = Box3;
 
-	this.min = ( min !== undefined ) ? min : new THREE.Vector3( Infinity, Infinity, Infinity );
-	this.max = ( max !== undefined ) ? max : new THREE.Vector3( - Infinity, - Infinity, - Infinity );
+var Sphere = require( "./Sphere" ),
+	Vector3 = require( "./Vector3" ),
+	BufferGeometry = require( "../core/BufferGeometry" ),
+	Geometry = require( "../core/Geometry" );
 
-};
+function Box3( min, max ) {
 
-THREE.Box3.prototype = {
+	this.min = ( min !== undefined ) ? min : new Vector3( Infinity, Infinity, Infinity );
+	this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
 
-	constructor: THREE.Box3,
+}
+
+Box3.prototype = {
+
+	constructor: Box3,
 
 	set: function ( min, max ) {
 
@@ -37,13 +44,17 @@ THREE.Box3.prototype = {
 
 	},
 
-	setFromCenterAndSize: function () {
+	setFromCenterAndSize: ( function () {
 
-		var v1 = new THREE.Vector3();
+		var v1;
 
 		return function ( center, size ) {
 
-			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
+			var halfSize;
+
+			if ( v1 === undefined ) { v1 = new Vector3(); }
+
+			halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 
 			this.min.copy( center ).sub( halfSize );
 			this.max.copy( center ).add( halfSize );
@@ -52,18 +63,21 @@ THREE.Box3.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
-	setFromObject: function () {
+	setFromObject: ( function () {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
-		var v1 = new THREE.Vector3();
+		var v1;
 
 		return function ( object ) {
 
-			var scope = this;
+			var scope = this,
+				i, il, geometry, vertices, positions;
+
+			if ( v1 === undefined ) { v1 = new Vector3(); }
 
 			object.updateMatrixWorld( true );
 
@@ -71,15 +85,15 @@ THREE.Box3.prototype = {
 
 			object.traverse( function ( node ) {
 
-				var geometry = node.geometry;
+				geometry = node.geometry;
 
 				if ( geometry !== undefined ) {
 
-					if ( geometry instanceof THREE.Geometry ) {
+					if ( geometry instanceof Geometry ) {
 
-						var vertices = geometry.vertices;
+						vertices = geometry.vertices;
 
-						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+						for ( i = 0, il = vertices.length; i < il; i ++ ) {
 
 							v1.copy( vertices[ i ] );
 
@@ -89,11 +103,11 @@ THREE.Box3.prototype = {
 
 						}
 
-					} else if ( geometry instanceof THREE.BufferGeometry && geometry.attributes[ 'position' ] !== undefined ) {
+					} else if ( geometry instanceof BufferGeometry && geometry.attributes[ "position" ] !== undefined ) {
 
-						var positions = geometry.attributes[ 'position' ].array;
+						positions = geometry.attributes[ "position" ].array;
 
-						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+						for ( i = 0, il = positions.length; i < il; i += 3 ) {
 
 							v1.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
 
@@ -113,7 +127,7 @@ THREE.Box3.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	clone: function () {
 
@@ -149,14 +163,14 @@ THREE.Box3.prototype = {
 
 	center: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
 	size: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 		return result.subVectors( this.max, this.min );
 
 	},
@@ -221,7 +235,7 @@ THREE.Box3.prototype = {
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 
 		return result.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
@@ -249,31 +263,38 @@ THREE.Box3.prototype = {
 
 	clampPoint: function ( point, optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 		return result.copy( point ).clamp( this.min, this.max );
 
 	},
 
-	distanceToPoint: function () {
+	distanceToPoint: ( function () {
 
-		var v1 = new THREE.Vector3();
+		var v1;
 
 		return function ( point ) {
 
-			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
+			var clampedPoint;
+
+			if ( v1 === undefined ) { v1 = new Vector3(); }
+
+			clampedPoint = v1.copy( point ).clamp( this.min, this.max );
+
 			return clampedPoint.sub( point ).length();
 
 		};
 
-	}(),
+	}() ),
 
-	getBoundingSphere: function () {
+	getBoundingSphere: ( function () {
 
-		var v1 = new THREE.Vector3();
+		var v1;
 
 		return function ( optionalTarget ) {
 
-			var result = optionalTarget || new THREE.Sphere();
+			var result = optionalTarget || new Sphere();
+
+			if ( v1 === undefined ) { v1 = new Vector3(); }
 
 			result.center = this.center();
 			result.radius = this.size( v1 ).length() * 0.5;
@@ -282,7 +303,7 @@ THREE.Box3.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	intersect: function ( box ) {
 
@@ -302,20 +323,20 @@ THREE.Box3.prototype = {
 
 	},
 
-	applyMatrix4: function () {
+	applyMatrix4: ( function () {
 
-		var points = [
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3()
-		];
+		var points;
 
 		return function ( matrix ) {
+
+			if ( points === undefined ) {
+
+				points = [
+					new Vector3(), new Vector3(), new Vector3(), new Vector3(),
+					new Vector3(), new Vector3(), new Vector3(), new Vector3()
+				];
+
+			}
 
 			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
 			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
@@ -334,7 +355,7 @@ THREE.Box3.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	translate: function ( offset ) {
 

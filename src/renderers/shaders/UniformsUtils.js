@@ -2,17 +2,25 @@
  * Uniform Utilities
  */
 
-THREE.UniformsUtils = {
+var Color = require( "../../math/Color" ),
+	Matrix3 = require( "../../math/Matrix3" ),
+	Matrix4 = require( "../../math/Matrix4" ),
+	Texture = require( "../../textures/Texture" ),
+	Vector2 = require( "../../math/Vector2" ),
+	Vector3 = require( "../../math/Vector3" ),
+	Vector4 = require( "../../math/Vector4" );
+
+module.exports = {
 
 	merge: function ( uniforms ) {
 
-		var merged = {};
+		var u, tmp, p, merged = {};
 
-		for ( var u = 0; u < uniforms.length; u ++ ) {
+		for ( u = 0; u < uniforms.length; u ++ ) {
 
-			var tmp = this.clone( uniforms[ u ] );
+			tmp = this.clone( uniforms[ u ] );
 
-			for ( var p in tmp ) {
+			for ( p in tmp ) {
 
 				merged[ p ] = tmp[ p ];
 
@@ -26,33 +34,33 @@ THREE.UniformsUtils = {
 
 	clone: function ( uniforms_src ) {
 
-		var uniforms_dst = {};
+		var u, p, parameterSrc, uniforms_dst = {};
 
-		for ( var u in uniforms_src ) {
+		for ( u in uniforms_src ) {
 
 			uniforms_dst[ u ] = {};
 
-			for ( var p in uniforms_src[ u ] ) {
+			for ( p in uniforms_src[ u ] ) {
 
-				var parameter_src = uniforms_src[ u ][ p ];
+				parameterSrc = uniforms_src[ u ][ p ];
 
-				if ( parameter_src instanceof THREE.Color ||
-					 parameter_src instanceof THREE.Vector2 ||
-					 parameter_src instanceof THREE.Vector3 ||
-					 parameter_src instanceof THREE.Vector4 ||
-					 parameter_src instanceof THREE.Matrix3 ||
-					 parameter_src instanceof THREE.Matrix4 ||
-					 parameter_src instanceof THREE.Texture ) {
+				if ( parameterSrc instanceof Color ||
+						parameterSrc instanceof Vector2 ||
+						parameterSrc instanceof Vector3 ||
+						parameterSrc instanceof Vector4 ||
+						parameterSrc instanceof Matrix3 ||
+						parameterSrc instanceof Matrix4 ||
+						parameterSrc instanceof Texture ) {
 
-					uniforms_dst[ u ][ p ] = parameter_src.clone();
+					uniforms_dst[ u ][ p ] = parameterSrc.clone();
 
-				} else if ( Array.isArray( parameter_src ) ) {
+				} else if ( Array.isArray( parameterSrc ) ) {
 
-					uniforms_dst[ u ][ p ] = parameter_src.slice();
+					uniforms_dst[ u ][ p ] = parameterSrc.slice();
 
 				} else {
 
-					uniforms_dst[ u ][ p ] = parameter_src;
+					uniforms_dst[ u ][ p ] = parameterSrc;
 
 				}
 

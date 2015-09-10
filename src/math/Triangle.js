@@ -3,27 +3,33 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Triangle = function ( a, b, c ) {
+module.exports = Triangle;
 
-	this.a = ( a !== undefined ) ? a : new THREE.Vector3();
-	this.b = ( b !== undefined ) ? b : new THREE.Vector3();
-	this.c = ( c !== undefined ) ? c : new THREE.Vector3();
+var Plane = require( "./Plane" ),
+	Vector3 = require( "./Vector3" );
 
-};
+function Triangle( a, b, c ) {
 
-THREE.Triangle.normal = function () {
+	this.a = ( a !== undefined ) ? a : new Vector3();
+	this.b = ( b !== undefined ) ? b : new Vector3();
+	this.c = ( c !== undefined ) ? c : new Vector3();
 
-	var v0 = new THREE.Vector3();
+}
+
+Triangle.normal = ( function () {
+
+	var v0 = new Vector3();
 
 	return function ( a, b, c, optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 
 		result.subVectors( c, b );
 		v0.subVectors( a, b );
 		result.cross( v0 );
 
 		var resultLengthSq = result.lengthSq();
+
 		if ( resultLengthSq > 0 ) {
 
 			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
@@ -34,17 +40,19 @@ THREE.Triangle.normal = function () {
 
 	};
 
-}();
+}() );
 
 // static/instance method to calculate barycentric coordinates
 // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
-THREE.Triangle.barycoordFromPoint = function () {
+Triangle.barycoordFromPoint = ( function () {
 
-	var v0 = new THREE.Vector3();
-	var v1 = new THREE.Vector3();
-	var v2 = new THREE.Vector3();
+	var v0, v1, v2;
 
 	return function ( point, a, b, c, optionalTarget ) {
+
+		if ( v0 === undefined ) { v0 = new Vector3(); }
+		if ( v1 === undefined ) { v1 = new Vector3(); }
+		if ( v2 === undefined ) { v2 = new Vector3(); }
 
 		v0.subVectors( c, a );
 		v1.subVectors( b, a );
@@ -58,7 +66,7 @@ THREE.Triangle.barycoordFromPoint = function () {
 
 		var denom = ( dot00 * dot11 - dot01 * dot01 );
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 
 		// collinear or singular triangle
 		if ( denom === 0 ) {
@@ -78,25 +86,25 @@ THREE.Triangle.barycoordFromPoint = function () {
 
 	};
 
-}();
+}() );
 
-THREE.Triangle.containsPoint = function () {
+Triangle.containsPoint = ( function () {
 
-	var v1 = new THREE.Vector3();
+	var v1 = new Vector3();
 
 	return function ( point, a, b, c ) {
 
-		var result = THREE.Triangle.barycoordFromPoint( point, a, b, c, v1 );
+		var result = Triangle.barycoordFromPoint( point, a, b, c, v1 );
 
 		return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
 
 	};
 
-}();
+}() );
 
-THREE.Triangle.prototype = {
+Triangle.prototype = {
 
-	constructor: THREE.Triangle,
+	constructor: Triangle,
 
 	set: function ( a, b, c ) {
 
@@ -134,10 +142,10 @@ THREE.Triangle.prototype = {
 
 	},
 
-	area: function () {
+	area: ( function () {
 
-		var v0 = new THREE.Vector3();
-		var v1 = new THREE.Vector3();
+		var v0 = new Vector3();
+		var v1 = new Vector3();
 
 		return function () {
 
@@ -148,24 +156,24 @@ THREE.Triangle.prototype = {
 
 		};
 
-	}(),
+	}() ),
 
 	midpoint: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 		return result.addVectors( this.a, this.b ).add( this.c ).multiplyScalar( 1 / 3 );
 
 	},
 
 	normal: function ( optionalTarget ) {
 
-		return THREE.Triangle.normal( this.a, this.b, this.c, optionalTarget );
+		return Triangle.normal( this.a, this.b, this.c, optionalTarget );
 
 	},
 
 	plane: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Plane();
+		var result = optionalTarget || new Plane();
 
 		return result.setFromCoplanarPoints( this.a, this.b, this.c );
 
@@ -173,13 +181,13 @@ THREE.Triangle.prototype = {
 
 	barycoordFromPoint: function ( point, optionalTarget ) {
 
-		return THREE.Triangle.barycoordFromPoint( point, this.a, this.b, this.c, optionalTarget );
+		return Triangle.barycoordFromPoint( point, this.a, this.b, this.c, optionalTarget );
 
 	},
 
 	containsPoint: function ( point ) {
 
-		return THREE.Triangle.containsPoint( point, this.a, this.b, this.c );
+		return Triangle.containsPoint( point, this.a, this.b, this.c );
 
 	},
 

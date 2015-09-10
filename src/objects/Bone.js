@@ -4,22 +4,26 @@
  * @author ikerr / http://verold.com
  */
 
-THREE.Bone = function ( skin ) {
+module.exports = Bone;
 
-	THREE.Object3D.call( this );
+var Object3D = require( "../core/Object3D" );
 
-	this.type = 'Bone';
+function Bone( skin ) {
+
+	Object3D.call( this );
+
+	this.type = "Bone";
 
 	this.skin = skin;
 
-};
+}
 
-THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Bone.prototype.constructor = THREE.Bone;
+Bone.prototype = Object.create( Object3D.prototype );
+Bone.prototype.constructor = Bone;
 
-THREE.Bone.prototype.copy = function ( source ) {
+Bone.prototype.copy = function ( source ) {
 	
-	THREE.Object3D.prototype.copy.call( this, source );
+	Object3D.prototype.copy.call( this, source );
 	
 	this.skin = source.skin;
 	

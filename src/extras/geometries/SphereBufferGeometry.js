@@ -1,13 +1,20 @@
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
- * based on THREE.SphereGeometry
+ * based on SphereGeometry
  */
 
-THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+module.exports = SphereBufferGeometry;
 
-	THREE.BufferGeometry.call( this );
+var BufferAttribute = require( "../../core/BufferAttribute" ),
+	BufferGeometry = require( "../../core/BufferGeometry" ),
+	Sphere = require( "../../math/Sphere" ),
+	Vector3 = require( "../../math/Vector3" );
 
-	this.type = 'SphereBufferGeometry';
+function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+
+	BufferGeometry.call( this );
+
+	this.type = "SphereBufferGeometry";
 
 	this.parameters = {
 		radius: radius,
@@ -34,25 +41,30 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 	var vertexCount = ( ( widthSegments + 1 ) * ( heightSegments + 1 ) );
 
-	var positions = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+	var positions = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
 
-	var index = 0, vertices = [], normal = new THREE.Vector3();
+	var index = 0, vertices = [], normal = new Vector3();
 
-	for ( var y = 0; y <= heightSegments; y ++ ) {
+	var x, y, indices = [],
+		v1, v2, v3, v4,
+		v, verticesRow,
+		u, px, py, pz;
 
-		var verticesRow = [];
+	for ( y = 0; y <= heightSegments; y ++ ) {
 
-		var v = y / heightSegments;
+		verticesRow = [];
 
-		for ( var x = 0; x <= widthSegments; x ++ ) {
+		v = y / heightSegments;
 
-			var u = x / widthSegments;
+		for ( x = 0; x <= widthSegments; x ++ ) {
 
-			var px = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-			var py = radius * Math.cos( thetaStart + v * thetaLength );
-			var pz = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+			u = x / widthSegments;
+
+			px = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+			py = radius * Math.cos( thetaStart + v * thetaLength );
+			pz = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
 
 			normal.set( px, py, pz ).normalize();
 
@@ -70,39 +82,37 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 	}
 
-	var indices = [];
+	for ( y = 0; y < heightSegments; y ++ ) {
 
-	for ( var y = 0; y < heightSegments; y ++ ) {
+		for ( x = 0; x < widthSegments; x ++ ) {
 
-		for ( var x = 0; x < widthSegments; x ++ ) {
+			v1 = vertices[ y ][ x + 1 ];
+			v2 = vertices[ y ][ x ];
+			v3 = vertices[ y + 1 ][ x ];
+			v4 = vertices[ y + 1 ][ x + 1 ];
 
-			var v1 = vertices[ y ][ x + 1 ];
-			var v2 = vertices[ y ][ x ];
-			var v3 = vertices[ y + 1 ][ x ];
-			var v4 = vertices[ y + 1 ][ x + 1 ];
-
-			if ( y !== 0 || thetaStart > 0 ) indices.push( v1, v2, v4 );
-			if ( y !== heightSegments - 1 || thetaEnd < Math.PI ) indices.push( v2, v3, v4 );
+			if ( y !== 0 || thetaStart > 0 ) { indices.push( v1, v2, v4 ); }
+			if ( y !== heightSegments - 1 || thetaEnd < Math.PI ) { indices.push( v2, v3, v4 ); }
 
 		}
 
 	}
 
-	this.addIndex( new THREE.BufferAttribute( new Uint16Array( indices ), 1 ) );
-	this.addAttribute( 'position', positions );
-	this.addAttribute( 'normal', normals );
-	this.addAttribute( 'uv', uvs );
+	this.addIndex( new BufferAttribute( new Uint16Array( indices ), 1 ) );
+	this.addAttribute( "position", positions );
+	this.addAttribute( "normal", normals );
+	this.addAttribute( "uv", uvs );
 
-	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
+	this.boundingSphere = new Sphere( new Vector3(), radius );
 
-};
+}
 
-THREE.SphereBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.SphereBufferGeometry.prototype.constructor = THREE.SphereBufferGeometry;
+SphereBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+SphereBufferGeometry.prototype.constructor = SphereBufferGeometry;
 
-THREE.SphereBufferGeometry.prototype.clone = function () {
+SphereBufferGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.SphereBufferGeometry(
+	var geometry = new SphereBufferGeometry(
 		this.parameters.radius,
 		this.parameters.widthSegments,
 		this.parameters.heightSegments,

@@ -2,7 +2,10 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.AnimationHandler = {
+var Quaternion = require( "../../math/Quaternion" ),
+	SkinnedMesh = require( "../../objects/SkinnedMesh" );
+
+module.exports = {
 
 	LINEAR: 0,
 	CATMULLROM: 1,
@@ -10,21 +13,9 @@ THREE.AnimationHandler = {
 
 	//
 
-	add: function () {
-
-		console.warn( 'THREE.AnimationHandler.add() has been deprecated.' );
-
-	},
-	get: function () {
-
-		console.warn( 'THREE.AnimationHandler.get() has been deprecated.' );
-
-	},
-	remove: function () {
-
-		console.warn( 'THREE.AnimationHandler.remove() has been deprecated.' );
-
-	},
+	add: function () { console.warn( "AnimationHandler.add() has been deprecated." ); },
+	get: function () { console.warn( "AnimationHandler.get() has been deprecated." ); },
+	remove: function () { console.warn( "AnimationHandler.remove() has been deprecated." ); },
 
 	//
 
@@ -32,13 +23,17 @@ THREE.AnimationHandler = {
 
 	init: function ( data ) {
 
-		if ( data.initialized === true ) return data;
+		var h, k, m,
+			morphTargetName, usedMorphTargets,
+			quat, influences;
+
+		if ( data.initialized === true ) { return data; }
 
 		// loop through all keys
 
-		for ( var h = 0; h < data.hierarchy.length; h ++ ) {
+		for ( h = 0; h < data.hierarchy.length; h ++ ) {
 
-			for ( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
+			for ( k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
 
 				// remove minus times
 
@@ -51,10 +46,10 @@ THREE.AnimationHandler = {
 				// create quaternions
 
 				if ( data.hierarchy[ h ].keys[ k ].rot !== undefined &&
-				  ! ( data.hierarchy[ h ].keys[ k ].rot instanceof THREE.Quaternion ) ) {
+				  ! ( data.hierarchy[ h ].keys[ k ].rot instanceof Quaternion ) ) {
 
-					var quat = data.hierarchy[ h ].keys[ k ].rot;
-					data.hierarchy[ h ].keys[ k ].rot = new THREE.Quaternion().fromArray( quat );
+					quat = data.hierarchy[ h ].keys[ k ].rot;
+					data.hierarchy[ h ].keys[ k ].rot = new Quaternion().fromArray( quat );
 
 				}
 
@@ -66,13 +61,13 @@ THREE.AnimationHandler = {
 
 				// get all used
 
-				var usedMorphTargets = {};
+				usedMorphTargets = {};
 
-				for ( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
+				for ( k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
 
-					for ( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
+					for ( m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
 
-						var morphTargetName = data.hierarchy[ h ].keys[ k ].morphTargets[ m ];
+						morphTargetName = data.hierarchy[ h ].keys[ k ].morphTargets[ m ];
 						usedMorphTargets[ morphTargetName ] = - 1;
 
 					}
@@ -84,13 +79,13 @@ THREE.AnimationHandler = {
 
 				// set all used on all frames
 
-				for ( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
+				for ( k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
 
-					var influences = {};
+					influences = {};
 
-					for ( var morphTargetName in usedMorphTargets ) {
+					for ( morphTargetName in usedMorphTargets ) {
 
-						for ( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
+						for ( m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
 
 							if ( data.hierarchy[ h ].keys[ k ].morphTargets[ m ] === morphTargetName ) {
 
@@ -118,7 +113,7 @@ THREE.AnimationHandler = {
 
 			// remove all keys that are on the same time
 
-			for ( var k = 1; k < data.hierarchy[ h ].keys.length; k ++ ) {
+			for ( k = 1; k < data.hierarchy[ h ].keys.length; k ++ ) {
 
 				if ( data.hierarchy[ h ].keys[ k ].time === data.hierarchy[ h ].keys[ k - 1 ].time ) {
 
@@ -132,7 +127,7 @@ THREE.AnimationHandler = {
 
 			// set index
 
-			for ( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
+			for ( k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
 
 				data.hierarchy[ h ].keys[ k ].index = k;
 
@@ -152,8 +147,11 @@ THREE.AnimationHandler = {
 
 			hierarchy.push( root );
 
-			for ( var c = 0; c < root.children.length; c ++ )
+			for ( var c = 0; c < root.children.length; c ++ ) {
+
 				parseRecurseHierarchy( root.children[ c ], hierarchy );
+
+			}
 
 		};
 
@@ -161,7 +159,7 @@ THREE.AnimationHandler = {
 
 		var hierarchy = [];
 
-		if ( root instanceof THREE.SkinnedMesh ) {
+		if ( root instanceof SkinnedMesh ) {
 
 			for ( var b = 0; b < root.skeleton.bones.length; b ++ ) {
 
@@ -203,13 +201,15 @@ THREE.AnimationHandler = {
 
 	update: function ( deltaTimeMS ) {
 
-		for ( var i = 0; i < this.animations.length; i ++ ) {
+		var i;
 
-			this.animations[ i ].resetBlendWeights();
+		for ( i = 0; i < this.animations.length; i ++ ) {
+
+			this.animations[ i ].resetBlendWeights( );
 
 		}
 
-		for ( var i = 0; i < this.animations.length; i ++ ) {
+		for ( i = 0; i < this.animations.length; i ++ ) {
 
 			this.animations[ i ].update( deltaTimeMS );
 

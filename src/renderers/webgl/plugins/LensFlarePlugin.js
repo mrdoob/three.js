@@ -3,7 +3,12 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.LensFlarePlugin = function ( renderer, flares ) {
+module.exports = LensFlarePlugin;
+
+var Vector2 = require( "../../../math/Vector2" ),
+	Vector3 = require( "../../../math/Vector3" );
+
+function LensFlarePlugin( renderer, flares ) {
 
 	var gl = renderer.context;
 	var state = renderer.state;
@@ -18,9 +23,9 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		var vertices = new Float32Array( [
 			- 1, - 1,  0, 0,
-			 1, - 1,  1, 0,
-			 1,  1,  1, 1,
-			- 1,  1,  0, 1
+			  1, - 1,  1, 0,
+			  1,   1,  1, 1,
+			- 1,   1,  0, 1
 		] );
 
 		var faces = new Uint16Array( [
@@ -30,8 +35,8 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		// buffers
 
-		vertexBuffer     = gl.createBuffer();
-		elementBuffer    = gl.createBuffer();
+		vertexBuffer = gl.createBuffer();
+		elementBuffer = gl.createBuffer();
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
 		gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW );
@@ -41,7 +46,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		// textures
 
-		tempTexture      = gl.createTexture();
+		tempTexture = gl.createTexture();
 		occlusionTexture = gl.createTexture();
 
 		state.bindTexture( gl.TEXTURE_2D, tempTexture );
@@ -274,19 +279,19 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
 
-		if ( flares.length === 0 ) return;
+		if ( flares.length === 0 ) { return; }
 
-		var tempPosition = new THREE.Vector3();
+		var tempPosition = new Vector3();
 
 		var invAspect = viewportHeight / viewportWidth,
 			halfViewportWidth = viewportWidth * 0.5,
 			halfViewportHeight = viewportHeight * 0.5;
 
 		var size = 16 / viewportHeight,
-			scale = new THREE.Vector2( size * invAspect, size );
+			scale = new Vector2( size * invAspect, size );
 
-		var screenPosition = new THREE.Vector3( 1, 1, 0 ),
-			screenPositionPixels = new THREE.Vector2( 1, 1 );
+		var screenPosition = new Vector3( 1, 1, 0 ),
+			screenPositionPixels = new Vector2( 1, 1 );
 
 		if ( program === undefined ) {
 
@@ -316,6 +321,8 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		state.disable( gl.CULL_FACE );
 		gl.depthMask( false );
 
+		var flare;
+
 		for ( var i = 0, l = flares.length; i < l; i ++ ) {
 
 			size = 16 / viewportHeight;
@@ -323,7 +330,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 			// calc object screen position
 
-			var flare = flares[ i ];
+			flare = flares[ i ];
 
 			tempPosition.set( flare.matrixWorld.elements[ 12 ], flare.matrixWorld.elements[ 13 ], flare.matrixWorld.elements[ 14 ] );
 
@@ -353,7 +360,6 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				state.bindTexture( gl.TEXTURE_2D, tempTexture );
 				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
 
-
 				// render pink quad
 
 				gl.uniform1i( uniforms.renderType, 0 );
@@ -365,13 +371,11 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
-
 				// copy result to occlusionMap
 
 				state.activeTexture( gl.TEXTURE0 );
 				state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
 				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
-
 
 				// restore graphics
 
@@ -381,7 +385,6 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				state.activeTexture( gl.TEXTURE1 );
 				state.bindTexture( gl.TEXTURE_2D, tempTexture );
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
-
 
 				// update object positions
 
@@ -402,9 +405,11 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				gl.uniform1i( uniforms.renderType, 2 );
 				state.enable( gl.BLEND );
 
+				var sprite;
+
 				for ( var j = 0, jl = flare.lensFlares.length; j < jl; j ++ ) {
 
-					var sprite = flare.lensFlares[ j ];
+					sprite = flare.lensFlares[ j ];
 
 					if ( sprite.opacity > 0.001 && sprite.scale > 0.001 ) {
 
@@ -471,4 +476,4 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 	}
 
-};
+}

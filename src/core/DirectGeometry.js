@@ -2,14 +2,21 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.DirectGeometry = function () {
+module.exports = DirectGeometry;
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
+var EventDispatcher = require( "./EventDispatcher" ),
+	Geometry = require( "./Geometry" ),
+	_Math = require( "../math/Math" ),
+	Vector2 = require( "../math/Vector2" );
 
-	this.uuid = THREE.Math.generateUUID();
+function DirectGeometry() {
 
-	this.name = '';
-	this.type = 'DirectGeometry';
+	Object.defineProperty( this, "id", { value: Geometry.IdCount ++ } );
+
+	this.uuid = _Math.generateUUID();
+
+	this.name = "";
+	this.type = "DirectGeometry";
 
 	this.indices = [];
 	this.vertices = [];
@@ -38,24 +45,25 @@ THREE.DirectGeometry = function () {
 	this.uvsNeedUpdate = false;
 	this.groupsNeedUpdate = false;
 
-};
 
-THREE.DirectGeometry.prototype = {
+}
 
-	constructor: THREE.DirectGeometry,
+DirectGeometry.prototype = {
 
-	computeBoundingBox: THREE.Geometry.prototype.computeBoundingBox,
-	computeBoundingSphere: THREE.Geometry.prototype.computeBoundingSphere,
+	constructor: DirectGeometry,
+
+	computeBoundingBox: Geometry.prototype.computeBoundingBox,
+	computeBoundingSphere: Geometry.prototype.computeBoundingSphere,
 
 	computeFaceNormals: function () {
 
-		console.warn( 'THREE.DirectGeometry: computeFaceNormals() is not a method of this type of geometry.' );
+		console.warn( "DirectGeometry: computeFaceNormals() is not a method of this type of geometry." );
 
 	},
 
 	computeVertexNormals: function () {
 
-		console.warn( 'THREE.DirectGeometry: computeVertexNormals() is not a method of this type of geometry.' );
+		console.warn( "DirectGeometry: computeVertexNormals() is not a method of this type of geometry." );
 
 	},
 
@@ -65,11 +73,11 @@ THREE.DirectGeometry.prototype = {
 		var groups = [];
 		var materialIndex;
 
-		var faces = geometry.faces;
+		var i, faces = geometry.faces, face;
 
-		for ( var i = 0; i < faces.length; i ++ ) {
+		for ( i = 0; i < faces.length; i ++ ) {
 
-			var face = faces[ i ];
+			face = faces[ i ];
 
 			// materials
 
@@ -118,11 +126,17 @@ THREE.DirectGeometry.prototype = {
 		var morphTargets = geometry.morphTargets;
 		var morphTargetsLength = morphTargets.length;
 
+		var i,
+			morphTargetsPosition,
+			morphNormals,
+			morphNormalsLength,
+			morphTargetsNormal;
+
 		if ( morphTargetsLength > 0 ) {
 
-			var morphTargetsPosition = [];
+			morphTargetsPosition = [];
 
-			for ( var i = 0; i < morphTargetsLength; i ++ ) {
+			for ( i = 0; i < morphTargetsLength; i ++ ) {
 
 				morphTargetsPosition[ i ] = [];
 
@@ -132,14 +146,14 @@ THREE.DirectGeometry.prototype = {
 
 		}
 
-		var morphNormals = geometry.morphNormals;
-		var morphNormalsLength = morphNormals.length;
+		morphNormals = geometry.morphNormals;
+		morphNormalsLength = morphNormals.length;
 
 		if ( morphNormalsLength > 0 ) {
 
-			var morphTargetsNormal = [];
+			morphTargetsNormal = [];
 
-			for ( var i = 0; i < morphNormalsLength; i ++ ) {
+			for ( i = 0; i < morphNormalsLength; i ++ ) {
 
 				morphTargetsNormal[ i ] = [];
 
@@ -159,13 +173,16 @@ THREE.DirectGeometry.prototype = {
 
 		//
 
-		for ( var i = 0; i < faces.length; i ++ ) {
+		var face, vertexNormals, normal,
+			vertexColors, color, vertexUvs;
 
-			var face = faces[ i ];
+		for ( i = 0; i < faces.length; i ++ ) {
+
+			face = faces[ i ];
 
 			this.vertices.push( vertices[ face.a ], vertices[ face.b ], vertices[ face.c ] );
 
-			var vertexNormals = face.vertexNormals;
+			vertexNormals = face.vertexNormals;
 
 			if ( vertexNormals.length === 3 ) {
 
@@ -173,13 +190,13 @@ THREE.DirectGeometry.prototype = {
 
 			} else {
 
-				var normal = face.normal;
+				normal = face.normal;
 
 				this.normals.push( normal, normal, normal );
 
 			}
 
-			var vertexColors = face.vertexColors;
+			vertexColors = face.vertexColors;
 
 			if ( vertexColors.length === 3 ) {
 
@@ -187,7 +204,7 @@ THREE.DirectGeometry.prototype = {
 
 			} else {
 
-				var color = face.color;
+				color = face.color;
 
 				this.colors.push( color, color, color );
 
@@ -195,7 +212,7 @@ THREE.DirectGeometry.prototype = {
 
 			if ( hasFaceVertexUv === true ) {
 
-				var vertexUvs = faceVertexUvs[ 0 ][ i ];
+				vertexUvs = faceVertexUvs[ 0 ][ i ];
 
 				if ( vertexUvs !== undefined ) {
 
@@ -203,9 +220,9 @@ THREE.DirectGeometry.prototype = {
 
 				} else {
 
-					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv ', i );
+					console.warn( "DirectGeometry.fromGeometry(): Undefined vertexUv ", i );
 
-					this.uvs.push( new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() );
+					this.uvs.push( new Vector2(), new Vector2(), new Vector2() );
 
 				}
 
@@ -213,7 +230,7 @@ THREE.DirectGeometry.prototype = {
 
 			if ( hasFaceVertexUv2 === true ) {
 
-				var vertexUvs = faceVertexUvs[ 1 ][ i ];
+				vertexUvs = faceVertexUvs[ 1 ][ i ];
 
 				if ( vertexUvs !== undefined ) {
 
@@ -221,9 +238,9 @@ THREE.DirectGeometry.prototype = {
 
 				} else {
 
-					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv2 ', i );
+					console.warn( "DirectGeometry.fromGeometry(): Undefined vertexUv2 ", i );
 
-					this.uvs2.push( new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() );
+					this.uvs2.push( new Vector2(), new Vector2(), new Vector2() );
 
 				}
 
@@ -231,17 +248,19 @@ THREE.DirectGeometry.prototype = {
 
 			// morphs
 
-			for ( var j = 0; j < morphTargetsLength; j ++ ) {
+			var j, morphTarget, morphNormal;
 
-				var morphTarget = morphTargets[ j ].vertices;
+			for ( j = 0; j < morphTargetsLength; j ++ ) {
+
+				morphTarget = morphTargets[ j ].vertices;
 
 				morphTargetsPosition[ j ].push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
 
 			}
 
-			for ( var j = 0; j < morphNormalsLength; j ++ ) {
+			for ( j = 0; j < morphNormalsLength; j ++ ) {
 
-				var morphNormal = morphNormals[ j ].vertexNormals[ i ];
+				morphNormal = morphNormals[ j ].vertexNormals[ i ];
 
 				morphTargetsNormal[ j ].push( morphNormal.a, morphNormal.b, morphNormal.c );
 
@@ -277,10 +296,10 @@ THREE.DirectGeometry.prototype = {
 
 	dispose: function () {
 
-		this.dispatchEvent( { type: 'dispose' } );
+		this.dispatchEvent( { type: "dispose" } );
 
 	}
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.DirectGeometry.prototype );
+EventDispatcher.prototype.apply( DirectGeometry.prototype );

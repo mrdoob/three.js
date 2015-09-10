@@ -2,7 +2,13 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLGeometries = function ( gl, properties, info ) {
+module.exports = WebGLGeometries;
+
+var BufferGeometry = require( "../../core/BufferGeometry" ),
+	Geometry = require( "../../core/Geometry" ),
+	InterleavedBufferAttribute = require( "../../core/InterleavedBufferAttribute" );
+
+function WebGLGeometries( gl, properties, info ) {
 
 	var geometries = {};
 
@@ -16,19 +22,19 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		}
 
-		geometry.addEventListener( 'dispose', onGeometryDispose );
+		geometry.addEventListener( "dispose", onGeometryDispose );
 
 		var buffergeometry;
 
-		if ( geometry instanceof THREE.BufferGeometry ) {
+		if ( geometry instanceof BufferGeometry ) {
 
 			buffergeometry = geometry;
 
-		} else if ( geometry instanceof THREE.Geometry ) {
+		} else if ( geometry instanceof Geometry ) {
 
 			if ( geometry._bufferGeometry === undefined ) {
 
-				geometry._bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
+				geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
 
 			}
 
@@ -51,12 +57,12 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		deleteAttributes( buffergeometry.attributes );
 
-		geometry.removeEventListener( 'dispose', onGeometryDispose );
+		geometry.removeEventListener( "dispose", onGeometryDispose );
 
 		delete geometries[ geometry.id ];
 
 		var property = properties.get( geometry );
-		if ( property.wireframe ) deleteAttribute( property.wireframe );
+		if ( property.wireframe ) { deleteAttribute( property.wireframe ); }
 
 		info.memory.geometries --;
 
@@ -64,7 +70,7 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	function getAttributeBuffer( attribute ) {
 
-		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+		if ( attribute instanceof InterleavedBufferAttribute ) {
 
 			return properties.get( attribute.data ).__webglBuffer;
 
@@ -99,7 +105,7 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	function removeAttributeBuffer( attribute ) {
 
-		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+		if ( attribute instanceof InterleavedBufferAttribute ) {
 
 			properties.delete( attribute.data );
 
@@ -113,4 +119,4 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	this.get = get;
 
-};
+}

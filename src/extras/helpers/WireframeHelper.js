@@ -2,16 +2,22 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.WireframeHelper = function ( object, hex ) {
+module.exports = WireframeHelper;
+
+var WireframeGeometry = require( "../geometries/WireframeGeometry" ),
+	LineSegments = require( "../../objects/LineSegments" ),
+	LineBasicMaterial = require( "../../materials/LineBasicMaterial" );
+
+function WireframeHelper( object, hex ) {
 
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
 
-	THREE.LineSegments.call( this, new THREE.WireframeGeometry( object.geometry ), new THREE.LineBasicMaterial( { color: color } ) );
+	LineSegments.call( this, new WireframeGeometry( object.geometry ), new LineBasicMaterial( { color: color } ) );
 
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-};
+}
 
-THREE.WireframeHelper.prototype = Object.create( THREE.LineSegments.prototype );
-THREE.WireframeHelper.prototype.constructor = THREE.WireframeHelper;
+WireframeHelper.prototype = Object.create( LineSegments.prototype );
+WireframeHelper.prototype.constructor = WireframeHelper;

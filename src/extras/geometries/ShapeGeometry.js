@@ -12,29 +12,38 @@
  *	uvGenerator: <Object> // object that provides UV generator functions
  *
  * }
- **/
+ */
 
-THREE.ShapeGeometry = function ( shapes, options ) {
+module.exports = ShapeGeometry;
 
-	THREE.Geometry.call( this );
+var ExtrudeGeometry = require( "./ExtrudeGeometry" ),
+	ShapeUtils = require( "../ShapeUtils" ),
+	Face3 = require( "../../core/Face3" ),
+	Geometry = require( "../../core/Geometry" ),
+	Vector3 = require( "../../math/Vector3" );
 
-	this.type = 'ShapeGeometry';
+function ShapeGeometry( shapes, options ) {
 
-	if ( Array.isArray( shapes ) === false ) shapes = [ shapes ];
+	Geometry.call( this );
+
+	this.type = "ShapeGeometry";
+
+	if ( Array.isArray( shapes ) === false ) { shapes = [ shapes ]; }
 
 	this.addShapeList( shapes, options );
 
 	this.computeFaceNormals();
 
-};
+}
 
-THREE.ShapeGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ShapeGeometry.prototype.constructor = THREE.ShapeGeometry;
+ShapeGeometry.prototype = Object.create( Geometry.prototype );
+ShapeGeometry.prototype.constructor = ShapeGeometry;
 
 /**
- * Add an array of shapes to THREE.ShapeGeometry.
+ * Add an array of shapes to ShapeGeometry.
  */
-THREE.ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
+
+ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
 
 	for ( var i = 0, l = shapes.length; i < l; i ++ ) {
 
@@ -47,15 +56,16 @@ THREE.ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
 };
 
 /**
- * Adds a shape to THREE.ShapeGeometry, based on THREE.ExtrudeGeometry.
+ * Adds a shape to ShapeGeometry, based on ExtrudeGeometry.
  */
-THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
-	if ( options === undefined ) options = {};
+ShapeGeometry.prototype.addShape = function ( shape, options ) {
+
+	if ( options === undefined ) { options = {}; }
 	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 
 	var material = options.material;
-	var uvgen = options.UVGenerator === undefined ? THREE.ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
+	var uvgen = options.UVGenerator === undefined ? ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
 
 	//
 
@@ -67,7 +77,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 	var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
 
-	var reverse = ! THREE.Shape.Utils.isClockWise( vertices );
+	var reverse = ! ShapeUtils.isClockWise( vertices );
 
 	if ( reverse ) {
 
@@ -79,7 +89,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 			hole = holes[ i ];
 
-			if ( THREE.Shape.Utils.isClockWise( hole ) ) {
+			if ( ShapeUtils.isClockWise( hole ) ) {
 
 				holes[ i ] = hole.reverse();
 
@@ -91,7 +101,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-	var faces = THREE.Shape.Utils.triangulateShape( vertices, holes );
+	var faces = ShapeUtils.triangulateShape( vertices, holes );
 
 	// Vertices
 
@@ -106,12 +116,13 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var vert, vlen = vertices.length;
 	var face, flen = faces.length;
+	var a, b, c;
 
 	for ( i = 0; i < vlen; i ++ ) {
 
 		vert = vertices[ i ];
 
-		this.vertices.push( new THREE.Vector3( vert.x, vert.y, 0 ) );
+		this.vertices.push( new Vector3( vert.x, vert.y, 0 ) );
 
 	}
 
@@ -119,11 +130,11 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 		face = faces[ i ];
 
-		var a = face[ 0 ] + shapesOffset;
-		var b = face[ 1 ] + shapesOffset;
-		var c = face[ 2 ] + shapesOffset;
+		a = face[ 0 ] + shapesOffset;
+		b = face[ 1 ] + shapesOffset;
+		c = face[ 2 ] + shapesOffset;
 
-		this.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
+		this.faces.push( new Face3( a, b, c, null, null, material ) );
 		this.faceVertexUvs[ 0 ].push( uvgen.generateTopUV( this, a, b, c ) );
 
 	}

@@ -2,13 +2,17 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.RawShaderMaterial = function ( parameters ) {
+module.exports = RawShaderMaterial;
 
-	THREE.ShaderMaterial.call( this, parameters );
+var ShaderMaterial = require( "../materials/ShaderMaterial" );
 
-	this.type = 'RawShaderMaterial';
+function RawShaderMaterial( parameters ) {
 
-};
+	ShaderMaterial.call( this, parameters );
 
-THREE.RawShaderMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
-THREE.RawShaderMaterial.prototype.constructor = THREE.RawShaderMaterial;
+	this.type = "RawShaderMaterial";
+
+}
+
+RawShaderMaterial.prototype = Object.create( ShaderMaterial.prototype );
+RawShaderMaterial.prototype.constructor = RawShaderMaterial;

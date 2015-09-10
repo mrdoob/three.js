@@ -3,11 +3,16 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegments ) {
+module.exports = PlaneBufferGeometry;
 
-	THREE.BufferGeometry.call( this );
+var BufferAttribute = require( "../../core/BufferAttribute" ),
+	BufferGeometry = require( "../../core/BufferGeometry" );
 
-	this.type = 'PlaneBufferGeometry';
+function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
+
+	BufferGeometry.call( this );
+
+	this.type = "PlaneBufferGeometry";
 
 	this.parameters = {
 		width: width,
@@ -16,8 +21,8 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 		heightSegments: heightSegments
 	};
 
-	var width_half = width / 2;
-	var height_half = height / 2;
+	var widthHalf = width / 2;
+	var heightHalf = height / 2;
 
 	var gridX = Math.floor( widthSegments ) || 1;
 	var gridY = Math.floor( heightSegments ) || 1;
@@ -25,8 +30,8 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 	var gridX1 = gridX + 1;
 	var gridY1 = gridY + 1;
 
-	var segment_width = width / gridX;
-	var segment_height = height / gridY;
+	var segmentWidth = width / gridX;
+	var segmentHeight = height / gridY;
 
 	var vertices = new Float32Array( gridX1 * gridY1 * 3 );
 	var normals = new Float32Array( gridX1 * gridY1 * 3 );
@@ -35,13 +40,16 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 	var offset = 0;
 	var offset2 = 0;
 
-	for ( var iy = 0; iy < gridY1; iy ++ ) {
+	var iy, ix, x, y,
+		indices, a, b, c, d;
 
-		var y = iy * segment_height - height_half;
+	for ( iy = 0; iy < gridY1; iy ++ ) {
 
-		for ( var ix = 0; ix < gridX1; ix ++ ) {
+		y = iy * segmentHeight - heightHalf;
 
-			var x = ix * segment_width - width_half;
+		for ( ix = 0; ix < gridX1; ix ++ ) {
+
+			x = ix * segmentWidth - widthHalf;
 
 			vertices[ offset ] = x;
 			vertices[ offset + 1 ] = - y;
@@ -60,16 +68,16 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 	offset = 0;
 
-	var indices = new ( ( vertices.length / 3 ) > 65535 ? Uint32Array : Uint16Array )( gridX * gridY * 6 );
+	indices = ( vertices.length / 3 ) > BufferGeometry.MaxIndex ? new Uint32Array( gridX * gridY * 6 ) : new Uint16Array( gridX * gridY * 6 );
 
-	for ( var iy = 0; iy < gridY; iy ++ ) {
+	for ( iy = 0; iy < gridY; iy ++ ) {
 
-		for ( var ix = 0; ix < gridX; ix ++ ) {
+		for ( ix = 0; ix < gridX; ix ++ ) {
 
-			var a = ix + gridX1 * iy;
-			var b = ix + gridX1 * ( iy + 1 );
-			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
-			var d = ( ix + 1 ) + gridX1 * iy;
+			a = ix + gridX1 * iy;
+			b = ix + gridX1 * ( iy + 1 );
+			c = ( ix + 1 ) + gridX1 * ( iy + 1 );
+			d = ( ix + 1 ) + gridX1 * iy;
 
 			indices[ offset ] = a;
 			indices[ offset + 1 ] = b;
@@ -85,19 +93,19 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 	}
 
-	this.addIndex( new THREE.BufferAttribute( indices, 1 ) );
-	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	this.addIndex( new BufferAttribute( indices, 1 ) );
+	this.addAttribute( "position", new BufferAttribute( vertices, 3 ) );
+	this.addAttribute( "normal", new BufferAttribute( normals, 3 ) );
+	this.addAttribute( "uv", new BufferAttribute( uvs, 2 ) );
 
-};
+}
 
-THREE.PlaneBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.PlaneBufferGeometry.prototype.constructor = THREE.PlaneBufferGeometry;
+PlaneBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+PlaneBufferGeometry.prototype.constructor = PlaneBufferGeometry;
 
-THREE.PlaneBufferGeometry.prototype.clone = function () {
+PlaneBufferGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.PlaneBufferGeometry(
+	var geometry = new PlaneBufferGeometry(
 		this.parameters.width,
 		this.parameters.height,
 		this.parameters.widthSegments,

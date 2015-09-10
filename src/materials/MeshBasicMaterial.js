@@ -5,29 +5,29 @@
  * parameters = {
  *  color: <hex>,
  *  opacity: <float>,
- *  map: new THREE.Texture( <Image> ),
+ *  map: new Texture( <Image> ),
  *
- *  aoMap: new THREE.Texture( <Image> ),
+ *  aoMap: new Texture( <Image> ),
  *  aoMapIntensity: <float>
  *
- *  specularMap: new THREE.Texture( <Image> ),
+ *  specularMap: new Texture( <Image> ),
  *
- *  alphaMap: new THREE.Texture( <Image> ),
+ *  alphaMap: new Texture( <Image> ),
  *
- *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
- *  combine: THREE.Multiply,
+ *  envMap: new TextureCube( [posx, negx, posy, negy, posz, negz] ),
+ *  combine: Constants.MultiplyOperation,
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *
- *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
+ *  shading: Constants.SmoothShading,
+ *  blending: Constants.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
+ *  vertexColors: Constants.NoColors / Constants.VertexColors / Constants.FaceColors,
  *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
@@ -36,13 +36,19 @@
  * }
  */
 
-THREE.MeshBasicMaterial = function ( parameters ) {
+module.exports = MeshBasicMaterial;
 
-	THREE.Material.call( this );
+var Constants = require( "../Constants" ),
+	Material = require( "../materials/Material" ),
+	Color = require( "../math/Color" );
 
-	this.type = 'MeshBasicMaterial';
+function MeshBasicMaterial( parameters ) {
 
-	this.color = new THREE.Color( 0xffffff ); // emissive
+	Material.call( this );
+
+	this.type = "MeshBasicMaterial";
+
+	this.color = new Color( 0xffffff ); // emissive
 
 	this.map = null;
 
@@ -54,34 +60,34 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.alphaMap = null;
 
 	this.envMap = null;
-	this.combine = THREE.MultiplyOperation;
+	this.combine = Constants.MultiplyOperation;
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
 
 	this.fog = true;
 
-	this.shading = THREE.SmoothShading;
+	this.shading = Constants.SmoothShading;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
-	this.wireframeLinecap = 'round';
-	this.wireframeLinejoin = 'round';
+	this.wireframeLinecap = "round";
+	this.wireframeLinejoin = "round";
 
-	this.vertexColors = THREE.NoColors;
+	this.vertexColors = Constants.NoColors;
 
 	this.skinning = false;
 	this.morphTargets = false;
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshBasicMaterial.prototype.constructor = THREE.MeshBasicMaterial;
+MeshBasicMaterial.prototype = Object.create( Material.prototype );
+MeshBasicMaterial.prototype.constructor = MeshBasicMaterial;
 
-THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
+MeshBasicMaterial.prototype.copy = function ( source ) {
 	
-	THREE.Material.prototype.copy.call( this, source );
+	Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 

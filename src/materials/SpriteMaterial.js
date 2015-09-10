@@ -4,26 +4,31 @@
  * parameters = {
  *  color: <hex>,
  *  opacity: <float>,
- *  map: new THREE.Texture( <Image> ),
+ *  map: new Texture( <Image> ),
  *
- *  blending: THREE.NormalBlending,
+ *  blending: Constants.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
- *	uvOffset: new THREE.Vector2(),
- *	uvScale: new THREE.Vector2(),
+ *	uvOffset: new Vector2(),
+ *	uvScale: new Vector2(),
  *
  *  fog: <bool>
  * }
  */
 
-THREE.SpriteMaterial = function ( parameters ) {
+module.exports = SpriteMaterial;
 
-	THREE.Material.call( this );
+var Color = require( "../math/Color" ),
+	Material = require( "../materials/Material" );
 
-	this.type = 'SpriteMaterial';
+function SpriteMaterial( parameters ) {
 
-	this.color = new THREE.Color( 0xffffff );
+	Material.call( this );
+
+	this.type = "SpriteMaterial";
+
+	this.color = new Color( 0xffffff );
 	this.map = null;
 
 	this.rotation = 0;
@@ -34,14 +39,14 @@ THREE.SpriteMaterial = function ( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.SpriteMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.SpriteMaterial.prototype.constructor = THREE.SpriteMaterial;
+SpriteMaterial.prototype = Object.create( Material.prototype );
+SpriteMaterial.prototype.constructor = SpriteMaterial;
 
-THREE.SpriteMaterial.prototype.copy = function ( source ) {
+SpriteMaterial.prototype.copy = function ( source ) {
 
-	THREE.Material.prototype.copy.call( this, source );
+	Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 	this.map = source.map;

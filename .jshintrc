@@ -1,0 +1,17 @@
+{
+	"boss": true,
+	"browser": true,
+	"curly": true,
+	"eqeqeq": true,
+	"eqnull": true,
+	"globals": { "self": true },
+	"immed": true,
+	"latedef": "nofunc",
+	"newcap": false,
+	"noarg": true,
+	"node": true,
+	"sub": true,
+	/*"strict": true,*/
+	"undef": true,
+	"unused": true
+}

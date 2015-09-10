@@ -2,15 +2,19 @@
  * Uniforms library for shared webgl shaders
  */
 
-THREE.UniformsLib = {
+var Color = require( "../../math/Color" ),
+	Vector2 = require( "../../math/Vector2" ),
+	Vector4 = require( "../../math/Vector4" );
+
+module.exports = {
 
 	common: {
 
-		"diffuse" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
+		"diffuse" : { type: "c", value: new Color( 0xeeeeee ) },
 		"opacity" : { type: "f", value: 1.0 },
 
 		"map" : { type: "t", value: null },
-		"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"offsetRepeat" : { type: "v4", value: new Vector4( 0, 0, 1, 1 ) },
 
 		"specularMap" : { type: "t", value: null },
 		"alphaMap" : { type: "t", value: null },
@@ -52,7 +56,7 @@ THREE.UniformsLib = {
 	normalmap: {
 
 		"normalMap" : { type: "t", value: null },
-		"normalScale" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
+		"normalScale" : { type: "v2", value: new Vector2( 1, 1 ) }
 
 	},
 
@@ -69,7 +73,7 @@ THREE.UniformsLib = {
 		"fogDensity" : { type: "f", value: 0.00025 },
 		"fogNear" : { type: "f", value: 1 },
 		"fogFar" : { type: "f", value: 2000 },
-		"fogColor" : { type: "c", value: new THREE.Color( 0xffffff ) }
+		"fogColor" : { type: "c", value: new Color( 0xffffff ) }
 
 	},
 
@@ -101,17 +105,17 @@ THREE.UniformsLib = {
 
 	particle: {
 
-		"psColor" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
+		"psColor" : { type: "c", value: new Color( 0xeeeeee ) },
 		"opacity" : { type: "f", value: 1.0 },
 		"size" : { type: "f", value: 1.0 },
 		"scale" : { type: "f", value: 1.0 },
 		"map" : { type: "t", value: null },
-		"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"offsetRepeat" : { type: "v4", value: new Vector4( 0, 0, 1, 1 ) },
 
 		"fogDensity" : { type: "f", value: 0.00025 },
 		"fogNear" : { type: "f", value: 1 },
 		"fogFar" : { type: "f", value: 2000 },
-		"fogColor" : { type: "c", value: new THREE.Color( 0xffffff ) }
+		"fogColor" : { type: "c", value: new Color( 0xffffff ) }
 
 	},
 

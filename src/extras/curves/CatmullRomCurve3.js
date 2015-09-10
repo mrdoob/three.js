@@ -9,23 +9,25 @@
  * curve.tension is used for catmullrom which defaults to 0.5
  */
 
-THREE.CatmullRomCurve3 = ( function() {
+var Curve = require( "../core/Curve" ),
+	Vector3 = require( "../../math/Vector3" );
 
-	var
-		tmp = new THREE.Vector3(),
+module.exports = ( function() {
+
+	var tmp = new Vector3(),
 		px = new CubicPoly(),
 		py = new CubicPoly(),
 		pz = new CubicPoly();
 
 	/*
-	Based on an optimized c++ solution in
-	 - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
-	 - http://ideone.com/NoEbVM
-
-	This CubicPoly class could be used for reusing some variables and calculations,
-	but for three.js curve use, it could be possible inlined and flatten into a single function call
-	which can be placed in CurveUtils.
-	*/
+	 * Based on an optimized c++ solution in
+	 * - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
+	 * - http://ideone.com/NoEbVM
+	 *
+	 * This CubicPoly class could be used for reusing some variables and calculations,
+	 * but for three.js curve use, it could be possible inlined and flatten into a single function call
+	 * which can be placed in CurveUtils.
+	 */
 
 	function CubicPoly() {
 
@@ -39,6 +41,7 @@ THREE.CatmullRomCurve3 = ( function() {
 	 *  and
 	 *   p'(0) = t0, p'(1) = t1.
 	 */
+
 	CubicPoly.prototype.init = function( x0, x1, t0, t1 ) {
 
 		this.c0 = x0;
@@ -79,7 +82,7 @@ THREE.CatmullRomCurve3 = ( function() {
 	};
 
 	// Subclass Three.js curve
-	return THREE.Curve.create(
+	return Curve.create(
 
 		function ( p /* array of Vector3 */ ) {
 
@@ -94,7 +97,7 @@ THREE.CatmullRomCurve3 = ( function() {
 
 			l = points.length;
 
-			if ( l < 2 ) console.log( 'duh, you need at least 2 points' );
+			if ( l < 2 ) { console.log( "duh, you need at least 2 points" ); }
 
 			point = ( l - 1 ) * t;
 			intPoint = Math.floor( point );
@@ -126,7 +129,7 @@ THREE.CatmullRomCurve3 = ( function() {
 
 			if ( intPoint + 2 < l ) {
 
-				p3 = points[ intPoint + 2 ]
+				p3 = points[ intPoint + 2 ];
 
 			} else {
 
@@ -136,24 +139,24 @@ THREE.CatmullRomCurve3 = ( function() {
 
 			}
 
-			if ( this.type === undefined || this.type === 'centripetal' || this.type === 'chordal' ) {
+			if ( this.type === undefined || this.type === "centripetal" || this.type === "chordal" ) {
 
 				// init Centripetal / Chordal Catmull-Rom
-				var pow = this.type === 'chordal' ? 0.5 : 0.25;
+				var pow = this.type === "chordal" ? 0.5 : 0.25;
 				var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
 				var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
 				var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
 
 				// safety check for repeated points
-				if ( dt1 < 1e-4 ) dt1 = 1.0;
-				if ( dt0 < 1e-4 ) dt0 = dt1;
-				if ( dt2 < 1e-4 ) dt2 = dt1;
+				if ( dt1 < 1e-4 ) { dt1 = 1.0; }
+				if ( dt0 < 1e-4 ) { dt0 = dt1; }
+				if ( dt2 < 1e-4 ) { dt2 = dt1; }
 
 				px.initNonuniformCatmullRom( p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2 );
 				py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
 				pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
 
-			} else if ( this.type === 'catmullrom' ) {
+			} else if ( this.type === "catmullrom" ) {
 
 				var tension = this.tension !== undefined ? this.tension : 0.5;
 				px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, tension );
@@ -162,7 +165,7 @@ THREE.CatmullRomCurve3 = ( function() {
 
 			}
 
-			var v = new THREE.Vector3(
+			var v = new Vector3(
 				px.calc( weight ),
 				py.calc( weight ),
 				pz.calc( weight )
@@ -174,4 +177,4 @@ THREE.CatmullRomCurve3 = ( function() {
 
 	);
 
-} )();
+}() );

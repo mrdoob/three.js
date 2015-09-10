@@ -14,53 +14,62 @@
  *  headWidth - Number
  */
 
-THREE.ArrowHelper = ( function () {
+var CylinderGeometry = require( "../geometries/CylinderGeometry" ),
+	Geometry = require( "../../core/Geometry" ),
+	Object3D = require( "../../core/Object3D" ),
+	Vector3 = require( "../../math/Vector3" ),
+	LineBasicMaterial = require( "../../materials/LineBasicMaterial" ),
+	MeshBasicMaterial = require( "../../materials/MeshBasicMaterial" ),
+	Line = require( "../../objects/Line" ),
+	Mesh = require( "../../objects/Mesh" );
 
-	var lineGeometry = new THREE.Geometry();
-	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
+module.exports = ( function () {
 
-	var coneGeometry = new THREE.CylinderGeometry( 0, 0.5, 1, 5, 1 );
+	var lineGeometry = new Geometry();
+	lineGeometry.vertices.push( new Vector3( 0, 0, 0 ), new Vector3( 0, 1, 0 ) );
+
+	var coneGeometry = new CylinderGeometry( 0, 0.5, 1, 5, 1 );
 	coneGeometry.translate( 0, - 0.5, 0 );
 
-	return function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
+	return function ( dir, origin, length, color, headLength, headWidth ) {
 
 		// dir is assumed to be normalized
 
-		THREE.Object3D.call( this );
+		Object3D.call( this );
 
-		if ( color === undefined ) color = 0xffff00;
-		if ( length === undefined ) length = 1;
-		if ( headLength === undefined ) headLength = 0.2 * length;
-		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
+		if ( color === undefined ) { color = 0xffff00; }
+		if ( length === undefined ) { length = 1; }
+		if ( headLength === undefined ) { headLength = 0.2 * length; }
+		if ( headWidth === undefined ) { headWidth = 0.2 * headLength; }
 
 		this.position.copy( origin );
 		
 		if ( headLength < length ) {
-			this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: color } ) );
+			this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
 			this.line.matrixAutoUpdate = false;
 			this.add( this.line );
 		}
 
-		this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: color } ) );
+		this.cone = new Mesh( coneGeometry, new MeshBasicMaterial( { color: color } ) );
 		this.cone.matrixAutoUpdate = false;
 		this.add( this.cone );
 
 		this.setDirection( dir );
 		this.setLength( length, headLength, headWidth );
 
-	}
+	};
 
 }() );
 
-THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
-THREE.ArrowHelper.prototype.constructor = THREE.ArrowHelper;
+module.exports.prototype = Object.create( Object3D.prototype );
+module.exports.prototype.constructor = module.exports;
 
-THREE.ArrowHelper.prototype.setDirection = ( function () {
+module.exports.prototype.setDirection = ( function () {
 
-	var axis = new THREE.Vector3();
+	var axis = new Vector3();
 	var radians;
 
-	return function setDirection( dir ) {
+	return function ( dir ) {
 
 		// dir is assumed to be normalized
 
@@ -86,10 +95,10 @@ THREE.ArrowHelper.prototype.setDirection = ( function () {
 
 }() );
 
-THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
+module.exports.prototype.setLength = function ( length, headLength, headWidth ) {
 
-	if ( headLength === undefined ) headLength = 0.2 * length;
-	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
+	if ( headLength === undefined ) { headLength = 0.2 * length; }
+	if ( headWidth === undefined ) { headWidth = 0.2 * headLength; }
 
 	if ( headLength < length ){
 		this.line.scale.set( 1, length - headLength, 1 );
@@ -102,9 +111,9 @@ THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth
 
 };
 
-THREE.ArrowHelper.prototype.setColor = function ( color ) {
+module.exports.prototype.setColor = function ( color ) {
 
-	if ( this.line !== undefined ) this.line.material.color.set( color );
+	if ( this.line !== undefined ) { this.line.material.color.set( color ); }
 	this.cone.material.color.set( color );
 
 };

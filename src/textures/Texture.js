@@ -4,33 +4,40 @@
  * @author szimek / https://github.com/szimek/
  */
 
-THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+module.exports = Texture;
 
-	Object.defineProperty( this, 'id', { value: THREE.TextureIdCount ++ } );
+var Constants = require( "../Constants" ),
+	EventDispatcher = require( "../core/EventDispatcher" ),
+	_Math = require( "../math/Math" ),
+	Vector2 = require( "../math/Vector2" );
 
-	this.uuid = THREE.Math.generateUUID();
+function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.name = '';
-	this.sourceFile = '';
+	Object.defineProperty( this, "id", { value: Texture.IdCount ++ } );
 
-	this.image = image !== undefined ? image : THREE.Texture.DEFAULT_IMAGE;
+	this.uuid = _Math.generateUUID();
+
+	this.name = "";
+	this.sourceFile = "";
+
+	this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
 	this.mipmaps = [];
 
-	this.mapping = mapping !== undefined ? mapping : THREE.Texture.DEFAULT_MAPPING;
+	this.mapping = mapping !== undefined ? mapping : Texture.DEFAULT_MAPPING;
 
-	this.wrapS = wrapS !== undefined ? wrapS : THREE.ClampToEdgeWrapping;
-	this.wrapT = wrapT !== undefined ? wrapT : THREE.ClampToEdgeWrapping;
+	this.wrapS = wrapS !== undefined ? wrapS : Constants.ClampToEdgeWrapping;
+	this.wrapT = wrapT !== undefined ? wrapT : Constants.ClampToEdgeWrapping;
 
-	this.magFilter = magFilter !== undefined ? magFilter : THREE.LinearFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : THREE.LinearMipMapLinearFilter;
+	this.magFilter = magFilter !== undefined ? magFilter : Constants.LinearFilter;
+	this.minFilter = minFilter !== undefined ? minFilter : Constants.LinearMipMapLinearFilter;
 
 	this.anisotropy = anisotropy !== undefined ? anisotropy : 1;
 
-	this.format = format !== undefined ? format : THREE.RGBAFormat;
-	this.type = type !== undefined ? type : THREE.UnsignedByteType;
+	this.format = format !== undefined ? format : Constants.RGBAFormat;
+	this.type = type !== undefined ? type : Constants.UnsignedByteType;
 
-	this.offset = new THREE.Vector2( 0, 0 );
-	this.repeat = new THREE.Vector2( 1, 1 );
+	this.offset = new Vector2( 0, 0 );
+	this.repeat = new Vector2( 1, 1 );
 
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
@@ -40,18 +47,24 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.version = 0;
 	this.onUpdate = null;
 
-};
+}
 
-THREE.Texture.DEFAULT_IMAGE = undefined;
-THREE.Texture.DEFAULT_MAPPING = THREE.UVMapping;
+Texture.DEFAULT_IMAGE = undefined;
+Texture.DEFAULT_MAPPING = Constants.UVMapping;
 
-THREE.Texture.prototype = {
+Texture.prototype = {
 
-	constructor: THREE.Texture,
+	constructor: Texture,
+
+	get needsUpdate () {
+
+		return undefined;
+
+	},
 
 	set needsUpdate ( value ) {
 
-		if ( value === true ) this.version ++;
+		if ( value === true ) { this.version ++; }
 
 	},
 
@@ -109,21 +122,21 @@ THREE.Texture.prototype = {
 
 			} else {
 
-				canvas = document.createElement( 'canvas' );
+				canvas = document.createElement( "canvas" );
 				canvas.width = image.width;
 				canvas.height = image.height;
 
-				canvas.getContext( '2d' ).drawImage( image, 0, 0, image.width, image.height );
+				canvas.getContext( "2d" ).drawImage( image, 0, 0, image.width, image.height );
 
 			}
 
 			if ( canvas.width > 2048 || canvas.height > 2048 ) {
 
-				return canvas.toDataURL( 'image/jpeg', 0.6 );
+				return canvas.toDataURL( "image/jpeg", 0.6 );
 
 			} else {
 
-				return canvas.toDataURL( 'image/png' );
+				return canvas.toDataURL( "image/png" );
 
 			}
 
@@ -132,8 +145,8 @@ THREE.Texture.prototype = {
 		var output = {
 			metadata: {
 				version: 4.4,
-				type: 'Texture',
-				generator: 'Texture.toJSON'
+				type: "Texture",
+				generator: "Texture.toJSON"
 			},
 
 			uuid: this.uuid,
@@ -152,13 +165,13 @@ THREE.Texture.prototype = {
 
 		if ( this.image !== undefined ) {
 
-			// TODO: Move to THREE.Image
+			// TODO: Move to Image
 
 			var image = this.image;
 
 			if ( image.uuid === undefined ) {
 
-				image.uuid = THREE.Math.generateUUID(); // UGH
+				image.uuid = _Math.generateUUID(); // UGH
 
 			}
 
@@ -183,13 +196,13 @@ THREE.Texture.prototype = {
 
 	dispose: function () {
 
-		this.dispatchEvent( { type: 'dispose' } );
+		this.dispatchEvent( { type: "dispose" } );
 
 	},
 
 	transformUv: function ( uv ) {
 
-		if ( this.mapping !== THREE.UVMapping )  return;
+		if ( this.mapping !== Constants.UVMapping ) { return; }
 
 		uv.multiply( this.repeat );
 		uv.add( this.offset );
@@ -198,17 +211,17 @@ THREE.Texture.prototype = {
 
 			switch ( this.wrapS ) {
 
-				case THREE.RepeatWrapping:
+				case Constants.RepeatWrapping:
 
 					uv.x = uv.x - Math.floor( uv.x );
 					break;
 
-				case THREE.ClampToEdgeWrapping:
+				case Constants.ClampToEdgeWrapping:
 
 					uv.x = uv.x < 0 ? 0 : 1;
 					break;
 
-				case THREE.MirroredRepeatWrapping:
+				case Constants.MirroredRepeatWrapping:
 
 					if ( Math.abs( Math.floor( uv.x ) % 2 ) === 1 ) {
 
@@ -229,17 +242,17 @@ THREE.Texture.prototype = {
 
 			switch ( this.wrapT ) {
 
-				case THREE.RepeatWrapping:
+				case Constants.RepeatWrapping:
 
 					uv.y = uv.y - Math.floor( uv.y );
 					break;
 
-				case THREE.ClampToEdgeWrapping:
+				case Constants.ClampToEdgeWrapping:
 
 					uv.y = uv.y < 0 ? 0 : 1;
 					break;
 
-				case THREE.MirroredRepeatWrapping:
+				case Constants.MirroredRepeatWrapping:
 
 					if ( Math.abs( Math.floor( uv.y ) % 2 ) === 1 ) {
 
@@ -266,6 +279,6 @@ THREE.Texture.prototype = {
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.Texture.prototype );
+EventDispatcher.prototype.apply( Texture.prototype );
 
-THREE.TextureIdCount = 0;
+Texture.IdCount = 0;

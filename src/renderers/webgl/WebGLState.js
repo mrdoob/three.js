@@ -2,7 +2,11 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
+module.exports = WebGLState;
+
+var Constants = require( "../../Constants" );
+
+function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	var _this = this;
 
@@ -35,7 +39,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 
-	var currentTextureSlot = undefined;
+	var currentTextureSlot;
 	var currentBoundTextures = {};
 
 	this.init = function () {
@@ -123,8 +127,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 			compressedTextureFormats = [];
 
-			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) ||
-			     extensions.get( 'WEBGL_compressed_texture_s3tc' ) ) {
+			if ( extensions.get( "WEBGL_compressed_texture_pvrtc" ) ||
+			    extensions.get( "WEBGL_compressed_texture_s3tc" ) ) {
 
 				var formats = gl.getParameter( gl.COMPRESSED_TEXTURE_FORMATS );
 
@@ -146,17 +150,17 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		if ( blending !== currentBlending ) {
 
-			if ( blending === THREE.NoBlending ) {
+			if ( blending === Constants.NoBlending ) {
 
 				this.disable( gl.BLEND );
 
-			} else if ( blending === THREE.AdditiveBlending ) {
+			} else if ( blending === Constants.AdditiveBlending ) {
 
 				this.enable( gl.BLEND );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
 
-			} else if ( blending === THREE.SubtractiveBlending ) {
+			} else if ( blending === Constants.SubtractiveBlending ) {
 
 				// TODO: Find blendFuncSeparate() combination
 
@@ -164,7 +168,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
 
-			} else if ( blending === THREE.MultiplyBlending ) {
+			} else if ( blending === Constants.MultiplyBlending ) {
 
 				// TODO: Find blendFuncSeparate() combination
 
@@ -172,7 +176,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
 
-			} else if ( blending === THREE.CustomBlending ) {
+			} else if ( blending === Constants.CustomBlending ) {
 
 				this.enable( gl.BLEND );
 
@@ -188,7 +192,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		}
 
-		if ( blending === THREE.CustomBlending ) {
+		if ( blending === Constants.CustomBlending ) {
 
 			blendEquationAlpha = blendEquationAlpha || blendEquation;
 			blendSrcAlpha = blendSrcAlpha || blendSrc;
@@ -235,42 +239,42 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 				switch ( depthFunc ) {
 
-					case THREE.NeverDepth:
+					case Constants.NeverDepth:
 
 						gl.depthFunc( gl.NEVER );
 						break;
 
-					case THREE.AlwaysDepth:
+					case Constants.AlwaysDepth:
 
 						gl.depthFunc( gl.ALWAYS );
 						break;
 
-					case THREE.LessDepth:
+					case Constants.LessDepth:
 
 						gl.depthFunc( gl.LESS );
 						break;
 
-					case THREE.LessEqualDepth:
+					case Constants.LessEqualDepth:
 
 						gl.depthFunc( gl.LEQUAL );
 						break;
 
-					case THREE.EqualDepth:
+					case Constants.EqualDepth:
 
 						gl.depthFunc( gl.EQUAL );
 						break;
 
-					case THREE.GreaterEqualDepth:
+					case Constants.GreaterEqualDepth:
 
 						gl.depthFunc( gl.GEQUAL );
 						break;
 
-					case THREE.GreaterDepth:
+					case Constants.GreaterDepth:
 
 						gl.depthFunc( gl.GREATER );
 						break;
 
-					case THREE.NotEqualDepth:
+					case Constants.NotEqualDepth:
 
 						gl.depthFunc( gl.NOTEQUAL );
 						break;
@@ -402,7 +406,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.activeTexture = function ( webglSlot ) {
 
-		if ( webglSlot === undefined ) webglSlot = gl.TEXTURE0 + maxTextures - 1;
+		if ( webglSlot === undefined ) { webglSlot = gl.TEXTURE0 + maxTextures - 1; }
 
 		if ( currentTextureSlot !== webglSlot ) {
 
@@ -411,7 +415,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		}
 
-	}
+	};
 
 	this.bindTexture = function ( webglType, webglTexture ) {
 
@@ -497,4 +501,4 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
-};
+}

@@ -2,21 +2,26 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function ( manager ) {
+module.exports = ImageLoader;
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+var Cache = require( "./Cache" ),
+	DefaultLoadingManager = require( "./LoadingManager" ).DefaultLoadingManager;
 
-};
+function ImageLoader( manager ) {
 
-THREE.ImageLoader.prototype = {
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-	constructor: THREE.ImageLoader,
+}
+
+ImageLoader.prototype = {
+
+	constructor: ImageLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var cached = THREE.Cache.get( url );
+		var cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -34,13 +39,13 @@ THREE.ImageLoader.prototype = {
 
 		}
 
-		var image = document.createElement( 'img' );
+		var image = document.createElement( "img" );
 
-		image.addEventListener( 'load', function ( event ) {
+		image.addEventListener( "load", function () {
 
-			THREE.Cache.add( url, this );
+			Cache.add( url, this );
 
-			if ( onLoad ) onLoad( this );
+			if ( onLoad ) { onLoad( this ); }
 
 			scope.manager.itemEnd( url );
 
@@ -48,7 +53,7 @@ THREE.ImageLoader.prototype = {
 
 		if ( onProgress !== undefined ) {
 
-			image.addEventListener( 'progress', function ( event ) {
+			image.addEventListener( "progress", function ( event ) {
 
 				onProgress( event );
 
@@ -56,15 +61,15 @@ THREE.ImageLoader.prototype = {
 
 		}
 
-		image.addEventListener( 'error', function ( event ) {
+		image.addEventListener( "error", function ( event ) {
 
-			if ( onError ) onError( event );
+			if ( onError ) { onError( event ); }
 
 			scope.manager.itemError( url );
 
 		}, false );
 
-		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+		if ( this.crossOrigin !== undefined ) { image.crossOrigin = this.crossOrigin; }
 
 		scope.manager.itemStart( url );
 
