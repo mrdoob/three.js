@@ -10,7 +10,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		MeshPhongMaterial: 'phong',
 		LineBasicMaterial: 'basic',
 		LineDashedMaterial: 'dashed',
-		PointCloudMaterial: 'particle_basic'
+		PointsMaterial: 'points'
 	};
 
 	var parameterNames = [

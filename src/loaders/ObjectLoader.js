@@ -517,8 +517,9 @@ THREE.ObjectLoader.prototype = {
 					break;
 
 				case 'PointCloud':
+				case 'Points':
 
-					object = new THREE.PointCloud( getGeometry( data.geometry ), getMaterial( data.material ) );
+					object = new THREE.Points( getGeometry( data.geometry ), getMaterial( data.material ) );
 
 					break;
 

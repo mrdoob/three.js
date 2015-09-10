@@ -2,21 +2,21 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.PointCloud = function ( geometry, material ) {
+THREE.Points = function ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
-	this.type = 'PointCloud';
+	this.type = 'Points';
 
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
-	this.material = material !== undefined ? material : new THREE.PointCloudMaterial( { color: Math.random() * 0xffffff } );
+	this.material = material !== undefined ? material : new THREE.PointsMaterial( { color: Math.random() * 0xffffff } );
 
 };
 
-THREE.PointCloud.prototype = Object.create( THREE.Object3D.prototype );
-THREE.PointCloud.prototype.constructor = THREE.PointCloud;
+THREE.Points.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Points.prototype.constructor = THREE.Points;
 
-THREE.PointCloud.prototype.raycast = ( function () {
+THREE.Points.prototype.raycast = ( function () {
 
 	var inverseMatrix = new THREE.Matrix4();
 	var ray = new THREE.Ray();
@@ -25,7 +25,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 		var object = this;
 		var geometry = object.geometry;
-		var threshold = raycaster.params.PointCloud.threshold;
+		var threshold = raycaster.params.Points.threshold;
 
 		inverseMatrix.getInverse( this.matrixWorld );
 		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
@@ -120,13 +120,13 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 }() );
 
-THREE.PointCloud.prototype.clone = function () {
+THREE.Points.prototype.clone = function () {
 
 	return new this.constructor( this.geometry, this.material ).copy( this );
 
 };
 
-THREE.PointCloud.prototype.toJSON = function ( meta ) {
+THREE.Points.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
@@ -153,9 +153,16 @@ THREE.PointCloud.prototype.toJSON = function ( meta ) {
 
 // Backwards compatibility
 
+THREE.PointCloud = function ( geometry, material ) {
+
+	console.warn( 'THREE.PointCloud has been renamed to THREE.Points.' );
+	return new THREE.Points( geometry, material );
+
+};
+
 THREE.ParticleSystem = function ( geometry, material ) {
 
-	console.warn( 'THREE.ParticleSystem has been renamed to THREE.PointCloud.' );
-	return new THREE.PointCloud( geometry, material );
+	console.warn( 'THREE.ParticleSystem has been renamed to THREE.Points.' );
+	return new THREE.Points( geometry, material );
 
 };

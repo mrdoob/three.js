@@ -291,7 +291,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
+		if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points ) {
 
 			if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 

@@ -17,18 +17,27 @@
 		this.params = {
 			Sprite: {},
 			Mesh: {},
-			PointCloud: { threshold: 1 },
+			Points: { threshold: 1 },
 			LOD: {},
 			Line: {}
 		};
 
+		Object.defineProperties( this.params, {
+			PointCloud: {
+				get: function () {
+					console.warn( 'THREE.Raycaster: params.PointCloud has been renamed to params.Points.' );
+					return this.Points;
+				}
+			}
+		} );
+
 	};
 
-	var descSort = function ( a, b ) {
+	function descSort( a, b ) {
 
 		return a.distance - b.distance;
 
-	};
+	}
 
 	var intersectObject = function ( object, raycaster, intersects, recursive ) {
 

@@ -20,11 +20,11 @@
  * }
  */
 
-THREE.PointCloudMaterial = function ( parameters ) {
+THREE.PointsMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
-	this.type = 'PointCloudMaterial';
+	this.type = 'PointsMaterial';
 
 	this.color = new THREE.Color( 0xffffff );
 
@@ -41,10 +41,10 @@ THREE.PointCloudMaterial = function ( parameters ) {
 
 };
 
-THREE.PointCloudMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.PointCloudMaterial.prototype.constructor = THREE.PointCloudMaterial;
+THREE.PointsMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.PointsMaterial.prototype.constructor = THREE.PointsMaterial;
 
-THREE.PointCloudMaterial.prototype.copy = function ( source ) {
+THREE.PointsMaterial.prototype.copy = function ( source ) {
 
 	THREE.Material.prototype.copy.call( this, source );
 
@@ -58,23 +58,30 @@ THREE.PointCloudMaterial.prototype.copy = function ( source ) {
 	this.vertexColors = source.vertexColors;
 
 	this.fog = source.fog;
-	
+
 	return this;
 
 };
 
 // backwards compatibility
 
+THREE.PointCloudMaterial = function ( parameters ) {
+
+	console.warn( 'THREE.PointCloudMaterial has been renamed to THREE.PointsMaterial.' );
+	return new THREE.PointsMaterial( parameters );
+
+};
+
 THREE.ParticleBasicMaterial = function ( parameters ) {
 
-	console.warn( 'THREE.ParticleBasicMaterial has been renamed to THREE.PointCloudMaterial.' );
-	return new THREE.PointCloudMaterial( parameters );
+	console.warn( 'THREE.ParticleBasicMaterial has been renamed to THREE.PointsMaterial.' );
+	return new THREE.PointsMaterial( parameters );
 
 };
 
 THREE.ParticleSystemMaterial = function ( parameters ) {
 
-	console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointCloudMaterial.' );
-	return new THREE.PointCloudMaterial( parameters );
+	console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointsMaterial.' );
+	return new THREE.PointsMaterial( parameters );
 
 };

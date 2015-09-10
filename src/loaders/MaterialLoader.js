@@ -78,7 +78,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 
-		// for PointCloudMaterial
+		// for PointsMaterial
 		if ( json.size !== undefined ) material.size = json.size;
 		if ( json.sizeAttenuation !== undefined ) material.sizeAttenuation = json.sizeAttenuation;
 

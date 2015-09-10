@@ -99,7 +99,7 @@ THREE.UniformsLib = {
 
 	},
 
-	particle: {
+	points: {
 
 		"psColor" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
 		"opacity" : { type: "f", value: 1.0 },

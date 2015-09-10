@@ -293,7 +293,7 @@ THREE.BufferGeometry.prototype = {
 
 		var geometry = object.geometry;
 
-		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
+		if ( object instanceof THREE.Points || object instanceof THREE.Line ) {
 
 			var positions = new THREE.Float32Attribute( geometry.vertices.length * 3, 3 );
 			var colors = new THREE.Float32Attribute( geometry.colors.length * 3, 3 );

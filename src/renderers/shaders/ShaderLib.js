@@ -387,11 +387,11 @@ THREE.ShaderLib = {
 
 	},
 
-	'particle_basic': {
+	'points': {
 
 		uniforms: THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ "particle" ],
+			THREE.UniformsLib[ "points" ],
 			THREE.UniformsLib[ "shadowmap" ]
 
 		] ),
