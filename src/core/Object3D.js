@@ -301,13 +301,22 @@ THREE.Object3D.prototype = {
 
 	lookAt: function () {
 
-		// This routine does not support objects with rotated and/or translated parent(s)
-
 		var m1 = new THREE.Matrix4();
+		var v1 = new THREE.Vector3();
 
 		return function ( vector ) {
 
-			m1.lookAt( vector, this.position, this.up );
+			if ( this.parent && ( this.parent.parent || this.parent.type !== 'Scene' ) ) {
+
+				this.parent.worldToLocal( v1.copy( vector ) );
+
+				m1.lookAt( v1, this.position, this.up );
+
+			} else {
+
+				m1.lookAt( vector, this.position, this.up );
+
+			}
 
 			this.quaternion.setFromRotationMatrix( m1 );
 
