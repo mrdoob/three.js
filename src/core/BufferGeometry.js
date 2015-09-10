@@ -22,6 +22,8 @@ THREE.BufferGeometry = function () {
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
+	this.drawRange = { start: 0, count: Infinity };
+
 };
 
 THREE.BufferGeometry.prototype = {
@@ -118,6 +120,13 @@ THREE.BufferGeometry.prototype = {
 	clearGroups: function () {
 
 		this.groups = [];
+
+	},
+
+	setDrawRange: function ( start, count ) {
+
+		this.drawRange.start = start;
+		this.drawRange.count = count;
 
 	},
 

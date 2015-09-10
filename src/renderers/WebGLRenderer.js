@@ -837,7 +837,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( index !== null ) {
 
-				count = index.array.length;
+				count = index.count;
 
 			} else if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
@@ -845,13 +845,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				count = position.array.length / 3;
+				count = position.count;
 
 			}
 
+			var drawRange = geometry.drawRange;
+
 			group = {
-				start: 0,
-				count: count
+				start: drawRange.start,
+				count: Math.min( drawRange.count, count )
 			};
 
 		}
