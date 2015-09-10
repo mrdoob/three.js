@@ -1111,11 +1111,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// update scene graph
 
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+		if ( scene.autoUpdate === true ) scene.updateChildrenMatrixWorld();
 
-		// update camera matrices and frustum
-
-		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
@@ -1271,7 +1268,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// recycle existing render item or grow the array
-
 		var renderItem = array[ index ];
 
 		if ( renderItem !== undefined ) {
@@ -1310,7 +1306,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			lights.push( object );
 
 		} else if ( object instanceof THREE.Sprite ) {
-
+			
 			sprites.push( object );
 
 		} else if ( object instanceof THREE.LensFlare ) {
@@ -1329,7 +1325,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+			if ( object.frustumCulled === false || _frustum.intersectsGeometry( object.geometry, object._matrixWorld ) === true ) {
 
 				var material = object.material;
 
@@ -1337,7 +1333,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( _this.sortObjects === true ) {
 
-						_vector3.setFromMatrixPosition( object.matrixWorld );
+						_vector3.setFromMatrixPosition( object._matrixWorld );
 						_vector3.applyProjection( _projScreenMatrix );
 
 					}
@@ -1395,7 +1391,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
 			var group = renderItem.group;
 
-			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object._matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 			_this.renderBufferDirect( camera, lights, fog, geometry, material, object, group );
@@ -1412,9 +1408,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var object = renderList[ i ];
 
-			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object._matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
-
+			
 			if ( overrideMaterial === undefined ) material = object.material;
 
 			setMaterial( material );
@@ -1644,7 +1640,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( p_uniforms.cameraPosition !== undefined ) {
 
-					_vector3.setFromMatrixPosition( camera.matrixWorld );
+					_vector3.setFromMatrixPosition( camera._matrixWorld );
 					_gl.uniform3f( p_uniforms.cameraPosition, _vector3.x, _vector3.y, _vector3.z );
 
 				}
@@ -1810,7 +1806,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( p_uniforms.modelMatrix !== undefined ) {
 
-			_gl.uniformMatrix4fv( p_uniforms.modelMatrix, false, object.matrixWorld.elements );
+			_gl.uniformMatrix4fv( p_uniforms.modelMatrix, false, object._matrixWorld.elements );
 
 		}
 
@@ -2521,8 +2517,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.visible ) continue;
 
-				_direction.setFromMatrixPosition( light.matrixWorld );
-				_vector3.setFromMatrixPosition( light.target.matrixWorld );
+				_direction.setFromMatrixPosition( light._matrixWorld );
+				_vector3.setFromMatrixPosition( light.target._matrixWorld );
 				_direction.sub( _vector3 );
 				_direction.transformDirection( viewMatrix );
 
@@ -2546,7 +2542,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setColorLinear( pointColors, pointOffset, color, intensity );
 
-				_vector3.setFromMatrixPosition( light.matrixWorld );
+
+				_vector3.setFromMatrixPosition( light._matrixWorld );
 				_vector3.applyMatrix4( viewMatrix );
 
 				pointPositions[ pointOffset + 0 ] = _vector3.x;
@@ -2569,7 +2566,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setColorLinear( spotColors, spotOffset, color, intensity );
 
-				_direction.setFromMatrixPosition( light.matrixWorld );
+				_direction.setFromMatrixPosition( light._matrixWorld );
 				_vector3.copy( _direction ).applyMatrix4( viewMatrix );
 
 				spotPositions[ spotOffset + 0 ] = _vector3.x;
@@ -2578,7 +2575,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				spotDistances[ spotLength ] = distance;
 
-				_vector3.setFromMatrixPosition( light.target.matrixWorld );
+				_vector3.setFromMatrixPosition( light.target._matrixWorld );
 				_direction.sub( _vector3 );
 				_direction.transformDirection( viewMatrix );
 
@@ -2598,7 +2595,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.visible ) continue;
 
-				_direction.setFromMatrixPosition( light.matrixWorld );
+
+				_direction.setFromMatrixPosition( light._matrixWorld );
 				_direction.transformDirection( viewMatrix );
 
 				hemiOffset = hemiLength * 3;

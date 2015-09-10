@@ -6,7 +6,6 @@
 THREE.PointLightHelper = function ( light, sphereSize ) {
 
 	this.light = light;
-	this.light.updateMatrixWorld();
 
 	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
 	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );

@@ -58,8 +58,6 @@
 					group.scale.multiplyScalar( 50 );
 					scene.add( group );
 					
-					// To make sure that the matrixWorld is up to date for the boxhelpers
-					group.updateMatrixWorld(true);
 
 					var mesh = new THREE.Mesh( geometry, material );
 					group.add( mesh );

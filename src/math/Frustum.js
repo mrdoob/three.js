@@ -78,18 +78,22 @@ THREE.Frustum.prototype = {
 
 	},
 
-	intersectsObject: function () {
+	intersectsObject: function ( object ) {
+
+		return this.intersectsGeometry( object.geometry, object.matrixWorld );
+
+	},
+
+	intersectsGeometry: function () {
 
 		var sphere = new THREE.Sphere();
 
-		return function ( object ) {
-
-			var geometry = object.geometry;
+		return function ( geometry, matrix ) {
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
 			sphere.copy( geometry.boundingSphere );
-			sphere.applyMatrix4( object.matrixWorld );
+			sphere.applyMatrix4( matrix );
 
 			return this.intersectsSphere( sphere );
 

@@ -776,11 +776,9 @@
 
 			if ( scope.object === undefined ) return;
 
-			scope.object.updateMatrixWorld();
 			worldPosition.setFromMatrixPosition( scope.object.matrixWorld );
 			worldRotation.setFromRotationMatrix( tempMatrix.extractRotation( scope.object.matrixWorld ) );
 
-			camera.updateMatrixWorld();
 			camPosition.setFromMatrixPosition( camera.matrixWorld );
 			camRotation.setFromRotationMatrix( tempMatrix.extractRotation( camera.matrixWorld ) );
 

@@ -17,7 +17,7 @@ THREE.Object3D = function () {
 
 	this.parent = null;
 	this.children = [];
-
+	
 	this.up = THREE.Object3D.DefaultUp.clone();
 
 	var position = new THREE.Vector3();
@@ -67,11 +67,11 @@ THREE.Object3D = function () {
 
 	this.rotationAutoUpdate = true;
 
-	this.matrix = new THREE.Matrix4();
-	this.matrixWorld = new THREE.Matrix4();
+	this._matrix = new THREE.Matrix4();
+	this._matrixWorld = new THREE.Matrix4();
 
 	this.matrixAutoUpdate = THREE.Object3D.DefaultMatrixAutoUpdate;
-	this.matrixWorldNeedsUpdate = false;
+	this._matrixWorldNeedsUpdate = false;
 
 	this.visible = true;
 
@@ -82,6 +82,10 @@ THREE.Object3D = function () {
 	this.renderOrder = 0;
 
 	this.userData = {};
+	
+	this._position = this.position.clone();
+	this._quaternion = this.quaternion.clone();
+	this._scale = this.scale.clone();
 
 };
 
@@ -124,6 +128,31 @@ THREE.Object3D.prototype = {
 
 		console.warn( 'THREE.Object3D: .renderDepth has been removed. Use .renderOrder, instead.' );
 
+	},
+	
+	get matrix () {
+
+		if ( this.matrixAutoUpdate === true ) {
+	    	
+			return this.updateMatrix();
+	        
+		} else {
+	    	
+			return this._matrix;
+	        
+		}
+
+	},
+	set matrix ( value ) {
+		
+		this._matrix = value;
+	    
+	},
+	
+	get matrixWorld () {
+		
+		return this.updateMatrixWorld();
+	
 	},
 
 	applyMatrix: function ( matrix ) {
@@ -429,8 +458,6 @@ THREE.Object3D.prototype = {
 
 		var result = optionalTarget || new THREE.Vector3();
 
-		this.updateMatrixWorld( true );
-
 		return result.setFromMatrixPosition( this.matrixWorld );
 
 	},
@@ -443,8 +470,6 @@ THREE.Object3D.prototype = {
 		return function ( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Quaternion();
-
-			this.updateMatrixWorld( true );
 
 			this.matrixWorld.decompose( position, result, scale );
 
@@ -478,8 +503,6 @@ THREE.Object3D.prototype = {
 		return function ( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Vector3();
-
-			this.updateMatrixWorld( true );
 
 			this.matrixWorld.decompose( position, quaternion, result );
 
@@ -551,45 +574,118 @@ THREE.Object3D.prototype = {
 
 	},
 
-	updateMatrix: function () {
+	updateMatrix: ( function () {
+		
+		function updateMatrixWorldNeedsUpdate( o ) {
+			
+			o._matrixWorldNeedsUpdate = true;
+			
+		};
+		
+		return function() {
 
-		this.matrix.compose( this.position, this.quaternion, this.scale );
+			var position = this.position;
+			var quaternion = this.quaternion;
+			var scale = this.scale;
+			var _position = this._position;
+			var _quaternion = this._quaternion;
+			var _scale = this._scale;
+			
+			if ( ! _position.equals( position ) || ! _quaternion.equals( quaternion ) || ! _scale.equals( scale )  ) {
 
-		this.matrixWorldNeedsUpdate = true;
-
-	},
-
-	updateMatrixWorld: function ( force ) {
-
-		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
-
-		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
-
-			if ( this.parent === null ) {
-
-				this.matrixWorld.copy( this.matrix );
-
-			} else {
-
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
-
+				this._matrix.compose( position, quaternion, scale );
+				this.traverse( updateMatrixWorldNeedsUpdate );
+				_position.copy( position );
+				_quaternion.copy( quaternion );
+				_scale.copy( scale );
 			}
+			return this._matrix;
 
-			this.matrixWorldNeedsUpdate = false;
+		};
 
-			force = true;
+	} )(),
+	
+	_updateMatrixWorld: function () {
 
-		}
+        if ( this.matrixAutoUpdate === true ) {
 
-		// update children
+            this.updateMatrix();
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+        } else {
 
-			this.children[ i ].updateMatrixWorld( force );
+            this._matrixWorldNeedsUpdate = true;
 
-		}
+        } 
 
-	},
+        var parent = this.parent; 
+
+        if ( this._matrixWorldNeedsUpdate === true ) {
+
+            if ( parent === null ) {
+
+                this._matrixWorld.copy( this._matrix );             
+
+            } else {
+
+                this._matrixWorld.multiplyMatrices( parent._matrixWorld, this._matrix );
+
+            }
+
+        }
+
+        this._matrixWorldNeedsUpdate = false;
+
+        return this._matrixWorld;
+
+    },
+
+    updateMatrixWorld: function () {
+
+        var parent = this.parent; 
+
+        if ( parent !== null ) {
+
+            parent.updateMatrixWorld();
+
+        }
+
+        this._updateMatrixWorld();
+
+        return this._matrixWorld;
+
+    },
+
+    _updateChildrenMatrixWorld: function () {
+
+        this._updateMatrixWorld();
+
+        var children = this.children;
+
+        for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+            children[ i ]._updateChildrenMatrixWorld();
+
+        }
+
+        return this._matrixWorld;
+
+    },
+
+    updateChildrenMatrixWorld: function () {
+
+        var parent = this.parent; 
+
+        if ( parent !== null ) {
+        	
+            parent.updateMatrixWorld();
+            
+        }
+
+        this._updateChildrenMatrixWorld();
+
+        return this._matrixWorld;
+
+    },
 
 	toJSON: function ( meta ) {
 

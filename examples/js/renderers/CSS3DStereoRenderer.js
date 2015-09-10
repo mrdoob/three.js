@@ -252,7 +252,7 @@ THREE.CSS3DStereoRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		scene.updateMatrixWorld();
+		scene.updateChildrenMatrixWorld();
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 

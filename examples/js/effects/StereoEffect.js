@@ -76,10 +76,6 @@ THREE.StereoEffect = function ( renderer ) {
 
 	this.render = function ( scene, camera ) {
 
-		scene.updateMatrixWorld();
-
-		if ( camera.parent === null ) camera.updateMatrixWorld();
-
 		camera.matrixWorld.decompose( _position, _quaternion, _scale );
 
 		// Effective fov of the camera

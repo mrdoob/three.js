@@ -59,7 +59,6 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	this.normalizeSkinWeights();
 
-	this.updateMatrixWorld( true );
 	this.bind( new THREE.Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
 
 };
@@ -73,8 +72,6 @@ THREE.SkinnedMesh.prototype.bind = function( skeleton, bindMatrix ) {
 	this.skeleton = skeleton;
 
 	if ( bindMatrix === undefined ) {
-
-		this.updateMatrixWorld( true );
 		
 		this.skeleton.calculateInverses();
 
@@ -123,9 +120,10 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 };
 
-THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
+THREE.SkinnedMesh.prototype._updateMatrixWorld = function( ) {
 
-	THREE.Mesh.prototype.updateMatrixWorld.call( this, true );
+	// does this need to update the children??
+	THREE.Mesh.prototype._updateMatrixWorld.call( this );
 
 	if ( this.bindMode === "attached" ) {
 
