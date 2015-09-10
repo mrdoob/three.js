@@ -87,45 +87,17 @@
 
 
 				var loader = new THREE.JSONLoader();
-				loader.load( "models/skinned/marine/marine_anims.js", function( geometry, materials ) {
+				var url = "models/skinned/marine/marine_anims.json";
+
+				loader.load( url, function( geometry, materials ) {
 					skinnedMesh = new THREE.SkinnedMesh(geometry, materials[0]);
 
 					var originalMaterial = materials[ 0 ];
 					originalMaterial.skinning = true;
-
-				/*
-					// Create the animations
-					for ( var i = 0; i < geometry.animations.length; ++ i ) {
-						var animName = geometry.animations[ i ].name;
-						scope.animations[ animName ] = new THREE.Animation( scope, geometry.animations[ i ] );
-					}
-				*/
+					originalMaterial.transparent = false;
 
 					start();
 				});
-			}
-
-			function onWindowResize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function onShowSkeleton( event ) {
-
-				var shouldShow = event.detail.shouldShow;
-				helper.visible = shouldShow;
-
-			}
-
-			function onShowModel( event ) {
-
-				var shouldShow = event.detail.shouldShow;
-				skinnedMesh.showModel( shouldShow );
-
 			}
 
 			function start() {
@@ -149,10 +121,9 @@
 				helper.material.linewidth = 3;
 				scene.add( helper );
 
-				helper.visible = false;
+				helper.visible = true;
 
-				//THREE.AnimationHandler.add( skinnedMesh.geometry.animations[0] );
-				var animation = new THREE.Animation( skinnedMesh, skinnedMesh.geometry.animations[1] );
+				var animation = new THREE.Animation( skinnedMesh, skinnedMesh.geometry.animations[0] );
 				animation.play(0, 1);
 
 				animate();
@@ -179,6 +150,28 @@
 				// ( will equal step size next time a single step is desired )
 
 				timeToStep = 0;
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onShowSkeleton( event ) {
+
+				var shouldShow = event.detail.shouldShow;
+				helper.visible = shouldShow;
+
+			}
+
+			function onShowModel( event ) {
+
+				var shouldShow = event.detail.shouldShow;
+				skinnedMesh.showModel( shouldShow );
 
 			}
 
