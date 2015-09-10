@@ -10,19 +10,29 @@ This means that every action is encapsulated in a command-object which contains 
 
 ### Template for new commands ###
 
+Every command needs a constructor. In the constructor
+
 ```javascript
 	
-CmdXXX = function ( object ) {
+CmdXXX = function () {
 
 	Cmd.call( this );	// Call default constructor
 
 	this.type = 'CmdXXX';	// has to match the object-name!
 
 	// TODO: store all the relevant information needed to 
-	// restore the old and the new object-state
+	// restore the old and the new state
 
 };
+```
 
+And as part of the prototype you need to implement four functions
+- **execute:** which is also used for redo
+- **undo:** which reverts the changes made by 'execute'
+- **toJSON:** which serializes the command so that the undo/redo-history can be preserved across a browser refresh
+- **fromJSON:** which deserializes the command
+
+```javascript
 CmdXXX.prototype = {
 
 	execute: function () {
@@ -39,10 +49,10 @@ CmdXXX.prototype = {
 
 	toJSON: function () {
 
-		var output = Cmd.prototype.toJSON.call( this );
+		var output = Cmd.prototype.toJSON.call( this );	// Call 'toJSON'-method of prototype 'Cmd'
 
-		// TODO: serialize relevant information to json so that 
-		// it can be restored in 'fromJSON'
+		// TODO: serialize all the necessary information as part of 'output' (JSON-format)
+		// so that it can be restored in 'fromJSON'
 	
 		return output;
 
@@ -50,7 +60,7 @@ CmdXXX.prototype = {
 
 	fromJSON: function ( json ) {
 
-		Cmd.prototype.fromJSON.call( this, json );
+		Cmd.prototype.fromJSON.call( this, json );	// Call 'fromJSON'-method of prototype 'Cmd'
 		
 		// TODO: restore command from json
 		
@@ -62,11 +72,33 @@ CmdXXX.prototype = {
 
 ### Executing a command ###
 
-To execute a command we need an instance of the main editor-object.
+To execute a command we need an instance of the main editor-object. The editor-object functions as the only entry point through which all commands have to go to be added as part of the undo/redo-history.
 On **editor** we then call **.execute(...)*** with the new command-object which in turn calls **history.execute(...)** and adds the command to the undo-stack.
 
 ```javascript
 	
-editor.execute( new CmdXXX( object ) );
+editor.execute( new CmdXXX() );
 		
 ```
+
+### Updatable commands ###
+
+Some commands are also **updatable**. By default a command is not updatable. Making a command updatable means that you
+have to implement a fifth function 'update' as part of the prototype. In it only the 'new' state gets updated while the old one stays the same.
+
+Here as an example is the update-function of **CmdSetColor**:
+```javascript
+	update: function ( cmd ) {
+
+		this.newValue = cmd.newValue;
+
+	},
+
+```
+
+The idea behind 'updatable commands' is that two commands of the same type which occur
+within a short period of time should be merged into one.
+**For example:** Dragging with your mouse over the x-position field in the sidebar
+leads to hundreds of minor changes to the x-position.
+The user expectation is not to undo every single change that happened while he dragged
+the mouse cursor but rather to go back to the position before he started to drag his mouse.
