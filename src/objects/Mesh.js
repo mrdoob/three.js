@@ -77,16 +77,8 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 			return;
 
-
 		}
 
-		// If we have a BVHTree, then we will check this tree for intersection
-		if (this.BVHTree) {
-
-			this.BVHTree.intersectsObjectSpaceRay(ray, raycaster.near, raycaster.far, intersects);
-			return;
-
-		}
 
 		// Check boundingBox before continuing
 		if ( geometry.boundingBox !== null ) {
@@ -107,11 +99,11 @@ THREE.Mesh.prototype.raycast = ( function () {
 			if ( attributes.index !== undefined ) {
 
 				var indices = attributes.index.array;
-				vardrawcalls = geometry.drawcalls;
+				var groups = geometry.groups;
 
-				if ( drawcalls.length === 0 ) {
+				if ( groups.length === 0 ) {
 
-					drawcalls = [ { start: 0, count: indices.length, index: 0 } ];
+					groups = [ { start: 0, count: indices.length } ];
 
 				}
 
