@@ -772,8 +772,24 @@
 			event.preventDefault();
 
 		}
+		
+		this.addEventListeners = function () {
 
-		this.dispose = function() {
+			this.domElement.addEventListener( 'contextmenu', contextmenu, false );
+
+			this.domElement.addEventListener( 'mousedown', onMouseDown, false );
+			this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
+			this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+
+			this.domElement.addEventListener( 'touchstart', touchstart, false );
+			this.domElement.addEventListener( 'touchend', touchend, false );
+			this.domElement.addEventListener( 'touchmove', touchmove, false );
+
+			window.addEventListener( 'keydown', onKeyDown, false );
+
+		};
+
+		this.removeEventListeners = function () {
 
 			this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
 			this.domElement.removeEventListener( 'mousedown', onMouseDown, false );
@@ -783,25 +799,23 @@
 			this.domElement.removeEventListener( 'touchstart', touchstart, false );
 			this.domElement.removeEventListener( 'touchend', touchend, false );
 			this.domElement.removeEventListener( 'touchmove', touchmove, false );
-
+				
 			document.removeEventListener( 'mousemove', onMouseMove, false );
 			document.removeEventListener( 'mouseup', onMouseUp, false );
 
 			window.removeEventListener( 'keydown', onKeyDown, false );
 
-		}
+		};
 
-		this.domElement.addEventListener( 'contextmenu', contextmenu, false );
+		
 
-		this.domElement.addEventListener( 'mousedown', onMouseDown, false );
-		this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-		this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
-
-		this.domElement.addEventListener( 'touchstart', touchstart, false );
-		this.domElement.addEventListener( 'touchend', touchend, false );
-		this.domElement.addEventListener( 'touchmove', touchmove, false );
-
-		window.addEventListener( 'keydown', onKeyDown, false );
+		this.dispose = function() {
+		
+			this.removeEventListeners();
+			
+		};
+	
+		this.addEventListeners();
 
 		// force an update at start
 		this.update();
