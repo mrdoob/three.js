@@ -104,11 +104,12 @@
 
 				// LIGHTS
 
-				ambientLight = new THREE.AmbientLight( 0x222222 );
-				scene.add( ambientLight );
+				directionalLight = new THREE.DirectionalLight( 0xffeedd, 2 );
+				directionalLight.position.set( 1, 0.5, 1 ).normalize();
+				scene.add( directionalLight );
 
-				directionalLight = new THREE.DirectionalLight( 0xffeedd, 1 );
-				directionalLight.position.set( 1, -1, 1 ).normalize();
+				directionalLight = new THREE.DirectionalLight( 0xddddff, 0.5 );
+				directionalLight.position.set( -1, 0.5, -1 ).normalize();
 				scene.add( directionalLight );
 
 				// MATERIALS
@@ -122,7 +123,7 @@
 				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniformsUV[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniformsUV[ "uNormalScale" ].value = 0.75;
+				uniformsUV[ "uNormalScale" ].value = -1.5;
 
 				uniformsUV[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 
@@ -132,7 +133,7 @@
 				uniformsUV[ "specular" ].value.setHex( specular );
 
 				uniformsUV[ "uRoughness" ].value = 0.185;
-				uniformsUV[ "uSpecularBrightness" ].value = 0.8;
+				uniformsUV[ "uSpecularBrightness" ].value = 0.7;
 
 
 				var uniforms = THREE.UniformsUtils.clone( uniformsUV );
