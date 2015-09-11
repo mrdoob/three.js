@@ -600,19 +600,47 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	}
 
-	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
 
-	this.domElement.addEventListener( 'mousedown', mousedown, false );
+	function contextmenu( /* event */) {
+		event.preventDefault();
+	};
 
-	this.domElement.addEventListener( 'mousewheel', mousewheel, false );
-	this.domElement.addEventListener( 'DOMMouseScroll', mousewheel, false ); // firefox
+	this.addEventListeners = function () {
 
-	this.domElement.addEventListener( 'touchstart', touchstart, false );
-	this.domElement.addEventListener( 'touchend', touchend, false );
-	this.domElement.addEventListener( 'touchmove', touchmove, false );
+		this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 
-	window.addEventListener( 'keydown', keydown, false );
-	window.addEventListener( 'keyup', keyup, false );
+		this.domElement.addEventListener( 'mousedown', mousedown, false );
+
+		this.domElement.addEventListener( 'mousewheel', mousewheel, false );
+		this.domElement.addEventListener( 'DOMMouseScroll', mousewheel, false ); // firefox
+
+		this.domElement.addEventListener( 'touchstart', touchstart, false );
+		this.domElement.addEventListener( 'touchend', touchend, false );
+		this.domElement.addEventListener( 'touchmove', touchmove, false );
+
+		window.addEventListener( 'keydown', keydown, false );
+		window.addEventListener( 'keyup', keyup, false );
+	};
+
+	this.removeEventListeners = function () {
+
+		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
+
+		this.domElement.removeEventListener( 'mousedown', mousedown, false );
+
+		this.domElement.removeEventListener( 'mousewheel', mousewheel, false );
+		this.domElement.removeEventListener( 'DOMMouseScroll', mousewheel, false ); // firefox
+
+		this.domElement.removeEventListener( 'touchstart', touchstart, false );
+		this.domElement.removeEventListener( 'touchend', touchend, false );
+		this.domElement.removeEventListener( 'touchmove', touchmove, false );
+
+		window.removeEventListener( 'keydown', keydown, false );
+		window.removeEventListener( 'keyup', keyup, false );
+
+	};
+
+	this.addEventListeners();
 
 	this.handleResize();
 
