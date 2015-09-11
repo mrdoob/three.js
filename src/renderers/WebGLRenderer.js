@@ -1965,15 +1965,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.castShadow ) continue;
 
-				if ( light instanceof THREE.SpotLight || ( light instanceof THREE.DirectionalLight ) ) {
+				if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight  ) {
 
-					uniforms.shadowMap.value[ j ] = light.shadowMap;
+					if( light instanceof THREE.PointLight){
+						uniforms.shadowCube.value[ j ] = light.shadowMap;
+						uniforms.shadowMap.value[ j ] = null;
+						uniforms.isShadowCube.value[ j ] = 1;
+
+					} else {
+						uniforms.shadowMap.value[ j ] = light.shadowMap;
+						uniforms.isShadowCube.value[ j ] = 0;
+						uniforms.shadowCube.value[ j ] = null;
+					}					
+
 					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
 
 					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
 
 					uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
 					uniforms.shadowBias.value[ j ] = light.shadowBias;
+
+					_vector3.setFromMatrixPosition(light.matrixWorld);
+					uniforms.shadowLightPosition.value[ j * 3] = _vector3.x;
+					uniforms.shadowLightPosition.value[ j * 3 + 1] = _vector3.y;
+					uniforms.shadowLightPosition.value[ j * 3 + 2] = _vector3.z;
 
 					j ++;
 
@@ -2308,7 +2323,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				case 'tv':
 
-					// array of THREE.Texture (2d)
+					// array of THREE.Texture (2d or cube)
 
 					if ( uniform._array === undefined ) {
 
@@ -2330,8 +2345,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 						textureUnit = uniform._array[ i ];
 
 						if ( ! texture ) continue;
+						
+						if ( texture instanceof THREE.CubeTexture ||
+						   ( texture.image instanceof Array && texture.image.length === 6 ) ) { // CompressedTexture can have Array in image :/
 
-						_this.setTexture( texture, textureUnit );
+							setCubeTexture( texture, textureUnit );
+
+						} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
+
+							setCubeTextureDynamic( texture, textureUnit );
+
+						} else {
+
+							_this.setTexture( texture, textureUnit );
+
+						}
 
 					}
 
@@ -3011,7 +3039,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					renderTargetProperties.__webglFramebuffer[ i ] = _gl.createFramebuffer();
 					renderTargetProperties.__webglRenderbuffer[ i ] = _gl.createRenderbuffer();
-
 					state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 
 					setupFrameBuffer( renderTargetProperties.__webglFramebuffer[ i ], renderTarget, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
@@ -3122,6 +3149,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_currentFramebuffer = framebuffer;
 
+		}
+
+		if( isCube ){
+			var renderTargetProperties = properties.get( renderTarget );
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0,  _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, renderTargetProperties.__webglTexture , 0 );
 		}
 
 		_currentWidth = width;

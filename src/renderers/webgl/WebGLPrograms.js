@@ -98,7 +98,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			if ( ! light.castShadow ) continue;
 
-			if ( light instanceof THREE.SpotLight ) maxShadows ++;
+			if ( light instanceof THREE.SpotLight || light instanceof THREE.PointLight ) maxShadows ++;
 			if ( light instanceof THREE.DirectionalLight ) maxShadows ++;
 
 		}
