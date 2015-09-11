@@ -306,15 +306,15 @@ THREE.Object3D.prototype = {
 
 		return function ( vector ) {
 
-			if ( this.parent && ( this.parent.parent || this.parent.type !== 'Scene' ) ) {
+			if ( this.parent === null || this.parent instanceof THREE.Scene ) {
+
+				m1.lookAt( vector, this.position, this.up );
+
+			} else {
 
 				this.parent.worldToLocal( v1.copy( vector ) );
 
 				m1.lookAt( v1, this.position, this.up );
-
-			} else {
-
-				m1.lookAt( vector, this.position, this.up );
 
 			}
 

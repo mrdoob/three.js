@@ -41,15 +41,15 @@ THREE.Camera.prototype.lookAt = function () {
 
 	return function ( vector ) {
 
-		if ( this.parent && ( this.parent.parent || this.parent.type !== 'Scene' ) ) {
+		if ( this.parent === null || this.parent instanceof THREE.Scene ) {
+
+			m1.lookAt( this.position, vector, this.up );
+
+		} else {
 
 			this.parent.worldToLocal( v1.copy( vector ) );
 
 			m1.lookAt( this.position, v1, this.up );
-
-		} else {
-
-			m1.lookAt( this.position, vector, this.up );
 
 		}
 

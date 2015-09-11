@@ -62,11 +62,15 @@
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
-				camera.position.z = 500;
+				camera.position.z = 1000;
 				cameraParent = new THREE.Object3D();
-				cameraParent.position.z = 2700;
+				cameraParent.position.z = 2200;
 				cameraParent.add( camera );
 				scene.add( cameraParent );
+
+				var axis = new THREE.AxisHelper();
+				axis.scale.set( 500, 500, 500 );
+				scene.add( axis );
 
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial() );
 				scene.add( sphere );
@@ -77,7 +81,7 @@
 				geometry.translate( 0, 0 , geometryLength * 0.5 );
 
 				var material = new THREE.MeshNormalMaterial();
-				var materialParent = new THREE.MeshNormalMaterial( { transparent: true, opacity: 0.7 } );
+				var materialParent = new THREE.MeshBasicMaterial( { color: 0x404040, transparent: true, opacity: 0.7 } );
 
 				var deltaZ = 0;
 				for ( var i = 0; i < 1000; i ++ ) {
@@ -172,7 +176,7 @@
 				sphere.position.y = Math.cos( time * 0.5 ) * 2000;
 				sphere.position.z = Math.cos( time * 0.3 ) * 2000;
 
-				for ( var i = 1, l = scene.children.length; i < l; i ++ ) {
+				for ( var i = 2, l = scene.children.length; i < l; i ++ ) {
 
 					var obj = scene.children[ i ];
 					while ( obj.children.length > 0 ) {
@@ -182,6 +186,9 @@
 					obj.lookAt( sphere.position );
 
 				}
+
+				cameraParent.rotation.x = Math.sin( time * 0.7 ) * Math.PI * 0.1;
+				cameraParent.rotation.y = Math.cos( time * 0.5 ) * Math.PI * 0.1;
 
 				cameraParent.position.x += ( mouseX - cameraParent.position.x ) * .05;
 				cameraParent.position.y += ( - mouseY - cameraParent.position.y ) * .05;
