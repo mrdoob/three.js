@@ -289,8 +289,24 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	}
 
-	domElement.addEventListener( 'touchstart', touchStart, false );
-	domElement.addEventListener( 'touchmove', touchMove, false );
+
+
+
+	this.addEventListeners = function () {
+
+		domElement.addEventListener( 'touchstart', touchStart, false );
+		domElement.addEventListener('touchmove', touchMove, false);
+
+	};
+
+	this.removeEventListeners = function () {
+
+		domElement.removeEventListener( 'touchstart', touchStart, false );
+		domElement.removeEventListener('touchmove', touchMove, false);
+
+	};
+
+	this.addEventListeners();
 
 };
 

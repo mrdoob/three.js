@@ -5,6 +5,7 @@
  */
 
 THREE.FirstPersonControls = function ( object, domElement ) {
+	var scope = this;
 
 	this.object = object;
 	this.target = new THREE.Vector3( 0, 0, 0 );
@@ -74,115 +75,125 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	};
 
-	this.onMouseDown = function ( event ) {
+	function onMouseDown( event ) {
 
-		if ( this.domElement !== document ) {
+		if (scope.enabled === false) return;
 
-			this.domElement.focus();
+		if ( scope.domElement !== document ) {
+
+			scope.domElement.focus();
 
 		}
 
 		event.preventDefault();
 		event.stopPropagation();
 
-		if ( this.activeLook ) {
+		if ( scope.activeLook ) {
 
 			switch ( event.button ) {
 
-				case 0: this.moveForward = true; break;
-				case 2: this.moveBackward = true; break;
+				case 0: scope.moveForward = true; break;
+				case 2: scope.moveBackward = true; break;
 
 			}
 
 		}
 
-		this.mouseDragOn = true;
+		scope.mouseDragOn = true;
 
-	};
+	}
 
-	this.onMouseUp = function ( event ) {
+	function onMouseUp( event ) {
+
+		if (scope.enabled === false) return;
 
 		event.preventDefault();
 		event.stopPropagation();
 
-		if ( this.activeLook ) {
+		if ( scope.activeLook ) {
 
 			switch ( event.button ) {
 
-				case 0: this.moveForward = false; break;
-				case 2: this.moveBackward = false; break;
+				case 0: scope.moveForward = false; break;
+				case 2: scope.moveBackward = false; break;
 
 			}
 
 		}
 
-		this.mouseDragOn = false;
+		scope.mouseDragOn = false;
 
-	};
+	}
 
-	this.onMouseMove = function ( event ) {
+	function onMouseMove( event ) {
 
-		if ( this.domElement === document ) {
+		if (scope.enabled === false) return;
 
-			this.mouseX = event.pageX - this.viewHalfX;
-			this.mouseY = event.pageY - this.viewHalfY;
+		if ( scope.domElement === document ) {
+
+			scope.mouseX = event.pageX - scope.viewHalfX;
+			scope.mouseY = event.pageY - scope.viewHalfY;
 
 		} else {
 
-			this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
-			this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
+			scope.mouseX = event.pageX - scope.domElement.offsetLeft - scope.viewHalfX;
+			scope.mouseY = event.pageY - scope.domElement.offsetTop - scope.viewHalfY;
 
 		}
 
-	};
+	}
 
-	this.onKeyDown = function ( event ) {
+	function onKeyDown( event ) {
+
+		if (scope.enabled === false) return;
 
 		//event.preventDefault();
 
 		switch ( event.keyCode ) {
 
 			case 38: /*up*/
-			case 87: /*W*/ this.moveForward = true; break;
+			case 87: /*W*/ scope.moveForward = true; break;
 
 			case 37: /*left*/
-			case 65: /*A*/ this.moveLeft = true; break;
+			case 65: /*A*/ scope.moveLeft = true; break;
 
 			case 40: /*down*/
-			case 83: /*S*/ this.moveBackward = true; break;
+			case 83: /*S*/ scope.moveBackward = true; break;
 
 			case 39: /*right*/
-			case 68: /*D*/ this.moveRight = true; break;
+			case 68: /*D*/ scope.moveRight = true; break;
 
-			case 82: /*R*/ this.moveUp = true; break;
-			case 70: /*F*/ this.moveDown = true; break;
+			case 82: /*R*/ scope.moveUp = true; break;
+			case 70: /*F*/ scope.moveDown = true; break;
 
 		}
 
-	};
+	}
 
-	this.onKeyUp = function ( event ) {
+	function onKeyUp( event ) {
+
+		if (scope.enabled === false) return;
 
 		switch ( event.keyCode ) {
 
 			case 38: /*up*/
-			case 87: /*W*/ this.moveForward = false; break;
+			case 87: /*W*/ scope.moveForward = false; break;
 
 			case 37: /*left*/
-			case 65: /*A*/ this.moveLeft = false; break;
+			case 65: /*A*/ scope.moveLeft = false; break;
 
 			case 40: /*down*/
-			case 83: /*S*/ this.moveBackward = false; break;
+			case 83: /*S*/ scope.moveBackward = false; break;
 
 			case 39: /*right*/
-			case 68: /*D*/ this.moveRight = false; break;
+			case 68: /*D*/ scope.moveRight = false; break;
 
-			case 82: /*R*/ this.moveUp = false; break;
-			case 70: /*F*/ this.moveDown = false; break;
+			case 82: /*R*/ scope.moveUp = false; break;
+			case 70: /*F*/ scope.moveDown = false; break;
 
 		}
 
-	};
+	}
 
 	this.update = function( delta ) {
 
@@ -254,24 +265,38 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	};
 
 
-	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	function contextmenu( /* event */) {
+		event.preventDefault();
+	}
 
-	this.domElement.addEventListener( 'mousemove', bind( this, this.onMouseMove ), false );
-	this.domElement.addEventListener( 'mousedown', bind( this, this.onMouseDown ), false );
-	this.domElement.addEventListener( 'mouseup', bind( this, this.onMouseUp ), false );
+	this.addEventListeners = function () {
 
-	window.addEventListener( 'keydown', bind( this, this.onKeyDown ), false );
-	window.addEventListener( 'keyup', bind( this, this.onKeyUp ), false );
+		this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 
-	function bind( scope, fn ) {
+		this.domElement.addEventListener( 'mousemove', onMouseMove, false );
+		this.domElement.addEventListener( 'mousedown', onMouseDown, false );
+		this.domElement.addEventListener( 'mouseup', onMouseUp, false );
 
-		return function () {
-
-			fn.apply( scope, arguments );
-
-		};
+		window.addEventListener( 'keydown', onKeyDown, false );
+		window.addEventListener( 'keyup', onKeyUp, false );
 
 	};
+
+	this.removeEventListeners = function () {
+
+		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
+
+		this.domElement.removeEventListener( 'mousemove', onMouseMove, false );
+		this.domElement.removeEventListener( 'mousedown', onMouseDown, false );
+		this.domElement.removeEventListener( 'mouseup', onMouseUp, false );
+
+		window.removeEventListener( 'keydown', onKeyDown, false );
+		window.removeEventListener( 'keyup', onKeyUp, false );
+
+	};
+
+	this.addEventListeners();
+
 
 	this.handleResize();
 
