@@ -54,6 +54,188 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 
 };
 
+THREE.Mesh.prototype.objectSpaceRayIntersectsFace = function() {
+
+	var vA = new THREE.Vector3();
+	var vB = new THREE.Vector3();
+	var vC = new THREE.Vector3();
+
+	var intersectionPoint = new THREE.Vector3();
+	var intersectionPointWorld = new THREE.Vector3();
+	var originWorld = new THREE.Vector3();
+
+	var a, b, c, tmpFace;
+
+	var uvA = new THREE.Vector2();
+	var uvB = new THREE.Vector2();
+	var uvC = new THREE.Vector2();
+
+	var barycoord = new THREE.Vector3();
+
+
+	function uvIntersection( point, p1, p2, p3, uv1, uv2, uv3 ) {
+
+		THREE.Triangle.barycoordFromPoint( point, p1, p2, p3, barycoord );
+
+		uv1.multiplyScalar( barycoord.x );
+		uv2.multiplyScalar( barycoord.y );
+		uv3.multiplyScalar( barycoord.z );
+
+		uv1.add( uv2 ).add( uv3 );
+
+		return uv1.clone();
+
+	}
+
+
+	return function(faceIndex, objectSpaceRay, near, far,  intersects) {
+
+		var uv = undefined;
+		var uvs = undefined;
+		var geometry = this.geometry;
+
+
+		var material = this.material;
+		if ( material === undefined ) return;
+
+		if ( geometry instanceof THREE.BufferGeometry ) {
+
+			var attributes = geometry.attributes;
+			var positions = attributes.position.array;
+
+			// Indexed-BufferGeometry
+			if ( attributes.index !== undefined ) {
+
+				var indices = attributes.index.array;
+
+				a = ( indices[ faceIndex*3 ] )      ;
+				b = ( indices[ faceIndex*3 + 1 ] )  ;
+				c = ( indices[ faceIndex*3 + 2 ] )  ;
+
+			} else {
+
+				a = faceIndex*3 ;
+				b = faceIndex*3 + 1;
+				c = faceIndex*3 + 2;
+
+			}
+
+			vA.fromArray( positions, a *3 );
+			vB.fromArray( positions, b *3 );
+			vC.fromArray( positions, c *3 );
+
+			tmpFace = new THREE.Face3( a,b,c, THREE.Triangle.normal( vA, vB, vC ) );
+
+			if ( attributes.uv !== undefined ) {
+
+				uvs = attributes.uv.array;
+				uvA.fromArray( uvs, a * 2 );
+				uvB.fromArray( uvs, b * 2 );
+				uvC.fromArray( uvs, c * 2 );
+
+			}
+
+
+		} else if ( this.geometry instanceof THREE.Geometry ) {
+
+			tmpFace = geometry.faces[ faceIndex ];
+
+			var isFaceMaterial = this.material instanceof THREE.MeshFaceMaterial;
+			var objectMaterials = (isFaceMaterial === true ? this.material.materials : null);
+			material = (isFaceMaterial === true ? objectMaterials[ tmpFace.materialIndex ] : this.material);
+
+
+			if ( material === undefined ) return;
+
+			vertices = geometry.vertices;
+
+			a = vertices[ tmpFace.a ];
+			b = vertices[ tmpFace.b ];
+			c = vertices[ tmpFace.c ];
+
+			vA.set( 0, 0, 0 );
+			vB.set( 0, 0, 0 );
+			vC.set( 0, 0, 0 );
+
+
+			if ( faceMaterial.morphTargets === true ) {
+
+				var morphTargets = geometry.morphTargets;
+				var morphInfluences = this.morphTargetInfluences;
+
+				for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
+
+					var influence = morphInfluences[ t ];
+
+					if ( influence === 0 ) return;
+
+					var targets = morphTargets[ t ].vertices;
+
+					vA.addScaledVector( tempA.subVectors( targets[ tmpFace.a ], a ), influence );
+					vB.addScaledVector( tempB.subVectors( targets[ tmpFace.b ], b ), influence );
+					vC.addScaledVector( tempC.subVectors( targets[ tmpFace.c ], c ), influence );
+
+				}
+
+			}
+
+			vA.add( a );
+			vB.add( b );
+			vC.add( c );
+
+			if ( geometry.faceVertexUvs[ 0 ].length > 0 ) {
+
+				uvs = geometry.faceVertexUvs[ 0 ][ f ];
+				uvA.copy( uvs[ 0 ] );
+				uvB.copy( uvs[ 1 ] );
+				uvC.copy( uvs[ 2 ] );
+
+			}
+
+		} else {
+			console.warn('objectSpaceRayIntersectsFace: The type of the geometry is not supported.');
+			return;
+		}
+
+
+		if ( material.side === THREE.BackSide ) {
+
+			if ( objectSpaceRay.intersectTriangle( vC, vB, vA, true, intersectionPoint ) === null ){ return; } ;
+
+		} else {
+
+			if ( objectSpaceRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide, intersectionPoint ) === null ){ return; };
+
+		}
+
+		intersectionPointWorld.copy( intersectionPoint );
+		intersectionPointWorld.applyMatrix4( this.matrixWorld );
+
+		// To calculate the correct distance, we need to calculate the distance between the world intersection point
+		// and the world ray origin.  (If we didn't do that the distance will be off by the object scaling factors.)
+		originWorld.copy(objectSpaceRay.origin).applyMatrix4( this.matrixWorld );
+		var distance = originWorld.distanceTo( intersectionPointWorld );
+
+		if ( distance < near || distance > far ) return;
+
+		if ( uvs !== undefined ) {
+
+			uv = uvIntersection(intersectionPoint, vA, vB, vC, uvA, uvB, uvC);
+
+		}
+
+		intersects.push( {
+
+			distance: distance,
+			point: intersectionPointWorld.clone(),
+			uv: uv,
+			face: tmpFace,
+			faceIndex: faceIndex,
+			object: this
+
+		} );
+	};
+}();
 
 THREE.Mesh.prototype.raycast = ( function () {
 
