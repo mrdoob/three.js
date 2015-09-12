@@ -69,9 +69,9 @@
 				scene.add( ambient );
 
 				pointLight = new THREE.PointLight( 0xffffff );
-				pointLight.position.set(0,11,4);
+				pointLight.position.set( 0, 11, 4 );
 				pointLight.castShadow = true;
-				pointLight.shadowCameraNear = .05;
+				pointLight.shadowCameraNear = 1;
 				pointLight.shadowCameraFar = 30;
 				pointLight.shadowDarkness = 0.5;
 				pointLight.shadowCameraVisible = true;
@@ -87,7 +87,7 @@
 				dirLight.shadowCameraFar = 100;
 				dirLight.shadowCameraRight = 15;
 				dirLight.shadowCameraLeft = -15;
-				dirLight.shadowCameraTop	= 15;
+				dirLight.shadowCameraTop = 15;
 				dirLight.shadowCameraBottom = -15;
 				dirLight.shadowDarkness = 0.5;
 				dirLight.shadowCameraVisible = true;
@@ -135,85 +135,69 @@
 			
 				wallMaterial = new THREE.MeshPhongMaterial( {
 					color: 0xa0adaf,
-					shininess: 150,
-					specular: 0xffffff,
+					shininess: 10,
+					specular: 0x111111,
 					shading: THREE.SmoothShading
 				} );				
 
-				var groundGeometry = new THREE.BoxGeometry( 10, 0.15, 10 );
-				ground = new THREE.Mesh( groundGeometry, wallMaterial );
+				var wallGeometry = new THREE.BoxGeometry( 10, 0.15, 10 );
+				ground = new THREE.Mesh( wallGeometry, wallMaterial );
 				ground.name = "ground";
 				ground.scale.multiplyScalar( 3 );
 				ground.castShadow = false;
 				ground.receiveShadow = true;
 				scene.add( ground );
-				ground.position.set(0,-5,0);
+				ground.position.set( 0, -5, 0 );
 
-				var ceiling = new THREE.Mesh( groundGeometry, wallMaterial );
+				var ceiling = new THREE.Mesh( wallGeometry, wallMaterial );
 				ceiling.name = "ceiling";
 				ceiling.scale.multiplyScalar( 3 );
 				ceiling.castShadow = false;
 				ceiling.receiveShadow = true;
 				scene.add( ceiling );
-				ceiling.position.set(0,24,0);
+				ceiling.position.set( 0, 24, 0 );
 
-				var wall = new THREE.Mesh( groundGeometry, wallMaterial );
+				var wall = new THREE.Mesh( wallGeometry, wallMaterial );
 				wall.name = "left wall";
 				wall.scale.multiplyScalar( 3 );
 				wall.castShadow = false;
 				wall.receiveShadow = true;				
 				scene.add( wall );
-				wall.position.set(-14,10,0);
-				rotateAroundWorldAxis(wall, new THREE.Vector3(0,0,-1), Math.PI / 180 * 90);
+				wall.position.set( -14, 10, 0 );
+				wall.rotation.z = Math.PI / 2;
 
-				wall = new THREE.Mesh( groundGeometry, wallMaterial );
+				wall = new THREE.Mesh( wallGeometry, wallMaterial );
 				wall.name = "right wall";
 				wall.scale.multiplyScalar( 3 );
 				wall.castShadow = false;
 				wall.receiveShadow = true;				
 				scene.add( wall );
 				wall.position.set(14,10,0);
-				rotateAroundWorldAxis(wall, new THREE.Vector3(0,0,-1), Math.PI / 180 * 90);
+				wall.rotation.z = Math.PI / 2;
 
-				wall = new THREE.Mesh( groundGeometry, wallMaterial );
+				wall = new THREE.Mesh( wallGeometry, wallMaterial );
 				wall.name = "back wall";
 				wall.scale.multiplyScalar( 3 );
 				wall.castShadow = false;
 				wall.receiveShadow = true;				
 				scene.add( wall );
-				wall.position.set(0,10,-14);
-				rotateAroundWorldAxis(wall, new THREE.Vector3(1,0,0), Math.PI / 180 * 90);
+				wall.position.set( 0, 10, -14 );
+				wall.rotation.y = Math.PI / 2;
+				wall.rotation.z = Math.PI / 2;
 
 				var sphereGeometry = new THREE.SphereGeometry( 1, 32, 32 );
-				var material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 				var sphere = new THREE.Mesh( sphereGeometry, material );
 				sphere.castShadow = false;
 				sphere.receiveShadow = false;	
-				sphere.position.set(0,11,4);
+				sphere.position.set( 0, 11, 4 );
 				scene.add( sphere );
 
 				pointLightParent = new THREE.Object3D();
-				pointLightParent.add(pointLight);
-				pointLightParent.add(sphere);
-				scene.add(pointLightParent);			
-			}
+				pointLightParent.add( pointLight );
+				pointLightParent.add( sphere );
+				scene.add( pointLightParent );	
 
-			// Rotate an object around an arbitrary axis in world space       
-			function rotateAroundWorldAxis(object, axis, radians) {
-			    var rotWorldMatrix = new THREE.Matrix4();
-			    rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
-			    rotWorldMatrix.multiply(object.matrix);            
-			    object.matrix = rotWorldMatrix;
-			    object.rotation.setFromRotationMatrix(object.matrix);
-			}
-
-			// Rotate an object around an arbitrary axis in world space       
-			function rotateAroundWorldAxis(object, axis, radians) {
-			    var rotWorldMatrix = new THREE.Matrix4();
-			    rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
-			    rotWorldMatrix.multiply(object.matrix);               
-			    object.matrix = rotWorldMatrix;
-			    object.rotation.setFromRotationMatrix(object.matrix);
 			}
 
 			function initMisc() {
@@ -243,7 +227,6 @@
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
@@ -252,22 +235,20 @@
 
 				requestAnimationFrame( animate );
 				render();
-
 				stats.update();
 
 			}
 
 			function renderScene() {
+
 				renderer.render( scene, camera );
 			}
 
-
-			var updateCount = 0;
 			function render() {
 
 				var delta = clock.getDelta();
 
-				pointLightParent.rotation.y += .05;
+				pointLightParent.rotation.y += delta * 2;
 				renderScene();
 
 				cube.rotation.x += 0.25 * delta;
@@ -281,12 +262,6 @@
 				cube3.rotation.x += 0.25 * delta;
 				cube3.rotation.y += 2 * delta;
 				cube3.rotation.z += 1 * delta;
-
-				//var pos = new THREE.Vector3();
-				//pos.setFromMatrixPosition(pointLight.matrixWorld);
-				//console.log(pos.x +","+pos.y+","+pos.z);
-
-				updateCount++;
 
 			}
 

@@ -150,11 +150,15 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			var light = _lights[ i ];
 
 			if ( light instanceof THREE.PointLight ) {
+
 				faceCount = 6;
 				isCube = true;
+
 			} else {
+
 				faceCount = 1;
 				isCube = false;
+
 			}
 
 			if ( ! light.castShadow ) continue;
@@ -172,11 +176,15 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
 
 				if ( isCube ) {
+
 					light.shadowMap = new THREE.WebGLRenderTargetCube( light.shadowMapWidth, light.shadowMapWidth, pars );
 					light.shadowMapSize = new  THREE.Vector2( light.shadowMapWidth, light.shadowMapWidth );
+
 				} else {
+
 					light.shadowMap = new THREE.WebGLRenderTarget( light.shadowMapWidth, light.shadowMapHeight, pars );
 					light.shadowMapSize = new THREE.Vector2( light.shadowMapWidth, light.shadowMapHeight );
+
 				}	
 
 				light.shadowMatrix = new THREE.Matrix4();
@@ -217,21 +225,25 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			var shadowCamera = light.shadowCamera;
 
 			_lightPosition.setFromMatrixPosition( light.matrixWorld );
-			shadowCamera.position.copy(_lightPosition);
+			shadowCamera.position.copy( _lightPosition);
 
 			// render shadow map for each cube face (if omni-directional) or
 			// run a single pass if not
 
-			for(var face = 0; face < faceCount; face ++){				
+			for ( var face = 0; face < faceCount; face++ ){				
 		
-				if( isCube){
-					_lookTarget.copy(shadowCamera.position);
-					_lookTarget.add(cubeDirections[face]);
-					shadowCamera.up.copy(cubeUps[face]);
-					shadowCamera.lookAt(_lookTarget);				
+				if( isCube ){
+
+					_lookTarget.copy( shadowCamera.position );
+					_lookTarget.add( cubeDirections[face] );
+					shadowCamera.up.copy( cubeUps[face] );
+					shadowCamera.lookAt( _lookTarget );	
+
 				} else {
+
 					_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
-					shadowCamera.lookAt( _lookTarget);
+					shadowCamera.lookAt( _lookTarget );
+
 				}	
 
 				shadowCamera.updateMatrixWorld();
@@ -259,8 +271,10 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				// render shadow map
 
-				if(isCube){
+				if( isCube ){
+
 					shadowMap.activeCubeFace = face;
+
 				}	
 
 				_renderer.setRenderTarget( shadowMap );
@@ -292,7 +306,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 							if ( groupMaterial.visible === true ) {
 
-								var depthMaterial = getDepthMaterial( object, groupMaterial, isCube, _lightPosition);
+								var depthMaterial = getDepthMaterial( object, groupMaterial, isCube, _lightPosition );
 								_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, depthMaterial , object, group );
 
 							}
@@ -300,8 +314,10 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 						}
 
 					} else {
+
 						var depthMaterial = getDepthMaterial( object, material, isCube, _lightPosition);						
 						_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, depthMaterial, object, null );
+
 					}
 
 				}
@@ -344,17 +360,21 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var depthMaterialMorphSkin = _depthMaterialMorphSkin;
 
 		if ( isCube ){
+
 			depthMaterial = _distanceMaterial;
 			depthMaterialMorph = _distanceMaterialMorph; 
 			depthMaterialSkin = _distanceMaterialSkin; 
 			depthMaterialMorphSkin = _distanceMaterialMorphSkin;
 		}
 
-		if ( object.customDepthMaterial || object.customDistanceMaterial) {
+		if ( object.customDepthMaterial || object.customDistanceMaterial ) {
 
-			if( isCube ){
+			if ( isCube ){
+
 				newMaterial = object.customDistanceMaterial;
+
 			} else {
+
 				newMaterial = object.customDepthMaterial;
 			}
 
@@ -377,9 +397,10 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		newMaterial.wireframeLinewidth = material.wireframeLinewidth;
 
 		if ( isCube ){
-			if(newMaterial.uniforms.lightPos)
-			{
-				newMaterial.uniforms.lightPos.value.copy(lightPosition);
+
+			if( newMaterial.uniforms.lightPos ){
+
+				newMaterial.uniforms.lightPos.value.copy( lightPosition );
 			}
 		}
 
@@ -388,7 +409,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	}
 
 	function projectObject( object, camera ) {
-
 
 		if ( object.visible === false ) return;
 

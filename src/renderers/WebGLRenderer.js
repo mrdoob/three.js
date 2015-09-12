@@ -1967,15 +1967,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight  ) {
 
-					if( light instanceof THREE.PointLight){
+					if( light instanceof THREE.PointLight ){
+
 						uniforms.shadowCube.value[ j ] = light.shadowMap;
 						uniforms.shadowMap.value[ j ] = null;
 						uniforms.isShadowCube.value[ j ] = 1;
 
 					} else {
+
 						uniforms.shadowMap.value[ j ] = light.shadowMap;
 						uniforms.isShadowCube.value[ j ] = 0;
 						uniforms.shadowCube.value[ j ] = null;
+
 					}					
 
 					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
@@ -1985,10 +1988,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
 					uniforms.shadowBias.value[ j ] = light.shadowBias;
 
-					_vector3.setFromMatrixPosition(light.matrixWorld);
-					uniforms.shadowLightPosition.value[ j * 3] = _vector3.x;
-					uniforms.shadowLightPosition.value[ j * 3 + 1] = _vector3.y;
-					uniforms.shadowLightPosition.value[ j * 3 + 2] = _vector3.z;
+					_vector3.setFromMatrixPosition( light.matrixWorld );
+					uniforms.shadowLightPosition.value[ j * 3 ] = _vector3.x;
+					uniforms.shadowLightPosition.value[ j * 3 + 1 ] = _vector3.y;
+					uniforms.shadowLightPosition.value[ j * 3 + 2 ] = _vector3.z;
 
 					j ++;
 
@@ -3152,8 +3155,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if( isCube ){
+
 			var renderTargetProperties = properties.get( renderTarget );
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0,  _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, renderTargetProperties.__webglTexture , 0 );
+
 		}
 
 		_currentWidth = width;
