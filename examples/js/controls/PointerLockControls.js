@@ -58,12 +58,12 @@ THREE.PointerLockControls = function ( camera ) {
 
 	} ();
 
-	this.addEventListeners = function () {
+	this.enable = function () {
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 	};
 
-	this.removeEventListeners = function () {
+	this.disable = function () {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 
@@ -71,10 +71,10 @@ THREE.PointerLockControls = function ( camera ) {
 	
 	this.dispose = function() {
 	
-		this.removeEventListeners();
+		this.disable();
 		
 	};
 
-	this.addEventListeners();
+	this.enable();
 
 };

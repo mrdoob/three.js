@@ -256,7 +256,7 @@ THREE.FlyControls = function ( object, domElement ) {
 		event.preventDefault();
 	};
 
-	this.addEventListeners = function () {
+	this.enable = function () {
 
 		this.domElement.addEventListener('contextmenu', contextmenu, false);
 
@@ -269,7 +269,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.removeEventListeners = function () {
+	this.disable = function () {
 
 		this.domElement.removeEventListener('contextmenu', contextmenu, false);
 
@@ -284,11 +284,11 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.dispose = function() {
 	
-		this.removeEventListeners();
+		this.disable();
 		
 	};
 	
-	this.addEventListeners();
+	this.enable();
 
 	this.updateMovementVector();
 	this.updateRotationVector();

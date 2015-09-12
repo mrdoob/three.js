@@ -296,7 +296,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		
 	};
 
-	this.addEventListeners = function () {
+	this.enable = function () {
 	
 		domElement.addEventListener( 'contextmenu', contextmenu, false );
 		domElement.addEventListener( 'mousedown', onMouseDown, false );
@@ -325,7 +325,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		
 	};
 
-	this.addEventListeners();
+	this.enable();
 
 };
 

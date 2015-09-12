@@ -611,7 +611,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		event.preventDefault();
 	};
 
-	this.addEventListeners = function () {
+	this.enable = function () {
 
 		this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 
@@ -628,7 +628,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		window.addEventListener( 'keyup', keyup, false );
 	};
 
-	this.removeEventListeners = function () {
+	this.disable = function () {
 
 		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
 
@@ -649,11 +649,11 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	};
 
-	this.addEventListeners();
+	this.enable();
 
 	this.dispose = function() {
 	
-		this.removeEventListeners();
+		this.disable();
 		
 	};
 	

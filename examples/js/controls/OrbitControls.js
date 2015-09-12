@@ -773,7 +773,7 @@
 
 		}
 		
-		this.addEventListeners = function () {
+		this.enable = function () {
 
 			this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 
@@ -789,7 +789,7 @@
 
 		};
 
-		this.removeEventListeners = function () {
+		this.disable = function () {
 
 			this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
 			this.domElement.removeEventListener( 'mousedown', onMouseDown, false );
@@ -811,11 +811,11 @@
 
 		this.dispose = function() {
 		
-			this.removeEventListeners();
+			this.disable();
 			
 		};
 	
-		this.addEventListeners();
+		this.enable();
 
 		// force an update at start
 		this.update();

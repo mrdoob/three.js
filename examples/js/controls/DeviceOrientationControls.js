@@ -68,7 +68,7 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	};
 
-	this.addEventListeners = function () {
+	this.enable = function () {
 
 		onScreenOrientationChangeEvent(); // run once on load
 
@@ -79,7 +79,7 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	};
 
-	this.removeEventListeners = function () {
+	this.disable = function () {
 
 		window.removeEventListener('orientationchange', onScreenOrientationChangeEvent, false);
 		window.removeEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
@@ -89,10 +89,10 @@ THREE.DeviceOrientationControls = function ( object ) {
 	
 	this.dispose = function() {
 	
-		this.removeEventListeners();
+		this.disable();
 		
 	};
 
-	this.addEventListeners();
+	this.enable();
 
 };

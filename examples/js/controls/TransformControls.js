@@ -1053,7 +1053,7 @@
 
 		}
 
-		this.addEventListeners = function () {
+		this.enable = function () {
 
 			domElement.addEventListener( "mousedown", onPointerDown, false );
 			domElement.addEventListener( "touchstart", onPointerDown, false );
@@ -1072,7 +1072,7 @@
 
 		};
 
-		this.removeEventListeners = function () {
+		this.disable = function () {
 
 			domElement.removeEventListener( "mousedown", onPointerDown, false );
 			domElement.removeEventListener( "touchstart", onPointerDown, false );
@@ -1093,11 +1093,11 @@
 
 		this.dispose = function() {
 	
-			this.removeEventListeners();
+			this.disable();
 		
 		};
 	
-		this.addEventListeners();
+		this.enable();
 
 	};
 

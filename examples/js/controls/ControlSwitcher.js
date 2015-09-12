@@ -30,7 +30,7 @@ ControlSwitcher.prototype.setControlMode = function (controlMode) {
     this.camera.rotation.copy(prevCamera.rotation);
 
 	if(this.camControls !== undefined)
-		this.camControls.removeEventListeners();
+		this.camControls.disable();
 		
 	switch(controlMode) {
 	    case this.CAMERACONTROLMODE.ORBIT:
