@@ -171,8 +171,10 @@ THREE.WebGLProgram = ( function () {
 
 			prefixVertex = [
 
+				'#ifdef GL_ES',
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
+				'#endif',
 
 				'#define SHADER_NAME ' + material.__webglShader.name,
 
@@ -284,8 +286,10 @@ THREE.WebGLProgram = ( function () {
 				parameters.bumpMap || parameters.normalMap || parameters.flatShading || material.derivatives ? '#extension GL_OES_standard_derivatives : enable' : '',
 				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 
+				'#ifdef GL_ES',
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
+				'#endif',
 
 				'#define SHADER_NAME ' + material.__webglShader.name,
 
