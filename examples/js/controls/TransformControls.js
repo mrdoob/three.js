@@ -691,7 +691,7 @@
 		this.attach = function ( object ) {
 
 
-	
+
 
 			this.object = object;
 			this.visible = true;
@@ -1053,7 +1053,7 @@
 
 		}
 
-		this.enable = function () {
+		this.enableEventListeners = function () {
 
 			domElement.addEventListener( "mousedown", onPointerDown, false );
 			domElement.addEventListener( "touchstart", onPointerDown, false );
@@ -1072,7 +1072,7 @@
 
 		};
 
-		this.disable = function () {
+		this.disableEventListeners = function () {
 
 			domElement.removeEventListener( "mousedown", onPointerDown, false );
 			domElement.removeEventListener( "touchstart", onPointerDown, false );
@@ -1092,12 +1092,12 @@
 		};
 
 		this.dispose = function() {
-	
-			this.disable();
-		
+
+			this.disableEventListeners();
+
 		};
-	
-		this.enable();
+
+		this.enableEventListeners();
 
 	};
 

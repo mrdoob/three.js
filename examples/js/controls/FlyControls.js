@@ -84,7 +84,7 @@ THREE.FlyControls = function ( object, domElement ) {
 	function onKeyUp( event ) {
 
 		if (scope.enabled === false) return;
-		
+
 		switch ( event.keyCode ) {
 
 			case 16: /* shift */ scope.movementSpeedMultiplier = 1; break;
@@ -256,7 +256,7 @@ THREE.FlyControls = function ( object, domElement ) {
 		event.preventDefault();
 	};
 
-	this.enable = function () {
+	this.enableEventListeners = function () {
 
 		this.domElement.addEventListener('contextmenu', contextmenu, false);
 
@@ -269,7 +269,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.disable = function () {
+	this.disableEventListeners = function () {
 
 		this.domElement.removeEventListener('contextmenu', contextmenu, false);
 
@@ -283,12 +283,12 @@ THREE.FlyControls = function ( object, domElement ) {
 	};
 
 	this.dispose = function() {
-	
-		this.disable();
-		
+
+		this.disableEventListeners();
+
 	};
-	
-	this.enable();
+
+	this.enableEventListeners();
 
 	this.updateMovementVector();
 	this.updateRotationVector();

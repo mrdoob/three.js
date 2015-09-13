@@ -35,9 +35,9 @@ THREE.MouseControls = function ( object ) {
 	this.enabled = true;
 
 	this.orientation = {
-    x: 0,
-    y: 0,
-  };
+		x: 0,
+		y: 0,
+	};
 
 	this.update = function() {
 
@@ -50,24 +50,24 @@ THREE.MouseControls = function ( object ) {
 
 	};
 
-	this.enable = function () {
+	this.enableEventListeners = function () {
 
-		document.addEventListener('mousemove', onMouseMove, false);
+		document.addEventListener( 'mousemove', onMouseMove, false );
 
 	};
 
-	this.disable = function () {
+	this.disableEventListeners = function () {
 
-		document.removeEventListener('mousemove', onMouseMove, false);
+		document.removeEventListener( 'mousemove', onMouseMove, false );
 
 	};
 
 	this.dispose = function() {
-	
-		this.disable();
-		
+
+		this.disableEventListeners();
+
 	};
-	
-	this.enable();
+
+	this.enableEventListeners();
 
 };

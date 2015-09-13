@@ -586,13 +586,15 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	}
 
-	function contextmenu( /* event */) {
+	function contextmenu( /* event */ ) {
+
 		event.preventDefault();
+
 	};
 
-	this.enable = function () {
+	this.enableEventListeners = function () {
 
-		this.domElement.addEventListener('contextmenu', contextmenu, false);
+		this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 		this.domElement.addEventListener( 'mousedown', mousedown, false );
 
 		this.domElement.addEventListener( 'mousewheel', mousewheel, false );
@@ -607,9 +609,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	};
 
-	this.disable = function () {
+	this.disableEventListeners = function () {
 
-		this.domElement.removeEventListener('contextmenu', contextmenu, false);
+		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
 		this.domElement.removeEventListener( 'mousedown', mousedown, false );
 
 		this.domElement.removeEventListener( 'mousewheel', mousewheel, false );
@@ -624,12 +626,12 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	};
 
-	this.enable();
+	this.enableEventListeners();
 
 	this.dispose = function() {
-	
-		this.disable();
-		
+
+		this.disableEventListeners();
+
 	};
 
 	this.handleResize();

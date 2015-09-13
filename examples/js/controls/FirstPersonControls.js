@@ -5,6 +5,7 @@
  */
 
 THREE.FirstPersonControls = function ( object, domElement ) {
+
 	var scope = this;
 
 	this.object = object;
@@ -77,7 +78,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	function onMouseDown( event ) {
 
-		if (scope.enabled === false) return;
+		if ( scope.enabled === false ) return;
 
 		if ( scope.domElement !== document ) {
 
@@ -105,7 +106,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	function onMouseUp( event ) {
 
-		if (scope.enabled === false) return;
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -127,7 +128,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	function onMouseMove( event ) {
 
-		if (scope.enabled === false) return;
+		if ( scope.enabled === false ) return;
 
 		if ( scope.domElement === document ) {
 
@@ -145,7 +146,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	function onKeyDown( event ) {
 
-		if (scope.enabled === false) return;
+		if ( scope.enabled === false ) return;
 
 		//event.preventDefault();
 
@@ -172,7 +173,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	function onKeyUp( event ) {
 
-		if (scope.enabled === false) return;
+		if ( scope.enabled === false ) return;
 
 		switch ( event.keyCode ) {
 
@@ -265,11 +266,13 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	};
 
 
-	function contextmenu( /* event */) {
+	function contextmenu( /* event */ ) {
+
 		event.preventDefault();
+
 	}
 
-	this.enable = function () {
+	this.enableEventListeners = function () {
 
 		this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 
@@ -282,7 +285,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	};
 
-	this.disable = function () {
+	this.disableEventListeners = function () {
 
 		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
 
@@ -296,12 +299,12 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	};
 
 	this.dispose = function() {
-	
-		this.disable();
-		
+
+		this.disableEventListeners();
+
 	};
-	
-	this.enable();
+
+	this.enableEventListeners();
 
 
 	this.handleResize();

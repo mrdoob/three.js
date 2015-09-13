@@ -772,8 +772,8 @@
 			event.preventDefault();
 
 		}
-		
-		this.enable = function () {
+
+		this.enableEventListeners = function () {
 
 			this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 
@@ -789,7 +789,7 @@
 
 		};
 
-		this.disable = function () {
+		this.disableEventListeners = function () {
 
 			this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
 			this.domElement.removeEventListener( 'mousedown', onMouseDown, false );
@@ -799,7 +799,7 @@
 			this.domElement.removeEventListener( 'touchstart', touchstart, false );
 			this.domElement.removeEventListener( 'touchend', touchend, false );
 			this.domElement.removeEventListener( 'touchmove', touchmove, false );
-				
+
 			document.removeEventListener( 'mousemove', onMouseMove, false );
 			document.removeEventListener( 'mouseup', onMouseUp, false );
 
@@ -807,15 +807,15 @@
 
 		};
 
-		
+
 
 		this.dispose = function() {
-		
-			this.disable();
-			
+
+			this.disableEventListeners();
+
 		};
-	
-		this.enable();
+
+		this.enableEventListeners();
 
 		// force an update at start
 		this.update();

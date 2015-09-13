@@ -290,42 +290,43 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	}
 
-	function contextmenu( /* event */) {
-	
+	function contextmenu( /* event */ ) {
+
 		event.preventDefault();
-		
+
 	};
 
-	this.enable = function () {
-	
+	this.enableEventListeners = function () {
+
 		domElement.addEventListener( 'contextmenu', contextmenu, false );
 		domElement.addEventListener( 'mousedown', onMouseDown, false );
 		domElement.addEventListener( 'mousewheel', onMouseWheel, false );
 		domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
-		
+
 		domElement.addEventListener( 'touchstart', touchStart, false );
 		domElement.addEventListener( 'touchmove', touchMove, false );
+
 	};
 
-	this.removeEventListeners = function () {
+	this.disableEventListeners = function () {
 
 		domElement.removeEventListener( 'contextmenu', contextmenu, false );
 		domElement.removeEventListener( 'mousedown', onMouseDown, false );
 		domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
 		domElement.removeEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
-	
+
 		domElement.removeEventListener( 'touchstart', touchStart, false );
-		domElement.removeEventListener('touchmove', touchMove, false);
+		domElement.removeEventListener( 'touchmove', touchMove, false );
 
 	};
 
-    this.dispose = function() {
-	
-		this.removeEventListeners();
-		
+	this.dispose = function() {
+
+		this.disableEventListeners();
+
 	};
 
-	this.enable();
+	this.enableEventListeners();
 
 };
 

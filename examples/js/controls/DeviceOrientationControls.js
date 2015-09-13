@@ -68,31 +68,32 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	};
 
-	this.enable = function () {
+	this.enableEventListeners = function () {
 
 		onScreenOrientationChangeEvent(); // run once on load
 
-		window.addEventListener('orientationchange', onScreenOrientationChangeEvent, false);
-		window.addEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
+		window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+		window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
 
 		scope.enabled = true;
 
 	};
 
-	this.disable = function () {
+	this.disableEventListeners = function () {
 
-		window.removeEventListener('orientationchange', onScreenOrientationChangeEvent, false);
-		window.removeEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
+		window.removeEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+		window.removeEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
 
 		scope.enabled = false;
-	};
-	
-	this.dispose = function() {
-	
-		this.disable();
-		
+
 	};
 
-	this.enable();
+	this.dispose = function() {
+
+		this.disableEventListeners();
+
+	};
+
+	this.enableEventListeners();
 
 };
