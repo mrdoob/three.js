@@ -1013,7 +1013,7 @@ THREE.SEA3D.prototype.readGeometryBuffer = function( sea ) {
 
 	}
 
-	geo.addIndex( new THREE.BufferAttribute( new Uint16Array( sea.indexes ), 1 ) );
+	geo.setIndex( new THREE.BufferAttribute( new Uint16Array( sea.indexes ), 1 ) );
 	geo.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( sea.vertex ), 3 ) );
 
 	if ( sea.uv ) {

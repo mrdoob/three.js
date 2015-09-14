@@ -764,7 +764,7 @@
 
 						buffer = new Uint16Array( str_len / 2 );
 						attrib = new THREE.BufferAttribute( buffer, 1 );
-						geom.addIndex( attrib );
+						geom.setIndex( attrib );
 
 						idx = 0;
 

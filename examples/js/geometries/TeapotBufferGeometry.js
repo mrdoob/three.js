@@ -721,7 +721,7 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 
 	}
 
-	this.addIndex( new THREE.BufferAttribute( indices, 1 ) );
+	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
