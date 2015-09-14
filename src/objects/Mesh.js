@@ -96,9 +96,9 @@ THREE.Mesh.prototype.raycast = ( function () {
 			var attributes = geometry.attributes;
 			var positions = attributes.position.array;
 
-			if ( attributes.index !== undefined ) {
+			if ( geometry.index !== undefined ) {
 
-				var indices = attributes.index.array;
+				var indices = geometry.index.array;
 				var groups = geometry.groups;
 
 				if ( groups.length === 0 ) {
