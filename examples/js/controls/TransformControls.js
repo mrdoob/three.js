@@ -932,9 +932,21 @@
 
 				if ( scope.snap !== null ) {
 
+					if ( scope.space === "local" ) {
+
+						scope.object.position.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
+
+					}
+
 					if ( scope.axis.search( "X" ) !== - 1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
 					if ( scope.axis.search( "Y" ) !== - 1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
 					if ( scope.axis.search( "Z" ) !== - 1 ) scope.object.position.z = Math.round( scope.object.position.z / scope.snap ) * scope.snap;
+
+					if ( scope.space === "local" ) {
+
+						scope.object.position.applyMatrix4( worldRotationMatrix );
+
+					}
 
 				}
 
