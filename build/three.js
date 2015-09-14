@@ -10688,9 +10688,22 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addIndex: function ( attribute ) {
+	addIndex: function ( index ) {
 
-		this.index = attribute;
+		console.warn( 'THREE.BufferGeometry: .addIndex() has been renamed to .setIndex().' );
+		this.setIndex( index );
+
+	},
+
+	getIndex: function () {
+
+		return this.index;
+
+	},
+
+	setIndex: function ( index ) {
+
+		this.index = index;
 
 	},
 
@@ -10708,7 +10721,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( name === 'index' ) {
 
-			console.warn( 'THREE.BufferGeometry.addAttribute: Use .addIndex() for index attribute.' );
+			console.warn( 'THREE.BufferGeometry.addAttribute: Use .setIndex() for index attribute.' );
 			this.addIndex( attribute );
 
 		}
