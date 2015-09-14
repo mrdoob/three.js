@@ -84,7 +84,7 @@ THREE.EventDispatcher.prototype = {
 
 			event.target = this;
 
-			for ( var i = 0; i < listenerArray.length; i ++ ) {
+			for ( var i = listenerArray.length - 1; 0 <= i; i -= 1 ) {
 
         listenerArray[ i ].call( this, event );
 
