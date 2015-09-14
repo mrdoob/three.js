@@ -104,9 +104,9 @@ THREE.Mesh.prototype.objectSpaceRayIntersectsFace = function() {
 			var positions = attributes.position.array;
 
 			// Indexed-BufferGeometry
-			if ( attributes.index !== undefined ) {
+			if ( geometry.index !== undefined ) {
 
-				var indices = attributes.index.array;
+				var indices = geometry.index.array;
 
 				a = ( indices[ faceIndex*3 ] )      ;
 				b = ( indices[ faceIndex*3 + 1 ] )  ;
