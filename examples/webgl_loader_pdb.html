@@ -115,8 +115,13 @@
 				camera.position.z = 1000;
 				scene.add( camera );
 
-				var light = new THREE.PointLight( 0xffffff, 0.8 );
-				camera.add( light );
+				var light = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				light.position.set( 1, 1, 1 );
+				scene.add( light );
+
+				var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				light.position.set( -1, -1, 1 );
+				scene.add( light );
 
 				root = new THREE.Group();
 				scene.add( root );
