@@ -19706,8 +19706,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _this = this,
 
-	_programs = [],
-
 	// internal state cache
 
 	_currentProgram = null,
@@ -19755,7 +19753,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_infoMemory = {
 
-		programs: 0,
 		geometries: 0,
 		textures: 0
 
@@ -19774,9 +19771,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		render: _infoRender,
 		memory: _infoMemory,
-		programs: _programs
+		programs: null
 
 	};
+
 
 	// initialize
 
@@ -19838,6 +19836,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var properties = new THREE.WebGLProperties();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
 	var programCache = new THREE.WebGLPrograms( this, capabilities );
+
+	this.info.programs = programCache.programs;
 
 	var bufferRenderer = new THREE.WebGLBufferRenderer( _gl, extensions, _infoRender );
 	var indexedBufferRenderer = new THREE.WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
@@ -20213,41 +20213,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function releaseMaterialProgramReference( material ) {
 
-		var program = properties.get( material ).program.program;
-
-		if ( program === undefined ) return;
+		var programInfo = properties.get( material ).program;
 
 		material.program = undefined;
 
-		for ( var i = 0, n = _programs.length; i !== n; ++ i ) {
+		if ( programInfo !== undefined ) {
 
-			var programInfo = _programs[ i ];
-
-			if ( programInfo.program === program ) {
-
-				var newReferenceCount = -- programInfo.usedTimes;
-
-				if ( newReferenceCount === 0 ) {
-
-					// the last material that has been using the program let
-					// go of it, so remove it from the (unordered) _programs
-					// set and deallocate the GL resource
-
-					var newLength = n - 1;
-
-					_programs[ i ] = _programs[ newLength ];
-					_programs.pop();
-
-					_gl.deleteProgram( program );
-
-					_infoMemory.programs = newLength;
-
-				}
-
-				break;
-
-			}
-
+			programCache.releaseProgram( programInfo );
 		}
 
 	}
@@ -21066,15 +21038,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var parameters = programCache.getParameters( material, lights, fog, object );
 		var code = programCache.getProgramCode( material, parameters );
 
-
+		var program = materialProperties.program;
 		var programChange = true;
 
-		if ( ! materialProperties.program ) {
+		if ( program === undefined ) {
 
 			// new material
 			material.addEventListener( 'dispose', onMaterialDispose );
 
-		} else if ( materialProperties.program.code !== code ) {
+		} else if ( program.code !== code ) {
 
 			// changed glsl or parameters
 			releaseMaterialProgramReference( material );
@@ -21091,40 +21063,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( parameters.shaderID ) {
-
-			var shader = THREE.ShaderLib[ parameters.shaderID ];
-
-			materialProperties.__webglShader = {
-				name: material.type,
-				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-			};
-
-		} else {
-
-			materialProperties.__webglShader = {
-				name: material.type,
-				uniforms: material.uniforms,
-				vertexShader: material.vertexShader,
-				fragmentShader: material.fragmentShader
-			};
-
-		}
-
-		material.__webglShader = materialProperties.__webglShader;
-
-		var program = programCache.getProgram( material, parameters, code );
-
 		if ( programChange ) {
 
-			program.usedTimes ++;
+			if ( parameters.shaderID ) {
+
+				var shader = THREE.ShaderLib[ parameters.shaderID ];
+
+				materialProperties.__webglShader = {
+					name: material.type,
+					uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+					vertexShader: shader.vertexShader,
+					fragmentShader: shader.fragmentShader
+				};
+
+			} else {
+
+				materialProperties.__webglShader = {
+					name: material.type,
+					uniforms: material.uniforms,
+					vertexShader: material.vertexShader,
+					fragmentShader: material.fragmentShader
+				};
+
+			}
+
+			material.__webglShader = materialProperties.__webglShader;
+
+			program = programCache.acquireProgram( material, parameters, code );
+
+			materialProperties.program = program;
+			material.program = program;
 
 		}
-
-		materialProperties.program = program;
-		material.program = program;
 
 		var attributes = program.getAttributes();
 
@@ -24338,6 +24308,15 @@ THREE.WebGLProgram = ( function () {
 
 		};
 
+		// free resource
+
+		this.destroy = function() {
+
+			gl.deleteProgram( program );
+			this.program = undefined;
+
+		};
+
 		// DEPRECATED
 
 		Object.defineProperties( this, {
@@ -24612,7 +24591,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 	};
 
-	this.getProgram = function ( material, parameters, code ) {
+	this.acquireProgram = function ( material, parameters, code ) {
 
 		var program;
 
@@ -24624,6 +24603,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			if ( programInfo.code === code ) {
 
 				program = programInfo;
+				++ program.usedTimes;
 
 				break;
 
@@ -24638,9 +24618,28 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 		}
 
-		return program ;
+		return program;
 
-	}
+	};
+
+	this.releaseProgram = function( program ) {
+
+		if ( -- program.usedTimes === 0 ) {
+
+			// Remove from unordered set
+			var i = programs.indexOf( program );
+			programs[ i ] = programs[ programs.length - 1 ];
+			programs.pop();
+
+			// Free WebGL resources
+			program.destroy();
+
+		}
+
+	};
+
+	// Exposed for resource monitoring & error feedback via renderer.info:
+	this.programs = programs;
 
 };
 
