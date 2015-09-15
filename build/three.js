@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '72dev' };
+var THREE = { REVISION: '72' };
 
 //
 
@@ -12272,7 +12272,7 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 
 	this.type = 'HemisphereLight';
 
-	this.position.set( 0, 100, 0 );
+	this.position.set( 0, 1, 0 );
 	this.updateMatrix();
 
 	this.groundColor = new THREE.Color( groundColor );
