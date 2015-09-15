@@ -1,6 +1,6 @@
 THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
-	var programs = renderer.info.programs;
+	var programs = [];
 
 	var shaderIDs = {
 		MeshDepthMaterial: 'depth',
@@ -276,5 +276,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		}
 
 	};
+
+	// Exposed for resource monitoring & error feedback via renderer.info:
+	this.programs = programs;
 
 };

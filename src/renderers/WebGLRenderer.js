@@ -130,7 +130,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_infoMemory = {
 
 		geometries: 0,
-		textures: 0
+		textures: 0,
+		programs: 0
 
 	},
 
@@ -147,15 +148,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		render: _infoRender,
 		memory: _infoMemory,
-		programs: []
+		programs: null
 
 	};
 
 	Object.defineProperty( _infoMemory, 'programs', { get: function() {
 
-		return _this.info.programs.length;
+		var programs = _this.info.programs;
+		return programs !== null ? programs.length : 0;
 
 	} } );
+
 
 	// initialize
 
@@ -217,6 +220,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var properties = new THREE.WebGLProperties();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
 	var programCache = new THREE.WebGLPrograms( this, capabilities );
+
+	this.info.programs = programCache.programs;
 
 	var bufferRenderer = new THREE.WebGLBufferRenderer( _gl, extensions, _infoRender );
 	var indexedBufferRenderer = new THREE.WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
