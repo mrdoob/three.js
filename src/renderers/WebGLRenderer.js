@@ -130,8 +130,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_infoMemory = {
 
 		geometries: 0,
-		textures: 0,
-		programs: 0
+		textures: 0
 
 	},
 
@@ -151,13 +150,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		programs: null
 
 	};
-
-	Object.defineProperty( _infoMemory, 'programs', { get: function() {
-
-		var programs = _this.info.programs;
-		return programs !== null ? programs.length : 0;
-
-	} } );
 
 
 	// initialize
