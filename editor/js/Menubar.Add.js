@@ -236,6 +236,7 @@ Menubar.Add = function ( editor ) {
 	} );
 	options.add( option );
 
+	/*
 	// Teapot
 
 	var option = new UI.Panel();
@@ -263,6 +264,7 @@ Menubar.Add = function ( editor ) {
 
 	} );
 	options.add( option );
+	*/
 
 	// Sprite
 
