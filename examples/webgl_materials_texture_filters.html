@@ -114,17 +114,17 @@
 				context.fillRect( 0, 0, 64, 64);
 				context.fillRect( 64, 64, 64, 64 );
 
-				var textureCanvas = new THREE.Texture( imageCanvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
-					materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
-
-				textureCanvas.needsUpdate = true;
+				var textureCanvas = new THREE.CanvasTexture( imageCanvas );
 				textureCanvas.repeat.set( 1000, 1000 );
+				textureCanvas.wrapS = THREE.RepeatWrapping;
+				textureCanvas.wrapT = THREE.RepeatWrapping;
 
-				var textureCanvas2 = new THREE.Texture( imageCanvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping, THREE.NearestFilter, THREE.NearestFilter );
-					materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
+				var textureCanvas2 = textureCanvas.clone();
+				textureCanvas2.magFilter = THREE.NearestFilter;
+				textureCanvas2.minFilter = THREE.NearestFilter;
 
-				textureCanvas2.needsUpdate = true;
-				textureCanvas2.repeat.set( 1000, 1000 );
+				var	materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
+				var materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 

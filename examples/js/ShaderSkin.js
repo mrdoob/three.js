@@ -30,27 +30,27 @@ THREE.ShaderSkin = {
 
 			{
 
-			"enableBump"	: { type: "i", value: 0 },
-			"enableSpecular": { type: "i", value: 0 },
+				"enableBump"	: { type: "i", value: 0 },
+				"enableSpecular": { type: "i", value: 0 },
 
-			"tDiffuse"	: { type: "t", value: null },
-			"tBeckmann"	: { type: "t", value: null },
+				"tDiffuse"	: { type: "t", value: null },
+				"tBeckmann"	: { type: "t", value: null },
 
-			"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
-			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"opacity": 	  { type: "f", value: 1 },
+				"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
+				"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
+				"opacity": 	  { type: "f", value: 1 },
 
-			"uRoughness": 	  		{ type: "f", value: 0.15 },
-			"uSpecularBrightness": 	{ type: "f", value: 0.75 },
+				"uRoughness": 	  		{ type: "f", value: 0.15 },
+				"uSpecularBrightness": 	{ type: "f", value: 0.75 },
 
-			"bumpMap"	: { type: "t", value: null },
-			"bumpScale" : { type: "f", value: 1 },
+				"bumpMap"	: { type: "t", value: null },
+				"bumpScale" : { type: "f", value: 1 },
 
-			"specularMap" : { type: "t", value: null },
+				"specularMap" : { type: "t", value: null },
 
-			"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+				"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
-			"uWrapRGB":	{ type: "v3", value: new THREE.Vector3( 0.75, 0.375, 0.1875 ) }
+				"uWrapRGB":	{ type: "v3", value: new THREE.Vector3( 0.75, 0.375, 0.1875 ) }
 
 			}
 
@@ -59,7 +59,6 @@ THREE.ShaderSkin = {
 		fragmentShader: [
 
 			"#define USE_BUMPMAP",
-			"#extension GL_OES_standard_derivatives : enable",
 
 			"uniform bool enableBump;",
 			"uniform bool enableSpecular;",
@@ -168,7 +167,7 @@ THREE.ShaderSkin = {
 				"diffuseColor = diffuseColor * colDiffuse;",
 
 				"vec3 normal = normalize( vNormal );",
-				"vec3 viewPosition = normalize( vViewPosition );",
+				"vec3 viewerDirection = normalize( vViewPosition );",
 
 				"float specularStrength;",
 
@@ -198,9 +197,7 @@ THREE.ShaderSkin = {
 
 					"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
-						"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] + vViewPosition.xyz;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
@@ -210,10 +207,10 @@ THREE.ShaderSkin = {
 						"float pointDiffuseWeightHalf = max( 0.5 * dot( normal, lVector ) + 0.5, 0.0 );",
 						"vec3 pointDiffuseWeight = mix( vec3 ( pointDiffuseWeightFull ), vec3( pointDiffuseWeightHalf ), uWrapRGB );",
 
-						"float pointSpecularWeight = KS_Skin_Specular( normal, lVector, viewPosition, uRoughness, uSpecularBrightness );",
+						"float pointSpecularWeight = KS_Skin_Specular( normal, lVector, viewerDirection, uRoughness, uSpecularBrightness );",
 
-						"totalDiffuseLight += attenuation * pointLightColor[ i ] * pointDiffuseWeight;",
-						"totalSpecularLight += attenuation * specular * pointLightColor[ i ] * pointSpecularWeight * specularStrength;",
+						"totalDiffuseLight += pointLightColor[ i ] * ( pointDiffuseWeight * attenuation );",
+						"totalSpecularLight += pointLightColor[ i ] * specular * ( pointSpecularWeight * specularStrength * attenuation );",
 
 					"}",
 
@@ -225,16 +222,16 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
-						"vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );",
+						"vec3 dirVector = directionalLightDirection[ i ];",
 
 						"float dirDiffuseWeightFull = max( dot( normal, dirVector ), 0.0 );",
 						"float dirDiffuseWeightHalf = max( 0.5 * dot( normal, dirVector ) + 0.5, 0.0 );",
 						"vec3 dirDiffuseWeight = mix( vec3 ( dirDiffuseWeightFull ), vec3( dirDiffuseWeightHalf ), uWrapRGB );",
 
-						"float dirSpecularWeight = KS_Skin_Specular( normal, dirVector, viewPosition, uRoughness, uSpecularBrightness );",
+						"float dirSpecularWeight = KS_Skin_Specular( normal, dirVector, viewerDirection, uRoughness, uSpecularBrightness );",
 
 						"totalDiffuseLight += directionalLightColor[ i ] * dirDiffuseWeight;",
-						"totalSpecularLight += specular * directionalLightColor[ i ] * dirSpecularWeight * specularStrength;",
+						"totalSpecularLight += directionalLightColor[ i ] * ( dirSpecularWeight * specularStrength );",
 
 					"}",
 
@@ -246,7 +243,7 @@ THREE.ShaderSkin = {
 
 					"for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-						"vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );",
+						"vec3 lVector = hemisphereLightDirection[ i ];",
 
 						"float dotProduct = dot( normal, lVector );",
 						"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
@@ -256,14 +253,16 @@ THREE.ShaderSkin = {
 						// specular (sky light)
 
 						"float hemiSpecularWeight = 0.0;",
-						"hemiSpecularWeight += KS_Skin_Specular( normal, lVector, viewPosition, uRoughness, uSpecularBrightness );",
+						"hemiSpecularWeight += KS_Skin_Specular( normal, lVector, viewerDirection, uRoughness, uSpecularBrightness );",
 
 						// specular (ground light)
 
 						"vec3 lVectorGround = -lVector;",
-						"hemiSpecularWeight += KS_Skin_Specular( normal, lVectorGround, viewPosition, uRoughness, uSpecularBrightness );",
+						"hemiSpecularWeight += KS_Skin_Specular( normal, lVectorGround, viewerDirection, uRoughness, uSpecularBrightness );",
 
-						"totalSpecularLight += specular * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * specularStrength;",
+						"vec3 hemiSpecularColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
+
+						"totalSpecularLight += hemiSpecularColor * specular * ( hemiSpecularWeight * specularStrength );",
 
 					"}",
 
@@ -280,7 +279,7 @@ THREE.ShaderSkin = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader: [
 
@@ -339,26 +338,26 @@ THREE.ShaderSkin = {
 
 			{
 
-			"passID": { type: "i", value: 0 },
+				"passID": { type: "i", value: 0 },
 
-			"tDiffuse"	: { type: "t", value: null },
-			"tNormal"	: { type: "t", value: null },
+				"tDiffuse"	: { type: "t", value: null },
+				"tNormal"	: { type: "t", value: null },
 
-			"tBlur1"	: { type: "t", value: null },
-			"tBlur2"	: { type: "t", value: null },
-			"tBlur3"	: { type: "t", value: null },
-			"tBlur4"	: { type: "t", value: null },
+				"tBlur1"	: { type: "t", value: null },
+				"tBlur2"	: { type: "t", value: null },
+				"tBlur3"	: { type: "t", value: null },
+				"tBlur4"	: { type: "t", value: null },
 
-			"tBeckmann"	: { type: "t", value: null },
+				"tBeckmann"	: { type: "t", value: null },
 
-			"uNormalScale": { type: "f", value: 1.0 },
+				"uNormalScale": { type: "f", value: 1.0 },
 
-			"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
-			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"opacity": 	  { type: "f", value: 1 },
+				"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
+				"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
+				"opacity": 	  { type: "f", value: 1 },
 
-			"uRoughness": 	  		{ type: "f", value: 0.15 },
-			"uSpecularBrightness": 	{ type: "f", value: 0.75 }
+				"uRoughness": 	  		{ type: "f", value: 0.15 },
+				"uSpecularBrightness": 	{ type: "f", value: 0.75 }
 
 			}
 
@@ -387,8 +386,6 @@ THREE.ShaderSkin = {
 
 			"uniform float uNormalScale;",
 
-			"varying vec3 vTangent;",
-			"varying vec3 vBinormal;",
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
@@ -456,20 +453,29 @@ THREE.ShaderSkin = {
 
 				"vec4 mSpecular = vec4( specular, opacity );",
 
-				"vec3 normalTex = texture2D( tNormal, vUv ).xyz * 2.0 - 1.0;",
-				"normalTex.xy *= uNormalScale;",
-				"normalTex = normalize( normalTex );",
-
 				"vec4 colDiffuse = texture2D( tDiffuse, vUv );",
 				"colDiffuse *= colDiffuse;",
 
 				"diffuseColor *= colDiffuse;",
 
-				"mat3 tsb = mat3( vTangent, vBinormal, vNormal );",
-				"vec3 finalNormal = tsb * normalTex;",
+				// normal mapping
 
-				"vec3 normal = normalize( finalNormal );",
-				"vec3 viewPosition = normalize( vViewPosition );",
+				"vec4 posAndU = vec4( -vViewPosition, vUv.x );",
+				"vec4 posAndU_dx = dFdx( posAndU ),  posAndU_dy = dFdy( posAndU );",
+				"vec3 tangent = posAndU_dx.w * posAndU_dx.xyz + posAndU_dy.w * posAndU_dy.xyz;",
+				"vec3 normal = normalize( vNormal );",
+				"vec3 binormal = normalize( cross( tangent, normal ) );",
+				"tangent = cross( normal, binormal );",	// no normalization required
+				"mat3 tsb = mat3( tangent, binormal, normal );",
+
+				"vec3 normalTex = texture2D( tNormal, vUv ).xyz * 2.0 - 1.0;",
+				"normalTex.xy *= uNormalScale;",
+				"normalTex = normalize( normalTex );",
+
+				"vec3 finalNormal = tsb * normalTex;",
+				"normal = normalize( finalNormal );",
+
+				"vec3 viewerDirection = normalize( vViewPosition );",
 
 				// point lights
 
@@ -481,14 +487,19 @@ THREE.ShaderSkin = {
 					"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
 						"vec3 pointVector = normalize( vPointLight[ i ].xyz );",
-						"float pointDistance = vPointLight[ i ].w;",
+						"float attenuation = vPointLight[ i ].w;",
 
 						"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
 
-						"totalDiffuseLight += pointDistance * pointLightColor[ i ] * pointDiffuseWeight;",
+						"totalDiffuseLight += pointLightColor[ i ] * ( pointDiffuseWeight * attenuation );",
 
-						"if ( passID == 1 )",
-							"totalSpecularLight += pointDistance * mSpecular.xyz * pointLightColor[ i ] * KS_Skin_Specular( normal, pointVector, viewPosition, uRoughness, uSpecularBrightness );",
+						"if ( passID == 1 ) {",
+
+							"float pointSpecularWeight = KS_Skin_Specular( normal, pointVector, viewerDirection, uRoughness, uSpecularBrightness );",
+
+							"totalSpecularLight += pointLightColor[ i ] * mSpecular.xyz * ( pointSpecularWeight * attenuation );",
+
+						"}",
 
 					"}",
 
@@ -500,14 +511,19 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
-						"vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );",
+						"vec3 dirVector = directionalLightDirection[ i ];",
 
 						"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
 
 						"totalDiffuseLight += directionalLightColor[ i ] * dirDiffuseWeight;",
 
-						"if ( passID == 1 )",
-							"totalSpecularLight += mSpecular.xyz * directionalLightColor[ i ] * KS_Skin_Specular( normal, dirVector, viewPosition, uRoughness, uSpecularBrightness );",
+						"if ( passID == 1 ) {",
+
+							"float dirSpecularWeight = KS_Skin_Specular( normal, dirVector, viewerDirection, uRoughness, uSpecularBrightness );",
+
+							"totalSpecularLight += directionalLightColor[ i ] * mSpecular.xyz * dirSpecularWeight;",
+
+						"}",
 
 					"}",
 
@@ -571,11 +587,9 @@ THREE.ShaderSkin = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader: [
-
-			"attribute vec4 tangent;",
 
 			"#ifdef VERTEX_TEXTURES",
 
@@ -585,8 +599,6 @@ THREE.ShaderSkin = {
 
 			"#endif",
 
-			"varying vec3 vTangent;",
-			"varying vec3 vBinormal;",
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
@@ -614,13 +626,6 @@ THREE.ShaderSkin = {
 
 				"vNormal = normalize( normalMatrix * normal );",
 
-				// tangent and binormal vectors
-
-				"vTangent = normalize( normalMatrix * tangent.xyz );",
-
-				"vBinormal = cross( vNormal, vTangent ) * tangent.w;",
-				"vBinormal = normalize( vBinormal );",
-
 				"vUv = uv;",
 
 				// point lights
@@ -629,9 +634,7 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
-						"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] - vViewPosition;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
@@ -660,22 +663,10 @@ THREE.ShaderSkin = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShaderUV: [
 
-			"attribute vec4 tangent;",
-
-			"#ifdef VERTEX_TEXTURES",
-
-				"uniform sampler2D tDisplacement;",
-				"uniform float uDisplacementScale;",
-				"uniform float uDisplacementBias;",
-
-			"#endif",
-
-			"varying vec3 vTangent;",
-			"varying vec3 vBinormal;",
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
@@ -703,13 +694,6 @@ THREE.ShaderSkin = {
 
 				"vNormal = normalize( normalMatrix * normal );",
 
-				// tangent and binormal vectors
-
-				"vTangent = normalize( normalMatrix * tangent.xyz );",
-
-				"vBinormal = cross( vNormal, vTangent ) * tangent.w;",
-				"vBinormal = normalize( vBinormal );",
-
 				"vUv = uv;",
 
 				// point lights
@@ -718,9 +702,7 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
-						"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] - vViewPosition;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
@@ -736,7 +718,7 @@ THREE.ShaderSkin = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -763,7 +745,7 @@ THREE.ShaderSkin = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -795,7 +777,7 @@ THREE.ShaderSkin = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	}
 

@@ -21,7 +21,7 @@ THREE.TypedArrayUtils = {};
 THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 	var stack = [];
-	var sp = -1;
+	var sp = - 1;
 	var left = 0;
 	var right = arr.length / eleSize - 1;
 	var tmp = 0.0, x = 0, y = 0;
@@ -56,7 +56,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 				
 				i = j - 1;
 				
-				while ( i >= left && arr[ i * eleSize + orderElement ] > swap[orderElement ] ) {
+				while ( i >= left && arr[ i * eleSize + orderElement ] > swap[ orderElement ] ) {
 
 					for ( x = 0; x < eleSize; x ++ ) {
 
@@ -76,7 +76,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 			}
 			
-			if ( sp == -1 ) break;
+			if ( sp == - 1 ) break;
 
 			right = stack[ sp -- ]; //?
 			left = stack[ sp -- ];
@@ -215,7 +215,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 		median = Math.floor( plength / 2 );
 		
 		node = new self.Node( getPointSet( points, median ), depth, parent, median + pos );
-		node.left = buildTree( points.subarray( 0, median * eleSize), depth + 1, node, pos );
+		node.left = buildTree( points.subarray( 0, median * eleSize ), depth + 1, node, pos );
 		node.right = buildTree( points.subarray( ( median + 1 ) * eleSize, points.length ), depth + 1, node, pos + median + 1 );
 
 		return node;
@@ -224,7 +224,11 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 	this.root = buildTree( points, 0, null, 0 );
 		
-	this.getMaxDepth = function () { return maxDepth; };
+	this.getMaxDepth = function () {
+
+		return maxDepth;
+
+	};
 	
 	this.nearest = function ( point, maxNodes, maxDistance ) {
 	
@@ -240,15 +244,19 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 		bestNodes = new THREE.TypedArrayUtils.Kdtree.BinaryHeap(
 
-			function ( e ) { return -e[ 1 ]; }
+			function ( e ) {
 
-		);
+				return - e[ 1 ];
+
+			}
+
+					);
 
 		function nearestSearch( node ) {
 
 			var bestChild,
 				dimension = node.depth % eleSize,
-				ownDistance = metric(point, node.obj),
+				ownDistance = metric( point, node.obj ),
 				linearDistance = 0,
 				otherChild,
 				i,
@@ -330,7 +338,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 			// if there's still room or the current distance is nearer than the best distance
 
-			if ( bestNodes.size() < maxNodes || Math.abs(linearDistance) < bestNodes.peek()[ 1 ] ) {
+			if ( bestNodes.size() < maxNodes || Math.abs( linearDistance ) < bestNodes.peek()[ 1 ] ) {
 
 				if ( bestChild === node.left ) {
 

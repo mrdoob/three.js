@@ -11,7 +11,7 @@ var APP = {
 		var loader = new THREE.ObjectLoader();
 		var camera, scene, renderer;
 
-		var vr, controls;
+		var vr, controls, effect;
 
 		var events = {};
 
@@ -33,6 +33,9 @@ var APP = {
 			this.setCamera( loader.parse( json.camera ) );
 
 			events = {
+				init: [],
+				start: [],
+				stop: [],
 				keydown: [],
 				keyup: [],
 				mousedown: [],
@@ -44,6 +47,15 @@ var APP = {
 				update: []
 			};
 
+			var scriptWrapParams = 'player,renderer,scene';
+			var scriptWrapResultObj = {};
+			for ( var eventKey in events ) {
+				scriptWrapParams += ',' + eventKey;
+				scriptWrapResultObj[ eventKey ] = eventKey;
+			}
+			var scriptWrapResult =
+					JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
+
 			for ( var uuid in json.scripts ) {
 
 				var object = scene.getObjectByProperty( 'uuid', uuid, true );
@@ -54,7 +66,8 @@ var APP = {
 
 					var script = scripts[ i ];
 
-					var functions = ( new Function( 'player, scene, keydown, keyup, mousedown, mouseup, mousemove, touchstart, touchend, touchmove, update', script.source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, touchstart: touchstart, touchend: touchend, touchmove: touchmove, update: update };' ).bind( object ) )( this, scene );
+					var functions = ( new Function( scriptWrapParams,
+							script.source + '\nreturn ' + scriptWrapResult+ ';' ).bind( object ) )( this, renderer, scene );
 
 					for ( var name in functions ) {
 
@@ -75,6 +88,8 @@ var APP = {
 
 			}
 
+			dispatch( events.init, arguments );
+
 		};
 
 		this.setCamera = function ( value ) {
@@ -86,10 +101,10 @@ var APP = {
 
 			if ( vr === true ) {
 
-				if ( camera.parent === undefined ) {
+				if ( camera.parent === null ) {
 
 					// camera needs to be in the scene so camera2 matrix updates
-					
+
 					scene.add( camera );
 
 				}
@@ -100,7 +115,7 @@ var APP = {
 				camera = camera2;
 
 				controls = new THREE.VRControls( camera );
-				renderer = new THREE.VREffect( renderer );
+				effect = new THREE.VREffect( renderer );
 
 				document.addEventListener( 'keyup', function ( event ) {
 
@@ -114,7 +129,7 @@ var APP = {
 
 				this.dom.addEventListener( 'dblclick', function () {
 
-					renderer.setFullScreen( true );
+					effect.setFullScreen( true );
 
 				} );
 
@@ -146,7 +161,15 @@ var APP = {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-				array[ i ]( event );
+				try {
+
+					array[ i ]( event );
+
+				} catch (e) {
+
+					console.error( ( e.message || e ), ( e.stack || "" ) );
+
+				}
 
 			}
 
@@ -160,9 +183,16 @@ var APP = {
 
 			dispatch( events.update, { time: time, delta: time - prevTime } );
 
-			if ( vr ) controls.update();
+			if ( vr === true ) {
 
-			renderer.render( scene, camera );
+				controls.update();
+				effect.render( scene, camera );
+
+			} else {
+
+				renderer.render( scene, camera );
+
+			}
 
 			prevTime = time;
 
@@ -179,9 +209,10 @@ var APP = {
 			document.addEventListener( 'touchend', onDocumentTouchEnd );
 			document.addEventListener( 'touchmove', onDocumentTouchMove );
 
-			request = requestAnimationFrame( animate );
-			prevTime = performance.now();
+			dispatch( events.start, arguments );
 
+			request = requestAnimationFrame( animate );
+			prevTime = ( window.performance || Date ).now();
 		};
 
 		this.stop = function () {
@@ -195,8 +226,9 @@ var APP = {
 			document.removeEventListener( 'touchend', onDocumentTouchEnd );
 			document.removeEventListener( 'touchmove', onDocumentTouchMove );
 
-			cancelAnimationFrame( request );
+			dispatch( events.stop, arguments );
 
+			cancelAnimationFrame( request );
 		};
 
 		//

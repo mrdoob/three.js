@@ -87,7 +87,7 @@ THREE.BabylonLoader.prototype = {
 
 		var indices = new Uint16Array( json.indices );
 
-		geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+		geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 		// positions
 
@@ -137,13 +137,9 @@ THREE.BabylonLoader.prototype = {
 
 				var subMesh = subMeshes[ j ];
 
-				geometry.addDrawCall( subMesh.indexStart, subMesh.indexCount );
+				geometry.addGroup( subMesh.indexStart, subMesh.indexCount );
 
 			}
-
-		} else {
-
-			geometry.addDrawCall( 0, json.indices.length );
 
 		}
 
@@ -200,8 +196,9 @@ THREE.BabylonLoader.prototype = {
 			}
 
 			light.name = data.name;
-			light.position.set( data.position[ 0 ], data.position[ 1 ], - data.position[ 2 ] );
+			if ( data.position ) light.position.set( data.position[ 0 ], data.position[ 1 ], - data.position[ 2 ] );
 			light.color.fromArray( data.diffuse );
+			if ( data.groundColor ) light.groundColor.fromArray( data.groundColor );
 			if ( data.intensity ) light.intensity = data.intensity;
 
 			objects[ data.id ] = light;

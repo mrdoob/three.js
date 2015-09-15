@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -17,7 +18,9 @@
 		<h2>Example</h2>
 		<code>var color = new THREE.Color();</code>
 		<code>var color = new THREE.Color( 0xff0000 );</code>
-		<code>var color = new THREE.Color("rgb(255,0,0)");</code>
+		<code>var color = new THREE.Color("rgb(255, 0, 0)");</code>
+		<code>var color = new THREE.Color("rgb(100%, 0%, 0%)");</code>
+		<code>var color = new THREE.Color("hsl(0, 100%, 50%)");</code>
 		<code>var color = new THREE.Color( 1, 0, 0 );</code>
 
 
@@ -26,7 +29,7 @@
 
 		<h3>[name]( value )</h3>
 		<div>
-		value — optional argument that sets initial color.  Can be a hexadecimal or a CSS-style string, for example, "rgb(250, 0,0)", "rgb(100%,0%,0%)", "#ff0000", "#f00", or "red", or three arguments that represent color channels.
+		value — optional argument that sets initial color.  Can be a hexadecimal or a CSS-style string, for example, "rgb(250, 0,0)", "rgb(100%,0%,0%)", "hsl(0, 100%, 50%)", "#ff0000", "#f00", or "red", or three arguments that represent color channels.
 		</div>
 
 		<h2>Properties</h2>
@@ -112,10 +115,10 @@
 
 		<h3>[method:Color setStyle]( [page:String style] ) [page:Color this]</h3>
 		<div>
-		style — color as a CSS-style string, for example, "rgb(250, 0,0)", "rgb(100%,0%,0%)", "#ff0000", "#f00", or "red"
+		style — color as a CSS-style string.
 		</div>
 		<div>
-		Sets this color	from a CSS-style string.
+		Sets this color from a CSS-style string. For example, "rgb(250, 0,0)", "rgb(100%, 0%, 0%)", "hsl(0, 100%, 50%)", "#ff0000", "#f00", or "red". Transluent colors such as "rgba(255, 0, 0, 0.5)" and "hsla(0, 100%, 50%, 0.5)" are also accepted, but the alpha-channel coordinate will be discarded.
 		</div>
 
 		<h3>[method:String getStyle]()</h3>

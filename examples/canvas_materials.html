@@ -60,7 +60,7 @@
 
 				var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } );
 
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				var line = new THREE.LineSegments( geometry, material );
 				scene.add( line );
 
 				// Spheres
@@ -115,7 +115,7 @@
 					context.arc( 0, 0, 0.5, 0, PI2, true );
 					context.fill();
 
-				}
+				};
 
 				// Lights
 
@@ -176,7 +176,7 @@
 			function loadImage( path ) {
 
 				var image = document.createElement( 'img' );
-				var texture = new THREE.Texture( image, THREE.UVMapping )
+				var texture = new THREE.Texture( image, THREE.UVMapping );
 
 				image.onload = function () { texture.needsUpdate = true; };
 				image.src = path;

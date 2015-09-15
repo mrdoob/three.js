@@ -19,9 +19,6 @@ var Editor = function () {
 
 		// actions
 
-		playAnimation: new SIGNALS.Signal(),
-		stopAnimation: new SIGNALS.Signal(),
-
 		// showDialog: new SIGNALS.Signal(),
 
 		// notifications
@@ -70,10 +67,13 @@ var Editor = function () {
 	};
 
 	this.config = new Config();
+	this.history = new History( this );
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
 	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 100000 );
+	this.camera.position.set( 500, 250, 500 );
+	this.camera.lookAt( new THREE.Vector3() );
 	this.camera.name = 'Camera';
 
 	this.scene = new THREE.Scene();
@@ -188,7 +188,7 @@ Editor.prototype = {
 
 	removeObject: function ( object ) {
 
-		if ( object.parent === undefined ) return; // avoid deleting the camera or scene
+		if ( object.parent === null ) return; // avoid deleting the camera or scene
 
 		var scope = this;
 
@@ -241,8 +241,8 @@ Editor.prototype = {
 
 	addHelper: function () {
 
-		var geometry = new THREE.SphereGeometry( 20, 4, 2 );
-		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		var geometry = new THREE.SphereBufferGeometry( 20, 4, 2 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
 
 		return function ( object ) {
 
@@ -282,7 +282,6 @@ Editor.prototype = {
 			var picker = new THREE.Mesh( geometry, material );
 			picker.name = 'picker';
 			picker.userData.object = object;
-			picker.visible = false;
 			helper.add( picker );
 
 			this.sceneHelpers.add( helper );
@@ -411,6 +410,8 @@ Editor.prototype = {
 
 	clear: function () {
 
+		this.history.clear();
+
 		this.camera.position.set( 500, 250, 500 );
 		this.camera.lookAt( new THREE.Vector3() );
 
@@ -443,10 +444,7 @@ Editor.prototype = {
 
 		if ( json.scene === undefined ) {
 
-			var scene = loader.parse( json );
-
-			this.setScene( scene );
-
+			this.setScene( loader.parse( json ) );
 			return;
 
 		}

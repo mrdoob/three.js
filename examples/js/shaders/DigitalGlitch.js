@@ -34,7 +34,7 @@ THREE.DigitalGlitch = {
 			"vUv = uv;",
 			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 		"}"
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 		"uniform int byp;",//should we apply the glitch ?
@@ -98,6 +98,6 @@ THREE.DigitalGlitch = {
 			"}",
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

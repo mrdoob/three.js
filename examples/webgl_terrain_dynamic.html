@@ -73,6 +73,7 @@
 		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/SavePass.js"></script>
 
+		<script src="js/BufferGeometryUtils.js"></script>
 		<script src="js/ShaderTerrain.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -286,9 +287,6 @@
 				controls.zoomSpeed = 1.2;
 				controls.panSpeed = 0.8;
 
-				controls.noZoom = false;
-				controls.noPan = false;
-
 				controls.keys = [ 65, 83, 68 ];
 
 				// SCENE (FINAL)
@@ -314,7 +312,7 @@
 				var normalShader = THREE.NormalMapShader;
 
 				var rx = 256, ry = 256;
-				var pars = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 
 				heightMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 				heightMap.generateMipmaps = false;
@@ -418,7 +416,8 @@
 				// TERRAIN MESH
 
 				var geometryTerrain = new THREE.PlaneBufferGeometry( 6000, 6000, 256, 256 );
-				geometryTerrain.computeTangents();
+
+				THREE.BufferGeometryUtils.computeTangents( geometryTerrain );
 
 				terrain = new THREE.Mesh( geometryTerrain, mlib[ "terrain" ] );
 				terrain.position.set( 0, -125, 0 );
@@ -588,7 +587,7 @@
 
 				}
 
-			};
+			}
 
 			//
 
@@ -613,7 +612,7 @@
 
 				renderer.render( sceneTmp, cameraOrtho, target, true );
 
-			};
+			}
 
 			//
 

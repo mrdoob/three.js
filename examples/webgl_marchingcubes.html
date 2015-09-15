@@ -264,8 +264,9 @@
 			var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
 			reflectionCube.format = THREE.RGBFormat;
 
-			var refractionCube = new THREE.Texture( reflectionCube.image, THREE.CubeRefractionMapping );
+			var refractionCube = THREE.ImageUtils.loadTextureCube( urls );
 			reflectionCube.format = THREE.RGBFormat;
+			refractionCube.mapping = THREE.CubeRefractionMapping;
 
 			// toons
 
@@ -523,7 +524,7 @@
 
 			h.add( effectController, "speed", 0.1, 8.0, 0.05 );
 			h.add( effectController, "numBlobs", 1, 50, 1 );
-			h.add( effectController, "resolution", 14, 40, 1 );
+			h.add( effectController, "resolution", 14, 100, 1 );
 			h.add( effectController, "isolation", 10, 300, 1 );
 
 			h.add( effectController, "floor" );
@@ -591,7 +592,7 @@
 			if ( effectController.resolution !== resolution ) {
 
 				resolution = effectController.resolution;
-				effect.init( resolution );
+				effect.init( Math.floor( resolution ) );
 
 			}
 

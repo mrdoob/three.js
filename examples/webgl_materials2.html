@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials</title>
@@ -76,8 +76,8 @@
 
 				// Spheres geometry
 
-				var geometry_smooth = new THREE.SphereGeometry( 70, 32, 16 );
-				var geometry_flat = new THREE.SphereGeometry( 70, 32, 16 );
+				var geometry_smooth = new THREE.SphereBufferGeometry( 70, 32, 16 );
+				var geometry_flat = new THREE.SphereBufferGeometry( 70, 32, 16 );
 
 				objects = [];
 
@@ -100,7 +100,7 @@
 
 				}
 
-				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
 
 				// Lights
