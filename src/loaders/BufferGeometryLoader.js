@@ -41,7 +41,7 @@ THREE.BufferGeometryLoader.prototype = {
 		if ( index !== undefined ) {
 
 			var typedArray = new self[ index.type ]( index.array );
-			geometry.addIndex( new THREE.BufferAttribute( typedArray, 1 ) );
+			geometry.setIndex( new THREE.BufferAttribute( typedArray, 1 ) );
 
 		}
 
