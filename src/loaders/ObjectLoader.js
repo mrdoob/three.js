@@ -328,7 +328,7 @@ THREE.ObjectLoader.prototype = {
 			var loader = new THREE.ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
-			var loadImage = function ( url ) {
+			function loadImage( url ) {
 
 				scope.manager.itemStart( url );
 
@@ -338,7 +338,7 @@ THREE.ObjectLoader.prototype = {
 
 				} );
 
-			};
+			}
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
