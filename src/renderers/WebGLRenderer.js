@@ -1701,7 +1701,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.receiveShadow && ! material._shadowPass ) {
 
-				refreshUniformsShadow( m_uniforms, lights );
+				refreshUniformsShadow( m_uniforms, lights, camera );
 
 			}
 
@@ -1953,7 +1953,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function refreshUniformsShadow ( uniforms, lights ) {
+	function refreshUniformsShadow ( uniforms, lights, camera ) {
 
 		if ( uniforms.shadowMatrix ) {
 
@@ -1971,27 +1971,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						uniforms.shadowCube.value[ j ] = light.shadowMap;
 						uniforms.shadowMap.value[ j ] = null;
-						uniforms.isShadowCube.value[ j ] = 1;
+
+						// for point lights we set the sign of the shadowDarkness uniform to be negative
+						uniforms.shadowDarkness.value[ j ] = -light.shadowDarkness;
+
+						// when we have a point light, the 'shadowMatrix' uniform is used to store
+						// the inverse of the view matrix (camera.matrixWorld), so that we can get the 
+						// world-space position of the light in the shader.
+						uniforms.shadowMatrix.value[ j ] = camera.matrixWorld;
 
 					} else {
 
 						uniforms.shadowMap.value[ j ] = light.shadowMap;
-						uniforms.isShadowCube.value[ j ] = 0;
 						uniforms.shadowCube.value[ j ] = null;
+						uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
+						uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
 
 					}					
 
 					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
-
-					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
-
-					uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
 					uniforms.shadowBias.value[ j ] = light.shadowBias;
-
-					_vector3.setFromMatrixPosition( light.matrixWorld );
-					uniforms.shadowLightPosition.value[ j * 3 ] = _vector3.x;
-					uniforms.shadowLightPosition.value[ j * 3 + 1 ] = _vector3.y;
-					uniforms.shadowLightPosition.value[ j * 3 + 2 ] = _vector3.z;
 
 					j ++;
 

@@ -856,21 +856,14 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"#ifdef USE_SKINNING",
-
-			"	vWorldPosition = modelMatrix * skinned;",
-
-			"#else",
-
-			"	vWorldPosition = modelMatrix * vec4( position, 1.0 );",
-
-			"#endif",
-
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "begin_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "project_vertex" ],
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+
+				"vWorldPosition = worldPosition;",
 
 			"}"
 

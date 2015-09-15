@@ -13,16 +13,24 @@
 	vec3 shadowColor = vec3( 1.0 );
 
 	for( int i = 0; i < MAX_SHADOWS; i ++ ) {
-		vec3 lightToPosition = vWPosition[ i ].xyz - shadowLightPosition[ i ];
-		vec3 lightToFragment = normalize( lightToPosition );
-		float distanceToLight = length( lightToPosition );
-		int currentIsCube = isShadowCube[ i ];
+
+		// to save on uniform space, we use the sign of @shadowDarkness[ i ] to determine
+		// whether or not this light is a point light ( shadowDarkness[ i ] < 0 == point light)
+		bool isPointLight = shadowDarkness[ i ] < 0.0;
+
+		// get the real shadow darkness
+		float realShadowDarkness = abs( shadowDarkness[ i ] );
+
+		// for point lights, the uniform @vShadowCoord is re-purposed to hold
+		// the distance from the light to the world-space position of the fragment.
+		vec3 lightToPosition = vShadowCoord[ i ].xyz;
 		float cubeTexelSize = 1.0 / shadowMapSize[ i ].x;
+
 		vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;
 		float shadow = 0.0;
 
-				// if ( something && something ) breaks ATI OpenGL shader compiler
-				// if ( all( something, something ) ) using this instead
+		// if ( something && something ) breaks ATI OpenGL shader compiler
+		// if ( all( something, something ) ) using this instead
 
 		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
 		bool inFrustum = all( inFrustumVec );
@@ -31,14 +39,14 @@
 
 		bool frustumTest = all( frustumTestVec );
 
-		if ( frustumTest || currentIsCube == 1) {
+		if ( frustumTest || isPointLight ) {
 
 			shadowCoord.z += shadowBias[ i ];
 
 			#if defined( SHADOWMAP_TYPE_PCF )
-				if( currentIsCube == 1 ){
+				if( isPointLight ){
 				
-					shadow = sampleCubeShadowMapPCF( shadowCube[ i ], lightToFragment, distanceToLight, cubeTexelSize, 1.5);
+					shadow = sampleCubeShadowMapPCF( i,  normalize( lightToPosition ), length( lightToPosition ), cubeTexelSize, 1.5);
 					
 				} else {
 					// Percentage-close filtering
@@ -106,13 +114,13 @@
 					if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
 				}
-				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );
+				shadowColor = shadowColor * vec3( ( 1.0 - realShadowDarkness * shadow ) );
 				
 			#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
 			
-				if( currentIsCube == 1 ){
+				if( isPointLight ){
 
-					shadow = sampleCubeShadowMapPCF( shadowCube[ i ], lightToFragment, distanceToLight, cubeTexelSize, 2.5 );
+					shadow = sampleCubeShadowMapPCF( i,  normalize( lightToPosition ), length( lightToPosition ), cubeTexelSize, 2.5 );
 
 				} else { 
 
@@ -165,15 +173,15 @@
 					shadow = dot( shadowValues, vec4( 1.0 ) );
 				}
 
-				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );
+				shadowColor = shadowColor * vec3( ( 1.0 - realShadowDarkness * shadow ) );
 
 			#else
 
-				if( currentIsCube == 1 ){		
+				if( isPointLight ){		
 				
-					float dist = getCubeMapFloat( shadowCube[ i ], lightToFragment );
-					if ( distanceToLight >= dist)
-						shadowColor = shadowColor * vec3( 1.0 - shadowDarkness[ i ] );
+					float dist = getCubeShadowMapFloat( i,  normalize( lightToPosition ) );
+					if ( length( lightToPosition ) >= dist)
+						shadowColor = shadowColor * vec3( 1.0 - realShadowDarkness );
 						
 				} else {
 				
@@ -184,11 +192,11 @@
 
 					// spot with multiple shadows is darker
 
-					shadowColor = shadowColor * vec3( 1.0 - shadowDarkness[ i ] );
+					shadowColor = shadowColor * vec3( 1.0 - realShadowDarkness );
 
 					// spot with multiple shadows has the same color as single shadow spot
 
-					// 	shadowColor = min( shadowColor, vec3( shadowDarkness[ i ] ) );
+					// 	shadowColor = min( shadowColor, vec3( realShadowDarkness ) );
 				}
 
 			#endif

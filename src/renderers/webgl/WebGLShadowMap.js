@@ -14,7 +14,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_max = new THREE.Vector3(),
 
 	_lookTarget = new THREE.Vector3(),
-	_lightPosition = new THREE.Vector3(),
+	_lightPositionWorld = new THREE.Vector3(),
 
 	_renderList = [];
 
@@ -224,8 +224,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			var shadowMatrix = light.shadowMatrix;
 			var shadowCamera = light.shadowCamera;
 
-			_lightPosition.setFromMatrixPosition( light.matrixWorld );
-			shadowCamera.position.copy( _lightPosition);
+			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+			shadowCamera.position.copy( _lightPositionWorld);
 
 			// render shadow map for each cube face (if omni-directional) or
 			// run a single pass if not
@@ -306,7 +306,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 							if ( groupMaterial.visible === true ) {
 
-								var depthMaterial = getDepthMaterial( object, groupMaterial, isCube, _lightPosition );
+								var depthMaterial = getDepthMaterial( object, groupMaterial, isCube, _lightPositionWorld );
 								_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, depthMaterial , object, group );
 
 							}
@@ -345,7 +345,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	};
 
-	function getDepthMaterial( object, material, isCube, lightPosition) {
+	function getDepthMaterial( object, material, isCube, lightPositionWorld) {
 
 		var geometry = object.geometry;
 
@@ -400,7 +400,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			if( newMaterial.uniforms.lightPos ){
 
-				newMaterial.uniforms.lightPos.value.copy( lightPosition );
+				newMaterial.uniforms.lightPos.value.copy( lightPositionWorld );
 			}
 		}
 
