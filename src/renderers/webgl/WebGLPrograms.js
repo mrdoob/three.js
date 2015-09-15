@@ -230,7 +230,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 	};
 
-	this.getProgram = function ( material, parameters, code ) {
+	this.acquireProgram = function ( material, parameters, code ) {
 
 		var program;
 
@@ -242,6 +242,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			if ( programInfo.code === code ) {
 
 				program = programInfo;
+				++ program.usedTimes;
 
 				break;
 
@@ -256,8 +257,27 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 		}
 
-		return program ;
+		return program;
 
-	}
+	};
+
+	this.releaseProgram = function( program ) {
+
+		if ( -- program.usedTimes === 0 ) {
+
+			// Remove from unordered set
+			var i = programs.indexOf( program );
+			programs[ i ] = programs[ programs.length - 1 ];
+			programs.pop();
+
+			// Free WebGL resources
+			program.destroy();
+
+		}
+
+	};
+
+	// Exposed for resource monitoring & error feedback via renderer.info:
+	this.programs = programs;
 
 };
