@@ -36,13 +36,22 @@ THREE.Camera.prototype.getWorldDirection = function () {
 
 THREE.Camera.prototype.lookAt = function () {
 
-	// This routine does not support cameras with rotated and/or translated parent(s)
-
 	var m1 = new THREE.Matrix4();
+	var v1 = new THREE.Vector3();
 
 	return function ( vector ) {
 
-		m1.lookAt( this.position, vector, this.up );
+		if ( this.parent === null || this.parent instanceof THREE.Scene ) {
+
+			m1.lookAt( this.position, vector, this.up );
+
+		} else {
+
+			this.parent.worldToLocal( v1.copy( vector ) );
+
+			m1.lookAt( this.position, v1, this.up );
+
+		}
 
 		this.quaternion.setFromRotationMatrix( m1 );
 
