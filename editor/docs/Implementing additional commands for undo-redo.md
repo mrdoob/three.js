@@ -88,11 +88,11 @@ have to implement a fifth function 'update' as part of the prototype. In it only
 
 Here as an example is the update-function of **CmdSetColor**:
 ```javascript
-	update: function ( cmd ) {
+update: function ( cmd ) {
 
-		this.newValue = cmd.newValue;
+	this.newValue = cmd.newValue;
 
-	},
+},
 
 ```
 
