@@ -80,8 +80,11 @@ var Script = function ( editor ) {
 
 			if ( typeof( currentScript ) === 'object' ) {
 
-				currentScript.source = value;
-				signals.scriptChanged.dispatch( currentScript );
+				if ( value !== currentScript.source ) {
+
+					editor.execute( new CmdSetScriptValue( currentObject, currentScript, 'source', value, codemirror.getCursor() ) );
+
+				}
 				return;
 			}
 
@@ -387,6 +390,34 @@ var Script = function ( editor ) {
 		codemirror.setValue( source );
 		if (mode === 'json' ) mode = { name: 'javascript', json: true };
 		codemirror.setOption( 'mode', mode );
+
+	} );
+
+	signals.scriptRemoved.add( function ( script ) {
+
+		if ( currentScript === script ) {
+
+			container.setDisplay( 'none' );
+
+		}
+
+	} );
+
+	signals.refreshScriptEditor.add( function ( object, script, cursorPosition ) {
+
+		// Check if editor is being displayed
+		//...
+
+		if ( currentScript !== script ) return;
+
+		title.setValue( object.name + ' / ' + script.name );
+		codemirror.setValue( script.source );
+
+		if ( cursorPosition !== undefined ) {
+
+			codemirror.setCursor( cursorPosition );
+
+		}
 
 	} );
 

@@ -20,13 +20,22 @@ History.prototype = {
 		var lastCmd = this.undos[ this.undos.length - 1 ];
 		var timeDifference = new Date().getTime() - this.lastCmdTime.getTime();
 
-		if ( lastCmd != null &&
+		var isScriptCmd = lastCmd &&
+			lastCmd.updatable &&
+			lastCmd.script !== undefined &&
+			lastCmd.object === cmd.object &&
+			lastCmd.type === cmd.type &&
+			lastCmd.script === cmd.script &&
+			lastCmd.attributeName === cmd.attributeName;
+
+		var isUpdatableCmd = lastCmd &&
 			lastCmd.updatable &&
 			lastCmd.object === cmd.object &&
-			lastCmd.type == cmd.type &&
-			timeDifference < 500 ) {
+			lastCmd.type === cmd.type &&
+			timeDifference < 500;
 
-			// command objects have the same type and are less than 0.5 second apart
+		if ( isScriptCmd || isUpdatableCmd ) {
+
 			lastCmd.update( cmd );
 			cmd = lastCmd;
 

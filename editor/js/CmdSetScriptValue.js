@@ -2,39 +2,48 @@
  * Created by Daniel on 21.07.15.
  */
 
-CmdSetScriptSource = function ( object, script, source, oldSource, cursorPosition ) {
+CmdSetScriptValue = function ( object, script, attributeName, newValue, cursorPosition ) {
 
 	Cmd.call( this );
 
-	this.type = 'CmdSetScriptSource';
+	this.type = 'CmdSetScriptValue';
+	this.updatable = true;
 
 	this.object = object;
 	this.script = script;
-	this.oldSource = oldSource !== undefined ? oldSource : undefined;
-	this.newSource = source;
+	this.attributeName = attributeName;
+	this.oldValue = script !== undefined ? script[ this.attributeName ] : undefined;
+	this.newValue = newValue;
 	this.objectUuid = object !== undefined ? object.uuid : undefined;
 	this.cursorPosition = cursorPosition; // Format {line: 2, ch: 3}
 
 };
 
-CmdSetScriptSource.prototype = {
+CmdSetScriptValue.prototype = {
 
 	execute: function () {
 
 		this.index = this.editor.scripts[ this.objectUuid ].indexOf( this.script );
-		this.script.source = this.newSource;
+		this.script[ this.attributeName ] = this.newValue;
 
-		this.editor.signals.scriptChanged.dispatch( this.script );
+		this.editor.signals.scriptChanged.dispatch();
 		this.editor.signals.refreshScriptEditor.dispatch( this.object, this.script, this.cursorPosition );
 
 	},
 
 	undo: function () {
 
-		this.script.source = this.oldSource;
+		this.script[ this.attributeName ] = this.oldValue;
 
-		this.editor.signals.scriptChanged.dispatch( this.script );
+		this.editor.signals.scriptChanged.dispatch();
 		this.editor.signals.refreshScriptEditor.dispatch( this.object, this.script, this.cursorPosition );
+
+	},
+
+	update: function ( cmd ) {
+
+		this.cursorPosition = cmd.cursorPosition;
+		this.newValue = cmd.newValue;
 
 	},
 
@@ -44,8 +53,9 @@ CmdSetScriptSource.prototype = {
 
 		output.objectUuid = this.objectUuid;
 		output.index = this.index;
-		output.oldSource = this.oldSource;
-		output.newSource = this.newSource;
+		output.attributeName = this.attributeName;
+		output.oldValue = this.oldValue;
+		output.newValue = this.newValue;
 		output.cursorPosition = this.cursorPosition;
 
 		return output;
@@ -58,8 +68,9 @@ CmdSetScriptSource.prototype = {
 
 		this.objectUuid = json.objectUuid;
 		this.index = json.index;
-		this.oldSource = json.oldSource;
-		this.newSource = json.newSource;
+		this.oldValue = json.oldValue;
+		this.newValue = json.newValue;
+		this.attributeName = json.attributeName;
 		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.script = this.editor.scripts[ json.objectUuid ][ json.index ];
 		this.cursorPosition = json.cursorPosition;
