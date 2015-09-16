@@ -127,7 +127,7 @@ THREE.VREffect = function ( renderer, onError, camera ) {
 		if ( vrHMD ) {
 
 			var sceneL, sceneR;
-
+			var autoUpdate;
 			if ( Array.isArray( scene ) ) {
 
 				sceneL = scene[ 0 ];
@@ -137,7 +137,14 @@ THREE.VREffect = function ( renderer, onError, camera ) {
 
 				sceneL = scene;
 				sceneR = scene;
-				if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+				autoUpdate = scene.autoUpdate;
+
+				if ( autoUpdate === true ) {
+
+					scene.updateMatrixWorld();
+					scene.autoUpdate = false;
+
+				}
 
 			}
 
@@ -162,6 +169,12 @@ THREE.VREffect = function ( renderer, onError, camera ) {
 			renderer.render( sceneR, cameraR );
 
 			renderer.enableScissorTest( false );
+
+			if ( autoUpdate === true ) {
+
+				scene.autoUpdate = autoUpdate;
+
+			}
 
 			return;
 
