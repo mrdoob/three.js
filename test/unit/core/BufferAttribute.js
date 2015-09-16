@@ -27,7 +27,7 @@ test( "copy", function() {
 
 test( "copyAt", function() {
 	var attr = new THREE.BufferAttribute( new Float32Array( [1, 2, 3, 4, 5, 6, 7, 8, 9] ), 3 );
-	var attr2 = new THREE.BufferAttribute( [], 3 );
+	var attr2 = new THREE.BufferAttribute( new Float32Array(9), 3 );
 
 	attr2.copyAt( 1, attr, 2 );
 	attr2.copyAt( 0, attr, 1 );
@@ -42,7 +42,7 @@ test( "copyAt", function() {
 });
 
 test( "copyColorsArray", function() {
-	var attr = new THREE.BufferAttribute( [], 3 );
+	var attr = new THREE.BufferAttribute( new Float32Array(6), 3 );
 
 	attr.copyColorsArray( [
 		new THREE.Color( 0, 0.5, 1 ),
@@ -55,7 +55,7 @@ test( "copyColorsArray", function() {
 });
 
 test( "copyIndicesArray", function() {
-	var attr = new THREE.BufferAttribute( [], 3 );
+	var attr = new THREE.BufferAttribute( new Float32Array(6), 3 );
 
 	attr.copyIndicesArray( [
 		{a: 1, b: 2, c: 3},
@@ -68,7 +68,7 @@ test( "copyIndicesArray", function() {
 });
 
 test( "copyVector2sArray", function() {
-	var attr = new THREE.BufferAttribute( [], 2 );
+	var attr = new THREE.BufferAttribute( new Float32Array(4), 2 );
 
 	attr.copyVector2sArray( [
 		new THREE.Vector2(1, 2),
@@ -81,7 +81,7 @@ test( "copyVector2sArray", function() {
 });
 
 test( "copyVector3sArray", function() {
-	var attr = new THREE.BufferAttribute( [], 2 );
+	var attr = new THREE.BufferAttribute( new Float32Array(6), 2 );
 
 	attr.copyVector3sArray( [
 		new THREE.Vector3(1, 2, 3),
@@ -94,7 +94,7 @@ test( "copyVector3sArray", function() {
 });
 
 test( "copyVector4sArray", function() {
-	var attr = new THREE.BufferAttribute( [], 2 );
+	var attr = new THREE.BufferAttribute( new Float32Array(8), 2 );
 
 	attr.copyVector4sArray( [
 		new THREE.Vector4(1, 2, 3, 4),
