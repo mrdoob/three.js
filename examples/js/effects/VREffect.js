@@ -51,8 +51,8 @@ THREE.VREffect = function ( renderer, onError, camera ) {
 				cameraL.projectionMatrix.copy( fovToProjection( eyeFOVL, true, zNear, zFar ) );
 				cameraR.projectionMatrix.copy( fovToProjection( eyeFOVR, true, zNear, zFar ) );
 
-				stereoTransformL.makeTranslation( eyeTranslationL.x, eyeTranslationL.y, eyeTranslationL.z );
-				stereoTransformR.makeTranslation( eyeTranslationR.x, eyeTranslationR.y, eyeTranslationR.z );
+				stereoTransformL.makeTranslation( this.scale * eyeTranslationL.x, this.scale * eyeTranslationL.y, this.scale * eyeTranslationL.z );
+				stereoTransformR.makeTranslation( this.scale * eyeTranslationR.x, this.scale * eyeTranslationR.y, this.scale * eyeTranslationR.z );
 
 				break; // We keep the first we encounter
 
@@ -70,7 +70,7 @@ THREE.VREffect = function ( renderer, onError, camera ) {
 
 	if ( navigator.getVRDevices ) {
 
-		navigator.getVRDevices().then( gotVRDevices );
+		navigator.getVRDevices().then( gotVRDevices.bind(this) );
 
 	}
 
