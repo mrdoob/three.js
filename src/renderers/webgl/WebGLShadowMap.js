@@ -238,6 +238,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 					_lookTarget.add( cubeDirections[face] );
 					shadowCamera.up.copy( cubeUps[face] );
 					shadowCamera.lookAt( _lookTarget );	
+					shadowMap.activeCubeFace = face;
 
 				} else {
 
@@ -269,13 +270,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 				_frustum.setFromMatrix( _projScreenMatrix );
 
-				// render shadow map
-
-				if( isCube ){
-
-					shadowMap.activeCubeFace = face;
-
-				}	
+				// render shadow map	
 
 				_renderer.setRenderTarget( shadowMap );
 				_renderer.clear();
