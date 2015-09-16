@@ -208,7 +208,7 @@
 				22, 21, 23
 			] );
 
-			geometry.addIndex( new THREE.BufferAttribute( indices, 1 ) );
+			geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 			// per instance data
 			var offsets = new THREE.InstancedBufferAttribute( new Float32Array( instances * 3 ), 3, 1 );

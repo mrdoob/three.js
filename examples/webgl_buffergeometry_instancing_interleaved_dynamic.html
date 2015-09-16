@@ -178,7 +178,7 @@
 			22, 21, 23
 		] );
 
-		geometry.addIndex( new THREE.BufferAttribute( indices, 1 ) );
+		geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 		// per instance data
 		instanceBuffer = new THREE.InstancedInterleavedBuffer( new Float32Array( instances * 8 ), 8, 1 ).setDynamic( true );

@@ -101,7 +101,7 @@ THREE.VTKLoader.prototype = {
 		}
 
 		var geometry = new THREE.BufferGeometry();
-		geometry.addIndex( new THREE.BufferAttribute( new ( indices.length > 65535 ? Uint32Array : Uint16Array )( indices ), 1 ) );
+		geometry.setIndex( new THREE.BufferAttribute( new ( indices.length > 65535 ? Uint32Array : Uint16Array )( indices ), 1 ) );
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
 
 		return geometry;

@@ -104,11 +104,12 @@
 
 				// LIGHTS
 
-				ambientLight = new THREE.AmbientLight( 0x222222 );
-				scene.add( ambientLight );
+				directionalLight = new THREE.DirectionalLight( 0xffeedd, 1.5 );
+				directionalLight.position.set( 1, 0.5, 1 );
+				scene.add( directionalLight );
 
-				directionalLight = new THREE.DirectionalLight( 0xffeedd, 1 );
-				directionalLight.position.set( 1, -1, 1 ).normalize();
+				directionalLight = new THREE.DirectionalLight( 0xddddff, 0.5 );
+				directionalLight.position.set( -1, 0.5, -1 );
 				scene.add( directionalLight );
 
 				// MATERIALS
@@ -122,7 +123,7 @@
 				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniformsUV[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniformsUV[ "uNormalScale" ].value = 0.75;
+				uniformsUV[ "uNormalScale" ].value = -1.5;
 
 				uniformsUV[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 
@@ -132,7 +133,7 @@
 				uniformsUV[ "specular" ].value.setHex( specular );
 
 				uniformsUV[ "uRoughness" ].value = 0.185;
-				uniformsUV[ "uSpecularBrightness" ].value = 0.8;
+				uniformsUV[ "uSpecularBrightness" ].value = 0.7;
 
 
 				var uniforms = THREE.UniformsUtils.clone( uniformsUV );
@@ -178,13 +179,12 @@
 				// POSTPROCESSING
 
 				var renderModelUV = new THREE.RenderPass( scene, camera, materialUV, new THREE.Color( 0x575757 ) );
-				var renderModel = new THREE.RenderPass( scene, camera );
 
 				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 
 				var effectBloom1 = new THREE.BloomPass( 1, 15, 2, 512 );
-				var effectBloom2 = new THREE.BloomPass( 1, 25, 4, 512 );
-				var effectBloom3 = new THREE.BloomPass( 1, 25, 8, 512 );
+				var effectBloom2 = new THREE.BloomPass( 1, 25, 3, 512 );
+				var effectBloom3 = new THREE.BloomPass( 1, 25, 4, 512 );
 
 				effectBloom1.clear = true;
 				effectBloom2.clear = true;
@@ -194,7 +194,13 @@
 
 				//
 
-				var pars = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+				var pars = {
+					minFilter: THREE.LinearMipmapLinearFilter,
+					magFilter: THREE.LinearFilter,
+					format: THREE.RGBFormat,
+					stencilBuffer: false
+				};
+
 				var rtwidth = 512;
 				var rtheight = 512;
 
@@ -225,25 +231,8 @@
 				//
 
 				var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
-
 				composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
-
 				composerBeckmann.addPass( effectBeckmann );
-
-				//
-
-				var effectBloom = new THREE.BloomPass( 0.25 );
-
-				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
-				effectBleach.uniforms.opacity.value = 0.25;
-
-				effectBleach.renderToScreen = true;
-
-				composerFinal = new THREE.EffectComposer( renderer );
-
-				composerFinal.addPass( renderModel );
-				composerFinal.addPass( effectBloom );
-				composerFinal.addPass( effectBleach );
 
 				//
 
@@ -314,7 +303,6 @@
 
 				renderer.clear();
 
-
 				if ( firstPass ) {
 
 					composerBeckmann.render();
@@ -328,11 +316,9 @@
 				composerUV2.render();
 				composerUV3.render();
 
-				//composerFinal.render( 0.1 );
 				renderer.render( scene, camera );
 
 			}
-
 
 		</script>
 

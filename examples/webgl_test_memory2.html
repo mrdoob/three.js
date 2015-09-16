@@ -128,7 +128,7 @@
 
 				renderer.render( scene, camera );
 
-				console.log( "before", renderer.info.memory.programs );
+				console.log( "before", renderer.info.programs.length );
 
 				for ( var i = 0; i < N; i ++ ) {
 
@@ -137,7 +137,7 @@
 
 				}
 
-				console.log( "after", renderer.info.memory.programs );
+				console.log( "after", renderer.info.programs.length );
 
 			}
 

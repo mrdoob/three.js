@@ -106,10 +106,7 @@
 				// LIGHTS
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 2.25 );
-				directionalLight.position.set( 1, -0.5, 1 );
-				scene.add( directionalLight );
-
-				directionalLight.position.multiplyScalar( 500 );
+				directionalLight.position.set( 500, - 250, 500 );
 
 				directionalLight.castShadow = true;
 				//directionalLight.shadowCameraVisible = true;
@@ -128,10 +125,12 @@
 				directionalLight.shadowBias = -0.005;
 				directionalLight.shadowDarkness = 0.2;
 
+				scene.add( directionalLight );
+
 				//
 
-				directionalLight2 = new THREE.DirectionalLight( 0x8888ff, 0.5 );
-				directionalLight2.position.set( - 1, 0.5, -1 );
+				directionalLight2 = new THREE.DirectionalLight( 0x8888ff, 0.75 );
+				directionalLight2.position.set( - 500, 250, - 500 );
 				scene.add( directionalLight2 );
 
 				//
