@@ -39,8 +39,6 @@ test( "clone", function() {
 			bottom = -1,
 			top = 1,
 			aspect = 16 / 9,
-			left = -top * aspect,
-			right = -bottom * aspect,
 			fov = 90;
 
 	var cam = new THREE.PerspectiveCamera( fov, aspect, near, far );

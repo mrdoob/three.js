@@ -13,7 +13,10 @@ test( "lookAt", function() {
 
 test( "clone", function() {
 	var cam = new THREE.Camera();
-	cam.lookAt(new THREE.Vector3(1, 2, 3));
+
+	// fill the matrices with any nonsense values just to see if they get copied
+	cam.matrixWorldInverse.set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
+	cam.projectionMatrix.set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 
 	var clonedCam = cam.clone();
 
