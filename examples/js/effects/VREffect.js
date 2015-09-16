@@ -9,11 +9,13 @@
  *
  */
 
-THREE.VREffect = function ( renderer, onError ) {
+THREE.VREffect = function ( renderer, onError, camera ) {
 
 	var vrHMD;
 	var eyeTranslationL, eyeFOVL;
 	var eyeTranslationR, eyeFOVR;
+	var stereoTransformL = new THREE.Matrix4(),
+		stereoTransformR = new THREE.Matrix4();
 
 	function gotVRDevices( devices ) {
 
@@ -43,6 +45,14 @@ THREE.VREffect = function ( renderer, onError ) {
 					eyeFOVR = vrHMD.getRecommendedEyeFieldOfView( 'right' );
 
 				}
+
+				var zNear = camera !== undefined ? camera.near : 0.1;
+				var zFar = camera !== undefined ? camera.far : 1000;
+				cameraL.projectionMatrix.copy( fovToProjection( eyeFOVL, true, zNear, zFar ) );
+				cameraR.projectionMatrix.copy( fovToProjection( eyeFOVR, true, zNear, zFar ) );
+
+				stereoTransformL.makeTranslation( eyeTranslationL.x, eyeTranslationL.y, eyeTranslationL.z );
+				stereoTransformR.makeTranslation( eyeTranslationR.x, eyeTranslationR.y, eyeTranslationR.z );
 
 				break; // We keep the first we encounter
 
@@ -109,6 +119,9 @@ THREE.VREffect = function ( renderer, onError ) {
 	var cameraL = new THREE.PerspectiveCamera();
 	var cameraR = new THREE.PerspectiveCamera();
 
+	cameraL.matrixAutoUpdate = false;
+	cameraR.matrixAutoUpdate = false;
+
 	this.render = function ( scene, camera ) {
 
 		if ( vrHMD ) {
@@ -124,6 +137,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 				sceneL = scene;
 				sceneR = scene;
+				if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 			}
 
@@ -135,23 +149,16 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
-			cameraL.projectionMatrix = fovToProjection( eyeFOVL, true, camera.near, camera.far );
-			cameraR.projectionMatrix = fovToProjection( eyeFOVR, true, camera.near, camera.far );
-
-			camera.matrixWorld.decompose( cameraL.position, cameraL.quaternion, cameraL.scale );
-			camera.matrixWorld.decompose( cameraR.position, cameraR.quaternion, cameraR.scale );
-
-			cameraL.translateX( eyeTranslationL.x * this.scale );
-			cameraR.translateX( eyeTranslationR.x * this.scale );
-
 			// render left eye
 			renderer.setViewport( 0, 0, size.width, size.height );
 			renderer.setScissor( 0, 0, size.width, size.height );
+			cameraL.matrixWorld.multiplyMatrices( camera.matrixWorld, stereoTransformL );
 			renderer.render( sceneL, cameraL );
 
 			// render right eye
 			renderer.setViewport( size.width, 0, size.width, size.height );
 			renderer.setScissor( size.width, 0, size.width, size.height );
+			cameraR.matrixWorld.multiplyMatrices( camera.matrixWorld, stereoTransformR );
 			renderer.render( sceneR, cameraR );
 
 			renderer.enableScissorTest( false );
