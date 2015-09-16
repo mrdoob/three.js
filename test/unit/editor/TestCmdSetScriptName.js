@@ -1,6 +1,6 @@
 module("CmdSetScriptName");
 
-test( "Test CmdSetScriptName", function() {
+test( "Test CmdSetScriptValue for names", function() {
 
 	var editor = new Editor();
 
@@ -18,7 +18,7 @@ test( "Test CmdSetScriptName", function() {
 
 	names.map( function( name ) {
 
-		cmd = new CmdSetScriptName( box, xMove, name );
+		cmd = new CmdSetScriptValue( box, xMove, 'name', name );
 		cmd.updatable = false;
 		editor.execute( cmd );
 

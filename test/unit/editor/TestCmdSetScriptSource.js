@@ -1,6 +1,6 @@
 module( "CmdSetScriptSource" );
 
-test( "Test CmdSetScriptSource (Undo and Redo)", function() {
+test( "Test CmdSetScriptValue for source (Undo and Redo)", function() {
 
 	var editor = new Editor();
 
@@ -15,7 +15,7 @@ test( "Test CmdSetScriptSource (Undo and Redo)", function() {
  	cmd.updatable = false;
  	editor.execute( cmd );
 
- 	cmd = new CmdSetScriptSource( box, xMove, yMove['source'], xMove['source'], 0 );
+ 	cmd = new CmdSetScriptValue( box, xMove, 'source', yMove['source'], 0 );
  	cmd.updatable = false;
  	editor.execute( cmd );
 	ok( editor.scripts[ box.uuid ][0][ 'source' ] == yMove[ 'source' ], "OK, script source has been set successfully");
