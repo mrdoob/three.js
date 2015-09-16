@@ -45,8 +45,32 @@
 
 			#if defined( SHADOWMAP_TYPE_PCF )
 				if( isPointLight ){
-				
-					shadow = sampleCubeShadowMapPCF( i,  normalize( lightToPosition ), length( lightToPosition ), cubeTexelSize, 1.5);
+
+					initGridSamplingDisk();
+
+					float diskRadius = 1.5;
+					float numSamples = 1.0;
+					shadow = 0.0;
+
+					vec3 baseDirection = normalize( lightToPosition );
+					float curDistance = length( lightToPosition );
+
+					float dist = unpack1K( textureCube( shadowCube[ i ],  baseDirection ) );
+					if ( curDistance >= dist )
+						shadow += 1.0;
+					
+					// evaluate each sampling direction
+					for( int s = 0; s < 20; s++ ){
+					 
+						vec3 offset = gridSamplingDisk[ s ] * diskRadius * cubeTexelSize;
+						dist = unpack1K( textureCube( shadowCube[ i ],  vec3( baseDirection + offset ) ) );
+						if ( curDistance >= dist )
+							shadow += 1.0;
+						numSamples += 1.0;
+						
+					}
+
+					shadow /= numSamples;
 					
 				} else {
 					// Percentage-close filtering
@@ -120,7 +144,31 @@
 			
 				if( isPointLight ){
 
-					shadow = sampleCubeShadowMapPCF( i,  normalize( lightToPosition ), length( lightToPosition ), cubeTexelSize, 2.5 );
+					initGridSamplingDisk();
+
+					float diskRadius = 2.5;
+					float numSamples = 1.0;
+					shadow = 0.0;
+
+					vec3 baseDirection = normalize( lightToPosition );
+					float curDistance = length( lightToPosition );
+
+					float dist = unpack1K( textureCube( shadowCube[ i ],  baseDirection ) );
+					if ( curDistance >= dist )
+						shadow += 1.0;
+					
+					// evaluate each sampling direction
+					for( int s = 0; s < 20; s++ ){
+					 
+						vec3 offset = gridSamplingDisk[ s ] * diskRadius * cubeTexelSize;
+						dist = unpack1K( textureCube( shadowCube[ i ],  vec3( baseDirection + offset ) ) );
+						if ( curDistance >= dist )
+							shadow += 1.0;
+						numSamples += 1.0;
+						
+					}
+
+					shadow /= numSamples;
 
 				} else { 
 
@@ -179,7 +227,8 @@
 
 				if( isPointLight ){		
 				
-					float dist = getCubeShadowMapFloat( i,  normalize( lightToPosition ) );
+					vec4 data = textureCube( shadowCube[ i ],  normalize( lightToPosition ) );
+					float dist = unpack1K( data );
 					if ( length( lightToPosition ) >= dist)
 						shadowColor = shadowColor * vec3( 1.0 - realShadowDarkness );
 						
