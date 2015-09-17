@@ -17,6 +17,7 @@
 		<script src="../examples/js/loaders/AWDLoader.js"></script>
 		<script src="../examples/js/loaders/BabylonLoader.js"></script>
 		<script src="../examples/js/loaders/ColladaLoader.js"></script>
+		<script src="../examples/js/loaders/MD2Loader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
 		<script src="../examples/js/loaders/PLYLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
@@ -40,8 +41,31 @@
 		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
 		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
 		<script src="js/libs/codemirror/codemirror.js"></script>
+
 		<script src="js/libs/codemirror/mode/javascript.js"></script>
 		<script src="js/libs/esprima.js"></script>
+		<script src="js/libs/jsonlint.js"></script>
+		<script src="js/libs/glslprep.min.js"></script>
+
+		<script src="js/libs/codemirror/mode/glsl.js"></script>
+
+		<link rel="stylesheet" href="js/libs/codemirror/addon/dialog.css">
+		<link rel="stylesheet" href="js/libs/codemirror/addon/show-hint.css">
+		<link rel="stylesheet" href="js/libs/codemirror/addon/tern.css">
+		<script src="js/libs/codemirror/addon/dialog.js"></script>
+		<script src="js/libs/codemirror/addon/show-hint.js"></script>
+		<script src="js/libs/codemirror/addon/tern.js"></script>
+		<script src="js/libs/acorn/acorn.js"></script>
+		<script src="js/libs/acorn/acorn_loose.js"></script>
+		<script src="js/libs/acorn/walk.js"></script>
+		<script src="js/libs/ternjs/polyfill.js"></script>
+		<script src="js/libs/ternjs/signal.js"></script>
+		<script src="js/libs/ternjs/tern.js"></script>
+		<script src="js/libs/ternjs/def.js"></script>
+		<script src="js/libs/ternjs/comment.js"></script>
+		<script src="js/libs/ternjs/infer.js"></script>
+		<script src="js/libs/ternjs/doc_comment.js"></script>
+		<script src="js/libs/tern-threejs/threejs.js"></script>
 
 		<script src="js/libs/jszip.min.js"></script>
 		<script src="js/libs/sortable.min.js"></script>
@@ -60,6 +84,7 @@
 
 		<script src="js/Editor.js"></script>
 		<script src="js/Config.js"></script>
+		<script src="js/History.js"></script>
 		<script src="js/Loader.js"></script>
 		<script src="js/Menubar.js"></script>
 		<script src="js/Menubar.File.js"></script>
@@ -87,6 +112,8 @@
 		<script src="js/Sidebar.Geometry.SphereGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.TorusGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
+		<script src="../examples/js/geometries/TeapotBufferGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.TeapotBufferGeometry.js"></script>
 		<script src="js/Sidebar.Material.js"></script>
 		<script src="js/Sidebar.Script.js"></script>
 		<script src="js/Toolbar.js"></script>
@@ -109,11 +136,11 @@
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
-			var script = new Script( editor );
-			document.body.appendChild( script.dom );
-
 			var player = new Player( editor );
 			document.body.appendChild( player.dom );
+
+			var script = new Script( editor );
+			document.body.appendChild( script.dom );
 
 			var toolbar = new Toolbar( editor );
 			document.body.appendChild( toolbar.dom );
@@ -124,8 +151,10 @@
 			var sidebar = new Sidebar( editor );
 			document.body.appendChild( sidebar.dom );
 
+			/*
 			var dialog = new UI.Dialog();
 			document.body.appendChild( dialog.dom );
+			*/
 
 			//
 
@@ -232,8 +261,17 @@
 
 				switch ( event.keyCode ) {
 
-					case 8: // prevent browser back
-						event.preventDefault();
+					case 8:
+						event.preventDefault(); // prevent browser back
+
+						var object = editor.selected;
+
+						if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
+
+						var parent = object.parent;
+						editor.removeObject( object );
+						editor.select( parent );
+
 						break;
 
 				}
@@ -276,6 +314,13 @@
 				}
 
 			}
+
+			window.addEventListener( 'message', function ( event ) {
+
+				editor.clear();
+				editor.fromJSON( event.data );
+
+			}, false );
 
 		</script>
 	</body>

@@ -34,11 +34,11 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	for ( var i = 0, j = 0, l = indices.length; i < l; i += 3, j ++ ) {
 
-		var v1 = p[ indices[ i     ] ];
+		var v1 = p[ indices[ i ] ];
 		var v2 = p[ indices[ i + 1 ] ];
 		var v3 = p[ indices[ i + 2 ] ];
 
-		faces[ j ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
+		faces[ j ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ], undefined, j );
 
 	}
 
@@ -64,7 +64,9 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 		var max = Math.max( x0, Math.max( x1, x2 ) );
 		var min = Math.min( x0, Math.min( x1, x2 ) );
 
-		if ( max > 0.9 && min < 0.1 ) { // 0.9 is somewhat arbitrary
+		if ( max > 0.9 && min < 0.1 ) {
+
+			// 0.9 is somewhat arbitrary
 
 			if ( x0 < 0.2 ) uvs[ 0 ].x += 1;
 			if ( x1 < 0.2 ) uvs[ 1 ].x += 1;
@@ -113,9 +115,9 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	// Approximate a curved face with recursively sub-divided triangles.
 
-	function make( v1, v2, v3 ) {
+	function make( v1, v2, v3, materialIndex ) {
 
-		var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
+		var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ], undefined, materialIndex );
 		that.faces.push( face );
 
 		centroid.copy( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
@@ -135,11 +137,13 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	function subdivide( face, detail ) {
 
-		var cols = Math.pow(2, detail);
+		var cols = Math.pow( 2, detail );
 		var a = prepare( that.vertices[ face.a ] );
 		var b = prepare( that.vertices[ face.b ] );
 		var c = prepare( that.vertices[ face.c ] );
 		var v = [];
+
+		var materialIndex = face.materialIndex;
 
 		// Construct all of the vertices for this subdivision.
 
@@ -151,9 +155,9 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 			var bj = prepare( b.clone().lerp( c, i / cols ) );
 			var rows = cols - i;
 
-			for ( var j = 0; j <= rows; j ++) {
+			for ( var j = 0; j <= rows; j ++ ) {
 
-				if ( j == 0 && i == cols ) {
+				if ( j === 0 && i === cols ) {
 
 					v[ i ][ j ] = aj;
 
@@ -171,24 +175,26 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 		for ( var i = 0; i < cols ; i ++ ) {
 
-			for ( var j = 0; j < 2 * (cols - i) - 1; j ++ ) {
+			for ( var j = 0; j < 2 * ( cols - i ) - 1; j ++ ) {
 
 				var k = Math.floor( j / 2 );
 
-				if ( j % 2 == 0 ) {
+				if ( j % 2 === 0 ) {
 
 					make(
-						v[ i ][ k + 1],
+						v[ i ][ k + 1 ],
 						v[ i + 1 ][ k ],
-						v[ i ][ k ]
+						v[ i ][ k ],
+						materialIndex
 					);
 
 				} else {
 
 					make(
 						v[ i ][ k + 1 ],
-						v[ i + 1][ k + 1],
-						v[ i + 1 ][ k ]
+						v[ i + 1 ][ k + 1 ],
+						v[ i + 1 ][ k ],
+						materialIndex
 					);
 
 				}
@@ -233,3 +239,23 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.PolyhedronGeometry.prototype.constructor = THREE.PolyhedronGeometry;
+
+THREE.PolyhedronGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.PolyhedronGeometry(
+		this.parameters.vertices,
+		this.parameters.indices,
+		this.parameters.radius,
+		this.parameters.detail
+	);
+
+	return geometry.copy( this );
+
+};
+
+THREE.PolyhedronGeometry.prototype.copy = function ( source ) {
+
+	THREE.Geometry.prototype.copy.call( this, source );
+	return this;
+
+};

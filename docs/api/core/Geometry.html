@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -61,7 +62,7 @@
 		<h3>[property:Array colors]</h3>
 		<div>
 		Array of vertex [page:Color colors], matching number and order of vertices.<br />
-		Used in [page:PointCloud] and [page:Line].<br />
+		Used in [page:Points] and [page:Line].<br />
 		[page:Mesh Meshes] use per-face-use-of-vertex colors embedded directly in faces.<br />
 		To signal an update in this array, [page:Geometry Geometry.colorsNeedUpdate] needs to be set to true.
 		</div>
@@ -102,12 +103,30 @@
 
 		<h3>[property:Array skinWeights]</h3>
 		<div>
-		Array of skinning weights, matching number and order of vertices.
+		Array of [page:Vector4 Vector4s] representing the skinning weights as used in a [page:SkinnedMesh],
+		The weights match the number and order of vertices in the geometry. The weighted values
+		are typically between the values of 0 and 1 and affect the amount that the individuals bones affect
+		a given vertex.
 		</div>
 
 		<h3>[property:Array skinIndices]</h3>
 		<div>
-		Array of skinning indices, matching number and order of vertices.
+		Array of [page:Vector4 Vector4s] representing the indices of individual bones in the [page:Skeleton.bones] array,
+		The indices match the number and order of vertices in the geometry.
+		<code>
+		// e.g.
+		geometry.skinIndices[15] = new THREE.Vector4(   0,   5,   9, 0 );
+		geometry.skinWeights[15] = new THREE.Vector4( 0.2, 0.5, 0.3, 0 );
+
+		// corresponds with the following vertex
+		geometry.vertices[15];
+
+		// these bones will be used like so:
+		skeleton.bones[0]; // weight of 0.2
+		skeleton.bones[5]; // weight of 0.5
+		skeleton.bones[9]; // weight of 0.3
+		skeleton.bones[0]; // weight of 0
+		</code>
 		</div>
 
 		<h3>[property:Object boundingBox]</h3>
@@ -122,48 +141,38 @@
 		<code>{ radius: float }</code>
 		</div>
 
-		<h3>[property:Boolean hasTangents]</h3>
-		<div>
-		True if geometry has tangents. Set in [page:Geometry Geometry.computeTangents].
-		</div>
-
 		<h3>[property:Boolean dynamic]</h3>
 		<div>
 		Set to *true* if attribute buffers will need to change in runtime (using "dirty" flags).<br/>
 		Unless set to true internal typed arrays corresponding to buffers will be deleted once sent to GPU.<br/>
 		Defaults to true.
 		</div>
-		
+
 		<h3>[property:Boolean verticesNeedUpdate]</h3>
 		<div>
 		Set to *true* if the vertices array has been updated.
 		</div>
-		
+
 		<h3>[property:Boolean elementsNeedUpdate]</h3>
 		<div>
 		Set to *true* if the faces array has been updated.
 		</div>
-		
+
 		<h3>[property:Boolean uvsNeedUpdate]</h3>
 		<div>
 		Set to *true* if the uvs array has been updated.
 		</div>
-		
+
 		<h3>[property:Boolean normalsNeedUpdate]</h3>
 		<div>
 		Set to *true* if the normals array has been updated.
 		</div>
-		
-		<h3>[property:Boolean tangentsNeedUpdate]</h3>
-		<div>
-		Set to *true* if the tangents in the faces has been updated.
-		</div>
-		
+
 		<h3>[property:Boolean colorsNeedUpdate]</h3>
 		<div>
 		Set to *true* if the colors array has been updated.
 		</div>
-		
+
 		<h3>[property:Boolean lineDistancesNeedUpdate]</h3>
 		<div>
 		Set to *true* if the linedistances array has been updated.
@@ -174,15 +183,59 @@
 		An array containing distances between vertices for Line geometries.
 		This is required for LinePieces/LineDashedMaterial to render correctly.
 		Line distances can also be generated with computeLineDistances.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
-		
+
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
 		<h3>[method:null applyMatrix]( [page:Matrix4 matrix] )</h3>
 		<div>
 		Bakes matrix transform directly into vertex coordinates.
+		</div>
+
+		<h3>[method:null center] ()</h3>
+		<div>
+		Center the geometry based on the bounding box.
+		</div>
+
+		<h3>[method:Geometry rotateX] ( [page:Float radians] )</h3>
+		<div>
+		Rotate the geometry about the X axis. This is typically done as a one time operation, and not during a loop
+    Use [page:Object3D.rotation] for typical real-time mesh rotation.
+		</div>
+
+		<h3>[method:Geometry rotateY] ( [page:Float radians] )</h3>
+		<div>
+		Rotate the geometry about the Y axis. This is typically done as a one time operation, and not during a loop
+    Use [page:Object3D.rotation] for typical real-time mesh rotation.
+		</div>
+
+		<h3>[method:Geometry rotateZ] ( [page:Float radians] )</h3>
+		<div>
+		Rotate the geometry about the Z axis. This is typically done as a one time operation, and not during a loop
+    Use [page:Object3D.rotation] for typical real-time mesh rotation.
+		</div>
+
+		<h3>[method:Geometry translate] ( [page:Float x], [page:Float y], [page:Float z] )</h3>
+		<div>
+		Translate the geometry. This is typically done as a one time operation, and not during a loop
+    Use [page:Object3D.position] for typical real-time mesh translation.
+		</div>
+
+		<h3>[method:Geometry scale] ( [page:Float x], [page:Float y], [page:Float z] )</h3>
+		<div>
+		Scale the geometry data. This is typically done as a one time operation, and not during a loop
+    Use [page:Object3D.scale] for typical real-time mesh scaling.
+		</div>
+
+		<h3>[method:Geometry lookAt] ( [page:Vector3 vector] )</h3>
+		<div>
+		vector - A world vector to look at.<br />
+		</div>
+		<div>
+		Rotates the geometry to face point in space. This is typically done as a one time operation, and not during a loop
+    Use [page:Object3D.lookAt] for typical real-time mesh usage.
 		</div>
 
 		<h3>[method:null computeFaceNormals]()</h3>
@@ -201,13 +254,6 @@
 		Computes morph normals.
 		</div>
 
-		<h3>[method:null computeTangents]()</h3>
-		<div>
-		Computes vertex tangents.<br />
-		Based on [link:http://www.terathon.com/code/tangent.html]<br />
-		Geometry must have vertex [page:UV UVs] (layer 0 will be used).
-		</div>
-
 		<h3>[method:null computeBoundingBox]()</h3>
 		<div>
 		Computes bounding box of the geometry, updating [page:Geometry Geometry.boundingBox] attribute.
@@ -217,7 +263,7 @@
 		<div>
 		Computes bounding sphere of the geometry, updating [page:Geometry Geometry.boundingSphere] attribute.
 		</div>
-		
+
 		<div>Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed, otherwise they are *null*.</div>
 
 		<h3>[method:null merge]( [page:Geometry geometry], [page:Matrix4 matrix], [page:Integer materialIndexOffset] )</h3>
@@ -228,16 +274,22 @@
 		Checks for duplicate vertices using hashmap.<br />
 		Duplicated vertices are removed and faces' vertices are updated.
 		</div>
-		
+
+		<h3>[method:null normalize]()</h3>
+		<div>
+		Normalize the geometry. <br />
+		Make the geometry centered and has a bounding sphere whose raidus equals to 1.0.
+		</div>
+
 		<h3>[method:Geometry clone]()</h3>
 		<div>
 		Creates a new clone of the Geometry.
 		</div>
-		
+
 		<h3>[method:null dispose]()</h3>
 		<div>
 		Removes The object from memory. <br />
-		Don't forget to call this method when you remove a geometry because it can cause memory leaks. 
+		Don't forget to call this method when you remove a geometry because it can cause memory leaks.
 		</div>
 
 		<h3>[method:null computeLineDistances]()</h3>

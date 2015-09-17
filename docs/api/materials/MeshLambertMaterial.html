@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Material] &rarr;
@@ -12,8 +13,8 @@
 		<h1>[name]</h1>
 
 		<div class="desc">A material for non-shiny (Lambertian) surfaces, evaluated per vertex.</div>
-		
-		<iframe src='../../scenes/material-browser.html#MeshLambertMaterial'></iframe>
+
+		<iframe src='scenes/material-browser.html#MeshLambertMaterial'></iframe>
 
 		<h2>Constructor</h2>
 
@@ -25,12 +26,10 @@
 		<div>
 		color — Line color in hexadecimal. Default is 0xffffff.<br />
 		map — Sets the texture map. Default is null <br />
-		lightMap — Set light map. Default is null.<br />
 		specularMap — Set specular map. Default is null.<br />
 		alphaMap — Set alpha map. Default is null.<br />
 		envMap — Set env map. Default is null.<br />
 		fog — Define whether the material color is affected by global fog settings. Default is false.<br />
-		shading — How the triangles of a curved surface are rendered. Default is [page:Materials THREE.SmoothShading].<br/>
 		wireframe — Render geometry as wireframe. Default is false (i.e. render as smooth shaded).<br/>
 		wireframeLinewidth — Controls wireframe thickness. Default is 1.<br/>
 		wireframeLinecap — Define appearance of line ends. Default is 'round'.<br />
@@ -53,26 +52,9 @@
 		<div>
 		Emissive (light) color of the material, essentially a solid color unaffected by other lighting. Default is black.<br />
 		</div>
-		
-		<h3>[property:boolean wrapAround]</h3>
-		<div>
-			Define whether the diffuse lighting wraps around the model or not. This option adds a little more (tintable) light
-			onto the side of the object in relation to a light.
-		</div>
-
-		<h3>[property:Vector3 wrapRGB]</h3>
-		<div>
-			Decide how much of the wrap around values get used if the wrapAround option is set. The x, y, z values correspond
-			to the r, g, b values respectively. The typical range is of each is from 0 to 1. For example setting all of the
-			vector values to 0.5 will add a moderate amount of light to the side of the model. Changing *b* to 1 will
-			tint the light on the side to be more blue. Defaults to *(1,1,1)*.
-		</div> 
 
 		<h3>[property:Texture map]</h3>
 		<div>Set color texture map. Default is null.</div>
-
-		<h3>[property:Texture lightMap]</h3>
-		<div>Set light map. Default is null.</div>
 
 		<h3>[property:Texture specularMap]</h3>
 		<div>Since this material does not have a specular component, the specular value affects only how much of the environment map affects the surface. Default is null.</div>
@@ -85,12 +67,12 @@
 		<div>Set env map. Default is null.</div>
 
 		<h3>[property:Integer combine]</h3>
-		<div>How to combine the result of the surface's color with the environment map, if any.</div> 
-		 
+		<div>How to combine the result of the surface's color with the environment map, if any.</div>
+
 		<div>Options are [page:Textures THREE.Multiply] (default), [page:Textures THREE.MixOperation], [page:Textures THREE.AddOperation]. If mix is chosen, the reflectivity is used to blend between the two colors.</div>
-		 
+
 		<h3>[property:Float reflectivity]</h3>
-		<div>How much the environment map affects the surface; also see "combine".</div> 
+		<div>How much the environment map affects the surface; also see "combine".</div>
 
 		<h3>[property:Float refractionRatio]</h3>
 		<div>The index of refraction for an environment map using [page:Textures THREE.CubeRefractionMapping]. Default is *0.98*.</div>
@@ -99,14 +81,9 @@
 		<div>Define whether the material color is affected by global fog settings. Default is *true*.</div>
 		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
 
-		<h3>[property:Integer shading]</h3>
-		<div>How the triangles of a curved surface are rendered: as a smooth surface, as flat separate facets, or no shading at all.</div>
-
-		<div>Options are [page:Materials THREE.SmoothShading] (default), [page:Materials THREE.FlatShading], [page:Materials THREE.NoShading].</div>
-		
 		<h3>[property:Boolean wireframe]</h3>
 		<div>Whether the triangles' edges are displayed instead of surfaces. Default is *false*.</div>
-		
+
 		<h3>[property:Float wireframeLinewidth]</h3>
 		<div>Line thickness for wireframe mode. Default is *1.0*.</div>
 		<div>Due to limitations in the <a href="https://code.google.com/p/angleproject/" target="_blank">ANGLE layer</a>, on Windows platforms linewidth will always be 1 regardless of the set value.</div>
@@ -125,9 +102,9 @@
 
 		<h3>[property:Boolean skinning]</h3>
 		<div>Define whether the material uses skinning. Default is *false*.</div>
-	
+
 		<h3>[property:Boolean morphTargets]</h3>
-		<div>Define whether the material uses morphTargets. Default is *false*.</div>	
+		<div>Define whether the material uses morphTargets. Default is *false*.</div>
 
 		<h3>[property:boolean morphNormals]</h3>
 		<div>

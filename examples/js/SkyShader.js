@@ -14,15 +14,15 @@
  * Three.js integration by zz85 http://twitter.com/blurspline
 */
 
-THREE.ShaderLib['sky'] = {
+THREE.ShaderLib[ 'sky' ] = {
 
 	uniforms: {
 
-		luminance:	 { type: "f", value:1 },
-		turbidity:	 { type: "f", value:2 },
-		reileigh:	 { type: "f", value:1 },
-		mieCoefficient:	 { type: "f", value:0.005 },
-		mieDirectionalG: { type: "f", value:0.8 },
+		luminance:	 { type: "f", value: 1 },
+		turbidity:	 { type: "f", value: 2 },
+		reileigh:	 { type: "f", value: 1 },
+		mieCoefficient:	 { type: "f", value: 0.005 },
+		mieDirectionalG: { type: "f", value: 0.8 },
 		sunPosition: 	 { type: "v3", value: new THREE.Vector3() }
 
 	},
@@ -40,7 +40,7 @@ THREE.ShaderLib['sky'] = {
 
 		"}",
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -61,9 +61,6 @@ THREE.ShaderLib['sky'] = {
 		"uniform float reileigh;",
 		"uniform float mieCoefficient;",
 		"uniform float mieDirectionalG;",
-
-		"vec3 sunDirection = normalize(sunPosition);",
-		"float reileighCoefficient = reileigh;",
 
 		"// constants for atmospheric scattering",
 		"const float e = 2.71828182845904523536028747135266249775724709369995957;",
@@ -160,7 +157,9 @@ THREE.ShaderLib['sky'] = {
 
 			 "// gl_FragColor = vec4(sunfade, sunfade, sunfade, 1.0);",
 
-			"reileighCoefficient = reileighCoefficient - (1.0* (1.0-sunfade));",
+			"float reileighCoefficient = reileigh - (1.0* (1.0-sunfade));",
+
+			"vec3 sunDirection = normalize(sunPosition);",
 
 			"float sunE = sunIntensity(dot(sunDirection, up));",
 
@@ -235,7 +234,7 @@ THREE.ShaderLib['sky'] = {
 			"gl_FragColor.a = 1.0;",
 		"}",
 
-	].join("\n")
+	].join( "\n" )
 
 };
 
@@ -251,7 +250,7 @@ THREE.Sky = function () {
 		side: THREE.BackSide
 	} );
 
-	var skyGeo = new THREE.SphereGeometry( 450000, 32, 15 );
+	var skyGeo = new THREE.SphereBufferGeometry( 450000, 32, 15 );
 	var skyMesh = new THREE.Mesh( skyGeo, skyMat );
 
 

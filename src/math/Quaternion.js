@@ -18,8 +18,6 @@ THREE.Quaternion.prototype = {
 
 	constructor: THREE.Quaternion,
 
-	_x: 0,_y: 0, _z: 0, _w: 0,
-
 	get x () {
 
 		return this._x;
@@ -85,6 +83,12 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	clone: function () {
+
+		return new this.constructor( this._x, this._y, this._z, this._w );
+
+	},
+
 	copy: function ( quaternion ) {
 
 		this._x = quaternion.x;
@@ -103,6 +107,7 @@ THREE.Quaternion.prototype = {
 		if ( euler instanceof THREE.Euler === false ) {
 
 			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
+
 		}
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/
@@ -116,42 +121,44 @@ THREE.Quaternion.prototype = {
 		var s2 = Math.sin( euler._y / 2 );
 		var s3 = Math.sin( euler._z / 2 );
 
-		if ( euler.order === 'XYZ' ) {
+		var order = euler.order;
+
+		if ( order === 'XYZ' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
 			this._z = c1 * c2 * s3 + s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( euler.order === 'YXZ' ) {
+		} else if ( order === 'YXZ' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( euler.order === 'ZXY' ) {
+		} else if ( order === 'ZXY' ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 + s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( euler.order === 'ZYX' ) {
+		} else if ( order === 'ZYX' ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( euler.order === 'YZX' ) {
+		} else if ( order === 'YZX' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( euler.order === 'XZY' ) {
+		} else if ( order === 'XZY' ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
@@ -363,7 +370,7 @@ THREE.Quaternion.prototype = {
 
 		if ( p !== undefined ) {
 
-			THREE.warn( 'THREE.Quaternion: .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
+			console.warn( 'THREE.Quaternion: .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
 			return this.multiplyQuaternions( q, p );
 
 		}
@@ -392,7 +399,7 @@ THREE.Quaternion.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		THREE.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
+		console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
 		return vector.applyQuaternion( this );
 
 	},
@@ -505,13 +512,7 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	onChangeCallback: function () {},
-
-	clone: function () {
-
-		return new THREE.Quaternion( this._x, this._y, this._z, this._w );
-
-	}
+	onChangeCallback: function () {}
 
 };
 
@@ -519,4 +520,4 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 
 	return qm.copy( qa ).slerp( qb, t );
 
-}
+};

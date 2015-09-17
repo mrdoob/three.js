@@ -4,9 +4,9 @@ var prevTime = Date.now();
 var clock = new THREE.Clock();
 
 function render() {
-        
+
     renderer.render( scene, camera );
- 
+
     if ( hasMorph ) {
 
         var time = Date.now();
@@ -15,7 +15,7 @@ function render() {
 
         prevTime = time;
 
-    }     
+    }
 }
 
 function animate() {
@@ -57,7 +57,7 @@ function setupLights() {
     directionalLight.position.set(1, 1, 1).normalize();
     directionalLight.intensity = 1.0;
     scene.add( directionalLight );
-    
+
     directionalLight = new THREE.DirectionalLight( 0xb8b8b8 );
     directionalLight.position.set(-1, 0.6, 0.5).normalize();
     directionalLight.intensity = 0.5;
@@ -77,7 +77,7 @@ function loadObject( data ) {
 
     var hasLights = false;
 
-    var lights = ['AmbientLight', 'DirectionalLight', 'AreaLight',
+    var lights = ['AmbientLight', 'DirectionalLight',
         'PointLight', 'SpotLight', 'HemisphereLight']
 
     var cameras = ['OrthographicCamera', 'PerspectiveCamera'];
@@ -126,13 +126,13 @@ function loadGeometry( data, url ) {
     data = loader.parse( data, texturePath );
 
     if ( data.materials === undefined ) {
-    
+
         console.log('using default material');
         data.materials = [new THREE.MeshLambertMaterial( { color: 0xb8b8b8 } )];
-    
+
     }
 
-    var material = new THREE.MeshFaceMaterial( data.materials ); 
+    var material = new THREE.MeshFaceMaterial( data.materials );
     var mesh;
 
     if ( data.geometry.animations !== undefined && data.geometry.animations.length > 0 ) {
@@ -195,11 +195,11 @@ function loadBufferGeometry( data ) {
 function loadData( data, url ) {
 
     if ( data.metadata.type === 'Geometry' ) {
-        
+
         loadGeometry( data, url );
-    
+
     } else if ( data.metadata.type === 'Object' ) {
-    
+
         loadObject( data );
 
     } else if ( data.metadata.type === 'BufferGeometry' ) {
@@ -226,7 +226,7 @@ function init( url ) {
     container.appendChild( renderer.domElement );
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
-    
+
     var aspect = container.offsetWidth / container.offsetHeight;
     camera = new THREE.PerspectiveCamera( 50, aspect, 0.01, 50 );
     orbit = new THREE.OrbitControls( camera, container );
@@ -243,7 +243,7 @@ function init( url ) {
 
 	var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function ( x ) {
-    
+
         if ( xhr.readyState === xhr.DONE ) {
 
             if ( xhr.status === 200 || xhr.status === 0  ) {
@@ -256,8 +256,8 @@ function init( url ) {
 
             }
 
-        } 
-    
+        }
+
     };
     xhr.open( 'GET', url, true );
     xhr.withCredentials = false;

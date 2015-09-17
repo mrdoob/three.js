@@ -2,17 +2,69 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '71' };
+var THREE = { REVISION: '72' };
 
-// browserify support
+//
 
-if ( typeof module === 'object' ) {
+if ( typeof define === 'function' && define.amd ) {
 
-	module.exports = THREE;
+		define( 'three', THREE );
+
+} else if ( 'undefined' !== typeof exports && 'undefined' !== typeof module ) {
+
+		module.exports = THREE;
 
 }
 
+
 // polyfills
+
+if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === undefined ) {
+
+	// Missing in Android stock browser.
+
+	( function () {
+
+		var lastTime = 0;
+		var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
+
+		for ( var x = 0; x < vendors.length && ! self.requestAnimationFrame; ++ x ) {
+
+			self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
+			self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
+
+		}
+
+		if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
+
+			self.requestAnimationFrame = function ( callback ) {
+
+				var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
+				var id = self.setTimeout( function () {
+
+					callback( currTime + timeToCall );
+
+				}, timeToCall );
+				lastTime = currTime + timeToCall;
+				return id;
+
+			};
+
+		}
+
+		if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
+
+			self.cancelAnimationFrame = function ( id ) {
+
+				self.clearTimeout( id );
+
+			};
+
+		}
+
+	}() );
+
+}
 
 if ( Math.sign === undefined ) {
 
@@ -20,18 +72,28 @@ if ( Math.sign === undefined ) {
 
 	Math.sign = function ( x ) {
 
-		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : +x;
+		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : + x;
 
 	};
 
 }
 
+if ( Function.prototype.name === undefined && Object.defineProperty !== undefined ) {
 
-// set the default log handlers
-THREE.log = function() { console.log.apply( console, arguments ); }
-THREE.warn = function() { console.warn.apply( console, arguments ); }
-THREE.error = function() { console.error.apply( console, arguments ); }
+	// Missing in IE9-11.
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
 
+	Object.defineProperty( Function.prototype, 'name', {
+
+		get: function () {
+
+			return this.toString().match( /^\s*function\s*(\S*)\s*\(/ )[ 1 ];
+
+		}
+
+	} );
+
+}
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 
@@ -63,7 +125,6 @@ THREE.DoubleSide = 2;
 
 // shading
 
-THREE.NoShading = 0;
 THREE.FlatShading = 1;
 THREE.SmoothShading = 2;
 
@@ -84,7 +145,7 @@ THREE.CustomBlending = 5;
 
 // custom blending equations
 // (numbers start from 100 not to clash with other
-//  mappings to OpenGL constants defined in Texture.js)
+// mappings to OpenGL constants defined in Texture.js)
 
 THREE.AddEquation = 100;
 THREE.SubtractEquation = 101;
@@ -114,6 +175,17 @@ THREE.OneMinusDstAlphaFactor = 207;
 THREE.DstColorFactor = 208;
 THREE.OneMinusDstColorFactor = 209;
 THREE.SrcAlphaSaturateFactor = 210;
+
+// depth modes
+
+THREE.NeverDepth = 0;
+THREE.AlwaysDepth = 1;
+THREE.LessDepth = 2;
+THREE.LessEqualDepth = 3;
+THREE.EqualDepth = 4;
+THREE.GreaterEqualDepth = 5;
+THREE.GreaterDepth = 6;
+THREE.NotEqualDepth = 7;
 
 
 // TEXTURE CONSTANTS
@@ -197,25 +269,25 @@ THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 
 THREE.Projector = function () {
 
-	THREE.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
+	console.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
 
 	this.projectVector = function ( vector, camera ) {
 
-		THREE.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
+		console.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
 		vector.project( camera );
 
 	};
 
 	this.unprojectVector = function ( vector, camera ) {
 
-		THREE.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
+		console.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
 		vector.unproject( camera );
 
 	};
 
 	this.pickingRay = function ( vector, camera ) {
 
-		THREE.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
+		console.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
 
 	};
 
@@ -223,7 +295,7 @@ THREE.Projector = function () {
 
 THREE.CanvasRenderer = function () {
 
-	THREE.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
+	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
 
 	this.domElement = document.createElement( 'canvas' );
 	this.clear = function () {};

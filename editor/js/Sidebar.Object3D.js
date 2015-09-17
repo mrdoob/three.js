@@ -132,7 +132,7 @@ Sidebar.Object3D = function ( editor ) {
 	// scale
 
 	var objectScaleRow = new UI.Panel();
-	var objectScaleLock = new UI.Checkbox().setPosition( 'absolute' ).setLeft( '75px' );
+	var objectScaleLock = new UI.Checkbox( true ).setPosition( 'absolute' ).setLeft( '75px' );
 	var objectScaleX = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleX );
 	var objectScaleY = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleY );
 	var objectScaleZ = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleZ );
@@ -342,7 +342,7 @@ Sidebar.Object3D = function ( editor ) {
 
 		if ( object !== null ) {
 
-			if ( object.parent !== undefined ) {
+			if ( object.parent !== null ) {
 
 				var newParentId = parseInt( objectParent.getValue() );
 
@@ -535,7 +535,7 @@ Sidebar.Object3D = function ( editor ) {
 		objectUUID.setValue( object.uuid );
 		objectName.setValue( object.name );
 
-		if ( object.parent !== undefined ) {
+		if ( object.parent !== null ) {
 
 			objectParent.setValue( object.parent.id );
 

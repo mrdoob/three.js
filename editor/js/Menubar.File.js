@@ -278,16 +278,25 @@ Menubar.File = function ( editor ) {
 
 	//
 
+	var link = document.createElement( 'a' );
+	link.style.display = 'none';
+	document.body.appendChild( link ); // Firefox workaround, see #6594
+
 	var exportString = function ( output, filename ) {
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
 
-		var link = document.createElement( 'a' );
 		link.href = objectURL;
 		link.download = filename || 'data.json';
 		link.target = '_blank';
-		link.click();
+
+		var event = document.createEvent("MouseEvents");
+		event.initMouseEvent(
+			"click", true, false, window, 0, 0, 0, 0, 0
+			, false, false, false, false, 0, null
+		);
+		link.dispatchEvent(event);
 
 	};
 

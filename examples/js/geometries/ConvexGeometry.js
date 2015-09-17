@@ -80,11 +80,14 @@ THREE.ConvexGeometry = function( vertices ) {
 				faces[ f ] = faces[ faces.length - 1 ];
 				faces.pop();
 
-			} else { // not visible
+			} else {
+
+				// not visible
 
 				f ++;
 
 			}
+
 		}
 
 		// construct the new faces formed by the edges of the hole and the vertex
@@ -97,6 +100,7 @@ THREE.ConvexGeometry = function( vertices ) {
 			] );
 
 		}
+
 	}
 
 	/**
@@ -208,7 +212,7 @@ THREE.ConvexGeometry = function( vertices ) {
 		this.faceVertexUvs[ 0 ].push( [
 			vertexUv( this.vertices[ face.a ] ),
 			vertexUv( this.vertices[ face.b ] ),
-			vertexUv( this.vertices[ face.c ])
+			vertexUv( this.vertices[ face.c ] )
 		] );
 
 	}

@@ -23,7 +23,6 @@
 			}
 
 			a {
-
 				color: #0080ff;
 			}
 
@@ -44,10 +43,11 @@
 		<script>
 
 			var group;
-			var container, stats;
+			var container, controls, stats;
 			var particlesData = [];
 			var camera, scene, renderer;
-			var positions,colors;
+			var positions, colors;
+			var particles;
 			var pointCloud;
 			var particlePositions;
 			var linesMesh;
@@ -64,7 +64,7 @@
 				limitConnections: false,
 				maxConnections: 20,
 				particleCount: 500
-			}
+			};
 
 			init();
 			animate();
@@ -81,7 +81,7 @@
 				gui.add( effectController, "particleCount", 0, maxParticleCount, 1 ).onChange( function( value ) {
 
 					particleCount = parseInt( value );
-					particles.drawcalls[ 0 ].count = particleCount;
+					particles.setDrawRange( 0, particleCount );
 
 				});
 
@@ -117,7 +117,7 @@
 				positions = new Float32Array( segments * 3 );
 				colors = new Float32Array( segments * 3 );
 
-				var pMaterial = new THREE.PointCloudMaterial( {
+				var pMaterial = new THREE.PointsMaterial( {
 					color: 0xFFFFFF,
 					size: 3,
 					blending: THREE.AdditiveBlending,
@@ -146,30 +146,21 @@
 
 				}
 
-				particles.drawcalls.push( {
-					start: 0,
-					count: particleCount,
-					index: 0
-				} );
-
-				particles.addAttribute( 'position', new THREE.DynamicBufferAttribute( particlePositions, 3 ) );
+				particles.setDrawRange( 0, particleCount );
+				particles.addAttribute( 'position', new THREE.BufferAttribute( particlePositions, 3 ).setDynamic( true ) );
 
 				// create the particle system
-				pointCloud = new THREE.PointCloud( particles, pMaterial );
+				pointCloud = new THREE.Points( particles, pMaterial );
 				group.add( pointCloud );
 
 				var geometry = new THREE.BufferGeometry();
 
-				geometry.addAttribute( 'position', new THREE.DynamicBufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new THREE.DynamicBufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).setDynamic( true ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).setDynamic( true ) );
 
 				geometry.computeBoundingSphere();
 
-				geometry.drawcalls.push( {
-					start: 0,
-					count: 0,
-					index: 0
-				} );
+				geometry.setDrawRange( 0, 0 );
 
 				var material = new THREE.LineBasicMaterial( {
 					vertexColors: THREE.VertexColors,
@@ -177,7 +168,7 @@
 					transparent: true
 				} );
 
-				linesMesh = new THREE.Line( geometry, material, THREE.LinePieces );
+				linesMesh = new THREE.LineSegments( geometry, material );
 				group.add( linesMesh );
 
 				//
@@ -282,7 +273,7 @@
 				}
 
 
-				linesMesh.geometry.drawcalls[ 0 ].count = numConnected * 2;
+				linesMesh.geometry.setDrawRange( 0, numConnected * 2 );
 				linesMesh.geometry.attributes.position.needsUpdate = true;
 				linesMesh.geometry.attributes.color.needsUpdate = true;
 

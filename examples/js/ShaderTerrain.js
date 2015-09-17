@@ -23,32 +23,32 @@ THREE.ShaderTerrain = {
 
 			{
 
-			"enableDiffuse1"  : { type: "i", value: 0 },
-			"enableDiffuse2"  : { type: "i", value: 0 },
-			"enableSpecular"  : { type: "i", value: 0 },
-			"enableReflection": { type: "i", value: 0 },
+				"enableDiffuse1"  : { type: "i", value: 0 },
+				"enableDiffuse2"  : { type: "i", value: 0 },
+				"enableSpecular"  : { type: "i", value: 0 },
+				"enableReflection": { type: "i", value: 0 },
 
-			"tDiffuse1"	   : { type: "t", value: null },
-			"tDiffuse2"	   : { type: "t", value: null },
-			"tDetail"	   : { type: "t", value: null },
-			"tNormal"	   : { type: "t", value: null },
-			"tSpecular"	   : { type: "t", value: null },
-			"tDisplacement": { type: "t", value: null },
+				"tDiffuse1"	   : { type: "t", value: null },
+				"tDiffuse2"	   : { type: "t", value: null },
+				"tDetail"	   : { type: "t", value: null },
+				"tNormal"	   : { type: "t", value: null },
+				"tSpecular"	   : { type: "t", value: null },
+				"tDisplacement": { type: "t", value: null },
 
-			"uNormalScale": { type: "f", value: 1.0 },
+				"uNormalScale": { type: "f", value: 1.0 },
 
-			"uDisplacementBias": { type: "f", value: 0.0 },
-			"uDisplacementScale": { type: "f", value: 1.0 },
+				"uDisplacementBias": { type: "f", value: 0.0 },
+				"uDisplacementScale": { type: "f", value: 1.0 },
 
-			"diffuse": { type: "c", value: new THREE.Color( 0xeeeeee ) },
-			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"shininess": { type: "f", value: 30 },
-			"opacity": { type: "f", value: 1 },
+				"diffuse": { type: "c", value: new THREE.Color( 0xeeeeee ) },
+				"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
+				"shininess": { type: "f", value: 30 },
+				"opacity": { type: "f", value: 1 },
 
-			"uRepeatBase"    : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
-			"uRepeatOverlay" : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
+				"uRepeatBase"    : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
+				"uRepeatOverlay" : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
 
-			"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) }
+				"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) }
 
 			}
 
@@ -168,8 +168,7 @@ THREE.ShaderTerrain = {
 
 					"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-						"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
+						"vec3 lVector = pointLightPosition[ i ] + vViewPosition.xyz;",
 
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
@@ -198,7 +197,7 @@ THREE.ShaderTerrain = {
 
 					"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
-						"vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );",
+						"vec3 dirVector = directionalLightDirection[ i ];",
 						"vec3 dirHalfVector = normalize( dirVector + viewPosition );",
 
 						"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
@@ -222,7 +221,7 @@ THREE.ShaderTerrain = {
 
 					"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-						"vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );",
+						"vec3 lVector = hemisphereLightDirection[ i ];",
 
 						// diffuse
 
@@ -263,7 +262,7 @@ THREE.ShaderTerrain = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		vertexShader: [
 
@@ -336,7 +335,7 @@ THREE.ShaderTerrain = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	}
 

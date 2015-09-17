@@ -25,7 +25,7 @@ THREE.LuminosityShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -45,6 +45,6 @@ THREE.LuminosityShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

@@ -11,7 +11,7 @@ THREE.CSS3DObject = function ( element ) {
 
 	this.elementR = element.cloneNode( true );
 	this.elementR.style.position = 'absolute';
-	
+
 	this.addEventListener( 'removed', function ( event ) {
 
 		if ( this.elementL.parentNode !== null ) {
@@ -254,7 +254,7 @@ THREE.CSS3DStereoRenderer = function () {
 
 		scene.updateMatrixWorld();
 
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorld.decompose( _position, _quaternion, _scale );
 
@@ -265,7 +265,7 @@ THREE.CSS3DStereoRenderer = function () {
 		var fov = 0.5 / Math.tan( THREE.Math.degToRad( camera.fov * 0.5 ) ) * _height;
 
 		// Left
-		
+
 		_cameraL.fov = camera.fov;
 		_cameraL.aspect = 0.5 * camera.aspect;
 		_cameraL.updateProjectionMatrix();
@@ -292,11 +292,11 @@ THREE.CSS3DStereoRenderer = function () {
 		cameraElementL.style.MozTransform = style;
 		cameraElementL.style.oTransform = style;
 		cameraElementL.style.transform = style;
-		
+
 		renderObject( scene, _cameraL, cameraElementL, 'L' );
-		
+
 		// Right
-		
+
 		_cameraR.projectionMatrix = _cameraL.projectionMatrix;
 
 		_cameraR.near = camera.near;
@@ -321,7 +321,7 @@ THREE.CSS3DStereoRenderer = function () {
 		cameraElementR.style.MozTransform = style;
 		cameraElementR.style.oTransform = style;
 		cameraElementR.style.transform = style;
-		
+
 		renderObject( scene, _cameraR, cameraElementR, 'R' );
 
 	};

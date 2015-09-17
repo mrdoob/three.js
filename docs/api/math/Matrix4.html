@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -38,10 +39,10 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Float n11], [page:Float n12], [page:Float n13], [page:Float n14], [page:Float n21], [page:Float n22], [page:Float n23], [page:Float n24], [page:Float n31], [page:Float n32], [page:Float n33], [page:Float n34], [page:Float n41], [page:Float n42], [page:Float n43], [page:Float n44] )</h3>
+		<h3>[name]()</h3>
 
 		<div>
-		Initialises the matrix with the supplied row-major values n11..n44, or just creates an identity matrix if no values are passed.
+		Creates and initializes the matrix to the identity matrix.
 		</div>
 
 		<h2>Properties</h2>
@@ -63,7 +64,7 @@
 
 		<h3>[method:Matrix4 copy]( [page:Matrix4 m] ) [page:Matrix4 this]</h3>
 		<div>
-		Copies a matrix *m* into this matrix.
+		Copies the values of matrix *m* into this matrix.
 		</div>
 
 		<h3>[method:Matrix4 copyPosition]( [page:Matrix4 m] ) [page:Matrix4 this]</h3>
@@ -109,12 +110,12 @@
 
 		<h3>[method:Matrix4 multiplyScalar]( [page:Float s] ) [page:Matrix4 this]</h3>
 		<div>
-		Multiplies this matrix by *s*.
+		Multiplies every component of the matrix by a scalar value *s*.
 		</div>
 
 		<h3>[method:Float determinant]()</h3>
 		<div>
-		Computes determinant of this matrix.<br />
+		Computes and returns the determinant of this matrix.<br />
 		Based on [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm]
 		</div>
 
@@ -141,7 +142,7 @@
 
 		<h3>[method:Matrix4 makeRotationFromEuler]( [page:Euler euler] ) [page:Matrix4 this]</h3>
 		<div>
-		euler — Rotation vector followed by order of rotations. Eg. "XYZ".
+		euler — Rotation vector followed by order of rotations, e.g., "XYZ".
 		</div>
 		<div>
 		Sets the rotation submatrix of this matrix to the rotation specified by Euler angles, the rest of the matrix is identity.<br />
@@ -229,7 +230,7 @@
 
 		<h3>[method:Matrix4 clone]()</h3>
 		<div>
-		Clones this matrix.
+		Creates a copy of this matrix.
 		</div>
 
 		<h3>[method:Array applyToVector3Array]([page:Array a])</h3>
@@ -237,12 +238,12 @@
 		array -- An array in the form [vector1x, vector1y, vector1z, vector2x, vector2y, vector2z, ...]
 		</div>
 		<div>
-		Multiply (apply) this matrix to every vector3 in the array.
+		Multiplies (applies) this matrix to every vector3 in the array.
 		</div>
 
 		<h3>[method:Float getMaxScaleOnAxis]()</h3>
 		<div>
-		Gets the max scale value of the 3 axes.
+		Gets the maximum scale value of the 3 axes.
 		</div>
 
 		<h2>Source</h2>

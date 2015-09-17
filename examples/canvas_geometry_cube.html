@@ -82,7 +82,7 @@
 				// Plane
 
 				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				geometry.rotateX( - Math.PI / 2 );
 
 				var material = new THREE.MeshBasicMaterial( { color: 0xe0e0e0, overdraw: 0.5 } );
 

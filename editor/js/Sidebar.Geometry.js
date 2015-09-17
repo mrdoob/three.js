@@ -25,6 +25,7 @@ Sidebar.Geometry = function ( editor ) {
 
 		'Actions': 'Actions',
 		'Center': 'Center',
+		'Convert': 'Convert',
 		'Flatten': 'Flatten'
 
 	} );
@@ -52,6 +53,18 @@ Sidebar.Geometry = function ( editor ) {
 
 				editor.signals.geometryChanged.dispatch( geometry );
 				editor.signals.objectChanged.dispatch( object );
+
+				break;
+
+			case 'Convert':
+
+				if ( geometry instanceof THREE.Geometry ) {
+
+					object.geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+
+					signals.geometryChanged.dispatch( object );
+
+				}
 
 				break;
 
@@ -146,41 +159,15 @@ Sidebar.Geometry = function ( editor ) {
 
 			parameters.clear();
 
-			if ( geometry instanceof THREE.BoxGeometry ) {
+			if ( geometry.type === 'BufferGeometry' || geometry.type === 'Geometry' ) {
 
-				parameters.add( new Sidebar.Geometry.BoxGeometry( signals, object ) );
+				parameters.add( new Sidebar.Geometry.Modifiers( signals, object ) );
 
-			} else if ( geometry instanceof THREE.CircleGeometry ) {
+			} else if ( Sidebar.Geometry[ geometry.type ] !== undefined ) {
 
-				parameters.add( new Sidebar.Geometry.CircleGeometry( signals, object ) );
-
-			} else if ( geometry instanceof THREE.CylinderGeometry ) {
-
-				parameters.add( new Sidebar.Geometry.CylinderGeometry( signals, object ) );
-
-			} else if ( geometry instanceof THREE.SphereGeometry ) {
-
-				parameters.add( new Sidebar.Geometry.SphereGeometry( signals, object ) );
-
-			} else if ( geometry instanceof THREE.IcosahedronGeometry ) {
-
-				parameters.add( new Sidebar.Geometry.IcosahedronGeometry( signals, object ) );
-
-			} else if ( geometry instanceof THREE.PlaneGeometry ) {
-
-				parameters.add( new Sidebar.Geometry.PlaneGeometry( signals, object ) );
-
-			} else if ( geometry instanceof THREE.TorusGeometry ) {
-
-				parameters.add( new Sidebar.Geometry.TorusGeometry( signals, object ) );
-
-			} else if ( geometry instanceof THREE.TorusKnotGeometry ) {
-
-				parameters.add( new Sidebar.Geometry.TorusKnotGeometry( signals, object ) );
+				parameters.add( new Sidebar.Geometry[ geometry.type ]( signals, object ) );
 
 			}
-
-			parameters.add( new Sidebar.Geometry.Modifiers( signals, object ) );
 
 		} else {
 

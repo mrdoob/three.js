@@ -32,6 +32,26 @@ MAPPING_TYPES = type('Mapping', (), {
     'SPHERICAL_REFLECTION': 'SphericalReflectionMapping'
 })
 
+NUMERIC = {
+    'UVMapping': 300,
+    'CubeReflectionMapping': 301,
+    'CubeRefractionMapping': 302,
+    'EquirectangularReflectionMapping': 303,
+    'EquirectangularRefractionMapping': 304,
+    'SphericalReflectionMapping': 305,
+
+    'RepeatWrapping': 1000,
+    'ClampToEdgeWrapping': 1001,
+    'MirroredRepeatWrapping': 1002,
+
+    'NearestFilter': 1003,
+    'NearestMipMapNearestFilter': 1004,
+    'NearestMipMapLinearFilter': 1005,
+    'LinearFilter': 1006,
+    'LinearMipMapNearestFilter': 1007,
+    'LinearMipMapLinearFilter': 1008
+}
+
 JSON = 'json'
 EXTENSION = '.%s' % JSON
 INDENT = 'indent'
@@ -44,8 +64,15 @@ FACES = 'faces'
 NORMALS = 'normals'
 BONES = 'bones'
 UVS = 'uvs'
+APPLY_MODIFIERS = 'applyModifiers'
 COLORS = 'colors'
 MIX_COLORS = 'mixColors'
+EXTRA_VGROUPS = 'extraVertexGroups'
+INDEX = 'index'
+DRAW_CALLS = 'drawcalls'
+DC_START = 'start'
+DC_COUNT = 'count'
+DC_INDEX = 'index'
 SCALE = 'scale'
 COMPRESSION = 'compression'
 MAPS = 'maps'
@@ -76,6 +103,7 @@ GLOBAL = 'global'
 BUFFER_GEOMETRY = 'BufferGeometry'
 GEOMETRY = 'geometry'
 GEOMETRY_TYPE = 'geometryType'
+INDEX_TYPE = 'indexType'
 
 CRITICAL = 'critical'
 ERROR = 'error'
@@ -88,6 +116,10 @@ MSGPACK = 'msgpack'
 
 PACK = 'pack'
 
+FLOAT_32 = 'Float32Array'
+UINT_16 = 'Uint16Array'
+UINT_32 = 'Uint32Array'
+
 INFLUENCES_PER_VERTEX = 'influencesPerVertex'
 
 EXPORT_OPTIONS = {
@@ -95,7 +127,10 @@ EXPORT_OPTIONS = {
     VERTICES: True,
     NORMALS: True,
     UVS: True,
+    APPLY_MODIFIERS: True,
     COLORS: False,
+    EXTRA_VGROUPS: '',
+    INDEX_TYPE: UINT_16,
     MATERIALS: False,
     FACE_MATERIALS: False,
     SCALE: 1,
@@ -157,7 +192,6 @@ PERSPECTIVE_CAMERA = 'PerspectiveCamera'
 ORTHOGRAPHIC_CAMERA = 'OrthographicCamera'
 AMBIENT_LIGHT = 'AmbientLight'
 DIRECTIONAL_LIGHT = 'DirectionalLight'
-AREA_LIGHT = 'AreaLight'
 POINT_LIGHT = 'PointLight'
 SPOT_LIGHT = 'SpotLight'
 HEMISPHERE_LIGHT = 'HemisphereLight'
@@ -184,8 +218,6 @@ ATTRIBUTES = 'attributes'
 NORMAL = 'normal'
 ITEM_SIZE = 'itemSize'
 ARRAY = 'array'
-
-FLOAT_32 = 'Float32Array'
 
 VISIBLE = 'visible'
 CAST_SHADOW = 'castShadow'
@@ -288,6 +320,8 @@ NORMAL_BLENDING = 0
 
 VERTEX_COLORS_ON = 2
 VERTEX_COLORS_OFF = 0
+
+SIDE_DOUBLE = 2
 
 THREE_BASIC = 'MeshBasicMaterial'
 THREE_LAMBERT = 'MeshLambertMaterial'

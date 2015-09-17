@@ -68,7 +68,7 @@
 				scene.add( sphere );
 
 				var geometry = new THREE.CylinderGeometry( 0, 10, 100, 3 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationFromEuler( new THREE.Euler( Math.PI / 2, Math.PI, 0 ) ) );
+				geometry.rotateX( Math.PI / 2 );
 
 				var material = new THREE.MeshNormalMaterial();
 

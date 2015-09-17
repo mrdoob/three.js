@@ -22,7 +22,7 @@
 // [7] ocean_main               -> Vertex and Fragment shader used to create the final render
 
 
-THREE.ShaderLib['ocean_sim_vertex'] = {
+THREE.ShaderLib[ 'ocean_sim_vertex' ] = {
 	varying: {
 		"vUV": { type: "v2" }
 	},
@@ -33,9 +33,9 @@ THREE.ShaderLib['ocean_sim_vertex'] = {
 			'vUV = position.xy * 0.5 + 0.5;',
 			'gl_Position = vec4(position, 1.0 );',
 		'}'
-	].join('\n')
+	].join( '\n' )
 };
-THREE.ShaderLib['ocean_subtransform'] = {
+THREE.ShaderLib[ 'ocean_subtransform' ] = {
 	uniforms: {
 		"u_input": { type: "t", value: null },
 		"u_transformSize": { type: "f", value: 512.0 },
@@ -55,7 +55,7 @@ THREE.ShaderLib['ocean_subtransform'] = {
 		'uniform float u_subtransformSize;',
 
 		'varying vec2 vUV;',
-		
+
 		'vec2 multiplyComplex (vec2 a, vec2 b) {',
 			'return vec2(a[0] * b[0] - a[1] * b[1], a[1] * b[0] + a[0] * b[1]);',
 		'}',
@@ -86,11 +86,11 @@ THREE.ShaderLib['ocean_subtransform'] = {
 
 			'gl_FragColor = vec4(outputA, outputB);',
 		'}'
-	].join('\n')
+	].join( '\n' )
 };
-THREE.ShaderLib['ocean_initial_spectrum'] = {
+THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
 	uniforms: {
-		"u_wind": { type: "v2", value: new THREE.Vector2(10.0, 10.0) },
+		"u_wind": { type: "v2", value: new THREE.Vector2( 10.0, 10.0 ) },
 		"u_resolution": { type: "f", value: 512.0 },
 		"u_size": { type: "f", value: 250.0 },
 	},
@@ -105,7 +105,7 @@ THREE.ShaderLib['ocean_initial_spectrum'] = {
 		'uniform vec2 u_wind;',
 		'uniform float u_resolution;',
 		'uniform float u_size;',
-		
+
 		'float square (float x) {',
 			'return x * x;',
 		'}',
@@ -120,13 +120,13 @@ THREE.ShaderLib['ocean_initial_spectrum'] = {
 
 		'void main (void) {',
 			'vec2 coordinates = gl_FragCoord.xy - 0.5;',
-			
+
 			'float n = (coordinates.x < u_resolution * 0.5) ? coordinates.x : coordinates.x - u_resolution;',
 			'float m = (coordinates.y < u_resolution * 0.5) ? coordinates.y : coordinates.y - u_resolution;',
-			
+
 			'vec2 K = (2.0 * PI * vec2(n, m)) / u_size;',
 			'float k = length(K);',
-			
+
 			'float l_wind = length(u_wind);',
 
 			'float Omega = 0.84;',
@@ -166,9 +166,9 @@ THREE.ShaderLib['ocean_initial_spectrum'] = {
 			'}',
 			'gl_FragColor = vec4(h, 0.0, 0.0, 0.0);',
 		'}'
-	].join('\n')
+	].join( '\n' )
 };
-THREE.ShaderLib['ocean_phase'] = {
+THREE.ShaderLib[ 'ocean_phase' ] = {
 	uniforms: {
 		"u_phases": { type: "t", value: null },
 		"u_deltaTime": { type: "f", value: null },
@@ -206,12 +206,12 @@ THREE.ShaderLib['ocean_phase'] = {
 			'float phase = texture2D(u_phases, vUV).r;',
 			'float deltaPhase = omega(length(waveVector)) * u_deltaTime;',
 			'phase = mod(phase + deltaPhase, 2.0 * PI);',
-		
+
 			'gl_FragColor = vec4(phase, 0.0, 0.0, 0.0);',
 		'}'
-	].join('\n')
+	].join( '\n' )
 };
-THREE.ShaderLib['ocean_spectrum'] = {
+THREE.ShaderLib[ 'ocean_spectrum' ] = {
 	uniforms: {
 		"u_size": { type: "f", value: null },
 		"u_resolution": { type: "f", value: null },
@@ -273,12 +273,12 @@ THREE.ShaderLib['ocean_spectrum'] = {
 				'hX = vec2(0.0);',
 				'hZ = vec2(0.0);',
 			'}',
-		
+
 			'gl_FragColor = vec4(hX + multiplyByI(h), hZ);',
 		'}'
-	].join('\n')
+	].join( '\n' )
 };
-THREE.ShaderLib['ocean_normals'] = {
+THREE.ShaderLib[ 'ocean_normals' ] = {
 	uniforms: {
 		"u_displacementMap": { type: "t", value: null },
 		"u_resolution": { type: "f", value: null },
@@ -291,7 +291,7 @@ THREE.ShaderLib['ocean_normals'] = {
 		'precision highp float;',
 
 		'varying vec2 vUV;',
-		
+
 		'uniform sampler2D u_displacementMap;',
 		'uniform float u_resolution;',
 		'uniform float u_size;',
@@ -310,12 +310,12 @@ THREE.ShaderLib['ocean_normals'] = {
 			'vec3 topLeft = cross(top, left);',
 			'vec3 bottomLeft = cross(left, bottom);',
 			'vec3 bottomRight = cross(bottom, right);',
-		
+
 			'gl_FragColor = vec4(normalize(topRight + topLeft + bottomLeft + bottomRight), 1.0);',
 		'}'
-	].join('\n')
+	].join( '\n' )
 };
-THREE.ShaderLib['ocean_main'] = {
+THREE.ShaderLib[ 'ocean_main' ] = {
 	uniforms: {
 		"u_displacementMap": { type: "t", value: null },
 		"u_normalMap": { type: "t", value: null },
@@ -335,7 +335,7 @@ THREE.ShaderLib['ocean_main'] = {
 	},
 	vertexShader: [
 		'precision highp float;',
-		
+
 		'varying vec3 vPos;',
 		'varying vec2 vUV;',
 
@@ -351,7 +351,7 @@ THREE.ShaderLib['ocean_main'] = {
 			'vUV = uv;',
 			'gl_Position = u_projectionMatrix * u_viewMatrix * vec4(newPos, 1.0);',
 		'}'
-	].join('\n'),
+	].join( '\n' ),
 	fragmentShader: [
 		'precision highp float;',
 
@@ -384,5 +384,5 @@ THREE.ShaderLib['ocean_main'] = {
 
 			'gl_FragColor = vec4(hdr(color, u_exposure), 1.0);',
 		'}'
-	].join('\n')
+	].join( '\n' )
 };

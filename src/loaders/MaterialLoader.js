@@ -5,6 +5,7 @@
 THREE.MaterialLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.textures = {};
 
 };
 
@@ -32,10 +33,32 @@ THREE.MaterialLoader.prototype = {
 
 	},
 
+	setTextures: function ( value ) {
+
+		this.textures = value;
+
+	},
+
+	getTexture: function ( name ) {
+
+		var textures = this.textures;
+
+		if ( textures[ name ] === undefined ) {
+
+			console.warn( 'THREE.MaterialLoader: Undefined texture', name );
+
+		}
+
+		return textures[ name ];
+
+	},
+
 	parse: function ( json ) {
 
 		var material = new THREE[ json.type ];
+		material.uuid = json.uuid;
 
+		if ( json.name !== undefined ) material.name = json.name;
 		if ( json.color !== undefined ) material.color.setHex( json.color );
 		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
 		if ( json.specular !== undefined ) material.specular.setHex( json.specular );
@@ -49,11 +72,55 @@ THREE.MaterialLoader.prototype = {
 		if ( json.side !== undefined ) material.side = json.side;
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
+		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
+		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
+		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
+		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 
-		// for PointCloudMaterial
+		// for PointsMaterial
 		if ( json.size !== undefined ) material.size = json.size;
 		if ( json.sizeAttenuation !== undefined ) material.sizeAttenuation = json.sizeAttenuation;
+
+		// maps
+
+		if ( json.map !== undefined ) material.map = this.getTexture( json.map );
+
+		if ( json.alphaMap !== undefined ) {
+
+			material.alphaMap = this.getTexture( json.alphaMap );
+			material.transparent = true;
+
+		}
+
+		if ( json.bumpMap !== undefined ) material.bumpMap = this.getTexture( json.bumpMap );
+		if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
+
+		if ( json.normalMap !== undefined ) material.normalMap = this.getTexture( json.normalMap );
+		if ( json.normalScale )	material.normalScale = new THREE.Vector2( json.normalScale, json.normalScale );
+
+		if ( json.displacementMap !== undefined ) material.displacementMap = this.getTexture( json.displacementMap );
+		if ( json.displacementScale !== undefined ) material.displacementScale = json.displacementScale;
+		if ( json.displacementBias !== undefined ) material.displacementBias = json.displacementBias;
+
+		if ( json.specularMap !== undefined ) material.specularMap = this.getTexture( json.specularMap );
+
+		if ( json.envMap !== undefined ) {
+
+			material.envMap = this.getTexture( json.envMap );
+			material.combine = THREE.MultiplyOperation;
+
+		}
+
+		if ( json.reflectivity ) material.reflectivity = json.reflectivity;
+
+		if ( json.lightMap !== undefined ) material.lightMap = this.getTexture( json.lightMap );
+		if ( json.lightMapIntensity !== undefined ) material.lightMapIntensity = json.lightMapIntensity;
+
+		if ( json.aoMap !== undefined ) material.aoMap = this.getTexture( json.aoMap );
+		if ( json.aoMapIntensity !== undefined ) material.aoMapIntensity = json.aoMapIntensity;
+
+		// MeshFaceMaterial
 
 		if ( json.materials !== undefined ) {
 

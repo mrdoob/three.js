@@ -23,7 +23,6 @@
 			}
 
 			a {
-
 				color: #0080ff;
 			}
 
@@ -78,11 +77,9 @@
 
 				//
 
-				var triangles = 160000;
+				var triangles = 500000;
 
 				var geometry = new THREE.BufferGeometry();
-
-
 
 				var indices = new Uint32Array( triangles * 3 );
 
@@ -190,7 +187,7 @@
 
 				}
 
-				geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );

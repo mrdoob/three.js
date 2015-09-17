@@ -29,7 +29,7 @@ THREE.MD2Character = function () {
 
 		this.loadCounter = config.weapons.length * 2 + config.skins.length + 1;
 
-		var weaponsTextures = []
+		var weaponsTextures = [];
 		for ( var i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ];
 
 		// SKINS
@@ -39,7 +39,7 @@ THREE.MD2Character = function () {
 
 		// BODY
 
-		var loader = new THREE.JSONLoader();
+		var loader = new THREE.MD2Loader();
 
 		loader.load( config.baseUrl + config.body, function( geo ) {
 
@@ -79,7 +79,7 @@ THREE.MD2Character = function () {
 
 			}
 
-		}
+		};
 
 		for ( var i = 0; i < config.weapons.length; i ++ ) {
 
@@ -195,22 +195,17 @@ THREE.MD2Character = function () {
 
 		return textures;
 
-	};
+	}
 
 	function createPart( geometry, skinMap ) {
 
-		geometry.computeMorphNormals();
-
-		var whiteMap = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
-		var materialWireframe = new THREE.MeshPhongMaterial( { color: 0xffaa00, specular: 0x111111, shininess: 50, wireframe: true, shading: THREE.SmoothShading, map: whiteMap, morphTargets: true, morphNormals: true, metal: false } );
-
-		var materialTexture = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 50, wireframe: false, shading: THREE.SmoothShading, map: skinMap, morphTargets: true, morphNormals: true, metal: false } );
-		materialTexture.wrapAround = true;
+		var materialWireframe = new THREE.MeshLambertMaterial( { color: 0xffaa00, wireframe: true, morphTargets: true, morphNormals: true } );
+		var materialTexture = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: false, map: skinMap, morphTargets: true, morphNormals: true } );
 
 		//
 
 		var mesh = new THREE.MorphAnimMesh( geometry, materialTexture );
-		mesh.rotation.y = -Math.PI / 2;
+		mesh.rotation.y = - Math.PI / 2;
 
 		mesh.castShadow = true;
 		mesh.receiveShadow = true;
@@ -229,7 +224,7 @@ THREE.MD2Character = function () {
 
 		return mesh;
 
-	};
+	}
 
 	function checkLoadingComplete() {
 
@@ -237,6 +232,6 @@ THREE.MD2Character = function () {
 
 		if ( scope.loadCounter === 0 ) scope.onLoadComplete();
 
-	};
+	}
 
 };
