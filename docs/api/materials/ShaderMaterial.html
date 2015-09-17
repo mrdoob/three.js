@@ -72,12 +72,11 @@
 		</p>
 
 		<h3>Custom attributes and uniforms</h3>
-		Both custom attributes and uniforms must be declared in your GLSL shader code (within *vertexShader* and/or *fragmentShader*). Custom uniforms must be defined in <emph>both</emph> the *uniforms* property of your *ShaderMaterial*, and any custom attributes must be defined via [page:BufferAttribute] instances. Note that *varying*s only need to be declared within the shader code (not within the material).
+		<p>Both custom attributes and uniforms must be declared in your GLSL shader code (within *vertexShader* and/or *fragmentShader*). Custom uniforms must be defined in <emph>both</emph> the *uniforms* property of your *ShaderMaterial*, whereas any custom attributes must be defined via [page:BufferAttribute] instances. Note that *varying*s only need to be declared within the shader code (not within the material).
 		</p>
 
 		<p>To declare a custom attribute, please reference the [page:BufferGeometry] page for an overview, and the [page:BufferAttribute] page for a detailed look at the *BufferAttribute* API.</p>
-		<p>When creating your attibutes, each typed array that you create to hold your attibute's data must be a multiple of your data type's size. For example, if your attribute is a [page:Vector3 THREE.Vector3] type, and you have 3000 vertices in your [page:BufferGeometry], your typed array value must be created with a length of 3000 * 3, or 9000 (one value per-component). A table of each data type's size is shown below for reference:</p>
-
+		<p>When creating your attributes, each typed array that you create to hold your attribute's data must be a multiple of your data type's size. For example, if your attribute is a [page:Vector3 THREE.Vector3] type, and you have 3000 vertices in your [page:BufferGeometry], your typed array value must be created with a length of 3000 * 3, or 9000 (one value per-component). A table of each data type's size is shown below for reference:</p>
 
 		<table>
 			<caption><a id="attribute-sizes">Attribute sizes</a></caption>
