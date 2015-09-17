@@ -26,7 +26,7 @@
 
 		<div id="info">
 		"W" translate | "E" rotate | "R" scale | "+" increase size | "-" decrease size<br />
-		Press "Q" to toggle world/local space, press "S" to toggle grid snapping
+		Press "Q" to toggle world/local space, keep "Ctrl" down to snap to grid
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -78,7 +78,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-
 				window.addEventListener( 'keydown', function ( event ) {
 
 					switch ( event.keyCode ) {
@@ -87,8 +86,9 @@
 							control.setSpace( control.space === "local" ? "world" : "local" );
 							break;
 
-						case 83: // S
-							control.setSnap( control.snap === null ? 100 : null );
+						case 17: // Ctrl
+							control.setTranslationSnap( 100 );
+							control.setRotationSnap( 15 );
 							break;
 
 						case 87: // W
@@ -111,6 +111,19 @@
 						case 189:
 						case 109: // -, _, num-
 							control.setSize( Math.max( control.size - 0.1, 0.1 ) );
+							break;
+
+					}
+
+				});
+
+				window.addEventListener( 'keyup', function ( event ) {
+
+					switch ( event.keyCode ) {
+
+						case 17: // Ctrl
+							control.setTranslationSnap( null );
+							control.setRotationSnap( null );
 							break;
 
 					}
