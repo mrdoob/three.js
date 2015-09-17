@@ -560,11 +560,7 @@ class Geometry(base_classes.BaseNode):
             self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(
                 self.node, bone_map, influences) or []
 
-        if self.options.get(constants.MORPH_TARGETS):
-            logger.info("Parsing %s", constants.MORPH_TARGETS)
-            self[constants.MORPH_TARGETS] = api.mesh.morph_targets(
-                self.node, self.options) or []
-        elif self.options.get(constants.BLEND_SHAPES):
+        if self.options.get(constants.BLEND_SHAPES):
             logger.info("Parsing %s", constants.BLEND_SHAPES)
             mt = api.mesh.blend_shapes(self.node, self.options) or []
             self[constants.MORPH_TARGETS] = mt
@@ -574,6 +570,10 @@ class Geometry(base_classes.BaseNode):
                 merge = self._scene[constants.ANIMATION][0][constants.KEYFRAMES]
                 for track in tracks:
                     merge.append(track)
+        elif self.options.get(constants.MORPH_TARGETS):
+            logger.info("Parsing %s", constants.MORPH_TARGETS)
+            self[constants.MORPH_TARGETS] = api.mesh.morph_targets(
+                self.node, self.options) or []
 
         # In the moment there is no way to add extra data to a Geomtry in
         # Three.js. In case there is some day, here is the code:
