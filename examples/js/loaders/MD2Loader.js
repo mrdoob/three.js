@@ -305,7 +305,7 @@ THREE.MD2Loader.prototype = {
 
 			}
 
-			geometry.clips = THREE.AnimationClip.CreateClipsFromMorphTargetSequences( geometry.morphTargets, 10 )
+			geometry.animations = THREE.AnimationClip.CreateClipsFromMorphTargetSequences( geometry.morphTargets, 10 )
 
 			console.timeEnd( 'MD2Loader' );
 

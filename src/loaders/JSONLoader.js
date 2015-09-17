@@ -75,7 +75,7 @@ THREE.JSONLoader.prototype = {
 
 		parseSkin();
 		parseMorphing( scale );
-		parseClips();
+		parseAnimations();
 
 		geometry.computeFaceNormals();
 		geometry.computeBoundingSphere();
@@ -481,19 +481,9 @@ THREE.JSONLoader.prototype = {
 			}
 		}
 
-		function parseClips() {
+		function parseAnimations() {
 
-			geometry.clips = [];
-
-			// parse new style Clips
-			var clips = json.clips || [];
-
-			for( var i = 0; i < clips.length; i ++ ) {
-
-				var clip = THREE.AnimationClip.parse( clips[i] );
-				if( clip ) geometry.clips.push( clip );
-
-			}
+			var outputAnimations = [];
 
 			// parse old style Bone/Hierarchy animations
 			var animations = [];
@@ -512,7 +502,7 @@ THREE.JSONLoader.prototype = {
 			for( var i = 0; i < animations.length; i ++ ) {
 
 				var clip = THREE.AnimationClip.parseAnimation( animations[i], geometry.bones );
-				if( clip ) geometry.clips.push( clip );
+				if( clip ) outputAnimations.push( clip );
 
 			}
 
@@ -521,9 +511,11 @@ THREE.JSONLoader.prototype = {
 
 				// TODO: Figure out what an appropraite FPS is for morph target animations -- defaulting to 10, but really it is completely arbitrary.
 				var morphAnimationClips = THREE.AnimationClip.CreateClipsFromMorphTargetSequences( geometry.morphTargets, 10 );
-				geometry.clips = geometry.clips.concat( morphAnimationClips );
+				outputAnimations = outputAnimations.concat( morphAnimationClips );
 
 			}
+
+			if( outputAnimations.length > 0 ) geometry.animations = outputAnimations;
 
 		};
 

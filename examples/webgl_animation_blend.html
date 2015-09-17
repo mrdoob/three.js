@@ -124,7 +124,6 @@
 				var loader = new THREE.ObjectLoader();
 				loader.load( "models/json/blend-animation.json", function ( loadedScene ) {
 
-					//sceneAnimationClip = loadedScene.clips[0];
 					scene = loadedScene;
 					console.log( scene );
 					scene.add( camera );
@@ -132,9 +131,7 @@
 		
 				
 					var blendObject = scene.getObjectByName( 'tree-morph' );
-					console.log( blendObject );
-					var clip = blendObject.geometry.clips[0];
-					console.log( clip );
+					var clip = blendObject.geometry.animations[0];
 					mixer = new THREE.AnimationMixer( blendObject );
 					mixer.addAction( new THREE.AnimationAction( clip ) );
 

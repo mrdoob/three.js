@@ -502,7 +502,7 @@
 					mesh.speed = speed;
 
 					var mixer = new THREE.AnimationMixer( mesh );
-					mixer.addAction( new THREE.AnimationAction( geometry.clips[0] ).warpToDuration( duration ) );
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( duration ) );
 					mixer.update( 600 * Math.random() );
 					mesh.mixer = mixer;
 

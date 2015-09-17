@@ -4,7 +4,7 @@
 
 THREE.BlendCharacter = function () {
 
-	this.clips = {};
+	this.animations = {};
 	this.weightSchedule = [];
 	this.warpSchedule = [];
 
@@ -23,10 +23,10 @@ THREE.BlendCharacter = function () {
 			scope.mixer = new THREE.AnimationMixer( scope );
 
 			// Create the animations		
-			for ( var i = 0; i < geometry.clips.length; ++ i ) {
+			for ( var i = 0; i < geometry.animations.length; ++ i ) {
 
-				var animName = geometry.clips[ i ].name;
-				scope.clips[ animName ] = geometry.clips[ i ];
+				var animName = geometry.animations[ i ].name;
+				scope.animations[ animName ] = geometry.animations[ i ];
 
 			}
 
@@ -47,7 +47,7 @@ THREE.BlendCharacter = function () {
 
 		this.mixer.removeAllActions();
 		
-		this.mixer.play( new THREE.AnimationAction( this.clips[ animName ] ) );
+		this.mixer.play( new THREE.AnimationAction( this.animations[ animName ] ) );
 
 	};
 
@@ -55,8 +55,8 @@ THREE.BlendCharacter = function () {
 
 		this.mixer.removeAllActions();
  
-		var fromAction = new THREE.AnimationAction( this.clips[ fromAnimName ] );
-		var toAction = new THREE.AnimationAction( this.clips[ toAnimName ] );
+		var fromAction = new THREE.AnimationAction( this.animations[ fromAnimName ] );
+		var toAction = new THREE.AnimationAction( this.animations[ toAnimName ] );
 
 		this.mixer.play( fromAction );
 		this.mixer.play( toAction );
@@ -69,8 +69,8 @@ THREE.BlendCharacter = function () {
 
 		this.mixer.removeAllActions();
 
-		var fromAction = new THREE.AnimationAction( this.clips[ fromAnimName ] );
-		var toAction = new THREE.AnimationAction( this.clips[ toAnimName ] );
+		var fromAction = new THREE.AnimationAction( this.animations[ fromAnimName ] );
+		var toAction = new THREE.AnimationAction( this.animations[ toAnimName ] );
 
 		this.mixer.play( fromAction );
 		this.mixer.play( toAction );

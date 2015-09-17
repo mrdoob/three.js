@@ -254,7 +254,7 @@
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.speed = speed;
 
-					mixer.addAction( new THREE.AnimationAction( geometry.clips[0], Math.random() ).warpToDuration( duration ).setLocalRoot( mesh ) );
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[0], Math.random() ).warpToDuration( duration ).setLocalRoot( mesh ) );
 				
 					mesh.position.set( x, y, z );
 					mesh.rotation.y = Math.PI/2;

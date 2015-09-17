@@ -124,7 +124,8 @@
 				var loader = new THREE.ObjectLoader();
 				loader.load( "models/json/scene-animation.json", function ( loadedScene ) {
 
-					sceneAnimationClip = loadedScene.clips[0];
+					sceneAnimationClip = loadedScene.animations[0];
+					console.log('sceneAnimationClip', sceneAnimationClip);
 					scene = loadedScene;
 					scene.add( camera );
 					scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );

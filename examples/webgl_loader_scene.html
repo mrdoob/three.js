@@ -211,10 +211,10 @@
 
 						if ( object instanceof THREE.Mesh ) {
 
-							if( object.geometry && object.geometry.clips && object.geometry.clips.length > 0 ) {
+							if( object.geometry && object.geometry.animations && object.geometry.animations.length > 0 ) {
 
 								var mixer = new THREE.AnimationMixer( object );
-								mixer.addAction( new THREE.AnimationAction( object.geometry.clips[0] ) );
+								mixer.addAction( new THREE.AnimationAction( object.geometry.animations[0] ) );
 								mixers.push( mixer );
 
 							}

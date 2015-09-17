@@ -1,5 +1,5 @@
 /**
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  */
 
 THREE.Box2 = function ( min, max ) {

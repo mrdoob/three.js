@@ -234,7 +234,7 @@
 
 	
 				var clipMorpher = THREE.AnimationClip.CreateFromMorphTargetSequence( 'facialExpressions', mesh.geometry.morphTargets, 3 );
-				var clipBones = geometry.clips[0];
+				var clipBones = geometry.animations[0];
 
 				mixer = new THREE.AnimationMixer( mesh );
 				mixer.addAction( new THREE.AnimationAction( clipMorpher ) );

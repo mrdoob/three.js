@@ -58,13 +58,12 @@ THREE.ObjectLoader.prototype = {
 		var textures  = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
 
-		var tracks = [];
+		var object = this.parseObject( json.object, geometries, materials );
 
-		var object = this.parseObject( json.object, geometries, materials, tracks );
-
-		if( tracks.length > 0 ) {
-
-			object.clips = [ new THREE.AnimationClip( "default", -1, tracks ) ];
+		if( json.animations ) {
+			console.log( json.animations );
+			object.animations = this.parseAnimations( json.animations );
+			console.log( object.animations );
 
 		}
 
@@ -377,6 +376,22 @@ THREE.ObjectLoader.prototype = {
 
 	},
 
+	parseAnimations: function ( json ) {
+
+		var animations = [];
+
+		for( var i = 0; i < json.length; i ++ ) {
+
+			var clip = THREE.AnimationClip.parse( json[i] );
+
+			animations.push( clip );
+
+		}
+
+		return animations;
+
+	},
+
 	parseImages: function ( json, onLoad ) {
 
 		var scope = this;
@@ -481,7 +496,7 @@ THREE.ObjectLoader.prototype = {
 
 		var matrix = new THREE.Matrix4();
 
-		return function ( data, geometries, materials, tracks ) {
+		return function ( data, geometries, materials ) {
 
 			var object;
 
@@ -627,32 +642,9 @@ THREE.ObjectLoader.prototype = {
 
 				for ( var child in data.children ) {
 
-					object.add( this.parseObject( data.children[ child ], geometries, materials, tracks ) );
+					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
 
 				}
-
-			}
-			if( data.clips ) {
-
-				// NOTE: only reading the first clip if it exists.  We can add multiple clip support in the future with this design.
-				//  For multiple clip support we should merge clips on different nodes with the clips that have the same names.  Thus
-				//  One will end up with a few named clips for the scene composed of merged tracks from individual nodes.
-				for( var i = 0; i < Math.min( 1, data.clips.length ); i ++ ) {
-
-					var dataClips = data.clips[i];
-					var dataTracks = dataClips.tracks || [];
-					var fpsToSeconds = 1.0 / ( dataClips.fps || 30 );
-
-					for( var i = 0; i < dataTracks.length; i ++ ) {
-
-						var track = THREE.KeyframeTrack.parse( dataTracks[i] ).scale( fpsToSeconds );
-						track.name = object.uuid + '.' + track.name;
-						tracks.push( track );
-						
-					}
-
-				}
-				if( data.clips.length > 1 ) console.warn( "THREE.ObjectLoader: more than one clip specified on node, not yet supported" );
 
 			}
 
