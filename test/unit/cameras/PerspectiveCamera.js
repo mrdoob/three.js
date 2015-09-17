@@ -5,16 +5,8 @@
 module( "PerspectiveCamera" );
 
 test( "updateProjectionMatrix", function() {
-	var near = 1,
-			far = 3,
-			bottom = -1,
-			top = 1,
-			aspect = 16 / 9,
-			left = -top * aspect,
-			right = -bottom * aspect,
-			fov = 90;
 
-	var cam = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	var cam = new THREE.PerspectiveCamera( 75, 16 / 9, 0.1, 300.0 );
 
 	// updateProjectionMatrix is called in contructor
 	var m = cam.projectionMatrix;
@@ -23,12 +15,14 @@ test( "updateProjectionMatrix", function() {
 	// 2n/r-l		0			l+r/r-l				 0
 	//   0		2n/t-b	t+b/t-b				 0
 	//   0			0		-(f+n/f-n)	-(2fn/f-n)
-	//   0			0				-1						 0
+	//   0			0				-1					 0
 
+	// this matrix was calculated by hand via glMatrix.perspective(75, 16 / 9, 0.1, 300.0, pMatrix)
+	// to get a reference matrix from plain WebGL
 	var reference = new THREE.Matrix4().set(
-		( 2 * near ) / ( right - left ), 0, ( right + left ) / ( right - left ), 0,
-		0, ( 2 * near ) / ( top - bottom ), ( top + bottom ) / ( top - bottom ), 0,
-		0, 0, - ( far + near ) / ( far - near ), - ( 2 * near * far ) / ( far - near ),
+		0.7330642938613892, 0, 0, 0,
+		0, 1.3032253980636597, 0, 0,
+		0, 0, -1.000666856765747, -0.2000666856765747,
 		0, 0, -1, 0
 	);
 
