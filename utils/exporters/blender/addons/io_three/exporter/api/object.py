@@ -180,6 +180,8 @@ def animated_xform(obj, options):
         return []
     fcurves = fcurves.action.fcurves
 
+    objName = obj.name
+
     tracks = []
     i = 0
     nb_curves = len(fcurves)
@@ -202,7 +204,7 @@ def animated_xform(obj, options):
         track = []
         track_loc.append(track)
         tracks.append({
-            constants.NAME: field_info[0],
+            constants.NAME: objName+field_info[0],
             constants.TYPE: field_info[2],
             constants.KEYS: track
         })
@@ -228,12 +230,7 @@ def animated_xform(obj, options):
     context.scene.frame_set(original_frame, 0.0)  # restore to original frame
 
     # TODO: remove duplicated key frames
-
-    return [{
-        constants.KEYFRAMES: tracks,
-        constants.FPS: context.scene.render.fps,
-        constants.NAME: obj.name
-    }]
+    return tracks
 
 @_object
 def mesh(obj, options):

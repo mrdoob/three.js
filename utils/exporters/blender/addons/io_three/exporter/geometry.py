@@ -568,9 +568,12 @@ class Geometry(base_classes.BaseNode):
             logger.info("Parsing %s", constants.BLEND_SHAPES)
             mt = api.mesh.blend_shapes(self.node, self.options) or []
             self[constants.MORPH_TARGETS] = mt
-            if len(mt) > 0:  # there's blend shapes, let check for animation
-                self[constants.CLIPS] = api.mesh.animated_blend_shapes(self.node, self.options) or []
-
+            if len(mt) > 0 and self._scene:  # there's blend shapes, let check for animation
+                #self[constants.CLIPS] = api.mesh.animated_blend_shapes(self.node, self.options) or []
+                tracks = api.mesh.animated_blend_shapes(self.node, self[constants.NAME], self.options) or []
+                merge = self._scene[constants.ANIMATION][0][constants.KEYFRAMES]
+                for track in tracks:
+                    merge.append(track)
 
         # In the moment there is no way to add extra data to a Geomtry in
         # Three.js. In case there is some day, here is the code:

@@ -458,7 +458,7 @@ def blend_shapes(mesh, options):
     return manifest
 
 @_mesh
-def animated_blend_shapes(mesh, options):
+def animated_blend_shapes(mesh, name, options):
     """
 
     :param mesh:
@@ -473,7 +473,7 @@ def animated_blend_shapes(mesh, options):
         animCurves = animCurves.action.fcurves
 
     for key in shp.key_blocks.keys()[1:]:    # skip "Basis"
-        key_name = ".morphTargetInfluences["+key+"]"
+        key_name = name+".morphTargetInfluences["+key+"]"
         found_animation = False
         data_path = 'key_blocks["'+key+'"].value'
         values = []
@@ -492,12 +492,7 @@ def animated_blend_shapes(mesh, options):
                 constants.KEYS: values
             });
 
-    animation = [{
-        constants.KEYFRAMES: tracks,
-        constants.FPS: context.scene.render.fps,
-        constants.NAME: "default"
-    }]
-    return animation
+    return tracks
 
 @_mesh
 def materials(mesh, options):
