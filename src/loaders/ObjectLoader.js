@@ -61,9 +61,8 @@ THREE.ObjectLoader.prototype = {
 		var object = this.parseObject( json.object, geometries, materials );
 
 		if( json.animations ) {
-			console.log( json.animations );
+
 			object.animations = this.parseAnimations( json.animations );
-			console.log( object.animations );
 
 		}
 
