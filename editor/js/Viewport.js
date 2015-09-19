@@ -283,7 +283,7 @@ var Viewport = function ( editor ) {
 
 	signals.snapChanged.add( function ( dist ) {
 
-		transformControls.setSnap( dist );
+		transformControls.setTranslationSnap( dist );
 
 	} );
 
