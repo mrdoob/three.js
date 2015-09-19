@@ -803,7 +803,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( group === undefined ) {
+		if ( group === null ) {
 
 			var count;
 
@@ -1338,7 +1338,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					} else {
 
-						pushRenderItem( object, geometry, material, _vector3.z );
+						pushRenderItem( object, geometry, material, _vector3.z, null );
 
 					}
 
