@@ -14,6 +14,24 @@ THREE.VREffect = function ( renderer, onError ) {
 	var vrHMD;
 	var eyeTranslationL, eyeFOVL;
 	var eyeTranslationR, eyeFOVR;
+	var stereoTransformL = new THREE.Matrix4(),
+		stereoTransformR = new THREE.Matrix4();
+
+	var scale = 1;
+	Object.defineProperty( this, 'scale', {
+		get: function () {
+
+			return scale;
+
+		},
+		set: function ( s ) {
+
+			scale = s;
+			stereoTransformL.makeTranslation( scale * eyeTranslationL.x, scale * eyeTranslationL.y, scale * eyeTranslationL.z );
+			stereoTransformR.makeTranslation( scale * eyeTranslationR.x, scale * eyeTranslationR.y, scale * eyeTranslationR.z );
+
+		}
+	} );
 
 	function gotVRDevices( devices ) {
 
@@ -44,6 +62,8 @@ THREE.VREffect = function ( renderer, onError ) {
 
 				}
 
+				this.scale = 1;
+
 				break; // We keep the first we encounter
 
 			}
@@ -60,13 +80,11 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	if ( navigator.getVRDevices ) {
 
-		navigator.getVRDevices().then( gotVRDevices );
+		navigator.getVRDevices().then( gotVRDevices.bind( this ) );
 
 	}
 
 	//
-
-	this.scale = 1;
 
 	this.setSize = function( width, height ) {
 
@@ -109,11 +127,15 @@ THREE.VREffect = function ( renderer, onError ) {
 	var cameraL = new THREE.PerspectiveCamera();
 	var cameraR = new THREE.PerspectiveCamera();
 
+	cameraL.matrixAutoUpdate = false;
+	cameraR.matrixAutoUpdate = false;
+
 	this.render = function ( scene, camera ) {
 
 		if ( vrHMD ) {
 
 			var sceneL, sceneR;
+			var autoUpdate;
 
 			if ( Array.isArray( scene ) ) {
 
@@ -124,6 +146,14 @@ THREE.VREffect = function ( renderer, onError ) {
 
 				sceneL = scene;
 				sceneR = scene;
+
+				if ( scene.autoUpdate === true ) {
+
+					scene.updateMatrixWorld();
+					autoUpdate = scene.autoUpdate;
+					scene.autoUpdate = false;
+
+				}
 
 			}
 
@@ -138,23 +168,25 @@ THREE.VREffect = function ( renderer, onError ) {
 			cameraL.projectionMatrix = fovToProjection( eyeFOVL, true, camera.near, camera.far );
 			cameraR.projectionMatrix = fovToProjection( eyeFOVR, true, camera.near, camera.far );
 
-			camera.matrixWorld.decompose( cameraL.position, cameraL.quaternion, cameraL.scale );
-			camera.matrixWorld.decompose( cameraR.position, cameraR.quaternion, cameraR.scale );
-
-			cameraL.translateX( eyeTranslationL.x * this.scale );
-			cameraR.translateX( eyeTranslationR.x * this.scale );
-
 			// render left eye
 			renderer.setViewport( 0, 0, size.width, size.height );
 			renderer.setScissor( 0, 0, size.width, size.height );
+			cameraL.matrixWorld.multiplyMatrices( camera.matrixWorld, stereoTransformL );
 			renderer.render( sceneL, cameraL );
 
 			// render right eye
 			renderer.setViewport( size.width, 0, size.width, size.height );
 			renderer.setScissor( size.width, 0, size.width, size.height );
+			cameraR.matrixWorld.multiplyMatrices( camera.matrixWorld, stereoTransformR );
 			renderer.render( sceneR, cameraR );
 
 			renderer.enableScissorTest( false );
+
+			if ( autoUpdate === true ) {
+
+				scene.autoUpdate = true;
+
+			}
 
 			return;
 
