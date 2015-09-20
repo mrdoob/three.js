@@ -2,11 +2,11 @@
  * Created by Daniel on 21.07.15.
  */
 
-CmdToggleBoolean = function ( object, attributeName ) {
+CmdToggleBooleanMaterial = function ( object, attributeName ) {
 
 	Cmd.call( this );
 
-	this.type = 'CmdToggleBoolean';
+	this.type = 'CmdToggleBooleanMaterial';
 
 	this.object = object;
 	this.attributeName = attributeName;
@@ -14,19 +14,19 @@ CmdToggleBoolean = function ( object, attributeName ) {
 
 };
 
-CmdToggleBoolean.prototype = {
+CmdToggleBooleanMaterial.prototype = {
 
 	execute: function () {
 
-		this.object[ this.attributeName ] = !this.object[ this.attributeName ];
-		this.editor.signals.objectChanged.dispatch( this.object );
+		this.object.material[ this.attributeName ] = !this.object.material[ this.attributeName ];
+		this.editor.signals.materialChanged.dispatch( this.object.material );
 
 	},
 
 	undo: function () {
 
-		this.object[ this.attributeName ] = !this.object[ this.attributeName ];
-		this.editor.signals.objectChanged.dispatch( this.object );
+		this.object.material[ this.attributeName ] = !this.object.material[ this.attributeName ];
+		this.editor.signals.materialChanged.dispatch( this.object.material );
 
 	},
 
