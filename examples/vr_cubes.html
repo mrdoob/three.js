@@ -49,6 +49,7 @@
 		<script src="../build/three.min.js"></script>
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
+		<script src="js/controls/FlyControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -63,6 +64,15 @@
 			var radius = 100, theta = 0;
 			var crosshair;
 
+			var SCENARIO; // in both cases the camera is a child of an object that is moving (magicCarpet in this example)
+			// the camera's local matrix is dynamic, e.g. controlled by vrControls:
+			SCENARIO = "A";
+			// the camera's local matrix is fixed (less common case, it seems to me, but I still like to handle it):
+			//SCENARIO = "B";
+			var magicCarpet;
+			var flyControls;
+			var clock = new THREE.Clock();
+			
 			init();
 			animate();
 
@@ -79,7 +89,7 @@
 				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes';
 				container.appendChild( info );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.2, 10000 );
 
 				scene = new THREE.Scene();
 
@@ -141,6 +151,19 @@
 					fullScreenButton.classList.add('error');
 
 				} );
+
+				if (SCENARIO == "A") {
+					magicCarpet = new THREE.Mesh( new THREE.PlaneGeometry( 1.5, 2 ).rotateX( -Math.PI / 2 ).translate( 0, -1, 0 ) );
+				}
+				else if (SCENARIO == "B") {
+					magicCarpet = new THREE.Mesh( new THREE.PlaneGeometry( 1.5, 2 ).rotateX( -Math.PI / 2 ) );
+					camera.position.y += 1;
+				}
+				magicCarpet.add( camera );
+				scene.add( magicCarpet );
+				flyControls = new THREE.FlyControls( magicCarpet );
+				flyControls.movementSpeed *= 20;
+				flyControls.rollSpeed *= 10;
 
 				fullScreenButton.onclick = function() {
 
@@ -212,7 +235,11 @@
 
 				}
 
-				vrControls.update();
+				var delta = clock.getDelta();
+				flyControls.update( delta );
+				if (SCENARIO == "A") {
+					vrControls.update();
+				}
 
 				crosshair.quaternion.copy( camera.quaternion );
 				crosshair.position.set( 0, 0, 0 );
