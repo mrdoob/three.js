@@ -21,13 +21,16 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	var _depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 	_distanceMaterial, _distanceMaterialMorph, _distanceMaterialSkin, _distanceMaterialMorphSkin;
 
-	var cubeDirections = [new THREE.Vector3(1,0,0), new THREE.Vector3(-1,0,0), new THREE.Vector3(0,1,0),
-						  new THREE.Vector3(0,-1,0), new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,-1)];
+	var cubeDirections = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( - 1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ), 
+						   new THREE.Vector3( 0, 0, - 1 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, - 1, 0 ) ];
 
-	var cubeUps = [new THREE.Vector3(0,-1,0), new THREE.Vector3(0,-1,0), new THREE.Vector3(0,0,1),
-				   new THREE.Vector3(0,0,-1), new THREE.Vector3(0,-1,0), new THREE.Vector3(0,-1,0)];
+	var cubeUps = [ new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ), 
+					new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ),	new THREE.Vector3( 0, 0, - 1 ) ];
 
-    var _vector4 = new THREE.Vector4();
+	var cube2DViewPorts = [ new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(),
+				   			new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4() ];
+
+	var _vector4 = new THREE.Vector4();
 
 	// init
 
@@ -118,7 +121,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	this.render = function ( scene ) {
 
-		var faceCount, isCube;
+		var faceCount, isPointLight;
 
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
@@ -152,12 +155,28 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			if ( light instanceof THREE.PointLight ) {
 
 				faceCount = 6;
-				isCube = true;
+				isPointLight = true;
+
+				var vpWidth = light.shadowMapWidth / 4.0;
+				var vpHeight = light.shadowMapHeight / 2.0;
+
+				// positive X
+				cube2DViewPorts[ 0 ].set( vpWidth * 2, 0, vpWidth, vpHeight );
+				// negative X
+				cube2DViewPorts[ 1 ].set( 0, 0, vpWidth, vpHeight );
+				// positive Z
+				cube2DViewPorts[ 2 ].set( vpWidth * 3, 0, vpWidth, vpHeight );
+				// negative Z
+				cube2DViewPorts[ 3 ].set( vpWidth, 0, vpWidth, vpHeight );
+				// positive Y
+				cube2DViewPorts[ 4 ].set( 0, vpHeight, vpWidth, vpHeight );
+				// negative Y
+				cube2DViewPorts[ 5 ].set( vpWidth * 2, vpHeight, vpWidth, vpHeight );
 
 			} else {
 
 				faceCount = 1;
-				isCube = false;
+				isPointLight = false;
 
 			}
 
@@ -167,7 +186,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				var shadowFilter = THREE.LinearFilter;
 
-				if ( scope.type === THREE.PCFSoftShadowMap ) {
+				if ( scope.type === THREE.PCFSoftShadowMap || light instanceof THREE.PointLight ) {
 
 					shadowFilter = THREE.NearestFilter;
 
@@ -175,17 +194,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
 
-				if ( isCube ) {
-
-					light.shadowMap = new THREE.WebGLRenderTargetCube( light.shadowMapWidth, light.shadowMapWidth, pars );
-					light.shadowMapSize = new  THREE.Vector2( light.shadowMapWidth, light.shadowMapWidth );
-
-				} else {
-
-					light.shadowMap = new THREE.WebGLRenderTarget( light.shadowMapWidth, light.shadowMapHeight, pars );
-					light.shadowMapSize = new THREE.Vector2( light.shadowMapWidth, light.shadowMapHeight );
-
-				}	
+				light.shadowMap = new THREE.WebGLRenderTarget( light.shadowMapWidth, light.shadowMapHeight, pars );
+				light.shadowMapSize = new THREE.Vector2( light.shadowMapWidth, light.shadowMapHeight );
 
 				light.shadowMatrix = new THREE.Matrix4();
 
@@ -203,7 +213,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				} else {
 
-					light.shadowCamera = new THREE.PerspectiveCamera( light.shadowCameraFov, light.shadowMapWidth / light.shadowMapHeight, light.shadowCameraNear, light.shadowCameraFar );
+					light.shadowCamera = new THREE.PerspectiveCamera( light.shadowCameraFov, 1.0, light.shadowCameraNear, light.shadowCameraFar );
 
 				}
 
@@ -225,27 +235,34 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			var shadowCamera = light.shadowCamera;
 
 			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-			shadowCamera.position.copy( _lightPositionWorld);
+			shadowCamera.position.copy( _lightPositionWorld );
+
+			// save the existing viewport so it can be restored later
+			_renderer.getViewport( _vector4 );
+
+			_renderer.setRenderTarget( shadowMap );
+			_renderer.clear();		
 
 			// render shadow map for each cube face (if omni-directional) or
 			// run a single pass if not
 
-			for ( var face = 0; face < faceCount; face++ ){				
-		
-				if( isCube ){
+			for ( var face = 0; face < faceCount; face ++ ) {
+
+				if ( isPointLight ) {
 
 					_lookTarget.copy( shadowCamera.position );
-					_lookTarget.add( cubeDirections[face] );
-					shadowCamera.up.copy( cubeUps[face] );
-					shadowCamera.lookAt( _lookTarget );	
-					shadowMap.activeCubeFace = face;
+					_lookTarget.add( cubeDirections[ face ] );
+					shadowCamera.up.copy( cubeUps[ face ] );
+					shadowCamera.lookAt( _lookTarget );
+					var vpDimensions = cube2DViewPorts[ face ];
+					_renderer.setViewport( vpDimensions.x, vpDimensions.y, vpDimensions.z, vpDimensions.w );
 
 				} else {
 
 					_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
 					shadowCamera.lookAt( _lookTarget );
 
-				}	
+				}
 
 				shadowCamera.updateMatrixWorld();
 				shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
@@ -270,17 +287,13 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 				_frustum.setFromMatrix( _projScreenMatrix );
 
-				// render shadow map	
-
-				_renderer.setRenderTarget( shadowMap );
-				_renderer.clear();
-
 				// set object matrices & frustum culling
 
 				_renderList.length = 0;
 
 				projectObject( scene, shadowCamera );
 
+				// render shadow map
 				// render regular objects
 
 				for ( var j = 0, jl = _renderList.length; j < jl; j ++ ) {
@@ -301,8 +314,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 							if ( groupMaterial.visible === true ) {
 
-								var depthMaterial = getDepthMaterial( object, groupMaterial, isCube, _lightPositionWorld );
-								_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, depthMaterial , object, group );
+								var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
+								_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, depthMaterial, object, group );
 
 							}
 
@@ -310,7 +323,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 					} else {
 
-						var depthMaterial = getDepthMaterial( object, material, isCube, _lightPosition);						
+						var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
 						_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, depthMaterial, object, null );
 
 					}
@@ -318,6 +331,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				}
 
 			}
+
 		}
 
 		// restore GL state
@@ -334,13 +348,15 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
+		_renderer.setViewport( _vector4.x, _vector4.y, _vector4.z, _vector4.w );
+
 		_renderer.resetGLState();
 
 		scope.needsUpdate = false;
 
 	};
 
-	function getDepthMaterial( object, material, isCube, lightPositionWorld) {
+	function getDepthMaterial( object, material, isPointLight, lightPositionWorld ) {
 
 		var geometry = object.geometry;
 
@@ -350,27 +366,29 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var newMaterial;
 
 		var depthMaterial = _depthMaterial;
-		var depthMaterialMorph = _depthMaterialMorph; 
-		var depthMaterialSkin = _depthMaterialSkin; 
+		var depthMaterialMorph = _depthMaterialMorph;
+		var depthMaterialSkin = _depthMaterialSkin;
 		var depthMaterialMorphSkin = _depthMaterialMorphSkin;
 
-		if ( isCube ){
+		if ( isPointLight ) {
 
 			depthMaterial = _distanceMaterial;
-			depthMaterialMorph = _distanceMaterialMorph; 
-			depthMaterialSkin = _distanceMaterialSkin; 
+			depthMaterialMorph = _distanceMaterialMorph;
+			depthMaterialSkin = _distanceMaterialSkin;
 			depthMaterialMorphSkin = _distanceMaterialMorphSkin;
+
 		}
 
 		if ( object.customDepthMaterial || object.customDistanceMaterial ) {
 
-			if ( isCube ){
+			if ( isPointLight ) {
 
 				newMaterial = object.customDistanceMaterial;
 
 			} else {
 
 				newMaterial = object.customDepthMaterial;
+
 			}
 
 		} else if ( useSkinning ) {
@@ -391,12 +409,14 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		newMaterial.wireframe = material.wireframe;
 		newMaterial.wireframeLinewidth = material.wireframeLinewidth;
 
-		if ( isCube ){
+		if ( isPointLight ) {
 
-			if( newMaterial.uniforms.lightPos ){
+			if ( newMaterial.uniforms.lightPos ) {
 
 				newMaterial.uniforms.lightPos.value.copy( lightPositionWorld );
+
 			}
+
 		}
 
 		return newMaterial;
@@ -414,6 +434,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				var material = object.material;
 
 				if ( material.visible === true ) {
+
 					object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 					_renderList.push( object );
 

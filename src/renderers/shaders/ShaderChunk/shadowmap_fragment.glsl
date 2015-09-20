@@ -24,7 +24,9 @@
 		// for point lights, the uniform @vShadowCoord is re-purposed to hold
 		// the distance from the light to the world-space position of the fragment.
 		vec3 lightToPosition = vShadowCoord[ i ].xyz;
-		float cubeTexelSize = 1.0 / shadowMapSize[ i ].x;
+
+		float texelSizeX =  1.0 / shadowMapSize[ i ].x;
+		float texelSizeY =  1.0 / shadowMapSize[ i ].y;
 
 		vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;
 		float shadow = 0.0;
@@ -49,16 +51,20 @@
 
 					if( isPointLight ) {
 
+						float cubeTexelSize = 1.0 / ( shadowMapSize[ i ].x * 0.25 );
+						vec3 baseDirection3D = normalize( lightToPosition );
+						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeX, texelSizeY );
+
 						initGridSamplingDisk();
 
-						float diskRadius = 1.5;
+						float diskRadius = 1.25;
 						float numSamples = 1.0;
 						shadow = 0.0;
 
 						vec3 baseDirection = normalize( lightToPosition );
 						float curDistance = length( lightToPosition );
 
-						float dist = unpack1K( textureCube( shadowCube[ i ],  baseDirection ) );
+						float dist = unpack1K( texture2D( shadowMap[ i ],  baseDirection2D ) ) + 0.1;
 						if ( curDistance >= dist )
 							shadow += 1.0;
 						
@@ -66,15 +72,17 @@
 						for( int s = 0; s < 20; s++ ) {
 						 
 							vec3 offset = gridSamplingDisk[ s ] * diskRadius * cubeTexelSize;
-							dist = unpack1K( textureCube( shadowCube[ i ],  vec3( baseDirection + offset ) ) );
+							vec3 adjustedBaseDirection3D = baseDirection3D + offset;
+							vec2 adjustedBaseDirection2D = cubeToUV( adjustedBaseDirection3D, texelSizeX, texelSizeY );
+							dist = unpack1K( texture2D( shadowMap[ i ],  adjustedBaseDirection2D ) ) + 0.1;
 							if ( curDistance >= dist )
 								shadow += 1.0;
 							numSamples += 1.0;
-							
+
 						}
 
 						shadow /= numSamples;
-						
+
 					} else {
 
 				#endif
@@ -86,30 +94,22 @@
 						/*
 								// nested loops breaks shader compiler / validator on some ATI cards when using OpenGL
 								// must enroll loop manually
-
 							for ( float y = -1.25; y <= 1.25; y += 1.25 )
 								for ( float x = -1.25; x <= 1.25; x += 1.25 ) {
-
 									vec4 rgbaDepth = texture2D( shadowMap[ i ], vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy );
-
 											// doesn't seem to produce any noticeable visual difference compared to simple texture2D lookup
 											//vec4 rgbaDepth = texture2DProj( shadowMap[ i ], vec4( vShadowCoord[ i ].w * ( vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy ), 0.05, vShadowCoord[ i ].w ) );
-
 									float fDepth = unpackDepth( rgbaDepth );
-
 									if ( fDepth < shadowCoord.z )
 										shadow += 1.0;
-
 							}
-
 							shadow /= 9.0;
-
 						*/
 
 						const float shadowDelta = 1.0 / 9.0;
 
-						float xPixelOffset = 1.0 / shadowMapSize[ i ].x;
-						float yPixelOffset = 1.0 / shadowMapSize[ i ].y;
+						float xPixelOffset = texelSizeX;
+						float yPixelOffset = texelSizeY;
 
 						float dx0 = -1.25 * xPixelOffset;
 						float dy0 = -1.25 * yPixelOffset;
@@ -150,40 +150,46 @@
 				#endif
 
 				shadowColor = shadowColor * vec3( ( 1.0 - realShadowDarkness * shadow ) );
-				
+
 			#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
-	
-				#if defined(POINT_LIGHT_SHADOWS)	
+
+				#if defined(POINT_LIGHT_SHADOWS)
 
 					if( isPointLight ) {
 
+						float cubeTexelSize = 1.0 / ( shadowMapSize[ i ].x * 0.25 );
+						vec3 baseDirection3D = normalize( lightToPosition );
+						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeX, texelSizeY );
+
 						initGridSamplingDisk();
 
-						float diskRadius = 2.5;
+						float diskRadius = 2.25;
 						float numSamples = 1.0;
 						shadow = 0.0;
 
 						vec3 baseDirection = normalize( lightToPosition );
 						float curDistance = length( lightToPosition );
 
-						float dist = unpack1K( textureCube( shadowCube[ i ],  baseDirection ) );
+						float dist = unpack1K( texture2D( shadowMap[ i ],  baseDirection2D ) ) + 0.1;
 						if ( curDistance >= dist )
 							shadow += 1.0;
-						
+
 						// evaluate each sampling direction
 						for( int s = 0; s < 20; s++ ) {
-						 
+
 							vec3 offset = gridSamplingDisk[ s ] * diskRadius * cubeTexelSize;
-							dist = unpack1K( textureCube( shadowCube[ i ],  vec3( baseDirection + offset ) ) );
+							vec3 adjustedBaseDirection3D = baseDirection3D + offset;
+							vec2 adjustedBaseDirection2D = cubeToUV( adjustedBaseDirection3D, texelSizeX, texelSizeY );
+							dist = unpack1K( texture2D( shadowMap[ i ],  adjustedBaseDirection2D ) ) + 0.1;
 							if ( curDistance >= dist )
 								shadow += 1.0;
 							numSamples += 1.0;
-							
+
 						}
 
 						shadow /= numSamples;
 
-					} else { 
+					} else {
 
 				#endif
 
@@ -191,8 +197,8 @@
 						// (9 pixel kernel)
 						// http://fabiensanglard.net/shadowmappingPCF/
 
-						float xPixelOffset = 1.0 / shadowMapSize[ i ].x;
-						float yPixelOffset = 1.0 / shadowMapSize[ i ].y;
+						float xPixelOffset = texelSizeX;
+						float yPixelOffset = texelSizeY;
 
 						float dx0 = -1.0 * xPixelOffset;
 						float dy0 = -1.0 * yPixelOffset;
@@ -247,17 +253,19 @@
 
 				#if defined(POINT_LIGHT_SHADOWS)
 
-					if( isPointLight ) {		
+					if( isPointLight ) {
 
-							vec4 data = textureCube( shadowCube[ i ],  normalize( lightToPosition ) );
-							float dist = unpack1K( data );
-							if ( length( lightToPosition ) >= dist)
-								shadowColor = shadowColor * vec3( 1.0 - realShadowDarkness );
-							
+						vec3 baseDirection3D = normalize( lightToPosition );
+						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeX, texelSizeY );
+						vec4 data = texture2D( shadowMap[ i ],  baseDirection2D );
+						float dist = unpack1K( data ) + 0.1;
+						if ( length( lightToPosition ) >= dist)
+							shadowColor = shadowColor * vec3( 1.0 - realShadowDarkness );
+
 					} else {
 
 				#endif
-				
+
 						vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );
 						float fDepth = unpackDepth( rgbaDepth );
 

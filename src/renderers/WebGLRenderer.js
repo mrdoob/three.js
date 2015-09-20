@@ -374,6 +374,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.getViewport = function ( dimensions ) {
+
+		dimensions.x = _viewportX;
+		dimensions.y = _viewportY;
+
+		dimensions.z = _viewportWidth;
+		dimensions.w = _viewportHeight;
+
+	};
+
 	this.setScissor = function ( x, y, width, height ) {
 
 		_gl.scissor(
@@ -1965,30 +1975,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.castShadow ) continue;
 
-				if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight  ) {
+				if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
 
-					if( light instanceof THREE.PointLight ){
-
-						uniforms.shadowCube.value[ j ] = light.shadowMap;
-						uniforms.shadowMap.value[ j ] = null;
+					if ( light instanceof THREE.PointLight ) {
 
 						// for point lights we set the sign of the shadowDarkness uniform to be negative
-						uniforms.shadowDarkness.value[ j ] = -light.shadowDarkness;
+						uniforms.shadowDarkness.value[ j ] = - light.shadowDarkness;
 
 						// when we have a point light, the 'shadowMatrix' uniform is used to store
-						// the inverse of the view matrix (camera.matrixWorld), so that we can get the 
+						// the inverse of the view matrix (camera.matrixWorld), so that we can get the
 						// world-space position of the light in the shader.
 						uniforms.shadowMatrix.value[ j ] = camera.matrixWorld;
 
 					} else {
 
-						uniforms.shadowMap.value[ j ] = light.shadowMap;
-						uniforms.shadowCube.value[ j ] = null;
 						uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
 						uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
 
-					}					
+					}
 
+					uniforms.shadowMap.value[ j ] =  light.shadowMap;
 					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
 					uniforms.shadowBias.value[ j ] = light.shadowBias;
 
@@ -2347,9 +2353,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 						textureUnit = uniform._array[ i ];
 
 						if ( ! texture ) continue;
-						
+
 						if ( texture instanceof THREE.CubeTexture ||
-						   ( texture.image instanceof Array && texture.image.length === 6 ) ) { // CompressedTexture can have Array in image :/
+						   ( texture.image instanceof Array && texture.image.length === 6 ) ) {
+
+							// CompressedTexture can have Array in image :/
 
 							setCubeTexture( texture, textureUnit );
 
@@ -3153,10 +3161,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if( isCube ){
+		if ( isCube ) {
 
 			var renderTargetProperties = properties.get( renderTarget );
-			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0,  _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, renderTargetProperties.__webglTexture , 0 );
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0,  _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, renderTargetProperties.__webglTexture, 0 );
 
 		}
 

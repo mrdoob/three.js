@@ -842,7 +842,7 @@ THREE.ShaderLib = {
 
 		uniforms: {
 
-			"lightPos": { type: "v3", value: new THREE.Vector3(0,0,0) }
+			"lightPos": { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) }
 
 		},
 
@@ -867,7 +867,7 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -885,8 +885,8 @@ THREE.ShaderLib = {
    			"	res -= res.xxyz * bitMsk;",
    			"	return res; ",
 
-			"}",			
-			
+			"}",
+
 			"float unpack1K ( vec4 color ) {",
 
 			"	const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );",
@@ -900,8 +900,9 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	}
 
 };
+

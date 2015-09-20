@@ -75,12 +75,12 @@
 				pointLight.shadowCameraFar = 30;
 				pointLight.shadowDarkness = 0.5;
 				pointLight.shadowCameraVisible = true;
-				pointLight.shadowMapWidth = 1024;
+				pointLight.shadowMapWidth = 2048;
 				pointLight.shadowMapHeight = 1024;
 				pointLight.name = 'Point Light';
 				scene.add( pointLight );
 
-				dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				/*dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				dirLight.position.set( 0, 50, 0 );
 				dirLight.castShadow = true;
 				dirLight.shadowCameraNear = 0.01;
@@ -94,7 +94,7 @@
 				dirLight.shadowMapWidth = 1024;
 				dirLight.shadowMapHeight = 1024;
 				dirLight.name = 'Dir. Light';
-				//scene.add( dirLight );			
+				scene.add( dirLight );*/			
 
 				cubeMaterial = new THREE.MeshPhongMaterial( {
 					color: 0xff0000,
@@ -128,7 +128,7 @@
 				var torusGeometry =  new THREE.TorusKnotGeometry( 25, 8, 75, 20 );
 				torusKnot = new THREE.Mesh( torusGeometry, cubeMaterial );
 				torusKnot.scale.multiplyScalar( 1 / 18 );
-				torusKnot.position.y = 3;
+				torusKnot.position.set( -1, 3, -4 );
 				torusKnot.castShadow = true;
 				torusKnot.receiveShadow = true;
 				scene.add( torusKnot );
@@ -185,6 +185,16 @@
 				wall.rotation.y = Math.PI / 2;
 				wall.rotation.z = Math.PI / 2;
 
+				/*wall = new THREE.Mesh( wallGeometry, wallMaterial );
+				wall.name = "front wall";
+				wall.scale.multiplyScalar( 3 );
+				wall.castShadow = false;
+				wall.receiveShadow = true;				
+				scene.add( wall );
+				wall.position.set( 0, 10, 14 );
+				wall.rotation.y = Math.PI / 2;
+				wall.rotation.z = Math.PI / 2;*/
+
 				var sphereGeometry = new THREE.SphereGeometry( 1, 32, 32 );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 				var sphere = new THREE.Mesh( sphereGeometry, material );
@@ -206,7 +216,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000 );				
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.BasicShadowMap;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
 
 				// Mouse control
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
