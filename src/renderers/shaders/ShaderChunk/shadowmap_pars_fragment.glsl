@@ -25,6 +25,25 @@
 			
 		}
 
+		/**
+		*  cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
+		*  vector suitable for 2D texture mapping. This code uses the following layout for the
+		*  2D texture:
+		*
+		*  Y y
+		*  xzXZ
+		*
+		*  Y - Positive y direction
+		*  y - Negative y direction
+		*  X - Positive x direction
+		*  x - Negative x direction
+		*  Z - Positive z direction
+		*  z - Negative z direction
+		*
+		*  Alternate code for different layouts, more compact code arrangement, and seam
+		*  skipping can be found here: https://gist.github.com/tschw/da10c43c467ce8afd0c4
+		*/
+
 		vec2 cubeToUV( vec3 v, float texelSizeX, float texelSizeY ) {
 
 			// Horizontal cross layout:
