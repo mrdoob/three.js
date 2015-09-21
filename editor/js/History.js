@@ -22,6 +22,7 @@ History.prototype = {
 
 		var isScriptCmd = lastCmd &&
 			lastCmd.updatable &&
+			cmd.updatable &&
 			lastCmd.script !== undefined &&
 			lastCmd.object === cmd.object &&
 			lastCmd.type === cmd.type &&
@@ -30,6 +31,7 @@ History.prototype = {
 
 		var isUpdatableCmd = lastCmd &&
 			lastCmd.updatable &&
+			cmd.updatable &&
 			lastCmd.object === cmd.object &&
 			lastCmd.type === cmd.type &&
 			timeDifference < 500;

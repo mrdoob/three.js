@@ -82,7 +82,7 @@ Sidebar.Material = function ( editor ) {
 	materialProgramInfo.setMarginLeft( '4px' );
 	materialProgramInfo.onClick( function () {
 
-		signals.editScript.dispatch( currentObject.material, 'programInfo' );
+		signals.editScript.dispatch( currentObject, 'programInfo' );
 
 	} );
 	materialProgramRow.add( materialProgramInfo );
@@ -91,7 +91,7 @@ Sidebar.Material = function ( editor ) {
 	materialProgramVertex.setMarginLeft( '4px' );
 	materialProgramVertex.onClick( function () {
 
-		signals.editScript.dispatch( currentObject.material, 'vertexShader' );
+		signals.editScript.dispatch( currentObject, 'vertexShader' );
 
 	} );
 	materialProgramRow.add( materialProgramVertex );
@@ -100,7 +100,7 @@ Sidebar.Material = function ( editor ) {
 	materialProgramFragment.setMarginLeft( '4px' );
 	materialProgramFragment.onClick( function () {
 
-		signals.editScript.dispatch( currentObject.material, 'fragmentShader' );
+		signals.editScript.dispatch( currentObject, 'fragmentShader' );
 
 	} );
 	materialProgramRow.add( materialProgramFragment );

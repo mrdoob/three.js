@@ -91,12 +91,28 @@ var Script = function ( editor ) {
 			if ( currentScript !== 'programInfo' ) return;
 
 			var json = JSON.parse( value );
-			currentObject.defines = json.defines;
-			currentObject.uniforms = json.uniforms;
-			currentObject.attributes = json.attributes;
 
-			currentObject.needsUpdate = true;
-			signals.materialChanged.dispatch( currentObject );
+			if ( JSON.stringify( currentObject.material.defines ) !== JSON.stringify( json.defines ) ) {
+
+				var cmd = new CmdSetMaterialValue( currentObject, 'defines', json.defines );
+				cmd.updatable = false;
+				editor.execute( cmd );
+
+			}
+			if ( JSON.stringify( currentObject.material.uniforms ) !== JSON.stringify( json.uniforms ) ) {
+
+				var cmd = new CmdSetMaterialValue( currentObject, 'uniforms', json.uniforms );
+				cmd.updatable = false;
+				editor.execute( cmd );
+
+			}
+			if ( JSON.stringify( currentObject.material.attributes ) !== JSON.stringify( json.attributes ) ) {
+
+				var cmd = new CmdSetMaterialValue( currentObject, 'attributes', json.attributes );
+				cmd.updatable = false;
+				editor.execute( cmd );
+
+			}
 
 		}, 300 );
 
@@ -225,9 +241,9 @@ var Script = function ( editor ) {
 					if ( errors.length !== 0 ) break;
 					if ( renderer instanceof THREE.WebGLRenderer === false ) break;
 
-					currentObject[ currentScript ] = string;
-					currentObject.needsUpdate = true;
-					signals.materialChanged.dispatch( currentObject );
+					currentObject.material[ currentScript ] = string;
+					currentObject.material.needsUpdate = true;
+					signals.materialChanged.dispatch( currentObject.material );
 
 					var programs = renderer.info.programs;
 
@@ -239,7 +255,7 @@ var Script = function ( editor ) {
 						var diagnostics = programs[i].diagnostics;
 
 						if ( diagnostics === undefined ||
-								diagnostics.material !== currentObject ) continue;
+								diagnostics.material !== currentObject.material ) continue;
 
 						if ( ! diagnostics.runnable ) valid = false;
 
@@ -345,6 +361,7 @@ var Script = function ( editor ) {
 			mode = 'javascript';
 			name = script.name;
 			source = script.source;
+			title.setValue( object.name + ' / ' + name );
 
 		} else {
 
@@ -354,7 +371,7 @@ var Script = function ( editor ) {
 
 					mode = 'glsl';
 					name = 'Vertex Shader';
-					source = object.vertexShader || "";
+					source = object.material.vertexShader || "";
 
 					break;
 
@@ -362,7 +379,7 @@ var Script = function ( editor ) {
 
 					mode = 'glsl';
 					name = 'Fragment Shader';
-					source = object.fragmentShader || "";
+					source = object.material.fragmentShader || "";
 
 					break;
 
@@ -371,13 +388,14 @@ var Script = function ( editor ) {
 					mode = 'json';
 					name = 'Program Properties';
 					var json = {
-						defines: object.defines,
-						uniforms: object.uniforms,
-						attributes: object.attributes
+						defines: object.material.defines,
+						uniforms: object.material.uniforms,
+						attributes: object.material.attributes
 					};
 					source = JSON.stringify( json, null, '\t' );
 
 			}
+			title.setValue( object.material.name + ' / ' + name );
 
 		}
 
@@ -385,7 +403,6 @@ var Script = function ( editor ) {
 		currentScript = script;
 		currentObject = object;
 
-		title.setValue( object.name + ' / ' + name );
 		container.setDisplay( '' );
 		codemirror.setValue( source );
 		if (mode === 'json' ) mode = { name: 'javascript', json: true };

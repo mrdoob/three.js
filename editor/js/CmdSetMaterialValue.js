@@ -7,6 +7,7 @@ CmdSetMaterialValue = function ( object, attributeName, newValue ) {
 	Cmd.call( this );
 
 	this.type = 'CmdSetMaterialValue';
+	this.updatable = true;
 
 	this.object = object;
 	this.attributeName = attributeName;
@@ -21,16 +22,22 @@ CmdSetMaterialValue.prototype = {
 	execute: function () {
 
 		this.object.material[ this.attributeName ] = this.newValue;
-		this.editor.signals.objectChanged.dispatch( this.object );
-		this.editor.signals.sceneGraphChanged.dispatch();
+		this.object.material.needsUpdate = true;
+		this.editor.signals.materialChanged.dispatch( this.object.material );
 
 	},
 
 	undo: function () {
 
 		this.object.material[ this.attributeName ] = this.oldValue;
-		this.editor.signals.objectChanged.dispatch( this.object );
-		this.editor.signals.sceneGraphChanged.dispatch();
+		this.object.material.needsUpdate = true;
+		this.editor.signals.materialChanged.dispatch( this.object.material );
+
+	},
+
+	update: function ( cmd ) {
+
+		this.newValue = cmd.newValue;
 
 	},
 
