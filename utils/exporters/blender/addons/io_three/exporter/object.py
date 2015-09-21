@@ -46,8 +46,10 @@ class Object(base_classes.BaseNode):
         self[constants.COLOR] = api.light.color(self.data)
         self[constants.INTENSITY] = api.light.intensity(self.data)
 
-        if self[constants.TYPE] != constants.DIRECTIONAL_LIGHT:
-            self[constants.DISTANCE] = api.light.distance(self.data)
+        # Commented out because Blender's distance is not a cutoff value.
+        #if self[constants.TYPE] != constants.DIRECTIONAL_LIGHT:
+        #    self[constants.DISTANCE] = api.light.distance(self.data)
+        self[constants.DISTANCE] = 0;
 
         if self[constants.TYPE] == constants.SPOT_LIGHT:
             self[constants.ANGLE] = api.light.angle(self.data)
@@ -118,6 +120,16 @@ class Object(base_classes.BaseNode):
             self._init_camera()
         elif self[constants.TYPE] in lights:
             self._init_light()
+
+        no_anim = (None, False, constants.OFF)
+        if self.options.get(constants.KEYFRAMES) not in no_anim:
+            logger.info("Export Transform Animation for %s", self.node)
+            if self._scene:
+                # only when exporting scene
+                tracks = api.object.animated_xform(self.node, self.options)
+                merge = self._scene[constants.ANIMATION][0][constants.KEYFRAMES]
+                for track in tracks:
+                    merge.append(track)
 
         if self.options.get(constants.HIERARCHY, False):
             for child in api.object.children(self.node, self.scene.valid_types):

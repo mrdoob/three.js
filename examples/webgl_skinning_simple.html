@@ -23,7 +23,7 @@
 
 			var container, stats, controls;
 			var camera, scene, renderer, loader, clock, light;
-			var skinnedMesh, animation, groundMaterial, planeGeometry;
+			var skinnedMesh, animation, groundMaterial, planeGeometry, mixer;
 
 			init();
 			animate();
@@ -74,8 +74,9 @@
 					skinnedMesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
 					skinnedMesh.scale.set( 1, 1, 1 );
 					scene.add( skinnedMesh );
-					animation = new THREE.Animation( skinnedMesh, skinnedMesh.geometry.animations[ 0 ] );
-					animation.play();
+
+					mixer = new THREE.AnimationMixer( skinnedMesh );
+					mixer.addAction( new THREE.AnimationAction( skinnedMesh.geometry.animations[0] ) );					
 
 				});
 
@@ -85,7 +86,7 @@
 
 				requestAnimationFrame( animate );
 
-				THREE.AnimationHandler.update( clock.getDelta() );
+				if( mixer ) mixer.update( clock.getDelta() );
 
 				controls.update();
 
