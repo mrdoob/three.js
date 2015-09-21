@@ -224,7 +224,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				} else {
 
-					_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, material ), object );
+					_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, getDepthMaterial( object, material ), object, null );
 
 				}
 

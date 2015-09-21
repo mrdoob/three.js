@@ -16,9 +16,13 @@
 		<ul>
 			<li>implement an effect not included with any of the built-in [page:Material materials]</li>
 			<li>combine many objects into a single [page:Geometry] or [page:BufferGeometry] in order to improve performance</li>
-			<li>associate custom data with individual vertices ("custom attributes")</li>
 		</ul>
-		Note that a ShaderMaterial will only be rendered properly by [page:WebGLRenderer], since the GLSL code in the vertexShader and fragmentShader properties must be compiled and run on the GPU using WebGL.
+		There are the following notes to bear in mind when using a *ShaderMaterial*:
+
+		<ul>
+			<li>A *ShaderMaterial* will only be rendered properly by [page:WebGLRenderer], since the GLSL code in the *vertexShader* and *fragmentShader* properties must be compiled and run on the GPU using WebGL.</li>
+			<li>As of THREE r72, directly assigning attributes in a *ShaderMaterial* is no longer supported. A [page:BufferGeometry] instance (instead of a [page:Geometry] instance) must be used instead, using [page:BufferAttribute] instances to define custom attributes.</li>
+		</ul>
 		</div>
 
 		<h3>Example</h3>
@@ -67,66 +71,51 @@
 		</p>
 
 		<h3>Custom attributes and uniforms</h3>
-		Custom attributes and uniforms must be declared both in your GLSL shader code (within *vertexShader* and/or *fragmentShader*), <emph>and</emph> in the *attributes* and *uniforms* properties of your ShaderMaterial. The declaration in the material is necessary to ensure [page:WebGLRenderer] passes your attribute/uniform data in a buffer to the GPU when the shader is run. Note that *varying*s only need to be declared within the shader code (not within the material).
+		<p>Both custom attributes and uniforms must be declared in your GLSL shader code (within *vertexShader* and/or *fragmentShader*). Custom uniforms must be defined in <emph>both</emph> the *uniforms* property of your *ShaderMaterial*, whereas any custom attributes must be defined via [page:BufferAttribute] instances. Note that *varying*s only need to be declared within the shader code (not within the material).
 		</p>
-		<p>
-		To declare a custom attribute, use the *attributes* property of the material:
-		<code>
-		attributes: {
-			vertexOpacity: { type: 'f', value: [] }
-		}
-		</code>
-		Each attribute must have a *type* property and a *value* property.
+
+		<p>To declare a custom attribute, please reference the [page:BufferGeometry] page for an overview, and the [page:BufferAttribute] page for a detailed look at the *BufferAttribute* API.</p>
+		<p>When creating your attributes, each typed array that you create to hold your attribute's data must be a multiple of your data type's size. For example, if your attribute is a [page:Vector3 THREE.Vector3] type, and you have 3000 vertices in your [page:BufferGeometry], your typed array value must be created with a length of 3000 * 3, or 9000 (one value per-component). A table of each data type's size is shown below for reference:</p>
+
 		<table>
-			<caption><a id="attribute-types">Attribute types</a></caption>
+			<caption><a id="attribute-sizes">Attribute sizes</a></caption>
 			<thead>
 				<tr>
-					<th>Attribute *type* string</th>
 					<th>GLSL type</th>
 					<th>JavaScript type</th>
+					<th>Size</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-					<td><code>'f'</code></td>
 					<td>float</td>
 					<td>[page:Number]</td>
+					<td>1</td>
 				</tr>
 				<tr>
-					<td><code>'v2'</code></td>
 					<td>vec2</td>
 					<td>[page:Vector2 THREE.Vector2]</td>
+					<td>2</td>
 				</tr>
 				<tr>
-					<td><code>'v3'</code></td>
 					<td>vec3</td>
 					<td>[page:Vector3 THREE.Vector3]</td>
+					<td>3</td>
 				</tr>
 				<tr>
-					<td><code>'c'</code></td>
 					<td>vec3</td>
 					<td>[page:Color THREE.Color]</td>
+					<td>3</td>
 				</tr>
 				<tr>
-					<td><code>'v4'</code></td>
 					<td>vec4</td>
 					<td>[page:Vector4 THREE.Vector4]</td>
+					<td>4</td>
 				</tr>
 			</tbody>
 		</table>
-		The way attribute data is stored depends on whether you're using [page:BufferGeometry] or [page:Geometry]:
-		<ul>
-			<li>When using [page:Geometry], attribute data is stored directly on the <emph>material</emph>, using the attribute's *value* array; each element of *value* should correspond to one vertex. To update an attribute, set the *needsUpdate* flag to true on the material attribute:
-			<code>
-			material.attributes.vertexOpacity.needsUpdate = true;
-			</code>
-			</li>
-			<li>When using [page:BufferGeometry], attribute data is stored within a [page:BufferAttribute] on the geometry itself, and the *value* within the material is ignored. To update an attribute, set the *needsUpdate* flag to true on the [page:BufferAttribute] of the geometry:
-			<code>
-			geometry.attributes.vertexOpacity.needsUpdate = true;
-			</code>
-			See [page:BufferGeometry] for details.</li>
-		</ul>
+
+		Note that attribute buffers are <emph>not</emph> refreshed automatically when their values change. To update custom attributes, set the *needsUpdate* flag to true on the [page:BufferAttribute] of the geometry (see [page:BufferGeometry] for further details).
 		</p>
 
 		<p>
@@ -230,20 +219,6 @@
 		{ type: 'f', value: 1.0 }
 		</code>
 		where *type* is a <a href="#uniform-types">uniform type string</a>, and *value* is the value of the uniform. Names must match the name of the uniform, as defined in the GLSL code. Note that uniforms are refreshed on every frame, so updating the value of the uniform will immediately update the value available to the GLSL code.
-		</div>
-
-		<h3>[property:Object attributes]</h3>
-		<div>
-		<p>
-		Object specifying the custom attributes to be passed to the shader code; keys are attribute names, values are definitions of the form
-		<code>
-		{ type: 'f', value: [1.0, 0.5, 2.0, ...] }
-		</code>
-		where *type* is an <a href="#attribute-types">attribute type string</a>, and *value* is an array containing an attribute value for each vertex in the geometry (or *undefined* if using [page:BufferGeometry]). Names must match the name of the attribute, as defined in the GLSL code.
-		</p>
-		<p>
-		Note that attribute buffers are <emph>not</emph> refreshed automatically when their values change; if using [page:Geometry], set <code>needsUpdate = true</code> on the attribute definition. If using [page:BufferGeometry], set <code>needsUpdate = true</code> on the [page:BufferAttribute].
-		</p>
 		</div>
 
 		<h3>[property:Object defines]</h3>

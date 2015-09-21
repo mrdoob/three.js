@@ -245,7 +245,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 			if ( Math.abs( factor - 1.0 ) > EPS && factor > 0.0 ) {
 
-				_this.object.zoom *= factor;
+				_this.object.zoom /= factor;
 
 				if ( _this.staticMoving ) {
 

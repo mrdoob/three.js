@@ -64,7 +64,7 @@ THREE.BufferGeometry.prototype = {
 		if ( name === 'index' ) {
 
 			console.warn( 'THREE.BufferGeometry.addAttribute: Use .setIndex() for index attribute.' );
-			this.addIndex( attribute );
+			this.setIndex( attribute );
 
 		}
 
@@ -505,7 +505,7 @@ THREE.BufferGeometry.prototype = {
 
 			var TypeArray = geometry.vertices.length > 65535 ? Uint32Array : Uint16Array;
 			var indices = new TypeArray( geometry.indices.length * 3 );
-			this.addIndex( new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
+			this.setIndex( new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 		}
 
@@ -968,7 +968,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( index !== null ) {
 
-			this.addIndex( index.clone() );
+			this.setIndex( index.clone() );
 
 		}
 
