@@ -1,4 +1,4 @@
-module( "CmdSetScriptSource" );
+module( "CmdSetScriptValue" );
 
 test( "Test CmdSetScriptValue for source (Undo and Redo)", function() {
 
