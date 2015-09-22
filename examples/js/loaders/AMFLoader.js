@@ -35,8 +35,8 @@ THREE.AMFLoader.prototype = {
 		loader.setResponseType('arraybuffer');
 
 		loader.load(url, function(text) {
-			var amfobject = scope.parse(text);
-			onLoad(amfobject);
+			var amfObject = scope.parse(text);
+			onLoad(amfObject);
 		}, onProgress, onError);
 	},
 
@@ -47,9 +47,9 @@ THREE.AMFLoader.prototype = {
 		var amfMaterials = {};
 		var amfObjects = {};
 
-		var xmldata = this.loaddocument(data);
+		var xmldata = this._loadDocument(data);
 
-		amfScale = this.loaddocumentscale(xmldata);
+		amfScale = this._loadDocumentScale(xmldata);
 
 		var documentchildren = xmldata.documentElement.children;
 
@@ -63,10 +63,10 @@ THREE.AMFLoader.prototype = {
 					}
 				}
 			} else if(documentchildren[i].nodeName === 'material') {
-				var loadedmaterial = this.loadmaterials(documentchildren[i]);
+				var loadedmaterial = this._loadMaterials(documentchildren[i]);
 				amfMaterials[loadedmaterial.id] = loadedmaterial.material;
 			} else if(documentchildren[i].nodeName === 'object') {
-				var loadedobject = this.loadobject(documentchildren[i]);
+				var loadedobject = this._loadObject(documentchildren[i]);
 				amfObjects[loadedobject.id] = loadedobject.obj;
 			}
 		}
@@ -126,7 +126,7 @@ THREE.AMFLoader.prototype = {
 		return sceneobject;
 	},
 
-	loaddocument: function ( data ) {
+	_loadDocument: function ( data ) {
 		var view = new DataView(data);
 
 		var magic = String.fromCharCode(view.getUint8(0), view.getUint8(1));
@@ -172,7 +172,7 @@ THREE.AMFLoader.prototype = {
 		return xmldata;
 	},
 
-	loaddocumentscale: function ( xmldata ) {
+	_loadDocumentScale: function ( xmldata ) {
 		var scale = 1.0;
 
 		var unit = xmldata.documentElement.attributes['unit'].value.toLowerCase();
@@ -193,7 +193,7 @@ THREE.AMFLoader.prototype = {
 		return scale;
 	},
 
-	loadmaterials: function ( node ) {
+	_loadMaterials: function ( node ) {
 		var mat = node;
 
 		var loadedmaterial = null;
@@ -209,7 +209,7 @@ THREE.AMFLoader.prototype = {
 					matname = matchildel.textContent;
 				}
 			} else if(matchildel.nodeName === 'color') {
-				color = this.loadcolor(matchildel);
+				color = this._loadColor(matchildel);
 			}
 		}
 
@@ -226,7 +226,7 @@ THREE.AMFLoader.prototype = {
 		return { 'id': matid, 'material': loadedmaterial };
 	},
 
-	loadcolor: function ( node ) {
+	_loadColor: function ( node ) {
 		var color = {'r': 1.0, 'g': 1.0, 'b': 1.0, 'a': 1.0, opacity: 1.0};
 
 		for(var i = 0; i < node.children.length; i++) {
@@ -246,7 +246,7 @@ THREE.AMFLoader.prototype = {
 		return color;
 	},
 
-	loadmeshvolume: function( node ) {
+	_loadMeshVolume: function( node ) {
 		var volume = { "name": "", "triangles": [], "materialid": null };
 
 		var currvolumenode = node.firstElementChild;
@@ -281,7 +281,7 @@ THREE.AMFLoader.prototype = {
 		return volume;
 	},
 
-	loadmeshvertices: function( node ) {
+	_loadMeshVertices: function( node ) {
 		var vert_array = [];
 
 		var currverticesnode = node.firstElementChild;
@@ -314,7 +314,7 @@ THREE.AMFLoader.prototype = {
 		return vert_array;
 	},
 
-	loadobject: function ( node ) {
+	_loadObject: function ( node ) {
 		"use strict";
 		var objid = node.attributes['id'].textContent;
 		var loadedobject = { "name": "amfobject", "meshes": [] };
@@ -331,16 +331,16 @@ THREE.AMFLoader.prototype = {
 					}
 				}
 			} else if(currobjnode.nodeName === "color") {
-				currcolor = this.loadcolor(currobjnode);
+				currcolor = this._loadColor(currobjnode);
 			} else if(currobjnode.nodeName === "mesh") {
 				var currmeshnode = currobjnode.firstElementChild;
 				var mesh = {"vertices": [], "volumes": [], "color": currcolor };
 
 				while( currmeshnode ) {
 					if(currmeshnode.nodeName === "vertices") {
-						mesh.vertices = mesh.vertices.concat(this.loadmeshvertices(currmeshnode));
+						mesh.vertices = mesh.vertices.concat(this._loadMeshVertices(currmeshnode));
 					} else if(currmeshnode.nodeName === "volume") {
-						mesh.volumes.push(this.loadmeshvolume(currmeshnode));
+						mesh.volumes.push(this._loadMeshVolume(currmeshnode));
 					}
 					currmeshnode = currmeshnode.nextElementSibling;
 				}
