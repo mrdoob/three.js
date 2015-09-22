@@ -16,6 +16,22 @@ var Loader = function ( editor ) {
 
 		switch ( extension ) {
 
+			case 'amf':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var loader = new THREE.AMFLoader();
+					var amfobject = loader.parse( event.target.result );
+
+					editor.addObject( amfobject );
+					editor.select( amfobject );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
 			case 'awd':
 
 				var reader = new FileReader();
