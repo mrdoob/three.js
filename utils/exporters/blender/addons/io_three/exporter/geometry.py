@@ -496,7 +496,7 @@ class Geometry(base_classes.BaseNode):
                 self[constants.ATTRIBUTES][key][constants.ARRAY] = array
 
             self[constants.ATTRIBUTES][constants.INDEX] = {
-                constants.ITEM_SIZE: 3,
+                constants.ITEM_SIZE: 1,
                 constants.TYPE: option_index_type,
                 constants.ARRAY: index_data
             }
