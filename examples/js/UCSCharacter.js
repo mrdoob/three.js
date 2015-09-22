@@ -15,6 +15,8 @@ THREE.UCSCharacter = function() {
 	this.materials = [];
 	this.morphs = [];
 
+	this.mixer = new THREE.AnimationMixer( this.root );
+
 	this.onLoadComplete = function () {};
 	
 	this.loadCounter = 0;
@@ -41,10 +43,9 @@ THREE.UCSCharacter = function() {
 
 			geometry.computeBoundingBox();
 			geometry.computeVertexNormals();
-
-			//THREE.AnimationHandler.add( geometry.animation );
-
+			
 			mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshFaceMaterial() );
+			mesh.name = config.character;
 			scope.root.add( mesh );
 			
 			var bb = geometry.boundingBox;
@@ -54,8 +55,7 @@ THREE.UCSCharacter = function() {
 			mesh.castShadow = true;
 			mesh.receiveShadow = true;
 
-			animation = new THREE.Animation( mesh, geometry.animation );
-			animation.play();
+			scope.mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).setLocalRoot( mesh ) );
 			
 			scope.setSkin( 0 );
 			

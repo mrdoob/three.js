@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '72' };
+var THREE = { REVISION: '73dev' };
 
 //
 
@@ -264,6 +264,11 @@ THREE.RGB_PVRTC_2BPPV1_Format = 2101;
 THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 
+// Loop styles for AnimationAction
+
+THREE.LoopOnce = 2200;
+THREE.LoopRepeat = 2201;
+THREE.LoopPingPong = 2202;
 
 // DEPRECATED
 

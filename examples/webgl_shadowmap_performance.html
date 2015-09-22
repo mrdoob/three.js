@@ -57,7 +57,7 @@
 
 			var NEAR = 5, FAR = 3000;
 
-			var morph, morphs = [];
+			var morph, morphs = [], mixer;
 
 			var light;
 
@@ -237,6 +237,8 @@
 
 				scene.add( mesh );
 
+				mixer = new THREE.AnimationMixer( scene );
+					
 				// MORPHS
 
 				function addMorph( geometry, speed, duration, x, y, z, fudgeColor ) {
@@ -249,21 +251,20 @@
 
 					}
 
-					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.speed = speed;
 
-					meshAnim.speed = speed;
-					meshAnim.duration = duration;
-					meshAnim.time = 600 * Math.random();
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[0], Math.random() ).warpToDuration( duration ).setLocalRoot( mesh ) );
+				
+					mesh.position.set( x, y, z );
+					mesh.rotation.y = Math.PI/2;
 
-					meshAnim.position.set( x, y, z );
-					meshAnim.rotation.y = Math.PI/2;
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
 
-					meshAnim.castShadow = true;
-					meshAnim.receiveShadow = true;
+					scene.add( mesh );
 
-					scene.add( meshAnim );
-
-					morphs.push( meshAnim );
+					morphs.push( mesh );
 
 				}
 
@@ -291,7 +292,7 @@
 
 					for ( var i = - 600; i < 601; i += 2 ) {
 
-						addMorph( geometry, 550, 1000, 100 - Math.random() * 3000, FLOOR, i, true );
+						addMorph( geometry, 550, 1, 100 - Math.random() * 3000, FLOOR, i, true );
 
 					}
 
@@ -365,11 +366,11 @@
 
 				var delta = clock.getDelta();
 
+				if( mixer ) mixer.update( delta );
+
 				for ( var i = 0; i < morphs.length; i ++ ) {
 
 					morph = morphs[ i ];
-
-					morph.updateAnimation( 1000 * delta );
 
 					morph.position.x += morph.speed * delta;
 

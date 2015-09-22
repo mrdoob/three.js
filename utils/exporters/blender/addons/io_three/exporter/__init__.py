@@ -8,9 +8,10 @@ from . import scene, geometry, api, base_classes
 def _error_handler(func):
     
     def inner(filepath, options, *args, **kwargs):
-        level = options.get(constants.LOGGING, constants.DEBUG)
+        level = options.get(constants.LOGGING, constants.DISABLED)
         version = options.get('addon_version')
-        logger.init('io_three.export.log', level=level)
+        if level != constants.DISABLED:
+            logger.init('io_three.export.log', level=level)
         if version is not None:
             logger.debug("Addon Version %s", version)
         api.init()

@@ -57,7 +57,14 @@ THREE.ObjectLoader.prototype = {
 
 		var textures  = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
+
 		var object = this.parseObject( json.object, geometries, materials );
+
+		if( json.animations ) {
+
+			object.animations = this.parseAnimations( json.animations );
+
+		}
 
 		if ( json.images === undefined || json.images.length === 0 ) {
 
@@ -313,6 +320,22 @@ THREE.ObjectLoader.prototype = {
 		}
 
 		return materials;
+
+	},
+
+	parseAnimations: function ( json ) {
+
+		var animations = [];
+
+		for( var i = 0; i < json.length; i ++ ) {
+
+			var clip = THREE.AnimationClip.parse( json[i] );
+
+			animations.push( clip );
+
+		}
+
+		return animations;
 
 	},
 
