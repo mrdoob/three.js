@@ -806,10 +806,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				count = index.array.length;
 
-			} else if ( position instanceof THREE.InterleavedBufferAttribute ) {
-
-				count = position.data.array.length / 3;
-
 			} else {
 
 				count = position.count;
