@@ -5,6 +5,8 @@
 THREE.OBJLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	
+	this.materials = null;
 
 };
 
@@ -30,6 +32,12 @@ THREE.OBJLoader.prototype = {
 
 		this.crossOrigin = value;
 
+	},
+	
+	setMaterials: function ( materials ) {
+		
+		this.materials = materials;
+			
 	},
 
 	parse: function ( text ) {
@@ -361,6 +369,21 @@ THREE.OBJLoader.prototype = {
 
 				buffergeometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geometry.uvs ), 2 ) );
 
+			}
+			
+			var material;
+			
+			if ( this.materials !== null ) {
+				
+				material = this.materials.create( object.material.name );
+				
+			}
+							
+			if ( !material ) {
+
+				material = new THREE.MeshPhongMaterial();
+				material.name = object.material.name;
+				
 			}
 
 			material = new THREE.MeshLambertMaterial();
