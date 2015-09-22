@@ -1113,7 +1113,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
-		shadowMap.render( scene, camera );
+		shadowMap.render( scene );
 
 		//
 
