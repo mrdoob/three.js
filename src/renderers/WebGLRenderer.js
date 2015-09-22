@@ -809,7 +809,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( index !== null ) {
 
-				count = index.count;
+				count = index.array.length;
 
 			} else if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
