@@ -175,7 +175,11 @@ THREE.AMFLoader.prototype = {
 	_loadDocumentScale: function ( xmldata ) {
 		var scale = 1.0;
 
-		var unit = xmldata.documentElement.attributes['unit'].value.toLowerCase();
+		var unit = 'millimeter';
+
+		if( xmldata.documentElement.attributes['unit'] !== undefined ) {
+			unit = xmldata.documentElement.attributes['unit'].value.toLowerCase();
+		}
 
 		var scale_units = {
 			'millimeter': 1.0,
