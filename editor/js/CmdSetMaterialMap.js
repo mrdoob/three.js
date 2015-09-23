@@ -32,6 +32,7 @@ CmdSetMaterialMap = function ( object, mapName, newMap ) {
 			url: this.getDataURL( newMap.image )
 
 		} );
+		this.newMapJSON.sourceFile = newMap.sourceFile;
 
 	}
 
@@ -53,6 +54,7 @@ CmdSetMaterialMap = function ( object, mapName, newMap ) {
 			url: this.getDataURL( this.oldMap.image )
 
 		} );
+		this.oldMapJSON.sourceFile = this.oldMap.sourceFile;
 
 	}
 
@@ -116,6 +118,7 @@ CmdSetMaterialMap.prototype = {
 			var images = loader.parseImages( json.images );
 			var textures  = loader.parseTextures( [ json ], images );
 			map = textures[ json.uuid ];
+			map.sourceFile = json.sourceFile;
 
 		}
 		return map;
