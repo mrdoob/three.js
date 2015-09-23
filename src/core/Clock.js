@@ -20,7 +20,7 @@ THREE.Clock.prototype = {
 
 	_now: function () {
 
-	 	return self.performance !== undefined && self.performance.now !== undefined
+		return self.performance !== undefined && self.performance.now !== undefined
 			? self.performance.now()
 			: Date.now();
 
