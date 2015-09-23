@@ -1982,18 +1982,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 						// for point lights we set the sign of the shadowDarkness uniform to be negative
 						uniforms.shadowDarkness.value[ j ] = - light.shadowDarkness;
 
-						// when we have a point light, the 'shadowMatrix' uniform is used to store
-						// the inverse of the view matrix (camera.matrixWorld), so that we can get the
-						// world-space position of the light in the shader.
-						uniforms.shadowMatrix.value[ j ] = camera.matrixWorld;
-
 					} else {
-
-						uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
+						
 						uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
 
 					}
 
+					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
 					uniforms.shadowMap.value[ j ] =  light.shadowMap;
 					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
 					uniforms.shadowBias.value[ j ] = light.shadowBias;

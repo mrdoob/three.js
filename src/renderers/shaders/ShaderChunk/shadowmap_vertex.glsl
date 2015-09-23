@@ -8,18 +8,21 @@
 			// shadow map
 			if( shadowDarkness[ i ] < 0.0 ) {
 
-				// When we have a point light, the @shadowMatrix uniform is used to store
-				// the inverse of the view matrix, so that we can get the world-space
-				// position of the light.
+				// calculate vector from light to vertex in view space
 
-				vec4 lightPositionWorld = ( shadowMatrix[ i ] * vec4( pointLightPosition[ i ], 1.0 ) );
-				vec4 distanceToLight = worldPosition - lightPositionWorld;
-				distanceToLight.w = 1.0;
+				vec3 fromLight = mvPosition.xyz - pointLightPosition[ i ];
 
-				// We also repurpose vShadowCoord to hold the distance in world space from the
+				// Transform 'fromLight' into world space by multiplying it on the left
+				// side of 'viewMatrix'. This is equivalent to multiplying it on the right
+				// side of the transpose of 'viewMatrix'. Since 'viewMatrix' is orthogonal, 
+				// its transpose is the same as its inverse.
+
+				fromLight = fromLight * mat3( viewMatrix );
+
+				// We repurpose vShadowCoord to hold the distance in world space from the
 				// light to the vertex. This value will be interpolated correctly in the fragment shader.
 
-				vShadowCoord[ i ] = distanceToLight;
+				vShadowCoord[ i ] = vec4( fromLight, 1.0 );
 
 			} else {
 

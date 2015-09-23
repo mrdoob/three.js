@@ -41,9 +41,7 @@
 
 		bool frustumTest = all( frustumTestVec );
 
-		if ( frustumTest || isPointLight ) {
-
-			shadowCoord.z += shadowBias[ i ];
+		if ( frustumTest || isPointLight ) {			
 
 			#if defined( SHADOWMAP_TYPE_PCF )
 
@@ -74,7 +72,7 @@
 							vec3 offset = gridSamplingDisk[ s ] * diskRadius * cubeTexelSize;
 							vec3 adjustedBaseDirection3D = baseDirection3D + offset;
 							vec2 adjustedBaseDirection2D = cubeToUV( adjustedBaseDirection3D, texelSizeX, texelSizeY );
-							dist = unpack1K( texture2D( shadowMap[ i ],  adjustedBaseDirection2D ) ) + 0.1;
+							dist = unpack1K( texture2D( shadowMap[ i ],  adjustedBaseDirection2D ) ) + shadowBias[ i ];
 							if ( curDistance >= dist )
 								shadow += 1.0;
 							numSamples += 1.0;
@@ -105,6 +103,8 @@
 							}
 							shadow /= 9.0;
 						*/
+
+						shadowCoord.z += shadowBias[ i ];
 
 						const float shadowDelta = 1.0 / 9.0;
 
@@ -180,7 +180,7 @@
 							vec3 offset = gridSamplingDisk[ s ] * diskRadius * cubeTexelSize;
 							vec3 adjustedBaseDirection3D = baseDirection3D + offset;
 							vec2 adjustedBaseDirection2D = cubeToUV( adjustedBaseDirection3D, texelSizeX, texelSizeY );
-							dist = unpack1K( texture2D( shadowMap[ i ],  adjustedBaseDirection2D ) ) + 0.1;
+							dist = unpack1K( texture2D( shadowMap[ i ],  adjustedBaseDirection2D ) ) + shadowBias[ i ];
 							if ( curDistance >= dist )
 								shadow += 1.0;
 							numSamples += 1.0;
@@ -196,6 +196,8 @@
 						// Percentage-close filtering
 						// (9 pixel kernel)
 						// http://fabiensanglard.net/shadowmappingPCF/
+
+						shadowCoord.z += shadowBias[ i ];
 
 						float xPixelOffset = texelSizeX;
 						float yPixelOffset = texelSizeY;
@@ -258,13 +260,14 @@
 						vec3 baseDirection3D = normalize( lightToPosition );
 						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeX, texelSizeY );
 						vec4 data = texture2D( shadowMap[ i ],  baseDirection2D );
-						float dist = unpack1K( data ) + 0.1;
+						float dist = unpack1K( data ) + shadowBias[ i ];
 						if ( length( lightToPosition ) >= dist)
 							shadowColor = shadowColor * vec3( 1.0 - realShadowDarkness );
 
 					} else {
 
 				#endif
+						shadowCoord.z += shadowBias[ i ];
 
 						vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );
 						float fDepth = unpackDepth( rgbaDepth );
