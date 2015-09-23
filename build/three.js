@@ -8371,6 +8371,7 @@ THREE.Object3D.prototype = {
 		var isRootObject = ( meta === undefined );
 
 		var data = {};
+		var output = { object: data };
 
 		// meta is a hash used to collect geometries, materials.
 		// not providing it implies that this is the root object
@@ -8385,7 +8386,7 @@ THREE.Object3D.prototype = {
 				images: {}
 			};
 
-			data.metadata = {
+			output.metadata = {
 				version: 4.4,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
@@ -8416,8 +8417,6 @@ THREE.Object3D.prototype = {
 
 		}
 
-		var output = {};
-
 		if ( isRootObject ) {
 
 			var geometries = extractFromCache( meta.geometries );
@@ -8431,8 +8430,6 @@ THREE.Object3D.prototype = {
 			if ( images.length > 0 ) output.images = images;
 
 		}
-
-		output.object = data;
 
 		return output;
 
@@ -9500,7 +9497,7 @@ THREE.Geometry.prototype = {
 
 		}
 
-		var addFace = function ( a, b, c ) {
+		function addFace( a, b, c ) {
 
 			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
@@ -10103,6 +10100,18 @@ THREE.Geometry.prototype = {
 		var diff = this.vertices.length - unique.length;
 		this.vertices = unique;
 		return diff;
+
+	},
+
+	sortFacesByMaterial: function () {
+
+		function materialSort( a, b ) {
+
+			return a.materialIndex - b.materialIndex;
+
+		}
+
+		this.faces.sort( materialSort );
 
 	},
 
