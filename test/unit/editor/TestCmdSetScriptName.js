@@ -1,6 +1,6 @@
 module("CmdSetScriptName");
 
-test( "Test CmdSetScriptValue for names", function() {
+test( "Test CmdSetScriptValue for names (Undo and Redo)", function() {
 
 	var editor = new Editor();
 
