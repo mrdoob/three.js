@@ -12,6 +12,7 @@ CmdAddScript = function ( object, script ) {
 	this.objectUuid = object !== undefined ? object.uuid : undefined;
 
 	this.script = script;
+
 };
 
 CmdAddScript.prototype = {

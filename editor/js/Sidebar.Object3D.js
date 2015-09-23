@@ -438,7 +438,7 @@ Sidebar.Object3D = function ( editor ) {
 
 			if ( object.visible !== objectVisible.getValue() ) {
 
-				editor.execute( new CmdToggleBoolean( object, 'visible' ) );
+				editor.execute( new CmdSetValue( object, 'visible', objectVisible.getValue() ) );
 
 			}
 

@@ -443,7 +443,7 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.skinning !== undefined && material.skinning !== materialSkinning.getValue() ) {
 
-				editor.execute( new CmdToggleBooleanMaterial( currentObject, 'skinning' ) );
+				editor.execute( new CmdSetMaterialValue( currentObject, 'skinning', materialSkinning.getValue() ) );
 
 			}
 
@@ -668,7 +668,7 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.transparent !== undefined && material.transparent !== materialTransparent.getValue() ) {
 
-				editor.execute( new CmdToggleBooleanMaterial( currentObject, 'transparent' ) );
+				editor.execute( new CmdSetMaterialValue( currentObject, 'transparent', materialTransparent.getValue() ) );
 
 			}
 
@@ -680,7 +680,7 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.wireframe !== undefined && material.wireframe !== materialWireframe.getValue() ) {
 
-				editor.execute( new CmdToggleBooleanMaterial( currentObject, 'wireframe' ) );
+				editor.execute( new CmdSetMaterialValue( currentObject, 'wireframe', materialWireframe.getValue() ) );
 
 			}
 
