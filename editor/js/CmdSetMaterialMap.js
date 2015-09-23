@@ -13,10 +13,11 @@ CmdSetMaterialMap = function ( object, mapName, newMap ) {
 	this.oldMap = object !== undefined ? object.material[ mapName ] : undefined;
 	this.newMap = newMap;
 	this.objectUuid = object !== undefined ? object.uuid : undefined;
-/*
-	if ( object !== undefined ) {
 
-		meta = {
+	this.newMapJSON = null;
+	if ( newMap !== undefined && newMap !== null ) {
+
+		var meta = {
 			geometries: {},
 			materials: {},
 			textures: {},
@@ -24,16 +25,36 @@ CmdSetMaterialMap = function ( object, mapName, newMap ) {
 		};
 
 		this.newMapJSON = newMap.toJSON( meta );
-		this.newMapJSON.images = [ newMap.image.toJSON( meta ) ];
+		this.newMapJSON.images = [];
+		this.newMapJSON.images.push( {
 
-		if ( object.material[ mapName ] !== null ) {
+			uuid: newMap.image.uuid,
+			url: this.getDataURL( newMap.image )
 
-			this.oldMapJSON = object.material[ mapName ].toJSON( meta );
-			this.oldMapJSON.textures = [ object.material[ mapName ].texture.toJSON( meta ) ];
-		}
+		} );
 
 	}
-*/
+
+	this.oldMapJSON = null;
+	if ( object !== undefined && object.material[ mapName ] !== null ) {
+
+		var meta = {
+			geometries: {},
+			materials: {},
+			textures: {},
+			images: {}
+		};
+
+		this.oldMapJSON = this.oldMap.toJSON( meta );
+		this.oldMapJSON.images = [];
+		this.oldMapJSON.images.push( {
+
+			uuid: this.oldMap.image.uuid,
+			url: this.getDataURL( this.oldMap.image )
+
+		} );
+
+	}
 
 };
 
@@ -75,20 +96,59 @@ CmdSetMaterialMap.prototype = {
 
 		this.objectUuid = json.objectUuid;
 		this.mapName = json.mapName;
-		this.object = this.editor.objectByUuid( json.objectUuid );
 
-		this.oldMap = this.parseTexture( json.oldMap );
-		this.newMap = this.parseTexture( json.newMap );
+		this.object = this.editor.objectByUuid( json.objectUuid );
 
 		this.oldMapJSON = json.oldMap;
 		this.newMapJSON = json.newMap;
 
+		this.oldMap = this.parseTexture( json.oldMap );
+		this.newMap = this.parseTexture( json.newMap );
+
 	},
 
-	parseTexture: function ( data, images ) {
+	parseTexture: function ( json ) {
 
-		var loader = new THREE.ObjectLoader();
-		return loader.parseTextures( [ data ] )[ data.uuid ];
+		var map = null;
+		if ( json !== null ) {
+
+			var loader = new THREE.ObjectLoader();
+			var images = loader.parseImages( json.images );
+			var textures  = loader.parseTextures( [ json ], images );
+			map = textures[ json.uuid ];
+
+		}
+		return map;
+
+	},
+
+	getDataURL: function ( image ) {
+
+		var canvas;
+
+		if ( image.toDataURL !== undefined ) {
+
+			canvas = image;
+
+		} else {
+
+			canvas = document.createElement( 'canvas' );
+			canvas.width = image.width;
+			canvas.height = image.height;
+
+			canvas.getContext( '2d' ).drawImage( image, 0, 0, image.width, image.height );
+
+		}
+
+		if ( canvas.width > 2048 || canvas.height > 2048 ) {
+
+			return canvas.toDataURL( 'image/jpeg', 0.6 );
+
+		} else {
+
+			return canvas.toDataURL( 'image/png' );
+
+		}
 
 	}
 
