@@ -38,6 +38,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
 	this.version = 0;
+	this.previousVersion = 0;
 	this.onUpdate = null;
 
 };
@@ -51,7 +52,7 @@ THREE.Texture.prototype = {
 
 	set needsUpdate ( value ) {
 
-		if ( value === true ) this.version ++;
+		this.version  = value ? this.version + 1 : this.previousVersion;
 
 	},
 

@@ -2758,7 +2758,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( texture.generateMipmaps && isImagePowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
-		textureProperties.__version = texture.version;
+		textureProperties.__version = texture.previousVersion = texture.version;
 
 		if ( texture.onUpdate ) texture.onUpdate( texture );
 
@@ -2923,7 +2923,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				textureProperties.__version = texture.version;
+				textureProperties.__version = texture.previousVersion = texture.version;
 
 				if ( texture.onUpdate ) texture.onUpdate( texture );
 
