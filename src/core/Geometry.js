@@ -863,6 +863,18 @@ THREE.Geometry.prototype = {
 
 	},
 
+	sortFacesByMaterial: function () {
+
+		function materialSort( a, b ) {
+
+			return a.materialIndex - b.materialIndex;
+
+		}
+
+		this.faces.sort( materialSort );
+
+	},
+
 	toJSON: function () {
 
 		var data = {
