@@ -3158,14 +3158,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( renderTarget.format !== THREE.RGBAFormat && paramThreeToGL(renderTarget.format) !== _gl.getParameter(_gl.IMPLEMENTATION_COLOR_READ_FORMAT) ) {
+			if ( renderTarget.format !== THREE.RGBAFormat && paramThreeToGL( renderTarget.format ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
 
 				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
 				return;
 
 			}
 
-			if ( renderTarget.type !== THREE.UnsignedByteType && paramThreeToGL(renderTarget.type) !== _gl.getParameter(_gl.IMPLEMENTATION_COLOR_READ_TYPE) ) {
+			if ( renderTarget.type !== THREE.UnsignedByteType && paramThreeToGL( renderTarget.type ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) ) {
 
 				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
 				return;
@@ -3174,7 +3174,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( _gl.checkFramebufferStatus( _gl.FRAMEBUFFER ) === _gl.FRAMEBUFFER_COMPLETE ) {
 
-				_gl.readPixels( x, y, width, height, paramThreeToGL(renderTarget.format), paramThreeToGL(renderTarget.type), buffer );
+				_gl.readPixels( x, y, width, height, paramThreeToGL( renderTarget.format ), paramThreeToGL( renderTarget.type ), buffer );
 
 			} else {
 
@@ -3192,21 +3192,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function updateRenderTargetMipmap ( renderTarget ) {
+	function updateRenderTargetMipmap( renderTarget ) {
 
-		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
+		var target = renderTarget instanceof THREE.WebGLRenderTargetCube ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
+		var texture = properties.get( renderTarget ).__webglTexture;
 
-			state.bindTexture( _gl.TEXTURE_CUBE_MAP, properties.get( renderTarget ).__webglTexture );
-			_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
-			state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
-
-		} else {
-
-			state.bindTexture( _gl.TEXTURE_2D, properties.get( renderTarget ).__webglTexture );
-			_gl.generateMipmap( _gl.TEXTURE_2D );
-			state.bindTexture( _gl.TEXTURE_2D, null );
-
-		}
+		state.bindTexture( target, texture );
+		_gl.generateMipmap( target );
+		state.bindTexture( target, null );
 
 	}
 
