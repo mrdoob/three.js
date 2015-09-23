@@ -8366,6 +8366,7 @@ THREE.Object3D.prototype = {
 		var isRootObject = ( meta === undefined );
 
 		var data = {};
+		var output = { object: data };
 
 		// meta is a hash used to collect geometries, materials.
 		// not providing it implies that this is the root object
@@ -8380,7 +8381,7 @@ THREE.Object3D.prototype = {
 				images: {}
 			};
 
-			data.metadata = {
+			output.metadata = {
 				version: 4.4,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
@@ -8411,8 +8412,6 @@ THREE.Object3D.prototype = {
 
 		}
 
-		var output = {};
-
 		if ( isRootObject ) {
 
 			var geometries = extractFromCache( meta.geometries );
@@ -8426,8 +8425,6 @@ THREE.Object3D.prototype = {
 			if ( images.length > 0 ) output.images = images;
 
 		}
-
-		output.object = data;
 
 		return output;
 
@@ -10723,6 +10720,8 @@ THREE.BufferGeometry.prototype = {
 
 			console.warn( 'THREE.BufferGeometry.addAttribute: Use .setIndex() for index attribute.' );
 			this.setIndex( attribute );
+
+			return;
 
 		}
 
@@ -20433,11 +20432,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( index !== null ) {
 
-				count = index.count;
-
-			} else if ( position instanceof THREE.InterleavedBufferAttribute ) {
-
-				count = position.data.array.length / 3;
+				count = index.array.length;
 
 			} else {
 
@@ -24521,7 +24516,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			flatShading: material.shading === THREE.FlatShading,
 
 			sizeAttenuation: material.sizeAttenuation,
-			logarithmicDepthBuffer: renderer.logarithmicDepthBuffer,
+			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
 
 			skinning: material.skinning,
 			maxBones: maxBones,
