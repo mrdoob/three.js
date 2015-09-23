@@ -20,9 +20,7 @@ THREE.Clock.prototype = {
 
 	start: function () {
 
-		this.startTime = self.performance !== undefined && self.performance.now !== undefined
-					 ? self.performance.now()
-					 : Date.now();
+		this.startTime = this._getNow();
 
 		this.oldTime = this.startTime;
 		this.running = true;
@@ -55,9 +53,7 @@ THREE.Clock.prototype = {
 
 		if ( this.running ) {
 
-			var newTime = self.performance !== undefined && self.performance.now !== undefined
-					 ? self.performance.now()
-					 : Date.now();
+			var newTime = this._getNow();
 
 			diff = 0.001 * ( newTime - this.oldTime );
 			this.oldTime = newTime;
@@ -68,6 +64,14 @@ THREE.Clock.prototype = {
 
 		return diff;
 
+	},
+
+	_getNow: function () {
+		var now = self.performance !== undefined && self.performance.now !== undefined
+			? self.performance.now()
+			: Date.now();
+
+		return now;
 	}
 
 };
