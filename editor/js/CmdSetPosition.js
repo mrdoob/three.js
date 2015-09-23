@@ -31,7 +31,7 @@ CmdSetPosition.prototype = {
 	execute: function () {
 
 		this.object.position.copy( this.newPosition );
-		this.object.updateMatrix();
+		this.object.updateMatrixWorld( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	},
@@ -39,7 +39,7 @@ CmdSetPosition.prototype = {
 	undo: function () {
 
 		this.object.position.copy( this.oldPosition );
-		this.object.updateMatrix();
+		this.object.updateMatrixWorld( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	},

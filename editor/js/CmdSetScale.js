@@ -31,7 +31,7 @@ CmdSetScale.prototype = {
 	execute: function () {
 
 		this.object.scale.copy( this.newScale );
-		this.object.updateMatrix();
+		this.object.updateMatrixWorld( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	},
@@ -39,7 +39,7 @@ CmdSetScale.prototype = {
 	undo: function () {
 
 		this.object.scale.copy( this.oldScale );
-		this.object.updateMatrix();
+		this.object.updateMatrixWorld( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	},

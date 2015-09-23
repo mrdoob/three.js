@@ -32,7 +32,7 @@ CmdSetRotation.prototype = {
 	execute: function () {
 
 		this.object.rotation.copy( this.newRotation );
-		this.object.updateMatrix();
+		this.object.updateMatrixWorld( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	},
@@ -40,7 +40,7 @@ CmdSetRotation.prototype = {
 	undo: function () {
 
 		this.object.rotation.copy( this.oldRotation );
-		this.object.updateMatrix();
+		this.object.updateMatrixWorld( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	},
