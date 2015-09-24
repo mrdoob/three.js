@@ -78,6 +78,18 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		}
 
+		if ( this.usedInstancedBufferCount > 0 ) {
+
+			var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+			if ( extension != null ) {
+
+				extension.vertexAttribDivisorANGLE( attribute, 0 );
+
+			}
+
+		}
+
 	};
 
 	this.disableUnusedAttributes = function () {

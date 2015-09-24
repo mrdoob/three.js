@@ -25,7 +25,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
-	_usedInstancedBuffer = false,
 
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
@@ -936,7 +935,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							extension.vertexAttribDivisorANGLE( programAttribute, data.meshPerAttribute );
 
-							_usedInstancedBuffer = true;
+							state.usedInstancedBufferCount = data.meshPerAttribute;
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
@@ -962,25 +961,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							extension.vertexAttribDivisorANGLE( programAttribute, geometryAttribute.meshPerAttribute );
 
-							_usedInstancedBuffer = true;
+							state.usedInstancedBufferCount = geometryAttribute.meshPerAttribute;
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
 								geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
-
-							}
-
-						} else {
-
-						 if ( _usedInstancedBuffer ) {
-
-								extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-								if ( extension != null ) {
-
-									extension.vertexAttribDivisorANGLE( programAttribute, 0 );
-
-								}
 
 							}
 
