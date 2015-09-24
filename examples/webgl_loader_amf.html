@@ -71,20 +71,20 @@
 				scene = new THREE.Scene();
 				scene.add( new THREE.AmbientLight( 0x999999 ) );
 
-				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 25 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 50 );
 
-				// Normally Z is up for objects intended to be 3D printed.
-				// This rook is sideways ;)
+				// Z is up for objects intended to be 3D printed.
 
-				camera.up.set( 0, 1, 0 );
-				camera.position.set( 1, 6, 9 );
+				camera.up.set( 0, 0, 1 );
+				camera.position.set( 0, -9, 6 );
 
-				camera.add( new THREE.DirectionalLight( 0xffffff, 0.8 ) );
+				camera.add( new THREE.PointLight( 0xffffff, 0.8 ) );
 
 				scene.add( camera );
 
 				grid = new THREE.GridHelper( 25, 1.0 );
 				grid.setColors( 0xffffff, 0x555555 );
+				grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI/180 ) );
 				scene.add( grid );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -97,13 +97,14 @@
 
 				loader.load( './models/amf/rook.amf', function ( amfobject ) {
 
+					document.amfobject = amfobject;
 					scene.add( amfobject );
 					render();
 
 				} );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 1, 1.2, 0 );
+				controls.target.set( 0, 1.2, 2 );
 				controls.update();
 
 				controls.addEventListener( 'change', render );
