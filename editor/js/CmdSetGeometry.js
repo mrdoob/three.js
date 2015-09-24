@@ -12,11 +12,11 @@ CmdSetGeometry = function ( object, newGeometry ) {
 	this.object = object;
 	this.objectUuid = object !== undefined ? object.uuid : undefined;
 
-	this.newGeometry = newGeometry;	// only needed for update(cmd)
+	this.oldGeometry = object !== undefined ? object.geometry : undefined;
+	this.newGeometry = newGeometry;
 
 	this.oldGeometryJSON = object !== undefined ? object.geometry.toJSON() : undefined;
 	this.newGeometryJSON = newGeometry !== undefined ? newGeometry.toJSON() : undefined;
-
 
 };
 
@@ -25,7 +25,7 @@ CmdSetGeometry.prototype = {
 	execute: function () {
 
 		this.object.geometry.dispose();
-		this.object.geometry = this.parseGeometry( this.newGeometryJSON );
+		this.object.geometry = this.newGeometry;
 		this.object.geometry.computeBoundingSphere();
 
 		this.editor.signals.geometryChanged.dispatch( this.object );
@@ -36,7 +36,7 @@ CmdSetGeometry.prototype = {
 	undo: function () {
 
 		this.object.geometry.dispose();
-		this.object.geometry = this.parseGeometry( this.oldGeometryJSON );
+		this.object.geometry = this.oldGeometry;
 		this.object.geometry.computeBoundingSphere();
 
 		this.editor.signals.geometryChanged.dispatch( this.object );
@@ -46,6 +46,7 @@ CmdSetGeometry.prototype = {
 
 	update: function ( cmd ) {
 
+		this.newGeometry = cmd.newGeometry;
 		this.newGeometryJSON = cmd.newGeometry.toJSON();
 
 	},
@@ -72,13 +73,17 @@ CmdSetGeometry.prototype = {
 		this.oldGeometryJSON = json.oldGeometryJSON;
 		this.newGeometryJSON = json.newGeometryJSON;
 
-	},
+		this.oldGeometry = this.parseGeometry( this.oldGeometryJSON );
+		this.newGeometry = this.parseGeometry( this.newGeometryJSON );
 
-	parseGeometry: function ( data ) {
+		function parseGeometry ( data ) {
 
-		var loader = new THREE.ObjectLoader();
-		return loader.parseGeometries( [ data ] )[ data.uuid ];
+			var loader = new THREE.ObjectLoader();
+			return loader.parseGeometries( [ data ] )[ data.uuid ];
+
+		}
 
 	}
+
 
 };
