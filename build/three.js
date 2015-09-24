@@ -10107,15 +10107,15 @@ THREE.Geometry.prototype = {
 
 	},
 
-	sortFacesByMaterial: function () {
+	sortFacesByMaterialIndex: function () {
 
-		function materialSort( a, b ) {
+		function materialIndexSort( a, b ) {
 
 			return a.materialIndex - b.materialIndex;
 
 		}
 
-		this.faces.sort( materialSort );
+		this.faces.sort( materialIndexSort );
 
 	},
 
@@ -22287,8 +22287,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometryAttribute !== undefined ) {
 
-					state.enableAttribute( programAttribute );
-
 					var size = geometryAttribute.itemSize;
 					var buffer = objects.getAttributeBuffer( geometryAttribute );
 
@@ -22298,19 +22296,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 						var stride = data.stride;
 						var offset = geometryAttribute.offset;
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
-
 						if ( data instanceof THREE.InstancedInterleavedBuffer ) {
 
-							if ( extension === null ) {
-
-								console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
-								return;
-
-							}
-
-							extension.vertexAttribDivisorANGLE( programAttribute, data.meshPerAttribute );
+							state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute, extension );
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
@@ -22318,23 +22306,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							}
 
+						} else {
+
+							state.enableAttribute( programAttribute );
+
 						}
+
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
 
 					} else {
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
-
 						if ( geometryAttribute instanceof THREE.InstancedBufferAttribute ) {
 
-							if ( extension === null ) {
-
-								console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
-								return;
-
-							}
-
-							extension.vertexAttribDivisorANGLE( programAttribute, geometryAttribute.meshPerAttribute );
+							state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute, extension );
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
@@ -22342,7 +22327,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							}
 
+						} else {
+
+							state.enableAttribute( programAttribute );
+
 						}
+
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
 
 					}
 
@@ -26759,6 +26751,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
+	var attributeDivisors = new Uint8Array( 16 );
 
 	var capabilities = {};
 
@@ -26826,6 +26819,35 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 			gl.enableVertexAttribArray( attribute );
 			enabledAttributes[ attribute ] = 1;
+
+		}
+
+		if ( attributeDivisors[ attribute ] !== 0 ) {
+
+			var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+			extension.vertexAttribDivisorANGLE( attribute, 0 );
+			attributeDivisors[ attribute ] = 0;
+
+		}
+
+	};
+
+	this.enableAttributeAndDivisor = function ( attribute, meshPerAttribute, extension ) {
+
+		newAttributes[ attribute ] = 1;
+
+		if ( enabledAttributes[ attribute ] === 0 ) {
+
+			gl.enableVertexAttribArray( attribute );
+			enabledAttributes[ attribute ] = 1;
+
+		}
+
+		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
+
+			extension.vertexAttribDivisorANGLE( attribute, meshPerAttribute );
+			attributeDivisors[ attribute ] = meshPerAttribute;
 
 		}
 
