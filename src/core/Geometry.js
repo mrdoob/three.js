@@ -863,15 +863,15 @@ THREE.Geometry.prototype = {
 
 	},
 
-	sortFacesByMaterial: function () {
+	sortFacesByMaterialIndex: function () {
 
-		function materialSort( a, b ) {
+		function materialIndexSort( a, b ) {
 
 			return a.materialIndex - b.materialIndex;
 
 		}
 
-		this.faces.sort( materialSort );
+		this.faces.sort( materialIndexSort );
 
 	},
 

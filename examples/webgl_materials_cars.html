@@ -568,7 +568,7 @@
 
 			function createScene( geometry, car ) {
 
-				geometry.sortFacesByMaterial();
+				geometry.sortFacesByMaterialIndex();
 
 				var m = new THREE.MeshFaceMaterial(),
 					s = CARS[ car ].scale * 1,
