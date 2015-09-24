@@ -7,6 +7,18 @@ After evaluating different design patterns for undo/redo we decided to use the [
 
 This means that every action is encapsulated in a command-object which contains all the relevant information to restore the previous state.
 
+In our implementation we store the old and the new state separately (we don't store the complete state but rather the attribute and value which has changed).
+It would also be possible to only store the difference between the old and the new state.
+
+**Before implementing your own command you should look if you can't reuse one of the already existing ones.**
+
+For numbers, strings or booleans the CmdSet...Value-commands can be used.
+Then there are separate commands for:
+- setting a color property (THREE.Color)
+- setting maps (THREE.Texture)
+- setting geometries
+- setting materials
+- setting position, rotation and scale
 
 ### Template for new commands ###
 
@@ -102,3 +114,5 @@ within a short period of time should be merged into one.
 leads to hundreds of minor changes to the x-position.
 The user expectation is not to undo every single change that happened while he dragged
 the mouse cursor but rather to go back to the position before he started to drag his mouse.
+
+When editing a script the changes are also merged into one undo-step.
