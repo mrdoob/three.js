@@ -73,21 +73,19 @@
 
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 25 );
 
-				scene.fog = new THREE.Fog( 0x999999, 0, 25 );
-
 				// Normally Z is up for objects intended to be 3D printed.
 				// This rook is sideways ;)
 
-				camera.up = new THREE.Vector3( 0, 1, 0 );
-				camera.position.set( 1, 6, 9);
+				camera.up.set( 0, 1, 0 );
+				camera.position.set( 1, 6, 9 );
 
-				camera.add(new THREE.DirectionalLight( 0xffffff, 0.8 ) );
+				camera.add( new THREE.DirectionalLight( 0xffffff, 0.8 ) );
 
-				scene.add(camera);
+				scene.add( camera );
 
 				grid = new THREE.GridHelper( 25, 1.0 );
 				grid.setColors( 0xffffff, 0x555555 );
-				scene.add(grid);
+				scene.add( grid );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0x999999 );
