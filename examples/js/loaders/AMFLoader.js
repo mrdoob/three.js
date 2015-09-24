@@ -106,8 +106,8 @@ THREE.AMFLoader.prototype = {
 
 					var material = objdefaultmaterial;
 
-					newgeometry.addAttribute('position', vertices.clone());
-					newgeometry.addAttribute('index', new THREE.BufferAttribute(indexes, 1));
+					newgeometry.addAttribute('position', vertices.clone() );
+					newgeometry.setIndex( new THREE.BufferAttribute(indexes, 1) );
 
 					if(amfMaterials[currvolume.materialid] !== undefined) {
 						material = amfMaterials[currvolume.materialid];
