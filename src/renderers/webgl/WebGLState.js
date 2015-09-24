@@ -68,7 +68,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
-	this.enableAttribute = function ( attribute ) {
+	this.enableAttribute = function ( attribute, meshPerAttribute, extension ) {
 
 		newAttributes[ attribute ] = 1;
 
@@ -76,6 +76,15 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 			gl.enableVertexAttribArray( attribute );
 			enabledAttributes[ attribute ] = 1;
+
+		}
+
+		meshPerAttribute = meshPerAttribute || 0;
+
+		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
+
+			extension.vertexAttribDivisorANGLE( attribute, meshPerAttribute );
+			attributeDivisors[ attribute ] !== meshPerAttribute;
 
 		}
 
