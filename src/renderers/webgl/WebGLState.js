@@ -83,6 +83,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
 
+			extension = extension || extensions.get( 'ANGLE_instanced_arrays' );
+
 			extension.vertexAttribDivisorANGLE( attribute, meshPerAttribute );
 			attributeDivisors[ attribute ] = meshPerAttribute;
 
