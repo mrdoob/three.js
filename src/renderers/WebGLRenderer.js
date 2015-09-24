@@ -935,6 +935,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							extension.vertexAttribDivisorANGLE( programAttribute, data.meshPerAttribute );
 
+							state.usedInstancedBufferCount = data.meshPerAttribute;
+
 							if ( geometry.maxInstancedCount === undefined ) {
 
 								geometry.maxInstancedCount = data.meshPerAttribute * data.count;
@@ -958,6 +960,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 							}
 
 							extension.vertexAttribDivisorANGLE( programAttribute, geometryAttribute.meshPerAttribute );
+
+							state.usedInstancedBufferCount = geometryAttribute.meshPerAttribute;
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
