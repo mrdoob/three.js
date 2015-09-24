@@ -8,6 +8,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
+	var attributeDivisors = new Uint8Array( 16 );
 
 	var capabilities = {};
 
