@@ -19,19 +19,38 @@ CmdAddObject = function ( object ) {
 			textures: {},
 			images: {}
 		};
-		this.objectJSON = object.toJSON( meta );
+		var json = object.toJSON( meta );
 
-		if ( object.geometry !== undefined ) {
+		var geometries = extractFromCache( meta.geometries );
+		var materials = extractFromCache( meta.materials );
+		var textures = extractFromCache( meta.textures );
+		var images = extractFromCache( meta.images );
 
-			this.objectJSON.geometries = [ object.geometry.toJSON( meta ) ];
+		if ( geometries.length > 0 ) json.geometries = geometries;
+		if ( materials.length > 0 ) json.materials = materials;
+		if ( textures.length > 0 ) json.textures = textures;
+		if ( images.length > 0 ) json.images = images;
+
+		this.objectJSON = json;
+
+	}
+
+	// Note: The function 'extractFromCache' is copied from Object3D.toJSON()
+
+	// extract data from the cache hash
+	// remove metadata on each item
+	// and return as array
+	function extractFromCache ( cache ) {
+
+		var values = [];
+		for ( var key in cache ) {
+
+			var data = cache[ key ];
+			delete data.metadata;
+			values.push( data );
 
 		}
-
-		if ( object.material !== undefined ) {
-
-			this.objectJSON.materials = [ object.material.toJSON( meta ) ];
-
-		}
+		return values;
 
 	}
 
