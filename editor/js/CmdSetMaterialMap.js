@@ -14,8 +14,14 @@ CmdSetMaterialMap = function ( object, mapName, newMap ) {
 	this.newMap = newMap;
 	this.objectUuid = object !== undefined ? object.uuid : undefined;
 
-	this.newMapJSON = null;
-	if ( newMap !== undefined && newMap !== null ) {
+	this.newMapJSON = serializeMap( this.newMap );
+	this.oldMapJSON = serializeMap( this.oldMap );
+
+	// serializes a map (THREE.Texture)
+
+	function serializeMap ( map ) {
+
+		if ( map === null || map === undefined ) return null;
 
 		var meta = {
 			geometries: {},
@@ -24,37 +30,36 @@ CmdSetMaterialMap = function ( object, mapName, newMap ) {
 			images: {}
 		};
 
-		this.newMapJSON = newMap.toJSON( meta );
-		this.newMapJSON.images = [];
-		this.newMapJSON.images.push( {
+		var json = map.toJSON( meta );
 
-			uuid: newMap.image.uuid,
-			url: this.getDataURL( newMap.image )
+		var textures = extractFromCache( meta.textures );
+		var images = extractFromCache( meta.images );
 
-		} );
-		this.newMapJSON.sourceFile = newMap.sourceFile;
+		if ( textures.length > 0 ) json.textures = textures;
+		if ( images.length > 0 ) json.images = images;
+
+		json.sourceFile = map.sourceFile;
+
+		return json;
 
 	}
 
-	this.oldMapJSON = null;
-	if ( object !== undefined && object.material[ mapName ] !== null ) {
+	// Note: The function 'extractFromCache' is copied from Object3D.toJSON()
 
-		var meta = {
-			geometries: {},
-			materials: {},
-			textures: {},
-			images: {}
-		};
+	// extract data from the cache hash
+	// remove metadata on each item
+	// and return as array
+	function extractFromCache ( cache ) {
 
-		this.oldMapJSON = this.oldMap.toJSON( meta );
-		this.oldMapJSON.images = [];
-		this.oldMapJSON.images.push( {
+		var values = [];
+		for ( var key in cache ) {
 
-			uuid: this.oldMap.image.uuid,
-			url: this.getDataURL( this.oldMap.image )
+			var data = cache[ key ];
+			delete data.metadata;
+			values.push( data );
 
-		} );
-		this.oldMapJSON.sourceFile = this.oldMap.sourceFile;
+		}
+		return values;
 
 	}
 
@@ -104,52 +109,23 @@ CmdSetMaterialMap.prototype = {
 		this.oldMapJSON = json.oldMap;
 		this.newMapJSON = json.newMap;
 
-		this.oldMap = this.parseTexture( json.oldMap );
-		this.newMap = this.parseTexture( json.newMap );
+		this.oldMap = parseTexture( json.oldMap );
+		this.newMap = parseTexture( json.newMap );
 
-	},
 
-	parseTexture: function ( json ) {
+		function parseTexture ( json ) {
 
-		var map = null;
-		if ( json !== null ) {
+			var map = null;
+			if ( json !== null ) {
 
-			var loader = new THREE.ObjectLoader();
-			var images = loader.parseImages( json.images );
-			var textures  = loader.parseTextures( [ json ], images );
-			map = textures[ json.uuid ];
-			map.sourceFile = json.sourceFile;
+				var loader = new THREE.ObjectLoader();
+				var images = loader.parseImages( json.images );
+				var textures  = loader.parseTextures( [ json ], images );
+				map = textures[ json.uuid ];
+				map.sourceFile = json.sourceFile;
 
-		}
-		return map;
-
-	},
-
-	getDataURL: function ( image ) {
-
-		var canvas;
-
-		if ( image.toDataURL !== undefined ) {
-
-			canvas = image;
-
-		} else {
-
-			canvas = document.createElement( 'canvas' );
-			canvas.width = image.width;
-			canvas.height = image.height;
-
-			canvas.getContext( '2d' ).drawImage( image, 0, 0, image.width, image.height );
-
-		}
-
-		if ( canvas.width > 2048 || canvas.height > 2048 ) {
-
-			return canvas.toDataURL( 'image/jpeg', 0.6 );
-
-		} else {
-
-			return canvas.toDataURL( 'image/png' );
+			}
+			return map;
 
 		}
 
