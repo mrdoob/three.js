@@ -1,5 +1,5 @@
 #ifdef USE_SHADOWMAP
-	
+
 	uniform sampler2D shadowMap[ MAX_SHADOWS ];
 	uniform vec2 shadowMapSize[ MAX_SHADOWS ];
 
@@ -19,32 +19,30 @@
 	#if defined(POINT_LIGHT_SHADOWS)
 
 		float unpack1K ( vec4 color ) {
-		
+
 			const vec4 bitSh = vec4( 1.0 / (256.0 * 256.0 * 256.0), 1.0 / (256.0 * 256.0), 1.0 / 256.0, 1.0 );
 			return dot( color, bitSh ) * 1000.0;
-			
+
 		}
 
-		/**
-		*  cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
-		*  vector suitable for 2D texture mapping. This code uses the following layout for the
-		*  2D texture:		
-		*  
-		*  xzXZ
-		*   y Y
-		*
-		*  Y - Positive y direction
-		*  y - Negative y direction
-		*  X - Positive x direction
-		*  x - Negative x direction
-		*  Z - Positive z direction
-		*  z - Negative z direction
-		*
-		*  Alternate code for a horizontal cross layout can be found here:
-		*  https://gist.github.com/tschw/da10c43c467ce8afd0c4
-		*/
+		// cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
+		// vector suitable for 2D texture mapping. This code uses the following layout for the
+		// 2D texture:
+		//
+		// xzXZ
+		//  y Y
+		//
+		// Y - Positive y direction
+		// y - Negative y direction
+		// X - Positive x direction
+		// x - Negative x direction
+		// Z - Positive z direction
+		// z - Negative z direction
+		//
+		// Source and test bed:
+		// https://gist.github.com/tschw/da10c43c467ce8afd0c4
 
-		vec2 cubeToUV( vec3 v, float texelSizeX, float texelSizeY ) {
+		vec2 cubeToUV( vec3 v, float texelSizeY ) {
 
 			// Number of texels to avoid at the edge of each square
 
@@ -95,15 +93,15 @@
 			// scale := 0.5 / dim
 			// translate := ( center + 0.5 ) / dim
 			return vec2( 0.125, 0.25 ) * planar + vec2( 0.375, 0.75 );
-			
+
 		}
 
 		vec3 gridSamplingDisk[ 20 ];
 		bool gridSamplingInitialized = false;
 
-		void initGridSamplingDisk(){
+		void initGridSamplingDisk() {
 
-			if( gridSamplingInitialized ){
+			if( gridSamplingInitialized ) {
 
 				return;
 
@@ -131,7 +129,7 @@
 			gridSamplingDisk[19] = vec3(0, 1, -1);
 
 			gridSamplingInitialized = true;
-			
+
 		}
 
 	#endif
