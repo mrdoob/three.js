@@ -14,15 +14,52 @@ CmdSetMaterial = function ( object, newMaterial ) {
 	this.oldMaterial = object !== undefined ? object.material : undefined;
 	this.newMaterial = newMaterial;
 
-	meta = {
-		geometries: {},
-		materials: {},
-		textures: {},
-		images: {}
-	};
+	this.oldMaterialJSON = serializeMaterial( this.oldMaterial );
+	this.newMaterialJSON = serializeMaterial( this.newMaterial );
 
-	this.oldMaterialJSON = object !== undefined ? object.material.toJSON( meta ) : undefined;
-	this.newMaterialJSON = newMaterial !== undefined ? newMaterial.toJSON( meta ) : undefined;
+
+	function serializeMaterial ( material ) {
+
+		if ( material === undefined ) return null;
+
+		var meta = {
+			geometries: {},
+			materials: {},
+			textures: {},
+			images: {}
+		};
+
+		var json = {};
+		json.materials = [ material.toJSON( meta ) ];
+
+		var textures = extractFromCache( meta.textures );
+		var images = extractFromCache( meta.images );
+
+		if ( textures.length > 0 ) json.textures = textures;
+		if ( images.length > 0 ) json.images = images;
+
+		return json;
+
+	}
+
+	// Note: The function 'extractFromCache' is copied from Object3D.toJSON()
+
+	// extract data from the cache hash
+	// remove metadata on each item
+	// and return as array
+	function extractFromCache ( cache ) {
+
+		var values = [];
+		for ( var key in cache ) {
+
+			var data = cache[ key ];
+			delete data.metadata;
+			values.push( data );
+
+		}
+		return values;
+
+	}
 
 };
 
@@ -61,19 +98,22 @@ CmdSetMaterial.prototype = {
 		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.objectUuid = json.objectUuid;
 
-		this.oldMaterial = this.parseMaterial( json.oldMaterial );
-		this.newMaterial = this.parseMaterial( json.newMaterial );
-
 		this.oldMaterialJSON = json.oldMaterial;
 		this.newMaterialJSON = json.newMaterial;
 
-	},
+		this.oldMaterial = parseMaterial( json.oldMaterial );
+		this.newMaterial = parseMaterial( json.newMaterial );
 
-	parseMaterial: function ( data ) {
 
-		var loader = new THREE.ObjectLoader();
-		return loader.parseMaterials( [ data ] )[ data.uuid ];
+		function parseMaterial ( json ) {
 
+			var loader = new THREE.ObjectLoader();
+			var images = loader.parseImages( json.images );
+			var textures  = loader.parseTextures( json.textures, images );
+			var materials = loader.parseMaterials( json.materials, textures );
+			return materials[ json.materials[ 0 ].uuid ];
+
+		}
 	}
 
 };
