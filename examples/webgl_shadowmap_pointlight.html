@@ -1,8 +1,7 @@
-
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - Omni-directional Shadow map viewer example </title>
+		<title>three.js webgl - PointLight ShadowMap </title>
 		<meta charset="utf-8">
 		<style>
 			body {
@@ -25,15 +24,15 @@
 	</head>
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - Omni-directional Shadow map viewer example by <a href="https://github.com/mkkellogg">mkkellogg</a>
+		<a href="http://threejs.org" target="_blank">three.js</a> - PointLight ShadowMap by <a href="https://github.com/mkkellogg">mkkellogg</a>
 		</div>
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>		
+		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script>
-		
+
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer, clock, stats;
@@ -95,7 +94,7 @@
 				dirLight.shadowMapWidth = 1024;
 				dirLight.shadowMapHeight = 1024;
 				dirLight.name = 'Dir. Light';
-				scene.add( dirLight );*/			
+				scene.add( dirLight );*/
 
 				cubeMaterial = new THREE.MeshPhongMaterial( {
 					color: 0xff0000,
@@ -133,13 +132,13 @@
 				torusKnot.castShadow = true;
 				torusKnot.receiveShadow = true;
 				scene.add( torusKnot );
-			
+
 				wallMaterial = new THREE.MeshPhongMaterial( {
 					color: 0xa0adaf,
 					shininess: 10,
 					specular: 0x111111,
 					shading: THREE.SmoothShading
-				} );				
+				} );
 
 				var wallGeometry = new THREE.BoxGeometry( 10, 0.15, 10 );
 				ground = new THREE.Mesh( wallGeometry, wallMaterial );
@@ -162,7 +161,7 @@
 				wall.name = "left wall";
 				wall.scale.multiplyScalar( 3 );
 				wall.castShadow = false;
-				wall.receiveShadow = true;				
+				wall.receiveShadow = true;
 				scene.add( wall );
 				wall.position.set( -14, 10, 0 );
 				wall.rotation.z = Math.PI / 2;
@@ -171,7 +170,7 @@
 				wall.name = "right wall";
 				wall.scale.multiplyScalar( 3 );
 				wall.castShadow = false;
-				wall.receiveShadow = true;				
+				wall.receiveShadow = true;
 				scene.add( wall );
 				wall.position.set(14,10,0);
 				wall.rotation.z = Math.PI / 2;
@@ -180,7 +179,7 @@
 				wall.name = "back wall";
 				wall.scale.multiplyScalar( 3 );
 				wall.castShadow = false;
-				wall.receiveShadow = true;				
+				wall.receiveShadow = true;
 				scene.add( wall );
 				wall.position.set( 0, 10, -14 );
 				wall.rotation.y = Math.PI / 2;
@@ -190,7 +189,7 @@
 				wall.name = "front wall";
 				wall.scale.multiplyScalar( 3 );
 				wall.castShadow = false;
-				wall.receiveShadow = true;				
+				wall.receiveShadow = true;
 				scene.add( wall );
 				wall.position.set( 0, 10, 14 );
 				wall.rotation.y = Math.PI / 2;
@@ -200,14 +199,14 @@
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 				var sphere = new THREE.Mesh( sphereGeometry, material );
 				sphere.castShadow = false;
-				sphere.receiveShadow = false;	
+				sphere.receiveShadow = false;
 				sphere.position.set( 0, 11, 4 );
 				scene.add( sphere );
 
 				pointLightParent = new THREE.Object3D();
 				pointLightParent.add( pointLight );
 				pointLightParent.add( sphere );
-				scene.add( pointLightParent );	
+				scene.add( pointLightParent );
 
 			}
 
@@ -215,7 +214,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000 );				
+				renderer.setClearColor( 0x000000 );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.BasicShadowMap;
 
