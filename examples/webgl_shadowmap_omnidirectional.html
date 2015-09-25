@@ -59,7 +59,7 @@
 
 			function initScene() {
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 15, 35 );
 
 				scene = new THREE.Scene();
@@ -77,13 +77,14 @@
 				pointLight.shadowCameraVisible = true;
 				pointLight.shadowMapWidth = 2048;
 				pointLight.shadowMapHeight = 1024;
+				pointLight.shadowBias = 0.1;
 				pointLight.name = 'Point Light';
 				scene.add( pointLight );
 
 				/*dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				dirLight.position.set( 0, 50, 0 );
 				dirLight.castShadow = true;
-				dirLight.shadowCameraNear = 0.01;
+				dirLight.shadowCameraNear = 1;
 				dirLight.shadowCameraFar = 100;
 				dirLight.shadowCameraRight = 15;
 				dirLight.shadowCameraLeft = -15;
@@ -216,7 +217,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000 );				
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFShadowMap;
+				renderer.shadowMap.type = THREE.BasicShadowMap;
 
 				// Mouse control
 				controls = new THREE.OrbitControls( camera, renderer.domElement );

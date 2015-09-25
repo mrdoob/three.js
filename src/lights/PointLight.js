@@ -18,8 +18,8 @@ THREE.PointLight = function ( color, intensity, distance, decay ) {
 
 	//
 
-	this.shadowCameraNear = 0;
-	this.shadowCameraFar = 5000;
+	this.shadowCameraNear = 1;
+	this.shadowCameraFar = 500;
 	this.shadowCameraFov = 90;
 
 	this.shadowCameraVisible = false;

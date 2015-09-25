@@ -160,18 +160,35 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				var vpWidth = light.shadowMapWidth / 4.0;
 				var vpHeight = light.shadowMapHeight / 2.0;
 
+				/*
+				*
+				* These viewports map a cube-map onto a 2D texture with the
+				* following orientation:
+				*
+				*  xzXZ
+				*   y Y
+				*
+				*  Y - Positive y direction
+				*  y - Negative y direction
+				*  X - Positive x direction
+				*  x - Negative x direction
+				*  Z - Positive z direction
+				*  z - Negative z direction
+				*
+				*/
+
 				// positive X
-				cube2DViewPorts[ 0 ].set( vpWidth * 2, 0, vpWidth, vpHeight );
+				cube2DViewPorts[ 0 ].set( vpWidth * 2, vpHeight, vpWidth, vpHeight );
 				// negative X
-				cube2DViewPorts[ 1 ].set( 0, 0, vpWidth, vpHeight );
+				cube2DViewPorts[ 1 ].set( 0, vpHeight, vpWidth, vpHeight );
 				// positive Z
-				cube2DViewPorts[ 2 ].set( vpWidth * 3, 0, vpWidth, vpHeight );
+				cube2DViewPorts[ 2 ].set( vpWidth * 3, vpHeight, vpWidth, vpHeight );
 				// negative Z
-				cube2DViewPorts[ 3 ].set( vpWidth, 0, vpWidth, vpHeight );
+				cube2DViewPorts[ 3 ].set( vpWidth, vpHeight, vpWidth, vpHeight );
 				// positive Y
-				cube2DViewPorts[ 4 ].set( 0, vpHeight, vpWidth, vpHeight );
+				cube2DViewPorts[ 4 ].set(  vpWidth * 3, 0, vpWidth, vpHeight );
 				// negative Y
-				cube2DViewPorts[ 5 ].set( vpWidth * 2, vpHeight, vpWidth, vpHeight );
+				cube2DViewPorts[ 5 ].set( vpWidth, 0, vpWidth, vpHeight );
 
 			} else {
 
@@ -186,7 +203,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				var shadowFilter = THREE.LinearFilter;
 
-				if ( scope.type === THREE.PCFSoftShadowMap || light instanceof THREE.PointLight ) {
+				if ( scope.type === THREE.PCFSoftShadowMap) {
 
 					shadowFilter = THREE.NearestFilter;
 

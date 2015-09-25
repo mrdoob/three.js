@@ -28,10 +28,10 @@
 		/**
 		*  cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
 		*  vector suitable for 2D texture mapping. This code uses the following layout for the
-		*  2D texture:
-		*
-		*  Y y
+		*  2D texture:		
+		*  
 		*  xzXZ
+		*   y Y
 		*
 		*  Y - Positive y direction
 		*  y - Negative y direction
@@ -40,73 +40,61 @@
 		*  Z - Positive z direction
 		*  z - Negative z direction
 		*
-		*  Alternate code for different layouts, more compact code arrangement, and seam
-		*  skipping can be found here: https://gist.github.com/tschw/da10c43c467ce8afd0c4
+		*  Alternate code for a horizontal cross layout can be found here:
+		*  https://gist.github.com/tschw/da10c43c467ce8afd0c4
 		*/
 
 		vec2 cubeToUV( vec3 v, float texelSizeX, float texelSizeY ) {
 
-			// Horizontal cross layout:
-			const vec2 Squares = vec2( 4.0, 2.0 );
-			const vec2 Center = vec2( 1.0, 0.0 );
-
-			// Size of a square in UV space:
-			const vec2 TexSquareSize = 1.0 / Squares;
-
-			// UV space offset of the center of the center square of the cross:
-			const vec2 TexCoordOffs = TexSquareSize * ( 0.5 + Center );
-
-			// Factors to scale square space (-1..+1 per square) to UV space:
-			const vec2 TexSquareScale = TexSquareSize * 0.5;
-
-			// Just less than a texel in square space when divided by resolution:
-			const float TexEps = 1.5; // = min(Squares.x, Squares.y) - 0.5;
+			// Number of texels to avoid at the edge of each square
 
 			vec3 absV = abs( v );
-			vec3 sgnV = sign( v );
 
 			// Intersect unit cube
 
-			float scale = 1.0 / max( absV.x, max( absV.y, absV.z ) );
+			float scaleToCube = 1.0 / max( absV.x, max( absV.y, absV.z ) );
+			absV *= scaleToCube;
 
-			v *= scale; 
-			absV *= scale;
+			// Apply scale to avoid seams
 
-			// Determine gate factors
-
-			// gate.? is one when on left / right, bottom / top, back
-			float eps = TexEps * texelSizeY;
-			vec3 gate = step( 1.0 - eps, vec3( absV.xy, v.z ) );
-
-			// prefer any square over bottom / top
-			float notX = 1. - gate.x;
-			float notZ = 1. - gate.z;
-			gate.y *= notX * notZ;
-			// prefer back over side
-			gate.x *= notZ;
+			// two texels less per square (one texel will do for NEAREST)
+			v *= scaleToCube * ( 1.0 - 4.0 * texelSizeY );
 
 			// Unwrap
 
-			// start with xy coordinates
+			// space: -1 ... 1 range for each square
+			//
+			// #X##		dim    := ( 4 , 2 )
+			//  # #		center := ( 1 , 1 )
+
 			vec2 planar = v.xy;
 
-			// stop at the last texel (can use a factor of 1.0 for NEAREST)
-			float yTexelSize = 2.0 * Squares.y * texelSizeY;
-			float yAdjusted = planar.y * ( 1.0 - yTexelSize );
-			planar.y = yAdjusted;
-			planar.y -= gate.y * yAdjusted;
+			float almostATexel = 1.5 * texelSizeY;
+			float almostOne = 1.0 - almostATexel;
 
-			// unwrap left / right, top / bottom
-			planar.x += gate.x * ( sgnV.x + v.z * sgnV.x );
+			if ( absV.z >= almostOne ) {
 
-			planar.x += gate.y * ( -sgnV.y * 2.0 );
-			planar.y += gate.y * ( 2.0  + ( v.z * sgnV.y ) );
+				if ( v.z > 0.0 )
+					planar.x = 4.0 - v.x;
 
-			// unwrap back
-			planar.x += gate.z * ( 4.0 - 2.0 * planar.x );
+			} else if ( absV.x >= almostOne ) {
 
-			// adjust to UV space
-			return TexCoordOffs + planar * TexSquareScale; 
+				float signX = sign( v.x );
+				planar.x = v.z * signX + 2.0 * signX;
+
+			} else if ( absV.y >= almostOne ) {
+
+				float signY = sign( v.y );
+				planar.x = v.x + 2.0 * signY + 2.0;
+				planar.y = v.z * signY - 2.0;
+
+			}
+
+			// Transform to UV space
+
+			// scale := 0.5 / dim
+			// translate := ( center + 0.5 ) / dim
+			return vec2( 0.125, 0.25 ) * planar + vec2( 0.375, 0.75 );
 			
 		}
 
