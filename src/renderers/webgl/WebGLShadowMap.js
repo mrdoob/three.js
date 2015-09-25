@@ -16,10 +16,15 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_lookTarget = new THREE.Vector3(),
 	_lightPositionWorld = new THREE.Vector3(),
 
-	_renderList = [];
+	_renderList = [],
 
-	var _depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
-	_distanceMaterial, _distanceMaterialMorph, _distanceMaterialSkin, _distanceMaterialMorphSkin;
+	_MorphingFlag = 1,
+	_SkinningFlag = 2,
+
+	_NumberOfMaterialVariants = _MorphingFlag | _SkinningFlag,
+
+	_depthMaterials = new Array( _NumberOfMaterialVariants ),
+	_distanceMaterials = new Array( _NumberOfMaterialVariants );
 
 	var cubeDirections = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( - 1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ),
 						   new THREE.Vector3( 0, 0, - 1 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, - 1, 0 ) ];
@@ -37,75 +42,41 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 	var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
 
-	_depthMaterial = new THREE.ShaderMaterial( {
-		uniforms: depthUniforms,
-		vertexShader: depthShader.vertexShader,
-		fragmentShader: depthShader.fragmentShader
-	 } );
-
-	_depthMaterialMorph = new THREE.ShaderMaterial( {
-		uniforms: depthUniforms,
-		vertexShader: depthShader.vertexShader,
-		fragmentShader: depthShader.fragmentShader,
-		morphTargets: true
-	} );
-
-	_depthMaterialSkin = new THREE.ShaderMaterial( {
-		uniforms: depthUniforms,
-		vertexShader: depthShader.vertexShader,
-		fragmentShader: depthShader.fragmentShader,
-		skinning: true
-	} );
-
-	_depthMaterialMorphSkin = new THREE.ShaderMaterial( {
-		uniforms: depthUniforms,
-		vertexShader: depthShader.vertexShader,
-		fragmentShader: depthShader.fragmentShader,
-		morphTargets: true,
-		skinning: true
-	} );
-
-	_depthMaterial._shadowPass = true;
-	_depthMaterialMorph._shadowPass = true;
-	_depthMaterialSkin._shadowPass = true;
-	_depthMaterialMorphSkin._shadowPass = true;
-
-
 	var distanceShader = THREE.ShaderLib[ "distanceRGBA" ];
 	var distanceUniforms = THREE.UniformsUtils.clone( distanceShader.uniforms );
 
-	_distanceMaterial = new THREE.ShaderMaterial( {
-		uniforms: distanceUniforms,
-		vertexShader: distanceShader.vertexShader,
-		fragmentShader: distanceShader.fragmentShader
-	 } );
+	for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
 
-	_distanceMaterialMorph = new THREE.ShaderMaterial( {
-		uniforms: distanceUniforms,
-		vertexShader: distanceShader.vertexShader,
-		fragmentShader: distanceShader.fragmentShader,
-		morphTargets: true
-	} );
+		var useMorphing = ( i & _MorphingFlag ) !== 0;
+	    var useSkinning = ( i & _SkinningFlag ) !== 0;
 
-	_distanceMaterialSkin = new THREE.ShaderMaterial( {
-		uniforms: distanceUniforms,
-		vertexShader: distanceShader.vertexShader,
-		fragmentShader: distanceShader.fragmentShader,
-		skinning: true
-	} );
 
-	_distanceMaterialMorphSkin = new THREE.ShaderMaterial( {
-		uniforms: distanceUniforms,
-		vertexShader: distanceShader.vertexShader,
-		fragmentShader: distanceShader.fragmentShader,
-		morphTargets: true,
-		skinning: true
-	} );
+		var depthMaterial = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader,
+			morphTargets: useMorphing,
+			skinning: useSkinning
+		} );
 
-	_distanceMaterial._shadowPass = true;
-	_distanceMaterialMorph._shadowPass = true;
-	_distanceMaterialSkin._shadowPass = true;
-	_distanceMaterialMorphSkin._shadowPass = true;
+		depthMaterial._shadowPass = true;
+
+		_depthMaterials[ i ] = depthMaterial;
+
+
+		var distanceMaterial = new THREE.ShaderMaterial( {
+			uniforms: distanceUniforms,
+			vertexShader: distanceShader.vertexShader,
+			fragmentShader: distanceShader.fragmentShader,
+			morphTargets: useMorphing,
+			skinning: useSkinning
+		} );
+
+		distanceMaterial._shadowPass = true;
+
+		_distanceMaterials[ i ] = distanceMaterial;
+
+	}
 
 	//
 
@@ -373,48 +344,34 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		var geometry = object.geometry;
 
-		var useMorphing = geometry.morphTargets !== undefined && geometry.morphTargets.length > 0 && material.morphTargets;
-		var useSkinning = object instanceof THREE.SkinnedMesh && material.skinning;
+		var newMaterial = null;
 
-		var newMaterial;
-
-		var depthMaterial = _depthMaterial;
-		var depthMaterialMorph = _depthMaterialMorph;
-		var depthMaterialSkin = _depthMaterialSkin;
-		var depthMaterialMorphSkin = _depthMaterialMorphSkin;
+		var materialVariants = _depthMaterials;
+		var customMaterial = object.customDepthMaterial;
 
 		if ( isPointLight ) {
 
-			depthMaterial = _distanceMaterial;
-			depthMaterialMorph = _distanceMaterialMorph;
-			depthMaterialSkin = _distanceMaterialSkin;
-			depthMaterialMorphSkin = _distanceMaterialMorphSkin;
+			materialVariants = _distanceMaterials;
+			customMaterial = object.customDistanceMaterial;
 
 		}
 
-		if ( object.customDepthMaterial || object.customDistanceMaterial ) {
+		if ( ! customMaterial ) {
 
-			if ( isPointLight ) {
+			var useMorphing = geometry.morphTargets !== undefined &&
+					geometry.morphTargets.length > 0 && material.morphTargets;
 
-				newMaterial = object.customDistanceMaterial;
+			var useSkinning = object instanceof THREE.SkinnedMesh && material.skinning;
 
-			} else {
+			var variantIndex = 0;
+			if ( useMorphing ) variantIndex |= _MorphingFlag;
+			if ( useSkinning ) variantIndex |= _SkinningFlag;
 
-				newMaterial = object.customDepthMaterial;
-
-			}
-
-		} else if ( useSkinning ) {
-
-			newMaterial = useMorphing ? depthMaterialMorphSkin : depthMaterialSkin;
-
-		} else if ( useMorphing ) {
-
-			newMaterial = depthMaterialMorph;
+			newMaterial = materialVariants[ variantIndex ];
 
 		} else {
 
-			newMaterial = depthMaterial;
+			newMaterial = customMaterial;
 
 		}
 
@@ -422,13 +379,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		newMaterial.wireframe = material.wireframe;
 		newMaterial.wireframeLinewidth = material.wireframeLinewidth;
 
-		if ( isPointLight ) {
+		if ( isPointLight && newMaterial.uniforms.lightPos !== undefined ) {
 
-			if ( newMaterial.uniforms.lightPos ) {
-
-				newMaterial.uniforms.lightPos.value.copy( lightPositionWorld );
-
-			}
+			newMaterial.uniforms.lightPos.value.copy( lightPositionWorld );
 
 		}
 
