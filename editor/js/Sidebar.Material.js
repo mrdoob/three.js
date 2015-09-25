@@ -544,7 +544,7 @@ Sidebar.Material = function ( editor ) {
 				if ( objectHasUvs ) {
 
 					var specularMap = specularMapEnabled ? materialSpecularMap.getValue() : null;
-					if ( material.specularMap !== normalMap ) {
+					if ( material.specularMap !== specularMap ) {
 
 						editor.execute( new CmdSetMaterialMap( currentObject, 'specularMap', specularMap ) );
 
