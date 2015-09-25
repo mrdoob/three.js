@@ -42,7 +42,7 @@
 		// Source and test bed:
 		// https://gist.github.com/tschw/da10c43c467ce8afd0c4
 
-		vec2 cubeToUV( vec3 v, float texelSizeX, float texelSizeY ) {
+		vec2 cubeToUV( vec3 v, float texelSizeY ) {
 
 			// Number of texels to avoid at the edge of each square
 

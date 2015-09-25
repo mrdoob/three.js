@@ -51,7 +51,7 @@
 
 						float cubeTexelSize = 1.0 / ( shadowMapSize[ i ].x * 0.25 );
 						vec3 baseDirection3D = normalize( lightToPosition );
-						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeX, texelSizeY );
+						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeY );
 
 						initGridSamplingDisk();
 
@@ -71,7 +71,7 @@
 						 
 							vec3 offset = gridSamplingDisk[ s ] * diskRadius * cubeTexelSize;
 							vec3 adjustedBaseDirection3D = baseDirection3D + offset;
-							vec2 adjustedBaseDirection2D = cubeToUV( adjustedBaseDirection3D, texelSizeX, texelSizeY );
+							vec2 adjustedBaseDirection2D = cubeToUV( adjustedBaseDirection3D, texelSizeY );
 							dist = unpack1K( texture2D( shadowMap[ i ],  adjustedBaseDirection2D ) ) + shadowBias[ i ];
 							if ( curDistance >= dist )
 								shadow += 1.0;
@@ -159,7 +159,7 @@
 
 						float cubeTexelSize = 1.0 / ( shadowMapSize[ i ].x * 0.25 );
 						vec3 baseDirection3D = normalize( lightToPosition );
-						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeX, texelSizeY );
+						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeY );
 
 						initGridSamplingDisk();
 
@@ -179,7 +179,7 @@
 
 							vec3 offset = gridSamplingDisk[ s ] * diskRadius * cubeTexelSize;
 							vec3 adjustedBaseDirection3D = baseDirection3D + offset;
-							vec2 adjustedBaseDirection2D = cubeToUV( adjustedBaseDirection3D, texelSizeX, texelSizeY );
+							vec2 adjustedBaseDirection2D = cubeToUV( adjustedBaseDirection3D, texelSizeY );
 							dist = unpack1K( texture2D( shadowMap[ i ],  adjustedBaseDirection2D ) ) + shadowBias[ i ];
 							if ( curDistance >= dist )
 								shadow += 1.0;
@@ -258,7 +258,7 @@
 					if( isPointLight ) {
 
 						vec3 baseDirection3D = normalize( lightToPosition );
-						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeX, texelSizeY );
+						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeY );
 						vec4 data = texture2D( shadowMap[ i ],  baseDirection2D );
 						float dist = unpack1K( data ) + shadowBias[ i ];
 						if ( length( lightToPosition ) >= dist)
