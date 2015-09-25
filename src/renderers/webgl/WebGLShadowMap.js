@@ -21,10 +21,10 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	var _depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 	_distanceMaterial, _distanceMaterialMorph, _distanceMaterialSkin, _distanceMaterialMorphSkin;
 
-	var cubeDirections = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( - 1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ), 
+	var cubeDirections = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( - 1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ),
 						   new THREE.Vector3( 0, 0, - 1 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, - 1, 0 ) ];
 
-	var cubeUps = [ new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ), 
+	var cubeUps = [ new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ),
 					new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ),	new THREE.Vector3( 0, 0, - 1 ) ];
 
 	var cube2DViewPorts = [ new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(),
@@ -160,22 +160,18 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				var vpWidth = light.shadowMapWidth / 4.0;
 				var vpHeight = light.shadowMapHeight / 2.0;
 
-				/*
-				*
-				* These viewports map a cube-map onto a 2D texture with the
-				* following orientation:
-				*
-				*  xzXZ
-				*   y Y
-				*
-				*  Y - Positive y direction
-				*  y - Negative y direction
-				*  X - Positive x direction
-				*  x - Negative x direction
-				*  Z - Positive z direction
-				*  z - Negative z direction
-				*
-				*/
+				// These viewports map a cube-map onto a 2D texture with the
+				// following orientation:
+				//
+				//  xzXZ
+				//   y Y
+				//
+				// X - Positive x direction
+				// x - Negative x direction
+				// Y - Positive y direction
+				// y - Negative y direction
+				// Z - Positive z direction
+				// z - Negative z direction
 
 				// positive X
 				cube2DViewPorts[ 0 ].set( vpWidth * 2, vpHeight, vpWidth, vpHeight );
@@ -203,7 +199,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				var shadowFilter = THREE.LinearFilter;
 
-				if ( scope.type === THREE.PCFSoftShadowMap) {
+				if ( scope.type === THREE.PCFSoftShadowMap ) {
 
 					shadowFilter = THREE.NearestFilter;
 
@@ -258,7 +254,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			_renderer.getViewport( _vector4 );
 
 			_renderer.setRenderTarget( shadowMap );
-			_renderer.clear();		
+			_renderer.clear();
 
 			// render shadow map for each cube face (if omni-directional) or
 			// run a single pass if not
