@@ -26596,7 +26596,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_MorphingFlag = 1,
 	_SkinningFlag = 2,
 
-	_NumberOfMaterialVariants = _MorphingFlag | _SkinningFlag,
+	_NumberOfMaterialVariants = ( _MorphingFlag | _SkinningFlag ) + 1,
 
 	_depthMaterials = new Array( _NumberOfMaterialVariants ),
 	_distanceMaterials = new Array( _NumberOfMaterialVariants );
