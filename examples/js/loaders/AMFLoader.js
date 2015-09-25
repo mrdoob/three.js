@@ -48,7 +48,7 @@ THREE.AMFLoader.prototype = {
 
 	parse: function ( data ) {
 
-		function _loadDocument( data ) {
+		function loadDocument( data ) {
 
 			var view = new DataView( data );
 			var magic = String.fromCharCode( view.getUint8( 0 ), view.getUint8( 1 ) );
@@ -111,7 +111,7 @@ THREE.AMFLoader.prototype = {
 
 		}
 
-		function _loadDocumentScale( node ) {
+		function loadDocumentScale( node ) {
 
 			var scale = 1.0;
 			var unit = 'millimeter';
@@ -141,7 +141,7 @@ THREE.AMFLoader.prototype = {
 
 		}
 
-		function _loadMaterials( node ) {
+		function loadMaterials( node ) {
 
 			var matName = "AMF Material";
 			var matId = node.attributes[ 'id' ].textContent;
@@ -163,7 +163,7 @@ THREE.AMFLoader.prototype = {
 
 				} else if ( matChildEl.nodeName === 'color' ) {
 
-					color = _loadColor( matChildEl );
+					color = loadColor( matChildEl );
 
 				}
 
@@ -186,7 +186,7 @@ THREE.AMFLoader.prototype = {
 
 		}
 
-		function _loadColor( node ) {
+		function loadColor( node ) {
 
 			var color = { 'r': 1.0, 'g': 1.0, 'b': 1.0, 'a': 1.0, opacity: 1.0 };
 
@@ -218,7 +218,7 @@ THREE.AMFLoader.prototype = {
 
 		}
 
-		function _loadMeshVolume( node ) {
+		function loadMeshVolume( node ) {
 
 			var volume = { "name": "", "triangles": [], "materialid": null };
 
@@ -272,7 +272,7 @@ THREE.AMFLoader.prototype = {
 
 		}
 
-		function _loadMeshVertices( node ) {
+		function loadMeshVertices( node ) {
 
 			var vertArray = [];
 			var currVerticesNode = node.firstElementChild;
@@ -317,7 +317,7 @@ THREE.AMFLoader.prototype = {
 
 		}
 
-		function _loadObject( node ) {
+		function loadObject( node ) {
 
 			var objId = node.attributes[ 'id' ].textContent;
 			var loadedObject = { "name": "amfobject", "meshes": [] };
@@ -340,7 +340,7 @@ THREE.AMFLoader.prototype = {
 
 				} else if ( currObjNode.nodeName === "color" ) {
 
-					currColor = _loadColor( currObjNode );
+					currColor = loadColor( currObjNode );
 
 				} else if ( currObjNode.nodeName === "mesh" ) {
 
@@ -351,11 +351,11 @@ THREE.AMFLoader.prototype = {
 
 						if ( currMeshNode.nodeName === "vertices" ) {
 
-							mesh.vertices = mesh.vertices.concat( _loadMeshVertices( currMeshNode ) );
+							mesh.vertices = mesh.vertices.concat( loadMeshVertices( currMeshNode ) );
 
 						} else if ( currMeshNode.nodeName === "volume" ) {
 
-							mesh.volumes.push( _loadMeshVolume( currMeshNode ) );
+							mesh.volumes.push( loadMeshVolume( currMeshNode ) );
 
 						}
 
@@ -375,10 +375,10 @@ THREE.AMFLoader.prototype = {
 
 		}
 
-		var xmlData = _loadDocument( data );
+		var xmlData = loadDocument( data );
 		var amfName = "";
 		var amfAuthor = "";
-		var amfScale = _loadDocumentScale( xmlData );
+		var amfScale = loadDocumentScale( xmlData );
 		var amfMaterials = {};
 		var amfObjects = {};
 		var children = xmlData.documentElement.children;
@@ -405,13 +405,13 @@ THREE.AMFLoader.prototype = {
 
 			} else if ( child.nodeName === 'material' ) {
 
-				var loadedMaterial = _loadMaterials( child );
+				var loadedMaterial = loadMaterials( child );
 
 				amfMaterials[ loadedMaterial.id ] = loadedMaterial.material;
 
 			} else if ( child.nodeName === 'object' ) {
 
-				var loadedObject = _loadObject( child );
+				var loadedObject = loadObject( child );
 
 				amfObjects[ loadedObject.id ] = loadedObject.obj;
 
