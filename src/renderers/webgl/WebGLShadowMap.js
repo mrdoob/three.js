@@ -26,14 +26,20 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_depthMaterials = new Array( _NumberOfMaterialVariants ),
 	_distanceMaterials = new Array( _NumberOfMaterialVariants );
 
-	var cubeDirections = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( - 1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ),
-						   new THREE.Vector3( 0, 0, - 1 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, - 1, 0 ) ];
+	var cubeDirections = [
+		new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( - 1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ),
+		new THREE.Vector3( 0, 0, - 1 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, - 1, 0 )
+	];
 
-	var cubeUps = [ new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ),
-					new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ),	new THREE.Vector3( 0, 0, - 1 ) ];
+	var cubeUps = [
+		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ),
+		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ),	new THREE.Vector3( 0, 0, - 1 )
+	];
 
-	var cube2DViewPorts = [ new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(),
-				   			new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4() ];
+	var cube2DViewPorts = [
+		new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(),
+		new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()
+	];
 
 	var _vector4 = new THREE.Vector4();
 
@@ -48,7 +54,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
 
 		var useMorphing = ( i & _MorphingFlag ) !== 0;
-	    var useSkinning = ( i & _SkinningFlag ) !== 0;
+		var useSkinning = ( i & _SkinningFlag ) !== 0;
 
 
 		var depthMaterial = new THREE.ShaderMaterial( {
@@ -62,7 +68,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		depthMaterial._shadowPass = true;
 
 		_depthMaterials[ i ] = depthMaterial;
-
 
 		var distanceMaterial = new THREE.ShaderMaterial( {
 			uniforms: distanceUniforms,
@@ -153,7 +158,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				// negative Z
 				cube2DViewPorts[ 3 ].set( vpWidth, vpHeight, vpWidth, vpHeight );
 				// positive Y
-				cube2DViewPorts[ 4 ].set(  vpWidth * 3, 0, vpWidth, vpHeight );
+				cube2DViewPorts[ 4 ].set( vpWidth * 3, 0, vpWidth, vpHeight );
 				// negative Y
 				cube2DViewPorts[ 5 ].set( vpWidth, 0, vpWidth, vpHeight );
 
@@ -364,6 +369,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			var useSkinning = object instanceof THREE.SkinnedMesh && material.skinning;
 
 			var variantIndex = 0;
+
 			if ( useMorphing ) variantIndex |= _MorphingFlag;
 			if ( useSkinning ) variantIndex |= _SkinningFlag;
 
