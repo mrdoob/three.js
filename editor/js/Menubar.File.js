@@ -32,62 +32,6 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
-	// Open Editor-JSON
-
-	var editorJsonInput = document.createElement( 'input' );
-	editorJsonInput.type = 'file';
-	editorJsonInput.addEventListener( 'change', function ( event ) {
-
-		var reader = new FileReader();
-		reader.addEventListener( 'load', function ( event ) {
-
-			var contents = event.target.result;
-
-			var data;
-			try {
-
-				data = JSON.parse( contents );
-				editor.clear();
-				editor.fromJSON( data );
-
-			} catch ( error ) {
-
-				alert( error );
-				return;
-
-			}
-
-		}, false );
-		reader.readAsText( editorJsonInput.files[ 0 ] );
-
-	} );
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Open Editor-JSON...' );
-	option.onClick( function () {
-
-		editorJsonInput.click();
-
-	} );
-	options.add( option );
-
-	// Save Editor-JSON
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Save Editor-JSON...' );
-	option.onClick( function () {
-
-		var output = editor.toJSON();
-		output = JSON.stringify( output, null, '\t' );
-		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		exportString( output, 'editor.json' );
-
-	} );
-	options.add( option );
-
 	//
 
 	options.add( new UI.HorizontalRule() );
