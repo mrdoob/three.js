@@ -17,7 +17,7 @@ test( "Test CmdSetValue (Undo and Redo)", function(){
 
 		ok( 0 == 0, "Testing object of type '" + object.type + "'");
 
-		[ 'name', 'fov', 'near', 'far', 'intensity', 'distance', 'angle', 'exponent', 'decay' ].map( function( item ) {
+		[ 'name', 'fov', 'near', 'far', 'intensity', 'distance', 'angle', 'exponent', 'decay', 'visible', 'userData' ].map( function( item ) {
 
 			if( object[ item ] !== undefined ) {
 
