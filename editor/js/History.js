@@ -106,7 +106,6 @@ History.prototype = {
 		if ( cmd !== undefined ) {
 
 			cmd.undo();
-			console.log('Type: Undo ' + cmd.type );
 			this.redos.push( cmd );
 			this.editor.signals.historyChanged.dispatch( cmd );
 
@@ -145,7 +144,6 @@ History.prototype = {
 		if ( cmd !== undefined ) {
 
 			cmd.execute();
-			console.log('Type: Redo ' + cmd.type );
 			this.undos.push( cmd );
 			this.editor.signals.historyChanged.dispatch( cmd );
 
