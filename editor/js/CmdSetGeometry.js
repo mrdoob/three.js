@@ -73,8 +73,8 @@ CmdSetGeometry.prototype = {
 		this.oldGeometryJSON = json.oldGeometryJSON;
 		this.newGeometryJSON = json.newGeometryJSON;
 
-		this.oldGeometry = this.parseGeometry( this.oldGeometryJSON );
-		this.newGeometry = this.parseGeometry( this.newGeometryJSON );
+		this.oldGeometry = parseGeometry( this.oldGeometryJSON );
+		this.newGeometry = parseGeometry( this.newGeometryJSON );
 
 		function parseGeometry ( data ) {
 
