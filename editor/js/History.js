@@ -11,6 +11,24 @@ History = function ( editor ) {
 	this.lastCmdTime = new Date();
 	this.idCounter = 0;
 
+	this.historyDisabled = false;
+
+	// signals
+
+	var scope = this;
+
+	this.editor.signals.startPlayer.add( function () {
+
+		scope.historyDisabled = true;
+
+	} );
+
+	this.editor.signals.stopPlayer.add( function () {
+
+		scope.historyDisabled = false;
+
+	} );
+
 };
 
 History.prototype = {
@@ -61,6 +79,13 @@ History.prototype = {
 
 	undo: function () {
 
+		if ( this.historyDisabled ) {
+
+			alert("Undo/Redo disabled while scene is playing.");
+			return;
+
+		}
+
 		var cmd = undefined;
 
 		if ( this.undos.length > 0 ) {
@@ -92,6 +117,13 @@ History.prototype = {
 	},
 
 	redo: function () {
+
+		if ( this.historyDisabled ) {
+
+			alert("Undo/Redo disabled while scene is playing.");
+			return;
+
+		}
 
 		var cmd = undefined;
 
@@ -213,6 +245,13 @@ History.prototype = {
 	},
 
 	goToState: function ( id ) {
+
+		if ( this.historyDisabled ) {
+
+			alert("Undo/Redo disabled while scene is playing.");
+			return;
+
+		}
 
 		this.editor.signals.sceneGraphChanged.active = false;
 		this.editor.signals.historyChanged.active = false;
