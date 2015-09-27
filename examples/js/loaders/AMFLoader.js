@@ -267,7 +267,7 @@ THREE.AMFLoader.prototype = {
 		function loadMeshVertices( node ) {
 
 			var vertArray = [];
-
+			var normalArray = [];
 			var currVerticesNode = node.firstElementChild;
 
 			while ( currVerticesNode ) {
@@ -288,7 +288,18 @@ THREE.AMFLoader.prototype = {
 							vertArray.push(y);
 							vertArray.push(z);
 
+						} else if ( vNode.nodeName === "normal" ) {
+
+							var nx = vNode.getElementsByTagName("nx")[0].textContent;
+							var ny = vNode.getElementsByTagName("ny")[0].textContent;
+							var nz = vNode.getElementsByTagName("nz")[0].textContent;
+
+							normalArray.push(nx);
+							normalArray.push(ny);
+							normalArray.push(nz);
+
 						}
+						
 						vNode = vNode.nextElementSibling;
 
 					}
@@ -298,7 +309,7 @@ THREE.AMFLoader.prototype = {
 
 			}
 
-			return vertArray;
+			return { "vertices": vertArray, "normals": normalArray };
 
 		}
 
@@ -330,13 +341,16 @@ THREE.AMFLoader.prototype = {
 				} else if ( currObjNode.nodeName === "mesh" ) {
 
 					var currMeshNode = currObjNode.firstElementChild;
-					var mesh = { "vertices": [], "volumes": [], "color": currColor };
+					var mesh = { "vertices": [], "normals": [], "volumes": [], "color": currColor };
 
 					while ( currMeshNode ) {
 
 						if ( currMeshNode.nodeName === "vertices" ) {
 
-							mesh.vertices = mesh.vertices.concat( loadMeshVertices( currMeshNode ) );
+							var loadedVertices = loadMeshVertices( currMeshNode );
+
+							mesh.normals = mesh.normals.concat( loadedVertices.normals );
+							mesh.vertices = mesh.vertices.concat( loadedVertices.vertices );
 
 						} else if ( currMeshNode.nodeName === "volume" ) {
 
@@ -418,10 +432,19 @@ THREE.AMFLoader.prototype = {
 
 			for ( var i = 0; i < meshes.length; i ++ ) {
 
+				var objDefaultMaterial = defaultMaterial;
 				var mesh = meshes[ i ];
 				var meshVertices = Float32Array.from( mesh.vertices );
 				var vertices = new THREE.BufferAttribute( Float32Array.from( meshVertices ), 3 );
-				var objDefaultMaterial = defaultMaterial;
+				var meshNormals = null;
+				var normals = null;
+
+				if ( mesh.normals.length ) {
+
+					meshNormals = Float32Array.from( mesh.normals );
+					normals = new THREE.BufferAttribute( Float32Array.from( meshNormals ), 3 );
+
+				}
 
 				if ( mesh.color ) {
 
@@ -446,11 +469,16 @@ THREE.AMFLoader.prototype = {
 					var volume = volumes[ j ];
 					var newGeometry = new THREE.BufferGeometry();
 					var indexes = Uint32Array.from( volume.triangles );
-					var normals = new Uint32Array( vertices.array.length );
 					var material = objDefaultMaterial;
 
 					newGeometry.setIndex( new THREE.BufferAttribute( indexes, 1 ) );
 					newGeometry.addAttribute( 'position', vertices.clone() );
+
+					if( normals ) {
+
+						newGeometry.addAttribute( 'normal', normals.clone() );
+
+					}
 
 					if ( amfMaterials[ volume.materialid ] !== undefined ) {
 
