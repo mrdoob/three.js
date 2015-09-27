@@ -2,17 +2,17 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '72dev' };
+var THREE = { REVISION: '73dev' };
 
 //
 
 if ( typeof define === 'function' && define.amd ) {
 
-    define( 'three', THREE );
+		define( 'three', THREE );
 
 } else if ( 'undefined' !== typeof exports && 'undefined' !== typeof module ) {
 
-    module.exports = THREE;
+		module.exports = THREE;
 
 }
 
@@ -21,48 +21,48 @@ if ( typeof define === 'function' && define.amd ) {
 
 if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === undefined ) {
 
-  // Missing in Android stock browser.
+	// Missing in Android stock browser.
 
-  ( function () {
+	( function () {
 
-  	var lastTime = 0;
-  	var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
+		var lastTime = 0;
+		var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
 
-  	for ( var x = 0; x < vendors.length && ! self.requestAnimationFrame; ++ x ) {
+		for ( var x = 0; x < vendors.length && ! self.requestAnimationFrame; ++ x ) {
 
-  		self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
-  		self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
+			self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
+			self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
 
-  	}
+		}
 
-  	if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
+		if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
 
-  		self.requestAnimationFrame = function ( callback ) {
+			self.requestAnimationFrame = function ( callback ) {
 
-  			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-  			var id = self.setTimeout( function () {
+				var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
+				var id = self.setTimeout( function () {
 
-  				callback( currTime + timeToCall );
+					callback( currTime + timeToCall );
 
-  			}, timeToCall );
-  			lastTime = currTime + timeToCall;
-  			return id;
+				}, timeToCall );
+				lastTime = currTime + timeToCall;
+				return id;
 
-  		};
+			};
 
-  	}
+		}
 
-  	if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
+		if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
 
-  		self.cancelAnimationFrame = function ( id ) {
+			self.cancelAnimationFrame = function ( id ) {
 
-  			self.clearTimeout( id );
+				self.clearTimeout( id );
 
-  		};
+			};
 
-  	}
+		}
 
-  }() );
+	}() );
 
 }
 
@@ -125,7 +125,6 @@ THREE.DoubleSide = 2;
 
 // shading
 
-THREE.NoShading = 0;
 THREE.FlatShading = 1;
 THREE.SmoothShading = 2;
 
@@ -146,7 +145,7 @@ THREE.CustomBlending = 5;
 
 // custom blending equations
 // (numbers start from 100 not to clash with other
-//  mappings to OpenGL constants defined in Texture.js)
+// mappings to OpenGL constants defined in Texture.js)
 
 THREE.AddEquation = 100;
 THREE.SubtractEquation = 101;
@@ -265,6 +264,11 @@ THREE.RGB_PVRTC_2BPPV1_Format = 2101;
 THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 
+// Loop styles for AnimationAction
+
+THREE.LoopOnce = 2200;
+THREE.LoopRepeat = 2201;
+THREE.LoopPingPong = 2202;
 
 // DEPRECATED
 

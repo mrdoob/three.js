@@ -8,6 +8,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
+	var attributeDivisors = new Uint8Array( 16 );
 
 	var capabilities = {};
 
@@ -78,6 +79,35 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		}
 
+		if ( attributeDivisors[ attribute ] !== 0 ) {
+
+			var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+			extension.vertexAttribDivisorANGLE( attribute, 0 );
+			attributeDivisors[ attribute ] = 0;
+
+		}
+
+	};
+
+	this.enableAttributeAndDivisor = function ( attribute, meshPerAttribute, extension ) {
+
+		newAttributes[ attribute ] = 1;
+
+		if ( enabledAttributes[ attribute ] === 0 ) {
+
+			gl.enableVertexAttribArray( attribute );
+			enabledAttributes[ attribute ] = 1;
+
+		}
+
+		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
+
+			extension.vertexAttribDivisorANGLE( attribute, meshPerAttribute );
+			attributeDivisors[ attribute ] = meshPerAttribute;
+
+		}
+
 	};
 
 	this.disableUnusedAttributes = function () {
@@ -139,36 +169,6 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 		}
 
 		return compressedTextureFormats;
-
-	};
-
-	this.getMaxPrecision = function ( precision ) {
-
-		if ( precision === 'highp' ) {
-
-			if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.HIGH_FLOAT ).precision > 0 &&
-			     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.HIGH_FLOAT ).precision > 0 ) {
-
-				return 'highp';
-
-			}
-
-			precision = 'mediump';
-
-		}
-
-		if ( precision === 'mediump' ) {
-
-			if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.MEDIUM_FLOAT ).precision > 0 &&
-			     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT ).precision > 0 ) {
-
-				return 'mediump';
-
-			}
-
-		}
-
-		return 'lowp';
 
 	};
 

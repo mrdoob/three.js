@@ -89,36 +89,26 @@
 
 				// Spheres geometry
 
-				var geometry_smooth = new THREE.SphereGeometry( 70, 32, 16 );
-				var geometry_flat = new THREE.SphereGeometry( 70, 32, 16 );
-				var geometry_pieces = new THREE.SphereGeometry( 70, 32, 16 ); // Extra geometry to be broken down for MeshFaceMaterial
+				var geometry = new THREE.SphereGeometry( 70, 32, 16 );
 
-				for ( var i = 0, l = geometry_pieces.faces.length; i < l; i ++ ) {
+				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
 
-					var face = geometry_pieces.faces[ i ];
+					var face = geometry.faces[ i ];
 					face.materialIndex = Math.floor( Math.random() * materials.length );
 
 				}
+
+				geometry.sortFacesByMaterialIndex();
 
 				objects = [];
 
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
-					var material = materials[ i ];
-
-					if ( material.shading == THREE.FlatShading ) {
-
-						addMesh( geometry_flat, material );
-
-					} else {
-
-						addMesh( geometry_smooth, material );
-
-					}
+					addMesh( geometry, materials[ i ] );
 
 				}
 
-				addMesh( geometry_pieces, new THREE.MeshFaceMaterial( materials ) );
+				addMesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );

@@ -24,6 +24,8 @@ Sidebar.Animation = function ( editor ) {
 	var animationsRow = new UI.Panel();
 	container.add( animationsRow );
 
+	/*
+
 	var animations = {};
 
 	signals.objectAdded.add( function ( object ) {
@@ -104,6 +106,8 @@ Sidebar.Animation = function ( editor ) {
 		}
 
 	} );
+
+	*/
 
 	return container;
 

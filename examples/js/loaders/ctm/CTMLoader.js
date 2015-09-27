@@ -12,6 +12,25 @@ THREE.CTMLoader = function () {
 
 	THREE.Loader.call( this );
 
+	// Deprecated
+	
+	Object.defineProperties( this, {
+		statusDomElement: {
+			get: function () {
+
+				if ( this._statusDomElement === undefined ) {
+
+					this._statusDomElement = document.createElement( 'div' );
+
+				}
+
+				console.warn( 'THREE.BinaryLoader: .statusDomElement has been removed.' );
+				return this._statusDomElement;
+
+			}
+		},
+	} );
+
 };
 
 THREE.CTMLoader.prototype = Object.create( THREE.Loader.prototype );
@@ -219,7 +238,7 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
 		}
 
-		this.addIndex( new THREE.BufferAttribute( indices, 1 ) );
+		this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 		if ( normals !== undefined ) {

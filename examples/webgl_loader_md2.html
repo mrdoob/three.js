@@ -207,6 +207,8 @@
 					setupWeaponsGUI( character );
 					setupGUIAnimations( character );
 
+					character.setAnimation( character.meshBody.geometry.animations[0].name )
+
 				};
 
 				character.loadParts( config );
@@ -302,19 +304,21 @@
 
 				var folder = gui.addFolder( "Animations" );
 
-				var generateCallback = function( animationName ) {
+				var generateCallback = function( animationClip ) {
 
-					return function () { character.setAnimation( animationName ); };
+					return function () { character.setAnimation( animationClip.name ); };
 
 				};
 
 				var i = 0, guiItems = [];
 				var animations = character.meshBody.geometry.animations;
 
-				for ( var a in animations ) {
+				for ( var i = 0; i < animations.length; i ++ ) {
 
-					playbackConfig[ a ] = generateCallback( a );
-					guiItems[ i ] = folder.add( playbackConfig, a, a );
+					var clip = animations[i];
+
+					playbackConfig[ clip.name ] = generateCallback( clip );
+					guiItems[ i ] = folder.add( playbackConfig, clip.name, clip.name );
 
 					i ++;
 

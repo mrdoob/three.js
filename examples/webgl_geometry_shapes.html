@@ -115,7 +115,7 @@
 					// vertices from real points
 
 					var pgeo = points.clone();
-					var particles = new THREE.PointCloud( pgeo, new THREE.PointCloudMaterial( { color: color, size: 4 } ) );
+					var particles = new THREE.Points( pgeo, new THREE.PointsMaterial( { color: color, size: 4 } ) );
 					particles.position.set( x, y, z + 25 );
 					particles.rotation.set( rx, ry, rz );
 					particles.scale.set( s, s, s );
@@ -132,7 +132,7 @@
 					// equidistance sampled points
 
 					var pgeo = spacedPoints.clone();
-					var particles2 = new THREE.PointCloud( pgeo, new THREE.PointCloudMaterial( { color: color, size: 4 } ) );
+					var particles2 = new THREE.Points( pgeo, new THREE.PointsMaterial( { color: color, size: 4 } ) );
 					particles2.position.set( x, y, z + 125 );
 					particles2.rotation.set( rx, ry, rz );
 					particles2.scale.set( s, s, s );

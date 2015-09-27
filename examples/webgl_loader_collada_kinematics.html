@@ -120,14 +120,10 @@
 
 				// Lights
 
-				var directionalLight = new THREE.HemisphereLight( 0xffeeee, 0x111122 );
-				directionalLight.position.x = Math.random() - 0.5;
-				directionalLight.position.y = Math.random() - 0.5;
-				directionalLight.position.z = Math.random() - 0.5;
-				directionalLight.position.normalize();
-				scene.add( directionalLight );
+				var light = new THREE.HemisphereLight( 0xffeeee, 0x111122 );
+				scene.add( light );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.5 );
+				var pointLight = new THREE.PointLight( 0xffffff, 0.3 );
 				particleLight.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer();
@@ -149,29 +145,29 @@
 
 			function setupTween() {
 
-				var duration = getRandomInt(1000, 5000);
+				var duration = getRandomInt( 1000, 5000 );
 
 				var target = {};
 
-				for ( var i = 0; i < kinematics.joints.length; i++ ) {
+				for ( var i = 0; i < kinematics.joints.length; i ++ ) {
 
-						var joint = kinematics.joints[ i ];
+					var joint = kinematics.joints[ i ];
 
-						var old = tweenParameters[ i ];
+					var old = tweenParameters[ i ];
 
-						var position = old ? old : joint.zeroPosition;
+					var position = old ? old : joint.zeroPosition;
 
-						tweenParameters[ i ] = position;
+					tweenParameters[ i ] = position;
 
-						target[ i ] = getRandomInt(joint.limits.min, joint.limits.max)
+					target[ i ] = getRandomInt( joint.limits.min, joint.limits.max )
 
 				}
 
 				kinematicsTween = new TWEEN.Tween( tweenParameters ).to( target, duration ).easing( TWEEN.Easing.Quadratic.Out );
 
-				kinematicsTween.onUpdate(function() {
+				kinematicsTween.onUpdate( function() {
 
-					for ( var i = 0; i < kinematics.joints.length; i++ ) {
+					for ( var i = 0; i < kinematics.joints.length; i ++ ) {
 
 						kinematics.setJointValue( i, this[ i ] );
 
@@ -229,7 +225,7 @@
 
 			function getRandomInt( min, max ) {
 
-					return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
+				return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
 
 			}
 

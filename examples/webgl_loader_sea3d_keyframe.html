@@ -72,9 +72,7 @@
 			loader = new THREE.SEA3D( {
 
 				autoPlay : false, // Manual play animations
-				container : scene, // Container to add models
-				parser : THREE.SEA3D.BUFFER, // THREE.SEA3D.BUFFER to THREE.BufferGeometry
-				multiplier : 1 // Light multiplier
+				container : scene // Container to add models
 
 			} );
 
@@ -87,6 +85,8 @@
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
 
+				controls = new THREE.OrbitControls( camera );
+
 				// reset global animation time
 				SEA3D.AnimationHandler.setTime( 0 );
 
@@ -98,7 +98,7 @@
 
 			};
 
-			loader.load( './models/sea3d/keyframe.sea' );
+			loader.load( './models/sea3d/keyframe.tjs.sea' );
 
 			//
 			//	Animation Functions
@@ -147,8 +147,6 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 1000, - 300, 1000 );
-
-				controls = new THREE.OrbitControls( camera );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );

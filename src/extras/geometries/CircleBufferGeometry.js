@@ -56,7 +56,7 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 
 	}
 
-	this.addIndex( new THREE.BufferAttribute( new Uint16Array( indices ), 1 ) );
+	this.setIndex( new THREE.BufferAttribute( new Uint16Array( indices ), 1 ) );
 	this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );

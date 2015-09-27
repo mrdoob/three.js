@@ -212,10 +212,8 @@ THREE.AssimpJSONLoader.prototype = {
 
 		//geometry.computeFaceNormals();
 		//geometry.computeVertexNormals();
-		//geometry.computeTangents();
 		geometry.computeBoundingSphere();
 
-		// TODO: tangents
 		return geometry;
 
 	},

@@ -5,6 +5,13 @@
 
 THREE.JSONLoader = function ( manager ) {
 
+	if ( typeof manager === 'boolean' ) {
+
+		console.warn( 'THREE.JSONLoader: showStatus parameter has been removed from constructor.' );
+		manager = undefined;
+
+	}
+
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 	this.withCredentials = false;
@@ -14,6 +21,21 @@ THREE.JSONLoader = function ( manager ) {
 THREE.JSONLoader.prototype = {
 
 	constructor: THREE.JSONLoader,
+
+	// Deprecated
+	
+	get statusDomElement () {
+
+		if ( this._statusDomElement === undefined ) {
+
+			this._statusDomElement = document.createElement( 'div' );
+
+		}
+
+		console.warn( 'THREE.JSONLoader: .statusDomElement has been removed.' );
+		return this._statusDomElement;
+
+	},
 
 	load: function( url, onLoad, onProgress, onError ) {
 
@@ -75,6 +97,7 @@ THREE.JSONLoader.prototype = {
 
 		parseSkin();
 		parseMorphing( scale );
+		parseAnimations();
 
 		geometry.computeFaceNormals();
 		geometry.computeBoundingSphere();
@@ -422,12 +445,6 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-
-			// could change this to json.animations[0] or remove completely
-
-			geometry.animation = json.animation;
-			geometry.animations = json.animations;
-
 		};
 
 		function parseMorphing( scale ) {
@@ -484,6 +501,43 @@ THREE.JSONLoader.prototype = {
 				}
 
 			}
+		}
+
+		function parseAnimations() {
+
+			var outputAnimations = [];
+
+			// parse old style Bone/Hierarchy animations
+			var animations = [];
+			if( json.animation !== undefined ) {
+				animations.push( json.animation );
+			}
+			if( json.animations !== undefined ) {
+				if( json.animations.length ) {
+					animations = animations.concat( json.animations );
+				}
+				else {
+					animations.push( json.animations );
+				}
+			}
+
+			for( var i = 0; i < animations.length; i ++ ) {
+
+				var clip = THREE.AnimationClip.parseAnimation( animations[i], geometry.bones );
+				if( clip ) outputAnimations.push( clip );
+
+			}
+
+			// parse implicit morph animations
+			if( geometry.morphTargets ) {
+
+				// TODO: Figure out what an appropraite FPS is for morph target animations -- defaulting to 10, but really it is completely arbitrary.
+				var morphAnimationClips = THREE.AnimationClip.CreateClipsFromMorphTargetSequences( geometry.morphTargets, 10 );
+				outputAnimations = outputAnimations.concat( morphAnimationClips );
+
+			}
+
+			if( outputAnimations.length > 0 ) geometry.animations = outputAnimations;
 
 		};
 
@@ -494,12 +548,6 @@ THREE.JSONLoader.prototype = {
 		} else {
 
 			var materials = THREE.Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
-
-			if ( THREE.Loader.prototype.needsTangents( materials ) ) {
-
-				geometry.computeTangents();
-
-			}
 
 			return { geometry: geometry, materials: materials };
 

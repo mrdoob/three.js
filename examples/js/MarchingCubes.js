@@ -7,9 +7,7 @@
 
 THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
-	THREE.ImmediateRenderObject.call( this );
-
-	this.material = material;
+	THREE.ImmediateRenderObject.call( this, material );
 
 	this.enableUvs = enableUvs !== undefined ? enableUvs : false;
 	this.enableColors = enableColors !== undefined ? enableColors : false;

@@ -67,57 +67,37 @@ THREE.Line.prototype.raycast = ( function () {
 
 				var indices = index.array;
 				var positions = attributes.position.array;
-				var offsets = geometry.groups;
 
-				if ( offsets.length === 0 ) {
+				for ( var i = 0, l = indices.length - 1; i < l; i += step ) {
 
-					offsets = [ {
-						start: 0,
-						count: indices.length
-					} ];
+					var a = indices[ i ];
+					var b = indices[ i + 1 ];
 
-				}
+					vStart.fromArray( positions, a * 3 );
+					vEnd.fromArray( positions, b * 3 );
 
-				for ( var oi = 0; oi < offsets.length; oi ++ ) {
+					var distSq = ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
-					var offset = offsets[ oi ];
+					if ( distSq > precisionSq ) continue;
 
-					var start = offset.start;
-					var count = offset.count;
+					interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
-					for ( var i = start; i < start + count - 1; i += step ) {
+					var distance = raycaster.ray.origin.distanceTo( interRay );
 
-						var a = indices[ i ];
-						var b = indices[ i + 1 ];
+					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
-						vStart.fromArray( positions, a * 3 );
-						vEnd.fromArray( positions, b * 3 );
+					intersects.push( {
 
-						var distSq = ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
+						distance: distance,
+						// What do we want? intersection point on the ray or on the segment??
+						// point: raycaster.ray.at( distance ),
+						point: interSegment.clone().applyMatrix4( this.matrixWorld ),
+						index: i,
+						face: null,
+						faceIndex: null,
+						object: this
 
-						if ( distSq > precisionSq ) continue;
-
-						interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
-
-						var distance = raycaster.ray.origin.distanceTo( interRay );
-
-						if ( distance < raycaster.near || distance > raycaster.far ) continue;
-
-						intersects.push( {
-
-							distance: distance,
-							// What do we want? intersection point on the ray or on the segment??
-							// point: raycaster.ray.at( distance ),
-							point: interSegment.clone().applyMatrix4( this.matrixWorld ),
-							index: i,
-							offsetIndex: oi,
-							face: null,
-							faceIndex: null,
-							object: this
-
-						} );
-
-					}
+					} );
 
 				}
 
@@ -125,7 +105,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 				var positions = attributes.position.array;
 
-				for ( var i = 0; i < positions.length / 3 - 1; i += step ) {
+				for ( var i = 0, l = positions.length / 3 - 1; i < l; i += step ) {
 
 					vStart.fromArray( positions, 3 * i );
 					vEnd.fromArray( positions, 3 * i + 3 );
@@ -167,7 +147,7 @@ THREE.Line.prototype.raycast = ( function () {
 				var distSq = ray.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 
 				if ( distSq > precisionSq ) continue;
-				
+
 				interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
 				var distance = raycaster.ray.origin.distanceTo( interRay );

@@ -25,7 +25,7 @@ THREE.SVGLoader.prototype = {
 
 			var doc = parser.parseFromString( svgString, 'image/svg+xml' );  // application/xml
 
-			onLoad( doc.firstChild );
+			onLoad( doc.documentElement );
 
 		}, onProgress, onError );
 

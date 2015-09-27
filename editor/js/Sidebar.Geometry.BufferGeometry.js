@@ -19,6 +19,17 @@ Sidebar.Geometry.BufferGeometry = function ( editor ) {
 			container.clear();
 			container.setDisplay( 'block' );
 
+			var index = geometry.index;
+
+			if ( index !== null ) {
+
+				var panel = new UI.Panel();
+				panel.add( new UI.Text( 'index' ).setWidth( '90px' ) );
+				panel.add( new UI.Text( ( index.count ).format() ).setFontSize( '12px' ) );
+				container.add( panel );
+
+			}
+
 			var attributes = geometry.attributes;
 
 			for ( var name in attributes ) {

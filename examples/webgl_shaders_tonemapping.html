@@ -145,7 +145,8 @@
 						"varying vec3 vNormal;",
 						THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 						"void main() {",
-					 		THREE.ShaderChunk[ "defaultnormal_vertex" ],
+							THREE.ShaderChunk[ "beginnormal_vertex" ],
+							THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
 							"	vNormal = normalize( transformedNormal );",
 							"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",

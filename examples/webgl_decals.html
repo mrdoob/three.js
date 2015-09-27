@@ -102,8 +102,14 @@
 			controls.minDistance = 50;
 			controls.maxDistance = 200;
 
-			var light = new THREE.HemisphereLight( 0xffddcc, 0x111122 );
+			scene.add( new THREE.AmbientLight( 0x443333 ) );
+
+			var light = new THREE.DirectionalLight( 0xffddcc, 1 );
 			light.position.set( 1, 0.75, 0.5 );
+			scene.add( light );
+
+			var light = new THREE.DirectionalLight( 0xccccff, 1 );
+			light.position.set( -1, 0.75, -0.5 );
 			scene.add( light );
 
 			var geometry = new THREE.Geometry();
@@ -223,10 +229,12 @@
 			loader.load( 'obj/leeperrysmith/LeePerrySmith.js', function( geometry ) {
 
 				var material = new THREE.MeshPhongMaterial( {
+					specular: 0x111111,
 					map: THREE.ImageUtils.loadTexture( 'obj/leeperrysmith/Map-COL.jpg' ),
 					specularMap: THREE.ImageUtils.loadTexture( 'obj/leeperrysmith/Map-SPEC.jpg' ),
 					normalMap: THREE.ImageUtils.loadTexture( 'obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
-					shininess: 10
+					normalScale: new THREE.Vector2( 0.75, 0.75 ),
+					shininess: 25
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );

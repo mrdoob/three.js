@@ -73,6 +73,7 @@
 		<div id="menu"></div>
 
 		<script>
+
 			var camera, scene, renderer, labelsRenderer;
 			var controls;
 
@@ -108,16 +109,21 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
-				camera.position.z = 1500;
-
 				scene = new THREE.Scene();
 
-				var light = new THREE.HemisphereLight( 0xffffff, 0x000000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.z = 1000;
+				scene.add( camera );
+
+				var light = new THREE.DirectionalLight( 0xffffff, 0.8 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				root = new THREE.Object3D();
+				var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				light.position.set( -1, -1, 1 );
+				scene.add( light );
+
+				root = new THREE.Group();
 				scene.add( root );
 
 				//
@@ -138,8 +144,8 @@
 				//
 
 				controls = new THREE.TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 0.5;
-				controls.addEventListener( 'change', render );
+				controls.minDistance = 500;
+				controls.maxDistance = 2000;
 
 				//
 
@@ -184,7 +190,7 @@
 
 			function loadMolecule( url ) {
 
-				while( root.children.length > 0 ) {
+				while ( root.children.length > 0 ) {
 
 					var object = root.children[ 0 ];
 					object.parent.remove( object );
@@ -205,7 +211,7 @@
 						var color = geometry.colors[ i ];
 						var element = geometry.elements[ i ];
 
-						var material = new THREE.MeshLambertMaterial( { color: color } );
+						var material = new THREE.MeshPhongMaterial( { color: color } );
 
 						var object = new THREE.Mesh( sphereGeometry, material );
 						object.position.copy( position );
@@ -234,7 +240,7 @@
 						start.multiplyScalar( 75 );
 						end.multiplyScalar( 75 );
 
-						var object = new THREE.Mesh( boxGeometry, new THREE.MeshLambertMaterial( 0xffffff ) );
+						var object = new THREE.Mesh( boxGeometry, new THREE.MeshPhongMaterial( 0xffffff ) );
 						object.position.copy( start );
 						object.position.lerp( end, 0.5 );
 						object.scale.set( 5, 5, start.distanceTo( end ) );
@@ -250,7 +256,7 @@
 					if ( xhr.lengthComputable ) {
 
 						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
 
 					}
 
@@ -295,7 +301,6 @@
 
 			}
 
-    </script>
-  </body>
-
+		</script>
+	</body>
 </html>

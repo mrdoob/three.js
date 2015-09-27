@@ -7,12 +7,30 @@ var Loader = function ( editor ) {
 	var scope = this;
 	var signals = editor.signals;
 
+	this.texturePath = '';
+
 	this.loadFile = function ( file ) {
 
 		var filename = file.name;
 		var extension = filename.split( '.' ).pop().toLowerCase();
 
 		switch ( extension ) {
+
+			case 'amf':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var loader = new THREE.AMFLoader();
+					var amfobject = loader.parse( event.target.result );
+
+					editor.addObject( amfobject );
+					editor.select( amfobject );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
 
 			case 'awd':
 
@@ -386,6 +404,8 @@ var Loader = function ( editor ) {
 		} else if ( data.metadata.type.toLowerCase() === 'geometry' ) {
 
 			var loader = new THREE.JSONLoader();
+			loader.setTexturePath( scope.texturePath );
+
 			var result = loader.parse( data );
 
 			var geometry = result.geometry;
@@ -432,6 +452,8 @@ var Loader = function ( editor ) {
 		} else if ( data.metadata.type.toLowerCase() === 'object' ) {
 
 			var loader = new THREE.ObjectLoader();
+			loader.setTexturePath( scope.texturePath );
+
 			var result = loader.parse( data );
 
 			if ( result instanceof THREE.Scene ) {

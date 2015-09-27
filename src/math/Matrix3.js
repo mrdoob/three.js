@@ -1,7 +1,7 @@
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  */
 
 THREE.Matrix3 = function () {

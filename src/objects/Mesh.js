@@ -69,6 +69,29 @@ THREE.Mesh.prototype.raycast = ( function () {
 	var tempB = new THREE.Vector3();
 	var tempC = new THREE.Vector3();
 
+	var uvA = new THREE.Vector2();
+	var uvB = new THREE.Vector2();
+	var uvC = new THREE.Vector2();
+
+	var barycoord = new THREE.Vector3();
+
+	var intersectionPoint = new THREE.Vector3();
+	var intersectionPointWorld = new THREE.Vector3();
+
+	function uvIntersection( point, p1, p2, p3, uv1, uv2, uv3 ) {
+
+		THREE.Triangle.barycoordFromPoint( point, p1, p2, p3, barycoord );
+
+		uv1.multiplyScalar( barycoord.x );
+		uv2.multiplyScalar( barycoord.y );
+		uv3.multiplyScalar( barycoord.z );
+
+		uv1.add( uv2 ).add( uv3 );
+
+		return uv1.clone();
+
+	}
+
 	return function raycast( raycaster, intersects ) {
 
 		var geometry = this.geometry;
@@ -115,63 +138,56 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				var indices = index.array;
 				var positions = attributes.position.array;
-				var offsets = geometry.groups;
 
-				if ( offsets.length === 0 ) {
+				for ( var i = 0, l = indices.length; i < l; i += 3 ) {
 
-					offsets = [ {
-						start: 0,
-						count: indices.length
-					} ];
+					a = indices[ i ];
+					b = indices[ i + 1 ];
+					c = indices[ i + 2 ];
 
-				}
+					vA.fromArray( positions, a * 3 );
+					vB.fromArray( positions, b * 3 );
+					vC.fromArray( positions, c * 3 );
 
-				for ( var oi = 0, ol = offsets.length; oi < ol; ++ oi ) {
+					if ( material.side === THREE.BackSide ) {
 
-					var offset = offsets[ oi ];
+						if ( ray.intersectTriangle( vC, vB, vA, true, intersectionPoint ) === null ) continue;
 
-					var start = offset.start;
-					var count = offset.count;
+					} else {
 
-					for ( var i = start, il = start + count; i < il; i += 3 ) {
-
-						a = indices[ i ];
-						b = indices[ i + 1 ];
-						c = indices[ i + 2 ];
-
-						vA.fromArray( positions, a * 3 );
-						vB.fromArray( positions, b * 3 );
-						vC.fromArray( positions, c * 3 );
-
-						if ( material.side === THREE.BackSide ) {
-
-							var intersectionPoint = ray.intersectTriangle( vC, vB, vA, true );
-
-						} else {
-
-							var intersectionPoint = ray.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
-
-						}
-
-						if ( intersectionPoint === null ) continue;
-
-						intersectionPoint.applyMatrix4( this.matrixWorld );
-
-						var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
-
-						if ( distance < raycaster.near || distance > raycaster.far ) continue;
-
-						intersects.push( {
-
-							distance: distance,
-							point: intersectionPoint,
-							face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
-							faceIndex: Math.floor( i / 3 ), // triangle number in indices buffer semantics
-							object: this
-
-						} );
+						if ( ray.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide, intersectionPoint ) === null ) continue;
 
 					}
+
+					intersectionPointWorld.copy( intersectionPoint );
+					intersectionPointWorld.applyMatrix4( this.matrixWorld );
+
+					var distance = raycaster.ray.origin.distanceTo( intersectionPointWorld );
+
+					if ( distance < raycaster.near || distance > raycaster.far ) continue;
+
+					var uv;
+
+					if ( attributes.uv !== undefined ) {
+
+						var uvs = attributes.uv.array;
+						uvA.fromArray( uvs, a * 2 );
+						uvB.fromArray( uvs, b * 2 );
+						uvC.fromArray( uvs, c * 2 );
+						uv = uvIntersection( intersectionPoint, vA, vB, vC, uvA, uvB, uvC );
+
+					}
+
+					intersects.push( {
+
+						distance: distance,
+						point: intersectionPointWorld.clone(),
+						uv: uv,
+						face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
+						faceIndex: Math.floor( i / 3 ), // triangle number in indices buffer semantics
+						object: this
+
+					} );
 
 				}
 
@@ -179,7 +195,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				var positions = attributes.position.array;
 
-				for ( var i = 0, il = positions.length; i < il; i += 9 ) {
+				for ( var i = 0, l = positions.length; i < l; i += 9 ) {
 
 					vA.fromArray( positions, i );
 					vB.fromArray( positions, i + 3 );
@@ -187,21 +203,32 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 					if ( material.side === THREE.BackSide ) {
 
-						var intersectionPoint = ray.intersectTriangle( vC, vB, vA, true );
+						if ( ray.intersectTriangle( vC, vB, vA, true, intersectionPoint ) === null ) continue;
 
 					} else {
 
-						var intersectionPoint = ray.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+						if ( ray.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide, intersectionPoint ) === null ) continue;
 
 					}
 
-					if ( intersectionPoint === null ) continue;
+					intersectionPointWorld.copy( intersectionPoint );
+					intersectionPointWorld.applyMatrix4( this.matrixWorld );
 
-					intersectionPoint.applyMatrix4( this.matrixWorld );
-
-					var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
+					var distance = raycaster.ray.origin.distanceTo( intersectionPointWorld );
 
 					if ( distance < raycaster.near || distance > raycaster.far ) continue;
+
+					var uv;
+
+					if ( attributes.uv !== undefined ) {
+
+						var uvs = attributes.uv.array;
+						uvA.fromArray( uvs, i );
+						uvB.fromArray( uvs, i + 2 );
+						uvC.fromArray( uvs, i + 4 );
+						uv = uvIntersection( intersectionPoint, vA, vB, vC, uvA, uvB, uvC );
+
+					}
 
 					a = i / 3;
 					b = a + 1;
@@ -210,7 +237,8 @@ THREE.Mesh.prototype.raycast = ( function () {
 					intersects.push( {
 
 						distance: distance,
-						point: intersectionPoint,
+						point: intersectionPointWorld.clone(),
+						uv: uv,
 						face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
 						index: a, // triangle number in positions buffer semantics
 						object: this
@@ -275,26 +303,38 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				if ( faceMaterial.side === THREE.BackSide ) {
 
-					var intersectionPoint = ray.intersectTriangle( c, b, a, true );
+					if ( ray.intersectTriangle( c, b, a, true, intersectionPoint ) === null ) continue;
 
 				} else {
 
-					var intersectionPoint = ray.intersectTriangle( a, b, c, faceMaterial.side !== THREE.DoubleSide );
+					if ( ray.intersectTriangle( a, b, c, faceMaterial.side !== THREE.DoubleSide, intersectionPoint ) === null ) continue;
 
 				}
 
-				if ( intersectionPoint === null ) continue;
+				intersectionPointWorld.copy( intersectionPoint );
+				intersectionPointWorld.applyMatrix4( this.matrixWorld );
 
-				intersectionPoint.applyMatrix4( this.matrixWorld );
-
-				var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
+				var distance = raycaster.ray.origin.distanceTo( intersectionPointWorld );
 
 				if ( distance < raycaster.near || distance > raycaster.far ) continue;
+
+				var uv;
+
+				if ( geometry.faceVertexUvs[ 0 ].length > 0 ) {
+
+					var uvs = geometry.faceVertexUvs[ 0 ][ f ];
+					uvA.copy( uvs[ 0 ] );
+					uvB.copy( uvs[ 1 ] );
+					uvC.copy( uvs[ 2 ] );
+					uv = uvIntersection( intersectionPoint, a, b, c, uvA, uvB, uvC );
+
+				}
 
 				intersects.push( {
 
 					distance: distance,
-					point: intersectionPoint,
+					point: intersectionPointWorld.clone(),
+					uv: uv,
 					face: face,
 					faceIndex: f,
 					object: this

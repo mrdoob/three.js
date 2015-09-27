@@ -33,24 +33,6 @@ Sidebar.Geometry.Modifiers = function ( editor, object ) {
 
 	container.add( button );
 
-	// Convert to Geometry/BufferGeometry
-
-	var isBufferGeometry = geometry instanceof THREE.BufferGeometry;
-
-	if ( geometry instanceof THREE.Geometry ) {
-
-		var button = new UI.Button( 'Convert to BufferGeometry' );
-		button.onClick( function () {
-
-			if ( confirm( 'Are you sure?' ) === false ) return;
-
-			editor.execute( new CmdSetGeometry( object, new THREE.BufferGeometry().fromGeometry( object.geometry ) ) );
-
-		} );
-		container.add( button );
-
-	}
-
 	//
 
 	return container;

@@ -370,7 +370,7 @@ THREE.GPUParticleContainer = function(maxParticles, particleSystem) {
   self.particleShaderMat = self.GPUParticleSystem.particleShaderMat;
 
   this.init = function() {
-    self.particleSystem = new THREE.PointCloud(self.particleShaderGeo, self.particleShaderMat);
+    self.particleSystem = new THREE.Points(self.particleShaderGeo, self.particleShaderMat);
     self.particleSystem.frustumCulled = false;
     this.add(self.particleSystem);
   };
