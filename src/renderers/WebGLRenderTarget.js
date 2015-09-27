@@ -12,19 +12,13 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	options = options || {};
 
-	this.wrapS = options.wrapS !== undefined ? options.wrapS : THREE.ClampToEdgeWrapping;
-	this.wrapT = options.wrapT !== undefined ? options.wrapT : THREE.ClampToEdgeWrapping;
-
-	this.magFilter = options.magFilter !== undefined ? options.magFilter : THREE.LinearFilter;
-	this.minFilter = options.minFilter !== undefined ? options.minFilter : THREE.LinearMipMapLinearFilter;
-
-	this.anisotropy = options.anisotropy !== undefined ? options.anisotropy : 1;
-
-	this.offset = new THREE.Vector2( 0, 0 );
-	this.repeat = new THREE.Vector2( 1, 1 );
-
-	this.format = options.format !== undefined ? options.format : THREE.RGBAFormat;
-	this.type = options.type !== undefined ? options.type : THREE.UnsignedByteType;
+	this.texture = new THREE.Texture(undefined, undefined, 
+																	 options.wrapS, options.wrapT,
+																	 options.magFilter, options.minFilter,
+																	 options.format, options.type,
+																	 options.anisotropy);
+	// Don't generate mipmaps from target texture
+	this.texture.generateMipmaps = false;
 
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
@@ -63,24 +57,10 @@ THREE.WebGLRenderTarget.prototype = {
 		this.width = source.width;
 		this.height = source.height;
 
-		this.wrapS = source.wrapS;
-		this.wrapT = source.wrapT;
-
-		this.magFilter = source.magFilter;
-		this.minFilter = source.minFilter;
-
-		this.anisotropy = source.anisotropy;
-
-		this.offset.copy( source.offset );
-		this.repeat.copy( source.repeat );
-
-		this.format = source.format;
-		this.type = source.type;
+		this.texture = this.texture.clone();
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
-
-		this.generateMipmaps = source.generateMipmaps;
 
 		this.shareDepthFrom = source.shareDepthFrom;
 
