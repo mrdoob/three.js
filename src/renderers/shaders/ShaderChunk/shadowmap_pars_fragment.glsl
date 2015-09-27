@@ -56,7 +56,7 @@
 			// Apply scale to avoid seams
 
 			// two texels less per square (one texel will do for NEAREST)
-			v *= scaleToCube * ( 1.0 - 4.0 * texelSizeY );
+			v *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );
 
 			// Unwrap
 
