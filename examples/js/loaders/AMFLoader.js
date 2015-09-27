@@ -246,21 +246,13 @@ THREE.AMFLoader.prototype = {
 
 				} else if ( currVolumeNode.nodeName === "triangle" ) {
 
-					var triangleNode = currVolumeNode.firstElementChild;
+					var v1 = currVolumeNode.getElementsByTagName("v1")[0].textContent;
+					var v2 = currVolumeNode.getElementsByTagName("v2")[0].textContent;
+					var v3 = currVolumeNode.getElementsByTagName("v3")[0].textContent;
 
-					while ( triangleNode ) {
-
-						if ( triangleNode.nodeName === "v1" ||
-								triangleNode.nodeName === "v2" ||
-								triangleNode.nodeName === "v3" ) {
-
-							volume.triangles.push( triangleNode.textContent );
-
-						}
-
-						triangleNode = triangleNode.nextElementSibling;
-
-					}
+					volume.triangles.push( v1 );
+					volume.triangles.push( v2 );
+					volume.triangles.push( v3 );
 
 				}
 
@@ -275,6 +267,7 @@ THREE.AMFLoader.prototype = {
 		function loadMeshVertices( node ) {
 
 			var vertArray = [];
+
 			var currVerticesNode = node.firstElementChild;
 
 			while ( currVerticesNode ) {
@@ -287,21 +280,13 @@ THREE.AMFLoader.prototype = {
 
 						if ( vNode.nodeName === "coordinates" ) {
 
-							var coordNode = vNode.firstElementChild;
+							var x = vNode.getElementsByTagName("x")[0].textContent;
+							var y = vNode.getElementsByTagName("y")[0].textContent;
+							var z = vNode.getElementsByTagName("z")[0].textContent;
 
-							while ( coordNode ) {
-
-								if ( coordNode.nodeName === "x" ||
-										 coordNode.nodeName === "y" ||
-										 coordNode.nodeName === "z" ) {
-
-									vertArray.push( coordNode.textContent );
-
-								}
-
-								coordNode = coordNode.nextElementSibling;
-
-							}
+							vertArray.push(x);
+							vertArray.push(y);
+							vertArray.push(z);
 
 						}
 						vNode = vNode.nextElementSibling;
