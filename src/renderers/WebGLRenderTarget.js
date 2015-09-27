@@ -23,8 +23,6 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
 
-	this.generateMipmaps = true;
-
 	this.shareDepthFrom = options.shareDepthFrom !== undefined ? options.shareDepthFrom : null;
 
 };
