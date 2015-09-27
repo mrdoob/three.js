@@ -24,7 +24,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.AMFLoader();
 					var amfobject = loader.parse( event.target.result );
 
-					editor.addObject( amfobject );
+					editor.execute( new CmdAddObject( amfobject ) );
 					editor.select( amfobject );
 
 				}, false );

@@ -62,9 +62,7 @@ Sidebar.Geometry = function ( editor ) {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					object.geometry = new THREE.BufferGeometry().fromGeometry( geometry );
-
-					signals.geometryChanged.dispatch( object );
+					editor.execute( new CmdSetGeometry( object, new THREE.BufferGeometry().fromGeometry( geometry ) ) );
 
 				}
 

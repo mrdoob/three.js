@@ -557,9 +557,18 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs ) {
 
-					material.displacementMap = displacementMapEnabled ? materialDisplacementMap.getValue() : null;
-					material.displacementScale = materialDisplacementScale.getValue();
-					material.needsUpdate = true;
+					var displacementMap = displacementMapEnabled ? materialDisplacementMap.getValue() : null;
+					if ( material.displacementMap !== displacementMap ) {
+
+						editor.execute( new CmdSetMaterialMap( currentObject, 'displacementMap', displacementMap ) );
+
+					}
+
+					if ( material.displacementScale !== materialDisplacementScale.getValue() ) {
+
+						editor.execute( new CmdSetMaterialValue( currentObject, 'displacementScale', materialDisplacementScale.getValue() ) );
+
+					}
 
 				} else {
 
