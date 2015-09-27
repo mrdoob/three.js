@@ -2366,9 +2366,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							setCubeTexture( texture, textureUnit );
 
+						} else if ( texture instanceof THREE.WebGLRenderTarget ) {
+
+							_this.setTexture( texture.texture, textureUnit );
+
 						} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
 
-							setCubeTextureDynamic( texture, textureUnit );
+							setCubeTextureDynamic( texture.texture, textureUnit );
 
 						} else {
 
