@@ -62,6 +62,4 @@ test( "Test CmdMultiCmds (Undo and Redo)", function() {
 	ok( box.rotation.x == 0.4, "OK, x rotation has been modified accordingly after two multi executes (expected: 0.4, actual: " + box.rotation.x + ") " );
 	ok( box.scale.z == 1.6, "OK, z scale has been modified accordingly after two multi executes (expected: 1.6, actual: " + box.scale.z + ")" );
 
-	console.log( box );
-
 });
