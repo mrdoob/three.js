@@ -3008,50 +3008,65 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
 
 		if ( renderTarget.depthBuffer && ! renderTarget.stencilBuffer ) {
+
 			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTarget.width, renderTarget.height );
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
+
 		} else if ( renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
+
 			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
+
 		} else {
+
 			// FIXME: We don't support !depth !stencil
 			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.RGBA4, renderTarget.width, renderTarget.height );
+
 		}
 
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
+
 	}
 
 	// Setup GL resources for a non-texture depth buffer
-	function setupDepthRenderbuffer(renderTarget) {
-		
+	function setupDepthRenderbuffer( renderTarget ) {
+
 		var renderTargetProperties = properties.get( renderTarget );
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
 		if ( isCube ) {
+
 			renderTargetProperties.__webglDepthbuffer = [];
 			for ( var i = 0; i < 6; i ++ ) {
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ]);
+
+				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
 				renderTargetProperties.__webglDepthbuffer[ i ] = _gl.createRenderbuffer();
 				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget );
+
 			}
+
 		}
 		else {
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 			renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
 			setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget );
+
 		}
-		_gl.bindFramebuffer(_gl.FRAMEBUFFER, null );
+		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+
 	};
 
 	// Set up GL resources for the render target
-	function setupRenderTarget(renderTarget) {
+	function setupRenderTarget( renderTarget ) {
+
 		var renderTargetProperties = properties.get( renderTarget );
 		var textureProperties = properties.get( renderTarget.texture );
 
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
-		
+
 		textureProperties.__webglTexture = _gl.createTexture();
-		
+
 		_infoMemory.textures ++;
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
@@ -3064,41 +3079,54 @@ THREE.WebGLRenderer = function ( parameters ) {
 		//
 
 		if ( isCube ) {
+
 			renderTargetProperties.__webglFramebuffer = [];
 			for ( var i = 0; i < 6; i ++ ) {
+
 				renderTargetProperties.__webglFramebuffer[ i ] = _gl.createFramebuffer();
+
 			}
+
 		} else {
+
 			renderTargetProperties.__webglFramebuffer = _gl.createFramebuffer();
+
 		}
 
 		//
 		// Setup color buffer
 		//
 		if ( isCube ) {
+
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
 			setTextureParameters( _gl.TEXTURE_CUBE_MAP, renderTarget.texture, isTargetPowerOfTwo );
 			for ( var i = 0; i < 6; i ++ ) {
+
 				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ i ], renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
+
 			}
-			
+
 			if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
-			
+
 		} else {
+
 			state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
 			setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
 			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
-			
+
 			if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
 			state.bindTexture( _gl.TEXTURE_2D, null );
+
 		}
-		
+
 		//
 		// Setup depth and stencil buffers
 		//
 		if ( renderTarget.depthBuffer ) {
-			setupDepthRenderbuffer(renderTarget);
+
+			setupDepthRenderbuffer( renderTarget );
+
 		}
 
 	}
@@ -3106,7 +3134,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.setRenderTarget = function ( renderTarget ) {
 
 		if ( renderTarget && properties.get( renderTarget ).__webglFramebuffer === undefined ) {
-			setupRenderTarget(renderTarget);
+
+			setupRenderTarget( renderTarget );
+
 		}
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
