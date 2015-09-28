@@ -18,10 +18,15 @@
 
 	#if defined(POINT_LIGHT_SHADOWS)
 
-		float unpack1K ( vec4 color ) {
+		// adjustShadowValue1K() upacks the depth value stored in @textureData, adds @bias to it, and then
+		// comapres the result with @testDepth. If @testDepth is larger than or equal to that result, then
+		// @shadowValue is incremented by 1.0.
 
-			const vec4 bitSh = vec4( 1.0 / (256.0 * 256.0 * 256.0), 1.0 / (256.0 * 256.0), 1.0 / 256.0, 1.0 );
-			return dot( color, bitSh ) * 1000.0;
+		void adjustShadowValue1K( const float testDepth, const vec4 textureData, const float bias, inout float shadowValue ) {
+
+			const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
+			if( testDepth >= dot( textureData, bitSh ) * 1000.0 + bias )
+				shadowValue += 1.0;
 
 		}
 
@@ -56,7 +61,7 @@
 			// Apply scale to avoid seams
 
 			// two texels less per square (one texel will do for NEAREST)
-			v *= scaleToCube * ( 1.0 - 4.0 * texelSizeY );
+			v *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );
 
 			// Unwrap
 
@@ -96,41 +101,29 @@
 
 		}
 
-		vec3 gridSamplingDisk[ 20 ];
-		bool gridSamplingInitialized = false;
-
-		void initGridSamplingDisk() {
-
-			if( gridSamplingInitialized ) {
-
-				return;
-
-			}
-
-			gridSamplingDisk[0] = vec3(1, 1, 1);
-			gridSamplingDisk[1] = vec3(1, -1, 1);
-			gridSamplingDisk[2] = vec3(-1, -1, 1);
-			gridSamplingDisk[3] = vec3(-1, 1, 1);
-			gridSamplingDisk[4] = vec3(1, 1, -1);
-			gridSamplingDisk[5] = vec3(1, -1, -1);
-			gridSamplingDisk[6] = vec3(-1, -1, -1);
-			gridSamplingDisk[7] = vec3(-1, 1, -1);
-			gridSamplingDisk[8] = vec3(1, 1, 0);
-			gridSamplingDisk[9] = vec3(1, -1, 0);
-			gridSamplingDisk[10] = vec3(-1, -1, 0);
-			gridSamplingDisk[11] = vec3(-1, 1, 0);
-			gridSamplingDisk[12] = vec3(1, 0, 1);
-			gridSamplingDisk[13] = vec3(-1, 0, 1);
-			gridSamplingDisk[14] = vec3(1, 0, -1);
-			gridSamplingDisk[15] = vec3(-1, 0, -1);
-			gridSamplingDisk[16] = vec3(0, 1, 1);
-			gridSamplingDisk[17] = vec3(0, -1, 1);
-			gridSamplingDisk[18] = vec3(0, -1, -1);
-			gridSamplingDisk[19] = vec3(0, 1, -1);
-
-			gridSamplingInitialized = true;
-
-		}
+		// gsdXX = grid sampling disk XX
+		// these values are used when rendering PCF shadow maps for point lights
+		
+		const vec3 gsd0 = vec3( 1, 1, 1 );
+		const vec3 gsd1 = vec3( 1, - 1, 1 );
+		const vec3 gsd2 = vec3( - 1, - 1, 1 );
+		const vec3 gsd3 = vec3( - 1, 1, 1 );
+		const vec3 gsd4 = vec3( 1, 1, - 1 );
+		const vec3 gsd5 = vec3( 1, - 1, - 1 );
+		const vec3 gsd6 = vec3( - 1, - 1, - 1 );
+		const vec3 gsd7 = vec3( -1, 1, - 1 );
+		const vec3 gsd8 = vec3( 1, 1, 0 );
+		const vec3 gsd9 = vec3( 1, - 1, 0 );
+		const vec3 gsd10 = vec3( - 1, - 1, 0 );
+		const vec3 gsd11 = vec3( - 1, 1, 0 );
+		const vec3 gsd12 = vec3( 1, 0, 1 );
+		const vec3 gsd13 = vec3( - 1, 0, 1 );
+		const vec3 gsd14 = vec3( 1, 0, - 1 );
+		const vec3 gsd15 = vec3( - 1, 0, - 1 );
+		const vec3 gsd16 = vec3( 0, 1, 1 );
+		const vec3 gsd17 = vec3( 0, - 1, 1 );
+		const vec3 gsd18 = vec3( 0, - 1, - 1 );
+		const vec3 gsd19 = vec3( 0, 1, - 1 );
 
 	#endif
 
