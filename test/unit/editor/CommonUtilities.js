@@ -141,3 +141,22 @@ function getScriptCount( editor ) {
 
 	return scriptCount;
 }
+
+function exportScene( editor ) {
+
+	var output = editor.scene.toJSON();
+	output = JSON.stringify( output, null, '\t' );
+	output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+	return output;
+
+}
+
+function importScene( data ) {
+
+	var json = JSON.parse( data );
+	var loader = new THREE.ObjectLoader();
+	var result = loader.parse( json );
+
+	return result;
+
+}
