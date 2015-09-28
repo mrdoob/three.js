@@ -46,7 +46,6 @@ THREE.AnimationAction.prototype = {
 
 		var previousClipTime = this.clipTime;
    		var previousLoopCount = this.loopCount;
-   		var previousActionTime = this.actionTime;
 
 		var duration = this.clip.duration;
 	

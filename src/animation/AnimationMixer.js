@@ -217,8 +217,6 @@ THREE.AnimationMixer.prototype = {
 
 			for( var j = 0; j < actionResults.length; j ++ ) {
 
-				var name = action.clip.tracks[j].name;
-
 				action.propertyBindings[ j ].accumulate( actionResults[j], weight );
 
 			}

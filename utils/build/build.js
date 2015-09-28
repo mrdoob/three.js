@@ -2,7 +2,6 @@ var fs = require("fs");
 var path = require("path");
 var argparse =  require( "argparse" );
 var uglify = require("uglify-js");
-var spawn = require('child_process').spawn;
 
 function main() {
 

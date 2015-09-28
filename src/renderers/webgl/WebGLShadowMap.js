@@ -10,9 +10,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 
-	_min = new THREE.Vector3(),
-	_max = new THREE.Vector3(),
-
 	_lookTarget = new THREE.Vector3(),
 	_lightPositionWorld = new THREE.Vector3(),
 
