@@ -46,7 +46,7 @@ THREE.MD2Character = function () {
 		loader.load( config.baseUrl + config.body, function( geo ) {
 
 			geo.computeBoundingBox();
-			scope.root.position.y = - scope.scale * geo.boundingBox.min.y;
+			scope.root.position.y = -scope.scale * geo.boundingBox.min.y;
 
 			var mesh = createPart( geo, scope.skinsBody[ 0 ] );
 			mesh.scale.set( scope.scale, scope.scale, scope.scale );
@@ -238,7 +238,7 @@ THREE.MD2Character = function () {
 		//
 
 		var mesh = new THREE.Mesh( geometry, materialTexture );
-		mesh.rotation.y = - Math.PI / 2;
+		mesh.rotation.y = -Math.PI / 2;
 
 		mesh.castShadow = true;
 		mesh.receiveShadow = true;

@@ -24,13 +24,13 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_distanceMaterials = new Array( _NumberOfMaterialVariants );
 
 	var cubeDirections = [
-		new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( - 1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ),
-		new THREE.Vector3( 0, 0, - 1 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, - 1, 0 )
+		new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( -1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ),
+		new THREE.Vector3( 0, 0, -1 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, -1, 0 )
 	];
 
 	var cubeUps = [
 		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ),
-		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ),	new THREE.Vector3( 0, 0, - 1 )
+		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ),	new THREE.Vector3( 0, 0, -1 )
 	];
 
 	var cube2DViewPorts = [

@@ -2,7 +2,7 @@ function Transition ( sceneA, sceneB ) {
 
 	this.scene = new THREE.Scene();
 	
-	this.cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10, 10 );
+	this.cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -10, 10 );
 
 	this.textures = [];
 	for ( var i = 0; i < 6; i ++ )

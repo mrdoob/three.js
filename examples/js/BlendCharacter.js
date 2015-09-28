@@ -129,9 +129,9 @@ THREE.BlendCharacter.prototype.getForward = function() {
 
 		// pull the character's forward basis vector out of the matrix
 		forward.set(
-			- this.matrix.elements[ 8 ],
-			- this.matrix.elements[ 9 ],
-			- this.matrix.elements[ 10 ]
+			-this.matrix.elements[ 8 ],
+			-this.matrix.elements[ 9 ],
+			-this.matrix.elements[ 10 ]
 		);
 
 		return forward;

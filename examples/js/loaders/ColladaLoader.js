@@ -529,7 +529,7 @@
 								var transform = transforms[ i ];
 
 								// kinda ghetto joint detection
-								if ( transform.sid && transform.sid.indexOf( 'joint' + jointIndex ) !== - 1 ) {
+								if ( transform.sid && transform.sid.indexOf( 'joint' + jointIndex ) !== -1 ) {
 
 									// apply actual joint value here
 									switch ( joint.type ) {
@@ -1498,7 +1498,7 @@
 
 			case 'translate':
 
-				fixCoords( this.data, - 1 );
+				fixCoords( this.data, -1 );
 				this.obj = new THREE.Vector3( this.data[ 0 ], this.data[ 1 ], this.data[ 2 ] );
 				break;
 
@@ -2381,7 +2381,7 @@
 
 		this.semantic = element.getAttribute( 'semantic' );
 		this.source = element.getAttribute( 'source' ).replace( /^#/, '' );
-		this.set = _attr_as_int( element, 'set', - 1 );
+		this.set = _attr_as_int( element, 'set', -1 );
 		this.offset = _attr_as_int( element, 'offset', 0 );
 
 		if ( this.semantic === 'TEXCOORD' && this.set < 0 ) {
@@ -3472,7 +3472,7 @@
 		if ( this.input.length ) {
 
 			this.startTime = 100000000;
-			this.endTime = - 100000000;
+			this.endTime = -100000000;
 
 			for ( var i = 0; i < this.input.length; i ++ ) {
 
@@ -3513,7 +3513,7 @@
 					case 'rotate':
 					case 'translate':
 
-						fixCoords( data, - 1 );
+						fixCoords( data, -1 );
 						break;
 
 					case 'scale':
@@ -3525,7 +3525,7 @@
 
 			} else if ( this.strideOut === 4 && type === 'matrix' ) {
 
-				fixCoords( data, - 1 );
+				fixCoords( data, -1 );
 
 			}
 
@@ -4022,7 +4022,7 @@
 		var _axis = _floats( axisElement.textContent );
 		this.axis = getConvertedVec3( _axis, 0 );
 
-		var min = element.querySelector( 'limits min' ) ? parseFloat( element.querySelector( 'limits min' ).textContent ) : - 360;
+		var min = element.querySelector( 'limits min' ) ? parseFloat( element.querySelector( 'limits min' ).textContent ) : -360;
 		var max = element.querySelector( 'limits max' ) ? parseFloat( element.querySelector( 'limits max' ).textContent ) : 360;
 
 		this.limits = {
@@ -4472,7 +4472,7 @@
 	function calcAnimationBounds () {
 
 		var start = 1000000;
-		var end = - start;
+		var end = -start;
 		var frames = 0;
 		var ID;
 		for ( var id in animations ) {
@@ -4836,7 +4836,7 @@
 
 				if ( transform ) {
 
-					if ( sids.indexOf( fullSid ) === - 1 ) {
+					if ( sids.indexOf( fullSid ) === -1 ) {
 
 						sids.push( fullSid );
 
@@ -4852,7 +4852,7 @@
 
 							key = new Key( time );
 							var timeNdx = findTimeNdx( keys, time );
-							keys.splice( timeNdx === - 1 ? keys.length : timeNdx, 0, key );
+							keys.splice( timeNdx === -1 ? keys.length : timeNdx, 0, key );
 
 						}
 
@@ -4938,9 +4938,9 @@
 
 	function findTimeNdx ( keys, time ) {
 
-		var ndx = - 1;
+		var ndx = -1;
 
-		for ( var i = 0, il = keys.length; i < il && ndx === - 1; i ++ ) {
+		for ( var i = 0, il = keys.length; i < il && ndx === -1; i ++ ) {
 
 			var key = keys[ i ];
 
@@ -5041,7 +5041,7 @@
 
 		};
 
-		walk( - 1, skeleton, list );
+		walk( -1, skeleton, list );
 		return list;
 
 	};
@@ -5056,13 +5056,13 @@
 
 		switch ( axis ) {
 			case 'X':
-				data = upConversion === 'XtoY' ? data * - 1 : data;
+				data = upConversion === 'XtoY' ? data * -1 : data;
 				break;
 			case 'Y':
-				data = upConversion === 'YtoZ' || upConversion === 'YtoX' ? data * - 1 : data;
+				data = upConversion === 'YtoZ' || upConversion === 'YtoX' ? data * -1 : data;
 				break;
 			case 'Z':
-				data = upConversion === 'ZtoY' ? data * - 1 : data ;
+				data = upConversion === 'ZtoY' ? data * -1 : data ;
 				break;
 			default:
 				break;
@@ -5075,7 +5075,7 @@
 	function getConvertedVec3( data, offset ) {
 
 		var arr = [ data[ offset ], data[ offset + 1 ], data[ offset + 2 ] ];
-		fixCoords( arr, - 1 );
+		fixCoords( arr, -1 );
 		return new THREE.Vector3( arr[ 0 ], arr[ 1 ], arr[ 2 ] );
 
 	};
@@ -5088,40 +5088,40 @@
 
 			// Columns first
 			var arr = [ data[ 0 ], data[ 4 ], data[ 8 ] ];
-			fixCoords( arr, - 1 );
+			fixCoords( arr, -1 );
 			data[ 0 ] = arr[ 0 ];
 			data[ 4 ] = arr[ 1 ];
 			data[ 8 ] = arr[ 2 ];
 			arr = [ data[ 1 ], data[ 5 ], data[ 9 ] ];
-			fixCoords( arr, - 1 );
+			fixCoords( arr, -1 );
 			data[ 1 ] = arr[ 0 ];
 			data[ 5 ] = arr[ 1 ];
 			data[ 9 ] = arr[ 2 ];
 			arr = [ data[ 2 ], data[ 6 ], data[ 10 ] ];
-			fixCoords( arr, - 1 );
+			fixCoords( arr, -1 );
 			data[ 2 ] = arr[ 0 ];
 			data[ 6 ] = arr[ 1 ];
 			data[ 10 ] = arr[ 2 ];
 			// Rows second
 			arr = [ data[ 0 ], data[ 1 ], data[ 2 ] ];
-			fixCoords( arr, - 1 );
+			fixCoords( arr, -1 );
 			data[ 0 ] = arr[ 0 ];
 			data[ 1 ] = arr[ 1 ];
 			data[ 2 ] = arr[ 2 ];
 			arr = [ data[ 4 ], data[ 5 ], data[ 6 ] ];
-			fixCoords( arr, - 1 );
+			fixCoords( arr, -1 );
 			data[ 4 ] = arr[ 0 ];
 			data[ 5 ] = arr[ 1 ];
 			data[ 6 ] = arr[ 2 ];
 			arr = [ data[ 8 ], data[ 9 ], data[ 10 ] ];
-			fixCoords( arr, - 1 );
+			fixCoords( arr, -1 );
 			data[ 8 ] = arr[ 0 ];
 			data[ 9 ] = arr[ 1 ];
 			data[ 10 ] = arr[ 2 ];
 
 			// Now fix translation
 			arr = [ data[ 3 ], data[ 7 ], data[ 11 ] ];
-			fixCoords( arr, - 1 );
+			fixCoords( arr, -1 );
 			data[ 3 ] = arr[ 0 ];
 			data[ 7 ] = arr[ 1 ];
 			data[ 11 ] = arr[ 2 ];
@@ -5139,7 +5139,7 @@
 
 	function getConvertedIndex( index ) {
 
-		if ( index > - 1 && index < 3 ) {
+		if ( index > -1 && index < 3 ) {
 
 			var members = [ 'X', 'Y', 'Z' ],
 				indices = { X: 0, Y: 1, Z: 2 };
@@ -5157,7 +5157,7 @@
 
 		var channels = [];
 		var startTime = 1000000;
-		var endTime = - 1000000;
+		var endTime = -1000000;
 
 		for ( var id in animations ) {
 
@@ -5471,7 +5471,7 @@
 		for ( var i = 0; i < bones.length; i ++ ) {
 
 			var bone = bones[ i ];
-			var found = - 1;
+			var found = -1;
 
 			if ( bone.type != 'JOINT' ) continue;
 
@@ -5531,7 +5531,7 @@
 	function skinToBindPose ( geometry, skeleton, skinController ) {
 
 		var bones = [];
-		setupSkeleton( skeleton, bones, - 1 );
+		setupSkeleton( skeleton, bones, -1 );
 		setupSkinningMatrices( bones, skinController.skin );
 		var v = new THREE.Vector3();
 		var skinned = [];

@@ -6,7 +6,7 @@
 THREE.Box3 = function ( min, max ) {
 
 	this.min = ( min !== undefined ) ? min : new THREE.Vector3( Infinity, Infinity, Infinity );
-	this.max = ( max !== undefined ) ? max : new THREE.Vector3( - Infinity, - Infinity, - Infinity );
+	this.max = ( max !== undefined ) ? max : new THREE.Vector3( -Infinity, -Infinity, -Infinity );
 
 };
 
@@ -133,7 +133,7 @@ THREE.Box3.prototype = {
 	makeEmpty: function () {
 
 		this.min.x = this.min.y = this.min.z = Infinity;
-		this.max.x = this.max.y = this.max.z = - Infinity;
+		this.max.x = this.max.y = this.max.z = -Infinity;
 
 		return this;
 
@@ -181,7 +181,7 @@ THREE.Box3.prototype = {
 
 	expandByScalar: function ( scalar ) {
 
-		this.min.addScalar( - scalar );
+		this.min.addScalar( -scalar );
 		this.max.addScalar( scalar );
 
 		return this;

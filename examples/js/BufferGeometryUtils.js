@@ -156,7 +156,7 @@ THREE.BufferGeometryUtils = {
 
 			tmp2.crossVectors( n2, t );
 			test = tmp2.dot( tan2[ v ] );
-			w = ( test < 0.0 ) ? - 1.0 : 1.0;
+			w = ( test < 0.0 ) ? -1.0 : 1.0;
 
 			tangents[ v * 4 ] = tmp.x;
 			tangents[ v * 4 + 1 ] = tmp.y;

@@ -109,7 +109,7 @@ THREE.Projector = function () {
 	_vector3 = new THREE.Vector3(),
 	_vector4 = new THREE.Vector4(),
 
-	_clipBox = new THREE.Box3( new THREE.Vector3( - 1, - 1, - 1 ), new THREE.Vector3( 1, 1, 1 ) ),
+	_clipBox = new THREE.Box3( new THREE.Vector3( -1, -1, -1 ), new THREE.Vector3( 1, 1, 1 ) ),
 	_boundingBox = new THREE.Box3(),
 	_points3 = new Array( 3 ),
 	_points4 = new Array( 4 ),
@@ -188,9 +188,9 @@ THREE.Projector = function () {
 			positionScreen.y *= invW;
 			positionScreen.z *= invW;
 
-			vertex.visible = positionScreen.x >= - 1 && positionScreen.x <= 1 &&
-					 positionScreen.y >= - 1 && positionScreen.y <= 1 &&
-					 positionScreen.z >= - 1 && positionScreen.z <= 1;
+			vertex.visible = positionScreen.x >= -1 && positionScreen.x <= 1 &&
+					 positionScreen.y >= -1 && positionScreen.y <= 1 &&
+					 positionScreen.z >= -1 && positionScreen.z <= 1;
 
 		};
 
@@ -706,7 +706,7 @@ THREE.Projector = function () {
 
 				_vector4.z *= invW;
 
-				if ( _vector4.z >= - 1 && _vector4.z <= 1 ) {
+				if ( _vector4.z >= -1 && _vector4.z <= 1 ) {
 
 					_sprite = getNextSpriteInPool();
 					_sprite.id = object.id;
@@ -856,8 +856,8 @@ THREE.Projector = function () {
 		// Z = -1 and Z = +1, respectively.
 		bc1near =  s1.z + s1.w,
 		bc2near =  s2.z + s2.w,
-		bc1far =  - s1.z + s1.w,
-		bc2far =  - s2.z + s2.w;
+		bc1far =  -s1.z + s1.w,
+		bc2far =  -s2.z + s2.w;
 
 		if ( bc1near >= 0 && bc2near >= 0 && bc1far >= 0 && bc2far >= 0 ) {
 

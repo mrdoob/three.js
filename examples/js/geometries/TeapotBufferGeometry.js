@@ -654,19 +654,19 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 					if ( vert[ 0 ] === 0 && vert[ 1 ] === 0 ) {
 
 						// if above the middle of the teapot, normal points up, else down
-						normOut.set( 0, vert[ 2 ] > maxHeight2 ? 1 : - 1, 0 );
+						normOut.set( 0, vert[ 2 ] > maxHeight2 ? 1 : -1, 0 );
 
 					} else {
 
 						// standard output: rotate on X axis
-						normOut.set( norm.x, norm.z, - norm.y );
+						normOut.set( norm.x, norm.z, -norm.y );
 
 					}
 
 					// store it all
 					vertices[ vertCount ++ ] = trueSize * vert[ 0 ];
 					vertices[ vertCount ++ ] = trueSize * ( vert[ 2 ] - maxHeight2 );
-					vertices[ vertCount ++ ] = - trueSize * vert[ 1 ];
+					vertices[ vertCount ++ ] = -trueSize * vert[ 1 ];
 
 					normals[ normCount ++ ] = normOut.x;
 					normals[ normCount ++ ] = normOut.y;

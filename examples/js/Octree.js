@@ -47,7 +47,7 @@
 			
 		}
 		
-		return - 1;
+		return -1;
 		
 	}
 	
@@ -63,7 +63,7 @@
 			
 		}
 		
-		return - 1;
+		return -1;
 		
 	}
 
@@ -85,7 +85,7 @@
 		
 		this.nodeCount = 0;
 		
-		this.INDEX_INSIDE_CROSS = - 1;
+		this.INDEX_INSIDE_CROSS = -1;
 		this.INDEX_OUTSIDE_OFFSET = 2;
 		
 		this.INDEX_OUTSIDE_POS_X = isNumber( parameters.INDEX_OUTSIDE_POS_X ) ? parameters.INDEX_OUTSIDE_POS_X : 0;
@@ -97,11 +97,11 @@
 		
 		this.INDEX_OUTSIDE_MAP = [];
 		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_POS_X ] = { index: this.INDEX_OUTSIDE_POS_X, count: 0, x: 1, y: 0, z: 0 };
-		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_NEG_X ] = { index: this.INDEX_OUTSIDE_NEG_X, count: 0, x: - 1, y: 0, z: 0 };
+		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_NEG_X ] = { index: this.INDEX_OUTSIDE_NEG_X, count: 0, x: -1, y: 0, z: 0 };
 		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_POS_Y ] = { index: this.INDEX_OUTSIDE_POS_Y, count: 0, x: 0, y: 1, z: 0 };
-		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_NEG_Y ] = { index: this.INDEX_OUTSIDE_NEG_Y, count: 0, x: 0, y: - 1, z: 0 };
+		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_NEG_Y ] = { index: this.INDEX_OUTSIDE_NEG_Y, count: 0, x: 0, y: -1, z: 0 };
 		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_POS_Z ] = { index: this.INDEX_OUTSIDE_POS_Z, count: 0, x: 0, y: 0, z: 1 };
-		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_NEG_Z ] = { index: this.INDEX_OUTSIDE_NEG_Z, count: 0, x: 0, y: 0, z: - 1 };
+		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_NEG_Z ] = { index: this.INDEX_OUTSIDE_NEG_Z, count: 0, x: 0, y: 0, z: -1 };
 		
 		this.FLAG_POS_X = 1 << ( this.INDEX_OUTSIDE_POS_X + 1 );
 		this.FLAG_NEG_X = 1 << ( this.INDEX_OUTSIDE_NEG_X + 1 );
@@ -295,7 +295,7 @@
 				
 				index = indexOfValue( this.objects, object );
 				
-				if ( index !== - 1 ) {
+				if ( index !== -1 ) {
 					
 					this.objects.splice( index, 1 );
 					
@@ -311,7 +311,7 @@
 						
 						index = indexOfValue( this.objectsData, objectData );
 						
-						if ( index !== - 1 ) {
+						if ( index !== -1 ) {
 							
 							this.objectsData.splice( index, 1 );
 							
@@ -327,7 +327,7 @@
 				
 				index = indexOfPropertyWithValue( this.objectsDeferred, 'object', object );
 				
-				if ( index !== - 1 ) {
+				if ( index !== -1 ) {
 					
 					this.objectsDeferred.splice( index, 1 );
 					
@@ -528,7 +528,7 @@
 					
 					// if needed, create new result data
 					
-					if ( resultObjectIndex === - 1 ) {
+					if ( resultObjectIndex === -1 ) {
 						
 						resultData = {
 							object: object,
@@ -868,7 +868,7 @@
 			
 			node.indexOctant = indexOctant;
 			
-			if ( indexOfValue( this.nodesIndices, indexOctant ) === - 1 ) {
+			if ( indexOfValue( this.nodesIndices, indexOctant ) === -1 ) {
 				
 				this.nodesIndices.push( indexOctant );
 				
@@ -916,13 +916,13 @@
 			indexOctant = this.getOctantIndex( object );
 			
 			// if object fully contained by an octant, add to subtree
-			if ( indexOctant > - 1 && this.nodesIndices.length > 0 ) {
+			if ( indexOctant > -1 && this.nodesIndices.length > 0 ) {
 				
 				node = this.branch( indexOctant );
 				
 				node.addObject( object );
 				
-			} else if ( indexOctant < - 1 && this.parent instanceof THREE.OctreeNode ) {
+			} else if ( indexOctant < -1 && this.parent instanceof THREE.OctreeNode ) {
 				
 				// if object lies outside bounds, add to parent node
 				
@@ -934,7 +934,7 @@
 				
 				index = indexOfValue( this.objects, object );
 				
-				if ( index === - 1 ) {
+				if ( index === -1 ) {
 					
 					this.objects.push( object );
 					
@@ -1000,7 +1000,7 @@
 		removeObjectRecursive: function ( object, removeData ) {
 			
 			var i, l,
-				index = - 1,
+				index = -1,
 				objectData,
 				node,
 				objectRemoved;
@@ -1014,7 +1014,7 @@
 				
 				index = indexOfValue( this.objects, object );
 				
-				if ( index !== - 1 ) {
+				if ( index !== -1 ) {
 					
 					this.objects.splice( index, 1 );
 					object.node = undefined;
@@ -1123,12 +1123,12 @@
 				indexOctant = this.getOctantIndex( object );
 				
 				// if lies within octant
-				if ( indexOctant > - 1 ) {
+				if ( indexOctant > -1 ) {
 					
 					objectsSplit.push( object );
 					objectsSplitOctants.push( indexOctant );
 				
-				} else if ( indexOctant < - 1 ) {
+				} else if ( indexOctant < -1 ) {
 					
 					// lies outside radius
 					
@@ -1201,7 +1201,7 @@
 					
 					// if object contained by octant, branch this tree
 					
-					if ( indexOctant > - 1 ) {
+					if ( indexOctant > -1 ) {
 						
 						node = this.branch( indexOctant );
 						
@@ -1255,7 +1255,7 @@
 				radius = ( this.radiusOverlap ) * 0.5;
 				overlap = radius * this.tree.overlapPct;
 				radiusOffset = radius - overlap;
-				offset = this.utilVec31Branch.set( indexOctant & 1 ? radiusOffset : - radiusOffset, indexOctant & 2 ? radiusOffset : - radiusOffset, indexOctant & 4 ? radiusOffset : - radiusOffset );
+				offset = this.utilVec31Branch.set( indexOctant & 1 ? radiusOffset : -radiusOffset, indexOctant & 2 ? radiusOffset : -radiusOffset, indexOctant & 4 ? radiusOffset : -radiusOffset );
 				position = new THREE.Vector3().addVectors( this.position, offset );
 				
 				// node
@@ -1340,11 +1340,11 @@
 					
 					// if object outside this, include in calculations
 					
-					if ( indexOctant < - 1 ) {
+					if ( indexOctant < -1 ) {
 						
 						// convert octant index to outside flags
 						
-						flagsOutside = - indexOctant - this.tree.INDEX_OUTSIDE_OFFSET;
+						flagsOutside = -indexOctant - this.tree.INDEX_OUTSIDE_OFFSET;
 						
 						// check against bitwise flags
 						
@@ -1446,7 +1446,7 @@
 					// get this octant indices based on octant normal
 					
 					indexOctant = this.getOctantIndexFromPosition( octantX, octantY, octantZ );
-					indexOctantInverse = this.getOctantIndexFromPosition( - octantX, - octantY, - octantZ );
+					indexOctantInverse = this.getOctantIndexFromPosition( -octantX, -octantY, -octantZ );
 					
 					// properties
 					
@@ -1461,7 +1461,7 @@
 					// parent offset is difference between radius + overlap of parent and child
 					
 					radiusOffset = ( radiusParent + overlapParent ) - ( radius + overlap );
-					offset.set( indexOctant & 1 ? radiusOffset : - radiusOffset, indexOctant & 2 ? radiusOffset : - radiusOffset, indexOctant & 4 ? radiusOffset : - radiusOffset );
+					offset.set( indexOctant & 1 ? radiusOffset : -radiusOffset, indexOctant & 2 ? radiusOffset : -radiusOffset, indexOctant & 4 ? radiusOffset : -radiusOffset );
 					position = new THREE.Vector3().addVectors( this.position, offset );
 					
 					// parent
@@ -1743,7 +1743,7 @@
 					
 				}
 				
-				objectData.indexOctant = - indexOctant - this.tree.INDEX_OUTSIDE_OFFSET;
+				objectData.indexOctant = -indexOctant - this.tree.INDEX_OUTSIDE_OFFSET;
 				
 				return objectData.indexOctant;
 				
@@ -1751,7 +1751,7 @@
 			
 			// return octant index from delta xyz
 			
-			if ( deltaX - radiusObj > - overlap ) {
+			if ( deltaX - radiusObj > -overlap ) {
 				
 				// x right
 				
@@ -1766,7 +1766,7 @@
 				
 			}
 			
-			if ( deltaY - radiusObj > - overlap ) {
+			if ( deltaY - radiusObj > -overlap ) {
 				
 				// y right
 				
@@ -1782,7 +1782,7 @@
 			}
 			
 			
-			if ( deltaZ - radiusObj > - overlap ) {
+			if ( deltaZ - radiusObj > -overlap ) {
 				
 				// z right
 				

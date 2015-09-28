@@ -174,12 +174,12 @@ THREE.Matrix4.prototype = {
 			var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
 			te[ 0 ] = c * e;
-			te[ 4 ] = - c * f;
+			te[ 4 ] = -c * f;
 			te[ 8 ] = d;
 
 			te[ 1 ] = af + be * d;
 			te[ 5 ] = ae - bf * d;
-			te[ 9 ] = - b * c;
+			te[ 9 ] = -b * c;
 
 			te[ 2 ] = bf - ae * d;
 			te[ 6 ] = be + af * d;
@@ -195,7 +195,7 @@ THREE.Matrix4.prototype = {
 
 			te[ 1 ] = a * f;
 			te[ 5 ] = a * e;
-			te[ 9 ] = - b;
+			te[ 9 ] = -b;
 
 			te[ 2 ] = cf * b - de;
 			te[ 6 ] = df + ce * b;
@@ -206,14 +206,14 @@ THREE.Matrix4.prototype = {
 			var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
 			te[ 0 ] = ce - df * b;
-			te[ 4 ] = - a * f;
+			te[ 4 ] = -a * f;
 			te[ 8 ] = de + cf * b;
 
 			te[ 1 ] = cf + de * b;
 			te[ 5 ] = a * e;
 			te[ 9 ] = df - ce * b;
 
-			te[ 2 ] = - a * d;
+			te[ 2 ] = -a * d;
 			te[ 6 ] = b;
 			te[ 10 ] = a * c;
 
@@ -229,7 +229,7 @@ THREE.Matrix4.prototype = {
 			te[ 5 ] = bf * d + ae;
 			te[ 9 ] = af * d - be;
 
-			te[ 2 ] = - d;
+			te[ 2 ] = -d;
 			te[ 6 ] = b * c;
 			te[ 10 ] = a * c;
 
@@ -243,9 +243,9 @@ THREE.Matrix4.prototype = {
 
 			te[ 1 ] = f;
 			te[ 5 ] = a * e;
-			te[ 9 ] = - b * e;
+			te[ 9 ] = -b * e;
 
-			te[ 2 ] = - d * e;
+			te[ 2 ] = -d * e;
 			te[ 6 ] = ad * f + bc;
 			te[ 10 ] = ac - bd * f;
 
@@ -254,7 +254,7 @@ THREE.Matrix4.prototype = {
 			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
 			te[ 0 ] = c * e;
-			te[ 4 ] = - f;
+			te[ 4 ] = -f;
 			te[ 8 ] = d * e;
 
 			te[ 1 ] = ac * f + bd;
@@ -552,7 +552,7 @@ THREE.Matrix4.prototype = {
 
 		return (
 			n41 * (
-				+ n14 * n23 * n32
+				+n14 * n23 * n32
 				 - n13 * n24 * n32
 				 - n14 * n22 * n33
 				 + n12 * n24 * n33
@@ -560,7 +560,7 @@ THREE.Matrix4.prototype = {
 				 - n12 * n23 * n34
 			) +
 			n42 * (
-				+ n11 * n23 * n34
+				+n11 * n23 * n34
 				 - n11 * n24 * n33
 				 + n14 * n21 * n33
 				 - n13 * n21 * n34
@@ -568,7 +568,7 @@ THREE.Matrix4.prototype = {
 				 - n14 * n23 * n31
 			) +
 			n43 * (
-				+ n11 * n24 * n32
+				+n11 * n24 * n32
 				 - n11 * n22 * n34
 				 - n14 * n21 * n32
 				 + n12 * n21 * n34
@@ -576,7 +576,7 @@ THREE.Matrix4.prototype = {
 				 - n12 * n24 * n31
 			) +
 			n44 * (
-				- n13 * n22 * n31
+				-n13 * n22 * n31
 				 - n11 * n23 * n32
 				 + n11 * n22 * n33
 				 + n13 * n21 * n32
@@ -795,7 +795,7 @@ THREE.Matrix4.prototype = {
 		this.set(
 
 			1, 0,  0, 0,
-			0, c, - s, 0,
+			0, c, -s, 0,
 			0, s,  c, 0,
 			0, 0,  0, 1
 
@@ -813,7 +813,7 @@ THREE.Matrix4.prototype = {
 
 			 c, 0, s, 0,
 			 0, 1, 0, 0,
-			- s, 0, c, 0,
+			-s, 0, c, 0,
 			 0, 0, 0, 1
 
 		);
@@ -828,7 +828,7 @@ THREE.Matrix4.prototype = {
 
 		this.set(
 
-			c, - s, 0, 0,
+			c, -s, 0, 0,
 			s,  c, 0, 0,
 			0,  0, 1, 0,
 			0,  0, 0, 1
@@ -906,7 +906,7 @@ THREE.Matrix4.prototype = {
 			var det = this.determinant();
 			if ( det < 0 ) {
 
-				sx = - sx;
+				sx = -sx;
 
 			}
 
@@ -954,13 +954,13 @@ THREE.Matrix4.prototype = {
 
 		var a = ( right + left ) / ( right - left );
 		var b = ( top + bottom ) / ( top - bottom );
-		var c = - ( far + near ) / ( far - near );
-		var d = - 2 * far * near / ( far - near );
+		var c = -( far + near ) / ( far - near );
+		var d = -2 * far * near / ( far - near );
 
 		te[ 0 ] = x;	te[ 4 ] = 0;	te[ 8 ] = a;	te[ 12 ] = 0;
 		te[ 1 ] = 0;	te[ 5 ] = y;	te[ 9 ] = b;	te[ 13 ] = 0;
 		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = c;	te[ 14 ] = d;
-		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
+		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = -1;	te[ 15 ] = 0;
 
 		return this;
 
@@ -969,7 +969,7 @@ THREE.Matrix4.prototype = {
 	makePerspective: function ( fov, aspect, near, far ) {
 
 		var ymax = near * Math.tan( THREE.Math.degToRad( fov * 0.5 ) );
-		var ymin = - ymax;
+		var ymin = -ymax;
 		var xmin = ymin * aspect;
 		var xmax = ymax * aspect;
 
@@ -988,9 +988,9 @@ THREE.Matrix4.prototype = {
 		var y = ( top + bottom ) / h;
 		var z = ( far + near ) / p;
 
-		te[ 0 ] = 2 / w;	te[ 4 ] = 0;	te[ 8 ] = 0;	te[ 12 ] = - x;
-		te[ 1 ] = 0;	te[ 5 ] = 2 / h;	te[ 9 ] = 0;	te[ 13 ] = - y;
-		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = - 2 / p;	te[ 14 ] = - z;
+		te[ 0 ] = 2 / w;	te[ 4 ] = 0;	te[ 8 ] = 0;	te[ 12 ] = -x;
+		te[ 1 ] = 0;	te[ 5 ] = 2 / h;	te[ 9 ] = 0;	te[ 13 ] = -y;
+		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = -2 / p;	te[ 14 ] = -z;
 		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = 0;	te[ 15 ] = 1;
 
 		return this;

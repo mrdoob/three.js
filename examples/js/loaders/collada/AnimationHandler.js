@@ -73,7 +73,7 @@ THREE.AnimationHandler = {
 					for ( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
 
 						var morphTargetName = data.hierarchy[ h ].keys[ k ].morphTargets[ m ];
-						usedMorphTargets[ morphTargetName ] = - 1;
+						usedMorphTargets[ morphTargetName ] = -1;
 
 					}
 
@@ -181,7 +181,7 @@ THREE.AnimationHandler = {
 
 	play: function ( animation ) {
 
-		if ( this.animations.indexOf( animation ) === - 1 ) {
+		if ( this.animations.indexOf( animation ) === -1 ) {
 
 			this.animations.push( animation );
 
@@ -193,7 +193,7 @@ THREE.AnimationHandler = {
 
 		var index = this.animations.indexOf( animation );
 
-		if ( index !== - 1 ) {
+		if ( index !== -1 ) {
 
 			this.animations.splice( index, 1 );
 

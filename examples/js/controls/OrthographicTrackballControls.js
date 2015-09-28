@@ -8,7 +8,7 @@
 THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	var _this = this;
-	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
+	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
 
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -202,7 +202,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 				angle *= _this.rotateSpeed;
 
-				quaternion.setFromAxisAngle( axis, - angle );
+				quaternion.setFromAxisAngle( axis, -angle );
 
 				_eye.applyQuaternion( quaternion );
 				_this.object.up.applyQuaternion( quaternion );
@@ -507,7 +507,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 			// Firefox
 
-			delta = - event.detail / 3;
+			delta = -event.detail / 3;
 
 		}
 

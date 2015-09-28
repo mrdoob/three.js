@@ -209,19 +209,19 @@ THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
 			if ( check.x ) {
 
 				vertices = this.clipFace( vertices, new THREE.Vector3( 1, 0, 0 ) );
-				vertices = this.clipFace( vertices, new THREE.Vector3( - 1, 0, 0 ) );
+				vertices = this.clipFace( vertices, new THREE.Vector3( -1, 0, 0 ) );
 
 			}
 			if ( check.y ) {
 
 				vertices = this.clipFace( vertices, new THREE.Vector3( 0, 1, 0 ) );
-				vertices = this.clipFace( vertices, new THREE.Vector3( 0, - 1, 0 ) );
+				vertices = this.clipFace( vertices, new THREE.Vector3( 0, -1, 0 ) );
 
 			}
 			if ( check.z ) {
 
 				vertices = this.clipFace( vertices, new THREE.Vector3( 0, 0, 1 ) );
-				vertices = this.clipFace( vertices, new THREE.Vector3( 0, 0, - 1 ) );
+				vertices = this.clipFace( vertices, new THREE.Vector3( 0, 0, -1 ) );
 
 			}
 

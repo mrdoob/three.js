@@ -18,7 +18,7 @@ THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 	this.loopCount = 0;
 	this.enabled = true;	// allow for easy disabling of the action.
 
-	this.actionTime = - this.startTime;
+	this.actionTime = -this.startTime;
 	this.clipTime = 0;
 
 	this.propertyBindings = [];

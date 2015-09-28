@@ -124,11 +124,11 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 			// translate xOffset
 
 			eyeRight.elements[ 12 ] = eyeSep;
-			eyeLeft.elements[ 12 ] = - eyeSep;
+			eyeLeft.elements[ 12 ] = -eyeSep;
 
 			// for left eye
 
-			xmin = - ymax * _aspect + eyeSepOnProjection;
+			xmin = -ymax * _aspect + eyeSepOnProjection;
 			xmax = ymax * _aspect + eyeSepOnProjection;
 
 			projectionMatrix.elements[ 0 ] = 2 * _near / ( xmax - xmin );
@@ -138,7 +138,7 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 			// for right eye
 
-			xmin = - ymax * _aspect - eyeSepOnProjection;
+			xmin = -ymax * _aspect - eyeSepOnProjection;
 			xmax = ymax * _aspect - eyeSepOnProjection;
 
 			projectionMatrix.elements[ 0 ] = 2 * _near / ( xmax - xmin );

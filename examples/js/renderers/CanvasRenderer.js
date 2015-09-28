@@ -188,10 +188,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		_clipBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clipBox.min.set( -_canvasWidthHalf, -_canvasHeightHalf );
 		_clipBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
-		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox.min.set( -_canvasWidthHalf, -_canvasHeightHalf );
 		_clearBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
 		_contextGlobalAlpha = 1;
@@ -224,7 +224,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_clearColor.set( color );
 		_clearAlpha = alpha !== undefined ? alpha : 1;
 
-		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox.min.set( -_canvasWidthHalf, -_canvasHeightHalf );
 		_clearBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
 	};
@@ -262,9 +262,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_clearBox.expandByScalar( 2 );
 
 			_clearBox.min.x = _clearBox.min.x + _canvasWidthHalf;
-			_clearBox.min.y =  - _clearBox.min.y + _canvasHeightHalf;		// higher y value !
+			_clearBox.min.y =  -_clearBox.min.y + _canvasHeightHalf;		// higher y value !
 			_clearBox.max.x = _clearBox.max.x + _canvasWidthHalf;
-			_clearBox.max.y =  - _clearBox.max.y + _canvasHeightHalf;		// lower y value !
+			_clearBox.max.y =  -_clearBox.max.y + _canvasHeightHalf;		// lower y value !
 
 			if ( _clearAlpha < 1 ) {
 
@@ -319,7 +319,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
-		_context.setTransform( _viewportWidth / _canvasWidth, 0, 0, - _viewportHeight / _canvasHeight, _viewportX, _canvasHeight - _viewportY );
+		_context.setTransform( _viewportWidth / _canvasWidth, 0, 0, -_viewportHeight / _canvasHeight, _viewportX, _canvasHeight - _viewportY );
 		_context.translate( _canvasWidthHalf, _canvasHeightHalf );
 
 		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
@@ -375,9 +375,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
 
-				if ( _v1.positionScreen.z < - 1 || _v1.positionScreen.z > 1 ) continue;
-				if ( _v2.positionScreen.z < - 1 || _v2.positionScreen.z > 1 ) continue;
-				if ( _v3.positionScreen.z < - 1 || _v3.positionScreen.z > 1 ) continue;
+				if ( _v1.positionScreen.z < -1 || _v1.positionScreen.z > 1 ) continue;
+				if ( _v2.positionScreen.z < -1 || _v2.positionScreen.z > 1 ) continue;
+				if ( _v3.positionScreen.z < -1 || _v3.positionScreen.z > 1 ) continue;
 
 				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
 				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
@@ -547,9 +547,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 					_context.save();
 					_context.translate( v1.x, v1.y );
 					if ( material.rotation !== 0 ) _context.rotate( material.rotation );
-					_context.translate( - scaleX / 2, - scaleY / 2 );
+					_context.translate( -scaleX / 2, -scaleY / 2 );
 					_context.scale( cx, cy );
-					_context.translate( - ox, - oy );
+					_context.translate( -ox, -oy );
 					_context.fillRect( ox, oy, sx, sy );
 					_context.restore();
 
@@ -564,8 +564,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_context.save();
 				_context.translate( v1.x, v1.y );
 				if ( material.rotation !== 0 ) _context.rotate( material.rotation );
-				_context.scale( scaleX, - scaleY );
-				_context.fillRect( - 0.5, - 0.5, 1, 1 );
+				_context.scale( scaleX, -scaleY );
+				_context.fillRect( -0.5, -0.5, 1, 1 );
 				_context.restore();
 
 			}
@@ -842,7 +842,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		canvas.height = image.height;
 
 		var context = canvas.getContext( '2d' );
-		context.setTransform( 1, 0, 0, - 1, 0, image.height );
+		context.setTransform( 1, 0, 0, -1, 0, image.height );
 		context.drawImage( image, 0, 0 );
 
 		var repeatX = texture.wrapS === THREE.RepeatWrapping;

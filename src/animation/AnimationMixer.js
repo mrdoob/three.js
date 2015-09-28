@@ -83,7 +83,7 @@ THREE.AnimationMixer.prototype = {
 
 		var index = this.actions.indexOf( action );
 
-		if ( index !== - 1 ) {
+		if ( index !== -1 ) {
 
 			this.actions.splice( index, 1 );
 			action.mixer = null;

@@ -328,8 +328,8 @@ THREE.Vector2.prototype = {
 
 	negate: function () {
 
-		this.x = - this.x;
-		this.y = - this.y;
+		this.x = -this.x;
+		this.y = -this.y;
 
 		return this;
 

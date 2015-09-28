@@ -268,9 +268,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			} else {
 
-				if ( v_prev_x < - EPSILON ) {
+				if ( v_prev_x < -EPSILON ) {
 
-					if ( v_next_x < - EPSILON ) {
+					if ( v_next_x < -EPSILON ) {
 
 						direction_eq = true;
 
@@ -291,7 +291,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			if ( direction_eq ) {
 
 				// console.log("Warning: lines are a straight sequence");
-				v_trans_x = - v_prev_y;
+				v_trans_x = -v_prev_y;
 				v_trans_y =  v_prev_x;
 				shrink_by = Math.sqrt( v_prev_lensq );
 
@@ -368,7 +368,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
 
-			v( vert.x, vert.y,  - z );
+			v( vert.x, vert.y,  -z );
 
 		}
 
@@ -383,7 +383,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
-				v( vert.x, vert.y,  - z );
+				v( vert.x, vert.y,  -z );
 
 			}
 

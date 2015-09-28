@@ -21,7 +21,7 @@ THREE.TypedArrayUtils = {};
 THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 	var stack = [];
-	var sp = - 1;
+	var sp = -1;
 	var left = 0;
 	var right = arr.length / eleSize - 1;
 	var tmp = 0.0, x = 0, y = 0;
@@ -76,7 +76,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 			}
 			
-			if ( sp == - 1 ) break;
+			if ( sp == -1 ) break;
 
 			right = stack[ sp -- ]; //?
 			left = stack[ sp -- ];
@@ -246,7 +246,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 			function ( e ) {
 
-				return - e[ 1 ];
+				return -e[ 1 ];
 
 			}
 

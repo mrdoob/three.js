@@ -15,14 +15,14 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orth
 
 	this.fov = fov;
 
-	this.left = - width / 2;
+	this.left = -width / 2;
 	this.right = width / 2;
 	this.top = height / 2;
-	this.bottom = - height / 2;
+	this.bottom = -height / 2;
 
 	// We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
 
-	this.cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 	orthoNear, orthoFar );
+	this.cameraO = new THREE.OrthographicCamera( width / -2, width / 2, height / 2, height / -2, 	orthoNear, orthoFar );
 	this.cameraP = new THREE.PerspectiveCamera( fov, width / height, near, far );
 
 	this.zoom = 1;
@@ -73,10 +73,10 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 	halfHeight /= this.zoom;
 	halfWidth /= this.zoom;
 
-	this.cameraO.left = - halfWidth;
+	this.cameraO.left = -halfWidth;
 	this.cameraO.right = halfWidth;
 	this.cameraO.top = halfHeight;
-	this.cameraO.bottom = - halfHeight;
+	this.cameraO.bottom = -halfHeight;
 
 	// this.cameraO.left = -farHalfWidth;
 	// this.cameraO.right = farHalfWidth;
@@ -103,10 +103,10 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 THREE.CombinedCamera.prototype.setSize = function( width, height ) {
 
 	this.cameraP.aspect = width / height;
-	this.left = - width / 2;
+	this.left = -width / 2;
 	this.right = width / 2;
 	this.top = height / 2;
-	this.bottom = - height / 2;
+	this.bottom = -height / 2;
 
 };
 
@@ -202,7 +202,7 @@ THREE.CombinedCamera.prototype.toBackView = function() {
 THREE.CombinedCamera.prototype.toLeftView = function() {
 
 	this.rotation.x = 0;
-	this.rotation.y = - Math.PI / 2;
+	this.rotation.y = -Math.PI / 2;
 	this.rotation.z = 0;
 	this.rotationAutoUpdate = false;
 
@@ -219,7 +219,7 @@ THREE.CombinedCamera.prototype.toRightView = function() {
 
 THREE.CombinedCamera.prototype.toTopView = function() {
 
-	this.rotation.x = - Math.PI / 2;
+	this.rotation.x = -Math.PI / 2;
 	this.rotation.y = 0;
 	this.rotation.z = 0;
 	this.rotationAutoUpdate = false;

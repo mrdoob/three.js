@@ -10,7 +10,7 @@ THREE.InterleavedBuffer = function ( array, stride ) {
 	this.stride = stride;
 
 	this.dynamic = false;
-	this.updateRange = { offset: 0, count: - 1 };
+	this.updateRange = { offset: 0, count: -1 };
 
 	this.version = 0;
 

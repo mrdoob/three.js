@@ -446,7 +446,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 			cCROSSap = cX * apy - cY * apx;
 			bCROSScp = bX * cpy - bY * cpx;
 
-			if ( ( aCROSSbp >= - EPSILON ) && ( bCROSScp >= - EPSILON ) && ( cCROSSap >= - EPSILON ) ) return false;
+			if ( ( aCROSSbp >= -EPSILON ) && ( bCROSScp >= -EPSILON ) && ( cCROSSap >= -EPSILON ) ) return false;
 
 		}
 

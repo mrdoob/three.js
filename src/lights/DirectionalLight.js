@@ -22,10 +22,10 @@ THREE.DirectionalLight = function ( color, intensity ) {
 	this.shadowCameraNear = 50;
 	this.shadowCameraFar = 5000;
 
-	this.shadowCameraLeft = - 500;
+	this.shadowCameraLeft = -500;
 	this.shadowCameraRight = 500;
 	this.shadowCameraTop = 500;
-	this.shadowCameraBottom = - 500;
+	this.shadowCameraBottom = -500;
 
 	this.shadowCameraVisible = false;
 

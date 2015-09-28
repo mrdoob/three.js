@@ -22,10 +22,10 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 	var init = function () {
 
 		var vertices = new Float32Array( [
-			- 0.5, - 0.5,  0, 0,
-			  0.5, - 0.5,  1, 0,
+			-0.5, -0.5,  0, 0,
+			  0.5, -0.5,  1, 0,
 			  0.5,   0.5,  1, 1,
-			- 0.5,   0.5,  0, 1
+			-0.5,   0.5,  0, 1
 		] );
 
 		var faces = new Uint16Array( [
@@ -161,7 +161,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			var sprite = sprites[ i ];
 
 			sprite.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
-			sprite.z = - sprite.modelViewMatrix.elements[ 14 ];
+			sprite.z = -sprite.modelViewMatrix.elements[ 14 ];
 
 		}
 

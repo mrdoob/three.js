@@ -436,7 +436,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 					origin.copy( cameraPosition );
 
-					direction.set( x + blockX - canvasWidthHalf, - ( y + blockY - canvasHeightHalf ), - perspective );
+					direction.set( x + blockX - canvasWidthHalf, -( y + blockY - canvasHeightHalf ), -perspective );
 					direction.applyMatrix3( cameraNormalMatrix ).normalize();
 
 					spawnRay( origin, direction, pixelColor, 0 );

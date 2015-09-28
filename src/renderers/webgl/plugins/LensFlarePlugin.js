@@ -17,10 +17,10 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 	var init = function () {
 
 		var vertices = new Float32Array( [
-			- 1, - 1,  0, 0,
-			 1, - 1,  1, 0,
+			-1, -1,  0, 0,
+			 1, -1,  1, 0,
 			 1,  1,  1, 1,
-			- 1,  1,  0, 1
+			-1,  1,  0, 1
 		] );
 
 		var faces = new Uint16Array( [

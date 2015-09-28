@@ -86,8 +86,8 @@
 
 			} else if ( camera instanceof THREE.OrthographicCamera ) {
 
-				this.ray.origin.set( coords.x, coords.y, - 1 ).unproject( camera );
-				this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
+				this.ray.origin.set( coords.x, coords.y, -1 ).unproject( camera );
+				this.ray.direction.set( 0, 0, -1 ).transformDirection( camera.matrixWorld );
 
 			} else {
 

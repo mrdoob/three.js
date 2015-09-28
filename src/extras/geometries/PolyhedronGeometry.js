@@ -210,7 +210,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	function azimuth( vector ) {
 
-		return Math.atan2( vector.z, - vector.x );
+		return Math.atan2( vector.z, -vector.x );
 
 	}
 
@@ -219,7 +219,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	function inclination( vector ) {
 
-		return Math.atan2( - vector.y, Math.sqrt( ( vector.x * vector.x ) + ( vector.z * vector.z ) ) );
+		return Math.atan2( -vector.y, Math.sqrt( ( vector.x * vector.x ) + ( vector.z * vector.z ) ) );
 
 	}
 

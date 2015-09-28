@@ -10,7 +10,7 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.itemSize = itemSize;
 
 	this.dynamic = false;
-	this.updateRange = { offset: 0, count: - 1 };
+	this.updateRange = { offset: 0, count: -1 };
 
 	this.version = 0;
 

@@ -24,8 +24,8 @@
 	}
 	options = options || {};
 	this.clearColor = optionalParameter( options.CLEAR_COLOR, [ 1.0, 1.0, 1.0, 0.0 ] );
-	this.geometryOrigin = optionalParameter( options.GEOMETRY_ORIGIN, [ - 1000.0, - 1000.0 ] );
-	this.sunDirectionX = optionalParameter( options.SUN_DIRECTION[ 0 ], - 1.0 );
+	this.geometryOrigin = optionalParameter( options.GEOMETRY_ORIGIN, [ -1000.0, -1000.0 ] );
+	this.sunDirectionX = optionalParameter( options.SUN_DIRECTION[ 0 ], -1.0 );
 	this.sunDirectionY = optionalParameter( options.SUN_DIRECTION[ 1 ], 1.0 );
 	this.sunDirectionZ = optionalParameter( options.SUN_DIRECTION[ 2 ], 1.0 );
 	this.oceanColor = optionalParameter( options.OCEAN_COLOR, new THREE.Vector3( 0.004, 0.016, 0.047 ) );
@@ -208,7 +208,7 @@ THREE.Ocean.prototype.generateMesh = function () {
 
 	var geometry = new THREE.PlaneBufferGeometry( this.geometrySize, this.geometrySize, this.geometryResolution, this.geometryResolution );
 
-	geometry.rotateX( - Math.PI / 2 );
+	geometry.rotateX( -Math.PI / 2 );
 
 	this.oceanMesh = new THREE.Mesh( geometry, this.materialOcean );
 

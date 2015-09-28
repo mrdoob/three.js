@@ -48,7 +48,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 			var vertex = new THREE.Vector3();
 			vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
-			vertex.y = - v * height + heightHalf;
+			vertex.y = -v * height + heightHalf;
 			vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
 
 			this.vertices.push( vertex );
@@ -141,7 +141,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 	if ( openEnded === false && radiusBottom > 0 ) {
 
-		this.vertices.push( new THREE.Vector3( 0, - heightHalf, 0 ) );
+		this.vertices.push( new THREE.Vector3( 0, -heightHalf, 0 ) );
 
 		for ( x = 0; x < radialSegments; x ++ ) {
 
@@ -149,9 +149,9 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 			var v2 = vertices[ heightSegments ][ x ];
 			var v3 = this.vertices.length - 1;
 
-			var n1 = new THREE.Vector3( 0, - 1, 0 );
-			var n2 = new THREE.Vector3( 0, - 1, 0 );
-			var n3 = new THREE.Vector3( 0, - 1, 0 );
+			var n1 = new THREE.Vector3( 0, -1, 0 );
+			var n2 = new THREE.Vector3( 0, -1, 0 );
+			var n3 = new THREE.Vector3( 0, -1, 0 );
 
 			var uv1 = uvs[ heightSegments ][ x + 1 ].clone();
 			var uv2 = uvs[ heightSegments ][ x ].clone();

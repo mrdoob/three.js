@@ -147,7 +147,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.mirrorWorldPosition = new THREE.Vector3();
 	this.cameraWorldPosition = new THREE.Vector3();
 	this.rotationMatrix = new THREE.Matrix4();
-	this.lookAtPosition = new THREE.Vector3( 0, 0, - 1 );
+	this.lookAtPosition = new THREE.Vector3( 0, 0, -1 );
 	this.clipPlane = new THREE.Vector4();
 	
 	if ( camera instanceof THREE.PerspectiveCamera )
@@ -212,7 +212,7 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 
 	function sign( x ) {
 
-		return x ? x < 0 ? - 1 : 1 : 0;
+		return x ? x < 0 ? -1 : 1 : 0;
 
 	}
 
@@ -233,7 +233,7 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 
 	this.rotationMatrix.extractRotation( this.camera.matrixWorld );
 
-	this.lookAtPosition.set( 0, 0, - 1 );
+	this.lookAtPosition.set( 0, 0, -1 );
 	this.lookAtPosition.applyMatrix4( this.rotationMatrix );
 	this.lookAtPosition.add( this.cameraWorldPosition );
 
@@ -241,7 +241,7 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	target.reflect( this.normal ).negate();
 	target.add( this.mirrorWorldPosition );
 
-	this.up.set( 0, - 1, 0 );
+	this.up.set( 0, -1, 0 );
 	this.up.applyMatrix4( this.rotationMatrix );
 	this.up.reflect( this.normal ).negate();
 
@@ -274,7 +274,7 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 
 	q.x = ( sign( this.clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
 	q.y = ( sign( this.clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
-	q.z = - 1.0;
+	q.z = -1.0;
 	q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
 
 	// Calculate the scaled plane vector

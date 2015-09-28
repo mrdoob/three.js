@@ -224,7 +224,7 @@ THREE.NURBSUtils = {
 
 				}
 
-				var j1 = ( rk >= - 1 ) ? 1 : - rk;
+				var j1 = ( rk >= -1 ) ? 1 : -rk;
 				var j2 = ( r - 1 <= pk ) ? k - 1 :  p - r;
 
 				for ( var j = j1; j <= j2; ++ j ) {
@@ -236,7 +236,7 @@ THREE.NURBSUtils = {
 
 				if ( r <= pk ) {
 
-					a[ s2 ][ k ] = - a[ s1 ][ k - 1 ] / ndu[ pk + 1 ][ r ];
+					a[ s2 ][ k ] = -a[ s1 ][ k - 1 ] / ndu[ pk + 1 ][ r ];
 					d += a[ s2 ][ k ] * ndu[ r ][ pk ];
 
 				}

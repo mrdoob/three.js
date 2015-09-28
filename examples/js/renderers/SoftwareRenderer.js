@@ -88,7 +88,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var fixScale = 1 << subpixelBits;
 
 		viewportXScale =  fixScale * canvasWidth  / 2;
-		viewportYScale = - fixScale * canvasHeight / 2;
+		viewportYScale = -fixScale * canvasHeight / 2;
 		viewportZScale =             maxZVal      / 2;
 
 		viewportXOffs  =  fixScale * canvasWidth  / 2 + 0.5;
@@ -666,7 +666,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		// TODO: Implement per-pixel z-clipping
 
-		if ( v1.z < - 1 || v1.z > 1 || v2.z < - 1 || v2.z > 1 || v3.z < - 1 || v3.z > 1 ) return;
+		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 || v3.z < -1 || v3.z > 1 ) return;
 
 		// https://gist.github.com/2486101
 		// explanation: http://pouet.net/topic.php?which=8760&page=1
@@ -848,7 +848,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var cb2 = c2;
 		var cb3 = c3;
 		var cbz = cz;
-		var qstep = - q;
+		var qstep = -q;
 		var e1x = qstep * dy12;
 		var e2x = qstep * dy23;
 		var e3x = qstep * dy31;
@@ -898,22 +898,22 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			}
 
 			// Okay, we're now in a block we know is outside. Reverse direction and go into main loop.
-			qstep = - qstep;
-			e1x = - e1x;
-			e2x = - e2x;
-			e3x = - e3x;
-			ezx = - ezx;
+			qstep = -qstep;
+			e1x = -e1x;
+			e2x = -e2x;
+			e3x = -e3x;
+			ezx = -ezx;
 
 			if ( bHasUV ) {
 
-				etux = - etux;
-				etvx = - etvx;
+				etux = -etux;
+				etvx = -etvx;
 
 			}
 
 			if ( bHasNormal ) {
 
-				enzx = - enzx;
+				enzx = -enzx;
 
 			}
 

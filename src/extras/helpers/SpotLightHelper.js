@@ -16,8 +16,8 @@ THREE.SpotLightHelper = function ( light ) {
 
 	var geometry = new THREE.CylinderGeometry( 0, 1, 1, 8, 1, true );
 
-	geometry.translate( 0, - 0.5, 0 );
-	geometry.rotateX( - Math.PI / 2 );
+	geometry.translate( 0, -0.5, 0 );
+	geometry.rotateX( -Math.PI / 2 );
 
 	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
 

@@ -28,7 +28,7 @@ THREE.Camera.prototype.getWorldDirection = function () {
 
 		this.getWorldQuaternion( quaternion );
 
-		return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+		return result.set( 0, 0, -1 ).applyQuaternion( quaternion );
 
 	};
 

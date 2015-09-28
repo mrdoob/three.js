@@ -137,14 +137,14 @@ THREE.ImageUtils = {
 
 				var points = [];
 				var origin = [ 0, 0, data[ ( y * width + x ) * 4 ] / 255 * depth ];
-				points.push( [ - 1, 0, data[ ( y * width + lx ) * 4 ] / 255 * depth ] );
-				points.push( [ - 1, - 1, data[ ( ly * width + lx ) * 4 ] / 255 * depth ] );
-				points.push( [ 0, - 1, data[ ( ly * width + x ) * 4 ] / 255 * depth ] );
-				points.push( [ 1, - 1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
+				points.push( [ -1, 0, data[ ( y * width + lx ) * 4 ] / 255 * depth ] );
+				points.push( [ -1, -1, data[ ( ly * width + lx ) * 4 ] / 255 * depth ] );
+				points.push( [ 0, -1, data[ ( ly * width + x ) * 4 ] / 255 * depth ] );
+				points.push( [ 1, -1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 1, 0, data[ ( y * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 1, 1, data[ ( uy * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 0, 1, data[ ( uy * width + x ) * 4 ] / 255 * depth ] );
-				points.push( [ - 1, 1, data[ ( uy * width + lx ) * 4 ] / 255 * depth ] );
+				points.push( [ -1, 1, data[ ( uy * width + lx ) * 4 ] / 255 * depth ] );
 
 				var normals = [];
 				var num_points = points.length;

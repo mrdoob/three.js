@@ -585,10 +585,10 @@ THREE.Vector4.prototype = {
 
 	negate: function () {
 
-		this.x = - this.x;
-		this.y = - this.y;
-		this.z = - this.z;
-		this.w = - this.w;
+		this.x = -this.x;
+		this.y = -this.y;
+		this.z = -this.z;
+		this.w = -this.w;
 
 		return this;
 

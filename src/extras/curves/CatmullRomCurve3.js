@@ -43,7 +43,7 @@ THREE.CatmullRomCurve3 = ( function() {
 
 		this.c0 = x0;
 		this.c1 = t0;
-		this.c2 = - 3 * x0 + 3 * x1 - 2 * t0 - t1;
+		this.c2 = -3 * x0 + 3 * x1 - 2 * t0 - t1;
 		this.c3 = 2 * x0 - 2 * x1 + t0 + t1;
 
 	};

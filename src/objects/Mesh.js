@@ -25,7 +25,7 @@ THREE.Mesh.prototype.updateMorphTargets = function () {
 
 	if ( this.geometry.morphTargets !== undefined && this.geometry.morphTargets.length > 0 ) {
 
-		this.morphTargetBase = - 1;
+		this.morphTargetBase = -1;
 		this.morphTargetInfluences = [];
 		this.morphTargetDictionary = {};
 

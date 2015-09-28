@@ -411,14 +411,14 @@ if ( typeof DataView === 'undefined' ) {
 
 			}
 
-			if ( exponent === - 1023 ) {
+			if ( exponent === -1023 ) {
 
 				// Denormalized
-				return sign * mantissa * Math.pow( 2, - 1022 - 52 );
+				return sign * mantissa * Math.pow( 2, -1022 - 52 );
 
 			}
 
-			return sign * ( 1 + mantissa * Math.pow( 2, - 52 ) ) * Math.pow( 2, exponent );
+			return sign * ( 1 + mantissa * Math.pow( 2, -52 ) ) * Math.pow( 2, exponent );
 
 		},
 
@@ -444,14 +444,14 @@ if ( typeof DataView === 'undefined' ) {
 
 			}
 
-			if ( exponent === - 127 ) {
+			if ( exponent === -127 ) {
 
 				// Denormalized
-				return sign * mantissa * Math.pow( 2, - 126 - 23 );
+				return sign * mantissa * Math.pow( 2, -126 - 23 );
 
 			}
 
-			return sign * ( 1 + mantissa * Math.pow( 2, - 23 ) ) * Math.pow( 2, exponent );
+			return sign * ( 1 + mantissa * Math.pow( 2, -23 ) ) * Math.pow( 2, exponent );
 
 		},
 

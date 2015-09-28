@@ -28,7 +28,7 @@ THREE.MouseControls = function ( object ) {
 		orientation.y += movementX * 0.0025;
 		orientation.x += movementY * 0.0025;
 
-		orientation.x = Math.max( - PI_2, Math.min( PI_2, orientation.x ) );
+		orientation.x = Math.max( -PI_2, Math.min( PI_2, orientation.x ) );
 
 	};
 

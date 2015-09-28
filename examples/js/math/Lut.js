@@ -205,7 +205,7 @@ THREE.Lut.prototype = {
 
 		if ( this.legend.layout == 'horizontal' ) {
 
-			this.legend.mesh.rotation.z = - 90 * ( Math.PI / 180 );
+			this.legend.mesh.rotation.z = -90 * ( Math.PI / 180 );
 
 		}
 
@@ -253,7 +253,7 @@ THREE.Lut.prototype = {
 
 		if ( layout == 'vertical' ) {
 
-			this.legend.mesh.rotation.z = - 90 * ( Math.PI / 180 );
+			this.legend.mesh.rotation.z = -90 * ( Math.PI / 180 );
 
 		}
 

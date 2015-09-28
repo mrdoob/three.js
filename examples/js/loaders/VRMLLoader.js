@@ -111,7 +111,7 @@ THREE.VRMLLoader.prototype = {
 
 				var f, n, p, vertexIndex, color;
 
-				var direction = directionIsDown ? 1 : - 1;
+				var direction = directionIsDown ? 1 : -1;
 
 				var faceIndices = [ 'a', 'b', 'c', 'd' ];
 
@@ -150,7 +150,7 @@ THREE.VRMLLoader.prototype = {
 							if ( index === 0 ) {
 
 								A.x = 0;
-								A.y = directionIsDown ? radius : - 1 * radius;
+								A.y = directionIsDown ? radius : -1 * radius;
 
 							} else {
 

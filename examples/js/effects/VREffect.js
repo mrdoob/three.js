@@ -186,7 +186,7 @@ THREE.VREffect = function ( renderer, onError ) {
 		zNear = zNear === undefined ? 0.01 : zNear;
 		zFar = zFar === undefined ? 10000.0 : zFar;
 
-		var handednessScale = rightHanded ? - 1.0 : 1.0;
+		var handednessScale = rightHanded ? -1.0 : 1.0;
 
 		// start with an identity matrix
 		var mobj = new THREE.Matrix4();
@@ -206,13 +206,13 @@ THREE.VREffect = function ( renderer, onError ) {
 		// but the NDC scaling has Y=down (thanks D3D?)
 		m[ 1 * 4 + 0 ] = 0.0;
 		m[ 1 * 4 + 1 ] = scaleAndOffset.scale[ 1 ];
-		m[ 1 * 4 + 2 ] = - scaleAndOffset.offset[ 1 ] * handednessScale;
+		m[ 1 * 4 + 2 ] = -scaleAndOffset.offset[ 1 ] * handednessScale;
 		m[ 1 * 4 + 3 ] = 0.0;
 
 		// Z result (up to the app)
 		m[ 2 * 4 + 0 ] = 0.0;
 		m[ 2 * 4 + 1 ] = 0.0;
-		m[ 2 * 4 + 2 ] = zFar / ( zNear - zFar ) * - handednessScale;
+		m[ 2 * 4 + 2 ] = zFar / ( zNear - zFar ) * -handednessScale;
 		m[ 2 * 4 + 3 ] = ( zFar * zNear ) / ( zNear - zFar );
 
 		// W result (= Z in)

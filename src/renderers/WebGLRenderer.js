@@ -81,7 +81,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_currentProgram = null,
 	_currentFramebuffer = null,
-	_currentMaterialId = - 1,
+	_currentMaterialId = -1,
 	_currentGeometryProgram = '',
 	_currentCamera = null,
 
@@ -243,7 +243,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentCamera = null;
 
 		_currentGeometryProgram = '';
-		_currentMaterialId = - 1;
+		_currentMaterialId = -1;
 
 		_lightsNeedUpdate = true;
 
@@ -1073,7 +1073,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// reset caching for this frame
 
 		_currentGeometryProgram = '';
-		_currentMaterialId = - 1;
+		_currentMaterialId = -1;
 		_currentCamera = null;
 		_lightsNeedUpdate = true;
 
@@ -1531,7 +1531,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.id !== _currentMaterialId ) {
 
-			if ( _currentMaterialId === - 1 ) refreshLights = true;
+			if ( _currentMaterialId === -1 ) refreshLights = true;
 			_currentMaterialId = material.id;
 
 			refreshMaterial = true;
@@ -1809,7 +1809,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.envMap.value = material.envMap;
-		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
+		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : -1;
 
 		uniforms.reflectivity.value = material.reflectivity;
 		uniforms.refractionRatio.value = material.refractionRatio;
@@ -1981,7 +1981,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if ( light instanceof THREE.PointLight ) {
 
 						// for point lights we set the sign of the shadowDarkness uniform to be negative
-						uniforms.shadowDarkness.value[ j ] = - light.shadowDarkness;
+						uniforms.shadowDarkness.value[ j ] = -light.shadowDarkness;
 
 					} else {
 						
@@ -2737,7 +2737,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
-					if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+					if ( state.getCompressedTextureFormats().indexOf( glFormat ) > -1 ) {
 
 						state.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -2921,7 +2921,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
-								if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+								if ( state.getCompressedTextureFormats().indexOf( glFormat ) > -1 ) {
 
 									state.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
