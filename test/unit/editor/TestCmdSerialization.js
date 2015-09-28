@@ -49,13 +49,13 @@ test( "Test Serialization (simple)", function() {
 
 	};
 
-	var functions = [ addObject, addScript, moveObject ];
+	var setups = [ addObject, addScript, moveObject ];
 
 	// Forward tests
 
-	for (var i = 0; i < functions.length ; i++ ) {
+	for (var i = 0; i < setups.length ; i++ ) {
 
-		functions[i]();
+		setups[i]();
 
 		// Check for correct serialization
 
@@ -78,9 +78,9 @@ test( "Test Serialization (simple)", function() {
 
 	// Backward tests
 
-	for (var i = 0; i < functions.length ; i++ ) {
+	for (var i = 0; i < setups.length ; i++ ) {
 
-		functions[i]();
+		setups[i]();
 
 		editor.history.goToState( 0 );
 
