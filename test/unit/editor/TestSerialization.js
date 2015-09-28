@@ -5,11 +5,10 @@ test( "Test Serialization (simple)", function() {
 	// setup
 	var editor = new Editor();
 
-	var box = aBox( 'The Box' );
-	var light = aPointlight( 'The PointLight' );
-	var camera = aPerspectiveCamera( 'The Camera' );
-
 	var addObject = function () {
+
+		// setup
+		var box = aBox( 'The Box' );
 
 		// Test Add
 		var cmd = new CmdAddObject( box );
@@ -20,6 +19,9 @@ test( "Test Serialization (simple)", function() {
 	};
 
 	var addScript = function () {
+
+		// setup
+		var box = aBox( 'The Box' );
 
 		// Test Add
 
@@ -58,6 +60,9 @@ test( "Test Serialization (simple)", function() {
 		setups[i]();
 
 		// Check for correct serialization
+
+		editor.history.goToState( 0 );
+		editor.history.goToState( 1000 );
 
 		var history = JSON.stringify( editor.history.toJSON() );
 
