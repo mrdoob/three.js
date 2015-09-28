@@ -259,7 +259,7 @@ History.prototype = {
 		if ( cmd === undefined || id > cmd.id ) {
 
 			cmd = this.redo();
-			while ( id > cmd.id ) {
+			while ( cmd !== undefined && id > cmd.id ) {
 
 				cmd = this.redo();
 
