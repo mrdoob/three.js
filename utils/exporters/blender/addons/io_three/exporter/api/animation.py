@@ -4,7 +4,7 @@ Module for handling the parsing of skeletal animation data.
 
 import math
 import mathutils
-from bpy import data, context
+from bpy import data, context, ops
 from .. import constants, logger
 
 
@@ -171,11 +171,25 @@ def _parse_pose_action(action, armature, options):
     :param options:
 
     """
-    # @TODO: this seems to fail in batch mode meaning the
-    #        user has to have th GUI open. need to improve
-    #        this logic to allow batch processing, if Blender
-    #        chooses to behave....
-    current_context = context.area.type
+    try:
+        current_context = context.area.type
+    except AttributeError:
+        for window in context.window_manager.windows:
+            screen = window.screen
+            for area in screen.areas:
+                if area.type != 'VIEW_3D':
+                    continue
+
+                override = {
+                    'window': window,
+                    'screen': screen,
+                    'area': area
+                }
+                ops.screen.screen_full_area(override)
+                break
+        current_context = context.area.type
+
+    context.scene.objects.active = armature
     context.area.type = 'DOPESHEET_EDITOR'
     context.space_data.mode = 'ACTION'
     context.area.spaces.active.action = action
