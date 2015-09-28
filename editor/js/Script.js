@@ -422,9 +422,6 @@ var Script = function ( editor ) {
 
 	signals.refreshScriptEditor.add( function ( object, script, cursorPosition ) {
 
-		// Check if editor is being displayed
-		//...
-
 		if ( currentScript !== script ) return;
 
 		title.setValue( object.name + ' / ' + script.name );
