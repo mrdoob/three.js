@@ -865,10 +865,10 @@ THREE.Geometry.prototype = {
 
 	sortFacesByMaterialIndex: function () {
 
-		// tag faces
-
 		var faces = this.faces;
 		var length = faces.length;
+
+		// tag faces
 
 		for ( var i = 0; i < length; i ++ ) {
 
