@@ -18,10 +18,10 @@ THREE.ShaderLib[ 'water' ] = {
 			"distortionScale":  { type: "f", value: 20.0 },
 			"noiseScale":       { type: "f", value: 1.0 },
 			"textureMatrix" :   { type: "m4", value: new THREE.Matrix4() },
-			"sunColor":         { type: "c", value: new THREE.Color(0x7F7F7F) },
-			"sunDirection":     { type: "v3", value: new THREE.Vector3(0.70707, 0.70707, 0) },
-			"eye":              { type: "v3", value: new THREE.Vector3(0, 0, 0) },
-			"waterColor":       { type: "c", value: new THREE.Color(0x555555) }
+			"sunColor":         { type: "c", value: new THREE.Color( 0x7F7F7F ) },
+			"sunDirection":     { type: "v3", value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
+			"eye":              { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
+			"waterColor":       { type: "c", value: new THREE.Color( 0x555555 ) }
 		}
 	] ),
 
@@ -137,8 +137,8 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.waterColor = new THREE.Color( optionalParameter( options.waterColor, 0x7F7F7F ) );
 	this.eye = optionalParameter( options.eye, new THREE.Vector3( 0, 0, 0 ) );
 	this.distortionScale = optionalParameter( options.distortionScale, 20.0 );
-	this.side = optionalParameter(options.side, THREE.FrontSide);
-	this.fog = optionalParameter(options.fog, false);
+	this.side = optionalParameter( options.side, THREE.FrontSide );
+	this.fog = optionalParameter( options.fog, false );
 
 	this.renderer = renderer;
 	this.scene = scene;

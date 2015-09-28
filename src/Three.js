@@ -8,11 +8,11 @@ var THREE = { REVISION: '73dev' };
 
 if ( typeof define === 'function' && define.amd ) {
 
-		define( 'three', THREE );
+	define( 'three', THREE );
 
 } else if ( 'undefined' !== typeof exports && 'undefined' !== typeof module ) {
 
-		module.exports = THREE;
+	module.exports = THREE;
 
 }
 

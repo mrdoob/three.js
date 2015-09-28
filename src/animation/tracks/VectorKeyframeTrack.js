@@ -11,7 +11,7 @@ THREE.VectorKeyframeTrack = function ( name, keys ) {
 	THREE.KeyframeTrack.call( this, name, keys );
 
 	// local cache of value type to avoid allocations during runtime.
-	this.result = this.keys[0].value.clone();
+	this.result = this.keys[ 0 ].value.clone();
 
 };
 
@@ -43,13 +43,14 @@ THREE.VectorKeyframeTrack.prototype.clone = function() {
 
 	var clonedKeys = [];
 
-	for( var i = 0; i < this.keys.length; i ++ ) {
+	for ( var i = 0; i < this.keys.length; i ++ ) {
 		
-		var key = this.keys[i];
+		var key = this.keys[ i ];
 		clonedKeys.push( {
 			time: key.time,
 			value: key.value.clone()
 		} );
+
 	}
 
 	return new THREE.VectorKeyframeTrack( this.name, clonedKeys );
@@ -58,17 +59,19 @@ THREE.VectorKeyframeTrack.prototype.clone = function() {
 
 THREE.VectorKeyframeTrack.parse = function( json ) {
 
-	var elementCount = json.keys[0].value.length;
+	var elementCount = json.keys[ 0 ].value.length;
 	var valueType = THREE[ 'Vector' + elementCount ];
 
 	var keys = [];
 
-	for( var i = 0; i < json.keys.length; i ++ ) {
-		var jsonKey = json.keys[i];
+	for ( var i = 0; i < json.keys.length; i ++ ) {
+
+		var jsonKey = json.keys[ i ];
 		keys.push( {
 			value: new valueType().fromArray( jsonKey.value ),
 			time: jsonKey.time
 		} );
+
 	}
 
 	return new THREE.VectorKeyframeTrack( json.name, keys );

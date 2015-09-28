@@ -72,6 +72,7 @@ THREE.SpotLight.prototype.copy = function ( source ) {
 	this.shadowMapHeight = source.shadowMapHeight;
 
 	return this;
+
 }
 
 THREE.SpotLight.prototype.toJSON = function ( meta ) {

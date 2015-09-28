@@ -601,6 +601,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( programInfo !== undefined ) {
 
 			programCache.releaseProgram( programInfo );
+
 		}
 
 	}
@@ -1328,17 +1329,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object instanceof THREE.ImmediateRenderObject ) {
 
-					setMaterial( material );
+				setMaterial( material );
 
-					var program = setProgram( camera, lights, fog, material, object );
+				var program = setProgram( camera, lights, fog, material, object );
 
-					_currentGeometryProgram = '';
+				_currentGeometryProgram = '';
 
-					object.render( function ( object ) {
+				object.render( function ( object ) {
 
-						_this.renderBufferImmediate( object, program, material );
+					_this.renderBufferImmediate( object, program, material );
 
-					} );
+				} );
 
 			} else {
 

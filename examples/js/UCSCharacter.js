@@ -55,7 +55,7 @@ THREE.UCSCharacter = function() {
 			mesh.castShadow = true;
 			mesh.receiveShadow = true;
 
-			scope.mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).setLocalRoot( mesh ) );
+			scope.mixer.addAction( new THREE.AnimationAction( geometry.animations[ 0 ] ).setLocalRoot( mesh ) );
 			
 			scope.setSkin( 0 );
 			

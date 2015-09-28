@@ -82,8 +82,10 @@ THREE.BlendCharacter = function () {
 	this.applyWeight = function( animName, weight ) {
 
 		var action = this.mixer.findActionByName( animName );
-		if( action ) {
+		if ( action ) {
+
 			action.weight = weight;
+
 		}
 
 	};

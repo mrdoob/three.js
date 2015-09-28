@@ -11,7 +11,7 @@ THREE.BooleanKeyframeTrack = function ( name, keys ) {
 	THREE.KeyframeTrack.call( this, name, keys );
 
 	// local cache of value type to avoid allocations during runtime.
-	this.result = this.keys[0].value;
+	this.result = this.keys[ 0 ].value;
 
 };
 
@@ -43,13 +43,14 @@ THREE.BooleanKeyframeTrack.prototype.clone = function() {
 
 	var clonedKeys = [];
 
-	for( var i = 0; i < this.keys.length; i ++ ) {
+	for ( var i = 0; i < this.keys.length; i ++ ) {
 		
-		var key = this.keys[i];
+		var key = this.keys[ i ];
 		clonedKeys.push( {
 			time: key.time,
 			value: key.value
 		} );
+
 	}
 
 	return new THREE.BooleanKeyframeTrack( this.name, clonedKeys );
