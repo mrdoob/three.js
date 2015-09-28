@@ -3297,26 +3297,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	// Setup GL resources for the depth texture
-	function setupDepthTexture(depthTexture) {
+	function setupDepthTexture( depthTexture ) {
 
 		var depthTextureProperties = properties.get( depthTexture );
 		var isPowerOfTwo = THREE.Math.isPowerOfTwo( depthTexture.width ) && THREE.Math.isPowerOfTwo( depthTexture.height );
 
 		depthTextureProperties.__webglTexture = _gl.createTexture();
 
-		_gl.bindTexture(_gl.TEXTURE_2D, depthTextureProperties.__webglTexture);
-		setTextureParameters(_gl.TEXTURE_2D, depthTexture, isPowerOfTwo);
+		_gl.bindTexture( _gl.TEXTURE_2D, depthTextureProperties.__webglTexture );
+		setTextureParameters( _gl.TEXTURE_2D, depthTexture, isPowerOfTwo );
 
-		if (depthTexture.hasStencil) {
-			_gl.texImage2D(_gl.TEXTURE_2D, 0, _gl.DEPTH_STENCIL, depthTexture.width, depthTexture.height, 0, _gl.DEPTH_STENCIL, extensions.get( 'WEBGL_depth_texture' ).UNSIGNED_INT_24_8_WEBGL, null);
-			_gl.framebufferTexture2D(_gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.TEXTURE_2D, depthTextureProperties.__webglTexture, 0);
+		if ( depthTexture.hasStencil ) {
+
+			_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.DEPTH_STENCIL, depthTexture.width, depthTexture.height, 0, _gl.DEPTH_STENCIL, extensions.get( 'WEBGL_depth_texture' ).UNSIGNED_INT_24_8_WEBGL, null );
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.TEXTURE_2D, depthTextureProperties.__webglTexture, 0 );
+
 		}
 		else {
-			_gl.texImage2D(_gl.TEXTURE_2D, 0, _gl.DEPTH_COMPONENT, depthTexture.width, depthTexture.height, 0, _gl.DEPTH_COMPONENT, _gl.UNSIGNED_INT, null);
-			_gl.framebufferTexture2D(_gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, depthTextureProperties.__webglTexture, 0);
+
+			_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.DEPTH_COMPONENT, depthTexture.width, depthTexture.height, 0, _gl.DEPTH_COMPONENT, _gl.UNSIGNED_INT, null );
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, depthTextureProperties.__webglTexture, 0 );
+
 		}
 
-		_gl.bindTexture(_gl.TEXTURE_2D, null);
+		_gl.bindTexture( _gl.TEXTURE_2D, null );
+
 	}
 
 	// Set up GL resources for the render target
@@ -3385,13 +3390,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// FIXME: Warning if WEBGL_depth_texture not available?
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
-			setupDepthTexture(renderTarget.depth);
-			_gl.bindFramebuffer(_gl.FRAMEBUFFER, null );
+			setupDepthTexture( renderTarget.depth );
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 		}
 		else if ( renderTarget.depthBuffer ) {
 
-			setupDepthRenderbuffer(renderTarget);
+			setupDepthRenderbuffer( renderTarget );
 
 		}
 
