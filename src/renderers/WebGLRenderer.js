@@ -32,9 +32,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var lights = [];
 
 	var opaqueObjects = [];
-	var opaqueObjectsLastIndex = -1;
+	var opaqueObjectsLastIndex = - 1;
 	var transparentObjects = [];
-	var transparentObjectsLastIndex = -1;
+	var transparentObjectsLastIndex = - 1;
 
 	var morphInfluences = new Float32Array( 8 );
 
@@ -603,6 +603,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( programInfo !== undefined ) {
 
 			programCache.releaseProgram( programInfo );
+
 		}
 
 	}
@@ -1093,8 +1094,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		lights.length = 0;
 
-		opaqueObjectsLastIndex = -1;
-		transparentObjectsLastIndex = -1;
+		opaqueObjectsLastIndex = - 1;
+		transparentObjectsLastIndex = - 1;
 
 		sprites.length = 0;
 		lensFlares.length = 0;
@@ -1158,16 +1159,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		lensFlarePlugin.render( scene, camera, _currentWidth, _currentHeight );
 
 		// Generate mipmap if we're using any kind of mipmap filtering
-	
+
 		if ( renderTarget ) {
+
 			var texture = renderTarget.texture;
 			var isTargetPowerOfTwo = THREE.Math.isPowerOfTwo( renderTarget.width ) && THREE.Math.isPowerOfTwo( renderTarget.height );
-			if ( texture.generateMipmaps && 
-					 isTargetPowerOfTwo &&
-					 texture.minFilter !== THREE.NearestFilter && 
-					 texture.minFilter !== THREE.LinearFilter ) {
+			if ( texture.generateMipmaps && isTargetPowerOfTwo && texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
+
 				 updateRenderTargetMipmap( renderTarget );
+
 			}
+
 		}
 
 		// Ensure depth buffer writing is enabled so it can be cleared on next render
@@ -1335,17 +1337,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object instanceof THREE.ImmediateRenderObject ) {
 
-					setMaterial( material );
+				setMaterial( material );
 
-					var program = setProgram( camera, lights, fog, material, object );
+				var program = setProgram( camera, lights, fog, material, object );
 
-					_currentGeometryProgram = '';
+				_currentGeometryProgram = '';
 
-					object.render( function ( object ) {
+				object.render( function ( object ) {
 
-						_this.renderBufferImmediate( object, program, material );
+					_this.renderBufferImmediate( object, program, material );
 
-					} );
+				} );
 
 			} else {
 
@@ -1991,7 +1993,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						uniforms.shadowDarkness.value[ j ] = - light.shadowDarkness;
 
 					} else {
-						
+
 						uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
 
 					}
