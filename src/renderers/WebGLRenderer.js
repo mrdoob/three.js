@@ -1161,7 +1161,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 		if ( renderTarget ) {
 			var texture = renderTarget.texture;
+			var isTargetPowerOfTwo = THREE.Math.isPowerOfTwo( renderTarget.width ) && THREE.Math.isPowerOfTwo( renderTarget.height );
 			if ( texture.generateMipmaps && 
+					 isTargetPowerOfTwo &&
 					 texture.minFilter !== THREE.NearestFilter && 
 					 texture.minFilter !== THREE.LinearFilter ) {
 				 updateRenderTargetMipmap( renderTarget );
