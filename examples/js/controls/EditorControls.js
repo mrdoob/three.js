@@ -21,7 +21,7 @@ THREE.EditorControls = function ( object, domElement, center ) {
 	var vector = new THREE.Vector3();
 	var matrix = new THREE.Matrix3();
 
-	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };
+	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2 };
 	var state = STATE.NONE;
 
 	// pointer data
@@ -58,7 +58,7 @@ THREE.EditorControls = function ( object, domElement, center ) {
 
 		var parentRect = event.path[ 0 ].getBoundingClientRect();
 
-		// Filter touches that originate from the same element as the event.   
+		// Filter touches that originate from the same element as the event.
 
 		touches.length = 0;
 
@@ -403,11 +403,15 @@ THREE.EditorControls = function ( object, domElement, center ) {
 
 		var delta = 0;
 
-		if ( event.wheelDelta ) { // WebKit / Opera / Explorer 9
+		if ( event.wheelDelta ) {
+
+			// WebKit / Opera / Explorer 9
 
 			delta = - event.wheelDelta;
 
-		} else if ( event.detail ) { // Firefox
+		} else if ( event.detail ) {
+
+			// Firefox
 
 			delta = event.detail * 10;
 
@@ -417,7 +421,30 @@ THREE.EditorControls = function ( object, domElement, center ) {
 
 	}
 
-	domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	function contextmenu( event ) {
+
+		event.preventDefault();
+
+	}
+
+	this.dispose = function() {
+
+		domElement.removeEventListener( 'contextmenu', contextmenu, false );
+		domElement.removeEventListener( 'mousedown', onMouseDown, false );
+		domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
+		domElement.removeEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+
+		domElement.removeEventListener( 'mousemove', onMouseMove, false );
+		domElement.removeEventListener( 'mouseup', onMouseUp, false );
+		domElement.removeEventListener( 'mouseout', onMouseUp, false );
+		domElement.removeEventListener( 'dblclick', onMouseUp, false );
+
+		domElement.removeEventListener( 'touchstart', touchStart, false );
+		domElement.removeEventListener( 'touchmove', touchMove, false );
+
+	}
+
+	domElement.addEventListener( 'contextmenu', contextmenu, false );
 	domElement.addEventListener( 'mousedown', onMouseDown, false );
 	domElement.addEventListener( 'mousewheel', onMouseWheel, false );
 	domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
@@ -447,7 +474,7 @@ THREE.EditorControls = function ( object, domElement, center ) {
 				pointersDelta[ 1 ].subVectors( pointers[ 1 ], getClosestPoint( pointers[ 1 ], pointersOld ) );
 
 				if ( object instanceof THREE.PerspectiveCamera ) {
-				
+
 					scope.rotate( pointersDelta[ 0 ] );
 
 				} else if ( object instanceof THREE.OrthographicCamera ) {

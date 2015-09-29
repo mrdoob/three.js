@@ -22,7 +22,6 @@ var constants = {
 
 	shading : {
 
-		"THREE.NoShading" : THREE.NoShading,
 		"THREE.FlatShading" : THREE.FlatShading,
 		"THREE.SmoothShading" : THREE.SmoothShading
 
@@ -105,12 +104,12 @@ var envMaps = (function () {
 		path + 'pz' + format, path + 'nz' + format
 	];
 
-	var textureCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeRefractionMapping );
 	var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
 	reflectionCube.format = THREE.RGBFormat;
 
-	var refractionCube = new THREE.Texture( reflectionCube.image, THREE.CubeRefractionMapping );
-	reflectionCube.format = THREE.RGBFormat;
+	var refractionCube = THREE.ImageUtils.loadTextureCube( urls );
+	refractionCube.mapping = THREE.CubeRefractionMapping;
+	refractionCube.format = THREE.RGBFormat;
 
 	return {
 		none : null,
@@ -404,7 +403,6 @@ function guiMeshLambertMaterial ( gui, mesh, material, geometry ) {
 	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 	folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
 
-	folder.add( material, 'shading', constants.shading ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
 	folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );

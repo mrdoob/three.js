@@ -2,36 +2,55 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">A bone which is part of a [page:SkinnedMesh].</div>
-
+		<div class="desc">
+		A bone which is part of a [page:Skeleton]. The skeleton in turn is used by the [page:SkinnedMesh].
+		Bones are almost identical to a blank [page:Object3D].
+		</div>
+		
+		<h3>Example</h3>
+		
+		<code>
+		var root = new THREE.Bone();
+		var child = new THREE.Bone();
+		
+		root.add( child );
+		child.position.y = 5;
+		</code>
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:SkinnedMesh belongsToSkin])</h3>
+		<h3>[name]([page:SkinnedMesh skin])</h3>
 		<div>
-		belongsToSkin -- An instance of [page:SkinnedMesh].
-		</div>
-		<div>
-		This creates a new instance of a bone from the skin.
+		skin — (optional) The [page:SkinnedMesh] to which the bone belongs.
 		</div>
 
 		<h2>Properties</h2>
 
 		<h3>[property:SkinnedMesh skin]</h3>
 		<div>
-		The skin that contains this bone.
+		An optional reference to the [page:SkinnedMesh].
 		</div>
 
+		<h2>Methods</h2>
+
+		<h3>[method:Object3D clone]([page:Object3D object])</h3>
+		<div>
+		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned Bone Object.
+		</div>
+		<div>
+		Clone a Bone Object.
+		</div>
 
 		<h2>Source</h2>
 

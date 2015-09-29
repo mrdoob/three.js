@@ -102,22 +102,22 @@
 
 				//
 
-				mesh = new THREE.LineSegments(
-					new THREE.WireframeGeometry( new THREE.SphereBufferGeometry( 100, 16, 8 ) ),
-					new THREE.LineBasicMaterial( { color: 0xffffff } )
+				mesh = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 100, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } )
 				);
 				scene.add( mesh );
 
-				var mesh2 = new THREE.LineSegments(
-					new THREE.WireframeGeometry( new THREE.SphereBufferGeometry( 50, 16, 8 ) ),
-					new THREE.LineBasicMaterial( { color: 0x00ff00 } )
+				var mesh2 = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 50, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } )
 				);
 				mesh2.position.y = 150;
 				mesh.add( mesh2 );
 
-				var mesh3 = new THREE.LineSegments(
-					new THREE.WireframeGeometry( new THREE.SphereBufferGeometry( 5, 16, 8 ) ),
-					new THREE.LineBasicMaterial( { color: 0x0000ff } )
+				var mesh3 = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 5, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } )
 				);
 				mesh3.position.z = 150;
 				cameraRig.add( mesh3 );
@@ -137,7 +137,7 @@
 
 				}
 
-				var particles = new THREE.PointCloud( geometry, new THREE.PointCloudMaterial( { color: 0x888888 } ) );
+				var particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
 
 				//

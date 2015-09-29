@@ -25,7 +25,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 	var me = this;
 	this.on = function( event, handler ) {
 		
-		if ( !_listeners[ event ] ) _listeners[ event ] = [];
+		if ( ! _listeners[ event ] ) _listeners[ event ] = [];
 
 		_listeners[ event ].push( handler );
 		return me;
@@ -35,9 +35,9 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 	this.off = function( event, handler ) {
 		
 		var l = _listeners[ event ];
-		if ( !l ) return me;
+		if ( ! l ) return me;
 
-		if ( l.indexOf( handler ) > -1 ) {
+		if ( l.indexOf( handler ) > - 1 ) {
 			
 			l.splice( handler, 1 );
 		
@@ -50,9 +50,9 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 	var notify = function( event, data, member ) {
 			
 		var l = _listeners[ event ];
-		if ( !l ) return;
+		if ( ! l ) return;
 
-		if ( !member ) {
+		if ( ! member ) {
 					
 			for ( var i = 0; i < l.length; i ++ ) {
 						
@@ -96,6 +96,12 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 	
 	};
 
+	this.dispose = function() {
+
+		me.deactivate();
+
+	};
+
 	this.activate();
 
 	function onDocumentMouseMove( event ) {
@@ -103,7 +109,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 		event.preventDefault();
 
 		_mouse.x = ( event.clientX / _domElement.width ) * 2 - 1;
-		_mouse.y = -( event.clientY / _domElement.height ) * 2 + 1;
+		_mouse.y = - ( event.clientY / _domElement.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
 		var ray = _raycaster.ray;
@@ -118,6 +124,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 			var denom = normal.dot( ray.direction );
 			if ( denom == 0 ) {
+
 				// bail
 				console.log( 'no or infinite solutions' );
 				return;
@@ -188,7 +195,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 		event.preventDefault();
 
 		_mouse.x = ( event.clientX / _domElement.width ) * 2 - 1;
-		_mouse.y = -( event.clientY / _domElement.height ) * 2 + 1;
+		_mouse.y = - ( event.clientY / _domElement.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
 		var intersects = _raycaster.intersectObjects( _objects );

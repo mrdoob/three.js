@@ -14,6 +14,7 @@ THREE.ShaderLib = {
 		uniforms: THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "common" ],
+			THREE.UniformsLib[ "aomap" ],
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "shadowmap" ]
 
@@ -40,15 +41,17 @@ THREE.ShaderLib = {
 
 			"	#ifdef USE_ENVMAP",
 
+				THREE.ShaderChunk[ "beginnormal_vertex" ],
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
 			"	#endif",
 
+				THREE.ShaderChunk[ "begin_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 				THREE.ShaderChunk[ "worldpos_vertex" ],
@@ -57,7 +60,7 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -70,6 +73,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "uv2_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
 			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
+			THREE.ShaderChunk[ "aomap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
@@ -78,8 +82,9 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
+			"	vec3 totalAmbientLight = vec3( 1.0 );", // hardwired
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
@@ -87,8 +92,9 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
+				THREE.ShaderChunk[ "aomap_fragment" ],
 
-			"	outgoingLight = diffuseColor.rgb;", // simple shader
+			"	outgoingLight = diffuseColor.rgb * totalAmbientLight;", // simple shader
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],		// TODO: Shadows on an otherwise unlit surface doesn't make sense.
@@ -97,11 +103,11 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "fog_fragment" ],
 
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -149,14 +155,16 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "uv2_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
+				THREE.ShaderChunk[ "beginnormal_vertex" ],
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
+				THREE.ShaderChunk[ "begin_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 				THREE.ShaderChunk[ "worldpos_vertex" ],
@@ -166,7 +174,7 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -208,9 +216,6 @@ THREE.ShaderLib = {
 
 			"	#ifdef DOUBLE_SIDED",
 
-					//"float isFront = float( gl_FrontFacing );",
-					//"gl_FragColor.xyz *= isFront * vLightFront + ( 1.0 - isFront ) * vLightBack;",
-
 			"		if ( gl_FrontFacing )",
 			"			outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
 			"		else",
@@ -229,11 +234,11 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "fog_fragment" ],
 
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -244,8 +249,10 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "aomap" ],
 			THREE.UniformsLib[ "lightmap" ],
-			THREE.UniformsLib[ "bump" ],
+			THREE.UniformsLib[ "emissivemap" ],
+			THREE.UniformsLib[ "bumpmap" ],
 			THREE.UniformsLib[ "normalmap" ],
+			THREE.UniformsLib[ "displacementmap" ],
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
@@ -273,6 +280,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "uv_pars_vertex" ],
 			THREE.ShaderChunk[ "uv2_pars_vertex" ],
+			THREE.ShaderChunk[ "displacementmap_pars_vertex" ],
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
@@ -287,6 +295,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "uv2_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
+				THREE.ShaderChunk[ "beginnormal_vertex" ],
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
@@ -298,12 +307,14 @@ THREE.ShaderLib = {
 
 			"#endif",
 
+				THREE.ShaderChunk[ "begin_vertex" ],
+				THREE.ShaderChunk[ "displacementmap_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
-			"	vViewPosition = -mvPosition.xyz;",
+			"	vViewPosition = - mvPosition.xyz;",
 
 				THREE.ShaderChunk[ "worldpos_vertex" ],
 				THREE.ShaderChunk[ "envmap_vertex" ],
@@ -312,7 +323,7 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -332,6 +343,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
 			THREE.ShaderChunk[ "aomap_pars_fragment" ],
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
+			THREE.ShaderChunk[ "emissivemap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
@@ -343,9 +355,10 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 			"	vec3 totalAmbientLight = ambientLightColor;",
+			"	vec3 totalEmissiveLight = emissive;",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
@@ -353,8 +366,11 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
+				THREE.ShaderChunk[ "normal_phong_fragment" ],
 				THREE.ShaderChunk[ "lightmap_fragment" ],
+				THREE.ShaderChunk[ "hemilight_fragment" ],
 				THREE.ShaderChunk[ "aomap_fragment" ],
+				THREE.ShaderChunk[ "emissivemap_fragment" ],
 
 				THREE.ShaderChunk[ "lights_phong_fragment" ],
 
@@ -365,19 +381,19 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "fog_fragment" ],
 
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
-	'particle_basic': {
+	'points': {
 
 		uniforms: THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ "particle" ],
+			THREE.UniformsLib[ "points" ],
 			THREE.UniformsLib[ "shadowmap" ]
 
 		] ),
@@ -412,7 +428,7 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -428,7 +444,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( psColor, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
@@ -441,11 +457,11 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "fog_fragment" ],
 
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -488,7 +504,7 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -513,7 +529,7 @@ THREE.ShaderLib = {
 
 			"	}",
 
-			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
@@ -523,11 +539,11 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "fog_fragment" ],
 
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -549,13 +565,14 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+				THREE.ShaderChunk[ "begin_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -581,11 +598,11 @@ THREE.ShaderLib = {
 			"	#endif",
 
 			"	float color = 1.0 - smoothstep( mNear, mFar, depth );",
-			"	gl_FragColor = vec4( vec3( color ), opacity );",   // TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+			"	gl_FragColor = vec4( vec3( color ), opacity );",
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -609,13 +626,14 @@ THREE.ShaderLib = {
 
 			"	vNormal = normalize( normalMatrix * normal );",
 
+				THREE.ShaderChunk[ "begin_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -633,7 +651,7 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -663,7 +681,7 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -683,7 +701,7 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -713,7 +731,7 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -738,7 +756,7 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -768,14 +786,16 @@ THREE.ShaderLib = {
 			"void main() {",
 
 				THREE.ShaderChunk[ "skinbase_vertex" ],
+
+				THREE.ShaderChunk[ "begin_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -813,8 +833,76 @@ THREE.ShaderLib = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
+
+	},
+
+
+	'distanceRGBA': {
+
+		uniforms: {
+
+			"lightPos": { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) }
+
+		},
+
+		vertexShader: [
+
+			"varying vec4 vWorldPosition;",
+
+			THREE.ShaderChunk[ "common" ],
+			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
+
+			"void main() {",
+
+				THREE.ShaderChunk[ "skinbase_vertex" ],
+				THREE.ShaderChunk[ "begin_vertex" ],
+				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+
+				"vWorldPosition = worldPosition;",
+
+			"}"
+
+		].join( "\n" ),
+
+		fragmentShader: [
+
+			"uniform vec3 lightPos;",
+			"varying vec4 vWorldPosition;",
+
+			THREE.ShaderChunk[ "common" ],
+
+			"vec4 pack1K ( float depth ) {",
+
+			"   depth /= 1000.0;",
+			"   const vec4 bitSh = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
+  			"	const vec4 bitMsk = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
+   			"	vec4 res = fract( depth * bitSh );",
+   			"	res -= res.xxyz * bitMsk;",
+   			"	return res; ",
+
+			"}",
+
+			"float unpack1K ( vec4 color ) {",
+
+			"	const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );",
+			"	return dot( color, bitSh ) * 1000.0;",
+
+			"}",
+
+			"void main () {",
+
+			"	gl_FragColor = pack1K( length( vWorldPosition.xyz - lightPos.xyz ) );",
+
+			"}"
+
+		].join( "\n" )
 
 	}
 
 };
+

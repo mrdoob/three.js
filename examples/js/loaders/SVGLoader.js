@@ -11,7 +11,7 @@ THREE.SVGLoader = function ( manager ) {
 
 THREE.SVGLoader.prototype = {
 
-	constructor: THREE.MaterialLoader,
+	constructor: THREE.SVGLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -25,9 +25,16 @@ THREE.SVGLoader.prototype = {
 
 			var doc = parser.parseFromString( svgString, 'image/svg+xml' );  // application/xml
 
-			onLoad( doc.firstChild );
+			onLoad( doc.documentElement );
 
 		}, onProgress, onError );
 
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
 	}
+
 };

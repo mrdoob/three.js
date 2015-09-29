@@ -82,10 +82,9 @@
 				mouse = new THREE.Vector2();
 
 				var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				geometry.rotateX( - Math.PI / 2 );
 
-				plane = new THREE.Mesh( geometry );
-				plane.visible = false;
+				plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
 				scene.add( plane );
 
 				objects.push( plane );

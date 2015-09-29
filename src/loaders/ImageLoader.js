@@ -20,7 +20,16 @@ THREE.ImageLoader.prototype = {
 
 		if ( cached !== undefined ) {
 
-			if ( onLoad ) onLoad( cached );
+			if ( onLoad ) {
+
+				setTimeout( function () {
+
+					onLoad( cached );
+
+				}, 0 );
+
+			}
+
 			return cached;
 
 		}
@@ -47,21 +56,19 @@ THREE.ImageLoader.prototype = {
 
 		}
 
-		if ( onError !== undefined ) {
+		image.addEventListener( 'error', function ( event ) {
 
-			image.addEventListener( 'error', function ( event ) {
+			if ( onError ) onError( event );
 
-				onError( event );
+			scope.manager.itemError( url );
 
-			}, false );
-
-		}
+		}, false );
 
 		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
 
-		image.src = url;
-
 		scope.manager.itemStart( url );
+
+		image.src = url;
 
 		return image;
 

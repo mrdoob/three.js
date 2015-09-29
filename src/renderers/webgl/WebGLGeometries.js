@@ -2,11 +2,11 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLGeometries = function ( gl, info ) {
+THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	var geometries = {};
 
-	this.get = function ( object ) {
+	function get( object ) {
 
 		var geometry = object.geometry;
 
@@ -18,46 +18,99 @@ THREE.WebGLGeometries = function ( gl, info ) {
 
 		geometry.addEventListener( 'dispose', onGeometryDispose );
 
+		var buffergeometry;
+
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			geometries[ geometry.id ] = geometry;
+			buffergeometry = geometry;
 
-		} else {
+		} else if ( geometry instanceof THREE.Geometry ) {
 
-			geometries[ geometry.id ] = new THREE.BufferGeometry().setFromObject( object );
+			if ( geometry._bufferGeometry === undefined ) {
+
+				geometry._bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
+
+			}
+
+			buffergeometry = geometry._bufferGeometry;
 
 		}
 
+		geometries[ geometry.id ] = buffergeometry;
+
 		info.memory.geometries ++;
 
-		return geometries[ geometry.id ];
+		return buffergeometry;
 
-	};
+	}
 
 	function onGeometryDispose( event ) {
 
 		var geometry = event.target;
+		var buffergeometry = geometries[ geometry.id ];
+
+		deleteAttributes( buffergeometry.attributes );
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
-		geometry = geometries[ geometry.id ];
+		delete geometries[ geometry.id ];
 
-		for ( var name in geometry.attributes ) {
-
-			var attribute = geometry.attributes[ name ];
-
-			if ( attribute.buffer !== undefined ) {
-
-				gl.deleteBuffer( attribute.buffer );
-
-				delete attribute.buffer;
-
-			}
-
-		}
+		var property = properties.get( geometry );
+		if ( property.wireframe ) deleteAttribute( property.wireframe );
 
 		info.memory.geometries --;
 
 	}
+
+	function getAttributeBuffer( attribute ) {
+
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+			return properties.get( attribute.data ).__webglBuffer;
+
+		}
+
+		return properties.get( attribute ).__webglBuffer;
+
+	}
+
+	function deleteAttribute( attribute ) {
+
+		var buffer = getAttributeBuffer( attribute );
+
+		if ( buffer !== undefined ) {
+
+			gl.deleteBuffer( buffer );
+			removeAttributeBuffer( attribute );
+
+		}
+
+	}
+
+	function deleteAttributes( attributes ) {
+
+		for ( var name in attributes ) {
+
+			deleteAttribute( attributes[ name ] );
+
+		}
+
+	}
+
+	function removeAttributeBuffer( attribute ) {
+
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+			properties.delete( attribute.data );
+
+		} else {
+
+			properties.delete( attribute );
+
+		}
+
+	}
+
+	this.get = get;
 
 };

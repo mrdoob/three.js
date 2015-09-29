@@ -23,7 +23,7 @@ THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 
 	var orientation = new THREE.Vector3();
 
-	return function ( force ) {
+	return function updateMatrixWorld( force ) {
 
 		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
 
@@ -32,7 +32,7 @@ THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 
 		this.matrixWorld.decompose( position, quaternion, scale );
 
-		orientation.set( 0, 0, -1 ).applyQuaternion( quaternion );
+		orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
 		listener.setPosition( position.x, position.y, position.z );
 		listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );

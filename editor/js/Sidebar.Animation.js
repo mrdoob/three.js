@@ -24,6 +24,8 @@ Sidebar.Animation = function ( editor ) {
 	var animationsRow = new UI.Panel();
 	container.add( animationsRow );
 
+	/*
+
 	var animations = {};
 
 	signals.objectAdded.add( function ( object ) {
@@ -50,6 +52,25 @@ Sidebar.Animation = function ( editor ) {
 
 				animations[ child.id ] = new THREE.Animation( child, child.geometry.animation );
 
+			} else if ( child instanceof THREE.MorphAnimMesh ) {
+
+				var animation = new THREE.MorphAnimation( child );
+				animation.duration = 30;
+
+				// temporal hack for THREE.AnimationHandler
+				animation._play = animation.play;
+				animation.play = function () {
+					this._play();
+					THREE.AnimationHandler.play( this );
+				};
+				animation.resetBlendWeights = function () {};
+				animation.stop = function () {
+					this.pause();
+					THREE.AnimationHandler.stop( this );
+				};
+
+				animations[ child.id ] = animation;
+
 			}
 
 		} );
@@ -60,26 +81,22 @@ Sidebar.Animation = function ( editor ) {
 
 		container.setDisplay( 'none' );
 
-		if ( object instanceof THREE.SkinnedMesh ) {
+		if ( object instanceof THREE.SkinnedMesh || object instanceof THREE.MorphAnimMesh ) {
 
 			animationsRow.clear();
 
 			var animation = animations[ object.id ];
 
-			var playButton = new UI.Button().setLabel( 'Play' ).onClick( function () {
+			var playButton = new UI.Button( 'Play' ).onClick( function () {
 
 				animation.play();
-
-				signals.playAnimation.dispatch( animation );
 
 			} );
 			animationsRow.add( playButton );
 
-			var pauseButton = new UI.Button().setLabel( 'Stop' ).onClick( function () {
+			var pauseButton = new UI.Button( 'Stop' ).onClick( function () {
 
 				animation.stop();
-
-				signals.stopAnimation.dispatch( animation );
 
 			} );
 			animationsRow.add( pauseButton );
@@ -89,6 +106,8 @@ Sidebar.Animation = function ( editor ) {
 		}
 
 	} );
+
+	*/
 
 	return container;
 

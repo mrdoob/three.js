@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -55,7 +56,7 @@
 			[example:webgl_interactive_cubes_ortho Raycasting to a Mesh in using an OrthographicCamera], 
 			[example:webgl_interactive_buffergeometry Raycasting to a Mesh with BufferGeometry], 
 			[example:webgl_interactive_lines Raycasting to a Line], 
-			[example:webgl_interactive_raycasting_pointcloud Raycasting to a PointCloud], 
+			[example:webgl_interactive_raycasting_pointcloud Raycasting to a Points], 
 			[example:webgl_geometry_terrain_raycast Terrain raycasting], 
 			[example:webgl_octree_raycasting Raycasting using an octree],
 			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]</div>
@@ -70,7 +71,7 @@
 		<h3>[name]( [page:Vector3 origin], [page:Vector3 direction], [page:Float near], [page:Float far] ) {</h3>
 		<div>
 		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
-		[page:Vector3 direction] — The direction vector that  gives direction to the ray.<br />
+		[page:Vector3 direction] — The direction vector that gives direction to the ray. Should be normalized.<br />
 		[page:Float near] — All results returned are further away than near. Near can't be negative. Default value is 0.<br />
 		[page:Float far] — All results returned are closer then far. Far can't be lower then near . Default value is Infinity.
 		</div>
@@ -98,11 +99,6 @@
 		This value shouldn't be negative and should be larger than the near property. 
 		</div>
 
-		<h3>[property:float precision]</h3>
-		<div>
-		The precision factor of the raycaster when intersecting [page:Mesh] objects. 
-		</div>
-
 		<h3>.[page:float linePrecision]</h3>
 		<div>
 		The precision factor of the raycaster when intersecting [page:Line] objects. 
@@ -113,7 +109,7 @@
 		<h3>[method:null set]( [page:Vector3 origin], [page:Vector3 direction] )</h3>
 		<div>
 		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
-		[page:Vector3 direction] — The direction vector that  gives direction to the ray.
+		[page:Vector3 direction] — The normalized direction vector that gives direction to the ray.
 		</div>
 		<div>
 		Updates the ray with a new origin and direction.
@@ -153,7 +149,7 @@
         When intersecting a [page:Mesh] with a [page:BufferGeometry], the *faceIndex* will be *undefined*, and *indices* will be set; when intersecting a [page:Mesh] with a [page:Geometry], *indices* will be *undefined*. 
         </p>
 		<p>
-		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:PointCloud pointclouds].
+		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:Points pointclouds].
 		</p>
 		<p>
 		*Note* that for meshes, faces must be pointed towards the origin of the [page:.ray ray] in order to be detected; intersections of the ray passing through the back of a face will not be detected. To raycast against both faces of an object, you'll want to set the [page:Mesh.material material]'s [page:Material.side side] property to *THREE.DoubleSide*.  

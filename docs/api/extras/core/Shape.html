@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Path] &rarr;
@@ -15,7 +16,7 @@
 		Defines an arbitrary 2d shape plane using paths with optional holes. It can be used with [page:ExtrudeGeometry],
 		[page:ShapeGeometry], to get points, or to get triangulated faces.
 		</div>
-		
+
 		<code>
 		var heartShape = new THREE.Shape();
 
@@ -26,16 +27,16 @@
 		heartShape.bezierCurveTo( 60, 77, 80, 55, 80, 35 );
 		heartShape.bezierCurveTo( 80, 35, 80, 0, 50, 0 );
 		heartShape.bezierCurveTo( 35, 0, 25, 25, 25, 25 );
-		
+
 		var extrudeSettings = { amount: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
-		
+
 		var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		</code>
-		
+
 		<h2>Examples</h2>
-		
+
 		<div>
 		[example:webgl_geometry_shapes geometry / shapes ]<br/>
 		[example:webgl_geometry_extrude_shapes geometry / extrude / shapes ]<br/>
@@ -56,7 +57,7 @@
 		<h3>[property:array holes]</h3>
 		<div>
 		An array of [page:Path paths] that define the holes in the shape.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 

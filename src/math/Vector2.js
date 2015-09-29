@@ -65,6 +65,12 @@ THREE.Vector2.prototype = {
 
 	},
 
+	clone: function () {
+
+		return new this.constructor( this.x, this.y );
+
+	},
+
 	copy: function ( v ) {
 
 		this.x = v.x;
@@ -103,6 +109,15 @@ THREE.Vector2.prototype = {
 
 		this.x = a.x + b.x;
 		this.y = a.y + b.y;
+
+		return this;
+
+	},
+
+	addScaledVector: function ( v, s ) {
+
+		this.x += v.x * s;
+		this.y += v.y * s;
 
 		return this;
 
@@ -250,13 +265,14 @@ THREE.Vector2.prototype = {
 		}
 
 		return this;
+
 	},
 
-	clampScalar: ( function () {
+	clampScalar: function () {
 
 		var min, max;
 
-		return function ( minVal, maxVal ) {
+		return function clampScalar( minVal, maxVal ) {
 
 			if ( min === undefined ) {
 
@@ -272,7 +288,7 @@ THREE.Vector2.prototype = {
 
 		};
 
-	} )(),
+	}(),
 
 	floor: function () {
 
@@ -337,6 +353,12 @@ THREE.Vector2.prototype = {
 
 	},
 
+	lengthManhattan: function() {
+
+		return Math.abs( this.x ) + Math.abs( this.y );
+
+	},
+
 	normalize: function () {
 
 		return this.divideScalar( this.length() );
@@ -363,6 +385,7 @@ THREE.Vector2.prototype = {
 		if ( oldLength !== 0 && l !== oldLength ) {
 
 			this.multiplyScalar( l / oldLength );
+
 		}
 
 		return this;
@@ -425,12 +448,6 @@ THREE.Vector2.prototype = {
 		this.y = attribute.array[ index + 1 ];
 
 		return this;
-
-	},
-
-	clone: function () {
-
-		return new THREE.Vector2( this.x, this.y );
 
 	}
 

@@ -233,7 +233,7 @@
 						var y = ( i - dst.length / 2 ) * 110 + 50;
 
 						var mesh = new THREE.Mesh( geo1, material );
-						mesh.position.set( x, y, z );
+						mesh.position.set( x, -y, z );
 						mesh.matrixAutoUpdate = false;
 						mesh.updateMatrix();
 						scene.add( mesh );
@@ -269,7 +269,7 @@
 					var y = ( i - dst.length / 2 ) * 110 + 165;
 
 					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendDst.replace( "Factor", "" ), "rgba( 150, 0, 0, 1 )" ) );
-					mesh.position.set( x, - (y - 70), z );
+					mesh.position.set( x, - (y - 120), z );
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
 					scene.add( mesh );

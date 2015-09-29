@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr; [page:Light] &rarr;
@@ -17,6 +18,15 @@
 
 
 		<h2>Example</h2>
+		<div>[example:canvas_morphtargets_horse morphtargets / horse ]</div>
+		<div>[example:misc_controls_fly controls / fly ]</div>
+		<div>[example:misc_lights_test lights / test ]</div>
+		<div>[example:vr_cubes cubes ]</div>
+		<div>[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]</div>
+		<div>[example:webgl_effects_stereo effects / stereo ]</div>
+		<div>[example:webgl_geometry_extrude_splines geometry / extrude / splines ]</div>
+		<div>[example:webgl_materials_bumpmap materials / bumpmap ]</div>
+		<div>[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection ]</div>
 
 		<code>// White directional light at half intensity shining from the top.
 
@@ -56,6 +66,12 @@ scene.add( directionalLight );</code>
 		<h3>[property:Boolean onlyShadow]</h3>
 		<div>
 			If set to *true* light will only cast shadow but not contribute any lighting (as if *intensity* was 0 but cheaper to compute).<br />
+			Default — *false*.
+		</div>
+
+		<h3>[property:Boolean castShadow]</h3>
+		<div>
+			If set to true light will cast dynamic shadows. Warning: This is expensive and requires tweaking to get shadows looking right.<br />
 			Default — *false*.
 		</div>
 
@@ -125,81 +141,36 @@ scene.add( directionalLight );</code>
 			Default — *512*.
 		</div>
 
-		<h3>[property:Boolean shadowCascade]</h3>
-		<div>
-			**Experimental** If true, use a series of shadow maps in a cascade. This can give better z-depth resolution for a directional light. <br />
-			Default — *false*.
-		</div>
-
-		<h3>[property:Integer shadowCascadeCount]</h3>
-		<div>
-			Number of shadow maps to allocate in a cascade (one after another). <br />
-			Default — *2*.
-		</div>
-
-		<h3>[property:Vector3 shadowCascadeOffset]</h3>
-		<div>
-			A relative position to real camera where virtual shadow cameras are attached. A magic vector; scene and light orientation dependent. <br />
-			Default — *Three.Vector3( 0, 0, -1000 )*.
-		</div>
-
-		<h3>[property:Array shadowCascadeBias]</h3>
-		<div>
-			An array of shadowMapBias values for the corresponding shadow map in the cascade, near to far. <br />
-			Default — <strong>[ 0, 0, 0 ]</strong>.
-		</div>
-
-		<h3>[property:Array shadowCascadeWidth]</h3>
-		<div>
-			An array of shadowMapWidth values for the corresponding shadow map in the cascade, near to far. <br />
-			Default — <strong>[ 512, 512, 512 ]</strong>.
-		</div>
-
-		<h3>[property:Array shadowCascadeHeight]</h3>
-		<div>
-			An array of shadowMapHeight values for the corresponding shadow map in the cascade, near to far. <br />
-			Default — <strong>[ 512, 512, 512 ]</strong>.
-		</div>
-
-		<h3>[property:Array shadowCascadeNearZ]</h3>
-		<div>
-			An array of shadowMapNear values for the corresponding shadow map in the cascade, near to far. These typically start with -1.0 (near plane) and match with the previous shadowCascadeFarZ array value.<br />
-			Default — <strong>[ -1.000, 0.990, 0.998 ]</strong>.
-		</div>
-
-		<h3>[property:Array shadowCascadeFarZ]</h3>
-		<div>
-			An array of shadowMapFar values for the corresponding shadow map in the cascade, near to far. These typically match with the next shadowCascadeNearZ array value, ending in 1.0.<br />
-			Default — <strong>[ 0.990, 0.998, 1.000 ]</strong>.
-		</div>
-
-		<h3>[property:Array shadowCascadeArray]</h3>
-		<div>
-			Array of size shadowCascadeCount of [page:DirectionalLight THREE.DirectionalLight] objects. This holds the series of separate shadow maps in a cascade, near to far. Created internally.
-		</div>
-
 		<h3>[property:Vector2 shadowMapSize]</h3>
 		<div>
 			The shadowMapWidth and shadowMapHeight stored in a [page:Vector2 THREE.Vector2]. Set internally during rendering.
-		</div> 
+		</div>
 
 		<h3>[property:OrthographicCamera shadowCamera]</h3>
 		<div>
 			The shadow's view of the world. Computed internally during rendering from the shadowCamera* settings.
-		</div> 
+		</div>
 
 		<h3>[property:Matrix4 shadowMatrix]</h3>
 		<div>
 			Model to shadow camera space, to compute location and depth in shadow map. Computed internally during rendering.
-		</div> 
+		</div>
 
 		<h3>[property:WebGLRenderTarget shadowMap]</h3>
 		<div>
 		    The depth map generated using the shadowCamera; a location beyond a pixel's depth is in shadow. Computed internally during rendering.
-		</div> 
-		
-		<h2>Methods</h2>
+		</div>
 
+		<h2>Methods</h2>
+		<h3>[method:DirectionalLight clone]()</h3>
+		<div>
+		It returns a clone of DirectionalLight.
+		</div>
+
+		<h3>[method:JSON toJSON]()</h3>
+		<div>
+		Return DirectionalLight data in JSON format.
+		</div>
 
 		<h2>Source</h2>
 

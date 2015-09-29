@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -66,7 +67,7 @@
 
 		<h3>[property:Vector3 up]</h3>
 		<div>
-		Up direction.
+		Up direction. Default is THREE.Vector3( 0, 1, 0 ).
 		</div>
 
 		<h3>[property:Matrix4 matrix]</h3>
@@ -299,7 +300,7 @@
 
 		<h3>[method:Array raycast]([page:Raycaster raycaster], [page:Array intersects])</h3>
 		<div>
-		Abstract method to get intersections between a casted ray and this object. Subclasses such as [page:Mesh], [page:Line], and [page:PointCloud] implement this method in order to participate in raycasting.
+		Abstract method to get intersections between a casted ray and this object. Subclasses such as [page:Mesh], [page:Line], and [page:Points] implement this method in order to participate in raycasting.
 		</div>
 
 		<h2>Source</h2>

@@ -26,6 +26,8 @@ THREE.SkeletonHelper = function ( object ) {
 
 	}
 
+	geometry.dynamic = true;
+
 	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors, depthTest: false, depthWrite: false, transparent: true } );
 
 	THREE.LineSegments.call( this, geometry, material );

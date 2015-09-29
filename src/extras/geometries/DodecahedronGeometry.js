@@ -4,33 +4,28 @@
 
 THREE.DodecahedronGeometry = function ( radius, detail ) {
 
-	this.parameters = {
-		radius: radius,
-		detail: detail
-	};
-
 	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 	var r = 1 / t;
 
 	var vertices = [
 
 		// (±1, ±1, ±1)
-		-1, -1, -1,    -1, -1,  1,
-		-1,  1, -1,    -1,  1,  1,
-		 1, -1, -1,     1, -1,  1,
-		 1,  1, -1,     1,  1,  1,
+		- 1, - 1, - 1,    - 1, - 1,  1,
+		- 1,  1, - 1,    - 1,  1,  1,
+		 1, - 1, - 1,     1, - 1,  1,
+		 1,  1, - 1,     1,  1,  1,
 
 		// (0, ±1/φ, ±φ)
-		 0, -r, -t,     0, -r,  t,
-		 0,  r, -t,     0,  r,  t,
+		 0, - r, - t,     0, - r,  t,
+		 0,  r, - t,     0,  r,  t,
 
 		// (±1/φ, ±φ, 0)
-		-r, -t,  0,    -r,  t,  0,
-		 r, -t,  0,     r,  t,  0,
+		- r, - t,  0,    - r,  t,  0,
+		 r, - t,  0,     r,  t,  0,
 
 		// (±φ, 0, ±1/φ)
-		-t,  0, -r,     t,  0, -r,
-		-t,  0,  r,     t,  0,  r
+		- t,  0, - r,     t,  0, - r,
+		- t,  0,  r,     t,  0,  r
 	];
 
 	var indices = [
@@ -50,7 +45,27 @@ THREE.DodecahedronGeometry = function ( radius, detail ) {
 
 	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
+	this.type = 'DodecahedronGeometry';
+
+	this.parameters = {
+		radius: radius,
+		detail: detail
+	};
+
 };
 
-THREE.DodecahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.DodecahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.DodecahedronGeometry.prototype.constructor = THREE.DodecahedronGeometry;
+
+THREE.DodecahedronGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.DodecahedronGeometry(
+		this.parameters.radius,
+		this.parameters.detail
+	);
+
+	geometry.copy( this );
+
+	return geometry;
+
+};

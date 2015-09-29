@@ -12,7 +12,7 @@
  
 THREE.UVsDebug = function( geometry, size ) {
 
-    // handles wrapping of uv.x > 1 only
+	// handles wrapping of uv.x > 1 only
     
 	var abc = 'abc';
 
@@ -39,7 +39,7 @@ THREE.UVsDebug = function( geometry, size ) {
 	ctx.strokeStyle = 'rgba( 0, 0, 0, 1.0 )';
 	ctx.textAlign = 'center';
 
-    // paint background white
+	// paint background white
 
 	ctx.fillStyle = 'rgba( 255, 255, 255, 1.0 )';
 	ctx.fillRect( 0, 0, width, height );
@@ -48,7 +48,7 @@ THREE.UVsDebug = function( geometry, size ) {
 
 		uv = uvs[ i ];
 
-        // draw lines
+		// draw lines
 
 		ctx.beginPath();
 
@@ -78,13 +78,15 @@ THREE.UVsDebug = function( geometry, size ) {
 
 		a.divideScalar( jl );
 
-        // label the face number
+		// label the face number
 
 		ctx.font = "12pt Arial bold";
 		ctx.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
 		ctx.fillText( i, a.x * width, ( 1 - a.y ) * height );
 
-		if ( a.x > 0.95 ) { // wrap x // 0.95 is arbitrary
+		if ( a.x > 0.95 ) {
+
+			// wrap x // 0.95 is arbitrary
 
 			ctx.fillText( i, ( a.x % 1 ) * width, ( 1 - a.y ) * height );
 
@@ -93,7 +95,7 @@ THREE.UVsDebug = function( geometry, size ) {
 		ctx.font = "8pt Arial bold";
 		ctx.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
 
-        // label uv edge orders
+		// label uv edge orders
 
 		for ( j = 0, jl = uv.length; j < jl; j ++ ) {
 
@@ -103,7 +105,9 @@ THREE.UVsDebug = function( geometry, size ) {
 			vnum = faces[ i ][ abc[ j ] ];
 			ctx.fillText( abc[ j ] + vnum, b.x * width, ( 1 - b.y ) * height );
 
-			if ( b.x > 0.95 ) {  // wrap x
+			if ( b.x > 0.95 ) {
+
+				// wrap x
 
 				ctx.fillText( abc[ j ] + vnum, ( b.x % 1 ) * width, ( 1 - b.y ) * height );
 

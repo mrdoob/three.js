@@ -36,31 +36,28 @@ THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 
 };
 
-THREE.OrthographicCamera.prototype.clone = function () {
-
-	var camera = new THREE.OrthographicCamera();
-
-	THREE.Camera.prototype.clone.call( this, camera );
-
-	camera.zoom = this.zoom;
-
-	camera.left = this.left;
-	camera.right = this.right;
-	camera.top = this.top;
-	camera.bottom = this.bottom;
-
-	camera.near = this.near;
-	camera.far = this.far;
-
-	camera.projectionMatrix.copy( this.projectionMatrix );
-
-	return camera;
+THREE.OrthographicCamera.prototype.copy = function ( source ) {
+	
+	THREE.Camera.prototype.copy.call( this, source );
+	
+	this.left = source.left;
+	this.right = source.right;
+	this.top = source.top;
+	this.bottom = source.bottom;
+	this.near = source.near;
+	this.far = source.far;
+	
+	this.zoom = source.zoom;
+	
+	return this;
+		
 };
 
 THREE.OrthographicCamera.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
+	data.object.zoom = this.zoom;
 	data.object.left = this.left;
 	data.object.right = this.right;
 	data.object.top = this.top;

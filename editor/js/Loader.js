@@ -7,12 +7,30 @@ var Loader = function ( editor ) {
 	var scope = this;
 	var signals = editor.signals;
 
+	this.texturePath = '';
+
 	this.loadFile = function ( file ) {
 
 		var filename = file.name;
 		var extension = filename.split( '.' ).pop().toLowerCase();
 
 		switch ( extension ) {
+
+			case 'amf':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var loader = new THREE.AMFLoader();
+					var amfobject = loader.parse( event.target.result );
+
+					editor.addObject( amfobject );
+					editor.select( amfobject );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
 
 			case 'awd':
 
@@ -113,14 +131,12 @@ var Loader = function ( editor ) {
 					var xml = parser.parseFromString( contents, 'text/xml' );
 
 					var loader = new THREE.ColladaLoader();
-					loader.parse( xml, function ( collada ) {
+					var collada = loader.parse( xml );
 
-						collada.scene.name = filename;
+					collada.scene.name = filename;
 
-						editor.addObject( collada.scene );
-						editor.select( collada.scene );
-
-					} );
+					editor.addObject( collada.scene );
+					editor.select( collada.scene );
 
 				}, false );
 				reader.readAsText( file );
@@ -183,6 +199,30 @@ var Loader = function ( editor ) {
 				reader.readAsText( file );
 
 				break;
+
+				case 'md2':
+
+					var reader = new FileReader();
+					reader.addEventListener( 'load', function ( event ) {
+
+						var contents = event.target.result;
+
+						var geometry = new THREE.MD2Loader().parse( contents );
+						var material = new THREE.MeshPhongMaterial( {
+							morphTargets: true,
+							morphNormals: true
+						} );
+
+						var object = new THREE.MorphAnimMesh( geometry, material );
+						object.name = filename;
+
+						editor.addObject( object );
+						editor.select( object );
+
+					}, false );
+					reader.readAsArrayBuffer( file );
+
+					break;
 
 			case 'obj':
 
@@ -364,6 +404,8 @@ var Loader = function ( editor ) {
 		} else if ( data.metadata.type.toLowerCase() === 'geometry' ) {
 
 			var loader = new THREE.JSONLoader();
+			loader.setTexturePath( scope.texturePath );
+
 			var result = loader.parse( data );
 
 			var geometry = result.geometry;
@@ -410,6 +452,8 @@ var Loader = function ( editor ) {
 		} else if ( data.metadata.type.toLowerCase() === 'object' ) {
 
 			var loader = new THREE.ObjectLoader();
+			loader.setTexturePath( scope.texturePath );
+
 			var result = loader.parse( data );
 
 			if ( result instanceof THREE.Scene ) {

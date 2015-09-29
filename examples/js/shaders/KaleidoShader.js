@@ -31,7 +31,7 @@ THREE.KaleidoShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -55,6 +55,6 @@ THREE.KaleidoShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

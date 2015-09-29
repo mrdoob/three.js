@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Curve] &rarr;
@@ -27,22 +28,22 @@
 
 
 		<h2>Properties</h2>
-		
+
 
 		<h3>[property:array curves]</h3>
 		<div>
 		The array of [page:Curve]s
-		</div> 
+		</div>
 
 		<h3>[property:array bends]</h3>
 		<div>
 		An array of [page:Curve]s used to transform and bend the curve using [page:CurvePath.getWrapPoints].
-		</div> 
+		</div>
 
 		<h3>[property:boolean autoClose]</h3>
 		<div>
 		Whether or not to automatically close the path.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 
@@ -81,7 +82,7 @@
 		<div>
 		Creates a [page:Geometry] object comprised of [page:Vector3]s
 		</div>
-		
+
 		<h3>[method:Geometry createSpacedPointsGeometry]([page:Integer divisions])</h3>
 		<div>
 		divisions -- How many segments to create with [page:Vector3]s. Defaults to 12.
@@ -89,7 +90,7 @@
 		<div>
 		Creates a [page:Geometry] object comprised of [page:Vector3]s that are equidistant.
 		</div>
-		
+
 
 		<h3>[method:null add]([page:Curve curve])</h3>
 		<div>
@@ -123,7 +124,7 @@
 		Uses this CurvePath to generate a series of points transformed by the curves in the bends array. Returns an
 		array of [page:Vector2]s.
 		</div>
-		
+
 		<h3>[method:Array getTransformedSpacedPoints]([page:Integer segments], [page:Array bends])</h3>
 		<div>
 		segments -- The number of segments to create using the getPoints()<br />

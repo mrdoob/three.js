@@ -38,7 +38,7 @@
 		<a href="http://openctm.sourceforge.net/" target="_blank">CTM format</a> loader test -
 		using <a href="http://code.google.com/p/js-openctm/">js-openctm</a> -
 		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank">The Utah 3D Animation Repository</a>,
-		<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a>,
+		<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank">Lee Perry-Smith</a>,
 		<a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>
 		</div>
 
@@ -178,8 +178,6 @@
 				}, { useWorker: true } );
 
 				loader.load( "models/ctm/LeePerry.ctm",  function( geometry ) {
-
-					geometry.computeTangents();
 
 					var material = new THREE.MeshPhongMaterial( {
 

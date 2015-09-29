@@ -6,47 +6,36 @@ Sidebar.Geometry.BufferGeometry = function ( signals ) {
 
 	var container = new UI.Panel();
 
-	// vertices
-
-	var verticesRow = new UI.Panel();
-	var vertices = new UI.Text().setFontSize( '12px' );
-
-	verticesRow.add( new UI.Text( 'Vertices' ).setWidth( '90px' ) );
-	verticesRow.add( vertices );
-
-	container.add( verticesRow );
-
-	// faces
-
-	var facesRow = new UI.Panel();
-	var faces = new UI.Text().setFontSize( '12px' );
-
-	facesRow.add( new UI.Text( 'Faces' ).setWidth( '90px' ) );
-	facesRow.add( faces );
-
-	container.add( facesRow );
-
-	//
-
-	var update = function ( object ) {
+	function update( object ) {
 
 		if ( object === null ) return;
 
 		var geometry = object.geometry;
 
-		if ( geometry instanceof THREE.BufferGeometry ) { 
+		if ( geometry instanceof THREE.BufferGeometry ) {
 
+			container.clear();
 			container.setDisplay( 'block' );
 
-			vertices.setValue( ( geometry.attributes.position.array.length / 3 ).format() );
+			var index = geometry.index;
 
-			if ( geometry.attributes.index !== undefined ) {
+			if ( index !== null ) {
 
-				faces.setValue( ( geometry.attributes.index.array.length / 3 ).format() );
+				var panel = new UI.Panel();
+				panel.add( new UI.Text( 'index' ).setWidth( '90px' ) );
+				panel.add( new UI.Text( ( index.count ).format() ).setFontSize( '12px' ) );
+				container.add( panel );
 
-			} else {
+			}
 
-				faces.setValue( ( geometry.attributes.position.array.length / 9 ).format() );
+			var attributes = geometry.attributes;
+
+			for ( var name in attributes ) {
+
+				var panel = new UI.Panel();
+				panel.add( new UI.Text( name ).setWidth( '90px' ) );
+				panel.add( new UI.Text( ( attributes[ name ].count ).format() ).setFontSize( '12px' ) );
+				container.add( panel );
 
 			}
 

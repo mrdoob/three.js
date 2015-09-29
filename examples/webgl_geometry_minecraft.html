@@ -49,10 +49,6 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/wip/TypedGeometry.js"></script>
-		<script src="js/wip/IndexedTypedGeometry.js"></script>
-		<script src="js/wip/PlaneTypedGeometry.js"></script>
-
 		<script>
 
 			if ( ! Detector.webgl ) {
@@ -96,38 +92,44 @@
 
 				var matrix = new THREE.Matrix4();
 
-				var pxGeometry = new THREE.PlaneTypedGeometry( 100, 100 );
-				pxGeometry.uvs[ 1 ] = 0.5;
-				pxGeometry.uvs[ 3 ] = 0.5;
-				pxGeometry.applyMatrix( matrix.makeRotationY( Math.PI / 2 ) );
-				pxGeometry.applyMatrix( matrix.makeTranslation( 50, 0, 0 ) );
+				var pxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				pxGeometry.attributes.uv.array[ 1 ] = 0.5;
+				pxGeometry.attributes.uv.array[ 3 ] = 0.5;
+				pxGeometry.rotateY( Math.PI / 2 );
+				pxGeometry.translate( 50, 0, 0 );
 
-				var nxGeometry = new THREE.PlaneTypedGeometry( 100, 100 );
-				nxGeometry.uvs[ 1 ] = 0.5;
-				nxGeometry.uvs[ 3 ] = 0.5;
-				nxGeometry.applyMatrix( matrix.makeRotationY( - Math.PI / 2 ) );
-				nxGeometry.applyMatrix( matrix.makeTranslation( - 50, 0, 0 ) );
+				var nxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				nxGeometry.attributes.uv.array[ 1 ] = 0.5;
+				nxGeometry.attributes.uv.array[ 3 ] = 0.5;
+				nxGeometry.rotateY( - Math.PI / 2 );
+				nxGeometry.translate( - 50, 0, 0 );
 
-				var pyGeometry = new THREE.PlaneTypedGeometry( 100, 100 );
-				pyGeometry.uvs[ 5 ] = 0.5;
-				pyGeometry.uvs[ 7 ] = 0.5;
-				pyGeometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
-				pyGeometry.applyMatrix( matrix.makeTranslation( 0, 50, 0 ) );
+				var pyGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				pyGeometry.attributes.uv.array[ 5 ] = 0.5;
+				pyGeometry.attributes.uv.array[ 7 ] = 0.5;
+				pyGeometry.rotateX( - Math.PI / 2 );
+				pyGeometry.translate( 0, 50, 0 );
 
-				var pzGeometry = new THREE.PlaneTypedGeometry( 100, 100 );
-				pzGeometry.uvs[ 1 ] = 0.5;
-				pzGeometry.uvs[ 3 ] = 0.5;
-				pzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, 50 ) );
+				var pzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				pzGeometry.attributes.uv.array[ 1 ] = 0.5;
+				pzGeometry.attributes.uv.array[ 3 ] = 0.5;
+				pzGeometry.translate( 0, 0, 50 );
 
-				var nzGeometry = new THREE.PlaneTypedGeometry( 100, 100 );
-				nzGeometry.uvs[ 1 ] = 0.5;
-				nzGeometry.uvs[ 3 ] = 0.5;
-				nzGeometry.applyMatrix( matrix.makeRotationY( Math.PI ) );
-				nzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, -50 ) );
+				var nzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				nzGeometry.attributes.uv.array[ 1 ] = 0.5;
+				nzGeometry.attributes.uv.array[ 3 ] = 0.5;
+				nzGeometry.rotateY( Math.PI );
+				nzGeometry.translate( 0, 0, -50 );
 
 				//
 
-				var geometry = new THREE.TypedGeometry( worldWidth * worldDepth * 2 * 5 ); // 2 triangles, 5 possible sides
+				// BufferGeometry cannot be merged yet.
+				var tmpGeometry = new THREE.Geometry();
+				var pxTmpGeometry = new THREE.Geometry().fromBufferGeometry( pxGeometry );
+				var nxTmpGeometry = new THREE.Geometry().fromBufferGeometry( nxGeometry );
+				var pyTmpGeometry = new THREE.Geometry().fromBufferGeometry( pyGeometry );
+				var pzTmpGeometry = new THREE.Geometry().fromBufferGeometry( pzGeometry );
+				var nzTmpGeometry = new THREE.Geometry().fromBufferGeometry( nzGeometry );
 
 				for ( var z = 0; z < worldDepth; z ++ ) {
 
@@ -146,29 +148,29 @@
 						var pz = getY( x, z + 1 );
 						var nz = getY( x, z - 1 );
 
-						geometry.merge( pyGeometry, matrix );
+						tmpGeometry.merge( pyTmpGeometry, matrix );
 
-						if ( ( px != h && px != h + 1 ) || x == 0 ) {
+						if ( ( px !== h && px !== h + 1 ) || x === 0 ) {
 
-							geometry.merge( pxGeometry, matrix );
-
-						}
-
-						if ( ( nx != h && nx != h + 1 ) || x == worldWidth - 1 ) {
-
-							geometry.merge( nxGeometry, matrix );
+							tmpGeometry.merge( pxTmpGeometry, matrix );
 
 						}
 
-						if ( ( pz != h && pz != h + 1 ) || z == worldDepth - 1 ) {
+						if ( ( nx !== h && nx !== h + 1 ) || x === worldWidth - 1 ) {
 
-							geometry.merge( pzGeometry, matrix );
+							tmpGeometry.merge( nxTmpGeometry, matrix );
 
 						}
 
-						if ( ( nz != h && nz != h + 1 ) || z == 0 ) {
+						if ( ( pz !== h && pz !== h + 1 ) || z === worldDepth - 1 ) {
 
-							geometry.merge( nzGeometry, matrix );
+							tmpGeometry.merge( pzTmpGeometry, matrix );
+
+						}
+
+						if ( ( nz !== h && nz !== h + 1 ) || z === 0 ) {
+
+							tmpGeometry.merge( nzTmpGeometry, matrix );
 
 						}
 
@@ -176,6 +178,7 @@
 
 				}
 
+				var geometry = new THREE.BufferGeometry().fromGeometry( tmpGeometry );
 				geometry.computeBoundingSphere();
 
 				var texture = THREE.ImageUtils.loadTexture( 'textures/minecraft/atlas.png' );
@@ -230,7 +233,7 @@
 
 				for ( var j = 0; j < 4; j ++ ) {
 
-					if ( j == 0 ) for ( var i = 0; i < size; i ++ ) data[ i ] = 0;
+					if ( j === 0 ) for ( var i = 0; i < size; i ++ ) data[ i ] = 0;
 
 					for ( var i = 0; i < size; i ++ ) {
 
@@ -240,7 +243,7 @@
 
 					}
 
-					quality *= 4
+					quality *= 4;
 
 				}
 

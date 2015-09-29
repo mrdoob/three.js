@@ -26,10 +26,10 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, objects;
+			var camera, scene, renderer;
 			var particleLight;
 
-			var materials = [];
+			var objects = [], materials = [];
 
 			init();
 			animate();
@@ -89,33 +89,26 @@
 
 				// Spheres geometry
 
-				var geometry_smooth = new THREE.SphereGeometry( 70, 32, 16 );
-				var geometry_flat = new THREE.SphereGeometry( 70, 32, 16 );
+				var geometry = new THREE.SphereGeometry( 70, 32, 16 );
+
+				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
+
+					var face = geometry.faces[ i ];
+					face.materialIndex = Math.floor( Math.random() * materials.length );
+
+				}
+
+				geometry.sortFacesByMaterialIndex();
 
 				objects = [];
 
-				var sphere, geometry, material;
-
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
-					material = materials[ i ];
-
-					geometry = material.shading == THREE.FlatShading ? geometry_flat : geometry_smooth;
-
-					sphere = new THREE.Mesh( geometry, material );
-
-					sphere.position.x = ( i % 4 ) * 200 - 400;
-					sphere.position.z = Math.floor( i / 4 ) * 200 - 200;
-
-					sphere.rotation.x = Math.random() * 200 - 100;
-					sphere.rotation.y = Math.random() * 200 - 100;
-					sphere.rotation.z = Math.random() * 200 - 100;
-
-					objects.push( sphere );
-
-					scene.add( sphere );
+					addMesh( geometry, materials[ i ] );
 
 				}
+
+				addMesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
@@ -155,6 +148,23 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function addMesh( geometry, material ) {
+
+				var mesh = new THREE.Mesh( geometry, material );
+
+				mesh.position.x = ( objects.length % 4 ) * 200 - 400;
+				mesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
+
+				mesh.rotation.x = Math.random() * 200 - 100;
+				mesh.rotation.y = Math.random() * 200 - 100;
+				mesh.rotation.z = Math.random() * 200 - 100;
+
+				objects.push( mesh );
+
+				scene.add( mesh );
 
 			}
 

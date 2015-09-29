@@ -15,6 +15,8 @@ THREE.UCSCharacter = function() {
 	this.materials = [];
 	this.morphs = [];
 
+	this.mixer = new THREE.AnimationMixer( this.root );
+
 	this.onLoadComplete = function () {};
 	
 	this.loadCounter = 0;
@@ -38,12 +40,12 @@ THREE.UCSCharacter = function() {
 		var loader = new THREE.JSONLoader();
 		console.log( config.baseUrl + config.character );
 		loader.load( config.baseUrl + config.character, function( geometry ) {
+
 			geometry.computeBoundingBox();
 			geometry.computeVertexNormals();
-
-			//THREE.AnimationHandler.add( geometry.animation );
-
+			
 			mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshFaceMaterial() );
+			mesh.name = config.character;
 			scope.root.add( mesh );
 			
 			var bb = geometry.boundingBox;
@@ -53,31 +55,42 @@ THREE.UCSCharacter = function() {
 			mesh.castShadow = true;
 			mesh.receiveShadow = true;
 
-			animation = new THREE.Animation( mesh, geometry.animation );
-			animation.play();
+			scope.mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).setLocalRoot( mesh ) );
 			
-			scope.setSkin(0);
+			scope.setSkin( 0 );
 			
 			scope.checkLoadComplete();
+
 		} );
 
 	};
 	
 	this.setSkin = function( index ) {
+
 		if ( mesh && scope.materials ) {
+
 			mesh.material = scope.materials[ index ];
+
 		}
+
 	};
 	
 	this.updateMorphs = function( influences ) {
+
 		if ( mesh ) {
+
 			for ( var i = 0; i < scope.numMorphs; i ++ ) {
+
 				mesh.morphTargetInfluences[ i ] = influences[ scope.morphs[ i ] ] / 100;
+
 			}
+
 		}
+
 	};
 	
 	function loadTextures( baseUrl, textureUrls ) {
+
 		var mapping = THREE.UVMapping;
 		var textures = [];
 
@@ -89,9 +102,11 @@ THREE.UCSCharacter = function() {
 		}
 
 		return textures;
+
 	}
 
 	function createMaterials( skins ) {
+
 		var materials = [];
 		
 		for ( var i = 0; i < skins.length; i ++ ) {
@@ -107,6 +122,7 @@ THREE.UCSCharacter = function() {
 		}
 		
 		return materials;
+
 	}
 
 	this.checkLoadComplete = function () {

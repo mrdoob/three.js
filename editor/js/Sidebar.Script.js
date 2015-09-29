@@ -45,6 +45,13 @@ Sidebar.Script = function ( editor ) {
 		scriptsContainer.clear();
 
 		var object = editor.selected;
+
+		if ( object === null ) {
+
+			return;
+
+		}
+
 		var scripts = editor.scripts[ object.uuid ];
 
 		if ( scripts !== undefined ) {

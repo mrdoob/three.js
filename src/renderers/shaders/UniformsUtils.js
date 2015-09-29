@@ -46,7 +46,7 @@ THREE.UniformsUtils = {
 
 					uniforms_dst[ u ][ p ] = parameter_src.clone();
 
-				} else if ( parameter_src instanceof Array ) {
+				} else if ( Array.isArray( parameter_src ) ) {
 
 					uniforms_dst[ u ][ p ] = parameter_src.slice();
 

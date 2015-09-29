@@ -1,31 +1,3 @@
-#ifndef FLAT_SHADED
-
-	vec3 normal = normalize( vNormal );
-
-	#ifdef DOUBLE_SIDED
-
-		normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );
-
-	#endif
-
-#else
-
-	vec3 fdx = dFdx( vViewPosition );
-	vec3 fdy = dFdy( vViewPosition );
-	vec3 normal = normalize( cross( fdx, fdy ) );
-
-#endif
-
-#ifdef USE_NORMALMAP
-
-	normal = perturbNormal2Arb( -vViewPosition, normal );
-
-#elif defined( USE_BUMPMAP )
-
-	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );
-
-#endif
-
 vec3 viewDir = normalize( vViewPosition );
 
 vec3 totalDiffuseLight = vec3( 0.0 );
@@ -38,8 +10,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 		vec3 lightColor = pointLightColor[ i ];
 
 		vec3 lightPosition = pointLightPosition[ i ];
-		vec4 lPosition = viewMatrix * vec4( lightPosition, 1.0 );
-		vec3 lVector = lPosition.xyz + vViewPosition.xyz;
+		vec3 lVector = lightPosition + vViewPosition.xyz;
 		vec3 lightDir = normalize( lVector );
 
 		// attenuation
@@ -70,11 +41,10 @@ vec3 totalSpecularLight = vec3( 0.0 );
 		vec3 lightColor = spotLightColor[ i ];
 
 		vec3 lightPosition = spotLightPosition[ i ];
-		vec4 lPosition = viewMatrix * vec4( lightPosition, 1.0 );
-		vec3 lVector = lPosition.xyz + vViewPosition.xyz;
+		vec3 lVector = lightPosition + vViewPosition.xyz;
 		vec3 lightDir = normalize( lVector );
 
-		float spotEffect = dot( spotLightDirection[ i ], normalize( lightPosition - vWorldPosition ) );
+		float spotEffect = dot( spotLightDirection[ i ], lightDir );
 
 		if ( spotEffect > spotLightAngleCos[ i ] ) {
 
@@ -110,7 +80,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 		vec3 lightColor = directionalLightColor[ i ];
 
-		vec3 lightDir = transformDirection( directionalLightDirection[ i ], viewMatrix );
+		vec3 lightDir = directionalLightDirection[ i ];
 
 		// diffuse
 
@@ -128,38 +98,12 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 #endif
 
-#if MAX_HEMI_LIGHTS > 0
-
-	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
-
-		vec3 lightDir = transformDirection( hemisphereLightDirection[ i ], viewMatrix );
-
-		// diffuse
-
-		float dotProduct = dot( normal, lightDir );
-
-		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;
-
-		vec3 lightColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );
-
-		totalDiffuseLight += lightColor;
-
-		// specular (sky term only)
-
-		vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );
-
-		totalSpecularLight += brdf * specularStrength * lightColor * max( dotProduct, 0.0 );
-
-	}
-
-#endif
-
 #ifdef METAL
 
-	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + emissive;
+	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + totalEmissiveLight;
 
 #else
 
-	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + emissive;
+	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;
 
 #endif

@@ -1,5 +1,5 @@
 /**
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  */
 
 THREE.Plane = function ( normal, constant ) {
@@ -59,6 +59,11 @@ THREE.Plane.prototype = {
 
 	}(),
 
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
 
 	copy: function ( plane ) {
 
@@ -211,12 +216,6 @@ THREE.Plane.prototype = {
 	equals: function ( plane ) {
 
 		return plane.normal.equals( this.normal ) && ( plane.constant === this.constant );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Plane().copy( this );
 
 	}
 

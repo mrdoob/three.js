@@ -24,9 +24,10 @@
  * @param v6         Corner index +X, +Y, +Z.
  * @param v7         Corner index +X, +Y, -Z.
  */
-function hilbert3D(center, size, iterations, v0, v1, v2, v3, v4, v5, v6, v7) {
+function hilbert3D( center, size, iterations, v0, v1, v2, v3, v4, v5, v6, v7 ) {
+
 	// Default Vars
-	var center     = undefined !== center ? center : new THREE.Vector3(0, 0, 0),
+	var center     = undefined !== center ? center : new THREE.Vector3( 0, 0, 0 ),
 		size       = undefined !== size ? size : 10,
 		half       = size / 2,
 		iterations = undefined !== iterations ? iterations : 1,
@@ -64,6 +65,7 @@ function hilbert3D(center, size, iterations, v0, v1, v2, v3, v4, v5, v6, v7) {
 
 	// Recurse iterations
 	if ( -- iterations >= 0 ) {
+
 		var tmp = [];
 
 		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 0 ], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1 ) );
@@ -77,8 +79,10 @@ function hilbert3D(center, size, iterations, v0, v1, v2, v3, v4, v5, v6, v7) {
 
 		// Return recursive call
 		return tmp;
+
 	}
 
 	// Return complete Hilbert Curve.
 	return vec;
+
 }

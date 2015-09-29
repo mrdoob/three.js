@@ -81,34 +81,30 @@
 				spotlight = light;
 
 				var planeGeometry = new THREE.PlaneGeometry( 2000, 2000, 20, 20 );
-				planeGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
-				var planeMaterials = [ new THREE.MeshBasicMaterial( {
-					color: 0xeeeeee,
-					opacity: 0.5
-					} ), new THREE.MeshBasicMaterial( {
-						color: 0x405040,
-						wireframe: true,
-						opacity: 0.2,
-						transparent: true
-					} ) ];
+				planeGeometry.rotateX( - Math.PI / 2 );
+				var planeMaterial = new THREE.MeshBasicMaterial( { color: 0xeeeeee } );
 
-				var plane = THREE.SceneUtils.createMultiMaterialObject( planeGeometry, planeMaterials );
+				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
 				plane.position.y = -200;
-				plane.children[ 0 ].castShadow = false;
-				plane.children[ 0 ].receiveShadow = true;
+				plane.receiveShadow = true;
 				scene.add( plane );
+
+				var helper = new THREE.GridHelper( 1000, 100 );
+				helper.position.y = - 199;
+				helper.material.opacity = 0.25;
+				helper.material.transparent = true;
+				scene.add( helper );
+
 				var axis = new THREE.AxisHelper();
 				axis.position.set( -500, -500, -500 );
 				scene.add( axis );
 
-				renderer = new THREE.WebGLRenderer( {
-					antialias: true
-				} );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapSoft = true;
+				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
+
 				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';
 				info.style.top = '10px';
@@ -130,6 +126,7 @@
 
 				container.appendChild( info );
 				container.appendChild( options );
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
@@ -170,7 +167,7 @@
 
 				} );
 
-				var dragcontrols = new THREE.DragControls( camera, splineHelperObjects, renderer.domElement ); // 
+				var dragcontrols = new THREE.DragControls( camera, splineHelperObjects, renderer.domElement ); //
 
 				dragcontrols.on( 'hoveron', function( e ) {
 
@@ -259,6 +256,7 @@
 					opacity: 0.35,
 					linewidth: 2
 					} ) );
+				curve.mesh.castShadow = true;
 				splines.uniform = curve;
 
 				curve = new THREE.CatmullRomCurve3( positions );
@@ -268,6 +266,7 @@
 					opacity: 0.35,
 					linewidth: 2
 					} ) );
+				curve.mesh.castShadow = true;
 				splines.centripetal = curve;
 
 				curve = new THREE.CatmullRomCurve3( positions );
@@ -277,6 +276,7 @@
 					opacity: 0.35,
 					linewidth: 2
 					} ) );
+				curve.mesh.castShadow = true;
 				splines.chordal = curve;
 
 				for ( var k in splines ) {

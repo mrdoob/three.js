@@ -45,7 +45,7 @@ class Geometry(base_classes.BaseNode):
             ext = constants.PACK
 
         key = ''
-        for key in (constants.MORPH_TARGETS, constants.ANIMATION):
+        for key in (constants.MORPH_TARGETS, constants.ANIMATION, constants.CLIPS):
             if key in self.keys():
                 break
         else:
@@ -152,7 +152,7 @@ class Geometry(base_classes.BaseNode):
             texture_registration = self.register_textures()
             if texture_registration:
                 logger.info("%s has registered textures", self.node)
-                dirname = os.path.dirname(self.scene.filepath)
+                dirname = os.path.dirname(os.path.abspath(self.scene.filepath))
                 full_path = os.path.join(dirname, texture_folder)
                 io.copy_registered_textures(
                     full_path, texture_registration)
@@ -206,7 +206,7 @@ class Geometry(base_classes.BaseNode):
         """
         logger.debug("Geometry().write_animation(%s)", filepath)
 
-        for key in (constants.MORPH_TARGETS, constants.ANIMATION):
+        for key in (constants.MORPH_TARGETS, constants.ANIMATION, constants.CLIPS):
             try:
                 data = self[key]
                 break
@@ -245,7 +245,7 @@ class Geometry(base_classes.BaseNode):
                       constants.INDEX]
 
         data = {}
-        anim_components = [constants.MORPH_TARGETS, constants.ANIMATION]
+        anim_components = [constants.MORPH_TARGETS, constants.ANIMATION, constants.MORPH_TARGETS_ANIM, constants.CLIPS]
         if self.options.get(constants.EMBED_ANIMATION):
             components.extend(anim_components)
         else:
@@ -260,6 +260,12 @@ class Geometry(base_classes.BaseNode):
                     break
             else:
                 logger.info("No animation data found for %s", self.node)
+
+        option_extra_vgroups = self.options.get(constants.EXTRA_VGROUPS)
+
+        for name, index in api.mesh.extra_vertex_groups(self.node,
+                                                        option_extra_vgroups):
+            components.append(name)
 
         for component in components:
             try:
@@ -278,7 +284,9 @@ class Geometry(base_classes.BaseNode):
         data = self._component_data()
 
         if self[constants.TYPE] != constants.GEOMETRY.title():
-            data = {constants.ATTRIBUTES: data}
+            data = {
+                constants.DATA: {constants.ATTRIBUTES: data}
+            }
 
         data[constants.METADATA] = {
             constants.TYPE: self[constants.TYPE]
@@ -355,6 +363,9 @@ class Geometry(base_classes.BaseNode):
                 data[constants.DATA] = geometry_data = {}
 
             geometry_data[constants.ATTRIBUTES] = component_data
+            index = self.get(constants.INDEX)
+            if index is not None:
+                geometry_data[constants.INDEX] = index
             draw_calls = self.get(constants.DRAW_CALLS)
             if draw_calls is not None:
                 geometry_data[constants.DRAW_CALLS] = draw_calls
@@ -371,6 +382,7 @@ class Geometry(base_classes.BaseNode):
         options_vertices = self.options.get(constants.VERTICES)
         option_normals = self.options.get(constants.NORMALS)
         option_uvs = self.options.get(constants.UVS)
+        option_extra_vgroups = self.options.get(constants.EXTRA_VGROUPS)
         option_index_type = self.options.get(constants.INDEX_TYPE)
 
         pos_tuple = (constants.POSITION, options_vertices,
@@ -397,13 +409,29 @@ class Geometry(base_classes.BaseNode):
                 constants.ARRAY: array
             }
 
+        for name, index in api.mesh.extra_vertex_groups(self.node,
+                                                        option_extra_vgroups):
+
+            logger.info("Exporting extra vertex group %s", name)
+
+            array = api.mesh.buffer_vertex_group_data(self.node, index)
+            if not array:
+                logger.warning("No array could be made for %s", name)
+                continue
+
+            self[constants.ATTRIBUTES][name] = {
+                constants.ITEM_SIZE: 1,
+                constants.TYPE: constants.FLOAT_32,
+                constants.ARRAY: array
+            }
+
         if option_index_type != constants.NONE:
 
             assert(not (self.get(constants.INDEX) or
                         self.get(constants.DRAW_CALLS)))
 
             indices_per_face = 3
-            index_threshold  = 0xffff - indices_per_face
+            index_threshold = 0xffff - indices_per_face
             if option_index_type == constants.UINT_32:
                 index_threshold = 0x7fffffff - indices_per_face
 
@@ -415,8 +443,8 @@ class Geometry(base_classes.BaseNode):
                 item_size = entry[constants.ITEM_SIZE]
 
                 attrib_keys.append(key)
-                attrib_data_in.append( (entry[constants.ARRAY], item_size) )
-                attrib_data_out.append( ([], i, i + item_size) )
+                attrib_data_in.append((entry[constants.ARRAY], item_size))
+                attrib_data_out.append(([], i, i + item_size))
                 i += item_size
 
             index_data, draw_calls = [], []
@@ -430,7 +458,7 @@ class Geometry(base_classes.BaseNode):
                 vertex_data = ()
                 for array, item_size in attrib_data_in:
                     vertex_data += tuple(
-                            array[i * item_size : (i + 1) * item_size])
+                            array[i * item_size:(i + 1) * item_size])
 
                 vertex_index = indexed.get(vertex_data)
 
@@ -441,7 +469,7 @@ class Geometry(base_classes.BaseNode):
 
                     indexed[vertex_data] = vertex_index
                     for array, i_from, i_to in attrib_data_out:
-                        array.extend(vertex_data[i_from : i_to])
+                        array.extend(vertex_data[i_from:i_to])
 
                 index_data.append(vertex_index)
 
@@ -454,7 +482,8 @@ class Geometry(base_classes.BaseNode):
                     start, count = 0, len(index_data)
                     if draw_calls:
                         prev = draw_calls[-1]
-                        start = prev[constants.DC_START] + prev[constants.DC_COUNT]
+                        start = (prev[constants.DC_START] +
+                                 prev[constants.DC_COUNT])
                         count -= start
                     draw_calls.append({
                         constants.DC_START: start,
@@ -469,15 +498,14 @@ class Geometry(base_classes.BaseNode):
                 array = attrib_data_out[i][0]
                 self[constants.ATTRIBUTES][key][constants.ARRAY] = array
 
-            self[constants.ATTRIBUTES][constants.INDEX] = {
-                constants.ITEM_SIZE: 3,
+            self[constants.INDEX] = {
+                constants.ITEM_SIZE: 1,
                 constants.TYPE: option_index_type,
                 constants.ARRAY: index_data
             }
             if (draw_calls):
                 logger.info("draw_calls = %s", repr(draw_calls))
                 self[constants.DRAW_CALLS] = draw_calls
-
 
     def _parse_geometry(self):
         """Parse the geometry to Three.Geometry specs"""
@@ -505,9 +533,9 @@ class Geometry(base_classes.BaseNode):
 
         if self.options.get(constants.FACES):
             logger.info("Parsing %s", constants.FACES)
-            materials = self.get(constants.MATERIALS)
+            material_list = self.get(constants.MATERIALS)
             self[constants.FACES] = api.mesh.faces(
-                self.node, self.options, materials=materials) or []
+                self.node, self.options, material_list=material_list) or []
 
         no_anim = (None, False, constants.OFF)
         if self.options.get(constants.ANIMATION) not in no_anim:
@@ -535,7 +563,28 @@ class Geometry(base_classes.BaseNode):
             self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(
                 self.node, bone_map, influences) or []
 
-        if self.options.get(constants.MORPH_TARGETS):
+        if self.options.get(constants.BLEND_SHAPES):
+            logger.info("Parsing %s", constants.BLEND_SHAPES)
+            mt = api.mesh.blend_shapes(self.node, self.options) or []
+            self[constants.MORPH_TARGETS] = mt
+            if len(mt) > 0 and self._scene:  # there's blend shapes, let check for animation
+                #self[constants.CLIPS] = api.mesh.animated_blend_shapes(self.node, self.options) or []
+                tracks = api.mesh.animated_blend_shapes(self.node, self[constants.NAME], self.options) or []
+                merge = self._scene[constants.ANIMATION][0][constants.KEYFRAMES]
+                for track in tracks:
+                    merge.append(track)
+        elif self.options.get(constants.MORPH_TARGETS):
             logger.info("Parsing %s", constants.MORPH_TARGETS)
             self[constants.MORPH_TARGETS] = api.mesh.morph_targets(
                 self.node, self.options) or []
+
+        # In the moment there is no way to add extra data to a Geomtry in
+        # Three.js. In case there is some day, here is the code:
+        #
+        # option_extra_vgroups = self.options.get(constants.EXTRA_VGROUPS)
+        #
+        # for name, index in api.mesh.extra_vertex_groups(self.node,
+        #                                                 option_extra_vgroups):
+        #
+        #         logger.info("Exporting extra vertex group %s", name)
+        #         self[name] = api.mesh.vertex_group_data(self.node, index)

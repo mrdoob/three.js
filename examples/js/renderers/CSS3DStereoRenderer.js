@@ -254,7 +254,7 @@ THREE.CSS3DStereoRenderer = function () {
 
 		scene.updateMatrixWorld();
 
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorld.decompose( _position, _quaternion, _scale );
 

@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:CurvePath] &rarr;
@@ -35,7 +36,7 @@
 		<h3>[property:array actions]</h3>
 		<div>
 		The possible actions that define the path.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 
@@ -80,7 +81,7 @@
 		</div>
 		<div>Draw an arc absolutely positioned</div>
 
-		<h3>[method:null ellipse]( [page:Float x], [page:Float y], [page:Float xRadius], [page:Float yRadius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise] )</h3>
+		<h3>[method:null ellipse]( [page:Float x], [page:Float y], [page:Float xRadius], [page:Float yRadius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise], [page:Float rotation] )</h3>
 		<div>
 		x, y -- The center of the ellipse offset from the last call
 		xRadius -- The radius of the ellipse in the x axis
@@ -88,10 +89,11 @@
 		startAngle -- The start angle in radians
 		endAngle -- The end angle in radians
 		clockwise -- Sweep the ellipse clockwise. Defaults to false
+		rotation -- The rotation angle of the ellipse in radians, counterclockwise from the positive X axis. Optional, defaults to 0
 		</div>
 		<div>Draw an ellipse offset from the last call</div>
 
-		<h3>[method:null absellipse]( [page:Float x], [page:Float y], [page:Float xRadius], [page:Float yRadius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise] )</h3>
+		<h3>[method:null absellipse]( [page:Float x], [page:Float y], [page:Float xRadius], [page:Float yRadius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise], [page:Float rotation] )</h3>
 		<div>
 		x, y -- The absolute center of the ellipse
 		xRadius -- The radius of the ellipse in the x axis
@@ -99,6 +101,7 @@
 		startAngle -- The start angle in radians
 		endAngle -- The end angle in radians
 		clockwise -- Sweep the ellipse clockwise. Defaults to false
+		rotation -- The rotation angle of the ellipse in radians, counterclockwise from the positive X axis. Optional, defaults to 0
 		</div>
 		<div>Draw an ellipse absolutely positioned</div>
 
@@ -111,7 +114,7 @@
 		Converts the Path into an array of Shapes. By default solid shapes are defined clockwise (CW) and holes are defined counterclockwise (CCW). If isCCW is set to true,
 		then those are flipped. If the paramater noHoles is set to true then all paths are set as solid shapes and isCCW is ignored.
 		<br/>
-		
+
 		</div>
 
 

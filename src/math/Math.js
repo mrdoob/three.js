@@ -33,6 +33,7 @@ THREE.Math = {
 					uuid[ i ] = chars[ ( i === 19 ) ? ( r & 0x3 ) | 0x8 : r ];
 
 				}
+
 			}
 
 			return uuid.join( '' );
@@ -54,6 +55,15 @@ THREE.Math = {
 	clampBottom: function ( x, a ) {
 
 		return x < a ? a : x;
+
+	},
+
+	// compute euclidian modulo of m % n
+	// https://en.wikipedia.org/wiki/Modulo_operation
+
+	euclideanModulo: function ( n, m ) {
+
+		return ( ( n % m ) + m ) % m;
 
 	},
 
@@ -102,7 +112,7 @@ THREE.Math = {
 
 	randInt: function ( low, high ) {
 
-		return Math.floor( this.randFloat( low, high ) );
+		return low + Math.floor( Math.random() * ( high - low + 1 ) );
 
 	},
 

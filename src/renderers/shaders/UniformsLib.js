@@ -18,9 +18,7 @@ THREE.UniformsLib = {
 		"envMap" : { type: "t", value: null },
 		"flipEnvMap" : { type: "f", value: - 1 },
 		"reflectivity" : { type: "f", value: 1.0 },
-		"refractionRatio" : { type: "f", value: 0.98 },
-
-		"morphTargetInfluences" : { type: "f", value: 0 }
+		"refractionRatio" : { type: "f", value: 0.98 }
 
 	},
 
@@ -38,7 +36,13 @@ THREE.UniformsLib = {
 
 	},
 
-	bump: {
+	emissivemap: {
+
+		"emissiveMap" : { type: "t", value: null },
+
+	},
+
+	bumpmap: {
 
 		"bumpMap" : { type: "t", value: null },
 		"bumpScale" : { type: "f", value: 1 }
@@ -49,6 +53,15 @@ THREE.UniformsLib = {
 
 		"normalMap" : { type: "t", value: null },
 		"normalScale" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
+
+	},
+
+	displacementmap: {
+
+		"displacementMap" : { type: "t", value: null },
+		"displacementScale" : { type: "f", value: 1 },
+		"displacementBias" : { type: "f", value: 0 }
+
 	},
 
 	fog : {
@@ -86,7 +99,7 @@ THREE.UniformsLib = {
 
 	},
 
-	particle: {
+	points: {
 
 		"psColor" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
 		"opacity" : { type: "f", value: 1.0 },

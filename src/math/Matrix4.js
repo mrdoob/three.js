@@ -7,7 +7,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
  * @author timknip / http://www.floorplanner.com/
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
  */
 
@@ -59,6 +59,12 @@ THREE.Matrix4.prototype = {
 		);
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		return new THREE.Matrix4().fromArray( this.elements );
 
 	},
 
@@ -603,7 +609,7 @@ THREE.Matrix4.prototype = {
 
 		var te = this.elements;
 
-		array[ offset     ] = te[ 0 ];
+		array[ offset ] = te[ 0 ];
 		array[ offset + 1 ] = te[ 1 ];
 		array[ offset + 2 ] = te[ 2 ];
 		array[ offset + 3 ] = te[ 3 ];
@@ -991,6 +997,21 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	equals: function ( matrix ) {
+
+		var te = this.elements;
+		var me = matrix.elements;
+
+		for ( var i = 0; i < 16; i ++ ) {
+
+			if ( te[ i ] !== me[ i ] ) return false;
+
+		}
+
+		return true;
+
+	},
+
 	fromArray: function ( array ) {
 
 		this.elements.set( array );
@@ -1009,12 +1030,6 @@ THREE.Matrix4.prototype = {
 			te[ 8 ], te[ 9 ], te[ 10 ], te[ 11 ],
 			te[ 12 ], te[ 13 ], te[ 14 ], te[ 15 ]
 		];
-
-	},
-
-	clone: function () {
-
-		return new THREE.Matrix4().fromArray( this.elements );
 
 	}
 

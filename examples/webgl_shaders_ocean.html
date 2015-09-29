@@ -62,7 +62,7 @@
 				param: 4,
 				filterparam: 1
 			};
-			
+
 			var waterNormals;
 
 			init();
@@ -84,22 +84,24 @@
 				camera.position.set( 2000, 750, 2000 );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.userPan = false;
-				controls.userPanSpeed = 0.0;
+				controls.enablePan = false;
+				controls.minDistance = 1000.0;
 				controls.maxDistance = 5000.0;
 				controls.maxPolarAngle = Math.PI * 0.495;
 				controls.center.set( 0, 500, 0 );
 
-				var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+				scene.add( new THREE.AmbientLight( 0x444444 ) );
+
+				var light = new THREE.DirectionalLight( 0xffffbb, 1 );
 				light.position.set( - 1, 1, - 1 );
 				scene.add( light );
 
-				
+
 				waterNormals = new THREE.ImageUtils.loadTexture( 'textures/waternormals.jpg' );
-				waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping; 
+				waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
 
 				water = new THREE.Water( renderer, camera, scene, {
-					textureWidth: 512, 
+					textureWidth: 512,
 					textureHeight: 512,
 					waterNormals: waterNormals,
 					alpha: 	1.0,
@@ -124,7 +126,6 @@
 
 				var cubeMap = new THREE.CubeTexture( [] );
 				cubeMap.format = THREE.RGBFormat;
-				cubeMap.flipY = false;
 
 				var loader = new THREE.ImageLoader();
 				loader.load( 'textures/skyboxsun25degtest.png', function ( image ) {
@@ -154,8 +155,8 @@
 
 				} );
 
-				var cubeShader = THREE.ShaderLib['cube'];
-				cubeShader.uniforms['tCube'].value = cubeMap;
+				var cubeShader = THREE.ShaderLib[ 'cube' ];
+				cubeShader.uniforms[ 'tCube' ].value = cubeMap;
 
 				var skyBoxMaterial = new THREE.ShaderMaterial( {
 					fragmentShader: cubeShader.fragmentShader,
@@ -163,13 +164,13 @@
 					uniforms: cubeShader.uniforms,
 					depthWrite: false,
 					side: THREE.BackSide
-				});
+				} );
 
 				var skyBox = new THREE.Mesh(
 					new THREE.BoxGeometry( 1000000, 1000000, 1000000 ),
 					skyBoxMaterial
 				);
-				
+
 				scene.add( skyBox );
 
 
@@ -186,7 +187,7 @@
 					shininess: 100,
 					envMap: cubeMap
 				} );
-				
+
 				sphere = new THREE.Mesh( geometry, material );
 				scene.add( sphere );
 

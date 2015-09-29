@@ -2,13 +2,14 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<div class="desc">This displays a cylinder helper object for a [page:SpotLight] </div>
@@ -20,7 +21,7 @@
 		var spotLight = new THREE.SpotLight( 0xffffff );
 		spotLight.position.set( 10, 10, 10 );
 		scene.add( spotLight );
-		
+
 		var spotLightHelper = new THREE.SpotLightHelper( spotLight );
 		scene.add( spotLightHelper );
 		</code>
@@ -33,7 +34,7 @@
 		<div>
 		light -- The [page:SpotLight] to display
 		</div>
-		
+
 
 		<h2>Properties</h2>
 
@@ -41,11 +42,11 @@
 		<h3>[property:SpotLight light]</h3>
 		<div>
 		The [page:SpotLight]
-		</div> 
+		</div>
 
 
 		<h2>Methods</h2>
-		
+
 
 		<h3>[method:null update]()</h3>
 		<div>
