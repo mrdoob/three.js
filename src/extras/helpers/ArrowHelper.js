@@ -20,7 +20,7 @@ THREE.ArrowHelper = ( function () {
 	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
 
 	var coneGeometry = new THREE.CylinderGeometry( 0, 0.5, 1, 5, 1 );
-	coneGeometry.translate( 0, - 0.5, 0 );
+	coneGeometry.translate( 0, -0.5, 0 );
 
 	return function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
@@ -36,9 +36,11 @@ THREE.ArrowHelper = ( function () {
 		this.position.copy( origin );
 		
 		if ( headLength < length ) {
+
 			this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: color } ) );
 			this.line.matrixAutoUpdate = false;
 			this.add( this.line );
+
 		}
 
 		this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: color } ) );
@@ -68,13 +70,13 @@ THREE.ArrowHelper.prototype.setDirection = ( function () {
 
 			this.quaternion.set( 0, 0, 0, 1 );
 
-		} else if ( dir.y < - 0.99999 ) {
+		} else if ( dir.y < -0.99999 ) {
 
 			this.quaternion.set( 1, 0, 0, 0 );
 
 		} else {
 
-			axis.set( dir.z, 0, - dir.x ).normalize();
+			axis.set( dir.z, 0, -dir.x ).normalize();
 
 			radians = Math.acos( dir.y );
 
@@ -91,9 +93,11 @@ THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	if ( headLength < length ){
+	if ( headLength < length ) {
+
 		this.line.scale.set( 1, length - headLength, 1 );
 		this.line.updateMatrix();
+
 	}
 
 	this.cone.scale.set( headWidth, headLength, headWidth );

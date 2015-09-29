@@ -125,9 +125,9 @@ THREE.Ray.prototype = {
 			diff.copy( this.origin ).sub( segCenter );
 
 			var segExtent = v0.distanceTo( v1 ) * 0.5;
-			var a01 = - this.direction.dot( segDir );
+			var a01 = -this.direction.dot( segDir );
 			var b0 = diff.dot( this.direction );
-			var b1 = - diff.dot( segDir );
+			var b1 = -diff.dot( segDir );
 			var c = diff.lengthSq();
 			var det = Math.abs( 1 - a01 * a01 );
 			var s0, s1, sqrDist, extDet;
@@ -142,7 +142,7 @@ THREE.Ray.prototype = {
 
 				if ( s0 >= 0 ) {
 
-					if ( s1 >= - extDet ) {
+					if ( s1 >= -extDet ) {
 
 						if ( s1 <= extDet ) {
 
@@ -159,8 +159,8 @@ THREE.Ray.prototype = {
 							// region 1
 
 							s1 = segExtent;
-							s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-							sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+							s0 = Math.max( 0, -( a01 * s1 + b0 ) );
+							sqrDist = -s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 						}
 
@@ -168,37 +168,37 @@ THREE.Ray.prototype = {
 
 						// region 5
 
-						s1 = - segExtent;
-						s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+						s1 = -segExtent;
+						s0 = Math.max( 0, -( a01 * s1 + b0 ) );
+						sqrDist = -s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 					}
 
 				} else {
 
-					if ( s1 <= - extDet ) {
+					if ( s1 <= -extDet ) {
 
 						// region 4
 
-						s0 = Math.max( 0, - ( - a01 * segExtent + b0 ) );
-						s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
-						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+						s0 = Math.max( 0, -( -a01 * segExtent + b0 ) );
+						s1 = ( s0 > 0 ) ? -segExtent : Math.min( Math.max( -segExtent, -b1 ), segExtent );
+						sqrDist = -s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 					} else if ( s1 <= extDet ) {
 
 						// region 3
 
 						s0 = 0;
-						s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
+						s1 = Math.min( Math.max( -segExtent, -b1 ), segExtent );
 						sqrDist = s1 * ( s1 + 2 * b1 ) + c;
 
 					} else {
 
 						// region 2
 
-						s0 = Math.max( 0, - ( a01 * segExtent + b0 ) );
-						s1 = ( s0 > 0 ) ? segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
-						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+						s0 = Math.max( 0, -( a01 * segExtent + b0 ) );
+						s1 = ( s0 > 0 ) ? segExtent : Math.min( Math.max( -segExtent, -b1 ), segExtent );
+						sqrDist = -s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 					}
 
@@ -208,9 +208,9 @@ THREE.Ray.prototype = {
 
 				// Ray and segment are parallel.
 
-				s1 = ( a01 > 0 ) ? - segExtent : segExtent;
-				s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-				sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+				s1 = ( a01 > 0 ) ? -segExtent : segExtent;
+				s0 = Math.max( 0, -( a01 * s1 + b0 ) );
+				sqrDist = -s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 			}
 
@@ -324,7 +324,7 @@ THREE.Ray.prototype = {
 
 		}
 
-		var t = - ( this.origin.dot( plane.normal ) + plane.constant ) / denominator;
+		var t = -( this.origin.dot( plane.normal ) + plane.constant ) / denominator;
 
 		// Return if the ray never intersects the plane
 
@@ -460,8 +460,8 @@ THREE.Ray.prototype = {
 
 			} else if ( DdN < 0 ) {
 
-				sign = - 1;
-				DdN = - DdN;
+				sign = -1;
+				DdN = -DdN;
 
 			} else {
 
@@ -496,7 +496,7 @@ THREE.Ray.prototype = {
 			}
 
 			// Line intersects triangle, check if ray does.
-			var QdN = - sign * diff.dot( normal );
+			var QdN = -sign * diff.dot( normal );
 
 			// t < 0, no intersection
 			if ( QdN < 0 ) {

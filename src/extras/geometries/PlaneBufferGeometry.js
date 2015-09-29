@@ -44,7 +44,7 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 			var x = ix * segment_width - width_half;
 
 			vertices[ offset ] = x;
-			vertices[ offset + 1 ] = - y;
+			vertices[ offset + 1 ] = -y;
 
 			normals[ offset + 2 ] = 1;
 

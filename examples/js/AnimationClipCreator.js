@@ -24,6 +24,7 @@ THREE.AnimationClipCreator.CreateRotationAnimation = function( period, axis ) {
 	//console.log( 'rotateClip', clip );
 
 	return clip;
+
 };
 
 THREE.AnimationClipCreator.CreateScaleAxisAnimation = function( period, axis ) {
@@ -41,13 +42,14 @@ THREE.AnimationClipCreator.CreateScaleAxisAnimation = function( period, axis ) {
 	//console.log( 'scaleClip', clip );
 
 	return clip;
+
 };
 
 THREE.AnimationClipCreator.CreateShakeAnimation = function( duration, shakeScale ) {
 
 	var keys = [];
 
-	for( var i = 0; i < duration * 10; i ++ ) {
+	for ( var i = 0; i < duration * 10; i ++ ) {
 
 		keys.push( { 
 			time: ( i / 10.0 ),
@@ -64,6 +66,7 @@ THREE.AnimationClipCreator.CreateShakeAnimation = function( duration, shakeScale
 	//console.log( 'shakeClip', clip );
 
 	return clip;
+
 };
 
 
@@ -71,7 +74,7 @@ THREE.AnimationClipCreator.CreatePulsationAnimation = function( duration, pulseS
 
 	var keys = [];
 
-	for( var i = 0; i < duration * 10; i ++ ) {
+	for ( var i = 0; i < duration * 10; i ++ ) {
 
 		var scaleFactor = Math.random() * pulseScale;
 		keys.push( {
@@ -89,6 +92,7 @@ THREE.AnimationClipCreator.CreatePulsationAnimation = function( duration, pulseS
 	//console.log( 'scaleClip', clip );
 
 	return clip;
+
 };
 
 
@@ -116,6 +120,7 @@ THREE.AnimationClipCreator.CreateVisibilityAnimation = function( duration ) {
 	//console.log( 'scaleClip', clip );
 
 	return clip;
+
 };
 
 
@@ -123,8 +128,10 @@ THREE.AnimationClipCreator.CreateMaterialColorAnimation = function( duration, co
 
 	var timeStep = duration / colors.length;
 	var keys = [];
-	for( var i = 0; i <= colors.length; i ++ ) {
+	for ( var i = 0; i <= colors.length; i ++ ) {
+
 		keys.push( { time: i * timeStep, value: colors[ i % colors.length ] } );
+
 	}
 
 	var trackName = '.material[0].color';
@@ -135,5 +142,6 @@ THREE.AnimationClipCreator.CreateMaterialColorAnimation = function( duration, co
 	//console.log( 'diffuseClip', clip );
 
 	return clip;
+
 };
 

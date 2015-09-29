@@ -19,7 +19,7 @@ THREE.EditorControls = function ( object, domElement ) {
 	var scope = this;
 	var vector = new THREE.Vector3();
 
-	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2 };
+	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };
 	var state = STATE.NONE;
 
 	var center = this.center;
@@ -150,7 +150,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( state === STATE.ROTATE ) {
 
-			scope.rotate( new THREE.Vector3( - movementX * 0.005, - movementY * 0.005, 0 ) );
+			scope.rotate( new THREE.Vector3( -movementX * 0.005, -movementY * 0.005, 0 ) );
 
 		} else if ( state === STATE.ZOOM ) {
 
@@ -158,7 +158,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		} else if ( state === STATE.PAN ) {
 
-			scope.pan( new THREE.Vector3( - movementX, movementY, 0 ) );
+			scope.pan( new THREE.Vector3( -movementX, movementY, 0 ) );
 
 		}
 
@@ -189,7 +189,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 			// WebKit / Opera / Explorer 9
 
-			delta = - event.wheelDelta;
+			delta = -event.wheelDelta;
 
 		} else if ( event.detail ) {
 
@@ -291,7 +291,7 @@ THREE.EditorControls = function ( object, domElement ) {
 			case 1:
 				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
 				touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ], prevTouches ) ).multiplyScalar( - 0.005 ) );
+				scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ], prevTouches ) ).multiplyScalar( -0.005 ) );
 				break;
 
 			case 2:
@@ -304,8 +304,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 				var offset0 = touches[ 0 ].clone().sub( getClosest( touches[ 0 ], prevTouches ) );
 				var offset1 = touches[ 1 ].clone().sub( getClosest( touches[ 1 ], prevTouches ) );
-				offset0.x = - offset0.x;
-				offset1.x = - offset1.x;
+				offset0.x = -offset0.x;
+				offset1.x = -offset1.x;
 
 				scope.pan( offset0.add( offset1 ).multiplyScalar( 0.5 ) );
 

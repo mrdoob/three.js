@@ -60,7 +60,7 @@ THREE.ObjectLoader.prototype = {
 
 		var object = this.parseObject( json.object, geometries, materials );
 
-		if( json.animations ) {
+		if ( json.animations ) {
 
 			object.animations = this.parseAnimations( json.animations );
 
@@ -327,9 +327,9 @@ THREE.ObjectLoader.prototype = {
 
 		var animations = [];
 
-		for( var i = 0; i < json.length; i ++ ) {
+		for ( var i = 0; i < json.length; i ++ ) {
 
-			var clip = THREE.AnimationClip.parse( json[i] );
+			var clip = THREE.AnimationClip.parse( json[ i ] );
 
 			animations.push( clip );
 

@@ -49,22 +49,24 @@ THREE.VTKLoader.prototype = {
 		var inPointsSection = false;
 		var inPolygonsSection = false;
 
-		var lines = data.split('\n');
-		for ( var i = 0; i < lines.length; ++i ) {
+		var lines = data.split( '\n' );
+		for ( var i = 0; i < lines.length; ++ i ) {
 
-			line = lines[i];
+			line = lines[ i ];
 
 			if ( inPointsSection ) {
 
 				// get the vertices
 
 				while ( ( result = pat3Floats.exec( line ) ) !== null ) {
-					positions.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
-				}
-			}
-			else if ( inPolygonsSection ) {
 
-				result = patTriangle.exec(line);
+					positions.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
+
+				}
+
+			} else if ( inPolygonsSection ) {
+
+				result = patTriangle.exec( line );
 
 				if ( result !== null ) {
 
@@ -72,10 +74,10 @@ THREE.VTKLoader.prototype = {
 					// triangle
 
 					indices.push( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 3 ] ) );
-				}
-				else {
 
-					result = patQuad.exec(line);
+				} else {
+
+					result = patQuad.exec( line );
 
 					if ( result !== null ) {
 
@@ -84,20 +86,26 @@ THREE.VTKLoader.prototype = {
 
 						indices.push( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 4 ] ) );
 						indices.push( parseInt( result[ 2 ] ), parseInt( result[ 3 ] ), parseInt( result[ 4 ] ) );
+
 					}
 
 				}
 
 			}
 
-			if ( patPOLYGONS.exec(line) !== null ) {
+			if ( patPOLYGONS.exec( line ) !== null ) {
+
 				inPointsSection = false;
 				inPolygonsSection = true;
+
 			}
-			if ( patPOINTS.exec(line) !== null ) {
+			if ( patPOINTS.exec( line ) !== null ) {
+
 				inPolygonsSection = false;
 				inPointsSection = true;
+
 			}
+
 		}
 
 		var geometry = new THREE.BufferGeometry();

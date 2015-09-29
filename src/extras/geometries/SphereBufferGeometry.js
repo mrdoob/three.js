@@ -50,7 +50,7 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 			var u = x / widthSegments;
 
-			var px = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+			var px = -radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
 			var py = radius * Math.cos( thetaStart + v * thetaLength );
 			var pz = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
 

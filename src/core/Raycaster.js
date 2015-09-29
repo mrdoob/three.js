@@ -25,8 +25,10 @@
 		Object.defineProperties( this.params, {
 			PointCloud: {
 				get: function () {
+
 					console.warn( 'THREE.Raycaster: params.PointCloud has been renamed to params.Points.' );
 					return this.Points;
+
 				}
 			}
 		} );
@@ -84,8 +86,8 @@
 
 			} else if ( camera instanceof THREE.OrthographicCamera ) {
 
-				this.ray.origin.set( coords.x, coords.y, - 1 ).unproject( camera );
-				this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
+				this.ray.origin.set( coords.x, coords.y, -1 ).unproject( camera );
+				this.ray.direction.set( 0, 0, -1 ).transformDirection( camera.matrixWorld );
 
 			} else {
 

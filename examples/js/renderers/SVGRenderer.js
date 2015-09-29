@@ -96,11 +96,11 @@ THREE.SVGRenderer = function () {
 		_svgWidth = width; _svgHeight = height;
 		_svgWidthHalf = _svgWidth / 2; _svgHeightHalf = _svgHeight / 2;
 
-		_svg.setAttribute( 'viewBox', ( - _svgWidthHalf ) + ' ' + ( - _svgHeightHalf ) + ' ' + _svgWidth + ' ' + _svgHeight );
+		_svg.setAttribute( 'viewBox', ( -_svgWidthHalf ) + ' ' + ( -_svgHeightHalf ) + ' ' + _svgWidth + ' ' + _svgHeight );
 		_svg.setAttribute( 'width', _svgWidth );
 		_svg.setAttribute( 'height', _svgHeight );
 
-		_clipBox.min.set( - _svgWidthHalf, - _svgHeightHalf );
+		_clipBox.min.set( -_svgWidthHalf, -_svgHeightHalf );
 		_clipBox.max.set( _svgWidthHalf, _svgHeightHalf );
 
 	};
@@ -158,7 +158,7 @@ THREE.SVGRenderer = function () {
 			if ( element instanceof THREE.RenderableSprite ) {
 
 				_v1 = element;
-				_v1.x *= _svgWidthHalf; _v1.y *= - _svgHeightHalf;
+				_v1.x *= _svgWidthHalf; _v1.y *= -_svgHeightHalf;
 
 				renderSprite( _v1, element, material );
 
@@ -166,8 +166,8 @@ THREE.SVGRenderer = function () {
 
 				_v1 = element.v1; _v2 = element.v2;
 
-				_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
-				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
+				_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= -_svgHeightHalf;
+				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= -_svgHeightHalf;
 
 				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
 
@@ -181,13 +181,13 @@ THREE.SVGRenderer = function () {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
 
-				if ( _v1.positionScreen.z < - 1 || _v1.positionScreen.z > 1 ) continue;
-				if ( _v2.positionScreen.z < - 1 || _v2.positionScreen.z > 1 ) continue;
-				if ( _v3.positionScreen.z < - 1 || _v3.positionScreen.z > 1 ) continue;
+				if ( _v1.positionScreen.z < -1 || _v1.positionScreen.z > 1 ) continue;
+				if ( _v2.positionScreen.z < -1 || _v2.positionScreen.z > 1 ) continue;
+				if ( _v3.positionScreen.z < -1 || _v3.positionScreen.z > 1 ) continue;
 
-				_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
-				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
-				_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= - _svgHeightHalf;
+				_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= -_svgHeightHalf;
+				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= -_svgHeightHalf;
+				_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= -_svgHeightHalf;
 
 				_elemBox.setFromPoints( [
 					_v1.positionScreen,
@@ -213,7 +213,7 @@ THREE.SVGRenderer = function () {
 				_vector3.applyProjection( _viewProjectionMatrix );
 
 				var x =   _vector3.x * _svgWidthHalf;
-				var y = - _vector3.y * _svgHeightHalf;
+				var y = -_vector3.y * _svgHeightHalf;
 
 				var node = object.node;
 				node.setAttribute( 'transform', 'translate(' + x + ',' + y + ')' );

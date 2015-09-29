@@ -246,9 +246,9 @@ THREE.AMFLoader.prototype = {
 
 				} else if ( currVolumeNode.nodeName === "triangle" ) {
 
-					var v1 = currVolumeNode.getElementsByTagName("v1")[0].textContent;
-					var v2 = currVolumeNode.getElementsByTagName("v2")[0].textContent;
-					var v3 = currVolumeNode.getElementsByTagName("v3")[0].textContent;
+					var v1 = currVolumeNode.getElementsByTagName( "v1" )[ 0 ].textContent;
+					var v2 = currVolumeNode.getElementsByTagName( "v2" )[ 0 ].textContent;
+					var v3 = currVolumeNode.getElementsByTagName( "v3" )[ 0 ].textContent;
 
 					volume.triangles.push( v1 );
 					volume.triangles.push( v2 );
@@ -280,23 +280,23 @@ THREE.AMFLoader.prototype = {
 
 						if ( vNode.nodeName === "coordinates" ) {
 
-							var x = vNode.getElementsByTagName("x")[0].textContent;
-							var y = vNode.getElementsByTagName("y")[0].textContent;
-							var z = vNode.getElementsByTagName("z")[0].textContent;
+							var x = vNode.getElementsByTagName( "x" )[ 0 ].textContent;
+							var y = vNode.getElementsByTagName( "y" )[ 0 ].textContent;
+							var z = vNode.getElementsByTagName( "z" )[ 0 ].textContent;
 
-							vertArray.push(x);
-							vertArray.push(y);
-							vertArray.push(z);
+							vertArray.push( x );
+							vertArray.push( y );
+							vertArray.push( z );
 
 						} else if ( vNode.nodeName === "normal" ) {
 
-							var nx = vNode.getElementsByTagName("nx")[0].textContent;
-							var ny = vNode.getElementsByTagName("ny")[0].textContent;
-							var nz = vNode.getElementsByTagName("nz")[0].textContent;
+							var nx = vNode.getElementsByTagName( "nx" )[ 0 ].textContent;
+							var ny = vNode.getElementsByTagName( "ny" )[ 0 ].textContent;
+							var nz = vNode.getElementsByTagName( "nz" )[ 0 ].textContent;
 
-							normalArray.push(nx);
-							normalArray.push(ny);
-							normalArray.push(nz);
+							normalArray.push( nx );
+							normalArray.push( ny );
+							normalArray.push( nz );
 
 						}
 						
@@ -474,7 +474,7 @@ THREE.AMFLoader.prototype = {
 					newGeometry.setIndex( new THREE.BufferAttribute( indexes, 1 ) );
 					newGeometry.addAttribute( 'position', vertices.clone() );
 
-					if( normals ) {
+					if ( normals ) {
 
 						newGeometry.addAttribute( 'normal', normals.clone() );
 

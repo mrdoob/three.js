@@ -88,7 +88,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var fixScale = 1 << subpixelBits;
 
 		viewportXScale =  fixScale * canvasWidth  / 2;
-		viewportYScale = - fixScale * canvasHeight / 2;
+		viewportYScale = -fixScale * canvasHeight / 2;
 		viewportZScale =             maxZVal      / 2;
 
 		viewportXOffs  =  fixScale * canvasWidth  / 2 + 0.5;
@@ -144,7 +144,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	};
 
-    // TODO: Check why autoClear can't be false.
+	// TODO: Check why autoClear can't be false.
 	this.render = function ( scene, camera ) {
 
 		if ( this.autoClear === true ) this.clear();
@@ -263,11 +263,12 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				drawLine(
 					element.v1.positionScreen,
 					element.v2.positionScreen,
-					element.vertexColors[0],
-					element.vertexColors[1],
+					element.vertexColors[ 0 ],
+					element.vertexColors[ 1 ],
 					shader,
 					material
 				);
+
 			}
 
 		}
@@ -349,6 +350,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		}
 
 		cleanColorBuffer();
+
 	}
     
 	function cleanColorBuffer() {
@@ -609,7 +611,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					'buffer[ colorOffset + 2 ] = material.color.b * (color1.b+color2.b) * 0.5 * 255;',
 					'buffer[ colorOffset + 3 ] = 255;',
 					'depthBuf[ offset ] = depth;'
-				].join('\n');
+				].join( '\n' );
 
 				shader = new Function( 'buffer, depthBuf, offset, depth, color1, color2, material', string );
 
@@ -664,7 +666,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		// TODO: Implement per-pixel z-clipping
 
-		if ( v1.z < - 1 || v1.z > 1 || v2.z < - 1 || v2.z > 1 || v3.z < - 1 || v3.z > 1 ) return;
+		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 || v3.z < -1 || v3.z > 1 ) return;
 
 		// https://gist.github.com/2486101
 		// explanation: http://pouet.net/topic.php?which=8760&page=1
@@ -846,7 +848,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var cb2 = c2;
 		var cb3 = c3;
 		var cbz = cz;
-		var qstep = - q;
+		var qstep = -q;
 		var e1x = qstep * dy12;
 		var e2x = qstep * dy23;
 		var e3x = qstep * dy31;
@@ -896,22 +898,22 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			}
 
 			// Okay, we're now in a block we know is outside. Reverse direction and go into main loop.
-			qstep = - qstep;
-			e1x = - e1x;
-			e2x = - e2x;
-			e3x = - e3x;
-			ezx = - ezx;
+			qstep = -qstep;
+			e1x = -e1x;
+			e2x = -e2x;
+			e3x = -e3x;
+			ezx = -ezx;
 
 			if ( bHasUV ) {
 
-				etux = - etux;
-				etvx = - etvx;
+				etux = -etux;
+				etvx = -etvx;
 
 			}
 
 			if ( bHasNormal ) {
 
-				enzx = - enzx;
+				enzx = -enzx;
 
 			}
 
@@ -1200,31 +1202,33 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	function drawLine( v1, v2, color1, color2, shader, material ) {
         
 		// While the line mode is enable, blockSize has to be changed to 0.
-		if ( !lineMode ) {
+		if ( ! lineMode ) {
+
 			lineMode = true;            
 			blockShift = 0;
 			blockSize = 1 << blockShift;
 
 			setSize( canvas.width, canvas.height );
+
 		}
 
 		// TODO: Implement per-pixel z-clipping
 		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 ) return;
 
-		var halfLineWidth = Math.floor( (material.linewidth-1) * 0.5 );
+		var halfLineWidth = Math.floor( ( material.linewidth -1 ) * 0.5 );
       
 		// https://gist.github.com/2486101
 		// explanation: http://pouet.net/topic.php?which=8760&page=1
 
 		// 28.4 fixed-point coordinates
-		var x1 = (v1.x * viewportXScale + viewportXOffs) | 0;
-		var x2 = (v2.x * viewportXScale + viewportXOffs) | 0;
+		var x1 = ( v1.x * viewportXScale + viewportXOffs ) | 0;
+		var x2 = ( v2.x * viewportXScale + viewportXOffs ) | 0;
 
-		var y1 = (v1.y * viewportYScale + viewportYOffs) | 0;
-		var y2 = (v2.y * viewportYScale + viewportYOffs) | 0;
+		var y1 = ( v1.y * viewportYScale + viewportYOffs ) | 0;
+		var y2 = ( v2.y * viewportYScale + viewportYOffs ) | 0;
 
-		var z1 = (v1.z * viewportZScale + viewportZOffs) | 0;
-		var z2 = (v2.z * viewportZScale + viewportZOffs) | 0;
+		var z1 = ( v1.z * viewportZScale + viewportZOffs ) | 0;
+		var z2 = ( v2.z * viewportZScale + viewportZOffs ) | 0;
 
 		// Deltas
 		var dx12 = x1 - x2, dy12 = y1 - y2, dz12 = z1 - z2;
@@ -1243,34 +1247,34 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		recty2 = Math.max( maxy, recty2 );
 
 		// Get the line's unit vector and cross vector
-		var length = Math.sqrt((dy12 * dy12) + (dx12 * dx12));
-		var unitX = (dx12 / length);
-		var unitY = (dy12 / length);
-		var unitZ = (dz12 / length);        
+		var length = Math.sqrt( ( dy12 * dy12 ) + ( dx12 * dx12 ) );
+		var unitX = ( dx12 / length );
+		var unitY = ( dy12 / length );
+		var unitZ = ( dz12 / length );        
 		var pixelX, pixelY, pixelZ;
 		var pX, pY, pZ;
 		crossVector.set( unitX, unitY, unitZ );
 		crossVector.cross( lookVector );
 		crossVector.normalize();
             
-		while (length > 0) {
+		while ( length > 0 ) {
 
 			// Get this pixel.
-			pixelX = (x2 + length * unitX);
-			pixelY = (y2 + length * unitY);
-			pixelZ = (z2 + length * unitZ);               
+			pixelX = ( x2 + length * unitX );
+			pixelY = ( y2 + length * unitY );
+			pixelZ = ( z2 + length * unitZ );               
 
-			pixelX = (pixelX + subpixelBias) >> subpixelBits;
-			pixelY = (pixelY + subpixelBias) >> subpixelBits;
-			pZ = (pixelZ + subpixelBias) >> subpixelBits;
+			pixelX = ( pixelX + subpixelBias ) >> subpixelBits;
+			pixelY = ( pixelY + subpixelBias ) >> subpixelBits;
+			pZ = ( pixelZ + subpixelBias ) >> subpixelBits;
 
 			// Draw line with line width
-			for ( var i = -halfLineWidth; i <= halfLineWidth; ++i ) {
+			for ( var i = -halfLineWidth; i <= halfLineWidth; ++ i ) {
 
 				// Compute the line pixels.
 				// Get the pixels on the vector that crosses to the line vector
-				pX = Math.floor((pixelX + crossVector.x * i));
-				pY = Math.floor((pixelY + crossVector.y * i));                    
+				pX = Math.floor( ( pixelX + crossVector.x * i ) );
+				pY = Math.floor( ( pixelY + crossVector.y * i ) );                    
 
 				// if pixel is over the rect. Continue
 				if ( rectx1 >= pX || rectx2 <= pX || recty1 >= pY 
@@ -1289,17 +1293,21 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 				var bflags = blockFlags[ blockId ];
 				if ( bflags & BLOCK_NEEDCLEAR ) clearBlock( blockX, blockY );
-				blockFlags[ blockId ] = bflags & ~( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );                   
+				blockFlags[ blockId ] = bflags & ~ ( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );                   
 		        
 				// draw pixel
 				var offset = pX + pY * canvasWidth;
 
 				if ( pZ < zbuffer[ offset ] ) {		 
+
 					shader( data, zbuffer, offset, pZ, color1, color2, material );								
+
 				}
+
 			}
 
-			--length;
+			-- length;
+
 		}           
 
 	}

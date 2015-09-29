@@ -32,7 +32,7 @@
 
 		// How far you can orbit horizontally, upper and lower limits.
 		// If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
-		this.minAzimuthAngle = - Infinity; // radians
+		this.minAzimuthAngle = -Infinity; // radians
 		this.maxAzimuthAngle = Infinity; // radians
 
 		// Set to true to enable damping (inertia)
@@ -95,7 +95,7 @@
 
 				// get X column of matrix
 				v.set( te[ 0 ], te[ 1 ], te[ 2 ] );
-				v.multiplyScalar( - distance );
+				v.multiplyScalar( -distance );
 
 				panOffset.add( v );
 
@@ -383,7 +383,7 @@
 		var dollyEnd = new THREE.Vector2();
 		var dollyDelta = new THREE.Vector2();
 
-		var STATE = { NONE : - 1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
+		var STATE = { NONE : -1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
 
 		var state = STATE.NONE;
 
@@ -583,7 +583,7 @@
 
 				// Firefox
 
-				delta = - event.detail;
+				delta = -event.detail;
 
 			}
 
@@ -615,7 +615,7 @@
 					break;
 
 				case scope.keys.BOTTOM:
-					pan( 0, - scope.keyPanSpeed );
+					pan( 0, -scope.keyPanSpeed );
 					scope.update();
 					break;
 
@@ -625,7 +625,7 @@
 					break;
 
 				case scope.keys.RIGHT:
-					pan( - scope.keyPanSpeed, 0 );
+					pan( -scope.keyPanSpeed, 0 );
 					scope.update();
 					break;
 

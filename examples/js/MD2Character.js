@@ -46,7 +46,7 @@ THREE.MD2Character = function () {
 		loader.load( config.baseUrl + config.body, function( geo ) {
 
 			geo.computeBoundingBox();
-			scope.root.position.y = - scope.scale * geo.boundingBox.min.y;
+			scope.root.position.y = -scope.scale * geo.boundingBox.min.y;
 
 			var mesh = createPart( geo, scope.skinsBody[ 0 ] );
 			mesh.scale.set( scope.scale, scope.scale, scope.scale );
@@ -56,7 +56,7 @@ THREE.MD2Character = function () {
 			scope.meshBody = mesh;
 
 			scope.meshBody.clipOffset = 0;
-			scope.activeAnimationClipName = mesh.geometry.animations[0].name;
+			scope.activeAnimationClipName = mesh.geometry.animations[ 0 ].name;
 
 			scope.mixer = new THREE.AnimationMixer( mesh );
 
@@ -97,11 +97,14 @@ THREE.MD2Character = function () {
 
 	this.setPlaybackRate = function ( rate ) {
 
-		if( rate !== 0 ) {
+		if ( rate !== 0 ) {
+
 			this.mixer.timeScale = 1 / rate;
-		}
-		else {
+
+		} else {
+
 			this.mixer.timeScale = 0;
+
 		}
 
 	};
@@ -153,13 +156,15 @@ THREE.MD2Character = function () {
 
 		if ( this.meshBody ) {
 
-			if( this.meshBody.activeAction ) {
+			if ( this.meshBody.activeAction ) {
+
 				scope.mixer.removeAction( this.meshBody.activeAction );
 				this.meshBody.activeAction = null;
+
 			}
 
 			var clip = THREE.AnimationClip.findByName( this.meshBody.geometry.animations, clipName );
-			if( clip ) {
+			if ( clip ) {
 
 				var action = new THREE.AnimationAction( clip, this.mixer.time ).setLocalRoot( this.meshBody );
 				scope.mixer.addAction( action );
@@ -182,13 +187,15 @@ THREE.MD2Character = function () {
 
 		if ( scope.meshWeapon ) {
 
-			if( this.meshWeapon.activeAction ) {
+			if ( this.meshWeapon.activeAction ) {
+
 				scope.mixer.removeAction( this.meshWeapon.activeAction );
 				this.meshWeapon.activeAction = null;
+
 			}
 
 			var clip = THREE.AnimationClip.findByName( this.meshWeapon.geometry.animations, clipName );
-			if( clip ) {
+			if ( clip ) {
 
 				var action = new THREE.AnimationAction( clip ).syncWith( this.meshBody.activeAction ).setLocalRoot( this.meshWeapon );
 				scope.mixer.addAction( action );
@@ -203,7 +210,7 @@ THREE.MD2Character = function () {
 
 	this.update = function ( delta ) {
 
-		if( this.mixer ) this.mixer.update( delta );
+		if ( this.mixer ) this.mixer.update( delta );
 
 	};
 
@@ -231,7 +238,7 @@ THREE.MD2Character = function () {
 		//
 
 		var mesh = new THREE.Mesh( geometry, materialTexture );
-		mesh.rotation.y = - Math.PI / 2;
+		mesh.rotation.y = -Math.PI / 2;
 
 		mesh.castShadow = true;
 		mesh.receiveShadow = true;

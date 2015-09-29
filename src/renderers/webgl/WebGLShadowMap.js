@@ -10,9 +10,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 
-	_min = new THREE.Vector3(),
-	_max = new THREE.Vector3(),
-
 	_lookTarget = new THREE.Vector3(),
 	_lightPositionWorld = new THREE.Vector3(),
 
@@ -27,13 +24,13 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_distanceMaterials = new Array( _NumberOfMaterialVariants );
 
 	var cubeDirections = [
-		new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( - 1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ),
-		new THREE.Vector3( 0, 0, - 1 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, - 1, 0 )
+		new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( -1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ),
+		new THREE.Vector3( 0, 0, -1 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, -1, 0 )
 	];
 
 	var cubeUps = [
 		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ),
-		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ),	new THREE.Vector3( 0, 0, - 1 )
+		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ),	new THREE.Vector3( 0, 0, -1 )
 	];
 
 	var cube2DViewPorts = [

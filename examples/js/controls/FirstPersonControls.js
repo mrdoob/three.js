@@ -52,7 +52,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	if ( this.domElement !== document ) {
 
-		this.domElement.setAttribute( 'tabindex', - 1 );
+		this.domElement.setAttribute( 'tabindex', -1 );
 
 	}
 
@@ -203,14 +203,14 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		var actualMoveSpeed = delta * this.movementSpeed;
 
-		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) this.object.translateZ( -( actualMoveSpeed + this.autoSpeedFactor ) );
 		if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );
 
-		if ( this.moveLeft ) this.object.translateX( - actualMoveSpeed );
+		if ( this.moveLeft ) this.object.translateX( -actualMoveSpeed );
 		if ( this.moveRight ) this.object.translateX( actualMoveSpeed );
 
 		if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
-		if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
+		if ( this.moveDown ) this.object.translateY( -actualMoveSpeed );
 
 		var actualLookSpeed = delta * this.lookSpeed;
 
@@ -231,7 +231,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		this.lon += this.mouseX * actualLookSpeed;
 		if ( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
 
-		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
+		this.lat = Math.max( -85, Math.min( 85, this.lat ) );
 		this.phi = THREE.Math.degToRad( 90 - this.lat );
 
 		this.theta = THREE.Math.degToRad( this.lon );

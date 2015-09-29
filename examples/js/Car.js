@@ -27,7 +27,7 @@ THREE.Car = function () {
 	// car "feel" parameters
 
 	this.MAX_SPEED = 2200;
-	this.MAX_REVERSE_SPEED = - 1500;
+	this.MAX_REVERSE_SPEED = -1500;
 
 	this.MAX_WHEEL_ROTATION = 0.6;
 
@@ -144,7 +144,7 @@ THREE.Car = function () {
 		if ( controls.moveForward ) {
 
 			this.speed = THREE.Math.clamp( this.speed + delta * this.FRONT_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
-			this.acceleration = THREE.Math.clamp( this.acceleration + delta, - 1, 1 );
+			this.acceleration = THREE.Math.clamp( this.acceleration + delta, -1, 1 );
 
 		}
 
@@ -152,19 +152,19 @@ THREE.Car = function () {
 
 
 			this.speed = THREE.Math.clamp( this.speed - delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
-			this.acceleration = THREE.Math.clamp( this.acceleration - delta, - 1, 1 );
+			this.acceleration = THREE.Math.clamp( this.acceleration - delta, -1, 1 );
 
 		}
 
 		if ( controls.moveLeft ) {
 
-			this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_ACCELERATION, - this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
+			this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_ACCELERATION, -this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
 
 		}
 
 		if ( controls.moveRight ) {
 
-			this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation - delta * this.WHEEL_ANGULAR_ACCELERATION, - this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
+			this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation - delta * this.WHEEL_ANGULAR_ACCELERATION, -this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
 
 		}
 
@@ -184,7 +184,7 @@ THREE.Car = function () {
 				var k = exponentialEaseOut( this.speed / this.MAX_REVERSE_SPEED );
 
 				this.speed = THREE.Math.clamp( this.speed + k * delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, 0 );
-				this.acceleration = THREE.Math.clamp( this.acceleration + k * delta, - 1, 0 );
+				this.acceleration = THREE.Math.clamp( this.acceleration + k * delta, -1, 0 );
 
 			}
 
@@ -201,7 +201,7 @@ THREE.Car = function () {
 
 			} else {
 
-				this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_DECCELERATION, - this.MAX_WHEEL_ROTATION, 0 );
+				this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_DECCELERATION, -this.MAX_WHEEL_ROTATION, 0 );
 
 			}
 
@@ -227,7 +227,7 @@ THREE.Car = function () {
 		if ( this.loaded ) {
 
 			this.bodyMesh.rotation.z = this.MAX_TILT_SIDES * this.wheelOrientation * ( this.speed / this.MAX_SPEED );
-			this.bodyMesh.rotation.x = - this.MAX_TILT_FRONTBACK * this.acceleration;
+			this.bodyMesh.rotation.x = -this.MAX_TILT_FRONTBACK * this.acceleration;
 
 		}
 
@@ -323,7 +323,7 @@ THREE.Car = function () {
 
 			// front right wheel
 
-			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( - s, s, s ) );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( -s, s, s ) );
 
 			scope.frontRightWheelRoot.position.add( delta );
 
@@ -337,7 +337,7 @@ THREE.Car = function () {
 
 			// back left wheel
 
-			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( s, s, - s ) );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( s, s, -s ) );
 			delta.z -= scope.backWheelOffset;
 
 			scope.backLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
@@ -349,7 +349,7 @@ THREE.Car = function () {
 
 			// back right wheel
 
-			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( - s, s, - s ) );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( -s, s, -s ) );
 			delta.z -= scope.backWheelOffset;
 
 			scope.backRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
@@ -380,7 +380,7 @@ THREE.Car = function () {
 
 	function quadraticEaseOut( k ) {
 
-		return - k * ( k - 2 );
+		return -k * ( k - 2 );
 
 	}
 	function cubicEaseOut( k ) {
@@ -400,7 +400,7 @@ THREE.Car = function () {
 	}
 	function exponentialEaseOut( k ) {
 
-		return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1;
+		return k === 1 ? 1 : -Math.pow( 2, -10 * k ) + 1;
 
 	}
 

@@ -362,9 +362,9 @@ THREE.Geometry.prototype = {
 
 		var matrix = new THREE.Matrix4();
 		matrix.set(
-			s, 0, 0, - s * center.x,
-			0, s, 0, - s * center.y,
-			0, 0, s, - s * center.z,
+			s, 0, 0, -s * center.x,
+			0, s, 0, -s * center.y,
+			0, 0, s, -s * center.z,
 			0, 0, 0, 1
 		);
 
@@ -823,7 +823,7 @@ THREE.Geometry.prototype = {
 
 			indices = [ face.a, face.b, face.c ];
 
-			var dupIndex = - 1;
+			var dupIndex = -1;
 
 			// if any duplicate vertices are found in a Face3
 			// we have to remove the face as nothing can be saved

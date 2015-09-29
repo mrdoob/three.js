@@ -95,7 +95,7 @@ THREE.BabylonLoader.prototype = {
 
 		for ( var j = 2, jl = positions.length; j < jl; j += 3 ) {
 
-			positions[ j ] = - positions[ j ];
+			positions[ j ] = -positions[ j ];
 
 		}
 
@@ -109,7 +109,7 @@ THREE.BabylonLoader.prototype = {
 
 			for ( var j = 2, jl = normals.length; j < jl; j += 3 ) {
 
-				normals[ j ] = - normals[ j ];
+				normals[ j ] = -normals[ j ];
 
 			}
 
@@ -196,7 +196,7 @@ THREE.BabylonLoader.prototype = {
 			}
 
 			light.name = data.name;
-			if ( data.position ) light.position.set( data.position[ 0 ], data.position[ 1 ], - data.position[ 2 ] );
+			if ( data.position ) light.position.set( data.position[ 0 ], data.position[ 1 ], -data.position[ 2 ] );
 			light.color.fromArray( data.diffuse );
 			if ( data.groundColor ) light.groundColor.fromArray( data.groundColor );
 			if ( data.intensity ) light.intensity = data.intensity;
@@ -228,7 +228,7 @@ THREE.BabylonLoader.prototype = {
 			}
 
 			object.name = data.name;
-			object.position.set( data.position[ 0 ], data.position[ 1 ], - data.position[ 2 ] );
+			object.position.set( data.position[ 0 ], data.position[ 1 ], -data.position[ 2 ] );
 			object.rotation.fromArray( data.rotation );
 			if ( data.rotationQuaternion ) object.quaternion.fromArray( data.rotationQuaternion );
 			object.scale.fromArray( data.scaling );

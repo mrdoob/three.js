@@ -7,7 +7,7 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.object = object;
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
-	if ( domElement ) this.domElement.setAttribute( 'tabindex', - 1 );
+	if ( domElement ) this.domElement.setAttribute( 'tabindex', -1 );
 
 	// API
 
@@ -147,7 +147,7 @@ THREE.FlyControls = function ( object, domElement ) {
 			var halfWidth  = container.size[ 0 ] / 2;
 			var halfHeight = container.size[ 1 ] / 2;
 
-			this.moveState.yawLeft   = - ( ( event.pageX - container.offset[ 0 ] ) - halfWidth  ) / halfWidth;
+			this.moveState.yawLeft   = -( ( event.pageX - container.offset[ 0 ] ) - halfWidth  ) / halfWidth;
 			this.moveState.pitchDown =   ( ( event.pageY - container.offset[ 1 ] ) - halfHeight ) / halfHeight;
 
 			this.updateRotationVector();
@@ -206,9 +206,9 @@ THREE.FlyControls = function ( object, domElement ) {
 
 		var forward = ( this.moveState.forward || ( this.autoForward && ! this.moveState.back ) ) ? 1 : 0;
 
-		this.moveVector.x = ( - this.moveState.left    + this.moveState.right );
-		this.moveVector.y = ( - this.moveState.down    + this.moveState.up );
-		this.moveVector.z = ( - forward + this.moveState.back );
+		this.moveVector.x = ( -this.moveState.left    + this.moveState.right );
+		this.moveVector.y = ( -this.moveState.down    + this.moveState.up );
+		this.moveVector.z = ( -forward + this.moveState.back );
 
 		//console.log( 'move:', [ this.moveVector.x, this.moveVector.y, this.moveVector.z ] );
 
@@ -216,9 +216,9 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.updateRotationVector = function() {
 
-		this.rotationVector.x = ( - this.moveState.pitchDown + this.moveState.pitchUp );
-		this.rotationVector.y = ( - this.moveState.yawRight  + this.moveState.yawLeft );
-		this.rotationVector.z = ( - this.moveState.rollRight + this.moveState.rollLeft );
+		this.rotationVector.x = ( -this.moveState.pitchDown + this.moveState.pitchUp );
+		this.rotationVector.y = ( -this.moveState.yawRight  + this.moveState.yawLeft );
+		this.rotationVector.z = ( -this.moveState.rollRight + this.moveState.rollLeft );
 
 		//console.log( 'rotate:', [ this.rotationVector.x, this.rotationVector.y, this.rotationVector.z ] );
 

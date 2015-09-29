@@ -20,7 +20,7 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 	var
 		/* return codes for rgbe routines */
 		RGBE_RETURN_SUCCESS =  0,
-		RGBE_RETURN_FAILURE = - 1,
+		RGBE_RETURN_FAILURE = -1,
 
 		/* default error routine.  change this to change error handling */
 		rgbe_read_error     = 1,
@@ -62,7 +62,7 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 
 			lineLimit = ! lineLimit ? 1024 : lineLimit;
 			var p = buffer.pos,
-				i = - 1, len = 0, s = '', chunkSize = 128,
+				i = -1, len = 0, s = '', chunkSize = 128,
 				chunk = String.fromCharCode.apply( null, new Uint16Array( buffer.subarray( p, p + chunkSize ) ) )
 			;
 			while ( ( 0 > ( i = chunk.indexOf( NEWLINE ) ) ) && ( len < lineLimit ) && ( p < buffer.byteLength ) ) {
@@ -73,7 +73,7 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 
 			}
 
-			if ( - 1 < i ) {
+			if ( -1 < i ) {
 
 				/*for (i=l-1; i>=0; i--) {
 					byteCode = m.charCodeAt(i);

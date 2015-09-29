@@ -373,7 +373,7 @@ THREE.Object3D.prototype = {
 
 		var index = this.children.indexOf( object );
 
-		if ( index !== - 1 ) {
+		if ( index !== -1 ) {
 
 			object.parent = null;
 

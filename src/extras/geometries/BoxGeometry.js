@@ -28,12 +28,12 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 	var height_half = height / 2;
 	var depth_half = depth / 2;
 
-	buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, 0 ); // px
-	buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, 1 ); // nx
+	buildPlane( 'z', 'y', -1, -1, depth, height, width_half, 0 ); // px
+	buildPlane( 'z', 'y',   1, -1, depth, height, -width_half, 1 ); // nx
 	buildPlane( 'x', 'z',   1,   1, width, depth, height_half, 2 ); // py
-	buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, 3 ); // ny
-	buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, 4 ); // pz
-	buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, 5 ); // nz
+	buildPlane( 'x', 'z',   1, -1, width, depth, -height_half, 3 ); // ny
+	buildPlane( 'x', 'y',   1, -1, width, height, depth_half, 4 ); // pz
+	buildPlane( 'x', 'y', -1, -1, width, height, -depth_half, 5 ); // nz
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, materialIndex ) {
 
@@ -66,7 +66,7 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 		segment_height = height / gridY,
 		normal = new THREE.Vector3();
 
-		normal[ w ] = depth > 0 ? 1 : - 1;
+		normal[ w ] = depth > 0 ? 1 : -1;
 
 		for ( iy = 0; iy < gridY1; iy ++ ) {
 

@@ -24,7 +24,7 @@ var clothFunction = plane( restDistance * xSegs, restDistance * ySegs );
 var cloth = new Cloth( xSegs, ySegs );
 
 var GRAVITY = 981 * 1.4; // 
-var gravity = new THREE.Vector3( 0, - GRAVITY, 0 ).multiplyScalar( MASS );
+var gravity = new THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar( MASS );
 
 
 var TIMESTEP = 18 / 1000;
@@ -37,7 +37,7 @@ var wind = true;
 var windStrength = 2;
 var windForce = new THREE.Vector3( 0, 0, 0 );
 
-var ballPosition = new THREE.Vector3( 0, - 45, 0 );
+var ballPosition = new THREE.Vector3( 0, -45, 0 );
 var ballSize = 60; //40
 
 var tmpForce = new THREE.Vector3();
@@ -277,7 +277,7 @@ function simulate( time ) {
 	// Ball Constrains
 
 
-	ballPosition.z = - Math.sin( Date.now() / 600 ) * 90 ; //+ 40;
+	ballPosition.z = -Math.sin( Date.now() / 600 ) * 90 ; //+ 40;
 	ballPosition.x = Math.cos( Date.now() / 400 ) * 70;
 
 	if ( sphere.visible )
@@ -303,9 +303,9 @@ function simulate( time ) {
 
 		particle = particles[ i ];
 		pos = particle.position;
-		if ( pos.y < - 250 ) {
+		if ( pos.y < -250 ) {
 
-			pos.y = - 250;
+			pos.y = -250;
 
 		}
 

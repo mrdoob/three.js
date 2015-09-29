@@ -18,16 +18,16 @@ THREE.ParametricGeometries = {
 		if ( u < Math.PI ) {
 
 			x = 3 * Math.cos( u ) * ( 1 + Math.sin( u ) ) + ( 2 * ( 1 - Math.cos( u ) / 2 ) ) * Math.cos( u ) * Math.cos( v );
-			z = - 8 * Math.sin( u ) - 2 * ( 1 - Math.cos( u ) / 2 ) * Math.sin( u ) * Math.cos( v );
+			z = -8 * Math.sin( u ) - 2 * ( 1 - Math.cos( u ) / 2 ) * Math.sin( u ) * Math.cos( v );
 
 		} else {
 
 			x = 3 * Math.cos( u ) * ( 1 + Math.sin( u ) ) + ( 2 * ( 1 - Math.cos( u ) / 2 ) ) * Math.cos( v + Math.PI );
-			z = - 8 * Math.sin( u );
+			z = -8 * Math.sin( u );
 
 		}
 
-		y = - 2 * ( 1 - Math.cos( u ) / 2 ) * Math.sin( v );
+		y = -2 * ( 1 - Math.cos( u ) / 2 ) * Math.sin( v );
 
 		return new THREE.Vector3( x, y, z );
 
@@ -145,7 +145,7 @@ THREE.ParametricGeometries.TubeGeometry = function( path, segments, radius, segm
 
 		}
 
-		cx = - scope.radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
+		cx = -scope.radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 		cy = scope.radius * Math.sin( v );
 
 		pos2.copy( pos );

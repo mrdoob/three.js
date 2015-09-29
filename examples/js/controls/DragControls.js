@@ -37,7 +37,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 		var l = _listeners[ event ];
 		if ( ! l ) return me;
 
-		if ( l.indexOf( handler ) > - 1 ) {
+		if ( l.indexOf( handler ) > -1 ) {
 			
 			l.splice( handler, 1 );
 		
@@ -109,7 +109,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 		event.preventDefault();
 
 		_mouse.x = ( event.clientX / _domElement.width ) * 2 - 1;
-		_mouse.y = - ( event.clientY / _domElement.height ) * 2 + 1;
+		_mouse.y = -( event.clientY / _domElement.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
 		var ray = _raycaster.ray;
@@ -195,7 +195,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 		event.preventDefault();
 
 		_mouse.x = ( event.clientX / _domElement.width ) * 2 - 1;
-		_mouse.y = - ( event.clientY / _domElement.height ) * 2 + 1;
+		_mouse.y = -( event.clientY / _domElement.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
 		var intersects = _raycaster.intersectObjects( _objects );

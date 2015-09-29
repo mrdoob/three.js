@@ -29,7 +29,7 @@ THREE.EventDispatcher.prototype = {
 
 		}
 
-		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
+		if ( listeners[ type ].indexOf( listener ) === -1 ) {
 
 			listeners[ type ].push( listener );
 
@@ -43,7 +43,7 @@ THREE.EventDispatcher.prototype = {
 
 		var listeners = this._listeners;
 
-		if ( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1 ) {
+		if ( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== -1 ) {
 
 			return true;
 
@@ -64,7 +64,7 @@ THREE.EventDispatcher.prototype = {
 
 			var index = listenerArray.indexOf( listener );
 
-			if ( index !== - 1 ) {
+			if ( index !== -1 ) {
 
 				listenerArray.splice( index, 1 );
 

@@ -343,7 +343,7 @@ THREE.Color.prototype = {
 
 	getHexString: function () {
 
-		return ( '000000' + this.getHex().toString( 16 ) ).slice( - 6 );
+		return ( '000000' + this.getHex().toString( 16 ) ).slice( -6 );
 
 	},
 

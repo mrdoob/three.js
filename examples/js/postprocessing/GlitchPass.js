@@ -28,7 +28,7 @@ THREE.GlitchPass = function ( dt_size ) {
 	this.needsSwap = true;
 
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
@@ -51,9 +51,9 @@ THREE.GlitchPass.prototype = {
 		if ( this.curF % this.randX == 0 || this.goWild == true ) {
 
 			this.uniforms[ 'amount' ].value = Math.random() / 30;
-			this.uniforms[ 'angle' ].value = THREE.Math.randFloat( - Math.PI, Math.PI );
-			this.uniforms[ 'seed_x' ].value = THREE.Math.randFloat( - 1, 1 );
-			this.uniforms[ 'seed_y' ].value = THREE.Math.randFloat( - 1, 1 );
+			this.uniforms[ 'angle' ].value = THREE.Math.randFloat( -Math.PI, Math.PI );
+			this.uniforms[ 'seed_x' ].value = THREE.Math.randFloat( -1, 1 );
+			this.uniforms[ 'seed_y' ].value = THREE.Math.randFloat( -1, 1 );
 			this.uniforms[ 'distortion_x' ].value = THREE.Math.randFloat( 0, 1 );
 			this.uniforms[ 'distortion_y' ].value = THREE.Math.randFloat( 0, 1 );
 			this.curF = 0;
@@ -62,11 +62,11 @@ THREE.GlitchPass.prototype = {
 		} else if ( this.curF % this.randX < this.randX / 5 ) {
 
 			this.uniforms[ 'amount' ].value = Math.random() / 90;
-			this.uniforms[ 'angle' ].value = THREE.Math.randFloat( - Math.PI, Math.PI );
+			this.uniforms[ 'angle' ].value = THREE.Math.randFloat( -Math.PI, Math.PI );
 			this.uniforms[ 'distortion_x' ].value = THREE.Math.randFloat( 0, 1 );
 			this.uniforms[ 'distortion_y' ].value = THREE.Math.randFloat( 0, 1 );
-			this.uniforms[ 'seed_x' ].value = THREE.Math.randFloat( - 0.3, 0.3 );
-			this.uniforms[ 'seed_y' ].value = THREE.Math.randFloat( - 0.3, 0.3 );
+			this.uniforms[ 'seed_x' ].value = THREE.Math.randFloat( -0.3, 0.3 );
+			this.uniforms[ 'seed_y' ].value = THREE.Math.randFloat( -0.3, 0.3 );
 
 		} else if ( this.goWild == false ) {
 

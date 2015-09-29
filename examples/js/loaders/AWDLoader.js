@@ -749,7 +749,7 @@
 
 						while ( this._ptr < str_end ) {
 
-							buffer[ idx ]   = - this.readF32();
+							buffer[ idx ]   = -this.readF32();
 							buffer[ idx + 1 ] = this.readF32();
 							buffer[ idx + 2 ] = this.readF32();
 							idx += 3;
@@ -809,7 +809,7 @@
 
 						while ( this._ptr < str_end ) {
 
-							buffer[ idx ]   = - this.readF32();
+							buffer[ idx ]   = -this.readF32();
 							buffer[ idx + 1 ] = this.readF32();
 							buffer[ idx + 2 ] = this.readF32();
 							idx += 3;
@@ -1007,7 +1007,7 @@
 			//e[11] = this.readF32();
 			e[ 11 ] = 0.0;
 
-			e[ 12 ] = - this.readF32();
+			e[ 12 ] = -this.readF32();
 			e[ 13 ] = this.readF32();
 			e[ 14 ] = this.readF32();
 			//e[15] = this.readF32();
