@@ -64,7 +64,31 @@ if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === u
 
 		}
 
-	}() );
+	} )();
+
+}
+
+//
+
+if ( self.performance === undefined ) {
+
+	self.performance = {};
+
+}
+
+if ( self.performance.now === undefined ) {
+
+	( function () {
+
+		var start = Date.now();
+
+		self.performance.now = function () {
+
+			return Date.now() - start;
+
+		}
+
+	} )();
 
 }
 
@@ -7469,17 +7493,9 @@ THREE.Clock.prototype = {
 
 	constructor: THREE.Clock,
 
-	_now: function () {
-
-		return self.performance !== undefined && self.performance.now !== undefined
-			? self.performance.now()
-			: Date.now();
-
-	},
-
 	start: function () {
 
-		this.startTime = this._now();
+		this.startTime = self.performance.now();
 
 		this.oldTime = this.startTime;
 		this.running = true;
@@ -7512,7 +7528,7 @@ THREE.Clock.prototype = {
 
 		if ( this.running ) {
 
-			var newTime = this._now();
+			var newTime = self.performance.now();
 
 			diff = 0.001 * ( newTime - this.oldTime );
 			this.oldTime = newTime;
@@ -8408,6 +8424,22 @@ THREE.Object3D.prototype = {
 		if ( this.visible !== true ) data.visible = this.visible;
 
 		data.matrix = this.matrix.toArray();
+
+		//
+
+		if ( this.geometry && meta.geometries[ this.geometry.uuid ] === undefined ) {
+
+			meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON( meta );
+
+		}
+
+		if ( this.material && meta.materials[ this.material.uuid ] === undefined ) {
+
+			meta.materials[ this.material.uuid ] = this.material.toJSON( meta );
+
+		}
+
+		//
 
 		if ( this.children.length > 0 ) {
 
@@ -16374,7 +16406,7 @@ THREE.ObjectLoader.prototype = {
 
 			var object;
 
-			var getGeometry = function ( name ) {
+			function getGeometry( name ) {
 
 				if ( geometries[ name ] === undefined ) {
 
@@ -16384,9 +16416,11 @@ THREE.ObjectLoader.prototype = {
 
 				return geometries[ name ];
 
-			};
+			}
 
-			var getMaterial = function ( name ) {
+			function getMaterial( name ) {
+
+				if ( name === undefined ) return undefined;
 
 				if ( materials[ name ] === undefined ) {
 
@@ -16396,7 +16430,7 @@ THREE.ObjectLoader.prototype = {
 
 				return materials[ name ];
 
-			};
+			}
 
 			switch ( data.type ) {
 
@@ -18671,20 +18705,6 @@ THREE.Points.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
-	// only serialize if not in meta geometries cache
-	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
-
-		meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON();
-
-	}
-
-	// only serialize if not in meta materials cache
-	if ( meta.materials[ this.material.uuid ] === undefined ) {
-
-		meta.materials[ this.material.uuid ] = this.material.toJSON();
-
-	}
-
 	data.object.geometry = this.geometry.uuid;
 	data.object.material = this.material.uuid;
 
@@ -18896,20 +18916,6 @@ THREE.Line.prototype.clone = function () {
 THREE.Line.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	// only serialize if not in meta geometries cache
-	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
-
-		meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON();
-
-	}
-
-	// only serialize if not in meta materials cache
-	if ( meta.materials[ this.material.uuid ] === undefined ) {
-
-		meta.materials[ this.material.uuid ] = this.material.toJSON();
-
-	}
 
 	data.object.geometry = this.geometry.uuid;
 	data.object.material = this.material.uuid;
@@ -19302,20 +19308,6 @@ THREE.Mesh.prototype.clone = function () {
 THREE.Mesh.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	// only serialize if not in meta geometries cache
-	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
-
-		meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON( meta );
-
-	}
-
-	// only serialize if not in meta materials cache
-	if ( meta.materials[ this.material.uuid ] === undefined ) {
-
-		meta.materials[ this.material.uuid ] = this.material.toJSON( meta );
-
-	}
 
 	data.object.geometry = this.geometry.uuid;
 	data.object.material = this.material.uuid;
@@ -19939,13 +19931,6 @@ THREE.Sprite.prototype.clone = function () {
 THREE.Sprite.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	// only serialize if not in meta materials cache
-	if ( meta.materials[ this.material.uuid ] === undefined ) {
-
-		meta.materials[ this.material.uuid ] = this.material.toJSON();
-
-	}
 
 	data.object.material = this.material.uuid;
 
