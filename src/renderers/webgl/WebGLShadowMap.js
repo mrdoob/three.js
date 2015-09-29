@@ -122,14 +122,14 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		_state.setDepthTest( true );
 
+		// save the existing viewport so it can be restored later
+		_renderer.getViewport( _vector4 );
+
 		// render depth map
 
 		for ( var i = 0, il = _lights.length; i < il; i ++ ) {
 
 			var light = _lights[ i ];
-
-			// save the existing viewport so it can be restored later
-			_renderer.getViewport( _vector4 );
 
 			if ( light instanceof THREE.PointLight ) {
 
