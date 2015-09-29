@@ -8390,8 +8390,7 @@ THREE.Object3D.prototype = {
 
 		var isRootObject = ( meta === undefined );
 
-		var data = {};
-		var output = { object: data };
+		var output = {};
 
 		// meta is a hash used to collect geometries, materials.
 		// not providing it implies that this is the root object
@@ -8416,26 +8415,40 @@ THREE.Object3D.prototype = {
 
 		// standard Object3D serialization
 
-		data.uuid = this.uuid;
-		data.type = this.type;
+		var object = {};
 
-		if ( this.name !== '' ) data.name = this.name;
-		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
-		if ( this.visible !== true ) data.visible = this.visible;
+		object.uuid = this.uuid;
+		object.type = this.type;
 
-		data.matrix = this.matrix.toArray();
+		if ( this.name !== '' ) object.name = this.name;
+		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
+		if ( this.visible !== true ) object.visible = this.visible;
+
+		object.matrix = this.matrix.toArray();
 
 		//
 
-		if ( this.geometry && meta.geometries[ this.geometry.uuid ] === undefined ) {
+		if ( this.geometry !== undefined ) {
 
-			meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON( meta );
+			if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
+
+				meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON( meta );
+
+			}
+
+			object.geometry = this.geometry.uuid;
 
 		}
 
-		if ( this.material && meta.materials[ this.material.uuid ] === undefined ) {
+		if ( this.material !== undefined ) {
 
-			meta.materials[ this.material.uuid ] = this.material.toJSON( meta );
+			if ( meta.materials[ this.material.uuid ] === undefined ) {
+
+				meta.materials[ this.material.uuid ] = this.material.toJSON( meta );
+
+			}
+
+			object.material = this.material.uuid;
 
 		}
 
@@ -8443,11 +8456,11 @@ THREE.Object3D.prototype = {
 
 		if ( this.children.length > 0 ) {
 
-			data.children = [];
+			object.children = [];
 
 			for ( var i = 0; i < this.children.length; i ++ ) {
 
-				data.children.push( this.children[ i ].toJSON( meta ).object );
+				object.children.push( this.children[ i ].toJSON( meta ).object );
 
 			}
 
@@ -8466,6 +8479,8 @@ THREE.Object3D.prototype = {
 			if ( images.length > 0 ) output.images = images;
 
 		}
+
+		output.object = object;
 
 		return output;
 
@@ -14105,14 +14120,32 @@ THREE.Light.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Light.prototype.constructor = THREE.Light;
 
 THREE.Light.prototype.copy = function ( source ) {
-	
+
 	THREE.Object3D.prototype.copy.call( this, source );
-	
+
 	this.color.copy( source.color );
-	
+
 	return this;
 
 };
+
+THREE.Light.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+	data.object.color = this.color.getHex();
+	if ( this.groundColor !== undefined ) data.object.groundColor = this.groundColor.getHex();
+
+	if ( this.intensity !== undefined ) data.object.intensity = this.intensity;
+	if ( this.distance !== undefined ) data.object.distance = this.distance;
+	if ( this.angle !== undefined ) data.object.angle = this.angle;
+	if ( this.decay !== undefined ) data.object.decay = this.decay;
+	if ( this.exponent !== undefined ) data.object.exponent = this.exponent;
+
+	return data;
+
+};
+
 // File:src/lights/AmbientLight.js
 
 /**
@@ -14129,16 +14162,6 @@ THREE.AmbientLight = function ( color ) {
 
 THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
 THREE.AmbientLight.prototype.constructor = THREE.AmbientLight;
-
-THREE.AmbientLight.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.color = this.color.getHex();
-
-	return data;
-
-};
 
 // File:src/lights/DirectionalLight.js
 
@@ -14219,17 +14242,6 @@ THREE.DirectionalLight.prototype.copy = function ( source ) {
 
 };
 
-THREE.DirectionalLight.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.color = this.color.getHex();
-	data.object.intensity = this.intensity;
-
-	return data;
-
-};
-
 // File:src/lights/HemisphereLight.js
 
 /**
@@ -14261,18 +14273,6 @@ THREE.HemisphereLight.prototype.copy = function ( source ) {
 	this.intensity = source.intensity;
 
 	return this;
-
-};
-
-THREE.HemisphereLight.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.color = this.color.getHex();
-	data.object.groundColor = this.groundColor.getHex();
-	data.object.intensity = this.intensity;
-
-	return data;
 
 };
 
@@ -14346,19 +14346,6 @@ THREE.PointLight.prototype.copy = function ( source ) {
 	this.shadowMapHeight = source.shadowMapHeight;
 
 	return this;
-
-};
-
-THREE.PointLight.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.color = this.color.getHex();
-	data.object.intensity = this.intensity;
-	data.object.distance = this.distance;
-	data.object.decay = this.decay;
-
-	return data;
 
 };
 
@@ -14438,20 +14425,6 @@ THREE.SpotLight.prototype.copy = function ( source ) {
 	this.shadowMapHeight = source.shadowMapHeight;
 
 	return this;
-}
-
-THREE.SpotLight.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.color = this.color.getHex();
-	data.object.intensity = this.intensity;
-	data.object.distance = this.distance;
-	data.object.angle = this.angle;
-	data.object.exponent = this.exponent;
-	data.object.decay = this.decay;
-
-	return data;
 
 };
 
@@ -18701,17 +18674,6 @@ THREE.Points.prototype.clone = function () {
 
 };
 
-THREE.Points.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.geometry = this.geometry.uuid;
-	data.object.material = this.material.uuid;
-
-	return data;
-
-};
-
 // Backwards compatibility
 
 THREE.PointCloud = function ( geometry, material ) {
@@ -18910,17 +18872,6 @@ THREE.Line.prototype.raycast = ( function () {
 THREE.Line.prototype.clone = function () {
 
 	return new this.constructor( this.geometry, this.material ).copy( this );
-
-};
-
-THREE.Line.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.geometry = this.geometry.uuid;
-	data.object.material = this.material.uuid;
-
-	return data;
 
 };
 
@@ -19302,17 +19253,6 @@ THREE.Mesh.prototype.raycast = ( function () {
 THREE.Mesh.prototype.clone = function () {
 
 	return new this.constructor( this.geometry, this.material ).copy( this );
-
-};
-
-THREE.Mesh.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.geometry = this.geometry.uuid;
-	data.object.material = this.material.uuid;
-
-	return data;
 
 };
 
@@ -19925,16 +19865,6 @@ THREE.Sprite.prototype.raycast = ( function () {
 THREE.Sprite.prototype.clone = function () {
 
 	return new this.constructor( this.material ).copy( this );
-
-};
-
-THREE.Sprite.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.material = this.material.uuid;
-
-	return data;
 
 };
 
