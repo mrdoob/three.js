@@ -122,6 +122,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		_state.setDepthTest( true );
 
+		// save the existing viewport so it can be restored later
+		_renderer.getViewport( _vector4 );
+
 		// render depth map
 
 		for ( var i = 0, il = _lights.length; i < il; i ++ ) {
@@ -226,9 +229,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 			shadowCamera.position.copy( _lightPositionWorld );
 
-			// save the existing viewport so it can be restored later
-			_renderer.getViewport( _vector4 );
-
 			_renderer.setRenderTarget( shadowMap );
 			_renderer.clear();
 
@@ -321,6 +321,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			}
 
+			_renderer.setViewport( _vector4.x, _vector4.y, _vector4.z, _vector4.w );
+
 		}
 
 		// restore GL state
@@ -336,8 +338,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			_gl.cullFace( _gl.BACK );
 
 		}
-
-		_renderer.setViewport( _vector4.x, _vector4.y, _vector4.z, _vector4.w );
 
 		_renderer.resetGLState();
 

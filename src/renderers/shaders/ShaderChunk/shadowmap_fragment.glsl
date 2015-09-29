@@ -49,37 +49,44 @@
 
 					if( isPointLight ) {
 
-						float cubeTexelSize = 1.0 / ( shadowMapSize[ i ].x * 0.25 );
-						vec3 baseDirection3D = normalize( lightToPosition );
-						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeY );
+						// bd3D = base direction 3D
+						vec3 bd3D = normalize( lightToPosition );
+						// dp = distance from light to fragment position
+						float dp = length( lightToPosition );
 
-						initGridSamplingDisk();
+						shadow = 0.0;						
 
-						float diskRadius = 1.25;
-						float numSamples = 1.0;
-						shadow = 0.0;
+						// base measurement
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ) ), shadowBias[ i ], shadow );
 
-						vec3 baseDirection = normalize( lightToPosition );
-						float curDistance = length( lightToPosition );
+						// dr = disk radius
+						const float dr = 1.25;
+						// os = offset scale
+						float os = dr *  2.0 * texelSizeY;
 
-						float dist = unpack1K( texture2D( shadowMap[ i ],  baseDirection2D ) ) + 0.1;
-						if ( curDistance >= dist )
-							shadow += 1.0;
-						
-						// evaluate each sampling direction
-						for( int s = 0; s < 20; s++ ) {
-						 
-							vec3 offset = gridSamplingDisk[ s ] * diskRadius * cubeTexelSize;
-							vec3 adjustedBaseDirection3D = baseDirection3D + offset;
-							vec2 adjustedBaseDirection2D = cubeToUV( adjustedBaseDirection3D, texelSizeY );
-							dist = unpack1K( texture2D( shadowMap[ i ],  adjustedBaseDirection2D ) ) + shadowBias[ i ];
-							if ( curDistance >= dist )
-								shadow += 1.0;
-							numSamples += 1.0;
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd0 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd1 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd2 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd3 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd4 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd5 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd6 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd7 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd8 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd9 * os, texelSizeY ) ), shadowBias[ i ], shadow );
 
-						}
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd10 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd11 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd12 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd13 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd14 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd15 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd16 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd17 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd18 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd19 * os, texelSizeY ) ), shadowBias[ i ], shadow );
 
-						shadow /= numSamples;
+						shadow /= 21.0;
 
 					} else {
 
@@ -157,37 +164,44 @@
 
 					if( isPointLight ) {
 
-						float cubeTexelSize = 1.0 / ( shadowMapSize[ i ].x * 0.25 );
-						vec3 baseDirection3D = normalize( lightToPosition );
-						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeY );
+						// bd3D = base direction 3D
+						vec3 bd3D = normalize( lightToPosition );
+						// dp = distance from light to fragment position
+						float dp = length( lightToPosition );
 
-						initGridSamplingDisk();
+						shadow = 0.0;						
 
-						float diskRadius = 2.25;
-						float numSamples = 1.0;
-						shadow = 0.0;
+						// base measurement
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ) ), shadowBias[ i ], shadow );
 
-						vec3 baseDirection = normalize( lightToPosition );
-						float curDistance = length( lightToPosition );
+						// dr = disk radius
+						const float dr = 2.25;
+						// os = offset scale
+						float os = dr *  2.0 * texelSizeY;
 
-						float dist = unpack1K( texture2D( shadowMap[ i ],  baseDirection2D ) ) + 0.1;
-						if ( curDistance >= dist )
-							shadow += 1.0;
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd0 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd1 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd2 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd3 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd4 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd5 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd6 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd7 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd8 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd9 * os, texelSizeY ) ), shadowBias[ i ], shadow );
 
-						// evaluate each sampling direction
-						for( int s = 0; s < 20; s++ ) {
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd10 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd11 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd12 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd13 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd14 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd15 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd16 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd17 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd18 * os, texelSizeY ) ), shadowBias[ i ], shadow );
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + gsd19 * os, texelSizeY ) ), shadowBias[ i ], shadow );
 
-							vec3 offset = gridSamplingDisk[ s ] * diskRadius * cubeTexelSize;
-							vec3 adjustedBaseDirection3D = baseDirection3D + offset;
-							vec2 adjustedBaseDirection2D = cubeToUV( adjustedBaseDirection3D, texelSizeY );
-							dist = unpack1K( texture2D( shadowMap[ i ],  adjustedBaseDirection2D ) ) + shadowBias[ i ];
-							if ( curDistance >= dist )
-								shadow += 1.0;
-							numSamples += 1.0;
-
-						}
-
-						shadow /= numSamples;
+						shadow /= 21.0;
 
 					} else {
 
@@ -257,12 +271,14 @@
 
 					if( isPointLight ) {
 
-						vec3 baseDirection3D = normalize( lightToPosition );
-						vec2 baseDirection2D = cubeToUV( baseDirection3D, texelSizeY );
-						vec4 data = texture2D( shadowMap[ i ],  baseDirection2D );
-						float dist = unpack1K( data ) + shadowBias[ i ];
-						if ( length( lightToPosition ) >= dist)
-							shadowColor = shadowColor * vec3( 1.0 - realShadowDarkness );
+						vec3 bd3D = normalize( lightToPosition );
+						float dp = length( lightToPosition );
+
+						float shadow = 0.0;
+
+						adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ) ), shadowBias[ i ], shadow );
+
+						shadowColor = shadowColor * vec3( 1.0 - realShadowDarkness * shadow );
 
 					} else {
 

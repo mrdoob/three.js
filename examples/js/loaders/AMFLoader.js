@@ -246,21 +246,13 @@ THREE.AMFLoader.prototype = {
 
 				} else if ( currVolumeNode.nodeName === "triangle" ) {
 
-					var triangleNode = currVolumeNode.firstElementChild;
+					var v1 = currVolumeNode.getElementsByTagName("v1")[0].textContent;
+					var v2 = currVolumeNode.getElementsByTagName("v2")[0].textContent;
+					var v3 = currVolumeNode.getElementsByTagName("v3")[0].textContent;
 
-					while ( triangleNode ) {
-
-						if ( triangleNode.nodeName === "v1" ||
-								triangleNode.nodeName === "v2" ||
-								triangleNode.nodeName === "v3" ) {
-
-							volume.triangles.push( triangleNode.textContent );
-
-						}
-
-						triangleNode = triangleNode.nextElementSibling;
-
-					}
+					volume.triangles.push( v1 );
+					volume.triangles.push( v2 );
+					volume.triangles.push( v3 );
 
 				}
 
@@ -275,6 +267,7 @@ THREE.AMFLoader.prototype = {
 		function loadMeshVertices( node ) {
 
 			var vertArray = [];
+			var normalArray = [];
 			var currVerticesNode = node.firstElementChild;
 
 			while ( currVerticesNode ) {
@@ -287,23 +280,26 @@ THREE.AMFLoader.prototype = {
 
 						if ( vNode.nodeName === "coordinates" ) {
 
-							var coordNode = vNode.firstElementChild;
+							var x = vNode.getElementsByTagName("x")[0].textContent;
+							var y = vNode.getElementsByTagName("y")[0].textContent;
+							var z = vNode.getElementsByTagName("z")[0].textContent;
 
-							while ( coordNode ) {
+							vertArray.push(x);
+							vertArray.push(y);
+							vertArray.push(z);
 
-								if ( coordNode.nodeName === "x" ||
-										 coordNode.nodeName === "y" ||
-										 coordNode.nodeName === "z" ) {
+						} else if ( vNode.nodeName === "normal" ) {
 
-									vertArray.push( coordNode.textContent );
+							var nx = vNode.getElementsByTagName("nx")[0].textContent;
+							var ny = vNode.getElementsByTagName("ny")[0].textContent;
+							var nz = vNode.getElementsByTagName("nz")[0].textContent;
 
-								}
-
-								coordNode = coordNode.nextElementSibling;
-
-							}
+							normalArray.push(nx);
+							normalArray.push(ny);
+							normalArray.push(nz);
 
 						}
+						
 						vNode = vNode.nextElementSibling;
 
 					}
@@ -313,7 +309,7 @@ THREE.AMFLoader.prototype = {
 
 			}
 
-			return vertArray;
+			return { "vertices": vertArray, "normals": normalArray };
 
 		}
 
@@ -345,13 +341,16 @@ THREE.AMFLoader.prototype = {
 				} else if ( currObjNode.nodeName === "mesh" ) {
 
 					var currMeshNode = currObjNode.firstElementChild;
-					var mesh = { "vertices": [], "volumes": [], "color": currColor };
+					var mesh = { "vertices": [], "normals": [], "volumes": [], "color": currColor };
 
 					while ( currMeshNode ) {
 
 						if ( currMeshNode.nodeName === "vertices" ) {
 
-							mesh.vertices = mesh.vertices.concat( loadMeshVertices( currMeshNode ) );
+							var loadedVertices = loadMeshVertices( currMeshNode );
+
+							mesh.normals = mesh.normals.concat( loadedVertices.normals );
+							mesh.vertices = mesh.vertices.concat( loadedVertices.vertices );
 
 						} else if ( currMeshNode.nodeName === "volume" ) {
 
@@ -433,10 +432,19 @@ THREE.AMFLoader.prototype = {
 
 			for ( var i = 0; i < meshes.length; i ++ ) {
 
+				var objDefaultMaterial = defaultMaterial;
 				var mesh = meshes[ i ];
 				var meshVertices = Float32Array.from( mesh.vertices );
 				var vertices = new THREE.BufferAttribute( Float32Array.from( meshVertices ), 3 );
-				var objDefaultMaterial = defaultMaterial;
+				var meshNormals = null;
+				var normals = null;
+
+				if ( mesh.normals.length ) {
+
+					meshNormals = Float32Array.from( mesh.normals );
+					normals = new THREE.BufferAttribute( Float32Array.from( meshNormals ), 3 );
+
+				}
 
 				if ( mesh.color ) {
 
@@ -461,11 +469,16 @@ THREE.AMFLoader.prototype = {
 					var volume = volumes[ j ];
 					var newGeometry = new THREE.BufferGeometry();
 					var indexes = Uint32Array.from( volume.triangles );
-					var normals = new Uint32Array( vertices.array.length );
 					var material = objDefaultMaterial;
 
 					newGeometry.setIndex( new THREE.BufferAttribute( indexes, 1 ) );
 					newGeometry.addAttribute( 'position', vertices.clone() );
+
+					if( normals ) {
+
+						newGeometry.addAttribute( 'normal', normals.clone() );
+
+					}
 
 					if ( amfMaterials[ volume.materialid ] !== undefined ) {
 
