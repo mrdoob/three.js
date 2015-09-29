@@ -376,11 +376,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.getViewport = function ( dimensions ) {
 
-		dimensions.x = _viewportX;
-		dimensions.y = _viewportY;
+		dimensions.x = _viewportX / pixelRatio;
+		dimensions.y = _viewportY / pixelRatio;
 
-		dimensions.z = _viewportWidth;
-		dimensions.w = _viewportHeight;
+		dimensions.z = _viewportWidth / pixelRatio;
+		dimensions.w = _viewportHeight / pixelRatio;
 
 	};
 
@@ -1983,7 +1983,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						uniforms.shadowDarkness.value[ j ] = - light.shadowDarkness;
 
 					} else {
-						
+
 						uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
 
 					}
