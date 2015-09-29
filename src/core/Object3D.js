@@ -630,6 +630,22 @@ THREE.Object3D.prototype = {
 
 		data.matrix = this.matrix.toArray();
 
+		//
+
+		if ( this.geometry && meta.geometries[ this.geometry.uuid ] === undefined ) {
+
+			meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON( meta );
+
+		}
+
+		if ( this.material && meta.materials[ this.material.uuid ] === undefined ) {
+
+			meta.materials[ this.material.uuid ] = this.material.toJSON( meta );
+
+		}
+
+		//
+
 		if ( this.children.length > 0 ) {
 
 			data.children = [];
