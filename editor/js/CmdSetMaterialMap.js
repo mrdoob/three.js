@@ -31,13 +31,8 @@ CmdSetMaterialMap = function ( object, mapName, newMap ) {
 		};
 
 		var json = map.toJSON( meta );
-
-		var textures = extractFromCache( meta.textures );
 		var images = extractFromCache( meta.images );
-
-		if ( textures.length > 0 ) json.textures = textures;
 		if ( images.length > 0 ) json.images = images;
-
 		json.sourceFile = map.sourceFile;
 
 		return json;
