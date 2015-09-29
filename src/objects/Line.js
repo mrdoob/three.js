@@ -181,17 +181,6 @@ THREE.Line.prototype.clone = function () {
 
 };
 
-THREE.Line.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.geometry = this.geometry.uuid;
-	data.object.material = this.material.uuid;
-
-	return data;
-
-};
-
 // DEPRECATED
 
 THREE.LineStrip = 0;

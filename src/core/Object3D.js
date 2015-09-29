@@ -595,8 +595,7 @@ THREE.Object3D.prototype = {
 
 		var isRootObject = ( meta === undefined );
 
-		var data = {};
-		var output = { object: data };
+		var output = {};
 
 		// meta is a hash used to collect geometries, materials.
 		// not providing it implies that this is the root object
@@ -621,26 +620,40 @@ THREE.Object3D.prototype = {
 
 		// standard Object3D serialization
 
-		data.uuid = this.uuid;
-		data.type = this.type;
+		var object = {};
 
-		if ( this.name !== '' ) data.name = this.name;
-		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
-		if ( this.visible !== true ) data.visible = this.visible;
+		object.uuid = this.uuid;
+		object.type = this.type;
 
-		data.matrix = this.matrix.toArray();
+		if ( this.name !== '' ) object.name = this.name;
+		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
+		if ( this.visible !== true ) object.visible = this.visible;
+
+		object.matrix = this.matrix.toArray();
 
 		//
 
-		if ( this.geometry && meta.geometries[ this.geometry.uuid ] === undefined ) {
+		if ( this.geometry !== undefined ) {
 
-			meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON( meta );
+			if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
+
+				meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON( meta );
+
+			}
+
+			object.geometry = this.geometry.uuid;
 
 		}
 
-		if ( this.material && meta.materials[ this.material.uuid ] === undefined ) {
+		if ( this.material !== undefined ) {
 
-			meta.materials[ this.material.uuid ] = this.material.toJSON( meta );
+			if ( meta.materials[ this.material.uuid ] === undefined ) {
+
+				meta.materials[ this.material.uuid ] = this.material.toJSON( meta );
+
+			}
+
+			object.material = this.material.uuid;
 
 		}
 
@@ -648,11 +661,11 @@ THREE.Object3D.prototype = {
 
 		if ( this.children.length > 0 ) {
 
-			data.children = [];
+			object.children = [];
 
 			for ( var i = 0; i < this.children.length; i ++ ) {
 
-				data.children.push( this.children[ i ].toJSON( meta ).object );
+				object.children.push( this.children[ i ].toJSON( meta ).object );
 
 			}
 
@@ -671,6 +684,8 @@ THREE.Object3D.prototype = {
 			if ( images.length > 0 ) output.images = images;
 
 		}
+
+		output.object = object;
 
 		return output;
 

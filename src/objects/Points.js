@@ -126,17 +126,6 @@ THREE.Points.prototype.clone = function () {
 
 };
 
-THREE.Points.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.geometry = this.geometry.uuid;
-	data.object.material = this.material.uuid;
-
-	return data;
-
-};
-
 // Backwards compatibility
 
 THREE.PointCloud = function ( geometry, material ) {

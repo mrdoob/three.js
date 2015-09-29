@@ -354,14 +354,3 @@ THREE.Mesh.prototype.clone = function () {
 	return new this.constructor( this.geometry, this.material ).copy( this );
 
 };
-
-THREE.Mesh.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.geometry = this.geometry.uuid;
-	data.object.material = this.material.uuid;
-
-	return data;
-
-};
