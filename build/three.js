@@ -21896,11 +21896,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.getViewport = function ( dimensions ) {
 
-		dimensions.x = _viewportX;
-		dimensions.y = _viewportY;
+		dimensions.x = _viewportX / pixelRatio;
+		dimensions.y = _viewportY / pixelRatio;
 
-		dimensions.z = _viewportWidth;
-		dimensions.w = _viewportHeight;
+		dimensions.z = _viewportWidth / pixelRatio;
+		dimensions.w = _viewportHeight / pixelRatio;
 
 	};
 
@@ -23503,7 +23503,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						uniforms.shadowDarkness.value[ j ] = - light.shadowDarkness;
 
 					} else {
-						
+
 						uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
 
 					}
@@ -26732,14 +26732,14 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		_state.setDepthTest( true );
 
+		// save the existing viewport so it can be restored later
+		_renderer.getViewport( _vector4 );
+
 		// render depth map
 
 		for ( var i = 0, il = _lights.length; i < il; i ++ ) {
 
 			var light = _lights[ i ];
-
-			// save the existing viewport so it can be restored later
-			_renderer.getViewport( _vector4 );
 
 			if ( light instanceof THREE.PointLight ) {
 
