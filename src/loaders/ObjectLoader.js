@@ -461,6 +461,8 @@ THREE.ObjectLoader.prototype = {
 
 			var getMaterial = function ( name ) {
 
+				if ( name === undefined ) return undefined;
+
 				if ( materials[ name ] === undefined ) {
 
 					console.warn( 'THREE.ObjectLoader: Undefined material', name );
