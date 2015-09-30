@@ -7820,17 +7820,17 @@ THREE.Object3D = function () {
 	var quaternion = new THREE.Quaternion();
 	var scale = new THREE.Vector3( 1, 1, 1 );
 
-	var onRotationChange = function () {
+	function onRotationChange() {
 
 		quaternion.setFromEuler( rotation, false );
 
-	};
+	}
 
-	var onQuaternionChange = function () {
+	function onQuaternionChange() {
 
 		rotation.setFromQuaternion( quaternion, undefined, false );
 
-	};
+	}
 
 	rotation.onChange( onRotationChange );
 	quaternion.onChange( onQuaternionChange );
@@ -7889,7 +7889,7 @@ THREE.Object3D.prototype = {
 
 	get eulerOrder () {
 
-		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
+		console.warn( 'THREE.Object3D: .eulerOrder is now .rotation.order.' );
 
 		return this.rotation.order;
 
@@ -7897,7 +7897,7 @@ THREE.Object3D.prototype = {
 
 	set eulerOrder ( value ) {
 
-		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
+		console.warn( 'THREE.Object3D: .eulerOrder is now .rotation.order.' );
 
 		this.rotation.order = value;
 
@@ -7920,6 +7920,8 @@ THREE.Object3D.prototype = {
 		console.warn( 'THREE.Object3D: .renderDepth has been removed. Use .renderOrder, instead.' );
 
 	},
+
+	//
 
 	applyMatrix: function ( matrix ) {
 
@@ -21482,9 +21484,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var lights = [];
 
 	var opaqueObjects = [];
-	var opaqueObjectsLastIndex = -1;
+	var opaqueObjectsLastIndex = - 1;
 	var transparentObjects = [];
-	var transparentObjectsLastIndex = -1;
+	var transparentObjectsLastIndex = - 1;
 
 	var morphInfluences = new Float32Array( 8 );
 
@@ -22008,10 +22010,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function deallocateRenderTarget( renderTarget ) {
 
 		var renderTargetProperties = properties.get( renderTarget );
+		var textureProperties = properties.get( renderTarget.texture );
 
-		if ( ! renderTarget || renderTargetProperties.__webglTexture === undefined ) return;
+		if ( ! renderTarget || textureProperties.__webglTexture === undefined ) return;
 
-		_gl.deleteTexture( renderTargetProperties.__webglTexture );
+		_gl.deleteTexture( textureProperties.__webglTexture );
 
 		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
 
@@ -22029,6 +22032,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		properties.delete( renderTarget.texture );
 		properties.delete( renderTarget );
 
 	}
@@ -22051,6 +22055,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( programInfo !== undefined ) {
 
 			programCache.releaseProgram( programInfo );
+
 		}
 
 	}
@@ -22541,8 +22546,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		lights.length = 0;
 
-		opaqueObjectsLastIndex = -1;
-		transparentObjectsLastIndex = -1;
+		opaqueObjectsLastIndex = - 1;
+		transparentObjectsLastIndex = - 1;
 
 		sprites.length = 0;
 		lensFlares.length = 0;
@@ -22607,9 +22612,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 
-		if ( renderTarget && renderTarget.generateMipmaps && renderTarget.minFilter !== THREE.NearestFilter && renderTarget.minFilter !== THREE.LinearFilter ) {
+		if ( renderTarget ) {
 
-			updateRenderTargetMipmap( renderTarget );
+			var texture = renderTarget.texture;
+			var isTargetPowerOfTwo = THREE.Math.isPowerOfTwo( renderTarget.width ) && THREE.Math.isPowerOfTwo( renderTarget.height );
+			if ( texture.generateMipmaps && isTargetPowerOfTwo && texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
+
+				 updateRenderTargetMipmap( renderTarget );
+
+			}
 
 		}
 
@@ -22778,17 +22789,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object instanceof THREE.ImmediateRenderObject ) {
 
-					setMaterial( material );
+				setMaterial( material );
 
-					var program = setProgram( camera, lights, fog, material, object );
+				var program = setProgram( camera, lights, fog, material, object );
 
-					_currentGeometryProgram = '';
+				_currentGeometryProgram = '';
 
-					object.render( function ( object ) {
+				object.render( function ( object ) {
 
-						_this.renderBufferImmediate( object, program, material );
+					_this.renderBufferImmediate( object, program, material );
 
-					} );
+				} );
 
 			} else {
 
@@ -23250,6 +23261,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( uvScaleMap !== undefined ) {
 
+			if ( uvScaleMap instanceof THREE.WebGLRenderTarget ) uvScaleMap = uvScaleMap.texture;
 			var offset = uvScaleMap.offset;
 			var repeat = uvScaleMap.repeat;
 
@@ -23764,7 +23776,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
 
-						setCubeTextureDynamic( texture, textureUnit );
+						setCubeTextureDynamic( texture.texture, textureUnit );
+
+					} else if ( texture instanceof THREE.WebGLRenderTarget ) {
+
+						_this.setTexture( texture.texture, textureUnit );
 
 					} else {
 
@@ -23806,9 +23822,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							setCubeTexture( texture, textureUnit );
 
+						} else if ( texture instanceof THREE.WebGLRenderTarget ) {
+
+							_this.setTexture( texture.texture, textureUnit );
+
 						} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
 
-							setCubeTextureDynamic( texture, textureUnit );
+							setCubeTextureDynamic( texture.texture, textureUnit );
 
 						} else {
 
@@ -24425,7 +24445,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function setupFrameBuffer ( framebuffer, renderTarget, textureTarget ) {
 
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureTarget, properties.get( renderTarget ).__webglTexture, 0 );
+		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
 
 	}
 
@@ -24465,30 +24485,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( renderTarget && properties.get( renderTarget ).__webglFramebuffer === undefined ) {
 
 			var renderTargetProperties = properties.get( renderTarget );
+			var textureProperties = properties.get( renderTarget.texture );
 
 			if ( renderTarget.depthBuffer === undefined ) renderTarget.depthBuffer = true;
 			if ( renderTarget.stencilBuffer === undefined ) renderTarget.stencilBuffer = true;
 
 			renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
-			renderTargetProperties.__webglTexture = _gl.createTexture();
+			textureProperties.__webglTexture = _gl.createTexture();
 
 			_infoMemory.textures ++;
 
 			// Setup texture, create render and frame buffers
 
 			var isTargetPowerOfTwo = THREE.Math.isPowerOfTwo( renderTarget.width ) && THREE.Math.isPowerOfTwo( renderTarget.height ),
-				glFormat = paramThreeToGL( renderTarget.format ),
-				glType = paramThreeToGL( renderTarget.type );
+				glFormat = paramThreeToGL( renderTarget.texture.format ),
+				glType = paramThreeToGL( renderTarget.texture.type );
 
 			if ( isCube ) {
 
 				renderTargetProperties.__webglFramebuffer = [];
 				renderTargetProperties.__webglRenderbuffer = [];
 
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, renderTargetProperties.__webglTexture );
+				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
 
-				setTextureParameters( _gl.TEXTURE_CUBE_MAP, renderTarget, isTargetPowerOfTwo );
+				setTextureParameters( _gl.TEXTURE_CUBE_MAP, renderTarget.texture, isTargetPowerOfTwo );
 
 				for ( var i = 0; i < 6; i ++ ) {
 
@@ -24501,7 +24522,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( renderTarget.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+				if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
 
 			} else {
 
@@ -24517,8 +24538,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				state.bindTexture( _gl.TEXTURE_2D, renderTargetProperties.__webglTexture );
-				setTextureParameters( _gl.TEXTURE_2D, renderTarget, isTargetPowerOfTwo );
+				state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
+				setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
 
 				state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 
@@ -24542,7 +24563,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( renderTarget.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
+				if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
 			}
 
@@ -24608,8 +24629,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( isCube ) {
 
-			var renderTargetProperties = properties.get( renderTarget );
-			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0,  _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, renderTargetProperties.__webglTexture, 0 );
+			var textureProperties = properties.get( renderTarget.texture );
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0,  _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, textureProperties.__webglTexture, 0 );
 
 		}
 
@@ -24639,14 +24660,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( renderTarget.format !== THREE.RGBAFormat && paramThreeToGL( renderTarget.format ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+			if ( renderTarget.texture.format !== THREE.RGBAFormat && paramThreeToGL( renderTarget.texture.format ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
 
 				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
 				return;
 
 			}
 
-			if ( renderTarget.type !== THREE.UnsignedByteType && paramThreeToGL( renderTarget.type ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) ) {
+			if ( renderTarget.texture.type !== THREE.UnsignedByteType && paramThreeToGL( renderTarget.texture.type ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) ) {
 
 				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
 				return;
@@ -24655,7 +24676,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( _gl.checkFramebufferStatus( _gl.FRAMEBUFFER ) === _gl.FRAMEBUFFER_COMPLETE ) {
 
-				_gl.readPixels( x, y, width, height, paramThreeToGL( renderTarget.format ), paramThreeToGL( renderTarget.type ), buffer );
+				_gl.readPixels( x, y, width, height, paramThreeToGL( renderTarget.texture.format ), paramThreeToGL( renderTarget.texture.type ), buffer );
 
 			} else {
 
@@ -24676,7 +24697,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function updateRenderTargetMipmap( renderTarget ) {
 
 		var target = renderTarget instanceof THREE.WebGLRenderTargetCube ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
-		var texture = properties.get( renderTarget ).__webglTexture;
+		var texture = properties.get( renderTarget.texture ).__webglTexture;
 
 		state.bindTexture( target, texture );
 		_gl.generateMipmap( target );
@@ -24950,24 +24971,12 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	options = options || {};
 
-	this.wrapS = options.wrapS !== undefined ? options.wrapS : THREE.ClampToEdgeWrapping;
-	this.wrapT = options.wrapT !== undefined ? options.wrapT : THREE.ClampToEdgeWrapping;
+	if ( options.minFilter === undefined ) options.minFilter = THREE.LinearFilter;
 
-	this.magFilter = options.magFilter !== undefined ? options.magFilter : THREE.LinearFilter;
-	this.minFilter = options.minFilter !== undefined ? options.minFilter : THREE.LinearMipMapLinearFilter;
-
-	this.anisotropy = options.anisotropy !== undefined ? options.anisotropy : 1;
-
-	this.offset = new THREE.Vector2( 0, 0 );
-	this.repeat = new THREE.Vector2( 1, 1 );
-
-	this.format = options.format !== undefined ? options.format : THREE.RGBAFormat;
-	this.type = options.type !== undefined ? options.type : THREE.UnsignedByteType;
+	this.texture = new THREE.Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy );
 
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
-
-	this.generateMipmaps = true;
 
 	this.shareDepthFrom = options.shareDepthFrom !== undefined ? options.shareDepthFrom : null;
 
@@ -24976,6 +24985,168 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 THREE.WebGLRenderTarget.prototype = {
 
 	constructor: THREE.WebGLRenderTarget,
+
+	get wrapS() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .wrapS is now .texture.wrapS.' );
+
+		return this.texture.wrapS;
+
+	},
+
+	set wrapS( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .wrapS is now .texture.wrapS.' );
+
+		this.texture.wrapS = value;
+
+	},
+
+	get wrapT() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .wrapT is now .texture.wrapT.' );
+
+		return this.texture.wrapT;
+
+	},
+
+	set wrapT( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .wrapT is now .texture.wrapT.' );
+
+		this.texture.wrapT = value;
+
+	},
+
+	get magFilter() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .magFilter is now .texture.magFilter.' );
+
+		return this.texture.magFilter;
+
+	},
+
+	set magFilter( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .magFilter is now .texture.magFilter.' );
+
+		this.texture.magFilter = value;
+
+	},
+
+	get minFilter() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .minFilter is now .texture.minFilter.' );
+
+		return this.texture.minFilter;
+
+	},
+
+	set minFilter( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .minFilter is now .texture.minFilter.' );
+
+		this.texture.minFilter = value;
+
+	},
+
+	get anisotropy() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .anisotropy is now .texture.anisotropy.' );
+
+		return this.texture.anisotropy;
+
+	},
+
+	set anisotropy( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .anisotropy is now .texture.anisotropy.' );
+
+		this.texture.anisotropy = value;
+
+	},
+
+	get offset() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .offset is now .texture.offset.' );
+
+		return this.texture.offset;
+
+	},
+
+	set offset( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .offset is now .texture.offset.' );
+
+		this.texture.offset = value;
+
+	},
+
+	get repeat() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .repeat is now .texture.repeat.' );
+
+		return this.texture.repeat;
+
+	},
+
+	set repeat( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .repeat is now .texture.repeat.' );
+
+		this.texture.repeat = value;
+
+	},
+
+	get format() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .format is now .texture.format.' );
+
+		return this.texture.format;
+
+	},
+
+	set format( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .format is now .texture.format.' );
+
+		this.texture.format = value;
+
+	},
+
+	get type() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .type is now .texture.type.' );
+
+		return this.texture.type;
+
+	},
+
+	set type( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .type is now .texture.type.' );
+
+		this.texture.type = value;
+
+	},
+
+	get generateMipmaps() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .generateMipmaps is now .texture.generateMipmaps.' );
+
+		return this.texture.generateMipmaps;
+
+	},
+
+	set generateMipmaps( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .generateMipmaps is now .texture.generateMipmaps.' );
+
+		this.texture.generateMipmaps = value;
+
+	},
+
+	//
 
 	setSize: function ( width, height ) {
 
@@ -25001,24 +25172,10 @@ THREE.WebGLRenderTarget.prototype = {
 		this.width = source.width;
 		this.height = source.height;
 
-		this.wrapS = source.wrapS;
-		this.wrapT = source.wrapT;
-
-		this.magFilter = source.magFilter;
-		this.minFilter = source.minFilter;
-
-		this.anisotropy = source.anisotropy;
-
-		this.offset.copy( source.offset );
-		this.repeat.copy( source.repeat );
-
-		this.format = source.format;
-		this.type = source.type;
+		this.texture = source.texture.clone();
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
-
-		this.generateMipmaps = source.generateMipmaps;
 
 		this.shareDepthFrom = source.shareDepthFrom;
 
