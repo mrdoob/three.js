@@ -174,32 +174,28 @@ THREE.ColladaLoader.prototype = {
 		var xml = new DOMParser().parseFromString( text, 'text/xml' );
 
 		var geometries = xml.getElementsByTagName( 'library_geometries' )[ 0 ];
-		var materials = xml.getElementsByTagName( 'library_materials' )[ 0 ];
-		var images = xml.getElementsByTagName( 'library_images' )[ 0 ];
-		var effects = xml.getElementsByTagName( 'library_effects' )[ 0 ];
-
-		//console.log( geometries, materials, images, effects );
+		// var materials = xml.getElementsByTagName( 'library_materials' )[ 0 ];
+		// var images = xml.getElementsByTagName( 'library_images' )[ 0 ];
+		// var effects = xml.getElementsByTagName( 'library_effects' )[ 0 ];
 
 		var scene = new THREE.Scene();
 
 		var geometries = parseGeometries( geometries );
+		var material = new THREE.MeshPhongMaterial();
 
 		for ( var i = 0; i < geometries.length; i ++ ) {
 
-			scene.add( new THREE.Mesh( geometries[ i ], new THREE.MeshPhongMaterial() ) );
+			scene.add( new THREE.Mesh( geometries[ i ], material ) );
 
 		}
 
 		console.timeEnd( 'ColladaLoader2' );
-
-		console.log( scene );
 
 		return {
 			animations: [],
 			kinematics: { joints: [] },
 			scene: scene
 		};
-
 
 	}
 
