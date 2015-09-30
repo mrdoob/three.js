@@ -42,59 +42,126 @@ THREE.ColladaLoader.prototype = {
 
 	parse: function ( text ) {
 
-		function parseGeometries( xml ) {
+		function parseFloats( text ) {
 
-			xml = xml.getElementsByTagName("geometry");
+			var array = [];
+			var parts = text.split( ' ' );
 
-			var objects = [];
-
-			for ( var i = 0; i < xml.length; i ++ ) {
-
-				objects.push( parseMesh( xml[ i ].getElementsByTagName( 'mesh' )[ 0 ] ) );
-
+			for ( var i = 0, l = parts.length; i < l; i ++ ) {
+				array.push( parseFloat( parts[ i ] ) );
 			}
 
-			return objects;
+			return array;
 
 		}
 
-		function parseMesh( xml ) {
+		function parseInts( text ) {
 
-			var geometry = new THREE.BufferGeometry();
+			var array = [];
+			var parts = text.split( ' ' );
 
-			var sources = xml.getElementsByTagName( 'source' );
+			for ( var i = 0, l = parts.length; i < l; i ++ ) {
+				array.push( parseInt( parts[ i ] ) );
+			}
 
-			for ( var i = 0; i < sources.length; i ++ ) {
+			return array;
 
-				var source = sources[ i ];
-				var floats = source.getElementsByTagName( 'float_array' )[ 0 ].textContent.split( ' ' );
+		}
 
-				var array = [];
-				for ( var j = 0; j < floats.length; j ++ ) {
-					array.push( floats[ j ] );
-				}
+		function parseGeometries( xml ) {
 
-				geometry.addAttribute( 'position', new THREE.Float32Attribute( array, 3 ) );
+			xml = xml.getElementsByTagName( 'geometry' );
+
+			var geometries = [];
+
+			for ( var i = 0; i < xml.length; i ++ ) {
+
+				geometries.push( parseGeometry( xml[ i ].getElementsByTagName( 'mesh' )[ 0 ] ) );
 
 			}
 
+			return geometries;
 
-			var triangles = xml.getElementsByTagName( 'triangles' );
+		}
 
-			if ( triangles === null ) return mesh;
+		function parseGeometry( xml ) {
 
-			for ( var i = 0; i < triangles.length; i ++ ) {
+			var geometry = new THREE.BufferGeometry();
 
-				var triangle = triangles[ i ];
+			// sources
 
-				var indices = triangle.getElementsByTagName( 'p' )[ 0 ].textContent.split( ' ' );
+			var sources = {};
+			var sourceNodes = xml.getElementsByTagName( 'source' );
 
-				var array = [];
-				for ( var j = 0; j < indices.length; j ++ ) {
-					array.push( parseInt( indices[ j ] ) );
+			for ( var i = 0; i < sourceNodes.length; i ++ ) {
+
+				var sourceNode = sourceNodes[ i ];
+				var array = parseFloats( sourceNode.getElementsByTagName( 'float_array' )[ 0 ].textContent );
+				sources[ sourceNode.getAttribute( 'id' ) ] = array;
+
+			}
+
+			// vertices
+
+			var verticesNode = xml.getElementsByTagName( 'vertices' )[ 0 ];
+			sources[ verticesNode.getAttribute( 'id' ) ] = sources[ verticesNode.getElementsByTagName( 'input' )[ 0 ].getAttribute( 'source' ).substring( 1 ) ];
+
+			// triangles
+
+			var triangleNodes = xml.getElementsByTagName( 'triangles' );
+
+			if ( triangleNodes === null ) return geometry;
+
+			for ( var i = 0; i < triangleNodes.length; i ++ ) {
+
+				var triangleNode = triangleNodes[ i ];
+
+				// indices
+
+				var indices = parseInts( triangleNode.getElementsByTagName( 'p' )[ 0 ].textContent );
+
+				// inputs
+
+				var inputNodes = triangleNode.getElementsByTagName( 'input' );
+
+				var maxOffset = 0;
+
+				for ( var j = 0; j < inputNodes.length; j ++ ) {
+
+					var inputNode = inputNodes[ j ];
+					maxOffset = Math.max( maxOffset, parseInt( inputNode.getAttribute( 'offset' ) ) + 1 );
+
 				}
 
-				geometry.setIndex( new THREE.Uint16Attribute( array, 1 ) );
+				for ( var j = 0; j < inputNodes.length; j ++ ) {
+
+					var inputNode = inputNodes[ j ];
+
+					var source = sources[ inputNode.getAttribute( 'source' ).substring( 1 ) ];
+					var offset = parseInt( inputNode.getAttribute( 'offset' ) );
+
+					var array = [];
+
+					for ( var k = offset; k < indices.length; k += maxOffset ) {
+
+						var index = indices[ k ] * 3;
+						array.push( source[ index + 0 ], source[ index + 1 ], source[ index + 2 ] );
+
+					}
+
+					switch ( inputNode.getAttribute( 'semantic' ) ) {
+
+						case 'VERTEX':
+							geometry.addAttribute( 'position', new THREE.Float32Attribute( array, 3 ) );
+							break;
+
+						case 'NORMAL':
+							geometry.addAttribute( 'normal', new THREE.Float32Attribute( array, 3 ) );
+							break;
+
+					}
+
+				}
 
 			}
 
@@ -119,7 +186,7 @@ THREE.ColladaLoader.prototype = {
 
 		for ( var i = 0; i < geometries.length; i ++ ) {
 
-			scene.add( new THREE.Mesh( geometries[ i ] ) );
+			scene.add( new THREE.Mesh( geometries[ i ], new THREE.MeshPhongMaterial() ) );
 
 		}
 
