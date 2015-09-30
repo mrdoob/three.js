@@ -45,7 +45,7 @@ THREE.ColladaLoader.prototype = {
 		function parseFloats( text ) {
 
 			var array = [];
-			var parts = text.split( ' ' );
+			var parts = text.trim().split( /\s+/ );
 
 			for ( var i = 0, l = parts.length; i < l; i ++ ) {
 				array.push( parseFloat( parts[ i ] ) );
@@ -58,7 +58,7 @@ THREE.ColladaLoader.prototype = {
 		function parseInts( text ) {
 
 			var array = [];
-			var parts = text.split( ' ' );
+			var parts = text.trim().split( /\s+/ );
 
 			for ( var i = 0, l = parts.length; i < l; i ++ ) {
 				array.push( parseInt( parts[ i ] ) );
