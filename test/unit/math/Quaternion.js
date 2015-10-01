@@ -209,3 +209,11 @@ test( "equals", function() {
 	ok( a.equals( b ), "Passed!" );
 	ok( b.equals( a ), "Passed!" );
 });
+
+test( "slerp", function() {
+	var a = new THREE.Quaternion( 0.675341, 0.408783, 0.328567, 0.518512 );
+	var b = new THREE.Quaternion( 0.660279, 0.436474, 0.35119, 0.500187 );
+
+	ok( a.slerp( b, 0 ).equals( a ), "Passed!" );
+	ok( a.slerp( b, 1 ).equals( b ), "Passed!" );
+});

@@ -1,6 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
- * @author bhouston / http://exocortex.com/
+ * @author bhouston / http://clara.io/
  * @author stephomi / http://stephaneginier.com/
  */
 
@@ -15,22 +15,33 @@
 		this.far = far || Infinity;
 
 		this.params = {
-			Sprite: {},
 			Mesh: {},
-			PointCloud: { threshold: 1 },
+			Line: {},
 			LOD: {},
-			Line: {}
+			Points: { threshold: 1 },
+			Sprite: {}
 		};
+
+		Object.defineProperties( this.params, {
+			PointCloud: {
+				get: function () {
+					console.warn( 'THREE.Raycaster: params.PointCloud has been renamed to params.Points.' );
+					return this.Points;
+				}
+			}
+		} );
 
 	};
 
-	var descSort = function ( a, b ) {
+	function descSort( a, b ) {
 
 		return a.distance - b.distance;
 
-	};
+	}
 
 	var intersectObject = function ( object, raycaster, intersects, recursive ) {
+
+		if ( object.visible === false ) return;
 
 		object.raycast( raycaster, intersects );
 
@@ -50,41 +61,74 @@
 
 	//
 
-	THREE.Raycaster.prototype.precision = 0.0001;
-	THREE.Raycaster.prototype.linePrecision = 1;
+	THREE.Raycaster.prototype = {
 
-	THREE.Raycaster.prototype.set = function ( origin, direction ) {
+		constructor: THREE.Raycaster,
 
-		this.ray.set( origin, direction );
-		// direction is assumed to be normalized (for accurate distance calculations)
+		linePrecision: 1,
 
-	};
+		set: function ( origin, direction ) {
 
-	THREE.Raycaster.prototype.intersectObject = function ( object, recursive ) {
+			// direction is assumed to be normalized (for accurate distance calculations)
 
-		var intersects = [];
+			this.ray.set( origin, direction );
 
-		intersectObject( object, this, intersects, recursive );
+		},
 
-		intersects.sort( descSort );
+		setFromCamera: function ( coords, camera ) {
 
-		return intersects;
+			if ( camera instanceof THREE.PerspectiveCamera ) {
 
-	};
+				this.ray.origin.setFromMatrixPosition( camera.matrixWorld );
+				this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
 
-	THREE.Raycaster.prototype.intersectObjects = function ( objects, recursive ) {
+			} else if ( camera instanceof THREE.OrthographicCamera ) {
 
-		var intersects = [];
+				this.ray.origin.set( coords.x, coords.y, - 1 ).unproject( camera );
+				this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
 
-		for ( var i = 0, l = objects.length; i < l; i ++ ) {
+			} else {
 
-			intersectObject( objects[ i ], this, intersects, recursive );
+				console.error( 'THREE.Raycaster: Unsupported camera type.' );
+
+			}
+
+		},
+
+		intersectObject: function ( object, recursive ) {
+
+			var intersects = [];
+
+			intersectObject( object, this, intersects, recursive );
+
+			intersects.sort( descSort );
+
+			return intersects;
+
+		},
+
+		intersectObjects: function ( objects, recursive ) {
+
+			var intersects = [];
+
+			if ( Array.isArray( objects ) === false ) {
+
+				console.warn( 'THREE.Raycaster.intersectObjects: objects is not an Array.' );
+				return intersects;
+
+			}
+
+			for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+				intersectObject( objects[ i ], this, intersects, recursive );
+
+			}
+
+			intersects.sort( descSort );
+
+			return intersects;
 
 		}
-
-		intersects.sort( descSort );
-
-		return intersects;
 
 	};
 

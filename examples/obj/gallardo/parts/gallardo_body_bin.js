@@ -21,8 +21,7 @@
 	"colorSpecular" : [0.6525, 0.6525, 0.6525],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 21.568627,
-	"transparency" : 0.0
+	"specularCoef" : 21.568627
 	},
 
 	{
@@ -34,8 +33,7 @@
 	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 27.45098,
-	"transparency" : 0.0
+	"specularCoef" : 27.45098
 	},
 
 	{
@@ -47,8 +45,7 @@
 	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 27.45098,
-	"transparency" : 0.0
+	"specularCoef" : 27.45098
 	},
 
 	{
@@ -60,8 +57,7 @@
 	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 27.45098,
-	"transparency" : 0.0
+	"specularCoef" : 27.45098
 	},
 
 	{
@@ -73,8 +69,7 @@
 	"colorSpecular" : [0.0, 0.0, 0.0],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 3.921569,
-	"transparency" : 0.0
+	"specularCoef" : 3.921569
 	},
 
 	{
@@ -86,8 +81,7 @@
 	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 27.45098,
-	"transparency" : 0.0
+	"specularCoef" : 27.45098
 	},
 
 	{
@@ -99,8 +93,7 @@
 	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 27.45098,
-	"transparency" : 0.0
+	"specularCoef" : 27.45098
 	}],
 
     "buffers": "gallardo_body_bin.bin"

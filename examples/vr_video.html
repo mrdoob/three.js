@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - vr video</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				color: #fff;
+				text-align: center;
+			}
+			a {
+				color: #ff0
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> webgl - vr video<br />
+			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank">mery project</a>.
+		</div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/effects/VREffect.js"></script>
+		<script src="js/controls/VRControls.js"></script>
+
+		<script>
+
+			var camera, sceneLeft, sceneRight, renderer;
+			var video, texture;
+
+			var controls, effect;
+
+			init();
+			animate();
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+				container.addEventListener( 'click', function () {
+
+					video.play();
+					effect.setFullScreen( true );
+
+				} );
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 2000 );
+
+				// video
+
+				video = document.createElement( 'video' );
+				video.loop = true;
+				video.src = 'textures/MaryOculus.webm';
+				video.play();
+
+				texture = new THREE.VideoTexture( video );
+				texture.minFilter = THREE.LinearFilter;
+				texture.format = THREE.RGBFormat;
+				texture.generateMipmaps = false;
+
+				// left
+
+				sceneLeft = new THREE.Scene();
+
+				var geometry = new THREE.SphereGeometry( 500, 60, 40 );
+				geometry.scale( - 1, 1, 1 );
+
+				var uvs = geometry.faceVertexUvs[ 0 ];
+
+				for ( var i = 0; i < uvs.length; i ++ ) {
+
+					for ( var j = 0; j < 3; j ++ ) {
+
+						uvs[ i ][ j ].x *= 0.5;
+
+					}
+
+				}
+
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
+
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.rotation.y = - Math.PI / 2;
+				sceneLeft.add( mesh );
+
+				// right
+
+				sceneRight = new THREE.Scene();
+
+				var geometry = new THREE.SphereGeometry( 500, 60, 40 );
+				geometry.scale( - 1, 1, 1 );
+
+				var uvs = geometry.faceVertexUvs[ 0 ];
+
+				for ( var i = 0; i < uvs.length; i ++ ) {
+
+					for ( var j = 0; j < 3; j ++ ) {
+
+						uvs[ i ][ j ].x *= 0.5;
+						uvs[ i ][ j ].x += 0.5;
+
+					}
+
+				}
+
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
+
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.rotation.y = - Math.PI / 2;
+				sceneRight.add( mesh );
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0x101010 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				//
+
+				controls = new THREE.VRControls( camera );
+
+				effect = new THREE.VREffect( renderer );
+				effect.scale = 0; // video doesn't need eye separation
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				controls.update();
+
+				effect.render( [ sceneLeft, sceneRight ], camera );
+
+			}
+
+		</script>
+	</body>
+</html>

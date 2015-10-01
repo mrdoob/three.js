@@ -12,9 +12,9 @@
 	"src/math/Matrix3.js",
 	"src/math/Matrix4.js",
 	"src/math/Ray.js",
+	"src/math/Sphere.js",
 	"src/math/Frustum.js",
 	"src/math/Plane.js",
-	"src/math/Sphere.js",
 	"src/math/Math.js",
 	"src/math/Spline.js",
 	"src/math/Triangle.js"

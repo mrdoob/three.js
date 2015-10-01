@@ -98,8 +98,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
 
 				// CHARACTER
@@ -113,7 +114,7 @@
 					setupMorphsGUI();
 					gui.width = 300;
 					gui.open();
-				}
+				};
 				
 				var loader = new THREE.XHRLoader();
 				loader.load("models/skinned/UCS_config.json", function ( text ) {
@@ -145,7 +146,7 @@
 					return function () {
 						character.setSkin( index );
 					};
-				}
+				};
 
 				for ( var i = 0; i < character.numSkins; i++ ) {
 					var name = character.skins[ i ].name;
@@ -171,7 +172,7 @@
 					return function () {
 						character.updateMorphs( morphConfig );
 					}
-				}
+				};
 				
 				for ( var i = 0; i < character.numMorphs; i ++ ) {
 					var morphName = character.morphs[ i ];
@@ -223,7 +224,7 @@
 
 				// update skinning
 
-				THREE.AnimationHandler.update( delta );
+				character.mixer.update( delta );
 
 				renderer.render( scene, camera );
 

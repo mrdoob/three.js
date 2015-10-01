@@ -39,6 +39,9 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/loaders/collada/Animation.js"></script>
+		<script src="js/loaders/collada/AnimationHandler.js"></script>
+		<script src="js/loaders/collada/KeyFrameAnimation.js"></script>
 
 		<script src="js/loaders/ColladaLoader.js"></script>
 
@@ -56,7 +59,7 @@
 			var dae;
 
 			var clock = new THREE.Clock();
-			var morphs = [];
+			var mixers = [];
 
 			// Collada model
 
@@ -107,7 +110,6 @@
 					var material = materials[ 0 ];
 					material.morphTargets = true;
 					material.color.setHex( 0xffaaaa );
-					material.ambient.setHex( 0x222222 );
 
 					var faceMaterial = new THREE.MeshFaceMaterial( materials );
 
@@ -122,28 +124,26 @@
 
 						if ( Math.abs( x ) < 2 && Math.abs( z ) < 2 ) continue;
 
-						morph = new THREE.MorphAnimMesh( geometry, faceMaterial );
-
-						// one second duration
-
-						morph.duration = 1000;
-
-						// random animation offset
-
-						morph.time = 1000 * Math.random();
+						mesh = new THREE.Mesh( geometry, faceMaterial );
 
 						var s = THREE.Math.randFloat( 0.00075, 0.001 );
-						morph.scale.set( s, s, s );
+						mesh.scale.set( s, s, s );
 
-						morph.position.set( x, 0, z );
-						morph.rotation.y = THREE.Math.randFloat( -0.25, 0.25 );
+						mesh.position.set( x, 0, z );
+						mesh.rotation.y = THREE.Math.randFloat( -0.25, 0.25 );
 
-						morph.matrixAutoUpdate = false;
-						morph.updateMatrix();
+						mesh.matrixAutoUpdate = false;
+						mesh.updateMatrix();
 
-						scene.add( morph );
+						scene.add( mesh );
+						
+						var mixer = new THREE.AnimationMixer( mesh );
+						mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( 1 ) );
 
-						morphs.push( morph );
+						// random animation offset
+						mixer.update( 1000 * Math.random() );
+
+						mixers.push( mixer );
 
 					}
 
@@ -165,8 +165,8 @@
 				// Renderer
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				// Stats
@@ -203,12 +203,12 @@
 
 				THREE.AnimationHandler.update( delta );
 
-				if ( morphs.length ) {
+				for ( var i = 0; i < mixers.length; i ++ ) {
 
-					for ( var i = 0; i < morphs.length; i ++ )
-						morphs[ i ].updateAnimation( 1000 * delta );
+					mixers[ i ].update( delta );
 
 				}
+
 
 				render();
 				stats.update();

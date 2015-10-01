@@ -30,6 +30,7 @@ class ThreeJsWriter(object):
 
         self.verticeOffset = 0
         self.uvOffset = 0
+        self.normalOffset = 0
         self.vertices = []
         self.materials = []
         self.faces = []
@@ -128,6 +129,7 @@ class ThreeJsWriter(object):
             self._exportFaces(mesh)
             self.verticeOffset += len(mesh.getPoints())
             self.uvOffset += mesh.numUVs()
+            self.normalOffset += mesh.numNormals()
         if self.options['normals']:
             print("Exporting normals")
             self._exportNormals(mesh)
@@ -141,7 +143,7 @@ class ThreeJsWriter(object):
 
         if self.options['materials']:
             for engine in mesh.listConnections(type='shadingEngine'):
-                if sets(engine, isMember=face):
+                if sets(engine, isMember=face) or sets(engine, isMember=mesh):
                     for material in engine.listConnections(type='lambert'):
                         if self._materialIndices.has_key(material.name()):
                             return self._materialIndices[material.name()]
@@ -204,7 +206,7 @@ class ThreeJsWriter(object):
 
     def _exportFaceVertexNormals(self, face):
         for i in range(face.polygonVertexCount()):
-            self.faces.append(face.normalIndex(i))
+            self.faces.append(face.normalIndex(i) + self.normalOffset)
 
     def _exportNormals(self, mesh):
         for normal in mesh.getNormals():
@@ -268,9 +270,11 @@ class ThreeJsWriter(object):
             self._exportFile(result, f, "Specular")
 
     def _exportFile(self, result, mapFile, mapType):
-        fName = os.path.basename(mapFile.ftn.get())
+        src = mapFile.ftn.get()
+        targetDir = os.path.dirname(self.path)
+        fName = os.path.basename(src)
         if self.options['copyTextures']:
-            shutil.copy2(mapFile.ftn.get(), os.path.dirname(self.path) + "/" + fName)
+            shutil.copy2(src, os.path.join(targetDir, fName))
         result["map" + mapType] = fName
         result["map" + mapType + "Repeat"] = [1, 1]
         result["map" + mapType + "Wrap"] = ["repeat", "repeat"]

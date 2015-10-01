@@ -95,7 +95,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer, dirLight, hemiLight;
-			var morphs = [];
+			var mixers = [];
 			var stats;
 
 			var clock = new THREE.Clock();
@@ -164,8 +164,8 @@
 
 				// GROUND
 
-				var groundGeo = new THREE.PlaneGeometry( 10000, 10000 );
-				var groundMat = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0xffffff, specular: 0x050505 } );
+				var groundGeo = new THREE.PlaneBufferGeometry( 10000, 10000 );
+				var groundMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x050505 } );
 				groundMat.color.setHSL( 0.095, 1, 0.75 );
 
 				var ground = new THREE.Mesh( groundGeo, groundMat );
@@ -184,7 +184,7 @@
 					bottomColor: { type: "c", value: new THREE.Color( 0xffffff ) },
 					offset:		 { type: "f", value: 33 },
 					exponent:	 { type: "f", value: 0.6 }
-				}
+				};
 				uniforms.topColor.value.copy( hemiLight.color );
 
 				scene.fog.color.copy( uniforms.bottomColor.value );
@@ -202,39 +202,39 @@
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
-					geometry.computeMorphNormals();
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
-					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
-
-					meshAnim.duration = 1000;
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					var s = 0.35;
-					meshAnim.scale.set( s, s, s );
-					meshAnim.position.y = 15;
-					meshAnim.rotation.y = -1;
+					mesh.scale.set( s, s, s );
+					mesh.position.y = 15;
+					mesh.rotation.y = -1;
 
-					meshAnim.castShadow = true;
-					meshAnim.receiveShadow = true;
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
 
-					scene.add( meshAnim );
-					morphs.push( meshAnim );
+					scene.add( mesh );
+
+					var mixer = new THREE.AnimationMixer( mesh );
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( 5 ) );
+					mixers.push( mixer );
 
 				} );
 
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.setClearColor( scene.fog.color, 1 );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapCullFace = THREE.CullFaceBack;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.cullFace = THREE.CullFaceBack;
 
 				// STATS
 
@@ -277,12 +277,12 @@
 
 				switch ( event.keyCode ) {
 
-					case 72: /*h*/
+					case 72: // h
 
 					hemiLight.visible = !hemiLight.visible;
 					break;
 
-					case 68: /*d*/
+					case 68: // d
 
 					dirLight.visible = !dirLight.visible;
 					break;
@@ -308,10 +308,9 @@
 
 				//controls.update();
 
-				for ( var i = 0; i < morphs.length; i ++ ) {
+				for ( var i = 0; i < mixers.length; i ++ ) {
 
-					morph = morphs[ i ];
-					morph.updateAnimation( 1000 * delta );
+					mixers[ i ].update( delta );
 
 				}
 

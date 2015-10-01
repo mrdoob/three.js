@@ -5,7 +5,7 @@ three.js
 
 The aim of the project is to create a lightweight 3D library with a very low level of complexity — in other words, for dummies. The library provides &lt;canvas&gt;, &lt;svg&gt;, CSS3D and WebGL renderers.
 
-[Examples](http://threejs.org/) — [Documentation](http://threejs.org/docs/) — [Migrating](https://github.com/mrdoob/three.js/wiki/Migration) — [Help](http://stackoverflow.com/questions/tagged/three.js)
+[Examples](http://threejs.org/examples/) — [Documentation](http://threejs.org/docs/) — [Migrating](https://github.com/mrdoob/three.js/wiki/Migration) — [Help](http://stackoverflow.com/questions/tagged/three.js)
 
 
 ### Usage ###
@@ -17,7 +17,7 @@ Alternatively see [how to build the library yourself](https://github.com/mrdoob/
 <script src="js/three.min.js"></script>
 ```
 
-This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a &lt;canvas&gt; renderer for the scene and camera, and it adds that viewport to the document.body element. Finally it animates the cube within the scene for the camera.
+This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a `WebGL` renderer for the scene and camera, and it adds that viewport to the document.body element. Finally it animates the cube within the scene for the camera.
 
 ```html
 <script>
@@ -41,7 +41,7 @@ This code creates a scene, a camera, and a geometric cube, and it adds the cube 
 		mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 
-		renderer = new THREE.CanvasRenderer();
+		renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 
 		document.body.appendChild( renderer.domElement );
@@ -61,7 +61,7 @@ This code creates a scene, a camera, and a geometric cube, and it adds the cube 
 
 </script>
 ```
-If everything went well you should see [this](http://jsfiddle.net/Q7DLQ/).
+If everything went well you should see [this](http://jsfiddle.net/f17Lz5ux/).
 
 ### Change log ###
 

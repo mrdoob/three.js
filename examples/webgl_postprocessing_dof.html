@@ -89,6 +89,7 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
@@ -117,8 +118,6 @@
 
 				var start = Date.now();
 
-				renderer.initMaterial( cubeMaterial, scene.__lights, scene.fog );
-
 				var xgrid = 14,
 					ygrid = 9,
 					zgrid = 14;
@@ -142,7 +141,6 @@
 
 						materials[ c ] = new THREE.MeshBasicMaterial( parameters );
 						mesh = new THREE.Mesh( geo, materials[ c ] );
-						renderer.initMaterial( materials[ c ], scene.__lights, scene.fog, mesh );
 
 					}
 

@@ -47,7 +47,7 @@
 
 			var camera, scene, renderer;
 
-			var projector, raycaster, mouse, points = [];
+			var raycaster, mouse;
 
 			var mesh, line;
 
@@ -189,7 +189,7 @@
 				geometry.computeBoundingSphere();
 
 				var material = new THREE.MeshPhongMaterial( {
-						color: 0xaaaaaa, ambient: 0xaaaaaa, specular: 0xffffff, shininess: 250,
+						color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
 						side: THREE.DoubleSide, vertexColors: THREE.VertexColors
 				} );
 
@@ -198,7 +198,6 @@
 
 				//
 
-				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
 
 				mouse = new THREE.Vector2();
@@ -214,9 +213,9 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				//
@@ -269,32 +268,25 @@
 				mesh.rotation.x = time * 0.15;
 				mesh.rotation.y = time * 0.25;
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-				projector.unprojectVector( vector, camera );
-
-				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersects = raycaster.intersectObject( mesh );
 
 				if ( intersects.length > 0 ) {
 
 					var intersect = intersects[ 0 ];
+					var face = intersect.face;
 
-					var object = intersect.object;
-					var positions = object.geometry.attributes.position.array;
+					var linePosition = line.geometry.attributes.position;
+					var meshPosition = mesh.geometry.attributes.position;
 
-					for ( var i = 0, j = 0; i < 4; i ++, j += 3 ) {
-
-						var index = intersect.indices[ i % 3 ] * 3;
-
-						line.geometry.attributes.position.array[ j     ] = positions[ index     ];
-						line.geometry.attributes.position.array[ j + 1 ] = positions[ index + 1 ];
-						line.geometry.attributes.position.array[ j + 2 ] = positions[ index + 2 ];
-
-					}
+					linePosition.copyAt( 0, meshPosition, face.a );
+					linePosition.copyAt( 1, meshPosition, face.b );
+					linePosition.copyAt( 2, meshPosition, face.c );
+					linePosition.copyAt( 3, meshPosition, face.a );
 
 					mesh.updateMatrix();
-					
+
 					line.geometry.applyMatrix( mesh.matrix );
 
 					line.visible = true;

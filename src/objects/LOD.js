@@ -8,12 +8,28 @@ THREE.LOD = function () {
 
 	THREE.Object3D.call( this );
 
-	this.objects = [];
+	this.type = 'LOD';
+
+	Object.defineProperties( this, {
+		levels: {
+			enumerable: true,
+			value: []
+		},
+		objects: {
+			get: function () {
+
+				console.warn( 'THREE.LOD: .objects has been renamed to .levels.' );
+				return this.levels;
+
+			}
+		}
+	} );
 
 };
 
 
 THREE.LOD.prototype = Object.create( THREE.Object3D.prototype );
+THREE.LOD.prototype.constructor = THREE.LOD;
 
 THREE.LOD.prototype.addLevel = function ( object, distance ) {
 
@@ -21,9 +37,11 @@ THREE.LOD.prototype.addLevel = function ( object, distance ) {
 
 	distance = Math.abs( distance );
 
-	for ( var l = 0; l < this.objects.length; l ++ ) {
+	var levels = this.levels;
 
-		if ( distance < this.objects[ l ].distance ) {
+	for ( var l = 0; l < levels.length; l ++ ) {
+
+		if ( distance < levels[ l ].distance ) {
 
 			break;
 
@@ -31,16 +49,19 @@ THREE.LOD.prototype.addLevel = function ( object, distance ) {
 
 	}
 
-	this.objects.splice( l, 0, { distance: distance, object: object } );
+	levels.splice( l, 0, { distance: distance, object: object } );
+
 	this.add( object );
 
 };
 
 THREE.LOD.prototype.getObjectForDistance = function ( distance ) {
 
-	for ( var i = 1, l = this.objects.length; i < l; i ++ ) {
+	var levels = this.levels;
 
-		if ( distance < this.objects[ i ].distance ) {
+	for ( var i = 1, l = levels.length; i < l; i ++ ) {
+
+		if ( distance < levels[ i ].distance ) {
 
 			break;
 
@@ -48,7 +69,7 @@ THREE.LOD.prototype.getObjectForDistance = function ( distance ) {
 
 	}
 
-	return this.objects[ i - 1 ].object;
+	return levels[ i - 1 ].object;
 
 };
 
@@ -56,7 +77,7 @@ THREE.LOD.prototype.raycast = ( function () {
 
 	var matrixPosition = new THREE.Vector3();
 
-	return function ( raycaster, intersects ) {
+	return function raycast( raycaster, intersects ) {
 
 		matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
@@ -73,23 +94,25 @@ THREE.LOD.prototype.update = function () {
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
 
-	return function ( camera ) {
+	return function update( camera ) {
 
-		if ( this.objects.length > 1 ) {
+		var levels = this.levels;
+
+		if ( levels.length > 1 ) {
 
 			v1.setFromMatrixPosition( camera.matrixWorld );
 			v2.setFromMatrixPosition( this.matrixWorld );
 
 			var distance = v1.distanceTo( v2 );
 
-			this.objects[ 0 ].object.visible = true;
+			levels[ 0 ].object.visible = true;
 
-			for ( var i = 1, l = this.objects.length; i < l; i ++ ) {
+			for ( var i = 1, l = levels.length; i < l; i ++ ) {
 
-				if ( distance >= this.objects[ i ].distance ) {
+				if ( distance >= levels[ i ].distance ) {
 
-					this.objects[ i - 1 ].object.visible = false;
-					this.objects[ i     ].object.visible = true;
+					levels[ i - 1 ].object.visible = false;
+					levels[ i ].object.visible = true;
 
 				} else {
 
@@ -101,7 +124,7 @@ THREE.LOD.prototype.update = function () {
 
 			for ( ; i < l; i ++ ) {
 
-				this.objects[ i ].object.visible = false;
+				levels[ i ].object.visible = false;
 
 			}
 
@@ -111,18 +134,43 @@ THREE.LOD.prototype.update = function () {
 
 }();
 
-THREE.LOD.prototype.clone = function ( object ) {
+THREE.LOD.prototype.copy = function ( source ) {
 
-	if ( object === undefined ) object = new THREE.LOD();
+	THREE.Object3D.prototype.copy.call( this, source, false );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+	var levels = source.levels;
 
-	for ( var i = 0, l = this.objects.length; i < l; i ++ ) {
-		var x = this.objects[ i ].object.clone();
-		x.visible = i === 0;
-		object.addLevel( x, this.objects[ i ].distance );
+	for ( var i = 0, l = levels.length; i < l; i ++ ) {
+
+		var level = levels[ i ];
+
+		this.addLevel( level.object.clone(), level.distance );
+
 	}
 
-	return object;
+	return this;
+
+};
+
+THREE.LOD.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+	data.object.levels = [];
+
+	var levels = this.levels;
+
+	for ( var i = 0, l = levels.length; i < l; i ++ ) {
+
+		var level = levels[ i ];
+
+		data.object.levels.push( {
+			object: level.object.uuid,
+			distance: level.distance
+		} );
+
+	}
+
+	return data;
 
 };

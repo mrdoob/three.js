@@ -81,10 +81,62 @@
 
 				var i, line, vertex1, vertex2, material, p,
 					parameters = [ [ 0.25, 0xff7700, 1, 2 ], [ 0.5, 0xff9900, 1, 1 ], [ 0.75, 0xffaa00, 0.75, 1 ], [ 1, 0xffaa00, 0.5, 1 ], [ 1.25, 0x000833, 0.8, 1 ],
-							       [ 3.0, 0xaaaaaa, 0.75, 2 ], [ 3.5, 0xffffff, 0.5, 1 ], [ 4.5, 0xffffff, 0.25, 1 ], [ 5.5, 0xffffff, 0.125, 1 ] ],
+							       [ 3.0, 0xaaaaaa, 0.75, 2 ], [ 3.5, 0xffffff, 0.5, 1 ], [ 4.5, 0xffffff, 0.25, 1 ], [ 5.5, 0xffffff, 0.125, 1 ] ];
 
-					geometry = new THREE.Geometry();
+				var geometry = createGeometry();
 
+				for( i = 0; i < parameters.length; ++ i ) {
+
+					p = parameters[ i ];
+
+					material = new THREE.LineBasicMaterial( { color: p[ 1 ], opacity: p[ 2 ], linewidth: p[ 3 ] } );
+
+					line = new THREE.LineSegments( geometry, material );
+					line.scale.x = line.scale.y = line.scale.z = p[ 0 ];
+					line.originalScale = p[ 0 ];
+					line.rotation.y = Math.random() * Math.PI;
+					line.updateMatrix();
+					scene.add( line );
+
+				}
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				container.appendChild( renderer.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// test geometry swapability
+
+				setInterval( function () {
+
+					var geometry = createGeometry();
+
+					scene.traverse( function ( object ) {
+
+						if ( object instanceof THREE.Line ) {
+
+							object.geometry.dispose();
+							object.geometry = geometry;
+
+						}
+
+					} );
+
+				}, 1000 );
+
+			}
+
+			function createGeometry() {
+
+				var geometry = new THREE.Geometry();
 
 				for ( i = 0; i < 1500; i ++ ) {
 
@@ -103,32 +155,7 @@
 
 				}
 
-				for( i = 0; i < parameters.length; ++ i ) {
-
-					p = parameters[ i ];
-
-					material = new THREE.LineBasicMaterial( { color: p[ 1 ], opacity: p[ 2 ], linewidth: p[ 3 ] } );
-
-					line = new THREE.Line( geometry, material, THREE.LinePieces );
-					line.scale.x = line.scale.y = line.scale.z = p[ 0 ];
-					line.originalScale = p[ 0 ];
-					line.rotation.y = Math.random() * Math.PI;
-					line.updateMatrix();
-					scene.add( line );
-
-				}
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				container.appendChild( renderer.domElement );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
+				return geometry;
 
 			}
 

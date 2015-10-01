@@ -49,35 +49,35 @@
 */
 var global = window;
 (function (root, factory) {
-    if (typeof exports === 'object') {
+	if (typeof exports === 'object') {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like enviroments that support module.exports,
         // like Node.
-        factory(module.exports);
-    } else if (typeof define === 'function' && define.amd) {
+		factory(module.exports);
+	} else if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define([], function () {
-            return factory(root);
-        });
-    } else {
+		define([], function () {
+			return factory(root);
+		});
+	} else {
         // Browser globals
-        factory(root);
-    }
+		factory(root);
+	}
 }(this, function (root) {
-    "use strict";
+	"use strict";
 
-    var categoriesDepsOrder = ["buffers", "bufferViews", "images",  "videos", "samplers", "textures", "shaders", "programs", "techniques", "materials", "accessors", "meshes", "cameras", "lights", "skins", "nodes", "scenes", "animations"];
+	var categoriesDepsOrder = [ "buffers", "bufferViews", "images",  "videos", "samplers", "textures", "shaders", "programs", "techniques", "materials", "accessors", "meshes", "cameras", "lights", "skins", "nodes", "scenes", "animations" ];
 
-    var glTFParser = Object.create(Object.prototype, {
+	var glTFParser = Object.create(Object.prototype, {
 
         _rootDescription: { value: null, writable: true },
 
         rootDescription: {
             set: function(value) {
-                this._rootDescription = value;
+	this._rootDescription = value;
             },
             get: function() {
-                return this._rootDescription;
+	return this._rootDescription;
             }
         },
 
@@ -86,34 +86,34 @@ var global = window;
         //detect absolute path following the same protocol than window.location
         _isAbsolutePath: {
             value: function(path) {
-                var isAbsolutePathRegExp = new RegExp("^"+window.location.protocol, "i");
+	var isAbsolutePathRegExp = new RegExp("^" + window.location.protocol, "i");
 
-                return path.match(isAbsolutePathRegExp) ? true : false;
+	return path.match(isAbsolutePathRegExp) ? true : false;
             }
         },
 
         resolvePathIfNeeded: {
             value: function(path) {
-                if (this._isAbsolutePath(path)) {
-                    return path;
-                }
+	if (this._isAbsolutePath(path)) {
+		return path;
+	}
 
-                return this.baseURL + path;
+	return this.baseURL + path;
             }
         },
 
         _resolvePathsForCategories: {
             value: function(categories) {
-                categories.forEach( function(category) {
-                    var descriptions = this.json[category];
-                    if (descriptions) {
-                        var descriptionKeys = Object.keys(descriptions);
-                        descriptionKeys.forEach( function(descriptionKey) {
-                            var description = descriptions[descriptionKey];
-                            description.path = this.resolvePathIfNeeded(description.path);
-                        }, this);
-                    }
-                }, this);
+	categories.forEach( function(category) {
+		var descriptions = this.json[category];
+		if (descriptions) {
+			var descriptionKeys = Object.keys(descriptions);
+			descriptionKeys.forEach( function(descriptionKey) {
+				var description = descriptions[descriptionKey];
+				description.path = this.resolvePathIfNeeded(description.path);
+			}, this);
+		}
+	}, this);
             }
         },
 
@@ -125,13 +125,13 @@ var global = window;
         json: {
             enumerable: true,
             get: function() {
-                return this._json;
+	return this._json;
             },
             set: function(value) {
-                if (this._json !== value) {
-                    this._json = value;
-                    this._resolvePathsForCategories(["buffers", "shaders", "images", "videos"]);
-                }
+	if (this._json !== value) {
+		this._json = value;
+		this._resolvePathsForCategories([ "buffers", "shaders", "images", "videos" ]);
+	}
             }
         },
 
@@ -142,60 +142,60 @@ var global = window;
 
         getEntryDescription: {
             value: function (entryID, entryType) {
-                var entries = null;
+	var entries = null;
 
-                var category = entryType;
-                entries = this.rootDescription[category];
-                if (!entries) {
-                    console.log("ERROR:CANNOT find expected category named:"+category);
-                    return null;
-                }
+	var category = entryType;
+	entries = this.rootDescription[category];
+	if (!entries) {
+		console.log("ERROR:CANNOT find expected category named:" + category);
+		return null;
+	}
 
-                return entries ? entries[entryID] : null;
+	return entries ? entries[entryID] : null;
             }
         },
 
         _stepToNextCategory: {
             value: function() {
-                this._state.categoryIndex = this.getNextCategoryIndex(this._state.categoryIndex + 1);
-                if (this._state.categoryIndex !== -1) {
-                    this._state.categoryState.index = 0;
-                    return true;
-                }
+	this._state.categoryIndex = this.getNextCategoryIndex(this._state.categoryIndex + 1);
+	if (this._state.categoryIndex !== -1) {
+		this._state.categoryState.index = 0;
+		return true;
+	}
 
-                return false;
+	return false;
             }
         },
 
         _stepToNextDescription: {
             enumerable: false,
             value: function() {
-                var categoryState = this._state.categoryState;
-                var keys = categoryState.keys;
-                if (!keys) {
-                    console.log("INCONSISTENCY ERROR");
-                    return false;
-                }
+	var categoryState = this._state.categoryState;
+	var keys = categoryState.keys;
+	if (!keys) {
+		console.log("INCONSISTENCY ERROR");
+		return false;
+	}
 
-                categoryState.index++;
-                categoryState.keys = null;
-                if (categoryState.index >= keys.length) {
-                    return this._stepToNextCategory();
-                }
-                return false;
+	categoryState.index ++;
+	categoryState.keys = null;
+	if (categoryState.index >= keys.length) {
+		return this._stepToNextCategory();
+	}
+	return false;
             }
         },
 
         hasCategory: {
             value: function(category) {
-                return this.rootDescription[category] ? true : false;
+	return this.rootDescription[category] ? true : false;
             }
         },
 
         _handleState: {
             value: function() {
 
-                var methodForType = {
+	var methodForType = {
                     "buffers" : this.handleBuffer,
                     "bufferViews" : this.handleBufferView,
                     "shaders" : this.handleShader,
@@ -217,46 +217,46 @@ var global = window;
 
                 };
 
-                var success = true;
-                while (this._state.categoryIndex !== -1) {
-                    var category = categoriesDepsOrder[this._state.categoryIndex];
-                    var categoryState = this._state.categoryState;
-                    var keys = categoryState.keys;
-                    if (!keys) {
-                        categoryState.keys = keys = Object.keys(this.rootDescription[category]);
-                        if (keys) {
-                            if (keys.length == 0) {
-                                this._stepToNextDescription();
-                                continue;
-                            }
-                        }
-                    }
+	var success = true;
+	while (this._state.categoryIndex !== -1) {
+		var category = categoriesDepsOrder[this._state.categoryIndex];
+		var categoryState = this._state.categoryState;
+		var keys = categoryState.keys;
+		if (!keys) {
+			categoryState.keys = keys = Object.keys(this.rootDescription[category]);
+			if (keys) {
+				if (keys.length == 0) {
+					this._stepToNextDescription();
+					continue;
+				}
+			}
+		}
 
-                    var type = category;
-                    var entryID = keys[categoryState.index];
-                    var description = this.getEntryDescription(entryID, type);
-                    if (!description) {
-                        if (this.handleError) {
-                            this.handleError("INCONSISTENCY ERROR: no description found for entry "+entryID);
-                            success = false;
-                            break;
-                        }
-                    } else {
+		var type = category;
+		var entryID = keys[categoryState.index];
+		var description = this.getEntryDescription(entryID, type);
+		if (!description) {
+			if (this.handleError) {
+				this.handleError("INCONSISTENCY ERROR: no description found for entry " + entryID);
+				success = false;
+				break;
+			}
+		} else {
 
-                        if (methodForType[type]) {
-                            if (methodForType[type].call(this, entryID, description, this._state.userInfo) === false) {
-                                success = false;
-                                break;
-                            }
-                        }
+			if (methodForType[type]) {
+				if (methodForType[type].call(this, entryID, description, this._state.userInfo) === false) {
+					success = false;
+					break;
+				}
+			}
 
-                        this._stepToNextDescription();
-                    }
-                }
+			this._stepToNextDescription();
+		}
+	}
 
-                if (this.handleLoadCompleted) {
-                    this.handleLoadCompleted(success);
-                }
+	if (this.handleLoadCompleted) {
+		this.handleLoadCompleted(success);
+	}
 
             }
         },
@@ -264,40 +264,40 @@ var global = window;
         _loadJSONIfNeeded: {
             enumerable: true,
             value: function(callback) {
-                var self = this;
+	var self = this;
                 //FIXME: handle error
-                if (!this._json)  {
-                    var jsonPath = this._path;
-                    var i = jsonPath.lastIndexOf("/");
-                    this.baseURL = (i !== 0) ? jsonPath.substring(0, i + 1) : '';
-                    var jsonfile = new XMLHttpRequest();
-                    jsonfile.open("GET", jsonPath, true);
-                    jsonfile.addEventListener( 'load', function ( event ) {
-                        self.json = JSON.parse(jsonfile.responseText);
-                        if (callback) {
-                            callback(self.json);
-                        }
-                    }, false );
-                    jsonfile.send(null);
-               } else {
-                    if (callback) {
-                        callback(this.json);
-                    }
-                }
+	if (!this._json) {
+		var jsonPath = this._path;
+		var i = jsonPath.lastIndexOf("/");
+		this.baseURL = (i !== 0) ? jsonPath.substring(0, i + 1) : '';
+		var jsonfile = new XMLHttpRequest();
+		jsonfile.open("GET", jsonPath, true);
+		jsonfile.addEventListener( 'load', function ( event ) {
+			self.json = JSON.parse(jsonfile.responseText);
+			if (callback) {
+				callback(self.json);
+			}
+		}, false );
+		jsonfile.send(null);
+	} else {
+		if (callback) {
+			callback(this.json);
+		}
+	}
             }
         },
 
         /* load JSON and assign it as description to the reader */
         _buildLoader: {
             value: function(callback) {
-                var self = this;
-                function JSONReady(json) {
-                    self.rootDescription = json;
-                    if (callback)
+	var self = this;
+	function JSONReady(json) {
+		self.rootDescription = json;
+		if (callback)
                         callback(this);
-                }
+	}
 
-                this._loadJSONIfNeeded(JSONReady);
+	this._loadJSONIfNeeded(JSONReady);
             }
         },
 
@@ -305,51 +305,51 @@ var global = window;
 
         _getEntryType: {
             value: function(entryID) {
-                var rootKeys = categoriesDepsOrder;
-                for (var i = 0 ;  i < rootKeys.length ; i++) {
-                    var rootValues = this.rootDescription[rootKeys[i]];
-                    if (rootValues) {
-                        return rootKeys[i];
-                    }
-                }
-                return null;
+	var rootKeys = categoriesDepsOrder;
+	for (var i = 0 ; i < rootKeys.length ; i ++) {
+		var rootValues = this.rootDescription[rootKeys[i]];
+		if (rootValues) {
+			return rootKeys[i];
+		}
+	}
+	return null;
             }
         },
 
         getNextCategoryIndex: {
             value: function(currentIndex) {
-                for (var i = currentIndex ; i < categoriesDepsOrder.length ; i++) {
-                    if (this.hasCategory(categoriesDepsOrder[i])) {
-                        return i;
-                    }
-                }
+	for (var i = currentIndex ; i < categoriesDepsOrder.length ; i ++) {
+		if (this.hasCategory(categoriesDepsOrder[i])) {
+			return i;
+		}
+	}
 
-                return -1;
+	return -1;
             }
         },
 
         load: {
             enumerable: true,
             value: function(userInfo, options) {
-                var self = this;
-                this._buildLoader(function loaderReady(reader) {
-                    var startCategory = self.getNextCategoryIndex.call(self,0);
-                    if (startCategory !== -1) {
-                        self._state = { "userInfo" : userInfo,
+	var self = this;
+	this._buildLoader(function loaderReady(reader) {
+		var startCategory = self.getNextCategoryIndex.call(self, 0);
+		if (startCategory !== -1) {
+			self._state = { "userInfo" : userInfo,
                                         "options" : options,
                                         "categoryIndex" : startCategory,
                                         "categoryState" : { "index" : "0" } };
-                        self._handleState();
-                    }
-                });
+			self._handleState();
+		}
+	});
             }
         },
 
         initWithPath: {
             value: function(path) {
-                this._path = path;
-                this._json = null;
-                return this;
+	this._path = path;
+	this._json = null;
+	return this;
             }
         },
 
@@ -359,30 +359,30 @@ var global = window;
         //to be invoked by subclass, so that ids can be ensured to not overlap
         loaderContext: {
             value: function() {
-                if (typeof this._knownURLs[this._path] === "undefined") {
-                    this._knownURLs[this._path] = Object.keys(this._knownURLs).length;
-                }
-                return "__" + this._knownURLs[this._path];
+	if (typeof this._knownURLs[this._path] === "undefined") {
+		this._knownURLs[this._path] = Object.keys(this._knownURLs).length;
+	}
+	return "__" + this._knownURLs[this._path];
             }
         },
 
         initWithJSON: {
             value: function(json, baseURL) {
-                this.json = json;
-                this.baseURL = baseURL;
-                if (!baseURL) {
-                    console.log("WARNING: no base URL passed to Reader:initWithJSON");
-                }
-                return this;
+	this.json = json;
+	this.baseURL = baseURL;
+	if (!baseURL) {
+		console.log("WARNING: no base URL passed to Reader:initWithJSON");
+	}
+	return this;
             }
         }
 
     });
 
-    if(root) {
-        root.glTFParser = glTFParser;
-    }
+	if (root) {
+		root.glTFParser = glTFParser;
+	}
 
-    return glTFParser;
+	return glTFParser;
 
 }));

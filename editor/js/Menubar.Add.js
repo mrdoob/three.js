@@ -1,21 +1,61 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.Add = function ( editor ) {
+
+	var container = new UI.Panel();
+	container.setClass( 'menu' );
+
+	var title = new UI.Panel();
+	title.setClass( 'title' );
+	title.setTextContent( 'Add' );
+	container.add( title );
+
+	var options = new UI.Panel();
+	options.setClass( 'options' );
+	container.add( options );
+
+	//
 
 	var meshCount = 0;
 	var lightCount = 0;
+	var cameraCount = 0;
 
-	// event handlers
+	editor.signals.editorCleared.add( function () {
 
-	function onObject3DOptionClick () {
+		meshCount = 0;
+		lightCount = 0;
+		cameraCount = 0;
 
-		var mesh = new THREE.Object3D();
-		mesh.name = 'Object3D ' + ( ++ meshCount );
+	} );
+
+	// Group
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Group' );
+	option.onClick( function () {
+
+		var mesh = new THREE.Group();
+		mesh.name = 'Group ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
 		editor.select( mesh );
 
-	}
+	} );
+	options.add( option );
 
-	function onPlaneOptionClick () {
+	//
+
+	options.add( new UI.HorizontalRule() );
+
+	// Plane
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Plane' );
+	option.onClick( function () {
 
 		var width = 200;
 		var height = 200;
@@ -31,9 +71,15 @@ Menubar.Add = function ( editor ) {
 		editor.addObject( mesh );
 		editor.select( mesh );
 
-	};
+	} );
+	options.add( option );
 
-	function onBoxOptionClick () {
+	// Box
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Box' );
+	option.onClick( function () {
 
 		var width = 100;
 		var height = 100;
@@ -50,12 +96,18 @@ Menubar.Add = function ( editor ) {
 		editor.addObject( mesh );
 		editor.select( mesh );
 
-	}
-	
-	function onCircleOptionClick () {
+	} );
+	options.add( option );
+
+	// Circle
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Circle' );
+	option.onClick( function () {
 
 		var radius = 20;
-		var segments = 8;
+		var segments = 32;
 
 		var geometry = new THREE.CircleGeometry( radius, segments );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
@@ -64,14 +116,20 @@ Menubar.Add = function ( editor ) {
 		editor.addObject( mesh );
 		editor.select( mesh );
 
-	}
+	} );
+	options.add( option );
 
-	function onCylinderOptionClick () {
+	// Cylinder
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Cylinder' );
+	option.onClick( function () {
 
 		var radiusTop = 20;
 		var radiusBottom = 20;
 		var height = 100;
-		var radiusSegments = 8;
+		var radiusSegments = 32;
 		var heightSegments = 1;
 		var openEnded = false;
 
@@ -82,38 +140,60 @@ Menubar.Add = function ( editor ) {
 		editor.addObject( mesh );
 		editor.select( mesh );
 
-	}
+	} );
+	options.add( option );
 
-	function onSphereOptionClick () {
+	// Sphere
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Sphere' );
+	option.onClick( function () {
 
 		var radius = 75;
 		var widthSegments = 32;
 		var heightSegments = 16;
+		var phiStart = 0;
+		var phiLength = Math.PI * 2;
+		var thetaStart = 0;
+		var thetaLength = Math.PI;
 
-		var geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments );
+		var geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Sphere ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
 		editor.select( mesh );
 
-	}
+	} );
+	options.add( option );
 
-	function onIcosahedronOptionClick () {
+	// Icosahedron
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Icosahedron' );
+	option.onClick( function () {
 
 		var radius = 75;
 		var detail = 2;
 
-		var geometry = new THREE.IcosahedronGeometry ( radius, detail );
+		var geometry = new THREE.IcosahedronGeometry( radius, detail );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Icosahedron ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
 		editor.select( mesh );
 
-	}
+	} );
+	options.add( option );
 
-	function onTorusOptionClick () {
+	// Torus
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Torus' );
+	option.onClick( function () {
 
 		var radius = 100;
 		var tube = 40;
@@ -128,9 +208,15 @@ Menubar.Add = function ( editor ) {
 		editor.addObject( mesh );
 		editor.select( mesh );
 
-	}
+	} );
+	options.add( option );
 
- 	function onTorusKnotOptionClick () {
+	// TorusKnot
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'TorusKnot' );
+	option.onClick( function () {
 
 		var radius = 100;
 		var tube = 40;
@@ -147,9 +233,45 @@ Menubar.Add = function ( editor ) {
 		editor.addObject( mesh );
 		editor.select( mesh );
 
-	}
+	} );
+	options.add( option );
 
-	function onSpriteOptionClick () {
+	/*
+	// Teapot
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Teapot' );
+	option.onClick( function () {
+
+		var size = 50;
+		var segments = 10;
+		var bottom = true;
+		var lid = true;
+		var body = true;
+		var fitLid = false;
+		var blinnScale = true;
+
+		var material = new THREE.MeshPhongMaterial();
+		material.side = 2;
+
+		var geometry = new THREE.TeapotBufferGeometry( size, segments, bottom, lid, body, fitLid, blinnScale );
+		var mesh = new THREE.Mesh( geometry, material );
+		mesh.name = 'Teapot ' + ( ++ meshCount );
+
+		editor.addObject( mesh );
+		editor.select( mesh );
+
+	} );
+	options.add( option );
+	*/
+
+	// Sprite
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Sprite' );
+	option.onClick( function () {
 
 		var sprite = new THREE.Sprite( new THREE.SpriteMaterial() );
 		sprite.name = 'Sprite ' + ( ++ meshCount );
@@ -157,9 +279,19 @@ Menubar.Add = function ( editor ) {
 		editor.addObject( sprite );
 		editor.select( sprite );
 
-	}
+	} );
+	options.add( option );
 
-	function onPointLightOptionClick () {
+	//
+
+	options.add( new UI.HorizontalRule() );
+
+	// PointLight
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'PointLight' );
+	option.onClick( function () {
 
 		var color = 0xffffff;
 		var intensity = 1;
@@ -171,9 +303,15 @@ Menubar.Add = function ( editor ) {
 		editor.addObject( light );
 		editor.select( light );
 
-	}
+	} );
+	options.add( option );
 
-	function onSpotLightOptionClick () {
+	// SpotLight
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'SpotLight' );
+	option.onClick( function () {
 
 		var color = 0xffffff;
 		var intensity = 1;
@@ -185,14 +323,20 @@ Menubar.Add = function ( editor ) {
 		light.name = 'SpotLight ' + ( ++ lightCount );
 		light.target.name = 'SpotLight ' + ( lightCount ) + ' Target';
 
-		light.position.set( 0, 1, 0 ).multiplyScalar( 200 );
+		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
 		editor.addObject( light );
 		editor.select( light );
 
-	}
+	} );
+	options.add( option );
 
-	function onDirectionalLightOptionClick () {
+	// DirectionalLight
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'DirectionalLight' );
+	option.onClick( function () {
 
 		var color = 0xffffff;
 		var intensity = 1;
@@ -201,14 +345,20 @@ Menubar.Add = function ( editor ) {
 		light.name = 'DirectionalLight ' + ( ++ lightCount );
 		light.target.name = 'DirectionalLight ' + ( lightCount ) + ' Target';
 
-		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
+		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
 		editor.addObject( light );
 		editor.select( light );
 
-	}
+	} );
+	options.add( option );
 
-	function onHemisphereLightOptionClick () {
+	// HemisphereLight
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'HemisphereLight' );
+	option.onClick( function () {
 
 		var skyColor = 0x00aaff;
 		var groundColor = 0xffaa00;
@@ -217,14 +367,20 @@ Menubar.Add = function ( editor ) {
 		var light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
 		light.name = 'HemisphereLight ' + ( ++ lightCount );
 
-		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
+		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
 		editor.addObject( light );
 		editor.select( light );
 
-	}
+	} );
+	options.add( option );
 
-	function onAmbientLightOptionClick() {
+	// AmbientLight
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'AmbientLight' );
+	option.onClick( function() {
 
 		var color = 0x222222;
 
@@ -234,39 +390,29 @@ Menubar.Add = function ( editor ) {
 		editor.addObject( light );
 		editor.select( light );
 
-	}
+	} );
+	options.add( option );
 
-	// configure menu contents
+	//
 
-	var createOption = UI.MenubarHelper.createOption;
-	var createDivider = UI.MenubarHelper.createDivider;
+	options.add( new UI.HorizontalRule() );
 
-	var menuConfig = [
-		createOption( 'Object3D', onObject3DOptionClick ),
-		createDivider(),
+	// PerspectiveCamera
 
-		createOption( 'Plane', onPlaneOptionClick ),
-		createOption( 'Box', onBoxOptionClick ),
-		createOption( 'Circle', onCircleOptionClick ),
-		createOption( 'Cylinder', onCylinderOptionClick ),
-		createOption( 'Sphere', onSphereOptionClick  ),
-		createOption( 'Icosahedron', onIcosahedronOptionClick ),
-		createOption( 'Torus', onTorusOptionClick ),
-		createOption( 'Torus Knot', onTorusKnotOptionClick ),
-		createDivider(),
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'PerspectiveCamera' );
+	option.onClick( function() {
 
-		createOption( 'Sprite', onSpriteOptionClick  ),
-		createDivider(),
+		var camera = new THREE.PerspectiveCamera( 50, 1, 1, 10000 );
+		camera.name = 'PerspectiveCamera ' + ( ++ cameraCount );
 
-		createOption( 'Point light', onPointLightOptionClick ),
-		createOption( 'Spot light', onSpotLightOptionClick ),
-		createOption( 'Directional light', onDirectionalLightOptionClick ),
-		createOption( 'Hemisphere light', onHemisphereLightOptionClick ),
-		createOption( 'Ambient light', onAmbientLightOptionClick )
-	];
+		editor.addObject( camera );
+		editor.select( camera );
 
-	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
+	} );
+	options.add( option );
 
-	return UI.MenubarHelper.createMenuContainer( 'Add', optionsPanel );
+	return container;
 
 }

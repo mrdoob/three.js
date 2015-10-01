@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Texture] &rarr;
@@ -26,7 +27,7 @@
 		height -- The height of the biggest mipmap <br />
 		format -- The format used in the mipmaps <br />
 		type -- The type used in the mipmaps <br />
-		mapping --  How the image is applied to the object. An object type of THREE.UVMapping() is the default, where the U,V coordinates are used to apply the map, and a single texture is expected. The other types are THREE.CubeReflectionMapping, for cube maps used as a reflection map; THREE.CubeRefractionMapping, refraction mapping; THREE.SphericalReflectionMapping, a spherical reflection map projection; and THREE.SphericalRefractionMapping.<br />
+		mapping --  How the image is applied to the object. An object type of THREE.UVMapping is the default, where the U,V coordinates are used to apply the map, and a single texture is expected. The other types are THREE.CubeReflectionMapping, for cube maps used as a reflection map; THREE.CubeRefractionMapping, refraction mapping; and THREE.SphericalReflectionMapping, a spherical reflection map projection.<br />
 		wrapS -- The default is THREE.ClampToEdgeWrapping, where the edge is clamped to the outer edge texels. The other two choices are THREE.RepeatWrapping and THREE.MirroredRepeatWrapping.<br />
 		wrapT -- The default is THREE.ClampToEdgeWrapping, where the edge is clamped to the outer edge texels. The other two choices are THREE.RepeatWrapping and THREE.MirroredRepeatWrapping.<br />
 		magFilter -- How the texture is sampled when a texel covers more than one pixel. The default is THREE.LinearFilter, which takes the four closest texels and bilinearly interpolates among them. The other option is THREE.NearestFilter, which uses the value of the closest texels.<br />
@@ -39,6 +40,17 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:boolean flipY]</h3>
+		
+		<div>
+			False by default. Flipping textures does not work for compressed textures.
+		</div>
+
+		<h3>[property:boolean generateMipmaps]</h3>
+		
+		<div>
+			False by default. Mipmaps can't be generated for compressed textures
+		</div>
 
 
 		<h2>Methods</h2>

@@ -2,17 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Cache = function () {
+THREE.Cache = {
 
-	this.files = {};
+	enabled: false,
 
-};
-
-THREE.Cache.prototype = {
-
-	constructor: THREE.Cache,
+	files: {},
 
 	add: function ( key, file ) {
+
+		if ( this.enabled === false ) return;
 
 		// console.log( 'THREE.Cache', 'Adding key:', key );
 
@@ -21,6 +19,8 @@ THREE.Cache.prototype = {
 	},
 
 	get: function ( key ) {
+
+		if ( this.enabled === false ) return;
 
 		// console.log( 'THREE.Cache', 'Checking key:', key );
 
@@ -36,7 +36,7 @@ THREE.Cache.prototype = {
 
 	clear: function () {
 
-		this.files = {}
+		this.files = {};
 
 	}
 

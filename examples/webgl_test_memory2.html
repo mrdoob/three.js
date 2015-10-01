@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js - webgl</title>
@@ -73,7 +73,7 @@
 
 				scene = new THREE.Scene();
 
-				geometry = new THREE.SphereGeometry( 15, 64, 32 );
+				geometry = new THREE.SphereBufferGeometry( 15, 64, 32 );
 
 				for ( var i = 0; i < N; i ++ ) {
 
@@ -93,6 +93,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -127,7 +128,7 @@
 
 				renderer.render( scene, camera );
 
-				console.log( "before", renderer.info.memory.programs );
+				console.log( "before", renderer.info.programs.length );
 
 				for ( var i = 0; i < N; i ++ ) {
 
@@ -136,7 +137,7 @@
 
 				}
 
-				console.log( "after", renderer.info.memory.programs );
+				console.log( "after", renderer.info.programs.length );
 
 			}
 

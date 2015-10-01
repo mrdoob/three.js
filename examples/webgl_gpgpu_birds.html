@@ -138,7 +138,7 @@
 			// const float VISION = PI * 0.55;
 
 			float zoneRadius = 40.0;
-			float zoneRadiusSquared = zoneRadius * zoneRadius;
+			float zoneRadiusSquared = 1600.0;
 
 			float separationThresh = 0.45;
 			float alignmentThresh = 0.65;
@@ -207,54 +207,53 @@
 				vec3 central = vec3( 0., 0., 0. );
 				dir = selfPosition - central;
 				dist = length( dir );
+
 				dir.y *= 2.5;
 				velocity -= normalize( dir ) * delta * 5.;
 
 				for (float y=0.0;y<height;y++) {
 					for (float x=0.0;x<width;x++) {
 
-						if (
-							x == gl_FragCoord.x && y == gl_FragCoord.y) continue;
-
-						birdPosition = texture2D( texturePosition,
-							vec2( x / resolution.x,  y / resolution.y ) ).xyz;
+						vec2 ref = vec2( x + 0.5, y + 0.5 ) / resolution.xy;
+						birdPosition = texture2D( texturePosition, ref ).xyz;
 
 						dir = birdPosition - selfPosition;
 						dist = length(dir);
+
+						if (dist < 0.0001) continue;
+
 						distSquared = dist * dist;
 
-						if ( dist > 0.0 && distSquared < zoneRadiusSquared ) {
+						if (distSquared > zoneRadiusSquared ) continue;
 
-							percent = distSquared / zoneRadiusSquared;
+						percent = distSquared / zoneRadiusSquared;
 
-							if ( percent < separationThresh ) { // low
+						if ( percent < separationThresh ) { // low
 
-								// Separation - Move apart for comfort
-								f = (separationThresh / percent - 1.0) * delta;
-								velocity -= normalize(dir) * f;
+							// Separation - Move apart for comfort
+							f = (separationThresh / percent - 1.0) * delta;
+							velocity -= normalize(dir) * f;
 
-							} else if ( percent < alignmentThresh ) { // high
+						} else if ( percent < alignmentThresh ) { // high
 
-								// Alignment - fly the same direction
-								float threshDelta = alignmentThresh - separationThresh;
-								float adjustedPercent = ( percent - separationThresh ) / threshDelta;
+							// Alignment - fly the same direction
+							float threshDelta = alignmentThresh - separationThresh;
+							float adjustedPercent = ( percent - separationThresh ) / threshDelta;
 
-								birdVelocity = texture2D( textureVelocity, vec2(x/resolution.x, y/resolution.y) ).xyz;
+							birdVelocity = texture2D( textureVelocity, ref ).xyz;
 
-								f = ( 0.5 - cos( adjustedPercent * PI_2 ) * 0.5 + 0.5 ) * delta;
-								velocity += normalize(birdVelocity) * f;
+							f = ( 0.5 - cos( adjustedPercent * PI_2 ) * 0.5 + 0.5 ) * delta;
+							velocity += normalize(birdVelocity) * f;
 
-							} else {
+						} else {
 
-								// Attraction / Cohesion - move closer
-								float threshDelta = 1.0 - alignmentThresh;
-								float adjustedPercent = ( percent - alignmentThresh ) / threshDelta;
+							// Attraction / Cohesion - move closer
+							float threshDelta = 1.0 - alignmentThresh;
+							float adjustedPercent = ( percent - alignmentThresh ) / threshDelta;
 
-								 f = ( 0.5 - ( cos( adjustedPercent * PI_2 ) * -0.5 + 0.5 ) ) * delta;
+							f = ( 0.5 - ( cos( adjustedPercent * PI_2 ) * -0.5 + 0.5 ) ) * delta;
 
-								 velocity += normalize(dir) * f;
-
-							}
+							velocity += normalize(dir) * f;
 
 						}
 
@@ -452,9 +451,9 @@
 
 				}
 
-				this.applyMatrix( new THREE.Matrix4().makeScale( 0.2, 0.2, 0.2 ) );
+				this.scale( 0.2, 0.2, 0.2 );
 
-			}
+			};
 
 			THREE.BirdGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
@@ -505,8 +504,9 @@
 				scene.fog = new THREE.Fog( 0xffffff, 100, 1000 );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( scene.fog.color, 1 );
 				container.appendChild( renderer.domElement );
 
 				simulator = new SimulationRenderer(WIDTH, renderer);
@@ -563,39 +563,25 @@
 
 				var geometry = new THREE.BirdGeometry();
 
-				// For Vertex Shaders
-				birdAttributes = {
-					// index: { type: 'i', value: [] },
-					birdColor: { type: 'c', value: null },
-					reference: { type: 'v2', value: null },
-					birdVertex: { type: 'f', value: null }
-				};
-
 				// For Vertex and Fragment
 				birdUniforms = {
-
 					color: { type: "c", value: new THREE.Color( 0xff2200 ) },
 					texturePosition: { type: "t", value: null },
 					textureVelocity: { type: "t", value: null },
 					time: { type: "f", value: 1.0 },
-					delta: { type: "f", value: 0.0 },
-
+					delta: { type: "f", value: 0.0 }
 				};
 
 				// ShaderMaterial
-				var shaderMaterial = new THREE.ShaderMaterial( {
-
-					uniforms: 		birdUniforms,
-					attributes:     birdAttributes,
+				var material = new THREE.ShaderMaterial( {
+					uniforms:       birdUniforms,
 					vertexShader:   document.getElementById( 'birdVS' ).textContent,
 					fragmentShader: document.getElementById( 'birdFS' ).textContent,
 					side: THREE.DoubleSide
 
 				});
 
-
-				// var
-				birdMesh = new THREE.Mesh( geometry, shaderMaterial );
+				birdMesh = new THREE.Mesh( geometry, material );
 				birdMesh.rotation.y = Math.PI / 2;
 				birdMesh.matrixAutoUpdate = false;
 				birdMesh.updateMatrix();
@@ -662,7 +648,7 @@
 
 			function render() {
 
-				var now = performance.now()
+				var now = performance.now();
 				var delta = (now - last) / 1000;
 
 				if (delta > 1) delta = 1; // safety cap on large deltas

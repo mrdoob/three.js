@@ -3,17 +3,30 @@
 <head>
   <meta charset="utf-8">
   <title>ThreeJS Unit Tests - Using build/Three.js</title>
-  <link rel="stylesheet" href="qunit-1.10.0.css">
+  <link rel="stylesheet" href="qunit-1.18.0.css">
 </head>
 <body>
   <div id="qunit"></div>
-  <script src="qunit-1.10.0.js"></script>
+  <script src="../../node_modules/lodash/index.js"></script>
+  <script src="qunit-1.18.0.js"></script>
+  <script src="qunit-utils.js"></script>
+  <script src="SmartComparer.js"></script>
 
   <!-- add sources to test below -->
 
   <script src="../../build/three.js"></script>
 
   <!-- add class-based unit tests below -->
+
+  <script src="cameras/Camera.js"></script>
+  <script src="cameras/OrthographicCamera.js"></script>
+  <script src="cameras/PerspectiveCamera.js"></script>
+
+  <script src="core/BufferAttribute.js"></script>
+  <script src="core/BufferGeometry.js"></script>
+  <script src="core/Clock.js"></script>
+  <script src="core/EventDispatcher.js"></script>
+  <script src="core/Object3D.js"></script>
 
   <script src="math/Constants.js"></script>
   <script src="math/Box2.js"></script>
@@ -28,8 +41,47 @@
   <script src="math/Euler.js"></script>
   <script src="math/Line3.js"></script>
   <script src="math/Quaternion.js"></script>
+  <script src="math/Math.js"></script>
   <script src="math/Matrix3.js"></script>
   <script src="math/Matrix4.js"></script>
   <script src="math/Frustum.js"></script>
+
+  <script src="geometry/EdgesGeometry.js"></script>
+  <script src="extras/ImageUtils.test.js"></script>
+  <script src="lights/AmbientLight.tests.js"></script>
+  <script src="lights/DirectionalLight.tests.js"></script>
+  <script src="lights/HemisphereLight.tests.js"></script>
+  <script src="lights/PointLight.tests.js"></script>
+  <script src="lights/SpotLight.tests.js"></script>
+
+  <script src="extras/geometries/BoxGeometry.tests.js"></script>
+  <script src="extras/geometries/CircleBufferGeometry.tests.js"></script>
+  <script src="extras/geometries/CircleGeometry.tests.js"></script>
+  <script src="extras/geometries/CylinderGeometry.tests.js"></script>
+  <script src="extras/geometries/DodecahedronGeometry.tests.js"></script>
+  <script src="extras/geometries/ExtrudeGeometry.tests.js"></script>
+  <script src="extras/geometries/IcosahedronGeometry.tests.js"></script>
+  <script src="extras/geometries/LatheGeometry.tests.js"></script>
+  <script src="extras/geometries/OctahedronGeometry.tests.js"></script>
+  <script src="extras/geometries/ParametricGeometry.tests.js"></script>
+  <script src="extras/geometries/PlaneBufferGeometry.tests.js"></script>
+  <script src="extras/geometries/PlaneGeometry.tests.js"></script>
+  <script src="extras/geometries/PolyhedronGeometry.tests.js"></script>
+  <script src="extras/geometries/RingGeometry.tests.js"></script>
+  <script src="extras/geometries/ShapeGeometry.tests.js"></script>
+  <script src="extras/geometries/SphereBufferGeometry.tests.js"></script>
+  <script src="extras/geometries/SphereGeometry.tests.js"></script>
+  <script src="extras/geometries/TetrahedronGeometry.tests.js"></script>
+  <script src="extras/geometries/TextGeometry.tests.js"></script>
+  <script src="extras/geometries/TorusGeometry.tests.js"></script>
+  <script src="extras/geometries/TorusKnotGeometry.tests.js"></script>
+  <script src="extras/geometries/TubeGeometry.tests.js"></script>
+  <script src="extras/geometries/WireframeGeometry.tests.js"></script>
+
+
+  <!-- for debug output -->
+  <!--
+  <script src="../../examples/js/controls/OrbitControls.js"></script>
+  -->
 </body>
 </html>

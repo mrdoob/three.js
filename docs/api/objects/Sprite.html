@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
@@ -14,7 +15,7 @@
 		<div class="desc">A sprite is a plane in an 3d scene which faces always towards the camera. </div>
 
                 <h2>Example</h2>
-                
+
                 <code>
                 var map = THREE.ImageUtils.loadTexture( "sprite.png" );
                 var material = new THREE.SpriteMaterial( { map: map, color: 0xffffff, fog: true } );
@@ -36,18 +37,25 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:SpriteMaterial material]</h3>
+		<h3>[property:SpriteMaterial material]</h3>
 		<div>
 		An instance of [page:Material], defining the object's appearance. Default is a [page:SpriteMaterial] which is a white plane.
-		</div> 
+		</div>
 -
            	<h2>Methods</h2>
 
-                <h3>.clone()</h3>
+                <h3>[method:Sprite clone]()</h3>
                 <div>
                 This creates a new clone of the sprite.
                 </div>
-
+		
+		<h3>[method:Object3D clone]([page:Object3D object])</h3>
+		<div>
+		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned Sprite Object.
+		</div>
+		<div>
+		Clone a Sprite Object.
+		</div>
 
 		<h2>Source</h2>
 

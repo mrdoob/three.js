@@ -149,6 +149,7 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
 
@@ -177,8 +178,7 @@
 
 				// new way via CTMLoader and separate parts
 
-				loaderCTM = new THREE.CTMLoader( true );
-				document.body.appendChild( loaderCTM.statusDomElement );
+				loaderCTM = new THREE.CTMLoader();
 
 				var position = new THREE.Vector3( -105, -78, -40 );
 				var scale = new THREE.Vector3( 30, 30, 30 );
@@ -195,8 +195,6 @@
 						scene.add( mesh );
 
 					}
-
-					loaderCTM.statusDomElement.style.display = "none";
 
 					var end = Date.now();
 
@@ -268,10 +266,8 @@
 
 			function createScene( geometry, materials, x, y, z, s ) {
 
-				loader.statusDomElement.style.display = "none";
-
 				geometry.center();
-				
+
 				hackMaterials( materials );
 
 				var material = new THREE.MeshFaceMaterial( materials );

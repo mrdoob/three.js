@@ -1,75 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">	
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>        
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
 		<style type="text/css">
 			body {
 				margin: 0px;
 				overflow: hidden;
+				font-family: Monospace;
+				text-align: center;
 			}
-		</style>        
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+			}
+			a {
+				color: #09f;
+			}
+			#type-status {
+				font-weight: bold;
+			}
+			#stats { position: absolute; top:0; left: 0 }
+		</style>
 	</head>
 	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl ocean simulation<br/>
+			current simulation framebuffers type is <span id="type-status"></span><br/>
+			change type to <span id="change-type"></span>
+		</div>
 
-		<script src="../build/three.min.js"></script>		
+		<script src="../build/three.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/shaders/OceanShaders.js"></script>
-		<script src="js/Ocean.js"></script>		
+		<script src="js/Ocean.js"></script>
 
 		<script>
-			var lastTime = (new Date()).getTime();
-
-			var WINDOW = {
-				ms_Width: 0,
-				ms_Height: 0,
-				ms_Callbacks: {
-					70: "WINDOW.ToggleFullScreen()",		// Toggle fullscreen
-				},
-
-				Initialize: function () {
-					this.UpdateSize();
-
-					// Create callbacks from keyboard
-					document.onkeydown = function (inEvent) { WINDOW.CallAction(inEvent.keyCode); };
-					window.onresize = function (inEvent) {
-						WINDOW.UpdateSize();
-						WINDOW.ResizeCallback(WINDOW.ms_Width, WINDOW.ms_Height);
-					};
-				},
-				UpdateSize: function () {
-					this.ms_Width = window.outerWidth;
-					this.ms_Height = window.outerHeight - 4;
-				},
-				CallAction: function (inId) {
-					if (inId in this.ms_Callbacks) {
-						eval(this.ms_Callbacks[inId]);
-						return false;
-					}
-				},
-				ToggleFullScreen: function () {
-					if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement) {
-						if (document.documentElement.requestFullscreen)
-							document.documentElement.requestFullscreen();
-						else if (document.documentElement.mozRequestFullScreen)
-							document.documentElement.mozRequestFullScreen();
-						else if (document.documentElement.webkitRequestFullscreen)
-							document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-					}
-					else {
-						if (document.cancelFullScreen)
-							document.cancelFullScreen();
-						else if (document.mozCancelFullScreen)
-							document.mozCancelFullScreen();
-						else if (document.webkitCancelFullScreen)
-							document.webkitCancelFullScreen();
-					}
-				},
-				ResizeCallback: function (inWidth, inHeight) { },
-			};
+			var stats = new Stats();
+			document.body.appendChild( stats.domElement );
 
 			var lastTime = (new Date()).getTime();
+
+			var types = { 'float': 'half-float', 'half-float': 'float' };
+			var hash = document.location.hash.substr( 1 );
+			if (!(hash in types)) hash = 'half-float';
+
+			document.getElementById('type-status').innerHTML = hash;
+			document.getElementById('change-type').innerHTML = '<a href="#" onclick="return change(\'' + types[hash] + '\')">' + types[hash] + '</a>';
+
+			var lastTime = (new Date()).getTime();
+
+			function change(n) {
+				location.hash = n;
+				location.reload();
+				return false;
+			}
 
 			var DEMO =
 			{
@@ -82,6 +71,7 @@
 				Initialize: function () {
 
 					this.ms_Renderer = new THREE.WebGLRenderer();
+					this.ms_Renderer.setPixelRatio( window.devicePixelRatio );
 					this.ms_Renderer.context.getExtension('OES_texture_float');
 					this.ms_Renderer.context.getExtension('OES_texture_float_linear');
 
@@ -89,11 +79,11 @@
 
 					this.ms_Scene = new THREE.Scene();
 
-					this.ms_Camera = new THREE.PerspectiveCamera(55.0, WINDOW.ms_Width / WINDOW.ms_Height, 0.5, 300000);
+					this.ms_Camera = new THREE.PerspectiveCamera(55.0, window.innerWidth / window.innerHeight, 0.5, 300000);
 					this.ms_Camera.position.set(450, 350, 450);
 					this.ms_Camera.lookAt(new THREE.Vector3());
 
-					// Initialize Orbit control		
+					// Initialize Orbit control
 					this.ms_Controls = new THREE.OrbitControls(this.ms_Camera, this.ms_Renderer.domElement);
 					this.ms_Controls.userPan = false;
 					this.ms_Controls.userPanSpeed = 0.0;
@@ -101,14 +91,15 @@
 					this.ms_Controls.maxDistance = 2000.0;
 					this.ms_Controls.minPolarAngle = 0;
 					this.ms_Controls.maxPolarAngle = Math.PI * 0.495;
-					
-					var gsize = 512; 
-					var res = 1024; 
+
+					var gsize = 512;
+					var res = 1024;
 					var gres = res / 2;
 					var origx = -gsize / 2;
 					var origz = -gsize / 2;
 					this.ms_Ocean = new THREE.Ocean(this.ms_Renderer, this.ms_Camera, this.ms_Scene,
 					{
+						USE_HALF_FLOAT : hash === 'half-float',
 						INITIAL_SIZE : 256.0,
 						INITIAL_WIND : [10.0, 10.0],
 						INITIAL_CHOPPINESS : 1.5,
@@ -169,7 +160,7 @@
 						this.object.changed = true;
 					});
 				},
-				
+
 				Display: function () {
 					this.ms_Renderer.render(this.ms_Scene, this.ms_Camera);
 				},
@@ -205,17 +196,18 @@
 				}
 			};
 
-			WINDOW.Initialize();
-			
 			DEMO.Initialize();
 
-			WINDOW.ResizeCallback = function (inWidth, inHeight) { DEMO.Resize(inWidth, inHeight); };
-			DEMO.Resize(WINDOW.ms_Width, WINDOW.ms_Height);
+			window.addEventListener( 'resize', function () {
+				DEMO.Resize(window.innerWidth, window.innerHeight);
+			} );
+			DEMO.Resize(window.innerWidth, window.innerHeight);
 
 			var render = function () {
 
 				requestAnimationFrame( render );
 				DEMO.Update();
+				stats.update();
 
 			};
 

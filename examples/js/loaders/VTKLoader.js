@@ -2,102 +2,107 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.VTKLoader = function () {};
+THREE.VTKLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
 
 THREE.VTKLoader.prototype = {
 
 	constructor: THREE.VTKLoader,
 
-	load: function ( url, callback ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
-		var request = new XMLHttpRequest();
 
-		request.addEventListener( 'load', function ( event ) {
+		var loader = new THREE.XHRLoader( scope.manager );
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
 
-			var geometry = scope.parse( event.target.responseText );
+			onLoad( scope.parse( text ) );
 
-			scope.dispatchEvent( { type: 'load', content: geometry } );
+		}, onProgress, onError );
 
-			if ( callback ) callback( geometry );
+	},
 
-		}, false );
+	setCrossOrigin: function ( value ) {
 
-		request.addEventListener( 'progress', function ( event ) {
-
-			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
-
-		}, false );
-
-		request.addEventListener( 'error', function () {
-
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-
-		}, false );
-
-		request.open( 'GET', url, true );
-		request.send( null );
+		this.crossOrigin = value;
 
 	},
 
 	parse: function ( data ) {
 
-		var geometry = new THREE.Geometry();
+		var indices = [];
+		var positions = [];
 
-		var vertex = function ( x, y, z ) {
-
-			geometry.vertices.push( new THREE.Vector3( x, y, z ) );
-
-		}
-
-		var face3 = function ( a, b, c ) {
-
-			geometry.faces.push( new THREE.Face3( a, b, c ) );
-
-		}
-
-		var pattern, result;
+		var result;
 
 		// float float float
 
-		pattern = /([\+|\-]?[\d]+[\.]*[\d|\-|e]*)[ ]+([\+|\-]?[\d]+[\.]*[\d|\-|e]*)[ ]+([\+|\-]?[\d]+[\.]*[\d|\-|e]*)/g;
+		var pat3Floats = /([\-]?[\d]+[\.]?[\d|\-|e]*)[ ]+([\-]?[\d]+[\.]?[\d|\-|e]*)[ ]+([\-]?[\d]+[\.]?[\d|\-|e]*)/g;
+		var patTriangle = /^3[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/;
+		var patQuad = /^4[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/;
+		var patPOINTS = /^POINTS /;
+		var patPOLYGONS = /^POLYGONS /;
+		var inPointsSection = false;
+		var inPolygonsSection = false;
 
-		while ( ( result = pattern.exec( data ) ) !== null ) {
+		var lines = data.split('\n');
+		for ( var i = 0; i < lines.length; ++i ) {
 
-			// ["1.0 2.0 3.0", "1.0", "2.0", "3.0"]
+			line = lines[i];
 
-			vertex( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
+			if ( inPointsSection ) {
 
+				// get the vertices
+
+				while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+					positions.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
+				}
+			}
+			else if ( inPolygonsSection ) {
+
+				result = patTriangle.exec(line);
+
+				if ( result !== null ) {
+
+					// 3 int int int
+					// triangle
+
+					indices.push( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 3 ] ) );
+				}
+				else {
+
+					result = patQuad.exec(line);
+
+					if ( result !== null ) {
+
+						// 4 int int int int
+						// break quad into two triangles
+
+						indices.push( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 4 ] ) );
+						indices.push( parseInt( result[ 2 ] ), parseInt( result[ 3 ] ), parseInt( result[ 4 ] ) );
+					}
+
+				}
+
+			}
+
+			if ( patPOLYGONS.exec(line) !== null ) {
+				inPointsSection = false;
+				inPolygonsSection = true;
+			}
+			if ( patPOINTS.exec(line) !== null ) {
+				inPolygonsSection = false;
+				inPointsSection = true;
+			}
 		}
 
-		// 3 int int int
-
-		pattern = /3[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/g;
-
-		while ( ( result = pattern.exec( data ) ) !== null ) {
-
-			// ["3 1 2 3", "1", "2", "3"]
-
-			face3( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 3 ] ) );
-
-		}
-
-		// 4 int int int int
-
-		pattern = /4[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/g;
-
-		while ( ( result = pattern.exec( data ) ) !== null ) {
-
-			// ["4 1 2 3 4", "1", "2", "3", "4"]
-
-			face3( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 4 ] ) );
-			face3( parseInt( result[ 2 ] ), parseInt( result[ 3 ] ), parseInt( result[ 4 ] ) );
-
-		}
-
-		geometry.computeFaceNormals();
-		geometry.computeVertexNormals();
-		geometry.computeBoundingSphere();
+		var geometry = new THREE.BufferGeometry();
+		geometry.setIndex( new THREE.BufferAttribute( new ( indices.length > 65535 ? Uint32Array : Uint16Array )( indices ), 1 ) );
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
 
 		return geometry;
 

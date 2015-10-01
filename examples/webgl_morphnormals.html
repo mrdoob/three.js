@@ -36,8 +36,8 @@
 
 			var container, stats;
 			var camera, scene1, scene2, renderer;
+			var mixers = [];
 
-			var morphs = [];
 			var clock = new THREE.Clock();
 
 			init();
@@ -87,40 +87,45 @@
 
 				//
 
+				
 				var loader = new THREE.JSONLoader();
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
-					geometry.computeMorphNormals();
 
-					var material = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
-					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, morphTargets: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
+					var mesh = new THREE.Mesh( geometry, material );
 
-					meshAnim.duration = 5000;
+					mesh.scale.set( 1.5, 1.5, 1.5 );
+					mesh.position.y = 150;
 
-					meshAnim.scale.set( 1.5, 1.5, 1.5 );
-					meshAnim.position.y = 150;
+					scene1.add( mesh );
 
-					scene1.add( meshAnim );
-					morphs.push( meshAnim );
+					var mixer = new THREE.AnimationMixer( mesh );
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[ 0 ] ).warpToDuration( 5 ) );
+
+					mixers.push( mixer );
 
 				} );
 
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
+					geometry.computeVertexNormals();
 					geometry.computeMorphNormals();
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading } );
-					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
+					
+					mesh.scale.set( 1.5, 1.5, 1.5 );
+					mesh.position.y = 150;
 
-					meshAnim.duration = 5000;
+					scene2.add( mesh );
 
-					meshAnim.scale.set( 1.5, 1.5, 1.5 );
-					meshAnim.position.y = 150;
+					var mixer = new THREE.AnimationMixer( mesh );
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[ 0 ] ).warpToDuration( 5 ) );
 
-					scene2.add( meshAnim );
-					morphs.push( meshAnim );
+					mixers.push( mixer );
 
 				} );
 
@@ -133,6 +138,7 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				container.appendChild( renderer.domElement );
@@ -204,10 +210,8 @@
 
 				var delta = clock.getDelta();
 
-				for ( var i = 0; i < morphs.length; i ++ ) {
-
-					morph = morphs[ i ];
-					morph.updateAnimation( 1000 * delta );
+   				for ( var i = 0; i < mixers.length; i ++ ) {
+					mixers[ i ].update( delta );
 
 				}
 

@@ -22,7 +22,6 @@
 
 		<script src="js/CurveExtras.js"></script>
 		<script src="js/ParametricGeometries.js"></script>
-		<script src="js/utils/UVsUtils.js"></script>
 
 		<script>
 
@@ -60,7 +59,7 @@
 				map.anisotropy = 16;
 
 				materials = [
-					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map, side: THREE.DoubleSide } ),
+					new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, side: THREE.DoubleSide } )
 				];
 
@@ -110,7 +109,6 @@
 				scene.add( object );
 
 				var geo = new THREE.ParametricGeometry( THREE.ParametricGeometries.plane( 200, 200 ), 10, 20 );
-				// document.body.appendChild( THREE.UVsDebug( geo ));
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
 				object.position.set( 0, 0, 0 );
 				scene.add( object );
@@ -131,7 +129,6 @@
 				//  scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( sphere2, materials );
-				// document.body.appendChild( THREE.UVsDebug( sphere2 ));
 				object.position.set( 200, 0, 0 );
 				scene.add( object );
 
@@ -157,8 +154,8 @@
 				scene.add( object );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

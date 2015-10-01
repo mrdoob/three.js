@@ -36,6 +36,10 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/loaders/collada/Animation.js"></script>
+		<script src="js/loaders/collada/AnimationHandler.js"></script>
+		<script src="js/loaders/collada/KeyFrameAnimation.js"></script>
+
 		<script src="js/loaders/ColladaLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -47,6 +51,7 @@
 
 			var stats;
 			var scene;
+			var pointLight;
 			var camera;
 			var renderer;
 			var model;
@@ -54,7 +59,7 @@
 			var kfAnimations = [ ];
 			var kfAnimationsLength = 0;
 			var loader = new THREE.ColladaLoader();
-			var lastTimestamp;
+			var lastTimestamp = 0;
 			var progress = 0;
 
 			loader.load( './models/collada/pump/pump.dae', function ( collada ) {
@@ -90,7 +95,6 @@
 				for ( var i = 0; i < kfAnimationsLength; ++i ) {
 
 					var animation = animations[ i ];
-					THREE.AnimationHandler.add( animation );
 
 					var kfAnimation = new THREE.KeyFrameAnimation( animation );
 					kfAnimation.timeScale = 1;
@@ -113,7 +117,7 @@
 
 				}
 
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				var line = new THREE.LineSegments( geometry, material );
 				scene.add( line );
 
 				// Add the COLLADA
@@ -126,15 +130,13 @@
 				// Lights
 
 				pointLight = new THREE.PointLight( 0xffffff, 1.75 );
-				pointLight.position = camera.position;
-
 				scene.add( pointLight );
 
 				// Renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				// Stats
@@ -190,18 +192,17 @@
 						}
 
 					}
+
 					animation.loop = false;
 					animation.play();
-					lastTimestamp = Date.now();
 
 				}
 
 			}
 
-			function animate() {
+			function animate( timestamp ) {
 
-				var timestamp = Date.now();
-				var frameTime = ( timestamp - lastTimestamp ) * 0.001; // seconds
+				var frameTime = ( timestamp - lastTimestamp ) * 0.001;
 
 				if ( progress >= 0 && progress < 48 ) {
 
@@ -223,6 +224,8 @@
 					start();
 
 				}
+
+				pointLight.position.copy( camera.position );
 
 				progress += frameTime;
 				lastTimestamp = timestamp;

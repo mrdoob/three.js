@@ -26,7 +26,7 @@
 	"mapDiffuseWrap" : ["repeat", "repeat"],
 	"shading" : "Lambert",
 	"specularCoef" : 50,
-	"transparency" : 1.0,
+	"opacity" : 1.0,
 	"vertexColors" : false
 	}],
 
