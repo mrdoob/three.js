@@ -424,6 +424,9 @@ var Script = function ( editor ) {
 
 		if ( currentScript !== script ) return;
 
+		// copying the codemirror history because "codemirror.setValue(...)" alters its history
+
+		var history = codemirror.getHistory();
 		title.setValue( object.name + ' / ' + script.name );
 		codemirror.setValue( script.source );
 
@@ -432,6 +435,7 @@ var Script = function ( editor ) {
 			codemirror.setCursor( cursorPosition );
 
 		}
+		codemirror.setHistory( history ); // setting the history to previous state
 
 	} );
 

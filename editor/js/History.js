@@ -38,28 +38,29 @@ History.prototype = {
 		var lastCmd = this.undos[ this.undos.length - 1 ];
 		var timeDifference = new Date().getTime() - this.lastCmdTime.getTime();
 
-		var isScriptCmd = lastCmd &&
-			lastCmd.updatable &&
-			cmd.updatable &&
-			lastCmd.script !== undefined &&
-			lastCmd.object === cmd.object &&
-			lastCmd.type === cmd.type &&
-			lastCmd.script === cmd.script &&
-			lastCmd.attributeName === cmd.attributeName;
-
 		var isUpdatableCmd = lastCmd &&
 			lastCmd.updatable &&
 			cmd.updatable &&
 			lastCmd.object === cmd.object &&
 			lastCmd.type === cmd.type &&
-			timeDifference < 500;
+			lastCmd.script === cmd.script &&
+			lastCmd.attributeName === cmd.attributeName;
 
-		if ( isScriptCmd || isUpdatableCmd ) {
+		if ( isUpdatableCmd && cmd.type === "CmdSetScriptValue" ) {
+
+			// When the cmd.type is "CmdSetScriptValue" the timeDifference is ignored
+
+			lastCmd.update( cmd );
+			cmd = lastCmd;
+
+		} else if ( isUpdatableCmd && timeDifference < 500 ) {
 
 			lastCmd.update( cmd );
 			cmd = lastCmd;
 
 		} else {
+
+			// the command is not updatable and is added as a new part of the history
 
 			this.undos.push( cmd );
 			cmd.editor = this.editor;

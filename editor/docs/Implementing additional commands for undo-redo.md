@@ -108,6 +108,18 @@ update: function ( cmd ) {
 
 ```
 
+#### List of updatable commands
+
+- CmdSetColor
+- CmdSetGeometry
+- CmdSetMaterialColor
+- CmdSetMaterialValue
+- CmdSetPosition
+- CmdSetRotation
+- CmdSetScale
+- CmdSetValue
+- CmdSetScriptValue
+
 The idea behind 'updatable commands' is that two commands of the same type which occur
 within a short period of time should be merged into one.
 **For example:** Dragging with your mouse over the x-position field in the sidebar
