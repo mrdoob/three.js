@@ -320,12 +320,17 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		var material = new THREE.MeshPhongMaterial();
+		var matrix = new THREE.Matrix4();
+		var vector = new THREE.Vector3();
+
 		function parseNode( xml ) {
 
-			var group = new THREE.Group();
-			group.name = xml.getAttribute( 'name' );
-
-			var matrix = new THREE.Matrix4();
+			var node = {
+				name: xml.getAttribute( 'name' ),
+				matrix: new THREE.Matrix4(),
+				children: []
+			};
 
 			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
 
@@ -335,41 +340,38 @@ THREE.ColladaLoader.prototype = {
 
 				switch ( child.nodeName ) {
 
-					case 'node':
-						group.add( parseNode( child ) );
-						break;
-
 					case 'instance_camera':
-						var camera = camerasLibrary[ parseId( child.getAttribute( 'url' ) ) ];
-						group.add( camera );
+						node.camera = camerasLibrary[ parseId( child.getAttribute( 'url' ) ) ];
 						break;
 
 					case 'instance_geometry':
-						var geometry = geometriesLibrary[ parseId( child.getAttribute( 'url' ) ) ];
-						var material = new THREE.MeshPhongMaterial();
-						var mesh = new THREE.Mesh( geometry, material );
-						group.add( mesh );
+						node.geometry = geometriesLibrary[ parseId( child.getAttribute( 'url' ) ) ];
 						break;
 
 					case 'matrix':
-						matrix.multiply( new THREE.Matrix4().fromArray( parseFloats( child.textContent ) ) );
+						var array = parseFloats( child.textContent );
+						node.matrix.multiply( matrix.fromArray( array ) );
+						break;
+
+					case 'node':
+						node.children.push( parseNode( child ) );
 						break;
 
 					case 'translate':
-						var vector = new THREE.Vector3().fromArray( parseFloats( child.textContent ) );
-						matrix.multiply( new THREE.Matrix4().makeTranslation( vector.x, vector.y, vector.z ) );
+						var array = parseFloats( child.textContent );
+						vector.fromArray( array );
+						node.matrix.multiply( matrix.makeTranslation( vector.x, vector.y, vector.z ) );
 						break;
 
 					case 'rotate':
 						var array = parseFloats( child.textContent );
-						var axis = new THREE.Vector3().fromArray( array );
 						var angle = THREE.Math.degToRad( array[ 3 ] );
-						matrix.multiply( new THREE.Matrix4().makeRotationAxis( axis, angle ) );
+						node.matrix.multiply( matrix.makeRotationAxis( vector.fromArray( array ), angle ) );
 						break;
 
 					case 'scale':
-						var vector = new THREE.Vector3().fromArray( parseFloats( child.textContent ) );
-						matrix.scale( vector );
+						var array = parseFloats( child.textContent );
+						node.matrix.scale( vector.fromArray( array ) );
 						break;
 
 					case 'extra':
@@ -383,9 +385,34 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			matrix.decompose( group.position, group.quaternion, group.scale );
+			var object;
 
-			return group;
+			if ( node.camera !== undefined ) {
+
+				object = node.camera;
+
+			} else if ( node.geometry !== undefined ) {
+
+				object = new THREE.Mesh( node.geometry, material );
+
+			} else {
+
+				object = new THREE.Group();
+
+			}
+
+			object.name = node.name;
+			node.matrix.decompose( object.position, object.quaternion, object.scale );
+
+			var children = node.children;
+
+			for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+				object.add( node.children[ i ] );
+
+			}
+
+			return object;
 
 		}
 
@@ -439,11 +466,7 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'ColladaLoader2' );
 
-		console.time( 'ColladaLoader2: DOMParser' );
-
 		var xml = new DOMParser().parseFromString( text, 'text/xml' );
-
-		console.timeEnd( 'ColladaLoader2: DOMParser' );
 
 		var camerasLibrary = parseCamerasLibrary( xml );
 		var geometriesLibrary = parseGeometriesLibrary( xml );
