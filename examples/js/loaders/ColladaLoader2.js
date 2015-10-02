@@ -121,9 +121,9 @@ THREE.ColladaLoader.prototype = {
 			for ( var i = 0; i < elements.length; i ++ ) {
 
 				var element = elements[ i ];
-				var mesh = parseMesh( element.getElementsByTagName( 'mesh' )[ 0 ] );
+				var geometry = parseGeometry( element );
 
-				library[ element.getAttribute( 'id' ) ] = createGeometry( mesh );
+				library[ element.getAttribute( 'id' ) ] = createGeometry( geometry );
 
 			}
 
@@ -131,31 +131,38 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function parseMesh( xml ) {
+		function parseGeometry( xml ) {
 
-			var mesh = {
+			var data = {
+				id: xml.getAttribute( 'id' ),
 				sources: {}
 			};
 
-			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+			var mesh = xml.getElementsByTagName( 'mesh' )[ 0 ];
 
-				var child = xml.childNodes[ i ];
+			for ( var i = 0; i < mesh.childNodes.length; i ++ ) {
+
+				var child = mesh.childNodes[ i ];
 
 				if ( child.nodeType !== 1 ) continue;
 
 				switch ( child.nodeName ) {
 
 					case 'source':
-						mesh.sources[ child.getAttribute( 'id' ) ] = parseFloats( child.getElementsByTagName( 'float_array' )[ 0 ].textContent );
+						data.sources[ child.getAttribute( 'id' ) ] = parseFloats( child.getElementsByTagName( 'float_array' )[ 0 ].textContent );
 						break;
 
 					case 'vertices':
-						mesh.sources[ child.getAttribute( 'id' ) ] = mesh.sources[ parseId( child.getElementsByTagName( 'input' )[ 0 ].getAttribute( 'source' ) ) ];
+						data.sources[ child.getAttribute( 'id' ) ] = data.sources[ parseId( child.getElementsByTagName( 'input' )[ 0 ].getAttribute( 'source' ) ) ];
+						break;
+
+					case 'polygons':
+						console.log( 'ColladaLoader: Unsupported primitive type: ', child.nodeName );
 						break;
 
 					case 'polylist':
 					case 'triangles':
-						mesh.primitive = parsePrimitive( child );
+						data.primitive = parsePrimitive( child );
 						break;
 
 					default:
@@ -165,7 +172,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			return mesh;
+			return data;
 
 		}
 
@@ -208,19 +215,21 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function createGeometry( mesh ) {
+		function createGeometry( data ) {
 
-			if ( mesh.primitive === undefined ) return;
+			if ( data.primitive === undefined ) return;
 
-			var sources = mesh.sources;
-			var primitive = mesh.primitive;
+			var sources = data.sources;
+			var primitive = data.primitive;
 
 			var inputs = primitive.inputs;
 			var stride = primitive.stride;
 			var vcount = primitive.vcount;
 
-			var vcount = primitive.vcount;
 			var indices = primitive.p;
+			var vcount = primitive.vcount;
+
+			var maxcount = 0;
 
 			var geometry = new THREE.BufferGeometry();
 
@@ -275,7 +284,7 @@ THREE.ColladaLoader.prototype = {
 
 						} else {
 
-							console.log( 'ColladaLoader.createGeometry:', count, 'not supported.' );
+							maxcount = Math.max( maxcount, count );
 
 						}
 
@@ -304,6 +313,12 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 				}
+
+			}
+
+			if ( maxcount > 0 ) {
+
+				console.log( 'ColladaLoader: Geometry', data.id, 'has faces with more than 4 vertices.' );
 
 			}
 
@@ -464,9 +479,13 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		console.time( 'ColladaLoader2' );
+		console.time( 'ColladaLoader' );
+
+		console.time( 'ColladaLoader: DOMParser' );
 
 		var xml = new DOMParser().parseFromString( text, 'text/xml' );
+
+		console.timeEnd( 'ColladaLoader: DOMParser' );
 
 		var camerasLibrary = parseCamerasLibrary( xml );
 		var geometriesLibrary = parseGeometriesLibrary( xml );
@@ -474,7 +493,7 @@ THREE.ColladaLoader.prototype = {
 		var visualScenesLibrary = parseVisualScenesLibrary( xml );
 		var scene = parseScene( xml );
 
-		console.timeEnd( 'ColladaLoader2' );
+		console.timeEnd( 'ColladaLoader' );
 
 		// console.log( scene );
 
