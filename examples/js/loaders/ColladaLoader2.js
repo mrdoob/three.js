@@ -44,11 +44,11 @@ THREE.ColladaLoader.prototype = {
 
 		function parseFloats( text ) {
 
-			var array = [];
 			var parts = text.trim().split( /\s+/ );
+			var array = new Array( parts.length );
 
 			for ( var i = 0, l = parts.length; i < l; i ++ ) {
-				array.push( parseFloat( parts[ i ] ) );
+				array[ i ] = parseFloat( parts[ i ] );
 			}
 
 			return array;
@@ -57,11 +57,11 @@ THREE.ColladaLoader.prototype = {
 
 		function parseInts( text ) {
 
-			var array = [];
 			var parts = text.trim().split( /\s+/ );
+			var array = new Array( parts.length );
 
 			for ( var i = 0, l = parts.length; i < l; i ++ ) {
-				array.push( parseInt( parts[ i ] ) );
+				array[ i ] = parseInt( parts[ i ] );
 			}
 
 			return array;
@@ -209,6 +209,8 @@ THREE.ColladaLoader.prototype = {
 		}
 
 		function createGeometry( mesh ) {
+
+			if ( mesh.primitive === undefined ) return;
 
 			var sources = mesh.sources;
 			var primitive = mesh.primitive;
@@ -437,7 +439,11 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'ColladaLoader2' );
 
+		console.time( 'ColladaLoader2: DOMParser' );
+
 		var xml = new DOMParser().parseFromString( text, 'text/xml' );
+
+		console.timeEnd( 'ColladaLoader2: DOMParser' );
 
 		var camerasLibrary = parseCamerasLibrary( xml );
 		var geometriesLibrary = parseGeometriesLibrary( xml );
