@@ -74,30 +74,32 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		// cameras
+		// library
 
-		function parseCamerasLibrary( xml ) {
+		function parseLibrary( xml, libraryName, nodeName, parser ) {
 
-			var library = {};
+			var data = {};
 
-			var cameras = xml.getElementsByTagName( 'library_cameras' )[ 0 ];
+			var library = xml.getElementsByTagName( libraryName )[ 0 ];
 
-			if ( cameras !== undefined ) {
+			if ( library !== undefined ) {
 
-				var elements = cameras.getElementsByTagName( 'camera' );
+				var elements = library.getElementsByTagName( nodeName );
 
 				for ( var i = 0; i < elements.length; i ++ ) {
 
 					var element = elements[ i ];
-					library[ element.getAttribute( 'id' ) ] = parseCamera( element );
+					data[ element.getAttribute( 'id' ) ] = parser( element );
 
 				}
 
 			}
 
-			return library;
+			return data;
 
 		}
+
+		// camera
 
 		function parseCamera( xml ) {
 
@@ -109,27 +111,7 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		// geometries
-
-		function parseGeometriesLibrary( xml ) {
-
-			var library = {};
-
-			var geometries = xml.getElementsByTagName( 'library_geometries' )[ 0 ];
-			var elements = geometries.getElementsByTagName( 'geometry' );
-
-			for ( var i = 0; i < elements.length; i ++ ) {
-
-				var element = elements[ i ];
-				var geometry = parseGeometry( element );
-
-				library[ element.getAttribute( 'id' ) ] = createGeometry( geometry );
-
-			}
-
-			return library;
-
-		}
+		// geometry
 
 		function parseGeometry( xml ) {
 
@@ -172,7 +154,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			return data;
+			return createGeometry( data );
 
 		}
 
@@ -328,13 +310,6 @@ THREE.ColladaLoader.prototype = {
 
 		// nodes
 
-		function parseNodesLibrary( xml ) {
-
-			var library = {};
-			return library;
-
-		}
-
 		var material = new THREE.MeshPhongMaterial();
 		var matrix = new THREE.Matrix4();
 		var vector = new THREE.Vector3();
@@ -361,6 +336,10 @@ THREE.ColladaLoader.prototype = {
 
 					case 'instance_geometry':
 						node.geometry = geometriesLibrary[ parseId( child.getAttribute( 'url' ) ) ];
+						break;
+
+					case 'instance_node':
+						node.children.push( nodesLibrary[ parseId( child.getAttribute( 'url' ) ) ] );
 						break;
 
 					case 'matrix':
@@ -433,24 +412,6 @@ THREE.ColladaLoader.prototype = {
 
 		// visual scenes
 
-		function parseVisualScenesLibrary( xml ) {
-
-			var library = {};
-
-			var visualScenes = xml.getElementsByTagName( 'library_visual_scenes' )[ 0 ];
-			var elements = visualScenes.getElementsByTagName( 'visual_scene' );
-
-			for ( var i = 0; i < elements.length; i ++ ) {
-
-				var element = elements[ i ];
-				library[ element.getAttribute( 'id' ) ] = parseVisualScene( element );
-
-			}
-
-			return library;
-
-		}
-
 		function parseVisualScene( xml ) {
 
 			var group = new THREE.Group();
@@ -487,10 +448,10 @@ THREE.ColladaLoader.prototype = {
 
 		console.timeEnd( 'ColladaLoader: DOMParser' );
 
-		var camerasLibrary = parseCamerasLibrary( xml );
-		var geometriesLibrary = parseGeometriesLibrary( xml );
-		var nodesLibrary = parseNodesLibrary( xml );
-		var visualScenesLibrary = parseVisualScenesLibrary( xml );
+		var camerasLibrary = parseLibrary( xml, 'library_cameras', 'camera', parseCamera );
+		var geometriesLibrary = parseLibrary( xml, 'library_geometries', 'geometry', parseGeometry );
+		var nodesLibrary = parseLibrary( xml, 'library_nodes', 'node', parseNode );
+		var visualScenesLibrary = parseLibrary( xml, 'library_visual_scenes', 'visual_scene', parseVisualScene );
 		var scene = parseScene( xml );
 
 		console.timeEnd( 'ColladaLoader' );
