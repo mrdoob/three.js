@@ -254,11 +254,16 @@ THREE.ColladaLoader.prototype = {
 
 		// geometry
 
+		var lineMaterial = new THREE.LineBasicMaterial();
+		var meshMaterial = new THREE.MeshPhongMaterial();
+
 		function parseGeometry( xml ) {
 
 			var data = {
 				id: xml.getAttribute( 'id' ),
-				sources: {}
+				name: xml.getAttribute( 'name' ),
+				sources: {},
+				primitives: []
 			};
 
 			var mesh = xml.getElementsByTagName( 'mesh' )[ 0 ];
@@ -287,7 +292,7 @@ THREE.ColladaLoader.prototype = {
 					case 'linestrips':
 					case 'polylist':
 					case 'triangles':
-						data.primitive = parseGeometryPrimitive( child );
+						data.primitives.push( parseGeometryPrimitive( child ) );
 						break;
 
 					default:
@@ -299,119 +304,139 @@ THREE.ColladaLoader.prototype = {
 
 			//
 
-			if ( data.primitive === undefined ) return;
+			var group = new THREE.Group();
 
 			var sources = data.sources;
-			var primitive = data.primitive;
+			var primitives = data.primitives;
 
-			var inputs = primitive.inputs;
-			var stride = primitive.stride;
-			var vcount = primitive.vcount;
+			if ( primitives.length === 0 ) return group;
 
-			var indices = primitive.p;
-			var vcount = primitive.vcount;
+			for ( var p = 0; p < primitives.length; p ++ ) {
 
-			var maxcount = 0;
+				var primitive = primitives[ p ];
 
-			var geometry = new THREE.BufferGeometry();
+				var inputs = primitive.inputs;
+				var stride = primitive.stride;
+				var vcount = primitive.vcount;
 
-			for ( var name in inputs ) {
+				var indices = primitive.p;
+				var vcount = primitive.vcount;
 
-				var input = inputs[ name ];
+				var maxcount = 0;
 
-				var source = sources[ input.id ];
-				var offset = input.offset;
+				var geometry = new THREE.BufferGeometry();
+				if ( data.name ) geometry.name = data.name;
 
-				var array = [];
+				for ( var name in inputs ) {
 
-				function pushVector( i ) {
+					var input = inputs[ name ];
 
-					var index = indices[ i + offset ] * 3;
-					array.push( source[ index + 0 ], source[ index + 1 ], source[ index + 2 ] );
+					var source = sources[ input.id ];
+					var offset = input.offset;
 
-				}
+					var array = [];
 
-				if ( primitive.vcount !== undefined ) {
+					function pushVector( i ) {
 
-					var index = 0;
+						var index = indices[ i + offset ] * 3;
+						array.push( source[ index + 0 ], source[ index + 1 ], source[ index + 2 ] );
 
-					for ( var i = 0, l = vcount.length; i < l; i ++ ) {
+					}
 
-						var count = vcount[ i ];
+					if ( primitive.vcount !== undefined ) {
 
-						if ( count === 4 ) {
+						var index = 0;
 
-							var a = index + stride * 0;
-							var b = index + stride * 1;
-							var c = index + stride * 2;
-							var d = index + stride * 3;
+						for ( var i = 0, l = vcount.length; i < l; i ++ ) {
 
-							pushVector( a ); pushVector( b ); pushVector( d );
-							pushVector( b ); pushVector( c ); pushVector( d );
+							var count = vcount[ i ];
 
-						} else if ( count === 3 ) {
+							if ( count === 4 ) {
 
-							var a = index + stride * 0;
-							var b = index + stride * 1;
-							var c = index + stride * 2;
+								var a = index + stride * 0;
+								var b = index + stride * 1;
+								var c = index + stride * 2;
+								var d = index + stride * 3;
 
-							pushVector( a ); pushVector( b ); pushVector( c );
+								pushVector( a ); pushVector( b ); pushVector( d );
+								pushVector( b ); pushVector( c ); pushVector( d );
 
-						} else {
+							} else if ( count === 3 ) {
 
-							maxcount = Math.max( maxcount, count );
+								var a = index + stride * 0;
+								var b = index + stride * 1;
+								var c = index + stride * 2;
+
+								pushVector( a ); pushVector( b ); pushVector( c );
+
+							} else {
+
+								maxcount = Math.max( maxcount, count );
+
+							}
+
+							index += stride * count;
 
 						}
 
-						index += stride * count;
+					} else {
+
+						for ( var i = 0, l = indices.length; i < l; i += stride ) {
+
+							pushVector( i );
+
+						}
 
 					}
 
-				} else {
+					switch ( name )	{
 
-					for ( var i = 0, l = indices.length; i < l; i += stride ) {
+						case 'VERTEX':
+							geometry.addAttribute( 'position', new THREE.Float32Attribute( array, 3 ) );
+							break;
 
-						pushVector( i );
+						case 'NORMAL':
+							geometry.addAttribute( 'normal', new THREE.Float32Attribute( array, 3 ) );
+							break;
 
 					}
 
 				}
 
-				switch ( name )	{
+				if ( maxcount > 0 ) {
 
-					case 'VERTEX':
-						geometry.addAttribute( 'position', new THREE.Float32Attribute( array, 3 ) );
+					console.log( 'ColladaLoader: Geometry', data.id, 'has faces with more than 4 vertices.' );
+
+				}
+
+				switch ( primitive.type ) {
+
+					case 'lines':
+						group.add( new THREE.LineSegments( geometry, lineMaterial ) );
 						break;
 
-					case 'NORMAL':
-						geometry.addAttribute( 'normal', new THREE.Float32Attribute( array, 3 ) );
+					case 'linestrips':
+						group.add( new THREE.Line( geometry, lineMaterial ) );
+						break;
+
+					case 'triangles':
+					case 'polylist':
+						group.add( new THREE.Mesh( geometry, meshMaterial ) );
 						break;
 
 				}
 
 			}
 
-			if ( maxcount > 0 ) {
+			// flatten
 
-				console.log( 'ColladaLoader: Geometry', data.id, 'has faces with more than 4 vertices.' );
+			if ( group.children.length === 1 ) {
 
-			}
-
-			switch ( data.primitive.type ) {
-
-				case 'lines':
-					return new THREE.LineSegments( geometry );
-
-				case 'linestrips':
-					return new THREE.Line( geometry );
-
-				case 'triangles':
-				case 'polylist':
-					return new THREE.Mesh( geometry );
+				return group.children[ 0 ];
 
 			}
 
-			return;
+			return group;
 
 		}
 
@@ -494,7 +519,7 @@ THREE.ColladaLoader.prototype = {
 
 					case 'matrix':
 						var array = parseFloats( child.textContent );
-						node.matrix.multiply( matrix.fromArray( array ) ); // .transpose() when Z_UP?
+						node.matrix.multiply( matrix.fromArray( array ).transpose() ); // .transpose() when Z_UP?
 						break;
 
 					case 'node':
