@@ -28,9 +28,10 @@ Every command needs a constructor. In the constructor
 	
 CmdXXX = function () {
 
-	Cmd.call( this );	// Call default constructor
+	Cmd.call( this );					// Call default constructor
 
-	this.type = 'CmdXXX';	// has to match the object-name!
+	this.type = 'CmdXXX';				// has to match the object-name!
+	this.name = 'Set/Do/Update XXX'; 	// description of the command, used in Sidebar.History
 
 	// TODO: store all the relevant information needed to 
 	// restore the old and the new state

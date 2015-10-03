@@ -33,7 +33,7 @@ History = function ( editor ) {
 
 History.prototype = {
 
-	execute: function ( cmd ) {
+	execute: function ( cmd, optionalName ) {
 
 		var lastCmd = this.undos[ this.undos.length - 1 ];
 		var timeDifference = new Date().getTime() - this.lastCmdTime.getTime();
@@ -67,6 +67,7 @@ History.prototype = {
 			cmd.id = ++this.idCounter;
 
 		}
+		cmd.name = optionalName !== undefined ? optionalName : cmd.name;
 		cmd.execute();
 
 		this.lastCmdTime = new Date();

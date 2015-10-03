@@ -492,9 +492,9 @@ Editor.prototype = {
 
 	},
 
-	execute: function ( command ) {
+	execute: function ( cmd, optionalName ) {
 
-		this.history.execute( command );
+		this.history.execute( cmd, optionalName );
 
 	},
 
