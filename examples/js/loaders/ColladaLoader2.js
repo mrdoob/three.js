@@ -366,7 +366,7 @@ THREE.ColladaLoader.prototype = {
 
 					case 'matrix':
 						var array = parseFloats( child.textContent );
-						node.matrix.multiply( matrix.fromArray( array ) );
+						node.matrix.multiply( matrix.fromArray( array ).transpose() );
 						break;
 
 					case 'node':
