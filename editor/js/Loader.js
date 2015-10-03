@@ -197,6 +197,25 @@ var Loader = function ( editor ) {
 
 				break;
 
+
+				case 'kmz':
+
+					var reader = new FileReader();
+					reader.addEventListener( 'load', function ( event ) {
+
+						var loader = new THREE.KMZLoader();
+						var collada = loader.parse( event.target.result );
+
+						collada.scene.name = filename;
+
+						editor.addObject( collada.scene );
+						editor.select( collada.scene );
+
+					}, false );
+					reader.readAsArrayBuffer( file );
+
+					break;
+
 				case 'md2':
 
 					var reader = new FileReader();
