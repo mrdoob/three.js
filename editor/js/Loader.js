@@ -127,11 +127,8 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					var parser = new DOMParser();
-					var xml = parser.parseFromString( contents, 'text/xml' );
-
 					var loader = new THREE.ColladaLoader();
-					var collada = loader.parse( xml );
+					var collada = loader.parse( contents );
 
 					collada.scene.name = filename;
 
