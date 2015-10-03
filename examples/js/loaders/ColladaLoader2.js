@@ -84,9 +84,7 @@ THREE.ColladaLoader.prototype = {
 
 		// library
 
-		function parseLibrary( xml, libraryName, nodeName, parser ) {
-
-			var data = {};
+		function buildLibrary( data, libraryName, nodeName, parser ) {
 
 			var library = xml.getElementsByTagName( libraryName )[ 0 ];
 
@@ -103,8 +101,6 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			return data;
-
 		}
 
 		// image
@@ -118,6 +114,14 @@ THREE.ColladaLoader.prototype = {
 			if ( baseUrl !== undefined ) url = baseUrl + url;
 
 			return imageLoader.load( url );
+
+		}
+
+		// effect
+
+		function parseEffect( xml ) {
+
+			// console.log( xml );
 
 		}
 
@@ -279,6 +283,8 @@ THREE.ColladaLoader.prototype = {
 						console.log( 'ColladaLoader: Unsupported primitive type: ', child.nodeName );
 						break;
 
+					case 'lines':
+					case 'linestrips':
 					case 'polylist':
 					case 'triangles':
 						data.primitive = parseGeometryPrimitive( child );
@@ -391,13 +397,28 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			return geometry;
+			switch ( data.primitive.type ) {
+
+				case 'lines':
+					return new THREE.LineSegments( geometry );
+
+				case 'linestrips':
+					return new THREE.Line( geometry );
+
+				case 'triangles':
+				case 'polylist':
+					return new THREE.Mesh( geometry );
+
+			}
+
+			return;
 
 		}
 
 		function parseGeometryPrimitive( xml ) {
 
 			var primitive = {
+				type: xml.nodeName,
 				inputs: {},
 				stride: 0
 			};
@@ -436,7 +457,6 @@ THREE.ColladaLoader.prototype = {
 
 		// nodes
 
-		var material = new THREE.MeshPhongMaterial();
 		var matrix = new THREE.Matrix4();
 		var vector = new THREE.Vector3();
 
@@ -457,19 +477,19 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'instance_camera':
-						node.camera = camerasLibrary[ parseId( child.getAttribute( 'url' ) ) ];
+						node.camera = library.cameras[ parseId( child.getAttribute( 'url' ) ) ];
 						break;
 
 					case 'instance_light':
-						node.light = lightsLibrary[ parseId( child.getAttribute( 'url' ) ) ];
+						node.light = library.lights[ parseId( child.getAttribute( 'url' ) ) ];
 						break;
 
 					case 'instance_geometry':
-						node.geometry = geometriesLibrary[ parseId( child.getAttribute( 'url' ) ) ];
+						node.geometry = library.geometries[ parseId( child.getAttribute( 'url' ) ) ];
 						break;
 
 					case 'instance_node':
-						node.children.push( nodesLibrary[ parseId( child.getAttribute( 'url' ) ) ] );
+						node.children.push( library.nodes[ parseId( child.getAttribute( 'url' ) ) ] );
 						break;
 
 					case 'matrix':
@@ -523,7 +543,7 @@ THREE.ColladaLoader.prototype = {
 
 			} else if ( node.geometry !== undefined ) {
 
-				object = new THREE.Mesh( node.geometry, material );
+				object = node.geometry.clone();
 
 			} else {
 
@@ -572,7 +592,7 @@ THREE.ColladaLoader.prototype = {
 
 			var scene = xml.getElementsByTagName( 'scene' )[ 0 ];
 			var instance = scene.getElementsByTagName( 'instance_visual_scene' )[ 0 ];
-			return visualScenesLibrary[ parseId( instance.getAttribute( 'url' ) ) ];
+			return library.visualScenes[ parseId( instance.getAttribute( 'url' ) ) ];
 
 		}
 
@@ -584,12 +604,24 @@ THREE.ColladaLoader.prototype = {
 
 		console.timeEnd( 'ColladaLoader: DOMParser' );
 
-		var imagesLibrary = parseLibrary( xml, 'library_images', 'image', parseImage );
-		var camerasLibrary = parseLibrary( xml, 'library_cameras', 'camera', parseCamera );
-		var lightsLibrary = parseLibrary( xml, 'library_lights', 'light', parseLight );
-		var geometriesLibrary = parseLibrary( xml, 'library_geometries', 'geometry', parseGeometry );
-		var nodesLibrary = parseLibrary( xml, 'library_nodes', 'node', parseNode );
-		var visualScenesLibrary = parseLibrary( xml, 'library_visual_scenes', 'visual_scene', parseVisualScene );
+		var library = {
+			images: {},
+			effects: {},
+			cameras: {},
+			lights: {},
+			geometries: {},
+			nodes: {},
+			visualScenes: {}
+		};
+
+		buildLibrary( library.images, 'library_images', 'image', parseImage );
+		buildLibrary( library.effects, 'library_effects', 'effect', parseEffect );
+		buildLibrary( library.cameras, 'library_cameras', 'camera', parseCamera );
+		buildLibrary( library.lights, 'library_lights', 'light', parseLight );
+		buildLibrary( library.geometries, 'library_geometries', 'geometry', parseGeometry );
+		buildLibrary( library.nodes, 'library_nodes', 'node', parseNode );
+		buildLibrary( library.visualScenes, 'library_visual_scenes', 'visual_scene', parseVisualScene );
+
 		var scene = parseScene( xml );
 
 		console.timeEnd( 'ColladaLoader' );
