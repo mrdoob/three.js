@@ -3212,37 +3212,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 				restore = true;
 
 			}
-
-			if ( renderTarget.texture.format !== THREE.RGBAFormat && paramThreeToGL( renderTarget.texture.format ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
-
-				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
-				return;
-
-			}
-
-			if ( renderTarget.texture.type !== THREE.UnsignedByteType && paramThreeToGL( renderTarget.texture.type ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) ) {
-
-				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
-				return;
-
-			}
-
-			if ( _gl.checkFramebufferStatus( _gl.FRAMEBUFFER ) === _gl.FRAMEBUFFER_COMPLETE ) {
-
-				_gl.readPixels( x, y, width, height, paramThreeToGL( renderTarget.texture.format ), paramThreeToGL( renderTarget.texture.type ), buffer );
-
-			} else {
-
-				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
-
-			}
-
-			if ( restore ) {
-
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
-
-			}
-
+	            	try {
+	                	if (renderTarget.texture.format !== THREE.RGBAFormat && paramThreeToGL(renderTarget.texture.format) !== _gl.getParameter(_gl.IMPLEMENTATION_COLOR_READ_FORMAT)) {
+	
+	                    		console.error('THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.');
+	                    		return;
+	
+	                	}
+	
+	                	if (renderTarget.texture.type !== THREE.UnsignedByteType
+	                    		&& paramThreeToGL(renderTarget.texture.type) !== _gl.getParameter(_gl.IMPLEMENTATION_COLOR_READ_TYPE)
+	                    		&& !(renderTarget.texture.type === THREE.FloatType && extensions.get('WEBGL_color_buffer_float'))
+	                    		&& !(renderTarget.texture.type === THREE.HalfFloatType && extensions.get('EXT_color_buffer_half_float'))) {
+	
+	                    		console.error('THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.');
+	                    		return;
+	
+	                	}
+	
+	                	if (_gl.checkFramebufferStatus(_gl.FRAMEBUFFER) === _gl.FRAMEBUFFER_COMPLETE) {
+	
+	                    		_gl.readPixels(x, y, width, height, paramThreeToGL(renderTarget.texture.format), paramThreeToGL(renderTarget.texture.type), buffer);
+	
+	                	} else {
+	
+	                		 console.error('THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.');
+	
+	                	}
+	            	} finally {
+	                	if ( restore ) {
+	
+	                    		_gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
+	
+	                	}
+	            	}
 		}
 
 	};
