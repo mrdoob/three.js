@@ -148,6 +148,7 @@ Menubar.Edit = function ( editor ) {
 
 		}
 
+		var cmds = [];
 		root.traverse( function ( object ) {
 
 			var material = object.material;
@@ -159,8 +160,8 @@ Menubar.Edit = function ( editor ) {
 					var shader = glslprep.minifyGlsl( [
 							material.vertexShader, material.fragmentShader ] );
 
-					material.vertexShader = shader[ 0 ];
-					material.fragmentShader = shader[ 1 ];
+					cmds.push( new CmdSetMaterialValue( object, 'vertexShader', shader[ 0 ] ) );
+					cmds.push( new CmdSetMaterialValue( object, 'fragmentShader', shader[ 1 ] ) );
 
 					++nMaterialsChanged;
 
@@ -187,6 +188,8 @@ Menubar.Edit = function ( editor ) {
 			}
 
 		} );
+		editor.execute( new CmdMultiCmds( cmds ) );
+
 
 		window.alert( nMaterialsChanged +
 				" material(s) were changed.\n" + errors.join( "\n" ) );
