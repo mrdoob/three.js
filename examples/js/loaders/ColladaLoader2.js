@@ -340,13 +340,8 @@ THREE.ColladaLoader.prototype = {
 							var c = index + stride * 2;
 							var d = index + stride * 3;
 
-							pushVector( a );
-							pushVector( b );
-							pushVector( d );
-
-							pushVector( b );
-							pushVector( c );
-							pushVector( d );
+							pushVector( a ); pushVector( b ); pushVector( d );
+							pushVector( b ); pushVector( c ); pushVector( d );
 
 						} else if ( count === 3 ) {
 
@@ -354,9 +349,7 @@ THREE.ColladaLoader.prototype = {
 							var b = index + stride * 1;
 							var c = index + stride * 2;
 
-							pushVector( a );
-							pushVector( b );
-							pushVector( c );
+							pushVector( a ); pushVector( b ); pushVector( c );
 
 						} else {
 
@@ -515,6 +508,8 @@ THREE.ColladaLoader.prototype = {
 				}
 
 			}
+
+			//
 
 			var object;
 
