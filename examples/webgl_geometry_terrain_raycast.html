@@ -252,8 +252,8 @@
 
 			function onMouseMove( event ) {
 
-				mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
-				mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+				mouse.x = ( ( event.clientX * window.devicePixelRatio ) / renderer.domElement.width ) * 2 - 1;
+				mouse.y = - ( ( event.clientY * window.devicePixelRatio ) / renderer.domElement.height ) * 2 + 1;
 
 				raycaster.setFromCamera( mouse, camera );
 
