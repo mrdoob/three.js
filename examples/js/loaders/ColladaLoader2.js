@@ -133,6 +133,121 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		// light
+
+		function parseLight( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'technique_common':
+						data = parseLightTechnique( child );
+						break;
+
+				}
+
+			}
+
+			//
+
+			var light;
+
+			switch ( data.technique ) {
+
+				case 'directional':
+					light = new THREE.DirectionalLight();
+					break;
+
+				case 'point':
+					light = new THREE.PointLight();
+					break;
+
+				case 'spot':
+					light = new THREE.SpotLight();
+					break;
+
+				case 'ambient':
+					light = new THREE.AmbientLight();
+					break;
+
+			}
+
+			if ( data.parameters.color ) light.color.copy( data.parameters.color );
+			if ( data.parameters.distance ) light.distance = data.parameters.distance;
+
+			return light;
+
+		}
+
+		function parseLightTechnique( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'directional':
+					case 'point':
+					case 'spot':
+					case 'ambient':
+
+						data.technique = child.nodeName;
+						data.parameters = parseLightParameters( child );
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseLightParameters( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'color':
+						var array = parseFloats( child.textContent );
+						data.color = new THREE.Color().fromArray( array );
+						break;
+
+					case 'falloff_angle':
+						data.falloffAngle = parseFloat( child.textContent );
+						break;
+
+					case 'quadratic_attenuation':
+						var f = parseFloat( child.textContent );
+						data.distance = f ? Math.sqrt( 1 / f ) : 0;
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
 		// geometry
 
 		function parseGeometry( xml ) {
@@ -352,6 +467,10 @@ THREE.ColladaLoader.prototype = {
 						node.camera = camerasLibrary[ parseId( child.getAttribute( 'url' ) ) ];
 						break;
 
+					case 'instance_light':
+						node.light = lightsLibrary[ parseId( child.getAttribute( 'url' ) ) ];
+						break;
+
 					case 'instance_geometry':
 						node.geometry = geometriesLibrary[ parseId( child.getAttribute( 'url' ) ) ];
 						break;
@@ -402,6 +521,10 @@ THREE.ColladaLoader.prototype = {
 			if ( node.camera !== undefined ) {
 
 				object = node.camera.clone();
+
+			} else if ( node.light !== undefined) {
+
+				object = node.light.clone();
 
 			} else if ( node.geometry !== undefined ) {
 
@@ -468,6 +591,7 @@ THREE.ColladaLoader.prototype = {
 
 		var imagesLibrary = parseLibrary( xml, 'library_images', 'image', parseImage );
 		var camerasLibrary = parseLibrary( xml, 'library_cameras', 'camera', parseCamera );
+		var lightsLibrary = parseLibrary( xml, 'library_lights', 'light', parseLight );
 		var geometriesLibrary = parseLibrary( xml, 'library_geometries', 'geometry', parseGeometry );
 		var nodesLibrary = parseLibrary( xml, 'library_nodes', 'node', parseNode );
 		var visualScenesLibrary = parseLibrary( xml, 'library_visual_scenes', 'visual_scene', parseVisualScene );
