@@ -166,7 +166,7 @@ THREE.ColladaLoader.prototype = {
 
 					case 'polylist':
 					case 'triangles':
-						data.primitive = parsePrimitive( child );
+						data.primitive = parseGeometryPrimitive( child );
 						break;
 
 					default:
@@ -176,50 +176,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			return createGeometry( data );
-
-		}
-
-		function parsePrimitive( xml ) {
-
-			var primitive = {
-				inputs: {},
-				stride: 0
-			};
-
-			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
-
-				var child = xml.childNodes[ i ];
-
-				if ( child.nodeType !== 1 ) continue;
-
-				switch ( child.nodeName ) {
-
-					case 'input':
-						var id = parseId( child.getAttribute( 'source' ) );
-						var semantic = child.getAttribute( 'semantic' );
-						var offset = parseInt( child.getAttribute( 'offset' ) );
-						primitive.inputs[ semantic ] = { id: id, offset: offset };
-						primitive.stride = Math.max( primitive.stride, offset + 1 );
-						break;
-
-					case 'vcount':
-						primitive.vcount = parseInts( child.textContent );
-						break;
-
-					case 'p':
-						primitive.p = parseInts( child.textContent );
-						break;
-
-				}
-
-			}
-
-			return primitive;
-
-		}
-
-		function createGeometry( data ) {
+			//
 
 			if ( data.primitive === undefined ) return;
 
@@ -330,6 +287,45 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		function parseGeometryPrimitive( xml ) {
+
+			var primitive = {
+				inputs: {},
+				stride: 0
+			};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'input':
+						var id = parseId( child.getAttribute( 'source' ) );
+						var semantic = child.getAttribute( 'semantic' );
+						var offset = parseInt( child.getAttribute( 'offset' ) );
+						primitive.inputs[ semantic ] = { id: id, offset: offset };
+						primitive.stride = Math.max( primitive.stride, offset + 1 );
+						break;
+
+					case 'vcount':
+						primitive.vcount = parseInts( child.textContent );
+						break;
+
+					case 'p':
+						primitive.p = parseInts( child.textContent );
+						break;
+
+				}
+
+			}
+
+			return primitive;
+
+		}
+
 		// nodes
 
 		var material = new THREE.MeshPhongMaterial();
@@ -405,7 +401,7 @@ THREE.ColladaLoader.prototype = {
 
 			if ( node.camera !== undefined ) {
 
-				object = node.camera;
+				object = node.camera.clone();
 
 			} else if ( node.geometry !== undefined ) {
 
@@ -424,7 +420,7 @@ THREE.ColladaLoader.prototype = {
 
 			for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-				object.add( node.children[ i ] );
+				object.add( children[ i ] );
 
 			}
 
