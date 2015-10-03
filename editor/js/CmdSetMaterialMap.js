@@ -7,6 +7,7 @@ CmdSetMaterialMap = function ( object, mapName, newMap ) {
 	Cmd.call( this );
 
 	this.type = 'CmdSetMaterialMap';
+	this.name = 'Set material.' + mapName;
 
 	this.object = object;
 	this.mapName = mapName;

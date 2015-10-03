@@ -7,6 +7,8 @@ CmdSetUuid = function ( object, newUuid ) {
 	Cmd.call( this );
 
 	this.type = 'CmdSetUuid';
+	this.name = 'Update uuid';
+
 	this.object = object;
 
 	this.oldUuid = object !== undefined ? object.uuid : undefined;

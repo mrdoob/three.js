@@ -7,6 +7,7 @@ CmdSetPosition = function ( object, newPositionVector, oldPositionVector ) {
 	Cmd.call( this );
 
 	this.type = 'CmdSetPosition';
+	this.name = 'Set position';
 	this.updatable = true;
 
 	this.object = object;

@@ -7,6 +7,7 @@ CmdAddObject = function ( object ) {
 	Cmd.call( this );
 
 	this.type = 'CmdAddObject';
+	this.name = 'Add object';
 
 	this.object = object;
 	if ( object !== undefined ) {

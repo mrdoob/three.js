@@ -7,6 +7,7 @@ CmdRemoveObject = function ( object ) {
 	Cmd.call( this );
 
 	this.type = 'CmdRemoveObject';
+	this.name = 'Remove object';
 
 	this.object = object;
 	this.parent = object !== undefined ? object.parent : undefined;

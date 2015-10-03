@@ -79,7 +79,9 @@ Sidebar.Geometry = function ( editor ) {
 					new CmdSetRotation( object, new THREE.Euler( 0, 0, 0 ) ),
 					new CmdSetScale( object, new THREE.Vector3( 1, 1, 1 ) ) ];
 
-				editor.execute( new CmdMultiCmds( cmds ) );
+				var flattenCmd = new CmdMultiCmds( cmds );
+				flattenCmd.name = 'Flatten Geometry';
+				editor.execute( flattenCmd );
 
 				editor.signals.geometryChanged.dispatch( object );
 				editor.signals.objectChanged.dispatch( object );

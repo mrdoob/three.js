@@ -7,6 +7,7 @@ CmdSetScene = function ( oldScene, newScene ) {
 	Cmd.call( this );
 
 	this.type = 'CmdSetScene';
+	this.name = 'Set scene';
 
 	this.cmdArray = [];
 

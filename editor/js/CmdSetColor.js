@@ -7,6 +7,7 @@ CmdSetColor = function ( object, attributeName, newValue ) {
 	Cmd.call( this );
 
 	this.type = 'CmdSetColor';
+	this.name = 'Set ' + attributeName;
 	this.updatable = true;
 
 	this.object = object;

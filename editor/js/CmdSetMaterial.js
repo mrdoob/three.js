@@ -7,6 +7,7 @@ CmdSetMaterial = function ( object, newMaterial ) {
 	Cmd.call( this );
 
 	this.type = 'CmdSetMaterial';
+	this.name = 'Set material';
 
 	this.object = object;
 	this.objectUuid = object !== undefined ? object.uuid : undefined;

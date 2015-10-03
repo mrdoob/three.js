@@ -7,6 +7,7 @@ CmdSetGeometry = function ( object, newGeometry ) {
 	Cmd.call( this );
 
 	this.type = 'CmdSetGeometry';
+	this.name = 'Set geometry';
 	this.updatable = true;
 
 	this.object = object;

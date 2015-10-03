@@ -51,7 +51,7 @@ Sidebar.History = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + "<span style='color: #0000cc '>" + enumerator++ + ". Undo: " + object.type.substring( 3, object.type.length ).replace(/([a-z])([A-Z])/g, '$1 $2') + "</span>";
+				var html = pad + "<span style='color: #0000cc '>" + enumerator++ + ". Undo: " + object.name + "</span>";
 
 				options.push( { value: object.id, html: html } );
 
@@ -66,7 +66,7 @@ Sidebar.History = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + "<span style='color: #71544e'>" + enumerator++ + ". Redo: " +  object.type.substring( 3, object.type.length ).replace(/([a-z])([A-Z])/g, '$1 $2') + "</span>";
+				var html = pad + "<span style='color: #71544e'>" + enumerator++ + ". Redo: " +  object.name + "</span>";
 
 				options.push( { value: object.id, html: html } );
 

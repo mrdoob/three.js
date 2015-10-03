@@ -188,7 +188,9 @@ Menubar.Edit = function ( editor ) {
 			}
 
 		} );
-		editor.execute( new CmdMultiCmds( cmds ) );
+		var minifyCmd = new CmdMultiCmds( cmds );
+		minifyCmd.name = 'Minify Shaders';
+		editor.execute( minifyCmd );
 
 
 		window.alert( nMaterialsChanged +

@@ -7,6 +7,7 @@ CmdMultiCmds = function ( cmdArray ) {
 	Cmd.call( this );
 
 	this.type = 'CmdMultiCmds';
+	this.name = 'Multiple Changes';
 
 	this.cmdArray = cmdArray !== undefined ? cmdArray : [];
 

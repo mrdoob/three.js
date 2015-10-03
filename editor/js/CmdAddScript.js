@@ -7,6 +7,7 @@ CmdAddScript = function ( object, script ) {
 	Cmd.call( this );
 
 	this.type = 'CmdAddScript';
+	this.name = 'Add script';
 
 	this.object = object;
 	this.objectUuid = object !== undefined ? object.uuid : undefined;
