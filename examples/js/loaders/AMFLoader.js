@@ -36,11 +36,9 @@ THREE.AMFLoader.prototype = {
 		var loader = new THREE.XHRLoader( scope.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setResponseType( 'arraybuffer' );
-
 		loader.load( url, function( text ) {
 
-			var amfObject = scope.parse( text );
-			onLoad( amfObject );
+			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
 
@@ -77,7 +75,7 @@ THREE.AMFLoader.prototype = {
 
 				for ( file in zip.files ) {
 
-					if ( file.toLowerCase().endsWith( ".amf" ) ) {
+					if ( file.toLowerCase().substr( - 4 ) === '.amf' ) {
 
 						break;
 
@@ -299,7 +297,7 @@ THREE.AMFLoader.prototype = {
 							normalArray.push(nz);
 
 						}
-						
+
 						vNode = vNode.nextElementSibling;
 
 					}
