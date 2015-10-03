@@ -14,13 +14,21 @@ THREE.ColladaLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		function getBaseUrl( url ) {
+
+			var parts = url.split( '/' );
+			parts.pop();
+			return ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
+
+		}
+
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.setCrossOrigin( this.crossOrigin );
+		loader.setCrossOrigin( scope.crossOrigin );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			onLoad( scope.parse( text, getBaseUrl( url ) ) );
 
 		}, onProgress, onError );
 
@@ -40,7 +48,7 @@ THREE.ColladaLoader.prototype = {
 
 	},
 
-	parse: function ( text ) {
+	parse: function ( text, baseUrl ) {
 
 		function parseFloats( text ) {
 
@@ -96,6 +104,20 @@ THREE.ColladaLoader.prototype = {
 			}
 
 			return data;
+
+		}
+
+		// image
+
+		var imageLoader = new THREE.ImageLoader();
+
+		function parseImage( xml ) {
+
+			var url = xml.getElementsByTagName( 'init_from' )[ 0 ].textContent;
+
+			if ( baseUrl !== undefined ) url = baseUrl + url;
+
+			return imageLoader.load( url );
 
 		}
 
@@ -448,6 +470,7 @@ THREE.ColladaLoader.prototype = {
 
 		console.timeEnd( 'ColladaLoader: DOMParser' );
 
+		var imagesLibrary = parseLibrary( xml, 'library_images', 'image', parseImage );
 		var camerasLibrary = parseLibrary( xml, 'library_cameras', 'camera', parseCamera );
 		var geometriesLibrary = parseLibrary( xml, 'library_geometries', 'geometry', parseGeometry );
 		var nodesLibrary = parseLibrary( xml, 'library_nodes', 'node', parseNode );
