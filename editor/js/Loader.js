@@ -213,11 +213,12 @@ var Loader = function ( editor ) {
 							morphNormals: true
 						} );
 
-						var object = new THREE.MorphAnimMesh( geometry, material );
-						object.name = filename;
+						var mesh = new THREE.Mesh( geometry, material );
+						mesh.mixer = new THREE.AnimationMixer( mesh )
+						mesh.name = filename;
 
-						editor.addObject( object );
-						editor.select( object );
+						editor.addObject( mesh );
+						editor.select( mesh );
 
 					}, false );
 					reader.readAsArrayBuffer( file );
