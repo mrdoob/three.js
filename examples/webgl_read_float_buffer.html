@@ -207,16 +207,16 @@
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
                 
-                var valueDiv = document.createElement('div');
-                valueDiv.style.position = 'absolute';
-                valueDiv.style.top = '0px';
-                valueDiv.style.right = '0px';
-                valueDiv.style.width = '500px';
-                valueDiv.style.height = '300px';
-                valueDiv.style.fontSize = '60px';
-                container.appendChild( valueDiv );
-                valueNode = document.createTextNode('');
-                valueDiv.appendChild(valueNode);
+				var valueDiv = document.createElement('div');
+				valueDiv.style.position = 'absolute';
+				valueDiv.style.top = '0px';
+				valueDiv.style.right = '0px';
+				valueDiv.style.width = '500px';
+				valueDiv.style.height = '300px';
+				valueDiv.style.fontSize = '60px';
+				container.appendChild( valueDiv );
+				valueNode = document.createTextNode('');
+				valueDiv.appendChild(valueNode);
                 
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -281,10 +281,10 @@
 				renderer.render( scene, camera );
                 
                 
-                var read = new Float32Array(4);
-                renderer.readRenderTargetPixels(rtTexture, windowHalfX + mouseX, windowHalfY - mouseY, 1, 1, read);
+				var read = new Float32Array(4);
+				renderer.readRenderTargetPixels(rtTexture, windowHalfX + mouseX, windowHalfY - mouseY, 1, 1, read);
                 
-                valueNode.nodeValue ='r:' + read[0] +' g:' + read[1] + ' b:' + read[2];
+				valueNode.nodeValue ='r:' + read[0] +' g:' + read[1] + ' b:' + read[2];
 
 			}
 
