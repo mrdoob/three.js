@@ -20,19 +20,7 @@ CmdSetMaterialValue = function ( object, attributeName, newValue ) {
 
 CmdSetMaterialValue.prototype = {
 
-	init: function () {
-
-		if ( this.object === undefined ) {
-
-			this.object = this.editor.objectByUuid( this.objectUuid );
-
-		}
-
-	},
-
 	execute: function () {
-
-		this.init();
 
 		this.object.material[ this.attributeName ] = this.newValue;
 		this.object.material.needsUpdate = true;
@@ -41,8 +29,6 @@ CmdSetMaterialValue.prototype = {
 	},
 
 	undo: function () {
-
-		this.init();
 
 		this.object.material[ this.attributeName ] = this.oldValue;
 		this.object.material.needsUpdate = true;
@@ -77,6 +63,7 @@ CmdSetMaterialValue.prototype = {
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;
+		this.object = this.editor.objectByUuid( json.objectUuid );
 
 	}
 

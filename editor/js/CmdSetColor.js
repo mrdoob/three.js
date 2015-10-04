@@ -20,19 +20,8 @@ CmdSetColor = function ( object, attributeName, newValue ) {
 
 CmdSetColor.prototype = {
 
-	init: function () {
-
-		if ( this.object === undefined ) {
-
-			this.object = this.editor.objectByUuid( this.objectUuid );
-
-		}
-
-	},
-
 	execute: function () {
 
-		this.init();
 		this.object[ this.attributeName ].setHex( this.newValue );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
@@ -40,7 +29,6 @@ CmdSetColor.prototype = {
 
 	undo: function () {
 
-		this.init();
 		this.object[ this.attributeName ].setHex( this.oldValue );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
@@ -69,6 +57,7 @@ CmdSetColor.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
+		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.objectUuid = json.objectUuid;
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;

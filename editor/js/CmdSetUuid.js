@@ -18,24 +18,7 @@ CmdSetUuid = function ( object, newUuid ) {
 
 CmdSetUuid.prototype = {
 
-	init: function () {
-
-		if ( this.object === undefined ) {
-
-			this.object = this.editor.objectByUuid( this.oldUuid );
-
-		}
-		if ( this.object === undefined ) {
-
-			this.object = this.editor.objectByUuid( this.newUuid );
-
-		}
-
-	},
-
 	execute: function () {
-
-		this.init();
 
 		this.object.uuid = this.newUuid;
 		this.editor.signals.objectChanged.dispatch( this.object );
@@ -45,8 +28,6 @@ CmdSetUuid.prototype = {
 	},
 
 	undo: function () {
-
-		this.init();
 
 		this.object.uuid = this.oldUuid;
 		this.editor.signals.objectChanged.dispatch( this.object );
@@ -72,6 +53,13 @@ CmdSetUuid.prototype = {
 
 		this.oldUuid = json.oldUuid;
 		this.newUuid = json.newUuid;
+		this.object = this.editor.objectByUuid( json.oldUuid );
+
+		if ( this.object === undefined ) {
+
+			this.object = this.editor.objectByUuid( json.newUuid );
+
+		}
 
 	}
 

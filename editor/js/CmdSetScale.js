@@ -29,19 +29,7 @@ CmdSetScale = function ( object, newScaleVector, oldScaleVector ) {
 
 CmdSetScale.prototype = {
 
-	init: function () {
-
-		if ( this.object === undefined ) {
-
-			this.object = this.editor.objectByUuid( this.objectUuid );
-
-		}
-
-	},
-
 	execute: function () {
-
-		this.init();
 
 		this.object.scale.copy( this.newScale );
 		this.object.updateMatrixWorld( true );
@@ -50,8 +38,6 @@ CmdSetScale.prototype = {
 	},
 
 	undo: function () {
-
-		this.init();
 
 		this.object.scale.copy( this.oldScale );
 		this.object.updateMatrixWorld( true );
@@ -81,6 +67,7 @@ CmdSetScale.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
+		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.objectUuid = json.objectUuid;
 		this.oldScale = new THREE.Vector3().fromArray( json.oldScale );
 		this.newScale = new THREE.Vector3().fromArray( json.newScale );

@@ -65,39 +65,8 @@ CmdSetMaterial = function ( object, newMaterial ) {
 
 CmdSetMaterial.prototype = {
 
-	init: function () {
-
-		if ( this.object === undefined ) {
-
-			this.object = this.editor.objectByUuid( this.objectUuid );
-
-		}
-		if ( this.oldMaterial === undefined ) {
-
-			this.oldMaterial = parseMaterial( this.oldMaterialJSON );
-
-		}
-		if ( this.newMaterial === undefined ) {
-
-			this.newMaterial = parseMaterial( this.newMaterialJSON );
-
-		}
-
-		function parseMaterial ( json ) {
-
-			var loader = new THREE.ObjectLoader();
-			var images = loader.parseImages( json.images );
-			var textures  = loader.parseTextures( json.textures, images );
-			var materials = loader.parseMaterials( json.materials, textures );
-			return materials[ json.materials[ 0 ].uuid ];
-
-		}
-
-	},
-
 	execute: function () {
 
-		this.init();
 		this.object.material = this.newMaterial;
 		this.editor.signals.materialChanged.dispatch( this.newMaterial );
 
@@ -105,7 +74,6 @@ CmdSetMaterial.prototype = {
 
 	undo: function () {
 
-		this.init();
 		this.object.material = this.oldMaterial;
 		this.editor.signals.materialChanged.dispatch( this.oldMaterial );
 
@@ -127,10 +95,25 @@ CmdSetMaterial.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
+		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.objectUuid = json.objectUuid;
+
 		this.oldMaterialJSON = json.oldMaterial;
 		this.newMaterialJSON = json.newMaterial;
 
+		this.oldMaterial = parseMaterial( json.oldMaterial );
+		this.newMaterial = parseMaterial( json.newMaterial );
+
+
+		function parseMaterial ( json ) {
+
+			var loader = new THREE.ObjectLoader();
+			var images = loader.parseImages( json.images );
+			var textures  = loader.parseTextures( json.textures, images );
+			var materials = loader.parseMaterials( json.materials, textures );
+			return materials[ json.materials[ 0 ].uuid ];
+
+		}
 	}
 
 };

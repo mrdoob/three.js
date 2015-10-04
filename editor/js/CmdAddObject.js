@@ -59,33 +59,14 @@ CmdAddObject = function ( object ) {
 
 CmdAddObject.prototype = {
 
-	init: function () {
-
-		if ( this.object === undefined ) {
-
-			this.object = this.editor.objectByUuid( this.objectJSON.object.uuid );
-
-		}
-
-		if ( this.object === undefined ) {
-
-			var loader = new THREE.ObjectLoader();
-			this.object = loader.parse( this.objectJSON );
-
-		}
-
-	},
-
 	execute: function () {
 
-		this.init();
 		this.editor.addObject( this.object );
 
 	},
 
 	undo: function () {
 
-		this.init();
 		this.editor.removeObject( this.object );
 		this.editor.deselect();
 
@@ -106,6 +87,14 @@ CmdAddObject.prototype = {
 		Cmd.prototype.fromJSON.call( this, json );
 
 		this.objectJSON = json.object;
+		this.object = this.editor.objectByUuid( json.object.object.uuid );
+
+		if ( this.object === undefined ) {
+
+			var loader = new THREE.ObjectLoader();
+			this.object = loader.parse( json.object );
+
+		}
 
 	}
 

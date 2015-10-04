@@ -18,19 +18,7 @@ CmdAddScript = function ( object, script ) {
 
 CmdAddScript.prototype = {
 
-	init: function () {
-
-		if ( this.object === undefined ) {
-
-			this.object = this.editor.objectByUuid( this.objectUuid );
-
-		}
-
-	},
-
 	execute: function () {
-
-		this.init();
 
 		if ( this.editor.scripts[ this.object.uuid ] === undefined ) {
 
@@ -45,8 +33,6 @@ CmdAddScript.prototype = {
 	},
 
 	undo: function () {
-
-		this.init();
 
 		if ( this.editor.scripts[ this.object.uuid ] === undefined ) return;
 
@@ -79,6 +65,7 @@ CmdAddScript.prototype = {
 
 		this.objectUuid = json.objectUuid;
 		this.script = json.script;
+		this.object = this.editor.objectByUuid( json.objectUuid );
 
 	}
 

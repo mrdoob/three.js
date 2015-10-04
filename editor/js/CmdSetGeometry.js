@@ -23,36 +23,7 @@ CmdSetGeometry = function ( object, newGeometry ) {
 
 CmdSetGeometry.prototype = {
 
-	init: function () {
-
-		if ( this.object === undefined ) {
-
-			this.object = this.editor.objectByUuid( this.objectUuid );
-
-		}
-		if ( this.oldGeometry === undefined ) {
-
-			this.oldGeometry = parseGeometry( this.oldGeometryJSON );
-
-		}
-		if ( this.newGeometry === undefined ) {
-
-			this.newGeometry = parseGeometry( this.newGeometryJSON );
-
-		}
-
-		function parseGeometry ( data ) {
-
-			var loader = new THREE.ObjectLoader();
-			return loader.parseGeometries( [ data ] )[ data.uuid ];
-
-		}
-
-	},
-
 	execute: function () {
-
-		this.init();
 
 		this.object.geometry.dispose();
 		this.object.geometry = this.newGeometry;
@@ -64,8 +35,6 @@ CmdSetGeometry.prototype = {
 	},
 
 	undo: function () {
-
-		this.init();
 
 		this.object.geometry.dispose();
 		this.object.geometry = this.oldGeometry;
@@ -99,9 +68,21 @@ CmdSetGeometry.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
+		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.objectUuid = json.objectUuid;
 		this.oldGeometryJSON = json.oldGeometry;
 		this.newGeometryJSON = json.newGeometry;
+
+
+		this.oldGeometry = parseGeometry( this.oldGeometryJSON );
+		this.newGeometry = parseGeometry( this.newGeometryJSON );
+
+		function parseGeometry ( data ) {
+
+			var loader = new THREE.ObjectLoader();
+			return loader.parseGeometries( [ data ] )[ data.uuid ];
+
+		}
 
 	}
 

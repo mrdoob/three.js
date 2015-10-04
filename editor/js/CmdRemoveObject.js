@@ -62,35 +62,7 @@ CmdRemoveObject = function ( object ) {
 
 CmdRemoveObject.prototype = {
 
-	init: function () {
-
-		if ( this.parent === undefined ) {
-
-			this.parent = this.editor.objectByUuid( this.parentUuid );
-
-		}
-		if ( this.parent === undefined ) {
-
-			this.parent = this.editor.scene;
-
-		}
-		if ( this.object === undefined ) {
-
-			this.object = this.editor.objectByUuid( this.objectJSON.object.uuid );
-
-		}
-		if ( this.object === undefined ) {
-
-			var loader = new THREE.ObjectLoader();
-			this.object = loader.parse( this.objectJSON );
-
-		}
-
-	},
-
 	execute: function () {
-
-		this.init();
 
 		this.index = this.parent.children.indexOf( this.object );
 
@@ -109,8 +81,6 @@ CmdRemoveObject.prototype = {
 	},
 
 	undo: function () {
-
-		this.init();
 
 		var scope = this.editor;
 
@@ -147,9 +117,24 @@ CmdRemoveObject.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
-		this.objectJSON = json.object;
-		this.index = json.index;
+		this.parent = this.editor.objectByUuid( json.parentUuid );
+		if ( this.parent === undefined ) {
+
+			this.parent = this.editor.scene;
+
+		}
 		this.parentUuid = json.parentUuid;
+
+		this.index = json.index;
+		this.object = this.editor.objectByUuid( json.object.object.uuid );
+
+		if ( this.object === undefined ) {
+
+			var loader = new THREE.ObjectLoader();
+			this.object = loader.parse( json.object );
+
+		}
+		this.objectJSON = json.object;
 
 	}
 

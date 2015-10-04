@@ -5,6 +5,7 @@
 Cmd = function () {
 
 	this.id = -1;
+	this.serialized = false;
 	this.updatable = false;
 	this.type = '';
 	this.name = '';

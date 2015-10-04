@@ -29,19 +29,7 @@ CmdSetPosition = function ( object, newPositionVector, oldPositionVector ) {
 };
 CmdSetPosition.prototype = {
 
-	init: function () {
-
-		if ( this.object === undefined ) {
-
-			this.object = this.editor.objectByUuid( this.objectUuid );
-
-		}
-
-	},
-
 	execute: function () {
-
-		this.init();
 
 		this.object.position.copy( this.newPosition );
 		this.object.updateMatrixWorld( true );
@@ -50,8 +38,6 @@ CmdSetPosition.prototype = {
 	},
 
 	undo: function () {
-
-		this.init();
 
 		this.object.position.copy( this.oldPosition );
 		this.object.updateMatrixWorld( true );
@@ -81,6 +67,7 @@ CmdSetPosition.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
+		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.objectUuid = json.objectUuid;
 		this.oldPosition = new THREE.Vector3().fromArray( json.oldPosition );
 		this.newPosition = new THREE.Vector3().fromArray( json.newPosition );
