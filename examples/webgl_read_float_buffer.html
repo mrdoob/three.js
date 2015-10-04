@@ -89,7 +89,7 @@
 
 			var container, stats;
 
-			var cameraRTT, camera, sceneRTT, sceneScreen, scene, renderer, zmesh1, zmesh2;
+			var cameraRTT, sceneRTT, sceneScreen, renderer, zmesh1, zmesh2;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -108,15 +108,11 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 100;
-
 				cameraRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
 				cameraRTT.position.z = 100;
 
 				//
 
-				scene = new THREE.Scene();
 				sceneRTT = new THREE.Scene();
 				sceneScreen = new THREE.Scene();
 
@@ -173,28 +169,6 @@
 				quad.position.z = - 100;
 				sceneScreen.add( quad );
 
-				var n = 5,
-					geometry = new THREE.SphereGeometry( 10, 64, 32 ),
-					material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: rtTexture } );
-
-				for ( var j = 0; j < n; j ++ ) {
-
-					for ( var i = 0; i < n; i ++ ) {
-
-						mesh = new THREE.Mesh( geometry, material2 );
-
-						mesh.position.x = ( i - ( n - 1 ) / 2 ) * 20;
-						mesh.position.y = ( j - ( n - 1 ) / 2 ) * 20;
-						mesh.position.z = 0;
-
-						mesh.rotation.y = - Math.PI / 2;
-
-						scene.add( mesh );
-
-					}
-
-				}
-
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -245,11 +219,6 @@
 
 				var time = Date.now() * 0.0015;
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-				camera.lookAt( scene.position );
-
 				if ( zmesh1 && zmesh2 ) {
 
 					zmesh1.rotation.y = - time;
@@ -274,12 +243,6 @@
 				// Render full screen quad with generated texture
 
 				renderer.render( sceneScreen, cameraRTT );
-
-				// Render second scene to screen
-				// (using first scene as regular texture)
-
-				renderer.render( scene, camera );
-
 
 				var read = new Float32Array( 4 );
 				renderer.readRenderTargetPixels( rtTexture, windowHalfX + mouseX, windowHalfY - mouseY, 1, 1, read );
