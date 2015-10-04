@@ -1989,6 +1989,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( light instanceof THREE.PointLight ) {
 
+						// for point lights we set the shadow matrix to be a translation-only matrix
+						// equal to inverse of the light's position
+						_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
+						light.shadowMatrix.identity().setPosition( _vector3 );
+
 						// for point lights we set the sign of the shadowDarkness uniform to be negative
 						uniforms.shadowDarkness.value[ j ] = - light.shadowDarkness;
 
