@@ -7,7 +7,7 @@ CmdSetScale = function ( object, newScaleVector, oldScaleVector ) {
 	Cmd.call( this );
 
 	this.type = 'CmdSetScale';
-	this.name = 'Set scale';
+	this.name = 'Set Scale';
 	this.updatable = true;
 
 	this.object = object;

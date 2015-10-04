@@ -7,11 +7,11 @@ CmdAddObject = function ( object ) {
 	Cmd.call( this );
 
 	this.type = 'CmdAddObject';
-	this.name = 'Add object';
 
 	this.object = object;
 	if ( object !== undefined ) {
 
+		this.name = 'Add Object: ' + object.name;
 		object.updateMatrixWorld( true );
 
 		meta = {

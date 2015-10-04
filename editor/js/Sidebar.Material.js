@@ -410,7 +410,7 @@ Sidebar.Material = function ( editor ) {
 
 				material = new THREE[ materialClass.getValue() ]();
 
-				editor.execute( new CmdSetMaterial( currentObject, material ) );
+				editor.execute( new CmdSetMaterial( currentObject, material ), 'New Material: ' + materialClass.getValue() );
 				// TODO Copy other references in the scene graph
 				// keeping name and UUID then.
 				// Also there should be means to create a unique

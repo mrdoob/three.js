@@ -7,7 +7,7 @@ CmdSetUuid = function ( object, newUuid ) {
 	Cmd.call( this );
 
 	this.type = 'CmdSetUuid';
-	this.name = 'Update uuid';
+	this.name = 'Update UUID';
 
 	this.object = object;
 

@@ -7,7 +7,7 @@ CmdSetRotation = function ( object, newRotationEuler, oldRotationEuler ) {
 	Cmd.call( this );
 
 	this.type = 'CmdSetRotation';
-	this.name = 'Set rotation';
+	this.name = 'Set Rotation';
 	this.updatable = true;
 
 	this.object = object;

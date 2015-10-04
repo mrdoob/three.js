@@ -7,7 +7,7 @@ CmdRemoveScript = function ( object, script ) {
 	Cmd.call( this );
 
 	this.type = 'CmdRemoveScript';
-	this.name = 'Remove script';
+	this.name = 'Remove Script';
 
 	this.object = object;
 	this.objectUuid = object !== undefined ? object.uuid : undefined;

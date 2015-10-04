@@ -7,7 +7,7 @@ CmdSetGeometryValue = function ( object, attributeName, newValue ) {
 	Cmd.call( this );
 
 	this.type = 'CmdSetGeometryValue';
-	this.name = 'Set geometry.' + attributeName;
+	this.name = 'Set Geometry.' + attributeName;
 
 	this.object = object;
 	this.attributeName = attributeName;

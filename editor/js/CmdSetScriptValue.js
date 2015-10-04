@@ -7,7 +7,7 @@ CmdSetScriptValue = function ( object, script, attributeName, newValue, cursorPo
 	Cmd.call( this );
 
 	this.type = 'CmdSetScriptValue';
-	this.name = 'Set script.' + attributeName;
+	this.name = 'Set Script.' + attributeName;
 	this.updatable = true;
 
 	this.object = object;

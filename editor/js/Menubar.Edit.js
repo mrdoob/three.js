@@ -188,7 +188,12 @@ Menubar.Edit = function ( editor ) {
 			}
 
 		} );
-		editor.execute( new CmdMultiCmds( cmds ), 'Minify Shaders' );
+
+		if ( nMaterialsChanged > 0 ) {
+
+			editor.execute( new CmdMultiCmds( cmds ), 'Minify Shaders' );
+
+		}
 
 		window.alert( nMaterialsChanged +
 				" material(s) were changed.\n" + errors.join( "\n" ) );

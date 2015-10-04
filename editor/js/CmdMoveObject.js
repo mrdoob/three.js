@@ -7,7 +7,7 @@ CmdMoveObject = function ( object, newParent, newBefore ) {
 	Cmd.call( this );
 
 	this.type = 'CmdMoveObject';
-	this.name = 'Move object';
+	this.name = 'Move Object';
 
 	this.object = object;
 	this.objectUuid = object !== undefined ? object.uuid : undefined;
