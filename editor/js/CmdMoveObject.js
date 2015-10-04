@@ -10,22 +10,22 @@ CmdMoveObject = function ( object, newParent, newBefore ) {
 	this.name = 'Move Object';
 
 	this.object = object;
-	this.objectUuid = object !== undefined ? object.uuid : undefined;
+	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
 
-	this.oldParent = object !== undefined ? object.parent : undefined;
-	this.oldParentUuid = this.oldParent !== undefined ? this.oldParent.uuid : undefined;
-	this.oldIndex = this.oldParent !== undefined ? this.oldParent.children.indexOf( this.object ) : undefined;
+	this.oldParent = ( object !== undefined ) ? object.parent : undefined;
+	this.oldParentUuid = ( this.oldParent !== undefined ) ? this.oldParent.uuid : undefined;
+	this.oldIndex = ( this.oldParent !== undefined ) ? this.oldParent.children.indexOf( this.object ) : undefined;
 
 	this.newParent = newParent;
-	this.newParentUuid = newParent !== undefined ? newParent.uuid : undefined;
+	this.newParentUuid = ( newParent !== undefined ) ? newParent.uuid : undefined;
 
 	if ( newBefore !== undefined ) {
 
-		this.newIndex = newParent !== undefined ? newParent.children.indexOf( newBefore ) : undefined;
+		this.newIndex = ( newParent !== undefined ) ? newParent.children.indexOf( newBefore ) : undefined;
 
 	} else {
 
-		this.newIndex = newParent !== undefined ? newParent.children.length : undefined;
+		this.newIndex = ( newParent !== undefined ) ? newParent.children.length : undefined;
 
 	}
 
@@ -41,7 +41,29 @@ CmdMoveObject = function ( object, newParent, newBefore ) {
 
 CmdMoveObject.prototype = {
 
+	init: function () {
+
+		if ( this.object === undefined ) {
+
+				this.object = this.editor.objectByUuid( this.objectUuid );
+
+		}
+		if ( this.oldParent === undefined ) {
+
+			this.oldParent = this.editor.objectByUuid( this.oldParentUuid );
+
+		}
+		if ( this.newParent === undefined ) {
+
+			this.newParent = this.editor.objectByUuid( this.newParentUuid );
+
+		}
+
+	},
+
 	execute: function () {
+
+		this.init();
 
 		this.oldParent.remove( this.object );
 
@@ -54,6 +76,8 @@ CmdMoveObject.prototype = {
 	},
 
 	undo: function () {
+
+		this.init();
 
 		this.newParent.remove( this.object );
 
@@ -83,15 +107,9 @@ CmdMoveObject.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
-		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.objectUuid = json.objectUuid;
-
-		this.oldParent = this.editor.objectByUuid( json.oldParentUuid );
 		this.oldParentUuid = json.oldParentUuid;
-
-		this.newParent = this.editor.objectByUuid( json.newParentUuid );
 		this.newParentUuid = json.newParentUuid;
-
 		this.newIndex = json.newIndex;
 		this.oldIndex = json.oldIndex;
 

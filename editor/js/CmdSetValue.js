@@ -12,15 +12,27 @@ CmdSetValue = function ( object, attributeName, newValue ) {
 
 	this.object = object;
 	this.attributeName = attributeName;
-	this.oldValue = object !== undefined ? object[ attributeName ] : undefined;
+	this.oldValue = ( object !== undefined ) ? object[ attributeName ] : undefined;
 	this.newValue = newValue;
-	this.objectUuid = object !== undefined ? object.uuid : undefined;
+	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
 
 };
 
 CmdSetValue.prototype = {
 
+	init: function () {
+
+		if ( this.object === undefined ) {
+
+			this.object = this.editor.objectByUuid( this.objectUuid );
+
+		}
+
+	},
+
 	execute: function () {
+
+		this.init();
 
 		this.object[ this.attributeName ] = this.newValue;
 		this.editor.signals.objectChanged.dispatch( this.object );
@@ -30,6 +42,8 @@ CmdSetValue.prototype = {
 	},
 
 	undo: function () {
+
+		this.init();
 
 		this.object[ this.attributeName ] = this.oldValue;
 		this.editor.signals.objectChanged.dispatch( this.object );
@@ -65,7 +79,6 @@ CmdSetValue.prototype = {
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;
-		this.object = this.editor.objectByUuid( json.objectUuid );
 
 	}
 

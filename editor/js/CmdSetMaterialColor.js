@@ -11,16 +11,28 @@ CmdSetMaterialColor = function ( object, attributeName, newValue ) {
 	this.updatable = true;
 
 	this.object = object;
-	this.objectUuid = object !== undefined ? object.uuid : undefined;
+	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
 	this.attributeName = attributeName;
-	this.oldValue = object !== undefined ? this.object.material[ this.attributeName ].getHex() : undefined;
+	this.oldValue = ( object !== undefined ) ? this.object.material[ this.attributeName ].getHex() : undefined;
 	this.newValue = newValue;
 
 };
 
 CmdSetMaterialColor.prototype = {
 
+	init: function () {
+
+		if ( this.object === undefined ) {
+
+			this.object = this.editor.objectByUuid( this.objectUuid );
+
+		}
+
+	},
+
 	execute: function () {
+
+		this.init();
 
 		this.object.material[ this.attributeName ].setHex( this.newValue );
 		this.editor.signals.materialChanged.dispatch( this.object.material );
@@ -28,6 +40,8 @@ CmdSetMaterialColor.prototype = {
 	},
 
 	undo: function () {
+
+		this.init();
 
 		this.object.material[ this.attributeName ].setHex( this.oldValue );
 		this.editor.signals.materialChanged.dispatch( this.object.material );
@@ -57,7 +71,6 @@ CmdSetMaterialColor.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
-		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.objectUuid = json.objectUuid;
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;

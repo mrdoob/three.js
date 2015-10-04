@@ -11,19 +11,48 @@ CmdSetGeometry = function ( object, newGeometry ) {
 	this.updatable = true;
 
 	this.object = object;
-	this.objectUuid = object !== undefined ? object.uuid : undefined;
+	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
 
-	this.oldGeometry = object !== undefined ? object.geometry : undefined;
+	this.oldGeometry = ( object !== undefined ) ? object.geometry : undefined;
 	this.newGeometry = newGeometry;
 
-	this.oldGeometryJSON = object !== undefined ? object.geometry.toJSON() : undefined;
-	this.newGeometryJSON = newGeometry !== undefined ? newGeometry.toJSON() : undefined;
+	this.oldGeometryJSON = ( object !== undefined ) ? object.geometry.toJSON() : undefined;
+	this.newGeometryJSON = ( newGeometry !== undefined ) ? newGeometry.toJSON() : undefined;
 
 };
 
 CmdSetGeometry.prototype = {
 
+	init: function () {
+
+		if ( this.object === undefined ) {
+
+			this.object = this.editor.objectByUuid( this.objectUuid );
+
+		}
+		if ( this.oldGeometry === undefined ) {
+
+			this.oldGeometry = parseGeometry( this.oldGeometryJSON );
+
+		}
+		if ( this.newGeometry === undefined ) {
+
+			this.newGeometry = parseGeometry( this.newGeometryJSON );
+
+		}
+
+		function parseGeometry ( data ) {
+
+			var loader = new THREE.ObjectLoader();
+			return loader.parseGeometries( [ data ] )[ data.uuid ];
+
+		}
+
+	},
+
 	execute: function () {
+
+		this.init();
 
 		this.object.geometry.dispose();
 		this.object.geometry = this.newGeometry;
@@ -35,6 +64,8 @@ CmdSetGeometry.prototype = {
 	},
 
 	undo: function () {
+
+		this.init();
 
 		this.object.geometry.dispose();
 		this.object.geometry = this.oldGeometry;
@@ -57,8 +88,8 @@ CmdSetGeometry.prototype = {
 		var output = Cmd.prototype.toJSON.call( this );
 
 		output.objectUuid = this.objectUuid;
-		output.oldGeometryJSON = this.oldGeometryJSON;
-		output.newGeometryJSON = this.newGeometryJSON;
+		output.oldGeometry = this.oldGeometryJSON;
+		output.newGeometry = this.newGeometryJSON;
 
 		return output;
 
@@ -68,21 +99,9 @@ CmdSetGeometry.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
-		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.objectUuid = json.objectUuid;
-
-		this.oldGeometryJSON = json.oldGeometryJSON;
-		this.newGeometryJSON = json.newGeometryJSON;
-
-		this.oldGeometry = parseGeometry( this.oldGeometryJSON );
-		this.newGeometry = parseGeometry( this.newGeometryJSON );
-
-		function parseGeometry ( data ) {
-
-			var loader = new THREE.ObjectLoader();
-			return loader.parseGeometries( [ data ] )[ data.uuid ];
-
-		}
+		this.oldGeometryJSON = json.oldGeometry;
+		this.newGeometryJSON = json.newGeometry;
 
 	}
 

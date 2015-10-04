@@ -11,10 +11,10 @@ CmdSetMaterialMap = function ( object, mapName, newMap ) {
 
 	this.object = object;
 	this.mapName = mapName;
-	this.oldMap = object !== undefined ? object.material[ mapName ] : undefined;
+	this.oldMap = ( object !== undefined ) ? object.material[ mapName ] : undefined;
 	this.newMap = newMap;
-	this.objectUuid = object !== undefined ? object.uuid : undefined;
 
+	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
 	this.newMapJSON = serializeMap( this.newMap );
 	this.oldMapJSON = serializeMap( this.oldMap );
 
@@ -63,51 +63,23 @@ CmdSetMaterialMap = function ( object, mapName, newMap ) {
 
 CmdSetMaterialMap.prototype = {
 
-	execute: function () {
+	init: function () {
 
-		this.object.material[ this.mapName ] = this.newMap;
-		this.object.material.needsUpdate = true;
-		this.editor.signals.materialChanged.dispatch( this.object.material );
+		if ( this.object === undefined ) {
 
-	},
+			this.object = this.editor.objectByUuid( this.objectUuid );
 
-	undo: function () {
+		}
+		if ( this.oldMap === undefined ) {
 
-		this.object.material[ this.mapName ] = this.oldMap;
-		this.object.material.needsUpdate = true;
-		this.editor.signals.materialChanged.dispatch( this.object.material );
+			this.oldMap = parseTexture( this.oldMapJSON );
 
-	},
+		}
+		if ( this.newMap === undefined ) {
 
-	toJSON: function () {
+			this.newMap = parseTexture( this.newMapJSON );
 
-		var output = Cmd.prototype.toJSON.call( this );
-
-		output.objectUuid = this.objectUuid;
-		output.mapName = this.mapName;
-
-		output.oldMap = this.oldMapJSON;
-		output.newMap = this.newMapJSON;
-
-		return output;
-
-	},
-
-	fromJSON: function ( json ) {
-
-		Cmd.prototype.fromJSON.call( this, json );
-
-		this.objectUuid = json.objectUuid;
-		this.mapName = json.mapName;
-
-		this.object = this.editor.objectByUuid( json.objectUuid );
-
-		this.oldMapJSON = json.oldMap;
-		this.newMapJSON = json.newMap;
-
-		this.oldMap = parseTexture( json.oldMap );
-		this.newMap = parseTexture( json.newMap );
-
+		}
 
 		function parseTexture ( json ) {
 
@@ -124,6 +96,50 @@ CmdSetMaterialMap.prototype = {
 			return map;
 
 		}
+
+	},
+
+	execute: function () {
+
+		this.init();
+
+		this.object.material[ this.mapName ] = this.newMap;
+		this.object.material.needsUpdate = true;
+		this.editor.signals.materialChanged.dispatch( this.object.material );
+
+	},
+
+	undo: function () {
+
+		this.init();
+
+		this.object.material[ this.mapName ] = this.oldMap;
+		this.object.material.needsUpdate = true;
+		this.editor.signals.materialChanged.dispatch( this.object.material );
+
+	},
+
+	toJSON: function () {
+
+		var output = Cmd.prototype.toJSON.call( this );
+
+		output.objectUuid = this.objectUuid;
+		output.mapName = this.mapName;
+		output.oldMap = this.oldMapJSON;
+		output.newMap = this.newMapJSON;
+
+		return output;
+
+	},
+
+	fromJSON: function ( json ) {
+
+		Cmd.prototype.fromJSON.call( this, json );
+
+		this.objectUuid = json.objectUuid;
+		this.mapName = json.mapName;
+		this.oldMapJSON = json.oldMap;
+		this.newMapJSON = json.newMap;
 
 	}
 

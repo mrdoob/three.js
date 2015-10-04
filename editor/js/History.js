@@ -94,15 +94,6 @@ History.prototype = {
 
 			var cmd = this.undos.pop();
 
-			if ( cmd.serialized ) {
-
-				var json = cmd;
-				cmd = new window[ json.type ]();	// creates a new object of type "json.type"
-				cmd.editor = this.editor;
-				cmd.fromJSON( json );
-
-			}
-
 		}
 
 		if ( cmd !== undefined ) {
@@ -132,15 +123,6 @@ History.prototype = {
 
 			var cmd = this.redos.pop();
 
-			if ( cmd.serialized ) {
-
-				var json = cmd;
-				cmd = new window[ json.type ]();	// creates a new object of type "json.type"
-				cmd.editor = this.editor;
-				cmd.fromJSON( json );
-
-			}
-
 		}
 
 		if ( cmd !== undefined ) {
@@ -166,16 +148,7 @@ History.prototype = {
 		for ( var i = 0 ; i < this.undos.length; i++ ) {
 
 			var cmd = this.undos[ i ];
-
-			if ( cmd.serialized ) {
-
-				undos.push( cmd );	// add without serializing
-
-			} else {
-
-				undos.push( cmd.toJSON() );
-
-			}
+			undos.push( cmd.toJSON() );
 
 		}
 
@@ -188,17 +161,7 @@ History.prototype = {
 		for ( var i = 0 ; i < this.redos.length; i++ ) {
 
 			var cmd = this.redos[ i ];
-
-			if ( cmd.serialized ) {
-
-				redos.push( cmd );	// add without serializing
-
-			} else {
-
-				redos.push( cmd.toJSON() );
-
-			}
-
+			redos.push( cmd.toJSON() );
 
 		}
 
@@ -214,8 +177,10 @@ History.prototype = {
 
 		for ( var i = 0; i < json.undos.length ; i++ ) {
 
-			json.undos[ i ].serialized = true;
-			this.undos.push( json.undos[ i ] );
+			var cmd = new window[ json.undos[ i ].type ]();	// creates a new object of type "json.type"
+			cmd.fromJSON( json.undos[ i ] );
+			cmd.editor = this.editor;
+			this.undos.push( cmd );
 
 			this.idCounter = json.undos[ i ].id > this.idCounter ? json.undos[ i ].id : this.idCounter; // set last used idCounter
 
@@ -223,8 +188,10 @@ History.prototype = {
 
 		for ( var i = 0; i < json.redos.length ; i++ ) {
 
-			json.redos[ i ].serialized = true;
-			this.redos.push( json.redos[ i ] );
+			var cmd = new window[ json.redos[ i ].type ]();	// creates a new object of type "json.type"
+			cmd.fromJSON( json.redos[ i ] );
+			cmd.editor = this.editor;
+			this.redos.push( cmd );
 
 			this.idCounter = json.redos[ i ].id > this.idCounter ? json.redos[ i ].id : this.idCounter; // set last used idCounter
 

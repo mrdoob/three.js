@@ -11,7 +11,7 @@ CmdSetRotation = function ( object, newRotationEuler, oldRotationEuler ) {
 	this.updatable = true;
 
 	this.object = object;
-	this.objectUuid = object !== undefined ? object.uuid : undefined;
+	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
 
 	if ( object !== undefined && newRotationEuler !== undefined) {
 
@@ -30,7 +30,19 @@ CmdSetRotation = function ( object, newRotationEuler, oldRotationEuler ) {
 
 CmdSetRotation.prototype = {
 
+	init: function () {
+
+		if ( this.object === undefined ) {
+
+			this.object = this.editor.objectByUuid( this.objectUuid );
+
+		}
+
+	},
+
 	execute: function () {
+
+		this.init();
 
 		this.object.rotation.copy( this.newRotation );
 		this.object.updateMatrixWorld( true );
@@ -39,6 +51,8 @@ CmdSetRotation.prototype = {
 	},
 
 	undo: function () {
+
+		this.init();
 
 		this.object.rotation.copy( this.oldRotation );
 		this.object.updateMatrixWorld( true );
@@ -68,7 +82,6 @@ CmdSetRotation.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
-		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.objectUuid = json.objectUuid;
 		this.oldRotation = new THREE.Euler().fromArray(json.oldRotation);
 		this.newRotation = new THREE.Euler().fromArray(json.newRotation);
