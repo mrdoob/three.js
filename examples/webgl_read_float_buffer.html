@@ -100,7 +100,7 @@
 
 			var delta = 0.01;
 			var valueNode;
-            
+
 			init();
 			animate();
 
@@ -111,7 +111,7 @@
 				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 100;
 
-				cameraRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				cameraRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
 				cameraRTT.position.z = 100;
 
 				//
@@ -125,10 +125,10 @@
 				sceneRTT.add( light );
 
 				light = new THREE.DirectionalLight( 0xffaaaa, 1.5 );
-				light.position.set( 0, 0, -1 ).normalize();
+				light.position.set( 0, 0, - 1 ).normalize();
 				sceneRTT.add( light );
 
-				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, type:THREE.FloatType } );
+				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, type: THREE.FloatType } );
 
 				material = new THREE.ShaderMaterial( {
 
@@ -151,7 +151,7 @@
 				var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
 
 				quad = new THREE.Mesh( plane, material );
-				quad.position.z = -100;
+				quad.position.z = - 100;
 				sceneRTT.add( quad );
 
 				var geometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
@@ -170,16 +170,16 @@
 				sceneRTT.add( zmesh2 );
 
 				quad = new THREE.Mesh( plane, materialScreen );
-				quad.position.z = -100;
+				quad.position.z = - 100;
 				sceneScreen.add( quad );
 
 				var n = 5,
 					geometry = new THREE.SphereGeometry( 10, 64, 32 ),
 					material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: rtTexture } );
 
-				for( var j = 0; j < n; j ++ ) {
+				for ( var j = 0; j < n; j ++ ) {
 
-					for( var i = 0; i < n; i ++ ) {
+					for ( var i = 0; i < n; i ++ ) {
 
 						mesh = new THREE.Mesh( geometry, material2 );
 
@@ -206,8 +206,8 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
-                
-				var valueDiv = document.createElement('div');
+
+				var valueDiv = document.createElement( 'div' );
 				valueDiv.style.position = 'absolute';
 				valueDiv.style.top = '0px';
 				valueDiv.style.right = '0px';
@@ -215,9 +215,9 @@
 				valueDiv.style.height = '300px';
 				valueDiv.style.fontSize = '60px';
 				container.appendChild( valueDiv );
-				valueNode = document.createTextNode('');
-				valueDiv.appendChild(valueNode);
-                
+				valueNode = document.createTextNode( '' );
+				valueDiv.appendChild( valueNode );
+
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -259,7 +259,7 @@
 
 				if ( material.uniforms.time.value > 1 || material.uniforms.time.value < 0 ) {
 
-					delta *= -1;
+					delta *= - 1;
 
 				}
 
@@ -279,12 +279,12 @@
 				// (using first scene as regular texture)
 
 				renderer.render( scene, camera );
-                
-                
-				var read = new Float32Array(4);
-				renderer.readRenderTargetPixels(rtTexture, windowHalfX + mouseX, windowHalfY - mouseY, 1, 1, read);
-                
-				valueNode.nodeValue ='r:' + read[0] +' g:' + read[1] + ' b:' + read[2];
+
+
+				var read = new Float32Array( 4 );
+				renderer.readRenderTargetPixels( rtTexture, windowHalfX + mouseX, windowHalfY - mouseY, 1, 1, read );
+
+				valueNode.nodeValue = 'r:' + read[ 0 ] + ' g:' + read[ 1 ] + ' b:' + read[ 2 ];
 
 			}
 
