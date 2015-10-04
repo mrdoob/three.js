@@ -3,37 +3,41 @@ module( "CmdSetPosition" );
 test( "Test CmdSetPosition (Undo and Redo)", function() {
 
 	var editor = new Editor();
+	var box = aBox();
+	var cmd = new CmdAddObject( box );
+	editor.execute( cmd );
 
-	var mesh = aBox();
-	var initPosX =  50 ;
-	var initPosY = -80 ;
-	var initPosZ =  30 ;
-	mesh.position.x = initPosX ;
-	mesh.position.y = initPosY ;
-	mesh.position.z = initPosZ ;
+	var positions = [
 
-	editor.execute( new CmdAddObject( mesh ) );
-	editor.select( mesh );
+		{ x:  50, y: -80, z: 30 },
+		{ x: -10, y: 100, z:  0 },
+		{ x:  44, y: -20, z: 90 }
 
-	// translate the object
-	var newPosX = 100 ;
-	var newPosY = 200 ;
-	var newPosZ = 500 ;
-	var newPosition = new THREE.Vector3( newPosX, newPosY, newPosZ );
-	editor.execute( new CmdSetPosition( mesh, newPosition ) );
+	];
 
-	ok( mesh.position.x != initPosX, "OK, changing X position was successful" );
-	ok( mesh.position.y != initPosY, "OK, changing Y position was successful" );
-	ok( mesh.position.z != initPosZ, "OK, changing Z position was successful" );
+	positions.map( function( position ) {
+
+		var newPosition = new THREE.Vector3( position.x, position.y, position.z );
+		var cmd = new CmdSetPosition( box, newPosition );
+		cmd.updatable = false;
+		editor.execute( cmd );
+
+	});
+
+	ok( box.position.x == positions[ positions.length - 1 ].x, "OK, changing X position was successful" );
+	ok( box.position.y == positions[ positions.length - 1 ].y, "OK, changing Y position was successful" );
+	ok( box.position.z == positions[ positions.length - 1 ].z, "OK, changing Z position was successful" );
+
 
 	editor.undo();
-	ok( mesh.position.x == initPosX, "OK, changing X position value is undone" );
-	ok( mesh.position.y == initPosY, "OK, changing Y position value is undone" );
-	ok( mesh.position.z == initPosZ, "OK, changing Z position value is undone" );
+	ok( box.position.x == positions[ positions.length - 2 ].x, "OK, changing X position was successful (after undo)" );
+	ok( box.position.y == positions[ positions.length - 2 ].y, "OK, changing Y position was successful (after undo)" );
+	ok( box.position.z == positions[ positions.length - 2 ].z, "OK, changing Z position was successful (after undo)" );
 
 	editor.redo();
-	ok( mesh.position.x == newPosX, "OK, changing X position value is redone" );
-	ok( mesh.position.y == newPosY, "OK, changing Y position value is redone" );
-	ok( mesh.position.z == newPosZ, "OK, changing Z position value is redone" );
+	ok( box.position.x == positions[ positions.length - 1 ].x, "OK, changing X position was successful (after redo)" );
+	ok( box.position.y == positions[ positions.length - 1 ].y, "OK, changing Y position was successful (after redo)" );
+	ok( box.position.z == positions[ positions.length - 1 ].z, "OK, changing Z position was successful (after redo)" );
+
 
 });

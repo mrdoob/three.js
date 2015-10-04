@@ -31,8 +31,6 @@ test( "Test nested Do's, Undo's and Redo's ", function() {
 	// let's begin
 	editor.execute( new CmdAddObject( mesh ) );
 
-//	editor.execute( new CmdNameObject( editor, mesh, 'Nothing is as it was before' ) );
-
 	var newPos = new THREE.Vector3( initPosX + 100, initPosY, initPosZ );
 	editor.execute( new CmdSetPosition( mesh, newPos ) );
 
@@ -44,7 +42,6 @@ test( "Test nested Do's, Undo's and Redo's ", function() {
 
 
 	/* full check */
-//	ok( mesh.name == "Nothing is as it was before", "OK, name is correct" );
 
 	ok( mesh.position.x ==   102, "OK, X position is correct " );
 	ok( mesh.position.y ==     3, "OK, Y position is correct " );
@@ -62,10 +59,8 @@ test( "Test nested Do's, Undo's and Redo's ", function() {
 	editor.undo();  // rescaling undone
 	editor.undo();  // rotation undone
 	editor.undo();  // translation undone
-//	editor.undo();  // renaming undone
 
 	/* full check */
-//	ok( mesh.name == "One box unlike all others", "OK, name is correct" );
 
 	ok( mesh.position.x ==     2, "OK, X position is correct " );
 	ok( mesh.position.y ==     3, "OK, Y position is correct " );
@@ -80,7 +75,6 @@ test( "Test nested Do's, Undo's and Redo's ", function() {
 	ok( mesh.scale.z    ==    24, "OK, Z scale is correct " );
 
 
-//	editor.redo();  // renaming redone
 	editor.redo();  // translation redone
 	editor.redo();  // rotation redone
 
@@ -94,7 +88,6 @@ test( "Test nested Do's, Undo's and Redo's ", function() {
 	editor.undo();  // rotation undone (expected!)
 
 	/* full check */
-//	ok( mesh.name == "Nothing is as it was before", "OK, name is correct" );
 
 	ok( mesh.position.x ==   102, "OK, X position is correct " );
 	ok( mesh.position.y ==     3, "OK, Y position is correct " );

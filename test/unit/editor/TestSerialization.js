@@ -55,7 +55,7 @@ test( "Test Serialization (simple)", function() {
 
 	// Forward tests
 
-	for (var i = 0; i < setups.length ; i++ ) {
+	for ( var i = 0; i < setups.length ; i++ ) {
 
 		setups[i]();
 
