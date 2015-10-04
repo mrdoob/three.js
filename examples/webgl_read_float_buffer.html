@@ -99,7 +99,7 @@
 			var rtTexture, material, quad;
 
 			var delta = 0.01;
-            var valueNode;
+			var valueNode;
             
 			init();
 			animate();
@@ -128,7 +128,7 @@
 				light.position.set( 0, 0, -1 ).normalize();
 				sceneRTT.add( light );
 
-                rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, type:THREE.FloatType } );
+				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, type:THREE.FloatType } );
 
 				material = new THREE.ShaderMaterial( {
 
