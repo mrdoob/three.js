@@ -2004,7 +2004,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
-					uniforms.shadowMap.value[ j ] =  light.shadowMap;
+					uniforms.shadowMap.value[ j ] = light.shadowMap;
 					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
 					uniforms.shadowBias.value[ j ] = light.shadowBias;
 
@@ -2369,7 +2369,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						if ( ! texture ) continue;
 
 						if ( texture instanceof THREE.CubeTexture ||
-						   ( texture.image instanceof Array && texture.image.length === 6 ) ) {
+							 ( texture.image instanceof Array && texture.image.length === 6 ) ) {
 
 							// CompressedTexture can have Array in image :/
 
@@ -3183,7 +3183,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( isCube ) {
 
 			var textureProperties = properties.get( renderTarget.texture );
-			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0,  _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, textureProperties.__webglTexture, 0 );
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, textureProperties.__webglTexture, 0 );
 
 		}
 
@@ -3192,54 +3192,68 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.readRenderTargetPixels = function( renderTarget, x, y, width, height, buffer ) {
+	this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer ) {
 
-		if ( ! ( renderTarget instanceof THREE.WebGLRenderTarget ) ) {
+		if ( renderTarget instanceof THREE.WebGLRenderTarget === false ) {
 
 			console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
 			return;
 
 		}
 
-		if ( properties.get( renderTarget ).__webglFramebuffer ) {
+		var framebuffer = properties.get( renderTarget ).__webglFramebuffer;
+
+		if ( framebuffer ) {
 
 			var restore = false;
 
-			if ( properties.get( renderTarget ).__webglFramebuffer !== _currentFramebuffer ) {
+			if ( framebuffer !== _currentFramebuffer ) {
 
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, properties.get( renderTarget ).__webglFramebuffer );
+				_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 				restore = true;
 
 			}
 
-			if ( renderTarget.texture.format !== THREE.RGBAFormat && paramThreeToGL( renderTarget.texture.format ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+			try {
 
-				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
-				return;
+				var texture = renderTarget.texture;
 
-			}
+				if ( texture.format !== THREE.RGBAFormat
+					&& paramThreeToGL( texture.format ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
 
-			if ( renderTarget.texture.type !== THREE.UnsignedByteType && paramThreeToGL( renderTarget.texture.type ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) ) {
+					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
+					return;
 
-				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
-				return;
+				}
 
-			}
+				if ( texture.type !== THREE.UnsignedByteType
+					&& paramThreeToGL( texture.type ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE )
+					&& ! ( texture.type === THREE.FloatType && extensions.get( 'WEBGL_color_buffer_float' ) )
+					&& ! ( texture.type === THREE.HalfFloatType && extensions.get( 'EXT_color_buffer_half_float' ) ) ) {
 
-			if ( _gl.checkFramebufferStatus( _gl.FRAMEBUFFER ) === _gl.FRAMEBUFFER_COMPLETE ) {
+					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
+					return;
 
-				_gl.readPixels( x, y, width, height, paramThreeToGL( renderTarget.texture.format ), paramThreeToGL( renderTarget.texture.type ), buffer );
+				}
 
-			} else {
+				if ( _gl.checkFramebufferStatus( _gl.FRAMEBUFFER ) === _gl.FRAMEBUFFER_COMPLETE ) {
 
-				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
+					_gl.readPixels( x, y, width, height, paramThreeToGL( texture.format ), paramThreeToGL( texture.type ), buffer );
 
-			}
+				} else {
 
-			if ( restore ) {
+					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
 
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
+				}
+
+			} finally {
+
+				if ( restore ) {
+
+					_gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
+
+				}
 
 			}
 
