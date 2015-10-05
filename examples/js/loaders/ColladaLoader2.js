@@ -686,7 +686,7 @@ THREE.ColladaLoader.prototype = {
 
 			for ( var i = 0, l = nodes.length; i < l; i ++ ) {
 
-				group.add( getNode( nodes[ i ] ) );
+				group.add( getNode( nodes[ i ] ).clone() );
 
 			}
 
@@ -786,7 +786,7 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'ColladaLoader: Build' );
 
-		buildLibrary( library.images, buildImage );
+		// buildLibrary( library.images, buildImage );
 		// buildLibrary( library.effects, buildEffect );
 		buildLibrary( library.cameras, buildCamera );
 		buildLibrary( library.lights, buildLight );
