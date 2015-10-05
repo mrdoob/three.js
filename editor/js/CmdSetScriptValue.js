@@ -12,10 +12,10 @@ CmdSetScriptValue = function ( object, script, attributeName, newValue, cursorPo
 
 	this.object = object;
 	this.script = script;
+
 	this.attributeName = attributeName;
-	this.oldValue = script !== undefined ? script[ this.attributeName ] : undefined;
+	this.oldValue = ( script !== undefined ) ? script[ this.attributeName ] : undefined;
 	this.newValue = newValue;
-	this.objectUuid = object !== undefined ? object.uuid : undefined;
 	this.cursorPosition = cursorPosition; // Format {line: 2, ch: 3}
 
 };
@@ -24,7 +24,6 @@ CmdSetScriptValue.prototype = {
 
 	execute: function () {
 
-		this.index = this.editor.scripts[ this.objectUuid ].indexOf( this.script );
 		this.script[ this.attributeName ] = this.newValue;
 
 		this.editor.signals.scriptChanged.dispatch();
@@ -52,8 +51,8 @@ CmdSetScriptValue.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		output.objectUuid = this.objectUuid;
-		output.index = this.index;
+		output.objectUuid = this.object.uuid;
+		output.index = this.editor.scripts[ this.object.uuid ].indexOf( this.script );
 		output.attributeName = this.attributeName;
 		output.oldValue = this.oldValue;
 		output.newValue = this.newValue;
@@ -67,8 +66,6 @@ CmdSetScriptValue.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
-		this.objectUuid = json.objectUuid;
-		this.index = json.index;
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;
 		this.attributeName = json.attributeName;

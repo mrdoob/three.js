@@ -24,7 +24,7 @@ test("Test for CmdSetScene (Undo and Redo)", function() {
 	scenes.map( function( scene ) {
 
 		var importedScene = importScene( scene.exportedData );
-		var cmd = new CmdSetScene( editor.scene, importedScene );
+		var cmd = new CmdSetScene( importedScene );
 		cmd.updatable = false;
 		editor.execute( cmd );
 

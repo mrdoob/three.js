@@ -51,9 +51,9 @@ Sidebar.History = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + "<span style='color: #0000cc '>" + enumerator++ + ". Undo: " + object.name + "</span>";
+				var html = pad + "<span style='color: #0000cc '>" + enumerator++ + ". Undo: " + object.json.name + "</span>";
 
-				options.push( { value: object.id, html: html } );
+				options.push( { value: object.json.id, html: html } );
 
 			}
 
@@ -66,9 +66,9 @@ Sidebar.History = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + "<span style='color: #71544e'>" + enumerator++ + ". Redo: " +  object.name + "</span>";
+				var html = pad + "<span style='color: #71544e'>" + enumerator++ + ". Redo: " +  object.json.name + "</span>";
 
-				options.push( { value: object.id, html: html } );
+				options.push( { value: object.json.id, html: html } );
 
 			}
 
@@ -87,7 +87,7 @@ Sidebar.History = function ( editor ) {
 	signals.historyChanged.add( refreshUI );
 	signals.historyChanged.add( function ( cmd ) {
 		
-		outliner.setValue( cmd !== undefined ? cmd.id : null );
+		outliner.setValue( cmd !== undefined ? cmd.json.id : null );
 
 	} );
 

@@ -13,6 +13,10 @@ History = function ( editor ) {
 
 	this.historyDisabled = false;
 
+	//Set editor-reference in Cmd
+
+	Cmd( editor );
+
 	// signals
 
 	var scope = this;
@@ -63,12 +67,13 @@ History.prototype = {
 			// the command is not updatable and is added as a new part of the history
 
 			this.undos.push( cmd );
-			cmd.editor = this.editor;
 			cmd.id = ++this.idCounter;
 
 		}
 		cmd.name = optionalName !== undefined ? optionalName : cmd.name;
 		cmd.execute();
+		cmd.inMemory = true;
+		cmd.json = cmd.toJSON();	// serialize cmd immediately after execution
 
 		this.lastCmdTime = new Date();
 
@@ -94,12 +99,9 @@ History.prototype = {
 
 			var cmd = this.undos.pop();
 
-			if ( cmd.serialized ) {
+			if ( cmd.inMemory === false ) {
 
-				var json = cmd;
-				cmd = new window[ json.type ]();	// creates a new object of type "json.type"
-				cmd.editor = this.editor;
-				cmd.fromJSON( json );
+				cmd.fromJSON( cmd.json );
 
 			}
 
@@ -132,12 +134,9 @@ History.prototype = {
 
 			var cmd = this.redos.pop();
 
-			if ( cmd.serialized ) {
+			if ( cmd.inMemory === false ) {
 
-				var json = cmd;
-				cmd = new window[ json.type ]();	// creates a new object of type "json.type"
-				cmd.editor = this.editor;
-				cmd.fromJSON( json );
+				cmd.fromJSON( cmd.json );
 
 			}
 
@@ -166,16 +165,7 @@ History.prototype = {
 		for ( var i = 0 ; i < this.undos.length; i++ ) {
 
 			var cmd = this.undos[ i ];
-
-			if ( cmd.serialized ) {
-
-				undos.push( cmd );	// add without serializing
-
-			} else {
-
-				undos.push( cmd.toJSON() );
-
-			}
+			undos.push( cmd.json );
 
 		}
 
@@ -188,17 +178,7 @@ History.prototype = {
 		for ( var i = 0 ; i < this.redos.length; i++ ) {
 
 			var cmd = this.redos[ i ];
-
-			if ( cmd.serialized ) {
-
-				redos.push( cmd );	// add without serializing
-
-			} else {
-
-				redos.push( cmd.toJSON() );
-
-			}
-
+			redos.push( cmd.json );
 
 		}
 
@@ -214,19 +194,21 @@ History.prototype = {
 
 		for ( var i = 0; i < json.undos.length ; i++ ) {
 
-			json.undos[ i ].serialized = true;
-			this.undos.push( json.undos[ i ] );
-
-			this.idCounter = json.undos[ i ].id > this.idCounter ? json.undos[ i ].id : this.idCounter; // set last used idCounter
+			var cmdJSON = json.undos[ i ];
+			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+			cmd.json = cmdJSON;
+			this.undos.push( cmd );
+			this.idCounter = cmdJSON.id > this.idCounter ? cmdJSON.id : this.idCounter; // set last used idCounter
 
 		}
 
 		for ( var i = 0; i < json.redos.length ; i++ ) {
 
-			json.redos[ i ].serialized = true;
-			this.redos.push( json.redos[ i ] );
-
-			this.idCounter = json.redos[ i ].id > this.idCounter ? json.redos[ i ].id : this.idCounter; // set last used idCounter
+			var cmdJSON = json.redos[ i ];
+			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+			cmd.json = cmdJSON;
+			this.redos.push( cmd );
+			this.idCounter = cmdJSON.id > this.idCounter ? cmdJSON.id : this.idCounter; // set last used idCounter
 
 		}
 
@@ -258,10 +240,10 @@ History.prototype = {
 
 		var cmd = this.undos.length > 0 ? this.undos[ this.undos.length - 1 ] : undefined;	// next cmd to pop
 
-		if ( cmd === undefined || id > cmd.id ) {
+		if ( cmd === undefined || id > cmd.json.id ) {
 
 			cmd = this.redo();
-			while ( cmd !== undefined && id > cmd.id ) {
+			while ( cmd !== undefined && id > cmd.json.id ) {
 
 				cmd = this.redo();
 
@@ -273,7 +255,7 @@ History.prototype = {
 
 				cmd = this.undos[ this.undos.length - 1 ];	// next cmd to pop
 
-				if ( cmd === undefined || id === cmd.id ) break;
+				if ( cmd === undefined || id === cmd.json.id ) break;
 
 				cmd = this.undo();
 

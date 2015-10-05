@@ -11,16 +11,15 @@ CmdSetPosition = function ( object, newPositionVector, oldPositionVector ) {
 	this.updatable = true;
 
 	this.object = object;
-	this.objectUuid = object !== undefined ? object.uuid : undefined;
 
-	if (object !== undefined && newPositionVector !== undefined) {
+	if ( object !== undefined && newPositionVector !== undefined ) {
 
 		this.oldPosition = object.position.clone();
 		this.newPosition = newPositionVector.clone();
 
 	}
 
-	if (oldPositionVector !== undefined) {
+	if ( oldPositionVector !== undefined ) {
 
 		this.oldPosition = oldPositionVector.clone();
 
@@ -55,7 +54,7 @@ CmdSetPosition.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		output.objectUuid = this.objectUuid;
+		output.objectUuid = this.object.uuid;
 		output.oldPosition = this.oldPosition.toArray();
 		output.newPosition = this.newPosition.toArray();
 
@@ -68,9 +67,8 @@ CmdSetPosition.prototype = {
 		Cmd.prototype.fromJSON.call( this, json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.objectUuid = json.objectUuid;
-		this.oldPosition = new THREE.Vector3().fromArray(json.oldPosition);
-		this.newPosition = new THREE.Vector3().fromArray(json.newPosition);
+		this.oldPosition = new THREE.Vector3().fromArray( json.oldPosition );
+		this.newPosition = new THREE.Vector3().fromArray( json.newPosition );
 
 	}
 

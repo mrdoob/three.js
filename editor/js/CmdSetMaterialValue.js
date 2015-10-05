@@ -11,10 +11,9 @@ CmdSetMaterialValue = function ( object, attributeName, newValue ) {
 	this.updatable = true;
 
 	this.object = object;
-	this.attributeName = attributeName;
-	this.oldValue = object !== undefined ? object.material[ attributeName ] : undefined;
+	this.oldValue = ( object !== undefined ) ? object.material[ attributeName ] : undefined;
 	this.newValue = newValue;
-	this.objectUuid = object !== undefined ? object.uuid : undefined;
+	this.attributeName = attributeName;
 
 };
 
@@ -46,7 +45,7 @@ CmdSetMaterialValue.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		output.objectUuid = this.objectUuid;
+		output.objectUuid = this.object.uuid;
 		output.attributeName = this.attributeName;
 		output.oldValue = this.oldValue;
 		output.newValue = this.newValue;
@@ -59,7 +58,6 @@ CmdSetMaterialValue.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
-		this.objectUuid = json.objectUuid;
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;

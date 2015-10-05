@@ -2,7 +2,7 @@
  * Created by Daniel on 20.07.15.
  */
 
-CmdSetScene = function ( oldScene, newScene ) {
+CmdSetScene = function ( newScene ) {
 
 	Cmd.call( this );
 
@@ -13,9 +13,9 @@ CmdSetScene = function ( oldScene, newScene ) {
 
 	if ( newScene !== undefined ) {
 
-		this.cmdArray.push( new CmdSetUuid( oldScene, newScene.uuid ) );
-		this.cmdArray.push( new CmdSetValue( oldScene, 'name', newScene.name ) );
-		this.cmdArray.push( new CmdSetValue( oldScene, 'userData', JSON.parse( JSON.stringify( newScene.userData ) ) ) );
+		this.cmdArray.push( new CmdSetUuid( this.editor.scene, newScene.uuid ) );
+		this.cmdArray.push( new CmdSetValue( this.editor.scene, 'name', newScene.name ) );
+		this.cmdArray.push( new CmdSetValue( this.editor.scene, 'userData', JSON.parse( JSON.stringify( newScene.userData ) ) ) );
 
 		while ( newScene.children.length > 0 ) {
 
@@ -35,7 +35,6 @@ CmdSetScene.prototype = {
 
 		for ( var i = 0; i < this.cmdArray.length; i ++ ) {
 
-			this.cmdArray[ i ].editor = this.editor;
 			this.cmdArray[ i ].execute();
 
 		}
@@ -84,7 +83,6 @@ CmdSetScene.prototype = {
 		for ( var i = 0; i < cmds.length; i ++ ) {
 
 			var cmd = new window[ cmds[ i ].type ]();	// creates a new object of type "json.type"
-			cmd.editor = this.editor;
 			cmd.fromJSON( cmds[ i ] );
 			this.cmdArray.push( cmd );
 

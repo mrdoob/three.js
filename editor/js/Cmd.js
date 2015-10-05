@@ -2,13 +2,21 @@
  * Created by Daniel on 20.07.15.
  */
 
-Cmd = function () {
+Cmd = function ( editorRef ) {
 
 	this.id = -1;
-	this.serialized = false;
+	this.inMemory = false;
 	this.updatable = false;
 	this.type = '';
 	this.name = '';
+
+	if ( editorRef !== undefined ) {
+
+		Cmd.editor = editorRef;
+
+	}
+	this.editor = Cmd.editor;
+
 
 };
 
@@ -24,8 +32,10 @@ Cmd.prototype.toJSON = function () {
 
 Cmd.prototype.fromJSON = function ( json ) {
 
+	this.inMemory = true;
 	this.type = json.type;
 	this.id = json.id;
 	this.name = json.name;
+	this.json = json;
 
 };

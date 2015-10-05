@@ -10,10 +10,12 @@ CmdRemoveScript = function ( object, script ) {
 	this.name = 'Remove Script';
 
 	this.object = object;
-	this.objectUuid = object !== undefined ? object.uuid : undefined;
-
 	this.script = script;
+	if ( this.object && this.script ) {
 
+		this.index = this.editor.scripts[ this.object.uuid ].indexOf( this.script );
+
+	}
 };
 
 CmdRemoveScript.prototype = {
@@ -21,8 +23,6 @@ CmdRemoveScript.prototype = {
 	execute: function () {
 
 		if ( this.editor.scripts[ this.object.uuid ] === undefined ) return;
-
-		this.index = this.editor.scripts[ this.object.uuid ].indexOf( this.script );
 
 		if ( this.index !== - 1 ) {
 
@@ -52,7 +52,7 @@ CmdRemoveScript.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		output.objectUuid = this.objectUuid;
+		output.objectUuid = this.object.uuid;
 		output.script = this.script;
 		output.index = this.index;
 
@@ -64,7 +64,6 @@ CmdRemoveScript.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
-		this.objectUuid = json.objectUuid;
 		this.script = json.script;
 		this.index = json.index;
 		this.object = this.editor.objectByUuid( json.objectUuid );
