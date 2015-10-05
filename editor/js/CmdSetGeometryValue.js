@@ -10,11 +10,9 @@ CmdSetGeometryValue = function ( object, attributeName, newValue ) {
 	this.name = 'Set Geometry.' + attributeName;
 
 	this.object = object;
-
 	this.attributeName = attributeName;
 	this.oldValue = ( object !== undefined ) ? object.geometry[ attributeName ] : undefined;
 	this.newValue = newValue;
-	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
 
 };
 
@@ -42,7 +40,7 @@ CmdSetGeometryValue.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		output.objectUuid = this.objectUuid;
+		output.objectUuid = this.object.uuid;
 		output.attributeName = this.attributeName;
 		output.oldValue = this.oldValue;
 		output.newValue = this.newValue;
@@ -55,11 +53,10 @@ CmdSetGeometryValue.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
-		this.objectUuid = json.objectUuid;
+		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;
-		this.object = this.editor.objectByUuid( json.objectUuid );
 
 	}
 

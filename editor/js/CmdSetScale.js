@@ -11,7 +11,6 @@ CmdSetScale = function ( object, newScaleVector, oldScaleVector ) {
 	this.updatable = true;
 
 	this.object = object;
-	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
 
 	if ( object !== undefined && newScaleVector !== undefined ) {
 
@@ -55,7 +54,7 @@ CmdSetScale.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		output.objectUuid = this.objectUuid;
+		output.objectUuid = this.object.uuid;
 		output.oldScale = this.oldScale.toArray();
 		output.newScale = this.newScale.toArray();
 
@@ -68,7 +67,6 @@ CmdSetScale.prototype = {
 		Cmd.prototype.fromJSON.call( this, json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.objectUuid = json.objectUuid;
 		this.oldScale = new THREE.Vector3().fromArray( json.oldScale );
 		this.newScale = new THREE.Vector3().fromArray( json.newScale );
 

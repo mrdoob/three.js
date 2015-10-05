@@ -10,14 +10,9 @@ CmdMoveObject = function ( object, newParent, newBefore ) {
 	this.name = 'Move Object';
 
 	this.object = object;
-	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
-
 	this.oldParent = ( object !== undefined ) ? object.parent : undefined;
-	this.oldParentUuid = ( this.oldParent !== undefined ) ? this.oldParent.uuid : undefined;
 	this.oldIndex = ( this.oldParent !== undefined ) ? this.oldParent.children.indexOf( this.object ) : undefined;
-
 	this.newParent = newParent;
-	this.newParentUuid = ( newParent !== undefined ) ? newParent.uuid : undefined;
 
 	if ( newBefore !== undefined ) {
 
@@ -69,9 +64,9 @@ CmdMoveObject.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		output.objectUuid = this.objectUuid;
-		output.newParentUuid = this.newParentUuid;
-		output.oldParentUuid = this.oldParentUuid;
+		output.objectUuid = this.object.uuid;
+		output.newParentUuid = this.newParent.uuid;
+		output.oldParentUuid = this.oldParent.uuid;
 		output.newIndex = this.newIndex;
 		output.oldIndex = this.oldIndex;
 
@@ -84,14 +79,18 @@ CmdMoveObject.prototype = {
 		Cmd.prototype.fromJSON.call( this, json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.objectUuid = json.objectUuid;
-
 		this.oldParent = this.editor.objectByUuid( json.oldParentUuid );
-		this.oldParentUuid = json.oldParentUuid;
+		if ( this.oldParent === undefined ) {
 
+			this.oldParent = this.editor.scene;
+
+		}
 		this.newParent = this.editor.objectByUuid( json.newParentUuid );
-		this.newParentUuid = json.newParentUuid;
+		if ( this.newParent === undefined ) {
 
+			this.newParent = this.editor.scene;
+
+		}
 		this.newIndex = json.newIndex;
 		this.oldIndex = json.oldIndex;
 

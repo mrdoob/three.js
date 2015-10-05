@@ -11,13 +11,8 @@ CmdSetGeometry = function ( object, newGeometry ) {
 	this.updatable = true;
 
 	this.object = object;
-	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
-
 	this.oldGeometry = ( object !== undefined ) ? object.geometry : undefined;
 	this.newGeometry = newGeometry;
-
-	this.oldGeometryJSON = ( object !== undefined ) ? object.geometry.toJSON() : undefined;
-	this.newGeometryJSON = ( newGeometry !== undefined ) ? newGeometry.toJSON() : undefined;
 
 };
 
@@ -56,9 +51,9 @@ CmdSetGeometry.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		output.objectUuid = this.objectUuid;
-		output.oldGeometry = this.oldGeometryJSON;
-		output.newGeometry = this.newGeometryJSON;
+		output.objectUuid = this.object.uuid;
+		output.oldGeometry = this.object.geometry.toJSON();
+		output.newGeometry = this.newGeometry.toJSON();
 
 		return output;
 
@@ -69,13 +64,9 @@ CmdSetGeometry.prototype = {
 		Cmd.prototype.fromJSON.call( this, json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.objectUuid = json.objectUuid;
-		this.oldGeometryJSON = json.oldGeometry;
-		this.newGeometryJSON = json.newGeometry;
 
-
-		this.oldGeometry = parseGeometry( this.oldGeometryJSON );
-		this.newGeometry = parseGeometry( this.newGeometryJSON );
+		this.oldGeometry = parseGeometry( json.oldGeometry );
+		this.newGeometry = parseGeometry( json.newGeometry );
 
 		function parseGeometry ( data ) {
 
@@ -85,6 +76,5 @@ CmdSetGeometry.prototype = {
 		}
 
 	}
-
 
 };

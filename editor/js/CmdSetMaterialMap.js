@@ -5,7 +5,6 @@
 CmdSetMaterialMap = function ( object, mapName, newMap ) {
 
 	Cmd.call( this );
-
 	this.type = 'CmdSetMaterialMap';
 	this.name = 'Set Material.' + mapName;
 
@@ -13,51 +12,6 @@ CmdSetMaterialMap = function ( object, mapName, newMap ) {
 	this.mapName = mapName;
 	this.oldMap = ( object !== undefined ) ? object.material[ mapName ] : undefined;
 	this.newMap = newMap;
-
-	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
-	this.newMapJSON = serializeMap( this.newMap );
-	this.oldMapJSON = serializeMap( this.oldMap );
-
-	// serializes a map (THREE.Texture)
-
-	function serializeMap ( map ) {
-
-		if ( map === null || map === undefined ) return null;
-
-		var meta = {
-			geometries: {},
-			materials: {},
-			textures: {},
-			images: {}
-		};
-
-		var json = map.toJSON( meta );
-		var images = extractFromCache( meta.images );
-		if ( images.length > 0 ) json.images = images;
-		json.sourceFile = map.sourceFile;
-
-		return json;
-
-	}
-
-	// Note: The function 'extractFromCache' is copied from Object3D.toJSON()
-
-	// extract data from the cache hash
-	// remove metadata on each item
-	// and return as array
-	function extractFromCache ( cache ) {
-
-		var values = [];
-		for ( var key in cache ) {
-
-			var data = cache[ key ];
-			delete data.metadata;
-			values.push( data );
-
-		}
-		return values;
-
-	}
 
 };
 
@@ -83,13 +37,53 @@ CmdSetMaterialMap.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		output.objectUuid = this.objectUuid;
+		output.objectUuid = this.object.uuid;
 		output.mapName = this.mapName;
-
-		output.oldMap = this.oldMapJSON;
-		output.newMap = this.newMapJSON;
+		output.newMap = serializeMap( this.newMap );
+		output.oldMap = serializeMap( this.oldMap );
 
 		return output;
+
+		// serializes a map (THREE.Texture)
+
+		function serializeMap ( map ) {
+
+			if ( map === null || map === undefined ) return null;
+
+			var meta = {
+				geometries: {},
+				materials: {},
+				textures: {},
+				images: {}
+			};
+
+			var json = map.toJSON( meta );
+			var images = extractFromCache( meta.images );
+			if ( images.length > 0 ) json.images = images;
+			json.sourceFile = map.sourceFile;
+
+			return json;
+
+		}
+
+		// Note: The function 'extractFromCache' is copied from Object3D.toJSON()
+
+		// extract data from the cache hash
+		// remove metadata on each item
+		// and return as array
+		function extractFromCache ( cache ) {
+
+			var values = [];
+			for ( var key in cache ) {
+
+				var data = cache[ key ];
+				delete data.metadata;
+				values.push( data );
+
+			}
+			return values;
+
+		}
 
 	},
 
@@ -97,17 +91,10 @@ CmdSetMaterialMap.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
-		this.objectUuid = json.objectUuid;
-		this.mapName = json.mapName;
-
 		this.object = this.editor.objectByUuid( json.objectUuid );
-
-		this.oldMapJSON = json.oldMap;
-		this.newMapJSON = json.newMap;
-
+		this.mapName = json.mapName;
 		this.oldMap = parseTexture( json.oldMap );
 		this.newMap = parseTexture( json.newMap );
-
 
 		function parseTexture ( json ) {
 

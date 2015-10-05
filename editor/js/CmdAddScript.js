@@ -10,8 +10,6 @@ CmdAddScript = function ( object, script ) {
 	this.name = 'Add Script';
 
 	this.object = object;
-	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
-
 	this.script = script;
 
 };
@@ -52,7 +50,7 @@ CmdAddScript.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		output.objectUuid = this.objectUuid;
+		output.objectUuid = this.object.uuid;
 		output.script = this.script;
 
 		return output;
@@ -63,7 +61,6 @@ CmdAddScript.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
-		this.objectUuid = json.objectUuid;
 		this.script = json.script;
 		this.object = this.editor.objectByUuid( json.objectUuid );
 

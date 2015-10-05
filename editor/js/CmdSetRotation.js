@@ -11,7 +11,6 @@ CmdSetRotation = function ( object, newRotationEuler, oldRotationEuler ) {
 	this.updatable = true;
 
 	this.object = object;
-	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
 
 	if ( object !== undefined && newRotationEuler !== undefined) {
 
@@ -56,7 +55,7 @@ CmdSetRotation.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		output.objectUuid = this.objectUuid;
+		output.objectUuid = this.object.uuid;
 		output.oldRotation = this.oldRotation.toArray();
 		output.newRotation = this.newRotation.toArray();
 
@@ -69,7 +68,6 @@ CmdSetRotation.prototype = {
 		Cmd.prototype.fromJSON.call( this, json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.objectUuid = json.objectUuid;
 		this.oldRotation = new THREE.Euler().fromArray(json.oldRotation);
 		this.newRotation = new THREE.Euler().fromArray(json.newRotation);
 

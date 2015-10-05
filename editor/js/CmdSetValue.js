@@ -14,7 +14,6 @@ CmdSetValue = function ( object, attributeName, newValue ) {
 	this.attributeName = attributeName;
 	this.oldValue = ( object !== undefined ) ? object[ attributeName ] : undefined;
 	this.newValue = newValue;
-	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
 
 };
 
@@ -48,7 +47,7 @@ CmdSetValue.prototype = {
 
 		var output = Cmd.prototype.toJSON.call( this );
 
-		output.objectUuid = this.objectUuid;
+		output.objectUuid = this.object.uuid;
 		output.attributeName = this.attributeName;
 		output.oldValue = this.oldValue;
 		output.newValue = this.newValue;
@@ -61,7 +60,6 @@ CmdSetValue.prototype = {
 
 		Cmd.prototype.fromJSON.call( this, json );
 
-		this.objectUuid = json.objectUuid;
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;
