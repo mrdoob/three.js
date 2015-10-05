@@ -2,13 +2,21 @@
  * Created by Daniel on 20.07.15.
  */
 
-Cmd = function () {
+Cmd = function ( editorRef ) {
 
 	this.id = -1;
 	this.serialized = false;
 	this.updatable = false;
 	this.type = '';
 	this.name = '';
+
+	if ( editorRef !== undefined ) {
+
+		Cmd.editor = editorRef;
+
+	}
+	this.editor = Cmd.editor;
+
 
 };
 

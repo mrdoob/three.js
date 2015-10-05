@@ -13,6 +13,10 @@ History = function ( editor ) {
 
 	this.historyDisabled = false;
 
+	//Set editor-reference in Cmd
+
+	Cmd( editor );
+
 	// signals
 
 	var scope = this;
@@ -63,7 +67,6 @@ History.prototype = {
 			// the command is not updatable and is added as a new part of the history
 
 			this.undos.push( cmd );
-			cmd.editor = this.editor;
 			cmd.id = ++this.idCounter;
 
 		}
@@ -98,7 +101,6 @@ History.prototype = {
 
 				var json = cmd;
 				cmd = new window[ json.type ]();	// creates a new object of type "json.type"
-				cmd.editor = this.editor;
 				cmd.fromJSON( json );
 
 			}
@@ -136,7 +138,6 @@ History.prototype = {
 
 				var json = cmd;
 				cmd = new window[ json.type ]();	// creates a new object of type "json.type"
-				cmd.editor = this.editor;
 				cmd.fromJSON( json );
 
 			}

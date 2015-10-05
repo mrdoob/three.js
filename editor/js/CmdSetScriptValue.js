@@ -18,6 +18,7 @@ CmdSetScriptValue = function ( object, script, attributeName, newValue, cursorPo
 	this.newValue = newValue;
 	this.objectUuid = ( object !== undefined ) ? object.uuid : undefined;
 	this.cursorPosition = cursorPosition; // Format {line: 2, ch: 3}
+	this.index = this.editor.scripts[ this.objectUuid ].indexOf( this.script );
 
 };
 
@@ -25,7 +26,6 @@ CmdSetScriptValue.prototype = {
 
 	execute: function () {
 
-		this.index = this.editor.scripts[ this.objectUuid ].indexOf( this.script );
 		this.script[ this.attributeName ] = this.newValue;
 
 		this.editor.signals.scriptChanged.dispatch();

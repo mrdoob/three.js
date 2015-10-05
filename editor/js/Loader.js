@@ -40,7 +40,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.AWDLoader();
 					var scene = loader.parse( event.target.result );
 
-					editor.execute( new CmdSetScene( editor.scene, scene ) );
+					editor.execute( new CmdSetScene( scene ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -58,7 +58,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.BabylonLoader();
 					var scene = loader.parse( json );
 
-					editor.execute( new CmdSetScene( editor.scene, scene ) );
+					editor.execute( new CmdSetScene( scene ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -371,7 +371,7 @@ var Loader = function ( editor ) {
 
 					var result = new THREE.VRMLLoader().parse( contents );
 
-					editor.execute( new CmdSetScene( editor.scene, result ) );
+					editor.execute( new CmdSetScene( result ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -475,7 +475,7 @@ var Loader = function ( editor ) {
 
 			if ( result instanceof THREE.Scene ) {
 
-				editor.execute( new CmdSetScene( editor.scene, result ) );
+				editor.execute( new CmdSetScene( result ) );
 
 			} else {
 
@@ -491,7 +491,7 @@ var Loader = function ( editor ) {
 			var loader = new THREE.SceneLoader();
 			loader.parse( data, function ( result ) {
 
-				editor.execute( new CmdSetScene( editor.scene, result.scene ) );
+				editor.execute( new CmdSetScene( result.scene ) );
 
 			}, '' );
 
