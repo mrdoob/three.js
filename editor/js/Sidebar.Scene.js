@@ -133,8 +133,8 @@ Sidebar.Scene = function ( editor ) {
 
 		var options = [];
 
-		// options.push( { value: camera.id, html: '<span class="type ' + camera.type + '"></span> ' + camera.name } );
-		options.push( { static: true, value: scene.id, html: '<span class="type ' + scene.type + '"></span> ' + scene.name } );
+		// options.push( { value: camera.id, html: '<span class="type ' + camera.constructor.name + '"></span> ' + camera.name } );
+		options.push( { static: true, value: scene.id, html: '<span class="type ' + scene.constructor.name + '"></span> ' + scene.name } );
 
 		( function addObjects( objects, pad ) {
 
@@ -142,15 +142,15 @@ Sidebar.Scene = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + '<span class="type ' + object.type + '"></span> ' + object.name;
+				var html = pad + '<span class="type ' + object.constructor.name + '"></span> ' + object.name;
 
 				if ( object instanceof THREE.Mesh ) {
 
 					var geometry = object.geometry;
 					var material = object.material;
 
-					html += ' <span class="type ' + geometry.type + '"></span> ' + geometry.name;
-					html += ' <span class="type ' + material.type + '"></span> ' + material.name;
+					html += ' <span class="type ' + geometry.constructor.name + '"></span> ' + geometry.name;
+					html += ' <span class="type ' + material.constructor.name + '"></span> ' + material.name;
 
 				}
 

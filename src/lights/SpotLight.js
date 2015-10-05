@@ -6,8 +6,6 @@ THREE.SpotLight = function SpotLight ( color, intensity, distance, angle, expone
 
 	THREE.Light.call( this, color );
 
-	this.type = 'SpotLight';
-
 	this.position.set( 0, 1, 0 );
 	this.updateMatrix();
 

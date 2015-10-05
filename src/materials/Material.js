@@ -10,7 +10,6 @@ THREE.Material = function Material () {
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
-	this.type = 'Material';
 
 	this.side = THREE.FrontSide;
 
@@ -85,7 +84,7 @@ THREE.Material.prototype = {
 
 			if ( currentValue === undefined ) {
 
-				console.warn( "THREE." + this.type + ": '" + key + "' is not a property of this material." );
+				console.warn( "THREE." + this.constructor.name + ": '" + key + "' is not a property of this material." );
 				continue;
 
 			}
@@ -125,7 +124,7 @@ THREE.Material.prototype = {
 
 		// standard Material serialization
 		data.uuid = this.uuid;
-		data.type = this.type;
+		data.type = this.constructor.name;
 		if ( this.name !== '' ) data.name = this.name;
 
 		if ( this.color instanceof THREE.Color ) data.color = this.color.getHex();

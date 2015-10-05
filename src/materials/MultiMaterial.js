@@ -6,8 +6,6 @@ THREE.MultiMaterial = function MultiMaterial ( materials ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
-	this.type = 'MultiMaterial';
-
 	this.materials = materials instanceof Array ? materials : [];
 
 	this.visible = true;

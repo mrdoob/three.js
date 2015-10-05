@@ -6,8 +6,6 @@ THREE.AudioListener = function AudioListener () {
 
 	THREE.Object3D.call( this );
 
-	this.type = 'AudioListener';
-
 	this.context = new ( window.AudioContext || window.webkitAudioContext )();
 
 };

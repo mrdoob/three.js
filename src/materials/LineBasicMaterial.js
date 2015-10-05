@@ -24,8 +24,6 @@ THREE.LineBasicMaterial = function LineBasicMaterial ( parameters ) {
 
 	THREE.Material.call( this );
 
-	this.type = 'LineBasicMaterial';
-
 	this.color = new THREE.Color( 0xffffff );
 
 	this.linewidth = 1;

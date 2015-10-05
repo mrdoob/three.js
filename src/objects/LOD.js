@@ -8,8 +8,6 @@ THREE.LOD = function LOD () {
 
 	THREE.Object3D.call( this );
 
-	this.type = 'LOD';
-
 	Object.defineProperties( this, {
 		levels: {
 			enumerable: true,

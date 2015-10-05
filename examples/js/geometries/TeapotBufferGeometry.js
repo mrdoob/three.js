@@ -393,8 +393,6 @@ THREE.TeapotBufferGeometry = function TeapotBufferGeometry ( size, segments, bot
 
 	THREE.BufferGeometry.call( this );
 
-	this.type = 'TeapotBufferGeometry';
-
 	this.parameters = {
 		size: size,
 		segments: segments,

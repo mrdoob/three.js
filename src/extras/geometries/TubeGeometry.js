@@ -16,8 +16,6 @@ THREE.TubeGeometry = function TubeGeometry ( path, segments, radius, radialSegme
 
 	THREE.Geometry.call( this );
 
-	this.type = 'TubeGeometry';
-
 	this.parameters = {
 		path: path,
 		segments: segments,

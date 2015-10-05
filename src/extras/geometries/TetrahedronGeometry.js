@@ -14,8 +14,6 @@ THREE.TetrahedronGeometry = function TetrahedronGeometry ( radius, detail ) {
 
 	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
-	this.type = 'TetrahedronGeometry';
-
 	this.parameters = {
 		radius: radius,
 		detail: detail

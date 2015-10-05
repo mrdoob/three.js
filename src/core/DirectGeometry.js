@@ -9,7 +9,6 @@ THREE.DirectGeometry = function DirectGeometry () {
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
-	this.type = 'DirectGeometry';
 
 	this.indices = [];
 	this.vertices = [];

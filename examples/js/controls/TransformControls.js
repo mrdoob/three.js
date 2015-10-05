@@ -8,80 +8,75 @@
 	'use strict';
 
 
-	var GizmoMaterial = function GizmoMaterial ( parameters ) {
+	var gizmoMaterial = function ( parameters ) {
 
-		THREE.MeshBasicMaterial.call( this );
+		var material = new THREE.MeshBasicMaterial( parameters );
 
-		this.depthTest = false;
-		this.depthWrite = false;
-		this.side = THREE.FrontSide;
-		this.transparent = true;
+		material.depthTest = false;
+		material.depthWrite = false;
+		material.side = THREE.FrontSide;
+		material.transparent = true;
 
-		this.setValues( parameters );
+		material.setValues( parameters );
 
-		this.oldColor = this.color.clone();
-		this.oldOpacity = this.opacity;
+		material.oldColor = material.color.clone();
+		material.oldOpacity = material.opacity;
 
-		this.highlight = function( highlighted ) {
+		material.highlight = function( highlighted ) {
 
 			if ( highlighted ) {
 
-				this.color.setRGB( 1, 1, 0 );
-				this.opacity = 1;
+				material.color.setRGB( 1, 1, 0 );
+				material.opacity = 1;
 
 			} else {
 
-				this.color.copy( this.oldColor );
-				this.opacity = this.oldOpacity;
+				material.color.copy( material.oldColor );
+				material.opacity = material.oldOpacity;
 
 			}
 
 		};
 
+		return material;
+
 	};
 
-	GizmoMaterial.prototype = Object.create( THREE.MeshBasicMaterial.prototype );
-	GizmoMaterial.prototype.constructor = GizmoMaterial;
+	var gizmoLineMaterial = function ( parameters ) {
 
+		var material = new THREE.LineBasicMaterial( parameters );
 
-	var GizmoLineMaterial = function GizmoLineMaterial ( parameters ) {
+		material.depthTest = false;
+		material.depthWrite = false;
+		material.transparent = true;
+		material.linewidth = 1;
 
-		THREE.LineBasicMaterial.call( this );
+		material.setValues( parameters );
 
-		this.depthTest = false;
-		this.depthWrite = false;
-		this.transparent = true;
-		this.linewidth = 1;
+		material.oldColor = material.color.clone();
+		material.oldOpacity = material.opacity;
 
-		this.setValues( parameters );
-
-		this.oldColor = this.color.clone();
-		this.oldOpacity = this.opacity;
-
-		this.highlight = function( highlighted ) {
+		material.highlight = function( highlighted ) {
 
 			if ( highlighted ) {
 
-				this.color.setRGB( 1, 1, 0 );
-				this.opacity = 1;
+				material.color.setRGB( 1, 1, 0 );
+				material.opacity = 1;
 
 			} else {
 
-				this.color.copy( this.oldColor );
-				this.opacity = this.oldOpacity;
+				material.color.copy( material.oldColor );
+				material.opacity = material.oldOpacity;
 
 			}
 
 		};
 
+		return material;
+
 	};
 
-	GizmoLineMaterial.prototype = Object.create( THREE.LineBasicMaterial.prototype );
-	GizmoLineMaterial.prototype.constructor = GizmoLineMaterial;
-
-
-	var pickerMaterial = new GizmoMaterial( { visible: false, transparent: false } );
-
+	var pickerMaterial = gizmoMaterial( { visible: false, transparent: false } );
 
 	THREE.TransformGizmo = function TransformGizmo () {
 
@@ -246,34 +241,34 @@
 		this.handleGizmos = {
 
 			X: [
-				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0xff0000 } ) ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ] ],
-				[ new THREE.Line( lineXGeometry, new GizmoLineMaterial( { color: 0xff0000 } ) ) ]
+				[ new THREE.Mesh( arrowGeometry, gizmoMaterial( { color: 0xff0000 } ) ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ] ],
+				[ new THREE.Line( lineXGeometry, gizmoLineMaterial( { color: 0xff0000 } ) ) ]
 			],
 
 			Y: [
-				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0x00ff00 } ) ), [ 0, 0.5, 0 ] ],
-				[	new THREE.Line( lineYGeometry, new GizmoLineMaterial( { color: 0x00ff00 } ) ) ]
+				[ new THREE.Mesh( arrowGeometry, gizmoMaterial( { color: 0x00ff00 } ) ), [ 0, 0.5, 0 ] ],
+				[	new THREE.Line( lineYGeometry, gizmoLineMaterial( { color: 0x00ff00 } ) ) ]
 			],
 
 			Z: [
-				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0x0000ff } ) ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ] ],
-				[ new THREE.Line( lineZGeometry, new GizmoLineMaterial( { color: 0x0000ff } ) ) ]
+				[ new THREE.Mesh( arrowGeometry, gizmoMaterial( { color: 0x0000ff } ) ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ] ],
+				[ new THREE.Line( lineZGeometry, gizmoLineMaterial( { color: 0x0000ff } ) ) ]
 			],
 
 			XYZ: [
-				[ new THREE.Mesh( new THREE.OctahedronGeometry( 0.1, 0 ), new GizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) ), [ 0, 0, 0 ], [ 0, 0, 0 ] ]
+				[ new THREE.Mesh( new THREE.OctahedronGeometry( 0.1, 0 ), gizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) ), [ 0, 0, 0 ], [ 0, 0, 0 ] ]
 			],
 
 			XY: [
-				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), new GizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) ), [ 0.15, 0.15, 0 ] ]
+				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), gizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) ), [ 0.15, 0.15, 0 ] ]
 			],
 
 			YZ: [
-				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), new GizmoMaterial( { color: 0x00ffff, opacity: 0.25 } ) ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ] ]
+				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), gizmoMaterial( { color: 0x00ffff, opacity: 0.25 } ) ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ] ]
 			],
 
 			XZ: [
-				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), new GizmoMaterial( { color: 0xff00ff, opacity: 0.25 } ) ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ] ]
+				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), gizmoMaterial( { color: 0xff00ff, opacity: 0.25 } ) ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ] ]
 			]
 
 		};
@@ -382,23 +377,23 @@
 		this.handleGizmos = {
 
 			X: [
-				[ new THREE.Line( new CircleGeometry( 1, 'x', 0.5 ), new GizmoLineMaterial( { color: 0xff0000 } ) ) ]
+				[ new THREE.Line( new CircleGeometry( 1, 'x', 0.5 ), gizmoLineMaterial( { color: 0xff0000 } ) ) ]
 			],
 
 			Y: [
-				[ new THREE.Line( new CircleGeometry( 1, 'y', 0.5 ), new GizmoLineMaterial( { color: 0x00ff00 } ) ) ]
+				[ new THREE.Line( new CircleGeometry( 1, 'y', 0.5 ), gizmoLineMaterial( { color: 0x00ff00 } ) ) ]
 			],
 
 			Z: [
-				[ new THREE.Line( new CircleGeometry( 1, 'z', 0.5 ), new GizmoLineMaterial( { color: 0x0000ff } ) ) ]
+				[ new THREE.Line( new CircleGeometry( 1, 'z', 0.5 ), gizmoLineMaterial( { color: 0x0000ff } ) ) ]
 			],
 
 			E: [
-				[ new THREE.Line( new CircleGeometry( 1.25, 'z', 1 ), new GizmoLineMaterial( { color: 0xcccc00 } ) ) ]
+				[ new THREE.Line( new CircleGeometry( 1.25, 'z', 1 ), gizmoLineMaterial( { color: 0xcccc00 } ) ) ]
 			],
 
 			XYZE: [
-				[ new THREE.Line( new CircleGeometry( 1, 'z', 1 ), new GizmoLineMaterial( { color: 0x787878 } ) ) ]
+				[ new THREE.Line( new CircleGeometry( 1, 'z', 1 ), gizmoLineMaterial( { color: 0x787878 } ) ) ]
 			]
 
 		};
@@ -529,22 +524,22 @@
 		this.handleGizmos = {
 
 			X: [
-				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0xff0000 } ) ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ] ],
-				[ new THREE.Line( lineXGeometry, new GizmoLineMaterial( { color: 0xff0000 } ) ) ]
+				[ new THREE.Mesh( arrowGeometry, gizmoMaterial( { color: 0xff0000 } ) ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ] ],
+				[ new THREE.Line( lineXGeometry, gizmoLineMaterial( { color: 0xff0000 } ) ) ]
 			],
 
 			Y: [
-				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0x00ff00 } ) ), [ 0, 0.5, 0 ] ],
-				[ new THREE.Line( lineYGeometry, new GizmoLineMaterial( { color: 0x00ff00 } ) ) ]
+				[ new THREE.Mesh( arrowGeometry, gizmoMaterial( { color: 0x00ff00 } ) ), [ 0, 0.5, 0 ] ],
+				[ new THREE.Line( lineYGeometry, gizmoLineMaterial( { color: 0x00ff00 } ) ) ]
 			],
 
 			Z: [
-				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0x0000ff } ) ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ] ],
-				[ new THREE.Line( lineZGeometry, new GizmoLineMaterial( { color: 0x0000ff } ) ) ]
+				[ new THREE.Mesh( arrowGeometry, gizmoMaterial( { color: 0x0000ff } ) ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ] ],
+				[ new THREE.Line( lineZGeometry, gizmoLineMaterial( { color: 0x0000ff } ) ) ]
 			],
 
 			XYZ: [
-				[ new THREE.Mesh( new THREE.BoxGeometry( 0.125, 0.125, 0.125 ), new GizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) ) ]
+				[ new THREE.Mesh( new THREE.BoxGeometry( 0.125, 0.125, 0.125 ), gizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) ) ]
 			]
 
 		};

@@ -8,8 +8,6 @@ THREE.PerspectiveCamera = function PerspectiveCamera ( fov, aspect, near, far ) 
 
 	THREE.Camera.call( this );
 
-	this.type = 'PerspectiveCamera';
-
 	this.zoom = 1;
 
 	this.fov = fov !== undefined ? fov : 50;

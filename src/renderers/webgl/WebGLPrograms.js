@@ -115,7 +115,7 @@ THREE.WebGLPrograms = function WebGLPrograms ( renderer, capabilities ) {
 
 	this.getParameters = function ( material, lights, fog, object ) {
 
-		var shaderID = shaderIDs[ material.type ];
+		var shaderID = shaderIDs[ material.constructor.name ];
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
 

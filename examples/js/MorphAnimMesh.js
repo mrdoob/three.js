@@ -6,8 +6,6 @@ THREE.MorphAnimMesh = function MorphAnimMesh ( geometry, material ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
-	this.type = 'MorphAnimMesh';
-
 	this.mixer = new THREE.AnimationMixer( this );
 	this.activeAction = null;
 };

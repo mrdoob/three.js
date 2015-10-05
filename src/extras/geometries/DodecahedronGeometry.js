@@ -45,8 +45,6 @@ THREE.DodecahedronGeometry = function DodecahedronGeometry ( radius, detail ) {
 
 	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
-	this.type = 'DodecahedronGeometry';
-
 	this.parameters = {
 		radius: radius,
 		detail: detail

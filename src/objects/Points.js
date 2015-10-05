@@ -6,8 +6,6 @@ THREE.Points = function Points ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
-	this.type = 'Points';
-
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.PointsMaterial( { color: Math.random() * 0xffffff } );
 

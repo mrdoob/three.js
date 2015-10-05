@@ -6,8 +6,6 @@ THREE.RingGeometry = function RingGeometry ( innerRadius, outerRadius, thetaSegm
 
 	THREE.Geometry.call( this );
 
-	this.type = 'RingGeometry';
-
 	this.parameters = {
 		innerRadius: innerRadius,
 		outerRadius: outerRadius,

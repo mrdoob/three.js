@@ -90,6 +90,8 @@ THREE.ObjectLoader.prototype = {
 				var geometry;
 				var data = json[ i ];
 
+				console.log(data.type );
+
 				switch ( data.type ) {
 
 					case 'PlaneGeometry':

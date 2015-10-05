@@ -6,8 +6,6 @@ THREE.SpriteCanvasMaterial = function SpriteCanvasMaterial ( parameters ) {
 
 	THREE.Material.call( this );
 
-	this.type = 'SpriteCanvasMaterial';
-
 	this.color = new THREE.Color( 0xffffff );
 	this.program = function ( context, color ) {};
 

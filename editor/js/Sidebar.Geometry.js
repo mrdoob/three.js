@@ -150,7 +150,7 @@ Sidebar.Geometry = function ( editor ) {
 
 			container.setDisplay( 'block' );
 
-			geometryType.setValue( geometry.type );
+			geometryType.setValue( geometry.constructor.name );
 
 			geometryUUID.setValue( geometry.uuid );
 			geometryName.setValue( geometry.name );
@@ -159,13 +159,13 @@ Sidebar.Geometry = function ( editor ) {
 
 			parameters.clear();
 
-			if ( geometry.type === 'BufferGeometry' || geometry.type === 'Geometry' ) {
+			if ( geometry.constructor.name === 'BufferGeometry' || geometry.constructor.name === 'Geometry' ) {
 
 				parameters.add( new Sidebar.Geometry.Modifiers( signals, object ) );
 
-			} else if ( Sidebar.Geometry[ geometry.type ] !== undefined ) {
+			} else if ( Sidebar.Geometry[ geometry.constructor.name ] !== undefined ) {
 
-				parameters.add( new Sidebar.Geometry[ geometry.type ]( signals, object ) );
+				parameters.add( new Sidebar.Geometry[ geometry.constructor.name ]( signals, object ) );
 
 			}
 

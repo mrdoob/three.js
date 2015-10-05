@@ -9,8 +9,6 @@ THREE.CubeCamera = function CubeCamera ( near, far, cubeResolution ) {
 
 	THREE.Object3D.call( this );
 
-	this.type = 'CubeCamera';
-
 	var fov = 90, aspect = 1;
 
 	var cameraPX = new THREE.PerspectiveCamera( fov, aspect, near, far );

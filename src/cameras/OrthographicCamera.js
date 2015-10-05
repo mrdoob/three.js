@@ -6,8 +6,6 @@ THREE.OrthographicCamera = function OrthographicCamera ( left, right, top, botto
 
 	THREE.Camera.call( this );
 
-	this.type = 'OrthographicCamera';
-
 	this.zoom = 1;
 
 	this.left = left;

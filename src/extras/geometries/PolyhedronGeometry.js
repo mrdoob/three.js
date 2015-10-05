@@ -8,8 +8,6 @@ THREE.PolyhedronGeometry = function PolyhedronGeometry ( vertices, indices, radi
 
 	THREE.Geometry.call( this );
 
-	this.type = 'PolyhedronGeometry';
-
 	this.parameters = {
 		vertices: vertices,
 		indices: indices,

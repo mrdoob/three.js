@@ -15,8 +15,6 @@ THREE.LatheGeometry = function LatheGeometry ( points, segments, phiStart, phiLe
 
 	THREE.Geometry.call( this );
 
-	this.type = 'LatheGeometry';
-
 	this.parameters = {
 		points: points,
 		segments: segments,

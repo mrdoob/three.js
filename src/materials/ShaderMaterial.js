@@ -32,8 +32,6 @@ THREE.ShaderMaterial = function ShaderMaterial ( parameters ) {
 
 	THREE.Material.call( this );
 
-	this.type = 'ShaderMaterial';
-
 	this.defines = {};
 	this.uniforms = {};
 

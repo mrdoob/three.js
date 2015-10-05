@@ -6,8 +6,6 @@ THREE.HemisphereLight = function HemisphereLight ( skyColor, groundColor, intens
 
 	THREE.Light.call( this, skyColor );
 
-	this.type = 'HemisphereLight';
-
 	this.position.set( 0, 1, 0 );
 	this.updateMatrix();
 

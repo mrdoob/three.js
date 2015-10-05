@@ -14,8 +14,6 @@ THREE.OctahedronGeometry = function OctahedronGeometry ( radius, detail ) {
 
 	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
-	this.type = 'OctahedronGeometry';
-
 	this.parameters = {
 		radius: radius,
 		detail: detail

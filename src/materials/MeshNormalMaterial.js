@@ -18,8 +18,6 @@ THREE.MeshNormalMaterial = function MeshNormalMaterial ( parameters ) {
 
 	THREE.Material.call( this, parameters );
 
-	this.type = 'MeshNormalMaterial';
-
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 

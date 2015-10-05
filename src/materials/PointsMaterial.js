@@ -24,8 +24,6 @@ THREE.PointsMaterial = function PointsMaterial ( parameters ) {
 
 	THREE.Material.call( this );
 
-	this.type = 'PointsMaterial';
-
 	this.color = new THREE.Color( 0xffffff );
 
 	this.map = null;

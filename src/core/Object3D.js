@@ -13,7 +13,6 @@ THREE.Object3D = function Object3D () {
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
-	this.type = 'Object3D';
 
 	this.parent = null;
 	this.children = [];
@@ -625,7 +624,7 @@ THREE.Object3D.prototype = {
 		var object = {};
 
 		object.uuid = this.uuid;
-		object.type = this.type;
+		object.type = this.constructor.name;
 
 		if ( this.name !== '' ) object.name = this.name;
 		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;

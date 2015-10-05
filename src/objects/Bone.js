@@ -8,8 +8,6 @@ THREE.Bone = function Bone ( skin ) {
 
 	THREE.Object3D.call( this );
 
-	this.type = 'Bone';
-
 	this.skin = skin;
 
 };

@@ -7,8 +7,6 @@ THREE.SphereBufferGeometry = function SphereBufferGeometry ( radius, widthSegmen
 
 	THREE.BufferGeometry.call( this );
 
-	this.type = 'SphereBufferGeometry';
-
 	this.parameters = {
 		radius: radius,
 		widthSegments: widthSegments,

@@ -21,8 +21,6 @@ THREE.IcosahedronGeometry = function IcosahedronGeometry ( radius, detail ) {
 
 	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
-	this.type = 'IcosahedronGeometry';
-
 	this.parameters = {
 		radius: radius,
 		detail: detail

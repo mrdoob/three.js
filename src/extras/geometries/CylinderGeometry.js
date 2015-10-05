@@ -6,8 +6,6 @@ THREE.CylinderGeometry = function CylinderGeometry ( radiusTop, radiusBottom, he
 
 	THREE.Geometry.call( this );
 
-	this.type = 'CylinderGeometry';
-
 	this.parameters = {
 		radiusTop: radiusTop,
 		radiusBottom: radiusBottom,

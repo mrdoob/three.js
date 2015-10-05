@@ -7,8 +7,6 @@ THREE.BoxGeometry = function BoxGeometry ( width, height, depth, widthSegments, 
 
 	THREE.Geometry.call( this );
 
-	this.type = 'BoxGeometry';
-
 	this.parameters = {
 		width: width,
 		height: height,

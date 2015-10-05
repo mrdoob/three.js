@@ -84,7 +84,7 @@ function loadObject( data ) {
 
     for ( i = 0; i < scene.children.length; i ++ ) {
 
-        var lightIndex = lights.indexOf( scene.children[ i ].type );
+        var lightIndex = lights.indexOf( scene.children[ i ].constructor.name );
 
         if ( lightIndex > -1 ) {
 
@@ -93,7 +93,7 @@ function loadObject( data ) {
 
         }
 
-        var cameraIndex = cameras.indexOf( scene.children[ i ].type );
+        var cameraIndex = cameras.indexOf( scene.children[ i ].constructor.name );
 
         if ( cameraIndex > -1 ) {
 

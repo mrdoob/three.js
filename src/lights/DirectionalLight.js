@@ -7,8 +7,6 @@ THREE.DirectionalLight = function DirectionalLight ( color, intensity ) {
 
 	THREE.Light.call( this, color );
 
-	this.type = 'DirectionalLight';
-
 	this.position.set( 0, 1, 0 );
 	this.updateMatrix();
 

@@ -732,7 +732,7 @@ Sidebar.Material = function ( editor ) {
 
 		}
 
-		materialClass.setValue( material.type );
+		materialClass.setValue( material.constructor.name );
 
 		if ( material.color !== undefined ) {
 

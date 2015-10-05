@@ -637,7 +637,7 @@ THREE.WebGLRenderer = function WebGLRenderer ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 
-			if ( material.type !== 'MeshPhongMaterial' && material.shading === THREE.FlatShading ) {
+			if ( material.constructor.name !== 'MeshPhongMaterial' && material.shading === THREE.FlatShading ) {
 
 				for ( var i = 0, l = object.count * 3; i < l; i += 9 ) {
 
@@ -1398,7 +1398,7 @@ THREE.WebGLRenderer = function WebGLRenderer ( parameters ) {
 				var shader = THREE.ShaderLib[ parameters.shaderID ];
 
 				materialProperties.__webglShader = {
-					name: material.type,
+					name: material.constructor.name,
 					uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
@@ -1407,7 +1407,7 @@ THREE.WebGLRenderer = function WebGLRenderer ( parameters ) {
 			} else {
 
 				materialProperties.__webglShader = {
-					name: material.type,
+					name: material.constructor.name,
 					uniforms: material.uniforms,
 					vertexShader: material.vertexShader,
 					fragmentShader: material.fragmentShader

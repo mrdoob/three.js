@@ -7,8 +7,6 @@ THREE.Light = function Light ( color ) {
 
 	THREE.Object3D.call( this );
 
-	this.type = 'Light';
-
 	this.color = new THREE.Color( color );
 
 };

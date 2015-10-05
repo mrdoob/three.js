@@ -21,8 +21,6 @@ THREE.SpriteMaterial = function SpriteMaterial ( parameters ) {
 
 	THREE.Material.call( this );
 
-	this.type = 'SpriteMaterial';
-
 	this.color = new THREE.Color( 0xffffff );
 	this.map = null;
 

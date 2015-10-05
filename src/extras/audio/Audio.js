@@ -6,8 +6,6 @@ THREE.Audio = function Audio ( listener ) {
 
 	THREE.Object3D.call( this );
 
-	this.type = 'Audio';
-
 	this.context = listener.context;
 	this.source = this.context.createBufferSource();
 	this.source.onended = this.onEnded.bind( this );

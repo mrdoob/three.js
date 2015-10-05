@@ -10,7 +10,6 @@ THREE.BufferGeometry = function BufferGeometry () {
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
-	this.type = 'BufferGeometry';
 
 	this.index = null;
 	this.attributes = {};
@@ -902,7 +901,7 @@ THREE.BufferGeometry.prototype = {
 		// standard BufferGeometry serialization
 
 		data.uuid = this.uuid;
-		data.type = this.type;
+		data.type = this.constructor.name;
 		if ( this.name !== '' ) data.name = this.name;
 
 		if ( this.parameters !== undefined ) {

@@ -7,8 +7,6 @@ THREE.PlaneGeometry = function PlaneGeometry ( width, height, widthSegments, hei
 
 	THREE.Geometry.call( this );
 
-	this.type = 'PlaneGeometry';
-
 	this.parameters = {
 		width: width,
 		height: height,

@@ -7,8 +7,6 @@ THREE.PlaneBufferGeometry = function PlaneBufferGeometry ( width, height, widthS
 
 	THREE.BufferGeometry.call( this );
 
-	this.type = 'PlaneBufferGeometry';
-
 	this.parameters = {
 		width: width,
 		height: height,

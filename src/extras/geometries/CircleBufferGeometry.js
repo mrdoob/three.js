@@ -6,8 +6,6 @@ THREE.CircleBufferGeometry = function CircleBufferGeometry ( radius, segments, t
 
 	THREE.BufferGeometry.call( this );
 
-	this.type = 'CircleBufferGeometry';
-
 	this.parameters = {
 		radius: radius,
 		segments: segments,
