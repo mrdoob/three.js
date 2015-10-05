@@ -100,6 +100,7 @@ Some commands are also **updatable**. By default a command is not updatable. Mak
 have to implement a fifth function 'update' as part of the prototype. In it only the 'new' state gets updated while the old one stays the same.
 
 Here as an example is the update-function of **CmdSetColor**:
+
 ```javascript
 update: function ( cmd ) {
 
