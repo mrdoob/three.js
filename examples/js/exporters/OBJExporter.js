@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.OBJExporter = function () {};
+THREE.OBJExporter = function OBJExporter () {};
 
 THREE.OBJExporter.prototype = {
 

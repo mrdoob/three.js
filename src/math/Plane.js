@@ -2,7 +2,7 @@
  * @author bhouston / http://clara.io
  */
 
-THREE.Plane = function ( normal, constant ) {
+THREE.Plane = function Plane ( normal, constant ) {
 
 	this.normal = ( normal !== undefined ) ? normal : new THREE.Vector3( 1, 0, 0 );
 	this.constant = ( constant !== undefined ) ? constant : 0;

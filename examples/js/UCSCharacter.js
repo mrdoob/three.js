@@ -1,16 +1,16 @@
-THREE.UCSCharacter = function() {
+THREE.UCSCharacter = function UCSCharacter () {
 
 	var scope = this;
-	
+
 	var mesh;
 
 	this.scale = 1;
 
 	this.root = new THREE.Object3D();
-	
+
 	this.numSkins;
 	this.numMorphs;
-	
+
 	this.skins = [];
 	this.materials = [];
 	this.morphs = [];
@@ -18,24 +18,24 @@ THREE.UCSCharacter = function() {
 	this.mixer = new THREE.AnimationMixer( this.root );
 
 	this.onLoadComplete = function () {};
-	
+
 	this.loadCounter = 0;
 
 	this.loadParts = function ( config ) {
-		
+
 		this.numSkins = config.skins.length;
 		this.numMorphs = config.morphs.length;
-		
+
 		// Character geometry + number of skins
 		this.loadCounter = 1 + config.skins.length;
-		
+
 		// SKINS
 		this.skins = loadTextures( config.baseUrl + "skins/", config.skins );
 		this.materials = createMaterials( this.skins );
-		
+
 		// MORPHS
 		this.morphs = config.morphs;
-		
+
 		// CHARACTER
 		var loader = new THREE.JSONLoader();
 		console.log( config.baseUrl + config.character );
@@ -43,11 +43,11 @@ THREE.UCSCharacter = function() {
 
 			geometry.computeBoundingBox();
 			geometry.computeVertexNormals();
-			
+
 			mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshFaceMaterial() );
 			mesh.name = config.character;
 			scope.root.add( mesh );
-			
+
 			var bb = geometry.boundingBox;
 			scope.root.scale.set( config.s, config.s, config.s );
 			scope.root.position.set( config.x, config.y - bb.min.y * config.s, config.z );
@@ -56,15 +56,15 @@ THREE.UCSCharacter = function() {
 			mesh.receiveShadow = true;
 
 			scope.mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).setLocalRoot( mesh ) );
-			
+
 			scope.setSkin( 0 );
-			
+
 			scope.checkLoadComplete();
 
 		} );
 
 	};
-	
+
 	this.setSkin = function( index ) {
 
 		if ( mesh && scope.materials ) {
@@ -74,7 +74,7 @@ THREE.UCSCharacter = function() {
 		}
 
 	};
-	
+
 	this.updateMorphs = function( influences ) {
 
 		if ( mesh ) {
@@ -88,7 +88,7 @@ THREE.UCSCharacter = function() {
 		}
 
 	};
-	
+
 	function loadTextures( baseUrl, textureUrls ) {
 
 		var mapping = THREE.UVMapping;
@@ -108,7 +108,7 @@ THREE.UCSCharacter = function() {
 	function createMaterials( skins ) {
 
 		var materials = [];
-		
+
 		for ( var i = 0; i < skins.length; i ++ ) {
 
 			materials[ i ] = new THREE.MeshLambertMaterial( {
@@ -120,7 +120,7 @@ THREE.UCSCharacter = function() {
 			} );
 
 		}
-		
+
 		return materials;
 
 	}

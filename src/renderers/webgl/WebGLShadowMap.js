@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
+THREE.WebGLShadowMap = function WebGLShadowMap ( _renderer, _lights, _objects ) {
 
 	var _gl = _renderer.context,
 	_state = _renderer.state,
@@ -100,15 +100,15 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var faceCount, isPointLight;
 
 		if ( scope.enabled === false ) return;
-		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;	
+		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
-		// Set GL state for depth map. 
+		// Set GL state for depth map.
 		_gl.clearColor( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
 		_state.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
 		_gl.cullFace( scope.cullFace === THREE.CullFaceFront ? _gl.FRONT : _gl.BACK );
-		_state.setDepthTest( true );			
+		_state.setDepthTest( true );
 
 		// save the existing viewport so it can be restored later
 		_renderer.getViewport( _vector4 );
@@ -311,13 +311,13 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			//We must call _renderer.resetGLState() at the end of each iteration of
 			// the light loop in order to force material updates for each light.
-			_renderer.resetGLState();			
+			_renderer.resetGLState();
 
 		}
 
 		_renderer.setViewport( _vector4.x, _vector4.y, _vector4.z, _vector4.w );
 
-		// Restore GL state. 
+		// Restore GL state.
 		var clearColor = _renderer.getClearColor(),
 		clearAlpha = _renderer.getClearAlpha();
 		_renderer.setClearColor( clearColor, clearAlpha );
@@ -329,7 +329,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
-		_renderer.resetGLState();			
+		_renderer.resetGLState();
 
 		scope.needsUpdate = false;
 

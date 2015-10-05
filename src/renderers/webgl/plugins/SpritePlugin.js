@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpritePlugin = function ( renderer, sprites ) {
+THREE.SpritePlugin = function SpritePlugin ( renderer, sprites ) {
 
 	var gl = renderer.context;
 	var state = renderer.state;

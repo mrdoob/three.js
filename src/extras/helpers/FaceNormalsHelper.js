@@ -3,7 +3,7 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
+THREE.FaceNormalsHelper = function FaceNormalsHelper ( object, size, hex, linewidth ) {
 
 	// FaceNormalsHelper only supports THREE.Geometry
 

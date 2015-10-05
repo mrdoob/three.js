@@ -2,7 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
+THREE.WebGLIndexedBufferRenderer = function WebGLIndexedBufferRenderer ( _gl, extensions, _infoRender ) {
 
 	var mode;
 

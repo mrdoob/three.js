@@ -1,6 +1,6 @@
 THREE = {};
-    
-THREE.Vector3 = function ( x, y, z ) {
+
+THREE.Vector3 = function Vector3 ( x, y, z ) {
 
     this.x = x || 0;
     this.y = y || 0;
@@ -11,7 +11,7 @@ THREE.Vector3 = function ( x, y, z ) {
 THREE.Vector3.prototype = {
 
     constructor: THREE.Vector3,
-    
+
     lengthSq: function () {
 
             return this.x * this.x + this.y * this.y + this.z * this.z;
@@ -29,15 +29,15 @@ THREE.Vector3.prototype = {
             return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
 
     }
-    
+
 };
 
 var a = [];
 
 for ( var i = 0; i < 100000; i ++ ) {
-    
+
     a[ i ] = new THREE.Vector3( i * 0.01, i * 2, i * -1.3 );
-    
+
 }
 
 

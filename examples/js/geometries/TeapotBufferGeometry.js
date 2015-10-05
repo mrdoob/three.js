@@ -3,7 +3,7 @@
  *
  * Tessellates the famous Utah teapot database by Martin Newell into triangles.
  *
- * THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn )
+ * THREE.TeapotBufferGeometry = function TeapotBufferGeometry ( size, segments, bottom, lid, body, fitLid, blinn )
  *
  * defaults: size = 50, segments = 10, bottom = true, lid = true, body = true,
  *   fitLid = false, blinn = true
@@ -52,7 +52,7 @@
  */
 /*global THREE */
 
-THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn ) {
+THREE.TeapotBufferGeometry = function TeapotBufferGeometry ( size, segments, bottom, lid, body, fitLid, blinn ) {
 
 	"use strict";
 

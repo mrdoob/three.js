@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Audio = function ( listener ) {
+THREE.Audio = function Audio ( listener ) {
 
 	THREE.Object3D.call( this );
 

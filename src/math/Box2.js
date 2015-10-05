@@ -2,7 +2,7 @@
  * @author bhouston / http://clara.io
  */
 
-THREE.Box2 = function ( min, max ) {
+THREE.Box2 = function Box2 ( min, max ) {
 
 	this.min = ( min !== undefined ) ? min : new THREE.Vector2( Infinity, Infinity );
 	this.max = ( max !== undefined ) ? max : new THREE.Vector2( - Infinity, - Infinity );
@@ -51,7 +51,7 @@ THREE.Box2.prototype = {
 		};
 
 	}(),
-	
+
 	clone: function () {
 
 		return new this.constructor().copy( this );

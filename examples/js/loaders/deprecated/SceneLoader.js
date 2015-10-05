@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SceneLoader = function ( manager ) {
+THREE.SceneLoader = function SceneLoader ( manager ) {
 
 	this.onLoadStart = function () {};
 	this.onLoadProgress = function() {};

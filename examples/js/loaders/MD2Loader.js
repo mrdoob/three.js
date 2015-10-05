@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MD2Loader = function ( manager ) {
+THREE.MD2Loader = function MD2Loader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
@@ -226,7 +226,7 @@ THREE.MD2Loader.prototype = {
 
 					var character = data.getUint8( offset + j, true );
 					if( character === 0 ) break;
-					
+
 					string[ j ] = character;
 
 				}

@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Triangle = function ( a, b, c ) {
+THREE.Triangle = function Triangle ( a, b, c ) {
 
 	this.a = ( a !== undefined ) ? a : new THREE.Vector3();
 	this.b = ( b !== undefined ) ? b : new THREE.Vector3();

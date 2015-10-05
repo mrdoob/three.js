@@ -11,7 +11,7 @@
  * See webgl_loader_assimp2json example.
  */
 
-THREE.AssimpJSONLoader = function ( manager ) {
+THREE.AssimpJSONLoader = function AssimpJSONLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 

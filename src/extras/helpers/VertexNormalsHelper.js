@@ -3,7 +3,7 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
+THREE.VertexNormalsHelper = function VertexNormalsHelper ( object, size, hex, linewidth ) {
 
 	this.object = object;
 

@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.MaskPass = function ( scene, camera ) {
+THREE.MaskPass = function MaskPass ( scene, camera ) {
 
 	this.scene = scene;
 	this.camera = camera;
@@ -67,7 +67,7 @@ THREE.MaskPass.prototype = {
 };
 
 
-THREE.ClearMaskPass = function () {
+THREE.ClearMaskPass = function ClearMaskPass () {
 
 	this.enabled = true;
 

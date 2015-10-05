@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.WireframeGeometry = function ( geometry ) {
+THREE.WireframeGeometry = function WireframeGeometry ( geometry ) {
 
 	THREE.BufferGeometry.call( this );
 

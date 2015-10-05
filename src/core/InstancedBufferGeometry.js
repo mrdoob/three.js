@@ -2,7 +2,7 @@
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedBufferGeometry = function () {
+THREE.InstancedBufferGeometry = function InstancedBufferGeometry () {
 
 	THREE.BufferGeometry.call( this );
 

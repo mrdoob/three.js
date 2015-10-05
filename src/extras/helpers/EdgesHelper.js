@@ -8,7 +8,7 @@
  * an edge is only rendered if the angle is at least 10 degrees.
  */
 
-THREE.EdgesHelper = function ( object, hex, thresholdAngle ) {
+THREE.EdgesHelper = function EdgesHelper ( object, hex, thresholdAngle ) {
 
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
 

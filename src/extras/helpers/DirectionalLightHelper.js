@@ -4,7 +4,7 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.DirectionalLightHelper = function ( light, size ) {
+THREE.DirectionalLightHelper = function DirectionalLightHelper ( light, size ) {
 
 	THREE.Object3D.call( this );
 

@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Fog = function ( color, near, far ) {
+THREE.Fog = function Fog ( color, near, far ) {
 
 	this.name = '';
 

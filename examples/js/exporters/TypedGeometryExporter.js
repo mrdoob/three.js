@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.TypedGeometryExporter = function () {};
+THREE.TypedGeometryExporter = function TypedGeometryExporter () {};
 
 THREE.TypedGeometryExporter.prototype = {
 
@@ -23,7 +23,7 @@ THREE.TypedGeometryExporter.prototype = {
 		for ( var key in attributes ) {
 
 			var attribute = attributes[ key ];
-			
+
 			var typedArray = geometry[ attribute ];
 			var array = [];
 

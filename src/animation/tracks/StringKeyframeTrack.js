@@ -1,12 +1,12 @@
 /**
  *
  * A Track that interpolates Strings
- * 
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.StringKeyframeTrack = function ( name, keys ) {
+THREE.StringKeyframeTrack = function StringKeyframeTrack ( name, keys ) {
 
 	THREE.KeyframeTrack.call( this, name, keys );
 
@@ -44,7 +44,7 @@ THREE.StringKeyframeTrack.prototype.clone = function() {
 	var clonedKeys = [];
 
 	for( var i = 0; i < this.keys.length; i ++ ) {
-		
+
 		var key = this.keys[i];
 		clonedKeys.push( {
 			time: key.time,
@@ -61,4 +61,3 @@ THREE.StringKeyframeTrack.parse = function( json ) {
 	return new THREE.StringKeyframeTrack( json.name, json.keys );
 
 };
- 

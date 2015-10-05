@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.STLExporter = function () {};
+THREE.STLExporter = function STLExporter () {};
 
 THREE.STLExporter.prototype = {
 

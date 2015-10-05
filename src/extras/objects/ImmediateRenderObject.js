@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ImmediateRenderObject = function ( material ) {
+THREE.ImmediateRenderObject = function ImmediateRenderObject ( material ) {
 
 	THREE.Object3D.call( this );
 

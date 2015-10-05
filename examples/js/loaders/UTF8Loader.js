@@ -5,7 +5,7 @@
  * Code to load/decompress mesh is taken from r100 of this webgl-loader
  */
 
-THREE.UTF8Loader = function () {};
+THREE.UTF8Loader = function UTF8Loader () {};
 
 /**
  * Load UTF8 encoded model

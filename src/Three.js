@@ -296,7 +296,7 @@ THREE.LoopPingPong = 2202;
 
 // DEPRECATED
 
-THREE.Projector = function () {
+THREE.Projector = function Projector () {
 
 	console.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
 
@@ -322,7 +322,7 @@ THREE.Projector = function () {
 
 };
 
-THREE.CanvasRenderer = function () {
+THREE.CanvasRenderer = function CanvasRenderer () {
 
 	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
 

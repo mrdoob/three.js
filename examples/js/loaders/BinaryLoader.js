@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.BinaryLoader = function ( manager ) {
+THREE.BinaryLoader = function BinaryLoader ( manager ) {
 
 	if ( typeof manager === 'boolean' ) {
 
@@ -20,7 +20,7 @@ THREE.BinaryLoader.prototype = {
 	constructor: THREE.BinaryLoader,
 
 	// Deprecated
-	
+
 	get statusDomElement () {
 
 		if ( this._statusDomElement === undefined ) {

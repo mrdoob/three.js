@@ -4,7 +4,7 @@
  * @author angelxuanchang
  */
 
-THREE.MTLLoader = function( manager ) {
+THREE.MTLLoader = function MTLLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 

@@ -2,7 +2,7 @@
  * @author daron1337 / http://daron1337.github.io/
  */
 
-THREE.Lut = function ( colormap, numberofcolors ) {
+THREE.Lut = function Lut ( colormap, numberofcolors ) {
 
 	this.lut = [];
 	this.map = THREE.ColorMapKeywords[ colormap ];

@@ -35,7 +35,7 @@
  * }
  */
 
-THREE.MeshLambertMaterial = function ( parameters ) {
+THREE.MeshLambertMaterial = function MeshLambertMaterial ( parameters ) {
 
 	THREE.Material.call( this );
 

@@ -302,7 +302,7 @@
 	//    Zoom - middle mouse, or mousewheel / touch: two finger spread or squish
 	//    Pan - right mouse, or arrow keys / touch: three finter swipe
 
-	THREE.OrbitControls = function ( object, domElement ) {
+	THREE.OrbitControls = function OrbitControls ( object, domElement ) {
 
 		var constraint = new OrbitConstraint( object );
 

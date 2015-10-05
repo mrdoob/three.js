@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.FogExp2 = function ( color, density ) {
+THREE.FogExp2 = function FogExp2 ( color, density ) {
 
 	this.name = '';
 

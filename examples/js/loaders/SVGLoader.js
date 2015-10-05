@@ -3,7 +3,7 @@
  * @author zz85 / http://joshuakoo.com/
  */
 
-THREE.SVGLoader = function ( manager ) {
+THREE.SVGLoader = function SVGLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 

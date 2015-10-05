@@ -5,7 +5,7 @@
  * @author jonobr1 / http://jonobr1.com/
  */
 
-THREE.Mesh = function ( geometry, material ) {
+THREE.Mesh = function Mesh ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 

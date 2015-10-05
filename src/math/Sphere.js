@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Sphere = function ( center, radius ) {
+THREE.Sphere = function Sphere ( center, radius ) {
 
 	this.center = ( center !== undefined ) ? center : new THREE.Vector3();
 	this.radius = ( radius !== undefined ) ? radius : 0;

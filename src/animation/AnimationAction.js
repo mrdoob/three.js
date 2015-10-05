@@ -1,12 +1,12 @@
 /**
  *
  * A clip that has been explicitly scheduled.
- * 
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
+THREE.AnimationAction = function AnimationAction ( clip, startTime, timeScale, weight, loop ) {
 
 	if( clip === undefined ) throw new Error( 'clip is null' );
 	this.clip = clip;
@@ -39,7 +39,7 @@ THREE.AnimationAction.prototype = {
 		this.localRoot = localRoot;
 
 		return this;
-		
+
 	},
 
 	updateTime: function( clipDeltaTime ) {
@@ -49,14 +49,14 @@ THREE.AnimationAction.prototype = {
    		var previousActionTime = this.actionTime;
 
 		var duration = this.clip.duration;
-	
+
 		this.actionTime = this.actionTime + clipDeltaTime;
-	
+
 		if( this.loop === THREE.LoopOnce ) {
 
 			this.loopCount = 0;
 			this.clipTime = Math.min( Math.max( this.actionTime, 0 ), duration );
-	
+
 			// if time is changed since last time, see if we have hit a start/end limit
 			if( this.clipTime !== previousClipTime ) {
 
@@ -73,16 +73,16 @@ THREE.AnimationAction.prototype = {
 
 			}
 
-		
+
 			return this.clipTime;
 
 		}
-		
+
 		this.loopCount = Math.floor( this.actionTime / duration );
-	
+
 		var newClipTime = this.actionTime - this.loopCount * duration;
 		newClipTime = newClipTime % duration;
-	
+
 		// if we are ping pong looping, ensure that we go backwards when appropriate
 		if( this.loop == THREE.LoopPingPong ) {
 
@@ -101,7 +101,7 @@ THREE.AnimationAction.prototype = {
    			this.mixer.dispatchEvent( { type: 'loop', action: this, loopDelta: ( this.loopCount - this.loopCount ) } );
 
    		}
-	
+
 	   	return this.clipTime;
 
 	},
@@ -136,7 +136,7 @@ THREE.AnimationAction.prototype = {
 		var clipResults = this.clip.getAt( this.clipTime );
 
 		return clipResults;
-		
+
 	},
 
 	getTimeScaleAt: function( time ) {

@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
+THREE.HemisphereLight = function HemisphereLight ( skyColor, groundColor, intensity ) {
 
 	THREE.Light.call( this, skyColor );
 

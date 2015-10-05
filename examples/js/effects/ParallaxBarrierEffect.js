@@ -4,7 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ParallaxBarrierEffect = function ( renderer ) {
+THREE.ParallaxBarrierEffect = function ParallaxBarrierEffect ( renderer ) {
 
 	var eyeRight = new THREE.Matrix4();
 	var eyeLeft = new THREE.Matrix4();

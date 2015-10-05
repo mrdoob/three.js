@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.MorphAnimMesh = function ( geometry, material ) {
+THREE.MorphAnimMesh = function MorphAnimMesh ( geometry, material ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
@@ -33,7 +33,7 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 		this.mixer.removeAction( this.activeAction );
 		this.activeAction = null;
-		
+
 	}
 
 	var clip = THREE.AnimationClip.findByName( this.geometry.animations, label );

@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PointLightHelper = function ( light, sphereSize ) {
+THREE.PointLightHelper = function PointLightHelper ( light, sphereSize ) {
 
 	this.light = light;
 	this.light.updateMatrixWorld();

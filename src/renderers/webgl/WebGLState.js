@@ -2,7 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
+THREE.WebGLState = function WebGLState ( gl, extensions, paramThreeToGL ) {
 
 	var _this = this;
 

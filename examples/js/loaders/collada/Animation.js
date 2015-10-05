@@ -4,7 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Animation = function ( root, data ) {
+THREE.Animation = function Animation ( root, data ) {
 
 	this.root = root;
 	this.data = THREE.AnimationHandler.init( data );

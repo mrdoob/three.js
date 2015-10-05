@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
+THREE.LoadingManager = function LoadingManager ( onLoad, onProgress, onError ) {
 
 	var scope = this;
 

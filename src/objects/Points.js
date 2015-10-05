@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Points = function ( geometry, material ) {
+THREE.Points = function Points ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
@@ -128,14 +128,14 @@ THREE.Points.prototype.clone = function () {
 
 // Backwards compatibility
 
-THREE.PointCloud = function ( geometry, material ) {
+THREE.PointCloud = function PointCloud ( geometry, material ) {
 
 	console.warn( 'THREE.PointCloud has been renamed to THREE.Points.' );
 	return new THREE.Points( geometry, material );
 
 };
 
-THREE.ParticleSystem = function ( geometry, material ) {
+THREE.ParticleSystem = function ParticleSystem ( geometry, material ) {
 
 	console.warn( 'THREE.ParticleSystem has been renamed to THREE.Points.' );
 	return new THREE.Points( geometry, material );

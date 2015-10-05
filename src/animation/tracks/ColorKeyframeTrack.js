@@ -1,12 +1,12 @@
 /**
  *
  * A Track that interpolates Color
- * 
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.ColorKeyframeTrack = function ( name, keys ) {
+THREE.ColorKeyframeTrack = function ColorKeyframeTrack ( name, keys ) {
 
 	THREE.KeyframeTrack.call( this, name, keys );
 
@@ -44,7 +44,7 @@ THREE.ColorKeyframeTrack.prototype.clone = function() {
 	var clonedKeys = [];
 
 	for( var i = 0; i < this.keys.length; i ++ ) {
-		
+
 		var key = this.keys[i];
 		clonedKeys.push( {
 			time: key.time,
@@ -71,4 +71,3 @@ THREE.ColorKeyframeTrack.parse = function( json ) {
 	return new THREE.ColorKeyframeTrack( json.name, keys );
 
 };
- 

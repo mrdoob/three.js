@@ -1,12 +1,12 @@
 /**
  *
  * Reusable set of Tracks that represent an animation.
- * 
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.AnimationClip = function ( name, duration, tracks ) {
+THREE.AnimationClip = function AnimationClip ( name, duration, tracks ) {
 
 	this.name = name;
 	this.tracks = tracks;
@@ -26,7 +26,7 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 	this.optimize();
 
 	this.results = [];
-	
+
 };
 
 THREE.AnimationClip.prototype = {
@@ -122,7 +122,7 @@ THREE.AnimationClip.findByName = function( clipArray, name ) {
 };
 
 THREE.AnimationClip.CreateClipsFromMorphTargetSequences = function( morphTargets, fps ) {
-	
+
 	var animationToMorphTargets = {};
 
 	// tested with https://regex101.com/ on trick sequences such flamingo_flyA_003, flamingo_run1_003, crdeath0059
@@ -133,7 +133,7 @@ THREE.AnimationClip.CreateClipsFromMorphTargetSequences = function( morphTargets
 
 		var morphTarget = morphTargets[ i ];
 		var parts = morphTarget.name.match( pattern );
-	
+
 		if ( parts && parts.length > 1 ) {
 
 			var name = parts[ 1 ];
@@ -196,12 +196,12 @@ THREE.AnimationClip.parseAnimation = function( animation, bones, nodeName ) {
 
 				keys.push( { time: animationKey.time, value: animationKeyToValueFunc( animationKey ) } );
 			}
-	
+
 		}
 
 		// only return track if there are actually keys.
 		if( keys.length > 0 ) {
-		
+
 			return new trackType( trackName, keys );
 
 		}
@@ -256,7 +256,7 @@ THREE.AnimationClip.parseAnimation = function( animation, bones, nodeName ) {
 							time: animationKey.time,
 							value: (( animationKey.morphTarget === morphTargetName ) ? 1 : 0 )
 						});
-				
+
 				}
 
 				tracks.push( new THREE.NumberKeyframeTrack( nodeName + '.morphTargetInfluence[' + morphTargetName + ']', keys ) );
@@ -269,14 +269,14 @@ THREE.AnimationClip.parseAnimation = function( animation, bones, nodeName ) {
 		else {
 
 			var boneName = nodeName + '.bones[' + bones[ h ].name + ']';
-		
+
 			// track contains positions...
 			var positionTrack = convertTrack( boneName + '.position', animationKeys, 'pos', THREE.VectorKeyframeTrack, function( animationKey ) {
 					return new THREE.Vector3().fromArray( animationKey.pos )
 				} );
 
 			if( positionTrack ) tracks.push( positionTrack );
-			
+
 			// track contains quaternions...
 			var quaternionTrack = convertTrack( boneName + '.quaternion', animationKeys, 'rot', THREE.QuaternionKeyframeTrack, function( animationKey ) {
 					if( animationKey.rot.slerp ) {

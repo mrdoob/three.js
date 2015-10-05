@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.WireframeHelper = function ( object, hex ) {
+THREE.WireframeHelper = function WireframeHelper ( object, hex ) {
 
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
 

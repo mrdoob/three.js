@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.RaytracingRenderer = function ( parameters ) {
+THREE.RaytracingRenderer = function RaytracingRenderer ( parameters ) {
 
 	console.log( 'THREE.RaytracingRenderer', THREE.REVISION );
 

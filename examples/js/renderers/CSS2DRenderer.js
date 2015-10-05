@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.CSS2DObject = function ( element ) {
+THREE.CSS2DObject = function CSS2DObject ( element ) {
 
 	THREE.Object3D.call( this );
 
@@ -26,7 +26,7 @@ THREE.CSS2DObject.prototype.constructor = THREE.CSS2DObject;
 
 //
 
-THREE.CSS2DRenderer = function () {
+THREE.CSS2DRenderer = function CSS2DRenderer () {
 
 	console.log( 'THREE.CSS2DRenderer', THREE.REVISION );
 

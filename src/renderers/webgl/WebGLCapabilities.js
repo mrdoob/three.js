@@ -1,4 +1,4 @@
-THREE.WebGLCapabilities = function ( gl, extensions, parameters ) {
+THREE.WebGLCapabilities = function WebGLCapabilities ( gl, extensions, parameters ) {
 
 	function getMaxPrecision( precision ) {
 

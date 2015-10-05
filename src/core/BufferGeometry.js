@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BufferGeometry = function () {
+THREE.BufferGeometry = function BufferGeometry () {
 
 	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
 

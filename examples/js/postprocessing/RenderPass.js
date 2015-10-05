@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
+THREE.RenderPass = function RenderPass ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
 
 	this.scene = scene;
 	this.camera = camera;

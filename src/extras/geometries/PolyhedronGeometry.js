@@ -4,7 +4,7 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
+THREE.PolyhedronGeometry = function PolyhedronGeometry ( vertices, indices, radius, detail ) {
 
 	THREE.Geometry.call( this );
 

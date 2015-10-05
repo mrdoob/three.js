@@ -19,7 +19,7 @@
  *
  */
 
-THREE.AMFLoader = function ( manager ) {
+THREE.AMFLoader = function AMFLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 

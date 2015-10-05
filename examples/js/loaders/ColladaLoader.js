@@ -57,7 +57,7 @@
 
 	};
 
-	THREE.ColladaLoader = function ( manager ) {
+	THREE.ColladaLoader = function ColladaLoader ( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 

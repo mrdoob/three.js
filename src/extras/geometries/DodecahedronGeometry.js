@@ -2,7 +2,7 @@
  * @author Abe Pazos / https://hamoid.com
  */
 
-THREE.DodecahedronGeometry = function ( radius, detail ) {
+THREE.DodecahedronGeometry = function DodecahedronGeometry ( radius, detail ) {
 
 	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 	var r = 1 / t;

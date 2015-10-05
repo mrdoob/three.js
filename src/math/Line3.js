@@ -2,7 +2,7 @@
  * @author bhouston / http://clara.io
  */
 
-THREE.Line3 = function ( start, end ) {
+THREE.Line3 = function Line3 ( start, end ) {
 
 	this.start = ( start !== undefined ) ? start : new THREE.Vector3();
 	this.end = ( end !== undefined ) ? end : new THREE.Vector3();

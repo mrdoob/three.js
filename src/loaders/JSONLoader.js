@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.JSONLoader = function ( manager ) {
+THREE.JSONLoader = function JSONLoader ( manager ) {
 
 	if ( typeof manager === 'boolean' ) {
 
@@ -23,7 +23,7 @@ THREE.JSONLoader.prototype = {
 	constructor: THREE.JSONLoader,
 
 	// Deprecated
-	
+
 	get statusDomElement () {
 
 		if ( this._statusDomElement === undefined ) {

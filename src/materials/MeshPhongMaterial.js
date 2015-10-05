@@ -56,7 +56,7 @@
  * }
  */
 
-THREE.MeshPhongMaterial = function ( parameters ) {
+THREE.MeshPhongMaterial = function MeshPhongMaterial ( parameters ) {
 
 	THREE.Material.call( this );
 

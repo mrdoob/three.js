@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AxisHelper = function ( size ) {
+THREE.AxisHelper = function AxisHelper ( size ) {
 
 	size = size || 1;
 

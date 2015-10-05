@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Gyroscope = function () {
+THREE.Gyroscope = function Gyroscope () {
 
 	THREE.Object3D.call( this );
 

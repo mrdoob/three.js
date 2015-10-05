@@ -11,7 +11,7 @@
  *	NURBS surface
  **************************************************************/
 
-THREE.NURBSSurface = function ( degree1, degree2, knots1, knots2 /* arrays of reals */, controlPoints /* array^2 of Vector(2|3|4) */ ) {
+THREE.NURBSSurface = function NURBSSurface ( degree1, degree2, knots1, knots2 /* arrays of reals */, controlPoints /* array^2 of Vector(2|3|4) */ ) {
 
 	this.degree1 = degree1;
 	this.degree2 = degree2;
@@ -51,5 +51,3 @@ THREE.NURBSSurface.prototype = {
 
 	}
 };
-
-

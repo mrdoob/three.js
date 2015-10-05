@@ -9,7 +9,7 @@
  *
  */
 
-THREE.VREffect = function ( renderer, onError ) {
+THREE.VREffect = function VREffect ( renderer, onError ) {
 
 	var vrHMD;
 	var eyeTranslationL, eyeFOVL;

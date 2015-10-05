@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GridHelper = function ( size, step ) {
+THREE.GridHelper = function GridHelper ( size, step ) {
 
 	var geometry = new THREE.Geometry();
 	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );

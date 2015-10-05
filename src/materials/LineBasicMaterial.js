@@ -20,7 +20,7 @@
  * }
  */
 
-THREE.LineBasicMaterial = function ( parameters ) {
+THREE.LineBasicMaterial = function LineBasicMaterial ( parameters ) {
 
 	THREE.Material.call( this );
 

@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BufferGeometryLoader = function ( manager ) {
+THREE.BufferGeometryLoader = function BufferGeometryLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 

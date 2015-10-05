@@ -3,7 +3,7 @@
  **************************************************************/
 
 
-THREE.QuadraticBezierCurve = function ( v0, v1, v2 ) {
+THREE.QuadraticBezierCurve = function QuadraticBezierCurve ( v0, v1, v2 ) {
 
 	this.v0 = v0;
 	this.v1 = v1;

@@ -4,7 +4,7 @@
  * This controls allow to change the orientation of the camera using the mouse
  */
 
-THREE.MouseControls = function ( object ) {
+THREE.MouseControls = function MouseControls ( object ) {
 
 	var scope = this;
 	var PI_2 = Math.PI / 2;

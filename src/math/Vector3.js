@@ -7,7 +7,7 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.Vector3 = function ( x, y, z ) {
+THREE.Vector3 = function Vector3 ( x, y, z ) {
 
 	this.x = x || 0;
 	this.y = y || 0;

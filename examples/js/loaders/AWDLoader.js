@@ -70,7 +70,7 @@
 		}
 	}
 
-	THREE.AWDLoader = function ( manager ) {
+	THREE.AWDLoader = function AWDLoader ( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 

@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Color = function ( color ) {
+THREE.Color = function Color ( color ) {
 
 	if ( arguments.length === 3 ) {
 

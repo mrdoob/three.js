@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BufferAttribute = function ( array, itemSize ) {
+THREE.BufferAttribute = function BufferAttribute ( array, itemSize ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -311,55 +311,55 @@ THREE.BufferAttribute.prototype = {
 
 //
 
-THREE.Int8Attribute = function ( array, itemSize ) {
+THREE.Int8Attribute = function Int8Attribute ( array, itemSize ) {
 
 	return new THREE.BufferAttribute( new Int8Array( array ), itemSize );
 
 };
 
-THREE.Uint8Attribute = function ( array, itemSize ) {
+THREE.Uint8Attribute = function Uint8Attribute ( array, itemSize ) {
 
 	return new THREE.BufferAttribute( new Uint8Array( array ), itemSize );
 
 };
 
-THREE.Uint8ClampedAttribute = function ( array, itemSize ) {
+THREE.Uint8ClampedAttribute = function Uint8ClampedAttribute ( array, itemSize ) {
 
 	return new THREE.BufferAttribute( new Uint8ClampedArray( array ), itemSize );
 
 };
 
-THREE.Int16Attribute = function ( array, itemSize ) {
+THREE.Int16Attribute = function Int16Attribute ( array, itemSize ) {
 
 	return new THREE.BufferAttribute( new Int16Array( array ), itemSize );
 
 };
 
-THREE.Uint16Attribute = function ( array, itemSize ) {
+THREE.Uint16Attribute = function Uint16Attribute ( array, itemSize ) {
 
 	return new THREE.BufferAttribute( new Uint16Array( array ), itemSize );
 
 };
 
-THREE.Int32Attribute = function ( array, itemSize ) {
+THREE.Int32Attribute = function Int32Attribute ( array, itemSize ) {
 
 	return new THREE.BufferAttribute( new Int32Array( array ), itemSize );
 
 };
 
-THREE.Uint32Attribute = function ( array, itemSize ) {
+THREE.Uint32Attribute = function Uint32Attribute ( array, itemSize ) {
 
 	return new THREE.BufferAttribute( new Uint32Array( array ), itemSize );
 
 };
 
-THREE.Float32Attribute = function ( array, itemSize ) {
+THREE.Float32Attribute = function Float32Attribute ( array, itemSize ) {
 
 	return new THREE.BufferAttribute( new Float32Array( array ), itemSize );
 
 };
 
-THREE.Float64Attribute = function ( array, itemSize ) {
+THREE.Float64Attribute = function Float64Attribute ( array, itemSize ) {
 
 	return new THREE.BufferAttribute( new Float64Array( array ), itemSize );
 
@@ -368,7 +368,7 @@ THREE.Float64Attribute = function ( array, itemSize ) {
 
 // Deprecated
 
-THREE.DynamicBufferAttribute = function ( array, itemSize ) {
+THREE.DynamicBufferAttribute = function DynamicBufferAttribute ( array, itemSize ) {
 
 	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
 	return new THREE.BufferAttribute( array, itemSize ).setDynamic( true );

@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay ) {
+THREE.SpotLight = function SpotLight ( color, intensity, distance, angle, exponent, decay ) {
 
 	THREE.Light.call( this, color );
 

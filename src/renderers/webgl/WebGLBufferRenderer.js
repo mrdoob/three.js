@@ -2,7 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
+THREE.WebGLBufferRenderer = function WebGLBufferRenderer ( _gl, extensions, _infoRender ) {
 
 	var mode;
 

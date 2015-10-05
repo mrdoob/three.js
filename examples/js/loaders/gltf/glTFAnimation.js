@@ -2,7 +2,7 @@
  * @author Tony Parisi / http://www.tonyparisi.com/
  */
 
-THREE.glTFAnimator = ( function () {
+THREE.glTFAnimator = ( function glTFAnimator () {
 
 	var animators = [];
 
@@ -33,14 +33,14 @@ THREE.glTFAnimator = ( function () {
 })();
 
 // Construction/initialization
-THREE.glTFAnimation = function(interps)
+THREE.glTFAnimation = function glTFAnimation (interps)
 {
 	this.running = false;
 	this.loop = false;
 	this.duration = 0;
 	this.startTime = 0;
 	this.interps = [];
-	
+
 	if (interps)
 	{
 		this.createInterpolators(interps);
@@ -63,7 +63,7 @@ THREE.glTFAnimation.prototype.play = function()
 {
 	if (this.running)
 		return;
-	
+
 	this.startTime = Date.now();
 	this.running = true;
 	THREE.glTFAnimator.add(this);
@@ -80,12 +80,12 @@ THREE.glTFAnimation.prototype.update = function()
 {
 	if (!this.running)
 		return;
-	
+
 	var now = Date.now();
 	var deltat = (now - this.startTime) / 1000;
 	var t = deltat % this.duration;
 	var nCycles = Math.floor(deltat / this.duration);
-	
+
 	if (nCycles >= 1 && !this.loop)
 	{
 		this.running = false;
@@ -109,20 +109,20 @@ THREE.glTFAnimation.prototype.update = function()
 
 //Interpolator class
 //Construction/initialization
-THREE.glTFInterpolator = function(param) 
-{	    		
+THREE.glTFInterpolator = function glTFInterpolator (param)
+{
 	this.keys = param.keys;
 	this.values = param.values;
 	this.count = param.count;
 	this.type = param.type;
 	this.path = param.path;
 	this.isRot = false;
-	
+
 	var node = param.target;
 	node.updateMatrix();
 	node.matrixAutoUpdate = true;
 	this.targetNode = node;
-	
+
 	switch (param.path) {
 		case "translation" :
 			this.target = node.position;
@@ -138,9 +138,9 @@ THREE.glTFInterpolator = function(param)
 			this.originalValue = node.scale.clone();
 			break;
 	}
-	
+
 	this.duration = this.keys[this.count - 1];
-	
+
 	this.vec1 = new THREE.Vector3;
 	this.vec2 = new THREE.Vector3;
 	this.vec3 = new THREE.Vector3;
@@ -189,13 +189,13 @@ THREE.glTFInterpolator.prototype.interp = function(t)
 	else if (t >= this.keys[this.count - 1])
 	{
 		if (this.isRot) {
-			this.quat3.set(this.values[(this.count - 1) * 4], 
+			this.quat3.set(this.values[(this.count - 1) * 4],
 					this.values[(this.count - 1) * 4 + 1],
 					this.values[(this.count - 1) * 4 + 2],
 					this.values[(this.count - 1) * 4 + 3]);
 		}
 		else {
-			this.vec3.set(this.values[(this.count - 1) * 3], 
+			this.vec3.set(this.values[(this.count - 1) * 3],
 					this.values[(this.count - 1) * 3 + 1],
 					this.values[(this.count - 1) * 3 + 2]);
 		}
@@ -206,7 +206,7 @@ THREE.glTFInterpolator.prototype.interp = function(t)
 		{
 			var key1 = this.keys[i];
 			var key2 = this.keys[i + 1];
-	
+
 			if (t >= key1 && t <= key2)
 			{
 				if (this.isRot) {
@@ -227,13 +227,13 @@ THREE.glTFInterpolator.prototype.interp = function(t)
 					this.vec2.set(this.values[(i + 1) * 3],
 							this.values[(i + 1) * 3 + 1],
 							this.values[(i + 1) * 3 + 2]);
-	
+
 					this.vec3.lerp(this.vec2, (t - key1) / (key2 - key1));
 				}
 			}
 		}
 	}
-	
+
 	if (this.target)
 	{
 		this.copyValue(this.target);
@@ -241,11 +241,11 @@ THREE.glTFInterpolator.prototype.interp = function(t)
 };
 
 THREE.glTFInterpolator.prototype.copyValue = function(target) {
-	
+
 	if (this.isRot) {
 		target.copy(this.quat3);
 	}
 	else {
 		target.copy(this.vec3);
-	}		
+	}
 };

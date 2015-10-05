@@ -4,7 +4,7 @@
  * @author julianwa / https://github.com/julianwa
  */
 
-THREE.RenderableObject = function () {
+THREE.RenderableObject = function RenderableObject () {
 
 	this.id = 0;
 
@@ -16,7 +16,7 @@ THREE.RenderableObject = function () {
 
 //
 
-THREE.RenderableFace = function () {
+THREE.RenderableFace = function RenderableFace () {
 
 	this.id = 0;
 
@@ -40,7 +40,7 @@ THREE.RenderableFace = function () {
 
 //
 
-THREE.RenderableVertex = function () {
+THREE.RenderableVertex = function RenderableVertex () {
 
 	this.position = new THREE.Vector3();
 	this.positionWorld = new THREE.Vector3();
@@ -59,7 +59,7 @@ THREE.RenderableVertex.prototype.copy = function ( vertex ) {
 
 //
 
-THREE.RenderableLine = function () {
+THREE.RenderableLine = function RenderableLine () {
 
 	this.id = 0;
 
@@ -76,7 +76,7 @@ THREE.RenderableLine = function () {
 
 //
 
-THREE.RenderableSprite = function () {
+THREE.RenderableSprite = function RenderableSprite () {
 
 	this.id = 0;
 
@@ -96,7 +96,7 @@ THREE.RenderableSprite = function () {
 
 //
 
-THREE.Projector = function () {
+THREE.Projector = function Projector () {
 
 	var _object, _objectCount, _objectPool = [], _objectPoolLength = 0,
 	_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,

@@ -1,12 +1,12 @@
 /**
  *
  * Creator of typical test AnimationClips / KeyframeTracks
- * 
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.AnimationClipCreator = function() {
+THREE.AnimationClipCreator = function AnimationClipCreator () {
 };
 
 THREE.AnimationClipCreator.CreateRotationAnimation = function( period, axis ) {
@@ -49,7 +49,7 @@ THREE.AnimationClipCreator.CreateShakeAnimation = function( duration, shakeScale
 
 	for( var i = 0; i < duration * 10; i ++ ) {
 
-		keys.push( { 
+		keys.push( {
 			time: ( i / 10.0 ),
 			value: new THREE.Vector3( Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0 ).multiply( shakeScale )
 		} );
@@ -136,4 +136,3 @@ THREE.AnimationClipCreator.CreateMaterialColorAnimation = function( duration, co
 
 	return clip;
 };
-

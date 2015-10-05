@@ -4,7 +4,7 @@
  * A shadow Mesh that follows a shadow-casting Mesh in the scene, but is confined to a single plane.
  */
 
-THREE.ShadowMesh = function ( mesh ) {
+THREE.ShadowMesh = function ShadowMesh ( mesh ) {
 
 	var shadowMaterial = new THREE.MeshBasicMaterial( {
 

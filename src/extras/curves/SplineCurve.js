@@ -2,7 +2,7 @@
  *	Spline curve
  **************************************************************/
 
-THREE.SplineCurve = function ( points /* array of Vector2 */ ) {
+THREE.SplineCurve = function SplineCurve ( points /* array of Vector2 */ ) {
 
 	this.points = ( points == undefined ) ? [] : points;
 

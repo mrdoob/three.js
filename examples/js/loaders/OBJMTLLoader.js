@@ -5,7 +5,7 @@
  * @author angelxuanchang
  */
 
-THREE.OBJMTLLoader = function ( manager ) {
+THREE.OBJMTLLoader = function OBJMTLLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 

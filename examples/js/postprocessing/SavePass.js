@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SavePass = function ( renderTarget ) {
+THREE.SavePass = function SavePass ( renderTarget ) {
 
 	if ( THREE.CopyShader === undefined )
 		console.error( "THREE.SavePass relies on THREE.CopyShader" );

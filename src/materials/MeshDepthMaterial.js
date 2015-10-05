@@ -14,7 +14,7 @@
  * }
  */
 
-THREE.MeshDepthMaterial = function ( parameters ) {
+THREE.MeshDepthMaterial = function MeshDepthMaterial ( parameters ) {
 
 	THREE.Material.call( this );
 

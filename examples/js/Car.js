@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Car = function () {
+THREE.Car = function Car () {
 
 	var scope = this;
 

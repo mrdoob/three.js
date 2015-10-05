@@ -6,7 +6,7 @@
  * @author elephantatwork / www.elephantatwork.ch
  */
 
-THREE.Object3D = function () {
+THREE.Object3D = function Object3D () {
 
 	Object.defineProperty( this, 'id', { value: THREE.Object3DIdCount ++ } );
 

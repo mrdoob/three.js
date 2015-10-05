@@ -1,12 +1,12 @@
 /**
  *
  * A track bound to a real value in the scene graph.
- * 
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.PropertyBinding = function ( rootNode, trackName ) {
+THREE.PropertyBinding = function PropertyBinding ( rootNode, trackName ) {
 
 	this.rootNode = rootNode;
 	this.trackName = trackName;
@@ -23,7 +23,7 @@ THREE.PropertyBinding = function ( rootNode, trackName ) {
 	this.propertyIndex = parseResults.propertyIndex;
 
 	this.node = THREE.PropertyBinding.findNode( rootNode, this.nodeName ) || rootNode;
-	
+
 	this.cumulativeValue = null;
 	this.cumulativeWeight = 0;
 };
@@ -40,7 +40,7 @@ THREE.PropertyBinding.prototype = {
 	},
 
 	accumulate: function( value, weight ) {
-		
+
 		if( ! this.isBound ) this.bind();
 
 		if( this.cumulativeWeight === 0 ) {
@@ -75,7 +75,7 @@ THREE.PropertyBinding.prototype = {
 		this.getValue = null;
 		this.lerpValue = null;
 		this.equalsValue = null;
-		this.triggerDirty = null;	
+		this.triggerDirty = null;
 		this.isBound = false;
 
 	},
@@ -98,11 +98,11 @@ THREE.PropertyBinding.prototype = {
 			if( this.objectName === "materials" ) {
 				if( ! targetObject.material ) {
 					console.error( '  can not bind to material as node does not have a material', this );
-					return;				
+					return;
 				}
 				if( ! targetObject.material.materials ) {
 					console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
-					return;				
+					return;
 				}
 				targetObject = targetObject.material.materials;
 			}
@@ -112,7 +112,7 @@ THREE.PropertyBinding.prototype = {
 					return;
 				}
 				// potential future optimization: skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
-				
+
 				targetObject = targetObject.skeleton.bones;
 
 				// support resolving morphTarget names into indices.
@@ -126,16 +126,16 @@ THREE.PropertyBinding.prototype = {
 			else {
 
 				if( targetObject[ this.objectName ] === undefined ) {
-					console.error( '  can not bind to objectName of node, undefined', this );			
+					console.error( '  can not bind to objectName of node, undefined', this );
 					return;
 				}
 				targetObject = targetObject[ this.objectName ];
 			}
-			
+
 			if( this.objectIndex !== undefined ) {
 				if( targetObject[ this.objectIndex ] === undefined ) {
 					console.error( "  trying to bind to objectIndex of objectName, but is undefined:", this, targetObject );
-					return;				
+					return;
 				}
 
 				targetObject = targetObject[ this.objectIndex ];
@@ -146,7 +146,7 @@ THREE.PropertyBinding.prototype = {
  		// special case mappings
  		var nodeProperty = targetObject[ this.propertyName ];
 		if( ! nodeProperty ) {
-			console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );				
+			console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );
 			return;
 		}
 
@@ -155,15 +155,15 @@ THREE.PropertyBinding.prototype = {
 
 			if( this.propertyName === "morphTargetInfluences" ) {
 				// potential optimization, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
-				
+
 				// support resolving morphTarget names into indices.
 				if( ! targetObject.geometry ) {
-					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );				
+					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );
 				}
 				if( ! targetObject.geometry.morphTargets ) {
-					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );				
+					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );
 				}
-				
+
 				for( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
 					if( targetObject.geometry.morphTargets[i].name === this.propertyIndex ) {
 						this.propertyIndex = i;
@@ -185,9 +185,9 @@ THREE.PropertyBinding.prototype = {
 			};
 
 		}
-		// must use copy for Object3D.Euler/Quaternion		
+		// must use copy for Object3D.Euler/Quaternion
 		else if( nodeProperty.copy ) {
-			
+
 			this.setValue = function setValue_propertyObject( value ) {
 				if( ! this.equalsValue( nodeProperty, value ) ) {
 					nodeProperty.copy( value );
@@ -206,7 +206,7 @@ THREE.PropertyBinding.prototype = {
 
 			this.setValue = function setValue_property( value ) {
 				if( ! this.equalsValue( targetObject[ this.propertyName ], value ) ) {
-					targetObject[ this.propertyName ] = value;	
+					targetObject[ this.propertyName ] = value;
 					return true;
 				}
 				return false;
@@ -218,16 +218,16 @@ THREE.PropertyBinding.prototype = {
 
 		}
 
-		// trigger node dirty			
+		// trigger node dirty
 		if( targetObject.needsUpdate !== undefined ) { // material
-			
+
 			this.triggerDirty = function triggerDirty_needsUpdate() {
 				this.node.needsUpdate = true;
 			}
 
-		}			
+		}
 		else if( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
-			
+
 			this.triggerDirty = function triggerDirty_matrixWorldNeedsUpdate() {
 				targetObject.matrixWorldNeedsUpdate = true;
 			}
@@ -250,7 +250,7 @@ THREE.PropertyBinding.prototype = {
 
 		// early exit if there is nothing to apply.
 		if( this.cumulativeWeight > 0 ) {
-		
+
 			// blend with original value
 			if( this.cumulativeWeight < 1 ) {
 
@@ -289,7 +289,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	//	  .bone[Armature.DEF_cog].position
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_. ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/; 
+	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_. ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
 	var matches = re.exec(trackName);
 
 	if( ! matches ) {
@@ -375,7 +375,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 			}
 
-			return null;	
+			return null;
 
 		};
 

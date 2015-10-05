@@ -2,7 +2,7 @@
  * @author timothypratley / https://github.com/timothypratley
  */
 
-THREE.TetrahedronGeometry = function ( radius, detail ) {
+THREE.TetrahedronGeometry = function TetrahedronGeometry ( radius, detail ) {
 
 	var vertices = [
 		 1,  1,  1,   - 1, - 1,  1,   - 1,  1, - 1,    1, - 1, - 1

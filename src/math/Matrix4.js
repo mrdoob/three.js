@@ -11,7 +11,7 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.Matrix4 = function () {
+THREE.Matrix4 = function Matrix4 () {
 
 	this.elements = new Float32Array( [
 

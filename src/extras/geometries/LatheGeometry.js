@@ -4,14 +4,14 @@
  * @author bhouston / http://clara.io
  */
 
-// points - to create a closed torus, one must use a set of points 
+// points - to create a closed torus, one must use a set of points
 //    like so: [ a, b, c, d, a ], see first is the same as last.
 // segments - the number of circumference segments to create
 // phiStart - the starting radian
 // phiLength - the radian (0 to 2*PI) range of the lathed section
 //    2*pi is a closed lathe, less than 2PI is a portion.
 
-THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
+THREE.LatheGeometry = function LatheGeometry ( points, segments, phiStart, phiLength ) {
 
 	THREE.Geometry.call( this );
 

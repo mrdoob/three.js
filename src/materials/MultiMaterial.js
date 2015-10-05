@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MultiMaterial = function ( materials ) {
+THREE.MultiMaterial = function MultiMaterial ( materials ) {
 
 	this.uuid = THREE.Math.generateUUID();
 

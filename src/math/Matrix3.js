@@ -4,7 +4,7 @@
  * @author bhouston / http://clara.io
  */
 
-THREE.Matrix3 = function () {
+THREE.Matrix3 = function Matrix3 () {
 
 	this.elements = new Float32Array( [
 

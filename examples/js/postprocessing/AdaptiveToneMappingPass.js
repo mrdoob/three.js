@@ -7,7 +7,7 @@
  * Full-screen tone-mapping shader based on http://www.graphics.cornell.edu/~jaf/publications/sig02_paper.pdf
  */
 
-THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
+THREE.AdaptiveToneMappingPass = function AdaptiveToneMappingPass ( adaptive, resolution ) {
 
 	this.resolution = ( resolution !== undefined ) ? resolution : 256;
 	this.needsInit = true;

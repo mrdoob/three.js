@@ -4,7 +4,7 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.SpotLightHelper = function ( light ) {
+THREE.SpotLightHelper = function SpotLightHelper ( light ) {
 
 	THREE.Object3D.call( this );
 

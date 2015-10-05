@@ -5,7 +5,7 @@
  * @author bhouston / http://clara.io
  */
 
-THREE.Quaternion = function ( x, y, z, w ) {
+THREE.Quaternion = function Quaternion ( x, y, z, w ) {
 
 	this._x = x || 0;
 	this._y = y || 0;

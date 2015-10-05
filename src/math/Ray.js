@@ -2,7 +2,7 @@
  * @author bhouston / http://clara.io
  */
 
-THREE.Ray = function ( origin, direction ) {
+THREE.Ray = function Ray ( origin, direction ) {
 
 	this.origin = ( origin !== undefined ) ? origin : new THREE.Vector3();
 	this.direction = ( direction !== undefined ) ? direction : new THREE.Vector3();

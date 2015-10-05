@@ -6,7 +6,7 @@
 
 ( function ( THREE ) {
 
-	THREE.Raycaster = function ( origin, direction, near, far ) {
+	THREE.Raycaster = function Raycaster ( origin, direction, near, far ) {
 
 		this.ray = new THREE.Ray( origin, direction );
 		// direction is assumed to be normalized (for accurate distance calculations)

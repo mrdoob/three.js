@@ -3,7 +3,7 @@
  * based on THREE.SphereGeometry
  */
 
-THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+THREE.SphereBufferGeometry = function SphereBufferGeometry ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
 	THREE.BufferGeometry.call( this );
 

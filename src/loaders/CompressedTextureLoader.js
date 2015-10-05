@@ -4,7 +4,7 @@
  * Abstract Base class to block based textures loader (dds, pvr, ...)
  */
 
-THREE.CompressedTextureLoader = function ( manager ) {
+THREE.CompressedTextureLoader = function CompressedTextureLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 

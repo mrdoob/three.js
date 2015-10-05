@@ -4,7 +4,7 @@
  *
  **/
 
-THREE.Path = function ( points ) {
+THREE.Path = function Path ( points ) {
 
 	THREE.CurvePath.call( this );
 
@@ -402,7 +402,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			var cos, sin;
 			if ( aRotation !== 0 ) {
-		
+
 				cos = Math.cos( aRotation );
 				sin = Math.sin( aRotation );
 

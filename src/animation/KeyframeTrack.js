@@ -6,7 +6,7 @@
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.KeyframeTrack = function ( name, keys ) {
+THREE.KeyframeTrack = function KeyframeTrack ( name, keys ) {
 
 	if( name === undefined ) throw new Error( "track name is undefined" );
 	if( keys === undefined || keys.length === 0 ) throw new Error( "no keys in track named " + name );

@@ -3,7 +3,7 @@
  */
 
 
-THREE.BokehPass = function ( scene, camera, params ) {
+THREE.BokehPass = function BokehPass ( scene, camera, params ) {
 
 	this.scene = scene;
 	this.camera = camera;
@@ -37,7 +37,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 		console.error( "THREE.BokehPass relies on THREE.BokehShader" );
 
 	}
-	
+
 	var bokehShader = THREE.BokehShader;
 	var bokehUniforms = THREE.UniformsUtils.clone( bokehShader.uniforms );
 
@@ -99,4 +99,3 @@ THREE.BokehPass.prototype = {
 	}
 
 };
-

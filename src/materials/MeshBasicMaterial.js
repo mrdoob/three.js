@@ -36,7 +36,7 @@
  * }
  */
 
-THREE.MeshBasicMaterial = function ( parameters ) {
+THREE.MeshBasicMaterial = function MeshBasicMaterial ( parameters ) {
 
 	THREE.Material.call( this );
 
@@ -80,7 +80,7 @@ THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.MeshBasicMaterial.prototype.constructor = THREE.MeshBasicMaterial;
 
 THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
-	
+
 	THREE.Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
@@ -112,7 +112,7 @@ THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
 
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
-	
+
 	return this;
 
 };

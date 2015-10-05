@@ -2,7 +2,7 @@
  *	Cubic Bezier curve
  **************************************************************/
 
-THREE.CubicBezierCurve = function ( v0, v1, v2, v3 ) {
+THREE.CubicBezierCurve = function CubicBezierCurve ( v0, v1, v2, v3 ) {
 
 	this.v0 = v0;
 	this.v1 = v1;

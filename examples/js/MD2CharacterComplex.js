@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.MD2CharacterComplex = function () {
+THREE.MD2CharacterComplex = function MD2CharacterComplex () {
 
 	var scope = this;
 

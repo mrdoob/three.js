@@ -2,7 +2,7 @@
  *	Arc curve
  **************************************************************/
 
-THREE.ArcCurve = function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
+THREE.ArcCurve = function ArcCurve ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
 	THREE.EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 

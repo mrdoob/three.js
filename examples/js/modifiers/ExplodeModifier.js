@@ -5,7 +5,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ExplodeModifier = function () {
+THREE.ExplodeModifier = function ExplodeModifier () {
 
 };
 

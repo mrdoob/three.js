@@ -2,7 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLObjects = function ( gl, properties, info ) {
+THREE.WebGLObjects = function WebGLObjects ( gl, properties, info ) {
 
 	var geometries = new THREE.WebGLGeometries( gl, properties, info );
 

@@ -6,7 +6,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Spline = function ( points ) {
+THREE.Spline = function Spline ( points ) {
 
 	this.points = points;
 

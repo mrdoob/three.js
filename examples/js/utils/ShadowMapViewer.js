@@ -27,7 +27,7 @@
  *	6) If you set the position or size members directly, you need to call shadowMapViewer.update();
  */
 
-THREE.ShadowMapViewer = function ( light ) {
+THREE.ShadowMapViewer = function ShadowMapViewer ( light ) {
 
 	//- Internals
 	var scope = this;
@@ -35,7 +35,7 @@ THREE.ShadowMapViewer = function ( light ) {
 	var userAutoClearSetting;
 
 	//Holds the initial position and dimension of the HUD
-	var frame = { 
+	var frame = {
 		x: 10,
 		y: 10,
 		width: 256,
@@ -103,7 +103,7 @@ THREE.ShadowMapViewer = function ( light ) {
 
 	//- API
 	// Set to false to disable displaying this shadow map
-	this.enabled = true; 
+	this.enabled = true;
 
 	// Set the size of the displayed shadow map on the HUD
 	this.size = {

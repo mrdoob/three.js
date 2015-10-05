@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.TexturePass = function ( texture, opacity ) {
+THREE.TexturePass = function TexturePass ( texture, opacity ) {
 
 	if ( THREE.CopyShader === undefined )
 		console.error( "THREE.TexturePass relies on THREE.CopyShader" );

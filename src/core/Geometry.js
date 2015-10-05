@@ -7,7 +7,7 @@
  * @author bhouston / http://clara.io
  */
 
-THREE.Geometry = function () {
+THREE.Geometry = function Geometry () {
 
 	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
 

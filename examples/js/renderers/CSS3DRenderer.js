@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.CSS3DObject = function ( element ) {
+THREE.CSS3DObject = function CSS3DObject ( element ) {
 
 	THREE.Object3D.call( this );
 
@@ -25,7 +25,7 @@ THREE.CSS3DObject = function ( element ) {
 THREE.CSS3DObject.prototype = Object.create( THREE.Object3D.prototype );
 THREE.CSS3DObject.prototype.constructor = THREE.CSS3DObject;
 
-THREE.CSS3DSprite = function ( element ) {
+THREE.CSS3DSprite = function CSS3DSprite ( element ) {
 
 	THREE.CSS3DObject.call( this, element );
 
@@ -36,7 +36,7 @@ THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite;
 
 //
 
-THREE.CSS3DRenderer = function () {
+THREE.CSS3DRenderer = function CSS3DRenderer () {
 
 	console.log( 'THREE.CSS3DRenderer', THREE.REVISION );
 

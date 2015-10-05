@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Line = function ( geometry, material, mode ) {
+THREE.Line = function Line ( geometry, material, mode ) {
 
 	if ( mode === 1 ) {
 

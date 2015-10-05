@@ -34,7 +34,7 @@
  *	Abstract Curve base class
  **************************************************************/
 
-THREE.Curve = function () {
+THREE.Curve = function Curve () {
 
 };
 

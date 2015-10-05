@@ -51,7 +51,7 @@ THREE.ShaderLib[ 'mirror' ] = {
 
 };
 
-THREE.Mirror = function ( renderer, camera, options ) {
+THREE.Mirror = function Mirror ( renderer, camera, options ) {
 
 	THREE.Object3D.call( this );
 

@@ -2,7 +2,7 @@
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InterleavedBufferAttribute = function ( interleavedBuffer, itemSize, offset ) {
+THREE.InterleavedBufferAttribute = function InterleavedBufferAttribute ( interleavedBuffer, itemSize, offset ) {
 
 	this.uuid = THREE.Math.generateUUID();
 

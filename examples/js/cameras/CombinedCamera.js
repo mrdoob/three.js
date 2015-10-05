@@ -9,7 +9,7 @@
  */
 
 
-THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orthoFar ) {
+THREE.CombinedCamera = function CombinedCamera ( width, height, fov, near, far, orthoNear, orthoFar ) {
 
 	THREE.Camera.call( this );
 

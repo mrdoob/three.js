@@ -3,7 +3,7 @@
  */
 
 
-THREE.PointLight = function ( color, intensity, distance, decay ) {
+THREE.PointLight = function PointLight ( color, intensity, distance, decay ) {
 
 	THREE.Light.call( this, color );
 

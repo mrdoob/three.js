@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Material = function () {
+THREE.Material = function Material () {
 
 	Object.defineProperty( this, 'id', { value: THREE.MaterialIdCount ++ } );
 

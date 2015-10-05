@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.DotScreenPass = function ( center, angle, scale ) {
+THREE.DotScreenPass = function DotScreenPass ( center, angle, scale ) {
 
 	if ( THREE.DotScreenShader === undefined )
 		console.error( "THREE.DotScreenPass relies on THREE.DotScreenShader" );

@@ -2,7 +2,7 @@
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedInterleavedBuffer = function ( array, stride, meshPerAttribute ) {
+THREE.InstancedInterleavedBuffer = function InstancedInterleavedBuffer ( array, stride, meshPerAttribute ) {
 
 	THREE.InterleavedBuffer.call( this, array, stride );
 

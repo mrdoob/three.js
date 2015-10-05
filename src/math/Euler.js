@@ -4,7 +4,7 @@
  * @author bhouston / http://clara.io
  */
 
-THREE.Euler = function ( x, y, z, order ) {
+THREE.Euler = function Euler ( x, y, z, order ) {
 
 	this._x = x || 0;
 	this._y = y || 0;

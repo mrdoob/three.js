@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Loader = function () {
+THREE.Loader = function Loader () {
 
 	this.onLoadStart = function () {};
 	this.onLoadProgress = function () {};

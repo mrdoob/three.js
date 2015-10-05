@@ -1,12 +1,12 @@
 /**
  *
  * A Track that interpolates Quaternion
- * 
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.QuaternionKeyframeTrack = function ( name, keys ) {
+THREE.QuaternionKeyframeTrack = function QuaternionKeyframeTrack ( name, keys ) {
 
 	THREE.KeyframeTrack.call( this, name, keys );
 
@@ -14,7 +14,7 @@ THREE.QuaternionKeyframeTrack = function ( name, keys ) {
 	this.result = this.keys[0].value.clone();
 
 };
- 
+
 THREE.QuaternionKeyframeTrack.prototype = Object.create( THREE.KeyframeTrack.prototype );
 
 THREE.QuaternionKeyframeTrack.prototype.constructor = THREE.QuaternionKeyframeTrack;
@@ -44,7 +44,7 @@ THREE.QuaternionKeyframeTrack.prototype.multiply = function( quat ) {
 	for( var i = 0; i < this.keys.length; i ++ ) {
 
 		this.keys[i].value.multiply( quat );
-		
+
 	}
 
 	return this;
@@ -56,7 +56,7 @@ THREE.QuaternionKeyframeTrack.prototype.clone = function() {
 	var clonedKeys = [];
 
 	for( var i = 0; i < this.keys.length; i ++ ) {
-		
+
 		var key = this.keys[i];
 		clonedKeys.push( {
 			time: key.time,
@@ -83,4 +83,3 @@ THREE.QuaternionKeyframeTrack.parse = function( json ) {
 	return new THREE.QuaternionKeyframeTrack( json.name, keys );
 
 };
- 

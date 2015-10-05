@@ -1,4 +1,4 @@
-/*    
+/*
  *	 PVRLoader
  *   Author: pierre lepers
  *   Date: 17/09/2014 11:09
@@ -8,7 +8,7 @@
  *   TODO : implement loadMipmaps option
  */
 
-THREE.PVRLoader = function ( manager ) {
+THREE.PVRLoader = function PVRLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
@@ -36,7 +36,7 @@ THREE.PVRLoader.parse = function ( buffer, loadMipmaps ) {
 
 		return THREE.PVRLoader._parseV3( pvrDatas );
 
-	} 
+	}
 	// PVR v2
 	else if ( header[ 11 ] === 0x21525650 ) {
 
@@ -51,10 +51,10 @@ THREE.PVRLoader.parse = function ( buffer, loadMipmaps ) {
 };
 
 THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
-	
+
 	var header = pvrDatas.header;
 	var bpp, format;
-	
+
 
 	var metaLen 	  = header[ 12 ],
 		pixelFormat   =  header[ 2 ],
@@ -141,7 +141,7 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 
 	} else
 		throw new Error( "pvrtc - unknown format " + formatFlags );
-	
+
 
 
 	pvrDatas.dataPtr 	 = headerLength;
@@ -162,14 +162,14 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 
 
 THREE.PVRLoader._extract = function ( pvrDatas ) {
-	
+
 	var pvr = {
-		mipmaps: [], 
-		width: pvrDatas.width, 
-		height: pvrDatas.height, 
-		format: pvrDatas.format, 
-		mipmapCount: pvrDatas.numMipmaps, 
-		isCubemap : pvrDatas.isCubemap 
+		mipmaps: [],
+		width: pvrDatas.width,
+		height: pvrDatas.height,
+		format: pvrDatas.format,
+		mipmapCount: pvrDatas.numMipmaps,
+		isCubemap : pvrDatas.isCubemap
 	};
 
 	var buffer = pvrDatas.buffer;
@@ -246,10 +246,10 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 
 			var byteArray = new Uint8Array( buffer, dataOffset, dataSize );
 
-			var mipmap = { 
-				data: byteArray, 
-				width: sWidth, 
-				height: sHeight 
+			var mipmap = {
+				data: byteArray,
+				width: sWidth,
+				height: sHeight
 			};
 
 			pvr.mipmaps[ surfIndex * pvrDatas.numMipmaps + mipLevel ] = mipmap;

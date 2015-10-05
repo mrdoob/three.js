@@ -1,6 +1,6 @@
 THREE = {};
-    
-THREE.Vector3 = function ( x, y, z ) {
+
+THREE.Vector3 = function Vector3 ( x, y, z ) {
 
     this.x = x || 0;
     this.y = y || 0;
@@ -11,16 +11,16 @@ THREE.Vector3 = function ( x, y, z ) {
 THREE.Vector3.prototype = {
 
     constructor: THREE.Vector3,
-    
+
     length: function () {
 
             return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
 
     }
-    
+
 };
 
-THREE.Vector3X = function ( x, y, z ) {
+THREE.Vector3X = function Vector3X ( x, y, z ) {
 
     var elements = this.elements = new Float32Array( 3 );
     elements[0] = x || 0;
@@ -32,17 +32,17 @@ THREE.Vector3X = function ( x, y, z ) {
 THREE.Vector3X.prototype = {
 
     constructor: THREE.Vector3X,
-    
+
     length: function () {
 
             return Math.sqrt( this.elements[0] * this.elements[0] + this.elements[1] * this.elements[1] + this.elements[2] * this.elements[2] );
 
     }
-    
+
 };
 
 
-THREE.Vector3Y = function ( x, y, z ) {
+THREE.Vector3Y = function Vector3Y ( x, y, z ) {
 
     this.elements = [ x || 0, y || 1, z || 2 ];
 
@@ -51,13 +51,13 @@ THREE.Vector3Y = function ( x, y, z ) {
 THREE.Vector3Y.prototype = {
 
     constructor: THREE.Vector3Y,
-    
+
     length: function () {
 
             return Math.sqrt( this.elements[0] * this.elements[0] + this.elements[1] * this.elements[1] + this.elements[2] * this.elements[2] );
 
     }
-    
+
 };
 
 

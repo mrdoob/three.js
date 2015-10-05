@@ -3,7 +3,7 @@
  * @author willy-vvu / http://willy-vvu.github.io
  */
 
-THREE.MorphAnimation = function ( mesh ) {
+THREE.MorphAnimation = function MorphAnimation ( mesh ) {
 
 	this.mesh = mesh;
 	this.frames = mesh.morphTargetInfluences.length;

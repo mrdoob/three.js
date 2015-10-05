@@ -5,7 +5,7 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.EditorControls = function ( object, domElement ) {
+THREE.EditorControls = function EditorControls ( object, domElement ) {
 
 	domElement = ( domElement !== undefined ) ? domElement : document;
 

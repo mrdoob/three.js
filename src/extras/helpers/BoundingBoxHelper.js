@@ -4,7 +4,7 @@
 
 // a helper to show the world-axis-aligned bounding box for an object
 
-THREE.BoundingBoxHelper = function ( object, hex ) {
+THREE.BoundingBoxHelper = function BoundingBoxHelper ( object, hex ) {
 
 	var color = ( hex !== undefined ) ? hex : 0x888888;
 

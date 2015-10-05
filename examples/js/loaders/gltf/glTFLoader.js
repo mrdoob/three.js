@@ -3,7 +3,7 @@
  */
 
 
-THREE.glTFLoader = function () {
+THREE.glTFLoader = function glTFLoader () {
 	this.meshesRequested = 0;
 	this.meshesLoaded = 0;
 	this.pendingMeshes = [];

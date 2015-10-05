@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com
  */
 
-THREE.VRControls = function ( object, onError ) {
+THREE.VRControls = function VRControls ( object, onError ) {
 
 	var scope = this;
 

@@ -2,7 +2,7 @@
  * @author bhouston / http://clara.io/
  */
 
-THREE.AnimationLoader = function ( manager ) {
+THREE.AnimationLoader = function AnimationLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 

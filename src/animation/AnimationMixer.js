@@ -7,7 +7,7 @@
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.AnimationMixer = function( root ) {
+THREE.AnimationMixer = function AnimationMixer ( root ) {
 
 	this.root = root;
 	this.time = 0;
@@ -37,19 +37,19 @@ THREE.AnimationMixer.prototype = {
 
 			var track = tracks[ i ];
 
-			var propertyBindingKey = root.uuid + '-' + track.name;			
+			var propertyBindingKey = root.uuid + '-' + track.name;
 			var propertyBinding = this.propertyBindingMap[ propertyBindingKey ];
 
 			if( propertyBinding === undefined ) {
-			
+
 				propertyBinding = new THREE.PropertyBinding( root, track.name );
 				this.propertyBindingMap[ propertyBindingKey ] = propertyBinding;
-			
+
 			}
 
 			// push in the same order as the tracks.
 			action.propertyBindings.push( propertyBinding );
-			
+
 			// track usages of shared property bindings, because if we leave too many around, the mixer can get slow
 			propertyBinding.referenceCount += 1;
 
@@ -62,7 +62,7 @@ THREE.AnimationMixer.prototype = {
 		for( var i = 0; i < this.actions.length; i ++ ) {
 
 			this.actions[i].mixer = null;
-			
+
 		}
 
 		// unbind all property bindings
@@ -96,12 +96,12 @@ THREE.AnimationMixer.prototype = {
 		var tracks = action.clip.tracks;
 
 		for( var i = 0; i < tracks.length; i ++ ) {
-		
+
 			var track = tracks[ i ];
 
-			var propertyBindingKey = root.uuid + '-' + track.name;			
+			var propertyBindingKey = root.uuid + '-' + track.name;
 			var propertyBinding = this.propertyBindingMap[ propertyBindingKey ];
-	
+
 			propertyBinding.referenceCount -= 1;
 
 			if( propertyBinding.referenceCount <= 0 ) {
@@ -145,7 +145,7 @@ THREE.AnimationMixer.prototype = {
 
 		keys.push( { time: this.time, value: 1 } );
 		keys.push( { time: this.time + duration, value: 0 } );
-		
+
 		action.weight = new THREE.NumberKeyframeTrack( "weight", keys );
 
 		return this;
@@ -153,12 +153,12 @@ THREE.AnimationMixer.prototype = {
 	},
 
 	fadeIn: function( action, duration ) {
-		
+
 		var keys = [];
-		
+
 		keys.push( { time: this.time, value: 0 } );
 		keys.push( { time: this.time + duration, value: 1 } );
-		
+
 		action.weight = new THREE.NumberKeyframeTrack( "weight", keys );
 
 		return this;
@@ -168,10 +168,10 @@ THREE.AnimationMixer.prototype = {
 	warp: function( action, startTimeScale, endTimeScale, duration ) {
 
 		var keys = [];
-		
+
 		keys.push( { time: this.time, value: startTimeScale } );
 		keys.push( { time: this.time + duration, value: endTimeScale } );
-		
+
 		action.timeScale = new THREE.NumberKeyframeTrack( "timeScale", keys );
 
 		return this;
@@ -184,7 +184,7 @@ THREE.AnimationMixer.prototype = {
 		this.fadeIn( fadeInAction, duration );
 
 		if( warp ) {
-	
+
 			var startEndRatio = fadeOutAction.clip.duration / fadeInAction.clip.duration;
 			var endStartRatio = 1.0 / startEndRatio;
 
@@ -194,7 +194,7 @@ THREE.AnimationMixer.prototype = {
 		}
 
 		return this;
-		
+
 	},
 
 	update: function( deltaTime ) {
@@ -210,7 +210,7 @@ THREE.AnimationMixer.prototype = {
 
 			var actionTimeScale = action.getTimeScaleAt( this.time );
 			var actionDeltaTime = mixerDeltaTime * actionTimeScale;
-		
+
 			var actionResults = action.update( actionDeltaTime );
 
 			if( action.weight <= 0 || ! action.enabled ) continue;
@@ -224,7 +224,7 @@ THREE.AnimationMixer.prototype = {
 			}
 
 		}
-	
+
 		// apply to nodes
 		for( var propertyBindingKey in this.propertyBindingMap ) {
 
@@ -233,7 +233,7 @@ THREE.AnimationMixer.prototype = {
 		}
 
 		return this;
-		
+
 	}
 
 };

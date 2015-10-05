@@ -5,7 +5,7 @@
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
 
-THREE.HDRLoader = THREE.RGBELoader = function ( manager ) {
+THREE.HDRLoader = THREE.RGBELoader = function HDRLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
@@ -112,16 +112,16 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 
 					programtype: 'RGBE',              /* listed at beginning of file to identify it
 													* after "#?".  defaults to "RGBE" */
-														
+
 					format: '',                       /* RGBE format, default 32-bit_rle_rgbe */
 
 					gamma: 1.0,                       /* image has already been gamma corrected with
 													* given gamma.  defaults to 1.0 (no correction) */
-														
+
 					exposure: 1.0,                    /* a value of 1.0 in an image corresponds to
 													* <exposure> watts/steradian/m^2.
 													* defaults to 1.0 */
-														
+
 					width: 0, height: 0               /* image dimensions, width/height */
 
 				}

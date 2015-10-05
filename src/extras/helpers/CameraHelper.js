@@ -7,7 +7,7 @@
  *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
  */
 
-THREE.CameraHelper = function ( camera ) {
+THREE.CameraHelper = function CameraHelper ( camera ) {
 
 	var geometry = new THREE.Geometry();
 	var material = new THREE.LineBasicMaterial( { color: 0xffffff, vertexColors: THREE.FaceColors } );

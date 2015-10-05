@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LineSegments = function ( geometry, material ) {
+THREE.LineSegments = function LineSegments ( geometry, material ) {
 
 	THREE.Line.call( this, geometry, material );
 

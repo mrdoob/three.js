@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com
  */
 
-THREE.WebGLRenderTargetCube = function ( width, height, options ) {
+THREE.WebGLRenderTargetCube = function WebGLRenderTargetCube ( width, height, options ) {
 
 	THREE.WebGLRenderTarget.call( this, width, height, options );
 

@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Group = function () {
+THREE.Group = function Group () {
 
 	THREE.Object3D.call( this );
 

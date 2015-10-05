@@ -1,4 +1,4 @@
-THREE.DecalVertex = function( v, n ) {
+THREE.DecalVertex = function DecalVertex ( v, n ) {
 
 	this.vertex = v;
 	this.normal = n;
@@ -11,7 +11,7 @@ THREE.DecalVertex.prototype.clone = function() {
 
 };
 
-THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
+THREE.DecalGeometry = function DecalGeometry ( mesh, position, rotation, dimensions, check ) {
 
 	THREE.Geometry.call( this );
 

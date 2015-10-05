@@ -1,12 +1,12 @@
 /**
  *
  * A Track that interpolates Numbers
- * 
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.NumberKeyframeTrack = function ( name, keys ) {
+THREE.NumberKeyframeTrack = function NumberKeyframeTrack ( name, keys ) {
 
 	THREE.KeyframeTrack.call( this, name, keys );
 
@@ -44,7 +44,7 @@ THREE.NumberKeyframeTrack.prototype.clone = function() {
 	var clonedKeys = [];
 
 	for( var i = 0; i < this.keys.length; i ++ ) {
-		
+
 		var key = this.keys[i];
 		clonedKeys.push( {
 			time: key.time,
@@ -61,4 +61,3 @@ THREE.NumberKeyframeTrack.parse = function( json ) {
 	return new THREE.NumberKeyframeTrack( json.name, json.keys );
 
 };
- 

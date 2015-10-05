@@ -8,7 +8,7 @@
  *  curves, but retains the api of a curve
  **************************************************************/
 
-THREE.CurvePath = function () {
+THREE.CurvePath = function CurvePath () {
 
 	this.curves = [];
 	this.bends = [];

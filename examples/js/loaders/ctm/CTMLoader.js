@@ -8,12 +8,12 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.CTMLoader = function () {
+THREE.CTMLoader = function CTMLoader () {
 
 	THREE.Loader.call( this );
 
 	// Deprecated
-	
+
 	Object.defineProperties( this, {
 		statusDomElement: {
 			get: function () {

@@ -1,19 +1,19 @@
-/* 
+/*
  * @author zz85 / http://github.com/zz85
  * @author WestLangley / http://github.com/WestLangley
  *
- * tool for "unwrapping" and debugging three.js 
+ * tool for "unwrapping" and debugging three.js
  * geometries UV mapping
  *
  * Sample usage:
  *	document.body.appendChild( THREE.UVsDebug( new THREE.SphereGeometry( 10, 10, 10, 10 ) );
  *
  */
- 
-THREE.UVsDebug = function( geometry, size ) {
+
+THREE.UVsDebug = function UVsDebug ( geometry, size ) {
 
 	// handles wrapping of uv.x > 1 only
-    
+
 	var abc = 'abc';
 
 	var uv, u, ax, ay;
@@ -120,4 +120,3 @@ THREE.UVsDebug = function( geometry, size ) {
 	return canvas;
 
 };
-

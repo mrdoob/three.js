@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.WebGLRenderTarget = function ( width, height, options ) {
+THREE.WebGLRenderTarget = function WebGLRenderTarget ( width, height, options ) {
 
 	this.uuid = THREE.Math.generateUUID();
 

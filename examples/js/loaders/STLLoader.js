@@ -27,7 +27,7 @@
  */
 
 
-THREE.STLLoader = function ( manager ) {
+THREE.STLLoader = function STLLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 

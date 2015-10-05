@@ -238,7 +238,7 @@ THREE.ShaderLib[ 'sky' ] = {
 
 };
 
-THREE.Sky = function () {
+THREE.Sky = function Sky () {
 
 	var skyShader = THREE.ShaderLib[ "sky" ];
 	var skyUniforms = THREE.UniformsUtils.clone( skyShader.uniforms );

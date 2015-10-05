@@ -1,7 +1,7 @@
 /*
- *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog 
+ *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
  *
- *	Subdivision Geometry Modifier 
+ *	Subdivision Geometry Modifier
  *		using Loop Subdivision Scheme
  *
  *	References:
@@ -15,7 +15,7 @@
  *
  */
 
-THREE.SubdivisionModifier = function ( subdivisions ) {
+THREE.SubdivisionModifier = function SubdivisionModifier ( subdivisions ) {
 
 	this.subdivisions = ( subdivisions === undefined ) ? 1 : subdivisions;
 
@@ -44,7 +44,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	// Some constants
 	var WARNINGS = ! true; // Set to true for development
 	var ABC = [ 'a', 'b', 'c' ];
-	
+
 
 	function getEdge( a, b, map ) {
 
@@ -72,7 +72,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 			edge = map[ key ];
 
 		} else {
-			
+
 			var vertexA = vertices[ vertexIndexA ];
 			var vertexB = vertices[ vertexIndexB ];
 
@@ -95,7 +95,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 		metaVertices[ a ].edges.push( edge );
 		metaVertices[ b ].edges.push( edge );
-		
+
 
 	}
 
@@ -108,7 +108,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 			metaVertices[ i ] = { edges: [] };
 
 		}
-		
+
 		for ( i = 0, il = faces.length; i < il; i ++ ) {
 
 			face = faces[ i ];
@@ -161,7 +161,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 		/******************************************************
 		 *
-		 *	Step 1. 
+		 *	Step 1.
 		 *	For each edge, create a new Edge Vertex,
 		 *	then position it.
 		 *
@@ -189,9 +189,9 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 				adjacentVertexWeight = 0;
 
 				if ( connectedFaces != 1 ) {
-					
+
 					if ( WARNINGS ) console.warn( 'Subdivision Modifier: Number of connected faces != 2, is: ', connectedFaces, currentEdge );
-			
+
 				}
 
 			}
@@ -203,7 +203,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 			for ( j = 0; j < connectedFaces; j ++ ) {
 
 				face = currentEdge.faces[ j ];
-				
+
 				for ( k = 0; k < 3; k ++ ) {
 
 					other = oldVertices[ face[ ABC[ k ] ] ];
@@ -227,7 +227,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 		/******************************************************
 		 *
-		 *	Step 2. 
+		 *	Step 2.
 		 *	Reposition each source vertices.
 		 *
 		 *******************************************************/
@@ -262,7 +262,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 			connectingVertexWeight = beta;
 
 			if ( n <= 2 ) {
-				
+
 				// crease and boundary rules
 				// console.warn('crease and boundary rules');
 
@@ -282,9 +282,9 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 				} else if ( n == 0 ) {
 
 					if ( WARNINGS ) console.warn( '0 connecting edges' );
-			
+
 				}
-			
+
 			}
 
 			newSourceVertex = oldVertex.clone().multiplyScalar( sourceVertexWeight );
@@ -301,15 +301,15 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 			tmp.multiplyScalar( connectingVertexWeight );
 			newSourceVertex.add( tmp );
-			
+
 			newSourceVertices.push( newSourceVertex );
 
 		}
 
-							   
+
 		/******************************************************
 		 *
-		 *	Step 3. 
+		 *	Step 3.
 		 *	Generate Faces between source vertecies
 		 *	and edge vertices.
 		 *

@@ -2,7 +2,7 @@
  *	Line
  **************************************************************/
 
-THREE.LineCurve = function ( v1, v2 ) {
+THREE.LineCurve = function LineCurve ( v1, v2 ) {
 
 	this.v1 = v1;
 	this.v2 = v2;

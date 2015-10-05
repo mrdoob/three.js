@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.MD2Character = function () {
+THREE.MD2Character = function MD2Character () {
 
 	var scope = this;
 
@@ -198,7 +198,7 @@ THREE.MD2Character = function () {
 			}
 
 		}
-			
+
 	}
 
 	this.update = function ( delta ) {
@@ -240,7 +240,7 @@ THREE.MD2Character = function () {
 
 		mesh.materialTexture = materialTexture;
 		mesh.materialWireframe = materialWireframe;
-	
+
 		return mesh;
 
 	}

@@ -7,7 +7,7 @@
  * 16 April 2012 - @blurspline
  */
 
-THREE.AsciiEffect = function ( renderer, charSet, options ) {
+THREE.AsciiEffect = function AsciiEffect ( renderer, charSet, options ) {
 
 	// its fun to create one your own!
 

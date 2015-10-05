@@ -8,7 +8,7 @@
 	'use strict';
 
 
-	var GizmoMaterial = function ( parameters ) {
+	var GizmoMaterial = function GizmoMaterial ( parameters ) {
 
 		THREE.MeshBasicMaterial.call( this );
 
@@ -44,7 +44,7 @@
 	GizmoMaterial.prototype.constructor = GizmoMaterial;
 
 
-	var GizmoLineMaterial = function ( parameters ) {
+	var GizmoLineMaterial = function GizmoLineMaterial ( parameters ) {
 
 		THREE.LineBasicMaterial.call( this );
 
@@ -83,7 +83,7 @@
 	var pickerMaterial = new GizmoMaterial( { visible: false, transparent: false } );
 
 
-	THREE.TransformGizmo = function () {
+	THREE.TransformGizmo = function TransformGizmo () {
 
 		var scope = this;
 
@@ -223,7 +223,7 @@
 
 	};
 
-	THREE.TransformGizmoTranslate = function () {
+	THREE.TransformGizmoTranslate = function TransformGizmoTranslate () {
 
 		THREE.TransformGizmo.call( this );
 
@@ -356,7 +356,7 @@
 	THREE.TransformGizmoTranslate.prototype = Object.create( THREE.TransformGizmo.prototype );
 	THREE.TransformGizmoTranslate.prototype.constructor = THREE.TransformGizmoTranslate;
 
-	THREE.TransformGizmoRotate = function () {
+	THREE.TransformGizmoRotate = function TransformGizmoRotate () {
 
 		THREE.TransformGizmo.call( this );
 
@@ -506,7 +506,7 @@
 	THREE.TransformGizmoRotate.prototype = Object.create( THREE.TransformGizmo.prototype );
 	THREE.TransformGizmoRotate.prototype.constructor = THREE.TransformGizmoRotate;
 
-	THREE.TransformGizmoScale = function () {
+	THREE.TransformGizmoScale = function TransformGizmoScale () {
 
 		THREE.TransformGizmo.call( this );
 
@@ -606,7 +606,7 @@
 	THREE.TransformGizmoScale.prototype = Object.create( THREE.TransformGizmo.prototype );
 	THREE.TransformGizmoScale.prototype.constructor = THREE.TransformGizmoScale;
 
-	THREE.TransformControls = function ( camera, domElement ) {
+	THREE.TransformControls = function TransformControls ( camera, domElement ) {
 
 		// TODO: Make non-uniform scale and rotate play nice in hierarchies
 		// TODO: ADD RXYZ contol

@@ -1,4 +1,4 @@
-﻿THREE.Ocean = function ( renderer, camera, scene, options ) {
+﻿THREE.Ocean = function Ocean ( renderer, camera, scene, options ) {
 
 	// flag used to trigger parameter changes
 	this.changed = true;

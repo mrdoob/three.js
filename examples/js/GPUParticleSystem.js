@@ -15,7 +15,7 @@
  *
  */
 
-THREE.GPUParticleSystem = function(options) {
+THREE.GPUParticleSystem = function GPUParticleSystem ( options ) {
 
   var self = this;
   var options = options || {};
@@ -282,7 +282,7 @@ THREE.GPUParticleSystem.prototype.constructor = THREE.GPUParticleSystem;
 
 
 // Subclass for particle containers, allows for very large arrays to be spread out
-THREE.GPUParticleContainer = function(maxParticles, particleSystem) {
+THREE.GPUParticleContainer = function GPUParticleContainer ( maxParticles, particleSystem ) {
 
   var self = this;
   self.PARTICLE_COUNT = maxParticles || 100000;

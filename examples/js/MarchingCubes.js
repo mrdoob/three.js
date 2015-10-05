@@ -5,7 +5,7 @@
  * http://webglsamples.googlecode.com/hg/blob/blob.html
  */
 
-THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
+THREE.MarchingCubes = function MarchingCubes ( resolution, material, enableUvs, enableColors ) {
 
 	THREE.ImmediateRenderObject.call( this, material );
 

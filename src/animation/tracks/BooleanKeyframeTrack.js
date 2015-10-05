@@ -1,12 +1,12 @@
 /**
  *
  * A Track that interpolates Boolean
- * 
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.BooleanKeyframeTrack = function ( name, keys ) {
+THREE.BooleanKeyframeTrack = function BooleanKeyframeTrack ( name, keys ) {
 
 	THREE.KeyframeTrack.call( this, name, keys );
 
@@ -44,7 +44,7 @@ THREE.BooleanKeyframeTrack.prototype.clone = function() {
 	var clonedKeys = [];
 
 	for( var i = 0; i < this.keys.length; i ++ ) {
-		
+
 		var key = this.keys[i];
 		clonedKeys.push( {
 			time: key.time,
@@ -61,4 +61,3 @@ THREE.BooleanKeyframeTrack.parse = function( json ) {
 	return new THREE.BooleanKeyframeTrack( json.name, json.keys );
 
 };
- 

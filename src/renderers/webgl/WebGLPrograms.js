@@ -1,4 +1,4 @@
-THREE.WebGLPrograms = function ( renderer, capabilities ) {
+THREE.WebGLPrograms = function WebGLPrograms ( renderer, capabilities ) {
 
 	var programs = [];
 
@@ -20,7 +20,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 		"maxMorphTargets", "maxMorphNormals", "maxDirLights", "maxPointLights",
-		"maxSpotLights", "maxHemiLights", "maxShadows", "shadowMapEnabled", "pointLightShadows", 
+		"maxSpotLights", "maxHemiLights", "maxShadows", "shadowMapEnabled", "pointLightShadows",
 		"shadowMapType", "shadowMapDebug", "alphaTest", "metal", "doubleSided",
 		"flipSided"
 	];
@@ -105,7 +105,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 				maxShadows ++;
 				pointLightShadows ++;
 
-			} 
+			}
 
 		}
 

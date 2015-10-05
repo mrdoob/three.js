@@ -2,7 +2,7 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
+THREE.EdgesGeometry = function EdgesGeometry ( geometry, thresholdAngle ) {
 
 	THREE.BufferGeometry.call( this );
 

@@ -2,7 +2,7 @@
  * @author Michael Guerrero / http://realitymeltdown.com
  */
 
-THREE.BlendCharacter = function () {
+THREE.BlendCharacter = function BlendCharacter () {
 
 	this.animations = {};
 	this.weightSchedule = [];
@@ -22,7 +22,7 @@ THREE.BlendCharacter = function () {
 
 			scope.mixer = new THREE.AnimationMixer( scope );
 
-			// Create the animations		
+			// Create the animations
 			for ( var i = 0; i < geometry.animations.length; ++ i ) {
 
 				var animName = geometry.animations[ i ].name;
@@ -46,7 +46,7 @@ THREE.BlendCharacter = function () {
 	this.play = function( animName, weight ) {
 
 		this.mixer.removeAllActions();
-		
+
 		this.mixer.play( new THREE.AnimationAction( this.animations[ animName ] ) );
 
 	};
@@ -54,7 +54,7 @@ THREE.BlendCharacter = function () {
 	this.crossfade = function( fromAnimName, toAnimName, duration ) {
 
 		this.mixer.removeAllActions();
- 
+
 		var fromAction = new THREE.AnimationAction( this.animations[ fromAnimName ] );
 		var toAction = new THREE.AnimationAction( this.animations[ toAnimName ] );
 
@@ -137,4 +137,3 @@ THREE.BlendCharacter.prototype.getForward = function() {
 	}
 
 };
-
