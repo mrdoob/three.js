@@ -1,6 +1,6 @@
 module( "Serialization" );
 
-test( "Test Serialization (simple)", function() {
+test( "Test Serialization", function() {
 
 	// setup
 	var editor = new Editor();
