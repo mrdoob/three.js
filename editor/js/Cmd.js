@@ -36,6 +36,5 @@ Cmd.prototype.fromJSON = function ( json ) {
 	this.type = json.type;
 	this.id = json.id;
 	this.name = json.name;
-	this.json = json;
 
 };

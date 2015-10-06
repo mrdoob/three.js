@@ -70,10 +70,10 @@ History.prototype = {
 			cmd.id = ++this.idCounter;
 
 		}
-		cmd.name = optionalName !== undefined ? optionalName : cmd.name;
+		cmd.name = ( optionalName !== undefined ) ? optionalName : cmd.name;
 		cmd.execute();
 		cmd.inMemory = true;
-		cmd.json = cmd.toJSON();	// serialize cmd immediately after execution
+		cmd.json = cmd.toJSON();	// serialize the cmd immediately after execution and append the json to the cmd
 
 		this.lastCmdTime = new Date();
 
@@ -164,8 +164,7 @@ History.prototype = {
 
 		for ( var i = 0 ; i < this.undos.length; i++ ) {
 
-			var cmd = this.undos[ i ];
-			undos.push( cmd.json );
+			undos.push( this.undos[ i ].json );
 
 		}
 
@@ -177,8 +176,7 @@ History.prototype = {
 
 		for ( var i = 0 ; i < this.redos.length; i++ ) {
 
-			var cmd = this.redos[ i ];
-			redos.push( cmd.json );
+			redos.push( this.redos[ i ].json );
 
 		}
 
@@ -198,7 +196,7 @@ History.prototype = {
 			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			this.undos.push( cmd );
-			this.idCounter = cmdJSON.id > this.idCounter ? cmdJSON.id : this.idCounter; // set last used idCounter
+			this.idCounter = ( cmdJSON.id > this.idCounter ) ? cmdJSON.id : this.idCounter; // set last used idCounter
 
 		}
 
@@ -208,11 +206,12 @@ History.prototype = {
 			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			this.redos.push( cmd );
-			this.idCounter = cmdJSON.id > this.idCounter ? cmdJSON.id : this.idCounter; // set last used idCounter
+			this.idCounter = ( cmdJSON.id > this.idCounter ) ? cmdJSON.id : this.idCounter; // set last used idCounter
 
 		}
 
-		this.editor.signals.historyChanged.dispatch();
+		// Select the last executed undo-command
+		this.editor.signals.historyChanged.dispatch( this.undos[ this.undos.length - 1 ] );
 
 	},
 
