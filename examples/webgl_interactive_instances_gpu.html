@@ -84,7 +84,6 @@
 	<div id="container"></div>
 
 	<script src="../build/three.min.js"></script>
-	<script src="../src/renderers/WebGLRenderer.js"></script>
 	<script src="js/controls/TrackballControls.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 
@@ -274,7 +273,7 @@
 
 		var container, stats;
 		var camera, controls, scene, renderer;
-		var pickingData, pickingTexture, pickingScene;
+		var pickingData, pickingRenderTarget, pickingScene;
 		var highlightBox;
 		var materialList = [];
 		var geometryList = [];
@@ -744,13 +743,13 @@
 			);
 			camera.position.z = 40;
 
-			// picking texture
+			// picking render target
 
-			pickingTexture = new THREE.WebGLRenderTarget(
+			pickingRenderTarget = new THREE.WebGLRenderTarget(
 				window.innerWidth, window.innerHeight
 			);
-			pickingTexture.generateMipmaps = false;
-			pickingTexture.minFilter = THREE.NearestFilter;
+			pickingRenderTarget.texture.generateMipmaps = false;
+			pickingRenderTarget.texture.minFilter = THREE.NearestFilter;
 
 			// highlight box
 
@@ -845,14 +844,14 @@
 
 			// render the picking scene off-screen
 
-			renderer.render( pickingScene, camera, pickingTexture );
+			renderer.render( pickingScene, camera, pickingRenderTarget );
 
 			// read the pixel under the mouse from the texture
 
 			renderer.readRenderTargetPixels(
-				pickingTexture,
+				pickingRenderTarget,
 				mouse.x,
-				pickingTexture.height - mouse.y,
+				pickingRenderTarget.height - mouse.y,
 				1,
 				1,
 				pixelBuffer
