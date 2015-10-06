@@ -53,7 +53,7 @@ var Viewport = function ( editor ) {
 
 			}
 
-			signals.updateSidebar.dispatch( object );
+			signals.refreshSidebarObject3D.dispatch( object );
 
 		}
 
@@ -105,7 +105,6 @@ var Viewport = function ( editor ) {
 
 		}
 
-		signals.objectChanged.dispatch( object );
 		controls.enabled = true;
 
 	} );

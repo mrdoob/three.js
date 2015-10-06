@@ -63,7 +63,7 @@ var Editor = function () {
 		windowResize: new SIGNALS.Signal(),
 
 		showGridChanged: new SIGNALS.Signal(),
-		updateSidebar: new SIGNALS.Signal(),
+		refreshSidebarObject3D: new SIGNALS.Signal(),
 		historyChanged: new SIGNALS.Signal(),
 		refreshScriptEditor: new SIGNALS.Signal()
 

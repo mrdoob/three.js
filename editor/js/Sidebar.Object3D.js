@@ -56,8 +56,6 @@ Sidebar.Object3D = function ( editor ) {
 
 		this.setValue( 'Actions' );
 
-		signals.objectChanged.dispatch( object );
-
 	} );
 	container.addStatic( objectActions );
 
@@ -457,8 +455,6 @@ Sidebar.Object3D = function ( editor ) {
 
 			}
 
-			signals.objectChanged.dispatch( object );
-
 		}
 
 	}
@@ -546,7 +542,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	} );
 
-	signals.updateSidebar.add( function ( object ) {
+	signals.refreshSidebarObject3D.add( function ( object ) {
 
 		if ( object !== editor.selected ) return;
 
@@ -555,7 +551,7 @@ Sidebar.Object3D = function ( editor ) {
 	} );
 
 	function updateUI( object ) {
-
+		console.log("updateUI called");
 		objectType.setValue( object.type );
 
 		objectUUID.setValue( object.uuid );

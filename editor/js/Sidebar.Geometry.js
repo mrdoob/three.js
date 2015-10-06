@@ -54,7 +54,6 @@ Sidebar.Geometry = function ( editor ) {
 				editor.execute( new CmdSetPosition( object, newPosition ) );
 
 				editor.signals.geometryChanged.dispatch( object );
-				editor.signals.objectChanged.dispatch( object );
 
 				break;
 
@@ -81,16 +80,11 @@ Sidebar.Geometry = function ( editor ) {
 
 				editor.execute( new CmdMultiCmds( cmds ), 'Flatten Geometry' );
 
-				editor.signals.geometryChanged.dispatch( object );
-				editor.signals.objectChanged.dispatch( object );
-
 				break;
 
 		}
 
 		this.setValue( 'Actions' );
-
-		signals.objectChanged.dispatch( object );
 
 	} );
 	container.addStatic( objectActions );
@@ -184,7 +178,6 @@ Sidebar.Geometry = function ( editor ) {
 
 	signals.objectSelected.add( build );
 	signals.geometryChanged.add( build );
-	signals.updateSidebar.add( build );
 
 	return container;
 
