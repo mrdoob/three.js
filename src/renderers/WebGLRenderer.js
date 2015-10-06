@@ -1814,7 +1814,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if( material.hasDynamicUniforms === true ){
+
+			updateDynamicUniforms( materialProperties.uniformsList, camera, object );
+
+		}
+
 		return program;
+
+	}
+
+	function updateDynamicUniforms ( uniforms, camera, object ) {
+
+		var dynamicUniforms = [];
+
+		for ( var j = 0, jl = uniforms.length; j < jl; j ++ ) {
+
+			var uniform = uniforms[ j ][ 0 ];
+			var updateFunction = uniform.updateFunction;
+
+			if( typeof updateFunction === "function" ){
+
+				updateFunction( uniform, camera, object );
+				dynamicUniforms.push( uniforms[ j ] );
+
+			}
+
+		}
+
+		loadUniformsGeneric( dynamicUniforms );
 
 	}
 
