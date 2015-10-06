@@ -77,6 +77,11 @@
 			<span>render continuously</span>
 			<input id="animate" type="checkbox" />
 
+			&nbsp;&nbsp;&nbsp;
+
+			<span>use override material (only singleMaterial)</span>
+			<input id="override" type="checkbox" checked/>
+
 		</div>
 
 	</div>
@@ -248,14 +253,18 @@
 
 		precision highp float;
 
-		uniform vec3 color;
+		#ifdef PICKING
+			uniform vec3 pickingColor;
+		#else
+			uniform vec3 color;
+		#endif
 
 		varying vec3 vPosition;
 
 		void main()	{
 
 			#ifdef PICKING
-				gl_FragColor = vec4( color, 1.0 );
+				gl_FragColor = vec4( pickingColor, 1.0 );
 			#else
 				vec3 fdx = dFdx( vPosition );
 	            vec3 fdy = dFdy( vPosition );
@@ -274,9 +283,12 @@
 		var container, stats;
 		var camera, controls, scene, renderer;
 		var pickingData, pickingRenderTarget, pickingScene;
+		var useOverrideMaterial = true;
+		var singleMaterial, singlePickingMaterial;
 		var highlightBox;
 		var materialList = [];
 		var geometryList = [];
+		var objectCount = 0;
 		var geometrySize;
 		var mouse = new THREE.Vector2();
 		var scale = 1.03;
@@ -337,6 +349,19 @@
 
 			} );
 
+			//
+
+			var overrideElm = document.getElementById( 'override' );
+
+			useOverrideMaterial = overrideElm.checked;
+
+			overrideElm.addEventListener( "click", function(){
+
+				useOverrideMaterial = overrideElm.checked;
+				initMesh();
+
+			} );
+
 		}
 
 		function clean(){
@@ -359,6 +384,10 @@
 			pickingData = {};
 			materialList = [];
 			geometryList = [];
+			objectCount = 0;
+
+			singleMaterial = undefined;
+			singlePickingMaterial = undefined;
 
 		}
 
@@ -431,6 +460,7 @@
 
 				console.log( "material count:", materialList.length );
 				console.log( "geometry count:", geometryList.length );
+				console.log( "object count:", objectCount );
 				console.log( renderer.info.memory )
 				console.log( renderer.info.render )
 
@@ -460,7 +490,7 @@
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag,
 				uniforms: {
-					color: {
+					pickingColor: {
 						type: "c",
 						value: new THREE.Color(),
 					}
@@ -474,16 +504,18 @@
 			for ( var i = 0; i < instanceCount; i ++ ) {
 
 				var object = new THREE.Mesh( geo, material );
+				objectCount++;
 				randomizeMatrix( matrix );
 				object.applyMatrix( matrix );
 				var pickingObject = object.clone();
+				objectCount++;
 
 				object.material = material.clone();
 				object.material.uniforms.color.value.setHex( Math.random() * 0xffffff );
 				materialList.push( object.material );
 
 				pickingObject.material = pickingMaterial.clone();
-				pickingObject.material.uniforms.color.value.setHex( i + 1 );
+				pickingObject.material.uniforms.pickingColor.value.setHex( i + 1 );
 				materialList.push( pickingObject.material );
 
 				pickingData[ i + 1 ] = object;
@@ -524,16 +556,22 @@
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag,
 				uniforms: {
-					color: {
+					pickingColor: {
 						type: "c",
 						value: new THREE.Color(),
 						updateFunction: function( uniform, camera, object ){
-							uniform.value.setHex( object.userData.color );
+							uniform.value.setHex( object.userData.pickingColor );
 						}
 					}
 				}
 			} );
 			materialList.push( pickingMaterial );
+
+			if( useOverrideMaterial ){
+				// make globally available
+				singleMaterial = material;
+				singlePickingMaterial = pickingMaterial;
+			}
 
 			// geometry / mesh
 
@@ -542,20 +580,30 @@
 			for ( var i = 0; i < instanceCount; i ++ ) {
 
 				var object = new THREE.Mesh( geo, material );
+				objectCount++;
 				randomizeMatrix( matrix );
 				object.applyMatrix( matrix );
-				var pickingObject = object.clone();
+
+				var pickingObject;
+				if( !useOverrideMaterial ){
+					pickingObject = object.clone();
+					objectCount++;
+				}
 
 				object.material = material;
 				object.userData[ "color" ] = Math.random() * 0xffffff;
 
-				pickingObject.material = pickingMaterial;
-				pickingObject.userData[ "color" ] = i + 1;
+				if( useOverrideMaterial ){
+					object.userData[ "pickingColor" ] = i + 1;
+				}else{
+					pickingObject.material = pickingMaterial;
+					pickingObject.userData[ "pickingColor" ] = i + 1;
+				}
 
 				pickingData[ i + 1 ] = object;
 
 				scene.add( object );
-				pickingScene.add( pickingObject );
+				if( !useOverrideMaterial ) pickingScene.add( pickingObject );
 
 			}
 
@@ -597,6 +645,7 @@
 			for ( var i = 0, ul = instanceCount; i < ul; i++ ) {
 				randomizeMatrix( matrix );
 				var object = new THREE.Object3D();
+				objectCount++;
 				object.applyMatrix( matrix );
 				pickingData[ i + 1 ] = object;
 				vertices.set( pos.array, i * posLen );
@@ -689,6 +738,7 @@
 			for ( var i = 0, ul = mcol0.count; i < ul; i++ ) {
 				randomizeMatrix( matrix );
 				var object = new THREE.Object3D();
+				objectCount++;
 				object.applyMatrix( matrix );
 				pickingData[ i + 1 ] = object;
 				// matrices.set( matrix.elements, i * 16 );
@@ -842,7 +892,19 @@
 
 			// render the picking scene off-screen
 
-			renderer.render( pickingScene, camera, pickingRenderTarget );
+			highlightBox.visible = false;
+
+			if( singlePickingMaterial ){
+
+				scene.overrideMaterial = singlePickingMaterial;
+				renderer.render( scene, camera, pickingRenderTarget );
+				scene.overrideMaterial = null;
+
+			}else{
+
+				renderer.render( pickingScene, camera, pickingRenderTarget );
+
+			}
 
 			// read the pixel under the mouse from the texture
 
