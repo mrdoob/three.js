@@ -82,6 +82,22 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		// asset
+
+		function parseAsset( xml ) {
+
+			return {
+				upAxis: parseAssetUpAxis( xml.getElementsByTagName( 'up_axis' )[ 0 ] )
+			};
+
+		}
+
+		function parseAssetUpAxis( xml ) {
+
+			return xml !== undefined ? xml.textContent : 'Y_UP';
+
+		}
+
 		// library
 
 		function parseLibrary( data, libraryName, nodeName, parser ) {
@@ -781,6 +797,15 @@ THREE.ColladaLoader.prototype = {
 		var xml = new DOMParser().parseFromString( text, 'application/xml' );
 
 		console.timeEnd( 'ColladaLoader: DOMParser' );
+
+		// metadata
+
+		var version = xml.getElementsByTagName( 'COLLADA' )[ 0 ].getAttribute( 'version' );
+		console.log( 'ColladaLoader: File version', version );
+
+		var asset = parseAsset( xml.getElementsByTagName( 'asset' )[ 0 ] );
+
+		//
 
 		var library = {
 			images: {},
