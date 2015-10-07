@@ -23,7 +23,8 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 		segments: segments,
 		radius: radius,
 		radialSegments: radialSegments,
-		closed: closed
+		closed: closed,
+		taper: taper
 	};
 
 	segments = segments || 64;
