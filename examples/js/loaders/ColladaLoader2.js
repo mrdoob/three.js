@@ -758,7 +758,7 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'ColladaLoader: DOMParser' );
 
-		var xml = new DOMParser().parseFromString( text, 'text/xml' );
+		var xml = new DOMParser().parseFromString( text, 'application/xml' );
 
 		console.timeEnd( 'ColladaLoader: DOMParser' );
 

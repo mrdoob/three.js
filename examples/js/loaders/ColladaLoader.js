@@ -120,7 +120,7 @@
 
 		parse: function( text ) {
 
-			COLLADA = new DOMParser().parseFromString( text, 'text/xml' );
+			COLLADA = new DOMParser().parseFromString( text, 'application/xml' );
 
 			this.parseAsset();
 			this.setUpConversion();
