@@ -357,6 +357,12 @@ THREE.LoopOnce = 2200;
 THREE.LoopRepeat = 2201;
 THREE.LoopPingPong = 2202;
 
+// Interpolation
+
+THREE.InterpolateDiscrete = 2300;
+THREE.InterpolateLinear = 2301;
+THREE.InterpolateSmooth = 2302;
+
 // DEPRECATED
 
 THREE.Projector = function () {

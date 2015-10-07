@@ -16,7 +16,7 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 	if( this.duration < 0 ) {
 		for( var i = 0; i < this.tracks.length; i ++ ) {
 			var track = this.tracks[i];
-			this.duration = Math.max( track.keys[ track.keys.length - 1 ].time );
+			this.duration = Math.max( track.times[ track.times.length - 1 ] );
 		}
 	}
 
@@ -25,28 +25,11 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 	this.trim();
 	this.optimize();
 
-	this.results = [];
-
 };
 
 THREE.AnimationClip.prototype = {
 
 	constructor: THREE.AnimationClip,
-
-	getAt: function( clipTime ) {
-
-		clipTime = Math.max( 0, Math.min( clipTime, this.duration ) );
-
-		for( var i = 0; i < this.tracks.length; i ++ ) {
-
-			var track = this.tracks[ i ];
-
-			this.results[ i ] = track.getAt( clipTime );
-
-		}
-
-		return this.results;
-	},
 
 	trim: function() {
 
@@ -74,32 +57,78 @@ THREE.AnimationClip.prototype = {
 
 };
 
+// parse the standard JSON format for clips
+THREE.AnimationClip.parse = function( json ) {
+
+	var tracks = [],
+		jsonTracks = json[ 'tracks' ],
+		frameTime = 1.0 / ( json[ 'fps' ] || 1.0 );
+
+	for( var i = 0, n = jsonTracks.length; i !== n; ++ i ) {
+
+		tracks.push( THREE.KeyframeTrack.parse( jsonTracks[ i ] ).scale( frameTime ) );
+
+	}
+
+	return new THREE.AnimationClip( json[ 'name' ], json[ 'duration' ], tracks );
+
+};
+
+
+THREE.AnimationClip.toJSON = function( clip ) {
+
+	var tracks = [],
+		clipTracks = clip.tracks;
+
+	var json = {
+
+		'name': clip.name,
+		'duration': clip.duration,
+		'tracks': tracks
+
+	};
+
+	for ( var i = 0, n = clipTracks.length; i !== n; ++ i ) {
+
+		tracks.push( THREE.KeyframeTrack.toJSON( clipTracks[ i ] ) );
+
+	}
+
+	return json;
+
+}
+
 
 THREE.AnimationClip.CreateFromMorphTargetSequence = function( name, morphTargetSequence, fps ) {
-
 
 	var numMorphTargets = morphTargetSequence.length;
 	var tracks = [];
 
 	for( var i = 0; i < numMorphTargets; i ++ ) {
 
-		var keys = [];
+		var times = [];
+		var values = [];
 
-		keys.push( { time: ( i + numMorphTargets - 1 ) % numMorphTargets, value: 0 } );
-		keys.push( { time: i, value: 1 } );
-		keys.push( { time: ( i + 1 ) % numMorphTargets, value: 0 } );
+		times.push(
+				( i + numMorphTargets - 1 ) % numMorphTargets,
+				i,
+				( i + 1 ) % numMorphTargets );
 
-		keys.sort( THREE.KeyframeTrack.keyComparer );
+		values.push( 0, 1, 0 );
+
+		var order = THREE.AnimationUtils.getKeyframeOrder( times );
+		times = THREE.AnimationUtils.sortedArray( times, 1, order );
+		values = THREE.AnimationUtils.sortedArray( values, 1, order );
 
 		// if there is a key at the first frame, duplicate it as the last frame as well for perfect loop.
-		if( keys[0].time === 0 ) {
-			keys.push( {
-				time: numMorphTargets,
-				value: keys[0].value
-			});
+		if( times[ 0 ] === 0 ) {
+
+			times.push( numMorphTargets );
+			values.push( values[ 0 ] );
+
 		}
 
-		tracks.push( new THREE.NumberKeyframeTrack( '.morphTargetInfluences[' + morphTargetSequence[i].name + ']', keys ).scale( 1.0 / fps ) );
+		tracks.push( new THREE.NumberKeyframeTrack( '.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']', times, values ).scale( 1.0 / fps ) );
 	}
 
 	return new THREE.AnimationClip( name, -1, tracks );
@@ -110,9 +139,9 @@ THREE.AnimationClip.findByName = function( clipArray, name ) {
 
 	for( var i = 0; i < clipArray.length; i ++ ) {
 
-		if( clipArray[i].name === name ) {
+		if( clipArray[ i ].name === name ) {
 
-			return clipArray[i];
+			return clipArray[ i ];
 
 		}
 	}
@@ -160,22 +189,6 @@ THREE.AnimationClip.CreateClipsFromMorphTargetSequences = function( morphTargets
 
 };
 
-// parse the standard JSON format for clips
-THREE.AnimationClip.parse = function( json ) {
-
-	var tracks = [];
-
-	for( var i = 0; i < json.tracks.length; i ++ ) {
-
-		tracks.push( THREE.KeyframeTrack.parse( json.tracks[i] ).scale( 1.0 / json.fps ) );
-
-	}
-
-	return new THREE.AnimationClip( json.name, json.duration, tracks );
-
-};
-
-
 // parse the animation.hierarchy format
 THREE.AnimationClip.parseAnimation = function( animation, bones ) {
 
@@ -184,29 +197,17 @@ THREE.AnimationClip.parseAnimation = function( animation, bones ) {
 		return null;
 	}
 
-	var convertTrack = function( trackName, animationKeys, propertyName, trackType, animationKeyToValueFunc ) {
-
-		var keys = [];
-
-		for( var k = 0; k < animationKeys.length; k ++ ) {
-
-			var animationKey = animationKeys[k];
-
-			if( animationKey[propertyName] !== undefined ) {
-
-				keys.push( { time: animationKey.time, value: animationKeyToValueFunc( animationKey ) } );
-			}
-
-		}
+	var convertTrack = function( trackName, animationKeys, propertyName, trackType ) {
 
 		// only return track if there are actually keys.
-		if( keys.length > 0 ) {
+		if ( animationKeys.length === 0 ) return null;
 
-			return new trackType( trackName, keys );
+		var times = [];
+		var values = [];
 
-		}
+		THREE.AnimationUtils.flattenJSON( animationKeys, times, values, propertyName );
 
-		return null;
+		return new trackType( trackName, times, values );
 
 	};
 
@@ -246,16 +247,15 @@ THREE.AnimationClip.parseAnimation = function( animation, bones ) {
 			// create a track for each morph target with all zero morphTargetInfluences except for the keys in which the morphTarget is named.
 			for( var morphTargetName in morphTargetNames ) {
 
-				var keys = [];
+				var times = [];
+				var values = [];
 
 				for( var m = 0; m < animationKeys[k].morphTargets.length; m ++ ) {
 
 					var animationKey = animationKeys[k];
 
-					keys.push( {
-							time: animationKey.time,
-							value: (( animationKey.morphTarget === morphTargetName ) ? 1 : 0 )
-						});
+					times.push( animationKey.time );
+					values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 )
 
 				}
 
@@ -265,35 +265,20 @@ THREE.AnimationClip.parseAnimation = function( animation, bones ) {
 
 			duration = morphTargetNames.length * ( fps || 1.0 );
 
-		}
-		else {
+		} else {
 
 			var boneName = '.bones[' + bones[ h ].name + ']';
 
 			// track contains positions...
-			var positionTrack = convertTrack( boneName + '.position', animationKeys, 'pos', THREE.VectorKeyframeTrack, function( animationKey ) {
-					return new THREE.Vector3().fromArray( animationKey.pos )
-				} );
-
+			var positionTrack = convertTrack( boneName + '.position', animationKeys, 'pos', THREE.VectorKeyframeTrack );
 			if( positionTrack ) tracks.push( positionTrack );
 
 			// track contains quaternions...
-			var quaternionTrack = convertTrack( boneName + '.quaternion', animationKeys, 'rot', THREE.QuaternionKeyframeTrack, function( animationKey ) {
-					if( animationKey.rot.slerp ) {
-						return animationKey.rot.clone();
-					}
-					else {
-						return new THREE.Quaternion().fromArray( animationKey.rot );
-					}
-				} );
-
+			var quaternionTrack = convertTrack( boneName + '.quaternion', animationKeys, 'rot', THREE.QuaternionKeyframeTrack );
 			if( quaternionTrack ) tracks.push( quaternionTrack );
 
 			// track contains quaternions...
-			var scaleTrack = convertTrack( boneName + '.scale', animationKeys, 'scl', THREE.VectorKeyframeTrack, function( animationKey ) {
-					return new THREE.Vector3().fromArray( animationKey.scl )
-				} );
-
+			var scaleTrack = convertTrack( boneName + '.scale', animationKeys, 'scl', THREE.VectorKeyframeTrack );
 			if( scaleTrack ) tracks.push( scaleTrack );
 
 		}

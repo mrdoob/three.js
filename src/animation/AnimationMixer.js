@@ -1,19 +1,30 @@
 /**
  *
- * Mixes together the AnimationClips scheduled by AnimationActions and applies them to the root and subtree
+ * Sequencer that performs AnimationActions, mixes their results and updates
+ * the scene graph.
  *
  *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
+ * @author tschw
  */
 
 THREE.AnimationMixer = function( root ) {
 
 	this.root = root;
+	this.uuid = THREE.Math.generateUUID();
+
 	this.time = 0;
 	this.timeScale = 1.0;
-	this.actions = [];
-	this.propertyBindingMap = {};
+
+	this._actions = [];
+
+	this._bindingsMaps = {}; // contains a path -> prop_mixer map per root.uuid
+
+	this._bindings = []; // array of all bindings with refCnt != 0
+	this._bindingsDirty = false; // whether we need to rebuild the array
+
+	this._accuIndex = 0;
 
 };
 
@@ -23,57 +34,114 @@ THREE.AnimationMixer.prototype = {
 
 	addAction: function( action ) {
 
-		// TODO: check for duplicate action names?  Or provide each action with a UUID?
+		if ( this._actions.indexOf( action ) !== -1 ) {
 
-		this.actions.push( action );
-		action.init( this.time );
-		action.mixer = this;
+			return; // action is already added - do nothing
 
-		var tracks = action.clip.tracks;
+		}
 
-		var root = action.localRoot || this.root;
+		var root = action.localRoot || this.root,
+			rootUuid = root.uuid,
 
-		for( var i = 0; i < tracks.length; i ++ ) {
+			bindingsMap = this._bindingsMaps[ rootUuid ];
+
+		if ( bindingsMap === undefined ) {
+
+			bindingsMap = {};
+			this._bindingsMaps[ rootUuid ] = bindingsMap;
+
+		}
+
+		var interpolants = action._interpolants,
+			actionBindings = action._propertyBindings,
+
+			tracks = action.clip.tracks,
+			bindingsChanged = false,
+
+			myUuid = this.uuid,
+			prevRootUuid = action._prevRootUuid,
+
+			rootSwitchValid =
+				prevRootUuid !== rootUuid &&
+				action._prevMixerUuid === myUuid,
+
+			prevRootBindingsMap;
+
+		if ( rootSwitchValid ) {
+
+			// in this case we try to transfer currently unused
+			// context infrastructure from the previous root
+
+			prevRootBindingsMap = this._bindingsMaps[ prevRootUuid ];
+
+		}
+
+		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
 
 			var track = tracks[ i ];
 
-			var propertyBindingKey = root.uuid + '-' + track.name;			
-			var propertyBinding = this.propertyBindingMap[ propertyBindingKey ];
+			var trackName = track.name;
+			var propertyMixer = bindingsMap[ trackName ];
 
-			if( propertyBinding === undefined ) {
-			
-				propertyBinding = new THREE.PropertyBinding( root, track.name );
-				this.propertyBindingMap[ propertyBindingKey ] = propertyBinding;
-			
+			if ( rootSwitchValid && propertyMixer === undefined ) {
+
+				var candidate = prevRootBindingsMap[ trackName ];
+
+				if ( candidate !== undefined &&
+						candidate.referenceCount === 0 ) {
+
+					propertyMixer = candidate;
+
+					// no longer use with the old root!
+					delete prevRootBindingsMap[ trackName ];
+
+					propertyMixer.binding.setRootNode( root );
+
+					bindingsMap[ trackName ] = propertyMixer;
+
+				}
+
 			}
 
-			// push in the same order as the tracks.
-			action.propertyBindings.push( propertyBinding );
-			
-			// track usages of shared property bindings, because if we leave too many around, the mixer can get slow
-			propertyBinding.referenceCount += 1;
+			if ( propertyMixer === undefined ) {
+
+				propertyMixer = new THREE.PropertyMixer(
+						root, trackName,
+						track.ValueTypeName, track.getValueSize() );
+
+				bindingsMap[ trackName ] = propertyMixer;
+
+			}
+
+			if ( propertyMixer.referenceCount === 0 ) {
+
+				propertyMixer.saveOriginalState();
+				bindingsChanged = true;
+
+			}
+
+			++ propertyMixer.referenceCount;
+
+			interpolants[ i ].result = propertyMixer.buffer;
+			actionBindings[ i ] = propertyMixer;
 
 		}
 
-	},
+		if ( bindingsChanged ) {
 
-	removeAllActions: function() {
-
-		for( var i = 0; i < this.actions.length; i ++ ) {
-
-			this.actions[i].mixer = null;
-			
-		}
-
-		// unbind all property bindings
-		for( var properyBindingKey in this.propertyBindingMap ) {
-
-			this.propertyBindingMap[ properyBindingKey ].unbind();
+			this._bindingsDirty = true; // invalidates this._bindings
 
 		}
 
-		this.actions = [];
-		this.propertyBindingMap = {};
+		action.mixer = this;
+		action._prevRootUuid = rootUuid;
+		action._prevMixerUuid = myUuid;
+
+		// TODO: check for duplicate action names?
+		// Or provide each action with a UUID?
+		this._actions.push( action );
+
+		action.init( this.time );
 
 		return this;
 
@@ -81,48 +149,101 @@ THREE.AnimationMixer.prototype = {
 
 	removeAction: function( action ) {
 
-		var index = this.actions.indexOf( action );
+		var actions = this._actions,
+			index = actions.indexOf( action );
 
-		if ( index !== - 1 ) {
+		if ( index === - 1 ) {
 
-			this.actions.splice( index, 1 );
-			action.mixer = null;
+			return this; // we don't know this action - do nothing
 
 		}
 
+		// unreference all property mixers
+		var uuid = ( action.localRoot || this.root ).uuid,
+			actionBindings = action._propertyBindings,
+			bindings = this._bindingsMaps[ uuid ],
 
-		// remove unused property bindings because if we leave them around the mixer can get slow
-		var root = action.localRoot || this.root;
-		var tracks = action.clip.tracks;
+			bindingsChanged = false;
 
-		for( var i = 0; i < tracks.length; i ++ ) {
-		
-			var track = tracks[ i ];
+		for( var i = 0, n = actionBindings.length; i !== n; ++ i ) {
 
-			var propertyBindingKey = root.uuid + '-' + track.name;			
-			var propertyBinding = this.propertyBindingMap[ propertyBindingKey ];
-	
-			propertyBinding.referenceCount -= 1;
+			var propertyMixer = actionBindings[ i ];
+			actionBindings[ i ] = null;
 
-			if( propertyBinding.referenceCount <= 0 ) {
+			// eventually remove the binding from the array
+			if( -- propertyMixer.referenceCount === 0 ) {
 
-				propertyBinding.unbind();
-
-				delete this.propertyBindingMap[ propertyBindingKey ];
+				propertyMixer.restoreOriginalState();
+				bindingsChanged = true;
 
 			}
+
 		}
+
+		if ( bindingsChanged ) {
+
+			this._bindingsDirty = true; // invalidates this._bindings
+
+		}
+
+		// remove from array-based unordered set
+		actions[ index ] = actions[ actions.length - 1 ];
+		actions.pop();
+
+		action.mixer = null;
 
 		return this;
 
 	},
 
+	removeAllActions: function() {
+
+		if ( this._bindingsDirty ) {
+
+			this._updateBindings();
+
+		}
+
+		var bindings = this._bindings; // all bindings currently in use
+
+		for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+
+			var binding = bindings[ i ];
+			binding.referenceCount = 0;
+			binding.restoreOriginalState();
+
+		}
+
+		bindings.length = 0;
+
+		this._bindingsDirty = false;
+
+		var actions = this._actions;
+
+		for ( var i = 0, n = actions.length; i !== n; ++ i ) {
+
+			actions[ i ].mixer = null;
+
+		}
+
+		actions.length = 0;
+
+		return this;
+
+	},
+
+
 	// can be optimized if needed
 	findActionByName: function( name ) {
 
-		for( var i = 0; i < this.actions.length; i ++ ) {
+		var actions = this._actions;
 
-			if( this.actions[i].name === name ) return this.actions[i];
+		for ( var i = 0, n = actions.length; i !== n; ++ i ) {
+
+			var action = actions[ i ];
+			var actionName = action.getName();
+
+			if( name === actionName ) return action;
 
 		}
 
@@ -141,25 +262,21 @@ THREE.AnimationMixer.prototype = {
 
 	fadeOut: function( action, duration ) {
 
-		var keys = [];
+		var time = this.time,
+			times = Float64Array.of( time, time + duration );
 
-		keys.push( { time: this.time, value: 1 } );
-		keys.push( { time: this.time + duration, value: 0 } );
-		
-		action.weight = new THREE.NumberKeyframeTrack( "weight", keys );
+		action.weight = new THREE.LinearInterpolant( times, this._Down, 1, this._tmp );
 
 		return this;
 
 	},
 
 	fadeIn: function( action, duration ) {
-		
-		var keys = [];
-		
-		keys.push( { time: this.time, value: 0 } );
-		keys.push( { time: this.time + duration, value: 1 } );
-		
-		action.weight = new THREE.NumberKeyframeTrack( "weight", keys );
+
+		var time = this.time,
+			times = Float64Array.of( time, time + duration );
+
+		action.weight = new THREE.LinearInterpolant( times, this._Up, 1, this._tmp );
 
 		return this;
 
@@ -167,12 +284,11 @@ THREE.AnimationMixer.prototype = {
 
 	warp: function( action, startTimeScale, endTimeScale, duration ) {
 
-		var keys = [];
-		
-		keys.push( { time: this.time, value: startTimeScale } );
-		keys.push( { time: this.time + duration, value: endTimeScale } );
-		
-		action.timeScale = new THREE.NumberKeyframeTrack( "timeScale", keys );
+		var time = this.time,
+			times = Float64Array.of( time, time + duration ),
+			values = Float64Array.of( startTimeScale, endTimeScale );
+
+		action.timeScale = new THREE.LinearInterpolant( times, values, 1, this._tmp );
 
 		return this;
 
@@ -184,7 +300,7 @@ THREE.AnimationMixer.prototype = {
 		this.fadeIn( fadeInAction, duration );
 
 		if( warp ) {
-	
+
 			var startEndRatio = fadeOutAction.clip.duration / fadeInAction.clip.duration;
 			var endStartRatio = 1.0 / startEndRatio;
 
@@ -194,47 +310,144 @@ THREE.AnimationMixer.prototype = {
 		}
 
 		return this;
-		
+
 	},
 
 	update: function( deltaTime ) {
 
-		var mixerDeltaTime = deltaTime * this.timeScale;
-		this.time += mixerDeltaTime;
+		var actions = this._actions,
+			mixerDeltaTime = deltaTime * this.timeScale;
 
-		for( var i = 0; i < this.actions.length; i ++ ) {
+		var time = this.time += mixerDeltaTime;
+		var accuIndex = this.accuIndex ^= 1;
 
-			var action = this.actions[i];
+		// perform all actions
 
-			var weight = action.getWeightAt( this.time );
+		for ( var i = 0, n = actions.length; i !== n; ++ i ) {
 
-			var actionTimeScale = action.getTimeScaleAt( this.time );
-			var actionDeltaTime = mixerDeltaTime * actionTimeScale;
-		
-			var actionResults = action.update( actionDeltaTime );
+			var action = actions[ i ];
+			if ( ! action.enabled ) continue;
 
-			if( action.weight <= 0 || ! action.enabled ) continue;
+			var weight = action.getWeightAt( time );
+			if ( weight <= 0 ) continue;
 
-			for( var j = 0; j < actionResults.length; j ++ ) {
+			var actionTimeScale = action.getTimeScaleAt( time );
+			var actionTime = action.updateTime( mixerDeltaTime * actionTimeScale );
 
-				var name = action.clip.tracks[j].name;
+			var interpolants = action._interpolants;
+			var propertyMixers = action._propertyBindings;
 
-				action.propertyBindings[ j ].accumulate( actionResults[j], weight );
+			for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+				interpolants[ j ].getAt( actionTime );
+				propertyMixers[ j ].accumulate( accuIndex, weight );
 
 			}
 
 		}
-	
-		// apply to nodes
-		for( var propertyBindingKey in this.propertyBindingMap ) {
 
-			this.propertyBindingMap[ propertyBindingKey ].apply();
+		if ( this._bindingsDirty ) {
+
+			this._updateBindings();
+			this._bindingsDirty = false;
+
+		}
+
+		var bindings = this._bindings;
+		for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+
+			bindings[ i ].apply( accuIndex );
 
 		}
 
 		return this;
-		
-	}
+
+	},
+
+	// releases cached references to scene graph nodes
+	// pass 'true' for 'unbindOnly' to allow a quick rebind at
+	// the expense of higher cost add / removeAction operations
+	releaseCachedBindings: function( unbindOnly ) {
+
+		var bindingsMaps = this._bindingsMaps;
+
+		for ( var rootUuid in bindingsMaps ) {
+
+			var bindingsMap = bindingsMaps[ rootUuid ];
+
+			var mapChanged = false;
+
+			for ( var trackName in bindingsMap ) {
+
+				var propertyMixer = bindingsMap[ trackName ];
+
+				if ( propertyMixer.referenceCount === 0 ) {
+
+					if ( unbindOnly ) {
+
+						propertyMixer.binding.unbind();
+
+					} else {
+
+						delete bindingsMap[ trackName ];
+						mapChanged = true;
+
+					}
+
+				}
+
+			}
+
+			if ( mapChanged ) {
+
+				remove_empty_map: for (;;) {
+
+					// unless not empty...
+					for ( var k in bindingsMap ) break remove_empty_map;
+
+					delete bindingsMaps[ rootUuid ];
+					break;
+
+				}
+
+			}
+
+		}
+
+	},
+
+	_updateBindings: function() {
+
+		var bindingsMaps = this._bindingsMaps,
+			bindings = this._bindings,
+			writeIndex = 0;
+
+		for ( var rootUuid in bindingsMaps ) {
+
+			var bindingsMap = bindingsMaps[ rootUuid ];
+
+			for ( var trackName in bindingsMap ) {
+
+				var propertyMixer = bindingsMap[ trackName ];
+
+				if ( propertyMixer.referenceCount !== 0 ) {
+
+					bindings[ writeIndex ++ ] = propertyMixer;
+
+				}
+
+			}
+
+		}
+
+		bindings.length = writeIndex;
+
+	},
+
+	_Up: Float64Array.of( 0, 1 ),
+	_Down: Float64Array.of( 1, 0 ),
+
+	_tmp: new Float64Array( 1 )
 
 };
 

@@ -1,19 +1,19 @@
 /**
  *
- * A track bound to a real value in the scene graph.
- * 
+ * A reference to a real property in the scene graph.
+ *
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
+ * @author tschw
  */
 
-THREE.PropertyBinding = function ( rootNode, trackName ) {
+THREE.PropertyBinding = function ( rootNode, path ) {
 
 	this.rootNode = rootNode;
-	this.trackName = trackName;
-	this.referenceCount = 0;
-	this.originalValue = null; // the value of the property before it was controlled by this binding
+	this.path = path;
 
-	var parseResults = THREE.PropertyBinding.parseTrackName( trackName );
+	var parseResults = THREE.PropertyBinding.parseTrackName( path );
 
 	this.directoryName = parseResults.directoryName;
 	this.nodeName = parseResults.nodeName;
@@ -22,74 +22,71 @@ THREE.PropertyBinding = function ( rootNode, trackName ) {
 	this.propertyName = parseResults.propertyName;
 	this.propertyIndex = parseResults.propertyIndex;
 
-	this.node = THREE.PropertyBinding.findNode( rootNode, this.nodeName ) || rootNode;
-	
-	this.cumulativeValue = null;
-	this.cumulativeWeight = 0;
+	this.setRootNode( rootNode );
+
 };
 
 THREE.PropertyBinding.prototype = {
 
 	constructor: THREE.PropertyBinding,
 
-	reset: function() {
+	getValue: function getValue_unbound( targetArray, offset ) {
 
-		this.cumulativeValue = null;
-		this.cumulativeWeight = 0;
+		this.bind();
+		this.getValue( targetArray, offset );
+
+		// Note: This class uses a State pattern on a per-method basis:
+		// 'bind' sets 'this.getValue' / 'setValue' and shadows the
+		// prototype version of these methods with one that represents
+		// the bound state. When the property is not found, the methods
+		// become no-ops.
 
 	},
 
-	accumulate: function( value, weight ) {
-		
-		if( ! this.isBound ) this.bind();
+	setValue: function getValue_unbound( sourceArray, offset ) {
 
-		if( this.cumulativeWeight === 0 ) {
+		this.bind();
+		this.setValue( sourceArray, offset );
 
-			if( weight > 0 ) {
+	},
 
-				if( this.cumulativeValue === null ) {
-					this.cumulativeValue = THREE.AnimationUtils.clone( value );
-				}
-				this.cumulativeWeight = weight;
+	// change the root used for binding
+	setRootNode: function( rootNode ) {
 
-			}
+		var oldNode = this.node,
+			newNode = THREE.PropertyBinding.findNode( rootNode, this.nodeName ) || rootNode;
+
+		if ( oldNode && oldNode !== newNode ) {
+
+			this.unbind(); // for the change to take effect on the next call
 
 		}
-		else {
 
-			var lerpAlpha = weight / ( this.cumulativeWeight + weight );
-			this.cumulativeValue = this.lerpValue( this.cumulativeValue, value, lerpAlpha );
-			this.cumulativeWeight += weight;
-
-		}
+		this.rootNode = rootNode;
+		this.node = newNode;
 
 	},
 
-	unbind: function() {
-
-		if( ! this.isBound ) return;
-
-		this.setValue( this.originalValue );
-
-		this.setValue = null;
-		this.getValue = null;
-		this.lerpValue = null;
-		this.equalsValue = null;
-		this.triggerDirty = null;	
-		this.isBound = false;
-
-	},
-
-	// bind to the real property in the scene graph, remember original value, memorize various accessors for speed/inefficiency
+	// create getter / setter pair for a property in the scene graph
 	bind: function() {
-
-		if( this.isBound ) return;
 
 		var targetObject = this.node;
 
+		if ( ! targetObject ) {
+
+			targetObject = THREE.PropertyBinding.findNode( this.rootNode, this.nodeName ) || this.rootNode;
+
+			this.node = targetObject;
+
+		}
+
+		// set fail state so we can just 'return' on error
+		this.getValue = this._getValue_unavailable;
+		this.setValue = this._setValue_unavailable;
+
  		// ensure there is a value node
 		if( ! targetObject ) {
-			console.error( "  trying to update node for track: " + this.trackName + " but it wasn't found." );
+			console.error( "  trying to update node for track: " + this.path + " but it wasn't found." );
 			return;
 		}
 
@@ -98,11 +95,11 @@ THREE.PropertyBinding.prototype = {
 			if( this.objectName === "materials" ) {
 				if( ! targetObject.material ) {
 					console.error( '  can not bind to material as node does not have a material', this );
-					return;				
+					return;
 				}
 				if( ! targetObject.material.materials ) {
 					console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
-					return;				
+					return;
 				}
 				targetObject = targetObject.material.materials;
 			}
@@ -112,7 +109,7 @@ THREE.PropertyBinding.prototype = {
 					return;
 				}
 				// potential future optimization: skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
-				
+
 				targetObject = targetObject.skeleton.bones;
 
 				// support resolving morphTarget names into indices.
@@ -126,16 +123,16 @@ THREE.PropertyBinding.prototype = {
 			else {
 
 				if( targetObject[ this.objectName ] === undefined ) {
-					console.error( '  can not bind to objectName of node, undefined', this );			
+					console.error( '  can not bind to objectName of node, undefined', this );
 					return;
 				}
 				targetObject = targetObject[ this.objectName ];
 			}
-			
+
 			if( this.objectIndex !== undefined ) {
 				if( targetObject[ this.objectIndex ] === undefined ) {
 					console.error( "  trying to bind to objectIndex of objectName, but is undefined:", this, targetObject );
-					return;				
+					return;
 				}
 
 				targetObject = targetObject[ this.objectIndex ];
@@ -146,8 +143,23 @@ THREE.PropertyBinding.prototype = {
  		// special case mappings
  		var nodeProperty = targetObject[ this.propertyName ];
 		if( ! nodeProperty ) {
-			console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );				
+			console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );
 			return;
+		}
+
+		// determine versioning scheme
+		var versioning = 0;
+		var NeedsUpdate = 1;
+		var MatrixWorldNeedsUpdate = 2;
+
+		if( targetObject.needsUpdate !== undefined ) { // material
+
+			versioning = NeedsUpdate;
+
+		} else if( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
+
+			versioning = MatrixWorldNeedsUpdate;
+
 		}
 
 		// access a sub element of the property array (only primitives are supported right now)
@@ -155,15 +167,15 @@ THREE.PropertyBinding.prototype = {
 
 			if( this.propertyName === "morphTargetInfluences" ) {
 				// potential optimization, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
-				
+
 				// support resolving morphTarget names into indices.
 				if( ! targetObject.geometry ) {
-					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );				
+					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );
 				}
 				if( ! targetObject.geometry.morphTargets ) {
-					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );				
+					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );
 				}
-				
+
 				for( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
 					if( targetObject.geometry.morphTargets[i].name === this.propertyIndex ) {
 						this.propertyIndex = i;
@@ -172,109 +184,163 @@ THREE.PropertyBinding.prototype = {
 				}
 			}
 
-			this.setValue = function setValue_propertyIndexed( value ) {
-				if( ! this.equalsValue( nodeProperty[ this.propertyIndex ], value ) ) {
-					nodeProperty[ this.propertyIndex ] = value;
-					return true;
-				}
-				return false;
+			var propertyIndex = this.propertyIndex;
+
+			this.getValue = function getValue_propertyIndexed( buffer, offset ) {
+
+				buffer[ offset ] = nodeProperty[ this.propertyIndex ];
+
 			};
 
-			this.getValue = function getValue_propertyIndexed() {
-				return nodeProperty[ this.propertyIndex ];
-			};
+			switch ( versioning ) {
 
-		}
-		// must use copy for Object3D.Euler/Quaternion		
-		else if( nodeProperty.copy ) {
-			
-			this.setValue = function setValue_propertyObject( value ) {
-				if( ! this.equalsValue( nodeProperty, value ) ) {
-					nodeProperty.copy( value );
-					return true;
-				}
-				return false;
+				case NeedsUpdate:
+
+					this.setValue = function setValue_propertyIndexed( buffer, offset ) {
+
+						nodeProperty[ propertyIndex ] = buffer[ offset ];
+						targetObject.needsUpdate = true;
+
+					};
+
+					break;
+
+				case MatrixWorldNeedsUpdate:
+
+					this.setValue = function setValue_propertyIndexed( buffer, offset ) {
+
+						nodeProperty[ propertyIndex ] = buffer[ offset ];
+						targetObject.matrixWorldNeedsUpdate = true;
+
+					};
+
+					break;
+
+				default:
+
+					this.setValue = function setValue_propertyIndexed( buffer, offset ) {
+
+						nodeProperty[ propertyIndex ] = buffer[ offset ];
+
+					};
+
 			}
 
-			this.getValue = function getValue_propertyObject() {
-				return nodeProperty;
+		}
+		// must use copy for Object3D.Euler/Quaternion
+		else if( nodeProperty.fromArray !== undefined && nodeProperty.toArray !== undefined ) {
+
+			this.getValue = function getValue_propertyObject( buffer, offset ) {
+
+				nodeProperty.toArray( buffer, offset );
+
 			};
+
+
+			switch ( versioning ) {
+
+				case NeedsUpdate:
+
+					this.setValue = function setValue_propertyObject( buffer, offset ) {
+
+						nodeProperty.fromArray( buffer, offset );
+						targetObject.needsUpdate = true;
+
+					}
+
+				case MatrixWorldNeedsUpdate:
+
+					this.setValue = function setValue_propertyObject( buffer, offset ) {
+
+						nodeProperty.fromArray( buffer, offset );
+						targetObject.matrixWorldNeedsUpdate = true;
+
+					}
+
+				default:
+
+					this.setValue = function setValue_propertyObject( buffer, offset ) {
+
+						nodeProperty.fromArray( buffer, offset );
+
+					}
+
+			}
 
 		}
 		// otherwise just set the property directly on the node (do not use nodeProperty as it may not be a reference object)
 		else {
 
-			this.setValue = function setValue_property( value ) {
-				if( ! this.equalsValue( targetObject[ this.propertyName ], value ) ) {
-					targetObject[ this.propertyName ] = value;	
-					return true;
-				}
-				return false;
-			}
+			var propertyName = this.propertyName;
 
-			this.getValue = function getValue_property() {
-				return targetObject[ this.propertyName ];
+			this.getValue = function getValue_property( buffer, offset ) {
+
+				buffer[ offset ] = nodeProperty[ propertyName ];
+
 			};
 
-		}
+			switch ( versioning ) {
 
-		// trigger node dirty			
-		if( targetObject.needsUpdate !== undefined ) { // material
-			
-			this.triggerDirty = function triggerDirty_needsUpdate() {
-				this.node.needsUpdate = true;
+				case NeedsUpdate:
+
+					this.setValue = function setValue_property( buffer, offset ) {
+
+						nodeProperty[ propertyName ] = buffer[ offset ];
+						targetObject.needsUpdate = true;
+
+					}
+
+					break;
+
+				case MatrixWorldNeedsUpdate:
+
+					this.setValue = function setValue_property( buffer, offset ) {
+
+						nodeProperty[ propertyName ] = buffer[ offset ];
+						targetObject.matrixWorldNeedsUpdate = true;
+
+					}
+
+					break;
+
+				default:
+
+					this.setValue = function setValue_property( buffer, offset ) {
+
+						nodeProperty[ propertyName ] = buffer[ offset ];
+
+					}
+
 			}
 
-		}			
-		else if( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
-			
-			this.triggerDirty = function triggerDirty_matrixWorldNeedsUpdate() {
-				targetObject.matrixWorldNeedsUpdate = true;
-			}
-
 		}
-
-		this.originalValue = this.getValue();
-
-		this.equalsValue = THREE.AnimationUtils.getEqualsFunc( this.originalValue );
-		this.lerpValue = THREE.AnimationUtils.getLerpFunc( this.originalValue, true );
-
-		this.isBound = true;
 
 	},
 
-	apply: function() {
+	unbind: function() {
 
-		// for speed capture the setter pattern as a closure (sort of a memoization pattern: https://en.wikipedia.org/wiki/Memoization)
-		if( ! this.isBound ) this.bind();
+		this.node = null;
 
-		// early exit if there is nothing to apply.
-		if( this.cumulativeWeight > 0 ) {
-		
-			// blend with original value
-			if( this.cumulativeWeight < 1 ) {
+		// back to the prototype version of getValue / setValue
+		// note: avoiding to mutate the shape of 'this' via 'delete'
+		this.getValue = this._getValue_unbound;
+		this.setValue = this._setValue_unbound;
 
-				var remainingWeight = 1 - this.cumulativeWeight;
-				var lerpAlpha = remainingWeight / ( this.cumulativeWeight + remainingWeight );
-				this.cumulativeValue = this.lerpValue( this.cumulativeValue, this.originalValue, lerpAlpha );
-
-			}
-
-			var valueChanged = this.setValue( this.cumulativeValue );
-
-			if( valueChanged && this.triggerDirty ) {
-				this.triggerDirty();
-			}
-
-			// reset accumulator
-			this.cumulativeValue = null;
-			this.cumulativeWeight = 0;
-
-		}
 	}
 
 };
 
+Object.assign( THREE.PropertyBinding.prototype, {
+
+	// these are used to "bind" a nonexistent property
+	_getValue_unavailable: function() {},
+	_setValue_unavailable: function() {},
+
+	// initial state of these methods that calls 'bind'
+	_getValue_unbound: THREE.PropertyBinding.prototype.getValue,
+	_setValue_unbound: THREE.PropertyBinding.prototype.setValue
+
+} );
 
 THREE.PropertyBinding.parseTrackName = function( trackName ) {
 
@@ -289,7 +355,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	//	  .bone[Armature.DEF_cog].position
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_. ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/; 
+	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_. ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
 	var matches = re.exec(trackName);
 
 	if( ! matches ) {
@@ -375,7 +441,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 			}
 
-			return null;	
+			return null;
 
 		};
 

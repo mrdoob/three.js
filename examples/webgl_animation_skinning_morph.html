@@ -61,7 +61,7 @@
 
 			var mesh, helper;
 
-			var mixer;
+			var mixer, facesAction, bonesAction;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -152,11 +152,11 @@
 
 					createScene( geometry, materials, 0, FLOOR, -300, 60 )
 
+					// GUI
+
+					initGUI();
+
 				} );
-
-				// GUI
-
-				initGUI();
 
 				//
 
@@ -224,20 +224,26 @@
 				helper.visible = false;
 				scene.add( helper );
 
+				mixer = new THREE.AnimationMixer( mesh );
+
+				var clipBones = geometry.animations[0];
+				bonesAction = new THREE.AnimationAction( clipBones );
 
 				var clipMorpher = THREE.AnimationClip.CreateFromMorphTargetSequence( 'facialExpressions', mesh.geometry.morphTargets, 3 );
-				var clipBones = geometry.animations[0];
-
-				mixer = new THREE.AnimationMixer( mesh );
-				mixer.addAction( new THREE.AnimationAction( clipMorpher ) );
-				mixer.addAction( new THREE.AnimationAction( clipBones ) );
+				facesAction = new THREE.AnimationAction( clipMorpher );
 			}
 
 			function initGUI() {
 
 				var API = {
 					'show model'    : true,
-					'show skeleton' : false
+					'show skeleton' : false,
+					'bones action' : true, // use false to see initial allocation
+					'bones enable' : true,
+					'faces action' : true,
+					'faces enable' : true,
+					'release props' : function() { mixer.releaseCachedBindings( true ); },
+					'purge cache' : function() { mixer.releaseCachedBindings(); }
 				};
 
 				var gui = new dat.GUI();
@@ -245,6 +251,62 @@
 				gui.add( API, 'show model' ).onChange( function() { mesh.visible = API[ 'show model' ]; } );
 
 				gui.add( API, 'show skeleton' ).onChange( function() { helper.visible = API[ 'show skeleton' ]; } );
+
+
+				// Note: .add/removeAction and .enabled = true / false have
+				// different performance characteristics:
+				//
+				// The former changes dynamic data structures in the mixer,
+				// therefore the switch is more expensive but removes the
+				// per-action  base cost caused by the unique property
+				// bindings it uses.
+				//
+				// The latter is a zero-cost switch, but the per-frame base
+				// cost for having the action added to the mixer remains.
+
+				function actionControls( key, action ) {
+
+					var guiNameAddRemove = key + ' action';
+					var guiNameEnabled = key + ' enable';
+
+					// set initial state
+
+					if ( API[ guiNameAddRemove ] ) {
+
+						action.enabled = API[ guiNameEnabled ];
+						mixer.addAction( action );
+
+					}
+
+					// attach controls
+
+					gui.add( API, guiNameAddRemove ).onChange( function() {
+
+						if ( API[ guiNameAddRemove ] ) {
+
+							mixer.addAction( action );
+
+						} else {
+
+							mixer.removeAction( action );
+
+						}
+
+					} );
+
+					gui.add( API, guiNameEnabled ).onChange( function() {
+
+						action.enabled = API[ guiNameEnabled ];
+
+					} );
+
+				}
+
+				actionControls( 'bones', bonesAction );
+				actionControls( 'faces', facesAction );
+
+				gui.add( API, 'release props' );
+				gui.add( API, 'purge cache' );
 
 			}
 

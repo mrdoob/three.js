@@ -41,14 +41,12 @@ function BlendCharacterGui( blendMesh ) {
 	this.update = function( time ) {
 
 		var getWeight = function( actionName ) {
-			for( var i = 0; i < blendMesh.mixer.actions.length; i ++ ) {
-				var action = blendMesh.mixer.actions[i];
-				if( action.clip.name === actionName ) {
-					return action.getWeightAt( time );	
-				}
-			}
-			return 0;
+
+			var action = blendMesh.mixer.findActionByName( actionName );
+			return ( action !== null) ? action.getWeightAt( time ) : 0;
+
 		}
+
 		controls[ 'idle' ] = getWeight( 'idle' );
 		controls[ 'walk' ] = getWeight( 'walk' );
 		controls[ 'run' ] = getWeight( 'run' );
