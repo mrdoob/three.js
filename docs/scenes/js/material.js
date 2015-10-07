@@ -439,7 +439,7 @@ function guiMeshPhongMaterial ( gui, mesh, material, geometry ) {
 	folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
 	folder.addColor( data, 'specular' ).onChange( handleColorChange( material.specular ) );
 
-	folder.add( material, 'shininess', 1, 100);
+	folder.add( material, 'shininess', 0, 100);
 	folder.add( material, 'shading', constants.shading).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
