@@ -569,11 +569,11 @@ THREE.ColladaLoader.prototype = {
 			var data = {
 				name: xml.getAttribute( 'name' ),
 				matrix: new THREE.Matrix4(),
+				nodes: [],
 				instanceCameras: [],
 				instanceLights: [],
 				instanceGeometries: [],
-				instanceNodes: [],
-				nodes: []
+				instanceNodes: []
 			};
 
 			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
@@ -583,6 +583,11 @@ THREE.ColladaLoader.prototype = {
 				if ( child.nodeType !== 1 ) continue;
 
 				switch ( child.nodeName ) {
+
+					case 'node':
+						parseNode( child );
+						data.nodes.push( child.getAttribute( 'id' ) );
+						break;
 
 					case 'instance_camera':
 						data.instanceCameras.push( parseId( child.getAttribute( 'url' ) ) );
@@ -603,11 +608,6 @@ THREE.ColladaLoader.prototype = {
 					case 'matrix':
 						var array = parseFloats( child.textContent );
 						data.matrix.multiply( matrix.fromArray( array ).transpose() ); // .transpose() when Z_UP?
-						break;
-
-					case 'node':
-						parseNode( child );
-						data.nodes.push( child.getAttribute( 'id' ) );
 						break;
 
 					case 'translate':
@@ -650,47 +650,67 @@ THREE.ColladaLoader.prototype = {
 
 		function buildNode( data ) {
 
-			var group = new THREE.Group();
-			group.name = data.name;
-			data.matrix.decompose( group.position, group.quaternion, group.scale );
+			var objects = [];
 
+			var matrix = data.matrix;
+			var nodes = data.nodes;
 			var instanceCameras = data.instanceCameras;
 			var instanceLights = data.instanceLights;
 			var instanceGeometries = data.instanceGeometries;
 			var instanceNodes = data.instanceNodes;
-			var nodes = data.nodes;
+
+			for ( var i = 0, l = nodes.length; i < l; i ++ ) {
+
+				objects.push( getNode( nodes[ i ] ).clone() );
+
+			}
 
 			for ( var i = 0, l = instanceCameras.length; i < l; i ++ ) {
 
-				group.add( getCamera( instanceCameras[ i ] ).clone() );
+				objects.push( getCamera( instanceCameras[ i ] ).clone() );
 
 			}
 
 			for ( var i = 0, l = instanceLights.length; i < l; i ++ ) {
 
-				group.add( getLight( instanceLights[ i ] ).clone() );
+				objects.push( getLight( instanceLights[ i ] ).clone() );
 
 			}
 
 			for ( var i = 0, l = instanceGeometries.length; i < l; i ++ ) {
 
-				group.add( getGeometry( instanceGeometries[ i ] ).clone() );
+				objects.push( getGeometry( instanceGeometries[ i ] ).clone() );
 
 			}
 
 			for ( var i = 0, l = instanceNodes.length; i < l; i ++ ) {
 
-				group.add( getNode( instanceNodes[ i ] ).clone() );
+				objects.push( getNode( instanceNodes[ i ] ).clone() );
 
 			}
 
-			for ( var i = 0, l = nodes.length; i < l; i ++ ) {
+			var object;
 
-				group.add( getNode( nodes[ i ] ).clone() );
+			if ( objects.length === 1 ) {
+
+				object = objects[ 0 ];
+
+			} else {
+
+				object = new THREE.Group();
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					object.add( objects[ i ] );
+
+				}
 
 			}
 
-			return group;
+			object.name = data.name;
+			matrix.decompose( object.position, object.quaternion, object.scale );
+
+			return object;
 
 		}
 

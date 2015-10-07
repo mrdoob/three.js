@@ -252,7 +252,7 @@
 
 			function initKeyDown() {
 
-				var onKeyDown = function ( event ) {
+				function onKeyDown( event ) {
 
 					switch ( event.keyCode ) {
 
@@ -280,9 +280,9 @@
 
 				};
 
-				var onKeyUp = function ( event ) {
+				function onKeyUp( event ) {
 
-					switch( event.keyCode ) {
+					switch ( event.keyCode ) {
 
 						case 38: // up
 						case 87: // w
@@ -376,6 +376,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
+				composer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
