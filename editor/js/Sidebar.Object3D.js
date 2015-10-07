@@ -95,6 +95,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	container.add( objectNameRow );
 
+	/*
 	// parent
 
 	var objectParentRow = new UI.Panel();
@@ -104,6 +105,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectParentRow.add( objectParent );
 
 	container.add( objectParentRow );
+	*/
 
 	// position
 
@@ -342,6 +344,7 @@ Sidebar.Object3D = function ( editor ) {
 
 		if ( object !== null ) {
 
+			/*
 			if ( object.parent !== null ) {
 
 				var newParentId = parseInt( objectParent.getValue() );
@@ -353,6 +356,7 @@ Sidebar.Object3D = function ( editor ) {
 				}
 
 			}
+			*/
 
 			object.position.x = objectPositionX.getValue();
 			object.position.y = objectPositionY.getValue();
@@ -448,7 +452,7 @@ Sidebar.Object3D = function ( editor ) {
 	function updateRows( object ) {
 
 		var properties = {
-			'parent': objectParentRow,
+			// 'parent': objectParentRow,
 			'fov': objectFovRow,
 			'near': objectNearRow,
 			'far': objectFarRow,
@@ -505,6 +509,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	} );
 
+	/*
 	signals.sceneGraphChanged.add( function () {
 
 		var scene = editor.scene;
@@ -519,6 +524,7 @@ Sidebar.Object3D = function ( editor ) {
 		objectParent.setOptions( options );
 
 	} );
+	*/
 
 	signals.objectChanged.add( function ( object ) {
 
@@ -535,11 +541,13 @@ Sidebar.Object3D = function ( editor ) {
 		objectUUID.setValue( object.uuid );
 		objectName.setValue( object.name );
 
+		/*
 		if ( object.parent !== null ) {
 
 			objectParent.setValue( object.parent.id );
 
 		}
+		*/
 
 		objectPositionX.setValue( object.position.x );
 		objectPositionY.setValue( object.position.y );
