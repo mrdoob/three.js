@@ -551,7 +551,7 @@ Sidebar.Object3D = function ( editor ) {
 	} );
 
 	function updateUI( object ) {
-		console.log("updateUI called");
+
 		objectType.setValue( object.type );
 
 		objectUUID.setValue( object.uuid );
