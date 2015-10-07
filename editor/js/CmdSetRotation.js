@@ -1,8 +1,15 @@
 /**
- * Created by Daniel on 23.07.15.
+ * @author dforrer / https://github.com/dforrer
  */
 
-CmdSetRotation = function ( object, newRotationEuler, oldRotationEuler ) {
+/**
+ * @param object THREE.Object3D
+ * @param newRotation THREE.Euler
+ * @param optionalOldRotation THREE.Euler
+ * @constructor
+ */
+
+CmdSetRotation = function ( object, newRotation, optionalOldRotation ) {
 
 	Cmd.call( this );
 
@@ -12,16 +19,16 @@ CmdSetRotation = function ( object, newRotationEuler, oldRotationEuler ) {
 
 	this.object = object;
 
-	if ( object !== undefined && newRotationEuler !== undefined) {
+	if ( object !== undefined && newRotation !== undefined) {
 
 		this.oldRotation = object.rotation.clone();
-		this.newRotation = newRotationEuler.clone();
+		this.newRotation = newRotation.clone();
 
 	}
 
-	if ( oldRotationEuler !== undefined ) {
+	if ( optionalOldRotation !== undefined ) {
 
-		this.oldRotation = oldRotationEuler.clone();
+		this.oldRotation = optionalOldRotation.clone();
 
 	}
 

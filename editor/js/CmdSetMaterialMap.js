@@ -1,5 +1,12 @@
 /**
- * Created by Daniel on 21.07.15.
+ * @author dforrer / https://github.com/dforrer
+ */
+
+/**
+ * @param object THREE.Object3D
+ * @param mapName string
+ * @param newMap THREE.Texture
+ * @constructor
  */
 
 CmdSetMaterialMap = function ( object, mapName, newMap ) {

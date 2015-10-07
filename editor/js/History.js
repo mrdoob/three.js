@@ -1,6 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
- * edited by dforrer on 20.07.15.
+ * @author dforrer / https://github.com/dforrer
  */
 
 History = function ( editor ) {

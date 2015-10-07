@@ -1,8 +1,15 @@
 /**
- * Created by Daniel on 23.07.15.
+ * @author dforrer / https://github.com/dforrer
  */
 
-CmdSetScale = function ( object, newScaleVector, oldScaleVector ) {
+/**
+ * @param object THREE.Object3D
+ * @param newScale THREE.Vector3
+ * @param optionalOldScale THREE.Vector3
+ * @constructor
+ */
+
+CmdSetScale = function ( object, newScale, optionalOldScale ) {
 
 	Cmd.call( this );
 
@@ -12,18 +19,19 @@ CmdSetScale = function ( object, newScaleVector, oldScaleVector ) {
 
 	this.object = object;
 
-	if ( object !== undefined && newScaleVector !== undefined ) {
+	if ( object !== undefined && newScale !== undefined ) {
 
 		this.oldScale = object.scale.clone();
-		this.newScale = newScaleVector.clone();
+		this.newScale = newScale.clone();
 
 	}
 
-	if ( oldScaleVector !== undefined ) {
+	if ( optionalOldScale !== undefined ) {
 
-		this.oldScale = oldScaleVector.clone();
+		this.oldScale = optionalOldScale.clone();
 
 	}
+
 };
 
 CmdSetScale.prototype = {

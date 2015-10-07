@@ -1,8 +1,15 @@
 /**
- * Created by Daniel on 23.07.15.
+ * @author dforrer / https://github.com/dforrer
  */
 
-CmdSetPosition = function ( object, newPositionVector, oldPositionVector ) {
+/**
+ * @param object THREE.Object3D
+ * @param newPosition THREE.Vector3
+ * @param optionalOldPosition THREE.Vector3
+ * @constructor
+ */
+
+CmdSetPosition = function ( object, newPosition, optionalOldPosition ) {
 
 	Cmd.call( this );
 
@@ -12,16 +19,16 @@ CmdSetPosition = function ( object, newPositionVector, oldPositionVector ) {
 
 	this.object = object;
 
-	if ( object !== undefined && newPositionVector !== undefined ) {
+	if ( object !== undefined && newPosition !== undefined ) {
 
 		this.oldPosition = object.position.clone();
-		this.newPosition = newPositionVector.clone();
+		this.newPosition = newPosition.clone();
 
 	}
 
-	if ( oldPositionVector !== undefined ) {
+	if ( optionalOldPosition !== undefined ) {
 
-		this.oldPosition = oldPositionVector.clone();
+		this.oldPosition = optionalOldPosition.clone();
 
 	}
 

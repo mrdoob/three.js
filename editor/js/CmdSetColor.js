@@ -1,5 +1,12 @@
 /**
- * Created by Daniel on 21.07.15.
+ * @author dforrer / https://github.com/dforrer
+ */
+
+/**
+ * @param object THREE.Object3D
+ * @param attributeName string
+ * @param newValue integer representing a hex color value
+ * @constructor
  */
 
 CmdSetColor = function ( object, attributeName, newValue ) {

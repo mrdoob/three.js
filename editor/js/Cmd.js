@@ -1,5 +1,11 @@
 /**
- * Created by Daniel on 20.07.15.
+ * @author dforrer / https://github.com/dforrer
+ */
+
+/**
+ * @param editorRef pointer to main editor object used to initialize
+ *        each command object with a reference to the editor
+ * @constructor
  */
 
 Cmd = function ( editorRef ) {

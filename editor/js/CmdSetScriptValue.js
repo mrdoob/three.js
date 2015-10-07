@@ -1,5 +1,14 @@
 /**
- * Created by Daniel on 21.07.15.
+ * @author dforrer / https://github.com/dforrer
+ */
+
+/**
+ * @param object THREE.Object3D
+ * @param script javascript object
+ * @param attributeName string
+ * @param newValue string, object
+ * @param cursorPosition javascript object with format {line: 2, ch: 3}
+ * @constructor
  */
 
 CmdSetScriptValue = function ( object, script, attributeName, newValue, cursorPosition ) {
@@ -16,7 +25,7 @@ CmdSetScriptValue = function ( object, script, attributeName, newValue, cursorPo
 	this.attributeName = attributeName;
 	this.oldValue = ( script !== undefined ) ? script[ this.attributeName ] : undefined;
 	this.newValue = newValue;
-	this.cursorPosition = cursorPosition; // Format {line: 2, ch: 3}
+	this.cursorPosition = cursorPosition;
 
 };
 

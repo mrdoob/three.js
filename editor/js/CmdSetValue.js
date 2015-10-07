@@ -1,5 +1,12 @@
 /**
- * Created by Daniel on 21.07.15.
+ * @author dforrer / https://github.com/dforrer
+ */
+
+/**
+ * @param object THREE.Object3D
+ * @param attributeName string
+ * @param newValue number, string, boolean or object
+ * @constructor
  */
 
 CmdSetValue = function ( object, attributeName, newValue ) {

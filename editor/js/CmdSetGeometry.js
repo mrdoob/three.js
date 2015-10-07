@@ -1,5 +1,11 @@
 /**
- * Created by Daniel on 21.07.15.
+ * @author dforrer / https://github.com/dforrer
+ */
+
+/**
+ * @param object THREE.Object3D
+ * @param newGeometry THREE.Geometry
+ * @constructor
  */
 
 CmdSetGeometry = function ( object, newGeometry ) {

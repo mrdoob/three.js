@@ -1,5 +1,12 @@
 /**
- * Created by Daniel on 20.07.15.
+ * @author dforrer / https://github.com/dforrer
+ */
+
+/**
+ * @param object THREE.Object3D
+ * @param newParent THREE.Object3D
+ * @param newBefore THREE.Object3D
+ * @constructor
  */
 
 CmdMoveObject = function ( object, newParent, newBefore ) {

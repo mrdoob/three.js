@@ -1,5 +1,10 @@
 /**
- * Created by Daniel on 20.07.15.
+ * @author dforrer / https://github.com/dforrer
+ */
+
+/**
+ * @param cmdArray array containing command objects
+ * @constructor
  */
 
 CmdMultiCmds = function ( cmdArray ) {

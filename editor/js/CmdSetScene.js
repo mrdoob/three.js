@@ -1,8 +1,13 @@
 /**
- * Created by Daniel on 20.07.15.
+ * @author dforrer / https://github.com/dforrer
  */
 
-CmdSetScene = function ( newScene ) {
+/**
+ * @param scene containing children to import
+ * @constructor
+ */
+
+CmdSetScene = function ( scene ) {
 
 	Cmd.call( this );
 
@@ -11,15 +16,15 @@ CmdSetScene = function ( newScene ) {
 
 	this.cmdArray = [];
 
-	if ( newScene !== undefined ) {
+	if ( scene !== undefined ) {
 
-		this.cmdArray.push( new CmdSetUuid( this.editor.scene, newScene.uuid ) );
-		this.cmdArray.push( new CmdSetValue( this.editor.scene, 'name', newScene.name ) );
-		this.cmdArray.push( new CmdSetValue( this.editor.scene, 'userData', JSON.parse( JSON.stringify( newScene.userData ) ) ) );
+		this.cmdArray.push( new CmdSetUuid( this.editor.scene, scene.uuid ) );
+		this.cmdArray.push( new CmdSetValue( this.editor.scene, 'name', scene.name ) );
+		this.cmdArray.push( new CmdSetValue( this.editor.scene, 'userData', JSON.parse( JSON.stringify( scene.userData ) ) ) );
 
-		while ( newScene.children.length > 0 ) {
+		while ( scene.children.length > 0 ) {
 
-			var child = newScene.children.pop();
+			var child = scene.children.pop();
 			this.cmdArray.push( new CmdAddObject( child ) );
 
 		}

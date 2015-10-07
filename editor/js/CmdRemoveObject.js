@@ -1,5 +1,10 @@
 /**
- * Created by Daniel on 20.07.15.
+ * @author dforrer / https://github.com/dforrer
+ */
+
+/**
+ * @param object THREE.Object3D
+ * @constructor
  */
 
 CmdRemoveObject = function ( object ) {
