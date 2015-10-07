@@ -1,5 +1,5 @@
 /**
- * @author mrdoob / http://mrdoob.com/
+ * @author dforrer / https://github.com/dforrer
  */
 
 Sidebar.History = function ( editor ) {
