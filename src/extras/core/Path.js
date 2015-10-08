@@ -197,7 +197,7 @@ THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
 		points.push( this.getPoint( i / divisions ) );
 
-		//if( !this.getPoint( i / divisions ) ) throw "DIE";
+		//if ( !this.getPoint( i / divisions ) ) throw "DIE";
 
 	}
 

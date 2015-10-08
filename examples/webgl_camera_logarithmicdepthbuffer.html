@@ -337,6 +337,7 @@
 			}
 			function onMouseWheel(ev) {
 				var amount = -ev.wheelDeltaY || ev.detail;
+				if ( amount === 0 ) return;
 				var dir = amount / Math.abs(amount);
 				zoomspeed = dir/10;
 

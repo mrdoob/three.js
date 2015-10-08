@@ -6,7 +6,7 @@ THREE.Color = function ( color ) {
 
 	if ( arguments.length === 3 ) {
 
-		return this.setRGB( arguments[ 0 ], arguments[ 1 ], arguments[ 2 ] );
+		return this.fromArray( arguments );
 
 	}
 
@@ -64,7 +64,7 @@ THREE.Color.prototype = {
 
 	setHSL: function () {
 
-		function hue2rgb ( p, q, t ) {
+		function hue2rgb( p, q, t ) {
 
 			if ( t < 0 ) t += 1;
 			if ( t > 1 ) t -= 1;
@@ -105,7 +105,7 @@ THREE.Color.prototype = {
 
 	setStyle: function ( style ) {
 
-		var parseAlpha = function ( strAlpha ) {
+		function parseAlpha( strAlpha ) {
 
 			var alpha = parseFloat( strAlpha );
 

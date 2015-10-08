@@ -113,7 +113,7 @@ THREE.CameraHelper.prototype.update = function () {
 	var vector = new THREE.Vector3();
 	var camera = new THREE.Camera();
 
-	var setPoint = function ( point, x, y, z ) {
+	function setPoint( point, x, y, z ) {
 
 		vector.set( x, y, z ).unproject( camera );
 
@@ -129,7 +129,7 @@ THREE.CameraHelper.prototype.update = function () {
 
 		}
 
-	};
+	}
 
 	return function () {
 
