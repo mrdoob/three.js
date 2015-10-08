@@ -97,7 +97,7 @@ History.prototype = {
 
 		if ( this.undos.length > 0 ) {
 
-			var cmd = this.undos.pop();
+			cmd = this.undos.pop();
 
 			if ( cmd.inMemory === false ) {
 
@@ -132,7 +132,7 @@ History.prototype = {
 
 		if ( this.redos.length > 0 ) {
 
-			var cmd = this.redos.pop();
+			cmd = this.redos.pop();
 
 			if ( cmd.inMemory === false ) {
 

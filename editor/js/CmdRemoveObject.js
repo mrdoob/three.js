@@ -69,7 +69,7 @@ CmdRemoveObject.prototype = {
 
 		this.object.updateMatrixWorld( true );
 
-		meta = {
+		var meta = {
 			geometries: {},
 			materials: {},
 			textures: {},
