@@ -363,6 +363,9 @@ class Geometry(base_classes.BaseNode):
                 data[constants.DATA] = geometry_data = {}
 
             geometry_data[constants.ATTRIBUTES] = component_data
+            index = self.get(constants.INDEX)
+            if index is not None:
+                geometry_data[constants.INDEX] = index
             draw_calls = self.get(constants.DRAW_CALLS)
             if draw_calls is not None:
                 geometry_data[constants.DRAW_CALLS] = draw_calls
@@ -495,8 +498,8 @@ class Geometry(base_classes.BaseNode):
                 array = attrib_data_out[i][0]
                 self[constants.ATTRIBUTES][key][constants.ARRAY] = array
 
-            self[constants.ATTRIBUTES][constants.INDEX] = {
-                constants.ITEM_SIZE: 3,
+            self[constants.INDEX] = {
+                constants.ITEM_SIZE: 1,
                 constants.TYPE: option_index_type,
                 constants.ARRAY: index_data
             }
