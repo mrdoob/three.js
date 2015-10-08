@@ -49,7 +49,6 @@ CmdSetGeometry.prototype = {
 	update: function ( cmd ) {
 
 		this.newGeometry = cmd.newGeometry;
-		this.newGeometryJSON = cmd.newGeometry.toJSON();
 
 	},
 
