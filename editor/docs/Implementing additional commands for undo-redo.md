@@ -28,10 +28,10 @@ Every command needs a constructor. In the constructor
 	
 CmdXXX = function () {
 
-	Cmd.call( this );					// Call default constructor
+	Cmd.call( this ); // Required: Call default constructor
 
-	this.type = 'CmdXXX';				// has to match the object-name!
-	this.name = 'Set/Do/Update XXX'; 	// description of the command, used in Sidebar.History
+	this.type = 'CmdXXX';            // Required: has to match the object-name!
+	this.name = 'Set/Do/Update XXX'; // Required: description of the command, used in Sidebar.History
 
 	// TODO: store all the relevant information needed to 
 	// restore the old and the new state
@@ -62,7 +62,7 @@ CmdXXX.prototype = {
 
 	toJSON: function () {
 
-		var output = Cmd.prototype.toJSON.call( this );	// Call 'toJSON'-method of prototype 'Cmd'
+		var output = Cmd.prototype.toJSON.call( this ); // Required: Call 'toJSON'-method of prototype 'Cmd'
 
 		// TODO: serialize all the necessary information as part of 'output' (JSON-format)
 		// so that it can be restored in 'fromJSON'
@@ -73,7 +73,7 @@ CmdXXX.prototype = {
 
 	fromJSON: function ( json ) {
 
-		Cmd.prototype.fromJSON.call( this, json );	// Call 'fromJSON'-method of prototype 'Cmd'
+		Cmd.prototype.fromJSON.call( this, json ); // Required: Call 'fromJSON'-method of prototype 'Cmd'
 		
 		// TODO: restore command from json
 		
