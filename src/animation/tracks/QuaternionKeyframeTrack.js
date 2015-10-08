@@ -1,7 +1,7 @@
 /**
  *
  * A Track that interpolates Quaternion
- *
+ * 
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
@@ -14,7 +14,7 @@ THREE.QuaternionKeyframeTrack = function ( name, keys ) {
 	this.result = this.keys[0].value.clone();
 
 };
-
+ 
 THREE.QuaternionKeyframeTrack.prototype = Object.create( THREE.KeyframeTrack.prototype );
 
 THREE.QuaternionKeyframeTrack.prototype.constructor = THREE.QuaternionKeyframeTrack;
@@ -41,10 +41,10 @@ THREE.QuaternionKeyframeTrack.prototype.compareValues = function( value0, value1
 
 THREE.QuaternionKeyframeTrack.prototype.multiply = function( quat ) {
 
-	for ( var i = 0; i < this.keys.length; i ++ ) {
+	for( var i = 0; i < this.keys.length; i ++ ) {
 
 		this.keys[i].value.multiply( quat );
-
+		
 	}
 
 	return this;
@@ -55,8 +55,8 @@ THREE.QuaternionKeyframeTrack.prototype.clone = function() {
 
 	var clonedKeys = [];
 
-	for ( var i = 0; i < this.keys.length; i ++ ) {
-
+	for( var i = 0; i < this.keys.length; i ++ ) {
+		
 		var key = this.keys[i];
 		clonedKeys.push( {
 			time: key.time,
@@ -72,7 +72,7 @@ THREE.QuaternionKeyframeTrack.parse = function( json ) {
 
 	var keys = [];
 
-	for ( var i = 0; i < json.keys.length; i ++ ) {
+	for( var i = 0; i < json.keys.length; i ++ ) {
 		var jsonKey = json.keys[i];
 		keys.push( {
 			value: new THREE.Quaternion().fromArray( jsonKey.value ),
@@ -83,3 +83,4 @@ THREE.QuaternionKeyframeTrack.parse = function( json ) {
 	return new THREE.QuaternionKeyframeTrack( json.name, keys );
 
 };
+ 

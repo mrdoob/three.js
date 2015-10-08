@@ -1,14 +1,14 @@
 /**
  *
  * A clip that has been explicitly scheduled.
- *
+ * 
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
 THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 
-	if ( clip === undefined ) throw new Error( 'clip is null' );
+	if( clip === undefined ) throw new Error( 'clip is null' );
 	this.clip = clip;
 	this.localRoot = null;
 	this.startTime = startTime || 0;
@@ -39,7 +39,7 @@ THREE.AnimationAction.prototype = {
 		this.localRoot = localRoot;
 
 		return this;
-
+		
 	},
 
 	updateTime: function( clipDeltaTime ) {
@@ -49,22 +49,23 @@ THREE.AnimationAction.prototype = {
    		var previousActionTime = this.actionTime;
 
 		var duration = this.clip.duration;
-
+	
 		this.actionTime = this.actionTime + clipDeltaTime;
-
-		if ( this.loop === THREE.LoopOnce ) {
+	
+		if( this.loop === THREE.LoopOnce ) {
 
 			this.loopCount = 0;
 			this.clipTime = Math.min( Math.max( this.actionTime, 0 ), duration );
-
+	
 			// if time is changed since last time, see if we have hit a start/end limit
-			if ( this.clipTime !== previousClipTime ) {
+			if( this.clipTime !== previousClipTime ) {
 
-				if ( this.clipTime === duration ) {
+				if( this.clipTime === duration ) {
 
 					this.mixer.dispatchEvent( { type: 'finished', action: this, direction: 1 } );
 
-				} else if ( this.clipTime === 0 ) {
+				}
+				else if( this.clipTime === 0 ) {
 
 					this.mixer.dispatchEvent( { type: 'finished', action: this, direction: -1 } );
 
@@ -72,20 +73,20 @@ THREE.AnimationAction.prototype = {
 
 			}
 
-
+		
 			return this.clipTime;
 
 		}
-
+		
 		this.loopCount = Math.floor( this.actionTime / duration );
-
+	
 		var newClipTime = this.actionTime - this.loopCount * duration;
 		newClipTime = newClipTime % duration;
-
+	
 		// if we are ping pong looping, ensure that we go backwards when appropriate
-		if ( this.loop == THREE.LoopPingPong ) {
+		if( this.loop == THREE.LoopPingPong ) {
 
-			if ( Math.abs( this.loopCount % 2 ) === 1 ) {
+			if( Math.abs( this.loopCount % 2 ) === 1 ) {
 
 				newClipTime = duration - newClipTime;
 
@@ -95,12 +96,12 @@ THREE.AnimationAction.prototype = {
 
 		this.clipTime = newClipTime;
 
-		if ( this.loopCount !== previousLoopCount ) {
+		if( this.loopCount !== previousLoopCount ) {
 
    			this.mixer.dispatchEvent( { type: 'loop', action: this, loopDelta: ( this.loopCount - this.loopCount ) } );
 
    		}
-
+	
 	   	return this.clipTime;
 
 	},
@@ -135,12 +136,12 @@ THREE.AnimationAction.prototype = {
 		var clipResults = this.clip.getAt( this.clipTime );
 
 		return clipResults;
-
+		
 	},
 
 	getTimeScaleAt: function( time ) {
 
-		if ( this.timeScale.getAt ) {
+		if( this.timeScale.getAt ) {
 			// pass in time, not clip time, allows for fadein/fadeout across multiple loops of the clip
 			return this.timeScale.getAt( time );
 
@@ -152,7 +153,7 @@ THREE.AnimationAction.prototype = {
 
 	getWeightAt: function( time ) {
 
-		if ( this.weight.getAt ) {
+		if( this.weight.getAt ) {
 			// pass in time, not clip time, allows for fadein/fadeout across multiple loops of the clip
 			return this.weight.getAt( time );
 
