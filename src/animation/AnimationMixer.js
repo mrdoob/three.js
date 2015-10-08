@@ -33,23 +33,23 @@ THREE.AnimationMixer.prototype = {
 
 		var root = action.localRoot || this.root;
 
-		for( var i = 0; i < tracks.length; i ++ ) {
+		for ( var i = 0; i < tracks.length; i ++ ) {
 
 			var track = tracks[ i ];
 
-			var propertyBindingKey = root.uuid + '-' + track.name;			
+			var propertyBindingKey = root.uuid + '-' + track.name;
 			var propertyBinding = this.propertyBindingMap[ propertyBindingKey ];
 
-			if( propertyBinding === undefined ) {
-			
+			if ( propertyBinding === undefined ) {
+
 				propertyBinding = new THREE.PropertyBinding( root, track.name );
 				this.propertyBindingMap[ propertyBindingKey ] = propertyBinding;
-			
+
 			}
 
 			// push in the same order as the tracks.
 			action.propertyBindings.push( propertyBinding );
-			
+
 			// track usages of shared property bindings, because if we leave too many around, the mixer can get slow
 			propertyBinding.referenceCount += 1;
 
@@ -59,14 +59,14 @@ THREE.AnimationMixer.prototype = {
 
 	removeAllActions: function() {
 
-		for( var i = 0; i < this.actions.length; i ++ ) {
+		for ( var i = 0; i < this.actions.length; i ++ ) {
 
 			this.actions[i].mixer = null;
-			
+
 		}
 
 		// unbind all property bindings
-		for( var properyBindingKey in this.propertyBindingMap ) {
+		for ( var properyBindingKey in this.propertyBindingMap ) {
 
 			this.propertyBindingMap[ properyBindingKey ].unbind();
 
@@ -95,16 +95,16 @@ THREE.AnimationMixer.prototype = {
 		var root = action.localRoot || this.root;
 		var tracks = action.clip.tracks;
 
-		for( var i = 0; i < tracks.length; i ++ ) {
-		
+		for ( var i = 0; i < tracks.length; i ++ ) {
+
 			var track = tracks[ i ];
 
-			var propertyBindingKey = root.uuid + '-' + track.name;			
+			var propertyBindingKey = root.uuid + '-' + track.name;
 			var propertyBinding = this.propertyBindingMap[ propertyBindingKey ];
-	
+
 			propertyBinding.referenceCount -= 1;
 
-			if( propertyBinding.referenceCount <= 0 ) {
+			if ( propertyBinding.referenceCount <= 0 ) {
 
 				propertyBinding.unbind();
 
@@ -120,9 +120,9 @@ THREE.AnimationMixer.prototype = {
 	// can be optimized if needed
 	findActionByName: function( name ) {
 
-		for( var i = 0; i < this.actions.length; i ++ ) {
+		for ( var i = 0; i < this.actions.length; i ++ ) {
 
-			if( this.actions[i].name === name ) return this.actions[i];
+			if ( this.actions[i].name === name ) return this.actions[i];
 
 		}
 
@@ -145,7 +145,7 @@ THREE.AnimationMixer.prototype = {
 
 		keys.push( { time: this.time, value: 1 } );
 		keys.push( { time: this.time + duration, value: 0 } );
-		
+
 		action.weight = new THREE.NumberKeyframeTrack( "weight", keys );
 
 		return this;
@@ -153,12 +153,12 @@ THREE.AnimationMixer.prototype = {
 	},
 
 	fadeIn: function( action, duration ) {
-		
+
 		var keys = [];
-		
+
 		keys.push( { time: this.time, value: 0 } );
 		keys.push( { time: this.time + duration, value: 1 } );
-		
+
 		action.weight = new THREE.NumberKeyframeTrack( "weight", keys );
 
 		return this;
@@ -168,10 +168,10 @@ THREE.AnimationMixer.prototype = {
 	warp: function( action, startTimeScale, endTimeScale, duration ) {
 
 		var keys = [];
-		
+
 		keys.push( { time: this.time, value: startTimeScale } );
 		keys.push( { time: this.time + duration, value: endTimeScale } );
-		
+
 		action.timeScale = new THREE.NumberKeyframeTrack( "timeScale", keys );
 
 		return this;
@@ -183,8 +183,8 @@ THREE.AnimationMixer.prototype = {
 		this.fadeOut( fadeOutAction, duration );
 		this.fadeIn( fadeInAction, duration );
 
-		if( warp ) {
-	
+		if ( warp ) {
+
 			var startEndRatio = fadeOutAction.clip.duration / fadeInAction.clip.duration;
 			var endStartRatio = 1.0 / startEndRatio;
 
@@ -194,7 +194,7 @@ THREE.AnimationMixer.prototype = {
 		}
 
 		return this;
-		
+
 	},
 
 	update: function( deltaTime ) {
@@ -202,7 +202,7 @@ THREE.AnimationMixer.prototype = {
 		var mixerDeltaTime = deltaTime * this.timeScale;
 		this.time += mixerDeltaTime;
 
-		for( var i = 0; i < this.actions.length; i ++ ) {
+		for ( var i = 0; i < this.actions.length; i ++ ) {
 
 			var action = this.actions[i];
 
@@ -210,12 +210,12 @@ THREE.AnimationMixer.prototype = {
 
 			var actionTimeScale = action.getTimeScaleAt( this.time );
 			var actionDeltaTime = mixerDeltaTime * actionTimeScale;
-		
+
 			var actionResults = action.update( actionDeltaTime );
 
-			if( action.weight <= 0 || ! action.enabled ) continue;
+			if ( action.weight <= 0 || ! action.enabled ) continue;
 
-			for( var j = 0; j < actionResults.length; j ++ ) {
+			for ( var j = 0; j < actionResults.length; j ++ ) {
 
 				var name = action.clip.tracks[j].name;
 
@@ -224,16 +224,16 @@ THREE.AnimationMixer.prototype = {
 			}
 
 		}
-	
+
 		// apply to nodes
-		for( var propertyBindingKey in this.propertyBindingMap ) {
+		for ( var propertyBindingKey in this.propertyBindingMap ) {
 
 			this.propertyBindingMap[ propertyBindingKey ].apply();
 
 		}
 
 		return this;
-		
+
 	}
 
 };

@@ -1,6 +1,6 @@
 #if MAX_HEMI_LIGHTS > 0
 
-	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
+	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
 		vec3 lightDir = hemisphereLightDirection[ i ];
 

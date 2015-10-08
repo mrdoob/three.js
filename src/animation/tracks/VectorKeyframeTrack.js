@@ -1,7 +1,7 @@
 /**
  *
  * A Track that interpolates Vectors
- * 
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
@@ -43,8 +43,8 @@ THREE.VectorKeyframeTrack.prototype.clone = function() {
 
 	var clonedKeys = [];
 
-	for( var i = 0; i < this.keys.length; i ++ ) {
-		
+	for ( var i = 0; i < this.keys.length; i ++ ) {
+
 		var key = this.keys[i];
 		clonedKeys.push( {
 			time: key.time,
@@ -63,7 +63,7 @@ THREE.VectorKeyframeTrack.parse = function( json ) {
 
 	var keys = [];
 
-	for( var i = 0; i < json.keys.length; i ++ ) {
+	for ( var i = 0; i < json.keys.length; i ++ ) {
 		var jsonKey = json.keys[i];
 		keys.push( {
 			value: new valueType().fromArray( jsonKey.value ),
@@ -74,4 +74,3 @@ THREE.VectorKeyframeTrack.parse = function( json ) {
 	return new THREE.VectorKeyframeTrack( json.name, keys );
 
 };
- 

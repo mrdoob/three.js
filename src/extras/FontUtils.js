@@ -289,7 +289,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 	// takes in an contour array and returns
 
-	var process = function ( contour, indices ) {
+	function process( contour, indices ) {
 
 		var n = contour.length;
 
@@ -383,11 +383,11 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 		if ( indices ) return vertIndices;
 		return result;
 
-	};
+	}
 
 	// calculate area of the contour polygon
 
-	var area = function ( contour ) {
+	function area( contour ) {
 
 		var n = contour.length;
 		var a = 0.0;
@@ -400,9 +400,9 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 		return a * 0.5;
 
-	};
+	}
 
-	var snip = function ( contour, u, v, w, n, verts ) {
+	function snip( contour, u, v, w, n, verts ) {
 
 		var p;
 		var ax, ay, bx, by;
@@ -452,8 +452,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 		return true;
 
-	};
-
+	}
 
 	namespace.Triangulate = process;
 	namespace.Triangulate.area = area;

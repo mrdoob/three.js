@@ -25,7 +25,7 @@
 		void adjustShadowValue1K( const float testDepth, const vec4 textureData, const float bias, inout float shadowValue ) {
 
 			const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
-			if( testDepth >= dot( textureData, bitSh ) * 1000.0 + bias )
+			if ( testDepth >= dot( textureData, bitSh ) * 1000.0 + bias )
 				shadowValue += 1.0;
 
 		}

@@ -45,7 +45,7 @@ THREE.ImageUtils = {
 
 		var loaded = 0;
 
-		var loadTexture = function ( i ) {
+		function loadTexture( i ) {
 
 			loader.load( array[ i ], function ( image ) {
 
@@ -63,7 +63,7 @@ THREE.ImageUtils = {
 
 			}, undefined, onError );
 
-		};
+		}
 
 		for ( var i = 0, il = array.length; i < il; ++ i ) {
 
@@ -91,24 +91,24 @@ THREE.ImageUtils = {
 
 		// Adapted from http://www.paulbrunt.co.uk/lab/heightnormal/
 
-		var cross = function ( a, b ) {
+		function cross( a, b ) {
 
 			return [ a[ 1 ] * b[ 2 ] - a[ 2 ] * b[ 1 ], a[ 2 ] * b[ 0 ] - a[ 0 ] * b[ 2 ], a[ 0 ] * b[ 1 ] - a[ 1 ] * b[ 0 ] ];
 
-		};
+		}
 
-		var subtract = function ( a, b ) {
+		function subtract( a, b ) {
 
 			return [ a[ 0 ] - b[ 0 ], a[ 1 ] - b[ 1 ], a[ 2 ] - b[ 2 ] ];
 
-		};
+		}
 
-		var normalize = function ( a ) {
+		function normalize( a ) {
 
 			var l = Math.sqrt( a[ 0 ] * a[ 0 ] + a[ 1 ] * a[ 1 ] + a[ 2 ] * a[ 2 ] );
 			return [ a[ 0 ] / l, a[ 1 ] / l, a[ 2 ] / l ];
 
-		};
+		}
 
 		depth = depth | 1;
 

@@ -2,7 +2,7 @@
 
 	vec3 shadowMask = vec3( 1.0 );
 
-	for( int i = 0; i < MAX_SHADOWS; i ++ ) {
+	for ( int i = 0; i < MAX_SHADOWS; i ++ ) {
 		
 		float texelSizeY =  1.0 / shadowMapSize[ i ].y;
 
@@ -14,7 +14,7 @@
 		// whether or not this light is a point light ( shadowDarkness[ i ] < 0 == point light)
 		bool isPointLight = shadowDarkness[ i ] < 0.0;	
 
-		if( isPointLight ) {
+		if ( isPointLight ) {
 
 			// get the real shadow darkness
 			float realShadowDarkness = abs( shadowDarkness[ i ] );
@@ -99,7 +99,7 @@
 
 			bool frustumTest = all( frustumTestVec );
 
-			if( frustumTest ) {
+			if ( frustumTest ) {
 
 	#if defined( SHADOWMAP_TYPE_PCF )
 		

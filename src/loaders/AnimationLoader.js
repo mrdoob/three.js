@@ -36,7 +36,7 @@ THREE.AnimationLoader.prototype = {
 
 		var animations = [];
 
-		for( var i = 0; i < json.length; i ++ ) {
+		for ( var i = 0; i < json.length; i ++ ) {
 
 			var clip = THREE.AnimationClip.parse( json[i] );
 
