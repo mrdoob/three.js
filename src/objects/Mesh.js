@@ -218,21 +218,21 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
+					a = i / 3;
+					b = a + 1;
+					c = a + 2;
+
 					var uv;
 
 					if ( attributes.uv !== undefined ) {
 
 						var uvs = attributes.uv.array;
-						uvA.fromArray( uvs, i );
-						uvB.fromArray( uvs, i + 2 );
-						uvC.fromArray( uvs, i + 4 );
+						uvA.fromArray( uvs, a * 2 );
+						uvB.fromArray( uvs, b * 2 );
+						uvC.fromArray( uvs, c * 2 );
 						uv = uvIntersection( intersectionPoint, vA, vB, vC, uvA, uvB, uvC );
 
 					}
-
-					a = i / 3;
-					b = a + 1;
-					c = a + 2;
 
 					intersects.push( {
 
