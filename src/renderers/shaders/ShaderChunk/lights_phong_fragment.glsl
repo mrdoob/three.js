@@ -1,34 +1,33 @@
 vec3 viewDir = normalize( vViewPosition );
 
-vec3 totalDiffuseLight = vec3( 0.0 );
-vec3 totalSpecularLight = vec3( 0.0 );
+vec3 totalReflectedLight = vec3( 0.0 );
+
+#ifdef METAL
+
+	diffuseColor.rgb = diffuseColor.rgb * specular;
+
+#endif
 
 #if MAX_POINT_LIGHTS > 0
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
-		vec3 lightColor = pointLightColor[ i ];
+		vec3 lightDir, lightIntensity;
+		getSpotLight( i, lightDir, lightIntensity );
 
-		vec3 lightPosition = pointLightPosition[ i ];
-		vec3 lVector = lightPosition + vViewPosition.xyz;
-		vec3 lightDir = normalize( lVector );
+		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
 
-		// attenuation
+			vec3 halfDir = normalize( lightDir + viewDir );
+			float dotNL = saturate( dot( normal, lightDir ) );
+			float dotNH = saturate( dot( normal, halfDir ) );
+			float dotLH = saturate( dot( lightDir, halfDir ) );
 
-		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );
+			totalReflectedLight += (
+				BRDF_Lambert( diffuseColor.rgb, dotNL ) +
+				BRDF_BlinnPhong( specular, shininess, dotNH, dotLH )
+				) * lightIntensity;
 
-		// diffuse
-
-		float cosineTerm = saturate( dot( normal, lightDir ) );
-
-		totalDiffuseLight += lightColor * attenuation * cosineTerm;
-
-		// specular
-
-		vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );
-
-		totalSpecularLight += brdf * specularStrength * lightColor * attenuation * cosineTerm;
-
+		}
 
 	}
 
@@ -38,35 +37,20 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
-		vec3 lightColor = spotLightColor[ i ];
+		vec3 lightDir, lightIntensity;
+		getSpotLight( i, lightDir, lightIntensity );
 
-		vec3 lightPosition = spotLightPosition[ i ];
-		vec3 lVector = lightPosition + vViewPosition.xyz;
-		vec3 lightDir = normalize( lVector );
+		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
 
-		float spotEffect = dot( spotLightDirection[ i ], lightDir );
+			vec3 halfDir = normalize( lightDir + viewDir );
+			float dotNL = saturate( dot( normal, lightDir ) );
+			float dotNH = saturate( dot( normal, halfDir ) );
+			float dotLH = saturate( dot( lightDir, halfDir ) );
 
-		if ( spotEffect > spotLightAngleCos[ i ] ) {
-
-			spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ i ] ) );
-
-			// attenuation
-
-			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );
-
-			attenuation *= spotEffect;
-
-			// diffuse
-
-			float cosineTerm = saturate( dot( normal, lightDir ) );
-
-			totalDiffuseLight += lightColor * attenuation * cosineTerm;
-
-			// specular
-
-			vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );
-
-			totalSpecularLight += brdf * specularStrength * lightColor * attenuation * cosineTerm;
+			totalReflectedLight += (
+				BRDF_Lambert( diffuseColor.rgb, dotNL ) +
+				BRDF_BlinnPhong( specular, shininess, dotNH, dotLH )
+				) * lightIntensity;
 
 		}
 
@@ -78,32 +62,25 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-		vec3 lightColor = directionalLightColor[ i ];
+		vec3 lightDir, lightIntensity;
+		getDirLight( i, lightDir, lightIntensity );
 
-		vec3 lightDir = directionalLightDirection[ i ];
+		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
 
-		// diffuse
+			vec3 halfDir = normalize( lightDir + viewDir );
+			float dotNL = saturate( dot( normal, lightDir ) );
+			float dotNH = saturate( dot( normal, halfDir ) );
+			float dotLH = saturate( dot( lightDir, halfDir ) );
 
-		float cosineTerm = saturate( dot( normal, lightDir ) );
+			totalReflectedLight += (
+				BRDF_Lambert( diffuseColor.rgb, dotNL ) +
+				BRDF_BlinnPhong( specular, shininess, dotNH, dotLH )
+				) * lightIntensity;
 
-		totalDiffuseLight += lightColor * cosineTerm;
-
-		// specular
-
-		vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );
-
-		totalSpecularLight += brdf * specularStrength * lightColor * cosineTerm;
+		}
 
 	}
 
 #endif
 
-#ifdef METAL
-
-	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + totalEmissiveLight;
-
-#else
-
-	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;
-
-#endif
+outgoingLight += totalReflectedLight + totalEmissiveLight;

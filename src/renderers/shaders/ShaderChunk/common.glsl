@@ -1,5 +1,6 @@
 #define PI 3.14159
 #define PI2 6.28318
+#define RECIPROCAL_PI 0.31830988618
 #define RECIPROCAL_PI2 0.15915494
 #define LOG2 1.442695
 #define EPSILON 1e-6
@@ -52,6 +53,41 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 
 }
 
+vec3 inputToLinear( in vec3 a ) {
+
+	#ifdef GAMMA_INPUT
+
+		return pow( a, vec3( float( GAMMA_FACTOR ) ) );
+
+	#else
+
+		return a;
+
+	#endif
+
+}
+
+vec3 linearToOutput( in vec3 a ) {
+
+	#ifdef GAMMA_OUTPUT
+
+		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );
+
+	#else
+
+		return a;
+
+	#endif
+
+}
+
+
+vec3 BRDF_Lambert( in vec3 diffuseColor, in float dotLN ) {
+
+	return diffuseColor * ( dotLN * RECIPROCAL_PI );
+
+}
+
 vec3 F_Schlick( in vec3 specularColor, in float dotLH ) {
 
 	// Original approximation by Christophe Schlick '94
@@ -80,49 +116,14 @@ float D_BlinnPhong( in float shininess, in float dotNH ) {
 
 }
 
-vec3 BRDF_BlinnPhong( in vec3 specularColor, in float shininess, in vec3 normal, in vec3 lightDir, in vec3 viewDir ) {
-
-	vec3 halfDir = normalize( lightDir + viewDir );
-
-	//float dotNL = saturate( dot( normal, lightDir ) );
-	//float dotNV = saturate( dot( normal, viewDir ) );
-	float dotNH = saturate( dot( normal, halfDir ) );
-	float dotLH = saturate( dot( lightDir, halfDir ) );
+vec3 BRDF_BlinnPhong( in vec3 specularColor, in float shininess, in float dotNH, in float dotLH ) {
 
 	vec3 F = F_Schlick( specularColor, dotLH );
-
 	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );
-
 	float D = D_BlinnPhong( shininess, dotNH );
 
 	return F * G * D;
 
 }
 
-vec3 inputToLinear( in vec3 a ) {
 
-	#ifdef GAMMA_INPUT
-
-		return pow( a, vec3( float( GAMMA_FACTOR ) ) );
-
-	#else
-
-		return a;
-
-	#endif
-
-}
-
-vec3 linearToOutput( in vec3 a ) {
-
-	#ifdef GAMMA_OUTPUT
-
-		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );
-
-	#else
-
-		return a;
-
-	#endif
-
-}

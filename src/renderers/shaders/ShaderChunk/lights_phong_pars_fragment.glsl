@@ -1,9 +1,30 @@
 uniform vec3 ambientLightColor;
 
+#if MAX_SPOT_LIGHTS > 0 || defined( USE_ENVMAP )
+
+	varying vec3 vWorldPosition;
+
+#endif
+
+varying vec3 vViewPosition;
+
+#ifndef FLAT_SHADED
+
+	varying vec3 vNormal;
+
+#endif
+
 #if MAX_DIR_LIGHTS > 0
 
 	uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];
 	uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];
+
+	#define getDirLight( directionalIndex, lightDir, lightIntensity ) { 
+	
+		lightDir = directionalLightDirection[ directionalIndex ]; 
+		lightIntensity = directionalLightColor[ directionalIndex ]; 
+	
+	}
 
 #endif
 
@@ -18,10 +39,21 @@ uniform vec3 ambientLightColor;
 #if MAX_POINT_LIGHTS > 0
 
 	uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];
-
 	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];
 	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];
 	uniform float pointLightDecay[ MAX_POINT_LIGHTS ];
+
+	#define getPointLight( pointIndex, lightDir, lightIntensity ) { 
+	
+		vec3 lightPosition = pointLightPosition[ pointIndex ]; 
+	
+		vec3 lVector = lightPosition + vViewPosition.xyz; 
+		lightDir = normalize( lVector ); 
+	
+		lightIntensity = pointLightColor[ pointIndex ]; 
+		lightIntensity *= calcLightAttenuation( length( lVector ), pointLightDistance[ pointIndex ], pointLightDecay[ pointIndex ] ); 
+	
+	}
 
 #endif
 
@@ -35,18 +67,24 @@ uniform vec3 ambientLightColor;
 	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];
 	uniform float spotLightDecay[ MAX_SPOT_LIGHTS ];
 
+	#define getSpotLight( spotIndex, lightDir, lightIntensity ) {
+	
+		vec3 lightPosition = spotLightPosition[ spotIndex ];
+	
+		vec3 lVector = lightPosition + vViewPosition.xyz;
+		lightDir = normalize( lVector );
+	
+		float spotEffect = dot( spotLightDirection[ spotIndex ], lightDir );
+		spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ spotIndex ] ) );
+	
+		lightIntensity = spotLightColor[ spotIndex ];
+		lightIntensity *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLightDistance[ spotIndex ], spotLightDecay[ spotIndex ] ) );
+
+	}
+
 #endif
 
-#if MAX_SPOT_LIGHTS > 0 || defined( USE_ENVMAP )
 
-	varying vec3 vWorldPosition;
 
-#endif
 
-varying vec3 vViewPosition;
 
-#ifndef FLAT_SHADED
-
-	varying vec3 vNormal;
-
-#endif
