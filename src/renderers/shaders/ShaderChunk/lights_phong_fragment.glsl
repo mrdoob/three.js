@@ -2,9 +2,11 @@ vec3 viewDir = normalize( vViewPosition );
 
 vec3 totalReflectedLight = vec3( 0.0 );
 
+var diffuse = diffuseColor.rgb;
+
 #ifdef METAL
 
-	diffuseColor.rgb = diffuseColor.rgb * specular;
+	diffuse *= specular;
 
 #endif
 
@@ -23,7 +25,7 @@ vec3 totalReflectedLight = vec3( 0.0 );
 			float dotLH = saturate( dot( lightDir, halfDir ) );
 
 			totalReflectedLight += (
-				BRDF_Lambert( diffuseColor.rgb, dotNL ) +
+				BRDF_Lambert( diffuse, dotNL ) +
 				BRDF_BlinnPhong( specular, shininess, dotNH, dotLH )
 				) * lightIntensity;
 
@@ -48,7 +50,7 @@ vec3 totalReflectedLight = vec3( 0.0 );
 			float dotLH = saturate( dot( lightDir, halfDir ) );
 
 			totalReflectedLight += (
-				BRDF_Lambert( diffuseColor.rgb, dotNL ) +
+				BRDF_Lambert( diffuse, dotNL ) +
 				BRDF_BlinnPhong( specular, shininess, dotNH, dotLH )
 				) * lightIntensity;
 
@@ -73,7 +75,7 @@ vec3 totalReflectedLight = vec3( 0.0 );
 			float dotLH = saturate( dot( lightDir, halfDir ) );
 
 			totalReflectedLight += (
-				BRDF_Lambert( diffuseColor.rgb, dotNL ) +
+				BRDF_Lambert( diffuse, dotNL ) +
 				BRDF_BlinnPhong( specular, shininess, dotNH, dotLH )
 				) * lightIntensity;
 
