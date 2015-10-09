@@ -22,7 +22,7 @@ THREE.WebGLProperties = function () {
 
 	};
 
-	this.delete = function ( object ) {
+	this.remove = function ( object ) {
 
 		delete properties[ object.uuid ];
 
