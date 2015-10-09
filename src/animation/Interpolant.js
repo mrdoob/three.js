@@ -33,7 +33,7 @@ THREE.Interpolant.prototype = {
 		var keyTime = times[ index ];
 		var prevKeyTime = times[ index - 1 ];
 
-		change_interval: for (;;) {
+		validate_interval: {
 
 			seek: for (;;) {
 
@@ -118,9 +118,9 @@ THREE.Interpolant.prototype = {
 
 				} else {
 
-					// the current interval is still valid
+					// the interval is valid
 
-					break change_interval;
+					break validate_interval;
 
 				}
 
@@ -152,7 +152,6 @@ THREE.Interpolant.prototype = {
 			this.cachedIndex = index;
 
 			this._intervalChanged( index, prevKeyTime, keyTime );
-			break;
 
 		}
 

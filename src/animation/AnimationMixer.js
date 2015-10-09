@@ -400,13 +400,11 @@ THREE.AnimationMixer.prototype = {
 
 			if ( mapChanged ) {
 
-				remove_empty_map: for (;;) {
+				remove_empty_map: {
 
-					// unless not empty...
 					for ( var k in bindingsMap ) break remove_empty_map;
 
 					delete bindingsMaps[ rootUuid ];
-					break;
 
 				}
 
