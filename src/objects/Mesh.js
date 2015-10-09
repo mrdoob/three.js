@@ -211,8 +211,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 					b = indices[ i + 1 ];
 					c = indices[ i + 2 ];
 
-					intersection = checkBufferGeometryIntersection( this, raycaster, ray, 
-																    positions, uvs, a, b, c );
+					intersection = checkBufferGeometryIntersection( this, raycaster, ray, positions, uvs, a, b, c );
 
 					if( intersection ){
 
@@ -233,8 +232,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 					b = a + 1;
 					c = a + 2;
           
-					intersection = checkBufferGeometryIntersection( this, raycaster, ray, 
-																    positions, uvs, a, b, c );
+					intersection = checkBufferGeometryIntersection( this, raycaster, ray, positions, uvs, a, b, c );
 
 					if( intersection ){
 
