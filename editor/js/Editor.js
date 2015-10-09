@@ -414,6 +414,7 @@ Editor.prototype = {
 	clear: function () {
 
 		this.history.clear();
+		this.storage.clear();
 
 		this.camera.position.set( 500, 250, 500 );
 		this.camera.lookAt( new THREE.Vector3() );

@@ -101,11 +101,11 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
 
-			properties.delete( attribute.data );
+			properties.remove( attribute.data );
 
 		} else {
 
-			properties.delete( attribute );
+			properties.remove( attribute );
 
 		}
 
