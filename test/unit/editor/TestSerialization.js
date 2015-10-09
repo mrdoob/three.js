@@ -1,9 +1,15 @@
 module( "Serialization" );
 
-test( "Test Serialization", function() {
+asyncTest( "Test Serialization", function() {
 
 	// setup
 	var editor = new Editor();
+	editor.storage.init( function () {
+
+		performTests();
+		start(); // continue running other tests
+
+	} );
 
 	var green   = 12581843; // bffbd3
 
@@ -99,7 +105,6 @@ test( "Test Serialization", function() {
 
 		return "setGeometry";
 	};
-
 
 	var setGeometryValue = function() {
 
@@ -270,56 +275,60 @@ test( "Test Serialization", function() {
 		setValue
 	];
 
-	// Forward tests
+	function performTests() {
 
-	for ( var i = 0; i < setups.length ; i++ ) {
+		// Forward tests
 
-		var name = setups[i]();
+		for ( var i = 0; i < setups.length ; i++ ) {
 
-		// Check for correct serialization
+			var name = setups[i]();
 
-		editor.history.goToState( 0 );
-		editor.history.goToState( 1000 );
+			// Check for correct serialization
 
-		var history = JSON.stringify( editor.history.toJSON() );
+			editor.history.goToState( 0 );
+			editor.history.goToState( 1000 );
 
-		editor.history.clear();
+			var history = JSON.stringify( editor.history.toJSON() );
 
-		editor.history.fromJSON( JSON.parse( history ) );
+			editor.history.clear();
 
-		editor.history.goToState( 0 );
-		editor.history.goToState( 1000 );
+			editor.history.fromJSON( JSON.parse( history ) );
 
-		var history2 = JSON.stringify( editor.history.toJSON() );
+			editor.history.goToState( 0 );
+			editor.history.goToState( 1000 );
 
-		ok( history == history2 , "OK, forward serializing was successful for " + name );
+			var history2 = JSON.stringify( editor.history.toJSON() );
 
-		editor.clear();
+			ok( history == history2 , "OK, forward serializing was successful for " + name );
 
-	}
+			editor.clear();
 
-	// Backward tests
+		}
 
-	for (var i = 0; i < setups.length ; i++ ) {
+		// Backward tests
 
-		var name = setups[i]();
+		for (var i = 0; i < setups.length ; i++ ) {
 
-		editor.history.goToState( 0 );
+			var name = setups[i]();
 
-		var history = JSON.stringify( editor.history.toJSON() );
+			editor.history.goToState( 0 );
 
-		editor.history.clear();
+			var history = JSON.stringify( editor.history.toJSON() );
 
-		editor.history.fromJSON( JSON.parse( history ) );
+			editor.history.clear();
 
-		editor.history.goToState( 1000 );
-		editor.history.goToState( 0 );
+			editor.history.fromJSON( JSON.parse( history ) );
 
-		var history2 = JSON.stringify( editor.history.toJSON() );
+			editor.history.goToState( 1000 );
+			editor.history.goToState( 0 );
 
-		ok( history == history2 , "OK, backward serializing was successful for " + name );
+			var history2 = JSON.stringify( editor.history.toJSON() );
 
-		editor.clear();
+			ok( history == history2 , "OK, backward serializing was successful for " + name );
+
+			editor.clear();
+
+		}
 
 	}
 
