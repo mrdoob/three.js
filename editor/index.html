@@ -187,7 +187,7 @@
 
 				var timeout;
 
-				var saveState = function ( scene ) {
+				function saveState( scene ) {
 
 					if ( editor.config.getKey( 'autosave' ) === false ) {
 
@@ -215,7 +215,6 @@
 
 				var signals = editor.signals;
 
-				signals.editorCleared.add( saveState );
 				signals.geometryChanged.add( saveState );
 				signals.objectAdded.add( saveState );
 				signals.objectChanged.add( saveState );
