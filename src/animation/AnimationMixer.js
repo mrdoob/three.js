@@ -159,9 +159,10 @@ THREE.AnimationMixer.prototype = {
 		}
 
 		// unreference all property mixers
-		var uuid = ( action.localRoot || this.root ).uuid,
+		var interpolants = action._interpolants,
 			actionBindings = action._propertyBindings,
-			bindings = this._bindingsMaps[ uuid ],
+			rootUuid = ( action.localRoot || this.root ).uuid,
+			bindings = this._bindingsMaps[ rootUuid ],
 
 			bindingsChanged = false;
 
@@ -169,6 +170,8 @@ THREE.AnimationMixer.prototype = {
 
 			var propertyMixer = actionBindings[ i ];
 			actionBindings[ i ] = null;
+
+			interpolants[ i ].result = null;
 
 			// eventually remove the binding from the array
 			if( -- propertyMixer.referenceCount === 0 ) {
