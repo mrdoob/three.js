@@ -883,7 +883,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( object instanceof THREE.Points ) {
 
 			renderer.setMode( _gl.POINTS );
-			renderer.render( group.start, group.count );
+
+			if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
+
+				renderer.renderInstances( geometry );
+
+			} else {
+
+				renderer.render( group.start, group.count );
+
+			}
 
 		}
 
