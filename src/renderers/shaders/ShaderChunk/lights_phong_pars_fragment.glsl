@@ -17,12 +17,9 @@ varying vec3 vViewPosition;
 
 #if MAX_DIR_LIGHTS > 0
 
-	//uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];
-	//uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];
-
 	struct DirectionalLight {
-	  vec3 color;
 	  vec3 direction;
+	  vec3 color;
 	};
 
 	uniform DirectionalLight singleTestDirLight;
@@ -40,14 +37,10 @@ varying vec3 vViewPosition;
 
 #if MAX_HEMI_LIGHTS > 0
 
-	//uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];
-	//uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];
-	//uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];
-
 	struct HemisphereLight {
+	  vec3 direction;
 	  vec3 skyColor;
 	  vec3 groundColor;
-	  vec3 direction;
 	};
 
 	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
@@ -56,18 +49,12 @@ varying vec3 vViewPosition;
 
 #if MAX_POINT_LIGHTS > 0
 
-	//uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];
-	//uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];
-	//uniform float pointLightDistance[ MAX_POINT_LIGHTS ];
-	//uniform float pointLightDecay[ MAX_POINT_LIGHTS ];
-
 	struct PointLight {
-	  vec3 color;
 	  vec3 position;
-	  float decay;
+	  vec3 color;
 	  float distance;
+	  float decay;
 	};
-
 
 	uniform PointLight singleTestPointLight;
 
@@ -89,22 +76,14 @@ varying vec3 vViewPosition;
 
 #if MAX_SPOT_LIGHTS > 0
 
-	//uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];
-	//uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];
-	//uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];
-	//uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];
-	//uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];
-	//uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];
-	//uniform float spotLightDecay[ MAX_SPOT_LIGHTS ];
-
 	struct SpotLight {
-	  vec3 color;
 	  vec3 position;
 	  vec3 direction;
-	  float angleCos;
-	  float exponent;
+	  vec3 color;
 	  float distance;
 	  float decay;
+	  float angleCos;
+	  float exponent;
 	};
 
 	uniform SpotLight spotLights[ MAX_SPOT_LIGHTS ];

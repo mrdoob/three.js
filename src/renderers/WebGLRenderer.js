@@ -2470,12 +2470,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 					continue;
 				}
 
-				_direction.setFromMatrixPosition( light.matrixWorld );
+				lightUniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
-				_direction.sub( _vector3 );
-				_direction.transformDirection( viewMatrix );
+				lightUniforms.direction.sub( _vector3 );
+				lightUniforms.direction.transformDirection( viewMatrix );
 
-				lightUniforms.position.copy( _direction );
 				lightUniforms.color.copy( color ).multiplyScalar( intensity );
 				lightUniforms.distance = distance;
 
@@ -2497,10 +2496,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					continue;
 				}
 
-				_vector3.setFromMatrixPosition( light.matrixWorld );
-				_vector3.applyMatrix4( viewMatrix );
+				lightUniforms.position.setFromMatrixPosition( light.matrixWorld );
+				lightUniforms.position.applyMatrix4( viewMatrix );
 
-				lightUniforms.position.copy(  _vector3 );
 				lightUniforms.color.copy( color ).multiplyScalar( intensity );
 				lightUniforms.distance = distance;
 				lightUniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
@@ -2525,18 +2523,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 					continue;
 				}
 
-				_direction.setFromMatrixPosition( light.matrixWorld );
-				_vector3.copy( _direction ).applyMatrix4( viewMatrix );
+				lightUniforms.position.setFromMatrixPosition( light.matrixWorld );
+				lightUniforms.position.applyMatrix4( viewMatrix );
 
-				lightUniforms.position.copy( _vector3 );
 				lightUniforms.color.copy( color ).multiplyScalar( intensity );
 				lightUniforms.distance = distance;
 
+				lightUniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
-				_direction.sub( _vector3 );
-				_direction.transformDirection( viewMatrix );
+				lightUniforms.direction.sub( _vector3 );
+				lightUniforms.direction.transformDirection( viewMatrix );
 
-				lightUniforms.direction.copy( _direction);
 				lightUniforms.angleCos = Math.cos( light.angle );
 				lightUniforms.exponent = light.exponent;
 				lightUniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
@@ -2558,10 +2555,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					continue;
 				}
 
-				_direction.setFromMatrixPosition( light.matrixWorld );
-				_direction.transformDirection( viewMatrix );
+				lightUniforms.position.setFromMatrixPosition( light.matrixWorld );
+				lightUniforms.position.transformDirection( viewMatrix );
 
-				lightUniforms.position.copy( _direction);
 				lightUniforms.skyColor.copy(  light.color ).multiplyScalar( intensity );
 				lightUniforms.groundColor.copy( groundColor ).multiplyScalar( intensity );
 
