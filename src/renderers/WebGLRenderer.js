@@ -813,23 +813,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( group === null ) {
 
-			var count;
+			var start = geometry.drawRange.start;
+			var count = geometry.drawRange.count;
 
-			if ( index !== null ) {
+			if ( count === Infinity ) {
 
-				count = index.array.length;
+				if ( index !== null ) {
 
-			} else {
+					count = index.array.length;
 
-				count = position.count;
+				} else {
+
+					count = position.count;
+
+				}
 
 			}
 
-			var drawRange = geometry.drawRange;
-
 			group = {
-				start: drawRange.start,
-				count: Math.min( drawRange.count, count )
+				start: start,
+				count: count
 			};
 
 		}
