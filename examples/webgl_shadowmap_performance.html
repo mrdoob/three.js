@@ -238,7 +238,7 @@
 				scene.add( mesh );
 
 				mixer = new THREE.AnimationMixer( scene );
-					
+
 				// MORPHS
 
 				function addMorph( geometry, speed, duration, x, y, z, fudgeColor ) {
@@ -255,7 +255,7 @@
 					mesh.speed = speed;
 
 					mixer.addAction( new THREE.AnimationAction( geometry.animations[0], Math.random() ).warpToDuration( duration ).setLocalRoot( mesh ) );
-				
+
 					mesh.position.set( x, y, z );
 					mesh.rotation.y = Math.PI/2;
 
@@ -268,27 +268,9 @@
 
 				}
 
-				function morphColorsToFaceColors( geometry ) {
-
-					if ( geometry.morphColors && geometry.morphColors.length ) {
-
-						var colorMap = geometry.morphColors[ 0 ];
-
-						for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-
-							geometry.faces[ i ].color = colorMap.colors[ i ];
-
-						}
-
-					}
-
-				}
-
 				var loader = new THREE.JSONLoader();
 
 				loader.load( "models/animated/horse.js", function( geometry ) {
-
-					morphColorsToFaceColors( geometry );
 
 					for ( var i = - 600; i < 601; i += 2 ) {
 
@@ -301,49 +283,42 @@
 				/*
 				loader.load( "obj/morphs/fox.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 200, 1000, 100 - Math.random() * 500, FLOOR - 5, 600 );
 
 				} );
 
 				loader.load( "obj/morphs/shdw3walk.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 40, 2000, -500, FLOOR + 60, 245 );
 
 				} );
 
 				loader.load( "obj/morphs/flamingo.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 500, 1000, 500 - Math.random() * 500, FLOOR + 350, 40 );
 
 				} );
 
 				loader.load( "obj/morphs/stork.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 350, 1000, 500 - Math.random() * 500, FLOOR + 350, 340 );
 
 				} );
 
 				loader.load( "obj/morphs/mountainlion.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 400, 1000, 500 - Math.random() * 500, FLOOR - 5, 700 );
 
 				} );
 
 				loader.load( "obj/morphs/bearBrown.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 300, 2500, -500, FLOOR - 5, -750 );
 
 				} );
 
 				loader.load( "obj/morphs/parrot.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 450, 500, 500 - Math.random() * 500, FLOOR + 300, 700 );
 
 				} );

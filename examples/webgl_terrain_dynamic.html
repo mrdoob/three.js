@@ -518,29 +518,12 @@
 
 				}
 
-				function morphColorsToFaceColors( geometry ) {
-
-					if ( geometry.morphColors && geometry.morphColors.length ) {
-
-						var colorMap = geometry.morphColors[ 0 ];
-
-						for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-
-							geometry.faces[ i ].color = colorMap.colors[ i ];
-
-						}
-
-					}
-
-				}
-
 				var loader = new THREE.JSONLoader();
 
 				var startX = -3000;
 
 				loader.load( "models/animated/parrot.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 250, 0.5, startX -500, 500, 700 );
 					addMorph( geometry, 250, 0.5, startX - Math.random() * 500, 500, -200 );
 					addMorph( geometry, 250, 0.5, startX - Math.random() * 500, 500, 200 );
@@ -550,14 +533,12 @@
 
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 500, 1, startX - Math.random() * 500, 350, 40 );
 
 				} );
 
 				loader.load( "models/animated/stork.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 350, 1, startX - Math.random() * 500, 350, 340 );
 
 				} );

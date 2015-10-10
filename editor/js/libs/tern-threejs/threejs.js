@@ -409,10 +409,6 @@
           "!type": "[]",
           "!doc": "Array of morph targets. Each morph target is a Javascript object:\n\t\t<code>{ name: \"targetName\", vertices: [ new THREE.Vector3(), ... ] }</code>\n\t\tMorph vertices match number and order of primary vertices."
         },
-        "morphColors": {
-          "!type": "[]",
-          "!doc": "Array of morph colors. Morph colors have similar structure as morph targets, each color set is a Javascript object:\n\t\t<code>morphColor = { name: \"colorName\", colors: [ new THREE.Color(), ... ] }</code>\n\t\tMorph colors can match either the number and order of faces (face colors) or the number of vertices (vertex colors)."
-        },
         "morphNormals": {
           "!type": "[]",
           "!doc": "Array of morph normals. Morph normals have similar structure as morph targets, each normal set is a Javascript object:\n\t\t<code>morphNormal = { name: \"NormalName\", normals: [ new THREE.Vector3(), ... ] }</code>"

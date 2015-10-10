@@ -25,8 +25,6 @@
 
     "morphTargets": [],
 
-    "morphColors": [],
-
     "normals": [],
 
     "colors": [],
