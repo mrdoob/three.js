@@ -811,29 +811,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( group === null ) {
+		var drawStart = geometry.drawRange.start;
+		var drawCount = geometry.drawRange.count;
 
-			var start = geometry.drawRange.start;
-			var count = geometry.drawRange.count;
+		if ( drawCount === Infinity ) {
 
-			if ( count === Infinity ) {
+			drawCount = index !== null ? index.count : position.count;
 
-				if ( index !== null ) {
+		}
 
-					count = index.array.length;
+		if ( group !== null ) {
 
-				} else {
-
-					count = position.count;
-
-				}
-
-			}
-
-			group = {
-				start: start,
-				count: count
-			};
+			drawStart = Math.max( drawStart, group.start );
+			drawCount = Math.min( drawCount, group.count );
 
 		}
 
@@ -856,7 +846,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				renderer.render( group.start, group.count );
+				renderer.render( drawStart, drawCount );
 
 			}
 
@@ -878,12 +868,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			renderer.render( group.start, group.count );
+			renderer.render( drawStart, drawCount );
 
 		} else if ( object instanceof THREE.Points ) {
 
 			renderer.setMode( _gl.POINTS );
-			renderer.render( group.start, group.count );
+			renderer.render( drawStart, drawCount );
 
 		}
 
