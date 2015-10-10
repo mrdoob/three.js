@@ -25,6 +25,8 @@ varying vec3 vViewPosition;
 	  vec3 direction;
 	};
 
+	uniform DirectionalLight singleTestDirLight;
+
 	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];
 
 	void getDirLight( const in DirectionalLight directionalLight, out vec3 lightDir, out vec3 lightColor ) { 
@@ -65,6 +67,9 @@ varying vec3 vViewPosition;
 	  float decay;
 	  float distance;
 	};
+
+
+	uniform PointLight singleTestPointLight;
 
 	uniform PointLight pointLights[ MAX_POINT_LIGHTS ];
 

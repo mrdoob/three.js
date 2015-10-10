@@ -26,6 +26,9 @@ THREE.WebGLProgram = ( function () {
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 	
+
+		// TODO: Combine.
+		var structRe = /^([\w\d_]+)\.([\w\d_]+)$/; 
 		var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/; 
 		var arrayRe = /^([\w\d_]+)\[0\]$/; 
 
@@ -37,7 +40,22 @@ THREE.WebGLProgram = ( function () {
 
 			console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
 
-			var matches = arrayStructRe.exec(name);
+			var matches = structRe.exec(name);
+			if( matches ) {
+
+				var structName = matches[1];
+				var structProperty = matches[2];
+
+				var uniformsStruct = uniforms[ structName ];
+				if( ! uniformsStruct ) {
+					uniformsStruct = uniforms[ structName ] = {};
+				}
+				uniformsStruct[ structProperty ] = location;
+
+				continue;
+			}
+
+			matches = arrayStructRe.exec(name);
 			if( matches ) {
 
 				var arrayName = matches[1];

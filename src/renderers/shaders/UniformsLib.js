@@ -80,22 +80,22 @@ THREE.UniformsLib = {
 		"directionalLightDirection" : { type: "fv", value: [] },
 		"directionalLightColor" : { type: "fv", value: [] },
 
-		"hemisphereLightDirection" : { type: "fv", value: [] },
-		"hemisphereLightSkyColor" : { type: "fv", value: [] },
-		"hemisphereLightGroundColor" : { type: "fv", value: [] },
+		"hemisphereLightDirection" : { type: "fv", value: [], array: 'hemisphereLights', property: 'direction' },
+		"hemisphereLightSkyColor" : { type: "fv", value: [], array: 'hemisphereLights', property: 'skyColor' },
+		"hemisphereLightGroundColor" : { type: "fv", value: [], array: 'hemisphereLights', property: 'groundColor' },
 
-		"pointLightColor" : { type: "fv", value: [] },
-		"pointLightPosition" : { type: "fv", value: [] },
-		"pointLightDistance" : { type: "fv1", value: [] },
-		"pointLightDecay" : { type: "fv1", value: [] },
+		"pointLightColor" : { type: "fv", value: [], array: 'pointLights', property: 'color' },
+		"pointLightPosition" : { type: "fv", value: [], array: 'pointLights', property: 'position' },
+		"pointLightDistance" : { type: "fv1", value: [], array: 'pointLights', property: 'distance' },
+		"pointLightDecay" : { type: "fv1", value: [], array: 'pointLights', property: 'decay' },
 
-		"spotLightColor" : { type: "fv", value: [] },
-		"spotLightPosition" : { type: "fv", value: [] },
-		"spotLightDirection" : { type: "fv", value: [] },
-		"spotLightDistance" : { type: "fv1", value: [] },
-		"spotLightAngleCos" : { type: "fv1", value: [] },
-		"spotLightExponent" : { type: "fv1", value: [] },
-		"spotLightDecay" : { type: "fv1", value: [] }
+		"spotLightColor" : { type: "fv", value: [], array: 'spotLights', property: 'color' },
+		"spotLightPosition" : { type: "fv", value: [], array: 'spotLights', property: 'position' },
+		"spotLightDirection" : { type: "fv", value: [], array: 'spotLights', property: 'direction' },
+		"spotLightDistance" : { type: "fv1", value: [], array: 'spotLights', property: 'distance' },
+		"spotLightAngleCos" : { type: "fv1", value: [], array: 'spotLights', property: 'angleCos' },
+		"spotLightExponent" : { type: "fv1", value: [], array: 'spotLights', property: 'exponent' },
+		"spotLightDecay" : { type: "fv1", value: [], array: 'spotLights', property: 'decay' }
 
 	},
 

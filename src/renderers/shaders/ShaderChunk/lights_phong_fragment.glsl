@@ -19,7 +19,8 @@ vec3 diffuse = diffuseColor.rgb;
 
 		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
 
-			vec3 halfDir = normalize( lightDir + viewDir );
+
+			vec3 halfDir = normalize( lightDir + viewDir ) * singleTestPointLight.distance;
 			float dotNL = saturate( dot( normal, lightDir ) );
 			float dotNH = saturate( dot( normal, halfDir ) );
 			float dotLH = saturate( dot( lightDir, halfDir ) );
