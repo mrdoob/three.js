@@ -17,6 +17,54 @@ Sidebar.History = function ( editor ) {
 	} );
 
 	container.addStatic( new UI.Text( 'HISTORY' ) );
+
+	// Actions
+
+	var objectActions = new UI.Select().setPosition('absolute').setRight( '8px' ).setFontSize( '11px' );
+	objectActions.setOptions( {
+
+		'Actions': 'Actions',
+		'Serialization': 'Serialize History?'
+
+	} );
+	objectActions.onClick( function ( event ) {
+
+		event.stopPropagation(); // Avoid panel collapsing
+
+	} );
+	objectActions.onChange( function ( event ) {
+
+		var currentValue = history.serializationEnabled ? 'yes' : 'no';
+
+		var response;
+		if ( ( response = prompt( 'Should the history be preserved across a browser refresh? (yes or no)', currentValue ) ) === null ) {
+
+			this.setValue( 'Actions' );
+			return;
+
+		}
+
+		if ( response.toLowerCase() === 'yes' ) {
+
+			alert( 'The history will be preserved across a browser refresh.' );
+
+			var lastUndoCmd = history.undos[ history.undos.length - 1 ];
+			var lastUndoId = ( lastUndoCmd !== undefined ) ? lastUndoCmd.id : 0;
+			editor.history.enableSerialization( lastUndoId );
+
+		} else {
+
+			alert( 'The history will NOT be preserved across a browser refresh.' );
+			editor.history.disableSerialization();
+
+		}
+
+		this.setValue( 'Actions' );
+
+	} );
+	container.addStatic( objectActions );
+
+
 	container.add( new UI.Break() );
 
 	var ignoreObjectSelectedSignal = false;
@@ -51,9 +99,9 @@ Sidebar.History = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + "<span style='color: #0000cc '>" + enumerator++ + ". Undo: " + object.json.name + "</span>";
+				var html = pad + "<span style='color: #0000cc '>" + enumerator++ + ". Undo: " + object.name + "</span>";
 
-				options.push( { value: object.json.id, html: html } );
+				options.push( { value: object.id, html: html } );
 
 			}
 
@@ -66,9 +114,9 @@ Sidebar.History = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + "<span style='color: #71544e'>" + enumerator++ + ". Redo: " +  object.json.name + "</span>";
+				var html = pad + "<span style='color: #71544e'>" + enumerator++ + ". Redo: " +  object.name + "</span>";
 
-				options.push( { value: object.json.id, html: html } );
+				options.push( { value: object.id, html: html } );
 
 			}
 
@@ -87,7 +135,7 @@ Sidebar.History = function ( editor ) {
 	signals.historyChanged.add( refreshUI );
 	signals.historyChanged.add( function ( cmd ) {
 		
-		outliner.setValue( cmd !== undefined ? cmd.json.id : null );
+		outliner.setValue( cmd !== undefined ? cmd.id : null );
 
 	} );
 

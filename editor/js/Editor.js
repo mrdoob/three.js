@@ -434,8 +434,6 @@ Editor.prototype = {
 
 		this.deselect();
 
-		this.history.clear();
-
 		this.signals.editorCleared.dispatch();
 
 	},

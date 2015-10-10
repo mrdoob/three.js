@@ -12,6 +12,7 @@ History = function ( editor ) {
 	this.idCounter = 0;
 
 	this.historyDisabled = false;
+	this.serializationEnabled = true;
 
 	//Set editor-reference in Cmd
 
@@ -73,8 +74,12 @@ History.prototype = {
 		cmd.name = ( optionalName !== undefined ) ? optionalName : cmd.name;
 		cmd.execute();
 		cmd.inMemory = true;
-		cmd.json = cmd.toJSON();	// serialize the cmd immediately after execution and append the json to the cmd
 
+		if ( this.serializationEnabled ) {
+
+			cmd.json = cmd.toJSON();	// serialize the cmd immediately after execution and append the json to the cmd
+
+		}
 		this.lastCmdTime = new Date();
 
 		// clearing all the redo-commands
@@ -157,30 +162,39 @@ History.prototype = {
 	toJSON: function () {
 
 		var history = {};
+		history.serializationEnabled = this.serializationEnabled;
+		history.undos = [];
+		history.redos = [];
+
+		if ( !this.serializationEnabled ) {
+
+			return history;
+
+		}
 
 		// Append Undos to History
 
-		var undos = [];
-
 		for ( var i = 0 ; i < this.undos.length; i++ ) {
 
-			undos.push( this.undos[ i ].json );
+			if ( this.undos[ i ].hasOwnProperty( "json" ) ) {
+
+				history.undos.push( this.undos[ i ].json );
+
+			}
 
 		}
-
-		history.undos = undos;
 
 		// Append Redos to History
 
-		var redos = [];
-
 		for ( var i = 0 ; i < this.redos.length; i++ ) {
 
-			redos.push( this.redos[ i ].json );
+			if ( this.redos[ i ].hasOwnProperty( "json" ) ) {
+
+				history.redos.push( this.redos[ i ].json );
+
+			}
 
 		}
-
-		history.redos = redos;
 
 		return history;
 
@@ -190,11 +204,15 @@ History.prototype = {
 
 		if ( json === undefined ) return;
 
+		this.serializationEnabled = json.serializationEnabled;
+
 		for ( var i = 0; i < json.undos.length ; i++ ) {
 
 			var cmdJSON = json.undos[ i ];
 			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
 			cmd.json = cmdJSON;
+			cmd.id = cmdJSON.id;
+			cmd.name = cmdJSON.name;
 			this.undos.push( cmd );
 			this.idCounter = ( cmdJSON.id > this.idCounter ) ? cmdJSON.id : this.idCounter; // set last used idCounter
 
@@ -205,6 +223,8 @@ History.prototype = {
 			var cmdJSON = json.redos[ i ];
 			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
 			cmd.json = cmdJSON;
+			cmd.id = cmdJSON.id;
+			cmd.name = cmdJSON.name;
 			this.redos.push( cmd );
 			this.idCounter = ( cmdJSON.id > this.idCounter ) ? cmdJSON.id : this.idCounter; // set last used idCounter
 
@@ -239,10 +259,10 @@ History.prototype = {
 
 		var cmd = this.undos.length > 0 ? this.undos[ this.undos.length - 1 ] : undefined;	// next cmd to pop
 
-		if ( cmd === undefined || id > cmd.json.id ) {
+		if ( cmd === undefined || id > cmd.id ) {
 
 			cmd = this.redo();
-			while ( cmd !== undefined && id > cmd.json.id ) {
+			while ( cmd !== undefined && id > cmd.id ) {
 
 				cmd = this.redo();
 
@@ -254,7 +274,7 @@ History.prototype = {
 
 				cmd = this.undos[ this.undos.length - 1 ];	// next cmd to pop
 
-				if ( cmd === undefined || id === cmd.json.id ) break;
+				if ( cmd === undefined || id === cmd.id ) break;
 
 				cmd = this.undo();
 
@@ -267,6 +287,53 @@ History.prototype = {
 
 		this.editor.signals.sceneGraphChanged.dispatch();
 		this.editor.signals.historyChanged.dispatch( cmd );
+
+	},
+
+	enableSerialization: function ( id ) {
+
+		if ( this.serializationEnabled ) { return; }
+
+		/**
+		 * because there might be commands in this.undos and this.redos
+		 * which have not been serialized with .toJSON() we go back
+		 * to the oldest command and redo one command after the other
+		 * while also calling .toJSON() on them.
+		 */
+
+		this.goToState(-1);
+
+		this.editor.signals.sceneGraphChanged.active = false;
+		this.editor.signals.historyChanged.active = false;
+
+		var cmd = this.redo();
+		while ( cmd !== undefined ) {
+
+			if ( !cmd.hasOwnProperty( "json" ) ) {
+
+				cmd.json = cmd.toJSON();
+
+			}
+			cmd = this.redo();
+
+		}
+
+		this.editor.signals.sceneGraphChanged.active = true;
+		this.editor.signals.historyChanged.active = true;
+
+		this.serializationEnabled = true;
+
+		this.goToState( id );
+
+	},
+
+	disableSerialization: function () {
+
+		if ( !this.serializationEnabled ) { return; }
+
+		this.serializationEnabled = false;
+
+		this.editor.signals.historyChanged.dispatch();
 
 	}
 
