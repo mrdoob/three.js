@@ -23,7 +23,7 @@ THREE.JSONLoader.prototype = {
 	constructor: THREE.JSONLoader,
 
 	// Deprecated
-	
+
 	get statusDomElement () {
 
 		if ( this._statusDomElement === undefined ) {
@@ -451,18 +451,16 @@ THREE.JSONLoader.prototype = {
 
 			if ( json.morphTargets !== undefined ) {
 
-				var i, l, v, vl, dstVertices, srcVertices;
-
-				for ( i = 0, l = json.morphTargets.length; i < l; i ++ ) {
+				for ( var i = 0, l = json.morphTargets.length; i < l; i ++ ) {
 
 					geometry.morphTargets[ i ] = {};
 					geometry.morphTargets[ i ].name = json.morphTargets[ i ].name;
 					geometry.morphTargets[ i ].vertices = [];
 
-					dstVertices = geometry.morphTargets[ i ].vertices;
-					srcVertices = json.morphTargets[ i ].vertices;
+					var dstVertices = geometry.morphTargets[ i ].vertices;
+					var srcVertices = json.morphTargets[ i ].vertices;
 
-					for ( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
+					for ( var v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
 
 						var vertex = new THREE.Vector3();
 						vertex.x = srcVertices[ v ] * scale;
