@@ -12,8 +12,7 @@ THREE.KeyframeTrack = function ( name, times, values, interpolation ) {
 
 	if( name === undefined ) throw new Error( "track name is undefined" );
 
-	if( times === undefined || times.length === 0 ||
-			values === undefined || values.length === 0 ) {
+	if( times === undefined || times.length === 0 ) {
 
 		throw new Error( "no keyframes in track named " + name );
 
@@ -221,25 +220,27 @@ THREE.KeyframeTrack.prototype = {
 	},
 
 	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
-	// One could eventually ensure that all key.values in a track are all of the same type (otherwise interpolation makes no sense.)
 	validate: function() {
 
-		if ( this.getValueSize() % 1 !== 0 ) {
+		var valid = true;
 
-			throw new Error( "invalid value size for track named " + this.name );
+		var valueSize = this.getValueSize();
+		if ( valueSize - Math.floor( valueSize ) !== 0 ) {
+
+			console.error( "invalid value size in track", this );
+			valid = false;
 
 		}
 
-		var times = this.times;
-		var values = this.values;
-		var stride = this.getValueSize();
+		var times = this.times,
+			values = this.values,
 
-		var nKeys = times.length;
+			nKeys = times.length;
 
 		if( nKeys === 0 ) {
 
-			console.error( "  track is empty, no keys", this );
-			return;
+			console.error( "track is empty", this );
+			valid = false;
 
 		}
 
@@ -249,38 +250,19 @@ THREE.KeyframeTrack.prototype = {
 
 			var currTime = times[ i ];
 
-			if( currTime === undefined || currTime === null ) {
+			if ( Number.isNaN( currTime ) ) {
 
-				console.error( "  time is null in track", this, i );
-				return;
-
-			}
-
-			if( ( typeof currTime ) !== 'number' || Number.isNaN( currTime ) ) {
-
-				console.error( "  time is not a valid number", this, i, currTime );
-				return;
-
-			}
-
-			var offset = i * stride;
-			for ( var j = offset, e = offset + stride; j !== e; ++ j ) {
-
-				var value = values[ j ];
-
-				if( value === undefined || value === null) {
-
-					console.error( "  value is null in track", this, j, value );
-					return;
-
-				}
+				console.error( "time is not a valid number", this, i, currTime );
+				valid = false;
+				break;
 
 			}
 
 			if( prevTime !== null && prevTime > currTime ) {
 
-				console.error( "  time is less than previous key time, out of order keys", this, i, currTime, prevTime );
-				return;
+				console.error( "out of order keys", this, i, currTime, prevTime );
+				valid = false;
+				break;
 
 			}
 
@@ -288,7 +270,29 @@ THREE.KeyframeTrack.prototype = {
 
 		}
 
-		return this;
+		if ( values !== undefined ) {
+
+			if ( THREE.AnimationUtils.isTypedArray( values ) ) {
+
+				for ( var i = 0, n = values.length; i !== n; ++ i ) {
+
+					var value = values[ i ];
+
+					if ( Number.isNaN( value ) ) {
+
+						console.error( "value is not a valid number", this, i, value );
+						valid = false;
+						break;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return valid;
 
 	},
 

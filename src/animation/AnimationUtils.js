@@ -22,7 +22,8 @@ THREE.AnimationUtils = {
 	// converts an array to a specific type
 	convertArray: function( array, type, forceClone ) {
 
-		if ( ! forceClone && array.constructor === type ) return array;
+		if ( ! array ||
+				! forceClone && array.constructor === type ) return array;
 
 		if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
 
@@ -33,6 +34,13 @@ THREE.AnimationUtils = {
 		var result = [];
 		result.push.apply( result, array );
 		return result;
+
+	},
+
+	isTypedArray: function( object ) {
+
+		return ArrayBuffer.isView( object ) &&
+				! ( object instanceof DataView );
 
 	},
 
