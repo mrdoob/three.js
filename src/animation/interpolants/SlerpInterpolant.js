@@ -28,8 +28,8 @@ Object.assign( THREE.SlerpInterpolant.prototype, THREE.Interpolant.prototype, {
 
 		for ( var end = offset + stride; offset !== end; offset += 4 ) {
 
-			THREE.AnimationUtils.slerp(
-					result, 0, values, offset - stride, offset, alpha );
+			THREE.Quaternion.slerpFlat( result, 0,
+					values, offset - stride, values, offset, alpha );
 
 		}
 

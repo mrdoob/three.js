@@ -180,8 +180,8 @@ THREE.PropertyMixer.prototype = {
 
 	_slerp: function( buffer, dstOffset, srcOffset, t, stride ) {
 
-		THREE.AnimationUtils.slerp(
-				buffer, dstOffset, buffer, dstOffset, srcOffset, t );
+		THREE.Quaternion.slerpFlat( buffer, dstOffset,
+				buffer, dstOffset, buffer, srcOffset, t );
 
 	},
 

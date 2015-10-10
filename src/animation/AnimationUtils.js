@@ -113,67 +113,6 @@ THREE.AnimationUtils = {
 
 		}
 
-	},
-
-	// fuzz-free, array-based Quaternion SLERP operation
-	slerp: function( dst, dstOffset, src, srcOffset0, srcOffset1, t ) {
-
-		var x0 = src[   srcOffset0   ],
-			y0 = src[ srcOffset0 + 1 ],
-			z0 = src[ srcOffset0 + 2 ],
-			w0 = src[ srcOffset0 + 3 ],
-
-			x1 = src[   srcOffset1   ],
-			y1 = src[ srcOffset1 + 1 ],
-			z1 = src[ srcOffset1 + 2 ],
-			w1 = src[ srcOffset1 + 3 ];
-
-		if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
-
-			var s = 1 - t,
-
-				cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
-
-				dir = ( cos >= 0 ? 1 : -1 ),
-				sqrSin = 1 - cos * cos;
-
-			// Skip the Slerp for tiny steps to avoid numeric problems:
-			if ( sqrSin > Number.EPSILON ) {
-
-				var sin = Math.sqrt( sqrSin ),
-					len = Math.atan2( sin, cos * dir );
-
-				s = Math.sin( s * len ) / sin;
-				t = Math.sin( t * len ) / sin;
-
-			}
-
-			var tDir = t * dir;
-
-			x0 = x0 * s + x1 * tDir;
-			y0 = y0 * s + y1 * tDir;
-			z0 = z0 * s + z1 * tDir;
-			w0 = w0 * s + w1 * tDir;
-
-			// Normalize in case we just did a lerp:
-			if ( s === 1 - t ) {
-
-				var f = 1 / Math.sqrt( x0 * x0 + y0 * y0 + z0 * z0 + w0 * w0 );
-
-				x0 *= f;
-				y0 *= f;
-				z0 *= f;
-				w0 *= f;
-
-			}
-
-		}
-
-		dst[   dstOffset   ] = x0;
-		dst[ dstOffset + 1 ] = y0;
-		dst[ dstOffset + 2 ] = z0;
-		dst[ dstOffset + 3 ] = w0;
-
 	}
 
 };
