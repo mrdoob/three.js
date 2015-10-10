@@ -25,6 +25,9 @@ THREE.WebGLProgram = ( function () {
 		var uniforms = {};
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
+	
+		var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/; 
+		var arrayRe = /^([\w\d_]+)\[0\]$/; 
 
 		for ( var i = 0; i < n; i ++ ) {
 
@@ -32,19 +35,43 @@ THREE.WebGLProgram = ( function () {
 			var name = info.name;
 			var location = gl.getUniformLocation( program, name );
 
-			// console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
+			console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
 
-			var suffixPos = name.lastIndexOf( '[0]' );
-			if ( suffixPos !== - 1 && suffixPos === name.length - 3 ) {
+			var matches = arrayStructRe.exec(name);
+			if( matches ) {
 
-				uniforms[ name.substr( 0, suffixPos ) ] = location;
+				var arrayName = matches[1];
+				var arrayIndex = matches[2];
+				var arrayProperty = matches[3];
 
+				var uniformsArray = uniforms[ arrayName ];
+				if( ! uniformsArray ) {
+					uniformsArray = uniforms[ arrayName ] = [];
+				}
+				var uniformsArrayIndex = uniformsArray[ arrayIndex ];
+				if( ! uniformsArrayIndex ) {
+					uniformsArrayIndex = uniformsArray[ arrayIndex ] = {};
+				}
+				uniformsArrayIndex[ arrayProperty ] = location;
+
+				continue;
+			}
+
+			matches = arrayRe.exec(name)
+			if( matches ) {
+
+				var arrayName = matches[1];
+
+				uniforms[ arrayName ] = location;
+
+				continue;
 			}
 
 			uniforms[ name ] = location;
 
 		}
 
+		console.log("uniforms", uniforms);
 		return uniforms;
 
 	}

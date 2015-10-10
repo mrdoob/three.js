@@ -2,7 +2,7 @@ vec3 viewDir = normalize( vViewPosition );
 
 vec3 totalReflectedLight = vec3( 0.0 );
 
-var diffuse = diffuseColor.rgb;
+vec3 diffuse = diffuseColor.rgb;
 
 #ifdef METAL
 
@@ -15,7 +15,7 @@ var diffuse = diffuseColor.rgb;
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
 		vec3 lightDir, lightIntensity;
-		getSpotLight( i, lightDir, lightIntensity );
+		getPointLight( pointLights[i], lightDir, lightIntensity );
 
 		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
 
@@ -40,7 +40,7 @@ var diffuse = diffuseColor.rgb;
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
 		vec3 lightDir, lightIntensity;
-		getSpotLight( i, lightDir, lightIntensity );
+		getSpotLight( spotLights[i], lightDir, lightIntensity );
 
 		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
 
@@ -65,7 +65,7 @@ var diffuse = diffuseColor.rgb;
 	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
 		vec3 lightDir, lightIntensity;
-		getDirLight( i, lightDir, lightIntensity );
+		getDirLight( directionalLights[i], lightDir, lightIntensity );
 
 		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
 

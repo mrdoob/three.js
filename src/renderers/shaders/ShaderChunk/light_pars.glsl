@@ -26,13 +26,13 @@
 	//uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];
 	//uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];
 
-	struct HemisphericLight {
+	struct HemisphereLight {
 	  vec3 skyColor;
 	  vec3 groundColor;
 	  vec3 direction;
 	};
 
-	uniform HemisphericLight hemisphericLights[ MAX_HEMI_LIGHTS ];
+	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
 
 #endif
 
