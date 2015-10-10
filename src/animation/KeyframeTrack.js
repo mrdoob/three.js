@@ -300,11 +300,11 @@ THREE.KeyframeTrack.prototype = {
 	// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
 	optimize: function() {
 
-		var times = this.times;
-		var values = this.values;
-		var stride = this.getValueSize();
+		var times = this.times,
+			values = this.values,
+			stride = this.getValueSize(),
 
-		var writeIndex = 1;
+			writeIndex = 1;
 
 		for( var i = 1, n = times.length - 1; i <= n; ++ i ) {
 
@@ -318,9 +318,9 @@ THREE.KeyframeTrack.prototype = {
 			if ( time !== timeNext && ( i !== 1 || time !== time[ 0 ] ) ) {
 
 				// remove unnecessary keyframes same as their neighbors
-				var offset = i * stride;
-				var offsetP = offset - stride;
-				var offsetN = offset + stride;
+				var offset = i * stride,
+					offsetP = offset - stride,
+					offsetN = offset + stride;
 
 				for ( var j = 0; j !== stride; ++ j ) {
 
@@ -346,8 +346,8 @@ THREE.KeyframeTrack.prototype = {
 
 					times[ writeIndex ] = times[ i ];
 
-					var readOffset = i * stride;
-					var writeOffset = writeIndex * stride;
+					var readOffset = i * stride,
+						writeOffset = writeIndex * stride;
 
 					for ( var j = 0; j !== stride; ++ j ) {
 
@@ -377,126 +377,129 @@ THREE.KeyframeTrack.prototype = {
 
 };
 
-// Serialization (in static context, because of constructor invocation
-// and automatic invocation of .toJSON):
+// Static methods:
 
-THREE.KeyframeTrack.parse = function( json ) {
+Object.assign( THREE.KeyframeTrack, {
 
-	if( json[ 'type' ] === undefined ) {
+	// Serialization (in static context, because of constructor invocation
+	// and automatic invocation of .toJSON):
 
-		throw new Error( "track type undefined, can not parse" );
+	parse: function( json ) {
 
-	}
+		if( json[ 'type' ] === undefined ) {
 
-	var trackType = THREE.KeyframeTrack.GetTrackTypeForValueTypeName( json.type );
-
-	if ( json[ 'times' ] === undefined ) {
-
-		console.warn( "legacy JSON format detected, converting" );
-
-		var times = [], values = [];
-
-		THREE.AnimationUtils.flattenJSON( json, times, values, 'value' );
-
-		json[ 'times' ] = times;
-		json[ 'values' ] = values;
-
-	}
-
-	// derived classes can define a static parse method
-	if ( trackType.parse !== undefined ) {
-
-		return trackType.parse( json );
-
-	} else {
-
-		// by default, we asssume a constructor compatible with the base
-		return new trackType(
-				json[ 'name' ], json[ 'times' ], json[ 'values' ], json[ 'interpolation' ] );
-
-	}
-
-};
-
-THREE.KeyframeTrack.toJSON = function( track ) {
-
-	var trackType = track.constructor;
-
-	var json;
-
-	// derived classes can define a static toJSON method
-	if ( trackType.toJSON !== undefined ) {
-
-		json = trackType.toJSON( track );
-
-	} else {
-
-		// by default, we assume the data can be serialized as-is
-		json = {
-
-			'name': track.name,
-			'times': THREE.AnimationUtils.convertArray( track.times, Array ),
-			'values': THREE.AnimationUtils.convertArray( track.values, Array )
-
-		};
-
-		var interpolation = track.getInterpolation();
-
-		if ( interpolation !== track.DefaultInterpolation ) {
-
-			json[ 'interpolation' ] = interpolation;
+			throw new Error( "track type undefined, can not parse" );
 
 		}
 
+		var trackType = THREE.KeyframeTrack.GetTrackTypeForValueTypeName( json.type );
+
+		if ( json[ 'times' ] === undefined ) {
+
+			console.warn( "legacy JSON format detected, converting" );
+
+			var times = [], values = [];
+
+			THREE.AnimationUtils.flattenJSON( json, times, values, 'value' );
+
+			json[ 'times' ] = times;
+			json[ 'values' ] = values;
+
+		}
+
+		// derived classes can define a static parse method
+		if ( trackType.parse !== undefined ) {
+
+			return trackType.parse( json );
+
+		} else {
+
+			// by default, we asssume a constructor compatible with the base
+			return new trackType(
+					json[ 'name' ], json[ 'times' ], json[ 'values' ], json[ 'interpolation' ] );
+
+		}
+
+	},
+
+	toJSON: function( track ) {
+
+		var trackType = track.constructor;
+
+		var json;
+
+		// derived classes can define a static toJSON method
+		if ( trackType.toJSON !== undefined ) {
+
+			json = trackType.toJSON( track );
+
+		} else {
+
+			// by default, we assume the data can be serialized as-is
+			json = {
+
+				'name': track.name,
+				'times': THREE.AnimationUtils.convertArray( track.times, Array ),
+				'values': THREE.AnimationUtils.convertArray( track.values, Array )
+
+			};
+
+			var interpolation = track.getInterpolation();
+
+			if ( interpolation !== track.DefaultInterpolation ) {
+
+				json[ 'interpolation' ] = interpolation;
+
+			}
+
+		}
+
+		json[ 'type' ] = track.ValueTypeName; // mandatory
+
+		return json;
+
+	},
+
+	GetTrackTypeForValueTypeName: function( typeName ) {
+
+		switch( typeName.toLowerCase() ) {
+
+			case "scalar":
+			case "double":
+			case "float":
+			case "number":
+			case "integer":
+
+				return THREE.NumberKeyframeTrack;
+
+			case "vector":
+			case "vector2":
+			case "vector3":
+			case "vector4":
+
+				return THREE.VectorKeyframeTrack;
+
+			case "color":
+
+				return THREE.ColorKeyframeTrack;
+
+			case "quaternion":
+
+				return THREE.QuaternionKeyframeTrack;
+
+			case "bool":
+			case "boolean":
+
+				return THREE.BooleanKeyframeTrack;
+
+			case "string":
+
+				return THREE.StringKeyframeTrack;
+
+		};
+
+		throw new Error( "Unsupported typeName: " + typeName );
+
 	}
 
-	json[ 'type' ] = track.ValueTypeName; // mandatory
-
-	return json;
-
-};
-
-THREE.KeyframeTrack.GetTrackTypeForValueTypeName = function( typeName ) {
-
-	switch( typeName.toLowerCase() ) {
-
-		case "scalar":
-		case "double":
-		case "float":
-		case "number":
-		case "integer":
-
-			return THREE.NumberKeyframeTrack;
-
-		case "vector":
-		case "vector2":
-		case "vector3":
-		case "vector4":
-
-			return THREE.VectorKeyframeTrack;
-
-		case "color":
-
-			return THREE.ColorKeyframeTrack;
-
-		case "quaternion":
-
-			return THREE.QuaternionKeyframeTrack;
-
-		case "bool":
-		case "boolean":
-
-			return THREE.BooleanKeyframeTrack;
-
-		case "string":
-
-			return THREE.StringKeyframeTrack;
-
-	};
-
-	throw new Error( "Unsupported typeName: " + typeName );
-<<<<<<< HEAD
-=======
-
->>>>>>> Animation: Interpolants & extensibility overhaul.
-};
+} );
