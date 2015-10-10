@@ -77,25 +77,34 @@ THREE.UniformsLib = {
 
 		"ambientLightColor" : { type: "fv", value: [] },
 
-		"directionalLightDirection" : { type: "v3sa", value: [], name: 'hemisphereLights', property: 'direction' },
-		"directionalLightColor" : { type: "csa", value: [], name: 'hemisphereLights', property: 'direction' },
+		"directionalLights" : { type: "sa", value: [], properties: {
+			"direction": { type: "v3" },
+			"color": { type: "c" }
+		} };
 
-		"hemisphereLightDirection" : { type: "v3sa", value: [], name: 'hemisphereLights', property: 'direction' },
-		"hemisphereLightSkyColor" : { type: "csa", value: [], name: 'hemisphereLights', property: 'skyColor' },
-		"hemisphereLightGroundColor" : { type: "csa", value: [], name: 'hemisphereLights', property: 'groundColor' },
+		"hemisphereLights" : { type: "sa", value: [], properties: {
+			"direction": { type: "v3" },
+			"skyColor": { type: "v3" },
+			"groundColor": { type: "v3" }
+		} };
 
-		"pointLightColor" : { type: "csa", value: [], name: 'pointLights', property: 'color' },
-		"pointLightPosition" : { type: "v3sa", value: [], name: 'pointLights', property: 'position' },
-		"pointLightDistance" : { type: "fsa", value: [], name: 'pointLights', property: 'distance' },
-		"pointLightDecay" : { type: "fsa", value: [], name: 'pointLights', property: 'decay' },
+		"pointLights" : { type: "sa", value: [], properties: {
+			"color": { type: "c" },
+			"position": { type: "v3" },
+			"direction": { type: "v3" },
+			"distance": { type: "f" }
+		} };
 
-		"spotLightColor" : { type: "csa", value: [], name: 'spotLights', property: 'color' },
-		"spotLightPosition" : { type: "v3sa", value: [], name: 'spotLights', property: 'position' },
-		"spotLightDirection" : { type: "v3sa", value: [], name: 'spotLights', property: 'direction' },
-		"spotLightDistance" : { type: "fsa", value: [], name: 'spotLights', property: 'distance' },
-		"spotLightAngleCos" : { type: "fsa", value: [], name: 'spotLights', property: 'angleCos' },
-		"spotLightExponent" : { type: "fsa", value: [], name: 'spotLights', property: 'exponent' },
-		"spotLightDecay" : { type: "fsa", value: [], name: 'spotLights', property: 'decay' }
+		"spotLights" : { type: "sa", value: [], properties: {
+			"color": { type: "c" },
+			"position": { type: "v3" },
+			"direction": { type: "v3" },
+			"distance": { type: "f" },
+			"angleCos": { type: "f" },
+			"exponent": { type: "f" },
+			"decay": { type: "f" }
+		} };
+
 
 	},
 

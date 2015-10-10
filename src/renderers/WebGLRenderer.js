@@ -1915,26 +1915,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.ambientLightColor.value = lights.ambient;
 
-		uniforms.directionalLightColor.value = lights.directional.colors;
-		uniforms.directionalLightDirection.value = lights.directional.positions;
+		uniforms.directionalLights.value = lights.directional;
 
-		uniforms.pointLightColor.value = lights.point.colors;
-		uniforms.pointLightPosition.value = lights.point.positions;
-		uniforms.pointLightDistance.value = lights.point.distances;
-		uniforms.pointLightDecay.value = lights.point.decays;
+		uniforms.pointLights.value = lights.point;
 
-		uniforms.spotLightColor.value = lights.spot.colors;
-		uniforms.spotLightPosition.value = lights.spot.positions;
-		uniforms.spotLightDistance.value = lights.spot.distances;
-		uniforms.spotLightDirection.value = lights.spot.directions;
-		uniforms.spotLightAngleCos.value = lights.spot.anglesCos;
-		uniforms.spotLightExponent.value = lights.spot.exponents;
-		uniforms.spotLightDecay.value = lights.spot.decays;
+		uniforms.spotLights.value = lights.spot;
 
-		uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
-		uniforms.hemisphereLightGroundColor.value = lights.hemi.groundColors;
-		uniforms.hemisphereLightDirection.value = lights.hemi.positions;
-
+		uniforms.hemisphereLights.value = lights.hemi;
 	}
 
 	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
@@ -2140,80 +2127,68 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					break;
 
-				case 'fs':
+				case 's':
 
-					_gl.uniform1f( location[ uniform.property ], value );
-
-					break;
-
-				case 'v2s':
-	
-					_gl.uniform2f( location[ uniform.property ], value.x, value.y );
-
-					break;
-
-				case 'v3s':
-
-					_gl.uniform3f( location[ uniform.property ], value.x, value.y, value.z );
-
-					break;
-
-				case 'v4s':
-
-					_gl.uniform4f( location[ uniform.property ], value.x, value.y, value.z, value.w );
-
-					break;
-
-				case 'cs':
-
-					_gl.uniform3f( location[ uniform.property ], value.r, value.g, value.b );
-
-					break;
-
-				case 'fsa':
-
-					for( var i = 0; i < value.length; i ++ ) {
-
-						_gl.uniform1f( location[ i ][ uniform.property ], value );
+					// TODO: Optimize this.
+					for( var j = 0; j < uniform.properties.length; j ++ ) {
+					
+						var property = uniform.properties[j];
+						var uniformProperty =  location[ property ];
+						var valueProperty = values[ property ];
+						switch( property.type ) {
+							case 'f':
+								_gl.uniform1f( uniformProperty, valueProperty );
+								break;
+							case 'v2':
+								_gl.uniform1f( uniformProperty, valueProperty.x, valueProperty.y );
+								break;
+							case 'v3':
+								_gl.uniform1f( uniformProperty, valueProperty.x, valueProperty.y, valueProperty.z );
+								break;
+							case 'v4':
+								_gl.uniform1f( uniformProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
+								break;
+							case 'c':
+								_gl.uniform1f( uniformProperty, valueProperty.r, valueProperty.g, valueProperty.b );
+								break;
+						};
 
 					}
 
 					break;
 
-				case 'v2sa':
+				case 'sa':
 
-					for( var i = 0; i < value.length; i ++ ) {
-	
-						_gl.uniform2f( location[ i ][ uniform.property ], value.x, value.y );
-
-					}
-					break;
-
-				case 'v3sa':
-
+					// TODO: Optimize this.
 					for( var i = 0; i < value.length; i ++ ) {
 
-						_gl.uniform3f( location[ i ][ uniform.property ], value.x, value.y, value.z );
+						for( var j = 0; j < uniform.properties.length; j ++ ) {
+						
+							var property = uniform.properties[j];
+							var uniformProperty =  location[ i ][ property ];
+							var valueProperty = value[i][ property ];
+							switch( property.type ) {
+								case 'f':
+									_gl.uniform1f( uniformProperty, valueProperty );
+									break;
+								case 'v2':
+									_gl.uniform1f( uniformProperty, valueProperty.x, valueProperty.y );
+									break;
+								case 'v3':
+									_gl.uniform1f( uniformProperty, valueProperty.x, valueProperty.y, valueProperty.z );
+									break;
+								case 'v4':
+									_gl.uniform1f( uniformProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
+									break;
+								case 'c':
+									_gl.uniform1f( uniformProperty, valueProperty.r, valueProperty.g, valueProperty.b );
+									break;
+							};
+
+						}
 
 					}
-					break;
 
-				case 'v4sa':
-
-					for( var i = 0; i < value.length; i ++ ) {
-	
-						_gl.uniform4f( location[ i ][ uniform.property ], value.x, value.y, value.z, value.w );
-
-					}
-					break;
-
-				case 'csa':
-
-					for( var i = 0; i < value.length; i ++ ) {
-	
-						_gl.uniform3f( location[ i ][ uniform.property ], value.r, value.g, value.b );
-
-					}
 					break;
 
 				case 'iv1':
@@ -2455,40 +2430,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		viewMatrix = camera.matrixWorldInverse,
 
-		dirColors = zlights.directional.colors,
-		dirPositions = zlights.directional.positions,
+		function adjustArray( array, newLength ) {
+			if( array.length !== newLength ) {
+				return Array( newLength );
+			}
+			return array;
+		}
 
-		pointColors = zlights.point.colors,
-		pointPositions = zlights.point.positions,
-		pointDistances = zlights.point.distances,
-		pointDecays = zlights.point.decays,
-
-		spotColors = zlights.spot.colors,
-		spotPositions = zlights.spot.positions,
-		spotDistances = zlights.spot.distances,
-		spotDirections = zlights.spot.directions,
-		spotAnglesCos = zlights.spot.anglesCos,
-		spotExponents = zlights.spot.exponents,
-		spotDecays = zlights.spot.decays,
-
-		hemiSkyColors = zlights.hemi.skyColors,
-		hemiGroundColors = zlights.hemi.groundColors,
-		hemiPositions = zlights.hemi.positions,
-
-		dirLength = 0,
-		pointLength = 0,
-		spotLength = 0,
-		hemiLength = 0,
-
-		dirCount = 0,
-		pointCount = 0,
-		spotCount = 0,
-		hemiCount = 0,
-
-		dirOffset = 0,
-		pointOffset = 0,
-		spotOffset = 0,
-		hemiOffset = 0;
+		var directionalLights = adjustArray( zlights.directional );
+		var pointLights = adjustArray( zlights.point );
+		var spotLights = adjustArray( zlights.spot );
+		var hemisphereLights = adjustArray( zlights.hemi );
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -2510,103 +2462,70 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
-				dirCount += 1;
+				var directionalLight = directionalLights[i];
 
-				if ( ! light.visible ) continue;
+				if ( ! light.visible ) {
+					directionlLight.color = new THREE.Color( 0x000000 );
+					continue;
+				}
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
 				_direction.sub( _vector3 );
 				_direction.transformDirection( viewMatrix );
 
-				dirOffset = dirLength * 3;
-
-				dirPositions[ dirOffset + 0 ] = _direction.x;
-				dirPositions[ dirOffset + 1 ] = _direction.y;
-				dirPositions[ dirOffset + 2 ] = _direction.z;
-
-				setColorLinear( dirColors, dirOffset, color, intensity );
-
-				dirLength += 1;
+				directionlLight.position = _direction.clone();
+				directionlLight.color = color.clone().multiplyScalar( intensity );
+				directionlLight.distance = distance;
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				pointCount += 1;
-
 				if ( ! light.visible ) continue;
-
-				pointOffset = pointLength * 3;
-
-				setColorLinear( pointColors, pointOffset, color, intensity );
 
 				_vector3.setFromMatrixPosition( light.matrixWorld );
 				_vector3.applyMatrix4( viewMatrix );
 
-				pointPositions[ pointOffset + 0 ] = _vector3.x;
-				pointPositions[ pointOffset + 1 ] = _vector3.y;
-				pointPositions[ pointOffset + 2 ] = _vector3.z;
+				var pointLight = pointLights[i];
 
-				// distance is 0 if decay is 0, because there is no attenuation at all.
-				pointDistances[ pointLength ] = distance;
-				pointDecays[ pointLength ] = ( light.distance === 0 ) ? 0.0 : light.decay;
-
-				pointLength += 1;
+				pointLight.position = _vector3.clone();
+				pointLight.color = color.clone().multiplyScalar( intensity );
+				pointLight.distance = distance;
+				pointLight.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
-				spotCount += 1;
-
 				if ( ! light.visible ) continue;
 
-				spotOffset = spotLength * 3;
-
-				setColorLinear( spotColors, spotOffset, color, intensity );
+				var spotLight = spotLights[i];
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.copy( _direction ).applyMatrix4( viewMatrix );
 
-				spotPositions[ spotOffset + 0 ] = _vector3.x;
-				spotPositions[ spotOffset + 1 ] = _vector3.y;
-				spotPositions[ spotOffset + 2 ] = _vector3.z;
-
-				spotDistances[ spotLength ] = distance;
+				spotLight.position = _vector3.clone();
+				spotLight.color = color.clone().multiplyScalar( intensity );
+				spotLight.distance = distance;
 
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
 				_direction.sub( _vector3 );
 				_direction.transformDirection( viewMatrix );
 
-				spotDirections[ spotOffset + 0 ] = _direction.x;
-				spotDirections[ spotOffset + 1 ] = _direction.y;
-				spotDirections[ spotOffset + 2 ] = _direction.z;
-
-				spotAnglesCos[ spotLength ] = Math.cos( light.angle );
-				spotExponents[ spotLength ] = light.exponent;
-				spotDecays[ spotLength ] = ( light.distance === 0 ) ? 0.0 : light.decay;
-
-				spotLength += 1;
+				spotLight.direction = _direction.clone();
+				spotLight.angleCos = Math.cos( light.angle );
+				spotLight.exponent = light.exponent;
+				spotLight.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
-
-				hemiCount += 1;
 
 				if ( ! light.visible ) continue;
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
 				_direction.transformDirection( viewMatrix );
 
-				hemiOffset = hemiLength * 3;
+				var hemisphereLight = hemisphereLights[i];
 
-				hemiPositions[ hemiOffset + 0 ] = _direction.x;
-				hemiPositions[ hemiOffset + 1 ] = _direction.y;
-				hemiPositions[ hemiOffset + 2 ] = _direction.z;
-
-				skyColor = light.color;
-				groundColor = light.groundColor;
-
-				setColorLinear( hemiSkyColors, hemiOffset, skyColor, intensity );
-				setColorLinear( hemiGroundColors, hemiOffset, groundColor, intensity );
-
-				hemiLength += 1;
+				spotLight.position = _direction.clone();
+				spotLight.skyColor = light.color.clone().multiplyScalar( intensity );
+				spotLight.groundColor = light.groundColor.clone().multiplyScalar( intensity );
 
 			}
 
