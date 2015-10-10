@@ -31,9 +31,7 @@ THREE.AnimationUtils = {
 
 		}
 
-		var result = [];
-		result.push.apply( result, array );
-		return result;
+		return Array.prototype.slice.call( array ); // create Array
 
 	},
 
@@ -88,28 +86,72 @@ THREE.AnimationUtils = {
 	// function for parsing AOS keyframe formats
 	flattenJSON: function( jsonKeys, times, values, valuePropertyName ) {
 
-		for ( var i = 0, n = jsonKeys.length; i !== n; ++ i ) {
+		var i = 1, key = jsonKeys[ 0 ];
 
-			var key = jsonKeys[ i ];
-			var value = key[ valuePropertyName ];
+		while ( key !== undefined && key[ valuePropertyName ] === undefined ) {
 
-			if ( value === undefined ) continue;
+			key = jsonKeys[ i ++ ];
 
-			times.push( key[ 'time' ] );
+		}
 
-			if ( value[ 'splice' ] !== undefined ) {
+		if ( key === undefined ) return; // no data
 
-				values.push.apply( values, value );
+		var value = key[ valuePropertyName ];
+		if ( value === undefined ) return; // no data
 
-			} else if ( value[ 'toArray' ] !== undefined ) {
+		if ( value[ 'splice' ] !== undefined ) {
+			// ...assume array
 
-				value.toArray( values, values.length );
+			do {
 
-			} else {
+				value = key[ valuePropertyName ];
 
-				values.push( value )
+				if ( value !== undefined ) {
 
-			}
+					times.push( key.time );
+					values.push.apply( values, value ); // push all elements
+
+				}
+
+				key = jsonKeys[ i ++ ];
+
+			} while ( key !== undefined );
+
+		} else if ( value[ 'toArray' ] !== undefined ) {
+			// ...assume THREE.Math-ish
+
+			do {
+
+				value = key[ valuePropertyName ];
+
+				if ( value !== undefined ) {
+
+					times.push( key.time );
+					value.toArray( values, values.length );
+
+				}
+
+				key = jsonKeys[ i ++ ];
+
+			} while ( key !== undefined );
+
+		} else {
+			// otherwise push as-is
+
+			do {
+
+				value = key[ valuePropertyName ];
+
+				if ( value !== undefined ) {
+
+					times.push( key.time );
+					values.push( value );
+
+				}
+
+				key = jsonKeys[ i ++ ];
+
+			} while ( key !== undefined );
 
 		}
 
