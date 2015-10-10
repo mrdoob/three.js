@@ -12,26 +12,21 @@ vec3 normal = normalize( transformedNormal );
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
-		vec3 lightColor = pointLightColor[ i ];
+		vec3 lightDir, lightIntensity;
+		getPointLight( pointLights[i], -vViewPosition, lightDir, lightIntensity );
 
-		vec3 lVector = pointLightPosition[ i ] - mvPosition.xyz;
-		vec3 lightDir = normalize( lVector );
+		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
 
-		// attenuation
+			float dotNL = dot( normal, lightDir );
 
-		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );
+			vLightFront += lightIntensity * saturate( dotNL );
 
-		// diffuse
+			#ifdef DOUBLE_SIDED
 
-		float dotProduct = dot( normal, lightDir );
+				vLightBack += lightIntensity * saturate( - dotNL );
 
-		vLightFront += lightColor * attenuation * saturate( dotProduct );
-
-		#ifdef DOUBLE_SIDED
-
-			vLightBack += lightColor * attenuation * saturate( - dotProduct );
-
-		#endif
+			#endif
+		}
 
 	}
 
@@ -41,33 +36,18 @@ vec3 normal = normalize( transformedNormal );
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
-		vec3 lightColor = spotLightColor[ i ];
+		vec3 lightDir, lightIntensity;
+		getSpotLight( spotLights[i], -vViewPosition, lightDir, lightIntensity );
 
-		vec3 lightPosition = spotLightPosition[ i ];
-		vec3 lVector = lightPosition - mvPosition.xyz;
-		vec3 lightDir = normalize( lVector );
+		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
 
-		float spotEffect = dot( spotLightDirection[ i ], lightDir );
+			float dotNL = saturate( dot( normal, lightDir ) );
 
-		if ( spotEffect > spotLightAngleCos[ i ] ) {
-
-			spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ i ] ) );
-
-			// attenuation
-
-			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );
-
-			attenuation *= spotEffect;
-
-			// diffuse
-
-			float dotProduct = dot( normal, lightDir );
-
-			vLightFront += lightColor * attenuation * saturate( dotProduct );
+			vLightFront += lightIntensity * saturate( dotNL );
 
 			#ifdef DOUBLE_SIDED
 
-				vLightBack += lightColor * attenuation * saturate( - dotProduct );
+				vLightBack += lightIntensity * saturate( - dotNL );
 
 			#endif
 
@@ -81,21 +61,22 @@ vec3 normal = normalize( transformedNormal );
 
 	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-		vec3 lightColor = directionalLightColor[ i ];
+		vec3 lightDir, lightIntensity;
+		getDirLightDirect( directionalLights[i], lightDir, lightIntensity );
 
-		vec3 lightDir = directionalLightDirection[ i ];
+		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
 
-		// diffuse
+			float dotNL = dot( normal, lightDir );
 
-		float dotProduct = dot( normal, lightDir );
+			vLightFront += lightIntensity * saturate( dotNL );
 
-		vLightFront += lightColor * saturate( dotProduct );
+			#ifdef DOUBLE_SIDED
 
-		#ifdef DOUBLE_SIDED
+				vLightBack += lightIntensity * saturate( - dotNL );
 
-			vLightBack += lightColor * saturate( - dotProduct );
+			#endif
 
-		#endif
+		}
 
 	}
 
@@ -105,21 +86,11 @@ vec3 normal = normalize( transformedNormal );
 
 	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		vec3 lightDir = hemisphereLightDirection[ i ];
-
-		// diffuse
-
-		float dotProduct = dot( normal, lightDir );
-
-		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;
-
-		vLightFront += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );
+		vLightFront += getHemisphereLightIndirect( hemisphereLights[ i ], normal );
 
 		#ifdef DOUBLE_SIDED
-
-			float hemiDiffuseWeightBack = - 0.5 * dotProduct + 0.5;
-
-			vLightBack += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeightBack );
+	
+			vLightBack += getHemisphereLightIndirect( hemisphereLights[ i ], -normal );
 
 		#endif
 

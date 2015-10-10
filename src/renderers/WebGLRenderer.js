@@ -2137,7 +2137,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 						};
 
 					}
-					debugger;
 
 					break;
 
@@ -2176,7 +2175,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 					}
-					debugger;
 					
 					break;
 
