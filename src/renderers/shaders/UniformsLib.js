@@ -77,25 +77,25 @@ THREE.UniformsLib = {
 
 		"ambientLightColor" : { type: "fv", value: [] },
 
-		"directionalLightDirection" : { type: "fv", value: [] },
-		"directionalLightColor" : { type: "fv", value: [] },
+		"directionalLightDirection" : { type: "v3sa", value: [], name: 'hemisphereLights', property: 'direction' },
+		"directionalLightColor" : { type: "csa", value: [], name: 'hemisphereLights', property: 'direction' },
 
-		"hemisphereLightDirection" : { type: "fv", value: [], array: 'hemisphereLights', property: 'direction' },
-		"hemisphereLightSkyColor" : { type: "fv", value: [], array: 'hemisphereLights', property: 'skyColor' },
-		"hemisphereLightGroundColor" : { type: "fv", value: [], array: 'hemisphereLights', property: 'groundColor' },
+		"hemisphereLightDirection" : { type: "v3sa", value: [], name: 'hemisphereLights', property: 'direction' },
+		"hemisphereLightSkyColor" : { type: "csa", value: [], name: 'hemisphereLights', property: 'skyColor' },
+		"hemisphereLightGroundColor" : { type: "csa", value: [], name: 'hemisphereLights', property: 'groundColor' },
 
-		"pointLightColor" : { type: "fv", value: [], array: 'pointLights', property: 'color' },
-		"pointLightPosition" : { type: "fv", value: [], array: 'pointLights', property: 'position' },
-		"pointLightDistance" : { type: "fv1", value: [], array: 'pointLights', property: 'distance' },
-		"pointLightDecay" : { type: "fv1", value: [], array: 'pointLights', property: 'decay' },
+		"pointLightColor" : { type: "csa", value: [], name: 'pointLights', property: 'color' },
+		"pointLightPosition" : { type: "v3sa", value: [], name: 'pointLights', property: 'position' },
+		"pointLightDistance" : { type: "fsa", value: [], name: 'pointLights', property: 'distance' },
+		"pointLightDecay" : { type: "fsa", value: [], name: 'pointLights', property: 'decay' },
 
-		"spotLightColor" : { type: "fv", value: [], array: 'spotLights', property: 'color' },
-		"spotLightPosition" : { type: "fv", value: [], array: 'spotLights', property: 'position' },
-		"spotLightDirection" : { type: "fv", value: [], array: 'spotLights', property: 'direction' },
-		"spotLightDistance" : { type: "fv1", value: [], array: 'spotLights', property: 'distance' },
-		"spotLightAngleCos" : { type: "fv1", value: [], array: 'spotLights', property: 'angleCos' },
-		"spotLightExponent" : { type: "fv1", value: [], array: 'spotLights', property: 'exponent' },
-		"spotLightDecay" : { type: "fv1", value: [], array: 'spotLights', property: 'decay' }
+		"spotLightColor" : { type: "csa", value: [], name: 'spotLights', property: 'color' },
+		"spotLightPosition" : { type: "v3sa", value: [], name: 'spotLights', property: 'position' },
+		"spotLightDirection" : { type: "v3sa", value: [], name: 'spotLights', property: 'direction' },
+		"spotLightDistance" : { type: "fsa", value: [], name: 'spotLights', property: 'distance' },
+		"spotLightAngleCos" : { type: "fsa", value: [], name: 'spotLights', property: 'angleCos' },
+		"spotLightExponent" : { type: "fsa", value: [], name: 'spotLights', property: 'exponent' },
+		"spotLightDecay" : { type: "fsa", value: [], name: 'spotLights', property: 'decay' }
 
 	},
 

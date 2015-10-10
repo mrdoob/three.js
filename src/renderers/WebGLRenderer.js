@@ -2140,6 +2140,82 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					break;
 
+				case 'fs':
+
+					_gl.uniform1f( location[ uniform.property ], value );
+
+					break;
+
+				case 'v2s':
+	
+					_gl.uniform2f( location[ uniform.property ], value.x, value.y );
+
+					break;
+
+				case 'v3s':
+
+					_gl.uniform3f( location[ uniform.property ], value.x, value.y, value.z );
+
+					break;
+
+				case 'v4s':
+
+					_gl.uniform4f( location[ uniform.property ], value.x, value.y, value.z, value.w );
+
+					break;
+
+				case 'cs':
+
+					_gl.uniform3f( location[ uniform.property ], value.r, value.g, value.b );
+
+					break;
+
+				case 'fsa':
+
+					for( var i = 0; i < value.length; i ++ ) {
+
+						_gl.uniform1f( location[ i ][ uniform.property ], value );
+
+					}
+
+					break;
+
+				case 'v2sa':
+
+					for( var i = 0; i < value.length; i ++ ) {
+	
+						_gl.uniform2f( location[ i ][ uniform.property ], value.x, value.y );
+
+					}
+					break;
+
+				case 'v3sa':
+
+					for( var i = 0; i < value.length; i ++ ) {
+
+						_gl.uniform3f( location[ i ][ uniform.property ], value.x, value.y, value.z );
+
+					}
+					break;
+
+				case 'v4sa':
+
+					for( var i = 0; i < value.length; i ++ ) {
+	
+						_gl.uniform4f( location[ i ][ uniform.property ], value.x, value.y, value.z, value.w );
+
+					}
+					break;
+
+				case 'csa':
+
+					for( var i = 0; i < value.length; i ++ ) {
+	
+						_gl.uniform3f( location[ i ][ uniform.property ], value.r, value.g, value.b );
+
+					}
+					break;
+
 				case 'iv1':
 
 					// flat array of integers (JS or typed array)
