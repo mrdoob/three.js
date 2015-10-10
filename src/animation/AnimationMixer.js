@@ -268,7 +268,8 @@ THREE.AnimationMixer.prototype = {
 		var time = this.time,
 			times = Float64Array.of( time, time + duration );
 
-		action.weight = new THREE.LinearInterpolant( times, this._Down, 1, this._tmp );
+		action.weight = new THREE.LinearInterpolant(
+				times, this._FadeOutValues, 1, this._tmp );
 
 		return this;
 
@@ -279,7 +280,8 @@ THREE.AnimationMixer.prototype = {
 		var time = this.time,
 			times = Float64Array.of( time, time + duration );
 
-		action.weight = new THREE.LinearInterpolant( times, this._Up, 1, this._tmp );
+		action.weight = new THREE.LinearInterpolant(
+				times, this._FadeInValues, 1, this._tmp );
 
 		return this;
 
@@ -403,6 +405,8 @@ THREE.AnimationMixer.prototype = {
 
 			if ( mapChanged ) {
 
+				// when bindingsMap became empty, remove it from bindingsMaps
+
 				remove_empty_map: {
 
 					for ( var k in bindingsMap ) break remove_empty_map;
@@ -445,8 +449,8 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
-	_Up: Float64Array.of( 0, 1 ),
-	_Down: Float64Array.of( 1, 0 ),
+	_FadeInValues: Float64Array.of( 0, 1 ),
+	_FadeOutValues: Float64Array.of( 1, 0 ),
 
 	_tmp: new Float64Array( 1 )
 

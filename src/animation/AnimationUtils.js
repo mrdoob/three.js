@@ -9,7 +9,7 @@ THREE.AnimationUtils = {
 	// same as Array.prototype.slice, but also works on typed arrays
 	arraySlice: function( array, from, to ) {
 
-		if ( array.slice === undefined ) {
+		if ( THREE.AnimationUtils.isTypedArray( array ) ) {
 
 			return new array.constructor( array.subarray( from, to ) );
 
@@ -22,12 +22,12 @@ THREE.AnimationUtils = {
 	// converts an array to a specific type
 	convertArray: function( array, type, forceClone ) {
 
-		if ( ! array ||
+		if ( ! array || // let 'undefined' and 'null' pass
 				! forceClone && array.constructor === type ) return array;
 
-		if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
+		if ( typeof type[ 'BYTES_PER_ELEMENT' ] === 'number' ) {
 
-			return new type( array );
+			return new type( array ); // create typed array
 
 		}
 

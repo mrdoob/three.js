@@ -1,6 +1,6 @@
 /**
  *
- * Abstract base class for interpolants over timed keyframe values.
+ * Abstract base class for interpolants over timed sample values.
  * It handles seeking of the interval and boundary cases. Concrete
  * subclasses then implement the actual intepolation by filling in
  * the Template Methods.
@@ -39,6 +39,10 @@ THREE.Interpolant.prototype = {
 
 				var right;
 
+//- See http://jsperf.com/comparison-to-undefined/2
+//- slower code:
+//-
+//- 			if ( time >= keyTime || keyTime === undefined ) {
 				if ( ! ( time < keyTime ) ) {
 
 					// linear scan forward
@@ -72,6 +76,8 @@ THREE.Interpolant.prototype = {
 					// prepare binary search on the right side of the index
 					right = times.length;
 
+//- slower code:
+//-				} else if ( time < prevKeyTime || prevKeyTime === undefined ) {
 				} else if ( ! ( time >= prevKeyTime ) ) {
 
 					// looping?
@@ -145,15 +151,16 @@ THREE.Interpolant.prototype = {
 				keyTime = times[ index ];
 				prevKeyTime = times[ index - 1 ];
 
-				continue; // check boundary cases, again
+				// check boundary cases, again
+//-				continue;
 
-			} // seek
+			} // seek loop
 
 			this.cachedIndex = index;
 
 			this._intervalChanged( index, prevKeyTime, keyTime );
 
-		}
+		} // validate_interval block
 
 		return this._interpolate( index, prevKeyTime, time, keyTime );
 
