@@ -2391,14 +2391,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setColorLinear( array, offset, color, intensity ) {
-
-		array[ offset + 0 ] = color.r * intensity;
-		array[ offset + 1 ] = color.g * intensity;
-		array[ offset + 2 ] = color.b * intensity;
-
-	}
-
 	function setupLights ( lights, camera ) {
 
 		var l, ll, light,
