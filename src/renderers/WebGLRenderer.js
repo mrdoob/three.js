@@ -1914,13 +1914,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function refreshUniformsLights ( uniforms, lights ) {
 
 		uniforms.ambientLightColor.value = lights.ambient;
-
 		uniforms.directionalLights.value = lights.directional;
-
 		uniforms.pointLights.value = lights.point;
-
 		uniforms.spotLights.value = lights.spot;
-
 		uniforms.hemisphereLights.value = lights.hemi;
 	}
 
@@ -1930,25 +1926,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.ambientLightColor.needsUpdate = value;
 
-		uniforms.directionalLightColor.needsUpdate = value;
-		uniforms.directionalLightDirection.needsUpdate = value;
-
-		uniforms.pointLightColor.needsUpdate = value;
-		uniforms.pointLightPosition.needsUpdate = value;
-		uniforms.pointLightDistance.needsUpdate = value;
-		uniforms.pointLightDecay.needsUpdate = value;
-
-		uniforms.spotLightColor.needsUpdate = value;
-		uniforms.spotLightPosition.needsUpdate = value;
-		uniforms.spotLightDistance.needsUpdate = value;
-		uniforms.spotLightDirection.needsUpdate = value;
-		uniforms.spotLightAngleCos.needsUpdate = value;
-		uniforms.spotLightExponent.needsUpdate = value;
-		uniforms.spotLightDecay.needsUpdate = value;
-
-		uniforms.hemisphereLightSkyColor.needsUpdate = value;
-		uniforms.hemisphereLightGroundColor.needsUpdate = value;
-		uniforms.hemisphereLightDirection.needsUpdate = value;
+		uniforms.directionalLights.needsUpdate = value;
+		uniforms.pointLights.needsUpdate = value;
+		uniforms.spotLights.needsUpdate = value;
+		uniforms.hemisphereLights.needsUpdate = value;
 
 	}
 
@@ -2463,7 +2444,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 				}
 
-				var lightUniforms = directionalLights[i] = light.__webglUniforms;
+				var lightUniforms = light.__webglUniforms;
+				zlights.directional.push( lightUniforms ); 
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2489,7 +2471,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 				}
 
-				var lightUniforms = pointLights[i] = light.__webglUniforms;
+				var lightUniforms = light.__webglUniforms;
+				zlights.point.push( lightUniforms ); 
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2516,7 +2499,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 				}
 
-				var lightUniforms = spotLights[i] = light.__webglUniforms;
+				var lightUniforms = light.__webglUniforms;
+				zlights.spot.push( lightUniforms ); 
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2548,7 +2532,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 				}
 
-				var lightUniforms = hemisphereLights[i] = light.__webglUniforms;
+				var lightUniforms = light.__webglUniforms;
+				zlights.hemi.push( lightUniforms ); 
 
 				if ( ! light.visible ) {
 					lightUniforms.skyColor.setRGB( 0, 0, 0 );
