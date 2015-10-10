@@ -2422,7 +2422,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var l, ll, light,
 		r = 0, g = 0, b = 0,
-		color, skyColor, groundColor,
+		color,
 		intensity,
 		distance,
 
@@ -2430,17 +2430,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		viewMatrix = camera.matrixWorldInverse,
 
-		function adjustArray( array, newLength ) {
-			if( array.length !== newLength ) {
-				return Array( newLength );
-			}
-			return array;
-		}
-
-		var directionalLights = adjustArray( zlights.directional );
-		var pointLights = adjustArray( zlights.point );
-		var spotLights = adjustArray( zlights.spot );
-		var hemisphereLights = adjustArray( zlights.hemi );
+		zlights.directional = [];
+		zlights.point = [];
+		zlights.spot = [];
+		zlights.hemi = [];
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -2462,10 +2455,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
-				var directionalLight = directionalLights[i];
+				if( ! light.__webglUniforms ) {
+					light.__webglUniforms = {
+						position: new THREE.Vector3(),
+						color: new THREE.Color(),
+						distance: 0
+					}
+				}
+
+				var lightUniforms = directionalLights[i] = light.__webglUniforms;
 
 				if ( ! light.visible ) {
-					directionlLight.color = new THREE.Color( 0x000000 );
+					lightUniforms.color.setRGB( 0, 0, 0 );
 					continue;
 				}
 
@@ -2474,76 +2475,99 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_direction.sub( _vector3 );
 				_direction.transformDirection( viewMatrix );
 
-				directionlLight.position = _direction.clone();
-				directionlLight.color = color.clone().multiplyScalar( intensity );
-				directionlLight.distance = distance;
+				lightUniforms.position.copy( _direction );
+				lightUniforms.color.copy( color ).multiplyScalar( intensity );
+				lightUniforms.distance = distance;
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				if ( ! light.visible ) continue;
+				if( ! light.__webglUniforms ) {
+					light.__webglUniforms = {
+						position: new THREE.Vector3(),
+						color: new THREE.Color(),
+						distance: 0,
+						decay: 0
+					}
+				}
+
+				var lightUniforms = pointLights[i] = light.__webglUniforms;
+
+				if ( ! light.visible ) {
+					lightUniforms.color.setRGB( 0, 0, 0 );
+					continue;
+				}
 
 				_vector3.setFromMatrixPosition( light.matrixWorld );
 				_vector3.applyMatrix4( viewMatrix );
 
-				var pointLight = pointLights[i];
-
-				pointLight.position = _vector3.clone();
-				pointLight.color = color.clone().multiplyScalar( intensity );
-				pointLight.distance = distance;
-				pointLight.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
+				lightUniforms.position.copy(  _vector3 );
+				lightUniforms.color.copy( color ).multiplyScalar( intensity );
+				lightUniforms.distance = distance;
+				lightUniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
-				if ( ! light.visible ) continue;
+				if( ! light.__webglUniforms ) {
+					light.__webglUniforms = {
+						position: new THREE.Vector3(),
+						direction: new THREE.Vector3(),
+						color: new THREE.Color(),
+						distance: 0,
+						decay: 0,
+						angleCos: 0
+					}
+				}
 
-				var spotLight = spotLights[i];
+				var lightUniforms = spotLights[i] = light.__webglUniforms;
+
+				if ( ! light.visible ) {
+					lightUniforms.color.setRGB( 0, 0, 0 );
+					continue;
+				}
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.copy( _direction ).applyMatrix4( viewMatrix );
 
-				spotLight.position = _vector3.clone();
-				spotLight.color = color.clone().multiplyScalar( intensity );
-				spotLight.distance = distance;
+				lightUniforms.position.copy( _vector3 );
+				lightUniforms.color.copy( color ).multiplyScalar( intensity );
+				lightUniforms.distance = distance;
 
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
 				_direction.sub( _vector3 );
 				_direction.transformDirection( viewMatrix );
 
-				spotLight.direction = _direction.clone();
-				spotLight.angleCos = Math.cos( light.angle );
-				spotLight.exponent = light.exponent;
-				spotLight.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
+				lightUniforms.direction.copy( _direction);
+				lightUniforms.angleCos = Math.cos( light.angle );
+				lightUniforms.exponent = light.exponent;
+				lightUniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 
-				if ( ! light.visible ) continue;
+				if( ! light.__webglUniforms ) {
+					light.__webglUniforms = {
+						position: new THREE.Vector3(),
+						skyColor: new THREE.Color(),
+						groundColor: new THREE.Color()
+					}
+				}
+
+				var lightUniforms = hemisphereLights[i] = light.__webglUniforms;
+
+				if ( ! light.visible ) {
+					lightUniforms.skyColor.setRGB( 0, 0, 0 );
+					continue;
+				}
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
 				_direction.transformDirection( viewMatrix );
 
-				var hemisphereLight = hemisphereLights[i];
-
-				spotLight.position = _direction.clone();
-				spotLight.skyColor = light.color.clone().multiplyScalar( intensity );
-				spotLight.groundColor = light.groundColor.clone().multiplyScalar( intensity );
+				lightUniforms.position.copy( _direction);
+				lightUniforms.skyColor.copy(  light.color ).multiplyScalar( intensity );
+				lightUniforms.groundColor.copy( groundColor ).multiplyScalar( intensity );
 
 			}
 
 		}
-
-		// null eventual remains from removed lights
-		// (this is to avoid if in shader)
-
-		for ( l = dirLength * 3, ll = Math.max( dirColors.length, dirCount * 3 ); l < ll; l ++ ) dirColors[ l ] = 0.0;
-		for ( l = pointLength * 3, ll = Math.max( pointColors.length, pointCount * 3 ); l < ll; l ++ ) pointColors[ l ] = 0.0;
-		for ( l = spotLength * 3, ll = Math.max( spotColors.length, spotCount * 3 ); l < ll; l ++ ) spotColors[ l ] = 0.0;
-		for ( l = hemiLength * 3, ll = Math.max( hemiSkyColors.length, hemiCount * 3 ); l < ll; l ++ ) hemiSkyColors[ l ] = 0.0;
-		for ( l = hemiLength * 3, ll = Math.max( hemiGroundColors.length, hemiCount * 3 ); l < ll; l ++ ) hemiGroundColors[ l ] = 0.0;
-
-		zlights.directional.length = dirLength;
-		zlights.point.length = pointLength;
-		zlights.spot.length = spotLength;
-		zlights.hemi.length = hemiLength;
 
 		zlights.ambient[ 0 ] = r;
 		zlights.ambient[ 1 ] = g;
