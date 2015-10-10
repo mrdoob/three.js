@@ -62,7 +62,31 @@ if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === u
 
 		}
 
-	}() );
+	} )();
+
+}
+
+//
+
+if ( self.performance === undefined ) {
+
+	self.performance = {};
+
+}
+
+if ( self.performance.now === undefined ) {
+
+	( function () {
+
+		var start = Date.now();
+
+		self.performance.now = function () {
+
+			return Date.now() - start;
+
+		}
+
+	} )();
 
 }
 

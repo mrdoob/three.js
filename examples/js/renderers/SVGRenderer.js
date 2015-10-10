@@ -36,7 +36,6 @@ THREE.SVGRenderer = function () {
 	_clearColor = new THREE.Color(),
 	_clearAlpha = 1,
 
-	_w, // z-buffer to w-buffer
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
 	_centroid = new THREE.Vector3(),
 	_normal = new THREE.Vector3(),
@@ -382,11 +381,6 @@ THREE.SVGRenderer = function () {
 			calculateLight( _lights, _centroid, element.normalModel, _color );
 
 			_color.multiply( _diffuseColor ).add( material.emissive );
-
-		} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			_w = 1 - ( material.__2near / ( material.__farPlusNear - element.z * material.__farMinusNear ) );
-			_color.setRGB( _w, _w, _w );
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 

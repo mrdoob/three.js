@@ -36,11 +36,9 @@ THREE.AMFLoader.prototype = {
 		var loader = new THREE.XHRLoader( scope.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setResponseType( 'arraybuffer' );
-
 		loader.load( url, function( text ) {
 
-			var amfObject = scope.parse( text );
-			onLoad( amfObject );
+			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
 
@@ -77,7 +75,7 @@ THREE.AMFLoader.prototype = {
 
 				for ( file in zip.files ) {
 
-					if ( file.toLowerCase().endsWith( ".amf" ) ) {
+					if ( file.toLowerCase().substr( - 4 ) === '.amf' ) {
 
 						break;
 
@@ -246,21 +244,13 @@ THREE.AMFLoader.prototype = {
 
 				} else if ( currVolumeNode.nodeName === "triangle" ) {
 
-					var triangleNode = currVolumeNode.firstElementChild;
+					var v1 = currVolumeNode.getElementsByTagName("v1")[0].textContent;
+					var v2 = currVolumeNode.getElementsByTagName("v2")[0].textContent;
+					var v3 = currVolumeNode.getElementsByTagName("v3")[0].textContent;
 
-					while ( triangleNode ) {
-
-						if ( triangleNode.nodeName === "v1" ||
-								triangleNode.nodeName === "v2" ||
-								triangleNode.nodeName === "v3" ) {
-
-							volume.triangles.push( triangleNode.textContent );
-
-						}
-
-						triangleNode = triangleNode.nextElementSibling;
-
-					}
+					volume.triangles.push( v1 );
+					volume.triangles.push( v2 );
+					volume.triangles.push( v3 );
 
 				}
 
@@ -288,21 +278,23 @@ THREE.AMFLoader.prototype = {
 
 						if ( vNode.nodeName === "coordinates" ) {
 
-							var coordNode = vNode.firstElementChild;
+							var x = vNode.getElementsByTagName("x")[0].textContent;
+							var y = vNode.getElementsByTagName("y")[0].textContent;
+							var z = vNode.getElementsByTagName("z")[0].textContent;
 
-							while ( coordNode ) {
+							vertArray.push(x);
+							vertArray.push(y);
+							vertArray.push(z);
 
-								if ( coordNode.nodeName === "x" ||
-										 coordNode.nodeName === "y" ||
-										 coordNode.nodeName === "z" ) {
+						} else if ( vNode.nodeName === "normal" ) {
 
-									vertArray.push( coordNode.textContent );
+							var nx = vNode.getElementsByTagName("nx")[0].textContent;
+							var ny = vNode.getElementsByTagName("ny")[0].textContent;
+							var nz = vNode.getElementsByTagName("nz")[0].textContent;
 
-								}
-
-								coordNode = coordNode.nextElementSibling;
-
-							}
+							normalArray.push(nx);
+							normalArray.push(ny);
+							normalArray.push(nz);
 
 						} else if ( vNode.nodeName === "normal" ) {
 

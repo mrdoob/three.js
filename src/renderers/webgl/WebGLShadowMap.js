@@ -100,33 +100,26 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var faceCount, isPointLight;
 
 		if ( scope.enabled === false ) return;
-		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
+		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;	
 
-		// set GL state for depth map
-
+		// Set GL state for depth map. 
 		_gl.clearColor( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
-
 		_state.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
+		_gl.cullFace( scope.cullFace === THREE.CullFaceFront ? _gl.FRONT : _gl.BACK );
+		_state.setDepthTest( true );			
 
-		if ( scope.cullFace === THREE.CullFaceFront ) {
-
-			_gl.cullFace( _gl.FRONT );
-
-		} else {
-
-			_gl.cullFace( _gl.BACK );
-
-		}
-
-		_state.setDepthTest( true );
+		// save the existing viewport so it can be restored later
+		_renderer.getViewport( _vector4 );
 
 		// render depth map
 
 		for ( var i = 0, il = _lights.length; i < il; i ++ ) {
 
 			var light = _lights[ i ];
+
+			if ( ! light.castShadow ) continue;
 
 			if ( light instanceof THREE.PointLight ) {
 
@@ -168,8 +161,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				isPointLight = false;
 
 			}
-
-			if ( ! light.castShadow ) continue;
 
 			if ( ! light.shadowMap ) {
 
@@ -225,9 +216,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 			shadowCamera.position.copy( _lightPositionWorld );
-
-			// save the existing viewport so it can be restored later
-			_renderer.getViewport( _vector4 );
 
 			_renderer.setRenderTarget( shadowMap );
 			_renderer.clear();
@@ -321,13 +309,17 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			}
 
+			//We must call _renderer.resetGLState() at the end of each iteration of
+			// the light loop in order to force material updates for each light.
+			_renderer.resetGLState();			
+
 		}
 
-		// restore GL state
+		_renderer.setViewport( _vector4.x, _vector4.y, _vector4.z, _vector4.w );
 
+		// Restore GL state. 
 		var clearColor = _renderer.getClearColor(),
 		clearAlpha = _renderer.getClearAlpha();
-
 		_renderer.setClearColor( clearColor, clearAlpha );
 		_state.enable( _gl.BLEND );
 
@@ -337,9 +329,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
-		_renderer.setViewport( _vector4.x, _vector4.y, _vector4.z, _vector4.w );
-
-		_renderer.resetGLState();
+		_renderer.resetGLState();			
 
 		scope.needsUpdate = false;
 

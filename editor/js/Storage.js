@@ -76,14 +76,14 @@ var Storage = function () {
 
 		},
 
-		clear: function ( callback ) {
+		clear: function () {
 
 			var transaction = database.transaction( [ 'states' ], 'readwrite' );
 			var objectStore = transaction.objectStore( 'states' );
 			var request = objectStore.clear();
 			request.onsuccess = function ( event ) {
 
-				callback();
+				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Cleared IndexedDB.' );
 
 			};
 

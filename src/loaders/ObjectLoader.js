@@ -60,7 +60,7 @@ THREE.ObjectLoader.prototype = {
 
 		var object = this.parseObject( json.object, geometries, materials );
 
-		if( json.animations ) {
+		if ( json.animations ) {
 
 			object.animations = this.parseAnimations( json.animations );
 
@@ -327,7 +327,7 @@ THREE.ObjectLoader.prototype = {
 
 		var animations = [];
 
-		for( var i = 0; i < json.length; i ++ ) {
+		for ( var i = 0; i < json.length; i ++ ) {
 
 			var clip = THREE.AnimationClip.parse( json[i] );
 
@@ -447,7 +447,7 @@ THREE.ObjectLoader.prototype = {
 
 			var object;
 
-			var getGeometry = function ( name ) {
+			function getGeometry( name ) {
 
 				if ( geometries[ name ] === undefined ) {
 
@@ -457,9 +457,11 @@ THREE.ObjectLoader.prototype = {
 
 				return geometries[ name ];
 
-			};
+			}
 
-			var getMaterial = function ( name ) {
+			function getMaterial( name ) {
+
+				if ( name === undefined ) return undefined;
 
 				if ( materials[ name ] === undefined ) {
 
@@ -469,7 +471,7 @@ THREE.ObjectLoader.prototype = {
 
 				return materials[ name ];
 
-			};
+			}
 
 			switch ( data.type ) {
 

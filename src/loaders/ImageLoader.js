@@ -20,13 +20,21 @@ THREE.ImageLoader.prototype = {
 
 		if ( cached !== undefined ) {
 
+			scope.manager.itemStart( url );
+
 			if ( onLoad ) {
 
 				setTimeout( function () {
 
 					onLoad( cached );
 
+					scope.manager.itemEnd( url );
+
 				}, 0 );
+
+			} else {
+
+				scope.manager.itemEnd( url );
 
 			}
 
