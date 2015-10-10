@@ -102,7 +102,7 @@ vec3 F_Schlick( in vec3 specularColor, in float dotLH ) {
 
 float G_BlinnPhong_Implicit( /* in float dotNL, in float dotNV */ ) {
 
-	// geometry term is (n⋅l)(n⋅v) / 4(n⋅l)(n⋅v)
+	// geometry term is (n dot l)(n dot v) / 4(n dot l)(n dot v)
 
 	return 0.25;
 
@@ -125,5 +125,3 @@ vec3 BRDF_BlinnPhong( in vec3 specularColor, in float shininess, in float dotNH,
 	return F * G * D;
 
 }
-
-

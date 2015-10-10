@@ -80,20 +80,20 @@ THREE.UniformsLib = {
 		"directionalLights" : { type: "sa", value: [], properties: {
 			"direction": { type: "v3" },
 			"color": { type: "c" }
-		} };
+		} },
 
 		"hemisphereLights" : { type: "sa", value: [], properties: {
 			"direction": { type: "v3" },
 			"skyColor": { type: "v3" },
 			"groundColor": { type: "v3" }
-		} };
+		} },
 
 		"pointLights" : { type: "sa", value: [], properties: {
 			"color": { type: "c" },
 			"position": { type: "v3" },
 			"direction": { type: "v3" },
 			"distance": { type: "f" }
-		} };
+		} },
 
 		"spotLights" : { type: "sa", value: [], properties: {
 			"color": { type: "c" },
@@ -103,7 +103,7 @@ THREE.UniformsLib = {
 			"angleCos": { type: "f" },
 			"exponent": { type: "f" },
 			"decay": { type: "f" }
-		} };
+		} }
 
 
 	},

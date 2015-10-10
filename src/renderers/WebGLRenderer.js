@@ -2110,66 +2110,74 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				case 's':
 
+					//console.log( "uniform s", uniform, location );
 					// TODO: Optimize this.
-					for( var j = 0; j < uniform.properties.length; j ++ ) {
-					
-						var property = uniform.properties[j];
-						var uniformProperty =  location[ property ];
-						var valueProperty = values[ property ];
+					for( var propertyName in uniform.properties ) {
+						var property = uniform.properties[ propertyName ];
+						var locationProperty =  location[ propertyName ];
+						var valueProperty = value[ propertyName ];
+						//console.log( "uniformProperty", property, valueProperty );
+
 						switch( property.type ) {
 							case 'f':
-								_gl.uniform1f( uniformProperty, valueProperty );
+								_gl.uniform1f( locationProperty, valueProperty );
 								break;
 							case 'v2':
-								_gl.uniform1f( uniformProperty, valueProperty.x, valueProperty.y );
+								_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
 								break;
 							case 'v3':
-								_gl.uniform1f( uniformProperty, valueProperty.x, valueProperty.y, valueProperty.z );
+								_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
 								break;
 							case 'v4':
-								_gl.uniform1f( uniformProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
+								_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
 								break;
 							case 'c':
-								_gl.uniform1f( uniformProperty, valueProperty.r, valueProperty.g, valueProperty.b );
+								_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
 								break;
 						};
 
 					}
+					debugger;
 
 					break;
 
 				case 'sa':
 
+					//console.log( "uniform sa", uniform, location );
 					// TODO: Optimize this.
 					for( var i = 0; i < value.length; i ++ ) {
 
-						for( var j = 0; j < uniform.properties.length; j ++ ) {
-						
-							var property = uniform.properties[j];
-							var uniformProperty =  location[ i ][ property ];
-							var valueProperty = value[i][ property ];
+						//console.log( "uniformIndex", i );
+						for( var propertyName in uniform.properties ) {
+							
+							var property = uniform.properties[ propertyName ];
+							var locationProperty =  location[ i ][ propertyName ];
+							var valueProperty = value[i][ propertyName ];
+							//console.log( "uniformProperty", property, valueProperty, i );
+
 							switch( property.type ) {
 								case 'f':
-									_gl.uniform1f( uniformProperty, valueProperty );
+									_gl.uniform1f( locationProperty, valueProperty );
 									break;
 								case 'v2':
-									_gl.uniform1f( uniformProperty, valueProperty.x, valueProperty.y );
+									_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
 									break;
 								case 'v3':
-									_gl.uniform1f( uniformProperty, valueProperty.x, valueProperty.y, valueProperty.z );
+									_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
 									break;
 								case 'v4':
-									_gl.uniform1f( uniformProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
+									_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
 									break;
 								case 'c':
-									_gl.uniform1f( uniformProperty, valueProperty.r, valueProperty.g, valueProperty.b );
+									_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
 									break;
 							};
 
 						}
 
 					}
-
+					debugger;
+					
 					break;
 
 				case 'iv1':
@@ -2401,7 +2409,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		zlights = _lights,
 
-		viewMatrix = camera.matrixWorldInverse,
+		viewMatrix = camera.matrixWorldInverse;
 
 		zlights.directional = [];
 		zlights.point = [];
@@ -2430,9 +2438,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if( ! light.__webglUniforms ) {
 					light.__webglUniforms = {
-						position: new THREE.Vector3(),
-						color: new THREE.Color(),
-						distance: 0
+						direction: new THREE.Vector3(),
+						color: new THREE.Color()
 					}
 				}
 
@@ -2449,8 +2456,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				lightUniforms.direction.sub( _vector3 );
 				lightUniforms.direction.transformDirection( viewMatrix );
 
-				lightUniforms.color.copy( color ).multiplyScalar( intensity );
-				lightUniforms.distance = distance;
+				lightUniforms.color.copy( light.color ).multiplyScalar( light.intensity );
 
 			} else if ( light instanceof THREE.PointLight ) {
 
@@ -2474,8 +2480,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				lightUniforms.position.setFromMatrixPosition( light.matrixWorld );
 				lightUniforms.position.applyMatrix4( viewMatrix );
 
-				lightUniforms.color.copy( color ).multiplyScalar( intensity );
-				lightUniforms.distance = distance;
+				lightUniforms.color.copy( light.color ).multiplyScalar( light.intensity );
+				lightUniforms.distance = light.distance;
 				lightUniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
 			} else if ( light instanceof THREE.SpotLight ) {
@@ -2536,7 +2542,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				lightUniforms.position.transformDirection( viewMatrix );
 
 				lightUniforms.skyColor.copy(  light.color ).multiplyScalar( intensity );
-				lightUniforms.groundColor.copy( groundColor ).multiplyScalar( intensity );
+				lightUniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
 
 			}
 
