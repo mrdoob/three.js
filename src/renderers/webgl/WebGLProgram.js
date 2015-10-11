@@ -1,6 +1,11 @@
 THREE.WebGLProgram = ( function () {
 
 	var programIdCount = 0;
+	
+	// TODO: Combine the regex
+	var structRe = /^([\w\d_]+)\.([\w\d_]+)$/; 
+	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/; 
+	var arrayRe = /^([\w\d_]+)\[0\]$/; 
 
 	function generateDefines( defines ) {
 
@@ -26,12 +31,6 @@ THREE.WebGLProgram = ( function () {
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 	
-
-		// TODO: Combine.
-		var structRe = /^([\w\d_]+)\.([\w\d_]+)$/; 
-		var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/; 
-		var arrayRe = /^([\w\d_]+)\[0\]$/; 
-
 		for ( var i = 0; i < n; i ++ ) {
 
 			var info = gl.getActiveUniform( program, i );

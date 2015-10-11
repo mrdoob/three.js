@@ -2110,14 +2110,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				case 's':
 
-					//console.log( "uniform s", uniform, location );
 					// TODO: Optimize this.
 					for( var propertyName in uniform.properties ) {
+	
 						var property = uniform.properties[ propertyName ];
 						var locationProperty =  location[ propertyName ];
 						var valueProperty = value[ propertyName ];
-						//console.log( "uniformProperty", property, valueProperty );
-
+	
 						switch( property.type ) {
 							case 'f':
 								_gl.uniform1f( locationProperty, valueProperty );
@@ -2142,18 +2141,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				case 'sa':
 
-					//console.log( "uniform sa", uniform, location );
 					// TODO: Optimize this.
 					for( var i = 0; i < value.length; i ++ ) {
 
-						//console.log( "uniformIndex", i );
 						for( var propertyName in uniform.properties ) {
 							
 							var property = uniform.properties[ propertyName ];
 							var locationProperty =  location[ i ][ propertyName ];
 							var valueProperty = value[i][ propertyName ];
-							//console.log( "uniformProperty", property, valueProperty, i );
-
+	
 							switch( property.type ) {
 								case 'f':
 									_gl.uniform1f( locationProperty, valueProperty );
