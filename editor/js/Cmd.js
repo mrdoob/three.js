@@ -10,7 +10,7 @@
 
 Cmd = function ( editorRef ) {
 
-	this.id = -1;
+	this.id = - 1;
 	this.inMemory = false;
 	this.updatable = false;
 	this.type = '';

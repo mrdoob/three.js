@@ -30,6 +30,7 @@ CmdSetScene = function ( scene ) {
 		}
 
 	}
+
 };
 
 CmdSetScene.prototype = {

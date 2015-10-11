@@ -20,7 +20,7 @@ Sidebar.History = function ( editor ) {
 
 	// Actions
 
-	var objectActions = new UI.Select().setPosition('absolute').setRight( '8px' ).setFontSize( '11px' );
+	var objectActions = new UI.Select().setPosition( 'absolute' ).setRight( '8px' ).setFontSize( '11px' );
 	objectActions.setOptions( {
 
 		'Actions': 'Actions',
@@ -99,7 +99,7 @@ Sidebar.History = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + "<span style='color: #0000cc '>" + enumerator++ + ". Undo: " + object.name + "</span>";
+				var html = pad + "<span style='color: #0000cc '>" + enumerator ++ + ". Undo: " + object.name + "</span>";
 
 				options.push( { value: object.id, html: html } );
 
@@ -114,7 +114,7 @@ Sidebar.History = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + "<span style='color: #71544e'>" + enumerator++ + ". Redo: " +  object.name + "</span>";
+				var html = pad + "<span style='color: #71544e'>" + enumerator ++ + ". Redo: " +  object.name + "</span>";
 
 				options.push( { value: object.id, html: html } );
 

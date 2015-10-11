@@ -68,7 +68,7 @@ History.prototype = {
 			// the command is not updatable and is added as a new part of the history
 
 			this.undos.push( cmd );
-			cmd.id = ++this.idCounter;
+			cmd.id = ++ this.idCounter;
 
 		}
 		cmd.name = ( optionalName !== undefined ) ? optionalName : cmd.name;
@@ -93,7 +93,7 @@ History.prototype = {
 
 		if ( this.historyDisabled ) {
 
-			alert("Undo/Redo disabled while scene is playing.");
+			alert( "Undo/Redo disabled while scene is playing." );
 			return;
 
 		}
@@ -128,7 +128,7 @@ History.prototype = {
 
 		if ( this.historyDisabled ) {
 
-			alert("Undo/Redo disabled while scene is playing.");
+			alert( "Undo/Redo disabled while scene is playing." );
 			return;
 
 		}
@@ -166,7 +166,7 @@ History.prototype = {
 		history.undos = [];
 		history.redos = [];
 
-		if ( !this.serializationEnabled ) {
+		if ( ! this.serializationEnabled ) {
 
 			return history;
 
@@ -174,7 +174,7 @@ History.prototype = {
 
 		// Append Undos to History
 
-		for ( var i = 0 ; i < this.undos.length; i++ ) {
+		for ( var i = 0 ; i < this.undos.length; i ++ ) {
 
 			if ( this.undos[ i ].hasOwnProperty( "json" ) ) {
 
@@ -186,7 +186,7 @@ History.prototype = {
 
 		// Append Redos to History
 
-		for ( var i = 0 ; i < this.redos.length; i++ ) {
+		for ( var i = 0 ; i < this.redos.length; i ++ ) {
 
 			if ( this.redos[ i ].hasOwnProperty( "json" ) ) {
 
@@ -206,7 +206,7 @@ History.prototype = {
 
 		this.serializationEnabled = json.serializationEnabled;
 
-		for ( var i = 0; i < json.undos.length ; i++ ) {
+		for ( var i = 0; i < json.undos.length; i ++ ) {
 
 			var cmdJSON = json.undos[ i ];
 			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
@@ -218,7 +218,7 @@ History.prototype = {
 
 		}
 
-		for ( var i = 0; i < json.redos.length ; i++ ) {
+		for ( var i = 0; i < json.redos.length; i ++ ) {
 
 			var cmdJSON = json.redos[ i ];
 			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
@@ -249,7 +249,7 @@ History.prototype = {
 
 		if ( this.historyDisabled ) {
 
-			alert("Undo/Redo disabled while scene is playing.");
+			alert( "Undo/Redo disabled while scene is playing." );
 			return;
 
 		}
@@ -292,7 +292,7 @@ History.prototype = {
 
 	enableSerialization: function ( id ) {
 
-		if ( this.serializationEnabled ) { return; }
+		if ( this.serializationEnabled ) return;
 
 		/**
 		 * because there might be commands in this.undos and this.redos
@@ -301,7 +301,7 @@ History.prototype = {
 		 * while also calling .toJSON() on them.
 		 */
 
-		this.goToState(-1);
+		this.goToState( - 1 );
 
 		this.editor.signals.sceneGraphChanged.active = false;
 		this.editor.signals.historyChanged.active = false;
@@ -309,7 +309,7 @@ History.prototype = {
 		var cmd = this.redo();
 		while ( cmd !== undefined ) {
 
-			if ( !cmd.hasOwnProperty( "json" ) ) {
+			if ( ! cmd.hasOwnProperty( "json" ) ) {
 
 				cmd.json = cmd.toJSON();
 
@@ -329,7 +329,7 @@ History.prototype = {
 
 	disableSerialization: function () {
 
-		if ( !this.serializationEnabled ) { return; }
+		if ( ! this.serializationEnabled ) return;
 
 		this.serializationEnabled = false;
 

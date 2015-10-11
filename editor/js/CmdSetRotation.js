@@ -19,7 +19,7 @@ CmdSetRotation = function ( object, newRotation, optionalOldRotation ) {
 
 	this.object = object;
 
-	if ( object !== undefined && newRotation !== undefined) {
+	if ( object !== undefined && newRotation !== undefined ) {
 
 		this.oldRotation = object.rotation.clone();
 		this.newRotation = newRotation.clone();
@@ -75,8 +75,8 @@ CmdSetRotation.prototype = {
 		Cmd.prototype.fromJSON.call( this, json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.oldRotation = new THREE.Euler().fromArray(json.oldRotation);
-		this.newRotation = new THREE.Euler().fromArray(json.newRotation);
+		this.oldRotation = new THREE.Euler().fromArray( json.oldRotation );
+		this.newRotation = new THREE.Euler().fromArray( json.newRotation );
 
 	}
 

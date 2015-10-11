@@ -111,6 +111,7 @@ CmdSetMaterial.prototype = {
 			return materials[ json.materials[ 0 ].uuid ];
 
 		}
+
 	}
 
 };

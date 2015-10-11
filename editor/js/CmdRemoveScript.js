@@ -22,6 +22,7 @@ CmdRemoveScript = function ( object, script ) {
 		this.index = this.editor.scripts[ this.object.uuid ].indexOf( this.script );
 
 	}
+
 };
 
 CmdRemoveScript.prototype = {
