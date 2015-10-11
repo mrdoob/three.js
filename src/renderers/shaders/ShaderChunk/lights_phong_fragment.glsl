@@ -17,13 +17,12 @@ IncidentLight incidentLight;
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
-		getPointLightDirect( pointLights[ i ], -vViewPosition, incidentLight );
+		getPointIncidentLight( pointLights[ i ], -vViewPosition, incidentLight );
 
-		directReflectedLight.diffuse +=
-			BRDF_Lambert( incidentLight, normal, diffuse );
+		BRDF_Lambert( incidentLight, normal, diffuse, directReflectedLight );
 
-		directReflectedLight.specular +=
-			BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess );
+		BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess, directReflectedLight );
+
 
 	}
 
@@ -35,11 +34,9 @@ IncidentLight incidentLight;
 
 		getSpotLightDirect( spotLights[ i ], -vViewPosition, incidentLight );
 
-		directReflectedLight.diffuse +=
-			BRDF_Lambert( incidentLight, normal, diffuse );
+		BRDF_Lambert( incidentLight, normal, diffuse, directReflectedLight );
 
-		directReflectedLight.specular +=
-			BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess );
+		BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess, directReflectedLight );
 
 	}
 
@@ -49,13 +46,11 @@ IncidentLight incidentLight;
 
 	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-		getDirLightDirect( directionalLights[ i ], incidentLight );
+		getDirIncidentLight( directionalLights[ i ], incidentLight );
 
-		directReflectedLight.diffuse +=
-			BRDF_Lambert( incidentLight, normal, diffuse );
+		BRDF_Lambert( incidentLight, normal, diffuse, directReflectedLight );
 
-		directReflectedLight.specular +=
-			BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess );
+		BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess, directReflectedLight );
 
 	}
 
@@ -65,10 +60,9 @@ IncidentLight incidentLight;
 
 	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		getHemisphereLightIndirect( hemisphereLights[ i ], normal, incidentLight );
+		getHemisphereIncidentLight( hemisphereLights[ i ], normal, incidentLight );
 
-		indirectReflectedLight.diffuse +=
-			BRDF_Lambert( incidentLight, normal, diffuse );
+		BRDF_Lambert( incidentLight, normal, diffuse, indirectReflectedLight );
 
 	}
 

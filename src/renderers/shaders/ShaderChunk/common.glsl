@@ -92,9 +92,9 @@ struct ReflectedLight {
  	vec3 diffuse;
 };
 
-vec3 BRDF_Lambert( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 diffuseColor ) {
+void BRDF_Lambert( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 diffuseColor, inout ReflectedLight reflectedLight ) {
 
-	return incidentLight.color * diffuseColor * ( saturate( dot( normal, incidentLight.direction ) ) );
+	reflectedLight.diffuse += incidentLight.color * diffuseColor * ( saturate( dot( normal, incidentLight.direction ) ) );
 
 	// the above should be scaled by '' * RECIPROCAL_PI'
 }
@@ -127,7 +127,7 @@ float D_BlinnPhong( const in float shininess, const in float dotNH ) {
 
 }
 
-vec3 BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float shininess ) {
+void BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float shininess, inout ReflectedLight reflectedLight ) {
 
 	vec3 halfDir = normalize( incidentLight.direction + viewDir );
 	float dotNH = saturate( dot( normal, halfDir ) );
@@ -137,7 +137,7 @@ vec3 BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal
 	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );
 	float D = D_BlinnPhong( shininess, dotNH );
 
-	return incidentLight.color * F * ( G * D );
+	reflectedLight.specular += incidentLight.color * F * ( G * D );
 
 }
 
@@ -150,7 +150,7 @@ vec3 BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal
 
 	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];
 
-	void getDirLightDirect( const in DirectionalLight directionalLight, out IncidentLight incidentLight ) { 
+	void getDirIncidentLight( const in DirectionalLight directionalLight, out IncidentLight incidentLight ) { 
 	
 		incidentLight.color = directionalLight.color;
 		incidentLight.direction = directionalLight.direction; 
@@ -170,7 +170,7 @@ vec3 BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal
 
 	uniform PointLight pointLights[ MAX_POINT_LIGHTS ];
 
-	void getPointLightDirect( const in PointLight pointLight, const in vec3 position, out IncidentLight incidentLight ) { 
+	void getPointIncidentLight( const in PointLight pointLight, const in vec3 position, out IncidentLight incidentLight ) { 
 	
 		vec3 lightPosition = pointLight.position; 
 	
@@ -198,7 +198,7 @@ vec3 BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal
 
 	uniform SpotLight spotLights[ MAX_SPOT_LIGHTS ];
 
-	void getSpotLightDirect( const in SpotLight spotLight, const in vec3 position, out IncidentLight incidentLight ) {
+	void getSpotIncidentLight( const in SpotLight spotLight, const in vec3 position, out IncidentLight incidentLight ) {
 	
 		vec3 lightPosition = spotLight.position;
 	
@@ -226,7 +226,7 @@ vec3 BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal
 
 	layout(packed)uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
 
-	void getHemisphereLightIndirect( const in HemisphereLight hemiLight, const in vec3 normal, out IncidentLight incidentLight ) { 
+	void getHemisphereIncidentLight( const in HemisphereLight hemiLight, const in vec3 normal, out IncidentLight incidentLight ) { 
 	
 		float dotNL = dot( normal, hemiLight.direction );
 
