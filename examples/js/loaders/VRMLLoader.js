@@ -796,8 +796,8 @@ THREE.VRMLLoader.prototype = {
 
 								var face = new THREE.Face3(
 									indexes[ 0 ],
-									indexes[ skip + data.ccw ? 1 : 2 ],
-									indexes[ skip + data.ccw ? 2 : 1 ],
+									indexes[ skip + (data.ccw ? 1 : 2) ],
+									indexes[ skip + (data.ccw ? 2 : 1) ],
 									null // normal, will be added later
 									// todo: pass in the color, if a color index is present
 								);
@@ -809,12 +809,12 @@ THREE.VRMLLoader.prototype = {
 											uvs[ uvIndexes[ 0 ] ].y
 										) ,
 										new THREE.Vector2 (
-											uvs[ uvIndexes[ skip + data.ccw ? 1 : 2 ] ].x ,
-											uvs[ uvIndexes[ skip + data.ccw ? 1 : 2 ] ].y
+											uvs[ uvIndexes[ skip + (data.ccw ? 1 : 2) ] ].x ,
+											uvs[ uvIndexes[ skip + (data.ccw ? 1 : 2) ] ].y
 										) ,
 										new THREE.Vector2 (
-											uvs[ uvIndexes[ skip + data.ccw ? 2 : 1 ] ].x ,
-											uvs[ uvIndexes[ skip + data.ccw ? 2 : 1 ] ].y
+											uvs[ uvIndexes[ skip + (data.ccw ? 2 : 1) ] ].x ,
+											uvs[ uvIndexes[ skip + (data.ccw ? 2 : 1) ] ].y
 										)
 									] );
 								}
