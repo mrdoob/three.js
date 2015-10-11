@@ -12,6 +12,60 @@ UI.Element = function ( dom ) {
 
 UI.Element.prototype = {
 
+	add: function () {
+
+		for ( var i = 0; i < arguments.length; i ++ ) {
+
+			var argument = arguments[ i ];
+
+			if ( argument instanceof UI.Element ) {
+
+				this.dom.appendChild( argument.dom );
+
+			} else {
+
+				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' )
+
+			}
+
+		}
+
+		return this;
+
+	},
+
+	remove: function () {
+
+		for ( var i = 0; i < arguments.length; i ++ ) {
+
+			var argument = arguments[ i ];
+
+			if ( argument instanceof UI.Element ) {
+
+				this.dom.removeChild( argument.dom );
+
+			} else {
+
+				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' )
+
+			}
+
+		}
+
+		return this;
+
+	},
+
+	clear: function () {
+
+		while ( this.dom.children.length ) {
+
+			this.dom.removeChild( this.dom.lastChild );
+
+		}
+
+	},
+
 	setId: function ( id ) {
 
 		this.dom.id = id;
@@ -106,65 +160,11 @@ UI.Panel = function () {
 	this.dom = dom;
 
 	return this;
+
 };
 
 UI.Panel.prototype = Object.create( UI.Element.prototype );
 UI.Panel.prototype.constructor = UI.Panel;
-
-UI.Panel.prototype.add = function () {
-
-	for ( var i = 0; i < arguments.length; i ++ ) {
-
-		var argument = arguments[ i ];
-
-		if ( argument instanceof UI.Element ) {
-
-			this.dom.appendChild( argument.dom );
-
-		} else {
-
-			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
-
-		}
-
-	}
-
-	return this;
-
-};
-
-
-UI.Panel.prototype.remove = function () {
-
-	for ( var i = 0; i < arguments.length; i ++ ) {
-
-		var argument = arguments[ i ];
-
-		if ( argument instanceof UI.Element ) {
-
-			this.dom.removeChild( argument.dom );
-
-		} else {
-
-			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
-
-		}
-
-	}
-
-	return this;
-
-};
-
-UI.Panel.prototype.clear = function () {
-
-	while ( this.dom.children.length ) {
-
-		this.dom.removeChild( this.dom.lastChild );
-
-	}
-
-};
 
 
 // Collapsible Panel
