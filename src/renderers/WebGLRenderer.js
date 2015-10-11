@@ -2010,7 +2010,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
 					uniforms.shadowMap.value[ j ] = light.shadowMap;
-					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
+					uniforms.shadowMapSize.value[ j ] = light.shadow.mapSize;
 					uniforms.shadowBias.value[ j ] = light.shadowBias;
 
 					j ++;

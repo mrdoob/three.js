@@ -114,11 +114,6 @@ Object.defineProperties( THREE.Light.prototype, {
 			this.shadow.map = value;
 		}
 	},
-	shadowMapSize: {
-		get: function () {
-			return this.shadow.mapSize;
-		}
-	},
 	shadowMapWidth: {
 		get: function () {
 			return this.shadow.mapSize.x;
