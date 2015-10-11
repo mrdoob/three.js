@@ -747,15 +747,17 @@ THREE.VRMLLoader.prototype = {
 
 							if ( 'Coordinate' === child.nodeType ) {
 
-								if ( child.points )
+								if ( child.points ) {
 
-								for ( var k = 0, l = child.points.length; k < l; k ++ ) {
+									for ( var k = 0, l = child.points.length; k < l; k ++ ) {
 
-									var point = child.points[ k ];
+										var point = child.points[ k ];
 
-									vec = new THREE.Vector3( point.x, point.y, point.z );
+										vec = new THREE.Vector3( point.x, point.y, point.z );
 
-									geometry.vertices.push( vec );
+										geometry.vertices.push( vec );
+
+									}
 
 								}
 
@@ -781,50 +783,57 @@ THREE.VRMLLoader.prototype = {
 						var skip = 0;
 
 						// some shapes only have vertices for use in other shapes
-						if ( data.coordIndex )
+						if ( data.coordIndex ) {
 
-						// read this: http://math.hws.edu/eck/cs424/notes2013/16_Threejs_Advanced.html
-						for ( var i = 0, j = data.coordIndex.length; i < j; i ++ ) {
+							// read this: http://math.hws.edu/eck/cs424/notes2013/16_Threejs_Advanced.html
+							for ( var i = 0, j = data.coordIndex.length; i < j; i ++ ) {
 
-							indexes = data.coordIndex[ i ]; if ( data.texCoordIndex ) uvIndexes = data.texCoordIndex[ i ];
+								indexes = data.coordIndex[ i ]; if ( data.texCoordIndex ) uvIndexes = data.texCoordIndex[ i ];
 
-							// vrml support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
-							skip = 0;
+								// vrml support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
+								skip = 0;
 
-							// Face3 only works with triangles, but IndexedFaceSet allows shapes with more then three vertices, build them of triangles
-							while ( indexes.length >= 3 && skip < ( indexes.length - 2 ) ) {
+								// Face3 only works with triangles, but IndexedFaceSet allows shapes with more then three vertices, build them of triangles
+								while ( indexes.length >= 3 && skip < ( indexes.length - 2 ) ) {
 
-								var face = new THREE.Face3(
-									indexes[ 0 ],
-									indexes[ skip + (data.ccw ? 1 : 2) ],
-									indexes[ skip + (data.ccw ? 2 : 1) ],
-									null // normal, will be added later
-									// todo: pass in the color, if a color index is present
-								);
+									var face = new THREE.Face3(
+										indexes[ 0 ],
+										indexes[ skip + (data.ccw ? 1 : 2) ],
+										indexes[ skip + (data.ccw ? 2 : 1) ],
+										null // normal, will be added later
+										// todo: pass in the color, if a color index is present
+									);
 
-								if ( uvs && uvIndexes ) {
-									geometry.faceVertexUvs [0].push( [
-										new THREE.Vector2 (
-											uvs[ uvIndexes[ 0 ] ].x ,
-											uvs[ uvIndexes[ 0 ] ].y
-										) ,
-										new THREE.Vector2 (
-											uvs[ uvIndexes[ skip + (data.ccw ? 1 : 2) ] ].x ,
-											uvs[ uvIndexes[ skip + (data.ccw ? 1 : 2) ] ].y
-										) ,
-										new THREE.Vector2 (
-											uvs[ uvIndexes[ skip + (data.ccw ? 2 : 1) ] ].x ,
-											uvs[ uvIndexes[ skip + (data.ccw ? 2 : 1) ] ].y
-										)
-									] );
+									if ( uvs && uvIndexes ) {
+										geometry.faceVertexUvs [0].push( [
+											new THREE.Vector2 (
+												uvs[ uvIndexes[ 0 ] ].x ,
+												uvs[ uvIndexes[ 0 ] ].y
+											) ,
+											new THREE.Vector2 (
+												uvs[ uvIndexes[ skip + (data.ccw ? 1 : 2) ] ].x ,
+												uvs[ uvIndexes[ skip + (data.ccw ? 1 : 2) ] ].y
+											) ,
+											new THREE.Vector2 (
+												uvs[ uvIndexes[ skip + (data.ccw ? 2 : 1) ] ].x ,
+												uvs[ uvIndexes[ skip + (data.ccw ? 2 : 1) ] ].y
+											)
+										] );
+									}
+
+									skip ++;
+
+									geometry.faces.push( face );
+
 								}
 
-								skip ++;
-
-								geometry.faces.push( face );
 
 							}
 
+						} else {
+
+							// do not add dummy mesh to the scene
+							parent.parent.remove( parent );
 
 						}
 
