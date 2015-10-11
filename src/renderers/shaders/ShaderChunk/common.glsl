@@ -82,10 +82,11 @@ vec3 linearToOutput( in vec3 a ) {
 }
 
 
-vec3 BRDF_Lambert( const in vec3 incomingLight, const in vec3 diffuseColor, const in vec3 normal, const in vec3 lightDir ) {
+vec3 BRDF_Lambert( const in vec3 lightColor, const in vec3 lightDir, const in vec3 normal, const in vec3 diffuseColor ) {
 
-	return incomingLight * diffuseColor * ( saturate( dot( normal, lightDir ) ) * RECIPROCAL_PI );
+	return lightColor * diffuseColor * ( saturate( dot( normal, lightDir ) ) );
 
+	// the above should be scaled by '' * RECIPROCAL_PI'
 }
 
 vec3 F_Schlick( const in vec3 F0, const in float dotLH ) {
@@ -116,9 +117,9 @@ float D_BlinnPhong( const in float shininess, const in float dotNH ) {
 
 }
 
-vec3 BRDF_BlinnPhong( const in vec3 incomingLight, const in vec3 specularColor, const in float shininess, const in vec3 normal, const in vec3 lightDir, const in vec3 viewDir ) {
+vec3 BRDF_BlinnPhong( const in vec3 lightColor, const in vec3 lightDir, const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float shininess ) {
 
-	vec3 halfDir = normalize( lightDir + viewDir ) * singleTestPointLight.distance;
+	vec3 halfDir = normalize( lightDir + viewDir );
 	float dotNH = saturate( dot( normal, halfDir ) );
 	float dotLH = saturate( dot( lightDir, halfDir ) );
 
@@ -126,7 +127,7 @@ vec3 BRDF_BlinnPhong( const in vec3 incomingLight, const in vec3 specularColor, 
 	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );
 	float D = D_BlinnPhong( shininess, dotNH );
 
-	return incomingLight * F * ( G * D );
+	return lightColor * F * ( G * D );
 
 }
 
@@ -141,7 +142,7 @@ vec3 BRDF_BlinnPhong( const in vec3 incomingLight, const in vec3 specularColor, 
 
 	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];
 
-	void getDirLightDirect( const in DirectionalLight directionalLight, out vec3 lightDir, out vec3 lightColor ) { 
+	void getDirLightDirect( const in DirectionalLight directionalLight, out vec3 lightColor, out vec3 lightDir ) { 
 	
 		lightDir = directionalLight.direction; 
 		lightColor = directionalLight.color;
@@ -159,11 +160,9 @@ vec3 BRDF_BlinnPhong( const in vec3 incomingLight, const in vec3 specularColor, 
 	  float decay;
 	};
 
-	uniform PointLight singleTestPointLight;
-
 	uniform PointLight pointLights[ MAX_POINT_LIGHTS ];
 
-	void getPointLightDirect( const in PointLight pointLight, const in vec3 position, out vec3 lightDir, out vec3 lightColor ) { 
+	void getPointLightDirect( const in PointLight pointLight, const in vec3 position, out vec3 lightColor, out vec3 lightDir ) { 
 	
 		vec3 lightPosition = pointLight.position; 
 	
@@ -191,7 +190,7 @@ vec3 BRDF_BlinnPhong( const in vec3 incomingLight, const in vec3 specularColor, 
 
 	uniform SpotLight spotLights[ MAX_SPOT_LIGHTS ];
 
-	void getSpotLightDirect( const in SpotLight spotLight, const in vec3 position, out vec3 lightDir, out vec3 lightColor ) {
+	void getSpotLightDirect( const in SpotLight spotLight, const in vec3 position, out vec3 lightColor, out vec3 lightDir ) {
 	
 		vec3 lightPosition = spotLight.position;
 	
@@ -219,13 +218,15 @@ vec3 BRDF_BlinnPhong( const in vec3 incomingLight, const in vec3 specularColor, 
 
 	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
 
-	vec3 getHemisphereLightIndirect( const in HemisphereLight hemiLight, in vec3 normal ) { 
+	void getHemisphereLightIndirect( const in HemisphereLight hemiLight, const in vec3 normal, out vec3 lightColor, out vec3 lightDir ) { 
 	
 		float dotNL = dot( normal, hemiLight.direction );
 
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
 
-		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
+		lightColor = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
+
+		lightDir = normal;
 
 	}
 
