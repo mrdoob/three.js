@@ -21988,7 +21988,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// remove all webgl properties
-		properties.remove( texture );
+		properties.delete( texture );
 
 	}
 
@@ -22017,8 +22017,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		properties.remove( renderTarget.texture );
-		properties.remove( renderTarget );
+		properties.delete( renderTarget.texture );
+		properties.delete( renderTarget );
 
 	}
 
@@ -22026,7 +22026,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		releaseMaterialProgramReference( material );
 
-		properties.remove( material );
+		properties.delete( material );
 
 	}
 
@@ -25572,11 +25572,11 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
 
-			properties.remove( attribute.data );
+			properties.delete( attribute.data );
 
 		} else {
 
-			properties.remove( attribute );
+			properties.delete( attribute );
 
 		}
 
@@ -26642,7 +26642,7 @@ THREE.WebGLProperties = function () {
 
 	};
 
-	this.remove = function ( object ) {
+	this.delete = function ( object ) {
 
 		delete properties[ object.uuid ];
 
