@@ -13,14 +13,14 @@ vec3 diffuse = vec3( 1.0 );
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
-		vec3 lightColor, lightDir;
-		getPointLightDirect( pointLights[i], mvPosition.xyz, lightColor, lightDir );
+		IncidentLight incidentLight;
+		getPointLightDirect( pointLights[ i ], mvPosition.xyz, incidentLight );
 
-		vLightFront += BRDF_Lambert( lightColor, lightDir, normal, diffuse );
+		vLightFront += BRDF_Lambert( incidentLight, normal, diffuse );
 
 		#ifdef DOUBLE_SIDED
 
-			vLightBack += BRDF_Lambert( lightColor, lightDir, -normal, diffuse );
+			vLightBack += BRDF_Lambert( incidentLight, -normal, diffuse );
 
 		#endif
 
@@ -32,14 +32,14 @@ vec3 diffuse = vec3( 1.0 );
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
-		vec3 lightColor, lightDir;
-		getSpotLightDirect( spotLights[i], mvPosition.xyz, lightColor, lightDir );
+		IncidentLight incidentLight;
+		getSpotLightDirect( spotLights[ i ], mvPosition.xyz, incidentLight );
 
-		vLightFront += BRDF_Lambert( lightColor, lightDir, normal, diffuse );
+		vLightFront += BRDF_Lambert( incidentLight, normal, diffuse );
 
 		#ifdef DOUBLE_SIDED
 
-			vLightBack += BRDF_Lambert( lightColor, lightDir, -normal, diffuse );
+			vLightBack += BRDF_Lambert( incidentLight, -normal, diffuse );
 
 		#endif
 
@@ -51,14 +51,14 @@ vec3 diffuse = vec3( 1.0 );
 
 	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-		vec3 lightColor, lightDir;
-		getDirLightDirect( directionalLights[i], lightColor, lightDir );
+		IncidentLight incidentLight;
+		getDirLightDirect( directionalLights[ i ], incidentLight );
 
-		vLightFront += BRDF_Lambert( lightColor, lightDir, normal, diffuse );
+		vLightFront += BRDF_Lambert( incidentLight, normal, diffuse );
 
 		#ifdef DOUBLE_SIDED
 
-			vLightBack += BRDF_Lambert( lightColor, lightDir, -normal, diffuse );
+			vLightBack += BRDF_Lambert( incidentLight, -normal, diffuse );
 
 		#endif
 
@@ -70,16 +70,16 @@ vec3 diffuse = vec3( 1.0 );
 
 	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		vec3 lightColor, lightDir;
-		getHemisphereLightIndirect( hemisphereLights[ i ], normal, lightColor, lightDir );
+		IncidentLight incidentLight;
+		getHemisphereLightIndirect( hemisphereLights[ i ], normal, incidentLight );
 
-		vLightFront += BRDF_Lambert( lightColor, lightDir, normal, diffuse );
+		vLightFront += BRDF_Lambert( incidentLight, normal, diffuse );
 
 		#ifdef DOUBLE_SIDED
 	
-			getHemisphereLightIndirect( hemisphereLights[ i ], -normal, lightColor, lightDir );
+			incidentLight = getHemisphereLightIndirect( hemisphereLights[ i ], -normal );
 
-			vLightBack += BRDF_Lambert( lightColor, lightDir, -normal, diffuse );
+			vLightBack += BRDF_Lambert( incidentLight, -normal, diffuse );
 
 		#endif
 

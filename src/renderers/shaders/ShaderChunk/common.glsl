@@ -82,9 +82,15 @@ vec3 linearToOutput( in vec3 a ) {
 }
 
 
-vec3 BRDF_Lambert( const in vec3 lightColor, const in vec3 lightDir, const in vec3 normal, const in vec3 diffuseColor ) {
+struct IncidentLight {
+  vec3 color;
+  vec3 direction;
+};
 
-	return lightColor * diffuseColor * ( saturate( dot( normal, lightDir ) ) );
+
+vec3 BRDF_Lambert( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 diffuseColor ) {
+
+	return incidentLight.color * diffuseColor * ( saturate( dot( normal, incidentLight.direction ) ) );
 
 	// the above should be scaled by '' * RECIPROCAL_PI'
 }
@@ -117,17 +123,17 @@ float D_BlinnPhong( const in float shininess, const in float dotNH ) {
 
 }
 
-vec3 BRDF_BlinnPhong( const in vec3 lightColor, const in vec3 lightDir, const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float shininess ) {
+vec3 BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float shininess ) {
 
-	vec3 halfDir = normalize( lightDir + viewDir );
+	vec3 halfDir = normalize( incidentLight.direction + viewDir );
 	float dotNH = saturate( dot( normal, halfDir ) );
-	float dotLH = saturate( dot( lightDir, halfDir ) );
+	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
 
 	vec3 F = F_Schlick( specularColor, dotLH );
 	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );
 	float D = D_BlinnPhong( shininess, dotNH );
 
-	return lightColor * F * ( G * D );
+	return incidentLight.color * F * ( G * D );
 
 }
 
@@ -142,10 +148,10 @@ vec3 BRDF_BlinnPhong( const in vec3 lightColor, const in vec3 lightDir, const in
 
 	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];
 
-	void getDirLightDirect( const in DirectionalLight directionalLight, out vec3 lightColor, out vec3 lightDir ) { 
+	void getDirLightDirect( const in DirectionalLight directionalLight, out IncidentLight incidentLight ) { 
 	
-		lightDir = directionalLight.direction; 
-		lightColor = directionalLight.color;
+		incidentLight.color = directionalLight.color;
+		incidentLight.direction = directionalLight.direction; 
 
 	}
 
@@ -162,15 +168,15 @@ vec3 BRDF_BlinnPhong( const in vec3 lightColor, const in vec3 lightDir, const in
 
 	uniform PointLight pointLights[ MAX_POINT_LIGHTS ];
 
-	void getPointLightDirect( const in PointLight pointLight, const in vec3 position, out vec3 lightColor, out vec3 lightDir ) { 
+	void getPointLightDirect( const in PointLight pointLight, const in vec3 position, out IncidentLight incidentLight ) { 
 	
 		vec3 lightPosition = pointLight.position; 
 	
 		vec3 lVector = lightPosition - position; 
-		lightDir = normalize( lVector ); 
+		incidentLight.direction = normalize( lVector ); 
 	
-		lightColor = pointLight.color; 
-		lightColor *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay ); 
+		incidentLight.color = pointLight.color; 
+		incidentLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay ); 
 	
 	}
 
@@ -190,18 +196,18 @@ vec3 BRDF_BlinnPhong( const in vec3 lightColor, const in vec3 lightDir, const in
 
 	uniform SpotLight spotLights[ MAX_SPOT_LIGHTS ];
 
-	void getSpotLightDirect( const in SpotLight spotLight, const in vec3 position, out vec3 lightColor, out vec3 lightDir ) {
+	void getSpotLightDirect( const in SpotLight spotLight, const in vec3 position, out IncidentLight incidentLight ) {
 	
 		vec3 lightPosition = spotLight.position;
 	
 		vec3 lVector = lightPosition - position;
-		lightDir = normalize( lVector );
+		incidentLight.direction = normalize( lVector );
 	
-		float spotEffect = dot( spotLight.direction, lightDir );
+		float spotEffect = dot( spotLight.direction, incidentLight.direction );
 		spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
 	
-		lightColor = spotLight.color;
-		lightColor *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
+		incidentLight.color = spotLight.color;
+		incidentLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
 
 	}
 
@@ -218,15 +224,15 @@ vec3 BRDF_BlinnPhong( const in vec3 lightColor, const in vec3 lightDir, const in
 
 	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
 
-	void getHemisphereLightIndirect( const in HemisphereLight hemiLight, const in vec3 normal, out vec3 lightColor, out vec3 lightDir ) { 
+	void getHemisphereLightIndirect( const in HemisphereLight hemiLight, const in vec3 normal, out IncidentLight incidentLight ) { 
 	
 		float dotNL = dot( normal, hemiLight.direction );
 
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
 
-		lightColor = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
+		incidentLight.color = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
 
-		lightDir = normal;
+		incidentLight.direction = normal;
 
 	}
 

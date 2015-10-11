@@ -17,14 +17,14 @@ vec3 diffuse = diffuseColor.rgb;
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
-		vec3 lightColor, lightDir;
-		getPointLightDirect( pointLights[i], -vViewPosition, lightColor, lightDir );
+		IncidentLight incidentLight;
+		getPointLightDirect( pointLights[ i ], -vViewPosition, incidentLight );
 
 		totalDirectReflectedDiffuse +=
-			BRDF_Lambert( lightColor, lightDir, normal, diffuse );
+			BRDF_Lambert( incidentLight, normal, diffuse );
 
 		totalDirectReflectedSpecular +=
-			BRDF_BlinnPhong( lightColor, lightDir, normal, viewDir, specular, shininess );
+			BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess );
 
 	}
 
@@ -34,14 +34,14 @@ vec3 diffuse = diffuseColor.rgb;
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
-		vec3 lightColor, lightDir;
-		getSpotLightDirect( spotLights[i], -vViewPosition, lightColor, lightDir );
+		IncidentLight incidentLight;
+		getSpotLightDirect( spotLights[ i ], -vViewPosition, incidentLight );
 
 		totalDirectReflectedDiffuse +=
-			BRDF_Lambert( lightColor, lightDir, normal, diffuse );
+			BRDF_Lambert( incidentLight, normal, diffuse );
 
 		totalDirectReflectedSpecular +=
-			BRDF_BlinnPhong( lightColor, lightDir, normal, viewDir, specular, shininess );
+			BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess );
 
 	}
 
@@ -51,14 +51,14 @@ vec3 diffuse = diffuseColor.rgb;
 
 	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-		vec3 lightColor, lightDir;
-		getDirLightDirect( directionalLights[i], lightColor, lightDir );
+		IncidentLight incidentLight;
+		getDirLightDirect( directionalLights[ i ], incidentLight );
 
 		totalDirectReflectedDiffuse +=
-			BRDF_Lambert( lightColor, lightDir, normal, diffuse );
+			BRDF_Lambert( incidentLight, normal, diffuse );
 
 		totalDirectReflectedSpecular +=
-			BRDF_BlinnPhong( lightColor, lightDir, normal, viewDir, specular, shininess );
+			BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess );
 
 	}
 
@@ -68,11 +68,11 @@ vec3 diffuse = diffuseColor.rgb;
 
 	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		vec3 lightColor, lightDir;
-		getHemisphereLightIndirect( hemisphereLights[ i ], normal, lightColor, lightDir );
+		IncidentLight incidentLight;
+		getHemisphereLightIndirect( hemisphereLights[ i ], normal, incidentLight );
 
 		totalIndirectReflectedDiffuse +=
-			BRDF_Lambert( lightColor, lightDir, normal, diffuse );
+			BRDF_Lambert( incidentLight, normal, diffuse );
 
 	}
 
