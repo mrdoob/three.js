@@ -833,10 +833,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var groupCount = group !== null ? group.count : Infinity;
 
 		var drawStart = Math.max( dataStart, rangeStart, groupStart );
-
 		var drawEnd = Math.min( dataStart + dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
 
-		var drawCount = drawEnd - drawStart + 1;
+		var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
 
 		//
 
