@@ -14,23 +14,12 @@ vec3 diffuse = diffuseColor.rgb;
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
-		vec3 lightDir, lightIntensity;
-		getPointLightDirect( pointLights[i], -vViewPosition, lightDir, lightIntensity );
+		vec3 lightDir, lightColor;
+		getPointLightDirect( pointLights[i], -vViewPosition, lightDir, lightColor );
 
-		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
-
-
-			vec3 halfDir = normalize( lightDir + viewDir ) * singleTestPointLight.distance;
-			float dotNL = saturate( dot( normal, lightDir ) );
-			float dotNH = saturate( dot( normal, halfDir ) );
-			float dotLH = saturate( dot( lightDir, halfDir ) );
-
-			totalReflectedLight += (
-				BRDF_Lambert( diffuse, dotNL ) +
-				BRDF_BlinnPhong( specular, shininess, dotNH, dotLH )
-				) * lightIntensity;
-
-		}
+		totalReflectedLight +=
+			BRDF_Lambert( lightColor, diffuse, normal, lightDir ) +
+			BRDF_BlinnPhong( lightColor, specular, shininess, normal, lightDir, viewDir );
 
 	}
 
@@ -40,22 +29,12 @@ vec3 diffuse = diffuseColor.rgb;
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
-		vec3 lightDir, lightIntensity;
-		getSpotLightDirect( spotLights[i], -vViewPosition, lightDir, lightIntensity );
+		vec3 lightDir, lightColor;
+		getSpotLightDirect( spotLights[i], -vViewPosition, lightDir, lightColor );
 
-		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
-
-			vec3 halfDir = normalize( lightDir + viewDir );
-			float dotNL = saturate( dot( normal, lightDir ) );
-			float dotNH = saturate( dot( normal, halfDir ) );
-			float dotLH = saturate( dot( lightDir, halfDir ) );
-
-			totalReflectedLight += (
-				BRDF_Lambert( diffuse, dotNL ) +
-				BRDF_BlinnPhong( specular, shininess, dotNH, dotLH )
-				) * lightIntensity;
-
-		}
+		totalReflectedLight +=
+			BRDF_Lambert( lightColor, diffuse, normal, lightDir ) +
+			BRDF_BlinnPhong( lightColor, specular, shininess, normal, lightDir, viewDir );
 
 	}
 
@@ -68,19 +47,9 @@ vec3 diffuse = diffuseColor.rgb;
 		vec3 lightDir, lightIntensity;
 		getDirLightDirect( directionalLights[i], lightDir, lightIntensity );
 
-		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
-
-			vec3 halfDir = normalize( lightDir + viewDir );
-			float dotNL = saturate( dot( normal, lightDir ) );
-			float dotNH = saturate( dot( normal, halfDir ) );
-			float dotLH = saturate( dot( lightDir, halfDir ) );
-
-			totalReflectedLight += (
-				BRDF_Lambert( diffuse, dotNL ) +
-				BRDF_BlinnPhong( specular, shininess, dotNH, dotLH )
-				) * lightIntensity;
-
-		}
+		totalReflectedLight +=
+			BRDF_Lambert( lightColor, diffuse, normal, lightDir ) +
+			BRDF_BlinnPhong( lightColor, specular, shininess, normal, lightDir, viewDir );
 
 	}
 

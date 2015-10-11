@@ -91,7 +91,7 @@ THREE.UniformsLib = {
 		"pointLights" : { type: "sa", value: [], properties: {
 			"color": { type: "c" },
 			"position": { type: "v3" },
-			"direction": { type: "v3" },
+			"decay": { type: "f" },
 			"distance": { type: "f" }
 		} },
 

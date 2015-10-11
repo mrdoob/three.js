@@ -12,21 +12,16 @@ vec3 normal = normalize( transformedNormal );
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
-		vec3 lightDir, lightIntensity;
-		getPointLight( pointLights[i], -vViewPosition, lightDir, lightIntensity );
+		vec3 lightDir, lightColor;
+		getPointLightDirect( pointLights[i], mvPosition.xyz, lightDir, lightColor );
 
-		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
+		vLightFront += BRDF_Lambert( lightColor, vec3( 1.0 ), normal, lightDir );
 
-			float dotNL = dot( normal, lightDir );
+		#ifdef DOUBLE_SIDED
 
-			vLightFront += lightIntensity * saturate( dotNL );
+			vLightBack += BRDF_Lambert( lightColor, vec3( 1.0 ), -normal, lightDir );
 
-			#ifdef DOUBLE_SIDED
-
-				vLightBack += lightIntensity * saturate( - dotNL );
-
-			#endif
-		}
+		#endif
 
 	}
 
@@ -37,21 +32,15 @@ vec3 normal = normalize( transformedNormal );
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
 		vec3 lightDir, lightIntensity;
-		getSpotLight( spotLights[i], -vViewPosition, lightDir, lightIntensity );
+		getSpotLightDirect( spotLights[i], mvPosition.xyz, lightDir, lightIntensity );
 
-		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
+		vLightFront += BRDF_Lambert( lightColor, vec3( 1.0 ), normal, lightDir );
 
-			float dotNL = saturate( dot( normal, lightDir ) );
+		#ifdef DOUBLE_SIDED
 
-			vLightFront += lightIntensity * saturate( dotNL );
+			vLightBack += BRDF_Lambert( lightColor, vec3( 1.0 ), -normal, lightDir );
 
-			#ifdef DOUBLE_SIDED
-
-				vLightBack += lightIntensity * saturate( - dotNL );
-
-			#endif
-
-		}
+		#endif
 
 	}
 
@@ -64,19 +53,13 @@ vec3 normal = normalize( transformedNormal );
 		vec3 lightDir, lightIntensity;
 		getDirLightDirect( directionalLights[i], lightDir, lightIntensity );
 
-		if( dot( lightIntensity, lightIntensity ) > 0.0 ) {
+		vLightFront += BRDF_Lambert( lightColor, vec3( 1.0 ), normal, lightDir );
 
-			float dotNL = dot( normal, lightDir );
+		#ifdef DOUBLE_SIDED
 
-			vLightFront += lightIntensity * saturate( dotNL );
+			vLightBack += BRDF_Lambert( lightColor, vec3( 1.0 ), -normal, lightDir );
 
-			#ifdef DOUBLE_SIDED
-
-				vLightBack += lightIntensity * saturate( - dotNL );
-
-			#endif
-
-		}
+		#endif
 
 	}
 
@@ -86,11 +69,11 @@ vec3 normal = normalize( transformedNormal );
 
 	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		vLightFront += getHemisphereLightIndirect( hemisphereLights[ i ], normal );
+		vLightFront += getHemisphereLightIndirect( hemisphereLights[ i ], normal ) * RECIPROCAL_PI;
 
 		#ifdef DOUBLE_SIDED
 	
-			vLightBack += getHemisphereLightIndirect( hemisphereLights[ i ], -normal );
+			vLightBack += getHemisphereLightIndirect( hemisphereLights[ i ], -normal ) * RECIPROCAL_PI;
 
 		#endif
 
