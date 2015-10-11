@@ -247,21 +247,27 @@ Sidebar.Object3D = function ( editor ) {
 
 	// shadow
 
-	var objectCastShadowRow = new UI.Panel();
+	var objectShadowRow = new UI.Panel();
+
+	objectShadowRow.add( new UI.Text( 'Shadow' ).setWidth( '90px' ) );
+
+	var objectCastShadowSpan = new UI.Span();
 	var objectCastShadow = new UI.Checkbox().onChange( update );
 
-	objectCastShadowRow.add( new UI.Text( 'Cast Shadow' ).setWidth( '90px' ) );
-	objectCastShadowRow.add( objectCastShadow );
+	objectCastShadowSpan.add( objectCastShadow );
+	objectCastShadowSpan.add( new UI.Text( 'cast' ).setMarginRight( '10px' ) );
 
-	container.add( objectCastShadowRow );
+	objectShadowRow.add( objectCastShadowSpan );
 
-	var objectReceiveShadowRow = new UI.Panel();
+	var objectReceiveShadowSpan = new UI.Span();
 	var objectReceiveShadow = new UI.Checkbox().onChange( update );
 
-	objectReceiveShadowRow.add( new UI.Text( 'Receive Shad' ).setWidth( '90px' ) );
-	objectReceiveShadowRow.add( objectReceiveShadow );
+	objectReceiveShadowSpan.add( objectReceiveShadow );
+	objectReceiveShadowSpan.add( new UI.Text( 'receive' ) );
 
-	container.add( objectReceiveShadowRow );
+	objectShadowRow.add( objectReceiveShadowSpan );
+
+	container.add( objectShadowRow );
 
 	// visible
 
@@ -493,8 +499,8 @@ Sidebar.Object3D = function ( editor ) {
 			'angle' : objectAngleRow,
 			'exponent' : objectExponentRow,
 			'decay' : objectDecayRow,
-			'castShadow' : objectCastShadowRow,
-			'receiveShadow' : objectReceiveShadowRow
+			'castShadow' : objectShadowRow,
+			'receiveShadow' : objectReceiveShadowSpan
 		};
 
 		for ( var property in properties ) {

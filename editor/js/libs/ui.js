@@ -90,6 +90,8 @@ UI.Element.prototype = {
 
 		}
 
+		return this;
+
 	},
 
 	setDisabled: function ( value ) {
@@ -123,6 +125,7 @@ properties.forEach( function ( property ) {
 	UI.Element.prototype[ method ] = function () {
 
 		this.setStyle( property, arguments );
+
 		return this;
 
 	};
@@ -146,6 +149,21 @@ events.forEach( function ( event ) {
 	};
 
 } );
+
+// Span
+
+UI.Span = function () {
+
+	UI.Element.call( this );
+
+	this.dom = document.createElement( 'span' );
+
+	return this;
+
+};
+
+UI.Span.prototype = Object.create( UI.Element.prototype );
+UI.Span.prototype.constructor = UI.Span;
 
 
 // Panel
