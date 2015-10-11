@@ -216,17 +216,26 @@ Object.assign( THREE.AnimationClip, {
 
 		}
 
-		var convertTrack = function( trackName, animationKeys, propertyName, trackType ) {
+		var addNonemptyTrack = function(
+				trackType, trackName, animationKeys, propertyName, destTracks ) {
 
 			// only return track if there are actually keys.
-			if ( animationKeys.length === 0 ) return null;
+			if ( animationKeys.length !== 0 ) {
 
-			var times = [];
-			var values = [];
+				var times = [];
+				var values = [];
 
-			THREE.AnimationUtils.flattenJSON( animationKeys, times, values, propertyName );
+				THREE.AnimationUtils.flattenJSON(
+						animationKeys, times, values, propertyName );
 
-			return new trackType( trackName, times, values );
+				// empty keys are filtered out, so check again
+				if ( times.length !== 0 ) {
+
+					destTracks.push( new trackType( trackName, times, values ) );
+
+				}
+
+			}
 
 		};
 
@@ -291,20 +300,21 @@ Object.assign( THREE.AnimationClip, {
 				duration = morphTargetNames.length * ( fps || 1.0 );
 
 			} else {
+				// ...assume skeletal animation
 
 				var boneName = '.bones[' + bones[ h ].name + ']';
 
-				// track contains positions...
-				var positionTrack = convertTrack( boneName + '.position', animationKeys, 'pos', THREE.VectorKeyframeTrack );
-				if ( positionTrack ) tracks.push( positionTrack );
+				addNonemptyTrack(
+						THREE.VectorKeyframeTrack, boneName + '.position',
+						animationKeys, 'pos', tracks );
 
-				// track contains quaternions...
-				var quaternionTrack = convertTrack( boneName + '.quaternion', animationKeys, 'rot', THREE.QuaternionKeyframeTrack );
-				if ( quaternionTrack ) tracks.push( quaternionTrack );
+				addNonemptyTrack(
+						THREE.QuaternionKeyframeTrack, boneName + '.quaternion',
+						animationKeys, 'rot', tracks );
 
-				// track contains quaternions...
-				var scaleTrack = convertTrack( boneName + '.scale', animationKeys, 'scl', THREE.VectorKeyframeTrack );
-				if ( scaleTrack ) tracks.push( scaleTrack );
+				addNonemptyTrack(
+						THREE.VectorKeyframeTrack, boneName + '.scale',
+						animationKeys, 'scl', tracks );
 
 			}
 
