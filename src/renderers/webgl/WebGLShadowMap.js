@@ -119,7 +119,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			var light = _lights[ i ];
 
-			if ( ! light.castShadow ) continue;
+			if ( light.castShadow === false ) continue;
 
 			if ( light instanceof THREE.PointLight ) {
 
@@ -162,7 +162,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			}
 
-			if ( ! light.shadowMap ) {
+			if ( light.shadowMap === null ) {
 
 				var shadowFilter = THREE.LinearFilter;
 
@@ -178,9 +178,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				light.shadowMatrix = new THREE.Matrix4();
 
-			}
-
-			if ( light.shadowCamera.parent === null ) {
+				//
 
 				if ( light instanceof THREE.SpotLight ) {
 
@@ -189,10 +187,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				}
 
 				light.shadowCamera.updateProjectionMatrix();
-
-				scene.add( light.shadowCamera );
-
-				if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 			}
 
