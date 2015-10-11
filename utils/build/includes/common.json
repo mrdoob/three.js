@@ -49,6 +49,7 @@
 	"src/cameras/OrthographicCamera.js",
 	"src/cameras/PerspectiveCamera.js",
 	"src/lights/Light.js",
+	"src/lights/LightShadow.js",
 	"src/lights/AmbientLight.js",
 	"src/lights/DirectionalLight.js",
 	"src/lights/HemisphereLight.js",
