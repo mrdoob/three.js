@@ -88,10 +88,8 @@ struct IncidentLight {
 };
 
 struct ReflectedLight {
- 	vec3 directSpecular;
- 	vec3 directDiffuse;
- 	vec3 indirectSpecular;
- 	vec3 indirectDiffuse;
+ 	vec3 specular;
+ 	vec3 diffuse;
 };
 
 vec3 BRDF_Lambert( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 diffuseColor ) {
@@ -149,8 +147,6 @@ vec3 BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal
 	  vec3 direction;
 	  vec3 color;
 	};
-
-	uniform DirectionalLight singleTestDirLight;
 
 	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];
 
@@ -228,7 +224,7 @@ vec3 BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal
 	  vec3 groundColor;
 	};
 
-	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
+	layout(packed)uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
 
 	void getHemisphereLightIndirect( const in HemisphereLight hemiLight, const in vec3 normal, out IncidentLight incidentLight ) { 
 	
