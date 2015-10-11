@@ -11,11 +11,12 @@ vec3 diffuse = diffuseColor.rgb;
 
 #endif
 
+IncidentLight incidentLight;
+
 #if MAX_POINT_LIGHTS > 0
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
-		IncidentLight incidentLight;
 		getPointLightDirect( pointLights[ i ], -vViewPosition, incidentLight );
 
 		directReflectedLight.diffuse +=
@@ -32,7 +33,6 @@ vec3 diffuse = diffuseColor.rgb;
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
-		IncidentLight incidentLight;
 		getSpotLightDirect( spotLights[ i ], -vViewPosition, incidentLight );
 
 		directReflectedLight.diffuse +=
@@ -49,7 +49,6 @@ vec3 diffuse = diffuseColor.rgb;
 
 	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-		IncidentLight incidentLight;
 		getDirLightDirect( directionalLights[ i ], incidentLight );
 
 		directReflectedLight.diffuse +=
@@ -66,7 +65,6 @@ vec3 diffuse = diffuseColor.rgb;
 
 	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		IncidentLight incidentLight;
 		getHemisphereLightIndirect( hemisphereLights[ i ], normal, incidentLight );
 
 		indirectReflectedLight.diffuse +=
