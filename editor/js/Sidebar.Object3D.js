@@ -251,11 +251,11 @@ Sidebar.Object3D = function ( editor ) {
 
 	objectShadowRow.add( new UI.Text( 'Shadow' ).setWidth( '90px' ) );
 
-	var objectCastShadowSpan = new UI.Span();
+	var objectCastShadowSpan = new UI.Span().setMarginRight( '10px' );
 	var objectCastShadow = new UI.Checkbox().onChange( update );
 
 	objectCastShadowSpan.add( objectCastShadow );
-	objectCastShadowSpan.add( new UI.Text( 'cast' ).setMarginRight( '10px' ) );
+	objectCastShadowSpan.add( new UI.Text( 'cast' ) );
 
 	objectShadowRow.add( objectCastShadowSpan );
 

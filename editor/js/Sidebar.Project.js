@@ -43,7 +43,19 @@ Sidebar.Project = function ( editor ) {
 	var rendererTypeRow = new UI.Panel();
 	var rendererType = new UI.Select().setOptions( options ).setWidth( '150px' ).onChange( function () {
 
-		config.setKey( 'project/renderer', this.getValue() );
+		var value = this.getValue();
+
+		if ( value === 'WebGLRenderer' ) {
+
+			rendererPropertiesRow.setDisplay( '' );
+
+		} else {
+
+			rendererPropertiesRow.setDisplay( 'none' );
+
+		}
+
+		config.setKey( 'project/renderer', value );
 		updateRenderer();
 
 	} );
@@ -61,7 +73,10 @@ Sidebar.Project = function ( editor ) {
 
 	// antialiasing
 
-	var rendererAntialiasRow = new UI.Panel();
+	var rendererPropertiesRow = new UI.Panel();
+	rendererPropertiesRow.add( new UI.Text( '' ).setWidth( '90px' ) );
+
+	var rendererAntialiasSpan = new UI.Span().setMarginRight( '10px' );
 	var rendererAntialias = new UI.Checkbox( config.getKey( 'project/renderer/antialias' ) ).setLeft( '100px' ).onChange( function () {
 
 		config.setKey( 'project/renderer/antialias', this.getValue() );
@@ -69,14 +84,14 @@ Sidebar.Project = function ( editor ) {
 
 	} );
 
-	rendererAntialiasRow.add( new UI.Text( 'Antialias' ).setWidth( '90px' ) );
-	rendererAntialiasRow.add( rendererAntialias );
+	rendererAntialiasSpan.add( rendererAntialias );
+	rendererAntialiasSpan.add( new UI.Text( 'antialias' ) );
 
-	container.add( rendererAntialiasRow );
+	rendererPropertiesRow.add( rendererAntialiasSpan );
 
 	// shadow
 
-	var rendererShadowsRow = new UI.Panel();
+	var rendererShadowsSpan = new UI.Span();
 	var rendererShadows = new UI.Checkbox( config.getKey( 'project/renderer/shadows' ) ).setLeft( '100px' ).onChange( function () {
 
 		config.setKey( 'project/renderer/shadows', this.getValue() );
@@ -84,10 +99,12 @@ Sidebar.Project = function ( editor ) {
 
 	} );
 
-	rendererShadowsRow.add( new UI.Text( 'Shadows' ).setWidth( '90px' ) );
-	rendererShadowsRow.add( rendererShadows );
+	rendererShadowsSpan.add( rendererShadows );
+	rendererShadowsSpan.add( new UI.Text( 'shadows' ) );
 
-	container.add( rendererShadowsRow );
+	rendererPropertiesRow.add( rendererShadowsSpan );
+
+	container.add( rendererPropertiesRow );
 
 	// VR
 
