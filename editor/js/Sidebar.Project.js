@@ -4,6 +4,7 @@
 
 Sidebar.Project = function ( editor ) {
 
+	var config = editor.config;
 	var signals = editor.signals;
 
 	var rendererTypes = {
@@ -17,10 +18,10 @@ Sidebar.Project = function ( editor ) {
 	};
 
 	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/project/collapsed' ) );
+	container.setCollapsed( config.getKey( 'ui/sidebar/project/collapsed' ) );
 	container.onCollapsedChange( function ( boolean ) {
 
-		editor.config.setKey( 'ui/sidebar/project/collapsed', boolean );
+		config.setKey( 'ui/sidebar/project/collapsed', boolean );
 
 	} );
 
@@ -42,7 +43,7 @@ Sidebar.Project = function ( editor ) {
 	var rendererTypeRow = new UI.Panel();
 	var rendererType = new UI.Select().setOptions( options ).setWidth( '150px' ).onChange( function () {
 
-		editor.config.setKey( 'project/renderer', this.getValue() );
+		config.setKey( 'project/renderer', this.getValue() );
 		updateRenderer();
 
 	} );
@@ -52,18 +53,18 @@ Sidebar.Project = function ( editor ) {
 
 	container.add( rendererTypeRow );
 
-	if ( editor.config.getKey( 'project/renderer' ) !== undefined ) {
+	if ( config.getKey( 'project/renderer' ) !== undefined ) {
 
-		rendererType.setValue( editor.config.getKey( 'project/renderer' ) );
+		rendererType.setValue( config.getKey( 'project/renderer' ) );
 
 	}
 
 	// antialiasing
 
 	var rendererAntialiasRow = new UI.Panel();
-	var rendererAntialias = new UI.Checkbox( editor.config.getKey( 'project/renderer/antialias' ) ).setLeft( '100px' ).onChange( function () {
+	var rendererAntialias = new UI.Checkbox( config.getKey( 'project/renderer/antialias' ) ).setLeft( '100px' ).onChange( function () {
 
-		editor.config.setKey( 'project/renderer/antialias', this.getValue() );
+		config.setKey( 'project/renderer/antialias', this.getValue() );
 		updateRenderer();
 
 	} );
@@ -76,9 +77,9 @@ Sidebar.Project = function ( editor ) {
 	// shadow
 
 	var rendererShadowsRow = new UI.Panel();
-	var rendererShadows = new UI.Checkbox( editor.config.getKey( 'project/renderer/shadows' ) ).setLeft( '100px' ).onChange( function () {
+	var rendererShadows = new UI.Checkbox( config.getKey( 'project/renderer/shadows' ) ).setLeft( '100px' ).onChange( function () {
 
-		editor.config.setKey( 'project/renderer/shadows', this.getValue() );
+		config.setKey( 'project/renderer/shadows', this.getValue() );
 		updateRenderer();
 
 	} );
@@ -91,9 +92,9 @@ Sidebar.Project = function ( editor ) {
 	// VR
 
 	var vrRow = new UI.Panel();
-	var vr = new UI.Checkbox( editor.config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
+	var vr = new UI.Checkbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
 
-		editor.config.setKey( 'project/vr', this.getValue() );
+		config.setKey( 'project/vr', this.getValue() );
 		// updateRenderer();
 
 	} );
@@ -125,7 +126,7 @@ Sidebar.Project = function ( editor ) {
 
 	}
 
-	createRenderer( editor.config.getKey( 'project/renderer' ), editor.config.getKey( 'project/renderer/antialias' ), editor.config.getKey( 'project/renderer/shadows' ) );
+	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
 
 	return container;
 
