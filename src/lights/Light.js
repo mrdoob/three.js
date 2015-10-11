@@ -17,16 +17,6 @@ THREE.Light.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Light.prototype.constructor = THREE.Light;
 
 Object.defineProperties( THREE.Light.prototype, {
-	castShadow: {
-		get: function () {
-			if ( this.shadow === undefined ) return false;
-			return this.shadow.enabled;
-		},
-		set: function ( value ) {
-			if ( this.shadow === undefined ) return;
-			this.shadow.enabled = value;
-		}
-	},
 	onlyShadow: {
 		set: function ( value ) {
 			console.warn( 'THREE.Light: .onlyShadow has been removed.' );

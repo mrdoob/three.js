@@ -4,8 +4,6 @@
 
 THREE.LightShadow = function ( camera ) {
 
-	this.enabled = false;
-
 	this.camera = camera;
 
 	this.bias = 0;
