@@ -470,6 +470,7 @@ Editor.prototype = {
 		return {
 
 			project: {
+				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				vr: this.config.getKey( 'project/vr' )
 			},
 			camera: this.camera.toJSON(),
