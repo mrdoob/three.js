@@ -9,6 +9,7 @@ vLightFront = vec3( 0.0 );
 vec3 normal = normalize( transformedNormal );
 vec3 diffuse = vec3( 1.0 );
 
+
 #if MAX_POINT_LIGHTS > 0
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {

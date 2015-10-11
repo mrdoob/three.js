@@ -83,10 +83,16 @@ vec3 linearToOutput( in vec3 a ) {
 
 
 struct IncidentLight {
-  vec3 color;
-  vec3 direction;
+ 	vec3 color;
+ 	vec3 direction;
 };
 
+struct ReflectedLight {
+ 	vec3 directSpecular;
+ 	vec3 directDiffuse;
+ 	vec3 indirectSpecular;
+ 	vec3 indirectDiffuse;
+};
 
 vec3 BRDF_Lambert( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 diffuseColor ) {
 

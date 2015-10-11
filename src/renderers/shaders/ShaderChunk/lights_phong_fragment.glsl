@@ -1,9 +1,10 @@
 vec3 viewDir = normalize( vViewPosition );
 
-vec3 totalDirectReflectedSpecular = vec3( 0.0 );
-vec3 totalDirectReflectedDiffuse = vec3( 0.0 );
-vec3 totalIndirectReflectedSpecular = vec3( 0.0 );
-vec3 totalIndirectReflectedDiffuse = vec3( 0.0 );
+ReflectedLight reflectedLight;
+reflectedLight.directSpecular = vec3( 0.0 );
+reflectedLight.directDiffuse = vec3( 0.0 );
+reflectedLight.indirectSpecular = vec3( 0.0 );
+reflectedLight.indirectDiffuse = vec3( 0.0 );
 
 vec3 diffuse = diffuseColor.rgb;
 
@@ -20,10 +21,10 @@ vec3 diffuse = diffuseColor.rgb;
 		IncidentLight incidentLight;
 		getPointLightDirect( pointLights[ i ], -vViewPosition, incidentLight );
 
-		totalDirectReflectedDiffuse +=
+		reflectedLight.directDiffuse +=
 			BRDF_Lambert( incidentLight, normal, diffuse );
 
-		totalDirectReflectedSpecular +=
+		reflectedLight.directSpecular +=
 			BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess );
 
 	}
@@ -37,10 +38,10 @@ vec3 diffuse = diffuseColor.rgb;
 		IncidentLight incidentLight;
 		getSpotLightDirect( spotLights[ i ], -vViewPosition, incidentLight );
 
-		totalDirectReflectedDiffuse +=
+		reflectedLight.directDiffuse +=
 			BRDF_Lambert( incidentLight, normal, diffuse );
 
-		totalDirectReflectedSpecular +=
+		reflectedLight.directSpecular +=
 			BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess );
 
 	}
@@ -54,10 +55,10 @@ vec3 diffuse = diffuseColor.rgb;
 		IncidentLight incidentLight;
 		getDirLightDirect( directionalLights[ i ], incidentLight );
 
-		totalDirectReflectedDiffuse +=
+		reflectedLight.directDiffuse +=
 			BRDF_Lambert( incidentLight, normal, diffuse );
 
-		totalDirectReflectedSpecular +=
+		reflectedLight.directSpecular +=
 			BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess );
 
 	}
@@ -71,7 +72,7 @@ vec3 diffuse = diffuseColor.rgb;
 		IncidentLight incidentLight;
 		getHemisphereLightIndirect( hemisphereLights[ i ], normal, incidentLight );
 
-		totalIndirectReflectedDiffuse +=
+		reflectedLight.indirectDiffuse +=
 			BRDF_Lambert( incidentLight, normal, diffuse );
 
 	}
@@ -80,8 +81,8 @@ vec3 diffuse = diffuseColor.rgb;
 
 
 outgoingLight +=
-	totalDirectReflectedDiffuse +
-	totalDirectReflectedSpecular +
-	totalIndirectReflectedDiffuse +
-	totalIndirectReflectedSpecular +
+	reflectedLight.directSpecular +
+	reflectedLight.directDiffuse +
+	reflectedLight.indirectSpecular +
+	reflectedLight.indirectDiffuse +
 	totalEmissiveLight;
