@@ -39,48 +39,94 @@
 
 	<div class="info">
 
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - gpu picking of geometry instances using a single material
+		<a href="http://threejs.org" target="_blank">three.js</a> webgl - gpu picking of geometry instances
 
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 
 		<br/><br/>
 
+		<div>This demo compares different methods of constructing and rendering many instances of a single geometry.</div>
+
+		<br/>
+
 		<div>
 
-			<span>number of instances </span>
-			<select id="instanceCount">
-				<option>100</option>
-				<option>500</option>
-				<option selected>1000</option>
-				<option>2000</option>
-				<option>3000</option>
-				<option>5000</option>
-				<option>10000</option>
-				<option>20000</option>
-				<option>30000</option>
-				<option>50000</option>
-				<option>100000</option>
-			</select>
+			<div style="display:inline-block;">
+				<span>number of<br/>geometry instances</span>
+				<br/>
+				<select id="instanceCount">
+					<option>100</option>
+					<option>500</option>
+					<option selected>1000</option>
+					<option>2000</option>
+					<option>3000</option>
+					<option>5000</option>
+					<option>10000</option>
+					<option>20000</option>
+					<option>30000</option>
+					<option>50000</option>
+					<option>100000</option>
+				</select>
+			</div>
 
 			&nbsp;&nbsp;&nbsp;
 
-			<span>method</span>
-			<select id="method">
-				<option>instanced</option>
-				<option selected>merged</option>
-				<option>singleMaterial</option>
-				<option>multiMaterial</option>
-			</select>
+			<div style="display:inline-block;">
+				<span>method of<br/>construction/rendering</span>
+				<br/>
+				<select id="method">
+					<option>instanced</option>
+					<option>merged</option>
+					<option selected>singleMaterial</option>
+					<option>multiMaterial</option>
+				</select>
+			</div>
 
 			&nbsp;&nbsp;&nbsp;
 
-			<span>render continuously</span>
-			<input id="animate" type="checkbox" />
+			<div style="display:inline-block;">
+				<span>render continuously<br/>(to get fps reading)</span>
+				<br/>
+				<input id="animate" type="checkbox" />
+			</div>
 
 			&nbsp;&nbsp;&nbsp;
 
-			<span>use override material (only singleMaterial)</span>
-			<input id="override" type="checkbox" checked/>
+			<div style="display:inline-block;">
+				<span>use override material<br/>(only effects singleMaterial method)</span>
+				<br/>
+				<input id="override" type="checkbox" checked/>
+			</div>
+
+			&nbsp;&nbsp;&nbsp;
+
+			<div style="display:inline-block;">
+				<span>construct anew<br/>(to get additional timings)</span>
+				<br/>
+				<button id="construct" type="button">do it</button>
+			</div>
+
+		</div>
+
+		<br/>
+
+		<div>
+
+			<span>Materials: #<span id="materialCount"></span></span>
+
+			&nbsp;&nbsp;&nbsp;
+
+			<span>Objects: #<span id="objectCount"></span></span>
+
+			&nbsp;&nbsp;&nbsp;
+
+			<span>Drawcalls: #<span id="drawcalls"></span></span>
+
+			&nbsp;&nbsp;&nbsp;
+
+			<span>Construction time: <span id="initTime"></span>&nbsp;ms</span>
+
+			&nbsp;&nbsp;&nbsp;
 
 		</div>
 
@@ -306,17 +352,17 @@
 		gui();
 		init();
 		initMesh();
-		if( doAnimate ) animate();
+		if ( doAnimate ) animate();
 
 		//
 
-		function gui(){
+		function gui() {
 
 			var instanceCountElm = document.getElementById( 'instanceCount' );
 
 			instanceCount = parseInt( instanceCountElm.value );
 
-			instanceCountElm.addEventListener( "change", function(){
+			instanceCountElm.addEventListener( "change", function() {
 
 				instanceCount = parseInt( instanceCountElm.value );
 				initMesh();
@@ -329,7 +375,7 @@
 
 			method = methodElm.value;
 
-			methodElm.addEventListener( "change", function(){
+			methodElm.addEventListener( "change", function() {
 
 				method = methodElm.value;
 				initMesh();
@@ -342,7 +388,7 @@
 
 			doAnimate = animateElm.checked;
 
-			animateElm.addEventListener( "click", function(){
+			animateElm.addEventListener( "click", function() {
 
 				doAnimate = animateElm.checked;
 				animate();
@@ -355,25 +401,39 @@
 
 			useOverrideMaterial = overrideElm.checked;
 
-			overrideElm.addEventListener( "click", function(){
+			overrideElm.addEventListener( "click", function() {
 
 				useOverrideMaterial = overrideElm.checked;
 				initMesh();
 
 			} );
 
+			//
+
+			var constructElm = document.getElementById( 'construct' );
+
+			constructElm.addEventListener( "click", function() {
+
+				initMesh();
+
+			} );
+
 		}
 
-		function clean(){
+		function clean() {
 
 			THREE.Cache.clear();
 
-			materialList.forEach( function( m ){
+			materialList.forEach( function( m ) {
+
 				m.dispose();
+
 			} );
 
-			geometryList.forEach( function( g ){
+			geometryList.forEach( function( g ) {
+
 				g.dispose();
+
 			} );
 
 			scene = new THREE.Scene();
@@ -391,14 +451,14 @@
 
 		}
 
-		var randomizeMatrix = function(){
+		var randomizeMatrix = function() {
 
 			var position = new THREE.Vector3();
 			var rotation = new THREE.Euler();
 			var quaternion = new THREE.Quaternion();
 			var scale = new THREE.Vector3();
 
-			return function( matrix ){
+			return function( matrix ) {
 
 				position.x = Math.random() * 40 - 20;
 				position.y = Math.random() * 40 - 20;
@@ -418,7 +478,7 @@
 
 		}();
 
-		function initMesh(){
+		function initMesh() {
 
 			clean();
 
@@ -433,8 +493,9 @@
 				console.log( "instanceCount:", instanceCount );
 
 				console.time( "init mesh" );
+				var start = window.performance.now();
 
-				switch( method ){
+				switch ( method ){
 
 					case "merged":
 						makeMerged( geo );
@@ -457,6 +518,7 @@
 				render();
 
 				console.timeEnd( "init mesh", method );
+				var end = window.performance.now();
 
 				console.log( "material count:", materialList.length );
 				console.log( "geometry count:", geometryList.length );
@@ -464,11 +526,16 @@
 				console.log( renderer.info.memory )
 				console.log( renderer.info.render )
 
+				document.getElementById( 'materialCount' ).innerText = materialList.length;
+				document.getElementById( 'objectCount' ).innerText = objectCount;
+				document.getElementById( 'drawcalls' ).innerText = renderer.info.render.calls;
+				document.getElementById( 'initTime' ).innerText = ( end - start ).toFixed( 2 );
+
 			} );
 
 		}
 
-		function makeMultiMaterial( geo ){
+		function makeMultiMaterial( geo ) {
 
 			// material
 
@@ -504,11 +571,11 @@
 			for ( var i = 0; i < instanceCount; i ++ ) {
 
 				var object = new THREE.Mesh( geo, material );
-				objectCount++;
+				objectCount ++;
 				randomizeMatrix( matrix );
 				object.applyMatrix( matrix );
 				var pickingObject = object.clone();
-				objectCount++;
+				objectCount ++;
 
 				object.material = material.clone();
 				object.material.uniforms.color.value.setHex( Math.random() * 0xffffff );
@@ -530,7 +597,7 @@
 
 		}
 
-		function makeSingleMaterial( geo ){
+		function makeSingleMaterial( geo ) {
 
 			// material
 
@@ -544,8 +611,10 @@
 					color: {
 						type: "c",
 						value: new THREE.Color(),
-						updateFunction: function( uniform, camera, object ){
+						updateFunction: function( uniform, camera, object ) {
+
 							uniform.value.setHex( object.userData.color );
+
 						}
 					}
 				}
@@ -559,18 +628,22 @@
 					pickingColor: {
 						type: "c",
 						value: new THREE.Color(),
-						updateFunction: function( uniform, camera, object ){
+						updateFunction: function( uniform, camera, object ) {
+
 							uniform.value.setHex( object.userData.pickingColor );
+
 						}
 					}
 				}
 			} );
 			materialList.push( pickingMaterial );
 
-			if( useOverrideMaterial ){
+			if ( useOverrideMaterial ) {
+
 				// make globally available
 				singleMaterial = material;
 				singlePickingMaterial = pickingMaterial;
+
 			}
 
 			// geometry / mesh
@@ -580,36 +653,42 @@
 			for ( var i = 0; i < instanceCount; i ++ ) {
 
 				var object = new THREE.Mesh( geo, material );
-				objectCount++;
+				objectCount ++;
 				randomizeMatrix( matrix );
 				object.applyMatrix( matrix );
 
 				var pickingObject;
-				if( !useOverrideMaterial ){
+				if ( ! useOverrideMaterial ) {
+
 					pickingObject = object.clone();
-					objectCount++;
+					objectCount ++;
+
 				}
 
 				object.material = material;
 				object.userData[ "color" ] = Math.random() * 0xffffff;
 
-				if( useOverrideMaterial ){
+				if ( useOverrideMaterial ) {
+
 					object.userData[ "pickingColor" ] = i + 1;
-				}else{
+
+				}else {
+
 					pickingObject.material = pickingMaterial;
 					pickingObject.userData[ "pickingColor" ] = i + 1;
+
 				}
 
 				pickingData[ i + 1 ] = object;
 
 				scene.add( object );
-				if( !useOverrideMaterial ) pickingScene.add( pickingObject );
+				if ( ! useOverrideMaterial ) pickingScene.add( pickingObject );
 
 			}
 
 		}
 
-		function makeMerged( geo ){
+		function makeMerged( geo ) {
 
 			// material
 
@@ -642,14 +721,16 @@
 				new Float32Array( instanceCount * posLen ), 3
 			);
 			var matrix = new THREE.Matrix4();
-			for ( var i = 0, ul = instanceCount; i < ul; i++ ) {
+			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
+
 				randomizeMatrix( matrix );
 				var object = new THREE.Object3D();
-				objectCount++;
+				objectCount ++;
 				object.applyMatrix( matrix );
 				pickingData[ i + 1 ] = object;
 				vertices.set( pos.array, i * posLen );
 				matrix.applyToVector3Array( vertices.array, i * posLen, posLen )
+
 			}
 			mgeo.addAttribute( 'position', vertices );
 
@@ -657,12 +738,20 @@
 			var colors = new THREE.BufferAttribute(
 				new Float32Array( instanceCount * colCount * 3 ), 3
 			);
-			var randCol = function(){ return Math.random(); };
-			for ( var i = 0, ul = instanceCount; i < ul; i++ ) {
+			var randCol = function() {
+
+				return Math.random();
+
+			};
+			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
+
 				var r = randCol(), g = randCol(), b = randCol();
-				for ( var j = i * colCount, jl = ( i + 1 ) * colCount; j < jl; j++ ){
+				for ( var j = i * colCount, jl = ( i + 1 ) * colCount; j < jl; j ++ ) {
+
 					colors.setXYZ( j, r, g, b );
+
 				}
+
 			}
 			mgeo.addAttribute( 'color', colors );
 
@@ -670,11 +759,15 @@
 			var pickingColors = new THREE.BufferAttribute(
 				new Float32Array( instanceCount * colCount * 3 ), 3
 			);
-			for ( var i = 0, ul = instanceCount; i < ul; i++ ) {
+			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
+
 				col.setHex( i + 1 );
-				for ( var j = i * colCount, jl = ( i + 1 ) * colCount; j < jl; j++ ){
+				for ( var j = i * colCount, jl = ( i + 1 ) * colCount; j < jl; j ++ ) {
+
 					pickingColors.setXYZ( j, col.r, col.g, col.b );
+
 				}
+
 			}
 			mgeo.addAttribute( 'pickingColor', pickingColors );
 
@@ -688,7 +781,7 @@
 
 		}
 
-		function makeInstanced( geo ){
+		function makeInstanced( geo ) {
 
 			// material
 
@@ -735,17 +828,19 @@
 			);
 			var matrix = new THREE.Matrix4();
 			var me = matrix.elements;
-			for ( var i = 0, ul = mcol0.count; i < ul; i++ ) {
+			for ( var i = 0, ul = mcol0.count; i < ul; i ++ ) {
+
 				randomizeMatrix( matrix );
 				var object = new THREE.Object3D();
-				objectCount++;
+				objectCount ++;
 				object.applyMatrix( matrix );
 				pickingData[ i + 1 ] = object;
 				// matrices.set( matrix.elements, i * 16 );
-				mcol0.setXYZ( i, me[  0 ], me[  1 ], me[  2 ] );
-				mcol1.setXYZ( i, me[  4 ], me[  5 ], me[  6 ] );
-				mcol2.setXYZ( i, me[  8 ], me[  9 ], me[ 10 ] );
+				mcol0.setXYZ( i, me[ 0 ], me[ 1 ], me[ 2 ] );
+				mcol1.setXYZ( i, me[ 4 ], me[ 5 ], me[ 6 ] );
+				mcol2.setXYZ( i, me[ 8 ], me[ 9 ], me[ 10 ] );
 				mcol3.setXYZ( i, me[ 12 ], me[ 13 ], me[ 14 ] );
+
 			}
 			// igeo.addAttribute( 'matrix', matrices );
 			igeo.addAttribute( 'mcol0', mcol0 );
@@ -753,12 +848,18 @@
 			igeo.addAttribute( 'mcol2', mcol2 );
 			igeo.addAttribute( 'mcol3', mcol3 );
 
-			var randCol = function(){ return Math.random(); };
+			var randCol = function() {
+
+				return Math.random();
+
+			};
 			var colors = new THREE.InstancedBufferAttribute(
 				new Float32Array( instanceCount * 3 ), 3, 1
 			);
-			for ( var i = 0, ul = colors.count; i < ul; i++ ) {
+			for ( var i = 0, ul = colors.count; i < ul; i ++ ) {
+
 				colors.setXYZ( i, randCol(), randCol(), randCol() );
+
 			}
 			igeo.addAttribute( 'color', colors );
 
@@ -766,9 +867,11 @@
 			var pickingColors = new THREE.InstancedBufferAttribute(
 				new Float32Array( instanceCount * 3 ), 3, 1
 			);
-			for ( var i = 0, ul = pickingColors.count; i < ul; i++ ) {
+			for ( var i = 0, ul = pickingColors.count; i < ul; i ++ ) {
+
 				col.setHex( i + 1 );
 				pickingColors.setXYZ( i, col.r, col.g, col.b );
+
 			}
 			igeo.addAttribute( 'pickingColor', pickingColors );
 
@@ -819,8 +922,10 @@
 				alpha: true
 			} );
 			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+
 				document.getElementById( "notSupported" ).style.display = "";
 				return;
+
 			}
 			renderer.setClearColor( 0xffffff );
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -829,7 +934,9 @@
 			container.appendChild( renderer.domElement );
 
 			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+
 				throw 'ANGLE_instanced_arrays not supported';
+
 			}
 
 			// controls
@@ -877,8 +984,10 @@
 
 		function animate() {
 
-			if( doAnimate ){
+			if ( doAnimate ) {
+
 				requestAnimationFrame( animate );
+
 			}
 
 			controls.update();
@@ -894,13 +1003,13 @@
 
 			highlightBox.visible = false;
 
-			if( singlePickingMaterial ){
+			if ( singlePickingMaterial ) {
 
 				scene.overrideMaterial = singlePickingMaterial;
 				renderer.render( scene, camera, pickingRenderTarget );
 				scene.overrideMaterial = null;
 
-			}else{
+			}else {
 
 				renderer.render( pickingScene, camera, pickingRenderTarget );
 
@@ -920,9 +1029,9 @@
 			// interpret the pixel as an ID
 
 			var id =
-				( pixelBuffer[0] << 16 ) |
-				( pixelBuffer[1] << 8 ) |
-				( pixelBuffer[2] );
+				( pixelBuffer[ 0 ] << 16 ) |
+				( pixelBuffer[ 1 ] << 8 ) |
+				( pixelBuffer[ 2 ] );
 
 			var object = pickingData[ id ];
 
@@ -930,7 +1039,7 @@
 
 				// move the highlightBox so that it surrounds the picked object
 
-				if ( object.position && object.rotation && object.scale ){
+				if ( object.position && object.rotation && object.scale ) {
 
 					highlightBox.position.copy( object.position );
 					highlightBox.rotation.copy( object.rotation );
