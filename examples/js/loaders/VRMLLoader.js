@@ -637,7 +637,7 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /DEF/.exec( data.string ) ) {
 
-						object.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+						object.name = /DEF\s+(\w+)/.exec( data.string )[ 1 ];
 
 						defines[ object.name ] = object;
 
@@ -720,6 +720,8 @@ THREE.VRMLLoader.prototype = {
 
 							if ( 'Coordinate' === child.nodeType ) {
 
+								if ( child.points )
+
 								for ( var k = 0, l = child.points.length; k < l; k ++ ) {
 
 									var point = child.points[ k ];
@@ -730,6 +732,21 @@ THREE.VRMLLoader.prototype = {
 
 								}
 
+								if ( child.string.indexOf ( 'DEF' ) > -1 ) {
+
+									var name = /DEF\s+(\w+)/.exec( child.string )[ 1 ];
+
+									defines[ name ] = geometry.vertices;
+
+								}
+
+								if ( child.string.indexOf ( 'USE' ) > -1 ) {
+
+									var defineKey = /USE\s+(\w+)/.exec( child.string )[ 1 ];
+
+									geometry.vertices = defines[ defineKey ];
+								}
+
 								break;
 
 							}
@@ -737,6 +754,9 @@ THREE.VRMLLoader.prototype = {
 						}
 
 						var skip = 0;
+
+						// some shapes only have vertices for use in other shapes
+						if ( data.coordIndex )
 
 						// read this: http://math.hws.edu/eck/cs424/notes2013/16_Threejs_Advanced.html
 						for ( var i = 0, j = data.coordIndex.length; i < j; i ++ ) {
@@ -878,6 +898,40 @@ THREE.VRMLLoader.prototype = {
 		var scene = new THREE.Scene();
 
 		var lines = data.split( '\n' );
+
+		// some lines do not have breaks
+		for (var i = lines.length -1; i > -1; i--) {
+
+			// split lines with {..{ or {..[ - some have both
+			if (/{.*[{\[]/.test (lines[i])) {
+				var parts = lines[i].split ('{').join ('{\n').split ('\n');
+				parts.unshift(1);
+				parts.unshift(i);
+				lines.splice.apply(lines, parts);
+			} else
+
+			// split lines with ]..}
+			if (/\].*}/.test (lines[i])) {
+				var parts = lines[i].split (']').join (']\n').split ('\n');
+				parts.unshift(1);
+				parts.unshift(i);
+				lines.splice.apply(lines, parts);
+			}
+
+			// split lines with }..}
+			if (/}.*}/.test (lines[i])) {
+				var parts = lines[i].split ('}').join ('}\n').split ('\n');
+				parts.unshift(1);
+				parts.unshift(i);
+				lines.splice.apply(lines, parts);
+			}
+
+			// force the parser to create Coordinate node for empty coords
+			// coord USE something -> coord USE something Coordinate {}
+			if((lines[i].indexOf ('coord') > -1) && (lines[i].indexOf ('[') < 0) && (lines[i].indexOf ('{') < 0)) {
+				lines[i] += ' Coordinate {}';
+			}
+		}
 
 		var header = lines.shift();
 
