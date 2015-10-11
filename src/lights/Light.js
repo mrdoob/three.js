@@ -116,18 +116,18 @@ Object.defineProperties( THREE.Light.prototype, {
 	},
 	shadowMapWidth: {
 		get: function () {
-			return this.shadow.mapSize.x;
+			return this.shadow.mapSize.width;
 		},
 		set: function ( value ) {
-			this.shadow.mapSize.x = value;
+			this.shadow.mapSize.width = value;
 		}
 	},
 	shadowMapHeight: {
 		get: function () {
-			return this.shadow.mapSize.y;
+			return this.shadow.mapSize.height;
 		},
 		set: function ( value ) {
-			this.shadow.mapSize.y = value;
+			this.shadow.mapSize.height = value;
 		}
 	},
 	shadowMatrix: {

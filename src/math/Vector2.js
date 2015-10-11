@@ -16,6 +16,14 @@ THREE.Vector2.prototype = {
 
 	constructor: THREE.Vector2,
 
+	get width() { return this.x },
+	set width( value ) { this.x = value },
+
+	get height() { return this.y },
+	set height( value ) { this.y = value },
+
+	//
+
 	set: function ( x, y ) {
 
 		this.x = x;

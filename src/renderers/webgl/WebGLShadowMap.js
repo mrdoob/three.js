@@ -174,7 +174,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
 
-				light.shadowMap = new THREE.WebGLRenderTarget( light.shadow.mapSize.x, light.shadow.mapSize.y, pars );
+				light.shadowMap = new THREE.WebGLRenderTarget( light.shadow.mapSize.width, light.shadow.mapSize.height, pars );
 
 				light.shadowMatrix = new THREE.Matrix4();
 
