@@ -245,6 +245,24 @@ Sidebar.Object3D = function ( editor ) {
 
 	container.add( objectDecayRow );
 
+	// shadow
+
+	var objectCastShadowRow = new UI.Panel();
+	var objectCastShadow = new UI.Checkbox().onChange( update );
+
+	objectCastShadowRow.add( new UI.Text( 'Cast Shadow' ).setWidth( '90px' ) );
+	objectCastShadowRow.add( objectCastShadow );
+
+	container.add( objectCastShadowRow );
+
+	var objectReceiveShadowRow = new UI.Panel();
+	var objectReceiveShadow = new UI.Checkbox().onChange( update );
+
+	objectReceiveShadowRow.add( new UI.Text( 'Receive Shad' ).setWidth( '90px' ) );
+	objectReceiveShadowRow.add( objectReceiveShadow );
+
+	container.add( objectReceiveShadowRow );
+
 	// visible
 
 	var objectVisibleRow = new UI.Panel();
@@ -431,6 +449,18 @@ Sidebar.Object3D = function ( editor ) {
 
 			}
 
+			if ( object.castShadow !== undefined ) {
+
+				object.castShadow = objectCastShadow.getValue();
+
+			}
+
+			if ( object.receiveShadow !== undefined ) {
+
+				object.receiveShadow = objectReceiveShadow.getValue();
+
+			}
+
 			object.visible = objectVisible.getValue();
 
 			try {
@@ -462,7 +492,9 @@ Sidebar.Object3D = function ( editor ) {
 			'distance' : objectDistanceRow,
 			'angle' : objectAngleRow,
 			'exponent' : objectExponentRow,
-			'decay' : objectDecayRow
+			'decay' : objectDecayRow,
+			'castShadow' : objectCastShadowRow,
+			'receiveShadow' : objectReceiveShadowRow
 		};
 
 		for ( var property in properties ) {
@@ -618,6 +650,18 @@ Sidebar.Object3D = function ( editor ) {
 		if ( object.decay !== undefined ) {
 
 			objectDecay.setValue( object.decay );
+
+		}
+
+		if ( object.castShadow !== undefined ) {
+
+			objectCastShadow.setValue( object.castShadow );
+
+		}
+
+		if ( object.receiveShadow !== undefined ) {
+
+			objectReceiveShadow.setValue( object.receiveShadow );
 
 		}
 

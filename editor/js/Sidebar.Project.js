@@ -73,6 +73,21 @@ Sidebar.Project = function ( editor ) {
 
 	container.add( rendererAntialiasRow );
 
+	// shadow
+
+	var rendererShadowsRow = new UI.Panel();
+	var rendererShadows = new UI.Checkbox( editor.config.getKey( 'project/renderer/shadows' ) ).setLeft( '100px' ).onChange( function () {
+
+		editor.config.setKey( 'project/renderer/shadows', this.getValue() );
+		updateRenderer();
+
+	} );
+
+	rendererShadowsRow.add( new UI.Text( 'Shadows' ).setWidth( '90px' ) );
+	rendererShadowsRow.add( rendererShadows );
+
+	container.add( rendererShadowsRow );
+
 	// VR
 
 	var vrRow = new UI.Panel();
@@ -92,11 +107,11 @@ Sidebar.Project = function ( editor ) {
 
 	function updateRenderer() {
 
-		createRenderer( rendererType.getValue(), rendererAntialias.getValue() );
+		createRenderer( rendererType.getValue(), rendererAntialias.getValue(), rendererShadows.getValue() );
 
 	}
 
-	function createRenderer( type, antialias ) {
+	function createRenderer( type, antialias, shadows ) {
 
 		if ( type === 'WebGLRenderer' && System.support.webgl === false ) {
 
@@ -105,11 +120,12 @@ Sidebar.Project = function ( editor ) {
 		}
 
 		var renderer = new rendererTypes[ type ]( { antialias: antialias } );
+		if ( shadows && renderer.shadowMap ) renderer.shadowMap.enabled = true;
 		signals.rendererChanged.dispatch( renderer );
 
 	}
 
-	createRenderer( editor.config.getKey( 'project/renderer' ), editor.config.getKey( 'project/renderer/antialias' ) );
+	createRenderer( editor.config.getKey( 'project/renderer' ), editor.config.getKey( 'project/renderer/antialias' ), editor.config.getKey( 'project/renderer/shadows' ) );
 
 	return container;
 
