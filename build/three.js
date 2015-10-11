@@ -1414,6 +1414,14 @@ THREE.Vector2.prototype = {
 
 	constructor: THREE.Vector2,
 
+	get width() { return this.x },
+	set width( value ) { this.x = value },
+
+	get height() { return this.y },
+	set height( value ) { this.y = value },
+
+	//
+
 	set: function ( x, y ) {
 
 		this.x = x;
@@ -14140,63 +14148,37 @@ Object.defineProperties( THREE.Light.prototype, {
 			console.warn( 'THREE.Light: .onlyShadow has been removed.' );
 		}
 	},
-	shadowCamera: {
-		get: function () {
-			return this.shadow.camera;
-		}
-	},
 	shadowCameraFov: {
-		get: function () {
-			return this.shadow.camera.fov;
-		},
 		set: function ( value ) {
 			this.shadow.camera.fov = value;
 		}
 	},
 	shadowCameraLeft: {
-		get: function () {
-			return this.shadow.camera.left;
-		},
 		set: function ( value ) {
 			this.shadow.camera.left = value;
 		}
 	},
 	shadowCameraRight: {
-		get: function () {
-			return this.shadow.camera.right;
-		},
 		set: function ( value ) {
 			this.shadow.camera.right = value;
 		}
 	},
 	shadowCameraTop: {
-		get: function () {
-			return this.shadow.camera.top;
-		},
 		set: function ( value ) {
 			this.shadow.camera.top = value;
 		}
 	},
 	shadowCameraBottom: {
-		get: function () {
-			return this.shadow.camera.bottom;
-		},
 		set: function ( value ) {
 			this.shadow.camera.bottom = value;
 		}
 	},
 	shadowCameraNear: {
-		get: function () {
-			return this.shadow.camera.near;
-		},
 		set: function ( value ) {
 			this.shadow.camera.near = value;
 		}
 	},
 	shadowCameraFar: {
-		get: function () {
-			return this.shadow.camera.far;
-		},
 		set: function ( value ) {
 			this.shadow.camera.far = value;
 		}
@@ -14207,51 +14189,23 @@ Object.defineProperties( THREE.Light.prototype, {
 		}
 	},
 	shadowBias: {
-		get: function () {
-			return this.shadow.bias;
-		},
 		set: function ( value ) {
 			this.shadow.bias = value;
 		}
 	},
 	shadowDarkness: {
-		get: function () {
-			return this.shadow.darkness;
-		},
 		set: function ( value ) {
 			this.shadow.darkness = value;
 		}
 	},
-	shadowMap: {
-		get: function () {
-			return this.shadow.map;
-		},
-		set: function ( value ) {
-			this.shadow.map = value;
-		}
-	},
 	shadowMapWidth: {
-		get: function () {
-			return this.shadow.mapSize.x;
-		},
 		set: function ( value ) {
-			this.shadow.mapSize.x = value;
+			this.shadow.mapSize.width = value;
 		}
 	},
 	shadowMapHeight: {
-		get: function () {
-			return this.shadow.mapSize.y;
-		},
 		set: function ( value ) {
-			this.shadow.mapSize.y = value;
-		}
-	},
-	shadowMatrix: {
-		get: function () {
-			return this.shadow.matrix;
-		},
-		set: function ( value ) {
-			this.shadow.matrix = value;
+			this.shadow.mapSize.height = value;
 		}
 	}
 } );
@@ -23471,30 +23425,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var light = lights[ i ];
 
-				if ( ! light.castShadow ) continue;
+				if ( light.castShadow === false ) continue;
 
 				if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
+
+					var shadow = light.shadow;
 
 					if ( light instanceof THREE.PointLight ) {
 
 						// for point lights we set the shadow matrix to be a translation-only matrix
 						// equal to inverse of the light's position
 						_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-						light.shadowMatrix.identity().setPosition( _vector3 );
+						shadow.matrix.identity().setPosition( _vector3 );
 
 						// for point lights we set the sign of the shadowDarkness uniform to be negative
-						uniforms.shadowDarkness.value[ j ] = - light.shadowDarkness;
+						uniforms.shadowDarkness.value[ j ] = - shadow.darkness;
 
 					} else {
 
-						uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
+						uniforms.shadowDarkness.value[ j ] = shadow.darkness;
 
 					}
 
-					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
-					uniforms.shadowMap.value[ j ] = light.shadowMap;
-					uniforms.shadowMapSize.value[ j ] = light.shadow.mapSize;
-					uniforms.shadowBias.value[ j ] = light.shadowBias;
+					uniforms.shadowMatrix.value[ j ] = shadow.matrix;
+					uniforms.shadowMap.value[ j ] = shadow.map;
+					uniforms.shadowMapSize.value[ j ] = shadow.mapSize;
+					uniforms.shadowBias.value[ j ] = shadow.bias;
 
 					j ++;
 
@@ -26806,7 +26762,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var useMorphing = ( i & _MorphingFlag ) !== 0;
 		var useSkinning = ( i & _SkinningFlag ) !== 0;
 
-
 		var depthMaterial = new THREE.ShaderMaterial( {
 			uniforms: depthUniforms,
 			vertexShader: depthShader.vertexShader,
@@ -26871,13 +26826,17 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			if ( light.castShadow === false ) continue;
 
+			var shadow = light.shadow;
+			var shadowCamera = shadow.camera;
+			var shadowMapSize = shadow.mapSize;
+
 			if ( light instanceof THREE.PointLight ) {
 
 				faceCount = 6;
 				isPointLight = true;
 
-				var vpWidth = light.shadowMapWidth / 4.0;
-				var vpHeight = light.shadowMapHeight / 2.0;
+				var vpWidth = shadowMapSize.x / 4.0;
+				var vpHeight = shadowMapSize.y / 2.0;
 
 				// These viewports map a cube-map onto a 2D texture with the
 				// following orientation:
@@ -26912,7 +26871,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			}
 
-			if ( light.shadowMap === null ) {
+			if ( shadow.map === null ) {
 
 				var shadowFilter = THREE.LinearFilter;
 
@@ -26924,25 +26883,23 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
 
-				light.shadowMap = new THREE.WebGLRenderTarget( light.shadow.mapSize.x, light.shadow.mapSize.y, pars );
-
-				light.shadowMatrix = new THREE.Matrix4();
+				shadow.map = new THREE.WebGLRenderTarget( shadowMapSize.x, shadowMapSize.y, pars );
+				shadow.matrix = new THREE.Matrix4();
 
 				//
 
 				if ( light instanceof THREE.SpotLight ) {
 
-					light.shadowCamera.aspect = light.shadow.mapSize.x / light.shadow.mapSize.y;
+					shadowCamera.aspect = shadowMapSize.x / shadowMapSize.y;
 
 				}
 
-				light.shadowCamera.updateProjectionMatrix();
+				shadowCamera.updateProjectionMatrix();
 
 			}
 
-			var shadowMap = light.shadowMap;
-			var shadowMatrix = light.shadowMatrix;
-			var shadowCamera = light.shadowCamera;
+			var shadowMap = shadow.map;
+			var shadowMatrix = shadow.matrix;
 
 			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 			shadowCamera.position.copy( _lightPositionWorld );
@@ -35977,6 +35934,8 @@ THREE.CameraHelper = function ( camera ) {
 	THREE.LineSegments.call( this, geometry, material );
 
 	this.camera = camera;
+	this.camera.updateProjectionMatrix();
+
 	this.matrix = camera.matrixWorld;
 	this.matrixAutoUpdate = false;
 
