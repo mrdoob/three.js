@@ -14230,11 +14230,6 @@ Object.defineProperties( THREE.Light.prototype, {
 			this.shadow.map = value;
 		}
 	},
-	shadowMapSize: {
-		get: function () {
-			return this.shadow.mapSize;
-		}
-	},
 	shadowMapWidth: {
 		get: function () {
 			return this.shadow.mapSize.x;
@@ -22321,10 +22316,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var groupCount = group !== null ? group.count : Infinity;
 
 		var drawStart = Math.max( dataStart, rangeStart, groupStart );
-
 		var drawEnd = Math.min( dataStart + dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
 
-		var drawCount = drawEnd - drawStart + 1;
+		var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
 
 		//
 
@@ -23499,7 +23493,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
 					uniforms.shadowMap.value[ j ] = light.shadowMap;
-					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
+					uniforms.shadowMapSize.value[ j ] = light.shadow.mapSize;
 					uniforms.shadowBias.value[ j ] = light.shadowBias;
 
 					j ++;
