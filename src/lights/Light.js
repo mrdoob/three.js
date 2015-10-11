@@ -24,63 +24,37 @@ Object.defineProperties( THREE.Light.prototype, {
 			console.warn( 'THREE.Light: .onlyShadow has been removed.' );
 		}
 	},
-	shadowCamera: {
-		get: function () {
-			return this.shadow.camera;
-		}
-	},
 	shadowCameraFov: {
-		get: function () {
-			return this.shadow.camera.fov;
-		},
 		set: function ( value ) {
 			this.shadow.camera.fov = value;
 		}
 	},
 	shadowCameraLeft: {
-		get: function () {
-			return this.shadow.camera.left;
-		},
 		set: function ( value ) {
 			this.shadow.camera.left = value;
 		}
 	},
 	shadowCameraRight: {
-		get: function () {
-			return this.shadow.camera.right;
-		},
 		set: function ( value ) {
 			this.shadow.camera.right = value;
 		}
 	},
 	shadowCameraTop: {
-		get: function () {
-			return this.shadow.camera.top;
-		},
 		set: function ( value ) {
 			this.shadow.camera.top = value;
 		}
 	},
 	shadowCameraBottom: {
-		get: function () {
-			return this.shadow.camera.bottom;
-		},
 		set: function ( value ) {
 			this.shadow.camera.bottom = value;
 		}
 	},
 	shadowCameraNear: {
-		get: function () {
-			return this.shadow.camera.near;
-		},
 		set: function ( value ) {
 			this.shadow.camera.near = value;
 		}
 	},
 	shadowCameraFar: {
-		get: function () {
-			return this.shadow.camera.far;
-		},
 		set: function ( value ) {
 			this.shadow.camera.far = value;
 		}
@@ -91,51 +65,23 @@ Object.defineProperties( THREE.Light.prototype, {
 		}
 	},
 	shadowBias: {
-		get: function () {
-			return this.shadow.bias;
-		},
 		set: function ( value ) {
 			this.shadow.bias = value;
 		}
 	},
 	shadowDarkness: {
-		get: function () {
-			return this.shadow.darkness;
-		},
 		set: function ( value ) {
 			this.shadow.darkness = value;
 		}
 	},
-	shadowMap: {
-		get: function () {
-			return this.shadow.map;
-		},
-		set: function ( value ) {
-			this.shadow.map = value;
-		}
-	},
 	shadowMapWidth: {
-		get: function () {
-			return this.shadow.mapSize.width;
-		},
 		set: function ( value ) {
 			this.shadow.mapSize.width = value;
 		}
 	},
 	shadowMapHeight: {
-		get: function () {
-			return this.shadow.mapSize.height;
-		},
 		set: function ( value ) {
 			this.shadow.mapSize.height = value;
-		}
-	},
-	shadowMatrix: {
-		get: function () {
-			return this.shadow.matrix;
-		},
-		set: function ( value ) {
-			this.shadow.matrix = value;
 		}
 	}
 } );

@@ -56,7 +56,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var useMorphing = ( i & _MorphingFlag ) !== 0;
 		var useSkinning = ( i & _SkinningFlag ) !== 0;
 
-
 		var depthMaterial = new THREE.ShaderMaterial( {
 			uniforms: depthUniforms,
 			vertexShader: depthShader.vertexShader,
@@ -121,13 +120,17 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			if ( light.castShadow === false ) continue;
 
+			var shadow = light.shadow;
+			var shadowCamera = shadow.camera;
+			var shadowMapSize = shadow.mapSize;
+
 			if ( light instanceof THREE.PointLight ) {
 
 				faceCount = 6;
 				isPointLight = true;
 
-				var vpWidth = light.shadowMapWidth / 4.0;
-				var vpHeight = light.shadowMapHeight / 2.0;
+				var vpWidth = shadowMapSize.x / 4.0;
+				var vpHeight = shadowMapSize.y / 2.0;
 
 				// These viewports map a cube-map onto a 2D texture with the
 				// following orientation:
@@ -162,7 +165,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			}
 
-			if ( light.shadowMap === null ) {
+			if ( shadow.map === null ) {
 
 				var shadowFilter = THREE.LinearFilter;
 
@@ -174,25 +177,23 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
 
-				light.shadowMap = new THREE.WebGLRenderTarget( light.shadow.mapSize.width, light.shadow.mapSize.height, pars );
-
-				light.shadowMatrix = new THREE.Matrix4();
+				shadow.map = new THREE.WebGLRenderTarget( shadowMapSize.x, shadowMapSize.y, pars );
+				shadow.matrix = new THREE.Matrix4();
 
 				//
 
 				if ( light instanceof THREE.SpotLight ) {
 
-					light.shadowCamera.aspect = light.shadow.mapSize.x / light.shadow.mapSize.y;
+					shadowCamera.aspect = shadowMapSize.x / shadowMapSize.y;
 
 				}
 
-				light.shadowCamera.updateProjectionMatrix();
+				shadowCamera.updateProjectionMatrix();
 
 			}
 
-			var shadowMap = light.shadowMap;
-			var shadowMatrix = light.shadowMatrix;
-			var shadowCamera = light.shadowCamera;
+			var shadowMap = shadow.map;
+			var shadowMatrix = shadow.matrix;
 
 			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 			shadowCamera.position.copy( _lightPositionWorld );

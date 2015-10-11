@@ -1988,30 +1988,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var light = lights[ i ];
 
-				if ( ! light.castShadow ) continue;
+				if ( light.castShadow === false ) continue;
 
 				if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
+
+					var shadow = light.shadow;
 
 					if ( light instanceof THREE.PointLight ) {
 
 						// for point lights we set the shadow matrix to be a translation-only matrix
 						// equal to inverse of the light's position
 						_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-						light.shadowMatrix.identity().setPosition( _vector3 );
+						shadow.matrix.identity().setPosition( _vector3 );
 
 						// for point lights we set the sign of the shadowDarkness uniform to be negative
-						uniforms.shadowDarkness.value[ j ] = - light.shadowDarkness;
+						uniforms.shadowDarkness.value[ j ] = - shadow.darkness;
 
 					} else {
 
-						uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
+						uniforms.shadowDarkness.value[ j ] = shadow.darkness;
 
 					}
 
-					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
-					uniforms.shadowMap.value[ j ] = light.shadowMap;
-					uniforms.shadowMapSize.value[ j ] = light.shadow.mapSize;
-					uniforms.shadowBias.value[ j ] = light.shadowBias;
+					uniforms.shadowMatrix.value[ j ] = shadow.matrix;
+					uniforms.shadowMap.value[ j ] = shadow.map;
+					uniforms.shadowMapSize.value[ j ] = shadow.mapSize;
+					uniforms.shadowBias.value[ j ] = shadow.bias;
 
 					j ++;
 
