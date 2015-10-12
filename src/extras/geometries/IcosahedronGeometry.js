@@ -35,13 +35,11 @@ THREE.IcosahedronGeometry.prototype.constructor = THREE.IcosahedronGeometry;
 
 THREE.IcosahedronGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.IcosahedronGeometry(
-		this.parameters.radius,
-		this.parameters.detail
+	var parameters = this.parameters;
+
+	return new THREE.IcosahedronGeometry(
+		parameters.radius,
+		parameters.detail
 	);
-
-	geometry.copy( this );
-
-	return geometry;
 
 };

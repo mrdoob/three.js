@@ -70,15 +70,13 @@ THREE.CircleBufferGeometry.prototype.constructor = THREE.CircleBufferGeometry;
 
 THREE.CircleBufferGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.CircleBufferGeometry(
-		this.parameters.radius,
-		this.parameters.segments,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
+	var parameters = this.parameters;
+
+	return new THREE.CircleBufferGeometry(
+		parameters.radius,
+		parameters.segments,
+		parameters.thetaStart,
+		parameters.thetaLength
 	);
-
-	geometry.copy( this );
-
-	return geometry;
 
 };

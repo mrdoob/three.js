@@ -128,16 +128,16 @@ THREE.BoxGeometry.prototype.constructor = THREE.BoxGeometry;
 
 THREE.BoxGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.BoxGeometry(
-		this.parameters.width,
-		this.parameters.height,
-		this.parameters.depth,
-		this.parameters.widthSegments,
-		this.parameters.heightSegments,
-		this.parameters.depthSegments
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.BoxGeometry(
+		parameters.width,
+		parameters.height,
+		parameters.depth,
+		parameters.widthSegments,
+		parameters.heightSegments,
+		parameters.depthSegments
+	);
 
 };
 
