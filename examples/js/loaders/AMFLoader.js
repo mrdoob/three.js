@@ -297,16 +297,6 @@ THREE.AMFLoader.prototype = {
 							normalArray.push(ny);
 							normalArray.push(nz);
 
-						} else if ( vNode.nodeName === "normal" ) {
-
-							var nx = vNode.getElementsByTagName("nx")[0].textContent;
-							var ny = vNode.getElementsByTagName("ny")[0].textContent;
-							var nz = vNode.getElementsByTagName("nz")[0].textContent;
-
-							normalArray.push(nx);
-							normalArray.push(ny);
-							normalArray.push(nz);
-
 						}
 
 						vNode = vNode.nextElementSibling;
