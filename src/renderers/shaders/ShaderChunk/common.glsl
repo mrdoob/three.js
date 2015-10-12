@@ -102,18 +102,24 @@ struct ReflectedLight {
  	vec3 diffuse;
 };
 
-void BRDF_Lambert( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 diffuseColor, inout ReflectedLight reflectedLight ) {
+struct GeometricContext {
+	vec3 position;
+	vec3 normal;
+	vec3 viewDir;
+};
 
-	reflectedLight.diffuse += incidentLight.color * diffuseColor * ( saturate( dot( normal, incidentLight.direction ) ) * RECIPROCAL_PI );
+void BRDF_Lambert( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 diffuseColor, inout ReflectedLight reflectedLight ) {
+
+	reflectedLight.diffuse += incidentLight.color * diffuseColor * ( saturate( dot( geometryContext.normal, incidentLight.direction ) ) * RECIPROCAL_PI );
 
 }
 
-void BRDF_OrenNayar( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 viewDir, const in vec3 diffuse, const in float roughness, inout ReflectedLight reflectedLight ) {
+void BRDF_OrenNayar( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 diffuse, const in float roughness, inout ReflectedLight reflectedLight ) {
 
-	vec3 halfDir = normalize( incidentLight.direction + viewDir );
-	float dotVH = saturate( dot( viewDir, halfDir ) );
-	float dotNV = saturate( dot( normal, viewDir ) );
-	float dotNL = saturate( dot( normal, incidentLight.direction ) );
+	vec3 halfDir = normalize( incidentLight.direction + geometryContext.viewDir );
+	float dotVH = saturate( dot( geometryContext.viewDir, halfDir ) );
+	float dotNV = saturate( dot( geometryContext.normal, geometryContext.viewDir ) );
+	float dotNL = saturate( dot( geometryContext.normal, incidentLight.direction ) );
 
 	float m2 = roughness * roughness;
 	float termA = 1.0 - 0.5 * m2 / (m2 + 0.33);
@@ -153,10 +159,10 @@ float D_BlinnPhong( const in float shininess, const in float dotNH ) {
 
 }
 
-void BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float shininess, inout ReflectedLight reflectedLight ) {
+void BRDF_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 specularColor, const in float shininess, inout ReflectedLight reflectedLight ) {
 
-	vec3 halfDir = normalize( incidentLight.direction + viewDir );
-	float dotNH = saturate( dot( normal, halfDir ) );
+	vec3 halfDir = normalize( incidentLight.direction + geometryContext.viewDir );
+	float dotNH = saturate( dot( geometryContext.normal, halfDir ) );
 	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
 
 	vec3 F = F_Schlick( specularColor, dotLH );
@@ -176,7 +182,7 @@ void BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal
 
 	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];
 
-	void getDirIncidentLight( const in DirectionalLight directionalLight, out IncidentLight incidentLight ) { 
+	void getDirIncidentLight( const in DirectionalLight directionalLight, const in GeometricContext geometryContext, out IncidentLight incidentLight ) { 
 	
 		incidentLight.color = directionalLight.color;
 		incidentLight.direction = directionalLight.direction; 
@@ -196,11 +202,11 @@ void BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal
 
 	uniform PointLight pointLights[ MAX_POINT_LIGHTS ];
 
-	void getPointIncidentLight( const in PointLight pointLight, const in vec3 position, out IncidentLight incidentLight ) { 
+	void getPointIncidentLight( const in PointLight pointLight, const in GeometricContext geometryContext, out IncidentLight incidentLight ) { 
 	
 		vec3 lightPosition = pointLight.position; 
 	
-		vec3 lVector = lightPosition - position; 
+		vec3 lVector = lightPosition - geometryContext.position; 
 		incidentLight.direction = normalize( lVector ); 
 	
 		incidentLight.color = pointLight.color; 
@@ -224,11 +230,11 @@ void BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal
 
 	uniform SpotLight spotLights[ MAX_SPOT_LIGHTS ];
 
-	void getSpotIncidentLight( const in SpotLight spotLight, const in vec3 position, out IncidentLight incidentLight ) {
+	void getSpotIncidentLight( const in SpotLight spotLight, const in GeometricContext geometryContext, out IncidentLight incidentLight ) {
 	
 		vec3 lightPosition = spotLight.position;
 	
-		vec3 lVector = lightPosition - position;
+		vec3 lVector = lightPosition - geometryContext.position;
 		incidentLight.direction = normalize( lVector );
 	
 		float spotEffect = dot( spotLight.direction, incidentLight.direction );
@@ -250,17 +256,17 @@ void BRDF_BlinnPhong( const in IncidentLight incidentLight, const in vec3 normal
 	  vec3 groundColor;
 	};
 
-	layout(packed)uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
+	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
 
-	void getHemisphereIncidentLight( const in HemisphereLight hemiLight, const in vec3 normal, out IncidentLight incidentLight ) { 
+	void getHemisphereIncidentLight( const in HemisphereLight hemiLight, const in GeometricContext geometryContext, out IncidentLight incidentLight ) { 
 	
-		float dotNL = dot( normal, hemiLight.direction );
+		float dotNL = dot( geometryContext.normal, hemiLight.direction );
 
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
 
 		incidentLight.color = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
 
-		incidentLight.direction = normal;
+		incidentLight.direction = geometryContext.normal;
 
 	}
 

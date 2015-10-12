@@ -24,16 +24,18 @@ IncidentLight incidentLight;
 ReflectedLight directReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 
+GeometricContext geometricContext = GeometricContext( -vViewPosition, normal, viewDir );
+
 #if MAX_POINT_LIGHTS > 0
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
-		getPointIncidentLight( pointLights[ i ], -vViewPosition, incidentLight );
+		getPointIncidentLight( pointLights[ i ], geometricContext, incidentLight );
 
-		BRDF_Lambert( incidentLight, normal, diffuse, directReflectedLight );
-		//BRDF_OrenNayar( incidentLight, normal, viewDir, diffuse, 0.5, directReflectedLight );
+		BRDF_Lambert( incidentLight, geometricContext, diffuse, directReflectedLight );
+		//BRDF_OrenNayar( incidentLight, geometricContext, diffuse, 0.5, directReflectedLight );
 
-		BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess, directReflectedLight );
+		BRDF_BlinnPhong( incidentLight, geometricContext, specular, shininess, directReflectedLight );
 
 	}
 
@@ -43,12 +45,12 @@ ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 )
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
-		getSpotIncidentLight( spotLights[ i ], -vViewPosition, incidentLight );
+		getSpotIncidentLight( spotLights[ i ], geometricContext, incidentLight );
 
-		BRDF_Lambert( incidentLight, normal, diffuse, directReflectedLight );
-		//BRDF_OrenNayar( incidentLight, normal, viewDir, diffuse, 0.5, directReflectedLight );
+		BRDF_Lambert( incidentLight, geometricContext, diffuse, directReflectedLight );
+		//BRDF_OrenNayar( incidentLight, geometricContext, diffuse, 0.5, directReflectedLight );
 
-		BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess, directReflectedLight );
+		BRDF_BlinnPhong( incidentLight, geometricContext, specular, shininess, directReflectedLight );
 
 	}
 
@@ -58,12 +60,12 @@ ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 )
 
 	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-		getDirIncidentLight( directionalLights[ i ], incidentLight );
+		getDirIncidentLight( directionalLights[ i ], geometricContext, incidentLight );
 
-		BRDF_Lambert( incidentLight, normal, diffuse, directReflectedLight );
-		//BRDF_OrenNayar( incidentLight, normal, viewDir, diffuse, 0.5, directReflectedLight );
+		BRDF_Lambert( incidentLight, geometricContext, diffuse, directReflectedLight );
+		//BRDF_OrenNayar( incidentLight, geometricContext, diffuse, 0.5, directReflectedLight );
 
-		BRDF_BlinnPhong( incidentLight, normal, viewDir, specular, shininess, directReflectedLight );
+		BRDF_BlinnPhong( incidentLight, geometricContext, specular, shininess, directReflectedLight );
 
 	}
 
@@ -73,10 +75,10 @@ ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 )
 
 	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		getHemisphereIncidentLight( hemisphereLights[ i ], normal, incidentLight );
+		getHemisphereIncidentLight( hemisphereLights[ i ], geometricContext, incidentLight );
 
-		BRDF_Lambert( incidentLight, normal, diffuse, indirectReflectedLight );
-		//BRDF_OrenNayar( incidentLight, normal, viewDir, diffuse, 0.5, indirectReflectedLight );
+		BRDF_Lambert( incidentLight, geometricContext, diffuse, indirectReflectedLight );
+		//BRDF_OrenNayar( incidentLight, geometricContext, diffuse, 0.5, indirectReflectedLight );
 
 	}
 

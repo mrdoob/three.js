@@ -2518,7 +2518,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if( ! light.__webglUniforms ) {
 					light.__webglUniforms = {
-						position: new THREE.Vector3(),
+						direction: new THREE.Vector3(),
 						skyColor: new THREE.Color(),
 						groundColor: new THREE.Color()
 					}
@@ -2532,10 +2532,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 					continue;
 				}
 
-				lightUniforms.position.setFromMatrixPosition( light.matrixWorld );
-				lightUniforms.position.transformDirection( viewMatrix );
+				lightUniforms.direction.setFromMatrixPosition( light.matrixWorld );
+				lightUniforms.direction.transformDirection( viewMatrix );
+				lightUniforms.direction.normalize();
 
-				lightUniforms.skyColor.copy(  light.color ).multiplyScalar( intensity );
+				lightUniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
 				lightUniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
 
 			}

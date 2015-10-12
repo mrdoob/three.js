@@ -114,7 +114,7 @@
 					geometry.computeVertexNormals();
 					geometry.computeMorphNormals();
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading } );
 					var mesh = new THREE.Mesh( geometry, material );
 					
 					mesh.scale.set( 1.5, 1.5, 1.5 );
