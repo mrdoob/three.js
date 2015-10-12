@@ -9,7 +9,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "cd utils/build && ./build.sh",
+    "codestyle": "cd utils/codestyle && ./codestyle.sh"
   },
   "repository": {
     "type": "git",
