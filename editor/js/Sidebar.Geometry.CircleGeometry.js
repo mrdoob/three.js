@@ -28,6 +28,26 @@ Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 
 	container.add( segmentsRow );
 
+	// thetaStart
+
+	var thetaStartRow = new UI.Panel();
+	var thetaStart = new UI.Number( parameters.thetaStart ).onChange( update );
+
+	thetaStartRow.add( new UI.Text( 'Theta start' ).setWidth( '90px' ) );
+	thetaStartRow.add( thetaStart );
+
+	container.add( thetaStartRow );
+
+	// thetaLength
+
+	var thetaLengthRow = new UI.Panel();
+	var thetaLength = new UI.Number( parameters.thetaLength ).onChange( update );
+
+	thetaLengthRow.add( new UI.Text( 'Theta length' ).setWidth( '90px' ) );
+	thetaLengthRow.add( thetaLength );
+
+	container.add( thetaLengthRow );
+
 	//
 
 	function update() {
@@ -36,10 +56,10 @@ Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 
 		object.geometry = new THREE.CircleGeometry(
 			radius.getValue(),
-			segments.getValue()
+			segments.getValue(),
+			thetaStart.getValue(),
+			thetaLength.getValue()
 		);
-
-		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );
 
