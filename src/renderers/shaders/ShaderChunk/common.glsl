@@ -91,6 +91,8 @@ vec3 linearToOutput( in vec3 a ) {
 
 }
 
+//#define ENERGY_PRESERVING_MONOCHROME
+
 
 struct IncidentLight {
  	vec3 color;
@@ -108,9 +110,18 @@ struct GeometricContext {
 	vec3 viewDir;
 };
 
+
 void BRDF_Lambert( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 diffuseColor, inout ReflectedLight reflectedLight ) {
 
-	reflectedLight.diffuse += incidentLight.color * diffuseColor * ( saturate( dot( geometryContext.normal, incidentLight.direction ) ) * RECIPROCAL_PI );
+	float lambertianReflectance = saturate( dot( geometryContext.normal, incidentLight.direction ) );
+
+	#if defined( ENERGY_PRESERVING_MONOCHROME ) || defined( ENERGY_PRESERVING_RGB )
+
+		lambertianReflectance *= RECIPROCAL_PI;
+
+	#endif
+
+	reflectedLight.diffuse += incidentLight.color * diffuseColor * lambertianReflectance;
 
 }
 

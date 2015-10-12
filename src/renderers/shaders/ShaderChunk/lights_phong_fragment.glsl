@@ -8,9 +8,7 @@ vec3 diffuse = diffuseColor.rgb;
 
 #endif
 
-#define ENERGY_PRESERVING_MONOCHROME
-
-#ifdef ENERGY_PRESERVING_RGB
+#if defined( ENERGY_PRESERVING_RGB )
 
 	diffuse *= whiteCompliment( specular );
 

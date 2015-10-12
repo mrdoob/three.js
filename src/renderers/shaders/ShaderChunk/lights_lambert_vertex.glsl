@@ -3,6 +3,7 @@ vec3 normal = normalize( transformedNormal );
 
 vec3 diffuse = vec3( 1.0 );
 
+
 IncidentLight incidentLight;
 ReflectedLight frontReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 ReflectedLight backReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
