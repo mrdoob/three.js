@@ -143,7 +143,7 @@ THREE.AMFLoader.prototype = {
 
 			var matName = "AMF Material";
 			var matId = node.attributes[ 'id' ].textContent;
-			var color = { r: 1.0, g: 1.0, b: 1.0, a: 1.0, opacity: 1.0 };
+			var color = { r: 1.0, g: 1.0, b: 1.0, a: 1.0 };
 
 			var loadedMaterial = null;
 
@@ -173,10 +173,10 @@ THREE.AMFLoader.prototype = {
 				name: matName
 			} );
 
-			if ( color.opacity !== 1.0 ) {
+			if ( color.a !== 1.0 ) {
 
 				loadedMaterial.transparent = true;
-				loadedMaterial.opacity = color.opacity;
+				loadedMaterial.opacity = color.a;
 
 			}
 
@@ -186,7 +186,7 @@ THREE.AMFLoader.prototype = {
 
 		function loadColor( node ) {
 
-			var color = { 'r': 1.0, 'g': 1.0, 'b': 1.0, 'a': 1.0, opacity: 1.0 };
+			var color = { 'r': 1.0, 'g': 1.0, 'b': 1.0, 'a': 1.0 };
 
 			for ( var i = 0; i < node.children.length; i ++ ) {
 
@@ -207,7 +207,6 @@ THREE.AMFLoader.prototype = {
 				} else if ( matColor.nodeName === 'a' ) {
 
 					color.a = matColor.textContent;
-					color.opacity = matColor.textContent;
 
 				}
 
@@ -479,9 +478,9 @@ THREE.AMFLoader.prototype = {
 
 					}
 
-					if ( amfMaterials[ volume.materialid ] !== undefined ) {
+					if ( amfMaterials[ volume.materialId ] !== undefined ) {
 
-						material = amfMaterials[ volume.materialid ];
+						material = amfMaterials[ volume.materialId ];
 
 					}
 
