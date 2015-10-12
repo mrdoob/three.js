@@ -20609,6 +20609,7 @@ THREE.ShaderLib = {
 
 			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
+			"	vec3 totalAmbientLight = vec3( 1.0 )", // hardwired
 			"	vec3 shadowMask = vec3( 1.0 );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
@@ -20620,7 +20621,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
-			"	outgoingLight = diffuseColor.rgb * shadowMask;",
+			"	outgoingLight = diffuseColor.rgb * totalAmbientLight * shadowMask;",
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
 
@@ -21449,7 +21450,6 @@ THREE.ShaderLib = {
 	}
 
 };
-
 
 // File:src/renderers/WebGLRenderer.js
 
