@@ -24,8 +24,7 @@ test( "Test CmdSetScale (Undo and Redo)", function() {
 		cmd.updatable = false;
 		editor.execute( cmd );
 
-
-	});
+	} );
 
 	ok( box.scale.x == scales[ scales.length - 1 ].x, "OK, setting X scale value was successful" );
 	ok( box.scale.y == scales[ scales.length - 1 ].y, "OK, setting Y scale value was successful" );
@@ -44,4 +43,4 @@ test( "Test CmdSetScale (Undo and Redo)", function() {
 	ok( box.scale.z == scales[ scales.length - 1 ].z, "OK, Z scale is correct after redo" );
 
 
-});
+} );

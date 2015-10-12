@@ -29,27 +29,24 @@ test( "Test CmdSetScriptValue for source (Undo and Redo)", function() {
 
 	testSourceData.map( function( script ) {
 
-		var cmd = new CmdSetScriptValue( box, translateScript, 'source', script.source , 0 );
+		var cmd = new CmdSetScriptValue( box, translateScript, 'source', script.source, 0 );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
-	});
+	} );
 
 	var length = testSourceData.length;
-	ok( editor.scripts[ box.uuid ][0][ 'source' ] == testSourceData[ length - 1].source,
-		"OK, 'source' was set correctly to the last value (expected: '" + testSourceData[ length - 1 ].source + "', actual: '" + editor.scripts[ box.uuid ][0][ 'source' ] + "')");
+	ok( editor.scripts[ box.uuid ][ 0 ][ 'source' ] == testSourceData[ length - 1 ].source,
+		"OK, 'source' was set correctly to the last value (expected: '" + testSourceData[ length - 1 ].source + "', actual: '" + editor.scripts[ box.uuid ][ 0 ][ 'source' ] + "')" );
 
 	editor.undo();
-	ok( editor.scripts[ box.uuid ][0][ 'source' ] == testSourceData[ length - 2 ].source,
-		"OK, 'source' was set correctly to the second to the last value after undo (expected: '" + testSourceData[ length - 2 ].source + "', actual: '" + editor.scripts[ box.uuid ][0][ 'source' ] + "')");
+	ok( editor.scripts[ box.uuid ][ 0 ][ 'source' ] == testSourceData[ length - 2 ].source,
+		"OK, 'source' was set correctly to the second to the last value after undo (expected: '" + testSourceData[ length - 2 ].source + "', actual: '" + editor.scripts[ box.uuid ][ 0 ][ 'source' ] + "')" );
 
 	editor.redo();
-	ok( editor.scripts[ box.uuid ][0][ 'source' ] == testSourceData[ length - 1 ].source,
-		"OK, 'source' was set correctly to the last value again after redo (expected: '" + testSourceData[ length - 1 ].source + "', actual: '" + editor.scripts[ box.uuid ][0][ 'source' ]	 + "')");
+	ok( editor.scripts[ box.uuid ][ 0 ][ 'source' ] == testSourceData[ length - 1 ].source,
+		"OK, 'source' was set correctly to the last value again after redo (expected: '" + testSourceData[ length - 1 ].source + "', actual: '" + editor.scripts[ box.uuid ][ 0 ][ 'source' ]	 + "')" );
 
-
-
-	// test name
 
 	var names = [ "X Script", "Y Script", "Z Script" ];
 
@@ -59,17 +56,17 @@ test( "Test CmdSetScriptValue for source (Undo and Redo)", function() {
 		cmd.updatable = false;
 		editor.execute( cmd );
 
-	});
+	} );
 
-	var scriptName = editor.scripts[ box.uuid ][0][ "name" ];
+	var scriptName = editor.scripts[ box.uuid ][ 0 ][ "name" ];
 	ok( scriptName == names[ names.length - 1 ], "OK, the script name corresponds to the last script name that was assigned" );
 
 	editor.undo();
-	scriptName = editor.scripts[ box.uuid ][0][ "name" ];
+	scriptName = editor.scripts[ box.uuid ][ 0 ][ "name" ];
 	ok( scriptName == names[ names.length - 2 ], "OK, the script name corresponds to the second last script name that was assigned" );
 
 	editor.redo();
-	scriptName = editor.scripts[ box.uuid ][0][ "name" ];
+	scriptName = editor.scripts[ box.uuid ][ 0 ][ "name" ];
 	ok( scriptName == names[ names.length - 1 ], "OK, the script name corresponds to the last script name that was assigned, again" );
 
-});
+} );

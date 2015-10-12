@@ -10,9 +10,9 @@ test( "Test CmdSetRotation (Undo and Redo)", function() {
 
 	var rotations = [
 
-		{ x: 1.1, y:  0.4, z: -2.0 },
-		{ x: 2.2, y: -1.3, z:  1.3 },
-		{ x: 0.3, y: -0.1, z: -1.9 }
+		{ x: 1.1, y:   0.4, z: - 2.0 },
+		{ x: 2.2, y: - 1.3, z:   1.3 },
+		{ x: 0.3, y: - 0.1, z: - 1.9 }
 
 	];
 
@@ -24,7 +24,7 @@ test( "Test CmdSetRotation (Undo and Redo)", function() {
 		cmd.updatable = false;
 		editor.execute ( cmd );
 
-	});
+	} );
 
 
 	ok( box.rotation.x == rotations[ rotations.length - 1 ].x, "OK, changing X rotation was successful" );
@@ -43,4 +43,4 @@ test( "Test CmdSetRotation (Undo and Redo)", function() {
 
 
 
-});
+} );

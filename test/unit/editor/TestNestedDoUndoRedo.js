@@ -1,8 +1,6 @@
 module( "NestedDoUndoRedo" );
 
-test( "Test nested Do's, Undo's and Redo's ", function() {
-
-	// TODO: replace CmdNameObject by CmdSetValue
+test( "Test nested Do's, Undo's and Redo's", function() {
 
 	var editor = new Editor();
 
@@ -102,4 +100,4 @@ test( "Test nested Do's, Undo's and Redo's ", function() {
 	ok( mesh.scale.z    ==    24, "OK, Z scale is correct " );
 
 
-});
+} );

@@ -26,6 +26,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "addObject";
+
 	};
 
 	var addScript = function () {
@@ -38,7 +39,7 @@ test( "Test Serialization", function( assert ) {
 		var cmd = new CmdAddObject( box );
 		editor.execute( cmd );
 
-		var cmd = new CmdAddScript( box, { "name":"test","source":"console.log(\"hello world\");" } );
+		var cmd = new CmdAddScript( box, { "name": "test", "source": "console.log(\"hello world\");" } );
 		cmd.updatable = false;
 
 		editor.execute( cmd );
@@ -62,6 +63,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( new CmdMoveObject( lukeSkywalker, anakinSkywalker ) );
 
 		return "moveObject";
+
 	};
 
 	var removeScript = function () {
@@ -69,7 +71,7 @@ test( "Test Serialization", function( assert ) {
 		var box = aBox( 'Box with no script' );
 		editor.execute( new CmdAddObject( box ) );
 
-		var script = { "name":"test","source":"console.log(\"hello world\");" } ;
+		var script = { "name": "test", "source": "console.log(\"hello world\");" } ;
 		var cmd = new CmdAddScript( box, script );
 		cmd.updatable = false;
 
@@ -79,6 +81,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "removeScript";
+
 	};
 
 	var setColor = function () {
@@ -91,6 +94,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "setColor";
+
 	};
 
 	var setGeometry = function () {
@@ -105,6 +109,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "setGeometry";
+
 	};
 
 	var setGeometryValue = function() {
@@ -117,6 +122,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "setGeometryValue";
+
 	};
 
 	var setMaterial = function () {
@@ -130,6 +136,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "setMaterial";
+
 	};
 
 	var setMaterialColor = function () {
@@ -142,6 +149,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "setMaterialColor";
+
 	};
 
 	var setMaterialMap = function () {
@@ -162,6 +170,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "setMaterialMap";
+
 	};
 
 	var setMaterialValue = function () {
@@ -174,6 +183,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "setMaterialValue";
+
 	};
 
 	var setPosition = function () {
@@ -187,6 +197,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "setPosition";
+
 	};
 
 	var setRotation = function () {
@@ -194,7 +205,7 @@ test( "Test Serialization", function( assert ) {
 		var box = aBox( 'Box with rotation' );
 		editor.execute( new CmdAddObject( box ) );
 
-		var newRotation = new THREE.Euler( 0.3, -1.7, 2 );
+		var newRotation = new THREE.Euler( 0.3, - 1.7, 2 );
 		var cmd = new CmdSetRotation( box, newRotation );
 		cmd.updatable = false;
 		editor.execute ( cmd );
@@ -206,7 +217,7 @@ test( "Test Serialization", function( assert ) {
 	var setScale = function () {
 
 		var sphere = aSphere( 'Sphere with scale' );
-		editor.execute( new CmdAddObject( sphere) );
+		editor.execute( new CmdAddObject( sphere ) );
 
 		var newScale = new THREE.Vector3( 1.2, 3.3, 4.6 );
 		var cmd = new CmdSetScale( sphere, newScale );
@@ -214,6 +225,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "setScale";
+
 	};
 
 	var setScriptValue = function () {
@@ -224,7 +236,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( new CmdAddScript( box, script ) );
 
 		var newScript = { name: "Console", source: "console.log( null );" };
-		var cmd = new CmdSetScriptValue( box, script, 'source', newScript.source , 0 );
+		var cmd = new CmdSetScriptValue( box, script, 'source', newScript.source, 0 );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -242,6 +254,7 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "setUuid";
+
 	};
 
 	var setValue = function () {
@@ -254,9 +267,11 @@ test( "Test Serialization", function( assert ) {
 		editor.execute( cmd );
 
 		return "setValue";
+
 	};
 
 	var setups = [
+
 		addObject,
 		addScript,
 		moveObject,
@@ -274,15 +289,16 @@ test( "Test Serialization", function( assert ) {
 		setScriptValue,
 		setUuid,
 		setValue
+
 	];
 
 	function performTests() {
 
 		// Forward tests
 
-		for ( var i = 0; i < setups.length ; i++ ) {
+		for ( var i = 0; i < setups.length ; i ++ ) {
 
-			var name = setups[i]();
+			var name = setups[ i ]();
 
 			// Check for correct serialization
 
@@ -300,7 +316,7 @@ test( "Test Serialization", function( assert ) {
 
 			var history2 = JSON.stringify( editor.history.toJSON() );
 
-			ok( history == history2 , "OK, forward serializing was successful for " + name );
+			ok( history == history2, "OK, forward serializing was successful for " + name );
 
 			editor.clear();
 
@@ -308,9 +324,9 @@ test( "Test Serialization", function( assert ) {
 
 		// Backward tests
 
-		for (var i = 0; i < setups.length ; i++ ) {
+		for ( var i = 0; i < setups.length ; i ++ ) {
 
-			var name = setups[i]();
+			var name = setups[ i ]();
 
 			editor.history.goToState( 0 );
 
@@ -325,7 +341,7 @@ test( "Test Serialization", function( assert ) {
 
 			var history2 = JSON.stringify( editor.history.toJSON() );
 
-			ok( history == history2 , "OK, backward serializing was successful for " + name );
+			ok( history == history2, "OK, backward serializing was successful for " + name );
 
 			editor.clear();
 
@@ -333,4 +349,5 @@ test( "Test Serialization", function( assert ) {
 
 	}
 
-});
+} );
+

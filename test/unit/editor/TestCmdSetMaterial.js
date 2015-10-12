@@ -1,4 +1,4 @@
-module("CmdSetMaterial");
+module( "CmdSetMaterial" );
 
 test( "Test for CmdSetMaterial (Undo and Redo)", function() {
 
@@ -10,6 +10,7 @@ test( "Test for CmdSetMaterial (Undo and Redo)", function() {
 	editor.execute( cmd );
 
 	materialClasses = [
+
 		'LineBasicMaterial',
 		'LineDashedMaterial',
 		'MeshBasicMaterial',
@@ -19,6 +20,7 @@ test( "Test for CmdSetMaterial (Undo and Redo)", function() {
 		'MeshPhongMaterial',
 		'ShaderMaterial',
 		'SpriteMaterial'
+
 	];
 
 	materialClasses.map( function( materialClass ) {
@@ -26,7 +28,7 @@ test( "Test for CmdSetMaterial (Undo and Redo)", function() {
 		material = new THREE[ materialClass ]();
 		editor.execute( new CmdSetMaterial( box, material ) );
 
-	});
+	} );
 
 	var i = materialClasses.length - 1;
 
@@ -37,23 +39,23 @@ test( "Test for CmdSetMaterial (Undo and Redo)", function() {
 
 
 	// test undos
-	while( i > 0 ) {
+	while ( i > 0 ) {
 
 		editor.undo();
-		--i;
+		-- i;
 		ok( box.material.type == materialClasses[ i ],
 			"OK, material type was set correctly after undo (expected: '" + materialClasses[ i ] + "', actual: '" + box.material.type + "')" );
 
 	}
 
 	// test redos
-	while( i < materialClasses.length - 1 ) {
+	while ( i < materialClasses.length - 1 ) {
 
 		editor.redo();
-		++i;
+		++ i;
 		ok( box.material.type == materialClasses[ i ],
 			"OK, material type was set correctly after redo (expected: '" + materialClasses[ i ] + "', actual: '" + box.material.type + "')" );
 
 	}
 
-});
+} );

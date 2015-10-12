@@ -8,8 +8,10 @@ function mergeParams( defaults, customParams ) {
 	var params = {};
 
 	defaultKeys.map( function( key ) {
+
 		params[ key ] = customParams[ key ] || defaultKeys[ key ];
-	});
+
+	} );
 
 	return params;
 
@@ -19,9 +21,11 @@ function mergeParams( defaults, customParams ) {
 function getGeometryParams( type, customParams ) {
 
 	if ( typeof customParams != "undefined" &&
-		 typeof customParams.geometry != "undefined" &&
-		 typeof customParams.geometry.parameters != "undefined" ) {
+		typeof customParams.geometry != "undefined" &&
+		typeof customParams.geometry.parameters != "undefined" ) {
+
 		var customGeometryParams = customParams.geometry.parameters;
+
 	}
 
 	var defaults = {};
@@ -58,24 +62,24 @@ function getGeometry( type, customParams ) {
 		case "BoxGeometry":
 
 			return new THREE.BoxGeometry(
-				params['width'],
-				params['height'],
-				params['depth'],
-				params['widthSegments'],
-				params['heightSegments'],
-				params['depthSegments']
+				params[ 'width' ],
+				params[ 'height' ],
+				params[ 'depth' ],
+				params[ 'widthSegments' ],
+				params[ 'heightSegments' ],
+				params[ 'depthSegments' ]
 			);
 
 		case "SphereGeometry":
 
 			return new THREE.SphereGeometry(
-				params['radius'],
-				params['widthSegments'],
-				params['heightSegments'],
-				params['phiStart'],
-				params['phiLength'],
-				params['thetaStart'],
-				params['thetaLength']
+				params[ 'radius' ],
+				params[ 'widthSegments' ],
+				params[ 'heightSegments' ],
+				params[ 'phiStart' ],
+				params[ 'phiLength' ],
+				params[ 'thetaStart' ],
+				params[ 'thetaLength' ]
 			);
 
 		default:
@@ -102,6 +106,7 @@ function getObject( name, type, customParams ) {
 function aBox( name, customParams ) {
 
 	return getObject( name, "BoxGeometry", customParams );
+
 }
 
 function aSphere( name, customParams ) {
@@ -133,13 +138,14 @@ function getScriptCount( editor ) {
 	var scriptsKeys = Object.keys( editor.scripts );
 	var scriptCount = 0;
 
-	for ( var i = 0; i < scriptsKeys.length; i++ ) {
+	for ( var i = 0; i < scriptsKeys.length; i ++ ) {
 
-		scriptCount += editor.scripts[ scriptsKeys[i] ].length;
+		scriptCount += editor.scripts[ scriptsKeys[ i ] ].length;
 
 	}
 
 	return scriptCount;
+
 }
 
 function exportScene( editor ) {

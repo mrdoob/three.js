@@ -24,7 +24,7 @@ test( "Test CmdAddObject and CmdRemoveObject (Undo and Redo)", function() {
 		ok( editor.scene.children.length == 0, "OK, adding '" + object.type + "' is undone (was removed)" );
 
 		editor.redo();
-		ok( editor.scene.children[ 0 ].name == object.name , "OK, removed '" + object.type + "' was added again (redo)" );
+		ok( editor.scene.children[ 0 ].name == object.name, "OK, removed '" + object.type + "' was added again (redo)" );
 
 
 		// Test Remove
@@ -35,13 +35,13 @@ test( "Test CmdAddObject and CmdRemoveObject (Undo and Redo)", function() {
 		ok( editor.scene.children.length == 0, "OK, removing object was successful" );
 
 		editor.undo();
-		ok( editor.scene.children[ 0 ].name == object.name , "OK, removed object was added again (undo)" );
+		ok( editor.scene.children[ 0 ].name == object.name, "OK, removed object was added again (undo)" );
 
 		editor.redo();
 		ok( editor.scene.children.length == 0, "OK, object was removed again (redo)" );
 
 
-	});
+	} );
 
 
-});
+} );

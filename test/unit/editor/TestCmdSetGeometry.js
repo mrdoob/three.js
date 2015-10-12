@@ -16,7 +16,7 @@ test( "Test CmdSetGeometry (Undo and Redo)", function() {
 	cmd.updatable = false;
 	editor.execute( cmd );
 
-	for ( var i = 0; i < geometryParams.length; i++ ) {
+	for ( var i = 0; i < geometryParams.length; i ++ ) {
 
 		var cmd = new CmdSetGeometry( box, getGeometry( "BoxGeometry", geometryParams[ i ] ) );
 		cmd.updatable = false;
@@ -37,22 +37,22 @@ test( "Test CmdSetGeometry (Undo and Redo)", function() {
 	editor.undo();
 	var actualParams = box.geometry.parameters;
 	var expectedParams = geometryParams[ 0 ].geometry.parameters;
-	ok( actualParams.width == expectedParams.width, "OK, box width matches the corresponding value from boxGeometry1 (after undo)");
-	ok( actualParams.height == expectedParams.height, "OK, box height matches the corresponding value from boxGeometry1 (after undo)");
-	ok( actualParams.depth == expectedParams.depth, "OK, box depth matches the corresponding value from boxGeometry1 (after undo)");
-	ok( actualParams.widthSegments == expectedParams.widthSegments, "OK, box widthSegments matches the corresponding value from boxGeometry1 (after undo)");
-	ok( actualParams.heightSegments == expectedParams.heightSegments, "OK, box heightSegments matches the corresponding value from boxGeometry1 (after undo)");
-	ok( actualParams.depthSegments == expectedParams.depthSegments, "OK, box depthSegments matches the corresponding value from boxGeometry1 (after undo)");
+	ok( actualParams.width == expectedParams.width, "OK, box width matches the corresponding value from boxGeometry1 (after undo)" );
+	ok( actualParams.height == expectedParams.height, "OK, box height matches the corresponding value from boxGeometry1 (after undo)" );
+	ok( actualParams.depth == expectedParams.depth, "OK, box depth matches the corresponding value from boxGeometry1 (after undo)" );
+	ok( actualParams.widthSegments == expectedParams.widthSegments, "OK, box widthSegments matches the corresponding value from boxGeometry1 (after undo)" );
+	ok( actualParams.heightSegments == expectedParams.heightSegments, "OK, box heightSegments matches the corresponding value from boxGeometry1 (after undo)" );
+	ok( actualParams.depthSegments == expectedParams.depthSegments, "OK, box depthSegments matches the corresponding value from boxGeometry1 (after undo)" );
 
 	editor.redo();
 	var actualParams = box.geometry.parameters;
 	var expectedParams = geometryParams[ 1 ].geometry.parameters;
-	ok( actualParams.width == expectedParams.width, "OK, box width matches the corresponding value from boxGeometry2 (after redo)");
-	ok( actualParams.height == expectedParams.height, "OK, box height matches the corresponding value from boxGeometry2 (after redo)");
-	ok( actualParams.depth == expectedParams.depth, "OK, box depth matches the corresponding value from boxGeometry2 (after redo)");
-	ok( actualParams.widthSegments == expectedParams.widthSegments, "OK, box widthSegments matches the corresponding value from boxGeometry2 (after redo)");
-	ok( actualParams.heightSegments == expectedParams.heightSegments, "OK, box heightSegments matches the corresponding value from boxGeometry2 (after redo)");
-	ok( actualParams.depthSegments == expectedParams.depthSegments, "OK, box depthSegments matches the corresponding value from boxGeometry2 (after redo)");
+	ok( actualParams.width == expectedParams.width, "OK, box width matches the corresponding value from boxGeometry2 (after redo)" );
+	ok( actualParams.height == expectedParams.height, "OK, box height matches the corresponding value from boxGeometry2 (after redo)" );
+	ok( actualParams.depth == expectedParams.depth, "OK, box depth matches the corresponding value from boxGeometry2 (after redo)" );
+	ok( actualParams.widthSegments == expectedParams.widthSegments, "OK, box widthSegments matches the corresponding value from boxGeometry2 (after redo)" );
+	ok( actualParams.heightSegments == expectedParams.heightSegments, "OK, box heightSegments matches the corresponding value from boxGeometry2 (after redo)" );
+	ok( actualParams.depthSegments == expectedParams.depthSegments, "OK, box depthSegments matches the corresponding value from boxGeometry2 (after redo)" );
 
 
-});
+} );

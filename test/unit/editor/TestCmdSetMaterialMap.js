@@ -1,4 +1,4 @@
-module("CmdSetMaterialMap");
+module( "CmdSetMaterialMap" );
 
 test( "Test for CmdSetMaterialMap (Undo and Redo)", function() {
 
@@ -18,10 +18,12 @@ test( "Test for CmdSetMaterialMap (Undo and Redo)", function() {
 
 	// define images for given files
 	var images = files.map( function( file ) {
+
 		var i = new Image();
 		i.src = file.data;
 		return { name: file.name, image: i };
-	});
+
+	} );
 
 
 	// test all maps
@@ -30,10 +32,12 @@ test( "Test for CmdSetMaterialMap (Undo and Redo)", function() {
 
 		// define textures for given images
 		var textures = images.map( function( img ) {
+
 			var texture = new THREE.Texture( img.image, mapName );
 			texture.sourceFile = img.name;
 			return texture;
-		});
+
+		} );
 
 		// apply the textures
 		textures.map( function( texture ) {
@@ -42,7 +46,7 @@ test( "Test for CmdSetMaterialMap (Undo and Redo)", function() {
 			cmd.updatable = false;
 			editor.execute( cmd );
 
-		});
+		} );
 
 
 		ok( box.material[ mapName ].image.src == images[ images.length - 1 ].image.src,
@@ -56,6 +60,6 @@ test( "Test for CmdSetMaterialMap (Undo and Redo)", function() {
 		ok( box.material[ mapName ].image.src == images[ images.length - 1 ].image.src,
 			"OK, " + mapName + " set correctly after redo" );
 
-	});
+	} );
 
-});
+} );

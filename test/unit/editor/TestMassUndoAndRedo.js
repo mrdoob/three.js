@@ -1,4 +1,4 @@
-module("MassUndoAndRedo");
+module( "MassUndoAndRedo" );
 
 test( "MassUndoAndRedo (stress test)", function() {
 
@@ -8,14 +8,14 @@ test( "MassUndoAndRedo (stress test)", function() {
 
 	// add objects
 	var i = 0;
-	while( i < MAX_OBJECTS ) {
+	while ( i < MAX_OBJECTS ) {
 
 		var object = aSphere( 'Sphere #' + i );
 		var cmd = new CmdAddObject( object );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
-		i++;
+		i ++;
 
 	}
 
@@ -24,10 +24,10 @@ test( "MassUndoAndRedo (stress test)", function() {
 
 	// remove all objects
 	i = 0;
-	while( i < MAX_OBJECTS ) {
+	while ( i < MAX_OBJECTS ) {
 
 		editor.undo();
-		i++;
+		i ++;
 
 	}
 
@@ -37,13 +37,14 @@ test( "MassUndoAndRedo (stress test)", function() {
 
 
 	i = 0;
-	while( i < MAX_OBJECTS ) {
+	while ( i < MAX_OBJECTS ) {
 
 		editor.redo();
-		i++;
+		i ++;
 
 	}
 
 	ok( editor.scene.children.lenght = MAX_OBJECTS,
 		"OK, " + MAX_OBJECTS + " objects have been added again by redos" );
-});
+
+} );

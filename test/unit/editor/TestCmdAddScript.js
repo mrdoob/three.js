@@ -1,6 +1,6 @@
-module("CmdAddScript");
+module( "CmdAddScript" );
 
-test( "Test CmdAddScript (Undo and Redo)" , function() {
+test( "Test CmdAddScript (Undo and Redo)", function() {
 
 	var editor = new Editor();
 
@@ -15,14 +15,16 @@ test( "Test CmdAddScript (Undo and Redo)" , function() {
 
 	// add objects to editor
 	objects.map( function( item ) {
+
 		editor.execute( new CmdAddObject( item ) );
-	});
+
+	} );
 	ok( editor.scene.children.length == 2, "OK, the box and the sphere have been added" );
 
 	// add scripts to the objects
-	for ( var i = 0; i < scripts.length; i++ ) {
+	for ( var i = 0; i < scripts.length; i ++ ) {
 
-		var cmd = new CmdAddScript( objects[i], scripts[i] );
+		var cmd = new CmdAddScript( objects[ i ], scripts[ i ] );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -31,9 +33,9 @@ test( "Test CmdAddScript (Undo and Redo)" , function() {
 	var scriptsKeys = Object.keys( editor.scripts );
 	ok( getScriptCount( editor ) == scripts.length, "OK, correct number of scripts have been added" );
 
-	for ( var i = 0; i < objects.length; i++ ) {
+	for ( var i = 0; i < objects.length; i ++ ) {
 
-		ok( objects[i].uuid == scriptsKeys[i], "OK, script key #" + i + " matches the object's UUID" );
+		ok( objects[ i ].uuid == scriptsKeys[ i ], "OK, script key #" + i + " matches the object's UUID" );
 
 	}
 
@@ -44,11 +46,12 @@ test( "Test CmdAddScript (Undo and Redo)" , function() {
 	ok( getScriptCount( editor ) == scripts.length, "OK, one script has been added again by redo" );
 
 
-	for (var i = 0; i < scriptsKeys.length; i++ ) {
+	for ( var i = 0; i < scriptsKeys.length; i ++ ) {
 
-		ok( editor.scripts[ scriptsKeys[i] ][0] == scripts[i], "OK, script #" + i + " is still assigned correctly" );
+		ok( editor.scripts[ scriptsKeys[ i ] ][ 0 ] == scripts[ i ], "OK, script #" + i + " is still assigned correctly" );
 
 	}
 
 
-});
+} );
+

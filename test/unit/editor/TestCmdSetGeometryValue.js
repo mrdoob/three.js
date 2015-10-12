@@ -14,7 +14,7 @@ test( "Test CmdSetGeometryValue (Undo and Redo)", function() {
 		{ uuid: THREE.Math.generateUUID(), name: 'Jack' }
 	];
 
-	for( var i = 0; i < testData.length; i++ ) {
+	for ( var i = 0; i < testData.length; i ++ ) {
 
 		var keys = Object.keys( testData[ i ] );
 
@@ -24,7 +24,7 @@ test( "Test CmdSetGeometryValue (Undo and Redo)", function() {
 			cmd.updatable = false;
 			editor.execute( cmd );
 
-		});
+		} );
 
 	}
 
@@ -43,4 +43,4 @@ test( "Test CmdSetGeometryValue (Undo and Redo)", function() {
 	ok( box.geometry.name == testData[ 1 ].name, "OK, box.geometry.name is correct after executes" );
 	ok( box.geometry.uuid == testData[ 1 ].uuid, "OK, box.geometry.uuid is correct after executes" );
 
-});
+} );

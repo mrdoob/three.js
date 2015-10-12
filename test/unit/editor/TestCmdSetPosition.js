@@ -9,9 +9,9 @@ test( "Test CmdSetPosition (Undo and Redo)", function() {
 
 	var positions = [
 
-		{ x:  50, y: -80, z: 30 },
-		{ x: -10, y: 100, z:  0 },
-		{ x:  44, y: -20, z: 90 }
+		{ x:   50, y: - 80, z: 30 },
+		{ x: - 10, y:  100, z:  0 },
+		{ x:   44, y: - 20, z: 90 }
 
 	];
 
@@ -22,7 +22,7 @@ test( "Test CmdSetPosition (Undo and Redo)", function() {
 		cmd.updatable = false;
 		editor.execute( cmd );
 
-	});
+	} );
 
 	ok( box.position.x == positions[ positions.length - 1 ].x, "OK, changing X position was successful" );
 	ok( box.position.y == positions[ positions.length - 1 ].y, "OK, changing Y position was successful" );
@@ -40,4 +40,4 @@ test( "Test CmdSetPosition (Undo and Redo)", function() {
 	ok( box.position.z == positions[ positions.length - 1 ].z, "OK, changing Z position was successful (after redo)" );
 
 
-});
+} );

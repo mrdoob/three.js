@@ -1,6 +1,6 @@
-module("TestCmdSetScene");
+module( "TestCmdSetScene" );
 
-test("Test for CmdSetScene (Undo and Redo)", function() {
+test( "Test for CmdSetScene (Undo and Redo)", function() {
 
 	// setup
 	var editor = new Editor();
@@ -16,7 +16,7 @@ test("Test for CmdSetScene (Undo and Redo)", function() {
 		editor.execute( cmd );
 		return { obj: object, exportedData: exportScene( editor ) };
 
-	});
+	} );
 
 
 	// create new empty editor (scene), merge the other editors (scenes)
@@ -28,41 +28,41 @@ test("Test for CmdSetScene (Undo and Redo)", function() {
 		cmd.updatable = false;
 		editor.execute( cmd );
 
-	});
+	} );
 
 	// tests
 	ok( editor.scene.children.length = scenes.length,
-		"OK, all scenes have been merged");
+		"OK, all scenes have been merged" );
 
 	var i = 0;
-	while( i < editor.scene.children.length ) {
+	while ( i < editor.scene.children.length ) {
 
 		ok( editor.scene.children[ i ].name == scenes[ i ].obj.name,
-			"OK, editor.scene.children[ " + i + " ].name matches scenes[ " + i + " ].obj.name");
-		i++;
+			"OK, editor.scene.children[ " + i + " ].name matches scenes[ " + i + " ].obj.name" );
+		i ++;
 
 	}
 
 	editor.undo();
 	var i = 0;
-	while( i < editor.scene.children.length ) {
+	while ( i < editor.scene.children.length ) {
 
 		ok( editor.scene.children[ i ].name == scenes[ i ].obj.name,
-			"OK, editor.scene.children[ " + i + " ].name matches scenes[ " + i + " ].obj.name after undo");
-		i++;
+			"OK, editor.scene.children[ " + i + " ].name matches scenes[ " + i + " ].obj.name after undo" );
+		i ++;
 
 	}
 
 
 	editor.redo();
 	var i = 0;
-	while( i < editor.scene.children.length ) {
+	while ( i < editor.scene.children.length ) {
 
 		ok( editor.scene.children[ i ].name == scenes[ i ].obj.name,
-			"OK, editor.scene.children[ " + i + " ].name matches scenes[ " + i + " ].obj.name after redo");
-		i++;
+			"OK, editor.scene.children[ " + i + " ].name matches scenes[ " + i + " ].obj.name after redo" );
+		i ++;
 
 	}
 
 
-});
+} );

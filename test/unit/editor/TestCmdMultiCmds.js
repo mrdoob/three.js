@@ -14,14 +14,19 @@ test( "Test CmdMultiCmds (Undo and Redo)", function() {
 
 	// setup first multi commands
 	var firstMultiCmds = [
-		new CmdSetGeometry( box, boxGeometries[0] ),
+
+		new CmdSetGeometry( box, boxGeometries[ 0 ] ),
 		new CmdSetPosition( box, new THREE.Vector3( 1, 2, 3 ) ),
 		new CmdSetRotation( box, new THREE.Euler( 0.1, 0.2, 0.2 ) ),
 		new CmdSetScale( box, new THREE.Vector3( 1.1, 1.2, 1.3 ) )
+
 	];
+
 	firstMultiCmds.map( function( cmd ) {
+
 		cmd.updatable = false;
-	});
+
+	} );
 
 	var firstMultiCmd = new CmdMultiCmds( firstMultiCmds );
 	firstMultiCmd.updatable = false;
@@ -30,14 +35,19 @@ test( "Test CmdMultiCmds (Undo and Redo)", function() {
 
 	// setup second multi commands
 	var secondMultiCmds = [
-		new CmdSetGeometry( box, boxGeometries[1] ),
+
+		new CmdSetGeometry( box, boxGeometries[ 1 ] ),
 		new CmdSetPosition( box, new THREE.Vector3( 4, 5, 6 ) ),
 		new CmdSetRotation( box, new THREE.Euler( 0.4, 0.5, 0.6 ) ),
 		new CmdSetScale( box, new THREE.Vector3( 1.4, 1.5, 1.6 ) )
+
 	];
+
 	secondMultiCmds.map( function( cmd ) {
+
 		cmd.updatable = false;
-	});
+
+	} );
 
 	var secondMultiCmd = new CmdMultiCmds( secondMultiCmds );
 	secondMultiCmd.updatable = false;
@@ -62,4 +72,4 @@ test( "Test CmdMultiCmds (Undo and Redo)", function() {
 	ok( box.rotation.x == 0.4, "OK, x rotation has been modified accordingly after two multi executes (expected: 0.4, actual: " + box.rotation.x + ") " );
 	ok( box.scale.z == 1.6, "OK, z scale has been modified accordingly after two multi executes (expected: 1.6, actual: " + box.scale.z + ")" );
 
-});
+} );

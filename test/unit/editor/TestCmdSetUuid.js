@@ -1,6 +1,6 @@
 module( "CmdSetUuid" );
 
-test( "Test CmdSetUuid (Undo and Redo)", function(){
+test( "Test CmdSetUuid (Undo and Redo)", function() {
 
 	var editor = new Editor();
 	var object = aBox( 'UUID test box' );
@@ -15,7 +15,7 @@ test( "Test CmdSetUuid (Undo and Redo)", function(){
 		cmd.updatable = false;
 		editor.execute( cmd );
 
-	});
+	} );
 
 	ok( object.uuid == uuids[ uuids.length - 1 ],
 		"OK, UUID on actual object matches last UUID in the test data array " );
@@ -29,4 +29,4 @@ test( "Test CmdSetUuid (Undo and Redo)", function(){
 		"OK, UUID on actual object matches last UUID in the test data array again (after redo) " );
 
 
-});
+} );

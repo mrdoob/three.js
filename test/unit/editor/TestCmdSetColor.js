@@ -1,6 +1,6 @@
 module( "CmdSetColor" );
 
-test("Test CmdSetColor (Undo and Redo)", function() {
+test( "Test CmdSetColor (Undo and Redo)", function() {
 
 	var editor = new Editor();
 	var pointLight = aPointlight( "The light Light" );
@@ -18,7 +18,7 @@ test("Test CmdSetColor (Undo and Redo)", function() {
 		cmd.updatable = false;
 		editor.execute( cmd );
 
-	});
+	} );
 
 	ok( pointLight.color.getHex() == colors[ colors.length - 1 ],
 		"OK, color has been set successfully (expected: '" + colors[ colors.length - 1 ] + "', actual: '" + pointLight.color.getHex() + "')" );
@@ -32,4 +32,4 @@ test("Test CmdSetColor (Undo and Redo)", function() {
 		"OK, color has been set successfully after redo (expected: '" + colors[ colors.length - 1 ] + "', actual: '" + pointLight.color.getHex() + "')" );
 
 
-});
+} );
