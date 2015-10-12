@@ -29574,233 +29574,233 @@ THREE.Curve = function () {
 
 };
 
-// Virtual base class method to overwrite and implement in subclasses
-//	- t [0 .. 1]
+THREE.Curve.prototype = {
 
-THREE.Curve.prototype.getPoint = function ( t ) {
+	constructor: THREE.Curve,
 
-	console.warn( "THREE.Curve: Warning, getPoint() not implemented!" );
-	return null;
+	// Virtual base class method to overwrite and implement in subclasses
+	//	- t [0 .. 1]
 
-};
+	getPoint: function ( t ) {
 
-// Get point at relative position in curve according to arc length
-// - u [0 .. 1]
+		console.warn( "THREE.Curve: Warning, getPoint() not implemented!" );
+		return null;
 
-THREE.Curve.prototype.getPointAt = function ( u ) {
+	},
 
-	var t = this.getUtoTmapping( u );
-	return this.getPoint( t );
+	// Get point at relative position in curve according to arc length
+	// - u [0 .. 1]
 
-};
+	getPointAt: function ( u ) {
 
-// Get sequence of points using getPoint( t )
+		var t = this.getUtoTmapping( u );
+		return this.getPoint( t );
 
-THREE.Curve.prototype.getPoints = function ( divisions ) {
+	},
 
-	if ( ! divisions ) divisions = 5;
+	// Get sequence of points using getPoint( t )
 
-	var d, pts = [];
+	getPoints: function ( divisions ) {
 
-	for ( d = 0; d <= divisions; d ++ ) {
+		if ( ! divisions ) divisions = 5;
 
-		pts.push( this.getPoint( d / divisions ) );
+		var d, pts = [];
 
-	}
+		for ( d = 0; d <= divisions; d ++ ) {
 
-	return pts;
-
-};
-
-// Get sequence of points using getPointAt( u )
-
-THREE.Curve.prototype.getSpacedPoints = function ( divisions ) {
-
-	if ( ! divisions ) divisions = 5;
-
-	var d, pts = [];
-
-	for ( d = 0; d <= divisions; d ++ ) {
-
-		pts.push( this.getPointAt( d / divisions ) );
-
-	}
-
-	return pts;
-
-};
-
-// Get total curve arc length
-
-THREE.Curve.prototype.getLength = function () {
-
-	var lengths = this.getLengths();
-	return lengths[ lengths.length - 1 ];
-
-};
-
-// Get list of cumulative segment lengths
-
-THREE.Curve.prototype.getLengths = function ( divisions ) {
-
-	if ( ! divisions ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
-
-	if ( this.cacheArcLengths
-		&& ( this.cacheArcLengths.length === divisions + 1 )
-		&& ! this.needsUpdate ) {
-
-		//console.log( "cached", this.cacheArcLengths );
-		return this.cacheArcLengths;
-
-	}
-
-	this.needsUpdate = false;
-
-	var cache = [];
-	var current, last = this.getPoint( 0 );
-	var p, sum = 0;
-
-	cache.push( 0 );
-
-	for ( p = 1; p <= divisions; p ++ ) {
-
-		current = this.getPoint ( p / divisions );
-		sum += current.distanceTo( last );
-		cache.push( sum );
-		last = current;
-
-	}
-
-	this.cacheArcLengths = cache;
-
-	return cache; // { sums: cache, sum:sum }; Sum is in the last element.
-
-};
-
-
-THREE.Curve.prototype.updateArcLengths = function() {
-
-	this.needsUpdate = true;
-	this.getLengths();
-
-};
-
-// Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant
-
-THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
-
-	var arcLengths = this.getLengths();
-
-	var i = 0, il = arcLengths.length;
-
-	var targetArcLength; // The targeted u distance value to get
-
-	if ( distance ) {
-
-		targetArcLength = distance;
-
-	} else {
-
-		targetArcLength = u * arcLengths[ il - 1 ];
-
-	}
-
-	//var time = Date.now();
-
-	// binary search for the index with largest value smaller than target u distance
-
-	var low = 0, high = il - 1, comparison;
-
-	while ( low <= high ) {
-
-		i = Math.floor( low + ( high - low ) / 2 ); // less likely to overflow, though probably not issue here, JS doesn't really have integers, all numbers are floats
-
-		comparison = arcLengths[ i ] - targetArcLength;
-
-		if ( comparison < 0 ) {
-
-			low = i + 1;
-
-		} else if ( comparison > 0 ) {
-
-			high = i - 1;
-
-		} else {
-
-			high = i;
-			break;
-
-			// DONE
+			pts.push( this.getPoint( d / divisions ) );
 
 		}
 
-	}
+		return pts;
 
-	i = high;
+	},
 
-	//console.log('b' , i, low, high, Date.now()- time);
+	// Get sequence of points using getPointAt( u )
 
-	if ( arcLengths[ i ] === targetArcLength ) {
+	getSpacedPoints: function ( divisions ) {
 
-		var t = i / ( il - 1 );
+		if ( ! divisions ) divisions = 5;
+
+		var d, pts = [];
+
+		for ( d = 0; d <= divisions; d ++ ) {
+
+			pts.push( this.getPointAt( d / divisions ) );
+
+		}
+
+		return pts;
+
+	},
+
+	// Get total curve arc length
+
+	getLength: function () {
+
+		var lengths = this.getLengths();
+		return lengths[ lengths.length - 1 ];
+
+	},
+
+	// Get list of cumulative segment lengths
+
+	getLengths: function ( divisions ) {
+
+		if ( ! divisions ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
+
+		if ( this.cacheArcLengths
+			&& ( this.cacheArcLengths.length === divisions + 1 )
+			&& ! this.needsUpdate ) {
+
+			//console.log( "cached", this.cacheArcLengths );
+			return this.cacheArcLengths;
+
+		}
+
+		this.needsUpdate = false;
+
+		var cache = [];
+		var current, last = this.getPoint( 0 );
+		var p, sum = 0;
+
+		cache.push( 0 );
+
+		for ( p = 1; p <= divisions; p ++ ) {
+
+			current = this.getPoint ( p / divisions );
+			sum += current.distanceTo( last );
+			cache.push( sum );
+			last = current;
+
+		}
+
+		this.cacheArcLengths = cache;
+
+		return cache; // { sums: cache, sum:sum }; Sum is in the last element.
+
+	},
+
+	updateArcLengths: function() {
+
+		this.needsUpdate = true;
+		this.getLengths();
+
+	},
+
+	// Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant
+
+	getUtoTmapping: function ( u, distance ) {
+
+		var arcLengths = this.getLengths();
+
+		var i = 0, il = arcLengths.length;
+
+		var targetArcLength; // The targeted u distance value to get
+
+		if ( distance ) {
+
+			targetArcLength = distance;
+
+		} else {
+
+			targetArcLength = u * arcLengths[ il - 1 ];
+
+		}
+
+		//var time = Date.now();
+
+		// binary search for the index with largest value smaller than target u distance
+
+		var low = 0, high = il - 1, comparison;
+
+		while ( low <= high ) {
+
+			i = Math.floor( low + ( high - low ) / 2 ); // less likely to overflow, though probably not issue here, JS doesn't really have integers, all numbers are floats
+
+			comparison = arcLengths[ i ] - targetArcLength;
+
+			if ( comparison < 0 ) {
+
+				low = i + 1;
+
+			} else if ( comparison > 0 ) {
+
+				high = i - 1;
+
+			} else {
+
+				high = i;
+				break;
+
+				// DONE
+
+			}
+
+		}
+
+		i = high;
+
+		//console.log('b' , i, low, high, Date.now()- time);
+
+		if ( arcLengths[ i ] === targetArcLength ) {
+
+			var t = i / ( il - 1 );
+			return t;
+
+		}
+
+		// we could get finer grain at lengths, or use simple interpolation between two points
+
+		var lengthBefore = arcLengths[ i ];
+		var lengthAfter = arcLengths[ i + 1 ];
+
+		var segmentLength = lengthAfter - lengthBefore;
+
+		// determine where we are between the 'before' and 'after' points
+
+		var segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
+
+		// add that fractional amount to t
+
+		var t = ( i + segmentFraction ) / ( il - 1 );
+
 		return t;
 
+	},
+
+	// Returns a unit vector tangent at t
+	// In case any sub curve does not implement its tangent derivation,
+	// 2 points a small delta apart will be used to find its gradient
+	// which seems to give a reasonable approximation
+
+	getTangent: function( t ) {
+
+		var delta = 0.0001;
+		var t1 = t - delta;
+		var t2 = t + delta;
+
+		// Capping in case of danger
+
+		if ( t1 < 0 ) t1 = 0;
+		if ( t2 > 1 ) t2 = 1;
+
+		var pt1 = this.getPoint( t1 );
+		var pt2 = this.getPoint( t2 );
+
+		var vec = pt2.clone().sub( pt1 );
+		return vec.normalize();
+
+	},
+
+	getTangentAt: function ( u ) {
+
+		var t = this.getUtoTmapping( u );
+		return this.getTangent( t );
+
 	}
 
-	// we could get finer grain at lengths, or use simple interpolation between two points
-
-	var lengthBefore = arcLengths[ i ];
-	var lengthAfter = arcLengths[ i + 1 ];
-
-	var segmentLength = lengthAfter - lengthBefore;
-
-	// determine where we are between the 'before' and 'after' points
-
-	var segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
-
-	// add that fractional amount to t
-
-	var t = ( i + segmentFraction ) / ( il - 1 );
-
-	return t;
-
-};
-
-// Returns a unit vector tangent at t
-// In case any sub curve does not implement its tangent derivation,
-// 2 points a small delta apart will be used to find its gradient
-// which seems to give a reasonable approximation
-
-THREE.Curve.prototype.getTangent = function( t ) {
-
-	var delta = 0.0001;
-	var t1 = t - delta;
-	var t2 = t + delta;
-
-	// Capping in case of danger
-
-	if ( t1 < 0 ) t1 = 0;
-	if ( t2 > 1 ) t2 = 1;
-
-	var pt1 = this.getPoint( t1 );
-	var pt2 = this.getPoint( t2 );
-
-	var vec = pt2.clone().sub( pt1 );
-	return vec.normalize();
-
-};
-
-
-THREE.Curve.prototype.getTangentAt = function ( u ) {
-
-	var t = this.getUtoTmapping( u );
-	return this.getTangent( t );
-
-};
-
-
-
-
+}
 
 /**************************************************************
  *	Utils
@@ -29901,11 +29901,13 @@ THREE.CurvePath.prototype.add = function ( curve ) {
 
 };
 
+/*
 THREE.CurvePath.prototype.checkConnection = function() {
 	// TODO
 	// If the ending of curve is not connected to the starting
 	// or the next curve, then, this is not a real path
 };
+*/
 
 THREE.CurvePath.prototype.closePath = function() {
 
@@ -29936,7 +29938,7 @@ THREE.CurvePath.prototype.getPoint = function( t ) {
 
 	var d = t * this.getLength();
 	var curveLengths = this.getCurveLengths();
-	var i = 0, diff, curve;
+	var i = 0;
 
 	// To think about boundaries points.
 
@@ -29944,8 +29946,8 @@ THREE.CurvePath.prototype.getPoint = function( t ) {
 
 		if ( curveLengths[ i ] >= d ) {
 
-			diff = curveLengths[ i ] - d;
-			curve = this.curves[ i ];
+			var diff = curveLengths[ i ] - d;
+			var curve = this.curves[ i ];
 
 			var u = 1 - diff / curve.getLength();
 
@@ -29965,8 +29967,8 @@ THREE.CurvePath.prototype.getPoint = function( t ) {
 
 /*
 THREE.CurvePath.prototype.getTangent = function( t ) {
-};*/
-
+};
+*/
 
 // We cannot use the default THREE.Curve getPoint() with getLength() because in
 // THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
@@ -29996,9 +29998,8 @@ THREE.CurvePath.prototype.getCurveLengths = function() {
 	// Push sums into cached array
 
 	var lengths = [], sums = 0;
-	var i, il = this.curves.length;
 
-	for ( i = 0; i < il; i ++ ) {
+	for ( var i = 0, l = this.curves.length; i < l; i ++ ) {
 
 		sums += this.curves[ i ].getLength();
 		lengths.push( sums );
@@ -30025,15 +30026,13 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
 	maxX = maxY = Number.NEGATIVE_INFINITY;
 	minX = minY = Number.POSITIVE_INFINITY;
 
-	var p, i, il, sum;
-
 	var v3 = points[ 0 ] instanceof THREE.Vector3;
 
-	sum = v3 ? new THREE.Vector3() : new THREE.Vector2();
+	var sum = v3 ? new THREE.Vector3() : new THREE.Vector2();
 
-	for ( i = 0, il = points.length; i < il; i ++ ) {
+	for ( var i = 0, l = points.length; i < l; i ++ ) {
 
-		p = points[ i ];
+		var p = points[ i ];
 
 		if ( p.x > maxX ) maxX = p.x;
 		else if ( p.x < minX ) minX = p.x;
@@ -30098,9 +30097,10 @@ THREE.CurvePath.prototype.createGeometry = function( points ) {
 
 	var geometry = new THREE.Geometry();
 
-	for ( var i = 0; i < points.length; i ++ ) {
+	for ( var i = 0, l = points.length; i < l; i ++ ) {
 
-		geometry.vertices.push( new THREE.Vector3( points[ i ].x, points[ i ].y, points[ i ].z || 0 ) );
+		var point = points[ i ];
+		geometry.vertices.push( new THREE.Vector3( point.x, point.y, point.z || 0 ) );
 
 	}
 
@@ -30124,7 +30124,6 @@ THREE.CurvePath.prototype.addWrapPath = function ( bendpath ) {
 THREE.CurvePath.prototype.getTransformedPoints = function( segments, bends ) {
 
 	var oldPts = this.getPoints( segments ); // getPoints getSpacedPoints
-	var i, il;
 
 	if ( ! bends ) {
 
@@ -30132,7 +30131,7 @@ THREE.CurvePath.prototype.getTransformedPoints = function( segments, bends ) {
 
 	}
 
-	for ( i = 0, il = bends.length; i < il; i ++ ) {
+	for ( var i = 0, l = bends.length; i < l; i ++ ) {
 
 		oldPts = this.getWrapPoints( oldPts, bends[ i ] );
 
@@ -30146,15 +30145,13 @@ THREE.CurvePath.prototype.getTransformedSpacedPoints = function( segments, bends
 
 	var oldPts = this.getSpacedPoints( segments );
 
-	var i, il;
-
 	if ( ! bends ) {
 
 		bends = this.bends;
 
 	}
 
-	for ( i = 0, il = bends.length; i < il; i ++ ) {
+	for ( var i = 0, l = bends.length; i < l; i ++ ) {
 
 		oldPts = this.getWrapPoints( oldPts, bends[ i ] );
 
@@ -30171,16 +30168,14 @@ THREE.CurvePath.prototype.getWrapPoints = function ( oldPts, path ) {
 
 	var bounds = this.getBoundingBox();
 
-	var i, il, p, oldX, oldY, xNorm;
+	for ( var i = 0, l = oldPts.length; i < l; i ++ ) {
 
-	for ( i = 0, il = oldPts.length; i < il; i ++ ) {
+		var p = oldPts[ i ];
 
-		p = oldPts[ i ];
+		var oldX = p.x;
+		var oldY = p.y;
 
-		oldX = p.x;
-		oldY = p.y;
-
-		xNorm = oldX / bounds.maxX;
+		var xNorm = oldX / bounds.maxX;
 
 		// If using actual distance, for length > path, requires line extrusions
 		//xNorm = path.getUtoTmapping(xNorm, oldX); // 3 styles. 1) wrap stretched. 2) wrap stretch by arc length 3) warp by actual distance
@@ -30228,7 +30223,6 @@ THREE.Path.prototype = Object.create( THREE.CurvePath.prototype );
 THREE.Path.prototype.constructor = THREE.Path;
 
 THREE.PathActions = {
-
 	MOVE_TO: 'moveTo',
 	LINE_TO: 'lineTo',
 	QUADRATIC_CURVE_TO: 'quadraticCurveTo', // Bezier quadratic curve
@@ -30247,9 +30241,9 @@ THREE.Path.prototype.fromPoints = function ( vectors ) {
 
 	this.moveTo( vectors[ 0 ].x, vectors[ 0 ].y );
 
-	for ( var v = 1, vlen = vectors.length; v < vlen; v ++ ) {
+	for ( var i = 1, l = vectors.length; i < l; i ++ ) {
 
-		this.lineTo( vectors[ v ].x, vectors[ v ].y );
+		this.lineTo( vectors[ i ].x, vectors[ i ].y );
 
 	}
 
@@ -30289,18 +30283,19 @@ THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
 
-	var curve = new THREE.QuadraticBezierCurve( new THREE.Vector2( x0, y0 ),
-												new THREE.Vector2( aCPx, aCPy ),
-												new THREE.Vector2( aX, aY ) );
+	var curve = new THREE.QuadraticBezierCurve(
+		new THREE.Vector2( x0, y0 ),
+		new THREE.Vector2( aCPx, aCPy ),
+		new THREE.Vector2( aX, aY )
+	);
+
 	this.curves.push( curve );
 
 	this.actions.push( { action: THREE.PathActions.QUADRATIC_CURVE_TO, args: args } );
 
 };
 
-THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y,
-											   aCP2x, aCP2y,
-											   aX, aY ) {
+THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
 
 	var args = Array.prototype.slice.call( arguments );
 
@@ -30309,10 +30304,13 @@ THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y,
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
 
-	var curve = new THREE.CubicBezierCurve( new THREE.Vector2( x0, y0 ),
-											new THREE.Vector2( aCP1x, aCP1y ),
-											new THREE.Vector2( aCP2x, aCP2y ),
-											new THREE.Vector2( aX, aY ) );
+	var curve = new THREE.CubicBezierCurve(
+		new THREE.Vector2( x0, y0 ),
+		new THREE.Vector2( aCP1x, aCP1y ),
+		new THREE.Vector2( aCP2x, aCP2y ),
+		new THREE.Vector2( aX, aY )
+	);
+
 	this.curves.push( curve );
 
 	this.actions.push( { action: THREE.PathActions.BEZIER_CURVE_TO, args: args } );
@@ -30326,7 +30324,7 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
-	//---
+
 	var npts = [ new THREE.Vector2( x0, y0 ) ];
 	Array.prototype.push.apply( npts, pts );
 
@@ -30339,8 +30337,7 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 // FUTURE: Change the API or follow canvas API?
 
-THREE.Path.prototype.arc = function ( aX, aY, aRadius,
-									  aStartAngle, aEndAngle, aClockwise ) {
+THREE.Path.prototype.arc = function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
 	var lastargs = this.actions[ this.actions.length - 1 ].args;
 	var x0 = lastargs[ lastargs.length - 2 ];
@@ -30351,28 +30348,24 @@ THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 
  };
 
- THREE.Path.prototype.absarc = function ( aX, aY, aRadius,
-									  aStartAngle, aEndAngle, aClockwise ) {
+ THREE.Path.prototype.absarc = function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
 	this.absellipse( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 
  };
 
-THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius,
-									  aStartAngle, aEndAngle, aClockwise, aRotation ) {
+THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
 	var lastargs = this.actions[ this.actions.length - 1 ].args;
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
 
-	this.absellipse( aX + x0, aY + y0, xRadius, yRadius,
-		aStartAngle, aEndAngle, aClockwise, aRotation );
+	this.absellipse( aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
 
  };
 
 
-THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
-									  aStartAngle, aEndAngle, aClockwise, aRotation ) {
+THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
 	var args = [
 		aX, aY,
@@ -30381,8 +30374,8 @@ THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
 		aClockwise,
 		aRotation || 0 // aRotation is optional.
 	];
-	var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius,
-									aStartAngle, aEndAngle, aClockwise, aRotation );
+
+	var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
 	this.curves.push( curve );
 
 	var lastPoint = curve.getPoint( 1 );
@@ -30431,17 +30424,15 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 	var points = [];
 
-	var i, il, item, action, args;
 	var cpx, cpy, cpx2, cpy2, cpx1, cpy1, cpx0, cpy0,
-		laste, j,
-		t, tx, ty;
+		laste, tx, ty;
 
-	for ( i = 0, il = this.actions.length; i < il; i ++ ) {
+	for ( var i = 0, l = this.actions.length; i < l; i ++ ) {
 
-		item = this.actions[ i ];
+		var item = this.actions[ i ];
 
-		action = item.action;
-		args = item.args;
+		var action = item.action;
+		var args = item.args;
 
 		switch ( action ) {
 
@@ -30481,9 +30472,9 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			}
 
-			for ( j = 1; j <= divisions; j ++ ) {
+			for ( var j = 1; j <= divisions; j ++ ) {
 
-				t = j / divisions;
+				var t = j / divisions;
 
 				tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
 				ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
@@ -30522,9 +30513,9 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 			}
 
 
-			for ( j = 1; j <= divisions; j ++ ) {
+			for ( var j = 1; j <= divisions; j ++ ) {
 
-				t = j / divisions;
+				var t = j / divisions;
 
 				tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
 				ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
@@ -30548,7 +30539,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			var spline = new THREE.SplineCurve( spts );
 
-			for ( j = 1; j <= n; j ++ ) {
+			for ( var j = 1; j <= n; j ++ ) {
 
 				points.push( spline.getPointAt( j / n ) );
 
@@ -30567,9 +30558,9 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 			var angle;
 			var tdivisions = divisions * 2;
 
-			for ( j = 1; j <= tdivisions; j ++ ) {
+			for ( var j = 1; j <= tdivisions; j ++ ) {
 
-				t = j / tdivisions;
+				var t = j / tdivisions;
 
 				if ( ! aClockwise ) {
 
@@ -30608,15 +30599,15 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			var cos, sin;
 			if ( aRotation !== 0 ) {
-		
+
 				cos = Math.cos( aRotation );
 				sin = Math.sin( aRotation );
 
 			}
 
-			for ( j = 1; j <= tdivisions; j ++ ) {
+			for ( var j = 1; j <= tdivisions; j ++ ) {
 
-				t = j / tdivisions;
+				var t = j / tdivisions;
 
 				if ( ! aClockwise ) {
 
@@ -30687,16 +30678,14 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 	function extractSubpaths( inActions ) {
 
-		var i, il, item, action, args;
-
 		var subPaths = [], lastPath = new THREE.Path();
 
-		for ( i = 0, il = inActions.length; i < il; i ++ ) {
+		for ( var i = 0, l = inActions.length; i < l; i ++ ) {
 
-			item = inActions[ i ];
+			var item = inActions[ i ];
 
-			args = item.args;
-			action = item.action;
+			var args = item.args;
+			var action = item.action;
 
 			if ( action === THREE.PathActions.MOVE_TO ) {
 
@@ -30729,7 +30718,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 		var shapes = [];
 
-		for ( var i = 0, il = inSubpaths.length; i < il; i ++ ) {
+		for ( var i = 0, l = inSubpaths.length; i < l; i ++ ) {
 
 			var tmpPath = inSubpaths[ i ];
 
@@ -30842,9 +30831,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 	newShapes[ mainIdx ] = undefined;
 	newShapeHoles[ mainIdx ] = [];
 
-	var i, il;
-
-	for ( i = 0, il = subPaths.length; i < il; i ++ ) {
+	for ( var i = 0, l = subPaths.length; i < l; i ++ ) {
 
 		tmpPath = subPaths[ i ];
 		tmpPoints = tmpPath.getPoints();
@@ -30888,13 +30875,16 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			betterShapeHoles[ sIdx ] = [];
 
 		}
+
 		for ( var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
 
 			var sho = newShapeHoles[ sIdx ];
+
 			for ( var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
 
 				var ho = sho[ hIdx ];
 				var hole_unassigned = true;
+
 				for ( var s2Idx = 0; s2Idx < newShapes.length; s2Idx ++ ) {
 
 					if ( isPointInsidePolygon( ho.p, newShapes[ s2Idx ].p ) ) {
@@ -30933,13 +30923,15 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 	}
 
-	var tmpHoles, j, jl;
-	for ( i = 0, il = newShapes.length; i < il; i ++ ) {
+	var tmpHoles;
+
+	for ( var i = 0, il = newShapes.length; i < il; i ++ ) {
 
 		tmpShape = newShapes[ i ].s;
 		shapes.push( tmpShape );
 		tmpHoles = newShapeHoles[ i ];
-		for ( j = 0, jl = tmpHoles.length; j < jl; j ++ ) {
+
+		for ( var j = 0, jl = tmpHoles.length; j < jl; j ++ ) {
 
 			tmpShape.holes.push( tmpHoles[ j ].h );
 
@@ -30969,6 +30961,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 THREE.Shape = function () {
 
 	THREE.Path.apply( this, arguments );
+
 	this.holes = [];
 
 };
@@ -30980,8 +30973,7 @@ THREE.Shape.prototype.constructor = THREE.Shape;
 
 THREE.Shape.prototype.extrude = function ( options ) {
 
-	var extruded = new THREE.ExtrudeGeometry( this, options );
-	return extruded;
+	return new THREE.ExtrudeGeometry( this, options );
 
 };
 
@@ -30989,8 +30981,7 @@ THREE.Shape.prototype.extrude = function ( options ) {
 
 THREE.Shape.prototype.makeGeometry = function ( options ) {
 
-	var geometry = new THREE.ShapeGeometry( this, options );
-	return geometry;
+	return new THREE.ShapeGeometry( this, options );
 
 };
 
@@ -30998,9 +30989,9 @@ THREE.Shape.prototype.makeGeometry = function ( options ) {
 
 THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
 
-	var i, il = this.holes.length, holesPts = [];
+	var holesPts = [];
 
-	for ( i = 0; i < il; i ++ ) {
+	for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
 
 		holesPts[ i ] = this.holes[ i ].getTransformedPoints( divisions, this.bends );
 
@@ -31014,9 +31005,9 @@ THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
 
 THREE.Shape.prototype.getSpacedPointsHoles = function ( divisions ) {
 
-	var i, il = this.holes.length, holesPts = [];
+	var holesPts = [];
 
-	for ( i = 0; i < il; i ++ ) {
+	for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
 
 		holesPts[ i ] = this.holes[ i ].getTransformedSpacedPoints( divisions, this.bends );
 
@@ -31052,17 +31043,18 @@ THREE.Shape.prototype.extractPoints = function ( divisions ) {
 
 };
 
-//
-// THREE.Shape.prototype.extractAllPointsWithBend = function ( divisions, bend ) {
-//
-// 	return {
-//
-// 		shape: this.transform( bend, divisions ),
-// 		holes: this.getPointsHoles( divisions, bend )
-//
-// 	};
-//
-// };
+/*
+THREE.Shape.prototype.extractAllPointsWithBend = function ( divisions, bend ) {
+
+	return {
+
+		shape: this.transform( bend, divisions ),
+		holes: this.getPointsHoles( divisions, bend )
+
+	};
+
+};
+*/
 
 // Get points of shape and holes (spaced by regular distance)
 
@@ -32369,16 +32361,16 @@ THREE.BoxGeometry.prototype.constructor = THREE.BoxGeometry;
 
 THREE.BoxGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.BoxGeometry(
-		this.parameters.width,
-		this.parameters.height,
-		this.parameters.depth,
-		this.parameters.widthSegments,
-		this.parameters.heightSegments,
-		this.parameters.depthSegments
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.BoxGeometry(
+		parameters.width,
+		parameters.height,
+		parameters.depth,
+		parameters.widthSegments,
+		parameters.heightSegments,
+		parameters.depthSegments
+	);
 
 };
 
@@ -32448,14 +32440,14 @@ THREE.CircleGeometry.prototype.constructor = THREE.CircleGeometry;
 
 THREE.CircleGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.CircleGeometry(
-		this.parameters.radius,
-		this.parameters.segments,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.CircleGeometry(
+		parameters.radius,
+		parameters.segments,
+		parameters.thetaStart,
+		parameters.thetaLength
+	);
 
 };
 
@@ -32533,16 +32525,14 @@ THREE.CircleBufferGeometry.prototype.constructor = THREE.CircleBufferGeometry;
 
 THREE.CircleBufferGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.CircleBufferGeometry(
-		this.parameters.radius,
-		this.parameters.segments,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
+	var parameters = this.parameters;
+
+	return new THREE.CircleBufferGeometry(
+		parameters.radius,
+		parameters.segments,
+		parameters.thetaStart,
+		parameters.thetaLength
 	);
-
-	geometry.copy( this );
-
-	return geometry;
 
 };
 
@@ -32723,18 +32713,18 @@ THREE.CylinderGeometry.prototype.constructor = THREE.CylinderGeometry;
 
 THREE.CylinderGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.CylinderGeometry(
-		this.parameters.radiusTop,
-		this.parameters.radiusBottom,
-		this.parameters.height,
-		this.parameters.radialSegments,
-		this.parameters.heightSegments,
-		this.parameters.openEnded,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.CylinderGeometry(
+		parameters.radiusTop,
+		parameters.radiusBottom,
+		parameters.height,
+		parameters.radialSegments,
+		parameters.heightSegments,
+		parameters.openEnded,
+		parameters.thetaStart,
+		parameters.thetaLength
+	);
 
 };
 
@@ -33817,14 +33807,14 @@ THREE.PlaneGeometry.prototype.constructor = THREE.PlaneGeometry;
 
 THREE.PlaneGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.PlaneGeometry(
-		this.parameters.width,
-		this.parameters.height,
-		this.parameters.widthSegments,
-		this.parameters.heightSegments
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.PlaneGeometry(
+		parameters.width,
+		parameters.height,
+		parameters.widthSegments,
+		parameters.heightSegments
+	);
 
 };
 
@@ -33929,16 +33919,14 @@ THREE.PlaneBufferGeometry.prototype.constructor = THREE.PlaneBufferGeometry;
 
 THREE.PlaneBufferGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.PlaneBufferGeometry(
-		this.parameters.width,
-		this.parameters.height,
-		this.parameters.widthSegments,
-		this.parameters.heightSegments
+	var parameters = this.parameters;
+
+	return new THREE.PlaneBufferGeometry(
+		parameters.width,
+		parameters.height,
+		parameters.widthSegments,
+		parameters.heightSegments
 	);
-
-	geometry.copy( this );
-
-	return geometry;
 
 };
 
@@ -34039,16 +34027,16 @@ THREE.RingGeometry.prototype.constructor = THREE.RingGeometry;
 
 THREE.RingGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.RingGeometry(
-		this.parameters.innerRadius,
-		this.parameters.outerRadius,
-		this.parameters.thetaSegments,
-		this.parameters.phiSegments,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.RingGeometry(
+		parameters.innerRadius,
+		parameters.outerRadius,
+		parameters.thetaSegments,
+		parameters.phiSegments,
+		parameters.thetaStart,
+		parameters.thetaLength
+	);
 
 };
 
@@ -34083,17 +34071,17 @@ THREE.SphereGeometry.prototype.constructor = THREE.SphereGeometry;
 
 THREE.SphereGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.SphereGeometry(
-		this.parameters.radius,
-		this.parameters.widthSegments,
-		this.parameters.heightSegments,
-		this.parameters.phiStart,
-		this.parameters.phiLength,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.SphereGeometry(
+		parameters.radius,
+		parameters.widthSegments,
+		parameters.heightSegments,
+		parameters.phiStart,
+		parameters.phiLength,
+		parameters.thetaStart,
+		parameters.thetaLength
+	);
 
 };
 
@@ -34203,19 +34191,17 @@ THREE.SphereBufferGeometry.prototype.constructor = THREE.SphereBufferGeometry;
 
 THREE.SphereBufferGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.SphereBufferGeometry(
-		this.parameters.radius,
-		this.parameters.widthSegments,
-		this.parameters.heightSegments,
-		this.parameters.phiStart,
-		this.parameters.phiLength,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
+	var parameters = this.parameters;
+
+	return new THREE.SphereBufferGeometry(
+		parameters.radius,
+		parameters.widthSegments,
+		parameters.heightSegments,
+		parameters.phiStart,
+		parameters.phiLength,
+		parameters.thetaStart,
+		parameters.thetaLength
 	);
-
-	geometry.copy( this );
-
-	return geometry;
 
 };
 
@@ -34368,15 +34354,15 @@ THREE.TorusGeometry.prototype.constructor = THREE.TorusGeometry;
 
 THREE.TorusGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.TorusGeometry(
-		this.parameters.radius,
-		this.parameters.tube,
-		this.parameters.radialSegments,
-		this.parameters.tubularSegments,
-		this.parameters.arc
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.TorusGeometry(
+		parameters.radius,
+		parameters.tube,
+		parameters.radialSegments,
+		parameters.tubularSegments,
+		parameters.arc
+	);
 
 };
 
@@ -34499,17 +34485,17 @@ THREE.TorusKnotGeometry.prototype.constructor = THREE.TorusKnotGeometry;
 
 THREE.TorusKnotGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.TorusKnotGeometry(
-		this.parameters.radius,
-		this.parameters.tube,
-		this.parameters.radialSegments,
-		this.parameters.tubularSegments,
-		this.parameters.p,
-		this.parameters.q,
-		this.parameters.heightScale
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.TorusKnotGeometry(
+		parameters.radius,
+		parameters.tube,
+		parameters.radialSegments,
+		parameters.tubularSegments,
+		parameters.p,
+		parameters.q,
+		parameters.heightScale
+	);
 
 };
 
@@ -35076,21 +35062,14 @@ THREE.PolyhedronGeometry.prototype.constructor = THREE.PolyhedronGeometry;
 
 THREE.PolyhedronGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.PolyhedronGeometry(
-		this.parameters.vertices,
-		this.parameters.indices,
-		this.parameters.radius,
-		this.parameters.detail
+	var parameters = this.parameters;
+
+	return new THREE.PolyhedronGeometry(
+		parameters.vertices,
+		parameters.indices,
+		parameters.radius,
+		parameters.detail
 	);
-
-	return geometry.copy( this );
-
-};
-
-THREE.PolyhedronGeometry.prototype.copy = function ( source ) {
-
-	THREE.Geometry.prototype.copy.call( this, source );
-	return this;
 
 };
 
@@ -35157,14 +35136,12 @@ THREE.DodecahedronGeometry.prototype.constructor = THREE.DodecahedronGeometry;
 
 THREE.DodecahedronGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.DodecahedronGeometry(
-		this.parameters.radius,
-		this.parameters.detail
+	var parameters = this.parameters;
+
+	return new THREE.DodecahedronGeometry(
+		parameters.radius,
+		parameters.detail
 	);
-
-	geometry.copy( this );
-
-	return geometry;
 
 };
 
@@ -35207,14 +35184,12 @@ THREE.IcosahedronGeometry.prototype.constructor = THREE.IcosahedronGeometry;
 
 THREE.IcosahedronGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.IcosahedronGeometry(
-		this.parameters.radius,
-		this.parameters.detail
+	var parameters = this.parameters;
+
+	return new THREE.IcosahedronGeometry(
+		parameters.radius,
+		parameters.detail
 	);
-
-	geometry.copy( this );
-
-	return geometry;
 
 };
 
@@ -35250,14 +35225,12 @@ THREE.OctahedronGeometry.prototype.constructor = THREE.OctahedronGeometry;
 
 THREE.OctahedronGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.OctahedronGeometry(
-		this.parameters.radius,
-		this.parameters.detail
+	var parameters = this.parameters;
+
+	return new THREE.OctahedronGeometry(
+		parameters.radius,
+		parameters.detail
 	);
-
-	geometry.copy( this );
-
-	return geometry;
 
 };
 
@@ -35293,14 +35266,12 @@ THREE.TetrahedronGeometry.prototype.constructor = THREE.TetrahedronGeometry;
 
 THREE.TetrahedronGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.TetrahedronGeometry(
-		this.parameters.radius,
-		this.parameters.detail
+	var parameters = this.parameters;
+
+	return new THREE.TetrahedronGeometry(
+		parameters.radius,
+		parameters.detail
 	);
-
-	geometry.copy( this );
-
-	return geometry;
 
 };
 
