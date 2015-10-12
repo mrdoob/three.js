@@ -1,13 +1,14 @@
 module( "Serialization" );
 
-asyncTest( "Test Serialization", function() {
+test( "Test Serialization", function( assert ) {
 
 	// setup
 	var editor = new Editor();
+	var done = assert.async();
 	editor.storage.init( function () {
 
 		performTests();
-		start(); // continue running other tests
+		done(); // continue running other tests
 
 	} );
 
