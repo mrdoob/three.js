@@ -84,7 +84,7 @@ THREE.ShaderLib = {
 
 			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	vec3 totalAmbientLight = vec3( 1.0 );", // hardwired
+			"	vec3 shadowMask = vec3( 1.0 );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
@@ -93,11 +93,11 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 				THREE.ShaderChunk[ "aomap_fragment" ],
+				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
-			"	outgoingLight = diffuseColor.rgb * totalAmbientLight;", // simple shader
+			"	outgoingLight = diffuseColor.rgb * shadowMask;",
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
-				THREE.ShaderChunk[ "shadowmap_fragment" ],		// TODO: Shadows on an otherwise unlit surface doesn't make sense.
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
@@ -209,6 +209,7 @@ THREE.ShaderLib = {
 			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 			"	vec3 totalAmbientLight = ambientLightColor;",
+			"	vec3 shadowMask = vec3( 1.0 );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
@@ -216,22 +217,22 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
+				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 			"	#ifdef DOUBLE_SIDED",
 
 			"		if ( gl_FrontFacing )",
-			"			outgoingLight += diffuseColor.rgb * ( vLightFront + totalAmbientLight ) + emissive;",
+			"			outgoingLight += diffuseColor.rgb * ( vLightFront * shadowMask + totalAmbientLight ) + emissive;",
 			"		else",
-			"			outgoingLight += diffuseColor.rgb * ( vLightBack + totalAmbientLight ) + emissive;",
+			"			outgoingLight += diffuseColor.rgb * ( vLightBack * shadowMask + totalAmbientLight ) + emissive;",
 
 			"	#else",
 
-			"		outgoingLight += diffuseColor.rgb * ( vLightFront + totalAmbientLight ) + emissive;",
+			"		outgoingLight += diffuseColor.rgb * ( vLightFront * shadowMask + totalAmbientLight ) + emissive;",
 
 			"	#endif",
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
-				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
@@ -362,6 +363,7 @@ THREE.ShaderLib = {
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 			"	vec3 totalAmbientLight = ambientLightColor;",
 			"	vec3 totalEmissiveLight = emissive;",
+			"	vec3 shadowMask = vec3( 1.0 );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
@@ -376,6 +378,10 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "emissivemap_fragment" ],
 
 				THREE.ShaderChunk[ "lights_phong_fragment" ],
+				THREE.ShaderChunk[ "shadowmap_fragment" ],
+
+				"totalDiffuseLight *= shadowMask;",
+				"totalSpecularLight *= shadowMask;",
 
 				"#ifdef METAL",
 
@@ -388,7 +394,6 @@ THREE.ShaderLib = {
 				"#endif",
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
-				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
@@ -459,15 +464,16 @@ THREE.ShaderLib = {
 
 			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( psColor, opacity );",
+			"	vec3 shadowMask = vec3( 1.0 );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_particle_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
-
-			"	outgoingLight = diffuseColor.rgb;", // simple shader
-
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
+
+			"	outgoingLight = diffuseColor.rgb * shadowMask;",
+
 				THREE.ShaderChunk[ "fog_fragment" ],
 
 			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
