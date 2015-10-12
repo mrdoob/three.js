@@ -6,6 +6,8 @@ Sidebar.History = function ( editor ) {
 
 	var signals = editor.signals;
 
+	var config = editor.config;
+
 	var history = editor.history;
 
 	var container = new UI.CollapsiblePanel();
@@ -18,35 +20,16 @@ Sidebar.History = function ( editor ) {
 
 	container.addStatic( new UI.Text( 'HISTORY' ) );
 
-	// Actions
+	// Checkbox 'Save History'
+	var saveHistorySpan = new UI.Span().setPosition( 'absolute' ).setLeft( '200px' ).setFontSize( '13px' );
+	var saveHistoryCheckbox = new UI.Checkbox( config.getKey( 'project/history/stored' ) ).setLeft( '50px' ).onChange( function () {
 
-	var objectActions = new UI.Select().setPosition( 'absolute' ).setRight( '8px' ).setFontSize( '11px' );
-	objectActions.setOptions( {
+		config.setKey( 'project/history/stored', this.getValue() );
+		var saveHistory = this.getValue();
 
-		'Actions': 'Actions',
-		'Serialization': 'Serialize History?'
+		if ( saveHistory ) {
 
-	} );
-	objectActions.onClick( function ( event ) {
-
-		event.stopPropagation(); // Avoid panel collapsing
-
-	} );
-	objectActions.onChange( function ( event ) {
-
-		var currentValue = history.serializationEnabled ? 'yes' : 'no';
-
-		var response;
-		if ( ( response = prompt( 'Should the history be preserved across a browser refresh? (yes or no)', currentValue ) ) === null ) {
-
-			this.setValue( 'Actions' );
-			return;
-
-		}
-
-		if ( response.toLowerCase() === 'yes' ) {
-
-			alert( 'The history will be preserved across a browser refresh.' );
+			alert( 'The history will be preserved across a browser refresh.\nThis can have an impact on performance (mainly when working with textures)!' );
 
 			var lastUndoCmd = history.undos[ history.undos.length - 1 ];
 			var lastUndoId = ( lastUndoCmd !== undefined ) ? lastUndoCmd.id : 0;
@@ -54,16 +37,22 @@ Sidebar.History = function ( editor ) {
 
 		} else {
 
-			alert( 'The history will NOT be preserved across a browser refresh.' );
-			editor.history.disableSerialization();
+			signals.historyChanged.dispatch();
 
 		}
 
-		this.setValue( 'Actions' );
+	} );
+
+	saveHistorySpan.add( saveHistoryCheckbox );
+	saveHistorySpan.add( new UI.Text( 'Save History' ).setPosition( 'relative' ).setLeft( '5px' ) );
+
+	saveHistorySpan.onClick( function ( event ) {
+
+		event.stopPropagation(); // Avoid panel collapsing
 
 	} );
-	container.addStatic( objectActions );
 
+	container.addStatic( saveHistorySpan );
 
 	container.add( new UI.Break() );
 

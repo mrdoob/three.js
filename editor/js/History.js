@@ -12,7 +12,7 @@ History = function ( editor ) {
 	this.idCounter = 0;
 
 	this.historyDisabled = false;
-	this.serializationEnabled = true;
+	this.config = editor.config;
 
 	//Set editor-reference in Cmd
 
@@ -75,7 +75,7 @@ History.prototype = {
 		cmd.execute();
 		cmd.inMemory = true;
 
-		if ( this.serializationEnabled ) {
+		if ( this.config.getKey( 'project/history/stored' ) ) {
 
 			cmd.json = cmd.toJSON();	// serialize the cmd immediately after execution and append the json to the cmd
 
@@ -162,11 +162,10 @@ History.prototype = {
 	toJSON: function () {
 
 		var history = {};
-		history.serializationEnabled = this.serializationEnabled;
 		history.undos = [];
 		history.redos = [];
 
-		if ( ! this.serializationEnabled ) {
+		if ( ! this.config.getKey( 'project/history/stored' ) ) {
 
 			return history;
 
@@ -203,8 +202,6 @@ History.prototype = {
 	fromJSON: function ( json ) {
 
 		if ( json === undefined ) return;
-
-		this.serializationEnabled = json.serializationEnabled;
 
 		for ( var i = 0; i < json.undos.length; i ++ ) {
 
@@ -292,8 +289,6 @@ History.prototype = {
 
 	enableSerialization: function ( id ) {
 
-		if ( this.serializationEnabled ) return;
-
 		/**
 		 * because there might be commands in this.undos and this.redos
 		 * which have not been serialized with .toJSON() we go back
@@ -321,19 +316,7 @@ History.prototype = {
 		this.editor.signals.sceneGraphChanged.active = true;
 		this.editor.signals.historyChanged.active = true;
 
-		this.serializationEnabled = true;
-
 		this.goToState( id );
-
-	},
-
-	disableSerialization: function () {
-
-		if ( ! this.serializationEnabled ) return;
-
-		this.serializationEnabled = false;
-
-		this.editor.signals.historyChanged.dispatch();
 
 	}
 
