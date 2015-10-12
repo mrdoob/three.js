@@ -377,6 +377,16 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "lights_phong_fragment" ],
 
+				"#ifdef METAL",
+
+				"	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + totalEmissiveLight;",
+
+				"#else",
+
+				"	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;",
+
+				"#endif",
+
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
