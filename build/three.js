@@ -14195,7 +14195,7 @@ Object.defineProperties( THREE.Light.prototype, {
 	},
 	shadowDarkness: {
 		set: function ( value ) {
-			this.shadow.darkness = value;
+			console.warn( 'THREE.Light: .shadowDarkness has been removed.' );
 		}
 	},
 	shadowMapWidth: {
@@ -14248,7 +14248,6 @@ THREE.LightShadow = function ( camera ) {
 	this.camera = camera;
 
 	this.bias = 0;
-	this.darkness = 0.5;
 
 	this.mapSize = new THREE.Vector2( 512, 512 );
 
@@ -21451,6 +21450,7 @@ THREE.ShaderLib = {
 
 };
 
+
 // File:src/renderers/WebGLRenderer.js
 
 /**
@@ -23457,11 +23457,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 						shadow.matrix.identity().setPosition( _vector3 );
 
 						// for point lights we set the sign of the shadowDarkness uniform to be negative
-						uniforms.shadowDarkness.value[ j ] = - 1.0; // shadow.darkness;
+						uniforms.shadowDarkness.value[ j ] = - 1.0;
 
 					} else {
 
-						uniforms.shadowDarkness.value[ j ] = 1.0; // shadow.darkness;
+						uniforms.shadowDarkness.value[ j ] = 1.0;
 
 					}
 
