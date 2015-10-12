@@ -84,8 +84,8 @@ THREE.UniformsLib = {
 
 		"hemisphereLights" : { type: "sa", value: [], properties: {
 			"direction": { type: "v3" },
-			"skyColor": { type: "v3" },
-			"groundColor": { type: "v3" }
+			"skyColor": { type: "c" },
+			"groundColor": { type: "c" }
 		} },
 
 		"pointLights" : { type: "sa", value: [], properties: {
