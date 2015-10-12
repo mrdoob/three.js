@@ -182,6 +182,8 @@ THREE.ShaderLib = {
 			"uniform vec3 emissive;",
 			"uniform float opacity;",
 
+			"uniform vec3 ambientLightColor;",
+
 			"varying vec3 vLightFront;",
 
 			"#ifdef DOUBLE_SIDED",
@@ -206,6 +208,7 @@ THREE.ShaderLib = {
 
 			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
+			"	vec3 totalAmbientLight = ambientLightColor;",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
@@ -217,13 +220,13 @@ THREE.ShaderLib = {
 			"	#ifdef DOUBLE_SIDED",
 
 			"		if ( gl_FrontFacing )",
-			"			outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
+			"			outgoingLight += diffuseColor.rgb * ( vLightFront + totalAmbientLight ) + emissive;",
 			"		else",
-			"			outgoingLight += diffuseColor.rgb * vLightBack + emissive;",
+			"			outgoingLight += diffuseColor.rgb * ( vLightBack + totalAmbientLight ) + emissive;",
 
 			"	#else",
 
-			"		outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
+			"		outgoingLight += diffuseColor.rgb * ( vLightFront + totalAmbientLight ) + emissive;",
 
 			"	#endif",
 
