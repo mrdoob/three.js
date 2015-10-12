@@ -26,11 +26,13 @@ THREE.CurvePath.prototype.add = function ( curve ) {
 
 };
 
+/*
 THREE.CurvePath.prototype.checkConnection = function() {
 	// TODO
 	// If the ending of curve is not connected to the starting
 	// or the next curve, then, this is not a real path
 };
+*/
 
 THREE.CurvePath.prototype.closePath = function() {
 
@@ -61,7 +63,7 @@ THREE.CurvePath.prototype.getPoint = function( t ) {
 
 	var d = t * this.getLength();
 	var curveLengths = this.getCurveLengths();
-	var i = 0, diff, curve;
+	var i = 0;
 
 	// To think about boundaries points.
 
@@ -69,8 +71,8 @@ THREE.CurvePath.prototype.getPoint = function( t ) {
 
 		if ( curveLengths[ i ] >= d ) {
 
-			diff = curveLengths[ i ] - d;
-			curve = this.curves[ i ];
+			var diff = curveLengths[ i ] - d;
+			var curve = this.curves[ i ];
 
 			var u = 1 - diff / curve.getLength();
 
@@ -90,8 +92,8 @@ THREE.CurvePath.prototype.getPoint = function( t ) {
 
 /*
 THREE.CurvePath.prototype.getTangent = function( t ) {
-};*/
-
+};
+*/
 
 // We cannot use the default THREE.Curve getPoint() with getLength() because in
 // THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
@@ -121,9 +123,8 @@ THREE.CurvePath.prototype.getCurveLengths = function() {
 	// Push sums into cached array
 
 	var lengths = [], sums = 0;
-	var i, il = this.curves.length;
 
-	for ( i = 0; i < il; i ++ ) {
+	for ( var i = 0, l = this.curves.length; i < l; i ++ ) {
 
 		sums += this.curves[ i ].getLength();
 		lengths.push( sums );
@@ -150,15 +151,13 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
 	maxX = maxY = Number.NEGATIVE_INFINITY;
 	minX = minY = Number.POSITIVE_INFINITY;
 
-	var p, i, il, sum;
-
 	var v3 = points[ 0 ] instanceof THREE.Vector3;
 
-	sum = v3 ? new THREE.Vector3() : new THREE.Vector2();
+	var sum = v3 ? new THREE.Vector3() : new THREE.Vector2();
 
-	for ( i = 0, il = points.length; i < il; i ++ ) {
+	for ( var i = 0, l = points.length; i < l; i ++ ) {
 
-		p = points[ i ];
+		var p = points[ i ];
 
 		if ( p.x > maxX ) maxX = p.x;
 		else if ( p.x < minX ) minX = p.x;
@@ -223,9 +222,10 @@ THREE.CurvePath.prototype.createGeometry = function( points ) {
 
 	var geometry = new THREE.Geometry();
 
-	for ( var i = 0; i < points.length; i ++ ) {
+	for ( var i = 0, l = points.length; i < l; i ++ ) {
 
-		geometry.vertices.push( new THREE.Vector3( points[ i ].x, points[ i ].y, points[ i ].z || 0 ) );
+		var point = points[ i ];
+		geometry.vertices.push( new THREE.Vector3( point.x, point.y, point.z || 0 ) );
 
 	}
 
@@ -249,7 +249,6 @@ THREE.CurvePath.prototype.addWrapPath = function ( bendpath ) {
 THREE.CurvePath.prototype.getTransformedPoints = function( segments, bends ) {
 
 	var oldPts = this.getPoints( segments ); // getPoints getSpacedPoints
-	var i, il;
 
 	if ( ! bends ) {
 
@@ -257,7 +256,7 @@ THREE.CurvePath.prototype.getTransformedPoints = function( segments, bends ) {
 
 	}
 
-	for ( i = 0, il = bends.length; i < il; i ++ ) {
+	for ( var i = 0, l = bends.length; i < l; i ++ ) {
 
 		oldPts = this.getWrapPoints( oldPts, bends[ i ] );
 
@@ -271,15 +270,13 @@ THREE.CurvePath.prototype.getTransformedSpacedPoints = function( segments, bends
 
 	var oldPts = this.getSpacedPoints( segments );
 
-	var i, il;
-
 	if ( ! bends ) {
 
 		bends = this.bends;
 
 	}
 
-	for ( i = 0, il = bends.length; i < il; i ++ ) {
+	for ( var i = 0, l = bends.length; i < l; i ++ ) {
 
 		oldPts = this.getWrapPoints( oldPts, bends[ i ] );
 
@@ -296,16 +293,14 @@ THREE.CurvePath.prototype.getWrapPoints = function ( oldPts, path ) {
 
 	var bounds = this.getBoundingBox();
 
-	var i, il, p, oldX, oldY, xNorm;
+	for ( var i = 0, l = oldPts.length; i < l; i ++ ) {
 
-	for ( i = 0, il = oldPts.length; i < il; i ++ ) {
+		var p = oldPts[ i ];
 
-		p = oldPts[ i ];
+		var oldX = p.x;
+		var oldY = p.y;
 
-		oldX = p.x;
-		oldY = p.y;
-
-		xNorm = oldX / bounds.maxX;
+		var xNorm = oldX / bounds.maxX;
 
 		// If using actual distance, for length > path, requires line extrusions
 		//xNorm = path.getUtoTmapping(xNorm, oldX); // 3 styles. 1) wrap stretched. 2) wrap stretch by arc length 3) warp by actual distance

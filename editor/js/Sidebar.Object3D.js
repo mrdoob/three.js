@@ -243,6 +243,30 @@ Sidebar.Object3D = function ( editor ) {
 
 	container.add( objectDecayRow );
 
+	// shadow
+
+	var objectShadowRow = new UI.Panel();
+
+	objectShadowRow.add( new UI.Text( 'Shadow' ).setWidth( '90px' ) );
+
+	var objectCastShadowSpan = new UI.Span().setMarginRight( '10px' );
+	var objectCastShadow = new UI.Checkbox().onChange( update );
+
+	objectCastShadowSpan.add( objectCastShadow );
+	objectCastShadowSpan.add( new UI.Text( 'cast' ) );
+
+	objectShadowRow.add( objectCastShadowSpan );
+
+	var objectReceiveShadowSpan = new UI.Span();
+	var objectReceiveShadow = new UI.Checkbox().onChange( update );
+
+	objectReceiveShadowSpan.add( objectReceiveShadow );
+	objectReceiveShadowSpan.add( new UI.Text( 'receive' ) );
+
+	objectShadowRow.add( objectReceiveShadowSpan );
+
+	container.add( objectShadowRow );
+
 	// visible
 
 	var objectVisibleRow = new UI.Panel();
@@ -444,6 +468,19 @@ Sidebar.Object3D = function ( editor ) {
 
 			}
 
+			if ( object.castShadow !== objectCastShadow.getValue() ) {
+
+				editor.execute( new CmdSetValue( object, 'castShadow', objectCastShadow.getValue() ) );
+
+			}
+
+			if ( object.receiveShadow !== objectReceiveShadow.getValue() ) {
+
+				editor.execute( new CmdSetValue( object, 'receiveShadow', objectReceiveShadow.getValue() ) );
+				object.material.needsUpdate = true;
+
+			}
+
 			try {
 
 				var userData = JSON.parse( objectUserData.getValue() );
@@ -476,7 +513,9 @@ Sidebar.Object3D = function ( editor ) {
 			'distance' : objectDistanceRow,
 			'angle' : objectAngleRow,
 			'exponent' : objectExponentRow,
-			'decay' : objectDecayRow
+			'decay' : objectDecayRow,
+			'castShadow' : objectShadowRow,
+			'receiveShadow' : objectReceiveShadowSpan
 		};
 
 		for ( var property in properties ) {
@@ -640,6 +679,18 @@ Sidebar.Object3D = function ( editor ) {
 		if ( object.decay !== undefined ) {
 
 			objectDecay.setValue( object.decay );
+
+		}
+
+		if ( object.castShadow !== undefined ) {
+
+			objectCastShadow.setValue( object.castShadow );
+
+		}
+
+		if ( object.receiveShadow !== undefined ) {
+
+			objectReceiveShadow.setValue( object.receiveShadow );
 
 		}
 

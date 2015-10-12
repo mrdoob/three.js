@@ -87,11 +87,9 @@
 
 				//
 
-				
+
 				var loader = new THREE.JSONLoader();
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
-
-					morphColorsToFaceColors( geometry );
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, morphTargets: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
 					var mesh = new THREE.Mesh( geometry, material );
@@ -110,13 +108,12 @@
 
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					geometry.computeVertexNormals();
 					geometry.computeMorphNormals();
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading } );
 					var mesh = new THREE.Mesh( geometry, material );
-					
+
 					mesh.scale.set( 1.5, 1.5, 1.5 );
 					mesh.position.y = 150;
 
@@ -151,23 +148,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
-			}
-
-			function morphColorsToFaceColors( geometry ) {
-
-				if ( geometry.morphColors && geometry.morphColors.length ) {
-
-					var colorMap = geometry.morphColors[ 0 ];
-
-					for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-
-						geometry.faces[ i ].color = colorMap.colors[ i ];
-						geometry.faces[ i ].color.offsetHSL( 0, 0.3, 0 );
-
-					}
-
-				}
 
 			}
 

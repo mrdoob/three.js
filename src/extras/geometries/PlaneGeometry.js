@@ -25,13 +25,13 @@ THREE.PlaneGeometry.prototype.constructor = THREE.PlaneGeometry;
 
 THREE.PlaneGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.PlaneGeometry(
-		this.parameters.width,
-		this.parameters.height,
-		this.parameters.widthSegments,
-		this.parameters.heightSegments
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.PlaneGeometry(
+		parameters.width,
+		parameters.height,
+		parameters.widthSegments,
+		parameters.heightSegments
+	);
 
 };

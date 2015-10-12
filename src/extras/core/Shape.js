@@ -12,6 +12,7 @@
 THREE.Shape = function () {
 
 	THREE.Path.apply( this, arguments );
+
 	this.holes = [];
 
 };
@@ -23,8 +24,7 @@ THREE.Shape.prototype.constructor = THREE.Shape;
 
 THREE.Shape.prototype.extrude = function ( options ) {
 
-	var extruded = new THREE.ExtrudeGeometry( this, options );
-	return extruded;
+	return new THREE.ExtrudeGeometry( this, options );
 
 };
 
@@ -32,8 +32,7 @@ THREE.Shape.prototype.extrude = function ( options ) {
 
 THREE.Shape.prototype.makeGeometry = function ( options ) {
 
-	var geometry = new THREE.ShapeGeometry( this, options );
-	return geometry;
+	return new THREE.ShapeGeometry( this, options );
 
 };
 
@@ -41,9 +40,9 @@ THREE.Shape.prototype.makeGeometry = function ( options ) {
 
 THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
 
-	var i, il = this.holes.length, holesPts = [];
+	var holesPts = [];
 
-	for ( i = 0; i < il; i ++ ) {
+	for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
 
 		holesPts[ i ] = this.holes[ i ].getTransformedPoints( divisions, this.bends );
 
@@ -57,9 +56,9 @@ THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
 
 THREE.Shape.prototype.getSpacedPointsHoles = function ( divisions ) {
 
-	var i, il = this.holes.length, holesPts = [];
+	var holesPts = [];
 
-	for ( i = 0; i < il; i ++ ) {
+	for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
 
 		holesPts[ i ] = this.holes[ i ].getTransformedSpacedPoints( divisions, this.bends );
 
@@ -95,17 +94,18 @@ THREE.Shape.prototype.extractPoints = function ( divisions ) {
 
 };
 
-//
-// THREE.Shape.prototype.extractAllPointsWithBend = function ( divisions, bend ) {
-//
-// 	return {
-//
-// 		shape: this.transform( bend, divisions ),
-// 		holes: this.getPointsHoles( divisions, bend )
-//
-// 	};
-//
-// };
+/*
+THREE.Shape.prototype.extractAllPointsWithBend = function ( divisions, bend ) {
+
+	return {
+
+		shape: this.transform( bend, divisions ),
+		holes: this.getPointsHoles( divisions, bend )
+
+	};
+
+};
+*/
 
 // Get points of shape and holes (spaced by regular distance)
 

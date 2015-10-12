@@ -551,7 +551,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// remove all webgl properties
-		properties.remove( texture );
+		properties.delete( texture );
 
 	}
 
@@ -580,8 +580,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		properties.remove( renderTarget.texture );
-		properties.remove( renderTarget );
+		properties.delete( renderTarget.texture );
+		properties.delete( renderTarget );
 
 	}
 
@@ -589,7 +589,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		releaseMaterialProgramReference( material );
 
-		properties.remove( material );
+		properties.delete( material );
 
 	}
 
@@ -811,28 +811,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( group === null ) {
+		//
 
-			var count;
+		var dataStart = 0;
+		var dataCount = Infinity;
 
-			if ( index !== null ) {
+		if ( index !== null ) {
 
-				count = index.array.length;
+			dataCount = index.count
 
-			} else {
+		} else if ( position !== undefined ) {
 
-				count = position.count;
-
-			}
-
-			var drawRange = geometry.drawRange;
-
-			group = {
-				start: drawRange.start,
-				count: Math.min( drawRange.count, count )
-			};
+			dataCount = position.count;
 
 		}
+
+		var rangeStart = geometry.drawRange.start;
+		var rangeCount = geometry.drawRange.count;
+
+		var groupStart = group !== null ? group.start : 0;
+		var groupCount = group !== null ? group.count : Infinity;
+
+		var drawStart = Math.max( dataStart, rangeStart, groupStart );
+		var drawEnd = Math.min( dataStart + dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
+
+		var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
+
+		//
 
 		if ( object instanceof THREE.Mesh ) {
 
@@ -853,7 +858,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				renderer.render( group.start, group.count );
+				renderer.render( drawStart, drawCount );
 
 			}
 
@@ -875,12 +880,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			renderer.render( group.start, group.count );
+			renderer.render( drawStart, drawCount );
 
 		} else if ( object instanceof THREE.Points ) {
 
 			renderer.setMode( _gl.POINTS );
-			renderer.render( group.start, group.count );
+			renderer.render( drawStart, drawCount );
 
 		}
 
@@ -1983,30 +1988,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var light = lights[ i ];
 
-				if ( ! light.castShadow ) continue;
+				if ( light.castShadow === false ) continue;
 
 				if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
+
+					var shadow = light.shadow;
 
 					if ( light instanceof THREE.PointLight ) {
 
 						// for point lights we set the shadow matrix to be a translation-only matrix
 						// equal to inverse of the light's position
 						_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-						light.shadowMatrix.identity().setPosition( _vector3 );
+						shadow.matrix.identity().setPosition( _vector3 );
 
 						// for point lights we set the sign of the shadowDarkness uniform to be negative
-						uniforms.shadowDarkness.value[ j ] = - light.shadowDarkness;
+						uniforms.shadowDarkness.value[ j ] = - shadow.darkness;
 
 					} else {
 
-						uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
+						uniforms.shadowDarkness.value[ j ] = shadow.darkness;
 
 					}
 
-					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
-					uniforms.shadowMap.value[ j ] = light.shadowMap;
-					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
-					uniforms.shadowBias.value[ j ] = light.shadowBias;
+					uniforms.shadowMatrix.value[ j ] = shadow.matrix;
+					uniforms.shadowMap.value[ j ] = shadow.map;
+					uniforms.shadowMapSize.value[ j ] = shadow.mapSize;
+					uniforms.shadowBias.value[ j ] = shadow.bias;
 
 					j ++;
 
@@ -2461,8 +2468,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			light = lights[ l ];
-
-			if ( light.onlyShadow ) continue;
 
 			color = light.color;
 			intensity = light.intensity;

@@ -27,16 +27,16 @@ THREE.SphereGeometry.prototype.constructor = THREE.SphereGeometry;
 
 THREE.SphereGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.SphereGeometry(
-		this.parameters.radius,
-		this.parameters.widthSegments,
-		this.parameters.heightSegments,
-		this.parameters.phiStart,
-		this.parameters.phiLength,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.SphereGeometry(
+		parameters.radius,
+		parameters.widthSegments,
+		parameters.heightSegments,
+		parameters.phiStart,
+		parameters.phiLength,
+		parameters.thetaStart,
+		parameters.thetaLength
+	);
 
 };

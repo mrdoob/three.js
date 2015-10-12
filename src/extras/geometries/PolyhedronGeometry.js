@@ -242,20 +242,13 @@ THREE.PolyhedronGeometry.prototype.constructor = THREE.PolyhedronGeometry;
 
 THREE.PolyhedronGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.PolyhedronGeometry(
-		this.parameters.vertices,
-		this.parameters.indices,
-		this.parameters.radius,
-		this.parameters.detail
+	var parameters = this.parameters;
+
+	return new THREE.PolyhedronGeometry(
+		parameters.vertices,
+		parameters.indices,
+		parameters.radius,
+		parameters.detail
 	);
-
-	return geometry.copy( this );
-
-};
-
-THREE.PolyhedronGeometry.prototype.copy = function ( source ) {
-
-	THREE.Geometry.prototype.copy.call( this, source );
-	return this;
 
 };

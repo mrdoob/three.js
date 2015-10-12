@@ -56,7 +56,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var useMorphing = ( i & _MorphingFlag ) !== 0;
 		var useSkinning = ( i & _SkinningFlag ) !== 0;
 
-
 		var depthMaterial = new THREE.ShaderMaterial( {
 			uniforms: depthUniforms,
 			vertexShader: depthShader.vertexShader,
@@ -100,15 +99,15 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var faceCount, isPointLight;
 
 		if ( scope.enabled === false ) return;
-		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;	
+		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
-		// Set GL state for depth map. 
+		// Set GL state for depth map.
 		_gl.clearColor( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
 		_state.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
 		_gl.cullFace( scope.cullFace === THREE.CullFaceFront ? _gl.FRONT : _gl.BACK );
-		_state.setDepthTest( true );			
+		_state.setDepthTest( true );
 
 		// save the existing viewport so it can be restored later
 		_renderer.getViewport( _vector4 );
@@ -119,15 +118,19 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			var light = _lights[ i ];
 
-			if ( ! light.castShadow ) continue;
+			if ( light.castShadow === false ) continue;
+
+			var shadow = light.shadow;
+			var shadowCamera = shadow.camera;
+			var shadowMapSize = shadow.mapSize;
 
 			if ( light instanceof THREE.PointLight ) {
 
 				faceCount = 6;
 				isPointLight = true;
 
-				var vpWidth = light.shadowMapWidth / 4.0;
-				var vpHeight = light.shadowMapHeight / 2.0;
+				var vpWidth = shadowMapSize.x / 4.0;
+				var vpHeight = shadowMapSize.y / 2.0;
 
 				// These viewports map a cube-map onto a 2D texture with the
 				// following orientation:
@@ -162,7 +165,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			}
 
-			if ( ! light.shadowMap ) {
+			if ( shadow.map === null ) {
 
 				var shadowFilter = THREE.LinearFilter;
 
@@ -174,45 +177,23 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
 
-				light.shadowMap = new THREE.WebGLRenderTarget( light.shadowMapWidth, light.shadowMapHeight, pars );
-				light.shadowMapSize = new THREE.Vector2( light.shadowMapWidth, light.shadowMapHeight );
+				shadow.map = new THREE.WebGLRenderTarget( shadowMapSize.x, shadowMapSize.y, pars );
+				shadow.matrix = new THREE.Matrix4();
 
-				light.shadowMatrix = new THREE.Matrix4();
-
-			}
-
-			if ( ! light.shadowCamera ) {
+				//
 
 				if ( light instanceof THREE.SpotLight ) {
 
-					light.shadowCamera = new THREE.PerspectiveCamera( light.shadowCameraFov, light.shadowMapWidth / light.shadowMapHeight, light.shadowCameraNear, light.shadowCameraFar );
-
-				} else if ( light instanceof THREE.DirectionalLight ) {
-
-					light.shadowCamera = new THREE.OrthographicCamera( light.shadowCameraLeft, light.shadowCameraRight, light.shadowCameraTop, light.shadowCameraBottom, light.shadowCameraNear, light.shadowCameraFar );
-
-				} else {
-
-					light.shadowCamera = new THREE.PerspectiveCamera( light.shadowCameraFov, 1.0, light.shadowCameraNear, light.shadowCameraFar );
+					shadowCamera.aspect = shadowMapSize.x / shadowMapSize.y;
 
 				}
 
-				scene.add( light.shadowCamera );
-
-				if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+				shadowCamera.updateProjectionMatrix();
 
 			}
 
-			if ( light.shadowCameraVisible && ! light.cameraHelper ) {
-
-				light.cameraHelper = new THREE.CameraHelper( light.shadowCamera );
-				scene.add( light.cameraHelper );
-
-			}
-
-			var shadowMap = light.shadowMap;
-			var shadowMatrix = light.shadowMatrix;
-			var shadowCamera = light.shadowCamera;
+			var shadowMap = shadow.map;
+			var shadowMatrix = shadow.matrix;
 
 			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 			shadowCamera.position.copy( _lightPositionWorld );
@@ -243,9 +224,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				shadowCamera.updateMatrixWorld();
 				shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
-
-				if ( light.cameraHelper ) light.cameraHelper.visible = light.shadowCameraVisible;
-				if ( light.shadowCameraVisible ) light.cameraHelper.update();
 
 				// compute shadow matrix
 
@@ -311,13 +289,13 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			//We must call _renderer.resetGLState() at the end of each iteration of
 			// the light loop in order to force material updates for each light.
-			_renderer.resetGLState();			
+			_renderer.resetGLState();
 
 		}
 
 		_renderer.setViewport( _vector4.x, _vector4.y, _vector4.z, _vector4.w );
 
-		// Restore GL state. 
+		// Restore GL state.
 		var clearColor = _renderer.getClearColor(),
 		clearAlpha = _renderer.getClearAlpha();
 		_renderer.setClearColor( clearColor, clearAlpha );
@@ -329,7 +307,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
-		_renderer.resetGLState();			
+		_renderer.resetGLState();
 
 		scope.needsUpdate = false;
 

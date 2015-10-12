@@ -80,14 +80,14 @@ THREE.TorusGeometry.prototype.constructor = THREE.TorusGeometry;
 
 THREE.TorusGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.TorusGeometry(
-		this.parameters.radius,
-		this.parameters.tube,
-		this.parameters.radialSegments,
-		this.parameters.tubularSegments,
-		this.parameters.arc
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.TorusGeometry(
+		parameters.radius,
+		parameters.tube,
+		parameters.radialSegments,
+		parameters.tubularSegments,
+		parameters.arc
+	);
 
 };

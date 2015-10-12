@@ -23,7 +23,7 @@ THREE.JSONLoader.prototype = {
 	constructor: THREE.JSONLoader,
 
 	// Deprecated
-	
+
 	get statusDomElement () {
 
 		if ( this._statusDomElement === undefined ) {
@@ -451,18 +451,16 @@ THREE.JSONLoader.prototype = {
 
 			if ( json.morphTargets !== undefined ) {
 
-				var i, l, v, vl, dstVertices, srcVertices;
-
-				for ( i = 0, l = json.morphTargets.length; i < l; i ++ ) {
+				for ( var i = 0, l = json.morphTargets.length; i < l; i ++ ) {
 
 					geometry.morphTargets[ i ] = {};
 					geometry.morphTargets[ i ].name = json.morphTargets[ i ].name;
 					geometry.morphTargets[ i ].vertices = [];
 
-					dstVertices = geometry.morphTargets[ i ].vertices;
-					srcVertices = json.morphTargets[ i ].vertices;
+					var dstVertices = geometry.morphTargets[ i ].vertices;
+					var srcVertices = json.morphTargets[ i ].vertices;
 
-					for ( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
+					for ( var v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
 
 						var vertex = new THREE.Vector3();
 						vertex.x = srcVertices[ v ] * scale;
@@ -477,30 +475,21 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-			if ( json.morphColors !== undefined ) {
+			if ( json.morphColors !== undefined && json.morphColors.length > 0 ) {
 
-				var i, l, c, cl, dstColors, srcColors, color;
+				console.warn( 'THREE.JSONLoader: "morphColors" no longer supported. Using them as face colors.' );
 
-				for ( i = 0, l = json.morphColors.length; i < l; i ++ ) {
+				var faces = geometry.faces;
+				var morphColors = json.morphColors[ 0 ].colors;
 
-					geometry.morphColors[ i ] = {};
-					geometry.morphColors[ i ].name = json.morphColors[ i ].name;
-					geometry.morphColors[ i ].colors = [];
+				for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
-					dstColors = geometry.morphColors[ i ].colors;
-					srcColors = json.morphColors[ i ].colors;
-
-					for ( c = 0, cl = srcColors.length; c < cl; c += 3 ) {
-
-						color = new THREE.Color( 0xffaa00 );
-						color.setRGB( srcColors[ c ], srcColors[ c + 1 ], srcColors[ c + 2 ] );
-						dstColors.push( color );
-
-					}
+					faces[ i ].color.fromArray( morphColors, i * 3 );
 
 				}
 
 			}
+
 		}
 
 		function parseAnimations() {
