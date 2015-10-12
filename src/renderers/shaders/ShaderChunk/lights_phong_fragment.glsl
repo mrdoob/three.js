@@ -1,5 +1,3 @@
-vec3 viewDir = normalize( vViewPosition );
-
 vec3 diffuse = diffuseColor.rgb;
 
 #ifdef METAL
@@ -19,21 +17,22 @@ vec3 diffuse = diffuseColor.rgb;
 #endif
 
 IncidentLight incidentLight;
+
+GeometricContext geometry = GeometricContext( -vViewPosition, normal, normalize(vViewPosition ) );
+
 ReflectedLight directReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
-
-GeometricContext geometricContext = GeometricContext( -vViewPosition, normal, viewDir );
 
 #if MAX_POINT_LIGHTS > 0
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
-		getPointIncidentLight( pointLights[ i ], geometricContext, incidentLight );
+		getPointIncidentLight( pointLights[ i ], geometry, incidentLight );
 
-		BRDF_Lambert( incidentLight, geometricContext, diffuse, directReflectedLight );
-		//BRDF_OrenNayar( incidentLight, geometricContext, diffuse, 0.5, directReflectedLight );
+		BRDF_Lambert( incidentLight, geometry, diffuse, directReflectedLight );
+		//BRDF_OrenNayar( incidentLight, geometry, diffuse, 0.5, directReflectedLight );
 
-		BRDF_BlinnPhong( incidentLight, geometricContext, specular, shininess, directReflectedLight );
+		BRDF_BlinnPhong( incidentLight, geometry, specular, shininess, directReflectedLight );
 
 	}
 
@@ -43,12 +42,12 @@ GeometricContext geometricContext = GeometricContext( -vViewPosition, normal, vi
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
-		getSpotIncidentLight( spotLights[ i ], geometricContext, incidentLight );
+		getSpotIncidentLight( spotLights[ i ], geometry, incidentLight );
 
-		BRDF_Lambert( incidentLight, geometricContext, diffuse, directReflectedLight );
-		//BRDF_OrenNayar( incidentLight, geometricContext, diffuse, 0.5, directReflectedLight );
+		BRDF_Lambert( incidentLight, geometry, diffuse, directReflectedLight );
+		//BRDF_OrenNayar( incidentLight, geometry, diffuse, 0.5, directReflectedLight );
 
-		BRDF_BlinnPhong( incidentLight, geometricContext, specular, shininess, directReflectedLight );
+		BRDF_BlinnPhong( incidentLight, geometry, specular, shininess, directReflectedLight );
 
 	}
 
@@ -58,12 +57,12 @@ GeometricContext geometricContext = GeometricContext( -vViewPosition, normal, vi
 
 	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-		getDirIncidentLight( directionalLights[ i ], geometricContext, incidentLight );
+		getDirIncidentLight( directionalLights[ i ], geometry, incidentLight );
 
-		BRDF_Lambert( incidentLight, geometricContext, diffuse, directReflectedLight );
-		//BRDF_OrenNayar( incidentLight, geometricContext, diffuse, 0.5, directReflectedLight );
+		BRDF_Lambert( incidentLight, geometry, diffuse, directReflectedLight );
+		//BRDF_OrenNayar( incidentLight, geometry, diffuse, 0.5, directReflectedLight );
 
-		BRDF_BlinnPhong( incidentLight, geometricContext, specular, shininess, directReflectedLight );
+		BRDF_BlinnPhong( incidentLight, geometry, specular, shininess, directReflectedLight );
 
 	}
 
@@ -73,10 +72,10 @@ GeometricContext geometricContext = GeometricContext( -vViewPosition, normal, vi
 
 	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		getHemisphereIncidentLight( hemisphereLights[ i ], geometricContext, incidentLight );
+		getHemisphereIncidentLight( hemisphereLights[ i ], geometry, incidentLight );
 
-		BRDF_Lambert( incidentLight, geometricContext, diffuse, indirectReflectedLight );
-		//BRDF_OrenNayar( incidentLight, geometricContext, diffuse, 0.5, indirectReflectedLight );
+		BRDF_Lambert( incidentLight, geometry, diffuse, indirectReflectedLight );
+		//BRDF_OrenNayar( incidentLight, geometry, diffuse, 0.5, indirectReflectedLight );
 
 	}
 
