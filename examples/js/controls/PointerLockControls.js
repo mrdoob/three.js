@@ -31,14 +31,6 @@ THREE.PointerLockControls = function ( camera ) {
 
 	};
 
-	this.dispose = function() {
-
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-
-	}
-
-	document.addEventListener( 'mousemove', onMouseMove, false );
-
 	this.enabled = false;
 
 	this.getObject = function () {
@@ -64,6 +56,26 @@ THREE.PointerLockControls = function ( camera ) {
 
 		}
 
-	}();
+	} ();
+
+	this.enableEventListeners = function () {
+
+		document.addEventListener( 'mousemove', onMouseMove, false );
+
+	};
+
+	this.disableEventListeners = function () {
+
+		document.removeEventListener( 'mousemove', onMouseMove, false );
+
+	};
+
+	this.dispose = function() {
+
+		this.disableEventListeners();
+
+	};
+
+	this.enableEventListeners();
 
 };

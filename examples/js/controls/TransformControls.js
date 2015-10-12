@@ -688,41 +688,11 @@
 		var camPosition = new THREE.Vector3();
 		var camRotation = new THREE.Euler();
 
-		domElement.addEventListener( "mousedown", onPointerDown, false );
-		domElement.addEventListener( "touchstart", onPointerDown, false );
-
-		domElement.addEventListener( "mousemove", onPointerHover, false );
-		domElement.addEventListener( "touchmove", onPointerHover, false );
-
-		domElement.addEventListener( "mousemove", onPointerMove, false );
-		domElement.addEventListener( "touchmove", onPointerMove, false );
-
-		domElement.addEventListener( "mouseup", onPointerUp, false );
-		domElement.addEventListener( "mouseout", onPointerUp, false );
-		domElement.addEventListener( "touchend", onPointerUp, false );
-		domElement.addEventListener( "touchcancel", onPointerUp, false );
-		domElement.addEventListener( "touchleave", onPointerUp, false );
-
-		this.dispose = function () {
-
-			domElement.removeEventListener( "mousedown", onPointerDown );
-			domElement.removeEventListener( "touchstart", onPointerDown );
-
-			domElement.removeEventListener( "mousemove", onPointerHover );
-			domElement.removeEventListener( "touchmove", onPointerHover );
-
-			domElement.removeEventListener( "mousemove", onPointerMove );
-			domElement.removeEventListener( "touchmove", onPointerMove );
-
-			domElement.removeEventListener( "mouseup", onPointerUp );
-			domElement.removeEventListener( "mouseout", onPointerUp );
-			domElement.removeEventListener( "touchend", onPointerUp );
-			domElement.removeEventListener( "touchcancel", onPointerUp );
-			domElement.removeEventListener( "touchleave", onPointerUp );
-
-		};
 
 		this.attach = function ( object ) {
+
+
+
 
 			this.object = object;
 			this.visible = true;
@@ -1123,6 +1093,52 @@
 			return intersections[ 0 ] ? intersections[ 0 ] : false;
 
 		}
+
+		this.enableEventListeners = function () {
+
+			domElement.addEventListener( "mousedown", onPointerDown, false );
+			domElement.addEventListener( "touchstart", onPointerDown, false );
+
+			domElement.addEventListener( "mousemove", onPointerHover, false );
+			domElement.addEventListener( "touchmove", onPointerHover, false );
+
+			domElement.addEventListener( "mousemove", onPointerMove, false );
+			domElement.addEventListener( "touchmove", onPointerMove, false );
+
+			domElement.addEventListener( "mouseup", onPointerUp, false );
+			domElement.addEventListener( "mouseout", onPointerUp, false );
+			domElement.addEventListener( "touchend", onPointerUp, false );
+			domElement.addEventListener( "touchcancel", onPointerUp, false );
+			domElement.addEventListener( "touchleave", onPointerUp, false );
+
+		};
+
+		this.disableEventListeners = function () {
+
+			domElement.removeEventListener( "mousedown", onPointerDown, false );
+			domElement.removeEventListener( "touchstart", onPointerDown, false );
+
+			domElement.removeEventListener( "mousemove", onPointerHover, false );
+			domElement.removeEventListener( "touchmove", onPointerHover, false );
+
+			domElement.removeEventListener( "mousemove", onPointerMove, false );
+			domElement.removeEventListener( "touchmove", onPointerMove, false );
+
+			domElement.removeEventListener( "mouseup", onPointerUp, false );
+			domElement.removeEventListener( "mouseout", onPointerUp, false );
+			domElement.removeEventListener( "touchend", onPointerUp, false );
+			domElement.removeEventListener( "touchcancel", onPointerUp, false );
+			domElement.removeEventListener( "touchleave", onPointerUp, false );
+
+		};
+
+		this.dispose = function() {
+
+			this.disableEventListeners();
+
+		};
+
+		this.enableEventListeners();
 
 	};
 
