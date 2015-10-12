@@ -50,9 +50,7 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 
 	for ( var i = 1; i <= segments; i ++ ) {
 
-		indices.push( i );
-		indices.push( i + 1 );
-		indices.push( 0 );
+		indices.push( i, i + 1, 0 );
 
 	}
 
