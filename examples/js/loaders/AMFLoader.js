@@ -143,7 +143,7 @@ THREE.AMFLoader.prototype = {
 
 			var matName = "AMF Material";
 			var matId = node.attributes[ 'id' ].textContent;
-			var color;
+			var color = { r: 1.0, g: 1.0, b: 1.0, a: 1.0, opacity: 1.0 };
 
 			var loadedMaterial = null;
 
@@ -206,6 +206,7 @@ THREE.AMFLoader.prototype = {
 
 				} else if ( matColor.nodeName === 'a' ) {
 
+					color.a = matColor.textContent;
 					color.opacity = matColor.textContent;
 
 				}
