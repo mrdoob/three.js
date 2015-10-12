@@ -7,7 +7,6 @@ THREE.LightShadow = function ( camera ) {
 	this.camera = camera;
 
 	this.bias = 0;
-	this.darkness = 0.5;
 
 	this.mapSize = new THREE.Vector2( 512, 512 );
 
