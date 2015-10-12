@@ -8,6 +8,16 @@
 #define saturate(a) clamp( a, 0.0, 1.0 )
 #define whiteCompliment(a) ( 1.0 - saturate( a ) )
 
+float luminance( const in vec3 color ) {
+    const vec3 W = vec3(0.2125, 0.7154, 0.0721);
+    return dot( color, W );
+}
+
+float average( const in vec3 color ) {
+    const vec3 W = vec3(0.3333, 0.3333, 0.3333);
+    return dot( color, W );
+}
+
 vec3 transformDirection( in vec3 normal, in mat4 matrix ) {
 
 	return normalize( ( matrix * vec4( normal, 0.0 ) ).xyz );
@@ -94,10 +104,26 @@ struct ReflectedLight {
 
 void BRDF_Lambert( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 diffuseColor, inout ReflectedLight reflectedLight ) {
 
-	reflectedLight.diffuse += incidentLight.color * diffuseColor * ( saturate( dot( normal, incidentLight.direction ) ) );
+	reflectedLight.diffuse += incidentLight.color * diffuseColor * ( saturate( dot( normal, incidentLight.direction ) ) * RECIPROCAL_PI );
 
-	// the above should be scaled by '' * RECIPROCAL_PI'
 }
+
+void BRDF_OrenNayar( const in IncidentLight incidentLight, const in vec3 normal, const in vec3 viewDir, const in vec3 diffuse, const in float roughness, inout ReflectedLight reflectedLight ) {
+
+	vec3 halfDir = normalize( incidentLight.direction + viewDir );
+	float dotVH = saturate( dot( viewDir, halfDir ) );
+	float dotNV = saturate( dot( normal, viewDir ) );
+	float dotNL = saturate( dot( normal, incidentLight.direction ) );
+
+	float m2 = roughness * roughness;
+	float termA = 1.0 - 0.5 * m2 / (m2 + 0.33);
+	float Cosri = 2.0 * dotVH - 1.0 - dotNV * dotNL;
+	float termB = 0.45 * m2 / (m2 + 0.09) * Cosri * ( Cosri >= 0.0 ? min( 1.0, dotNL / dotNV ) : dotNL );
+
+	reflectedLight.diffuse = incidentLight.color * diffuse * ( RECIPROCAL_PI * ( dotNL * termA + termB ) );
+
+}
+
 
 vec3 F_Schlick( const in vec3 F0, const in float dotLH ) {
 

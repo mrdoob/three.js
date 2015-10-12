@@ -1,19 +1,12 @@
-vLightFront = vec3( 0.0 );
-
-#ifdef DOUBLE_SIDED
-
-	vLightBack = vec3( 0.0 );
-
-#endif
-
 vec3 normal = normalize( transformedNormal );
+vec3 backNormal = -normal;
+
 vec3 diffuse = vec3( 1.0 );
 
 IncidentLight incidentLight;
 ReflectedLight frontReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 ReflectedLight backReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 
-vec3 backNormal = -normal;
 
 #if MAX_POINT_LIGHTS > 0
 
@@ -57,7 +50,7 @@ vec3 backNormal = -normal;
 
 		getDirIncidentLight( directionalLights[ i ], incidentLight );
 
-		vLightFront += BRDF_Lambert( incidentLight, normal, diffuse, frontReflectedLight );
+		BRDF_Lambert( incidentLight, normal, diffuse, frontReflectedLight );
 
 		#ifdef DOUBLE_SIDED
 
@@ -89,10 +82,10 @@ vec3 backNormal = -normal;
 
 #endif
 
-vLightFront += ambientLightColor + frontReflectedLight.diffuse;
+vLightFront = ambientLightColor + frontReflectedLight.diffuse;
 
 #ifdef DOUBLE_SIDED
 
-	vLightBack += ambientLightColor + backReflectedLight.diffuse;
+	vLightBack = ambientLightColor + backReflectedLight.diffuse;
 
 #endif
