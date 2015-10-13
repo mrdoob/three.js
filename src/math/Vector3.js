@@ -526,9 +526,9 @@ THREE.Vector3.prototype = {
 
 		var newLength = ( oldLength < min ) ? min : ( ( oldLength > max ) ? max : oldLength );
 
-		if ( newLength !== oldLength ) {
+		if ( oldLength !== 0 && newLength !== oldLength ) {
 
-			this.divideScalar( oldLength ).multiplyScalar( newLength );
+			this.multiplyScalar( newLength / oldLength );
 
 		}
 
