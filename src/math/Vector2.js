@@ -292,17 +292,17 @@ THREE.Vector2.prototype = {
 
 	clampLength: function ( min, max ) {
 
-			var oldLength = this.length();
+		var oldLength = this.length();
 
-			var newLength = ( oldLength < min ) ? min : ( ( oldLength > max ) ? max : oldLength );
+		var newLength = ( oldLength < min ) ? min : ( ( oldLength > max ) ? max : oldLength );
 
-			if ( newLength !== oldLength ) {
+		if ( newLength !== oldLength ) {
 
-				this.divideScalar( oldLength ).multiplyScalar( newLength );
+			this.divideScalar( oldLength ).multiplyScalar( newLength );
 
-			}
+		}
 
-			return this;
+		return this;
 
 	},
 
