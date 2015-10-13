@@ -1,3 +1,8 @@
+/**
+ * @author lxxxvi / https://github.com/lxxxvi
+ * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
+ */
+
 module( "NestedDoUndoRedo" );
 
 test( "Test nested Do's, Undo's and Redo's", function() {

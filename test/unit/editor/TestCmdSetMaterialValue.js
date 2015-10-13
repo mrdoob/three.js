@@ -1,3 +1,8 @@
+/**
+ * @author lxxxvi / https://github.com/lxxxvi
+ * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
+ */
+
 module( "CmdSetMaterialValue" );
 
 test( "Test for CmdSetMaterialValue (Undo and Redo)", function() {

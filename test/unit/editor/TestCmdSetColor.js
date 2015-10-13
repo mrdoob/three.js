@@ -1,3 +1,8 @@
+/**
+ * @author lxxxvi / https://github.com/lxxxvi
+ * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
+ */
+
 module( "CmdSetColor" );
 
 test( "Test CmdSetColor (Undo and Redo)", function() {
