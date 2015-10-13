@@ -6855,19 +6855,9 @@ THREE.Math = {
 
 	}(),
 
-	// Clamp value to range <a, b>
+	clamp: function ( value, min, max ) {
 
-	clamp: function ( x, a, b ) {
-
-		return ( x < a ) ? a : ( ( x > b ) ? b : x );
-
-	},
-
-	// Clamp value to range <a, inf)
-
-	clampBottom: function ( x, a ) {
-
-		return x < a ? a : x;
+		return Math.max( min, Math.min( max, value ) );
 
 	},
 
@@ -29783,7 +29773,6 @@ THREE.Curve.create = function ( constructor, getPointFunc ) {
 THREE.CurvePath = function () {
 
 	this.curves = [];
-	this.bends = [];
 
 	this.autoClose = false; // Automatically closes the path
 
@@ -29911,63 +29900,6 @@ THREE.CurvePath.prototype.getCurveLengths = function() {
 
 
 
-// Returns min and max coordinates
-
-THREE.CurvePath.prototype.getBoundingBox = function () {
-
-	var points = this.getPoints();
-
-	var maxX, maxY, maxZ;
-	var minX, minY, minZ;
-
-	maxX = maxY = Number.NEGATIVE_INFINITY;
-	minX = minY = Number.POSITIVE_INFINITY;
-
-	var v3 = points[ 0 ] instanceof THREE.Vector3;
-
-	var sum = v3 ? new THREE.Vector3() : new THREE.Vector2();
-
-	for ( var i = 0, l = points.length; i < l; i ++ ) {
-
-		var p = points[ i ];
-
-		if ( p.x > maxX ) maxX = p.x;
-		else if ( p.x < minX ) minX = p.x;
-
-		if ( p.y > maxY ) maxY = p.y;
-		else if ( p.y < minY ) minY = p.y;
-
-		if ( v3 ) {
-
-			if ( p.z > maxZ ) maxZ = p.z;
-			else if ( p.z < minZ ) minZ = p.z;
-
-		}
-
-		sum.add( p );
-
-	}
-
-	var ret = {
-
-		minX: minX,
-		minY: minY,
-		maxX: maxX,
-		maxY: maxY
-
-	};
-
-	if ( v3 ) {
-
-		ret.maxZ = maxZ;
-		ret.minZ = minZ;
-
-	}
-
-	return ret;
-
-};
-
 /**************************************************************
  *	Create Geometries Helpers
  **************************************************************/
@@ -30002,95 +29934,6 @@ THREE.CurvePath.prototype.createGeometry = function( points ) {
 	}
 
 	return geometry;
-
-};
-
-
-/**************************************************************
- *	Bend / Wrap Helper Methods
- **************************************************************/
-
-// Wrap path / Bend modifiers?
-
-THREE.CurvePath.prototype.addWrapPath = function ( bendpath ) {
-
-	this.bends.push( bendpath );
-
-};
-
-THREE.CurvePath.prototype.getTransformedPoints = function( segments, bends ) {
-
-	var oldPts = this.getPoints( segments ); // getPoints getSpacedPoints
-
-	if ( ! bends ) {
-
-		bends = this.bends;
-
-	}
-
-	for ( var i = 0, l = bends.length; i < l; i ++ ) {
-
-		oldPts = this.getWrapPoints( oldPts, bends[ i ] );
-
-	}
-
-	return oldPts;
-
-};
-
-THREE.CurvePath.prototype.getTransformedSpacedPoints = function( segments, bends ) {
-
-	var oldPts = this.getSpacedPoints( segments );
-
-	if ( ! bends ) {
-
-		bends = this.bends;
-
-	}
-
-	for ( var i = 0, l = bends.length; i < l; i ++ ) {
-
-		oldPts = this.getWrapPoints( oldPts, bends[ i ] );
-
-	}
-
-	return oldPts;
-
-};
-
-// This returns getPoints() bend/wrapped around the contour of a path.
-// Read http://www.planetclegg.com/projects/WarpingTextToSplines.html
-
-THREE.CurvePath.prototype.getWrapPoints = function ( oldPts, path ) {
-
-	var bounds = this.getBoundingBox();
-
-	for ( var i = 0, l = oldPts.length; i < l; i ++ ) {
-
-		var p = oldPts[ i ];
-
-		var oldX = p.x;
-		var oldY = p.y;
-
-		var xNorm = oldX / bounds.maxX;
-
-		// If using actual distance, for length > path, requires line extrusions
-		//xNorm = path.getUtoTmapping(xNorm, oldX); // 3 styles. 1) wrap stretched. 2) wrap stretch by arc length 3) warp by actual distance
-
-		xNorm = path.getUtoTmapping( xNorm, oldX );
-
-		// check for out of bounds?
-
-		var pathPt = path.getPoint( xNorm );
-		var normal = path.getTangent( xNorm );
-		normal.set( - normal.y, normal.x ).multiplyScalar( oldY );
-
-		p.x = pathPt.x + normal.x;
-		p.y = pathPt.y + normal.y;
-
-	}
-
-	return oldPts;
 
 };
 
@@ -30310,12 +30153,6 @@ THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 /* Return an array of vectors based on contour of the path */
 
 THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
-
-	if ( this.useSpacedPoints ) {
-
-		return this.getSpacedPoints( divisions, closedPath );
-
-	}
 
 	divisions = divisions || 12;
 
@@ -30890,23 +30727,7 @@ THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
 
 	for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ].getTransformedPoints( divisions, this.bends );
-
-	}
-
-	return holesPts;
-
-};
-
-// Get points of holes (spaced by regular distance)
-
-THREE.Shape.prototype.getSpacedPointsHoles = function ( divisions ) {
-
-	var holesPts = [];
-
-	for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
-
-		holesPts[ i ] = this.holes[ i ].getTransformedSpacedPoints( divisions, this.bends );
+		holesPts[ i ] = this.holes[ i ].getPoints( divisions );
 
 	}
 
@@ -30921,7 +30742,7 @@ THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
 
 	return {
 
-		shape: this.getTransformedPoints( divisions ),
+		shape: this.getPoints( divisions ),
 		holes: this.getPointsHoles( divisions )
 
 	};
@@ -30930,39 +30751,7 @@ THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
 
 THREE.Shape.prototype.extractPoints = function ( divisions ) {
 
-	if ( this.useSpacedPoints ) {
-
-		return this.extractAllSpacedPoints( divisions );
-
-	}
-
 	return this.extractAllPoints( divisions );
-
-};
-
-/*
-THREE.Shape.prototype.extractAllPointsWithBend = function ( divisions, bend ) {
-
-	return {
-
-		shape: this.transform( bend, divisions ),
-		holes: this.getPointsHoles( divisions, bend )
-
-	};
-
-};
-*/
-
-// Get points of shape and holes (spaced by regular distance)
-
-THREE.Shape.prototype.extractAllSpacedPoints = function ( divisions ) {
-
-	return {
-
-		shape: this.getTransformedSpacedPoints( divisions ),
-		holes: this.getSpacedPointsHoles( divisions )
-
-	};
 
 };
 
@@ -32773,6 +32562,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	var extrudePath = options.extrudePath;
 	var extrudePts, extrudeByPath = false;
 
+	var material = options.material;
+	var extrudeMaterial = options.extrudeMaterial;
+
 	// Use default WorldUVGenerator if no UV generators are specified.
 	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : THREE.ExtrudeGeometry.WorldUVGenerator;
 
@@ -33317,7 +33109,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		b += shapesOffset;
 		c += shapesOffset;
 
-		scope.faces.push( new THREE.Face3( a, b, c ) );
+		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
 
 		var uvs = uvgen.generateTopUV( scope, a, b, c );
 
@@ -33332,8 +33124,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		c += shapesOffset;
 		d += shapesOffset;
 
-		scope.faces.push( new THREE.Face3( a, b, d ) );
-		scope.faces.push( new THREE.Face3( b, c, d ) );
+		scope.faces.push( new THREE.Face3( a, b, d, null, null, extrudeMaterial ) );
+		scope.faces.push( new THREE.Face3( b, c, d, null, null, extrudeMaterial ) );
 
 		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
 
