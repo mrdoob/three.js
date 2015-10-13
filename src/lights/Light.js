@@ -71,7 +71,7 @@ Object.defineProperties( THREE.Light.prototype, {
 	},
 	shadowDarkness: {
 		set: function ( value ) {
-			console.warn( 'THREE.Light: .shadowDarkness has been removed.' );
+			this.shadow.darkness = value;
 		}
 	},
 	shadowMapWidth: {
