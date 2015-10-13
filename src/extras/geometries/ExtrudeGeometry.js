@@ -84,6 +84,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	var extrudePath = options.extrudePath;
 	var extrudePts, extrudeByPath = false;
 
+	var material = options.material;
+	var extrudeMaterial = options.extrudeMaterial;
+
 	// Use default WorldUVGenerator if no UV generators are specified.
 	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : THREE.ExtrudeGeometry.WorldUVGenerator;
 
@@ -628,7 +631,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		b += shapesOffset;
 		c += shapesOffset;
 
-		scope.faces.push( new THREE.Face3( a, b, c ) );
+		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
 
 		var uvs = uvgen.generateTopUV( scope, a, b, c );
 
@@ -643,8 +646,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		c += shapesOffset;
 		d += shapesOffset;
 
-		scope.faces.push( new THREE.Face3( a, b, d ) );
-		scope.faces.push( new THREE.Face3( b, c, d ) );
+		scope.faces.push( new THREE.Face3( a, b, d, null, null, extrudeMaterial ) );
+		scope.faces.push( new THREE.Face3( b, c, d, null, null, extrudeMaterial ) );
 
 		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
 
