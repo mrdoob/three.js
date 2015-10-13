@@ -290,15 +290,11 @@ THREE.Vector2.prototype = {
 
 	}(),
 
-	clampLength: function () {
+	clampLength: function ( min, max ) {
 
-		var oldLength, newLength;
+			var oldLength = this.length();
 
-		return function clampLength( min, max ) {
-
-			oldLength = this.length();
-
-			newLength = ( oldLength < min ) ? min : ( ( oldLength > max ) ? max : oldLength );
+			var newLength = ( oldLength < min ) ? min : ( ( oldLength > max ) ? max : oldLength );
 
 			if ( newLength !== oldLength ) {
 
@@ -308,9 +304,7 @@ THREE.Vector2.prototype = {
 
 			return this;
 
-		};
-
-	}(),
+	},
 
 	floor: function () {
 
