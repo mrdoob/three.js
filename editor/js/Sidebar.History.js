@@ -21,7 +21,8 @@ Sidebar.History = function ( editor ) {
 	container.addStatic( new UI.Text( 'HISTORY' ) );
 
 	// Checkbox 'Save History'
-	var saveHistorySpan = new UI.Span().setPosition( 'absolute' ).setLeft( '200px' ).setFontSize( '13px' );
+
+	var saveHistorySpan = new UI.Span().setPosition( 'absolute' ).setLeft( '180px' ).setFontSize( '13px' );
 	var saveHistoryCheckbox = new UI.Checkbox( config.getKey( 'project/history/stored' ) ).setLeft( '50px' ).onChange( function () {
 
 		config.setKey( 'project/history/stored', this.getValue() );
