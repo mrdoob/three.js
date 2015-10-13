@@ -31,6 +31,7 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 
 #endif
 
+
 #if MAX_POINT_LIGHTS > 0
 
 	struct PointLight {
@@ -55,6 +56,7 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 	}
 
 #endif
+
 
 #if MAX_SPOT_LIGHTS > 0
 
@@ -82,76 +84,6 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 	
 		incidentLight.color = spotLight.color;
 		incidentLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
-
-	}
-
-#endif
-
-#define MAX_AREA_LIGHTS 0 
-
-#if MAX_AREA_LIGHTS > 0
-
-	struct HemisphereLight {
-	  vec3 position;
-	  vec3 width;
-	  vec3 height;
-	  vec3 color;
-	  //sampler2D image;
-	  float distance;
-	  float decay;
-	};
-
-	uniform AreaLight areaLights[ MAX_AREA_LIGHTS ];
-
-	void getAreaIncidentLight( const in AreaLight areaLight, const in GeometricContext geometry, out IncidentLight diffuseIncidentLight, out IncidentLight specularIncidentLight ) {
-	
-		float widthLength = length( areaLight.width );
-		float heightLength = length( areaLight.height );
-
-		vec3 widthDir = areaLight.width / widthLength;
-		vec3 heightDir = areaLight.height / heightLength;
-		vec3 areaLightDirection = normalize( cross( widthDir, heightDir ) );
-
-		// project onto plane and calculate direction from center to the projection.
-		vec3 planePosition = projectOnPlane( viewDir, areaLight.position, areaLightDirection ),  // projection in plane
-		vec3 planeOffset = planePosition - areaLight.position;
-
-		// calculate distance from area:
-		vec2 planeOffsetUV = vec2( dot( planeOffset, widthDir ), dot( planeOffset, heightDir ) );
-		vec2 clampedPlaneOffsetUV = vec2( clamp( planeOffsetUV.x, -widthLength, widthLength ), clamp( planeOffsetUV.y, -heightLength, heightLength ) );
-		vec3 clampedPlanePosition = areaLight.position + ( widthDir * clampedPlaneOffsetUV.x + heightDir * clampedPlaneOffsetUV.y );
-
-		vec3 positionToLight = ( clampedPlanePosition - geometry.position );
-		float lightDistance = length( positionToLight );
-
-		diffuseIncidentLight.color = areaLight.color[ i ] * calcLightAttenuation( lightDistance, areaLight.distance, areaLight.decay ) * 0.01;
-		diffuseIncidentLight.direction = positionToLight / lightDistance;
-
-
-		vec3 reflectDir = reflect( geometry.viewDir, geometry.normal );
-		planePosition = linePlaneIntersect( geometry.position, reflectDir, areaLight.osition[ i ], areaLightNormal[ i ] );
-		float specAngle = dot( reflectDir, direction );
-		
-		if( dot( geometry.position - areaLight.position, areaLightDirection ) >= 0.0 && specAngle > 0.0 ) {
-
-			planeOffset = planePosition - areaLight.position;
-			planeOffsetUV = vec2( dot( planeOffset, widthDir ), dot( planeOffset, heightDir ) );
-			clampedPlaneOffsetUV = vec2( clamp( planeOffsetUV.x, -widthLength, widthLength ), clamp( planeOffsetUV.y, -heightLength, heightLength ) );
-			clampedPlanePosition = areaLight.position + ( widthDir * clampedPlaneOffsetUV.x + heightDir * clampedPlaneOffsetUV.y );
-
-			positionToLight = ( clampedPlanePosition - geometry.position );
-			lightDistance = length( positionToLight );
-
-			specularIncidentLight.color = areaLight.color[ i ] * calcLightAttenuation( lightDistance, areaLight.distance, areaLight.decay ) * 0.01;
-			specularIncidentLight.direction = positionToLight / lightDistance;
-
-		}
-		else {
-
-			specularIncidentLight.color = vec3( 0.0 );
-			specularIncidentLight.direction = vec3( 1.0, 0.0, 0.0 );
-
-		}
 
 	}
 
@@ -201,6 +133,78 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 
 		incidentLight.color = vec3( 0.0 );
 		incidentLight.direction = geometry.normal;
+
+	}
+
+#endif
+
+
+#define MAX_AREA_LIGHTS 0 
+
+#if MAX_AREA_LIGHTS > 0
+
+	struct HemisphereLight {
+	  vec3 position;	// NOTE: top left of area light, not the center
+	  vec3 width;
+	  vec3 height;
+	  vec3 color;
+	  //sampler2D image;
+	  float distance;
+	  float decay;
+	};
+
+	uniform AreaLight areaLights[ MAX_AREA_LIGHTS ];
+
+	vec3 clampToAreaLight( const in mat3 worldToPlaneMat, const in vec3 lightPositionPlaneCoord, const in vec3 point ) {
+
+		// convert into "plane space" from world space
+		var pointPlaneCoord = worldToPlaneMat * point;
+
+		// clamp point plane coords to positive unit in plane space.
+		pointPlaneCoord.xy = clamp( positionPlaneCoord.xy - lightPositionPlaneCoord.xy, 0.0, 1.0 ) + lightPositionPlaneCoord.xy;
+		pointPlaneCoord.z = lightPositionPlaneOffset; // project onto plane in plane coordinate space
+
+		// convert out of "plane space" into world space
+		return positionPlaneCoord * worldToPlaneMat;
+
+	}
+
+	void getAreaIncidentLight( const in AreaLight areaLight, const in GeometricContext geometry, out IncidentLight diffuseIncidentLight, out IncidentLight specularIncidentLight ) {
+	
+		vec3 areaLightDirection = normalize( cross( widthDir, heightDir ) );
+		// NOTE: width and height are purposely not normalized, this is necessary because plane space is scaled based on width/height size.
+		mat3 worldToPlaneMat = mat3( areaLight.width, areaLight.height, areaLightDirection );
+		vec3 lightPositionPlaneCoord = worldToPlaneMat * areaLight.position;
+
+		vec3 clampedPlanePosition = clampToAreaLight( worldToPlaneMat, lightPositionPlaneCoord, geometry.position );
+
+		vec3 positionToLight = ( clampedPlanePosition - geometry.position );
+		float lightDistance = length( positionToLight );
+
+		diffuseIncidentLight.color = areaLight.color[ i ] * calcLightAttenuation( lightDistance, areaLight.distance, areaLight.decay ) * 0.01;
+		diffuseIncidentLight.direction = positionToLight / lightDistance;
+
+		vec3 reflectDir = reflect( geometry.viewDir, geometry.normal );
+		float specAngle = dot( reflectDir, direction );
+		
+		if( dot( geometry.position - areaLight.position, areaLightDirection ) >= 0.0 && specAngle > 0.0 ) {
+
+			lightPositionPlaneCoord = linePlaneIntersect( geometry.position, reflectDir, areaLight.position, areaLight.normal );
+			clampedPlanePosition = clampToAreaLight( worldToPlaneMat, lightPositionPlaneCoord, lightPositionPlaneCoord );
+
+			positionToLight = ( clampedPlanePosition - geometry.position );
+			lightDistance = length( positionToLight );
+
+			specularIncidentLight.color = areaLight.color[ i ] * calcLightAttenuation( lightDistance, areaLight.distance, areaLight.decay );
+			specularIncidentLight.direction = positionToLight / lightDistance;
+
+		}
+		else {
+
+			specularIncidentLight.color = vec3( 0.0 );
+			specularIncidentLight.direction = vec3( 1.0, 0.0, 0.0 );
+
+		}
 
 	}
 
