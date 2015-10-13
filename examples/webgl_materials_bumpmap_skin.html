@@ -71,7 +71,7 @@
 
 			var mesh, mesh2;
 
-			var directionalLight, directionalLight2;
+			var directionalLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -105,7 +105,9 @@
 
 				// LIGHTS
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 2.25 );
+				scene.add( new THREE.AmbientLight( 0x333344 ) );
+
+				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( 500, - 250, 500 );
 
 				directionalLight.castShadow = true;
@@ -125,12 +127,6 @@
 				directionalLight.shadowBias = -0.005;
 
 				scene.add( directionalLight );
-
-				//
-
-				directionalLight2 = new THREE.DirectionalLight( 0x8888ff, 0.75 );
-				directionalLight2.position.set( - 500, 250, - 500 );
-				scene.add( directionalLight2 );
 
 				//
 
