@@ -55,7 +55,7 @@ THREE.KeyframeTrack.prototype = {
 
 	InterpolantFactoryMethodSmooth: function( result ) {
 
-		return new THREE.SmoothInterpolant(
+		return new THREE.CubicInterpolant(
 				this.times, this.values, this.getValueSize(), result );
 
 	},

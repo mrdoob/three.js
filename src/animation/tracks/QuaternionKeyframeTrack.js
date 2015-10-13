@@ -25,7 +25,7 @@ Object.assign( THREE.QuaternionKeyframeTrack.prototype, THREE.KeyframeTrack.prot
 
 	InterpolantFactoryMethodLinear: function( result ) {
 
-		return new THREE.SlerpInterpolant(
+		return new THREE.QuaternionLinearInterpolant(
 				this.times, this.values, this.getValueSize(), result );
 
 	},

@@ -363,6 +363,12 @@ THREE.InterpolateDiscrete = 2300;
 THREE.InterpolateLinear = 2301;
 THREE.InterpolateSmooth = 2302;
 
+// Interpolant ending modes
+
+THREE.ZeroCurvatureEnding = 2400;
+THREE.ZeroSlopeEnding = 2401;
+THREE.WrapAroundEnding = 2402;
+
 // DEPRECATED
 
 THREE.Projector = function () {

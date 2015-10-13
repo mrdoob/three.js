@@ -122,7 +122,7 @@ THREE.AnimationMixer.prototype = {
 
 			++ propertyMixer.referenceCount;
 
-			interpolants[ i ].result = propertyMixer.buffer;
+			interpolants[ i ].resultBuffer = propertyMixer.buffer;
 			actionBindings[ i ] = propertyMixer;
 
 		}
@@ -171,7 +171,7 @@ THREE.AnimationMixer.prototype = {
 			var propertyMixer = actionBindings[ i ];
 			actionBindings[ i ] = null;
 
-			interpolants[ i ].result = null;
+			interpolants[ i ].resultBuffer = null;
 
 			// eventually remove the binding from the array
 			if( -- propertyMixer.referenceCount === 0 ) {
@@ -344,7 +344,7 @@ THREE.AnimationMixer.prototype = {
 
 			for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
 
-				interpolants[ j ].getAt( actionTime );
+				interpolants[ j ].evaluate( actionTime );
 				propertyMixers[ j ].accumulate( accuIndex, weight );
 
 			}

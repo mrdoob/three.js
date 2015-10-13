@@ -162,9 +162,9 @@ THREE.AnimationAction.prototype = {
 
 		var timeScale = this.timeScale;
 
-		if( timeScale.getAt !== undefined ) {
+		if( timeScale.evaluate !== undefined ) {
 
-			return timeScale.getAt( time )[ 0 ];
+			return timeScale.evaluate( time )[ 0 ];
 
 		}
 
@@ -177,9 +177,9 @@ THREE.AnimationAction.prototype = {
 
 		var weight = this.weight;
 
-		if( weight.getAt !== undefined ) {
+		if( weight.evaluate !== undefined ) {
 
-			return weight.getAt( time )[ 0 ];
+			return weight.evaluate( time )[ 0 ];
 
 		}
 
