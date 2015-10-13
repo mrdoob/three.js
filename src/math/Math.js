@@ -48,14 +48,6 @@ THREE.Math = {
 
 	},
 
-	// Clamp value to range <a, inf)
-
-	clampBottom: function ( x, a ) {
-
-		return x < a ? a : x;
-
-	},
-
 	// compute euclidian modulo of m % n
 	// https://en.wikipedia.org/wiki/Modulo_operation
 
