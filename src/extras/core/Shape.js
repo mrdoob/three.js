@@ -44,23 +44,7 @@ THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
 
 	for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ].getTransformedPoints( divisions, this.bends );
-
-	}
-
-	return holesPts;
-
-};
-
-// Get points of holes (spaced by regular distance)
-
-THREE.Shape.prototype.getSpacedPointsHoles = function ( divisions ) {
-
-	var holesPts = [];
-
-	for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
-
-		holesPts[ i ] = this.holes[ i ].getTransformedSpacedPoints( divisions, this.bends );
+		holesPts[ i ] = this.holes[ i ].getPoints( divisions );
 
 	}
 
@@ -75,7 +59,7 @@ THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
 
 	return {
 
-		shape: this.getTransformedPoints( divisions ),
+		shape: this.getPoints( divisions ),
 		holes: this.getPointsHoles( divisions )
 
 	};
@@ -84,39 +68,7 @@ THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
 
 THREE.Shape.prototype.extractPoints = function ( divisions ) {
 
-	if ( this.useSpacedPoints ) {
-
-		return this.extractAllSpacedPoints( divisions );
-
-	}
-
 	return this.extractAllPoints( divisions );
-
-};
-
-/*
-THREE.Shape.prototype.extractAllPointsWithBend = function ( divisions, bend ) {
-
-	return {
-
-		shape: this.transform( bend, divisions ),
-		holes: this.getPointsHoles( divisions, bend )
-
-	};
-
-};
-*/
-
-// Get points of shape and holes (spaced by regular distance)
-
-THREE.Shape.prototype.extractAllSpacedPoints = function ( divisions ) {
-
-	return {
-
-		shape: this.getTransformedSpacedPoints( divisions ),
-		holes: this.getSpacedPointsHoles( divisions )
-
-	};
 
 };
 

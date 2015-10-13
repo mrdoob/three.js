@@ -213,12 +213,6 @@ THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
 THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
-	if ( this.useSpacedPoints ) {
-
-		return this.getSpacedPoints( divisions, closedPath );
-
-	}
-
 	divisions = divisions || 12;
 
 	var points = [];
