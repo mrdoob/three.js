@@ -191,7 +191,7 @@ THREE.Color.prototype = {
 					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*$/.exec( components ) ) {
 
 						// hsl(120,50%,50%)
-						var h = parseFloat( color[ 1 ] );
+						var h = parseFloat( color[ 1 ] ) / 360;
 						var s = parseInt( color[ 2 ], 10 ) / 100;
 						var l = parseInt( color[ 3 ], 10 ) / 100;
 
@@ -206,7 +206,7 @@ THREE.Color.prototype = {
 					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*([0-9]*\.?[0-9]+)\s*$/.exec( components ) ) {
 
 						// hsla(120,50%,50%,0.5)
-						var h = parseFloat( color[ 1 ] );
+						var h = parseFloat( color[ 1 ] ) / 360;
 						var s = parseInt( color[ 2 ], 10 ) / 100;
 						var l = parseInt( color[ 3 ], 10 ) / 100;
 						parseAlpha( color[ 4 ] );
