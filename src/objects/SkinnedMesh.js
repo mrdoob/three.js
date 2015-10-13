@@ -43,7 +43,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 			gbone = this.geometry.bones[ b ];
 
-			if ( gbone.parent !== - 1 ) {
+			if ( gbone.parent !== - 1 && gbone.parent !== null) {
 
 				bones[ gbone.parent ].add( bones[ b ] );
 

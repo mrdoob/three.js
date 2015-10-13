@@ -97,13 +97,3 @@ vec3 totalSpecularLight = vec3( 0.0 );
 	}
 
 #endif
-
-#ifdef METAL
-
-	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + totalEmissiveLight;
-
-#else
-
-	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;
-
-#endif

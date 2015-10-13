@@ -1,18 +1,16 @@
 #ifdef USE_SHADOWMAP
 
-	vec3 shadowMask = vec3( 1.0 );
-
 	for ( int i = 0; i < MAX_SHADOWS; i ++ ) {
-		
+
 		float texelSizeY =  1.0 / shadowMapSize[ i ].y;
 
-		float shadow = 0.0;	
+		float shadow = 0.0;
 
 #if defined( POINT_LIGHT_SHADOWS )
 
 		// to save on uniform space, we use the sign of @shadowDarkness[ i ] to determine
 		// whether or not this light is a point light ( shadowDarkness[ i ] < 0 == point light)
-		bool isPointLight = shadowDarkness[ i ] < 0.0;	
+		bool isPointLight = shadowDarkness[ i ] < 0.0;
 
 		if ( isPointLight ) {
 
@@ -102,11 +100,11 @@
 			if ( frustumTest ) {
 
 	#if defined( SHADOWMAP_TYPE_PCF )
-		
+
 				// Percentage-close filtering
 				// (9 pixel kernel)
 				// http://fabiensanglard.net/shadowmappingPCF/
-				
+
 				/*
 						// nested loops breaks shader compiler / validator on some ATI cards when using OpenGL
 						// must enroll loop manually
@@ -163,7 +161,7 @@
 
 				shadow *= shadowDarkness[ i ];
 
-	#elif defined( SHADOWMAP_TYPE_PCF_SOFT )				
+	#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
 
 				// Percentage-close filtering
 				// (9 pixel kernel)
@@ -216,14 +214,14 @@
 				shadow = dot( shadowValues, vec4( 1.0 ) ) * shadowDarkness[ i ];
 
 	#else // no percentage-closer filtering:
-				
+
 				shadowCoord.z += shadowBias[ i ];
 
 				vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );
 				float fDepth = unpackDepth( rgbaDepth );
 
 				if ( fDepth < shadowCoord.z )
-					shadow = shadowDarkness[ i ];				
+					shadow = shadowDarkness[ i ];
 
 	#endif
 
@@ -257,10 +255,8 @@
 
 #endif
 
-		shadowMask = shadowMask * vec3( 1.0 - shadow );	
+		shadowMask = shadowMask * vec3( 1.0 - shadow );
 
 	}
-
-	outgoingLight = outgoingLight * shadowMask;
 
 #endif

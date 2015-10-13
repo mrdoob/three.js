@@ -60,7 +60,6 @@
         },
         "materials": [{
             "opacity": 1,
-            "colorAmbient": [0.8,0.8,0.8],
             "doubleSided": true,
             "depthWrite": true,
             "depthTest": true,
