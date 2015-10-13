@@ -61,6 +61,7 @@
 				camera.position.set( 0, 10, 40 );
 
 				scene = new THREE.Scene();
+				scene.add( new THREE.AmbientLight( 0x222233 ) );
 
 				// Lights
 
@@ -74,6 +75,7 @@
 					pointLight.shadowMapWidth = 2048;
 					pointLight.shadowMapHeight = 1024;
 					pointLight.shadowBias = 0.01;
+					pointLight.shadowDarkness = 0.5;
 
 					var geometry = new THREE.SphereGeometry( 0.3, 32, 32 );
 					var material = new THREE.MeshBasicMaterial( { color: color } );
