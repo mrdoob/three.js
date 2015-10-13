@@ -21,7 +21,6 @@
     "DbgIndex" : 0,
     "DbgName" : "MaleMarineC",
     "blending" : "NormalBlending",
-    "colorAmbient" : [0.5364704212020399, 0.5364704212020399, 0.5364704212020399],
     "colorDiffuse" : [0.5364704212020399, 0.5364704212020399, 0.5364704212020399],
     "colorSpecular" : [0.19372500479221344, 0.19372500479221344, 0.19372500479221344],
     "depthTest" : true,
