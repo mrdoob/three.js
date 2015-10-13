@@ -302,7 +302,7 @@ THREE.Vector2.prototype = {
 
 			if ( newLength !== oldLength ) {
 
-				this.multiplyScalar( newLength / oldLength );
+				this.divideScalar( oldLength ).multiplyScalar( newLength );
 
 			}
 
