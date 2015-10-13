@@ -445,17 +445,15 @@ THREE.Color.prototype = {
 
 	setStyle: function ( style ) {
 
-		function parseAlpha( strAlpha ) {
+		function handleAlpha( string ) {
 
-			var alpha = parseFloat( strAlpha );
+			if ( string === undefined ) return;
 
-			if ( alpha < 1 ) {
+			if ( parseFloat( string ) < 1 ) {
 
-				console.warn( 'THREE.Color: Alpha component of color ' + style + ' will be ignored.' );
+				console.warn( 'THREE.Color: Alpha component of ' + style + ' will be ignored.' );
 
 			}
-
-			return alpha;
 
 		}
 
@@ -473,52 +471,29 @@ THREE.Color.prototype = {
 			switch ( name ) {
 
 				case 'rgb':
-
-					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*$/.exec( components ) ) {
-
-						// rgb(255,0,0)
-						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
-						this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
-						this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
-
-						return this;
-
-					}
-
-					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*$/.exec( components ) ) {
-
-						// rgb(100%,0%,0%)
-						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
-						this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
-						this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
-
-						return this;
-
-					}
-
-					break;
-
 				case 'rgba':
 
-					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9]*\.?[0-9]+)\s*$/.exec( components ) ) {
+					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(,\s*([0-9]*\.?[0-9]+)\s*)?$/.exec( components ) ) {
 
-						// rgba(255,0,0,0.5)
+						// rgb(255,0,0) rgba(255,0,0,0.5)
 						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
 						this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
 						this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
-						parseAlpha( color[ 4 ] );
+
+						handleAlpha( color[ 5 ] );
 
 						return this;
 
 					}
 
-					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*([0-9]*\.?[0-9]+)\s*$/.exec( components ) ) {
+					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(,\s*([0-9]*\.?[0-9]+)\s*)?$/.exec( components ) ) {
 
-						// rgba(100%,0%,0%,0.5)
+						// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
 						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
 						this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
 						this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
-						parseAlpha( color[ 4 ] );
+
+						handleAlpha( color[ 5 ] );
 
 						return this;
 
@@ -527,29 +502,16 @@ THREE.Color.prototype = {
 					break;
 
 				case 'hsl':
-
-					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*$/.exec( components ) ) {
-
-						// hsl(120,50%,50%)
-						var h = parseFloat( color[ 1 ] );
-						var s = parseInt( color[ 2 ], 10 ) / 100;
-						var l = parseInt( color[ 3 ], 10 ) / 100;
-
-						return this.setHSL( h, s, l );
-
-					}
-
-					break;
-
 				case 'hsla':
 
-					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*([0-9]*\.?[0-9]+)\s*$/.exec( components ) ) {
+					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(,\s*([0-9]*\.?[0-9]+)\s*)?$/.exec( components ) ) {
 
-						// hsla(120,50%,50%,0.5)
-						var h = parseFloat( color[ 1 ] );
+						// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
+						var h = parseFloat( color[ 1 ] ) / 360;
 						var s = parseInt( color[ 2 ], 10 ) / 100;
 						var l = parseInt( color[ 3 ], 10 ) / 100;
-						parseAlpha( color[ 4 ] );
+
+						handleAlpha( color[ 5 ] );
 
 						return this.setHSL( h, s, l );
 
@@ -1650,25 +1612,8 @@ THREE.Vector2.prototype = {
 
 		// This function assumes min < max, if this assumption isn't true it will not operate correctly
 
-		if ( this.x < min.x ) {
-
-			this.x = min.x;
-
-		} else if ( this.x > max.x ) {
-
-			this.x = max.x;
-
-		}
-
-		if ( this.y < min.y ) {
-
-			this.y = min.y;
-
-		} else if ( this.y > max.y ) {
-
-			this.y = max.y;
-
-		}
+		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
+		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
 
 		return this;
 
@@ -2327,35 +2272,9 @@ THREE.Vector3.prototype = {
 
 		// This function assumes min < max, if this assumption isn't true it will not operate correctly
 
-		if ( this.x < min.x ) {
-
-			this.x = min.x;
-
-		} else if ( this.x > max.x ) {
-
-			this.x = max.x;
-
-		}
-
-		if ( this.y < min.y ) {
-
-			this.y = min.y;
-
-		} else if ( this.y > max.y ) {
-
-			this.y = max.y;
-
-		}
-
-		if ( this.z < min.z ) {
-
-			this.z = min.z;
-
-		} else if ( this.z > max.z ) {
-
-			this.z = max.z;
-
-		}
+		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
+		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
+		this.z = Math.max( min.z, Math.min( max.z, this.z ) );
 
 		return this;
 
@@ -3202,45 +3121,10 @@ THREE.Vector4.prototype = {
 
 		// This function assumes min < max, if this assumption isn't true it will not operate correctly
 
-		if ( this.x < min.x ) {
-
-			this.x = min.x;
-
-		} else if ( this.x > max.x ) {
-
-			this.x = max.x;
-
-		}
-
-		if ( this.y < min.y ) {
-
-			this.y = min.y;
-
-		} else if ( this.y > max.y ) {
-
-			this.y = max.y;
-
-		}
-
-		if ( this.z < min.z ) {
-
-			this.z = min.z;
-
-		} else if ( this.z > max.z ) {
-
-			this.z = max.z;
-
-		}
-
-		if ( this.w < min.w ) {
-
-			this.w = min.w;
-
-		} else if ( this.w > max.w ) {
-
-			this.w = max.w;
-
-		}
+		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
+		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
+		this.z = Math.max( min.z, Math.min( max.z, this.z ) );
+		this.w = Math.max( min.w, Math.min( max.w, this.w ) );
 
 		return this;
 
@@ -19515,7 +19399,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 			gbone = this.geometry.bones[ b ];
 
-			if ( gbone.parent !== - 1 ) {
+			if ( gbone.parent !== - 1 && gbone.parent !== null) {
 
 				bones[ gbone.parent ].add( bones[ b ] );
 
