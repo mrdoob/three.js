@@ -181,3 +181,27 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 	}
 
 #endif
+
+
+#define MAX_LIGHT_PROBES 0
+
+#if MAX_LIGHT_PROBES > 0
+
+	struct ProbeLight {
+	  vec3 position;
+	  vec3 sh[9];
+	};
+
+	uniform LightProbes lightProbes[ MAX_LIGHT_PROBES ];
+
+	void getLightProbeIncidentLight( const in GeometricContext geometry, out IncidentLight incidentLight ) { 
+
+		// TODO: loop through all light probes and calculate their contributions
+		// based on an inverse distance weighting.	
+
+		incidentLight.color = vec3( 0.0 );
+		incidentLight.direction = geometry.normal;
+
+	}
+
+#endif
