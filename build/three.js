@@ -28325,24 +28325,16 @@ THREE.ImageUtils = {
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
 
-		var loader = new THREE.ImageLoader();
-		loader.crossOrigin = this.crossOrigin;
+		var loader = new THREE.TextureLoader();
+		loader.setCrossOrigin( this.crossOrigin );
 
-		var texture = new THREE.Texture( undefined, mapping );
-
-		loader.load( url, function ( image ) {
-
-			texture.image = image;
-			texture.needsUpdate = true;
+		var texture = loader.load( url, function ( texture ) {
 
 			if ( onLoad ) onLoad( texture );
 
-		}, undefined, function ( event ) {
+		}, undefined, onError );
 
-			if ( onError ) onError( event );
-
-		} );
-
+		texture.mapping = mapping;
 		texture.sourceFile = url;
 
 		return texture;
