@@ -414,23 +414,9 @@ THREE.Vector3.prototype = {
 
 	min: function ( v ) {
 
-		if ( this.x > v.x ) {
-
-			this.x = v.x;
-
-		}
-
-		if ( this.y > v.y ) {
-
-			this.y = v.y;
-
-		}
-
-		if ( this.z > v.z ) {
-
-			this.z = v.z;
-
-		}
+		this.x = Math.min( this.x, v.x );
+		this.y = Math.min( this.y, v.y );
+		this.z = Math.min( this.z, v.z );
 
 		return this;
 
@@ -438,23 +424,9 @@ THREE.Vector3.prototype = {
 
 	max: function ( v ) {
 
-		if ( this.x < v.x ) {
-
-			this.x = v.x;
-
-		}
-
-		if ( this.y < v.y ) {
-
-			this.y = v.y;
-
-		}
-
-		if ( this.z < v.z ) {
-
-			this.z = v.z;
-
-		}
+		this.x = Math.max( this.x, v.x );
+		this.y = Math.max( this.y, v.y );
+		this.z = Math.max( this.z, v.z );
 
 		return this;
 
