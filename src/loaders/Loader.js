@@ -76,16 +76,16 @@ THREE.Loader.prototype = {
 
 				if ( repeat !== undefined ) {
 
-					texture.repeat.set( repeat[ 0 ], repeat[ 1 ] );
+					texture.repeat.fromArray( repeat );
 
-					if ( repeat[ 0 ] > 1 ) texture.wrapS = THREE.RepeatWrapping;
-					if ( repeat[ 1 ] > 1 ) texture.wrapT = THREE.RepeatWrapping;
+					if ( repeat[ 0 ] !== 1 ) texture.wrapS = THREE.RepeatWrapping;
+					if ( repeat[ 1 ] !== 1 ) texture.wrapT = THREE.RepeatWrapping;
 
 				}
 
 				if ( offset !== undefined ) {
 
-					texture.offset.set( offset[ 0 ], offset[ 1 ] );
+					texture.offset.fromArray( offset );
 
 				}
 
