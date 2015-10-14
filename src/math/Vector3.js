@@ -494,6 +494,16 @@ THREE.Vector3.prototype = {
 
 	}(),
 
+	clampLength: function ( min, max ) {
+
+		var length = this.length();
+
+		this.multiplyScalar( Math.max( min, Math.min( max, length ) ) / length );
+
+		return this;
+
+	},
+
 	floor: function () {
 
 		this.x = Math.floor( this.x );
