@@ -61,8 +61,8 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 		var x1 = uvs[ 1 ].x;
 		var x2 = uvs[ 2 ].x;
 
-		var max = Math.max( x0, Math.max( x1, x2 ) );
-		var min = Math.min( x0, Math.min( x1, x2 ) );
+		var max = Math.max( x0, x1, x2 );
+		var min = Math.min( x0, x1, x2 );
 
 		if ( max > 0.9 && min < 0.1 ) {
 
