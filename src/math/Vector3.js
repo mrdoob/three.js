@@ -584,15 +584,9 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setLength: function ( l ) {
+	setLength: function ( length ) {
 
-		var oldLength = this.length();
-
-		if ( oldLength !== 0 && l !== oldLength  ) {
-
-			this.multiplyScalar( l / oldLength );
-
-		}
+		this.multiplyScalar( length / this.length() );
 
 		return this;
 
@@ -701,7 +695,7 @@ THREE.Vector3.prototype = {
 
 	angleTo: function ( v ) {
 
-		var theta = this.dot( v ) / ( Math.sqrt( this.lengthSq() * v.lengthSq() ) );
+		var theta = this.dot( v ) / Math.sqrt( this.lengthSq() * v.lengthSq() );
 
 		// clamp, to handle numerical problems
 
