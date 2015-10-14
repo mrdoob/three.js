@@ -362,6 +362,8 @@
 
 		// The four arrow keys
 		this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
+		// Track whether keys are up or down (down = true)
+		this.keyState = { LEFT: false, UP: false, RIGHT: false, BOTTOM: false };
 
 		// Mouse buttons
 		this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
@@ -610,27 +612,65 @@
 			switch ( event.keyCode ) {
 
 				case scope.keys.UP:
-					pan( 0, scope.keyPanSpeed );
-					scope.update();
+					scope.keyState.UP = true;
 					break;
 
 				case scope.keys.BOTTOM:
-					pan( 0, - scope.keyPanSpeed );
-					scope.update();
+					scope.keyState.BOTTOM = true;
 					break;
 
 				case scope.keys.LEFT:
-					pan( scope.keyPanSpeed, 0 );
-					scope.update();
+					scope.keyState.LEFT = true;
 					break;
 
 				case scope.keys.RIGHT:
-					pan( - scope.keyPanSpeed, 0 );
-					scope.update();
+					scope.keyState.RIGHT = true;
 					break;
 
 			}
 
+			var deltaX = 0;
+			if ( scope.keyState.LEFT ) deltaX += scope.keyPanSpeed;
+			if ( scope.keyState.RIGHT ) deltaX -= scope.keyPanSpeed;
+
+			var deltaY = 0;
+			if ( scope.keyState.UP ) deltaY += scope.keyPanSpeed;
+			if ( scope.keyState.BOTTOM ) deltaY -= scope.keyPanSpeed;
+
+			if (deltaX === 0 && deltaY === 0) return;
+			if (deltaX !== 0 && deltaY !== 0) {
+				// Travel diagonally at the same speed as axis-aligned
+				deltaX /= Math.SQRT2;
+				deltaY /= Math.SQRT2;
+			}
+			pan( deltaX, deltaY );
+			scope.update();
+
+		}
+
+		function onKeyUp( event ) {
+
+			if ( scope.enabled === false || scope.enableKeys === false || scope.enablePan === false ) return;
+
+			switch ( event.keyCode ) {
+
+				case scope.keys.UP:
+					scope.keyState.UP = false;
+					break;
+
+				case scope.keys.BOTTOM:
+					scope.keyState.BOTTOM = false;
+					break;
+
+				case scope.keys.LEFT:
+					scope.keyState.LEFT = false;
+					break;
+
+				case scope.keys.RIGHT:
+					scope.keyState.RIGHT = false;
+					break;
+
+			}
 		}
 
 		function touchstart( event ) {
@@ -788,6 +828,7 @@
 			document.removeEventListener( 'mouseup', onMouseUp, false );
 
 			window.removeEventListener( 'keydown', onKeyDown, false );
+			window.removeEventListener( 'keyup', onKeyUp, false );
 
 		}
 
@@ -802,6 +843,7 @@
 		this.domElement.addEventListener( 'touchmove', touchmove, false );
 
 		window.addEventListener( 'keydown', onKeyDown, false );
+		window.addEventListener( 'keyup', onKeyUp, false );
 
 		// force an update at start
 		this.update();
