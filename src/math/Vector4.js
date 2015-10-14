@@ -209,7 +209,7 @@ THREE.Vector4.prototype = {
 			this.x = 0;
 			this.y = 0;
 			this.z = 0;
-			this.w = 1;
+			this.w = 0;
 		}
 
 		return this;
