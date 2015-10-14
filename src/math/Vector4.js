@@ -200,10 +200,17 @@ THREE.Vector4.prototype = {
 
 	multiplyScalar: function ( scalar ) {
 
-		this.x *= scalar;
-		this.y *= scalar;
-		this.z *= scalar;
-		this.w *= scalar;
+		if ( isFinite( scalar ) ) {
+			this.x *= scalar;
+			this.y *= scalar;
+			this.z *= scalar;
+			this.w *= scalar;
+		} else {
+			this.x = 0;
+			this.y = 0;
+			this.z = 0;
+			this.w = 1;
+		}
 
 		return this;
 
@@ -229,25 +236,7 @@ THREE.Vector4.prototype = {
 
 	divideScalar: function ( scalar ) {
 
-		if ( scalar !== 0 ) {
-
-			var invScalar = 1 / scalar;
-
-			this.x *= invScalar;
-			this.y *= invScalar;
-			this.z *= invScalar;
-			this.w *= invScalar;
-
-		} else {
-
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
-			this.w = 1;
-
-		}
-
-		return this;
+		return this.multiplyScalar( 1 / scalar );
 
 	},
 
@@ -553,9 +542,7 @@ THREE.Vector4.prototype = {
 
 	setLength: function ( length ) {
 
-		this.multiplyScalar( length / this.length() );
-
-		return this;
+		return this.multiplyScalar( length / this.length() );
 
 	},
 
