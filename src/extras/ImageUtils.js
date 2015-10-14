@@ -10,15 +10,12 @@ THREE.ImageUtils = {
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
 
+		console.warn( 'THREE.ImageUtils.loadTexture is being deprecated. Use THREE.TextureLoader() instead.' );
+
 		var loader = new THREE.TextureLoader();
 		loader.setCrossOrigin( this.crossOrigin );
 
-		var texture = loader.load( url, function ( texture ) {
-
-			if ( onLoad ) onLoad( texture );
-
-		}, undefined, onError );
-
+		var texture = loader.load( url, onLoad, undefined, onError );
 		texture.mapping = mapping;
 
 		return texture;
@@ -27,15 +24,12 @@ THREE.ImageUtils = {
 
 	loadTextureCube: function ( urls, mapping, onLoad, onError ) {
 
+		console.warn( 'THREE.ImageUtils.loadTextureCube is being deprecated. Use THREE.CubeTextureLoader() instead.' );
+
 		var loader = new THREE.CubeTextureLoader();
 		loader.setCrossOrigin( this.crossOrigin );
 
-		var texture = loader.load( urls, function ( texture ) {
-
-			if ( onLoad ) onLoad( texture );
-
-		}, undefined, onError );
-
+		var texture = loader.load( urls, onLoad, undefined, onError );
 		texture.mapping = mapping;
 
 		return texture;
