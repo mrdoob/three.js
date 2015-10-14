@@ -149,6 +149,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
 
+			energyConserving: !! material.energyConserving,
+
 			combine: material.combine,
 
 			vertexColors: material.vertexColors,

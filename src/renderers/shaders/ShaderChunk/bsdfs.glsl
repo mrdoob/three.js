@@ -62,8 +62,8 @@ vec3 F_Schlick( const in vec3 F0, const in float dotLH ) {
 
 float G_SmithSchlick( float roughness2, float dotNL, float dotNV ) {
 
-	float termL = ( dotNL + sqrt( roughness2 + ( 1.0 - roughness2 ) * square( dotNL ) ) );
-	float termV = ( dotNV + sqrt( roughness2 + ( 1.0 - roughness2 ) * square( dotNV ) ) );
+	float termL = ( dotNL + sqrt( roughness2 + ( 1.0 - roughness2 ) * dotNL * dotNL ) );
+	float termV = ( dotNV + sqrt( roughness2 + ( 1.0 - roughness2 ) * dotNV * dotNV ) );
 	
 	return 1.0 / ( abs( termL * termV ) + 0.0000001 );
 
@@ -72,8 +72,8 @@ float G_SmithSchlick( float roughness2, float dotNL, float dotNV ) {
 float D_GGX( float roughness2, float dotNH ) {
 
 	// should 1/PI be in this distribution?
-	float denom = square( dotNH ) * ( roughness2 - 1.0 ) + 1.0;
-	return roughness2 / ( PI * square( denom ) + 0.0000001 );
+	float denom = dotNH * dotNH * ( roughness2 - 1.0 ) + 1.0;
+	return roughness2 / ( PI * denom * denom + 0.0000001 );
 
 }
 
