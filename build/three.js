@@ -14339,16 +14339,16 @@ THREE.Loader.prototype = {
 
 				if ( repeat !== undefined ) {
 
-					texture.repeat.set( repeat[ 0 ], repeat[ 1 ] );
+					texture.repeat.fromArray( repeat );
 
-					if ( repeat[ 0 ] > 1 ) texture.wrapS = THREE.RepeatWrapping;
-					if ( repeat[ 1 ] > 1 ) texture.wrapT = THREE.RepeatWrapping;
+					if ( repeat[ 0 ] !== 1 ) texture.wrapS = THREE.RepeatWrapping;
+					if ( repeat[ 1 ] !== 1 ) texture.wrapT = THREE.RepeatWrapping;
 
 				}
 
 				if ( offset !== undefined ) {
 
-					texture.offset.set( offset[ 0 ], offset[ 1 ] );
+					texture.offset.fromArray( offset );
 
 				}
 
@@ -14419,7 +14419,7 @@ THREE.Loader.prototype = {
 						if ( value.toLowerCase() === 'phong' ) json.type = 'MeshPhongMaterial';
 						break;
 					case 'mapDiffuse':
-						json.map = loadTexture( value, json.mapDiffuseRepeat, json.mapDiffuseOffset, json.mapDiffuseWrap, json.mapDiffuseAnisotropy );
+						json.map = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
 						break;
 					case 'mapDiffuseRepeat':
 					case 'mapDiffuseOffset':
@@ -14427,7 +14427,7 @@ THREE.Loader.prototype = {
 					case 'mapDiffuseAnisotropy':
 						break;
 					case 'mapLight':
-						json.lightMap = loadTexture( value, json.mapLightRepeat, json.mapLightOffset, json.mapLightWrap, json.mapLightAnisotropy );
+						json.lightMap = loadTexture( value, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
 						break;
 					case 'mapLightRepeat':
 					case 'mapLightOffset':
@@ -14435,7 +14435,7 @@ THREE.Loader.prototype = {
 					case 'mapLightAnisotropy':
 						break;
 					case 'mapAO':
-						json.aoMap = loadTexture( value, json.mapAORepeat, json.mapAOOffset, json.mapAOWrap, json.mapAOAnisotropy );
+						json.aoMap = loadTexture( value, m.mapAORepeat, m.mapAOOffset, m.mapAOWrap, m.mapAOAnisotropy );
 						break;
 					case 'mapAORepeat':
 					case 'mapAOOffset':
@@ -14443,7 +14443,7 @@ THREE.Loader.prototype = {
 					case 'mapAOAnisotropy':
 						break;
 					case 'mapBump':
-						json.bumpMap = loadTexture( value, json.mapBumpRepeat, json.mapBumpOffset, json.mapBumpWrap, json.mapBumpAnisotropy );
+						json.bumpMap = loadTexture( value, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy );
 						break;
 					case 'mapBumpScale':
 						json.bumpScale = value;
@@ -14454,7 +14454,7 @@ THREE.Loader.prototype = {
 					case 'mapBumpAnisotropy':
 						break;
 					case 'mapNormal':
-						json.normalMap = loadTexture( value, json.mapNormalRepeat, json.mapNormalOffset, json.mapNormalWrap, json.mapNormalAnisotropy );
+						json.normalMap = loadTexture( value, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy );
 						break;
 					case 'mapNormalFactor':
 						json.normalScale = [ value, value ];
@@ -14465,7 +14465,7 @@ THREE.Loader.prototype = {
 					case 'mapNormalAnisotropy':
 						break;
 					case 'mapSpecular':
-						json.specularMap = loadTexture( value, json.mapSpecularRepeat, json.mapSpecularOffset, json.mapSpecularWrap, json.mapSpecularAnisotropy );
+						json.specularMap = loadTexture( value, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy );
 						break;
 					case 'mapSpecularRepeat':
 					case 'mapSpecularOffset':
@@ -14473,7 +14473,7 @@ THREE.Loader.prototype = {
 					case 'mapSpecularAnisotropy':
 						break;
 					case 'mapAlpha':
-						json.alphaMap = loadTexture( value, json.mapAlphaRepeat, json.mapAlphaOffset, json.mapAlphaWrap, json.mapAlphaAnisotropy );
+						json.alphaMap = loadTexture( value, m.mapAlphaRepeat, m.mapAlphaOffset, m.mapAlphaWrap, m.mapAlphaAnisotropy );
 						break;
 					case 'mapAlphaRepeat':
 					case 'mapAlphaOffset':
@@ -16260,11 +16260,9 @@ THREE.TextureLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
-
 		var texture = new THREE.Texture();
 
-		var loader = new THREE.ImageLoader( scope.manager );
+		var loader = new THREE.ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( image ) {
 
@@ -16278,6 +16276,69 @@ THREE.TextureLoader.prototype = {
 			}
 
 		}, onProgress, onError );
+
+		return texture;
+
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	}
+
+};
+
+// File:src/loaders/CubeTextureLoader.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.CubeTextureLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
+
+THREE.CubeTextureLoader.prototype = {
+
+	constructor: THREE.CubeTextureLoader,
+
+	load: function ( urls, onLoad, onProgress, onError ) {
+
+		var texture = new THREE.CubeTexture( [] );
+
+		var loader = new THREE.ImageLoader();
+		loader.setCrossOrigin( this.crossOrigin );
+
+		var loaded = 0;
+
+		function loadTexture( i ) {
+
+			loader.load( urls[ i ], function ( image ) {
+
+				texture.images[ i ] = image;
+
+				loaded ++;
+
+				if ( loaded === 6 ) {
+
+					texture.needsUpdate = true;
+
+					if ( onLoad ) onLoad( texture );
+
+				}
+
+			}, undefined, onError );
+
+		}
+
+		for ( var i = 0; i < urls.length; ++ i ) {
+
+			loadTexture( i );
+
+		}
 
 		return texture;
 
@@ -28207,58 +28268,27 @@ THREE.ImageUtils = {
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
 
+		console.warn( 'THREE.ImageUtils.loadTexture is being deprecated. Use THREE.TextureLoader() instead.' );
+
 		var loader = new THREE.TextureLoader();
 		loader.setCrossOrigin( this.crossOrigin );
 
-		var texture = loader.load( url, function ( texture ) {
-
-			if ( onLoad ) onLoad( texture );
-
-		}, undefined, onError );
-
+		var texture = loader.load( url, onLoad, undefined, onError );
 		texture.mapping = mapping;
-		texture.sourceFile = url;
 
 		return texture;
 
 	},
 
-	loadTextureCube: function ( array, mapping, onLoad, onError ) {
+	loadTextureCube: function ( urls, mapping, onLoad, onError ) {
 
-		var images = [];
+		console.warn( 'THREE.ImageUtils.loadTextureCube is being deprecated. Use THREE.CubeTextureLoader() instead.' );
 
-		var loader = new THREE.ImageLoader();
-		loader.crossOrigin = this.crossOrigin;
+		var loader = new THREE.CubeTextureLoader();
+		loader.setCrossOrigin( this.crossOrigin );
 
-		var texture = new THREE.CubeTexture( images, mapping );
-
-		var loaded = 0;
-
-		function loadTexture( i ) {
-
-			loader.load( array[ i ], function ( image ) {
-
-				texture.images[ i ] = image;
-
-				loaded += 1;
-
-				if ( loaded === 6 ) {
-
-					texture.needsUpdate = true;
-
-					if ( onLoad ) onLoad( texture );
-
-				}
-
-			}, undefined, onError );
-
-		}
-
-		for ( var i = 0, il = array.length; i < il; ++ i ) {
-
-			loadTexture( i );
-
-		}
+		var texture = loader.load( urls, onLoad, undefined, onError );
+		texture.mapping = mapping;
 
 		return texture;
 
@@ -28273,133 +28303,6 @@ THREE.ImageUtils = {
 	loadCompressedTextureCube: function () {
 
 		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' )
-
-	},
-
-	getNormalMap: function ( image, depth ) {
-
-		// Adapted from http://www.paulbrunt.co.uk/lab/heightnormal/
-
-		function cross( a, b ) {
-
-			return [ a[ 1 ] * b[ 2 ] - a[ 2 ] * b[ 1 ], a[ 2 ] * b[ 0 ] - a[ 0 ] * b[ 2 ], a[ 0 ] * b[ 1 ] - a[ 1 ] * b[ 0 ] ];
-
-		}
-
-		function subtract( a, b ) {
-
-			return [ a[ 0 ] - b[ 0 ], a[ 1 ] - b[ 1 ], a[ 2 ] - b[ 2 ] ];
-
-		}
-
-		function normalize( a ) {
-
-			var l = Math.sqrt( a[ 0 ] * a[ 0 ] + a[ 1 ] * a[ 1 ] + a[ 2 ] * a[ 2 ] );
-			return [ a[ 0 ] / l, a[ 1 ] / l, a[ 2 ] / l ];
-
-		}
-
-		depth = depth | 1;
-
-		var width = image.width;
-		var height = image.height;
-
-		var canvas = document.createElement( 'canvas' );
-		canvas.width = width;
-		canvas.height = height;
-
-		var context = canvas.getContext( '2d' );
-		context.drawImage( image, 0, 0 );
-
-		var data = context.getImageData( 0, 0, width, height ).data;
-		var imageData = context.createImageData( width, height );
-		var output = imageData.data;
-
-		for ( var x = 0; x < width; x ++ ) {
-
-			for ( var y = 0; y < height; y ++ ) {
-
-				var ly = y - 1 < 0 ? 0 : y - 1;
-				var uy = y + 1 > height - 1 ? height - 1 : y + 1;
-				var lx = x - 1 < 0 ? 0 : x - 1;
-				var ux = x + 1 > width - 1 ? width - 1 : x + 1;
-
-				var points = [];
-				var origin = [ 0, 0, data[ ( y * width + x ) * 4 ] / 255 * depth ];
-				points.push( [ - 1, 0, data[ ( y * width + lx ) * 4 ] / 255 * depth ] );
-				points.push( [ - 1, - 1, data[ ( ly * width + lx ) * 4 ] / 255 * depth ] );
-				points.push( [ 0, - 1, data[ ( ly * width + x ) * 4 ] / 255 * depth ] );
-				points.push( [ 1, - 1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
-				points.push( [ 1, 0, data[ ( y * width + ux ) * 4 ] / 255 * depth ] );
-				points.push( [ 1, 1, data[ ( uy * width + ux ) * 4 ] / 255 * depth ] );
-				points.push( [ 0, 1, data[ ( uy * width + x ) * 4 ] / 255 * depth ] );
-				points.push( [ - 1, 1, data[ ( uy * width + lx ) * 4 ] / 255 * depth ] );
-
-				var normals = [];
-				var num_points = points.length;
-
-				for ( var i = 0; i < num_points; i ++ ) {
-
-					var v1 = points[ i ];
-					var v2 = points[ ( i + 1 ) % num_points ];
-					v1 = subtract( v1, origin );
-					v2 = subtract( v2, origin );
-					normals.push( normalize( cross( v1, v2 ) ) );
-
-				}
-
-				var normal = [ 0, 0, 0 ];
-
-				for ( var i = 0; i < normals.length; i ++ ) {
-
-					normal[ 0 ] += normals[ i ][ 0 ];
-					normal[ 1 ] += normals[ i ][ 1 ];
-					normal[ 2 ] += normals[ i ][ 2 ];
-
-				}
-
-				normal[ 0 ] /= normals.length;
-				normal[ 1 ] /= normals.length;
-				normal[ 2 ] /= normals.length;
-
-				var idx = ( y * width + x ) * 4;
-
-				output[ idx ] = ( ( normal[ 0 ] + 1.0 ) / 2.0 * 255 ) | 0;
-				output[ idx + 1 ] = ( ( normal[ 1 ] + 1.0 ) / 2.0 * 255 ) | 0;
-				output[ idx + 2 ] = ( normal[ 2 ] * 255 ) | 0;
-				output[ idx + 3 ] = 255;
-
-			}
-
-		}
-
-		context.putImageData( imageData, 0, 0 );
-
-		return canvas;
-
-	},
-
-	generateDataTexture: function ( width, height, color ) {
-
-		var size = width * height;
-		var data = new Uint8Array( 3 * size );
-
-		var r = Math.floor( color.r * 255 );
-		var g = Math.floor( color.g * 255 );
-		var b = Math.floor( color.b * 255 );
-
-		for ( var i = 0; i < size; i ++ ) {
-
-			data[ i * 3 ] 	   = r;
-			data[ i * 3 + 1 ] = g;
-			data[ i * 3 + 2 ] = b;
-
-		}
-
-		var texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
-		texture.needsUpdate = true;
-
-		return texture;
 
 	}
 
