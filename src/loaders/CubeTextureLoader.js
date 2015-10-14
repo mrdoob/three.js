@@ -17,7 +17,7 @@ THREE.CubeTextureLoader.prototype = {
 		var texture = new THREE.CubeTexture( [] );
 
 		var loader = new THREE.ImageLoader();
-		loder.setCrossOrigin( this.crossOrigin );
+		loader.setCrossOrigin( this.crossOrigin );
 
 		var loaded = 0;
 
