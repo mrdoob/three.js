@@ -20,48 +20,23 @@ THREE.ImageUtils = {
 		}, undefined, onError );
 
 		texture.mapping = mapping;
-		texture.sourceFile = url;
 
 		return texture;
 
 	},
 
-	loadTextureCube: function ( array, mapping, onLoad, onError ) {
+	loadTextureCube: function ( urls, mapping, onLoad, onError ) {
 
-		var images = [];
+		var loader = new THREE.CubeTextureLoader();
+		loader.setCrossOrigin( this.crossOrigin );
 
-		var loader = new THREE.ImageLoader();
-		loader.crossOrigin = this.crossOrigin;
+		var texture = loader.load( urls, function ( texture ) {
 
-		var texture = new THREE.CubeTexture( images, mapping );
+			if ( onLoad ) onLoad( texture );
 
-		var loaded = 0;
+		}, undefined, onError );
 
-		function loadTexture( i ) {
-
-			loader.load( array[ i ], function ( image ) {
-
-				texture.images[ i ] = image;
-
-				loaded += 1;
-
-				if ( loaded === 6 ) {
-
-					texture.needsUpdate = true;
-
-					if ( onLoad ) onLoad( texture );
-
-				}
-
-			}, undefined, onError );
-
-		}
-
-		for ( var i = 0, il = array.length; i < il; ++ i ) {
-
-			loadTexture( i );
-
-		}
+		texture.mapping = mapping;
 
 		return texture;
 
