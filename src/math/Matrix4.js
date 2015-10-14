@@ -341,7 +341,7 @@ THREE.Matrix4.prototype = {
 
 			z.subVectors( eye, target ).normalize();
 
-			if ( z.length() === 0 ) {
+			if ( z.lengthSq() === 0 ) {
 
 				z.z = 1;
 
@@ -349,7 +349,7 @@ THREE.Matrix4.prototype = {
 
 			x.crossVectors( up, z ).normalize();
 
-			if ( x.length() === 0 ) {
+			if ( x.lengthSq() === 0 ) {
 
 				z.x += 0.0001;
 				x.crossVectors( up, z ).normalize();
