@@ -65,6 +65,7 @@
 	"src/loaders/MaterialLoader.js",
 	"src/loaders/ObjectLoader.js",
 	"src/loaders/TextureLoader.js",
+	"src/loaders/CubeTextureLoader.js",	
 	"src/loaders/BinaryTextureLoader.js",
 	"src/loaders/CompressedTextureLoader.js",
 	"src/materials/Material.js",
