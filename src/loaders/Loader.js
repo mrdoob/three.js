@@ -156,7 +156,7 @@ THREE.Loader.prototype = {
 						if ( value.toLowerCase() === 'phong' ) json.type = 'MeshPhongMaterial';
 						break;
 					case 'mapDiffuse':
-						json.map = loadTexture( value, json.mapDiffuseRepeat, json.mapDiffuseOffset, json.mapDiffuseWrap, json.mapDiffuseAnisotropy );
+						json.map = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
 						break;
 					case 'mapDiffuseRepeat':
 					case 'mapDiffuseOffset':
@@ -164,7 +164,7 @@ THREE.Loader.prototype = {
 					case 'mapDiffuseAnisotropy':
 						break;
 					case 'mapLight':
-						json.lightMap = loadTexture( value, json.mapLightRepeat, json.mapLightOffset, json.mapLightWrap, json.mapLightAnisotropy );
+						json.lightMap = loadTexture( value, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
 						break;
 					case 'mapLightRepeat':
 					case 'mapLightOffset':
@@ -172,7 +172,7 @@ THREE.Loader.prototype = {
 					case 'mapLightAnisotropy':
 						break;
 					case 'mapAO':
-						json.aoMap = loadTexture( value, json.mapAORepeat, json.mapAOOffset, json.mapAOWrap, json.mapAOAnisotropy );
+						json.aoMap = loadTexture( value, m.mapAORepeat, m.mapAOOffset, m.mapAOWrap, m.mapAOAnisotropy );
 						break;
 					case 'mapAORepeat':
 					case 'mapAOOffset':
@@ -180,7 +180,7 @@ THREE.Loader.prototype = {
 					case 'mapAOAnisotropy':
 						break;
 					case 'mapBump':
-						json.bumpMap = loadTexture( value, json.mapBumpRepeat, json.mapBumpOffset, json.mapBumpWrap, json.mapBumpAnisotropy );
+						json.bumpMap = loadTexture( value, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy );
 						break;
 					case 'mapBumpScale':
 						json.bumpScale = value;
@@ -191,7 +191,7 @@ THREE.Loader.prototype = {
 					case 'mapBumpAnisotropy':
 						break;
 					case 'mapNormal':
-						json.normalMap = loadTexture( value, json.mapNormalRepeat, json.mapNormalOffset, json.mapNormalWrap, json.mapNormalAnisotropy );
+						json.normalMap = loadTexture( value, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy );
 						break;
 					case 'mapNormalFactor':
 						json.normalScale = [ value, value ];
@@ -202,7 +202,7 @@ THREE.Loader.prototype = {
 					case 'mapNormalAnisotropy':
 						break;
 					case 'mapSpecular':
-						json.specularMap = loadTexture( value, json.mapSpecularRepeat, json.mapSpecularOffset, json.mapSpecularWrap, json.mapSpecularAnisotropy );
+						json.specularMap = loadTexture( value, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy );
 						break;
 					case 'mapSpecularRepeat':
 					case 'mapSpecularOffset':
@@ -210,7 +210,7 @@ THREE.Loader.prototype = {
 					case 'mapSpecularAnisotropy':
 						break;
 					case 'mapAlpha':
-						json.alphaMap = loadTexture( value, json.mapAlphaRepeat, json.mapAlphaOffset, json.mapAlphaWrap, json.mapAlphaAnisotropy );
+						json.alphaMap = loadTexture( value, m.mapAlphaRepeat, m.mapAlphaOffset, m.mapAlphaWrap, m.mapAlphaAnisotropy );
 						break;
 					case 'mapAlphaRepeat':
 					case 'mapAlphaOffset':
