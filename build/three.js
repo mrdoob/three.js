@@ -23910,7 +23910,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var image = texture.image,
-		isImagePowerOfTwo = isPowerOfTwo( image ), // TODO: Always true at this step?
+		isImagePowerOfTwo = isPowerOfTwo( image ),
 		glFormat = paramThreeToGL( texture.format ),
 		glType = paramThreeToGL( texture.type );
 
@@ -24077,16 +24077,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function makePowerOfTwo( image ) {
 
-		var canvas = document.createElement( 'canvas' );
-		canvas.width = THREE.Math.nearestPowerOfTwo( image.width );
-		canvas.height = THREE.Math.nearestPowerOfTwo( image.height );
+		if ( image instanceof HTMLImageElement || image instanceof HTMLCanvasElement ) {
 
-		var context = canvas.getContext( '2d' );
-		context.drawImage( image, 0, 0, canvas.width, canvas.height );
+			var canvas = document.createElement( 'canvas' );
+			canvas.width = THREE.Math.nearestPowerOfTwo( image.width );
+			canvas.height = THREE.Math.nearestPowerOfTwo( image.height );
 
-		console.warn( 'THREE.WebGLRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
+			var context = canvas.getContext( '2d' );
+			context.drawImage( image, 0, 0, canvas.width, canvas.height );
 
-		return canvas;
+			console.warn( 'THREE.WebGLRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
+
+			return canvas;
+
+		}
+
+		return image;
 
 	}
 
