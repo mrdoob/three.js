@@ -16,7 +16,8 @@ THREE.ImageUtils = {
 		loader.setCrossOrigin( this.crossOrigin );
 
 		var texture = loader.load( url, onLoad, undefined, onError );
-		texture.mapping = mapping;
+
+		if ( mapping ) texture.mapping = mapping;
 
 		return texture;
 
@@ -30,7 +31,8 @@ THREE.ImageUtils = {
 		loader.setCrossOrigin( this.crossOrigin );
 
 		var texture = loader.load( urls, onLoad, undefined, onError );
-		texture.mapping = mapping;
+
+		if ( mapping ) texture.mapping = mapping;
 
 		return texture;
 
