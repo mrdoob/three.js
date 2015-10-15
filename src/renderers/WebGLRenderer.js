@@ -2707,8 +2707,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			textureProperties.__webglInit = true;
 
-			texture.__webglInit = true;
-
 			texture.addEventListener( 'dispose', onTextureDispose );
 
 			textureProperties.__webglTexture = _gl.createTexture();
