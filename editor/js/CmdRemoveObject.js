@@ -57,6 +57,7 @@ CmdRemoveObject.prototype = {
 
 		this.parent.children.splice( this.index, 0, this.object );
 		this.object.parent = this.parent;
+		this.editor.select( this.object );
 
 		this.editor.signals.objectAdded.dispatch( this.object );
 		this.editor.signals.sceneGraphChanged.dispatch();

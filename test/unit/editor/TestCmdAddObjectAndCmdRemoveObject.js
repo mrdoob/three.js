@@ -14,7 +14,7 @@ test( "Test CmdAddObject and CmdRemoveObject (Undo and Redo)", function() {
 	var light = aPointlight( 'The PointLight' );
 	var camera = aPerspectiveCamera( 'The Camera' );
 
-	var objects = [ box, light, camera ];
+	var objects = [ box , light, camera ];
 
 	objects.map( function( object ) {
 
@@ -31,6 +31,8 @@ test( "Test CmdAddObject and CmdRemoveObject (Undo and Redo)", function() {
 		editor.redo();
 		ok( editor.scene.children[ 0 ].name == object.name, "OK, removed '" + object.type + "' was added again (redo)" );
 
+		ok( editor.selected == object, "OK, focus was set on recovered object after Add-Redo" );
+
 
 		// Test Remove
 		var cmd = new CmdRemoveObject( object );
@@ -41,6 +43,8 @@ test( "Test CmdAddObject and CmdRemoveObject (Undo and Redo)", function() {
 
 		editor.undo();
 		ok( editor.scene.children[ 0 ].name == object.name, "OK, removed object was added again (undo)" );
+
+		ok( editor.selected == object, "OK, focus was set on recovered object after Delete-Undo" );
 
 		editor.redo();
 		ok( editor.scene.children.length == 0, "OK, object was removed again (redo)" );
