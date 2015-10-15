@@ -92,6 +92,16 @@ if ( self.performance.now === undefined ) {
 
 }
 
+//
+
+if ( Number.EPSILON === undefined ) {
+
+	Number.EPSILON = Math.pow( 2, -52 );
+
+}
+
+//
+
 if ( Math.sign === undefined ) {
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -2438,7 +2448,7 @@ THREE.Vector3.prototype = {
 
 	angleTo: function ( v ) {
 
-		var theta = this.dot( v ) / Math.sqrt( this.lengthSq() * v.lengthSq() );
+		var theta = this.dot( v ) / ( this.length() * v.length() );
 
 		// clamp, to handle numerical problems
 
@@ -5326,7 +5336,7 @@ THREE.Matrix4.prototype = {
 		var scaleYSq = te[ 4 ] * te[ 4 ] + te[ 5 ] * te[ 5 ] + te[ 6 ] * te[ 6 ];
 		var scaleZSq = te[ 8 ] * te[ 8 ] + te[ 9 ] * te[ 9 ] + te[ 10 ] * te[ 10 ];
 
-		return Math.sqrt( Math.max( scaleXSq, Math.max( scaleYSq, scaleZSq ) ) );
+		return Math.sqrt( Math.max( scaleXSq, scaleYSq, scaleZSq ) );
 
 	},
 
@@ -14054,6 +14064,8 @@ THREE.AmbientLight = function ( color ) {
 
 	this.type = 'AmbientLight';
 
+	this.castShadow = undefined;
+
 };
 
 THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
@@ -14110,6 +14122,8 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 	THREE.Light.call( this, skyColor );
 
 	this.type = 'HemisphereLight';
+
+	this.castShadow = undefined;
 
 	this.position.set( 0, 1, 0 );
 	this.updateMatrix();
@@ -23167,34 +23181,36 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var light = lights[ i ];
 
-				if ( light.castShadow === false ) continue;
+				if ( light.castShadow === true ) {
 
-				if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
+					if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
 
-					var shadow = light.shadow;
+						var shadow = light.shadow;
 
-					if ( light instanceof THREE.PointLight ) {
+						if ( light instanceof THREE.PointLight ) {
 
-						// for point lights we set the shadow matrix to be a translation-only matrix
-						// equal to inverse of the light's position
-						_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-						shadow.matrix.identity().setPosition( _vector3 );
+							// for point lights we set the shadow matrix to be a translation-only matrix
+							// equal to inverse of the light's position
+							_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
+							shadow.matrix.identity().setPosition( _vector3 );
 
-						// for point lights we set the sign of the shadowDarkness uniform to be negative
-						uniforms.shadowDarkness.value[ j ] = - shadow.darkness;
+							// for point lights we set the sign of the shadowDarkness uniform to be negative
+							uniforms.shadowDarkness.value[ j ] = - shadow.darkness;
 
-					} else {
+						} else {
 
-						uniforms.shadowDarkness.value[ j ] = shadow.darkness;
+							uniforms.shadowDarkness.value[ j ] = shadow.darkness;
+
+						}
+
+						uniforms.shadowMatrix.value[ j ] = shadow.matrix;
+						uniforms.shadowMap.value[ j ] = shadow.map;
+						uniforms.shadowMapSize.value[ j ] = shadow.mapSize;
+						uniforms.shadowBias.value[ j ] = shadow.bias;
+
+						j ++;
 
 					}
-
-					uniforms.shadowMatrix.value[ j ] = shadow.matrix;
-					uniforms.shadowMap.value[ j ] = shadow.map;
-					uniforms.shadowMapSize.value[ j ] = shadow.mapSize;
-					uniforms.shadowBias.value[ j ] = shadow.bias;
-
-					j ++;
 
 				}
 
@@ -23845,7 +23861,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( texture.wrapS !== THREE.ClampToEdgeWrapping || texture.wrapT !== THREE.ClampToEdgeWrapping ) {
 
-				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT should be set to THREE.ClampToEdgeWrapping. ( ' + texture.sourceFile + ' )' );
+				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT should be set to THREE.ClampToEdgeWrapping.', texture );
 
 			}
 
@@ -23854,7 +23870,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
 
-				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter. ( ' + texture.sourceFile + ' )' );
+				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter.', texture );
 
 			}
 
@@ -23883,8 +23899,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( textureProperties.__webglInit === undefined ) {
 
 			textureProperties.__webglInit = true;
-
-			texture.__webglInit = true;
 
 			texture.addEventListener( 'dispose', onTextureDispose );
 
@@ -26608,178 +26622,180 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			var light = _lights[ i ];
 
-			if ( light.castShadow === false ) continue;
+			if ( light.castShadow === true ) {
 
-			var shadow = light.shadow;
-			var shadowCamera = shadow.camera;
-			var shadowMapSize = shadow.mapSize;
+				var shadow = light.shadow;
+				var shadowCamera = shadow.camera;
+				var shadowMapSize = shadow.mapSize;
 
-			if ( light instanceof THREE.PointLight ) {
+				if ( light instanceof THREE.PointLight ) {
 
-				faceCount = 6;
-				isPointLight = true;
+					faceCount = 6;
+					isPointLight = true;
 
-				var vpWidth = shadowMapSize.x / 4.0;
-				var vpHeight = shadowMapSize.y / 2.0;
+					var vpWidth = shadowMapSize.x / 4.0;
+					var vpHeight = shadowMapSize.y / 2.0;
 
-				// These viewports map a cube-map onto a 2D texture with the
-				// following orientation:
-				//
-				//  xzXZ
-				//   y Y
-				//
-				// X - Positive x direction
-				// x - Negative x direction
-				// Y - Positive y direction
-				// y - Negative y direction
-				// Z - Positive z direction
-				// z - Negative z direction
+					// These viewports map a cube-map onto a 2D texture with the
+					// following orientation:
+					//
+					//  xzXZ
+					//   y Y
+					//
+					// X - Positive x direction
+					// x - Negative x direction
+					// Y - Positive y direction
+					// y - Negative y direction
+					// Z - Positive z direction
+					// z - Negative z direction
 
-				// positive X
-				cube2DViewPorts[ 0 ].set( vpWidth * 2, vpHeight, vpWidth, vpHeight );
-				// negative X
-				cube2DViewPorts[ 1 ].set( 0, vpHeight, vpWidth, vpHeight );
-				// positive Z
-				cube2DViewPorts[ 2 ].set( vpWidth * 3, vpHeight, vpWidth, vpHeight );
-				// negative Z
-				cube2DViewPorts[ 3 ].set( vpWidth, vpHeight, vpWidth, vpHeight );
-				// positive Y
-				cube2DViewPorts[ 4 ].set( vpWidth * 3, 0, vpWidth, vpHeight );
-				// negative Y
-				cube2DViewPorts[ 5 ].set( vpWidth, 0, vpWidth, vpHeight );
-
-			} else {
-
-				faceCount = 1;
-				isPointLight = false;
-
-			}
-
-			if ( shadow.map === null ) {
-
-				var shadowFilter = THREE.LinearFilter;
-
-				if ( scope.type === THREE.PCFSoftShadowMap ) {
-
-					shadowFilter = THREE.NearestFilter;
-
-				}
-
-				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
-
-				shadow.map = new THREE.WebGLRenderTarget( shadowMapSize.x, shadowMapSize.y, pars );
-				shadow.matrix = new THREE.Matrix4();
-
-				//
-
-				if ( light instanceof THREE.SpotLight ) {
-
-					shadowCamera.aspect = shadowMapSize.x / shadowMapSize.y;
-
-				}
-
-				shadowCamera.updateProjectionMatrix();
-
-			}
-
-			var shadowMap = shadow.map;
-			var shadowMatrix = shadow.matrix;
-
-			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-			shadowCamera.position.copy( _lightPositionWorld );
-
-			_renderer.setRenderTarget( shadowMap );
-			_renderer.clear();
-
-			// render shadow map for each cube face (if omni-directional) or
-			// run a single pass if not
-
-			for ( var face = 0; face < faceCount; face ++ ) {
-
-				if ( isPointLight ) {
-
-					_lookTarget.copy( shadowCamera.position );
-					_lookTarget.add( cubeDirections[ face ] );
-					shadowCamera.up.copy( cubeUps[ face ] );
-					shadowCamera.lookAt( _lookTarget );
-					var vpDimensions = cube2DViewPorts[ face ];
-					_renderer.setViewport( vpDimensions.x, vpDimensions.y, vpDimensions.z, vpDimensions.w );
+					// positive X
+					cube2DViewPorts[ 0 ].set( vpWidth * 2, vpHeight, vpWidth, vpHeight );
+					// negative X
+					cube2DViewPorts[ 1 ].set( 0, vpHeight, vpWidth, vpHeight );
+					// positive Z
+					cube2DViewPorts[ 2 ].set( vpWidth * 3, vpHeight, vpWidth, vpHeight );
+					// negative Z
+					cube2DViewPorts[ 3 ].set( vpWidth, vpHeight, vpWidth, vpHeight );
+					// positive Y
+					cube2DViewPorts[ 4 ].set( vpWidth * 3, 0, vpWidth, vpHeight );
+					// negative Y
+					cube2DViewPorts[ 5 ].set( vpWidth, 0, vpWidth, vpHeight );
 
 				} else {
 
-					_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
-					shadowCamera.lookAt( _lookTarget );
+					faceCount = 1;
+					isPointLight = false;
 
 				}
 
-				shadowCamera.updateMatrixWorld();
-				shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
+				if ( shadow.map === null ) {
 
-				// compute shadow matrix
+					var shadowFilter = THREE.LinearFilter;
 
-				shadowMatrix.set(
-					0.5, 0.0, 0.0, 0.5,
-					0.0, 0.5, 0.0, 0.5,
-					0.0, 0.0, 0.5, 0.5,
-					0.0, 0.0, 0.0, 1.0
-				);
+					if ( scope.type === THREE.PCFSoftShadowMap ) {
 
-				shadowMatrix.multiply( shadowCamera.projectionMatrix );
-				shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
+						shadowFilter = THREE.NearestFilter;
 
-				// update camera matrices and frustum
+					}
 
-				_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-				_frustum.setFromMatrix( _projScreenMatrix );
+					var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
 
-				// set object matrices & frustum culling
+					shadow.map = new THREE.WebGLRenderTarget( shadowMapSize.x, shadowMapSize.y, pars );
+					shadow.matrix = new THREE.Matrix4();
 
-				_renderList.length = 0;
+					//
 
-				projectObject( scene, shadowCamera );
+					if ( light instanceof THREE.SpotLight ) {
 
-				// render shadow map
-				// render regular objects
+						shadowCamera.aspect = shadowMapSize.x / shadowMapSize.y;
 
-				for ( var j = 0, jl = _renderList.length; j < jl; j ++ ) {
+					}
 
-					var object = _renderList[ j ];
-					var geometry = _objects.update( object );
-					var material = object.material;
+					shadowCamera.updateProjectionMatrix();
 
-					if ( material instanceof THREE.MeshFaceMaterial ) {
+				}
 
-						var groups = geometry.groups;
-						var materials = material.materials;
+				var shadowMap = shadow.map;
+				var shadowMatrix = shadow.matrix;
 
-						for ( var k = 0, kl = groups.length; k < kl; k ++ ) {
+				_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+				shadowCamera.position.copy( _lightPositionWorld );
 
-							var group = groups[ k ];
-							var groupMaterial = materials[ group.materialIndex ];
+				_renderer.setRenderTarget( shadowMap );
+				_renderer.clear();
 
-							if ( groupMaterial.visible === true ) {
+				// render shadow map for each cube face (if omni-directional) or
+				// run a single pass if not
 
-								var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
-								_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, depthMaterial, object, group );
+				for ( var face = 0; face < faceCount; face ++ ) {
 
-							}
+					if ( isPointLight ) {
 
-						}
+						_lookTarget.copy( shadowCamera.position );
+						_lookTarget.add( cubeDirections[ face ] );
+						shadowCamera.up.copy( cubeUps[ face ] );
+						shadowCamera.lookAt( _lookTarget );
+						var vpDimensions = cube2DViewPorts[ face ];
+						_renderer.setViewport( vpDimensions.x, vpDimensions.y, vpDimensions.z, vpDimensions.w );
 
 					} else {
 
-						var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
-						_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, depthMaterial, object, null );
+						_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+						shadowCamera.lookAt( _lookTarget );
+
+					}
+
+					shadowCamera.updateMatrixWorld();
+					shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
+
+					// compute shadow matrix
+
+					shadowMatrix.set(
+						0.5, 0.0, 0.0, 0.5,
+						0.0, 0.5, 0.0, 0.5,
+						0.0, 0.0, 0.5, 0.5,
+						0.0, 0.0, 0.0, 1.0
+					);
+
+					shadowMatrix.multiply( shadowCamera.projectionMatrix );
+					shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
+
+					// update camera matrices and frustum
+
+					_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
+					_frustum.setFromMatrix( _projScreenMatrix );
+
+					// set object matrices & frustum culling
+
+					_renderList.length = 0;
+
+					projectObject( scene, shadowCamera );
+
+					// render shadow map
+					// render regular objects
+
+					for ( var j = 0, jl = _renderList.length; j < jl; j ++ ) {
+
+						var object = _renderList[ j ];
+						var geometry = _objects.update( object );
+						var material = object.material;
+
+						if ( material instanceof THREE.MeshFaceMaterial ) {
+
+							var groups = geometry.groups;
+							var materials = material.materials;
+
+							for ( var k = 0, kl = groups.length; k < kl; k ++ ) {
+
+								var group = groups[ k ];
+								var groupMaterial = materials[ group.materialIndex ];
+
+								if ( groupMaterial.visible === true ) {
+
+									var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
+									_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, depthMaterial, object, group );
+
+								}
+
+							}
+
+						} else {
+
+							var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
+							_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, depthMaterial, object, null );
+
+						}
 
 					}
 
 				}
 
-			}
+				// We must call _renderer.resetGLState() at the end of each iteration of
+				// the light loop in order to force material updates for each light.
+				_renderer.resetGLState();
 
-			//We must call _renderer.resetGLState() at the end of each iteration of
-			// the light loop in order to force material updates for each light.
-			_renderer.resetGLState();
+			}
 
 		}
 
@@ -28266,6 +28282,58 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 };
 
+// File:src/extras/CurveUtils.js
+
+/**
+ * @author zz85 / http://www.lab4games.net/zz85/blog
+ */
+
+THREE.CurveUtils = {
+
+	tangentQuadraticBezier: function ( t, p0, p1, p2 ) {
+
+		return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 );
+
+	},
+
+	// Puay Bing, thanks for helping with this derivative!
+
+	tangentCubicBezier: function ( t, p0, p1, p2, p3 ) {
+
+		return - 3 * p0 * ( 1 - t ) * ( 1 - t )  +
+			3 * p1 * ( 1 - t ) * ( 1 - t ) - 6 * t * p1 * ( 1 - t ) +
+			6 * t *  p2 * ( 1 - t ) - 3 * t * t * p2 +
+			3 * t * t * p3;
+
+	},
+
+	tangentSpline: function ( t, p0, p1, p2, p3 ) {
+
+		// To check if my formulas are correct
+
+		var h00 = 6 * t * t - 6 * t; 	// derived from 2t^3 − 3t^2 + 1
+		var h10 = 3 * t * t - 4 * t + 1; // t^3 − 2t^2 + t
+		var h01 = - 6 * t * t + 6 * t; 	// − 2t3 + 3t2
+		var h11 = 3 * t * t - 2 * t;	// t3 − t2
+
+		return h00 + h10 + h01 + h11;
+
+	},
+
+	// Catmull-Rom
+
+	interpolate: function( p0, p1, p2, p3, t ) {
+
+		var v0 = ( p2 - p0 ) * 0.5;
+		var v1 = ( p3 - p1 ) * 0.5;
+		var t2 = t * t;
+		var t3 = t * t2;
+		return ( 2 * p1 - 2 * p2 + v0 + v1 ) * t3 + ( - 3 * p1 + 3 * p2 - 2 * v0 - v1 ) * t2 + v0 * t + p1;
+
+	}
+
+};
+
 // File:src/extras/GeometryUtils.js
 
 /**
@@ -28514,6 +28582,9 @@ THREE.FontUtils = {
 
 		var pts = [];
 
+		var b2 = THREE.ShapeUtils.b2;
+		var b3 = THREE.ShapeUtils.b3;
+
 		var i, i2, divisions,
 			outline, action, length,
 			scaleX, scaleY,
@@ -28579,8 +28650,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
 
 							var t = i2 / divisions;
-							THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
-							THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
+							b2( t, cpx0, cpx1, cpx );
+							b2( t, cpy0, cpy1, cpy );
 
 						}
 
@@ -28592,12 +28663,12 @@ THREE.FontUtils = {
 
 					// Cubic Bezier Curve
 
-					cpx  = outline[ i ++ ] *  scaleX + offset;
-					cpy  = outline[ i ++ ] *  scaleY;
-					cpx1 = outline[ i ++ ] *  scaleX + offset;
-					cpy1 = outline[ i ++ ] *  scaleY;
-					cpx2 = outline[ i ++ ] *  scaleX + offset;
-					cpy2 = outline[ i ++ ] *  scaleY;
+					cpx  = outline[ i ++ ] * scaleX + offset;
+					cpy  = outline[ i ++ ] * scaleY;
+					cpx1 = outline[ i ++ ] * scaleX + offset;
+					cpy1 = outline[ i ++ ] * scaleY;
+					cpx2 = outline[ i ++ ] * scaleX + offset;
+					cpy2 = outline[ i ++ ] * scaleY;
 
 					path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
 
@@ -28611,8 +28682,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
 
 							var t = i2 / divisions;
-							THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
-							THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
+							b3( t, cpx0, cpx1, cpx2, cpx );
+							b3( t, cpy0, cpy1, cpy2, cpy );
 
 						}
 
@@ -28689,8 +28760,6 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 
 ( function ( namespace ) {
-
-	var EPSILON = 0.0000000001;
 
 	// takes in an contour array and returns
 
@@ -28822,7 +28891,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 		cx = contour[ verts[ w ] ].x;
 		cy = contour[ verts[ w ] ].y;
 
-		if ( EPSILON > ( ( ( bx - ax ) * ( cy - ay ) ) - ( ( by - ay ) * ( cx - ax ) ) ) ) return false;
+		if ( Number.EPSILON > ( ( ( bx - ax ) * ( cy - ay ) ) - ( ( by - ay ) * ( cx - ax ) ) ) ) return false;
 
 		var aX, aY, bX, bY, cX, cY;
 		var apx, apy, bpx, bpy, cpx, cpy;
@@ -28851,7 +28920,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 			cCROSSap = cX * apy - cY * apx;
 			bCROSScp = bX * cpy - bY * cpx;
 
-			if ( ( aCROSSbp >= - EPSILON ) && ( bCROSScp >= - EPSILON ) && ( cCROSSap >= - EPSILON ) ) return false;
+			if ( ( aCROSSbp >= - Number.EPSILON ) && ( bCROSScp >= - Number.EPSILON ) && ( cCROSSap >= - Number.EPSILON ) ) return false;
 
 		}
 
@@ -28870,6 +28939,574 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 THREE.typeface_js = { faces: THREE.FontUtils.faces, loadFace: THREE.FontUtils.loadFace };
 if ( typeof self !== 'undefined' ) self._typeface_js = THREE.typeface_js;
+
+// File:src/extras/ShapeUtils.js
+
+/**
+ * @author zz85 / http://www.lab4games.net/zz85/blog
+ */
+
+THREE.ShapeUtils = {
+
+	triangulateShape: function ( contour, holes ) {
+
+		function point_in_segment_2D_colin( inSegPt1, inSegPt2, inOtherPt ) {
+
+			// inOtherPt needs to be collinear to the inSegment
+			if ( inSegPt1.x !== inSegPt2.x ) {
+
+				if ( inSegPt1.x < inSegPt2.x ) {
+
+					return	( ( inSegPt1.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt2.x ) );
+
+				} else {
+
+					return	( ( inSegPt2.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt1.x ) );
+
+				}
+
+			} else {
+
+				if ( inSegPt1.y < inSegPt2.y ) {
+
+					return	( ( inSegPt1.y <= inOtherPt.y ) && ( inOtherPt.y <= inSegPt2.y ) );
+
+				} else {
+
+					return	( ( inSegPt2.y <= inOtherPt.y ) && ( inOtherPt.y <= inSegPt1.y ) );
+
+				}
+
+			}
+
+		}
+
+		function intersect_segments_2D( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1, inSeg2Pt2, inExcludeAdjacentSegs ) {
+
+			var seg1dx = inSeg1Pt2.x - inSeg1Pt1.x,   seg1dy = inSeg1Pt2.y - inSeg1Pt1.y;
+			var seg2dx = inSeg2Pt2.x - inSeg2Pt1.x,   seg2dy = inSeg2Pt2.y - inSeg2Pt1.y;
+
+			var seg1seg2dx = inSeg1Pt1.x - inSeg2Pt1.x;
+			var seg1seg2dy = inSeg1Pt1.y - inSeg2Pt1.y;
+
+			var limit		= seg1dy * seg2dx - seg1dx * seg2dy;
+			var perpSeg1	= seg1dy * seg1seg2dx - seg1dx * seg1seg2dy;
+
+			if ( Math.abs( limit ) > Number.EPSILON ) {
+
+				// not parallel
+
+				var perpSeg2;
+				if ( limit > 0 ) {
+
+					if ( ( perpSeg1 < 0 ) || ( perpSeg1 > limit ) ) 		return [];
+					perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
+					if ( ( perpSeg2 < 0 ) || ( perpSeg2 > limit ) ) 		return [];
+
+				} else {
+
+					if ( ( perpSeg1 > 0 ) || ( perpSeg1 < limit ) ) 		return [];
+					perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
+					if ( ( perpSeg2 > 0 ) || ( perpSeg2 < limit ) ) 		return [];
+
+				}
+
+				// i.e. to reduce rounding errors
+				// intersection at endpoint of segment#1?
+				if ( perpSeg2 === 0 ) {
+
+					if ( ( inExcludeAdjacentSegs ) &&
+						 ( ( perpSeg1 === 0 ) || ( perpSeg1 === limit ) ) )		return [];
+					return [ inSeg1Pt1 ];
+
+				}
+				if ( perpSeg2 === limit ) {
+
+					if ( ( inExcludeAdjacentSegs ) &&
+						 ( ( perpSeg1 === 0 ) || ( perpSeg1 === limit ) ) )		return [];
+					return [ inSeg1Pt2 ];
+
+				}
+				// intersection at endpoint of segment#2?
+				if ( perpSeg1 === 0 )		return [ inSeg2Pt1 ];
+				if ( perpSeg1 === limit )	return [ inSeg2Pt2 ];
+
+				// return real intersection point
+				var factorSeg1 = perpSeg2 / limit;
+				return	[ { x: inSeg1Pt1.x + factorSeg1 * seg1dx,
+							y: inSeg1Pt1.y + factorSeg1 * seg1dy } ];
+
+			} else {
+
+				// parallel or collinear
+				if ( ( perpSeg1 !== 0 ) ||
+					 ( seg2dy * seg1seg2dx !== seg2dx * seg1seg2dy ) ) 			return [];
+
+				// they are collinear or degenerate
+				var seg1Pt = ( ( seg1dx === 0 ) && ( seg1dy === 0 ) );	// segment1 is just a point?
+				var seg2Pt = ( ( seg2dx === 0 ) && ( seg2dy === 0 ) );	// segment2 is just a point?
+				// both segments are points
+				if ( seg1Pt && seg2Pt ) {
+
+					if ( ( inSeg1Pt1.x !== inSeg2Pt1.x ) ||
+						 ( inSeg1Pt1.y !== inSeg2Pt1.y ) )		return [];	// they are distinct  points
+					return [ inSeg1Pt1 ];                 						// they are the same point
+
+				}
+				// segment#1  is a single point
+				if ( seg1Pt ) {
+
+					if ( ! point_in_segment_2D_colin( inSeg2Pt1, inSeg2Pt2, inSeg1Pt1 ) )		return [];		// but not in segment#2
+					return [ inSeg1Pt1 ];
+
+				}
+				// segment#2  is a single point
+				if ( seg2Pt ) {
+
+					if ( ! point_in_segment_2D_colin( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
+					return [ inSeg2Pt1 ];
+
+				}
+
+				// they are collinear segments, which might overlap
+				var seg1min, seg1max, seg1minVal, seg1maxVal;
+				var seg2min, seg2max, seg2minVal, seg2maxVal;
+				if ( seg1dx !== 0 ) {
+
+					// the segments are NOT on a vertical line
+					if ( inSeg1Pt1.x < inSeg1Pt2.x ) {
+
+						seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.x;
+						seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.x;
+
+					} else {
+
+						seg1min = inSeg1Pt2; seg1minVal = inSeg1Pt2.x;
+						seg1max = inSeg1Pt1; seg1maxVal = inSeg1Pt1.x;
+
+					}
+					if ( inSeg2Pt1.x < inSeg2Pt2.x ) {
+
+						seg2min = inSeg2Pt1; seg2minVal = inSeg2Pt1.x;
+						seg2max = inSeg2Pt2; seg2maxVal = inSeg2Pt2.x;
+
+					} else {
+
+						seg2min = inSeg2Pt2; seg2minVal = inSeg2Pt2.x;
+						seg2max = inSeg2Pt1; seg2maxVal = inSeg2Pt1.x;
+
+					}
+
+				} else {
+
+					// the segments are on a vertical line
+					if ( inSeg1Pt1.y < inSeg1Pt2.y ) {
+
+						seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.y;
+						seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.y;
+
+					} else {
+
+						seg1min = inSeg1Pt2; seg1minVal = inSeg1Pt2.y;
+						seg1max = inSeg1Pt1; seg1maxVal = inSeg1Pt1.y;
+
+					}
+					if ( inSeg2Pt1.y < inSeg2Pt2.y ) {
+
+						seg2min = inSeg2Pt1; seg2minVal = inSeg2Pt1.y;
+						seg2max = inSeg2Pt2; seg2maxVal = inSeg2Pt2.y;
+
+					} else {
+
+						seg2min = inSeg2Pt2; seg2minVal = inSeg2Pt2.y;
+						seg2max = inSeg2Pt1; seg2maxVal = inSeg2Pt1.y;
+
+					}
+
+				}
+				if ( seg1minVal <= seg2minVal ) {
+
+					if ( seg1maxVal <  seg2minVal )	return [];
+					if ( seg1maxVal === seg2minVal )	{
+
+						if ( inExcludeAdjacentSegs )		return [];
+						return [ seg2min ];
+
+					}
+					if ( seg1maxVal <= seg2maxVal )	return [ seg2min, seg1max ];
+					return	[ seg2min, seg2max ];
+
+				} else {
+
+					if ( seg1minVal >  seg2maxVal )	return [];
+					if ( seg1minVal === seg2maxVal )	{
+
+						if ( inExcludeAdjacentSegs )		return [];
+						return [ seg1min ];
+
+					}
+					if ( seg1maxVal <= seg2maxVal )	return [ seg1min, seg1max ];
+					return	[ seg1min, seg2max ];
+
+				}
+
+			}
+
+		}
+
+		function isPointInsideAngle( inVertex, inLegFromPt, inLegToPt, inOtherPt ) {
+
+			// The order of legs is important
+
+			// translation of all points, so that Vertex is at (0,0)
+			var legFromPtX	= inLegFromPt.x - inVertex.x,  legFromPtY	= inLegFromPt.y - inVertex.y;
+			var legToPtX	= inLegToPt.x	- inVertex.x,  legToPtY		= inLegToPt.y	- inVertex.y;
+			var otherPtX	= inOtherPt.x	- inVertex.x,  otherPtY		= inOtherPt.y	- inVertex.y;
+
+			// main angle >0: < 180 deg.; 0: 180 deg.; <0: > 180 deg.
+			var from2toAngle	= legFromPtX * legToPtY - legFromPtY * legToPtX;
+			var from2otherAngle	= legFromPtX * otherPtY - legFromPtY * otherPtX;
+
+			if ( Math.abs( from2toAngle ) > Number.EPSILON ) {
+
+				// angle != 180 deg.
+
+				var other2toAngle		= otherPtX * legToPtY - otherPtY * legToPtX;
+				// console.log( "from2to: " + from2toAngle + ", from2other: " + from2otherAngle + ", other2to: " + other2toAngle );
+
+				if ( from2toAngle > 0 ) {
+
+					// main angle < 180 deg.
+					return	( ( from2otherAngle >= 0 ) && ( other2toAngle >= 0 ) );
+
+				} else {
+
+					// main angle > 180 deg.
+					return	( ( from2otherAngle >= 0 ) || ( other2toAngle >= 0 ) );
+
+				}
+
+			} else {
+
+				// angle == 180 deg.
+				// console.log( "from2to: 180 deg., from2other: " + from2otherAngle  );
+				return	( from2otherAngle > 0 );
+
+			}
+
+		}
+
+
+		function removeHoles( contour, holes ) {
+
+			var shape = contour.concat(); // work on this shape
+			var hole;
+
+			function isCutLineInsideAngles( inShapeIdx, inHoleIdx ) {
+
+				// Check if hole point lies within angle around shape point
+				var lastShapeIdx = shape.length - 1;
+
+				var prevShapeIdx = inShapeIdx - 1;
+				if ( prevShapeIdx < 0 )			prevShapeIdx = lastShapeIdx;
+
+				var nextShapeIdx = inShapeIdx + 1;
+				if ( nextShapeIdx > lastShapeIdx )	nextShapeIdx = 0;
+
+				var insideAngle = isPointInsideAngle( shape[ inShapeIdx ], shape[ prevShapeIdx ], shape[ nextShapeIdx ], hole[ inHoleIdx ] );
+				if ( ! insideAngle ) {
+
+					// console.log( "Vertex (Shape): " + inShapeIdx + ", Point: " + hole[inHoleIdx].x + "/" + hole[inHoleIdx].y );
+					return	false;
+
+				}
+
+				// Check if shape point lies within angle around hole point
+				var lastHoleIdx = hole.length - 1;
+
+				var prevHoleIdx = inHoleIdx - 1;
+				if ( prevHoleIdx < 0 )			prevHoleIdx = lastHoleIdx;
+
+				var nextHoleIdx = inHoleIdx + 1;
+				if ( nextHoleIdx > lastHoleIdx )	nextHoleIdx = 0;
+
+				insideAngle = isPointInsideAngle( hole[ inHoleIdx ], hole[ prevHoleIdx ], hole[ nextHoleIdx ], shape[ inShapeIdx ] );
+				if ( ! insideAngle ) {
+
+					// console.log( "Vertex (Hole): " + inHoleIdx + ", Point: " + shape[inShapeIdx].x + "/" + shape[inShapeIdx].y );
+					return	false;
+
+				}
+
+				return	true;
+
+			}
+
+			function intersectsShapeEdge( inShapePt, inHolePt ) {
+
+				// checks for intersections with shape edges
+				var sIdx, nextIdx, intersection;
+				for ( sIdx = 0; sIdx < shape.length; sIdx ++ ) {
+
+					nextIdx = sIdx + 1; nextIdx %= shape.length;
+					intersection = intersect_segments_2D( inShapePt, inHolePt, shape[ sIdx ], shape[ nextIdx ], true );
+					if ( intersection.length > 0 )		return	true;
+
+				}
+
+				return	false;
+
+			}
+
+			var indepHoles = [];
+
+			function intersectsHoleEdge( inShapePt, inHolePt ) {
+
+				// checks for intersections with hole edges
+				var ihIdx, chkHole,
+					hIdx, nextIdx, intersection;
+				for ( ihIdx = 0; ihIdx < indepHoles.length; ihIdx ++ ) {
+
+					chkHole = holes[ indepHoles[ ihIdx ]];
+					for ( hIdx = 0; hIdx < chkHole.length; hIdx ++ ) {
+
+						nextIdx = hIdx + 1; nextIdx %= chkHole.length;
+						intersection = intersect_segments_2D( inShapePt, inHolePt, chkHole[ hIdx ], chkHole[ nextIdx ], true );
+						if ( intersection.length > 0 )		return	true;
+
+					}
+
+				}
+				return	false;
+
+			}
+
+			var holeIndex, shapeIndex,
+				shapePt, holePt,
+				holeIdx, cutKey, failedCuts = [],
+				tmpShape1, tmpShape2,
+				tmpHole1, tmpHole2;
+
+			for ( var h = 0, hl = holes.length; h < hl; h ++ ) {
+
+				indepHoles.push( h );
+
+			}
+
+			var minShapeIndex = 0;
+			var counter = indepHoles.length * 2;
+			while ( indepHoles.length > 0 ) {
+
+				counter --;
+				if ( counter < 0 ) {
+
+					console.log( "Infinite Loop! Holes left:" + indepHoles.length + ", Probably Hole outside Shape!" );
+					break;
+
+				}
+
+				// search for shape-vertex and hole-vertex,
+				// which can be connected without intersections
+				for ( shapeIndex = minShapeIndex; shapeIndex < shape.length; shapeIndex ++ ) {
+
+					shapePt = shape[ shapeIndex ];
+					holeIndex	= - 1;
+
+					// search for hole which can be reached without intersections
+					for ( var h = 0; h < indepHoles.length; h ++ ) {
+
+						holeIdx = indepHoles[ h ];
+
+						// prevent multiple checks
+						cutKey = shapePt.x + ":" + shapePt.y + ":" + holeIdx;
+						if ( failedCuts[ cutKey ] !== undefined )			continue;
+
+						hole = holes[ holeIdx ];
+						for ( var h2 = 0; h2 < hole.length; h2 ++ ) {
+
+							holePt = hole[ h2 ];
+							if ( ! isCutLineInsideAngles( shapeIndex, h2 ) )		continue;
+							if ( intersectsShapeEdge( shapePt, holePt ) )		continue;
+							if ( intersectsHoleEdge( shapePt, holePt ) )		continue;
+
+							holeIndex = h2;
+							indepHoles.splice( h, 1 );
+
+							tmpShape1 = shape.slice( 0, shapeIndex + 1 );
+							tmpShape2 = shape.slice( shapeIndex );
+							tmpHole1 = hole.slice( holeIndex );
+							tmpHole2 = hole.slice( 0, holeIndex + 1 );
+
+							shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
+
+							minShapeIndex = shapeIndex;
+
+							// Debug only, to show the selected cuts
+							// glob_CutLines.push( [ shapePt, holePt ] );
+
+							break;
+
+						}
+						if ( holeIndex >= 0 )	break;		// hole-vertex found
+
+						failedCuts[ cutKey ] = true;			// remember failure
+
+					}
+					if ( holeIndex >= 0 )	break;		// hole-vertex found
+
+				}
+
+			}
+
+			return shape; 			/* shape with no holes */
+
+		}
+
+
+		var i, il, f, face,
+			key, index,
+			allPointsMap = {};
+
+		// To maintain reference to old shape, one must match coordinates, or offset the indices from original arrays. It's probably easier to do the first.
+
+		var allpoints = contour.concat();
+
+		for ( var h = 0, hl = holes.length; h < hl; h ++ ) {
+
+			Array.prototype.push.apply( allpoints, holes[ h ] );
+
+		}
+
+		//console.log( "allpoints",allpoints, allpoints.length );
+
+		// prepare all points map
+
+		for ( i = 0, il = allpoints.length; i < il; i ++ ) {
+
+			key = allpoints[ i ].x + ":" + allpoints[ i ].y;
+
+			if ( allPointsMap[ key ] !== undefined ) {
+
+				console.warn( "THREE.Shape: Duplicate point", key );
+
+			}
+
+			allPointsMap[ key ] = i;
+
+		}
+
+		// remove holes by cutting paths to holes and adding them to the shape
+		var shapeWithoutHoles = removeHoles( contour, holes );
+
+		var triangles = THREE.FontUtils.Triangulate( shapeWithoutHoles, false ); // True returns indices for points of spooled shape
+		//console.log( "triangles",triangles, triangles.length );
+
+		// check all face vertices against all points map
+
+		for ( i = 0, il = triangles.length; i < il; i ++ ) {
+
+			face = triangles[ i ];
+
+			for ( f = 0; f < 3; f ++ ) {
+
+				key = face[ f ].x + ":" + face[ f ].y;
+
+				index = allPointsMap[ key ];
+
+				if ( index !== undefined ) {
+
+					face[ f ] = index;
+
+				}
+
+			}
+
+		}
+
+		return triangles.concat();
+
+	},
+
+	isClockWise: function ( pts ) {
+
+		return THREE.FontUtils.Triangulate.area( pts ) < 0;
+
+	},
+
+	// Bezier Curves formulas obtained from
+	// http://en.wikipedia.org/wiki/B%C3%A9zier_curve
+
+	// Quad Bezier Functions
+
+	b2: ( function () {
+
+		function b2p0( t, p ) {
+
+			var k = 1 - t;
+			return k * k * p;
+
+		}
+
+		function b2p1( t, p ) {
+
+			return 2 * ( 1 - t ) * t * p;
+
+		}
+
+		function b2p2( t, p ) {
+
+			return t * t * p;
+
+		}
+
+		return function ( t, p0, p1, p2 ) {
+
+			return b2p0( t, p0 ) + b2p1( t, p1 ) + b2p2( t, p2 );
+
+		};
+
+	} )(),
+
+	// Cubic Bezier Functions
+
+	b3: ( function () {
+
+		function b3p0( t, p ) {
+
+			var k = 1 - t;
+			return k * k * k * p;
+
+		}
+
+		function b3p1( t, p ) {
+
+			var k = 1 - t;
+			return 3 * k * k * t * p;
+
+		}
+
+		function b3p2( t, p ) {
+
+			var k = 1 - t;
+			return 3 * k * t * t * p;
+
+		}
+
+		function b3p3( t, p ) {
+
+			return t * t * t * p;
+
+		}
+
+		return function ( t, p0, p1, p2, p3 ) {
+
+			return b3p0( t, p0 ) + b3p1( t, p1 ) + b3p2( t, p2 ) + b3p3( t, p3 );
+
+		};
+
+	} )()
+
+};
 
 // File:src/extras/audio/Audio.js
 
@@ -29422,56 +30059,7 @@ THREE.Curve.prototype = {
 
 }
 
-/**************************************************************
- *	Utils
- **************************************************************/
-
-THREE.Curve.Utils = {
-
-	tangentQuadraticBezier: function ( t, p0, p1, p2 ) {
-
-		return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 );
-
-	},
-
-	// Puay Bing, thanks for helping with this derivative!
-
-	tangentCubicBezier: function ( t, p0, p1, p2, p3 ) {
-
-		return - 3 * p0 * ( 1 - t ) * ( 1 - t )  +
-			3 * p1 * ( 1 - t ) * ( 1 - t ) - 6 * t * p1 * ( 1 - t ) +
-			6 * t *  p2 * ( 1 - t ) - 3 * t * t * p2 +
-			3 * t * t * p3;
-
-	},
-
-	tangentSpline: function ( t, p0, p1, p2, p3 ) {
-
-		// To check if my formulas are correct
-
-		var h00 = 6 * t * t - 6 * t; 	// derived from 2t^3 − 3t^2 + 1
-		var h10 = 3 * t * t - 4 * t + 1; // t^3 − 2t^2 + t
-		var h01 = - 6 * t * t + 6 * t; 	// − 2t3 + 3t2
-		var h11 = 3 * t * t - 2 * t;	// t3 − t2
-
-		return h00 + h10 + h01 + h11;
-
-	},
-
-	// Catmull-Rom
-
-	interpolate: function( p0, p1, p2, p3, t ) {
-
-		var v0 = ( p2 - p0 ) * 0.5;
-		var v1 = ( p3 - p1 ) * 0.5;
-		var t2 = t * t;
-		var t3 = t * t2;
-		return ( 2 * p1 - 2 * p2 + v0 + v1 ) * t3 + ( - 3 * p1 + 3 * p2 - 2 * v0 - v1 ) * t2 + v0 * t + p1;
-
-	}
-
-};
-
+THREE.Curve.Utils = THREE.CurveUtils; // backwards compatibility
 
 // TODO: Transformation for Curves?
 
@@ -29695,16 +30283,6 @@ THREE.Path = function ( points ) {
 THREE.Path.prototype = Object.create( THREE.CurvePath.prototype );
 THREE.Path.prototype.constructor = THREE.Path;
 
-THREE.PathActions = {
-	MOVE_TO: 'moveTo',
-	LINE_TO: 'lineTo',
-	QUADRATIC_CURVE_TO: 'quadraticCurveTo', // Bezier quadratic curve
-	BEZIER_CURVE_TO: 'bezierCurveTo', 		// Bezier cubic curve
-	CSPLINE_THRU: 'splineThru',				// Catmull-Rom spline
-	ARC: 'arc',								// Circle
-	ELLIPSE: 'ellipse'
-};
-
 // TODO Clean up PATH API
 
 // Create path using straight lines to connect all points
@@ -29726,14 +30304,11 @@ THREE.Path.prototype.fromPoints = function ( vectors ) {
 
 THREE.Path.prototype.moveTo = function ( x, y ) {
 
-	var args = Array.prototype.slice.call( arguments );
-	this.actions.push( { action: THREE.PathActions.MOVE_TO, args: args } );
+	this.actions.push( { action: 'moveTo', args: [ x, y ] } );
 
 };
 
 THREE.Path.prototype.lineTo = function ( x, y ) {
-
-	var args = Array.prototype.slice.call( arguments );
 
 	var lastargs = this.actions[ this.actions.length - 1 ].args;
 
@@ -29743,13 +30318,11 @@ THREE.Path.prototype.lineTo = function ( x, y ) {
 	var curve = new THREE.LineCurve( new THREE.Vector2( x0, y0 ), new THREE.Vector2( x, y ) );
 	this.curves.push( curve );
 
-	this.actions.push( { action: THREE.PathActions.LINE_TO, args: args } );
+	this.actions.push( { action: 'lineTo', args: [ x, y ] } );
 
 };
 
 THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
-
-	var args = Array.prototype.slice.call( arguments );
 
 	var lastargs = this.actions[ this.actions.length - 1 ].args;
 
@@ -29764,13 +30337,11 @@ THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
 
 	this.curves.push( curve );
 
-	this.actions.push( { action: THREE.PathActions.QUADRATIC_CURVE_TO, args: args } );
+	this.actions.push( { action: 'quadraticCurveTo', args: [ aCPx, aCPy, aX, aY ] } );
 
 };
 
 THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
-
-	var args = Array.prototype.slice.call( arguments );
 
 	var lastargs = this.actions[ this.actions.length - 1 ].args;
 
@@ -29786,13 +30357,14 @@ THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y, aCP2x, aCP2y, aX, a
 
 	this.curves.push( curve );
 
-	this.actions.push( { action: THREE.PathActions.BEZIER_CURVE_TO, args: args } );
+	this.actions.push( { action: 'bezierCurveTo', args: [ aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ] } );
 
 };
 
 THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 	var args = Array.prototype.slice.call( arguments );
+
 	var lastargs = this.actions[ this.actions.length - 1 ].args;
 
 	var x0 = lastargs[ lastargs.length - 2 ];
@@ -29804,7 +30376,7 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 	var curve = new THREE.SplineCurve( npts );
 	this.curves.push( curve );
 
-	this.actions.push( { action: THREE.PathActions.CSPLINE_THRU, args: args } );
+	this.actions.push( { action: 'splineThru', args: args } );
 
 };
 
@@ -29855,7 +30427,7 @@ THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius, aStartAng
 	args.push( lastPoint.x );
 	args.push( lastPoint.y );
 
-	this.actions.push( { action: THREE.PathActions.ELLIPSE, args: args } );
+	this.actions.push( { action: 'ellipse', args: args } );
 
  };
 
@@ -29889,6 +30461,9 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 	divisions = divisions || 12;
 
+	var b2 = THREE.ShapeUtils.b2;
+	var b3 = THREE.ShapeUtils.b3;
+
 	var points = [];
 
 	var cpx, cpy, cpx2, cpy2, cpx1, cpy1, cpx0, cpy0,
@@ -29903,19 +30478,19 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 		switch ( action ) {
 
-		case THREE.PathActions.MOVE_TO:
+		case 'moveTo':
 
 			points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
 
 			break;
 
-		case THREE.PathActions.LINE_TO:
+		case 'lineTo':
 
 			points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
 
 			break;
 
-		case THREE.PathActions.QUADRATIC_CURVE_TO:
+		case 'quadraticCurveTo':
 
 			cpx  = args[ 2 ];
 			cpy  = args[ 3 ];
@@ -29943,8 +30518,8 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				var t = j / divisions;
 
-				tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
-				ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
+				tx = b2( t, cpx0, cpx1, cpx );
+				ty = b2( t, cpy0, cpy1, cpy );
 
 				points.push( new THREE.Vector2( tx, ty ) );
 
@@ -29952,7 +30527,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			break;
 
-		case THREE.PathActions.BEZIER_CURVE_TO:
+		case 'bezierCurveTo':
 
 			cpx  = args[ 4 ];
 			cpy  = args[ 5 ];
@@ -29984,8 +30559,8 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				var t = j / divisions;
 
-				tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
-				ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
+				tx = b3( t, cpx0, cpx1, cpx2, cpx );
+				ty = b3( t, cpy0, cpy1, cpy2, cpy );
 
 				points.push( new THREE.Vector2( tx, ty ) );
 
@@ -29993,7 +30568,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			break;
 
-		case THREE.PathActions.CSPLINE_THRU:
+		case 'splineThru':
 
 			laste = this.actions[ i - 1 ].args;
 
@@ -30014,7 +30589,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			break;
 
-		case THREE.PathActions.ARC:
+		case 'arc':
 
 			var aX = args[ 0 ], aY = args[ 1 ],
 				aRadius = args[ 2 ],
@@ -30050,7 +30625,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			break;
 
-		case THREE.PathActions.ELLIPSE:
+		case 'ellipse':
 
 			var aX = args[ 0 ], aY = args[ 1 ],
 				xRadius = args[ 2 ],
@@ -30115,9 +30690,8 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 	// Normalize to remove the closing point by default.
 	var lastPoint = points[ points.length - 1 ];
-	var EPSILON = 0.0000000001;
-	if ( Math.abs( lastPoint.x - points[ 0 ].x ) < EPSILON &&
-			 Math.abs( lastPoint.y - points[ 0 ].y ) < EPSILON )
+	if ( Math.abs( lastPoint.x - points[ 0 ].x ) < Number.EPSILON &&
+			 Math.abs( lastPoint.y - points[ 0 ].y ) < Number.EPSILON )
 		points.splice( points.length - 1, 1 );
 	if ( closedPath ) {
 
@@ -30154,7 +30728,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			var args = item.args;
 			var action = item.action;
 
-			if ( action === THREE.PathActions.MOVE_TO ) {
+			if ( action === 'moveTo' ) {
 
 				if ( lastPath.actions.length !== 0 ) {
 
@@ -30205,8 +30779,6 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 	function isPointInsidePolygon( inPt, inPolygon ) {
 
-		var EPSILON = 0.0000000001;
-
 		var polyLen = inPolygon.length;
 
 		// inPt on polygon contour => immediate success    or
@@ -30222,7 +30794,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			var edgeDx = edgeHighPt.x - edgeLowPt.x;
 			var edgeDy = edgeHighPt.y - edgeLowPt.y;
 
-			if ( Math.abs( edgeDy ) > EPSILON ) {
+			if ( Math.abs( edgeDy ) > Number.EPSILON ) {
 
 				// not parallel
 				if ( edgeDy < 0 ) {
@@ -30264,6 +30836,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 	}
 
+	var isClockWise = THREE.ShapeUtils.isClockWise;
 
 	var subPaths = extractSubpaths( this.actions );
 	if ( subPaths.length === 0 ) return [];
@@ -30284,7 +30857,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 	}
 
-	var holesFirst = ! THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
+	var holesFirst = ! isClockWise( subPaths[ 0 ].getPoints() );
 	holesFirst = isCCW ? ! holesFirst : holesFirst;
 
 	// console.log("Holes first", holesFirst);
@@ -30302,7 +30875,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 		tmpPath = subPaths[ i ];
 		tmpPoints = tmpPath.getPoints();
-		solid = THREE.Shape.Utils.isClockWise( tmpPoints );
+		solid = isClockWise( tmpPoints );
 		solid = isCCW ? ! solid : solid;
 
 		if ( solid ) {
@@ -30488,567 +31061,7 @@ THREE.Shape.prototype.extractPoints = function ( divisions ) {
 
 };
 
-/**************************************************************
- *	Utils
- **************************************************************/
-
-THREE.Shape.Utils = {
-
-	triangulateShape: function ( contour, holes ) {
-
-		function point_in_segment_2D_colin( inSegPt1, inSegPt2, inOtherPt ) {
-
-			// inOtherPt needs to be collinear to the inSegment
-			if ( inSegPt1.x !== inSegPt2.x ) {
-
-				if ( inSegPt1.x < inSegPt2.x ) {
-
-					return	( ( inSegPt1.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt2.x ) );
-
-				} else {
-
-					return	( ( inSegPt2.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt1.x ) );
-
-				}
-
-			} else {
-
-				if ( inSegPt1.y < inSegPt2.y ) {
-
-					return	( ( inSegPt1.y <= inOtherPt.y ) && ( inOtherPt.y <= inSegPt2.y ) );
-
-				} else {
-
-					return	( ( inSegPt2.y <= inOtherPt.y ) && ( inOtherPt.y <= inSegPt1.y ) );
-
-				}
-
-			}
-
-		}
-
-		function intersect_segments_2D( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1, inSeg2Pt2, inExcludeAdjacentSegs ) {
-
-			var EPSILON = 0.0000000001;
-
-			var seg1dx = inSeg1Pt2.x - inSeg1Pt1.x,   seg1dy = inSeg1Pt2.y - inSeg1Pt1.y;
-			var seg2dx = inSeg2Pt2.x - inSeg2Pt1.x,   seg2dy = inSeg2Pt2.y - inSeg2Pt1.y;
-
-			var seg1seg2dx = inSeg1Pt1.x - inSeg2Pt1.x;
-			var seg1seg2dy = inSeg1Pt1.y - inSeg2Pt1.y;
-
-			var limit		= seg1dy * seg2dx - seg1dx * seg2dy;
-			var perpSeg1	= seg1dy * seg1seg2dx - seg1dx * seg1seg2dy;
-
-			if ( Math.abs( limit ) > EPSILON ) {
-
-				// not parallel
-
-				var perpSeg2;
-				if ( limit > 0 ) {
-
-					if ( ( perpSeg1 < 0 ) || ( perpSeg1 > limit ) ) 		return [];
-					perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
-					if ( ( perpSeg2 < 0 ) || ( perpSeg2 > limit ) ) 		return [];
-
-				} else {
-
-					if ( ( perpSeg1 > 0 ) || ( perpSeg1 < limit ) ) 		return [];
-					perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
-					if ( ( perpSeg2 > 0 ) || ( perpSeg2 < limit ) ) 		return [];
-
-				}
-
-				// i.e. to reduce rounding errors
-				// intersection at endpoint of segment#1?
-				if ( perpSeg2 === 0 ) {
-
-					if ( ( inExcludeAdjacentSegs ) &&
-						 ( ( perpSeg1 === 0 ) || ( perpSeg1 === limit ) ) )		return [];
-					return [ inSeg1Pt1 ];
-
-				}
-				if ( perpSeg2 === limit ) {
-
-					if ( ( inExcludeAdjacentSegs ) &&
-						 ( ( perpSeg1 === 0 ) || ( perpSeg1 === limit ) ) )		return [];
-					return [ inSeg1Pt2 ];
-
-				}
-				// intersection at endpoint of segment#2?
-				if ( perpSeg1 === 0 )		return [ inSeg2Pt1 ];
-				if ( perpSeg1 === limit )	return [ inSeg2Pt2 ];
-
-				// return real intersection point
-				var factorSeg1 = perpSeg2 / limit;
-				return	[ { x: inSeg1Pt1.x + factorSeg1 * seg1dx,
-							y: inSeg1Pt1.y + factorSeg1 * seg1dy } ];
-
-			} else {
-
-				// parallel or collinear
-				if ( ( perpSeg1 !== 0 ) ||
-					 ( seg2dy * seg1seg2dx !== seg2dx * seg1seg2dy ) ) 			return [];
-
-				// they are collinear or degenerate
-				var seg1Pt = ( ( seg1dx === 0 ) && ( seg1dy === 0 ) );	// segment1 is just a point?
-				var seg2Pt = ( ( seg2dx === 0 ) && ( seg2dy === 0 ) );	// segment2 is just a point?
-				// both segments are points
-				if ( seg1Pt && seg2Pt ) {
-
-					if ( ( inSeg1Pt1.x !== inSeg2Pt1.x ) ||
-						 ( inSeg1Pt1.y !== inSeg2Pt1.y ) )		return [];	// they are distinct  points
-					return [ inSeg1Pt1 ];                 						// they are the same point
-
-				}
-				// segment#1  is a single point
-				if ( seg1Pt ) {
-
-					if ( ! point_in_segment_2D_colin( inSeg2Pt1, inSeg2Pt2, inSeg1Pt1 ) )		return [];		// but not in segment#2
-					return [ inSeg1Pt1 ];
-
-				}
-				// segment#2  is a single point
-				if ( seg2Pt ) {
-
-					if ( ! point_in_segment_2D_colin( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
-					return [ inSeg2Pt1 ];
-
-				}
-
-				// they are collinear segments, which might overlap
-				var seg1min, seg1max, seg1minVal, seg1maxVal;
-				var seg2min, seg2max, seg2minVal, seg2maxVal;
-				if ( seg1dx !== 0 ) {
-
-					// the segments are NOT on a vertical line
-					if ( inSeg1Pt1.x < inSeg1Pt2.x ) {
-
-						seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.x;
-						seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.x;
-
-					} else {
-
-						seg1min = inSeg1Pt2; seg1minVal = inSeg1Pt2.x;
-						seg1max = inSeg1Pt1; seg1maxVal = inSeg1Pt1.x;
-
-					}
-					if ( inSeg2Pt1.x < inSeg2Pt2.x ) {
-
-						seg2min = inSeg2Pt1; seg2minVal = inSeg2Pt1.x;
-						seg2max = inSeg2Pt2; seg2maxVal = inSeg2Pt2.x;
-
-					} else {
-
-						seg2min = inSeg2Pt2; seg2minVal = inSeg2Pt2.x;
-						seg2max = inSeg2Pt1; seg2maxVal = inSeg2Pt1.x;
-
-					}
-
-				} else {
-
-					// the segments are on a vertical line
-					if ( inSeg1Pt1.y < inSeg1Pt2.y ) {
-
-						seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.y;
-						seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.y;
-
-					} else {
-
-						seg1min = inSeg1Pt2; seg1minVal = inSeg1Pt2.y;
-						seg1max = inSeg1Pt1; seg1maxVal = inSeg1Pt1.y;
-
-					}
-					if ( inSeg2Pt1.y < inSeg2Pt2.y ) {
-
-						seg2min = inSeg2Pt1; seg2minVal = inSeg2Pt1.y;
-						seg2max = inSeg2Pt2; seg2maxVal = inSeg2Pt2.y;
-
-					} else {
-
-						seg2min = inSeg2Pt2; seg2minVal = inSeg2Pt2.y;
-						seg2max = inSeg2Pt1; seg2maxVal = inSeg2Pt1.y;
-
-					}
-
-				}
-				if ( seg1minVal <= seg2minVal ) {
-
-					if ( seg1maxVal <  seg2minVal )	return [];
-					if ( seg1maxVal === seg2minVal )	{
-
-						if ( inExcludeAdjacentSegs )		return [];
-						return [ seg2min ];
-
-					}
-					if ( seg1maxVal <= seg2maxVal )	return [ seg2min, seg1max ];
-					return	[ seg2min, seg2max ];
-
-				} else {
-
-					if ( seg1minVal >  seg2maxVal )	return [];
-					if ( seg1minVal === seg2maxVal )	{
-
-						if ( inExcludeAdjacentSegs )		return [];
-						return [ seg1min ];
-
-					}
-					if ( seg1maxVal <= seg2maxVal )	return [ seg1min, seg1max ];
-					return	[ seg1min, seg2max ];
-
-				}
-
-			}
-
-		}
-
-		function isPointInsideAngle( inVertex, inLegFromPt, inLegToPt, inOtherPt ) {
-
-			// The order of legs is important
-
-			var EPSILON = 0.0000000001;
-
-			// translation of all points, so that Vertex is at (0,0)
-			var legFromPtX	= inLegFromPt.x - inVertex.x,  legFromPtY	= inLegFromPt.y - inVertex.y;
-			var legToPtX	= inLegToPt.x	- inVertex.x,  legToPtY		= inLegToPt.y	- inVertex.y;
-			var otherPtX	= inOtherPt.x	- inVertex.x,  otherPtY		= inOtherPt.y	- inVertex.y;
-
-			// main angle >0: < 180 deg.; 0: 180 deg.; <0: > 180 deg.
-			var from2toAngle	= legFromPtX * legToPtY - legFromPtY * legToPtX;
-			var from2otherAngle	= legFromPtX * otherPtY - legFromPtY * otherPtX;
-
-			if ( Math.abs( from2toAngle ) > EPSILON ) {
-
-				// angle != 180 deg.
-
-				var other2toAngle		= otherPtX * legToPtY - otherPtY * legToPtX;
-				// console.log( "from2to: " + from2toAngle + ", from2other: " + from2otherAngle + ", other2to: " + other2toAngle );
-
-				if ( from2toAngle > 0 ) {
-
-					// main angle < 180 deg.
-					return	( ( from2otherAngle >= 0 ) && ( other2toAngle >= 0 ) );
-
-				} else {
-
-					// main angle > 180 deg.
-					return	( ( from2otherAngle >= 0 ) || ( other2toAngle >= 0 ) );
-
-				}
-
-			} else {
-
-				// angle == 180 deg.
-				// console.log( "from2to: 180 deg., from2other: " + from2otherAngle  );
-				return	( from2otherAngle > 0 );
-
-			}
-
-		}
-
-
-		function removeHoles( contour, holes ) {
-
-			var shape = contour.concat(); // work on this shape
-			var hole;
-
-			function isCutLineInsideAngles( inShapeIdx, inHoleIdx ) {
-
-				// Check if hole point lies within angle around shape point
-				var lastShapeIdx = shape.length - 1;
-
-				var prevShapeIdx = inShapeIdx - 1;
-				if ( prevShapeIdx < 0 )			prevShapeIdx = lastShapeIdx;
-
-				var nextShapeIdx = inShapeIdx + 1;
-				if ( nextShapeIdx > lastShapeIdx )	nextShapeIdx = 0;
-
-				var insideAngle = isPointInsideAngle( shape[ inShapeIdx ], shape[ prevShapeIdx ], shape[ nextShapeIdx ], hole[ inHoleIdx ] );
-				if ( ! insideAngle ) {
-
-					// console.log( "Vertex (Shape): " + inShapeIdx + ", Point: " + hole[inHoleIdx].x + "/" + hole[inHoleIdx].y );
-					return	false;
-
-				}
-
-				// Check if shape point lies within angle around hole point
-				var lastHoleIdx = hole.length - 1;
-
-				var prevHoleIdx = inHoleIdx - 1;
-				if ( prevHoleIdx < 0 )			prevHoleIdx = lastHoleIdx;
-
-				var nextHoleIdx = inHoleIdx + 1;
-				if ( nextHoleIdx > lastHoleIdx )	nextHoleIdx = 0;
-
-				insideAngle = isPointInsideAngle( hole[ inHoleIdx ], hole[ prevHoleIdx ], hole[ nextHoleIdx ], shape[ inShapeIdx ] );
-				if ( ! insideAngle ) {
-
-					// console.log( "Vertex (Hole): " + inHoleIdx + ", Point: " + shape[inShapeIdx].x + "/" + shape[inShapeIdx].y );
-					return	false;
-
-				}
-
-				return	true;
-
-			}
-
-			function intersectsShapeEdge( inShapePt, inHolePt ) {
-
-				// checks for intersections with shape edges
-				var sIdx, nextIdx, intersection;
-				for ( sIdx = 0; sIdx < shape.length; sIdx ++ ) {
-
-					nextIdx = sIdx + 1; nextIdx %= shape.length;
-					intersection = intersect_segments_2D( inShapePt, inHolePt, shape[ sIdx ], shape[ nextIdx ], true );
-					if ( intersection.length > 0 )		return	true;
-
-				}
-
-				return	false;
-
-			}
-
-			var indepHoles = [];
-
-			function intersectsHoleEdge( inShapePt, inHolePt ) {
-
-				// checks for intersections with hole edges
-				var ihIdx, chkHole,
-					hIdx, nextIdx, intersection;
-				for ( ihIdx = 0; ihIdx < indepHoles.length; ihIdx ++ ) {
-
-					chkHole = holes[ indepHoles[ ihIdx ]];
-					for ( hIdx = 0; hIdx < chkHole.length; hIdx ++ ) {
-
-						nextIdx = hIdx + 1; nextIdx %= chkHole.length;
-						intersection = intersect_segments_2D( inShapePt, inHolePt, chkHole[ hIdx ], chkHole[ nextIdx ], true );
-						if ( intersection.length > 0 )		return	true;
-
-					}
-
-				}
-				return	false;
-
-			}
-
-			var holeIndex, shapeIndex,
-				shapePt, holePt,
-				holeIdx, cutKey, failedCuts = [],
-				tmpShape1, tmpShape2,
-				tmpHole1, tmpHole2;
-
-			for ( var h = 0, hl = holes.length; h < hl; h ++ ) {
-
-				indepHoles.push( h );
-
-			}
-
-			var minShapeIndex = 0;
-			var counter = indepHoles.length * 2;
-			while ( indepHoles.length > 0 ) {
-
-				counter --;
-				if ( counter < 0 ) {
-
-					console.log( "Infinite Loop! Holes left:" + indepHoles.length + ", Probably Hole outside Shape!" );
-					break;
-
-				}
-
-				// search for shape-vertex and hole-vertex,
-				// which can be connected without intersections
-				for ( shapeIndex = minShapeIndex; shapeIndex < shape.length; shapeIndex ++ ) {
-
-					shapePt = shape[ shapeIndex ];
-					holeIndex	= - 1;
-
-					// search for hole which can be reached without intersections
-					for ( var h = 0; h < indepHoles.length; h ++ ) {
-
-						holeIdx = indepHoles[ h ];
-
-						// prevent multiple checks
-						cutKey = shapePt.x + ":" + shapePt.y + ":" + holeIdx;
-						if ( failedCuts[ cutKey ] !== undefined )			continue;
-
-						hole = holes[ holeIdx ];
-						for ( var h2 = 0; h2 < hole.length; h2 ++ ) {
-
-							holePt = hole[ h2 ];
-							if ( ! isCutLineInsideAngles( shapeIndex, h2 ) )		continue;
-							if ( intersectsShapeEdge( shapePt, holePt ) )		continue;
-							if ( intersectsHoleEdge( shapePt, holePt ) )		continue;
-
-							holeIndex = h2;
-							indepHoles.splice( h, 1 );
-
-							tmpShape1 = shape.slice( 0, shapeIndex + 1 );
-							tmpShape2 = shape.slice( shapeIndex );
-							tmpHole1 = hole.slice( holeIndex );
-							tmpHole2 = hole.slice( 0, holeIndex + 1 );
-
-							shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
-
-							minShapeIndex = shapeIndex;
-
-							// Debug only, to show the selected cuts
-							// glob_CutLines.push( [ shapePt, holePt ] );
-
-							break;
-
-						}
-						if ( holeIndex >= 0 )	break;		// hole-vertex found
-
-						failedCuts[ cutKey ] = true;			// remember failure
-
-					}
-					if ( holeIndex >= 0 )	break;		// hole-vertex found
-
-				}
-
-			}
-
-			return shape; 			/* shape with no holes */
-
-		}
-
-
-		var i, il, f, face,
-			key, index,
-			allPointsMap = {};
-
-		// To maintain reference to old shape, one must match coordinates, or offset the indices from original arrays. It's probably easier to do the first.
-
-		var allpoints = contour.concat();
-
-		for ( var h = 0, hl = holes.length; h < hl; h ++ ) {
-
-			Array.prototype.push.apply( allpoints, holes[ h ] );
-
-		}
-
-		//console.log( "allpoints",allpoints, allpoints.length );
-
-		// prepare all points map
-
-		for ( i = 0, il = allpoints.length; i < il; i ++ ) {
-
-			key = allpoints[ i ].x + ":" + allpoints[ i ].y;
-
-			if ( allPointsMap[ key ] !== undefined ) {
-
-				console.warn( "THREE.Shape: Duplicate point", key );
-
-			}
-
-			allPointsMap[ key ] = i;
-
-		}
-
-		// remove holes by cutting paths to holes and adding them to the shape
-		var shapeWithoutHoles = removeHoles( contour, holes );
-
-		var triangles = THREE.FontUtils.Triangulate( shapeWithoutHoles, false ); // True returns indices for points of spooled shape
-		//console.log( "triangles",triangles, triangles.length );
-
-		// check all face vertices against all points map
-
-		for ( i = 0, il = triangles.length; i < il; i ++ ) {
-
-			face = triangles[ i ];
-
-			for ( f = 0; f < 3; f ++ ) {
-
-				key = face[ f ].x + ":" + face[ f ].y;
-
-				index = allPointsMap[ key ];
-
-				if ( index !== undefined ) {
-
-					face[ f ] = index;
-
-				}
-
-			}
-
-		}
-
-		return triangles.concat();
-
-	},
-
-	isClockWise: function ( pts ) {
-
-		return THREE.FontUtils.Triangulate.area( pts ) < 0;
-
-	},
-
-	// Bezier Curves formulas obtained from
-	// http://en.wikipedia.org/wiki/B%C3%A9zier_curve
-
-	// Quad Bezier Functions
-
-	b2p0: function ( t, p ) {
-
-		var k = 1 - t;
-		return k * k * p;
-
-	},
-
-	b2p1: function ( t, p ) {
-
-		return 2 * ( 1 - t ) * t * p;
-
-	},
-
-	b2p2: function ( t, p ) {
-
-		return t * t * p;
-
-	},
-
-	b2: function ( t, p0, p1, p2 ) {
-
-		return this.b2p0( t, p0 ) + this.b2p1( t, p1 ) + this.b2p2( t, p2 );
-
-	},
-
-	// Cubic Bezier Functions
-
-	b3p0: function ( t, p ) {
-
-		var k = 1 - t;
-		return k * k * k * p;
-
-	},
-
-	b3p1: function ( t, p ) {
-
-		var k = 1 - t;
-		return 3 * k * k * t * p;
-
-	},
-
-	b3p2: function ( t, p ) {
-
-		var k = 1 - t;
-		return 3 * k * t * t * p;
-
-	},
-
-	b3p3: function ( t, p ) {
-
-		return t * t * t * p;
-
-	},
-
-	b3: function ( t, p0, p1, p2, p3 ) {
-
-		return this.b3p0( t, p0 ) + this.b3p1( t, p1 ) + this.b3p2( t, p2 ) +  this.b3p3( t, p3 );
-
-	}
-
-};
+THREE.Shape.Utils = THREE.ShapeUtils; // backwards compatibility
 
 // File:src/extras/curves/LineCurve.js
 
@@ -31112,26 +31125,24 @@ THREE.QuadraticBezierCurve.prototype.constructor = THREE.QuadraticBezierCurve;
 
 THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 
-	var vector = new THREE.Vector2();
+	var b2 = THREE.ShapeUtils.b2;
 
-	vector.x = THREE.Shape.Utils.b2( t, this.v0.x, this.v1.x, this.v2.x );
-	vector.y = THREE.Shape.Utils.b2( t, this.v0.y, this.v1.y, this.v2.y );
-
-	return vector;
+	return new THREE.Vector2(
+		b2( t, this.v0.x, this.v1.x, this.v2.x ),
+		b2( t, this.v0.y, this.v1.y, this.v2.y )
+	);
 
 };
 
 
 THREE.QuadraticBezierCurve.prototype.getTangent = function( t ) {
 
-	var vector = new THREE.Vector2();
+	var tangentQuadraticBezier = THREE.CurveUtils.tangentQuadraticBezier;
 
-	vector.x = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x );
-	vector.y = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.y, this.v1.y, this.v2.y );
-
-	// returns unit vector
-
-	return vector.normalize();
+	return new THREE.Vector2(
+		tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x ),
+		tangentQuadraticBezier( t, this.v0.y, this.v1.y, this.v2.y )
+	).normalize();
 
 };
 
@@ -31155,26 +31166,23 @@ THREE.CubicBezierCurve.prototype.constructor = THREE.CubicBezierCurve;
 
 THREE.CubicBezierCurve.prototype.getPoint = function ( t ) {
 
-	var tx, ty;
+	var b3 = THREE.ShapeUtils.b3;
 
-	tx = THREE.Shape.Utils.b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
-	ty = THREE.Shape.Utils.b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
-
-	return new THREE.Vector2( tx, ty );
+	return new THREE.Vector2( 
+		b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
+		b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
+	);
 
 };
 
 THREE.CubicBezierCurve.prototype.getTangent = function( t ) {
 
-	var tx, ty;
+	var tangentCubicBezier = THREE.CurveUtils.tangentCubicBezier;
 
-	tx = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
-	ty = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
-
-	var tangent = new THREE.Vector2( tx, ty );
-	tangent.normalize();
-
-	return tangent;
+	return new THREE.Vector2( 
+		tangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
+		tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
+	).normalize();
 
 };
 
@@ -31206,12 +31214,12 @@ THREE.SplineCurve.prototype.getPoint = function ( t ) {
 	var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
 	var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
 
-	var vector = new THREE.Vector2();
+	var interpolate = THREE.CurveUtils.interpolate;
 
-	vector.x = THREE.Curve.Utils.interpolate( point0.x, point1.x, point2.x, point3.x, weight );
-	vector.y = THREE.Curve.Utils.interpolate( point0.y, point1.y, point2.y, point3.y, weight );
-
-	return vector;
+	return new THREE.Vector2(
+		interpolate( point0.x, point1.x, point2.x, point3.x, weight ),
+		interpolate( point0.y, point1.y, point2.y, point3.y, weight )
+	);
 
 };
 
@@ -31342,13 +31350,13 @@ THREE.QuadraticBezierCurve3 = THREE.Curve.create(
 
 	function ( t ) {
 
-		var vector = new THREE.Vector3();
+		var b2 = THREE.ShapeUtils.b2;		
 
-		vector.x = THREE.Shape.Utils.b2( t, this.v0.x, this.v1.x, this.v2.x );
-		vector.y = THREE.Shape.Utils.b2( t, this.v0.y, this.v1.y, this.v2.y );
-		vector.z = THREE.Shape.Utils.b2( t, this.v0.z, this.v1.z, this.v2.z );
-
-		return vector;
+		return new THREE.Vector3(
+			b2( t, this.v0.x, this.v1.x, this.v2.x ),
+			b2( t, this.v0.y, this.v1.y, this.v2.y ),
+			b2( t, this.v0.z, this.v1.z, this.v2.z )
+		);
 
 	}
 
@@ -31373,13 +31381,13 @@ THREE.CubicBezierCurve3 = THREE.Curve.create(
 
 	function ( t ) {
 
-		var vector = new THREE.Vector3();
+		var b3 = THREE.ShapeUtils.b3;
 
-		vector.x = THREE.Shape.Utils.b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
-		vector.y = THREE.Shape.Utils.b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
-		vector.z = THREE.Shape.Utils.b3( t, this.v0.z, this.v1.z, this.v2.z, this.v3.z );
-
-		return vector;
+		return new THREE.Vector3(
+			b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
+			b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y ),
+			b3( t, this.v0.z, this.v1.z, this.v2.z, this.v3.z )
+		);
 
 	}
 
@@ -31414,13 +31422,13 @@ THREE.SplineCurve3 = THREE.Curve.create(
 		var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
 		var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
 
-		var vector = new THREE.Vector3();
+		var interpolate = THREE.CurveUtils.interpolate;
 
-		vector.x = THREE.Curve.Utils.interpolate( point0.x, point1.x, point2.x, point3.x, weight );
-		vector.y = THREE.Curve.Utils.interpolate( point0.y, point1.y, point2.y, point3.y, weight );
-		vector.z = THREE.Curve.Utils.interpolate( point0.z, point1.z, point2.z, point3.z, weight );
-
-		return vector;
+		return new THREE.Vector3(
+			interpolate( point0.x, point1.x, point2.x, point3.x, weight ),
+			interpolate( point0.y, point1.y, point2.y, point3.y, weight ),
+			interpolate( point0.z, point1.z, point2.z, point3.z, weight )
+		);
 
 	}
 
@@ -31636,13 +31644,13 @@ THREE.ClosedSplineCurve3 = THREE.Curve.create(
 		var point2 = points[ ( intPoint + 1 ) % points.length ];
 		var point3 = points[ ( intPoint + 2 ) % points.length ];
 
-		var vector = new THREE.Vector3();
+		var interpolate = THREE.CurveUtils.interpolate;
 
-		vector.x = THREE.Curve.Utils.interpolate( point0.x, point1.x, point2.x, point3.x, weight );
-		vector.y = THREE.Curve.Utils.interpolate( point0.y, point1.y, point2.y, point3.y, weight );
-		vector.z = THREE.Curve.Utils.interpolate( point0.z, point1.z, point2.z, point3.z, weight );
-
-		return vector;
+		return new THREE.Vector3(
+			interpolate( point0.x, point1.x, point2.x, point3.x, weight ),
+			interpolate( point0.y, point1.y, point2.y, point3.y, weight ),
+			interpolate( point0.z, point1.z, point2.z, point3.z, weight )
+		);
 
 	}
 
@@ -32346,7 +32354,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
 
-	var reverse = ! THREE.Shape.Utils.isClockWise( vertices );
+	var reverse = ! THREE.ShapeUtils.isClockWise( vertices );
 
 	if ( reverse ) {
 
@@ -32358,7 +32366,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			ahole = holes[ h ];
 
-			if ( THREE.Shape.Utils.isClockWise( ahole ) ) {
+			if ( THREE.ShapeUtils.isClockWise( ahole ) ) {
 
 				holes[ h ] = ahole.reverse();
 
@@ -32371,7 +32379,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	}
 
 
-	var faces = THREE.Shape.Utils.triangulateShape ( vertices, holes );
+	var faces = THREE.ShapeUtils.triangulateShape( vertices, holes );
 
 	/* Vertices */
 
@@ -32404,8 +32412,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	function getBevelVec( inPt, inPrev, inNext ) {
 
-		var EPSILON = 0.0000000001;
-
 		// computes for inPt the corresponding point inPt' on a new contour
 		//   shifted by 1 unit (length of normalized vector) to the left
 		// if we walk along contour clockwise, this new contour is outside the old one
@@ -32426,7 +32432,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		// check for collinear edges
 		var collinear0 = ( v_prev_x * v_next_y - v_prev_y * v_next_x );
 
-		if ( Math.abs( collinear0 ) > EPSILON ) {
+		if ( Math.abs( collinear0 ) > Number.EPSILON ) {
 
 			// not collinear
 
@@ -32472,9 +32478,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			// handle special case of collinear edges
 
 			var direction_eq = false;		// assumes: opposite
-			if ( v_prev_x > EPSILON ) {
+			if ( v_prev_x > Number.EPSILON ) {
 
-				if ( v_next_x > EPSILON ) {
+				if ( v_next_x > Number.EPSILON ) {
 
 					direction_eq = true;
 
@@ -32482,9 +32488,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			} else {
 
-				if ( v_prev_x < - EPSILON ) {
+				if ( v_prev_x < - Number.EPSILON ) {
 
-					if ( v_next_x < - EPSILON ) {
+					if ( v_next_x < - Number.EPSILON ) {
 
 						direction_eq = true;
 
@@ -32990,7 +32996,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 	var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
 
-	var reverse = ! THREE.Shape.Utils.isClockWise( vertices );
+	var reverse = ! THREE.ShapeUtils.isClockWise( vertices );
 
 	if ( reverse ) {
 
@@ -33002,7 +33008,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 			hole = holes[ i ];
 
-			if ( THREE.Shape.Utils.isClockWise( hole ) ) {
+			if ( THREE.ShapeUtils.isClockWise( hole ) ) {
 
 				holes[ i ] = hole.reverse();
 
@@ -33014,7 +33020,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-	var faces = THREE.Shape.Utils.triangulateShape( vertices, holes );
+	var faces = THREE.ShapeUtils.triangulateShape( vertices, holes );
 
 	// Vertices
 
@@ -34061,7 +34067,6 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 		numpoints = segments + 1,
 		theta,
-		epsilon = 0.0001,
 		smallest,
 
 		tx, ty, tz,
@@ -34160,7 +34165,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 		vec.crossVectors( tangents[ i - 1 ], tangents[ i ] );
 
-		if ( vec.length() > epsilon ) {
+		if ( vec.length() > Number.EPSILON ) {
 
 			vec.normalize();
 
@@ -34265,8 +34270,8 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 		var x1 = uvs[ 1 ].x;
 		var x2 = uvs[ 2 ].x;
 
-		var max = Math.max( x0, Math.max( x1, x2 ) );
-		var min = Math.min( x0, Math.min( x1, x2 ) );
+		var max = Math.max( x0, x1, x2 );
+		var min = Math.min( x0, x1, x2 );
 
 		if ( max > 0.9 && min < 0.1 ) {
 
