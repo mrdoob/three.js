@@ -494,64 +494,72 @@ THREE.ShapeUtils = {
 
 	// Quad Bezier Functions
 
-	b2p0: function ( t, p ) {
+	b2: ( function () {
 
-		var k = 1 - t;
-		return k * k * p;
+		function b2p0( t, p ) {
 
-	},
+			var k = 1 - t;
+			return k * k * p;
 
-	b2p1: function ( t, p ) {
+		}
 
-		return 2 * ( 1 - t ) * t * p;
+		function b2p1( t, p ) {
 
-	},
+			return 2 * ( 1 - t ) * t * p;
 
-	b2p2: function ( t, p ) {
+		}
 
-		return t * t * p;
+		function b2p2( t, p ) {
 
-	},
+			return t * t * p;
 
-	b2: function ( t, p0, p1, p2 ) {
+		}
 
-		return this.b2p0( t, p0 ) + this.b2p1( t, p1 ) + this.b2p2( t, p2 );
+		return function ( t, p0, p1, p2 ) {
 
-	},
+			return b2p0( t, p0 ) + b2p1( t, p1 ) + b2p2( t, p2 );
+
+		};
+
+	} )(),
 
 	// Cubic Bezier Functions
 
-	b3p0: function ( t, p ) {
+	b3: ( function () {
 
-		var k = 1 - t;
-		return k * k * k * p;
+		function b3p0( t, p ) {
 
-	},
+			var k = 1 - t;
+			return k * k * k * p;
 
-	b3p1: function ( t, p ) {
+		}
 
-		var k = 1 - t;
-		return 3 * k * k * t * p;
+		function b3p1( t, p ) {
 
-	},
+			var k = 1 - t;
+			return 3 * k * k * t * p;
 
-	b3p2: function ( t, p ) {
+		}
 
-		var k = 1 - t;
-		return 3 * k * t * t * p;
+		function b3p2( t, p ) {
 
-	},
+			var k = 1 - t;
+			return 3 * k * t * t * p;
 
-	b3p3: function ( t, p ) {
+		}
 
-		return t * t * t * p;
+		function b3p3( t, p ) {
 
-	},
+			return t * t * t * p;
 
-	b3: function ( t, p0, p1, p2, p3 ) {
+		}
 
-		return this.b3p0( t, p0 ) + this.b3p1( t, p1 ) + this.b3p2( t, p2 ) +  this.b3p3( t, p3 );
+		return function ( t, p0, p1, p2, p3 ) {
 
-	}
+			return b3p0( t, p0 ) + b3p1( t, p1 ) + b3p2( t, p2 ) + b3p3( t, p3 );
+
+		};
+
+	} )()
 
 };
