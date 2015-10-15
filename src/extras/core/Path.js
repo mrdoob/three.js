@@ -21,16 +21,6 @@ THREE.Path = function ( points ) {
 THREE.Path.prototype = Object.create( THREE.CurvePath.prototype );
 THREE.Path.prototype.constructor = THREE.Path;
 
-THREE.PathActions = {
-	MOVE_TO: 'moveTo',
-	LINE_TO: 'lineTo',
-	QUADRATIC_CURVE_TO: 'quadraticCurveTo', // Bezier quadratic curve
-	BEZIER_CURVE_TO: 'bezierCurveTo', 		// Bezier cubic curve
-	CSPLINE_THRU: 'splineThru',				// Catmull-Rom spline
-	ARC: 'arc',								// Circle
-	ELLIPSE: 'ellipse'
-};
-
 // TODO Clean up PATH API
 
 // Create path using straight lines to connect all points
@@ -53,7 +43,7 @@ THREE.Path.prototype.fromPoints = function ( vectors ) {
 THREE.Path.prototype.moveTo = function ( x, y ) {
 
 	var args = Array.prototype.slice.call( arguments );
-	this.actions.push( { action: THREE.PathActions.MOVE_TO, args: args } );
+	this.actions.push( { action: 'moveTo', args: args } );
 
 };
 
@@ -69,7 +59,7 @@ THREE.Path.prototype.lineTo = function ( x, y ) {
 	var curve = new THREE.LineCurve( new THREE.Vector2( x0, y0 ), new THREE.Vector2( x, y ) );
 	this.curves.push( curve );
 
-	this.actions.push( { action: THREE.PathActions.LINE_TO, args: args } );
+	this.actions.push( { action: 'lineTo', args: args } );
 
 };
 
@@ -90,7 +80,7 @@ THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
 
 	this.curves.push( curve );
 
-	this.actions.push( { action: THREE.PathActions.QUADRATIC_CURVE_TO, args: args } );
+	this.actions.push( { action: 'quadraticCurveTo', args: args } );
 
 };
 
@@ -112,7 +102,7 @@ THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y, aCP2x, aCP2y, aX, a
 
 	this.curves.push( curve );
 
-	this.actions.push( { action: THREE.PathActions.BEZIER_CURVE_TO, args: args } );
+	this.actions.push( { action: 'bezierCurveTo', args: args } );
 
 };
 
@@ -130,7 +120,7 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 	var curve = new THREE.SplineCurve( npts );
 	this.curves.push( curve );
 
-	this.actions.push( { action: THREE.PathActions.CSPLINE_THRU, args: args } );
+	this.actions.push( { action: 'splineThru', args: args } );
 
 };
 
@@ -181,7 +171,7 @@ THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius, aStartAng
 	args.push( lastPoint.x );
 	args.push( lastPoint.y );
 
-	this.actions.push( { action: THREE.PathActions.ELLIPSE, args: args } );
+	this.actions.push( { action: 'ellipse', args: args } );
 
  };
 
@@ -229,19 +219,19 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 		switch ( action ) {
 
-		case THREE.PathActions.MOVE_TO:
+		case 'moveTo':
 
 			points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
 
 			break;
 
-		case THREE.PathActions.LINE_TO:
+		case 'lineTo':
 
 			points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
 
 			break;
 
-		case THREE.PathActions.QUADRATIC_CURVE_TO:
+		case 'quadraticCurveTo':
 
 			cpx  = args[ 2 ];
 			cpy  = args[ 3 ];
@@ -278,7 +268,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			break;
 
-		case THREE.PathActions.BEZIER_CURVE_TO:
+		case 'bezierCurveTo':
 
 			cpx  = args[ 4 ];
 			cpy  = args[ 5 ];
@@ -310,8 +300,8 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				var t = j / divisions;
 
-				tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
-				ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
+				tx = THREE.ShapeUtils.b3( t, cpx0, cpx1, cpx2, cpx );
+				ty = THREE.ShapeUtils.b3( t, cpy0, cpy1, cpy2, cpy );
 
 				points.push( new THREE.Vector2( tx, ty ) );
 
@@ -319,7 +309,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			break;
 
-		case THREE.PathActions.CSPLINE_THRU:
+		case 'splineThru':
 
 			laste = this.actions[ i - 1 ].args;
 
@@ -340,7 +330,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			break;
 
-		case THREE.PathActions.ARC:
+		case 'arc':
 
 			var aX = args[ 0 ], aY = args[ 1 ],
 				aRadius = args[ 2 ],
@@ -376,7 +366,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			break;
 
-		case THREE.PathActions.ELLIPSE:
+		case 'ellipse':
 
 			var aX = args[ 0 ], aY = args[ 1 ],
 				xRadius = args[ 2 ],
@@ -480,7 +470,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			var args = item.args;
 			var action = item.action;
 
-			if ( action === THREE.PathActions.MOVE_TO ) {
+			if ( action === 'moveTo' ) {
 
 				if ( lastPath.actions.length !== 0 ) {
 
