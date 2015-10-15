@@ -4,6 +4,23 @@
 
 THREE.ShapeUtils = {
 
+	// calculate area of the contour polygon
+
+	area: function ( contour ) {
+
+		var n = contour.length;
+		var a = 0.0;
+
+		for ( var p = n - 1, q = 0; q < n; p = q ++ ) {
+
+			a += contour[ p ].x * contour[ q ].y - contour[ q ].x * contour[ p ].y;
+
+		}
+
+		return a * 0.5;
+
+	},
+
 	triangulate: ( function () {
 
 		/**
@@ -19,25 +36,6 @@ THREE.ShapeUtils = {
 		 * http://www.lab4games.net/zz85/blog
 		 *
 		 */
-
-		// calculate area of the contour polygon
-
-		function area( contour ) {
-
-			var n = contour.length;
-			var a = 0.0;
-
-			for ( var p = n - 1, q = 0; q < n; p = q ++ ) {
-
-				a += contour[ p ].x * contour[ q ].y - contour[ q ].x * contour[ p ].y;
-
-			}
-
-			return a * 0.5;
-
-		}
-
-		THREE.ShapeUtils.area = area;
 
 		function snip( contour, u, v, w, n, verts ) {
 
@@ -107,7 +105,7 @@ THREE.ShapeUtils = {
 
 			var u, v, w;
 
-			if ( area( contour ) > 0.0 ) {
+			if ( THREE.ShapeUtils.area( contour ) > 0.0 ) {
 
 				for ( v = 0; v < n; v ++ ) verts[ v ] = v;
 
