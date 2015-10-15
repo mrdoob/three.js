@@ -42,14 +42,11 @@ THREE.Path.prototype.fromPoints = function ( vectors ) {
 
 THREE.Path.prototype.moveTo = function ( x, y ) {
 
-	var args = Array.prototype.slice.call( arguments );
-	this.actions.push( { action: 'moveTo', args: args } );
+	this.actions.push( { action: 'moveTo', args: [ x, y ] } );
 
 };
 
 THREE.Path.prototype.lineTo = function ( x, y ) {
-
-	var args = Array.prototype.slice.call( arguments );
 
 	var lastargs = this.actions[ this.actions.length - 1 ].args;
 
@@ -59,13 +56,11 @@ THREE.Path.prototype.lineTo = function ( x, y ) {
 	var curve = new THREE.LineCurve( new THREE.Vector2( x0, y0 ), new THREE.Vector2( x, y ) );
 	this.curves.push( curve );
 
-	this.actions.push( { action: 'lineTo', args: args } );
+	this.actions.push( { action: 'lineTo', args: [ x, y ] } );
 
 };
 
 THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
-
-	var args = Array.prototype.slice.call( arguments );
 
 	var lastargs = this.actions[ this.actions.length - 1 ].args;
 
@@ -80,13 +75,11 @@ THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
 
 	this.curves.push( curve );
 
-	this.actions.push( { action: 'quadraticCurveTo', args: args } );
+	this.actions.push( { action: 'quadraticCurveTo', args: [ aCPx, aCPy, aX, aY ] } );
 
 };
 
 THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
-
-	var args = Array.prototype.slice.call( arguments );
 
 	var lastargs = this.actions[ this.actions.length - 1 ].args;
 
@@ -102,13 +95,14 @@ THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y, aCP2x, aCP2y, aX, a
 
 	this.curves.push( curve );
 
-	this.actions.push( { action: 'bezierCurveTo', args: args } );
+	this.actions.push( { action: 'bezierCurveTo', args: [ aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ] } );
 
 };
 
 THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 	var args = Array.prototype.slice.call( arguments );
+
 	var lastargs = this.actions[ this.actions.length - 1 ].args;
 
 	var x0 = lastargs[ lastargs.length - 2 ];
