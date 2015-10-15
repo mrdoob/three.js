@@ -1,5 +1,6 @@
 /**
  * @author dforrer / https://github.com/dforrer
+ * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
 Sidebar.History = function ( editor ) {
