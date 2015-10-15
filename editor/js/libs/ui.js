@@ -12,6 +12,60 @@ UI.Element = function ( dom ) {
 
 UI.Element.prototype = {
 
+	add: function () {
+
+		for ( var i = 0; i < arguments.length; i ++ ) {
+
+			var argument = arguments[ i ];
+
+			if ( argument instanceof UI.Element ) {
+
+				this.dom.appendChild( argument.dom );
+
+			} else {
+
+				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' )
+
+			}
+
+		}
+
+		return this;
+
+	},
+
+	remove: function () {
+
+		for ( var i = 0; i < arguments.length; i ++ ) {
+
+			var argument = arguments[ i ];
+
+			if ( argument instanceof UI.Element ) {
+
+				this.dom.removeChild( argument.dom );
+
+			} else {
+
+				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' )
+
+			}
+
+		}
+
+		return this;
+
+	},
+
+	clear: function () {
+
+		while ( this.dom.children.length ) {
+
+			this.dom.removeChild( this.dom.lastChild );
+
+		}
+
+	},
+
 	setId: function ( id ) {
 
 		this.dom.id = id;
@@ -35,6 +89,8 @@ UI.Element.prototype = {
 			this.dom.style[ style ] = array[ i ];
 
 		}
+
+		return this;
 
 	},
 
@@ -69,6 +125,7 @@ properties.forEach( function ( property ) {
 	UI.Element.prototype[ method ] = function () {
 
 		this.setStyle( property, arguments );
+
 		return this;
 
 	};
@@ -93,6 +150,21 @@ events.forEach( function ( event ) {
 
 } );
 
+// Span
+
+UI.Span = function () {
+
+	UI.Element.call( this );
+
+	this.dom = document.createElement( 'span' );
+
+	return this;
+
+};
+
+UI.Span.prototype = Object.create( UI.Element.prototype );
+UI.Span.prototype.constructor = UI.Span;
+
 
 // Panel
 
@@ -106,65 +178,11 @@ UI.Panel = function () {
 	this.dom = dom;
 
 	return this;
+
 };
 
 UI.Panel.prototype = Object.create( UI.Element.prototype );
 UI.Panel.prototype.constructor = UI.Panel;
-
-UI.Panel.prototype.add = function () {
-
-	for ( var i = 0; i < arguments.length; i ++ ) {
-
-		var argument = arguments[ i ];
-
-		if ( argument instanceof UI.Element ) {
-
-			this.dom.appendChild( argument.dom );
-
-		} else {
-
-			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
-
-		}
-
-	}
-
-	return this;
-
-};
-
-
-UI.Panel.prototype.remove = function () {
-
-	for ( var i = 0; i < arguments.length; i ++ ) {
-
-		var argument = arguments[ i ];
-
-		if ( argument instanceof UI.Element ) {
-
-			this.dom.removeChild( argument.dom );
-
-		} else {
-
-			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
-
-		}
-
-	}
-
-	return this;
-
-};
-
-UI.Panel.prototype.clear = function () {
-
-	while ( this.dom.children.length ) {
-
-		this.dom.removeChild( this.dom.lastChild );
-
-	}
-
-};
 
 
 // Collapsible Panel
@@ -996,47 +1014,58 @@ UI.Button.prototype.setLabel = function ( value ) {
 };
 
 
-// Dialog
+// Modal
 
-UI.Dialog = function ( value ) {
+UI.Modal = function ( value ) {
 
 	var scope = this;
 
-	var dom = document.createElement( 'dialog' );
+	var dom = document.createElement( 'div' );
 
-	if ( dom.showModal === undefined ) {
+	dom.style.position = 'absolute';
+	dom.style.width = '100%';
+	dom.style.height = '100%';
+	dom.style.backgroundColor = 'rgba(0,0,0,0.5)';
+	dom.style.display = 'none';
+	dom.style.alignItems = 'center';
+	dom.style.justifyContent = 'center';
+	dom.addEventListener( 'click', function ( event ) {
 
-		// fallback
+		scope.hide();
 
-		dom = document.createElement( 'div' );
-		dom.style.display = 'none';
-
-		dom.showModal = function () {
-
-			dom.style.position = 'absolute';
-			dom.style.left = '100px';
-			dom.style.top = '100px';
-			dom.style.zIndex = 1;
-			dom.style.display = '';
-
-		};
-
-	}
-
-	dom.className = 'Dialog';
+	} );
 
 	this.dom = dom;
+
+	this.container = new UI.Panel();
+	this.container.dom.style.width = '200px';
+	this.container.dom.style.padding = '20px';
+	this.container.dom.style.backgroundColor = '#ffffff';
+	this.container.dom.style.boxShadow = '0px 5px 10px rgba(0,0,0,0.5)';
+
+	this.add( this.container );
 
 	return this;
 
 };
 
-UI.Dialog.prototype = Object.create( UI.Panel.prototype );
-UI.Dialog.prototype.constructor = UI.Dialog;
+UI.Modal.prototype = Object.create( UI.Element.prototype );
+UI.Modal.prototype.constructor = UI.Modal;
 
-UI.Dialog.prototype.showModal = function () {
+UI.Modal.prototype.show = function ( content ) {
 
-	this.dom.showModal();
+	this.container.clear();
+	this.container.add( content );
+
+	this.dom.style.display = 'flex';
+
+	return this;
+
+};
+
+UI.Modal.prototype.hide = function () {
+
+	this.dom.style.display = 'none';
 
 	return this;
 

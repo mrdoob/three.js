@@ -39,18 +39,6 @@
 		[page:String texturePath] — optional. If not specified, textures will be assumed to be in the same folder as the Javascript model file.
 		</div>
 
-		<h3>[method:null loadAjaxJSON]([page:JSONLoader context], [page:String url], [page:Function callback], [page:String texturePath], [page:Function callbackProgress])</h3>
-		<div>
-		[page:JSONLoader context] — The [page:JSONLoader] instance<br />
-		[page:String url] — required<br />
-		[page:Function callback] — required. This function will be called with the loaded model as an instance of [page:Geometry geometry] when the load is completed.<br />
-		[page:String texturePath] — Base path for textures.<br />
-		[page:Function callbackProgress] — Will be called while load progresses. The argument will be an [page:Object] containing two attributes: .[page:Integer total] and .[page:Integer loaded] bytes.
-		</div>
-		<div>
-		Begin loading from url and call <em>callback</em> with the parsed response content.
-		</div>
-
 		<h3>[method:Object3D parse]( [page:Object json], [page:String texturePath] )</h3>
 		<div>
 		[page:String json] — JSON object to parse.<br />

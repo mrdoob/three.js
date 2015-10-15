@@ -95,7 +95,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer, dirLight, hemiLight;
-			var morphs = [];
+			var mixers = [];
 			var stats;
 
 			var clock = new THREE.Clock();
@@ -159,7 +159,6 @@
 
 				dirLight.shadowCameraFar = 3500;
 				dirLight.shadowBias = -0.0001;
-				dirLight.shadowDarkness = 0.35;
 				//dirLight.shadowCameraVisible = true;
 
 				// GROUND
@@ -201,23 +200,22 @@
 
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
-
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
-					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
-
-					meshAnim.duration = 1000;
+					var mesh = new THREE.Mesh( geometry, material );
 
 					var s = 0.35;
-					meshAnim.scale.set( s, s, s );
-					meshAnim.position.y = 15;
-					meshAnim.rotation.y = -1;
+					mesh.scale.set( s, s, s );
+					mesh.position.y = 15;
+					mesh.rotation.y = -1;
 
-					meshAnim.castShadow = true;
-					meshAnim.receiveShadow = true;
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
 
-					scene.add( meshAnim );
-					morphs.push( meshAnim );
+					scene.add( mesh );
+
+					var mixer = new THREE.AnimationMixer( mesh );
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[ 0 ] ).warpToDuration( 1 ) );
+					mixers.push( mixer );
 
 				} );
 
@@ -244,22 +242,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 				document.addEventListener( 'keydown', onKeyDown, false );
-
-			}
-
-			function morphColorsToFaceColors( geometry ) {
-
-				if ( geometry.morphColors && geometry.morphColors.length ) {
-
-					var colorMap = geometry.morphColors[ 0 ];
-
-					for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-
-						geometry.faces[ i ].color = colorMap.colors[ i ];
-
-					}
-
-				}
 
 			}
 
@@ -307,10 +289,9 @@
 
 				//controls.update();
 
-				for ( var i = 0; i < morphs.length; i ++ ) {
+				for ( var i = 0; i < mixers.length; i ++ ) {
 
-					morph = morphs[ i ];
-					morph.updateAnimation( 1000 * delta );
+					mixers[ i ].update( delta );
 
 				}
 
