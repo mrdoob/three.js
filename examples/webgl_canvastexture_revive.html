@@ -1,0 +1,596 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js save/restore of CanvasTexture</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #808080;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #ffffff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			#controls {
+				position: absolute;
+				text-align:left;
+				top: 40px;
+				left: 5px;
+				padding: 5px;
+			}
+
+			.control {
+				margin-bottom: 3px;
+			}
+
+			.button {
+				margin-top: 5px;
+				text-align: center;
+			}
+
+			input {
+				width: 50px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - save/restore of texture using canvas<br>Left and right: same canvas, different mapping - middle : an other canvas<br><br>Use your mouse to draw lines in the textures</div>
+		<fieldset id="controls">
+			<legend>Editor</legend>
+			<div class="control">
+				Back color
+				<input id="bColor1" type="color" onchange="setBackgroundColor1(event)" />
+				<input id="bColor2" type="color" onchange="setBackgroundColor2(event)" />
+			</div>
+			<div class="control">
+				Line color
+				<input id="lColor1" type="color" onchange="setLineColor1(event)" />
+				<input id="lColor2" type="color" onchange="setLineColor2(event)" />
+			</div>
+			<div class="control">
+				Line width
+				<input id="lWidth1" type="number" value="10" step="1" min="1" onchange="setLineWidth1(this)" />
+				<input id="lWidth2" type="number" value="10" step="1" min="1" onchange="setLineWidth2(this)" />
+			</div>
+			<div class="button">
+				<button onclick="saveScene()">Save</button>
+				<button onclick="clearScene()">Clear</button>
+				<button onclick="loadScene()">Load</button>
+			</div>
+		</fieldset>
+		<script src="../build/three.js"></script>
+		<!--<script src="../build/three.min.js"></script>-->
+		<script>
+
+			DrawedTexture = function ( config ) {
+
+				this._canvas = document.createElement( "canvas" );
+				this._canvas.width = this._canvas.height = 1024;
+				this._context2D = this._canvas.getContext( "2d" );
+
+				this._uuid = THREE.Math.generateUUID();
+				this._lines = [];
+				this._parentTextures = [];
+
+				if ( config ) {
+
+					if ( config.backgroundColor ) {
+
+						this._backgroundColor = config.backgroundColor;
+
+					}
+					if ( config.currentColor ) {
+
+						this._currentColor = config.currentColor;
+
+					}
+					if ( config.currentWidth ) {
+
+						this._currentWidth = config.currentWidth;
+
+					}
+					if ( config.parentTexture ) {
+
+						this._parentTextures.push( config.parentTexture );
+						config.parentTexture.image = this._canvas;
+
+					}
+
+				}
+
+				this._draw();
+
+			}
+
+			DrawedTexture.prototype = {
+
+				constructor: DrawedTexture,
+
+				_canvas: null,
+				_context2D: null,
+
+				_backgroundColor: "#F0F8FF",
+				_currentWidth: 4,
+				_currentColor: "#F7BE81",
+				_currentLine: undefined,
+
+				// bindToTexture is required.
+				bindToTexture: function ( parentTexture ) {
+
+					if ( this._parentTextures.indexOf( parentTexture ) === - 1 ) {
+
+						this._parentTextures.push( parentTexture );
+						parentTexture.image = this._canvas;
+
+						this._draw();
+
+					}
+
+				},
+
+				// toObject is required.
+				toObject: function ( meta ) {
+
+					var tout = Object.create( null );
+
+					tout.type = "DrawedTexture";
+					tout.uuid = this._uuid;
+					tout.backgroundColor = this._backgroundColor;
+					tout.currentWidth = this._currentWidth;
+					tout.currentColor = this._currentColor;
+					tout.lines = this._lines;
+
+					return tout;
+
+				},
+
+				// revive is required.
+				revive: function ( obj, parentTexture ) {
+
+					var that = new DrawedTexture();
+
+					if ( parentTexture ) {
+
+						that.bindToTexture( parentTexture );
+
+					}
+					that._loadFromJSON( obj );
+
+					return that;
+
+				},
+
+				startLine: function ( u, v ) {
+
+					this._currentLine = {};
+					this._currentLine.width = this._currentWidth;
+					this._currentLine.color = this._currentColor;
+					this._currentLine.start = new THREE.Vector2( u * this._canvas.width, v * this._canvas.height );
+					this._currentLine.end = this._currentLine.start.clone();
+					this._lines.push( this._currentLine );
+					this._draw();
+
+				},
+
+				drawLine: function ( u, v ) {
+
+					this._currentLine.end.x = u * this._canvas.width;
+					this._currentLine.end.y = v * this._canvas.height;
+					this._draw();
+
+				},
+
+				backgroundColor: function ( color ) {
+
+					if ( color !== undefined ) {
+
+						this._backgroundColor = color;
+						this._draw();
+
+					}
+					return this._backgroundColor;
+
+				},
+
+				lineWidth: function ( width ) {
+
+					if ( width !== undefined ) this._currentWidth = width;
+					return this._currentWidth;
+
+				},
+
+				lineColor: function ( color ) {
+
+					if ( color !== undefined ) this._currentColor = color;
+					return this._currentColor;
+
+				},
+
+				_draw: function () {
+
+					if ( ! this._context2D ) return;
+
+					this._context2D.clearRect( 0, 0, this._canvas.width, this._canvas.height )
+
+					// Background.
+					this._context2D.fillStyle = this._backgroundColor;
+					this._context2D.fillRect( 0, 0, this._canvas.width, this._canvas.height );
+
+					// draw lines.
+					var line;
+					for ( var i = 0; i < this._lines.length; i ++ ) {
+
+						line = this._lines[ i ];
+						this._context2D.lineWidth = line.width;
+						this._context2D.strokeStyle = line.color;
+
+						this._context2D.beginPath();
+						this._context2D.moveTo( line.start.x, line.start.y );
+						this._context2D.lineTo( line.end.x, line.end.y );
+						this._context2D.stroke();
+
+					}
+
+					for ( var i = 0; i < this._parentTextures.length; i ++ ) {
+
+						this._parentTextures[ i ].needsUpdate = true;
+
+					}
+
+				},
+
+				_loadFromJSON: function ( obj ) {
+
+					if ( ! obj ) return;
+
+					if ( obj.backgroundColor ) {
+
+						this._backgroundColor = obj.backgroundColor;
+
+					}
+					if ( obj.currentWidth ) {
+
+						this._currentWidth = obj.currentWidth;
+
+					}
+					if ( obj.currentColor ) {
+
+						this._currentColor = obj.currentColor;
+
+					}
+					if ( obj.lines ) {
+
+						this._lines = obj.lines;
+
+					}
+
+					this._draw();
+
+				}
+
+			}
+
+		</script>
+		<script>
+
+			var width = window.innerWidth;
+			var height = window.innerHeight;
+
+			var curCanvas;
+			var canvas = [];
+			var objects = [];
+			var planeTexture, cubeTexture, circleTexture;
+
+			var container;
+
+			var camera, scene, renderer;
+
+			var raycaster = new THREE.Raycaster();
+			var mouse = new THREE.Vector2();
+			var onClickPosition = new THREE.Vector2();
+
+			init();
+			render();
+
+			function init() {
+
+				container = document.getElementById( "container" );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+				camera.position.x = - 30;
+				camera.position.y = 40;
+				camera.position.z = 50;
+				camera.lookAt( scene.position );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( new THREE.Color( 0xEEEEEE, 1.0 ) );
+				renderer.setSize( width, height );
+				container.appendChild( renderer.domElement );
+
+				// Some lights.
+				var ambientLight = new THREE.AmbientLight( 0xA0A0A0 );
+				scene.add( ambientLight );
+				var directionalLight = new THREE.DirectionalLight( 0xEEEEEE );
+				directionalLight.position.set( - 40, 60, 0 );
+				directionalLight.target.position.set( - 40, 60, 60 );
+				scene.add( directionalLight );
+
+				// A plane on the left.
+				planeTexture = new THREE.CanvasTexture( undefined, THREE.UVMapping );
+				var canvas1 = new DrawedTexture( { parentTexture: planeTexture, backgroundColor: "#33CCFF", currentColor: "#FF00FF", currentWidth: 30 } );
+				planeTexture.canvasManager = canvas1;
+				var planeMaterial = new THREE.MeshPhongMaterial( { map: planeTexture } );
+				var planeGeometry = new THREE.PlaneBufferGeometry( 25, 25, 1, 1 );
+				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+				plane.name = "mesh0";
+				plane.position.x = - 16;
+				plane.position.y = - 5;
+				plane.position.z = 0;
+				canvas.push( canvas1 );
+				objects.push( plane );
+				scene.add( plane );
+
+				// A cube, in the middle.
+				cubeTexture = new THREE.CanvasTexture( undefined, THREE.UVMapping );
+				var canvas2 = new DrawedTexture( { parentTexture: cubeTexture, backgroundColor: "#5E10AE", currentColor: "#FF8000", currentWidth: 10 } );
+				cubeTexture.canvasManager = canvas2;
+				var cubeMaterial = new THREE.MeshPhongMaterial( { map: cubeTexture } );
+				var cubeGeometry = new THREE.BoxGeometry( 20, 20, 20 );
+				var cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+				cube.name = "mesh1";
+				cube.position.x = 4;
+				cube.position.y = - 5;
+				cube.position.z = 0;
+				canvas.push( canvas2 );
+				objects.push( cube );
+				scene.add( cube );
+
+				// A circle on the right.
+				// For demonstration purpose, use the same canvas with a different texture mapping.
+				// As uv are not saved with the geometry, we use offset and repeat.
+				circleTexture = new THREE.CanvasTexture( undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
+				circleTexture.offset.x = circleTexture.offset.y = - 0.5;
+				circleTexture.repeat.x = circleTexture.repeat.y = 2;
+				canvas1.bindToTexture( circleTexture );
+				circleTexture.canvasManager = canvas1;
+				var circleMaterial = new THREE.MeshBasicMaterial( { map: circleTexture } );
+				var circleGeometry = new THREE.CircleBufferGeometry( 25, 40, 0, Math.PI * 2 );
+				var circle = new THREE.Mesh( circleGeometry, circleMaterial );
+				circle.name = "mesh2";
+				circle.position.x = 24;
+				circle.position.y = - 5;
+				circle.position.z = 0;
+				objects.push( circle );
+				scene.add( circle );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				container.addEventListener( 'mousedown', onDown, false );
+
+				curCanvas = 0;
+				updateUI();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			};
+
+			function onDown( evt ) {
+
+				evt.preventDefault();
+
+				var array = getMousePosition( container, evt.clientX, evt.clientY );
+				onClickPosition.fromArray( array );
+
+				var intersects = getIntersects( onClickPosition, objects );
+				if ( intersects.length > 0 && intersects[ 0 ].uv ) {
+
+					curCanvas = canvas.indexOf( intersects[ 0 ].object.material.map.canvasManager );
+					updateUI();
+
+					var uv = intersects[ 0 ].uv;
+					intersects[ 0 ].object.material.map.transformUv( uv );
+					canvas[ curCanvas ].startLine( uv.x, uv.y );
+
+					container.addEventListener( 'mousemove', onMove, false );
+					container.addEventListener( 'mouseup', onUp, false );
+					container.addEventListener( 'mouseout', onUp, false );
+
+				}
+
+			};
+
+			function onMove( evt ) {
+
+				evt.preventDefault();
+
+				var array = getMousePosition( container, evt.clientX, evt.clientY );
+				onClickPosition.fromArray( array );
+
+				var intersects = getIntersects( onClickPosition, objects );
+				if ( intersects.length > 0 && intersects[ 0 ].uv ) {
+
+					var theCanvas = canvas.indexOf( intersects[ 0 ].object.material.map.canvasManager );
+					if ( theCanvas !== curCanvas ) return;
+
+					var uv = intersects[ 0 ].uv;
+					intersects[ 0 ].object.material.map.transformUv( uv );
+					canvas[ curCanvas ].drawLine( uv.x, uv.y );
+
+				}
+
+			};
+
+			function onUp( evt ) {
+
+				evt.preventDefault();
+
+				var array = getMousePosition( container, evt.clientX, evt.clientY );
+				onClickPosition.fromArray( array );
+
+				var intersects = getIntersects( onClickPosition, objects );
+				if ( intersects.length > 0 && intersects[ 0 ].uv ) {
+
+					var theCanvas = canvas.indexOf( intersects[ 0 ].object.material.map.canvasManager );
+					if ( theCanvas === curCanvas )
+					{
+
+						var uv = intersects[ 0 ].uv;
+						intersects[ 0 ].object.material.map.transformUv( uv );
+						canvas[ curCanvas ].drawLine( uv.x, uv.y );
+
+					}
+
+				}
+
+				container.removeEventListener( 'mousemove', onMove );
+				container.removeEventListener( 'mouseup', onUp );
+				container.removeEventListener( 'mouseout', onUp );
+
+			};
+
+			var getMousePosition = function ( dom, x, y ) {
+
+				var rect = dom.getBoundingClientRect();
+				return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
+
+			};
+
+			var getIntersects = function ( point, objects ) {
+
+				mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
+
+				raycaster.setFromCamera( mouse, camera );
+
+				return raycaster.intersectObjects( objects );
+
+			};
+
+			function render() {
+
+				requestAnimationFrame( render );
+				renderer.render( scene, camera );
+
+			};
+
+			function updateUI() {
+
+				document.getElementById( "bColor1" ).value = canvas[ 0 ].backgroundColor();
+				document.getElementById( "bColor2" ).value = canvas[ 1 ].backgroundColor();
+				document.getElementById( "lColor1" ).value = canvas[ 0 ].lineColor();
+				document.getElementById( "lColor2" ).value = canvas[ 1 ].lineColor();
+				document.getElementById( "lWidth1" ).value = canvas[ 0 ].lineWidth();
+				document.getElementById( "lWidth2" ).value = canvas[ 1 ].lineWidth();
+
+			};
+
+			function setBackgroundColor1( evt ) {
+
+				canvas[ 0 ].backgroundColor( evt.target.value );
+
+			};
+
+			function setBackgroundColor2( evt ) {
+
+				canvas[ 1 ].backgroundColor( evt.target.value );
+
+			};
+
+			function setLineColor1( evt ) {
+
+				canvas[ 0 ].lineColor( evt.target.value );
+
+			};
+
+			function setLineColor2( evt ) {
+
+				canvas[ 1 ].lineColor( evt.target.value );
+
+			};
+
+			function setLineWidth1( that ) {
+
+				canvas[ 0 ].lineWidth( parseInt( that.value ) );
+
+			};
+
+			function setLineWidth2( that ) {
+
+				canvas[ 1 ].lineWidth( parseInt( that.value ) );
+
+			};
+
+			function saveScene() {
+
+				var result = scene.toJSON();
+				var laChaine = JSON.stringify( result );
+				localStorage.setItem( "scene", JSON.stringify( result ) );
+
+			};
+
+			this.clearScene = function () {
+
+				scene = new THREE.Scene();
+
+			};
+
+			this.loadScene = function () {
+
+				var json = localStorage.getItem( "scene" );
+
+				if ( json ) {
+
+					var loadedGeometry = JSON.parse( json );
+					var loader = new THREE.ObjectLoader();
+
+					loadedScene = loader.parse( loadedGeometry );
+					scene = loadedScene;
+
+					// Now we have to do some stuff to bind the UI.
+					canvas = [];
+					objects = [];
+					var i = 0;
+					var mesh;
+					while ( mesh = scene.getObjectByName( "mesh" + i.toString() ) )
+					{
+
+						var texture = mesh.material.map;
+						if ( texture && texture.canvasManager ) {
+
+							objects.push( mesh );
+							canvas.push( texture.canvasManager );
+
+						}
+						i ++;
+
+					}
+					curCanvas = 0
+
+				}
+
+				updateUI();
+
+			};
+
+		</script>
+	</body>
+</html>
