@@ -41,7 +41,6 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Group ' + ( ++ meshCount );
 
 		editor.execute( new CmdAddObject( mesh ) );
-		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -69,7 +68,6 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Plane ' + ( ++ meshCount );
 
 		editor.execute( new CmdAddObject( mesh ) );
-		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -94,7 +92,6 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Box ' + ( ++ meshCount );
 
 		editor.execute( new CmdAddObject( mesh ) );
-		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -114,7 +111,6 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Circle ' + ( ++ meshCount );
 
 		editor.execute( new CmdAddObject( mesh ) );
-		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -138,7 +134,6 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Cylinder ' + ( ++ meshCount );
 
 		editor.execute( new CmdAddObject( mesh ) );
-		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -163,7 +158,6 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Sphere ' + ( ++ meshCount );
 
 		editor.execute( new CmdAddObject( mesh ) );
-		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -183,7 +177,6 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Icosahedron ' + ( ++ meshCount );
 
 		editor.execute( new CmdAddObject( mesh ) );
-		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -206,7 +199,6 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Torus ' + ( ++ meshCount );
 
 		editor.execute( new CmdAddObject( mesh ) );
-		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -231,7 +223,6 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'TorusKnot ' + ( ++ meshCount );
 
 		editor.execute( new CmdAddObject( mesh ) );
-		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -277,7 +268,6 @@ Menubar.Add = function ( editor ) {
 		sprite.name = 'Sprite ' + ( ++ meshCount );
 
 		editor.execute( new CmdAddObject( sprite ) );
-		editor.select( sprite );
 
 	} );
 	options.add( option );
@@ -301,7 +291,6 @@ Menubar.Add = function ( editor ) {
 		light.name = 'PointLight ' + ( ++ lightCount );
 
 		editor.execute( new CmdAddObject( light ) );
-		editor.select( light );
 
 	} );
 	options.add( option );
@@ -326,7 +315,6 @@ Menubar.Add = function ( editor ) {
 		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
 		editor.execute( new CmdAddObject( light ) );
-		editor.select( light );
 
 	} );
 	options.add( option );
@@ -348,7 +336,6 @@ Menubar.Add = function ( editor ) {
 		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
 		editor.execute( new CmdAddObject( light ) );
-		editor.select( light );
 
 	} );
 	options.add( option );
@@ -370,7 +357,6 @@ Menubar.Add = function ( editor ) {
 		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
 		editor.execute( new CmdAddObject( light ) );
-		editor.select( light );
 
 	} );
 	options.add( option );
@@ -388,7 +374,6 @@ Menubar.Add = function ( editor ) {
 		light.name = 'AmbientLight ' + ( ++ lightCount );
 
 		editor.execute( new CmdAddObject( light ) );
-		editor.select( light );
 
 	} );
 	options.add( option );
@@ -408,7 +393,6 @@ Menubar.Add = function ( editor ) {
 		camera.name = 'PerspectiveCamera ' + ( ++ cameraCount );
 
 		editor.execute( new CmdAddObject( camera ) );
-		editor.select( camera );
 
 	} );
 	options.add( option );

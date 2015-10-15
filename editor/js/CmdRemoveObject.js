@@ -37,6 +37,7 @@ CmdRemoveObject.prototype = {
 		} );
 
 		this.parent.remove( this.object );
+		this.editor.select( this.parent );
 
 		this.editor.signals.objectRemoved.dispatch( this.object );
 		this.editor.signals.sceneGraphChanged.dispatch();

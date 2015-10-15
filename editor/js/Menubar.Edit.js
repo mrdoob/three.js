@@ -96,7 +96,6 @@ Menubar.Edit = function ( editor ) {
 		object = object.clone();
 
 		editor.execute( new CmdAddObject( object ) );
-		editor.select( object );
 
 	} );
 	options.add( option );
@@ -116,7 +115,6 @@ Menubar.Edit = function ( editor ) {
 		if ( parent === undefined ) return; // avoid deleting the camera or scene
 
 		editor.execute( new CmdRemoveObject( object ) );
-		editor.select( parent );
 
 	} );
 	options.add( option );

@@ -25,7 +25,6 @@ var Loader = function ( editor ) {
 					var amfobject = loader.parse( event.target.result );
 
 					editor.execute( new CmdAddObject( amfobject ) );
-					editor.select( amfobject );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -82,7 +81,6 @@ var Loader = function ( editor ) {
 					mesh.name = filename;
 
 					editor.execute( new CmdAddObject( mesh ) );
-					editor.select( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -111,7 +109,6 @@ var Loader = function ( editor ) {
 						mesh.name = filename;
 
 						editor.execute( new CmdAddObject( mesh ) );
-						editor.select( mesh );
 
 					} );
 
@@ -133,7 +130,6 @@ var Loader = function ( editor ) {
 					collada.scene.name = filename;
 
 					editor.execute( new CmdAddObject( collada.scene ) );
-					editor.select( collada.scene );
 
 				}, false );
 				reader.readAsText( file );
@@ -209,7 +205,6 @@ var Loader = function ( editor ) {
 						collada.scene.name = filename;
 
 						editor.execute( new CmdAddObject( collada.scene ) );
-						editor.select( collada.scene );
 
 					}, false );
 					reader.readAsArrayBuffer( file );
@@ -234,7 +229,6 @@ var Loader = function ( editor ) {
 						mesh.name = filename;
 
 						editor.execute( new CmdAddObject( mesh ) );
-						editor.select( mesh );
 
 					}, false );
 					reader.readAsArrayBuffer( file );
@@ -252,7 +246,6 @@ var Loader = function ( editor ) {
 					object.name = filename;
 
 					editor.execute( new CmdAddObject( object ) );
-					editor.select( object );
 
 				}, false );
 				reader.readAsText( file );
@@ -276,7 +269,6 @@ var Loader = function ( editor ) {
 					mesh.name = filename;
 
 					editor.execute( new CmdAddObject( mesh ) );
-					editor.select( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -300,7 +292,6 @@ var Loader = function ( editor ) {
 					mesh.name = filename;
 
 					editor.execute( new CmdAddObject( mesh ) );
-					editor.select( mesh );
 
 				}, false );
 
@@ -330,7 +321,6 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 
 					editor.execute( new CmdAddObject( mesh ) );
-					editor.select( mesh );
 
 				}, false );
 				reader.readAsBinaryString( file );
@@ -355,7 +345,6 @@ var Loader = function ( editor ) {
 					mesh.name = filename;
 
 					editor.execute( new CmdAddObject( mesh ) );
-					editor.select( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -416,7 +405,6 @@ var Loader = function ( editor ) {
 			var mesh = new THREE.Mesh( result );
 
 			editor.execute( new CmdAddObject( mesh ) );
-			editor.select( mesh );
 
 		} else if ( data.metadata.type.toLowerCase() === 'geometry' ) {
 
@@ -464,7 +452,6 @@ var Loader = function ( editor ) {
 			mesh.name = filename;
 
 			editor.execute( new CmdAddObject( mesh ) );
-			editor.select( mesh );
 
 		} else if ( data.metadata.type.toLowerCase() === 'object' ) {
 
@@ -480,7 +467,6 @@ var Loader = function ( editor ) {
 			} else {
 
 				editor.execute( new CmdAddObject( result ) );
-				editor.select( result );
 
 			}
 
