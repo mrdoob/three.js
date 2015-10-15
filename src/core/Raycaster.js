@@ -118,9 +118,12 @@
 
 			}
 
+			var len = intersects.length;
+
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 				intersectObject( objects[ i ], this, intersects, recursive );
+				if ( intersects.length > len ) { intersects[ len ].item = i; len++; }
 
 			}
 
