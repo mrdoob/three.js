@@ -468,7 +468,12 @@ THREE.ColladaLoader.prototype = {
 					function pushVector( i ) {
 
 						var index = indices[ i + offset ] * 3;
-						array.push( source[ index + 0 ], source[ index + 1 ], source[ index + 2 ] );
+
+						if ( asset.upAxis === 'Z_UP' ) {
+							array.push( source[ index + 0 ], source[ index + 2 ], - source[ index + 1 ] );
+						} else {
+							array.push( source[ index + 0 ], source[ index + 1 ], source[ index + 2 ] );
+						}
 
 					}
 
