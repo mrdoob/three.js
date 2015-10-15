@@ -135,7 +135,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
 
-	var reverse = ! THREE.Shape.Utils.isClockWise( vertices );
+	var reverse = ! THREE.ShapeUtils.isClockWise( vertices );
 
 	if ( reverse ) {
 
@@ -147,7 +147,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			ahole = holes[ h ];
 
-			if ( THREE.Shape.Utils.isClockWise( ahole ) ) {
+			if ( THREE.ShapeUtils.isClockWise( ahole ) ) {
 
 				holes[ h ] = ahole.reverse();
 
@@ -160,7 +160,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	}
 
 
-	var faces = THREE.Shape.Utils.triangulateShape ( vertices, holes );
+	var faces = THREE.ShapeUtils.triangulateShape( vertices, holes );
 
 	/* Vertices */
 

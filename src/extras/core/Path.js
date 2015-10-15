@@ -253,8 +253,8 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				var t = j / divisions;
 
-				tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
-				ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
+				tx = THREE.ShapeUtils.b2( t, cpx0, cpx1, cpx );
+				ty = THREE.ShapeUtils.b2( t, cpy0, cpy1, cpy );
 
 				points.push( new THREE.Vector2( tx, ty ) );
 
@@ -591,7 +591,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 	}
 
-	var holesFirst = ! THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
+	var holesFirst = ! THREE.ShapeUtils.isClockWise( subPaths[ 0 ].getPoints() );
 	holesFirst = isCCW ? ! holesFirst : holesFirst;
 
 	// console.log("Holes first", holesFirst);
@@ -609,7 +609,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 		tmpPath = subPaths[ i ];
 		tmpPoints = tmpPath.getPoints();
-		solid = THREE.Shape.Utils.isClockWise( tmpPoints );
+		solid = THREE.ShapeUtils.isClockWise( tmpPoints );
 		solid = isCCW ? ! solid : solid;
 
 		if ( solid ) {

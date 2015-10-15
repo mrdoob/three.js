@@ -27,9 +27,9 @@ THREE.SplineCurve3 = THREE.Curve.create(
 
 		var vector = new THREE.Vector3();
 
-		vector.x = THREE.Curve.Utils.interpolate( point0.x, point1.x, point2.x, point3.x, weight );
-		vector.y = THREE.Curve.Utils.interpolate( point0.y, point1.y, point2.y, point3.y, weight );
-		vector.z = THREE.Curve.Utils.interpolate( point0.z, point1.z, point2.z, point3.z, weight );
+		vector.x = THREE.CurveUtils.interpolate( point0.x, point1.x, point2.x, point3.x, weight );
+		vector.y = THREE.CurveUtils.interpolate( point0.y, point1.y, point2.y, point3.y, weight );
+		vector.z = THREE.CurveUtils.interpolate( point0.z, point1.z, point2.z, point3.z, weight );
 
 		return vector;
 

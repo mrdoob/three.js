@@ -17,9 +17,9 @@ THREE.CubicBezierCurve3 = THREE.Curve.create(
 
 		var vector = new THREE.Vector3();
 
-		vector.x = THREE.Shape.Utils.b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
-		vector.y = THREE.Shape.Utils.b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
-		vector.z = THREE.Shape.Utils.b3( t, this.v0.z, this.v1.z, this.v2.z, this.v3.z );
+		vector.x = THREE.ShapeUtils.b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
+		vector.y = THREE.ShapeUtils.b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
+		vector.z = THREE.ShapeUtils.b3( t, this.v0.z, this.v1.z, this.v2.z, this.v3.z );
 
 		return vector;
 

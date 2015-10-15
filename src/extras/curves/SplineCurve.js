@@ -26,8 +26,8 @@ THREE.SplineCurve.prototype.getPoint = function ( t ) {
 
 	var vector = new THREE.Vector2();
 
-	vector.x = THREE.Curve.Utils.interpolate( point0.x, point1.x, point2.x, point3.x, weight );
-	vector.y = THREE.Curve.Utils.interpolate( point0.y, point1.y, point2.y, point3.y, weight );
+	vector.x = THREE.CurveUtils.interpolate( point0.x, point1.x, point2.x, point3.x, weight );
+	vector.y = THREE.CurveUtils.interpolate( point0.y, point1.y, point2.y, point3.y, weight );
 
 	return vector;
 

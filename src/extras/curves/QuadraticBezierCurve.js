@@ -19,8 +19,8 @@ THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 
 	var vector = new THREE.Vector2();
 
-	vector.x = THREE.Shape.Utils.b2( t, this.v0.x, this.v1.x, this.v2.x );
-	vector.y = THREE.Shape.Utils.b2( t, this.v0.y, this.v1.y, this.v2.y );
+	vector.x = THREE.ShapeUtils.b2( t, this.v0.x, this.v1.x, this.v2.x );
+	vector.y = THREE.ShapeUtils.b2( t, this.v0.y, this.v1.y, this.v2.y );
 
 	return vector;
 
@@ -31,8 +31,8 @@ THREE.QuadraticBezierCurve.prototype.getTangent = function( t ) {
 
 	var vector = new THREE.Vector2();
 
-	vector.x = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x );
-	vector.y = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.y, this.v1.y, this.v2.y );
+	vector.x = THREE.CurveUtils.tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x );
+	vector.y = THREE.CurveUtils.tangentQuadraticBezier( t, this.v0.y, this.v1.y, this.v2.y );
 
 	// returns unit vector
 
