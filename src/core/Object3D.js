@@ -408,12 +408,16 @@ THREE.Object3D.prototype = {
 
 		var children = [];
 		this.traverse(function (child) {
+
 			if (child.name === name) {
+
 				children.push(child);
 			}
+
 		});
 
 		return children;
+
 	},
 
 	getObjectByProperty: function ( name, value ) {
