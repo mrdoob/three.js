@@ -285,8 +285,6 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 ( function ( namespace ) {
 
-	var EPSILON = 0.0000000001;
-
 	// takes in an contour array and returns
 
 	function process( contour, indices ) {
@@ -417,7 +415,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 		cx = contour[ verts[ w ] ].x;
 		cy = contour[ verts[ w ] ].y;
 
-		if ( EPSILON > ( ( ( bx - ax ) * ( cy - ay ) ) - ( ( by - ay ) * ( cx - ax ) ) ) ) return false;
+		if ( Number.EPSILON > ( ( ( bx - ax ) * ( cy - ay ) ) - ( ( by - ay ) * ( cx - ax ) ) ) ) return false;
 
 		var aX, aY, bX, bY, cX, cY;
 		var apx, apy, bpx, bpy, cpx, cpy;
@@ -446,7 +444,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 			cCROSSap = cX * apy - cY * apx;
 			bCROSScp = bX * cpy - bY * cpx;
 
-			if ( ( aCROSSbp >= - EPSILON ) && ( bCROSScp >= - EPSILON ) && ( cCROSSap >= - EPSILON ) ) return false;
+			if ( ( aCROSSbp >= - Number.EPSILON ) && ( bCROSScp >= - Number.EPSILON ) && ( cCROSSap >= - Number.EPSILON ) ) return false;
 
 		}
 

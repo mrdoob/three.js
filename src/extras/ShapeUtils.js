@@ -39,8 +39,6 @@ THREE.ShapeUtils = {
 
 		function intersect_segments_2D( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1, inSeg2Pt2, inExcludeAdjacentSegs ) {
 
-			var EPSILON = 0.0000000001;
-
 			var seg1dx = inSeg1Pt2.x - inSeg1Pt1.x,   seg1dy = inSeg1Pt2.y - inSeg1Pt1.y;
 			var seg2dx = inSeg2Pt2.x - inSeg2Pt1.x,   seg2dy = inSeg2Pt2.y - inSeg2Pt1.y;
 
@@ -50,7 +48,7 @@ THREE.ShapeUtils = {
 			var limit		= seg1dy * seg2dx - seg1dx * seg2dy;
 			var perpSeg1	= seg1dy * seg1seg2dx - seg1dx * seg1seg2dy;
 
-			if ( Math.abs( limit ) > EPSILON ) {
+			if ( Math.abs( limit ) > Number.EPSILON ) {
 
 				// not parallel
 
@@ -216,8 +214,6 @@ THREE.ShapeUtils = {
 
 			// The order of legs is important
 
-			var EPSILON = 0.0000000001;
-
 			// translation of all points, so that Vertex is at (0,0)
 			var legFromPtX	= inLegFromPt.x - inVertex.x,  legFromPtY	= inLegFromPt.y - inVertex.y;
 			var legToPtX	= inLegToPt.x	- inVertex.x,  legToPtY		= inLegToPt.y	- inVertex.y;
@@ -227,7 +223,7 @@ THREE.ShapeUtils = {
 			var from2toAngle	= legFromPtX * legToPtY - legFromPtY * legToPtX;
 			var from2otherAngle	= legFromPtX * otherPtY - legFromPtY * otherPtX;
 
-			if ( Math.abs( from2toAngle ) > EPSILON ) {
+			if ( Math.abs( from2toAngle ) > Number.EPSILON ) {
 
 				// angle != 180 deg.
 

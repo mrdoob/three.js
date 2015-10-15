@@ -425,9 +425,8 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 	// Normalize to remove the closing point by default.
 	var lastPoint = points[ points.length - 1 ];
-	var EPSILON = 0.0000000001;
-	if ( Math.abs( lastPoint.x - points[ 0 ].x ) < EPSILON &&
-			 Math.abs( lastPoint.y - points[ 0 ].y ) < EPSILON )
+	if ( Math.abs( lastPoint.x - points[ 0 ].x ) < Number.EPSILON &&
+			 Math.abs( lastPoint.y - points[ 0 ].y ) < Number.EPSILON )
 		points.splice( points.length - 1, 1 );
 	if ( closedPath ) {
 
@@ -515,8 +514,6 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 	function isPointInsidePolygon( inPt, inPolygon ) {
 
-		var EPSILON = 0.0000000001;
-
 		var polyLen = inPolygon.length;
 
 		// inPt on polygon contour => immediate success    or
@@ -532,7 +529,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			var edgeDx = edgeHighPt.x - edgeLowPt.x;
 			var edgeDy = edgeHighPt.y - edgeLowPt.y;
 
-			if ( Math.abs( edgeDy ) > EPSILON ) {
+			if ( Math.abs( edgeDy ) > Number.EPSILON ) {
 
 				// not parallel
 				if ( edgeDy < 0 ) {

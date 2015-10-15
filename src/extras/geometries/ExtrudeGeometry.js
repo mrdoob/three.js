@@ -193,8 +193,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	function getBevelVec( inPt, inPrev, inNext ) {
 
-		var EPSILON = 0.0000000001;
-
 		// computes for inPt the corresponding point inPt' on a new contour
 		//   shifted by 1 unit (length of normalized vector) to the left
 		// if we walk along contour clockwise, this new contour is outside the old one
@@ -215,7 +213,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		// check for collinear edges
 		var collinear0 = ( v_prev_x * v_next_y - v_prev_y * v_next_x );
 
-		if ( Math.abs( collinear0 ) > EPSILON ) {
+		if ( Math.abs( collinear0 ) > Number.EPSILON ) {
 
 			// not collinear
 
@@ -261,9 +259,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			// handle special case of collinear edges
 
 			var direction_eq = false;		// assumes: opposite
-			if ( v_prev_x > EPSILON ) {
+			if ( v_prev_x > Number.EPSILON ) {
 
-				if ( v_next_x > EPSILON ) {
+				if ( v_next_x > Number.EPSILON ) {
 
 					direction_eq = true;
 
@@ -271,9 +269,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			} else {
 
-				if ( v_prev_x < - EPSILON ) {
+				if ( v_prev_x < - Number.EPSILON ) {
 
-					if ( v_next_x < - EPSILON ) {
+					if ( v_next_x < - Number.EPSILON ) {
 
 						direction_eq = true;
 
