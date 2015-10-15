@@ -160,6 +160,7 @@ THREE.ShaderSkin = {
 
 				"vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
 				"vec4 diffuseColor = vec4( diffuse, opacity );",
+				"vec3 shadowMask = vec3( 1.0 );",
 
 				"vec4 colDiffuse = texture2D( tDiffuse, vUv );",
 				"colDiffuse.rgb *= colDiffuse.rgb;",
@@ -268,9 +269,13 @@ THREE.ShaderSkin = {
 
 				"#endif",
 
+				THREE.ShaderChunk[ "shadowmap_fragment" ],
+
+				"totalDiffuseLight *= shadowMask;",
+				"totalSpecularLight *= shadowMask;",
+
 				"outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse ) + totalSpecularLight;",
 
-				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 				THREE.ShaderChunk[ "fog_fragment" ],
 

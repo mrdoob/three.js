@@ -16,6 +16,22 @@ var Loader = function ( editor ) {
 
 		switch ( extension ) {
 
+			case 'amf':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var loader = new THREE.AMFLoader();
+					var amfobject = loader.parse( event.target.result );
+
+					editor.addObject( amfobject );
+					editor.select( amfobject );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
 			case 'awd':
 
 				var reader = new FileReader();
@@ -111,11 +127,8 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					var parser = new DOMParser();
-					var xml = parser.parseFromString( contents, 'text/xml' );
-
 					var loader = new THREE.ColladaLoader();
-					var collada = loader.parse( xml );
+					var collada = loader.parse( contents );
 
 					collada.scene.name = filename;
 
@@ -184,6 +197,25 @@ var Loader = function ( editor ) {
 
 				break;
 
+
+				case 'kmz':
+
+					var reader = new FileReader();
+					reader.addEventListener( 'load', function ( event ) {
+
+						var loader = new THREE.KMZLoader();
+						var collada = loader.parse( event.target.result );
+
+						collada.scene.name = filename;
+
+						editor.addObject( collada.scene );
+						editor.select( collada.scene );
+
+					}, false );
+					reader.readAsArrayBuffer( file );
+
+					break;
+
 				case 'md2':
 
 					var reader = new FileReader();
@@ -197,11 +229,12 @@ var Loader = function ( editor ) {
 							morphNormals: true
 						} );
 
-						var object = new THREE.MorphAnimMesh( geometry, material );
-						object.name = filename;
+						var mesh = new THREE.Mesh( geometry, material );
+						mesh.mixer = new THREE.AnimationMixer( mesh )
+						mesh.name = filename;
 
-						editor.addObject( object );
-						editor.select( object );
+						editor.addObject( mesh );
+						editor.select( mesh );
 
 					}, false );
 					reader.readAsArrayBuffer( file );

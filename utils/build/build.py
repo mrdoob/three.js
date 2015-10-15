@@ -10,6 +10,7 @@ if sys.version_info < (2, 7):
 import argparse
 import json
 import os
+import re
 import shutil
 import tempfile
 
@@ -45,7 +46,7 @@ def main(argv=None):
 	fd, path = tempfile.mkstemp()
 	tmp = open(path, 'w', encoding='utf-8')
 	sources = []
-		
+
 	if args.amd:
 		tmp.write(u'( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n')
 
@@ -60,7 +61,10 @@ def main(argv=None):
 			with open(filename, 'r', encoding='utf-8') as f:
 				if filename.endswith(".glsl"):
 					tmp.write(u'THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + u'\'] = "')
-					tmp.write(f.read().replace('\n','\\n'))
+					text = f.read()
+					text = re.sub(r"\t*//.*\n", "", text) # strip comments
+					text = text.replace('\n','\\n') # line breaks to \n
+					tmp.write(text)
 					tmp.write(u'";\n\n')
 				else:
 					tmp.write(f.read())

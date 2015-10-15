@@ -19,25 +19,7 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay 
 	this.exponent = ( exponent !== undefined ) ? exponent : 10;
 	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
 
-	this.castShadow = false;
-	this.onlyShadow = false;
-
-	this.shadowCameraNear = 50;
-	this.shadowCameraFar = 5000;
-	this.shadowCameraFov = 50;
-
-	this.shadowCameraVisible = false;
-
-	this.shadowBias = 0;
-	this.shadowDarkness = 0.5;
-
-	this.shadowMapWidth = 512;
-	this.shadowMapHeight = 512;
-
-	this.shadowMap = null;
-	this.shadowMapSize = null;
-	this.shadowCamera = null;
-	this.shadowMatrix = null;
+	this.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 50, 5000 ) );
 
 };
 
@@ -56,35 +38,8 @@ THREE.SpotLight.prototype.copy = function ( source ) {
 
 	this.target = source.target.clone();
 
-	this.castShadow = source.castShadow;
-	this.onlyShadow = source.onlyShadow;
-
-	this.shadowCameraNear = source.shadowCameraNear;
-	this.shadowCameraFar = source.shadowCameraFar;
-	this.shadowCameraFov = source.shadowCameraFov;
-
-	this.shadowCameraVisible = source.shadowCameraVisible;
-
-	this.shadowBias = source.shadowBias;
-	this.shadowDarkness = source.shadowDarkness;
-
-	this.shadowMapWidth = source.shadowMapWidth;
-	this.shadowMapHeight = source.shadowMapHeight;
+	this.shadow = source.shadow.clone();
 
 	return this;
-}
-
-THREE.SpotLight.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.color = this.color.getHex();
-	data.object.intensity = this.intensity;
-	data.object.distance = this.distance;
-	data.object.angle = this.angle;
-	data.object.exponent = this.exponent;
-	data.object.decay = this.decay;
-
-	return data;
 
 };

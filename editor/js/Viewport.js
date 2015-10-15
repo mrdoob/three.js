@@ -283,7 +283,7 @@ var Viewport = function ( editor ) {
 
 	signals.snapChanged.add( function ( dist ) {
 
-		transformControls.setSnap( dist );
+		transformControls.setTranslationSnap( dist );
 
 	} );
 
@@ -555,6 +555,8 @@ var Viewport = function ( editor ) {
 
 		requestAnimationFrame( animate );
 
+		/*
+
 		// animations
 
 		if ( THREE.AnimationHandler.animations.length > 0 ) {
@@ -576,6 +578,8 @@ var Viewport = function ( editor ) {
 			render();
 
 		}
+
+		*/
 
 	}
 

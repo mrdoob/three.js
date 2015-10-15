@@ -38,7 +38,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - skinning + morphing
+		<a href="http://threejs.org" target="_blank">three.js</a> webgl - clip system
 		- knight by <a href="http://vimeo.com/36113323">apendua</a>
 		</div>
 
@@ -46,7 +46,6 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
@@ -61,6 +60,8 @@
 			var renderer;
 
 			var mesh, helper;
+
+			var mixer;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -90,7 +91,7 @@
 				// GROUND
 
 				var geometry = new THREE.PlaneBufferGeometry( 16000, 16000 );
-				var material = new THREE.MeshPhongMaterial( { emissive: 0xbbbbbb } );
+				var material = new THREE.MeshPhongMaterial( { emissive: 0x888888 } );
 
 				var ground = new THREE.Mesh( geometry, material );
 				ground.position.set( 0, FLOOR, 0 );
@@ -102,18 +103,16 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x222222 );
-				scene.add( ambient );
+				scene.add( new THREE.HemisphereLight( 0x111111, 0x444444 ) );
 
-
-				var light = new THREE.DirectionalLight( 0xebf3ff, 1.6 );
+				var light = new THREE.DirectionalLight( 0xebf3ff, 1.5 );
 				light.position.set( 0, 140, 500 ).multiplyScalar( 1.1 );
 				scene.add( light );
 
 				light.castShadow = true;
 
 				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 2048;
+				light.shadowMapHeight = 1024;
 
 				var d = 390;
 
@@ -124,12 +123,6 @@
 
 				light.shadowCameraFar = 3500;
 				//light.shadowCameraVisible = true;
-
-				//
-
-				var light = new THREE.DirectionalLight( 0x493f13, 1 );
-				light.position.set( 0, -1, 0 );
-				scene.add( light );
 
 				// RENDERER
 
@@ -183,26 +176,9 @@
 
 			}
 
-			function ensureLoop( animation ) {
-
-				for ( var i = 0; i < animation.hierarchy.length; i ++ ) {
-
-					var bone = animation.hierarchy[ i ];
-
-					var first = bone.keys[ 0 ];
-					var last = bone.keys[ bone.keys.length - 1 ];
-
-					last.pos = first.pos;
-					last.rot = first.rot;
-					last.scl = first.scl;
-
-				}
-
-			}
-
 			function createScene( geometry, materials, x, y, z, s ) {
 
-				ensureLoop( geometry.animation );
+				//ensureLoop( geometry.animation );
 
 				geometry.computeBoundingBox();
 				var bb = geometry.boundingBox;
@@ -214,14 +190,6 @@
 						path + 'posy' + format, path + 'negy' + format,
 						path + 'posz' + format, path + 'negz' + format
 					];
-
-
-				//var envMap = THREE.ImageUtils.loadTextureCube( urls );
-
-				//var map = THREE.ImageUtils.loadTexture( "textures/UV_Grid_Sm.jpg" );
-
-				//var bumpMap = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color() );
-				//var bumpMap = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
 
 				for ( var i = 0; i < materials.length; i ++ ) {
 
@@ -256,9 +224,13 @@
 				helper.visible = false;
 				scene.add( helper );
 
-				var animation = new THREE.Animation( mesh, geometry.animation );
-				animation.play();
 
+				var clipMorpher = THREE.AnimationClip.CreateFromMorphTargetSequence( 'facialExpressions', mesh.geometry.morphTargets, 3 );
+				var clipBones = geometry.animations[0];
+
+				mixer = new THREE.AnimationMixer( mesh );
+				mixer.addAction( new THREE.AnimationAction( clipMorpher ) );
+				mixer.addAction( new THREE.AnimationAction( clipBones ) );
 			}
 
 			function initGUI() {
@@ -303,30 +275,9 @@
 
 				camera.lookAt( scene.position );
 
-				// update skinning
-
-				THREE.AnimationHandler.update( delta );
-
-				if ( helper !== undefined ) helper.update();
-
-				// update morphs
-
-				if ( mesh ) {
-
-					var time = Date.now() * 0.001;
-
-					// mouth
-
-					mesh.morphTargetInfluences[ 1 ] = ( 1 + Math.sin( 4 * time ) ) / 2;
-
-					// frown ?
-
-					mesh.morphTargetInfluences[ 2 ] = ( 1 + Math.sin( 2 * time ) ) / 2;
-
-					// eyes
-
-					mesh.morphTargetInfluences[ 3 ] = ( 1 + Math.cos( 4 * time ) ) / 2;
-
+				if( mixer ) {
+					mixer.update( delta );
+					helper.update();
 				}
 
 				renderer.render( scene, camera );

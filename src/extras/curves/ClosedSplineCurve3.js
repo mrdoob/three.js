@@ -26,13 +26,13 @@ THREE.ClosedSplineCurve3 = THREE.Curve.create(
 		var point2 = points[ ( intPoint + 1 ) % points.length ];
 		var point3 = points[ ( intPoint + 2 ) % points.length ];
 
-		var vector = new THREE.Vector3();
+		var interpolate = THREE.CurveUtils.interpolate;
 
-		vector.x = THREE.Curve.Utils.interpolate( point0.x, point1.x, point2.x, point3.x, weight );
-		vector.y = THREE.Curve.Utils.interpolate( point0.y, point1.y, point2.y, point3.y, weight );
-		vector.z = THREE.Curve.Utils.interpolate( point0.z, point1.z, point2.z, point3.z, weight );
-
-		return vector;
+		return new THREE.Vector3(
+			interpolate( point0.x, point1.x, point2.x, point3.x, weight ),
+			interpolate( point0.y, point1.y, point2.y, point3.y, weight ),
+			interpolate( point0.z, point1.z, point2.z, point3.z, weight )
+		);
 
 	}
 

@@ -409,10 +409,6 @@
           "!type": "[]",
           "!doc": "Array of morph targets. Each morph target is a Javascript object:\n\t\t<code>{ name: \"targetName\", vertices: [ new THREE.Vector3(), ... ] }</code>\n\t\tMorph vertices match number and order of primary vertices."
         },
-        "morphColors": {
-          "!type": "[]",
-          "!doc": "Array of morph colors. Morph colors have similar structure as morph targets, each color set is a Javascript object:\n\t\t<code>morphColor = { name: \"colorName\", colors: [ new THREE.Color(), ... ] }</code>\n\t\tMorph colors can match either the number and order of faces (face colors) or the number of vertices (vertex colors)."
-        },
         "morphNormals": {
           "!type": "[]",
           "!doc": "Array of morph normals. Morph normals have similar structure as morph targets, each normal set is a Javascript object:\n\t\t<code>morphNormal = { name: \"NormalName\", normals: [ new THREE.Vector3(), ... ] }</code>"
@@ -2088,106 +2084,6 @@
         "intensity": {
           "!type": "number",
           "!doc": "Light's intensity.<br>\n\t\t\tDefault — *1.0*."
-        },
-        "onlyShadow": {
-          "!type": "bool",
-          "!doc": "If set to *true* light will only cast shadow but not contribute any lighting (as if *intensity* was 0 but cheaper to compute).<br>\n\t\t\tDefault — *false*."
-        },
-        "shadowCameraNear": {
-          "!type": "number",
-          "!doc": "Orthographic shadow camera frustum parameter.<br>\n\t\t\tDefault — *50*."
-        },
-        "shadowCameraFar": {
-          "!type": "number",
-          "!doc": "Orthographic shadow camera frustum parameter.<br>\n\t\t\tDefault — *5000*."
-        },
-        "shadowCameraLeft": {
-          "!type": "number",
-          "!doc": "Orthographic shadow camera frustum parameter.<br>\n\t\t\tDefault — *-500*."
-        },
-        "shadowCameraRight": {
-          "!type": "number",
-          "!doc": "Orthographic shadow camera frustum parameter.<br>\n\t\t\tDefault — *500*."
-        },
-        "shadowCameraTop": {
-          "!type": "number",
-          "!doc": "Orthographic shadow camera frustum parameter.<br>\n\t\t\tDefault — *500*."
-        },
-        "shadowCameraBottom": {
-          "!type": "number",
-          "!doc": "Orthographic shadow camera frustum parameter.<br>\n\t\t\tDefault — *-500*."
-        },
-        "shadowCameraVisible": {
-          "!type": "bool",
-          "!doc": "Show debug shadow camera frustum.<br>\n\t\t\tDefault — *false*."
-        },
-        "shadowBias": {
-          "!type": "number",
-          "!doc": "Shadow map bias, how much to add or subtract from the normalized depth when deciding whether a surface is in shadow.<br>\n\t\t\tDefault — *0*."
-        },
-        "shadowDarkness": {
-          "!type": "number",
-          "!doc": "Darkness of shadow casted by this light (from *0* to *1*).<br>\n\t\t\tDefault — *0.5*."
-        },
-        "shadowMapWidth": {
-          "!type": "number",
-          "!doc": "Shadow map texture width in pixels.<br>\n\t\t\tDefault — *512*."
-        },
-        "shadowMapHeight": {
-          "!type": "number",
-          "!doc": "Shadow map texture height in pixels.<br>\n\t\t\tDefault — *512*."
-        },
-        "shadowCascade": {
-          "!type": "bool",
-          "!doc": "**Experimental** If true, use a series of shadow maps in a cascade. This can give better z-depth resolution for a directional light. <br>\n\t\t\tDefault — *false*."
-        },
-        "shadowCascadeCount": {
-          "!type": "number",
-          "!doc": "Number of shadow maps to allocate in a cascade (one after another). <br>\n\t\t\tDefault — *2*."
-        },
-        "shadowCascadeOffset": {
-          "!type": "+THREE.Vector3",
-          "!doc": "A relative position to real camera where virtual shadow cameras are attached. A magic vector; scene and light orientation dependent. <br>\n\t\t\tDefault — *Three.Vector3( 0, 0, -1000 )*."
-        },
-        "shadowCascadeBias": {
-          "!type": "[]",
-          "!doc": "An array of shadowMapBias values for the corresponding shadow map in the cascade, near to far. <br>\n\t\t\tDefault — <strong>[ 0, 0, 0 ]</strong>."
-        },
-        "shadowCascadeWidth": {
-          "!type": "[]",
-          "!doc": "An array of shadowMapWidth values for the corresponding shadow map in the cascade, near to far. <br>\n\t\t\tDefault — <strong>[ 512, 512, 512 ]</strong>."
-        },
-        "shadowCascadeHeight": {
-          "!type": "[]",
-          "!doc": "An array of shadowMapHeight values for the corresponding shadow map in the cascade, near to far. <br>\n\t\t\tDefault — <strong>[ 512, 512, 512 ]</strong>."
-        },
-        "shadowCascadeNearZ": {
-          "!type": "[]",
-          "!doc": "An array of shadowMapNear values for the corresponding shadow map in the cascade, near to far. These typically start with -1.0 (near plane) and match with the previous shadowCascadeFarZ array value.<br>\n\t\t\tDefault — <strong>[ -1.000, 0.990, 0.998 ]</strong>."
-        },
-        "shadowCascadeFarZ": {
-          "!type": "[]",
-          "!doc": "An array of shadowMapFar values for the corresponding shadow map in the cascade, near to far. These typically match with the next shadowCascadeNearZ array value, ending in 1.0.<br>\n\t\t\tDefault — <strong>[ 0.990, 0.998, 1.000 ]</strong>."
-        },
-        "shadowCascadeArray": {
-          "!type": "[]",
-          "!doc": "Array of size shadowCascadeCount of [page:DirectionalLight THREE.DirectionalLight] objects. This holds the series of separate shadow maps in a cascade, near to far. Created internally."
-        },
-        "shadowMapSize": {
-          "!type": "+THREE.Vector2",
-          "!doc": "The shadowMapWidth and shadowMapHeight stored in a [page:Vector2 THREE.Vector2]. Set internally during rendering."
-        },
-        "shadowCamera": {
-          "!type": "+THREE.OrthographicCamera",
-          "!doc": "The shadow's view of the world. Computed internally during rendering from the shadowCamera* settings."
-        },
-        "shadowMatrix": {
-          "!type": "+THREE.Matrix4",
-          "!doc": "Model to shadow camera space, to compute location and depth in shadow map. Computed internally during rendering."
-        },
-        "shadowMap": {
-          "!type": "+THREE.WebGLRenderTarget",
-          "!doc": "The depth map generated using the shadowCamera; a location beyond a pixel's depth is in shadow. Computed internally during rendering."
         }
       },
       "!doc": "Affects objects using [page:MeshLambertMaterial] or [page:MeshPhongMaterial].",
@@ -2260,62 +2156,6 @@
         "exponent": {
           "!type": "number",
           "!doc": "Rapidity of the falloff of light from its target direction.<br>\n\t\t\tDefault — *10.0*."
-        },
-        "castShadow": {
-          "!type": "bool",
-          "!doc": "If set to *true* light will cast dynamic shadows. *Warning*: This is expensive and requires tweaking to get shadows looking right.<br>\n\t\t\tDefault — *false*."
-        },
-        "onlyShadow": {
-          "!type": "bool",
-          "!doc": "If set to *true* light will only cast shadow but not contribute any lighting (as if *intensity* was 0 but cheaper to compute).<br>\n\t\t\tDefault — *false*."
-        },
-        "shadowCameraNear": {
-          "!type": "number",
-          "!doc": "Perspective shadow camera frustum <em>near</em> parameter.<br>\n\t\t\tDefault — *50*."
-        },
-        "shadowCameraFar": {
-          "!type": "number",
-          "!doc": "Perspective shadow camera frustum <em>far</em> parameter.<br>\n\t\t\tDefault — *5000*."
-        },
-        "shadowCameraFov": {
-          "!type": "number",
-          "!doc": "Perspective shadow camera frustum <em>field of view</em> parameter.<br>\n\t\t\tDefault — *50*."
-        },
-        "shadowCameraVisible": {
-          "!type": "bool",
-          "!doc": "Show debug shadow camera frustum.<br>\n\t\t\tDefault — *false*."
-        },
-        "shadowBias": {
-          "!type": "number",
-          "!doc": "Shadow map bias, how much to add or subtract from the normalized depth when deciding whether a surface is in shadow.<br>\n\t\t\tDefault — *0*."
-        },
-        "shadowDarkness": {
-          "!type": "number",
-          "!doc": "Darkness of shadow casted by this light (from *0* to *1*).<br>\n\t\t\tDefault — *0.5*."
-        },
-        "shadowMapWidth": {
-          "!type": "number",
-          "!doc": "Shadow map texture width in pixels.<br>\n\t\t\tDefault — *512*."
-        },
-        "shadowMapHeight": {
-          "!type": "number",
-          "!doc": "Shadow map texture height in pixels.<br>\n\t\t\tDefault — *512*."
-        },
-        "shadowMapSize": {
-          "!type": "+THREE.Vector2",
-          "!doc": "The shadowMapWidth and shadowMapHeight stored in a [page:Vector2 THREE.Vector2]. Set internally during rendering."
-        },
-        "shadowCamera": {
-          "!type": "+THREE.PerspectiveCamera",
-          "!doc": "The shadow's view of the world. Computed internally during rendering from the shadowCamera* settings."
-        },
-        "shadowMatrix": {
-          "!type": "+THREE.Matrix4",
-          "!doc": "Model to shadow camera space, to compute location and depth in shadow map. Computed internally during rendering."
-        },
-        "shadowMap": {
-          "!type": "+THREE.WebGLRenderTarget",
-          "!doc": "The depth map generated using the shadowCamera; a location beyond a pixel's depth is in shadow. Computed internally during rendering."
         }
       },
       "!doc": "A point light that can cast shadow in one direction.",

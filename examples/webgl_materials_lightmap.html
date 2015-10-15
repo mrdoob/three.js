@@ -99,10 +99,11 @@
 
 				// LIGHTS
 
-				var hemiLight = new THREE.HemisphereLight( 0xaabbff, 0x040404, 0.3 );
-
-				hemiLight.position.y = 500;
-				scene.add( hemiLight );
+				var light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
+				light.position.x = 300;
+				light.position.y = 250;
+				light.position.z = -500;
+				scene.add( light );
 
 				// SKYDOME
 
@@ -114,7 +115,7 @@
 					offset:		 { type: "f", value: 400 },
 					exponent:	 { type: "f", value: 0.6 }
 				};
-				uniforms.topColor.value.copy( hemiLight.color );
+				uniforms.topColor.value.copy( light.color );
 
 				var skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
 				var skyMat = new THREE.ShaderMaterial( {

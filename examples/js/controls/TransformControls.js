@@ -617,7 +617,8 @@
 
 		this.object = undefined;
 		this.visible = false;
-		this.snap = null;
+		this.translationSnap = null;
+		this.rotationSnap = null;
 		this.space = "world";
 		this.size = 1;
 		this.axis = null;
@@ -750,9 +751,15 @@
 
 		};
 
-		this.setSnap = function ( snap ) {
+		this.setTranslationSnap = function ( translationSnap ) {
 
-			scope.snap = snap;
+			scope.translationSnap = translationSnap;
+
+		};
+
+		this.setRotationSnap = function ( rotationSnap ) {
+
+			scope.rotationSnap = rotationSnap;
 
 		};
 
@@ -930,11 +937,23 @@
 
 				}
 
-				if ( scope.snap !== null ) {
+				if ( scope.translationSnap !== null ) {
 
-					if ( scope.axis.search( "X" ) !== - 1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
-					if ( scope.axis.search( "Y" ) !== - 1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
-					if ( scope.axis.search( "Z" ) !== - 1 ) scope.object.position.z = Math.round( scope.object.position.z / scope.snap ) * scope.snap;
+					if ( scope.space === "local" ) {
+
+						scope.object.position.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
+
+					}
+
+					if ( scope.axis.search( "X" ) !== - 1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.translationSnap ) * scope.translationSnap;
+					if ( scope.axis.search( "Y" ) !== - 1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.translationSnap ) * scope.translationSnap;
+					if ( scope.axis.search( "Z" ) !== - 1 ) scope.object.position.z = Math.round( scope.object.position.z / scope.translationSnap ) * scope.translationSnap;
+
+					if ( scope.space === "local" ) {
+
+						scope.object.position.applyMatrix4( worldRotationMatrix );
+
+					}
 
 				}
 
@@ -1013,9 +1032,20 @@
 					offsetRotation.set( Math.atan2( tempVector.z, tempVector.y ), Math.atan2( tempVector.x, tempVector.z ), Math.atan2( tempVector.y, tempVector.x ) );
 
 					quaternionXYZ.setFromRotationMatrix( oldRotationMatrix );
-					quaternionX.setFromAxisAngle( unitX, rotation.x - offsetRotation.x );
-					quaternionY.setFromAxisAngle( unitY, rotation.y - offsetRotation.y );
-					quaternionZ.setFromAxisAngle( unitZ, rotation.z - offsetRotation.z );
+
+					if ( scope.rotationSnap !== null ) {
+
+						quaternionX.setFromAxisAngle( unitX, Math.round( ( rotation.x - offsetRotation.x ) / scope.rotationSnap ) * scope.rotationSnap );
+						quaternionY.setFromAxisAngle( unitY, Math.round( ( rotation.y - offsetRotation.y ) / scope.rotationSnap ) * scope.rotationSnap );
+						quaternionZ.setFromAxisAngle( unitZ, Math.round( ( rotation.z - offsetRotation.z ) / scope.rotationSnap ) * scope.rotationSnap );
+
+					} else {
+
+						quaternionX.setFromAxisAngle( unitX, rotation.x - offsetRotation.x );
+						quaternionY.setFromAxisAngle( unitY, rotation.y - offsetRotation.y );
+						quaternionZ.setFromAxisAngle( unitZ, rotation.z - offsetRotation.z );
+
+					}
 
 					if ( scope.axis === "X" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionX );
 					if ( scope.axis === "Y" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionY );
@@ -1030,9 +1060,20 @@
 
 					tempQuaternion.setFromRotationMatrix( tempMatrix.getInverse( parentRotationMatrix ) );
 
-					quaternionX.setFromAxisAngle( unitX, rotation.x - offsetRotation.x );
-					quaternionY.setFromAxisAngle( unitY, rotation.y - offsetRotation.y );
-					quaternionZ.setFromAxisAngle( unitZ, rotation.z - offsetRotation.z );
+					if ( scope.rotationSnap !== null ) {
+
+						quaternionX.setFromAxisAngle( unitX, Math.round( ( rotation.x - offsetRotation.x ) / scope.rotationSnap ) * scope.rotationSnap );
+						quaternionY.setFromAxisAngle( unitY, Math.round( ( rotation.y - offsetRotation.y ) / scope.rotationSnap ) * scope.rotationSnap );
+						quaternionZ.setFromAxisAngle( unitZ, Math.round( ( rotation.z - offsetRotation.z ) / scope.rotationSnap ) * scope.rotationSnap );
+
+					} else {
+
+						quaternionX.setFromAxisAngle( unitX, rotation.x - offsetRotation.x );
+						quaternionY.setFromAxisAngle( unitY, rotation.y - offsetRotation.y );
+						quaternionZ.setFromAxisAngle( unitZ, rotation.z - offsetRotation.z );
+
+					}
+
 					quaternionXYZ.setFromRotationMatrix( worldRotationMatrix );
 
 					if ( scope.axis === "X" ) tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionX );
