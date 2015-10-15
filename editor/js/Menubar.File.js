@@ -86,10 +86,11 @@ Menubar.File = function ( editor ) {
 		}
 
 		var output = geometry.toJSON();
+
 		try {
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-		} catch ( oops ) {
+		} catch ( e ) {
 			output = JSON.stringify( output );
 		}
 
@@ -115,10 +116,11 @@ Menubar.File = function ( editor ) {
 		}
 
 		var output = object.toJSON();
+
 		try {
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-		} catch ( oops ) {
+		} catch ( e ) {
 			output = JSON.stringify( output );
 		}
 
@@ -135,10 +137,11 @@ Menubar.File = function ( editor ) {
 	option.onClick( function () {
 
 		var output = editor.scene.toJSON();
+
 		try {
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-		} catch ( oops ) {
+		} catch ( e ) {
 			output = JSON.stringify( output );
 		}
 
