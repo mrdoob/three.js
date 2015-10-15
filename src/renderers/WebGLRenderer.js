@@ -2838,17 +2838,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			/*
 			if ( image.complete === false ) {
 
 				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture );
 				return;
 
 			}
-			*/
 
 			uploadTexture( textureProperties, texture, slot );
-
+			
 			return;
 
 		}
