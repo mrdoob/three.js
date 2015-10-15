@@ -1,4 +1,5 @@
 [
+	"src/extras/CurveUtils.js",
 	"src/extras/GeometryUtils.js",
 	"src/extras/ImageUtils.js",
 	"src/extras/SceneUtils.js",
