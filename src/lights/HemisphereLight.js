@@ -8,6 +8,8 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 
 	this.type = 'HemisphereLight';
 
+	this.castShadow = undefined;
+
 	this.position.set( 0, 1, 0 );
 	this.updateMatrix();
 

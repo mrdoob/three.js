@@ -8,6 +8,8 @@ THREE.AmbientLight = function ( color ) {
 
 	this.type = 'AmbientLight';
 
+	this.castShadow = undefined;
+
 };
 
 THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
