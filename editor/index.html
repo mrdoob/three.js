@@ -154,10 +154,8 @@
 			var sidebar = new Sidebar( editor );
 			document.body.appendChild( sidebar.dom );
 
-			/*
-			var dialog = new UI.Dialog();
-			document.body.appendChild( dialog.dom );
-			*/
+			var modal = new UI.Modal();
+			document.body.appendChild( modal.dom );
 
 			//
 
@@ -223,18 +221,11 @@
 				signals.sceneGraphChanged.add( saveState );
 				signals.scriptChanged.add( saveState );
 
-				/*
-				var showDialog = function ( content ) {
+				signals.showModal.add( function ( content ) {
 
-					dialog.clear();
+					modal.show( content );
 
-					dialog.add( content );
-					dialog.showModal();
-
-				};
-
-				signals.showDialog.add( showDialog );
-				*/
+				} );
 
 			} );
 
@@ -280,11 +271,11 @@
 
 			}, false );
 
-			var onWindowResize = function ( event ) {
+			function onWindowResize( event ) {
 
 				editor.signals.windowResize.dispatch();
 
-			};
+			}
 
 			window.addEventListener( 'resize', onWindowResize, false );
 

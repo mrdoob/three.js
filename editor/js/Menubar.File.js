@@ -275,21 +275,6 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
-	/*
-	// Test
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Test' );
-	option.onClick( function () {
-
-		var text = new UI.Text( 'blah' );
-		editor.showDialog( text );
-
-	} );
-	options.add( option );
-	*/
-
 
 	//
 

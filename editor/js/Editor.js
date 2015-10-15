@@ -19,7 +19,7 @@ var Editor = function () {
 
 		// actions
 
-		// showDialog: new SIGNALS.Signal(),
+		showModal: new SIGNALS.Signal(),
 
 		// notifications
 
@@ -101,14 +101,6 @@ Editor.prototype = {
 		this.signals.themeChanged.dispatch( value );
 
 	},
-
-	/*
-	showDialog: function ( value ) {
-
-		this.signals.showDialog.dispatch( value );
-
-	},
-	*/
 
 	//
 
