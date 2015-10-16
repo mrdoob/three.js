@@ -417,12 +417,15 @@ THREE.Vector2.prototype = {
 
 	},
 
-	rotateAround: function ( center, rotation ) {
+	rotateAround: function ( center, angle ) {
 
-		var x = this.x - center.x,	y = this.y - center.y;
+		var c = Math.cos( angle ), s = Math.sin( angle );
 
-		this.x = center.x + x * Math.cos(rotation) - y * Math.sin(rotation);
-		this.y = center.y + y * Math.cos(rotation) + x * Math.sin(rotation);
+		var x = this.x - center.x;
+		var y = this.y - center.y;
+
+		this.x = x * c - y * s + center.x;
+		this.y = x * s + y * c + center.y;
 
 		return this;
 
