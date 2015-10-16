@@ -239,7 +239,7 @@ var list = {
 		"Examples" : [
 			[ "CombinedCamera", "api/examples/cameras/CombinedCamera" ],
 			[ "LookupTable", "api/examples/Lut" ],
-			[ "SpriteCanvasMaterial", "api/materials/SpriteCanvasMaterial" ]
+			[ "SpriteCanvasMaterial", "api/examples/SpriteCanvasMaterial" ]
 
 		]
 
