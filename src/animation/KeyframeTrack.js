@@ -163,7 +163,7 @@ THREE.KeyframeTrack.prototype = {
 				return;
 			}
 
-			if ( ( typeof currKey.time ) !== 'number' || Number.isNaN( currKey.time ) ) {
+			if ( ( typeof currKey.time ) !== 'number' || isNaN( currKey.time ) ) {
 				console.error( "  key.time is not a valid number", this, i, currKey );
 				return;
 			}
