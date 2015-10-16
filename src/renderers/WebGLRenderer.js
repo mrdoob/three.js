@@ -1105,7 +1105,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		sprites.length = 0;
 		lensFlares.length = 0;
 
-		projectObject( scene );
+		projectObject( scene, camera );
 
 		opaqueObjects.length = opaqueObjectsLastIndex + 1;
 		transparentObjects.length = transparentObjectsLastIndex + 1;
@@ -1236,77 +1236,81 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function projectObject( object ) {
+	function projectObject( object, camera ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object instanceof THREE.Light ) {
+		if ( ( object.channels.mask & camera.channels.mask ) !== 0 ) {
 
-			lights.push( object );
+			if ( object instanceof THREE.Light ) {
 
-		} else if ( object instanceof THREE.Sprite ) {
+				lights.push( object );
 
-			sprites.push( object );
+			} else if ( object instanceof THREE.Sprite ) {
 
-		} else if ( object instanceof THREE.LensFlare ) {
+				sprites.push( object );
 
-			lensFlares.push( object );
+			} else if ( object instanceof THREE.LensFlare ) {
 
-		} else if ( object instanceof THREE.ImmediateRenderObject ) {
+				lensFlares.push( object );
 
-			if ( _this.sortObjects === true ) {
+			} else if ( object instanceof THREE.ImmediateRenderObject ) {
 
-				_vector3.setFromMatrixPosition( object.matrixWorld );
-				_vector3.applyProjection( _projScreenMatrix );
+				if ( _this.sortObjects === true ) {
 
-			}
+					_vector3.setFromMatrixPosition( object.matrixWorld );
+					_vector3.applyProjection( _projScreenMatrix );
 
-			pushRenderItem( object, null, object.material, _vector3.z, null );
+				}
 
-		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points ) {
+				pushRenderItem( object, null, object.material, _vector3.z, null );
 
-			if ( object instanceof THREE.SkinnedMesh ) {
+			} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points ) {
 
-				object.skeleton.update();
+				if ( object instanceof THREE.SkinnedMesh ) {
 
-			}
+					object.skeleton.update();
 
-			if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+				}
 
-				var material = object.material;
+				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
-				if ( material.visible === true ) {
+					var material = object.material;
 
-					if ( _this.sortObjects === true ) {
+					if ( material.visible === true ) {
 
-						_vector3.setFromMatrixPosition( object.matrixWorld );
-						_vector3.applyProjection( _projScreenMatrix );
+						if ( _this.sortObjects === true ) {
 
-					}
-
-					var geometry = objects.update( object );
-
-					if ( material instanceof THREE.MeshFaceMaterial ) {
-
-						var groups = geometry.groups;
-						var materials = material.materials;
-
-						for ( var i = 0, l = groups.length; i < l; i ++ ) {
-
-							var group = groups[ i ];
-							var groupMaterial = materials[ group.materialIndex ];
-
-							if ( groupMaterial.visible === true ) {
-
-								pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
-
-							}
+							_vector3.setFromMatrixPosition( object.matrixWorld );
+							_vector3.applyProjection( _projScreenMatrix );
 
 						}
 
-					} else {
+						var geometry = objects.update( object );
 
-						pushRenderItem( object, geometry, material, _vector3.z, null );
+						if ( material instanceof THREE.MeshFaceMaterial ) {
+
+							var groups = geometry.groups;
+							var materials = material.materials;
+
+							for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+								var group = groups[ i ];
+								var groupMaterial = materials[ group.materialIndex ];
+
+								if ( groupMaterial.visible === true ) {
+
+									pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
+
+								}
+
+							}
+
+						} else {
+
+							pushRenderItem( object, geometry, material, _vector3.z, null );
+
+						}
 
 					}
 
@@ -1320,7 +1324,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			projectObject( children[ i ] );
+			projectObject( children[ i ], camera );
 
 		}
 
@@ -2846,7 +2850,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			uploadTexture( textureProperties, texture, slot );
-			
+
 			return;
 
 		}
