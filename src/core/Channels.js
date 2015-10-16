@@ -34,12 +34,6 @@ THREE.Channels.prototype = {
 
 		this.mask &= ~ ( 1 << channel );
 
-	},
-
-	clear: function () {
-
-		this.mask = 1;
-
 	}
 
 };
