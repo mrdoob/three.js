@@ -42,19 +42,9 @@ THREE.Math = {
 
 	}(),
 
-	// Clamp value to range <a, b>
+	clamp: function ( value, min, max ) {
 
-	clamp: function ( x, a, b ) {
-
-		return ( x < a ) ? a : ( ( x > b ) ? b : x );
-
-	},
-
-	// Clamp value to range <a, inf)
-
-	clampBottom: function ( x, a ) {
-
-		return x < a ? a : x;
+		return Math.max( min, Math.min( max, value ) );
 
 	},
 
@@ -159,6 +149,12 @@ THREE.Math = {
 	isPowerOfTwo: function ( value ) {
 
 		return ( value & ( value - 1 ) ) === 0 && value !== 0;
+
+	},
+
+	nearestPowerOfTwo: function ( value ) {
+
+		return Math.pow( 2, Math.round( Math.log( value ) / Math.LN2 ) );
 
 	},
 

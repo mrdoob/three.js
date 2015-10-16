@@ -12,24 +12,12 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	options = options || {};
 
-	this.wrapS = options.wrapS !== undefined ? options.wrapS : THREE.ClampToEdgeWrapping;
-	this.wrapT = options.wrapT !== undefined ? options.wrapT : THREE.ClampToEdgeWrapping;
+	if ( options.minFilter === undefined ) options.minFilter = THREE.LinearFilter;
 
-	this.magFilter = options.magFilter !== undefined ? options.magFilter : THREE.LinearFilter;
-	this.minFilter = options.minFilter !== undefined ? options.minFilter : THREE.LinearMipMapLinearFilter;
-
-	this.anisotropy = options.anisotropy !== undefined ? options.anisotropy : 1;
-
-	this.offset = new THREE.Vector2( 0, 0 );
-	this.repeat = new THREE.Vector2( 1, 1 );
-
-	this.format = options.format !== undefined ? options.format : THREE.RGBAFormat;
-	this.type = options.type !== undefined ? options.type : THREE.UnsignedByteType;
+	this.texture = new THREE.Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy );
 
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
-
-	this.generateMipmaps = true;
 
 	this.shareDepthFrom = options.shareDepthFrom !== undefined ? options.shareDepthFrom : null;
 
@@ -38,6 +26,168 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 THREE.WebGLRenderTarget.prototype = {
 
 	constructor: THREE.WebGLRenderTarget,
+
+	get wrapS() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .wrapS is now .texture.wrapS.' );
+
+		return this.texture.wrapS;
+
+	},
+
+	set wrapS( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .wrapS is now .texture.wrapS.' );
+
+		this.texture.wrapS = value;
+
+	},
+
+	get wrapT() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .wrapT is now .texture.wrapT.' );
+
+		return this.texture.wrapT;
+
+	},
+
+	set wrapT( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .wrapT is now .texture.wrapT.' );
+
+		this.texture.wrapT = value;
+
+	},
+
+	get magFilter() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .magFilter is now .texture.magFilter.' );
+
+		return this.texture.magFilter;
+
+	},
+
+	set magFilter( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .magFilter is now .texture.magFilter.' );
+
+		this.texture.magFilter = value;
+
+	},
+
+	get minFilter() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .minFilter is now .texture.minFilter.' );
+
+		return this.texture.minFilter;
+
+	},
+
+	set minFilter( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .minFilter is now .texture.minFilter.' );
+
+		this.texture.minFilter = value;
+
+	},
+
+	get anisotropy() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .anisotropy is now .texture.anisotropy.' );
+
+		return this.texture.anisotropy;
+
+	},
+
+	set anisotropy( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .anisotropy is now .texture.anisotropy.' );
+
+		this.texture.anisotropy = value;
+
+	},
+
+	get offset() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .offset is now .texture.offset.' );
+
+		return this.texture.offset;
+
+	},
+
+	set offset( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .offset is now .texture.offset.' );
+
+		this.texture.offset = value;
+
+	},
+
+	get repeat() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .repeat is now .texture.repeat.' );
+
+		return this.texture.repeat;
+
+	},
+
+	set repeat( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .repeat is now .texture.repeat.' );
+
+		this.texture.repeat = value;
+
+	},
+
+	get format() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .format is now .texture.format.' );
+
+		return this.texture.format;
+
+	},
+
+	set format( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .format is now .texture.format.' );
+
+		this.texture.format = value;
+
+	},
+
+	get type() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .type is now .texture.type.' );
+
+		return this.texture.type;
+
+	},
+
+	set type( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .type is now .texture.type.' );
+
+		this.texture.type = value;
+
+	},
+
+	get generateMipmaps() {
+
+		console.warn( 'THREE.WebGLRenderTarget: .generateMipmaps is now .texture.generateMipmaps.' );
+
+		return this.texture.generateMipmaps;
+
+	},
+
+	set generateMipmaps( value ) {
+
+		console.warn( 'THREE.WebGLRenderTarget: .generateMipmaps is now .texture.generateMipmaps.' );
+
+		this.texture.generateMipmaps = value;
+
+	},
+
+	//
 
 	setSize: function ( width, height ) {
 
@@ -63,24 +213,10 @@ THREE.WebGLRenderTarget.prototype = {
 		this.width = source.width;
 		this.height = source.height;
 
-		this.wrapS = source.wrapS;
-		this.wrapT = source.wrapT;
-
-		this.magFilter = source.magFilter;
-		this.minFilter = source.minFilter;
-
-		this.anisotropy = source.anisotropy;
-
-		this.offset.copy( source.offset );
-		this.repeat.copy( source.repeat );
-
-		this.format = source.format;
-		this.type = source.type;
+		this.texture = source.texture.clone();
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
-
-		this.generateMipmaps = source.generateMipmaps;
 
 		this.shareDepthFrom = source.shareDepthFrom;
 

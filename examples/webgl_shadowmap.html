@@ -41,6 +41,8 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
+		<script src="js/geometries/TextGeometry.js"></script>
+		<script src="js/utils/FontUtils.js"></script>
 		<script src="fonts/helvetiker_bold.typeface.js"></script>
 
 		<script>
@@ -62,7 +64,7 @@
 
 			var sceneHUD, cameraOrtho, hudMesh;
 
-			var morph, morphs = [];
+			var morphs = [];
 
 			var light;
 
@@ -120,7 +122,6 @@
 				//light.shadowCameraVisible = true;
 
 				light.shadowBias = 0.0001;
-				light.shadowDarkness = 0.5;
 
 				light.shadowMapWidth = SHADOW_MAP_WIDTH;
 				light.shadowMapHeight = SHADOW_MAP_HEIGHT;
@@ -315,37 +316,23 @@
 
 					}
 
-					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.speed = speed;
 
-					meshAnim.speed = speed;
-					meshAnim.duration = duration;
-					meshAnim.time = 600 * Math.random();
+					var mixer = new THREE.AnimationMixer( mesh );
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( duration ) );
+					mixer.update( 600 * Math.random() );
+					mesh.mixer = mixer;
 
-					meshAnim.position.set( x, y, z );
-					meshAnim.rotation.y = Math.PI/2;
+					mesh.position.set( x, y, z );
+					mesh.rotation.y = Math.PI/2;
 
-					meshAnim.castShadow = true;
-					meshAnim.receiveShadow = true;
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
 
-					scene.add( meshAnim );
+					scene.add( mesh );
 
-					morphs.push( meshAnim );
-
-				}
-
-				function morphColorsToFaceColors( geometry ) {
-
-					if ( geometry.morphColors && geometry.morphColors.length ) {
-
-						var colorMap = geometry.morphColors[ 0 ];
-
-						for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-
-							geometry.faces[ i ].color = colorMap.colors[ i ];
-
-						}
-
-					}
+					morphs.push( mesh );
 
 				}
 
@@ -353,36 +340,31 @@
 
 				loader.load( "models/animated/horse.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, 300, true );
+					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, 450, true );
+					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, 600, true );
 
-					addMorph( geometry, 550, 1000, 100 - Math.random() * 1000, FLOOR, 300, true );
-					addMorph( geometry, 550, 1000, 100 - Math.random() * 1000, FLOOR, 450, true );
-					addMorph( geometry, 550, 1000, 100 - Math.random() * 1000, FLOOR, 600, true );
-
-					addMorph( geometry, 550, 1000, 100 - Math.random() * 1000, FLOOR, -300, true );
-					addMorph( geometry, 550, 1000, 100 - Math.random() * 1000, FLOOR, -450, true );
-					addMorph( geometry, 550, 1000, 100 - Math.random() * 1000, FLOOR, -600, true );
+					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, -300, true );
+					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, -450, true );
+					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, -600, true );
 
 				} );
 
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 500, 1000, 500 - Math.random() * 500, FLOOR + 350, 40 );
+					addMorph( geometry, 500, 1, 500 - Math.random() * 500, FLOOR + 350, 40 );
 
 				} );
 
 				loader.load( "models/animated/stork.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 350, 1000, 500 - Math.random() * 500, FLOOR + 350, 340 );
+					addMorph( geometry, 350, 1, 500 - Math.random() * 500, FLOOR + 350, 340 );
 
 				} );
 
 				loader.load( "models/animated/parrot.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 450, 500, 500 - Math.random() * 500, FLOOR + 300, 700 );
+					addMorph( geometry, 450, 0.5, 500 - Math.random() * 500, FLOOR + 300, 700 );
 
 				} );
 
@@ -405,7 +387,7 @@
 
 					morph = morphs[ i ];
 
-					morph.updateAnimation( 1000 * delta );
+					morph.mixer.update( delta );
 
 					morph.position.x += morph.speed * delta;
 

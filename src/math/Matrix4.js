@@ -7,7 +7,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
  * @author timknip / http://www.floorplanner.com/
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
  */
 
@@ -341,7 +341,7 @@ THREE.Matrix4.prototype = {
 
 			z.subVectors( eye, target ).normalize();
 
-			if ( z.length() === 0 ) {
+			if ( z.lengthSq() === 0 ) {
 
 				z.z = 1;
 
@@ -349,7 +349,7 @@ THREE.Matrix4.prototype = {
 
 			x.crossVectors( up, z ).normalize();
 
-			if ( x.length() === 0 ) {
+			if ( x.lengthSq() === 0 ) {
 
 				z.x += 0.0001;
 				x.crossVectors( up, z ).normalize();
@@ -769,7 +769,7 @@ THREE.Matrix4.prototype = {
 		var scaleYSq = te[ 4 ] * te[ 4 ] + te[ 5 ] * te[ 5 ] + te[ 6 ] * te[ 6 ];
 		var scaleZSq = te[ 8 ] * te[ 8 ] + te[ 9 ] * te[ 9 ] + te[ 10 ] * te[ 10 ];
 
-		return Math.sqrt( Math.max( scaleXSq, Math.max( scaleYSq, scaleZSq ) ) );
+		return Math.sqrt( Math.max( scaleXSq, scaleYSq, scaleZSq ) );
 
 	},
 

@@ -12,6 +12,7 @@ var Config = function () {
 
 		'project/renderer': 'WebGLRenderer',
 		'project/renderer/antialias': true,
+		'project/renderer/shadows': true,
 		'project/vr': false,
 
 		'ui/sidebar/animation/collapsed': true,

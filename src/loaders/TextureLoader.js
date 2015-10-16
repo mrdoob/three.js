@@ -14,13 +14,13 @@ THREE.TextureLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		var texture = new THREE.Texture();
 
-		var loader = new THREE.ImageLoader( scope.manager );
+		var loader = new THREE.ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( image ) {
 
-			var texture = new THREE.Texture( image );
+			texture.image = image;
 			texture.needsUpdate = true;
 
 			if ( onLoad !== undefined ) {
@@ -30,6 +30,8 @@ THREE.TextureLoader.prototype = {
 			}
 
 		}, onProgress, onError );
+
+		return texture;
 
 	},
 

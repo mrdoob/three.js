@@ -498,37 +498,23 @@
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
 
-					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.speed = speed;
 
-					meshAnim.speed = speed;
-					meshAnim.duration = duration;
-					meshAnim.time = 600 * Math.random();
+					var mixer = new THREE.AnimationMixer( mesh );
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( duration ) );
+					mixer.update( 600 * Math.random() );
+					mesh.mixer = mixer;
 
-					meshAnim.position.set( x, y, z );
-					meshAnim.rotation.y = Math.PI/2;
+					mesh.position.set( x, y, z );
+					mesh.rotation.y = Math.PI/2;
 
-					meshAnim.castShadow = true;
-					meshAnim.receiveShadow = false;
+					mesh.castShadow = true;
+					mesh.receiveShadow = false;
 
-					scene.add( meshAnim );
+					scene.add( mesh );
 
-					morphs.push( meshAnim );
-
-				}
-
-				function morphColorsToFaceColors( geometry ) {
-
-					if ( geometry.morphColors && geometry.morphColors.length ) {
-
-						var colorMap = geometry.morphColors[ 0 ];
-
-						for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-
-							geometry.faces[ i ].color = colorMap.colors[ i ];
-
-						}
-
-					}
+					morphs.push( mesh );
 
 				}
 
@@ -538,25 +524,22 @@
 
 				loader.load( "models/animated/parrot.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 250, 500, startX -500, 500, 700 );
-					addMorph( geometry, 250, 500, startX - Math.random() * 500, 500, -200 );
-					addMorph( geometry, 250, 500, startX - Math.random() * 500, 500, 200 );
-					addMorph( geometry, 250, 500, startX - Math.random() * 500, 500, 1000 );
+					addMorph( geometry, 250, 0.5, startX -500, 500, 700 );
+					addMorph( geometry, 250, 0.5, startX - Math.random() * 500, 500, -200 );
+					addMorph( geometry, 250, 0.5, startX - Math.random() * 500, 500, 200 );
+					addMorph( geometry, 250, 0.5, startX - Math.random() * 500, 500, 1000 );
 
 				} );
 
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 500, 1000, startX - Math.random() * 500, 350, 40 );
+					addMorph( geometry, 500, 1, startX - Math.random() * 500, 350, 40 );
 
 				} );
 
 				loader.load( "models/animated/stork.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 350, 1000, startX - Math.random() * 500, 350, 340 );
+					addMorph( geometry, 350, 1, startX - Math.random() * 500, 350, 340 );
 
 				} );
 
@@ -688,7 +671,7 @@
 
 						morph = morphs[ i ];
 
-						morph.updateAnimation( 1000 * delta );
+						morph.mixer.update( delta );
 
 						morph.position.x += morph.speed * delta;
 

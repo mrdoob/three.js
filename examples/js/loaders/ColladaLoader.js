@@ -100,9 +100,7 @@
 					parts.pop();
 					baseUrl = ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
 
-					var xmlParser = new DOMParser();
-					var responseXML = xmlParser.parseFromString( text, "application/xml" );
-					onLoad( scope.parse( responseXML, url ) );
+					onLoad( scope.parse( text, url ) );
 
 				}, onProgress, onError );
 
@@ -120,9 +118,9 @@
 
 		},
 
-		parse: function( doc ) {
+		parse: function( text ) {
 
-			COLLADA = doc;
+			COLLADA = new DOMParser().parseFromString( text, 'application/xml' );
 
 			this.parseAsset();
 			this.setUpConversion();

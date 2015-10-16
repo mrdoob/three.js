@@ -19,12 +19,13 @@ def _material(func):
 
         """
 
+        material = None
         if isinstance(name, types.Material):
             material = name
-        else:
+        elif name:
             material = data.materials[name]
 
-        return func(material, *args, **kwargs)
+        return func(material, *args, **kwargs) if material else None
 
     return inner
 

@@ -95,6 +95,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	container.add( objectNameRow );
 
+	/*
 	// parent
 
 	var objectParentRow = new UI.Panel();
@@ -104,6 +105,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectParentRow.add( objectParent );
 
 	container.add( objectParentRow );
+	*/
 
 	// position
 
@@ -243,6 +245,30 @@ Sidebar.Object3D = function ( editor ) {
 
 	container.add( objectDecayRow );
 
+	// shadow
+
+	var objectShadowRow = new UI.Panel();
+
+	objectShadowRow.add( new UI.Text( 'Shadow' ).setWidth( '90px' ) );
+
+	var objectCastShadowSpan = new UI.Span().setMarginRight( '10px' );
+	var objectCastShadow = new UI.Checkbox().onChange( update );
+
+	objectCastShadowSpan.add( objectCastShadow );
+	objectCastShadowSpan.add( new UI.Text( 'cast' ).setMarginLeft( '3px' ) );
+
+	objectShadowRow.add( objectCastShadowSpan );
+
+	var objectReceiveShadowSpan = new UI.Span();
+	var objectReceiveShadow = new UI.Checkbox().onChange( update );
+
+	objectReceiveShadowSpan.add( objectReceiveShadow );
+	objectReceiveShadowSpan.add( new UI.Text( 'receive' ).setMarginLeft( '3px' ) );
+
+	objectShadowRow.add( objectReceiveShadowSpan );
+
+	container.add( objectShadowRow );
+
 	// visible
 
 	var objectVisibleRow = new UI.Panel();
@@ -342,6 +368,7 @@ Sidebar.Object3D = function ( editor ) {
 
 		if ( object !== null ) {
 
+			/*
 			if ( object.parent !== null ) {
 
 				var newParentId = parseInt( objectParent.getValue() );
@@ -353,6 +380,7 @@ Sidebar.Object3D = function ( editor ) {
 				}
 
 			}
+			*/
 
 			object.position.x = objectPositionX.getValue();
 			object.position.y = objectPositionY.getValue();
@@ -427,6 +455,25 @@ Sidebar.Object3D = function ( editor ) {
 
 			}
 
+			if ( object.castShadow !== undefined ) {
+
+				object.castShadow = objectCastShadow.getValue();
+
+			}
+
+			if ( object.receiveShadow !== undefined ) {
+
+				var value = objectReceiveShadow.getValue();
+
+				if ( value !== object.receiveShadow ) {
+
+					object.receiveShadow = value;
+					object.material.needsUpdate = true;
+
+				}
+
+			}
+
 			object.visible = objectVisible.getValue();
 
 			try {
@@ -448,7 +495,7 @@ Sidebar.Object3D = function ( editor ) {
 	function updateRows( object ) {
 
 		var properties = {
-			'parent': objectParentRow,
+			// 'parent': objectParentRow,
 			'fov': objectFovRow,
 			'near': objectNearRow,
 			'far': objectFarRow,
@@ -458,7 +505,9 @@ Sidebar.Object3D = function ( editor ) {
 			'distance' : objectDistanceRow,
 			'angle' : objectAngleRow,
 			'exponent' : objectExponentRow,
-			'decay' : objectDecayRow
+			'decay' : objectDecayRow,
+			'castShadow' : objectShadowRow,
+			'receiveShadow' : objectReceiveShadowSpan
 		};
 
 		for ( var property in properties ) {
@@ -505,6 +554,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	} );
 
+	/*
 	signals.sceneGraphChanged.add( function () {
 
 		var scene = editor.scene;
@@ -519,6 +569,7 @@ Sidebar.Object3D = function ( editor ) {
 		objectParent.setOptions( options );
 
 	} );
+	*/
 
 	signals.objectChanged.add( function ( object ) {
 
@@ -535,11 +586,13 @@ Sidebar.Object3D = function ( editor ) {
 		objectUUID.setValue( object.uuid );
 		objectName.setValue( object.name );
 
+		/*
 		if ( object.parent !== null ) {
 
 			objectParent.setValue( object.parent.id );
 
 		}
+		*/
 
 		objectPositionX.setValue( object.position.x );
 		objectPositionY.setValue( object.position.y );
@@ -610,6 +663,18 @@ Sidebar.Object3D = function ( editor ) {
 		if ( object.decay !== undefined ) {
 
 			objectDecay.setValue( object.decay );
+
+		}
+
+		if ( object.castShadow !== undefined ) {
+
+			objectCastShadow.setValue( object.castShadow );
+
+		}
+
+		if ( object.receiveShadow !== undefined ) {
+
+			objectReceiveShadow.setValue( object.receiveShadow );
 
 		}
 

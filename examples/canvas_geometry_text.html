@@ -23,8 +23,8 @@
 
 		<script src="js/libs/stats.min.js"></script>
 
-		<!-- load the font file from canvas-text -->
-
+		<script src="js/geometries/TextGeometry.js"></script>
+		<script src="js/utils/FontUtils.js"></script>
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
 
 
@@ -90,8 +90,12 @@
 				text3d.computeBoundingBox();
 				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
 
-				var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, overdraw: 0.5 } );
-				text = new THREE.Mesh( text3d, textMaterial );
+				var material = new THREE.MeshFaceMaterial( [
+					new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, overdraw: 0.5 } ),
+					new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 } )
+				] );
+
+				text = new THREE.Mesh( text3d, material );
 
 				text.position.x = centerOffset;
 				text.position.y = 100;

@@ -37,6 +37,7 @@
 
 	<body>
 		<script src="../build/three.min.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/ShaderGodRays.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -54,7 +55,7 @@
 			var container, stats;
 			var camera, scene, renderer, materialDepth;
 
-			var treeMesh, sphereMesh;
+			var sphereMesh;
 
 			var sunPosition = new THREE.Vector3( 0, 1000, -1000 );
 			var screenSpacePosition = new THREE.Vector3();
@@ -94,20 +95,13 @@
 
 				// tree
 
-				var loader = new THREE.JSONLoader();
+				var loader = new THREE.OBJLoader();
+				loader.load( "models/obj/tree.obj", function ( object ) {
 
-				loader.load( "obj/tree/tree.js", function( geometry ) {
-
-					treeMesh = new THREE.Mesh( geometry, materialScene );
-					treeMesh.position.set( 0, -150, -150 );
-
-					var sc = 400;
-					treeMesh.scale.set( sc, sc, sc );
-
-					treeMesh.matrixAutoUpdate = false;
-					treeMesh.updateMatrix();
-
-					scene.add( treeMesh );
+					object.material = materialScene;
+					object.position.set( 0, -150, -150 );
+					object.scale.multiplyScalar( 400 );
+					scene.add( object );
 
 				} );
 
@@ -115,10 +109,7 @@
 
 				var geo = new THREE.SphereGeometry( 1, 20, 10 );
 				sphereMesh = new THREE.Mesh( geo, materialScene );
-
-				var sc = 20;
-				sphereMesh.scale.set( sc, sc, sc );
-
+				sphereMesh.scale.multiplyScalar( 20 );
 				scene.add( sphereMesh );
 
 				//
