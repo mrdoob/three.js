@@ -50,9 +50,9 @@
 		varying vec3 vColor;
 
 		void main() {
-			gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
 			vColor = vertColor;
 			vVisible = visible;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
 		}
 	</script>
 	<script type="x-shader/x-fragment" id="fragmentshader">
@@ -70,13 +70,13 @@
 	</head>
 	<body onload="app()">
 		<div id="title"></div>
-		<div id="ui"><a href="#" onclick="hide_lines();">CULL SOME LINES</a> - <a href="#" onclick="show_all_lines();">SHOW ALL LINES</a></div>
+		<div id="ui"><a href="#" onclick="hideLines();">CULL SOME LINES</a> - <a href="#" onclick="showAllLines();">SHOW ALL LINES</a></div>
 		<script>
 		var camera, scene, renderer, stats;
 		var geometry, mesh;
-		var num_lat = 100;
-		var num_lng = 200;
-		var num_lines_culled = 0;
+		var numLat = 100;
+		var numLng = 200;
+		var numLinesCulled = 0;
 
 		function app() {
 
@@ -116,44 +116,44 @@
 
 			window.addEventListener( 'resize', onWindowResize, false );
 
-			add_lines( 1.0 );
+			addLines( 1.0 );
 
 		}
 
-		function add_lines( radius ) {
+		function addLines( radius ) {
 
 			geometry = new THREE.BufferGeometry();
-			var line_positions = new Float32Array( num_lat * num_lng * 3 * 2 );
-			var line_colors = new Float32Array( num_lat * num_lng * 3 * 2 );
-			var visible = new Float32Array( num_lat * num_lng * 2 );
+			var linePositions = new Float32Array( numLat * numLng * 3 * 2 );
+			var lineColors = new Float32Array( numLat * numLng * 3 * 2 );
+			var visible = new Float32Array( numLat * numLng * 2 );
 
-			for ( var i = 0; i < num_lat; ++ i ) {
+			for ( var i = 0; i < numLat; ++ i ) {
 
-				for ( var j = 0; j < num_lng; ++ j ) {
+				for ( var j = 0; j < numLng; ++ j ) {
 
-					var lat = ( Math.random() * Math.PI ) / 50.0 + i / num_lat * Math.PI;
-					var lng = ( Math.random() * Math.PI ) / 50.0 + j / num_lng * 2 * Math.PI;
+					var lat = ( Math.random() * Math.PI ) / 50.0 + i / numLat * Math.PI;
+					var lng = ( Math.random() * Math.PI ) / 50.0 + j / numLng * 2 * Math.PI;
 
-					var index = i * num_lng + j;
+					var index = i * numLng + j;
 
-					line_positions[ index * 6 + 0 ] = 0;
-					line_positions[ index * 6 + 1 ] = 0;
-					line_positions[ index * 6 + 2 ] = 0;
-					line_positions[ index * 6 + 3 ] = radius * Math.sin( lat ) * Math.cos( lng );
-					line_positions[ index * 6 + 4 ] = radius * Math.cos( lat );
-					line_positions[ index * 6 + 5 ] = radius * Math.sin( lat ) * Math.sin( lng );
+					linePositions[ index * 6 + 0 ] = 0;
+					linePositions[ index * 6 + 1 ] = 0;
+					linePositions[ index * 6 + 2 ] = 0;
+					linePositions[ index * 6 + 3 ] = radius * Math.sin( lat ) * Math.cos( lng );
+					linePositions[ index * 6 + 4 ] = radius * Math.cos( lat );
+					linePositions[ index * 6 + 5 ] = radius * Math.sin( lat ) * Math.sin( lng );
 
 					var color = new THREE.Color( 0xffffff );
 
 					color.setHSL( lat / Math.PI, 1.0, 0.2 );
-					line_colors[ index * 6 + 0 ] = color.r;
-					line_colors[ index * 6 + 1 ] = color.g;
-					line_colors[ index * 6 + 2 ] = color.b;
+					lineColors[ index * 6 + 0 ] = color.r;
+					lineColors[ index * 6 + 1 ] = color.g;
+					lineColors[ index * 6 + 2 ] = color.b;
 
 					color.setHSL( lat / Math.PI, 1.0, 0.7 );
-					line_colors[ index * 6 + 3 ] = color.r;
-					line_colors[ index * 6 + 4 ] = color.g;
-					line_colors[ index * 6 + 5 ] = color.b;
+					lineColors[ index * 6 + 3 ] = color.r;
+					lineColors[ index * 6 + 4 ] = color.g;
+					lineColors[ index * 6 + 5 ] = color.b;
 
 					// non-0 is visible
 					visible[ index * 2 + 0 ] = 1.0;
@@ -163,33 +163,32 @@
 
 			}
 
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( line_positions, 3 ) );
-			geometry.addAttribute( 'vertColor', new THREE.BufferAttribute( line_colors, 3 ) );
+			geometry.addAttribute( 'position', new THREE.BufferAttribute( linePositions, 3 ) );
+			geometry.addAttribute( 'vertColor', new THREE.BufferAttribute( lineColors, 3 ) );
 			geometry.addAttribute( 'visible', new THREE.BufferAttribute( visible, 1 ) );
 
 			geometry.computeBoundingSphere();
 
-			var shader_material = new THREE.ShaderMaterial( {
+			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				vertexShader: document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
 			} );
 
-			mesh = new THREE.LineSegments( geometry, shader_material );
+			mesh = new THREE.LineSegments( geometry, shaderMaterial );
 			scene.add( mesh );
 
-			update_count();
+			updateCount();
 
 		}
 
-		function update_count() {
+		function updateCount() {
 
-			var str = 'BufferGeometry selective drawing: 1 draw call, ' + num_lat * num_lng + ' lines, ' + num_lines_culled + ' culled (<a target="_blank" href="http://callum.com">author</a>)';
+			var str = 'BufferGeometry selective drawing: 1 draw call, ' + numLat * numLng + ' lines, ' + numLinesCulled + ' culled (<a target="_blank" href="http://callum.com">author</a>)';
 			document.getElementById( 'title' ).innerHTML = str.replace( /\B(?=(\d{3})+(?!\d))/g, "," );
-
 		}
 
-		function hide_lines() {
+		function hideLines() {
 
 			for ( var i = 0; i < geometry.attributes.visible.array.length; i += 2 ) {
 
@@ -197,7 +196,7 @@
 
 					if ( geometry.attributes.visible.array[ i + 0 ] ) {
 
-						++ num_lines_culled;
+						++ numLinesCulled;
 
 					}
 
@@ -209,13 +208,13 @@
 			}
 			geometry.attributes.visible.needsUpdate = true;
 
-			update_count();
+			updateCount();
 
 		}
 
-		function show_all_lines() {
+		function showAllLines() {
 
-			num_lines_culled = 0;
+			numLinesCulled = 0;
 
 			for ( var i = 0; i < geometry.attributes.visible.array.length; i += 2 ) {
 
@@ -226,7 +225,7 @@
 
 			geometry.attributes.visible.needsUpdate = true;
 
-			update_count();
+			updateCount();
 
 		}
 
