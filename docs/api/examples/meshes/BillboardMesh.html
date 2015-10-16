@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<script src="../../../list.js"></script>
+	<script src="../../../page.js"></script>
+	<link type="text/css" rel="stylesheet" href="../../../page.css" />
+</head>
+<body>
+[page:Mesh] &rarr;
+
+<h1>[name]</h1>
+
+<div class="desc">A mesh that always faces a specified point (usually a camera).
+	Optionally, the mesh can be constrained to a specified axis. If so, it will
+	face the specified point as much as possible while remaining aligned with the axis.
+	If not constrained, the axis can be used as a custom up vector for the mesh.
+	Requires a call to the update method after each change.</div>
+
+
+<h2>Constructor</h2>
+
+
+<h3>[name]([page:Geometry geometry], [page:Material material], [page:Vector3 point], [page:Vector3 axis], [page:Boolean constrainedToAxis])</h3>
+<div>
+	geometry — Geometry for the mesh.<br />
+	material — Material for the mesh.<br />
+	point — The point the mesh should face.<br />
+	axis — The axis from the geometry origin that the mesh should be constrained to. If not constrained, defines a custom up vector for the mesh. Default is (0,1,0).<br />
+	constrainedToAxis — Boolean for whether the mesh should be constrained to the specified axis. Default is false.
+</div>
+<div>
+	Creates a [name] facing the specified point and optionally constrained to the specified axis. Requires a call to update before render.
+</div>
+
+
+<h2>Properties</h2>
+
+
+<h3>[property:Vector3 point]</h3>
+<div>
+	Gets or sets the point the mesh faces. Requires an update if setting to a new value.
+</div>
+
+<h3>[property:Vector3 axis]</h3>
+<div>
+	Gets or sets the axis that the mesh is constrained to. If not constrained, sets the mesh up vector. Requires an update if setting to a new value.
+</div>
+
+<h3>[property:Boolean constrained]</h3>
+<div>
+	Gets or sets the whether the mesh is constrained to axis. Requires an update if setting to a new value.
+</div>
+
+
+<h2>Methods</h2>
+
+
+<h3>[method:null update]()</h3>
+<div>
+	Updates the rotation of the mesh to look toward the specified point.
+</div>
+
+
+<h2>Source</h2>
+
+
+[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+</body>
+</html>
