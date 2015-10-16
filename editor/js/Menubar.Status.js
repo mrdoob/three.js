@@ -23,22 +23,26 @@ Menubar.Status = function ( editor ) {
 	} );
 	container.add( checkbox );
 
-	var title = new UI.Panel();
-	title.setClass( 'title' );
-	title.setTextContent( 'Autosave' );
-	container.add( title );
+	var text = new UI.Text( 'autosave' );
+	text.setClass( 'title' );
+	container.add( text );
 
 	editor.signals.savingStarted.add( function () {
 
-		title.setTextDecoration( 'underline' );
+		text.setTextDecoration( 'underline' );
 
 	} );
 
 	editor.signals.savingFinished.add( function () {
 
-		title.setTextDecoration( 'none' );
+		text.setTextDecoration( 'none' );
 
 	} );
+
+	var version = new UI.Text( 'r' + THREE.REVISION );
+	version.setClass( 'title' );
+	version.setOpacity( 0.5 );
+	container.add( version );
 
 	return container;
 

@@ -253,7 +253,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectCastShadow = new UI.Checkbox().onChange( update );
 
 	objectCastShadowSpan.add( objectCastShadow );
-	objectCastShadowSpan.add( new UI.Text( 'cast' ) );
+	objectCastShadowSpan.add( new UI.Text( 'cast' ).setMarginLeft( '3px' ) );
 
 	objectShadowRow.add( objectCastShadowSpan );
 
@@ -261,7 +261,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectReceiveShadow = new UI.Checkbox().onChange( update );
 
 	objectReceiveShadowSpan.add( objectReceiveShadow );
-	objectReceiveShadowSpan.add( new UI.Text( 'receive' ) );
+	objectReceiveShadowSpan.add( new UI.Text( 'receive' ).setMarginLeft( '3px' ) );
 
 	objectShadowRow.add( objectReceiveShadowSpan );
 

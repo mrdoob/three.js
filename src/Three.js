@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '73dev' };
+var THREE = { REVISION: '73' };
 
 //
 
@@ -89,6 +89,16 @@ if ( self.performance.now === undefined ) {
 	} )();
 
 }
+
+//
+
+if ( Number.EPSILON === undefined ) {
+
+	Number.EPSILON = Math.pow( 2, -52 );
+
+}
+
+//
 
 if ( Math.sign === undefined ) {
 

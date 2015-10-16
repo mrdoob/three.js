@@ -18,6 +18,9 @@
 		<script src="../build/three.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+
+		<script src="js/geometries/TextGeometry.js"></script>
+		<script src="js/utils/FontUtils.js"></script>
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
 
 		<script>
@@ -141,15 +144,15 @@
 				}
 
 				dropdown += '</select>';
-			
+
 				var text =
 					'Drag to spin THREE.' + params.type +
 				 	'<br>' +
 					'<br>Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;">next</a>';
 
 				text +=
-					'<br><br><font color="3333FF">Blue Arrows: Face Normals</font>' + 
-					'<br><font color="FF3333">Red Arrows: Vertex Normals before Geometry.mergeVertices</font>' + 
+					'<br><br><font color="3333FF">Blue Arrows: Face Normals</font>' +
+					'<br><font color="FF3333">Red Arrows: Vertex Normals before Geometry.mergeVertices</font>' +
 					'<br>Black Arrows: Vertex Normals after Geometry.mergeVertices';
 
 				info.innerHTML = text;
@@ -231,7 +234,7 @@
 						.add( geometry.vertices[ face.c ] )
 						.divideScalar( 3 );
 
-					var arrow = new THREE.ArrowHelper( 
+					var arrow = new THREE.ArrowHelper(
 							face.normal,
 							centroid,
 							normalLength,
@@ -245,7 +248,7 @@
 						continue;
 					}
 					for( var v = 0, vl = face.vertexNormals.length; v < vl; v ++ ) {
-						var arrow = new THREE.ArrowHelper( 
+						var arrow = new THREE.ArrowHelper(
 								face.vertexNormals[ v ],
 								originalGeometry.vertices[ face[ fvNames[ v ] ] ],
 								normalLength,
@@ -260,7 +263,7 @@
 						continue;
 					}
 					for( var v = 0, vl = face.vertexNormals.length; v < vl; v ++ ) {
-						var arrow = new THREE.ArrowHelper( 
+						var arrow = new THREE.ArrowHelper(
 								face.vertexNormals[ v ],
 								mesh.geometry.vertices[ face[ fvNames[ v ] ] ],
 								normalLength,
@@ -346,4 +349,3 @@
 
 	</body>
 </html>
-

@@ -16,6 +16,7 @@ THREE.Object3D = function () {
 	this.type = 'Object3D';
 
 	this.parent = null;
+	this.channels = new THREE.Channels();
 	this.children = [];
 
 	this.up = THREE.Object3D.DefaultUp.clone();

@@ -97,12 +97,10 @@
 
 				spotLight = new THREE.SpotLight( 0xffffbb, 2 );
 				spotLight.position.set( 0.5, 0, 1 );
+				spotLight.position.multiplyScalar( 700 );
 				scene.add( spotLight );
 
-				spotLight.position.multiplyScalar( 700 );
-
 				spotLight.castShadow = true;
-				spotLight.onlyShadow = true;
 				// spotLight.shadowCameraVisible = true;
 
 				spotLight.shadowMapWidth = 2048;

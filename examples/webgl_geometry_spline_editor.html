@@ -66,7 +66,7 @@
 				camera.position.z = 1000;
 				scene.add( camera );
 
-				scene.add( new THREE.AmbientLight( 0xcccccc ) );
+				scene.add( new THREE.AmbientLight( 0xf0f0f0 ) );
 				var light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 1500, 200 );
 				light.castShadow = true;
@@ -74,6 +74,7 @@
 				light.shadowCameraFar = camera.far;
 				light.shadowCameraFov = 70;
 				light.shadowBias = -0.000222;
+				light.shadowDarkness = 0.25;
 				light.shadowMapWidth = 1024;
 				light.shadowMapHeight = 1024;
 				scene.add( light );
@@ -81,7 +82,7 @@
 
 				var planeGeometry = new THREE.PlaneGeometry( 2000, 2000 );
 				planeGeometry.rotateX( - Math.PI / 2 );
-				var planeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+				var planeMaterial = new THREE.MeshBasicMaterial( { color: 0xeeeeee } );
 
 				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
 				plane.position.y = -200;

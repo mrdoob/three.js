@@ -85,7 +85,7 @@ Sidebar.Project = function ( editor ) {
 	} );
 
 	rendererAntialiasSpan.add( rendererAntialias );
-	rendererAntialiasSpan.add( new UI.Text( 'antialias' ) );
+	rendererAntialiasSpan.add( new UI.Text( 'antialias' ).setMarginLeft( '3px' ) );
 
 	rendererPropertiesRow.add( rendererAntialiasSpan );
 
@@ -100,7 +100,7 @@ Sidebar.Project = function ( editor ) {
 	} );
 
 	rendererShadowsSpan.add( rendererShadows );
-	rendererShadowsSpan.add( new UI.Text( 'shadows' ) );
+	rendererShadowsSpan.add( new UI.Text( 'shadows' ).setMarginLeft( '3px' ) );
 
 	rendererPropertiesRow.add( rendererShadowsSpan );
 
