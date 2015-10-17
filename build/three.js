@@ -2462,7 +2462,7 @@ THREE.Vector3.prototype = {
 
 	angleTo: function ( v ) {
 
-		var theta = this.dot( v ) / ( this.length() * v.length() );
+		var theta = this.dot( v ) / ( Math.sqrt( this.lengthSq() * v.lengthSq() ) );
 
 		// clamp, to handle numerical problems
 
@@ -10243,6 +10243,26 @@ THREE.Geometry.prototype = {
 
 	clone: function () {
 
+		// Handle primitives
+
+		var parameters = this.parameters;
+
+		if ( parameters !== undefined ) {
+
+			var values = [];
+
+			for ( var key in parameters ) {
+
+				values.push( parameters[ key ] );
+
+			}
+
+			var geometry = Object.create( this.constructor.prototype );
+			this.constructor.apply( geometry, values );
+			return geometry;
+
+		}
+
 		return new this.constructor().copy( this );
 
 	},
@@ -11580,6 +11600,26 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	clone: function () {
+
+		// Handle primitives
+
+		var parameters = this.parameters;
+
+		if ( parameters !== undefined ) {
+
+			var values = [];
+
+			for ( var key in parameters ) {
+
+				values.push( parameters[ key ] );
+
+			}
+
+			var geometry = Object.create( this.constructor.prototype );
+			this.constructor.apply( geometry, values );
+			return geometry;
+
+		}
 
 		return new this.constructor().copy( this );
 
@@ -22980,7 +23020,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( _this.shadowMap.enabled ) {
+			if ( shadowMap.enabled ) {
 
 				if ( object.receiveShadow && ! material._shadowPass ) {
 
@@ -31569,21 +31609,6 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.BoxGeometry.prototype.constructor = THREE.BoxGeometry;
 
-THREE.BoxGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.BoxGeometry(
-		parameters.width,
-		parameters.height,
-		parameters.depth,
-		parameters.widthSegments,
-		parameters.heightSegments,
-		parameters.depthSegments
-	);
-
-};
-
 THREE.CubeGeometry = THREE.BoxGeometry; // backwards compatibility
 
 // File:src/extras/geometries/CircleGeometry.js
@@ -31611,19 +31636,6 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.CircleGeometry.prototype.constructor = THREE.CircleGeometry;
-
-THREE.CircleGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.CircleGeometry(
-		parameters.radius,
-		parameters.segments,
-		parameters.thetaStart,
-		parameters.thetaLength
-	);
-
-};
 
 // File:src/extras/geometries/CircleBufferGeometry.js
 
@@ -31694,19 +31706,6 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 
 THREE.CircleBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.CircleBufferGeometry.prototype.constructor = THREE.CircleBufferGeometry;
-
-THREE.CircleBufferGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.CircleBufferGeometry(
-		parameters.radius,
-		parameters.segments,
-		parameters.thetaStart,
-		parameters.thetaLength
-	);
-
-};
 
 // File:src/extras/geometries/CylinderGeometry.js
 
@@ -31882,23 +31881,6 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.CylinderGeometry.prototype.constructor = THREE.CylinderGeometry;
-
-THREE.CylinderGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.CylinderGeometry(
-		parameters.radiusTop,
-		parameters.radiusBottom,
-		parameters.height,
-		parameters.radialSegments,
-		parameters.heightSegments,
-		parameters.openEnded,
-		parameters.thetaStart,
-		parameters.thetaLength
-	);
-
-};
 
 // File:src/extras/geometries/EdgesGeometry.js
 
@@ -32975,19 +32957,6 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.PlaneGeometry.prototype.constructor = THREE.PlaneGeometry;
 
-THREE.PlaneGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.PlaneGeometry(
-		parameters.width,
-		parameters.height,
-		parameters.widthSegments,
-		parameters.heightSegments
-	);
-
-};
-
 // File:src/extras/geometries/PlaneBufferGeometry.js
 
 /**
@@ -33087,19 +33056,6 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 THREE.PlaneBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.PlaneBufferGeometry.prototype.constructor = THREE.PlaneBufferGeometry;
 
-THREE.PlaneBufferGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.PlaneBufferGeometry(
-		parameters.width,
-		parameters.height,
-		parameters.widthSegments,
-		parameters.heightSegments
-	);
-
-};
-
 // File:src/extras/geometries/RingGeometry.js
 
 /**
@@ -33195,21 +33151,6 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 THREE.RingGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.RingGeometry.prototype.constructor = THREE.RingGeometry;
 
-THREE.RingGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.RingGeometry(
-		parameters.innerRadius,
-		parameters.outerRadius,
-		parameters.thetaSegments,
-		parameters.phiSegments,
-		parameters.thetaStart,
-		parameters.thetaLength
-	);
-
-};
-
 // File:src/extras/geometries/SphereGeometry.js
 
 /**
@@ -33238,22 +33179,6 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 
 THREE.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.SphereGeometry.prototype.constructor = THREE.SphereGeometry;
-
-THREE.SphereGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.SphereGeometry(
-		parameters.radius,
-		parameters.widthSegments,
-		parameters.heightSegments,
-		parameters.phiStart,
-		parameters.phiLength,
-		parameters.thetaStart,
-		parameters.thetaLength
-	);
-
-};
 
 // File:src/extras/geometries/SphereBufferGeometry.js
 
@@ -33359,22 +33284,6 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 THREE.SphereBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.SphereBufferGeometry.prototype.constructor = THREE.SphereBufferGeometry;
 
-THREE.SphereBufferGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.SphereBufferGeometry(
-		parameters.radius,
-		parameters.widthSegments,
-		parameters.heightSegments,
-		parameters.phiStart,
-		parameters.phiLength,
-		parameters.thetaStart,
-		parameters.thetaLength
-	);
-
-};
-
 // File:src/extras/geometries/TorusGeometry.js
 
 /**
@@ -33456,20 +33365,6 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 
 THREE.TorusGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TorusGeometry.prototype.constructor = THREE.TorusGeometry;
-
-THREE.TorusGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.TorusGeometry(
-		parameters.radius,
-		parameters.tube,
-		parameters.radialSegments,
-		parameters.tubularSegments,
-		parameters.arc
-	);
-
-};
 
 // File:src/extras/geometries/TorusKnotGeometry.js
 
@@ -33587,22 +33482,6 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 
 THREE.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TorusKnotGeometry.prototype.constructor = THREE.TorusKnotGeometry;
-
-THREE.TorusKnotGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.TorusKnotGeometry(
-		parameters.radius,
-		parameters.tube,
-		parameters.radialSegments,
-		parameters.tubularSegments,
-		parameters.p,
-		parameters.q,
-		parameters.heightScale
-	);
-
-};
 
 // File:src/extras/geometries/TubeGeometry.js
 
@@ -33747,14 +33626,6 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 
 THREE.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TubeGeometry.prototype.constructor = THREE.TubeGeometry;
-THREE.TubeGeometry.prototype.clone = function() {
-
-	return new this.constructor( this.parameters.path,
-		this.parameters.segments, this.parameters.radius, this.parameters.radialSegments,
-		this.parameters.closed, this.parameters.taper
-	);
-
-};
 
 THREE.TubeGeometry.NoTaper = function ( u ) {
 
@@ -34164,19 +34035,6 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.PolyhedronGeometry.prototype.constructor = THREE.PolyhedronGeometry;
 
-THREE.PolyhedronGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.PolyhedronGeometry(
-		parameters.vertices,
-		parameters.indices,
-		parameters.radius,
-		parameters.detail
-	);
-
-};
-
 // File:src/extras/geometries/DodecahedronGeometry.js
 
 /**
@@ -34238,17 +34096,6 @@ THREE.DodecahedronGeometry = function ( radius, detail ) {
 THREE.DodecahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.DodecahedronGeometry.prototype.constructor = THREE.DodecahedronGeometry;
 
-THREE.DodecahedronGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.DodecahedronGeometry(
-		parameters.radius,
-		parameters.detail
-	);
-
-};
-
 // File:src/extras/geometries/IcosahedronGeometry.js
 
 /**
@@ -34286,17 +34133,6 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 THREE.IcosahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.IcosahedronGeometry.prototype.constructor = THREE.IcosahedronGeometry;
 
-THREE.IcosahedronGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.IcosahedronGeometry(
-		parameters.radius,
-		parameters.detail
-	);
-
-};
-
 // File:src/extras/geometries/OctahedronGeometry.js
 
 /**
@@ -34327,17 +34163,6 @@ THREE.OctahedronGeometry = function ( radius, detail ) {
 THREE.OctahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.OctahedronGeometry.prototype.constructor = THREE.OctahedronGeometry;
 
-THREE.OctahedronGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.OctahedronGeometry(
-		parameters.radius,
-		parameters.detail
-	);
-
-};
-
 // File:src/extras/geometries/TetrahedronGeometry.js
 
 /**
@@ -34367,17 +34192,6 @@ THREE.TetrahedronGeometry = function ( radius, detail ) {
 
 THREE.TetrahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.TetrahedronGeometry.prototype.constructor = THREE.TetrahedronGeometry;
-
-THREE.TetrahedronGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.TetrahedronGeometry(
-		parameters.radius,
-		parameters.detail
-	);
-
-};
 
 // File:src/extras/geometries/ParametricGeometry.js
 
