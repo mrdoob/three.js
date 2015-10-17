@@ -1240,7 +1240,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		if ( ( object.channels.mask & camera.channels.mask ) !== 0 ) {
+		if ( ( object.layers.mask & camera.layers.mask ) !== 0 ) {
 
 			if ( object instanceof THREE.Light ) {
 

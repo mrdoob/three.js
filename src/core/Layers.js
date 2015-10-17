@@ -2,15 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Channels = function () {
+THREE.Layers = function () {
 
 	this.mask = 1;
 
 };
 
-THREE.Channels.prototype = {
+THREE.Layers.prototype = {
 
-	constructor: THREE.Channels,
+	constructor: THREE.Layers,
 
 	set: function ( channel ) {
 
