@@ -35,11 +35,9 @@ THREE.ArrowHelper = ( function () {
 
 		this.position.copy( origin );
 		
-		if ( headLength < length ) {
-			this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: color } ) );
-			this.line.matrixAutoUpdate = false;
-			this.add( this.line );
-		}
+		this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: color } ) );
+		this.line.matrixAutoUpdate = false;
+		this.add( this.line );
 
 		this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: color } ) );
 		this.cone.matrixAutoUpdate = false;
@@ -94,6 +92,9 @@ THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth
 	if ( headLength < length ){
 		this.line.scale.set( 1, length - headLength, 1 );
 		this.line.updateMatrix();
+		this.line.visible = true;
+	} else {
+		this.line.visible = false;
 	}
 
 	this.cone.scale.set( headWidth, headLength, headWidth );
@@ -104,7 +105,7 @@ THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth
 
 THREE.ArrowHelper.prototype.setColor = function ( color ) {
 
-	if ( this.line !== undefined ) this.line.material.color.set( color );
+	this.line.material.color.set( color );
 	this.cone.material.color.set( color );
 
 };
