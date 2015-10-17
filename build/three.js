@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '73' };
+var THREE = { REVISION: '74dev' };
 
 //
 
@@ -7267,48 +7267,6 @@ THREE.Triangle.prototype = {
 
 };
 
-// File:src/core/Channels.js
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.Channels = function () {
-
-	this.mask = 1;
-
-};
-
-THREE.Channels.prototype = {
-
-	constructor: THREE.Channels,
-
-	set: function ( channel ) {
-
-		this.mask = 1 << channel;
-
-	},
-
-	enable: function ( channel ) {
-
-		this.mask |= 1 << channel;
-
-	},
-
-	toggle: function ( channel ) {
-
-		this.mask ^= 1 << channel;
-
-	},
-
-	disable: function ( channel ) {
-
-		this.mask &= ~ ( 1 << channel );
-
-	}
-
-};
-
 // File:src/core/Clock.js
 
 /**
@@ -7491,6 +7449,54 @@ THREE.EventDispatcher.prototype = {
 
 };
 
+// File:src/core/Layers.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.Layers = function () {
+
+	this.mask = 1;
+
+};
+
+THREE.Layers.prototype = {
+
+	constructor: THREE.Layers,
+
+	set: function ( channel ) {
+
+		this.mask = 1 << channel;
+
+	},
+
+	enable: function ( channel ) {
+
+		this.mask |= 1 << channel;
+
+	},
+
+	toggle: function ( channel ) {
+
+		this.mask ^= 1 << channel;
+
+	},
+
+	disable: function ( channel ) {
+
+		this.mask &= ~ ( 1 << channel );
+
+	},
+
+	test: function ( layers ) {
+
+		return ( this.mask & layers.mask ) !== 0;
+
+	}
+
+};
+
 // File:src/core/Raycaster.js
 
 /**
@@ -7649,7 +7655,6 @@ THREE.Object3D = function () {
 	this.type = 'Object3D';
 
 	this.parent = null;
-	this.channels = new THREE.Channels();
 	this.children = [];
 
 	this.up = THREE.Object3D.DefaultUp.clone();
@@ -7707,6 +7712,7 @@ THREE.Object3D = function () {
 	this.matrixAutoUpdate = THREE.Object3D.DefaultMatrixAutoUpdate;
 	this.matrixWorldNeedsUpdate = false;
 
+	this.layers = new THREE.Layers();
 	this.visible = true;
 
 	this.castShadow = false;
@@ -22366,7 +22372,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
-		shadowMap.render( scene );
+		shadowMap.render( scene, camera );
 
 		//
 
@@ -22487,7 +22493,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		if ( ( object.channels.mask & camera.channels.mask ) !== 0 ) {
+		if ( object.layers.test( camera.layers ) ) {
 
 			if ( object instanceof THREE.Light ) {
 
@@ -26657,7 +26663,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	this.type = THREE.PCFShadowMap;
 	this.cullFace = THREE.CullFaceFront;
 
-	this.render = function ( scene ) {
+	this.render = function ( scene, camera ) {
 
 		var faceCount, isPointLight;
 
@@ -26809,7 +26815,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 					_renderList.length = 0;
 
-					projectObject( scene, shadowCamera );
+					projectObject( scene, camera, shadowCamera );
 
 					// render shadow map
 					// render regular objects
@@ -26928,11 +26934,11 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	}
 
-	function projectObject( object, camera ) {
+	function projectObject( object, camera, shadowCamera ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points ) {
+		if ( object.layers.test( camera.layers ) && ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points ) ) {
 
 			if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
@@ -26940,7 +26946,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				if ( material.visible === true ) {
 
-					object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+					object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 					_renderList.push( object );
 
 				}
@@ -26953,7 +26959,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			projectObject( children[ i ], camera );
+			projectObject( children[ i ], camera, shadowCamera );
 
 		}
 
