@@ -34,6 +34,12 @@ THREE.Layers.prototype = {
 
 		this.mask &= ~ ( 1 << channel );
 
+	},
+
+	test: function ( layers ) {
+
+		return ( this.mask & layers.mask ) !== 0;
+
 	}
 
 };
