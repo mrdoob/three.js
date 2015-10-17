@@ -1727,7 +1727,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( _this.shadowMap.enabled ) {
+			if ( shadowMap.enabled ) {
 
 				if ( object.receiveShadow && ! material._shadowPass ) {
 
