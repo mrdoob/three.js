@@ -10,7 +10,7 @@
 				font-weight: normal;
 				font-style: normal;
 			}
-			
+
 			body {
 				margin:0;
 				font-family: 'inconsolata';
@@ -18,9 +18,9 @@
 				line-height: 18px;
 				overflow: hidden;
 			}
-			
+
 			canvas { width: 100%; height: 100% }
-			
+
 			#newWindow {
 				display: block;
 				position: absolute;
@@ -31,12 +31,14 @@
 		</style>
 	</head>
 	<body>
-		
+
 		<a id='newWindow' href='./geometry-browser.html' target='_blank'>Open in New Window</a>
-		
+
 		<script src="../../build/three.min.js"></script>
 		<script src='../../examples/js/libs/dat.gui.min.js'></script>
 		<script src="../../examples/js/controls/OrbitControls.js"></script>
+		<script src="../../examples/js/geometries/TextGeometry.js"></script>
+		<script src="../../examples/js/utils/FontUtils.js"></script>
 		<script src="../../examples/fonts/gentilis_bold.typeface.js"></script>
 		<script src="../../examples/fonts/gentilis_regular.typeface.js"></script>
 		<script src="../../examples/fonts/optimer_bold.typeface.js"></script>
@@ -45,22 +47,22 @@
 		<script src="../../examples/fonts/helvetiker_regular.typeface.js"></script>
 		<script src="../../examples/fonts/droid/droid_serif_regular.typeface.js"></script>
 		<script src="../../examples/fonts/droid/droid_serif_bold.typeface.js"></script>
-		
+
 		<script src='js/geometry.js'></script>
-		
+
 		<script>
-			
+
 			document.getElementById('newWindow').href += window.location.hash;
-			
+
 			var gui = new dat.GUI();
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 50 );
 			camera.position.z = 30;
-			
+
 			var renderer = new THREE.WebGLRenderer({antialias: true});
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
-			
+
 			var orbit = new THREE.OrbitControls( camera, renderer.domElement );
 			orbit.enableZoom = false;
 
@@ -71,7 +73,7 @@
 			lights[0] = new THREE.PointLight( 0xffffff, 1, 0 );
 			lights[1] = new THREE.PointLight( 0xffffff, 1, 0 );
 			lights[2] = new THREE.PointLight( 0xffffff, 1, 0 );
-			
+
 			lights[0].position.set( 0, 200, 0 );
 			lights[1].position.set( 100, 200, 100 );
 			lights[2].position.set( -100, -200, -100 );
@@ -81,40 +83,40 @@
 			scene.add( lights[2] );
 
 			var mesh = new THREE.Object3D()
-			
+
 			mesh.add( new THREE.LineSegments(
-				
+
 				new THREE.Geometry(),
-				
+
 				new THREE.LineBasicMaterial({
 					color: 0xffffff,
 					transparent: true,
 					opacity: 0.5
 				})
-				
+
 			));
-			
+
 			mesh.add( new THREE.Mesh(
-				
+
 				new THREE.Geometry(),
-				
+
 				new THREE.MeshPhongMaterial({
 					color: 0x156289,
 					emissive: 0x072534,
 					side: THREE.DoubleSide,
 					shading: THREE.FlatShading
 				})
-				
+
 			));
-			
+
 			var options = chooseFromHash( mesh );
-			
+
 			scene.add( mesh );
-			
+
 			var prevFog = false;
-			
+
 			var render = function () {
-				
+
 				requestAnimationFrame( render );
 
 				var time = Date.now() * 0.001;
@@ -125,20 +127,20 @@
 				}
 
 				renderer.render( scene, camera );
-				
+
 			};
-			
+
 			window.addEventListener( 'resize', function () {
-				
+
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				
+
 			}, false );
 
 			render();
-			
+
 		</script>
 	</body>
 </html>
