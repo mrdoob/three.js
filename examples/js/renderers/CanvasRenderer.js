@@ -819,13 +819,22 @@ THREE.CanvasRenderer = function ( parameters ) {
 			texture instanceof THREE.DataTexture ) {
 
 			return {
-					canvas: undefined,
-					version: texture.version
-				}
+				canvas: undefined,
+				version: texture.version
+			}
 
 		}
 
 		var image = texture.image;
+
+		if ( image.complete === false ) {
+
+			return {
+				canvas: undefined,
+				version: 0
+			}
+
+		}
 
 		var canvas = document.createElement( 'canvas' );
 		canvas.width = image.width;
