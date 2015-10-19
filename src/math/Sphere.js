@@ -92,9 +92,22 @@ THREE.Sphere.prototype = {
 
 	intersectsSphere: function ( sphere ) {
 
+		console.warn( 'THREE.Sphere: .intersectsSphere() has been renamed to .isIntersectionSphere().' );
+
+		return this.isIntersectionSphere( sphere );
+	},
+
+	isIntersectionSphere: function ( sphere ) {
+
 		var radiusSum = this.radius + sphere.radius;
 
 		return sphere.center.distanceToSquared( this.center ) <= ( radiusSum * radiusSum );
+
+	},
+
+	isIntersectionBox: function ( box ) {
+
+		return box.isIntersectionSphere( this );
 
 	},
 
