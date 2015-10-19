@@ -177,7 +177,7 @@ THREE.AnimationClip.parse = function( json ) {
 
 
 // parse the animation.hierarchy format
-THREE.AnimationClip.parseAnimation = function( animation, bones, nodeName ) {
+THREE.AnimationClip.parseAnimation = function( animation, bones ) {
 
 	if ( ! animation ) {
 		console.error( "  no animation in JSONLoader data" );
@@ -211,7 +211,7 @@ THREE.AnimationClip.parseAnimation = function( animation, bones, nodeName ) {
 	};
 
 	var tracks = [];
-
+	
 	var clipName = animation.name || 'default';
 	var duration = animation.length || -1; // automatic length determination in AnimationClip.
 	var fps = animation.fps || 30;
@@ -259,7 +259,7 @@ THREE.AnimationClip.parseAnimation = function( animation, bones, nodeName ) {
 
 				}
 
-				tracks.push( new THREE.NumberKeyframeTrack( nodeName + '.morphTargetInfluence[' + morphTargetName + ']', keys ) );
+				tracks.push( new THREE.NumberKeyframeTrack( '.morphTargetInfluence[' + morphTargetName + ']', keys ) );
 
 			}
 
@@ -267,7 +267,7 @@ THREE.AnimationClip.parseAnimation = function( animation, bones, nodeName ) {
 
 		} else {
 
-			var boneName = nodeName + '.bones[' + bones[ h ].name + ']';
+			var boneName = '.bones[' + bones[ h ].name + ']';
 
 			// track contains positions...
 			var positionTrack = convertTrack( boneName + '.position', animationKeys, 'pos', THREE.VectorKeyframeTrack, function( animationKey ) {
