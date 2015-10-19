@@ -247,15 +247,23 @@ THREE.Box3.prototype = {
 
 	},
 
-	isIntersectionSphere: function ( sphere ) {
+	isIntersectionSphere: function () {
 
-		// Find the point on the AABB closest to the sphere center.
-		var closestPoint = this.clampPoint( sphere.center );
+	  var closestPoint;
 
-		// If that point is inside the sphere, the AABB and sphere intersect.
-		return closestPoint.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius )
+	  return function isIntersectionSphere( sphere ) {
 
-	},
+	    if ( closestPoint === undefined ) closestPoint = new THREE.Vector3();
+
+	    // Find the point on the AABB closest to the sphere center.
+	    this.clampPoint( sphere.center, closestPoint );
+
+	    // If that point is inside the sphere, the AABB and sphere intersect.
+	    return closestPoint.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
+
+	  };
+
+	}(),
 
 	clampPoint: function ( point, optionalTarget ) {
 
