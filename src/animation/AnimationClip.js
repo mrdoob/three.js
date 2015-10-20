@@ -8,7 +8,7 @@
 
 THREE.AnimationClip = function ( name, duration, tracks ) {
 
-	this.name = name;
+	this.name = name || THREE.Math.generateUUID();
 	this.tracks = tracks;
 	this.duration = ( duration !== undefined ) ? duration : -1;
 

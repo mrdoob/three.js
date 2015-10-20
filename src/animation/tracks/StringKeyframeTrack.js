@@ -14,7 +14,8 @@ THREE.StringKeyframeTrack = function ( name, times, values, interpolation ) {
 
 };
 
-Object.assign( THREE.StringKeyframeTrack.prototype, THREE.KeyframeTrack.prototype, {
+THREE.StringKeyframeTrack.prototype =
+		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
 
 	constructor: THREE.StringKeyframeTrack,
 

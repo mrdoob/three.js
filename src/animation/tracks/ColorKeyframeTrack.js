@@ -14,7 +14,8 @@ THREE.ColorKeyframeTrack = function ( name, times, values, interpolation ) {
 
 };
 
-Object.assign( THREE.ColorKeyframeTrack.prototype, THREE.KeyframeTrack.prototype, {
+THREE.ColorKeyframeTrack.prototype =
+		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
 
 	constructor: THREE.ColorKeyframeTrack,
 

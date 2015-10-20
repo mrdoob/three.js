@@ -133,7 +133,7 @@
 					var blendObject = scene.getObjectByName( 'tree-morph' );
 					var clip = blendObject.geometry.animations[0];
 					mixer = new THREE.AnimationMixer( blendObject );
-					mixer.addAction( new THREE.AnimationAction( clip ) );
+					mixer.clipAction( clip ).play();
 
 				} );
 

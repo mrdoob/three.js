@@ -34,8 +34,8 @@ THREE.KeyframeTrack.prototype = {
 
 	constructor: THREE.KeyframeTrack,
 
-	TimeBufferType: Float64Array,
-	ValueBufferType: Float64Array,
+	TimeBufferType: Float32Array,
+	ValueBufferType: Float32Array,
 
 	DefaultInterpolation: THREE.InterpolateLinear,
 
@@ -250,7 +250,7 @@ THREE.KeyframeTrack.prototype = {
 
 			var currTime = times[ i ];
 
-			if ( Number.isNaN( currTime ) ) {
+			if ( typeof currTime === 'number' && isNaN( currTime ) ) {
 
 				console.error( "time is not a valid number", this, i, currTime );
 				valid = false;
@@ -278,7 +278,7 @@ THREE.KeyframeTrack.prototype = {
 
 					var value = values[ i ];
 
-					if ( Number.isNaN( value ) ) {
+					if ( isNaN( value ) ) {
 
 						console.error( "value is not a valid number", this, i, value );
 						valid = false;
@@ -392,7 +392,7 @@ Object.assign( THREE.KeyframeTrack, {
 
 		}
 
-		var trackType = THREE.KeyframeTrack.GetTrackTypeForValueTypeName( json.type );
+		var trackType = THREE.KeyframeTrack._getTrackTypeForValueTypeName( json.type );
 
 		if ( json[ 'times' ] === undefined ) {
 
@@ -460,7 +460,7 @@ Object.assign( THREE.KeyframeTrack, {
 
 	},
 
-	GetTrackTypeForValueTypeName: function( typeName ) {
+	_getTrackTypeForValueTypeName: function( typeName ) {
 
 		switch( typeName.toLowerCase() ) {
 

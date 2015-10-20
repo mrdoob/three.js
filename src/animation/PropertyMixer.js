@@ -8,9 +8,9 @@
  * @author tschw
  */
 
-THREE.PropertyMixer = function ( rootNode, path, typeName, valueSize ) {
+THREE.PropertyMixer = function ( binding, typeName, valueSize ) {
 
-	this.binding = new THREE.PropertyBinding( rootNode, path );
+	this.binding = binding;
 	this.valueSize = valueSize;
 
 	var bufferType = Float64Array,
@@ -45,6 +45,7 @@ THREE.PropertyMixer = function ( rootNode, path, typeName, valueSize ) {
 
 	this.cumulativeWeight = 0;
 
+	this.useCount = 0;
 	this.referenceCount = 0;
 
 };

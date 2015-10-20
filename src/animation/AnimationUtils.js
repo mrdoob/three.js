@@ -99,8 +99,7 @@ THREE.AnimationUtils = {
 		var value = key[ valuePropertyName ];
 		if ( value === undefined ) return; // no data
 
-		if ( value[ 'splice' ] !== undefined ) {
-			// ...assume array
+		if ( Array.isArray( value ) ) {
 
 			do {
 

@@ -13,7 +13,8 @@ THREE.QuaternionKeyframeTrack = function ( name, times, values, interpolation ) 
 
 };
 
-Object.assign( THREE.QuaternionKeyframeTrack.prototype, THREE.KeyframeTrack.prototype, {
+THREE.QuaternionKeyframeTrack.prototype =
+		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
 
 	constructor: THREE.QuaternionKeyframeTrack,
 

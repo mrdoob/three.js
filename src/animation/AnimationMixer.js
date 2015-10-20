@@ -1,7 +1,6 @@
 /**
  *
- * Sequencer that performs AnimationActions, mixes their results and updates
- * the scene graph.
+ * Player for AnimationClips.
  *
  *
  * @author Ben Houston / http://clara.io/
@@ -11,20 +10,13 @@
 
 THREE.AnimationMixer = function( root ) {
 
-	this.root = root;
-	this.uuid = THREE.Math.generateUUID();
+	this._root = root;
+	this._initMemoryManager();
+	this._accuIndex = 0;
 
 	this.time = 0;
+
 	this.timeScale = 1.0;
-
-	this._actions = [];
-
-	this._bindingsMaps = {}; // contains a path -> prop_mixer map per root.uuid
-
-	this._bindings = []; // array of all bindings with refCnt != 0
-	this._bindingsDirty = false; // whether we need to rebuild the array
-
-	this._accuIndex = 0;
 
 };
 
@@ -32,221 +24,73 @@ THREE.AnimationMixer.prototype = {
 
 	constructor: THREE.AnimationMixer,
 
-	addAction: function( action ) {
+	// return an action for a clip optionally using a custom root target
+	// object (this method allocates a lot of dynamic memory in case a
+	// previously unknown clip/root combination is specified)
+	clipAction: function( clip, optionalRoot ) {
 
-		if ( this._actions.indexOf( action ) !== -1 ) {
-
-			return; // action is already added - do nothing
-
-		}
-
-		var root = action.localRoot || this.root,
+		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
+			clipName = ( typeof clip === 'string' ) ? clip : clip.name,
+			clipObject = ( clip !== clipName ) ? clip : null,
 
-			bindingsMap = this._bindingsMaps[ rootUuid ];
+			actionsForClip = this._actionsByClip[ clipName ],
+			prototypeAction;
 
-		if ( bindingsMap === undefined ) {
+		if ( actionsForClip !== undefined ) {
 
-			bindingsMap = {};
-			this._bindingsMaps[ rootUuid ] = bindingsMap;
+			var existingAction =
+					actionsForClip.actionByRoot[ rootUuid ];
 
-		}
+			if ( existingAction !== undefined ) {
 
-		var interpolants = action._interpolants,
-			actionBindings = action._propertyBindings,
-
-			tracks = action.clip.tracks,
-			bindingsChanged = false,
-
-			myUuid = this.uuid,
-			prevRootUuid = action._prevRootUuid,
-
-			rootSwitchValid =
-				prevRootUuid !== rootUuid &&
-				action._prevMixerUuid === myUuid,
-
-			prevRootBindingsMap;
-
-		if ( rootSwitchValid ) {
-
-			// in this case we try to transfer currently unused
-			// context infrastructure from the previous root
-
-			prevRootBindingsMap = this._bindingsMaps[ prevRootUuid ];
-
-		}
-
-		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
-
-			var track = tracks[ i ];
-
-			var trackName = track.name;
-			var propertyMixer = bindingsMap[ trackName ];
-
-			if ( rootSwitchValid && propertyMixer === undefined ) {
-
-				var candidate = prevRootBindingsMap[ trackName ];
-
-				if ( candidate !== undefined &&
-						candidate.referenceCount === 0 ) {
-
-					propertyMixer = candidate;
-
-					// no longer use with the old root!
-					delete prevRootBindingsMap[ trackName ];
-
-					propertyMixer.binding.setRootNode( root );
-
-					bindingsMap[ trackName ] = propertyMixer;
-
-				}
+				return existingAction;
 
 			}
 
-			if ( propertyMixer === undefined ) {
+			// we know the clip, so we don't have to parse all
+			// the bindings again but can just copy
+			prototypeAction = actionsForClip.knownActions[ 0 ];
 
-				propertyMixer = new THREE.PropertyMixer(
-						root, trackName,
-						track.ValueTypeName, track.getValueSize() );
+			// also, take the clip from the prototype action
+			clipObject = prototypeAction._clip;
 
-				bindingsMap[ trackName ] = propertyMixer;
+			if ( clip !== clipName && clip !== clipObject ) {
 
-			}
-
-			if ( propertyMixer.referenceCount === 0 ) {
-
-				propertyMixer.saveOriginalState();
-				bindingsChanged = true;
+				throw new Error(
+						"Different clips with the same name detected!" );
 
 			}
 
-			++ propertyMixer.referenceCount;
-
-			interpolants[ i ].resultBuffer = propertyMixer.buffer;
-			actionBindings[ i ] = propertyMixer;
-
 		}
 
-		if ( bindingsChanged ) {
+		// clip must be known when specified via string
+		if ( clipObject === null ) return null;
 
-			this._bindingsDirty = true; // invalidates this._bindings
+		// allocate all resources required to run it
+		var newAction = new THREE.
+				AnimationMixer._Action( this, clipObject, optionalRoot );
 
-		}
+		this._bindAction( newAction, prototypeAction );
 
-		action.mixer = this;
-		action._prevRootUuid = rootUuid;
-		action._prevMixerUuid = myUuid;
+		// and make the action known to the memory manager
+		this._addInactiveAction( newAction, clipName, rootUuid );
 
-		// TODO: check for duplicate action names?
-		// Or provide each action with a UUID?
-		this._actions.push( action );
-
-		action.init( this.time );
-
-		return this;
+		return newAction;
 
 	},
 
-	removeAction: function( action ) {
+	// get an existing action
+	existingAction: function( clip, optionalRoot ) {
 
-		var actions = this._actions,
-			index = actions.indexOf( action );
+		var root = optionalRoot || this._root,
+			rootUuid = root.uuid,
+			clipName = ( typeof clip === 'string' ) ? clip : clip.name,
+			actionsForClip = this._actionsByClip[ clipName ];
 
-		if ( index === - 1 ) {
+		if ( actionsForClip !== undefined ) {
 
-			return this; // we don't know this action - do nothing
-
-		}
-
-		// unreference all property mixers
-		var interpolants = action._interpolants,
-			actionBindings = action._propertyBindings,
-			rootUuid = ( action.localRoot || this.root ).uuid,
-			bindings = this._bindingsMaps[ rootUuid ],
-
-			bindingsChanged = false;
-
-		for( var i = 0, n = actionBindings.length; i !== n; ++ i ) {
-
-			var propertyMixer = actionBindings[ i ];
-			actionBindings[ i ] = null;
-
-			interpolants[ i ].resultBuffer = null;
-
-			// eventually remove the binding from the array
-			if( -- propertyMixer.referenceCount === 0 ) {
-
-				propertyMixer.restoreOriginalState();
-				bindingsChanged = true;
-
-			}
-
-		}
-
-		if ( bindingsChanged ) {
-
-			this._bindingsDirty = true; // invalidates this._bindings
-
-		}
-
-		// remove from array-based unordered set
-		actions[ index ] = actions[ actions.length - 1 ];
-		actions.pop();
-
-		action.mixer = null;
-
-		return this;
-
-	},
-
-	removeAllActions: function() {
-
-		if ( this._bindingsDirty ) {
-
-			this._updateBindings();
-
-		}
-
-		var bindings = this._bindings; // all bindings currently in use
-
-		for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
-
-			var binding = bindings[ i ];
-			binding.referenceCount = 0;
-			binding.restoreOriginalState();
-
-		}
-
-		bindings.length = 0;
-
-		this._bindingsDirty = false;
-
-		var actions = this._actions;
-
-		for ( var i = 0, n = actions.length; i !== n; ++ i ) {
-
-			actions[ i ].mixer = null;
-
-		}
-
-		actions.length = 0;
-
-		return this;
-
-	},
-
-
-	// can be optimized if needed
-	findActionByName: function( name ) {
-
-		var actions = this._actions;
-
-		for ( var i = 0, n = actions.length; i !== n; ++ i ) {
-
-			var action = actions[ i ];
-			var actionName = action.getName();
-
-			if( name === actionName ) return action;
+			return actionsForClip.actionByRoot[ rootUuid ] || null;
 
 		}
 
@@ -254,63 +98,26 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
-	play: function( action, optionalFadeInDuration ) {
+	// deactivates all previously scheduled actions
+	stopAllAction: function() {
 
-		action.startTime = this.time;
-		this.addAction( action );
+		var actions = this._actions,
+			nActions = this._nActiveActions,
+			bindings = this._bindings,
+			nBindings = this._nActiveBindings;
 
-		return this;
+		this._nActiveActions = 0;
+		this._nActiveBindings = 0;
 
-	},
+		for ( var i = 0; i !== nActions; ++ i ) {
 
-	fadeOut: function( action, duration ) {
+			actions[ i ].reset();
 
-		var time = this.time,
-			times = Float64Array.of( time, time + duration );
+		}
 
-		action.weight = new THREE.LinearInterpolant(
-				times, this._FadeOutValues, 1, this._tmp );
+		for ( var i = 0; i !== nBindings; ++ i ) {
 
-		return this;
-
-	},
-
-	fadeIn: function( action, duration ) {
-
-		var time = this.time,
-			times = Float64Array.of( time, time + duration );
-
-		action.weight = new THREE.LinearInterpolant(
-				times, this._FadeInValues, 1, this._tmp );
-
-		return this;
-
-	},
-
-	warp: function( action, startTimeScale, endTimeScale, duration ) {
-
-		var time = this.time,
-			times = Float64Array.of( time, time + duration ),
-			values = Float64Array.of( startTimeScale, endTimeScale );
-
-		action.timeScale = new THREE.LinearInterpolant( times, values, 1, this._tmp );
-
-		return this;
-
-	},
-
-	crossFade: function( fadeOutAction, fadeInAction, duration, warp ) {
-
-		this.fadeOut( fadeOutAction, duration );
-		this.fadeIn( fadeInAction, duration );
-
-		if( warp ) {
-
-			var startEndRatio = fadeOutAction.clip.duration / fadeInAction.clip.duration;
-			var endStartRatio = 1.0 / startEndRatio;
-
-			this.warp( fadeOutAction, 1.0, startEndRatio, duration );
-			this.warp( fadeInAction, endStartRatio, 1.0, duration );
+			bindings[ i ].useCount = 0;
 
 		}
 
@@ -318,48 +125,74 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
+	// advance the time and update apply the animation
 	update: function( deltaTime ) {
 
 		var actions = this._actions,
-			mixerDeltaTime = deltaTime * this.timeScale;
+			nActions = this._nActiveActions,
+			mixerDeltaTime = deltaTime * this.timeScale,
+			direction = Math.sign( deltaTime );
 
 		var time = this.time += mixerDeltaTime;
-		var accuIndex = this.accuIndex ^= 1;
+		var accuIndex = this._accuIndex ^= 1;
 
 		// perform all actions
 
-		for ( var i = 0, n = actions.length; i !== n; ++ i ) {
+		for ( var i = 0; i !== nActions; ++ i ) {
 
-			var action = actions[ i ];
+			var action = actions[ i ],
+				actionDeltaTime = mixerDeltaTime;
+
 			if ( ! action.enabled ) continue;
 
-			var weight = action.getWeightAt( time );
-			if ( weight <= 0 ) continue;
+			var startTime = action.startTime_;
 
-			var actionTimeScale = action.getTimeScaleAt( time );
-			var actionTime = action.updateTime( mixerDeltaTime * actionTimeScale );
+			if ( startTime !== null ) {
 
-			var interpolants = action._interpolants;
-			var propertyMixers = action._propertyBindings;
+				// check for scheduled start of action
 
-			for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+				var timeRunning = ( time - startTime ) * direction;
+				if ( timeRunning < 0 ) continue; // yet to come
 
-				interpolants[ j ].evaluate( actionTime );
-				propertyMixers[ j ].accumulate( accuIndex, weight );
+				// start
+
+				action.startTime_ = null; // unschedule
+				actionDeltaTime = direction * timeRunning;
+
+			}
+
+			// run this action
+
+			actionDeltaTime *= action.updateTimeScale_( time );
+			var clipTime = action.updateTime_( actionDeltaTime );
+
+			// note: updateTime_ may disable the action resulting in
+			// an effective weight of 0
+
+			var weight = action.updateWeight_( time );
+
+			if ( weight > 0 ) {
+
+				var interpolants = action._interpolants;
+				var propertyMixers = action._propertyBindings;
+
+				for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+					interpolants[ j ].evaluate( clipTime );
+					propertyMixers[ j ].accumulate( accuIndex, weight );
+
+				}
 
 			}
 
 		}
 
-		if ( this._bindingsDirty ) {
+		// update scene graph
 
-			this._updateBindings();
-			this._bindingsDirty = false;
+		var bindings = this._bindings,
+			nBindings = this._nActiveBindings;
 
-		}
-
-		var bindings = this._bindings;
-		for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+		for ( var i = 0; i !== nBindings; ++ i ) {
 
 			bindings[ i ].apply( accuIndex );
 
@@ -369,33 +202,512 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
-	// releases cached references to scene graph nodes
-	// pass 'true' for 'unbindOnly' to allow a quick rebind at
-	// the expense of higher cost add / removeAction operations
-	releaseCachedBindings: function( unbindOnly ) {
+	// return this mixer's root target object
+	getRoot: function() {
 
-		var bindingsMaps = this._bindingsMaps;
+		return this._root;
 
-		for ( var rootUuid in bindingsMaps ) {
+	},
 
-			var bindingsMap = bindingsMaps[ rootUuid ];
+	// free all resources specific to a particular clip
+	uncacheClip: function( clip ) {
 
-			var mapChanged = false;
+		var actions = this._actions,
+			clipName = clip.name,
+			actionsByClip = this._actionsByClip,
+			actionsForClip = actionsByClip[ clipName ];
 
-			for ( var trackName in bindingsMap ) {
+		if ( actionsForClip !== undefined ) {
 
-				var propertyMixer = bindingsMap[ trackName ];
+			// note: just calling _removeInactiveAction would mess up the
+			// iteration state and also require updating the state we can
+			// just throw away
 
-				if ( propertyMixer.referenceCount === 0 ) {
+			var actionsToRemove = actionsForClip.knownActions;
 
-					if ( unbindOnly ) {
+			for ( var i = 0, n = actionsToRemove.length; i !== n; ++ i ) {
 
-						propertyMixer.binding.unbind();
+				var action = actionsToRemove[ i ];
 
-					} else {
+				this._deactivateAction( action );
 
-						delete bindingsMap[ trackName ];
-						mapChanged = true;
+				var cacheIndex = action._cacheIndex,
+					lastInactiveAction = actions[ actions.length - 1 ];
+
+				action._cacheIndex = null;
+				action._byClipCacheIndex = null;
+
+				lastInactiveAction._cacheIndex = cacheIndex;
+				actions[ cacheIndex ] = lastInactiveAction;
+				actions.pop();
+
+				this._removeInactiveBindingsForAction( action );
+
+			}
+
+			delete actionsByClip[ clipName ];
+
+		}
+
+	},
+
+	// free all resources specific to a particular root target object
+	uncacheRoot: function( root ) {
+
+		var rootUuid = root.uuid,
+			actionsByClip = this._actionsByClip;
+
+		for ( var clipName in actionsByClip ) {
+
+			var actionByRoot = actionsByClip[ clipName ].actionByRoot,
+				action = actionByRoot[ rootUuid ];
+
+			if ( action !== undefined ) {
+
+				this._deactivateAction( action );
+				this._removeInactiveAction( action );
+
+			}
+
+		}
+
+		var bindingsByRoot = this._bindingsByRootAndName,
+			bindingByName = bindingsByRoot[ rootUuid ];
+
+		if ( bindingByName !== undefined ) {
+
+			for ( var trackName in bindingByName ) {
+
+				var binding = bindingByName[ trackName ];
+				binding.restoreOriginalState();
+				this._removeInactiveBinding( binding );
+
+			}
+
+		}
+
+	},
+
+	// remove a targeted clip from the cache
+	uncacheAction: function( clip, optionalRoot ) {
+
+		var action = this.existingAction( clip, optionalRoot );
+
+		if ( action !== null ) {
+
+			this._deactivateAction( action );
+			this._removeInactiveAction( action );
+
+		}
+
+	},
+
+	// DEPRECATED
+
+	findActionByName: function( name ) {
+
+		console.assert( false, "DEPRECATED: AnimationMixer.findActionByName" );
+
+		return this.clipAction( name );
+
+	},
+
+	play: function( action ) {
+
+		console.assert( false, "DEPRECATED: AnimationMixer.play" );
+
+		action.play();
+
+		return this;
+
+	},
+
+	fadeOut: function( action, duration ) {
+
+		console.assert( false, "DEPRECATED: AnimationMixer.fadeOut" );
+
+		action.fadeOut( duration );
+
+		return this;
+
+	},
+
+	fadeIn: function( action, duration ) {
+
+		console.assert( false, "DEPRECATED: AnimationMixer.fadeIn" );
+
+		action.fadeIn( duration );
+
+		return this;
+
+	},
+
+	warp: function( action, startTimeScale, endTimeScale, duration ) {
+
+		console.assert( false, "DEPRECATED: AnimationMixer.warp" );
+
+		action.warp( startTimeScale, endTimeScale, duration );
+
+		return this;
+
+	},
+
+	crossFade: function( fadeOutAction, fadeInAction, duration, warp ) {
+
+		console.assert( false, "DEPRECATED: AnimationMixer.crossFade" );
+
+		fadeOutAction.crossFadeTo( fadeInAction, duration, warp );
+
+		return this;
+
+	}
+
+};
+
+THREE.EventDispatcher.prototype.apply( THREE.AnimationMixer.prototype );
+
+THREE.AnimationMixer._Action =
+		function( mixer, clip, localRoot ) {
+
+	this._mixer = mixer;
+	this._clip = clip;
+	this._localRoot = localRoot || null;
+
+	var tracks = clip.tracks,
+		nTracks = tracks.length,
+		interpolants = new Array( nTracks );
+
+	var interpolantSettings = {
+			endingStart: 	THREE.ZeroCurvatureEnding,
+			endingEnd:		THREE.ZeroCurvatureEnding
+	};
+
+	for ( var i = 0; i !== nTracks; ++ i ) {
+
+		var interpolant = tracks[ i ].createInterpolant( null );
+		interpolants[ i ] = interpolant;
+		interpolant.settings = interpolantSettings
+
+	}
+	this._interpolantSettings = interpolantSettings;
+
+	this._interpolants = interpolants;
+	this._propertyBindings = new Array( nTracks );
+
+	this._timeScaleInterpolant = null;
+	this._weightInterpolant = null;
+
+	this._cacheIndex = null;
+	this._byClipCacheIndex = null;
+
+	this._effectiveTimeScale = 1;
+	this._effectiveWeight = 1;
+
+	this.loop = THREE.LoopRepeat;
+	this._loopCount = -1;
+
+	// global mixer time when the action is to be started
+	// it's set back to 'null' when the mixer has started this action
+	this.startTime_ = null;
+
+	// scaled local time of the action
+	// gets clamped or wrapped to 0..clip.duration according to loop
+	this.time = 0;
+
+	this.timeScale = 1;
+	this.weight = 1;
+
+	this.repetitions = Infinity; 		// no. of repetitions when looping
+
+	this.paused = false;				// false -> zero effective time scale
+	this.enabled = true;				// true -> zero effective weight
+
+	this.clampWhenFinished 	= true;		// keep feeding the last frame?
+
+	this.zeroSlopeAtStart 	= true;		// for smooth interpolation w/o separate
+	this.zeroSlopeAtEnd		= true;		// clips for start, loop and end
+
+};
+
+THREE.AnimationMixer._Action.prototype = {
+
+	constructor: THREE.AnimationMixer._Action,
+
+	// State & Scheduling
+
+	play: function() {
+
+		this._mixer._activateAction( this );
+
+		return this;
+
+	},
+
+	stop: function() {
+
+		this._mixer._deactivateAction( this );
+
+		return this.reset();
+
+	},
+
+	reset: function() {
+
+		this.paused = false;
+		this.enabled = true;
+
+		this.time = 0;			// restart clip
+		this._loopCount = -1;	// forget previous loops
+		this.startTime_ = null;	// forget scheduling
+
+		return this.stopFading().stopWarping();
+
+	},
+
+	isRunning: function() {
+
+		var start = this.startTime_;
+
+		return this.enabled && ! this.paused && this.timeScale !== 0 &&
+				this.startTime_ === null && this._mixer._isActiveAction( this )
+
+	},
+
+	// return true when play has been called
+	isScheduled: function() {
+
+		return this._mixer._isActiveAction( this );
+
+	},
+
+	startAt: function( time ) {
+
+		this.startTime_ = time;
+
+		return this;
+
+	},
+
+	setLoop: function( mode, repetitions ) {
+
+		this.loop = mode;
+		this.repetitions = repetitions;
+
+		return this;
+
+	},
+
+	// Weight
+
+	// set the weight stopping any scheduled fading
+	// although .enabled = false yields an effective weight of zero, this
+	// method does *not* change .enabled, because it would be confusing
+	setEffectiveWeight: function( weight ) {
+
+		this.weight = weight;
+
+		// note: same logic as when updated at runtime
+		this._effectiveWeight = this.enabled ? weight : 0;
+
+		return this.stopFading();
+
+	},
+
+	// return the weight considering fading and .enabled
+	getEffectiveWeight: function() {
+
+		return this._effectiveWeight;
+
+	},
+
+	fadeIn: function( duration ) {
+
+		return this._scheduleFading( duration, 0, 1 );
+
+	},
+
+	fadeOut: function( duration ) {
+
+		return this._scheduleFading( duration, 1, 0 );
+
+	},
+
+	crossFadeFrom: function( fadeOutAction, duration, warp ) {
+
+		var mixer = this._mixer;
+
+		fadeOutAction.fadeOut( duration );
+		this.fadeIn( duration );
+
+		if( warp ) {
+
+			var fadeInDuration = this._clip.duration,
+				fadeOutDuration = fadeOutAction._clip.duration,
+
+				startEndRatio = fadeOutDuration / fadeInDuration,
+				endStartRatio = fadeInDuration / fadeOutDuration;
+
+			fadeOutAction.warp( 1.0, startEndRatio, duration );
+			this.warp( endStartRatio, 1.0, duration );
+
+		}
+
+		return this;
+
+	},
+
+	crossFadeTo: function( fadeInAction, duration, warp ) {
+
+		return fadeInAction.crossFadeFrom( this, duration, warp );
+
+	},
+
+	stopFading: function() {
+
+		var weightInterpolant = this._weightInterpolant;
+
+		if ( weightInterpolant !== null ) {
+
+			this._weightInterpolant = null;
+			this._mixer._takeBackControlInterpolant( weightInterpolant );
+
+		}
+
+		return this;
+
+	},
+
+	// Time Scale Control
+
+	// set the weight stopping any scheduled warping
+	// although .paused = true yields an effective time scale of zero, this
+	// method does *not* change .paused, because it would be confusing
+	setEffectiveTimeScale: function( timeScale ) {
+
+		this.timeScale = timeScale;
+		this._effectiveTimeScale = this.paused ? 0 :timeScale;
+
+		return this.stopWarping();
+
+	},
+
+	// return the time scale considering warping and .paused
+	getEffectiveTimeScale: function() {
+
+		return this._effectiveTimeScale;
+
+	},
+
+	setDuration: function( duration ) {
+
+		this.timeScale = this._clip.duration / duration;
+
+		return this.stopWarping();
+
+	},
+
+	syncWith: function( action ) {
+
+		this.time = action.time;
+		this.timeScale = action.timeScale;
+
+		return this.stopWarping();
+
+	},
+
+	halt: function( duration ) {
+
+		return this.warp( this._currentTimeScale, 0, duration );
+
+	},
+
+	warp: function( startTimeScale, endTimeScale, duration ) {
+
+		var mixer = this._mixer, now = mixer.time,
+			interpolant = this._timeScaleInterpolant,
+
+			timeScale = this.timeScale;
+
+		if ( interpolant === null ) {
+
+			interpolant = mixer._lendControlInterpolant(),
+			this._timeScaleInterpolant = interpolant;
+
+		}
+
+		var times = interpolant.parameterPositions,
+			values = interpolant.sampleValues;
+
+		times[ 0 ] = now;
+		times[ 1 ] = now + duration;
+
+		values[ 0 ] = startTimeScale / timeScale;
+		values[ 1 ] = endTimeScale / timeScale;
+
+		return this;
+
+	},
+
+	stopWarping: function() {
+
+		var timeScaleInterpolant = this._timeScaleInterpolant;
+
+		if ( timeScaleInterpolant !== null ) {
+
+			this._timeScaleInterpolant = null;
+			this._mixer._takeBackControlInterpolant( timeScaleInterpolant );
+
+		}
+
+		return this;
+
+	},
+
+	// Object Accessors
+
+	getMixer: function() {
+
+		return this._mixer;
+
+	},
+
+	getClip: function() {
+
+		return this._clip;
+
+	},
+
+	getRoot: function() {
+
+		return this._localRoot || this._mixer._root;
+
+	},
+
+	// Interface used by the mixer:
+
+	updateWeight_: function( time ) {
+
+		var weight = 0;
+
+		if ( this.enabled ) {
+
+			weight = this.weight;
+			var interpolant = this._weightInterpolant;
+
+			if ( interpolant !== null ) {
+
+				var interpolantValue = interpolant.evaluate( time )[ 0 ];
+
+				weight *= interpolantValue;
+
+				if ( time > interpolant.parameterPositions[ 1 ] ) {
+
+					this.stopFading();
+
+					if ( interpolantValue === 0 ) {
+
+						// faded out, disable
+						this.enabled = false;
 
 					}
 
@@ -403,15 +715,44 @@ THREE.AnimationMixer.prototype = {
 
 			}
 
-			if ( mapChanged ) {
+		}
 
-				// when bindingsMap became empty, remove it from bindingsMaps
+		this._effectiveWeight = weight;
+		return weight;
 
-				remove_empty_map: {
+	},
 
-					for ( var k in bindingsMap ) break remove_empty_map;
+	updateTimeScale_: function( time ) {
 
-					delete bindingsMaps[ rootUuid ];
+		var timeScale = 0;
+
+		if ( ! this.paused ) {
+
+			timeScale = this.timeScale;
+
+			var interpolant = this._timeScaleInterpolant;
+
+			if ( interpolant !== null ) {
+
+				var interpolantValue = interpolant.evaluate( time )[ 0 ];
+
+				timeScale *= interpolantValue;
+
+				if ( time > interpolant.parameterPositions[ 1 ] ) {
+
+					this.stopWarping();
+
+					if ( timeScale === 0 ) {
+
+						// motion has halted, pause
+						this.pause = true;
+
+					} else {
+
+						// warp done - apply final time scale
+						this.timeScale = timeScale;
+
+					}
 
 				}
 
@@ -419,41 +760,671 @@ THREE.AnimationMixer.prototype = {
 
 		}
 
+		this._effectiveTimeScale = timeScale;
+		return timeScale;
+
 	},
 
-	_updateBindings: function() {
+	updateTime_: function( actionDeltaTime ) {
 
-		var bindingsMaps = this._bindingsMaps,
-			bindings = this._bindings,
-			writeIndex = 0;
+		var time = this.time + actionDeltaTime,
+			duration = this._clip.duration,
 
-		for ( var rootUuid in bindingsMaps ) {
+			direction = Math.sign( actionDeltaTime ),
 
-			var bindingsMap = bindingsMaps[ rootUuid ];
+			loop = this.loop,
+			loopCount = this._loopCount,
 
-			for ( var trackName in bindingsMap ) {
+			pingPong = false;
 
-				var propertyMixer = bindingsMap[ trackName ];
+		switch ( loop ) {
 
-				if ( propertyMixer.referenceCount !== 0 ) {
+			case THREE.LoopOnce:
+			case THREE.LoopOnceClamp:
 
-					bindings[ writeIndex ++ ] = propertyMixer;
+				if ( loopCount === -1 ) {
+
+					// just started
+
+					this.loopCount = 0;
+					this._setEndings( true, true, false );
 
 				}
+
+				if ( time >= duration ) {
+
+					time = duration;
+
+				} else if ( time < 0 ) {
+
+					time = 0;
+
+				} else break;
+
+				// reached the end
+
+				if ( this.clampWhenFinished ) this.pause = true;
+				else this.enabled = false;
+
+				this._mixer.dispatchEvent( {
+					type: 'finished', action: this, direction: direction
+				} );
+
+				break;
+
+			case THREE.LoopPingPong:
+
+				pingPong = true;
+
+			case THREE.LoopRepeat:
+
+				if ( loopCount === -1 ) {
+
+					// just started
+
+					loopCount = 0;
+
+					var atStart = direction > 0;
+					this._setEndings( atStart, ! atStart, pingPong );
+
+				}
+
+				if ( time >= duration || time < 0 ) {
+
+					// wrap around
+
+					var loopDelta = Math.floor( time / duration ); // signed
+					time -= duration * loopDelta;
+
+					loopCount += loopDelta * direction;
+
+					var pending = this.repetitions - loopCount;
+
+					if ( pending < 0 ) {
+
+						// stop (switch state, clamp time, fire event)
+
+						if ( this.clampWhenFinished ) this.paused = true;
+						else this.enabled = false;
+
+						time = direction < 0 ? 0 : duration;
+
+						this._mixer.dispatchEvent( {
+							type: 'finished', action: this,
+							direction: direction
+						} );
+
+						break;
+
+					} else if ( pending === 0 ) {
+
+						// transition to last round
+
+						var atStart = direction < 0;
+						this._setEndings( atStart, ! atStart, pingPong );
+
+					} else {
+
+						this._setEndings( false, false, pingPong );
+
+					}
+
+					this._loopCount = loopCount;
+
+					this._mixer.dispatchEvent( {
+						type: 'loop', action: this, loopDelta: loopDelta
+					} );
+
+				}
+
+				if ( loop === THREE.LoopPingPong && ( loopCount & 1 ) === 1 ) {
+
+					// invert time for the "pong round"
+
+					this.time = time;
+
+					return duration - time;
+
+				}
+
+				break;
+
+		}
+
+		this.time = time;
+
+		return time;
+
+	},
+
+	// Interna
+
+	_setEndings: function( atStart, atEnd, pingPong ) {
+
+		var settings = this._interpolantSettings;
+
+		if ( pingPong ) {
+
+			settings.endingStart 	= THREE.ZeroSlopeEnding;
+			settings.endingEnd		= THREE.ZeroSlopeEnding;
+
+		} else {
+
+			// assuming for LoopOnce atStart == atEnd == true
+
+			if ( atStart ) {
+
+				settings.endingStart = this.zeroSlopeAtStart ?
+						THREE.ZeroSlopeEnding : THREE.ZeroCurvatureEnding;
+
+			} else {
+
+				settings.endingStart = THREE.WrapAroundEnding;
+
+			}
+
+			if ( atEnd ) {
+
+				settings.endingEnd = this.zeroSlopeAtEnd ?
+						THREE.ZeroSlopeEnding : THREE.ZeroCurvatureEnding;
+
+			} else {
+
+				settings.endingEnd 	 = THREE.WrapAroundEnding;
 
 			}
 
 		}
 
-		bindings.length = writeIndex;
-
 	},
 
-	_FadeInValues: Float64Array.of( 0, 1 ),
-	_FadeOutValues: Float64Array.of( 1, 0 ),
+	_scheduleFading: function( duration, weightNow, weightThen ) {
 
-	_tmp: new Float64Array( 1 )
+		var mixer = this._mixer, now = mixer.time,
+			interpolant = this._weightInterpolant;
+
+		if ( interpolant === null ) {
+
+			interpolant = mixer._lendControlInterpolant(),
+			this._weightInterpolant = interpolant;
+
+		}
+
+		var times = interpolant.parameterPositions,
+			values = interpolant.sampleValues;
+
+		times[ 0 ] = now; 				values[ 0 ] = weightNow;
+		times[ 1 ] = now + duration;	values[ 1 ] = weightThen;
+
+		return this;
+
+	}
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.AnimationMixer.prototype );
+// Implementation details:
+
+Object.assign( THREE.AnimationMixer.prototype, {
+
+	_bindAction: function( action, prototypeAction ) {
+
+		var root = action._localRoot || this._root,
+			tracks = action._clip.tracks,
+			nTracks = tracks.length,
+			bindings = action._propertyBindings,
+			interpolants = action._interpolants,
+			rootUuid = root.uuid,
+			bindingsByRoot = this._bindingsByRootAndName,
+			bindingsByName = bindingsByRoot[ rootUuid ];
+
+		if ( bindingsByName === undefined ) {
+
+			bindingsByName = {};
+			bindingsByRoot[ rootUuid ] = bindingsByName;
+
+		}
+
+		for ( var i = 0; i !== nTracks; ++ i ) {
+
+			var track = tracks[ i ],
+				trackName = track.name,
+				binding = bindingsByName[ trackName ];
+
+			if ( binding !== undefined ) {
+
+				bindings[ i ] = binding;
+
+			} else {
+
+				binding = bindings[ i ];
+
+				if ( binding !== undefined ) {
+
+					// existing binding, make sure the cache knows
+
+					if ( binding._cacheIndex === null ) {
+
+						++ binding.referenceCount;
+						this._addInactiveBinding( binding, rootUuid, trackName );
+
+					}
+
+					continue;
+
+				}
+
+				var path = prototypeAction && prototypeAction.
+						_propertyBindings[ i ].binding.parsedPath;
+
+				binding = new THREE.PropertyMixer(
+						THREE.PropertyBinding.create( root, trackName, path ),
+						track.ValueTypeName, track.getValueSize() );
+
+				++ binding.referenceCount;
+				this._addInactiveBinding( binding, rootUuid, trackName );
+
+				bindings[ i ] = binding;
+
+			}
+
+			interpolants[ i ].resultBuffer = binding.buffer;
+
+		}
+
+	},
+
+	_activateAction: function( action ) {
+
+		if ( ! this._isActiveAction( action ) ) {
+
+			if ( action._cacheIndex === null ) {
+
+				// this action has been forgotten by the cache, but the user
+				// appears to be still using it -> rebind
+
+				var rootUuid = ( action._localRoot || this._root ).uuid,
+					clipName = action._clip.name,
+					actionsForClip = this._actionsByClip[ clipName ];
+
+				this._bindAction( action,
+						actionsForClip && actionsForClip.knownActions[ 0 ] );
+
+				this._addInactiveAction( action, clipName, rootUuid );
+
+			}
+
+			var bindings = action._propertyBindings;
+
+			// increment reference counts / sort out state
+			for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+
+				var binding = bindings[ i ];
+
+				if ( binding.useCount ++ === 0 ) {
+
+					this._lendBinding( binding );
+					binding.saveOriginalState();
+
+				}
+
+			}
+
+			this._lendAction( action );
+
+		}
+
+	},
+
+	_deactivateAction: function( action ) {
+
+		if ( this._isActiveAction( action ) ) {
+
+			var bindings = action._propertyBindings;
+
+			// decrement reference counts / sort out state
+			for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+
+				var binding = bindings[ i ];
+
+				if ( -- binding.useCount === 0 ) {
+
+					binding.restoreOriginalState();
+					this._takeBackBinding( binding );
+
+				}
+
+			}
+
+			this._takeBackAction( action );
+
+		}
+
+	},
+
+	// Memory manager
+
+	_initMemoryManager: function() {
+
+		this._actions = []; // 'nActiveActions' followed by inactive ones
+		this._nActiveActions = 0;
+
+		this._actionsByClip = {};
+		// inside:
+		// {
+		// 		knownActions: Array< _Action >	- used as prototypes
+		// 		actionByRoot: _Action			- lookup
+		// }
+
+
+		this._bindings = []; // 'nActiveBindings' followed by inactive ones
+		this._nActiveBindings = 0;
+
+		this._bindingsByRootAndName = {}; // inside: Map< name, PropertyMixer >
+
+
+		this._controlInterpolants = []; // same game as above
+		this._nActiveControlInterpolants = 0;
+
+		var scope = this;
+
+		this.stats = {
+
+			actions: {
+				get total() { return scope._actions.length; },
+				get inUse() { return scope._nActiveActions; }
+			},
+			bindings: {
+				get total() { return scope._bindings.length; },
+				get inUse() { return scope._nActiveBindings; }
+			},
+			controlInterpolants: {
+				get total() { return scope._controlInterpolants.length; },
+				get inUse() { return scope._nActiveControlInterpolants; }
+			}
+
+		};
+
+	},
+
+	// Memory management for _Action objects
+
+	_isActiveAction: function( action ) {
+
+		var index = action._cacheIndex;
+		return index !== null && index < this._nActiveActions;
+
+	},
+
+	_addInactiveAction: function( action, clipName, rootUuid ) {
+
+		var actions = this._actions,
+			actionsByClip = this._actionsByClip,
+			actionsForClip = actionsByClip[ clipName ];
+
+		if ( actionsForClip === undefined ) {
+
+			actionsForClip = {
+
+				knownActions: [ action ],
+				actionByRoot: {}
+
+			};
+
+			action._byClipCacheIndex = 0;
+
+			actionsByClip[ clipName ] = actionsForClip;
+
+		} else {
+
+			var knownActions = actionsForClip.knownActions;
+
+			action._byClipCacheIndex = knownActions.length;
+			knownActions.push( action );
+
+		}
+
+		action._cacheIndex = actions.length;
+		actions.push( action );
+
+		actionsForClip.actionByRoot[ rootUuid ] = action;
+
+	},
+
+	_removeInactiveAction: function( action ) {
+
+		var actions = this._actions,
+			lastInactiveAction = actions[ actions.length - 1 ],
+			cacheIndex = action._cacheIndex;
+
+		lastInactiveAction._cacheIndex = cacheIndex;
+		actions[ cacheIndex ] = lastInactiveAction;
+		actions.pop();
+
+		action._cacheIndex = null;
+
+
+		var clipName = action._clip.name,
+			actionsByClip = this._actionsByClip,
+			actionsForClip = actionsByClip[ clipName ],
+			knownActionsForClip = actionsForClip.knownActions,
+
+			lastKnownAction =
+				knownActionsForClip[ knownActionsForClip.length - 1 ],
+
+			byClipCacheIndex = action._byClipCacheIndex;
+
+		lastKnownAction._byClipCacheIndex = byClipCacheIndex;
+		knownActionsForClip[ byClipCacheIndex ] = lastKnownAction;
+		knownActionsForClip.pop();
+
+		action._byClipCacheIndex = null;
+
+
+		var actionByRoot = actionsForClip.actionByRoot,
+			rootUuid = ( actions._localRoot || this._root ).uuid;
+
+		delete actionByRoot[ rootUuid ];
+
+		if ( knownActionsForClip.length === 0 ) {
+
+			delete actionsByClip[ clipName ];
+
+		}
+
+		this._removeInactiveBindingsForAction( action );
+
+	},
+
+	_removeInactiveBindingsForAction: function( action ) {
+
+		var bindings = action._propertyBindings;
+		for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+
+			var binding = bindings[ i ];
+
+			if ( -- binding.referenceCount === 0 ) {
+
+				this._removeInactiveBinding( binding );
+
+			}
+
+		}
+
+	},
+
+	_lendAction: function( action ) {
+
+		// [ active actions |  inactive actions  ]
+		// [  active actions >| inactive actions ]
+		//                 s        a
+		//                  <-swap->
+		//                 a        s
+
+		var actions = this._actions,
+			prevIndex = action._cacheIndex,
+
+			lastActiveIndex = this._nActiveActions ++,
+
+			firstInactiveAction = actions[ lastActiveIndex ];
+
+		action._cacheIndex = lastActiveIndex;
+		actions[ lastActiveIndex ] = action;
+
+		firstInactiveAction._cacheIndex = prevIndex;
+		actions[ prevIndex ] = firstInactiveAction;
+
+	},
+
+	_takeBackAction: function( action ) {
+
+		// [  active actions  | inactive actions ]
+		// [ active actions |< inactive actions  ]
+		//        a        s
+		//         <-swap->
+		//        s        a
+
+		var actions = this._actions,
+			prevIndex = action._cacheIndex,
+
+			firstInactiveIndex = -- this._nActiveActions,
+
+			lastActiveAction = actions[ firstInactiveIndex ];
+
+		action._cacheIndex = firstInactiveIndex;
+		actions[ firstInactiveIndex ] = action;
+
+		lastActiveAction._cacheIndex = prevIndex;
+		actions[ prevIndex ] = lastActiveAction;
+
+	},
+
+	// Memory management for PropertyMixer objects
+
+	_addInactiveBinding: function( binding, rootUuid, trackName ) {
+
+		var bindingsByRoot = this._bindingsByRootAndName,
+			bindingByName = bindingsByRoot[ rootUuid ],
+
+			bindings = this._bindings;
+
+		if ( bindingByName === undefined ) {
+
+			bindingByName = {};
+			bindingsByRoot[ rootUuid ] = bindingByName;
+
+		}
+
+		bindingByName[ trackName ] = binding;
+
+		binding._cacheIndex = bindings.length;
+		bindings.push( binding );
+
+	},
+
+	_removeInactiveBinding: function( binding ) {
+
+		var bindings = this._bindings,
+			propBinding = binding.binding,
+			rootUuid = propBinding.rootNode.uuid,
+			trackName = propBinding.path,
+			bindingsByRoot = this._bindingsByRootAndName,
+			bindingByName = bindingsByRoot[ rootUuid ],
+
+			lastInactiveBinding = bindings[ bindings.length - 1 ],
+			cacheIndex = binding._cacheIndex;
+
+		lastInactiveBinding._cacheIndex = cacheIndex;
+		bindings[ cacheIndex ] = lastInactiveBinding;
+		bindings.pop();
+
+		delete bindingByName[ trackName ];
+
+		remove_empty_map: {
+
+			for ( var _ in bindingByName ) break remove_empty_map;
+
+			delete bindingsByRoot[ rootUuid ];
+
+		}
+
+	},
+
+	_lendBinding: function( binding ) {
+
+		var bindings = this._bindings,
+			prevIndex = binding._cacheIndex,
+
+			lastActiveIndex = this._nActiveBindings ++,
+
+			firstInactiveBinding = bindings[ lastActiveIndex ];
+
+		binding._cacheIndex = lastActiveIndex;
+		bindings[ lastActiveIndex ] = binding;
+
+		firstInactiveBinding._cacheIndex = prevIndex;
+		bindings[ prevIndex ] = firstInactiveBinding;
+
+	},
+
+	_takeBackBinding: function( binding ) {
+
+		var bindings = this._bindings,
+			prevIndex = binding._cacheIndex,
+
+			firstInactiveIndex = -- this._nActiveBindings,
+
+			lastActiveBinding = bindings[ firstInactiveIndex ];
+
+		binding._cacheIndex = firstInactiveIndex;
+		bindings[ firstInactiveIndex ] = binding;
+
+		lastActiveBinding._cacheIndex = prevIndex;
+		bindings[ prevIndex ] = lastActiveBinding;
+
+	},
+
+
+	// Memory management of Interpolants for weight and time scale
+
+	_lendControlInterpolant: function() {
+
+		var interpolants = this._controlInterpolants,
+			lastActiveIndex = this._nActiveControlInterpolants ++,
+			interpolant = interpolants[ lastActiveIndex ];
+
+		if ( interpolant === undefined ) {
+
+			interpolant = new THREE.LinearInterpolant(
+					new Float32Array( 2 ), new Float32Array( 2 ),
+						1, this._controlInterpolantsResultBuffer_ );
+
+			interpolant.__cacheIndex = lastActiveIndex;
+			interpolants[ lastActiveIndex ] = interpolant;
+
+		}
+
+		return interpolant;
+
+	},
+
+	_takeBackControlInterpolant: function( interpolant ) {
+
+		var interpolants = this._controlInterpolants,
+			prevIndex = interpolant.__cacheIndex,
+
+			firstInactiveIndex = -- this._nActiveControlInterpolants,
+
+			lastActiveInterpolant = interpolants[ firstInactiveIndex ];
+
+		interpolant.__cacheIndex = firstInactiveIndex;
+		interpolants[ firstInactiveIndex ] = interpolant;
+
+		lastActiveInterpolant.__cacheIndex = prevIndex;
+		interpolants[ prevIndex ] = lastActiveInterpolant;
+
+	},
+
+	_controlInterpolantsResultBuffer: new Float32Array( 1 )
+
+} );
+
