@@ -23059,7 +23059,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.Sprite ) {
 
-				sprites.push( object );
+				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+
+					sprites.push( object );
+
+				}
 
 			} else if ( object instanceof THREE.LensFlare ) {
 
