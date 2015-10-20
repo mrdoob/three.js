@@ -300,66 +300,6 @@ THREE.AnimationMixer.prototype = {
 
 		}
 
-	},
-
-	// DEPRECATED
-
-	findActionByName: function( name ) {
-
-		console.assert( false, "DEPRECATED: AnimationMixer.findActionByName" );
-
-		return this.clipAction( name );
-
-	},
-
-	play: function( action ) {
-
-		console.assert( false, "DEPRECATED: AnimationMixer.play" );
-
-		action.play();
-
-		return this;
-
-	},
-
-	fadeOut: function( action, duration ) {
-
-		console.assert( false, "DEPRECATED: AnimationMixer.fadeOut" );
-
-		action.fadeOut( duration );
-
-		return this;
-
-	},
-
-	fadeIn: function( action, duration ) {
-
-		console.assert( false, "DEPRECATED: AnimationMixer.fadeIn" );
-
-		action.fadeIn( duration );
-
-		return this;
-
-	},
-
-	warp: function( action, startTimeScale, endTimeScale, duration ) {
-
-		console.assert( false, "DEPRECATED: AnimationMixer.warp" );
-
-		action.warp( startTimeScale, endTimeScale, duration );
-
-		return this;
-
-	},
-
-	crossFade: function( fadeOutAction, fadeInAction, duration, warp ) {
-
-		console.assert( false, "DEPRECATED: AnimationMixer.crossFade" );
-
-		fadeOutAction.crossFadeTo( fadeInAction, duration, warp );
-
-		return this;
-
 	}
 
 };
