@@ -55,20 +55,36 @@ vec3 F_Schlick( const in vec3 F0, const in float dotLH ) {
 
 }
 
-float G_SmithSchlick( float roughness2, float dotNL, float dotNV ) {
+// Microfacet Models for Refraction through Rough Surfaces - equation (34)
+// http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
+// alpha is "roughness squared" in Disney’s reparameterization
+float G_GGX_Smith( in float alpha, in float dotNL, in float dotNV ) {
 
-	float termL = ( dotNL + sqrt( roughness2 + ( 1.0 - roughness2 ) * dotNL * dotNL ) );
-	float termV = ( dotNV + sqrt( roughness2 + ( 1.0 - roughness2 ) * dotNV * dotNV ) );
-	
-	return 1.0 / ( abs( termL * termV ) + 0.0000001 );
+	// geometry term = G(l) . G(v) / 4(n . l)(n. v)
+
+	float a2 = alpha * alpha;
+
+	float gl = dotNL + pow( a2 + ( 1.0 - a2 ) * dotNL * dotNL, 0.5 );
+
+	float gv = dotNV + pow( a2 + ( 1.0 - a2 ) * dotNV * dotNV, 0.5 );
+
+	return 1.0 / ( gl * gv );
 
 }
 
-float D_GGX( float roughness2, float dotNH ) {
 
-	// should 1/PI be in this distribution?
-	float denom = dotNH * dotNH * ( roughness2 - 1.0 ) + 1.0;
-	return roughness2 / ( PI * denom * denom + 0.0000001 );
+// Microfacet Models for Refraction through Rough Surfaces - equation (33)
+// http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
+// alpha is "roughness squared" in Disney’s reparameterization
+float D_GGX( in float alpha, in float dotNH ) {
+
+	// factor of 1/PI in distribution term omitted
+
+	float a2 = alpha * alpha;
+
+	float denom = dotNH * dotNH * ( a2 - 1.0 ) + 1.0; // avoid alpha = 0 with dotNH = 1
+
+	return a2 / ( denom * denom );
 
 }
 
@@ -113,5 +129,24 @@ void BRDF_BlinnPhong( const in IncidentLight incidentLight, const in GeometricCo
 	float D = D_BlinnPhong( shininess, dotNH );
 
 	reflectedLight.specular += incidentLight.color * F * ( G * D );
+
+}
+
+// ref: https://www.unrealengine.com/blog/physically-based-shading-on-mobile - environmentBRDF for GGX on mobile
+vec3 envBRDFApprox( vec3 specularColor, float roughness, in vec3 normal, in vec3 viewDir  ) {
+
+	float dotNV = saturate( dot( normal, viewDir ) );
+
+	const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );
+
+	const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );
+
+	vec4 r = roughness * c0 + c1;
+
+	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;
+
+	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
+
+	return specularColor * AB.x + AB.y;
 
 }
