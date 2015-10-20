@@ -387,8 +387,6 @@ THREE.ShaderLib = {
 
 				"directReflectedLight.diffuse *= shadowMask;",
 				"directReflectedLight.specular *= shadowMask;",
-				"indirectReflectedLight.diffuse *= shadowMask;",
-				"indirectReflectedLight.specular *= shadowMask;",
 
 				"#ifdef METAL",
 
