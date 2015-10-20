@@ -64,6 +64,24 @@ THREE.UniformsLib = {
 
 	},
 
+	roughnessmap: {
+
+		"roughnessMap" : { type: "t", value: null }
+
+	},
+
+	reflectivitymap: {
+
+		"reflectivityMap" : { type: "t", value: null }
+
+	},
+
+	metalnessmap: {
+
+		"metalnessMap" : { type: "t", value: null }
+
+	},
+
 	fog : {
 
 		"fogDensity" : { type: "f", value: 0.00025 },
