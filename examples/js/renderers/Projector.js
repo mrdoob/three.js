@@ -223,7 +223,7 @@ THREE.Projector = function () {
 			_points3[ 1 ] = v2.positionScreen;
 			_points3[ 2 ] = v3.positionScreen;
 
-			return _clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points3 ) );
+			return _clipBox.intersectsBox( _boundingBox.setFromPoints( _points3 ) );
 
 		}
 

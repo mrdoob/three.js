@@ -231,7 +231,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	isIntersectionBox: function ( box ) {
+	intersectsBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 
@@ -247,11 +247,19 @@ THREE.Box3.prototype = {
 
 	},
 
-	isIntersectionSphere: ( function () {
+	isIntersectionBox: function ( box ) {
+
+		console.warn( 'THREE.Box3: .isIntersectionBox() has been renamed to .intersectsBox().' );
+
+		return this.intersectsBox( box );
+
+	},
+
+	intersectsSphere: ( function () {
 
 		var closestPoint;
 
-		return function isIntersectionSphere( sphere ) {
+		return function intersectsSphere( sphere ) {
 
 			if ( closestPoint === undefined ) closestPoint = new THREE.Vector3();
 
@@ -264,6 +272,14 @@ THREE.Box3.prototype = {
 		};
 
 	} )(),
+
+	isIntersectionSphere: function ( sphere ) {
+
+		console.warn( 'THREE.Box3: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
+
+		return this.intersectsSphere( sphere );
+
+	},
 
 	clampPoint: function ( point, optionalTarget ) {
 
