@@ -787,6 +787,12 @@ Sidebar.Material = function ( editor ) {
 
 		}
 
+		if ( material.energyConserving !== undefined ) {
+
+			materialEnergyConserving.setValue( material.energyConserving );
+
+		}
+
 		if ( material.map !== undefined ) {
 
 			materialMapEnabled.setValue( material.map !== null );

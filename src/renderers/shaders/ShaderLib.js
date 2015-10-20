@@ -139,7 +139,6 @@ THREE.ShaderLib = {
 			"#endif",
 
 			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "math" ],
 			THREE.ShaderChunk[ "uv_pars_vertex" ],
 			THREE.ShaderChunk[ "uv2_pars_vertex" ],
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
@@ -338,8 +337,7 @@ THREE.ShaderLib = {
 			"uniform float shininess;",
 			"uniform float opacity;",
 
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "math" ],
+			THREE.ShaderChunk[ "common" ],	
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "uv_pars_fragment" ],
 			THREE.ShaderChunk[ "uv2_pars_fragment" ],
