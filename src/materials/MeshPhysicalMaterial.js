@@ -59,11 +59,11 @@
  * }
  */
 
-THREE.MeshStandardMaterial = function ( parameters ) {
+THREE.MeshPhysicalMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
-	this.type = 'MeshStandardMaterial';
+	this.type = 'MeshPhysicalMaterial';
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
 	this.roughness = 0.5;
@@ -124,10 +124,10 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 
 };
 
-THREE.MeshStandardMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshStandardMaterial.prototype.constructor = THREE.MeshStandardMaterial;
+THREE.MeshPhysicalMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.MeshPhysicalMaterial.prototype.constructor = THREE.MeshPhysicalMaterial;
 
-THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
+THREE.MeshPhysicalMaterial.prototype.copy = function ( source ) {
 
 	THREE.Material.prototype.copy.call( this, source );
 

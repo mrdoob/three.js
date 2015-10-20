@@ -409,7 +409,7 @@ THREE.ShaderLib = {
 
 	},
 
-	'standard': {
+	'physical': {
 
 		uniforms: THREE.UniformsUtils.merge( [
 
@@ -438,7 +438,7 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
-			"#define STANDARD",
+			"#define PHYSICAL",
 
 			"varying vec3 vViewPosition;",
 
@@ -461,7 +461,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
 
-			"void main() {", // STANDARD
+			"void main() {", // PHYSICAL
 
 				THREE.ShaderChunk[ "uv_vertex" ],
 				THREE.ShaderChunk[ "uv2_vertex" ],
@@ -499,7 +499,7 @@ THREE.ShaderLib = {
 
 		fragmentShader: [
 
-			"#define STANDARD",
+			"#define PHYSICAL",
 
 			"uniform vec3 diffuse;",
 			"uniform vec3 emissive;",
@@ -552,7 +552,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "emissivemap_fragment" ],
 
-				THREE.ShaderChunk[ "lights_standard_fragment" ],
+				THREE.ShaderChunk[ "lights_physical_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 				"totalDiffuseLight *= shadowMask;",
@@ -560,7 +560,7 @@ THREE.ShaderLib = {
 
 				"outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;",
 
-				THREE.ShaderChunk[ "envmap_standard_fragment" ],
+				THREE.ShaderChunk[ "envmap_physical_fragment" ],
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
