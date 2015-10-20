@@ -10,9 +10,7 @@ ReflectedLight backReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
-		IncidentLight directLight;
-
-		getPointDirectLight( pointLights[ i ], geometry, directLight );
+		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
 
 		BRDF_Lambert( directLight, geometry, diffuse, frontReflectedLight );
 
@@ -30,9 +28,7 @@ ReflectedLight backReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
-		IncidentLight directLight;
-
-		getSpotDirectLight( spotLights[ i ], geometry, directLight );
+		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );
 
 		BRDF_Lambert( directLight, geometry, diffuse, frontReflectedLight );
 
@@ -50,9 +46,7 @@ ReflectedLight backReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 
 	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-		IncidentLight directLight;
-
-		getDirectionalDirectLight( directionalLights[ i ], geometry, directLight );
+		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
 
 		BRDF_Lambert( directLight, geometry, diffuse, frontReflectedLight );
 
@@ -70,9 +64,7 @@ ReflectedLight backReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 
 	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		IncidentLight indirectLight;
-
-		getHemisphereIndirectLight( hemisphereLights[ i ], geometry, indirectLight );
+		IncidentLight indirectLight = getHemisphereIndirectLight( hemisphereLights[ i ], geometry );
 
 		BRDF_Lambert( indirectLight, geometry, diffuse, frontReflectedLight );
 

@@ -10,11 +10,14 @@ uniform vec3 ambientLightColor;
 
 	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];
 
-	void getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight ) { 
+	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) { 
+
+		IncidentLight directLight;
 	
 		directLight.color = directionalLight.color;
 		directLight.direction = directionalLight.direction; 
 
+		return directLight;
 	}
 
 #endif
@@ -31,8 +34,10 @@ uniform vec3 ambientLightColor;
 
 	uniform PointLight pointLights[ MAX_POINT_LIGHTS ];
 
-	void getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight directLight ) { 
+	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) { 
 	
+		IncidentLight directLight;
+
 		vec3 lightPosition = pointLight.position; 
 	
 		vec3 lVector = lightPosition - geometry.position; 
@@ -41,6 +46,7 @@ uniform vec3 ambientLightColor;
 		directLight.color = pointLight.color; 
 		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay ); 
 	
+		return directLight;
 	}
 
 #endif
@@ -60,8 +66,10 @@ uniform vec3 ambientLightColor;
 
 	uniform SpotLight spotLights[ MAX_SPOT_LIGHTS ];
 
-	void getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight ) {
+	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {
 	
+		IncidentLight directLight;
+
 		vec3 lightPosition = spotLight.position;
 	
 		vec3 lVector = lightPosition - geometry.position;
@@ -73,6 +81,7 @@ uniform vec3 ambientLightColor;
 		directLight.color = spotLight.color;
 		directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
 
+		return directLight;
 	}
 
 #endif
@@ -88,14 +97,17 @@ uniform vec3 ambientLightColor;
 
 	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
 
-	void getHemisphereIndirectLight( const in HemisphereLight hemiLight, const in GeometricContext geometry, out IncidentLight indirectLight ) { 
+	IncidentLight getHemisphereIndirectLight( const in HemisphereLight hemiLight, const in GeometricContext geometry ) { 
 	
+		IncidentLight directLight;
+
 		float dotNL = dot( geometry.normal, hemiLight.direction );
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
 
 		indirectLight.color = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
 		indirectLight.direction = geometry.normal;
 
+		return indirectLight;
 	}
 
 #endif
