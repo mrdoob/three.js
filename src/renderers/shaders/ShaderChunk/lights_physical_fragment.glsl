@@ -11,6 +11,15 @@ vec3 specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );
 diffuseColor.rgb *= ( 1.0 - metalnessFactor );
 
 
+#if defined( ENERGY_PRESERVING_RGB )
+
+	diffuseColor *= whiteCompliment( specularColor );
+
+#elif defined( ENERGY_PRESERVING_MONOCHROME )
+
+	diffuseColor *= whiteCompliment( luminance( specularColor ) );
+
+#endif
 
 GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal ), normalize(vViewPosition ) );
 
@@ -24,7 +33,7 @@ ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 )
 
 		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
 
-		BRDF_Lambert( directLight, geometry, diffuse, directReflectedLight );
+		BRDF_Lambert( directLight, geometry, diffuseColor, directReflectedLight );
 
 		BRDF_GGX( directLight, geometry, specularColor, roughnessFactor, directReflectedLight );
 
@@ -38,7 +47,7 @@ ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 )
 
 		IncidentLight directLight = getSpotDirectLight( pointLights[ i ], geometry );
 
-		BRDF_Lambert( directLight, geometry, diffuse, directReflectedLight );
+		BRDF_Lambert( directLight, geometry, diffuseColor, directReflectedLight );
 
 		BRDF_GGX( directLight, geometry, specularColor, roughnessFactor, directReflectedLight );
 
@@ -52,7 +61,7 @@ ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 )
 
 		IncidentLight directLight = getDirectionalDirectLight( pointLights[ i ], geometry );
 
-		BRDF_Lambert( directLight, geometry, diffuse, directReflectedLight );
+		BRDF_Lambert( directLight, geometry, diffuseColor, directReflectedLight );
 
 		BRDF_GGX( directLight, geometry, specularColor, roughnessFactor, directReflectedLight );
 
@@ -66,7 +75,7 @@ ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 )
 
 		IncidentLight indirectLight = getHemisphereIndirectLight( hemisphereLights[ i ], geometry );
 
-		BRDF_Lambert( indirectLight, geometry, diffuse, indirectReflectedLight );
+		BRDF_Lambert( indirectLight, geometry, diffuseColor, indirectReflectedLight );
 
 	}
 
