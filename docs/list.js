@@ -4,7 +4,6 @@ var list = {
 		"Introduction": [
 			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
 			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
-
 		]
 	},
 
@@ -32,7 +31,7 @@ var list = {
 			[ "Face3", "api/core/Face3" ],
 			[ "Geometry", "api/core/Geometry" ],
 			[ "Object3D", "api/core/Object3D" ],
-			[ "Raycaster", "api/core/Raycaster" ],
+			[ "Raycaster", "api/core/Raycaster" ]
 		],
 
 		"Lights": [
@@ -80,7 +79,6 @@ var list = {
 			[ "PointsMaterial", "api/materials/PointsMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
-			[ "SpriteCanvasMaterial", "api/materials/SpriteCanvasMaterial" ],
 			[ "SpriteMaterial", "api/materials/SpriteMaterial" ]
 		],
 
@@ -240,7 +238,8 @@ var list = {
 
 		"Examples" : [
 			[ "CombinedCamera", "api/examples/cameras/CombinedCamera" ],
-			[ "LookupTable", "api/examples/Lut" ]
+			[ "LookupTable", "api/examples/Lut" ],
+			[ "SpriteCanvasMaterial", "api/examples/SpriteCanvasMaterial" ]
 
 		]
 

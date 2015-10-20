@@ -39,9 +39,11 @@ THREE.XHRLoader.prototype = {
 
 		request.addEventListener( 'load', function ( event ) {
 
-			THREE.Cache.add( url, this.response );
+			var response = event.target.response;
 
-			if ( onLoad ) onLoad( this.response );
+			THREE.Cache.add( url, response );
+
+			if ( onLoad ) onLoad( response );
 
 			scope.manager.itemEnd( url );
 

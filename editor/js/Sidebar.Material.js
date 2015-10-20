@@ -353,7 +353,7 @@ Sidebar.Material = function ( editor ) {
 	// opacity
 
 	var materialOpacityRow = new UI.Panel();
-	var materialOpacity = new UI.Number().setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+	var materialOpacity = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
 
 	materialOpacityRow.add( new UI.Text( 'Opacity' ).setWidth( '90px' ) );
 	materialOpacityRow.add( materialOpacity );

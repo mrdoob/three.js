@@ -10,7 +10,7 @@ THREE.VideoTexture = function ( video, mapping, wrapS, wrapT, magFilter, minFilt
 
 	var scope = this;
 
-	var update = function () {
+	function update() {
 
 		requestAnimationFrame( update );
 
@@ -20,7 +20,7 @@ THREE.VideoTexture = function ( video, mapping, wrapS, wrapT, magFilter, minFilt
 
 		}
 
-	};
+	}
 
 	update();
 

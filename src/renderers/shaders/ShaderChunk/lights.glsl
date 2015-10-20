@@ -1,16 +1,4 @@
-
-
-float calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {
-
-	if ( decayExponent > 0.0 ) {
-
-	  return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
-
-	}
-
-	return 1.0;
-
-}
+uniform vec3 ambientLightColor;
 
 
 #if MAX_DIR_LIGHTS > 0
@@ -104,7 +92,7 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 	
 		float dotNL = dot( geometry.normal, hemiLight.direction );
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
-		
+
 		indirectLight.color = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
 		indirectLight.direction = geometry.normal;
 

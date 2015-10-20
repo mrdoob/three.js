@@ -1,5 +1,18 @@
 //#define ENERGY_PRESERVING_MONOCHROME
 
+float calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {
+
+	if ( decayExponent > 0.0 ) {
+
+	  return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
+
+	}
+
+	return 1.0;
+
+}
+
+
 void BRDF_Lambert( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 diffuseColor, inout ReflectedLight reflectedLight ) {
 
 	float lambertianReflectance = saturate( dot( geometryContext.normal, incidentLight.direction ) );

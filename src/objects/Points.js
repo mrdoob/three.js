@@ -32,11 +32,7 @@ THREE.Points.prototype.raycast = ( function () {
 
 		if ( geometry.boundingBox !== null ) {
 
-			if ( ray.isIntersectionBox( geometry.boundingBox ) === false ) {
-
-				return;
-
-			}
+			if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
 
 		}
 
@@ -123,31 +119,6 @@ THREE.Points.prototype.raycast = ( function () {
 THREE.Points.prototype.clone = function () {
 
 	return new this.constructor( this.geometry, this.material ).copy( this );
-
-};
-
-THREE.Points.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	// only serialize if not in meta geometries cache
-	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
-
-		meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON();
-
-	}
-
-	// only serialize if not in meta materials cache
-	if ( meta.materials[ this.material.uuid ] === undefined ) {
-
-		meta.materials[ this.material.uuid ] = this.material.toJSON();
-
-	}
-
-	data.object.geometry = this.geometry.uuid;
-	data.object.material = this.material.uuid;
-
-	return data;
 
 };
 

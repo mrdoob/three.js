@@ -86,9 +86,3 @@ ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 )
 	}
 
 #endif
-
-
-outgoingLight +=
-	directReflectedLight.specular + directReflectedLight.diffuse +
-	indirectReflectedLight.specular + indirectReflectedLight.diffuse +
-	totalEmissiveLight;

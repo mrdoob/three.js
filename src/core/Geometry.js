@@ -22,7 +22,6 @@ THREE.Geometry = function () {
 	this.faceVertexUvs = [ [] ];
 
 	this.morphTargets = [];
-	this.morphColors = [];
 	this.morphNormals = [];
 
 	this.skinWeights = [];
@@ -257,7 +256,7 @@ THREE.Geometry.prototype = {
 
 		}
 
-		var addFace = function ( a, b, c ) {
+		function addFace( a, b, c ) {
 
 			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
@@ -863,6 +862,53 @@ THREE.Geometry.prototype = {
 
 	},
 
+	sortFacesByMaterialIndex: function () {
+
+		var faces = this.faces;
+		var length = faces.length;
+
+		// tag faces
+
+		for ( var i = 0; i < length; i ++ ) {
+
+			faces[ i ]._id = i;
+
+		}
+
+		// sort faces
+
+		function materialIndexSort( a, b ) {
+
+			return a.materialIndex - b.materialIndex;
+
+		}
+
+		faces.sort( materialIndexSort );
+
+		// sort uvs
+
+		var uvs1 = this.faceVertexUvs[ 0 ];
+		var uvs2 = this.faceVertexUvs[ 1 ];
+
+		var newUvs1, newUvs2;
+
+		if ( uvs1 && uvs1.length === length ) newUvs1 = [];
+		if ( uvs2 && uvs2.length === length ) newUvs2 = [];
+
+		for ( var i = 0; i < length; i ++ ) {
+
+			var id = faces[ i ]._id;
+
+			if ( newUvs1 ) newUvs1.push( uvs1[ id ] );
+			if ( newUvs2 ) newUvs2.push( uvs2[ id ] );
+
+		}
+
+		if ( newUvs1 ) this.faceVertexUvs[ 0 ] = newUvs1;
+		if ( newUvs2 ) this.faceVertexUvs[ 1 ] = newUvs2;
+
+	},
+
 	toJSON: function () {
 
 		var data = {
@@ -1056,6 +1102,26 @@ THREE.Geometry.prototype = {
 	},
 
 	clone: function () {
+
+		// Handle primitives
+
+		var parameters = this.parameters;
+
+		if ( parameters !== undefined ) {
+
+			var values = [];
+
+			for ( var key in parameters ) {
+
+				values.push( parameters[ key ] );
+
+			}
+
+			var geometry = Object.create( this.constructor.prototype );
+			this.constructor.apply( geometry, values );
+			return geometry;
+
+		}
 
 		return new this.constructor().copy( this );
 

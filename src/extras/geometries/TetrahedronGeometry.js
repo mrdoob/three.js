@@ -25,16 +25,3 @@ THREE.TetrahedronGeometry = function ( radius, detail ) {
 
 THREE.TetrahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.TetrahedronGeometry.prototype.constructor = THREE.TetrahedronGeometry;
-
-THREE.TetrahedronGeometry.prototype.clone = function () {
-
-	var geometry = new THREE.TetrahedronGeometry(
-		this.parameters.radius,
-		this.parameters.detail
-	);
-
-	geometry.copy( this );
-
-	return geometry;
-
-};

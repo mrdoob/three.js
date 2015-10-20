@@ -122,17 +122,6 @@ THREE.Plane.prototype = {
 
 	},
 
-	isIntersectionLine: function ( line ) {
-
-		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
-
-		var startSign = this.distanceToPoint( line.start );
-		var endSign = this.distanceToPoint( line.end );
-
-		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
-
-	},
-
 	intersectLine: function () {
 
 		var v1 = new THREE.Vector3();
@@ -173,6 +162,24 @@ THREE.Plane.prototype = {
 
 	}(),
 
+	intersectsLine: function ( line ) {
+
+		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
+
+		var startSign = this.distanceToPoint( line.start );
+		var endSign = this.distanceToPoint( line.end );
+
+		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
+
+	},
+
+	isIntersectionLine: function ( line ) {
+
+		console.warn( 'THREE.Plane: .isIntersectionLine() has been renamed to .intersectsLine().' );
+
+		return this.intersectsLine( line );
+
+	},
 
 	coplanarPoint: function ( optionalTarget ) {
 

@@ -1,7 +1,7 @@
 /**
  *
  * A track bound to a real value in the scene graph.
- * 
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
@@ -23,7 +23,7 @@ THREE.PropertyBinding = function ( rootNode, trackName ) {
 	this.propertyIndex = parseResults.propertyIndex;
 
 	this.node = THREE.PropertyBinding.findNode( rootNode, this.nodeName ) || rootNode;
-	
+
 	this.cumulativeValue = null;
 	this.cumulativeWeight = 0;
 };
@@ -40,22 +40,21 @@ THREE.PropertyBinding.prototype = {
 	},
 
 	accumulate: function( value, weight ) {
-		
-		if( ! this.isBound ) this.bind();
 
-		if( this.cumulativeWeight === 0 ) {
+		if ( ! this.isBound ) this.bind();
 
-			if( weight > 0 ) {
+		if ( this.cumulativeWeight === 0 ) {
 
-				if( this.cumulativeValue === null ) {
+			if ( weight > 0 ) {
+
+				if ( this.cumulativeValue === null ) {
 					this.cumulativeValue = THREE.AnimationUtils.clone( value );
 				}
 				this.cumulativeWeight = weight;
 
 			}
 
-		}
-		else {
+		} else {
 
 			var lerpAlpha = weight / ( this.cumulativeWeight + weight );
 			this.cumulativeValue = this.lerpValue( this.cumulativeValue, value, lerpAlpha );
@@ -67,7 +66,7 @@ THREE.PropertyBinding.prototype = {
 
 	unbind: function() {
 
-		if( ! this.isBound ) return;
+		if ( ! this.isBound ) return;
 
 		this.setValue( this.originalValue );
 
@@ -75,7 +74,7 @@ THREE.PropertyBinding.prototype = {
 		this.getValue = null;
 		this.lerpValue = null;
 		this.equalsValue = null;
-		this.triggerDirty = null;	
+		this.triggerDirty = null;
 		this.isBound = false;
 
 	},
@@ -83,59 +82,57 @@ THREE.PropertyBinding.prototype = {
 	// bind to the real property in the scene graph, remember original value, memorize various accessors for speed/inefficiency
 	bind: function() {
 
-		if( this.isBound ) return;
+		if ( this.isBound ) return;
 
 		var targetObject = this.node;
 
  		// ensure there is a value node
-		if( ! targetObject ) {
+		if ( ! targetObject ) {
 			console.error( "  trying to update node for track: " + this.trackName + " but it wasn't found." );
 			return;
 		}
 
-		if( this.objectName ) {
+		if ( this.objectName ) {
 			// special case were we need to reach deeper into the hierarchy to get the face materials....
-			if( this.objectName === "materials" ) {
-				if( ! targetObject.material ) {
+			if ( this.objectName === "materials" ) {
+				if ( ! targetObject.material ) {
 					console.error( '  can not bind to material as node does not have a material', this );
-					return;				
+					return;
 				}
-				if( ! targetObject.material.materials ) {
+				if ( ! targetObject.material.materials ) {
 					console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
-					return;				
+					return;
 				}
 				targetObject = targetObject.material.materials;
-			}
-			else if( this.objectName === "bones" ) {
-				if( ! targetObject.skeleton ) {
+			} else if ( this.objectName === "bones" ) {
+				if ( ! targetObject.skeleton ) {
 					console.error( '  can not bind to bones as node does not have a skeleton', this );
 					return;
 				}
 				// potential future optimization: skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
-				
+
 				targetObject = targetObject.skeleton.bones;
 
 				// support resolving morphTarget names into indices.
-				for( var i = 0; i < targetObject.length; i ++ ) {
-					if( targetObject[i].name === this.objectIndex ) {
+				for ( var i = 0; i < targetObject.length; i ++ ) {
+					if ( targetObject[i].name === this.objectIndex ) {
 						this.objectIndex = i;
 						break;
 					}
 				}
-			}
-			else {
+			} else {
 
-				if( targetObject[ this.objectName ] === undefined ) {
-					console.error( '  can not bind to objectName of node, undefined', this );			
+				if ( targetObject[ this.objectName ] === undefined ) {
+					console.error( '  can not bind to objectName of node, undefined', this );
 					return;
 				}
 				targetObject = targetObject[ this.objectName ];
 			}
-			
-			if( this.objectIndex !== undefined ) {
-				if( targetObject[ this.objectIndex ] === undefined ) {
+
+			if ( this.objectIndex !== undefined ) {
+				if ( targetObject[ this.objectIndex ] === undefined ) {
 					console.error( "  trying to bind to objectIndex of objectName, but is undefined:", this, targetObject );
-					return;				
+					return;
 				}
 
 				targetObject = targetObject[ this.objectIndex ];
@@ -145,27 +142,27 @@ THREE.PropertyBinding.prototype = {
 
  		// special case mappings
  		var nodeProperty = targetObject[ this.propertyName ];
-		if( ! nodeProperty ) {
-			console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );				
+		if ( ! nodeProperty ) {
+			console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );
 			return;
 		}
 
 		// access a sub element of the property array (only primitives are supported right now)
-		if( this.propertyIndex !== undefined ) {
+		if ( this.propertyIndex !== undefined ) {
 
-			if( this.propertyName === "morphTargetInfluences" ) {
+			if ( this.propertyName === "morphTargetInfluences" ) {
 				// potential optimization, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
-				
+
 				// support resolving morphTarget names into indices.
-				if( ! targetObject.geometry ) {
-					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );				
+				if ( ! targetObject.geometry ) {
+					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );
 				}
-				if( ! targetObject.geometry.morphTargets ) {
-					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );				
+				if ( ! targetObject.geometry.morphTargets ) {
+					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );
 				}
-				
-				for( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
-					if( targetObject.geometry.morphTargets[i].name === this.propertyIndex ) {
+
+				for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
+					if ( targetObject.geometry.morphTargets[i].name === this.propertyIndex ) {
 						this.propertyIndex = i;
 						break;
 					}
@@ -173,7 +170,7 @@ THREE.PropertyBinding.prototype = {
 			}
 
 			this.setValue = function setValue_propertyIndexed( value ) {
-				if( ! this.equalsValue( nodeProperty[ this.propertyIndex ], value ) ) {
+				if ( ! this.equalsValue( nodeProperty[ this.propertyIndex ], value ) ) {
 					nodeProperty[ this.propertyIndex ] = value;
 					return true;
 				}
@@ -185,11 +182,11 @@ THREE.PropertyBinding.prototype = {
 			};
 
 		}
-		// must use copy for Object3D.Euler/Quaternion		
-		else if( nodeProperty.copy ) {
-			
+		// must use copy for Object3D.Euler/Quaternion
+		else if ( nodeProperty.copy ) {
+
 			this.setValue = function setValue_propertyObject( value ) {
-				if( ! this.equalsValue( nodeProperty, value ) ) {
+				if ( ! this.equalsValue( nodeProperty, value ) ) {
 					nodeProperty.copy( value );
 					return true;
 				}
@@ -205,8 +202,8 @@ THREE.PropertyBinding.prototype = {
 		else {
 
 			this.setValue = function setValue_property( value ) {
-				if( ! this.equalsValue( targetObject[ this.propertyName ], value ) ) {
-					targetObject[ this.propertyName ] = value;	
+				if ( ! this.equalsValue( targetObject[ this.propertyName ], value ) ) {
+					targetObject[ this.propertyName ] = value;
 					return true;
 				}
 				return false;
@@ -218,16 +215,15 @@ THREE.PropertyBinding.prototype = {
 
 		}
 
-		// trigger node dirty			
-		if( targetObject.needsUpdate !== undefined ) { // material
-			
+		// trigger node dirty
+		if ( targetObject.needsUpdate !== undefined ) { // material
+
 			this.triggerDirty = function triggerDirty_needsUpdate() {
 				this.node.needsUpdate = true;
 			}
 
-		}			
-		else if( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
-			
+		} else if ( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
+
 			this.triggerDirty = function triggerDirty_matrixWorldNeedsUpdate() {
 				targetObject.matrixWorldNeedsUpdate = true;
 			}
@@ -246,13 +242,13 @@ THREE.PropertyBinding.prototype = {
 	apply: function() {
 
 		// for speed capture the setter pattern as a closure (sort of a memoization pattern: https://en.wikipedia.org/wiki/Memoization)
-		if( ! this.isBound ) this.bind();
+		if ( ! this.isBound ) this.bind();
 
 		// early exit if there is nothing to apply.
-		if( this.cumulativeWeight > 0 ) {
-		
+		if ( this.cumulativeWeight > 0 ) {
+
 			// blend with original value
-			if( this.cumulativeWeight < 1 ) {
+			if ( this.cumulativeWeight < 1 ) {
 
 				var remainingWeight = 1 - this.cumulativeWeight;
 				var lerpAlpha = remainingWeight / ( this.cumulativeWeight + remainingWeight );
@@ -262,7 +258,7 @@ THREE.PropertyBinding.prototype = {
 
 			var valueChanged = this.setValue( this.cumulativeValue );
 
-			if( valueChanged && this.triggerDirty ) {
+			if ( valueChanged && this.triggerDirty ) {
 				this.triggerDirty();
 			}
 
@@ -289,10 +285,10 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	//	  .bone[Armature.DEF_cog].position
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_. ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/; 
+	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_. ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
 	var matches = re.exec(trackName);
 
-	if( ! matches ) {
+	if ( ! matches ) {
 		throw new Error( "cannot parse trackName at all: " + trackName );
 	}
 
@@ -309,7 +305,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 		propertyIndex: matches[11]	// allowed to be null, specifies that the whole property is set.
 	};
 
-	if( results.propertyName === null || results.propertyName.length === 0 ) {
+	if ( results.propertyName === null || results.propertyName.length === 0 ) {
 		throw new Error( "can not parse propertyName from trackName: " + trackName );
 	}
 
@@ -319,35 +315,59 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 
 THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
-	if( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
+	function searchSkeleton( skeleton ) {
+
+		for ( var i = 0; i < skeleton.bones.length; i ++ ) {
+
+			var bone = skeleton.bones[i];
+
+			if ( bone.name === nodeName ) {
+
+				return bone;
+
+			}
+		}
+
+		return null;
+
+	}
+
+	function searchNodeSubtree( children ) {
+
+		for ( var i = 0; i < children.length; i ++ ) {
+
+			var childNode = children[i];
+
+			if ( childNode.name === nodeName || childNode.uuid === nodeName ) {
+
+				return childNode;
+
+			}
+
+			var result = searchNodeSubtree( childNode.children );
+
+			if ( result ) return result;
+
+		}
+
+		return null;
+
+	}
+
+	//
+
+	if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
 
 		return root;
 
 	}
 
 	// search into skeleton bones.
-	if( root.skeleton ) {
-
-		var searchSkeleton = function( skeleton ) {
-
-			for( var i = 0; i < skeleton.bones.length; i ++ ) {
-
-				var bone = skeleton.bones[i];
-
-				if( bone.name === nodeName ) {
-
-					return bone;
-
-				}
-			}
-
-			return null;
-
-		};
+	if ( root.skeleton ) {
 
 		var bone = searchSkeleton( root.skeleton );
 
-		if( bone ) {
+		if ( bone ) {
 
 			return bone;
 
@@ -355,33 +375,11 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 	}
 
 	// search into node subtree.
-	if( root.children ) {
-
-		var searchNodeSubtree = function( children ) {
-
-			for( var i = 0; i < children.length; i ++ ) {
-
-				var childNode = children[i];
-
-				if( childNode.name === nodeName || childNode.uuid === nodeName ) {
-
-					return childNode;
-
-				}
-
-				var result = searchNodeSubtree( childNode.children );
-
-				if( result ) return result;
-
-			}
-
-			return null;	
-
-		};
+	if ( root.children ) {
 
 		var subTreeNode = searchNodeSubtree( root.children );
 
-		if( subTreeNode ) {
+		if ( subTreeNode ) {
 
 			return subTreeNode;
 

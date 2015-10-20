@@ -8,6 +8,8 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 
 	this.type = 'HemisphereLight';
 
+	this.castShadow = undefined;
+
 	this.position.set( 0, 1, 0 );
 	this.updateMatrix();
 
@@ -27,17 +29,5 @@ THREE.HemisphereLight.prototype.copy = function ( source ) {
 	this.intensity = source.intensity;
 
 	return this;
-
-};
-
-THREE.HemisphereLight.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.color = this.color.getHex();
-	data.object.groundColor = this.groundColor.getHex();
-	data.object.intensity = this.intensity;
-
-	return data;
 
 };

@@ -98,6 +98,12 @@ THREE.Sphere.prototype = {
 
 	},
 
+	intersectsBox: function ( box ) {
+
+		return box.intersectsSphere( this );
+
+	},
+
 	clampPoint: function ( point, optionalTarget ) {
 
 		var deltaLengthSq = this.center.distanceToSquared( point );

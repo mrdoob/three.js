@@ -27,7 +27,7 @@
 
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank">zz85</a> &amp; alteredq
-		<br/>built-in shape triangulation has been replaced with <a href="https://github.com/jahting/pnltri.js">PnlTri.js</a> by <a href="https://github.com/jahting" target="_blank">j ahting</a>
+		<br/>built-in shape triangulation has been replaced with <a href="https://github.com/mapbox/earcut">Earcut</a> by <a href="https://github.com/mourner" target="_blank">mourner</a>
 		<br/>type to enter new text, drag to spin the text
 		<br/><span class="button" id="color">change color</span>,
 			<span class="button" id="font">change font</span>,
@@ -56,7 +56,8 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<!-- load the font files -->
+		<script src="js/geometries/TextGeometry.js"></script>
+		<script src="js/utils/FontUtils.js"></script>
 
 		<script src="fonts/gentilis_bold.typeface.js"></script>
 		<script src="fonts/gentilis_regular.typeface.js"></script>
@@ -69,19 +70,38 @@
 		<script src="fonts/droid/droid_serif_regular.typeface.js"></script>
 		<script src="fonts/droid/droid_serif_bold.typeface.js"></script>
 
-		<!-- todo async loader for fonts -->
-
-
-		<!-- replace built-in triangulation with PnlTri.js -->
-		<script src="js/libs/pnltri.min.js"></script>
+		<!-- replace built-in triangulation with Earcut -->
+		<script src="js/libs/earcut.js"></script>
 		<script>
-			THREE.Shape.Utils.triangulateShape = ( function () {
-				var pnlTriangulator = new PNLTRI.Triangulator();
-				return function triangulateShape( contour, holes ) {
-					// console.log("new Triangulation: PnlTri.js " + PNLTRI.REVISION );
-					return pnlTriangulator.triangulate_polygon( [ contour ].concat(holes) );
-				};
-			} )();
+			function addContour( vertices, contour ) {
+			    for ( var i = 0; i < contour.length; i++ ) {
+			        vertices.push( contour[i].x );
+			        vertices.push( contour[i].y );
+			    }
+			}
+
+			THREE.Shape.Utils.triangulateShape = function ( contour, holes ) {
+			    var vertices = [];
+
+			    addContour( vertices, contour );
+
+			    var holeIndices = [];
+			    var holeIndex = contour.length;
+
+			    for ( i = 0; i < holes.length; i++ ) {
+			        holeIndices.push( holeIndex );
+			        holeIndex += holes[i].length;
+			        addContour( vertices, holes[i] );
+			    }
+
+			    var result = earcut( vertices, holeIndices, 2 );
+
+			    var grouped = [];
+			    for ( var i = 0; i < result.length; i += 3 ) {
+			        grouped.push( result.slice( i, i + 3 ) );
+			    }
+			    return grouped;
+			};	
 		</script>
 
 
@@ -100,7 +120,7 @@
 
 			var firstLetter = true;
 
-			var text = "three.js",
+			var text = "Earcut",
 
 				height = 20,
 				size = 70,

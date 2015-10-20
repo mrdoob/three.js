@@ -1,5 +1,3 @@
-uniform vec3 ambientLightColor;
-
 #if MAX_SPOT_LIGHTS > 0 || defined( USE_ENVMAP )
 
 	varying vec3 vWorldPosition;

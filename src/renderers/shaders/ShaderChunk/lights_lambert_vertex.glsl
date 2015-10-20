@@ -88,10 +88,10 @@ ReflectedLight backReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 
 #endif
 
-vLightFront = ambientLightColor + frontReflectedLight.diffuse;
+vLightFront = frontReflectedLight.diffuse;
 
 #ifdef DOUBLE_SIDED
 
-	vLightBack = ambientLightColor + backReflectedLight.diffuse;
+	vLightBack = backReflectedLight.diffuse;
 
 #endif

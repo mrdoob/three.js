@@ -24,11 +24,11 @@ THREE.SplineCurve.prototype.getPoint = function ( t ) {
 	var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
 	var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
 
-	var vector = new THREE.Vector2();
+	var interpolate = THREE.CurveUtils.interpolate;
 
-	vector.x = THREE.Curve.Utils.interpolate( point0.x, point1.x, point2.x, point3.x, weight );
-	vector.y = THREE.Curve.Utils.interpolate( point0.y, point1.y, point2.y, point3.y, weight );
-
-	return vector;
+	return new THREE.Vector2(
+		interpolate( point0.x, point1.x, point2.x, point3.x, weight ),
+		interpolate( point0.y, point1.y, point2.y, point3.y, weight )
+	);
 
 };

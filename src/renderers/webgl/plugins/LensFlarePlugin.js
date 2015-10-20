@@ -14,7 +14,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 	var tempTexture, occlusionTexture;
 
-	var init = function () {
+	function init() {
 
 		var vertices = new Float32Array( [
 			- 1, - 1,  0, 0,
@@ -88,7 +88,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 						"vec2 pos = position;",
 
-						"if( renderType == 2 ) {",
+						"if ( renderType == 2 ) {",
 
 							"vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 ) );",
 							"visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );",
@@ -131,13 +131,13 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 						// pink square
 
-						"if( renderType == 0 ) {",
+						"if ( renderType == 0 ) {",
 
 							"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
 
 						// restore
 
-						"} else if( renderType == 1 ) {",
+						"} else if ( renderType == 1 ) {",
 
 							"gl_FragColor = texture2D( map, vUV );",
 
@@ -181,7 +181,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 						"vec2 pos = position;",
 
-						"if( renderType == 2 ) {",
+						"if ( renderType == 2 ) {",
 
 							"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
 							"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
@@ -211,13 +211,13 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 						// pink square
 
-						"if( renderType == 0 ) {",
+						"if ( renderType == 0 ) {",
 
 							"gl_FragColor = vec4( texture2D( map, vUV ).rgb, 0.0 );",
 
 						// restore
 
-						"} else if( renderType == 1 ) {",
+						"} else if ( renderType == 1 ) {",
 
 							"gl_FragColor = texture2D( map, vUV );",
 
@@ -264,7 +264,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 			screenPosition: gl.getUniformLocation( program, "screenPosition" )
 		};
 
-	};
+	}
 
 	/*
 	 * Render lens flares
