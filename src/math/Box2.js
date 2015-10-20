@@ -51,7 +51,7 @@ THREE.Box2.prototype = {
 		};
 
 	}(),
-	
+
 	clone: function () {
 
 		return new this.constructor().copy( this );
@@ -165,7 +165,7 @@ THREE.Box2.prototype = {
 
 	},
 
-	isIntersectionBox: function ( box ) {
+	intersectsBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 
@@ -177,6 +177,14 @@ THREE.Box2.prototype = {
 		}
 
 		return true;
+
+	},
+
+	isIntersectionBox: function ( box ) {
+
+		console.warn( 'THREE.Box2: .isIntersectionBox() has been renamed to .intersectsBox().' );
+
+		return this.intersectsBox( box );
 
 	},
 

@@ -109,7 +109,7 @@ test( "distanceSqToPoint", function() {
 	ok( d === 0, "Passed!" );
 });
 
-test( "isIntersectionSphere", function() {
+test( "intersectsSphere", function() {
 	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 	var b = new THREE.Sphere( zero3, 0.5 );
 	var c = new THREE.Sphere( zero3, 1.5 );
@@ -117,17 +117,17 @@ test( "isIntersectionSphere", function() {
 	var e = new THREE.Sphere( two3, 0.1 );
 	var f = new THREE.Sphere( two3, 1 );
 
-	ok( ! a.isIntersectionSphere( b ), "Passed!" );
-	ok( ! a.isIntersectionSphere( c ), "Passed!" );
-	ok( a.isIntersectionSphere( d ), "Passed!" );
-	ok( ! a.isIntersectionSphere( e ), "Passed!" );
-	ok( ! a.isIntersectionSphere( f ), "Passed!" );
+	ok( ! a.intersectsSphere( b ), "Passed!" );
+	ok( ! a.intersectsSphere( c ), "Passed!" );
+	ok( a.intersectsSphere( d ), "Passed!" );
+	ok( ! a.intersectsSphere( e ), "Passed!" );
+	ok( ! a.intersectsSphere( f ), "Passed!" );
 });
 
 test( "intersectSphere", function() {
-	
+
 	var TOL = 0.0001;
-	
+
 	// ray a0 origin located at ( 0, 0, 0 ) and points outward in negative-z direction
 	var a0 = new THREE.Ray( zero3.clone(), new THREE.Vector3( 0, 0, -1 ) );
 	// ray a1 origin located at ( 1, 1, 1 ) and points left in negative-x direction
@@ -136,75 +136,75 @@ test( "intersectSphere", function() {
 	// sphere (radius of 2) located behind ray a0, should result in null
 	var b = new THREE.Sphere( new THREE.Vector3( 0, 0, 3 ), 2 );
 	ok( a0.intersectSphere( b ) === null, "Passed!" );
-	
+
 	// sphere (radius of 2) located in front of, but too far right of ray a0, should result in null
 	var b = new THREE.Sphere( new THREE.Vector3( 3, 0, -1 ), 2 );
 	ok( a0.intersectSphere( b ) === null, "Passed!" );
-	
+
 	// sphere (radius of 2) located below ray a1, should result in null
 	var b = new THREE.Sphere( new THREE.Vector3( 1, -2, 1 ), 2 );
 	ok( a1.intersectSphere( b ) === null, "Passed!" );
-	
-	// sphere (radius of 1) located to the left of ray a1, should result in intersection at 0, 1, 1 
+
+	// sphere (radius of 1) located to the left of ray a1, should result in intersection at 0, 1, 1
 	var b = new THREE.Sphere( new THREE.Vector3( -1, 1, 1 ), 1 );
 	ok( a1.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 1, 1 ) ) < TOL, "Passed!" );
-	
-	// sphere (radius of 1) located in front of ray a0, should result in intersection at 0, 0, -1 
+
+	// sphere (radius of 1) located in front of ray a0, should result in intersection at 0, 0, -1
 	var b = new THREE.Sphere( new THREE.Vector3( 0, 0, -2 ), 1 );
 	ok( a0.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 0, -1 ) ) < TOL, "Passed!" );
-	
-	// sphere (radius of 2) located in front & right of ray a0, should result in intersection at 0, 0, -1, or left-most edge of sphere 
+
+	// sphere (radius of 2) located in front & right of ray a0, should result in intersection at 0, 0, -1, or left-most edge of sphere
 	var b = new THREE.Sphere( new THREE.Vector3( 2, 0, -1 ), 2 );
 	ok( a0.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 0, -1 ) ) < TOL, "Passed!" );
-	
-	// same situation as above, but move the sphere a fraction more to the right, and ray a0 should now just miss 
+
+	// same situation as above, but move the sphere a fraction more to the right, and ray a0 should now just miss
 	var b = new THREE.Sphere( new THREE.Vector3( 2.01, 0, -1 ), 2 );
 	ok( a0.intersectSphere( b ) === null, "Passed!" );
-	
+
 	// following tests are for situations where the ray origin is inside the sphere
-	
-	// sphere (radius of 1) center located at ray a0 origin / sphere surrounds the ray origin, so the first intersect point 0, 0, 1, 
+
+	// sphere (radius of 1) center located at ray a0 origin / sphere surrounds the ray origin, so the first intersect point 0, 0, 1,
 	// is behind ray a0.  Therefore, second exit point on back of sphere will be returned: 0, 0, -1
 	// thus keeping the intersection point always in front of the ray.
 	var b = new THREE.Sphere( zero3.clone(), 1 );
 	ok( a0.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 0, -1 ) ) < TOL, "Passed!" );
-	
-	// sphere (radius of 4) center located behind ray a0 origin / sphere surrounds the ray origin, so the first intersect point 0, 0, 5, 
+
+	// sphere (radius of 4) center located behind ray a0 origin / sphere surrounds the ray origin, so the first intersect point 0, 0, 5,
 	// is behind ray a0.  Therefore, second exit point on back of sphere will be returned: 0, 0, -3
 	// thus keeping the intersection point always in front of the ray.
 	var b = new THREE.Sphere( new THREE.Vector3( 0, 0, 1 ), 4 );
 	ok( a0.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 0, -3 ) ) < TOL, "Passed!" );
-	
-	// sphere (radius of 4) center located in front of ray a0 origin / sphere surrounds the ray origin, so the first intersect point 0, 0, 3, 
+
+	// sphere (radius of 4) center located in front of ray a0 origin / sphere surrounds the ray origin, so the first intersect point 0, 0, 3,
 	// is behind ray a0.  Therefore, second exit point on back of sphere will be returned: 0, 0, -5
 	// thus keeping the intersection point always in front of the ray.
 	var b = new THREE.Sphere( new THREE.Vector3( 0, 0, -1 ), 4 );
 	ok( a0.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 0, -5 ) ) < TOL, "Passed!" );
-	
+
 });
 
-test( "isIntersectionPlane", function() {
+test( "intersectsPlane", function() {
 	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 
 	// parallel plane in front of the ray
 	var b = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().sub( new THREE.Vector3( 0, 0, -1 ) ) );
-	ok( a.isIntersectionPlane( b ), "Passed!" );
+	ok( a.intersectsPlane( b ), "Passed!" );
 
 	// parallel plane coincident with origin
 	var c = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().sub( new THREE.Vector3( 0, 0, 0 ) ) );
-	ok( a.isIntersectionPlane( c ), "Passed!" );
+	ok( a.intersectsPlane( c ), "Passed!" );
 
 	// parallel plane behind the ray
 	var d = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().sub( new THREE.Vector3( 0, 0, 1 ) ) );
-	ok( ! a.isIntersectionPlane( d ), "Passed!" );
+	ok( ! a.intersectsPlane( d ), "Passed!" );
 
 	// perpendical ray that overlaps exactly
 	var e = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ), one3 );
-	ok( a.isIntersectionPlane( e ), "Passed!" );
+	ok( a.intersectsPlane( e ), "Passed!" );
 
 	// perpendical ray that doesn't overlap
 	var f = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ), zero3 );
-	ok( ! a.isIntersectionPlane( f ), "Passed!" );
+	ok( ! a.intersectsPlane( f ), "Passed!" );
 });
 
 test( "intersectPlane", function() {
@@ -295,39 +295,37 @@ test( "distanceSqToSegment", function() {
 test( "intersectBox", function() {
 
 	var TOL = 0.0001;
-	
+
 	var box = new THREE.Box3( new THREE.Vector3(  -1, -1, -1 ), new THREE.Vector3( 1, 1, 1 ) );
 
 	var a = new THREE.Ray( new THREE.Vector3( -2, 0, 0 ), new THREE.Vector3( 1, 0, 0) );
 	//ray should intersect box at -1,0,0
-	ok( a.isIntersectionBox(box) === true, "Passed!" );
+	ok( a.intersectsBox(box) === true, "Passed!" );
 	ok( a.intersectBox(box).distanceTo( new THREE.Vector3( -1, 0, 0 ) ) < TOL, "Passed!" );
 
 	var b = new THREE.Ray( new THREE.Vector3( -2, 0, 0 ), new THREE.Vector3( -1, 0, 0) );
 	//ray is point away from box, it should not intersect
-	ok( b.isIntersectionBox(box) === false, "Passed!" );
+	ok( b.intersectsBox(box) === false, "Passed!" );
 	ok( b.intersectBox(box) === null, "Passed!" );
 
 	var c = new THREE.Ray( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0) );
 	// ray is inside box, should return exit point
-	ok( c.isIntersectionBox(box) === true, "Passed!" );
+	ok( c.intersectsBox(box) === true, "Passed!" );
 	ok( c.intersectBox(box).distanceTo( new THREE.Vector3( 1, 0, 0 ) ) < TOL, "Passed!" );
 
 	var d = new THREE.Ray( new THREE.Vector3( 0, 2, 1 ), new THREE.Vector3( 0, -1, -1).normalize() );
 	//tilted ray should intersect box at 0,1,0
-	ok( d.isIntersectionBox(box) === true, "Passed!" );
-	ok( d.intersectBox(box).distanceTo( new THREE.Vector3( 0, 1, 0 ) ) < TOL, "Passed!" );	
+	ok( d.intersectsBox(box) === true, "Passed!" );
+	ok( d.intersectBox(box).distanceTo( new THREE.Vector3( 0, 1, 0 ) ) < TOL, "Passed!" );
 
 	var e = new THREE.Ray( new THREE.Vector3( 1, -2, 1 ), new THREE.Vector3( 0, 1, 0).normalize() );
 	//handle case where ray is coplanar with one of the boxes side - box in front of ray
-	ok( e.isIntersectionBox(box) === true, "Passed!" );
-	ok( e.intersectBox(box).distanceTo( new THREE.Vector3( 1, -1, 1 ) ) < TOL, "Passed!" );	
-	
+	ok( e.intersectsBox(box) === true, "Passed!" );
+	ok( e.intersectBox(box).distanceTo( new THREE.Vector3( 1, -1, 1 ) ) < TOL, "Passed!" );
+
 	var f = new THREE.Ray( new THREE.Vector3( 1, -2, 0 ), new THREE.Vector3( 0, -1, 0).normalize() );
 	//handle case where ray is coplanar with one of the boxes side - box behind ray
-	ok( f.isIntersectionBox(box) === false, "Passed!" );
-	ok( f.intersectBox(box) == null, "Passed!" );		
-	
+	ok( f.intersectsBox(box) === false, "Passed!" );
+	ok( f.intersectBox(box) == null, "Passed!" );
+
 });
-
-
