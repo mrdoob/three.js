@@ -22,10 +22,10 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 
 	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];
 
-	void getDirIncidentLight( const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight incidentLight ) { 
+	void getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight ) { 
 	
-		incidentLight.color = directionalLight.color;
-		incidentLight.direction = directionalLight.direction; 
+		directLight.color = directionalLight.color;
+		directLight.direction = directionalLight.direction; 
 
 	}
 
@@ -43,15 +43,15 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 
 	uniform PointLight pointLights[ MAX_POINT_LIGHTS ];
 
-	void getPointIncidentLight( const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight incidentLight ) { 
+	void getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight directLight ) { 
 	
 		vec3 lightPosition = pointLight.position; 
 	
 		vec3 lVector = lightPosition - geometry.position; 
-		incidentLight.direction = normalize( lVector ); 
+		directLight.direction = normalize( lVector ); 
 	
-		incidentLight.color = pointLight.color; 
-		incidentLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay ); 
+		directLight.color = pointLight.color; 
+		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay ); 
 	
 	}
 
@@ -72,18 +72,18 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 
 	uniform SpotLight spotLights[ MAX_SPOT_LIGHTS ];
 
-	void getSpotIncidentLight( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight incidentLight ) {
+	void getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight ) {
 	
 		vec3 lightPosition = spotLight.position;
 	
 		vec3 lVector = lightPosition - geometry.position;
-		incidentLight.direction = normalize( lVector );
+		directLight.direction = normalize( lVector );
 	
-		float spotEffect = dot( spotLight.direction, incidentLight.direction );
+		float spotEffect = dot( spotLight.direction, directLight.direction );
 		spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
 	
-		incidentLight.color = spotLight.color;
-		incidentLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
+		directLight.color = spotLight.color;
+		directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
 
 	}
 
@@ -100,15 +100,13 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 
 	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
 
-	void getHemisphereIncidentLight( const in HemisphereLight hemiLight, const in GeometricContext geometry, out IncidentLight incidentLight ) { 
+	void getHemisphereIndirectLight( const in HemisphereLight hemiLight, const in GeometricContext geometry, out IncidentLight indirectLight ) { 
 	
 		float dotNL = dot( geometry.normal, hemiLight.direction );
-
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
-
-		incidentLight.color = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
-
-		incidentLight.direction = geometry.normal;
+		
+		indirectLight.color = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
+		indirectLight.direction = geometry.normal;
 
 	}
 

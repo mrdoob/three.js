@@ -1,23 +1,5 @@
 //#define ENERGY_PRESERVING_MONOCHROME
 
-
-struct IncidentLight {
- 	vec3 color;
- 	vec3 direction;
-};
-
-struct ReflectedLight {
- 	vec3 specular;
- 	vec3 diffuse;
-};
-
-struct GeometricContext {
-	vec3 position;
-	vec3 normal;
-	vec3 viewDir;
-};
-
-
 void BRDF_Lambert( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 diffuseColor, inout ReflectedLight reflectedLight ) {
 
 	float lambertianReflectance = saturate( dot( geometryContext.normal, incidentLight.direction ) );

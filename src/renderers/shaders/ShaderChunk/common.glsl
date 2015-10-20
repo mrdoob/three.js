@@ -10,6 +10,24 @@
 
 float average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }
 
+
+struct IncidentLight {
+ 	vec3 color;
+ 	vec3 direction;
+};
+
+struct ReflectedLight {
+ 	vec3 specular;
+ 	vec3 diffuse;
+};
+
+struct GeometricContext {
+	vec3 position;
+	vec3 normal;
+	vec3 viewDir;
+};
+
+
 vec3 transformDirection( in vec3 normal, in mat4 matrix ) {
 
 	return normalize( ( matrix * vec4( normal, 0.0 ) ).xyz );
