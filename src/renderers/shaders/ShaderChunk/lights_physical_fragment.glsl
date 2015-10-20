@@ -1,8 +1,3 @@
-vec3 viewDir = normalize( vViewPosition );
-
-vec3 totalDiffuseLight = vec3( 0.0 );
-vec3 totalSpecularLight = vec3( 0.0 );
-
 
 // roughness linear remapping
 
@@ -16,32 +11,22 @@ vec3 specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );
 diffuseColor.rgb *= ( 1.0 - metalnessFactor );
 
 
+
+GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal ), normalize(vViewPosition ) );
+
+ReflectedLight directReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
+ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
+
+
 #if MAX_POINT_LIGHTS > 0
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
-		vec3 lightColor = pointLightColor[ i ];
+		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
 
-		vec3 lightPosition = pointLightPosition[ i ];
-		vec3 lVector = lightPosition + vViewPosition.xyz;
-		vec3 lightDir = normalize( lVector );
+		BRDF_Lambert( directLight, geometry, diffuse, directReflectedLight );
 
-		// attenuation
-
-		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );
-
-		// diffuse
-
-		float cosineTerm = saturate( dot( normal, lightDir ) );
-
-		totalDiffuseLight += lightColor * attenuation * cosineTerm;
-
-		// specular
-
-    	vec3 brdf = BRDF_GGX( specularColor, roughnessFactor, normal, lightDir, viewDir );
-
-		totalSpecularLight += brdf * specularStrength * lightColor * attenuation * cosineTerm;
-
+		BRDF_GGX( directLight, geometry, specularColor, roughnessFactor, directReflectedLight );
 
 	}
 
@@ -51,37 +36,11 @@ diffuseColor.rgb *= ( 1.0 - metalnessFactor );
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
-		vec3 lightColor = spotLightColor[ i ];
+		IncidentLight directLight = getSpotDirectLight( pointLights[ i ], geometry );
 
-		vec3 lightPosition = spotLightPosition[ i ];
-		vec3 lVector = lightPosition + vViewPosition.xyz;
-		vec3 lightDir = normalize( lVector );
+		BRDF_Lambert( directLight, geometry, diffuse, directReflectedLight );
 
-		float spotEffect = dot( spotLightDirection[ i ], lightDir );
-
-		if ( spotEffect > spotLightAngleCos[ i ] ) {
-
-			spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ i ] ) );
-
-			// attenuation
-
-			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );
-
-			attenuation *= spotEffect;
-
-			// diffuse
-
-			float cosineTerm = saturate( dot( normal, lightDir ) );
-
-			totalDiffuseLight += lightColor * attenuation * cosineTerm;
-
-			// specular
-
-    		vec3 brdf = BRDF_GGX( specularColor, roughnessFactor, normal, lightDir, viewDir );
-
-			totalSpecularLight += brdf * specularStrength * lightColor * attenuation * cosineTerm;
-
-		}
+		BRDF_GGX( directLight, geometry, specularColor, roughnessFactor, directReflectedLight );
 
 	}
 
@@ -91,21 +50,23 @@ diffuseColor.rgb *= ( 1.0 - metalnessFactor );
 
 	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-		vec3 lightColor = directionalLightColor[ i ];
+		IncidentLight directLight = getDirectionalDirectLight( pointLights[ i ], geometry );
 
-		vec3 lightDir = directionalLightDirection[ i ];
+		BRDF_Lambert( directLight, geometry, diffuse, directReflectedLight );
 
-		// diffuse
+		BRDF_GGX( directLight, geometry, specularColor, roughnessFactor, directReflectedLight );
 
-		float cosineTerm = saturate( dot( normal, lightDir ) );
+	}
 
-		totalDiffuseLight += lightColor * cosineTerm;
+#endif
 
-		// specular
+#if MAX_HEMI_LIGHTS > 0
 
-    	vec3 brdf = BRDF_GGX( specularColor, roughnessFactor, normal, lightDir, viewDir );
+	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		totalSpecularLight += brdf * specularStrength * lightColor * cosineTerm;
+		IncidentLight indirectLight = getHemisphereIndirectLight( hemisphereLights[ i ], geometry );
+
+		BRDF_Lambert( indirectLight, geometry, diffuse, indirectReflectedLight );
 
 	}
 
