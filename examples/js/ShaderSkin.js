@@ -455,12 +455,11 @@ THREE.ShaderSkin = {
 				"#if MAX_POINT_LIGHTS > 0",
 
 					"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
-
+						
 						"vec3 pointVector = normalize( pointLights[ i ].direction );",
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLights[ i ].distance, pointLights[ i ].decay );",
 				
 						"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
-
-						"float attenuation = calcLightAttenuation( length( lVector ), pointLights[ i ].distance, pointLights[ i ].decay );",
 				
 						"totalDiffuseLight += pointLightColor[ i ] * ( pointDiffuseWeight * attenuation );",
 
@@ -577,7 +576,6 @@ THREE.ShaderSkin = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "lights" ],
 
 			"void main() {",
 
@@ -590,24 +588,6 @@ THREE.ShaderSkin = {
 				"vNormal = normalize( normalMatrix * normal );",
 
 				"vUv = uv;",
-
-				// point lights
-
-				"#if MAX_POINT_LIGHTS > 0",
-
-					"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
-
-						"vec3 lVector = pointLights[ i ].position - vViewPosition;",
-
-						"float attenuation = calcLightAttenuation( length( lVector ), pointLights[ i ].distance, pointLights[ i ].decay );",
-
-						"lVector = normalize( lVector );",
-
-						"vPointLight[ i ] = vec4( lVector, attenuation );",
-
-					"}",
-
-				"#endif",
 
 				// displacement mapping
 
@@ -636,7 +616,6 @@ THREE.ShaderSkin = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "lights" ],
 
 			"void main() {",
 
@@ -649,24 +628,6 @@ THREE.ShaderSkin = {
 				"vNormal = normalize( normalMatrix * normal );",
 
 				"vUv = uv;",
-
-				// point lights
-
-				"#if MAX_POINT_LIGHTS > 0",
-
-					"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
-
-						"vec3 lVector = pointLights[ i ].position - vViewPosition;",
-
-						"float attenuation = calcLightAttenuation( length( lVector ), pointLights[ i ].distance, pointLights[ i ].decay );",
-
-						"lVector = normalize( lVector );",
-
-						"vPointLight[ i ] = vec4( lVector, attenuation );",
-
-					"}",
-
-				"#endif",
 
 				"gl_Position = vec4( uv.x * 2.0 - 1.0, uv.y * 2.0 - 1.0, 0.0, 1.0 );",
 
