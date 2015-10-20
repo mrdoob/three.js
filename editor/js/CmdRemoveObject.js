@@ -69,52 +69,11 @@ CmdRemoveObject.prototype = {
 	toJSON: function () {
 
 		var output = Cmd.prototype.toJSON.call( this );
-
-		this.object.updateMatrixWorld( true );
-
-		var meta = {
-			geometries: {},
-			materials: {},
-			textures: {},
-			images: {}
-		};
-		var json = this.object.toJSON( meta );
-
-		var geometries = extractFromCache( meta.geometries );
-		var materials = extractFromCache( meta.materials );
-		var textures = extractFromCache( meta.textures );
-		var images = extractFromCache( meta.images );
-
-		if ( geometries.length > 0 ) json.geometries = geometries;
-		if ( materials.length > 0 ) json.materials = materials;
-		if ( textures.length > 0 ) json.textures = textures;
-		if ( images.length > 0 ) json.images = images;
-
-		output.object = json;
+		output.object = this.object.toJSON();
 		output.index = this.index;
 		output.parentUuid = this.parent.uuid;
 
 		return output;
-
-
-		// Note: The function 'extractFromCache' is copied from Object3D.toJSON()
-
-		// extract data from the cache hash
-		// remove metadata on each item
-		// and return as array
-		function extractFromCache ( cache ) {
-
-			var values = [];
-			for ( var key in cache ) {
-
-				var data = cache[ key ];
-				delete data.metadata;
-				values.push( data );
-
-			}
-			return values;
-
-		}
 
 	},
 
