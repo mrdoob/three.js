@@ -191,8 +191,8 @@ THREE.Box3.prototype = {
 	containsPoint: function ( point ) {
 
 		if ( point.x < this.min.x || point.x > this.max.x ||
-		     point.y < this.min.y || point.y > this.max.y ||
-		     point.z < this.min.z || point.z > this.max.z ) {
+				 point.y < this.min.y || point.y > this.max.y ||
+				 point.z < this.min.z || point.z > this.max.z ) {
 
 			return false;
 
@@ -236,8 +236,8 @@ THREE.Box3.prototype = {
 		// using 6 splitting planes to rule out intersections.
 
 		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
-		     box.max.y < this.min.y || box.min.y > this.max.y ||
-		     box.max.z < this.min.z || box.min.z > this.max.z ) {
+				 box.max.y < this.min.y || box.min.y > this.max.y ||
+				 box.max.z < this.min.z || box.min.z > this.max.z ) {
 
 			return false;
 
@@ -247,23 +247,23 @@ THREE.Box3.prototype = {
 
 	},
 
-	isIntersectionSphere: function () {
+	isIntersectionSphere: ( function () {
 
-	  var closestPoint;
+		var closestPoint;
 
-	  return function isIntersectionSphere( sphere ) {
+		return function isIntersectionSphere( sphere ) {
 
-	    if ( closestPoint === undefined ) closestPoint = new THREE.Vector3();
+			if ( closestPoint === undefined ) closestPoint = new THREE.Vector3();
 
-	    // Find the point on the AABB closest to the sphere center.
-	    this.clampPoint( sphere.center, closestPoint );
+			// Find the point on the AABB closest to the sphere center.
+			this.clampPoint( sphere.center, closestPoint );
 
-	    // If that point is inside the sphere, the AABB and sphere intersect.
-	    return closestPoint.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
+			// If that point is inside the sphere, the AABB and sphere intersect.
+			return closestPoint.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
 
-	  };
+		};
 
-	}(),
+	} )(),
 
 	clampPoint: function ( point, optionalTarget ) {
 
@@ -343,7 +343,7 @@ THREE.Box3.prototype = {
 			points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
 			points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
 			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );  // 111
+			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );	// 111
 
 			this.makeEmpty();
 			this.setFromPoints( points );
