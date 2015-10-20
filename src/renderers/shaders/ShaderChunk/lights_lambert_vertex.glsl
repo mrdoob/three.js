@@ -70,7 +70,7 @@ ReflectedLight backReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 
 		#ifdef DOUBLE_SIDED
 	
-			getHemisphereIndirectLight( hemisphereLights[ i ], backGeometry, indirectLight );
+			indirectLight = getHemisphereIndirectLight( hemisphereLights[ i ], backGeometry );
 
 			BRDF_Lambert( indirectLight, backGeometry, diffuse, backReflectedLight );
 

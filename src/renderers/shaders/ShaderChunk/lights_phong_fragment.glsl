@@ -16,7 +16,7 @@ vec3 diffuse = diffuseColor.rgb;
 
 #endif
 
-GeometricContext geometry = GeometricContext( -vViewPosition, normal, normalize(vViewPosition ) );
+GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal ), normalize(vViewPosition ) );
 
 ReflectedLight directReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );

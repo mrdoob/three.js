@@ -99,7 +99,7 @@ uniform vec3 ambientLightColor;
 
 	IncidentLight getHemisphereIndirectLight( const in HemisphereLight hemiLight, const in GeometricContext geometry ) { 
 	
-		IncidentLight directLight;
+		IncidentLight indirectLight;
 
 		float dotNL = dot( geometry.normal, hemiLight.direction );
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;

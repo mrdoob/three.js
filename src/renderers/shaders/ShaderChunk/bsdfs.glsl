@@ -58,7 +58,7 @@ vec3 F_Schlick( const in vec3 F0, const in float dotLH ) {
 // Microfacet Models for Refraction through Rough Surfaces - equation (34)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
 // alpha is "roughness squared" in Disney’s reparameterization
-float G_GGX_Smith( in float alpha, in float dotNL, in float dotNV ) {
+float G_SmithSchlick( in float alpha, in float dotNL, in float dotNV ) {
 
 	// geometry term = G(l) . G(v) / 4(n . l)(n. v)
 
