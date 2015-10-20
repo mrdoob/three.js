@@ -3738,7 +3738,7 @@ THREE.Box2.prototype = {
 		};
 
 	}(),
-	
+
 	clone: function () {
 
 		return new this.constructor().copy( this );
@@ -3852,7 +3852,7 @@ THREE.Box2.prototype = {
 
 	},
 
-	isIntersectionBox: function ( box ) {
+	intersectsBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 
@@ -3864,6 +3864,14 @@ THREE.Box2.prototype = {
 		}
 
 		return true;
+
+	},
+
+	isIntersectionBox: function ( box ) {
+
+		console.warn( 'THREE.Box2: .isIntersectionBox() has been renamed to .intersectsBox().' );
+
+		return this.intersectsBox( box );
 
 	},
 
@@ -4157,7 +4165,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	isIntersectionBox: function ( box ) {
+	intersectsBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 
@@ -4173,11 +4181,19 @@ THREE.Box3.prototype = {
 
 	},
 
-	isIntersectionSphere: ( function () {
+	isIntersectionBox: function ( box ) {
+
+		console.warn( 'THREE.Box3: .isIntersectionBox() has been renamed to .intersectsBox().' );
+
+		return this.intersectsBox( box );
+
+	},
+
+	intersectsSphere: ( function () {
 
 		var closestPoint;
 
-		return function isIntersectionSphere( sphere ) {
+		return function intersectsSphere( sphere ) {
 
 			if ( closestPoint === undefined ) closestPoint = new THREE.Vector3();
 
@@ -4190,6 +4206,14 @@ THREE.Box3.prototype = {
 		};
 
 	} )(),
+
+	isIntersectionSphere: function ( sphere ) {
+
+		console.warn( 'THREE.Box3: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
+
+		return this.intersectsSphere( sphere );
+
+	},
 
 	clampPoint: function ( point, optionalTarget ) {
 
@@ -5870,13 +5894,6 @@ THREE.Ray.prototype = {
 
 	}(),
 
-
-	isIntersectionSphere: function ( sphere ) {
-
-		return this.distanceToPoint( sphere.center ) <= sphere.radius;
-
-	},
-
 	intersectSphere: function () {
 
 		// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
@@ -5918,35 +5935,24 @@ THREE.Ray.prototype = {
 
 	}(),
 
-	isIntersectionPlane: function ( plane ) {
+	intersectsSphere: function ( sphere ) {
 
-		// check if the ray lies on the plane first
+		return this.distanceToPoint( sphere.center ) <= sphere.radius;
 
-		var distToPoint = plane.distanceToPoint( this.origin );
+	},
 
-		if ( distToPoint === 0 ) {
+	isIntersectionSphere: function ( sphere ) {
 
-			return true;
+		console.warn( 'THREE.Ray: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
 
-		}
-
-		var denominator = plane.normal.dot( this.direction );
-
-		if ( denominator * distToPoint < 0 ) {
-
-			return true;
-
-		}
-
-		// ray origin is behind the plane (and is pointing behind it)
-
-		return false;
+		return this.intersectsSphere( sphere );
 
 	},
 
 	distanceToPlane: function ( plane ) {
 
 		var denominator = plane.normal.dot( this.direction );
+
 		if ( denominator === 0 ) {
 
 			// line is coplanar, return origin
@@ -5984,17 +5990,41 @@ THREE.Ray.prototype = {
 
 	},
 
-	isIntersectionBox: function () {
 
-		var v = new THREE.Vector3();
 
-		return function ( box ) {
+	intersectsPlane: function ( plane ) {
 
-			return this.intersectBox( box, v ) !== null;
+		// check if the ray lies on the plane first
 
-		};
+		var distToPoint = plane.distanceToPoint( this.origin );
 
-	}(),
+		if ( distToPoint === 0 ) {
+
+			return true;
+
+		}
+
+		var denominator = plane.normal.dot( this.direction );
+
+		if ( denominator * distToPoint < 0 ) {
+
+			return true;
+
+		}
+
+		// ray origin is behind the plane (and is pointing behind it)
+
+		return false;
+
+	},
+
+	isIntersectionPlane: function ( plane ) {
+
+		console.warn( 'THREE.Ray: .isIntersectionPlane() has been renamed to .intersectsPlane().' );
+
+		return this.intersectsPlane( plane );
+
+	},
 
 	intersectBox: function ( box, optionalTarget ) {
 
@@ -6064,6 +6094,26 @@ THREE.Ray.prototype = {
 		if ( tmax < 0 ) return null;
 
 		return this.at( tmin >= 0 ? tmin : tmax, optionalTarget );
+
+	},
+
+	intersectsBox: ( function () {
+
+		var v = new THREE.Vector3();
+
+		return function ( box ) {
+
+			return this.intersectBox( box, v ) !== null;
+
+		};
+
+	} )(),
+
+	isIntersectionBox: function ( box ) {
+
+		console.warn( 'THREE.Ray: .isIntersectionBox() has been renamed to .intersectsBox().' );
+
+		return this.intersectsBox( box );
 
 	},
 
@@ -6265,22 +6315,15 @@ THREE.Sphere.prototype = {
 
 	intersectsSphere: function ( sphere ) {
 
-		console.warn( 'THREE.Sphere: .intersectsSphere() has been renamed to .isIntersectionSphere().' );
-
-		return this.isIntersectionSphere( sphere );
-	},
-
-	isIntersectionSphere: function ( sphere ) {
-
 		var radiusSum = this.radius + sphere.radius;
 
 		return sphere.center.distanceToSquared( this.center ) <= ( radiusSum * radiusSum );
 
 	},
 
-	isIntersectionBox: function ( box ) {
+	intersectsBox: function ( box ) {
 
-		return box.isIntersectionSphere( this );
+		return box.intersectsSphere( this );
 
 	},
 
@@ -6647,17 +6690,6 @@ THREE.Plane.prototype = {
 
 	},
 
-	isIntersectionLine: function ( line ) {
-
-		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
-
-		var startSign = this.distanceToPoint( line.start );
-		var endSign = this.distanceToPoint( line.end );
-
-		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
-
-	},
-
 	intersectLine: function () {
 
 		var v1 = new THREE.Vector3();
@@ -6698,6 +6730,24 @@ THREE.Plane.prototype = {
 
 	}(),
 
+	intersectsLine: function ( line ) {
+
+		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
+
+		var startSign = this.distanceToPoint( line.start );
+		var endSign = this.distanceToPoint( line.end );
+
+		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
+
+	},
+
+	isIntersectionLine: function ( line ) {
+
+		console.warn( 'THREE.Plane: .isIntersectionLine() has been renamed to .intersectsLine().' );
+
+		return this.intersectsLine( line );
+
+	},
 
 	coplanarPoint: function ( optionalTarget ) {
 
@@ -18484,11 +18534,7 @@ THREE.Points.prototype.raycast = ( function () {
 
 		if ( geometry.boundingBox !== null ) {
 
-			if ( ray.isIntersectionBox( geometry.boundingBox ) === false ) {
-
-				return;
-
-			}
+			if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
 
 		}
 
@@ -18641,11 +18687,7 @@ THREE.Line.prototype.raycast = ( function () {
 		sphere.copy( geometry.boundingSphere );
 		sphere.applyMatrix4( this.matrixWorld );
 
-		if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
-
-			return;
-
-		}
+		if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
 		inverseMatrix.getInverse( this.matrixWorld );
 		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
@@ -18974,7 +19016,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 		sphere.copy( geometry.boundingSphere );
 		sphere.applyMatrix4( matrixWorld );
 
-		if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) return;
+		if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
 		// Check boundingBox before continuing
 
@@ -18983,7 +19025,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		if ( geometry.boundingBox !== null ) {
 
-			if ( ray.isIntersectionBox( geometry.boundingBox ) === false ) return;
+			if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
 
 		}
 
