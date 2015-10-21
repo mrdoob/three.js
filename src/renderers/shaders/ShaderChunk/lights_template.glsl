@@ -40,19 +40,29 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 #endif
 
+#if defined( BRDF_Material_DiffuseIndirectLight )
+
 	{
 	
-		IncidentLight indirectLight = getAmbientIndirectLight( ambientLightColor, geometry );
+		IncidentLight indirectLight;
+		indirectLight.direction = geometry.normal;
+		indirectLight.color = ambientLightColor;
 
-		BRDF_Material_DiffuseIndirectLight( indirectLight, geometry, material, indirectReflectedLight );
+#ifdef USE_LIGHTMAP
 
-	}
+		indirectLight.color += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
 
-#if ( MAX_HEMI_LIGHTS > 0 ) && defined( BRDF_Material_DiffuseIndirectLight )
+#endif
 
-	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
+#if ( MAX_HEMI_LIGHTS > 0 )
 
-		IncidentLight indirectLight = getHemisphereIndirectLight( hemisphereLights[ i ], geometry );
+		for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
+
+			indirectLight.color += getHemisphereIndirectLight( hemisphereLights[ i ], geometry ).color;
+
+		}
+
+#endif
 
 		BRDF_Material_DiffuseIndirectLight( indirectLight, geometry, material, indirectReflectedLight );
 
