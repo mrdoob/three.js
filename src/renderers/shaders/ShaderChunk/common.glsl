@@ -21,13 +21,6 @@ struct ReflectedLight {
  	vec3 diffuse;
 };
 
-void accumulateReflectedLight( inout ReflectedLight accumulator, const in ReflectedLight item ) {
-
-	accumulator.diffuse += item.diffuse;
-	accumulator.specular += item.specular;
-
-}
-
 struct GeometricContext {
 	vec3 position;
 	vec3 normal;
