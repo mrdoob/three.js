@@ -93,13 +93,17 @@ GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.n
 
 		#endif
 
-		float frontDotNL = saturate( dot( geometry.normal, frontIndirectLight.direction ) );
-		vLightFront += frontDotNL * frontIndirectLight.color * BRDF_Diffuse_Lambert( frontIndirectLight, geometry, diffuse );
+		//float frontDotNL = saturate( dot( geometry.normal, frontIndirectLight.direction ) );
+		//vLightFront += frontDotNL * frontIndirectLight.color * BRDF_Diffuse_Lambert( frontIndirectLight, geometry, diffuse );
+		// the following is equivalent to the above
+		vLightFront += frontIndirectLight.color;
 
 		#ifdef DOUBLE_SIDED
 
-			float backDotNL = saturate( dot( -geometry.normal, backIndirectLight.direction ) );
-			vLightBack += backDotNL * backIndirectLight.color * BRDF_Diffuse_Lambert( backIndirectLight, backGeometry, diffuse );
+			//float backDotNL = saturate( dot( -geometry.normal, backIndirectLight.direction ) );
+			//vLightBack += backDotNL * backIndirectLight.color * BRDF_Diffuse_Lambert( backIndirectLight, backGeometry, diffuse );
+			// the following is equivalent to the above
+			vLightBack += backIndirectLight.color;
 
 		#endif
 
