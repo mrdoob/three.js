@@ -86,6 +86,15 @@ uniform vec3 ambientLightColor;
 
 #endif
 
+	IncidentLight getAmbientIndirectLight( const in vec3 ambientLightColor, const in GeometricContext geometry ) { 
+	
+		IncidentLight indirectLight;
+
+		indirectLight.color = ambientLightColor;
+		indirectLight.direction = geometry.normal;
+
+		return indirectLight;
+	}
 
 #if MAX_HEMI_LIGHTS > 0
 

@@ -40,6 +40,14 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 #endif
 
+	{
+	
+		IncidentLight indirectLight = getAmbientIndirectLight( ambientLightColor, geometry );
+
+		BRDF_Material_DiffuseIndirectLight( indirectLight, geometry, material, indirectReflectedLight );
+
+	}
+
 #if ( MAX_HEMI_LIGHTS > 0 ) && defined( BRDF_Material_DiffuseIndirectLight )
 
 	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {

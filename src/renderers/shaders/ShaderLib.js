@@ -364,7 +364,7 @@ THREE.ShaderLib = {
 
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 			"	ReflectedLight directReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
-			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), ambientLightColor );",
+			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
 			"	vec3 totalEmissiveLight = emissive;",
 			
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
@@ -538,7 +538,7 @@ THREE.ShaderLib = {
 
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 			"	ReflectedLight directReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
-			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), ambientLightColor );",
+			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
 			"	vec3 totalEmissiveLight = emissive;",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],

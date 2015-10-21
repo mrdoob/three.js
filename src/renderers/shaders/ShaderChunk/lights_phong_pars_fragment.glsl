@@ -38,6 +38,6 @@ void BRDF_BlinnPhongMaterial_IndirectLight( const in IncidentLight indirectLight
 
 }
 
-#define BRDF_Material_IndirectLight    BRDF_BlinnPhongMaterial_IndirectLight
+#define BRDF_Material_DiffuseIndirectLight    BRDF_BlinnPhongMaterial_IndirectLight
 
 #define Material_LightProbeLOD( material )   (0)

@@ -126,7 +126,6 @@
 	"src/renderers/shaders/ShaderChunk/envmap_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/envmap_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/envmap_pars_vertex.glsl",
-	"src/renderers/shaders/ShaderChunk/envmap_physical_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/envmap_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/fog_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/fog_pars_fragment.glsl",
