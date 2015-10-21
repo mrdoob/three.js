@@ -1,5 +1,5 @@
 #ifdef USE_LIGHTMAP
 
-	totalAmbientLight += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
+	indirectReflectedLight.diffuse += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
 
 #endif

@@ -57,7 +57,7 @@
 
 	envMapColor.rgb = inputToLinear( envMapColor.rgb );
 
-    outgoingLight += envBRDFApprox( specularColor, roughnessFactor, normal, viewDir  ) * envMapColor.rgb * envMapIntensity * reflectivityFactor;
+    indirectReflectedLight.specular += envBRDFApprox( specularColor, roughnessFactor, normal, viewDir  ) * envMapColor.rgb * envMapIntensity * reflectivityFactor;
 
 #endif
 
