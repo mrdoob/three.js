@@ -29,13 +29,14 @@ THREE.CompressedTextureLoader.prototype = {
 
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 
 		if ( Array.isArray( url ) ) {
 
 			var loaded = 0;
 
-			var loadTexture = function ( i ) {
+			function loadTexture( i ) {
 
 				loader.load( url[ i ], function ( buffer ) {
 
@@ -129,6 +130,12 @@ THREE.CompressedTextureLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
 
 	}
 
