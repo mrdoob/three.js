@@ -29,22 +29,22 @@ ReflectedLight BRDF_Add( const in ReflectedLight base, const in ReflectedLight o
 	);
 }
 
-void BRDF_Lambert( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 diffuseColor, inout ReflectedLight reflectedLight ) {
-
-	float lambertianReflectance = saturate( dot( geometryContext.normal, incidentLight.direction ) );
+vec3 BRDF_Diffuse_Lambert( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 diffuseColor ) {
 
 	#if defined( ENERGY_PRESERVING_MONOCHROME ) || defined( ENERGY_PRESERVING_RGB )
 
-		lambertianReflectance *= RECIPROCAL_PI;
+		return diffuseColor * RECIPROCAL_PI;
+
+	#else
+
+		return diffuseColor;
 
 	#endif
-
-	reflectedLight.diffuse += incidentLight.color * diffuseColor * lambertianReflectance;
 
 }
 
 // this roughness is a different property than specular roughness used in GGX.
-void BRDF_OrenNayar( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 diffuse, const in float roughness, inout ReflectedLight reflectedLight ) {
+vec3 BRDF_Diffuse_OrenNayar( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 diffuse, const in float roughness ) {
 
 	vec3 halfDir = normalize( incidentLight.direction + geometryContext.viewDir );
 	float dotVH = saturate( dot( geometryContext.viewDir, halfDir ) );
@@ -56,7 +56,7 @@ void BRDF_OrenNayar( const in IncidentLight incidentLight, const in GeometricCon
 	float Cosri = 2.0 * dotVH - 1.0 - dotNV * dotNL;
 	float termB = 0.45 * m2 / (m2 + 0.09) * Cosri * ( Cosri >= 0.0 ? min( 1.0, dotNL / dotNV ) : dotNL );
 
-	reflectedLight.diffuse = incidentLight.color * diffuse * ( RECIPROCAL_PI * ( dotNL * termA + termB ) );
+	return diffuse * ( RECIPROCAL_PI * ( dotNL * termA + termB ) );
 
 }
 
@@ -107,7 +107,7 @@ float D_GGX( in float roughtness2, in float dotNH ) {
 
 }
 
-void BRDF_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness2, inout ReflectedLight reflectedLight ) {
+vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness2 ) {
 	
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 	float dotNH = saturate( dot( geometry.normal, halfDir ) );
@@ -119,14 +119,14 @@ void BRDF_GGX( const in IncidentLight incidentLight, const in GeometricContext g
 	float G = G_SmithSchlick( roughness2, dotNL, dotNV );
 	float D = D_GGX( roughness2, dotNH );
 
-	reflectedLight.specular += incidentLight.color * F * ( dotNL * G * D );
+	return F * ( G * D );
 
 }
 
 #define DIELECTRIC_SPECULAR_F0 0.20
 
 // this blends the existing reflected light with a clear coat.
-void BRDF_GGX_ClearCoat( const in IncidentLight incidentLight, const in GeometricContext geometry, const in float clearCoatWeight, const in float clearCoatRoughness, inout ReflectedLight reflectedLight ) {
+vec3 BRDF_Specular_ClearCoat( const in IncidentLight incidentLight, const in GeometricContext geometry, const in float clearCoatWeight, const in float clearCoatRoughness ) {
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 	float dotNH = saturate( dot( geometry.normal, halfDir ) );
@@ -139,16 +139,12 @@ void BRDF_GGX_ClearCoat( const in IncidentLight incidentLight, const in Geometri
 	float D = D_GGX( clearCoatRoughness, dotNH );
 
 	
-	ReflectedLight clearCoatReflectedLight;
-	clearCoatReflectedLight.specular = incidentLight.color * F * ( G * D );
-	clearCoatReflectedLight.diffuse = vec3( 0.0 );
-
-	reflectedLight = BRDF_Mix( reflectedLight, clearCoatReflectedLight, clearCoatWeight ); 
+	return F * ( G * D );
 
 }
 
 // ref: https://www.unrealengine.com/blog/physically-based-shading-on-mobile - environmentBRDF for GGX on mobile
-void BRDF_GGX_Environment( const in IncidentLight incidentLight, const in GeometricContext geometry, vec3 specularColor, float roughness, inout ReflectedLight reflectedLight ) {
+vec3 BRDF_Specular_GGX_Environment( const in IncidentLight incidentLight, const in GeometricContext geometry, vec3 specularColor, float roughness ) {
 
 	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 
@@ -158,7 +154,7 @@ void BRDF_GGX_Environment( const in IncidentLight incidentLight, const in Geomet
 	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;
 	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
 
-	reflectedLight.specular += incidentLight.color * specularColor * AB.x + AB.y;
+	return specularColor * AB.x + AB.y;
 
 }
 
@@ -177,7 +173,7 @@ float D_BlinnPhong( const in float shininess, const in float dotNH ) {
 
 }
 
-void BRDF_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess, inout ReflectedLight reflectedLight ) {
+vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 	float dotNH = saturate( dot( geometry.normal, halfDir ) );
@@ -187,6 +183,6 @@ void BRDF_BlinnPhong( const in IncidentLight incidentLight, const in GeometricCo
 	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );
 	float D = D_BlinnPhong( shininess, dotNH );
 
-	reflectedLight.specular += incidentLight.color * F * ( G * D );
+	return F * ( G * D );
 
 }

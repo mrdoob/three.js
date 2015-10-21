@@ -12,11 +12,13 @@ ReflectedLight backReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 
 		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
 
-		BRDF_Lambert( directLight, geometry, diffuse, frontReflectedLight );
+		float dotNL = dot( geometry.normal, directLight.direction );
+		frontReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, geometry, diffuse );
 
 		#ifdef DOUBLE_SIDED
 
-			BRDF_Lambert( directLight, backGeometry, diffuse, backReflectedLight );
+			float dotNLBack = dot( -geometry.normal, directLight.direction );
+			backReflectedLight.diffuse += dotNLBack * directLight.color * BRDF_Diffuse_Lambert( directLight, backGeometry, diffuse );
 
 		#endif
 
@@ -30,14 +32,15 @@ ReflectedLight backReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 
 		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );
 
-		BRDF_Lambert( directLight, geometry, diffuse, frontReflectedLight );
+		float dotNL = dot( geometry.normal, directLight.direction );
+		frontReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, geometry, diffuse );
 
 		#ifdef DOUBLE_SIDED
 
-			BRDF_Lambert( directLight, backGeometry, diffuse, backReflectedLight );
+			float dotNLBack = dot( -geometry.normal, directLight.direction );
+			backReflectedLight.diffuse += dotNLBack * directLight.color * BRDF_Diffuse_Lambert( directLight, backGeometry, diffuse );
 
 		#endif
-
 	}
 
 #endif
@@ -48,11 +51,13 @@ ReflectedLight backReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 
 		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
 
-		BRDF_Lambert( directLight, geometry, diffuse, frontReflectedLight );
+		float dotNL = dot( geometry.normal, directLight.direction );
+		frontReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, geometry, diffuse );
 
 		#ifdef DOUBLE_SIDED
 
-			BRDF_Lambert( directLight, backGeometry, diffuse, backReflectedLight );
+			float dotNLBack = dot( -geometry.normal, directLight.direction );
+			backReflectedLight.diffuse += dotNLBack * directLight.color * BRDF_Diffuse_Lambert( directLight, backGeometry, diffuse );
 
 		#endif
 
@@ -66,13 +71,15 @@ ReflectedLight backReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
 
 		IncidentLight indirectLight = getHemisphereIndirectLight( hemisphereLights[ i ], geometry );
 
-		BRDF_Lambert( indirectLight, geometry, diffuse, frontReflectedLight );
+		float dotNL = dot( geometry.normal, directLight.direction );
+		frontReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, geometry, diffuse );
 
 		#ifdef DOUBLE_SIDED
 	
 			indirectLight = getHemisphereIndirectLight( hemisphereLights[ i ], backGeometry );
 
-			BRDF_Lambert( indirectLight, backGeometry, diffuse, backReflectedLight );
+			float dotNLBack = dot( -geometry.normal, directLight.direction );
+			backReflectedLight.diffuse += dotNLBack * directLight.color * BRDF_Diffuse_Lambert( directLight, backGeometry, diffuse );
 
 		#endif
 

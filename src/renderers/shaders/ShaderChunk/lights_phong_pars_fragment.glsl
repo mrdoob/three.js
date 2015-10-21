@@ -19,25 +19,27 @@ struct BlinnPhongMaterial {
 	vec3	specularColor;
 };
 
-void BRDF_BlinnPhongMaterial_DirectLight( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight directReflectedLight ) {
+void BlinnPhongMaterial_RE_DirectLight( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight directReflectedLight ) {
 
-	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );
+	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
 
-	BRDF_Lambert( directLight, geometry, material.diffuseColor, directReflectedLight );
-	//BRDF_OrenNayar( directLight, geometry, material.diffuseColor, 0.5, directReflectedLight );
+	directReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, geometry, material.diffuseColor );
+	//directReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_OrenNayar( directLight, geometry, material.diffuseColor, 0.5 );
 
-	BRDF_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess, directReflectedLight );
+	directReflectedLight.specular += dotNL * directLight.color * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );
 	
 }
 
-#define BRDF_Material_DirectLight    BRDF_BlinnPhongMaterial_DirectLight
+#define Material_RE_DirectLight    BlinnPhongMaterial_RE_DirectLight
 
-void BRDF_BlinnPhongMaterial_IndirectLight( const in IncidentLight indirectLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight indirectReflectedLight ) {
+void BlinnPhongMaterial_RE_IndirectLight( const in IncidentLight indirectLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight indirectReflectedLight ) {
 
-	BRDF_Lambert( indirectLight, geometry, material.diffuseColor, indirectReflectedLight );
+	float dotNL = saturate( dot( geometry.normal, indirectLight.direction ) );
+
+	indirectReflectedLight.diffuse += dotNL * indirectLight.color * BRDF_Diffuse_Lambert( indirectLight, geometry, material.diffuseColor );
 
 }
 
-#define BRDF_Material_DiffuseIndirectLight    BRDF_BlinnPhongMaterial_IndirectLight
+#define Material_RE_DiffuseIndirectLight    BlinnPhongMaterial_RE_IndirectLight
 
 #define Material_LightProbeLOD( material )   (0)

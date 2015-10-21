@@ -124,12 +124,7 @@ uniform vec3 ambientLightColor;
 
 #ifdef USE_ENVMAP
 
-	struct SpecularLightProbe {
-		samplerCube	map;
-		float intensity;
-	};
-
-	IncidentLight getSpecularLightProbeIndirectLight( const in SpecularLightProbe specularLightProbe, const in GeometricContext geometry, const in float lodLevel ) { 
+	IncidentLight getSpecularLightProbeIndirectLight( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float lodLevel ) { 
 	
 		#ifdef ENVMAP_MODE_REFLECTION
 
@@ -159,11 +154,11 @@ uniform vec3 ambientLightColor;
 
 				float bias = pow( lodLevel, 0.5 ) * 7.0; // from bhouston - there are other models for this calculation (roughness; not roughnesFactor)
 
-				vec4 envMapColor = textureCubeLodEXT( specularLightProbe.map, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), bias );
+				vec4 envMapColor = textureCubeLodEXT( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), bias );
 
 			#else
 
-				vec4 envMapColor = textureCube( specularLightProbe.map, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );
+				vec4 envMapColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );
 
 			#endif
 
@@ -172,19 +167,19 @@ uniform vec3 ambientLightColor;
 			vec2 sampleUV;
 			sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );
 			sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;
-			vec4 envMapColor = texture2D( specularLightProbe.map, sampleUV );
+			vec4 envMapColor = texture2D( envMap, sampleUV );
 
 		#elif defined( ENVMAP_TYPE_SPHERE )
 
 			vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));
-			vec4 envMapColor = texture2D( specularLightProbe.map, reflectView.xy * 0.5 + 0.5 );
+			vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
 
 		#endif
 
 		envMapColor.rgb = inputToLinear( envMapColor.rgb );
 
 		IncidentLight indirectLight;
-		indirectLight.color = envMapColor.rgb * specularLightProbe.intensity;
+		indirectLight.color = envMapColor.rgb * reflectivity;
 		indirectLight.direction = geometry.normal;
 
 		return indirectLight;

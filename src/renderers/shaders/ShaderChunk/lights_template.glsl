@@ -4,43 +4,43 @@
 
 GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal ), normalize(vViewPosition ) );
 
-#if ( MAX_POINT_LIGHTS > 0 ) && defined( BRDF_Material_DirectLight )
+#if ( MAX_POINT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
 		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
 
-		BRDF_Material_DirectLight( directLight, geometry, material, directReflectedLight );
+		Material_RE_DirectLight( directLight, geometry, material, directReflectedLight );
 
 	}
 
 #endif
 
-#if ( MAX_SPOT_LIGHTS > 0 ) && defined( BRDF_Material_DirectLight )
+#if ( MAX_SPOT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
 		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );
 
-		BRDF_Material_DirectLight( directLight, geometry, material, directReflectedLight );
+		Material_RE_DirectLight( directLight, geometry, material, directReflectedLight );
 
 	}
 
 #endif
 
-#if ( MAX_DIR_LIGHTS > 0 ) && defined( BRDF_Material_DirectLight )
+#if ( MAX_DIR_LIGHTS > 0 ) && defined( Material_RE_DirectLight )
 
 	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
 		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
 
-		BRDF_Material_DirectLight( directLight, geometry, material, directReflectedLight );
+		Material_RE_DirectLight( directLight, geometry, material, directReflectedLight );
 		
 	}
 
 #endif
 
-#if defined( BRDF_Material_DiffuseIndirectLight )
+#if defined( Material_RE_IndirectDiffuseLight )
 
 	{
 	
@@ -64,19 +64,19 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 #endif
 
-		BRDF_Material_DiffuseIndirectLight( indirectLight, geometry, material, indirectReflectedLight );
+		Material_RE_IndirectDiffuseLight( indirectLight, geometry, material, indirectReflectedLight );
 
 	}
 
 #endif
 
-#if defined( ENV_MAP ) && defined( BRDF_Material_SpecularIndirectLight )
+#if defined( USE_ENVMAP ) && defined( Material_RE_IndirectSpecularLight )
 
 	{
 
-		IncidentLight indirectLight = getSpecularLightProbeIndirectLight( specularLightProbe, geometry, Material_LightProbeLOD( material ) );
+		IncidentLight indirectLight = getSpecularLightProbeIndirectLight( /*specularLightProbe,*/ geometry, Material_LightProbeLOD( material ) );
 
-    	BRDF_Material_SpecularIndirectLight( lightProbeIncidentLight, geometry, material, indirectReflectedLight );
+    	Material_RE_IndirectSpecularLight( indirectLight, geometry, material, indirectReflectedLight );
 
     }
 
