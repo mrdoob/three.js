@@ -11,8 +11,6 @@
  *
  *  map: new THREE.Texture( <Image> ),
  *
- *  energyConverving: false
- *
  *  lightMap: new THREE.Texture( <Image> ),
  *  lightMapIntensity: <float>
  *
@@ -72,8 +70,6 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.metal = false;
 
 	this.map = null;
-
-	this.energyConserving = false;
 
 	this.lightMap = null;
 	this.lightMapIntensity = 1.0;
@@ -136,8 +132,6 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.metal = source.metal;
 
 	this.map = source.map;
-
-	this.energyConserving = source.energyConserving;
 
 	this.lightMap = source.lightMap;
 	this.lightMapIntensity = source.lightMapIntensity;

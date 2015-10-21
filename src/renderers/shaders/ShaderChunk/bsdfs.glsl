@@ -1,6 +1,3 @@
-//#define ENERGY_PRESERVING_MONOCHROME
-
-
 float calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {
 
 	if ( decayExponent > 0.0 ) {

@@ -163,16 +163,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialVertexColorsRow );
 
-	// energy conserving
-
-	var materialEnergyConservingRow = new UI.Panel();
-	var materialEnergyConserving = new UI.Checkbox( false ).onChange( update );
-
-	materialEnergyConservingRow.add( new UI.Text( 'EnergyConserving' ).setWidth( '90px' ) );
-	materialEnergyConservingRow.add( materialEnergyConserving );
-
-	container.add( materialEnergyConservingRow );
-
 	// skinning
 
 	var materialSkinningRow = new UI.Panel();
@@ -472,12 +462,6 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material.energyConserving !== undefined ) {
-
-				material.energyConserving = materialEnergyConserving.getValue();
-
-			}
-
 			if ( material.map !== undefined ) {
 
 				var mapEnabled = materialMapEnabled.getValue() === true;
@@ -703,7 +687,6 @@ Sidebar.Material = function ( editor ) {
 			'vertexShader': materialProgramRow,
 			'vertexColors': materialVertexColorsRow,
 			'skinning': materialSkinningRow,
-			'energyConserving': materialEnergyConservingRow,
 			'map': materialMapRow,
 			'alphaMap': materialAlphaMapRow,
 			'bumpMap': materialBumpMapRow,
@@ -784,12 +767,6 @@ Sidebar.Material = function ( editor ) {
 		if ( material.skinning !== undefined ) {
 
 			materialSkinning.setValue( material.skinning );
-
-		}
-
-		if ( material.energyConserving !== undefined ) {
-
-			materialEnergyConserving.setValue( material.energyConserving );
 
 		}
 
