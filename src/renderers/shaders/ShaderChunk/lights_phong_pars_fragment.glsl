@@ -30,6 +30,7 @@ void BRDF_BlinnPhongMaterial_DirectLight( const in IncidentLight directLight, co
 	
 }
 
+#define BRDF_Material_DirectLight    BRDF_BlinnPhongMaterial_DirectLight
 
 void BRDF_BlinnPhongMaterial_IndirectLight( const in IncidentLight indirectLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight indirectReflectedLight ) {
 
@@ -37,5 +38,6 @@ void BRDF_BlinnPhongMaterial_IndirectLight( const in IncidentLight indirectLight
 
 }
 
-#define BRDF_Material_DirectLight    BRDF_BlinnPhongMaterial_DirectLight
 #define BRDF_Material_IndirectLight    BRDF_BlinnPhongMaterial_IndirectLight
+
+#define Material_LightProbeLOD( material )   (0)

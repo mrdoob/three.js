@@ -24,13 +24,24 @@ void BRDF_PhysicalMaterial_DirectLight( const in IncidentLight directLight, cons
 	directReflectedLight.specular += reflectedLight.specular;
 	
 }
+#define BRDF_Material_DirectLight    BRDF_PhysicalMaterial_DirectLight
 
 
-void BRDF_PhysicalMaterial_IndirectLight( const in IncidentLight indirectLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight indirectReflectedLight ) {
+void BRDF_PhysicalMaterial_DiffuseIndirectLight( const in IncidentLight indirectLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight indirectReflectedLight ) {
 
 	BRDF_Lambert( indirectLight, geometry, material.diffuseColor, indirectReflectedLight );
 
 }
 
-#define BRDF_Material_DirectLight    BRDF_PhysicalMaterial_DirectLight
-#define BRDF_Material_IndirectLight    BRDF_PhysicalMaterial_IndirectLight
+#define BRDF_Material_DiffuseIndirectLight    BRDF_PhysicalMaterial_DiffuseIndirectLight
+
+
+void BRDF_PhysicalMaterial_SpecularIndirectLight( const in IncidentLight indirectLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight indirectReflectedLight ) {
+
+    BRDF_GGX_Environment( lightProbeIncidentLight, geometry, material.specularColor, material.roughness, indirectReflectedLight );
+
+}
+
+#define Material_LightProbeLOD( material )   (material.roughness)
+
+#define BRDF_Material_SpecularIndirectLight    BRDF_PhysicalMaterial_SpecularIndirectLight

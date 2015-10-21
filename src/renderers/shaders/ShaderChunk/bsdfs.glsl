@@ -15,6 +15,20 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 }
 
 
+ReflectedLight BRDF_Mix( const in ReflectedLight base, const in ReflectedLight over, const in float weight ) {
+	return ReflectedLight(
+		mix( base.diffuse, over.diffuse, weight ),
+		mix( base.specular, over.specular, weight )
+	);
+}
+
+ReflectedLight BRDF_Add( const in ReflectedLight base, const in ReflectedLight over, const in float weight ) {
+	return ReflectedLight(
+		base.diffuse + over.diffuse,
+		base.specular + over.specular 
+	);
+}
+
 void BRDF_Lambert( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 diffuseColor, inout ReflectedLight reflectedLight ) {
 
 	float lambertianReflectance = saturate( dot( geometryContext.normal, incidentLight.direction ) );
@@ -105,12 +119,14 @@ void BRDF_GGX( const in IncidentLight incidentLight, const in GeometricContext g
 	float G = G_SmithSchlick( roughness2, dotNL, dotNV );
 	float D = D_GGX( roughness2, dotNH );
 
-	reflectedLight.specular += incidentLight.color * F * ( G * D );
+	reflectedLight.specular += incidentLight.color * F * ( dotNL * G * D );
 
 }
 
+#define DIELECTRIC_SPECULAR_F0 0.20
+
 // this blends the existing reflected light with a clear coat.
-void BRDF_GGX_ClearCoat_Over( const in IncidentLight incidentLight, const in GeometricContext geometry, const in float clearCoatWeight, const in float clearCoatRoughness, inout ReflectedLight reflectedLight ) {
+void BRDF_GGX_ClearCoat( const in IncidentLight incidentLight, const in GeometricContext geometry, const in float clearCoatWeight, const in float clearCoatRoughness, inout ReflectedLight reflectedLight ) {
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 	float dotNH = saturate( dot( geometry.normal, halfDir ) );
@@ -122,15 +138,17 @@ void BRDF_GGX_ClearCoat_Over( const in IncidentLight incidentLight, const in Geo
 	float G = G_Kelemen( dotNV );
 	float D = D_GGX( clearCoatRoughness, dotNH );
 
-	vec3 clearCoatColor = F * ( G * D );
+	
+	ReflectedLight clearCoatReflectedLight;
+	clearCoatReflectedLight.specular = incidentLight.color * F * ( G * D );
+	clearCoatReflectedLight.diffuse = vec3( 0.0 );
 
-	reflectedLight.diffuse = mix( reflectedLight.diffuse, vec3( 0.0 ), clearCoatWeight );
-	reflectedLight.specular = mix( reflectedLight.specular, clearCoatColor, clearCoatWeight ); 
+	reflectedLight = BRDF_Mix( reflectedLight, clearCoatReflectedLight, clearCoatWeight ); 
 
 }
 
 // ref: https://www.unrealengine.com/blog/physically-based-shading-on-mobile - environmentBRDF for GGX on mobile
-vec3 BRDF_GGX_Environment( const in GeometricContext geometry, vec3 specularColor, float roughness  ) {
+void BRDF_GGX_Environment( const in IncidentLight incidentLight, const in GeometricContext geometry, vec3 specularColor, float roughness, inout ReflectedLight reflectedLight ) {
 
 	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 
@@ -140,7 +158,7 @@ vec3 BRDF_GGX_Environment( const in GeometricContext geometry, vec3 specularColo
 	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;
 	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
 
-	return specularColor * AB.x + AB.y;
+	reflectedLight.specular += incidentLight.color * specularColor * AB.x + AB.y;
 
 }
 

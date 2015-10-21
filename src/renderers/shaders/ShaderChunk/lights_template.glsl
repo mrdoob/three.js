@@ -4,7 +4,7 @@
 
 GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal ), normalize(vViewPosition ) );
 
-#if MAX_POINT_LIGHTS > 0
+#if ( MAX_POINT_LIGHTS > 0 ) && defined( BRDF_Material_DirectLight )
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
@@ -16,7 +16,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 #endif
 
-#if MAX_SPOT_LIGHTS > 0
+#if ( MAX_SPOT_LIGHTS > 0 ) && defined( BRDF_Material_DirectLight )
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
@@ -28,7 +28,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 #endif
 
-#if MAX_DIR_LIGHTS > 0
+#if ( MAX_DIR_LIGHTS > 0 ) && defined( BRDF_Material_DirectLight )
 
 	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
@@ -40,14 +40,26 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 #endif
 
-#if MAX_HEMI_LIGHTS > 0
+#if ( MAX_HEMI_LIGHTS > 0 ) && defined( BRDF_Material_DiffuseIndirectLight )
 
 	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
 		IncidentLight indirectLight = getHemisphereIndirectLight( hemisphereLights[ i ], geometry );
 
-		BRDF_Material_IndirectLight( indirectLight, geometry, material, indirectReflectedLight );
+		BRDF_Material_DiffuseIndirectLight( indirectLight, geometry, material, indirectReflectedLight );
 
 	}
+
+#endif
+
+#if defined( ENV_MAP ) && defined( BRDF_Material_SpecularIndirectLight )
+
+	{
+
+		IncidentLight indirectLight = getSpecularLightProbeIndirectLight( specularLightProbe, geometry, Material_LightProbeLOD( material ) );
+
+    	BRDF_Material_SpecularIndirectLight( lightProbeIncidentLight, geometry, material, indirectReflectedLight );
+
+    }
 
 #endif

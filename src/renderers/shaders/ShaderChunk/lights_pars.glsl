@@ -111,3 +111,76 @@ uniform vec3 ambientLightColor;
 	}
 
 #endif
+
+
+#ifdef USE_ENVMAP
+
+	struct SpecularLightProbe {
+		samplerCube	map;
+		float intensity;
+	};
+
+	IncidentLight getSpecularLightProbeIndirectLight( const in SpecularLightProbe specularLightProbe, const in GeometricContext geometry, const in float lodLevel ) { 
+	
+		#ifdef ENVMAP_MODE_REFLECTION
+
+			vec3 reflectVec = reflect( -geometry.viewDir, geometry.normal );
+
+		#else
+
+			vec3 reflectVec = refract( -geometry.viewDir, geometry.normal, refractionRatio );
+
+		#endif
+
+		#ifdef DOUBLE_SIDED
+
+			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+
+		#else
+
+			float flipNormal = 1.0;
+
+		#endif
+
+		reflectVec = normalize( transformDirection( reflectVec, viewMatrix ) );
+
+		#ifdef ENVMAP_TYPE_CUBE
+
+			#if defined( TEXTURE_CUBE_LOD_EXT )
+
+				float bias = pow( lodLevel, 0.5 ) * 7.0; // from bhouston - there are other models for this calculation (roughness; not roughnesFactor)
+
+				vec4 envMapColor = textureCubeLodEXT( specularLightProbe.map, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), bias );
+
+			#else
+
+				vec4 envMapColor = textureCube( specularLightProbe.map, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );
+
+			#endif
+
+		#elif defined( ENVMAP_TYPE_EQUIREC )
+
+			vec2 sampleUV;
+			sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );
+			sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;
+			vec4 envMapColor = texture2D( specularLightProbe.map, sampleUV );
+
+		#elif defined( ENVMAP_TYPE_SPHERE )
+
+			vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));
+			vec4 envMapColor = texture2D( specularLightProbe.map, reflectView.xy * 0.5 + 0.5 );
+
+		#endif
+
+		envMapColor.rgb = inputToLinear( envMapColor.rgb );
+
+		IncidentLight indirectLight;
+		indirectLight.color = envMapColor.rgb * specularLightProbe.intensity;
+		indirectLight.direction = geometry.normal;
+
+		return indirectLight;
+
+	}
+
+#endif
+
