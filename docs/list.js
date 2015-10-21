@@ -159,7 +159,6 @@ var list = {
 		"Extras": [
 			[ "FontUtils", "api/extras/FontUtils" ],
 			[ "GeometryUtils", "api/extras/GeometryUtils" ],
-			[ "ImageUtils", "api/extras/ImageUtils" ],
 			[ "SceneUtils", "api/extras/SceneUtils" ]
 		],
 
