@@ -14781,6 +14781,8 @@ THREE.XHRLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		if ( this.path !== undefined ) url = this.path + url;
+
 		var scope = this;
 
 		var cached = THREE.Cache.get( url );
@@ -14846,15 +14848,21 @@ THREE.XHRLoader.prototype = {
 
 	},
 
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
 	setResponseType: function ( value ) {
 
 		this.responseType = value;
 
 	},
 
-	setCrossOrigin: function ( value ) {
+	setPath: function ( value ) {
 
-		this.crossOrigin = value;
+		this.path = value;
 
 	},
 
@@ -14883,6 +14891,8 @@ THREE.ImageLoader.prototype = {
 	constructor: THREE.ImageLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
+
+		if ( this.path !== undefined ) url = this.path + url;
 
 		var scope = this;
 
@@ -14955,6 +14965,12 @@ THREE.ImageLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
 
 	}
 
@@ -16468,6 +16484,7 @@ THREE.TextureLoader.prototype = {
 
 		var loader = new THREE.ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 		loader.load( url, function ( image ) {
 
 			texture.image = image;
@@ -16488,6 +16505,12 @@ THREE.TextureLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
 
 	}
 
@@ -16515,6 +16538,7 @@ THREE.CubeTextureLoader.prototype = {
 
 		var loader = new THREE.ImageLoader();
 		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 
 		var loaded = 0;
 
@@ -16551,6 +16575,12 @@ THREE.CubeTextureLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
 
 	}
 
@@ -16688,42 +16718,43 @@ THREE.CompressedTextureLoader.prototype = {
 
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+
+		function loadTexture( i ) {
+
+			loader.load( url[ i ], function ( buffer ) {
+
+				var texDatas = scope._parser( buffer, true );
+
+				images[ i ] = {
+					width: texDatas.width,
+					height: texDatas.height,
+					format: texDatas.format,
+					mipmaps: texDatas.mipmaps
+				};
+
+				loaded += 1;
+
+				if ( loaded === 6 ) {
+
+					if ( texDatas.mipmapCount === 1 )
+						texture.minFilter = THREE.LinearFilter;
+
+					texture.format = texDatas.format;
+					texture.needsUpdate = true;
+
+					if ( onLoad ) onLoad( texture );
+
+				}
+
+			}, onProgress, onError );
+
+		}
 
 		if ( Array.isArray( url ) ) {
 
 			var loaded = 0;
-
-			var loadTexture = function ( i ) {
-
-				loader.load( url[ i ], function ( buffer ) {
-
-					var texDatas = scope._parser( buffer, true );
-
-					images[ i ] = {
-						width: texDatas.width,
-						height: texDatas.height,
-						format: texDatas.format,
-						mipmaps: texDatas.mipmaps
-					};
-
-					loaded += 1;
-
-					if ( loaded === 6 ) {
-
-						if ( texDatas.mipmapCount === 1 )
- 							texture.minFilter = THREE.LinearFilter;
-
-						texture.format = texDatas.format;
-						texture.needsUpdate = true;
-
-						if ( onLoad ) onLoad( texture );
-
-					}
-
-				}, onProgress, onError );
-
-			};
 
 			for ( var i = 0, il = url.length; i < il; ++ i ) {
 
@@ -16788,6 +16819,12 @@ THREE.CompressedTextureLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
 
 	}
 
@@ -26024,6 +26061,12 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		var geometry = event.target;
 		var buffergeometry = geometries[ geometry.id ];
+
+		if ( buffergeometry.index !== null ) {
+
+			deleteAttribute( buffergeometry.index );
+
+		}
 
 		deleteAttributes( buffergeometry.attributes );
 
