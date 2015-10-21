@@ -36,6 +36,7 @@ void PhysicalMaterial_RE_SpecularIndirectLight( const in IncidentLight indirectL
 
 }
 
-#define Material_LightProbeLOD( material )   (material.specularRoughness)
+// from bhouston - there are other models for this calculation (roughness; not roughnesFactor)
+#define Material_LightProbeLOD( material )   (pow( ( material.specularRoughness - 0.5 ) * 2.0, 0.5 ) * 7.0)
 
 #define Material_RE_IndirectSpecularLight    PhysicalMaterial_RE_SpecularIndirectLight

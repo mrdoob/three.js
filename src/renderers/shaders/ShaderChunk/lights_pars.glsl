@@ -146,15 +146,13 @@ uniform vec3 ambientLightColor;
 
 		#endif
 
-		reflectVec = normalize( transformDirection( reflectVec, viewMatrix ) );
+		reflectVec = normalize( inverseTransformDirection( reflectVec, viewMatrix ) );
 
 		#ifdef ENVMAP_TYPE_CUBE
 
-			#if defined( TEXTURE_CUBE_LOD_EXT )
+			#if defined( TEXTURE_CUBE_LOD_EXT )				
 
-				float bias = pow( lodLevel, 0.5 ) * 7.0; // from bhouston - there are other models for this calculation (roughness; not roughnesFactor)
-
-				vec4 envMapColor = textureCubeLodEXT( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), bias );
+				vec4 envMapColor = textureCubeLodEXT( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), lodLevel );
 
 			#else
 
