@@ -1,6 +1,6 @@
 #ifdef USE_ENVMAP
-
 	uniform float reflectivity;
+
 	#ifdef ENVMAP_TYPE_CUBE
 		uniform samplerCube envMap;
 	#else
