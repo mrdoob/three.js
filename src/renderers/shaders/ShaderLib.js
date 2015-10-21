@@ -230,13 +230,13 @@ THREE.ShaderLib = {
 			"	#ifdef DOUBLE_SIDED",
 
 			"		if ( gl_FrontFacing )",
-			"			outgoingLight += diffuseColor.rgb * ( vLightFront * shadowMask + totalAmbientLight ) + emissive;",
+			"			outgoingLight += diffuseColor.rgb * ( vLightFront * shadowMask ) + emissive;",
 			"		else",
-			"			outgoingLight += diffuseColor.rgb * ( vLightBack * shadowMask + totalAmbientLight ) + emissive;",
+			"			outgoingLight += diffuseColor.rgb * ( vLightBack * shadowMask ) + emissive;",
 
 			"	#else",
 
-			"		outgoingLight += diffuseColor.rgb * ( vLightFront * shadowMask + totalAmbientLight ) + emissive;",
+			"		outgoingLight += diffuseColor.rgb * ( vLightFront * shadowMask ) + emissive;",
 
 			"	#endif",
 
