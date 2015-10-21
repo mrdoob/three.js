@@ -1,8 +1,5 @@
-#if defined( PHYSICAL ) || defined( USE_ENVMAP )
-	uniform float reflectivity;
-#endif
-
 #ifdef USE_ENVMAP
+	uniform float reflectivity;
 
 	#ifdef ENVMAP_TYPE_CUBE
 		uniform samplerCube envMap;
