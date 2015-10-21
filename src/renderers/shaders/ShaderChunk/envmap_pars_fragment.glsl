@@ -1,6 +1,9 @@
+#if defined( PHYSICAL ) || defined( USE_ENVMAP )
+	uniform float reflectivity;
+#endif
+
 #ifdef USE_ENVMAP
 
-	uniform float reflectivity;
 	#ifdef ENVMAP_TYPE_CUBE
 		uniform samplerCube envMap;
 	#else
@@ -8,7 +11,7 @@
 	#endif
 	uniform float flipEnvMap;
 
-	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )
+	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( PHYSICAL )
 
 		uniform float refractionRatio;
 

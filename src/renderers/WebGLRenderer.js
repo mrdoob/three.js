@@ -637,7 +637,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 
-			if ( material.type !== 'MeshPhongMaterial' && material.shading === THREE.FlatShading ) {
+			if ( material.type !== 'MeshPhongMaterial' && material.type !== 'MeshPhysicalMaterial' && material.shading === THREE.FlatShading ) {
 
 				for ( var i = 0, l = object.count * 3; i < l; i += 9 ) {
 
@@ -1119,7 +1119,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
-		shadowMap.render( scene );
+		shadowMap.render( scene, camera );
 
 		//
 
@@ -1240,7 +1240,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		if ( ( object.channels.mask & camera.channels.mask ) !== 0 ) {
+		if ( object.layers.test( camera.layers ) ) {
 
 			if ( object instanceof THREE.Light ) {
 
@@ -1573,6 +1573,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.ShaderMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material.envMap ) {
 
 				if ( p_uniforms.cameraPosition !== undefined ) {
@@ -1587,6 +1588,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshBasicMaterial ||
+				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material instanceof THREE.ShaderMaterial ||
 				 material.skinning ) {
 
@@ -1665,6 +1667,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
+				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material.lights ) {
 
 				if ( _lightsNeedUpdate ) {
@@ -1690,7 +1693,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.MeshBasicMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
-				 material instanceof THREE.MeshPhongMaterial ) {
+				 material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshPhysicalMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
 
@@ -1715,6 +1719,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				refreshUniformsPhong( m_uniforms, material );
 
+			} else if ( material instanceof THREE.MeshPhysicalMaterial ) {
+
+				refreshUniformsStandard( m_uniforms, material );
+
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
 				m_uniforms.mNear.value = camera.near;
@@ -1727,9 +1735,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( object.receiveShadow && ! material._shadowPass ) {
+			if ( shadowMap.enabled ) {
 
-				refreshUniformsShadow( m_uniforms, lights, camera );
+				if ( object.receiveShadow && ! material._shadowPass ) {
+
+					refreshUniformsShadow( m_uniforms, lights, camera );
+
+				}
 
 			}
 
@@ -1923,6 +1935,74 @@ THREE.WebGLRenderer = function ( parameters ) {
 			uniforms.displacementMap.value = material.displacementMap;
 			uniforms.displacementScale.value = material.displacementScale;
 			uniforms.displacementBias.value = material.displacementBias;
+
+		}
+
+	}
+
+	function refreshUniformsStandard ( uniforms, material ) {
+
+		uniforms.roughness.value = material.roughness;
+		//uniforms.reflectivity.value = material.reflectivity; // part of uniforms common
+		uniforms.metalness.value = material.metalness;
+
+		if ( material.roughnessMap ) {
+
+			uniforms.roughnessMap.value = material.roughnessMap;
+
+		}
+
+		if ( material.reflectivityMap ) {
+
+			uniforms.reflectivityMap.value = material.reflectivityMap;
+
+		}
+
+		if ( material.metalnessMap ) {
+
+			uniforms.metalnessMap.value = material.metalnessMap;
+
+		}
+
+		if ( material.lightMap ) {
+
+			uniforms.lightMap.value = material.lightMap;
+			uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
+		}
+
+		if ( material.emissiveMap ) {
+
+			uniforms.emissiveMap.value = material.emissiveMap;
+
+		}
+
+		if ( material.bumpMap ) {
+
+			uniforms.bumpMap.value = material.bumpMap;
+			uniforms.bumpScale.value = material.bumpScale;
+
+		}
+
+		if ( material.normalMap ) {
+
+			uniforms.normalMap.value = material.normalMap;
+			uniforms.normalScale.value.copy( material.normalScale );
+
+		}
+
+		if ( material.displacementMap ) {
+
+			uniforms.displacementMap.value = material.displacementMap;
+			uniforms.displacementScale.value = material.displacementScale;
+			uniforms.displacementBias.value = material.displacementBias;
+
+		}
+
+		if ( material.envMap ) {
+
+			//uniforms.envMap.value = material.envMap; // part of uniforms common
+			uniforms.envMapIntensity.value = material.envMapIntensity;
 
 		}
 

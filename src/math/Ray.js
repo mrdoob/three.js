@@ -232,13 +232,6 @@ THREE.Ray.prototype = {
 
 	}(),
 
-
-	isIntersectionSphere: function ( sphere ) {
-
-		return this.distanceToPoint( sphere.center ) <= sphere.radius;
-
-	},
-
 	intersectSphere: function () {
 
 		// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
@@ -280,35 +273,24 @@ THREE.Ray.prototype = {
 
 	}(),
 
-	isIntersectionPlane: function ( plane ) {
+	intersectsSphere: function ( sphere ) {
 
-		// check if the ray lies on the plane first
+		return this.distanceToPoint( sphere.center ) <= sphere.radius;
 
-		var distToPoint = plane.distanceToPoint( this.origin );
+	},
 
-		if ( distToPoint === 0 ) {
+	isIntersectionSphere: function ( sphere ) {
 
-			return true;
+		console.warn( 'THREE.Ray: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
 
-		}
-
-		var denominator = plane.normal.dot( this.direction );
-
-		if ( denominator * distToPoint < 0 ) {
-
-			return true;
-
-		}
-
-		// ray origin is behind the plane (and is pointing behind it)
-
-		return false;
+		return this.intersectsSphere( sphere );
 
 	},
 
 	distanceToPlane: function ( plane ) {
 
 		var denominator = plane.normal.dot( this.direction );
+
 		if ( denominator === 0 ) {
 
 			// line is coplanar, return origin
@@ -346,17 +328,41 @@ THREE.Ray.prototype = {
 
 	},
 
-	isIntersectionBox: function () {
 
-		var v = new THREE.Vector3();
 
-		return function ( box ) {
+	intersectsPlane: function ( plane ) {
 
-			return this.intersectBox( box, v ) !== null;
+		// check if the ray lies on the plane first
 
-		};
+		var distToPoint = plane.distanceToPoint( this.origin );
 
-	}(),
+		if ( distToPoint === 0 ) {
+
+			return true;
+
+		}
+
+		var denominator = plane.normal.dot( this.direction );
+
+		if ( denominator * distToPoint < 0 ) {
+
+			return true;
+
+		}
+
+		// ray origin is behind the plane (and is pointing behind it)
+
+		return false;
+
+	},
+
+	isIntersectionPlane: function ( plane ) {
+
+		console.warn( 'THREE.Ray: .isIntersectionPlane() has been renamed to .intersectsPlane().' );
+
+		return this.intersectsPlane( plane );
+
+	},
 
 	intersectBox: function ( box, optionalTarget ) {
 
@@ -426,6 +432,26 @@ THREE.Ray.prototype = {
 		if ( tmax < 0 ) return null;
 
 		return this.at( tmin >= 0 ? tmin : tmax, optionalTarget );
+
+	},
+
+	intersectsBox: ( function () {
+
+		var v = new THREE.Vector3();
+
+		return function ( box ) {
+
+			return this.intersectBox( box, v ) !== null;
+
+		};
+
+	} )(),
+
+	isIntersectionBox: function ( box ) {
+
+		console.warn( 'THREE.Ray: .isIntersectionBox() has been renamed to .intersectsBox().' );
+
+		return this.intersectsBox( box );
 
 	},
 

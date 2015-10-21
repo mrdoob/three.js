@@ -32,11 +32,7 @@ THREE.Points.prototype.raycast = ( function () {
 
 		if ( geometry.boundingBox !== null ) {
 
-			if ( ray.isIntersectionBox( geometry.boundingBox ) === false ) {
-
-				return;
-
-			}
+			if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
 
 		}
 
