@@ -63,7 +63,7 @@ def main(argv=None):
 					tmp.write(u'THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + u'\'] = "')
 					text = f.read()
 					text = re.sub(r"[ \t]*//.*\n", "", text) # remove //
-					text = re.sub(r"[ \t]*\/\*[\s\S]*\*\/\n?", "", text) # remove /* */
+					text = re.sub(r"[ \t]*/\*[\s\S]*?\*/", "", text) # remove /* */
 					text = re.sub(r"\n+", '\\\\n', text) # \n+ to \n
 					tmp.write(text)
 					tmp.write(u'";\n\n')
