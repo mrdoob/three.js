@@ -158,12 +158,12 @@ UI.Outliner = function ( editor ) {
 
 			if ( item.nextSibling === null ) {
 
-				editor.moveObject( object, editor.scene );
+				editor.execute( new CmdMoveObject( object, editor.scene ) );
 
 			} else {
 
 				var nextObject = scene.getObjectById( item.nextSibling.value );
-				editor.moveObject( object, nextObject.parent, nextObject );
+				editor.execute( new CmdMoveObject( object, nextObject.parent, nextObject ) );
 
 			}
 

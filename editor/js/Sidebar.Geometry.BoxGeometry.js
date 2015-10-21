@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.BoxGeometry = function ( signals, object ) {
+Sidebar.Geometry.BoxGeometry = function ( editor, object ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 
@@ -72,20 +74,14 @@ Sidebar.Geometry.BoxGeometry = function ( signals, object ) {
 
 	function update() {
 
-		object.geometry.dispose();
-
-		object.geometry = new THREE.BoxGeometry(
+		editor.execute( new CmdSetGeometry( object, new THREE.BoxGeometry(
 			width.getValue(),
 			height.getValue(),
 			depth.getValue(),
 			widthSegments.getValue(),
 			heightSegments.getValue(),
 			depthSegments.getValue()
-		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.geometryChanged.dispatch( object );
+		) ) );
 
 	}
 

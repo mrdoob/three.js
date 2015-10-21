@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
+Sidebar.Geometry.CircleGeometry = function ( editor, object ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 
@@ -52,16 +54,12 @@ Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 
 	function update() {
 
-		object.geometry.dispose();
-
-		object.geometry = new THREE.CircleGeometry(
+		editor.execute( new CmdSetGeometry( object, new THREE.CircleGeometry(
 			radius.getValue(),
 			segments.getValue(),
 			thetaStart.getValue(),
 			thetaLength.getValue()
-		);
-
-		signals.geometryChanged.dispatch( object );
+		) ) );
 
 	}
 

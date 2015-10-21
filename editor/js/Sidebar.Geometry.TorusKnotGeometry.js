@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
+Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 
@@ -83,9 +85,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 
 	function update() {
 
-		object.geometry.dispose();
-
-		object.geometry = new THREE.TorusKnotGeometry(
+		editor.execute( new CmdSetGeometry( object, new THREE.TorusKnotGeometry(
 			radius.getValue(),
 			tube.getValue(),
 			radialSegments.getValue(),
@@ -93,11 +93,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 			p.getValue(),
 			q.getValue(),
 			heightScale.getValue()
-		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.geometryChanged.dispatch( object );
+		) ) );
 
 	}
 

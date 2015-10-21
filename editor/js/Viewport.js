@@ -34,7 +34,9 @@ var Viewport = function ( editor ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
-	var matrix = new THREE.Matrix4();
+	var objectPositionOnDown = null;
+	var objectRotationOnDown = null;
+	var objectScaleOnDown = null;
 
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
@@ -51,6 +53,8 @@ var Viewport = function ( editor ) {
 
 			}
 
+			signals.refreshSidebarObject3D.dispatch( object );
+
 		}
 
 		render();
@@ -60,7 +64,9 @@ var Viewport = function ( editor ) {
 
 		var object = transformControls.object;
 
-		matrix.copy( object.matrix );
+		objectPositionOnDown = object.position.clone();
+		objectRotationOnDown = object.rotation.clone();
+		objectScaleOnDown = object.scale.clone();
 
 		controls.enabled = false;
 
@@ -69,26 +75,36 @@ var Viewport = function ( editor ) {
 
 		var object = transformControls.object;
 
-		if ( matrix.equals( object.matrix ) === false ) {
+		if ( object != null ) {
 
-			( function ( matrix1, matrix2 ) {
+			switch ( transformControls.getMode() ) {
 
-				editor.history.add(
-					function () {
-						matrix1.decompose( object.position, object.quaternion, object.scale );
-						signals.objectChanged.dispatch( object );
-					},
-					function () {
-						matrix2.decompose( object.position, object.quaternion, object.scale );
-						signals.objectChanged.dispatch( object );
+				case 'translate':
+					if (!objectPositionOnDown.equals(object.position)) {
+
+						editor.execute(new CmdSetPosition( object, object.position, objectPositionOnDown ));
+
 					}
-				);
+					break;
+				case 'rotate':
+					if (!objectRotationOnDown.equals(object.rotation)) {
 
-			} )( matrix.clone(), object.matrix.clone() );
+						editor.execute(new CmdSetRotation( object, object.rotation, objectRotationOnDown ));
+
+					}
+					break;
+				case 'scale':
+					if (!objectScaleOnDown.equals(object.scale)) {
+
+						editor.execute(new CmdSetScale( object, object.scale, objectScaleOnDown ));
+
+					}
+					break;
+
+			}
 
 		}
 
-		signals.objectChanged.dispatch( object );
 		controls.enabled = true;
 
 	} );
@@ -358,9 +374,13 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.geometryChanged.add( function ( geometry ) {
+	signals.geometryChanged.add( function ( object ) {
 
-		selectionBox.update( editor.selected );
+		if ( object !== null ) {
+
+			selectionBox.update( object );
+
+		}
 
 		render();
 
@@ -384,8 +404,12 @@ var Viewport = function ( editor ) {
 
 	signals.objectChanged.add( function ( object ) {
 
-		selectionBox.update( object );
-		transformControls.update();
+		if ( editor.selected === object ) {
+
+			selectionBox.update( object );
+			transformControls.update();
+
+		}
 
 		if ( object instanceof THREE.PerspectiveCamera ) {
 
