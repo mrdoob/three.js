@@ -1,5 +1,7 @@
 //#define ENERGY_PRESERVING_MONOCHROME
 
+#define DIELECTRIC_SPECULAR_F0 0.20
+
 float calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {
 
 	if ( decayExponent > 0.0 ) {
@@ -27,6 +29,7 @@ void BRDF_Lambert( const in IncidentLight incidentLight, const in GeometricConte
 
 }
 
+// this roughness is a different property than specular roughness used in GGX.
 void BRDF_OrenNayar( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 diffuse, const in float roughness, inout ReflectedLight reflectedLight ) {
 
 	vec3 halfDir = normalize( incidentLight.direction + geometryContext.viewDir );
@@ -57,41 +60,36 @@ vec3 F_Schlick( const in vec3 F0, const in float dotLH ) {
 
 // Microfacet Models for Refraction through Rough Surfaces - equation (34)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
-// alpha is "roughness squared" in Disney’s reparameterization
-float G_SmithSchlick( in float alpha, in float dotNL, in float dotNV ) {
+// roughtness2 is "roughness squared" in Disney’s reparameterization
+float G_SmithSchlick( in float roughtness2, in float dotNL, in float dotNV ) {
 
 	// geometry term = G(l) . G(v) / 4(n . l)(n. v)
 
-	float a2 = alpha * alpha;
-
+	float a2 = roughtness2 * roughtness2;
 	float gl = dotNL + pow( a2 + ( 1.0 - a2 ) * dotNL * dotNL, 0.5 );
-
 	float gv = dotNV + pow( a2 + ( 1.0 - a2 ) * dotNV * dotNV, 0.5 );
 
 	return 1.0 / ( gl * gv );
 
 }
 
+// useful for clear coat surfaces, use with Distribution_GGX.
+float G_Kelemen( float vDotH ) {
 
-// Microfacet Models for Refraction through Rough Surfaces - equation (33)
-// http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
-// alpha is "roughness squared" in Disney’s reparameterization
-float D_GGX( in float alpha, in float dotNH ) {
-
-	// factor of 1/PI in distribution term omitted
-
-	float a2 = alpha * alpha;
-
-	float denom = dotNH * dotNH * ( a2 - 1.0 ) + 1.0; // avoid alpha = 0 with dotNH = 1
-
-	return a2 / ( denom * denom );
+	return 1.0 / ( 4.0 * vDotH * vDotH + 0.0000001 );
 
 }
 
-float G_BlinnPhong_Implicit( /* in float dotNL, in float dotNV */ ) {
+// Microfacet Models for Refraction through Rough Surfaces - equation (33)
+// http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
+// roughtness2 is "roughness squared" in Disney’s reparameterization
+float D_GGX( in float roughtness2, in float dotNH ) {
 
-	// geometry term is (n dot l)(n dot v) / 4(n dot l)(n dot v)
-	return 0.25;
+	// factor of 1/PI in distribution term omitted
+	float a2 = roughtness2 * roughtness2;
+	float denom = dotNH * dotNH * ( a2 - 1.0 ) + 1.0; // avoid roughtness2 = 0 with dotNH = 1
+
+	return a2 / ( denom * denom );
 
 }
 
@@ -108,6 +106,49 @@ void BRDF_GGX( const in IncidentLight incidentLight, const in GeometricContext g
 	float D = D_GGX( roughness2, dotNH );
 
 	reflectedLight.specular += incidentLight.color * F * ( G * D );
+
+}
+
+// this blends the existing reflected light with a clear coat.
+void BRDF_GGX_ClearCoat_Over( const in IncidentLight incidentLight, const in GeometricContext geometry, const in float clearCoatWeight, const in float clearCoatRoughness, inout ReflectedLight reflectedLight ) {
+
+	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
+	float dotNH = saturate( dot( geometry.normal, halfDir ) );
+	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
+	float dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );
+	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
+
+	vec3 F = F_Schlick( vec3( DIELECTRIC_SPECULAR_F0 ), dotLH );
+	float G = G_Kelemen( dotNV );
+	float D = D_GGX( clearCoatRoughness, dotNH );
+
+	vec3 clearCoatColor = F * ( G * D );
+
+	reflectedLight.diffuse = mix( reflectedLight.diffuse, vec3( 0.0 ), clearCoatWeight );
+	reflectedLight.specular = mix( reflectedLight.specular, clearCoatColor, clearCoatWeight ); 
+
+}
+
+// ref: https://www.unrealengine.com/blog/physically-based-shading-on-mobile - environmentBRDF for GGX on mobile
+vec3 BRDF_GGX_Environment( const in GeometricContext geometry, vec3 specularColor, float roughness  ) {
+
+	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
+
+	const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );
+	const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );
+	vec4 r = roughness * c0 + c1;
+	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;
+	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
+
+	return specularColor * AB.x + AB.y;
+
+}
+
+
+float G_BlinnPhong_Implicit( /* in float dotNL, in float dotNV */ ) {
+
+	// geometry term is (n dot l)(n dot v) / 4(n dot l)(n dot v)
+	return 0.25;
 
 }
 
@@ -129,24 +170,5 @@ void BRDF_BlinnPhong( const in IncidentLight incidentLight, const in GeometricCo
 	float D = D_BlinnPhong( shininess, dotNH );
 
 	reflectedLight.specular += incidentLight.color * F * ( G * D );
-
-}
-
-// ref: https://www.unrealengine.com/blog/physically-based-shading-on-mobile - environmentBRDF for GGX on mobile
-vec3 envBRDFApprox( vec3 specularColor, float roughness, in vec3 normal, in vec3 viewDir  ) {
-
-	float dotNV = saturate( dot( normal, viewDir ) );
-
-	const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );
-
-	const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );
-
-	vec4 r = roughness * c0 + c1;
-
-	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;
-
-	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
-
-	return specularColor * AB.x + AB.y;
 
 }
