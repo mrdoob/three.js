@@ -47,15 +47,15 @@
 
 	#ifdef ENVMAP_BLENDING_MULTIPLY
 
-		indirectReflectedLight.specular = mix( indirectReflectedLight.specular, indirectReflectedLight.specular * envColor.xyz, specularStrength * reflectivity );
+		outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );
 
 	#elif defined( ENVMAP_BLENDING_MIX )
 
-		indirectReflectedLight.specular = mix( indirectReflectedLight.specular, envColor.xyz, specularStrength * reflectivity );
+		outgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );
 
 	#elif defined( ENVMAP_BLENDING_ADD )
 
-		indirectReflectedLight.specular += envColor.xyz * specularStrength * reflectivity;
+		outgoingLight += envColor.xyz * specularStrength * reflectivity;
 
 	#endif
 

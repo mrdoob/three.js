@@ -101,14 +101,13 @@ THREE.ShaderLib = {
 			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), diffuse );",
 
 				THREE.ShaderChunk[ "aomap_fragment" ],
-				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				"indirectReflectedLight.diffuse *= shadowMask;",
 		
 				"vec3 outgoingLight = indirectReflectedLight.diffuse;",
 
+				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-
 				THREE.ShaderChunk[ "fog_fragment" ],
 
 			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
@@ -241,6 +240,8 @@ THREE.ShaderLib = {
 
 			"	#endif",
 
+				THREE.ShaderChunk[ "envmap_fragment" ],
+		
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
@@ -388,7 +389,6 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 
 				// modulation
-				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "aomap_fragment" ],
 			
 				"vec3 shadowMask = vec3( 1.0 );",
@@ -406,6 +406,7 @@ THREE.ShaderLib = {
 
 				"#endif",
 
+				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],

@@ -122,7 +122,7 @@ uniform vec3 ambientLightColor;
 #endif
 
 
-#ifdef USE_ENVMAP
+#if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
 	IncidentLight getSpecularLightProbeIndirectLight( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float lodLevel ) { 
 	
