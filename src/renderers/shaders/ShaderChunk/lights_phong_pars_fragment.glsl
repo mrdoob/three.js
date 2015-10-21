@@ -40,6 +40,6 @@ void BlinnPhongMaterial_RE_IndirectLight( const in IncidentLight indirectLight, 
 
 }
 
-#define Material_RE_DiffuseIndirectLight    BlinnPhongMaterial_RE_IndirectLight
+#define Material_RE_IndirectDiffuseLight    BlinnPhongMaterial_RE_IndirectLight
 
 #define Material_LightProbeLOD( material )   (0)
