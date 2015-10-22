@@ -128,60 +128,25 @@ THREE.AnimationMixer.prototype = {
 	// advance the time and update apply the animation
 	update: function( deltaTime ) {
 
+		deltaTime *= this.timeScale;
+
 		var actions = this._actions,
 			nActions = this._nActiveActions,
-			mixerDeltaTime = deltaTime * this.timeScale,
-			direction = Math.sign( deltaTime );
 
-		var time = this.time += mixerDeltaTime;
-		var accuIndex = this._accuIndex ^= 1;
+			time = this.time += deltaTime,
+			timeDirection = Math.sign( deltaTime ),
 
-		// perform all actions
+			accuIndex = this._accuIndex ^= 1;
+
+		// run active actions
 
 		for ( var i = 0; i !== nActions; ++ i ) {
 
-			var action = actions[ i ],
-				actionDeltaTime = mixerDeltaTime;
+			var action = actions[ i ];
 
-			if ( ! action.enabled ) continue;
+			if ( action.enabled ) {
 
-			var startTime = action.startTime_;
-
-			if ( startTime !== null ) {
-
-				// check for scheduled start of action
-
-				var timeRunning = ( time - startTime ) * direction;
-				if ( timeRunning < 0 ) continue; // yet to come
-
-				// start
-
-				action.startTime_ = null; // unschedule
-				actionDeltaTime = direction * timeRunning;
-
-			}
-
-			// run this action
-
-			actionDeltaTime *= action.updateTimeScale_( time );
-			var clipTime = action.updateTime_( actionDeltaTime );
-
-			// note: updateTime_ may disable the action resulting in
-			// an effective weight of 0
-
-			var weight = action.updateWeight_( time );
-
-			if ( weight > 0 ) {
-
-				var interpolants = action._interpolants;
-				var propertyMixers = action._propertyBindings;
-
-				for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
-
-					interpolants[ j ].evaluate( clipTime );
-					propertyMixers[ j ].accumulate( accuIndex, weight );
-
-				}
+				action._update( time, deltaTime, timeDirection, accuIndex );
 
 			}
 
@@ -329,40 +294,43 @@ THREE.AnimationMixer._Action =
 		interpolant.settings = interpolantSettings
 
 	}
+
 	this._interpolantSettings = interpolantSettings;
 
-	this._interpolants = interpolants;
+	this._interpolants = interpolants;	// bound by the mixer
+
+	// inside: PropertyMixer (managed by the mixer)
 	this._propertyBindings = new Array( nTracks );
+
+	this._cacheIndex = null;			// for the memory manager
+	this._byClipCacheIndex = null;		// for the memory manager
 
 	this._timeScaleInterpolant = null;
 	this._weightInterpolant = null;
-
-	this._cacheIndex = null;
-	this._byClipCacheIndex = null;
-
-	this._effectiveTimeScale = 1;
-	this._effectiveWeight = 1;
 
 	this.loop = THREE.LoopRepeat;
 	this._loopCount = -1;
 
 	// global mixer time when the action is to be started
-	// it's set back to 'null' when the mixer has started this action
-	this.startTime_ = null;
+	// it's set back to 'null' upon start of the action
+	this._startTime = null;
 
 	// scaled local time of the action
 	// gets clamped or wrapped to 0..clip.duration according to loop
 	this.time = 0;
 
 	this.timeScale = 1;
+	this._effectiveTimeScale = 1;
+
 	this.weight = 1;
+	this._effectiveWeight = 1;
 
 	this.repetitions = Infinity; 		// no. of repetitions when looping
 
 	this.paused = false;				// false -> zero effective time scale
 	this.enabled = true;				// true -> zero effective weight
 
-	this.clampWhenFinished 	= true;		// keep feeding the last frame?
+	this.clampWhenFinished 	= false;	// keep feeding the last frame?
 
 	this.zeroSlopeAtStart 	= true;		// for smooth interpolation w/o separate
 	this.zeroSlopeAtEnd		= true;		// clips for start, loop and end
@@ -398,7 +366,7 @@ THREE.AnimationMixer._Action.prototype = {
 
 		this.time = 0;			// restart clip
 		this._loopCount = -1;	// forget previous loops
-		this.startTime_ = null;	// forget scheduling
+		this._startTime = null;	// forget scheduling
 
 		return this.stopFading().stopWarping();
 
@@ -406,10 +374,10 @@ THREE.AnimationMixer._Action.prototype = {
 
 	isRunning: function() {
 
-		var start = this.startTime_;
+		var start = this._startTime;
 
 		return this.enabled && ! this.paused && this.timeScale !== 0 &&
-				this.startTime_ === null && this._mixer._isActiveAction( this )
+				this._startTime === null && this._mixer._isActiveAction( this )
 
 	},
 
@@ -422,7 +390,7 @@ THREE.AnimationMixer._Action.prototype = {
 
 	startAt: function( time ) {
 
-		this.startTime_ = time;
+		this._startTime = time;
 
 		return this;
 
@@ -623,9 +591,58 @@ THREE.AnimationMixer._Action.prototype = {
 
 	},
 
-	// Interface used by the mixer:
+	// Interna
 
-	updateWeight_: function( time ) {
+	_update: function( time, deltaTime, timeDirection, accuIndex ) {
+		// called by the mixer
+
+		var startTime = this._startTime;
+
+		if ( startTime !== null ) {
+
+			// check for scheduled start of action
+
+			var timeRunning = ( time - startTime ) * timeDirection;
+			if ( timeRunning < 0 || timeDirection === 0 ) {
+
+				return; // yet to come / don't decide when delta = 0
+
+			}
+
+			// start
+
+			this._startTime = null; // unschedule
+			deltaTime = timeDirection * timeRunning;
+
+		}
+
+		// apply time scale and advance time
+
+		deltaTime *= this._updateTimeScale( time );
+		var clipTime = this._updateTime( deltaTime );
+
+		// note: _updateTime may disable the action resulting in
+		// an effective weight of 0
+
+		var weight = this._updateWeight( time );
+
+		if ( weight > 0 ) {
+
+			var interpolants = this._interpolants;
+			var propertyMixers = this._propertyBindings;
+
+			for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+				interpolants[ j ].evaluate( clipTime );
+				propertyMixers[ j ].accumulate( accuIndex, weight );
+
+			}
+
+		}
+
+	},
+
+	_updateWeight: function( time ) {
 
 		var weight = 0;
 
@@ -662,7 +679,7 @@ THREE.AnimationMixer._Action.prototype = {
 
 	},
 
-	updateTimeScale_: function( time ) {
+	_updateTimeScale: function( time ) {
 
 		var timeScale = 0;
 
@@ -705,12 +722,13 @@ THREE.AnimationMixer._Action.prototype = {
 
 	},
 
-	updateTime_: function( actionDeltaTime ) {
+	_updateTime: function( deltaTime ) {
 
-		var time = this.time + actionDeltaTime,
-			duration = this._clip.duration,
+		var time = this.time + deltaTime;
 
-			direction = Math.sign( actionDeltaTime ),
+		if ( deltaTime === 0 ) return time;
+
+		var duration = this._clip.duration,
 
 			loop = this.loop,
 			loopCount = this._loopCount,
@@ -747,7 +765,8 @@ THREE.AnimationMixer._Action.prototype = {
 				else this.enabled = false;
 
 				this._mixer.dispatchEvent( {
-					type: 'finished', action: this, direction: direction
+					type: 'finished', action: this,
+					direction: deltaTime < 0 ? -1 : 1
 				} );
 
 				break;
@@ -762,10 +781,23 @@ THREE.AnimationMixer._Action.prototype = {
 
 					// just started
 
-					loopCount = 0;
+					if ( deltaTime > 0 ) {
 
-					var atStart = direction > 0;
-					this._setEndings( atStart, ! atStart, pingPong );
+						loopCount = 0;
+
+						this._setEndings(
+								true, this.repetitions === 0, pingPong );
+
+					} else {
+
+						// when looping in reverse direction, the initial
+						// transition through zero counts as a repetition,
+						// so leave loopCount at -1
+
+						this._setEndings(
+								this.repetitions === 0, true, pingPong );
+
+					}
 
 				}
 
@@ -776,7 +808,7 @@ THREE.AnimationMixer._Action.prototype = {
 					var loopDelta = Math.floor( time / duration ); // signed
 					time -= duration * loopDelta;
 
-					loopCount += loopDelta * direction;
+					loopCount += Math.abs( loopDelta );
 
 					var pending = this.repetitions - loopCount;
 
@@ -787,11 +819,11 @@ THREE.AnimationMixer._Action.prototype = {
 						if ( this.clampWhenFinished ) this.paused = true;
 						else this.enabled = false;
 
-						time = direction < 0 ? 0 : duration;
+						time = deltaTime > 0 ? duration : 0;
 
 						this._mixer.dispatchEvent( {
 							type: 'finished', action: this,
-							direction: direction
+							direction: deltaTime > 0 ? 1 : -1
 						} );
 
 						break;
@@ -800,7 +832,7 @@ THREE.AnimationMixer._Action.prototype = {
 
 						// transition to last round
 
-						var atStart = direction < 0;
+						var atStart = deltaTime < 0;
 						this._setEndings( atStart, ! atStart, pingPong );
 
 					} else {
@@ -836,8 +868,6 @@ THREE.AnimationMixer._Action.prototype = {
 		return time;
 
 	},
-
-	// Interna
 
 	_setEndings: function( atStart, atEnd, pingPong ) {
 
@@ -1336,7 +1366,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 			interpolant = new THREE.LinearInterpolant(
 					new Float32Array( 2 ), new Float32Array( 2 ),
-						1, this._controlInterpolantsResultBuffer_ );
+						1, this._controlInterpolantsResultBuffer );
 
 			interpolant.__cacheIndex = lastActiveIndex;
 			interpolants[ lastActiveIndex ] = interpolant;
