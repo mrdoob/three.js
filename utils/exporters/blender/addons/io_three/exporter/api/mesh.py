@@ -465,6 +465,11 @@ def animated_blend_shapes(mesh, name, options):
     :param options:
 
     """
+
+    # let filter the name to only keep the node's name
+    # the two cases are '%sGeometry' and '%sGeometry.%d', and we want %s
+    name = re.search("^(.*)Geometry(\..*)?$", name).group(1)
+
     logger.debug("mesh.animated_blend_shapes(%s, %s)", mesh, options)
     tracks = []
     shp = mesh.shape_keys
