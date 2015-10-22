@@ -338,6 +338,7 @@ INTENSITY = 'intensity'
 DISTANCE = 'distance'
 ASPECT = 'aspect'
 ANGLE = 'angle'
+DECAY = 'decayExponent'
 
 FOV = 'fov'
 ASPECT = 'aspect'
