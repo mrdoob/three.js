@@ -21,7 +21,7 @@ test( "Test unwanted situations ", function() {
 
 
 	var box = aBox();
-	var cmd = new CmdAddObject( box );
+	var cmd = new AddObjectCommand( box );
 	cmd.updatable = false;
 	editor.execute( cmd );
 

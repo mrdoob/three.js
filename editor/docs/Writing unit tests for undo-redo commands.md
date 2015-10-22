@@ -26,8 +26,8 @@ Within the file, go to the `<!-- command object classes -->` and include the new
 ```javascript
 // <!-- command object classes -->
 //...
-<script src="../../editor/js/CmdSetUuid.js"></script>
-<script src="../../editor/js/CmdSetValue.js"></script>
+<script src="../../editor/js/SetUuidCommand.js"></script>
+<script src="../../editor/js/SetValueCommand.js"></script>
 <script src="../../editor/js/CmdXXX.js"></script>         // add this line
 //...
 ```
@@ -39,7 +39,7 @@ Next, in the same file, go to `<!-- Undo-Redo tests -->` and include the test fi
 ```javascript
 // <!-- Undo-Redo tests -->
 //...
-<script src="editor/TestCmdSetValue.js"></script>
+<script src="editor/TestSetValueCommand.js"></script>
 <script src="editor/TestCmdXXX.js"></script>              // add this line
 <script src="editor/TestNestedDoUndoRedo.js"></script>
 //...
@@ -68,7 +68,7 @@ test("Test CmdXXX (Undo and Redo)", function() {
     // var perspectiveCamera = aPerspectiveCamera( 'Name your perspectiveCamera' );
 
     // in most cases you'll need to add the object to work with
-    editor.execute( new CmdAddObject( box ) );
+    editor.execute( new AddObjectCommand( box ) );
 
 
     // your test begins here...

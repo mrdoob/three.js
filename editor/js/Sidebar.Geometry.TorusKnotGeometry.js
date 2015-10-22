@@ -85,7 +85,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new CmdSetGeometry( object, new THREE.TorusKnotGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE.TorusKnotGeometry(
 			radius.getValue(),
 			tube.getValue(),
 			radialSegments.getValue(),

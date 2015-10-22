@@ -35,7 +35,7 @@ Sidebar.Geometry.IcosahedronGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new CmdSetGeometry( object, new THREE.IcosahedronGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE.IcosahedronGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );

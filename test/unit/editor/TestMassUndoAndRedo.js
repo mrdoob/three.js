@@ -16,7 +16,7 @@ test( "MassUndoAndRedo (stress test)", function() {
 	while ( i < MAX_OBJECTS ) {
 
 		var object = aSphere( 'Sphere #' + i );
-		var cmd = new CmdAddObject( object );
+		var cmd = new AddObjectCommand( object );
 		cmd.updatable = false;
 		editor.execute( cmd );
 

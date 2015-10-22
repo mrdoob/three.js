@@ -40,7 +40,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Group();
 		mesh.name = 'Group ' + ( ++ meshCount );
 
-		editor.execute( new CmdAddObject( mesh ) );
+		editor.execute( new AddObjectCommand( mesh ) );
 
 	} );
 	options.add( option );
@@ -67,7 +67,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, material );
 		mesh.name = 'Plane ' + ( ++ meshCount );
 
-		editor.execute( new CmdAddObject( mesh ) );
+		editor.execute( new AddObjectCommand( mesh ) );
 
 	} );
 	options.add( option );
@@ -91,7 +91,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Box ' + ( ++ meshCount );
 
-		editor.execute( new CmdAddObject( mesh ) );
+		editor.execute( new AddObjectCommand( mesh ) );
 
 	} );
 	options.add( option );
@@ -110,7 +110,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Circle ' + ( ++ meshCount );
 
-		editor.execute( new CmdAddObject( mesh ) );
+		editor.execute( new AddObjectCommand( mesh ) );
 
 	} );
 	options.add( option );
@@ -133,7 +133,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Cylinder ' + ( ++ meshCount );
 
-		editor.execute( new CmdAddObject( mesh ) );
+		editor.execute( new AddObjectCommand( mesh ) );
 
 	} );
 	options.add( option );
@@ -157,7 +157,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Sphere ' + ( ++ meshCount );
 
-		editor.execute( new CmdAddObject( mesh ) );
+		editor.execute( new AddObjectCommand( mesh ) );
 
 	} );
 	options.add( option );
@@ -176,7 +176,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Icosahedron ' + ( ++ meshCount );
 
-		editor.execute( new CmdAddObject( mesh ) );
+		editor.execute( new AddObjectCommand( mesh ) );
 
 	} );
 	options.add( option );
@@ -198,7 +198,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Torus ' + ( ++ meshCount );
 
-		editor.execute( new CmdAddObject( mesh ) );
+		editor.execute( new AddObjectCommand( mesh ) );
 
 	} );
 	options.add( option );
@@ -222,7 +222,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'TorusKnot ' + ( ++ meshCount );
 
-		editor.execute( new CmdAddObject( mesh ) );
+		editor.execute( new AddObjectCommand( mesh ) );
 
 	} );
 	options.add( option );
@@ -267,7 +267,7 @@ Menubar.Add = function ( editor ) {
 		var sprite = new THREE.Sprite( new THREE.SpriteMaterial() );
 		sprite.name = 'Sprite ' + ( ++ meshCount );
 
-		editor.execute( new CmdAddObject( sprite ) );
+		editor.execute( new AddObjectCommand( sprite ) );
 
 	} );
 	options.add( option );
@@ -290,7 +290,7 @@ Menubar.Add = function ( editor ) {
 		var light = new THREE.PointLight( color, intensity, distance );
 		light.name = 'PointLight ' + ( ++ lightCount );
 
-		editor.execute( new CmdAddObject( light ) );
+		editor.execute( new AddObjectCommand( light ) );
 
 	} );
 	options.add( option );
@@ -314,7 +314,7 @@ Menubar.Add = function ( editor ) {
 
 		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
-		editor.execute( new CmdAddObject( light ) );
+		editor.execute( new AddObjectCommand( light ) );
 
 	} );
 	options.add( option );
@@ -335,7 +335,7 @@ Menubar.Add = function ( editor ) {
 
 		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
-		editor.execute( new CmdAddObject( light ) );
+		editor.execute( new AddObjectCommand( light ) );
 
 	} );
 	options.add( option );
@@ -356,7 +356,7 @@ Menubar.Add = function ( editor ) {
 
 		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
-		editor.execute( new CmdAddObject( light ) );
+		editor.execute( new AddObjectCommand( light ) );
 
 	} );
 	options.add( option );
@@ -373,7 +373,7 @@ Menubar.Add = function ( editor ) {
 		var light = new THREE.AmbientLight( color );
 		light.name = 'AmbientLight ' + ( ++ lightCount );
 
-		editor.execute( new CmdAddObject( light ) );
+		editor.execute( new AddObjectCommand( light ) );
 
 	} );
 	options.add( option );
@@ -392,7 +392,7 @@ Menubar.Add = function ( editor ) {
 		var camera = new THREE.PerspectiveCamera( 50, 1, 1, 10000 );
 		camera.name = 'PerspectiveCamera ' + ( ++ cameraCount );
 
-		editor.execute( new CmdAddObject( camera ) );
+		editor.execute( new AddObjectCommand( camera ) );
 
 	} );
 	options.add( option );

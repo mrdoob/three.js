@@ -42,7 +42,7 @@ Sidebar.Material = function ( editor ) {
 	var materialNameRow = new UI.Panel();
 	var materialName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-		editor.execute( new CmdSetMaterialValue( editor.selected, 'name', materialName.getValue() ) );
+		editor.execute( new SetMaterialValueCommand( editor.selected, 'name', materialName.getValue() ) );
 
 	} );
 
@@ -402,7 +402,7 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.uuid !== undefined && material.uuid !== materialUUID.getValue() ) {
 
-				editor.execute( new CmdSetMaterialValue( currentObject, 'uuid', materialUUID.getValue() ) );
+				editor.execute( new SetMaterialValueCommand( currentObject, 'uuid', materialUUID.getValue() ) );
 
 			}
 
@@ -410,7 +410,7 @@ Sidebar.Material = function ( editor ) {
 
 				material = new THREE[ materialClass.getValue() ]();
 
-				editor.execute( new CmdSetMaterial( currentObject, material ), 'New Material: ' + materialClass.getValue() );
+				editor.execute( new SetMaterialCommand( currentObject, material ), 'New Material: ' + materialClass.getValue() );
 				// TODO Copy other references in the scene graph
 				// keeping name and UUID then.
 				// Also there should be means to create a unique
@@ -421,25 +421,25 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.color !== undefined && material.color.getHex() !== materialColor.getHexValue() ) {
 
-				editor.execute( new CmdSetMaterialColor( currentObject, 'color', materialColor.getHexValue() ) );
+				editor.execute( new SetMaterialColorCommand( currentObject, 'color', materialColor.getHexValue() ) );
 
 			}
 
 			if ( material.emissive !== undefined && material.emissive.getHex() !== materialEmissive.getHexValue() ) {
 
-				editor.execute( new CmdSetMaterialColor( currentObject, 'emissive', materialEmissive.getHexValue() ) );
+				editor.execute( new SetMaterialColorCommand( currentObject, 'emissive', materialEmissive.getHexValue() ) );
 
 			}
 
 			if ( material.specular !== undefined && material.specular.getHex() !== materialSpecular.getHexValue() ) {
 
-				editor.execute( new CmdSetMaterialColor( currentObject, 'specular', materialSpecular.getHexValue() ) );
+				editor.execute( new SetMaterialColorCommand( currentObject, 'specular', materialSpecular.getHexValue() ) );
 
 			}
 
 			if ( material.shininess !== undefined && Math.abs( material.shininess - materialShininess.getValue() ) >= 0.01 ) {
 
-				editor.execute( new CmdSetMaterialValue( currentObject, 'shininess', materialShininess.getValue() ) );
+				editor.execute( new SetMaterialValueCommand( currentObject, 'shininess', materialShininess.getValue() ) );
 
 			}
 
@@ -449,7 +449,7 @@ Sidebar.Material = function ( editor ) {
 
 				if ( material.vertexColors !== vertexColors ) {
 
-					editor.execute( new CmdSetMaterialValue( currentObject, 'vertexColors', vertexColors ) );
+					editor.execute( new SetMaterialValueCommand( currentObject, 'vertexColors', vertexColors ) );
 
 				}
 
@@ -457,7 +457,7 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.skinning !== undefined && material.skinning !== materialSkinning.getValue() ) {
 
-				editor.execute( new CmdSetMaterialValue( currentObject, 'skinning', materialSkinning.getValue() ) );
+				editor.execute( new SetMaterialValueCommand( currentObject, 'skinning', materialSkinning.getValue() ) );
 
 			}
 
@@ -470,7 +470,7 @@ Sidebar.Material = function ( editor ) {
 					var map = mapEnabled ? materialMap.getValue() : null;
 					if ( material.map !== map ) {
 
-						editor.execute( new CmdSetMaterialMap( currentObject, 'map', map ) );
+						editor.execute( new SetMaterialMapCommand( currentObject, 'map', map ) );
 
 					}
 
@@ -491,7 +491,7 @@ Sidebar.Material = function ( editor ) {
 					var alphaMap = mapEnabled ? materialAlphaMap.getValue() : null;
 					if ( material.alphaMap !== alphaMap ) {
 
-						editor.execute( new CmdSetMaterialMap( currentObject, 'alphaMap', alphaMap ) );
+						editor.execute( new SetMaterialMapCommand( currentObject, 'alphaMap', alphaMap ) );
 
 					}
 
@@ -512,13 +512,13 @@ Sidebar.Material = function ( editor ) {
 					var bumpMap = bumpMapEnabled ? materialBumpMap.getValue() : null;
 					if ( material.bumpMap !== bumpMap ) {
 
-						editor.execute( new CmdSetMaterialMap( currentObject, 'bumpMap', bumpMap ) );
+						editor.execute( new SetMaterialMapCommand( currentObject, 'bumpMap', bumpMap ) );
 
 					}
 
 					if ( material.bumpScale !== materialBumpScale.getValue() ) {
 
-						editor.execute( new CmdSetMaterialValue( currentObject, 'bumpScale', materialBumpScale.getValue() ) );
+						editor.execute( new SetMaterialValueCommand( currentObject, 'bumpScale', materialBumpScale.getValue() ) );
 
 					}
 
@@ -539,7 +539,7 @@ Sidebar.Material = function ( editor ) {
 					var normalMap = normalMapEnabled ? materialNormalMap.getValue() : null;
 					if ( material.normalMap !== normalMap ) {
 
-						editor.execute( new CmdSetMaterialMap( currentObject, 'normalMap', normalMap ) );
+						editor.execute( new SetMaterialMapCommand( currentObject, 'normalMap', normalMap ) );
 
 					}
 
@@ -560,13 +560,13 @@ Sidebar.Material = function ( editor ) {
 					var displacementMap = displacementMapEnabled ? materialDisplacementMap.getValue() : null;
 					if ( material.displacementMap !== displacementMap ) {
 
-						editor.execute( new CmdSetMaterialMap( currentObject, 'displacementMap', displacementMap ) );
+						editor.execute( new SetMaterialMapCommand( currentObject, 'displacementMap', displacementMap ) );
 
 					}
 
 					if ( material.displacementScale !== materialDisplacementScale.getValue() ) {
 
-						editor.execute( new CmdSetMaterialValue( currentObject, 'displacementScale', materialDisplacementScale.getValue() ) );
+						editor.execute( new SetMaterialValueCommand( currentObject, 'displacementScale', materialDisplacementScale.getValue() ) );
 
 					}
 
@@ -587,7 +587,7 @@ Sidebar.Material = function ( editor ) {
 					var specularMap = specularMapEnabled ? materialSpecularMap.getValue() : null;
 					if ( material.specularMap !== specularMap ) {
 
-						editor.execute( new CmdSetMaterialMap( currentObject, 'specularMap', specularMap ) );
+						editor.execute( new SetMaterialMapCommand( currentObject, 'specularMap', specularMap ) );
 
 					}
 
@@ -607,13 +607,13 @@ Sidebar.Material = function ( editor ) {
 
 				if ( material.envMap !== envMap ) {
 
-					editor.execute( new CmdSetMaterialMap( currentObject, 'envMap', envMap ) );
+					editor.execute( new SetMaterialMapCommand( currentObject, 'envMap', envMap ) );
 
 				}
 
 				if ( material.reflectivity !== materialReflectivity.getValue() ) {
 
-					editor.execute( new CmdSetMaterialValue( currentObject, 'reflectivity', materialReflectivity.getValue() ) );
+					editor.execute( new SetMaterialValueCommand( currentObject, 'reflectivity', materialReflectivity.getValue() ) );
 
 				}
 
@@ -628,7 +628,7 @@ Sidebar.Material = function ( editor ) {
 					var lightMap = lightMapEnabled ? materialLightMap.getValue() : null;
 					if ( material.lightMap !== lightMap ) {
 
-						editor.execute( new CmdSetMaterialMap( currentObject, 'lightMap', lightMap ) );
+						editor.execute( new SetMaterialMapCommand( currentObject, 'lightMap', lightMap ) );
 
 					}
 
@@ -649,13 +649,13 @@ Sidebar.Material = function ( editor ) {
 					var aoMap = aoMapEnabled ? materialAOMap.getValue() : null;
 					if ( material.aoMap !== aoMap ) {
 
-						editor.execute( new CmdSetMaterialMap( currentObject, 'aoMap', aoMap ) );
+						editor.execute( new SetMaterialMapCommand( currentObject, 'aoMap', aoMap ) );
 
 					}
 
 					if ( material.aoMapIntensity !== materialAOScale.getValue() ) {
 
-						editor.execute( new CmdSetMaterialValue( currentObject, 'aoMapIntensity', materialAOScale.getValue() ) );
+						editor.execute( new SetMaterialValueCommand( currentObject, 'aoMapIntensity', materialAOScale.getValue() ) );
 
 					}
 
@@ -672,7 +672,7 @@ Sidebar.Material = function ( editor ) {
 				var side = parseInt( materialSide.getValue() );
 				if ( material.side !== side ) {
 
-					editor.execute( new CmdSetMaterialValue( currentObject, 'side', side ) );
+					editor.execute( new SetMaterialValueCommand( currentObject, 'side', side ) );
 
 				}
 
@@ -684,7 +684,7 @@ Sidebar.Material = function ( editor ) {
 				var shading = parseInt( materialShading.getValue() );
 				if ( material.shading !== shading ) {
 
-					editor.execute( new CmdSetMaterialValue( currentObject, 'shading', shading ) );
+					editor.execute( new SetMaterialValueCommand( currentObject, 'shading', shading ) );
 
 				}
 
@@ -695,7 +695,7 @@ Sidebar.Material = function ( editor ) {
 				var blending = parseInt( materialBlending.getValue() );
 				if ( material.blending !== blending ) {
 
-					editor.execute( new CmdSetMaterialValue( currentObject, 'blending', blending ) );
+					editor.execute( new SetMaterialValueCommand( currentObject, 'blending', blending ) );
 
 				}
 
@@ -703,31 +703,31 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.opacity !== undefined && Math.abs( material.opacity - materialOpacity.getValue() ) >= 0.01 ) {
 
-				editor.execute( new CmdSetMaterialValue( currentObject, 'opacity', materialOpacity.getValue() ) );
+				editor.execute( new SetMaterialValueCommand( currentObject, 'opacity', materialOpacity.getValue() ) );
 
 			}
 
 			if ( material.transparent !== undefined && material.transparent !== materialTransparent.getValue() ) {
 
-				editor.execute( new CmdSetMaterialValue( currentObject, 'transparent', materialTransparent.getValue() ) );
+				editor.execute( new SetMaterialValueCommand( currentObject, 'transparent', materialTransparent.getValue() ) );
 
 			}
 
 			if ( material.alphaTest !== undefined && Math.abs( material.alphaTest - materialAlphaTest.getValue() ) >= 0.01 ) {
 
-				editor.execute( new CmdSetMaterialValue( currentObject, 'alphaTest', materialAlphaTest.getValue() ) );
+				editor.execute( new SetMaterialValueCommand( currentObject, 'alphaTest', materialAlphaTest.getValue() ) );
 
 			}
 
 			if ( material.wireframe !== undefined && material.wireframe !== materialWireframe.getValue() ) {
 
-				editor.execute( new CmdSetMaterialValue( currentObject, 'wireframe', materialWireframe.getValue() ) );
+				editor.execute( new SetMaterialValueCommand( currentObject, 'wireframe', materialWireframe.getValue() ) );
 
 			}
 
 			if ( material.wireframeLinewidth !== undefined && Math.abs( material.wireframeLinewidth - materialWireframeLinewidth.getValue() ) >= 0.01 ) {
 
-				editor.execute( new CmdSetMaterialValue( currentObject, 'wireframeLinewidth', materialWireframeLinewidth.getValue() ) );
+				editor.execute( new SetMaterialValueCommand( currentObject, 'wireframeLinewidth', materialWireframeLinewidth.getValue() ) );
 
 			}
 

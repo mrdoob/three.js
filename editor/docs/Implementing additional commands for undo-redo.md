@@ -28,7 +28,7 @@ Every command needs a constructor. In the constructor
 	
 CmdXXX = function () {
 
-	Cmd.call( this ); // Required: Call default constructor
+	Command.call( this ); // Required: Call default constructor
 
 	this.type = 'CmdXXX';            // Required: has to match the object-name!
 	this.name = 'Set/Do/Update XXX'; // Required: description of the command, used in Sidebar.History
@@ -62,7 +62,7 @@ CmdXXX.prototype = {
 
 	toJSON: function () {
 
-		var output = Cmd.prototype.toJSON.call( this ); // Required: Call 'toJSON'-method of prototype 'Cmd'
+		var output = Command.prototype.toJSON.call( this ); // Required: Call 'toJSON'-method of prototype 'Command'
 
 		// TODO: serialize all the necessary information as part of 'output' (JSON-format)
 		// so that it can be restored in 'fromJSON'
@@ -73,7 +73,7 @@ CmdXXX.prototype = {
 
 	fromJSON: function ( json ) {
 
-		Cmd.prototype.fromJSON.call( this, json ); // Required: Call 'fromJSON'-method of prototype 'Cmd'
+		Command.prototype.fromJSON.call( this, json ); // Required: Call 'fromJSON'-method of prototype 'Command'
 		
 		// TODO: restore command from json
 		
@@ -99,7 +99,7 @@ editor.execute( new CmdXXX() );
 Some commands are also **updatable**. By default a command is not updatable. Making a command updatable means that you
 have to implement a fifth function 'update' as part of the prototype. In it only the 'new' state gets updated while the old one stays the same.
 
-Here as an example is the update-function of **CmdSetColor**:
+Here as an example is the update-function of **SetColorCommand**:
 
 ```javascript
 update: function ( cmd ) {
@@ -112,15 +112,15 @@ update: function ( cmd ) {
 
 #### List of updatable commands
 
-- CmdSetColor
-- CmdSetGeometry
-- CmdSetMaterialColor
-- CmdSetMaterialValue
-- CmdSetPosition
-- CmdSetRotation
-- CmdSetScale
-- CmdSetValue
-- CmdSetScriptValue
+- SetColorCommand
+- SetGeometryCommand
+- SetMaterialColorCommand
+- SetMaterialValueCommand
+- SetPositionCommand
+- SetRotationCommand
+- SetScaleCommand
+- SetValueCommand
+- SetScriptValueCommand
 
 The idea behind 'updatable commands' is that two commands of the same type which occur
 within a short period of time should be merged into one.

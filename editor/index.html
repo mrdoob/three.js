@@ -124,27 +124,27 @@
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
-		<script src="js/Cmd.js"></script>
-		<script src="js/CmdAddObject.js"></script>
-		<script src="js/CmdRemoveObject.js"></script>
-		<script src="js/CmdMoveObject.js"></script>
-		<script src="js/CmdSetPosition.js"></script>
-		<script src="js/CmdSetRotation.js"></script>
-		<script src="js/CmdSetScale.js"></script>
-		<script src="js/CmdSetValue.js"></script>
-		<script src="js/CmdSetUuid.js"></script>
-		<script src="js/CmdSetColor.js"></script>
-		<script src="js/CmdSetGeometry.js"></script>
-		<script src="js/CmdSetGeometryValue.js"></script>
-		<script src="js/CmdMultiCmds.js"></script>
-		<script src="js/CmdAddScript.js"></script>
-		<script src="js/CmdRemoveScript.js"></script>
-		<script src="js/CmdSetScriptValue.js"></script>
-		<script src="js/CmdSetMaterial.js"></script>
-		<script src="js/CmdSetMaterialValue.js"></script>
-		<script src="js/CmdSetMaterialColor.js"></script>
-		<script src="js/CmdSetMaterialMap.js"></script>
-		<script src="js/CmdSetScene.js"></script>
+		<script src="js/Command.js"></script>
+		<script src="js/commands/AddObjectCommand.js"></script>
+		<script src="js/commands/RemoveObjectCommand.js"></script>
+		<script src="js/commands/MoveObjectCommand.js"></script>
+		<script src="js/commands/SetPositionCommand.js"></script>
+		<script src="js/commands/SetRotationCommand.js"></script>
+		<script src="js/commands/SetScaleCommand.js"></script>
+		<script src="js/commands/SetValueCommand.js"></script>
+		<script src="js/commands/SetUuidCommand.js"></script>
+		<script src="js/commands/SetColorCommand.js"></script>
+		<script src="js/commands/SetGeometryCommand.js"></script>
+		<script src="js/commands/SetGeometryValueCommand.js"></script>
+		<script src="js/commands/MultiCmdsCommand.js"></script>
+		<script src="js/commands/AddScriptCommand.js"></script>
+		<script src="js/commands/RemoveScriptCommand.js"></script>
+		<script src="js/commands/SetScriptValueCommand.js"></script>
+		<script src="js/commands/SetMaterialCommand.js"></script>
+		<script src="js/commands/SetMaterialValueCommand.js"></script>
+		<script src="js/commands/SetMaterialColorCommand.js"></script>
+		<script src="js/commands/SetMaterialMapCommand.js"></script>
+		<script src="js/commands/SetSceneCommand.js"></script>
 
 		<script>
 
@@ -286,7 +286,7 @@
 						if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
 						var parent = object.parent;
-						if ( parent !== null ) editor.execute( new CmdRemoveObject( object ) );
+						if ( parent !== null ) editor.execute( new RemoveObjectCommand( object ) );
 
 						break;
 
