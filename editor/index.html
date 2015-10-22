@@ -23,6 +23,7 @@
 		<script src="../examples/js/loaders/KMZLoader.js"></script>
 		<script src="../examples/js/loaders/MD2Loader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
+		<script src="../examples/js/loaders/PlayCanvasLoader.js"></script>
 		<script src="../examples/js/loaders/PLYLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
 		<script src="../examples/js/loaders/UTF8Loader.js"></script>
@@ -288,7 +289,7 @@
 						if ( parent !== null ) editor.execute( new CmdRemoveObject( object ) );
 
 						break;
-						
+
 					case 90: // Register Ctrl-Z for Undo, Ctrl-Shift-Z for Redo
 
 						if ( event.ctrlKey && event.shiftKey ) {

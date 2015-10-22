@@ -81,8 +81,7 @@
 
 				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
 				reflectionCube.format = THREE.RGBFormat;
-				reflectionCube = null;
-
+		
 				var cubeWidth = 400;
 				var numberOfSphersPerSide = 5;
 				var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
@@ -91,20 +90,30 @@
 				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
 	
-				for( var alpha = 0; alpha <= 1.0; alpha += stepSize ) {
+				var localReflectionCube;
+				
+				for( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
+
+					if( alphaIndex % 2 === 0 ) {
+						localReflectionCube = null;
+					}
+					else {
+						localReflectionCube = reflectionCube;
+					}
 
 					var specularShininess = Math.pow( 2, alpha * 10 );
 
 					for( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
 						var specularColor = new THREE.Color( beta * 0.2, beta * 0.2, beta * 0.2 );
+						var reflectivity = beta;
 
 						for( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
 							// basic monochromatic energy preservation
 							var diffuseColor = new THREE.Color( 0, 0, gamma ).multiplyScalar( 1 - beta * 0.2 );
 
-							var material = new THREE.MeshPhongMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: diffuseColor, specular: specularColor, shininess: specularShininess, shading: THREE.SmoothShading, envMap: reflectionCube,  } )
+							var material = new THREE.MeshPhongMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: diffuseColor, specular: specularColor, reflectivity: reflectivity, shininess: specularShininess, shading: THREE.SmoothShading, envMap: localReflectionCube  } )
 
 							var mesh = new THREE.Mesh( geometry, material );
 
@@ -145,8 +154,8 @@
 				addLabel( "-shininess", new THREE.Vector3( -350, 0, 0 ) );
 				addLabel( "+shininess", new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "-specular", new THREE.Vector3( 0, -300, 0 ) );
-				addLabel( "+specular", new THREE.Vector3( 0, 300, 0 ) );
+				addLabel( "-specular, -reflectivity", new THREE.Vector3( 0, -300, 0 ) );
+				addLabel( "+specular, +reflectivity", new THREE.Vector3( 0, 300, 0 ) );
 
 				addLabel( "-diffuse", new THREE.Vector3( 0, 0, -300 ) );
 				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
