@@ -342,11 +342,9 @@ def faces(mesh, options, material_list=None):
                     face_data.append(mat_index)
                     break
             else:
+                logger.warning("Could not map the material index "
+                         "for face %d" % face.index);
                 face_data.append(0)  # default to index zero if there's a bad material
-                #################################
-                # IMPORTANT:
-                # this fix is to foolproof the export, might not be necessary to send it to THREE.js
-                #################################
 
         if uv_indices:
             for index, uv_layer in enumerate(uv_indices):
