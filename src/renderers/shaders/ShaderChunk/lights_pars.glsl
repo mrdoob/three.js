@@ -146,7 +146,7 @@ uniform vec3 ambientLightColor;
 
 		#endif
 
-		reflectVec = normalize( inverseTransformDirection( reflectVec, viewMatrix ) );
+		reflectVec = inverseTransformDirection( reflectVec, viewMatrix );
 
 		#ifdef ENVMAP_TYPE_CUBE
 

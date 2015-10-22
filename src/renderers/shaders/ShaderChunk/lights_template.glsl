@@ -1,6 +1,17 @@
+//
+// This is a template that can be used to light a material, it uses pluggable RenderEquations (RE)
+//   for specific lighting scenarios.
+//
 // Instructions for use:
-//  - Ensure that both BRDF_Material_DirectLight and BRDF_Material_Indirect light are defined
+//  - Ensure that both Material_RE_DirectLight, Material_RE_IndirectDiffuseLight and Material_RE_IndirectSpecularLight are defined
+//  - If you have defined a Material_RE_IndirectSpecularLight, you need to also provide a Material_LightProbeLOD.
 //  - Create a material parameter that is to be passed as the third parameter to your lighting functions.
+//
+// TODO:
+//  - Add area light support.
+//  - Add sphere light support.
+//  - Add diffuse light probe (irradiance cubemap) support.
+//
 
 GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal ), normalize(vViewPosition ) );
 
