@@ -37,10 +37,8 @@ uniform vec3 ambientLightColor;
 	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) { 
 	
 		IncidentLight directLight;
-
-		vec3 lightPosition = pointLight.position; 
 	
-		vec3 lVector = lightPosition - geometry.position; 
+		vec3 lVector = pointLight.position - geometry.position; 
 		directLight.direction = normalize( lVector ); 
 	
 		directLight.color = pointLight.color; 
@@ -70,9 +68,7 @@ uniform vec3 ambientLightColor;
 	
 		IncidentLight directLight;
 
-		vec3 lightPosition = spotLight.position;
-	
-		vec3 lVector = lightPosition - geometry.position;
+		vec3 lVector = spotLight.position - geometry.position;
 		directLight.direction = normalize( lVector );
 	
 		float spotEffect = dot( spotLight.direction, directLight.direction );
