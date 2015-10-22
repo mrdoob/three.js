@@ -343,7 +343,7 @@ def faces(mesh, options, material_list=None):
                     break
             else:
                 logger.warning("Could not map the material index "
-                         "for face %d" % face.index);
+                         "for face %d" % face.index)
                 face_data.append(0)  # default to index zero if there's a bad material
 
         if uv_indices:
