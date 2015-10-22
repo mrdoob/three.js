@@ -51,8 +51,12 @@ class Object(base_classes.BaseNode):
         #    self[constants.DISTANCE] = api.light.distance(self.data)
         self[constants.DISTANCE] = 0;
 
-        if self[constants.TYPE] == constants.SPOT_LIGHT:
+        lightType = self[constants.TYPE]
+        if lightType == constants.SPOT_LIGHT:
             self[constants.ANGLE] = api.light.angle(self.data)
+            self[constants.DECAY] = api.light.falloff(self.data)
+        elif lightType == constants.POINT_LIGHT:
+            self[constants.DECAY] = api.light.falloff(self.data)
 
     def _init_mesh(self):
         """Initialize mesh attributes"""
