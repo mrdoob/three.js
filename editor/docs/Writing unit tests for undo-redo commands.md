@@ -16,19 +16,19 @@ Each of the listed steps will now be described in detail.
 
 ### 1. Create a new unit test file ###
 
-Create a new file in path `test/unit/editor/TestCmdXXX.js`.
+Create a new file in path `test/unit/editor/TestDoSomethingCommand.js`.
 
 ### 2. Include the new command in the editor test suite ###
 
 Navigate to the editor test suite `test/unit/unittests_editor.html` and open it.
 Within the file, go to the `<!-- command object classes -->` and include the new command:
 
-```javascript
+```html
 // <!-- command object classes -->
 //...
-<script src="../../editor/js/SetUuidCommand.js"></script>
-<script src="../../editor/js/SetValueCommand.js"></script>
-<script src="../../editor/js/CmdXXX.js"></script>         // add this line
+<script src="../../editor/js/AddScriptCommand.js"></script>
+<script src="../../editor/js/DoSomethingCommand.js"></script>         // add this line
+<script src="../../editor/js/MoveObjectCommand.js"></script>
 //...
 ```
 
@@ -36,12 +36,12 @@ It is recommended to keep the script inclusions in alphabetical order, if possib
 
 Next, in the same file, go to `<!-- Undo-Redo tests -->` and include the test file for the new command:
 
-```javascript
+```html
 // <!-- Undo-Redo tests -->
 //...
-<script src="editor/TestSetValueCommand.js"></script>
-<script src="editor/TestCmdXXX.js"></script>              // add this line
-<script src="editor/TestNestedDoUndoRedo.js"></script>
+<script src="editor/TestAddScriptCommand.js"></script>
+<script src="editor/TestDoSomethingCommand.js"></script>              // add this line
+<script src="editor/TestMoveObjectCommand.js"></script>
 //...
 ```
 
@@ -51,12 +51,12 @@ Again, keeping the alphabetical order is recommended.
 
 #### Template ####
 
-Open the unit test file `test/unit/editor/TestCmdXXX.js` and paste following code:
+Open the unit test file `test/unit/editor/TestDoSomethingCommand.js` and paste following code:
 
 ```javascript
-module( "CmdXXX" );
+module( "DoSomethingCommand" );
 
-test("Test CmdXXX (Undo and Redo)", function() {
+test("Test DoSomethingCommand (Undo and Redo)", function() {
 
     var editor = new Editor();
 
@@ -74,13 +74,13 @@ test("Test CmdXXX (Undo and Redo)", function() {
     // your test begins here...
 
 
-});
+} );
 ```
 
 The predefined code is just meant to ease the development, you do not have to stick with it.
 However, the test should cover at least one `editor.execute()`, one `editor.undo()` and one `editor.redo()` call.
 
-Best practice is to call `editor.execute( new CmdXXX( {custom parameters} ) )` **twice**. Since you'll have to do one undo (go one step back), it is recommended to have a custom state for comparison. Try to avoid assertions `ok()` against default values.
+Best practice is to call `editor.execute( new DoSomethingCommand( {custom parameters} ) )` **twice**. Since you'll have to do one undo (go one step back), it is recommended to have a custom state for comparison. Try to avoid assertions `ok()` against default values.
 
 #### Assertions ####
 After performing `editor.execute()` twice, you can do your first assertion to check whether the executes are done correctly.

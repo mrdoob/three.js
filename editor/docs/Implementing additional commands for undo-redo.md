@@ -12,7 +12,7 @@ It would also be possible to only store the difference between the old and the n
 
 **Before implementing your own command you should look if you can't reuse one of the already existing ones.**
 
-For numbers, strings or booleans the CmdSet...Value-commands can be used.
+For numbers, strings or booleans the Set...ValueCommand-commands can be used.
 Then there are separate commands for:
 - setting a color property (THREE.Color)
 - setting maps (THREE.Texture)
@@ -26,12 +26,12 @@ Every command needs a constructor. In the constructor
 
 ```javascript
 	
-CmdXXX = function () {
+DoSomethingCommand = function () {
 
 	Command.call( this ); // Required: Call default constructor
 
-	this.type = 'CmdXXX';            // Required: has to match the object-name!
-	this.name = 'Set/Do/Update XXX'; // Required: description of the command, used in Sidebar.History
+	this.type = 'DoSomethingCommand';            // Required: has to match the object-name!
+	this.name = 'Set/Do/Update DoSomething'; // Required: description of the command, used in Sidebar.History
 
 	// TODO: store all the relevant information needed to 
 	// restore the old and the new state
@@ -46,7 +46,7 @@ And as part of the prototype you need to implement four functions
 - **fromJSON:** which deserializes the command
 
 ```javascript
-CmdXXX.prototype = {
+DoSomethingCommand.prototype = {
 
 	execute: function () {
 
@@ -66,7 +66,7 @@ CmdXXX.prototype = {
 
 		// TODO: serialize all the necessary information as part of 'output' (JSON-format)
 		// so that it can be restored in 'fromJSON'
-	
+
 		return output;
 
 	},
@@ -74,9 +74,9 @@ CmdXXX.prototype = {
 	fromJSON: function ( json ) {
 
 		Command.prototype.fromJSON.call( this, json ); // Required: Call 'fromJSON'-method of prototype 'Command'
-		
+
 		// TODO: restore command from json
-		
+
 	}
 
 };
@@ -89,9 +89,9 @@ To execute a command we need an instance of the main editor-object. The editor-o
 On **editor** we then call **.execute(...)*** with the new command-object which in turn calls **history.execute(...)** and adds the command to the undo-stack.
 
 ```javascript
-	
-editor.execute( new CmdXXX() );
-		
+
+editor.execute( new DoSomethingCommand() );
+
 ```
 
 ### Updatable commands ###
