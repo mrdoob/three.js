@@ -252,6 +252,24 @@ var Loader = function ( editor ) {
 
 				break;
 
+			case 'playcanvas':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+					var json = JSON.parse( contents );
+
+					var loader = new THREE.PlayCanvasLoader();
+					var object = loader.parse( json );
+
+					editor.execute( new CmdAddObject( object ) );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
 			case 'ply':
 
 				var reader = new FileReader();
