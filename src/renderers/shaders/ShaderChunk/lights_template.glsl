@@ -55,13 +55,11 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 	{
 	
-		IncidentLight indirectLight;
-		indirectLight.direction = geometry.normal;
-		indirectLight.color = ambientLightColor;
+		vec3 indirectDiffuseColor = ambientLightColor;
 
 #ifdef USE_LIGHTMAP
 
-		indirectLight.color += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
+		indirectDiffuseColor += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
 
 #endif
 
@@ -69,13 +67,13 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 		for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-			indirectLight.color += getHemisphereIndirectLight( hemisphereLights[ i ], geometry ).color;
+			indirectDiffuseColor += getHemisphereIndirectLightColor( hemisphereLights[ i ], geometry );
 
 		}
 
 #endif
 
-		Material_RE_IndirectDiffuseLight( indirectLight, geometry, material, indirectReflectedLight );
+		Material_RE_IndirectDiffuseLight( indirectDiffuseColor, geometry, material, indirectReflectedLight );
 
 	}
 
@@ -85,9 +83,9 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 	{
 
-		IncidentLight indirectLight = getSpecularLightProbeIndirectLight( /*specularLightProbe,*/ geometry, Material_LightProbeLOD( material ) );
+		vec3 indirectSpecularColor = getSpecularLightProbeIndirectLightColor( /*specularLightProbe,*/ geometry, Material_LightProbeLOD( material ) );
 
-    	Material_RE_IndirectSpecularLight( indirectLight, geometry, material, indirectReflectedLight );
+    	Material_RE_IndirectSpecularLight( indirectSpecularColor, geometry, material, indirectReflectedLight );
 
     }
 

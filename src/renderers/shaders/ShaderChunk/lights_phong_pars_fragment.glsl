@@ -23,8 +23,7 @@ void BlinnPhongMaterial_RE_DirectLight( const in IncidentLight directLight, cons
 
 	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
 
-	directReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, geometry, material.diffuseColor );
-	//directReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_OrenNayar( directLight, geometry, material.diffuseColor, 0.5 );
+	directReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( material.diffuseColor );
 
 	directReflectedLight.specular += dotNL * directLight.color * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );
 	
@@ -32,14 +31,14 @@ void BlinnPhongMaterial_RE_DirectLight( const in IncidentLight directLight, cons
 
 #define Material_RE_DirectLight    BlinnPhongMaterial_RE_DirectLight
 
-void BlinnPhongMaterial_RE_IndirectLight( const in IncidentLight indirectLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight indirectReflectedLight ) {
+void BlinnPhongMaterial_RE_IndirectDiffuseLight( const in vec3 indirectDiffuseColor, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight indirectReflectedLight ) {
 
-	float dotNL = saturate( dot( geometry.normal, indirectLight.direction ) );
+	//float dotNL = saturate( dot( geometry.normal, indirectLight.direction ) );  not required because result is always 1.0
 
-	indirectReflectedLight.diffuse += dotNL * indirectLight.color * BRDF_Diffuse_Lambert( indirectLight, geometry, material.diffuseColor );
+	indirectReflectedLight.diffuse += indirectDiffuseColor * BRDF_Diffuse_Lambert( material.diffuseColor );
 
 }
 
-#define Material_RE_IndirectDiffuseLight    BlinnPhongMaterial_RE_IndirectLight
+#define Material_RE_IndirectDiffuseLight    BlinnPhongMaterial_RE_IndirectDiffuseLight
 
 #define Material_LightProbeLOD( material )   (0)

@@ -11,7 +11,7 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 }
 
 
-vec3 BRDF_Diffuse_Lambert( const in IncidentLight incidentLight, const in GeometricContext geometryContext, const in vec3 diffuseColor ) {
+vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 
 	// factor of 1/PI in BRDF omitted as incoming light intensity is scaled up by PI because it is considered a punctual light source
 
@@ -93,7 +93,7 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 
 
 // ref: https://www.unrealengine.com/blog/physically-based-shading-on-mobile - environmentBRDF for GGX on mobile
-vec3 BRDF_Specular_GGX_Environment( const in IncidentLight incidentLight, const in GeometricContext geometry, vec3 specularColor, float roughness ) {
+vec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, vec3 specularColor, float roughness ) {
 
 	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 

@@ -86,15 +86,6 @@ uniform vec3 ambientLightColor;
 
 #endif
 
-	IncidentLight getAmbientIndirectLight( const in vec3 ambientLightColor, const in GeometricContext geometry ) { 
-	
-		IncidentLight indirectLight;
-
-		indirectLight.color = ambientLightColor;
-		indirectLight.direction = geometry.normal;
-
-		return indirectLight;
-	}
 
 #if MAX_HEMI_LIGHTS > 0
 
@@ -106,17 +97,13 @@ uniform vec3 ambientLightColor;
 
 	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
 
-	IncidentLight getHemisphereIndirectLight( const in HemisphereLight hemiLight, const in GeometricContext geometry ) { 
+	vec3 getHemisphereIndirectLightColor( const in HemisphereLight hemiLight, const in GeometricContext geometry ) { 
 	
-		IncidentLight indirectLight;
-
 		float dotNL = dot( geometry.normal, hemiLight.direction );
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
 
-		indirectLight.color = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
-		indirectLight.direction = geometry.normal;
+		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
 
-		return indirectLight;
 	}
 
 #endif
@@ -124,7 +111,7 @@ uniform vec3 ambientLightColor;
 
 #if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
-	IncidentLight getSpecularLightProbeIndirectLight( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float lodLevel ) { 
+	vec3 getSpecularLightProbeIndirectLightColor( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float lodLevel ) { 
 	
 		#ifdef ENVMAP_MODE_REFLECTION
 
@@ -176,11 +163,7 @@ uniform vec3 ambientLightColor;
 
 		envMapColor.rgb = inputToLinear( envMapColor.rgb );
 
-		IncidentLight indirectLight;
-		indirectLight.color = envMapColor.rgb * reflectivity;
-		indirectLight.direction = geometry.normal;
-
-		return indirectLight;
+		return envMapColor.rgb * reflectivity;
 
 	}
 

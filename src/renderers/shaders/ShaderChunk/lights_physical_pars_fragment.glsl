@@ -10,29 +10,29 @@ void PhysicalMaterial_RE_DirectLight( const in IncidentLight directLight, const 
 
 	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
 
-	directReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, geometry, material.diffuseColor );
+	directReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( material.diffuseColor );
 	directReflectedLight.specular += dotNL * directLight.color * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.specularRoughness );
 	
 }
 #define Material_RE_DirectLight    PhysicalMaterial_RE_DirectLight
 
 
-void PhysicalMaterial_RE_DiffuseIndirectLight( const in IncidentLight indirectLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight indirectReflectedLight ) {
+void PhysicalMaterial_RE_DiffuseIndirectLight( const in vec3 indirectDiffuseColor, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight indirectReflectedLight ) {
 
-	float dotNL = saturate( dot( geometry.normal, indirectLight.direction ) );
+	//float dotNL = saturate( dot( geometry.normal, indirectLight.direction ) );  not required because result is always 1.0
 
-	indirectReflectedLight.diffuse += dotNL * indirectLight.color * BRDF_Diffuse_Lambert( indirectLight, geometry, material.diffuseColor );
+	indirectReflectedLight.diffuse += indirectDiffuseColor * BRDF_Diffuse_Lambert( material.diffuseColor );
 
 }
 
 #define Material_RE_IndirectDiffuseLight    PhysicalMaterial_RE_DiffuseIndirectLight
 
 
-void PhysicalMaterial_RE_SpecularIndirectLight( const in IncidentLight indirectLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight indirectReflectedLight ) {
+void PhysicalMaterial_RE_SpecularIndirectLight( const in vec3 indirectSpecularColor, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight indirectReflectedLight ) {
 
-	float dotNL = saturate( dot( geometry.normal, indirectLight.direction ) );
+	//float dotNL = saturate( dot( geometry.normal, indirectLight.direction ) );  not required because result is always 1.0
 
-    indirectReflectedLight.specular += dotNL * indirectLight.color * BRDF_Specular_GGX_Environment( indirectLight, geometry, material.specularColor, material.specularRoughness );
+    indirectReflectedLight.specular += indirectSpecularColor * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );
 
 }
 

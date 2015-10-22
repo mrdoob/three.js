@@ -10,12 +10,12 @@ GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.n
 		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
 
 		float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
-		vLightFront += dotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, geometry, diffuse );
+		vLightFront += dotNL * directLight.color * BRDF_Diffuse_Lambert( diffuse );
 
 		#ifdef DOUBLE_SIDED
 
 			float backDotNL = saturate( dot( -geometry.normal, directLight.direction ) );
-			vLightBack += backDotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, backGeometry, diffuse );
+			vLightBack += backDotNL * directLight.color * BRDF_Diffuse_Lambert( diffuse );
 
 		#endif
 
@@ -30,12 +30,12 @@ GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.n
 		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );
 
 		float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
-		vLightFront += dotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, geometry, diffuse );
+		vLightFront += dotNL * directLight.color * BRDF_Diffuse_Lambert( diffuse );
 
 		#ifdef DOUBLE_SIDED
 
 			float backDotNL = saturate( dot( -geometry.normal, directLight.direction ) );
-			vLightBack += backDotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, backGeometry, diffuse );
+			vLightBack += backDotNL * directLight.color * BRDF_Diffuse_Lambert( diffuse );
 
 		#endif
 	}
@@ -49,12 +49,12 @@ GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.n
 		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
 
 		float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
-		vLightFront += dotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, geometry, diffuse );
+		vLightFront += dotNL * directLight.color * BRDF_Diffuse_Lambert( diffuse );
 
 		#ifdef DOUBLE_SIDED
 
 			float backDotNL = saturate( dot( -geometry.normal, directLight.direction ) );
-			vLightBack += backDotNL * directLight.color * BRDF_Diffuse_Lambert( directLight, backGeometry, diffuse );
+			vLightBack += backDotNL * directLight.color * BRDF_Diffuse_Lambert( diffuse );
 
 		#endif
 
@@ -63,16 +63,15 @@ GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.n
 #endif
 
 	{
-	
-		IncidentLight frontIndirectLight;
-		frontIndirectLight.direction = geometry.normal;
-		frontIndirectLight.color = ambientLightColor;
+		// dotNL is always one, and diffuseColor is vec3(1.0), thus the result is equivalent to summing indirectDiffuse lights
+		//float frontDotNL = saturate( dot( geometry.normal, frontIndirectLight.direction ) );
+		//vLightFront += frontDotNL * frontIndirectLight.color * BRDF_Diffuse_Lambert( diffuse );
+		
+		vLightFront += ambientLightColor;
 
 		#ifdef DOUBLE_SIDED
 		
-			IncidentLight backIndirectLight;
-			backIndirectLight.direction = -geometry.normal;
-			backIndirectLight.color = ambientLightColor;
+			vec3 vLightBack = ambientLightColor;
 
 		#endif
 
@@ -80,30 +79,16 @@ GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.n
 
 			for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-				frontIndirectLight.color += getHemisphereIndirectLight( hemisphereLights[ i ], geometry ).color;
+				vLightFront += getHemisphereIndirectLight( hemisphereLights[ i ], geometry );
 
 
 				#ifdef DOUBLE_SIDED
 			
-					backIndirectLight.color += getHemisphereIndirectLight( hemisphereLights[ i ], backGeometry ).color;
+					vLightBack += getHemisphereIndirectLight( hemisphereLights[ i ], backGeometry );
 
 				#endif
 
 			}
-
-		#endif
-
-		//float frontDotNL = saturate( dot( geometry.normal, frontIndirectLight.direction ) );
-		//vLightFront += frontDotNL * frontIndirectLight.color * BRDF_Diffuse_Lambert( frontIndirectLight, geometry, diffuse );
-		// the following is equivalent to the above
-		vLightFront += frontIndirectLight.color;
-
-		#ifdef DOUBLE_SIDED
-
-			//float backDotNL = saturate( dot( -geometry.normal, backIndirectLight.direction ) );
-			//vLightBack += backDotNL * backIndirectLight.color * BRDF_Diffuse_Lambert( backIndirectLight, backGeometry, diffuse );
-			// the following is equivalent to the above
-			vLightBack += backIndirectLight.color;
 
 		#endif
 
