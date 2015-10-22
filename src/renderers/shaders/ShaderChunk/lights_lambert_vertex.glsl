@@ -74,7 +74,7 @@ GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.n
 
 		#ifdef DOUBLE_SIDED
 		
-			vec3 vLightBack = ambientLightColor;
+			vLightBack += ambientLightColor;
 
 		#endif
 
