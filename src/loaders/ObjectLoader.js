@@ -514,9 +514,22 @@ THREE.ObjectLoader.prototype = {
 
 					break;
 
-				case 'Mesh':
+				case 'Mesh': {
 
-					object = new THREE.Mesh( getGeometry( data.geometry ), getMaterial( data.material ) );
+						var geometry = getGeometry( data.geometry );
+						
+						if( geometry.bones && geometry.bones.length > 0 ) {
+
+							object = new THREE.SkinnedMesh( geometry, getMaterial( data.material ) );
+
+						}
+						else {
+
+							object = new THREE.Mesh( geometry, getMaterial( data.material ) );	
+
+						}
+
+					}
 
 					break;
 
