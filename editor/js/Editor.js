@@ -19,7 +19,7 @@ var Editor = function () {
 
 		// actions
 
-		// showDialog: new SIGNALS.Signal(),
+		showModal: new SIGNALS.Signal(),
 
 		// notifications
 
@@ -101,14 +101,6 @@ Editor.prototype = {
 		this.signals.themeChanged.dispatch( value );
 
 	},
-
-	/*
-	showDialog: function ( value ) {
-
-		this.signals.showDialog.dispatch( value );
-
-	},
-	*/
 
 	//
 
@@ -411,6 +403,7 @@ Editor.prototype = {
 	clear: function () {
 
 		this.history.clear();
+		this.storage.clear();
 
 		this.camera.position.set( 500, 250, 500 );
 		this.camera.lookAt( new THREE.Vector3() );
@@ -469,6 +462,7 @@ Editor.prototype = {
 		return {
 
 			project: {
+				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				vr: this.config.getKey( 'project/vr' )
 			},
 			camera: this.camera.toJSON(),

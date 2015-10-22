@@ -173,7 +173,6 @@
 				spotLight.shadowCameraFov = 50;
 
 				spotLight.shadowBias = -0.00125;
-				spotLight.shadowDarkness = 0.5;
 				spotLight.shadowMapWidth = SHADOW_MAP_WIDTH;
 				spotLight.shadowMapHeight = SHADOW_MAP_HEIGHT;
 
@@ -262,11 +261,11 @@
 
 					var params  = {
 
-						"a" : { map: flareA, useScreenCoordinates: false, color: 0xffffff, blending: THREE.AdditiveBlending },
-						"b" : { map: flareB, useScreenCoordinates: false, color: 0xffffff, blending: THREE.AdditiveBlending },
+						"a" : { map: flareA, color: 0xffffff, blending: THREE.AdditiveBlending },
+						"b" : { map: flareB, color: 0xffffff, blending: THREE.AdditiveBlending },
 
-						"ar" : { map: flareA, useScreenCoordinates: false, color: 0xff0000, blending: THREE.AdditiveBlending },
-						"br" : { map: flareB, useScreenCoordinates: false, color: 0xff0000, blending: THREE.AdditiveBlending }
+						"ar" : { map: flareA, color: 0xff0000, blending: THREE.AdditiveBlending },
+						"br" : { map: flareB, color: 0xff0000, blending: THREE.AdditiveBlending }
 
 					};
 

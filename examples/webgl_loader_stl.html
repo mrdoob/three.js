@@ -165,10 +165,9 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x777777 ) );
+				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
 
-				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
-				addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
+				addShadowedLight( 0.5, 1, -1, 0xffff99, 1 );
 
 				// renderer
 
@@ -220,7 +219,6 @@
 				directionalLight.shadowMapHeight = 1024;
 
 				directionalLight.shadowBias = -0.005;
-				directionalLight.shadowDarkness = 0.15;
 
 			}
 

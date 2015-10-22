@@ -22,15 +22,30 @@ THREE.BufferGeometry = function () {
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
+	this.drawRange = { start: 0, count: Infinity };
+
 };
 
 THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addIndex: function ( attribute ) {
+	addIndex: function ( index ) {
 
-		this.index = attribute;
+		console.warn( 'THREE.BufferGeometry: .addIndex() has been renamed to .setIndex().' );
+		this.setIndex( index );
+
+	},
+
+	getIndex: function () {
+
+		return this.index;
+
+	},
+
+	setIndex: function ( index ) {
+
+		this.index = index;
 
 	},
 
@@ -48,8 +63,10 @@ THREE.BufferGeometry.prototype = {
 
 		if ( name === 'index' ) {
 
-			console.warn( 'THREE.BufferGeometry.addAttribute: Use .addIndex() for index attribute.' );
-			this.addIndex( attribute );
+			console.warn( 'THREE.BufferGeometry.addAttribute: Use .setIndex() for index attribute.' );
+			this.setIndex( attribute );
+
+			return;
 
 		}
 
@@ -118,6 +135,13 @@ THREE.BufferGeometry.prototype = {
 	clearGroups: function () {
 
 		this.groups = [];
+
+	},
+
+	setDrawRange: function ( start, count ) {
+
+		this.drawRange.start = start;
+		this.drawRange.count = count;
 
 	},
 
@@ -293,7 +317,7 @@ THREE.BufferGeometry.prototype = {
 
 		var geometry = object.geometry;
 
-		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
+		if ( object instanceof THREE.Points || object instanceof THREE.Line ) {
 
 			var positions = new THREE.Float32Attribute( geometry.vertices.length * 3, 3 );
 			var colors = new THREE.Float32Attribute( geometry.colors.length * 3, 3 );
@@ -305,7 +329,7 @@ THREE.BufferGeometry.prototype = {
 
 				var lineDistances = new THREE.Float32Attribute( geometry.lineDistances.length, 1 );
 
-				this.addAttribute( 'lineDistance',  lineDistances.copyArray( geometry.lineDistances ) );
+				this.addAttribute( 'lineDistance', lineDistances.copyArray( geometry.lineDistances ) );
 
 			}
 
@@ -410,6 +434,21 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		if ( geometry.uvsNeedUpdate ) {
+
+				var attribute = this.attributes.uv;
+
+				if ( attribute !== undefined ) {
+
+						attribute.copyVector2sArray( geometry.uvs );
+						attribute.needsUpdate = true;
+
+				}
+
+				geometry.uvsNeedUpdate = false;
+
+		}
+
 		if ( geometry.lineDistancesNeedUpdate ) {
 
 			var attribute = this.attributes.lineDistance;
@@ -483,7 +522,7 @@ THREE.BufferGeometry.prototype = {
 
 			var TypeArray = geometry.vertices.length > 65535 ? Uint32Array : Uint16Array;
 			var indices = new TypeArray( geometry.indices.length * 3 );
-			this.addIndex( new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
+			this.setIndex( new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 		}
 
@@ -936,6 +975,26 @@ THREE.BufferGeometry.prototype = {
 
 	clone: function () {
 
+		// Handle primitives
+
+		var parameters = this.parameters;
+
+		if ( parameters !== undefined ) {
+
+			var values = [];
+
+			for ( var key in parameters ) {
+
+				values.push( parameters[ key ] );
+
+			}
+
+			var geometry = Object.create( this.constructor.prototype );
+			this.constructor.apply( geometry, values );
+			return geometry;
+
+		}
+
 		return new this.constructor().copy( this );
 
 	},
@@ -946,7 +1005,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( index !== null ) {
 
-			this.addIndex( index.clone() );
+			this.setIndex( index.clone() );
 
 		}
 

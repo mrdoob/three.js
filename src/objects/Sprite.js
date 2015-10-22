@@ -10,7 +10,7 @@ THREE.Sprite = ( function () {
 	var uvs = new Float32Array( [ 0, 0,   1, 0,   1, 1,   0, 1 ] );
 
 	var geometry = new THREE.BufferGeometry();
-	geometry.addIndex( new THREE.BufferAttribute( indices, 1 ) );
+	geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 	geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
@@ -63,23 +63,6 @@ THREE.Sprite.prototype.raycast = ( function () {
 THREE.Sprite.prototype.clone = function () {
 
 	return new this.constructor( this.material ).copy( this );
-
-};
-
-THREE.Sprite.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	// only serialize if not in meta materials cache
-	if ( meta.materials[ this.material.uuid ] === undefined ) {
-
-		meta.materials[ this.material.uuid ] = this.material.toJSON();
-
-	}
-
-	data.object.material = this.material.uuid;
-
-	return data;
 
 };
 

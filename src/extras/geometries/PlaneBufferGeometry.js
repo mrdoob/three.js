@@ -85,7 +85,7 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 	}
 
-	this.addIndex( new THREE.BufferAttribute( indices, 1 ) );
+	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
@@ -94,18 +94,3 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 THREE.PlaneBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.PlaneBufferGeometry.prototype.constructor = THREE.PlaneBufferGeometry;
-
-THREE.PlaneBufferGeometry.prototype.clone = function () {
-
-	var geometry = new THREE.PlaneBufferGeometry(
-		this.parameters.width,
-		this.parameters.height,
-		this.parameters.widthSegments,
-		this.parameters.heightSegments
-	);
-
-	geometry.copy( this );
-
-	return geometry;
-
-};

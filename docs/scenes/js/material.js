@@ -22,7 +22,6 @@ var constants = {
 
 	shading : {
 
-		"THREE.NoShading" : THREE.NoShading,
 		"THREE.FlatShading" : THREE.FlatShading,
 		"THREE.SmoothShading" : THREE.SmoothShading
 
@@ -404,7 +403,6 @@ function guiMeshLambertMaterial ( gui, mesh, material, geometry ) {
 	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 	folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
 
-	folder.add( material, 'shading', constants.shading ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
 	folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );
@@ -441,7 +439,7 @@ function guiMeshPhongMaterial ( gui, mesh, material, geometry ) {
 	folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
 	folder.addColor( data, 'specular' ).onChange( handleColorChange( material.specular ) );
 
-	folder.add( material, 'shininess', 1, 100);
+	folder.add( material, 'shininess', 0, 100);
 	folder.add( material, 'shading', constants.shading).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );

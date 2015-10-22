@@ -537,7 +537,6 @@ def materials(mesh, options):
 
         logger.info("Compiling attributes for %s", mat.name)
         attributes = {
-            constants.COLOR_AMBIENT: material.ambient_color(mat),
             constants.COLOR_EMISSIVE: material.emissive_color(mat),
             constants.SHADING: material.shading(mat),
             constants.OPACITY: material.opacity(mat),

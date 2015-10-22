@@ -148,7 +148,7 @@
 			geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
 			geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
 
-			particleSystem = new THREE.PointCloud( geometry, shaderMaterial );
+			particleSystem = new THREE.Points( geometry, shaderMaterial );
 
 			scene.add( particleSystem );
 

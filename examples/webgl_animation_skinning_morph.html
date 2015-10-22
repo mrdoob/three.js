@@ -62,7 +62,7 @@
 			var mesh, helper;
 
 			var mixer;
-		
+
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -91,7 +91,7 @@
 				// GROUND
 
 				var geometry = new THREE.PlaneBufferGeometry( 16000, 16000 );
-				var material = new THREE.MeshPhongMaterial( { emissive: 0xbbbbbb } );
+				var material = new THREE.MeshPhongMaterial( { emissive: 0x888888 } );
 
 				var ground = new THREE.Mesh( geometry, material );
 				ground.position.set( 0, FLOOR, 0 );
@@ -103,18 +103,16 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x222222 );
-				scene.add( ambient );
+				scene.add( new THREE.HemisphereLight( 0x111111, 0x444444 ) );
 
-
-				var light = new THREE.DirectionalLight( 0xebf3ff, 1.6 );
+				var light = new THREE.DirectionalLight( 0xebf3ff, 1.5 );
 				light.position.set( 0, 140, 500 ).multiplyScalar( 1.1 );
 				scene.add( light );
 
 				light.castShadow = true;
 
 				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 2048;
+				light.shadowMapHeight = 1024;
 
 				var d = 390;
 
@@ -125,12 +123,6 @@
 
 				light.shadowCameraFar = 3500;
 				//light.shadowCameraVisible = true;
-
-				//
-
-				var light = new THREE.DirectionalLight( 0x493f13, 1 );
-				light.position.set( 0, -1, 0 );
-				scene.add( light );
 
 				// RENDERER
 
@@ -232,9 +224,9 @@
 				helper.visible = false;
 				scene.add( helper );
 
-	
+
 				var clipMorpher = THREE.AnimationClip.CreateFromMorphTargetSequence( 'facialExpressions', mesh.geometry.morphTargets, 3 );
-				var clipBones = geometry.clips[0];
+				var clipBones = geometry.animations[0];
 
 				mixer = new THREE.AnimationMixer( mesh );
 				mixer.addAction( new THREE.AnimationAction( clipMorpher ) );

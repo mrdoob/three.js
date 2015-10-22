@@ -1,7 +1,0 @@
-<Files *.js>
-SetOutputFilter DEFLATE
-</Files>
-
-<Files *.bin>
-SetOutputFilter DEFLATE
-</Files>

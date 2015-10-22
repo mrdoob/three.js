@@ -1,6 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
- * @author bhouston / http://exocortex.com/
+ * @author bhouston / http://clara.io/
  * @author stephomi / http://stephaneginier.com/
  */
 
@@ -15,22 +15,31 @@
 		this.far = far || Infinity;
 
 		this.params = {
-			Sprite: {},
 			Mesh: {},
-			PointCloud: { threshold: 1 },
+			Line: {},
 			LOD: {},
-			Line: {}
+			Points: { threshold: 1 },
+			Sprite: {}
 		};
+
+		Object.defineProperties( this.params, {
+			PointCloud: {
+				get: function () {
+					console.warn( 'THREE.Raycaster: params.PointCloud has been renamed to params.Points.' );
+					return this.Points;
+				}
+			}
+		} );
 
 	};
 
-	var descSort = function ( a, b ) {
+	function descSort( a, b ) {
 
 		return a.distance - b.distance;
 
-	};
+	}
 
-	var intersectObject = function ( object, raycaster, intersects, recursive ) {
+	function intersectObject( object, raycaster, intersects, recursive ) {
 
 		if ( object.visible === false ) return;
 
@@ -48,7 +57,7 @@
 
 		}
 
-	};
+	}
 
 	//
 

@@ -514,7 +514,6 @@
 				"DbgColor" : 15658734,
 				"DbgIndex" : 0,
 				"DbgName" : "Material",
-				"colorAmbient" : [0.0, 0.0, 0.0],
 				"colorDiffuse" : [0.8, 0.8, 0.8],
 				"colorSpecular" : [0.5, 0.5, 0.5],
 				"specularCoef" : 50,

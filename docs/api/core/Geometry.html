@@ -62,7 +62,7 @@
 		<h3>[property:Array colors]</h3>
 		<div>
 		Array of vertex [page:Color colors], matching number and order of vertices.<br />
-		Used in [page:PointCloud] and [page:Line].<br />
+		Used in [page:Points] and [page:Line].<br />
 		[page:Mesh Meshes] use per-face-use-of-vertex colors embedded directly in faces.<br />
 		To signal an update in this array, [page:Geometry Geometry.colorsNeedUpdate] needs to be set to true.
 		</div>
@@ -86,13 +86,6 @@
 		Array of morph targets. Each morph target is a Javascript object:
 		<code>{ name: "targetName", vertices: [ new THREE.Vector3(), ... ] }</code>
 		Morph vertices match number and order of primary vertices.
-		</div>
-
-		<h3>[property:Array morphColors]</h3>
-		<div>
-		Array of morph colors. Morph colors have similar structure as morph targets, each color set is a Javascript object:
-		<code>morphColor = { name: "colorName", colors: [ new THREE.Color(), ... ] }</code>
-		Morph colors can match either the number and order of faces (face colors) or the number of vertices (vertex colors).
 		</div>
 
 		<h3>[property:Array morphNormals]</h3>

@@ -69,7 +69,7 @@
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var container,stats;
+			var container, stats;
 			var camera, scene, renderer;
 
 			var clock = new THREE.Clock();
@@ -85,25 +85,25 @@
 				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
-				camera.position.x = 700;
-				camera.position.z = -500;
-				camera.position.y = 180;
+				camera.position.set( 700, 200, - 500 );
 
 				// SCENE
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xffffff, 1000, 10000 );
 
 				// CONTROLS
 
 				controls = new THREE.OrbitControls( camera );
+				controls.maxPolarAngle = 0.9 * Math.PI / 2;
+				controls.enableZoom = false;
 
 				// LIGHTS
 
-				var hemiLight = new THREE.HemisphereLight( 0xaabbff, 0x040404, 0.3 );
-
-				hemiLight.position.y = 500;
-				scene.add( hemiLight );
+				var light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
+				light.position.x = 300;
+				light.position.y = 250;
+				light.position.z = -500;
+				scene.add( light );
 
 				// SKYDOME
 
@@ -115,9 +115,7 @@
 					offset:		 { type: "f", value: 400 },
 					exponent:	 { type: "f", value: 0.6 }
 				};
-				uniforms.topColor.value.copy( hemiLight.color );
-
-				scene.fog.color.copy( uniforms.bottomColor.value );
+				uniforms.topColor.value.copy( light.color );
 
 				var skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
 				var skyMat = new THREE.ShaderMaterial( {
@@ -133,10 +131,8 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;
@@ -152,8 +148,10 @@
 				var loader = new THREE.JSONLoader();
 				loader.load( "obj/lightmap/lightmap.js", function ( geometry, materials ) {
 
-					for( var i = 0; i < materials.length; i ++ ) {
-						materials[i].lightMapIntensity = 0.75;
+					for ( var i = 0; i < materials.length; i ++ ) {
+
+						materials[ i ].lightMapIntensity = 0.75;
+
 					}
 
 					var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
@@ -189,8 +187,8 @@
 
 			}
 
-
 		</script>
 
 	</body>
+
 </html>

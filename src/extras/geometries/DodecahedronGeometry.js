@@ -56,16 +56,3 @@ THREE.DodecahedronGeometry = function ( radius, detail ) {
 
 THREE.DodecahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.DodecahedronGeometry.prototype.constructor = THREE.DodecahedronGeometry;
-
-THREE.DodecahedronGeometry.prototype.clone = function () {
-
-	var geometry = new THREE.DodecahedronGeometry(
-		this.parameters.radius,
-		this.parameters.detail
-	);
-
-	geometry.copy( this );
-
-	return geometry;
-
-};

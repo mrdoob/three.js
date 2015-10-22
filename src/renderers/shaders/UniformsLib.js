@@ -42,7 +42,7 @@ THREE.UniformsLib = {
 
 	},
 
-	bump: {
+	bumpmap: {
 
 		"bumpMap" : { type: "t", value: null },
 		"bumpScale" : { type: "f", value: 1 }
@@ -53,6 +53,33 @@ THREE.UniformsLib = {
 
 		"normalMap" : { type: "t", value: null },
 		"normalScale" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
+
+	},
+
+	displacementmap: {
+
+		"displacementMap" : { type: "t", value: null },
+		"displacementScale" : { type: "f", value: 1 },
+		"displacementBias" : { type: "f", value: 0 }
+
+	},
+
+	roughnessmap: {
+
+		"roughnessMap" : { type: "t", value: null }
+
+	},
+
+	reflectivitymap: {
+
+		"reflectivityMap" : { type: "t", value: null }
+
+	},
+
+	metalnessmap: {
+
+		"metalnessMap" : { type: "t", value: null }
+
 	},
 
 	fog : {
@@ -90,7 +117,7 @@ THREE.UniformsLib = {
 
 	},
 
-	particle: {
+	points: {
 
 		"psColor" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
 		"opacity" : { type: "f", value: 1.0 },

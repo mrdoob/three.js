@@ -56,7 +56,7 @@ THREE.MD2Character = function () {
 			scope.meshBody = mesh;
 
 			scope.meshBody.clipOffset = 0;
-			scope.activeAnimationClipName = mesh.geometry.clips[0].name;
+			scope.activeAnimationClipName = mesh.geometry.animations[0].name;
 
 			scope.mixer = new THREE.AnimationMixer( mesh );
 
@@ -158,7 +158,7 @@ THREE.MD2Character = function () {
 				this.meshBody.activeAction = null;
 			}
 
-			var clip = THREE.AnimationClip.findByName( this.meshBody.geometry.clips, clipName );
+			var clip = THREE.AnimationClip.findByName( this.meshBody.geometry.animations, clipName );
 			if( clip ) {
 
 				var action = new THREE.AnimationAction( clip, this.mixer.time ).setLocalRoot( this.meshBody );
@@ -187,7 +187,7 @@ THREE.MD2Character = function () {
 				this.meshWeapon.activeAction = null;
 			}
 
-			var clip = THREE.AnimationClip.findByName( this.meshWeapon.geometry.clips, clipName );
+			var clip = THREE.AnimationClip.findByName( this.meshWeapon.geometry.animations, clipName );
 			if( clip ) {
 
 				var action = new THREE.AnimationAction( clip ).syncWith( this.meshBody.activeAction ).setLocalRoot( this.meshWeapon );
@@ -225,8 +225,8 @@ THREE.MD2Character = function () {
 
 	function createPart( geometry, skinMap ) {
 
-		var materialWireframe = new THREE.MeshLambertMaterial( { color: 0xffaa00, wireframe: true, shading: THREE.SmoothShading, morphTargets: true, morphNormals: true } );
-		var materialTexture = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: false, shading: THREE.SmoothShading, map: skinMap, morphTargets: true, morphNormals: true } );
+		var materialWireframe = new THREE.MeshLambertMaterial( { color: 0xffaa00, wireframe: true, morphTargets: true, morphNormals: true } );
+		var materialTexture = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: false, map: skinMap, morphTargets: true, morphNormals: true } );
 
 		//
 

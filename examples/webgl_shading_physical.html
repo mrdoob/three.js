@@ -86,8 +86,7 @@
 				shadowCameraNear: 750,
 				shadowCameraFar: 4000,
 				shadowCameraFov: 30,
-				shadowBias: -0.0002,
-				shadowDarkness: 0.3
+				shadowBias: -0.0002
 
 			}, gamma = {
 				gammaFactor: 2.0,
@@ -276,7 +275,7 @@
 
 					mixer = new THREE.AnimationMixer( mesh );
 
-					mixer.addAction( new THREE.AnimationAction( geometry.clips[0] ).warpToDuration( 10 ) );
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( 10 ) );
 
 					var s = 200;
 					mesh.scale.set( s, s, s );
@@ -317,7 +316,6 @@
 
 				sunLight.castShadow = true;
 
-				sunLight.shadowDarkness = 0.3 * sunIntensity;
 				sunLight.shadowBias = -0.0002;
 
 				sunLight.shadowCameraNear = 750;
@@ -427,9 +425,6 @@
 
 				});
 
-				shadowGUI.add( shadowConfig, 'shadowDarkness', 0, 1 ).onChange( function() {
-
-				});
 				shadowGUI.open();
 
 				gammaGUI = gui.addFolder( "Gamma" );
@@ -539,8 +534,6 @@
 				pointLight.intensity = - parameters.control * 0.5 + 1;
 
 				pointLight.color.setHSL( 0.1, 0.75, parameters.control * 0.5 + 0.5 );
-
-				sunLight.shadowDarkness = shadowConfig.shadowDarkness * sunLight.intensity;
 
 				// render cube map
 

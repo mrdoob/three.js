@@ -16,29 +16,7 @@ THREE.DirectionalLight = function ( color, intensity ) {
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 
-	this.castShadow = false;
-	this.onlyShadow = false;
-
-	this.shadowCameraNear = 50;
-	this.shadowCameraFar = 5000;
-
-	this.shadowCameraLeft = - 500;
-	this.shadowCameraRight = 500;
-	this.shadowCameraTop = 500;
-	this.shadowCameraBottom = - 500;
-
-	this.shadowCameraVisible = false;
-
-	this.shadowBias = 0;
-	this.shadowDarkness = 0.5;
-
-	this.shadowMapWidth = 512;
-	this.shadowMapHeight = 512;
-
-	this.shadowMap = null;
-	this.shadowMapSize = null;
-	this.shadowCamera = null;
-	this.shadowMatrix = null;
+	this.shadow = new THREE.LightShadow( new THREE.OrthographicCamera( - 500, 500, 500, - 500, 50, 5000 ) );
 
 };
 
@@ -52,36 +30,8 @@ THREE.DirectionalLight.prototype.copy = function ( source ) {
 	this.intensity = source.intensity;
 	this.target = source.target.clone();
 
-	this.castShadow = source.castShadow;
-	this.onlyShadow = source.onlyShadow;
-
-	this.shadowCameraNear = source.shadowCameraNear;
-	this.shadowCameraFar = source.shadowCameraFar;
-
-	this.shadowCameraLeft = source.shadowCameraLeft;
-	this.shadowCameraRight = source.shadowCameraRight;
-	this.shadowCameraTop = source.shadowCameraTop;
-	this.shadowCameraBottom = source.shadowCameraBottom;
-
-	this.shadowCameraVisible = source.shadowCameraVisible;
-
-	this.shadowBias = source.shadowBias;
-	this.shadowDarkness = source.shadowDarkness;
-
-	this.shadowMapWidth = source.shadowMapWidth;
-	this.shadowMapHeight = source.shadowMapHeight;
+	this.shadow = source.shadow.clone();
 
 	return this;
-
-};
-
-THREE.DirectionalLight.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.color = this.color.getHex();
-	data.object.intensity = this.intensity;
-
-	return data;
 
 };

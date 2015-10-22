@@ -1,5 +1,5 @@
 /**
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -95,6 +95,12 @@ THREE.Sphere.prototype = {
 		var radiusSum = this.radius + sphere.radius;
 
 		return sphere.center.distanceToSquared( this.center ) <= ( radiusSum * radiusSum );
+
+	},
+
+	intersectsBox: function ( box ) {
+
+		return box.intersectsSphere( this );
 
 	},
 

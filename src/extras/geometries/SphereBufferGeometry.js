@@ -88,7 +88,7 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 	}
 
-	this.addIndex( new THREE.BufferAttribute( new Uint16Array( indices ), 1 ) );
+	this.setIndex( new ( positions.count > 65535 ? THREE.Uint32Attribute : THREE.Uint16Attribute )( indices, 1 ) );
 	this.addAttribute( 'position', positions );
 	this.addAttribute( 'normal', normals );
 	this.addAttribute( 'uv', uvs );
@@ -99,21 +99,3 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 THREE.SphereBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.SphereBufferGeometry.prototype.constructor = THREE.SphereBufferGeometry;
-
-THREE.SphereBufferGeometry.prototype.clone = function () {
-
-	var geometry = new THREE.SphereBufferGeometry(
-		this.parameters.radius,
-		this.parameters.widthSegments,
-		this.parameters.heightSegments,
-		this.parameters.phiStart,
-		this.parameters.phiLength,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
-	);
-
-	geometry.copy( this );
-
-	return geometry;
-
-};

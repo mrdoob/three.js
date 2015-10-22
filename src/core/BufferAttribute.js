@@ -20,7 +20,7 @@ THREE.BufferAttribute.prototype = {
 
 	constructor: THREE.BufferAttribute,
 
-	get length () {
+	get length() {
 
 		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
 		return this.array.length;
@@ -362,5 +362,15 @@ THREE.Float32Attribute = function ( array, itemSize ) {
 THREE.Float64Attribute = function ( array, itemSize ) {
 
 	return new THREE.BufferAttribute( new Float64Array( array ), itemSize );
+
+};
+
+
+// Deprecated
+
+THREE.DynamicBufferAttribute = function ( array, itemSize ) {
+
+	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
+	return new THREE.BufferAttribute( array, itemSize ).setDynamic( true );
 
 };

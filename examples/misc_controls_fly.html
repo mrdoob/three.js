@@ -184,17 +184,17 @@
 
 				var stars;
 				var starsMaterials = [
-					new THREE.PointCloudMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
-					new THREE.PointCloudMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
-					new THREE.PointCloudMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
-					new THREE.PointCloudMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
-					new THREE.PointCloudMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
-					new THREE.PointCloudMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
+					new THREE.PointsMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
 				];
 
 				for ( i = 10; i < 30; i ++ ) {
 
-					stars = new THREE.PointCloud( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
+					stars = new THREE.Points( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
 
 					stars.rotation.x = Math.random() * 6;
 					stars.rotation.y = Math.random() * 6;

@@ -32,6 +32,8 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+
+		<script src="js/MorphAnimMesh.js"></script>
 		<script src="js/loaders/collada/Animation.js"></script>
 		<script src="js/loaders/collada/AnimationHandler.js"></script>
 		<script src="js/loaders/collada/KeyFrameAnimation.js"></script>
@@ -156,6 +158,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
+				composer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}

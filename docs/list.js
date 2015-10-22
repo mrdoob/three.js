@@ -4,7 +4,6 @@ var list = {
 		"Introduction": [
 			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
 			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
-
 		]
 	},
 
@@ -32,7 +31,7 @@ var list = {
 			[ "Face3", "api/core/Face3" ],
 			[ "Geometry", "api/core/Geometry" ],
 			[ "Object3D", "api/core/Object3D" ],
-			[ "Raycaster", "api/core/Raycaster" ],
+			[ "Raycaster", "api/core/Raycaster" ]
 		],
 
 		"Lights": [
@@ -77,10 +76,9 @@ var list = {
 			[ "MeshLambertMaterial", "api/materials/MeshLambertMaterial" ],
 			[ "MeshNormalMaterial", "api/materials/MeshNormalMaterial" ],
 			[ "MeshPhongMaterial", "api/materials/MeshPhongMaterial" ],
-			[ "PointCloudMaterial", "api/materials/PointCloudMaterial" ],
+			[ "PointsMaterial", "api/materials/PointsMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
-			[ "SpriteCanvasMaterial", "api/materials/SpriteCanvasMaterial" ],
 			[ "SpriteMaterial", "api/materials/SpriteMaterial" ]
 		],
 
@@ -113,7 +111,7 @@ var list = {
 			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
 			[ "MorphAnimMesh", "api/objects/MorphAnimMesh" ],
-			[ "PointCloud", "api/objects/PointCloud" ],
+			[ "Points", "api/objects/Points" ],
 			[ "SkinnedMesh", "api/objects/SkinnedMesh" ],
 			[ "Skeleton", "api/objects/Skeleton" ],
 			[ "Sprite", "api/objects/Sprite" ]
@@ -240,7 +238,8 @@ var list = {
 
 		"Examples" : [
 			[ "CombinedCamera", "api/examples/cameras/CombinedCamera" ],
-			[ "LookupTable", "api/examples/Lut" ]
+			[ "LookupTable", "api/examples/Lut" ],
+			[ "SpriteCanvasMaterial", "api/examples/SpriteCanvasMaterial" ]
 
 		]
 

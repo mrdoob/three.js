@@ -11,11 +11,12 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 	var thresholdDot = Math.cos( THREE.Math.degToRad( thresholdAngle ) );
 
 	var edge = [ 0, 0 ], hash = {};
-	var sortFunction = function ( a, b ) {
+
+	function sortFunction( a, b ) {
 
 		return a - b;
 
-	};
+	}
 
 	var keys = [ 'a', 'b', 'c' ];
 

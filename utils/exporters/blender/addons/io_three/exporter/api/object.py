@@ -13,7 +13,6 @@ from .constants import (
     SUN,
     POINT,
     HEMI,
-    AREA,
     CAMERA,
     PERSP,
     ORTHO,
@@ -291,8 +290,7 @@ def node_type(obj):
             POINT: constants.POINT_LIGHT,
             SUN: constants.DIRECTIONAL_LIGHT,
             SPOT: constants.SPOT_LIGHT,
-            HEMI: constants.HEMISPHERE_LIGHT,
-            AREA: constants.AREA_LIGHT,
+            HEMI: constants.HEMISPHERE_LIGHT
         },
         CAMERA: {
             PERSP: constants.PERSPECTIVE_CAMERA,

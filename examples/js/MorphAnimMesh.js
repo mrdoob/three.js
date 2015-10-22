@@ -36,7 +36,7 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 		
 	}
 
-	var clip = THREE.AnimationClip.findByName( this.geometry.clips, label );
+	var clip = THREE.AnimationClip.findByName( this.geometry.animations, label );
 
 	if ( clip ) {
 
@@ -47,7 +47,7 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	} else {
 
-		throw new Error( 'THREE.MorphAnimMesh: clips[' + label + '] undefined in .playAnimation()' );
+		throw new Error( 'THREE.MorphAnimMesh: animations[' + label + '] undefined in .playAnimation()' );
 
 	}
 

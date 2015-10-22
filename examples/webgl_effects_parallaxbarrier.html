@@ -560,6 +560,8 @@
 
 			function createScene( geometry, car ) {
 
+				geometry.sortFacesByMaterialIndex();
+
 				var m = new THREE.MeshFaceMaterial(),
 					s = CARS[ car ].scale * 1,
 					r = CARS[ car ].init_rotation,

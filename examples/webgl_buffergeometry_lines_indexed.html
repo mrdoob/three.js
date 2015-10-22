@@ -181,7 +181,7 @@
 				);
 				// --------------------------------
 
-				geometry.addIndex( new THREE.BufferAttribute( new Uint16Array( indices_array ), 1 ) );
+				geometry.setIndex( new THREE.BufferAttribute( new Uint16Array( indices_array ), 1 ) );
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 				geometry.computeBoundingSphere();

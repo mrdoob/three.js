@@ -330,7 +330,7 @@ THREE.Lut.prototype = {
 		var txtTitle = new THREE.CanvasTexture( canvasTitle );
 		txtTitle.minFilter = THREE.LinearFilter;
 
-		var spriteMaterialTitle = new THREE.SpriteMaterial( { map: txtTitle, useScreenCoordinates: false } );
+		var spriteMaterialTitle = new THREE.SpriteMaterial( { map: txtTitle } );
 
 		var spriteTitle = new THREE.Sprite( spriteMaterialTitle );
 
@@ -410,7 +410,7 @@ THREE.Lut.prototype = {
 				var txtTick = new THREE.CanvasTexture( canvasTick );
 				txtTick.minFilter = THREE.LinearFilter;
 
-				var spriteMaterialTick = new THREE.SpriteMaterial( { map: txtTick, useScreenCoordinates: false } );
+				var spriteMaterialTick = new THREE.SpriteMaterial( { map: txtTick } );
 
 				var spriteTick = new THREE.Sprite( spriteMaterialTick );
 

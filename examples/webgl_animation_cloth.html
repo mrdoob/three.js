@@ -175,7 +175,6 @@
 				light.shadowCameraBottom = -d;
 
 				light.shadowCameraFar = 1000;
-				light.shadowDarkness = 0.5;
 
 				scene.add( light );
 
@@ -188,7 +187,6 @@
 				var clothMaterial = new THREE.MeshPhongMaterial( {
 					specular: 0x030303,
 					emissive: 0x111111,
-					shiness: 10,
 					map: clothTexture,
 					side: THREE.DoubleSide,
 					alphaTest: 0.5

@@ -319,7 +319,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse color (color under white light) using RGB values
 
-					params[ 'diffuse' ] = new THREE.Color().fromArray( value );
+					params[ 'color' ] = new THREE.Color().fromArray( value );
 
 					break;
 
@@ -351,7 +351,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					// The specular exponent (defines the focus of the specular highlight)
 					// A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
 
-					params[ 'shininess' ] = value;
+					params[ 'shininess' ] = parseFloat( value );
 
 					break;
 
@@ -387,12 +387,6 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					break;
 
 			}
-
-		}
-
-		if ( params[ 'diffuse' ] ) {
-
-			params[ 'color' ] = params[ 'diffuse' ];
 
 		}
 

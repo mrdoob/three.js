@@ -248,6 +248,7 @@
 
 						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
 
+						mm.specularMap = m.map;
 						mm.shininess = 30;
 						mm.color.setHex( 0x404040 );
 						mm.metal = true;

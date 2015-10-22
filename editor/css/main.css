@@ -116,6 +116,18 @@ textarea, input { outline: none; } /* osx */
 	color: #8888ee;
 }
 
+.Line {
+	color: #88ee88;
+}
+
+.LineSegments {
+	color: #88ee88;
+}
+
+.Points {
+	color: #ee8888;
+}
+
 /* */
 
 .PointLight {
