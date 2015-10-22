@@ -7,7 +7,6 @@ import mathutils
 from bpy import data, context
 from .. import constants, logger
 
-
 def pose_animation(armature, options):
     """Query armature animation using pose bones
 
@@ -47,9 +46,10 @@ def _parse_action(func, armature, options):
     animations = []
     logger.info("Parsing %d actions", len(data.actions))
     for action in data.actions:
-        logger.info("Parsing action %s", action.name)
-        animation = func(action, armature, options)
-        animations.append(animation)
+        if action == armature.animation_data.action:
+            logger.info("Parsing action %s", action.name)
+            animation = func(action, armature, options)
+            animations.append(animation)
     return animations
 
 
