@@ -342,9 +342,11 @@ def faces(mesh, options, material_list=None):
                     face_data.append(mat_index)
                     break
             else:
-                error = ("Could not map the material index "
-                         "for face %d" % face.index)
-                raise exceptions.MaterialError(error)
+                face_data.append(0)  # default to index zero if there's a bad material
+                #################################
+                # IMPORTANT:
+                # this fix is to foolproof the export, might not be necessary to send it to THREE.js
+                #################################
 
         if uv_indices:
             for index, uv_layer in enumerate(uv_indices):
@@ -525,6 +527,9 @@ def materials(mesh, options):
     logger.info("Vertex colours set to %s", use_colors)
 
     for mat, index in material_sets:
+        if mat == None:     # undefined material for a specific index is skipped
+            continue
+
         try:
             dbg_color = constants.DBG_COLORS[index]
         except IndexError:
