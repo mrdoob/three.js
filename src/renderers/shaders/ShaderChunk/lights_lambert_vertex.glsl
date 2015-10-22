@@ -79,12 +79,11 @@ GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.n
 
 			for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-				vLightFront += getHemisphereIndirectLight( hemisphereLights[ i ], geometry );
-
+				vLightFront += getHemisphereIndirectLightColor( hemisphereLights[ i ], geometry );
 
 				#ifdef DOUBLE_SIDED
 			
-					vLightBack += getHemisphereIndirectLight( hemisphereLights[ i ], backGeometry );
+					vLightBack += getHemisphereIndirectLightColor( hemisphereLights[ i ], backGeometry );
 
 				#endif
 
