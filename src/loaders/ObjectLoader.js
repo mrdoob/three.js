@@ -514,20 +514,18 @@ THREE.ObjectLoader.prototype = {
 
 					break;
 
-				case 'Mesh': {
+				case 'Mesh':
 
-						var geometry = getGeometry( data.geometry );
-						
-						if( geometry.bones && geometry.bones.length > 0 ) {
+					var geometry = getGeometry( data.geometry );
+					var material = getMaterial( data.material );
 
-							object = new THREE.SkinnedMesh( geometry, getMaterial( data.material ) );
+					if ( geometry.bones && geometry.bones.length > 0 ) {
 
-						}
-						else {
+						object = new THREE.SkinnedMesh( geometry, material );
 
-							object = new THREE.Mesh( geometry, getMaterial( data.material ) );	
+					} else {
 
-						}
+						object = new THREE.Mesh( geometry, material );	
 
 					}
 
