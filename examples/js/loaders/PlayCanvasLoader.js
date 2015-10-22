@@ -109,7 +109,9 @@ THREE.PlayCanvasLoader.prototype = {
 			}
 
 			for ( var i = 0; i < data.rotation.length; i ++ ) {
+
 				data.rotation[ i ] *= Math.PI / 180;
+
 			}
 
 			object.position.fromArray( data.position );
