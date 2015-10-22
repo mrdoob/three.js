@@ -539,7 +539,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			case 1:
 				_movePrev.copy( _moveCurr );
-				_moveCurr.copy( getMouseOnCircle(  event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
+				_moveCurr.copy( getMouseOnCircle( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
 				break;
 
 			case 2:
@@ -565,9 +565,17 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		switch ( event.touches.length ) {
 
+			case 0:
+				_state = STATE.NONE;
+				break;
+
 			case 1:
 				_movePrev.copy( _moveCurr );
-				_moveCurr.copy( getMouseOnCircle(  event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
+				_moveCurr.copy( getMouseOnCircle( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
+				if ( _state !== STATE.TOUCH_ROTATE ) {
+					_state = STATE.TOUCH_ROTATE;
+					_movePrev.copy( _moveCurr );
+				}
 				break;
 
 			case 2:
@@ -581,7 +589,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		}
 
-		_state = STATE.NONE;
 		_this.dispatchEvent( endEvent );
 
 	}
