@@ -14,9 +14,9 @@ History = function ( editor ) {
 	this.historyDisabled = false;
 	this.config = editor.config;
 
-	//Set editor-reference in Cmd
+	//Set editor-reference in Command
 
-	Cmd( editor );
+	Command( editor );
 
 	// signals
 
@@ -51,9 +51,9 @@ History.prototype = {
 			lastCmd.script === cmd.script &&
 			lastCmd.attributeName === cmd.attributeName;
 
-		if ( isUpdatableCmd && cmd.type === "CmdSetScriptValue" ) {
+		if ( isUpdatableCmd && cmd.type === "SetScriptValueCommand" ) {
 
-			// When the cmd.type is "CmdSetScriptValue" the timeDifference is ignored
+			// When the cmd.type is "SetScriptValueCommand" the timeDifference is ignored
 
 			lastCmd.update( cmd );
 			cmd = lastCmd;

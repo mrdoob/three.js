@@ -32,16 +32,16 @@ test( "Test nested Do's, Undo's and Redo's", function() {
 	mesh.scale.z    = initScaleZ ;
 
 	// let's begin
-	editor.execute( new CmdAddObject( mesh ) );
+	editor.execute( new AddObjectCommand( mesh ) );
 
 	var newPos = new THREE.Vector3( initPosX + 100, initPosY, initPosZ );
-	editor.execute( new CmdSetPosition( mesh, newPos ) );
+	editor.execute( new SetPositionCommand( mesh, newPos ) );
 
 	var newRotation = new THREE.Euler( initRotationX, initRotationY + 1000, initRotationZ );
-	editor.execute( new CmdSetRotation( mesh, newRotation ) );
+	editor.execute( new SetRotationCommand( mesh, newRotation ) );
 
 	var newScale = new THREE.Vector3( initScaleX, initScaleY, initScaleZ + 10000 );
-	editor.execute( new CmdSetScale( mesh, newScale ) );
+	editor.execute( new SetScaleCommand( mesh, newScale ) );
 
 
 	/* full check */
@@ -81,7 +81,7 @@ test( "Test nested Do's, Undo's and Redo's", function() {
 	editor.redo();  // translation redone
 	editor.redo();  // rotation redone
 
-	editor.execute( new CmdRemoveObject( mesh ) );
+	editor.execute( new RemoveObjectCommand( mesh ) );
 	ok( editor.scene.children.length == 0, "OK, object removal was successful" );
 
 	editor.undo();  // removal undone

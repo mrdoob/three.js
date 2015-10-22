@@ -51,7 +51,7 @@ Sidebar.Geometry = function ( editor ) {
 
 				var newPosition = object.position.clone();
 				newPosition.sub( offset );
-				editor.execute( new CmdSetPosition( object, newPosition ) );
+				editor.execute( new SetPositionCommand( object, newPosition ) );
 
 				editor.signals.geometryChanged.dispatch( object );
 
@@ -61,7 +61,7 @@ Sidebar.Geometry = function ( editor ) {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					editor.execute( new CmdSetGeometry( object, new THREE.BufferGeometry().fromGeometry( geometry ) ) );
+					editor.execute( new SetGeometryCommand( object, new THREE.BufferGeometry().fromGeometry( geometry ) ) );
 
 				}
 
@@ -73,12 +73,12 @@ Sidebar.Geometry = function ( editor ) {
 				newGeometry.uuid = geometry.uuid;
 				newGeometry.applyMatrix( object.matrix );
 
-				var cmds = [ new CmdSetGeometry( object, newGeometry ),
-					new CmdSetPosition( object, new THREE.Vector3( 0, 0, 0 ) ),
-					new CmdSetRotation( object, new THREE.Euler( 0, 0, 0 ) ),
-					new CmdSetScale( object, new THREE.Vector3( 1, 1, 1 ) ) ];
+				var cmds = [ new SetGeometryCommand( object, newGeometry ),
+					new SetPositionCommand( object, new THREE.Vector3( 0, 0, 0 ) ),
+					new SetRotationCommand( object, new THREE.Euler( 0, 0, 0 ) ),
+					new SetScaleCommand( object, new THREE.Vector3( 1, 1, 1 ) ) ];
 
-				editor.execute( new CmdMultiCmds( cmds ), 'Flatten Geometry' );
+				editor.execute( new MultiCmdsCommand( cmds ), 'Flatten Geometry' );
 
 				break;
 
@@ -99,7 +99,7 @@ Sidebar.Geometry = function ( editor ) {
 
 		geometryUUID.setValue( THREE.Math.generateUUID() );
 
-		editor.execute( new CmdSetGeometryValue( editor.selected, 'uuid', geometryUUID.getValue() ) );
+		editor.execute( new SetGeometryValueCommand( editor.selected, 'uuid', geometryUUID.getValue() ) );
 
 	} );
 
@@ -114,7 +114,7 @@ Sidebar.Geometry = function ( editor ) {
 	var geometryNameRow = new UI.Panel();
 	var geometryName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-		editor.execute( new CmdSetGeometryValue( editor.selected, 'name', geometryName.getValue() ) );
+		editor.execute( new SetGeometryValueCommand( editor.selected, 'name', geometryName.getValue() ) );
 
 	} );
 

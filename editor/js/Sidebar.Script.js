@@ -27,7 +27,7 @@ Sidebar.Script = function ( editor ) {
 	newScript.onClick( function () {
 
 		var script = { name: '', source: 'function update( event ) {}' };
-		editor.execute( new CmdAddScript( editor.selected, script ) );
+		editor.execute( new AddScriptCommand( editor.selected, script ) );
 
 	} );
 	container.add( newScript );
@@ -63,7 +63,7 @@ Sidebar.Script = function ( editor ) {
 					var name = new UI.Input( script.name ).setWidth( '130px' ).setFontSize( '12px' );
 					name.onChange( function () {
 
-						editor.execute( new CmdSetScriptValue( editor.selected, script, 'name', this.getValue() ) );
+						editor.execute( new SetScriptValueCommand( editor.selected, script, 'name', this.getValue() ) );
 
 					} );
 					scriptsContainer.add( name );
@@ -83,7 +83,7 @@ Sidebar.Script = function ( editor ) {
 
 						if ( confirm( 'Are you sure?' ) ) {
 
-							editor.execute( new CmdRemoveScript( editor.selected, script ) );
+							editor.execute( new RemoveScriptCommand( editor.selected, script ) );
 
 						}
 

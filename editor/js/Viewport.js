@@ -82,21 +82,21 @@ var Viewport = function ( editor ) {
 				case 'translate':
 					if (!objectPositionOnDown.equals(object.position)) {
 
-						editor.execute(new CmdSetPosition( object, object.position, objectPositionOnDown ));
+						editor.execute(new SetPositionCommand( object, object.position, objectPositionOnDown ));
 
 					}
 					break;
 				case 'rotate':
 					if (!objectRotationOnDown.equals(object.rotation)) {
 
-						editor.execute(new CmdSetRotation( object, object.rotation, objectRotationOnDown ));
+						editor.execute(new SetRotationCommand( object, object.rotation, objectRotationOnDown ));
 
 					}
 					break;
 				case 'scale':
 					if (!objectScaleOnDown.equals(object.scale)) {
 
-						editor.execute(new CmdSetScale( object, object.scale, objectScaleOnDown ));
+						editor.execute(new SetScaleCommand( object, object.scale, objectScaleOnDown ));
 
 					}
 					break;

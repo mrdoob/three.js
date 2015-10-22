@@ -25,7 +25,7 @@ test( "Test Serialization", function( assert ) {
 		var box = aBox( 'The Box' );
 
 		// Test Add
-		var cmd = new CmdAddObject( box );
+		var cmd = new AddObjectCommand( box );
 		cmd.updatable = false;
 
 		editor.execute( cmd );
@@ -41,10 +41,10 @@ test( "Test Serialization", function( assert ) {
 
 		// Test Add
 
-		var cmd = new CmdAddObject( box );
+		var cmd = new AddObjectCommand( box );
 		editor.execute( cmd );
 
-		var cmd = new CmdAddScript( box, { "name": "test", "source": "console.log(\"hello world\");" } );
+		var cmd = new AddScriptCommand( box, { "name": "test", "source": "console.log(\"hello world\");" } );
 		cmd.updatable = false;
 
 		editor.execute( cmd );
@@ -61,11 +61,11 @@ test( "Test Serialization", function( assert ) {
 		var anakinSkywalker = aSphere( anakinsName );
 		var lukeSkywalker   = aBox( lukesName );
 
-		editor.execute( new CmdAddObject( anakinSkywalker ) );
-		editor.execute( new CmdAddObject( lukeSkywalker ) );
+		editor.execute( new AddObjectCommand( anakinSkywalker ) );
+		editor.execute( new AddObjectCommand( lukeSkywalker ) );
 
 		// Tell Luke, Anakin is his father
-		editor.execute( new CmdMoveObject( lukeSkywalker, anakinSkywalker ) );
+		editor.execute( new MoveObjectCommand( lukeSkywalker, anakinSkywalker ) );
 
 		return "moveObject";
 
@@ -74,15 +74,15 @@ test( "Test Serialization", function( assert ) {
 	var removeScript = function () {
 
 		var box = aBox( 'Box with no script' );
-		editor.execute( new CmdAddObject( box ) );
+		editor.execute( new AddObjectCommand( box ) );
 
 		var script = { "name": "test", "source": "console.log(\"hello world\");" } ;
-		var cmd = new CmdAddScript( box, script );
+		var cmd = new AddScriptCommand( box, script );
 		cmd.updatable = false;
 
 		editor.execute( cmd );
 
-		cmd = new CmdRemoveScript( box, script );
+		cmd = new RemoveScriptCommand( box, script );
 		editor.execute( cmd );
 
 		return "removeScript";
@@ -93,8 +93,8 @@ test( "Test Serialization", function( assert ) {
 
 		var pointLight = aPointlight( "The light Light" );
 
-		editor.execute( new CmdAddObject( pointLight ) );
-		var cmd = new CmdSetColor( pointLight, 'color', green );
+		editor.execute( new AddObjectCommand( pointLight ) );
+		var cmd = new SetColorCommand( pointLight, 'color', green );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -107,9 +107,9 @@ test( "Test Serialization", function( assert ) {
 		var box = aBox( 'Guinea Pig' ); // default ( 100, 100, 100, 1, 1, 1 )
 		var boxGeometry = { geometry: { parameters: { width: 200, height: 201, depth: 202, widthSegments: 2, heightSegments: 3, depthSegments: 4 } } };
 
-		editor.execute( new CmdAddObject( box ) );
+		editor.execute( new AddObjectCommand( box ) );
 
-		var cmd = new CmdSetGeometry( box, getGeometry( "BoxGeometry", boxGeometry ) );
+		var cmd = new SetGeometryCommand( box, getGeometry( "BoxGeometry", boxGeometry ) );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -120,9 +120,9 @@ test( "Test Serialization", function( assert ) {
 	var setGeometryValue = function() {
 
 		var box = aBox( 'Geometry Value Box' );
-		editor.execute( new CmdAddObject( box ) );
+		editor.execute( new AddObjectCommand( box ) );
 
-		cmd = new CmdSetGeometryValue( box, 'uuid', THREE.Math.generateUUID() );
+		cmd = new SetGeometryValueCommand( box, 'uuid', THREE.Math.generateUUID() );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -133,10 +133,10 @@ test( "Test Serialization", function( assert ) {
 	var setMaterial = function () {
 
 		var sphere = aSphere( 'The Sun' );
-		editor.execute( new CmdAddObject( sphere ) );
+		editor.execute( new AddObjectCommand( sphere ) );
 
 		var material = new THREE[ 'MeshPhongMaterial' ]();
-		var cmd = new CmdSetMaterial( sphere, material );
+		var cmd = new SetMaterialCommand( sphere, material );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -147,9 +147,9 @@ test( "Test Serialization", function( assert ) {
 	var setMaterialColor = function () {
 
 		var box = aBox( 'Box with colored material' );
-		editor.execute( new CmdAddObject( box ) );
+		editor.execute( new AddObjectCommand( box ) );
 
-		var cmd = new CmdSetMaterialColor( box, 'color', green );
+		var cmd = new SetMaterialColorCommand( box, 'color', green );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -160,7 +160,7 @@ test( "Test Serialization", function( assert ) {
 	var setMaterialMap = function () {
 
 		var sphere = aSphere( 'Sphere with texture' );
-		editor.execute( new CmdAddObject( sphere ) );
+		editor.execute( new AddObjectCommand( sphere ) );
 
 		// dirt.png
 		var data = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpDMjYxMEI4MzVENDMxMUU1OTdEQUY4QkNGNUVENjg4MyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpDMjYxMEI4NDVENDMxMUU1OTdEQUY4QkNGNUVENjg4MyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkMyNjEwQjgxNUQ0MzExRTU5N0RBRjhCQ0Y1RUQ2ODgzIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkMyNjEwQjgyNUQ0MzExRTU5N0RBRjhCQ0Y1RUQ2ODgzIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+txizaQAAABVQTFRFh4eHbGxsdFhEWT0puYVclmxKeVU6ppwr+AAAAHtJREFUeNosjgEWBCEIQplFuP+RB5h9lZn2EZxkLzC3D1YSgSlmk7i0ctzDZNBz/VSoX1KwjlFI8WmA2R7JqUa0LJJcd1rLNWRRaMyi+3Y16qMKHhdE48XLsDyHKJ0nSMazY1fxHyriXxV584tmEedcfGNrA/5cmK8AAwCT9ATehDDyzwAAAABJRU5ErkJggg==';
@@ -170,7 +170,7 @@ test( "Test Serialization", function( assert ) {
 		var texture = new THREE.Texture( img, 'map' );
 		texture.sourceFile = 'dirt.png';
 
-		var cmd = new CmdSetMaterialMap( sphere, 'map', texture );
+		var cmd = new SetMaterialMapCommand( sphere, 'map', texture );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -181,9 +181,9 @@ test( "Test Serialization", function( assert ) {
 	var setMaterialValue = function () {
 
 		var box = aBox( 'Box with values' );
-		editor.execute( new CmdAddObject( box ) );
+		editor.execute( new AddObjectCommand( box ) );
 
-		var cmd = new CmdSetMaterialValue( box, 'name', 'Bravo' );
+		var cmd = new SetMaterialValueCommand( box, 'name', 'Bravo' );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -194,10 +194,10 @@ test( "Test Serialization", function( assert ) {
 	var setPosition = function () {
 
 		var sphere = aSphere( 'Sphere with position' );
-		editor.execute( new CmdAddObject( sphere ) );
+		editor.execute( new AddObjectCommand( sphere ) );
 
 		var newPosition = new THREE.Vector3( 101, 202, 303 );
-		var cmd = new CmdSetPosition( sphere, newPosition );
+		var cmd = new SetPositionCommand( sphere, newPosition );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -208,10 +208,10 @@ test( "Test Serialization", function( assert ) {
 	var setRotation = function () {
 
 		var box = aBox( 'Box with rotation' );
-		editor.execute( new CmdAddObject( box ) );
+		editor.execute( new AddObjectCommand( box ) );
 
 		var newRotation = new THREE.Euler( 0.3, - 1.7, 2 );
-		var cmd = new CmdSetRotation( box, newRotation );
+		var cmd = new SetRotationCommand( box, newRotation );
 		cmd.updatable = false;
 		editor.execute ( cmd );
 
@@ -222,10 +222,10 @@ test( "Test Serialization", function( assert ) {
 	var setScale = function () {
 
 		var sphere = aSphere( 'Sphere with scale' );
-		editor.execute( new CmdAddObject( sphere ) );
+		editor.execute( new AddObjectCommand( sphere ) );
 
 		var newScale = new THREE.Vector3( 1.2, 3.3, 4.6 );
-		var cmd = new CmdSetScale( sphere, newScale );
+		var cmd = new SetScaleCommand( sphere, newScale );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -236,12 +236,12 @@ test( "Test Serialization", function( assert ) {
 	var setScriptValue = function () {
 
 		var box = aBox( 'Box with script' );
-		editor.execute( new CmdAddObject( box ) );
+		editor.execute( new AddObjectCommand( box ) );
 		var script = { name: "Alert", source: "alert( null );" };
-		editor.execute( new CmdAddScript( box, script ) );
+		editor.execute( new AddScriptCommand( box, script ) );
 
 		var newScript = { name: "Console", source: "console.log( null );" };
-		var cmd = new CmdSetScriptValue( box, script, 'source', newScript.source, 0 );
+		var cmd = new SetScriptValueCommand( box, script, 'source', newScript.source, 0 );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -252,9 +252,9 @@ test( "Test Serialization", function( assert ) {
 	var setUuid = function () {
 
 		var sphere = aSphere( 'Sphere with UUID' );
-		editor.execute( new CmdAddObject( sphere ) );
+		editor.execute( new AddObjectCommand( sphere ) );
 
-		var cmd = new CmdSetUuid( sphere, THREE.Math.generateUUID() );
+		var cmd = new SetUuidCommand( sphere, THREE.Math.generateUUID() );
 		cmd.updatable = false;
 		editor.execute( cmd );
 
@@ -265,9 +265,9 @@ test( "Test Serialization", function( assert ) {
 	var setValue = function () {
 
 		var box = aBox( 'Box with value' );
-		editor.execute( new CmdAddObject( box ) );
+		editor.execute( new AddObjectCommand( box ) );
 
-		var cmd = new CmdSetValue( box, 'intensity', 2.3 );
+		var cmd = new SetValueCommand( box, 'intensity', 2.3 );
 		cmd.updatable = false;
 		editor.execute( cmd );
 

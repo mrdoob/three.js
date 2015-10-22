@@ -12,7 +12,7 @@ It would also be possible to only store the difference between the old and the n
 
 **Before implementing your own command you should look if you can't reuse one of the already existing ones.**
 
-For numbers, strings or booleans the CmdSet...Value-commands can be used.
+For numbers, strings or booleans the Set...ValueCommand-commands can be used.
 Then there are separate commands for:
 - setting a color property (THREE.Color)
 - setting maps (THREE.Texture)
@@ -26,12 +26,12 @@ Every command needs a constructor. In the constructor
 
 ```javascript
 	
-CmdXXX = function () {
+var DoSomethingCommand = function () {
 
-	Cmd.call( this ); // Required: Call default constructor
+	Command.call( this ); // Required: Call default constructor
 
-	this.type = 'CmdXXX';            // Required: has to match the object-name!
-	this.name = 'Set/Do/Update XXX'; // Required: description of the command, used in Sidebar.History
+	this.type = 'DoSomethingCommand';            // Required: has to match the object-name!
+	this.name = 'Set/Do/Update Something'; // Required: description of the command, used in Sidebar.History
 
 	// TODO: store all the relevant information needed to 
 	// restore the old and the new state
@@ -46,7 +46,7 @@ And as part of the prototype you need to implement four functions
 - **fromJSON:** which deserializes the command
 
 ```javascript
-CmdXXX.prototype = {
+DoSomethingCommand.prototype = {
 
 	execute: function () {
 
@@ -62,21 +62,21 @@ CmdXXX.prototype = {
 
 	toJSON: function () {
 
-		var output = Cmd.prototype.toJSON.call( this ); // Required: Call 'toJSON'-method of prototype 'Cmd'
+		var output = Command.prototype.toJSON.call( this ); // Required: Call 'toJSON'-method of prototype 'Command'
 
 		// TODO: serialize all the necessary information as part of 'output' (JSON-format)
 		// so that it can be restored in 'fromJSON'
-	
+
 		return output;
 
 	},
 
 	fromJSON: function ( json ) {
 
-		Cmd.prototype.fromJSON.call( this, json ); // Required: Call 'fromJSON'-method of prototype 'Cmd'
-		
+		Command.prototype.fromJSON.call( this, json ); // Required: Call 'fromJSON'-method of prototype 'Command'
+
 		// TODO: restore command from json
-		
+
 	}
 
 };
@@ -89,9 +89,9 @@ To execute a command we need an instance of the main editor-object. The editor-o
 On **editor** we then call **.execute(...)*** with the new command-object which in turn calls **history.execute(...)** and adds the command to the undo-stack.
 
 ```javascript
-	
-editor.execute( new CmdXXX() );
-		
+
+editor.execute( new DoSomethingCommand() );
+
 ```
 
 ### Updatable commands ###
@@ -99,7 +99,7 @@ editor.execute( new CmdXXX() );
 Some commands are also **updatable**. By default a command is not updatable. Making a command updatable means that you
 have to implement a fifth function 'update' as part of the prototype. In it only the 'new' state gets updated while the old one stays the same.
 
-Here as an example is the update-function of **CmdSetColor**:
+Here as an example is the update-function of **SetColorCommand**:
 
 ```javascript
 update: function ( cmd ) {
@@ -112,15 +112,15 @@ update: function ( cmd ) {
 
 #### List of updatable commands
 
-- CmdSetColor
-- CmdSetGeometry
-- CmdSetMaterialColor
-- CmdSetMaterialValue
-- CmdSetPosition
-- CmdSetRotation
-- CmdSetScale
-- CmdSetValue
-- CmdSetScriptValue
+- SetColorCommand
+- SetGeometryCommand
+- SetMaterialColorCommand
+- SetMaterialValueCommand
+- SetPositionCommand
+- SetRotationCommand
+- SetScaleCommand
+- SetValueCommand
+- SetScriptValueCommand
 
 The idea behind 'updatable commands' is that two commands of the same type which occur
 within a short period of time should be merged into one.
