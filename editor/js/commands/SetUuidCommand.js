@@ -9,7 +9,7 @@
  * @constructor
  */
 
-SetUuidCommand = function ( object, newUuid ) {
+var SetUuidCommand = function ( object, newUuid ) {
 
 	Command.call( this );
 

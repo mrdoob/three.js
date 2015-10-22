@@ -10,7 +10,7 @@
  * @constructor
  */
 
-MoveObjectCommand = function ( object, newParent, newBefore ) {
+var MoveObjectCommand = function ( object, newParent, newBefore ) {
 
 	Command.call( this );
 

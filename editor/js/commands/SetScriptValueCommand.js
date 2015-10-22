@@ -12,7 +12,7 @@
  * @constructor
  */
 
-SetScriptValueCommand = function ( object, script, attributeName, newValue, cursorPosition ) {
+var SetScriptValueCommand = function ( object, script, attributeName, newValue, cursorPosition ) {
 
 	Command.call( this );
 

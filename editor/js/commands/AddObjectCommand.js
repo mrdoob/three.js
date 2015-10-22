@@ -8,7 +8,7 @@
  * @constructor
  */
 
-AddObjectCommand = function ( object ) {
+var AddObjectCommand = function ( object ) {
 
 	Command.call( this );
 

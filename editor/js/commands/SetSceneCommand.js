@@ -8,7 +8,7 @@
  * @constructor
  */
 
-SetSceneCommand = function ( scene ) {
+var SetSceneCommand = function ( scene ) {
 
 	Command.call( this );
 

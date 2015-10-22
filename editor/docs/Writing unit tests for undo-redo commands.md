@@ -26,9 +26,9 @@ Within the file, go to the `<!-- command object classes -->` and include the new
 ```html
 // <!-- command object classes -->
 //...
-<script src="../../editor/js/AddScriptCommand.js"></script>
-<script src="../../editor/js/DoSomethingCommand.js"></script>         // add this line
-<script src="../../editor/js/MoveObjectCommand.js"></script>
+<script src="../../editor/js/commands/AddScriptCommand.js"></script>
+<script src="../../editor/js/commands/DoSomethingCommand.js"></script>         // add this line
+<script src="../../editor/js/commands/MoveObjectCommand.js"></script>
 //...
 ```
 

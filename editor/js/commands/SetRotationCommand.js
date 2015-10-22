@@ -10,7 +10,7 @@
  * @constructor
  */
 
-SetRotationCommand = function ( object, newRotation, optionalOldRotation ) {
+var SetRotationCommand = function ( object, newRotation, optionalOldRotation ) {
 
 	Command.call( this );
 

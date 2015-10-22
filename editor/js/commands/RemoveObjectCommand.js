@@ -8,7 +8,7 @@
  * @constructor
  */
 
-RemoveObjectCommand = function ( object ) {
+var RemoveObjectCommand = function ( object ) {
 
 	Command.call( this );
 

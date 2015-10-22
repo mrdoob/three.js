@@ -10,7 +10,7 @@
  * @constructor
  */
 
-SetMaterialValueCommand = function ( object, attributeName, newValue ) {
+var SetMaterialValueCommand = function ( object, attributeName, newValue ) {
 
 	Command.call( this );
 

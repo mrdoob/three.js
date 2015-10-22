@@ -9,7 +9,7 @@
  * @constructor
  */
 
-SetGeometryCommand = function ( object, newGeometry ) {
+var SetGeometryCommand = function ( object, newGeometry ) {
 
 	Command.call( this );
 

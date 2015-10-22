@@ -10,7 +10,7 @@
  * @constructor
  */
 
-SetColorCommand = function ( object, attributeName, newValue ) {
+var SetColorCommand = function ( object, attributeName, newValue ) {
 
 	Command.call( this );
 

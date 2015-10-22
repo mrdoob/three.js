@@ -10,7 +10,7 @@
  * @constructor
  */
 
-SetMaterialColorCommand = function ( object, attributeName, newValue ) {
+var SetMaterialColorCommand = function ( object, attributeName, newValue ) {
 
 	Command.call( this );
 

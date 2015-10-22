@@ -8,7 +8,7 @@
  * @constructor
  */
 
-MultiCmdsCommand = function ( cmdArray ) {
+var MultiCmdsCommand = function ( cmdArray ) {
 
 	Command.call( this );
 

@@ -9,7 +9,7 @@
  * @constructor
  */
 
-AddScriptCommand = function ( object, script ) {
+var AddScriptCommand = function ( object, script ) {
 
 	Command.call( this );
 

@@ -10,7 +10,7 @@
  * @constructor
  */
 
-SetPositionCommand = function ( object, newPosition, optionalOldPosition ) {
+var SetPositionCommand = function ( object, newPosition, optionalOldPosition ) {
 
 	Command.call( this );
 

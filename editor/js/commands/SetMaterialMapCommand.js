@@ -10,7 +10,7 @@
  * @constructor
  */
 
-SetMaterialMapCommand = function ( object, mapName, newMap ) {
+var SetMaterialMapCommand = function ( object, mapName, newMap ) {
 
 	Command.call( this );
 	this.type = 'SetMaterialMapCommand';

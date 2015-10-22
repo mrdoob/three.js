@@ -9,7 +9,7 @@
  * @constructor
  */
 
-SetMaterialCommand = function ( object, newMaterial ) {
+var SetMaterialCommand = function ( object, newMaterial ) {
 
 	Command.call( this );
 

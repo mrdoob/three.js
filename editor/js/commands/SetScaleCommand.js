@@ -10,7 +10,7 @@
  * @constructor
  */
 
-SetScaleCommand = function ( object, newScale, optionalOldScale ) {
+var SetScaleCommand = function ( object, newScale, optionalOldScale ) {
 
 	Command.call( this );
 

@@ -10,7 +10,7 @@
  * @constructor
  */
 
-SetGeometryValueCommand = function ( object, attributeName, newValue ) {
+var SetGeometryValueCommand = function ( object, attributeName, newValue ) {
 
 	Command.call( this );
 

@@ -10,7 +10,7 @@
  * @constructor
  */
 
-SetValueCommand = function ( object, attributeName, newValue ) {
+var SetValueCommand = function ( object, attributeName, newValue ) {
 
 	Command.call( this );
 

@@ -9,7 +9,7 @@
  * @constructor
  */
 
-RemoveScriptCommand = function ( object, script ) {
+var RemoveScriptCommand = function ( object, script ) {
 
 	Command.call( this );
 

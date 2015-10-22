@@ -26,12 +26,12 @@ Every command needs a constructor. In the constructor
 
 ```javascript
 	
-DoSomethingCommand = function () {
+var DoSomethingCommand = function () {
 
 	Command.call( this ); // Required: Call default constructor
 
 	this.type = 'DoSomethingCommand';            // Required: has to match the object-name!
-	this.name = 'Set/Do/Update DoSomething'; // Required: description of the command, used in Sidebar.History
+	this.name = 'Set/Do/Update Something'; // Required: description of the command, used in Sidebar.History
 
 	// TODO: store all the relevant information needed to 
 	// restore the old and the new state
