@@ -31,22 +31,6 @@ def _material(func):
 
 
 @_material
-def ambient_color(material):
-    """
-
-    :param material:
-    :return: rgb value
-    :rtype: tuple
-
-    """
-    logger.debug("material.ambient_color(%s)", material)
-    diffuse = diffuse_color(material)
-    return (material.ambient * diffuse[0],
-            material.ambient * diffuse[1],
-            material.ambient * diffuse[2])
-
-
-@_material
 def blending(material):
     """
 

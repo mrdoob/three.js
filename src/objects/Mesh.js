@@ -169,7 +169,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 		sphere.copy( geometry.boundingSphere );
 		sphere.applyMatrix4( matrixWorld );
 
-		if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) return;
+		if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
 		// Check boundingBox before continuing
 
@@ -178,7 +178,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		if ( geometry.boundingBox !== null ) {
 
-			if ( ray.isIntersectionBox( geometry.boundingBox ) === false ) return;
+			if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
 
 		}
 

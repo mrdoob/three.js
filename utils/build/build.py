@@ -62,8 +62,9 @@ def main(argv=None):
 				if filename.endswith(".glsl"):
 					tmp.write(u'THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + u'\'] = "')
 					text = f.read()
-					text = re.sub(r"\t*//.*\n", "", text) # strip comments
-					text = text.replace('\n','\\n') # line breaks to \n
+					text = re.sub(r"\t*//.*\n", "", text) # remove //
+					text = re.sub(r"\t*\/\*[\s\S]*\*\/\n", "", text) # remove /* */
+					text = re.sub(r"\n+", '\\\\n', text) # line breaks to \n
 					tmp.write(text)
 					tmp.write(u'";\n\n')
 				else:
