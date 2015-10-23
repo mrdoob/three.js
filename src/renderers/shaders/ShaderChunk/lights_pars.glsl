@@ -145,19 +145,27 @@ uniform vec3 ambientLightColor;
 
 	}
 
+	// http://stackoverflow.com/a/24390149 modified to work on a CubeMap.
+	float textureQueryLodCUBE( const in vec3 sampleDirection, const in float cubeMapWidth )
+	{
+	    vec3  dx_vtc        = dFdx( sampleDirection * cubeMapWidth );
+	    vec3  dy_vtc        = dFdy( sampleDirection * cubeMapWidth );
+	    float delta_max_sqr = max(dot(dx_vtc, dx_vtc), dot(dy_vtc, dy_vtc));
+	    return 0.5 * log2( delta_max_sqr );
+	}
 
 	// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
 	float getSpecularMIPBias( const in float blinnShininessExponent, const in int maxMIPLevel, const vec3 sampleDirection ) {
 
-		float envMapWidth = pow( 2.0, float(mapMIPLevel) );
+		float envMapWidth = pow( 2.0, float(maxMIPLevel) );
 
 		//float desiredMIPLevel = log2( envMapWidth * sqrt( 3.0 ) ) - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
 		float desiredMIPLevel = float(maxMIPLevel) - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
-		float sampleMIPLevel = textureQueryLod( environmentMap, worldSpaceReflectionVector, envMapWidth );
+		float sampleMIPLevel = textureQueryLodCUBE( sampleDirection, envMapWidth );
 	
 		// clamp to allowable LOD ranges.
-		sampleMIPLevel = clamp( sampleMIPLevel, 0.0, maxMIPLevel );
-		desiredMIPLevel = clamp( desiredMIPLevel, 0.0, maxMIPLevel );
+		sampleMIPLevel = clamp( sampleMIPLevel, 0.0, float(maxMIPLevel) );
+		desiredMIPLevel = clamp( desiredMIPLevel, 0.0, float(maxMIPLevel) );
 
 		// only go to lower LOD levels
 	  	return max( desiredMIPLevel - sampleMIPLevel, 0.0 );
