@@ -97,6 +97,10 @@
 
 			bool frustumTest = all( frustumTestVec );
 
+			float shadowBiasLocal = shadowBias[ i ];
+			vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );
+			float shadowDarknessLocal = shadowDarkness[ i ];
+
 			if ( frustumTest ) {
 
 	#if defined( SHADOWMAP_TYPE_PCF )
@@ -215,13 +219,12 @@
 
 	#else // no percentage-closer filtering:
 
-				shadowCoord.z += shadowBias[ i ];
+				shadowCoord.z += shadowDarknessLocal;
 
-				vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );
 				float fDepth = unpackDepth( rgbaDepth );
 
 				if ( fDepth < shadowCoord.z )
-					shadow = shadowDarkness[ i ];
+					shadow = shadowDarknessLocal;
 
 	#endif
 
