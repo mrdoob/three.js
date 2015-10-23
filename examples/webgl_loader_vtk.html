@@ -47,7 +47,7 @@
 
 			var container, stats;
 
-			var camera, controls, scene, renderer;
+			var camera, controls, scene, renderer, material;
 
 			var cross;
 
@@ -83,7 +83,20 @@
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 
-				var material = new THREE.MeshLambertMaterial( { color:0xffffff, side: THREE.DoubleSide } );
+
+				var path = "textures/cube/pisa/";
+				var format = '.png';
+				var urls = [
+						path + 'px' + format, path + 'nx' + format,
+						path + 'py' + format, path + 'ny' + format,
+						path + 'pz' + format, path + 'nz' + format
+					];
+
+				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+				reflectionCube.format = THREE.RGBFormat;
+
+				var diffuseColor = new THREE.Color( 1, 1, 1 );
+				material = new THREE.MeshPhysicalMaterial( { color: diffuseColor, metalness: 1.0, roughness: 0.2, shading: THREE.SmoothShading, envMap: reflectionCube } );
 
 				var loader = new THREE.VTKLoader();
 				loader.load( "models/vtk/bunny.vtk", function ( geometry ) {
@@ -132,6 +145,12 @@
 
 				requestAnimationFrame( animate );
 
+				var timer = Date.now() * 0.001;
+
+				if( material ) {
+					material.roughness = Math.cos( timer ) * 0.5 + 0.5;
+					material.needsUpdate = true;
+				}
 				controls.update();
 				renderer.render( scene, camera );
 
