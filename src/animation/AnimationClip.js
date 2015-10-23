@@ -68,8 +68,8 @@ Object.assign( THREE.AnimationClip, {
 	parse: function( json ) {
 
 		var tracks = [],
-			jsonTracks = json[ 'tracks' ],
-			frameTime = 1.0 / ( json[ 'fps' ] || 1.0 );
+			jsonTracks = json.tracks,
+			frameTime = 1.0 / ( json.fps || 1.0 );
 
 		for ( var i = 0, n = jsonTracks.length; i !== n; ++ i ) {
 
@@ -77,7 +77,7 @@ Object.assign( THREE.AnimationClip, {
 
 		}
 
-		return new THREE.AnimationClip( json[ 'name' ], json[ 'duration' ], tracks );
+		return new THREE.AnimationClip( json.name, json.duration, tracks );
 
 	},
 

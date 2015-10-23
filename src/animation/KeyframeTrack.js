@@ -386,7 +386,7 @@ Object.assign( THREE.KeyframeTrack, {
 
 	parse: function( json ) {
 
-		if( json[ 'type' ] === undefined ) {
+		if( json.type === undefined ) {
 
 			throw new Error( "track type undefined, can not parse" );
 
@@ -394,16 +394,16 @@ Object.assign( THREE.KeyframeTrack, {
 
 		var trackType = THREE.KeyframeTrack._getTrackTypeForValueTypeName( json.type );
 
-		if ( json[ 'times' ] === undefined ) {
+		if ( json.times === undefined ) {
 
 			console.warn( "legacy JSON format detected, converting" );
 
 			var times = [], values = [];
 
-			THREE.AnimationUtils.flattenJSON( json[ 'keys' ], times, values, 'value' );
+			THREE.AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
 
-			json[ 'times' ] = times;
-			json[ 'values' ] = values;
+			json.times = times;
+			json.values = values;
 
 		}
 
@@ -416,7 +416,7 @@ Object.assign( THREE.KeyframeTrack, {
 
 			// by default, we asssume a constructor compatible with the base
 			return new trackType(
-					json[ 'name' ], json[ 'times' ], json[ 'values' ], json[ 'interpolation' ] );
+					json.name, json.times, json.values, json.interpolation );
 
 		}
 
@@ -448,13 +448,13 @@ Object.assign( THREE.KeyframeTrack, {
 
 			if ( interpolation !== track.DefaultInterpolation ) {
 
-				json[ 'interpolation' ] = interpolation;
+				json.interpolation = interpolation;
 
 			}
 
 		}
 
-		json[ 'type' ] = track.ValueTypeName; // mandatory
+		json.type = track.ValueTypeName; // mandatory
 
 		return json;
 
