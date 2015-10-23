@@ -145,11 +145,11 @@ uniform vec3 ambientLightColor;
 
 	}
 
-	// http://stackoverflow.com/a/24390149 modified to work on a CubeMap.
-	float textureQueryLodCUBE( const in vec3 sampleDirection, const in float cubeMapWidth )
+	// http://stackoverflow.com/a/24390149 modified to work on a cubeMap vec3.
+	float textureQueryLodCUBE( const in vec3 sampleDirectionScaledByCubeWidth )
 	{
-	    vec3  dx_vtc        = dFdx( sampleDirection * cubeMapWidth );
-	    vec3  dy_vtc        = dFdy( sampleDirection * cubeMapWidth );
+	    vec3  dx_vtc        = dFdx( sampleDirectionScaledByCubeWidth );
+	    vec3  dy_vtc        = dFdy( sampleDirectionScaledByCubeWidth );
 	    float delta_max_sqr = max(dot(dx_vtc, dx_vtc), dot(dy_vtc, dy_vtc));
 	    return 0.5 * log2( delta_max_sqr );
 	}
@@ -161,7 +161,7 @@ uniform vec3 ambientLightColor;
 
 		//float desiredMIPLevel = log2( envMapWidth * sqrt( 3.0 ) ) - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
 		float desiredMIPLevel = float(maxMIPLevel) - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
-		float sampleMIPLevel = textureQueryLodCUBE( sampleDirection, envMapWidth );
+		float sampleMIPLevel = textureQueryLodCUBE( sampleDirection * ( envMapWidth * 0.5 ) ); // only half because sampleDirection ranges of [-1,1]
 	
 		// clamp to allowable LOD ranges.
 		sampleMIPLevel = clamp( sampleMIPLevel, 0.0, float(maxMIPLevel) );
