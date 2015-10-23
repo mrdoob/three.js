@@ -400,7 +400,7 @@ Object.assign( THREE.KeyframeTrack, {
 
 			var times = [], values = [];
 
-			THREE.AnimationUtils.flattenJSON( json, times, values, 'value' );
+			THREE.AnimationUtils.flattenJSON( json[ 'keys' ], times, values, 'value' );
 
 			json[ 'times' ] = times;
 			json[ 'values' ] = values;
