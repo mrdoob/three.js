@@ -249,21 +249,11 @@ Sidebar.Object3D = function ( editor ) {
 
 	objectShadowRow.add( new UI.Text( 'Shadow' ).setWidth( '90px' ) );
 
-	var objectCastShadowSpan = new UI.Span().setMarginRight( '10px' );
-	var objectCastShadow = new UI.Checkbox().onChange( update );
+	var objectCastShadow = new UI.THREE.Boolean( false, 'cast' ).onChange( update );
+	objectShadowRow.add( objectCastShadow );
 
-	objectCastShadowSpan.add( objectCastShadow );
-	objectCastShadowSpan.add( new UI.Text( 'cast' ).setMarginLeft( '3px' ) );
-
-	objectShadowRow.add( objectCastShadowSpan );
-
-	var objectReceiveShadowSpan = new UI.Span();
-	var objectReceiveShadow = new UI.Checkbox().onChange( update );
-
-	objectReceiveShadowSpan.add( objectReceiveShadow );
-	objectReceiveShadowSpan.add( new UI.Text( 'receive' ).setMarginLeft( '3px' ) );
-
-	objectShadowRow.add( objectReceiveShadowSpan );
+	var objectReceiveShadow = new UI.THREE.Boolean( false, 'receive' ).onChange( update );
+	objectShadowRow.add( objectReceiveShadow );
 
 	container.add( objectShadowRow );
 
@@ -519,7 +509,7 @@ Sidebar.Object3D = function ( editor ) {
 			'exponent' : objectExponentRow,
 			'decay' : objectDecayRow,
 			'castShadow' : objectShadowRow,
-			'receiveShadow' : objectReceiveShadowSpan
+			'receiveShadow' : objectReceiveShadow
 		};
 
 		for ( var property in properties ) {

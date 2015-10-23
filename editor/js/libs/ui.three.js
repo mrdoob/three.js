@@ -309,3 +309,34 @@ UI.Outliner.prototype.setValue = function ( value ) {
 	return this;
 
 };
+
+UI.THREE = {};
+
+UI.THREE.Boolean = function ( boolean, text ) {
+
+	UI.Span.call( this );
+
+	this.setMarginRight( '10px' )
+
+	this.checkbox = new UI.Checkbox( boolean );
+	this.text = new UI.Text( text ).setMarginLeft( '3px' );
+
+	this.add( this.checkbox );
+	this.add( this.text );
+
+};
+
+UI.THREE.Boolean.prototype = Object.create( UI.Span.prototype );
+UI.THREE.Boolean.prototype.constructor = UI.THREE.Boolean;
+
+UI.THREE.Boolean.prototype.getValue = function () {
+
+	return this.checkbox.getValue();
+
+};
+
+UI.THREE.Boolean.prototype.setValue = function ( value ) {
+
+	return this.checkbox.setValue( value );
+
+};
