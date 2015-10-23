@@ -10181,7 +10181,7 @@ THREE.Geometry.prototype = {
 
 			var face = this.faces[ i ];
 
-			var hasMaterial = false; // face.materialIndex !== undefined;
+			var hasMaterial = true;
 			var hasFaceUv = false; // deprecated
 			var hasFaceVertexUv = this.faceVertexUvs[ 0 ][ i ] !== undefined;
 			var hasFaceNormal = face.normal.length() > 0;
@@ -10191,7 +10191,7 @@ THREE.Geometry.prototype = {
 
 			var faceType = 0;
 
-			faceType = setBit( faceType, 0, 0 );
+			faceType = setBit( faceType, 0, 0 ); // isQuad
 			faceType = setBit( faceType, 1, hasMaterial );
 			faceType = setBit( faceType, 2, hasFaceUv );
 			faceType = setBit( faceType, 3, hasFaceVertexUv );
@@ -10202,6 +10202,7 @@ THREE.Geometry.prototype = {
 
 			faces.push( faceType );
 			faces.push( face.a, face.b, face.c );
+			faces.push( face.materialIndex );
 
 			if ( hasFaceVertexUv ) {
 
@@ -14593,7 +14594,7 @@ THREE.Loader.prototype = {
 
 				switch ( name ) {
 					case 'DbgColor':
-						json.color = value;
+						if ( json.color === undefined ) json.color = value;
 						break;
 					case 'DbgIndex':
 					case 'opticalDensity':
@@ -18004,7 +18005,7 @@ THREE.MultiMaterial.prototype = {
 
 	constructor: THREE.MultiMaterial,
 
-	toJSON: function () {
+	toJSON: function ( meta ) {
 
 		var output = {
 			metadata: {
@@ -18017,9 +18018,14 @@ THREE.MultiMaterial.prototype = {
 			materials: []
 		};
 
-		for ( var i = 0, l = this.materials.length; i < l; i ++ ) {
+		var materials = this.materials;
 
-			output.materials.push( this.materials[ i ].toJSON() );
+		for ( var i = 0, l = materials.length; i < l; i ++ ) {
+
+			var material = materials[ i ].toJSON( meta );
+			delete material.metadata;
+
+			output.materials.push( material );
 
 		}
 
