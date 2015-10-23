@@ -474,10 +474,14 @@ Sidebar.Object3D = function ( editor ) {
 
 			}
 
-			if ( object.receiveShadow !== objectReceiveShadow.getValue() ) {
+			if ( object.receiveShadow !== undefined ) {
 
-				editor.execute( new SetValueCommand( object, 'receiveShadow', objectReceiveShadow.getValue() ) );
-				object.material.needsUpdate = true;
+				if ( object.receiveShadow !== objectReceiveShadow.getValue() ) {
+
+					editor.execute( new SetValueCommand( object, 'receiveShadow', objectReceiveShadow.getValue() ) );
+					object.material.needsUpdate = true;
+
+				}
 
 			}
 
