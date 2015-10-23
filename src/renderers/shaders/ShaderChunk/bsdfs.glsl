@@ -107,7 +107,7 @@ vec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, vec3 spe
 
 	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
 
-	return specularColor * AB.x + AB.y * grazingColor;
+	return ( specularColor * AB.x + AB.y ) * grazingColor;
 
 } // validated
 
