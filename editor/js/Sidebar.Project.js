@@ -45,17 +45,8 @@ Sidebar.Project = function ( editor ) {
 
 		var value = this.getValue();
 
-		if ( value === 'WebGLRenderer' ) {
-
-			rendererPropertiesRow.setDisplay( '' );
-
-		} else {
-
-			rendererPropertiesRow.setDisplay( 'none' );
-
-		}
-
 		config.setKey( 'project/renderer', value );
+
 		updateRenderer();
 
 	} );
@@ -136,6 +127,8 @@ Sidebar.Project = function ( editor ) {
 			type = 'CanvasRenderer';
 
 		}
+
+		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
 
 		var renderer = new rendererTypes[ type ]( { antialias: antialias } );
 		if ( shadows && renderer.shadowMap ) renderer.shadowMap.enabled = true;
