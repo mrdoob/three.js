@@ -286,9 +286,11 @@ THREE.WebGLProgram = ( function () {
 			prefixFragment = [
 
 				parameters.bumpMap || parameters.normalMap || parameters.flatShading || material.derivatives ? '#extension GL_OES_standard_derivatives : enable' : '',
-				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
+				( parameters.logarithmicDepthBuffer || material.fragDepth ) && renderer.extensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 
-				parameters.envMap && renderer.extensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
+				material.drawBuffers && renderer.extensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : enable' : '',
+
+				( parameters.envMap || material.shaderTextureLOD ) && renderer.extensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
 
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',

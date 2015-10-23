@@ -59,6 +59,9 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.morphNormals = false; // set to use morph normals
 
 	this.derivatives = false; // set to use derivatives
+	this.fragDepth = false; // set to use fragment depth values
+	this.drawBuffers = false; // set to use draw buffers
+	this.shaderTextureLOD = false; // set to use shader texture LOD
 
 	// When rendered geometry doesn't include these attributes but the material does,
 	// use these default values in WebGL. This avoids errors when buffer data is missing.
@@ -116,6 +119,9 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 	this.morphNormals = source.morphNormals;
 
 	this.derivatives = source.derivatives;
+	this.fragDepth = source.fragDepth;
+	this.drawBuffers = source.drawBuffers;
+	this.shaderTextureLOD = source.shaderTextureLOD;
 
 	return this;
 
