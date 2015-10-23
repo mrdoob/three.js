@@ -91,12 +91,3 @@ vec3 linearToOutput( in vec3 a ) {
 	#endif
 
 }
-
-// http://stackoverflow.com/a/24390149 modified to work on a CubeMap.
-float textureQueryLod( const in vec3 sampleDirection, const in float cubeMapWidth )
-{
-    vec3  dx_vtc        = dFdx( sampleDirection * cubeMapWidth );
-    vec3  dy_vtc        = dFdy( sampleDirection * cubeMapWidth );
-    float delta_max_sqr = max(dot(dx_vtc, dx_vtc), dot(dy_vtc, dy_vtc));
-    return 0.5 * log2( delta_max_sqr );
-}

@@ -83,7 +83,8 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 	{
 
-		vec3 indirectSpecularColor = getSpecularLightProbeIndirectLightColor( /*specularLightProbe,*/ geometry, Material_BlinnShininessExponent( material ) );
+		// TODO, replace 8 with the real maxMIPLevel
+		vec3 indirectSpecularColor = getSpecularLightProbeIndirectLightColor( /*specularLightProbe,*/ geometry, Material_BlinnShininessExponent( material ), 8 );
 
 		Material_RE_IndirectSpecularLight( indirectSpecularColor, geometry, material, reflectedLight );
 
