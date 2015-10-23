@@ -154,21 +154,28 @@ uniform vec3 ambientLightColor;
 	    return 0.5 * log2( delta_max_sqr );
 	}
 
+	// this is not correct for cube maps.
+	float getSamplerMIPLevel( const in int maxMIPLevel, const vec3 sampleDirection ) {
+
+		float envMapWidth = pow( 2.0, float(maxMIPLevel) );
+
+		float sampleMIPLevel = textureQueryLodCUBE( sampleDirection * ( envMapWidth * 0.5 ) ); // only half because sampleDirection ranges of [-1,1]
+	
+		// clamp to allowable LOD ranges.
+		return clamp( sampleMIPLevel, 0.0, float(maxMIPLevel) );
+
+	}
+
 	// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
-	float getSpecularMIPBias( const in float blinnShininessExponent, const in int maxMIPLevel, const vec3 sampleDirection ) {
+	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {
 
 		float envMapWidth = pow( 2.0, float(maxMIPLevel) );
 
 		//float desiredMIPLevel = log2( envMapWidth * sqrt( 3.0 ) ) - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
 		float desiredMIPLevel = float(maxMIPLevel) - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
-		float sampleMIPLevel = textureQueryLodCUBE( sampleDirection * ( envMapWidth * 0.5 ) ); // only half because sampleDirection ranges of [-1,1]
 	
 		// clamp to allowable LOD ranges.
-		sampleMIPLevel = clamp( sampleMIPLevel, 0.0, float(maxMIPLevel) );
-		desiredMIPLevel = clamp( desiredMIPLevel, 0.0, float(maxMIPLevel) );
-
-		// only go to lower LOD levels
-	  	return max( desiredMIPLevel - sampleMIPLevel, 0.0 );
+		return clamp( desiredMIPLevel, 0.0, float(maxMIPLevel) );
 
 	}
 
@@ -198,9 +205,20 @@ uniform vec3 ambientLightColor;
 
 		#ifdef ENVMAP_TYPE_CUBE
 
-			float mipBias = getSpecularMIPBias( blinnShininessExponent, maxMIPLevel, reflectVec );
+			float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );
 
-			vec4 envMapColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), mipBias );
+			#if defined( TEXTURE_CUBE_LOD_EXT )				
+
+				vec4 envMapColor = textureCubeLodEXT( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), specularMIPLevel );
+
+			#else
+
+				float samplerMIPLevel = getSamplerMIPLevel( maxMIPLevel, reflectVec );
+
+				vec4 envMapColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), max( specularMIPLevel - samplerMIPLevel ) );
+
+			#endif
+ 
 
 		#elif defined( ENVMAP_TYPE_EQUIREC )
 
