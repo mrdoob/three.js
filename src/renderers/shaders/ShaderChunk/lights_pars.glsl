@@ -159,7 +159,7 @@ uniform vec3 ambientLightColor;
 
 		envMapColor.rgb = inputToLinear( envMapColor.rgb );
 
-		return envMapColor.rgb * reflectivity;
+		return envMapColor.rgb;
 
 	}
 
