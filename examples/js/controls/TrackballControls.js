@@ -561,12 +561,10 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			case 0:
 				_state = STATE.NONE;
-				_touchZoomDistanceStart = _touchZoomDistanceEnd = 0;
 				break;
 
 			case 1:
 				_state = STATE.TOUCH_ROTATE;
-				_touchZoomDistanceStart = _touchZoomDistanceEnd = 0;
 				_moveCurr.copy( getMouseOnCircle( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
 				_movePrev.copy( _moveCurr );
 				break;
