@@ -8,6 +8,7 @@
 #define saturate(a) clamp( a, 0.0, 1.0 )
 #define whiteCompliment(a) ( 1.0 - saturate( a ) )
 
+float square( const in float x ) { return x*x; }
 float average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }
 
 
