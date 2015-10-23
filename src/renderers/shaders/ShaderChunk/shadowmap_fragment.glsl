@@ -219,7 +219,7 @@
 
 	#else // no percentage-closer filtering:
 
-				shadowCoord.z += shadowDarknessLocal;
+				shadowCoord.z += shadowBiasLocal;
 
 				float fDepth = unpackDepth( rgbaDepth );
 
