@@ -9,7 +9,7 @@ THREE.WebGLProgram = ( function () {
 		var chunks = [
 			( parameters.logarithmicDepthBuffer || extensions.derivatives ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 			( extensions.fragDepth ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
-			( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : enable' : '',
+			( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : required' : '',
 			( parameters.envMap || extensions.shaderTextureLOD ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
 		];
 
