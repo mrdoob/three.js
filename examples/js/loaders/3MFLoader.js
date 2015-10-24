@@ -1,16 +1,7 @@
-THREE.ThreeMFLoader = function ( manager, extensions ) {
+THREE.ThreeMFLoader = function ( manager ) {
 
-	if ( manager instanceof Array ) {
-
-		this.manager = THREE.DefaultLoadingManager;
-		this.availableExtensions = manager;
-
-	} else {
-
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-		this.availableExtensions = extensions || [];
-
-	}
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.availableExtensions = [];
 
 };
 
@@ -151,8 +142,6 @@ THREE.ThreeMFLoader.prototype = {
 
 				var texturesPartName = texturesPartNames[ i ];
 				texturesParts[ texturesPartName ] = zip.file( texturesPartName ).asBinary();
-				//var img = document.createElement('img');
-				//img.src = 'data:image/png;,' + btoa(texturesParts[ texturesPartName ]);
 
 			}
 
@@ -235,11 +224,11 @@ THREE.ThreeMFLoader.prototype = {
 
 			meshData[ 'vertices' ] = new Float32Array( vertices.length );
 
-            for ( var i = 0; i < vertices.length; i++ ) {
+			for ( var i = 0; i < vertices.length; i++ ) {
 
-                meshData[ 'vertices' ][ i ] = vertices[ i ];
+				meshData[ 'vertices' ][ i ] = vertices[ i ];
 
-            }
+			}
 
 			var triangleProperties = [];
 			var triangles = [];
@@ -294,11 +283,11 @@ THREE.ThreeMFLoader.prototype = {
 			meshData[ 'triangleProperties' ] = triangleProperties;
 			meshData[ 'triangles' ] = new Uint32Array( triangles.length );
 
-            for ( var i = 0; i < triangles.length; i++ ) {
+			for ( var i = 0; i < triangles.length; i++ ) {
 
-                meshData[ 'triangles' ][ i ] = triangles[ i ];
+				meshData[ 'triangles' ][ i ] = triangles[ i ];
 
-            }
+			}
 
 			return meshData;
 
@@ -385,9 +374,7 @@ THREE.ThreeMFLoader.prototype = {
 		function parseResourcesNode( resourcesNode ) {
 
 			var resourcesData = {};
-
 			var geometry, material;
-
 			var basematerialsNode = resourcesNode.querySelector( 'basematerials' );
 
 			if ( basematerialsNode ) {
@@ -417,6 +404,7 @@ THREE.ThreeMFLoader.prototype = {
 			var itemNodes = buildNode.querySelectorAll( 'item' );
 
 			for ( var i = 0; i < itemNodes.length; i++ ) {
+
 				var itemNode = itemNodes[ i ];
 				var buildItem =  {
 					objectid: itemNode.getAttribute( 'objectid' )
@@ -598,6 +586,7 @@ THREE.ThreeMFLoader.prototype = {
 			}
 
 			return group;
+
 		}
 
 		var data3mf = loadDocument( data );
@@ -606,5 +595,11 @@ THREE.ThreeMFLoader.prototype = {
 		return build( meshes, data3mf[ 'rels' ], data3mf )
 
 	},
+
+    addExtension: function( extension ) {
+
+		this.availableExtensions.push( extension );
+
+    }
 
 };
