@@ -311,6 +311,10 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 			var value = mat[ prop ];
 
+			if ( value === '' ) {
+				continue;
+			}
+
 			switch ( prop.toLowerCase() ) {
 
 				// Ns is material specular exponent
