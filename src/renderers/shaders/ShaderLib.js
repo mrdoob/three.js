@@ -601,7 +601,7 @@ THREE.ShaderLib = {
 			"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 			"	#ifdef USE_SIZEATTENUATION",
-			"		gl_PointSize = size * ( scale / length( mvPosition.xyz ) );",
+			"		gl_PointSize = size * ( scale / -mvPosition.z );",
 			"	#else",
 			"		gl_PointSize = size;",
 			"	#endif",
