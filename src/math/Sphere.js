@@ -104,6 +104,20 @@ THREE.Sphere.prototype = {
 
 	},
 
+	intersectsPlane: function ( plane ) {
+
+		// We use the following equation to compute the signed distance from
+		// the center of the sphere to the plane.
+		//
+		// distance = q * n - d
+		//
+		// If this distance is greater than the radius of the sphere,
+		// then there is no intersection.
+
+		return ( ( this.center.dot( plane.normal ) - plane.constant ) <= this.radius );
+
+	},
+
 	clampPoint: function ( point, optionalTarget ) {
 
 		var deltaLengthSq = this.center.distanceToSquared( point );
