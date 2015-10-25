@@ -181,6 +181,18 @@ THREE.Plane.prototype = {
 
 	},
 
+	intersectsBox: function ( box ) {
+
+		return box.intersectsPlane( this );
+
+	},
+
+	intersectsSphere: function ( sphere ) {
+
+		return sphere.intersectsPlane( this );
+
+	},
+
 	coplanarPoint: function ( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
