@@ -129,6 +129,59 @@ if ( Function.prototype.name === undefined && Object.defineProperty !== undefine
 
 }
 
+if ( Object.assign === undefined ) {
+
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+
+	Object.defineProperty( Object, 'assign', {
+
+		writable: true,
+		configurable: true,
+
+		value: function(target) {
+
+			'use strict';
+
+			if ( target === undefined || target === null ) {
+
+				throw new TypeError( "Cannot convert first argument to object" );
+
+			}
+
+			var to = Object( target );
+
+			for ( var i = 1, n = arguments.length; i !== n; ++ i ) {
+
+				var nextSource = arguments[ i ];
+
+				if ( nextSource === undefined || nextSource === null ) continue;
+
+				nextSource = Object( nextSource );
+
+				var keysArray = Object.keys( nextSource );
+
+				for ( var nextIndex = 0, len = keysArray.length; nextIndex !== len; ++ nextIndex ) {
+
+					var nextKey = keysArray[ nextIndex ];
+					var desc = Object.getOwnPropertyDescriptor( nextSource, nextKey );
+
+					if ( desc !== undefined && desc.enumerable ) {
+
+						to[ nextKey ] = nextSource[ nextKey ];
+
+					}
+
+				}
+
+			}
+
+			return to;
+
+		}
+
+	} );
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 
 THREE.MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
@@ -303,6 +356,18 @@ THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 THREE.LoopOnce = 2200;
 THREE.LoopRepeat = 2201;
 THREE.LoopPingPong = 2202;
+
+// Interpolation
+
+THREE.InterpolateDiscrete = 2300;
+THREE.InterpolateLinear = 2301;
+THREE.InterpolateSmooth = 2302;
+
+// Interpolant ending modes
+
+THREE.ZeroCurvatureEnding = 2400;
+THREE.ZeroSlopeEnding = 2401;
+THREE.WrapAroundEnding = 2402;
 
 // DEPRECATED
 
