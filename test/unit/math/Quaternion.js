@@ -342,8 +342,7 @@ function slerpTestSkeleton( doSlerp, maxError ) {
 
 test( "slerp", function() {
 
-	var ErrorMargin = Number.EPSILON * 64; // probably improvable
-	slerpTestSkeleton( doSlerpObject, ErrorMargin );
+	slerpTestSkeleton( doSlerpObject, Number.EPSILON );
 
 } );
 
