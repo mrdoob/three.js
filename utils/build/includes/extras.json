@@ -1,7 +1,5 @@
 [
 	"src/extras/CurveUtils.js",
-	"src/extras/GeometryUtils.js",
-	"src/extras/ImageUtils.js",
 	"src/extras/SceneUtils.js",
 	"src/extras/ShapeUtils.js",
 	"src/extras/audio/Audio.js",
