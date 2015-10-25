@@ -1540,6 +1540,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			m_uniforms = materialProperties.__webglShader.uniforms;
 
 		if ( program.id !== _currentProgram ) {
+			// note: implied by the 'initMaterial' code path, above
 
 			_gl.useProgram( program.program );
 			_currentProgram = program.id;
@@ -1552,7 +1553,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.id !== _currentMaterialId ) {
 
-			if ( _currentMaterialId === - 1 ) refreshLights = true;
 			_currentMaterialId = material.id;
 
 			refreshMaterial = true;
@@ -1570,7 +1570,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 
-			if ( camera !== _currentCamera ) _currentCamera = camera;
+			if ( camera !== _currentCamera ) {
+
+				_currentCamera = camera;
+
+				_lightsNeedUpdate = true;
+				refreshMaterial = true;
+
+			}
 
 			// load material specific uniforms
 			// (shader material also gets them for the sake of genericity)
@@ -1674,6 +1681,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material.lights ) {
 
+				// update lights on first use per frame or after reset
+
 				if ( _lightsNeedUpdate ) {
 
 					refreshLights = true;
@@ -1682,12 +1691,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
+				// the following code is an evil hack, using the current
+				// material as a scratch pad for updating the lighting
+				// uniforms in the GL state
+
+				// note: a material only happens to get updated .uniforms
+				// by chance
+
 				if ( refreshLights ) {
 
 					refreshUniformsLights( m_uniforms, _lights );
 					markUniformsLightsNeedsUpdate( m_uniforms, true );
 
 				} else {
+
+					// possibly outdated - don't care, but prevent the
+					// uniforms from messing with the GL state
 
 					markUniformsLightsNeedsUpdate( m_uniforms, false );
 
