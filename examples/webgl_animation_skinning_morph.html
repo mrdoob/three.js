@@ -515,12 +515,7 @@
 
 								rootName = value;
 								root = rootObjects[ rootNames.indexOf( rootName ) ];
-
-								if ( action !== null ) {
-
-								// TODO
-
-								}
+								action = mixer.clipAction( clip, root );
 
 							}
 
@@ -549,6 +544,8 @@
 					} );
 					folder.add( API, 'repetitions', 0, Infinity );
 					folder.add( API, 'local root', rootNames );
+
+					API[ 'play()' ]();
 
 				}; // function clipControl
 
