@@ -72,6 +72,114 @@ Object.defineProperties( THREE.Light.prototype, {
 
 //
 
+Object.defineProperties( THREE.WebGLRenderer.prototype, {
+	supportsFloatTextures: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .supportsFloatTextures() is now .extensions.get( \'OES_texture_float\' ).' );
+			return this.extensions.get( 'OES_texture_float' );
+		}
+	},
+	supportsHalfFloatTextures: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .supportsHalfFloatTextures() is now .extensions.get( \'OES_texture_half_float\' ).' );
+			return this.extensions.get( 'OES_texture_half_float' );
+		}
+	},
+	supportsStandardDerivatives: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .supportsStandardDerivatives() is now .extensions.get( \'OES_standard_derivatives\' ).' );
+			return this.extensions.get( 'OES_standard_derivatives' );
+		}
+	},
+	supportsCompressedTextureS3TC: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .supportsCompressedTextureS3TC() is now .extensions.get( \'WEBGL_compressed_texture_s3tc\' ).' );
+			return this.extensions.get( 'WEBGL_compressed_texture_s3tc' );
+		}
+	},
+	supportsCompressedTexturePVRTC: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .supportsCompressedTexturePVRTC() is now .extensions.get( \'WEBGL_compressed_texture_pvrtc\' ).' );
+			return this.extensions.get( 'WEBGL_compressed_texture_pvrtc' );
+		}
+	},
+	supportsBlendMinMax: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .supportsBlendMinMax() is now .extensions.get( \'EXT_blend_minmax\' ).' );
+			return this.extensions.get( 'EXT_blend_minmax' );
+		}
+	},
+	supportsVertexTextures: {
+		value: function () {
+			return this.capabilities.vertexTextures;
+		}
+	},
+	supportsInstancedArrays: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .supportsInstancedArrays() is now .extensions.get( \'ANGLE_instanced_arrays\' ).' );
+			return this.extensions.get( 'ANGLE_instanced_arrays' );
+		}
+	},
+	initMaterial: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );
+		}
+	},
+	addPrePlugin: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .addPrePlugin() has been removed.' );
+		}
+	},
+	addPostPlugin: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .addPostPlugin() has been removed.' );
+		}
+	},
+	updateShadowMap: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .updateShadowMap() has been removed.' );
+		}
+	},
+	shadowMapEnabled: {
+		get: function () {
+			return this.shadowMap.enabled;
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.WebGLRenderer: .shadowMapEnabled is now .shadowMap.enabled.' );
+			this.shadowMap.enabled = value;
+		}
+	},
+	shadowMapType: {
+		get: function () {
+			return this.shadowMap.type;
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.WebGLRenderer: .shadowMapType is now .shadowMap.type.' );
+			this.shadowMap.type = value;
+		}
+	},
+	shadowMapCullFace: {
+		get: function () {
+			return this.shadowMap.cullFace;
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
+			this.shadowMap.cullFace = value;
+		}
+	},
+	shadowMapDebug: {
+		get: function () {
+			return this.shadowMap.debug;
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.WebGLRenderer: .shadowMapDebug is now .shadowMap.debug.' );
+			this.shadowMap.debug = value;
+		}
+	}
+} );
+
+//
+
 THREE.Projector = function () {
 
 	console.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
