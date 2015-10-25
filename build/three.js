@@ -131,6 +131,59 @@ if ( Function.prototype.name === undefined && Object.defineProperty !== undefine
 
 }
 
+if ( Object.assign === undefined ) {
+
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+
+	Object.defineProperty( Object, 'assign', {
+
+		writable: true,
+		configurable: true,
+
+		value: function(target) {
+
+			'use strict';
+
+			if ( target === undefined || target === null ) {
+
+				throw new TypeError( "Cannot convert first argument to object" );
+
+			}
+
+			var to = Object( target );
+
+			for ( var i = 1, n = arguments.length; i !== n; ++ i ) {
+
+				var nextSource = arguments[ i ];
+
+				if ( nextSource === undefined || nextSource === null ) continue;
+
+				nextSource = Object( nextSource );
+
+				var keysArray = Object.keys( nextSource );
+
+				for ( var nextIndex = 0, len = keysArray.length; nextIndex !== len; ++ nextIndex ) {
+
+					var nextKey = keysArray[ nextIndex ];
+					var desc = Object.getOwnPropertyDescriptor( nextSource, nextKey );
+
+					if ( desc !== undefined && desc.enumerable ) {
+
+						to[ nextKey ] = nextSource[ nextKey ];
+
+					}
+
+				}
+
+			}
+
+			return to;
+
+		}
+
+	} );
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 
 THREE.MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
@@ -305,6 +358,18 @@ THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 THREE.LoopOnce = 2200;
 THREE.LoopRepeat = 2201;
 THREE.LoopPingPong = 2202;
+
+// Interpolation
+
+THREE.InterpolateDiscrete = 2300;
+THREE.InterpolateLinear = 2301;
+THREE.InterpolateSmooth = 2302;
+
+// Interpolant ending modes
+
+THREE.ZeroCurvatureEnding = 2400;
+THREE.ZeroSlopeEnding = 2401;
+THREE.WrapAroundEnding = 2402;
 
 // DEPRECATED
 
@@ -1285,7 +1350,6 @@ THREE.Quaternion.prototype = {
 
 		}
 
-		var halfTheta = Math.acos( cosHalfTheta );
 		var sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
 
 		if ( Math.abs( sinHalfTheta ) < 0.001 ) {
@@ -1299,6 +1363,7 @@ THREE.Quaternion.prototype = {
 
 		}
 
+		var halfTheta = Math.atan2( sinHalfTheta, cosHalfTheta );
 		var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
 		ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
 
@@ -1360,11 +1425,79 @@ THREE.Quaternion.prototype = {
 
 };
 
-THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
+Object.assign( THREE.Quaternion, {
 
-	return qm.copy( qa ).slerp( qb, t );
+	slerp: function( qa, qb, qm, t ) {
 
-};
+		return qm.copy( qa ).slerp( qb, t );
+
+	},
+
+	slerpFlat: function(
+			dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
+
+		// fuzz-free, array-based Quaternion SLERP operation
+
+		var x0 = src0[   srcOffset0   ],
+			y0 = src0[ srcOffset0 + 1 ],
+			z0 = src0[ srcOffset0 + 2 ],
+			w0 = src0[ srcOffset0 + 3 ],
+
+			x1 = src1[   srcOffset1   ],
+			y1 = src1[ srcOffset1 + 1 ],
+			z1 = src1[ srcOffset1 + 2 ],
+			w1 = src1[ srcOffset1 + 3 ];
+
+		if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
+
+			var s = 1 - t,
+
+				cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
+
+				dir = ( cos >= 0 ? 1 : -1 ),
+				sqrSin = 1 - cos * cos;
+
+			// Skip the Slerp for tiny steps to avoid numeric problems:
+			if ( sqrSin > Number.EPSILON ) {
+
+				var sin = Math.sqrt( sqrSin ),
+					len = Math.atan2( sin, cos * dir );
+
+				s = Math.sin( s * len ) / sin;
+				t = Math.sin( t * len ) / sin;
+
+			}
+
+			var tDir = t * dir;
+
+			x0 = x0 * s + x1 * tDir;
+			y0 = y0 * s + y1 * tDir;
+			z0 = z0 * s + z1 * tDir;
+			w0 = w0 * s + w1 * tDir;
+
+			// Normalize in case we just did a lerp:
+			if ( s === 1 - t ) {
+
+				var f = 1 / Math.sqrt( x0 * x0 + y0 * y0 + z0 * z0 + w0 * w0 );
+
+				x0 *= f;
+				y0 *= f;
+				z0 *= f;
+				w0 *= f;
+
+			}
+
+		}
+
+		dst[   dstOffset   ] = x0;
+		dst[ dstOffset + 1 ] = y0;
+		dst[ dstOffset + 2 ] = z0;
+		dst[ dstOffset + 3 ] = w0;
+
+	}
+
+} );
+
 
 // File:src/math/Vector2.js
 
@@ -7348,6 +7481,541 @@ THREE.Triangle.prototype = {
 
 };
 
+// File:src/math/Interpolant.js
+
+/**
+ * Abstract base class of interpolants over parametric samples.
+ *
+ * The parameter domain is one dimensional, typically the time or a path
+ * along a curve defined by the data.
+ *
+ * The sample values can have any dimensionality and derived classes may
+ * apply special interpretations to the data.
+ *
+ * This class provides the interval seek in a Template Method, deferring
+ * the actual interpolation to derived classes.
+ *
+ * Time complexity is O(1) for linear access crossing at most two points
+ * and O(log N) for random access, where N is the number of positions.
+ *
+ * References:
+ *
+ * 		http://www.oodesign.com/template-method-pattern.html
+ *
+ * @author tschw
+ */
+
+THREE.Interpolant = function(
+		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+	this.parameterPositions = parameterPositions;
+	this._cachedIndex = 0;
+
+	this.resultBuffer = resultBuffer !== undefined ?
+			resultBuffer : new sampleValues.constructor( sampleSize );
+	this.sampleValues = sampleValues;
+	this.valueSize = sampleSize;
+
+};
+
+THREE.Interpolant.prototype = {
+
+	constructor: THREE.Intepolant,
+
+	evaluate: function( t ) {
+
+		var pp = this.parameterPositions,
+			i1 = this._cachedIndex,
+
+			t1 = pp[   i1   ],
+			t0 = pp[ i1 - 1 ];
+
+		validate_interval: {
+
+			seek: {
+
+				var right;
+
+				linear_scan: {
+//- See http://jsperf.com/comparison-to-undefined/3
+//- slower code:
+//-
+//- 				if ( t >= t1 || t1 === undefined ) {
+					forward_scan: if ( ! ( t < t1 ) ) {
+
+						for ( var giveUpAt = i1 + 2; ;) {
+
+							if ( t1 === undefined ) {
+
+								if ( t < t0 ) break forward_scan;
+
+								// after end
+
+								i1 = pp.length;
+								this._cachedIndex = i1;
+								return this.afterEnd_( i1 - 1, t, t0 );
+
+							}
+
+							if ( i1 === giveUpAt ) break; // this loop
+
+							t0 = t1;
+							t1 = pp[ ++ i1 ];
+
+							if ( t < t1 ) {
+
+								// we have arrived at the sought interval
+								break seek;
+
+							}
+
+						}
+
+						// prepare binary search on the right side of the index
+						right = pp.length;
+						break linear_scan;
+
+					}
+
+//- slower code:
+//-					if ( t < t0 || t0 === undefined ) {
+					if ( ! ( t >= t0 ) ) {
+
+						// looping?
+
+						var t1global = pp[ 1 ];
+
+						if ( t < t1global ) {
+
+							i1 = 2; // + 1, using the scan for the details
+							t0 = t1global;
+
+						}
+
+						// linear reverse scan
+
+						for ( var giveUpAt = i1 - 2; ;) {
+
+							if ( t0 === undefined ) {
+
+								// before start
+
+								this._cachedIndex = 0;
+								return this.beforeStart_( 0, t, t1 );
+
+							}
+
+							if ( i1 === giveUpAt ) break; // this loop
+
+							t1 = t0;
+							t0 = pp[ -- i1 - 1 ];
+
+							if ( t >= t0 ) {
+
+								// we have arrived at the sought interval
+								break seek;
+
+							}
+
+						}
+
+						// prepare binary search on the left side of the index
+						right = i1;
+						i1 = 0;
+						break linear_scan;
+
+					}
+
+					// the interval is valid
+
+					break validate_interval;
+
+				} // linear scan
+
+				// binary search
+
+				while ( i1 < right ) {
+
+					var mid = ( i1 + right ) >>> 1;
+
+					if ( t < pp[ mid ] ) {
+
+						right = mid;
+
+					} else {
+
+						i1 = mid + 1;
+
+					}
+
+				}
+
+				t1 = pp[   i1   ];
+				t0 = pp[ i1 - 1 ];
+
+				// check boundary cases, again
+
+				if ( t0 === undefined ) {
+
+					this._cachedIndex = 0;
+					return this.beforeStart_( 0, t, t1 );
+
+				}
+
+				if ( t1 === undefined ) {
+
+					i1 = pp.length;
+					this._cachedIndex = i1;
+					return this.afterEnd_( i1 - 1, t0, t );
+
+				}
+
+			} // seek
+
+			this._cachedIndex = i1;
+
+			this.intervalChanged_( i1, t0, t1 );
+
+		} // validate_interval
+
+		return this.interpolate_( i1, t0, t, t1 );
+
+	},
+
+	settings: null, // optional, subclass-specific settings structure
+	// Note: The indirection allows central control of many interpolants.
+
+	// --- Protected interface
+
+	DefaultSettings_: {},
+
+	getSettings_: function() {
+
+		return this.settings || this.DefaultSettings_;
+
+	},
+
+	copySampleValue_: function( index ) {
+
+		// copies a sample value to the result buffer
+
+		var result = this.resultBuffer,
+			values = this.sampleValues,
+			stride = this.valueSize,
+			offset = index * stride;
+
+		for ( var i = 0; i !== stride; ++ i ) {
+
+			result[ i ] = values[ offset + i ];
+
+		}
+
+		return result;
+
+	},
+
+	// Template methods for derived classes:
+
+	interpolate_: function( i1, t0, t, t1 ) {
+
+		throw new Error( "call to abstract method" );
+		// implementations shall return this.resultBuffer
+
+	},
+
+	intervalChanged_: function( i1, t0, t1 ) {
+
+		// empty
+
+	}
+
+};
+
+Object.assign( THREE.Interpolant.prototype, {
+
+	beforeStart_: //( 0, t, t0 ), returns this.resultBuffer
+		THREE.Interpolant.prototype.copySampleValue_,
+
+	afterEnd_: //( N-1, tN-1, t ), returns this.resultBuffer
+		THREE.Interpolant.prototype.copySampleValue_
+
+} );
+
+// File:src/math/interpolants/CubicInterpolant.js
+
+/**
+ * Fast and simple cubic spline interpolant.
+ *
+ * It was derived from a Hermitian construction setting the first derivative
+ * at each sample position to the linear slope between neighboring positions
+ * over their parameter interval.
+ *
+ * @author tschw
+ */
+
+THREE.CubicInterpolant = function(
+		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+	THREE.Interpolant.call(
+			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+
+	this._weightPrev = -0;
+	this._offsetPrev = -0;
+	this._weightNext = -0;
+	this._offsetNext = -0;
+
+};
+
+THREE.CubicInterpolant.prototype =
+		Object.assign( Object.create( THREE.Interpolant.prototype ), {
+
+	constructor: THREE.CubicInterpolant,
+
+	DefaultSettings_: {
+
+		endingStart: 	THREE.ZeroCurvatureEnding,
+		endingEnd:		THREE.ZeroCurvatureEnding
+
+	},
+
+	intervalChanged_: function( i1, t0, t1 ) {
+
+		var pp = this.parameterPositions,
+			iPrev = i1 - 2,
+			iNext = i1 + 1,
+
+			tPrev = pp[ iPrev ],
+			tNext = pp[ iNext ];
+
+		if ( tPrev === undefined ) {
+
+			switch ( this.getSettings_().endingStart ) {
+
+				case THREE.ZeroSlopeEnding:
+
+					// f'(t0) = 0
+					iPrev = i1;
+					tPrev = 2 * t0 - t1;
+
+					break;
+
+				case THREE.WrapAroundEnding:
+
+					// use the other end of the curve
+					iPrev = pp.length - 2;
+					tPrev = t0 + pp[ iPrev ] - pp[ iPrev + 1 ];
+
+					break;
+
+				default: // ZeroCurvatureEnding
+
+					// f''(t0) = 0 a.k.a. Natural Spline
+					iPrev = i1;
+					tPrev = t1;
+
+			}
+
+		}
+
+		if ( tNext === undefined ) {
+
+			switch ( this.getSettings_().endingEnd ) {
+
+				case THREE.ZeroSlopeEnding:
+
+					// f'(tN) = 0
+					iNext = i1;
+					tNext = 2 * t1 - t0;
+
+					break;
+
+				case THREE.WrapAroundEnding:
+
+					// use the other end of the curve
+					iNext = 1;
+					tNext = t1 + pp[ 1 ] - pp[ 0 ];
+
+					break;
+
+				default: // ZeroCurvatureEnding
+
+					// f''(tN) = 0, a.k.a. Natural Spline
+					iNext = i1 - 1;
+					tNext = t0;
+
+			}
+
+		}
+
+		var halfDt = ( t1 - t0 ) * 0.5,
+			stride = this.valueSize;
+
+		this._weightPrev = halfDt / ( t0 - tPrev );
+		this._weightNext = halfDt / ( tNext - t1 );
+		this._offsetPrev = iPrev * stride;
+		this._offsetNext = iNext * stride;
+
+	},
+
+	interpolate_: function( i1, t0, t, t1 ) {
+
+		var result = this.resultBuffer,
+			values = this.sampleValues,
+			stride = this.valueSize,
+
+			o1 = i1 * stride,		o0 = o1 - stride,
+			oP = this._offsetPrev, 	oN = this._offsetNext,
+			wP = this._weightPrev,	wN = this._weightNext,
+
+			p = ( t - t0 ) / ( t1 - t0 ),
+			pp = p * p,
+			ppp = pp * p;
+
+		// evaluate polynomials
+
+		var sP =     - wP   * ppp   +         2 * wP    * pp    -          wP   * p;
+		var s0 = ( 1 + wP ) * ppp   + (-1.5 - 2 * wP )  * pp    + ( -0.5 + wP ) * p     + 1;
+		var s1 = (-1 - wN ) * ppp   + ( 1.5 +   wN   )  * pp    +    0.5        * p;
+		var sN =       wN   * ppp   -           wN      * pp;
+
+		// combine data linearly
+
+		for ( var i = 0; i !== stride; ++ i ) {
+
+			result[ i ] =
+					sP * values[ oP + i ] +
+					s0 * values[ o0 + i ] +
+					s1 * values[ o1 + i ] +
+					sN * values[ oN + i ];
+
+		}
+
+		return result;
+
+	}
+
+} );
+
+// File:src/math/interpolants/DiscreteInterpolant.js
+
+/**
+ *
+ * Interpolant that evaluates to the sample value at the position preceeding
+ * the parameter.
+ *
+ * @author tschw
+ */
+
+THREE.DiscreteInterpolant = function(
+		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+	THREE.Interpolant.call(
+			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+
+};
+
+THREE.DiscreteInterpolant.prototype =
+		Object.assign( Object.create( THREE.Interpolant.prototype ), {
+
+	constructor: THREE.DiscreteInterpolant,
+
+	interpolate_: function( i1, t0, t, t1 ) {
+
+		return this.copySampleValue_( i1 - 1 );
+
+	}
+
+} );
+
+// File:src/math/interpolants/LinearInterpolant.js
+
+/**
+ * @author tschw
+ */
+
+THREE.LinearInterpolant = function(
+		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+	THREE.Interpolant.call(
+			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+
+};
+
+THREE.LinearInterpolant.prototype =
+		Object.assign( Object.create( THREE.Interpolant.prototype ), {
+
+	constructor: THREE.LinearInterpolant,
+
+	interpolate_: function( i1, t0, t, t1 ) {
+
+		var result = this.resultBuffer,
+			values = this.sampleValues,
+			stride = this.valueSize,
+
+			offset1 = i1 * stride,
+			offset0 = offset1 - stride,
+
+			weight1 = ( t - t0 ) / ( t1 - t0 ),
+			weight0 = 1 - weight1;
+
+		for ( var i = 0; i !== stride; ++ i ) {
+
+			result[ i ] =
+					values[ offset0 + i ] * weight0 +
+					values[ offset1 + i ] * weight1;
+
+		}
+
+		return result;
+
+	}
+
+} );
+
+// File:src/math/interpolants/QuaternionLinearInterpolant.js
+
+/**
+ * Spherical linear unit quaternion interpolant.
+ *
+ * @author tschw
+ */
+
+THREE.QuaternionLinearInterpolant = function(
+		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+	THREE.Interpolant.call(
+			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+
+};
+
+THREE.QuaternionLinearInterpolant.prototype =
+		Object.assign( Object.create( THREE.Interpolant.prototype ), {
+
+	constructor: THREE.QuaternionLinearInterpolant,
+
+	interpolate_: function( i1, t0, t, t1 ) {
+
+		var result = this.resultBuffer,
+			values = this.sampleValues,
+			stride = this.valueSize,
+
+			offset = i1 * stride,
+
+			alpha = ( t - t0 ) / ( t1 - t0 );
+
+		for ( var end = offset + stride; offset !== end; offset += 4 ) {
+
+			THREE.Quaternion.slerpFlat( result, 0,
+					values, offset - stride, values, offset, alpha );
+
+		}
+
+		return result;
+
+	}
+
+} );
+
 // File:src/core/Clock.js
 
 /**
@@ -11815,174 +12483,6 @@ THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
 
 THREE.EventDispatcher.prototype.apply( THREE.InstancedBufferGeometry.prototype );
 
-// File:src/animation/AnimationAction.js
-
-/**
- *
- * A clip that has been explicitly scheduled.
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- */
-
-THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
-
-	if ( clip === undefined ) throw new Error( 'clip is null' );
-	this.clip = clip;
-	this.localRoot = null;
-	this.startTime = startTime || 0;
-	this.timeScale = timeScale || 1;
-	this.weight = weight || 1;
-	this.loop = loop || THREE.LoopRepeat;
-	this.loopCount = 0;
-	this.enabled = true;	// allow for easy disabling of the action.
-
-	this.actionTime = - this.startTime;
-	this.clipTime = 0;
-
-	this.propertyBindings = [];
-};
-
-/*
-THREE.LoopOnce = 2200;
-THREE.LoopRepeat = 2201;
-THREE.LoopPingPing = 2202;
-*/
-
-THREE.AnimationAction.prototype = {
-
-	constructor: THREE.AnimationAction,
-
-	setLocalRoot: function( localRoot ) {
-
-		this.localRoot = localRoot;
-
-		return this;
-
-	},
-
-	updateTime: function( clipDeltaTime ) {
-
-		var previousClipTime = this.clipTime;
-   		var previousLoopCount = this.loopCount;
-   		var previousActionTime = this.actionTime;
-
-		var duration = this.clip.duration;
-
-		this.actionTime = this.actionTime + clipDeltaTime;
-
-		if ( this.loop === THREE.LoopOnce ) {
-
-			this.loopCount = 0;
-			this.clipTime = Math.min( Math.max( this.actionTime, 0 ), duration );
-
-			// if time is changed since last time, see if we have hit a start/end limit
-			if ( this.clipTime !== previousClipTime ) {
-
-				if ( this.clipTime === duration ) {
-
-					this.mixer.dispatchEvent( { type: 'finished', action: this, direction: 1 } );
-
-				} else if ( this.clipTime === 0 ) {
-
-					this.mixer.dispatchEvent( { type: 'finished', action: this, direction: -1 } );
-
-				}
-
-			}
-
-
-			return this.clipTime;
-
-		}
-
-		this.loopCount = Math.floor( this.actionTime / duration );
-
-		var newClipTime = this.actionTime - this.loopCount * duration;
-		newClipTime = newClipTime % duration;
-
-		// if we are ping pong looping, ensure that we go backwards when appropriate
-		if ( this.loop == THREE.LoopPingPong ) {
-
-			if ( Math.abs( this.loopCount % 2 ) === 1 ) {
-
-				newClipTime = duration - newClipTime;
-
-			}
-
-		}
-
-		this.clipTime = newClipTime;
-
-		if ( this.loopCount !== previousLoopCount ) {
-
-   			this.mixer.dispatchEvent( { type: 'loop', action: this, loopDelta: ( this.loopCount - this.loopCount ) } );
-
-   		}
-
-	   	return this.clipTime;
-
-	},
-
-	syncWith: function( action ) {
-
-		this.actionTime = action.actionTime;
-		this.timeScale = action.timeScale;
-
-		return this;
-	},
-
-	warpToDuration: function( duration ) {
-
-		this.timeScale = this.clip.duration / duration;
-
-		return this;
-	},
-
-	init: function( time ) {
-
-		this.clipTime = time - this.startTime;
-
-		return this;
-
-	},
-
-	update: function( clipDeltaTime ) {
-
-		this.updateTime( clipDeltaTime );
-
-		var clipResults = this.clip.getAt( this.clipTime );
-
-		return clipResults;
-
-	},
-
-	getTimeScaleAt: function( time ) {
-
-		if ( this.timeScale.getAt ) {
-			// pass in time, not clip time, allows for fadein/fadeout across multiple loops of the clip
-			return this.timeScale.getAt( time );
-
-		}
-
-		return this.timeScale;
-
-	},
-
-	getWeightAt: function( time ) {
-
-		if ( this.weight.getAt ) {
-			// pass in time, not clip time, allows for fadein/fadeout across multiple loops of the clip
-			return this.weight.getAt( time );
-
-		}
-
-		return this.weight;
-
-	}
-
-};
-
 // File:src/animation/AnimationClip.js
 
 /**
@@ -11995,16 +12495,20 @@ THREE.AnimationAction.prototype = {
 
 THREE.AnimationClip = function ( name, duration, tracks ) {
 
-	this.name = name;
+	this.name = name || THREE.Math.generateUUID();
 	this.tracks = tracks;
 	this.duration = ( duration !== undefined ) ? duration : -1;
 
 	// this means it should figure out its duration by scanning the tracks
 	if ( this.duration < 0 ) {
+
 		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
 			var track = this.tracks[i];
-			this.duration = Math.max( track.keys[ track.keys.length - 1 ].time );
+			this.duration = Math.max( track.times[ track.times.length - 1 ] );
+
 		}
+
 	}
 
 	// maybe only do these on demand, as doing them here could potentially slow down loading
@@ -12012,28 +12516,11 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 	this.trim();
 	this.optimize();
 
-	this.results = [];
-
 };
 
 THREE.AnimationClip.prototype = {
 
 	constructor: THREE.AnimationClip,
-
-	getAt: function( clipTime ) {
-
-		clipTime = Math.max( 0, Math.min( clipTime, this.duration ) );
-
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
-
-			var track = this.tracks[ i ];
-
-			this.results[ i ] = track.getAt( clipTime );
-
-		}
-
-		return this.results;
-	},
 
 	trim: function() {
 
@@ -12061,259 +12548,301 @@ THREE.AnimationClip.prototype = {
 
 };
 
+// Static methods:
 
-THREE.AnimationClip.CreateFromMorphTargetSequence = function( name, morphTargetSequence, fps ) {
+Object.assign( THREE.AnimationClip, {
 
+	parse: function( json ) {
 
-	var numMorphTargets = morphTargetSequence.length;
-	var tracks = [];
+		var tracks = [],
+			jsonTracks = json.tracks,
+			frameTime = 1.0 / ( json.fps || 1.0 );
 
-	for ( var i = 0; i < numMorphTargets; i ++ ) {
+		for ( var i = 0, n = jsonTracks.length; i !== n; ++ i ) {
 
-		var keys = [];
-
-		keys.push( { time: ( i + numMorphTargets - 1 ) % numMorphTargets, value: 0 } );
-		keys.push( { time: i, value: 1 } );
-		keys.push( { time: ( i + 1 ) % numMorphTargets, value: 0 } );
-
-		keys.sort( THREE.KeyframeTrack.keyComparer );
-
-		// if there is a key at the first frame, duplicate it as the last frame as well for perfect loop.
-		if ( keys[0].time === 0 ) {
-			keys.push( {
-				time: numMorphTargets,
-				value: keys[0].value
-			});
-		}
-
-		tracks.push( new THREE.NumberKeyframeTrack( '.morphTargetInfluences[' + morphTargetSequence[i].name + ']', keys ).scale( 1.0 / fps ) );
-	}
-
-	return new THREE.AnimationClip( name, -1, tracks );
-
-};
-
-THREE.AnimationClip.findByName = function( clipArray, name ) {
-
-	for ( var i = 0; i < clipArray.length; i ++ ) {
-
-		if ( clipArray[i].name === name ) {
-
-			return clipArray[i];
+			tracks.push( THREE.KeyframeTrack.parse( jsonTracks[ i ] ).scale( frameTime ) );
 
 		}
-	}
 
-	return null;
+		return new THREE.AnimationClip( json.name, json.duration, tracks );
 
-};
+	},
 
-THREE.AnimationClip.CreateClipsFromMorphTargetSequences = function( morphTargets, fps ) {
 
-	var animationToMorphTargets = {};
+	toJSON: function( clip ) {
 
-	// tested with https://regex101.com/ on trick sequences such flamingo_flyA_003, flamingo_run1_003, crdeath0059
-	var pattern = /^([\w-]*?)([\d]+)$/;
+		var tracks = [],
+			clipTracks = clip.tracks;
 
-	// sort morph target names into animation groups based patterns like Walk_001, Walk_002, Run_001, Run_002
-	for ( var i = 0, il = morphTargets.length; i < il; i ++ ) {
+		var json = {
 
-		var morphTarget = morphTargets[ i ];
-		var parts = morphTarget.name.match( pattern );
+			'name': clip.name,
+			'duration': clip.duration,
+			'tracks': tracks
 
-		if ( parts && parts.length > 1 ) {
+		};
 
-			var name = parts[ 1 ];
+		for ( var i = 0, n = clipTracks.length; i !== n; ++ i ) {
 
-			var animationMorphTargets = animationToMorphTargets[ name ];
-			if ( ! animationMorphTargets ) {
-				animationToMorphTargets[ name ] = animationMorphTargets = [];
+			tracks.push( THREE.KeyframeTrack.toJSON( clipTracks[ i ] ) );
+
+		}
+
+		return json;
+
+	},
+
+
+	CreateFromMorphTargetSequence: function( name, morphTargetSequence, fps ) {
+
+		var numMorphTargets = morphTargetSequence.length;
+		var tracks = [];
+
+		for ( var i = 0; i < numMorphTargets; i ++ ) {
+
+			var times = [];
+			var values = [];
+
+			times.push(
+					( i + numMorphTargets - 1 ) % numMorphTargets,
+					i,
+					( i + 1 ) % numMorphTargets );
+
+			values.push( 0, 1, 0 );
+
+			var order = THREE.AnimationUtils.getKeyframeOrder( times );
+			times = THREE.AnimationUtils.sortedArray( times, 1, order );
+			values = THREE.AnimationUtils.sortedArray( values, 1, order );
+
+			// if there is a key at the first frame, duplicate it as the
+			// last frame as well for perfect loop.
+			if ( times[ 0 ] === 0 ) {
+
+				times.push( numMorphTargets );
+				values.push( values[ 0 ] );
+
 			}
 
-			animationMorphTargets.push( morphTarget );
-
+			tracks.push(
+					new THREE.NumberKeyframeTrack(
+						'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
+						times, values
+					).scale( 1.0 / fps ) );
 		}
 
-	}
+		return new THREE.AnimationClip( name, -1, tracks );
 
-	var clips = [];
+	},
 
-	for ( var name in animationToMorphTargets ) {
+	findByName: function( clipArray, name ) {
 
-		clips.push( THREE.AnimationClip.CreateFromMorphTargetSequence( name, animationToMorphTargets[ name ], fps ) );
-	}
+		for ( var i = 0; i < clipArray.length; i ++ ) {
 
-	return clips;
+			if ( clipArray[ i ].name === name ) {
 
-};
+				return clipArray[ i ];
 
-// parse the standard JSON format for clips
-THREE.AnimationClip.parse = function( json ) {
-
-	var tracks = [];
-
-	for ( var i = 0; i < json.tracks.length; i ++ ) {
-
-		tracks.push( THREE.KeyframeTrack.parse( json.tracks[i] ).scale( 1.0 / json.fps ) );
-
-	}
-
-	return new THREE.AnimationClip( json.name, json.duration, tracks );
-
-};
-
-
-// parse the animation.hierarchy format
-THREE.AnimationClip.parseAnimation = function( animation, bones ) {
-
-	if ( ! animation ) {
-		console.error( "  no animation in JSONLoader data" );
-		return null;
-	}
-
-	var convertTrack = function( trackName, animationKeys, propertyName, trackType, animationKeyToValueFunc ) {
-
-		var keys = [];
-
-		for ( var k = 0; k < animationKeys.length; k ++ ) {
-
-			var animationKey = animationKeys[k];
-
-			if ( animationKey[propertyName] !== undefined ) {
-
-				keys.push( { time: animationKey.time, value: animationKeyToValueFunc( animationKey ) } );
 			}
-
-		}
-
-		// only return track if there are actually keys.
-		if ( keys.length > 0 ) {
-
-			return new trackType( trackName, keys );
-
 		}
 
 		return null;
 
-	};
+	},
 
-	var tracks = [];
-	
-	var clipName = animation.name || 'default';
-	var duration = animation.length || -1; // automatic length determination in AnimationClip.
-	var fps = animation.fps || 30;
+	CreateClipsFromMorphTargetSequences: function( morphTargets, fps ) {
 
-	var hierarchyTracks = animation.hierarchy || [];
+		var animationToMorphTargets = {};
 
-	for ( var h = 0; h < hierarchyTracks.length; h ++ ) {
+		// tested with https://regex101.com/ on trick sequences
+		// such flamingo_flyA_003, flamingo_run1_003, crdeath0059
+		var pattern = /^([\w-]*?)([\d]+)$/;
 
-		var animationKeys = hierarchyTracks[ h ].keys;
+		// sort morph target names into animation groups based
+		// patterns like Walk_001, Walk_002, Run_001, Run_002
+		for ( var i = 0, il = morphTargets.length; i < il; i ++ ) {
 
-		// skip empty tracks
-		if ( ! animationKeys || animationKeys.length == 0 ) {
-			continue;
+			var morphTarget = morphTargets[ i ];
+			var parts = morphTarget.name.match( pattern );
+
+			if ( parts && parts.length > 1 ) {
+
+				var name = parts[ 1 ];
+
+				var animationMorphTargets = animationToMorphTargets[ name ];
+				if ( ! animationMorphTargets ) {
+
+					animationToMorphTargets[ name ] = animationMorphTargets = [];
+
+				}
+
+				animationMorphTargets.push( morphTarget );
+
+			}
+
 		}
 
-		// process morph targets in a way exactly compatible with AnimationHandler.init( animation )
-		if ( animationKeys[0].morphTargets ) {
+		var clips = [];
 
-			// figure out all morph targets used in this track
-			var morphTargetNames = {};
-			for ( var k = 0; k < animationKeys.length; k ++ ) {
+		for ( var name in animationToMorphTargets ) {
 
-				if ( animationKeys[k].morphTargets ) {
-					for ( var m = 0; m < animationKeys[k].morphTargets.length; m ++ ) {
+			clips.push( THREE.AnimationClip.CreateFromMorphTargetSequence( name, animationToMorphTargets[ name ], fps ) );
 
-						morphTargetNames[ animationKeys[k].morphTargets[m] ] = -1;
-					}
+		}
+
+		return clips;
+
+	},
+
+	// parse the animation.hierarchy format
+	parseAnimation: function( animation, bones, nodeName ) {
+
+		if ( ! animation ) {
+
+			console.error( "  no animation in JSONLoader data" );
+			return null;
+
+		}
+
+		var addNonemptyTrack = function(
+				trackType, trackName, animationKeys, propertyName, destTracks ) {
+
+			// only return track if there are actually keys.
+			if ( animationKeys.length !== 0 ) {
+
+				var times = [];
+				var values = [];
+
+				THREE.AnimationUtils.flattenJSON(
+						animationKeys, times, values, propertyName );
+
+				// empty keys are filtered out, so check again
+				if ( times.length !== 0 ) {
+
+					destTracks.push( new trackType( trackName, times, values ) );
+
 				}
 
 			}
 
-			// create a track for each morph target with all zero morphTargetInfluences except for the keys in which the morphTarget is named.
-			for ( var morphTargetName in morphTargetNames ) {
+		};
 
-				var keys = [];
+		var tracks = [];
 
-				for ( var m = 0; m < animationKeys[k].morphTargets.length; m ++ ) {
+		var clipName = animation.name || 'default';
+		// automatic length determination in AnimationClip.
+		var duration = animation.length || -1;
+		var fps = animation.fps || 30;
 
-					var animationKey = animationKeys[k];
+		var hierarchyTracks = animation.hierarchy || [];
 
-					keys.push( {
-							time: animationKey.time,
-							value: (( animationKey.morphTarget === morphTargetName ) ? 1 : 0 )
-						});
+		for ( var h = 0; h < hierarchyTracks.length; h ++ ) {
+
+			var animationKeys = hierarchyTracks[ h ].keys;
+
+			// skip empty tracks
+			if ( ! animationKeys || animationKeys.length == 0 ) continue;
+
+			// process morph targets in a way exactly compatible
+			// with AnimationHandler.init( animation )
+			if ( animationKeys[0].morphTargets ) {
+
+				// figure out all morph targets used in this track
+				var morphTargetNames = {};
+				for ( var k = 0; k < animationKeys.length; k ++ ) {
+
+					if ( animationKeys[k].morphTargets ) {
+
+						for ( var m = 0; m < animationKeys[k].morphTargets.length; m ++ ) {
+
+							morphTargetNames[ animationKeys[k].morphTargets[m] ] = -1;
+						}
+
+					}
 
 				}
 
-				tracks.push( new THREE.NumberKeyframeTrack( '.morphTargetInfluence[' + morphTargetName + ']', keys ) );
+				// create a track for each morph target with all zero
+				// morphTargetInfluences except for the keys in which
+				// the morphTarget is named.
+				for ( var morphTargetName in morphTargetNames ) {
+
+					var times = [];
+					var values = [];
+
+					for ( var m = 0;
+							m !== animationKeys[k].morphTargets.length; ++ m ) {
+
+						var animationKey = animationKeys[k];
+
+						times.push( animationKey.time );
+						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 )
+
+					}
+
+					tracks.push( new THREE.NumberKeyframeTrack(
+							'.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
+
+				}
+
+				duration = morphTargetNames.length * ( fps || 1.0 );
+
+			} else {
+				// ...assume skeletal animation
+
+				var boneName = '.bones[' + bones[ h ].name + ']';
+
+				addNonemptyTrack(
+						THREE.VectorKeyframeTrack, boneName + '.position',
+						animationKeys, 'pos', tracks );
+
+				addNonemptyTrack(
+						THREE.QuaternionKeyframeTrack, boneName + '.quaternion',
+						animationKeys, 'rot', tracks );
+
+				addNonemptyTrack(
+						THREE.VectorKeyframeTrack, boneName + '.scale',
+						animationKeys, 'scl', tracks );
 
 			}
 
-			duration = morphTargetNames.length * ( fps || 1.0 );
+		}
 
-		} else {
+		if ( tracks.length === 0 ) {
 
-			var boneName = '.bones[' + bones[ h ].name + ']';
-
-			// track contains positions...
-			var positionTrack = convertTrack( boneName + '.position', animationKeys, 'pos', THREE.VectorKeyframeTrack, function( animationKey ) {
-					return new THREE.Vector3().fromArray( animationKey.pos )
-				} );
-
-			if ( positionTrack ) tracks.push( positionTrack );
-
-			// track contains quaternions...
-			var quaternionTrack = convertTrack( boneName + '.quaternion', animationKeys, 'rot', THREE.QuaternionKeyframeTrack, function( animationKey ) {
-					if ( animationKey.rot.slerp ) {
-						return animationKey.rot.clone();
-					} else {
-						return new THREE.Quaternion().fromArray( animationKey.rot );
-					}
-				} );
-
-			if ( quaternionTrack ) tracks.push( quaternionTrack );
-
-			// track contains quaternions...
-			var scaleTrack = convertTrack( boneName + '.scale', animationKeys, 'scl', THREE.VectorKeyframeTrack, function( animationKey ) {
-					return new THREE.Vector3().fromArray( animationKey.scl )
-				} );
-
-			if ( scaleTrack ) tracks.push( scaleTrack );
+			return null;
 
 		}
+
+		var clip = new THREE.AnimationClip( clipName, duration, tracks );
+
+		return clip;
+
 	}
 
-	if ( tracks.length === 0 ) {
+} );
 
-		return null;
-
-	}
-
-	var clip = new THREE.AnimationClip( clipName, duration, tracks );
-
-	return clip;
-
-};
 
 // File:src/animation/AnimationMixer.js
 
 /**
  *
- * Mixes together the AnimationClips scheduled by AnimationActions and applies them to the root and subtree
+ * Player for AnimationClips.
  *
  *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
+ * @author tschw
  */
 
 THREE.AnimationMixer = function( root ) {
 
-	this.root = root;
+	this._root = root;
+	this._initMemoryManager();
+	this._accuIndex = 0;
+
 	this.time = 0;
+
 	this.timeScale = 1.0;
-	this.actions = [];
-	this.propertyBindingMap = {};
 
 };
 
@@ -12321,108 +12850,73 @@ THREE.AnimationMixer.prototype = {
 
 	constructor: THREE.AnimationMixer,
 
-	addAction: function( action ) {
+	// return an action for a clip optionally using a custom root target
+	// object (this method allocates a lot of dynamic memory in case a
+	// previously unknown clip/root combination is specified)
+	clipAction: function( clip, optionalRoot ) {
 
-		// TODO: check for duplicate action names?  Or provide each action with a UUID?
+		var root = optionalRoot || this._root,
+			rootUuid = root.uuid,
+			clipName = ( typeof clip === 'string' ) ? clip : clip.name,
+			clipObject = ( clip !== clipName ) ? clip : null,
 
-		this.actions.push( action );
-		action.init( this.time );
-		action.mixer = this;
+			actionsForClip = this._actionsByClip[ clipName ],
+			prototypeAction;
 
-		var tracks = action.clip.tracks;
+		if ( actionsForClip !== undefined ) {
 
-		var root = action.localRoot || this.root;
+			var existingAction =
+					actionsForClip.actionByRoot[ rootUuid ];
 
-		for ( var i = 0; i < tracks.length; i ++ ) {
+			if ( existingAction !== undefined ) {
 
-			var track = tracks[ i ];
-
-			var propertyBindingKey = root.uuid + '-' + track.name;
-			var propertyBinding = this.propertyBindingMap[ propertyBindingKey ];
-
-			if ( propertyBinding === undefined ) {
-
-				propertyBinding = new THREE.PropertyBinding( root, track.name );
-				this.propertyBindingMap[ propertyBindingKey ] = propertyBinding;
+				return existingAction;
 
 			}
 
-			// push in the same order as the tracks.
-			action.propertyBindings.push( propertyBinding );
+			// we know the clip, so we don't have to parse all
+			// the bindings again but can just copy
+			prototypeAction = actionsForClip.knownActions[ 0 ];
 
-			// track usages of shared property bindings, because if we leave too many around, the mixer can get slow
-			propertyBinding.referenceCount += 1;
+			// also, take the clip from the prototype action
+			clipObject = prototypeAction._clip;
 
-		}
+			if ( clip !== clipName && clip !== clipObject ) {
 
-	},
-
-	removeAllActions: function() {
-
-		for ( var i = 0; i < this.actions.length; i ++ ) {
-
-			this.actions[i].mixer = null;
-
-		}
-
-		// unbind all property bindings
-		for ( var properyBindingKey in this.propertyBindingMap ) {
-
-			this.propertyBindingMap[ properyBindingKey ].unbind();
-
-		}
-
-		this.actions = [];
-		this.propertyBindingMap = {};
-
-		return this;
-
-	},
-
-	removeAction: function( action ) {
-
-		var index = this.actions.indexOf( action );
-
-		if ( index !== - 1 ) {
-
-			this.actions.splice( index, 1 );
-			action.mixer = null;
-
-		}
-
-
-		// remove unused property bindings because if we leave them around the mixer can get slow
-		var root = action.localRoot || this.root;
-		var tracks = action.clip.tracks;
-
-		for ( var i = 0; i < tracks.length; i ++ ) {
-
-			var track = tracks[ i ];
-
-			var propertyBindingKey = root.uuid + '-' + track.name;
-			var propertyBinding = this.propertyBindingMap[ propertyBindingKey ];
-
-			propertyBinding.referenceCount -= 1;
-
-			if ( propertyBinding.referenceCount <= 0 ) {
-
-				propertyBinding.unbind();
-
-				delete this.propertyBindingMap[ propertyBindingKey ];
+				throw new Error(
+						"Different clips with the same name detected!" );
 
 			}
+
 		}
 
-		return this;
+		// clip must be known when specified via string
+		if ( clipObject === null ) return null;
+
+		// allocate all resources required to run it
+		var newAction = new THREE.
+				AnimationMixer._Action( this, clipObject, optionalRoot );
+
+		this._bindAction( newAction, prototypeAction );
+
+		// and make the action known to the memory manager
+		this._addInactiveAction( newAction, clipName, rootUuid );
+
+		return newAction;
 
 	},
 
-	// can be optimized if needed
-	findActionByName: function( name ) {
+	// get an existing action
+	existingAction: function( clip, optionalRoot ) {
 
-		for ( var i = 0; i < this.actions.length; i ++ ) {
+		var root = optionalRoot || this._root,
+			rootUuid = root.uuid,
+			clipName = ( typeof clip === 'string' ) ? clip : clip.name,
+			actionsForClip = this._actionsByClip[ clipName ];
 
-			if ( this.actions[i].name === name ) return this.actions[i];
+		if ( actionsForClip !== undefined ) {
+
+			return actionsForClip.actionByRoot[ rootUuid ] || null;
 
 		}
 
@@ -12430,66 +12924,26 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
-	play: function( action, optionalFadeInDuration ) {
+	// deactivates all previously scheduled actions
+	stopAllAction: function() {
 
-		action.startTime = this.time;
-		this.addAction( action );
+		var actions = this._actions,
+			nActions = this._nActiveActions,
+			bindings = this._bindings,
+			nBindings = this._nActiveBindings;
 
-		return this;
+		this._nActiveActions = 0;
+		this._nActiveBindings = 0;
 
-	},
+		for ( var i = 0; i !== nActions; ++ i ) {
 
-	fadeOut: function( action, duration ) {
+			actions[ i ].reset();
 
-		var keys = [];
+		}
 
-		keys.push( { time: this.time, value: 1 } );
-		keys.push( { time: this.time + duration, value: 0 } );
+		for ( var i = 0; i !== nBindings; ++ i ) {
 
-		action.weight = new THREE.NumberKeyframeTrack( "weight", keys );
-
-		return this;
-
-	},
-
-	fadeIn: function( action, duration ) {
-
-		var keys = [];
-
-		keys.push( { time: this.time, value: 0 } );
-		keys.push( { time: this.time + duration, value: 1 } );
-
-		action.weight = new THREE.NumberKeyframeTrack( "weight", keys );
-
-		return this;
-
-	},
-
-	warp: function( action, startTimeScale, endTimeScale, duration ) {
-
-		var keys = [];
-
-		keys.push( { time: this.time, value: startTimeScale } );
-		keys.push( { time: this.time + duration, value: endTimeScale } );
-
-		action.timeScale = new THREE.NumberKeyframeTrack( "timeScale", keys );
-
-		return this;
-
-	},
-
-	crossFade: function( fadeOutAction, fadeInAction, duration, warp ) {
-
-		this.fadeOut( fadeOutAction, duration );
-		this.fadeIn( fadeInAction, duration );
-
-		if ( warp ) {
-
-			var startEndRatio = fadeOutAction.clip.duration / fadeInAction.clip.duration;
-			var endStartRatio = 1.0 / startEndRatio;
-
-			this.warp( fadeOutAction, 1.0, startEndRatio, duration );
-			this.warp( fadeInAction, endStartRatio, 1.0, duration );
+			bindings[ i ].useCount = 0;
 
 		}
 
@@ -12497,42 +12951,145 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
+	// advance the time and update apply the animation
 	update: function( deltaTime ) {
 
-		var mixerDeltaTime = deltaTime * this.timeScale;
-		this.time += mixerDeltaTime;
+		deltaTime *= this.timeScale;
 
-		for ( var i = 0; i < this.actions.length; i ++ ) {
+		var actions = this._actions,
+			nActions = this._nActiveActions,
 
-			var action = this.actions[i];
+			time = this.time += deltaTime,
+			timeDirection = Math.sign( deltaTime ),
 
-			var weight = action.getWeightAt( this.time );
+			accuIndex = this._accuIndex ^= 1;
 
-			var actionTimeScale = action.getTimeScaleAt( this.time );
-			var actionDeltaTime = mixerDeltaTime * actionTimeScale;
+		// run active actions
 
-			var actionResults = action.update( actionDeltaTime );
+		for ( var i = 0; i !== nActions; ++ i ) {
 
-			if ( action.weight <= 0 || ! action.enabled ) continue;
+			var action = actions[ i ];
 
-			for ( var j = 0; j < actionResults.length; j ++ ) {
+			if ( action.enabled ) {
 
-				var name = action.clip.tracks[j].name;
-
-				action.propertyBindings[ j ].accumulate( actionResults[j], weight );
+				action._update( time, deltaTime, timeDirection, accuIndex );
 
 			}
 
 		}
 
-		// apply to nodes
-		for ( var propertyBindingKey in this.propertyBindingMap ) {
+		// update scene graph
 
-			this.propertyBindingMap[ propertyBindingKey ].apply();
+		var bindings = this._bindings,
+			nBindings = this._nActiveBindings;
+
+		for ( var i = 0; i !== nBindings; ++ i ) {
+
+			bindings[ i ].apply( accuIndex );
 
 		}
 
 		return this;
+
+	},
+
+	// return this mixer's root target object
+	getRoot: function() {
+
+		return this._root;
+
+	},
+
+	// free all resources specific to a particular clip
+	uncacheClip: function( clip ) {
+
+		var actions = this._actions,
+			clipName = clip.name,
+			actionsByClip = this._actionsByClip,
+			actionsForClip = actionsByClip[ clipName ];
+
+		if ( actionsForClip !== undefined ) {
+
+			// note: just calling _removeInactiveAction would mess up the
+			// iteration state and also require updating the state we can
+			// just throw away
+
+			var actionsToRemove = actionsForClip.knownActions;
+
+			for ( var i = 0, n = actionsToRemove.length; i !== n; ++ i ) {
+
+				var action = actionsToRemove[ i ];
+
+				this._deactivateAction( action );
+
+				var cacheIndex = action._cacheIndex,
+					lastInactiveAction = actions[ actions.length - 1 ];
+
+				action._cacheIndex = null;
+				action._byClipCacheIndex = null;
+
+				lastInactiveAction._cacheIndex = cacheIndex;
+				actions[ cacheIndex ] = lastInactiveAction;
+				actions.pop();
+
+				this._removeInactiveBindingsForAction( action );
+
+			}
+
+			delete actionsByClip[ clipName ];
+
+		}
+
+	},
+
+	// free all resources specific to a particular root target object
+	uncacheRoot: function( root ) {
+
+		var rootUuid = root.uuid,
+			actionsByClip = this._actionsByClip;
+
+		for ( var clipName in actionsByClip ) {
+
+			var actionByRoot = actionsByClip[ clipName ].actionByRoot,
+				action = actionByRoot[ rootUuid ];
+
+			if ( action !== undefined ) {
+
+				this._deactivateAction( action );
+				this._removeInactiveAction( action );
+
+			}
+
+		}
+
+		var bindingsByRoot = this._bindingsByRootAndName,
+			bindingByName = bindingsByRoot[ rootUuid ];
+
+		if ( bindingByName !== undefined ) {
+
+			for ( var trackName in bindingByName ) {
+
+				var binding = bindingByName[ trackName ];
+				binding.restoreOriginalState();
+				this._removeInactiveBinding( binding );
+
+			}
+
+		}
+
+	},
+
+	// remove a targeted clip from the cache
+	uncacheAction: function( clip, optionalRoot ) {
+
+		var action = this.existingAction( clip, optionalRoot );
+
+		if ( action !== null ) {
+
+			this._deactivateAction( action );
+			this._removeInactiveAction( action );
+
+		}
 
 	}
 
@@ -12540,114 +13097,1662 @@ THREE.AnimationMixer.prototype = {
 
 THREE.EventDispatcher.prototype.apply( THREE.AnimationMixer.prototype );
 
+THREE.AnimationMixer._Action =
+		function( mixer, clip, localRoot ) {
+
+	this._mixer = mixer;
+	this._clip = clip;
+	this._localRoot = localRoot || null;
+
+	var tracks = clip.tracks,
+		nTracks = tracks.length,
+		interpolants = new Array( nTracks );
+
+	var interpolantSettings = {
+			endingStart: 	THREE.ZeroCurvatureEnding,
+			endingEnd:		THREE.ZeroCurvatureEnding
+	};
+
+	for ( var i = 0; i !== nTracks; ++ i ) {
+
+		var interpolant = tracks[ i ].createInterpolant( null );
+		interpolants[ i ] = interpolant;
+		interpolant.settings = interpolantSettings
+
+	}
+
+	this._interpolantSettings = interpolantSettings;
+
+	this._interpolants = interpolants;	// bound by the mixer
+
+	// inside: PropertyMixer (managed by the mixer)
+	this._propertyBindings = new Array( nTracks );
+
+	this._cacheIndex = null;			// for the memory manager
+	this._byClipCacheIndex = null;		// for the memory manager
+
+	this._timeScaleInterpolant = null;
+	this._weightInterpolant = null;
+
+	this.loop = THREE.LoopRepeat;
+	this._loopCount = -1;
+
+	// global mixer time when the action is to be started
+	// it's set back to 'null' upon start of the action
+	this._startTime = null;
+
+	// scaled local time of the action
+	// gets clamped or wrapped to 0..clip.duration according to loop
+	this.time = 0;
+
+	this.timeScale = 1;
+	this._effectiveTimeScale = 1;
+
+	this.weight = 1;
+	this._effectiveWeight = 1;
+
+	this.repetitions = Infinity; 		// no. of repetitions when looping
+
+	this.paused = false;				// false -> zero effective time scale
+	this.enabled = true;				// true -> zero effective weight
+
+	this.clampWhenFinished 	= false;	// keep feeding the last frame?
+
+	this.zeroSlopeAtStart 	= true;		// for smooth interpolation w/o separate
+	this.zeroSlopeAtEnd		= true;		// clips for start, loop and end
+
+};
+
+THREE.AnimationMixer._Action.prototype = {
+
+	constructor: THREE.AnimationMixer._Action,
+
+	// State & Scheduling
+
+	play: function() {
+
+		this._mixer._activateAction( this );
+
+		return this;
+
+	},
+
+	stop: function() {
+
+		this._mixer._deactivateAction( this );
+
+		return this.reset();
+
+	},
+
+	reset: function() {
+
+		this.paused = false;
+		this.enabled = true;
+
+		this.time = 0;			// restart clip
+		this._loopCount = -1;	// forget previous loops
+		this._startTime = null;	// forget scheduling
+
+		return this.stopFading().stopWarping();
+
+	},
+
+	isRunning: function() {
+
+		var start = this._startTime;
+
+		return this.enabled && ! this.paused && this.timeScale !== 0 &&
+				this._startTime === null && this._mixer._isActiveAction( this )
+
+	},
+
+	// return true when play has been called
+	isScheduled: function() {
+
+		return this._mixer._isActiveAction( this );
+
+	},
+
+	startAt: function( time ) {
+
+		this._startTime = time;
+
+		return this;
+
+	},
+
+	setLoop: function( mode, repetitions ) {
+
+		this.loop = mode;
+		this.repetitions = repetitions;
+
+		return this;
+
+	},
+
+	// Weight
+
+	// set the weight stopping any scheduled fading
+	// although .enabled = false yields an effective weight of zero, this
+	// method does *not* change .enabled, because it would be confusing
+	setEffectiveWeight: function( weight ) {
+
+		this.weight = weight;
+
+		// note: same logic as when updated at runtime
+		this._effectiveWeight = this.enabled ? weight : 0;
+
+		return this.stopFading();
+
+	},
+
+	// return the weight considering fading and .enabled
+	getEffectiveWeight: function() {
+
+		return this._effectiveWeight;
+
+	},
+
+	fadeIn: function( duration ) {
+
+		return this._scheduleFading( duration, 0, 1 );
+
+	},
+
+	fadeOut: function( duration ) {
+
+		return this._scheduleFading( duration, 1, 0 );
+
+	},
+
+	crossFadeFrom: function( fadeOutAction, duration, warp ) {
+
+		var mixer = this._mixer;
+
+		fadeOutAction.fadeOut( duration );
+		this.fadeIn( duration );
+
+		if( warp ) {
+
+			var fadeInDuration = this._clip.duration,
+				fadeOutDuration = fadeOutAction._clip.duration,
+
+				startEndRatio = fadeOutDuration / fadeInDuration,
+				endStartRatio = fadeInDuration / fadeOutDuration;
+
+			fadeOutAction.warp( 1.0, startEndRatio, duration );
+			this.warp( endStartRatio, 1.0, duration );
+
+		}
+
+		return this;
+
+	},
+
+	crossFadeTo: function( fadeInAction, duration, warp ) {
+
+		return fadeInAction.crossFadeFrom( this, duration, warp );
+
+	},
+
+	stopFading: function() {
+
+		var weightInterpolant = this._weightInterpolant;
+
+		if ( weightInterpolant !== null ) {
+
+			this._weightInterpolant = null;
+			this._mixer._takeBackControlInterpolant( weightInterpolant );
+
+		}
+
+		return this;
+
+	},
+
+	// Time Scale Control
+
+	// set the weight stopping any scheduled warping
+	// although .paused = true yields an effective time scale of zero, this
+	// method does *not* change .paused, because it would be confusing
+	setEffectiveTimeScale: function( timeScale ) {
+
+		this.timeScale = timeScale;
+		this._effectiveTimeScale = this.paused ? 0 :timeScale;
+
+		return this.stopWarping();
+
+	},
+
+	// return the time scale considering warping and .paused
+	getEffectiveTimeScale: function() {
+
+		return this._effectiveTimeScale;
+
+	},
+
+	setDuration: function( duration ) {
+
+		this.timeScale = this._clip.duration / duration;
+
+		return this.stopWarping();
+
+	},
+
+	syncWith: function( action ) {
+
+		this.time = action.time;
+		this.timeScale = action.timeScale;
+
+		return this.stopWarping();
+
+	},
+
+	halt: function( duration ) {
+
+		return this.warp( this._currentTimeScale, 0, duration );
+
+	},
+
+	warp: function( startTimeScale, endTimeScale, duration ) {
+
+		var mixer = this._mixer, now = mixer.time,
+			interpolant = this._timeScaleInterpolant,
+
+			timeScale = this.timeScale;
+
+		if ( interpolant === null ) {
+
+			interpolant = mixer._lendControlInterpolant(),
+			this._timeScaleInterpolant = interpolant;
+
+		}
+
+		var times = interpolant.parameterPositions,
+			values = interpolant.sampleValues;
+
+		times[ 0 ] = now;
+		times[ 1 ] = now + duration;
+
+		values[ 0 ] = startTimeScale / timeScale;
+		values[ 1 ] = endTimeScale / timeScale;
+
+		return this;
+
+	},
+
+	stopWarping: function() {
+
+		var timeScaleInterpolant = this._timeScaleInterpolant;
+
+		if ( timeScaleInterpolant !== null ) {
+
+			this._timeScaleInterpolant = null;
+			this._mixer._takeBackControlInterpolant( timeScaleInterpolant );
+
+		}
+
+		return this;
+
+	},
+
+	// Object Accessors
+
+	getMixer: function() {
+
+		return this._mixer;
+
+	},
+
+	getClip: function() {
+
+		return this._clip;
+
+	},
+
+	getRoot: function() {
+
+		return this._localRoot || this._mixer._root;
+
+	},
+
+	// Interna
+
+	_update: function( time, deltaTime, timeDirection, accuIndex ) {
+		// called by the mixer
+
+		var startTime = this._startTime;
+
+		if ( startTime !== null ) {
+
+			// check for scheduled start of action
+
+			var timeRunning = ( time - startTime ) * timeDirection;
+			if ( timeRunning < 0 || timeDirection === 0 ) {
+
+				return; // yet to come / don't decide when delta = 0
+
+			}
+
+			// start
+
+			this._startTime = null; // unschedule
+			deltaTime = timeDirection * timeRunning;
+
+		}
+
+		// apply time scale and advance time
+
+		deltaTime *= this._updateTimeScale( time );
+		var clipTime = this._updateTime( deltaTime );
+
+		// note: _updateTime may disable the action resulting in
+		// an effective weight of 0
+
+		var weight = this._updateWeight( time );
+
+		if ( weight > 0 ) {
+
+			var interpolants = this._interpolants;
+			var propertyMixers = this._propertyBindings;
+
+			for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+				interpolants[ j ].evaluate( clipTime );
+				propertyMixers[ j ].accumulate( accuIndex, weight );
+
+			}
+
+		}
+
+	},
+
+	_updateWeight: function( time ) {
+
+		var weight = 0;
+
+		if ( this.enabled ) {
+
+			weight = this.weight;
+			var interpolant = this._weightInterpolant;
+
+			if ( interpolant !== null ) {
+
+				var interpolantValue = interpolant.evaluate( time )[ 0 ];
+
+				weight *= interpolantValue;
+
+				if ( time > interpolant.parameterPositions[ 1 ] ) {
+
+					this.stopFading();
+
+					if ( interpolantValue === 0 ) {
+
+						// faded out, disable
+						this.enabled = false;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		this._effectiveWeight = weight;
+		return weight;
+
+	},
+
+	_updateTimeScale: function( time ) {
+
+		var timeScale = 0;
+
+		if ( ! this.paused ) {
+
+			timeScale = this.timeScale;
+
+			var interpolant = this._timeScaleInterpolant;
+
+			if ( interpolant !== null ) {
+
+				var interpolantValue = interpolant.evaluate( time )[ 0 ];
+
+				timeScale *= interpolantValue;
+
+				if ( time > interpolant.parameterPositions[ 1 ] ) {
+
+					this.stopWarping();
+
+					if ( timeScale === 0 ) {
+
+						// motion has halted, pause
+						this.pause = true;
+
+					} else {
+
+						// warp done - apply final time scale
+						this.timeScale = timeScale;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		this._effectiveTimeScale = timeScale;
+		return timeScale;
+
+	},
+
+	_updateTime: function( deltaTime ) {
+
+		var time = this.time + deltaTime;
+
+		if ( deltaTime === 0 ) return time;
+
+		var duration = this._clip.duration,
+
+			loop = this.loop,
+			loopCount = this._loopCount,
+
+			pingPong = false;
+
+		switch ( loop ) {
+
+			case THREE.LoopOnce:
+			case THREE.LoopOnceClamp:
+
+				if ( loopCount === -1 ) {
+
+					// just started
+
+					this.loopCount = 0;
+					this._setEndings( true, true, false );
+
+				}
+
+				if ( time >= duration ) {
+
+					time = duration;
+
+				} else if ( time < 0 ) {
+
+					time = 0;
+
+				} else break;
+
+				// reached the end
+
+				if ( this.clampWhenFinished ) this.pause = true;
+				else this.enabled = false;
+
+				this._mixer.dispatchEvent( {
+					type: 'finished', action: this,
+					direction: deltaTime < 0 ? -1 : 1
+				} );
+
+				break;
+
+			case THREE.LoopPingPong:
+
+				pingPong = true;
+
+			case THREE.LoopRepeat:
+
+				if ( loopCount === -1 ) {
+
+					// just started
+
+					if ( deltaTime > 0 ) {
+
+						loopCount = 0;
+
+						this._setEndings(
+								true, this.repetitions === 0, pingPong );
+
+					} else {
+
+						// when looping in reverse direction, the initial
+						// transition through zero counts as a repetition,
+						// so leave loopCount at -1
+
+						this._setEndings(
+								this.repetitions === 0, true, pingPong );
+
+					}
+
+				}
+
+				if ( time >= duration || time < 0 ) {
+
+					// wrap around
+
+					var loopDelta = Math.floor( time / duration ); // signed
+					time -= duration * loopDelta;
+
+					loopCount += Math.abs( loopDelta );
+
+					var pending = this.repetitions - loopCount;
+
+					if ( pending < 0 ) {
+
+						// stop (switch state, clamp time, fire event)
+
+						if ( this.clampWhenFinished ) this.paused = true;
+						else this.enabled = false;
+
+						time = deltaTime > 0 ? duration : 0;
+
+						this._mixer.dispatchEvent( {
+							type: 'finished', action: this,
+							direction: deltaTime > 0 ? 1 : -1
+						} );
+
+						break;
+
+					} else if ( pending === 0 ) {
+
+						// transition to last round
+
+						var atStart = deltaTime < 0;
+						this._setEndings( atStart, ! atStart, pingPong );
+
+					} else {
+
+						this._setEndings( false, false, pingPong );
+
+					}
+
+					this._loopCount = loopCount;
+
+					this._mixer.dispatchEvent( {
+						type: 'loop', action: this, loopDelta: loopDelta
+					} );
+
+				}
+
+				if ( loop === THREE.LoopPingPong && ( loopCount & 1 ) === 1 ) {
+
+					// invert time for the "pong round"
+
+					this.time = time;
+
+					return duration - time;
+
+				}
+
+				break;
+
+		}
+
+		this.time = time;
+
+		return time;
+
+	},
+
+	_setEndings: function( atStart, atEnd, pingPong ) {
+
+		var settings = this._interpolantSettings;
+
+		if ( pingPong ) {
+
+			settings.endingStart 	= THREE.ZeroSlopeEnding;
+			settings.endingEnd		= THREE.ZeroSlopeEnding;
+
+		} else {
+
+			// assuming for LoopOnce atStart == atEnd == true
+
+			if ( atStart ) {
+
+				settings.endingStart = this.zeroSlopeAtStart ?
+						THREE.ZeroSlopeEnding : THREE.ZeroCurvatureEnding;
+
+			} else {
+
+				settings.endingStart = THREE.WrapAroundEnding;
+
+			}
+
+			if ( atEnd ) {
+
+				settings.endingEnd = this.zeroSlopeAtEnd ?
+						THREE.ZeroSlopeEnding : THREE.ZeroCurvatureEnding;
+
+			} else {
+
+				settings.endingEnd 	 = THREE.WrapAroundEnding;
+
+			}
+
+		}
+
+	},
+
+	_scheduleFading: function( duration, weightNow, weightThen ) {
+
+		var mixer = this._mixer, now = mixer.time,
+			interpolant = this._weightInterpolant;
+
+		if ( interpolant === null ) {
+
+			interpolant = mixer._lendControlInterpolant(),
+			this._weightInterpolant = interpolant;
+
+		}
+
+		var times = interpolant.parameterPositions,
+			values = interpolant.sampleValues;
+
+		times[ 0 ] = now; 				values[ 0 ] = weightNow;
+		times[ 1 ] = now + duration;	values[ 1 ] = weightThen;
+
+		return this;
+
+	}
+
+};
+
+// Implementation details:
+
+Object.assign( THREE.AnimationMixer.prototype, {
+
+	_bindAction: function( action, prototypeAction ) {
+
+		var root = action._localRoot || this._root,
+			tracks = action._clip.tracks,
+			nTracks = tracks.length,
+			bindings = action._propertyBindings,
+			interpolants = action._interpolants,
+			rootUuid = root.uuid,
+			bindingsByRoot = this._bindingsByRootAndName,
+			bindingsByName = bindingsByRoot[ rootUuid ];
+
+		if ( bindingsByName === undefined ) {
+
+			bindingsByName = {};
+			bindingsByRoot[ rootUuid ] = bindingsByName;
+
+		}
+
+		for ( var i = 0; i !== nTracks; ++ i ) {
+
+			var track = tracks[ i ],
+				trackName = track.name,
+				binding = bindingsByName[ trackName ];
+
+			if ( binding !== undefined ) {
+
+				bindings[ i ] = binding;
+
+			} else {
+
+				binding = bindings[ i ];
+
+				if ( binding !== undefined ) {
+
+					// existing binding, make sure the cache knows
+
+					if ( binding._cacheIndex === null ) {
+
+						++ binding.referenceCount;
+						this._addInactiveBinding( binding, rootUuid, trackName );
+
+					}
+
+					continue;
+
+				}
+
+				var path = prototypeAction && prototypeAction.
+						_propertyBindings[ i ].binding.parsedPath;
+
+				binding = new THREE.PropertyMixer(
+						THREE.PropertyBinding.create( root, trackName, path ),
+						track.ValueTypeName, track.getValueSize() );
+
+				++ binding.referenceCount;
+				this._addInactiveBinding( binding, rootUuid, trackName );
+
+				bindings[ i ] = binding;
+
+			}
+
+			interpolants[ i ].resultBuffer = binding.buffer;
+
+		}
+
+	},
+
+	_activateAction: function( action ) {
+
+		if ( ! this._isActiveAction( action ) ) {
+
+			if ( action._cacheIndex === null ) {
+
+				// this action has been forgotten by the cache, but the user
+				// appears to be still using it -> rebind
+
+				var rootUuid = ( action._localRoot || this._root ).uuid,
+					clipName = action._clip.name,
+					actionsForClip = this._actionsByClip[ clipName ];
+
+				this._bindAction( action,
+						actionsForClip && actionsForClip.knownActions[ 0 ] );
+
+				this._addInactiveAction( action, clipName, rootUuid );
+
+			}
+
+			var bindings = action._propertyBindings;
+
+			// increment reference counts / sort out state
+			for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+
+				var binding = bindings[ i ];
+
+				if ( binding.useCount ++ === 0 ) {
+
+					this._lendBinding( binding );
+					binding.saveOriginalState();
+
+				}
+
+			}
+
+			this._lendAction( action );
+
+		}
+
+	},
+
+	_deactivateAction: function( action ) {
+
+		if ( this._isActiveAction( action ) ) {
+
+			var bindings = action._propertyBindings;
+
+			// decrement reference counts / sort out state
+			for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+
+				var binding = bindings[ i ];
+
+				if ( -- binding.useCount === 0 ) {
+
+					binding.restoreOriginalState();
+					this._takeBackBinding( binding );
+
+				}
+
+			}
+
+			this._takeBackAction( action );
+
+		}
+
+	},
+
+	// Memory manager
+
+	_initMemoryManager: function() {
+
+		this._actions = []; // 'nActiveActions' followed by inactive ones
+		this._nActiveActions = 0;
+
+		this._actionsByClip = {};
+		// inside:
+		// {
+		// 		knownActions: Array< _Action >	- used as prototypes
+		// 		actionByRoot: _Action			- lookup
+		// }
+
+
+		this._bindings = []; // 'nActiveBindings' followed by inactive ones
+		this._nActiveBindings = 0;
+
+		this._bindingsByRootAndName = {}; // inside: Map< name, PropertyMixer >
+
+
+		this._controlInterpolants = []; // same game as above
+		this._nActiveControlInterpolants = 0;
+
+		var scope = this;
+
+		this.stats = {
+
+			actions: {
+				get total() { return scope._actions.length; },
+				get inUse() { return scope._nActiveActions; }
+			},
+			bindings: {
+				get total() { return scope._bindings.length; },
+				get inUse() { return scope._nActiveBindings; }
+			},
+			controlInterpolants: {
+				get total() { return scope._controlInterpolants.length; },
+				get inUse() { return scope._nActiveControlInterpolants; }
+			}
+
+		};
+
+	},
+
+	// Memory management for _Action objects
+
+	_isActiveAction: function( action ) {
+
+		var index = action._cacheIndex;
+		return index !== null && index < this._nActiveActions;
+
+	},
+
+	_addInactiveAction: function( action, clipName, rootUuid ) {
+
+		var actions = this._actions,
+			actionsByClip = this._actionsByClip,
+			actionsForClip = actionsByClip[ clipName ];
+
+		if ( actionsForClip === undefined ) {
+
+			actionsForClip = {
+
+				knownActions: [ action ],
+				actionByRoot: {}
+
+			};
+
+			action._byClipCacheIndex = 0;
+
+			actionsByClip[ clipName ] = actionsForClip;
+
+		} else {
+
+			var knownActions = actionsForClip.knownActions;
+
+			action._byClipCacheIndex = knownActions.length;
+			knownActions.push( action );
+
+		}
+
+		action._cacheIndex = actions.length;
+		actions.push( action );
+
+		actionsForClip.actionByRoot[ rootUuid ] = action;
+
+	},
+
+	_removeInactiveAction: function( action ) {
+
+		var actions = this._actions,
+			lastInactiveAction = actions[ actions.length - 1 ],
+			cacheIndex = action._cacheIndex;
+
+		lastInactiveAction._cacheIndex = cacheIndex;
+		actions[ cacheIndex ] = lastInactiveAction;
+		actions.pop();
+
+		action._cacheIndex = null;
+
+
+		var clipName = action._clip.name,
+			actionsByClip = this._actionsByClip,
+			actionsForClip = actionsByClip[ clipName ],
+			knownActionsForClip = actionsForClip.knownActions,
+
+			lastKnownAction =
+				knownActionsForClip[ knownActionsForClip.length - 1 ],
+
+			byClipCacheIndex = action._byClipCacheIndex;
+
+		lastKnownAction._byClipCacheIndex = byClipCacheIndex;
+		knownActionsForClip[ byClipCacheIndex ] = lastKnownAction;
+		knownActionsForClip.pop();
+
+		action._byClipCacheIndex = null;
+
+
+		var actionByRoot = actionsForClip.actionByRoot,
+			rootUuid = ( actions._localRoot || this._root ).uuid;
+
+		delete actionByRoot[ rootUuid ];
+
+		if ( knownActionsForClip.length === 0 ) {
+
+			delete actionsByClip[ clipName ];
+
+		}
+
+		this._removeInactiveBindingsForAction( action );
+
+	},
+
+	_removeInactiveBindingsForAction: function( action ) {
+
+		var bindings = action._propertyBindings;
+		for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+
+			var binding = bindings[ i ];
+
+			if ( -- binding.referenceCount === 0 ) {
+
+				this._removeInactiveBinding( binding );
+
+			}
+
+		}
+
+	},
+
+	_lendAction: function( action ) {
+
+		// [ active actions |  inactive actions  ]
+		// [  active actions >| inactive actions ]
+		//                 s        a
+		//                  <-swap->
+		//                 a        s
+
+		var actions = this._actions,
+			prevIndex = action._cacheIndex,
+
+			lastActiveIndex = this._nActiveActions ++,
+
+			firstInactiveAction = actions[ lastActiveIndex ];
+
+		action._cacheIndex = lastActiveIndex;
+		actions[ lastActiveIndex ] = action;
+
+		firstInactiveAction._cacheIndex = prevIndex;
+		actions[ prevIndex ] = firstInactiveAction;
+
+	},
+
+	_takeBackAction: function( action ) {
+
+		// [  active actions  | inactive actions ]
+		// [ active actions |< inactive actions  ]
+		//        a        s
+		//         <-swap->
+		//        s        a
+
+		var actions = this._actions,
+			prevIndex = action._cacheIndex,
+
+			firstInactiveIndex = -- this._nActiveActions,
+
+			lastActiveAction = actions[ firstInactiveIndex ];
+
+		action._cacheIndex = firstInactiveIndex;
+		actions[ firstInactiveIndex ] = action;
+
+		lastActiveAction._cacheIndex = prevIndex;
+		actions[ prevIndex ] = lastActiveAction;
+
+	},
+
+	// Memory management for PropertyMixer objects
+
+	_addInactiveBinding: function( binding, rootUuid, trackName ) {
+
+		var bindingsByRoot = this._bindingsByRootAndName,
+			bindingByName = bindingsByRoot[ rootUuid ],
+
+			bindings = this._bindings;
+
+		if ( bindingByName === undefined ) {
+
+			bindingByName = {};
+			bindingsByRoot[ rootUuid ] = bindingByName;
+
+		}
+
+		bindingByName[ trackName ] = binding;
+
+		binding._cacheIndex = bindings.length;
+		bindings.push( binding );
+
+	},
+
+	_removeInactiveBinding: function( binding ) {
+
+		var bindings = this._bindings,
+			propBinding = binding.binding,
+			rootUuid = propBinding.rootNode.uuid,
+			trackName = propBinding.path,
+			bindingsByRoot = this._bindingsByRootAndName,
+			bindingByName = bindingsByRoot[ rootUuid ],
+
+			lastInactiveBinding = bindings[ bindings.length - 1 ],
+			cacheIndex = binding._cacheIndex;
+
+		lastInactiveBinding._cacheIndex = cacheIndex;
+		bindings[ cacheIndex ] = lastInactiveBinding;
+		bindings.pop();
+
+		delete bindingByName[ trackName ];
+
+		remove_empty_map: {
+
+			for ( var _ in bindingByName ) break remove_empty_map;
+
+			delete bindingsByRoot[ rootUuid ];
+
+		}
+
+	},
+
+	_lendBinding: function( binding ) {
+
+		var bindings = this._bindings,
+			prevIndex = binding._cacheIndex,
+
+			lastActiveIndex = this._nActiveBindings ++,
+
+			firstInactiveBinding = bindings[ lastActiveIndex ];
+
+		binding._cacheIndex = lastActiveIndex;
+		bindings[ lastActiveIndex ] = binding;
+
+		firstInactiveBinding._cacheIndex = prevIndex;
+		bindings[ prevIndex ] = firstInactiveBinding;
+
+	},
+
+	_takeBackBinding: function( binding ) {
+
+		var bindings = this._bindings,
+			prevIndex = binding._cacheIndex,
+
+			firstInactiveIndex = -- this._nActiveBindings,
+
+			lastActiveBinding = bindings[ firstInactiveIndex ];
+
+		binding._cacheIndex = firstInactiveIndex;
+		bindings[ firstInactiveIndex ] = binding;
+
+		lastActiveBinding._cacheIndex = prevIndex;
+		bindings[ prevIndex ] = lastActiveBinding;
+
+	},
+
+
+	// Memory management of Interpolants for weight and time scale
+
+	_lendControlInterpolant: function() {
+
+		var interpolants = this._controlInterpolants,
+			lastActiveIndex = this._nActiveControlInterpolants ++,
+			interpolant = interpolants[ lastActiveIndex ];
+
+		if ( interpolant === undefined ) {
+
+			interpolant = new THREE.LinearInterpolant(
+					new Float32Array( 2 ), new Float32Array( 2 ),
+						1, this._controlInterpolantsResultBuffer );
+
+			interpolant.__cacheIndex = lastActiveIndex;
+			interpolants[ lastActiveIndex ] = interpolant;
+
+		}
+
+		return interpolant;
+
+	},
+
+	_takeBackControlInterpolant: function( interpolant ) {
+
+		var interpolants = this._controlInterpolants,
+			prevIndex = interpolant.__cacheIndex,
+
+			firstInactiveIndex = -- this._nActiveControlInterpolants,
+
+			lastActiveInterpolant = interpolants[ firstInactiveIndex ];
+
+		interpolant.__cacheIndex = firstInactiveIndex;
+		interpolants[ firstInactiveIndex ] = interpolant;
+
+		lastActiveInterpolant.__cacheIndex = prevIndex;
+		interpolants[ prevIndex ] = lastActiveInterpolant;
+
+	},
+
+	_controlInterpolantsResultBuffer: new Float32Array( 1 )
+
+} );
+
+
+// File:src/animation/AnimationObjectGroup.js
+
+/**
+ *
+ * A group of objects that receives a shared animation state.
+ *
+ * Usage:
+ *
+ * 	-	Add objects you would otherwise pass as 'root' to the
+ * 		constructor or the .clipAction method of AnimationMixer.
+ *
+ * 	-	Instead pass this object as 'root'.
+ *
+ * 	-	You can also add and remove objects later when the mixer
+ * 		is running.
+ *
+ * Note:
+ *
+ *  	Objects of this class appear as one object to the mixer,
+ *  	so cache control of the individual objects must be done
+ *  	on the group.
+ *
+ * Limitation:
+ *
+ * 	- 	The animated properties must be compatible among the
+ * 		all objects in the group.
+ *
+ *  -	A single property can either be controlled through a
+ *  	target group or directly, but not both.
+ *
+ * @author tschw
+ */
+
+THREE.AnimationObjectGroup = function( var_args ) {
+
+	this.uuid = THREE.Math.generateUUID();
+
+	// cached objects followed by the active ones
+	this._objects = Array.prototype.slice.call( arguments );
+
+	this.nCachedObjects_ = 0;			// threshold
+	// note: read by PropertyBinding.Composite
+
+	var indices = {};
+	this._indicesByUUID = indices;		// for bookkeeping
+
+	for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+
+		indices[ arguments[ i ].uuid ] = i;
+
+	}
+
+	this._paths = [];					// inside: string
+	this._parsedPaths = [];				// inside: { we don't care, here }
+	this._bindings = []; 				// inside: Array< PropertyBinding >
+	this._bindingsIndicesByPath = {}; 	// inside: indices in these arrays
+
+	var scope = this;
+
+	this.stats = {
+
+		objects: {
+			get total() { return scope._objects.length; },
+			get inUse() { return this.total - scope.nCachedObjects_;  }
+		},
+
+		get bindingsPerObject() { return scope._bindings.length; }
+
+	};
+
+};
+
+THREE.AnimationObjectGroup.prototype = {
+
+	constructor: THREE.AnimationObjectGroup,
+
+	add: function( var_args ) {
+
+		var objects = this._objects,
+			nObjects = objects.length,
+			nCachedObjects = this.nCachedObjects_,
+			indicesByUUID = this._indicesByUUID,
+			paths = this._paths,
+			parsedPaths = this._parsedPaths,
+			bindings = this._bindings,
+			nBindings = bindings.length;
+
+		for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+
+			var object = arguments[ i ],
+				uuid = object.uuid,
+				index = indicesByUUID[ uuid ];
+
+			if ( index === undefined ) {
+
+				// unknown object -> add it to the ACTIVE region
+
+				index = nObjects ++;
+				indicesByUUID[ uuid ] = index;
+				objects.push( object );
+
+				// accounting is done, now do the same for all bindings
+
+				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+
+					bindings[ j ].push(
+							new THREE.PropertyBinding(
+								object, paths[ j ], parsedPaths[ j ] ) );
+
+				}
+
+			} else if ( index < nCachedObjects ) {
+
+				var knownObject = objects[ index ];
+
+				// move existing object to the ACTIVE region
+
+				var firstActiveIndex = -- nCachedObjects,
+					lastCachedObject = objects[ firstActiveIndex ];
+
+				indicesByUUID[ lastCachedObject.uuid ] = index;
+				objects[ index ] = lastCachedObject;
+
+				indicesByUUID[ uuid ] = firstActiveIndex;
+				objects[ firstActiveIndex ] = object;
+
+				// accounting is done, now do the same for all bindings
+
+				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+
+					var bindingsForPath = bindings[ j ],
+						lastCached = bindingsForPath[ firstActiveIndex ],
+						binding = bindingsForPath[ index ];
+
+					bindingsForPath[ index ] = lastCached;
+
+					if ( binding === undefined ) {
+
+						// since we do not bother to create new bindings
+						// for objects that are cached, the binding may
+						// or may not exist
+
+						binding = new THREE.PropertyBinding(
+								object, paths[ j ], parsedPaths[ j ] );
+
+					}
+
+					bindingsForPath[ firstActiveIndex ] = binding;
+
+				}
+
+			} else if ( objects[ index ] !== knownObject) {
+
+				console.error( "Different objects with the same UUID " +
+						"detected. Clean the caches or recreate your " +
+						"infrastructure when reloading scenes..." );
+
+			} // else the object is already where we want it to be
+
+		} // for arguments
+
+		this.nCachedObjects_ = nCachedObjects;
+
+	},
+
+	remove: function( var_args ) {
+
+		var objects = this._objects,
+			nObjects = objects.length,
+			nCachedObjects = this.nCachedObjects_,
+			indicesByUUID = this._indicesByUUID,
+			bindings = this._bindings,
+			nBindings = bindings.length;
+
+		for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+
+			var object = arguments[ i ],
+				uuid = object.uuid,
+				index = indicesByUUID[ uuid ];
+
+			if ( index !== undefined && index >= nCachedObjects ) {
+
+				// move existing object into the CACHED region
+
+				var lastCachedIndex = nCachedObjects ++,
+					firstActiveObject = objects[ lastCachedIndex ];
+
+				indicesByUUID[ firstActiveObject.uuid ] = index;
+				objects[ index ] = firstActiveObject;
+
+				indicesByUUID[ uuid ] = lastCachedIndex;
+				objects[ lastCachedIndex ] = object;
+
+				// accounting is done, now do the same for all bindings
+
+				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+
+					var bindingsForPath = bindings[ j ],
+						firstActive = bindingsForPath[ lastCachedIndex ],
+						binding = bindingsForPath[ index ];
+
+					bindingsForPath[ index ] = firstActive;
+					bindingsForPath[ lastCachedIndex ] = binding;
+
+				}
+
+			}
+
+		} // for arguments
+
+		this.nCachedObjects_ = nCachedObjects;
+
+	},
+
+	// remove & forget
+	uncache: function( var_args ) {
+
+		var objects = this._objects,
+			nObjects = objects.length,
+			nCachedObjects = this.nCachedObjects_,
+			indicesByUUID = this._indicesByUUID,
+			bindings = this._bindings,
+			nBindings = bindings.length;
+
+		for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+
+			var object = arguments[ i ],
+				uuid = object.uuid,
+				index = indicesByUUID[ uuid ];
+
+			if ( index !== undefined ) {
+
+				delete indicesByUUID[ uuid ];
+
+				if ( index < nCachedObjects ) {
+
+					// object is cached, shrink the CACHED region
+
+					var firstActiveIndex = -- nCachedObjects,
+						lastCachedObject = objects[ firstActiveIndex ],
+						lastIndex = -- nObjects,
+						lastObject = objects[ lastIndex ];
+
+					// last cached object takes this object's place
+					indicesByUUID[ lastCachedObject.uuid ] = index;
+					objects[ index ] = lastCachedObject;
+
+					// last object goes to the activated slot and pop
+					indicesByUUID[ lastObject.uuid ] = firstActiveIndex;
+					objects[ firstActiveIndex ] = lastObject;
+					objects.pop();
+
+					// accounting is done, now do the same for all bindings
+
+					for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+
+						var bindingsForPath = bindings[ j ],
+							lastCached = bindingsForPath[ firstActiveIndex ],
+							last = bindingsForPath[ lastIndex ];
+
+						bindingsForPath[ index ] = lastCached;
+						bindingsForPath[ firstActiveIndex ] = last;
+						bindingsForPath.pop();
+
+					}
+
+				} else {
+
+					// object is active, just swap with the last and pop
+
+					var lastIndex = -- nObjects,
+						lastObject = objects[ lastIndex ];
+
+					indicesByUUID[ lastObject.uuid ] = index;
+					objects[ index ] = lastObject;
+					objects.pop();
+
+					// accounting is done, now do the same for all bindings
+
+					for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+
+						var bindingsForPath = bindings[ j ];
+
+						bindingsForPath[ index ] = bindingsForPath[ lastIndex ];
+						bindingsForPath.pop();
+
+					}
+
+				} // cached or active
+
+			} // if object is known
+
+		} // for arguments
+
+		this.nCachedObjects_ = nCachedObjects;
+
+	},
+
+	// Internal interface used by befriended PropertyBinding.Composite:
+
+	subscribe_: function( path, parsedPath ) {
+		// returns an array of bindings for the given path that is changed
+		// according to the contained objects in the group
+
+		var indicesByPath = this._bindingsIndicesByPath,
+			index = indicesByPath[ path ],
+			bindings = this._bindings;
+
+		if ( index !== undefined ) return bindings[ index ];
+
+		var paths = this._paths,
+			parsedPaths = this._parsedPaths,
+			objects = this._objects,
+			nObjects = objects.length,
+			nCachedObjects = this.nCachedObjects_,
+			bindingsForPath = new Array( nObjects );
+
+		index = bindings.length;
+
+		indicesByPath[ path ] = index;
+
+		paths.push( path );
+		parsedPaths.push( parsedPath );
+		bindings.push( bindingsForPath );
+
+		for ( var i = nCachedObjects,
+				n = objects.length; i !== n; ++ i ) {
+
+			var object = objects[ i ];
+
+			bindingsForPath[ i ] =
+					new THREE.PropertyBinding( object, path, parsedPath );
+
+		}
+
+		return bindingsForPath;
+
+	},
+
+	unsubscribe_: function( path ) {
+		// tells the group to forget about a property path and no longer
+		// update the array previously obtained with 'subscribe_'
+
+		var indicesByPath = this._bindingsIndicesByPath,
+			index = indicesByPath[ path ];
+
+		if ( index !== undefined ) {
+
+			var paths = this._paths,
+				parsedPaths = this._parsedPaths,
+				bindings = this._bindings,
+				lastBindingsIndex = bindings.length - 1,
+				lastBindings = bindings[ lastBindingsIndex ],
+				lastBindingsPath = path[ lastBindingsIndex ];
+
+			indicesByPath[ lastBindingsPath ] = index;
+
+			bindings[ index ] = lastBindings;
+			bindings.pop();
+
+			parsedPaths[ index ] = parsedPaths[ lastBindingsIndex ];
+			parsedPaths.pop();
+
+			paths[ index ] = paths[ lastBindingsIndex ];
+			paths.pop();
+
+		}
+
+	}
+
+};
+
+
 // File:src/animation/AnimationUtils.js
 
 /**
+ * @author tschw
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
 THREE.AnimationUtils = {
 
-	getEqualsFunc: function( exemplarValue ) {
+	// same as Array.prototype.slice, but also works on typed arrays
+	arraySlice: function( array, from, to ) {
 
-		if ( exemplarValue.equals ) {
-			return function equals_object( a, b ) {
-				return a.equals( b );
-			}
+		if ( THREE.AnimationUtils.isTypedArray( array ) ) {
+
+			return new array.constructor( array.subarray( from, to ) );
+
 		}
 
-		return function equals_primitive( a, b ) {
-			return ( a === b );
-		};
+		return array.slice( from, to );
 
 	},
 
-	clone: function( exemplarValue ) {
+	// converts an array to a specific type
+	convertArray: function( array, type, forceClone ) {
 
-		var typeName = typeof exemplarValue;
-		if ( typeName === "object" ) {
-			if ( exemplarValue.clone ) {
-				return exemplarValue.clone();
-			}
-			console.error( "can not figure out how to copy exemplarValue", exemplarValue );
+		if ( ! array || // let 'undefined' and 'null' pass
+				! forceClone && array.constructor === type ) return array;
+
+		if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
+
+			return new type( array ); // create typed array
+
 		}
 
-		return exemplarValue;
+		return Array.prototype.slice.call( array ); // create Array
 
 	},
 
-	lerp: function( a, b, alpha, interTrack ) {
+	isTypedArray: function( object ) {
 
-		var lerpFunc = THREE.AnimationUtils.getLerpFunc( a, interTrack );
-
-		return lerpFunc( a, b, alpha );
+		return ArrayBuffer.isView( object ) &&
+				! ( object instanceof DataView );
 
 	},
 
-	lerp_object: function( a, b, alpha ) {
-		return a.lerp( b, alpha );
+	// returns an array by which times and values can be sorted
+	getKeyframeOrder: function( times ) {
+
+		function compareTime( i, j ) {
+
+			return times[ i ] - times[ j ];
+
+		}
+
+		var n = times.length;
+		var result = new Array( n );
+		for ( var i = 0; i !== n; ++ i ) result[ i ] = i;
+
+		result.sort( compareTime );
+
+		return result;
+
 	},
 
-	slerp_object: function( a, b, alpha ) {
-		return a.slerp( b, alpha );
+	// uses the array previously returned by 'getKeyframeOrder' to sort data
+	sortedArray: function( values, stride, order ) {
+
+		var nValues = values.length;
+		var result = new values.constructor( nValues );
+
+		for ( var i = 0, dstOffset = 0; dstOffset !== nValues; ++ i ) {
+
+			var srcOffset = order[ i ] * stride;
+
+			for ( var j = 0; j !== stride; ++ j ) {
+
+				result[ dstOffset ++ ] = values[ srcOffset + j ];
+
+			}
+
+		}
+
+		return result;
+
 	},
 
-	lerp_number: function( a, b, alpha ) {
-		return a * ( 1 - alpha ) + b * alpha;
-	},
+	// function for parsing AOS keyframe formats
+	flattenJSON: function( jsonKeys, times, values, valuePropertyName ) {
 
-	lerp_boolean: function( a, b, alpha ) {
-		return ( alpha < 0.5 ) ? a : b;
-	},
+		var i = 1, key = jsonKeys[ 0 ];
 
-	lerp_boolean_immediate: function( a, b, alpha ) {
-		return a;
-	},
+		while ( key !== undefined && key[ valuePropertyName ] === undefined ) {
 
-	lerp_string: function( a, b, alpha ) {
-		return ( alpha < 0.5 ) ? a : b;
-	},
+			key = jsonKeys[ i ++ ];
 
-	lerp_string_immediate: function( a, b, alpha ) {
- 		return a;
- 	},
+		}
 
-	// NOTE: this is an accumulator function that modifies the first argument (e.g. a).	This is to minimize memory alocations.
-	getLerpFunc: function( exemplarValue, interTrack ) {
+		if ( key === undefined ) return; // no data
 
-		if ( exemplarValue === undefined || exemplarValue === null ) throw new Error( "examplarValue is null" );
+		var value = key[ valuePropertyName ];
+		if ( value === undefined ) return; // no data
 
-		var typeName = typeof exemplarValue;
+		if ( Array.isArray( value ) ) {
 
-		switch( typeName ) {
+			do {
 
-			case "object":
-				if ( exemplarValue.lerp ) {
-					return THREE.AnimationUtils.lerp_object;
+				value = key[ valuePropertyName ];
+
+				if ( value !== undefined ) {
+
+					times.push( key.time );
+					values.push.apply( values, value ); // push all elements
+
 				}
 
-				if ( exemplarValue.slerp ) {
-					return THREE.AnimationUtils.slerp_object;
-				}
-				break;
+				key = jsonKeys[ i ++ ];
 
-			case "number":
-				return THREE.AnimationUtils.lerp_number;
+			} while ( key !== undefined );
 
-			case "boolean":
-				if ( interTrack ) {
-					return THREE.AnimationUtils.lerp_boolean;
-				} else {
-					return THREE.AnimationUtils.lerp_boolean_immediate;
+		} else if ( value.toArray !== undefined ) {
+			// ...assume THREE.Math-ish
+
+			do {
+
+				value = key[ valuePropertyName ];
+
+				if ( value !== undefined ) {
+
+					times.push( key.time );
+					value.toArray( values, values.length );
+
 				}
 
-			case "string":
-				if ( interTrack ) {
-					return THREE.AnimationUtils.lerp_string;
-				} else {
-					return THREE.AnimationUtils.lerp_string_immediate;
+				key = jsonKeys[ i ++ ];
+
+			} while ( key !== undefined );
+
+		} else {
+			// otherwise push as-is
+
+			do {
+
+				value = key[ valuePropertyName ];
+
+				if ( value !== undefined ) {
+
+					times.push( key.time );
+					values.push( value );
+
 				}
+
+				key = jsonKeys[ i ++ ];
+
+			} while ( key !== undefined );
 
 		}
 
@@ -12659,22 +14764,30 @@ THREE.AnimationUtils = {
 
 /**
  *
- * A Track that returns a keyframe interpolated value, currently linearly interpolated
+ * A timed sequence of keyframes for a specific property.
+ *
  *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
+ * @author tschw
  */
 
-THREE.KeyframeTrack = function ( name, keys ) {
+THREE.KeyframeTrack = function ( name, times, values, interpolation ) {
 
-	if ( name === undefined ) throw new Error( "track name is undefined" );
-	if ( keys === undefined || keys.length === 0 ) throw new Error( "no keys in track named " + name );
+	if( name === undefined ) throw new Error( "track name is undefined" );
+
+	if( times === undefined || times.length === 0 ) {
+
+		throw new Error( "no keyframes in track named " + name );
+
+	}
 
 	this.name = name;
-	this.keys = keys;	// time in seconds, value as value
 
-	// the index of the last result, used as a starting point for local search.
-	this.lastIndex = 0;
+	this.times = THREE.AnimationUtils.convertArray( times, this.TimeBufferType );
+	this.values = THREE.AnimationUtils.convertArray( values, this.ValueBufferType );
+
+	this.setInterpolation( interpolation || this.DefaultInterpolation );
 
 	this.validate();
 	this.optimize();
@@ -12685,61 +14798,124 @@ THREE.KeyframeTrack.prototype = {
 
 	constructor: THREE.KeyframeTrack,
 
-	getAt: function( time ) {
+	TimeBufferType: Float32Array,
+	ValueBufferType: Float32Array,
 
+	DefaultInterpolation: THREE.InterpolateLinear,
 
-		// this can not go higher than this.keys.length.
-		while( ( this.lastIndex < this.keys.length ) && ( time >= this.keys[this.lastIndex].time ) ) {
-			this.lastIndex ++;
-		};
+	InterpolantFactoryMethodDiscrete: function( result ) {
 
-		// this can not go lower than 0.
-		while( ( this.lastIndex > 0 ) && ( time < this.keys[this.lastIndex - 1].time ) ) {
-			this.lastIndex --;
+		return new THREE.DiscreteInterpolant(
+				this.times, this.values, this.getValueSize(), result );
+
+	},
+
+	InterpolantFactoryMethodLinear: function( result ) {
+
+		return new THREE.LinearInterpolant(
+				this.times, this.values, this.getValueSize(), result );
+
+	},
+
+	InterpolantFactoryMethodSmooth: function( result ) {
+
+		return new THREE.CubicInterpolant(
+				this.times, this.values, this.getValueSize(), result );
+
+	},
+
+	setInterpolation: function( interpolation ) {
+
+		var factoryMethod = undefined;
+
+		switch ( interpolation ) {
+
+			case THREE.InterpolateDiscrete:
+
+				factoryMethod = this.InterpolantFactoryMethodDiscrete;
+
+				break;
+
+			case THREE.InterpolateLinear:
+
+				factoryMethod = this.InterpolantFactoryMethodLinear;
+
+				break;
+
+			case THREE.InterpolateSmooth:
+
+				factoryMethod = this.InterpolantFactoryMethodSmooth;
+
+				break;
+
 		}
 
-		if ( this.lastIndex >= this.keys.length ) {
+		if ( factoryMethod === undefined ) {
 
-			this.setResult( this.keys[ this.keys.length - 1 ].value );
+			var message = "unsupported interpolation for " +
+					this.ValueTypeName + " keyframe track named " + this.name;
 
-			return this.result;
+			if ( this.createInterpolant === undefined ) {
+
+				// fall back to default, unless the default itself is messed up
+				if ( interpolation !== this.DefaultInterpolation ) {
+
+					this.setInterpolation( this.DefaultInterpolation );
+
+				} else {
+
+					throw new Error( message ); // fatal, in this case
+
+				}
+
+			}
+
+			console.warn( message );
+			return;
 
 		}
 
-		if ( this.lastIndex === 0 ) {
+		this.createInterpolant = factoryMethod;
 
-			this.setResult( this.keys[ 0 ].value );
+	},
 
-			return this.result;
+	getInterpolation: function() {
+
+		switch ( this.createInterpolant ) {
+
+			case this.InterpolantFactoryMethodDiscrete:
+
+				return THREE.InterpolateDiscrete;
+
+			case this.InterpolantFactoryMethodLinear:
+
+				return THREE.InterpolateLinear;
+
+			case this.InterpolantFactoryMethodSmooth:
+
+				return THREE.InterpolateSmooth;
 
 		}
 
-		var prevKey = this.keys[ this.lastIndex - 1 ];
-		this.setResult( prevKey.value );
+	},
 
-		// if true, means that prev/current keys are identical, thus no interpolation required.
-		if ( prevKey.constantToNext ) {
+	getValueSize: function() {
 
-			return this.result;
-
-		}
-
-		// linear interpolation to start with
-		var currentKey = this.keys[ this.lastIndex ];
-		var alpha = ( time - prevKey.time ) / ( currentKey.time - prevKey.time );
-		this.result = this.lerpValues( this.result, currentKey.value, alpha );
-
-		return this.result;
+		return this.values.length / this.times.length;
 
 	},
 
 	// move all keyframes either forwards or backwards in time
 	shift: function( timeOffset ) {
 
-		if ( timeOffset !== 0.0 ) {
+		if( timeOffset !== 0.0 ) {
 
-			for ( var i = 0; i < this.keys.length; i ++ ) {
-				this.keys[i].time += timeOffset;
+			var times = this.times;
+
+			for( var i = 0, n = times.length; i !== n; ++ i ) {
+
+				times[ i ] += timeOffset;
+
 			}
 
 		}
@@ -12751,10 +14927,14 @@ THREE.KeyframeTrack.prototype = {
 	// scale all keyframe times by a factor (useful for frame <-> seconds conversions)
 	scale: function( timeScale ) {
 
-		if ( timeScale !== 1.0 ) {
+		if( timeScale !== 1.0 ) {
 
-			for ( var i = 0; i < this.keys.length; i ++ ) {
-				this.keys[i].time *= timeScale;
+			var times = this.times;
+
+			for( var i = 0, n = times.length; i !== n; ++ i ) {
+
+				times[ i ] *= timeScale;
+
 			}
 
 		}
@@ -12765,123 +14945,195 @@ THREE.KeyframeTrack.prototype = {
 
 	// removes keyframes before and after animation without changing any values within the range [startTime, endTime].
 	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
- 	trim: function( startTime, endTime ) {
+	trim: function( startTime, endTime ) {
+
+		var times = this.times;
+		var nKeys = times.length;
 
 		var firstKeysToRemove = 0;
-		for ( var i = 1; i < this.keys.length; i ++ ) {
-			if ( this.keys[i] <= startTime ) {
-				firstKeysToRemove ++;
-			}
+		for ( var i = 1; i !== nKeys; ++ i ) {
+
+			if ( times[i] <= startTime ) ++ firstKeysToRemove;
+
 		}
 
 		var lastKeysToRemove = 0;
-		for ( var i = this.keys.length - 2; i > 0; i ++ ) {
-			if ( this.keys[i] >= endTime ) {
-				lastKeysToRemove ++;
-			} else {
-				break;
-			}
+		for ( var i = nKeys - 2; i !== 0; -- i ) {
+
+			if ( times[i] >= endTime ) ++ lastKeysToRemove;
+			else break;
+
 		}
 
 		// remove last keys first because it doesn't affect the position of the first keys (the otherway around doesn't work as easily)
-		if ( ( firstKeysToRemove + lastKeysToRemove ) > 0 ) {
-			this.keys = this.keys.splice( firstKeysToRemove, this.keys.length - lastKeysToRemove - firstKeysToRemove );;
+		if( ( firstKeysToRemove + lastKeysToRemove ) !== 0 ) {
+
+			var from = firstKeysToRemove;
+			var to = nKeys - lastKeysToRemove - firstKeysToRemove;
+
+			this.times = THREE.AnimationUtils.arraySlice( times, from, to );
+
+			var values = this.values;
+			var stride = this.getValueSize();
+			this.values = THREE.AnimationUtils.arraySlice( values, from * stride, to * stride );
+
 		}
 
 		return this;
 
 	},
-
-	/* NOTE: This is commented out because we really shouldn't have to handle unsorted key lists
-	         Tracks with out of order keys should be considered to be invalid.  - bhouston
-	sort: function() {
-
-		this.keys.sort( THREE.KeyframeTrack.keyComparer );
-
-		return this;
-
-	},*/
 
 	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
-	// One could eventually ensure that all key.values in a track are all of the same type (otherwise interpolation makes no sense.)
 	validate: function() {
 
-		var prevKey = null;
+		var valid = true;
 
-		if ( this.keys.length === 0 ) {
-			console.error( "  track is empty, no keys", this );
-			return;
-		}
+		var valueSize = this.getValueSize();
+		if ( valueSize - Math.floor( valueSize ) !== 0 ) {
 
-		for ( var i = 0; i < this.keys.length; i ++ ) {
-
-			var currKey = this.keys[i];
-
-			if ( ! currKey ) {
-				console.error( "  key is null in track", this, i );
-				return;
-			}
-
-			if ( ( typeof currKey.time ) !== 'number' || isNaN( currKey.time ) ) {
-				console.error( "  key.time is not a valid number", this, i, currKey );
-				return;
-			}
-
-			if ( currKey.value === undefined || currKey.value === null) {
-				console.error( "  key.value is null in track", this, i, currKey );
-				return;
-			}
-
-			if ( prevKey && prevKey.time > currKey.time ) {
-				console.error( "  key.time is less than previous key time, out of order keys", this, i, currKey, prevKey );
-				return;
-			}
-
-			prevKey = currKey;
+			console.error( "invalid value size in track", this );
+			valid = false;
 
 		}
 
-		return this;
+		var times = this.times,
+			values = this.values,
+
+			nKeys = times.length;
+
+		if( nKeys === 0 ) {
+
+			console.error( "track is empty", this );
+			valid = false;
+
+		}
+
+		var prevTime = null;
+
+		for( var i = 0; i !== nKeys; i ++ ) {
+
+			var currTime = times[ i ];
+
+			if ( typeof currTime === 'number' && isNaN( currTime ) ) {
+
+				console.error( "time is not a valid number", this, i, currTime );
+				valid = false;
+				break;
+
+			}
+
+			if( prevTime !== null && prevTime > currTime ) {
+
+				console.error( "out of order keys", this, i, currTime, prevTime );
+				valid = false;
+				break;
+
+			}
+
+			prevTime = currTime;
+
+		}
+
+		if ( values !== undefined ) {
+
+			if ( THREE.AnimationUtils.isTypedArray( values ) ) {
+
+				for ( var i = 0, n = values.length; i !== n; ++ i ) {
+
+					var value = values[ i ];
+
+					if ( isNaN( value ) ) {
+
+						console.error( "value is not a valid number", this, i, value );
+						valid = false;
+						break;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return valid;
 
 	},
 
-	// currently only removes equivalent sequential keys (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0), which are common in morph target animations
+	// removes equivalent sequential keys as common in morph target sequences
+	// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
 	optimize: function() {
 
-		var newKeys = [];
-		var prevKey = this.keys[0];
-		newKeys.push( prevKey );
+		var times = this.times,
+			values = this.values,
+			stride = this.getValueSize(),
 
-		var equalsFunc = THREE.AnimationUtils.getEqualsFunc( prevKey.value );
+			writeIndex = 1;
 
-		for ( var i = 1; i < this.keys.length - 1; i ++ ) {
-			var currKey = this.keys[i];
-			var nextKey = this.keys[i+1];
+		for( var i = 1, n = times.length - 1; i <= n; ++ i ) {
 
-			// if prevKey & currKey are the same time, remove currKey.  If you want immediate adjacent keys, use an epsilon offset
-			// it is not possible to have two keys at the same time as we sort them.  The sort is not stable on keys with the same time.
-			if ( ( prevKey.time === currKey.time ) ) {
+			var keep = false;
 
-				continue;
+			var time = times[ i ];
+			var timeNext = times[ i + 1 ];
+
+			// remove adjacent keyframes scheduled at the same time
+
+			if ( time !== timeNext && ( i !== 1 || time !== time[ 0 ] ) ) {
+
+				// remove unnecessary keyframes same as their neighbors
+				var offset = i * stride,
+					offsetP = offset - stride,
+					offsetN = offset + stride;
+
+				for ( var j = 0; j !== stride; ++ j ) {
+
+					var value = values[ offset + j ];
+
+					if ( value !== values[ offsetP + j ] ||
+							value !== values[ offsetN + j ] ) {
+
+						keep = true;
+						break;
+
+					}
+
+				}
 
 			}
 
-			// remove completely unnecessary keyframes that are the same as their prev and next keys
-			if ( this.compareValues( prevKey.value, currKey.value ) && this.compareValues( currKey.value, nextKey.value ) ) {
+			// in-place compaction
 
-				continue;
+			if ( keep ) {
+
+				if ( i !== writeIndex ) {
+
+					times[ writeIndex ] = times[ i ];
+
+					var readOffset = i * stride,
+						writeOffset = writeIndex * stride;
+
+					for ( var j = 0; j !== stride; ++ j ) {
+
+						values[ writeOffset + j ] = values[ readOffset + j ];
+
+					}
+
+
+				}
+
+				++ writeIndex;
 
 			}
 
-			// determine if interpolation is required
-			prevKey.constantToNext = this.compareValues( prevKey.value, currKey.value );
-
-			newKeys.push( currKey );
-			prevKey = currKey;
 		}
-		newKeys.push( this.keys[ this.keys.length - 1 ] );
 
-		this.keys = newKeys;
+		if ( writeIndex !== times.length ) {
+
+			this.times = THREE.AnimationUtils.arraySlice( times, 0, writeIndex );
+			this.values = THREE.AnimationUtils.arraySlice( values, 0, writeIndex * stride );
+
+		}
 
 		return this;
 
@@ -12889,112 +15141,570 @@ THREE.KeyframeTrack.prototype = {
 
 };
 
-THREE.KeyframeTrack.keyComparer = function keyComparator(key0, key1) {
-	return key0.time - key1.time;
-};
+// Static methods:
 
-THREE.KeyframeTrack.parse = function( json ) {
+Object.assign( THREE.KeyframeTrack, {
 
-	if ( json.type === undefined ) throw new Error( "track type undefined, can not parse" );
+	// Serialization (in static context, because of constructor invocation
+	// and automatic invocation of .toJSON):
 
-	var trackType = THREE.KeyframeTrack.GetTrackTypeForTypeName( json.type );
+	parse: function( json ) {
 
-	return trackType.parse( json );
+		if( json.type === undefined ) {
 
-};
+			throw new Error( "track type undefined, can not parse" );
 
-THREE.KeyframeTrack.GetTrackTypeForTypeName = function( typeName ) {
-	switch( typeName.toLowerCase() ) {
-	 	case "vector":
-	 	case "vector2":
-	 	case "vector3":
-	 	case "vector4":
-			return THREE.VectorKeyframeTrack;
+		}
 
-	 	case "quaternion":
-			return THREE.QuaternionKeyframeTrack;
+		var trackType = THREE.KeyframeTrack._getTrackTypeForValueTypeName( json.type );
 
-	 	case "integer":
-	 	case "scalar":
-	 	case "double":
-	 	case "float":
-	 	case "number":
-			return THREE.NumberKeyframeTrack;
+		if ( json.times === undefined ) {
 
-	 	case "bool":
-	 	case "boolean":
-			return THREE.BooleanKeyframeTrack;
+			console.warn( "legacy JSON format detected, converting" );
 
-	 	case "string":
-	 		return THREE.StringKeyframeTrack;
-	};
+			var times = [], values = [];
 
-	throw new Error( "Unsupported typeName: " + typeName );
-};
+			THREE.AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
+
+			json.times = times;
+			json.values = values;
+
+		}
+
+		// derived classes can define a static parse method
+		if ( trackType.parse !== undefined ) {
+
+			return trackType.parse( json );
+
+		} else {
+
+			// by default, we asssume a constructor compatible with the base
+			return new trackType(
+					json.name, json.times, json.values, json.interpolation );
+
+		}
+
+	},
+
+	toJSON: function( track ) {
+
+		var trackType = track.constructor;
+
+		var json;
+
+		// derived classes can define a static toJSON method
+		if ( trackType.toJSON !== undefined ) {
+
+			json = trackType.toJSON( track );
+
+		} else {
+
+			// by default, we assume the data can be serialized as-is
+			json = {
+
+				'name': track.name,
+				'times': THREE.AnimationUtils.convertArray( track.times, Array ),
+				'values': THREE.AnimationUtils.convertArray( track.values, Array )
+
+			};
+
+			var interpolation = track.getInterpolation();
+
+			if ( interpolation !== track.DefaultInterpolation ) {
+
+				json.interpolation = interpolation;
+
+			}
+
+		}
+
+		json.type = track.ValueTypeName; // mandatory
+
+		return json;
+
+	},
+
+	_getTrackTypeForValueTypeName: function( typeName ) {
+
+		switch( typeName.toLowerCase() ) {
+
+			case "scalar":
+			case "double":
+			case "float":
+			case "number":
+			case "integer":
+
+				return THREE.NumberKeyframeTrack;
+
+			case "vector":
+			case "vector2":
+			case "vector3":
+			case "vector4":
+
+				return THREE.VectorKeyframeTrack;
+
+			case "color":
+
+				return THREE.ColorKeyframeTrack;
+
+			case "quaternion":
+
+				return THREE.QuaternionKeyframeTrack;
+
+			case "bool":
+			case "boolean":
+
+				return THREE.BooleanKeyframeTrack;
+
+			case "string":
+
+				return THREE.StringKeyframeTrack;
+
+		};
+
+		throw new Error( "Unsupported typeName: " + typeName );
+
+	}
+
+} );
 
 // File:src/animation/PropertyBinding.js
 
 /**
  *
- * A track bound to a real value in the scene graph.
+ * A reference to a real property in the scene graph.
+ *
  *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
+ * @author tschw
  */
 
-THREE.PropertyBinding = function ( rootNode, trackName ) {
+THREE.PropertyBinding = function ( rootNode, path, parsedPath ) {
+
+	this.path = path;
+	this.parsedPath = parsedPath ||
+			THREE.PropertyBinding.parseTrackName( path );
+
+	this.node = THREE.PropertyBinding.findNode(
+			rootNode, this.parsedPath.nodeName ) || rootNode;
 
 	this.rootNode = rootNode;
-	this.trackName = trackName;
-	this.referenceCount = 0;
-	this.originalValue = null; // the value of the property before it was controlled by this binding
 
-	var parseResults = THREE.PropertyBinding.parseTrackName( trackName );
-
-	this.directoryName = parseResults.directoryName;
-	this.nodeName = parseResults.nodeName;
-	this.objectName = parseResults.objectName;
-	this.objectIndex = parseResults.objectIndex;
-	this.propertyName = parseResults.propertyName;
-	this.propertyIndex = parseResults.propertyIndex;
-
-	this.node = THREE.PropertyBinding.findNode( rootNode, this.nodeName ) || rootNode;
-
-	this.cumulativeValue = null;
-	this.cumulativeWeight = 0;
 };
 
 THREE.PropertyBinding.prototype = {
 
 	constructor: THREE.PropertyBinding,
 
-	reset: function() {
+	getValue: function getValue_unbound( targetArray, offset ) {
 
-		this.cumulativeValue = null;
-		this.cumulativeWeight = 0;
+		this.bind();
+		this.getValue( targetArray, offset );
+
+		// Note: This class uses a State pattern on a per-method basis:
+		// 'bind' sets 'this.getValue' / 'setValue' and shadows the
+		// prototype version of these methods with one that represents
+		// the bound state. When the property is not found, the methods
+		// become no-ops.
 
 	},
 
-	accumulate: function( value, weight ) {
+	setValue: function getValue_unbound( sourceArray, offset ) {
 
-		if ( ! this.isBound ) this.bind();
+		this.bind();
+		this.setValue( sourceArray, offset );
 
-		if ( this.cumulativeWeight === 0 ) {
+	},
 
-			if ( weight > 0 ) {
+	// create getter / setter pair for a property in the scene graph
+	bind: function() {
 
-				if ( this.cumulativeValue === null ) {
-					this.cumulativeValue = THREE.AnimationUtils.clone( value );
-				}
-				this.cumulativeWeight = weight;
+		var targetObject = this.node,
+			parsedPath = this.parsedPath,
+
+			objectName = parsedPath.objectName,
+			propertyName = parsedPath.propertyName,
+			propertyIndex = parsedPath.propertyIndex;
+
+		if ( ! targetObject ) {
+
+			targetObject = THREE.PropertyBinding.findNode(
+					this.rootNode, parsedPath.nodeName ) || this.rootNode;
+
+			this.node = targetObject;
+
+		}
+
+		// set fail state so we can just 'return' on error
+		this.getValue = this._getValue_unavailable;
+		this.setValue = this._setValue_unavailable;
+
+ 		// ensure there is a value node
+		if ( ! targetObject ) {
+
+			console.error( "  trying to update node for track: " + this.path + " but it wasn't found." );
+			return;
+
+		}
+
+		if( objectName ) {
+
+			var objectIndex = parsedPath.objectIndex;
+
+			// special cases were we need to reach deeper into the hierarchy to get the face materials....
+			switch ( objectName ) {
+
+				case 'materials':
+
+					if( ! targetObject.material ) {
+
+						console.error( '  can not bind to material as node does not have a material', this );
+						return;
+
+					}
+
+					if( ! targetObject.material.materials ) {
+
+						console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
+						return;
+
+					}
+
+					targetObject = targetObject.material.materials;
+
+					break;
+
+				case 'bones':
+
+					if( ! targetObject.skeleton ) {
+
+						console.error( '  can not bind to bones as node does not have a skeleton', this );
+						return;
+
+					}
+
+					// potential future optimization: skip this if propertyIndex is already an integer
+					// and convert the integer string to a true integer.
+
+					targetObject = targetObject.skeleton.bones;
+
+					// support resolving morphTarget names into indices.
+					for ( var i = 0; i < targetObject.length; i ++ ) {
+
+						if ( targetObject[i].name === objectIndex ) {
+
+							objectIndex = i;
+							break;
+
+						}
+
+					}
+
+					break;
+
+				default:
+
+					if ( targetObject[ objectName ] === undefined ) {
+
+						console.error( '  can not bind to objectName of node, undefined', this );
+						return;
+
+					}
+
+					targetObject = targetObject[ objectName ];
 
 			}
 
+
+			if ( objectIndex !== undefined ) {
+
+				if( targetObject[ objectIndex ] === undefined ) {
+
+					console.error( "  trying to bind to objectIndex of objectName, but is undefined:", this, targetObject );
+					return;
+
+				}
+
+				targetObject = targetObject[ objectIndex ];
+
+			}
+
+		}
+
+		// resolve property
+		var nodeProperty = targetObject[ propertyName ];
+
+		if ( ! nodeProperty ) {
+
+			var nodeName = parsedPath.nodeName;
+
+			console.error( "  trying to update property for track: " + nodeName +
+					'.' + propertyName + " but it wasn't found.", targetObject );
+			return;
+
+		}
+
+		// determine versioning scheme
+		var versioning = this.Versioning.None;
+
+		if ( targetObject.needsUpdate !== undefined ) { // material
+
+			versioning = this.Versioning.NeedsUpdate;
+			this.targetObject = targetObject;
+
+		} else if ( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
+
+			versioning = this.Versioning.MatrixWorldNeedsUpdate;
+			this.targetObject = targetObject;
+
+		}
+
+		// determine how the property gets bound
+		var bindingType = this.BindingType.Direct;
+
+		if ( propertyIndex !== undefined ) {
+			// access a sub element of the property array (only primitives are supported right now)
+
+			if ( propertyName === "morphTargetInfluences" ) {
+				// potential optimization, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
+
+				// support resolving morphTarget names into indices.
+				if ( ! targetObject.geometry ) {
+
+					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );
+					return;
+
+				}
+
+				if ( ! targetObject.geometry.morphTargets ) {
+
+					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );
+					return;
+
+				}
+
+				for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
+
+					if ( targetObject.geometry.morphTargets[i].name === propertyIndex ) {
+
+						propertyIndex = i;
+						break;
+
+					}
+
+				}
+
+			}
+
+			bindingType = this.BindingType.ArrayElement;
+
+			this.resolvedProperty = nodeProperty;
+			this.propertyIndex = propertyIndex;
+
+		} else if ( nodeProperty.fromArray !== undefined && nodeProperty.toArray !== undefined ) {
+			// must use copy for Object3D.Euler/Quaternion
+
+			bindingType = this.BindingType.HasFromToArray;
+
+			this.resolvedProperty = nodeProperty;
+
 		} else {
 
-			var lerpAlpha = weight / ( this.cumulativeWeight + weight );
-			this.cumulativeValue = this.lerpValue( this.cumulativeValue, value, lerpAlpha );
-			this.cumulativeWeight += weight;
+			this.propertyName = propertyName;
+
+		}
+
+		// select getter / setter
+		this.getValue = this.GetterByBindingType[ bindingType ];
+		this.setValue = this.SetterByBindingTypeAndVersioning[ bindingType ][ versioning ];
+
+	},
+
+	unbind: function() {
+
+		this.node = null;
+
+		// back to the prototype version of getValue / setValue
+		// note: avoiding to mutate the shape of 'this' via 'delete'
+		this.getValue = this._getValue_unbound;
+		this.setValue = this._setValue_unbound;
+
+	}
+
+};
+
+Object.assign( THREE.PropertyBinding.prototype, { // prototype, continued
+
+	// these are used to "bind" a nonexistent property
+	_getValue_unavailable: function() {},
+	_setValue_unavailable: function() {},
+
+	// initial state of these methods that calls 'bind'
+	_getValue_unbound: THREE.PropertyBinding.prototype.getValue,
+	_setValue_unbound: THREE.PropertyBinding.prototype.setValue,
+
+	BindingType: {
+		Direct: 0,
+		ArrayElement: 1,
+		HasFromToArray: 2
+	},
+
+	Versioning: {
+		None: 0,
+		NeedsUpdate: 1,
+		MatrixWorldNeedsUpdate: 2
+	},
+
+	GetterByBindingType: [
+
+		function getValue_direct( buffer, offset ) {
+
+			buffer[ offset ] = this.node[ this.propertyName ];
+
+		},
+
+		function getValue_arrayElement( buffer, offset ) {
+
+			buffer[ offset ] = this.resolvedProperty[ this.propertyIndex ];
+
+		},
+
+		function getValue_toArray( buffer, offset ) {
+
+			this.resolvedProperty.toArray( buffer, offset );
+
+		}
+
+	],
+
+	SetterByBindingTypeAndVersioning: [
+
+		[
+			// Direct
+
+			function setValue_direct( buffer, offset ) {
+
+				this.node[ this.propertyName ] = buffer[ offset ];
+
+			},
+
+			function setValue_direct_setNeedsUpdate( buffer, offset ) {
+
+				this.node[ this.propertyName ] = buffer[ offset ];
+				this.targetObject.needsUpdate = true;
+
+			},
+
+			function setValue_direct_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+				this.node[ this.propertyName ] = buffer[ offset ];
+				this.targetObject.matrixWorldNeedsUpdate = true;
+
+			}
+
+		], [
+
+			// ArrayElement
+
+			function setValue_arrayElement( buffer, offset ) {
+
+				this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
+
+			},
+
+			function setValue_arrayElement_setNeedsUpdate( buffer, offset ) {
+
+				this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
+				this.targetObject.needsUpdate = true;
+
+			},
+
+			function setValue_arrayElement_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+				this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
+				this.targetObject.matrixWorldNeedsUpdate = true;
+
+			}
+
+		], [
+
+			// HasToFromArray
+
+			function setValue_fromArray( buffer, offset ) {
+
+				this.resolvedProperty.fromArray( buffer, offset );
+
+			},
+
+			function setValue_fromArray_setNeedsUpdate( buffer, offset ) {
+
+				this.resolvedProperty.fromArray( buffer, offset );
+				this.targetObject.needsUpdate = true;
+
+			},
+
+			function setValue_fromArray_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+				this.resolvedProperty.fromArray( buffer, offset );
+				this.targetObject.matrixWorldNeedsUpdate = true;
+
+			}
+
+		]
+
+	]
+
+} );
+
+THREE.PropertyBinding.Composite =
+		function( targetGroup, path, optionalParsedPath ) {
+
+	var parsedPath = optionalParsedPath ||
+			THREE.PropertyBinding.parseTrackName( path );
+
+	this._targetGroup = targetGroup;
+	this._bindings = targetGroup.subscribe_( path, parsedPath );
+
+};
+
+THREE.PropertyBinding.Composite.prototype = {
+
+	constructor: THREE.PropertyBinding.Composite,
+
+	getValue: function( array, offset ) {
+
+		this.bind(); // bind all binding
+
+		var firstValidIndex = this._targetGroup.nCachedObjects_,
+			binding = this._bindings[ firstValidIndex ];
+
+		// and only call .getValue on the first
+		if ( binding !== undefined ) binding.getValue( array, offset );
+
+	},
+
+	setValue: function( array, offset ) {
+
+		var bindings = this._bindings;
+
+		for ( var i = this._targetGroup.nCachedObjects_,
+				n = bindings.length; i !== n; ++ i ) {
+
+			bindings[ i ].setValue( array, offset );
+
+		}
+
+	},
+
+	bind: function() {
+
+		var bindings = this._bindings;
+
+		for ( var i = this._targetGroup.nCachedObjects_,
+				n = bindings.length; i !== n; ++ i ) {
+
+			bindings[ i ].bind();
 
 		}
 
@@ -13002,211 +15712,32 @@ THREE.PropertyBinding.prototype = {
 
 	unbind: function() {
 
-		if ( ! this.isBound ) return;
+		var bindings = this._bindings;
 
-		this.setValue( this.originalValue );
+		for ( var i = this._targetGroup.nCachedObjects_,
+				n = bindings.length; i !== n; ++ i ) {
 
-		this.setValue = null;
-		this.getValue = null;
-		this.lerpValue = null;
-		this.equalsValue = null;
-		this.triggerDirty = null;
-		this.isBound = false;
-
-	},
-
-	// bind to the real property in the scene graph, remember original value, memorize various accessors for speed/inefficiency
-	bind: function() {
-
-		if ( this.isBound ) return;
-
-		var targetObject = this.node;
-
- 		// ensure there is a value node
-		if ( ! targetObject ) {
-			console.error( "  trying to update node for track: " + this.trackName + " but it wasn't found." );
-			return;
-		}
-
-		if ( this.objectName ) {
-			// special case were we need to reach deeper into the hierarchy to get the face materials....
-			if ( this.objectName === "materials" ) {
-				if ( ! targetObject.material ) {
-					console.error( '  can not bind to material as node does not have a material', this );
-					return;
-				}
-				if ( ! targetObject.material.materials ) {
-					console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
-					return;
-				}
-				targetObject = targetObject.material.materials;
-			} else if ( this.objectName === "bones" ) {
-				if ( ! targetObject.skeleton ) {
-					console.error( '  can not bind to bones as node does not have a skeleton', this );
-					return;
-				}
-				// potential future optimization: skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
-
-				targetObject = targetObject.skeleton.bones;
-
-				// support resolving morphTarget names into indices.
-				for ( var i = 0; i < targetObject.length; i ++ ) {
-					if ( targetObject[i].name === this.objectIndex ) {
-						this.objectIndex = i;
-						break;
-					}
-				}
-			} else {
-
-				if ( targetObject[ this.objectName ] === undefined ) {
-					console.error( '  can not bind to objectName of node, undefined', this );
-					return;
-				}
-				targetObject = targetObject[ this.objectName ];
-			}
-
-			if ( this.objectIndex !== undefined ) {
-				if ( targetObject[ this.objectIndex ] === undefined ) {
-					console.error( "  trying to bind to objectIndex of objectName, but is undefined:", this, targetObject );
-					return;
-				}
-
-				targetObject = targetObject[ this.objectIndex ];
-			}
+			bindings[ i ].unbind();
 
 		}
 
- 		// special case mappings
- 		var nodeProperty = targetObject[ this.propertyName ];
-		if ( ! nodeProperty ) {
-			console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );
-			return;
-		}
-
-		// access a sub element of the property array (only primitives are supported right now)
-		if ( this.propertyIndex !== undefined ) {
-
-			if ( this.propertyName === "morphTargetInfluences" ) {
-				// potential optimization, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
-
-				// support resolving morphTarget names into indices.
-				if ( ! targetObject.geometry ) {
-					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );
-				}
-				if ( ! targetObject.geometry.morphTargets ) {
-					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );
-				}
-
-				for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
-					if ( targetObject.geometry.morphTargets[i].name === this.propertyIndex ) {
-						this.propertyIndex = i;
-						break;
-					}
-				}
-			}
-
-			this.setValue = function setValue_propertyIndexed( value ) {
-				if ( ! this.equalsValue( nodeProperty[ this.propertyIndex ], value ) ) {
-					nodeProperty[ this.propertyIndex ] = value;
-					return true;
-				}
-				return false;
-			};
-
-			this.getValue = function getValue_propertyIndexed() {
-				return nodeProperty[ this.propertyIndex ];
-			};
-
-		}
-		// must use copy for Object3D.Euler/Quaternion
-		else if ( nodeProperty.copy ) {
-
-			this.setValue = function setValue_propertyObject( value ) {
-				if ( ! this.equalsValue( nodeProperty, value ) ) {
-					nodeProperty.copy( value );
-					return true;
-				}
-				return false;
-			}
-
-			this.getValue = function getValue_propertyObject() {
-				return nodeProperty;
-			};
-
-		}
-		// otherwise just set the property directly on the node (do not use nodeProperty as it may not be a reference object)
-		else {
-
-			this.setValue = function setValue_property( value ) {
-				if ( ! this.equalsValue( targetObject[ this.propertyName ], value ) ) {
-					targetObject[ this.propertyName ] = value;
-					return true;
-				}
-				return false;
-			}
-
-			this.getValue = function getValue_property() {
-				return targetObject[ this.propertyName ];
-			};
-
-		}
-
-		// trigger node dirty
-		if ( targetObject.needsUpdate !== undefined ) { // material
-
-			this.triggerDirty = function triggerDirty_needsUpdate() {
-				this.node.needsUpdate = true;
-			}
-
-		} else if ( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
-
-			this.triggerDirty = function triggerDirty_matrixWorldNeedsUpdate() {
-				targetObject.matrixWorldNeedsUpdate = true;
-			}
-
-		}
-
-		this.originalValue = this.getValue();
-
-		this.equalsValue = THREE.AnimationUtils.getEqualsFunc( this.originalValue );
-		this.lerpValue = THREE.AnimationUtils.getLerpFunc( this.originalValue, true );
-
-		this.isBound = true;
-
-	},
-
-	apply: function() {
-
-		// for speed capture the setter pattern as a closure (sort of a memoization pattern: https://en.wikipedia.org/wiki/Memoization)
-		if ( ! this.isBound ) this.bind();
-
-		// early exit if there is nothing to apply.
-		if ( this.cumulativeWeight > 0 ) {
-
-			// blend with original value
-			if ( this.cumulativeWeight < 1 ) {
-
-				var remainingWeight = 1 - this.cumulativeWeight;
-				var lerpAlpha = remainingWeight / ( this.cumulativeWeight + remainingWeight );
-				this.cumulativeValue = this.lerpValue( this.cumulativeValue, this.originalValue, lerpAlpha );
-
-			}
-
-			var valueChanged = this.setValue( this.cumulativeValue );
-
-			if ( valueChanged && this.triggerDirty ) {
-				this.triggerDirty();
-			}
-
-			// reset accumulator
-			this.cumulativeValue = null;
-			this.cumulativeWeight = 0;
-
-		}
 	}
 
 };
 
+THREE.PropertyBinding.create = function( root, path, parsedPath ) {
+
+	if ( ! ( root instanceof THREE.AnimationObjectGroup ) ) {
+
+		return new THREE.PropertyBinding( root, path, parsedPath );
+
+	} else {
+
+		return new THREE.PropertyBinding.Composite( root, path, parsedPath );
+
+	}
+
+};
 
 THREE.PropertyBinding.parseTrackName = function( trackName ) {
 
@@ -13224,7 +15755,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_. ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
 	var matches = re.exec(trackName);
 
-	if ( ! matches ) {
+	if( ! matches ) {
 		throw new Error( "cannot parse trackName at all: " + trackName );
 	}
 
@@ -13233,7 +15764,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
     }
 
 	var results = {
-		directoryName: matches[1],
+		// directoryName: matches[1], // (tschw) currently unused
 		nodeName: matches[3], 	// allowed to be null, specified root node.
 		objectName: matches[5],
 		objectIndex: matches[7],
@@ -13241,7 +15772,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 		propertyIndex: matches[11]	// allowed to be null, specifies that the whole property is set.
 	};
 
-	if ( results.propertyName === null || results.propertyName.length === 0 ) {
+	if( results.propertyName === null || results.propertyName.length === 0 ) {
 		throw new Error( "can not parse propertyName from trackName: " + trackName );
 	}
 
@@ -13251,59 +15782,35 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 
 THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
-	function searchSkeleton( skeleton ) {
-
-		for ( var i = 0; i < skeleton.bones.length; i ++ ) {
-
-			var bone = skeleton.bones[i];
-
-			if ( bone.name === nodeName ) {
-
-				return bone;
-
-			}
-		}
-
-		return null;
-
-	}
-
-	function searchNodeSubtree( children ) {
-
-		for ( var i = 0; i < children.length; i ++ ) {
-
-			var childNode = children[i];
-
-			if ( childNode.name === nodeName || childNode.uuid === nodeName ) {
-
-				return childNode;
-
-			}
-
-			var result = searchNodeSubtree( childNode.children );
-
-			if ( result ) return result;
-
-		}
-
-		return null;
-
-	}
-
-	//
-
-	if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
+	if( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
 
 		return root;
 
 	}
 
 	// search into skeleton bones.
-	if ( root.skeleton ) {
+	if( root.skeleton ) {
+
+		var searchSkeleton = function( skeleton ) {
+
+			for( var i = 0; i < skeleton.bones.length; i ++ ) {
+
+				var bone = skeleton.bones[i];
+
+				if( bone.name === nodeName ) {
+
+					return bone;
+
+				}
+			}
+
+			return null;
+
+		};
 
 		var bone = searchSkeleton( root.skeleton );
 
-		if ( bone ) {
+		if( bone ) {
 
 			return bone;
 
@@ -13311,11 +15818,33 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 	}
 
 	// search into node subtree.
-	if ( root.children ) {
+	if( root.children ) {
+
+		var searchNodeSubtree = function( children ) {
+
+			for( var i = 0; i < children.length; i ++ ) {
+
+				var childNode = children[i];
+
+				if( childNode.name === nodeName || childNode.uuid === nodeName ) {
+
+					return childNode;
+
+				}
+
+				var result = searchNodeSubtree( childNode.children );
+
+				if( result ) return result;
+
+			}
+
+			return null;
+
+		};
 
 		var subTreeNode = searchNodeSubtree( root.children );
 
-		if ( subTreeNode ) {
+		if( subTreeNode ) {
 
 			return subTreeNode;
 
@@ -13324,238 +15853,212 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 	}
 
 	return null;
+
 }
 
-// File:src/animation/tracks/VectorKeyframeTrack.js
+// File:src/animation/PropertyMixer.js
 
 /**
  *
- * A Track that interpolates Vectors
+ * Buffered scene graph property that allows weighted accumulation.
+ *
  *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
+ * @author tschw
  */
 
-THREE.VectorKeyframeTrack = function ( name, keys ) {
+THREE.PropertyMixer = function ( binding, typeName, valueSize ) {
 
-	THREE.KeyframeTrack.call( this, name, keys );
+	this.binding = binding;
+	this.valueSize = valueSize;
 
-	// local cache of value type to avoid allocations during runtime.
-	this.result = this.keys[0].value.clone();
+	var bufferType = Float64Array,
+		mixFunction;
 
-};
+	switch ( typeName ) {
 
-THREE.VectorKeyframeTrack.prototype = Object.create( THREE.KeyframeTrack.prototype );
+		case 'quaternion':			mixFunction = this._slerp;		break;
 
-THREE.VectorKeyframeTrack.prototype.constructor = THREE.VectorKeyframeTrack;
+		case 'string':
+		case 'bool':
 
-THREE.VectorKeyframeTrack.prototype.setResult = function( value ) {
+			bufferType = Array,		mixFunction = this._select;		break;
 
-	this.result.copy( value );
-
-};
-
-// memoization of the lerp function for speed.
-// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
-THREE.VectorKeyframeTrack.prototype.lerpValues = function( value0, value1, alpha ) {
-
-	return value0.lerp( value1, alpha );
-
-};
-
-THREE.VectorKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
-
-	return value0.equals( value1 );
-
-};
-
-THREE.VectorKeyframeTrack.prototype.clone = function() {
-
-	var clonedKeys = [];
-
-	for ( var i = 0; i < this.keys.length; i ++ ) {
-
-		var key = this.keys[i];
-		clonedKeys.push( {
-			time: key.time,
-			value: key.value.clone()
-		} );
-	}
-
-	return new THREE.VectorKeyframeTrack( this.name, clonedKeys );
-
-};
-
-THREE.VectorKeyframeTrack.parse = function( json ) {
-
-	var elementCount = json.keys[0].value.length;
-	var valueType = THREE[ 'Vector' + elementCount ];
-
-	var keys = [];
-
-	for ( var i = 0; i < json.keys.length; i ++ ) {
-		var jsonKey = json.keys[i];
-		keys.push( {
-			value: new valueType().fromArray( jsonKey.value ),
-			time: jsonKey.time
-		} );
-	}
-
-	return new THREE.VectorKeyframeTrack( json.name, keys );
-
-};
-
-// File:src/animation/tracks/QuaternionKeyframeTrack.js
-
-/**
- *
- * A Track that interpolates Quaternion
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- */
-
-THREE.QuaternionKeyframeTrack = function ( name, keys ) {
-
-	THREE.KeyframeTrack.call( this, name, keys );
-
-	// local cache of value type to avoid allocations during runtime.
-	this.result = this.keys[0].value.clone();
-
-};
-
-THREE.QuaternionKeyframeTrack.prototype = Object.create( THREE.KeyframeTrack.prototype );
-
-THREE.QuaternionKeyframeTrack.prototype.constructor = THREE.QuaternionKeyframeTrack;
-
-THREE.QuaternionKeyframeTrack.prototype.setResult = function( value ) {
-
-	this.result.copy( value );
-
-};
-
-// memoization of the lerp function for speed.
-// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
-THREE.QuaternionKeyframeTrack.prototype.lerpValues = function( value0, value1, alpha ) {
-
-	return value0.slerp( value1, alpha );
-
-};
-
-THREE.QuaternionKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
-
-	return value0.equals( value1 );
-
-};
-
-THREE.QuaternionKeyframeTrack.prototype.multiply = function( quat ) {
-
-	for ( var i = 0; i < this.keys.length; i ++ ) {
-
-		this.keys[i].value.multiply( quat );
+		default:					mixFunction = this._lerp;
 
 	}
 
-	return this;
+	this.buffer = new bufferType( valueSize * 4 );
+	// layout: [ incoming | accu0 | accu1 | orig ]
+	//
+	// interpolators can use .buffer as their .result
+	// the data then goes to 'incoming'
+	//
+	// 'accu0' and 'accu1' are used frame-interleaved for
+	// the cumulative result and are compared to detect
+	// changes
+	//
+	// 'orig' stores the original state of the property
+
+	this._mixBufferRegion = mixFunction;
+
+	this.cumulativeWeight = 0;
+
+	this.useCount = 0;
+	this.referenceCount = 0;
 
 };
 
-THREE.QuaternionKeyframeTrack.prototype.clone = function() {
+THREE.PropertyMixer.prototype = {
 
-	var clonedKeys = [];
+	constructor: THREE.PropertyMixer,
 
-	for ( var i = 0; i < this.keys.length; i ++ ) {
+	// accumulate data in the 'incoming' region into 'accu<i>'
+	accumulate: function( accuIndex, weight ) {
 
-		var key = this.keys[i];
-		clonedKeys.push( {
-			time: key.time,
-			value: key.value.clone()
-		} );
+		// note: happily accumulating nothing when weight = 0, the caller knows
+		// the weight and shouldn't have made the call in the first place
+
+		var buffer = this.buffer,
+			stride = this.valueSize,
+			offset = accuIndex * stride + stride,
+
+			currentWeight = this.cumulativeWeight;
+
+		if ( currentWeight === 0 ) {
+
+			// accuN := incoming * weight
+
+			for ( var i = 0; i !== stride; ++ i ) {
+
+				buffer[ offset + i ] = buffer[ i ];
+
+			}
+
+			currentWeight = weight;
+
+		} else {
+
+			// accuN := accuN + incoming * weight
+
+			currentWeight += weight;
+			var mix = weight / currentWeight;
+			this._mixBufferRegion( buffer, offset, 0, mix, stride );
+
+		}
+
+		this.cumulativeWeight = currentWeight;
+
+	},
+
+	// apply the state of 'accu<i>' to the binding when accus differ
+	apply: function( accuIndex ) {
+
+		var stride = this.valueSize,
+			buffer = this.buffer,
+			offset = accuIndex * stride + stride,
+
+			weight = this.cumulativeWeight,
+
+			binding = this.binding;
+
+		this.cumulativeWeight = 0;
+
+		if ( weight < 1 ) {
+
+			// accuN := accuN + original * ( 1 - cumulativeWeight )
+
+			var originalValueOffset = stride * 3;
+
+			this._mixBufferRegion(
+					buffer, offset, originalValueOffset, 1 - weight, stride );
+
+		}
+
+		for ( var i = stride, e = stride + stride; i !== e; ++ i ) {
+
+			if ( buffer[ i ] !== buffer[ i + stride ] ) {
+
+				// value has changed -> update scene graph
+
+				binding.setValue( buffer, offset );
+				break;
+
+			}
+
+		}
+
+	},
+
+	// remember the state of the bound property and copy it to both accus
+	saveOriginalState: function() {
+
+		var binding = this.binding;
+
+		var buffer = this.buffer,
+			stride = this.valueSize,
+
+			originalValueOffset = stride * 3;
+
+		binding.getValue( buffer, originalValueOffset );
+
+		// accu[0..1] := orig -- initially detect changes against the original
+		for ( var i = stride, e = originalValueOffset; i !== e; ++ i ) {
+
+			buffer[ i ] = buffer[ originalValueOffset + ( i % stride ) ];
+
+		}
+
+		this.cumulativeWeight = 0;
+
+	},
+
+	// apply the state previously taken via 'saveOriginalState' to the binding
+	restoreOriginalState: function() {
+
+		var originalValueOffset = this.valueSize * 3;
+		this.binding.setValue( this.buffer, originalValueOffset );
+
+	},
+
+
+	// mix functions
+
+	_select: function( buffer, dstOffset, srcOffset, t, stride ) {
+
+		if ( t >= 0.5 ) {
+
+			for ( var i = 0; i !== stride; ++ i ) {
+
+				buffer[ dstOffset + i ] = buffer[ srcOffset + i ];
+
+			}
+
+		}
+
+	},
+
+	_slerp: function( buffer, dstOffset, srcOffset, t, stride ) {
+
+		THREE.Quaternion.slerpFlat( buffer, dstOffset,
+				buffer, dstOffset, buffer, srcOffset, t );
+
+	},
+
+	_lerp: function( buffer, dstOffset, srcOffset, t, stride ) {
+
+		var s = 1 - t;
+
+		for ( var i = 0; i !== stride; ++ i ) {
+
+			var j = dstOffset + i;
+
+			buffer[ j ] = buffer[ j ] * s + buffer[ srcOffset + i ] * t;
+
+		}
+
 	}
-
-	return new THREE.QuaternionKeyframeTrack( this.name, clonedKeys );
-
-};
-
-THREE.QuaternionKeyframeTrack.parse = function( json ) {
-
-	var keys = [];
-
-	for ( var i = 0; i < json.keys.length; i ++ ) {
-		var jsonKey = json.keys[i];
-		keys.push( {
-			value: new THREE.Quaternion().fromArray( jsonKey.value ),
-			time: jsonKey.time
-		} );
-	}
-
-	return new THREE.QuaternionKeyframeTrack( json.name, keys );
-
-};
-
-// File:src/animation/tracks/StringKeyframeTrack.js
-
-/**
- *
- * A Track that interpolates Strings
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- */
-
-THREE.StringKeyframeTrack = function ( name, keys ) {
-
-	THREE.KeyframeTrack.call( this, name, keys );
-
-	// local cache of value type to avoid allocations during runtime.
-	this.result = this.keys[0].value;
-
-};
-
-THREE.StringKeyframeTrack.prototype = Object.create( THREE.KeyframeTrack.prototype );
-
-THREE.StringKeyframeTrack.prototype.constructor = THREE.StringKeyframeTrack;
-
-THREE.StringKeyframeTrack.prototype.setResult = function( value ) {
-
-	this.result = value;
-
-};
-
-// memoization of the lerp function for speed.
-// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
-THREE.StringKeyframeTrack.prototype.lerpValues = function( value0, value1, alpha ) {
-
-	return ( alpha < 1.0 ) ? value0 : value1;
-
-};
-
-THREE.StringKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
-
-	return ( value0 === value1 );
-
-};
-
-THREE.StringKeyframeTrack.prototype.clone = function() {
-
-	var clonedKeys = [];
-
-	for ( var i = 0; i < this.keys.length; i ++ ) {
-
-		var key = this.keys[i];
-		clonedKeys.push( {
-			time: key.time,
-			value: key.value
-		} );
-	}
-
-	return new THREE.StringKeyframeTrack( this.name, clonedKeys );
-
-};
-
-THREE.StringKeyframeTrack.parse = function( json ) {
-
-	return new THREE.StringKeyframeTrack( json.name, json.keys );
 
 };
 
@@ -13563,133 +16066,172 @@ THREE.StringKeyframeTrack.parse = function( json ) {
 
 /**
  *
- * A Track that interpolates Boolean
+ * A Track of Boolean keyframe values.
+ *
  *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
+ * @author tschw
  */
 
-THREE.BooleanKeyframeTrack = function ( name, keys ) {
+THREE.BooleanKeyframeTrack = function ( name, times, values ) {
 
-	THREE.KeyframeTrack.call( this, name, keys );
-
-	// local cache of value type to avoid allocations during runtime.
-	this.result = this.keys[0].value;
+	THREE.KeyframeTrack.call( this, name, times, values );
 
 };
 
-THREE.BooleanKeyframeTrack.prototype = Object.create( THREE.KeyframeTrack.prototype );
+THREE.BooleanKeyframeTrack.prototype =
+		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
 
-THREE.BooleanKeyframeTrack.prototype.constructor = THREE.BooleanKeyframeTrack;
+	constructor: THREE.BooleanKeyframeTrack,
 
-THREE.BooleanKeyframeTrack.prototype.setResult = function( value ) {
+	ValueTypeName: 'bool',
+	ValueBufferType: Array,
 
-	this.result = value;
+	DefaultInterpolation: THREE.IntepolateDiscrete,
 
-};
+	InterpolantFactoryMethodLinear: undefined,
+	InterpolantFactoryMethodSmooth: undefined
 
-// memoization of the lerp function for speed.
-// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
-THREE.BooleanKeyframeTrack.prototype.lerpValues = function( value0, value1, alpha ) {
+	// Note: Actually this track could have a optimized / compressed
+	// representation of a single value and a custom interpolant that
+	// computes "firstValue ^ isOdd( index )".
 
-	return ( alpha < 1.0 ) ? value0 : value1;
-
-};
-
-THREE.BooleanKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
-
-	return ( value0 === value1 );
-
-};
-
-THREE.BooleanKeyframeTrack.prototype.clone = function() {
-
-	var clonedKeys = [];
-
-	for ( var i = 0; i < this.keys.length; i ++ ) {
-
-		var key = this.keys[i];
-		clonedKeys.push( {
-			time: key.time,
-			value: key.value
-		} );
-	}
-
-	return new THREE.BooleanKeyframeTrack( this.name, clonedKeys );
-
-};
-
-THREE.BooleanKeyframeTrack.parse = function( json ) {
-
-	return new THREE.BooleanKeyframeTrack( json.name, json.keys );
-
-};
+} );
 
 // File:src/animation/tracks/NumberKeyframeTrack.js
 
 /**
  *
- * A Track that interpolates Numbers
+ * A Track of numeric keyframe values.
  *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
+ * @author tschw
  */
 
-THREE.NumberKeyframeTrack = function ( name, keys ) {
+THREE.NumberKeyframeTrack = function ( name, times, values, interpolation ) {
 
-	THREE.KeyframeTrack.call( this, name, keys );
-
-	// local cache of value type to avoid allocations during runtime.
-	this.result = this.keys[0].value;
+	THREE.KeyframeTrack.call( this, name, times, values, interpolation );
 
 };
 
-THREE.NumberKeyframeTrack.prototype = Object.create( THREE.KeyframeTrack.prototype );
+THREE.NumberKeyframeTrack.prototype =
+		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
 
-THREE.NumberKeyframeTrack.prototype.constructor = THREE.NumberKeyframeTrack;
+	constructor: THREE.NumberKeyframeTrack,
 
-THREE.NumberKeyframeTrack.prototype.setResult = function( value ) {
+	ValueTypeName: 'number',
 
-	this.result = value;
+	// ValueBufferType is inherited
 
-};
+	// DefaultInterpolation is inherited
 
-// memoization of the lerp function for speed.
-// NOTE: Do not optimize as a prototype initialization closure, as value0 will be different on a per class basis.
-THREE.NumberKeyframeTrack.prototype.lerpValues = function( value0, value1, alpha ) {
+} );
 
-	return value0 * ( 1 - alpha ) + value1 * alpha;
+// File:src/animation/tracks/QuaternionKeyframeTrack.js
 
-};
+/**
+ *
+ * A Track of quaternion keyframe values.
+ *
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ * @author tschw
+ */
 
-THREE.NumberKeyframeTrack.prototype.compareValues = function( value0, value1 ) {
+THREE.QuaternionKeyframeTrack = function ( name, times, values, interpolation ) {
 
-	return ( value0 === value1 );
-
-};
-
-THREE.NumberKeyframeTrack.prototype.clone = function() {
-
-	var clonedKeys = [];
-
-	for ( var i = 0; i < this.keys.length; i ++ ) {
-
-		var key = this.keys[i];
-		clonedKeys.push( {
-			time: key.time,
-			value: key.value
-		} );
-	}
-
-	return new THREE.NumberKeyframeTrack( this.name, clonedKeys );
+	THREE.KeyframeTrack.call( this, name, times, values, interpolation );
 
 };
 
-THREE.NumberKeyframeTrack.parse = function( json ) {
+THREE.QuaternionKeyframeTrack.prototype =
+		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
 
-	return new THREE.NumberKeyframeTrack( json.name, json.keys );
+	constructor: THREE.QuaternionKeyframeTrack,
+
+	ValueTypeName: 'quaternion',
+
+	// ValueBufferType is inherited
+
+	DefaultInterpolation: THREE.InterpolateLinear,
+
+	InterpolantFactoryMethodLinear: function( result ) {
+
+		return new THREE.QuaternionLinearInterpolant(
+				this.times, this.values, this.getValueSize(), result );
+
+	},
+
+	InterpolantFactoryMethodSmooth: undefined // not yet implemented
+
+} );
+
+// File:src/animation/tracks/StringKeyframeTrack.js
+
+/**
+ *
+ * A Track that interpolates Strings
+ *
+ *
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ * @author tschw
+ */
+
+THREE.StringKeyframeTrack = function ( name, times, values, interpolation ) {
+
+	THREE.KeyframeTrack.call( this, name, times, values, interpolation );
 
 };
+
+THREE.StringKeyframeTrack.prototype =
+		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
+
+	constructor: THREE.StringKeyframeTrack,
+
+	ValueTypeName: 'string',
+	ValueBufferType: Array,
+
+	DefaultInterpolation: THREE.IntepolateDiscrete,
+
+	InterpolantFactoryMethodLinear: undefined,
+
+	InterpolantFactoryMethodSmooth: undefined
+
+} );
+
+// File:src/animation/tracks/VectorKeyframeTrack.js
+
+/**
+ *
+ * A Track of vectored keyframe values.
+ *
+ *
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ * @author tschw
+ */
+
+THREE.VectorKeyframeTrack = function ( name, times, values, interpolation ) {
+
+	THREE.KeyframeTrack.call( this, name, times, values, interpolation );
+
+};
+
+THREE.VectorKeyframeTrack.prototype =
+		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
+
+	constructor: THREE.VectorKeyframeTrack,
+
+	ValueTypeName: 'vector'
+
+	// ValueBufferType is inherited
+
+	// DefaultInterpolation is inherited
+
+} );
 
 // File:src/cameras/Camera.js
 
