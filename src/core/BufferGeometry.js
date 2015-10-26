@@ -826,7 +826,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeOffsets: function ( size ) {
 
-		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.')
+		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.');
 
 	},
 
