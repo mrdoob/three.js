@@ -4308,6 +4308,53 @@ THREE.Box3.prototype = {
 
 	},
 
+	intersectsPlane: function ( plane ) {
+
+		// We compute the minimum and maximum dot product values. If those values
+		// are on the same side (back or front) of the plane, then there is no intersection.
+
+		var min, max;
+
+		if( plane.normal.x > 0 ) {
+
+			min = plane.normal.x * this.min.x;
+			max = plane.normal.x * this.max.x;
+
+		} else {
+
+			min = plane.normal.x * this.max.x;
+			max = plane.normal.x * this.min.x;
+
+		}
+
+		if( plane.normal.y > 0 ) {
+
+			min += plane.normal.y * this.min.y;
+			max += plane.normal.y * this.max.y;
+
+		} else {
+
+			min += plane.normal.y * this.max.y;
+			max += plane.normal.y * this.min.y;
+
+		}
+
+		if( plane.normal.z > 0 ) {
+
+			min += plane.normal.z * this.min.z;
+			max += plane.normal.z * this.max.z;
+
+		} else {
+
+			min += plane.normal.z * this.max.z;
+			max += plane.normal.z * this.min.z;
+
+		}
+
+		return ( min <= plane.constant && max >= plane.constant );
+
+	},
+
 	clampPoint: function ( point, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
@@ -6420,6 +6467,20 @@ THREE.Sphere.prototype = {
 
 	},
 
+	intersectsPlane: function ( plane ) {
+
+		// We use the following equation to compute the signed distance from
+		// the center of the sphere to the plane.
+		//
+		// distance = q * n - d
+		//
+		// If this distance is greater than the radius of the sphere,
+		// then there is no intersection.
+
+		return ( Math.abs( ( this.center.dot( plane.normal ) - plane.constant ) ) <= this.radius );
+
+	},
+
 	clampPoint: function ( point, optionalTarget ) {
 
 		var deltaLengthSq = this.center.distanceToSquared( point );
@@ -6839,6 +6900,18 @@ THREE.Plane.prototype = {
 		console.warn( 'THREE.Plane: .isIntersectionLine() has been renamed to .intersectsLine().' );
 
 		return this.intersectsLine( line );
+
+	},
+
+	intersectsBox: function ( box ) {
+
+		return box.intersectsPlane( this );
+
+	},
+
+	intersectsSphere: function ( sphere ) {
+
+		return sphere.intersectsPlane( this );
 
 	},
 
@@ -20643,7 +20716,12 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.morphTargets = false; // set to use morph targets
 	this.morphNormals = false; // set to use morph normals
 
-	this.derivatives = false; // set to use derivatives
+	this.extensions = {
+		derivatives: false, // set to use derivatives
+		fragDepth: false, // set to use fragment depth values
+		drawBuffers: false, // set to use draw buffers
+		shaderTextureLOD: false // set to use shader texture LOD
+	};
 
 	// When rendered geometry doesn't include these attributes but the material does,
 	// use these default values in WebGL. This avoids errors when buffer data is missing.
@@ -20700,7 +20778,7 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
 
-	this.derivatives = source.derivatives;
+	this.extensions = source.extensions;
 
 	return this;
 
@@ -20718,6 +20796,27 @@ THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+Object.defineProperties( THREE.ShaderMaterial.prototype, {
+
+	derivatives: {
+
+		get: function () {
+
+			return this.extensions.derivatives;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
+			this.extensions.derivatives = value;
+
+		}
+
+	}
+
+} );
 
 // File:src/materials/RawShaderMaterial.js
 
@@ -22707,7 +22806,7 @@ THREE.ShaderChunk[ 'alphatest_fragment'] = "#ifdef ALPHATEST\n	if ( diffuseColor
 
 // File:src/renderers/shaders/ShaderChunk/aomap_fragment.glsl
 
-THREE.ShaderChunk[ 'aomap_fragment'] = "#ifdef USE_AOMAP\n	totalAmbientLight *= ( texture2D( aoMap, vUv2 ).r - 1.0 ) * aoMapIntensity + 1.0;\n#endif\n";
+THREE.ShaderChunk[ 'aomap_fragment'] = "#ifdef USE_AOMAP\n	indirectReflectedLight.diffuse *= ( texture2D( aoMap, vUv2 ).r - 1.0 ) * aoMapIntensity + 1.0;\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/aomap_pars_fragment.glsl
 
@@ -22720,6 +22819,10 @@ THREE.ShaderChunk[ 'begin_vertex'] = "\nvec3 transformed = vec3( position );\n";
 // File:src/renderers/shaders/ShaderChunk/beginnormal_vertex.glsl
 
 THREE.ShaderChunk[ 'beginnormal_vertex'] = "\nvec3 objectNormal = vec3( normal );\n";
+
+// File:src/renderers/shaders/ShaderChunk/bsdfs.glsl
+
+THREE.ShaderChunk[ 'bsdfs'] = "float calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {\n	if ( decayExponent > 0.0 ) {\n	  return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );\n	}\n	return 1.0;\n}\nvec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\n	return diffuseColor;\n}\nvec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\n	float fresnel = exp2( ( -5.55437 * dotLH - 6.98316 ) * dotLH );\n	return ( 1.0 - specularColor ) * fresnel + specularColor;\n}\nfloat G_GGX_Smith( in float alpha, in float dotNL, in float dotNV ) {\n	float a2 = alpha * alpha;\n	float gl = dotNL + pow( a2 + ( 1.0 - a2 ) * dotNL * dotNL, 0.5 );\n	float gv = dotNV + pow( a2 + ( 1.0 - a2 ) * dotNV * dotNV, 0.5 );\n	return 1.0 / ( gl * gv );\n}\nfloat D_GGX( in float alpha, in float dotNH ) {\n	float a2 = alpha * alpha;\n	float denom = dotNH * dotNH * ( a2 - 1.0 ) + 1.0;\n	return a2 / ( denom * denom );\n}\nvec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n	\n	float alpha = roughness * roughness;\n	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n	float dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );\n	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n	float dotNH = saturate( dot( geometry.normal, halfDir ) );\n	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n	vec3 F = F_Schlick( specularColor, dotLH );\n	float G = G_GGX_Smith( alpha, dotNL, dotNV );\n	float D = D_GGX( alpha, dotNH );\n	return F * ( G * D );\n}\nvec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, vec3 specularColor, float roughness ) {\n	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n	const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );\n	const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );\n	vec4 r = roughness * c0 + c1;\n	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;\n	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;\n	return specularColor * AB.x + AB.y;\n}\nfloat G_BlinnPhong_Implicit( ) {\n	return 0.25;\n}\nfloat D_BlinnPhong( const in float shininess, const in float dotNH ) {\n	return ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n}\nvec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\n	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n	float dotNH = saturate( dot( geometry.normal, halfDir ) );\n	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n	vec3 F = F_Schlick( specularColor, dotLH );\n	float G = G_BlinnPhong_Implicit( );\n	float D = D_BlinnPhong( shininess, dotNH );\n	return F * ( G * D );\n} // validated";
 
 // File:src/renderers/shaders/ShaderChunk/bumpmap_pars_fragment.glsl
 
@@ -22743,7 +22846,7 @@ THREE.ShaderChunk[ 'color_vertex'] = "#ifdef USE_COLOR\n	vColor.xyz = color.xyz;
 
 // File:src/renderers/shaders/ShaderChunk/common.glsl
 
-THREE.ShaderChunk[ 'common'] = "#define PI 3.14159\n#define PI2 6.28318\n#define RECIPROCAL_PI2 0.15915494\n#define LOG2 1.442695\n#define EPSILON 1e-6\n#define saturate(a) clamp( a, 0.0, 1.0 )\n#define whiteCompliment(a) ( 1.0 - saturate( a ) )\nvec3 transformDirection( in vec3 normal, in mat4 matrix ) {\n	return normalize( ( matrix * vec4( normal, 0.0 ) ).xyz );\n}\nvec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {\n	return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );\n}\nvec3 projectOnPlane(in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n	float distance = dot( planeNormal, point - pointOnPlane );\n	return - distance * planeNormal + point;\n}\nfloat sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n	return sign( dot( point - pointOnPlane, planeNormal ) );\n}\nvec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {\n	return lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;\n}\nfloat calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {\n	if ( decayExponent > 0.0 ) {\n	  return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );\n	}\n	return 1.0;\n}\nvec3 F_Schlick( in vec3 specularColor, in float dotLH ) {\n	float fresnel = exp2( ( -5.55437 * dotLH - 6.98316 ) * dotLH );\n	return ( 1.0 - specularColor ) * fresnel + specularColor;\n}\nfloat G_BlinnPhong_Implicit( ) {\n	return 0.25;\n}\nfloat D_BlinnPhong( in float shininess, in float dotNH ) {\n	return ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n}\nvec3 BRDF_BlinnPhong( in vec3 specularColor, in float shininess, in vec3 normal, in vec3 lightDir, in vec3 viewDir ) {\n	vec3 halfDir = normalize( lightDir + viewDir );\n	float dotNH = saturate( dot( normal, halfDir ) );\n	float dotLH = saturate( dot( lightDir, halfDir ) );\n	vec3 F = F_Schlick( specularColor, dotLH );\n	float G = G_BlinnPhong_Implicit( );\n	float D = D_BlinnPhong( shininess, dotNH );\n	return F * G * D;\n}\nfloat G_GGX_Smith( in float alpha, in float dotNL, in float dotNV ) {\n	float a2 = alpha * alpha;\n	float gl = dotNL + pow( a2 + ( 1.0 - a2 ) * dotNL * dotNL, 0.5 );\n	float gv = dotNV + pow( a2 + ( 1.0 - a2 ) * dotNV * dotNV, 0.5 );\n	return 1.0 / ( gl * gv );\n}\nfloat D_GGX( in float alpha, in float dotNH ) {\n	float a2 = alpha * alpha;\n	float denom = dotNH * dotNH * ( a2 - 1.0 ) + 1.0;\n	return a2 / ( denom * denom );\n}\nvec3 BRDF_GGX( in vec3 specularColor, in float roughness, in vec3 normal, in vec3 lightDir, in vec3 viewDir ) {\n	float alpha = roughness * roughness;\n	vec3 halfDir = normalize( lightDir + viewDir );\n	float dotNL = saturate( dot( normal, lightDir ) );\n	float dotNV = saturate( dot( normal, viewDir ) );\n	float dotNH = saturate( dot( normal, halfDir ) );\n	float dotLH = saturate( dot( lightDir, halfDir ) );\n	vec3 F = F_Schlick( specularColor, dotLH );\n	float G = G_GGX_Smith( alpha, dotNL, dotNV );\n	float D = D_GGX( alpha, dotNH );\n	return F * G * D;\n}\nvec3 BRDF_Lambert( in vec3 diffuseColor ) {\n	return diffuseColor;\n}\nvec3 envBRDFApprox( vec3 specularColor, float roughness, in vec3 normal, in vec3 viewDir  ) {\n	float dotNV = saturate( dot( normal, viewDir ) );\n	const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );\n	const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );\n	vec4 r = roughness * c0 + c1;\n	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;\n	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;\n	return specularColor * AB.x + AB.y;\n}\nvec3 inputToLinear( in vec3 a ) {\n	#ifdef GAMMA_INPUT\n		return pow( a, vec3( float( GAMMA_FACTOR ) ) );\n	#else\n		return a;\n	#endif\n}\nvec3 linearToOutput( in vec3 a ) {\n	#ifdef GAMMA_OUTPUT\n		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );\n	#else\n		return a;\n	#endif\n}\n";
+THREE.ShaderChunk[ 'common'] = "#define PI 3.14159\n#define PI2 6.28318\n#define RECIPROCAL_PI 0.31830988618\n#define RECIPROCAL_PI2 0.15915494\n#define LOG2 1.442695\n#define EPSILON 1e-6\n#define saturate(a) clamp( a, 0.0, 1.0 )\n#define whiteCompliment(a) ( 1.0 - saturate( a ) )\nfloat average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }\nstruct IncidentLight {\n 	vec3 color;\n 	vec3 direction;\n};\nstruct ReflectedLight {\n 	vec3 specular;\n 	vec3 diffuse;\n};\nstruct GeometricContext {\n	vec3 position;\n	vec3 normal;\n	vec3 viewDir;\n};\nvec3 transformDirection( in vec3 normal, in mat4 matrix ) {\n	return normalize( ( matrix * vec4( normal, 0.0 ) ).xyz );\n}\nvec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {\n	return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );\n}\nvec3 projectOnPlane(in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n	float distance = dot( planeNormal, point - pointOnPlane );\n	return - distance * planeNormal + point;\n}\nfloat sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n	return sign( dot( point - pointOnPlane, planeNormal ) );\n}\nvec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {\n	return lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;\n}\nvec3 inputToLinear( in vec3 a ) {\n	#ifdef GAMMA_INPUT\n		return pow( a, vec3( float( GAMMA_FACTOR ) ) );\n	#else\n		return a;\n	#endif\n}\nvec3 linearToOutput( in vec3 a ) {\n	#ifdef GAMMA_OUTPUT\n		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );\n	#else\n		return a;\n	#endif\n}\n";
 
 // File:src/renderers/shaders/ShaderChunk/defaultnormal_vertex.glsl
 
@@ -22777,10 +22880,6 @@ THREE.ShaderChunk[ 'envmap_pars_fragment'] = "#ifdef USE_ENVMAP\n	uniform float 
 
 THREE.ShaderChunk[ 'envmap_pars_vertex'] = "#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP ) && ! defined( PHONG ) && ! defined( PHYSICAL )\n	varying vec3 vReflect;\n	uniform float refractionRatio;\n#endif\n";
 
-// File:src/renderers/shaders/ShaderChunk/envmap_physical_fragment.glsl
-
-THREE.ShaderChunk[ 'envmap_physical_fragment'] = "#ifdef USE_ENVMAP\n	float reflectivityFactor = reflectivity;\n	vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );\n	vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n	#ifdef ENVMAP_MODE_REFLECTION\n		vec3 reflectVec = reflect( cameraToVertex, worldNormal );\n	#else\n		vec3 reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );\n	#endif\n	#ifdef DOUBLE_SIDED\n		float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n	#else\n		float flipNormal = 1.0;\n	#endif\n	#ifdef ENVMAP_TYPE_CUBE\n		#if defined( TEXTURE_CUBE_LOD_EXT )\n			float bias = pow( roughness, 0.5 ) * 7.0;\n			vec4 envMapColor = textureCubeLodEXT( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), bias );\n		#else\n			vec4 envMapColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n		#endif\n	#elif defined( ENVMAP_TYPE_EQUIREC )\n		vec2 sampleUV;\n		sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n		vec4 envMapColor = texture2D( envMap, sampleUV );\n	#elif defined( ENVMAP_TYPE_SPHERE )\n		vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n		vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );\n	#endif\n	envMapColor.rgb = inputToLinear( envMapColor.rgb );\n    outgoingLight += envBRDFApprox( specularColor, roughnessFactor, normal, viewDir  ) * envMapColor.rgb * envMapIntensity * reflectivityFactor;\n#endif\n";
-
 // File:src/renderers/shaders/ShaderChunk/envmap_vertex.glsl
 
 THREE.ShaderChunk[ 'envmap_vertex'] = "#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP ) && ! defined( PHONG ) && ! defined( PHYSICAL )\n	vec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );\n	vec3 worldNormal = inverseTransformDirection( transformedNormal, viewMatrix );\n	#ifdef ENVMAP_MODE_REFLECTION\n		vReflect = reflect( cameraToVertex, worldNormal );\n	#else\n		vReflect = refract( cameraToVertex, worldNormal, refractionRatio );\n	#endif\n#endif\n";
@@ -22793,33 +22892,25 @@ THREE.ShaderChunk[ 'fog_fragment'] = "#ifdef USE_FOG\n	#ifdef USE_LOGDEPTHBUF_EX
 
 THREE.ShaderChunk[ 'fog_pars_fragment'] = "#ifdef USE_FOG\n	uniform vec3 fogColor;\n	#ifdef FOG_EXP2\n		uniform float fogDensity;\n	#else\n		uniform float fogNear;\n		uniform float fogFar;\n	#endif\n#endif";
 
-// File:src/renderers/shaders/ShaderChunk/hemilight_fragment.glsl
+// File:src/renderers/shaders/ShaderChunk/lights_pars.glsl
 
-THREE.ShaderChunk[ 'hemilight_fragment'] = "#if MAX_HEMI_LIGHTS > 0\n	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n		vec3 lightDir = hemisphereLightDirection[ i ];\n		float dotProduct = dot( normal, lightDir );\n		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;\n		vec3 lightColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );\n		totalAmbientLight += lightColor;\n	}\n#endif\n";
-
-// File:src/renderers/shaders/ShaderChunk/lightmap_fragment.glsl
-
-THREE.ShaderChunk[ 'lightmap_fragment'] = "#ifdef USE_LIGHTMAP\n	totalAmbientLight += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;\n#endif\n";
+THREE.ShaderChunk[ 'lights_pars'] = "uniform vec3 ambientLightColor;\n#if MAX_DIR_LIGHTS > 0\n	struct DirectionalLight {\n	  vec3 direction;\n	  vec3 color;\n	};\n	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];\n	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) { \n		IncidentLight directLight;\n	\n		directLight.color = directionalLight.color;\n		directLight.direction = directionalLight.direction; \n		return directLight;\n	}\n#endif\n#if MAX_POINT_LIGHTS > 0\n	struct PointLight {\n	  vec3 position;\n	  vec3 color;\n	  float distance;\n	  float decay;\n	};\n	uniform PointLight pointLights[ MAX_POINT_LIGHTS ];\n	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) { \n	\n		IncidentLight directLight;\n	\n		vec3 lVector = pointLight.position - geometry.position; \n		directLight.direction = normalize( lVector ); \n	\n		directLight.color = pointLight.color; \n		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay ); \n	\n		return directLight;\n	}\n#endif\n#if MAX_SPOT_LIGHTS > 0\n	struct SpotLight {\n	  vec3 position;\n	  vec3 direction;\n	  vec3 color;\n	  float distance;\n	  float decay;\n	  float angleCos;\n	  float exponent;\n	};\n	uniform SpotLight spotLights[ MAX_SPOT_LIGHTS ];\n	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {\n	\n		IncidentLight directLight;\n		vec3 lVector = spotLight.position - geometry.position;\n		directLight.direction = normalize( lVector );\n	\n		float spotEffect = dot( spotLight.direction, directLight.direction );\n		spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );\n	\n		directLight.color = spotLight.color;\n		directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );\n		return directLight;\n	}\n#endif\n#if MAX_HEMI_LIGHTS > 0\n	struct HemisphereLight {\n	  vec3 direction;\n	  vec3 skyColor;\n	  vec3 groundColor;\n	};\n	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];\n	vec3 getHemisphereIndirectLightColor( const in HemisphereLight hemiLight, const in GeometricContext geometry ) { \n	\n		float dotNL = dot( geometry.normal, hemiLight.direction );\n		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;\n		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );\n	}\n#endif\n#if defined( USE_ENVMAP ) && defined( PHYSICAL )\n	vec3 getSpecularLightProbeIndirectLightColor( const in GeometricContext geometry, const in float lodLevel ) { \n	\n		#ifdef ENVMAP_MODE_REFLECTION\n			vec3 reflectVec = reflect( -geometry.viewDir, geometry.normal );\n		#else\n			vec3 reflectVec = refract( -geometry.viewDir, geometry.normal, refractionRatio );\n		#endif\n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		reflectVec = inverseTransformDirection( reflectVec, viewMatrix );\n		#ifdef ENVMAP_TYPE_CUBE\n			#if defined( TEXTURE_CUBE_LOD_EXT )				\n				vec4 envMapColor = textureCubeLodEXT( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), lodLevel );\n			#else\n				vec4 envMapColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n			#endif\n		#elif defined( ENVMAP_TYPE_EQUIREC )\n			vec2 sampleUV;\n			sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n			sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n			vec4 envMapColor = texture2D( envMap, sampleUV );\n		#elif defined( ENVMAP_TYPE_SPHERE )\n			vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n			vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );\n		#endif\n		envMapColor.rgb = inputToLinear( envMapColor.rgb );\n		return envMapColor.rgb * reflectivity;\n	}\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/lightmap_pars_fragment.glsl
 
 THREE.ShaderChunk[ 'lightmap_pars_fragment'] = "#ifdef USE_LIGHTMAP\n	uniform sampler2D lightMap;\n	uniform float lightMapIntensity;\n#endif";
 
-// File:src/renderers/shaders/ShaderChunk/lights_pars.glsl
-
-THREE.ShaderChunk[ 'lights_pars'] = "#if MAX_DIR_LIGHTS > 0\n	uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];\n	uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];\n#endif\n#if MAX_HEMI_LIGHTS > 0\n	uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];\n#endif\n#if MAX_POINT_LIGHTS > 0\n	uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];\n	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];\n	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];\n	uniform float pointLightDecay[ MAX_POINT_LIGHTS ];\n#endif\n#if MAX_SPOT_LIGHTS > 0\n	uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightDecay[ MAX_SPOT_LIGHTS ];\n#endif\n";
-
 // File:src/renderers/shaders/ShaderChunk/lights_lambert_vertex.glsl
 
-THREE.ShaderChunk[ 'lights_lambert_vertex'] = "vLightFront = vec3( 0.0 );\n#ifdef DOUBLE_SIDED\n	vLightBack = vec3( 0.0 );\n#endif\nvec3 normal = normalize( transformedNormal );\n#if MAX_POINT_LIGHTS > 0\n	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n		vec3 lightColor = pointLightColor[ i ];\n		vec3 lVector = pointLightPosition[ i ] - mvPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );\n		float dotProduct = dot( normal, lightDir );\n		vLightFront += lightColor * attenuation * saturate( dotProduct );\n		#ifdef DOUBLE_SIDED\n			vLightBack += lightColor * attenuation * saturate( - dotProduct );\n		#endif\n	}\n#endif\n#if MAX_SPOT_LIGHTS > 0\n	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n		vec3 lightColor = spotLightColor[ i ];\n		vec3 lightPosition = spotLightPosition[ i ];\n		vec3 lVector = lightPosition - mvPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n		float spotEffect = dot( spotLightDirection[ i ], lightDir );\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n			spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ i ] ) );\n			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );\n			attenuation *= spotEffect;\n			float dotProduct = dot( normal, lightDir );\n			vLightFront += lightColor * attenuation * saturate( dotProduct );\n			#ifdef DOUBLE_SIDED\n				vLightBack += lightColor * attenuation * saturate( - dotProduct );\n			#endif\n		}\n	}\n#endif\n#if MAX_DIR_LIGHTS > 0\n	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n		vec3 lightColor = directionalLightColor[ i ];\n		vec3 lightDir = directionalLightDirection[ i ];\n		float dotProduct = dot( normal, lightDir );\n		vLightFront += lightColor * saturate( dotProduct );\n		#ifdef DOUBLE_SIDED\n			vLightBack += lightColor * saturate( - dotProduct );\n		#endif\n	}\n#endif\n#if MAX_HEMI_LIGHTS > 0\n	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n		vec3 lightDir = hemisphereLightDirection[ i ];\n		float dotProduct = dot( normal, lightDir );\n		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;\n		vLightFront += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );\n		#ifdef DOUBLE_SIDED\n			float hemiDiffuseWeightBack = - 0.5 * dotProduct + 0.5;\n			vLightBack += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeightBack );\n		#endif\n	}\n#endif\n";
+THREE.ShaderChunk[ 'lights_lambert_vertex'] = "vec3 diffuse = vec3( 1.0 );\nGeometricContext geometry = GeometricContext( mvPosition.xyz, normalize( transformedNormal ), normalize( -mvPosition.xyz ) );\nGeometricContext backGeometry = GeometricContext( geometry.position, -geometry.normal, geometry.viewDir );\n#if MAX_POINT_LIGHTS > 0\n	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );\n		float dotNL = dot( geometry.normal, directLight.direction );\n		vec3 directLightColor_Diffuse = directLight.color * BRDF_Diffuse_Lambert( diffuse );\n		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n		#ifdef DOUBLE_SIDED\n			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n		#endif\n	}\n#endif\n#if MAX_SPOT_LIGHTS > 0\n	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );\n		float dotNL = dot( geometry.normal, directLight.direction );\n		vec3 directLightColor_Diffuse = directLight.color * BRDF_Diffuse_Lambert( diffuse );\n		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n		#ifdef DOUBLE_SIDED\n			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n		#endif\n	}\n#endif\n#if MAX_DIR_LIGHTS > 0\n	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );\n		float dotNL = dot( geometry.normal, directLight.direction );\n		vec3 directLightColor_Diffuse = directLight.color * BRDF_Diffuse_Lambert( diffuse );\n		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n		#ifdef DOUBLE_SIDED\n			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n		#endif\n	}\n#endif\n	{\n		\n		vLightFront += ambientLightColor;\n		#ifdef DOUBLE_SIDED\n		\n			vLightBack += ambientLightColor;\n		#endif\n		#if MAX_HEMI_LIGHTS > 0\n			for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n				vLightFront += getHemisphereIndirectLightColor( hemisphereLights[ i ], geometry );\n				#ifdef DOUBLE_SIDED\n			\n					vLightBack += getHemisphereIndirectLightColor( hemisphereLights[ i ], backGeometry );\n				#endif\n			}\n		#endif\n	}";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_phong_fragment'] = "vec3 viewDir = normalize( vViewPosition );\nvec3 totalDiffuseLight = vec3( 0.0 );\nvec3 totalSpecularLight = vec3( 0.0 );\n#if MAX_POINT_LIGHTS > 0\n	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n		vec3 lightColor = pointLightColor[ i ];\n		vec3 lightPosition = pointLightPosition[ i ];\n		vec3 lVector = lightPosition + vViewPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );\n		float cosineTerm = saturate( dot( normal, lightDir ) );\n		totalDiffuseLight += lightColor * attenuation * cosineTerm;\n		vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );\n		totalSpecularLight += brdf * specularStrength * lightColor * attenuation * cosineTerm;\n	}\n#endif\n#if MAX_SPOT_LIGHTS > 0\n	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n		vec3 lightColor = spotLightColor[ i ];\n		vec3 lightPosition = spotLightPosition[ i ];\n		vec3 lVector = lightPosition + vViewPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n		float spotEffect = dot( spotLightDirection[ i ], lightDir );\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n			spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ i ] ) );\n			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );\n			attenuation *= spotEffect;\n			float cosineTerm = saturate( dot( normal, lightDir ) );\n			totalDiffuseLight += lightColor * attenuation * cosineTerm;\n			vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );\n			totalSpecularLight += brdf * specularStrength * lightColor * attenuation * cosineTerm;\n		}\n	}\n#endif\n#if MAX_DIR_LIGHTS > 0\n	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n		vec3 lightColor = directionalLightColor[ i ];\n		vec3 lightDir = directionalLightDirection[ i ];\n		float cosineTerm = saturate( dot( normal, lightDir ) );\n		totalDiffuseLight += lightColor * cosineTerm;\n		vec3 brdf = BRDF_BlinnPhong( specular, shininess, normal, lightDir, viewDir );\n		totalSpecularLight += brdf * specularStrength * lightColor * cosineTerm;\n	}\n#endif\n";
+THREE.ShaderChunk[ 'lights_phong_fragment'] = "BlinnPhongMaterial material;\nmaterial.specularColor = specular;\nmaterial.specularShininess = shininess;\nmaterial.diffuseColor = diffuseColor.rgb;\n#ifdef METAL\n	material.diffuseColor = vec3( 0.0 );\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_phong_pars_fragment'] = "uniform vec3 ambientLightColor;\n#if MAX_SPOT_LIGHTS > 0 || defined( USE_ENVMAP )\n	varying vec3 vWorldPosition;\n#endif\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\n";
+THREE.ShaderChunk[ 'lights_phong_pars_fragment'] = "#if MAX_SPOT_LIGHTS > 0 || defined( USE_ENVMAP )\n	varying vec3 vWorldPosition;\n#endif\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\nstruct BlinnPhongMaterial {\n	vec3	diffuseColor;\n	float	specularShininess;\n	vec3	specularColor;\n};\nvoid BlinnPhongMaterial_RE_DirectLight( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight directReflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	directReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( material.diffuseColor );\n	directReflectedLight.specular += dotNL * directLight.color * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );\n	\n}\n#define Material_RE_DirectLight    BlinnPhongMaterial_RE_DirectLight\nvoid BlinnPhongMaterial_RE_IndirectDiffuseLight( const in vec3 indirectDiffuseColor, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight indirectReflectedLight ) {\n	indirectReflectedLight.diffuse += indirectDiffuseColor * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\n#define Material_RE_IndirectDiffuseLight    BlinnPhongMaterial_RE_IndirectDiffuseLight\n#define Material_LightProbeLOD( material )   (0)\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_pars_vertex.glsl
 
@@ -22831,7 +22922,15 @@ THREE.ShaderChunk[ 'lights_phong_vertex'] = "#if MAX_SPOT_LIGHTS > 0 || defined(
 
 // File:src/renderers/shaders/ShaderChunk/lights_physical_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_physical_fragment'] = "vec3 viewDir = normalize( vViewPosition );\nvec3 totalDiffuseLight = vec3( 0.0 );\nvec3 totalSpecularLight = vec3( 0.0 );\nroughnessFactor = roughnessFactor * 0.5 + 0.5;\nvec3 specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );\ndiffuseColor.rgb *= ( 1.0 - metalnessFactor );\n#if MAX_POINT_LIGHTS > 0\n	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n		vec3 lightColor = pointLightColor[ i ];\n		vec3 lightPosition = pointLightPosition[ i ];\n		vec3 lVector = lightPosition + vViewPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );\n		float cosineTerm = saturate( dot( normal, lightDir ) );\n		totalDiffuseLight += lightColor * attenuation * cosineTerm;\n    	vec3 brdf = BRDF_GGX( specularColor, roughnessFactor, normal, lightDir, viewDir );\n		totalSpecularLight += brdf * specularStrength * lightColor * attenuation * cosineTerm;\n	}\n#endif\n#if MAX_SPOT_LIGHTS > 0\n	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n		vec3 lightColor = spotLightColor[ i ];\n		vec3 lightPosition = spotLightPosition[ i ];\n		vec3 lVector = lightPosition + vViewPosition.xyz;\n		vec3 lightDir = normalize( lVector );\n		float spotEffect = dot( spotLightDirection[ i ], lightDir );\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n			spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ i ] ) );\n			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );\n			attenuation *= spotEffect;\n			float cosineTerm = saturate( dot( normal, lightDir ) );\n			totalDiffuseLight += lightColor * attenuation * cosineTerm;\n    		vec3 brdf = BRDF_GGX( specularColor, roughnessFactor, normal, lightDir, viewDir );\n			totalSpecularLight += brdf * specularStrength * lightColor * attenuation * cosineTerm;\n		}\n	}\n#endif\n#if MAX_DIR_LIGHTS > 0\n	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n		vec3 lightColor = directionalLightColor[ i ];\n		vec3 lightDir = directionalLightDirection[ i ];\n		float cosineTerm = saturate( dot( normal, lightDir ) );\n		totalDiffuseLight += lightColor * cosineTerm;\n    	vec3 brdf = BRDF_GGX( specularColor, roughnessFactor, normal, lightDir, viewDir );\n		totalSpecularLight += brdf * specularStrength * lightColor * cosineTerm;\n	}\n#endif\n";
+THREE.ShaderChunk[ 'lights_physical_fragment'] = "PhysicalMaterial material;\nmaterial.diffuseColor = diffuseColor.rgb * ( 1.0 - metalnessFactor );\nmaterial.specularRoughness = roughnessFactor * 0.5 + 0.5;material.specularColor = mix( vec3( 0.04 ) * reflectivity, diffuseColor.rgb, metalnessFactor );\n";
+
+// File:src/renderers/shaders/ShaderChunk/lights_physical_pars_fragment.glsl
+
+THREE.ShaderChunk[ 'lights_physical_pars_fragment'] = "struct PhysicalMaterial {\n	vec3	diffuseColor;\n	float	specularRoughness;\n	vec3	specularColor;\n	float	clearCoatWeight;\n	float	clearCoatRoughness;\n};\nvoid PhysicalMaterial_RE_DirectLight( const in IncidentLight directLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight directReflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	directReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( material.diffuseColor );\n	directReflectedLight.specular += dotNL * directLight.color * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.specularRoughness );\n	\n}\n#define Material_RE_DirectLight    PhysicalMaterial_RE_DirectLight\nvoid PhysicalMaterial_RE_DiffuseIndirectLight( const in vec3 indirectDiffuseColor, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight indirectReflectedLight ) {\n	indirectReflectedLight.diffuse += indirectDiffuseColor * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\n#define Material_RE_IndirectDiffuseLight    PhysicalMaterial_RE_DiffuseIndirectLight\nvoid PhysicalMaterial_RE_SpecularIndirectLight( const in vec3 indirectSpecularColor, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight indirectReflectedLight ) {\n    indirectReflectedLight.specular += indirectSpecularColor * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );\n}\n#define Material_LightProbeLOD( material )   (pow( ( material.specularRoughness - 0.5 ) * 2.0, 0.5 ) * 7.0)\n#define Material_RE_IndirectSpecularLight    PhysicalMaterial_RE_SpecularIndirectLight\n";
+
+// File:src/renderers/shaders/ShaderChunk/lights_template.glsl
+
+THREE.ShaderChunk[ 'lights_template'] = "\nGeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal ), normalize(vViewPosition ) );\n#if ( MAX_POINT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )\n	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );\n		Material_RE_DirectLight( directLight, geometry, material, directReflectedLight );\n	}\n#endif\n#if ( MAX_SPOT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )\n	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );\n		Material_RE_DirectLight( directLight, geometry, material, directReflectedLight );\n	}\n#endif\n#if ( MAX_DIR_LIGHTS > 0 ) && defined( Material_RE_DirectLight )\n	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );\n		Material_RE_DirectLight( directLight, geometry, material, directReflectedLight );\n		\n	}\n#endif\n#if defined( Material_RE_IndirectDiffuseLight )\n	{\n	\n		vec3 indirectDiffuseColor = ambientLightColor;\n#ifdef USE_LIGHTMAP\n		indirectDiffuseColor += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;\n#endif\n#if ( MAX_HEMI_LIGHTS > 0 )\n		for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n			indirectDiffuseColor += getHemisphereIndirectLightColor( hemisphereLights[ i ], geometry );\n		}\n#endif\n		Material_RE_IndirectDiffuseLight( indirectDiffuseColor, geometry, material, indirectReflectedLight );\n	}\n#endif\n#if defined( USE_ENVMAP ) && defined( Material_RE_IndirectSpecularLight )\n	{\n		vec3 indirectSpecularColor = getSpecularLightProbeIndirectLightColor( geometry, Material_LightProbeLOD( material ) );\n    	Material_RE_IndirectSpecularLight( indirectSpecularColor, geometry, material, indirectReflectedLight );\n    }\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/linear_to_gamma_fragment.glsl
 
@@ -23146,25 +23245,34 @@ THREE.UniformsLib = {
 
 		"ambientLightColor" : { type: "fv", value: [] },
 
-		"directionalLightDirection" : { type: "fv", value: [] },
-		"directionalLightColor" : { type: "fv", value: [] },
+		"directionalLights" : { type: "sa", value: [], properties: {
+			"direction": { type: "v3" },
+			"color": { type: "c" }
+		} },
 
-		"hemisphereLightDirection" : { type: "fv", value: [] },
-		"hemisphereLightSkyColor" : { type: "fv", value: [] },
-		"hemisphereLightGroundColor" : { type: "fv", value: [] },
+		"hemisphereLights" : { type: "sa", value: [], properties: {
+			"direction": { type: "v3" },
+			"skyColor": { type: "c" },
+			"groundColor": { type: "c" }
+		} },
 
-		"pointLightColor" : { type: "fv", value: [] },
-		"pointLightPosition" : { type: "fv", value: [] },
-		"pointLightDistance" : { type: "fv1", value: [] },
-		"pointLightDecay" : { type: "fv1", value: [] },
+		"pointLights" : { type: "sa", value: [], properties: {
+			"color": { type: "c" },
+			"position": { type: "v3" },
+			"decay": { type: "f" },
+			"distance": { type: "f" }
+		} },
 
-		"spotLightColor" : { type: "fv", value: [] },
-		"spotLightPosition" : { type: "fv", value: [] },
-		"spotLightDirection" : { type: "fv", value: [] },
-		"spotLightDistance" : { type: "fv1", value: [] },
-		"spotLightAngleCos" : { type: "fv1", value: [] },
-		"spotLightExponent" : { type: "fv1", value: [] },
-		"spotLightDecay" : { type: "fv1", value: [] }
+		"spotLights" : { type: "sa", value: [], properties: {
+			"color": { type: "c" },
+			"position": { type: "v3" },
+			"direction": { type: "v3" },
+			"distance": { type: "f" },
+			"angleCos": { type: "f" },
+			"exponent": { type: "f" },
+			"decay": { type: "f" }
+		} }
+
 
 	},
 
@@ -23269,6 +23377,12 @@ THREE.ShaderLib = {
 			"uniform vec3 diffuse;",
 			"uniform float opacity;",
 
+			"#ifndef FLAT_SHADED",
+
+			"	varying vec3 vNormal;",
+
+			"#endif",
+
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "uv_pars_fragment" ],
@@ -23284,9 +23398,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	vec3 totalAmbientLight = vec3( 1.0 );", // hardwired
 			"	vec3 shadowMask = vec3( 1.0 );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
@@ -23295,15 +23407,17 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
+
+			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), diffuseColor.rgb );",
+
 				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
-
-			"	outgoingLight = diffuseColor.rgb * totalAmbientLight * shadowMask;",
+				"indirectReflectedLight.diffuse *= shadowMask;",
+		
+				"vec3 outgoingLight = indirectReflectedLight.diffuse;",
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
-
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-
 				THREE.ShaderChunk[ "fog_fragment" ],
 
 			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
@@ -23345,6 +23459,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "uv_pars_vertex" ],
 			THREE.ShaderChunk[ "uv2_pars_vertex" ],
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
+			THREE.ShaderChunk[ "bsdfs" ],
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
@@ -23425,18 +23540,18 @@ THREE.ShaderLib = {
 			"	#ifdef DOUBLE_SIDED",
 
 			"		if ( gl_FrontFacing )",
-			"			outgoingLight += diffuseColor.rgb * ( vLightFront * shadowMask + totalAmbientLight ) + emissive;",
+			"			outgoingLight += diffuseColor.rgb * ( vLightFront * shadowMask ) + emissive;",
 			"		else",
-			"			outgoingLight += diffuseColor.rgb * ( vLightBack * shadowMask + totalAmbientLight ) + emissive;",
+			"			outgoingLight += diffuseColor.rgb * ( vLightBack * shadowMask ) + emissive;",
 
 			"	#else",
 
-			"		outgoingLight += diffuseColor.rgb * ( vLightFront * shadowMask + totalAmbientLight ) + emissive;",
+			"		outgoingLight += diffuseColor.rgb * ( vLightFront * shadowMask ) + emissive;",
 
 			"	#endif",
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
-
+		
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
@@ -23542,7 +23657,7 @@ THREE.ShaderLib = {
 			"uniform float shininess;",
 			"uniform float opacity;",
 
-			THREE.ShaderChunk[ "common" ],
+			THREE.ShaderChunk[ "common" ],	
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "uv_pars_fragment" ],
 			THREE.ShaderChunk[ "uv2_pars_fragment" ],
@@ -23553,6 +23668,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "emissivemap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
+			THREE.ShaderChunk[ "bsdfs" ],
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
@@ -23563,12 +23679,11 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	vec3 totalAmbientLight = ambientLightColor;",
+			"	ReflectedLight directReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
+			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
 			"	vec3 totalEmissiveLight = emissive;",
-			"	vec3 shadowMask = vec3( 1.0 );",
-
+			
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
@@ -23576,29 +23691,32 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 				THREE.ShaderChunk[ "normal_phong_fragment" ],
-				THREE.ShaderChunk[ "lightmap_fragment" ],
-				THREE.ShaderChunk[ "hemilight_fragment" ],
-				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "emissivemap_fragment" ],
 
+				// accumulation
 				THREE.ShaderChunk[ "lights_phong_fragment" ],
-				THREE.ShaderChunk[ "shadowmap_fragment" ],
+				THREE.ShaderChunk[ "lights_template" ],
+				THREE.ShaderChunk[ "lightmap_fragment" ],
 
-				"totalDiffuseLight *= shadowMask;",
-				"totalSpecularLight *= shadowMask;",
+				// modulation
+				THREE.ShaderChunk[ "aomap_fragment" ],
+			
+				"vec3 shadowMask = vec3( 1.0 );",
+				THREE.ShaderChunk[ "shadowmap_fragment" ],
+				"directReflectedLight.diffuse *= shadowMask;",
+				"directReflectedLight.specular *= shadowMask;",
 
 				"#ifdef METAL",
 
-				"	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + totalEmissiveLight;",
+				"	vec3 outgoingLight = ( directReflectedLight.diffuse + indirectReflectedLight.diffuse ) * specular + directReflectedLight.specular + indirectReflectedLight.specular + totalEmissiveLight;",
 
 				"#else",
 
-				"	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;",
+				"	vec3 outgoingLight = ( directReflectedLight.diffuse + indirectReflectedLight.diffuse ) + directReflectedLight.specular + indirectReflectedLight.specular + totalEmissiveLight;",
 
 				"#endif",
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
-
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
@@ -23711,6 +23829,14 @@ THREE.ShaderLib = {
 
 			"uniform float envMapIntensity;", // temporary
 
+			"varying vec3 vViewPosition;",
+
+			"#ifndef FLAT_SHADED",
+
+			"	varying vec3 vNormal;",
+
+			"#endif",
+
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "uv_pars_fragment" ],
@@ -23722,8 +23848,9 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "emissivemap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
+			THREE.ShaderChunk[ "bsdfs" ],
 			THREE.ShaderChunk[ "lights_pars" ],
-			THREE.ShaderChunk[ "lights_phong_pars_fragment" ], // use phong chunk for now
+			THREE.ShaderChunk[ "lights_physical_pars_fragment" ], // use phong chunk for now
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
 			THREE.ShaderChunk[ "normalmap_pars_fragment" ],
@@ -23734,11 +23861,10 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	vec3 totalAmbientLight = ambientLightColor;",
+			"	ReflectedLight directReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
+			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
 			"	vec3 totalEmissiveLight = emissive;",
-			"	vec3 shadowMask = vec3( 1.0 );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
@@ -23750,20 +23876,23 @@ THREE.ShaderLib = {
 				//THREE.ShaderChunk[ "reflectivitymap_fragment" ],
 				THREE.ShaderChunk[ "metalnessmap_fragment" ],
 				THREE.ShaderChunk[ "normal_phong_fragment" ], // use phong chunk for now
-				THREE.ShaderChunk[ "lightmap_fragment" ],
-				THREE.ShaderChunk[ "hemilight_fragment" ],
-				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "emissivemap_fragment" ],
 
+				// accumulation
 				THREE.ShaderChunk[ "lights_physical_fragment" ],
-				THREE.ShaderChunk[ "shadowmap_fragment" ],
-
-				"totalDiffuseLight *= shadowMask;",
-				"totalSpecularLight *= shadowMask;",
-
-				"outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;",
-
+				THREE.ShaderChunk[ "lights_template" ],		
+				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "envmap_physical_fragment" ],
+
+				// modulation
+				THREE.ShaderChunk[ "aomap_fragment" ],
+
+				"vec3 shadowMask = vec3( 1.0 );",
+				THREE.ShaderChunk[ "shadowmap_fragment" ],
+				"directReflectedLight.diffuse *= shadowMask;",
+				"directReflectedLight.specular *= shadowMask;",
+
+				"vec3 outgoingLight = directReflectedLight.diffuse + indirectReflectedLight.diffuse + directReflectedLight.specular + indirectReflectedLight.specular + totalEmissiveLight;",
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
@@ -23803,7 +23932,7 @@ THREE.ShaderLib = {
 			"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 			"	#ifdef USE_SIZEATTENUATION",
-			"		gl_PointSize = size * ( scale / length( mvPosition.xyz ) );",
+			"		gl_PointSize = size * ( scale / -mvPosition.z );",
 			"	#else",
 			"		gl_PointSize = size;",
 			"	#endif",
@@ -26314,27 +26443,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function refreshUniformsLights ( uniforms, lights ) {
 
 		uniforms.ambientLightColor.value = lights.ambient;
-
-		uniforms.directionalLightColor.value = lights.directional.colors;
-		uniforms.directionalLightDirection.value = lights.directional.positions;
-
-		uniforms.pointLightColor.value = lights.point.colors;
-		uniforms.pointLightPosition.value = lights.point.positions;
-		uniforms.pointLightDistance.value = lights.point.distances;
-		uniforms.pointLightDecay.value = lights.point.decays;
-
-		uniforms.spotLightColor.value = lights.spot.colors;
-		uniforms.spotLightPosition.value = lights.spot.positions;
-		uniforms.spotLightDistance.value = lights.spot.distances;
-		uniforms.spotLightDirection.value = lights.spot.directions;
-		uniforms.spotLightAngleCos.value = lights.spot.anglesCos;
-		uniforms.spotLightExponent.value = lights.spot.exponents;
-		uniforms.spotLightDecay.value = lights.spot.decays;
-
-		uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
-		uniforms.hemisphereLightGroundColor.value = lights.hemi.groundColors;
-		uniforms.hemisphereLightDirection.value = lights.hemi.positions;
-
+		uniforms.directionalLights.value = lights.directional;
+		uniforms.pointLights.value = lights.point;
+		uniforms.spotLights.value = lights.spot;
+		uniforms.hemisphereLights.value = lights.hemi;
 	}
 
 	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
@@ -26343,25 +26455,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.ambientLightColor.needsUpdate = value;
 
-		uniforms.directionalLightColor.needsUpdate = value;
-		uniforms.directionalLightDirection.needsUpdate = value;
-
-		uniforms.pointLightColor.needsUpdate = value;
-		uniforms.pointLightPosition.needsUpdate = value;
-		uniforms.pointLightDistance.needsUpdate = value;
-		uniforms.pointLightDecay.needsUpdate = value;
-
-		uniforms.spotLightColor.needsUpdate = value;
-		uniforms.spotLightPosition.needsUpdate = value;
-		uniforms.spotLightDistance.needsUpdate = value;
-		uniforms.spotLightDirection.needsUpdate = value;
-		uniforms.spotLightAngleCos.needsUpdate = value;
-		uniforms.spotLightExponent.needsUpdate = value;
-		uniforms.spotLightDecay.needsUpdate = value;
-
-		uniforms.hemisphereLightSkyColor.needsUpdate = value;
-		uniforms.hemisphereLightGroundColor.needsUpdate = value;
-		uniforms.hemisphereLightDirection.needsUpdate = value;
+		uniforms.directionalLights.needsUpdate = value;
+		uniforms.pointLights.needsUpdate = value;
+		uniforms.spotLights.needsUpdate = value;
+		uniforms.hemisphereLights.needsUpdate = value;
 
 	}
 
@@ -26555,6 +26652,72 @@ THREE.WebGLRenderer = function ( parameters ) {
 					// single THREE.Color
 					_gl.uniform3f( location, value.r, value.g, value.b );
 
+					break;
+
+				case 's':
+
+					// TODO: Optimize this.
+					for( var propertyName in uniform.properties ) {
+	
+						var property = uniform.properties[ propertyName ];
+						var locationProperty =  location[ propertyName ];
+						var valueProperty = value[ propertyName ];
+	
+						switch( property.type ) {
+							case 'f':
+								_gl.uniform1f( locationProperty, valueProperty );
+								break;
+							case 'v2':
+								_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
+								break;
+							case 'v3':
+								_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
+								break;
+							case 'v4':
+								_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
+								break;
+							case 'c':
+								_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
+								break;
+						};
+
+					}
+
+					break;
+
+				case 'sa':
+
+					// TODO: Optimize this.
+					for( var i = 0; i < value.length; i ++ ) {
+
+						for( var propertyName in uniform.properties ) {
+							
+							var property = uniform.properties[ propertyName ];
+							var locationProperty =  location[ i ][ propertyName ];
+							var valueProperty = value[i][ propertyName ];
+	
+							switch( property.type ) {
+								case 'f':
+									_gl.uniform1f( locationProperty, valueProperty );
+									break;
+								case 'v2':
+									_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
+									break;
+								case 'v3':
+									_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
+									break;
+								case 'v4':
+									_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
+									break;
+								case 'c':
+									_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
+									break;
+							};
+
+						}
+
+					}
+					
 					break;
 
 				case 'iv1':
@@ -26799,60 +26962,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setColorLinear( array, offset, color, intensity ) {
-
-		array[ offset + 0 ] = color.r * intensity;
-		array[ offset + 1 ] = color.g * intensity;
-		array[ offset + 2 ] = color.b * intensity;
-
-	}
-
 	function setupLights ( lights, camera ) {
 
 		var l, ll, light,
 		r = 0, g = 0, b = 0,
-		color, skyColor, groundColor,
+		color,
 		intensity,
 		distance,
 
 		zlights = _lights,
 
-		viewMatrix = camera.matrixWorldInverse,
+		viewMatrix = camera.matrixWorldInverse;
 
-		dirColors = zlights.directional.colors,
-		dirPositions = zlights.directional.positions,
-
-		pointColors = zlights.point.colors,
-		pointPositions = zlights.point.positions,
-		pointDistances = zlights.point.distances,
-		pointDecays = zlights.point.decays,
-
-		spotColors = zlights.spot.colors,
-		spotPositions = zlights.spot.positions,
-		spotDistances = zlights.spot.distances,
-		spotDirections = zlights.spot.directions,
-		spotAnglesCos = zlights.spot.anglesCos,
-		spotExponents = zlights.spot.exponents,
-		spotDecays = zlights.spot.decays,
-
-		hemiSkyColors = zlights.hemi.skyColors,
-		hemiGroundColors = zlights.hemi.groundColors,
-		hemiPositions = zlights.hemi.positions,
-
-		dirLength = 0,
-		pointLength = 0,
-		spotLength = 0,
-		hemiLength = 0,
-
-		dirCount = 0,
-		pointCount = 0,
-		spotCount = 0,
-		hemiCount = 0,
-
-		dirOffset = 0,
-		pointOffset = 0,
-		spotOffset = 0,
-		hemiOffset = 0;
+		zlights.directional = [];
+		zlights.point = [];
+		zlights.spot = [];
+		zlights.hemi = [];
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -26872,121 +26997,118 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
-				dirCount += 1;
+				if( ! light.__webglUniforms ) {
+					light.__webglUniforms = {
+						direction: new THREE.Vector3(),
+						color: new THREE.Color()
+					}
+				}
 
-				if ( ! light.visible ) continue;
+				var lightUniforms = light.__webglUniforms;
+				zlights.directional.push( lightUniforms ); 
 
-				_direction.setFromMatrixPosition( light.matrixWorld );
+				if ( ! light.visible ) {
+					lightUniforms.color.setRGB( 0, 0, 0 );
+					continue;
+				}
+
+				lightUniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
-				_direction.sub( _vector3 );
-				_direction.transformDirection( viewMatrix );
+				lightUniforms.direction.sub( _vector3 );
+				lightUniforms.direction.transformDirection( viewMatrix );
 
-				dirOffset = dirLength * 3;
-
-				dirPositions[ dirOffset + 0 ] = _direction.x;
-				dirPositions[ dirOffset + 1 ] = _direction.y;
-				dirPositions[ dirOffset + 2 ] = _direction.z;
-
-				setColorLinear( dirColors, dirOffset, color, intensity );
-
-				dirLength += 1;
+				lightUniforms.color.copy( light.color ).multiplyScalar( light.intensity );
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				pointCount += 1;
+				if( ! light.__webglUniforms ) {
+					light.__webglUniforms = {
+						position: new THREE.Vector3(),
+						color: new THREE.Color(),
+						distance: 0,
+						decay: 0
+					}
+				}
 
-				if ( ! light.visible ) continue;
+				var lightUniforms = light.__webglUniforms;
+				zlights.point.push( lightUniforms ); 
 
-				pointOffset = pointLength * 3;
+				if ( ! light.visible ) {
+					lightUniforms.color.setRGB( 0, 0, 0 );
+					continue;
+				}
 
-				setColorLinear( pointColors, pointOffset, color, intensity );
+				lightUniforms.position.setFromMatrixPosition( light.matrixWorld );
+				lightUniforms.position.applyMatrix4( viewMatrix );
 
-				_vector3.setFromMatrixPosition( light.matrixWorld );
-				_vector3.applyMatrix4( viewMatrix );
-
-				pointPositions[ pointOffset + 0 ] = _vector3.x;
-				pointPositions[ pointOffset + 1 ] = _vector3.y;
-				pointPositions[ pointOffset + 2 ] = _vector3.z;
-
-				// distance is 0 if decay is 0, because there is no attenuation at all.
-				pointDistances[ pointLength ] = distance;
-				pointDecays[ pointLength ] = ( light.distance === 0 ) ? 0.0 : light.decay;
-
-				pointLength += 1;
+				lightUniforms.color.copy( light.color ).multiplyScalar( light.intensity );
+				lightUniforms.distance = light.distance;
+				lightUniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
-				spotCount += 1;
+				if( ! light.__webglUniforms ) {
+					light.__webglUniforms = {
+						position: new THREE.Vector3(),
+						direction: new THREE.Vector3(),
+						color: new THREE.Color(),
+						distance: 0,
+						decay: 0,
+						angleCos: 0
+					}
+				}
 
-				if ( ! light.visible ) continue;
+				var lightUniforms = light.__webglUniforms;
+				zlights.spot.push( lightUniforms ); 
 
-				spotOffset = spotLength * 3;
+				if ( ! light.visible ) {
+					lightUniforms.color.setRGB( 0, 0, 0 );
+					continue;
+				}
 
-				setColorLinear( spotColors, spotOffset, color, intensity );
+				lightUniforms.position.setFromMatrixPosition( light.matrixWorld );
+				lightUniforms.position.applyMatrix4( viewMatrix );
 
-				_direction.setFromMatrixPosition( light.matrixWorld );
-				_vector3.copy( _direction ).applyMatrix4( viewMatrix );
+				lightUniforms.color.copy( color ).multiplyScalar( intensity );
+				lightUniforms.distance = distance;
 
-				spotPositions[ spotOffset + 0 ] = _vector3.x;
-				spotPositions[ spotOffset + 1 ] = _vector3.y;
-				spotPositions[ spotOffset + 2 ] = _vector3.z;
-
-				spotDistances[ spotLength ] = distance;
-
+				lightUniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
-				_direction.sub( _vector3 );
-				_direction.transformDirection( viewMatrix );
+				lightUniforms.direction.sub( _vector3 );
+				lightUniforms.direction.transformDirection( viewMatrix );
 
-				spotDirections[ spotOffset + 0 ] = _direction.x;
-				spotDirections[ spotOffset + 1 ] = _direction.y;
-				spotDirections[ spotOffset + 2 ] = _direction.z;
-
-				spotAnglesCos[ spotLength ] = Math.cos( light.angle );
-				spotExponents[ spotLength ] = light.exponent;
-				spotDecays[ spotLength ] = ( light.distance === 0 ) ? 0.0 : light.decay;
-
-				spotLength += 1;
+				lightUniforms.angleCos = Math.cos( light.angle );
+				lightUniforms.exponent = light.exponent;
+				lightUniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 
-				hemiCount += 1;
+				if( ! light.__webglUniforms ) {
+					light.__webglUniforms = {
+						direction: new THREE.Vector3(),
+						skyColor: new THREE.Color(),
+						groundColor: new THREE.Color()
+					}
+				}
 
-				if ( ! light.visible ) continue;
+				var lightUniforms = light.__webglUniforms;
+				zlights.hemi.push( lightUniforms ); 
 
-				_direction.setFromMatrixPosition( light.matrixWorld );
-				_direction.transformDirection( viewMatrix );
+				if ( ! light.visible ) {
+					lightUniforms.skyColor.setRGB( 0, 0, 0 );
+					continue;
+				}
 
-				hemiOffset = hemiLength * 3;
+				lightUniforms.direction.setFromMatrixPosition( light.matrixWorld );
+				lightUniforms.direction.transformDirection( viewMatrix );
+				lightUniforms.direction.normalize();
 
-				hemiPositions[ hemiOffset + 0 ] = _direction.x;
-				hemiPositions[ hemiOffset + 1 ] = _direction.y;
-				hemiPositions[ hemiOffset + 2 ] = _direction.z;
-
-				skyColor = light.color;
-				groundColor = light.groundColor;
-
-				setColorLinear( hemiSkyColors, hemiOffset, skyColor, intensity );
-				setColorLinear( hemiGroundColors, hemiOffset, groundColor, intensity );
-
-				hemiLength += 1;
+				lightUniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
+				lightUniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
 
 			}
 
 		}
-
-		// null eventual remains from removed lights
-		// (this is to avoid if in shader)
-
-		for ( l = dirLength * 3, ll = Math.max( dirColors.length, dirCount * 3 ); l < ll; l ++ ) dirColors[ l ] = 0.0;
-		for ( l = pointLength * 3, ll = Math.max( pointColors.length, pointCount * 3 ); l < ll; l ++ ) pointColors[ l ] = 0.0;
-		for ( l = spotLength * 3, ll = Math.max( spotColors.length, spotCount * 3 ); l < ll; l ++ ) spotColors[ l ] = 0.0;
-		for ( l = hemiLength * 3, ll = Math.max( hemiSkyColors.length, hemiCount * 3 ); l < ll; l ++ ) hemiSkyColors[ l ] = 0.0;
-		for ( l = hemiLength * 3, ll = Math.max( hemiGroundColors.length, hemiCount * 3 ); l < ll; l ++ ) hemiGroundColors[ l ] = 0.0;
-
-		zlights.directional.length = dirLength;
-		zlights.point.length = pointLength;
-		zlights.spot.length = spotLength;
-		zlights.hemi.length = hemiLength;
 
 		zlights.ambient[ 0 ] = r;
 		zlights.ambient[ 1 ] = g;
@@ -28681,6 +28803,26 @@ THREE.WebGLProgram = ( function () {
 
 	var programIdCount = 0;
 
+	// TODO: Combine the regex
+	var structRe = /^([\w\d_]+)\.([\w\d_]+)$/;
+	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/;
+	var arrayRe = /^([\w\d_]+)\[0\]$/;
+
+	function generateExtensions( extensions, parameters, rendererExtensions ) {
+
+		extensions = extensions || {};
+
+		var chunks = [
+			( extensions.derivatives || parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+			( extensions.fragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
+			( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
+			( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
+		];
+
+		return chunks.filter( filterEmptyLine ).join( '\n' );
+
+	}
+
 	function generateDefines( defines ) {
 
 		var chunks = [];
@@ -28711,13 +28853,51 @@ THREE.WebGLProgram = ( function () {
 			var name = info.name;
 			var location = gl.getUniformLocation( program, name );
 
-			// console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
+			//console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
 
-			var suffixPos = name.lastIndexOf( '[0]' );
-			if ( suffixPos !== - 1 && suffixPos === name.length - 3 ) {
+			var matches = structRe.exec(name);
+			if( matches ) {
 
-				uniforms[ name.substr( 0, suffixPos ) ] = location;
+				var structName = matches[1];
+				var structProperty = matches[2];
 
+				var uniformsStruct = uniforms[ structName ];
+				if( ! uniformsStruct ) {
+					uniformsStruct = uniforms[ structName ] = {};
+				}
+				uniformsStruct[ structProperty ] = location;
+
+				continue;
+			}
+
+			matches = arrayStructRe.exec(name);
+			if( matches ) {
+
+				var arrayName = matches[1];
+				var arrayIndex = matches[2];
+				var arrayProperty = matches[3];
+
+				var uniformsArray = uniforms[ arrayName ];
+				if( ! uniformsArray ) {
+					uniformsArray = uniforms[ arrayName ] = [];
+				}
+				var uniformsArrayIndex = uniformsArray[ arrayIndex ];
+				if( ! uniformsArrayIndex ) {
+					uniformsArrayIndex = uniformsArray[ arrayIndex ] = {};
+				}
+				uniformsArrayIndex[ arrayProperty ] = location;
+
+				continue;
+			}
+
+			matches = arrayRe.exec(name)
+			if( matches ) {
+
+				var arrayName = matches[1];
+
+				uniforms[ arrayName ] = location;
+
+				continue;
 			}
 
 			uniforms[ name ] = location;
@@ -28759,6 +28939,7 @@ THREE.WebGLProgram = ( function () {
 
 		var gl = renderer.context;
 
+		var extensions = material.extensions;
 		var defines = material.defines;
 
 		var vertexShader = material.__webglShader.vertexShader;
@@ -28832,6 +29013,8 @@ THREE.WebGLProgram = ( function () {
 		// console.log( 'building new program ' );
 
 		//
+
+		var customExtensions = generateExtensions( extensions, parameters, renderer.extensions );
 
 		var customDefines = generateDefines( defines );
 
@@ -28962,12 +29145,10 @@ THREE.WebGLProgram = ( function () {
 
 			].filter( filterEmptyLine ).join( '\n' );
 
+
 			prefixFragment = [
 
-				parameters.bumpMap || parameters.normalMap || parameters.flatShading || material.derivatives ? '#extension GL_OES_standard_derivatives : enable' : '',
-				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
-
-				parameters.envMap && renderer.extensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
+				customExtensions,
 
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
