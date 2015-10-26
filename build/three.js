@@ -6453,7 +6453,7 @@ THREE.Sphere.prototype = {
 		// If this distance is greater than the radius of the sphere,
 		// then there is no intersection.
 
-		return ( Math.abs( ( this.center.dot( plane.normal ) - plane.constant ) ) <= this.radius );
+		return Math.abs( this.center.dot( plane.normal ) - plane.constant ) <= this.radius;
 
 	},
 
@@ -6462,6 +6462,7 @@ THREE.Sphere.prototype = {
 		var deltaLengthSq = this.center.distanceToSquared( point );
 
 		var result = optionalTarget || new THREE.Vector3();
+
 		result.copy( point );
 
 		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
@@ -18285,7 +18286,21 @@ THREE.MaterialLoader.prototype = {
 		if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
 
 		if ( json.normalMap !== undefined ) material.normalMap = this.getTexture( json.normalMap );
-		if ( json.normalScale )	material.normalScale = new THREE.Vector2( json.normalScale, json.normalScale );
+		if ( json.normalScale ) {
+
+			var normalScale = json.normalScale;
+
+			if ( Array.isArray( normalScale ) === false ) {
+
+				// Blender exporter used to export a scalar. See #7459
+
+				normalScale = [ normalScale, normalScale ];
+
+			}
+
+			material.normalScale.fromArray( normalScale );
+
+		}
 
 		if ( json.displacementMap !== undefined ) material.displacementMap = this.getTexture( json.displacementMap );
 		if ( json.displacementScale !== undefined ) material.displacementScale = json.displacementScale;
@@ -19485,7 +19500,7 @@ THREE.Material.prototype = {
 		if ( this.normalMap instanceof THREE.Texture ) {
 
 			data.normalMap = this.normalMap.toJSON( meta ).uuid;
-			data.normalScale = this.normalScale; // Removed for now, causes issue in editor ui.js
+			data.normalScale = this.normalScale.toArray();
 
 		}
 		if ( this.displacementMap instanceof THREE.Texture ) {
@@ -19710,7 +19725,7 @@ THREE.LineBasicMaterial.prototype.copy = function ( source ) {
  *  dashSize: <float>,
  *  gapSize: <float>,
  *
- *  vertexColors: <bool>
+ *  vertexColors: THREE.NoColors / THREE.FaceColors / THREE.VertexColors
  *
  *  fog: <bool>
  * }
@@ -19730,7 +19745,7 @@ THREE.LineDashedMaterial = function ( parameters ) {
 	this.dashSize = 3;
 	this.gapSize = 1;
 
-	this.vertexColors = false;
+	this.vertexColors = THREE.NoColors;
 
 	this.fog = true;
 
@@ -25877,9 +25892,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		materialProperties.uniformsList = [];
 
-		var uniformLocations = materialProperties.program.getUniforms();
+		var uniforms = materialProperties.__webglShader.uniforms,
+			uniformLocations = materialProperties.program.getUniforms();
 
-		for ( var u in materialProperties.__webglShader.uniforms ) {
+		for ( var u in uniforms ) {
 
 			var location = uniformLocations[ u ];
 
@@ -25888,6 +25904,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 				materialProperties.uniformsList.push( [ materialProperties.__webglShader.uniforms[ u ], location ] );
 
 			}
+
+		}
+
+		if ( material instanceof THREE.MeshPhongMaterial ||
+				material instanceof THREE.MeshLambertMaterial ||
+				material instanceof THREE.MeshPhysicalMaterial ||
+				material.lights ) {
+
+			// wire up the material to this renderer's lighting state
+
+			uniforms.ambientLightColor.value = _lights.ambient;
+			uniforms.directionalLights.value = _lights.directional;
+			uniforms.pointLights.value = _lights.point;
+			uniforms.spotLights.value = _lights.spot;
+			uniforms.hemisphereLights.value = _lights.hemi;
 
 		}
 
@@ -25956,7 +25987,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.id !== _currentMaterialId ) {
 
-			if ( _currentMaterialId === - 1 ) refreshLights = true;
 			_currentMaterialId = material.id;
 
 			refreshMaterial = true;
@@ -25974,7 +26004,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 
-			if ( camera !== _currentCamera ) _currentCamera = camera;
+			if ( camera !== _currentCamera ) {
+
+				_currentCamera = camera;
+
+				// lighting uniforms depend on the camera so enforce an update
+				// now, in case this material supports lights - or later, when
+				// the next material that does gets activated:
+
+				refreshMaterial = true;		// set to true on material change
+				_lightsNeedUpdate = true;	// remains set until update done
+
+			}
 
 			// load material specific uniforms
 			// (shader material also gets them for the sake of genericity)
@@ -26078,24 +26119,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material.lights ) {
 
+				// the current material requires lighting info
+
+				// if we haven't done so since the start of the frame, after a
+				// reset or camera change, update the lighting uniforms values
+				// of all materials (by reference)
+
 				if ( _lightsNeedUpdate ) {
 
-					refreshLights = true;
-					setupLights( lights, camera );
 					_lightsNeedUpdate = false;
 
-				}
-
-				if ( refreshLights ) {
-
-					refreshUniformsLights( m_uniforms, _lights );
-					markUniformsLightsNeedsUpdate( m_uniforms, true );
-
-				} else {
-
-					markUniformsLightsNeedsUpdate( m_uniforms, false );
+					setupLights( lights, camera );
+					refreshLights = true;
 
 				}
+
+				// use the current material's .needsUpdate flags to set
+				// the GL state when required
+
+				markUniformsLightsNeedsUpdate( m_uniforms, refreshLights );
 
 			}
 
@@ -26414,15 +26456,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	}
-
-	function refreshUniformsLights ( uniforms, lights ) {
-
-		uniforms.ambientLightColor.value = lights.ambient;
-		uniforms.directionalLights.value = lights.directional;
-		uniforms.pointLights.value = lights.point;
-		uniforms.spotLights.value = lights.spot;
-		uniforms.hemisphereLights.value = lights.hemi;
 	}
 
 	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
@@ -26948,12 +26981,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		zlights = _lights,
 
-		viewMatrix = camera.matrixWorldInverse;
+		viewMatrix = camera.matrixWorldInverse,
 
-		zlights.directional = [];
-		zlights.point = [];
-		zlights.spot = [];
-		zlights.hemi = [];
+		writeIndexDirectional = 0,
+		writeIndexPoint = 0,
+		writeIndexSpot = 0,
+		writeIndexHemi = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -26981,7 +27014,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.directional.push( lightUniforms );
+				zlights.directional[ writeIndexDirectional ++ ] = lightUniforms;
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -27007,7 +27040,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.point.push( lightUniforms );
+				zlights.point[ writeIndexPoint ++ ] = lightUniforms; 
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -27035,7 +27068,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.spot.push( lightUniforms );
+				zlights.spot[ writeIndexSpot ++ ] = lightUniforms; 
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -27068,7 +27101,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.hemi.push( lightUniforms );
+				zlights.hemi[ writeIndexHemi ++ ] = lightUniforms; 
 
 				if ( ! light.visible ) {
 					lightUniforms.skyColor.setRGB( 0, 0, 0 );
@@ -27089,6 +27122,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		zlights.ambient[ 0 ] = r;
 		zlights.ambient[ 1 ] = g;
 		zlights.ambient[ 2 ] = b;
+
+		zlights.directional.length = writeIndexDirectional;
+		zlights.point.length = writeIndexPoint;
+		zlights.spot.length = writeIndexSpot;
+		zlights.hemi.length = writeIndexHemi;
 
 	}
 
