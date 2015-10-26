@@ -223,6 +223,27 @@ test( "intersectsBox", function() {
 	ok( ! b.intersectsBox( c ), "Passed!" );
 });
 
+test( "intersectsSphere", function() {
+	var a = new THREE.Box3( zero3.clone(), one3.clone() );
+	var b = new THREE.Sphere( zero3.clone(), 1 );
+
+	ok( a.intersectsSphere( b ) , "Passed!" );
+
+	b.translate( new THREE.Vector3( 2, 2, 2 ) );
+	ok( ! a.intersectsSphere( b ) , "Passed!" );
+});
+
+test( "intersectsPlane", function() {
+	var a = new THREE.Box3( zero3.clone(), one3.clone() );
+	var b = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 1 );
+	var c = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 1.25 );
+	var d = new THREE.Plane( new THREE.Vector3( 0, -1, 0 ), 1.25 );
+
+	ok( a.intersectsPlane( b ) , "Passed!" );
+	ok( ! a.intersectsPlane( c ) , "Passed!" );
+	ok( ! a.intersectsPlane( d ) , "Passed!" );
+});
+
 test( "getBoundingSphere", function() {
 	var a = new THREE.Box3( zero3.clone(), zero3.clone() );
 	var b = new THREE.Box3( zero3.clone(), one3.clone() );
