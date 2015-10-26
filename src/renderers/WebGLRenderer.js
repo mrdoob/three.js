@@ -1717,7 +1717,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( material instanceof THREE.PointsMaterial ) {
 
-				refreshUniformsParticle( m_uniforms, material );
+				refreshUniformsPoints( m_uniforms, material );
 
 			} else if ( material instanceof THREE.MeshPhongMaterial ) {
 
@@ -1865,7 +1865,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function refreshUniformsParticle ( uniforms, material ) {
+	function refreshUniformsPoints ( uniforms, material ) {
 
 		uniforms.psColor.value = material.color;
 		uniforms.opacity.value = material.opacity;
@@ -2230,11 +2230,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// TODO: Optimize this.
 					for( var propertyName in uniform.properties ) {
-	
+
 						var property = uniform.properties[ propertyName ];
 						var locationProperty =  location[ propertyName ];
 						var valueProperty = value[ propertyName ];
-	
+
 						switch( property.type ) {
 							case 'f':
 								_gl.uniform1f( locationProperty, valueProperty );
@@ -2263,11 +2263,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 					for( var i = 0; i < value.length; i ++ ) {
 
 						for( var propertyName in uniform.properties ) {
-							
+
 							var property = uniform.properties[ propertyName ];
 							var locationProperty =  location[ i ][ propertyName ];
 							var valueProperty = value[i][ propertyName ];
-	
+
 							switch( property.type ) {
 								case 'f':
 									_gl.uniform1f( locationProperty, valueProperty );
@@ -2289,7 +2289,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 					}
-					
+
 					break;
 
 				case 'iv1':
@@ -2577,7 +2577,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.directional.push( lightUniforms ); 
+				zlights.directional.push( lightUniforms );
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2603,7 +2603,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.point.push( lightUniforms ); 
+				zlights.point.push( lightUniforms );
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2631,7 +2631,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.spot.push( lightUniforms ); 
+				zlights.spot.push( lightUniforms );
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2664,7 +2664,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.hemi.push( lightUniforms ); 
+				zlights.hemi.push( lightUniforms );
 
 				if ( ! light.visible ) {
 					lightUniforms.skyColor.setRGB( 0, 0, 0 );
