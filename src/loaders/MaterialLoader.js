@@ -99,20 +99,17 @@ THREE.MaterialLoader.prototype = {
 		if ( json.normalMap !== undefined ) material.normalMap = this.getTexture( json.normalMap );
 		if ( json.normalScale )	{
 
-			var jsonValue = json.normalScale,
-				vector = new THREE.Vector2();
+			var normalScale = json.normalScale;
 
-			if ( Array.isArray( jsonValue ) ) {
+			if ( Array.isArray( normalScale ) === false ) {
 
-				vector.fromArray( jsonValue );
+				// Blender exporter used to export a scalar. See #7459
 
-			} else {
-
-				vector.set( jsonValue, jsonValue );
+				normalScale = [ normalScale, normalScale ];
 
 			}
 
-			material.normalScale = vector;
+			material.normalScale.fromArray( normalScale );
 
 		}
 
