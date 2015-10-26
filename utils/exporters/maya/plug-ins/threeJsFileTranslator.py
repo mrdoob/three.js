@@ -233,11 +233,10 @@ class ThreeJsWriter(object):
             "DbgName": mat.name(),
             "blending": "NormalBlending",
             "colorDiffuse": map(lambda i: i * mat.getDiffuseCoeff(), mat.getColor().rgb),
-            "colorAmbient": mat.getAmbientColor().rgb,
             "depthTest": True,
             "depthWrite": True,
             "shading": mat.__class__.__name__,
-            "transparency": mat.getTransparency().a,
+            "opacity": mat.getTransparency().a,
             "transparent": mat.getTransparency().a != 1.0,
             "vertexColors": False
         }
