@@ -1,21 +1,21 @@
 THREE.WebGLProgram = ( function () {
 
 	var programIdCount = 0;
-	
+
 	// TODO: Combine the regex
-	var structRe = /^([\w\d_]+)\.([\w\d_]+)$/; 
-	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/; 
-	var arrayRe = /^([\w\d_]+)\[0\]$/; 
+	var structRe = /^([\w\d_]+)\.([\w\d_]+)$/;
+	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/;
+	var arrayRe = /^([\w\d_]+)\[0\]$/;
 
 	function generateExtensions( extensions, parameters, rendererExtensions ) {
 
 		extensions = extensions || {};
 
 		var chunks = [
-			( parameters.logarithmicDepthBuffer || extensions.derivatives ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_OES_standard_derivatives : enable' : '',
-			( extensions.fragDepth ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
+			( extensions.derivatives || parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+			( extensions.fragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 			( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
-			( parameters.envMap || extensions.shaderTextureLOD ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
+			( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
 		];
 
 		return chunks.filter( filterEmptyLine ).join( '\n' );
@@ -45,7 +45,7 @@ THREE.WebGLProgram = ( function () {
 		var uniforms = {};
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
-	
+
 		for ( var i = 0; i < n; i ++ ) {
 
 			var info = gl.getActiveUniform( program, i );
