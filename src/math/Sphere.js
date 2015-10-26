@@ -114,7 +114,7 @@ THREE.Sphere.prototype = {
 		// If this distance is greater than the radius of the sphere,
 		// then there is no intersection.
 
-		return ( Math.abs( ( this.center.dot( plane.normal ) - plane.constant ) ) <= this.radius );
+		return Math.abs( this.center.dot( plane.normal ) - plane.constant ) <= this.radius;
 
 	},
 
@@ -123,6 +123,7 @@ THREE.Sphere.prototype = {
 		var deltaLengthSq = this.center.distanceToSquared( point );
 
 		var result = optionalTarget || new THREE.Vector3();
+
 		result.copy( point );
 
 		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
