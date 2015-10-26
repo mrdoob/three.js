@@ -3,7 +3,8 @@ vec3 diffuse = vec3( 1.0 );
 GeometricContext geometry = GeometricContext( mvPosition.xyz, normalize( transformedNormal ), normalize( -mvPosition.xyz ) );
 GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.normal, geometry.viewDir );
 
-	vLightFront = vec3( 0.0 );
+vLightFront = vec3( 0.0 );
+
 #ifdef DOUBLE_SIDED
 	vLightBack = vec3( 0.0 );
 #endif
@@ -74,11 +75,11 @@ GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.n
 		// dotNL is always one, and diffuseColor is vec3(1.0), thus the result is equivalent to summing indirectDiffuse lights
 		//float frontDotNL = saturate( dot( geometry.normal, frontIndirectLight.direction ) );
 		//vLightFront += frontDotNL * frontIndirectLight.color * BRDF_Diffuse_Lambert( diffuse );
-		
+
 		vLightFront += ambientLightColor;
 
 		#ifdef DOUBLE_SIDED
-		
+
 			vLightBack += ambientLightColor;
 
 		#endif
@@ -90,7 +91,7 @@ GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.n
 				vLightFront += getHemisphereIndirectLightColor( hemisphereLights[ i ], geometry );
 
 				#ifdef DOUBLE_SIDED
-			
+
 					vLightBack += getHemisphereIndirectLightColor( hemisphereLights[ i ], backGeometry );
 
 				#endif
