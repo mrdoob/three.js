@@ -1,6 +1,11 @@
 THREE.WebGLProgram = ( function () {
 
 	var programIdCount = 0;
+	
+	// TODO: Combine the regex
+	var structRe = /^([\w\d_]+)\.([\w\d_]+)$/; 
+	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/; 
+	var arrayRe = /^([\w\d_]+)\[0\]$/; 
 
 	function generateDefines( defines ) {
 
@@ -25,20 +30,58 @@ THREE.WebGLProgram = ( function () {
 		var uniforms = {};
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
-
+	
 		for ( var i = 0; i < n; i ++ ) {
 
 			var info = gl.getActiveUniform( program, i );
 			var name = info.name;
 			var location = gl.getUniformLocation( program, name );
 
-			// console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
+			//console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
 
-			var suffixPos = name.lastIndexOf( '[0]' );
-			if ( suffixPos !== - 1 && suffixPos === name.length - 3 ) {
+			var matches = structRe.exec(name);
+			if( matches ) {
 
-				uniforms[ name.substr( 0, suffixPos ) ] = location;
+				var structName = matches[1];
+				var structProperty = matches[2];
 
+				var uniformsStruct = uniforms[ structName ];
+				if( ! uniformsStruct ) {
+					uniformsStruct = uniforms[ structName ] = {};
+				}
+				uniformsStruct[ structProperty ] = location;
+
+				continue;
+			}
+
+			matches = arrayStructRe.exec(name);
+			if( matches ) {
+
+				var arrayName = matches[1];
+				var arrayIndex = matches[2];
+				var arrayProperty = matches[3];
+
+				var uniformsArray = uniforms[ arrayName ];
+				if( ! uniformsArray ) {
+					uniformsArray = uniforms[ arrayName ] = [];
+				}
+				var uniformsArrayIndex = uniformsArray[ arrayIndex ];
+				if( ! uniformsArrayIndex ) {
+					uniformsArrayIndex = uniformsArray[ arrayIndex ] = {};
+				}
+				uniformsArrayIndex[ arrayProperty ] = location;
+
+				continue;
+			}
+
+			matches = arrayRe.exec(name)
+			if( matches ) {
+
+				var arrayName = matches[1];
+
+				uniforms[ arrayName ] = location;
+
+				continue;
 			}
 
 			uniforms[ name ] = location;
@@ -285,7 +328,7 @@ THREE.WebGLProgram = ( function () {
 
 			prefixFragment = [
 
-				parameters.bumpMap || parameters.normalMap || parameters.flatShading || material.derivatives ? '#extension GL_OES_standard_derivatives : enable' : '',
+				parameters.bumpMap || parameters.normalMap || parameters.flatShading || material.derivatives || parameters.envMap ? '#extension GL_OES_standard_derivatives : enable' : '',
 				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 
 				parameters.envMap && renderer.extensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
