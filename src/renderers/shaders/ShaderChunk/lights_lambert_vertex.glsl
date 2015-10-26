@@ -3,6 +3,11 @@ vec3 diffuse = vec3( 1.0 );
 GeometricContext geometry = GeometricContext( mvPosition.xyz, normalize( transformedNormal ), normalize( -mvPosition.xyz ) );
 GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.normal, geometry.viewDir );
 
+	vLightFront = vec3( 0.0 );
+#ifdef DOUBLE_SIDED
+	vLightBack = vec3( 0.0 );
+#endif
+
 #if MAX_POINT_LIGHTS > 0
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
