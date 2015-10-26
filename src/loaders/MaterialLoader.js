@@ -97,7 +97,24 @@ THREE.MaterialLoader.prototype = {
 		if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
 
 		if ( json.normalMap !== undefined ) material.normalMap = this.getTexture( json.normalMap );
-		if ( json.normalScale )	material.normalScale = new THREE.Vector2( json.normalScale, json.normalScale );
+		if ( json.normalScale )	{
+
+			var jsonValue = json.normalScale,
+				vector = new THREE.Vector2();
+
+			if ( Array.isArray( jsonValue ) ) {
+
+				vector.fromArray( jsonValue );
+
+			} else {
+
+				vector.set( jsonValue, jsonValue );
+
+			}
+
+			material.normalScale = vector;
+
+		}
 
 		if ( json.displacementMap !== undefined ) material.displacementMap = this.getTexture( json.displacementMap );
 		if ( json.displacementScale !== undefined ) material.displacementScale = json.displacementScale;
