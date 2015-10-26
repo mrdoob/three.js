@@ -36,7 +36,10 @@ class Material(base_classes.BaseNode):
             self[constants.EMISSIVE] = utilities.rgb2int(emissive)
 
         vertex_color = api.material.use_vertex_colors(self.node)
-        self[constants.VERTEX_COLORS] = vertex_color
+        if vertex_color:
+            self[constants.VERTEX_COLORS] = constants.VERTEX_COLORS_ON
+        else:
+            self[constants.VERTEX_COLORS] = constants.VERTEX_COLORS_OFF
 
         self[constants.BLENDING] = api.material.blending(self.node)
 
