@@ -2562,13 +2562,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		zlights = _lights,
 
-		viewMatrix = camera.matrixWorldInverse;
+		viewMatrix = camera.matrixWorldInverse,
 
-		// those are held by reference, so do not clobber
-		zlights.directional.length = 0;
-		zlights.point.length = 0;
-		zlights.spot.length = 0;
-		zlights.hemi.length = 0;
+		writeIndexDirectional = 0,
+		writeIndexPoint = 0,
+		writeIndexSpot = 0,
+		writeIndexHemi = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -2596,7 +2595,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.directional.push( lightUniforms );
+				zlights.directional[ writeIndexDirectional ++ ] = lightUniforms;
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2622,7 +2621,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.point.push( lightUniforms );
+				zlights.point[ writeIndexPoint ++ ] = lightUniforms; 
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2650,7 +2649,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.spot.push( lightUniforms );
+				zlights.spot[ writeIndexSpot ++ ] = lightUniforms; 
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2683,7 +2682,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.hemi.push( lightUniforms );
+				zlights.hemi[ writeIndexHemi ++ ] = lightUniforms; 
 
 				if ( ! light.visible ) {
 					lightUniforms.skyColor.setRGB( 0, 0, 0 );
@@ -2704,6 +2703,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		zlights.ambient[ 0 ] = r;
 		zlights.ambient[ 1 ] = g;
 		zlights.ambient[ 2 ] = b;
+
+		zlights.directional.length = writeIndexDirectional;
+		zlights.point.length = writeIndexPoint;
+		zlights.spot.length = writeIndexSpot;
+		zlights.hemi.length = writeIndexHemi;
 
 	}
 
