@@ -58,7 +58,12 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.morphTargets = false; // set to use morph targets
 	this.morphNormals = false; // set to use morph normals
 
-	this.derivatives = false; // set to use derivatives
+	this.extensions = {
+		derivatives: false, // set to use derivatives
+		fragDepth: false, // set to use fragment depth values
+		drawBuffers: false, // set to use draw buffers
+		shaderTextureLOD: false // set to use shader texture LOD
+	};
 
 	// When rendered geometry doesn't include these attributes but the material does,
 	// use these default values in WebGL. This avoids errors when buffer data is missing.
@@ -115,7 +120,7 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
 
-	this.derivatives = source.derivatives;
+	this.extensions = source.extensions;
 
 	return this;
 
@@ -133,3 +138,24 @@ THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+Object.defineProperties( THREE.ShaderMaterial.prototype, {
+
+	derivatives: {
+
+		get: function () {
+
+			return this.extensions.derivatives;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
+			this.extensions.derivatives = value;
+
+		}
+
+	}
+
+} );

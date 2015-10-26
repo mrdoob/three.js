@@ -7,6 +7,21 @@ THREE.WebGLProgram = ( function () {
 	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/; 
 	var arrayRe = /^([\w\d_]+)\[0\]$/; 
 
+	function generateExtensions( extensions, parameters, rendererExtensions ) {
+
+		extensions = extensions || {};
+
+		var chunks = [
+			( parameters.logarithmicDepthBuffer || extensions.derivatives ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+			( extensions.fragDepth ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
+			( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
+			( parameters.envMap || extensions.shaderTextureLOD ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
+		];
+
+		return chunks.filter( filterEmptyLine ).join( '\n' );
+
+	}
+
 	function generateDefines( defines ) {
 
 		var chunks = [];
@@ -123,6 +138,7 @@ THREE.WebGLProgram = ( function () {
 
 		var gl = renderer.context;
 
+		var extensions = material.extensions;
 		var defines = material.defines;
 
 		var vertexShader = material.__webglShader.vertexShader;
@@ -196,6 +212,8 @@ THREE.WebGLProgram = ( function () {
 		// console.log( 'building new program ' );
 
 		//
+
+		var customExtensions = generateExtensions( extensions, parameters, renderer.extensions );
 
 		var customDefines = generateDefines( defines );
 
@@ -326,12 +344,10 @@ THREE.WebGLProgram = ( function () {
 
 			].filter( filterEmptyLine ).join( '\n' );
 
+
 			prefixFragment = [
 
-				parameters.bumpMap || parameters.normalMap || parameters.flatShading || material.derivatives ? '#extension GL_OES_standard_derivatives : enable' : '',
-				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
-
-				parameters.envMap && renderer.extensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
+				customExtensions,
 
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
