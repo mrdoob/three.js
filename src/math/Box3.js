@@ -247,14 +247,6 @@ THREE.Box3.prototype = {
 
 	},
 
-	isIntersectionBox: function ( box ) {
-
-		console.warn( 'THREE.Box3: .isIntersectionBox() has been renamed to .intersectsBox().' );
-
-		return this.intersectsBox( box );
-
-	},
-
 	intersectsSphere: ( function () {
 
 		var closestPoint;
@@ -272,14 +264,6 @@ THREE.Box3.prototype = {
 		};
 
 	} )(),
-
-	isIntersectionSphere: function ( sphere ) {
-
-		console.warn( 'THREE.Box3: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
-
-		return this.intersectsSphere( sphere );
-
-	},
 
 	intersectsPlane: function ( plane ) {
 

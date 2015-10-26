@@ -180,14 +180,6 @@ THREE.Box2.prototype = {
 
 	},
 
-	isIntersectionBox: function ( box ) {
-
-		console.warn( 'THREE.Box2: .isIntersectionBox() has been renamed to .intersectsBox().' );
-
-		return this.intersectsBox( box );
-
-	},
-
 	clampPoint: function ( point, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector2();

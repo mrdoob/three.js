@@ -2,6 +2,30 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+Object.defineProperties( THREE.Box2.prototype, {
+	isIntersectionBox: {
+		value: function ( box ) {
+			console.warn( 'THREE.Box2: .isIntersectionBox() has been renamed to .intersectsBox().' );
+			return this.intersectsBox( box );
+		}
+	}
+} );
+
+Object.defineProperties( THREE.Box3.prototype, {
+	isIntersectionBox: {
+		value: function ( box ) {
+			console.warn( 'THREE.Box3: .isIntersectionBox() has been renamed to .intersectsBox().' );
+			return this.intersectsBox( box );
+		}
+	},
+	isIntersectionSphere: {
+		value: function ( sphere ) {
+			console.warn( 'THREE.Box3: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
+			return this.intersectsSphere( sphere );
+		}
+	}
+} );
+
 Object.defineProperties( THREE.Light.prototype, {
 	onlyShadow: {
 		set: function ( value ) {
