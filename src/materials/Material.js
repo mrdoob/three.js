@@ -156,7 +156,7 @@ THREE.Material.prototype = {
 		if ( this.normalMap instanceof THREE.Texture ) {
 
 			data.normalMap = this.normalMap.toJSON( meta ).uuid;
-			data.normalScale = this.normalScale; // Removed for now, causes issue in editor ui.js
+			data.normalScale = this.normalScale.toArray();
 
 		}
 		if ( this.displacementMap instanceof THREE.Texture ) {
