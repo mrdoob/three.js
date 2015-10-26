@@ -160,6 +160,8 @@
 				var loader = new THREE.JSONLoader();
 				loader.load( "models/skinned/knight.js", function ( geometry, materials ) {
 
+					console.log( 'materials', materials );
+
 					createScene( geometry, materials, 0, FLOOR, -300, 60 )
 
 					// GUI
