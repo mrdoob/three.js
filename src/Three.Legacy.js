@@ -312,6 +312,10 @@ Object.defineProperties( THREE.Material.prototype, {
 
 Object.defineProperties( THREE.ShaderMaterial.prototype, {
 	derivatives: {
+		get: function () {
+			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
+			return this.extensions.derivatives;			
+		},
 		set: function ( value ) {
 			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
 			this.extensions.derivatives = value;
