@@ -121,19 +121,3 @@ THREE.Points.prototype.clone = function () {
 	return new this.constructor( this.geometry, this.material ).copy( this );
 
 };
-
-// Backwards compatibility
-
-THREE.PointCloud = function ( geometry, material ) {
-
-	console.warn( 'THREE.PointCloud has been renamed to THREE.Points.' );
-	return new THREE.Points( geometry, material );
-
-};
-
-THREE.ParticleSystem = function ( geometry, material ) {
-
-	console.warn( 'THREE.ParticleSystem has been renamed to THREE.Points.' );
-	return new THREE.Points( geometry, material );
-
-};

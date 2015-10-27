@@ -223,6 +223,23 @@ Object.defineProperties( THREE.Object3D.prototype, {
 
 //
 
+Object.defineProperties( THREE, {
+	PointCloud: {
+		value: function ( geometry, material ) {
+			console.warn( 'THREE.PointCloud has been renamed to THREE.Points.' );
+			return new THREE.Points( geometry, material );
+		}
+	},
+	ParticleSystem: {
+		value: function ( geometry, material ) {
+			console.warn( 'THREE.ParticleSystem has been renamed to THREE.Points.' );
+			return new THREE.Points( geometry, material );
+		}
+	}
+} );
+
+//
+
 Object.defineProperties( THREE.Light.prototype, {
 	onlyShadow: {
 		set: function ( value ) {
