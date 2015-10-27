@@ -310,11 +310,32 @@ Object.defineProperties( THREE.Material.prototype, {
 	}
 } );
 
+Object.defineProperties( THREE, {
+	PointCloudMaterial: {
+		value: function ( parameters ) {
+			console.warn( 'THREE.PointCloudMaterial has been renamed to THREE.PointsMaterial.' );
+			return new THREE.PointsMaterial( parameters );
+		}
+	},
+	ParticleBasicMaterial: {
+		value: function ( parameters ) {
+			console.warn( 'THREE.ParticleBasicMaterial has been renamed to THREE.PointsMaterial.' );
+			return new THREE.PointsMaterial( parameters );
+		}
+	},
+	ParticleSystemMaterial:{
+		value: function ( parameters ) {
+			console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointsMaterial.' );
+			return new THREE.PointsMaterial( parameters );
+		}
+	}
+} );
+
 Object.defineProperties( THREE.ShaderMaterial.prototype, {
 	derivatives: {
 		get: function () {
 			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
-			return this.extensions.derivatives;			
+			return this.extensions.derivatives;
 		},
 		set: function ( value ) {
 			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
