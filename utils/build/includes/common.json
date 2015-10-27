@@ -51,6 +51,8 @@
 	"src/animation/tracks/QuaternionKeyframeTrack.js",
 	"src/animation/tracks/StringKeyframeTrack.js",
 	"src/animation/tracks/VectorKeyframeTrack.js",
+	"src/audio/Audio.js",
+	"src/audio/AudioListener.js",
 	"src/cameras/Camera.js",
 	"src/cameras/CubeCamera.js",
 	"src/cameras/OrthographicCamera.js",

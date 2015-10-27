@@ -2,8 +2,6 @@
 	"src/extras/CurveUtils.js",
 	"src/extras/SceneUtils.js",
 	"src/extras/ShapeUtils.js",
-	"src/extras/audio/Audio.js",
-	"src/extras/audio/AudioListener.js",
 	"src/extras/core/Curve.js",
 	"src/extras/core/CurvePath.js",
 	"src/extras/core/Path.js",
