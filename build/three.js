@@ -8320,42 +8320,6 @@ THREE.Object3D.prototype = {
 
 	constructor: THREE.Object3D,
 
-	get eulerOrder () {
-
-		console.warn( 'THREE.Object3D: .eulerOrder is now .rotation.order.' );
-
-		return this.rotation.order;
-
-	},
-
-	set eulerOrder ( value ) {
-
-		console.warn( 'THREE.Object3D: .eulerOrder is now .rotation.order.' );
-
-		this.rotation.order = value;
-
-	},
-
-	get useQuaternion () {
-
-		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
-
-	},
-
-	set useQuaternion ( value ) {
-
-		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
-
-	},
-
-	set renderDepth ( value ) {
-
-		console.warn( 'THREE.Object3D: .renderDepth has been removed. Use .renderOrder, instead.' );
-
-	},
-
-	//
-
 	applyMatrix: function ( matrix ) {
 
 		this.matrix.multiplyMatrices( matrix, this.matrix );
@@ -8467,13 +8431,6 @@ THREE.Object3D.prototype = {
 		};
 
 	}(),
-
-	translate: function ( distance, axis ) {
-
-		console.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
-		return this.translateOnAxis( axis, distance );
-
-	},
 
 	translateX: function () {
 
@@ -8612,13 +8569,6 @@ THREE.Object3D.prototype = {
 			this.children.splice( index, 1 );
 
 		}
-
-	},
-
-	getChildByName: function ( name ) {
-
-		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
-		return this.getObjectByName( name );
 
 	},
 
@@ -16072,6 +16022,287 @@ THREE.VectorKeyframeTrack.prototype =
 
 } );
 
+// File:src/audio/Audio.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.Audio = function ( listener ) {
+
+	THREE.Object3D.call( this );
+
+	this.type = 'Audio';
+
+	this.context = listener.context;
+	this.source = this.context.createBufferSource();
+	this.source.onended = this.onEnded.bind( this );
+
+	this.gain = this.context.createGain();
+	this.gain.connect( this.context.destination );
+
+	this.panner = this.context.createPanner();
+	this.panner.connect( this.gain );
+
+	this.autoplay = false;
+
+	this.startTime = 0;
+	this.playbackRate = 1;
+	this.isPlaying = false;
+
+};
+
+THREE.Audio.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Audio.prototype.constructor = THREE.Audio;
+
+THREE.Audio.prototype.load = function ( file ) {
+
+	var scope = this;
+
+	var request = new XMLHttpRequest();
+	request.open( 'GET', file, true );
+	request.responseType = 'arraybuffer';
+	request.onload = function ( e ) {
+
+		scope.context.decodeAudioData( this.response, function ( buffer ) {
+
+			scope.source.buffer = buffer;
+
+			if ( scope.autoplay ) scope.play();
+
+		} );
+
+	};
+	request.send();
+
+	return this;
+
+};
+
+THREE.Audio.prototype.play = function () {
+
+	if ( this.isPlaying === true ) {
+
+		console.warn( 'THREE.Audio: Audio is already playing.' );
+		return;
+
+	}
+
+	var source = this.context.createBufferSource();
+
+	source.buffer = this.source.buffer;
+	source.loop = this.source.loop;
+	source.onended = this.source.onended;
+	source.start( 0, this.startTime );
+	source.playbackRate.value = this.playbackRate;
+
+	this.isPlaying = true;
+
+	this.source = source;
+
+	this.connect();
+
+};
+
+THREE.Audio.prototype.pause = function () {
+
+	this.source.stop();
+	this.startTime = this.context.currentTime;
+
+};
+
+THREE.Audio.prototype.stop = function () {
+
+	this.source.stop();
+	this.startTime = 0;
+
+};
+
+THREE.Audio.prototype.connect = function () {
+
+	if ( this.filter !== undefined ) {
+
+		this.source.connect( this.filter );
+		this.filter.connect( this.panner );
+
+	} else {
+
+		this.source.connect( this.panner );
+
+	}
+
+};
+
+THREE.Audio.prototype.disconnect = function () {
+
+	if ( this.filter !== undefined ) {
+
+		this.source.disconnect( this.filter );
+		this.filter.disconnect( this.panner );
+
+	} else {
+
+		this.source.disconnect( this.panner );
+
+	}
+
+};
+
+THREE.Audio.prototype.setFilter = function ( value ) {
+
+	if ( this.isPlaying === true ) {
+
+		this.disconnect();
+		this.filter = value;
+		this.connect();
+
+	} else {
+
+		this.filter = value;
+
+	}
+
+};
+
+THREE.Audio.prototype.getFilter = function () {
+
+	return this.filter;
+
+};
+
+THREE.Audio.prototype.setPlaybackRate = function ( value ) {
+
+	this.playbackRate = value;
+
+	if ( this.isPlaying === true ) {
+
+		this.source.playbackRate.value = this.playbackRate;
+
+	}
+
+};
+
+THREE.Audio.prototype.getPlaybackRate = function () {
+
+	return this.playbackRate;
+
+};
+
+THREE.Audio.prototype.onEnded = function() {
+
+	this.isPlaying = false;
+
+};
+
+THREE.Audio.prototype.setLoop = function ( value ) {
+
+	this.source.loop = value;
+
+};
+
+THREE.Audio.prototype.getLoop = function () {
+
+	return this.source.loop;
+
+};
+
+THREE.Audio.prototype.setRefDistance = function ( value ) {
+
+	this.panner.refDistance = value;
+
+};
+
+THREE.Audio.prototype.getRefDistance = function () {
+
+	return this.panner.refDistance;
+
+};
+
+THREE.Audio.prototype.setRolloffFactor = function ( value ) {
+
+	this.panner.rolloffFactor = value;
+
+};
+
+THREE.Audio.prototype.getRolloffFactor = function () {
+
+	return this.panner.rolloffFactor;
+
+};
+
+THREE.Audio.prototype.setVolume = function ( value ) {
+
+	this.gain.gain.value = value;
+
+};
+
+THREE.Audio.prototype.getVolume = function () {
+
+	return this.gain.gain.value;
+
+};
+
+THREE.Audio.prototype.updateMatrixWorld = ( function () {
+
+	var position = new THREE.Vector3();
+
+	return function updateMatrixWorld( force ) {
+
+		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+
+		position.setFromMatrixPosition( this.matrixWorld );
+
+		this.panner.setPosition( position.x, position.y, position.z );
+
+	};
+
+} )();
+
+// File:src/audio/AudioListener.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.AudioListener = function () {
+
+	THREE.Object3D.call( this );
+
+	this.type = 'AudioListener';
+
+	this.context = new ( window.AudioContext || window.webkitAudioContext )();
+
+};
+
+THREE.AudioListener.prototype = Object.create( THREE.Object3D.prototype );
+THREE.AudioListener.prototype.constructor = THREE.AudioListener;
+
+THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
+
+	var position = new THREE.Vector3();
+	var quaternion = new THREE.Quaternion();
+	var scale = new THREE.Vector3();
+
+	var orientation = new THREE.Vector3();
+
+	return function updateMatrixWorld( force ) {
+
+		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+
+		var listener = this.context.listener;
+		var up = this.up;
+
+		this.matrixWorld.decompose( position, quaternion, scale );
+
+		orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+
+		listener.setPosition( position.x, position.y, position.z );
+		listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
+
+	};
+
+} )();
+
 // File:src/cameras/Camera.js
 
 /**
@@ -19360,7 +19591,7 @@ THREE.Material.prototype = {
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
-	
+
 		// TODO: Copied from Object3D.toJSON
 
 		function extractFromCache ( cache ) {
@@ -19440,27 +19671,6 @@ THREE.Material.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
-
-	},
-
-	// Deprecated
-
-	get wrapAround () {
-
-		console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
-
-	},
-
-	set wrapAround ( boolean ) {
-
-		console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
-
-	},
-
-	get wrapRGB () {
-
-		console.warn( 'THREE.' + this.type + ': .wrapRGB has been removed.' );
-		return new THREE.Color();
 
 	}
 
@@ -31231,8 +31441,6 @@ Object.defineProperties( THREE.Box3.prototype, {
 	}
 } );
 
-//
-
 Object.defineProperties( THREE.Matrix3.prototype, {
 	multiplyVector3: {
 		value: function ( vector ) {
@@ -31318,8 +31526,6 @@ Object.defineProperties( THREE.Matrix4.prototype, {
 	}
 } );
 
-//
-
 Object.defineProperties( THREE.Plane.prototype, {
 	isIntersectionLine: {
 		value: function ( line ) {
@@ -31329,8 +31535,6 @@ Object.defineProperties( THREE.Plane.prototype, {
 	}
 } );
 
-//
-
 Object.defineProperties( THREE.Quaternion.prototype, {
 	multiplyVector3: {
 		value: function ( vector ) {
@@ -31339,8 +31543,6 @@ Object.defineProperties( THREE.Quaternion.prototype, {
 		}
 	}
 } );
-
-//
 
 Object.defineProperties( THREE.Ray.prototype, {
 	isIntersectionBox: {
@@ -31362,8 +31564,6 @@ Object.defineProperties( THREE.Ray.prototype, {
 		}
 	}
 } );
-
-//
 
 Object.defineProperties( THREE.Vector3.prototype, {
 	setEulerFromRotationMatrix: {
@@ -31392,6 +31592,46 @@ Object.defineProperties( THREE.Vector3.prototype, {
 		value: function ( index, matrix ) {
 			console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
 			return this.setFromMatrixColumn( index, matrix );
+		}
+	}
+} );
+
+//
+
+Object.defineProperties( THREE.Object3D.prototype, {
+	eulerOrder: {
+		get: function () {
+			console.warn( 'THREE.Object3D: .eulerOrder is now .rotation.order.' );
+			return this.rotation.order;
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.Object3D: .eulerOrder is now .rotation.order.' );
+			this.rotation.order = value;
+		}
+	},
+	getChildByName: {
+		value: function ( name ) {
+			console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
+			return this.getObjectByName( name );
+		}
+	},
+	renderDepth: {
+		set: function ( value ) {
+			console.warn( 'THREE.Object3D: .renderDepth has been removed. Use .renderOrder, instead.' );
+		}
+	},
+	translate: {
+		value: function ( distance, axis ) {
+			console.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
+			return this.translateOnAxis( axis, distance );
+		}
+	},
+	useQuaternion: {
+		get: function () {
+			console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 		}
 	}
 } );
@@ -31468,8 +31708,29 @@ Object.defineProperties( THREE.Light.prototype, {
 
 //
 
+Object.defineProperties( THREE.Material.prototype, {
+	wrapAround: {
+		get: function () {
+			console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+		}
+	},
+	wrapRGB: {
+		get: function () {
+			console.warn( 'THREE.' + this.type + ': .wrapRGB has been removed.' );
+			return new THREE.Color();
+		}
+	}
+} );
+
 Object.defineProperties( THREE.ShaderMaterial.prototype, {
 	derivatives: {
+		get: function () {
+			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
+			return this.extensions.derivatives;			
+		},
 		set: function ( value ) {
 			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
 			this.extensions.derivatives = value;
@@ -32659,287 +32920,6 @@ THREE.ShapeUtils = {
 	} )()
 
 };
-
-// File:src/extras/audio/Audio.js
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.Audio = function ( listener ) {
-
-	THREE.Object3D.call( this );
-
-	this.type = 'Audio';
-
-	this.context = listener.context;
-	this.source = this.context.createBufferSource();
-	this.source.onended = this.onEnded.bind( this );
-
-	this.gain = this.context.createGain();
-	this.gain.connect( this.context.destination );
-
-	this.panner = this.context.createPanner();
-	this.panner.connect( this.gain );
-
-	this.autoplay = false;
-
-	this.startTime = 0;
-	this.playbackRate = 1;
-	this.isPlaying = false;
-
-};
-
-THREE.Audio.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Audio.prototype.constructor = THREE.Audio;
-
-THREE.Audio.prototype.load = function ( file ) {
-
-	var scope = this;
-
-	var request = new XMLHttpRequest();
-	request.open( 'GET', file, true );
-	request.responseType = 'arraybuffer';
-	request.onload = function ( e ) {
-
-		scope.context.decodeAudioData( this.response, function ( buffer ) {
-
-			scope.source.buffer = buffer;
-
-			if ( scope.autoplay ) scope.play();
-
-		} );
-
-	};
-	request.send();
-
-	return this;
-
-};
-
-THREE.Audio.prototype.play = function () {
-
-	if ( this.isPlaying === true ) {
-
-		console.warn( 'THREE.Audio: Audio is already playing.' );
-		return;
-
-	}
-
-	var source = this.context.createBufferSource();
-
-	source.buffer = this.source.buffer;
-	source.loop = this.source.loop;
-	source.onended = this.source.onended;
-	source.start( 0, this.startTime );
-	source.playbackRate.value = this.playbackRate;
-
-	this.isPlaying = true;
-
-	this.source = source;
-
-	this.connect();
-
-};
-
-THREE.Audio.prototype.pause = function () {
-
-	this.source.stop();
-	this.startTime = this.context.currentTime;
-
-};
-
-THREE.Audio.prototype.stop = function () {
-
-	this.source.stop();
-	this.startTime = 0;
-
-};
-
-THREE.Audio.prototype.connect = function () {
-
-	if ( this.filter !== undefined ) {
-
-		this.source.connect( this.filter );
-		this.filter.connect( this.panner );
-
-	} else {
-
-		this.source.connect( this.panner );
-
-	}
-
-};
-
-THREE.Audio.prototype.disconnect = function () {
-
-	if ( this.filter !== undefined ) {
-
-		this.source.disconnect( this.filter );
-		this.filter.disconnect( this.panner );
-
-	} else {
-
-		this.source.disconnect( this.panner );
-
-	}
-
-};
-
-THREE.Audio.prototype.setFilter = function ( value ) {
-
-	if ( this.isPlaying === true ) {
-
-		this.disconnect();
-		this.filter = value;
-		this.connect();
-
-	} else {
-
-		this.filter = value;
-
-	}
-
-};
-
-THREE.Audio.prototype.getFilter = function () {
-
-	return this.filter;
-
-};
-
-THREE.Audio.prototype.setPlaybackRate = function ( value ) {
-
-	this.playbackRate = value;
-
-	if ( this.isPlaying === true ) {
-
-		this.source.playbackRate.value = this.playbackRate;
-
-	}
-
-};
-
-THREE.Audio.prototype.getPlaybackRate = function () {
-
-	return this.playbackRate;
-
-};
-
-THREE.Audio.prototype.onEnded = function() {
-
-	this.isPlaying = false;
-
-};
-
-THREE.Audio.prototype.setLoop = function ( value ) {
-
-	this.source.loop = value;
-
-};
-
-THREE.Audio.prototype.getLoop = function () {
-
-	return this.source.loop;
-
-};
-
-THREE.Audio.prototype.setRefDistance = function ( value ) {
-
-	this.panner.refDistance = value;
-
-};
-
-THREE.Audio.prototype.getRefDistance = function () {
-
-	return this.panner.refDistance;
-
-};
-
-THREE.Audio.prototype.setRolloffFactor = function ( value ) {
-
-	this.panner.rolloffFactor = value;
-
-};
-
-THREE.Audio.prototype.getRolloffFactor = function () {
-
-	return this.panner.rolloffFactor;
-
-};
-
-THREE.Audio.prototype.setVolume = function ( value ) {
-
-	this.gain.gain.value = value;
-
-};
-
-THREE.Audio.prototype.getVolume = function () {
-
-	return this.gain.gain.value;
-
-};
-
-THREE.Audio.prototype.updateMatrixWorld = ( function () {
-
-	var position = new THREE.Vector3();
-
-	return function updateMatrixWorld( force ) {
-
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
-
-		position.setFromMatrixPosition( this.matrixWorld );
-
-		this.panner.setPosition( position.x, position.y, position.z );
-
-	};
-
-} )();
-
-// File:src/extras/audio/AudioListener.js
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.AudioListener = function () {
-
-	THREE.Object3D.call( this );
-
-	this.type = 'AudioListener';
-
-	this.context = new ( window.AudioContext || window.webkitAudioContext )();
-
-};
-
-THREE.AudioListener.prototype = Object.create( THREE.Object3D.prototype );
-THREE.AudioListener.prototype.constructor = THREE.AudioListener;
-
-THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
-
-	var position = new THREE.Vector3();
-	var quaternion = new THREE.Quaternion();
-	var scale = new THREE.Vector3();
-
-	var orientation = new THREE.Vector3();
-
-	return function updateMatrixWorld( force ) {
-
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
-
-		var listener = this.context.listener;
-		var up = this.up;
-
-		this.matrixWorld.decompose( position, quaternion, scale );
-
-		orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
-
-		listener.setPosition( position.x, position.y, position.z );
-		listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
-
-	};
-
-} )();
 
 // File:src/extras/core/Curve.js
 
