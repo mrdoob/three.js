@@ -20663,29 +20663,6 @@ THREE.PointsMaterial.prototype.copy = function ( source ) {
 
 };
 
-// backwards compatibility
-
-THREE.PointCloudMaterial = function ( parameters ) {
-
-	console.warn( 'THREE.PointCloudMaterial has been renamed to THREE.PointsMaterial.' );
-	return new THREE.PointsMaterial( parameters );
-
-};
-
-THREE.ParticleBasicMaterial = function ( parameters ) {
-
-	console.warn( 'THREE.ParticleBasicMaterial has been renamed to THREE.PointsMaterial.' );
-	return new THREE.PointsMaterial( parameters );
-
-};
-
-THREE.ParticleSystemMaterial = function ( parameters ) {
-
-	console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointsMaterial.' );
-	return new THREE.PointsMaterial( parameters );
-
-};
-
 // File:src/materials/ShaderMaterial.js
 
 /**
@@ -21446,22 +21423,6 @@ THREE.Points.prototype.raycast = ( function () {
 THREE.Points.prototype.clone = function () {
 
 	return new this.constructor( this.geometry, this.material ).copy( this );
-
-};
-
-// Backwards compatibility
-
-THREE.PointCloud = function ( geometry, material ) {
-
-	console.warn( 'THREE.PointCloud has been renamed to THREE.Points.' );
-	return new THREE.Points( geometry, material );
-
-};
-
-THREE.ParticleSystem = function ( geometry, material ) {
-
-	console.warn( 'THREE.ParticleSystem has been renamed to THREE.Points.' );
-	return new THREE.Points( geometry, material );
 
 };
 
@@ -25607,10 +25568,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( renderTarget ) {
 
 			var texture = renderTarget.texture;
-			var isTargetPowerOfTwo = isPowerOfTwo( renderTarget );
-			if ( texture.generateMipmaps && isTargetPowerOfTwo && texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
 
-				 updateRenderTargetMipmap( renderTarget );
+			if ( texture.generateMipmaps && isPowerOfTwo( renderTarget ) &&
+					texture.minFilter !== THREE.NearestFilter &&
+					texture.minFilter !== THREE.LinearFilter ) {
+
+				updateRenderTargetMipmap( renderTarget );
 
 			}
 
@@ -27060,7 +27023,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.point[ writeIndexPoint ++ ] = lightUniforms; 
+				zlights.point[ writeIndexPoint ++ ] = lightUniforms;
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -27088,7 +27051,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.spot[ writeIndexSpot ++ ] = lightUniforms; 
+				zlights.spot[ writeIndexSpot ++ ] = lightUniforms;
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -27121,7 +27084,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.hemi[ writeIndexHemi ++ ] = lightUniforms; 
+				zlights.hemi[ writeIndexHemi ++ ] = lightUniforms;
 
 				if ( ! light.visible ) {
 					lightUniforms.skyColor.setRGB( 0, 0, 0 );
@@ -31640,6 +31603,23 @@ Object.defineProperties( THREE.Object3D.prototype, {
 
 //
 
+Object.defineProperties( THREE, {
+	PointCloud: {
+		value: function ( geometry, material ) {
+			console.warn( 'THREE.PointCloud has been renamed to THREE.Points.' );
+			return new THREE.Points( geometry, material );
+		}
+	},
+	ParticleSystem: {
+		value: function ( geometry, material ) {
+			console.warn( 'THREE.ParticleSystem has been renamed to THREE.Points.' );
+			return new THREE.Points( geometry, material );
+		}
+	}
+} );
+
+//
+
 Object.defineProperties( THREE.Light.prototype, {
 	onlyShadow: {
 		set: function ( value ) {
@@ -31727,11 +31707,32 @@ Object.defineProperties( THREE.Material.prototype, {
 	}
 } );
 
+Object.defineProperties( THREE, {
+	PointCloudMaterial: {
+		value: function ( parameters ) {
+			console.warn( 'THREE.PointCloudMaterial has been renamed to THREE.PointsMaterial.' );
+			return new THREE.PointsMaterial( parameters );
+		}
+	},
+	ParticleBasicMaterial: {
+		value: function ( parameters ) {
+			console.warn( 'THREE.ParticleBasicMaterial has been renamed to THREE.PointsMaterial.' );
+			return new THREE.PointsMaterial( parameters );
+		}
+	},
+	ParticleSystemMaterial:{
+		value: function ( parameters ) {
+			console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointsMaterial.' );
+			return new THREE.PointsMaterial( parameters );
+		}
+	}
+} );
+
 Object.defineProperties( THREE.ShaderMaterial.prototype, {
 	derivatives: {
 		get: function () {
 			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
-			return this.extensions.derivatives;			
+			return this.extensions.derivatives;
 		},
 		set: function ( value ) {
 			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
