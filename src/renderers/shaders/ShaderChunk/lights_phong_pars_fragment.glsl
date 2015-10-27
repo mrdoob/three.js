@@ -17,6 +17,7 @@ struct BlinnPhongMaterial {
 	vec3	diffuseColor;
 	vec3	specularColor;
 	float	specularShininess;
+	float	specularStrength;
 };
 
 void BlinnPhongMaterial_RE_DirectLight( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight directReflectedLight ) {
@@ -25,8 +26,8 @@ void BlinnPhongMaterial_RE_DirectLight( const in IncidentLight directLight, cons
 
 	directReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( material.diffuseColor );
 
-	directReflectedLight.specular += dotNL * directLight.color * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );
-	
+	directReflectedLight.specular += dotNL * directLight.color * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;
+
 }
 
 #define Material_RE_DirectLight    BlinnPhongMaterial_RE_DirectLight
