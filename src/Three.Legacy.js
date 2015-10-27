@@ -26,6 +26,41 @@ Object.defineProperties( THREE.Box3.prototype, {
 	}
 } );
 
+//
+
+Object.defineProperties( THREE.Vector3.prototype, {
+	setEulerFromRotationMatrix: {
+		value: function () {
+			console.error( 'THREE.Vector3: .setEulerFromRotationMatrix() has been removed. Use Euler.setFromRotationMatrix() instead.' );
+		}
+	},
+	setEulerFromQuaternion: {
+		value: function () {
+			console.error( 'THREE.Vector3: .setEulerFromQuaternion() has been removed. Use Euler.setFromQuaternion() instead.' );
+		}
+	},
+	getPositionFromMatrix: {
+		value: function ( m ) {
+			console.warn( 'THREE.Vector3: .getPositionFromMatrix() has been renamed to .setFromMatrixPosition().' );
+			return this.setFromMatrixPosition( m );
+		}
+	},
+	getScaleFromMatrix: {
+		value: function ( m ) {
+			console.warn( 'THREE.Vector3: .getScaleFromMatrix() has been renamed to .setFromMatrixScale().' );
+			return this.setFromMatrixScale( m );
+		}
+	},
+	getColumnFromMatrix: {
+		value: function ( index, matrix ) {
+			console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
+			return this.setFromMatrixColumn( index, matrix );
+		}
+	}
+} );
+
+//
+
 Object.defineProperties( THREE.Light.prototype, {
 	onlyShadow: {
 		set: function ( value ) {
