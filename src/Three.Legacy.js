@@ -28,6 +28,93 @@ Object.defineProperties( THREE.Box3.prototype, {
 
 //
 
+Object.defineProperties( THREE.Matrix3.prototype, {
+	multiplyVector3: {
+		value: function ( vector ) {
+			console.warn( 'THREE.Matrix3: .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.' );
+			return vector.applyMatrix3( this );
+		}
+	},
+	multiplyVector3Array: {
+		value: function ( a ) {
+			console.warn( 'THREE.Matrix3: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
+			return this.applyToVector3Array( a );
+		}
+	}
+} );
+
+Object.defineProperties( THREE.Matrix4.prototype, {
+	extractPosition: {
+		value: function ( m ) {
+			console.warn( 'THREE.Matrix4: .extractPosition() has been renamed to .copyPosition().' );
+			return this.copyPosition( m );
+		}
+	},
+	setRotationFromQuaternion: {
+		value: function ( q ) {
+			console.warn( 'THREE.Matrix4: .setRotationFromQuaternion() has been renamed to .makeRotationFromQuaternion().' );
+			return this.makeRotationFromQuaternion( q );
+		}
+	},
+	multiplyVector3: {
+		value: function ( vector ) {
+			console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
+			return vector.applyProjection( this );
+		}
+	},
+	multiplyVector4: {
+		value: function ( vector ) {
+			console.warn( 'THREE.Matrix4: .multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+			return vector.applyMatrix4( this );
+		}
+	},
+	multiplyVector3Array: {
+		value: function ( a ) {
+			console.warn( 'THREE.Matrix4: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
+			return this.applyToVector3Array( a );
+		}
+	},
+	rotateAxis: {
+		value: function ( v ) {
+			console.warn( 'THREE.Matrix4: .rotateAxis() has been removed. Use Vector3.transformDirection( matrix ) instead.' );
+			v.transformDirection( this );
+		}
+	},
+	crossVector: {
+		value: function ( vector ) {
+			console.warn( 'THREE.Matrix4: .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+			return vector.applyMatrix4( this );
+		}
+	},
+	translate: {
+		value: function ( v ) {
+			console.error( 'THREE.Matrix4: .translate() has been removed.' );
+		}
+	},
+	rotateX: {
+		value: function ( angle ) {
+			console.error( 'THREE.Matrix4: .rotateX() has been removed.' );
+		}
+	},
+	rotateY: {
+		value: function ( angle ) {
+			console.error( 'THREE.Matrix4: .rotateY() has been removed.' );
+		}
+	},
+	rotateZ: {
+		value: function ( angle ) {
+			console.error( 'THREE.Matrix4: .rotateZ() has been removed.' );
+		}
+	},
+	rotateByAxis: {
+		value: function ( axis, angle ) {
+			console.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
+		}
+	}	
+} );
+
+//
+
 Object.defineProperties( THREE.Vector3.prototype, {
 	setEulerFromRotationMatrix: {
 		value: function () {
