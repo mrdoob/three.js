@@ -12,13 +12,15 @@ float average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }
 
 
 struct IncidentLight {
- 	vec3 color;
- 	vec3 direction;
+	vec3 color;
+	vec3 direction;
 };
 
 struct ReflectedLight {
- 	vec3 specular;
- 	vec3 diffuse;
+	vec3 directDiffuse;
+	vec3 directSpecular;
+	vec3 indirectDiffuse;
+	vec3 indirectSpecular;
 };
 
 struct GeometricContext {

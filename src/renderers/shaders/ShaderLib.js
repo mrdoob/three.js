@@ -98,13 +98,13 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 
-			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), diffuseColor.rgb );",
+			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), diffuseColor.rgb, vec3( 0.0 ) );",
 
 				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
-				"indirectReflectedLight.diffuse *= shadowMask;",
+				"reflectedLight.indirectDiffuse *= shadowMask;",
 
-				"vec3 outgoingLight = indirectReflectedLight.diffuse;",
+				"vec3 outgoingLight = reflectedLight.indirectDiffuse;",
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
@@ -370,8 +370,7 @@ THREE.ShaderLib = {
 			"void main() {",
 
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	ReflectedLight directReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
-			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
+			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
 			"	vec3 totalEmissiveLight = emissive;",
 			"	vec3 shadowMask = vec3( 1.0 );",
 
@@ -393,16 +392,16 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
-				"directReflectedLight.diffuse *= shadowMask;",
-				"directReflectedLight.specular *= shadowMask;",
+				"reflectedLight.directDiffuse *= shadowMask;",
+				"reflectedLight.directSpecular *= shadowMask;",
 
 				"#ifdef METAL",
 
-				"	vec3 outgoingLight = ( directReflectedLight.diffuse + indirectReflectedLight.diffuse ) * specular + directReflectedLight.specular + indirectReflectedLight.specular + totalEmissiveLight;",
+				"   vec3 outgoingLight = ( reflectedLight.directDiffuse + reflectedLight.indirectDiffuse ) * specular + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
 
 				"#else",
 
-				"	vec3 outgoingLight = ( directReflectedLight.diffuse + indirectReflectedLight.diffuse ) + directReflectedLight.specular + indirectReflectedLight.specular + totalEmissiveLight;",
+				"   vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
 
 				"#endif",
 
@@ -540,7 +539,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "bsdfs" ],
 			THREE.ShaderChunk[ "lights_pars" ],
-			THREE.ShaderChunk[ "lights_physical_pars_fragment" ], // use phong chunk for now
+			THREE.ShaderChunk[ "lights_physical_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
 			THREE.ShaderChunk[ "normalmap_pars_fragment" ],
@@ -552,8 +551,7 @@ THREE.ShaderLib = {
 			"void main() {",
 
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	ReflectedLight directReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
-			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
+			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
 			"	vec3 totalEmissiveLight = emissive;",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
@@ -579,10 +577,11 @@ THREE.ShaderLib = {
 
 				"vec3 shadowMask = vec3( 1.0 );",
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
-				"directReflectedLight.diffuse *= shadowMask;",
-				"directReflectedLight.specular *= shadowMask;",
 
-				"vec3 outgoingLight = directReflectedLight.diffuse + indirectReflectedLight.diffuse + directReflectedLight.specular + indirectReflectedLight.specular + totalEmissiveLight;",
+				"reflectedLight.directDiffuse *= shadowMask;",
+				"reflectedLight.directSpecular *= shadowMask;",
+
+				"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
