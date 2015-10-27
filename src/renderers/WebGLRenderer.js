@@ -1168,10 +1168,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( renderTarget ) {
 
 			var texture = renderTarget.texture;
-			var isTargetPowerOfTwo = isPowerOfTwo( renderTarget );
-			if ( texture.generateMipmaps && isTargetPowerOfTwo && texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
 
-				 updateRenderTargetMipmap( renderTarget );
+			if ( texture.generateMipmaps && isPowerOfTwo( renderTarget ) &&
+					texture.minFilter !== THREE.NearestFilter &&
+					texture.minFilter !== THREE.LinearFilter ) {
+
+				updateRenderTargetMipmap( renderTarget );
 
 			}
 
@@ -2621,7 +2623,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.point[ writeIndexPoint ++ ] = lightUniforms; 
+				zlights.point[ writeIndexPoint ++ ] = lightUniforms;
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2649,7 +2651,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.spot[ writeIndexSpot ++ ] = lightUniforms; 
+				zlights.spot[ writeIndexSpot ++ ] = lightUniforms;
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2682,7 +2684,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.hemi[ writeIndexHemi ++ ] = lightUniforms; 
+				zlights.hemi[ writeIndexHemi ++ ] = lightUniforms;
 
 				if ( ! light.visible ) {
 					lightUniforms.skyColor.setRGB( 0, 0, 0 );
