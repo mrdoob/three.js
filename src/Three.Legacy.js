@@ -26,8 +26,6 @@ Object.defineProperties( THREE.Box3.prototype, {
 	}
 } );
 
-//
-
 Object.defineProperties( THREE.Matrix3.prototype, {
 	multiplyVector3: {
 		value: function ( vector ) {
@@ -113,8 +111,6 @@ Object.defineProperties( THREE.Matrix4.prototype, {
 	}
 } );
 
-//
-
 Object.defineProperties( THREE.Plane.prototype, {
 	isIntersectionLine: {
 		value: function ( line ) {
@@ -124,8 +120,6 @@ Object.defineProperties( THREE.Plane.prototype, {
 	}
 } );
 
-//
-
 Object.defineProperties( THREE.Quaternion.prototype, {
 	multiplyVector3: {
 		value: function ( vector ) {
@@ -134,8 +128,6 @@ Object.defineProperties( THREE.Quaternion.prototype, {
 		}
 	}
 } );
-
-//
 
 Object.defineProperties( THREE.Ray.prototype, {
 	isIntersectionBox: {
@@ -157,8 +149,6 @@ Object.defineProperties( THREE.Ray.prototype, {
 		}
 	}
 } );
-
-//
 
 Object.defineProperties( THREE.Vector3.prototype, {
 	setEulerFromRotationMatrix: {
@@ -187,6 +177,46 @@ Object.defineProperties( THREE.Vector3.prototype, {
 		value: function ( index, matrix ) {
 			console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
 			return this.setFromMatrixColumn( index, matrix );
+		}
+	}
+} );
+
+//
+
+Object.defineProperties( THREE.Object3D.prototype, {
+	eulerOrder: {
+		get: function () {
+			console.warn( 'THREE.Object3D: .eulerOrder is now .rotation.order.' );
+			return this.rotation.order;
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.Object3D: .eulerOrder is now .rotation.order.' );
+			this.rotation.order = value;
+		}
+	},
+	getChildByName: {
+		value: function ( name ) {
+			console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
+			return this.getObjectByName( name );
+		}
+	},
+	renderDepth: {
+		set: function ( value ) {
+			console.warn( 'THREE.Object3D: .renderDepth has been removed. Use .renderOrder, instead.' );
+		}
+	},
+	translate: {
+		value: function ( distance, axis ) {
+			console.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
+			return this.translateOnAxis( axis, distance );
+		}
+	},
+	useQuaternion: {
+		get: function () {
+			console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 		}
 	}
 } );
