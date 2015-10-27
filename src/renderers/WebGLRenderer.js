@@ -2577,8 +2577,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.AmbientLight ) {
 
-				if ( ! light.visible ) continue;
-
 				r += color.r;
 				g += color.g;
 				b += color.b;
@@ -2594,11 +2592,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var lightUniforms = light.__webglUniforms;
 				_lights.directional[ writeIndexDirectional ++ ] = lightUniforms;
-
-				if ( ! light.visible ) {
-					lightUniforms.color.setRGB( 0, 0, 0 );
-					continue;
-				}
 
 				lightUniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
@@ -2620,11 +2613,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var lightUniforms = light.__webglUniforms;
 				_lights.point[ writeIndexPoint ++ ] = lightUniforms;
-
-				if ( ! light.visible ) {
-					lightUniforms.color.setRGB( 0, 0, 0 );
-					continue;
-				}
 
 				lightUniforms.position.setFromMatrixPosition( light.matrixWorld );
 				lightUniforms.position.applyMatrix4( viewMatrix );
@@ -2648,11 +2636,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var lightUniforms = light.__webglUniforms;
 				_lights.spot[ writeIndexSpot ++ ] = lightUniforms;
-
-				if ( ! light.visible ) {
-					lightUniforms.color.setRGB( 0, 0, 0 );
-					continue;
-				}
 
 				lightUniforms.position.setFromMatrixPosition( light.matrixWorld );
 				lightUniforms.position.applyMatrix4( viewMatrix );
@@ -2681,11 +2664,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var lightUniforms = light.__webglUniforms;
 				_lights.hemi[ writeIndexHemi ++ ] = lightUniforms;
-
-				if ( ! light.visible ) {
-					lightUniforms.skyColor.setRGB( 0, 0, 0 );
-					continue;
-				}
 
 				lightUniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				lightUniforms.direction.transformDirection( viewMatrix );
