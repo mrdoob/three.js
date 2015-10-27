@@ -374,7 +374,7 @@ THREE.ShaderLib = {
 			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
 			"	vec3 totalEmissiveLight = emissive;",
 			"	vec3 shadowMask = vec3( 1.0 );",
-			
+
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],

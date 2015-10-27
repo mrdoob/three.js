@@ -15,8 +15,8 @@ varying vec3 vViewPosition;
 
 struct BlinnPhongMaterial {
 	vec3	diffuseColor;
-	float	specularShininess;
 	vec3	specularColor;
+	float	specularShininess;
 };
 
 void BlinnPhongMaterial_RE_DirectLight( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight directReflectedLight ) {
