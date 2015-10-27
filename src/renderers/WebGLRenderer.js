@@ -2590,15 +2590,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 				}
 
-				var lightUniforms = light.__webglUniforms;
-				_lights.directional[ writeIndexDirectional ++ ] = lightUniforms;
+				var uniforms = light.__webglUniforms;
 
-				lightUniforms.direction.setFromMatrixPosition( light.matrixWorld );
+				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
-				lightUniforms.direction.sub( _vector3 );
-				lightUniforms.direction.transformDirection( viewMatrix );
+				uniforms.direction.sub( _vector3 );
+				uniforms.direction.transformDirection( viewMatrix );
+				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
 
-				lightUniforms.color.copy( light.color ).multiplyScalar( light.intensity );
+				_lights.directional[ writeIndexDirectional ++ ] = uniforms;
+
 
 			} else if ( light instanceof THREE.PointLight ) {
 
@@ -2611,15 +2612,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 				}
 
-				var lightUniforms = light.__webglUniforms;
-				_lights.point[ writeIndexPoint ++ ] = lightUniforms;
+				var uniforms = light.__webglUniforms;
 
-				lightUniforms.position.setFromMatrixPosition( light.matrixWorld );
-				lightUniforms.position.applyMatrix4( viewMatrix );
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
 
-				lightUniforms.color.copy( light.color ).multiplyScalar( light.intensity );
-				lightUniforms.distance = light.distance;
-				lightUniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
+				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
+				uniforms.distance = light.distance;
+				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
+
+				_lights.point[ writeIndexPoint ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
@@ -2634,23 +2636,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 				}
 
-				var lightUniforms = light.__webglUniforms;
-				_lights.spot[ writeIndexSpot ++ ] = lightUniforms;
+				var uniforms = light.__webglUniforms;
 
-				lightUniforms.position.setFromMatrixPosition( light.matrixWorld );
-				lightUniforms.position.applyMatrix4( viewMatrix );
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
 
-				lightUniforms.color.copy( color ).multiplyScalar( intensity );
-				lightUniforms.distance = distance;
+				uniforms.color.copy( color ).multiplyScalar( intensity );
+				uniforms.distance = distance;
 
-				lightUniforms.direction.setFromMatrixPosition( light.matrixWorld );
+				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
-				lightUniforms.direction.sub( _vector3 );
-				lightUniforms.direction.transformDirection( viewMatrix );
+				uniforms.direction.sub( _vector3 );
+				uniforms.direction.transformDirection( viewMatrix );
 
-				lightUniforms.angleCos = Math.cos( light.angle );
-				lightUniforms.exponent = light.exponent;
-				lightUniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
+				uniforms.angleCos = Math.cos( light.angle );
+				uniforms.exponent = light.exponent;
+				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
+
+				_lights.spot[ writeIndexSpot ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 
@@ -2662,15 +2665,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 				}
 
-				var lightUniforms = light.__webglUniforms;
-				_lights.hemi[ writeIndexHemi ++ ] = lightUniforms;
+				var uniforms = light.__webglUniforms;
 
-				lightUniforms.direction.setFromMatrixPosition( light.matrixWorld );
-				lightUniforms.direction.transformDirection( viewMatrix );
-				lightUniforms.direction.normalize();
+				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
+				uniforms.direction.transformDirection( viewMatrix );
+				uniforms.direction.normalize();
 
-				lightUniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
-				lightUniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
+				uniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
+				uniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
+
+				_lights.hemi[ writeIndexHemi ++ ] = uniforms;
 
 			}
 
