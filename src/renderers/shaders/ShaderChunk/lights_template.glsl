@@ -21,7 +21,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
 
-		Material_RE_DirectLight( directLight, geometry, material, directReflectedLight );
+		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );
 
 	}
 
@@ -33,7 +33,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );
 
-		Material_RE_DirectLight( directLight, geometry, material, directReflectedLight );
+		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );
 
 	}
 
@@ -45,7 +45,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
 
-		Material_RE_DirectLight( directLight, geometry, material, directReflectedLight );
+		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );
 		
 	}
 
@@ -73,7 +73,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 #endif
 
-		Material_RE_IndirectDiffuseLight( indirectDiffuseColor, geometry, material, indirectReflectedLight );
+		Material_RE_IndirectDiffuseLight( indirectDiffuseColor, geometry, material, reflectedLight );
 
 	}
 
@@ -85,7 +85,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 		vec3 indirectSpecularColor = getSpecularLightProbeIndirectLightColor( /*specularLightProbe,*/ geometry, Material_LightProbeLOD( material ) );
 
-    	Material_RE_IndirectSpecularLight( indirectSpecularColor, geometry, material, indirectReflectedLight );
+		Material_RE_IndirectSpecularLight( indirectSpecularColor, geometry, material, reflectedLight );
 
     }
 
