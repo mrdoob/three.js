@@ -31,7 +31,7 @@ SetValueCommand.prototype = {
 
 		this.object[ this.attributeName ] = this.newValue;
 		this.editor.signals.objectChanged.dispatch( this.object );
-		this.editor.signals.sceneGraphChanged.dispatch();
+		// this.editor.signals.sceneGraphChanged.dispatch();
 
 	},
 
@@ -39,7 +39,7 @@ SetValueCommand.prototype = {
 
 		this.object[ this.attributeName ] = this.oldValue;
 		this.editor.signals.objectChanged.dispatch( this.object );
-		this.editor.signals.sceneGraphChanged.dispatch();
+		// this.editor.signals.sceneGraphChanged.dispatch();
 
 	},
 
