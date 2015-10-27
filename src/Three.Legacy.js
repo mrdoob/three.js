@@ -126,6 +126,17 @@ Object.defineProperties( THREE.Plane.prototype, {
 
 //
 
+Object.defineProperties( THREE.Quaternion.prototype, {
+	multiplyVector3: {
+		value: function ( vector ) {
+			console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
+			return vector.applyQuaternion( this );
+		}
+	}
+} );
+
+//
+
 Object.defineProperties( THREE.Ray.prototype, {
 	isIntersectionBox: {
 		value: function ( box ) {
