@@ -110,7 +110,16 @@ Object.defineProperties( THREE.Matrix4.prototype, {
 		value: function ( axis, angle ) {
 			console.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
 		}
-	}	
+	}
+} );
+
+Object.defineProperties( THREE.Plane.prototype, {
+	isIntersectionLine: {
+		value: function ( line ) {
+			console.warn( 'THREE.Plane: .isIntersectionLine() has been renamed to .intersectsLine().' );
+			return this.intersectsLine( line );
+		}
+	}
 } );
 
 //
