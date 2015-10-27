@@ -16771,6 +16771,8 @@ THREE.LightShadow.prototype = {
 
 		this.mapSize.copy( source.mapSize );
 
+		return this;
+
 	},
 
 	clone: function () {
@@ -22915,11 +22917,11 @@ THREE.ShaderChunk[ 'lights_lambert_vertex'] = "vec3 diffuse = vec3( 1.0 );\nGeom
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_phong_fragment'] = "BlinnPhongMaterial material;\nmaterial.specularColor = specular;\nmaterial.specularShininess = shininess;\nmaterial.diffuseColor = diffuseColor.rgb;\n#ifdef METAL\n	material.diffuseColor = vec3( 0.0 );\n#endif";
+THREE.ShaderChunk[ 'lights_phong_fragment'] = "BlinnPhongMaterial material;\nmaterial.diffuseColor = diffuseColor.rgb;\nmaterial.specularColor = specular;\nmaterial.specularShininess = shininess;\nmaterial.specularStrength = specularStrength;\n#ifdef METAL\n	material.diffuseColor = vec3( 0.0 );\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_phong_pars_fragment'] = "#if MAX_SPOT_LIGHTS > 0 || defined( USE_ENVMAP )\n	varying vec3 vWorldPosition;\n#endif\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\nstruct BlinnPhongMaterial {\n	vec3	diffuseColor;\n	float	specularShininess;\n	vec3	specularColor;\n};\nvoid BlinnPhongMaterial_RE_DirectLight( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight directReflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	directReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( material.diffuseColor );\n	directReflectedLight.specular += dotNL * directLight.color * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );\n	\n}\n#define Material_RE_DirectLight    BlinnPhongMaterial_RE_DirectLight\nvoid BlinnPhongMaterial_RE_IndirectDiffuseLight( const in vec3 indirectDiffuseColor, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight indirectReflectedLight ) {\n	indirectReflectedLight.diffuse += indirectDiffuseColor * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\n#define Material_RE_IndirectDiffuseLight    BlinnPhongMaterial_RE_IndirectDiffuseLight\n#define Material_LightProbeLOD( material )   (0)\n";
+THREE.ShaderChunk[ 'lights_phong_pars_fragment'] = "#if MAX_SPOT_LIGHTS > 0 || defined( USE_ENVMAP )\n	varying vec3 vWorldPosition;\n#endif\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\nstruct BlinnPhongMaterial {\n	vec3	diffuseColor;\n	vec3	specularColor;\n	float	specularShininess;\n	float	specularStrength;\n};\nvoid BlinnPhongMaterial_RE_DirectLight( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight directReflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	directReflectedLight.diffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( material.diffuseColor );\n	directReflectedLight.specular += dotNL * directLight.color * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;\n}\n#define Material_RE_DirectLight    BlinnPhongMaterial_RE_DirectLight\nvoid BlinnPhongMaterial_RE_IndirectDiffuseLight( const in vec3 indirectDiffuseColor, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight indirectReflectedLight ) {\n	indirectReflectedLight.diffuse += indirectDiffuseColor * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\n#define Material_RE_IndirectDiffuseLight    BlinnPhongMaterial_RE_IndirectDiffuseLight\n#define Material_LightProbeLOD( material )   (0)\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_pars_vertex.glsl
 
@@ -23422,7 +23424,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				"indirectReflectedLight.diffuse *= shadowMask;",
-		
+
 				"vec3 outgoingLight = indirectReflectedLight.diffuse;",
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
@@ -23560,7 +23562,7 @@ THREE.ShaderLib = {
 			"	#endif",
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
-		
+
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
@@ -23666,7 +23668,7 @@ THREE.ShaderLib = {
 			"uniform float shininess;",
 			"uniform float opacity;",
 
-			THREE.ShaderChunk[ "common" ],	
+			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "uv_pars_fragment" ],
 			THREE.ShaderChunk[ "uv2_pars_fragment" ],
@@ -23692,7 +23694,8 @@ THREE.ShaderLib = {
 			"	ReflectedLight directReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
 			"	ReflectedLight indirectReflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ) );",
 			"	vec3 totalEmissiveLight = emissive;",
-			
+			"	vec3 shadowMask = vec3( 1.0 );",
+
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
@@ -23709,9 +23712,8 @@ THREE.ShaderLib = {
 
 				// modulation
 				THREE.ShaderChunk[ "aomap_fragment" ],
-			
-				"vec3 shadowMask = vec3( 1.0 );",
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
+
 				"directReflectedLight.diffuse *= shadowMask;",
 				"directReflectedLight.specular *= shadowMask;",
 
@@ -23889,7 +23891,7 @@ THREE.ShaderLib = {
 
 				// accumulation
 				THREE.ShaderChunk[ "lights_physical_fragment" ],
-				THREE.ShaderChunk[ "lights_template" ],		
+				THREE.ShaderChunk[ "lights_template" ],
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "envmap_physical_fragment" ],
 
