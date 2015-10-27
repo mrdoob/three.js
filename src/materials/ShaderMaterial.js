@@ -138,24 +138,3 @@ THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
-
-Object.defineProperties( THREE.ShaderMaterial.prototype, {
-
-	derivatives: {
-
-		get: function () {
-
-			return this.extensions.derivatives;
-
-		},
-
-		set: function ( value ) {
-
-			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
-			this.extensions.derivatives = value;
-
-		}
-
-	}
-
-} );

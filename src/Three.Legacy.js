@@ -96,6 +96,17 @@ Object.defineProperties( THREE.Light.prototype, {
 
 //
 
+Object.defineProperties( THREE.ShaderMaterial.prototype, {
+	derivatives: {
+		set: function ( value ) {
+			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
+			this.extensions.derivatives = value;
+		}
+	}
+} );
+
+//
+
 Object.defineProperties( THREE.WebGLRenderer.prototype, {
 	supportsFloatTextures: {
 		value: function () {
