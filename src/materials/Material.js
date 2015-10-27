@@ -187,7 +187,7 @@ THREE.Material.prototype = {
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
-	
+
 		// TODO: Copied from Object3D.toJSON
 
 		function extractFromCache ( cache ) {
@@ -267,27 +267,6 @@ THREE.Material.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
-
-	},
-
-	// Deprecated
-
-	get wrapAround () {
-
-		console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
-
-	},
-
-	set wrapAround ( boolean ) {
-
-		console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
-
-	},
-
-	get wrapRGB () {
-
-		console.warn( 'THREE.' + this.type + ': .wrapRGB has been removed.' );
-		return new THREE.Color();
 
 	}
 

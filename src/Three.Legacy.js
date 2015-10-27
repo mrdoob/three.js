@@ -263,6 +263,23 @@ Object.defineProperties( THREE.Light.prototype, {
 
 //
 
+Object.defineProperties( THREE.Material.prototype, {
+	wrapAround: {
+		get: function () {
+			console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+		}
+	},
+	wrapRGB: {
+		get: function () {
+			console.warn( 'THREE.' + this.type + ': .wrapRGB has been removed.' );
+			return new THREE.Color();
+		}
+	}
+} );
+
 Object.defineProperties( THREE.ShaderMaterial.prototype, {
 	derivatives: {
 		set: function ( value ) {
