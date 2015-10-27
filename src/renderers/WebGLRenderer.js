@@ -106,19 +106,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// light arrays cache
 
-	_direction = new THREE.Vector3(),
-
-	_lightsNeedUpdate = true,
-
 	_lights = {
 
 		ambient: [ 0, 0, 0 ],
-		directional: { length: 0, colors: [], positions: [] },
-		point: { length: 0, colors: [], positions: [], distances: [], decays: [] },
-		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [], decays: [] },
-		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
+		directional: [],
+		point: [],
+		spot: [],
+		hemi: []
 
 	},
+
+	_lightsNeedUpdate = true,
 
 	// info
 
@@ -2562,8 +2560,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		intensity,
 		distance,
 
-		zlights = _lights,
-
 		viewMatrix = camera.matrixWorldInverse,
 
 		writeIndexDirectional = 0,
@@ -2597,7 +2593,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.directional[ writeIndexDirectional ++ ] = lightUniforms;
+				_lights.directional[ writeIndexDirectional ++ ] = lightUniforms;
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2623,7 +2619,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.point[ writeIndexPoint ++ ] = lightUniforms;
+				_lights.point[ writeIndexPoint ++ ] = lightUniforms;
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2651,7 +2647,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.spot[ writeIndexSpot ++ ] = lightUniforms;
+				_lights.spot[ writeIndexSpot ++ ] = lightUniforms;
 
 				if ( ! light.visible ) {
 					lightUniforms.color.setRGB( 0, 0, 0 );
@@ -2684,7 +2680,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var lightUniforms = light.__webglUniforms;
-				zlights.hemi[ writeIndexHemi ++ ] = lightUniforms;
+				_lights.hemi[ writeIndexHemi ++ ] = lightUniforms;
 
 				if ( ! light.visible ) {
 					lightUniforms.skyColor.setRGB( 0, 0, 0 );
@@ -2702,14 +2698,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		zlights.ambient[ 0 ] = r;
-		zlights.ambient[ 1 ] = g;
-		zlights.ambient[ 2 ] = b;
+		_lights.ambient[ 0 ] = r;
+		_lights.ambient[ 1 ] = g;
+		_lights.ambient[ 2 ] = b;
 
-		zlights.directional.length = writeIndexDirectional;
-		zlights.point.length = writeIndexPoint;
-		zlights.spot.length = writeIndexSpot;
-		zlights.hemi.length = writeIndexHemi;
+		_lights.directional.length = writeIndexDirectional;
+		_lights.point.length = writeIndexPoint;
+		_lights.spot.length = writeIndexSpot;
+		_lights.hemi.length = writeIndexHemi;
 
 	}
 
