@@ -113,11 +113,36 @@ Object.defineProperties( THREE.Matrix4.prototype, {
 	}
 } );
 
+//
+
 Object.defineProperties( THREE.Plane.prototype, {
 	isIntersectionLine: {
 		value: function ( line ) {
 			console.warn( 'THREE.Plane: .isIntersectionLine() has been renamed to .intersectsLine().' );
 			return this.intersectsLine( line );
+		}
+	}
+} );
+
+//
+
+Object.defineProperties( THREE.Ray.prototype, {
+	isIntersectionBox: {
+		value: function ( box ) {
+			console.warn( 'THREE.Ray: .isIntersectionBox() has been renamed to .intersectsBox().' );
+			return this.intersectsBox( box );
+		}
+	},
+	isIntersectionPlane: {
+		value: function ( plane ) {
+			console.warn( 'THREE.Ray: .isIntersectionPlane() has been renamed to .intersectsPlane().' );
+			return this.intersectsPlane( plane );
+		}
+	},
+	isIntersectionSphere: {
+		value: function ( sphere ) {
+			console.warn( 'THREE.Ray: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
+			return this.intersectsSphere( sphere );
 		}
 	}
 } );

@@ -279,14 +279,6 @@ THREE.Ray.prototype = {
 
 	},
 
-	isIntersectionSphere: function ( sphere ) {
-
-		console.warn( 'THREE.Ray: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
-
-		return this.intersectsSphere( sphere );
-
-	},
-
 	distanceToPlane: function ( plane ) {
 
 		var denominator = plane.normal.dot( this.direction );
@@ -353,14 +345,6 @@ THREE.Ray.prototype = {
 		// ray origin is behind the plane (and is pointing behind it)
 
 		return false;
-
-	},
-
-	isIntersectionPlane: function ( plane ) {
-
-		console.warn( 'THREE.Ray: .isIntersectionPlane() has been renamed to .intersectsPlane().' );
-
-		return this.intersectsPlane( plane );
 
 	},
 
@@ -446,14 +430,6 @@ THREE.Ray.prototype = {
 		};
 
 	} )(),
-
-	isIntersectionBox: function ( box ) {
-
-		console.warn( 'THREE.Ray: .isIntersectionBox() has been renamed to .intersectsBox().' );
-
-		return this.intersectsBox( box );
-
-	},
 
 	intersectTriangle: function () {
 
