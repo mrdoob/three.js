@@ -1383,7 +1383,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var materialProperties = properties.get( material );
 
-		var parameters = programCache.getParameters( material, lights, fog, object );
+		var parameters = programCache.getParameters( material, _lights, fog, object );
 		var code = programCache.getProgramCode( material, parameters );
 
 		var program = materialProperties.program;
