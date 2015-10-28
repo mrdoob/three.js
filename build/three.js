@@ -24602,6 +24602,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
 	var properties = new THREE.WebGLProperties();
+	var materialsCache = new THREE.WebGLMaterials();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
 	var programCache = new THREE.WebGLPrograms( this, capabilities );
 
@@ -24993,7 +24994,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function releaseMaterialProgramReference( material ) {
 
-		var programInfo = properties.get( material ).program;
+		var programInfo = materialsCache.get( material ).program;
 
 		material.program = undefined;
 
@@ -25514,6 +25515,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		setupLights( lights, camera );
+
 		//
 
 		shadowMap.render( scene, camera );
@@ -25773,7 +25776,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function initMaterial( material, lights, fog, object ) {
 
-		var materialProperties = properties.get( material );
+		var materialProperties = materialsCache.get( material );
 
 		var parameters = programCache.getParameters( material, lights, fog, object );
 		var code = programCache.getProgramCode( material, parameters );
@@ -25937,7 +25940,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_usedTextureUnits = 0;
 
-		var materialProperties = properties.get( material );
+		var materialProperties = materialsCache.get( material );
 
 		if ( material.needsUpdate || ! materialProperties.program ) {
 
@@ -26109,7 +26112,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_lightsNeedUpdate = false;
 
-					setupLights( lights, camera );
 					refreshLights = true;
 
 				}
@@ -26961,10 +26963,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		viewMatrix = camera.matrixWorldInverse,
 
-		writeIndexDirectional = 0,
-		writeIndexPoint = 0,
-		writeIndexSpot = 0,
-		writeIndexHemi = 0;
+		directionalCurrent = _lights.directional.length,
+		pointCurrent = _lights.point.length,
+		spotCurrent = _lights.spot.length,
+		hemiCurrent = _lights.hemi.length,
+
+		directionalLength = 0,
+		pointLength = 0,
+		spotLength = 0,
+		hemiLength = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -26997,7 +27004,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.direction.transformDirection( viewMatrix );
 				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
 
-				_lights.directional[ writeIndexDirectional ++ ] = uniforms;
+				_lights.directional[ directionalLength ++ ] = uniforms;
 
 
 			} else if ( light instanceof THREE.PointLight ) {
@@ -27020,7 +27027,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.distance = light.distance;
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
-				_lights.point[ writeIndexPoint ++ ] = uniforms;
+				_lights.point[ pointLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
@@ -27052,7 +27059,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.exponent = light.exponent;
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
-				_lights.spot[ writeIndexSpot ++ ] = uniforms;
+				_lights.spot[ spotLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 
@@ -27073,7 +27080,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
 				uniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
 
-				_lights.hemi[ writeIndexHemi ++ ] = uniforms;
+				_lights.hemi[ hemiLength ++ ] = uniforms;
 
 			}
 
@@ -27083,10 +27090,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lights.ambient[ 1 ] = g;
 		_lights.ambient[ 2 ] = b;
 
-		_lights.directional.length = writeIndexDirectional;
-		_lights.point.length = writeIndexPoint;
-		_lights.spot.length = writeIndexSpot;
-		_lights.hemi.length = writeIndexHemi;
+		// Reset materials if light setup changes
+
+		if ( directionalCurrent !== directionalLength ||
+				pointCurrent !== pointLength ||
+				spotCurrent !== spotLength ||
+				hemiCurrent !== hemiLength ) {
+
+			materialsCache.clear();
+
+		}
+
+		_lights.directional.length = directionalLength;
+		_lights.point.length = pointLength;
+		_lights.spot.length = spotLength;
+		_lights.hemi.length = hemiLength;
 
 	}
 
@@ -28381,6 +28399,46 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 };
 
+// File:src/renderers/webgl/WebGLMaterials.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.WebGLMaterials = function () {
+
+	var properties = {};
+
+	this.get = function ( material ) {
+
+		var uuid = material.uuid;
+		var map = properties[ uuid ];
+
+		if ( map === undefined ) {
+
+			map = {};
+			properties[ uuid ] = map;
+
+		}
+
+		return map;
+
+	};
+
+	this.delete = function ( object ) {
+
+		delete properties[ object.uuid ];
+
+	};
+
+	this.clear = function () {
+
+		properties = {};
+
+	};
+
+};
+
 // File:src/renderers/webgl/WebGLObjects.js
 
 /**
@@ -29268,8 +29326,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			var light = lights[ l ];
 
-			if ( light.visible === false ) continue;
-
 			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
 			if ( light instanceof THREE.PointLight ) pointLights ++;
 			if ( light instanceof THREE.SpotLight ) spotLights ++;
@@ -29290,7 +29346,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			var light = lights[ l ];
 
-			if ( ! light.castShadow ) continue;
+			if ( light.castShadow === false ) continue;
 
 			if ( light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) maxShadows ++;
 			if ( light instanceof THREE.PointLight ) {
