@@ -193,7 +193,6 @@ var list = {
 		"Extras / Geometries": [
 			[ "BoxGeometry", "api/extras/geometries/BoxGeometry" ],
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
-			[ "CubeGeometry", "api/extras/geometries/CubeGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
 			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
 			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
