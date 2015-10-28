@@ -108,6 +108,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_lights = {
 
+		hash: '',
+
 		ambient: [ 0, 0, 0 ],
 		directional: [],
 		point: [],
@@ -1496,6 +1498,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				material instanceof THREE.MeshPhysicalMaterial ||
 				material.lights ) {
 
+			materialProperties.lightsHash = _lights.hash;
+
 			// wire up the material to this renderer's lighting state
 
 			uniforms.ambientLightColor.value = _lights.ambient;
@@ -1543,7 +1547,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var materialProperties = materialsCache.get( material );
 
-		if ( material.needsUpdate || ! materialProperties.program ) {
+		if ( materialProperties.program === undefined ) {
+
+			material.needsUpdate = true;
+
+		}
+
+		if ( materialProperties.lightsHash !== undefined &&
+			materialProperties.lightsHash !== _lights.hash ) {
+
+			material.needsUpdate = true;
+
+		}
+
+		if ( material.needsUpdate ) {
 
 			initMaterial( material, lights, fog, object );
 			material.needsUpdate = false;
@@ -2564,11 +2581,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		viewMatrix = camera.matrixWorldInverse,
 
-		directionalCurrent = _lights.directional.length,
-		pointCurrent = _lights.point.length,
-		spotCurrent = _lights.spot.length,
-		hemiCurrent = _lights.hemi.length,
-
 		directionalLength = 0,
 		pointLength = 0,
 		spotLength = 0,
@@ -2691,21 +2703,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lights.ambient[ 1 ] = g;
 		_lights.ambient[ 2 ] = b;
 
-		// Reset materials if light setup changes
-
-		if ( directionalCurrent !== directionalLength ||
-				pointCurrent !== pointLength ||
-				spotCurrent !== spotLength ||
-				hemiCurrent !== hemiLength ) {
-
-			materialsCache.clear();
-
-		}
-
 		_lights.directional.length = directionalLength;
 		_lights.point.length = pointLength;
 		_lights.spot.length = spotLength;
 		_lights.hemi.length = hemiLength;
+
+		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength;
 
 	}
 
