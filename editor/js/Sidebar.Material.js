@@ -60,9 +60,10 @@ Sidebar.Material = function ( editor ) {
 		'LineDashedMaterial': 'LineDashedMaterial',
 		'MeshBasicMaterial': 'MeshBasicMaterial',
 		'MeshDepthMaterial': 'MeshDepthMaterial',
-		'MeshLambertMaterial': 'MeshLambertMaterial',
 		'MeshNormalMaterial': 'MeshNormalMaterial',
+		'MeshLambertMaterial': 'MeshLambertMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial',
+		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
 		'ShaderMaterial': 'ShaderMaterial',
 		'SpriteMaterial': 'SpriteMaterial'
 
@@ -116,6 +117,26 @@ Sidebar.Material = function ( editor ) {
 	materialColorRow.add( materialColor );
 
 	container.add( materialColorRow );
+
+	// roughness
+
+	var materialRoughnessRow = new UI.Panel();
+	var materialRoughness = new UI.Number( 0.5 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+
+	materialRoughnessRow.add( new UI.Text( 'Roughness' ).setWidth( '90px' ) );
+	materialRoughnessRow.add( materialRoughness );
+
+	container.add( materialRoughnessRow );
+
+	// metalness
+
+	var materialMetalnessRow = new UI.Panel();
+	var materialMetalness = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+
+	materialMetalnessRow.add( new UI.Text( 'Metalness' ).setWidth( '90px' ) );
+	materialMetalnessRow.add( materialMetalness );
+
+	container.add( materialMetalnessRow );
 
 	// emissive
 
@@ -422,6 +443,18 @@ Sidebar.Material = function ( editor ) {
 			if ( material.color !== undefined && material.color.getHex() !== materialColor.getHexValue() ) {
 
 				editor.execute( new SetMaterialColorCommand( currentObject, 'color', materialColor.getHexValue() ) );
+
+			}
+
+			if ( material.roughness !== undefined && Math.abs( material.roughness - materialRoughness.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetMaterialValueCommand( currentObject, 'roughness', materialRoughness.getValue() ) );
+
+			}
+
+			if ( material.metalness !== undefined && Math.abs( material.metalness - materialMetalness.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetMaterialValueCommand( currentObject, 'metalness', materialMetalness.getValue() ) );
 
 			}
 
@@ -752,6 +785,8 @@ Sidebar.Material = function ( editor ) {
 		var properties = {
 			'name': materialNameRow,
 			'color': materialColorRow,
+			'roughness': materialRoughnessRow,
+			'metalness': materialMetalnessRow,
 			'emissive': materialEmissiveRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
@@ -810,6 +845,18 @@ Sidebar.Material = function ( editor ) {
 		if ( material.color !== undefined ) {
 
 			materialColor.setHexValue( material.color.getHexString() );
+
+		}
+
+		if ( material.roughness !== undefined ) {
+
+			materialRoughness.setValue( material.roughness );
+
+		}
+
+		if ( material.metalness !== undefined ) {
+
+			materialMetalness.setValue( material.metalness );
 
 		}
 
