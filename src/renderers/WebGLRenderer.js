@@ -203,6 +203,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
 	var properties = new THREE.WebGLProperties();
+	var materialsCache = new THREE.WebGLMaterials();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
 	var programCache = new THREE.WebGLPrograms( this, capabilities );
 
@@ -594,7 +595,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function releaseMaterialProgramReference( material ) {
 
-		var programInfo = properties.get( material ).program;
+		var programInfo = materialsCache.get( material ).program;
 
 		material.program = undefined;
 
@@ -1374,7 +1375,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function initMaterial( material, lights, fog, object ) {
 
-		var materialProperties = properties.get( material );
+		var materialProperties = materialsCache.get( material );
 
 		var parameters = programCache.getParameters( material, lights, fog, object );
 		var code = programCache.getProgramCode( material, parameters );
@@ -1538,7 +1539,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_usedTextureUnits = 0;
 
-		var materialProperties = properties.get( material );
+		var materialProperties = materialsCache.get( material );
 
 		if ( material.needsUpdate || ! materialProperties.program ) {
 
