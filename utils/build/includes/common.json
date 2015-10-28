@@ -194,7 +194,6 @@
 	"src/renderers/webgl/WebGLExtensions.js",
 	"src/renderers/webgl/WebGLCapabilities.js",
 	"src/renderers/webgl/WebGLGeometries.js",
-	"src/renderers/webgl/WebGLMaterials.js",
 	"src/renderers/webgl/WebGLObjects.js",
 	"src/renderers/webgl/WebGLProgram.js",
 	"src/renderers/webgl/WebGLPrograms.js",

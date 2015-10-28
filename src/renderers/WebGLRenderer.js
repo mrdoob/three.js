@@ -205,7 +205,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
 	var properties = new THREE.WebGLProperties();
-	var materialsCache = new THREE.WebGLMaterials();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
 	var programCache = new THREE.WebGLPrograms( this, capabilities );
 
@@ -597,7 +596,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function releaseMaterialProgramReference( material ) {
 
-		var programInfo = materialsCache.get( material ).program;
+		var programInfo = properties.get( material ).program;
 
 		material.program = undefined;
 
@@ -1379,7 +1378,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function initMaterial( material, lights, fog, object ) {
 
-		var materialProperties = materialsCache.get( material );
+		var materialProperties = properties.get( material );
 
 		var parameters = programCache.getParameters( material, lights, fog, object );
 		var code = programCache.getProgramCode( material, parameters );
@@ -1498,6 +1497,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				material instanceof THREE.MeshPhysicalMaterial ||
 				material.lights ) {
 
+			// store the light setup it was created for
+
 			materialProperties.lightsHash = _lights.hash;
 
 			// wire up the material to this renderer's lighting state
@@ -1545,7 +1546,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_usedTextureUnits = 0;
 
-		var materialProperties = materialsCache.get( material );
+		var materialProperties = properties.get( material );
 
 		if ( materialProperties.program === undefined ) {
 
