@@ -77,8 +77,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			var light = lights[ l ];
 
-			if ( light.visible === false ) continue;
-
 			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
 			if ( light instanceof THREE.PointLight ) pointLights ++;
 			if ( light instanceof THREE.SpotLight ) spotLights ++;
@@ -99,7 +97,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			var light = lights[ l ];
 
-			if ( ! light.castShadow ) continue;
+			if ( light.castShadow === false ) continue;
 
 			if ( light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) maxShadows ++;
 			if ( light instanceof THREE.PointLight ) {
