@@ -24595,7 +24595,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		directional: [],
 		point: [],
 		spot: [],
-		hemi: []
+		hemi: [],
+
+		shadows: 0,
+		shadowsPointLight: 0
 
 	},
 
@@ -25861,7 +25864,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var materialProperties = properties.get( material );
 
-		var parameters = programCache.getParameters( material, lights, fog, object );
+		var parameters = programCache.getParameters( material, _lights, fog, object );
 		var code = programCache.getProgramCode( material, parameters );
 
 		var program = materialProperties.program;
@@ -27068,6 +27071,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spotLength = 0,
 		hemiLength = 0;
 
+		_lights.shadows = 0;
+		_lights.shadowsPointLight = 0;
+
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			light = lights[ l ];
@@ -27101,6 +27107,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_lights.directional[ directionalLength ++ ] = uniforms;
 
+				if ( light.castShadow ) _lights.shadows ++;
 
 			} else if ( light instanceof THREE.PointLight ) {
 
@@ -27123,6 +27130,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
 				_lights.point[ pointLength ++ ] = uniforms;
+
+				if ( light.castShadow ) {
+
+					_lights.shadows ++;
+					_lights.shadowsPointLight ++;
+
+				}
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
@@ -27155,6 +27169,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
 				_lights.spot[ spotLength ++ ] = uniforms;
+
+				if ( light.castShadow ) _lights.shadows ++;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 
@@ -29361,61 +29377,12 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 	}
 
-	function allocateLights( lights ) {
-
-		var dirLights = 0;
-		var pointLights = 0;
-		var spotLights = 0;
-		var hemiLights = 0;
-
-		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
-
-			var light = lights[ l ];
-
-			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
-			if ( light instanceof THREE.PointLight ) pointLights ++;
-			if ( light instanceof THREE.SpotLight ) spotLights ++;
-			if ( light instanceof THREE.HemisphereLight ) hemiLights ++;
-
-		}
-
-		return { 'directional': dirLights, 'point': pointLights, 'spot': spotLights, 'hemi': hemiLights };
-
-	}
-
-	function allocateShadows( lights ) {
-
-		var maxShadows = 0;
-		var pointLightShadows = 0;
-
-		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
-
-			var light = lights[ l ];
-
-			if ( light.castShadow === false ) continue;
-
-			if ( light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) maxShadows ++;
-			if ( light instanceof THREE.PointLight ) {
-
-				maxShadows ++;
-				pointLightShadows ++;
-
-			}
-
-		}
-
-		return { 'maxShadows': maxShadows, 'pointLightShadows': pointLightShadows };
-
-	}
-
 	this.getParameters = function ( material, lights, fog, object ) {
 
 		var shaderID = shaderIDs[ material.type ];
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
 
-		var maxLightCount = allocateLights( lights );
-		var allocatedShadows = allocateShadows( lights );
 		var maxBones = allocateBones( object );
 		var precision = renderer.getPrecision();
 
@@ -29475,14 +29442,15 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			maxMorphTargets: renderer.maxMorphTargets,
 			maxMorphNormals: renderer.maxMorphNormals,
 
-			maxDirLights: maxLightCount.directional,
-			maxPointLights: maxLightCount.point,
-			maxSpotLights: maxLightCount.spot,
-			maxHemiLights: maxLightCount.hemi,
+			maxDirLights: lights.directional.length,
+			maxPointLights: lights.point.length,
+			maxSpotLights: lights.spot.length,
+			maxHemiLights: lights.hemi.length,
 
-			maxShadows: allocatedShadows.maxShadows,
-			pointLightShadows: allocatedShadows.pointLightShadows,
-			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && allocatedShadows.maxShadows > 0,
+			maxShadows: lights.shadows,
+			pointLightShadows: lights.shadowsPointLight,
+
+			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows > 0,
 			shadowMapType: renderer.shadowMap.type,
 			shadowMapDebug: renderer.shadowMap.debug,
 
