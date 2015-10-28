@@ -13,10 +13,7 @@ THREE.WebGLMaterials = function () {
 
 		if ( map === undefined ) {
 
-			map = {
-
-			};
-
+			map = {};
 			properties[ uuid ] = map;
 
 		}
