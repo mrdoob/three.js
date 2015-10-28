@@ -114,7 +114,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		directional: [],
 		point: [],
 		spot: [],
-		hemi: []
+		hemi: [],
+
+		shadows: 0,
+		shadowsPointLight: 0
 
 	},
 
@@ -2587,6 +2590,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spotLength = 0,
 		hemiLength = 0;
 
+		_lights.shadows = 0;
+		_lights.shadowsPointLight = 0;
+
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			light = lights[ l ];
@@ -2620,6 +2626,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_lights.directional[ directionalLength ++ ] = uniforms;
 
+				if ( light.castShadow ) _lights.shadows ++;
 
 			} else if ( light instanceof THREE.PointLight ) {
 
@@ -2642,6 +2649,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
 				_lights.point[ pointLength ++ ] = uniforms;
+
+				if ( light.castShadow ) {
+
+					_lights.shadows ++;
+					_lights.shadowsPointLight ++;
+
+				}
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
@@ -2674,6 +2688,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
 				_lights.spot[ spotLength ++ ] = uniforms;
+
+				if ( light.castShadow ) _lights.shadows ++;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 
