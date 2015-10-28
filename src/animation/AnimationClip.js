@@ -15,12 +15,7 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 	// this means it should figure out its duration by scanning the tracks
 	if ( this.duration < 0 ) {
 
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
-
-			var track = this.tracks[i];
-			this.duration = Math.max( track.times[ track.times.length - 1 ] );
-
-		}
+		this.resetDuration();
 
 	}
 
@@ -34,6 +29,24 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 THREE.AnimationClip.prototype = {
 
 	constructor: THREE.AnimationClip,
+
+	resetDuration: function() {
+
+		var tracks = this.tracks,
+			duration = 0;
+
+		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
+
+			var track = this.tracks[ i ];
+
+			duration = Math.max(
+					duration, track.times[ track.times.length - 1 ] );
+
+		}
+
+		this.duration = duration;
+
+	},
 
 	trim: function() {
 
