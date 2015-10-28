@@ -570,7 +570,6 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "lights_physical_fragment" ],
 				THREE.ShaderChunk[ "lights_template" ],
 				THREE.ShaderChunk[ "lightmap_fragment" ],
-				THREE.ShaderChunk[ "envmap_physical_fragment" ],
 
 				// modulation
 				THREE.ShaderChunk[ "aomap_fragment" ],
