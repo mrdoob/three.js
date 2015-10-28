@@ -237,6 +237,12 @@ THREE.PropertyBinding.prototype = {
 
 			this.resolvedProperty = nodeProperty;
 
+		} else if ( Array.isArray( nodeProperty ) ) {
+
+			bindingType = this.BindingType.EntireArray;
+
+			this.resolvedProperty = nodeProperty;
+
 		} else {
 
 			this.propertyName = propertyName;
@@ -274,8 +280,9 @@ Object.assign( THREE.PropertyBinding.prototype, { // prototype, continued
 
 	BindingType: {
 		Direct: 0,
-		ArrayElement: 1,
-		HasFromToArray: 2
+		EntireArray: 1,
+		ArrayElement: 2,
+		HasFromToArray: 3
 	},
 
 	Versioning: {
@@ -289,6 +296,18 @@ Object.assign( THREE.PropertyBinding.prototype, { // prototype, continued
 		function getValue_direct( buffer, offset ) {
 
 			buffer[ offset ] = this.node[ this.propertyName ];
+
+		},
+
+		function getValue_array( buffer, offset ) {
+
+			var source = this.node[ this.propertyName ];
+
+			for ( var i = 0, n = source.length; i !== n; ++ i ) {
+
+				buffer[ offset ++ ] = source[ i ];
+
+			}
 
 		},
 
@@ -327,6 +346,50 @@ Object.assign( THREE.PropertyBinding.prototype, { // prototype, continued
 			function setValue_direct_setMatrixWorldNeedsUpdate( buffer, offset ) {
 
 				this.node[ this.propertyName ] = buffer[ offset ];
+				this.targetObject.matrixWorldNeedsUpdate = true;
+
+			}
+
+		], [
+
+			// EntireArray
+
+			function setValue_array( buffer, offset ) {
+
+				var dest = this.resolvedProperty;
+
+				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+
+					dest[ i ] = buffer[ offset ++ ];
+
+				}
+
+			},
+
+			function setValue_array_setNeedsUpdate( buffer, offset ) {
+
+				var dest = this.resolvedProperty;
+
+				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+
+					dest[ i ] = buffer[ offset ++ ];
+
+				}
+
+				this.targetObject.needsUpdate = true;
+
+			},
+
+			function setValue_array_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+				var dest = this.resolvedProperty;
+
+				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+
+					dest[ i ] = buffer[ offset ++ ];
+
+				}
+
 				this.targetObject.matrixWorldNeedsUpdate = true;
 
 			}
