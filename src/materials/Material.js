@@ -140,6 +140,10 @@ THREE.Material.prototype = {
 		if ( this.name !== '' ) data.name = this.name;
 
 		if ( this.color instanceof THREE.Color ) data.color = this.color.getHex();
+
+		if ( this.roughness !== 0.5 ) data.roughness = this.roughness;
+		if ( this.metalness > 0 ) data.metalness = this.metalness;
+
 		if ( this.emissive instanceof THREE.Color ) data.emissive = this.emissive.getHex();
 		if ( this.specular instanceof THREE.Color ) data.specular = this.specular.getHex();
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
