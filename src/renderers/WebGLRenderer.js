@@ -2563,9 +2563,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		viewMatrix = camera.matrixWorldInverse,
 
+		directionalCurrent = _lights.directional.length;
 		directionalLength = 0,
+
+		pointCurrent = _lights.point.length;
 		pointLength = 0,
+
+		spotCurrent = _lights.spot.length;
 		spotLength = 0,
+
+		hemiCurrent = _lights.hemi.length;
 		hemiLength = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
@@ -2684,6 +2691,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lights.ambient[ 0 ] = r;
 		_lights.ambient[ 1 ] = g;
 		_lights.ambient[ 2 ] = b;
+
+		// Reset materials if light setup changes
+
+		if ( directionalCurrent !== directionalLength ||
+				pointCurrent !== pointLength ||
+				spotCurrent !== spotLength ||
+				hemiCurrent !== hemiLength ) {
+
+			materialsCache.clear();
+
+		}
 
 		_lights.directional.length = directionalLength;
 		_lights.point.length = pointLength;
