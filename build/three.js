@@ -12291,12 +12291,7 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 	// this means it should figure out its duration by scanning the tracks
 	if ( this.duration < 0 ) {
 
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
-
-			var track = this.tracks[i];
-			this.duration = Math.max( track.times[ track.times.length - 1 ] );
-
-		}
+		this.resetDuration();
 
 	}
 
@@ -12310,6 +12305,24 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 THREE.AnimationClip.prototype = {
 
 	constructor: THREE.AnimationClip,
+
+	resetDuration: function() {
+
+		var tracks = this.tracks,
+			duration = 0;
+
+		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
+
+			var track = this.tracks[ i ];
+
+			duration = Math.max(
+					duration, track.times[ track.times.length - 1 ] );
+
+		}
+
+		this.duration = duration;
+
+	},
 
 	trim: function() {
 
@@ -15298,6 +15311,12 @@ THREE.PropertyBinding.prototype = {
 
 			this.resolvedProperty = nodeProperty;
 
+		} else if ( Array.isArray( nodeProperty ) ) {
+
+			bindingType = this.BindingType.EntireArray;
+
+			this.resolvedProperty = nodeProperty;
+
 		} else {
 
 			this.propertyName = propertyName;
@@ -15335,8 +15354,9 @@ Object.assign( THREE.PropertyBinding.prototype, { // prototype, continued
 
 	BindingType: {
 		Direct: 0,
-		ArrayElement: 1,
-		HasFromToArray: 2
+		EntireArray: 1,
+		ArrayElement: 2,
+		HasFromToArray: 3
 	},
 
 	Versioning: {
@@ -15350,6 +15370,18 @@ Object.assign( THREE.PropertyBinding.prototype, { // prototype, continued
 		function getValue_direct( buffer, offset ) {
 
 			buffer[ offset ] = this.node[ this.propertyName ];
+
+		},
+
+		function getValue_array( buffer, offset ) {
+
+			var source = this.node[ this.propertyName ];
+
+			for ( var i = 0, n = source.length; i !== n; ++ i ) {
+
+				buffer[ offset ++ ] = source[ i ];
+
+			}
 
 		},
 
@@ -15388,6 +15420,50 @@ Object.assign( THREE.PropertyBinding.prototype, { // prototype, continued
 			function setValue_direct_setMatrixWorldNeedsUpdate( buffer, offset ) {
 
 				this.node[ this.propertyName ] = buffer[ offset ];
+				this.targetObject.matrixWorldNeedsUpdate = true;
+
+			}
+
+		], [
+
+			// EntireArray
+
+			function setValue_array( buffer, offset ) {
+
+				var dest = this.resolvedProperty;
+
+				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+
+					dest[ i ] = buffer[ offset ++ ];
+
+				}
+
+			},
+
+			function setValue_array_setNeedsUpdate( buffer, offset ) {
+
+				var dest = this.resolvedProperty;
+
+				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+
+					dest[ i ] = buffer[ offset ++ ];
+
+				}
+
+				this.targetObject.needsUpdate = true;
+
+			},
+
+			function setValue_array_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+				var dest = this.resolvedProperty;
+
+				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+
+					dest[ i ] = buffer[ offset ++ ];
+
+				}
+
 				this.targetObject.matrixWorldNeedsUpdate = true;
 
 			}
@@ -24507,6 +24583,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_lights = {
 
+		hash: '',
+
 		ambient: [ 0, 0, 0 ],
 		directional: [],
 		point: [],
@@ -24602,7 +24680,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
 	var properties = new THREE.WebGLProperties();
-	var materialsCache = new THREE.WebGLMaterials();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
 	var programCache = new THREE.WebGLPrograms( this, capabilities );
 
@@ -24994,7 +25071,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function releaseMaterialProgramReference( material ) {
 
-		var programInfo = materialsCache.get( material ).program;
+		var programInfo = properties.get( material ).program;
 
 		material.program = undefined;
 
@@ -25776,7 +25853,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function initMaterial( material, lights, fog, object ) {
 
-		var materialProperties = materialsCache.get( material );
+		var materialProperties = properties.get( material );
 
 		var parameters = programCache.getParameters( material, lights, fog, object );
 		var code = programCache.getProgramCode( material, parameters );
@@ -25895,6 +25972,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				material instanceof THREE.MeshPhysicalMaterial ||
 				material.lights ) {
 
+			// store the light setup it was created for
+
+			materialProperties.lightsHash = _lights.hash;
+
 			// wire up the material to this renderer's lighting state
 
 			uniforms.ambientLightColor.value = _lights.ambient;
@@ -25940,9 +26021,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_usedTextureUnits = 0;
 
-		var materialProperties = materialsCache.get( material );
+		var materialProperties = properties.get( material );
 
-		if ( material.needsUpdate || ! materialProperties.program ) {
+		if ( materialProperties.program === undefined ) {
+
+			material.needsUpdate = true;
+
+		}
+
+		if ( materialProperties.lightsHash !== undefined &&
+			materialProperties.lightsHash !== _lights.hash ) {
+
+			material.needsUpdate = true;
+
+		}
+
+		if ( material.needsUpdate ) {
 
 			initMaterial( material, lights, fog, object );
 			material.needsUpdate = false;
@@ -26153,7 +26247,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( material instanceof THREE.MeshPhysicalMaterial ) {
 
-				refreshUniformsStandard( m_uniforms, material );
+				refreshUniformsPhysical( m_uniforms, material );
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -26372,7 +26466,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function refreshUniformsStandard ( uniforms, material ) {
+	function refreshUniformsPhysical ( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
 		//uniforms.reflectivity.value = material.reflectivity; // part of uniforms common
@@ -26963,11 +27057,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		viewMatrix = camera.matrixWorldInverse,
 
-		directionalCurrent = _lights.directional.length,
-		pointCurrent = _lights.point.length,
-		spotCurrent = _lights.spot.length,
-		hemiCurrent = _lights.hemi.length,
-
 		directionalLength = 0,
 		pointLength = 0,
 		spotLength = 0,
@@ -27090,21 +27179,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lights.ambient[ 1 ] = g;
 		_lights.ambient[ 2 ] = b;
 
-		// Reset materials if light setup changes
-
-		if ( directionalCurrent !== directionalLength ||
-				pointCurrent !== pointLength ||
-				spotCurrent !== spotLength ||
-				hemiCurrent !== hemiLength ) {
-
-			materialsCache.clear();
-
-		}
-
 		_lights.directional.length = directionalLength;
 		_lights.point.length = pointLength;
 		_lights.spot.length = spotLength;
 		_lights.hemi.length = hemiLength;
+
+		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength;
 
 	}
 
@@ -28396,46 +28476,6 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 	}
 
 	this.get = get;
-
-};
-
-// File:src/renderers/webgl/WebGLMaterials.js
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.WebGLMaterials = function () {
-
-	var properties = {};
-
-	this.get = function ( material ) {
-
-		var uuid = material.uuid;
-		var map = properties[ uuid ];
-
-		if ( map === undefined ) {
-
-			map = {};
-			properties[ uuid ] = map;
-
-		}
-
-		return map;
-
-	};
-
-	this.delete = function ( object ) {
-
-		delete properties[ object.uuid ];
-
-	};
-
-	this.clear = function () {
-
-		properties = {};
-
-	};
 
 };
 
