@@ -2564,16 +2564,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		viewMatrix = camera.matrixWorldInverse,
 
-		directionalCurrent = _lights.directional.length;
+		directionalCurrent = _lights.directional.length,
+		pointCurrent = _lights.point.length,
+		spotCurrent = _lights.spot.length,
+		hemiCurrent = _lights.hemi.length,
+
 		directionalLength = 0,
-
-		pointCurrent = _lights.point.length;
 		pointLength = 0,
-
-		spotCurrent = _lights.spot.length;
 		spotLength = 0,
-
-		hemiCurrent = _lights.hemi.length;
 		hemiLength = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
