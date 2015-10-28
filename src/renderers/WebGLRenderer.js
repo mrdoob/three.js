@@ -2563,10 +2563,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		viewMatrix = camera.matrixWorldInverse,
 
-		writeIndexDirectional = 0,
-		writeIndexPoint = 0,
-		writeIndexSpot = 0,
-		writeIndexHemi = 0;
+		directionalLength = 0,
+		pointLength = 0,
+		spotLength = 0,
+		hemiLength = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -2599,7 +2599,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.direction.transformDirection( viewMatrix );
 				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
 
-				_lights.directional[ writeIndexDirectional ++ ] = uniforms;
+				_lights.directional[ directionalLength ++ ] = uniforms;
 
 
 			} else if ( light instanceof THREE.PointLight ) {
@@ -2622,7 +2622,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.distance = light.distance;
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
-				_lights.point[ writeIndexPoint ++ ] = uniforms;
+				_lights.point[ pointLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
@@ -2654,7 +2654,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.exponent = light.exponent;
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
-				_lights.spot[ writeIndexSpot ++ ] = uniforms;
+				_lights.spot[ spotLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 
@@ -2675,7 +2675,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
 				uniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
 
-				_lights.hemi[ writeIndexHemi ++ ] = uniforms;
+				_lights.hemi[ hemiLength ++ ] = uniforms;
 
 			}
 
@@ -2685,10 +2685,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lights.ambient[ 1 ] = g;
 		_lights.ambient[ 2 ] = b;
 
-		_lights.directional.length = writeIndexDirectional;
-		_lights.point.length = writeIndexPoint;
-		_lights.spot.length = writeIndexSpot;
-		_lights.hemi.length = writeIndexHemi;
+		_lights.directional.length = directionalLength;
+		_lights.point.length = pointLength;
+		_lights.spot.length = spotLength;
+		_lights.hemi.length = hemiLength;
 
 	}
 
