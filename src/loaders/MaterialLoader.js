@@ -111,6 +111,17 @@ THREE.MaterialLoader.prototype = {
 
 			}
 
+			if ( material.normalMap !== undefined &&
+					material instanceof THREE.ShaderMaterial ) {
+
+				// ShaderMaterial can be taught to do normal mapping -
+				// we allow this case if there is in fact a normal map
+				// (serialization of uniforms is still incomplete).
+
+				material.normalScale = new THREE.Vector2();
+
+			}
+
 			material.normalScale.fromArray( normalScale );
 
 		}
