@@ -1754,7 +1754,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( material instanceof THREE.MeshPhysicalMaterial ) {
 
-				refreshUniformsStandard( m_uniforms, material );
+				refreshUniformsPhysical( m_uniforms, material );
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -1973,7 +1973,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function refreshUniformsStandard ( uniforms, material ) {
+	function refreshUniformsPhysical ( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
 		//uniforms.reflectivity.value = material.reflectivity; // part of uniforms common
