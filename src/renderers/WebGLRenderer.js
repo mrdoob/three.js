@@ -121,8 +121,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	},
 
-	_lightsNeedUpdate = true,
-
 	// info
 
 	_infoMemory = {
@@ -247,8 +245,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
-
-		_lightsNeedUpdate = true;
 
 		state.reset();
 
@@ -1085,7 +1081,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
 		_currentCamera = null;
-		_lightsNeedUpdate = true;
 
 		// update scene graph
 
@@ -1618,7 +1613,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// the next material that does gets activated:
 
 				refreshMaterial = true;		// set to true on material change
-				_lightsNeedUpdate = true;	// remains set until update done
+				refreshLights = true;		// remains set until update done
 
 			}
 
@@ -1711,14 +1706,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( refreshMaterial ) {
 
-			// refresh uniforms common to several materials
-
-			if ( fog && material.fog ) {
-
-				refreshUniformsFog( m_uniforms, fog );
-
-			}
-
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshPhysicalMaterial ||
@@ -1726,22 +1713,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// the current material requires lighting info
 
-				// if we haven't done so since the start of the frame, after a
-				// reset or camera change, update the lighting uniforms values
-				// of all materials (by reference)
-
-				if ( _lightsNeedUpdate ) {
-
-					_lightsNeedUpdate = false;
-
-					refreshLights = true;
-
-				}
-
+				// note: all lighting uniforms are always set correctly
+				// they simply reference the renderer's state for their
+				// values
+				//
 				// use the current material's .needsUpdate flags to set
 				// the GL state when required
 
 				markUniformsLightsNeedsUpdate( m_uniforms, refreshLights );
+
+			}
+
+			// refresh uniforms common to several materials
+
+			if ( fog && material.fog ) {
+
+				refreshUniformsFog( m_uniforms, fog );
 
 			}
 
