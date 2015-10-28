@@ -1116,6 +1116,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		setupLights( lights, camera );
+
 		//
 
 		shadowMap.render( scene, camera );
@@ -1711,7 +1713,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_lightsNeedUpdate = false;
 
-					setupLights( lights, camera );
 					refreshLights = true;
 
 				}
