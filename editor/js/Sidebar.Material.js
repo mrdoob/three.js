@@ -258,6 +258,30 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialDisplacementMapRow );
 
+	// roughness map
+
+	var materialRoughnessMapRow = new UI.Panel();
+	var materialRoughnessMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialRoughnessMap = new UI.Texture().onChange( update );
+
+	materialRoughnessMapRow.add( new UI.Text( 'Rough. Map' ).setWidth( '90px' ) );
+	materialRoughnessMapRow.add( materialRoughnessMapEnabled );
+	materialRoughnessMapRow.add( materialRoughnessMap );
+
+	container.add( materialRoughnessMapRow );
+
+	// metalness map
+
+	var materialMetalnessMapRow = new UI.Panel();
+	var materialMetalnessMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialMetalnessMap = new UI.Texture().onChange( update );
+
+	materialMetalnessMapRow.add( new UI.Text( 'Metal. Map' ).setWidth( '90px' ) );
+	materialMetalnessMapRow.add( materialMetalnessMapEnabled );
+	materialMetalnessMapRow.add( materialMetalnessMap );
+
+	container.add( materialMetalnessMapRow );
+
 	// specular map
 
 	var materialSpecularMapRow = new UI.Panel();
@@ -611,6 +635,60 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.roughnessMap !== undefined ) {
+
+				var roughnessMapEnabled = materialRoughnessMapEnabled.getValue() === true;
+
+				if ( objectHasUvs ) {
+
+					var roughnessMap = roughnessMapEnabled ? materialRoughnessMap.getValue() : null;
+					if ( material.roughnessMap !== roughnessMap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'roughnessMap', roughnessMap ) );
+
+					}
+
+					if ( material.displacementScale !== materialDisplacementScale.getValue() ) {
+
+						editor.execute( new SetMaterialValueCommand( currentObject, 'displacementScale', materialDisplacementScale.getValue() ) );
+
+					}
+
+				} else {
+
+					if ( roughnessMapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
+			if ( material.metalnessMap !== undefined ) {
+
+				var metalnessMapEnabled = materialMetalnessMapEnabled.getValue() === true;
+
+				if ( objectHasUvs ) {
+
+					var metalnessMap = metalnessMapEnabled ? materialMetalnessMap.getValue() : null;
+					if ( material.metalnessMap !== metalnessMap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'metalnessMap', metalnessMap ) );
+
+					}
+
+					if ( material.displacementScale !== materialDisplacementScale.getValue() ) {
+
+						editor.execute( new SetMaterialValueCommand( currentObject, 'displacementScale', materialDisplacementScale.getValue() ) );
+
+					}
+
+				} else {
+
+					if ( metalnessMapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
 			if ( material.specularMap !== undefined ) {
 
 				var specularMapEnabled = materialSpecularMapEnabled.getValue() === true;
@@ -798,6 +876,8 @@ Sidebar.Material = function ( editor ) {
 			'bumpMap': materialBumpMapRow,
 			'normalMap': materialNormalMapRow,
 			'displacementMap': materialDisplacementMapRow,
+			'roughnessMap': materialRoughnessMapRow,
+			'metalnessMap': materialMetalnessMapRow,
 			'specularMap': materialSpecularMapRow,
 			'envMap': materialEnvMapRow,
 			'lightMap': materialLightMapRow,
@@ -951,6 +1031,30 @@ Sidebar.Material = function ( editor ) {
 			}
 
 			materialDisplacementScale.setValue( material.displacementScale );
+
+		}
+
+		if ( material.roughnessMap !== undefined ) {
+
+			materialRoughnessMapEnabled.setValue( material.roughnessMap !== null );
+
+			if ( material.roughnessMap !== null || resetTextureSelectors ) {
+
+				materialRoughnessMap.setValue( material.roughnessMap );
+
+			}
+
+		}
+
+		if ( material.metalnessMap !== undefined ) {
+
+			materialMetalnessMapEnabled.setValue( material.metalnessMap !== null );
+
+			if ( material.metalnessMap !== null || resetTextureSelectors ) {
+
+				materialMetalnessMap.setValue( material.metalnessMap );
+
+			}
 
 		}
 
