@@ -363,9 +363,8 @@ THREE.OBJLoader.prototype = {
 
 			}
 			
+			buffergeometry.computeFaceNormals();
 			buffergeometry.computeVertexNormals();
-                	buffergeometry.computeFaceNormals();
-                	buffergeometry.dynamic = true;
 
 			material = new THREE.MeshLambertMaterial();
 			material.name = object.material.name;
