@@ -147,3 +147,8 @@ vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in Ge
 	return F * ( G * D );
 
 } // validated
+
+// source: http://simonstechblog.blogspot.ca/2011/12/microfacet-brdf.html
+float GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {
+	return ( 2.0 / square( ggxRoughness + 0.0001 ) - 2.0 );
+}

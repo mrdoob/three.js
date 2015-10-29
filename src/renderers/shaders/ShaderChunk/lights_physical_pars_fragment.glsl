@@ -32,6 +32,6 @@ void PhysicalMaterial_RE_SpecularIndirectLight( const in vec3 indirectSpecularCo
 
 }
 
-#define Material_BlinnShininessExponent( material )   ( 2.0 / square( material.specularRoughness + 0.0001 ) - 2.0 )
+#define Material_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.specularRoughness )
 
 #define Material_RE_IndirectSpecularLight    PhysicalMaterial_RE_SpecularIndirectLight
