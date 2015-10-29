@@ -1,4 +1,4 @@
-float calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {
+float calcLightAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
 
 	if ( decayExponent > 0.0 ) {
 
@@ -36,7 +36,7 @@ vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {
 // Microfacet Models for Refraction through Rough Surfaces - equation (34)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
 // alpha is "roughness squared" in Disney’s reparameterization
-float G_GGX_Smith( in float alpha, in float dotNL, in float dotNV ) {
+float G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {
 
 	// geometry term = G(l)⋅G(v) / 4(n⋅l)(n⋅v)
 
@@ -54,7 +54,7 @@ float G_GGX_Smith( in float alpha, in float dotNL, in float dotNV ) {
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
 // alpha is "roughness squared" in Disney’s reparameterization
-float D_GGX( in float alpha, in float dotNH ) {
+float D_GGX( const in float alpha, const in float dotNH ) {
 
 	// factor of 1/PI in distribution term omitted as incoming light intensity is scaled up by PI because it is considered a punctual light source
 
@@ -93,7 +93,7 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 
 
 // ref: https://www.unrealengine.com/blog/physically-based-shading-on-mobile - environmentBRDF for GGX on mobile
-vec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, vec3 specularColor, float roughness ) {
+vec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {
 
 	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 
@@ -112,7 +112,7 @@ vec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, vec3 spe
 } // validated
 
 
-float G_BlinnPhong_Implicit( /* in float dotNL, in float dotNV */ ) {
+float G_BlinnPhong_Implicit( /* const in float dotNL, const in float dotNV */ ) {
 
 	// geometry term is (n dot l)(n dot v) / 4(n dot l)(n dot v)
 	return 0.25;
