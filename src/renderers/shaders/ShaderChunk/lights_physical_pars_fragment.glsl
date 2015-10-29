@@ -2,6 +2,7 @@ struct PhysicalMaterial {
 	vec3	diffuseColor;
 	float	specularRoughness;
 	vec3	specularColor;
+	vec3	grazingColor;
 	float	clearCoatWeight;
 	float	clearCoatRoughness;
 };
@@ -11,7 +12,7 @@ void PhysicalMaterial_RE_DirectLight( const in IncidentLight directLight, const 
 	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
 
 	reflectedLight.directDiffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( material.diffuseColor );
-	reflectedLight.directSpecular += dotNL * directLight.color * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.specularRoughness );
+	reflectedLight.directSpecular += dotNL * directLight.color * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.grazingColor, material.specularRoughness );
 	
 }
 #define Material_RE_DirectLight    PhysicalMaterial_RE_DirectLight
@@ -28,7 +29,7 @@ void PhysicalMaterial_RE_DiffuseIndirectLight( const in vec3 indirectDiffuseColo
 
 void PhysicalMaterial_RE_SpecularIndirectLight( const in vec3 indirectSpecularColor, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-    reflectedLight.indirectSpecular += indirectSpecularColor * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );
+    reflectedLight.indirectSpecular += indirectSpecularColor * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.grazingColor, material.specularRoughness );
 
 }
 
