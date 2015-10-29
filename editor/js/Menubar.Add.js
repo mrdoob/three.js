@@ -354,7 +354,7 @@ Menubar.Add = function ( editor ) {
 		var light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
 		light.name = 'HemisphereLight ' + ( ++ lightCount );
 
-		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
+		light.position.set( 0, 100, 0 );
 
 		editor.execute( new AddObjectCommand( light ) );
 
