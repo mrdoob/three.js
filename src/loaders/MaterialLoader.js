@@ -99,7 +99,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
 
 		if ( json.normalMap !== undefined ) material.normalMap = this.getTexture( json.normalMap );
-		if ( json.normalScale ) {
+		if ( json.normalScale !== undefined ) {
 
 			var normalScale = json.normalScale;
 
@@ -111,7 +111,7 @@ THREE.MaterialLoader.prototype = {
 
 			}
 
-			material.normalScale.fromArray( normalScale );
+			material.normalScale = new THREE.Vector2().fromArray( normalScale );
 
 		}
 
