@@ -20,7 +20,7 @@ vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 } // validated
 
 
-vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {
+vec3 F_Schlick( const in vec3 specularColor, const in vec3 grazingColor, const in float dotLH ) {
 
 	// Original approximation by Christophe Schlick '94
 	//;float fresnel = pow( 1.0 - dotLH, 5.0 );
@@ -28,7 +28,7 @@ vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {
 	// Optimized variant (presented by Epic at SIGGRAPH '13)
 	float fresnel = exp2( ( -5.55437 * dotLH - 6.98316 ) * dotLH );
 
-	return ( 1.0 - specularColor ) * fresnel + specularColor;
+	return mix( specularColor, grazingColor, fresnel );
 
 } // validated
 
@@ -68,7 +68,7 @@ float D_GGX( in float alpha, in float dotNH ) {
 
 
 // GGX Distribution, Schlick Fresnel, GGX-Smith Visibility
-vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {
+vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in vec3 grazingColor, const in float roughness ) {
 	
 	// factor of 1/PI in BRDF omitted (normally it is in D_GGX) as incoming light intensity is scaled up by PI because it is considered a punctual light source
 
@@ -81,7 +81,7 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 	float dotNH = saturate( dot( geometry.normal, halfDir ) );
 	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
 
-	vec3 F = F_Schlick( specularColor, dotLH );
+	vec3 F = F_Schlick( specularColor, grazingColor, dotLH );
 
 	float G = G_GGX_Smith( alpha, dotNL, dotNV );
 
@@ -93,7 +93,7 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 
 
 // ref: https://www.unrealengine.com/blog/physically-based-shading-on-mobile - environmentBRDF for GGX on mobile
-vec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, vec3 specularColor, float roughness ) {
+vec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, vec3 specularColor, const in vec3 grazingColor, float roughness ) {
 
 	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 
@@ -107,7 +107,7 @@ vec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, vec3 spe
 
 	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
 
-	return specularColor * AB.x + AB.y;
+	return ( specularColor * AB.x + AB.y ) * grazingColor;
 
 } // validated
 
@@ -138,7 +138,7 @@ vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in Ge
 	float dotNH = saturate( dot( geometry.normal, halfDir ) );
 	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
 
-	vec3 F = F_Schlick( specularColor, dotLH );
+	vec3 F = F_Schlick( specularColor, vec3( 1.0 ), dotLH );
 
 	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );
 
