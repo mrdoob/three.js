@@ -145,37 +145,17 @@ uniform vec3 ambientLightColor;
 
 	}
 
-	// http://stackoverflow.com/a/24390149 modified to work on a cubeMap vec3.
-	float textureQueryLodCUBE( const in vec3 sampleDirectionScaledByCubeWidth )
-	{
-	    vec3  dx_vtc        = dFdx( sampleDirectionScaledByCubeWidth );
-	    vec3  dy_vtc        = dFdy( sampleDirectionScaledByCubeWidth );
-	    float delta_max_sqr = max(dot(dx_vtc, dx_vtc), dot(dy_vtc, dy_vtc));
-	    return 0.5 * log2( delta_max_sqr );
-	}
-
-	// this is not correct for cube maps.
-	float getSamplerMIPLevel( const in int maxMIPLevel, const vec3 sampleDirection ) {
-
-		float envMapWidth = pow( 2.0, float(maxMIPLevel) );
-
-		float sampleMIPLevel = textureQueryLodCUBE( sampleDirection * ( envMapWidth * 0.5 ) ); // only half because sampleDirection ranges of [-1,1]
-	
-		// clamp to allowable LOD ranges.
-		return clamp( sampleMIPLevel, 0.0, float(maxMIPLevel) );
-
-	}
-
 	// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
 	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {
 
-		float envMapWidth = pow( 2.0, float(maxMIPLevel) );
-
+		//float envMapWidth = pow( 2.0, maxMIPLevelScalar );
 		//float desiredMIPLevel = log2( envMapWidth * sqrt( 3.0 ) ) - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
-		float desiredMIPLevel = float(maxMIPLevel) - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
+
+		float maxMIPLevelScalar = float( maxMIPLevel );
+		float desiredMIPLevel = maxMIPLevelScalar - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
 	
 		// clamp to allowable LOD ranges.
-		return clamp( desiredMIPLevel, 0.0, float(maxMIPLevel) );
+		return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
 
 	}
 
