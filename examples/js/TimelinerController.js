@@ -7,7 +7,7 @@
  *
  * Source code:
  *
- * 		https://github.com/tschw/timeliner
+ * 		https://github.com/tschw/timeliner_gui
  * 		https://github.com/zz85/timeliner (fork's origin)
  *
  * @author tschw
