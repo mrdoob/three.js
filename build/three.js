@@ -18426,7 +18426,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
 
 		if ( json.normalMap !== undefined ) material.normalMap = this.getTexture( json.normalMap );
-		if ( json.normalScale ) {
+		if ( json.normalScale !== undefined ) {
 
 			var normalScale = json.normalScale;
 
@@ -18438,7 +18438,7 @@ THREE.MaterialLoader.prototype = {
 
 			}
 
-			material.normalScale.fromArray( normalScale );
+			material.normalScale = new THREE.Vector2().fromArray( normalScale );
 
 		}
 
@@ -20205,8 +20205,6 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.specular = new THREE.Color( 0x111111 );
 	this.shininess = 30;
 
-	this.metal = false;
-
 	this.map = null;
 
 	this.lightMap = null;
@@ -20266,8 +20264,6 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.emissive.copy( source.emissive );
 	this.specular.copy( source.specular );
 	this.shininess = source.shininess;
-
-	this.metal = source.metal;
 
 	this.map = source.map;
 
@@ -23759,15 +23755,7 @@ THREE.ShaderLib = {
 				"reflectedLight.directDiffuse *= shadowMask;",
 				"reflectedLight.directSpecular *= shadowMask;",
 
-				"#ifdef METAL",
-
-				"   vec3 outgoingLight = ( reflectedLight.directDiffuse + reflectedLight.indirectDiffuse ) * specular + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
-
-				"#else",
-
-				"   vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
-
-				"#endif",
+				"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
@@ -24601,8 +24589,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	},
 
-	_lightsNeedUpdate = true,
-
 	// info
 
 	_infoMemory = {
@@ -24727,8 +24713,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
-
-		_lightsNeedUpdate = true;
 
 		state.reset();
 
@@ -25565,7 +25549,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
 		_currentCamera = null;
-		_lightsNeedUpdate = true;
 
 		// update scene graph
 
@@ -26098,7 +26081,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// the next material that does gets activated:
 
 				refreshMaterial = true;		// set to true on material change
-				_lightsNeedUpdate = true;	// remains set until update done
+				refreshLights = true;		// remains set until update done
 
 			}
 
@@ -26191,14 +26174,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( refreshMaterial ) {
 
-			// refresh uniforms common to several materials
-
-			if ( fog && material.fog ) {
-
-				refreshUniformsFog( m_uniforms, fog );
-
-			}
-
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshPhysicalMaterial ||
@@ -26206,22 +26181,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// the current material requires lighting info
 
-				// if we haven't done so since the start of the frame, after a
-				// reset or camera change, update the lighting uniforms values
-				// of all materials (by reference)
-
-				if ( _lightsNeedUpdate ) {
-
-					_lightsNeedUpdate = false;
-
-					refreshLights = true;
-
-				}
-
+				// note: all lighting uniforms are always set correctly
+				// they simply reference the renderer's state for their
+				// values
+				//
 				// use the current material's .needsUpdate flags to set
 				// the GL state when required
 
 				markUniformsLightsNeedsUpdate( m_uniforms, refreshLights );
+
+			}
+
+			// refresh uniforms common to several materials
+
+			if ( fog && material.fog ) {
+
+				refreshUniformsFog( m_uniforms, fog );
 
 			}
 
@@ -29123,7 +29098,6 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.flatShading ? '#define FLAT_SHADED' : '',
 
-				parameters.metal ? '#define METAL' : '',
 				parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
 				parameters.flipSided ? '#define FLIP_SIDED' : '',
 
@@ -29333,7 +29307,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 		"maxMorphTargets", "maxMorphNormals", "maxDirLights", "maxPointLights",
 		"maxSpotLights", "maxHemiLights", "maxShadows", "shadowMapEnabled", "pointLightShadows",
-		"shadowMapType", "shadowMapDebug", "alphaTest", "metal", "doubleSided",
+		"shadowMapType", "shadowMapDebug", "alphaTest", "doubleSided",
 		"flipSided"
 	];
 
@@ -29454,7 +29428,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			shadowMapDebug: renderer.shadowMap.debug,
 
 			alphaTest: material.alphaTest,
-			metal: material.metal,
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide
 
@@ -31774,10 +31747,22 @@ Object.defineProperties( THREE, {
 	}
 } );
 
+Object.defineProperties( THREE.MeshPhongMaterial.prototype, {
+	metal: {
+		get: function () {
+			console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshPhysicalMaterial instead.' );
+			return false;
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshPhysicalMaterial instead' );
+		}
+	}
+} );
+
 Object.defineProperties( THREE.ShaderMaterial.prototype, {
 	derivatives: {
 		get: function () {
-			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
+			console.warn( 'THREE.ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
 			return this.extensions.derivatives;
 		},
 		set: function ( value ) {
