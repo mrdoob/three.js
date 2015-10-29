@@ -99,7 +99,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
 
 		if ( json.normalMap !== undefined ) material.normalMap = this.getTexture( json.normalMap );
-		if ( json.normalScale ) {
+		if ( json.normalScale !== undefined ) {
 
 			var normalScale = json.normalScale;
 
@@ -111,13 +111,16 @@ THREE.MaterialLoader.prototype = {
 
 			}
 
-			material.normalScale.fromArray( normalScale );
+			material.normalScale = new THREE.Vector2().fromArray( normalScale );
 
 		}
 
 		if ( json.displacementMap !== undefined ) material.displacementMap = this.getTexture( json.displacementMap );
 		if ( json.displacementScale !== undefined ) material.displacementScale = json.displacementScale;
 		if ( json.displacementBias !== undefined ) material.displacementBias = json.displacementBias;
+
+		if ( json.roughnessMap !== undefined ) material.roughnessMap = this.getTexture( json.roughnessMap );
+		if ( json.metalnessMap !== undefined ) material.metalnessMap = this.getTexture( json.metalnessMap );
 
 		if ( json.specularMap !== undefined ) material.specularMap = this.getTexture( json.specularMap );
 

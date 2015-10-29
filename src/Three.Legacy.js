@@ -348,10 +348,22 @@ Object.defineProperties( THREE, {
 	}
 } );
 
+Object.defineProperties( THREE.MeshPhongMaterial.prototype, {
+	metal: {
+		get: function () {
+			console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshPhysicalMaterial instead.' );
+			return false;
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshPhysicalMaterial instead' );
+		}
+	}
+} );
+
 Object.defineProperties( THREE.ShaderMaterial.prototype, {
 	derivatives: {
 		get: function () {
-			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
+			console.warn( 'THREE.ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
 			return this.extensions.derivatives;
 		},
 		set: function ( value ) {

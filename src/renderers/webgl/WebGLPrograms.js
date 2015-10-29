@@ -23,7 +23,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 		"maxMorphTargets", "maxMorphNormals", "maxDirLights", "maxPointLights",
 		"maxSpotLights", "maxHemiLights", "maxShadows", "shadowMapEnabled", "pointLightShadows",
-		"shadowMapType", "shadowMapDebug", "alphaTest", "metal", "doubleSided",
+		"shadowMapType", "shadowMapDebug", "alphaTest", "doubleSided",
 		"flipSided"
 	];
 
@@ -144,7 +144,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			shadowMapDebug: renderer.shadowMap.debug,
 
 			alphaTest: material.alphaTest,
-			metal: material.metal,
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide
 
