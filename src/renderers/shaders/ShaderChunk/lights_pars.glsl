@@ -185,17 +185,16 @@ uniform vec3 ambientLightColor;
 
 		#ifdef ENVMAP_TYPE_CUBE
 
-			float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );
+			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
 
 			#if defined( TEXTURE_CUBE_LOD_EXT )				
 
-				vec4 envMapColor = textureCubeLodEXT( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), specularMIPLevel );
+				float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );
+				vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );
 
 			#else
 
-				float samplerMIPLevel = getSamplerMIPLevel( maxMIPLevel, reflectVec );
-
-				vec4 envMapColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), max( specularMIPLevel - samplerMIPLevel ) );
+				vec4 envMapColor = textureCube( envMap, queryReflectVec );
 
 			#endif
  
