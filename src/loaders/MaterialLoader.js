@@ -119,6 +119,9 @@ THREE.MaterialLoader.prototype = {
 		if ( json.displacementScale !== undefined ) material.displacementScale = json.displacementScale;
 		if ( json.displacementBias !== undefined ) material.displacementBias = json.displacementBias;
 
+		if ( json.roughnessMap !== undefined ) material.roughnessMap = this.getTexture( json.roughnessMap );
+		if ( json.metalnessMap !== undefined ) material.metalnessMap = this.getTexture( json.metalnessMap );
+
 		if ( json.specularMap !== undefined ) material.specularMap = this.getTexture( json.specularMap );
 
 		if ( json.envMap !== undefined ) {
