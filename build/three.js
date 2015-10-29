@@ -18446,6 +18446,9 @@ THREE.MaterialLoader.prototype = {
 		if ( json.displacementScale !== undefined ) material.displacementScale = json.displacementScale;
 		if ( json.displacementBias !== undefined ) material.displacementBias = json.displacementBias;
 
+		if ( json.roughnessMap !== undefined ) material.roughnessMap = this.getTexture( json.roughnessMap );
+		if ( json.metalnessMap !== undefined ) material.metalnessMap = this.getTexture( json.metalnessMap );
+
 		if ( json.specularMap !== undefined ) material.specularMap = this.getTexture( json.specularMap );
 
 		if ( json.envMap !== undefined ) {
@@ -19654,6 +19657,8 @@ THREE.Material.prototype = {
 			data.displacementBias = this.displacementBias;
 
 		}
+		if ( this.roughnessMap instanceof THREE.Texture ) data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
+		if ( this.metalnessMap instanceof THREE.Texture ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
 		if ( this.specularMap instanceof THREE.Texture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
 		if ( this.envMap instanceof THREE.Texture ) {
 
