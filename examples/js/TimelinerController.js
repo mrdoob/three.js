@@ -63,6 +63,12 @@ THREE.TimelinerController.prototype = {
 
 	},
 
+	setDuration: function( duration ) {
+
+		this._clip.duration = duration;
+
+	},
+
 	getChannelNames: function() {
 
 		return this._channelNames;
@@ -93,7 +99,6 @@ THREE.TimelinerController.prototype = {
 		this._propRefs[ channelName ].getValue( values, offset );
 
 		this._sort( track );
-		this._clip.resetDuration();
 
 	},
 
@@ -135,7 +140,6 @@ THREE.TimelinerController.prototype = {
 			values.length = nValues - stride;
 
 			this._sort( track );
-			this._clip.resetDuration();
 
 		}
 
@@ -153,17 +157,22 @@ THREE.TimelinerController.prototype = {
 
 	serialize: function() {
 
-		var result = {},
+		var result = {
+				duration: this._clip.duration,
+				channels: {}
+			},
 
 			names = this._channelNames,
-			tracks = this._tracks;
+			tracks = this._tracks,
+
+			channels = result.channels;
 
 		for ( var i = 0, n = names.length; i !== n; ++ i ) {
 
 			var name = names[ i ],
 				track = tracks[ name ];
 
-			result[ name ] = {
+			channels[ name ] = {
 
 				times: track.times,
 				values: track.values
@@ -179,13 +188,17 @@ THREE.TimelinerController.prototype = {
 	deserialize: function( structs ) {
 
 		var names = this._channelNames,
-			tracks = this._tracks;
+			tracks = this._tracks,
+
+			channels = structs.channels;
+
+		this.setDuration( structs.duration );
 
 		for ( var i = 0, n = names.length; i !== n; ++ i ) {
 
 			var name = names[ i ],
 				track = tracks[ name ];
-				data = structs[ name ];
+				data = channels[ name ];
 
 			this._setArray( track.times, data.times );
 			this._setArray( track.values, data.values );
