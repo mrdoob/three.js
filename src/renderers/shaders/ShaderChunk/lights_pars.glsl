@@ -107,7 +107,21 @@ uniform vec3 ambientLightColor;
 
 #if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
-	vec3 getSpecularLightProbeIndirectLightColor( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float lodLevel ) { 
+	// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
+	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {
+
+		//float envMapWidth = pow( 2.0, maxMIPLevelScalar );
+		//float desiredMIPLevel = log2( envMapWidth * sqrt( 3.0 ) ) - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
+
+		float maxMIPLevelScalar = float( maxMIPLevel );
+		float desiredMIPLevel = maxMIPLevelScalar - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
+	
+		// clamp to allowable LOD ranges.
+		return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
+
+	}
+
+	vec3 getSpecularLightProbeIndirectLightColor( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) { 
 	
 		#ifdef ENVMAP_MODE_REFLECTION
 
@@ -133,15 +147,19 @@ uniform vec3 ambientLightColor;
 
 		#ifdef ENVMAP_TYPE_CUBE
 
+			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
+
 			#if defined( TEXTURE_CUBE_LOD_EXT )				
 
-				vec4 envMapColor = textureCubeLodEXT( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), lodLevel );
+				float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );
+				vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );
 
 			#else
 
-				vec4 envMapColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );
+				vec4 envMapColor = textureCube( envMap, queryReflectVec );
 
 			#endif
+ 
 
 		#elif defined( ENVMAP_TYPE_EQUIREC )
 
