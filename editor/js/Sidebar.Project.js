@@ -45,17 +45,8 @@ Sidebar.Project = function ( editor ) {
 
 		var value = this.getValue();
 
-		if ( value === 'WebGLRenderer' ) {
-
-			rendererPropertiesRow.setDisplay( '' );
-
-		} else {
-
-			rendererPropertiesRow.setDisplay( 'none' );
-
-		}
-
 		config.setKey( 'project/renderer', value );
+
 		updateRenderer();
 
 	} );
@@ -76,33 +67,23 @@ Sidebar.Project = function ( editor ) {
 	var rendererPropertiesRow = new UI.Panel();
 	rendererPropertiesRow.add( new UI.Text( '' ).setWidth( '90px' ) );
 
-	var rendererAntialiasSpan = new UI.Span().setMarginRight( '10px' );
-	var rendererAntialias = new UI.Checkbox( config.getKey( 'project/renderer/antialias' ) ).setLeft( '100px' ).onChange( function () {
+	var rendererAntialias = new UI.THREE.Boolean( config.getKey( 'project/renderer/antialias' ), 'antialias' ).onChange( function () {
 
 		config.setKey( 'project/renderer/antialias', this.getValue() );
 		updateRenderer();
 
 	} );
-
-	rendererAntialiasSpan.add( rendererAntialias );
-	rendererAntialiasSpan.add( new UI.Text( 'antialias' ).setMarginLeft( '3px' ) );
-
-	rendererPropertiesRow.add( rendererAntialiasSpan );
+	rendererPropertiesRow.add( rendererAntialias );
 
 	// shadow
 
-	var rendererShadowsSpan = new UI.Span();
-	var rendererShadows = new UI.Checkbox( config.getKey( 'project/renderer/shadows' ) ).setLeft( '100px' ).onChange( function () {
+	var rendererShadows = new UI.THREE.Boolean( config.getKey( 'project/renderer/shadows' ), 'shadows' ).onChange( function () {
 
 		config.setKey( 'project/renderer/shadows', this.getValue() );
 		updateRenderer();
 
 	} );
-
-	rendererShadowsSpan.add( rendererShadows );
-	rendererShadowsSpan.add( new UI.Text( 'shadows' ).setMarginLeft( '3px' ) );
-
-	rendererPropertiesRow.add( rendererShadowsSpan );
+	rendererPropertiesRow.add( rendererShadows );
 
 	container.add( rendererPropertiesRow );
 
@@ -136,6 +117,8 @@ Sidebar.Project = function ( editor ) {
 			type = 'CanvasRenderer';
 
 		}
+
+		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
 
 		var renderer = new rendererTypes[ type ]( { antialias: antialias } );
 		if ( shadows && renderer.shadowMap ) renderer.shadowMap.enabled = true;

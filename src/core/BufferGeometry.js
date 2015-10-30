@@ -826,7 +826,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeOffsets: function ( size ) {
 
-		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.')
+		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.');
 
 	},
 
@@ -974,6 +974,26 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	clone: function () {
+
+		// Handle primitives
+
+		var parameters = this.parameters;
+
+		if ( parameters !== undefined ) {
+
+			var values = [];
+
+			for ( var key in parameters ) {
+
+				values.push( parameters[ key ] );
+
+			}
+
+			var geometry = Object.create( this.constructor.prototype );
+			this.constructor.apply( geometry, values );
+			return geometry;
+
+		}
 
 		return new this.constructor().copy( this );
 

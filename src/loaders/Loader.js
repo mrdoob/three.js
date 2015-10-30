@@ -126,7 +126,7 @@ THREE.Loader.prototype = {
 
 				switch ( name ) {
 					case 'DbgColor':
-						json.color = value;
+						if ( json.color === undefined ) json.color = value;
 						break;
 					case 'DbgIndex':
 					case 'opticalDensity':
@@ -138,6 +138,9 @@ THREE.Loader.prototype = {
 						break;
 					case 'blending':
 						json.blending = THREE[ value ];
+						break;
+					case 'colorAmbient':
+						console.warn( 'THREE.Loader.createMaterial: colorAmbient is no longer supported' );
 						break;
 					case 'colorDiffuse':
 						json.color = color.fromArray( value ).getHex();
@@ -224,7 +227,7 @@ THREE.Loader.prototype = {
 						json.side = THREE.DoubleSide;
 						break;
 					case 'transparency':
-						console.warn( 'THREE.Loader: transparency has been renamed to opacity' );
+						console.warn( 'THREE.Loader.createMaterial: transparency has been renamed to opacity' );
 						json.opacity = value;
 						break;
 					case 'opacity':
@@ -241,7 +244,7 @@ THREE.Loader.prototype = {
 						if ( value === 'face' ) json.vertexColors = THREE.FaceColors;
 						break;
 					default:
-						console.error( 'Loader.createMaterial: Unsupported', name, value );
+						console.error( 'THREE.Loader.createMaterial: Unsupported', name, value );
 						break;
 				}
 

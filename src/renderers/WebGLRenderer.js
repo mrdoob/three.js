@@ -106,17 +106,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// light arrays cache
 
-	_direction = new THREE.Vector3(),
-
-	_lightsNeedUpdate = true,
-
 	_lights = {
 
+		hash: '',
+
 		ambient: [ 0, 0, 0 ],
-		directional: { length: 0, colors: [], positions: [] },
-		point: { length: 0, colors: [], positions: [], distances: [], decays: [] },
-		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [], decays: [] },
-		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
+		directional: [],
+		point: [],
+		spot: [],
+		hemi: [],
+
+		shadows: 0,
+		shadowsPointLight: 0
 
 	},
 
@@ -244,8 +245,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
-
-		_lightsNeedUpdate = true;
 
 		state.reset();
 
@@ -637,7 +636,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 
-			if ( material.type !== 'MeshPhongMaterial' && material.shading === THREE.FlatShading ) {
+			if ( material.type !== 'MeshPhongMaterial' && material.type !== 'MeshPhysicalMaterial' && material.shading === THREE.FlatShading ) {
 
 				for ( var i = 0, l = object.count * 3; i < l; i += 9 ) {
 
@@ -1082,7 +1081,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
 		_currentCamera = null;
-		_lightsNeedUpdate = true;
 
 		// update scene graph
 
@@ -1117,9 +1115,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		setupLights( lights, camera );
+
 		//
 
-		shadowMap.render( scene );
+		shadowMap.render( scene, camera );
 
 		//
 
@@ -1168,10 +1168,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( renderTarget ) {
 
 			var texture = renderTarget.texture;
-			var isTargetPowerOfTwo = isPowerOfTwo( renderTarget );
-			if ( texture.generateMipmaps && isTargetPowerOfTwo && texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
 
-				 updateRenderTargetMipmap( renderTarget );
+			if ( texture.generateMipmaps && isPowerOfTwo( renderTarget ) &&
+					texture.minFilter !== THREE.NearestFilter &&
+					texture.minFilter !== THREE.LinearFilter ) {
+
+				updateRenderTargetMipmap( renderTarget );
 
 			}
 
@@ -1240,7 +1242,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		if ( ( object.channels.mask & camera.channels.mask ) !== 0 ) {
+		if ( object.layers.test( camera.layers ) ) {
 
 			if ( object instanceof THREE.Light ) {
 
@@ -1248,7 +1250,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.Sprite ) {
 
-				sprites.push( object );
+				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+
+					sprites.push( object );
+
+				}
 
 			} else if ( object instanceof THREE.LensFlare ) {
 
@@ -1372,7 +1378,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var materialProperties = properties.get( material );
 
-		var parameters = programCache.getParameters( material, lights, fog, object );
+		var parameters = programCache.getParameters( material, _lights, fog, object );
 		var code = programCache.getProgramCode( material, parameters );
 
 		var program = materialProperties.program;
@@ -1469,9 +1475,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		materialProperties.uniformsList = [];
 
-		var uniformLocations = materialProperties.program.getUniforms();
+		var uniforms = materialProperties.__webglShader.uniforms,
+			uniformLocations = materialProperties.program.getUniforms();
 
-		for ( var u in materialProperties.__webglShader.uniforms ) {
+		for ( var u in uniforms ) {
 
 			var location = uniformLocations[ u ];
 
@@ -1480,6 +1487,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 				materialProperties.uniformsList.push( [ materialProperties.__webglShader.uniforms[ u ], location ] );
 
 			}
+
+		}
+
+		if ( material instanceof THREE.MeshPhongMaterial ||
+				material instanceof THREE.MeshLambertMaterial ||
+				material instanceof THREE.MeshPhysicalMaterial ||
+				material.lights ) {
+
+			// store the light setup it was created for
+
+			materialProperties.lightsHash = _lights.hash;
+
+			// wire up the material to this renderer's lighting state
+
+			uniforms.ambientLightColor.value = _lights.ambient;
+			uniforms.directionalLights.value = _lights.directional;
+			uniforms.pointLights.value = _lights.point;
+			uniforms.spotLights.value = _lights.spot;
+			uniforms.hemisphereLights.value = _lights.hemi;
 
 		}
 
@@ -1520,7 +1546,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var materialProperties = properties.get( material );
 
-		if ( material.needsUpdate || ! materialProperties.program ) {
+		if ( materialProperties.program === undefined ) {
+
+			material.needsUpdate = true;
+
+		}
+
+		if ( materialProperties.lightsHash !== undefined &&
+			materialProperties.lightsHash !== _lights.hash ) {
+
+			material.needsUpdate = true;
+
+		}
+
+		if ( material.needsUpdate ) {
 
 			initMaterial( material, lights, fog, object );
 			material.needsUpdate = false;
@@ -1548,7 +1587,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.id !== _currentMaterialId ) {
 
-			if ( _currentMaterialId === - 1 ) refreshLights = true;
 			_currentMaterialId = material.id;
 
 			refreshMaterial = true;
@@ -1566,13 +1604,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 
-			if ( camera !== _currentCamera ) _currentCamera = camera;
+			if ( camera !== _currentCamera ) {
+
+				_currentCamera = camera;
+
+				// lighting uniforms depend on the camera so enforce an update
+				// now, in case this material supports lights - or later, when
+				// the next material that does gets activated:
+
+				refreshMaterial = true;		// set to true on material change
+				refreshLights = true;		// remains set until update done
+
+			}
 
 			// load material specific uniforms
 			// (shader material also gets them for the sake of genericity)
 
 			if ( material instanceof THREE.ShaderMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material.envMap ) {
 
 				if ( p_uniforms.cameraPosition !== undefined ) {
@@ -1587,6 +1637,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshBasicMaterial ||
+				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material instanceof THREE.ShaderMaterial ||
 				 material.skinning ) {
 
@@ -1655,6 +1706,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( refreshMaterial ) {
 
+			if ( material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshLambertMaterial ||
+				 material instanceof THREE.MeshPhysicalMaterial ||
+				 material.lights ) {
+
+				// the current material requires lighting info
+
+				// note: all lighting uniforms are always set correctly
+				// they simply reference the renderer's state for their
+				// values
+				//
+				// use the current material's .needsUpdate flags to set
+				// the GL state when required
+
+				markUniformsLightsNeedsUpdate( m_uniforms, refreshLights );
+
+			}
+
 			// refresh uniforms common to several materials
 
 			if ( fog && material.fog ) {
@@ -1663,34 +1732,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshLambertMaterial ||
-				 material.lights ) {
-
-				if ( _lightsNeedUpdate ) {
-
-					refreshLights = true;
-					setupLights( lights, camera );
-					_lightsNeedUpdate = false;
-
-				}
-
-				if ( refreshLights ) {
-
-					refreshUniformsLights( m_uniforms, _lights );
-					markUniformsLightsNeedsUpdate( m_uniforms, true );
-
-				} else {
-
-					markUniformsLightsNeedsUpdate( m_uniforms, false );
-
-				}
-
-			}
-
 			if ( material instanceof THREE.MeshBasicMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
-				 material instanceof THREE.MeshPhongMaterial ) {
+				 material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshPhysicalMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
 
@@ -1709,11 +1754,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( material instanceof THREE.PointsMaterial ) {
 
-				refreshUniformsParticle( m_uniforms, material );
+				refreshUniformsPoints( m_uniforms, material );
 
 			} else if ( material instanceof THREE.MeshPhongMaterial ) {
 
 				refreshUniformsPhong( m_uniforms, material );
+
+			} else if ( material instanceof THREE.MeshPhysicalMaterial ) {
+
+				refreshUniformsPhysical( m_uniforms, material );
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -1727,9 +1776,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( object.receiveShadow && ! material._shadowPass ) {
+			if ( shadowMap.enabled ) {
 
-				refreshUniformsShadow( m_uniforms, lights, camera );
+				if ( object.receiveShadow && ! material._shadowPass ) {
+
+					refreshUniformsShadow( m_uniforms, lights, camera );
+
+				}
 
 			}
 
@@ -1849,11 +1902,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function refreshUniformsParticle ( uniforms, material ) {
+	function refreshUniformsPoints ( uniforms, material ) {
 
 		uniforms.psColor.value = material.color;
 		uniforms.opacity.value = material.opacity;
-		uniforms.size.value = material.size;
+		uniforms.size.value = material.size * pixelRatio;
 		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
 
 		uniforms.map.value = material.map;
@@ -1928,29 +1981,71 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function refreshUniformsLights ( uniforms, lights ) {
+	function refreshUniformsPhysical ( uniforms, material ) {
 
-		uniforms.ambientLightColor.value = lights.ambient;
+		uniforms.roughness.value = material.roughness;
+		//uniforms.reflectivity.value = material.reflectivity; // part of uniforms common
+		uniforms.metalness.value = material.metalness;
 
-		uniforms.directionalLightColor.value = lights.directional.colors;
-		uniforms.directionalLightDirection.value = lights.directional.positions;
+		if ( material.roughnessMap ) {
 
-		uniforms.pointLightColor.value = lights.point.colors;
-		uniforms.pointLightPosition.value = lights.point.positions;
-		uniforms.pointLightDistance.value = lights.point.distances;
-		uniforms.pointLightDecay.value = lights.point.decays;
+			uniforms.roughnessMap.value = material.roughnessMap;
 
-		uniforms.spotLightColor.value = lights.spot.colors;
-		uniforms.spotLightPosition.value = lights.spot.positions;
-		uniforms.spotLightDistance.value = lights.spot.distances;
-		uniforms.spotLightDirection.value = lights.spot.directions;
-		uniforms.spotLightAngleCos.value = lights.spot.anglesCos;
-		uniforms.spotLightExponent.value = lights.spot.exponents;
-		uniforms.spotLightDecay.value = lights.spot.decays;
+		}
 
-		uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
-		uniforms.hemisphereLightGroundColor.value = lights.hemi.groundColors;
-		uniforms.hemisphereLightDirection.value = lights.hemi.positions;
+		if ( material.reflectivityMap ) {
+
+			uniforms.reflectivityMap.value = material.reflectivityMap;
+
+		}
+
+		if ( material.metalnessMap ) {
+
+			uniforms.metalnessMap.value = material.metalnessMap;
+
+		}
+
+		if ( material.lightMap ) {
+
+			uniforms.lightMap.value = material.lightMap;
+			uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
+		}
+
+		if ( material.emissiveMap ) {
+
+			uniforms.emissiveMap.value = material.emissiveMap;
+
+		}
+
+		if ( material.bumpMap ) {
+
+			uniforms.bumpMap.value = material.bumpMap;
+			uniforms.bumpScale.value = material.bumpScale;
+
+		}
+
+		if ( material.normalMap ) {
+
+			uniforms.normalMap.value = material.normalMap;
+			uniforms.normalScale.value.copy( material.normalScale );
+
+		}
+
+		if ( material.displacementMap ) {
+
+			uniforms.displacementMap.value = material.displacementMap;
+			uniforms.displacementScale.value = material.displacementScale;
+			uniforms.displacementBias.value = material.displacementBias;
+
+		}
+
+		if ( material.envMap ) {
+
+			//uniforms.envMap.value = material.envMap; // part of uniforms common
+			uniforms.envMapIntensity.value = material.envMapIntensity;
+
+		}
 
 	}
 
@@ -1960,25 +2055,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.ambientLightColor.needsUpdate = value;
 
-		uniforms.directionalLightColor.needsUpdate = value;
-		uniforms.directionalLightDirection.needsUpdate = value;
-
-		uniforms.pointLightColor.needsUpdate = value;
-		uniforms.pointLightPosition.needsUpdate = value;
-		uniforms.pointLightDistance.needsUpdate = value;
-		uniforms.pointLightDecay.needsUpdate = value;
-
-		uniforms.spotLightColor.needsUpdate = value;
-		uniforms.spotLightPosition.needsUpdate = value;
-		uniforms.spotLightDistance.needsUpdate = value;
-		uniforms.spotLightDirection.needsUpdate = value;
-		uniforms.spotLightAngleCos.needsUpdate = value;
-		uniforms.spotLightExponent.needsUpdate = value;
-		uniforms.spotLightDecay.needsUpdate = value;
-
-		uniforms.hemisphereLightSkyColor.needsUpdate = value;
-		uniforms.hemisphereLightGroundColor.needsUpdate = value;
-		uniforms.hemisphereLightDirection.needsUpdate = value;
+		uniforms.directionalLights.needsUpdate = value;
+		uniforms.pointLights.needsUpdate = value;
+		uniforms.spotLights.needsUpdate = value;
+		uniforms.hemisphereLights.needsUpdate = value;
 
 	}
 
@@ -2171,6 +2251,72 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// single THREE.Color
 					_gl.uniform3f( location, value.r, value.g, value.b );
+
+					break;
+
+				case 's':
+
+					// TODO: Optimize this.
+					for( var propertyName in uniform.properties ) {
+
+						var property = uniform.properties[ propertyName ];
+						var locationProperty =  location[ propertyName ];
+						var valueProperty = value[ propertyName ];
+
+						switch( property.type ) {
+							case 'f':
+								_gl.uniform1f( locationProperty, valueProperty );
+								break;
+							case 'v2':
+								_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
+								break;
+							case 'v3':
+								_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
+								break;
+							case 'v4':
+								_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
+								break;
+							case 'c':
+								_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
+								break;
+						};
+
+					}
+
+					break;
+
+				case 'sa':
+
+					// TODO: Optimize this.
+					for( var i = 0; i < value.length; i ++ ) {
+
+						for( var propertyName in uniform.properties ) {
+
+							var property = uniform.properties[ propertyName ];
+							var locationProperty =  location[ i ][ propertyName ];
+							var valueProperty = value[i][ propertyName ];
+
+							switch( property.type ) {
+								case 'f':
+									_gl.uniform1f( locationProperty, valueProperty );
+									break;
+								case 'v2':
+									_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
+									break;
+								case 'v3':
+									_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
+									break;
+								case 'v4':
+									_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
+									break;
+								case 'c':
+									_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
+									break;
+							};
+
+						}
+
+					}
 
 					break;
 
@@ -2416,60 +2562,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setColorLinear( array, offset, color, intensity ) {
-
-		array[ offset + 0 ] = color.r * intensity;
-		array[ offset + 1 ] = color.g * intensity;
-		array[ offset + 2 ] = color.b * intensity;
-
-	}
-
 	function setupLights ( lights, camera ) {
 
 		var l, ll, light,
 		r = 0, g = 0, b = 0,
-		color, skyColor, groundColor,
+		color,
 		intensity,
 		distance,
 
-		zlights = _lights,
-
 		viewMatrix = camera.matrixWorldInverse,
 
-		dirColors = zlights.directional.colors,
-		dirPositions = zlights.directional.positions,
-
-		pointColors = zlights.point.colors,
-		pointPositions = zlights.point.positions,
-		pointDistances = zlights.point.distances,
-		pointDecays = zlights.point.decays,
-
-		spotColors = zlights.spot.colors,
-		spotPositions = zlights.spot.positions,
-		spotDistances = zlights.spot.distances,
-		spotDirections = zlights.spot.directions,
-		spotAnglesCos = zlights.spot.anglesCos,
-		spotExponents = zlights.spot.exponents,
-		spotDecays = zlights.spot.decays,
-
-		hemiSkyColors = zlights.hemi.skyColors,
-		hemiGroundColors = zlights.hemi.groundColors,
-		hemiPositions = zlights.hemi.positions,
-
-		dirLength = 0,
+		directionalLength = 0,
 		pointLength = 0,
 		spotLength = 0,
-		hemiLength = 0,
+		hemiLength = 0;
 
-		dirCount = 0,
-		pointCount = 0,
-		spotCount = 0,
-		hemiCount = 0,
-
-		dirOffset = 0,
-		pointOffset = 0,
-		spotOffset = 0,
-		hemiOffset = 0;
+		_lights.shadows = 0;
+		_lights.shadowsPointLight = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -2481,133 +2590,129 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.AmbientLight ) {
 
-				if ( ! light.visible ) continue;
-
 				r += color.r;
 				g += color.g;
 				b += color.b;
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
-				dirCount += 1;
+				if( ! light.__webglUniforms ) {
+					light.__webglUniforms = {
+						direction: new THREE.Vector3(),
+						color: new THREE.Color()
+					}
+				}
 
-				if ( ! light.visible ) continue;
+				var uniforms = light.__webglUniforms;
 
-				_direction.setFromMatrixPosition( light.matrixWorld );
+				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
-				_direction.sub( _vector3 );
-				_direction.transformDirection( viewMatrix );
+				uniforms.direction.sub( _vector3 );
+				uniforms.direction.transformDirection( viewMatrix );
+				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
 
-				dirOffset = dirLength * 3;
+				_lights.directional[ directionalLength ++ ] = uniforms;
 
-				dirPositions[ dirOffset + 0 ] = _direction.x;
-				dirPositions[ dirOffset + 1 ] = _direction.y;
-				dirPositions[ dirOffset + 2 ] = _direction.z;
-
-				setColorLinear( dirColors, dirOffset, color, intensity );
-
-				dirLength += 1;
+				if ( light.castShadow ) _lights.shadows ++;
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				pointCount += 1;
+				if( ! light.__webglUniforms ) {
+					light.__webglUniforms = {
+						position: new THREE.Vector3(),
+						color: new THREE.Color(),
+						distance: 0,
+						decay: 0
+					}
+				}
 
-				if ( ! light.visible ) continue;
+				var uniforms = light.__webglUniforms;
 
-				pointOffset = pointLength * 3;
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
 
-				setColorLinear( pointColors, pointOffset, color, intensity );
+				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
+				uniforms.distance = light.distance;
+				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
-				_vector3.setFromMatrixPosition( light.matrixWorld );
-				_vector3.applyMatrix4( viewMatrix );
+				_lights.point[ pointLength ++ ] = uniforms;
 
-				pointPositions[ pointOffset + 0 ] = _vector3.x;
-				pointPositions[ pointOffset + 1 ] = _vector3.y;
-				pointPositions[ pointOffset + 2 ] = _vector3.z;
+				if ( light.castShadow ) {
 
-				// distance is 0 if decay is 0, because there is no attenuation at all.
-				pointDistances[ pointLength ] = distance;
-				pointDecays[ pointLength ] = ( light.distance === 0 ) ? 0.0 : light.decay;
+					_lights.shadows ++;
+					_lights.shadowsPointLight ++;
 
-				pointLength += 1;
+				}
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
-				spotCount += 1;
+				if( ! light.__webglUniforms ) {
+					light.__webglUniforms = {
+						position: new THREE.Vector3(),
+						direction: new THREE.Vector3(),
+						color: new THREE.Color(),
+						distance: 0,
+						decay: 0,
+						angleCos: 0
+					}
+				}
 
-				if ( ! light.visible ) continue;
+				var uniforms = light.__webglUniforms;
 
-				spotOffset = spotLength * 3;
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
 
-				setColorLinear( spotColors, spotOffset, color, intensity );
+				uniforms.color.copy( color ).multiplyScalar( intensity );
+				uniforms.distance = distance;
 
-				_direction.setFromMatrixPosition( light.matrixWorld );
-				_vector3.copy( _direction ).applyMatrix4( viewMatrix );
-
-				spotPositions[ spotOffset + 0 ] = _vector3.x;
-				spotPositions[ spotOffset + 1 ] = _vector3.y;
-				spotPositions[ spotOffset + 2 ] = _vector3.z;
-
-				spotDistances[ spotLength ] = distance;
-
+				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
-				_direction.sub( _vector3 );
-				_direction.transformDirection( viewMatrix );
+				uniforms.direction.sub( _vector3 );
+				uniforms.direction.transformDirection( viewMatrix );
 
-				spotDirections[ spotOffset + 0 ] = _direction.x;
-				spotDirections[ spotOffset + 1 ] = _direction.y;
-				spotDirections[ spotOffset + 2 ] = _direction.z;
+				uniforms.angleCos = Math.cos( light.angle );
+				uniforms.exponent = light.exponent;
+				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
-				spotAnglesCos[ spotLength ] = Math.cos( light.angle );
-				spotExponents[ spotLength ] = light.exponent;
-				spotDecays[ spotLength ] = ( light.distance === 0 ) ? 0.0 : light.decay;
+				_lights.spot[ spotLength ++ ] = uniforms;
 
-				spotLength += 1;
+				if ( light.castShadow ) _lights.shadows ++;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 
-				hemiCount += 1;
+				if( ! light.__webglUniforms ) {
+					light.__webglUniforms = {
+						direction: new THREE.Vector3(),
+						skyColor: new THREE.Color(),
+						groundColor: new THREE.Color()
+					}
+				}
 
-				if ( ! light.visible ) continue;
+				var uniforms = light.__webglUniforms;
 
-				_direction.setFromMatrixPosition( light.matrixWorld );
-				_direction.transformDirection( viewMatrix );
+				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
+				uniforms.direction.transformDirection( viewMatrix );
+				uniforms.direction.normalize();
 
-				hemiOffset = hemiLength * 3;
+				uniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
+				uniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
 
-				hemiPositions[ hemiOffset + 0 ] = _direction.x;
-				hemiPositions[ hemiOffset + 1 ] = _direction.y;
-				hemiPositions[ hemiOffset + 2 ] = _direction.z;
-
-				skyColor = light.color;
-				groundColor = light.groundColor;
-
-				setColorLinear( hemiSkyColors, hemiOffset, skyColor, intensity );
-				setColorLinear( hemiGroundColors, hemiOffset, groundColor, intensity );
-
-				hemiLength += 1;
+				_lights.hemi[ hemiLength ++ ] = uniforms;
 
 			}
 
 		}
 
-		// null eventual remains from removed lights
-		// (this is to avoid if in shader)
+		_lights.ambient[ 0 ] = r;
+		_lights.ambient[ 1 ] = g;
+		_lights.ambient[ 2 ] = b;
 
-		for ( l = dirLength * 3, ll = Math.max( dirColors.length, dirCount * 3 ); l < ll; l ++ ) dirColors[ l ] = 0.0;
-		for ( l = pointLength * 3, ll = Math.max( pointColors.length, pointCount * 3 ); l < ll; l ++ ) pointColors[ l ] = 0.0;
-		for ( l = spotLength * 3, ll = Math.max( spotColors.length, spotCount * 3 ); l < ll; l ++ ) spotColors[ l ] = 0.0;
-		for ( l = hemiLength * 3, ll = Math.max( hemiSkyColors.length, hemiCount * 3 ); l < ll; l ++ ) hemiSkyColors[ l ] = 0.0;
-		for ( l = hemiLength * 3, ll = Math.max( hemiGroundColors.length, hemiCount * 3 ); l < ll; l ++ ) hemiGroundColors[ l ] = 0.0;
+		_lights.directional.length = directionalLength;
+		_lights.point.length = pointLength;
+		_lights.spot.length = spotLength;
+		_lights.hemi.length = hemiLength;
 
-		zlights.directional.length = dirLength;
-		zlights.point.length = pointLength;
-		zlights.spot.length = spotLength;
-		zlights.hemi.length = hemiLength;
-
-		zlights.ambient[ 0 ] = r;
-		zlights.ambient[ 1 ] = g;
-		zlights.ambient[ 2 ] = b;
+		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength;
 
 	}
 
@@ -3433,143 +3538,5 @@ THREE.WebGLRenderer = function ( parameters ) {
 		return 0;
 
 	}
-
-	// DEPRECATED
-
-	this.supportsFloatTextures = function () {
-
-		console.warn( 'THREE.WebGLRenderer: .supportsFloatTextures() is now .extensions.get( \'OES_texture_float\' ).' );
-		return extensions.get( 'OES_texture_float' );
-
-	};
-
-	this.supportsHalfFloatTextures = function () {
-
-		console.warn( 'THREE.WebGLRenderer: .supportsHalfFloatTextures() is now .extensions.get( \'OES_texture_half_float\' ).' );
-		return extensions.get( 'OES_texture_half_float' );
-
-	};
-
-	this.supportsStandardDerivatives = function () {
-
-		console.warn( 'THREE.WebGLRenderer: .supportsStandardDerivatives() is now .extensions.get( \'OES_standard_derivatives\' ).' );
-		return extensions.get( 'OES_standard_derivatives' );
-
-	};
-
-	this.supportsCompressedTextureS3TC = function () {
-
-		console.warn( 'THREE.WebGLRenderer: .supportsCompressedTextureS3TC() is now .extensions.get( \'WEBGL_compressed_texture_s3tc\' ).' );
-		return extensions.get( 'WEBGL_compressed_texture_s3tc' );
-
-	};
-
-	this.supportsCompressedTexturePVRTC = function () {
-
-		console.warn( 'THREE.WebGLRenderer: .supportsCompressedTexturePVRTC() is now .extensions.get( \'WEBGL_compressed_texture_pvrtc\' ).' );
-		return extensions.get( 'WEBGL_compressed_texture_pvrtc' );
-
-	};
-
-	this.supportsBlendMinMax = function () {
-
-		console.warn( 'THREE.WebGLRenderer: .supportsBlendMinMax() is now .extensions.get( \'EXT_blend_minmax\' ).' );
-		return extensions.get( 'EXT_blend_minmax' );
-
-	};
-
-	this.supportsVertexTextures = function () {
-
-		return capabilities.vertexTextures;
-
-	};
-
-	this.supportsInstancedArrays = function () {
-
-		console.warn( 'THREE.WebGLRenderer: .supportsInstancedArrays() is now .extensions.get( \'ANGLE_instanced_arrays\' ).' );
-		return extensions.get( 'ANGLE_instanced_arrays' );
-
-	};
-
-	//
-
-	this.initMaterial = function () {
-
-		console.warn( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );
-
-	};
-
-	this.addPrePlugin = function () {
-
-		console.warn( 'THREE.WebGLRenderer: .addPrePlugin() has been removed.' );
-
-	};
-
-	this.addPostPlugin = function () {
-
-		console.warn( 'THREE.WebGLRenderer: .addPostPlugin() has been removed.' );
-
-	};
-
-	this.updateShadowMap = function () {
-
-		console.warn( 'THREE.WebGLRenderer: .updateShadowMap() has been removed.' );
-
-	};
-
-	Object.defineProperties( this, {
-		shadowMapEnabled: {
-			get: function () {
-
-				return shadowMap.enabled;
-
-			},
-			set: function ( value ) {
-
-				console.warn( 'THREE.WebGLRenderer: .shadowMapEnabled is now .shadowMap.enabled.' );
-				shadowMap.enabled = value;
-
-			}
-		},
-		shadowMapType: {
-			get: function () {
-
-				return shadowMap.type;
-
-			},
-			set: function ( value ) {
-
-				console.warn( 'THREE.WebGLRenderer: .shadowMapType is now .shadowMap.type.' );
-				shadowMap.type = value;
-
-			}
-		},
-		shadowMapCullFace: {
-			get: function () {
-
-				return shadowMap.cullFace;
-
-			},
-			set: function ( value ) {
-
-				console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
-				shadowMap.cullFace = value;
-
-			}
-		},
-		shadowMapDebug: {
-			get: function () {
-
-				return shadowMap.debug;
-
-			},
-			set: function ( value ) {
-
-				console.warn( 'THREE.WebGLRenderer: .shadowMapDebug is now .shadowMap.debug.' );
-				shadowMap.debug = value;
-
-			}
-		}
-	} );
 
 };
