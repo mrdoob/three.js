@@ -129,6 +129,24 @@ THREE.Mesh.prototype.raycast = ( function () {
 		vA.fromArray( positions, a * 3 );
 		vB.fromArray( positions, b * 3 );
 		vC.fromArray( positions, c * 3 );
+		return check( object, raycaster, ray, uvs, a, b, c );
+
+	}
+
+	function checkInstancedBufferGeometryIntersection( object, raycaster, ray, uvs, a, b, c, instance, getPointCoordinates) {
+        getPointCoordinates(instance, a, vA);
+        getPointCoordinates(instance, b, vB);
+        getPointCoordinates(instance, c, vC);
+
+		var intersection =  check( object, raycaster, ray, uvs, a, b, c );
+		if (intersection) {
+		    intersection.instance = instance;
+		}
+
+		return intersection;
+	}
+
+	function check( object, raycaster, ray, uvs, a, b, c ) {
 
 		var intersection = checkIntersection( object, raycaster, ray, vA, vB, vC, intersectionPoint );
 
@@ -184,7 +202,75 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		var uvs, intersection;
 
-		if ( geometry instanceof THREE.BufferGeometry ) {
+		if ( geometry instanceof THREE.InstancedBufferGeometry ) {
+		    
+		    var getPointCoordinates = geometry.getPointCoordinates;
+
+			var a, b, c;
+			var index = geometry.index;
+			var attributes = geometry.attributes;
+			var positions = attributes.position.array;
+			var nInstances = geometry.maxInstancedCount;
+
+			if ( attributes.uv !== undefined ){
+
+				uvs = attributes.uv.array;
+
+			}
+
+			if ( index !== null ) {
+
+				var indices = index.array;
+
+				for ( var i = 0, l = indices.length; i < l; i += 3 ) {
+
+					a = indices[ i ];
+					b = indices[ i + 1 ];
+					c = indices[ i + 2 ];
+
+                    for ( var j = 0; j < nInstances; j++ ) {
+
+    					intersection = checkInstancedBufferGeometryIntersection( this, raycaster, ray, uvs, a, b, c, j , getPointCoordinates);
+
+    					if ( intersection ) {
+    
+    						intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indices buffer semantics
+    						intersects.push( intersection );
+
+    					}
+
+                    }
+
+				}
+
+			} else {
+
+				for ( var i = 0, l = positions.length; i < l; i += 9 ) {
+
+					a = i / 3;
+					b = a + 1;
+					c = a + 2;
+
+                    for ( var j = 0; j < nInstances; j++ ) {
+
+    					intersection = checkInstancedBufferGeometryIntersection( this, raycaster, ray, uvs, a, b, c, j , getPointCoordinates);
+
+    					if ( intersection ) {
+
+    						intersection.index = a; // triangle number in positions buffer semantics
+    						intersects.push( intersection );
+
+    					}
+
+                    }
+
+				}
+
+			}
+
+
+
+		} else 	if ( geometry instanceof THREE.BufferGeometry ) {
 
 			var a, b, c;
 			var index = geometry.index;
