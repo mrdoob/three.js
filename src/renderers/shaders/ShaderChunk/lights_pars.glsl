@@ -124,7 +124,7 @@ uniform vec3 ambientLightColor;
 
 		#ifdef ENVMAP_TYPE_CUBE
 
-			vec3 queryVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
+			vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );
 
 			#if defined( TEXTURE_CUBE_LOD_EXT )				
 
