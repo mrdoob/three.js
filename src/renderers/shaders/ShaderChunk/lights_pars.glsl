@@ -107,6 +107,46 @@ uniform vec3 ambientLightColor;
 
 #if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
+
+	vec3 getDiffuseLightProbeIndirectLightColor( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) { 
+
+		#ifdef DOUBLE_SIDED
+
+			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+
+		#else
+
+			float flipNormal = 1.0;
+
+		#endif
+
+		vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
+
+		#ifdef ENVMAP_TYPE_CUBE
+
+			vec3 queryVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
+
+			#if defined( TEXTURE_CUBE_LOD_EXT )				
+
+				vec4 envMapColor = textureCubeLodEXT( envMap, queryVec, float( maxMIPLevel ) );
+
+			#else
+
+				vec4 envMapColor = textureCube( envMap, queryVec, float( maxMIPLevel ) );
+
+			#endif
+		#else
+
+			vec4 envMapColor = vec3( 0.0 );
+
+		#endif
+
+		envMapColor.rgb = inputToLinear( envMapColor.rgb );
+
+		return envMapColor.rgb;
+
+	}
+
 	// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
 	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {
 
