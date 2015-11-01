@@ -7,7 +7,7 @@
  *
  * Source code:
  *
- * 		https://github.com/tschw/timeliner
+ * 		https://github.com/tschw/timeliner_gui
  * 		https://github.com/zz85/timeliner (fork's origin)
  *
  * @author tschw
@@ -63,6 +63,12 @@ THREE.TimelinerController.prototype = {
 
 	},
 
+	setDuration: function( duration ) {
+
+		this._clip.duration = duration;
+
+	},
+
 	getChannelNames: function() {
 
 		return this._channelNames;
@@ -79,21 +85,39 @@ THREE.TimelinerController.prototype = {
 
 		var track = this._tracks[ channelName ],
 			times = track.times,
-			index = times.indexOf( time );
+			index = Timeliner.binarySearch( times, time ),
+			values = track.values,
+			stride = track.getValueSize(),
+			offset = index * stride;
 
-		if ( index === -1 ) index = times.length;
+		if ( index < 0 ) {
 
-		var values = track.values,
-			offset = index * track.getValueSize();
+			// insert new keyframe
 
-		// note: not calling track.getValueSize with
-		// inconsistent array sizes
+			index = ~ index;
+			offset = index * stride;
 
-		times[ index ] = time;
+			var nTimes = times.length + 1,
+				nValues = values.length + stride;
+
+			times[ index ] = time;
+
+			for ( var i = nTimes - 1; i !== index; -- i ) {
+
+				times[ i ] = times[ i - 1 ];
+
+			}
+
+			for ( var i = nValues - 1,
+					e = offset + stride - 1; i !== e; -- i ) {
+
+				values[ i ] = values[ i - stride ];
+
+			}
+
+		}
+
 		this._propRefs[ channelName ].getValue( values, offset );
-
-		this._sort( track );
-		this._clip.resetDuration();
 
 	},
 
@@ -101,69 +125,79 @@ THREE.TimelinerController.prototype = {
 
 		var track = this._tracks[ channelName ],
 			times = track.times,
-			index = times.indexOf( time );
+			index = Timeliner.binarySearch( times, time );
 
-		if ( index === 0 ) {
+		// we disallow to remove the keyframe when it is the last one we have,
+		// since the animation system is designed to always produce a defined
+		// state
 
-			// we disallow to remove the first keyframe
-			// since the animation system is designed to
-			// always produce a defined state - we allow
-			// the initial state to be changed however
+		if ( times.length > 1 && index >= 0 ) {
 
-			this.setKeyframe( channelName, time );
-
-		} else if ( index !== -1 ) {
-
-			var values = track.values,
+			var nTimes = times.length - 1,
+				values = track.values,
 				stride = track.getValueSize(),
-				offset = index * stride,
+				nValues = values.length - stride;
 
-				nValues = values.length;
+			// note: no track.getValueSize when array sizes are out of sync
 
-			// note: not calling track.getValueSize with
-			// inconsistent array sizes
+			for ( var i = index; i !== nTimes; ++ i ) {
 
-			times[ index ] = times[ times.length - 1 ];
-			times.pop();
-
-			for ( var i = nValues - stride; i !== nValues; ++ i ) {
-
-				values[ offset ++ ] = values[ i ];
+				times[ i ] = times[ i + 1 ];
 
 			}
 
-			values.length = nValues - stride;
+			times.pop();
 
-			this._sort( track );
-			this._clip.resetDuration();
+			for ( var offset = index * stride; offset !== nValues; ++ offset ) {
+
+				values[ offset ] = values[ offset + stride ];
+
+			}
+
+			values.length = nValues;
 
 		}
 
 	},
 
-	hasKeyframe: function( channelName, time ) {
+	moveKeyframe: function( channelName, time, delta, moveRemaining ) {
 
 		var track = this._tracks[ channelName ],
 			times = track.times,
-			index = times.indexOf( time );
+			index = Timeliner.binarySearch( times, time );
 
-		return index !== -1;
+		if ( index >= 0 ) {
+
+			var endAt = moveRemaining ? times.length : index + 1,
+				needsSort = times[ index - 1 ] <= time ||
+					! moveRemaining && time >= times[ index + 1 ];
+
+			while ( index !== endAt ) times[ index ++ ] += delta;
+
+			if ( needsSort ) this._sort( track );
+
+		}
 
 	},
 
 	serialize: function() {
 
-		var result = {},
+		var result = {
+				duration: this._clip.duration,
+				channels: {}
+			},
 
 			names = this._channelNames,
-			tracks = this._tracks;
+			tracks = this._tracks,
+
+			channels = result.channels;
 
 		for ( var i = 0, n = names.length; i !== n; ++ i ) {
 
 			var name = names[ i ],
 				track = tracks[ name ];
 
-			result[ name ] = {
+			channels[ name ] = {
 
 				times: track.times,
 				values: track.values
@@ -179,13 +213,17 @@ THREE.TimelinerController.prototype = {
 	deserialize: function( structs ) {
 
 		var names = this._channelNames,
-			tracks = this._tracks;
+			tracks = this._tracks,
+
+			channels = structs.channels;
+
+		this.setDuration( structs.duration );
 
 		for ( var i = 0, n = names.length; i !== n; ++ i ) {
 
 			var name = names[ i ],
 				track = tracks[ name ];
-				data = structs[ name ];
+				data = channels[ name ];
 
 			this._setArray( track.times, data.times );
 			this._setArray( track.values, data.values );
