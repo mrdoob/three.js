@@ -46,10 +46,14 @@ THREE.XHRLoader.prototype = {
 			THREE.Cache.add( url, response );
 
 			if ( this.status == 200 && this.readyState == 4 ) {
-				if ( onLoad ) onLoad( response );	
+
+				if ( onLoad ) onLoad( response );
+
 			} else {
+
 				if ( onError ) onError( event );
-			};
+
+			}
 
 			scope.manager.itemEnd( url );
 
