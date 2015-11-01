@@ -11,6 +11,8 @@ THREE.Light = function ( color ) {
 
 	this.color = new THREE.Color( color );
 
+	this.receiveShadow = undefined;
+
 };
 
 THREE.Light.prototype = Object.create( THREE.Object3D.prototype );

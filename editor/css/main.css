@@ -6,7 +6,7 @@ body {
 }
 
 hr {
-	border: 0px;
+	border: 0;
 	border-top: 1px solid #ccc;
 }
 
@@ -42,14 +42,14 @@ textarea, input { outline: none; } /* osx */
 }
 
 	.Panel.Collapsible .Static {
-		margin: 0px;
+		margin: 0;
 	}
 
 	.Panel.Collapsible .Static .Button {
 		float: left;
 		margin-right: 6px;
-		width: 0px;
-		height: 0px;
+		width: 0;
+		height: 0;
 		border: 6px solid transparent;
 	}
 
@@ -88,7 +88,7 @@ textarea, input { outline: none; } /* osx */
 
 		color: #f00;
 		text-align: right;
-		padding: 0px 20px;
+		padding: 0 20px;
 
 	}
 
@@ -97,7 +97,7 @@ textarea, input { outline: none; } /* osx */
 .type {
 	position:relative;
 	top:-2px;
-	padding: 0px 2px;
+	padding: 0 2px;
 	color: #ddd;
 }
 .type:after {
@@ -114,6 +114,18 @@ textarea, input { outline: none; } /* osx */
 
 .Mesh {
 	color: #8888ee;
+}
+
+.Line {
+	color: #88ee88;
+}
+
+.LineSegments {
+	color: #88ee88;
+}
+
+.Points {
+	color: #ee8888;
 }
 
 /* */

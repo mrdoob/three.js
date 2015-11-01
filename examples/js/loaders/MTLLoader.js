@@ -311,6 +311,10 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 			var value = mat[ prop ];
 
+			if ( value === '' ) {
+				continue;
+			}
+
 			switch ( prop.toLowerCase() ) {
 
 				// Ns is material specular exponent
@@ -351,7 +355,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					// The specular exponent (defines the focus of the specular highlight)
 					// A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
 
-					params[ 'shininess' ] = value;
+					params[ 'shininess' ] = parseFloat( value );
 
 					break;
 

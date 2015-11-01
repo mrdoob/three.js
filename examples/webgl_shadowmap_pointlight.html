@@ -61,29 +61,25 @@
 				camera.position.set( 0, 10, 40 );
 
 				scene = new THREE.Scene();
+				scene.add( new THREE.AmbientLight( 0x222233 ) );
 
 				// Lights
 
-				var ambient = new THREE.AmbientLight( 0x404040 );
-				scene.add( ambient );
-
 				function createLight( color ) {
 
-					var pointLight = new THREE.PointLight( color );
+					var pointLight = new THREE.PointLight( color, 1, 30 );
 					pointLight.castShadow = true;
 					pointLight.shadowCameraNear = 1;
 					pointLight.shadowCameraFar = 30;
-					pointLight.shadowDarkness = 0.5;
 					// pointLight.shadowCameraVisible = true;
 					pointLight.shadowMapWidth = 2048;
 					pointLight.shadowMapHeight = 1024;
 					pointLight.shadowBias = 0.01;
+					pointLight.shadowDarkness = 0.5;
 
 					var geometry = new THREE.SphereGeometry( 0.3, 32, 32 );
 					var material = new THREE.MeshBasicMaterial( { color: color } );
 					var sphere = new THREE.Mesh( geometry, material );
-					sphere.castShadow = false;
-					sphere.receiveShadow = false;
 					pointLight.add( sphere );
 
 					return pointLight
@@ -118,43 +114,38 @@
 
 				var wallGeometry = new THREE.BoxGeometry( 10, 0.15, 10 );
 				ground = new THREE.Mesh( wallGeometry, wallMaterial );
+				ground.position.set( 0, -5, 0 );
 				ground.scale.multiplyScalar( 3 );
-				ground.castShadow = false;
 				ground.receiveShadow = true;
 				scene.add( ground );
-				ground.position.set( 0, -5, 0 );
 
 				var ceiling = new THREE.Mesh( wallGeometry, wallMaterial );
+				ceiling.position.set( 0, 24, 0 );
 				ceiling.scale.multiplyScalar( 3 );
-				ceiling.castShadow = false;
 				ceiling.receiveShadow = true;
 				scene.add( ceiling );
-				ceiling.position.set( 0, 24, 0 );
 
 				var wall = new THREE.Mesh( wallGeometry, wallMaterial );
-				wall.scale.multiplyScalar( 3 );
-				wall.castShadow = false;
-				wall.receiveShadow = true;
-				scene.add( wall );
 				wall.position.set( -14, 10, 0 );
 				wall.rotation.z = Math.PI / 2;
-
-				wall = new THREE.Mesh( wallGeometry, wallMaterial );
 				wall.scale.multiplyScalar( 3 );
-				wall.castShadow = false;
 				wall.receiveShadow = true;
 				scene.add( wall );
-				wall.position.set(14,10,0);
+
+				wall = new THREE.Mesh( wallGeometry, wallMaterial );
+				wall.position.set( 14, 10, 0 );
 				wall.rotation.z = Math.PI / 2;
-
-				wall = new THREE.Mesh( wallGeometry, wallMaterial );
 				wall.scale.multiplyScalar( 3 );
-				wall.castShadow = false;
 				wall.receiveShadow = true;
 				scene.add( wall );
+
+				wall = new THREE.Mesh( wallGeometry, wallMaterial );
 				wall.position.set( 0, 10, -14 );
 				wall.rotation.y = Math.PI / 2;
 				wall.rotation.z = Math.PI / 2;
+				wall.scale.multiplyScalar( 3 );
+				wall.receiveShadow = true;
+				scene.add( wall );
 
 				/*
 				wall = new THREE.Mesh( wallGeometry, wallMaterial );

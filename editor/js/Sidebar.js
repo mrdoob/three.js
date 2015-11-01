@@ -8,6 +8,7 @@ var Sidebar = function ( editor ) {
 	container.setId( 'sidebar' );
 
 	container.add( new Sidebar.Project( editor ) );
+	container.add( new Sidebar.History( editor ) );
 	container.add( new Sidebar.Scene( editor ) );
 	container.add( new Sidebar.Object3D( editor ) );
 	container.add( new Sidebar.Geometry( editor ) );

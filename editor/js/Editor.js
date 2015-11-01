@@ -19,7 +19,7 @@ var Editor = function () {
 
 		// actions
 
-		// showDialog: new SIGNALS.Signal(),
+		showModal: new SIGNALS.Signal(),
 
 		// notifications
 
@@ -62,7 +62,10 @@ var Editor = function () {
 		fogParametersChanged: new SIGNALS.Signal(),
 		windowResize: new SIGNALS.Signal(),
 
-		showGridChanged: new SIGNALS.Signal()
+		showGridChanged: new SIGNALS.Signal(),
+		refreshSidebarObject3D: new SIGNALS.Signal(),
+		historyChanged: new SIGNALS.Signal(),
+		refreshScriptEditor: new SIGNALS.Signal()
 
 	};
 
@@ -101,14 +104,6 @@ Editor.prototype = {
 		this.signals.themeChanged.dispatch( value );
 
 	},
-
-	/*
-	showDialog: function ( value ) {
-
-		this.signals.showDialog.dispatch( value );
-
-	},
-	*/
 
 	//
 
@@ -411,6 +406,7 @@ Editor.prototype = {
 	clear: function () {
 
 		this.history.clear();
+		this.storage.clear();
 
 		this.camera.position.set( 500, 250, 500 );
 		this.camera.lookAt( new THREE.Vector3() );
@@ -461,6 +457,7 @@ Editor.prototype = {
 
 		this.setScene( loader.parse( json.scene ) );
 		this.scripts = json.scripts;
+		this.history.fromJSON( json.history );
 
 	},
 
@@ -469,13 +466,39 @@ Editor.prototype = {
 		return {
 
 			project: {
+				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				vr: this.config.getKey( 'project/vr' )
 			},
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
-			scripts: this.scripts
+			scripts: this.scripts,
+			history: this.history.toJSON()
 
 		};
+
+	},
+
+	objectByUuid: function ( uuid ) {
+
+		return this.scene.getObjectByProperty( 'uuid', uuid, true );
+
+	},
+
+	execute: function ( cmd, optionalName ) {
+
+		this.history.execute( cmd, optionalName );
+
+	},
+
+	undo: function () {
+
+		this.history.undo();
+
+	},
+
+	redo: function () {
+
+		this.history.redo();
 
 	}
 

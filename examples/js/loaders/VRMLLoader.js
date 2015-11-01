@@ -44,9 +44,13 @@ THREE.VRMLLoader.prototype = {
 
 		this.crossOrigin = value;
 
+		THREE.ImageUtils.crossOrigin = value;
+
 	},
 
 	parse: function ( data ) {
+
+		var texturePath = this.texturePath || '';
 
 		var parseV1 = function ( lines, scene ) {
 
@@ -58,6 +62,7 @@ THREE.VRMLLoader.prototype = {
 
 			var defines = {};
 			var float_pattern = /(\b|\-|\+)([\d\.e]+)/;
+			var float2_pattern = /([\d\.\+\-e]+)\s+([\d\.\+\-e]+)/g;
 			var float3_pattern = /([\d\.\+\-e]+)\s+([\d\.\+\-e]+)\s+([\d\.\+\-e]+)/g;
 
 			/**
@@ -239,10 +244,10 @@ THREE.VRMLLoader.prototype = {
 						this.points = [];
 						break;
 					case 'coordIndex':
+					case 'texCoordIndex':
 						this.recordingFieldname = fieldName;
 						this.isRecordingFaces = true;
 						this.indexes = [];
-						break;
 				}
 
 				if ( this.isRecordingFaces ) {
@@ -287,11 +292,13 @@ THREE.VRMLLoader.prototype = {
 					if ( /]/.exec( line ) ) {
 
 						this.isRecordingFaces = false;
-						node.coordIndex = this.indexes;
+						node[this.recordingFieldname] = this.indexes;
 
 					}
 
 				} else if ( this.isRecordingPoints ) {
+
+					if ( node.nodeType == 'Coordinate' )
 
 					while ( null !== ( parts = float3_pattern.exec( line ) ) ) {
 
@@ -299,6 +306,19 @@ THREE.VRMLLoader.prototype = {
 							x: parseFloat( parts[ 1 ] ),
 							y: parseFloat( parts[ 2 ] ),
 							z: parseFloat( parts[ 3 ] )
+						};
+
+						this.points.push( point );
+
+					}
+
+					if ( node.nodeType == 'TextureCoordinate' )
+
+					while ( null !== ( parts = float2_pattern.exec( line ) ) ) {
+
+						point = {
+							x: parseFloat( parts[ 1 ] ),
+							y: parseFloat( parts[ 2 ] )
 						};
 
 						this.points.push( point );
@@ -505,7 +525,7 @@ THREE.VRMLLoader.prototype = {
 
 					}
 
-					if ( matches = /([^\s]*){1}\s?{/.exec( line ) ) {
+					if ( matches = /([^\s]*){1}(?:\s+)?{/.exec( line ) ) {
 
 						// first subpattern should match the Node name
 
@@ -637,7 +657,7 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /DEF/.exec( data.string ) ) {
 
-						object.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+						object.name = /DEF\s+(\w+)/.exec( data.string )[ 1 ];
 
 						defines[ object.name ] = object;
 
@@ -710,7 +730,7 @@ THREE.VRMLLoader.prototype = {
 
 						var geometry = new THREE.Geometry();
 
-						var indexes;
+						var indexes, uvIndexes, uvs;
 
 						for ( var i = 0, j = data.children.length; i < j; i ++ ) {
 
@@ -718,19 +738,43 @@ THREE.VRMLLoader.prototype = {
 
 							var vec;
 
+							if ( 'TextureCoordinate' === child.nodeType ) {
+
+								uvs = child.points;
+
+							}
+
+
 							if ( 'Coordinate' === child.nodeType ) {
 
-								for ( var k = 0, l = child.points.length; k < l; k ++ ) {
+								if ( child.points ) {
 
-									var point = child.points[ k ];
+									for ( var k = 0, l = child.points.length; k < l; k ++ ) {
 
-									vec = new THREE.Vector3( point.x, point.y, point.z );
+										var point = child.points[ k ];
 
-									geometry.vertices.push( vec );
+										vec = new THREE.Vector3( point.x, point.y, point.z );
+
+										geometry.vertices.push( vec );
+
+									}
 
 								}
 
-								break;
+								if ( child.string.indexOf ( 'DEF' ) > -1 ) {
+
+									var name = /DEF\s+(\w+)/.exec( child.string )[ 1 ];
+
+									defines[ name ] = geometry.vertices;
+
+								}
+
+								if ( child.string.indexOf ( 'USE' ) > -1 ) {
+
+									var defineKey = /USE\s+(\w+)/.exec( child.string )[ 1 ];
+
+									geometry.vertices = defines[ defineKey ];
+								}
 
 							}
 
@@ -738,33 +782,58 @@ THREE.VRMLLoader.prototype = {
 
 						var skip = 0;
 
-						// read this: http://math.hws.edu/eck/cs424/notes2013/16_Threejs_Advanced.html
-						for ( var i = 0, j = data.coordIndex.length; i < j; i ++ ) {
+						// some shapes only have vertices for use in other shapes
+						if ( data.coordIndex ) {
 
-							indexes = data.coordIndex[ i ];
+							// read this: http://math.hws.edu/eck/cs424/notes2013/16_Threejs_Advanced.html
+							for ( var i = 0, j = data.coordIndex.length; i < j; i ++ ) {
 
-							// vrml support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
-							skip = 0;
+								indexes = data.coordIndex[ i ]; if ( data.texCoordIndex ) uvIndexes = data.texCoordIndex[ i ];
 
-							// todo: this is the time to check if the faces are ordered ccw or not (cw)
+								// vrml support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
+								skip = 0;
 
-							// Face3 only works with triangles, but IndexedFaceSet allows shapes with more then three vertices, build them of triangles
-							while ( indexes.length >= 3 && skip < ( indexes.length - 2 ) ) {
+								// Face3 only works with triangles, but IndexedFaceSet allows shapes with more then three vertices, build them of triangles
+								while ( indexes.length >= 3 && skip < ( indexes.length - 2 ) ) {
 
-								var face = new THREE.Face3(
-									indexes[ 0 ],
-									indexes[ skip + 1 ],
-									indexes[ skip + 2 ],
-									null // normal, will be added later
-									// todo: pass in the color, if a color index is present
-								);
+									var face = new THREE.Face3(
+										indexes[ 0 ],
+										indexes[ skip + (data.ccw ? 1 : 2) ],
+										indexes[ skip + (data.ccw ? 2 : 1) ],
+										null // normal, will be added later
+										// todo: pass in the color, if a color index is present
+									);
 
-								skip ++;
+									if ( uvs && uvIndexes ) {
+										geometry.faceVertexUvs [0].push( [
+											new THREE.Vector2 (
+												uvs[ uvIndexes[ 0 ] ].x ,
+												uvs[ uvIndexes[ 0 ] ].y
+											) ,
+											new THREE.Vector2 (
+												uvs[ uvIndexes[ skip + (data.ccw ? 1 : 2) ] ].x ,
+												uvs[ uvIndexes[ skip + (data.ccw ? 1 : 2) ] ].y
+											) ,
+											new THREE.Vector2 (
+												uvs[ uvIndexes[ skip + (data.ccw ? 2 : 1) ] ].x ,
+												uvs[ uvIndexes[ skip + (data.ccw ? 2 : 1) ] ].y
+											)
+										] );
+									}
 
-								geometry.faces.push( face );
+									skip ++;
+
+									geometry.faces.push( face );
+
+								}
+
 
 							}
 
+						} else {
+
+							// do not add dummy mesh to the scene
+							parent.parent.remove( parent );
 
 						}
 
@@ -850,8 +919,19 @@ THREE.VRMLLoader.prototype = {
 
 							parent.material = material;
 
-							// material found, stop looping
-							break;
+						}
+
+						if ( 'ImageTexture' === child.nodeType ) {
+
+							var textureName = /"([^"]+)"/.exec(child.children[ 0 ]);
+
+							if (textureName) {
+
+								parent.material.name = textureName[ 1 ];
+
+								parent.material.map = THREE.ImageUtils.loadTexture (texturePath + textureName[ 1 ]);
+
+							}
 
 						}
 
@@ -878,6 +958,40 @@ THREE.VRMLLoader.prototype = {
 		var scene = new THREE.Scene();
 
 		var lines = data.split( '\n' );
+
+		// some lines do not have breaks
+		for (var i = lines.length -1; i > -1; i--) {
+
+			// split lines with {..{ or {..[ - some have both
+			if (/{.*[{\[]/.test (lines[i])) {
+				var parts = lines[i].split ('{').join ('{\n').split ('\n');
+				parts.unshift(1);
+				parts.unshift(i);
+				lines.splice.apply(lines, parts);
+			} else
+
+			// split lines with ]..}
+			if (/\].*}/.test (lines[i])) {
+				var parts = lines[i].split (']').join (']\n').split ('\n');
+				parts.unshift(1);
+				parts.unshift(i);
+				lines.splice.apply(lines, parts);
+			}
+
+			// split lines with }..}
+			if (/}.*}/.test (lines[i])) {
+				var parts = lines[i].split ('}').join ('}\n').split ('\n');
+				parts.unshift(1);
+				parts.unshift(i);
+				lines.splice.apply(lines, parts);
+			}
+
+			// force the parser to create Coordinate node for empty coords
+			// coord USE something -> coord USE something Coordinate {}
+			if((lines[i].indexOf ('coord') > -1) && (lines[i].indexOf ('[') < 0) && (lines[i].indexOf ('{') < 0)) {
+				lines[i] += ' Coordinate {}';
+			}
+		}
 
 		var header = lines.shift();
 

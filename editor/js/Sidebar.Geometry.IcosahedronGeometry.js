@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.IcosahedronGeometry = function ( signals, object ) {
+Sidebar.Geometry.IcosahedronGeometry = function ( editor, object ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 
@@ -33,14 +35,10 @@ Sidebar.Geometry.IcosahedronGeometry = function ( signals, object ) {
 
 	function update() {
 
-		object.geometry.dispose();
-
-		object.geometry = new THREE.IcosahedronGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE.IcosahedronGeometry(
 			radius.getValue(),
 			detail.getValue()
-		);
-
-		object.geometry.computeBoundingSphere();
+		) ) );
 
 		signals.objectChanged.dispatch( object );
 

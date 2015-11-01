@@ -60,7 +60,7 @@ THREE.ObjectLoader.prototype = {
 
 		var object = this.parseObject( json.object, geometries, materials );
 
-		if( json.animations ) {
+		if ( json.animations ) {
 
 			object.animations = this.parseAnimations( json.animations );
 
@@ -258,15 +258,6 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
-					case 'TextGeometry':
-
-						geometry = new THREE.TextGeometry(
-							data.text,
-							data.data
-						);
-
-						break;
-
 					case 'BufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
@@ -327,7 +318,7 @@ THREE.ObjectLoader.prototype = {
 
 		var animations = [];
 
-		for( var i = 0; i < json.length; i ++ ) {
+		for ( var i = 0; i < json.length; i ++ ) {
 
 			var clip = THREE.AnimationClip.parse( json[i] );
 
@@ -525,7 +516,18 @@ THREE.ObjectLoader.prototype = {
 
 				case 'Mesh':
 
-					object = new THREE.Mesh( getGeometry( data.geometry ), getMaterial( data.material ) );
+					var geometry = getGeometry( data.geometry );
+					var material = getMaterial( data.material );
+
+					if ( geometry.bones && geometry.bones.length > 0 ) {
+
+						object = new THREE.SkinnedMesh( geometry, material );
+
+					} else {
+
+						object = new THREE.Mesh( geometry, material );	
+
+					}
 
 					break;
 
