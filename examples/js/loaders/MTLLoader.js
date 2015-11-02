@@ -418,7 +418,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 			loader.setCrossOrigin( this.crossOrigin );
 			loader.load( url, function ( image ) {
 
-				texture.image = THREE.MTLLoader.ensurePowerOfTwo_( image );
+				texture.image = image;
 				texture.needsUpdate = true;
 
 				if ( onLoad ) onLoad( texture );
@@ -432,38 +432,6 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 		return texture;
 
 	}
-
-};
-
-THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
-
-	if ( ! THREE.Math.isPowerOfTwo( image.width ) || ! THREE.Math.isPowerOfTwo( image.height ) ) {
-
-		var canvas = document.createElement( "canvas" );
-		canvas.width = THREE.MTLLoader.nextHighestPowerOfTwo_( image.width );
-		canvas.height = THREE.MTLLoader.nextHighestPowerOfTwo_( image.height );
-
-		var ctx = canvas.getContext( "2d" );
-		ctx.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
-		return canvas;
-
-	}
-
-	return image;
-
-};
-
-THREE.MTLLoader.nextHighestPowerOfTwo_ = function( x ) {
-
-	-- x;
-
-	for ( var i = 1; i < 32; i <<= 1 ) {
-
-		x = x | x >> i;
-
-	}
-
-	return x + 1;
 
 };
 
