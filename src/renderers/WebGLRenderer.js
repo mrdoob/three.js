@@ -846,8 +846,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 				renderer.setMode( _gl.LINES );
 
 			} else {
+				
+				switch ( object.mode ) {
 
-				renderer.setMode( _gl.TRIANGLES );
+					case THREE.TrianglesDrawMode:
+						renderer.setMode( _gl.TRIANGLES );
+						break;
+
+					case THREE.TriangleStripDrawMode:
+						renderer.setMode( _gl.TRIANGLE_STRIP );
+						break;
+
+					case THREE.TriangleFanDrawMode:
+						renderer.setMode( _gl.TRIANGLE_FAN );
+						break;
+
+				}
 
 			}
 

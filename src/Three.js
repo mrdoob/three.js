@@ -368,3 +368,9 @@ THREE.InterpolateSmooth = 2302;
 THREE.ZeroCurvatureEnding = 2400;
 THREE.ZeroSlopeEnding = 2401;
 THREE.WrapAroundEnding = 2402;
+
+// Triangle Draw modes
+
+THREE.TrianglesDrawMode = 0;
+THREE.TriangleStripDrawMode = 1;
+THREE.TriangleFanDrawMode = 2;
