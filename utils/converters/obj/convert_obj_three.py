@@ -393,11 +393,6 @@ def parse_mtl(fname):
             if chunks[0] == "map_Kd" and len(chunks) == 2:
                 materials[identifier]["mapDiffuse"] = texture_relative_path(chunks[1])
 
-            # Ambient texture
-            # map_Ka texture_ambient.jpg
-            if chunks[0] == "map_Ka" and len(chunks) == 2:
-                materials[identifier]["mapAmbient"] = texture_relative_path(chunks[1])
-
             # Specular texture
             # map_Ks texture_specular.jpg
             if chunks[0] == "map_Ks" and len(chunks) == 2:
@@ -422,11 +417,6 @@ def parse_mtl(fname):
             # Kd 1.000 1.000 1.000
             if chunks[0] == "Kd" and len(chunks) == 4:
                 materials[identifier]["colorDiffuse"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
-
-            # Ambient color
-            # Ka 1.000 1.000 1.000
-            if chunks[0] == "Ka" and len(chunks) == 4:
-                materials[identifier]["colorAmbient"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
 
             # Specular color
             # Ks 1.000 1.000 1.000
@@ -1614,4 +1604,3 @@ if __name__ == "__main__":
         convert_ascii(infile, morphfiles, colorfiles, outfile)
     elif TYPE == "binary":
         convert_binary(infile, outfile)
-
