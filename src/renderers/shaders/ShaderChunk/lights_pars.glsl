@@ -10,12 +10,12 @@ uniform vec3 ambientLightColor;
 
 	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];
 
-	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) { 
+	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
-	
+
 		directLight.color = directionalLight.color;
-		directLight.direction = directionalLight.direction; 
+		directLight.direction = directionalLight.direction;
 
 		return directLight;
 	}
@@ -34,16 +34,16 @@ uniform vec3 ambientLightColor;
 
 	uniform PointLight pointLights[ MAX_POINT_LIGHTS ];
 
-	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) { 
-	
+	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) {
+
 		IncidentLight directLight;
-	
-		vec3 lVector = pointLight.position - geometry.position; 
-		directLight.direction = normalize( lVector ); 
-	
-		directLight.color = pointLight.color; 
-		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay ); 
-	
+
+		vec3 lVector = pointLight.position - geometry.position;
+		directLight.direction = normalize( lVector );
+
+		directLight.color = pointLight.color;
+		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay );
+
 		return directLight;
 	}
 
@@ -65,19 +65,19 @@ uniform vec3 ambientLightColor;
 	uniform SpotLight spotLights[ MAX_SPOT_LIGHTS ];
 
 	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {
-	
+
 		IncidentLight directLight;
 
 		vec3 lVector = spotLight.position - geometry.position;
 		directLight.direction = normalize( lVector );
-	
+
 		float spotEffect = dot( directLight.direction, spotLight.direction );
 
 		if ( spotEffect > spotLight.angleCos ) {
 
 			float spotEffect = dot( spotLight.direction, directLight.direction );
 			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
-		
+
 			directLight.color = spotLight.color;
 			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
 
@@ -104,8 +104,8 @@ uniform vec3 ambientLightColor;
 
 	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
 
-	vec3 getHemisphereIndirectLightColor( const in HemisphereLight hemiLight, const in GeometricContext geometry ) { 
-	
+	vec3 getHemisphereIndirectLightColor( const in HemisphereLight hemiLight, const in GeometricContext geometry ) {
+
 		float dotNL = dot( geometry.normal, hemiLight.direction );
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
 
@@ -119,7 +119,7 @@ uniform vec3 ambientLightColor;
 #if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
 
-	vec3 getDiffuseLightProbeIndirectLightColor( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) { 
+	vec3 getDiffuseLightProbeIndirectLightColor( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) {
 
 		#ifdef DOUBLE_SIDED
 
@@ -140,19 +140,19 @@ uniform vec3 ambientLightColor;
 			// TODO: replace with properly filtered cubemaps and access the irradiance LOD level, be it the last LOD level
 			// of a specular cubemap, or just the default level of a specially created irradiance cubemap.
 
-			#if defined( TEXTURE_CUBE_LOD_EXT )				
+			#if defined( TEXTURE_CUBE_LOD_EXT )
 
 				vec4 envMapColor = textureCubeLodEXT( envMap, queryVec, float( maxMIPLevel ) );
 
 			#else
 
-				// force the bias high to get the last LOD level as it is the most blurred.				
+				// force the bias high to get the last LOD level as it is the most blurred.
 				vec4 envMapColor = textureCube( envMap, queryVec, float( maxMIPLevel ) );
 
 			#endif
 		#else
 
-			vec4 envMapColor = vec3( 0.0 );
+			vec3 envMapColor = vec3( 0.0 );
 
 		#endif
 
@@ -170,14 +170,14 @@ uniform vec3 ambientLightColor;
 
 		float maxMIPLevelScalar = float( maxMIPLevel );
 		float desiredMIPLevel = maxMIPLevelScalar - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
-	
+
 		// clamp to allowable LOD ranges.
 		return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
 
 	}
 
-	vec3 getSpecularLightProbeIndirectLightColor( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) { 
-	
+	vec3 getSpecularLightProbeIndirectLightColor( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) {
+
 		#ifdef ENVMAP_MODE_REFLECTION
 
 			vec3 reflectVec = reflect( -geometry.viewDir, geometry.normal );
@@ -204,7 +204,7 @@ uniform vec3 ambientLightColor;
 
 			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
 
-			#if defined( TEXTURE_CUBE_LOD_EXT )				
+			#if defined( TEXTURE_CUBE_LOD_EXT )
 
 				float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );
 				vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );
@@ -214,7 +214,7 @@ uniform vec3 ambientLightColor;
 				vec4 envMapColor = textureCube( envMap, queryReflectVec );
 
 			#endif
- 
+
 
 		#elif defined( ENVMAP_TYPE_EQUIREC )
 
@@ -237,4 +237,3 @@ uniform vec3 ambientLightColor;
 	}
 
 #endif
-
