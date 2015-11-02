@@ -126,12 +126,16 @@ uniform vec3 ambientLightColor;
 
 			vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );
 
+			// TODO: replace with properly filtered cubemaps and access the irradiance LOD level, be it the last LOD level
+			// of a specular cubemap, or just the default level of a specially created irradiance cubemap.
+
 			#if defined( TEXTURE_CUBE_LOD_EXT )				
 
 				vec4 envMapColor = textureCubeLodEXT( envMap, queryVec, float( maxMIPLevel ) );
 
 			#else
 
+				// force the bias high to get the last LOD level as it is the most blurred.				
 				vec4 envMapColor = textureCube( envMap, queryVec, float( maxMIPLevel ) );
 
 			#endif
