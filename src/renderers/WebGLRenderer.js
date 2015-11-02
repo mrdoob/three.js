@@ -846,8 +846,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				renderer.setMode( _gl.LINES );
 
 			} else {
-				
-				switch ( object.mode ) {
+
+				switch ( object.drawMode ) {
 
 					case THREE.TrianglesDrawMode:
 						renderer.setMode( _gl.TRIANGLES );
