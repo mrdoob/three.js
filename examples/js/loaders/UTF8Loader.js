@@ -546,7 +546,7 @@ THREE.UTF8Loader.prototype.downloadMesh = function ( path, name, meshEntry, deco
 	var loader = this;
 	var idx = 0;
 
-	function onprogress( req, e ) {
+	function onprogress( data ) {
 
 		while ( idx < meshEntry.length ) {
 
@@ -557,18 +557,18 @@ THREE.UTF8Loader.prototype.downloadMesh = function ( path, name, meshEntry, deco
 
 				var meshEnd = indexRange[ 0 ] + 3 * indexRange[ 1 ];
 
-				if ( req.responseText.length < meshEnd ) break;
+				if ( data.length < meshEnd ) break;
 
-				loader.decompressMesh( req.responseText, meshParams, decodeParams, name, idx, callback );
+				loader.decompressMesh( data, meshParams, decodeParams, name, idx, callback );
 
 			} else {
 
 				var codeRange = meshParams.codeRange;
 				var meshEnd = codeRange[ 0 ] + codeRange[ 1 ];
 
-				if ( req.responseText.length < meshEnd ) break;
+				if ( data.length < meshEnd ) break;
 
-				loader.decompressMesh2( req.responseText, meshParams, decodeParams, name, idx, callback );
+				loader.decompressMesh2( data, meshParams, decodeParams, name, idx, callback );
 			}
 
 			++ idx;
@@ -577,17 +577,13 @@ THREE.UTF8Loader.prototype.downloadMesh = function ( path, name, meshEntry, deco
 
 	}
 
-	getHttpRequest( path, function( req, e ) {
+	getHttpRequest( path, function( data ) {
 
-		if ( req.status === 200 || req.status === 0 ) {
-
-			onprogress( req, e );
-
-		}
+		onprogress( data );
 
         // TODO: handle errors.
 
-	}, onprogress );
+	});
 
 };
 
@@ -745,24 +741,15 @@ THREE.UTF8Loader.prototype.downloadModelJson = function ( jsonUrl, callback, opt
 
 function getHttpRequest( url, onload, opt_onprogress ) {
 
-	var LISTENERS = {
+	var req = new THREE.XHRLoader();
+	req.load( url, onload, opt_onprogress );
 
-        load: function( e ) { onload( req, e ); },
-        progress: function( e ) { opt_onprogress( req, e ); }
-
-    };
-
-	var req = new XMLHttpRequest();
-	addListeners( req, LISTENERS );
-
-	req.open( 'GET', url, true );
-	req.send( null );
 }
 
 function getJsonRequest( url, onjson ) {
 
 	getHttpRequest( url,
-        function( e ) { onjson( JSON.parse( e.responseText ) ); },
+        function( e ) { onjson( JSON.parse( e ) ); },
         function() {} );
 
 }
