@@ -73,6 +73,13 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 #endif
 
+#if defined( USE_ENVMAP ) && defined( PHYSICAL )
+
+		// TODO, replace 8 with the real maxMIPLevel
+		indirectDiffuseColor += getDiffuseLightProbeIndirectLightColor( /*lightProbe,*/ geometry, 8 );
+
+#endif
+
 		Material_RE_IndirectDiffuseLight( indirectDiffuseColor, geometry, material, reflectedLight );
 
 	}
