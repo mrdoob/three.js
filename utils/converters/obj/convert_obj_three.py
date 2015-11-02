@@ -138,7 +138,6 @@ import glob
 ALIGN = "none"        	# center centerxz bottom top none
 SHADING = "smooth"      # smooth flat
 TYPE = "ascii"          # ascii binary
-TRANSPARENCY = "normal" # normal invert
 
 TRUNCATE = False
 SCALE = 1.0
@@ -428,14 +427,19 @@ def parse_mtl(fname):
             if chunks[0] == "Ns" and len(chunks) == 2:
                 materials[identifier]["specularCoef"] = float(chunks[1])
 
+            # Dissolves
+            # d 0.9
+            if chunks[0] == "d" and len(chunks) == 2:
+                materials[identifier]["opacity"] = float(chunks[1])
+                if materials[identifier]["opacity"] < 1.0:
+                    materials[identifier]["transparent"] = True
+
             # Transparency
-            # Tr 0.9 or d 0.9
-            if (chunks[0] == "Tr" or chunks[0] == "d") and len(chunks) == 2:
-                materials[identifier]["transparent"] = True
-                if TRANSPARENCY == "invert":
-                    materials[identifier]["opacity"] = float(chunks[1])
-                else:
-                    materials[identifier]["opacity"] = 1.0 - float(chunks[1])
+            # Tr 0.1
+            if chunks[0] == "Tr" and len(chunks) == 2:
+                materials[identifier]["opacity"] = 1.0 - float(chunks[1])
+                if materials[identifier]["opacity"] < 1.0:
+                    materials[identifier]["transparent"] = True
 
             # Optical density
             # Ni 1.0
@@ -1573,10 +1577,6 @@ if __name__ == "__main__":
         elif o in ("-t", "--type"):
             if a in ("binary", "ascii"):
                 TYPE = a
-
-        elif o in ("-d", "--dissolve"):
-            if a in ("normal", "invert"):
-                TRANSPARENCY = a
 
         elif o in ("-b", "--bakecolors"):
             BAKE_COLORS = True
