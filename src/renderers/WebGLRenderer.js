@@ -3250,13 +3250,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var glFormat = paramThreeToGL( renderTarget.texture.format );
 		var glType = paramThreeToGL( renderTarget.texture.type );
 
-		//
 		// Setup framebuffer
-		//
 
 		if ( isCube ) {
 
 			renderTargetProperties.__webglFramebuffer = [];
+
 			for ( var i = 0; i < 6; i ++ ) {
 
 				renderTargetProperties.__webglFramebuffer[ i ] = _gl.createFramebuffer();
@@ -3269,9 +3268,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		//
 		// Setup color buffer
-		//
+
 		if ( isCube ) {
 
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
