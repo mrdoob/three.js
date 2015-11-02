@@ -22950,7 +22950,7 @@ THREE.ShaderChunk[ 'fog_pars_fragment'] = "#ifdef USE_FOG\n	uniform vec3 fogColo
 
 // File:src/renderers/shaders/ShaderChunk/lights_pars.glsl
 
-THREE.ShaderChunk[ 'lights_pars'] = "uniform vec3 ambientLightColor;\n#if MAX_DIR_LIGHTS > 0\n	struct DirectionalLight {\n	  vec3 direction;\n	  vec3 color;\n	};\n	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];\n	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) { \n		IncidentLight directLight;\n	\n		directLight.color = directionalLight.color;\n		directLight.direction = directionalLight.direction; \n		return directLight;\n	}\n#endif\n#if MAX_POINT_LIGHTS > 0\n	struct PointLight {\n	  vec3 position;\n	  vec3 color;\n	  float distance;\n	  float decay;\n	};\n	uniform PointLight pointLights[ MAX_POINT_LIGHTS ];\n	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) { \n	\n		IncidentLight directLight;\n	\n		vec3 lVector = pointLight.position - geometry.position; \n		directLight.direction = normalize( lVector ); \n	\n		directLight.color = pointLight.color; \n		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay ); \n	\n		return directLight;\n	}\n#endif\n#if MAX_SPOT_LIGHTS > 0\n	struct SpotLight {\n	  vec3 position;\n	  vec3 direction;\n	  vec3 color;\n	  float distance;\n	  float decay;\n	  float angleCos;\n	  float exponent;\n	};\n	uniform SpotLight spotLights[ MAX_SPOT_LIGHTS ];\n	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {\n	\n		IncidentLight directLight;\n		vec3 lVector = spotLight.position - geometry.position;\n		directLight.direction = normalize( lVector );\n	\n		float spotEffect = dot( directLight.direction, spotLight.direction );\n		if ( spotEffect > spotLight.angleCos ) {\n			float spotEffect = dot( spotLight.direction, directLight.direction );\n			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );\n		\n			directLight.color = spotLight.color;\n			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );\n		}\n		else {\n			directLight.color = vec3( 0.0 );\n		}\n		return directLight;\n	}\n#endif\n#if MAX_HEMI_LIGHTS > 0\n	struct HemisphereLight {\n	  vec3 direction;\n	  vec3 skyColor;\n	  vec3 groundColor;\n	};\n	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];\n	vec3 getHemisphereIndirectLightColor( const in HemisphereLight hemiLight, const in GeometricContext geometry ) { \n	\n		float dotNL = dot( geometry.normal, hemiLight.direction );\n		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;\n		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );\n	}\n#endif\n#if defined( USE_ENVMAP ) && defined( PHYSICAL )\n	vec3 getDiffuseLightProbeIndirectLightColor( const in GeometricContext geometry, const in int maxMIPLevel ) { \n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );\n		#ifdef ENVMAP_TYPE_CUBE\n			vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );\n			#if defined( TEXTURE_CUBE_LOD_EXT )				\n				vec4 envMapColor = textureCubeLodEXT( envMap, queryVec, float( maxMIPLevel ) );\n			#else\n				vec4 envMapColor = textureCube( envMap, queryVec, float( maxMIPLevel ) );\n			#endif\n		#else\n			vec4 envMapColor = vec3( 0.0 );\n		#endif\n		envMapColor.rgb = inputToLinear( envMapColor.rgb );\n		return envMapColor.rgb;\n	}\n	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {\n		float maxMIPLevelScalar = float( maxMIPLevel );\n		float desiredMIPLevel = maxMIPLevelScalar - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );\n	\n		return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );\n	}\n	vec3 getSpecularLightProbeIndirectLightColor( const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) { \n	\n		#ifdef ENVMAP_MODE_REFLECTION\n			vec3 reflectVec = reflect( -geometry.viewDir, geometry.normal );\n		#else\n			vec3 reflectVec = refract( -geometry.viewDir, geometry.normal, refractionRatio );\n		#endif\n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		reflectVec = inverseTransformDirection( reflectVec, viewMatrix );\n		#ifdef ENVMAP_TYPE_CUBE\n			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );\n			#if defined( TEXTURE_CUBE_LOD_EXT )				\n				float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );\n				vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );\n			#else\n				vec4 envMapColor = textureCube( envMap, queryReflectVec );\n			#endif\n \n		#elif defined( ENVMAP_TYPE_EQUIREC )\n			vec2 sampleUV;\n			sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n			sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n			vec4 envMapColor = texture2D( envMap, sampleUV );\n		#elif defined( ENVMAP_TYPE_SPHERE )\n			vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n			vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );\n		#endif\n		envMapColor.rgb = inputToLinear( envMapColor.rgb );\n		return envMapColor.rgb;\n	}\n#endif\n";
+THREE.ShaderChunk[ 'lights_pars'] = "uniform vec3 ambientLightColor;\n#if MAX_DIR_LIGHTS > 0\n	struct DirectionalLight {\n	  vec3 direction;\n	  vec3 color;\n	};\n	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];\n	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		directLight.color = directionalLight.color;\n		directLight.direction = directionalLight.direction;\n		return directLight;\n	}\n#endif\n#if MAX_POINT_LIGHTS > 0\n	struct PointLight {\n	  vec3 position;\n	  vec3 color;\n	  float distance;\n	  float decay;\n	};\n	uniform PointLight pointLights[ MAX_POINT_LIGHTS ];\n	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		vec3 lVector = pointLight.position - geometry.position;\n		directLight.direction = normalize( lVector );\n		directLight.color = pointLight.color;\n		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay );\n		return directLight;\n	}\n#endif\n#if MAX_SPOT_LIGHTS > 0\n	struct SpotLight {\n	  vec3 position;\n	  vec3 direction;\n	  vec3 color;\n	  float distance;\n	  float decay;\n	  float angleCos;\n	  float exponent;\n	};\n	uniform SpotLight spotLights[ MAX_SPOT_LIGHTS ];\n	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		vec3 lVector = spotLight.position - geometry.position;\n		directLight.direction = normalize( lVector );\n		float spotEffect = dot( directLight.direction, spotLight.direction );\n		if ( spotEffect > spotLight.angleCos ) {\n			float spotEffect = dot( spotLight.direction, directLight.direction );\n			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );\n			directLight.color = spotLight.color;\n			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );\n		}\n		else {\n			directLight.color = vec3( 0.0 );\n		}\n		return directLight;\n	}\n#endif\n#if MAX_HEMI_LIGHTS > 0\n	struct HemisphereLight {\n	  vec3 direction;\n	  vec3 skyColor;\n	  vec3 groundColor;\n	};\n	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];\n	vec3 getHemisphereIndirectLightColor( const in HemisphereLight hemiLight, const in GeometricContext geometry ) {\n		float dotNL = dot( geometry.normal, hemiLight.direction );\n		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;\n		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );\n	}\n#endif\n#if defined( USE_ENVMAP ) && defined( PHYSICAL )\n	vec3 getDiffuseLightProbeIndirectLightColor( const in GeometricContext geometry, const in int maxMIPLevel ) {\n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );\n		#ifdef ENVMAP_TYPE_CUBE\n			vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );\n			#if defined( TEXTURE_CUBE_LOD_EXT )\n				vec4 envMapColor = textureCubeLodEXT( envMap, queryVec, float( maxMIPLevel ) );\n			#else\n				vec4 envMapColor = textureCube( envMap, queryVec, float( maxMIPLevel ) );\n			#endif\n		#else\n			vec3 envMapColor = vec3( 0.0 );\n		#endif\n		envMapColor.rgb = inputToLinear( envMapColor.rgb );\n		return envMapColor.rgb;\n	}\n	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {\n		float maxMIPLevelScalar = float( maxMIPLevel );\n		float desiredMIPLevel = maxMIPLevelScalar - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );\n		return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );\n	}\n	vec3 getSpecularLightProbeIndirectLightColor( const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) {\n		#ifdef ENVMAP_MODE_REFLECTION\n			vec3 reflectVec = reflect( -geometry.viewDir, geometry.normal );\n		#else\n			vec3 reflectVec = refract( -geometry.viewDir, geometry.normal, refractionRatio );\n		#endif\n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		reflectVec = inverseTransformDirection( reflectVec, viewMatrix );\n		#ifdef ENVMAP_TYPE_CUBE\n			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );\n			#if defined( TEXTURE_CUBE_LOD_EXT )\n				float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );\n				vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );\n			#else\n				vec4 envMapColor = textureCube( envMap, queryReflectVec );\n			#endif\n		#elif defined( ENVMAP_TYPE_EQUIREC )\n			vec2 sampleUV;\n			sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n			sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n			vec4 envMapColor = texture2D( envMap, sampleUV );\n		#elif defined( ENVMAP_TYPE_SPHERE )\n			vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n			vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );\n		#endif\n		envMapColor.rgb = inputToLinear( envMapColor.rgb );\n		return envMapColor.rgb;\n	}\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/lightmap_pars_fragment.glsl
 
@@ -27640,14 +27640,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Render targets
 
-	function setupFrameBuffer ( framebuffer, renderTarget, textureTarget ) {
+	// Setup storage for target texture and bind it to correct framebuffer
+	function setupFrameBufferTexture ( framebuffer, renderTarget, attachment, textureTarget ) {
 
+		var glFormat = paramThreeToGL( renderTarget.texture.format );
+		var glType = paramThreeToGL( renderTarget.texture.type );
+		state.texImage2D( textureTarget, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
+		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
+		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 	}
 
-	function setupRenderBuffer ( renderbuffer, renderTarget ) {
+	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
+	function setupRenderBufferStorage ( renderbuffer, renderTarget ) {
 
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
 
@@ -27656,13 +27662,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTarget.width, renderTarget.height );
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
 
-		/* For some reason this is not working. Defaulting to RGBA4.
-		} else if ( ! renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
-
-			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.STENCIL_INDEX8, renderTarget.width, renderTarget.height );
-			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
-		*/
-
 		} else if ( renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
 
 			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
@@ -27670,7 +27669,111 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
+			// FIXME: We don't support !depth !stencil
 			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.RGBA4, renderTarget.width, renderTarget.height );
+
+		}
+
+		_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
+
+	}
+
+	// Setup GL resources for a non-texture depth buffer
+	function setupDepthRenderbuffer( renderTarget ) {
+
+		var renderTargetProperties = properties.get( renderTarget );
+
+		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
+		if ( isCube ) {
+
+			renderTargetProperties.__webglDepthbuffer = [];
+			for ( var i = 0; i < 6; i ++ ) {
+
+				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
+				renderTargetProperties.__webglDepthbuffer[ i ] = _gl.createRenderbuffer();
+				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget );
+
+			}
+
+		}
+		else {
+
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+			renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
+			setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget );
+
+		}
+		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+
+	};
+
+	// Set up GL resources for the render target
+	function setupRenderTarget( renderTarget ) {
+
+		var renderTargetProperties = properties.get( renderTarget );
+		var textureProperties = properties.get( renderTarget.texture );
+
+		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
+
+		textureProperties.__webglTexture = _gl.createTexture();
+
+		_infoMemory.textures ++;
+
+		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
+		var isTargetPowerOfTwo = THREE.Math.isPowerOfTwo( renderTarget.width ) && THREE.Math.isPowerOfTwo( renderTarget.height );
+		var glFormat = paramThreeToGL( renderTarget.texture.format );
+		var glType = paramThreeToGL( renderTarget.texture.type );
+
+		// Setup framebuffer
+
+		if ( isCube ) {
+
+			renderTargetProperties.__webglFramebuffer = [];
+
+			for ( var i = 0; i < 6; i ++ ) {
+
+				renderTargetProperties.__webglFramebuffer[ i ] = _gl.createFramebuffer();
+
+			}
+
+		} else {
+
+			renderTargetProperties.__webglFramebuffer = _gl.createFramebuffer();
+
+		}
+
+		// Setup color buffer
+
+		if ( isCube ) {
+
+			state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
+			setTextureParameters( _gl.TEXTURE_CUBE_MAP, renderTarget.texture, isTargetPowerOfTwo );
+			for ( var i = 0; i < 6; i ++ ) {
+
+				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ i ], renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
+
+			}
+
+			if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+			state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
+
+		} else {
+
+			state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
+			setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
+			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
+
+			if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
+			state.bindTexture( _gl.TEXTURE_2D, null );
+
+		}
+
+		//
+		// Setup depth and stencil buffers
+		//
+		if ( renderTarget.depthBuffer ) {
+
+			setupDepthRenderbuffer( renderTarget );
 
 		}
 
@@ -27678,110 +27781,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setRenderTarget = function ( renderTarget ) {
 
-		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
-
 		if ( renderTarget && properties.get( renderTarget ).__webglFramebuffer === undefined ) {
 
-			var renderTargetProperties = properties.get( renderTarget );
-			var textureProperties = properties.get( renderTarget.texture );
-
-			if ( renderTarget.depthBuffer === undefined ) renderTarget.depthBuffer = true;
-			if ( renderTarget.stencilBuffer === undefined ) renderTarget.stencilBuffer = true;
-
-			renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
-
-			textureProperties.__webglTexture = _gl.createTexture();
-
-			_infoMemory.textures ++;
-
-			// Setup texture, create render and frame buffers
-
-			var isTargetPowerOfTwo = isPowerOfTwo( renderTarget ),
-				glFormat = paramThreeToGL( renderTarget.texture.format ),
-				glType = paramThreeToGL( renderTarget.texture.type );
-
-			if ( isCube ) {
-
-				renderTargetProperties.__webglFramebuffer = [];
-				renderTargetProperties.__webglRenderbuffer = [];
-
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
-
-				setTextureParameters( _gl.TEXTURE_CUBE_MAP, renderTarget.texture, isTargetPowerOfTwo );
-
-				for ( var i = 0; i < 6; i ++ ) {
-
-					renderTargetProperties.__webglFramebuffer[ i ] = _gl.createFramebuffer();
-					renderTargetProperties.__webglRenderbuffer[ i ] = _gl.createRenderbuffer();
-					state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
-
-					setupFrameBuffer( renderTargetProperties.__webglFramebuffer[ i ], renderTarget, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
-					setupRenderBuffer( renderTargetProperties.__webglRenderbuffer[ i ], renderTarget );
-
-				}
-
-				if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
-
-			} else {
-
-				renderTargetProperties.__webglFramebuffer = _gl.createFramebuffer();
-
-				if ( renderTarget.shareDepthFrom ) {
-
-					renderTargetProperties.__webglRenderbuffer = renderTarget.shareDepthFrom.__webglRenderbuffer;
-
-				} else {
-
-					renderTargetProperties.__webglRenderbuffer = _gl.createRenderbuffer();
-
-				}
-
-				state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
-				setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
-
-				state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
-
-				setupFrameBuffer( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.TEXTURE_2D );
-
-				if ( renderTarget.shareDepthFrom ) {
-
-					if ( renderTarget.depthBuffer && ! renderTarget.stencilBuffer ) {
-
-						_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderTargetProperties.__webglRenderbuffer );
-
-					} else if ( renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
-
-						_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderTargetProperties.__webglRenderbuffer );
-
-					}
-
-				} else {
-
-					setupRenderBuffer( renderTargetProperties.__webglRenderbuffer, renderTarget );
-
-				}
-
-				if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
-
-			}
-
-			// Release everything
-
-			if ( isCube ) {
-
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
-
-			} else {
-
-				state.bindTexture( _gl.TEXTURE_2D, null );
-
-			}
-
-			_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+			setupRenderTarget( renderTarget );
 
 		}
 
+		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
 		var framebuffer, width, height, vx, vy;
 
 		if ( renderTarget ) {
@@ -28034,8 +28040,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 /**
  * @author szimek / https://github.com/szimek/
  * @author alteredq / http://alteredqualia.com/
+ * @author Marius Kintel / https://github.com/kintel
  */
 
+/*
+ In options, we can specify:
+ * Texture parameters for an auto-generated target texture
+ * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
+*/
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.uuid = THREE.Math.generateUUID();
@@ -28051,8 +28063,6 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
-
-	this.shareDepthFrom = options.shareDepthFrom !== undefined ? options.shareDepthFrom : null;
 
 };
 
