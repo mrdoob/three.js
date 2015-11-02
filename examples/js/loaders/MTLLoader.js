@@ -124,8 +124,6 @@ THREE.MTLLoader.prototype = {
  *                                Default: false, assumed to be already normalized
  *                  ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's
  *                                  Default: false
- *                  invertTransparency: If transparency need to be inverted (inversion is needed if d = 0 is fully opaque)
- *                                      Default: false (d = 1 is fully opaque)
  * @constructor
  */
 
@@ -213,20 +211,6 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 								save = false;
 
 							}
-
-						}
-
-						break;
-
-					case 'd':
-
-						// According to MTL format (http://paulbourke.net/dataformats/mtl/):
-						//   d is dissolve for current material
-						//   factor of 1.0 is fully opaque, a factor of 0 is fully dissolved (completely transparent)
-
-						if ( this.options && this.options.invertTransparency ) {
-
-							value = 1 - value;
 
 						}
 
@@ -327,12 +311,6 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					break;
 
-				case 'ka':
-
-					// Ambient color (color under shadow) using RGB values
-
-					break;
-
 				case 'ks':
 
 					// Specular color (color when light is reflected from shiny surface) using RGB values
@@ -361,14 +339,21 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 				case 'd':
 
-					// According to MTL format (http://paulbourke.net/dataformats/mtl/):
-					//   d is dissolve for current material
-					//   factor of 1.0 is fully opaque, a factor of 0 is fully dissolved (completely transparent)
-
 					if ( value < 1 ) {
 
-						params[ 'transparent' ] = true;
 						params[ 'opacity' ] = value;
+						params[ 'transparent' ] = true;
+
+					}
+
+					break;
+
+				case 'Tr':
+
+					if ( value > 0 ) {
+
+						params[ 'opacity' ] = 1 - value;
+						params[ 'transparent' ] = true;
 
 					}
 
