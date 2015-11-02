@@ -707,3 +707,12 @@ THREE.CanvasRenderer = function () {
 	this.setSize = function () {};
 
 };
+
+//
+
+THREE.TextGeometry = function () {
+
+	console.error( 'THREE.TextGeometry has been moved to /examples/js/geometries/TextGeometry.js' );
+	console.error( 'THREE.FontUtils has been moved to /examples/js/utils/FontUtils.js' );
+
+};
