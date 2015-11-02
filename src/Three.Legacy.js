@@ -283,7 +283,7 @@ Object.defineProperties( THREE.Light.prototype, {
 	},
 	shadowCameraVisible: {
 		set: function ( value ) {
-			console.warn( 'THREE.Light: .shadowCameraVisible has been removed. Use new THREE.CameraHelper( light.shadow ) instead.' );
+			console.warn( 'THREE.Light: .shadowCameraVisible has been removed. Use new THREE.CameraHelper( light.shadow.camera ) instead.' );
 		}
 	},
 	shadowBias: {
