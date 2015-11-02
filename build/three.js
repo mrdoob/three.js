@@ -371,6 +371,12 @@ THREE.ZeroCurvatureEnding = 2400;
 THREE.ZeroSlopeEnding = 2401;
 THREE.WrapAroundEnding = 2402;
 
+// Triangle Draw modes
+
+THREE.TrianglesDrawMode = 0;
+THREE.TriangleStripDrawMode = 1;
+THREE.TriangleFanDrawMode = 2;
+
 // File:src/math/Color.js
 
 /**
@@ -4052,11 +4058,14 @@ THREE.Box3.prototype = {
 
 				if ( geometry !== undefined ) {
 
-					geometry.computeBoundingBox();
+					if ( geometry.boundingBox === null ) {
 
-					box.copy( geometry.boundingBox )
+						geometry.computeBoundingBox();
+
+					}
+
+					box.copy( geometry.boundingBox );
 					box.applyMatrix4( node.matrixWorld );
-
 					scope.union( box );
 
 				}
@@ -17195,12 +17204,9 @@ THREE.Loader.prototype = {
 
 				switch ( name ) {
 					case 'DbgColor':
-						if ( json.color === undefined ) json.color = value;
-						break;
 					case 'DbgIndex':
 					case 'opticalDensity':
 					case 'illumination':
-						// These were never supported
 						break;
 					case 'DbgName':
 						json.name = value;
@@ -21717,12 +21723,20 @@ THREE.Mesh = function ( geometry, material ) {
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
+	this.drawMode = THREE.TrianglesDrawMode;
+	
 	this.updateMorphTargets();
 
 };
 
 THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Mesh.prototype.constructor = THREE.Mesh;
+
+THREE.Mesh.prototype.setDrawMode = function ( mode ) {
+
+	this.drawMode = mode;
+
+};
 
 THREE.Mesh.prototype.updateMorphTargets = function () {
 
@@ -25306,8 +25320,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 				renderer.setMode( _gl.LINES );
 
 			} else {
+				
+				switch ( object.mode ) {
 
-				renderer.setMode( _gl.TRIANGLES );
+					case THREE.TrianglesDrawMode:
+						renderer.setMode( _gl.TRIANGLES );
+						break;
+
+					case THREE.TriangleStripDrawMode:
+						renderer.setMode( _gl.TRIANGLE_STRIP );
+						break;
+
+					case THREE.TriangleFanDrawMode:
+						renderer.setMode( _gl.TRIANGLE_FAN );
+						break;
+
+				}
 
 			}
 
