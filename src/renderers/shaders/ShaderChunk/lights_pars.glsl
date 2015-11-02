@@ -71,13 +71,24 @@ uniform vec3 ambientLightColor;
 		vec3 lVector = spotLight.position - geometry.position;
 		directLight.direction = normalize( lVector );
 	
-		float spotEffect = dot( spotLight.direction, directLight.direction );
-		spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
-	
-		directLight.color = spotLight.color;
-		directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
+		float spotEffect = dot( directLight.direction, spotLight.direction );
+
+		if ( spotEffect > spotLight.angleCos ) {
+
+			float spotEffect = dot( spotLight.direction, directLight.direction );
+			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
+		
+			directLight.color = spotLight.color;
+			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
+
+		}
+		else {
+
+			directLight.color = vec3( 0.0 );
+		}
 
 		return directLight;
+
 	}
 
 #endif
