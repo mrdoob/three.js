@@ -100,8 +100,8 @@
 					scene.add( mesh );
 
 					mixer = new THREE.AnimationMixer( mesh );
-					mixer.addAction( new THREE.AnimationAction( mesh.geometry.animations[ 0 ] ) );
-					mixer.addAction( new THREE.AnimationAction( mesh.geometry.morphAnimations[ 0 ] ) ) ;
+					mixer.clipAction( mesh.geometry.animations[ 0 ] ).play();
+					mixer.clipAction( mesh.geometry.morphAnimations[ 0 ] ).play();
 
 					ikSolver = new THREE.CCDIKSolver( mesh );
 
@@ -162,12 +162,16 @@
 
 					mixer.update( clock.getDelta() );
 
-					// this may should be in THREE.AnimationMixer or somewhere
-					if( ikSolver ) {
-
-						ikSolver.update();
-
-					}
+					/* Note: ikSolver.resetLinks() is workaround for r74dev.
+					 *       THREE.PropertyMixer.apply() seems to have buffer cache
+					 *       when mixer.update() is called.
+					 *       ikSolver.update() change bone position/quaternion
+					 *       without mixer.update() then buffer cache will be inconsistent.
+					 *       ikSolver.resetLinks() explicitly resets IK link bones quaternion and
+					 *       tries to avoid issues caused by this inconsistent.
+					 */
+					ikSolver.resetLinks();
+					ikSolver.update();
 
 				}
 

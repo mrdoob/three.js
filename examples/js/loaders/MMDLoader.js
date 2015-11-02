@@ -1653,8 +1653,19 @@ THREE.MMDLoader.prototype.createMesh = function ( model, vmd, texturePath, onPro
 
 		for ( var i = 1; i < orderedMorphs.length; i++ ) {
 
-			var h = morphAnimation.hierarchy[ i ];
-			tracks.push( new THREE.NumberKeyframeTrack( '.morphTargetInfluences[' + i + ']', h.keys ) );
+			var keys = morphAnimation.hierarchy[ i ].keys;
+			var times = [];
+			var values = [];
+
+			for ( var j = 0; j < keys.length; j++ ) {
+
+				var key = keys[ j ];
+				times.push( key.time );
+				values.push( key.value );
+
+			}
+
+			tracks.push( new THREE.NumberKeyframeTrack( '.morphTargetInfluences[' + i + ']', times, values ) );
 
 		}
 
