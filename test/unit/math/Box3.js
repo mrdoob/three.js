@@ -39,6 +39,21 @@ test( "set", function() {
 	ok( a.max.equals( one3 ), "Passed!" );
 });
 
+test( "setFromPoints", function() {
+	var a = new THREE.Box3();
+
+	a.setFromPoints( [ zero3, one3, two3 ] );
+	ok( a.min.equals( zero3 ), "Passed!" );
+	ok( a.max.equals( two3 ), "Passed!" );
+
+	a.setFromPoints( [ one3 ] );
+	ok( a.min.equals( one3 ), "Passed!" );
+	ok( a.max.equals( one3 ), "Passed!" );
+
+	a.setFromPoints( [] );
+	ok( a.empty(), "Passed!" );
+});
+
 test( "empty/makeEmpty", function() {
 	var a = new THREE.Box3();
 

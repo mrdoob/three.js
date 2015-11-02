@@ -25,6 +25,8 @@ THREE.LineDashedMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
+	this.type = 'LineDashedMaterial';
+
 	this.color = new THREE.Color( 0xffffff );
 
 	this.linewidth = 1;
@@ -42,25 +44,24 @@ THREE.LineDashedMaterial = function ( parameters ) {
 };
 
 THREE.LineDashedMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.LineDashedMaterial.prototype.constructor = THREE.LineDashedMaterial;
 
-THREE.LineDashedMaterial.prototype.clone = function () {
+THREE.LineDashedMaterial.prototype.copy = function ( source ) {
 
-	var material = new THREE.LineDashedMaterial();
+	THREE.Material.prototype.copy.call( this, source );
 
-	THREE.Material.prototype.clone.call( this, material );
+	this.color.copy( source.color );
+	
+	this.linewidth = source.linewidth;
 
-	material.color.copy( this.color );
+	this.scale = source.scale;
+	this.dashSize = source.dashSize;
+	this.gapSize = source.gapSize;
 
-	material.linewidth = this.linewidth;
+	this.vertexColors = source.vertexColors;
 
-	material.scale = this.scale;
-	material.dashSize = this.dashSize;
-	material.gapSize = this.gapSize;
+	this.fog = source.fog;
 
-	material.vertexColors = this.vertexColors;
-
-	material.fog = this.fog;
-
-	return material;
+	return this;
 
 };

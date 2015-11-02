@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Line] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">A series of lines.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
+
+		<div>
+		geometry — Vertices representing the line segment(s).<br />
+		material — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].
+		</div>
+
+		<div>If no material is supplied, a randomized line material will be created and assigned to the object.</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Geometry geometry]</h3>
+		<div>
+		Vertices representing the line segment(s).
+		</div>
+
+		<h3>[property:Material material]</h3>
+		<div>
+		Material for the line.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Array raycast]([page:Raycaster raycaster], [page:Array intersects])</h3>
+		<div>
+		Get intersections between a casted ray and this Line. [page:Raycaster.intersectObject] will call this method.
+		</div>
+		
+		<h3>[method:Object3D clone]([page:Object3D object])</h3>
+		<div>
+		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned LineSegments Object.
+		</div>
+		<div>
+		Clone a LineSegments Object.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

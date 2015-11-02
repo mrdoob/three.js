@@ -79,24 +79,29 @@
 
 				data = generateHeight( worldWidth, worldDepth );
 
-				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
+				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 
-				var geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				geometry.rotateX( - Math.PI / 2 );
 
-				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
+				var vertices = geometry.attributes.position.array;
 
-					geometry.vertices[ i ].y = data[ i ] * 10;
+				for ( var i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
+
+					vertices[ j + 1 ] = data[ i ] * 10;
 
 				}
 
-				texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
-				texture.needsUpdate = true;
+				texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
+				texture.wrapS = THREE.ClampToEdgeWrapping;
+				texture.wrapT = THREE.ClampToEdgeWrapping;
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xbfd1e5 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";
@@ -127,14 +132,8 @@
 
 			function generateHeight( width, height ) {
 
-				var size = width * height, data = new Float32Array( size ),
+				var size = width * height, data = new Uint8Array( size ),
 				perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
-
-				for ( var i = 0; i < size; i ++ ) {
-
-					data[ i ] = 0
-
-				}
 
 				for ( var j = 0; j < 4; j ++ ) {
 
@@ -142,7 +141,6 @@
 
 						var x = i % width, y = ~~ ( i / width );
 						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
-
 
 					}
 

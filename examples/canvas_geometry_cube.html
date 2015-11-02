@@ -17,6 +17,9 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -60,15 +63,17 @@
 
 				// Cube
 
-				var geometry = new THREE.CubeGeometry( 200, 200, 200 );
+				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
 
-				for ( var i = 0; i < geometry.faces.length; i ++ ) {
+				for ( var i = 0; i < geometry.faces.length; i += 2 ) {
 
-					geometry.faces[ i ].color.setHex( Math.random() * 0xffffff );
+					var hex = Math.random() * 0xffffff;
+					geometry.faces[ i ].color.setHex( hex );
+					geometry.faces[ i + 1 ].color.setHex( hex );
 
 				}
 
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors } );
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, overdraw: 0.5 } );
 
 				cube = new THREE.Mesh( geometry, material );
 				cube.position.y = 150;
@@ -76,17 +81,18 @@
 
 				// Plane
 
-				var geometry = new THREE.PlaneGeometry( 200, 200 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				geometry.rotateX( - Math.PI / 2 );
 
-				var material = new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } );
+				var material = new THREE.MeshBasicMaterial( { color: 0xe0e0e0, overdraw: 0.5 } );
 
 				plane = new THREE.Mesh( geometry, material );
 				scene.add( plane );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

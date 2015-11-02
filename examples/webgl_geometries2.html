@@ -20,18 +20,12 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<!--
-		<script src="../src/core/Geometry.js"></script>
-		<script src="../src/extras/geometries/ParametricGeometry.js"></script>
-		-->
-
 		<script src="js/CurveExtras.js"></script>
-		<script src="js/UVsUtils.js"></script>
 		<script src="js/ParametricGeometries.js"></script>
+
 		<script>
 
 			/* Testing the new Parametric Surfaces Geometries*/
-
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -60,12 +54,12 @@
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
-				var map = THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' );
+				var map = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
 				materials = [
-					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map, side: THREE.DoubleSide } ),
+					new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, side: THREE.DoubleSide } )
 				];
 
@@ -115,7 +109,6 @@
 				scene.add( object );
 
 				var geo = new THREE.ParametricGeometry( THREE.ParametricGeometries.plane( 200, 200 ), 10, 20 );
-				// document.body.appendChild( THREE.UVsDebug( geo ));
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
 				object.position.set( 0, 0, 0 );
 				scene.add( object );
@@ -136,7 +129,6 @@
 				//  scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( sphere2, materials );
-				// document.body.appendChild( THREE.UVsDebug( sphere2 ));
 				object.position.set( 200, 0, 0 );
 				scene.add( object );
 
@@ -153,10 +145,6 @@
 				// object.position.set( -200, 100, 0 );
 				// scene.add( object );
 
-				// object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry2( 400, 400, 4, 4 ), materials );
-				// object.position.set( -200, 100, 0 );
-				// scene.add( object );
-
 				object = new THREE.AxisHelper( 50 );
 				object.position.set( 200, 0, -200 );
 				scene.add( object );
@@ -166,8 +154,8 @@
 				scene.add( object );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

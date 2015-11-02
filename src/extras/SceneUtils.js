@@ -6,7 +6,7 @@ THREE.SceneUtils = {
 
 	createMultiMaterialObject: function ( geometry, materials ) {
 
-		var group = new THREE.Object3D();
+		var group = new THREE.Group();
 
 		for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
@@ -18,7 +18,7 @@ THREE.SceneUtils = {
 
 	},
 
-	detach : function ( child, parent, scene ) {
+	detach: function ( child, parent, scene ) {
 
 		child.applyMatrix( parent.matrixWorld );
 		parent.remove( child );

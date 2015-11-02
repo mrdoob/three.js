@@ -5,10 +5,12 @@
 
 THREE.Material = function () {
 
-	this.id = THREE.MaterialIdCount ++;
+	Object.defineProperty( this, 'id', { value: THREE.MaterialIdCount ++ } );
+
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
+	this.type = 'Material';
 
 	this.side = THREE.FrontSide;
 
@@ -20,9 +22,17 @@ THREE.Material = function () {
 	this.blendSrc = THREE.SrcAlphaFactor;
 	this.blendDst = THREE.OneMinusSrcAlphaFactor;
 	this.blendEquation = THREE.AddEquation;
+	this.blendSrcAlpha = null;
+	this.blendDstAlpha = null;
+	this.blendEquationAlpha = null;
 
+	this.depthFunc = THREE.LessEqualDepth;
 	this.depthTest = true;
 	this.depthWrite = true;
+
+	this.colorWrite = true;
+
+	this.precision = null; // override the renderer's default precision for this material
 
 	this.polygonOffset = false;
 	this.polygonOffsetFactor = 0;
@@ -34,13 +44,27 @@ THREE.Material = function () {
 
 	this.visible = true;
 
-	this.needsUpdate = true;
+	this._needsUpdate = true;
 
 };
 
 THREE.Material.prototype = {
 
 	constructor: THREE.Material,
+
+	get needsUpdate () {
+
+		return this._needsUpdate;
+
+	},
+
+	set needsUpdate ( value ) {
+
+		if ( value === true ) this.update();
+
+		this._needsUpdate = value;
+
+	},
 
 	setValues: function ( values ) {
 
@@ -52,33 +76,36 @@ THREE.Material.prototype = {
 
 			if ( newValue === undefined ) {
 
-				console.warn( 'THREE.Material: \'' + key + '\' parameter is undefined.' );
+				console.warn( "THREE.Material: '" + key + "' parameter is undefined." );
 				continue;
 
 			}
 
-			if ( key in this ) {
+			var currentValue = this[ key ];
 
-				var currentValue = this[ key ];
+			if ( currentValue === undefined ) {
 
-				if ( currentValue instanceof THREE.Color ) {
+				console.warn( "THREE." + this.type + ": '" + key + "' is not a property of this material." );
+				continue;
 
-					currentValue.set( newValue );
+			}
 
-				} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
+			if ( currentValue instanceof THREE.Color ) {
 
-					currentValue.copy( newValue );
+				currentValue.set( newValue );
 
-				} else if ( key == 'overdraw') {
+			} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
 
-					// ensure overdraw is backwards-compatable with legacy boolean type
-					this[ key ] = Number(newValue);
+				currentValue.copy( newValue );
 
-				} else {
+			} else if ( key === 'overdraw' ) {
 
-					this[ key ] = newValue;
+				// ensure overdraw is backwards-compatible with legacy boolean type
+				this[ key ] = Number( newValue );
 
-				}
+			} else {
+
+				this[ key ] = newValue;
 
 			}
 
@@ -86,43 +113,148 @@ THREE.Material.prototype = {
 
 	},
 
-	clone: function ( material ) {
+	toJSON: function ( meta ) {
 
-		if ( material === undefined ) material = new THREE.Material();
+		var data = {
+			metadata: {
+				version: 4.4,
+				type: 'Material',
+				generator: 'Material.toJSON'
+			}
+		};
 
-		material.name = this.name;
+		// standard Material serialization
+		data.uuid = this.uuid;
+		data.type = this.type;
+		if ( this.name !== '' ) data.name = this.name;
 
-		material.side = this.side;
+		if ( this.color instanceof THREE.Color ) data.color = this.color.getHex();
+		if ( this.emissive instanceof THREE.Color ) data.emissive = this.emissive.getHex();
+		if ( this.specular instanceof THREE.Color ) data.specular = this.specular.getHex();
+		if ( this.shininess !== undefined ) data.shininess = this.shininess;
 
-		material.opacity = this.opacity;
-		material.transparent = this.transparent;
+		if ( this.map instanceof THREE.Texture ) data.map = this.map.toJSON( meta ).uuid;
+		if ( this.alphaMap instanceof THREE.Texture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
+		if ( this.lightMap instanceof THREE.Texture ) data.lightMap = this.lightMap.toJSON( meta ).uuid;
+		if ( this.bumpMap instanceof THREE.Texture ) {
 
-		material.blending = this.blending;
+			data.bumpMap = this.bumpMap.toJSON( meta ).uuid;
+			data.bumpScale = this.bumpScale;
 
-		material.blendSrc = this.blendSrc;
-		material.blendDst = this.blendDst;
-		material.blendEquation = this.blendEquation;
+		}
+		if ( this.normalMap instanceof THREE.Texture ) {
 
-		material.depthTest = this.depthTest;
-		material.depthWrite = this.depthWrite;
+			data.normalMap = this.normalMap.toJSON( meta ).uuid;
+			data.normalScale = this.normalScale; // Removed for now, causes issue in editor ui.js
 
-		material.polygonOffset = this.polygonOffset;
-		material.polygonOffsetFactor = this.polygonOffsetFactor;
-		material.polygonOffsetUnits = this.polygonOffsetUnits;
+		}
+		if ( this.displacementMap instanceof THREE.Texture ) {
 
-		material.alphaTest = this.alphaTest;
+			data.displacementMap = this.displacementMap.toJSON( meta ).uuid;
+			data.displacementScale = this.displacementScale;
+			data.displacementBias = this.displacementBias;
 
-		material.overdraw = this.overdraw;
+		}
+		if ( this.specularMap instanceof THREE.Texture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
+		if ( this.envMap instanceof THREE.Texture ) {
 
-		material.visible = this.visible;
+			data.envMap = this.envMap.toJSON( meta ).uuid;
+			data.reflectivity = this.reflectivity; // Scale behind envMap
 
-		return material;
+		}
+
+		if ( this.size !== undefined ) data.size = this.size;
+		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
+
+		if ( this.vertexColors !== undefined && this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
+		if ( this.shading !== undefined && this.shading !== THREE.SmoothShading ) data.shading = this.shading;
+		if ( this.blending !== undefined && this.blending !== THREE.NormalBlending ) data.blending = this.blending;
+		if ( this.side !== undefined && this.side !== THREE.FrontSide ) data.side = this.side;
+
+		if ( this.opacity < 1 ) data.opacity = this.opacity;
+		if ( this.transparent === true ) data.transparent = this.transparent;
+		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
+		if ( this.wireframe === true ) data.wireframe = this.wireframe;
+		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
+
+		return data;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
+	copy: function ( source ) {
+
+		this.name = source.name;
+
+		this.side = source.side;
+
+		this.opacity = source.opacity;
+		this.transparent = source.transparent;
+
+		this.blending = source.blending;
+
+		this.blendSrc = source.blendSrc;
+		this.blendDst = source.blendDst;
+		this.blendEquation = source.blendEquation;
+		this.blendSrcAlpha = source.blendSrcAlpha;
+		this.blendDstAlpha = source.blendDstAlpha;
+		this.blendEquationAlpha = source.blendEquationAlpha;
+
+		this.depthFunc = source.depthFunc;
+		this.depthTest = source.depthTest;
+		this.depthWrite = source.depthWrite;
+
+		this.precision = source.precision;
+
+		this.polygonOffset = source.polygonOffset;
+		this.polygonOffsetFactor = source.polygonOffsetFactor;
+		this.polygonOffsetUnits = source.polygonOffsetUnits;
+
+		this.alphaTest = source.alphaTest;
+
+		this.overdraw = source.overdraw;
+
+		this.visible = source.visible;
+
+		return this;
+
+	},
+
+	update: function () {
+
+		this.dispatchEvent( { type: 'update' } );
 
 	},
 
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
+
+	},
+
+	// Deprecated
+
+	get wrapAround () {
+
+		console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+
+	},
+
+	set wrapAround ( boolean ) {
+
+		console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+
+	},
+
+	get wrapRGB () {
+
+		console.warn( 'THREE.' + this.type + ': .wrapRGB has been removed.' );
+		return new THREE.Color();
 
 	}
 

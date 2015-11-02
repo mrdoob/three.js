@@ -1,10 +1,13 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Toolbar = function ( editor ) {
 
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
-	container.setPosition( 'absolute' );
-	container.setClass( 'toolbar' );
+	container.setId( 'toolbar' );
 
 	var buttons = new UI.Panel();
 	container.add( buttons );
@@ -34,22 +37,29 @@ var Toolbar = function ( editor ) {
 
 	// grid
 
-	var grid = new UI.Number( 25 ).onChange( update );
-	grid.dom.style.width = '42px';
+	var grid = new UI.Number( 25 ).setWidth( '40px' ).onChange( update );
 	buttons.add( new UI.Text( 'Grid: ' ) );
 	buttons.add( grid );
 
-	var snap = new UI.Checkbox( false ).onChange( update );
+	var snap = new UI.Checkbox( false ).onChange( update ).setMarginLeft( '10px' );
 	buttons.add( snap );
-	buttons.add( new UI.Text( 'snap' ) );
+	buttons.add( new UI.Text( 'snap' ).setMarginLeft( '3px' ) );
+
+	var local = new UI.Checkbox( false ).onChange( update ).setMarginLeft( '10px' );
+	buttons.add( local );
+	buttons.add( new UI.Text( 'local' ).setMarginLeft( '3px' ) );
+
+	var showGrid = new UI.Checkbox().onChange( update ).setValue( true ).setMarginLeft( '10px' );
+	buttons.add( showGrid );
+	buttons.add( new UI.Text( 'show' ).setMarginLeft( '3px' ) );
 
 	function update() {
 
 		signals.snapChanged.dispatch( snap.getValue() === true ? grid.getValue() : null );
+		signals.spaceChanged.dispatch( local.getValue() === true ? "local" : "world" );
+		signals.showGridChanged.dispatch( showGrid.getValue() );
 
 	}
-
-	update();
 
 	return container;
 

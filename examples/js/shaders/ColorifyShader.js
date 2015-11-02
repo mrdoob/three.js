@@ -24,7 +24,7 @@ THREE.ColorifyShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -44,6 +44,6 @@ THREE.ColorifyShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

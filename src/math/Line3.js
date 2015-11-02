@@ -1,5 +1,5 @@
 /**
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  */
 
 THREE.Line3 = function ( start, end ) {
@@ -19,6 +19,12 @@ THREE.Line3.prototype = {
 		this.end.copy( end );
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
 
 	},
 
@@ -65,7 +71,7 @@ THREE.Line3.prototype = {
 
 	},
 
-	closestPointToPointParameter: function() {
+	closestPointToPointParameter: function () {
 
 		var startP = new THREE.Vector3();
 		var startEnd = new THREE.Vector3();
@@ -114,12 +120,6 @@ THREE.Line3.prototype = {
 	equals: function ( line ) {
 
 		return line.start.equals( this.start ) && line.end.equals( this.end );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Line3().copy( this );
 
 	}
 

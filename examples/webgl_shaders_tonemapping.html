@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - adaptive tone-mapping</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:georgia;
+				text-align:center;
+			}
+			h1 { }
+			a { color:skyblue; text-decoration:none }
+			canvas { pointer-events:none; z-index:0; position:relative; }
+			.label { background-color: black; position: absolute; z-index: 100; padding: 5px }
+
+		</style>
+	</head>
+
+	<body>
+		<div id="d">
+			<div id="info">
+				<a href="http://threejs.org" target="_blank">three.js</a> webgl demo :
+				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank">Sean Ward</a> :
+
+			</div>
+			<div class="label" style="position: absolute;left: 12%;bottom: 10%;">Low Dynamic Range</div>
+			<div class="label" style="position: absolute;left: 12%;bottom: 5%;">Static Tone Mapping</div>
+			<div class="label" style="position: absolute;left: 45%;bottom: 10%;">High Dynamic Range</div>
+			<div class="label" style="position: absolute;left: 45%;bottom: 5%;">Static Tone Mapping</div>
+			<div class="label" style="position: absolute;left: 80%;bottom: 10%;">High Dynamic Range</div>
+			<div class="label" style="position: absolute;left: 80%;bottom: 5%;">Adaptive Tone Mapping</div>
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/LuminosityShader.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/ToneMapShader.js"></script>
+		<script src="js/shaders/GammaCorrectionShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/postprocessing/AdaptiveToneMappingPass.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container;
+
+			var bloomPass, adaptToneMappingPass;
+			var params;
+
+			var camera, scene, renderer, dynamicHdrEffectComposer, hdrEffectComposer, ldrEffectComposer;
+			var cameraCube, sceneCube;
+			var cameraBG, debugScene;
+			var adaptiveLuminanceMat, currentLuminanceRT, previousLuminanceMat;
+
+			var directionalLight;
+
+			var orbitControls;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var windowThirdX = window.innerWidth / 3;
+			var windowThirdY = window.innerHeight / 3;
+
+			init();
+			animate();
+
+			function init() {
+
+				params = {
+					bloomAmount: 1.0,
+					sunLight: 4.0,
+
+					enabled: true,
+					avgLuminance: 0.7,
+					middleGrey: 0.04,
+					maxLuminance: 16,
+
+					adaptionRate: 2.0,
+				};
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// CAMERAS
+
+				camera = new THREE.PerspectiveCamera( 70, windowThirdX / window.innerHeight, 0.1, 100000 );
+				camera.position.x = 700;
+				camera.position.y = 400;
+				camera.position.z = 800;
+				cameraCube = new THREE.PerspectiveCamera( 70, windowThirdX / window.innerHeight, 1, 100000 );
+
+				cameraBG = new THREE.OrthographicCamera( -windowHalfX, windowHalfX, windowHalfY, -windowHalfY, -10000, 10000 );
+				cameraBG.position.z = 100;
+
+				orbitControls = new THREE.OrbitControls( camera, container );
+				orbitControls.autoRotate = true;
+				orbitControls.autoRotateSpeed = 1;
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				sceneCube = new THREE.Scene();
+				debugScene = new THREE.Scene();
+
+				// LIGHTS
+
+				var ambient = new THREE.AmbientLight( 0x050505 );
+				scene.add( ambient );
+
+				directionalLight = new THREE.DirectionalLight( 0xffffff, params.sunLight );
+				directionalLight.position.set( 2, 0, 10 ).normalize();
+				scene.add( directionalLight );
+
+				var atmoShader = {
+					side: THREE.BackSide,
+					// blending: THREE.AdditiveBlending,
+					transparent: true,
+					lights: true,
+					uniforms: THREE.UniformsUtils.merge( [
+
+						THREE.UniformsLib[ "common" ],
+						THREE.UniformsLib[ "lights" ],
+					] ),
+					vertexShader: [
+						"varying vec3 vViewPosition;",
+						"varying vec3 vNormal;",
+						THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
+						"void main() {",
+							THREE.ShaderChunk[ "beginnormal_vertex" ],
+							THREE.ShaderChunk[ "defaultnormal_vertex" ],
+
+							"	vNormal = normalize( transformedNormal );",
+							"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+							"vViewPosition = -mvPosition.xyz;",
+							"gl_Position = projectionMatrix * mvPosition;",
+						"}"
+
+					].join("\n"),
+
+					fragmentShader: [
+
+						THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
+
+						"void main() {",
+							"vec3 normal = normalize( -vNormal );",
+							"vec3 viewPosition = normalize( vViewPosition );",
+							"#if MAX_DIR_LIGHTS > 0",
+
+								"vec3 dirDiffuse = vec3( 0.0 );",
+
+								"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
+
+									"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
+									"vec3 dirVector = normalize( lDirection.xyz );",
+									"float dotProduct = dot( viewPosition, dirVector );",
+									"dotProduct = 1.0 * max( dotProduct, 0.0 ) + (1.0 - max( -dot( normal, dirVector ), 0.0 ));",
+									"dotProduct *= dotProduct;",
+									"dirDiffuse += max( 0.5 * dotProduct, 0.0 ) * directionalLightColor[ i ];",
+								"}",
+							"#endif",
+
+							//Fade out atmosphere at edge
+							"float viewDot = abs(dot( normal, viewPosition ));",
+							"viewDot = clamp( pow( viewDot + 0.6, 10.0 ), 0.0, 1.0);",
+
+							"vec3 colour = vec3( 0.05, 0.09, 0.13 ) * dirDiffuse;",
+							"gl_FragColor = vec4( colour, viewDot );",
+
+						"}"
+
+					].join("\n"),
+				};
+
+				var earthAtmoMat = new THREE.ShaderMaterial( atmoShader );
+
+				var earthMat = new THREE.MeshPhongMaterial( {
+					color: 0xffffff,
+					shininess: 200
+				} );
+
+				var earthDiffuse = THREE.ImageUtils.loadTexture( 'textures/planets/earth_atmos_4096.jpg', undefined, function( tex ) {
+					earthMat.map = tex;
+					earthMat.needsUpdate = true;
+				} );
+				var earthSpecular = THREE.ImageUtils.loadTexture( 'textures/planets/earth_specular_2048.jpg', undefined, function( tex ) {
+					earthMat.specularMap = tex;
+					earthMat.needsUpdate = true;
+				} );
+
+				// var earthNormal = THREE.ImageUtils.loadTexture( 'textures/planets/earth-new-normal-2048.jpg', undefined, function( tex ) {
+				// 	earthMat.normalMap = tex;
+				// 	earthMat.needsUpdate = true;
+				// } );
+
+				var earthLightsMat = new THREE.MeshBasicMaterial( {
+					color: 0xffffff,
+					blending: THREE.AdditiveBlending,
+					transparent: true,
+					depthTest: false
+				} );
+
+				var earthLights = THREE.ImageUtils.loadTexture( 'textures/planets/earth_lights_2048.png', undefined, function( tex ) {
+					earthLightsMat.map = tex;
+					earthLightsMat.needsUpdate = true;
+				} );
+
+				var earthCloudsMat = new THREE.MeshLambertMaterial( {
+					color: 0xffffff,
+					blending: THREE.NormalBlending,
+					transparent: true,
+					depthTest: false
+				} );
+
+				var earthClouds = THREE.ImageUtils.loadTexture( 'textures/planets/earth_clouds_2048.png', undefined, function( tex ) {
+					earthCloudsMat.map = tex;
+					earthCloudsMat.needsUpdate = true;
+				} );
+
+				var earthGeo = new THREE.SphereGeometry( 600, 24, 24 );
+				var sphereMesh = new THREE.Mesh( earthGeo, earthMat );
+				scene.add( sphereMesh );
+
+				var sphereLightsMesh = new THREE.Mesh( earthGeo, earthLightsMat );
+				scene.add( sphereLightsMesh );
+
+				var sphereCloudsMesh = new THREE.Mesh( earthGeo, earthCloudsMat );
+				scene.add( sphereCloudsMesh );
+
+				var sphereAtmoMesh = new THREE.Mesh( earthGeo, earthAtmoMat );
+				sphereAtmoMesh.scale.set( 1.05, 1.05, 1.05 );
+				scene.add( sphereAtmoMesh );
+
+				var vBGShader = [
+					// "attribute vec2 uv;",
+					"varying vec2 vUv;",
+					"void main() {",
+						"vUv = uv;",
+						"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+					"}"
+
+				].join("\n");
+
+				var pBGShader = [
+
+					"uniform sampler2D map;",
+					"varying vec2 vUv;",
+
+					"void main() {",
+
+						"vec2 sampleUV = vUv;",
+						"vec4 colour = texture2D( map, sampleUV, 0.0 );",
+
+						"gl_FragColor = vec4( colour.xyz, 1.0 );",
+
+					"}"
+
+				].join("\n");
+
+				// Skybox
+				adaptiveLuminanceMat = new THREE.ShaderMaterial( {
+					uniforms: {
+						map: { type: 't', value: null }
+					},
+					vertexShader: vBGShader,
+					fragmentShader: pBGShader,
+					depthTest: false,
+					// color: 0xffffff
+					blending: THREE.NoBlending
+				} );
+
+				currentLuminanceMat = new THREE.ShaderMaterial( {
+					uniforms: {
+						map: { type: 't', value: null }
+					},
+					vertexShader: vBGShader,
+					fragmentShader: pBGShader,
+					depthTest: false,
+					// color: 0xffffff
+					// blending: THREE.NoBlending
+				} );
+
+				var quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.1, 0.1 ), currentLuminanceMat );
+				quadBG.position.z = -500;
+				quadBG.position.x = -window.innerWidth * 0.5 + window.innerWidth * 0.05;
+				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
+				debugScene.add( quadBG );
+
+				quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.1, 0.1 ), adaptiveLuminanceMat );
+				quadBG.position.z = -500;
+				quadBG.position.x = -window.innerWidth * 0.5 + window.innerWidth * 0.15;
+				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
+				debugScene.add( quadBG );
+
+				var r = "textures/cube/MilkyWay/";
+				var urls = [ r + "dark-s_px.jpg", r + "dark-s_nx.jpg",
+							 r + "dark-s_py.jpg", r + "dark-s_ny.jpg",
+							 r + "dark-s_pz.jpg", r + "dark-s_nz.jpg" ];
+
+				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				textureCube.format = THREE.RGBFormat;
+				var skyboxShader = THREE.ShaderLib[ "cube" ];
+				skyboxShader.uniforms[ "tCube" ].value = textureCube;
+
+				var skyboxMaterial = new THREE.ShaderMaterial( {
+
+					fragmentShader: skyboxShader.fragmentShader,
+					vertexShader: skyboxShader.vertexShader,
+					uniforms: skyboxShader.uniforms,
+					depthWrite: false,
+					side: THREE.BackSide
+
+				} ),
+
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), skyboxMaterial );
+				sceneCube.add( mesh );
+
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setFaceCulling( THREE.CullFaceNone );
+				renderer.autoClear = false;
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = false;
+
+				container.appendChild( renderer.domElement );
+
+				var extensions = new THREE.WebGLExtensions( renderer.getContext() );
+
+				// var width = window.innerWidth || 1;
+				var height = window.innerHeight || 1;
+
+				var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, stencilBuffer: false };
+				var regularRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
+				ldrEffectComposer = new THREE.EffectComposer( renderer, regularRenderTarget );
+
+				if ( extensions.get('OES_texture_half_float_linear') ) {
+					parameters.type = THREE.FloatType;
+				}
+				var hdrRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
+				dynamicHdrEffectComposer = new THREE.EffectComposer( renderer, hdrRenderTarget );
+				dynamicHdrEffectComposer.setSize( window.innerWidth, window.innerHeight );
+				hdrEffectComposer = new THREE.EffectComposer( renderer, hdrRenderTarget );
+
+				var debugPass = new THREE.RenderPass( debugScene, cameraBG );
+				debugPass.clear = false;
+				var scenePass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined );
+				var skyboxPass = new THREE.RenderPass( sceneCube, cameraCube );
+				scenePass.clear = false;
+
+				adaptToneMappingPass = new THREE.AdaptiveToneMappingPass( true, 256 );
+				adaptToneMappingPass.needsSwap = true;
+				ldrToneMappingPass = new THREE.AdaptiveToneMappingPass( false, 256 );
+				hdrToneMappingPass = new THREE.AdaptiveToneMappingPass( false, 256 );
+				bloomPass = new THREE.BloomPass();
+				var gammaCorrectionPass = new THREE.ShaderPass( THREE.GammaCorrectionShader );
+				gammaCorrectionPass.renderToScreen = true;
+
+				dynamicHdrEffectComposer.addPass( skyboxPass );
+				dynamicHdrEffectComposer.addPass( scenePass );
+				dynamicHdrEffectComposer.addPass( adaptToneMappingPass );
+				// dynamicHdrEffectComposer.addPass( debugPass );
+				dynamicHdrEffectComposer.addPass( bloomPass );
+				dynamicHdrEffectComposer.addPass( gammaCorrectionPass );
+
+				hdrEffectComposer.addPass( skyboxPass );
+				hdrEffectComposer.addPass( scenePass );
+				hdrEffectComposer.addPass( hdrToneMappingPass );
+				hdrEffectComposer.addPass( bloomPass );
+				hdrEffectComposer.addPass( gammaCorrectionPass );
+
+				ldrEffectComposer.addPass( skyboxPass );
+				ldrEffectComposer.addPass( scenePass );
+				ldrEffectComposer.addPass( ldrToneMappingPass );
+				ldrEffectComposer.addPass( bloomPass );
+				ldrEffectComposer.addPass( gammaCorrectionPass );
+
+				// var gammaPass = new THREE.ShaderPass( GammaShader );
+				// gammaPass.renderToScreen = true;
+				// ldrEffectComposer.addPass( gammaPass );
+
+
+				var gui = new dat.GUI();
+
+				// dynamicHdrGui.add( params, 'projection', { 'From cam to mesh': 'camera', 'Normal to mesh': 'normal' } );
+				var sceneGui = gui.addFolder( 'Scenes' );
+				var toneMappingGui = gui.addFolder( 'ToneMapping' );
+				var staticToneMappingGui = gui.addFolder( 'StaticOnly' );
+				var adaptiveToneMappingGui = gui.addFolder( 'AdaptiveOnly' );
+
+				sceneGui.add( params, 'bloomAmount', 0.0, 10.0 );
+				sceneGui.add( params, 'sunLight', 0.1, 12.0 );
+
+				toneMappingGui.add( params, 'enabled' );
+				toneMappingGui.add( params, 'middleGrey', 0, 12 );
+				toneMappingGui.add( params, 'maxLuminance', 1, 30 );
+
+				staticToneMappingGui.add( params, 'avgLuminance', 0.001, 2.0 );
+				adaptiveToneMappingGui.add( params, 'adaptionRate', 0.0, 10.0 );
+
+				gui.open();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+				windowThirdX = window.innerWidth / 3;
+				windowThirdY = window.innerHeight / 3;
+
+				camera.aspect = windowThirdX / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				cameraCube.aspect = windowThirdX / window.innerHeight;
+				cameraCube.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				if ( bloomPass ) {
+					bloomPass.copyUniforms[ "opacity" ].value = params.bloomAmount;
+				}
+
+				if ( adaptToneMappingPass ) {
+					adaptToneMappingPass.setAdaptionRate( params.adaptionRate );
+					adaptiveLuminanceMat.uniforms.map.value = adaptToneMappingPass.luminanceRT;
+					currentLuminanceMat.uniforms.map.value = adaptToneMappingPass.currentLuminanceRT;
+
+					adaptToneMappingPass.enabled = params.enabled;
+					adaptToneMappingPass.setMaxLuminance( params.maxLuminance );
+					adaptToneMappingPass.setMiddleGrey( params.middleGrey );
+
+					hdrToneMappingPass.enabled = params.enabled;
+					hdrToneMappingPass.setMaxLuminance( params.maxLuminance );
+					hdrToneMappingPass.setMiddleGrey( params.middleGrey );
+					if ( hdrToneMappingPass.setAverageLuminance ) {
+						hdrToneMappingPass.setAverageLuminance( params.avgLuminance );
+					}
+
+					ldrToneMappingPass.enabled = params.enabled;
+					ldrToneMappingPass.setMaxLuminance( params.maxLuminance );
+					ldrToneMappingPass.setMiddleGrey( params.middleGrey );
+					if ( ldrToneMappingPass.setAverageLuminance ) {
+						ldrToneMappingPass.setAverageLuminance( params.avgLuminance );
+					}
+				}
+
+				directionalLight.intensity = params.sunLight;
+
+				orbitControls.update();
+
+				render();
+
+			}
+
+			function render() {
+
+				camera.lookAt( scene.position );
+				cameraCube.rotation.copy( camera.rotation );
+
+				renderer.setViewport( 0, 0, windowThirdX, window.innerHeight );
+				ldrEffectComposer.render( 0.017 );
+
+				renderer.setViewport( windowThirdX, 0, windowThirdX, window.innerHeight );
+				hdrEffectComposer.render( 0.017 );
+
+				renderer.setViewport( windowThirdX * 2, 0, windowThirdX, window.innerHeight );
+				dynamicHdrEffectComposer.render( 0.017 );
+
+			}
+
+		</script>
+
+	</body>
+</html>

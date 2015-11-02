@@ -1,4 +1,4 @@
-# The issues section is for bug reports and feature requests only. If you need help, please use [stackoverflow](http://stackoverflow.com/questions/tagged/three.js).
+### The issues section is for bug reports and feature requests only. If you need help, please use [stackoverflow](http://stackoverflow.com/questions/tagged/three.js).
 
 
 Before reporting a bug

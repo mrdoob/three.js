@@ -4,46 +4,14 @@
 
 THREE.BoxHelper = function ( object ) {
 
-	//   5____4
-	// 1/___0/|
-	// | 6__|_7
-	// 2/___3/
+	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
+	var positions = new Float32Array( 8 * 3 );
 
-	var vertices = [
-		new THREE.Vector3(   1,   1,   1 ),
-		new THREE.Vector3( - 1,   1,   1 ),
-		new THREE.Vector3( - 1, - 1,   1 ),
-		new THREE.Vector3(   1, - 1,   1 ),
+	var geometry = new THREE.BufferGeometry();
+	geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-		new THREE.Vector3(   1,   1, - 1 ),
-		new THREE.Vector3( - 1,   1, - 1 ),
-		new THREE.Vector3( - 1, - 1, - 1 ),
-		new THREE.Vector3(   1, - 1, - 1 )
-	];
-
-	this.vertices = vertices;
-
-	// TODO: Wouldn't be nice if Line had .segments?
-
-	var geometry = new THREE.Geometry();
-	geometry.vertices.push(
-		vertices[ 0 ], vertices[ 1 ],
-		vertices[ 1 ], vertices[ 2 ],
-		vertices[ 2 ], vertices[ 3 ],
-		vertices[ 3 ], vertices[ 0 ],
-
-		vertices[ 4 ], vertices[ 5 ],
-		vertices[ 5 ], vertices[ 6 ],
-		vertices[ 6 ], vertices[ 7 ],
-		vertices[ 7 ], vertices[ 4 ],
-
-		vertices[ 0 ], vertices[ 4 ],
-		vertices[ 1 ], vertices[ 5 ],
-		vertices[ 2 ], vertices[ 6 ],
-		vertices[ 3 ], vertices[ 7 ]
-	);
-
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ), THREE.LinePieces );
+	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
 
 	if ( object !== undefined ) {
 
@@ -53,35 +21,54 @@ THREE.BoxHelper = function ( object ) {
 
 };
 
-THREE.BoxHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.BoxHelper.prototype = Object.create( THREE.LineSegments.prototype );
+THREE.BoxHelper.prototype.constructor = THREE.BoxHelper;
 
-THREE.BoxHelper.prototype.update = function ( object ) {
+THREE.BoxHelper.prototype.update = ( function () {
 
-	var geometry = object.geometry;
+	var box = new THREE.Box3();
 
-	if ( geometry.boundingBox === null ) {
+	return function ( object ) {
 
-		geometry.computeBoundingBox();
+		box.setFromObject( object );
+
+		if ( box.empty() ) return;
+
+		var min = box.min;
+		var max = box.max;
+
+		/*
+		  5____4
+		1/___0/|
+		| 6__|_7
+		2/___3/
+
+		0: max.x, max.y, max.z
+		1: min.x, max.y, max.z
+		2: min.x, min.y, max.z
+		3: max.x, min.y, max.z
+		4: max.x, max.y, min.z
+		5: min.x, max.y, min.z
+		6: min.x, min.y, min.z
+		7: max.x, min.y, min.z
+		*/
+
+		var position = this.geometry.attributes.position;
+		var array = position.array;
+
+		array[  0 ] = max.x; array[  1 ] = max.y; array[  2 ] = max.z;
+		array[  3 ] = min.x; array[  4 ] = max.y; array[  5 ] = max.z;
+		array[  6 ] = min.x; array[  7 ] = min.y; array[  8 ] = max.z;
+		array[  9 ] = max.x; array[ 10 ] = min.y; array[ 11 ] = max.z;
+		array[ 12 ] = max.x; array[ 13 ] = max.y; array[ 14 ] = min.z;
+		array[ 15 ] = min.x; array[ 16 ] = max.y; array[ 17 ] = min.z;
+		array[ 18 ] = min.x; array[ 19 ] = min.y; array[ 20 ] = min.z;
+		array[ 21 ] = max.x; array[ 22 ] = min.y; array[ 23 ] = min.z;
+
+		position.needsUpdate = true;
+
+		this.geometry.computeBoundingSphere();
 
 	}
 
-	var min = geometry.boundingBox.min;
-	var max = geometry.boundingBox.max;
-	var vertices = this.vertices;
-
-	vertices[ 0 ].set( max.x, max.y, max.z );
-	vertices[ 1 ].set( min.x, max.y, max.z );
-	vertices[ 2 ].set( min.x, min.y, max.z );
-	vertices[ 3 ].set( max.x, min.y, max.z );
-	vertices[ 4 ].set( max.x, max.y, min.z );
-	vertices[ 5 ].set( min.x, max.y, min.z );
-	vertices[ 6 ].set( min.x, min.y, min.z );
-	vertices[ 7 ].set( max.x, min.y, min.z );
-
-	this.geometry.computeBoundingSphere();
-	this.geometry.verticesNeedUpdate = true;
-
-	this.matrixAutoUpdate = false;
-	this.matrixWorld = object.matrixWorld;
-
-};
+} )();

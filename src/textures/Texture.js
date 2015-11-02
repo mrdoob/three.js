@@ -6,15 +6,17 @@
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.id = THREE.TextureIdCount ++;
+	Object.defineProperty( this, 'id', { value: THREE.TextureIdCount ++ } );
+
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
+	this.sourceFile = '';
 
-	this.image = image;
+	this.image = image !== undefined ? image : THREE.Texture.DEFAULT_IMAGE;
 	this.mipmaps = [];
 
-	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
+	this.mapping = mapping !== undefined ? mapping : THREE.Texture.DEFAULT_MAPPING;
 
 	this.wrapS = wrapS !== undefined ? wrapS : THREE.ClampToEdgeWrapping;
 	this.wrapT = wrapT !== undefined ? wrapT : THREE.ClampToEdgeWrapping;
@@ -35,50 +37,230 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.flipY = true;
 	this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-	this.needsUpdate = false;
+	this.version = 0;
 	this.onUpdate = null;
 
 };
+
+THREE.Texture.DEFAULT_IMAGE = undefined;
+THREE.Texture.DEFAULT_MAPPING = THREE.UVMapping;
 
 THREE.Texture.prototype = {
 
 	constructor: THREE.Texture,
 
-	clone: function ( texture ) {
+	set needsUpdate ( value ) {
 
-		if ( texture === undefined ) texture = new THREE.Texture();
+		if ( value === true ) this.version ++;
 
-		texture.image = this.image;
-		texture.mipmaps = this.mipmaps.slice(0);
+	},
 
-		texture.mapping = this.mapping;
+	clone: function () {
 
-		texture.wrapS = this.wrapS;
-		texture.wrapT = this.wrapT;
+		return new this.constructor().copy( this );
 
-		texture.magFilter = this.magFilter;
-		texture.minFilter = this.minFilter;
+	},
 
-		texture.anisotropy = this.anisotropy;
+	copy: function ( source ) {
 
-		texture.format = this.format;
-		texture.type = this.type;
+		this.image = source.image;
+		this.mipmaps = source.mipmaps.slice( 0 );
 
-		texture.offset.copy( this.offset );
-		texture.repeat.copy( this.repeat );
+		this.mapping = source.mapping;
 
-		texture.generateMipmaps = this.generateMipmaps;
-		texture.premultiplyAlpha = this.premultiplyAlpha;
-		texture.flipY = this.flipY;
-		texture.unpackAlignment = this.unpackAlignment;
+		this.wrapS = source.wrapS;
+		this.wrapT = source.wrapT;
 
-		return texture;
+		this.magFilter = source.magFilter;
+		this.minFilter = source.minFilter;
+
+		this.anisotropy = source.anisotropy;
+
+		this.format = source.format;
+		this.type = source.type;
+
+		this.offset.copy( source.offset );
+		this.repeat.copy( source.repeat );
+
+		this.generateMipmaps = source.generateMipmaps;
+		this.premultiplyAlpha = source.premultiplyAlpha;
+		this.flipY = source.flipY;
+		this.unpackAlignment = source.unpackAlignment;
+
+		return this;
+
+	},
+
+	toJSON: function ( meta ) {
+
+		if ( meta.textures[ this.uuid ] !== undefined ) {
+
+			return meta.textures[ this.uuid ];
+
+		}
+
+		function getDataURL( image ) {
+
+			var canvas;
+
+			if ( image.toDataURL !== undefined ) {
+
+				canvas = image;
+
+			} else {
+
+				canvas = document.createElement( 'canvas' );
+				canvas.width = image.width;
+				canvas.height = image.height;
+
+				canvas.getContext( '2d' ).drawImage( image, 0, 0, image.width, image.height );
+
+			}
+
+			if ( canvas.width > 2048 || canvas.height > 2048 ) {
+
+				return canvas.toDataURL( 'image/jpeg', 0.6 );
+
+			} else {
+
+				return canvas.toDataURL( 'image/png' );
+
+			}
+
+		}
+
+		var output = {
+			metadata: {
+				version: 4.4,
+				type: 'Texture',
+				generator: 'Texture.toJSON'
+			},
+
+			uuid: this.uuid,
+			name: this.name,
+
+			mapping: this.mapping,
+
+			repeat: [ this.repeat.x, this.repeat.y ],
+			offset: [ this.offset.x, this.offset.y ],
+			wrap: [ this.wrapS, this.wrapT ],
+
+			minFilter: this.minFilter,
+			magFilter: this.magFilter,
+			anisotropy: this.anisotropy
+		};
+
+		if ( this.image !== undefined ) {
+
+			// TODO: Move to THREE.Image
+
+			var image = this.image;
+
+			if ( image.uuid === undefined ) {
+
+				image.uuid = THREE.Math.generateUUID(); // UGH
+
+			}
+
+			if ( meta.images[ image.uuid ] === undefined ) {
+
+				meta.images[ image.uuid ] = {
+					uuid: image.uuid,
+					url: getDataURL( image )
+				};
+
+			}
+
+			output.image = image.uuid;
+
+		}
+
+		meta.textures[ this.uuid ] = output;
+
+		return output;
 
 	},
 
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
+
+	},
+
+	transformUv: function ( uv ) {
+
+		if ( this.mapping !== THREE.UVMapping )  return;
+
+		uv.multiply( this.repeat );
+		uv.add( this.offset );
+
+		if ( uv.x < 0 || uv.x > 1 ) {
+
+			switch ( this.wrapS ) {
+
+				case THREE.RepeatWrapping:
+
+					uv.x = uv.x - Math.floor( uv.x );
+					break;
+
+				case THREE.ClampToEdgeWrapping:
+
+					uv.x = uv.x < 0 ? 0 : 1;
+					break;
+
+				case THREE.MirroredRepeatWrapping:
+
+					if ( Math.abs( Math.floor( uv.x ) % 2 ) === 1 ) {
+
+						uv.x = Math.ceil( uv.x ) - uv.x;
+
+					} else {
+
+						uv.x = uv.x - Math.floor( uv.x );
+
+					}
+					break;
+
+			}
+
+		}
+
+		if ( uv.y < 0 || uv.y > 1 ) {
+
+			switch ( this.wrapT ) {
+
+				case THREE.RepeatWrapping:
+
+					uv.y = uv.y - Math.floor( uv.y );
+					break;
+
+				case THREE.ClampToEdgeWrapping:
+
+					uv.y = uv.y < 0 ? 0 : 1;
+					break;
+
+				case THREE.MirroredRepeatWrapping:
+
+					if ( Math.abs( Math.floor( uv.y ) % 2 ) === 1 ) {
+
+						uv.y = Math.ceil( uv.y ) - uv.y;
+
+					} else {
+
+						uv.y = uv.y - Math.floor( uv.y );
+
+					}
+					break;
+
+			}
+
+		}
+
+		if ( this.flipY ) {
+
+			uv.y = 1 - uv.y;
+
+		}
 
 	}
 

@@ -41,7 +41,7 @@
 
 				scene = new THREE.Scene();
 
-				var light, object, object2;
+				var light, object;
 
 				scene.add( new THREE.AmbientLight( 0x404040 ) );
 
@@ -49,11 +49,11 @@
 				light.position.set( 0, 1, 0 );
 				scene.add( light );
 
-				var map = THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' );
+				var map = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
-				var material = new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map, side: THREE.DoubleSide } );
+				var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
 
 				//
 
@@ -79,7 +79,7 @@
 				object.position.set( -400, 0, 0 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), material );
+				object = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100, 4, 4, 4 ), material );
 				object.position.set( -200, 0, 0 );
 				scene.add( object );
 
@@ -128,6 +128,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

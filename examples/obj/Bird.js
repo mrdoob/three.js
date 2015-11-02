@@ -20,7 +20,6 @@ var Bird = function () {
 	f3( 4, 7, 6 );
 	f3( 5, 6, 7 );
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 	function v( x, y, z ) {
@@ -38,3 +37,4 @@ var Bird = function () {
 }
 
 Bird.prototype = Object.create( THREE.Geometry.prototype );
+Bird.prototype.constructor = Bird;

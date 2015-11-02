@@ -39,6 +39,21 @@ test( "set", function() {
 	ok( a.max.equals( one2 ), "Passed!" );
 });
 
+test( "setFromPoints", function() {
+	var a = new THREE.Box2();
+
+	a.setFromPoints( [ zero2, one2, two2 ] );
+	ok( a.min.equals( zero2 ), "Passed!" );
+	ok( a.max.equals( two2 ), "Passed!" );
+
+	a.setFromPoints( [ one2 ] );
+	ok( a.min.equals( one2 ), "Passed!" );
+	ok( a.max.equals( one2 ), "Passed!" );
+
+	a.setFromPoints( [] );
+	ok( a.empty(), "Passed!" );
+});
+
 test( "empty/makeEmpty", function() {
 	var a = new THREE.Box2();
 
@@ -157,21 +172,6 @@ test( "clampPoint", function() {
 	ok( b.clampPoint( new THREE.Vector2( 0, 0 ) ).equals( new THREE.Vector2( 0, 0 ) ), "Passed!" );
 	ok( b.clampPoint( new THREE.Vector2( -1, -1 ) ).equals( new THREE.Vector2( -1, -1 ) ), "Passed!" );
 	ok( b.clampPoint( new THREE.Vector2( -2, -2 ) ).equals( new THREE.Vector2( -1, -1 ) ), "Passed!" );
-});
-
-test( "distanceToPoint", function() {
-	var a = new THREE.Box2( zero2.clone(), zero2.clone() );
-	var b = new THREE.Box2( one2.clone().negate(), one2.clone() );
-
-	ok( a.distanceToPoint( new THREE.Vector2( 0, 0 ) ) == 0, "Passed!" );
-	ok( a.distanceToPoint( new THREE.Vector2( 1, 1 ) ) == Math.sqrt( 2 ), "Passed!" );
-	ok( a.distanceToPoint( new THREE.Vector2( -1, -1 ) ) == Math.sqrt( 2 ), "Passed!" );
-
-	ok( b.distanceToPoint( new THREE.Vector2( 2, 2 ) ) == Math.sqrt( 2 ), "Passed!" );
-	ok( b.distanceToPoint( new THREE.Vector2( 1, 1 ) ) == 0, "Passed!" );
-	ok( b.distanceToPoint( new THREE.Vector2( 0, 0 ) ) == 0, "Passed!" );
-	ok( b.distanceToPoint( new THREE.Vector2( -1, -1 ) ) == 0, "Passed!" );
-	ok( b.distanceToPoint( new THREE.Vector2( -2, -2 ) ) == Math.sqrt( 2 ), "Passed!" );
 });
 
 test( "distanceToPoint", function() {

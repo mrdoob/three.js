@@ -4,27 +4,24 @@
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
  * @author zz85 / http://www.lab4games.net/zz85/blog
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  */
 
 THREE.Geometry = function () {
 
-	this.id = THREE.GeometryIdCount ++;
+	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
+
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
+	this.type = 'Geometry';
 
 	this.vertices = [];
-	this.colors = [];  // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
-	this.normals = []; // one-to-one vertex normals, used in Ribbon
-
+	this.colors = [];
 	this.faces = [];
-
-	this.faceUvs = [[]];
-	this.faceVertexUvs = [[]];
+	this.faceVertexUvs = [ [] ];
 
 	this.morphTargets = [];
-	this.morphColors = [];
 	this.morphNormals = [];
 
 	this.skinWeights = [];
@@ -35,21 +32,15 @@ THREE.Geometry = function () {
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
-	this.hasTangents = false;
-
-	this.dynamic = true; // the intermediate typed arrays will be deleted when set to false
-
 	// update flags
 
 	this.verticesNeedUpdate = false;
 	this.elementsNeedUpdate = false;
 	this.uvsNeedUpdate = false;
 	this.normalsNeedUpdate = false;
-	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.lineDistancesNeedUpdate = false;
-
-	this.buffersNeedUpdate = false;
+	this.groupsNeedUpdate = false;
 
 };
 
@@ -79,51 +70,306 @@ THREE.Geometry.prototype = {
 
 			}
 
-			face.centroid.applyMatrix4( matrix );
-
 		}
 
-		if ( this.boundingBox instanceof THREE.Box3 ) {
+		if ( this.boundingBox !== null ) {
 
 			this.computeBoundingBox();
 
 		}
 
-		if ( this.boundingSphere instanceof THREE.Sphere ) {
+		if ( this.boundingSphere !== null ) {
 
 			this.computeBoundingSphere();
 
 		}
 
+		this.verticesNeedUpdate = true;
+		this.normalsNeedUpdate = true;
+
 	},
 
-	computeCentroids: function () {
+	rotateX: function () {
 
-		var f, fl, face;
+		// rotate geometry around world x-axis
 
-		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+		var m1;
 
-			face = this.faces[ f ];
-			face.centroid.set( 0, 0, 0 );
+		return function rotateX( angle ) {
 
-			if ( face instanceof THREE.Face3 ) {
+			if ( m1 === undefined ) m1 = new THREE.Matrix4();
 
-				face.centroid.add( this.vertices[ face.a ] );
-				face.centroid.add( this.vertices[ face.b ] );
-				face.centroid.add( this.vertices[ face.c ] );
-				face.centroid.divideScalar( 3 );
+			m1.makeRotationX( angle );
 
-			} else if ( face instanceof THREE.Face4 ) {
+			this.applyMatrix( m1 );
 
-				face.centroid.add( this.vertices[ face.a ] );
-				face.centroid.add( this.vertices[ face.b ] );
-				face.centroid.add( this.vertices[ face.c ] );
-				face.centroid.add( this.vertices[ face.d ] );
-				face.centroid.divideScalar( 4 );
+			return this;
+
+		};
+
+	}(),
+
+	rotateY: function () {
+
+		// rotate geometry around world y-axis
+
+		var m1;
+
+		return function rotateY( angle ) {
+
+			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+
+			m1.makeRotationY( angle );
+
+			this.applyMatrix( m1 );
+
+			return this;
+
+		};
+
+	}(),
+
+	rotateZ: function () {
+
+		// rotate geometry around world z-axis
+
+		var m1;
+
+		return function rotateZ( angle ) {
+
+			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+
+			m1.makeRotationZ( angle );
+
+			this.applyMatrix( m1 );
+
+			return this;
+
+		};
+
+	}(),
+
+	translate: function () {
+
+		// translate geometry
+
+		var m1;
+
+		return function translate( x, y, z ) {
+
+			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+
+			m1.makeTranslation( x, y, z );
+
+			this.applyMatrix( m1 );
+
+			return this;
+
+		};
+
+	}(),
+
+	scale: function () {
+
+		// scale geometry
+
+		var m1;
+
+		return function scale( x, y, z ) {
+
+			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+
+			m1.makeScale( x, y, z );
+
+			this.applyMatrix( m1 );
+
+			return this;
+
+		};
+
+	}(),
+
+	lookAt: function () {
+
+		var obj;
+
+		return function lookAt( vector ) {
+
+			if ( obj === undefined ) obj = new THREE.Object3D();
+
+			obj.lookAt( vector );
+
+			obj.updateMatrix();
+
+			this.applyMatrix( obj.matrix );
+
+		};
+
+	}(),
+
+	fromBufferGeometry: function ( geometry ) {
+
+		var scope = this;
+
+		var indices = geometry.index !== null ? geometry.index.array : undefined;
+		var attributes = geometry.attributes;
+
+		var vertices = attributes.position.array;
+		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
+		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
+		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
+		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
+
+		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
+
+		var tempNormals = [];
+		var tempUVs = [];
+		var tempUVs2 = [];
+
+		for ( var i = 0, j = 0, k = 0; i < vertices.length; i += 3, j += 2, k += 4 ) {
+
+			scope.vertices.push( new THREE.Vector3( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] ) );
+
+			if ( normals !== undefined ) {
+
+				tempNormals.push( new THREE.Vector3( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] ) );
+
+			}
+
+			if ( colors !== undefined ) {
+
+				scope.colors.push( new THREE.Color( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
+
+			}
+
+			if ( uvs !== undefined ) {
+
+				tempUVs.push( new THREE.Vector2( uvs[ j ], uvs[ j + 1 ] ) );
+
+			}
+
+			if ( uvs2 !== undefined ) {
+
+				tempUVs2.push( new THREE.Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
 
 			}
 
 		}
+
+		function addFace( a, b, c ) {
+
+			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
+			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
+
+			var face = new THREE.Face3( a, b, c, vertexNormals, vertexColors );
+
+			scope.faces.push( face );
+
+			if ( uvs !== undefined ) {
+
+				scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ].clone(), tempUVs[ b ].clone(), tempUVs[ c ].clone() ] );
+
+			}
+
+			if ( uvs2 !== undefined ) {
+
+				scope.faceVertexUvs[ 1 ].push( [ tempUVs2[ a ].clone(), tempUVs2[ b ].clone(), tempUVs2[ c ].clone() ] );
+
+			}
+
+		};
+
+		if ( indices !== undefined ) {
+
+			var groups = geometry.groups;
+
+			if ( groups.length > 0 ) {
+
+				for ( var i = 0; i < groups.length; i ++ ) {
+
+					var group = groups[ i ];
+
+					var start = group.start;
+					var count = group.count;
+
+					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
+
+						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ] );
+
+					}
+
+				}
+
+			} else {
+
+				for ( var i = 0; i < indices.length; i += 3 ) {
+
+					addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+
+				}
+
+			}
+
+		} else {
+
+			for ( var i = 0; i < vertices.length / 3; i += 3 ) {
+
+				addFace( i, i + 1, i + 2 );
+
+			}
+
+		}
+
+		this.computeFaceNormals();
+
+		if ( geometry.boundingBox !== null ) {
+
+			this.boundingBox = geometry.boundingBox.clone();
+
+		}
+
+		if ( geometry.boundingSphere !== null ) {
+
+			this.boundingSphere = geometry.boundingSphere.clone();
+
+		}
+
+		return this;
+
+	},
+
+	center: function () {
+
+		this.computeBoundingBox();
+
+		var offset = this.boundingBox.center().negate();
+
+		this.translate( offset.x, offset.y, offset.z );
+
+		return offset;
+
+	},
+
+	normalize: function () {
+
+		this.computeBoundingSphere();
+
+		var center = this.boundingSphere.center;
+		var radius = this.boundingSphere.radius;
+
+		var s = radius === 0 ? 1 : 1.0 / radius;
+
+		var matrix = new THREE.Matrix4();
+		matrix.set(
+			s, 0, 0, - s * center.x,
+			0, s, 0, - s * center.y,
+			0, 0, s, - s * center.z,
+			0, 0, 0, 1
+		);
+
+		this.applyMatrix( matrix );
+
+		return this;
 
 	},
 
@@ -155,45 +401,11 @@ THREE.Geometry.prototype = {
 
 		var v, vl, f, fl, face, vertices;
 
-		// create internal buffers for reuse when calling this method repeatedly
-		// (otherwise memory allocation / deallocation every frame is big resource hog)
+		vertices = new Array( this.vertices.length );
 
-		if ( this.__tmpVertices === undefined ) {
+		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
-			this.__tmpVertices = new Array( this.vertices.length );
-			vertices = this.__tmpVertices;
-
-			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
-
-				vertices[ v ] = new THREE.Vector3();
-
-			}
-
-			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-
-				face = this.faces[ f ];
-
-				if ( face instanceof THREE.Face3 ) {
-
-					face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-
-				} else if ( face instanceof THREE.Face4 ) {
-
-					face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-
-				}
-
-			}
-
-		} else {
-
-			vertices = this.__tmpVertices;
-
-			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
-
-				vertices[ v ].set( 0, 0, 0 );
-
-			}
+			vertices[ v ] = new THREE.Vector3();
 
 		}
 
@@ -202,56 +414,24 @@ THREE.Geometry.prototype = {
 			// vertex normals weighted by triangle areas
 			// http://www.iquilezles.org/www/articles/normals/normals.htm
 
-			var vA, vB, vC, vD;
-			var cb = new THREE.Vector3(), ab = new THREE.Vector3(),
-				db = new THREE.Vector3(), dc = new THREE.Vector3(), bc = new THREE.Vector3();
+			var vA, vB, vC;
+			var cb = new THREE.Vector3(), ab = new THREE.Vector3();
 
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 				face = this.faces[ f ];
 
-				if ( face instanceof THREE.Face3 ) {
+				vA = this.vertices[ face.a ];
+				vB = this.vertices[ face.b ];
+				vC = this.vertices[ face.c ];
 
-					vA = this.vertices[ face.a ];
-					vB = this.vertices[ face.b ];
-					vC = this.vertices[ face.c ];
+				cb.subVectors( vC, vB );
+				ab.subVectors( vA, vB );
+				cb.cross( ab );
 
-					cb.subVectors( vC, vB );
-					ab.subVectors( vA, vB );
-					cb.cross( ab );
-
-					vertices[ face.a ].add( cb );
-					vertices[ face.b ].add( cb );
-					vertices[ face.c ].add( cb );
-
-				} else if ( face instanceof THREE.Face4 ) {
-
-					vA = this.vertices[ face.a ];
-					vB = this.vertices[ face.b ];
-					vC = this.vertices[ face.c ];
-					vD = this.vertices[ face.d ];
-
-					// abd
-
-					db.subVectors( vD, vB );
-					ab.subVectors( vA, vB );
-					db.cross( ab );
-
-					vertices[ face.a ].add( db );
-					vertices[ face.b ].add( db );
-					vertices[ face.d ].add( db );
-
-					// bcd
-
-					dc.subVectors( vD, vC );
-					bc.subVectors( vB, vC );
-					dc.cross( bc );
-
-					vertices[ face.b ].add( dc );
-					vertices[ face.c ].add( dc );
-					vertices[ face.d ].add( dc );
-
-				}
+				vertices[ face.a ].add( cb );
+				vertices[ face.b ].add( cb );
+				vertices[ face.c ].add( cb );
 
 			}
 
@@ -261,20 +441,9 @@ THREE.Geometry.prototype = {
 
 				face = this.faces[ f ];
 
-				if ( face instanceof THREE.Face3 ) {
-
-					vertices[ face.a ].add( face.normal );
-					vertices[ face.b ].add( face.normal );
-					vertices[ face.c ].add( face.normal );
-
-				} else if ( face instanceof THREE.Face4 ) {
-
-					vertices[ face.a ].add( face.normal );
-					vertices[ face.b ].add( face.normal );
-					vertices[ face.c ].add( face.normal );
-					vertices[ face.d ].add( face.normal );
-
-				}
+				vertices[ face.a ].add( face.normal );
+				vertices[ face.b ].add( face.normal );
+				vertices[ face.c ].add( face.normal );
 
 			}
 
@@ -290,18 +459,19 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ f ];
 
-			if ( face instanceof THREE.Face3 ) {
+			var vertexNormals = face.vertexNormals;
 
-				face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
-				face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
-				face.vertexNormals[ 2 ].copy( vertices[ face.c ] );
+			if ( vertexNormals.length === 3 ) {
 
-			} else if ( face instanceof THREE.Face4 ) {
+				vertexNormals[ 0 ].copy( vertices[ face.a ] );
+				vertexNormals[ 1 ].copy( vertices[ face.b ] );
+				vertexNormals[ 2 ].copy( vertices[ face.c ] );
 
-				face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
-				face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
-				face.vertexNormals[ 2 ].copy( vertices[ face.c ] );
-				face.vertexNormals[ 3 ].copy( vertices[ face.d ] );
+			} else {
+
+				vertexNormals[ 0 ] = vertices[ face.a ].clone();
+				vertexNormals[ 1 ] = vertices[ face.b ].clone();
+				vertexNormals[ 2 ] = vertices[ face.c ].clone();
 
 			}
 
@@ -371,19 +541,8 @@ THREE.Geometry.prototype = {
 
 				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
-					face = this.faces[ f ];
-
 					faceNormal = new THREE.Vector3();
-
-					if ( face instanceof THREE.Face3 ) {
-
-						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
-
-					} else {
-
-						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), d: new THREE.Vector3() };
-
-					}
+					vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
 
 					dstNormalsFace.push( faceNormal );
 					dstNormalsVertex.push( vertexNormals );
@@ -416,20 +575,9 @@ THREE.Geometry.prototype = {
 
 				faceNormal.copy( face.normal );
 
-				if ( face instanceof THREE.Face3 ) {
-
-					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
-					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
-					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
-
-				} else {
-
-					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
-					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
-					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
-					vertexNormals.d.copy( face.vertexNormals[ 3 ] );
-
-				}
+				vertexNormals.a.copy( face.vertexNormals[ 0 ] );
+				vertexNormals.b.copy( face.vertexNormals[ 1 ] );
+				vertexNormals.c.copy( face.vertexNormals[ 2 ] );
 
 			}
 
@@ -450,119 +598,11 @@ THREE.Geometry.prototype = {
 
 	computeTangents: function () {
 
-		// based on http://www.terathon.com/code/tangent.html
-		// tangents go to vertices
-
-		var f, fl, v, vl, i, il, vertexIndex,
-			face, uv, vA, vB, vC, uvA, uvB, uvC,
-			x1, x2, y1, y2, z1, z2,
-			s1, s2, t1, t2, r, t, test,
-			tan1 = [], tan2 = [],
-			sdir = new THREE.Vector3(), tdir = new THREE.Vector3(),
-			tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(),
-			n = new THREE.Vector3(), w;
-
-		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
-
-			tan1[ v ] = new THREE.Vector3();
-			tan2[ v ] = new THREE.Vector3();
-
-		}
-
-		function handleTriangle( context, a, b, c, ua, ub, uc ) {
-
-			vA = context.vertices[ a ];
-			vB = context.vertices[ b ];
-			vC = context.vertices[ c ];
-
-			uvA = uv[ ua ];
-			uvB = uv[ ub ];
-			uvC = uv[ uc ];
-
-			x1 = vB.x - vA.x;
-			x2 = vC.x - vA.x;
-			y1 = vB.y - vA.y;
-			y2 = vC.y - vA.y;
-			z1 = vB.z - vA.z;
-			z2 = vC.z - vA.z;
-
-			s1 = uvB.x - uvA.x;
-			s2 = uvC.x - uvA.x;
-			t1 = uvB.y - uvA.y;
-			t2 = uvC.y - uvA.y;
-
-			r = 1.0 / ( s1 * t2 - s2 * t1 );
-			sdir.set( ( t2 * x1 - t1 * x2 ) * r,
-					  ( t2 * y1 - t1 * y2 ) * r,
-					  ( t2 * z1 - t1 * z2 ) * r );
-			tdir.set( ( s1 * x2 - s2 * x1 ) * r,
-					  ( s1 * y2 - s2 * y1 ) * r,
-					  ( s1 * z2 - s2 * z1 ) * r );
-
-			tan1[ a ].add( sdir );
-			tan1[ b ].add( sdir );
-			tan1[ c ].add( sdir );
-
-			tan2[ a ].add( tdir );
-			tan2[ b ].add( tdir );
-			tan2[ c ].add( tdir );
-
-		}
-
-		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-
-			face = this.faces[ f ];
-			uv = this.faceVertexUvs[ 0 ][ f ]; // use UV layer 0 for tangents
-
-			if ( face instanceof THREE.Face3 ) {
-
-				handleTriangle( this, face.a, face.b, face.c, 0, 1, 2 );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				handleTriangle( this, face.a, face.b, face.d, 0, 1, 3 );
-				handleTriangle( this, face.b, face.c, face.d, 1, 2, 3 );
-
-			}
-
-		}
-
-		var faceIndex = [ 'a', 'b', 'c', 'd' ];
-
-		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-
-			face = this.faces[ f ];
-
-			for ( i = 0; i < face.vertexNormals.length; i++ ) {
-
-				n.copy( face.vertexNormals[ i ] );
-
-				vertexIndex = face[ faceIndex[ i ] ];
-
-				t = tan1[ vertexIndex ];
-
-				// Gram-Schmidt orthogonalize
-
-				tmp.copy( t );
-				tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
-
-				// Calculate handedness
-
-				tmp2.crossVectors( face.vertexNormals[ i ], t );
-				test = tmp2.dot( tan2[ vertexIndex ] );
-				w = (test < 0.0) ? -1.0 : 1.0;
-
-				face.vertexTangents[ i ] = new THREE.Vector4( tmp.x, tmp.y, tmp.z, w );
-
-			}
-
-		}
-
-		this.hasTangents = true;
+		console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
 
 	},
 
-	computeLineDistances: function ( ) {
+	computeLineDistances: function () {
 
 		var d = 0;
 		var vertices = this.vertices;
@@ -605,6 +645,131 @@ THREE.Geometry.prototype = {
 
 	},
 
+	merge: function ( geometry, matrix, materialIndexOffset ) {
+
+		if ( geometry instanceof THREE.Geometry === false ) {
+
+			console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
+			return;
+
+		}
+
+		var normalMatrix,
+		vertexOffset = this.vertices.length,
+		vertices1 = this.vertices,
+		vertices2 = geometry.vertices,
+		faces1 = this.faces,
+		faces2 = geometry.faces,
+		uvs1 = this.faceVertexUvs[ 0 ],
+		uvs2 = geometry.faceVertexUvs[ 0 ];
+
+		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
+
+		if ( matrix !== undefined ) {
+
+			normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+
+		}
+
+		// vertices
+
+		for ( var i = 0, il = vertices2.length; i < il; i ++ ) {
+
+			var vertex = vertices2[ i ];
+
+			var vertexCopy = vertex.clone();
+
+			if ( matrix !== undefined ) vertexCopy.applyMatrix4( matrix );
+
+			vertices1.push( vertexCopy );
+
+		}
+
+		// faces
+
+		for ( i = 0, il = faces2.length; i < il; i ++ ) {
+
+			var face = faces2[ i ], faceCopy, normal, color,
+			faceVertexNormals = face.vertexNormals,
+			faceVertexColors = face.vertexColors;
+
+			faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
+			faceCopy.normal.copy( face.normal );
+
+			if ( normalMatrix !== undefined ) {
+
+				faceCopy.normal.applyMatrix3( normalMatrix ).normalize();
+
+			}
+
+			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
+
+				normal = faceVertexNormals[ j ].clone();
+
+				if ( normalMatrix !== undefined ) {
+
+					normal.applyMatrix3( normalMatrix ).normalize();
+
+				}
+
+				faceCopy.vertexNormals.push( normal );
+
+			}
+
+			faceCopy.color.copy( face.color );
+
+			for ( var j = 0, jl = faceVertexColors.length; j < jl; j ++ ) {
+
+				color = faceVertexColors[ j ];
+				faceCopy.vertexColors.push( color.clone() );
+
+			}
+
+			faceCopy.materialIndex = face.materialIndex + materialIndexOffset;
+
+			faces1.push( faceCopy );
+
+		}
+
+		// uvs
+
+		for ( i = 0, il = uvs2.length; i < il; i ++ ) {
+
+			var uv = uvs2[ i ], uvCopy = [];
+
+			if ( uv === undefined ) {
+
+				continue;
+
+			}
+
+			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
+
+				uvCopy.push( uv[ j ].clone() );
+
+			}
+
+			uvs1.push( uvCopy );
+
+		}
+
+	},
+
+	mergeMesh: function ( mesh ) {
+
+		if ( mesh instanceof THREE.Mesh === false ) {
+
+			console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
+			return;
+
+		}
+
+		mesh.matrixAutoUpdate && mesh.updateMatrix();
+
+		this.merge( mesh.geometry, mesh.matrix );
+
+	},
+
 	/*
 	 * Checks for duplicate vertices with hashmap.
 	 * Duplicated vertices are removed
@@ -613,17 +778,14 @@ THREE.Geometry.prototype = {
 
 	mergeVertices: function () {
 
-		var verticesMap = {}; // Hashmap for looking up vertice by position coordinates (and making sure they are unique)
+		var verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
 		var unique = [], changes = [];
 
 		var v, key;
-		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
+		var precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
 		var precision = Math.pow( 10, precisionPoints );
-		var i,il, face;
-		var indices, k, j, jl, u;
-
-		// reset cache of vertices as it now will be changing.
-		this.__tmpVertices = undefined;
+		var i, il, face;
+		var indices, j, jl;
 
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
@@ -643,100 +805,35 @@ THREE.Geometry.prototype = {
 
 			}
 
-		};
+		}
 
 
 		// if faces are completely degenerate after merging vertices, we
 		// have to remove them from the geometry.
 		var faceIndicesToRemove = [];
 
-		for( i = 0, il = this.faces.length; i < il; i ++ ) {
+		for ( i = 0, il = this.faces.length; i < il; i ++ ) {
 
 			face = this.faces[ i ];
 
-			if ( face instanceof THREE.Face3 ) {
+			face.a = changes[ face.a ];
+			face.b = changes[ face.b ];
+			face.c = changes[ face.c ];
 
-				face.a = changes[ face.a ];
-				face.b = changes[ face.b ];
-				face.c = changes[ face.c ];
+			indices = [ face.a, face.b, face.c ];
 
-				indices = [ face.a, face.b, face.c ];
+			var dupIndex = - 1;
 
-				var dupIndex = -1;
+			// if any duplicate vertices are found in a Face3
+			// we have to remove the face as nothing can be saved
+			for ( var n = 0; n < 3; n ++ ) {
 
-				// if any duplicate vertices are found in a Face3
-				// we have to remove the face as nothing can be saved
-				for ( var n = 0; n < 3; n ++ ) {
-					if ( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
+				if ( indices[ n ] === indices[ ( n + 1 ) % 3 ] ) {
 
-						dupIndex = n;
-						faceIndicesToRemove.push( i );
-						break;
+					dupIndex = n;
+					faceIndicesToRemove.push( i );
+					break;
 
-					}
-				}
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				face.a = changes[ face.a ];
-				face.b = changes[ face.b ];
-				face.c = changes[ face.c ];
-				face.d = changes[ face.d ];
-
-				// check dups in (a, b, c, d) and convert to -> face3
-
-				indices = [ face.a, face.b, face.c, face.d ];
-
-				var dupIndex = -1;
-
-				for ( var n = 0; n < 4; n ++ ) {
-
-					if ( indices[ n ] == indices[ ( n + 1 ) % 4 ] ) {
-
-						// if more than one duplicated vertex is found
-						// we can't generate any valid Face3's, thus
-						// we need to remove this face complete.
-						if ( dupIndex >= 0 ) {
-
-							faceIndicesToRemove.push( i );
-
-						}
-
-						dupIndex = n;
-
-					}
-				}
-
-				if ( dupIndex >= 0 ) {
-
-					indices.splice( dupIndex, 1 );
-
-					var newFace = new THREE.Face3( indices[0], indices[1], indices[2], face.normal, face.color, face.materialIndex );
-
-					for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
-
-						u = this.faceVertexUvs[ j ][ i ];
-
-						if ( u ) {
-							u.splice( dupIndex, 1 );
-						}
-
-					}
-
-					if( face.vertexNormals && face.vertexNormals.length > 0) {
-
-						newFace.vertexNormals = face.vertexNormals;
-						newFace.vertexNormals.splice( dupIndex, 1 );
-
-					}
-
-					if( face.vertexColors && face.vertexColors.length > 0 ) {
-
-						newFace.vertexColors = face.vertexColors;
-						newFace.vertexColors.splice( dupIndex, 1 );
-					}
-
-					this.faces[ i ] = newFace;
 				}
 
 			}
@@ -745,11 +842,13 @@ THREE.Geometry.prototype = {
 
 		for ( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
 
-			this.faces.splice( i, 1 );
+			var idx = faceIndicesToRemove[ i ];
+
+			this.faces.splice( idx, 1 );
 
 			for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
 
-				this.faceVertexUvs[ j ].splice( i, 1 );
+				this.faceVertexUvs[ j ].splice( idx, 1 );
 
 			}
 
@@ -763,43 +862,302 @@ THREE.Geometry.prototype = {
 
 	},
 
-	clone: function () {
-
-		var geometry = new THREE.Geometry();
-
-		var vertices = this.vertices;
-
-		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
-
-			geometry.vertices.push( vertices[ i ].clone() );
-
-		}
+	sortFacesByMaterialIndex: function () {
 
 		var faces = this.faces;
+		var length = faces.length;
 
-		for ( var i = 0, il = faces.length; i < il; i ++ ) {
+		// tag faces
 
-			geometry.faces.push( faces[ i ].clone() );
+		for ( var i = 0; i < length; i ++ ) {
+
+			faces[ i ]._id = i;
 
 		}
 
-		var uvs = this.faceVertexUvs[ 0 ];
+		// sort faces
 
-		for ( var i = 0, il = uvs.length; i < il; i ++ ) {
+		function materialIndexSort( a, b ) {
 
-			var uv = uvs[ i ], uvCopy = [];
+			return a.materialIndex - b.materialIndex;
 
-			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
+		}
 
-				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
+		faces.sort( materialIndexSort );
+
+		// sort uvs
+
+		var uvs1 = this.faceVertexUvs[ 0 ];
+		var uvs2 = this.faceVertexUvs[ 1 ];
+
+		var newUvs1, newUvs2;
+
+		if ( uvs1 && uvs1.length === length ) newUvs1 = [];
+		if ( uvs2 && uvs2.length === length ) newUvs2 = [];
+
+		for ( var i = 0; i < length; i ++ ) {
+
+			var id = faces[ i ]._id;
+
+			if ( newUvs1 ) newUvs1.push( uvs1[ id ] );
+			if ( newUvs2 ) newUvs2.push( uvs2[ id ] );
+
+		}
+
+		if ( newUvs1 ) this.faceVertexUvs[ 0 ] = newUvs1;
+		if ( newUvs2 ) this.faceVertexUvs[ 1 ] = newUvs2;
+
+	},
+
+	toJSON: function () {
+
+		var data = {
+			metadata: {
+				version: 4.4,
+				type: 'Geometry',
+				generator: 'Geometry.toJSON'
+			}
+		};
+
+		// standard Geometry serialization
+
+		data.uuid = this.uuid;
+		data.type = this.type;
+		if ( this.name !== '' ) data.name = this.name;
+
+		if ( this.parameters !== undefined ) {
+
+			var parameters = this.parameters;
+
+			for ( var key in parameters ) {
+
+				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
 
 			}
 
-			geometry.faceVertexUvs[ 0 ].push( uvCopy );
+			return data;
 
 		}
 
-		return geometry;
+		var vertices = [];
+
+		for ( var i = 0; i < this.vertices.length; i ++ ) {
+
+			var vertex = this.vertices[ i ];
+			vertices.push( vertex.x, vertex.y, vertex.z );
+
+		}
+
+		var faces = [];
+		var normals = [];
+		var normalsHash = {};
+		var colors = [];
+		var colorsHash = {};
+		var uvs = [];
+		var uvsHash = {};
+
+		for ( var i = 0; i < this.faces.length; i ++ ) {
+
+			var face = this.faces[ i ];
+
+			var hasMaterial = false; // face.materialIndex !== undefined;
+			var hasFaceUv = false; // deprecated
+			var hasFaceVertexUv = this.faceVertexUvs[ 0 ][ i ] !== undefined;
+			var hasFaceNormal = face.normal.length() > 0;
+			var hasFaceVertexNormal = face.vertexNormals.length > 0;
+			var hasFaceColor = face.color.r !== 1 || face.color.g !== 1 || face.color.b !== 1;
+			var hasFaceVertexColor = face.vertexColors.length > 0;
+
+			var faceType = 0;
+
+			faceType = setBit( faceType, 0, 0 );
+			faceType = setBit( faceType, 1, hasMaterial );
+			faceType = setBit( faceType, 2, hasFaceUv );
+			faceType = setBit( faceType, 3, hasFaceVertexUv );
+			faceType = setBit( faceType, 4, hasFaceNormal );
+			faceType = setBit( faceType, 5, hasFaceVertexNormal );
+			faceType = setBit( faceType, 6, hasFaceColor );
+			faceType = setBit( faceType, 7, hasFaceVertexColor );
+
+			faces.push( faceType );
+			faces.push( face.a, face.b, face.c );
+
+			if ( hasFaceVertexUv ) {
+
+				var faceVertexUvs = this.faceVertexUvs[ 0 ][ i ];
+
+				faces.push(
+					getUvIndex( faceVertexUvs[ 0 ] ),
+					getUvIndex( faceVertexUvs[ 1 ] ),
+					getUvIndex( faceVertexUvs[ 2 ] )
+				);
+
+			}
+
+			if ( hasFaceNormal ) {
+
+				faces.push( getNormalIndex( face.normal ) );
+
+			}
+
+			if ( hasFaceVertexNormal ) {
+
+				var vertexNormals = face.vertexNormals;
+
+				faces.push(
+					getNormalIndex( vertexNormals[ 0 ] ),
+					getNormalIndex( vertexNormals[ 1 ] ),
+					getNormalIndex( vertexNormals[ 2 ] )
+				);
+
+			}
+
+			if ( hasFaceColor ) {
+
+				faces.push( getColorIndex( face.color ) );
+
+			}
+
+			if ( hasFaceVertexColor ) {
+
+				var vertexColors = face.vertexColors;
+
+				faces.push(
+					getColorIndex( vertexColors[ 0 ] ),
+					getColorIndex( vertexColors[ 1 ] ),
+					getColorIndex( vertexColors[ 2 ] )
+				);
+
+			}
+
+		}
+
+		function setBit( value, position, enabled ) {
+
+			return enabled ? value | ( 1 << position ) : value & ( ~ ( 1 << position ) );
+
+		}
+
+		function getNormalIndex( normal ) {
+
+			var hash = normal.x.toString() + normal.y.toString() + normal.z.toString();
+
+			if ( normalsHash[ hash ] !== undefined ) {
+
+				return normalsHash[ hash ];
+
+			}
+
+			normalsHash[ hash ] = normals.length / 3;
+			normals.push( normal.x, normal.y, normal.z );
+
+			return normalsHash[ hash ];
+
+		}
+
+		function getColorIndex( color ) {
+
+			var hash = color.r.toString() + color.g.toString() + color.b.toString();
+
+			if ( colorsHash[ hash ] !== undefined ) {
+
+				return colorsHash[ hash ];
+
+			}
+
+			colorsHash[ hash ] = colors.length;
+			colors.push( color.getHex() );
+
+			return colorsHash[ hash ];
+
+		}
+
+		function getUvIndex( uv ) {
+
+			var hash = uv.x.toString() + uv.y.toString();
+
+			if ( uvsHash[ hash ] !== undefined ) {
+
+				return uvsHash[ hash ];
+
+			}
+
+			uvsHash[ hash ] = uvs.length / 2;
+			uvs.push( uv.x, uv.y );
+
+			return uvsHash[ hash ];
+
+		}
+
+		data.data = {};
+
+		data.data.vertices = vertices;
+		data.data.normals = normals;
+		if ( colors.length > 0 ) data.data.colors = colors;
+		if ( uvs.length > 0 ) data.data.uvs = [ uvs ]; // temporal backward compatibility
+		data.data.faces = faces;
+
+		return data;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
+	copy: function ( source ) {
+
+		this.vertices = [];
+		this.faces = [];
+		this.faceVertexUvs = [ [] ];
+
+		var vertices = source.vertices;
+
+		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+
+			this.vertices.push( vertices[ i ].clone() );
+
+		}
+
+		var faces = source.faces;
+
+		for ( var i = 0, il = faces.length; i < il; i ++ ) {
+
+			this.faces.push( faces[ i ].clone() );
+
+		}
+
+		for ( var i = 0, il = source.faceVertexUvs.length; i < il; i ++ ) {
+
+			var faceVertexUvs = source.faceVertexUvs[ i ];
+
+			if ( this.faceVertexUvs[ i ] === undefined ) {
+
+				this.faceVertexUvs[ i ] = [];
+
+			}
+
+			for ( var j = 0, jl = faceVertexUvs.length; j < jl; j ++ ) {
+
+				var uvs = faceVertexUvs[ j ], uvsCopy = [];
+
+				for ( var k = 0, kl = uvs.length; k < kl; k ++ ) {
+
+					var uv = uvs[ k ];
+
+					uvsCopy.push( uv.clone() );
+
+				}
+
+				this.faceVertexUvs[ i ].push( uvsCopy );
+
+			}
+
+		}
+
+		return this;
 
 	},
 

@@ -39,6 +39,9 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/loaders/collada/Animation.js"></script>
+		<script src="js/loaders/collada/AnimationHandler.js"></script>
+		<script src="js/loaders/collada/KeyFrameAnimation.js"></script>
 
 		<script src="js/loaders/ColladaLoader.js"></script>
 
@@ -53,10 +56,10 @@
 
 			var camera, scene, renderer, objects;
 			var particleLight, pointLight;
-			var dae, skin;
+			var dae;
 
 			var clock = new THREE.Clock();
-			var morphs = [];
+			var mixers = [];
 
 			// Collada model
 
@@ -65,7 +68,17 @@
 			loader.load( 'models/collada/monster/monster.dae', function ( collada ) {
 
 				dae = collada.scene;
-				skin = collada.skins[ 0 ];
+
+				dae.traverse( function ( child ) {
+
+					if ( child instanceof THREE.SkinnedMesh ) {
+
+						var animation = new THREE.Animation( child, child.geometry.animation );
+						animation.play();
+
+					}
+
+				} );
 
 				dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
 				dae.position.x = -1;
@@ -97,7 +110,6 @@
 					var material = materials[ 0 ];
 					material.morphTargets = true;
 					material.color.setHex( 0xffaaaa );
-					material.ambient.setHex( 0x222222 );
 
 					var faceMaterial = new THREE.MeshFaceMaterial( materials );
 
@@ -112,28 +124,26 @@
 
 						if ( Math.abs( x ) < 2 && Math.abs( z ) < 2 ) continue;
 
-						morph = new THREE.MorphAnimMesh( geometry, faceMaterial );
-
-						// one second duration
-
-						morph.duration = 1000;
-
-						// random animation offset
-
-						morph.time = 1000 * Math.random();
+						mesh = new THREE.Mesh( geometry, faceMaterial );
 
 						var s = THREE.Math.randFloat( 0.00075, 0.001 );
-						morph.scale.set( s, s, s );
+						mesh.scale.set( s, s, s );
 
-						morph.position.set( x, 0, z );
-						morph.rotation.y = THREE.Math.randFloat( -0.25, 0.25 );
+						mesh.position.set( x, 0, z );
+						mesh.rotation.y = THREE.Math.randFloat( -0.25, 0.25 );
 
-						morph.matrixAutoUpdate = false;
-						morph.updateMatrix();
+						mesh.matrixAutoUpdate = false;
+						mesh.updateMatrix();
 
-						scene.add( morph );
+						scene.add( mesh );
+						
+						var mixer = new THREE.AnimationMixer( mesh );
+						mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( 1 ) );
 
-						morphs.push( morph );
+						// random animation offset
+						mixer.update( 1000 * Math.random() );
+
+						mixers.push( mixer );
 
 					}
 
@@ -155,8 +165,8 @@
 				// Renderer
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				// Stats
@@ -183,47 +193,22 @@
 
 			//
 
-			var t = 0;
 			function animate() {
 
 				requestAnimationFrame( animate );
 
-				// animate Collada model
-
-				if ( t > 30 ) t = 0;
-
-				if ( skin ) {
-
-					// guess this can be done smarter...
-
-					// (Indeed, there are way more frames than needed and interpolation is not used at all
-					//  could be something like - one morph per each skinning pose keyframe, or even less,
-					//  animation could be resampled, morphing interpolation handles sparse keyframes quite well.
-					//  Simple animation cycles like this look ok with 10-15 frames instead of 100 ;)
-
-					for ( var i = 0; i < skin.morphTargetInfluences.length; i++ ) {
-
-						skin.morphTargetInfluences[ i ] = 0;
-
-					}
-
-					skin.morphTargetInfluences[ Math.floor( t ) ] = 1;
-
-					t += 0.5;
-
-				}
-
-				// animate morphs
-
 				var delta = clock.getDelta();
 
-				if ( morphs.length ) {
+				// animate Collada model
 
-					for ( var i = 0; i < morphs.length; i ++ )
-						morphs[ i ].updateAnimation( 1000 * delta );
+				THREE.AnimationHandler.update( delta );
 
+				for ( var i = 0; i < mixers.length; i ++ ) {
+
+					mixers[ i ].update( delta );
 
 				}
+
 
 				render();
 				stats.update();

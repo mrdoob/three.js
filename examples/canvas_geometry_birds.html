@@ -29,9 +29,13 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - birds demo</div>
 
 		<script src="../build/three.min.js"></script>
-		<script src="obj/Bird.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
+
+		<script src="obj/Bird.js"></script>
 
 		<script>
 
@@ -51,13 +55,13 @@
 
 					_goal = target;
 
-				}
+				};
 
 				this.setAvoidWalls = function ( value ) {
 
 					_avoidWalls = value;
 
-				}
+				};
 
 				this.setWorldSize = function ( width, height, depth ) {
 
@@ -65,7 +69,7 @@
 					_height = height;
 					_depth = depth;
 
-				}
+				};
 
 				this.run = function ( boids ) {
 
@@ -116,7 +120,7 @@
 
 					this.move();
 
-				}
+				};
 
 				this.flock = function ( boids ) {
 
@@ -130,7 +134,7 @@
 					_acceleration.add( this.cohesion( boids ) );
 					_acceleration.add( this.separation( boids ) );
 
-				}
+				};
 
 				this.move = function () {
 
@@ -147,7 +151,7 @@
 					this.position.add( this.velocity );
 					_acceleration.set( 0, 0, 0 );
 
-				}
+				};
 
 				this.checkBounds = function () {
 
@@ -158,7 +162,7 @@
 					if ( this.position.z >  _depth ) this.position.z = - _depth;
 					if ( this.position.z < - _depth ) this.position.z =  _depth;
 
-				}
+				};
 
 				//
 
@@ -173,7 +177,7 @@
 
 					return steer;
 
-				}
+				};
 
 				this.repulse = function ( target ) {
 
@@ -190,7 +194,7 @@
 
 					}
 
-				}
+				};
 
 				this.reach = function ( target, amount ) {
 
@@ -201,7 +205,7 @@
 
 					return steer;
 
-				}
+				};
 
 				this.alignment = function ( boids ) {
 
@@ -241,7 +245,7 @@
 
 					return velSum;
 
-				}
+				};
 
 				this.cohesion = function ( boids ) {
 
@@ -284,7 +288,7 @@
 
 					return steer;
 
-				}
+				};
 
 				this.separation = function ( boids ) {
 
@@ -359,14 +363,14 @@
 
 					bird = birds[ i ] = new THREE.Mesh( new Bird(), new THREE.MeshBasicMaterial( { color:Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
 					bird.phase = Math.floor( Math.random() * 62.83 );
-					bird.position = boids[ i ].position;
 					scene.add( bird );
 
 
 				}
 
 				renderer = new THREE.CanvasRenderer();
-				// renderer.autoClear = false;
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -429,6 +433,7 @@
 					boid.run( boids );
 
 					bird = birds[ i ];
+					bird.position.copy( boids[ i ].position );
 
 					color = bird.material.color;
 					color.r = color.g = color.b = ( 500 - bird.position.z ) / 1000;

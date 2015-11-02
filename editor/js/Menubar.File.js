@@ -1,56 +1,48 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.File = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
-	container.onMouseOver( function () { options.setDisplay( 'block' ) } );
-	container.onMouseOut( function () { options.setDisplay( 'none' ) } );
-	container.onClick( function () { options.setDisplay( 'block' ) } );
 
 	var title = new UI.Panel();
-	title.setTextContent( 'File' ).setColor( '#666' );
-	title.setMargin( '0px' );
-	title.setPadding( '8px' );
+	title.setClass( 'title' );
+	title.setTextContent( 'File' );
 	container.add( title );
-
-	//
 
 	var options = new UI.Panel();
 	options.setClass( 'options' );
-	options.setDisplay( 'none' );
 	container.add( options );
 
-	// new
+	// New
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'New' );
 	option.onClick( function () {
 
-		if ( confirm( 'Are you sure?' ) ) {
+		if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
-			if ( localStorage.threejsEditor !== undefined ) {
-
-				delete localStorage.threejsEditor;
-
-			}
-
-			location.href = location.pathname;
+			editor.clear();
 
 		}
 
 	} );
 	options.add( option );
 
+	//
+
 	options.add( new UI.HorizontalRule() );
 
+	// Import
 
-	// import
+	var fileInput = document.createElement( 'input' );
+	fileInput.type = 'file';
+	fileInput.addEventListener( 'change', function ( event ) {
 
-	var input = document.createElement( 'input' );
-	input.type = 'file';
-	input.addEventListener( 'change', function ( event ) {
-
-		editor.loader.loadFile( input.files[ 0 ] );
+		editor.loader.loadFile( fileInput.files[ 0 ] );
 
 	} );
 
@@ -59,162 +51,255 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Import' );
 	option.onClick( function () {
 
-		input.click();
+		fileInput.click();
 
 	} );
 	options.add( option );
 
+	//
+
 	options.add( new UI.HorizontalRule() );
 
-
-	// export geometry
+	// Export Geometry
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Geometry' );
 	option.onClick( function () {
 
-		exportGeometry( THREE.GeometryExporter );
+		var object = editor.selected;
+
+		if ( object === null ) {
+
+			alert( 'No object selected.' );
+			return;
+
+		}
+
+		var geometry = object.geometry;
+
+		if ( geometry === undefined ) {
+
+			alert( 'The selected object doesn\'t have geometry.' );
+			return;
+
+		}
+
+		var output = geometry.toJSON();
+
+		try {
+			output = JSON.stringify( output, null, '\t' );
+			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+		} catch ( e ) {
+			output = JSON.stringify( output );
+		}
+
+		exportString( output, 'geometry.json' );
 
 	} );
 	options.add( option );
 
-	/*
-
-	// export scene
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Export Scene' );
-	option.onClick( function () {
-
-		exportScene( THREE.SceneExporter );
-
-	} );
-	options.add( option );
-
-	*/
-
-	// export object
+	// Export Object
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Object' );
 	option.onClick( function () {
 
-		exportObject( THREE.ObjectExporter );
+		var object = editor.selected;
+
+		if ( object === null ) {
+
+			alert( 'No object selected' );
+			return;
+
+		}
+
+		var output = object.toJSON();
+
+		try {
+			output = JSON.stringify( output, null, '\t' );
+			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+		} catch ( e ) {
+			output = JSON.stringify( output );
+		}
+
+		exportString( output, 'model.json' );
 
 	} );
 	options.add( option );
 
-	// export scene
+	// Export Scene
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Scene' );
 	option.onClick( function () {
 
-		exportScene( THREE.ObjectExporter );
+		var output = editor.scene.toJSON();
+
+		try {
+			output = JSON.stringify( output, null, '\t' );
+			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+		} catch ( e ) {
+			output = JSON.stringify( output );
+		}
+
+		exportString( output, 'scene.json' );
 
 	} );
 	options.add( option );
 
-	// export OBJ
+	// Export OBJ
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export OBJ' );
 	option.onClick( function () {
 
-		exportGeometry( THREE.OBJExporter );
-
-	} );
-	options.add( option );
-
-	var exportGeometry = function ( exporterClass ) {
-
 		var object = editor.selected;
 
-		if ( object.geometry === undefined ) {
+		if ( object === null ) {
 
-			alert( "Selected object doesn't have any geometry" );
+			alert( 'No object selected.' );
 			return;
 
 		}
 
-		var exporter = new exporterClass();
+		var exporter = new THREE.OBJExporter();
 
-		var output;
+		exportString( exporter.parse( object ), 'model.obj' );
 
-		if ( exporter instanceof THREE.GeometryExporter ) {
+	} );
+	options.add( option );
 
-			output = JSON.stringify( exporter.parse( object.geometry ), null, '\t' );
-			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		} else {
-
-			output = exporter.parse( object.geometry );
-
-		}
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	};
-
-	var exportObject = function ( exporterClass ) {
-
-		var exporter = new exporterClass();
-
-		var object = editor.selected;
-
-		var output = JSON.stringify( exporter.parse( object ), null, '\t' );
-		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	};
-
-	var exportScene = function ( exporterClass ) {
-
-		var exporter = new exporterClass();
-
-		var output = JSON.stringify( exporter.parse( editor.scene ), null, '\t' );
-		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	};
-
-	options.add( new UI.HorizontalRule() );
-
-
-	// share
+	// Export STL
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
-	option.setTextContent( 'Share' );
+	option.setTextContent( 'Export STL' );
 	option.onClick( function () {
 
-		var exporter = new THREE.ObjectExporter();
-		var string = JSON.stringify( exporter.parse( editor.scene ) );
-		window.location.hash = 'A/' + window.btoa( RawDeflate.deflate( string ) );
+		var exporter = new THREE.STLExporter();
+
+		exportString( exporter.parse( editor.scene ), 'model.stl' );
+
+	} );
+	options.add( option );
+
+	//
+
+	options.add( new UI.HorizontalRule() );
+
+	// Publish
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Publish' );
+	option.onClick( function () {
+
+		var camera = editor.camera;
+
+		var zip = new JSZip();
+
+		zip.file( 'index.html', [
+
+			'<!DOCTYPE html>',
+			'<html lang="en">',
+			'	<head>',
+			'		<title>three.js</title>',
+			'		<meta charset="utf-8">',
+			'		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">',
+			'		<style>',
+			'		body {',
+			'			margin: 0px;',
+			'			overflow: hidden;',
+			'		}',
+			'		</style>',
+			'	</head>',
+			'	<body ontouchstart="">',
+			'		<script src="js/three.min.js"></script>',
+			'		<script src="js/app.js"></script>',
+			'		<script>',
+			'',
+			'			var loader = new THREE.XHRLoader();',
+			'			loader.load( \'app.json\', function ( text ) {',
+			'',
+			'				var player = new APP.Player();',
+			'				player.load( JSON.parse( text ) );',
+			'				player.setSize( window.innerWidth, window.innerHeight );',
+			'				player.play();',
+			'',
+			'				document.body.appendChild( player.dom );',
+			'',
+			'				window.addEventListener( \'resize\', function () {',
+			'					player.setSize( window.innerWidth, window.innerHeight );',
+			'				} );',
+			'',
+			'			} );',
+			'',
+			'		</script>',
+			'	</body>',
+			'</html>'
+
+		].join( '\n' ) );
+
+		//
+
+		var output = editor.toJSON();
+		output = JSON.stringify( output, null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
+		zip.file( 'app.json', output );
+
+		//
+
+		var manager = new THREE.LoadingManager( function () {
+
+			location.href = 'data:application/zip;base64,' + zip.generate();
+
+		} );
+
+		var loader = new THREE.XHRLoader( manager );
+		loader.load( 'js/libs/app.js', function ( content ) {
+
+			zip.file( 'js/app.js', content );
+
+		} );
+		loader.load( '../build/three.min.js', function ( content ) {
+
+			zip.file( 'js/three.min.js', content );
+
+		} );
 
 	} );
 	options.add( option );
 
 
+	//
+
+	var link = document.createElement( 'a' );
+	link.style.display = 'none';
+	document.body.appendChild( link ); // Firefox workaround, see #6594
+
+	var exportString = function ( output, filename ) {
+
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
+
+		link.href = objectURL;
+		link.download = filename || 'data.json';
+		link.target = '_blank';
+
+		var event = document.createEvent("MouseEvents");
+		event.initMouseEvent(
+			"click", true, false, window, 0, 0, 0, 0, 0
+			, false, false, false, false, 0, null
+		);
+		link.dispatchEvent(event);
+
+	};
+
 	return container;
 
-}
+};

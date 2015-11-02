@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - sea3d / keyframe</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+
+			}
+
+			a { color: white }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<div id="description">Click to play</div>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/ColorCorrectionShader.js"></script>
+		<script src="js/shaders/VignetteShader.js"></script>
+
+		<script src="js/MorphAnimMesh.js"></script>
+		<script src="js/loaders/collada/Animation.js"></script>
+
+		<script src="js/loaders/sea3d/SEA3D.js"></script>
+		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
+		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer, composer, controls, demoAt = -1;
+
+			var loader;
+
+			// Initialize Three.JS
+
+			init();
+
+			//
+			// SEA3D Loader
+			//
+
+			loader = new THREE.SEA3D( {
+
+				autoPlay : false, // Manual play animations
+				container : scene // Container to add models
+
+			} );
+
+			loader.onComplete = function( e ) {
+
+				// Get the first camera from 3ds Max
+				// use loader.get... to get others objects
+
+				var cam = loader.cameras[0];
+				camera.position.copy( cam.position );
+				camera.rotation.copy( cam.rotation );
+
+				controls = new THREE.OrbitControls( camera );
+
+				// reset global animation time
+				SEA3D.AnimationHandler.setTime( 0 );
+
+				// events
+
+				window.addEventListener('click', onMouseClick, false);
+
+				animate();
+
+			};
+
+			loader.load( './models/sea3d/keyframe.tjs.sea' );
+
+			//
+			//	Animation Functions
+			//
+
+			function playAll(name, crossfade, offset) {
+
+				// reset global time
+				SEA3D.AnimationHandler.setTime( 0 );
+
+				// play all animations
+				for(var i = 0; i < loader.meshes.length; i++) {
+					if (loader.meshes[i].animation)
+						loader.meshes[i].animation.play(name, crossfade, offset);
+				}
+
+			}
+
+			function setTimeScale( timeScale ) {
+
+				// set in all active animations
+				for(var i in SEA3D.AnimationHandler.animations) {
+					SEA3D.AnimationHandler.animations[i].timeScale = timeScale;
+				}
+
+			}
+
+			function stopAll() {
+
+				// reset global time
+				SEA3D.AnimationHandler.setTime( 0 );
+
+				// stop all active animations
+				SEA3D.AnimationHandler.stop();
+
+			}
+
+			//
+
+			function init() {
+
+				scene = new THREE.Scene();
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 1000, - 300, 1000 );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x333333, 1 );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				// post-processing
+
+				composer = new THREE.EffectComposer( renderer );
+
+				var renderPass = new THREE.RenderPass( scene, camera );
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				composer.addPass( renderPass );
+
+				var vh = 1.4, vl = 1.2;
+
+				var colorCorrectionPass = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
+				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
+				composer.addPass( colorCorrectionPass );
+
+				var vignettePass = new THREE.ShaderPass( THREE.VignetteShader );
+				vignettePass.uniforms[ "darkness" ].value = 1.0;
+				composer.addPass( vignettePass );
+
+				composer.addPass( copyPass );
+				copyPass.renderToScreen = true;
+
+				// extra lights
+
+				scene.add( new THREE.AmbientLight( 0x333333 ) );
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				composer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function description(msg) {
+
+				document.getElementById('description').innerHTML = (demoAt + 1) + " - " + msg;
+
+			}
+
+			function onMouseClick( e ) {
+
+				// 0 at 3 demos
+
+				switch( demoAt = ++demoAt % 4 ) {
+
+					// play all animation to sequence "crash#1"
+
+					case 0:
+
+						playAll("crash#1", .5);
+						setTimeScale(1);
+
+						description("crash#1 - crossfade 0.5 seconds");
+
+						break;
+
+					// play all animation to sequence "crash#2"
+
+					case 1:
+
+						playAll("crash#2", .5);
+
+						description("crash#2 - crossfade 0.5 seconds");
+
+						break;
+
+					// play animation in single object
+
+					case 2:
+
+						stopAll();
+
+						var fracture99 = loader.getMesh("Object099");
+
+						//fracture99.animation.time = 0;
+						//fracture99.animation.timeScale = 1;
+						//fracture99.animation.playing
+						//fracture99.animation.states ...
+						//fracture99.animation.currentState ...
+
+						//fracture99.animation.node ...
+						//fracture99.animation.node.duration
+
+						fracture99.animation.play("crash#2", .5, 0);
+						//fracture99.animation.pause();
+						//fracture99.animation.stop();
+
+						description("crash#2 in single object - crossfade 0.5 seconds");
+
+						break;
+
+					// set time scale
+
+					case 3:
+
+						playAll("crash#2", .5);
+						setTimeScale(.1);
+
+						description("time scale / 10 - crossfade 0.5 seconds");
+
+						break;
+				}
+			}
+
+			//
+
+			var clock = new THREE.Clock();
+
+			function animate() {
+
+				var delta = clock.getDelta();
+
+				requestAnimationFrame( animate );
+
+				// Update SEA3D Animations
+				THREE.SEA3D.AnimationHandler.update( delta );
+
+				render( delta );
+
+				stats.update();
+
+			}
+
+			function render( dlt ) {
+
+				//renderer.render( scene, camera );
+				composer.render( dlt );
+
+			}
+
+		</script>
+	</body>
+</html>

@@ -128,19 +128,19 @@
 
 				// MATERIALS
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, ambient: 0x444444, map: texture } );
-				var objectMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, ambient: 0x111111, specular: 0xffffff, metal: true, map: texture2 } );
+				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture } );
+				var objectMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xffffff, metal: true, map: texture2 } );
 
 				// GROUND
 
-				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 800, 400, 2, 2 ), groundMaterial );
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 800, 400, 2, 2 ), groundMaterial );
 				mesh.position.y = -5;
 				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
 				// OBJECTS
 
-				//var objectGeometry = new THREE.CubeGeometry( 0.5, 1, 1 );
+				//var objectGeometry = new THREE.BoxGeometry( 0.5, 1, 1 );
 				//var objectGeometry = new THREE.SphereGeometry( 1.5, 16, 8 );
 				var objectGeometry = new THREE.TorusGeometry( 1.5, 0.4, 8, 16 );
 
@@ -170,65 +170,46 @@
 				var c1 = 0xff0040, c2 = 0x0040ff, c3 = 0x80ff80, c4 = 0xffaa00, c5 = 0x00ffaa, c6 = 0xff1100;
 				//var c1 = 0xffffff, c2 = 0xffffff, c3 = 0xffffff, c4 = 0xffffff, c5 = 0xffffff, c6 = 0xffffff;
 
+				var sphere = new THREE.SphereGeometry( 0.25, 16, 8 );
+
 				light1 = new THREE.PointLight( c1, intensity, distance );
+				light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c1 } ) ) );
 				scene.add( light1 );
 
 				light2 = new THREE.PointLight( c2, intensity, distance );
+				light2.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c2 } ) ) );
 				scene.add( light2 );
 
 				light3 = new THREE.PointLight( c3, intensity, distance );
+				light3.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c3 } ) ) );
 				scene.add( light3 );
 
 				light4 = new THREE.PointLight( c4, intensity, distance );
+				light4.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c4 } ) ) );
 				scene.add( light4 );
 
 				light5 = new THREE.PointLight( c5, intensity, distance );
+				light5.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c5 } ) ) );
 				scene.add( light5 );
 
 				light6 = new THREE.PointLight( c6, intensity, distance );
+				light6.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c6 } ) ) );
 				scene.add( light6 );
 
 				var dlight = new THREE.DirectionalLight( 0xffffff, 0.1 );
 				dlight.position.set( 0.5, -1, 0 ).normalize();
 				scene.add( dlight );
 
-				var sphere = new THREE.SphereGeometry( 0.25, 16, 8 );
-
-				var l1 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c1 } ) );
-				l1.position = light1.position;
-				scene.add( l1 );
-
-				var l2 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c2 } ) );
-				l2.position = light2.position;
-				scene.add( l2 );
-
-				var l3 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c3 } ) );
-				l3.position = light3.position;
-				scene.add( l3 );
-
-				var l4 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c4 } ) );
-				l4.position = light4.position;
-				scene.add( l4 );
-
-				var l5 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c5 } ) );
-				l5.position = light5.position;
-				scene.add( l5 );
-
-				var l6 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c6 } ) );
-				l6.position = light6.position;
-				scene.add( l6 );
-
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x030303, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( scene.fog.color, 1 );
-
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				// STATS
 

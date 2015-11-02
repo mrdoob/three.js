@@ -4,37 +4,49 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
+THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	THREE.Geometry.call( this );
+
+	this.type = 'PolyhedronGeometry';
+
+	this.parameters = {
+		vertices: vertices,
+		indices: indices,
+		radius: radius,
+		detail: detail
+	};
 
 	radius = radius || 1;
 	detail = detail || 0;
 
 	var that = this;
 
-	for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+	for ( var i = 0, l = vertices.length; i < l; i += 3 ) {
 
-		prepare( new THREE.Vector3( vertices[ i ][ 0 ], vertices[ i ][ 1 ], vertices[ i ][ 2 ] ) );
+		prepare( new THREE.Vector3( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] ) );
 
 	}
 
-	var midpoints = [], p = this.vertices;
+	var p = this.vertices;
 
-	var f = [];
+	var faces = [];
+
+	for ( var i = 0, j = 0, l = indices.length; i < l; i += 3, j ++ ) {
+
+		var v1 = p[ indices[ i ] ];
+		var v2 = p[ indices[ i + 1 ] ];
+		var v3 = p[ indices[ i + 2 ] ];
+
+		faces[ j ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ], undefined, j );
+
+	}
+
+	var centroid = new THREE.Vector3();
+
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
-		var v1 = p[ faces[ i ][ 0 ] ];
-		var v2 = p[ faces[ i ][ 1 ] ];
-		var v3 = p[ faces[ i ][ 2 ] ];
-
-		f[ i ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
-
-	}
-
-	for ( var i = 0, l = f.length; i < l; i ++ ) {
-
-		subdivide(f[ i ], detail);
+		subdivide( faces[ i ], detail );
 
 	}
 
@@ -49,10 +61,12 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 		var x1 = uvs[ 1 ].x;
 		var x2 = uvs[ 2 ].x;
 
-		var max = Math.max( x0, Math.max( x1, x2 ) );
-		var min = Math.min( x0, Math.min( x1, x2 ) );
+		var max = Math.max( x0, x1, x2 );
+		var min = Math.min( x0, x1, x2 );
 
-		if ( max > 0.9 && min < 0.1 ) { // 0.9 is somewhat arbitrary
+		if ( max > 0.9 && min < 0.1 ) {
+
+			// 0.9 is somewhat arbitrary
 
 			if ( x0 < 0.2 ) uvs[ 0 ].x += 1;
 			if ( x1 < 0.2 ) uvs[ 1 ].x += 1;
@@ -75,8 +89,6 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 	// Merge vertices
 
 	this.mergeVertices();
-
-	this.computeCentroids();
 
 	this.computeFaceNormals();
 
@@ -103,13 +115,14 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	// Approximate a curved face with recursively sub-divided triangles.
 
-	function make( v1, v2, v3 ) {
+	function make( v1, v2, v3, materialIndex ) {
 
-		var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
-		face.centroid.add( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
+		var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ], undefined, materialIndex );
 		that.faces.push( face );
 
-		var azi = azimuth( face.centroid );
+		centroid.copy( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
+
+		var azi = azimuth( centroid );
 
 		that.faceVertexUvs[ 0 ].push( [
 			correctUV( v1.uv, v1, azi ),
@@ -122,14 +135,15 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	// Analytically subdivide a face to the required detail level.
 
-	function subdivide(face, detail ) {
+	function subdivide( face, detail ) {
 
-		var cols = Math.pow(2, detail);
-		var cells = Math.pow(4, detail);
+		var cols = Math.pow( 2, detail );
 		var a = prepare( that.vertices[ face.a ] );
 		var b = prepare( that.vertices[ face.b ] );
 		var c = prepare( that.vertices[ face.c ] );
 		var v = [];
+
+		var materialIndex = face.materialIndex;
 
 		// Construct all of the vertices for this subdivision.
 
@@ -141,9 +155,9 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 			var bj = prepare( b.clone().lerp( c, i / cols ) );
 			var rows = cols - i;
 
-			for ( var j = 0; j <= rows; j ++) {
+			for ( var j = 0; j <= rows; j ++ ) {
 
-				if ( j == 0 && i == cols ) {
+				if ( j === 0 && i === cols ) {
 
 					v[ i ][ j ] = aj;
 
@@ -161,24 +175,26 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 		for ( var i = 0; i < cols ; i ++ ) {
 
-			for ( var j = 0; j < 2 * (cols - i) - 1; j ++ ) {
+			for ( var j = 0; j < 2 * ( cols - i ) - 1; j ++ ) {
 
 				var k = Math.floor( j / 2 );
 
-				if ( j % 2 == 0 ) {
+				if ( j % 2 === 0 ) {
 
 					make(
-						v[ i ][ k + 1],
+						v[ i ][ k + 1 ],
 						v[ i + 1 ][ k ],
-						v[ i ][ k ]
+						v[ i ][ k ],
+						materialIndex
 					);
 
 				} else {
 
 					make(
 						v[ i ][ k + 1 ],
-						v[ i + 1][ k + 1],
-						v[ i + 1 ][ k ]
+						v[ i + 1 ][ k + 1 ],
+						v[ i + 1 ][ k ],
+						materialIndex
 					);
 
 				}
@@ -194,7 +210,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	function azimuth( vector ) {
 
-		return Math.atan2( vector.z, -vector.x );
+		return Math.atan2( vector.z, - vector.x );
 
 	}
 
@@ -203,7 +219,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	function inclination( vector ) {
 
-		return Math.atan2( -vector.y, Math.sqrt( ( vector.x * vector.x ) + ( vector.z * vector.z ) ) );
+		return Math.atan2( - vector.y, Math.sqrt( ( vector.x * vector.x ) + ( vector.z * vector.z ) ) );
 
 	}
 
@@ -222,3 +238,17 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 };
 
 THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.PolyhedronGeometry.prototype.constructor = THREE.PolyhedronGeometry;
+
+THREE.PolyhedronGeometry.prototype.clone = function () {
+
+	var parameters = this.parameters;
+
+	return new THREE.PolyhedronGeometry(
+		parameters.vertices,
+		parameters.indices,
+		parameters.radius,
+		parameters.detail
+	);
+
+};

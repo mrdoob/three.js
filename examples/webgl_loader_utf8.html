@@ -36,6 +36,7 @@
 
 		<script src="js/loaders/UTF8Loader.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
+		<script src="js/loaders/DDSLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -95,7 +96,7 @@
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
-				//directionalLight.shadowCameraVisible = true;
+				// directionalLight.shadowCameraVisible = true;
 
 				directionalLight.shadowMapWidth = 2048;
 				directionalLight.shadowMaHeight = 2048;
@@ -114,10 +115,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				renderer.setClearColor( scene.fog.color, 1 );
-
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
@@ -125,10 +125,9 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapType = THREE.PCFShadowMap;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
 
 				// STATS
 
@@ -139,6 +138,8 @@
 				container.appendChild( stats.domElement );
 
 				var start = Date.now();
+
+				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
 				var loader = new THREE.UTF8Loader();
 
@@ -157,13 +158,6 @@
 
 						node.castShadow = true;
 						node.receiveShadow = true;
-
-						if ( node.material && node.material.name === "skin" ) {
-
-							node.material.wrapAround = true;
-							node.material.wrapRGB.set( 0.6, 0.2, 0.1 );
-
-						}
 
 					} );
 
@@ -184,13 +178,6 @@
 
 						node.castShadow = true;
 						node.receiveShadow = true;
-
-						if ( node.material && ( node.material.name === "head" || node.material.name === "skinbody" ) ) {
-
-							node.material.wrapAround = true;
-							node.material.wrapRGB.set( 0.6, 0.2, 0.1 );
-
-						}
 
 					} );
 

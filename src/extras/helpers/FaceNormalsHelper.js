@@ -5,72 +5,106 @@
 
 THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 
+	// FaceNormalsHelper only supports THREE.Geometry
+
 	this.object = object;
 
-	this.size = size || 1;
+	this.size = ( size !== undefined ) ? size : 1;
 
-	var color = hex || 0xffff00;
+	var color = ( hex !== undefined ) ? hex : 0xffff00;
 
-	var width = linewidth || 1;
+	var width = ( linewidth !== undefined ) ? linewidth : 1;
 
-	var geometry = new THREE.Geometry();
+	//
 
-	var faces = this.object.geometry.faces;
+	var nNormals = 0;
 
-	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+	var objGeometry = this.object.geometry;
 
-		geometry.vertices.push( new THREE.Vector3() );
-		geometry.vertices.push( new THREE.Vector3() );
+	if ( objGeometry instanceof THREE.Geometry ) {
+
+		nNormals = objGeometry.faces.length;
+
+	} else {
+
+		console.warn( 'THREE.FaceNormalsHelper: only THREE.Geometry is supported. Use THREE.VertexNormalsHelper, instead.' );
 
 	}
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ), THREE.LinePieces );
+	//
+
+	var geometry = new THREE.BufferGeometry();
+
+	var positions = new THREE.Float32Attribute( nNormals * 2 * 3, 3 );
+
+	geometry.addAttribute( 'position', positions );
+
+	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ) );
+
+	//
 
 	this.matrixAutoUpdate = false;
-
-	this.normalMatrix = new THREE.Matrix3();
-
 	this.update();
 
 };
 
-THREE.FaceNormalsHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.FaceNormalsHelper.prototype = Object.create( THREE.LineSegments.prototype );
+THREE.FaceNormalsHelper.prototype.constructor = THREE.FaceNormalsHelper;
 
-THREE.FaceNormalsHelper.prototype.update = ( function ( object ) {
+THREE.FaceNormalsHelper.prototype.update = ( function () {
 
 	var v1 = new THREE.Vector3();
+	var v2 = new THREE.Vector3();
+	var normalMatrix = new THREE.Matrix3();
 
-	return function ( object ) {
+	return function update() {
 
 		this.object.updateMatrixWorld( true );
 
-		this.normalMatrix.getNormalMatrix( this.object.matrixWorld );
+		normalMatrix.getNormalMatrix( this.object.matrixWorld );
 
-		var vertices = this.geometry.vertices;
+		var matrixWorld = this.object.matrixWorld;
 
-		var faces = this.object.geometry.faces;
+		var position = this.geometry.attributes.position;
 
-		var worldMatrix = this.object.matrixWorld;
+		//
+
+		var objGeometry = this.object.geometry;
+
+		var vertices = objGeometry.vertices;
+
+		var faces = objGeometry.faces;
+
+		var idx = 0;
 
 		for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
 			var face = faces[ i ];
 
-			v1.copy( face.normal ).applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size );
+			var normal = face.normal;
 
-			var idx = 2 * i;
+			v1.copy( vertices[ face.a ] )
+				.add( vertices[ face.b ] )
+				.add( vertices[ face.c ] )
+				.divideScalar( 3 )
+				.applyMatrix4( matrixWorld );
 
-			vertices[ idx ].copy( face.centroid ).applyMatrix4( worldMatrix );
+			v2.copy( normal ).applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
 
-			vertices[ idx + 1 ].addVectors( vertices[ idx ], v1 );
+			position.setXYZ( idx, v1.x, v1.y, v1.z );
+
+			idx = idx + 1;
+
+			position.setXYZ( idx, v2.x, v2.y, v2.z );
+
+			idx = idx + 1;
 
 		}
 
-		this.geometry.verticesNeedUpdate = true;
+		position.needsUpdate = true;
 
 		return this;
 
 	}
 
-}());
-
+}() );

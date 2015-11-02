@@ -86,21 +86,20 @@
 				var material = new THREE.MeshLambertMaterial( { color:0xffffff, side: THREE.DoubleSide } );
 
 				var loader = new THREE.VTKLoader();
-				loader.addEventListener( 'load', function ( event ) {
+				loader.load( "models/vtk/bunny.vtk", function ( geometry ) {
 
-					var geometry = event.content;
+					geometry.computeVertexNormals();
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.setY( - 0.09 );
 					scene.add( mesh );
 
 				} );
-				loader.load( "models/vtk/bunny.vtk" );
 
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0x000000, 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container = document.createElement( 'div' );

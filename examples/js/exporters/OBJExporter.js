@@ -8,99 +8,141 @@ THREE.OBJExporter.prototype = {
 
 	constructor: THREE.OBJExporter,
 
-	parse: function ( geometry ) {
-
-		console.log( geometry );
+	parse: function ( object ) {
 
 		var output = '';
 
-		for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
+		var indexVertex = 0;
+		var indexVertexUvs = 0;
+		var indexNormals = 0;
 
-			var vertex = geometry.vertices[ i ];
-			output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+		var parseMesh = function ( mesh ) {
 
-		}
+			var nbVertex = 0;
+			var nbVertexUvs = 0;
+			var nbNormals = 0;
 
-		// uvs
+			var geometry = mesh.geometry;
 
-		for ( var i = 0, l = geometry.faceVertexUvs[ 0 ].length; i < l; i ++ ) {
+			if ( geometry instanceof THREE.Geometry ) {
 
-			var vertexUvs = geometry.faceVertexUvs[ 0 ][ i ];
+				output += 'o ' + mesh.name + '\n';
 
-			for ( var j = 0; j < vertexUvs.length; j ++ ) {
+				var vertices = geometry.vertices;
 
-				var uv = vertexUvs[ j ];
-				output += 'vt ' + uv.x + ' ' + uv.y + '\n';
+				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+
+					var vertex = vertices[ i ].clone();
+					vertex.applyMatrix4( mesh.matrixWorld );
+
+					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+
+					nbVertex ++;
+
+				}
+
+				// uvs
+
+				var faces = geometry.faces;
+				var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
+				var hasVertexUvs = faces.length === faceVertexUvs.length;
+
+				if ( hasVertexUvs ) {
+
+					for ( var i = 0, l = faceVertexUvs.length; i < l; i ++ ) {
+
+						var vertexUvs = faceVertexUvs[ i ];
+
+						for ( var j = 0, jl = vertexUvs.length; j < jl; j ++ ) {
+
+							var uv = vertexUvs[ j ];
+
+							output += 'vt ' + uv.x + ' ' + uv.y + '\n';
+
+							nbVertexUvs ++;
+
+						}
+
+					}
+
+				}
+
+				// normals
+
+				var normalMatrixWorld = new THREE.Matrix3();
+				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
+
+				for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+					var face = faces[ i ];
+					var vertexNormals = face.vertexNormals;
+
+					if ( vertexNormals.length === 3 ) {
+
+						for ( var j = 0, jl = vertexNormals.length; j < jl; j ++ ) {
+
+							var normal = vertexNormals[ j ].clone();
+							normal.applyMatrix3( normalMatrixWorld );
+
+							output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
+
+							nbNormals ++;
+
+						}
+
+					} else {
+
+						var normal = face.normal.clone();
+						normal.applyMatrix3( normalMatrixWorld );
+
+						for ( var j = 0; j < 3; j ++ ) {
+
+							output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
+
+							nbNormals ++;
+
+						}
+
+					}
+
+				}
+
+				// faces
+
+
+				for ( var i = 0, j = 1, l = faces.length; i < l; i ++, j += 3 ) {
+
+					var face = faces[ i ];
+
+					output += 'f ';
+					output += ( indexVertex + face.a + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j     ) : '' ) + '/' + ( indexNormals + j     ) + ' ';
+					output += ( indexVertex + face.b + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + 1 ) : '' ) + '/' + ( indexNormals + j + 1 ) + ' ';
+					output += ( indexVertex + face.c + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + 2 ) : '' ) + '/' + ( indexNormals + j + 2 ) + '\n';
+
+				}
+
+			} else {
+
+				console.warn( 'THREE.OBJExporter.parseMesh(): geometry type unsupported', mesh );
+				// TODO: Support only BufferGeometry and use use setFromObject()
 
 			}
 
-		}
+			// update index
+			indexVertex += nbVertex;
+			indexVertexUvs += nbVertexUvs;
+			indexNormals += nbNormals;
 
-		// normals
+		};
 
-		for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
+		object.traverse( function ( child ) {
 
-			var normals = geometry.faces[ i ].vertexNormals;
+			if ( child instanceof THREE.Mesh ) parseMesh( child );
 
-			for ( var j = 0; j < normals.length; j ++ ) {
-
-				var normal = normals[ j ];
-				output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
-
-			}
-
-		}
-
-		// map
-
-		var count = 1; // OBJ values start by 1
-		var map = [ count ];
-
-		for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
-
-			var face = geometry.faces[ i ];
-
-			if ( face instanceof THREE.Face3 ) {
-
-				count += 3;
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				count += 4;
-
-			}
-
-			map.push( count );
-
-		}
-
-		// faces
-
-		for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
-
-			var face = geometry.faces[ i ];
-
-			output += 'f ';
-
-			if ( face instanceof THREE.Face3 ) {
-
-				output += ( face.a + 1 ) + '/' + ( map[ i ] ) + '/' + ( map[ i ] ) + ' ';
-				output += ( face.b + 1 ) + '/' + ( map[ i ] + 1 ) + '/' + ( map[ i ] + 1 ) + ' ';
-				output += ( face.c + 1 ) + '/' + ( map[ i ] + 2 ) + '/' + ( map[ i ] + 2 ) + '\n';
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				output += ( face.a + 1 ) + '/' + ( map[ i ] ) + '/' + ( map[ i ] ) + ' ';
-				output += ( face.b + 1 ) + '/' + ( map[ i ] + 1 ) + '/' + ( map[ i ] + 1 ) + ' ';
-				output += ( face.c + 1 ) + '/' + ( map[ i ] + 2 ) + '/' + ( map[ i ] + 2 ) + ' ';
-				output += ( face.d + 1 ) + '/' + ( map[ i ] + 3 ) + '/' + ( map[ i ] + 3 ) + '\n';
-
-			}
-
-		}
+		} );
 
 		return output;
 
 	}
 
-}
+};

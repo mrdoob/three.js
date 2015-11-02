@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		This class stores data for an attribute associated with a [page:BufferGeometry]. See that page for details and a usage example. This class is used to store builtin attributes such as vertex position, normals, color, etc., but can also be used in your code to store custom attributes in a [page:BufferGeometry].
+		</div>
+
+		<h2>Constructor</h2>
+		<h3>[name]([page:Array array], [page:Integer itemSize])</h3>
+		<div>
+		Instantiates this attribute with data from the associated buffer. The array can either be a regular Array or a Typed Array.
+		itemSize gives the number of values of the array that should be associated with a particular vertex.
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array array]</h3>
+		<div>
+		Stores the data associated with this attribute; can be an Array or a Typed Array. This element should have <code>itemSize * numVertices</code> elements, where numVertices is the number of vertices in the associated [page:BufferGeometry geometry].
+		</div>
+
+		<h3>[property:Integer itemSize]</h3>
+		<div>
+		Records how many items of the array are associated with a particular vertex. For instance, if this
+		attribute is storing a 3-component vector (such as a position, normal, or color), then itemSize should be 3.
+		</div>
+
+		<h3>[property:Integer length]</h3>
+		<div>
+		Gives the total number of elements in the array.
+		</div>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<div>
+		Flag to indicate that this attribute has changed and should be re-send to the GPU. Set this to true when you modify the value of the array.
+		</div>
+
+		<h3>[property:Integer version]</h3>
+		<div>
+		A version number, incremented every time the needsUpdate property is set to true.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null copyAt] ( [page:Integer index1], attribute, [page:Integer index2] ) </h3>
+		<div>
+		Copies itemSize values in the array from the vertex at index2 to the vertex at index1.
+		</div>
+
+		<h3>[method:null set] ( [page:Array value] ) </h3>
+		<div>
+		Sets the associated array with values from the passed array.
+		</div>
+
+		<h3>[method:null setX]( index, x ) </h3>
+		<div>
+		Sets the value of the array at <code>index * itemSize</code> to x
+		</div>
+
+		<h3>[method:null setY]( index, y ) </h3>
+		<div>
+		Sets the value of the array at <code>index * itemSize + 1</code> to y
+		</div>
+
+		<h3>[method:null setZ]( index, z ) </h3>
+		<div>
+		Sets the value of the array at <code>index * itemSize + 2</code> to z
+		</div>
+
+		<h3>[method:null setXY]( index, x, y ) </h3>
+		<div>
+		Sets the value of the array at <code>index * itemSize</code> to x and
+		sets the value of the array at <code>index * itemSize + 1</code> to y
+		</div>
+
+		<h3>[method:null setXYZ]( index, x, y, z ) </h3>
+		<div>
+		Sets the value of the array at <code>index * itemSize</code> to x,
+		the value of the array at <code>index * itemSize + 1</code> to y, and
+		the value of the array at <code>index * itemSize + 2</code> to z.
+		</div>
+
+		<h3>[method:null setXYZW]( index, x, y, z, w ) </h3>
+		<div>
+		Sets the value of the array at <code>index * itemSize</code> to x,
+		the value of the array at <code>index * itemSize + 1</code> to y,
+		the value of the array at <code>index * itemSize + 2</code> to z, and
+		the value of the array at <code>index * itemSize + 3</code> to w.
+		</div>
+
+		<h3>[method:BufferAttribute clone]() </h3>
+		<div>
+		Copies this attribute.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

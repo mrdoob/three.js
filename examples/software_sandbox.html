@@ -18,6 +18,8 @@
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/SoftwareRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
@@ -68,7 +70,7 @@
 
 				// Plane
 
-				var geometry = new THREE.CubeGeometry( 200, 200, 200 );
+				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
 
 				for ( var i = 0, j = geometry.faces.length; i < j; i ++ ) {
 
@@ -80,6 +82,7 @@
 				scene.add( cube );
 
 				renderer = new THREE.SoftwareRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

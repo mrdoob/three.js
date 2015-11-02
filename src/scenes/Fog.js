@@ -3,11 +3,11 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Fog = function ( hex, near, far ) {
+THREE.Fog = function ( color, near, far ) {
 
 	this.name = '';
 
-	this.color = new THREE.Color( hex );
+	this.color = new THREE.Color( color );
 
 	this.near = ( near !== undefined ) ? near : 1;
 	this.far = ( far !== undefined ) ? far : 1000;

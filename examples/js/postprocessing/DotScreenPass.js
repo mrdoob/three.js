@@ -12,8 +12,8 @@ THREE.DotScreenPass = function ( center, angle, scale ) {
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 	if ( center !== undefined ) this.uniforms[ "center" ].value.copy( center );
-	if ( angle !== undefined ) this.uniforms[ "angle"].value = angle;
-	if ( scale !== undefined ) this.uniforms[ "scale"].value = scale;
+	if ( angle !== undefined ) this.uniforms[ "angle" ].value = angle;
+	if ( scale !== undefined ) this.uniforms[ "scale" ].value = scale;
 
 	this.material = new THREE.ShaderMaterial( {
 
@@ -27,6 +27,13 @@ THREE.DotScreenPass = function ( center, angle, scale ) {
 	this.renderToScreen = false;
 	this.needsSwap = true;
 
+
+	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	this.scene  = new THREE.Scene();
+
+	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.scene.add( this.quad );
+
 };
 
 THREE.DotScreenPass.prototype = {
@@ -36,15 +43,15 @@ THREE.DotScreenPass.prototype = {
 		this.uniforms[ "tDiffuse" ].value = readBuffer;
 		this.uniforms[ "tSize" ].value.set( readBuffer.width, readBuffer.height );
 
-		THREE.EffectComposer.quad.material = this.material;
+		this.quad.material = this.material;
 
 		if ( this.renderToScreen ) {
 
-			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera );
+			renderer.render( this.scene, this.camera );
 
 		} else {
 
-			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, writeBuffer, false );
+			renderer.render( this.scene, this.camera, writeBuffer, false );
 
 		}
 

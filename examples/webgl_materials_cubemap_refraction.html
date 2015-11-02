@@ -52,7 +52,7 @@
 			var camera, scene, renderer;
 			var cameraCube, sceneCube, cubeTarget;
 
-			var mesh, zmesh, lightMesh, geometry;
+			var mesh, zmesh, geometry;
 
 			var loader;
 
@@ -89,11 +89,11 @@
 
 				// light representation
 
-				sphere = new THREE.SphereGeometry( 100, 16, 8 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
-				lightMesh.position = pointLight.position;
-				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
-				scene.add( lightMesh );
+				var sphere = new THREE.SphereGeometry( 100, 16, 8 );
+
+				var mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				mesh.scale.set( 0.05, 0.05, 0.05 );
+				pointLight.add( mesh );
 
 				// material samples
 
@@ -103,11 +103,11 @@
 							 r + "py.jpg", r + "ny.jpg",
 							 r + "pz.jpg", r + "nz.jpg" ];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls, new THREE.CubeRefractionMapping() );
+				var textureCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeRefractionMapping );
 
 				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity:0.9 } );
 				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
-				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } )
+				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
 
 				// Skybox
 
@@ -123,12 +123,13 @@
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000 ), material );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100000, 100000, 100000 ), material );
 				sceneCube.add( mesh );
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
@@ -139,9 +140,7 @@
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
 
-				loader = new THREE.BinaryLoader( true );
-				document.body.appendChild( loader.statusDomElement );
-
+				loader = new THREE.BinaryLoader();
 				loader.load( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
@@ -188,8 +187,6 @@
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
-				loader.statusDomElement.style.display = "none";
-
 			}
 
 			function onDocumentMouseMove(event) {
@@ -221,8 +218,8 @@
 
 				cameraCube.rotation.copy( camera.rotation );
 
-				lightMesh.position.x = 1500 * Math.cos( timer );
-				lightMesh.position.z = 1500 * Math.sin( timer );
+				pointLight.position.x = 1500 * Math.cos( timer );
+				pointLight.position.z = 1500 * Math.sin( timer );
 
 				renderer.clear();
 				renderer.render( sceneCube, cameraCube );

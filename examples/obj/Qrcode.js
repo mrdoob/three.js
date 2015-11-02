@@ -1434,7 +1434,6 @@ var Qrcode = function () {
 	f4(20,21,363,362,color2);
 	f4(19,20,362,361,color2);
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 	function v( x, y, z ) {
@@ -1451,10 +1450,12 @@ var Qrcode = function () {
 
 	function f4( a, b, c, d, color ) {
 
-		scope.faces.push( new THREE.Face4( a, b, c, d, undefined, color ) );
+		scope.faces.push( new THREE.Face3( a, b, d, undefined, color ) );
+		scope.faces.push( new THREE.Face3( b, c, d, undefined, color ) );
 
 	}
 
 }
 
 Qrcode.prototype = Object.create( THREE.Geometry.prototype );
+Qrcode.prototype.constructor = Qrcode;

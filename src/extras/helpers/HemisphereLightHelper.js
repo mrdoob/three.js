@@ -3,20 +3,20 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSize ) {
+THREE.HemisphereLightHelper = function ( light, sphereSize ) {
 
 	THREE.Object3D.call( this );
 
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	this.matrixWorld = light.matrixWorld;
+	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	this.colors = [ new THREE.Color(), new THREE.Color() ];
 
 	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
-	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+	geometry.rotateX( - Math.PI / 2 );
 
 	for ( var i = 0, il = 8; i < il; i ++ ) {
 
@@ -34,6 +34,14 @@ THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSiz
 };
 
 THREE.HemisphereLightHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.HemisphereLightHelper.prototype.constructor = THREE.HemisphereLightHelper;
+
+THREE.HemisphereLightHelper.prototype.dispose = function () {
+
+	this.lightSphere.geometry.dispose();
+	this.lightSphere.material.dispose();
+
+};
 
 THREE.HemisphereLightHelper.prototype.update = function () {
 
@@ -44,10 +52,9 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 		this.colors[ 0 ].copy( this.light.color ).multiplyScalar( this.light.intensity );
 		this.colors[ 1 ].copy( this.light.groundColor ).multiplyScalar( this.light.intensity );
 
-		this.lightSphere.lookAt( vector.getPositionFromMatrix( this.light.matrixWorld ).negate() );
+		this.lightSphere.lookAt( vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 		this.lightSphere.geometry.colorsNeedUpdate = true;
 
 	}
 
 }();
-

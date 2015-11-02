@@ -1,5 +1,5 @@
 /**
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -11,7 +11,7 @@ THREE.Triangle = function ( a, b, c ) {
 
 };
 
-THREE.Triangle.normal = function() {
+THREE.Triangle.normal = function () {
 
 	var v0 = new THREE.Vector3();
 
@@ -24,7 +24,7 @@ THREE.Triangle.normal = function() {
 		result.cross( v0 );
 
 		var resultLengthSq = result.lengthSq();
-		if( resultLengthSq > 0 ) {
+		if ( resultLengthSq > 0 ) {
 
 			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
 
@@ -36,9 +36,9 @@ THREE.Triangle.normal = function() {
 
 }();
 
-// static/instance method to calculate barycoordinates
+// static/instance method to calculate barycentric coordinates
 // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
-THREE.Triangle.barycoordFromPoint = function() {
+THREE.Triangle.barycoordFromPoint = function () {
 
 	var v0 = new THREE.Vector3();
 	var v1 = new THREE.Vector3();
@@ -60,25 +60,27 @@ THREE.Triangle.barycoordFromPoint = function() {
 
 		var result = optionalTarget || new THREE.Vector3();
 
-		// colinear or singular triangle
-		if( denom == 0 ) {
+		// collinear or singular triangle
+		if ( denom === 0 ) {
+
 			// arbitrary location outside of triangle?
 			// not sure if this is the best idea, maybe should be returning undefined
-			return result.set( -2, -1, -1 );
+			return result.set( - 2, - 1, - 1 );
+
 		}
 
 		var invDenom = 1 / denom;
 		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
 		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
 
-		// barycoordinates must always sum to 1
+		// barycentric coordinates must always sum to 1
 		return result.set( 1 - u - v, v, u );
 
 	};
 
 }();
 
-THREE.Triangle.containsPoint = function() {
+THREE.Triangle.containsPoint = function () {
 
 	var v1 = new THREE.Vector3();
 
@@ -108,11 +110,17 @@ THREE.Triangle.prototype = {
 
 	setFromPointsAndIndices: function ( points, i0, i1, i2 ) {
 
-		this.a.copy( points[i0] );
-		this.b.copy( points[i1] );
-		this.c.copy( points[i2] );
+		this.a.copy( points[ i0 ] );
+		this.b.copy( points[ i1 ] );
+		this.c.copy( points[ i2 ] );
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
 
 	},
 
@@ -126,7 +134,7 @@ THREE.Triangle.prototype = {
 
 	},
 
-	area: function() {
+	area: function () {
 
 		var v0 = new THREE.Vector3();
 		var v1 = new THREE.Vector3();
@@ -178,12 +186,6 @@ THREE.Triangle.prototype = {
 	equals: function ( triangle ) {
 
 		return triangle.a.equals( this.a ) && triangle.b.equals( this.b ) && triangle.c.equals( this.c );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Triangle().copy( this );
 
 	}
 

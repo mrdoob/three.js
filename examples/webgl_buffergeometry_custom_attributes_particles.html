@@ -1,41 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - buffer geometry custom attributes [particles]</title>
+		<title>three.js webgl - buffer geometry custom attributes - particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
 				background-color: #000000;
 				margin: 0px;
 				overflow: hidden;
 			}
 			#info {
-				color: #fff;
-				background-color: rgba( 0, 0, 0, 0.75 );
-				position: relative;
-				top: 0px; width: 100%;
+				position: absolute;
+				top: 0px;
+				width: 100%;
 				padding: 5px;
-				z-index:100;
-				width:33em;
-				margin:0 auto -2em;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				font-weight: bold;
 			}
-			a { color: #ff0000 }
+			a {
+				color: #fff;
+			}
 		</style>
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - buffergeometry custom attributes example - particles</div>
 		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry custom attributes - particles</div>
 
 		<script src="../build/three.min.js"></script>
-		<script src="../src/renderers/WebGLRenderer.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -53,7 +49,6 @@
 
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-				//gl_PointSize = size;
 				gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );
 
 				gl_Position = projectionMatrix * mvPosition;
@@ -72,6 +67,7 @@
 			void main() {
 
 				gl_FragColor = vec4( color * vColor, 1.0 );
+
 				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
 
 			}
@@ -85,11 +81,8 @@
 
 		var renderer, scene, camera, stats;
 
-		var sphere, uniforms, geometry;
+		var particleSystem, uniforms, geometry;
 
-		var noise = [];
-		var values_size;
-		//500000
 		var particles = 100000;
 
 		var WIDTH = window.innerWidth;
@@ -105,30 +98,22 @@
 
 			scene = new THREE.Scene();
 
-			var attributes = {
-
-				size: {	type: 'f', value: null },
-				customColor: { type: 'c', value: null }
-
-			};
-
 			uniforms = {
 
 				color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/spark1.png" ) },
+				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/spark1.png" ) }
 
 			};
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms: 		uniforms,
-				attributes:     attributes,
+				uniforms:       uniforms,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
-				blending: 		THREE.AdditiveBlending,
-				depthTest: 		false,
-				transparent:	true
+				blending:       THREE.AdditiveBlending,
+				depthTest:      false,
+				transparent:    true
 
 			});
 
@@ -136,58 +121,39 @@
 			var radius = 200;
 
 			geometry = new THREE.BufferGeometry();
-			// geometry.dynamic = true;
-			geometry.attributes = {
 
-				position: {
-					itemSize: 3,
-					array: new Float32Array( particles * 3 )
-				},
-				customColor: {
-					itemSize: 3,
-					array: new Float32Array( particles * 3 )
-				},
-				size: {
-					itemSize: 1,
-					array: new Float32Array( particles ),
-					dynamic: true
-				},
+			var positions = new Float32Array( particles * 3 );
+			var colors = new Float32Array( particles * 3 );
+			var sizes = new Float32Array( particles );
 
-			}
+			var color = new THREE.Color();
 
+			for ( var i = 0, i3 = 0; i < particles; i ++, i3 += 3 ) {
 
-			values_size = geometry.attributes.size.array;
-			var positions = geometry.attributes.position.array;
-			var values_color = geometry.attributes.customColor.array;
+				positions[ i3 + 0 ] = ( Math.random() * 2 - 1 ) * radius;
+				positions[ i3 + 1 ] = ( Math.random() * 2 - 1 ) * radius;
+				positions[ i3 + 2 ] = ( Math.random() * 2 - 1 ) * radius;
 
-			sphere = new THREE.ParticleSystem( geometry, shaderMaterial );
+				color.setHSL( i / particles, 1.0, 0.5 );
 
-			//sphere.sortParticles = true;
+				colors[ i3 + 0 ] = color.r;
+				colors[ i3 + 1 ] = color.g;
+				colors[ i3 + 2 ] = color.b;
 
-			var color = new THREE.Color( 0xffaa00 );;
-
-			for( var v = 0; v < particles; v++ ) {
-
-				values_size[ v ] = 10;
-
-				positions[ v * 3 + 0 ] = (Math.random() * 2 - 1) * radius;
-				positions[ v * 3 + 1 ] = (Math.random() * 2 - 1) * radius;
-				positions[ v * 3 + 2 ] = (Math.random() * 2 - 1) * radius;
-
-				if ( positions[ v * 3 + 0 ] < 0 )
-					color.setHSL( 0.5 + 0.1 * ( v / particles ), 0.7, 0.1 );
-				else
-					color.setHSL( 0.0 + 0.1 * ( v / particles ), 0.9, 0.1 );
-
-				values_color[ v * 3 + 0 ] = color.r;
-				values_color[ v * 3 + 1 ] = color.g;
-				values_color[ v * 3 + 2 ] = color.b;
+				sizes[ i ] = 20;
 
 			}
 
-			scene.add( sphere );
+			geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+			geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+			geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
 
-			renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
+			particleSystem = new THREE.Points( geometry, shaderMaterial );
+
+			scene.add( particleSystem );
+
+			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( WIDTH, HEIGHT );
 
 			var container = document.getElementById( 'container' );
@@ -226,11 +192,13 @@
 
 			var time = Date.now() * 0.005;
 
-			sphere.rotation.z = 0.01 * time;
+			particleSystem.rotation.z = 0.01 * time;
 
-			for( var i = 0; i < particles; i++ ) {
+			var sizes = geometry.attributes.size.array;
 
-				values_size[ i ] = 14 + 13 * Math.sin( 0.1 * i + time );
+			for ( var i = 0; i < particles; i++ ) {
+
+				sizes[ i ] = 10 * ( 1 + Math.sin( 0.1 * i + time ) );
 
 			}
 
@@ -240,9 +208,7 @@
 
 		}
 
-
 	</script>
 
 </body>
-
 </html>

@@ -1,23 +1,50 @@
-// Texture
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
 
-UI.Texture = function ( position ) {
+UI.Texture = function ( mapping ) {
 
-    UI.Element.call( this );
+	UI.Element.call( this );
 
 	var scope = this;
 
-	var image = new Image();
-	this.texture = null;
+	var dom = document.createElement( 'span' );
 
-	this.dom = document.createElement( 'input' );
-	this.dom.type = 'file';
-	this.dom.style.position = position || 'relative';
+	var input = document.createElement( 'input' );
+	input.type = 'file';
+	input.addEventListener( 'change', function ( event ) {
 
-	this.onChangeCallback = null;
+		loadFile( event.target.files[ 0 ] );
 
-	this.dom.addEventListener( 'change', function ( event ) {
+	} );
 
-		var file = event.target.files[ 0 ];
+	var canvas = document.createElement( 'canvas' );
+	canvas.width = 32;
+	canvas.height = 16;
+	canvas.style.cursor = 'pointer';
+	canvas.style.marginRight = '5px';
+	canvas.style.border = '1px solid #888';
+	canvas.addEventListener( 'click', function ( event ) {
+
+		input.click();
+
+	}, false );
+	canvas.addEventListener( 'drop', function ( event ) {
+
+		event.preventDefault();
+		event.stopPropagation();
+		loadFile( event.dataTransfer.files[ 0 ] );
+
+	}, false );
+	dom.appendChild( canvas );
+
+	var name = document.createElement( 'input' );
+	name.disabled = true;
+	name.style.width = '64px';
+	name.style.border = '1px solid #ccc';
+	dom.appendChild( name );
+
+	var loadFile = function ( file ) {
 
 		if ( file.type.match( 'image.*' ) ) {
 
@@ -27,31 +54,11 @@ UI.Texture = function ( position ) {
 				var image = document.createElement( 'img' );
 				image.addEventListener( 'load', function( event ) {
 
-					scope.texture = new THREE.Texture( this );
-					scope.texture.needsUpdate = true;
+					var texture = new THREE.Texture( this, mapping );
+					texture.sourceFile = file.name;
+					texture.needsUpdate = true;
 
-					// remember the original filename (including extension)
-					// this is used for url field in the scene export
-
-					scope.texture.sourceFile = file.name;
-
-					// generate unique name per texture
-					// based on source file name
-
-					var chunks = file.name.split( '.' );
-					var extension = chunks.pop().toLowerCase();
-					var filename = chunks.join( '.' );
-
-					if ( ! ( filename in scope.textureNameMap ) ) {
-
-						scope.textureNameMap[ filename ] = true;
-						scope.texture.name = filename;
-
-					} else {
-
-						scope.texture.name = filename + "_" + scope.texture.id;
-
-					}
+					scope.setValue( texture );
 
 					if ( scope.onChangeCallback ) scope.onChangeCallback();
 
@@ -65,15 +72,18 @@ UI.Texture = function ( position ) {
 
 		}
 
-	}, false );
+	}
+
+	this.dom = dom;
+	this.texture = null;
+	this.onChangeCallback = null;
 
 	return this;
 
 };
 
 UI.Texture.prototype = Object.create( UI.Element.prototype );
-
-UI.Texture.prototype.textureNameMap = {};
+UI.Texture.prototype.constructor = UI.Texture;
 
 UI.Texture.prototype.getValue = function () {
 
@@ -81,9 +91,38 @@ UI.Texture.prototype.getValue = function () {
 
 };
 
-UI.Texture.prototype.setValue = function ( value ) {
+UI.Texture.prototype.setValue = function ( texture ) {
 
-	this.texture = value;
+	var canvas = this.dom.children[ 0 ];
+	var name = this.dom.children[ 1 ];
+	var context = canvas.getContext( '2d' );
+
+	if ( texture !== null ) {
+
+		var image = texture.image;
+
+		if ( image !== undefined && image.width > 0 ) {
+
+			name.value = texture.sourceFile;
+
+			var scale = canvas.width / image.width;
+			context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
+
+		} else {
+
+			name.value = texture.sourceFile + ' (error)';
+			context.clearRect( 0, 0, canvas.width, canvas.height );
+
+		}
+
+	} else {
+
+		name.value = '';
+		context.clearRect( 0, 0, canvas.width, canvas.height );
+
+	}
+
+	this.texture = texture;
 
 };
 
@@ -95,71 +134,177 @@ UI.Texture.prototype.onChange = function ( callback ) {
 
 };
 
+// Outliner
 
-// CubeTexture
-
-UI.CubeTexture = function ( position ) {
+UI.Outliner = function ( editor ) {
 
 	UI.Element.call( this );
 
 	var scope = this;
 
-	this.texture = null;
+	var dom = document.createElement( 'div' );
+	dom.className = 'Outliner';
+	dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
 
-	this.dom = document.createElement( 'input' );
-	this.dom.type = 'file';
-	this.dom.style.position = position || 'relative';
+	var scene = editor.scene;
 
-	this.onChangeCallback = null;
+	var sortable = Sortable.create( dom, {
+		draggable: '.draggable',
+		onUpdate: function ( event ) {
 
-	this.dom.addEventListener( 'change', function ( event ) {
+			var item = event.item;
 
-		var file = event.target.files[ 0 ];
+			var object = scene.getObjectById( item.value );
 
-		if ( file.type.match( 'image.*' ) ) {
+			if ( item.nextSibling === null ) {
 
-			var reader = new FileReader();
-			reader.addEventListener( 'load', function ( event ) {
+				editor.moveObject( object, editor.scene );
 
-				var image = document.createElement( 'img' );
-				image.addEventListener( 'load', function( event ) {
+			} else {
 
-					scope.texture = new THREE.Texture( [ this, this, this, this, this, this ], new THREE.CubeReflectionMapping() )
-					scope.texture.needsUpdate = true;
+				var nextObject = scene.getObjectById( item.nextSibling.value );
+				editor.moveObject( object, nextObject.parent, nextObject );
 
-					if ( scope.onChangeCallback ) scope.onChangeCallback();
-
-				}, false );
-				image.src = event.target.result;
-
-			}, false );
-			reader.readAsDataURL( file );
+			}
 
 		}
+	} );
 
-	}, false );
+	// Broadcast for object selection after arrow navigation
+	var changeEvent = document.createEvent('HTMLEvents');
+	changeEvent.initEvent( 'change', true, true );
+
+	// Prevent native scroll behavior
+	dom.addEventListener( 'keydown', function (event) {
+
+		switch ( event.keyCode ) {
+			case 38: // up
+			case 40: // down
+			event.preventDefault();
+			event.stopPropagation();
+			break;
+		}
+
+	}, false);
+
+	// Keybindings to support arrow navigation
+	dom.addEventListener( 'keyup', function (event) {
+
+		switch ( event.keyCode ) {
+			case 38: // up
+			case 40: // down
+			scope.selectedIndex += ( event.keyCode == 38 ) ? -1 : 1;
+
+			if ( scope.selectedIndex >= 0 && scope.selectedIndex < scope.options.length ) {
+
+				// Highlight selected dom elem and scroll parent if needed
+				scope.setValue( scope.options[ scope.selectedIndex ].value );
+
+				scope.dom.dispatchEvent( changeEvent );
+
+			}
+
+			break;
+		}
+
+	}, false);
+
+	this.dom = dom;
+
+	this.options = [];
+	this.selectedIndex = -1;
+	this.selectedValue = null;
 
 	return this;
 
 };
 
-UI.CubeTexture.prototype = Object.create( UI.Element.prototype );
+UI.Outliner.prototype = Object.create( UI.Element.prototype );
+UI.Outliner.prototype.constructor = UI.Outliner;
 
-UI.CubeTexture.prototype.getValue = function () {
+UI.Outliner.prototype.setOptions = function ( options ) {
 
-	return this.texture;
+	var scope = this;
+
+	var changeEvent = document.createEvent( 'HTMLEvents' );
+	changeEvent.initEvent( 'change', true, true );
+
+	while ( scope.dom.children.length > 0 ) {
+
+		scope.dom.removeChild( scope.dom.firstChild );
+
+	}
+
+	scope.options = [];
+
+	for ( var i = 0; i < options.length; i ++ ) {
+
+		var option = options[ i ];
+
+		var div = document.createElement( 'div' );
+		div.className = 'option ' + ( option.static === true ? '': 'draggable' );
+		div.innerHTML = option.html;
+		div.value = option.value;
+		scope.dom.appendChild( div );
+
+		scope.options.push( div );
+
+		div.addEventListener( 'click', function ( event ) {
+
+			scope.setValue( this.value );
+			scope.dom.dispatchEvent( changeEvent );
+
+		}, false );
+
+	}
+
+	return scope;
 
 };
 
-UI.CubeTexture.prototype.setValue = function ( value ) {
+UI.Outliner.prototype.getValue = function () {
 
-	this.texture = value;
+	return this.selectedValue;
 
 };
 
-UI.CubeTexture.prototype.onChange = function ( callback ) {
+UI.Outliner.prototype.setValue = function ( value ) {
 
-	this.onChangeCallback = callback;
+	for ( var i = 0; i < this.options.length; i ++ ) {
+
+		var element = this.options[ i ];
+
+		if ( element.value === value ) {
+
+			element.classList.add( 'active' );
+
+			// scroll into view
+
+			var y = element.offsetTop - this.dom.offsetTop;
+			var bottomY = y + element.offsetHeight;
+			var minScroll = bottomY - this.dom.offsetHeight;
+
+			if ( this.dom.scrollTop > y ) {
+
+				this.dom.scrollTop = y
+
+			} else if ( this.dom.scrollTop < minScroll ) {
+
+				this.dom.scrollTop = minScroll;
+
+			}
+
+			this.selectedIndex = i;
+
+		} else {
+
+			element.classList.remove( 'active' );
+
+		}
+
+	}
+
+	this.selectedValue = value;
 
 	return this;
 

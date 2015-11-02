@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Three.js Material Browser</title>
+		<style>
+			@font-face {
+				font-family: 'inconsolata';
+				src: url('../files/inconsolata.woff') format('woff');
+				font-weight: normal;
+				font-style: normal;
+			}
+			
+			body {
+				margin:0;
+				font-family: 'inconsolata';
+				font-size: 15px;
+				line-height: 18px;
+				overflow: hidden;
+			}
+			
+			canvas { width: 100%; height: 100% }
+			
+			#newWindow {
+				display: block;
+				position: absolute;
+				bottom: 0.3em;
+				left: 0.5em;
+				color: #fff;
+			}
+		</style>
+	</head>
+	<body>
+		
+		<a id='newWindow' href='./material-browser.html' target='_blank'>Open in New Window</a>
+		
+		<script src="../../build/three.min.js"></script>
+		<script src='../../examples/js/libs/dat.gui.min.js'></script>
+		<script src='js/material.js'></script>
+		
+		<script>
+			
+			document.getElementById('newWindow').href += window.location.hash;
+			
+			var gui = new dat.GUI();
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 50 );
+			camera.position.z = 30;
+			
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			var ambientLight = new THREE.AmbientLight( 0x000000 );
+			scene.add( ambientLight );
+
+			var lights = [];
+			lights[0] = new THREE.PointLight( 0xffffff, 1, 0 );
+			lights[1] = new THREE.PointLight( 0xffffff, 1, 0 );
+			lights[2] = new THREE.PointLight( 0xffffff, 1, 0 );
+			
+			lights[0].position.set( 0, 200, 0 );
+			lights[1].position.set( 100, 200, 100 );
+			lights[2].position.set( -100, -200, -100 );
+
+			scene.add( lights[0] );
+			scene.add( lights[1] );
+			scene.add( lights[2] );
+
+			guiScene( gui, scene, camera );
+
+			var geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
+			var mesh = new THREE.Mesh( geometry );
+			
+			generateVertexColors( geometry );
+			
+			mesh.material = chooseFromHash( gui, mesh, geometry );
+
+			generateMorphTargets( mesh, geometry );
+
+			scene.add( mesh );
+			
+			var prevFog = false;
+			
+			var render = function () {
+				
+				requestAnimationFrame( render );
+
+				var time = Date.now() * 0.001;
+
+				mesh.rotation.x += 0.005;
+				mesh.rotation.y += 0.005;
+				
+				if ( prevFog !== scene.fog ) {
+					
+					mesh.material.needsUpdate = true;
+					prevFog = scene.fog;
+					
+				}
+				
+				if ( mesh.morphTargetInfluences ) {
+					
+					mesh.morphTargetInfluences[ 0 ] = ( 1 + Math.sin( 4 * time ) ) / 2;
+					
+				}
+
+				renderer.render( scene, camera );
+				
+			};
+			
+			window.addEventListener( 'resize', function () {
+				
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				
+			}, false );
+
+			render();
+			
+		</script>
+	</body>
+</html>

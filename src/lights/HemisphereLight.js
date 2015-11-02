@@ -2,28 +2,32 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.HemisphereLight = function ( skyColorHex, groundColorHex, intensity ) {
+THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 
-	THREE.Light.call( this, skyColorHex );
+	THREE.Light.call( this, skyColor );
 
-	this.position.set( 0, 100, 0 );
+	this.type = 'HemisphereLight';
 
-	this.groundColor = new THREE.Color( groundColorHex );
+	this.castShadow = undefined;
+
+	this.position.set( 0, 1, 0 );
+	this.updateMatrix();
+
+	this.groundColor = new THREE.Color( groundColor );
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 
 };
 
 THREE.HemisphereLight.prototype = Object.create( THREE.Light.prototype );
+THREE.HemisphereLight.prototype.constructor = THREE.HemisphereLight;
 
-THREE.HemisphereLight.prototype.clone = function () {
+THREE.HemisphereLight.prototype.copy = function ( source ) {
 
-	var light = new THREE.PointLight();
+	THREE.Light.prototype.copy.call( this, source );
 
-	THREE.Light.prototype.clone.call( this, light );
+	this.groundColor.copy( source.groundColor );
+	this.intensity = source.intensity;
 
-	light.groundColor.copy( this.groundColor );
-	light.intensity = this.intensity;
-
-	return light;
+	return this;
 
 };

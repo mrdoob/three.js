@@ -1,0 +1,5 @@
+Creative Commons Licence
+Infinite, 3D Head Scan by Lee Perry-Smith is licensed under a Creative Commons Attribution 3.0 Unported License.
+Based on a work at www.triplegangers.com.
+Permissions beyond the scope of this license may be available at http://www.ir-ltd.net/
+Please remember: Do what you want with the files, but always mention where you got them from...

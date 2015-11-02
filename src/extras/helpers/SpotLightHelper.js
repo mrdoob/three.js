@@ -11,16 +11,16 @@ THREE.SpotLightHelper = function ( light ) {
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	this.matrixWorld = light.matrixWorld;
+	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	var geometry = new THREE.CylinderGeometry( 0, 1, 1, 8, 1, true );
 
-	geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, -0.5, 0 ) );
-	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+	geometry.translate( 0, - 0.5, 0 );
+	geometry.rotateX( - Math.PI / 2 );
 
 	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
-	
+
 	this.cone = new THREE.Mesh( geometry, material );
 	this.add( this.cone );
 
@@ -29,10 +29,19 @@ THREE.SpotLightHelper = function ( light ) {
 };
 
 THREE.SpotLightHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.SpotLightHelper.prototype.constructor = THREE.SpotLightHelper;
+
+THREE.SpotLightHelper.prototype.dispose = function () {
+
+	this.cone.geometry.dispose();
+	this.cone.material.dispose();
+
+};
 
 THREE.SpotLightHelper.prototype.update = function () {
 
 	var vector = new THREE.Vector3();
+	var vector2 = new THREE.Vector3();
 
 	return function () {
 
@@ -41,10 +50,13 @@ THREE.SpotLightHelper.prototype.update = function () {
 
 		this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-		this.cone.lookAt( vector.getPositionFromMatrix( this.light.matrixWorld ).negate() );
+		vector.setFromMatrixPosition( this.light.matrixWorld );
+		vector2.setFromMatrixPosition( this.light.target.matrixWorld );
+
+		this.cone.lookAt( vector2.sub( vector ) );
 
 		this.cone.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	}
+	};
 
 }();

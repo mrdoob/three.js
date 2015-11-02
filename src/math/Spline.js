@@ -14,11 +14,11 @@ THREE.Spline = function ( points ) {
 	point, intPoint, weight, w2, w3,
 	pa, pb, pc, pd;
 
-	this.initFromArray = function( a ) {
+	this.initFromArray = function ( a ) {
 
 		this.points = [];
 
-		for ( var i = 0; i < a.length; i++ ) {
+		for ( var i = 0; i < a.length; i ++ ) {
 
 			this.points[ i ] = { x: a[ i ][ 0 ], y: a[ i ][ 1 ], z: a[ i ][ 2 ] };
 
@@ -84,7 +84,7 @@ THREE.Spline = function ( points ) {
 
 		chunkLengths[ 0 ] = 0;
 
-		if ( !nSubDivisions ) nSubDivisions = 100;
+		if ( ! nSubDivisions ) nSubDivisions = 100;
 
 		nSamples = this.points.length * nSubDivisions;
 
@@ -104,7 +104,7 @@ THREE.Spline = function ( points ) {
 			point = ( this.points.length - 1 ) * index;
 			intPoint = Math.floor( point );
 
-			if ( intPoint != oldIntPoint ) {
+			if ( intPoint !== oldIntPoint ) {
 
 				chunkLengths[ intPoint ] = totalLength;
 				oldIntPoint = intPoint;
@@ -125,7 +125,7 @@ THREE.Spline = function ( points ) {
 
 		var i, j,
 			index, indexCurrent, indexNext,
-			linearDistance, realDistance,
+			realDistance,
 			sampling, position,
 			newpoints = [],
 			tmpVec = new THREE.Vector3(),
@@ -133,7 +133,7 @@ THREE.Spline = function ( points ) {
 
 		newpoints.push( tmpVec.copy( this.points[ 0 ] ).clone() );
 
-		for ( i = 1; i < this.points.length; i++ ) {
+		for ( i = 1; i < this.points.length; i ++ ) {
 
 			//tmpVec.copy( this.points[ i - 1 ] );
 			//linearDistance = tmpVec.distanceTo( this.points[ i ] );
@@ -145,7 +145,7 @@ THREE.Spline = function ( points ) {
 			indexCurrent = ( i - 1 ) / ( this.points.length - 1 );
 			indexNext = i / ( this.points.length - 1 );
 
-			for ( j = 1; j < sampling - 1; j++ ) {
+			for ( j = 1; j < sampling - 1; j ++ ) {
 
 				index = indexCurrent + j * ( 1 / sampling ) * ( indexNext - indexCurrent );
 
@@ -171,6 +171,6 @@ THREE.Spline = function ( points ) {
 
 		return ( 2 * ( p1 - p2 ) + v0 + v1 ) * t3 + ( - 3 * ( p1 - p2 ) - 2 * v0 - v1 ) * t2 + v0 * t + p1;
 
-	};
+	}
 
 };

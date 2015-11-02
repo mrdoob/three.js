@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loaders - vrml loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> -
+		vrml format loader test -
+		<!--model from <a href="http://cs.iupui.edu/~aharris/webDesign/vrml/" target="_blank">VRML 2.0 Tutorial</a>,-->
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/loaders/VRMLLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+
+			var cross;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
+				camera.position.z = 6;
+
+				controls = new THREE.OrbitControls( camera );
+
+				controls.rotateSpeed = 5.0;
+				controls.zoomSpeed = 5;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				scene = new THREE.Scene();
+				scene.add( camera );
+
+				// light
+
+				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 200, 200, 1000 ).normalize();
+
+				camera.add( dirLight );
+				camera.add( dirLight.target );
+
+				var loader = new THREE.VRMLLoader();
+				loader.load( 'models/vrml/house.wrl', function ( object ) {
+
+					scene.add( object );
+
+				} );
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+				renderer.render( scene, camera );
+
+				stats.update();
+
+			}
+
+		</script>
+
+	</body>
+</html>

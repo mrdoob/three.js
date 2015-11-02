@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Euler Angles. <br/><br/>
+
+		Euler angles describe a rotation transformation by rotating an object on its various axes in specified amounts per axis, and a specified axis order.
+		(More information on <a href='http://en.wikipedia.org/wiki/Euler_angles' target='blank'>Wikipedia</a>)</div>
+
+		<h2>Example</h2>
+
+		<code>var a = new THREE.Euler( 0, 1, 1.57, 'XYZ' );
+		var b = new THREE.Vector3( 1, 0, 1 );
+		b.applyEuler(a);
+		</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Float x], [page:Float y], [page:Float z], [page:String order] )</h3>
+		<div>
+		x -- [page:Float] the angle of the x axis in radians<br />
+		y -- [page:Float] the angle of the y axis in radians<br />
+		z -- [page:Float] the angle of the z axis in radians<br />
+		order -- [page:String] A string representing the order that the rotations are applied, defaults to 'XYZ' (must be upper case).
+		</div>
+		<div>
+		A euler angle for transforming
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Float x]</h3>
+
+		<h3>[property:Float y]</h3>
+
+		<h3>[property:Float z]</h3>
+
+		<h3>[property:String order]</h3>
+
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Euler set]( [page:Float x], [page:Float y], [page:Float z], [page:String order] ) [page:Euler this]</h3>
+		<div>
+		x -- [page:Float] Angle in x axis in radians<br />
+		y -- [page:Float] Angle in y axis in radians<br />
+		z -- [page:Float] Angle in z axis in radians<br />
+		order -- [page:string] Order of axes, defaults to 'XYZ' (must be upper case)
+		</div>
+		<div>
+		Sets the angles of this euler transform.
+		</div>
+
+		<h3>[method:Euler copy]( [page:Euler euler] ) [page:Euler this]</h3>
+		<div>
+		Copies value of *euler* to this euler.
+		</div>
+
+		<h3>[method:Euler setFromRotationMatrix]( [page:Matrix4 m], [page:String order] ) [page:Euler this]</h3>
+		<div>
+		m -- [page:Matrix4] assumes upper 3x3 of matrix is a pure rotation matrix (i.e. unscaled)<br />
+		order -- [page:string] Order of axes, defaults to 'XYZ' (must be upper case)
+		</div>
+		<div>
+		Sets the angles of this euler transform from a pure rotation matrix based on the orientation specified by order.
+		</div>
+
+		<h3>[method:Euler setFromQuaternion]( [page:Quaternion q], [page:String order] ) [page:Euler this]</h3>
+		<div>
+		q -- [page:Quaternion] quaternion must be normalized<br />
+		order -- [page:string] Order of axes, defaults to 'XYZ' (must be upper case)
+		</div>
+		<div>
+		Sets the angles of this euler transform from a normalized quaternion based on the orientation specified by order.
+		</div>
+
+		<h3>[method:Euler reorder]( [page:String newOrder] ) [page:Euler this]</h3>
+		<div>
+		Resets the euler angle with a new order by creating a quaternion from this euler angle and then setting this euler angle with the quaternion and the new order. <br />
+		WARNING: this discards revolution information.
+		</div>
+
+		<h3>[method:Euler setFromVector3]([page:Vector3 vector], [page:String order]) [page:Euler this]</h3>
+		<div>
+		vector -- [page:Vector3].
+		order -- [page:string] Order of axes, defaults to 'XYZ' (must be upper case)
+		</div>
+		<div>
+		Optionally Vector3 to the XYZ parameters of Euler, and order to the Euler's order property.
+		</div>
+
+		<h3>[method:Vector3 toVector3]()</h3>
+		<div>
+		Returns the Euler's XYZ properties as a Vector3.
+		</div>
+
+		<h3>[method:Euler fromArray]([page:Array array]) [page:Euler this]</h3>
+		<div>
+		array -- [page:Array] of length 3 or 4. array[3] is an optional order argument.
+		</div>
+		<div>
+		Assigns this euler's x angle to array[0]. <br />
+		Assigns this euler's y angle to array[1]. <br />
+		Assigns this euler's z angle to array[2]. <br />
+		Optionally assigns this euler's order to array[3].
+		</div>
+
+		<h3>[method:Array toArray]( [page:Array array] )</h3>
+		<div>
+		array -- Optional array to store the euler.
+		</div>
+		<div>
+		Returns an array [x, y, z, order]
+		</div>
+
+		<h3>[method:Boolean equals]( [page:Euler euler] )</h3>
+		<div>
+		Checks for strict equality of this euler and *euler*.
+		</div>
+
+		<h3>[method:Euler clone]()</h3>
+		<div>
+		Returns a new euler created from this euler.
+		</div>
+
+
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

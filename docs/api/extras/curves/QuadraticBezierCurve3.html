@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+			Create a smooth 3d <a href="http://en.wikipedia.org/wiki/B%C3%A9zier_curve#mediaviewer/File:B%C3%A9zier_2_big.gif" target="_blank">quadratic bezier curve</a>.
+		</div>
+
+		<h2>Example</h2>
+
+<code>
+var curve = new THREE.QuadraticBezierCurve3(
+	new THREE.Vector3( -10, 0, 0 ),
+	new THREE.Vector3( 20, 15, 0 ),
+	new THREE.Vector3( 10, 0, 0 )
+);
+
+var geometry = new THREE.Geometry();
+geometry.vertices = curve.getPoints( 50 );
+
+var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+
+// Create the final Object3d to add to the scene
+var curveObject = new THREE.Line( geometry, material );
+</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Vector3 v0], [page:Vector3 v1], [page:Vector3 v2] )</h3>
+		<div>
+			[page:Vector3 v0] – The starting point<br/>
+			[page:Vector3 v1] – The middle control point<br/>
+			[page:Vector3 v2] – The ending point<br/>
+		</div>
+
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Vector3 v0]</h3>
+
+		<h3>[property:Vector3 v1]</h3>
+
+		<h3>[property:Vector3 v2]</h3>
+
+
+		<h2>Methods</h2>
+
+
+		<h3>See [page:Curve] for inherited methods</h3>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

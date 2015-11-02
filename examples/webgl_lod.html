@@ -120,7 +120,8 @@
 				}
 
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );

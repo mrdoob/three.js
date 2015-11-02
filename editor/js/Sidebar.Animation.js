@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Animation = function ( editor ) {
 
 	var signals = editor.signals;
@@ -5,91 +9,105 @@ Sidebar.Animation = function ( editor ) {
 	var options = {};
 	var possibleAnimations = {};
 
-	var container = new UI.Panel();
-	container.setBorderTop( '1px solid #ccc' );
-	container.setPadding( '10px' );
+	var container = new UI.CollapsiblePanel();
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/animation/collapsed' ) );
+	container.onCollapsedChange( function ( boolean ) {
+
+		editor.config.setKey( 'ui/sidebar/animation/collapsed', boolean );
+
+	} );
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text( 'Animation' ).setColor( '#666' ) );
-	container.add( new UI.Break(), new UI.Break() );
-
-	var AnimationsRow = new UI.Panel();
-	var Animations = new UI.Select().setOptions( options ).setWidth( '130px' ).setColor( '#444' ).setFontSize( '12px' );
-	AnimationsRow.add( new UI.Text( 'animations' ).setWidth( '90px' ).setColor( '#666' ) );
-	AnimationsRow.add( Animations );
-	container.add( AnimationsRow );
+	container.addStatic( new UI.Text( 'Animation' ).setTextTransform( 'uppercase' ) );
 	container.add( new UI.Break() );
 
-	var PlayRow = new UI.Panel();
-	var playButton = new UI.Button().setLabel("Play").onClick(play);
-	PlayRow.add( playButton );
-	container.add( PlayRow );
-	container.add( new UI.Break() );
+	var animationsRow = new UI.Panel();
+	container.add( animationsRow );
 
-	function play() {
+	/*
 
-		var value = Animations.getValue();
-
-		if ( possibleAnimations[ value ] ) {
-
-			var anims = possibleAnimations[value]
-
-			for ( var i = 0; i < anims.length; i ++ ) {
-
-				anims[ i ].play();
-
-			}
-
-			signals.playAnimations.dispatch( anims );
-
-		};
-
-	}
+	var animations = {};
 
 	signals.objectAdded.add( function ( object ) {
 
-		if ( object instanceof THREE.Mesh ) {
+		object.traverse( function ( child ) {
 
-			if ( object.geometry && object.geometry.animation ) {
+			if ( child instanceof THREE.SkinnedMesh ) {
 
-				var name = object.geometry.animation.name;
-				options[name] = name
+				var material = child.material;
 
-				Animations.setOptions( options );
+				if ( material instanceof THREE.MeshFaceMaterial ) {
 
-				THREE.AnimationHandler.add( object.geometry.animation );
+					for ( var i = 0; i < material.materials.length; i ++ ) {
 
-				var animation = new THREE.Animation( object, name, THREE.AnimationHandler.CATMULLROM );
+						material.materials[ i ].skinning = true;
 
-				if ( possibleAnimations[ name ] ){
-
-					possibleAnimations[ name ].push( animation );
+					}
 
 				} else {
 
-					possibleAnimations[ name ] = [ animation ];
+					child.material.skinning = true;
 
 				}
 
+				animations[ child.id ] = new THREE.Animation( child, child.geometry.animation );
+
+			} else if ( child instanceof THREE.MorphAnimMesh ) {
+
+				var animation = new THREE.MorphAnimation( child );
+				animation.duration = 30;
+
+				// temporal hack for THREE.AnimationHandler
+				animation._play = animation.play;
+				animation.play = function () {
+					this._play();
+					THREE.AnimationHandler.play( this );
+				};
+				animation.resetBlendWeights = function () {};
+				animation.stop = function () {
+					this.pause();
+					THREE.AnimationHandler.stop( this );
+				};
+
+				animations[ child.id ] = animation;
+
 			}
 
-		}
+		} );
 
 	} );
 
 	signals.objectSelected.add( function ( object ) {
 
-		if ( object && object.geometry && object.geometry.animation ) {
+		container.setDisplay( 'none' );
+
+		if ( object instanceof THREE.SkinnedMesh || object instanceof THREE.MorphAnimMesh ) {
+
+			animationsRow.clear();
+
+			var animation = animations[ object.id ];
+
+			var playButton = new UI.Button( 'Play' ).onClick( function () {
+
+				animation.play();
+
+			} );
+			animationsRow.add( playButton );
+
+			var pauseButton = new UI.Button( 'Stop' ).onClick( function () {
+
+				animation.stop();
+
+			} );
+			animationsRow.add( pauseButton );
 
 			container.setDisplay( 'block' );
-
-		} else {
-
-			container.setDisplay( 'none' );
 
 		}
 
 	} );
+
+	*/
 
 	return container;
 

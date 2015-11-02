@@ -16,14 +16,14 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
-
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/AnimationClipCreator.js"></script>
 
 		<script>
 
 			var container, stats;
 			var camera, scene, projector, renderer;
-			var mesh;
+			var mesh, mixer;
 
 			init();
 			animate();
@@ -51,29 +51,37 @@
 
 				//
 
-				var light = new THREE.DirectionalLight( 0xefefff, 2 );
+				var light = new THREE.DirectionalLight( 0xefefff, 1.5 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var light = new THREE.DirectionalLight( 0xffefef, 2 );
+				var light = new THREE.DirectionalLight( 0xffefef, 1.5 );
 				light.position.set( -1, -1, -1 ).normalize();
 				scene.add( light );
 
-				var loader = new THREE.JSONLoader( true );
+				var loader = new THREE.JSONLoader();
 				loader.load( "models/animated/horse.js", function( geometry ) {
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x606060, morphTargets: true } ) );
+					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( {
+						vertexColors: THREE.FaceColors,
+						morphTargets: true
+					} ) );
 					mesh.scale.set( 1.5, 1.5, 1.5 );
 					scene.add( mesh );
+
+					mixer = new THREE.AnimationMixer( mesh );
+
+					var clip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'gallop', geometry.morphTargets, 30 );
+					mixer.addAction( new THREE.AnimationAction( clip ).warpToDuration( 1 ) );
 
 				} );
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.sortObjects = false;
+				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild(renderer.domElement);
 
 				//
@@ -112,9 +120,7 @@
 			var radius = 600;
 			var theta = 0;
 
-			var duration = 1000;
-			var keyframes = 15, interpolation = duration / keyframes;
-			var lastKeyframe = 0, currentKeyframe = 0;
+			var prevTime = Date.now();
 
 			function render() {
 
@@ -125,29 +131,13 @@
 
 				camera.lookAt( camera.target );
 
-				if ( mesh ) {
+				if ( mixer ) {
 
-					// Alternate morph targets
+					var time = Date.now();
 
-					var time = Date.now() % duration;
+					mixer.update( ( time - prevTime ) * 0.001 );
 
-					var keyframe = Math.floor( time / interpolation );
-
-					if ( keyframe != currentKeyframe ) {
-
-						mesh.morphTargetInfluences[ lastKeyframe ] = 0;
-						mesh.morphTargetInfluences[ currentKeyframe ] = 1;
-						mesh.morphTargetInfluences[ keyframe ] = 0;
-
-						lastKeyframe = currentKeyframe;
-						currentKeyframe = keyframe;
-
-						// console.log( mesh.morphTargetInfluences );
-
-					}
-
-					mesh.morphTargetInfluences[ keyframe ] = ( time % interpolation ) / interpolation;
-					mesh.morphTargetInfluences[ lastKeyframe ] = 1 - mesh.morphTargetInfluences[ keyframe ];
+					prevTime = time;
 
 				}
 

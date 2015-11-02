@@ -2,45 +2,42 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Line] &rarr;
+
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Helper object to show a wireframe box (with no face diagonals) around an object</div>
+
+
+		<h2>Example</h2>
+
+		<code>var sphere = new THREE.SphereGeometry();
+		var object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial(0xff0000) );
+		var box = new THREE.BoxHelper( object );
+		scene.add( box );
+		</code>
 
 
 		<h2>Constructor</h2>
 
-
-		<h3>[name]([page:todo size])</h3>
-		<div>
-		size -- todo
-		</div>
-		<div>
-		todo
-		</div>
+		<h3>[name]( [page:Object3D object] )</h3>
+		<div>Creates a new wireframe box matching the size of the passed box.</div>
 
 		<h2>Properties</h2>
 
-
-		<h3>.[page:array vertices]</h3>
-		<div>
-		todo
-		</div> 
+		<div>(none)</div>
 
 		<h2>Methods</h2>
 
-
-		<h3>.update([page:todo object]) [page:todo]</h3>
+		<h3>[method:null update]( [page:Object3D object] )</h3>
 		<div>
-		object -- todo
-		</div>
-		<div>
-		todo
-		</div>
+		Updates the helper's geometry to match the dimensions of the [page:Geometry.boundingBox bounding box] of the passed object's geometry.
 
 		<h2>Source</h2>
 
