@@ -39,8 +39,6 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 	var uvs = new Float32Array( ntris * 3 * 2 );
 
 	var i, j, offset;
-	var x, y, z;
-	var u, v;
 
 	var end = attribArray.length;
 	var stride = 8;
@@ -52,13 +50,9 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 
 	for ( i = offset; i < end; i += stride ) {
 
-		x = attribArray[ i ];
-		y = attribArray[ i + 1 ];
-		z = attribArray[ i + 2 ];
-
-		positions[ j ++ ] = x;
-		positions[ j ++ ] = y;
-		positions[ j ++ ] = z;
+		positions[ j ++ ] = attribArray[ i     ];
+		positions[ j ++ ] = attribArray[ i + 1 ];
+		positions[ j ++ ] = attribArray[ i + 2 ];
 
 	}
 
@@ -69,12 +63,8 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 
 	for ( i = offset; i < end; i += stride ) {
 
-		u = attribArray[ i ];
-		v = attribArray[ i + 1 ];
-
-		uvs[ j ++ ] = u;
-		uvs[ j ++ ] = v;
-
+		uvs[ j ++ ] = attribArray[ i     ];
+		uvs[ j ++ ] = attribArray[ i + 1 ];
 	}
 
 	// extract normals
@@ -84,13 +74,9 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 
 	for ( i = offset; i < end; i += stride ) {
 
-		x = attribArray[ i ];
-		y = attribArray[ i + 1 ];
-		z = attribArray[ i + 2 ];
-
-		normals[ j ++ ] = x;
-		normals[ j ++ ] = y;
-		normals[ j ++ ] = z;
+		normals[ j ++ ] = attribArray[ i     ];
+		normals[ j ++ ] = attribArray[ i + 1 ];
+		normals[ j ++ ] = attribArray[ i + 2 ];
 
 	}
 
