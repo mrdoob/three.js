@@ -21724,7 +21724,7 @@ THREE.Mesh = function ( geometry, material ) {
 	this.material = material !== undefined ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
 	this.drawMode = THREE.TrianglesDrawMode;
-	
+
 	this.updateMorphTargets();
 
 };
@@ -21732,9 +21732,9 @@ THREE.Mesh = function ( geometry, material ) {
 THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Mesh.prototype.constructor = THREE.Mesh;
 
-THREE.Mesh.prototype.setDrawMode = function ( mode ) {
+THREE.Mesh.prototype.setDrawMode = function ( value ) {
 
-	this.drawMode = mode;
+	this.drawMode = value;
 
 };
 
@@ -25320,8 +25320,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				renderer.setMode( _gl.LINES );
 
 			} else {
-				
-				switch ( object.mode ) {
+
+				switch ( object.drawMode ) {
 
 					case THREE.TrianglesDrawMode:
 						renderer.setMode( _gl.TRIANGLES );
