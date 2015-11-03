@@ -215,7 +215,7 @@ THREE.OBJLoader.prototype = {
 		// f vertex//normal vertex//normal vertex//normal ...
 		var face_pattern4 = /^f\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))(?:\s+((-?\d+)\/\/(-?\d+)))?/;
 		
-		var object_pattern = /^o\s+(.+)/;
+		var object_pattern = /^[og]\s+(.+)/;
 		
 		var smoothing_pattern = /^s\s+([01]|on|off)/;
 
@@ -302,6 +302,10 @@ THREE.OBJLoader.prototype = {
 
 			} else if ( ( result = object_pattern.exec( line ) ) !== null ) {
 				
+				// o object_name
+				// or
+				// g group_name
+				
 				var name = result[1].trim();
 				
 				if ( foundObjects === false ) {
@@ -314,10 +318,6 @@ THREE.OBJLoader.prototype = {
 					addObject(name);
 					
 				}
-
-			} else if ( /^g /.test( line ) ) {
-
-				// group
 
 			} else if ( /^usemtl /.test( line ) ) {
 
