@@ -46,7 +46,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
 
 		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );
-		
+
 	}
 
 #endif
@@ -54,7 +54,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 #if defined( Material_RE_IndirectDiffuseLight )
 
 	{
-	
+
 		vec3 indirectDiffuseIrradiance = getAmbientLightIrradiance( ambientLightColor );
 
 #ifdef USE_LIGHTMAP
@@ -73,7 +73,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 #endif
 
-#if defined( USE_ENVMAP ) && defined( PHYSICAL )
+#if defined( USE_ENVMAP ) && defined( STANDARD )
 
 		// TODO, replace 8 with the real maxMIPLevel
 		indirectDiffuseIrradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 );

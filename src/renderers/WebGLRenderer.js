@@ -636,7 +636,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 
-			if ( material.type !== 'MeshPhongMaterial' && material.type !== 'MeshPhysicalMaterial' && material.shading === THREE.FlatShading ) {
+			if ( material.type !== 'MeshPhongMaterial' && material.type !== 'MeshStandardMaterial' && material.shading === THREE.FlatShading ) {
 
 				for ( var i = 0, l = object.count * 3; i < l; i += 9 ) {
 
@@ -1506,7 +1506,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material instanceof THREE.MeshPhongMaterial ||
 				material instanceof THREE.MeshLambertMaterial ||
-				material instanceof THREE.MeshPhysicalMaterial ||
+				material instanceof THREE.MeshStandardMaterial ||
 				material.lights ) {
 
 			// store the light setup it was created for
@@ -1636,7 +1636,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.ShaderMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshPhysicalMaterial ||
+				 material instanceof THREE.MeshStandardMaterial ||
 				 material.envMap ) {
 
 				if ( p_uniforms.cameraPosition !== undefined ) {
@@ -1651,7 +1651,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshBasicMaterial ||
-				 material instanceof THREE.MeshPhysicalMaterial ||
+				 material instanceof THREE.MeshStandardMaterial ||
 				 material instanceof THREE.ShaderMaterial ||
 				 material.skinning ) {
 
@@ -1722,7 +1722,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
-				 material instanceof THREE.MeshPhysicalMaterial ||
+				 material instanceof THREE.MeshStandardMaterial ||
 				 material.lights ) {
 
 				// the current material requires lighting info
@@ -1749,7 +1749,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material instanceof THREE.MeshBasicMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshPhysicalMaterial ) {
+				 material instanceof THREE.MeshStandardMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
 
@@ -1774,9 +1774,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				refreshUniformsPhong( m_uniforms, material );
 
-			} else if ( material instanceof THREE.MeshPhysicalMaterial ) {
+			} else if ( material instanceof THREE.MeshStandardMaterial ) {
 
-				refreshUniformsPhysical( m_uniforms, material );
+				refreshUniformsStandard( m_uniforms, material );
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -1995,7 +1995,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function refreshUniformsPhysical ( uniforms, material ) {
+	function refreshUniformsStandard ( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
 		//uniforms.reflectivity.value = material.reflectivity; // part of uniforms common

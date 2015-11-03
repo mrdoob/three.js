@@ -214,7 +214,7 @@
 
 					if ( m.name.indexOf( "Body" ) !== -1 ) {
 
-						var mm = new THREE.MeshPhysicalMaterial();
+						var mm = new THREE.MeshStandardMaterial();
 
 						mm.color.setHex( 0x000000 );
 						mm.lightMap = m.map;
@@ -226,7 +226,7 @@
 
 					} else if ( m.name.indexOf( "mirror" ) !== -1 ) {
 
-						var mm = new THREE.MeshPhysicalMaterial();
+						var mm = new THREE.MeshStandardMaterial();
 
 						mm.color.setHex( 0x808080 );
 						mm.lightMap = m.map;
@@ -238,7 +238,7 @@
 
 					} else if ( m.name.indexOf( "glass" ) !== -1 ) {
 
-						var mm = new THREE.MeshPhysicalMaterial();
+						var mm = new THREE.MeshStandardMaterial();
 
 						mm.color.copy( m.color );
 //						mm.lightMap = m.map;

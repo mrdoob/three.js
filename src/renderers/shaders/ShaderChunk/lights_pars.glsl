@@ -122,7 +122,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 #endif
 
 
-#if defined( USE_ENVMAP ) && defined( PHYSICAL )
+#if defined( USE_ENVMAP ) && defined( STANDARD )
 
 	vec3 getLightProbeIndirectIrradiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) {
 

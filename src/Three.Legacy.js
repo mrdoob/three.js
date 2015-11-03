@@ -351,11 +351,11 @@ Object.defineProperties( THREE, {
 Object.defineProperties( THREE.MeshPhongMaterial.prototype, {
 	metal: {
 		get: function () {
-			console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshPhysicalMaterial instead.' );
+			console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshStandardMaterial instead.' );
 			return false;
 		},
 		set: function ( value ) {
-			console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshPhysicalMaterial instead' );
+			console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshStandardMaterial instead' );
 		}
 	}
 } );

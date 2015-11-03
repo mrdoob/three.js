@@ -63,7 +63,7 @@ Sidebar.Material = function ( editor ) {
 		'MeshNormalMaterial': 'MeshNormalMaterial',
 		'MeshLambertMaterial': 'MeshLambertMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial',
-		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
+		'MeshStandardMaterial': 'MeshStandardMaterial',
 		'ShaderMaterial': 'ShaderMaterial',
 		'SpriteMaterial': 'SpriteMaterial'
 
