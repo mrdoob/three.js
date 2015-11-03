@@ -222,7 +222,7 @@ THREE.OBJLoader.prototype = {
 		// f vertex//normal vertex//normal vertex//normal ...
 		var face_pattern4 = /^f\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))(?:\s+((-?\d+)\/\/(-?\d+)))?/;
 
-		var object_pattern = /^[og]\s+(.+)/;
+		var object_pattern = /^[o]\s+(.+)/;
 
 		var smoothing_pattern = /^s\s+([01]|on|off)/;
 
