@@ -34,7 +34,7 @@
 
 		<script src="js/loaders/DDSLoader.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
-		<script src="js/loaders/OBJMTLLoader.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -83,19 +83,31 @@
 					}
 				};
 
-				var onError = function ( xhr ) {
-				};
-
-
+				var onError = function ( xhr ) { };
+				
 				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
-
-				var loader = new THREE.OBJMTLLoader();
-				loader.load( 'obj/male02/male02.obj', 'obj/male02/male02_dds.mtl', function ( object ) {
-
-					object.position.y = - 80;
-					scene.add( object );
-
-				}, onProgress, onError );
+				
+				var objLoader = new THREE.OBJLoader();
+				var mtlLoader = new THREE.MTLLoader(objLoader.manager);
+				
+				var mtlUrl = 'obj/male02/male02_dds.mtl';
+				var objUrl = 'obj/male02/male02.obj';
+				
+				mtlLoader.setBaseUrl( objUrl.substr( 0, objUrl.lastIndexOf( "/" ) + 1 ) );
+				
+				mtlLoader.load( mtlUrl, function( materials ) {
+					
+					materials.preload();
+					objLoader.setMaterials( materials );
+					
+					objLoader.load( objUrl, function ( object ) {
+	
+						object.position.y = - 80;
+						scene.add( object );
+	
+					}, onProgress, onError );
+					
+				});
 
 				//
 
