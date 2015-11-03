@@ -76,7 +76,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 #if MAX_DIR_LIGHTS > 0
 
-	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
+	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
 		vec3 lightColor = directionalLightColor[ i ];
 
@@ -95,15 +95,5 @@ vec3 totalSpecularLight = vec3( 0.0 );
 		totalSpecularLight += brdf * specularStrength * lightColor * cosineTerm;
 
 	}
-
-#endif
-
-#ifdef METAL
-
-	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + totalEmissiveLight;
-
-#else
-
-	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;
 
 #endif

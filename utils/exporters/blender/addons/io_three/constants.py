@@ -113,6 +113,7 @@ ERROR = 'error'
 WARNING = 'warning'
 INFO = 'info'
 DEBUG = 'debug'
+DISABLED = 'disabled'
 
 NONE = 'None'
 MSGPACK = 'msgpack'

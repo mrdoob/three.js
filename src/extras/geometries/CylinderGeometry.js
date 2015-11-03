@@ -173,17 +173,17 @@ THREE.CylinderGeometry.prototype.constructor = THREE.CylinderGeometry;
 
 THREE.CylinderGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.CylinderGeometry(
-		this.parameters.radiusTop,
-		this.parameters.radiusBottom,
-		this.parameters.height,
-		this.parameters.radialSegments,
-		this.parameters.heightSegments,
-		this.parameters.openEnded,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.CylinderGeometry(
+		parameters.radiusTop,
+		parameters.radiusBottom,
+		parameters.height,
+		parameters.radialSegments,
+		parameters.heightSegments,
+		parameters.openEnded,
+		parameters.thetaStart,
+		parameters.thetaLength
+	);
 
 };

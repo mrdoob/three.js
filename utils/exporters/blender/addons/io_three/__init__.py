@@ -629,6 +629,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         default=constants.EXPORT_OPTIONS[constants.PRECISION])
 
     logging_types = [
+        (constants.DISABLED, constants.DISABLED, constants.DISABLED),
         (constants.DEBUG, constants.DEBUG, constants.DEBUG),
         (constants.INFO, constants.INFO, constants.INFO),
         (constants.WARNING, constants.WARNING, constants.WARNING),
@@ -639,7 +640,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         name="",
         description="Logging verbosity level",
         items=logging_types,
-        default=constants.DEBUG)
+        default=constants.DISABLED)
 
     option_geometry_type = EnumProperty(
         name="Type",

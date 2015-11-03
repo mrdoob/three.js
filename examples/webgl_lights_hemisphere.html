@@ -159,7 +159,6 @@
 
 				dirLight.shadowCameraFar = 3500;
 				dirLight.shadowBias = -0.0001;
-				dirLight.shadowDarkness = 0.35;
 				//dirLight.shadowCameraVisible = true;
 
 				// GROUND
@@ -201,8 +200,6 @@
 
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
-
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
 					var mesh = new THREE.Mesh( geometry, material );
 
@@ -217,7 +214,7 @@
 					scene.add( mesh );
 
 					var mixer = new THREE.AnimationMixer( mesh );
-					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( 5 ) );
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[ 0 ] ).warpToDuration( 1 ) );
 					mixers.push( mixer );
 
 				} );
@@ -245,22 +242,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 				document.addEventListener( 'keydown', onKeyDown, false );
-
-			}
-
-			function morphColorsToFaceColors( geometry ) {
-
-				if ( geometry.morphColors && geometry.morphColors.length ) {
-
-					var colorMap = geometry.morphColors[ 0 ];
-
-					for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-
-						geometry.faces[ i ].color = colorMap.colors[ i ];
-
-					}
-
-				}
 
 			}
 

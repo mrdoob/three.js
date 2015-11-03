@@ -93,15 +93,15 @@ THREE.RingGeometry.prototype.constructor = THREE.RingGeometry;
 
 THREE.RingGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.RingGeometry(
-		this.parameters.innerRadius,
-		this.parameters.outerRadius,
-		this.parameters.thetaSegments,
-		this.parameters.phiSegments,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.RingGeometry(
+		parameters.innerRadius,
+		parameters.outerRadius,
+		parameters.thetaSegments,
+		parameters.phiSegments,
+		parameters.thetaStart,
+		parameters.thetaLength
+	);
 
 };

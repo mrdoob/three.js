@@ -27,6 +27,7 @@ var APP = {
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
+			if ( json.project.shadows ) renderer.shadowMap.enabled = true;
 			this.dom = renderer.domElement;
 
 			this.setScene( loader.parse( json.scene ) );
@@ -98,7 +99,6 @@ var APP = {
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
 
-
 			if ( vr === true ) {
 
 				if ( camera.parent === null ) {
@@ -157,7 +157,7 @@ var APP = {
 
 		};
 
-		var dispatch = function ( array, event ) {
+		function dispatch( array, event ) {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
@@ -173,11 +173,11 @@ var APP = {
 
 			}
 
-		};
+		}
 
 		var prevTime, request;
 
-		var animate = function ( time ) {
+		function animate( time ) {
 
 			request = requestAnimationFrame( animate );
 
@@ -196,7 +196,7 @@ var APP = {
 
 			prevTime = time;
 
-		};
+		}
 
 		this.play = function () {
 
@@ -233,53 +233,53 @@ var APP = {
 
 		//
 
-		var onDocumentKeyDown = function ( event ) {
+		function onDocumentKeyDown( event ) {
 
 			dispatch( events.keydown, event );
 
-		};
+		}
 
-		var onDocumentKeyUp = function ( event ) {
+		function onDocumentKeyUp( event ) {
 
 			dispatch( events.keyup, event );
 
-		};
+		}
 
-		var onDocumentMouseDown = function ( event ) {
+		function onDocumentMouseDown( event ) {
 
 			dispatch( events.mousedown, event );
 
-		};
+		}
 
-		var onDocumentMouseUp = function ( event ) {
+		function onDocumentMouseUp( event ) {
 
 			dispatch( events.mouseup, event );
 
-		};
+		}
 
-		var onDocumentMouseMove = function ( event ) {
+		function onDocumentMouseMove( event ) {
 
 			dispatch( events.mousemove, event );
 
-		};
+		}
 
-		var onDocumentTouchStart = function ( event ) {
+		function onDocumentTouchStart( event ) {
 
 			dispatch( events.touchstart, event );
 
-		};
+		}
 
-		var onDocumentTouchEnd = function ( event ) {
+		function onDocumentTouchEnd( event ) {
 
 			dispatch( events.touchend, event );
 
-		};
+		}
 
-		var onDocumentTouchMove = function ( event ) {
+		function onDocumentTouchMove( event ) {
 
 			dispatch( events.touchmove, event );
 
-		};
+		}
 
 	}
 

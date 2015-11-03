@@ -28,7 +28,7 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 	var uvs = new Float32Array( vertices * 2 );
 
 	// center data is already zero, but need to set a few extras
-	normals[ 3 ] = 1.0;
+	normals[ 2 ] = 1.0;
 	uvs[ 0 ] = 0.5;
 	uvs[ 1 ] = 0.5;
 
@@ -50,9 +50,7 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 
 	for ( var i = 1; i <= segments; i ++ ) {
 
-		indices.push( i );
-		indices.push( i + 1 );
-		indices.push( 0 );
+		indices.push( i, i + 1, 0 );
 
 	}
 
@@ -70,15 +68,13 @@ THREE.CircleBufferGeometry.prototype.constructor = THREE.CircleBufferGeometry;
 
 THREE.CircleBufferGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.CircleBufferGeometry(
-		this.parameters.radius,
-		this.parameters.segments,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
+	var parameters = this.parameters;
+
+	return new THREE.CircleBufferGeometry(
+		parameters.radius,
+		parameters.segments,
+		parameters.thetaStart,
+		parameters.thetaLength
 	);
-
-	geometry.copy( this );
-
-	return geometry;
 
 };
