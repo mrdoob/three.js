@@ -867,7 +867,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
-				renderer.renderInstances( geometry );
+				renderer.renderInstances( geometry, drawStart, drawCount );
 
 			} else {
 
