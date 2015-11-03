@@ -5,7 +5,7 @@
 THREE.OBJLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-	
+
 	this.materials = null;
 
 };
@@ -20,6 +20,7 @@ THREE.OBJLoader.prototype = {
 
 		var loader = new THREE.XHRLoader( scope.manager );
 		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
@@ -33,11 +34,17 @@ THREE.OBJLoader.prototype = {
 		this.crossOrigin = value;
 
 	},
-	
+
+	setPath: function ( value ) {
+
+		this.path = value;
+
+	},
+
 	setMaterials: function ( materials ) {
-		
+
 		this.materials = materials;
-			
+
 	},
 
 	parse: function ( text ) {
@@ -50,9 +57,9 @@ THREE.OBJLoader.prototype = {
 		var vertices = [];
 		var normals = [];
 		var uvs = [];
-		
+
 		function addObject(name) {
-			
+
 			var geometry = {
 				vertices: [],
 				normals: [],
@@ -71,7 +78,7 @@ THREE.OBJLoader.prototype = {
 			};
 
 			objects.push( object );
-			
+
 		}
 
 		function parseVertexIndex( value ) {
@@ -191,7 +198,7 @@ THREE.OBJLoader.prototype = {
 			}
 
 		}
-		
+
 		addObject("");
 
 		// v float float float
@@ -214,9 +221,9 @@ THREE.OBJLoader.prototype = {
 
 		// f vertex//normal vertex//normal vertex//normal ...
 		var face_pattern4 = /^f\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))(?:\s+((-?\d+)\/\/(-?\d+)))?/;
-		
+
 		var object_pattern = /^[og]\s+(.+)/;
-		
+
 		var smoothing_pattern = /^s\s+([01]|on|off)/;
 
 		//
@@ -301,22 +308,22 @@ THREE.OBJLoader.prototype = {
 				);
 
 			} else if ( ( result = object_pattern.exec( line ) ) !== null ) {
-				
+
 				// o object_name
 				// or
 				// g group_name
-				
+
 				var name = result[1].trim();
-				
+
 				if ( foundObjects === false ) {
-					
+
 					foundObjects = true;
 					object.name = name;
-					
+
 				} else {
-					
+
 					addObject(name);
-					
+
 				}
 
 			} else if ( /^usemtl /.test( line ) ) {
@@ -332,7 +339,7 @@ THREE.OBJLoader.prototype = {
 			} else if ( ( result = smoothing_pattern.exec( line ) ) !== null ) {
 
 				// smooth shading
-				
+
 				object.material.smooth = result[ 1 ] === "1" || result[ 1 ] === "on";
 
 			} else {
@@ -359,9 +366,9 @@ THREE.OBJLoader.prototype = {
 				buffergeometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( geometry.normals ), 3 ) );
 
 			} else {
-				
+
 				buffergeometry.computeVertexNormals();
-				
+
 			}
 
 			if ( geometry.uvs.length > 0 ) {
@@ -369,20 +376,20 @@ THREE.OBJLoader.prototype = {
 				buffergeometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geometry.uvs ), 2 ) );
 
 			}
-			
+
 			var material;
-			
+
 			if ( this.materials !== null ) {
-				
+
 				material = this.materials.create( object.material.name );
-				
+
 			}
-							
+
 			if ( !material ) {
 
 				material = new THREE.MeshPhongMaterial();
 				material.name = object.material.name;
-				
+
 			}
 
 			material.shading = object.material.smooth ? THREE.SmoothShading : THREE.FlatShading;

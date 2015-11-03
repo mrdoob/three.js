@@ -20,6 +20,7 @@ THREE.MTLLoader.prototype = {
 
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
@@ -28,7 +29,15 @@ THREE.MTLLoader.prototype = {
 
 	},
 
+	setPath: function ( value ) {
+
+		this.path = value;
+
+	},
+
 	setBaseUrl: function( value ) {
+
+		// TODO: Merge with setPath()? Or rename to setTexturePath?
 
 		this.baseUrl = value;
 
