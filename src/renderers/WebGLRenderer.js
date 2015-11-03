@@ -2216,6 +2216,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_gl.uniform4fv( location, value );
 					break;
 
+				case 'Matrix2fv':
+					_gl.uniformMatrix2fv( location, false, value );
+					break;
+
 				case 'Matrix3fv':
 					_gl.uniformMatrix3fv( location, false, value );
 					break;
@@ -2425,6 +2429,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					_gl.uniform4fv( location, uniform._array );
+
+					break;
+
+				case 'm2':
+
+					// single THREE.Matrix2
+					_gl.uniformMatrix2fv( location, false, value.elements );
 
 					break;
 
@@ -3294,9 +3305,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		//
 		// Setup depth and stencil buffers
-		//
+
 		if ( renderTarget.depthBuffer ) {
 
 			setupDepthRenderbuffer( renderTarget );
