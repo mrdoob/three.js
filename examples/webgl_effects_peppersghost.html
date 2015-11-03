@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js webgl - effects - peppers ghost</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <style>
-        body {
-            background: #777;
-            padding: 0;
-            margin: 0;
-            font-weight: bold;
-            overflow: hidden;
-        }
+		<title>three.js webgl - effects - peppers ghost</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+				body {
+						background: #777;
+						padding: 0;
+						margin: 0;
+						font-weight: bold;
+						overflow: hidden;
+				}
 
-        #info {
-            position: absolute;
-            top: 0px;
-            width: 100%;
-            color: #ffffff;
-            padding: 5px;
-            font-family: Monospace;
-            font-size: 13px;
-            text-align: center;
-            z-index: 1000;
-        }
+				#info {
+						position: absolute;
+						top: 0px;
+						width: 100%;
+						color: #ffffff;
+						padding: 5px;
+						font-family: Monospace;
+						font-size: 13px;
+						text-align: center;
+						z-index: 1000;
+				}
 
-        a {
-            color: #ffffff;
-        }
+				a {
+						color: #ffffff;
+				}
 
-        #oldie a {
-            color: #da0
-        }
-    </style>
+				#oldie a {
+						color: #da0
+				}
+		</style>
 </head>
 
 <body>
 <div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - <a href="https://en.wikipedia.org/wiki/Pepper%27s_ghost">peppers ghost effect</a> demo <br />
-    <a href="http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS">basic instructions for building the reflective prism</a></div>
+		<a href="http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS">basic instructions for building the reflective prism</a></div>
 
 <script src="../build/three.min.js"></script>
 
@@ -47,87 +47,87 @@
 
 <script>
 
-    if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-    var container;
+		var container;
 
-    var camera, scene, renderer, effect;
-    var cube;
+		var camera, scene, renderer, effect;
+		var cube;
 
-    var windowHalfX = window.innerWidth / 2;
-    var windowHalfY = window.innerHeight / 2;
+		var windowHalfX = window.innerWidth / 2;
+		var windowHalfY = window.innerHeight / 2;
 
-    init();
-    animate();
+		init();
+		animate();
 
-    function init() {
+		function init() {
 
-        container = document.createElement( 'div' );
-        document.body.appendChild( container );
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-        camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 
-        scene = new THREE.Scene();
+				scene = new THREE.Scene();
 
-        // Cube
+				// Cube
 
-        var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+				var geometry = new THREE.BoxGeometry( 1, 1, 1 );
 
-        for ( var i = 0; i < geometry.faces.length; i += 2 ) {
+				for ( var i = 0; i < geometry.faces.length; i += 2 ) {
 
-            var hex = Math.random() * 0xffffff;
-            geometry.faces[ i ].color.setHex( hex );
-            geometry.faces[ i + 1 ].color.setHex( hex );
+						var hex = Math.random() * 0xffffff;
+						geometry.faces[ i ].color.setHex( hex );
+						geometry.faces[ i + 1 ].color.setHex( hex );
 
-        }
+				}
 
-        var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, overdraw: 0.5 } );
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, overdraw: 0.5 } );
 
-        cube = new THREE.Mesh( geometry, material );
-        cube.position.y = 1;
-        scene.add( cube );
+				cube = new THREE.Mesh( geometry, material );
+				cube.position.y = 1;
+				scene.add( cube );
 
-        renderer = new THREE.WebGLRenderer();
-        renderer.setPixelRatio( window.devicePixelRatio );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 
-        container.appendChild( renderer.domElement );
+				container.appendChild( renderer.domElement );
 
-        effect = new THREE.PeppersGhostEffect( renderer );
-        effect.setSize( window.innerWidth, window.innerHeight );
-        effect.cameraDistance = 5;
+				effect = new THREE.PeppersGhostEffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );
+				effect.cameraDistance = 5;
 
-        window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
-    }
+		}
 
-    function onWindowResize() {
+		function onWindowResize() {
 
-        windowHalfX = window.innerWidth / 2,
-                windowHalfY = window.innerHeight / 2,
-                camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+				windowHalfX = window.innerWidth / 2,
+								windowHalfY = window.innerHeight / 2,
+								camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
-        effect.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
-    }
+		}
 
-    function animate() {
+		function animate() {
 
-        requestAnimationFrame( animate );
+				requestAnimationFrame( animate );
 
-        render();
+				render();
 
-    }
+		}
 
-    function render() {
+		function render() {
 
-        camera.lookAt( scene.position );
+				camera.lookAt( scene.position );
 
-        cube.rotation.y += 0.01;
+				cube.rotation.y += 0.01;
 
-        effect.render( scene, camera );
+				effect.render( scene, camera );
 
-    }
+		}
 
 
 </script>
