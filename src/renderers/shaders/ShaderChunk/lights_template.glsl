@@ -76,7 +76,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 #if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
 		// TODO, replace 8 with the real maxMIPLevel
-		indirectDiffuseIrradiance += getLightProbeIrradiance( /*lightProbe,*/ geometry, 8 );
+		indirectDiffuseIrradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 );
 
 #endif
 
@@ -91,7 +91,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 	{
 
 		// TODO, replace 8 with the real maxMIPLevel
-		vec3 indirectSpecularRadiance = getLightProbeRadiance( /*specularLightProbe,*/ geometry, Material_BlinnShininessExponent( material ), 8 );
+		vec3 indirectSpecularRadiance = getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry, Material_BlinnShininessExponent( material ), 8 );
 
 		Material_RE_IndirectSpecularLight( indirectSpecularRadiance, geometry, material, reflectedLight );
 

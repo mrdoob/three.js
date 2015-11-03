@@ -124,7 +124,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 #if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
-	vec3 getLightProbeIrradiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) {
+	vec3 getLightProbeIndirectIrradiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) {
 
 		#ifdef DOUBLE_SIDED
 
@@ -181,7 +181,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	}
 
-	vec3 getLightProbeRadiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) {
+	vec3 getLightProbeIndirectRadiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) {
 
 		#ifdef ENVMAP_MODE_REFLECTION
 
