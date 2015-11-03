@@ -16,7 +16,7 @@ vLightFront = vec3( 0.0 );
 		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
 
 		float dotNL = dot( geometry.normal, directLight.direction );
-		vec3 directLightColor_Diffuse = directLight.color * BRDF_Diffuse_Lambert( diffuse );
+		vec3 directLightColor_Diffuse = PI * directLight.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 
@@ -37,7 +37,7 @@ vLightFront = vec3( 0.0 );
 		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );
 
 		float dotNL = dot( geometry.normal, directLight.direction );
-		vec3 directLightColor_Diffuse = directLight.color * BRDF_Diffuse_Lambert( diffuse );
+		vec3 directLightColor_Diffuse = PI * directLight.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 
@@ -57,7 +57,7 @@ vLightFront = vec3( 0.0 );
 		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
 
 		float dotNL = dot( geometry.normal, directLight.direction );
-		vec3 directLightColor_Diffuse = directLight.color * BRDF_Diffuse_Lambert( diffuse );
+		vec3 directLightColor_Diffuse = PI * directLight.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 
@@ -72,15 +72,12 @@ vLightFront = vec3( 0.0 );
 #endif
 
 	{
-		// dotNL is always one, and diffuseColor is vec3(1.0), thus the result is equivalent to summing indirectDiffuse lights
-		//float frontDotNL = saturate( dot( geometry.normal, frontIndirectLight.direction ) );
-		//vLightFront += frontDotNL * frontIndirectLight.color * BRDF_Diffuse_Lambert( diffuse );
 
-		vLightFront += ambientLightColor;
+		vLightFront += PI * ambientLightColor;
 
 		#ifdef DOUBLE_SIDED
 
-			vLightBack += ambientLightColor;
+			vLightBack += PI * ambientLightColor;
 
 		#endif
 
@@ -88,11 +85,11 @@ vLightFront = vec3( 0.0 );
 
 			for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-				vLightFront += getHemisphereIndirectLightColor( hemisphereLights[ i ], geometry );
+				vLightFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
 
 				#ifdef DOUBLE_SIDED
 
-					vLightBack += getHemisphereIndirectLightColor( hemisphereLights[ i ], backGeometry );
+					vLightBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );
 
 				#endif
 

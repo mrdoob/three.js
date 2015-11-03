@@ -13,9 +13,7 @@ float calcLightAttenuation( const in float lightDistance, const in float cutoffD
 
 vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 
-	// factor of 1/PI in BRDF omitted as incoming light intensity is scaled up by PI because it is considered a punctual light source
-
-	return diffuseColor;
+	return RECIPROCAL_PI * diffuseColor;
 
 } // validated
 
@@ -56,21 +54,17 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 // alpha is "roughness squared" in Disney’s reparameterization
 float D_GGX( const in float alpha, const in float dotNH ) {
 
-	// factor of 1/PI in distribution term omitted as incoming light intensity is scaled up by PI because it is considered a punctual light source
-
 	float a2 = alpha * alpha;
 
 	float denom = dotNH * dotNH * ( a2 - 1.0 ) + 1.0; // avoid alpha = 0 with dotNH = 1
 
-	return a2 / ( denom * denom );
+	return RECIPROCAL_PI * a2 / ( denom * denom );
 
 }
 
 
 // GGX Distribution, Schlick Fresnel, GGX-Smith Visibility
 vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {
-	
-	// factor of 1/PI in BRDF omitted (normally it is in D_GGX) as incoming light intensity is scaled up by PI because it is considered a punctual light source
 
 	float alpha = roughness * roughness; // UE4's roughness
 
@@ -121,15 +115,11 @@ float G_BlinnPhong_Implicit( /* const in float dotNL, const in float dotNV */ ) 
 
 float D_BlinnPhong( const in float shininess, const in float dotNH ) {
 
-	// factor of 1/PI in distribution term omitted as incoming light intensity is scaled up by PI because it is considered a punctual light source
-
-	return ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );
+	return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );
 
 }
 
 vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {
-
-	// factor of 1/PI in BRDF omitted (normally it is in D_BlinnPhong) as incoming light intensity is scaled up by PI because it is considered a punctual light source
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 

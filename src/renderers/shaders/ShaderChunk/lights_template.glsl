@@ -55,11 +55,11 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 	{
 	
-		vec3 indirectDiffuseColor = ambientLightColor;
+		vec3 indirectDiffuseIrradiance = getAmbientLightIrradiance( ambientLightColor );
 
 #ifdef USE_LIGHTMAP
 
-		indirectDiffuseColor += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
+		indirectDiffuseIrradiance += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity; // factor of PI should not be present; included here to prevent breakage
 
 #endif
 
@@ -67,7 +67,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 		for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-			indirectDiffuseColor += getHemisphereIndirectLightColor( hemisphereLights[ i ], geometry );
+			indirectDiffuseIrradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
 
 		}
 
@@ -76,11 +76,11 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 #if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
 		// TODO, replace 8 with the real maxMIPLevel
-		indirectDiffuseColor += getDiffuseLightProbeIndirectLightColor( /*lightProbe,*/ geometry, 8 );
+		indirectDiffuseIrradiance += getLightProbeIrradiance( /*lightProbe,*/ geometry, 8 );
 
 #endif
 
-		Material_RE_IndirectDiffuseLight( indirectDiffuseColor, geometry, material, reflectedLight );
+		Material_RE_IndirectDiffuseLight( indirectDiffuseIrradiance, geometry, material, reflectedLight );
 
 	}
 
@@ -91,9 +91,9 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 	{
 
 		// TODO, replace 8 with the real maxMIPLevel
-		vec3 indirectSpecularColor = getSpecularLightProbeIndirectLightColor( /*specularLightProbe,*/ geometry, Material_BlinnShininessExponent( material ), 8 );
+		vec3 indirectSpecularRadiance = getLightProbeRadiance( /*specularLightProbe,*/ geometry, Material_BlinnShininessExponent( material ), 8 );
 
-		Material_RE_IndirectSpecularLight( indirectSpecularColor, geometry, material, reflectedLight );
+		Material_RE_IndirectSpecularLight( indirectSpecularRadiance, geometry, material, reflectedLight );
 
     }
 

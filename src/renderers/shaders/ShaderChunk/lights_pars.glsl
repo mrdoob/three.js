@@ -1,5 +1,11 @@
 uniform vec3 ambientLightColor;
 
+vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
+
+
+	return PI * ambientLightColor;
+
+}
 
 #if MAX_DIR_LIGHTS > 0
 
@@ -104,12 +110,12 @@ uniform vec3 ambientLightColor;
 
 	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
 
-	vec3 getHemisphereIndirectLightColor( const in HemisphereLight hemiLight, const in GeometricContext geometry ) {
+	vec3 getHemisphereLightIrradiance( const in HemisphereLight hemiLight, const in GeometricContext geometry ) {
 
 		float dotNL = dot( geometry.normal, hemiLight.direction );
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
 
-		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
+		return PI * mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
 
 	}
 
@@ -118,8 +124,7 @@ uniform vec3 ambientLightColor;
 
 #if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
-
-	vec3 getDiffuseLightProbeIndirectLightColor( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) {
+	vec3 getLightProbeIrradiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) {
 
 		#ifdef DOUBLE_SIDED
 
@@ -158,7 +163,7 @@ uniform vec3 ambientLightColor;
 
 		envMapColor.rgb = inputToLinear( envMapColor.rgb );
 
-		return envMapColor.rgb;
+		return PI * envMapColor.rgb;
 
 	}
 
@@ -176,7 +181,7 @@ uniform vec3 ambientLightColor;
 
 	}
 
-	vec3 getSpecularLightProbeIndirectLightColor( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) {
+	vec3 getLightProbeRadiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) {
 
 		#ifdef ENVMAP_MODE_REFLECTION
 
