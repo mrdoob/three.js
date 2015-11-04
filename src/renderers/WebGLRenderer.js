@@ -1523,6 +1523,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// detect dynamic uniforms
+
+		materialProperties.hasDynamicUniforms = false;
+
+		for ( var j = 0, jl = materialProperties.uniformsList.length; j < jl; j ++ ) {
+
+			var uniform = materialProperties.uniformsList[ j ][ 0 ];
+
+			if( typeof uniform.updateFunction === "function" ){
+
+				materialProperties.hasDynamicUniforms = true;
+				break;
+
+			}
+
+		}
+
 	}
 
 	function setMaterial( material ) {
@@ -1814,7 +1831,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if( materialProperties.hasDynamicUniforms === true ){
+
+			updateDynamicUniforms( materialProperties.uniformsList, camera, object );
+
+		}
+
 		return program;
+
+	}
+
+	function updateDynamicUniforms ( uniforms, camera, object ) {
+
+		var dynamicUniforms = [];
+
+		for ( var j = 0, jl = uniforms.length; j < jl; j ++ ) {
+
+			var uniform = uniforms[ j ][ 0 ];
+			var updateFunction = uniform.updateFunction;
+
+			if( typeof updateFunction === "function" ){
+
+				updateFunction( uniform, camera, object );
+				dynamicUniforms.push( uniforms[ j ] );
+
+			}
+
+		}
+
+		loadUniformsGeneric( dynamicUniforms );
 
 	}
 
