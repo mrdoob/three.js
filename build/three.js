@@ -9034,13 +9034,6 @@ THREE.BufferAttribute.prototype = {
 
 	constructor: THREE.BufferAttribute,
 
-	get length() {
-
-		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
-		return this.array.length;
-
-	},
-
 	get count() {
 
 		return this.array.length / this.itemSize;
@@ -12259,6 +12252,36 @@ THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
 };
 
 THREE.EventDispatcher.prototype.apply( THREE.InstancedBufferGeometry.prototype );
+
+// File:src/core/Uniform.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.Uniform = function ( type, value ) {
+
+	this.type = type;
+	this.value = value;
+
+	this.dynamic = false;
+
+};
+
+THREE.Uniform.prototype = {
+
+	constructor: THREE.Uniform,
+
+	onUpdate: function ( callback ) {
+
+		this.dynamic = true;
+		this.onUpdateCallback = callback;
+
+		return this;
+
+	}
+
+};
 
 // File:src/animation/AnimationClip.js
 
@@ -25340,7 +25363,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
-				renderer.renderInstances( geometry );
+				renderer.renderInstances( geometry, drawStart, drawCount );
 
 			} else {
 
@@ -25996,6 +26019,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// detect dynamic uniforms
+
+		materialProperties.hasDynamicUniforms = false;
+
+		for ( var j = 0, jl = materialProperties.uniformsList.length; j < jl; j ++ ) {
+
+			var uniform = materialProperties.uniformsList[ j ][ 0 ];
+
+			if ( uniform.dynamic === true ) {
+
+				materialProperties.hasDynamicUniforms = true;
+				break;
+
+			}
+
+		}
+
 	}
 
 	function setMaterial( material ) {
@@ -26287,7 +26327,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if( materialProperties.hasDynamicUniforms === true ){
+
+			updateDynamicUniforms( materialProperties.uniformsList, object, camera );
+
+		}
+
 		return program;
+
+	}
+
+	function updateDynamicUniforms ( uniforms, object, camera ) {
+
+		var dynamicUniforms = [];
+
+		for ( var j = 0, jl = uniforms.length; j < jl; j ++ ) {
+
+			var uniform = uniforms[ j ][ 0 ];
+			var onUpdateCallback = uniform.onUpdateCallback;
+
+			if ( onUpdateCallback !== undefined ) {
+
+				onUpdateCallback.bind( uniform )( object, camera );
+				dynamicUniforms.push( uniforms[ j ] );
+
+			}
+
+		}
+
+		loadUniformsGeneric( dynamicUniforms );
 
 	}
 
@@ -28242,7 +28310,7 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	}
 
-	function renderInstances( geometry ) {
+	function renderInstances( geometry, start, count ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -28255,7 +28323,7 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		var index = geometry.index;
 
-		extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount );
+		extension.drawElementsInstancedANGLE( mode, count, type, start * size, geometry.maxInstancedCount );
 
 	}
 
@@ -31744,6 +31812,17 @@ Object.defineProperties( THREE.Light.prototype, {
 	shadowMapHeight: {
 		set: function ( value ) {
 			this.shadow.mapSize.height = value;
+		}
+	}
+} );
+
+//
+
+Object.defineProperties( THREE.BufferAttribute.prototype, {
+	length: {
+		get: function () {
+			console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
+			return this.array.length;
 		}
 	}
 } );
