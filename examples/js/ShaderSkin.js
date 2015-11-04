@@ -170,9 +170,9 @@ THREE.ShaderSkin = {
 				"vec3 totalSpecularLight = vec3( 0.0 );",
 				"vec3 totalDiffuseLight = vec3( 0.0 );",
 
-				"#if MAX_POINT_LIGHTS > 0",
+				"#if POINT_LIGHTS > 0",
 
-					"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
+					"for ( int i = 0; i < POINT_LIGHTS; i ++ ) {",
 
 						"vec3 lVector = pointLights[ i ].position + vViewPosition.xyz;",
 
@@ -195,9 +195,9 @@ THREE.ShaderSkin = {
 
 				// directional lights
 
-				"#if MAX_DIR_LIGHTS > 0",
+				"#if DIR_LIGHTS > 0",
 
-					"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
+					"for( int i = 0; i < DIR_LIGHTS; i++ ) {",
 
 						"vec3 dirVector = directionalLights[ i ].direction;",
 
@@ -216,9 +216,9 @@ THREE.ShaderSkin = {
 
 				// hemisphere lights
 
-				"#if MAX_HEMI_LIGHTS > 0",
+				"#if HEMI_LIGHTS > 0",
 
-					"for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
+					"for ( int i = 0; i < HEMI_LIGHTS; i ++ ) {",
 
 						"vec3 lVector = hemisphereLightDirection[ i ];",
 
@@ -452,15 +452,15 @@ THREE.ShaderSkin = {
 				"vec3 totalDiffuseLight = vec3( 0.0 );",
 				"vec3 totalSpecularLight = vec3( 0.0 );",
 
-				"#if MAX_POINT_LIGHTS > 0",
+				"#if POINT_LIGHTS > 0",
 
-					"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
-						
+					"for ( int i = 0; i < POINT_LIGHTS; i ++ ) {",
+
 						"vec3 pointVector = normalize( pointLights[ i ].direction );",
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLights[ i ].distance, pointLights[ i ].decay );",
-				
+
 						"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
-				
+
 						"totalDiffuseLight += pointLightColor[ i ] * ( pointDiffuseWeight * attenuation );",
 
 						"if ( passID == 1 ) {",
@@ -477,15 +477,15 @@ THREE.ShaderSkin = {
 
 				// directional lights
 
-				"#if MAX_DIR_LIGHTS > 0",
+				"#if DIR_LIGHTS > 0",
 
-					"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
+					"for( int i = 0; i < DIR_LIGHTS; i++ ) {",
 
 						"vec3 dirVector = directionalLights[ i ].direction;",
 
 						"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
 
-					
+
 						"totalDiffuseLight += directionalLights[ i ].color * dirDiffuseWeight;",
 
 						"if ( passID == 1 ) {",

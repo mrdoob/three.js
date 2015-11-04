@@ -15,9 +15,9 @@
 
 GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal ), normalize(vViewPosition ) );
 
-#if ( MAX_POINT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )
+#if ( POINT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )
 
-	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
+	for ( int i = 0; i < POINT_LIGHTS; i ++ ) {
 
 		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
 
@@ -27,9 +27,9 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 #endif
 
-#if ( MAX_SPOT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )
+#if ( SPOT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )
 
-	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
+	for ( int i = 0; i < SPOT_LIGHTS; i ++ ) {
 
 		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );
 
@@ -39,9 +39,9 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 #endif
 
-#if ( MAX_DIR_LIGHTS > 0 ) && defined( Material_RE_DirectLight )
+#if ( DIR_LIGHTS > 0 ) && defined( Material_RE_DirectLight )
 
-	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
+	for ( int i = 0; i < DIR_LIGHTS; i ++ ) {
 
 		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
 
@@ -63,9 +63,9 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 #endif
 
-#if ( MAX_HEMI_LIGHTS > 0 )
+#if ( HEMI_LIGHTS > 0 )
 
-		for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
+		for ( int i = 0; i < HEMI_LIGHTS; i ++ ) {
 
 			indirectDiffuseIrradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
 

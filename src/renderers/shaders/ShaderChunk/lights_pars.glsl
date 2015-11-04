@@ -7,14 +7,14 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 }
 
-#if MAX_DIR_LIGHTS > 0
+#if DIR_LIGHTS > 0
 
 	struct DirectionalLight {
 	  vec3 direction;
 	  vec3 color;
 	};
 
-	uniform DirectionalLight directionalLights[ MAX_DIR_LIGHTS ];
+	uniform DirectionalLight directionalLights[ DIR_LIGHTS ];
 
 	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
 
@@ -29,7 +29,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 #endif
 
 
-#if MAX_POINT_LIGHTS > 0
+#if POINT_LIGHTS > 0
 
 	struct PointLight {
 	  vec3 position;
@@ -38,7 +38,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	  float decay;
 	};
 
-	uniform PointLight pointLights[ MAX_POINT_LIGHTS ];
+	uniform PointLight pointLights[ POINT_LIGHTS ];
 
 	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) {
 
@@ -56,7 +56,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 #endif
 
 
-#if MAX_SPOT_LIGHTS > 0
+#if SPOT_LIGHTS > 0
 
 	struct SpotLight {
 	  vec3 position;
@@ -68,7 +68,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	  float exponent;
 	};
 
-	uniform SpotLight spotLights[ MAX_SPOT_LIGHTS ];
+	uniform SpotLight spotLights[ SPOT_LIGHTS ];
 
 	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {
 
@@ -100,7 +100,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 #endif
 
 
-#if MAX_HEMI_LIGHTS > 0
+#if HEMI_LIGHTS > 0
 
 	struct HemisphereLight {
 	  vec3 direction;
@@ -108,7 +108,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	  vec3 groundColor;
 	};
 
-	uniform HemisphereLight hemisphereLights[ MAX_HEMI_LIGHTS ];
+	uniform HemisphereLight hemisphereLights[ HEMI_LIGHTS ];
 
 	vec3 getHemisphereLightIrradiance( const in HemisphereLight hemiLight, const in GeometricContext geometry ) {
 

@@ -166,11 +166,11 @@
 						"void main() {",
 							"vec3 normal = normalize( -vNormal );",
 							"vec3 viewPosition = normalize( vViewPosition );",
-							"#if MAX_DIR_LIGHTS > 0",
+							"#if DIR_LIGHTS > 0",
 
 								"vec3 dirDiffuse = vec3( 0.0 );",
 
-								"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
+								"for( int i = 0; i < DIR_LIGHTS; i ++ ) {",
 
 									"vec4 lDirection = viewMatrix * vec4( directionalLights[i].direction, 0.0 );",
 									"vec3 dirVector = normalize( lDirection.xyz );",

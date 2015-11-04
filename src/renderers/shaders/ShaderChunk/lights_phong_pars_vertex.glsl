@@ -4,8 +4,8 @@
 
 #endif
 
-#if MAX_POINT_LIGHTS > 0
+#if POINT_LIGHTS > 0
 
-	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];
+	uniform vec3 pointLightPosition[ POINT_LIGHTS ];
 
 #endif
