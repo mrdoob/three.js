@@ -166,7 +166,7 @@ THREE.Matrix3.prototype = {
 
 	getInverse: function ( matrix, throwOnInvertible ) {
 
-		// input: THREE.Matrix4
+		// input: THREE.Matrix3
 		// ( based on http://code.google.com/p/webgl-mjs/ )
 
 		var me = matrix.elements;
