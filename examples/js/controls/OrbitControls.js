@@ -52,6 +52,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// Set to true to disable this control
 	this.noPan = false;
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
+	this.limitPan = false;
+	this.maxDistanceFromOrigin = 100;
 
 	// Set to true to automatically rotate around the target
 	this.autoRotate = false;
@@ -307,7 +309,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 		radius = Math.max( this.minDistance, Math.min( this.maxDistance, radius ) );
 
 		// move target to panned location
-		this.target.add( pan );
+		var temp = this.target.clone();
+		temp.add( pan );
+		if ( !this.limitPan || temp.distanceTo(new THREE.Vector3(0,0,0)) < this.maxDistanceFromOrigin) {
+			this.target.add( pan );
+		}
 
 		offset.x = radius * Math.sin( phi ) * Math.sin( theta );
 		offset.y = radius * Math.cos( phi );
