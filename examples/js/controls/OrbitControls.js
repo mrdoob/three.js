@@ -293,7 +293,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 		phi += phiDelta;
 
 		// restrict theta to be between desired limits
-		theta = Math.max( this.minAzimuthAngle, Math.min( this.maxAzimuthAngle, theta ) );
+		if ( this.minAzimuthAngle > this.maxAzimuthAngle ) {
+
+			theta = theta < 0 ? Math.min( this.maxAzimuthAngle, theta ) : Math.max( this.minAzimuthAngle, theta );
+
+		} else {
+
+			theta = Math.max( this.minAzimuthAngle, Math.min( this.maxAzimuthAngle, theta ) );
+
+		}
 
 		// restrict phi to be between desired limits
 		phi = Math.max( this.minPolarAngle, Math.min( this.maxPolarAngle, phi ) );
