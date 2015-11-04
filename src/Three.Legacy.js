@@ -310,6 +310,17 @@ Object.defineProperties( THREE.Light.prototype, {
 
 //
 
+Object.defineProperties( THREE.BufferAttribute.prototype, {
+	length: {
+		get: function () {
+			console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
+			return this.array.length;
+		}
+	}
+} );
+
+//
+
 Object.defineProperties( THREE.Material.prototype, {
 	wrapAround: {
 		get: function () {
