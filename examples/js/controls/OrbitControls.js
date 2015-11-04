@@ -488,6 +488,7 @@
 
 				document.addEventListener( 'mousemove', onMouseMove, false );
 				document.addEventListener( 'mouseup', onMouseUp, false );
+				document.addEventListener( 'mouseout', onMouseUp, false );
 				scope.dispatchEvent( startEvent );
 
 			}
@@ -559,6 +560,7 @@
 
 			document.removeEventListener( 'mousemove', onMouseMove, false );
 			document.removeEventListener( 'mouseup', onMouseUp, false );
+			document.removeEventListener( 'mouseout', onMouseUp, false );
 			scope.dispatchEvent( endEvent );
 			state = STATE.NONE;
 
@@ -786,6 +788,7 @@
 
 			document.removeEventListener( 'mousemove', onMouseMove, false );
 			document.removeEventListener( 'mouseup', onMouseUp, false );
+			document.removeEventListener( 'mouseout', onMouseUp, false );
 
 			window.removeEventListener( 'keydown', onKeyDown, false );
 
