@@ -975,6 +975,7 @@ THREE.BufferGeometry.prototype = {
 
 	clone: function () {
 
+		/*
 		// Handle primitives
 
 		var parameters = this.parameters;
@@ -996,6 +997,9 @@ THREE.BufferGeometry.prototype = {
 		}
 
 		return new this.constructor().copy( this );
+		*/
+
+		return new THREE.BufferGeometry().copy( this );
 
 	},
 

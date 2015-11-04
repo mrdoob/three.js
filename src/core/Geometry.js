@@ -1104,6 +1104,7 @@ THREE.Geometry.prototype = {
 
 	clone: function () {
 
+		/*
 		// Handle primitives
 
 		var parameters = this.parameters;
@@ -1125,6 +1126,9 @@ THREE.Geometry.prototype = {
 		}
 
 		return new this.constructor().copy( this );
+		*/
+
+		return new THREE.Geometry().copy( this );
 
 	},
 
