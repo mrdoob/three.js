@@ -1531,7 +1531,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var uniform = materialProperties.uniformsList[ j ][ 0 ];
 
-			if( typeof uniform.updateFunction === "function" ){
+			if ( uniform.dynamic === true ) {
 
 				materialProperties.hasDynamicUniforms = true;
 				break;
@@ -1831,9 +1831,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if( materialProperties.hasDynamicUniforms === true ){
+		if ( materialProperties.hasDynamicUniforms === true ) {
 
-			updateDynamicUniforms( materialProperties.uniformsList, camera, object );
+			updateDynamicUniforms( materialProperties.uniformsList, object, camera );
 
 		}
 
@@ -1841,18 +1841,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function updateDynamicUniforms ( uniforms, camera, object ) {
+	function updateDynamicUniforms ( uniforms, object, camera ) {
 
 		var dynamicUniforms = [];
 
 		for ( var j = 0, jl = uniforms.length; j < jl; j ++ ) {
 
 			var uniform = uniforms[ j ][ 0 ];
-			var updateFunction = uniform.updateFunction;
+			var onUpdateCallback = uniform.onUpdateCallback;
 
-			if( typeof updateFunction === "function" ){
+			if ( onUpdateCallback !== undefined ) {
 
-				updateFunction( uniform, camera, object );
+				onUpdateCallback.bind( uniform )( object, camera );
 				dynamicUniforms.push( uniforms[ j ] );
 
 			}

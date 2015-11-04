@@ -604,36 +604,32 @@
 			var vert = document.getElementById( 'vertMaterial' ).textContent;
 			var frag = document.getElementById( 'fragMaterial' ).textContent;
 
+			function updateColor( object, camera ) {
+
+				this.value.setHex( object.userData.color );
+
+			}
+
 			var material = new THREE.RawShaderMaterial( {
 				vertexShader: vert,
 				fragmentShader: frag,
 				uniforms: {
-					color: {
-						type: "c",
-						value: new THREE.Color(),
-						updateFunction: function( uniform, camera, object ) {
-
-							uniform.value.setHex( object.userData.color );
-
-						}
-					}
+					color: new THREE.Uniform( 'c', new THREE.Color() ).onUpdate( updateColor )
 				}
 			} );
 			materialList.push( material );
+
+			function updatePickingColor( object, camera ) {
+
+				this.value.setHex( object.userData.pickingColor );
+
+			}
 
 			var pickingMaterial = new THREE.RawShaderMaterial( {
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag,
 				uniforms: {
-					pickingColor: {
-						type: "c",
-						value: new THREE.Color(),
-						updateFunction: function( uniform, camera, object ) {
-
-							uniform.value.setHex( object.userData.pickingColor );
-
-						}
-					}
+					pickingColor: new THREE.Uniform( 'c', new THREE.Color() ).onUpdate( updatePickingColor )
 				}
 			} );
 			materialList.push( pickingMaterial );
