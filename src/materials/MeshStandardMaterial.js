@@ -39,6 +39,8 @@
  *  alphaMap: new THREE.Texture( <Image> ),
  *
  *  envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
+ *  envMapIntensity: <float>
+ *
  *  refractionRatio: <float>,
  *
  *  shading: THREE.SmoothShading,

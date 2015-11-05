@@ -163,7 +163,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		envMapColor.rgb = inputToLinear( envMapColor.rgb );
 
-		return PI * envMapColor.rgb;
+		return PI * envMapColor.rgb * envMapIntensity;
 
 	}
 
@@ -237,7 +237,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		envMapColor.rgb = inputToLinear( envMapColor.rgb );
 
-		return envMapColor.rgb;
+		return envMapColor.rgb * envMapIntensity;
 
 	}
 
