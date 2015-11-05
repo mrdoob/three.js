@@ -2790,7 +2790,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_lights.shadows.length = shadowsLength;
 
-		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength;
+		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength + ',' + shadowsLength;
 
 	}
 
