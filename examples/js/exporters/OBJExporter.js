@@ -23,7 +23,9 @@ THREE.OBJExporter.prototype = {
 			var nbNormals = 0;
 
 			var geometry = mesh.geometry;
-
+			if ( geometry instanceof THREE.BufferGeometry ) {
+				geometry = new THREE.Geometry().fromBufferGeometry(geometry);
+			}
 			if ( geometry instanceof THREE.Geometry ) {
 
 				output += 'o ' + mesh.name + '\n';
