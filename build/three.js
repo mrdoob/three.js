@@ -27146,9 +27146,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		directionalLength = 0,
 		pointLength = 0,
 		spotLength = 0,
-		hemiLength = 0;
+		hemiLength = 0,
 
-		_lights.shadows.length = 0;
+		shadowsLength = 0;
+
 		_lights.shadowsPointLight = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
@@ -27184,7 +27185,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( light.castShadow ) {
 
-					_lights.shadows.push( [ light, directionalLength ] );
+					_lights.shadows[ shadowsLength ++ ] = [ light, directionalLength ];
 
 				}
 
@@ -27212,7 +27213,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( light.castShadow ) {
 
-					_lights.shadows.push( [ light, pointLength ] );
+					_lights.shadows[ shadowsLength ++ ] = [ light, pointLength ];
 					_lights.shadowsPointLight ++;
 
 				}
@@ -27251,7 +27252,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( light.castShadow ) {
 
-					_lights.shadows.push( [ light, spotLength ] );
+					_lights.shadows[ shadowsLength ++ ] = [ light, pointLength ];
 
 				}
 
@@ -27291,7 +27292,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lights.spot.length = spotLength;
 		_lights.hemi.length = hemiLength;
 
-		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength;
+		_lights.shadows.length = shadowsLength;
+
+		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength + ',' + shadowsLength;
 
 	}
 
