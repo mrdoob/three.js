@@ -170,9 +170,9 @@ THREE.ShaderSkin = {
 				"vec3 totalSpecularLight = vec3( 0.0 );",
 				"vec3 totalDiffuseLight = vec3( 0.0 );",
 
-				"#if POINT_LIGHTS > 0",
+				"#if NUM_POINT_LIGHTS > 0",
 
-					"for ( int i = 0; i < POINT_LIGHTS; i ++ ) {",
+					"for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {",
 
 						"vec3 lVector = pointLights[ i ].position + vViewPosition.xyz;",
 
@@ -195,9 +195,9 @@ THREE.ShaderSkin = {
 
 				// directional lights
 
-				"#if DIR_LIGHTS > 0",
+				"#if NUM_DIR_LIGHTS > 0",
 
-					"for( int i = 0; i < DIR_LIGHTS; i++ ) {",
+					"for( int i = 0; i < NUM_DIR_LIGHTS; i++ ) {",
 
 						"vec3 dirVector = directionalLights[ i ].direction;",
 
@@ -216,9 +216,9 @@ THREE.ShaderSkin = {
 
 				// hemisphere lights
 
-				"#if HEMI_LIGHTS > 0",
+				"#if NUM_HEMI_LIGHTS > 0",
 
-					"for ( int i = 0; i < HEMI_LIGHTS; i ++ ) {",
+					"for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {",
 
 						"vec3 lVector = hemisphereLightDirection[ i ];",
 
@@ -452,9 +452,9 @@ THREE.ShaderSkin = {
 				"vec3 totalDiffuseLight = vec3( 0.0 );",
 				"vec3 totalSpecularLight = vec3( 0.0 );",
 
-				"#if POINT_LIGHTS > 0",
+				"#if NUM_POINT_LIGHTS > 0",
 
-					"for ( int i = 0; i < POINT_LIGHTS; i ++ ) {",
+					"for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {",
 
 						"vec3 pointVector = normalize( pointLights[ i ].direction );",
 						"float attenuation = calcLightAttenuation( length( lVector ), pointLights[ i ].distance, pointLights[ i ].decay );",
@@ -477,9 +477,9 @@ THREE.ShaderSkin = {
 
 				// directional lights
 
-				"#if DIR_LIGHTS > 0",
+				"#if NUM_DIR_LIGHTS > 0",
 
-					"for( int i = 0; i < DIR_LIGHTS; i++ ) {",
+					"for( int i = 0; i < NUM_DIR_LIGHTS; i++ ) {",
 
 						"vec3 dirVector = directionalLights[ i ].direction;",
 

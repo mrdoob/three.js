@@ -142,9 +142,9 @@ THREE.ShaderTerrain = {
 
 				// point lights
 
-				"#if POINT_LIGHTS > 0",
+				"#if NUM_POINT_LIGHTS > 0",
 
-					"for ( int i = 0; i < POINT_LIGHTS; i ++ ) {",
+					"for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {",
 
 						"vec3 lVector = pointLights[ i ].position + vViewPosition.xyz;",
 
@@ -168,12 +168,12 @@ THREE.ShaderTerrain = {
 
 				// directional lights
 
-				"#if DIR_LIGHTS > 0",
+				"#if NUM_DIR_LIGHTS > 0",
 
 					"vec3 dirDiffuse = vec3( 0.0 );",
 					"vec3 dirSpecular = vec3( 0.0 );",
 
-					"for( int i = 0; i < DIR_LIGHTS; i++ ) {",
+					"for( int i = 0; i < NUM_DIR_LIGHTS; i++ ) {",
 
 						"vec3 dirVector = directionalLights[ i ].direction;",
 						"vec3 dirHalfVector = normalize( dirVector + viewPosition );",
@@ -192,12 +192,12 @@ THREE.ShaderTerrain = {
 
 				// hemisphere lights
 
-				"#if HEMI_LIGHTS > 0",
+				"#if NUM_HEMI_LIGHTS > 0",
 
 					"vec3 hemiDiffuse  = vec3( 0.0 );",
 					"vec3 hemiSpecular = vec3( 0.0 );",
 
-					"for( int i = 0; i < HEMI_LIGHTS; i ++ ) {",
+					"for( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {",
 
 						"vec3 lVector = hemisphereLightDirection[ i ];",
 

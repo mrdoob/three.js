@@ -245,10 +245,10 @@ THREE.WebGLProgram = ( function () {
 				renderer.gammaOutput ? '#define GAMMA_OUTPUT' : '',
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
-				'#define DIR_LIGHTS ' + parameters.dirLights,
-				'#define POINT_LIGHTS ' + parameters.pointLights,
-				'#define SPOT_LIGHTS ' + parameters.spotLights,
-				'#define HEMI_LIGHTS ' + parameters.hemiLights,
+				'#define NUM_DIR_LIGHTS ' + parameters.numDirLights,
+				'#define NUM_POINT_LIGHTS ' + parameters.numPointLights,
+				'#define NUM_SPOT_LIGHTS ' + parameters.numSpotLights,
+				'#define NUM_HEMI_LIGHTS ' + parameters.numHemiLights,
 
 				'#define MAX_SHADOWS ' + parameters.maxShadows,
 
@@ -356,10 +356,10 @@ THREE.WebGLProgram = ( function () {
 
 				customDefines,
 
-				'#define DIR_LIGHTS ' + parameters.dirLights,
-				'#define POINT_LIGHTS ' + parameters.pointLights,
-				'#define SPOT_LIGHTS ' + parameters.spotLights,
-				'#define HEMI_LIGHTS ' + parameters.hemiLights,
+				'#define NUM_DIR_LIGHTS ' + parameters.numDirLights,
+				'#define NUM_POINT_LIGHTS ' + parameters.numPointLights,
+				'#define NUM_SPOT_LIGHTS ' + parameters.numSpotLights,
+				'#define NUM_HEMI_LIGHTS ' + parameters.numHemiLights,
 
 				'#define MAX_SHADOWS ' + parameters.maxShadows,
 

@@ -21,8 +21,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
-		"maxMorphTargets", "maxMorphNormals", "dirLights", "pointLights",
-		"spotLights", "hemiLights", "maxShadows", "shadowMapEnabled", "pointLightShadows",
+		"maxMorphTargets", "maxMorphNormals", "numDirLights", "numPointLights",
+		"numSpotLights", "numHemiLights", "maxShadows", "shadowMapEnabled", "pointLightShadows",
 		"shadowMapType", "shadowMapDebug", "alphaTest", "doubleSided",
 		"flipSided"
 	];
@@ -131,10 +131,10 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			maxMorphTargets: renderer.maxMorphTargets,
 			maxMorphNormals: renderer.maxMorphNormals,
 
-			dirLights: lights.directional.length,
-			pointLights: lights.point.length,
-			spotLights: lights.spot.length,
-			hemiLights: lights.hemi.length,
+			numDirLights: lights.directional.length,
+			numPointLights: lights.point.length,
+			numSpotLights: lights.spot.length,
+			numHemiLights: lights.hemi.length,
 
 			maxShadows: lights.shadows,
 			pointLightShadows: lights.shadowsPointLight,
