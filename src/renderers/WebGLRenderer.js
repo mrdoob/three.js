@@ -1388,7 +1388,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function initMaterial( material, lights, fog, object ) {
+	function initMaterial( material, fog, object ) {
 
 		var materialProperties = properties.get( material );
 
@@ -1592,7 +1592,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.needsUpdate ) {
 
-			initMaterial( material, lights, fog, object );
+			initMaterial( material, fog, object );
 			material.needsUpdate = false;
 
 		}
