@@ -259,7 +259,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// shadow map
 
-	var shadowMap = new THREE.WebGLShadowMap( this, lights, objects );
+	var shadowMap = new THREE.WebGLShadowMap( this, _lights, objects );
 
 	this.shadowMap = shadowMap;
 
