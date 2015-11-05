@@ -270,7 +270,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 							if ( groupMaterial.visible === true ) {
 
 								var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
-								_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, depthMaterial, object, group );
+								_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
 
 							}
 
@@ -279,7 +279,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 					} else {
 
 						var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
-						_renderer.renderBufferDirect( shadowCamera, _lights, null, geometry, depthMaterial, object, null );
+						_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
 
 					}
 
