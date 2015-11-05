@@ -73,13 +73,6 @@ vLightFront = vec3( 0.0 );
 
 	{
 
-		vLightFront += PI * ambientLightColor;
-
-		#ifdef DOUBLE_SIDED
-
-			vLightBack += PI * ambientLightColor;
-
-		#endif
 
 		#if NUM_HEMI_LIGHTS > 0
 
