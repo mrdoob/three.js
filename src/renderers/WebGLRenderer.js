@@ -116,7 +116,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spot: [],
 		hemi: [],
 
-		shadows: 0,
+		shadows: [],
 		shadowsPointLight: 0
 
 	},
@@ -2126,41 +2126,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( uniforms.shadowMatrix ) {
 
 			var j = 0;
+			var shadows = _lights.shadows;
 
-			for ( var i = 0, il = lights.length; i < il; i ++ ) {
+			for ( var i = 0, il = shadows.length; i < il; i ++ ) {
 
-				var light = lights[ i ];
+				var light = shadows[ i ][ 0 ];
 
-				if ( light.castShadow === true ) {
+				if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
 
-					if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
+					var shadow = light.shadow;
 
-						var shadow = light.shadow;
+					if ( light instanceof THREE.PointLight ) {
 
-						if ( light instanceof THREE.PointLight ) {
+						// for point lights we set the shadow matrix to be a translation-only matrix
+						// equal to inverse of the light's position
+						_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
+						shadow.matrix.identity().setPosition( _vector3 );
 
-							// for point lights we set the shadow matrix to be a translation-only matrix
-							// equal to inverse of the light's position
-							_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-							shadow.matrix.identity().setPosition( _vector3 );
+						// for point lights we set the sign of the shadowDarkness uniform to be negative
+						uniforms.shadowDarkness.value[ j ] = - shadow.darkness;
 
-							// for point lights we set the sign of the shadowDarkness uniform to be negative
-							uniforms.shadowDarkness.value[ j ] = - shadow.darkness;
+					} else {
 
-						} else {
-
-							uniforms.shadowDarkness.value[ j ] = shadow.darkness;
-
-						}
-
-						uniforms.shadowMatrix.value[ j ] = shadow.matrix;
-						uniforms.shadowMap.value[ j ] = shadow.map;
-						uniforms.shadowMapSize.value[ j ] = shadow.mapSize;
-						uniforms.shadowBias.value[ j ] = shadow.bias;
-
-						j ++;
+						uniforms.shadowDarkness.value[ j ] = shadow.darkness;
 
 					}
+
+					uniforms.shadowMatrix.value[ j ] = shadow.matrix;
+					uniforms.shadowMap.value[ j ] = shadow.map;
+					uniforms.shadowMapSize.value[ j ] = shadow.mapSize;
+					uniforms.shadowBias.value[ j ] = shadow.bias;
+
+					j ++;
 
 				}
 
@@ -2647,7 +2644,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spotLength = 0,
 		hemiLength = 0;
 
-		_lights.shadows = 0;
+		_lights.shadows.length = 0;
 		_lights.shadowsPointLight = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
@@ -2681,9 +2678,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.direction.transformDirection( viewMatrix );
 				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
 
-				_lights.directional[ directionalLength ++ ] = uniforms;
+				if ( light.castShadow ) {
 
-				if ( light.castShadow ) _lights.shadows ++;
+					_lights.shadows.push( [ light, directionalLength ] );
+
+				}
+
+				_lights.directional[ directionalLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.PointLight ) {
 
@@ -2705,14 +2706,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.distance = light.distance;
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
-				_lights.point[ pointLength ++ ] = uniforms;
-
 				if ( light.castShadow ) {
 
-					_lights.shadows ++;
+					_lights.shadows.push( [ light, pointLength ] );
 					_lights.shadowsPointLight ++;
 
 				}
+
+				_lights.point[ pointLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
@@ -2744,9 +2745,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.exponent = light.exponent;
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
-				_lights.spot[ spotLength ++ ] = uniforms;
+				if ( light.castShadow ) {
 
-				if ( light.castShadow ) _lights.shadows ++;
+					_lights.shadows.push( [ light, spotLength ] );
+
+				}
+
+				_lights.spot[ spotLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 
