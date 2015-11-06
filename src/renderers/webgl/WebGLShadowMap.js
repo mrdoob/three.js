@@ -118,7 +118,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		for ( var i = 0, il = shadows.length; i < il; i ++ ) {
 
-			var light = shadows[ i ][ 0 ];
+			var light = shadows[ i ];
 
 			var shadow = light.shadow;
 			var shadowCamera = shadow.camera;

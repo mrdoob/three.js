@@ -2130,7 +2130,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( var i = 0, il = shadows.length; i < il; i ++ ) {
 
-				var light = shadows[ i ][ 0 ];
+				var light = shadows[ i ];
 
 				if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
 
@@ -2681,7 +2681,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( light.castShadow ) {
 
-					_lights.shadows[ shadowsLength ++ ] = [ light, directionalLength ];
+					_lights.shadows[ shadowsLength ++ ] = light;
 
 				}
 
@@ -2709,7 +2709,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( light.castShadow ) {
 
-					_lights.shadows[ shadowsLength ++ ] = [ light, pointLength ];
+					_lights.shadows[ shadowsLength ++ ] = light;
 					_lights.shadowsPointLight ++;
 
 				}
@@ -2748,7 +2748,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( light.castShadow ) {
 
-					_lights.shadows[ shadowsLength ++ ] = [ light, pointLength ];
+					_lights.shadows[ shadowsLength ++ ] = light;
 
 				}
 
