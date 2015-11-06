@@ -1,5 +1,6 @@
 #if defined( USE_ENVMAP ) || defined( STANDARD )
 	uniform float reflectivity;
+	uniform float envMapIntenstiy;
 #endif
 
 #ifdef USE_ENVMAP
