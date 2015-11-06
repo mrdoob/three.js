@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js / editor</title>
@@ -11,26 +11,10 @@
 
 		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/libs/system.min.js"></script>
+		<script src="websocket.js" type="text/javascript"></script>
 
 		<script src="../examples/js/controls/EditorControls.js"></script>
 		<script src="../examples/js/controls/TransformControls.js"></script>
-		<script src="../examples/js/loaders/AWDLoader.js"></script>
-		<script src="../examples/js/loaders/BabylonLoader.js"></script>
-		<script src="../examples/js/loaders/ColladaLoader.js"></script>
-		<script src="../examples/js/loaders/MD2Loader.js"></script>
-		<script src="../examples/js/loaders/OBJLoader.js"></script>
-		<script src="../examples/js/loaders/PLYLoader.js"></script>
-		<script src="../examples/js/loaders/STLLoader.js"></script>
-		<script src="../examples/js/loaders/UTF8Loader.js"></script>
-		<script src="../examples/js/loaders/VRMLLoader.js"></script>
-		<script src="../examples/js/loaders/VTKLoader.js"></script>
-		<script src="../examples/js/loaders/ctm/lzma.js"></script>
-		<script src="../examples/js/loaders/ctm/ctm.js"></script>
-		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
-		<script src="../examples/js/exporters/OBJExporter.js"></script>
-		<script src="../examples/js/exporters/STLExporter.js"></script>
-
-		<script src="../examples/js/loaders/deprecated/SceneLoader.js"></script>
 
 		<script src="../examples/js/renderers/Projector.js"></script>
 		<script src="../examples/js/renderers/CanvasRenderer.js"></script>
@@ -77,9 +61,6 @@
 		<script src="js/Player.js"></script>
 		<script src="js/Script.js"></script>
 
-		<script src="../examples/js/effects/VREffect.js"></script>
-		<script src="../examples/js/controls/VRControls.js"></script>
-
 		<script src="js/Storage.js"></script>
 
 		<script src="js/Editor.js"></script>
@@ -90,9 +71,7 @@
 		<script src="js/Menubar.File.js"></script>
 		<script src="js/Menubar.Edit.js"></script>
 		<script src="js/Menubar.Add.js"></script>
-		<script src="js/Menubar.Play.js"></script>
 		<script src="js/Menubar.View.js"></script>
-		<script src="js/Menubar.Examples.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Menubar.Status.js"></script>
 		<script src="js/Sidebar.js"></script>
@@ -112,14 +91,12 @@
 		<script src="js/Sidebar.Geometry.SphereGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.TorusGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
-		<script src="../examples/js/geometries/TeapotBufferGeometry.js"></script>
-		<script src="js/Sidebar.Geometry.TeapotBufferGeometry.js"></script>
 		<script src="js/Sidebar.Material.js"></script>
 		<script src="js/Sidebar.Script.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
-
+		<script type="text/javascript" src="websocket.js"></script>
 		<script>
 
 			window.URL = window.URL || window.webkitURL;
@@ -186,7 +163,7 @@
 
 				var saveState = function ( scene ) {
 
-					if ( editor.config.getKey( 'autosave' ) === false ) {
+					if ( true ) { // avoid saving state for now
 
 						return;
 
@@ -290,7 +267,7 @@
 
 			//
 
-			var file = null;
+			var file = 'scene.json';
 			var hash = window.location.hash;
 
 			if ( hash.substr( 1, 4 ) === 'app=' ) file = hash.substr( 5 );
