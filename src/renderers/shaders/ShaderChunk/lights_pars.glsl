@@ -2,7 +2,6 @@ uniform vec3 ambientLightColor;
 
 vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
-
 	return PI * ambientLightColor;
 
 }
@@ -24,6 +23,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		directLight.direction = directionalLight.direction;
 
 		return directLight;
+
 	}
 
 #endif
@@ -51,6 +51,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay );
 
 		return directLight;
+
 	}
 
 #endif
@@ -87,10 +88,10 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 			directLight.color = spotLight.color;
 			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
 
-		}
-		else {
+		} else {
 
 			directLight.color = vec3( 0.0 );
+
 		}
 
 		return directLight;
