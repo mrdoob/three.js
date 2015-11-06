@@ -21,7 +21,7 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 		PointLight pointLight = pointLights[ i ];
 
-		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
+		IncidentLight directLight = getPointDirectLight( pointLight, geometry );
 
 		#ifdef USE_SHADOWMAP
 		if ( pointLight.shadow > - 1 ) {
