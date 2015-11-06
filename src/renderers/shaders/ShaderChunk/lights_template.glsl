@@ -19,7 +19,19 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
+		PointLight pointLight = pointLights[ i ];
+
 		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
+
+		#ifdef USE_SHADOWMAP
+		if ( pointLight.shadow > - 1 ) {
+			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
+				if ( j == pointLight.shadow ) {
+					directLight.color *= shadows[ j ];
+				}
+			}
+		}
+		#endif
 
 		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );
 
@@ -31,7 +43,19 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
-		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );
+		SpotLight spotLight = spotLights[ i ];
+
+		IncidentLight directLight = getSpotDirectLight( spotLight, geometry );
+
+		#ifdef USE_SHADOWMAP
+		if ( spotLight.shadow > - 1 ) {
+			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
+				if ( j == spotLight.shadow ) {
+					directLight.color *= shadows[ j ];
+				}
+			}
+		}
+		#endif
 
 		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );
 
@@ -43,7 +67,19 @@ GeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal 
 
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
-		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
+		DirectionalLight directionalLight = directionalLights[ i ];
+
+		IncidentLight directLight = getDirectionalDirectLight( directionalLight, geometry );
+
+		#ifdef USE_SHADOWMAP
+		if ( directionalLight.shadow > - 1 ) {
+			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
+				if ( j == directionalLight.shadow ) {
+					directLight.color *= shadows[ j ];
+				}
+			}
+		}
+		#endif
 
 		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );
 

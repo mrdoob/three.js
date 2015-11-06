@@ -2324,6 +2324,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 						var valueProperty = value[ propertyName ];
 
 						switch( property.type ) {
+							case 'i':
+								_gl.uniform1i( locationProperty, valueProperty );
+								break;
 							case 'f':
 								_gl.uniform1f( locationProperty, valueProperty );
 								break;
@@ -2357,6 +2360,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 							var valueProperty = value[i][ propertyName ];
 
 							switch( property.type ) {
+								case 'i':
+									_gl.uniform1i( locationProperty, valueProperty );
+									break;
 								case 'f':
 									_gl.uniform1f( locationProperty, valueProperty );
 									break;
@@ -2667,7 +2673,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if( ! light.__webglUniforms ) {
 					light.__webglUniforms = {
 						direction: new THREE.Vector3(),
-						color: new THREE.Color()
+						color: new THREE.Color(),
+						shadow: -1
 					}
 				}
 
@@ -2681,7 +2688,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( light.castShadow ) {
 
+					uniforms.shadow = shadowsLength;
+
 					_lights.shadows[ shadowsLength ++ ] = light;
+
+				} else {
+
+					uniforms.shadow = -1;
 
 				}
 
@@ -2694,7 +2707,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 						position: new THREE.Vector3(),
 						color: new THREE.Color(),
 						distance: 0,
-						decay: 0
+						decay: 0,
+						shadow: -1
 					}
 				}
 
@@ -2709,8 +2723,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( light.castShadow ) {
 
+					uniforms.shadow = shadowsLength;
+
 					_lights.shadows[ shadowsLength ++ ] = light;
 					_lights.shadowsPointLight ++;
+
+				} else {
+
+					uniforms.shadow = -1;
 
 				}
 
@@ -2748,7 +2768,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( light.castShadow ) {
 
+					uniforms.shadow = shadowsLength;
+
 					_lights.shadows[ shadowsLength ++ ] = light;
+
+				} else {
+
+					uniforms.shadow = -1;
 
 				}
 

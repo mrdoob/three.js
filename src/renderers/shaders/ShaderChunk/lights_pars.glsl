@@ -11,6 +11,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	struct DirectionalLight {
 	  vec3 direction;
 	  vec3 color;
+	  int shadow;
 	};
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
@@ -36,6 +37,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	  vec3 color;
 	  float distance;
 	  float decay;
+	  int shadow;
 	};
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
@@ -67,6 +69,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	  float decay;
 	  float angleCos;
 	  float exponent;
+	  int shadow;
 	};
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];

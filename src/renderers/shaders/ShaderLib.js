@@ -380,6 +380,8 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "normal_phong_fragment" ],
 				THREE.ShaderChunk[ "emissivemap_fragment" ],
 
+				THREE.ShaderChunk[ "shadowmap_fragment" ],
+
 				// accumulation
 				THREE.ShaderChunk[ "lights_phong_fragment" ],
 				THREE.ShaderChunk[ "lights_template" ],
@@ -387,10 +389,6 @@ THREE.ShaderLib = {
 
 				// modulation
 				THREE.ShaderChunk[ "aomap_fragment" ],
-				THREE.ShaderChunk[ "shadowmap_fragment" ],
-
-				"reflectedLight.directDiffuse *= shadowMask;",
-				"reflectedLight.directSpecular *= shadowMask;",
 
 				"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
 
@@ -555,6 +553,8 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "normal_phong_fragment" ], // use phong chunk for now
 				THREE.ShaderChunk[ "emissivemap_fragment" ],
 
+				THREE.ShaderChunk[ "shadowmap_fragment" ],
+
 				// accumulation
 				THREE.ShaderChunk[ "lights_standard_fragment" ],
 				THREE.ShaderChunk[ "lights_template" ],
@@ -562,11 +562,6 @@ THREE.ShaderLib = {
 
 				// modulation
 				THREE.ShaderChunk[ "aomap_fragment" ],
-
-				THREE.ShaderChunk[ "shadowmap_fragment" ],
-
-				"reflectedLight.directDiffuse *= shadowMask;",
-				"reflectedLight.directSpecular *= shadowMask;",
 
 				"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
 
