@@ -45,7 +45,7 @@ THREE.XHRLoader.prototype = {
 
 			THREE.Cache.add( url, response );
 
-			if ( this.status == 200 && this.readyState == 4 ) {
+			if ( ( this.status === 0 || this.status === 200 )  && this.readyState === 4 ) {
 
 				if ( onLoad ) onLoad( response );
 
