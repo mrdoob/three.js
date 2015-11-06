@@ -1,6 +1,6 @@
-#ifdef USE_SHADOWMAP
+vec3 shadowMask = vec3( 1.0 );
 
-	vec3 shadowMask = vec3( 1.0 );
+#ifdef USE_SHADOWMAP
 
 	float shadows[ NUM_SHADOWS ];
 
