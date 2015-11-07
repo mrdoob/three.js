@@ -35,6 +35,7 @@ THREE.XHRLoader.prototype = {
 		}
 
 		var request = new XMLHttpRequest();
+		request.overrideMimeType( 'text/plain' );
 		request.open( 'GET', url, true );
 
 		request.addEventListener( 'load', function ( event ) {
