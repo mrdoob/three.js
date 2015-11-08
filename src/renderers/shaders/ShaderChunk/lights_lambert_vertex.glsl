@@ -1,7 +1,14 @@
 vec3 diffuse = vec3( 1.0 );
 
-GeometricContext geometry = GeometricContext( mvPosition.xyz, normalize( transformedNormal ), normalize( -mvPosition.xyz ) );
-GeometricContext backGeometry = GeometricContext( geometry.position, -geometry.normal, geometry.viewDir );
+GeometricContext geometry;
+geometry.position = mvPosition.xyz;
+geometry.normal = normalize( transformedNormal );
+geometry.viewDir = normalize( -mvPosition.xyz );
+
+GeometricContext backGeometry;
+backGeometry.position = geometry.position;
+backGeometry.normal = -geometry.normal;
+backGeometry.viewDir = geometry.viewDir;
 
 vLightFront = vec3( 0.0 );
 
