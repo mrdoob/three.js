@@ -23,7 +23,7 @@
 			#info {
 				color:#fff;
 				position: absolute;
-				top: 0px; width: 100%;
+				top: 0px; left: 0px; width: 50%;
 				padding: 5px;
 				z-index:100;
 			}
@@ -34,8 +34,8 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - webgl 3d sounds example -
 			music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank">larrylarrybb</a> and
-			<a href="http://www.newgrounds.com/audio/listen/376737" target="_blank">skullbeatz</a> <br/><br/>
-
+			<a href="http://www.newgrounds.com/audio/listen/376737" target="_blank">skullbeatz</a>  and 
+			<a href="http://opengameart.org/content/project-utopia-seamless-loop" target="_blank">congusbongus</a><br/><br/>
 			navigate with WASD / arrows / mouse
 		</div>
 
@@ -47,6 +47,8 @@
 		<script src="js/controls/FirstPersonControls.js"></script>
 
 		<script src="js/Detector.js"></script>
+
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -74,13 +76,7 @@
 				var listener = new THREE.AudioListener();
 				camera.add( listener );
 
-				controls = new THREE.FirstPersonControls( camera );
-
-				controls.movementSpeed = 70;
-				controls.lookSpeed = 0.05;
-				controls.noFly = true;
-				controls.lookVertical = false;
-
+				
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.0035 );
 
@@ -99,8 +95,10 @@
 				mesh1.position.set( -250, 30, 0 );
 				scene.add( mesh1 );
 
-				var sound1 = new THREE.Audio( listener );
-				sound1.load( 'sounds/358232_j_s_song.ogg' );
+				var sound1 = new THREE.PositionAudio( listener );
+				var buffer1 = new THREE.AudioBuffer( listener );
+				buffer1.load( 'sounds/358232_j_s_song.ogg' );
+				sound1.setBuffer(buffer1);
 				sound1.setRefDistance( 20 );
 				sound1.autoplay = true;
 				mesh1.add( sound1 );
@@ -111,12 +109,24 @@
 				mesh2.position.set( 250, 30, 0 );
 				scene.add( mesh2 );
 
-				var sound2 = new THREE.Audio( listener );
-				sound2.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' );
+				var sound2 = new THREE.PositionAudio( listener );
+				var buffer2 = new THREE.AudioBuffer( listener );
+				buffer2.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' );
+				sound2.setBuffer(buffer2);
 				sound2.setRefDistance( 20 );
 				sound2.autoplay = true;
 				mesh2.add( sound2 );
 
+				// global ambient audio
+	
+				var sound3 = new THREE.Audio( listener );
+				var buffer3 = new THREE.AudioBuffer( listener );
+				buffer3.load( 'sounds/Project_Utopia.ogg' );
+				sound3.setBuffer(buffer3);
+				sound3.autoplay = true;
+				sound3.setLoop(true);
+				sound3.setVolume(0.5);
+				
 				// ground
 
 				var helper = new THREE.GridHelper( 500, 10 );
@@ -126,6 +136,30 @@
 				scene.add( helper );
 
 				//
+    			var SoundControls = function() {
+					   this.master = listener.getMasterVolume();
+					   this.firstSphere =  sound1.getVolume();
+					   this.secondSphere =  sound2.getVolume();
+					   this.Ambient =  sound3.getVolume();
+				};
+      			var gui = new dat.GUI();
+				var soundControls = new SoundControls();
+				var volumeFolder = gui.addFolder('sound volume');
+				volumeFolder.add(soundControls, 'master').min(0.0).max(1.0).step(0.01).onChange(function() {
+					listener.setMasterVolume(soundControls.master);
+				});
+				volumeFolder.add(soundControls, 'firstSphere').min(0.0).max(1.0).step(0.01).onChange(function() {
+					sound1.setVolume(soundControls.firstSphere);
+				});
+				volumeFolder.add(soundControls, 'secondSphere').min(0.0).max(1.0).step(0.01).onChange(function() {
+					sound2.setVolume(soundControls.secondSphere);
+				});
+				volumeFolder.add(soundControls, 'Ambient').min(0.0).max(1.0).step(0.01).onChange(function() {
+					sound3.setVolume(soundControls.Ambient);
+				});
+				volumeFolder.open();
+
+
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -135,6 +169,14 @@
 				container.appendChild( renderer.domElement );
 
 				//
+				controls = new THREE.FirstPersonControls( camera, renderer.domElement );
+
+				controls.movementSpeed = 70;
+				controls.lookSpeed = 0.05;
+				controls.noFly = true;
+				controls.lookVertical = false;
+
+				
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

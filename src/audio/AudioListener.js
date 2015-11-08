@@ -9,11 +9,70 @@ THREE.AudioListener = function () {
 	this.type = 'AudioListener';
 
 	this.context = new ( window.AudioContext || window.webkitAudioContext )();
-
+	this.masterGain =  this.context.createGain();
+	this.masterGain.connect(this.context.destination);
+	this.filter = null;
+	
 };
 
 THREE.AudioListener.prototype = Object.create( THREE.Object3D.prototype );
 THREE.AudioListener.prototype.constructor = THREE.AudioListener;
+
+THREE.AudioListener.prototype.getOutputNode = function () {
+	
+	return this.masterGain;
+	
+};
+
+THREE.AudioListener.prototype.removeFilter = function ( ) {
+	
+	if (this.filter !== null && this.filter !== undefined) {
+	
+		this.masterGain.disconnect(this.filter);
+		this.filter.disconnect(this.context.destination);
+		this.masterGain.connect(this.context.destination);
+		this.filter = null;
+		
+	}
+	
+}
+
+THREE.AudioListener.prototype.setFilter = function ( value ) {
+
+	if (this.filter !== null && this.filter !== undefined) {
+		
+		this.masterGain.disconnect(this.filter);
+		this.filter.disconnect(this.context.destination);
+
+	} else {
+		
+		this.masterGain.disconnect(this.context.destination);
+		
+	}
+	this.filter = value;
+	this.masterGain.connect(this.filter);
+	this.filter.connect(this.context.destination);	
+	
+};
+
+THREE.AudioListener.prototype.getFilter = function () {
+
+	return this.filter;
+
+};
+
+THREE.AudioListener.prototype.setMasterVolume = function ( value ) {
+
+	this.masterGain.gain.value = value;
+
+};
+
+THREE.AudioListener.prototype.getMasterVolume = function () {
+
+	return this.masterGain.gain.value;
+
+};
+
 
 THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 
