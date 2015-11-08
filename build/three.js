@@ -10,11 +10,11 @@ var THREE = { REVISION: '74dev' };
 
 if ( typeof define === 'function' && define.amd ) {
 
-		define( 'three', THREE );
+	define( 'three', THREE );
 
 } else if ( 'undefined' !== typeof exports && 'undefined' !== typeof module ) {
 
-		module.exports = THREE;
+	module.exports = THREE;
 
 }
 
@@ -17443,6 +17443,7 @@ THREE.XHRLoader.prototype = {
 		}
 
 		var request = new XMLHttpRequest();
+		request.overrideMimeType( 'text/plain' );
 		request.open( 'GET', url, true );
 
 		request.addEventListener( 'load', function ( event ) {
@@ -17451,17 +17452,19 @@ THREE.XHRLoader.prototype = {
 
 			THREE.Cache.add( url, response );
 
-			if ( this.status == 200 && this.readyState == 4 ) {
+			if ( this.status === 200 && this.readyState === 4 ) {
 
 				if ( onLoad ) onLoad( response );
+
+				scope.manager.itemEnd( url );
 
 			} else {
 
 				if ( onError ) onError( event );
 
-			}
+				scope.manager.itemError( url );
 
-			scope.manager.itemEnd( url );
+			}
 
 		}, false );
 
@@ -23019,7 +23022,7 @@ THREE.ShaderChunk[ 'lights_standard_pars_fragment'] = "struct PhysicalMaterial {
 
 // File:src/renderers/shaders/ShaderChunk/lights_template.glsl
 
-THREE.ShaderChunk[ 'lights_template'] = "\nGeometricContext geometry = GeometricContext( -vViewPosition, normalize( normal ), normalize(vViewPosition ) );\n#if ( NUM_POINT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )\n	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n		PointLight pointLight = pointLights[ i ];\n		IncidentLight directLight = getPointDirectLight( pointLight, geometry );\n		#ifdef USE_SHADOWMAP\n		if ( pointLight.shadow > - 1 ) {\n			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {\n				if ( j == pointLight.shadow ) {\n					directLight.color *= shadows[ j ];\n				}\n			}\n		}\n		#endif\n		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );\n	}\n#endif\n#if ( NUM_SPOT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )\n	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n		SpotLight spotLight = spotLights[ i ];\n		IncidentLight directLight = getSpotDirectLight( spotLight, geometry );\n		#ifdef USE_SHADOWMAP\n		if ( spotLight.shadow > - 1 ) {\n			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {\n				if ( j == spotLight.shadow ) {\n					directLight.color *= shadows[ j ];\n				}\n			}\n		}\n		#endif\n		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );\n	}\n#endif\n#if ( NUM_DIR_LIGHTS > 0 ) && defined( Material_RE_DirectLight )\n	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n		DirectionalLight directionalLight = directionalLights[ i ];\n		IncidentLight directLight = getDirectionalDirectLight( directionalLight, geometry );\n		#ifdef USE_SHADOWMAP\n		if ( directionalLight.shadow > - 1 ) {\n			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {\n				if ( j == directionalLight.shadow ) {\n					directLight.color *= shadows[ j ];\n				}\n			}\n		}\n		#endif\n		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );\n	}\n#endif\n#if defined( Material_RE_IndirectDiffuseLight )\n	{\n		vec3 indirectDiffuseIrradiance = getAmbientLightIrradiance( ambientLightColor );\n#ifdef USE_LIGHTMAP\n		indirectDiffuseIrradiance += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;\n#endif\n#if ( NUM_HEMI_LIGHTS > 0 )\n		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n			indirectDiffuseIrradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );\n		}\n#endif\n#if defined( USE_ENVMAP ) && defined( STANDARD )\n		indirectDiffuseIrradiance += getLightProbeIndirectIrradiance( geometry, 8 );\n#endif\n		Material_RE_IndirectDiffuseLight( indirectDiffuseIrradiance, geometry, material, reflectedLight );\n	}\n#endif\n#if defined( USE_ENVMAP ) && defined( Material_RE_IndirectSpecularLight )\n	{\n		vec3 indirectSpecularRadiance = getLightProbeIndirectRadiance( geometry, Material_BlinnShininessExponent( material ), 8 );\n		Material_RE_IndirectSpecularLight( indirectSpecularRadiance, geometry, material, reflectedLight );\n    }\n#endif\n";
+THREE.ShaderChunk[ 'lights_template'] = "\nGeometricContext geometry = GeometricContext( -vViewPosition, normal, normalize( vViewPosition ) );\n#if ( NUM_POINT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )\n	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n		PointLight pointLight = pointLights[ i ];\n		IncidentLight directLight = getPointDirectLight( pointLight, geometry );\n		#ifdef USE_SHADOWMAP\n		if ( pointLight.shadow > - 1 ) {\n			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {\n				if ( j == pointLight.shadow ) {\n					directLight.color *= shadows[ j ];\n				}\n			}\n		}\n		#endif\n		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );\n	}\n#endif\n#if ( NUM_SPOT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )\n	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n		SpotLight spotLight = spotLights[ i ];\n		IncidentLight directLight = getSpotDirectLight( spotLight, geometry );\n		#ifdef USE_SHADOWMAP\n		if ( spotLight.shadow > - 1 ) {\n			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {\n				if ( j == spotLight.shadow ) {\n					directLight.color *= shadows[ j ];\n				}\n			}\n		}\n		#endif\n		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );\n	}\n#endif\n#if ( NUM_DIR_LIGHTS > 0 ) && defined( Material_RE_DirectLight )\n	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n		DirectionalLight directionalLight = directionalLights[ i ];\n		IncidentLight directLight = getDirectionalDirectLight( directionalLight, geometry );\n		#ifdef USE_SHADOWMAP\n		if ( directionalLight.shadow > - 1 ) {\n			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {\n				if ( j == directionalLight.shadow ) {\n					directLight.color *= shadows[ j ];\n				}\n			}\n		}\n		#endif\n		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );\n	}\n#endif\n#if defined( Material_RE_IndirectDiffuseLight )\n	{\n		vec3 indirectDiffuseIrradiance = getAmbientLightIrradiance( ambientLightColor );\n#ifdef USE_LIGHTMAP\n		indirectDiffuseIrradiance += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;\n#endif\n#if ( NUM_HEMI_LIGHTS > 0 )\n		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n			indirectDiffuseIrradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );\n		}\n#endif\n#if defined( USE_ENVMAP ) && defined( STANDARD )\n		indirectDiffuseIrradiance += getLightProbeIndirectIrradiance( geometry, 8 );\n#endif\n		Material_RE_IndirectDiffuseLight( indirectDiffuseIrradiance, geometry, material, reflectedLight );\n	}\n#endif\n#if defined( USE_ENVMAP ) && defined( Material_RE_IndirectSpecularLight )\n	{\n		vec3 indirectSpecularRadiance = getLightProbeIndirectRadiance( geometry, Material_BlinnShininessExponent( material ), 8 );\n		Material_RE_IndirectSpecularLight( indirectSpecularRadiance, geometry, material, reflectedLight );\n    }\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/linear_to_gamma_fragment.glsl
 
