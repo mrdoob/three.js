@@ -13,7 +13,10 @@
 //  - Add diffuse light probe (irradiance cubemap) support.
 //
 
-GeometricContext geometry = GeometricContext( -vViewPosition, normal, normalize( vViewPosition ) );
+GeometricContext geometry;
+geometry.position = -vViewPosition;
+geometry.normal = normal;
+geometry.viewDir = normalize( vViewPosition );
 
 #if ( NUM_POINT_LIGHTS > 0 ) && defined( Material_RE_DirectLight )
 
