@@ -864,16 +864,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			}
-
-			if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
-
-				renderer.renderInstances( geometry, drawStart, drawCount );
-
-			} else {
-
-				renderer.render( drawStart, drawCount );
-
-			}
+			
 
 		} else if ( object instanceof THREE.Line ) {
 
@@ -893,11 +884,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			renderer.render( drawStart, drawCount );
-
 		} else if ( object instanceof THREE.Points ) {
 
 			renderer.setMode( _gl.POINTS );
+
+		}
+		
+		if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
+
+			renderer.renderInstances( geometry, drawStart, drawCount );
+
+		} else {
+
 			renderer.render( drawStart, drawCount );
 
 		}
