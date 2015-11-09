@@ -44,13 +44,14 @@ THREE.VRMLLoader.prototype = {
 
 		this.crossOrigin = value;
 
-		THREE.ImageUtils.crossOrigin = value;
-
 	},
 
 	parse: function ( data ) {
 
 		var texturePath = this.texturePath || '';
+
+		var textureLoader = new THREE.TextureLoader( this.manager );
+		textureLoader.setCrossOrigin( this.crossOrigin );
 
 		var parseV1 = function ( lines, scene ) {
 
@@ -929,7 +930,7 @@ THREE.VRMLLoader.prototype = {
 
 								parent.material.name = textureName[ 1 ];
 
-								parent.material.map = THREE.ImageUtils.loadTexture (texturePath + textureName[ 1 ]);
+								parent.material.map = textureLoader.load( texturePath + textureName[ 1 ] );
 
 							}
 
