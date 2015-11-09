@@ -92,6 +92,31 @@ THREE.PositionalAudio.prototype.getRolloffFactor = function () {
 
 };
 
+THREE.PositionalAudio.prototype.setDistanceModel = function ( value ) {
+
+	this.panner.distanceModel = value;
+
+};
+
+THREE.PositionalAudio.prototype.getDistanceModel = function () {
+
+	return this.panner.distanceModel;
+
+};
+
+THREE.PositionalAudio.prototype.setMaxDistance = function ( value ) {
+
+	this.panner.maxDistance = value;
+
+};
+
+THREE.PositionalAudio.prototype.getMaxDistance = function () {
+
+	return this.panner.maxDistance;
+
+};
+
+
 THREE.PositionalAudio.prototype.updateMatrixWorld = ( function () {
 
 	var position = new THREE.Vector3();
