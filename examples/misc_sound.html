@@ -88,6 +88,7 @@
 
 				material_sphere1 = new THREE.MeshLambertMaterial( { color: 0xffaa00, shading: THREE.FlatShading } );
 				material_sphere2 = new THREE.MeshLambertMaterial( { color: 0xff2200, shading: THREE.FlatShading } );
+				material_sphere3 = new THREE.MeshLambertMaterial( { color: 0x6622aa, shading: THREE.FlatShading } );
 
 				// sound spheres
 
@@ -116,15 +117,37 @@
 				sound2.setRefDistance( 20 );
 				sound2.autoplay = true;
 				mesh2.add( sound2 );
+				
+				
+				var mesh3 = new THREE.Mesh( sphere, material_sphere3 );
+				mesh3.position.set( 0, 30, -250 );
+				scene.add( mesh3 );
+				
+				var sound3 = new THREE.PositionalAudio( listener );
+				var oscillator = listener.context.createOscillator();
+				oscillator.type = 'sine';
+				oscillator.frequency.value = 144;
+				oscillator.start(0);
+				sound3.setNodeSource(oscillator);
+				sound3.setRefDistance( 20 );
+				sound3.setVolume(0.5);
+				mesh3.add(sound3);
+				
+		/*		buffer2.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' );
+				sound2.setBuffer(buffer2);
+				sound2.setRefDistance( 20 );
+				sound2.autoplay = true;
+				mesh2.add( sound2 );
+		*/		
 
 				// global ambient audio
 	
-				var sound3 = new THREE.Audio( listener );
+				var sound4 = new THREE.Audio( listener );
 				var buffer3 = new THREE.AudioBuffer( listener );
 				buffer3.load( 'sounds/Project_Utopia.ogg' );
-				sound3.setBuffer(buffer3);
-				sound3.autoplay = true;
-				sound3.setLoop(true);
+				sound4.setBuffer(buffer3);
+				sound4.autoplay = true;
+				sound4.setLoop(true);
 				sound3.setVolume(0.5);
 				
 				// ground
@@ -140,11 +163,18 @@
 					   this.master = listener.getMasterVolume();
 					   this.firstSphere =  sound1.getVolume();
 					   this.secondSphere =  sound2.getVolume();
-					   this.Ambient =  sound3.getVolume();
+					   this.thirdSphere = sound3.getVolume();
+					   this.Ambient =  sound4.getVolume();
 				};
+				var GeneratorControls = function() {
+					   this.frequency = oscillator.frequency.value;
+					   this.wavetype = oscillator.type;
+				}
       			var gui = new dat.GUI();
 				var soundControls = new SoundControls();
+				var generatorControls = new GeneratorControls();
 				var volumeFolder = gui.addFolder('sound volume');
+				var generatorFolder = gui.addFolder('sound generator');
 				volumeFolder.add(soundControls, 'master').min(0.0).max(1.0).step(0.01).onChange(function() {
 					listener.setMasterVolume(soundControls.master);
 				});
@@ -154,10 +184,22 @@
 				volumeFolder.add(soundControls, 'secondSphere').min(0.0).max(1.0).step(0.01).onChange(function() {
 					sound2.setVolume(soundControls.secondSphere);
 				});
+				
+				volumeFolder.add(soundControls, 'thirdSphere').min(0.0).max(1.0).step(0.01).onChange(function() {
+					sound3.setVolume(soundControls.thirdSphere);
+				});
 				volumeFolder.add(soundControls, 'Ambient').min(0.0).max(1.0).step(0.01).onChange(function() {
-					sound3.setVolume(soundControls.Ambient);
+					sound4.setVolume(soundControls.Ambient);
 				});
 				volumeFolder.open();
+				generatorFolder.add(generatorControls, 'frequency').min(50.0).max(5000.0).step(1.0).onChange(function() {
+					oscillator.frequency.value = generatorControls.frequency;
+				});
+				generatorFolder.add(generatorControls, 'wavetype', ['sine', 'square', 'sawtooth', 'triangle']).onChange(function() {
+					oscillator.type = generatorControls.wavetype;
+				});
+				generatorFolder.open();
+				
 
 
 
@@ -210,6 +252,7 @@
 
 				material_sphere1.color.setHSL( 0.0, 0.3 + 0.7 * ( 1 + Math.cos( time ) ) / 2, 0.5 );
 				material_sphere2.color.setHSL( 0.1, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2, 0.5 );
+				material_sphere3.color.setHSL( 0.1, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2, 0.5 );
 
 				renderer.render( scene, camera );
 
