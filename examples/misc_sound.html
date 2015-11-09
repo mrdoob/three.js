@@ -95,7 +95,7 @@
 				mesh1.position.set( -250, 30, 0 );
 				scene.add( mesh1 );
 
-				var sound1 = new THREE.PositionAudio( listener );
+				var sound1 = new THREE.PositionalAudio( listener );
 				var buffer1 = new THREE.AudioBuffer( listener );
 				buffer1.load( 'sounds/358232_j_s_song.ogg' );
 				sound1.setBuffer(buffer1);
@@ -109,7 +109,7 @@
 				mesh2.position.set( 250, 30, 0 );
 				scene.add( mesh2 );
 
-				var sound2 = new THREE.PositionAudio( listener );
+				var sound2 = new THREE.PositionalAudio( listener );
 				var buffer2 = new THREE.AudioBuffer( listener );
 				buffer2.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' );
 				sound2.setBuffer(buffer2);

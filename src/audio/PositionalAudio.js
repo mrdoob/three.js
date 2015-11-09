@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PositionAudio = function ( listener ) {
+THREE.PositionalAudio = function ( listener ) {
 
 	THREE.Audio.call( this, listener );
 
@@ -11,12 +11,12 @@ THREE.PositionAudio = function ( listener ) {
 
 };
 
-THREE.PositionAudio.prototype = Object.create( THREE.Audio.prototype );
-THREE.PositionAudio.prototype.constructor = THREE.PositionAudio;
+THREE.PositionalAudio.prototype = Object.create( THREE.Audio.prototype );
+THREE.PositionalAudio.prototype.constructor = THREE.PositionalAudio;
 
 
 
-THREE.PositionAudio.prototype.connect = function () {
+THREE.PositionalAudio.prototype.connect = function () {
 
 	if ( this.filter !== undefined ) {
 
@@ -31,7 +31,7 @@ THREE.PositionAudio.prototype.connect = function () {
 
 };
 
-THREE.PositionAudio.prototype.disconnect = function () {
+THREE.PositionalAudio.prototype.disconnect = function () {
 
 	if ( this.filter !== undefined ) {
 
@@ -46,7 +46,7 @@ THREE.PositionAudio.prototype.disconnect = function () {
 
 };
 
-THREE.PositionAudio.prototype.setFilter = function ( value ) {
+THREE.PositionalAudio.prototype.setFilter = function ( value ) {
 
 	if ( this.isPlaying === true ) {
 
@@ -62,37 +62,37 @@ THREE.PositionAudio.prototype.setFilter = function ( value ) {
 
 };
 
-THREE.PositionAudio.prototype.getFilter = function () {
+THREE.PositionalAudio.prototype.getFilter = function () {
 
 	return this.filter;
 
 };
 
-THREE.PositionAudio.prototype.setRefDistance = function ( value ) {
+THREE.PositionalAudio.prototype.setRefDistance = function ( value ) {
 
 	this.panner.refDistance = value;
 
 };
 
-THREE.PositionAudio.prototype.getRefDistance = function () {
+THREE.PositionalAudio.prototype.getRefDistance = function () {
 
 	return this.panner.refDistance;
 
 };
 
-THREE.PositionAudio.prototype.setRolloffFactor = function ( value ) {
+THREE.PositionalAudio.prototype.setRolloffFactor = function ( value ) {
 
 	this.panner.rolloffFactor = value;
 
 };
 
-THREE.PositionAudio.prototype.getRolloffFactor = function () {
+THREE.PositionalAudio.prototype.getRolloffFactor = function () {
 
 	return this.panner.rolloffFactor;
 
 };
 
-THREE.PositionAudio.prototype.updateMatrixWorld = ( function () {
+THREE.PositionalAudio.prototype.updateMatrixWorld = ( function () {
 
 	var position = new THREE.Vector3();
 
