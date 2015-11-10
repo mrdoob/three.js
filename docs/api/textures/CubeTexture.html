@@ -17,15 +17,15 @@
 		<h2>Example</h2>
 
 		<code>
-		var path = "textures/cube/pisa/";
-		var format = '.png';
-		var urls = [
-			path + 'px' + format, path + 'nx' + format,
-			path + 'py' + format, path + 'ny' + format,
-			path + 'pz' + format, path + 'nz' + format
-		];
+		var loader = new THREE.CubeTextureLoader();
+		loader.setPath( 'textures/cube/pisa/' );
+		
+		var textureCube = loader.load( [
+			'px.png', 'nx.png',
+			'py.png', 'ny.png',
+			'pz.png', 'nz.png'
+		] );
 
-		var textureCube = THREE.ImageUtils.loadTextureCube( urls );
 		var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 		</code>
 
@@ -37,9 +37,7 @@
 		<div>
 		CubeTexture is almost equivalent in functionality and usage to [page:Texture]. The only differences are that the
 		images are an array of 6 images as opposed to a single image, and the mapping options are
-		[page:Textures THREE.CubeReflectionMapping] (default) or [page:Textures THREE.CubeRefractionMapping]<br />
-		<br />
-		Generally [page:ImageUtils.loadTextureCube] is used instead of using CubeTexture directly.
+		[page:Textures THREE.CubeReflectionMapping] (default) or [page:Textures THREE.CubeRefractionMapping]
 		</div>
 
 

@@ -29,6 +29,8 @@ THREE.LightShadow.prototype = {
 
 		this.mapSize.copy( source.mapSize );
 
+		return this;
+
 	},
 
 	clone: function () {

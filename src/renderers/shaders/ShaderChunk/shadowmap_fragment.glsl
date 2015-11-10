@@ -1,6 +1,10 @@
+vec3 shadowMask = vec3( 1.0 );
+
 #ifdef USE_SHADOWMAP
 
-	for ( int i = 0; i < MAX_SHADOWS; i ++ ) {
+	float shadows[ NUM_SHADOWS ];
+
+	for ( int i = 0; i < NUM_SHADOWS; i ++ ) {
 
 		float texelSizeY =  1.0 / shadowMapSize[ i ].y;
 
@@ -256,6 +260,8 @@
 #endif
 
 		shadowMask = shadowMask * vec3( 1.0 - shadow );
+
+		shadows[ i ] = 1.0 - shadow;
 
 	}
 

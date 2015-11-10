@@ -10,7 +10,7 @@ THREE.BabylonLoader = function ( manager ) {
 
 THREE.BabylonLoader.prototype = {
 
-	constructor: THREE.ObjectLoader,
+	constructor: THREE.BabylonLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 

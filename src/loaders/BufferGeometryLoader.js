@@ -64,7 +64,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 				var group = groups[ i ];
 
-				geometry.addGroup( group.start, group.count );
+				geometry.addGroup( group.start, group.count, group.materialIndex );
 
 			}
 

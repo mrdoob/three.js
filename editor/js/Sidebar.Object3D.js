@@ -41,22 +41,20 @@ Sidebar.Object3D = function ( editor ) {
 		switch ( this.getValue() ) {
 
 			case 'Reset Position':
-				object.position.set( 0, 0, 0 );
+				editor.execute( new SetPositionCommand( object, new THREE.Vector3( 0, 0, 0 ) ) );
 				break;
 
 			case 'Reset Rotation':
-				object.rotation.set( 0, 0, 0 );
+				editor.execute( new SetRotationCommand( object, new THREE.Euler( 0, 0, 0 ) ) );
 				break;
 
 			case 'Reset Scale':
-				object.scale.set( 1, 1, 1 );
+				editor.execute( new SetScaleCommand( object, new THREE.Vector3( 1, 1, 1 ) ) );
 				break;
 
 		}
 
 		this.setValue( 'Actions' );
-
-		signals.objectChanged.dispatch( object );
 
 	} );
 	container.addStatic( objectActions );
@@ -71,7 +69,7 @@ Sidebar.Object3D = function ( editor ) {
 
 		objectUUID.setValue( THREE.Math.generateUUID() );
 
-		editor.selected.uuid = objectUUID.getValue();
+		editor.execute( new SetUuidCommand( editor.selected, objectUUID.getValue() ) );
 
 	} );
 
@@ -86,7 +84,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectNameRow = new UI.Panel();
 	var objectName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-		editor.nameObject( editor.selected, objectName.getValue() );
+		editor.execute( new SetValueCommand( editor.selected, 'name', objectName.getValue() ) );
 
 	} );
 
@@ -251,21 +249,11 @@ Sidebar.Object3D = function ( editor ) {
 
 	objectShadowRow.add( new UI.Text( 'Shadow' ).setWidth( '90px' ) );
 
-	var objectCastShadowSpan = new UI.Span().setMarginRight( '10px' );
-	var objectCastShadow = new UI.Checkbox().onChange( update );
+	var objectCastShadow = new UI.THREE.Boolean( false, 'cast' ).onChange( update );
+	objectShadowRow.add( objectCastShadow );
 
-	objectCastShadowSpan.add( objectCastShadow );
-	objectCastShadowSpan.add( new UI.Text( 'cast' ).setMarginLeft( '3px' ) );
-
-	objectShadowRow.add( objectCastShadowSpan );
-
-	var objectReceiveShadowSpan = new UI.Span();
-	var objectReceiveShadow = new UI.Checkbox().onChange( update );
-
-	objectReceiveShadowSpan.add( objectReceiveShadow );
-	objectReceiveShadowSpan.add( new UI.Text( 'receive' ).setMarginLeft( '3px' ) );
-
-	objectShadowRow.add( objectReceiveShadowSpan );
+	var objectReceiveShadow = new UI.THREE.Boolean( false, 'receive' ).onChange( update );
+	objectShadowRow.add( objectReceiveShadow );
 
 	container.add( objectShadowRow );
 
@@ -375,118 +363,132 @@ Sidebar.Object3D = function ( editor ) {
 
 				if ( object.parent.id !== newParentId && object.id !== newParentId ) {
 
-					editor.moveObject( object, editor.scene.getObjectById( newParentId ) );
+					editor.execute( new MoveObjectCommand( object, editor.scene.getObjectById( newParentId ) ) );
 
 				}
 
 			}
 			*/
 
-			object.position.x = objectPositionX.getValue();
-			object.position.y = objectPositionY.getValue();
-			object.position.z = objectPositionZ.getValue();
+			var newPosition = new THREE.Vector3( objectPositionX.getValue(), objectPositionY.getValue(), objectPositionZ.getValue() );
+			if ( object.position.distanceTo( newPosition ) >= 0.01 ) {
 
-			object.rotation.x = objectRotationX.getValue();
-			object.rotation.y = objectRotationY.getValue();
-			object.rotation.z = objectRotationZ.getValue();
+				editor.execute( new SetPositionCommand( object, newPosition ) );
 
-			object.scale.x = objectScaleX.getValue();
-			object.scale.y = objectScaleY.getValue();
-			object.scale.z = objectScaleZ.getValue();
+			}
 
-			if ( object.fov !== undefined ) {
+			var newRotation = new THREE.Euler( objectRotationX.getValue(), objectRotationY.getValue(), objectRotationZ.getValue() );
+			if ( object.rotation.toVector3().distanceTo( newRotation.toVector3() ) >= 0.01 ) {
 
-				object.fov = objectFov.getValue();
+				editor.execute( new SetRotationCommand( object, newRotation ) );
+
+			}
+
+			var newScale = new THREE.Vector3( objectScaleX.getValue(), objectScaleY.getValue(), objectScaleZ.getValue() );
+			if ( object.scale.distanceTo( newScale ) >= 0.01 ) {
+
+				editor.execute( new SetScaleCommand( object, newScale ) );
+
+			}
+
+			if ( object.fov !== undefined && Math.abs( object.fov - objectFov.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( object, 'fov', objectFov.getValue() ) );
 				object.updateProjectionMatrix();
 
 			}
 
-			if ( object.near !== undefined ) {
+			if ( object.near !== undefined && Math.abs( object.near - objectNear.getValue() ) >= 0.01 ) {
 
-				object.near = objectNear.getValue();
-
-			}
-
-			if ( object.far !== undefined ) {
-
-				object.far = objectFar.getValue();
+				editor.execute( new SetValueCommand( object, 'near', objectNear.getValue() ) );
 
 			}
 
-			if ( object.intensity !== undefined ) {
+			if ( object.far !== undefined && Math.abs( object.far - objectFar.getValue() ) >= 0.01 ) {
 
-				object.intensity = objectIntensity.getValue();
-
-			}
-
-			if ( object.color !== undefined ) {
-
-				object.color.setHex( objectColor.getHexValue() );
+				editor.execute( new SetValueCommand( object, 'far', objectFar.getValue() ) );
 
 			}
 
-			if ( object.groundColor !== undefined ) {
+			if ( object.intensity !== undefined && Math.abs( object.intensity - objectIntensity.getValue() ) >= 0.01 ) {
 
-				object.groundColor.setHex( objectGroundColor.getHexValue() );
-
-			}
-
-			if ( object.distance !== undefined ) {
-
-				object.distance = objectDistance.getValue();
+				editor.execute( new SetValueCommand( object, 'intensity', objectIntensity.getValue() ) );
 
 			}
 
-			if ( object.angle !== undefined ) {
+			if ( object.color !== undefined && object.color.getHex() !== objectColor.getHexValue() ) {
 
-				object.angle = objectAngle.getValue();
-
-			}
-
-			if ( object.exponent !== undefined ) {
-
-				object.exponent = objectExponent.getValue();
+				editor.execute( new SetColorCommand( object, 'color', objectColor.getHexValue() ) );
 
 			}
 
-			if ( object.decay !== undefined ) {
+			if ( object.groundColor !== undefined && object.groundColor.getHex() !== objectGroundColor.getHexValue() ) {
 
-				object.decay = objectDecay.getValue();
+				editor.execute( new SetColorCommand( object, 'groundColor', objectGroundColor.getHexValue() ) );
 
 			}
 
-			if ( object.castShadow !== undefined ) {
+			if ( object.distance !== undefined && Math.abs( object.distance - objectDistance.getValue() ) >= 0.01 ) {
 
-				object.castShadow = objectCastShadow.getValue();
+				editor.execute( new SetValueCommand( object, 'distance', objectDistance.getValue() ) );
+
+			}
+
+			if ( object.angle !== undefined && Math.abs( object.angle - objectAngle.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( object, 'angle', objectAngle.getValue() ) );
+
+			}
+
+			if ( object.exponent !== undefined && Math.abs( object.exponent - objectExponent.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( object, 'exponent', objectExponent.getValue() ) );
+
+			}
+
+			if ( object.decay !== undefined && Math.abs( object.decay - objectDecay.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( object, 'decay', objectDecay.getValue() ) );
+
+			}
+
+			if ( object.visible !== objectVisible.getValue() ) {
+
+				editor.execute( new SetValueCommand( object, 'visible', objectVisible.getValue() ) );
+
+			}
+
+			if ( object.castShadow !== objectCastShadow.getValue() ) {
+
+				editor.execute( new SetValueCommand( object, 'castShadow', objectCastShadow.getValue() ) );
 
 			}
 
 			if ( object.receiveShadow !== undefined ) {
 
-				var value = objectReceiveShadow.getValue();
+				if ( object.receiveShadow !== objectReceiveShadow.getValue() ) {
 
-				if ( value !== object.receiveShadow ) {
-
-					object.receiveShadow = value;
+					editor.execute( new SetValueCommand( object, 'receiveShadow', objectReceiveShadow.getValue() ) );
 					object.material.needsUpdate = true;
 
 				}
 
 			}
 
-			object.visible = objectVisible.getValue();
-
 			try {
 
-				object.userData = JSON.parse( objectUserData.getValue() );
+				var userData = JSON.parse( objectUserData.getValue() );
+				if ( JSON.stringify( object.userData ) != JSON.stringify( userData ) ) {
+
+					editor.execute( new SetValueCommand( object, 'userData', userData ) );
+
+				}
 
 			} catch ( exception ) {
 
 				console.warn( exception );
 
 			}
-
-			signals.objectChanged.dispatch( object );
 
 		}
 
@@ -507,7 +509,7 @@ Sidebar.Object3D = function ( editor ) {
 			'exponent' : objectExponentRow,
 			'decay' : objectDecayRow,
 			'castShadow' : objectShadowRow,
-			'receiveShadow' : objectReceiveShadowSpan
+			'receiveShadow' : objectReceiveShadow
 		};
 
 		for ( var property in properties ) {
@@ -572,6 +574,14 @@ Sidebar.Object3D = function ( editor ) {
 	*/
 
 	signals.objectChanged.add( function ( object ) {
+
+		if ( object !== editor.selected ) return;
+
+		updateUI( object );
+
+	} );
+
+	signals.refreshSidebarObject3D.add( function ( object ) {
 
 		if ( object !== editor.selected ) return;
 
