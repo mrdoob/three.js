@@ -864,7 +864,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			}
-			
+
 
 		} else if ( object instanceof THREE.Line ) {
 
@@ -889,7 +889,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			renderer.setMode( _gl.POINTS );
 
 		}
-		
+
 		if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
 			renderer.renderInstances( geometry, drawStart, drawCount );
@@ -2123,41 +2123,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( uniforms.shadowMatrix ) {
 
-			var j = 0;
 			var shadows = _lights.shadows;
 
-			for ( var i = 0, il = shadows.length; i < il; i ++ ) {
+			for ( var i = 0, l = shadows.length; i < l; i ++ ) {
 
 				var light = shadows[ i ];
+				var shadow = light.shadow;
 
-				if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
+				if ( light instanceof THREE.PointLight ) {
 
-					var shadow = light.shadow;
+					// for point lights we set the shadow matrix to be a translation-only matrix
+					// equal to inverse of the light's position
+					_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
+					shadow.matrix.identity().setPosition( _vector3 );
 
-					if ( light instanceof THREE.PointLight ) {
+					// for point lights we set the sign of the shadowDarkness uniform to be negative
+					uniforms.shadowDarkness.value[ i ] = - shadow.darkness;
 
-						// for point lights we set the shadow matrix to be a translation-only matrix
-						// equal to inverse of the light's position
-						_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-						shadow.matrix.identity().setPosition( _vector3 );
+				} else {
 
-						// for point lights we set the sign of the shadowDarkness uniform to be negative
-						uniforms.shadowDarkness.value[ j ] = - shadow.darkness;
-
-					} else {
-
-						uniforms.shadowDarkness.value[ j ] = shadow.darkness;
-
-					}
-
-					uniforms.shadowMatrix.value[ j ] = shadow.matrix;
-					uniforms.shadowMap.value[ j ] = shadow.map;
-					uniforms.shadowMapSize.value[ j ] = shadow.mapSize;
-					uniforms.shadowBias.value[ j ] = shadow.bias;
-
-					j ++;
+					uniforms.shadowDarkness.value[ i ] = shadow.darkness;
 
 				}
+
+				uniforms.shadowBias.value[ i ] = shadow.bias;
+				uniforms.shadowMap.value[ i ] = shadow.map;
+				uniforms.shadowMapSize.value[ i ] = shadow.mapSize;
+				uniforms.shadowMatrix.value[ i ] = shadow.matrix;
 
 			}
 
