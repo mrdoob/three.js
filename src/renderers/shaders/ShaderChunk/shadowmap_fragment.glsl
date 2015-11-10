@@ -10,7 +10,7 @@ vec3 shadowMask = vec3( 1.0 );
 
 		float shadow = 0.0;
 
-#if defined( POINT_LIGHT_SHADOWS )
+#ifdef POINT_LIGHT_SHADOWS
 
 		// to save on uniform space, we use the sign of @shadowDarkness[ i ] to determine
 		// whether or not this light is a point light ( shadowDarkness[ i ] < 0 == point light)

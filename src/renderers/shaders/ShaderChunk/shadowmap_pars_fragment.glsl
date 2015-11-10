@@ -16,7 +16,7 @@
 
 	}
 
-	#if defined(POINT_LIGHT_SHADOWS)
+	#ifdef POINT_LIGHT_SHADOWS
 
 		// adjustShadowValue1K() upacks the depth value stored in @textureData, adds @bias to it, and then
 		// comapres the result with @testDepth. If @testDepth is larger than or equal to that result, then
