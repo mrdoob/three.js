@@ -253,7 +253,7 @@ vec3 shadowMask = vec3( 1.0 );
 
 #endif
 
-#if defined( POINT_LIGHT_SHADOWS )
+#ifdef POINT_LIGHT_SHADOWS
 
 		}
 

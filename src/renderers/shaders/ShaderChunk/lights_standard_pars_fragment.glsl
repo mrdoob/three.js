@@ -13,13 +13,9 @@ void PhysicalMaterial_RE_DirectLight( const in IncidentLight directLight, const 
 	vec3 irradiance = dotNL * PI * directLight.color; // punctual light
 
 	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
-
 	reflectedLight.directSpecular += irradiance * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.specularRoughness );
-	
+
 }
-
-#define Material_RE_DirectLight    PhysicalMaterial_RE_DirectLight
-
 
 void PhysicalMaterial_RE_DiffuseIndirectLight( const in vec3 irradiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
@@ -27,15 +23,14 @@ void PhysicalMaterial_RE_DiffuseIndirectLight( const in vec3 irradiance, const i
 
 }
 
-#define Material_RE_IndirectDiffuseLight    PhysicalMaterial_RE_DiffuseIndirectLight
-
-
 void PhysicalMaterial_RE_SpecularIndirectLight( const in vec3 radiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-    reflectedLight.indirectSpecular += radiance * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );
+	reflectedLight.indirectSpecular += radiance * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );
 
 }
 
-#define Material_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.specularRoughness )
-
+#define Material_RE_DirectLight    PhysicalMaterial_RE_DirectLight
+#define Material_RE_IndirectDiffuseLight    PhysicalMaterial_RE_DiffuseIndirectLight
 #define Material_RE_IndirectSpecularLight    PhysicalMaterial_RE_SpecularIndirectLight
+
+#define Material_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.specularRoughness )
