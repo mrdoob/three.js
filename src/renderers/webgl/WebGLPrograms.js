@@ -21,10 +21,11 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
-		"maxMorphTargets", "maxMorphNormals", "numDirLights", "numPointLights",
-		"numSpotLights", "numHemiLights", "numShadows", "shadowMapEnabled", "pointLightShadows",
-		"shadowMapType", "shadowMapDebug", "alphaTest", "doubleSided",
-		"flipSided"
+		"maxMorphTargets", "maxMorphNormals",
+		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
+		"numShadows", "shadowMapEnabled", "pointLightShadows",
+		"shadowMapType", "shadowMapDebug",
+		"alphaTest", "doubleSided", "flipSided"
 	];
 
 
