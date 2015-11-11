@@ -29,6 +29,16 @@ THREE.Audio.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Audio.prototype.constructor = THREE.Audio;
 
 
+THREE.Audio.prototype.load = function ( fileName ) {
+
+	var audioBuffer = new THREE.AudioBuffer(this.context);
+	audioBuffer.load(fileName);
+	this.setBuffer(audioBuffer);
+	return this;
+
+};
+
+
 THREE.Audio.prototype.setNodeSource = function ( audioNode ) {
 
 	this.hasPlaybackControl = false;

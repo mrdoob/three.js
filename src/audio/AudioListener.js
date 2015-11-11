@@ -26,7 +26,7 @@ THREE.AudioListener.prototype.getOutputNode = function () {
 
 THREE.AudioListener.prototype.removeFilter = function ( ) {
 	
-	if (this.filter !== null && this.filter !== undefined) {
+	if (this.filter !== null) {
 	
 		this.masterGain.disconnect(this.filter);
 		this.filter.disconnect(this.context.destination);
@@ -39,7 +39,7 @@ THREE.AudioListener.prototype.removeFilter = function ( ) {
 
 THREE.AudioListener.prototype.setFilter = function ( value ) {
 
-	if (this.filter !== null && this.filter !== undefined) {
+	if (this.filter !== null) {
 		
 		this.masterGain.disconnect(this.filter);
 		this.filter.disconnect(this.context.destination);

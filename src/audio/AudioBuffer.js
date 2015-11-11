@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AudioBuffer = function ( listener ) {
+THREE.AudioBuffer = function ( context ) {
 
-	this.context = listener.context;
+	this.context = context;
 	this.ready = false;
 	this.readyCallbacks = [];
 

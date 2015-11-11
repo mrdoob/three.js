@@ -97,9 +97,7 @@
 				scene.add( mesh1 );
 
 				var sound1 = new THREE.PositionalAudio( listener );
-				var buffer1 = new THREE.AudioBuffer( listener );
-				buffer1.load( 'sounds/358232_j_s_song.ogg' );
-				sound1.setBuffer(buffer1);
+				sound1.load( 'sounds/358232_j_s_song.ogg' );
 				sound1.setRefDistance( 20 );
 				sound1.autoplay = true;
 				mesh1.add( sound1 );
@@ -111,9 +109,7 @@
 				scene.add( mesh2 );
 
 				var sound2 = new THREE.PositionalAudio( listener );
-				var buffer2 = new THREE.AudioBuffer( listener );
-				buffer2.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' );
-				sound2.setBuffer(buffer2);
+				sound2.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' );
 				sound2.setRefDistance( 20 );
 				sound2.autoplay = true;
 				mesh2.add( sound2 );
@@ -133,22 +129,13 @@
 				sound3.setVolume(0.5);
 				mesh3.add(sound3);
 				
-		/*		buffer2.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' );
-				sound2.setBuffer(buffer2);
-				sound2.setRefDistance( 20 );
-				sound2.autoplay = true;
-				mesh2.add( sound2 );
-		*/		
-
 				// global ambient audio
 	
 				var sound4 = new THREE.Audio( listener );
-				var buffer3 = new THREE.AudioBuffer( listener );
-				buffer3.load( 'sounds/Project_Utopia.ogg' );
-				sound4.setBuffer(buffer3);
+				sound4.load( 'sounds/Project_Utopia.ogg' );
 				sound4.autoplay = true;
 				sound4.setLoop(true);
-				sound3.setVolume(0.5);
+				sound4.setVolume(0.5);
 				
 				// ground
 
@@ -252,7 +239,7 @@
 
 				material_sphere1.color.setHSL( 0.0, 0.3 + 0.7 * ( 1 + Math.cos( time ) ) / 2, 0.5 );
 				material_sphere2.color.setHSL( 0.1, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2, 0.5 );
-				material_sphere3.color.setHSL( 0.1, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2, 0.5 );
+				material_sphere3.color.setHSL( 0.1, 0.5, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2);
 
 				renderer.render( scene, camera );
 
