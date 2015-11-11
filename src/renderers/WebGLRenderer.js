@@ -3256,9 +3256,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var renderTargetProperties = properties.get( renderTarget );
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
+
 		if ( isCube ) {
 
 			renderTargetProperties.__webglDepthbuffer = [];
+
 			for ( var i = 0; i < 6; i ++ ) {
 
 				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
@@ -3267,17 +3269,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-		}
-		else {
+		} else {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 			renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
 			setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget );
 
 		}
+
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
-	};
+	}
 
 	// Set up GL resources for the render target
 	function setupRenderTarget( renderTarget ) {
