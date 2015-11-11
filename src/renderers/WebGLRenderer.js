@@ -208,6 +208,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var properties = new THREE.WebGLProperties();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
 	var programCache = new THREE.WebGLPrograms( this, capabilities );
+	var lightCache = new THREE.WebGLLights();
 
 	this.info.programs = programCache.programs;
 
@@ -2662,15 +2663,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
-				if( ! light.__webglUniforms ) {
-					light.__webglUniforms = {
-						direction: new THREE.Vector3(),
-						color: new THREE.Color(),
-						shadow: -1
-					}
-				}
-
-				var uniforms = light.__webglUniforms;
+				var uniforms = lightCache.get( light );
 
 				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
@@ -2694,17 +2687,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				if( ! light.__webglUniforms ) {
-					light.__webglUniforms = {
-						position: new THREE.Vector3(),
-						color: new THREE.Color(),
-						distance: 0,
-						decay: 0,
-						shadow: -1
-					}
-				}
-
-				var uniforms = light.__webglUniforms;
+				var uniforms = lightCache.get( light );
 
 				uniforms.position.setFromMatrixPosition( light.matrixWorld );
 				uniforms.position.applyMatrix4( viewMatrix );
@@ -2730,18 +2713,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
-				if( ! light.__webglUniforms ) {
-					light.__webglUniforms = {
-						position: new THREE.Vector3(),
-						direction: new THREE.Vector3(),
-						color: new THREE.Color(),
-						distance: 0,
-						decay: 0,
-						angleCos: 0
-					}
-				}
-
-				var uniforms = light.__webglUniforms;
+				var uniforms = lightCache.get( light );
 
 				uniforms.position.setFromMatrixPosition( light.matrixWorld );
 				uniforms.position.applyMatrix4( viewMatrix );
@@ -2774,15 +2746,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 
-				if( ! light.__webglUniforms ) {
-					light.__webglUniforms = {
-						direction: new THREE.Vector3(),
-						skyColor: new THREE.Color(),
-						groundColor: new THREE.Color()
-					}
-				}
-
-				var uniforms = light.__webglUniforms;
+				var uniforms = lightCache.get( light );
 
 				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				uniforms.direction.transformDirection( viewMatrix );

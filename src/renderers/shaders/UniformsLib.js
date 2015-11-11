@@ -82,7 +82,7 @@ THREE.UniformsLib = {
 
 	},
 
-	fog : {
+	fog: {
 
 		"fogDensity" : { type: "f", value: 0.00025 },
 		"fogNear" : { type: "f", value: 1 },
