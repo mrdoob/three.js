@@ -254,7 +254,7 @@ def get_texture_name(t):
             texture_name = ""
 
     if len(texture_name) == 0:
-        return "Texture_" + t.GetUniqueID()
+        return "Texture_%s" % t.GetUniqueID()
     else:
         return "Texture_%s_" % t.GetUniqueID() + texture_name
 
