@@ -97,7 +97,11 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 
-			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), diffuseColor.rgb, vec3( 0.0 ) );",
+			"	ReflectedLight reflectedLight;",
+			"	reflectedLight.directDiffuse = vec3( 0.0 );",
+			"	reflectedLight.directSpecular = vec3( 0.0 );",
+			"	reflectedLight.indirectDiffuse = diffuseColor.rgb;",
+			"	reflectedLight.indirectSpecular = vec3( 0.0 );",
 
 				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
