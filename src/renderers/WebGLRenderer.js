@@ -2304,6 +2304,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					break;
 
+				/*
 				case 's':
 
 					// TODO: Optimize this.
@@ -2337,6 +2338,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					break;
+				*/
 
 				case 'sa':
 
@@ -2347,9 +2349,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							var property = uniform.properties[ propertyName ];
 							var locationProperty =  location[ i ][ propertyName ];
-							var valueProperty = value[i][ propertyName ];
+							var valueProperty = value[ i ][ propertyName ];
 
-							switch( property.type ) {
+							switch ( property.type ) {
 								case 'i':
 									_gl.uniform1i( locationProperty, valueProperty );
 									break;
