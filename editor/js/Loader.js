@@ -75,7 +75,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.BabylonLoader();
 
 					var geometry = loader.parseGeometry( json );
-					var material = new THREE.MeshPhongMaterial();
+					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
@@ -103,7 +103,7 @@ var Loader = function ( editor ) {
 						geometry.sourceType = "ctm";
 						geometry.sourceFile = file.name;
 
-						var material = new THREE.MeshPhongMaterial();
+						var material = new THREE.MeshStandardMaterial();
 
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.name = filename;
@@ -219,7 +219,7 @@ var Loader = function ( editor ) {
 						var contents = event.target.result;
 
 						var geometry = new THREE.MD2Loader().parse( contents );
-						var material = new THREE.MeshPhongMaterial( {
+						var material = new THREE.MeshStandardMaterial( {
 							morphTargets: true,
 							morphNormals: true
 						} );
@@ -281,7 +281,7 @@ var Loader = function ( editor ) {
 					geometry.sourceType = "ply";
 					geometry.sourceFile = file.name;
 
-					var material = new THREE.MeshPhongMaterial();
+					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
@@ -304,7 +304,7 @@ var Loader = function ( editor ) {
 					geometry.sourceType = "stl";
 					geometry.sourceFile = file.name;
 
-					var material = new THREE.MeshPhongMaterial();
+					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
@@ -357,7 +357,7 @@ var Loader = function ( editor ) {
 					geometry.sourceType = "vtk";
 					geometry.sourceFile = file.name;
 
-					var material = new THREE.MeshPhongMaterial();
+					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
@@ -448,7 +448,7 @@ var Loader = function ( editor ) {
 
 			} else {
 
-				material = new THREE.MeshPhongMaterial();
+				material = new THREE.MeshStandardMaterial();
 
 			}
 
