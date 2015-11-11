@@ -1775,16 +1775,23 @@ def generate_mesh_object(node, geometry_dict, material_dict):
             material_names.append('')
 
         material_name = get_multi_material_name(node) if material_count > 1 else material_names[0]
+    else:
+        mesh_name = 'Mesh_%s_%s' % (mesh.GetUniqueID(), mesh.GetName()) if len(mesh.GetName()) > 0 else 'Mesh_%s' % mesh.GetUniqueID()
+        sys.stderr.write("WARNING: Mesh '%s' has no materials\n" % mesh_name)
 
-    return {
-       type_key: 'Mesh',
-      'geometry': geometry_dict[get_geometry_name(node)],
-      'material': material_dict[material_name],
-      'position': serialize_vector3(position),
-      'quaternion': serialize_vector4(quaternion),
-      'scale': serialize_vector3(scale),
-      'visible': True
+    output = {
+        type_key: 'Mesh',
+        'geometry': geometry_dict[get_geometry_name(node)],
+        'position': serialize_vector3(position),
+        'quaternion': serialize_vector4(quaternion),
+        'scale': serialize_vector3(scale),
+        'visible': True
     }
+
+    if len(material_name) > 0:
+        output['material'] = material_dict[material_name]
+
+    return output
 
 # #####################################################
 # Generate Node Object
