@@ -395,7 +395,7 @@ var Loader = function ( editor ) {
 
 	}
 
-	var handleJSON = function ( data, file, filename ) {
+	function handleJSON( data, file, filename ) {
 
 		if ( data.metadata === undefined ) { // 2.0
 
@@ -409,98 +409,108 @@ var Loader = function ( editor ) {
 
 		}
 
-		if ( data.metadata.version === undefined ) {
+		if ( data.metadata.formatVersion !== undefined ) {
 
 			data.metadata.version = data.metadata.formatVersion;
 
 		}
 
-		if ( data.metadata.type === 'BufferGeometry' ) {
+		switch ( data.metadata.type.toLowerCase() ) {
 
-			var loader = new THREE.BufferGeometryLoader();
-			var result = loader.parse( data );
+			case 'buffergeometry':
 
-			var mesh = new THREE.Mesh( result );
+				var loader = new THREE.BufferGeometryLoader();
+				var result = loader.parse( data );
 
-			editor.execute( new AddObjectCommand( mesh ) );
+				var mesh = new THREE.Mesh( result );
 
-		} else if ( data.metadata.type.toLowerCase() === 'geometry' ) {
+				editor.execute( new AddObjectCommand( mesh ) );
 
-			var loader = new THREE.JSONLoader();
-			loader.setTexturePath( scope.texturePath );
+				break;
 
-			var result = loader.parse( data );
+			case 'geometry':
 
-			var geometry = result.geometry;
-			var material;
+				var loader = new THREE.JSONLoader();
+				loader.setTexturePath( scope.texturePath );
 
-			if ( result.materials !== undefined ) {
+				var result = loader.parse( data );
 
-				if ( result.materials.length > 1 ) {
+				var geometry = result.geometry;
+				var material;
 
-					material = new THREE.MeshFaceMaterial( result.materials );
+				if ( result.materials !== undefined ) {
+
+					if ( result.materials.length > 1 ) {
+
+						material = new THREE.MeshFaceMaterial( result.materials );
+
+					} else {
+
+						material = result.materials[ 0 ];
+
+					}
 
 				} else {
 
-					material = result.materials[ 0 ];
+					material = new THREE.MeshStandardMaterial();
 
 				}
 
-			} else {
+				geometry.sourceType = "ascii";
+				geometry.sourceFile = file.name;
 
-				material = new THREE.MeshStandardMaterial();
+				var mesh;
 
-			}
+				if ( geometry.animation && geometry.animation.hierarchy ) {
 
-			geometry.sourceType = "ascii";
-			geometry.sourceFile = file.name;
+					mesh = new THREE.SkinnedMesh( geometry, material );
 
-			var mesh;
+				} else {
 
-			if ( geometry.animation && geometry.animation.hierarchy ) {
+					mesh = new THREE.Mesh( geometry, material );
 
-				mesh = new THREE.SkinnedMesh( geometry, material );
+				}
 
-			} else {
+				mesh.name = filename;
 
-				mesh = new THREE.Mesh( geometry, material );
+				editor.execute( new AddObjectCommand( mesh ) );
 
-			}
+				break;
 
-			mesh.name = filename;
+			case 'object':
 
-			editor.execute( new AddObjectCommand( mesh ) );
+				var loader = new THREE.ObjectLoader();
+				loader.setTexturePath( scope.texturePath );
 
-		} else if ( data.metadata.type.toLowerCase() === 'object' ) {
+				var result = loader.parse( data );
 
-			var loader = new THREE.ObjectLoader();
-			loader.setTexturePath( scope.texturePath );
+				if ( result instanceof THREE.Scene ) {
 
-			var result = loader.parse( data );
+					editor.execute( new SetSceneCommand( result ) );
 
-			if ( result instanceof THREE.Scene ) {
+				} else {
 
-				editor.execute( new SetSceneCommand( result ) );
+					editor.execute( new AddObjectCommand( result ) );
 
-			} else {
+				}
 
-				editor.execute( new AddObjectCommand( result ) );
+				break;
 
-			}
+			case 'scene':
 
-		} else if ( data.metadata.type.toLowerCase() === 'scene' ) {
+				// DEPRECATED
 
-			// DEPRECATED
+				var loader = new THREE.SceneLoader();
+				loader.parse( data, function ( result ) {
 
-			var loader = new THREE.SceneLoader();
-			loader.parse( data, function ( result ) {
+					editor.execute( new SetSceneCommand( result.scene ) );
 
-				editor.execute( new SetSceneCommand( result.scene ) );
+				}, '' );
 
-			}, '' );
+				break;
 
 		}
 
-	};
+	}
 
 }
