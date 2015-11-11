@@ -509,6 +509,12 @@ var Loader = function ( editor ) {
 
 				break;
 
+			case 'app':
+
+				editor.fromJSON( data );
+
+				break;
+
 		}
 
 	}

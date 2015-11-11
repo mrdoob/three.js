@@ -465,6 +465,7 @@ Editor.prototype = {
 
 		return {
 
+			metadata: {},
 			project: {
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				vr: this.config.getKey( 'project/vr' )

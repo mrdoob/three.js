@@ -247,6 +247,9 @@ Menubar.File = function ( editor ) {
 		//
 
 		var output = editor.toJSON();
+		output.metadata.type = 'App';
+		delete output.history;
+
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
