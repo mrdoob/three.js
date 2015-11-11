@@ -23002,7 +23002,7 @@ THREE.ShaderChunk[ 'lights_phong_fragment'] = "BlinnPhongMaterial material;\nmat
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_phong_pars_fragment'] = "#ifdef USE_ENVMAP\n	varying vec3 vWorldPosition;\n#endif\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\nstruct BlinnPhongMaterial {\n	vec3	diffuseColor;\n	vec3	specularColor;\n	float	specularShininess;\n	float	specularStrength;\n};\nvoid BlinnPhongMaterial_RE_DirectLight( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	vec3 irradiance = dotNL * PI * directLight.color;\n	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;\n}\n#define Material_RE_DirectLight    BlinnPhongMaterial_RE_DirectLight\nvoid BlinnPhongMaterial_RE_IndirectDiffuseLight( const in vec3 irradiance, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\n#define Material_RE_IndirectDiffuseLight    BlinnPhongMaterial_RE_IndirectDiffuseLight\n#define Material_LightProbeLOD( material )   (0)\n";
+THREE.ShaderChunk[ 'lights_phong_pars_fragment'] = "#ifdef USE_ENVMAP\n	varying vec3 vWorldPosition;\n#endif\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\nstruct BlinnPhongMaterial {\n	vec3	diffuseColor;\n	vec3	specularColor;\n	float	specularShininess;\n	float	specularStrength;\n};\nvoid BlinnPhongMaterial_RE_DirectLight( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	vec3 irradiance = dotNL * PI * directLight.color;\n	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;\n}\nvoid BlinnPhongMaterial_RE_IndirectDiffuseLight( const in vec3 irradiance, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\n#define Material_RE_DirectLight    BlinnPhongMaterial_RE_DirectLight\n#define Material_RE_IndirectDiffuseLight    BlinnPhongMaterial_RE_IndirectDiffuseLight\n#define Material_LightProbeLOD( material )   (0)\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_pars_vertex.glsl
 
@@ -23018,7 +23018,7 @@ THREE.ShaderChunk[ 'lights_standard_fragment'] = "PhysicalMaterial material;\nma
 
 // File:src/renderers/shaders/ShaderChunk/lights_standard_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_standard_pars_fragment'] = "struct PhysicalMaterial {\n	vec3	diffuseColor;\n	float	specularRoughness;\n	vec3	specularColor;\n	float	clearCoatWeight;\n	float	clearCoatRoughness;\n};\nvoid PhysicalMaterial_RE_DirectLight( const in IncidentLight directLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	vec3 irradiance = dotNL * PI * directLight.color;\n	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n	reflectedLight.directSpecular += irradiance * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.specularRoughness );\n	\n}\n#define Material_RE_DirectLight    PhysicalMaterial_RE_DirectLight\nvoid PhysicalMaterial_RE_DiffuseIndirectLight( const in vec3 irradiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\n#define Material_RE_IndirectDiffuseLight    PhysicalMaterial_RE_DiffuseIndirectLight\nvoid PhysicalMaterial_RE_SpecularIndirectLight( const in vec3 radiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n    reflectedLight.indirectSpecular += radiance * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );\n}\n#define Material_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.specularRoughness )\n#define Material_RE_IndirectSpecularLight    PhysicalMaterial_RE_SpecularIndirectLight\n";
+THREE.ShaderChunk[ 'lights_standard_pars_fragment'] = "struct PhysicalMaterial {\n	vec3	diffuseColor;\n	float	specularRoughness;\n	vec3	specularColor;\n	float	clearCoatWeight;\n	float	clearCoatRoughness;\n};\nvoid PhysicalMaterial_RE_DirectLight( const in IncidentLight directLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	vec3 irradiance = dotNL * PI * directLight.color;\n	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n	reflectedLight.directSpecular += irradiance * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.specularRoughness );\n}\nvoid PhysicalMaterial_RE_DiffuseIndirectLight( const in vec3 irradiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\nvoid PhysicalMaterial_RE_SpecularIndirectLight( const in vec3 radiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectSpecular += radiance * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );\n}\n#define Material_RE_DirectLight    PhysicalMaterial_RE_DirectLight\n#define Material_RE_IndirectDiffuseLight    PhysicalMaterial_RE_DiffuseIndirectLight\n#define Material_RE_IndirectSpecularLight    PhysicalMaterial_RE_SpecularIndirectLight\n#define Material_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.specularRoughness )\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_template.glsl
 
@@ -23102,11 +23102,11 @@ THREE.ShaderChunk[ 'roughnessmap_pars_fragment'] = "#ifdef USE_ROUGHNESSMAP\n	un
 
 // File:src/renderers/shaders/ShaderChunk/shadowmap_fragment.glsl
 
-THREE.ShaderChunk[ 'shadowmap_fragment'] = "vec3 shadowMask = vec3( 1.0 );\n#ifdef USE_SHADOWMAP\n	float shadows[ NUM_SHADOWS ];\n	for ( int i = 0; i < NUM_SHADOWS; i ++ ) {\n		float texelSizeY =  1.0 / shadowMapSize[ i ].y;\n		float shadow = 0.0;\n#if defined( POINT_LIGHT_SHADOWS )\n		bool isPointLight = shadowDarkness[ i ] < 0.0;\n		if ( isPointLight ) {\n			float realShadowDarkness = abs( shadowDarkness[ i ] );\n			vec3 lightToPosition = vShadowCoord[ i ].xyz;\n	#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )\n			vec3 bd3D = normalize( lightToPosition );\n			float dp = length( lightToPosition );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ) ), shadowBias[ i ], shadow );\n	#if defined( SHADOWMAP_TYPE_PCF )\n			const float Dr = 1.25;\n	#elif defined( SHADOWMAP_TYPE_PCF_SOFT )\n			const float Dr = 2.25;\n	#endif\n			float os = Dr *  2.0 * texelSizeY;\n			const vec3 Gsd = vec3( - 1, 0, 1 );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzy * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxy * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxy * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzy * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zyz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xyz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zyx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xyx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.yzz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.yxz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.yxx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.yzx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			shadow *= realShadowDarkness * ( 1.0 / 21.0 );\n	#else\n			vec3 bd3D = normalize( lightToPosition );\n			float dp = length( lightToPosition );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ) ), shadowBias[ i ], shadow );\n			shadow *= realShadowDarkness;\n	#endif\n		} else {\n#endif\n			float texelSizeX =  1.0 / shadowMapSize[ i ].x;\n			vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;\n			bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\n			bool inFrustum = all( inFrustumVec );\n			bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\n			bool frustumTest = all( frustumTestVec );\n			if ( frustumTest ) {\n	#if defined( SHADOWMAP_TYPE_PCF )\n				shadowCoord.z += shadowBias[ i ];\n				const float ShadowDelta = 1.0 / 9.0;\n				float xPixelOffset = texelSizeX;\n				float yPixelOffset = texelSizeY;\n				float dx0 = - 1.25 * xPixelOffset;\n				float dy0 = - 1.25 * yPixelOffset;\n				float dx1 = 1.25 * xPixelOffset;\n				float dy1 = 1.25 * yPixelOffset;\n				float fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				shadow *= shadowDarkness[ i ];\n	#elif defined( SHADOWMAP_TYPE_PCF_SOFT )\n				shadowCoord.z += shadowBias[ i ];\n				float xPixelOffset = texelSizeX;\n				float yPixelOffset = texelSizeY;\n				float dx0 = - 1.0 * xPixelOffset;\n				float dy0 = - 1.0 * yPixelOffset;\n				float dx1 = 1.0 * xPixelOffset;\n				float dy1 = 1.0 * yPixelOffset;\n				mat3 shadowKernel;\n				mat3 depthKernel;\n				depthKernel[ 0 ][ 0 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );\n				depthKernel[ 0 ][ 1 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );\n				depthKernel[ 0 ][ 2 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );\n				depthKernel[ 1 ][ 0 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );\n				depthKernel[ 1 ][ 1 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );\n				depthKernel[ 1 ][ 2 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );\n				depthKernel[ 2 ][ 0 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );\n				depthKernel[ 2 ][ 1 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );\n				depthKernel[ 2 ][ 2 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );\n				vec3 shadowZ = vec3( shadowCoord.z );\n				shadowKernel[ 0 ] = vec3( lessThan( depthKernel[ 0 ], shadowZ ) );\n				shadowKernel[ 0 ] *= vec3( 0.25 );\n				shadowKernel[ 1 ] = vec3( lessThan( depthKernel[ 1 ], shadowZ ) );\n				shadowKernel[ 1 ] *= vec3( 0.25 );\n				shadowKernel[ 2 ] = vec3( lessThan( depthKernel[ 2 ], shadowZ ) );\n				shadowKernel[ 2 ] *= vec3( 0.25 );\n				vec2 fractionalCoord = 1.0 - fract( shadowCoord.xy * shadowMapSize[ i ].xy );\n				shadowKernel[ 0 ] = mix( shadowKernel[ 1 ], shadowKernel[ 0 ], fractionalCoord.x );\n				shadowKernel[ 1 ] = mix( shadowKernel[ 2 ], shadowKernel[ 1 ], fractionalCoord.x );\n				vec4 shadowValues;\n				shadowValues.x = mix( shadowKernel[ 0 ][ 1 ], shadowKernel[ 0 ][ 0 ], fractionalCoord.y );\n				shadowValues.y = mix( shadowKernel[ 0 ][ 2 ], shadowKernel[ 0 ][ 1 ], fractionalCoord.y );\n				shadowValues.z = mix( shadowKernel[ 1 ][ 1 ], shadowKernel[ 1 ][ 0 ], fractionalCoord.y );\n				shadowValues.w = mix( shadowKernel[ 1 ][ 2 ], shadowKernel[ 1 ][ 1 ], fractionalCoord.y );\n				shadow = dot( shadowValues, vec4( 1.0 ) ) * shadowDarkness[ i ];\n	#else\n				shadowCoord.z += shadowBias[ i ];\n				vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );\n				float fDepth = unpackDepth( rgbaDepth );\n				if ( fDepth < shadowCoord.z )\n					shadow = shadowDarkness[ i ];\n	#endif\n			}\n#ifdef SHADOWMAP_DEBUG\n			if ( inFrustum ) {\n				if ( i == 0 ) {\n					outgoingLight *= vec3( 1.0, 0.5, 0.0 );\n				} else if ( i == 1 ) {\n					outgoingLight *= vec3( 0.0, 1.0, 0.8 );\n				} else {\n					outgoingLight *= vec3( 0.0, 0.5, 1.0 );\n				}\n			}\n#endif\n#if defined( POINT_LIGHT_SHADOWS )\n		}\n#endif\n		shadowMask = shadowMask * vec3( 1.0 - shadow );\n		shadows[ i ] = 1.0 - shadow;\n	}\n#endif\n";
+THREE.ShaderChunk[ 'shadowmap_fragment'] = "vec3 shadowMask = vec3( 1.0 );\n#ifdef USE_SHADOWMAP\n	float shadows[ NUM_SHADOWS ];\n	for ( int i = 0; i < NUM_SHADOWS; i ++ ) {\n		float texelSizeY =  1.0 / shadowMapSize[ i ].y;\n		float shadow = 0.0;\n#ifdef POINT_LIGHT_SHADOWS\n		bool isPointLight = shadowDarkness[ i ] < 0.0;\n		if ( isPointLight ) {\n			float realShadowDarkness = abs( shadowDarkness[ i ] );\n			vec3 lightToPosition = vShadowCoord[ i ].xyz;\n	#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )\n			vec3 bd3D = normalize( lightToPosition );\n			float dp = length( lightToPosition );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ) ), shadowBias[ i ], shadow );\n	#if defined( SHADOWMAP_TYPE_PCF )\n			const float Dr = 1.25;\n	#elif defined( SHADOWMAP_TYPE_PCF_SOFT )\n			const float Dr = 2.25;\n	#endif\n			float os = Dr *  2.0 * texelSizeY;\n			const vec3 Gsd = vec3( - 1, 0, 1 );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzy * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxy * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxy * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzy * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zyz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xyz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zyx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xyx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.yzz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.yxz * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.yxx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.yzx * os, texelSizeY ) ), shadowBias[ i ], shadow );\n			shadow *= realShadowDarkness * ( 1.0 / 21.0 );\n	#else\n			vec3 bd3D = normalize( lightToPosition );\n			float dp = length( lightToPosition );\n			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ) ), shadowBias[ i ], shadow );\n			shadow *= realShadowDarkness;\n	#endif\n		} else {\n#endif\n			float texelSizeX =  1.0 / shadowMapSize[ i ].x;\n			vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;\n			bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\n			bool inFrustum = all( inFrustumVec );\n			bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\n			bool frustumTest = all( frustumTestVec );\n			if ( frustumTest ) {\n	#if defined( SHADOWMAP_TYPE_PCF )\n				shadowCoord.z += shadowBias[ i ];\n				const float ShadowDelta = 1.0 / 9.0;\n				float xPixelOffset = texelSizeX;\n				float yPixelOffset = texelSizeY;\n				float dx0 = - 1.25 * xPixelOffset;\n				float dy0 = - 1.25 * yPixelOffset;\n				float dx1 = 1.25 * xPixelOffset;\n				float dy1 = 1.25 * yPixelOffset;\n				float fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;\n				shadow *= shadowDarkness[ i ];\n	#elif defined( SHADOWMAP_TYPE_PCF_SOFT )\n				shadowCoord.z += shadowBias[ i ];\n				float xPixelOffset = texelSizeX;\n				float yPixelOffset = texelSizeY;\n				float dx0 = - 1.0 * xPixelOffset;\n				float dy0 = - 1.0 * yPixelOffset;\n				float dx1 = 1.0 * xPixelOffset;\n				float dy1 = 1.0 * yPixelOffset;\n				mat3 shadowKernel;\n				mat3 depthKernel;\n				depthKernel[ 0 ][ 0 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );\n				depthKernel[ 0 ][ 1 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );\n				depthKernel[ 0 ][ 2 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );\n				depthKernel[ 1 ][ 0 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );\n				depthKernel[ 1 ][ 1 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );\n				depthKernel[ 1 ][ 2 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );\n				depthKernel[ 2 ][ 0 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );\n				depthKernel[ 2 ][ 1 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );\n				depthKernel[ 2 ][ 2 ] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );\n				vec3 shadowZ = vec3( shadowCoord.z );\n				shadowKernel[ 0 ] = vec3( lessThan( depthKernel[ 0 ], shadowZ ) );\n				shadowKernel[ 0 ] *= vec3( 0.25 );\n				shadowKernel[ 1 ] = vec3( lessThan( depthKernel[ 1 ], shadowZ ) );\n				shadowKernel[ 1 ] *= vec3( 0.25 );\n				shadowKernel[ 2 ] = vec3( lessThan( depthKernel[ 2 ], shadowZ ) );\n				shadowKernel[ 2 ] *= vec3( 0.25 );\n				vec2 fractionalCoord = 1.0 - fract( shadowCoord.xy * shadowMapSize[ i ].xy );\n				shadowKernel[ 0 ] = mix( shadowKernel[ 1 ], shadowKernel[ 0 ], fractionalCoord.x );\n				shadowKernel[ 1 ] = mix( shadowKernel[ 2 ], shadowKernel[ 1 ], fractionalCoord.x );\n				vec4 shadowValues;\n				shadowValues.x = mix( shadowKernel[ 0 ][ 1 ], shadowKernel[ 0 ][ 0 ], fractionalCoord.y );\n				shadowValues.y = mix( shadowKernel[ 0 ][ 2 ], shadowKernel[ 0 ][ 1 ], fractionalCoord.y );\n				shadowValues.z = mix( shadowKernel[ 1 ][ 1 ], shadowKernel[ 1 ][ 0 ], fractionalCoord.y );\n				shadowValues.w = mix( shadowKernel[ 1 ][ 2 ], shadowKernel[ 1 ][ 1 ], fractionalCoord.y );\n				shadow = dot( shadowValues, vec4( 1.0 ) ) * shadowDarkness[ i ];\n	#else\n				shadowCoord.z += shadowBias[ i ];\n				vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );\n				float fDepth = unpackDepth( rgbaDepth );\n				if ( fDepth < shadowCoord.z )\n					shadow = shadowDarkness[ i ];\n	#endif\n			}\n#ifdef SHADOWMAP_DEBUG\n			if ( inFrustum ) {\n				if ( i == 0 ) {\n					outgoingLight *= vec3( 1.0, 0.5, 0.0 );\n				} else if ( i == 1 ) {\n					outgoingLight *= vec3( 0.0, 1.0, 0.8 );\n				} else {\n					outgoingLight *= vec3( 0.0, 0.5, 1.0 );\n				}\n			}\n#endif\n#ifdef POINT_LIGHT_SHADOWS\n		}\n#endif\n		shadowMask = shadowMask * vec3( 1.0 - shadow );\n		shadows[ i ] = 1.0 - shadow;\n	}\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/shadowmap_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'shadowmap_pars_fragment'] = "#ifdef USE_SHADOWMAP\n	uniform sampler2D shadowMap[ NUM_SHADOWS ];\n	uniform vec2 shadowMapSize[ NUM_SHADOWS ];\n	uniform float shadowDarkness[ NUM_SHADOWS ];\n	uniform float shadowBias[ NUM_SHADOWS ];\n	varying vec4 vShadowCoord[ NUM_SHADOWS ];\n	float unpackDepth( const in vec4 rgba_depth ) {\n		const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );\n		float depth = dot( rgba_depth, bit_shift );\n		return depth;\n	}\n	#if defined(POINT_LIGHT_SHADOWS)\n		void adjustShadowValue1K( const float testDepth, const vec4 textureData, const float bias, inout float shadowValue ) {\n			const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );\n			if ( testDepth >= dot( textureData, bitSh ) * 1000.0 + bias )\n				shadowValue += 1.0;\n		}\n		vec2 cubeToUV( vec3 v, float texelSizeY ) {\n			vec3 absV = abs( v );\n			float scaleToCube = 1.0 / max( absV.x, max( absV.y, absV.z ) );\n			absV *= scaleToCube;\n			v *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );\n			vec2 planar = v.xy;\n			float almostATexel = 1.5 * texelSizeY;\n			float almostOne = 1.0 - almostATexel;\n			if ( absV.z >= almostOne ) {\n				if ( v.z > 0.0 )\n					planar.x = 4.0 - v.x;\n			} else if ( absV.x >= almostOne ) {\n				float signX = sign( v.x );\n				planar.x = v.z * signX + 2.0 * signX;\n			} else if ( absV.y >= almostOne ) {\n				float signY = sign( v.y );\n				planar.x = v.x + 2.0 * signY + 2.0;\n				planar.y = v.z * signY - 2.0;\n			}\n			return vec2( 0.125, 0.25 ) * planar + vec2( 0.375, 0.75 );\n		}\n	#endif\n#endif\n";
+THREE.ShaderChunk[ 'shadowmap_pars_fragment'] = "#ifdef USE_SHADOWMAP\n	uniform sampler2D shadowMap[ NUM_SHADOWS ];\n	uniform vec2 shadowMapSize[ NUM_SHADOWS ];\n	uniform float shadowDarkness[ NUM_SHADOWS ];\n	uniform float shadowBias[ NUM_SHADOWS ];\n	varying vec4 vShadowCoord[ NUM_SHADOWS ];\n	float unpackDepth( const in vec4 rgba_depth ) {\n		const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );\n		float depth = dot( rgba_depth, bit_shift );\n		return depth;\n	}\n	#ifdef POINT_LIGHT_SHADOWS\n		void adjustShadowValue1K( const float testDepth, const vec4 textureData, const float bias, inout float shadowValue ) {\n			const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );\n			if ( testDepth >= dot( textureData, bitSh ) * 1000.0 + bias )\n				shadowValue += 1.0;\n		}\n		vec2 cubeToUV( vec3 v, float texelSizeY ) {\n			vec3 absV = abs( v );\n			float scaleToCube = 1.0 / max( absV.x, max( absV.y, absV.z ) );\n			absV *= scaleToCube;\n			v *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );\n			vec2 planar = v.xy;\n			float almostATexel = 1.5 * texelSizeY;\n			float almostOne = 1.0 - almostATexel;\n			if ( absV.z >= almostOne ) {\n				if ( v.z > 0.0 )\n					planar.x = 4.0 - v.x;\n			} else if ( absV.x >= almostOne ) {\n				float signX = sign( v.x );\n				planar.x = v.z * signX + 2.0 * signX;\n			} else if ( absV.y >= almostOne ) {\n				float signY = sign( v.y );\n				planar.x = v.x + 2.0 * signY + 2.0;\n				planar.y = v.z * signY - 2.0;\n			}\n			return vec2( 0.125, 0.25 ) * planar + vec2( 0.375, 0.75 );\n		}\n	#endif\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/shadowmap_pars_vertex.glsl
 
@@ -23324,7 +23324,7 @@ THREE.UniformsLib = {
 
 	},
 
-	fog : {
+	fog: {
 
 		"fogDensity" : { type: "f", value: 0.00025 },
 		"fogNear" : { type: "f", value: 1 },
@@ -23502,7 +23502,11 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 
-			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), diffuseColor.rgb, vec3( 0.0 ) );",
+			"	ReflectedLight reflectedLight;",
+			"	reflectedLight.directDiffuse = vec3( 0.0 );",
+			"	reflectedLight.directSpecular = vec3( 0.0 );",
+			"	reflectedLight.indirectDiffuse = diffuseColor.rgb;",
+			"	reflectedLight.indirectSpecular = vec3( 0.0 );",
 
 				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
@@ -24711,6 +24715,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var properties = new THREE.WebGLProperties();
 	var objects = new THREE.WebGLObjects( _gl, properties, this.info );
 	var programCache = new THREE.WebGLPrograms( this, capabilities );
+	var lightCache = new THREE.WebGLLights();
 
 	this.info.programs = programCache.programs;
 
@@ -25367,7 +25372,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			}
-			
+
 
 		} else if ( object instanceof THREE.Line ) {
 
@@ -25392,7 +25397,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			renderer.setMode( _gl.POINTS );
 
 		}
-		
+
 		if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
 			renderer.renderInstances( geometry, drawStart, drawCount );
@@ -26626,41 +26631,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( uniforms.shadowMatrix ) {
 
-			var j = 0;
 			var shadows = _lights.shadows;
 
-			for ( var i = 0, il = shadows.length; i < il; i ++ ) {
+			for ( var i = 0, l = shadows.length; i < l; i ++ ) {
 
 				var light = shadows[ i ];
+				var shadow = light.shadow;
 
-				if ( light instanceof THREE.PointLight || light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
+				if ( light instanceof THREE.PointLight ) {
 
-					var shadow = light.shadow;
+					// for point lights we set the shadow matrix to be a translation-only matrix
+					// equal to inverse of the light's position
+					_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
+					shadow.matrix.identity().setPosition( _vector3 );
 
-					if ( light instanceof THREE.PointLight ) {
+					// for point lights we set the sign of the shadowDarkness uniform to be negative
+					uniforms.shadowDarkness.value[ i ] = - shadow.darkness;
 
-						// for point lights we set the shadow matrix to be a translation-only matrix
-						// equal to inverse of the light's position
-						_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-						shadow.matrix.identity().setPosition( _vector3 );
+				} else {
 
-						// for point lights we set the sign of the shadowDarkness uniform to be negative
-						uniforms.shadowDarkness.value[ j ] = - shadow.darkness;
-
-					} else {
-
-						uniforms.shadowDarkness.value[ j ] = shadow.darkness;
-
-					}
-
-					uniforms.shadowMatrix.value[ j ] = shadow.matrix;
-					uniforms.shadowMap.value[ j ] = shadow.map;
-					uniforms.shadowMapSize.value[ j ] = shadow.mapSize;
-					uniforms.shadowBias.value[ j ] = shadow.bias;
-
-					j ++;
+					uniforms.shadowDarkness.value[ i ] = shadow.darkness;
 
 				}
+
+				uniforms.shadowBias.value[ i ] = shadow.bias;
+				uniforms.shadowMap.value[ i ] = shadow.map;
+				uniforms.shadowMapSize.value[ i ] = shadow.mapSize;
+				uniforms.shadowMatrix.value[ i ] = shadow.matrix;
 
 			}
 
@@ -26815,6 +26812,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					break;
 
+				/*
 				case 's':
 
 					// TODO: Optimize this.
@@ -26848,6 +26846,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					break;
+				*/
 
 				case 'sa':
 
@@ -26858,9 +26857,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							var property = uniform.properties[ propertyName ];
 							var locationProperty =  location[ i ][ propertyName ];
-							var valueProperty = value[i][ propertyName ];
+							var valueProperty = value[ i ][ propertyName ];
 
-							switch( property.type ) {
+							switch ( property.type ) {
 								case 'i':
 									_gl.uniform1i( locationProperty, valueProperty );
 									break;
@@ -27171,15 +27170,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
-				if( ! light.__webglUniforms ) {
-					light.__webglUniforms = {
-						direction: new THREE.Vector3(),
-						color: new THREE.Color(),
-						shadow: -1
-					}
-				}
-
-				var uniforms = light.__webglUniforms;
+				var uniforms = lightCache.get( light );
 
 				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
@@ -27203,17 +27194,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				if( ! light.__webglUniforms ) {
-					light.__webglUniforms = {
-						position: new THREE.Vector3(),
-						color: new THREE.Color(),
-						distance: 0,
-						decay: 0,
-						shadow: -1
-					}
-				}
-
-				var uniforms = light.__webglUniforms;
+				var uniforms = lightCache.get( light );
 
 				uniforms.position.setFromMatrixPosition( light.matrixWorld );
 				uniforms.position.applyMatrix4( viewMatrix );
@@ -27239,18 +27220,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
-				if( ! light.__webglUniforms ) {
-					light.__webglUniforms = {
-						position: new THREE.Vector3(),
-						direction: new THREE.Vector3(),
-						color: new THREE.Color(),
-						distance: 0,
-						decay: 0,
-						angleCos: 0
-					}
-				}
-
-				var uniforms = light.__webglUniforms;
+				var uniforms = lightCache.get( light );
 
 				uniforms.position.setFromMatrixPosition( light.matrixWorld );
 				uniforms.position.applyMatrix4( viewMatrix );
@@ -27283,15 +27253,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 
-				if( ! light.__webglUniforms ) {
-					light.__webglUniforms = {
-						direction: new THREE.Vector3(),
-						skyColor: new THREE.Color(),
-						groundColor: new THREE.Color()
-					}
-				}
-
-				var uniforms = light.__webglUniforms;
+				var uniforms = lightCache.get( light );
 
 				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				uniforms.direction.transformDirection( viewMatrix );
@@ -28623,6 +28585,75 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 };
 
+// File:src/renderers/webgl/WebGLLights.js
+
+/**
+* @author mrdoob / http://mrdoob.com/
+*/
+
+THREE.WebGLLights = function () {
+
+	var lights = {};
+
+	this.get = function ( light ) {
+
+		if ( lights[ light.id ] !== undefined ) {
+
+			return lights[ light.id ];
+
+		}
+
+		var uniforms;
+
+		switch ( light.type ) {
+
+			case 'DirectionalLight':
+				uniforms = {
+					direction: new THREE.Vector3(),
+					color: new THREE.Color(),
+					shadow: -1
+				};
+				break;
+
+			case 'PointLight':
+				uniforms = {
+					position: new THREE.Vector3(),
+					color: new THREE.Color(),
+					distance: 0,
+					decay: 0,
+					shadow: -1
+				};
+				break;
+
+			case 'SpotLight':
+				uniforms = {
+					position: new THREE.Vector3(),
+					direction: new THREE.Vector3(),
+					color: new THREE.Color(),
+					distance: 0,
+					decay: 0,
+					angleCos: 0
+				};
+				break;
+
+			case 'HemisphereLight':
+				uniforms = {
+					direction: new THREE.Vector3(),
+					skyColor: new THREE.Color(),
+					groundColor: new THREE.Color()
+				};
+				break;
+
+		}
+
+		lights[ light.id ] = uniforms;
+
+		return uniforms;
+
+	};
+
+};
+
 // File:src/renderers/webgl/WebGLObjects.js
 
 /**
@@ -29453,10 +29484,11 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
-		"maxMorphTargets", "maxMorphNormals", "numDirLights", "numPointLights",
-		"numSpotLights", "numHemiLights", "numShadows", "shadowMapEnabled", "pointLightShadows",
-		"shadowMapType", "shadowMapDebug", "alphaTest", "doubleSided",
-		"flipSided"
+		"maxMorphTargets", "maxMorphNormals",
+		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
+		"numShadows", "shadowMapEnabled", "pointLightShadows",
+		"shadowMapType", "shadowMapDebug",
+		"alphaTest", "doubleSided", "flipSided"
 	];
 
 
