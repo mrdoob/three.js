@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - scene transitions</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			.info {
+				position: absolute;
+				background-color: black;
+				opacity: 0.8;
+				color: white;
+				text-align: center;
+				top: 0px;
+				width: 100%;
+			}
+
+			.info a {
+				color: #00ffff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div class="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> standard shader material modifier - by <a href="https://twitter.com/fernandojsg">fernandojsg</a>
+		</div>
+
+		<div id="container"></div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			var container, stats;
+			var transition;
+			var material;
+			var start;
+			var light1;
+
+			var clock = new THREE.Clock();
+
+			init();
+			
+			function init() {
+				matrix=new THREE.Matrix4;
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
+				camera.position.z = 300;
+				scene.add(camera);
+				
+				var ambientLight = new THREE.AmbientLight(0x333333);
+				scene.add(ambientLight);
+
+				light1 = new THREE.PointLight( 0xffffff, 1, 1000 );
+				light1.position.set(20,20,100);
+				scene.add( light1 );
+				
+				geometry = new THREE.BoxGeometry ( 100,500, 100, 10, 40, 10 );
+				
+				var base = "hexagonal";
+				var NormalMap = new THREE.ImageUtils.loadTexture("textures/"+base+"_normal.png");
+				var DiffuseMap = new THREE.ImageUtils.loadTexture("textures/"+base+".png");
+					
+				NormalMap.wrapS = DiffuseMap.wrapS = THREE.RepeatWrapping;
+				NormalMap.wrapT = DiffuseMap.wrapT = THREE.RepeatWrapping;	
+				var repeat = 4;
+				DiffuseMap.repeat.set( 1, repeat );
+				NormalMap.repeat.set( 1,  repeat);
+
+				material = new THREE.MeshPhongMaterial( { 
+					color: 0xAAAAAA,
+					specular: 0xffffff,
+					shininess: 10,
+					map: DiffuseMap,
+					normalMap: NormalMap,
+					normalScale: new THREE.Vector2( 1, - 1 ), // why does the normal map require negation in this case?
+					shaderModifier: {
+						preVertex: [
+						 	'float angle = (150.*sin(time-position.y))*0.02;',
+						 	'transformed = vec3(transformed.x * cos(angle) - transformed.z * sin(angle), transformed.y, transformed.x * sin(angle) + transformed.z*cos(angle));',
+						 	'vNormal = vec3( vNormal.x * cos( angle ) - vNormal.z * sin( angle ), vNormal.y, vNormal.x * sin( angle ) + vNormal.z * cos( angle ) );'
+						 ].join("\n"),
+						uniforms: { 
+							"time": { type: "f", value: 1.0 }
+						},
+						preMainVertex: "uniform float time;",
+					}
+				} );
+
+				var mesh = new THREE.Mesh(geometry, material);
+				scene.add(mesh);
+
+				
+				renderer = new THREE.WebGLRenderer();
+				scene.add( new THREE.AmbientLight( 0x505050 ) );
+				renderer.setClearColor( 0xf0f0f0 );
+
+				renderer.setSize(window.innerWidth, window.innerHeight);
+
+				document.body.appendChild(renderer.domElement);
+
+				//
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				document.body.appendChild( stats.domElement );
+
+				start = Date.now();
+				animate();
+
+			}
+			
+			function animate() {
+
+				requestAnimationFrame(animate);
+				render();
+
+			}
+
+			function render() {
+				
+				time = (Date.now() - start)/1000;
+
+				if (material.__webglShader)
+					material.__webglShader.uniforms[ "time" ].value = time;
+
+				renderer.render(scene, camera);
+
+				stats.update();
+
+			}
+
+		</script>
+
+	</body>
+	
+</html>
+
