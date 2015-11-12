@@ -19,7 +19,6 @@ THREE.MTLLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( this.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
 		loader.load( url, function ( text ) {
 

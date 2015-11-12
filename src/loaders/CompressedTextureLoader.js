@@ -28,7 +28,6 @@ THREE.CompressedTextureLoader.prototype = {
 		texture.image = images;
 
 		var loader = new THREE.XHRLoader( this.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 
@@ -124,12 +123,6 @@ THREE.CompressedTextureLoader.prototype = {
 		}
 
 		return texture;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
 
 	},
 

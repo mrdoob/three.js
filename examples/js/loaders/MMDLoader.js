@@ -82,7 +82,6 @@ THREE.MMDLoader.prototype.load = function ( modelUrl, vmdUrl, callback, onProgre
 THREE.MMDLoader.prototype.loadFileAsBuffer = function ( url, onLoad, onProgress, onError ) {
 
 	var loader = new THREE.XHRLoader( this.manager );
-	loader.setCrossOrigin( this.crossOrigin );
 	loader.setResponseType( 'arraybuffer' );
 	loader.load( url, function ( buffer ) {
 
