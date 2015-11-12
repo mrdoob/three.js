@@ -34,7 +34,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - webgl 3d sounds example -
 			music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank">larrylarrybb</a> and
-			<a href="http://www.newgrounds.com/audio/listen/376737" target="_blank">skullbeatz</a>  and 
+			<a href="http://www.newgrounds.com/audio/listen/376737" target="_blank">skullbeatz</a>  and
 			<a href="http://opengameart.org/content/project-utopia-seamless-loop" target="_blank">congusbongus</a><br/><br/>
 			navigate with WASD / arrows / mouse
 		</div>
@@ -76,9 +76,9 @@
 				var listener = new THREE.AudioListener();
 				camera.add( listener );
 
-				
+
 				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0x000000, 0.0035 );
+				scene.fog = new THREE.FogExp2( 0x000000, 0.0025 );
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0.5, 1 ).normalize();
@@ -113,12 +113,12 @@
 				sound2.setRefDistance( 20 );
 				sound2.autoplay = true;
 				mesh2.add( sound2 );
-				
-				
+
+
 				var mesh3 = new THREE.Mesh( sphere, material_sphere3 );
 				mesh3.position.set( 0, 30, -250 );
 				scene.add( mesh3 );
-				
+
 				var sound3 = new THREE.PositionalAudio( listener );
 				var oscillator = listener.context.createOscillator();
 				oscillator.type = 'sine';
@@ -128,15 +128,15 @@
 				sound3.setRefDistance( 20 );
 				sound3.setVolume(0.5);
 				mesh3.add(sound3);
-				
+
 				// global ambient audio
-	
+
 				var sound4 = new THREE.Audio( listener );
 				sound4.load( 'sounds/Project_Utopia.ogg' );
 				sound4.autoplay = true;
 				sound4.setLoop(true);
 				sound4.setVolume(0.5);
-				
+
 				// ground
 
 				var helper = new THREE.GridHelper( 500, 10 );
@@ -171,7 +171,7 @@
 				volumeFolder.add(soundControls, 'secondSphere').min(0.0).max(1.0).step(0.01).onChange(function() {
 					sound2.setVolume(soundControls.secondSphere);
 				});
-				
+
 				volumeFolder.add(soundControls, 'thirdSphere').min(0.0).max(1.0).step(0.01).onChange(function() {
 					sound3.setVolume(soundControls.thirdSphere);
 				});
@@ -186,7 +186,7 @@
 					oscillator.type = generatorControls.wavetype;
 				});
 				generatorFolder.open();
-				
+
 
 
 
@@ -205,7 +205,7 @@
 				controls.noFly = true;
 				controls.lookVertical = false;
 
-				
+
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
