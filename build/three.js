@@ -16134,45 +16134,60 @@ THREE.Audio = function ( listener ) {
 	this.source.onended = this.onEnded.bind( this );
 
 	this.gain = this.context.createGain();
-	this.gain.connect( this.context.destination );
-
-	this.panner = this.context.createPanner();
-	this.panner.connect( this.gain );
+	this.gain.connect( listener.getOutputNode());
 
 	this.autoplay = false;
 
 	this.startTime = 0;
 	this.playbackRate = 1;
 	this.isPlaying = false;
+	this.hasPlaybackControl = true;
+	this.sourceType = 'empty';
 
 };
 
 THREE.Audio.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Audio.prototype.constructor = THREE.Audio;
 
-THREE.Audio.prototype.load = function ( file ) {
+
+THREE.Audio.prototype.load = function ( fileName ) {
+
+	var audioBuffer = new THREE.AudioBuffer(this.context);
+	audioBuffer.load(fileName);
+	this.setBuffer(audioBuffer);
+	return this;
+
+};
+
+
+THREE.Audio.prototype.setNodeSource = function ( audioNode ) {
+
+	this.hasPlaybackControl = false;
+	this.sourceType = 'audioNode';
+	this.source = audioNode;
+	this.connect();
+	
+	return this;
+
+};
+
+
+
+THREE.Audio.prototype.setBuffer = function ( audioBuffer ) {
 
 	var scope = this;
-
-	var request = new XMLHttpRequest();
-	request.open( 'GET', file, true );
-	request.responseType = 'arraybuffer';
-	request.onload = function ( e ) {
-
-		scope.context.decodeAudioData( this.response, function ( buffer ) {
-
-			scope.source.buffer = buffer;
-
-			if ( scope.autoplay ) scope.play();
-
-		} );
-
-	};
-	request.send();
+	
+	audioBuffer.onReady(function(buffer) {
+		scope.source.buffer = buffer;
+		scope.sourceType = 'buffer';
+		if ( scope.autoplay ) scope.play();
+	});
 
 	return this;
 
 };
+
+
 
 THREE.Audio.prototype.play = function () {
 
@@ -16182,6 +16197,14 @@ THREE.Audio.prototype.play = function () {
 		return;
 
 	}
+	
+	if ( this.hasPlaybackControl === false ) {
+
+		console.warn( 'THREE.Audio: this Audio has no playback control.' );
+		return;
+
+	}
+
 
 	var source = this.context.createBufferSource();
 
@@ -16201,12 +16224,26 @@ THREE.Audio.prototype.play = function () {
 
 THREE.Audio.prototype.pause = function () {
 
+	if (this.hasPlaybackControl === false) {
+		
+		console.warn( 'THREE.Audio: this Audio has no playback control.' );
+		return;
+		
+	}
+	
 	this.source.stop();
 	this.startTime = this.context.currentTime;
 
 };
 
 THREE.Audio.prototype.stop = function () {
+
+	if (this.hasPlaybackControl === false) {
+		
+		console.warn( 'THREE.Audio: this Audio has no playback control.' );
+		return;
+		
+	}
 
 	this.source.stop();
 	this.startTime = 0;
@@ -16218,11 +16255,11 @@ THREE.Audio.prototype.connect = function () {
 	if ( this.filter !== undefined ) {
 
 		this.source.connect( this.filter );
-		this.filter.connect( this.panner );
+		this.filter.connect( this.gain );
 
 	} else {
 
-		this.source.connect( this.panner );
+		this.source.connect( this.gain );
 
 	}
 
@@ -16233,11 +16270,11 @@ THREE.Audio.prototype.disconnect = function () {
 	if ( this.filter !== undefined ) {
 
 		this.source.disconnect( this.filter );
-		this.filter.disconnect( this.panner );
+		this.filter.disconnect( this.gain );
 
 	} else {
 
-		this.source.disconnect( this.panner );
+		this.source.disconnect( this.gain );
 
 	}
 
@@ -16267,6 +16304,13 @@ THREE.Audio.prototype.getFilter = function () {
 
 THREE.Audio.prototype.setPlaybackRate = function ( value ) {
 
+	if (this.hasPlaybackControl === false) {
+		
+		console.warn( 'THREE.Audio: this Audio has no playback control.' );
+		return;
+		
+	}
+
 	this.playbackRate = value;
 
 	if ( this.isPlaying === true ) {
@@ -16291,39 +16335,30 @@ THREE.Audio.prototype.onEnded = function() {
 
 THREE.Audio.prototype.setLoop = function ( value ) {
 
+	if (this.hasPlaybackControl === false) {
+		
+		console.warn( 'THREE.Audio: this Audio has no playback control.' );
+		return;
+		
+	}
+
 	this.source.loop = value;
 
 };
 
 THREE.Audio.prototype.getLoop = function () {
+	
+	if (this.hasPlaybackControl === false) {
+		
+		console.warn( 'THREE.Audio: this Audio has no playback control.' );
+		return false;
+		
+	}
 
 	return this.source.loop;
 
 };
 
-THREE.Audio.prototype.setRefDistance = function ( value ) {
-
-	this.panner.refDistance = value;
-
-};
-
-THREE.Audio.prototype.getRefDistance = function () {
-
-	return this.panner.refDistance;
-
-};
-
-THREE.Audio.prototype.setRolloffFactor = function ( value ) {
-
-	this.panner.rolloffFactor = value;
-
-};
-
-THREE.Audio.prototype.getRolloffFactor = function () {
-
-	return this.panner.rolloffFactor;
-
-};
 
 THREE.Audio.prototype.setVolume = function ( value ) {
 
@@ -16337,7 +16372,183 @@ THREE.Audio.prototype.getVolume = function () {
 
 };
 
-THREE.Audio.prototype.updateMatrixWorld = ( function () {
+
+// File:src/audio/AudioBuffer.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.AudioBuffer = function ( context ) {
+
+	this.context = context;
+	this.ready = false;
+	this.readyCallbacks = [];
+
+};
+
+THREE.AudioBuffer.prototype.load = function ( file ) {
+
+	var scope = this;
+
+	var request = new XMLHttpRequest();
+	request.open( 'GET', file, true );
+	request.responseType = 'arraybuffer';
+	request.onload = function ( e ) {
+
+		scope.context.decodeAudioData( this.response, function ( buffer ) {
+
+			scope.buffer = buffer;
+			scope.ready = true;
+			
+			for (var i = 0; i < scope.readyCallbacks.length; i++) {
+				scope.readyCallbacks[i](scope.buffer);
+			}
+			scope.readyCallbacks = [];
+			
+		} );
+
+	};
+	request.send();
+
+	return this;
+
+};
+
+THREE.AudioBuffer.prototype.onReady = function ( callback ) {
+	
+	if (this.ready) {
+		callback(this.buffer);
+	}
+	else {
+		this.readyCallbacks.push(callback);
+	}
+
+};
+
+
+// File:src/audio/PositionalAudio.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.PositionalAudio = function ( listener ) {
+
+	THREE.Audio.call( this, listener );
+
+	this.panner = this.context.createPanner();
+	this.panner.connect( this.gain );
+
+};
+
+THREE.PositionalAudio.prototype = Object.create( THREE.Audio.prototype );
+THREE.PositionalAudio.prototype.constructor = THREE.PositionalAudio;
+
+
+
+THREE.PositionalAudio.prototype.connect = function () {
+
+	if ( this.filter !== undefined ) {
+
+		this.source.connect( this.filter );
+		this.filter.connect( this.panner );
+
+	} else {
+
+		this.source.connect( this.panner );
+
+	}
+
+};
+
+THREE.PositionalAudio.prototype.disconnect = function () {
+
+	if ( this.filter !== undefined ) {
+
+		this.source.disconnect( this.filter );
+		this.filter.disconnect( this.panner );
+
+	} else {
+
+		this.source.disconnect( this.panner );
+
+	}
+
+};
+
+THREE.PositionalAudio.prototype.setFilter = function ( value ) {
+
+	if ( this.isPlaying === true ) {
+
+		this.disconnect();
+		this.filter = value;
+		this.connect();
+
+	} else {
+
+		this.filter = value;
+
+	}
+
+};
+
+THREE.PositionalAudio.prototype.getFilter = function () {
+
+	return this.filter;
+
+};
+
+THREE.PositionalAudio.prototype.setRefDistance = function ( value ) {
+
+	this.panner.refDistance = value;
+
+};
+
+THREE.PositionalAudio.prototype.getRefDistance = function () {
+
+	return this.panner.refDistance;
+
+};
+
+THREE.PositionalAudio.prototype.setRolloffFactor = function ( value ) {
+
+	this.panner.rolloffFactor = value;
+
+};
+
+THREE.PositionalAudio.prototype.getRolloffFactor = function () {
+
+	return this.panner.rolloffFactor;
+
+};
+
+THREE.PositionalAudio.prototype.setDistanceModel = function ( value ) {
+
+	this.panner.distanceModel = value;
+
+};
+
+THREE.PositionalAudio.prototype.getDistanceModel = function () {
+
+	return this.panner.distanceModel;
+
+};
+
+THREE.PositionalAudio.prototype.setMaxDistance = function ( value ) {
+
+	this.panner.maxDistance = value;
+
+};
+
+THREE.PositionalAudio.prototype.getMaxDistance = function () {
+
+	return this.panner.maxDistance;
+
+};
+
+
+THREE.PositionalAudio.prototype.updateMatrixWorld = ( function () {
 
 	var position = new THREE.Vector3();
 
@@ -16366,11 +16577,70 @@ THREE.AudioListener = function () {
 	this.type = 'AudioListener';
 
 	this.context = new ( window.AudioContext || window.webkitAudioContext )();
-
+	this.masterGain =  this.context.createGain();
+	this.masterGain.connect(this.context.destination);
+	this.filter = null;
+	
 };
 
 THREE.AudioListener.prototype = Object.create( THREE.Object3D.prototype );
 THREE.AudioListener.prototype.constructor = THREE.AudioListener;
+
+THREE.AudioListener.prototype.getOutputNode = function () {
+	
+	return this.masterGain;
+	
+};
+
+THREE.AudioListener.prototype.removeFilter = function ( ) {
+	
+	if (this.filter !== null) {
+	
+		this.masterGain.disconnect(this.filter);
+		this.filter.disconnect(this.context.destination);
+		this.masterGain.connect(this.context.destination);
+		this.filter = null;
+		
+	}
+	
+}
+
+THREE.AudioListener.prototype.setFilter = function ( value ) {
+
+	if (this.filter !== null) {
+		
+		this.masterGain.disconnect(this.filter);
+		this.filter.disconnect(this.context.destination);
+
+	} else {
+		
+		this.masterGain.disconnect(this.context.destination);
+		
+	}
+	this.filter = value;
+	this.masterGain.connect(this.filter);
+	this.filter.connect(this.context.destination);	
+	
+};
+
+THREE.AudioListener.prototype.getFilter = function () {
+
+	return this.filter;
+
+};
+
+THREE.AudioListener.prototype.setMasterVolume = function ( value ) {
+
+	this.masterGain.gain.value = value;
+
+};
+
+THREE.AudioListener.prototype.getMasterVolume = function () {
+
+	return this.masterGain.gain.value;
+
+};
+
 
 THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 
@@ -27763,9 +28033,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var renderTargetProperties = properties.get( renderTarget );
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
+
 		if ( isCube ) {
 
 			renderTargetProperties.__webglDepthbuffer = [];
+
 			for ( var i = 0; i < 6; i ++ ) {
 
 				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
@@ -27774,17 +28046,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-		}
-		else {
+		} else {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 			renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
 			setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget );
 
 		}
+
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
-	};
+	}
 
 	// Set up GL resources for the render target
 	function setupRenderTarget( renderTarget ) {
