@@ -132,8 +132,7 @@
 				
 				time = (Date.now() - start)/1000;
 
-				if (material.__webglShader)
-					material.__webglShader.uniforms[ "time" ].value = time;
+				material.shaderModifier.uniforms[ "time" ].value = time;
 
 				renderer.render(scene, camera);
 
