@@ -65,6 +65,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// Set to false to disable panning
 	this.enablePan = true;
+	this.panSpeed = 1.0;
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
 	// Set to true to automatically rotate around the target
@@ -193,6 +194,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.pan = function ( deltaX, deltaY /*, screenWidth, screenHeight */ ) {
 
 		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+
+		deltaX = scope.panSpeed * deltaX;
+		deltaY = scope.panSpeed * deltaY;
 
 		if ( scope.object instanceof THREE.PerspectiveCamera ) {
 
