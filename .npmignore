@@ -1,5 +1,7 @@
-examples/
-src/
+examples/*
+!examples/js/
+src/*
+!src/extras/
 test/
 utils/
 docs/
