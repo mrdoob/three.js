@@ -2,19 +2,6 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Object.defineProperties( THREE.Audio.prototype, {
-	setRefDistance: {
-		value: function () {
-			console.warn( 'THREE.Audio: .setRefDistance() has been moved to THREE.PositionalAudio.' );
-		}
-	},
-	setRolloffFactor: {
-		value: function () {
-			console.warn( 'THREE.Audio: .setRolloffFactor() has been moved to THREE.PositionalAudio.' );
-		}
-	}
-} );
-
 Object.defineProperties( THREE.Box2.prototype, {
 	isIntersectionBox: {
 		value: function ( box ) {
