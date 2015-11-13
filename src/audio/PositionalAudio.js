@@ -14,59 +14,10 @@ THREE.PositionalAudio = function ( listener ) {
 THREE.PositionalAudio.prototype = Object.create( THREE.Audio.prototype );
 THREE.PositionalAudio.prototype.constructor = THREE.PositionalAudio;
 
-
-
-THREE.PositionalAudio.prototype.connect = function () {
-
-	if ( this.filter !== undefined ) {
-
-		this.source.connect( this.filter );
-		this.filter.connect( this.panner );
-
-	} else {
-
-		this.source.connect( this.panner );
-
-	}
-
+THREE.PositionalAudio.prototype.getOutput = function() {
+	return this.panner;
 };
 
-THREE.PositionalAudio.prototype.disconnect = function () {
-
-	if ( this.filter !== undefined ) {
-
-		this.source.disconnect( this.filter );
-		this.filter.disconnect( this.panner );
-
-	} else {
-
-		this.source.disconnect( this.panner );
-
-	}
-
-};
-
-THREE.PositionalAudio.prototype.setFilter = function ( value ) {
-
-	if ( this.isPlaying === true ) {
-
-		this.disconnect();
-		this.filter = value;
-		this.connect();
-
-	} else {
-
-		this.filter = value;
-
-	}
-
-};
-
-THREE.PositionalAudio.prototype.getFilter = function () {
-
-	return this.filter;
-
-};
 
 THREE.PositionalAudio.prototype.setRefDistance = function ( value ) {
 
