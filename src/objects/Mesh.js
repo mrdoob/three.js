@@ -14,12 +14,20 @@ THREE.Mesh = function ( geometry, material ) {
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
+	this.drawMode = THREE.TrianglesDrawMode;
+
 	this.updateMorphTargets();
 
 };
 
 THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Mesh.prototype.constructor = THREE.Mesh;
+
+THREE.Mesh.prototype.setDrawMode = function ( value ) {
+
+	this.drawMode = value;
+
+};
 
 THREE.Mesh.prototype.updateMorphTargets = function () {
 
@@ -169,7 +177,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 		sphere.copy( geometry.boundingSphere );
 		sphere.applyMatrix4( matrixWorld );
 
-		if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) return;
+		if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
 		// Check boundingBox before continuing
 
@@ -178,7 +186,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		if ( geometry.boundingBox !== null ) {
 
-			if ( ray.isIntersectionBox( geometry.boundingBox ) === false ) return;
+			if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
 
 		}
 

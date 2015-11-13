@@ -28,7 +28,6 @@ THREE.AssimpJSONLoader.prototype = {
 		this.texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : this.extractUrlBase( url );
 
 		var loader = new THREE.XHRLoader( this.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
 			var json = JSON.parse( text ), scene, metadata;

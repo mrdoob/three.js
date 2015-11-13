@@ -79,7 +79,6 @@ var list = {
 			[ "PointsMaterial", "api/materials/PointsMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
-			[ "SpriteCanvasMaterial", "api/materials/SpriteCanvasMaterial" ],
 			[ "SpriteMaterial", "api/materials/SpriteMaterial" ]
 		],
 
@@ -160,7 +159,6 @@ var list = {
 		"Extras": [
 			[ "FontUtils", "api/extras/FontUtils" ],
 			[ "GeometryUtils", "api/extras/GeometryUtils" ],
-			[ "ImageUtils", "api/extras/ImageUtils" ],
 			[ "SceneUtils", "api/extras/SceneUtils" ]
 		],
 
@@ -195,7 +193,6 @@ var list = {
 		"Extras / Geometries": [
 			[ "BoxGeometry", "api/extras/geometries/BoxGeometry" ],
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
-			[ "CubeGeometry", "api/extras/geometries/CubeGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
 			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
 			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
@@ -239,7 +236,8 @@ var list = {
 
 		"Examples" : [
 			[ "CombinedCamera", "api/examples/cameras/CombinedCamera" ],
-			[ "LookupTable", "api/examples/Lut" ]
+			[ "LookupTable", "api/examples/Lut" ],
+			[ "SpriteCanvasMaterial", "api/examples/SpriteCanvasMaterial" ]
 
 		]
 

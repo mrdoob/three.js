@@ -272,7 +272,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		var getClosest = function( touch, touches ) {
+		function getClosest( touch, touches ) {
 
 			var closest = touches[ 0 ];
 
@@ -284,7 +284,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 			return closest;
 
-		};
+		}
 
 		switch ( event.touches.length ) {
 

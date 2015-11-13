@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.Modifiers = function ( signals, object ) {
+Sidebar.Geometry.Modifiers = function ( editor, object ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel().setPaddingLeft( '90px' );
 

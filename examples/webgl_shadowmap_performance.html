@@ -54,12 +54,14 @@
 			var SCREEN_HEIGHT = window.innerHeight;
 			var FLOOR = -250;
 
+			var ANIMATION_GROUPS = 25;
+
 			var camera, controls, scene, renderer;
 			var container, stats;
 
 			var NEAR = 5, FAR = 3000;
 
-			var morph, morphs = [], mixer;
+			var morph, morphs = [], mixer, animGroups = [];
 
 			var light;
 
@@ -240,9 +242,16 @@
 
 				mixer = new THREE.AnimationMixer( scene );
 
+				for ( var i = 0; i !== ANIMATION_GROUPS; ++ i ) {
+
+					var group = new THREE.AnimationObjectGroup();
+					animGroups.push( new THREE.AnimationObjectGroup() );
+
+				}
+
 				// MORPHS
 
-				function addMorph( geometry, speed, duration, x, y, z, fudgeColor ) {
+				function addMorph( geometry, speed, duration, x, y, z, fudgeColor, massOptimization ) {
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
 
@@ -255,7 +264,35 @@
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.speed = speed;
 
-					mixer.addAction( new THREE.AnimationAction( geometry.animations[0], Math.random() ).warpToDuration( duration ).setLocalRoot( mesh ) );
+					var clip = geometry.animations[ 0 ];
+
+					if ( massOptimization ) {
+
+						var index = Math.floor( Math.random() * ANIMATION_GROUPS ),
+							animGroup = animGroups[ index ];
+
+						animGroup.add( mesh );
+
+						if ( ! mixer.existingAction( clip, animGroup ) ) {
+
+							var randomness = 0.6 * Math.random() - 0.3;
+							var phase = ( index + randomness ) / ANIMATION_GROUPS;
+
+							mixer.clipAction( clip, animGroup ).
+									setDuration( duration ).
+									startAt( - duration * phase ).
+									play();
+
+						}
+
+					} else {
+
+						mixer.clipAction( clip, mesh ).
+								setDuration( duration ).
+								startAt( - duration * Math.random() ).
+								play();
+
+					}
 
 					mesh.position.set( x, y, z );
 					mesh.rotation.y = Math.PI/2;
@@ -275,7 +312,7 @@
 
 					for ( var i = - 600; i < 601; i += 2 ) {
 
-						addMorph( geometry, 550, 1, 100 - Math.random() * 3000, FLOOR, i, true );
+						addMorph( geometry, 550, 1, 100 - Math.random() * 3000, FLOOR, i, true, true );
 
 					}
 
@@ -342,7 +379,7 @@
 
 				var delta = clock.getDelta();
 
-				if( mixer ) mixer.update( delta );
+				if ( mixer ) mixer.update( delta );
 
 				for ( var i = 0; i < morphs.length; i ++ ) {
 

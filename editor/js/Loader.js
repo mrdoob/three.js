@@ -24,8 +24,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.AMFLoader();
 					var amfobject = loader.parse( event.target.result );
 
-					editor.addObject( amfobject );
-					editor.select( amfobject );
+					editor.execute( new AddObjectCommand( amfobject ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -40,7 +39,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.AWDLoader();
 					var scene = loader.parse( event.target.result );
 
-					editor.setScene( scene );
+					editor.execute( new SetSceneCommand( scene ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -58,7 +57,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.BabylonLoader();
 					var scene = loader.parse( json );
 
-					editor.setScene( scene );
+					editor.execute( new SetSceneCommand( scene ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -76,13 +75,12 @@ var Loader = function ( editor ) {
 					var loader = new THREE.BabylonLoader();
 
 					var geometry = loader.parseGeometry( json );
-					var material = new THREE.MeshPhongMaterial();
+					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.addObject( mesh );
-					editor.select( mesh );
+					editor.execute( new AddObjectCommand( mesh ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -105,13 +103,12 @@ var Loader = function ( editor ) {
 						geometry.sourceType = "ctm";
 						geometry.sourceFile = file.name;
 
-						var material = new THREE.MeshPhongMaterial();
+						var material = new THREE.MeshStandardMaterial();
 
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.name = filename;
 
-						editor.addObject( mesh );
-						editor.select( mesh );
+						editor.execute( new AddObjectCommand( mesh ) );
 
 					} );
 
@@ -132,8 +129,7 @@ var Loader = function ( editor ) {
 
 					collada.scene.name = filename;
 
-					editor.addObject( collada.scene );
-					editor.select( collada.scene );
+					editor.execute( new AddObjectCommand( collada.scene ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -208,8 +204,7 @@ var Loader = function ( editor ) {
 
 						collada.scene.name = filename;
 
-						editor.addObject( collada.scene );
-						editor.select( collada.scene );
+						editor.execute( new AddObjectCommand( collada.scene ) );
 
 					}, false );
 					reader.readAsArrayBuffer( file );
@@ -224,7 +219,7 @@ var Loader = function ( editor ) {
 						var contents = event.target.result;
 
 						var geometry = new THREE.MD2Loader().parse( contents );
-						var material = new THREE.MeshPhongMaterial( {
+						var material = new THREE.MeshStandardMaterial( {
 							morphTargets: true,
 							morphNormals: true
 						} );
@@ -233,8 +228,7 @@ var Loader = function ( editor ) {
 						mesh.mixer = new THREE.AnimationMixer( mesh )
 						mesh.name = filename;
 
-						editor.addObject( mesh );
-						editor.select( mesh );
+						editor.execute( new AddObjectCommand( mesh ) );
 
 					}, false );
 					reader.readAsArrayBuffer( file );
@@ -251,8 +245,25 @@ var Loader = function ( editor ) {
 					var object = new THREE.OBJLoader().parse( contents );
 					object.name = filename;
 
-					editor.addObject( object );
-					editor.select( object );
+					editor.execute( new AddObjectCommand( object ) );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
+			case 'playcanvas':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+					var json = JSON.parse( contents );
+
+					var loader = new THREE.PlayCanvasLoader();
+					var object = loader.parse( json );
+
+					editor.execute( new AddObjectCommand( object ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -270,13 +281,12 @@ var Loader = function ( editor ) {
 					geometry.sourceType = "ply";
 					geometry.sourceFile = file.name;
 
-					var material = new THREE.MeshPhongMaterial();
+					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.addObject( mesh );
-					editor.select( mesh );
+					editor.execute( new AddObjectCommand( mesh ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -294,13 +304,12 @@ var Loader = function ( editor ) {
 					geometry.sourceType = "stl";
 					geometry.sourceFile = file.name;
 
-					var material = new THREE.MeshPhongMaterial();
+					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.addObject( mesh );
-					editor.select( mesh );
+					editor.execute( new AddObjectCommand( mesh ) );
 
 				}, false );
 
@@ -329,8 +338,7 @@ var Loader = function ( editor ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
 
-					editor.addObject( mesh );
-					editor.select( mesh );
+					editor.execute( new AddObjectCommand( mesh ) );
 
 				}, false );
 				reader.readAsBinaryString( file );
@@ -349,13 +357,12 @@ var Loader = function ( editor ) {
 					geometry.sourceType = "vtk";
 					geometry.sourceFile = file.name;
 
-					var material = new THREE.MeshPhongMaterial();
+					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.addObject( mesh );
-					editor.select( mesh );
+					editor.execute( new AddObjectCommand( mesh ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -371,7 +378,7 @@ var Loader = function ( editor ) {
 
 					var result = new THREE.VRMLLoader().parse( contents );
 
-					editor.setScene( result );
+					editor.execute( new SetSceneCommand( result ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -388,7 +395,7 @@ var Loader = function ( editor ) {
 
 	}
 
-	var handleJSON = function ( data, file, filename ) {
+	function handleJSON( data, file, filename ) {
 
 		if ( data.metadata === undefined ) { // 2.0
 
@@ -402,101 +409,114 @@ var Loader = function ( editor ) {
 
 		}
 
-		if ( data.metadata.version === undefined ) {
+		if ( data.metadata.formatVersion !== undefined ) {
 
 			data.metadata.version = data.metadata.formatVersion;
 
 		}
 
-		if ( data.metadata.type === 'BufferGeometry' ) {
+		switch ( data.metadata.type.toLowerCase() ) {
 
-			var loader = new THREE.BufferGeometryLoader();
-			var result = loader.parse( data );
+			case 'buffergeometry':
 
-			var mesh = new THREE.Mesh( result );
+				var loader = new THREE.BufferGeometryLoader();
+				var result = loader.parse( data );
 
-			editor.addObject( mesh );
-			editor.select( mesh );
+				var mesh = new THREE.Mesh( result );
 
-		} else if ( data.metadata.type.toLowerCase() === 'geometry' ) {
+				editor.execute( new AddObjectCommand( mesh ) );
 
-			var loader = new THREE.JSONLoader();
-			loader.setTexturePath( scope.texturePath );
+				break;
 
-			var result = loader.parse( data );
+			case 'geometry':
 
-			var geometry = result.geometry;
-			var material;
+				var loader = new THREE.JSONLoader();
+				loader.setTexturePath( scope.texturePath );
 
-			if ( result.materials !== undefined ) {
+				var result = loader.parse( data );
 
-				if ( result.materials.length > 1 ) {
+				var geometry = result.geometry;
+				var material;
 
-					material = new THREE.MeshFaceMaterial( result.materials );
+				if ( result.materials !== undefined ) {
+
+					if ( result.materials.length > 1 ) {
+
+						material = new THREE.MeshFaceMaterial( result.materials );
+
+					} else {
+
+						material = result.materials[ 0 ];
+
+					}
 
 				} else {
 
-					material = result.materials[ 0 ];
+					material = new THREE.MeshStandardMaterial();
 
 				}
 
-			} else {
+				geometry.sourceType = "ascii";
+				geometry.sourceFile = file.name;
 
-				material = new THREE.MeshPhongMaterial();
+				var mesh;
 
-			}
+				if ( geometry.animation && geometry.animation.hierarchy ) {
 
-			geometry.sourceType = "ascii";
-			geometry.sourceFile = file.name;
+					mesh = new THREE.SkinnedMesh( geometry, material );
 
-			var mesh;
+				} else {
 
-			if ( geometry.animation && geometry.animation.hierarchy ) {
+					mesh = new THREE.Mesh( geometry, material );
 
-				mesh = new THREE.SkinnedMesh( geometry, material );
+				}
 
-			} else {
+				mesh.name = filename;
 
-				mesh = new THREE.Mesh( geometry, material );
+				editor.execute( new AddObjectCommand( mesh ) );
 
-			}
+				break;
 
-			mesh.name = filename;
+			case 'object':
 
-			editor.addObject( mesh );
-			editor.select( mesh );
+				var loader = new THREE.ObjectLoader();
+				loader.setTexturePath( scope.texturePath );
 
-		} else if ( data.metadata.type.toLowerCase() === 'object' ) {
+				var result = loader.parse( data );
 
-			var loader = new THREE.ObjectLoader();
-			loader.setTexturePath( scope.texturePath );
+				if ( result instanceof THREE.Scene ) {
 
-			var result = loader.parse( data );
+					editor.execute( new SetSceneCommand( result ) );
 
-			if ( result instanceof THREE.Scene ) {
+				} else {
 
-				editor.setScene( result );
+					editor.execute( new AddObjectCommand( result ) );
 
-			} else {
+				}
 
-				editor.addObject( result );
-				editor.select( result );
+				break;
 
-			}
+			case 'scene':
 
-		} else if ( data.metadata.type.toLowerCase() === 'scene' ) {
+				// DEPRECATED
 
-			// DEPRECATED
+				var loader = new THREE.SceneLoader();
+				loader.parse( data, function ( result ) {
 
-			var loader = new THREE.SceneLoader();
-			loader.parse( data, function ( result ) {
+					editor.execute( new SetSceneCommand( result.scene ) );
 
-				editor.setScene( result.scene );
+				}, '' );
 
-			}, '' );
+				break;
+
+			case 'app':
+
+				editor.fromJSON( data );
+
+				break;
 
 		}
 
-	};
+	}
 
 }
