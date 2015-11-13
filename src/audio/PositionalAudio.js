@@ -14,8 +14,10 @@ THREE.PositionalAudio = function ( listener ) {
 THREE.PositionalAudio.prototype = Object.create( THREE.Audio.prototype );
 THREE.PositionalAudio.prototype.constructor = THREE.PositionalAudio;
 
-THREE.PositionalAudio.prototype.getOutput = function() {
+THREE.PositionalAudio.prototype.getOutput = function () {
+
 	return this.panner;
+
 };
 
 

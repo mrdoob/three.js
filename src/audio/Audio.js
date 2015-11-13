@@ -13,7 +13,7 @@ THREE.Audio = function ( listener ) {
 	this.source.onended = this.onEnded.bind( this );
 
 	this.gain = this.context.createGain();
-	this.gain.connect( listener.getOutputNode());
+	this.gain.connect( listener.getOutputNode() );
 
 	this.autoplay = false;
 
@@ -29,19 +29,22 @@ THREE.Audio = function ( listener ) {
 THREE.Audio.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Audio.prototype.constructor = THREE.Audio;
 
-THREE.Audio.prototype.getOutput = function() {
+THREE.Audio.prototype.getOutput = function () {
+
 	return this.gain;
+
 };
 
-THREE.Audio.prototype.load = function ( fileName ) {
+THREE.Audio.prototype.load = function ( file ) {
 
-	var audioBuffer = new THREE.AudioBuffer(this.context);
-	audioBuffer.load(fileName);
-	this.setBuffer(audioBuffer);
+	var buffer = new THREE.AudioBuffer( this.context );
+	buffer.load( file );
+
+	this.setBuffer( buffer );
+
 	return this;
 
 };
-
 
 THREE.Audio.prototype.setNodeSource = function ( audioNode ) {
 
@@ -49,17 +52,15 @@ THREE.Audio.prototype.setNodeSource = function ( audioNode ) {
 	this.sourceType = 'audioNode';
 	this.source = audioNode;
 	this.connect();
-	
+
 	return this;
 
 };
 
-
-
 THREE.Audio.prototype.setBuffer = function ( audioBuffer ) {
 
 	var scope = this;
-	
+
 	audioBuffer.onReady(function(buffer) {
 		scope.source.buffer = buffer;
 		scope.sourceType = 'buffer';
@@ -70,8 +71,6 @@ THREE.Audio.prototype.setBuffer = function ( audioBuffer ) {
 
 };
 
-
-
 THREE.Audio.prototype.play = function () {
 
 	if ( this.isPlaying === true ) {
@@ -80,14 +79,13 @@ THREE.Audio.prototype.play = function () {
 		return;
 
 	}
-	
+
 	if ( this.hasPlaybackControl === false ) {
 
 		console.warn( 'THREE.Audio: this Audio has no playback control.' );
 		return;
 
 	}
-
 
 	var source = this.context.createBufferSource();
 
@@ -107,13 +105,13 @@ THREE.Audio.prototype.play = function () {
 
 THREE.Audio.prototype.pause = function () {
 
-	if (this.hasPlaybackControl === false) {
-		
+	if ( this.hasPlaybackControl === false ) {
+
 		console.warn( 'THREE.Audio: this Audio has no playback control.' );
 		return;
-		
+
 	}
-	
+
 	this.source.stop();
 	this.startTime = this.context.currentTime;
 
@@ -121,11 +119,11 @@ THREE.Audio.prototype.pause = function () {
 
 THREE.Audio.prototype.stop = function () {
 
-	if (this.hasPlaybackControl === false) {
-		
+	if ( this.hasPlaybackControl === false ) {
+
 		console.warn( 'THREE.Audio: this Audio has no playback control.' );
 		return;
-		
+
 	}
 
 	this.source.stop();
@@ -138,11 +136,11 @@ THREE.Audio.prototype.connect = function () {
 	if ( this.filter !== null ) {
 
 		this.source.connect( this.filter );
-		this.filter.connect( this.getOutput());
+		this.filter.connect( this.getOutput() );
 
 	} else {
 
-		this.source.connect( this.getOutput());
+		this.source.connect( this.getOutput() );
 
 	}
 
@@ -153,11 +151,11 @@ THREE.Audio.prototype.disconnect = function () {
 	if ( this.filter !== null ) {
 
 		this.source.disconnect( this.filter );
-		this.filter.disconnect( this.getOutput());
+		this.filter.disconnect( this.getOutput() );
 
 	} else {
 
-		this.source.disconnect( this.getOutput());
+		this.source.disconnect( this.getOutput() );
 
 	}
 
@@ -187,11 +185,11 @@ THREE.Audio.prototype.getFilter = function () {
 
 THREE.Audio.prototype.setPlaybackRate = function ( value ) {
 
-	if (this.hasPlaybackControl === false) {
-		
+	if ( this.hasPlaybackControl === false ) {
+
 		console.warn( 'THREE.Audio: this Audio has no playback control.' );
 		return;
-		
+
 	}
 
 	this.playbackRate = value;
@@ -218,11 +216,11 @@ THREE.Audio.prototype.onEnded = function() {
 
 THREE.Audio.prototype.setLoop = function ( value ) {
 
-	if (this.hasPlaybackControl === false) {
-		
+	if ( this.hasPlaybackControl === false ) {
+
 		console.warn( 'THREE.Audio: this Audio has no playback control.' );
 		return;
-		
+
 	}
 
 	this.source.loop = value;
@@ -230,12 +228,12 @@ THREE.Audio.prototype.setLoop = function ( value ) {
 };
 
 THREE.Audio.prototype.getLoop = function () {
-	
-	if (this.hasPlaybackControl === false) {
-		
+
+	if ( this.hasPlaybackControl === false ) {
+
 		console.warn( 'THREE.Audio: this Audio has no playback control.' );
 		return false;
-		
+
 	}
 
 	return this.source.loop;
@@ -254,4 +252,3 @@ THREE.Audio.prototype.getVolume = function () {
 	return this.gain.gain.value;
 
 };
-

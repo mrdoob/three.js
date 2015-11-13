@@ -23,12 +23,15 @@ THREE.AudioBuffer.prototype.load = function ( file ) {
 
 			scope.buffer = buffer;
 			scope.ready = true;
-			
-			for (var i = 0; i < scope.readyCallbacks.length; i++) {
+
+			for ( var i = 0; i < scope.readyCallbacks.length; i ++ ) {
+
 				scope.readyCallbacks[i](scope.buffer);
+
 			}
+
 			scope.readyCallbacks = [];
-			
+
 		} );
 
 	};
@@ -39,13 +42,15 @@ THREE.AudioBuffer.prototype.load = function ( file ) {
 };
 
 THREE.AudioBuffer.prototype.onReady = function ( callback ) {
-	
-	if (this.ready) {
-		callback(this.buffer);
-	}
-	else {
-		this.readyCallbacks.push(callback);
+
+	if ( this.ready ) {
+
+		callback( this.buffer );
+
+	} else {
+
+		this.readyCallbacks.push( callback );
+
 	}
 
 };
-

@@ -12,47 +12,48 @@ THREE.AudioListener = function () {
 	this.masterGain =  this.context.createGain();
 	this.masterGain.connect(this.context.destination);
 	this.filter = null;
-	
+
 };
 
 THREE.AudioListener.prototype = Object.create( THREE.Object3D.prototype );
 THREE.AudioListener.prototype.constructor = THREE.AudioListener;
 
 THREE.AudioListener.prototype.getOutputNode = function () {
-	
+
 	return this.masterGain;
-	
+
 };
 
 THREE.AudioListener.prototype.removeFilter = function ( ) {
-	
-	if (this.filter !== null) {
-	
-		this.masterGain.disconnect(this.filter);
-		this.filter.disconnect(this.context.destination);
-		this.masterGain.connect(this.context.destination);
+
+	if ( this.filter !== null ) {
+
+		this.masterGain.disconnect( this.filter );
+		this.filter.disconnect( this.context.destination );
+		this.masterGain.connect( this.context.destination );
 		this.filter = null;
-		
+
 	}
-	
+
 }
 
 THREE.AudioListener.prototype.setFilter = function ( value ) {
 
-	if (this.filter !== null) {
-		
-		this.masterGain.disconnect(this.filter);
-		this.filter.disconnect(this.context.destination);
+	if ( this.filter !== null ) {
+
+		this.masterGain.disconnect( this.filter );
+		this.filter.disconnect( this.context.destination );
 
 	} else {
-		
-		this.masterGain.disconnect(this.context.destination);
-		
+
+		this.masterGain.disconnect( this.context.destination );
+
 	}
+
 	this.filter = value;
-	this.masterGain.connect(this.filter);
-	this.filter.connect(this.context.destination);	
-	
+	this.masterGain.connect( this.filter );
+	this.filter.connect( this.context.destination );
+
 };
 
 THREE.AudioListener.prototype.getFilter = function () {
