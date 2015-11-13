@@ -135,7 +135,7 @@ THREE.Audio.prototype.stop = function () {
 
 THREE.Audio.prototype.connect = function () {
 
-	if ( this.filter != null ) {
+	if ( this.filter !== null ) {
 
 		this.source.connect( this.filter );
 		this.filter.connect( this.getOutput());
@@ -150,7 +150,7 @@ THREE.Audio.prototype.connect = function () {
 
 THREE.Audio.prototype.disconnect = function () {
 
-	if ( this.filter != null ) {
+	if ( this.filter !== null ) {
 
 		this.source.disconnect( this.filter );
 		this.filter.disconnect( this.getOutput());
