@@ -53,6 +53,7 @@
 	"src/animation/tracks/StringKeyframeTrack.js",
 	"src/animation/tracks/VectorKeyframeTrack.js",
 	"src/audio/Audio.js",
+	"src/audio/AudioAnalyser.js",	
 	"src/audio/AudioBuffer.js",	
 	"src/audio/PositionalAudio.js",
 	"src/audio/AudioListener.js",	
