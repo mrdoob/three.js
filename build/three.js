@@ -23197,7 +23197,7 @@ THREE.ShaderChunk[ 'lights_phong_vertex'] = "#ifdef USE_ENVMAP\n	vWorldPosition 
 
 // File:src/renderers/shaders/ShaderChunk/lights_standard_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_standard_fragment'] = "PhysicalMaterial material;\nmaterial.diffuseColor = diffuseColor.rgb * ( 1.0 - metalnessFactor );\nmaterial.specularRoughness = roughnessFactor * 0.5 + 0.5;material.specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );\n";
+THREE.ShaderChunk[ 'lights_standard_fragment'] = "PhysicalMaterial material;\nmaterial.diffuseColor = diffuseColor.rgb * ( 1.0 - metalnessFactor );\nmaterial.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );material.specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_standard_pars_fragment.glsl
 
