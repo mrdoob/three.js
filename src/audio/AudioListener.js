@@ -10,7 +10,8 @@ THREE.AudioListener = function () {
 
 	this.context = new ( window.AudioContext || window.webkitAudioContext )();
 	this.masterGain =  this.context.createGain();
-	this.masterGain.connect(this.context.destination);
+	this.masterGain.connect( this.context.destination );
+
 	this.filter = null;
 
 };

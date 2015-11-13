@@ -22,6 +22,7 @@ THREE.Audio = function ( listener ) {
 	this.isPlaying = false;
 	this.hasPlaybackControl = true;
 	this.sourceType = 'empty';
+
 	this.filter = null;
 
 };
@@ -161,7 +162,15 @@ THREE.Audio.prototype.disconnect = function () {
 
 };
 
+THREE.Audio.prototype.getFilter = function () {
+
+	return this.filter;
+
+};
+
 THREE.Audio.prototype.setFilter = function ( value ) {
+
+	if ( value === undefined ) value = null;
 
 	if ( this.isPlaying === true ) {
 
@@ -174,12 +183,6 @@ THREE.Audio.prototype.setFilter = function ( value ) {
 		this.filter = value;
 
 	}
-
-};
-
-THREE.Audio.prototype.getFilter = function () {
-
-	return this.filter;
 
 };
 
