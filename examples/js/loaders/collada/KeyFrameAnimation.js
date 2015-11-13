@@ -84,7 +84,7 @@ THREE.KeyFrameAnimation.prototype = {
 
 				var keys = this.data.hierarchy[ h ].keys;
 
-				if ( keys.length ) {
+				if ( keys.length > 1 ) {
 
 					node.animationCache.prevKey = keys[ 0 ];
 					node.animationCache.nextKey = keys[ 1 ];
