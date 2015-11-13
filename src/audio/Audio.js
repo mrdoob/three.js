@@ -22,12 +22,16 @@ THREE.Audio = function ( listener ) {
 	this.isPlaying = false;
 	this.hasPlaybackControl = true;
 	this.sourceType = 'empty';
+	this.filter = null;
 
 };
 
 THREE.Audio.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Audio.prototype.constructor = THREE.Audio;
 
+THREE.Audio.prototype.getOutput = function() {
+	return this.gain;
+};
 
 THREE.Audio.prototype.load = function ( fileName ) {
 
@@ -131,14 +135,14 @@ THREE.Audio.prototype.stop = function () {
 
 THREE.Audio.prototype.connect = function () {
 
-	if ( this.filter !== undefined ) {
+	if ( this.filter !== null ) {
 
 		this.source.connect( this.filter );
-		this.filter.connect( this.gain );
+		this.filter.connect( this.getOutput());
 
 	} else {
 
-		this.source.connect( this.gain );
+		this.source.connect( this.getOutput());
 
 	}
 
@@ -146,14 +150,14 @@ THREE.Audio.prototype.connect = function () {
 
 THREE.Audio.prototype.disconnect = function () {
 
-	if ( this.filter !== undefined ) {
+	if ( this.filter !== null ) {
 
 		this.source.disconnect( this.filter );
-		this.filter.disconnect( this.gain );
+		this.filter.disconnect( this.getOutput());
 
 	} else {
 
-		this.source.disconnect( this.gain );
+		this.source.disconnect( this.getOutput());
 
 	}
 
