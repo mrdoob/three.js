@@ -16134,7 +16134,7 @@ THREE.Audio = function ( listener ) {
 	this.source.onended = this.onEnded.bind( this );
 
 	this.gain = this.context.createGain();
-	this.gain.connect( listener.getOutputNode());
+	this.gain.connect( listener.getOutputNode() );
 
 	this.autoplay = false;
 
@@ -16143,22 +16143,29 @@ THREE.Audio = function ( listener ) {
 	this.isPlaying = false;
 	this.hasPlaybackControl = true;
 	this.sourceType = 'empty';
+	this.filter = null;
 
 };
 
 THREE.Audio.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Audio.prototype.constructor = THREE.Audio;
 
+THREE.Audio.prototype.getOutput = function () {
 
-THREE.Audio.prototype.load = function ( fileName ) {
-
-	var audioBuffer = new THREE.AudioBuffer(this.context);
-	audioBuffer.load(fileName);
-	this.setBuffer(audioBuffer);
-	return this;
+	return this.gain;
 
 };
 
+THREE.Audio.prototype.load = function ( file ) {
+
+	var buffer = new THREE.AudioBuffer( this.context );
+	buffer.load( file );
+
+	this.setBuffer( buffer );
+
+	return this;
+
+};
 
 THREE.Audio.prototype.setNodeSource = function ( audioNode ) {
 
@@ -16166,17 +16173,15 @@ THREE.Audio.prototype.setNodeSource = function ( audioNode ) {
 	this.sourceType = 'audioNode';
 	this.source = audioNode;
 	this.connect();
-	
+
 	return this;
 
 };
 
-
-
 THREE.Audio.prototype.setBuffer = function ( audioBuffer ) {
 
 	var scope = this;
-	
+
 	audioBuffer.onReady(function(buffer) {
 		scope.source.buffer = buffer;
 		scope.sourceType = 'buffer';
@@ -16187,8 +16192,6 @@ THREE.Audio.prototype.setBuffer = function ( audioBuffer ) {
 
 };
 
-
-
 THREE.Audio.prototype.play = function () {
 
 	if ( this.isPlaying === true ) {
@@ -16197,14 +16200,13 @@ THREE.Audio.prototype.play = function () {
 		return;
 
 	}
-	
+
 	if ( this.hasPlaybackControl === false ) {
 
 		console.warn( 'THREE.Audio: this Audio has no playback control.' );
 		return;
 
 	}
-
 
 	var source = this.context.createBufferSource();
 
@@ -16224,13 +16226,13 @@ THREE.Audio.prototype.play = function () {
 
 THREE.Audio.prototype.pause = function () {
 
-	if (this.hasPlaybackControl === false) {
-		
+	if ( this.hasPlaybackControl === false ) {
+
 		console.warn( 'THREE.Audio: this Audio has no playback control.' );
 		return;
-		
+
 	}
-	
+
 	this.source.stop();
 	this.startTime = this.context.currentTime;
 
@@ -16238,11 +16240,11 @@ THREE.Audio.prototype.pause = function () {
 
 THREE.Audio.prototype.stop = function () {
 
-	if (this.hasPlaybackControl === false) {
-		
+	if ( this.hasPlaybackControl === false ) {
+
 		console.warn( 'THREE.Audio: this Audio has no playback control.' );
 		return;
-		
+
 	}
 
 	this.source.stop();
@@ -16252,14 +16254,14 @@ THREE.Audio.prototype.stop = function () {
 
 THREE.Audio.prototype.connect = function () {
 
-	if ( this.filter !== undefined ) {
+	if ( this.filter !== null ) {
 
 		this.source.connect( this.filter );
-		this.filter.connect( this.gain );
+		this.filter.connect( this.getOutput() );
 
 	} else {
 
-		this.source.connect( this.gain );
+		this.source.connect( this.getOutput() );
 
 	}
 
@@ -16267,14 +16269,14 @@ THREE.Audio.prototype.connect = function () {
 
 THREE.Audio.prototype.disconnect = function () {
 
-	if ( this.filter !== undefined ) {
+	if ( this.filter !== null ) {
 
 		this.source.disconnect( this.filter );
-		this.filter.disconnect( this.gain );
+		this.filter.disconnect( this.getOutput() );
 
 	} else {
 
-		this.source.disconnect( this.gain );
+		this.source.disconnect( this.getOutput() );
 
 	}
 
@@ -16304,11 +16306,11 @@ THREE.Audio.prototype.getFilter = function () {
 
 THREE.Audio.prototype.setPlaybackRate = function ( value ) {
 
-	if (this.hasPlaybackControl === false) {
-		
+	if ( this.hasPlaybackControl === false ) {
+
 		console.warn( 'THREE.Audio: this Audio has no playback control.' );
 		return;
-		
+
 	}
 
 	this.playbackRate = value;
@@ -16335,11 +16337,11 @@ THREE.Audio.prototype.onEnded = function() {
 
 THREE.Audio.prototype.setLoop = function ( value ) {
 
-	if (this.hasPlaybackControl === false) {
-		
+	if ( this.hasPlaybackControl === false ) {
+
 		console.warn( 'THREE.Audio: this Audio has no playback control.' );
 		return;
-		
+
 	}
 
 	this.source.loop = value;
@@ -16347,12 +16349,12 @@ THREE.Audio.prototype.setLoop = function ( value ) {
 };
 
 THREE.Audio.prototype.getLoop = function () {
-	
-	if (this.hasPlaybackControl === false) {
-		
+
+	if ( this.hasPlaybackControl === false ) {
+
 		console.warn( 'THREE.Audio: this Audio has no playback control.' );
 		return false;
-		
+
 	}
 
 	return this.source.loop;
@@ -16371,7 +16373,6 @@ THREE.Audio.prototype.getVolume = function () {
 	return this.gain.gain.value;
 
 };
-
 
 // File:src/audio/AudioBuffer.js
 
@@ -16400,12 +16401,15 @@ THREE.AudioBuffer.prototype.load = function ( file ) {
 
 			scope.buffer = buffer;
 			scope.ready = true;
-			
-			for (var i = 0; i < scope.readyCallbacks.length; i++) {
+
+			for ( var i = 0; i < scope.readyCallbacks.length; i ++ ) {
+
 				scope.readyCallbacks[i](scope.buffer);
+
 			}
+
 			scope.readyCallbacks = [];
-			
+
 		} );
 
 	};
@@ -16416,16 +16420,18 @@ THREE.AudioBuffer.prototype.load = function ( file ) {
 };
 
 THREE.AudioBuffer.prototype.onReady = function ( callback ) {
-	
-	if (this.ready) {
-		callback(this.buffer);
-	}
-	else {
-		this.readyCallbacks.push(callback);
+
+	if ( this.ready ) {
+
+		callback( this.buffer );
+
+	} else {
+
+		this.readyCallbacks.push( callback );
+
 	}
 
 };
-
 
 // File:src/audio/PositionalAudio.js
 
@@ -16445,59 +16451,12 @@ THREE.PositionalAudio = function ( listener ) {
 THREE.PositionalAudio.prototype = Object.create( THREE.Audio.prototype );
 THREE.PositionalAudio.prototype.constructor = THREE.PositionalAudio;
 
+THREE.PositionalAudio.prototype.getOutput = function () {
 
-
-THREE.PositionalAudio.prototype.connect = function () {
-
-	if ( this.filter !== undefined ) {
-
-		this.source.connect( this.filter );
-		this.filter.connect( this.panner );
-
-	} else {
-
-		this.source.connect( this.panner );
-
-	}
+	return this.panner;
 
 };
 
-THREE.PositionalAudio.prototype.disconnect = function () {
-
-	if ( this.filter !== undefined ) {
-
-		this.source.disconnect( this.filter );
-		this.filter.disconnect( this.panner );
-
-	} else {
-
-		this.source.disconnect( this.panner );
-
-	}
-
-};
-
-THREE.PositionalAudio.prototype.setFilter = function ( value ) {
-
-	if ( this.isPlaying === true ) {
-
-		this.disconnect();
-		this.filter = value;
-		this.connect();
-
-	} else {
-
-		this.filter = value;
-
-	}
-
-};
-
-THREE.PositionalAudio.prototype.getFilter = function () {
-
-	return this.filter;
-
-};
 
 THREE.PositionalAudio.prototype.setRefDistance = function ( value ) {
 
@@ -16580,47 +16539,48 @@ THREE.AudioListener = function () {
 	this.masterGain =  this.context.createGain();
 	this.masterGain.connect(this.context.destination);
 	this.filter = null;
-	
+
 };
 
 THREE.AudioListener.prototype = Object.create( THREE.Object3D.prototype );
 THREE.AudioListener.prototype.constructor = THREE.AudioListener;
 
 THREE.AudioListener.prototype.getOutputNode = function () {
-	
+
 	return this.masterGain;
-	
+
 };
 
 THREE.AudioListener.prototype.removeFilter = function ( ) {
-	
-	if (this.filter !== null) {
-	
-		this.masterGain.disconnect(this.filter);
-		this.filter.disconnect(this.context.destination);
-		this.masterGain.connect(this.context.destination);
+
+	if ( this.filter !== null ) {
+
+		this.masterGain.disconnect( this.filter );
+		this.filter.disconnect( this.context.destination );
+		this.masterGain.connect( this.context.destination );
 		this.filter = null;
-		
+
 	}
-	
+
 }
 
 THREE.AudioListener.prototype.setFilter = function ( value ) {
 
-	if (this.filter !== null) {
-		
-		this.masterGain.disconnect(this.filter);
-		this.filter.disconnect(this.context.destination);
+	if ( this.filter !== null ) {
+
+		this.masterGain.disconnect( this.filter );
+		this.filter.disconnect( this.context.destination );
 
 	} else {
-		
-		this.masterGain.disconnect(this.context.destination);
-		
+
+		this.masterGain.disconnect( this.context.destination );
+
 	}
+
 	this.filter = value;
-	this.masterGain.connect(this.filter);
-	this.filter.connect(this.context.destination);	
-	
+	this.masterGain.connect( this.filter );
+	this.filter.connect( this.context.destination );
+
 };
 
 THREE.AudioListener.prototype.getFilter = function () {
@@ -20580,7 +20540,6 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
  * parameters = {
  *  color: <hex>,
  *  roughness: <float>,
- *  reflectivity: <float>,
  *  metalness: <float>,
 
  *  emissive: <hex>,
@@ -20607,8 +20566,6 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
  *  displacementBias: <float>,
  *
  *  roughnessMap: new THREE.Texture( <Image> ),
- *
- *  reflectivityMap: new THREE.Texture( <Image> ),
  *
  *  metalnessMap: new THREE.Texture( <Image> ),
  *
@@ -20645,7 +20602,6 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
 	this.roughness = 0.5;
-	this.reflectivity = 1;
 	this.metalness = 0;
 
 	this.emissive = new THREE.Color( 0x000000 );
@@ -20671,8 +20627,6 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.displacementBias = 0;
 
 	this.roughnessMap = null;
-
-	this.reflectivityMap = null;
 
 	this.metalnessMap = null;
 
@@ -20711,7 +20665,6 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 
 	this.color.copy( source.color );
 	this.roughness = source.roughness;
-	this.reflectivity = source.reflectivity;
 	this.metalness = source.metalness;
 
 	this.emissive.copy( source.emissive );
@@ -20737,8 +20690,6 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.displacementBias = source.displacementBias;
 
 	this.roughnessMap = source.roughnessMap;
-
-	this.reflectivityMap = source.reflectivityMap;
 
 	this.metalnessMap = source.metalnessMap;
 
@@ -23241,7 +23192,7 @@ THREE.ShaderChunk[ 'lights_phong_vertex'] = "#ifdef USE_ENVMAP\n	vWorldPosition 
 
 // File:src/renderers/shaders/ShaderChunk/lights_standard_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_standard_fragment'] = "PhysicalMaterial material;\nmaterial.diffuseColor = diffuseColor.rgb * ( 1.0 - metalnessFactor );\nmaterial.specularRoughness = roughnessFactor * 0.5 + 0.5;material.specularColor = mix( vec3( 0.08 ) * reflectivity, diffuseColor.rgb, metalnessFactor );\n";
+THREE.ShaderChunk[ 'lights_standard_fragment'] = "PhysicalMaterial material;\nmaterial.diffuseColor = diffuseColor.rgb * ( 1.0 - metalnessFactor );\nmaterial.specularRoughness = roughnessFactor * 0.5 + 0.5;material.specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_standard_pars_fragment.glsl
 
@@ -23381,15 +23332,15 @@ THREE.ShaderChunk[ 'uv2_vertex'] = "#if defined( USE_LIGHTMAP ) || defined( USE_
 
 // File:src/renderers/shaders/ShaderChunk/uv_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'uv_pars_fragment'] = "#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_REFLECTIVITYMAP ) || defined( USE_METALNESSMAP )\n	varying vec2 vUv;\n#endif";
+THREE.ShaderChunk[ 'uv_pars_fragment'] = "#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )\n	varying vec2 vUv;\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/uv_pars_vertex.glsl
 
-THREE.ShaderChunk[ 'uv_pars_vertex'] = "#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_REFLECTIVITYMAP ) || defined( USE_METALNESSMAP )\n	varying vec2 vUv;\n	uniform vec4 offsetRepeat;\n#endif\n";
+THREE.ShaderChunk[ 'uv_pars_vertex'] = "#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )\n	varying vec2 vUv;\n	uniform vec4 offsetRepeat;\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/uv_vertex.glsl
 
-THREE.ShaderChunk[ 'uv_vertex'] = "#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_REFLECTIVITYMAP ) || defined( USE_METALNESSMAP )\n	vUv = uv * offsetRepeat.zw + offsetRepeat.xy;\n#endif";
+THREE.ShaderChunk[ 'uv_vertex'] = "#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )\n	vUv = uv * offsetRepeat.zw + offsetRepeat.xy;\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/worldpos_vertex.glsl
 
@@ -23536,12 +23487,6 @@ THREE.UniformsLib = {
 	roughnessmap: {
 
 		"roughnessMap" : { type: "t", value: null }
-
-	},
-
-	reflectivitymap: {
-
-		"reflectivityMap" : { type: "t", value: null }
 
 	},
 
@@ -24053,7 +23998,6 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "normalmap" ],
 			THREE.UniformsLib[ "displacementmap" ],
 			THREE.UniformsLib[ "roughnessmap" ],
-			THREE.UniformsLib[ "reflectivitymap" ],
 			THREE.UniformsLib[ "metalnessmap" ],
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
@@ -24167,7 +24111,6 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
 			THREE.ShaderChunk[ "normalmap_pars_fragment" ],
 			THREE.ShaderChunk[ "roughnessmap_pars_fragment" ],
-			//THREE.ShaderChunk[ "reflectivitymap_pars_fragment" ],
 			THREE.ShaderChunk[ "metalnessmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 
@@ -24184,7 +24127,6 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 				THREE.ShaderChunk[ "roughnessmap_fragment" ],
-				//THREE.ShaderChunk[ "reflectivitymap_fragment" ],
 				THREE.ShaderChunk[ "metalnessmap_fragment" ],
 				THREE.ShaderChunk[ "normal_fragment" ],
 				THREE.ShaderChunk[ "emissivemap_fragment" ],
@@ -26776,18 +26718,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function refreshUniformsStandard ( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
-		//uniforms.reflectivity.value = material.reflectivity; // part of uniforms common
 		uniforms.metalness.value = material.metalness;
 
 		if ( material.roughnessMap ) {
 
 			uniforms.roughnessMap.value = material.roughnessMap;
-
-		}
-
-		if ( material.reflectivityMap ) {
-
-			uniforms.reflectivityMap.value = material.reflectivityMap;
 
 		}
 
@@ -29380,7 +29315,6 @@ THREE.WebGLProgram = ( function () {
 				parameters.displacementMap && parameters.supportsVertexTextures ? '#define USE_DISPLACEMENTMAP' : '',
 				parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 				parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
-				parameters.reflectivityMap ? '#define USE_REFLECTIVITYMAP' : '',
 				parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 				parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
@@ -29499,7 +29433,6 @@ THREE.WebGLProgram = ( function () {
 				parameters.normalMap ? '#define USE_NORMALMAP' : '',
 				parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 				parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
-				parameters.reflectivityMap ? '#define USE_REFLECTIVITYMAP' : '',
 				parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 				parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
@@ -29709,7 +29642,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 	var parameterNames = [
 		"precision", "supportsVertexTextures", "map", "envMap", "envMapMode",
 		"lightMap", "aoMap", "emissiveMap", "bumpMap", "normalMap", "displacementMap", "specularMap",
-		"roughnessMap", "reflectivityMap", "metalnessMap",
+		"roughnessMap", "metalnessMap",
 		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
@@ -29797,7 +29730,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			normalMap: !! material.normalMap,
 			displacementMap: !! material.displacementMap,
 			roughnessMap: !! material.roughnessMap,
-			reflectivityMap: !! material.reflectivityMap,
 			metalnessMap: !! material.metalnessMap,
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
