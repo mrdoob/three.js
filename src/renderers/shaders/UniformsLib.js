@@ -70,12 +70,6 @@ THREE.UniformsLib = {
 
 	},
 
-	reflectivitymap: {
-
-		"reflectivityMap" : { type: "t", value: null }
-
-	},
-
 	metalnessmap: {
 
 		"metalnessMap" : { type: "t", value: null }

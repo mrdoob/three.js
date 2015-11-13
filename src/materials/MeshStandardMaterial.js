@@ -4,7 +4,6 @@
  * parameters = {
  *  color: <hex>,
  *  roughness: <float>,
- *  reflectivity: <float>,
  *  metalness: <float>,
 
  *  emissive: <hex>,
@@ -31,8 +30,6 @@
  *  displacementBias: <float>,
  *
  *  roughnessMap: new THREE.Texture( <Image> ),
- *
- *  reflectivityMap: new THREE.Texture( <Image> ),
  *
  *  metalnessMap: new THREE.Texture( <Image> ),
  *
@@ -69,7 +66,6 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
 	this.roughness = 0.5;
-	this.reflectivity = 1;
 	this.metalness = 0;
 
 	this.emissive = new THREE.Color( 0x000000 );
@@ -95,8 +91,6 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.displacementBias = 0;
 
 	this.roughnessMap = null;
-
-	this.reflectivityMap = null;
 
 	this.metalnessMap = null;
 
@@ -135,7 +129,6 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 
 	this.color.copy( source.color );
 	this.roughness = source.roughness;
-	this.reflectivity = source.reflectivity;
 	this.metalness = source.metalness;
 
 	this.emissive.copy( source.emissive );
@@ -161,8 +154,6 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.displacementBias = source.displacementBias;
 
 	this.roughnessMap = source.roughnessMap;
-
-	this.reflectivityMap = source.reflectivityMap;
 
 	this.metalnessMap = source.metalnessMap;
 

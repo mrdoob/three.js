@@ -421,7 +421,6 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "normalmap" ],
 			THREE.UniformsLib[ "displacementmap" ],
 			THREE.UniformsLib[ "roughnessmap" ],
-			THREE.UniformsLib[ "reflectivitymap" ],
 			THREE.UniformsLib[ "metalnessmap" ],
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
@@ -535,7 +534,6 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
 			THREE.ShaderChunk[ "normalmap_pars_fragment" ],
 			THREE.ShaderChunk[ "roughnessmap_pars_fragment" ],
-			//THREE.ShaderChunk[ "reflectivitymap_pars_fragment" ],
 			THREE.ShaderChunk[ "metalnessmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 
@@ -552,7 +550,6 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 				THREE.ShaderChunk[ "roughnessmap_fragment" ],
-				//THREE.ShaderChunk[ "reflectivitymap_fragment" ],
 				THREE.ShaderChunk[ "metalnessmap_fragment" ],
 				THREE.ShaderChunk[ "normal_fragment" ],
 				THREE.ShaderChunk[ "emissivemap_fragment" ],
