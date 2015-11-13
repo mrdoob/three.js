@@ -101,17 +101,12 @@ THREE.KeyFrameAnimation.prototype = {
 		}
 
 		this.isPaused = false;
-
-		THREE.AnimationHandler.play( this );
-
 	},
 
 	stop: function () {
 
 		this.isPlaying = false;
 		this.isPaused  = false;
-
-		THREE.AnimationHandler.stop( this );
 
 		// reset JIT matrix and remove cache
 
