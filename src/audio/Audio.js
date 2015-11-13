@@ -13,7 +13,7 @@ THREE.Audio = function ( listener ) {
 	this.source.onended = this.onEnded.bind( this );
 
 	this.gain = this.context.createGain();
-	this.gain.connect( listener.getOutputNode() );
+	this.gain.connect( listener.getInput() );
 
 	this.autoplay = false;
 

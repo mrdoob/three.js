@@ -19,7 +19,7 @@ THREE.AudioListener = function () {
 THREE.AudioListener.prototype = Object.create( THREE.Object3D.prototype );
 THREE.AudioListener.prototype.constructor = THREE.AudioListener;
 
-THREE.AudioListener.prototype.getOutputNode = function () {
+THREE.AudioListener.prototype.getInput = function () {
 
 	return this.gain;
 
