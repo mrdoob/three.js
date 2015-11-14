@@ -46,6 +46,7 @@ THREE.JSONLoader.prototype = {
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setWithCredentials( this.withCredentials );
+		loader.setResponseType("application/json");
 		loader.load( url, function ( text ) {
 
 			var json = JSON.parse( text );

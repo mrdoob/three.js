@@ -68,7 +68,10 @@ THREE.XHRLoader.prototype = {
 		}, false );
 
 		if ( this.crossOrigin !== undefined ) request.crossOrigin = this.crossOrigin;
-		if ( this.responseType !== undefined ) request.responseType = this.responseType;
+		if ( this.responseType !== undefined ) {
+			request.responseType = this.responseType;
+			request.overrideMimeType( this.responseType );
+		}
 		if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
 		request.send( null );
