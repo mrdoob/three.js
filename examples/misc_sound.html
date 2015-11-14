@@ -61,6 +61,8 @@
 			var mesh;
 			var material_sphere1, material_sphere2;
 
+			var analyser1, analyser2, analyser3;
+
 			var clock = new THREE.Clock();
 
 			init();
@@ -114,6 +116,8 @@
 				sound2.autoplay = true;
 				mesh2.add( sound2 );
 
+				//
+
 
 				var mesh3 = new THREE.Mesh( sphere, material_sphere3 );
 				mesh3.position.set( 0, 30, -250 );
@@ -128,6 +132,12 @@
 				sound3.setRefDistance( 20 );
 				sound3.setVolume(0.5);
 				mesh3.add(sound3);
+
+				// analysers
+
+				analyser1 = new THREE.AudioAnalyser( sound1, 32 );
+				analyser2 = new THREE.AudioAnalyser( sound2, 32 );
+				analyser3 = new THREE.AudioAnalyser( sound3, 32 );
 
 				// global ambient audio
 
@@ -237,9 +247,9 @@
 
 				controls.update( delta );
 
-				material_sphere1.color.setHSL( 0.0, 0.3 + 0.7 * ( 1 + Math.cos( time ) ) / 2, 0.5 );
-				material_sphere2.color.setHSL( 0.1, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2, 0.5 );
-				material_sphere3.color.setHSL( 0.1, 0.5, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2);
+				material_sphere1.emissive.b = ( analyser1.getData()[ 8 ] / 256 );
+				material_sphere2.emissive.b = ( analyser2.getData()[ 8 ] / 256 );
+				material_sphere3.emissive.b = ( analyser3.getData()[ 8 ] / 256 );
 
 				renderer.render( scene, camera );
 

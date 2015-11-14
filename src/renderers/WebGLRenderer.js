@@ -2046,18 +2046,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function refreshUniformsStandard ( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
-		//uniforms.reflectivity.value = material.reflectivity; // part of uniforms common
 		uniforms.metalness.value = material.metalness;
 
 		if ( material.roughnessMap ) {
 
 			uniforms.roughnessMap.value = material.roughnessMap;
-
-		}
-
-		if ( material.reflectivityMap ) {
-
-			uniforms.reflectivityMap.value = material.reflectivityMap;
 
 		}
 
