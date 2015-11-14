@@ -112,12 +112,12 @@ geometry.viewDir = normalize( vViewPosition );
 
 		#endif
 
-		#if defined( USE_ENVMAP ) && defined( STANDARD )
+		// #if defined( USE_ENVMAP ) && defined( STANDARD )
 
 			// TODO, replace 8 with the real maxMIPLevel
-			//indirectDiffuseIrradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 ); // comment out until seams are fixed
+			// indirectDiffuseIrradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 ); // comment out until seams are fixed
 
-		#endif
+		// #endif
 
 		Material_RE_IndirectDiffuseLight( indirectDiffuseIrradiance, geometry, material, reflectedLight );
 
