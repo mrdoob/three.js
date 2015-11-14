@@ -43,6 +43,16 @@ THREE.Material = function () {
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
 	this.visible = true;
+	
+	this.shaderModifier = {
+		preMainVertex: '',
+		preVertex: '',
+		postVertex: '',
+		preMainFragment: '',
+		preFragment: '',
+		postFragment: '',
+		uniforms: [],
+	}		
 
 	this._needsUpdate = true;
 

@@ -1425,9 +1425,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var shader = THREE.ShaderLib[ parameters.shaderID ];
 
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				for (var param in material.shaderModifier.uniforms)
+					uniforms[param] = material.shaderModifier.uniforms[param];
+
 				materialProperties.__webglShader = {
 					name: material.type,
-					uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+					uniforms: uniforms,
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
 				};

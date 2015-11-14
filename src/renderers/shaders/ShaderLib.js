@@ -34,6 +34,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+
 				THREE.ShaderChunk[ "uv_vertex" ],
 				THREE.ShaderChunk[ "uv2_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
@@ -49,6 +50,9 @@ THREE.ShaderLib = {
 			"	#endif",
 
 				THREE.ShaderChunk[ "begin_vertex" ],
+
+			"	%PRE_VERTEX%",
+
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "project_vertex" ],
@@ -57,6 +61,8 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "worldpos_vertex" ],
 				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
+
+			"	%POST_VERTEX%",
 
 			"}"
 
@@ -88,6 +94,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+			"	%PRE_FRAGMENT%",
+
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
@@ -114,6 +122,8 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "fog_fragment" ],
 
 			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
+
+			"	%POST_FRAGMENT%",
 
 			"}"
 
@@ -173,6 +183,9 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
 				THREE.ShaderChunk[ "begin_vertex" ],
+
+			"	%PRE_VERTEX%",
+
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "project_vertex" ],
@@ -182,6 +195,8 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "lights_lambert_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
+
+			"	%POST_VERTEX%",
 
 			"}"
 
@@ -217,7 +232,9 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vec3 outgoingLight = vec3( 0.0 );",
+			"	%PRE_FRAGMENT%",
+
+			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 			"	vec3 totalAmbientLight = PI * ambientLightColor;",
 
@@ -249,6 +266,8 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "fog_fragment" ],
 
 			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
+
+			"	%POST_FRAGMENT%",
 
 			"}"
 
@@ -304,7 +323,6 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
 
 			"void main() {",
-
 				THREE.ShaderChunk[ "uv_vertex" ],
 				THREE.ShaderChunk[ "uv2_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
@@ -322,6 +340,9 @@ THREE.ShaderLib = {
 			"#endif",
 
 				THREE.ShaderChunk[ "begin_vertex" ],
+
+			"	%PRE_VERTEX%",
+
 				THREE.ShaderChunk[ "displacementmap_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
@@ -334,6 +355,8 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "lights_phong_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
+
+			"	%POST_VERTEX%",
 
 			"}"
 
@@ -370,6 +393,8 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 
 			"void main() {",
+
+			"	%PRE_FRAGMENT%",
 
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
@@ -572,6 +597,8 @@ THREE.ShaderLib = {
 
 			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
 
+			"	%POST_FRAGMENT%",
+
 			"}"
 
 		].join( "\n" )
@@ -599,6 +626,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+			"	%PRE_VERTEX%",
+
 				THREE.ShaderChunk[ "color_vertex" ],
 
 			"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
@@ -614,6 +643,8 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 				THREE.ShaderChunk[ "worldpos_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
+
+			"	%POST_VERTEX%",
 
 			"}"
 
@@ -633,6 +664,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+			"	%PRE_FRAGMENT%",
+
 			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( psColor, opacity );",
 
@@ -647,6 +680,8 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "fog_fragment" ],
 
 			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
+
+			"	%POST_FRAGMENT%",
 
 			"}"
 
@@ -682,6 +717,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+			"	%PRE_VERTEX%",
+
 				THREE.ShaderChunk[ "color_vertex" ],
 
 			"	vLineDistance = scale * lineDistance;",
@@ -690,6 +727,8 @@ THREE.ShaderLib = {
 			"	gl_Position = projectionMatrix * mvPosition;",
 
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+
+			"	%POST_VERTEX%",
 
 			"}"
 
@@ -712,6 +751,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+			"	%PRE_FRAGMENT%",
+
 			"	if ( mod( vLineDistance, totalSize ) > dashSize ) {",
 
 			"		discard;",
@@ -729,6 +770,8 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "fog_fragment" ],
 
 			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
+
+			"	%POST_FRAGMENT%",
 
 			"}"
 
@@ -755,9 +798,14 @@ THREE.ShaderLib = {
 			"void main() {",
 
 				THREE.ShaderChunk[ "begin_vertex" ],
+
+			"	%PRE_VERTEX%",
+
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+
+			"	%POST_VERTEX%",
 
 			"}"
 
@@ -774,6 +822,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+			"	%PRE_FRAGMENT%",
+
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 
 			"	#ifdef USE_LOGDEPTHBUF_EXT",
@@ -788,6 +838,8 @@ THREE.ShaderLib = {
 
 			"	float color = 1.0 - smoothstep( mNear, mFar, depth );",
 			"	gl_FragColor = vec4( vec3( color ), opacity );",
+
+			"	%POST_FRAGMENT%",
 
 			"}"
 
@@ -816,9 +868,14 @@ THREE.ShaderLib = {
 			"	vNormal = normalize( normalMatrix * normal );",
 
 				THREE.ShaderChunk[ "begin_vertex" ],
+
+			"	%PRE_VERTEX%",
+
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+
+			"	%POST_VERTEX%",
 
 			"}"
 
@@ -834,9 +891,13 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+			"	%PRE_FRAGMENT%",
+
 			"	gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+
+			"	%POST_FRAGMENT%",
 
 			"}"
 
@@ -862,11 +923,15 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+			"	%PRE_VERTEX%",
+
 			"	vWorldPosition = transformDirection( position, modelMatrix );",
 
 			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+
+			"	%POST_VERTEX%",
 
 			"}"
 
@@ -884,9 +949,13 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+			"	%PRE_FRAGMENT%",
+
 			"	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+
+			"	%POST_FRAGMENT%",
 
 			"}"
 
@@ -912,11 +981,15 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+			"	%PRE_VERTEX%",
+
 			"	vWorldPosition = transformDirection( position, modelMatrix );",
 
 			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+
+			"	%POST_VERTEX%",
 
 			"}"
 
@@ -934,6 +1007,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+			"	%PRE_FRAGMENT%",
+
 				// "	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 				"vec3 direction = normalize( vWorldPosition );",
 				"vec2 sampleUV;",
@@ -942,6 +1017,8 @@ THREE.ShaderLib = {
 				"gl_FragColor = texture2D( tEquirect, sampleUV );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+
+			"	%POST_FRAGMENT%",
 
 			"}"
 
@@ -977,10 +1054,15 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 
 				THREE.ShaderChunk[ "begin_vertex" ],
+
+			"	%PRE_VERTEX%",
+
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+
+			"	%POST_VERTEX%",
 
 			"}"
 
@@ -1003,6 +1085,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
+			"	%PRE_FRAGMENT%",
+
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 
 			"	#ifdef USE_LOGDEPTHBUF_EXT",
@@ -1014,6 +1098,8 @@ THREE.ShaderLib = {
 			"		gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );",
 
 			"	#endif",
+
+			"	%POST_FRAGMENT%",
 
 				//"gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z / gl_FragCoord.w );",
 				//"float z = ( ( gl_FragCoord.z / gl_FragCoord.w ) - 3.0 ) / ( 4000.0 - 3.0 );",
@@ -1047,12 +1133,17 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "begin_vertex" ],
+
+			"	%PRE_VERTEX%",
+
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "project_vertex" ],
 				THREE.ShaderChunk[ "worldpos_vertex" ],
 
 				"vWorldPosition = worldPosition;",
+
+			"	%POST_VERTEX%",
 
 			"}"
 
@@ -1085,7 +1176,11 @@ THREE.ShaderLib = {
 
 			"void main () {",
 
+			"	%PRE_FRAGMENT%",
+
 			"	gl_FragColor = pack1K( length( vWorldPosition.xyz - lightPos.xyz ) );",
+
+			"	%POST_FRAGMENT%",
 
 			"}"
 

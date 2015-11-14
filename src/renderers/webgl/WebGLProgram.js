@@ -410,9 +410,21 @@ THREE.WebGLProgram = ( function () {
 			].filter( filterEmptyLine ).join( '\n' );
 
 		}
+		
+		function valueOrEmpty(value) {
+			return (typeof value === "undefined") ? "": value;
+		}
 
-		var vertexGlsl = prefixVertex + vertexShader;
-		var fragmentGlsl = prefixFragment + fragmentShader;
+		vertexShader = vertexShader
+							.replace("%PRE_VERTEX%", valueOrEmpty(material.shaderModifier.preVertex))
+							.replace("%POST_VERTEX%", valueOrEmpty(material.shaderModifier.postVertex));
+
+		fragmentShader = fragmentShader
+							.replace("%PRE_FRAGMENT%", valueOrEmpty(material.shaderModifier.preFragment))
+							.replace("%POST_FRAGMENT%", valueOrEmpty(material.shaderModifier.postFragment));
+
+		var vertexGlsl = prefixVertex + valueOrEmpty(material.shaderModifier.preMainVertex) + "\n" + vertexShader;
+		var fragmentGlsl = prefixFragment + valueOrEmpty(material.shaderModifier.preMainFragment) + "\n" + fragmentShader;
 
 		var glVertexShader = THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
 		var glFragmentShader = THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
