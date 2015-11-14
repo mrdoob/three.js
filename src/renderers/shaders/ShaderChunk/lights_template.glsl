@@ -96,28 +96,28 @@ geometry.viewDir = normalize( vViewPosition );
 
 		vec3 indirectDiffuseIrradiance = getAmbientLightIrradiance( ambientLightColor );
 
-#ifdef USE_LIGHTMAP
+		#ifdef USE_LIGHTMAP
 
-		indirectDiffuseIrradiance += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity; // factor of PI should not be present; included here to prevent breakage
+			indirectDiffuseIrradiance += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity; // factor of PI should not be present; included here to prevent breakage
 
-#endif
+		#endif
 
-#if ( NUM_HEMI_LIGHTS > 0 )
+		#if ( NUM_HEMI_LIGHTS > 0 )
 
-		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
+			for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-			indirectDiffuseIrradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
+				indirectDiffuseIrradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
 
-		}
+			}
 
-#endif
+		#endif
 
-#if defined( USE_ENVMAP ) && defined( STANDARD )
+		#if defined( USE_ENVMAP ) && defined( STANDARD )
 
-		// TODO, replace 8 with the real maxMIPLevel
-		indirectDiffuseIrradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 );
+			// TODO, replace 8 with the real maxMIPLevel
+			//indirectDiffuseIrradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 ); // comment out until seams are fixed
 
-#endif
+		#endif
 
 		Material_RE_IndirectDiffuseLight( indirectDiffuseIrradiance, geometry, material, reflectedLight );
 
