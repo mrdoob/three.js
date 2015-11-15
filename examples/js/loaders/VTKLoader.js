@@ -38,16 +38,6 @@ THREE.VTKLoader.prototype = {
         // red, green, blue colors in the range 0 to 1
         var colors = [];
 
-        // LUT variables required for coloring
-        var colorMap = 'rainbow';
-        var numberOfColors = 512;
-        var lut = new THREE.Lut( colorMap, numberOfColors );
-        lut.setMax( 2000 );
-        lut.setMin( 0 );
-
-        // Float values defined for the LUT
-        var color_scalars = [];
-
         // normal vector, one per vertex
         var normals = [];
 
@@ -75,9 +65,6 @@ THREE.VTKLoader.prototype = {
         // Start of color section
         var patCOLOR_SCALARS = /^COLOR_SCALARS[ ]+(\w+)[ ]+3/;
 
-        // Start of LUT section
-        var patLOOKUP_TABLE = /^LOOKUP_TABLE[ ]+(\w)/;
-
         // NORMALS Normals float
         var patNORMALS = /^NORMALS[ ]+(\w+)[ ]+(\w+)/;
 
@@ -86,7 +73,6 @@ THREE.VTKLoader.prototype = {
         var inPointDataSection = false;
         var inCellDataSection = false;
         var inColorSection = false;
-        var inLookupTableSection = false;
         var inNormalsSection = false;
 
         var lines = data.split('\n');
@@ -148,24 +134,6 @@ THREE.VTKLoader.prototype = {
                         
                     }
                     
-                } else if ( inLookupTableSection ) {
-                
-                    // get the color scalars
-    
-                    var items = line.split( /(\s+)/ );
-                    
-                    for ( var item_index = 0; item_index < items.length; item_index++ ) {
-                    
-                        var scalar = parseFloat( items[ item_index ] ).toFixed( 12 );
-                        
-                        if ( ! isNaN( scalar ) ) {
-                        
-                            color_scalars.push( scalar );
-                            
-                        }
-                        
-                    }
-                    
                 } else if ( inNormalsSection ) {
                 
                     // get the normal vectors
@@ -193,22 +161,6 @@ THREE.VTKLoader.prototype = {
                         var g = parseFloat( result[ 2 ] );
                         var b = parseFloat( result[ 3 ] );
                         colors.push( r, g, b );
-                        
-                    }
-                    
-                } else if ( inLookupTableSection ) {
-                
-                    // get the color scalars
-                    var items = line.split( /(\s+)/ );
-                    
-                    for ( var item_index = 0; item_index < items.length; item_index++ ) {
-                    
-                        var scalar = parseFloat( items[ item_index ] ).toFixed( 12 );
-                        
-                        if ( ! isNaN( scalar ) ) {
-                        
-                            color_scalars.push( scalar );
-                        }
                         
                     }
                     
@@ -253,15 +205,6 @@ THREE.VTKLoader.prototype = {
             } else if ( patCOLOR_SCALARS.exec( line ) !== null ) {
             
                 inColorSection = true;
-                inLookupTableSection = false;
-                inNormalsSection = false;
-                inPointsSection = false;
-                inPolygonsSection = false;
-                
-            } else if ( patLOOKUP_TABLE.exec( line ) !== null ) {
-            
-                inLookupTableSection = true;
-                inColorSection = false;
                 inNormalsSection = false;
                 inPointsSection = false;
                 inPolygonsSection = false;
@@ -269,7 +212,6 @@ THREE.VTKLoader.prototype = {
             } else if ( patNORMALS.exec( line ) !== null ) {
             
                 inNormalsSection = true;
-                inLookupTableSection = false;
                 inColorSection = false;
                 inPointsSection = false;
                 inPolygonsSection = false;
@@ -297,31 +239,7 @@ THREE.VTKLoader.prototype = {
             if ( colors.length == positions.length ) {
             
                 geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
-                
-            } else if ( color_scalars.length > 0 ) {
-            
-                // Use LUT for coloring.
-                var lutColors = [];
-                for ( var i = 0; i < color_scalars.length; i++ ) {
-                
-                    var colorValue = color_scalars[ i ];
-                    color = lut.getColor( colorValue );
-                    if ( color == undefined ) {
-                    
-                        console.log( "ERROR: " + colorValue );
-                        
-                    } else {
-                    
-                        lutColors[ 3 * i ] = color.r;
-                        lutColors[ 3 * i + 1 ] = color.g;
-                        lutColors[ 3 * i + 2 ] = color.b;
-                        
-                    }
-                    
-                }
-                
-                geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( lutColors ), 3 ) );
-                
+                                
             }
 
             if ( normals.length == positions.length ) {
@@ -332,15 +250,14 @@ THREE.VTKLoader.prototype = {
             
         } else {
         
-            // cell centered colors. The only way to attach a solid color to each triangle
-            // is to use Geometry 
+            // Cell centered colors. The only way to attach a solid color to each triangle
+            // is to use Geometry, which is less efficient than BufferGeometry
             geometry = new THREE.Geometry();
 
             var numTriangles = indices.length / 3;
             var numPoints = positions.length / 3;
             var va, vb, vc;
             var face;
-            var colorA, colorB, colorC;
             var ia, ib, ic;
             var x, y, z;
             var r, g, b;
@@ -375,30 +292,8 @@ THREE.VTKLoader.prototype = {
                     
                 }
                 
-            } else if ( color_scalars.length == numTriangles ) {
-            
-                // Use LUT for coloring.
-                for ( var i = 0; i < numTriangles; ++i ) {
-                
-                    face = geometry.faces[i];
-                    colorValue = color_scalars[ i ];
-                    color = lut.getColor( colorValue );
-                    if ( color == undefined ) {
-                    
-                        console.log( "ERROR: " + colorValue );
-                        
-                    } else {
-
-                        color = new THREE.Color();
-                        color.setRGB( color.r, color.g, color.b );
-                        face.color = new THREE.Color().setRGB( r, g, b );
-                        
-                    }
-                    
-                }
-                
-            }
-            
+             } 
+     
         }
         
         return geometry;
