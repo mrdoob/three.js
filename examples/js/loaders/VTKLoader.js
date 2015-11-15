@@ -14,17 +14,22 @@ THREE.VTKLoader.prototype = {
     constructor: THREE.VTKLoader,
 
     load: function ( url, onLoad, onProgress, onError ) {
+    
         // Will we bump into trouble reading the whole file into memory?
         var scope = this;
         var loader = new THREE.XHRLoader( scope.manager );
         loader.setCrossOrigin( this.crossOrigin );
+        
         loader.load( url, function ( text ) {
             onLoad( scope.parse( text ) );
         }, onProgress, onError );
+        
     },
 
     setCrossOrigin: function ( value ) {
+    
         this.crossOrigin = value;
+        
     },
 
     parse: function ( data ) {
@@ -100,6 +105,7 @@ THREE.VTKLoader.prototype = {
                     // numVertices i0 i1 i2 ...
                     var numVertices = parseInt( result[ 1 ] );
                     var inds = result[ 2 ].split(/\s+/); 
+                    
                     if ( numVertices >= 3 ) {
                     
                         var i0 = parseInt( inds[ 0 ] );
