@@ -1,14 +1,15 @@
 // convert from intensity (power / solid angle) to irradiance assuming a spherical light falloff
 // this is only valid for spot and point lights
+// physically correct inverse quadratic falloff is achieved when decayExponent is 2.
 // discussed here: https://github.com/mrdoob/three.js/issues/7608
 float intensityToIrradianceSphericalFalloffCoefficient( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
 
 	if ( decayExponent > 0.0 ) {
 
-		float quadraticFalloff = 1.0 / pow( max( lightDistance, EPSILON ), decayExponent );
+		float distanceFalloff = 1.0 / pow( max( lightDistance, EPSILON ), decayExponent );
 		float smoothCutoff = square( saturate( 1.0 - quad( lightDistance / cutoffDistance ) ) );
 
-	 	return quadraticFalloff * smoothCutoff;
+	 	return distanceFalloff * smoothCutoff;
 
 	}
 
