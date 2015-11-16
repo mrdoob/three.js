@@ -25,7 +25,6 @@ THREE.ColladaLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.setCrossOrigin( scope.crossOrigin );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text, getBaseUrl( url ) ) );
@@ -343,6 +342,43 @@ THREE.ColladaLoader.prototype = {
 
 		// geometry
 
+		function parseSource( xml ) {
+
+			var data = {
+				array: [],
+				stride: 3
+			};
+
+			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'float_array':
+						data.array = parseFloats( child.textContent );
+						break;
+
+					case 'technique_common':
+						var accessor = child.getElementsByTagName( 'accessor' )[ 0 ]
+						if ( accessor !== undefined ) {
+							data.stride = parseInt( accessor.getAttribute( 'stride' ) );
+						}
+						break;
+
+					default:
+						console.log( child );
+
+				}
+
+			}
+
+			return data;
+
+		}
+
 		function parseGeometry( xml ) {
 
 			var data = {
@@ -359,14 +395,16 @@ THREE.ColladaLoader.prototype = {
 
 				if ( child.nodeType !== 1 ) continue;
 
+				var id = child.getAttribute( 'id' );
+
 				switch ( child.nodeName ) {
 
 					case 'source':
-						data.sources[ child.getAttribute( 'id' ) ] = parseFloats( child.getElementsByTagName( 'float_array' )[ 0 ].textContent );
+						data.sources[ id ] = parseSource( child );
 						break;
 
 					case 'vertices':
-						data.sources[ child.getAttribute( 'id' ) ] = data.sources[ parseId( child.getElementsByTagName( 'input' )[ 0 ].getAttribute( 'source' ) ) ];
+						data.sources[ id ] = data.sources[ parseId( child.getElementsByTagName( 'input' )[ 0 ].getAttribute( 'source' ) ) ];
 						break;
 
 					case 'polygons':
@@ -461,18 +499,21 @@ THREE.ColladaLoader.prototype = {
 					var input = inputs[ name ];
 
 					var source = sources[ input.id ];
+					var sourceArray = source.array;
+					var sourceStride = source.stride;
+
 					var offset = input.offset;
 
 					var array = [];
 
 					function pushVector( i ) {
 
-						var index = indices[ i + offset ] * 3;
+						var index = indices[ i + offset ] * sourceStride;
 
 						if ( asset.upAxis === 'Z_UP' ) {
-							array.push( source[ index + 0 ], source[ index + 2 ], - source[ index + 1 ] );
+							array.push( sourceArray[ index + 0 ], sourceArray[ index + 2 ], - sourceArray[ index + 1 ] );
 						} else {
-							array.push( source[ index + 0 ], source[ index + 1 ], source[ index + 2 ] );
+							array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
 						}
 
 					}
@@ -529,6 +570,10 @@ THREE.ColladaLoader.prototype = {
 							geometry.addAttribute( 'position', new THREE.Float32Attribute( array, 3 ) );
 							break;
 
+						case 'COLOR':
+							geometry.addAttribute( 'color', new THREE.Float32Attribute( array, 3 ) );
+							break;
+
 						case 'NORMAL':
 							geometry.addAttribute( 'normal', new THREE.Float32Attribute( array, 3 ) );
 							break;
@@ -555,7 +600,12 @@ THREE.ColladaLoader.prototype = {
 
 					case 'triangles':
 					case 'polylist':
-						group.add( new THREE.Mesh( geometry ) );
+						if ( geometry.attributes.color !== undefined ) {
+							var material = new THREE.MeshBasicMaterial( {
+								vertexColors: THREE.VertexColors
+							} );
+						}
+						group.add( new THREE.Mesh( geometry, material ) );
 						break;
 
 				}
@@ -653,7 +703,6 @@ THREE.ColladaLoader.prototype = {
 
 					default:
 						console.log( child );
-						break;
 
 				}
 

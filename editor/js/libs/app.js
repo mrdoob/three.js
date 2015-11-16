@@ -61,6 +61,13 @@ var APP = {
 
 				var object = scene.getObjectByProperty( 'uuid', uuid, true );
 
+				if ( object === undefined ) {
+
+					console.warn( 'APP.Player: Script without object.', uuid );
+					continue;
+
+				}
+
 				var scripts = json.scripts[ uuid ];
 
 				for ( var i = 0; i < scripts.length; i ++ ) {
@@ -76,7 +83,7 @@ var APP = {
 
 						if ( events[ name ] === undefined ) {
 
-							console.warn( 'APP.Player: event type not supported (', name, ')' );
+							console.warn( 'APP.Player: Event type not supported (', name, ')' );
 							continue;
 
 						}
@@ -90,6 +97,12 @@ var APP = {
 			}
 
 			dispatch( events.init, arguments );
+
+		};
+
+		this.getCamera = function () {
+
+			return camera;
 
 		};
 
