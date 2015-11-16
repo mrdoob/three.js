@@ -20,7 +20,7 @@ vLightFront = vec3( 0.0 );
 
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
-		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
+		IncidentLight directLight = getPointDirectIrradiance( pointLights[ i ], geometry );
 
 		float dotNL = dot( geometry.normal, directLight.direction );
 		vec3 directLightColor_Diffuse = PI * directLight.color;
@@ -41,7 +41,7 @@ vLightFront = vec3( 0.0 );
 
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
-		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );
+		IncidentLight directLight = getSpotDirectIrradiance( spotLights[ i ], geometry );
 
 		float dotNL = dot( geometry.normal, directLight.direction );
 		vec3 directLightColor_Diffuse = PI * directLight.color;

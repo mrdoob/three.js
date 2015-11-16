@@ -42,7 +42,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
 
-	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) {
+	IncidentLight getPointDirectIrradiance( const in PointLight pointLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
 
@@ -74,7 +74,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
 
-	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {
+	IncidentLight getSpotDirectIrradiance( const in SpotLight spotLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
 
