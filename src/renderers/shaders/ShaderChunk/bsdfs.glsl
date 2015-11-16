@@ -6,7 +6,7 @@ float intensityToIrradianceSphericalFalloffCoefficient( const in float lightDist
 	if ( decayExponent > 0.0 ) {
 
 		float quadraticFalloff = 1.0 / pow( max( lightDistance, EPSILON ), decayExponent );
-		float smoothCutoff = square( saturate( 1 - quad( lightDistance / cutoffDistance ) ) );
+		float smoothCutoff = square( saturate( 1.0 - quad( lightDistance / cutoffDistance ) ) );
 
 	 	return quadraticFalloff * smoothCutoff;
 
