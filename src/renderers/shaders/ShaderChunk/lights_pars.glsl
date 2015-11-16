@@ -18,12 +18,12 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	IncidentLight getDirectionalDirectIrradiance( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
 
-		IncidentLight directIrradiance;
+		IncidentLight directLight;
 
-		directIrradiance.color = directionalLight.color;
-		directIrradiance.direction = directionalLight.direction;
+		directLight.color = directionalLight.color;
+		directLight.direction = directionalLight.direction;
 
-		return directIrradiance;
+		return directLight;
 
 	}
 
@@ -44,15 +44,15 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	IncidentLight getPointDirectIrradiance( const in PointLight pointLight, const in GeometricContext geometry ) {
 
-		IncidentLight directIrradiance;
+		IncidentLight directLight;
 
 		vec3 lVector = pointLight.position - geometry.position;
-		directIrradiance.direction = normalize( lVector );
+		directLight.direction = normalize( lVector );
 
-		directIrradiance.color = pointLight.color;
-		directIrradiance.color *= intensityToIrradianceSphericalFalloffCoefficient( length( lVector ), pointLight.distance, pointLight.decay );
+		directLight.color = pointLight.color;
+		directLight.color *= intensityToIrradianceSphericalFalloffCoefficient( length( lVector ), pointLight.distance, pointLight.decay );
 
-		return directIrradiance;
+		return directLight;
 
 	}
 
@@ -76,28 +76,28 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	IncidentLight getSpotDirectIrradiance( const in SpotLight spotLight, const in GeometricContext geometry ) {
 
-		IncidentLight directIrradiance;
+		IncidentLight directLight;
 
 		vec3 lVector = spotLight.position - geometry.position;
-		directIrradiance.direction = normalize( lVector );
+		directLight.direction = normalize( lVector );
 
-		float spotEffect = dot( directIrradiance.direction, spotLight.direction );
+		float spotEffect = dot( directLight.direction, spotLight.direction );
 
 		if ( spotEffect > spotLight.angleCos ) {
 
-			float spotEffect = dot( spotLight.direction, directIrradiance.direction );
+			float spotEffect = dot( spotLight.direction, directLight.direction );
 			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
 
-			directIrradiance.color = spotLight.color;
-			directIrradiance.color *= ( spotEffect * intensityToIrradianceSphericalFalloffCoefficient( length( lVector ), spotLight.distance, spotLight.decay ) );
+			directLight.color = spotLight.color;
+			directLight.color *= ( spotEffect * intensityToIrradianceSphericalFalloffCoefficient( length( lVector ), spotLight.distance, spotLight.decay ) );
 
 		} else {
 
-			directIrradiance.color = vec3( 0.0 );
+			directLight.color = vec3( 0.0 );
 
 		}
 
-		return directIrradiance;
+		return directLight;
 
 	}
 

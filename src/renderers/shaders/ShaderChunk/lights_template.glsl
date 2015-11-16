@@ -24,19 +24,19 @@ geometry.viewDir = normalize( vViewPosition );
 
 		PointLight pointLight = pointLights[ i ];
 
-		IncidentLight directIrradiance = getPointDirectIrradiance( pointLight, geometry );
+		IncidentLight directLight = getPointDirectIrradiance( pointLight, geometry );
 
 		#ifdef USE_SHADOWMAP
 		if ( pointLight.shadow > - 1 ) {
 			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
 				if ( j == pointLight.shadow ) {
-					directIrradiance.color *= shadows[ j ];
+					directLight.color *= shadows[ j ];
 				}
 			}
 		}
 		#endif
 
-		Material_RE_DirectLight( directIrradiance, geometry, material, reflectedLight );
+		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );
 
 	}
 
@@ -48,19 +48,19 @@ geometry.viewDir = normalize( vViewPosition );
 
 		SpotLight spotLight = spotLights[ i ];
 
-		IncidentLight directIrradiance = getSpotDirectIrradiance( spotLight, geometry );
+		IncidentLight directLight = getSpotDirectIrradiance( spotLight, geometry );
 
 		#ifdef USE_SHADOWMAP
 		if ( spotLight.shadow > - 1 ) {
 			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
 				if ( j == spotLight.shadow ) {
-					directIrradiance.color *= shadows[ j ];
+					directLight.color *= shadows[ j ];
 				}
 			}
 		}
 		#endif
 
-		Material_RE_DirectLight( directIrradiance, geometry, material, reflectedLight );
+		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );
 
 	}
 
@@ -72,19 +72,19 @@ geometry.viewDir = normalize( vViewPosition );
 
 		DirectionalLight directionalLight = directionalLights[ i ];
 
-		IncidentLight directIrradiance = getDirectionalDirectIrradiance( directionalLight, geometry );
+		IncidentLight directLight = getDirectionalDirectIrradiance( directionalLight, geometry );
 
 		#ifdef USE_SHADOWMAP
 		if ( directionalLight.shadow > - 1 ) {
 			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
 				if ( j == directionalLight.shadow ) {
-					directIrradiance.color *= shadows[ j ];
+					directLight.color *= shadows[ j ];
 				}
 			}
 		}
 		#endif
 
-		Material_RE_DirectLight( directIrradiance, geometry, material, reflectedLight );
+		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );
 
 	}
 
