@@ -72,7 +72,7 @@ THREE.JSONLoader.prototype = {
 			var object = scope.parse( json, texturePath );
 			onLoad( object.geometry, object.materials );
 
-		} );
+		}, onProgress, onError );
 
 	},
 
