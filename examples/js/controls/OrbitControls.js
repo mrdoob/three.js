@@ -479,11 +479,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( dollyDelta.y > 0 ) {
 
-			dollyIn( scope.getZoomScale() );
+			dollyIn( getZoomScale() );
 
 		} else if ( dollyDelta.y < 0 ) {
 
-			dollyOut( scope.getZoomScale() );
+			dollyOut( getZoomScale() );
 
 		}
 
