@@ -21,6 +21,18 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay 
 
 	this.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 50, 5000 ) );
 
+	Object.defineProperties( this, {
+		power: {
+			enumerable: true,
+			get: function() {
+				return 4 * Math.PI * this.intensity;
+			},
+			set: function( value ) {
+				this.intensity = value / ( Math.PI * 4 );
+			}
+		}
+	} );
+
 };
 
 THREE.SpotLight.prototype = Object.create( THREE.Light.prototype );
