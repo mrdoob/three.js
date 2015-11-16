@@ -49,13 +49,13 @@ test( "rotateZ", function() {
 
 test( "fromBufferGeometry", function() {
 	var bufferGeometry = new THREE.BufferGeometry();
-	bufferGeometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array([1, 2, 3, 4, 5, 6, 7, 8, 9]), 3));
-	bufferGeometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array([0, 0, 0, 0.5, 0.5, 0.5, 1, 1, 1]), 3));
-	bufferGeometry.addAttribute('normal', new THREE.BufferAttribute(new Float32Array([0, 1, 0, 1, 0, 1, 1, 1, 0]), 3));
-	bufferGeometry.addAttribute('uv', new THREE.BufferAttribute(new Float32Array([0, 0, 0, 1, 1, 1]), 2));
-	bufferGeometry.addAttribute('uv2', new THREE.BufferAttribute(new Float32Array([0, 0, 0, 1, 1, 1]), 2));
+	bufferGeometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array( [1, 2, 3, 4, 5, 6, 7, 8, 9] ), 3 ) );
+	bufferGeometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array( [0, 0, 0, 0.5, 0.5, 0.5, 1, 1, 1] ), 3 ) );
+	bufferGeometry.addAttribute('normal', new THREE.BufferAttribute(new Float32Array( [0, 1, 0, 1, 0, 1, 1, 1, 0] ), 3 ) );
+	bufferGeometry.addAttribute('uv', new THREE.BufferAttribute(new Float32Array( [0, 0, 0, 1, 1, 1] ), 2 ) );
+	bufferGeometry.addAttribute('uv2', new THREE.BufferAttribute(new Float32Array( [0, 0, 0, 1, 1, 1] ), 2 ) );
 
-	var geometry = new THREE.Geometry().fromBufferGeometry(bufferGeometry);
+	var geometry = new THREE.Geometry().fromBufferGeometry( bufferGeometry );
 
 	var colors = geometry.colors;
 	ok (
@@ -86,7 +86,7 @@ test( "normalize", function() {
 	var distances = geometry.lineDistances;
 	ok( distances[0] === 0, "distance to the 1st point is 0" );
 	ok( distances[1] === 1 + distances[0], "distance from the 1st to the 2nd is sqrt(2nd - 1st) + distance - 1" );
-	ok( distances[2] === Math.sqrt(0.5 * 0.5 + 1) + distances[1], "distance from the 1st to the 3nd is sqrt(3rd - 2nd) + distance - 1" );
+	ok( distances[2] === Math.sqrt( 0.5 * 0.5 + 1 ) + distances[1], "distance from the 1st to the 3nd is sqrt(3rd - 2nd) + distance - 1" );
 });
 
 function getGeometryByParams( x1, y1, z1, x2, y2, z2, x3, y3, z3 ) {
@@ -103,5 +103,5 @@ function getGeometryByParams( x1, y1, z1, x2, y2, z2, x3, y3, z3 ) {
 }
 
 function getGeometry() {
-	return getGeometryByParams(-0.5, 0, 0, 0.5, 0, 0, 0, 1, 0);
+	return getGeometryByParams( -0.5, 0, 0, 0.5, 0, 0, 0, 1, 0 );
 }
