@@ -7,8 +7,10 @@ module( "InstancedBufferGeometry" );
 function createClonableMock() {
 	return {
 		callCount: 0,
+
 		clone: function() {
 			this.callCount++;
+
 			return this;
 		}
 	}
@@ -23,13 +25,13 @@ test( "copy", function() {
 
 	var instance = new THREE.InstancedBufferGeometry();
 
-	instance.addGroup(0, 10, instanceMock1);
-	instance.addGroup(10, 5, instanceMock2);
-	instance.setIndex(indexMock);
-	instance.addAttribute('attributeMock1', attributeMock1);
-	instance.addAttribute('attributeMock2', attributeMock2);
+	instance.addGroup( 0, 10, instanceMock1 );
+	instance.addGroup( 10, 5, instanceMock2 );
+	instance.setIndex( indexMock );
+	instance.addAttribute( 'attributeMock1', attributeMock1 );
+	instance.addAttribute( 'attributeMock2', attributeMock2 );
 
-	var copiedInstance = instance.copy(instance);
+	var copiedInstance = instance.copy( instance );
 
 	ok( copiedInstance instanceof THREE.InstancedBufferGeometry, "the clone has the correct type" );
 
