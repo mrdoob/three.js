@@ -14,9 +14,9 @@ test( "can be created", function() {
 });
 
 test( "copy", function() {
-	var array = new Float32Array([1, 2, 3, 7, 8, 9]);
-	var instance = new THREE.InstancedBufferAttribute(array, 2, 123);
-	var copiedInstance = instance.copy(instance);
+	var array = new Float32Array( [1, 2, 3, 7, 8, 9] );
+	var instance = new THREE.InstancedBufferAttribute( array, 2, 123 );
+	var copiedInstance = instance.copy( instance );
 
 	ok( copiedInstance instanceof THREE.InstancedBufferAttribute, "the clone has the correct type" );
 	ok( copiedInstance.itemSize === 2, "itemSize was copied" );
