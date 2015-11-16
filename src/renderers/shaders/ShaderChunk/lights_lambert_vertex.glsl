@@ -61,10 +61,10 @@ vLightFront = vec3( 0.0 );
 
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
-		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
+		IncidentLight directIrradiance = getDirectionalDirectIrradiance( directionalLights[ i ], geometry );
 
-		float dotNL = dot( geometry.normal, directLight.direction );
-		vec3 directLightColor_Diffuse = PI * directLight.color;
+		float dotNL = dot( geometry.normal, directIrradiance.direction );
+		vec3 directLightColor_Diffuse = PI * directIrradiance.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 

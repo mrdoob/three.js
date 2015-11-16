@@ -16,14 +16,14 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
 
-	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
+	IncidentLight getDirectionalDirectIrradiance( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
 
-		IncidentLight directLight;
+		IncidentLight directIrradiance;
 
-		directLight.color = directionalLight.color;
-		directLight.direction = directionalLight.direction;
+		directIrradiance.color = directionalLight.color;
+		directIrradiance.direction = directionalLight.direction;
 
-		return directLight;
+		return directIrradiance;
 
 	}
 

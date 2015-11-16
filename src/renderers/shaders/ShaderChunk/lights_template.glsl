@@ -72,19 +72,19 @@ geometry.viewDir = normalize( vViewPosition );
 
 		DirectionalLight directionalLight = directionalLights[ i ];
 
-		IncidentLight directLight = getDirectionalDirectLight( directionalLight, geometry );
+		IncidentLight directIrradiance = getDirectionalDirectIrradiance( directionalLight, geometry );
 
 		#ifdef USE_SHADOWMAP
 		if ( directionalLight.shadow > - 1 ) {
 			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
 				if ( j == directionalLight.shadow ) {
-					directLight.color *= shadows[ j ];
+					directIrradiance.color *= shadows[ j ];
 				}
 			}
 		}
 		#endif
 
-		Material_RE_DirectLight( directLight, geometry, material, reflectedLight );
+		Material_RE_DirectLight( directIrradiance, geometry, material, reflectedLight );
 
 	}
 
