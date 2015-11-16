@@ -1,4 +1,7 @@
-float calcLightAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
+// convert from intensity (power / solid angle) to irradiance assuming a spherical light falloff
+// this is only valid for spot and point lights
+// discussed here: https://github.com/mrdoob/three.js/issues/7608
+float intensityToIrradianceSphericalFalloffCoefficient( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
 
 	if ( decayExponent > 0.0 ) {
 

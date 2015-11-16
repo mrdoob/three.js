@@ -50,7 +50,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		directLight.direction = normalize( lVector );
 
 		directLight.color = pointLight.color;
-		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay );
+		directLight.color *= intensityToIrradianceSphericalFalloffCoefficient( length( lVector ), pointLight.distance, pointLight.decay );
 
 		return directLight;
 
@@ -89,7 +89,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
 
 			directLight.color = spotLight.color;
-			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
+			directLight.color *= ( spotEffect * intensityToIrradianceSphericalFalloffCoefficient( length( lVector ), spotLight.distance, spotLight.decay ) );
 
 		} else {
 
