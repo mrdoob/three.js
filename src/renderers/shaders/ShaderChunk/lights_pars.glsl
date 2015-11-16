@@ -44,15 +44,15 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	IncidentLight getPointDirectIrradiance( const in PointLight pointLight, const in GeometricContext geometry ) {
 
-		IncidentLight directLight;
+		IncidentLight directIrradiance;
 
 		vec3 lVector = pointLight.position - geometry.position;
-		directLight.direction = normalize( lVector );
+		directIrradiance.direction = normalize( lVector );
 
-		directLight.color = pointLight.color;
-		directLight.color *= intensityToIrradianceSphericalFalloffCoefficient( length( lVector ), pointLight.distance, pointLight.decay );
+		directIrradiance.color = pointLight.color;
+		directIrradiance.color *= intensityToIrradianceSphericalFalloffCoefficient( length( lVector ), pointLight.distance, pointLight.decay );
 
-		return directLight;
+		return directIrradiance;
 
 	}
 
@@ -76,28 +76,28 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	IncidentLight getSpotDirectIrradiance( const in SpotLight spotLight, const in GeometricContext geometry ) {
 
-		IncidentLight directLight;
+		IncidentLight directIrradiance;
 
 		vec3 lVector = spotLight.position - geometry.position;
-		directLight.direction = normalize( lVector );
+		directIrradiance.direction = normalize( lVector );
 
-		float spotEffect = dot( directLight.direction, spotLight.direction );
+		float spotEffect = dot( directIrradiance.direction, spotLight.direction );
 
 		if ( spotEffect > spotLight.angleCos ) {
 
-			float spotEffect = dot( spotLight.direction, directLight.direction );
+			float spotEffect = dot( spotLight.direction, directIrradiance.direction );
 			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
 
-			directLight.color = spotLight.color;
-			directLight.color *= ( spotEffect * intensityToIrradianceSphericalFalloffCoefficient( length( lVector ), spotLight.distance, spotLight.decay ) );
+			directIrradiance.color = spotLight.color;
+			directIrradiance.color *= ( spotEffect * intensityToIrradianceSphericalFalloffCoefficient( length( lVector ), spotLight.distance, spotLight.decay ) );
 
 		} else {
 
-			directLight.color = vec3( 0.0 );
+			directIrradiance.color = vec3( 0.0 );
 
 		}
 
-		return directLight;
+		return directIrradiance;
 
 	}
 
