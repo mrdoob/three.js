@@ -2,10 +2,14 @@ float calcLightAttenuation( const in float lightDistance, const in float cutoffD
 
 	if ( decayExponent > 0.0 ) {
 
-	  return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
+		float quadraticFalloff = 1.0 / pow( max( lightDistance, EPSILON ), decayExponent );
+		float smoothCutoff = square( saturate( 1 - quad( lightDistance / cutoffDistance ) ) );
+
+	 	return quadraticFalloff * smoothCutoff;
 
 	}
 
+	
 	return 1.0;
 
 }
