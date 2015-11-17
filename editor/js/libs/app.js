@@ -48,7 +48,7 @@ var APP = {
 				update: []
 			};
 
-			var scriptWrapParams = 'player,renderer,scene';
+			var scriptWrapParams = 'player,renderer,scene,camera';
 			var scriptWrapResultObj = {};
 			for ( var eventKey in events ) {
 				scriptWrapParams += ',' + eventKey;
@@ -75,7 +75,7 @@ var APP = {
 					var script = scripts[ i ];
 
 					var functions = ( new Function( scriptWrapParams,
-							script.source + '\nreturn ' + scriptWrapResult+ ';' ).bind( object ) )( this, renderer, scene );
+							script.source + '\nreturn ' + scriptWrapResult+ ';' ).bind( object ) )( this, renderer, scene, camera );
 
 					for ( var name in functions ) {
 
@@ -97,12 +97,6 @@ var APP = {
 			}
 
 			dispatch( events.init, arguments );
-
-		};
-
-		this.getCamera = function () {
-
-			return camera;
 
 		};
 
