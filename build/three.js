@@ -30096,6 +30096,13 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
+		// Save GL state
+
+		var currentScissorTest = _state.getScissorTest();
+
+		// save the existing viewport so it can be restored later
+		_renderer.getViewport( _vector4 );
+
 		// Set GL state for depth map.
 		_gl.clearColor( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
@@ -30103,9 +30110,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		_gl.frontFace( _gl.CCW );
 		_gl.cullFace( scope.cullFace === THREE.CullFaceFront ? _gl.FRONT : _gl.BACK );
 		_state.setDepthTest( true );
-
-		// save the existing viewport so it can be restored later
-		_renderer.getViewport( _vector4 );
+		_state.setScissorTest( false );
 
 		// render depth map
 
@@ -30296,6 +30301,12 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		_renderer.setClearColor( clearColor, clearAlpha );
 		_state.enable( _gl.BLEND );
 
+		if ( currentScissorTest === true ) {
+
+			_state.setScissorTest( true );
+
+		}
+
 		if ( scope.cullFace === THREE.CullFaceFront ) {
 
 			_gl.cullFace( _gl.BACK );
@@ -30428,6 +30439,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var currentPolygonOffsetFactor = null;
 	var currentPolygonOffsetUnits = null;
+
+	var currentScissorTest = null;
 
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 
@@ -30809,7 +30822,15 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
+	this.getScissorTest = function () {
+
+		return currentScissorTest;
+
+	};
+
 	this.setScissorTest = function ( scissorTest ) {
+
+		currentScissorTest = scissorTest;
 
 		if ( scissorTest ) {
 
