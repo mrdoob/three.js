@@ -2650,9 +2650,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.AmbientLight ) {
 
-				r += color.r;
-				g += color.g;
-				b += color.b;
+				r += color.r * intensity;
+				g += color.g * intensity;
+				b += color.b * intensity;
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
