@@ -9465,6 +9465,8 @@ THREE.InterleavedBuffer.prototype = {
 		this.stride = source.stride;
 		this.dynamic = source.dynamic;
 
+		return this;
+
 	},
 
 	copyAt: function ( index1, attribute, index2 ) {
@@ -9557,7 +9559,7 @@ THREE.InterleavedBufferAttribute.prototype = {
 
 	get count() {
 
-		return this.data.array.length / this.data.stride;
+		return this.data.count;
 
 	},
 
