@@ -25,7 +25,7 @@
 		<div>[example:webgl_animation_cloth animation / cloth ]</div>
 		<div>[example:webgl_animation_skinning_blending animation / skinning / blending ]</div>
 		
-<code>var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+<code>var light = new THREE.AmbientLight( 0x404040, 1.0 ); // soft white light
 scene.add( light );</code>
 
 		<h2>Constructor</h2>
@@ -37,6 +37,15 @@ scene.add( light );</code>
 		</div>
 		<div>
 		This creates an Ambientlight with a color.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Float intensity]</h3>
+		<div>
+			Light's intensity in terms of radiance, watts / ( sr * m^2 ).  Also referred to as luminance, cd / m^2.<br />
+			Default — *1.0*.
 		</div>
 
 		<h2>Methods</h2>
