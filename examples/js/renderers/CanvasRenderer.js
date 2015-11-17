@@ -116,7 +116,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	if ( _context.setLineDash === undefined ) {
 
-		_context.setLineDash = function () {}
+		_context.setLineDash = function () {};
 
 	}
 
@@ -821,7 +821,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			return {
 				canvas: undefined,
 				version: texture.version
-			}
+			};
 
 		}
 
@@ -832,7 +832,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			return {
 				canvas: undefined,
 				version: 0
-			}
+			};
 
 		}
 
@@ -866,7 +866,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		return {
 			canvas: _context.createPattern( canvas, repeat ),
 			version: texture.version
-		}
+		};
 
 	}
 

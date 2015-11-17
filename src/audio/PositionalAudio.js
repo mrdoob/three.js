@@ -20,7 +20,6 @@ THREE.PositionalAudio.prototype.getOutput = function () {
 
 };
 
-
 THREE.PositionalAudio.prototype.setRefDistance = function ( value ) {
 
 	this.panner.refDistance = value;
@@ -68,7 +67,6 @@ THREE.PositionalAudio.prototype.getMaxDistance = function () {
 	return this.panner.maxDistance;
 
 };
-
 
 THREE.PositionalAudio.prototype.updateMatrixWorld = ( function () {
 

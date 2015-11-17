@@ -226,7 +226,7 @@ THREE.Geometry.prototype = {
 		var tempUVs = [];
 		var tempUVs2 = [];
 
-		for ( var i = 0, j = 0; i < vertices.length; i += 3, j += 2) {
+		for ( var i = 0, j = 0; i < vertices.length; i += 3, j += 2 ) {
 
 			scope.vertices.push( new THREE.Vector3( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] ) );
 

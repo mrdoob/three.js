@@ -88,10 +88,14 @@ Menubar.File = function ( editor ) {
 		var output = geometry.toJSON();
 
 		try {
+
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
 		} catch ( e ) {
+
 			output = JSON.stringify( output );
+
 		}
 
 		exportString( output, 'geometry.json' );
@@ -118,10 +122,14 @@ Menubar.File = function ( editor ) {
 		var output = object.toJSON();
 
 		try {
+
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
 		} catch ( e ) {
+
 			output = JSON.stringify( output );
+
 		}
 
 		exportString( output, 'model.json' );
@@ -139,10 +147,14 @@ Menubar.File = function ( editor ) {
 		var output = editor.scene.toJSON();
 
 		try {
+
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
 		} catch ( e ) {
+
 			output = JSON.stringify( output );
+
 		}
 
 		exportString( output, 'scene.json' );
@@ -294,12 +306,12 @@ Menubar.File = function ( editor ) {
 		link.download = filename || 'data.json';
 		link.target = '_blank';
 
-		var event = document.createEvent("MouseEvents");
+		var event = document.createEvent( 'MouseEvents' );
 		event.initMouseEvent(
-			"click", true, false, window, 0, 0, 0, 0, 0
-			, false, false, false, false, 0, null
+			'click', true, false, window, 0, 0, 0, 0, 0,
+			false, false, false, false, 0, null
 		);
-		link.dispatchEvent(event);
+		link.dispatchEvent( event );
 
 	};
 
