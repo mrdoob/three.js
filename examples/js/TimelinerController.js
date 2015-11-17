@@ -100,8 +100,6 @@ THREE.TimelinerController.prototype = {
 			var nTimes = times.length + 1,
 				nValues = values.length + stride;
 
-			times[ index ] = time;
-
 			for ( var i = nTimes - 1; i !== index; -- i ) {
 
 				times[ i ] = times[ i - 1 ];
@@ -117,6 +115,7 @@ THREE.TimelinerController.prototype = {
 
 		}
 
+		times[ index ] = time;
 		this._propRefs[ channelName ].getValue( values, offset );
 
 	},
