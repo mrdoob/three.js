@@ -54,49 +54,66 @@ THREE.WebGLProgram = ( function () {
 
 			//console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
 
-			var matches = structRe.exec(name);
-			if( matches ) {
+			var matches = structRe.exec( name );
+			if ( matches ) {
 
-				var structName = matches[1];
-				var structProperty = matches[2];
+				var structName = matches[ 1 ];
+				var structProperty = matches[ 2 ];
 
 				var uniformsStruct = uniforms[ structName ];
-				if( ! uniformsStruct ) {
+
+				if ( ! uniformsStruct ) {
+
 					uniformsStruct = uniforms[ structName ] = {};
+
 				}
+
 				uniformsStruct[ structProperty ] = location;
 
 				continue;
+
 			}
 
-			matches = arrayStructRe.exec(name);
-			if( matches ) {
+			matches = arrayStructRe.exec( name );
 
-				var arrayName = matches[1];
-				var arrayIndex = matches[2];
-				var arrayProperty = matches[3];
+			if ( matches ) {
+
+				var arrayName = matches[ 1 ];
+				var arrayIndex = matches[ 2 ];
+				var arrayProperty = matches[ 3 ];
 
 				var uniformsArray = uniforms[ arrayName ];
-				if( ! uniformsArray ) {
+
+				if ( ! uniformsArray ) {
+
 					uniformsArray = uniforms[ arrayName ] = [];
+
 				}
+
 				var uniformsArrayIndex = uniformsArray[ arrayIndex ];
-				if( ! uniformsArrayIndex ) {
+
+				if ( ! uniformsArrayIndex ) {
+
 					uniformsArrayIndex = uniformsArray[ arrayIndex ] = {};
+
 				}
+
 				uniformsArrayIndex[ arrayProperty ] = location;
 
 				continue;
+
 			}
 
-			matches = arrayRe.exec(name)
-			if( matches ) {
+			matches = arrayRe.exec( name );
 
-				var arrayName = matches[1];
+			if ( matches ) {
+
+				var arrayName = matches[ 1 ];
 
 				uniforms[ arrayName ] = location;
 
 				continue;
+
 			}
 
 			uniforms[ name ] = location;

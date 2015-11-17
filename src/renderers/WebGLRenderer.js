@@ -2337,9 +2337,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 				case 'sa':
 
 					// TODO: Optimize this.
-					for( var i = 0; i < value.length; i ++ ) {
+					for ( var i = 0; i < value.length; i ++ ) {
 
-						for( var propertyName in uniform.properties ) {
+						for ( var propertyName in uniform.properties ) {
 
 							var property = uniform.properties[ propertyName ];
 							var locationProperty =  location[ i ][ propertyName ];
@@ -2672,7 +2672,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else {
 
-					uniforms.shadow = -1;
+					uniforms.shadow = - 1;
 
 				}
 
@@ -2698,7 +2698,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else {
 
-					uniforms.shadow = -1;
+					uniforms.shadow = - 1;
 
 				}
 
@@ -2731,7 +2731,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else {
 
-					uniforms.shadow = -1;
+					uniforms.shadow = - 1;
 
 				}
 
