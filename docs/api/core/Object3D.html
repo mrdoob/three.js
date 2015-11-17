@@ -143,7 +143,7 @@
 
 		<h3>[property:Matrix4 matrixWorld]</h3>
 		<div>
-		The global transform of the object. If the Object3d has no parent, then it's identical to the local transform.
+		The global transform of the object. If the Object3d has no parent, then it's identical to the local transform.  World transforms are assumed to be specified in meters.
 		</div>
 
 
@@ -188,7 +188,7 @@
 		vector - A local vector.<br />
 		</div>
 		<div>
-		Updates the vector from local space to world space.
+		Updates the vector from local space to world space.  World space distances are assumed to be specified in meters.
 		</div>
 
 		<h3>[method:Vector3 worldToLocal]( [page:Vector3 vector] )</h3>
@@ -196,7 +196,7 @@
 		vector - A world vector.<br />
 		</div>
 		<div>
-		Updates the vector from world space to local space.
+		Updates the vector from world space to local space.  World space distances are assumed to be specified in meters.
 		</div>
 
 		<h3>[method:null lookAt]( [page:Vector3 vector] )</h3>
