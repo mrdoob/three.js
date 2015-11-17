@@ -24,7 +24,7 @@ UI.Element.prototype = {
 
 			} else {
 
-				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' )
+				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' );
 
 			}
 
@@ -46,7 +46,7 @@ UI.Element.prototype = {
 
 			} else {
 
-				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' )
+				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' );
 
 			}
 
@@ -198,7 +198,9 @@ UI.CollapsiblePanel = function () {
 	this.static = new UI.Panel();
 	this.static.setClass( 'Static' );
 	this.static.onClick( function () {
+
 		scope.toggle();
+
 	} );
 	this.dom.appendChild( this.static.dom );
 
@@ -263,7 +265,7 @@ UI.CollapsiblePanel.prototype.clear = function () {
 
 UI.CollapsiblePanel.prototype.toggle = function() {
 
-	this.setCollapsed( !this.isCollapsed );
+	this.setCollapsed( ! this.isCollapsed );
 
 };
 
@@ -616,7 +618,7 @@ UI.Color.prototype.setValue = function ( value ) {
 
 UI.Color.prototype.setHexValue = function ( hex ) {
 
-	this.dom.value = '#' + ( '000000' + hex.toString( 16 ) ).slice( -6 );
+	this.dom.value = '#' + ( '000000' + hex.toString( 16 ) ).slice( - 6 );
 
 	return this;
 
