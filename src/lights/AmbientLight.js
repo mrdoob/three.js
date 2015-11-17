@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AmbientLight = function ( color ) {
+THREE.AmbientLight = function ( color, intensity ) {
 
 	THREE.Light.call( this, color );
 
