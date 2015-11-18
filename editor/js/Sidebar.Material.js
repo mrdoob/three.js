@@ -842,7 +842,7 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			refreshUi(false);
+			refreshUI( false );
 
 			signals.materialChanged.dispatch( material );
 
@@ -854,7 +854,7 @@ Sidebar.Material = function ( editor ) {
 
 		}
 
-	};
+	}
 
 	//
 
@@ -899,12 +899,12 @@ Sidebar.Material = function ( editor ) {
 
 		}
 
-	};
+	}
 
 
-	function refreshUi( resetTextureSelectors ) {
+	function refreshUI( resetTextureSelectors ) {
 
-		if ( !currentObject ) return;
+		if ( ! currentObject ) return;
 
 		var material = currentObject.material;
 
@@ -1171,7 +1171,7 @@ Sidebar.Material = function ( editor ) {
 			var objectChanged = object !== currentObject;
 
 			currentObject = object;
-			refreshUi(objectChanged);
+			refreshUI( objectChanged );
 			container.setDisplay( '' );
 
 		} else {
@@ -1183,7 +1183,12 @@ Sidebar.Material = function ( editor ) {
 
 	} );
 
-	signals.materialChanged.add( function () { refreshUi() } );
+	signals.materialChanged.add( function () {
+
+		refreshUI();
+
+	} );
+
 	return container;
 
-}
+};
