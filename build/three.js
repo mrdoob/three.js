@@ -4535,7 +4535,7 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	getInverse: function ( matrix, throwOnInvertible ) {
+	getInverse: function ( matrix, throwOnDegenerate ) {
 
 		// input: THREE.Matrix4
 		// ( based on http://code.google.com/p/webgl-mjs/ )
@@ -4561,7 +4561,7 @@ THREE.Matrix3.prototype = {
 
 			var msg = "THREE.Matrix3.getInverse(): can't invert matrix, determinant is 0";
 
-			if ( throwOnInvertible || false ) {
+			if ( throwOnDegenerate || false ) {
 
 				throw new Error( msg );
 
@@ -9887,7 +9887,7 @@ THREE.Geometry.prototype = {
 		var tempUVs = [];
 		var tempUVs2 = [];
 
-		for ( var i = 0, j = 0, k = 0; i < vertices.length; i += 3, j += 2, k += 4 ) {
+		for ( var i = 0, j = 0; i < vertices.length; i += 3, j += 2 ) {
 
 			scope.vertices.push( new THREE.Vector3( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] ) );
 
@@ -11588,16 +11588,16 @@ THREE.BufferGeometry.prototype = {
 
 		if ( geometry.uvsNeedUpdate ) {
 
-				var attribute = this.attributes.uv;
+			var attribute = this.attributes.uv;
 
-				if ( attribute !== undefined ) {
+			if ( attribute !== undefined ) {
 
-						attribute.copyVector2sArray( geometry.uvs );
-						attribute.needsUpdate = true;
+				attribute.copyVector2sArray( geometry.uvs );
+				attribute.needsUpdate = true;
 
-				}
+			}
 
-				geometry.uvsNeedUpdate = false;
+			geometry.uvsNeedUpdate = false;
 
 		}
 
@@ -11862,11 +11862,11 @@ THREE.BufferGeometry.prototype = {
 
 				// reset existing normals to zero
 
-				var normals = attributes.normal.array;
+				var array = attributes.normal.array;
 
-				for ( var i = 0, il = normals.length; i < il; i ++ ) {
+				for ( var i = 0, il = array.length; i < il; i ++ ) {
 
-					normals[ i ] = 0;
+					array[ i ] = 0;
 
 				}
 
@@ -11978,7 +11978,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeOffsets: function ( size ) {
 
-		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.');
+		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.' );
 
 	},
 
@@ -16185,11 +16185,13 @@ THREE.Audio.prototype.setBuffer = function ( audioBuffer ) {
 
 	var scope = this;
 
-	audioBuffer.onReady(function(buffer) {
+	audioBuffer.onReady( function( buffer ) {
+
 		scope.source.buffer = buffer;
 		scope.sourceType = 'buffer';
 		if ( scope.autoplay ) scope.play();
-	});
+
+	} );
 
 	return this;
 
@@ -16439,7 +16441,7 @@ THREE.AudioBuffer.prototype.load = function ( file ) {
 
 			for ( var i = 0; i < scope.readyCallbacks.length; i ++ ) {
 
-				scope.readyCallbacks[i](scope.buffer);
+				scope.readyCallbacks[ i ]( scope.buffer );
 
 			}
 
@@ -16492,7 +16494,6 @@ THREE.PositionalAudio.prototype.getOutput = function () {
 
 };
 
-
 THREE.PositionalAudio.prototype.setRefDistance = function ( value ) {
 
 	this.panner.refDistance = value;
@@ -16540,7 +16541,6 @@ THREE.PositionalAudio.prototype.getMaxDistance = function () {
 	return this.panner.maxDistance;
 
 };
-
 
 THREE.PositionalAudio.prototype.updateMatrixWorld = ( function () {
 
@@ -16599,7 +16599,7 @@ THREE.AudioListener.prototype.removeFilter = function ( ) {
 
 	}
 
-}
+};
 
 THREE.AudioListener.prototype.setFilter = function ( value ) {
 
@@ -16864,20 +16864,20 @@ THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 };
 
 THREE.OrthographicCamera.prototype.copy = function ( source ) {
-	
+
 	THREE.Camera.prototype.copy.call( this, source );
-	
+
 	this.left = source.left;
 	this.right = source.right;
 	this.top = source.top;
 	this.bottom = source.bottom;
 	this.near = source.near;
 	this.far = source.far;
-	
+
 	this.zoom = source.zoom;
-	
+
 	return this;
-		
+
 };
 
 THREE.OrthographicCamera.prototype.toJSON = function ( meta ) {
@@ -17023,18 +17023,18 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 };
 
 THREE.PerspectiveCamera.prototype.copy = function ( source ) {
-	
+
 	THREE.Camera.prototype.copy.call( this, source );
-	
+
 	this.fov = source.fov;
 	this.aspect = source.aspect;
 	this.near = source.near;
 	this.far = source.far;
-	
+
 	this.zoom = source.zoom;
-	
+
 	return this;
-		
+
 };
 
 THREE.PerspectiveCamera.prototype.toJSON = function ( meta ) {
@@ -26630,6 +26630,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			uvScaleMap = material.bumpMap;
 
+		} else if ( material.roughnessMap ) {
+
+			uvScaleMap = material.roughnessMap;
+
+		} else if ( material.metalnessMap ) {
+
+			uvScaleMap = material.metalnessMap;
+
 		} else if ( material.alphaMap ) {
 
 			uvScaleMap = material.alphaMap;
@@ -26642,7 +26650,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( uvScaleMap !== undefined ) {
 
-			if ( uvScaleMap instanceof THREE.WebGLRenderTarget ) uvScaleMap = uvScaleMap.texture;
+			if ( uvScaleMap instanceof THREE.WebGLRenderTarget ) {
+
+				uvScaleMap = uvScaleMap.texture;
+
+			}
+
 			var offset = uvScaleMap.offset;
 			var repeat = uvScaleMap.repeat;
 
@@ -27050,9 +27063,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 				case 'sa':
 
 					// TODO: Optimize this.
-					for( var i = 0; i < value.length; i ++ ) {
+					for ( var i = 0; i < value.length; i ++ ) {
 
-						for( var propertyName in uniform.properties ) {
+						for ( var propertyName in uniform.properties ) {
 
 							var property = uniform.properties[ propertyName ];
 							var locationProperty =  location[ i ][ propertyName ];
@@ -27385,7 +27398,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else {
 
-					uniforms.shadow = -1;
+					uniforms.shadow = - 1;
 
 				}
 
@@ -27411,7 +27424,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else {
 
-					uniforms.shadow = -1;
+					uniforms.shadow = - 1;
 
 				}
 
@@ -27444,7 +27457,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else {
 
-					uniforms.shadow = -1;
+					uniforms.shadow = - 1;
 
 				}
 
@@ -29141,49 +29154,66 @@ THREE.WebGLProgram = ( function () {
 
 			//console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
 
-			var matches = structRe.exec(name);
-			if( matches ) {
+			var matches = structRe.exec( name );
+			if ( matches ) {
 
-				var structName = matches[1];
-				var structProperty = matches[2];
+				var structName = matches[ 1 ];
+				var structProperty = matches[ 2 ];
 
 				var uniformsStruct = uniforms[ structName ];
-				if( ! uniformsStruct ) {
+
+				if ( ! uniformsStruct ) {
+
 					uniformsStruct = uniforms[ structName ] = {};
+
 				}
+
 				uniformsStruct[ structProperty ] = location;
 
 				continue;
+
 			}
 
-			matches = arrayStructRe.exec(name);
-			if( matches ) {
+			matches = arrayStructRe.exec( name );
 
-				var arrayName = matches[1];
-				var arrayIndex = matches[2];
-				var arrayProperty = matches[3];
+			if ( matches ) {
+
+				var arrayName = matches[ 1 ];
+				var arrayIndex = matches[ 2 ];
+				var arrayProperty = matches[ 3 ];
 
 				var uniformsArray = uniforms[ arrayName ];
-				if( ! uniformsArray ) {
+
+				if ( ! uniformsArray ) {
+
 					uniformsArray = uniforms[ arrayName ] = [];
+
 				}
+
 				var uniformsArrayIndex = uniformsArray[ arrayIndex ];
-				if( ! uniformsArrayIndex ) {
+
+				if ( ! uniformsArrayIndex ) {
+
 					uniformsArrayIndex = uniformsArray[ arrayIndex ] = {};
+
 				}
+
 				uniformsArrayIndex[ arrayProperty ] = location;
 
 				continue;
+
 			}
 
-			matches = arrayRe.exec(name)
-			if( matches ) {
+			matches = arrayRe.exec( name );
 
-				var arrayName = matches[1];
+			if ( matches ) {
+
+				var arrayName = matches[ 1 ];
 
 				uniforms[ arrayName ] = location;
 
 				continue;
+
 			}
 
 			uniforms[ name ] = location;
