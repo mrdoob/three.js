@@ -159,6 +159,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 				vec4 envMapColor = textureCube( envMap, queryVec, float( maxMIPLevel ) );
 
 			#endif
+
 		#else
 
 			vec3 envMapColor = vec3( 0.0 );
@@ -209,13 +210,18 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		reflectVec = inverseTransformDirection( reflectVec, viewMatrix );
 
+		#ifdef TEXTURE_CUBE_LOD_EXT
+
+			float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );
+
+		#endif
+
 		#ifdef ENVMAP_TYPE_CUBE
 
 			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
 
-			#if defined( TEXTURE_CUBE_LOD_EXT )
+			#ifdef TEXTURE_CUBE_LOD_EXT
 
-				float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );
 				vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );
 
 			#else
@@ -224,18 +230,35 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 			#endif
 
-
 		#elif defined( ENVMAP_TYPE_EQUIREC )
 
 			vec2 sampleUV;
 			sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );
 			sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;
-			vec4 envMapColor = texture2D( envMap, sampleUV );
+
+			#ifdef TEXTURE_CUBE_LOD_EXT
+
+				vec4 envMapColor = texture2DLodEXT( envMap, sampleUV, specularMIPLevel );
+
+			#else
+
+				vec4 envMapColor = texture2D( envMap, sampleUV );
+
+			#endif
 
 		#elif defined( ENVMAP_TYPE_SPHERE )
 
 			vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));
-			vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
+
+			#ifdef TEXTURE_CUBE_LOD_EXT
+
+				vec4 envMapColor = texture2DLodEXT( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );
+
+			#else
+
+				vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
+
+			#endif
 
 		#endif
 
