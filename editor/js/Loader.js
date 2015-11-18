@@ -393,7 +393,7 @@ var Loader = function ( editor ) {
 
 		}
 
-	}
+	};
 
 	function handleJSON( data, file, filename ) {
 
@@ -511,7 +511,11 @@ var Loader = function ( editor ) {
 
 			case 'app':
 
-				editor.fromJSON( data );
+				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
+
+					editor.fromJSON( data );
+
+				}
 
 				break;
 
