@@ -511,11 +511,7 @@ var Loader = function ( editor ) {
 
 			case 'app':
 
-				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
-
-					editor.fromJSON( data );
-
-				}
+				editor.fromJSON( data );
 
 				break;
 
