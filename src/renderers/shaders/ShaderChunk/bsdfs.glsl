@@ -24,7 +24,7 @@ vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {
 	//;float fresnel = pow( 1.0 - dotLH, 5.0 );
 
 	// Optimized variant (presented by Epic at SIGGRAPH '13)
-	float fresnel = exp2( ( -5.55437 * dotLH - 6.98316 ) * dotLH );
+	float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );
 
 	return ( 1.0 - specularColor ) * fresnel + specularColor;
 
