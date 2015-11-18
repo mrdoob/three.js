@@ -66,7 +66,7 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
 	this.roughness = 0.5;
-	this.metalness = 0;
+	this.metalness = 0.5;
 
 	this.emissive = new THREE.Color( 0x000000 );
 
