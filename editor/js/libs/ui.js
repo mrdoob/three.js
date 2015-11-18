@@ -110,7 +110,7 @@ UI.Element.prototype = {
 
 	}
 
-}
+};
 
 // properties
 
@@ -663,7 +663,7 @@ UI.Number = function ( number ) {
 	var pointer = [ 0, 0 ];
 	var prevPointer = [ 0, 0 ];
 
-	var onMouseDown = function ( event ) {
+	function onMouseDown( event ) {
 
 		event.preventDefault();
 
@@ -676,9 +676,9 @@ UI.Number = function ( number ) {
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
 
-	};
+	}
 
-	var onMouseMove = function ( event ) {
+	function onMouseMove( event ) {
 
 		var currentValue = dom.value;
 
@@ -694,9 +694,9 @@ UI.Number = function ( number ) {
 
 		prevPointer = [ event.clientX, event.clientY ];
 
-	};
+	}
 
-	var onMouseUp = function ( event ) {
+	function onMouseUp( event ) {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
@@ -708,9 +708,9 @@ UI.Number = function ( number ) {
 
 		}
 
-	};
+	}
 
-	var onChange = function ( event ) {
+	function onChange( event ) {
 
 		var value = 0;
 
@@ -726,23 +726,23 @@ UI.Number = function ( number ) {
 
 		dom.value = parseFloat( value );
 
-	};
+	}
 
-	var onFocus = function ( event ) {
+	function onFocus( event ) {
 
 		dom.style.backgroundColor = '';
 		dom.style.borderColor = '#ccc';
 		dom.style.cursor = '';
 
-	};
+	}
 
-	var onBlur = function ( event ) {
+	function onBlur( event ) {
 
 		dom.style.backgroundColor = 'transparent';
 		dom.style.borderColor = 'transparent';
 		dom.style.cursor = 'col-resize';
 
-	};
+	}
 
 	dom.addEventListener( 'mousedown', onMouseDown, false );
 	dom.addEventListener( 'change', onChange, false );
@@ -827,7 +827,7 @@ UI.Integer = function ( number ) {
 	var pointer = [ 0, 0 ];
 	var prevPointer = [ 0, 0 ];
 
-	var onMouseDown = function ( event ) {
+	function onMouseDown( event ) {
 
 		event.preventDefault();
 
@@ -840,9 +840,9 @@ UI.Integer = function ( number ) {
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
 
-	};
+	}
 
-	var onMouseMove = function ( event ) {
+	function onMouseMove( event ) {
 
 		var currentValue = dom.value;
 
@@ -858,9 +858,9 @@ UI.Integer = function ( number ) {
 
 		prevPointer = [ event.clientX, event.clientY ];
 
-	};
+	}
 
-	var onMouseUp = function ( event ) {
+	function onMouseUp( event ) {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
@@ -872,9 +872,9 @@ UI.Integer = function ( number ) {
 
 		}
 
-	};
+	}
 
-	var onChange = function ( event ) {
+	function onChange( event ) {
 
 		var value = 0;
 
@@ -890,23 +890,23 @@ UI.Integer = function ( number ) {
 
 		dom.value = parseInt( value );
 
-	};
+	}
 
-	var onFocus = function ( event ) {
+	function onFocus( event ) {
 
 		dom.style.backgroundColor = '';
 		dom.style.borderColor = '#ccc';
 		dom.style.cursor = '';
 
-	};
+	}
 
-	var onBlur = function ( event ) {
+	function onBlur( event ) {
 
 		dom.style.backgroundColor = 'transparent';
 		dom.style.borderColor = 'transparent';
 		dom.style.cursor = 'col-resize';
 
-	};
+	}
 
 	dom.addEventListener( 'mousedown', onMouseDown, false );
 	dom.addEventListener( 'change', onChange, false );
