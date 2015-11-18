@@ -131,7 +131,7 @@ Sidebar.Material = function ( editor ) {
 	// metalness
 
 	var materialMetalnessRow = new UI.Panel();
-	var materialMetalness = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+	var materialMetalness = new UI.Number( 0.5 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
 
 	materialMetalnessRow.add( new UI.Text( 'Metalness' ).setWidth( '90px' ) );
 	materialMetalnessRow.add( materialMetalness );
