@@ -94,7 +94,7 @@ if ( self.performance.now === undefined ) {
 
 if ( Number.EPSILON === undefined ) {
 
-	Number.EPSILON = Math.pow( 2, -52 );
+	Number.EPSILON = Math.pow( 2, - 52 );
 
 }
 
@@ -138,7 +138,7 @@ if ( Object.assign === undefined ) {
 		writable: true,
 		configurable: true,
 
-		value: function(target) {
+		value: function ( target ) {
 
 			'use strict';
 
@@ -180,6 +180,7 @@ if ( Object.assign === undefined ) {
 		}
 
 	} );
+
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
