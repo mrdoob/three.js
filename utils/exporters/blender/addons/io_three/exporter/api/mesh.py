@@ -620,29 +620,31 @@ def normals(mesh):
 
 
 @_mesh
-def skin_weights(mesh, bone_map, influences):
+def skin_weights(mesh, bone_map, influences, anim_type):
     """
 
     :param mesh:
     :param bone_map:
     :param influences:
+    :param anim_type
 
     """
     logger.debug("mesh.skin_weights(%s)", mesh)
-    return _skinning_data(mesh, bone_map, influences, 1)
+    return _skinning_data(mesh, bone_map, influences, anim_type, 1)
 
 
 @_mesh
-def skin_indices(mesh, bone_map, influences):
+def skin_indices(mesh, bone_map, influences, anim_type):
     """
 
     :param mesh:
     :param bone_map:
     :param influences:
+    :param anim_type
 
     """
     logger.debug("mesh.skin_indices(%s)", mesh)
-    return _skinning_data(mesh, bone_map, influences, 0)
+    return _skinning_data(mesh, bone_map, influences, anim_type,  0)
 
 
 @_mesh
@@ -958,19 +960,27 @@ def _armature(mesh):
     return armature
 
 
-def _skinning_data(mesh, bone_map, influences, array_index):
+def _skinning_data(mesh, bone_map, influences, anim_type, array_index):
     """
 
     :param mesh:
     :param bone_map:
     :param influences:
     :param array_index:
+    :param anim_type
 
     """
     armature = _armature(mesh)
     manifest = []
     if not armature:
         return manifest
+
+    # armature bones here based on type
+    if anim_type == constants.OFF or anim_type == constants.REST:
+        armature_bones = armature.data.bones
+    else:
+        # POSE mode
+        armature_bones = armature.pose.bones
 
     obj = object_.objects_using_mesh(mesh)[0]
     logger.debug("Skinned object found %s", obj.name)
@@ -987,7 +997,7 @@ def _skinning_data(mesh, bone_map, influences, array_index):
                 manifest.append(0)
                 continue
             name = obj.vertex_groups[bone_array[index][0]].name
-            for bone_index, bone in enumerate(armature.pose.bones):
+            for bone_index, bone in enumerate(armature_bones):
                 if bone.name != name:
                     continue
                 if array_index is 0:
