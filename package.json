@@ -31,7 +31,6 @@
   "devDependencies": {
     "argparse": "^1.0.3",
     "jscs": "^1.13.1",
-    "lodash": "^3.10.0",
     "uglify-js": "^2.6.0"
   }
 }
