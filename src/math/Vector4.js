@@ -30,6 +30,17 @@ THREE.Vector4.prototype = {
 
 	},
 
+	setScalar: function ( scalar ) {
+
+		this.x = scalar;
+		this.y = scalar;
+		this.z = scalar;
+		this.w = scalar;
+
+		return this;
+
+	},
+
 	setX: function ( x ) {
 
 		this.x = x;
