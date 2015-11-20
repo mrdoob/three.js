@@ -241,6 +241,7 @@ class ThreeJsWriter(object):
             "vertexColors": False
         }
         if isinstance(mat, nodetypes.Phong):
+            result["reflectivity"] = mat.getReflectivity()
             result["colorSpecular"] = mat.getSpecularColor().rgb
             result["specularCoef"] = mat.getCosPower()
             if self.options["specularMaps"]:
