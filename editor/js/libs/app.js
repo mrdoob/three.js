@@ -48,7 +48,7 @@ var APP = {
 				update: []
 			};
 
-			var scriptWrapParams = 'player,renderer,scene';
+			var scriptWrapParams = 'player,renderer,scene,camera';
 			var scriptWrapResultObj = {};
 			for ( var eventKey in events ) {
 				scriptWrapParams += ',' + eventKey;
@@ -61,6 +61,13 @@ var APP = {
 
 				var object = scene.getObjectByProperty( 'uuid', uuid, true );
 
+				if ( object === undefined ) {
+
+					console.warn( 'APP.Player: Script without object.', uuid );
+					continue;
+
+				}
+
 				var scripts = json.scripts[ uuid ];
 
 				for ( var i = 0; i < scripts.length; i ++ ) {
@@ -68,7 +75,7 @@ var APP = {
 					var script = scripts[ i ];
 
 					var functions = ( new Function( scriptWrapParams,
-							script.source + '\nreturn ' + scriptWrapResult+ ';' ).bind( object ) )( this, renderer, scene );
+							script.source + '\nreturn ' + scriptWrapResult+ ';' ).bind( object ) )( this, renderer, scene, camera );
 
 					for ( var name in functions ) {
 
@@ -76,7 +83,7 @@ var APP = {
 
 						if ( events[ name ] === undefined ) {
 
-							console.warn( 'APP.Player: event type not supported (', name, ')' );
+							console.warn( 'APP.Player: Event type not supported (', name, ')' );
 							continue;
 
 						}

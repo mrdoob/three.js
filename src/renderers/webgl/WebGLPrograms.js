@@ -8,7 +8,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		MeshBasicMaterial: 'basic',
 		MeshLambertMaterial: 'lambert',
 		MeshPhongMaterial: 'phong',
-		MeshPhysicalMaterial: 'physical',
+		MeshStandardMaterial: 'standard',
 		LineBasicMaterial: 'basic',
 		LineDashedMaterial: 'dashed',
 		PointsMaterial: 'points'
@@ -17,14 +17,15 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 	var parameterNames = [
 		"precision", "supportsVertexTextures", "map", "envMap", "envMapMode",
 		"lightMap", "aoMap", "emissiveMap", "bumpMap", "normalMap", "displacementMap", "specularMap",
-		"roughnessMap", "reflectivityMap", "metalnessMap",
+		"roughnessMap", "metalnessMap",
 		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
-		"maxMorphTargets", "maxMorphNormals", "maxDirLights", "maxPointLights",
-		"maxSpotLights", "maxHemiLights", "maxShadows", "shadowMapEnabled", "pointLightShadows",
-		"shadowMapType", "shadowMapDebug", "alphaTest", "doubleSided",
-		"flipSided"
+		"maxMorphTargets", "maxMorphNormals",
+		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
+		"numShadows", "shadowMapEnabled", "pointLightShadows",
+		"shadowMapType", "shadowMapDebug",
+		"alphaTest", "doubleSided", "flipSided"
 	];
 
 
@@ -81,7 +82,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			if ( precision !== material.precision ) {
 
-				console.warn( 'THREE.WebGLRenderer.initMaterial:', material.precision, 'not supported, using', precision, 'instead.' );
+				console.warn( 'THREE.WebGLProgram.getParameters:', material.precision, 'not supported, using', precision, 'instead.' );
 
 			}
 
@@ -104,7 +105,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			normalMap: !! material.normalMap,
 			displacementMap: !! material.displacementMap,
 			roughnessMap: !! material.roughnessMap,
-			reflectivityMap: !! material.reflectivityMap,
 			metalnessMap: !! material.metalnessMap,
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
@@ -131,15 +131,15 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			maxMorphTargets: renderer.maxMorphTargets,
 			maxMorphNormals: renderer.maxMorphNormals,
 
-			maxDirLights: lights.directional.length,
-			maxPointLights: lights.point.length,
-			maxSpotLights: lights.spot.length,
-			maxHemiLights: lights.hemi.length,
+			numDirLights: lights.directional.length,
+			numPointLights: lights.point.length,
+			numSpotLights: lights.spot.length,
+			numHemiLights: lights.hemi.length,
 
-			maxShadows: lights.shadows,
+			numShadows: lights.shadows.length,
 			pointLightShadows: lights.shadowsPointLight,
 
-			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows > 0,
+			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
 			shadowMapDebug: renderer.shadowMap.debug,
 

@@ -3775,6 +3775,13 @@ THREE.ColladaLoader = function () {
 		props[ 'shading' ] = preferredShading;
 		props[ 'side' ] = this.effect.doubleSided ? THREE.DoubleSide : THREE.FrontSide;
 
+		if ( props.diffuse !== undefined ) {
+
+			props.color = props.diffuse;
+			delete props.diffuse;
+
+		}
+
 		switch ( this.type ) {
 
 			case 'constant':
@@ -3786,14 +3793,12 @@ THREE.ColladaLoader = function () {
 			case 'phong':
 			case 'blinn':
 
-				if (props.diffuse != undefined) props.color = props.diffuse;
 				this.material = new THREE.MeshPhongMaterial( props );
 				break;
 
 			case 'lambert':
 			default:
 
-				if (props.diffuse != undefined) props.color = props.diffuse;
 				this.material = new THREE.MeshLambertMaterial( props );
 				break;
 

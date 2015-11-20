@@ -436,16 +436,16 @@ THREE.BufferGeometry.prototype = {
 
 		if ( geometry.uvsNeedUpdate ) {
 
-				var attribute = this.attributes.uv;
+			var attribute = this.attributes.uv;
 
-				if ( attribute !== undefined ) {
+			if ( attribute !== undefined ) {
 
-						attribute.copyVector2sArray( geometry.uvs );
-						attribute.needsUpdate = true;
+				attribute.copyVector2sArray( geometry.uvs );
+				attribute.needsUpdate = true;
 
-				}
+			}
 
-				geometry.uvsNeedUpdate = false;
+			geometry.uvsNeedUpdate = false;
 
 		}
 
@@ -710,11 +710,11 @@ THREE.BufferGeometry.prototype = {
 
 				// reset existing normals to zero
 
-				var normals = attributes.normal.array;
+				var array = attributes.normal.array;
 
-				for ( var i = 0, il = normals.length; i < il; i ++ ) {
+				for ( var i = 0, il = array.length; i < il; i ++ ) {
 
-					normals[ i ] = 0;
+					array[ i ] = 0;
 
 				}
 
@@ -826,7 +826,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeOffsets: function ( size ) {
 
-		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.');
+		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.' );
 
 	},
 
@@ -975,6 +975,7 @@ THREE.BufferGeometry.prototype = {
 
 	clone: function () {
 
+		/*
 		// Handle primitives
 
 		var parameters = this.parameters;
@@ -996,6 +997,9 @@ THREE.BufferGeometry.prototype = {
 		}
 
 		return new this.constructor().copy( this );
+		*/
+
+		return new THREE.BufferGeometry().copy( this );
 
 	},
 

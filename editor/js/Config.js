@@ -70,6 +70,6 @@ var Config = function () {
 
 		}
 
-	}
+	};
 
 };

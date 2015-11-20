@@ -8,11 +8,11 @@ var THREE = { REVISION: '74dev' };
 
 if ( typeof define === 'function' && define.amd ) {
 
-		define( 'three', THREE );
+	define( 'three', THREE );
 
 } else if ( 'undefined' !== typeof exports && 'undefined' !== typeof module ) {
 
-		module.exports = THREE;
+	module.exports = THREE;
 
 }
 
@@ -94,7 +94,7 @@ if ( self.performance.now === undefined ) {
 
 if ( Number.EPSILON === undefined ) {
 
-	Number.EPSILON = Math.pow( 2, -52 );
+	Number.EPSILON = Math.pow( 2, - 52 );
 
 }
 
@@ -138,7 +138,7 @@ if ( Object.assign === undefined ) {
 		writable: true,
 		configurable: true,
 
-		value: function(target) {
+		value: function ( target ) {
 
 			'use strict';
 
@@ -180,6 +180,7 @@ if ( Object.assign === undefined ) {
 		}
 
 	} );
+
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
@@ -368,3 +369,9 @@ THREE.InterpolateSmooth = 2302;
 THREE.ZeroCurvatureEnding = 2400;
 THREE.ZeroSlopeEnding = 2401;
 THREE.WrapAroundEnding = 2402;
+
+// Triangle Draw modes
+
+THREE.TrianglesDrawMode = 0;
+THREE.TriangleStripDrawMode = 1;
+THREE.TriangleFanDrawMode = 2;

@@ -24,20 +24,20 @@ void BlinnPhongMaterial_RE_DirectLight( const in IncidentLight directLight, cons
 
 	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
 
-	reflectedLight.directDiffuse += dotNL * directLight.color * BRDF_Diffuse_Lambert( material.diffuseColor );
+	vec3 irradiance = dotNL * PI * directLight.color; // punctual light
 
-	reflectedLight.directSpecular += dotNL * directLight.color * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;
+	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
+	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;
+
+}
+
+void BlinnPhongMaterial_RE_IndirectDiffuseLight( const in vec3 irradiance, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
+
+	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
 
 }
 
 #define Material_RE_DirectLight    BlinnPhongMaterial_RE_DirectLight
-
-void BlinnPhongMaterial_RE_IndirectDiffuseLight( const in vec3 indirectDiffuseColor, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
-
-	reflectedLight.indirectDiffuse += indirectDiffuseColor * BRDF_Diffuse_Lambert( material.diffuseColor );
-
-}
-
 #define Material_RE_IndirectDiffuseLight    BlinnPhongMaterial_RE_IndirectDiffuseLight
 
 #define Material_LightProbeLOD( material )   (0)

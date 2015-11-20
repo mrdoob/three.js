@@ -1402,7 +1402,7 @@ THREE.SEA3D.prototype.readSoundPoint = function( sea ) {
 
 	}
 
-	var sound3d = new THREE.Audio( this.audioListener );
+	var sound3d = new THREE.PositionalAudio( this.audioListener );
 
 	sound3d.load( sea.sound.tag );
 	sound3d.autoplay = sea.autoPlay;

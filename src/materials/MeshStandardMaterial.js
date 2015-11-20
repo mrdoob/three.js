@@ -4,7 +4,6 @@
  * parameters = {
  *  color: <hex>,
  *  roughness: <float>,
- *  reflectivity: <float>,
  *  metalness: <float>,
 
  *  emissive: <hex>,
@@ -32,13 +31,13 @@
  *
  *  roughnessMap: new THREE.Texture( <Image> ),
  *
- *  reflectivityMap: new THREE.Texture( <Image> ),
- *
  *  metalnessMap: new THREE.Texture( <Image> ),
  *
  *  alphaMap: new THREE.Texture( <Image> ),
  *
  *  envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
+ *  envMapIntensity: <float>
+ *
  *  refractionRatio: <float>,
  *
  *  shading: THREE.SmoothShading,
@@ -59,16 +58,15 @@
  * }
  */
 
-THREE.MeshPhysicalMaterial = function ( parameters ) {
+THREE.MeshStandardMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
-	this.type = 'MeshPhysicalMaterial';
+	this.type = 'MeshStandardMaterial';
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
 	this.roughness = 0.5;
-	this.reflectivity = 1;
-	this.metalness = 0;
+	this.metalness = 0.5;
 
 	this.emissive = new THREE.Color( 0x000000 );
 
@@ -93,8 +91,6 @@ THREE.MeshPhysicalMaterial = function ( parameters ) {
 	this.displacementBias = 0;
 
 	this.roughnessMap = null;
-
-	this.reflectivityMap = null;
 
 	this.metalnessMap = null;
 
@@ -124,16 +120,15 @@ THREE.MeshPhysicalMaterial = function ( parameters ) {
 
 };
 
-THREE.MeshPhysicalMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshPhysicalMaterial.prototype.constructor = THREE.MeshPhysicalMaterial;
+THREE.MeshStandardMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.MeshStandardMaterial.prototype.constructor = THREE.MeshStandardMaterial;
 
-THREE.MeshPhysicalMaterial.prototype.copy = function ( source ) {
+THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 
 	THREE.Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 	this.roughness = source.roughness;
-	this.reflectivity = source.reflectivity;
 	this.metalness = source.metalness;
 
 	this.emissive.copy( source.emissive );
@@ -159,8 +154,6 @@ THREE.MeshPhysicalMaterial.prototype.copy = function ( source ) {
 	this.displacementBias = source.displacementBias;
 
 	this.roughnessMap = source.roughnessMap;
-
-	this.reflectivityMap = source.reflectivityMap;
 
 	this.metalnessMap = source.metalnessMap;
 

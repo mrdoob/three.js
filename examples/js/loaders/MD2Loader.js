@@ -17,19 +17,12 @@ THREE.MD2Loader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( buffer ) {
 
 			onLoad( scope.parse( buffer ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
 
 	},
 

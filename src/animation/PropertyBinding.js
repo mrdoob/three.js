@@ -237,7 +237,7 @@ THREE.PropertyBinding.prototype = {
 
 			this.resolvedProperty = nodeProperty;
 
-		} else if ( Array.isArray( nodeProperty ) ) {
+		} else if ( nodeProperty.length !== undefined ) {
 
 			bindingType = this.BindingType.EntireArray;
 
@@ -301,7 +301,7 @@ Object.assign( THREE.PropertyBinding.prototype, { // prototype, continued
 
 		function getValue_array( buffer, offset ) {
 
-			var source = this.node[ this.propertyName ];
+			var source = this.resolvedProperty;
 
 			for ( var i = 0, n = source.length; i !== n; ++ i ) {
 
