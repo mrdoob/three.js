@@ -12,7 +12,7 @@ test( "intersectObjects", function() {
 		"no recursive search should lead to one hit" );
 
 	ok ( raycaster.intersectObjects( objectsToCheck, true ).length === 3,
-		"recursive search should lead to two hits" );
+		"recursive search should lead to three hits" );
 
 	var intersections = raycaster.intersectObjects( objectsToCheck, true );
 	for ( var i = 0; i < intersections.length - 1; i++ ) {
@@ -30,7 +30,7 @@ test( "intersectObject", function() {
 		"no recursive search should lead to one hit" );
 
 	ok ( raycaster.intersectObject( objectsToCheck[ 0 ], true ).length === 3,
-		"recursive search should lead to two hits" );
+		"recursive search should lead to three hits" );
 
 	var intersections = raycaster.intersectObject( objectsToCheck[ 0 ], true );
 	for ( var i = 0; i < intersections.length - 1; i++ ) {
