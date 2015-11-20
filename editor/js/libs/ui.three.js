@@ -190,21 +190,27 @@ UI.Outliner = function ( editor ) {
 	// Keybindings to support arrow navigation
 	dom.addEventListener( 'keyup', function (event) {
 
-		switch ( event.keyCode ) {
-			case 38: // up
-			case 40: // down
-			scope.selectedIndex += ( event.keyCode == 38 ) ? -1 : 1;
+		function select( index ) {
 
-			if ( scope.selectedIndex >= 0 && scope.selectedIndex < scope.options.length ) {
+			if ( index >= 0 && index < scope.options.length ) {
+
+				scope.selectedIndex = index;
 
 				// Highlight selected dom elem and scroll parent if needed
-				scope.setValue( scope.options[ scope.selectedIndex ].value );
-
+				scope.setValue( scope.options[ index ].value );
 				scope.dom.dispatchEvent( changeEvent );
 
 			}
 
-			break;
+		}
+
+		switch ( event.keyCode ) {
+			case 38: // up
+				select( scope.selectedIndex - 1 );
+				break;
+			case 40: // down
+				select( scope.selectedIndex + 1 );
+				break;
 		}
 
 	}, false);

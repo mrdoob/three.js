@@ -23,15 +23,15 @@ Sidebar.History = function ( editor ) {
 
 	// Checkbox 'Save History'
 
-	var saveHistorySpan = new UI.Span().setPosition( 'absolute' ).setLeft( '180px' ).setFontSize( '13px' );
-	var saveHistoryCheckbox = new UI.Checkbox( config.getKey( 'project/history/stored' ) ).setLeft( '50px' ).onChange( function () {
+	var saveHistorySpan = new UI.Span().setPosition( 'absolute' ).setRight( '8px' );
+	var saveHistoryCheckbox = new UI.Checkbox( config.getKey( 'project/history/stored' ) ).onChange( function () {
 
 		config.setKey( 'project/history/stored', this.getValue() );
 		var saveHistory = this.getValue();
 
 		if ( saveHistory ) {
 
-			alert( 'The history will be preserved across a browser refresh.\nThis can have an impact on performance (mainly when working with textures)!' );
+			alert( 'The history will be preserved across sessions.\nThis can have an impact on performance when working with textures.' );
 
 			var lastUndoCmd = history.undos[ history.undos.length - 1 ];
 			var lastUndoId = ( lastUndoCmd !== undefined ) ? lastUndoCmd.id : 0;
@@ -46,7 +46,6 @@ Sidebar.History = function ( editor ) {
 	} );
 
 	saveHistorySpan.add( saveHistoryCheckbox );
-	saveHistorySpan.add( new UI.Text( 'Save History' ).setPosition( 'relative' ).setLeft( '5px' ) );
 
 	saveHistorySpan.onClick( function ( event ) {
 
@@ -125,7 +124,7 @@ Sidebar.History = function ( editor ) {
 
 	signals.historyChanged.add( refreshUI );
 	signals.historyChanged.add( function ( cmd ) {
-		
+
 		outliner.setValue( cmd !== undefined ? cmd.id : null );
 
 	} );

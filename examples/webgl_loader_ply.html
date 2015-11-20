@@ -92,12 +92,14 @@
 				var loader = new THREE.PLYLoader();
 				loader.load( './models/ply/ascii/dolphins.ply', function ( geometry ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0x0055ff, specular: 0x111111, shininess: 200 } );
+					geometry.computeFaceNormals();
+
+					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff } );
 					var mesh = new THREE.Mesh( geometry, material );
 
-					mesh.position.set( 0, - 0.25, 0 );
-					mesh.rotation.set( 0, - Math.PI / 2, 0 );
-					mesh.scale.set( 0.001, 0.001, 0.001 );
+					mesh.position.y = - 0.25;
+					mesh.rotation.x = - Math.PI / 2;
+					mesh.scale.multiplyScalar( 0.001 );
 
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
@@ -108,7 +110,7 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x777777 ) );
+				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
 
 				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
 				addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );

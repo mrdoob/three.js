@@ -26,7 +26,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - Physical Material Variantions v2 by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - Standard Material Variantions v2 by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -89,7 +89,7 @@
 				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
 				var localReflectionCube;
-				
+
 				for( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
 					var roughness = 1.0 - alpha;
@@ -110,7 +110,7 @@
 							// basic monochromatic energy preservation
 							var diffuseColor = new THREE.Color( gamma, 0, 0 ).multiplyScalar( 1 - 0.08 );
 
-							var material = new THREE.MeshPhysicalMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: diffuseColor, reflectivity: reflectivity, roughness: roughness, shading: THREE.SmoothShading, envMap: localReflectionCube } )
+							var material = new THREE.MeshStandardMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: diffuseColor, reflectivity: reflectivity, roughness: roughness, shading: THREE.SmoothShading, envMap: localReflectionCube } )
 
 							var mesh = new THREE.Mesh( geometry, material );
 
@@ -124,7 +124,7 @@
 						}
 					}
 				}
-	
+
 				function addLabel( name, location ) {
 					var textGeo = new THREE.TextGeometry( name, {
 
@@ -161,11 +161,11 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				//scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.set( 1, 1, 1 ).normalize();
-				scene.add( directionalLight );
+				//var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				//directionalLight.position.set( 1, 1, 1 ).normalize();
+				//scene.add( directionalLight );
 
 				var pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
 				particleLight.add( pointLight );

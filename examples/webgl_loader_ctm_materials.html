@@ -214,37 +214,37 @@
 
 					if ( m.name.indexOf( "Body" ) !== -1 ) {
 
-						var mm = new THREE.MeshPhysicalMaterial();
+						var mm = new THREE.MeshStandardMaterial();
 
 						mm.color.setHex( 0x000000 );
 						mm.lightMap = m.map;
 						mm.envMap = textureCube;
-						mm.metalness = 0.99;
+						mm.metalness = 0.9;
 						mm.roughness = 0.2;
 
 						materials[ i ] = mm;
 
 					} else if ( m.name.indexOf( "mirror" ) !== -1 ) {
 
-						var mm = new THREE.MeshPhysicalMaterial();
+						var mm = new THREE.MeshStandardMaterial();
 
 						mm.color.setHex( 0x808080 );
 						mm.lightMap = m.map;
 						mm.envMap = textureCube;
-						mm.metalness = 1;
-						mm.roughness = 0;
+						mm.metalness = 0.9;
+						mm.roughness = 0.5;
 
 						materials[ i ] = mm;
 
 					} else if ( m.name.indexOf( "glass" ) !== -1 ) {
 
-						var mm = new THREE.MeshPhysicalMaterial();
+						var mm = new THREE.MeshStandardMaterial();
 
 						mm.color.copy( m.color );
 //						mm.lightMap = m.map;
 						mm.envMap = textureCube;
 						mm.metalness = 1;
-						mm.roughtness = 0;
+						mm.roughtness = 0.1;
 						mm.opacity = m.opacity;
 						mm.transparent = true;
 

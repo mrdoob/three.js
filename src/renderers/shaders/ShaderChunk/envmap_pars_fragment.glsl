@@ -1,5 +1,6 @@
-#if defined( USE_ENVMAP ) || defined( PHYSICAL )
+#if defined( USE_ENVMAP ) || defined( STANDARD )
 	uniform float reflectivity;
+	uniform float envMapIntenstiy;
 #endif
 
 #ifdef USE_ENVMAP
@@ -10,7 +11,7 @@
 	#endif
 	uniform float flipEnvMap;
 
-	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( PHYSICAL )
+	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( STANDARD )
 
 		uniform float refractionRatio;
 

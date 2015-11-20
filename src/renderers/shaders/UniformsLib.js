@@ -70,19 +70,13 @@ THREE.UniformsLib = {
 
 	},
 
-	reflectivitymap: {
-
-		"reflectivityMap" : { type: "t", value: null }
-
-	},
-
 	metalnessmap: {
 
 		"metalnessMap" : { type: "t", value: null }
 
 	},
 
-	fog : {
+	fog: {
 
 		"fogDensity" : { type: "f", value: 0.00025 },
 		"fogNear" : { type: "f", value: 1 },
@@ -97,7 +91,8 @@ THREE.UniformsLib = {
 
 		"directionalLights" : { type: "sa", value: [], properties: {
 			"direction": { type: "v3" },
-			"color": { type: "c" }
+			"color": { type: "c" },
+			"shadow": { type: "i" }
 		} },
 
 		"hemisphereLights" : { type: "sa", value: [], properties: {
@@ -110,7 +105,8 @@ THREE.UniformsLib = {
 			"color": { type: "c" },
 			"position": { type: "v3" },
 			"decay": { type: "f" },
-			"distance": { type: "f" }
+			"distance": { type: "f" },
+			"shadow": { type: "i" }
 		} },
 
 		"spotLights" : { type: "sa", value: [], properties: {
@@ -120,7 +116,8 @@ THREE.UniformsLib = {
 			"distance": { type: "f" },
 			"angleCos": { type: "f" },
 			"exponent": { type: "f" },
-			"decay": { type: "f" }
+			"decay": { type: "f" },
+			"shadow": { type: "i" }
 		} }
 
 
