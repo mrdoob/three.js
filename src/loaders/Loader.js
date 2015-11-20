@@ -227,10 +227,11 @@ THREE.Loader.prototype = {
 						console.warn( 'THREE.Loader.createMaterial: transparency has been renamed to opacity' );
 						json.opacity = value;
 						break;
-					case 'opacity':
-					case 'transparent':
 					case 'depthTest':
 					case 'depthWrite':
+					case 'opacity':
+					case 'reflectivity':
+					case 'transparent':
 					case 'visible':
 					case 'wireframe':
 						json[ name ] = value;
@@ -239,9 +240,6 @@ THREE.Loader.prototype = {
 						if ( value === true ) json.vertexColors = THREE.VertexColors;
 						if ( value === 'face' ) json.vertexColors = THREE.FaceColors;
 						break;
-					case 'reflectivity':
-                				json.reflectivity = value;
-                        			break;
 					default:
 						console.error( 'THREE.Loader.createMaterial: Unsupported', name, value );
 						break;
