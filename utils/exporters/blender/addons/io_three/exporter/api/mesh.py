@@ -535,7 +535,6 @@ def materials(mesh, options):
 
         logger.info("Compiling attributes for %s", mat.name)
         attributes = {
-            constants.COLOR_EMISSIVE: material.emissive_color(mat),
             constants.SHADING: material.shading(mat),
             constants.OPACITY: material.opacity(mat),
             constants.TRANSPARENT: material.transparent(mat),
@@ -556,6 +555,12 @@ def materials(mesh, options):
         if (use_colors and mix) or (not use_colors):
             colors = material.diffuse_color(mat)
             attributes[constants.COLOR_DIFFUSE] = colors
+
+        if attributes[constants.SHADING] != constants.BASIC:
+            logger.info("Adding emissive attributes")
+            attributes.update({
+                constants.COLOR_EMISSIVE: material.emissive_color(mat),
+            })
 
         if attributes[constants.SHADING] == constants.PHONG:
             logger.info("Adding specular attributes")
