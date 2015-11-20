@@ -239,6 +239,9 @@ THREE.Loader.prototype = {
 						if ( value === true ) json.vertexColors = THREE.VertexColors;
 						if ( value === 'face' ) json.vertexColors = THREE.FaceColors;
 						break;
+					case 'reflectivity':
+                				json.reflectivity = value;
+                        			break;
 					default:
 						console.error( 'THREE.Loader.createMaterial: Unsupported', name, value );
 						break;
