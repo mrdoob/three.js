@@ -538,7 +538,7 @@ Object.assign( THREE.Quaternion, {
 
 				cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
 
-				dir = ( cos >= 0 ? 1 : -1 ),
+				dir = ( cos >= 0 ? 1 : - 1 ),
 				sqrSin = 1 - cos * cos;
 
 			// Skip the Slerp for tiny steps to avoid numeric problems:
@@ -573,7 +573,7 @@ Object.assign( THREE.Quaternion, {
 
 		}
 
-		dst[   dstOffset   ] = x0;
+		dst[ dstOffset ] = x0;
 		dst[ dstOffset + 1 ] = y0;
 		dst[ dstOffset + 2 ] = z0;
 		dst[ dstOffset + 3 ] = w0;
