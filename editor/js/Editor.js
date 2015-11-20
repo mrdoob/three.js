@@ -466,6 +466,25 @@ Editor.prototype = {
 
 	toJSON: function () {
 
+		// scripts clean up
+
+		var scene = this.scene;
+		var scripts = this.scripts;
+
+		for ( var key in scripts ) {
+
+			var script = scripts[ key ];
+
+			if ( script.length === 0 || scene.getObjectByProperty( 'uuid', key ) === undefined ) {
+
+				delete scripts[ key ];
+
+			}
+
+		}
+
+		//
+
 		return {
 
 			metadata: {},
