@@ -16,11 +16,29 @@ THREE.Vector2.prototype = {
 
 	constructor: THREE.Vector2,
 
-	get width() { return this.x },
-	set width( value ) { this.x = value },
+	get width() {
 
-	get height() { return this.y },
-	set height( value ) { this.y = value },
+		return this.x;
+
+	},
+
+	set width( value ) {
+
+		this.x = value;
+
+	},
+
+	get height() {
+
+		return this.y;
+
+	},
+
+	set height( value ) {
+
+		this.y = value;
+
+	},
 
 	//
 
@@ -186,11 +204,15 @@ THREE.Vector2.prototype = {
 	multiplyScalar: function ( scalar ) {
 
 		if ( isFinite( scalar ) ) {
+
 			this.x *= scalar;
 			this.y *= scalar;
+
 		} else {
+
 			this.x = 0;
 			this.y = 0;
+
 		}
 
 		return this;
