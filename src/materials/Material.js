@@ -197,13 +197,19 @@ THREE.Material.prototype = {
 		// TODO: Copied from Object3D.toJSON
 
 		function extractFromCache ( cache ) {
+
 			var values = [];
+
 			for ( var key in cache ) {
+
 				var data = cache[ key ];
 				delete data.metadata;
 				values.push( data );
+
 			}
+
 			return values;
+
 		}
 
 		if ( isRoot ) {
