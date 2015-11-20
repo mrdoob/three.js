@@ -1478,11 +1478,29 @@ THREE.Vector2.prototype = {
 
 	constructor: THREE.Vector2,
 
-	get width() { return this.x },
-	set width( value ) { this.x = value },
+	get width() {
 
-	get height() { return this.y },
-	set height( value ) { this.y = value },
+		return this.x;
+
+	},
+
+	set width( value ) {
+
+		this.x = value;
+
+	},
+
+	get height() {
+
+		return this.y;
+
+	},
+
+	set height( value ) {
+
+		this.y = value;
+
+	},
 
 	//
 
@@ -1490,6 +1508,15 @@ THREE.Vector2.prototype = {
 
 		this.x = x;
 		this.y = y;
+
+		return this;
+
+	},
+
+	setScalar: function ( scalar ) {
+
+		this.x = scalar;
+		this.y = scalar;
 
 		return this;
 
@@ -1639,11 +1666,15 @@ THREE.Vector2.prototype = {
 	multiplyScalar: function ( scalar ) {
 
 		if ( isFinite( scalar ) ) {
+
 			this.x *= scalar;
 			this.y *= scalar;
+
 		} else {
+
 			this.x = 0;
 			this.y = 0;
+
 		}
 
 		return this;
@@ -1928,6 +1959,16 @@ THREE.Vector3.prototype = {
 
 	},
 
+	setScalar: function ( scalar ) {
+
+		this.x = scalar;
+		this.y = scalar;
+		this.z = scalar;
+
+		return this;
+
+	},
+
 	setX: function ( x ) {
 
 		this.x = x;
@@ -2098,13 +2139,17 @@ THREE.Vector3.prototype = {
 	multiplyScalar: function ( scalar ) {
 
 		if ( isFinite( scalar ) ) {
+
 			this.x *= scalar;
 			this.y *= scalar;
 			this.z *= scalar;
+
 		} else {
+
 			this.x = 0;
 			this.y = 0;
 			this.z = 0;
+
 		}
 
 		return this;
@@ -2697,6 +2742,17 @@ THREE.Vector4.prototype = {
 
 	},
 
+	setScalar: function ( scalar ) {
+
+		this.x = scalar;
+		this.y = scalar;
+		this.z = scalar;
+		this.w = scalar;
+
+		return this;
+
+	},
+
 	setX: function ( x ) {
 
 		this.x = x;
@@ -2868,15 +2924,19 @@ THREE.Vector4.prototype = {
 	multiplyScalar: function ( scalar ) {
 
 		if ( isFinite( scalar ) ) {
+
 			this.x *= scalar;
 			this.y *= scalar;
 			this.z *= scalar;
 			this.w *= scalar;
+
 		} else {
+
 			this.x = 0;
 			this.y = 0;
 			this.z = 0;
 			this.w = 0;
+
 		}
 
 		return this;
@@ -8111,7 +8171,7 @@ THREE.Layers.prototype = {
 
 	};
 
-	function descSort( a, b ) {
+	function ascSort( a, b ) {
 
 		return a.distance - b.distance;
 
@@ -8179,7 +8239,7 @@ THREE.Layers.prototype = {
 
 			intersectObject( object, this, intersects, recursive );
 
-			intersects.sort( descSort );
+			intersects.sort( ascSort );
 
 			return intersects;
 
@@ -8202,7 +8262,7 @@ THREE.Layers.prototype = {
 
 			}
 
-			intersects.sort( descSort );
+			intersects.sort( ascSort );
 
 			return intersects;
 
@@ -17604,10 +17664,10 @@ THREE.Loader.prototype = {
 						console.warn( 'THREE.Loader.createMaterial: transparency has been renamed to opacity' );
 						json.opacity = value;
 						break;
-					case 'opacity':
-					case 'transparent':
 					case 'depthTest':
 					case 'depthWrite':
+					case 'opacity':
+					case 'reflectivity':
 					case 'transparent':
 					case 'visible':
 					case 'wireframe':
@@ -39541,7 +39601,7 @@ THREE.MorphBlendMesh.prototype.createAnimation = function ( name, start, end, fp
 
 THREE.MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
 
-	var pattern = /([a-z]+)_?(\d+)/;
+	var pattern = /([a-z]+)_?(\d+)/i;
 
 	var firstAnimation, frameRanges = {};
 
