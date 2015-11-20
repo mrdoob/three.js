@@ -231,7 +231,6 @@ THREE.Loader.prototype = {
 					case 'transparent':
 					case 'depthTest':
 					case 'depthWrite':
-					case 'transparent':
 					case 'visible':
 					case 'wireframe':
 						json[ name ] = value;
