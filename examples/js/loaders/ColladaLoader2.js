@@ -613,10 +613,14 @@ THREE.ColladaLoader.prototype = {
 
 					case 'triangles':
 					case 'polylist':
-						var material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
+						var material;
 						if ( geometry.attributes.color !== undefined ) {
 
-							material.vertexColors = THREE.VertexColors;
+							// Temporal Workaround for EXTW models
+
+							material = new THREE.MeshBasicMaterial( {
+								vertexColors: THREE.VertexColors
+							} );
 
 						}
 						group.add( new THREE.Mesh( geometry, material ) );
