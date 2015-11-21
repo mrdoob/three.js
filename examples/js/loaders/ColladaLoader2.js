@@ -36,7 +36,9 @@ THREE.ColladaLoader.prototype = {
 	options: {
 
 		set convertUpAxis ( value ) {
+
 			console.log( 'ColladaLoder.options.convertUpAxis: TODO' );
+
 		}
 
 	},
@@ -55,7 +57,9 @@ THREE.ColladaLoader.prototype = {
 			var array = new Array( parts.length );
 
 			for ( var i = 0, l = parts.length; i < l; i ++ ) {
+
 				array[ i ] = parseFloat( parts[ i ] );
+
 			}
 
 			return array;
@@ -68,7 +72,9 @@ THREE.ColladaLoader.prototype = {
 			var array = new Array( parts.length );
 
 			for ( var i = 0, l = parts.length; i < l; i ++ ) {
+
 				array[ i ] = parseInt( parts[ i ] );
+
 			}
 
 			return array;
@@ -362,9 +368,12 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'technique_common':
-						var accessor = child.getElementsByTagName( 'accessor' )[ 0 ]
+						var accessor = child.getElementsByTagName( 'accessor' )[ 0 ];
+
 						if ( accessor !== undefined ) {
+
 							data.stride = parseInt( accessor.getAttribute( 'stride' ) );
+
 						}
 						break;
 
@@ -511,9 +520,13 @@ THREE.ColladaLoader.prototype = {
 						var index = indices[ i + offset ] * sourceStride;
 
 						if ( asset.upAxis === 'Z_UP' ) {
+
 							array.push( sourceArray[ index + 0 ], sourceArray[ index + 2 ], - sourceArray[ index + 1 ] );
+
 						} else {
+
 							array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
+
 						}
 
 					}
@@ -600,10 +613,11 @@ THREE.ColladaLoader.prototype = {
 
 					case 'triangles':
 					case 'polylist':
+						var material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 						if ( geometry.attributes.color !== undefined ) {
-							var material = new THREE.MeshBasicMaterial( {
-								vertexColors: THREE.VertexColors
-							} );
+
+							material.vertexColors = THREE.VertexColors;
+
 						}
 						group.add( new THREE.Mesh( geometry, material ) );
 						break;
