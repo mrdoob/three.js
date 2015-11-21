@@ -447,8 +447,12 @@ Editor.prototype = {
 
 		// TODO: Clean this up somehow
 
-		this.config.setKey( 'project/renderer/shadows', json.project.shadows );
-		this.config.setKey( 'project/vr', json.project.vr );
+		if ( json.project !== undefined ) {
+
+			this.config.setKey( 'project/renderer/shadows', json.project.shadows );
+			this.config.setKey( 'project/vr', json.project.vr );
+
+		}
 
 		var camera = loader.parse( json.camera );
 
