@@ -319,13 +319,11 @@
 
 			//
 
-			var file = null;
 			var hash = window.location.hash;
 
-			if ( hash.substr( 1, 4 ) === 'app=' ) file = hash.substr( 5 );
-			if ( hash.substr( 1, 6 ) === 'scene=' ) file = hash.substr( 7 );
+			if ( hash.substr( 1, 5 ) === 'file=' ) {
 
-			if ( file !== null ) {
+				var file = hash.substr( 6 );
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
