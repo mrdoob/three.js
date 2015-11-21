@@ -54,13 +54,19 @@ scene.add( light );</code>
 
 		<h3>[property:Float intensity]</h3>
 		<div>
-			Light's intensity.<br />
+			Light's intensity in terms of radiant intensity, watts / sr.  Also referred to as lumious intensity, candela.<br />
 			Default - *1.0*.
+		</div>
+
+		<h3>[property:Float power]</h3>
+		<div>
+			Light's power in terms of radiant flux, watts.  Also referred to as lumious flux, lumen.<br />
+			Default — *4PI*.
 		</div>
 
 		<h3>[property:Float distance]</h3>
 		<div>
-			If non-zero, light will attenuate linearly from maximum intensity at light *position* down to zero at *distance*.<br />
+			If non-zero, light will attenuate linearly from maximum intensity at light *position* down to zero at *distance*.  Distance is specified in terms of world space and its units are meters.<br />
 			Default — *0.0*.
 		</div>
 		
