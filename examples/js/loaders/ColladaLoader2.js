@@ -813,11 +813,19 @@ THREE.ColladaLoader.prototype = {
 				children: []
 			};
 
-			var elements = xml.getElementsByTagName( 'node' );
+			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
 
-			for ( var i = 0; i < elements.length; i ++ ) {
+				var child = xml.childNodes[ i ];
 
-				data.children.push( parseNode( elements[ i ] ) );
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'node':
+						data.children.push( parseNode( child ) );
+						break;
+
+				}
 
 			}
 
