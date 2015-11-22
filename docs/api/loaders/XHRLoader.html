@@ -37,6 +37,11 @@
 		Can be set to change the response type.
 		</div>
 
+		<h3>[property:Boolean ignoreHTTPStatus]</h3>
+		<div>
+		When set, the 'load' event handler will not check HTTP Status or readyState. All 'load' events will then be treated as successfull. Should only be used when XHRLoader fetch data from a non-http source (e.g. local file system, file://).
+		</div>
+
 
 		<h2>Methods</h2>
 
@@ -59,6 +64,11 @@
 		<h3>[method:null setResponseType]( [page:String value] )</h3>
 		<div>
 		[page:String value] — the empty string (default), "arraybuffer", "blob", "document", "json", or "text".
+		</div>
+
+		<h3>[method:null setIgnoreHTTPStatus]( [page:Boolean value] )</h3>
+		<div>
+		[page:Boolean value] — true/false
 		</div>
 
 
