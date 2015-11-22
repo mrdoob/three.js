@@ -12,6 +12,8 @@ THREE.XHRLoader.prototype = {
 
 	constructor: THREE.XHRLoader,
 
+	ignoreHTTPStatus: false,
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		if ( this.path !== undefined ) url = this.path + url;
@@ -46,7 +48,7 @@ THREE.XHRLoader.prototype = {
 
 			THREE.Cache.add( url, response );
 
-			if ( this.status === 200 && this.readyState === 4 ) {
+			if ( ( this.status === 200 && this.readyState === 4 ) || scope.ignoreHTTPStatus ) {
 
 				if ( onLoad ) onLoad( response );
 
@@ -106,6 +108,12 @@ THREE.XHRLoader.prototype = {
 	setWithCredentials: function ( value ) {
 
 		this.withCredentials = value;
+
+	}
+
+	setIgnoreHTTPStatus: function ( value ) {
+
+		this.ignoreHTTPStatus = value;
 
 	}
 
