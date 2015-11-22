@@ -42,7 +42,7 @@ Sidebar.Material = function ( editor ) {
 	var materialNameRow = new UI.Panel();
 	var materialName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-		editor.setMaterialName( editor.selected.material, materialName.getValue() );
+		editor.execute( new SetMaterialValueCommand( editor.selected, 'name', materialName.getValue() ) );
 
 	} );
 
@@ -60,9 +60,10 @@ Sidebar.Material = function ( editor ) {
 		'LineDashedMaterial': 'LineDashedMaterial',
 		'MeshBasicMaterial': 'MeshBasicMaterial',
 		'MeshDepthMaterial': 'MeshDepthMaterial',
-		'MeshLambertMaterial': 'MeshLambertMaterial',
 		'MeshNormalMaterial': 'MeshNormalMaterial',
+		'MeshLambertMaterial': 'MeshLambertMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial',
+		'MeshStandardMaterial': 'MeshStandardMaterial',
 		'ShaderMaterial': 'ShaderMaterial',
 		'SpriteMaterial': 'SpriteMaterial'
 
@@ -82,7 +83,7 @@ Sidebar.Material = function ( editor ) {
 	materialProgramInfo.setMarginLeft( '4px' );
 	materialProgramInfo.onClick( function () {
 
-		signals.editScript.dispatch( currentObject.material, 'programInfo' );
+		signals.editScript.dispatch( currentObject, 'programInfo' );
 
 	} );
 	materialProgramRow.add( materialProgramInfo );
@@ -91,7 +92,7 @@ Sidebar.Material = function ( editor ) {
 	materialProgramVertex.setMarginLeft( '4px' );
 	materialProgramVertex.onClick( function () {
 
-		signals.editScript.dispatch( currentObject.material, 'vertexShader' );
+		signals.editScript.dispatch( currentObject, 'vertexShader' );
 
 	} );
 	materialProgramRow.add( materialProgramVertex );
@@ -100,7 +101,7 @@ Sidebar.Material = function ( editor ) {
 	materialProgramFragment.setMarginLeft( '4px' );
 	materialProgramFragment.onClick( function () {
 
-		signals.editScript.dispatch( currentObject.material, 'fragmentShader' );
+		signals.editScript.dispatch( currentObject, 'fragmentShader' );
 
 	} );
 	materialProgramRow.add( materialProgramFragment );
@@ -116,6 +117,26 @@ Sidebar.Material = function ( editor ) {
 	materialColorRow.add( materialColor );
 
 	container.add( materialColorRow );
+
+	// roughness
+
+	var materialRoughnessRow = new UI.Panel();
+	var materialRoughness = new UI.Number( 0.5 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+
+	materialRoughnessRow.add( new UI.Text( 'Roughness' ).setWidth( '90px' ) );
+	materialRoughnessRow.add( materialRoughness );
+
+	container.add( materialRoughnessRow );
+
+	// metalness
+
+	var materialMetalnessRow = new UI.Panel();
+	var materialMetalness = new UI.Number( 0.5 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+
+	materialMetalnessRow.add( new UI.Text( 'Metalness' ).setWidth( '90px' ) );
+	materialMetalnessRow.add( materialMetalness );
+
+	container.add( materialMetalnessRow );
 
 	// emissive
 
@@ -237,6 +258,30 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialDisplacementMapRow );
 
+	// roughness map
+
+	var materialRoughnessMapRow = new UI.Panel();
+	var materialRoughnessMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialRoughnessMap = new UI.Texture().onChange( update );
+
+	materialRoughnessMapRow.add( new UI.Text( 'Rough. Map' ).setWidth( '90px' ) );
+	materialRoughnessMapRow.add( materialRoughnessMapEnabled );
+	materialRoughnessMapRow.add( materialRoughnessMap );
+
+	container.add( materialRoughnessMapRow );
+
+	// metalness map
+
+	var materialMetalnessMapRow = new UI.Panel();
+	var materialMetalnessMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialMetalnessMap = new UI.Texture().onChange( update );
+
+	materialMetalnessMapRow.add( new UI.Text( 'Metal. Map' ).setWidth( '90px' ) );
+	materialMetalnessMapRow.add( materialMetalnessMapEnabled );
+	materialMetalnessMapRow.add( materialMetalnessMap );
+
+	container.add( materialMetalnessMapRow );
+
 	// specular map
 
 	var materialSpecularMapRow = new UI.Panel();
@@ -288,6 +333,18 @@ Sidebar.Material = function ( editor ) {
 	materialAOMapRow.add( materialAOScale );
 
 	container.add( materialAOMapRow );
+
+	// emissive map
+
+	var materialEmissiveMapRow = new UI.Panel();
+	var materialEmissiveMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialEmissiveMap = new UI.Texture().onChange( update );
+
+	materialEmissiveMapRow.add( new UI.Text( 'Emissive Map' ).setWidth( '90px' ) );
+	materialEmissiveMapRow.add( materialEmissiveMapEnabled );
+	materialEmissiveMapRow.add( materialEmissiveMap );
+
+	container.add( materialEmissiveMapRow );
 
 	// side
 
@@ -343,7 +400,7 @@ Sidebar.Material = function ( editor ) {
 	// opacity
 
 	var materialOpacityRow = new UI.Panel();
-	var materialOpacity = new UI.Number().setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+	var materialOpacity = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
 
 	materialOpacityRow.add( new UI.Text( 'Opacity' ).setWidth( '90px' ) );
 	materialOpacityRow.add( materialOpacity );
@@ -400,9 +457,9 @@ Sidebar.Material = function ( editor ) {
 
 		if ( material ) {
 
-			if ( material.uuid !== undefined ) {
+			if ( material.uuid !== undefined && material.uuid !== materialUUID.getValue() ) {
 
-				material.uuid = materialUUID.getValue();
+				editor.execute( new SetMaterialValueCommand( currentObject, 'uuid', materialUUID.getValue() ) );
 
 			}
 
@@ -410,7 +467,7 @@ Sidebar.Material = function ( editor ) {
 
 				material = new THREE[ materialClass.getValue() ]();
 
-				object.material = material;
+				editor.execute( new SetMaterialCommand( currentObject, material ), 'New Material: ' + materialClass.getValue() );
 				// TODO Copy other references in the scene graph
 				// keeping name and UUID then.
 				// Also there should be means to create a unique
@@ -419,27 +476,39 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material.color !== undefined ) {
+			if ( material.color !== undefined && material.color.getHex() !== materialColor.getHexValue() ) {
 
-				material.color.setHex( materialColor.getHexValue() );
-
-			}
-
-			if ( material.emissive !== undefined ) {
-
-				material.emissive.setHex( materialEmissive.getHexValue() );
+				editor.execute( new SetMaterialColorCommand( currentObject, 'color', materialColor.getHexValue() ) );
 
 			}
 
-			if ( material.specular !== undefined ) {
+			if ( material.roughness !== undefined && Math.abs( material.roughness - materialRoughness.getValue() ) >= 0.01 ) {
 
-				material.specular.setHex( materialSpecular.getHexValue() );
+				editor.execute( new SetMaterialValueCommand( currentObject, 'roughness', materialRoughness.getValue() ) );
 
 			}
 
-			if ( material.shininess !== undefined ) {
+			if ( material.metalness !== undefined && Math.abs( material.metalness - materialMetalness.getValue() ) >= 0.01 ) {
 
-				material.shininess = materialShininess.getValue();
+				editor.execute( new SetMaterialValueCommand( currentObject, 'metalness', materialMetalness.getValue() ) );
+
+			}
+
+			if ( material.emissive !== undefined && material.emissive.getHex() !== materialEmissive.getHexValue() ) {
+
+				editor.execute( new SetMaterialColorCommand( currentObject, 'emissive', materialEmissive.getHexValue() ) );
+
+			}
+
+			if ( material.specular !== undefined && material.specular.getHex() !== materialSpecular.getHexValue() ) {
+
+				editor.execute( new SetMaterialColorCommand( currentObject, 'specular', materialSpecular.getHexValue() ) );
+
+			}
+
+			if ( material.shininess !== undefined && Math.abs( material.shininess - materialShininess.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetMaterialValueCommand( currentObject, 'shininess', materialShininess.getValue() ) );
 
 			}
 
@@ -449,16 +518,15 @@ Sidebar.Material = function ( editor ) {
 
 				if ( material.vertexColors !== vertexColors ) {
 
-					material.vertexColors = vertexColors;
-					material.needsUpdate = true;
+					editor.execute( new SetMaterialValueCommand( currentObject, 'vertexColors', vertexColors ) );
 
 				}
 
 			}
 
-			if ( material.skinning !== undefined ) {
+			if ( material.skinning !== undefined && material.skinning !== materialSkinning.getValue() ) {
 
-				material.skinning = materialSkinning.getValue();
+				editor.execute( new SetMaterialValueCommand( currentObject, 'skinning', materialSkinning.getValue() ) );
 
 			}
 
@@ -468,8 +536,12 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs ) {
 
-					material.map = mapEnabled ? materialMap.getValue() : null;
-					material.needsUpdate = true;
+					var map = mapEnabled ? materialMap.getValue() : null;
+					if ( material.map !== map ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'map', map ) );
+
+					}
 
 				} else {
 
@@ -485,8 +557,12 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs ) {
 
-					material.alphaMap = mapEnabled ? materialAlphaMap.getValue() : null;
-					material.needsUpdate = true;
+					var alphaMap = mapEnabled ? materialAlphaMap.getValue() : null;
+					if ( material.alphaMap !== alphaMap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'alphaMap', alphaMap ) );
+
+					}
 
 				} else {
 
@@ -502,9 +578,18 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs ) {
 
-					material.bumpMap = bumpMapEnabled ? materialBumpMap.getValue() : null;
-					material.bumpScale = materialBumpScale.getValue();
-					material.needsUpdate = true;
+					var bumpMap = bumpMapEnabled ? materialBumpMap.getValue() : null;
+					if ( material.bumpMap !== bumpMap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'bumpMap', bumpMap ) );
+
+					}
+
+					if ( material.bumpScale !== materialBumpScale.getValue() ) {
+
+						editor.execute( new SetMaterialValueCommand( currentObject, 'bumpScale', materialBumpScale.getValue() ) );
+
+					}
 
 				} else {
 
@@ -520,8 +605,12 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs ) {
 
-					material.normalMap = normalMapEnabled ? materialNormalMap.getValue() : null;
-					material.needsUpdate = true;
+					var normalMap = normalMapEnabled ? materialNormalMap.getValue() : null;
+					if ( material.normalMap !== normalMap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'normalMap', normalMap ) );
+
+					}
 
 				} else {
 
@@ -537,13 +626,76 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs ) {
 
-					material.displacementMap = displacementMapEnabled ? materialDisplacementMap.getValue() : null;
-					material.displacementScale = materialDisplacementScale.getValue();
-					material.needsUpdate = true;
+					var displacementMap = displacementMapEnabled ? materialDisplacementMap.getValue() : null;
+					if ( material.displacementMap !== displacementMap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'displacementMap', displacementMap ) );
+
+					}
+
+					if ( material.displacementScale !== materialDisplacementScale.getValue() ) {
+
+						editor.execute( new SetMaterialValueCommand( currentObject, 'displacementScale', materialDisplacementScale.getValue() ) );
+
+					}
 
 				} else {
 
 					if ( displacementMapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
+			if ( material.roughnessMap !== undefined ) {
+
+				var roughnessMapEnabled = materialRoughnessMapEnabled.getValue() === true;
+
+				if ( objectHasUvs ) {
+
+					var roughnessMap = roughnessMapEnabled ? materialRoughnessMap.getValue() : null;
+					if ( material.roughnessMap !== roughnessMap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'roughnessMap', roughnessMap ) );
+
+					}
+
+					if ( material.displacementScale !== materialDisplacementScale.getValue() ) {
+
+						editor.execute( new SetMaterialValueCommand( currentObject, 'displacementScale', materialDisplacementScale.getValue() ) );
+
+					}
+
+				} else {
+
+					if ( roughnessMapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
+			if ( material.metalnessMap !== undefined ) {
+
+				var metalnessMapEnabled = materialMetalnessMapEnabled.getValue() === true;
+
+				if ( objectHasUvs ) {
+
+					var metalnessMap = metalnessMapEnabled ? materialMetalnessMap.getValue() : null;
+					if ( material.metalnessMap !== metalnessMap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'metalnessMap', metalnessMap ) );
+
+					}
+
+					if ( material.displacementScale !== materialDisplacementScale.getValue() ) {
+
+						editor.execute( new SetMaterialValueCommand( currentObject, 'displacementScale', materialDisplacementScale.getValue() ) );
+
+					}
+
+				} else {
+
+					if ( metalnessMapEnabled ) textureWarning = true;
 
 				}
 
@@ -555,8 +707,12 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs ) {
 
-					material.specularMap = specularMapEnabled ? materialSpecularMap.getValue() : null;
-					material.needsUpdate = true;
+					var specularMap = specularMapEnabled ? materialSpecularMap.getValue() : null;
+					if ( material.specularMap !== specularMap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'specularMap', specularMap ) );
+
+					}
 
 				} else {
 
@@ -570,12 +726,21 @@ Sidebar.Material = function ( editor ) {
 
 				var envMapEnabled = materialEnvMapEnabled.getValue() === true;
 
-				material.envMap = envMapEnabled ? materialEnvMap.getValue() : null;
-				material.reflectivity = materialReflectivity.getValue();
-				material.needsUpdate = true;
+				var envMap = envMapEnabled ? materialEnvMap.getValue() : null;
+
+				if ( material.envMap !== envMap ) {
+
+					editor.execute( new SetMaterialMapCommand( currentObject, 'envMap', envMap ) );
+
+				}
+
+				if ( material.reflectivity !== materialReflectivity.getValue() ) {
+
+					editor.execute( new SetMaterialValueCommand( currentObject, 'reflectivity', materialReflectivity.getValue() ) );
+
+				}
 
 			}
-
 
 			if ( material.lightMap !== undefined ) {
 
@@ -583,8 +748,12 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs ) {
 
-					material.lightMap = lightMapEnabled ? materialLightMap.getValue() : null;
-					material.needsUpdate = true;
+					var lightMap = lightMapEnabled ? materialLightMap.getValue() : null;
+					if ( material.lightMap !== lightMap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'lightMap', lightMap ) );
+
+					}
 
 				} else {
 
@@ -600,9 +769,18 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs ) {
 
-					material.aoMap = aoMapEnabled ? materialAOMap.getValue() : null;
-					material.aoMapIntensity = materialAOScale.getValue();
-					material.needsUpdate = true;
+					var aoMap = aoMapEnabled ? materialAOMap.getValue() : null;
+					if ( material.aoMap !== aoMap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'aoMap', aoMap ) );
+
+					}
+
+					if ( material.aoMapIntensity !== materialAOScale.getValue() ) {
+
+						editor.execute( new SetMaterialValueCommand( currentObject, 'aoMapIntensity', materialAOScale.getValue() ) );
+
+					}
 
 				} else {
 
@@ -612,55 +790,92 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.emissiveMap !== undefined ) {
+
+				var emissiveMapEnabled = materialEmissiveMapEnabled.getValue() === true;
+
+				if ( objectHasUvs ) {
+
+					var emissiveMap = emissiveMapEnabled ? materialEmissiveMap.getValue() : null;
+					if ( material.emissiveMap !== emissiveMap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'emissiveMap', emissiveMap ) );
+
+					}
+
+				} else {
+
+					if ( emissiveMapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
 			if ( material.side !== undefined ) {
 
-				material.side = parseInt( materialSide.getValue() );
+				var side = parseInt( materialSide.getValue() );
+				if ( material.side !== side ) {
+
+					editor.execute( new SetMaterialValueCommand( currentObject, 'side', side ) );
+
+				}
+
 
 			}
 
 			if ( material.shading !== undefined ) {
 
-				material.shading = parseInt( materialShading.getValue() );
+				var shading = parseInt( materialShading.getValue() );
+				if ( material.shading !== shading ) {
+
+					editor.execute( new SetMaterialValueCommand( currentObject, 'shading', shading ) );
+
+				}
 
 			}
 
 			if ( material.blending !== undefined ) {
 
-				material.blending = parseInt( materialBlending.getValue() );
+				var blending = parseInt( materialBlending.getValue() );
+				if ( material.blending !== blending ) {
+
+					editor.execute( new SetMaterialValueCommand( currentObject, 'blending', blending ) );
+
+				}
 
 			}
 
-			if ( material.opacity !== undefined ) {
+			if ( material.opacity !== undefined && Math.abs( material.opacity - materialOpacity.getValue() ) >= 0.01 ) {
 
-				material.opacity = materialOpacity.getValue();
-
-			}
-
-			if ( material.transparent !== undefined ) {
-
-				material.transparent = materialTransparent.getValue();
+				editor.execute( new SetMaterialValueCommand( currentObject, 'opacity', materialOpacity.getValue() ) );
 
 			}
 
-			if ( material.alphaTest !== undefined ) {
+			if ( material.transparent !== undefined && material.transparent !== materialTransparent.getValue() ) {
 
-				material.alphaTest = materialAlphaTest.getValue();
-
-			}
-
-			if ( material.wireframe !== undefined ) {
-
-				material.wireframe = materialWireframe.getValue();
+				editor.execute( new SetMaterialValueCommand( currentObject, 'transparent', materialTransparent.getValue() ) );
 
 			}
 
-			if ( material.wireframeLinewidth !== undefined ) {
+			if ( material.alphaTest !== undefined && Math.abs( material.alphaTest - materialAlphaTest.getValue() ) >= 0.01 ) {
 
-				material.wireframeLinewidth = materialWireframeLinewidth.getValue();
+				editor.execute( new SetMaterialValueCommand( currentObject, 'alphaTest', materialAlphaTest.getValue() ) );
 
 			}
 
-			refreshUi(false);
+			if ( material.wireframe !== undefined && material.wireframe !== materialWireframe.getValue() ) {
+
+				editor.execute( new SetMaterialValueCommand( currentObject, 'wireframe', materialWireframe.getValue() ) );
+
+			}
+
+			if ( material.wireframeLinewidth !== undefined && Math.abs( material.wireframeLinewidth - materialWireframeLinewidth.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetMaterialValueCommand( currentObject, 'wireframeLinewidth', materialWireframeLinewidth.getValue() ) );
+
+			}
+
+			refreshUI( false );
 
 			signals.materialChanged.dispatch( material );
 
@@ -672,7 +887,7 @@ Sidebar.Material = function ( editor ) {
 
 		}
 
-	};
+	}
 
 	//
 
@@ -681,6 +896,8 @@ Sidebar.Material = function ( editor ) {
 		var properties = {
 			'name': materialNameRow,
 			'color': materialColorRow,
+			'roughness': materialRoughnessRow,
+			'metalness': materialMetalnessRow,
 			'emissive': materialEmissiveRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
@@ -692,10 +909,13 @@ Sidebar.Material = function ( editor ) {
 			'bumpMap': materialBumpMapRow,
 			'normalMap': materialNormalMapRow,
 			'displacementMap': materialDisplacementMapRow,
+			'roughnessMap': materialRoughnessMapRow,
+			'metalnessMap': materialMetalnessMapRow,
 			'specularMap': materialSpecularMapRow,
 			'envMap': materialEnvMapRow,
 			'lightMap': materialLightMapRow,
 			'aoMap': materialAOMapRow,
+			'emissiveMap': materialEmissiveMapRow,
 			'side': materialSideRow,
 			'shading': materialShadingRow,
 			'blending': materialBlendingRow,
@@ -713,10 +933,12 @@ Sidebar.Material = function ( editor ) {
 
 		}
 
-	};
+	}
 
 
-	function refreshUi( resetTextureSelectors ) {
+	function refreshUI( resetTextureSelectors ) {
+
+		if ( ! currentObject ) return;
 
 		var material = currentObject.material;
 
@@ -737,6 +959,18 @@ Sidebar.Material = function ( editor ) {
 		if ( material.color !== undefined ) {
 
 			materialColor.setHexValue( material.color.getHexString() );
+
+		}
+
+		if ( material.roughness !== undefined ) {
+
+			materialRoughness.setValue( material.roughness );
+
+		}
+
+		if ( material.metalness !== undefined ) {
+
+			materialMetalness.setValue( material.metalness );
 
 		}
 
@@ -834,6 +1068,30 @@ Sidebar.Material = function ( editor ) {
 
 		}
 
+		if ( material.roughnessMap !== undefined ) {
+
+			materialRoughnessMapEnabled.setValue( material.roughnessMap !== null );
+
+			if ( material.roughnessMap !== null || resetTextureSelectors ) {
+
+				materialRoughnessMap.setValue( material.roughnessMap );
+
+			}
+
+		}
+
+		if ( material.metalnessMap !== undefined ) {
+
+			materialMetalnessMapEnabled.setValue( material.metalnessMap !== null );
+
+			if ( material.metalnessMap !== null || resetTextureSelectors ) {
+
+				materialMetalnessMap.setValue( material.metalnessMap );
+
+			}
+
+		}
+
 		if ( material.specularMap !== undefined ) {
 
 			materialSpecularMapEnabled.setValue( material.specularMap !== null );
@@ -883,6 +1141,18 @@ Sidebar.Material = function ( editor ) {
 			}
 
 			materialAOScale.setValue( material.aoMapIntensity );
+
+		}
+
+		if ( material.emissiveMap !== undefined ) {
+
+			materialEmissiveMapEnabled.setValue( material.emissiveMap !== null );
+
+			if ( material.emissiveMap !== null || resetTextureSelectors ) {
+
+				materialEmissiveMap.setValue( material.emissiveMap );
+
+			}
 
 		}
 
@@ -947,7 +1217,7 @@ Sidebar.Material = function ( editor ) {
 			var objectChanged = object !== currentObject;
 
 			currentObject = object;
-			refreshUi(objectChanged);
+			refreshUI( objectChanged );
 			container.setDisplay( '' );
 
 		} else {
@@ -959,6 +1229,12 @@ Sidebar.Material = function ( editor ) {
 
 	} );
 
+	signals.materialChanged.add( function () {
+
+		refreshUI();
+
+	} );
+
 	return container;
 
-}
+};

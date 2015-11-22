@@ -62,7 +62,10 @@ var Editor = function () {
 		fogParametersChanged: new SIGNALS.Signal(),
 		windowResize: new SIGNALS.Signal(),
 
-		showGridChanged: new SIGNALS.Signal()
+		showGridChanged: new SIGNALS.Signal(),
+		refreshSidebarObject3D: new SIGNALS.Signal(),
+		historyChanged: new SIGNALS.Signal(),
+		refreshScriptEditor: new SIGNALS.Signal()
 
 	};
 
@@ -71,8 +74,8 @@ var Editor = function () {
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
-	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 100000 );
-	this.camera.position.set( 500, 250, 500 );
+	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 10000 );
+	this.camera.position.set( 20, 10, 20 );
 	this.camera.lookAt( new THREE.Vector3() );
 	this.camera.name = 'Camera';
 
@@ -233,7 +236,7 @@ Editor.prototype = {
 
 	addHelper: function () {
 
-		var geometry = new THREE.SphereBufferGeometry( 20, 4, 2 );
+		var geometry = new THREE.SphereBufferGeometry( 2, 4, 2 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
 
 		return function ( object ) {
@@ -242,23 +245,23 @@ Editor.prototype = {
 
 			if ( object instanceof THREE.Camera ) {
 
-				helper = new THREE.CameraHelper( object, 10 );
+				helper = new THREE.CameraHelper( object, 1 );
 
 			} else if ( object instanceof THREE.PointLight ) {
 
-				helper = new THREE.PointLightHelper( object, 10 );
+				helper = new THREE.PointLightHelper( object, 1 );
 
 			} else if ( object instanceof THREE.DirectionalLight ) {
 
-				helper = new THREE.DirectionalLightHelper( object, 20 );
+				helper = new THREE.DirectionalLightHelper( object, 1 );
 
 			} else if ( object instanceof THREE.SpotLight ) {
 
-				helper = new THREE.SpotLightHelper( object, 10 );
+				helper = new THREE.SpotLightHelper( object, 1 );
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
-				helper = new THREE.HemisphereLightHelper( object, 10 );
+				helper = new THREE.HemisphereLightHelper( object, 1 );
 
 			} else if ( object instanceof THREE.SkinnedMesh ) {
 
@@ -405,7 +408,7 @@ Editor.prototype = {
 		this.history.clear();
 		this.storage.clear();
 
-		this.camera.position.set( 500, 250, 500 );
+		this.camera.position.set( 20, 10, 20 );
 		this.camera.lookAt( new THREE.Vector3() );
 
 		var objects = this.scene.children;
@@ -444,6 +447,13 @@ Editor.prototype = {
 
 		// TODO: Clean this up somehow
 
+		if ( json.project !== undefined ) {
+
+			this.config.setKey( 'project/renderer/shadows', json.project.shadows );
+			this.config.setKey( 'project/vr', json.project.vr );
+
+		}
+
 		var camera = loader.parse( json.camera );
 
 		this.camera.position.copy( camera.position );
@@ -454,22 +464,68 @@ Editor.prototype = {
 
 		this.setScene( loader.parse( json.scene ) );
 		this.scripts = json.scripts;
+		this.history.fromJSON( json.history );
 
 	},
 
 	toJSON: function () {
 
+		// scripts clean up
+
+		var scene = this.scene;
+		var scripts = this.scripts;
+
+		for ( var key in scripts ) {
+
+			var script = scripts[ key ];
+
+			if ( script.length === 0 || scene.getObjectByProperty( 'uuid', key ) === undefined ) {
+
+				delete scripts[ key ];
+
+			}
+
+		}
+
+		//
+
 		return {
 
+			metadata: {},
 			project: {
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				vr: this.config.getKey( 'project/vr' )
 			},
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
-			scripts: this.scripts
+			scripts: this.scripts,
+			history: this.history.toJSON()
 
 		};
+
+	},
+
+	objectByUuid: function ( uuid ) {
+
+		return this.scene.getObjectByProperty( 'uuid', uuid, true );
+
+	},
+
+	execute: function ( cmd, optionalName ) {
+
+		this.history.execute( cmd, optionalName );
+
+	},
+
+	undo: function () {
+
+		this.history.undo();
+
+	},
+
+	redo: function () {
+
+		this.history.redo();
 
 	}
 

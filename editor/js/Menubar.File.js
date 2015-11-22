@@ -88,13 +88,17 @@ Menubar.File = function ( editor ) {
 		var output = geometry.toJSON();
 
 		try {
+
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
 		} catch ( e ) {
+
 			output = JSON.stringify( output );
+
 		}
 
-		exportString( output, 'geometry.json' );
+		saveString( output, 'geometry.json' );
 
 	} );
 	options.add( option );
@@ -118,13 +122,17 @@ Menubar.File = function ( editor ) {
 		var output = object.toJSON();
 
 		try {
+
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
 		} catch ( e ) {
+
 			output = JSON.stringify( output );
+
 		}
 
-		exportString( output, 'model.json' );
+		saveString( output, 'model.json' );
 
 	} );
 	options.add( option );
@@ -139,13 +147,17 @@ Menubar.File = function ( editor ) {
 		var output = editor.scene.toJSON();
 
 		try {
+
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
 		} catch ( e ) {
+
 			output = JSON.stringify( output );
+
 		}
 
-		exportString( output, 'scene.json' );
+		saveString( output, 'scene.json' );
 
 	} );
 	options.add( option );
@@ -168,7 +180,7 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new THREE.OBJExporter();
 
-		exportString( exporter.parse( object ), 'model.obj' );
+		saveString( exporter.parse( object ), 'model.obj' );
 
 	} );
 	options.add( option );
@@ -182,7 +194,7 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new THREE.STLExporter();
 
-		exportString( exporter.parse( editor.scene ), 'model.stl' );
+		saveString( exporter.parse( editor.scene ), 'model.stl' );
 
 	} );
 	options.add( option );
@@ -247,6 +259,9 @@ Menubar.File = function ( editor ) {
 		//
 
 		var output = editor.toJSON();
+		output.metadata.type = 'App';
+		delete output.history;
+
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
@@ -256,7 +271,7 @@ Menubar.File = function ( editor ) {
 
 		var manager = new THREE.LoadingManager( function () {
 
-			location.href = 'data:application/zip;base64,' + zip.generate();
+			save( zip.generate( { type: 'blob' } ), 'download.zip' );
 
 		} );
 
@@ -282,23 +297,21 @@ Menubar.File = function ( editor ) {
 	link.style.display = 'none';
 	document.body.appendChild( link ); // Firefox workaround, see #6594
 
-	var exportString = function ( output, filename ) {
+	function save( blob, filename ) {
 
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		link.href = objectURL;
+		link.href = URL.createObjectURL( blob );
 		link.download = filename || 'data.json';
-		link.target = '_blank';
+		link.click();
 
-		var event = document.createEvent("MouseEvents");
-		event.initMouseEvent(
-			"click", true, false, window, 0, 0, 0, 0, 0
-			, false, false, false, false, 0, null
-		);
-		link.dispatchEvent(event);
+		// URL.revokeObjectURL( url ); breaks Firefox...
 
-	};
+	}
+
+	function saveString( text, filename ) {
+
+		save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+	}
 
 	return container;
 

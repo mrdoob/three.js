@@ -275,7 +275,7 @@
 
 					mixer = new THREE.AnimationMixer( mesh );
 
-					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( 10 ) );
+					mixer.clipAction( geometry.animations[0] ).setDuration( 10 ).play();
 
 					var s = 200;
 					mesh.scale.set( s, s, s );

@@ -23,6 +23,7 @@
 		<script src="../examples/js/loaders/KMZLoader.js"></script>
 		<script src="../examples/js/loaders/MD2Loader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
+		<script src="../examples/js/loaders/PlayCanvasLoader.js"></script>
 		<script src="../examples/js/loaders/PLYLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
 		<script src="../examples/js/loaders/UTF8Loader.js"></script>
@@ -119,9 +120,31 @@
 		<script src="js/Sidebar.Geometry.TeapotBufferGeometry.js"></script>
 		<script src="js/Sidebar.Material.js"></script>
 		<script src="js/Sidebar.Script.js"></script>
+		<script src="js/Sidebar.History.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
+		<script src="js/Command.js"></script>
+		<script src="js/commands/AddObjectCommand.js"></script>
+		<script src="js/commands/RemoveObjectCommand.js"></script>
+		<script src="js/commands/MoveObjectCommand.js"></script>
+		<script src="js/commands/SetPositionCommand.js"></script>
+		<script src="js/commands/SetRotationCommand.js"></script>
+		<script src="js/commands/SetScaleCommand.js"></script>
+		<script src="js/commands/SetValueCommand.js"></script>
+		<script src="js/commands/SetUuidCommand.js"></script>
+		<script src="js/commands/SetColorCommand.js"></script>
+		<script src="js/commands/SetGeometryCommand.js"></script>
+		<script src="js/commands/SetGeometryValueCommand.js"></script>
+		<script src="js/commands/MultiCmdsCommand.js"></script>
+		<script src="js/commands/AddScriptCommand.js"></script>
+		<script src="js/commands/RemoveScriptCommand.js"></script>
+		<script src="js/commands/SetScriptValueCommand.js"></script>
+		<script src="js/commands/SetMaterialCommand.js"></script>
+		<script src="js/commands/SetMaterialValueCommand.js"></script>
+		<script src="js/commands/SetMaterialColorCommand.js"></script>
+		<script src="js/commands/SetMaterialMapCommand.js"></script>
+		<script src="js/commands/SetSceneCommand.js"></script>
 
 		<script>
 
@@ -139,11 +162,11 @@
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
-			var player = new Player( editor );
-			document.body.appendChild( player.dom );
-
 			var script = new Script( editor );
 			document.body.appendChild( script.dom );
+
+			var player = new Player( editor );
+			document.body.appendChild( player.dom );
 
 			var toolbar = new Toolbar( editor );
 			document.body.appendChild( toolbar.dom );
@@ -220,6 +243,7 @@
 				signals.materialChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );
 				signals.scriptChanged.add( saveState );
+				signals.historyChanged.add( saveState );
 
 				signals.showModal.add( function ( content ) {
 
@@ -262,9 +286,21 @@
 						if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
 						var parent = object.parent;
-						editor.removeObject( object );
-						editor.select( parent );
+						if ( parent !== null ) editor.execute( new RemoveObjectCommand( object ) );
 
+						break;
+
+					case 90: // Register Ctrl-Z for Undo, Ctrl-Shift-Z for Redo
+
+						if ( event.ctrlKey && event.shiftKey ) {
+
+							editor.redo();
+
+						} else if ( event.ctrlKey ) {
+
+							editor.undo();
+
+						}
 						break;
 
 				}
@@ -283,13 +319,11 @@
 
 			//
 
-			var file = null;
 			var hash = window.location.hash;
 
-			if ( hash.substr( 1, 4 ) === 'app=' ) file = hash.substr( 5 );
-			if ( hash.substr( 1, 6 ) === 'scene=' ) file = hash.substr( 7 );
+			if ( hash.substr( 1, 5 ) === 'file=' ) {
 
-			if ( file !== null ) {
+				var file = hash.substr( 6 );
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 

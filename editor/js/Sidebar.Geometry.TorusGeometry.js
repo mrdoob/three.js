@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
+Sidebar.Geometry.TorusGeometry = function ( editor, object ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 
@@ -63,19 +65,13 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 
 	function update() {
 
-		object.geometry.dispose();
-
-		object.geometry = new THREE.TorusGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE.TorusGeometry(
 			radius.getValue(),
 			tube.getValue(),
 			radialSegments.getValue(),
 			tubularSegments.getValue(),
 			arc.getValue()
-		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.geometryChanged.dispatch( object );
+		) ) );
 
 	}
 

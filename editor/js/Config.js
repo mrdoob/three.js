@@ -10,6 +10,7 @@ var Config = function () {
 		'autosave': true,
 		'theme': 'css/light.css',
 
+		'project/history/stored': true,
 		'project/renderer': 'WebGLRenderer',
 		'project/renderer/antialias': true,
 		'project/renderer/shadows': true,
@@ -17,6 +18,7 @@ var Config = function () {
 
 		'ui/sidebar/animation/collapsed': true,
 		'ui/sidebar/geometry/collapsed': true,
+		'ui/sidebar/history/collapsed': true,
 		'ui/sidebar/material/collapsed': true,
 		'ui/sidebar/object3d/collapsed': false,
 		'ui/sidebar/project/collapsed': true,
@@ -68,6 +70,6 @@ var Config = function () {
 
 		}
 
-	}
+	};
 
 };
