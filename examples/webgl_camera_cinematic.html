@@ -19,8 +19,7 @@
 
 		<script src="js/shaders/BokehShader2.js"></script>
 
-		<!--<script src="../src/cameras/PerspectiveCamera.js"></script>-->
-		<!--<script src="../src/cameras/CinematicCamera.js"></script>-->
+		<script src="js/cameras/CinematicCamera.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
@@ -56,9 +55,9 @@
 
 
 				scene = new THREE.Scene();
-				scene.add( new THREE.AmbientLight( 0xffffff, 0.03 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.3 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				var light = new THREE.DirectionalLight( 0xffffff, 0.35 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 

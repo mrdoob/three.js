@@ -61,7 +61,6 @@
 	"src/cameras/CubeCamera.js",
 	"src/cameras/OrthographicCamera.js",
 	"src/cameras/PerspectiveCamera.js",
-	"src/cameras/CinematicCamera.js",
 	"src/lights/Light.js",
 	"src/lights/LightShadow.js",
 	"src/lights/AmbientLight.js",
