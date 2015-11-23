@@ -112,16 +112,13 @@ THREE.CinematicCamera.prototype.initPostProcessing = function (){
 
         
         this.postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / -2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
-
-        this.postprocessing.camera.position= this.position;
-				this.postprocessing.camera.rotation= this.rotation;
-
+        
+    
         this.postprocessing.scene.add( this.postprocessing.camera );
 
         var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
         this.postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
         this.postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-
 
 
         var bokeh_shader = THREE.BokehShader;
