@@ -142,7 +142,7 @@ function checkFinite( geom ) {
 
 	// TODO Buffers, normal, etc.
 
-	QUnit.assert.ok( allVerticesAreFinite, "contains non-finite coordinates" );
+	QUnit.assert.ok( allVerticesAreFinite, "contains only finite coordinates" );
 
 }
 
