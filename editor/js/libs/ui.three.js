@@ -72,7 +72,7 @@ UI.Texture = function ( mapping ) {
 
 		}
 
-	}
+	};
 
 	this.dom = dom;
 	this.texture = null;
@@ -171,24 +171,24 @@ UI.Outliner = function ( editor ) {
 	} );
 
 	// Broadcast for object selection after arrow navigation
-	var changeEvent = document.createEvent('HTMLEvents');
+	var changeEvent = document.createEvent( 'HTMLEvents' );
 	changeEvent.initEvent( 'change', true, true );
 
 	// Prevent native scroll behavior
-	dom.addEventListener( 'keydown', function (event) {
+	dom.addEventListener( 'keydown', function ( event ) {
 
 		switch ( event.keyCode ) {
 			case 38: // up
 			case 40: // down
-			event.preventDefault();
-			event.stopPropagation();
-			break;
+				event.preventDefault();
+				event.stopPropagation();
+				break;
 		}
 
-	}, false);
+	}, false );
 
 	// Keybindings to support arrow navigation
-	dom.addEventListener( 'keyup', function (event) {
+	dom.addEventListener( 'keyup', function ( event ) {
 
 		function select( index ) {
 
@@ -213,12 +213,12 @@ UI.Outliner = function ( editor ) {
 				break;
 		}
 
-	}, false);
+	}, false );
 
 	this.dom = dom;
 
 	this.options = [];
-	this.selectedIndex = -1;
+	this.selectedIndex = - 1;
 	this.selectedValue = null;
 
 	return this;
@@ -248,7 +248,7 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 		var option = options[ i ];
 
 		var div = document.createElement( 'div' );
-		div.className = 'option ' + ( option.static === true ? '': 'draggable' );
+		div.className = 'option ' + ( option.static === true ? '' : 'draggable' );
 		div.innerHTML = option.html;
 		div.value = option.value;
 		scope.dom.appendChild( div );
@@ -292,7 +292,7 @@ UI.Outliner.prototype.setValue = function ( value ) {
 
 			if ( this.dom.scrollTop > y ) {
 
-				this.dom.scrollTop = y
+				this.dom.scrollTop = y;
 
 			} else if ( this.dom.scrollTop < minScroll ) {
 
@@ -322,7 +322,7 @@ UI.THREE.Boolean = function ( boolean, text ) {
 
 	UI.Span.call( this );
 
-	this.setMarginRight( '10px' )
+	this.setMarginRight( '10px' );
 
 	this.checkbox = new UI.Checkbox( boolean );
 	this.text = new UI.Text( text ).setMarginLeft( '3px' );
