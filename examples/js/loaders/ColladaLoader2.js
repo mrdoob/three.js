@@ -51,6 +51,28 @@ THREE.ColladaLoader.prototype = {
 
 	parse: function ( text, baseUrl ) {
 
+		function getElementsByTagName( xml, name ) {
+
+			// Non recursive xml.getElementsByTagName() ...
+
+			var array = [];
+
+			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeName === name ) {
+
+					array.push( child );
+
+				}
+
+			}
+
+			return array;
+
+		}
+
 		function parseFloats( text ) {
 
 			var parts = text.trim().split( /\s+/ );
