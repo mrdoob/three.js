@@ -56,10 +56,11 @@ THREE.ColladaLoader.prototype = {
 			// Non recursive xml.getElementsByTagName() ...
 
 			var array = [];
+			var childNodes = xml.childNodes;
 
-			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+			for ( var i = 0, l = childNodes.length; i < l; i ++ ) {
 
-				var child = xml.childNodes[ i ];
+				var child = childNodes[ i ];
 
 				if ( child.nodeName === name ) {
 
