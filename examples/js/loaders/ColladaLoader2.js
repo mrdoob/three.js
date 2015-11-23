@@ -114,7 +114,7 @@ THREE.ColladaLoader.prototype = {
 		function parseAsset( xml ) {
 
 			return {
-				upAxis: parseAssetUpAxis( xml.getElementsByTagName( 'up_axis' )[ 0 ] )
+				upAxis: parseAssetUpAxis( getElementsByTagName( xml, 'up_axis' )[ 0 ] )
 			};
 
 		}
@@ -127,13 +127,13 @@ THREE.ColladaLoader.prototype = {
 
 		// library
 
-		function parseLibrary( data, libraryName, nodeName, parser ) {
+		function parseLibrary( xml, data, libraryName, nodeName, parser ) {
 
-			var library = xml.getElementsByTagName( libraryName )[ 0 ];
+			var library = getElementsByTagName( xml, libraryName )[ 0 ];
 
 			if ( library !== undefined ) {
 
-				var elements = library.getElementsByTagName( nodeName );
+				var elements = getElementsByTagName( library, nodeName );
 
 				for ( var i = 0; i < elements.length; i ++ ) {
 
@@ -175,7 +175,7 @@ THREE.ColladaLoader.prototype = {
 		function parseImage( xml ) {
 
 			var data = {
-				url: xml.getElementsByTagName( 'init_from' )[ 0 ].textContent
+				url: getElementsByTagName( xml, 'init_from' )[ 0 ].textContent
 			};
 
 			library.images[ xml.getAttribute( 'id' ) ] = data;
@@ -390,7 +390,7 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'technique_common':
-						var accessor = child.getElementsByTagName( 'accessor' )[ 0 ];
+						var accessor = getElementsByTagName( child, 'accessor' )[ 0 ];
 
 						if ( accessor !== undefined ) {
 
@@ -418,7 +418,7 @@ THREE.ColladaLoader.prototype = {
 				primitives: []
 			};
 
-			var mesh = xml.getElementsByTagName( 'mesh' )[ 0 ];
+			var mesh = getElementsByTagName( xml, 'mesh' )[ 0 ];
 
 			for ( var i = 0; i < mesh.childNodes.length; i ++ ) {
 
@@ -435,7 +435,7 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'vertices':
-						data.sources[ id ] = data.sources[ parseId( child.getElementsByTagName( 'input' )[ 0 ].getAttribute( 'source' ) ) ];
+						data.sources[ id ] = data.sources[ parseId( getElementsByTagName( child, 'input' )[ 0 ].getAttribute( 'source' ) ) ];
 						break;
 
 					case 'polygons':
@@ -499,6 +499,8 @@ THREE.ColladaLoader.prototype = {
 			return primitive;
 
 		}
+
+		var DEFAULT_MATERIAL = new THREE.MeshPhongMaterial();
 
 		function buildGeometry( data ) {
 
@@ -635,7 +637,7 @@ THREE.ColladaLoader.prototype = {
 
 					case 'triangles':
 					case 'polylist':
-						var material;
+						var material = DEFAULT_MATERIAL;
 						if ( geometry.attributes.color !== undefined ) {
 
 							// Temporal Workaround for EXTW models
@@ -839,19 +841,11 @@ THREE.ColladaLoader.prototype = {
 				children: []
 			};
 
-			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+			var elements = getElementsByTagName( xml, 'node' );
 
-				var child = xml.childNodes[ i ];
+			for ( var i = 0; i < elements.length; i ++ ) {
 
-				if ( child.nodeType !== 1 ) continue;
-
-				switch ( child.nodeName ) {
-
-					case 'node':
-						data.children.push( parseNode( child ) );
-						break;
-
-				}
+				data.children.push( parseNode( elements[ i ] ) );
 
 			}
 
@@ -886,8 +880,7 @@ THREE.ColladaLoader.prototype = {
 
 		function parseScene( xml ) {
 
-			var scene = xml.getElementsByTagName( 'scene' )[ 0 ];
-			var instance = scene.getElementsByTagName( 'instance_visual_scene' )[ 0 ];
+			var instance = getElementsByTagName( xml, 'instance_visual_scene' )[ 0 ];
 			return getVisualScene( parseId( instance.getAttribute( 'url' ) ) );
 
 		}
@@ -900,12 +893,14 @@ THREE.ColladaLoader.prototype = {
 
 		console.timeEnd( 'ColladaLoader: DOMParser' );
 
+		var collada = getElementsByTagName( xml, 'COLLADA' )[ 0 ];
+
 		// metadata
 
-		var version = xml.getElementsByTagName( 'COLLADA' )[ 0 ].getAttribute( 'version' );
+		var version = collada.getAttribute( 'version' );
 		console.log( 'ColladaLoader: File version', version );
 
-		var asset = parseAsset( xml.getElementsByTagName( 'asset' )[ 0 ] );
+		var asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
 
 		//
 
@@ -921,13 +916,13 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'ColladaLoader: Parse' );
 
-		parseLibrary( library.images, 'library_images', 'image', parseImage );
-		// parseLibrary( library.effects, 'library_effects', 'effect', parseEffect );
-		parseLibrary( library.cameras, 'library_cameras', 'camera', parseCamera );
-		parseLibrary( library.lights, 'library_lights', 'light', parseLight );
-		parseLibrary( library.geometries, 'library_geometries', 'geometry', parseGeometry );
-		parseLibrary( library.nodes, 'library_nodes', 'node', parseNode );
-		parseLibrary( library.visualScenes, 'library_visual_scenes', 'visual_scene', parseVisualScene );
+		parseLibrary( collada, library.images, 'library_images', 'image', parseImage );
+		// parseLibrary( collada, library.effects, 'library_effects', 'effect', parseEffect );
+		parseLibrary( collada, library.cameras, 'library_cameras', 'camera', parseCamera );
+		parseLibrary( collada, library.lights, 'library_lights', 'light', parseLight );
+		parseLibrary( collada, library.geometries, 'library_geometries', 'geometry', parseGeometry );
+		parseLibrary( collada, library.nodes, 'library_nodes', 'node', parseNode );
+		parseLibrary( collada, library.visualScenes, 'library_visual_scenes', 'visual_scene', parseVisualScene );
 
 		console.timeEnd( 'ColladaLoader: Parse' );
 
@@ -945,7 +940,7 @@ THREE.ColladaLoader.prototype = {
 
 		// console.log( library );
 
-		var scene = parseScene( xml );
+		var scene = parseScene( getElementsByTagName( collada, 'scene' )[ 0 ] );
 
 		console.timeEnd( 'ColladaLoader' );
 
