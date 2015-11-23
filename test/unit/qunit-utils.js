@@ -177,7 +177,7 @@ function runStdLightTests( assert, lights ) {
 
 	for ( var i = 0, l = lights.length; i < l; i++ ) {
 
-		const light = lights[i];
+		var light = lights[i];
 
 		// Clone
 		checkLightClone( light );
