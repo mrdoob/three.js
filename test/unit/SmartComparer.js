@@ -71,10 +71,10 @@ function SmartComparer() {
 
 	function isFunction(value) {
 
-    // The use of `Object#toString` avoids issues with the `typeof` operator
-    // in Safari 8 which returns 'object' for typed array constructors, and
-    // PhantomJS 1.9 which returns 'function' for `NodeList` instances.
-    var tag = isObject(value) ? Object.prototype.toString.call(value) : '';
+		// The use of `Object#toString` avoids issues with the `typeof` operator
+		// in Safari 8 which returns 'object' for typed array constructors, and
+		// PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+		var tag = isObject(value) ? Object.prototype.toString.call(value) : '';
 
 		return tag == '[object Function]' || tag == '[object GeneratorFunction]';
 
@@ -83,8 +83,8 @@ function SmartComparer() {
 	function isObject(value) {
 
 		// Avoid a V8 JIT bug in Chrome 19-20.
-    // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-    var type = typeof value;
+		// See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
+		var type = typeof value;
 
 		return !!value && (type == 'object' || type == 'function');
 
