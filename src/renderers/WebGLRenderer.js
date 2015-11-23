@@ -312,7 +312,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			return value;
 
-		}
+		};
 
 	} )();
 

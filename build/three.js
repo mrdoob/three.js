@@ -25106,7 +25106,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			return value;
 
-		}
+		};
 
 	} )();
 
@@ -33923,7 +33923,7 @@ THREE.CurvePath.prototype.getCurveLengths = function() {
 
 THREE.CurvePath.prototype.createPointsGeometry = function( divisions ) {
 
-	var pts = this.getPoints( divisions, true );
+	var pts = this.getPoints( divisions );
 	return this.createGeometry( pts );
 
 };
@@ -33932,7 +33932,7 @@ THREE.CurvePath.prototype.createPointsGeometry = function( divisions ) {
 
 THREE.CurvePath.prototype.createSpacedPointsGeometry = function( divisions ) {
 
-	var pts = this.getSpacedPoints( divisions, true );
+	var pts = this.getSpacedPoints( divisions );
 	return this.createGeometry( pts );
 
 };
@@ -34125,7 +34125,7 @@ THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius, aStartAng
 
  };
 
-THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
+THREE.Path.prototype.getSpacedPoints = function ( divisions ) {
 
 	if ( ! divisions ) divisions = 40;
 
@@ -34139,11 +34139,11 @@ THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
 	}
 
-	// if ( closedPath ) {
-	//
-	// 	points.push( points[ 0 ] );
-	//
-	// }
+	if ( this.autoClose ) {
+
+		points.push( points[ 0 ] );
+
+	}
 
 	return points;
 
@@ -34151,7 +34151,7 @@ THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
 /* Return an array of vectors based on contour of the path */
 
-THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
+THREE.Path.prototype.getPoints = function( divisions ) {
 
 	divisions = divisions || 12;
 
@@ -34387,7 +34387,8 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 	if ( Math.abs( lastPoint.x - points[ 0 ].x ) < Number.EPSILON &&
 			 Math.abs( lastPoint.y - points[ 0 ].y ) < Number.EPSILON )
 		points.splice( points.length - 1, 1 );
-	if ( closedPath ) {
+
+	if ( this.autoClose ) {
 
 		points.push( points[ 0 ] );
 
