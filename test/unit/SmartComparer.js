@@ -134,13 +134,6 @@ function SmartComparer() {
 		var keys1 = Object.keys( val1 );
 		var keys2 = Object.keys( val2 );
 
-		var keys1T = _( val1 ).keys().value();
-		var keys2T = _( val2 ).keys().value();
-		var missingActual = _.difference( keys1T, keys2T );
-		if ( missingActual.length !== 0 ) {
-			console.log(missingActual, keys1T, keys2T);
-		}
-
 		for ( var i = 0, l = keys1.length; i < l; i++ ) {
 
 			if (keys2.indexOf(keys1[ i ]) < 0) {
