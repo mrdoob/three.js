@@ -146,7 +146,7 @@ THREE.CurvePath.prototype.getCurveLengths = function() {
 
 THREE.CurvePath.prototype.createPointsGeometry = function( divisions ) {
 
-	var pts = this.getPoints( divisions, true );
+	var pts = this.getPoints( divisions );
 	return this.createGeometry( pts );
 
 };
@@ -155,7 +155,7 @@ THREE.CurvePath.prototype.createPointsGeometry = function( divisions ) {
 
 THREE.CurvePath.prototype.createSpacedPointsGeometry = function( divisions ) {
 
-	var pts = this.getSpacedPoints( divisions, true );
+	var pts = this.getSpacedPoints( divisions );
 	return this.createGeometry( pts );
 
 };
