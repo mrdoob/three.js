@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
+Sidebar.Geometry.SphereGeometry = function ( editor, object ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 
@@ -83,9 +85,7 @@ Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 
 	function update() {
 
-		object.geometry.dispose();
-
-		object.geometry = new THREE.SphereGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE.SphereGeometry(
 			radius.getValue(),
 			widthSegments.getValue(),
 			heightSegments.getValue(),
@@ -93,11 +93,7 @@ Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 			phiLength.getValue(),
 			thetaStart.getValue(),
 			thetaLength.getValue()
-		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.geometryChanged.dispatch( object );
+		) ) );
 
 	}
 

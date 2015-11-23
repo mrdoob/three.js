@@ -25,14 +25,3 @@ THREE.OctahedronGeometry = function ( radius, detail ) {
 
 THREE.OctahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.OctahedronGeometry.prototype.constructor = THREE.OctahedronGeometry;
-
-THREE.OctahedronGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.OctahedronGeometry(
-		parameters.radius,
-		parameters.detail
-	);
-
-};

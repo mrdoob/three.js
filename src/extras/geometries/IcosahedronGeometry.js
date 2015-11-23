@@ -32,14 +32,3 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 
 THREE.IcosahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.IcosahedronGeometry.prototype.constructor = THREE.IcosahedronGeometry;
-
-THREE.IcosahedronGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.IcosahedronGeometry(
-		parameters.radius,
-		parameters.detail
-	);
-
-};

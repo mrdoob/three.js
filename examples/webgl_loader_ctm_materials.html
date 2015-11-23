@@ -180,7 +180,7 @@
 
 				loaderCTM = new THREE.CTMLoader();
 
-				var position = new THREE.Vector3( -105, -78, -40 );
+				var position = new THREE.Vector3( -105, -78, -30 );
 				var scale = new THREE.Vector3( 30, 30, 30 );
 
 				loaderCTM.loadParts( "models/ctm/camaro/camaro.js", function( geometries, materials ) {
@@ -214,31 +214,37 @@
 
 					if ( m.name.indexOf( "Body" ) !== -1 ) {
 
-						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+						var mm = new THREE.MeshStandardMaterial();
 
+						mm.color.setHex( 0x000000 );
+						mm.lightMap = m.map;
 						mm.envMap = textureCube;
-						mm.combine = THREE.MixOperation;
-						mm.reflectivity = 0.75;
+						mm.metalness = 0.9;
+						mm.roughness = 0.2;
 
 						materials[ i ] = mm;
 
 					} else if ( m.name.indexOf( "mirror" ) !== -1 ) {
 
-						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+						var mm = new THREE.MeshStandardMaterial();
 
+						mm.color.setHex( 0x808080 );
+						mm.lightMap = m.map;
 						mm.envMap = textureCube;
-						mm.combine = THREE.MultiplyOperation;
+						mm.metalness = 0.9;
+						mm.roughness = 0.5;
 
 						materials[ i ] = mm;
 
 					} else if ( m.name.indexOf( "glass" ) !== -1 ) {
 
-						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+						var mm = new THREE.MeshStandardMaterial();
 
-						mm.envMap = textureCube;
 						mm.color.copy( m.color );
-						mm.combine = THREE.MixOperation;
-						mm.reflectivity = 0.25;
+//						mm.lightMap = m.map;
+						mm.envMap = textureCube;
+						mm.metalness = 1;
+						mm.roughtness = 0.1;
 						mm.opacity = m.opacity;
 						mm.transparent = true;
 
@@ -248,6 +254,7 @@
 
 						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
 
+						mm.specularMap = m.map;
 						mm.shininess = 30;
 						mm.color.setHex( 0x404040 );
 						mm.metal = true;

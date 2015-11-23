@@ -18,6 +18,7 @@ THREE.CubeTextureLoader.prototype = {
 
 		var loader = new THREE.ImageLoader();
 		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 
 		var loaded = 0;
 
@@ -54,6 +55,12 @@ THREE.CubeTextureLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
 
 	}
 

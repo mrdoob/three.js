@@ -93,7 +93,7 @@
 					scene.add( mesh );
 
 					var mixer = new THREE.AnimationMixer( mesh );
-					mixer.addAction( new THREE.AnimationAction( geometry.animations[ 0 ] ).warpToDuration( 1 ) );
+					mixer.clipAction( geometry.animations[ 0 ] ).setDuration( 1 ).play();
 
 					mixers.push( mixer );
 
@@ -120,7 +120,7 @@
 					scene.add( mesh );
 
 					var mixer = new THREE.AnimationMixer( mesh );
-					mixer.addAction( new THREE.AnimationAction( geometry.animations[ 0 ] ).warpToDuration( 1 ) );
+					mixer.clipAction( geometry.animations[ 0 ] ).setDuration( 1 ).play();
 
 					mixers.push( mixer );
 

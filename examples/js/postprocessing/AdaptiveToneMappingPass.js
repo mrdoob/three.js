@@ -132,9 +132,10 @@ THREE.AdaptiveToneMappingPass.prototype = {
 		if ( this.needsInit ) {
 
 			this.reset( renderer );
-			this.luminanceRT.type = readBuffer.type;
-			this.previousLuminanceRT.type = readBuffer.type;
-			this.currentLuminanceRT.type = readBuffer.type;
+
+			this.luminanceRT.texture.type = readBuffer.texture.type;
+			this.previousLuminanceRT.texture.type = readBuffer.texture.type;
+			this.currentLuminanceRT.texture.type = readBuffer.texture.type;
 			this.needsInit = false;
 
 		}
@@ -188,11 +189,12 @@ THREE.AdaptiveToneMappingPass.prototype = {
 		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 
 		this.luminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
-		this.luminanceRT.generateMipmaps = false;
-		this.previousLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
-		this.previousLuminanceRT.generateMipmaps = false;
+		this.luminanceRT.texture.generateMipmaps = false;
 
-		//We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
+		this.previousLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.previousLuminanceRT.texture.generateMipmaps = false;
+
+		// We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
 		pars.minFilter = THREE.LinearMipMapLinearFilter;
 		this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
 

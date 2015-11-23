@@ -84,13 +84,14 @@ THREE.SEA3D.ShaderLib.replaceCode = function( src, target, replace ) {
 
 THREE.SEA3D.ShaderLib.fragStdMtl = THREE.SEA3D.ShaderLib.replaceCode( THREE.ShaderLib.phong.fragmentShader, [
 	//	Target
-	'outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + totalEmissiveLight;', // METAL
-	'outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;'
+	'vec3 outgoingLight = ( reflectedLight.directDiffuse + reflectedLight.indirectDiffuse ) * specular + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;', // METAL
+	'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;'
 ], [
 	//	Replace To
-	'outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight + totalEmissiveLight ) * specular + totalSpecularLight;', // METAL
-	'outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight + totalEmissiveLight ) + totalSpecularLight;'
+	'vec3 outgoingLight = ( reflectedLight.directDiffuse + reflectedLight.indirectDiffuse ) * specular + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight * specular;', // METAL
+	'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight * diffuse;'
 ] );
+
 
 //
 //	Standard Material
@@ -1401,7 +1402,7 @@ THREE.SEA3D.prototype.readSoundPoint = function( sea ) {
 
 	}
 
-	var sound3d = new THREE.Audio( this.audioListener );
+	var sound3d = new THREE.PositionalAudio( this.audioListener );
 
 	sound3d.load( sea.sound.tag );
 	sound3d.autoplay = sea.autoPlay;
