@@ -1,9 +1,55 @@
+var workers, worker;
+var BLOCK = 128;
+var startX, startY, division, completed = 0;
+
+self.onmessage = function(e) {
+	var data = e.data;
+	if (!data) return;
+
+	if (data.init) {
+		console.log('init')
+		var
+			width = data.init[0],
+			height = data.init[1];
+
+		initScene(width, height);
+		worker = data.worker;
+		workers = data.workers;
+		BLOCK = data.blockSize;
+
+		if (data.maxRecursionDepth) maxRecursionDepth = data.maxRecursionDepth;
+
+		var xblocks = Math.ceil(width / BLOCK);
+		var yblocks = Math.ceil(height / BLOCK);
+
+		division = Math.ceil(xblocks * yblocks / workers);
+
+		var start = division * worker;
+		startX = (start % xblocks) * BLOCK;
+		startY = (start / xblocks | 0) * BLOCK;
+
+		completed = 0;
+	}
+
+	if (data.render) {
+		renderer.render(scene, camera)
+	}
+}
+
+importScripts('../../../build/three.min.js');
+importScripts('../../../examples/raytrace_scene.js');
+
+
 /**
+ * DOM-less version of Raytracing Renderer
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
+ * @author zz95 / http://github.com/zz85
  */
 
-THREE.RaytracingRenderer = function ( parameters ) {
+THREE.RaytracingRenderer =
+
+THREE.RaytracingRendererWorker = function ( parameters ) {
 
 	console.log( 'THREE.RaytracingRenderer', THREE.REVISION );
 
@@ -11,18 +57,10 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	var scope = this;
 
-	var canvas = document.createElement( 'canvas' );
-	var context = canvas.getContext( '2d', {
-		alpha: parameters.alpha === true
-	} );
-
 	var maxRecursionDepth = 3;
 
 	var canvasWidth, canvasHeight;
 	var canvasWidthHalf, canvasHeightHalf;
-
-	var clearColor = new THREE.Color( 0x000000 );
-
 	var origin = new THREE.Vector3();
 	var direction = new THREE.Vector3();
 
@@ -42,37 +80,12 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	var animationFrameId = null;
 
-	this.domElement = canvas;
-
-	this.autoClear = true;
-
-	this.setClearColor = function ( color, alpha ) {
-
-		clearColor.set( color );
-
-	};
-
-	this.setPixelRatio = function () {};
-
 	this.setSize = function ( width, height ) {
-
-		canvas.width = width;
-		canvas.height = height;
-
-		canvasWidth = canvas.width;
-		canvasHeight = canvas.height;
+		canvasWidth = width;
+		canvasHeight = height;
 
 		canvasWidthHalf = Math.floor( canvasWidth / 2 );
 		canvasHeightHalf = Math.floor( canvasHeight / 2 );
-
-		context.fillStyle = 'white';
-
-	};
-
-	this.setSize( canvas.width, canvas.height );
-
-	this.clear = function () {
-
 	};
 
 	//
@@ -408,20 +421,9 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	var renderBlock = ( function () {
 
-		var blockSize = 64;
+		var blockSize = BLOCK;
 
-		var canvasBlock = document.createElement( 'canvas' );
-		canvasBlock.width = blockSize;
-		canvasBlock.height = blockSize;
-
-		var contextBlock = canvasBlock.getContext( '2d', {
-
-			alpha: parameters.alpha === true
-
-		} );
-
-		var imagedata = contextBlock.getImageData( 0, 0, blockSize, blockSize );
-		var data = imagedata.data;
+		var data = new Uint8ClampedArray(blockSize * blockSize * 4);
 
 		var pixelColor = new THREE.Color();
 
@@ -447,40 +449,66 @@ THREE.RaytracingRenderer = function ( parameters ) {
 					data[ index ]     = Math.sqrt( pixelColor.r ) * 255;
 					data[ index + 1 ] = Math.sqrt( pixelColor.g ) * 255;
 					data[ index + 2 ] = Math.sqrt( pixelColor.b ) * 255;
+					data[ index + 3 ] = 255;
 
 				}
 
 			}
 
-			context.putImageData( imagedata, blockX, blockY );
+			// self.postMessage({
+			// 	blockX: blockX,
+			// 	blockY: blockY,
+			// 	blockSize: blockSize,
+			// 	data: data
+			// })
+
+			// Use transferable objects! :)
+			self.postMessage({
+				data: data.buffer,
+				blockX: blockX,
+				blockY: blockY,
+				blockSize: blockSize,
+			}, [data.buffer]);
+
+			data = new Uint8ClampedArray(blockSize * blockSize * 4);
+
+			// OK Done!
 
 			blockX += blockSize;
+
+			completed++;
 
 			if ( blockX >= canvasWidth ) {
 
 				blockX = 0;
 				blockY += blockSize;
 
-				if ( blockY >= canvasHeight ) {
-					console.log('Total Renderering time', timeRendering / 1000, 's');
-					console.log('Absolute time', (Date.now() - reallyThen) / 1000, 's');
-					scope.dispatchEvent( { type: "complete" } );
-					return;
-
-				}
-
 			}
 
-			context.fillRect( blockX, blockY, blockSize, blockSize );
+			console.log('Worker', worker, 'completed', completed, '/', division)
 
-			animationFrameId = requestAnimationFrame( function () {
+			if ( blockY >= canvasHeight || completed === division ) {
+				console.log('Total Renderering time', timeRendering / 1000, 's');
+				console.log('Absolute time', (Date.now() - reallyThen) / 1000, 's');
+				scope.dispatchEvent( { type: "complete" } );
+				self.postMessage({
+					type: 'complete',
+					time: Date.now() - reallyThen
+				});
+				return;
+			}
+
+
+			function next () {
 				console.time('render')
 				var then = Date.now();
 				renderBlock( blockX, blockY );
 				timeRendering += Date.now() - then;
 				console.timeEnd('render')
+			}
 
-			} );
+			// animationFrameId = requestAnimationFrame( next );
+			next();
 
 		};
 
@@ -488,8 +516,6 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	this.render = function ( scene, camera ) {
 		reallyThen = Date.now()
-
-		if ( this.autoClear === true ) this.clear();
 
 		cancelAnimationFrame( animationFrameId );
 
@@ -543,10 +569,10 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		} );
 
-		renderBlock( 0, 0 );
+		renderBlock( startX, startY );
 
 	};
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.RaytracingRenderer.prototype );
+THREE.EventDispatcher.prototype.apply( THREE.RaytracingRendererWorker.prototype );
