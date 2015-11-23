@@ -210,51 +210,7 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Publish' );
 	option.onClick( function () {
 
-		var camera = editor.camera;
-
 		var zip = new JSZip();
-
-		zip.file( 'index.html', [
-
-			'<!DOCTYPE html>',
-			'<html lang="en">',
-			'	<head>',
-			'		<title>three.js</title>',
-			'		<meta charset="utf-8">',
-			'		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">',
-			'		<style>',
-			'		body {',
-			'			margin: 0px;',
-			'			overflow: hidden;',
-			'		}',
-			'		</style>',
-			'	</head>',
-			'	<body ontouchstart="">',
-			'		<script src="js/three.min.js"></script>',
-			'		<script src="js/app.js"></script>',
-			'		<script>',
-			'',
-			'			var loader = new THREE.XHRLoader();',
-			'			loader.load( \'app.json\', function ( text ) {',
-			'',
-			'				var player = new APP.Player();',
-			'				player.load( JSON.parse( text ) );',
-			'				player.setSize( window.innerWidth, window.innerHeight );',
-			'				player.play();',
-			'',
-			'				document.body.appendChild( player.dom );',
-			'',
-			'				window.addEventListener( \'resize\', function () {',
-			'					player.setSize( window.innerWidth, window.innerHeight );',
-			'				} );',
-			'',
-			'			} );',
-			'',
-			'		</script>',
-			'	</body>',
-			'</html>'
-
-		].join( '\n' ) );
 
 		//
 
@@ -276,6 +232,11 @@ Menubar.File = function ( editor ) {
 		} );
 
 		var loader = new THREE.XHRLoader( manager );
+		loader.load( 'js/libs/app/index.html', function ( content ) {
+
+			zip.file( 'index.html', content );
+
+		} );
 		loader.load( 'js/libs/app.js', function ( content ) {
 
 			zip.file( 'js/app.js', content );
