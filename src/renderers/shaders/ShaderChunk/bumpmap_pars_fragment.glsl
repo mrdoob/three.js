@@ -3,10 +3,10 @@
 	uniform sampler2D bumpMap;
 	uniform float bumpScale;
 
-			// Derivative maps - bump mapping unparametrized surfaces by Morten Mikkelsen
-			//	http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html
+	// Derivative maps - bump mapping unparametrized surfaces by Morten Mikkelsen
+	// http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html
 
-			// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
+	// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
 
 	vec2 dHdxy_fwd() {
 

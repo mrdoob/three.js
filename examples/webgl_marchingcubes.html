@@ -60,7 +60,7 @@
 
 	<script src="../build/three.min.js"></script>
 
-	<script src="js/controls/TrackballControls.js"></script>
+	<script src="js/controls/OrbitControls.js"></script>
 
 	<script src="js/shaders/CopyShader.js"></script>
 	<script src="js/shaders/FXAAShader.js"></script>
@@ -158,7 +158,8 @@
 			// RENDERER
 
 			renderer = new THREE.WebGLRenderer();
-			renderer.setClearColor( 0x050505, 1 );
+			renderer.setClearColor( 0x050505 );
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 			renderer.domElement.style.position = "absolute";
@@ -174,7 +175,7 @@
 
 			// CONTROLS
 
-			controls = new THREE.TrackballControls( camera, renderer.domElement );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 			// STATS
 
@@ -263,8 +264,9 @@
 			var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
 			reflectionCube.format = THREE.RGBFormat;
 
-			var refractionCube = new THREE.Texture( reflectionCube.image, new THREE.CubeRefractionMapping() );
+			var refractionCube = THREE.ImageUtils.loadTextureCube( urls );
 			reflectionCube.format = THREE.RGBFormat;
+			refractionCube.mapping = THREE.CubeRefractionMapping;
 
 			// toons
 
@@ -333,7 +335,7 @@
 
 			"plastic" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, ambient: 0x000000, shininess: 250 } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, shininess: 250 } ),
 				h: 0.6, s: 0.8, l: 0.1
 			},
 
@@ -522,7 +524,7 @@
 
 			h.add( effectController, "speed", 0.1, 8.0, 0.05 );
 			h.add( effectController, "numBlobs", 1, 50, 1 );
-			h.add( effectController, "resolution", 14, 40, 1 );
+			h.add( effectController, "resolution", 14, 100, 1 );
 			h.add( effectController, "isolation", 10, 300, 1 );
 
 			h.add( effectController, "floor" );
@@ -590,7 +592,7 @@
 			if ( effectController.resolution !== resolution ) {
 
 				resolution = effectController.resolution;
-				effect.init( resolution );
+				effect.init( Math.floor( resolution ) );
 
 			}
 

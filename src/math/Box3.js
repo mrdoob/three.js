@@ -1,5 +1,5 @@
 /**
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
  */
 
@@ -29,7 +29,7 @@ THREE.Box3.prototype = {
 
 		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-			this.expandByPoint( points[ i ] )
+			this.expandByPoint( points[ i ] );
 
 		}
 
@@ -57,7 +57,7 @@ THREE.Box3.prototype = {
 	setFromObject: function () {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
-		// accounting for both the object's, and childrens', world transforms
+		// accounting for both the object's, and children's, world transforms
 
 		var v1 = new THREE.Vector3();
 
@@ -71,17 +71,37 @@ THREE.Box3.prototype = {
 
 			object.traverse( function ( node ) {
 
-				if ( node.geometry !== undefined && node.geometry.vertices !== undefined ) {
+				var geometry = node.geometry;
 
-					var vertices = node.geometry.vertices;
+				if ( geometry !== undefined ) {
 
-					for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+					if ( geometry instanceof THREE.Geometry ) {
 
-						v1.copy( vertices[ i ] );
+						var vertices = geometry.vertices;
 
-						v1.applyMatrix4( node.matrixWorld );
+						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
-						scope.expandByPoint( v1 );
+							v1.copy( vertices[ i ] );
+
+							v1.applyMatrix4( node.matrixWorld );
+
+							scope.expandByPoint( v1 );
+
+						}
+
+					} else if ( geometry instanceof THREE.BufferGeometry && geometry.attributes[ 'position' ] !== undefined ) {
+
+						var positions = geometry.attributes[ 'position' ].array;
+
+						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+							v1.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+
+							v1.applyMatrix4( node.matrixWorld );
+
+							scope.expandByPoint( v1 );
+
+						}
 
 					}
 
@@ -94,6 +114,12 @@ THREE.Box3.prototype = {
 		};
 
 	}(),
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
 
 	copy: function ( box ) {
 
@@ -322,12 +348,6 @@ THREE.Box3.prototype = {
 	equals: function ( box ) {
 
 		return box.min.equals( this.min ) && box.max.equals( this.max );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Box3().copy( this );
 
 	}
 

@@ -59,8 +59,6 @@
 
 			var clock = new THREE.Clock();
 
-			var composer;
-
 			init();
 			animate();
 
@@ -80,7 +78,7 @@
 				controls.domElement = container;
 				controls.rollSpeed = Math.PI / 6;
 				controls.autoForward = false;
-				controls.dragToLook = false
+				controls.dragToLook = false;
 
 				// scene
 
@@ -93,7 +91,7 @@
 				var s = 250;
 
 				var cube = new THREE.BoxGeometry( s, s, s );
-				var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
 
 				for ( var i = 0; i < 3000; i ++ ) {
@@ -118,12 +116,7 @@
 
 				// lights
 
-				var ambient = new THREE.AmbientLight( 0xffffff );
-				ambient.color.setHSL( 0.1, 0.3, 0.2 );
-				scene.add( ambient );
-
-
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.05 );
 				dirLight.position.set( 0, -1, 0 ).normalize();
 				scene.add( dirLight );
 
@@ -141,7 +134,7 @@
 
 				function addLight( h, s, l, x, y, z ) {
 
-					var light = new THREE.PointLight( 0xffffff, 1.5, 4500 );
+					var light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
 					light.color.setHSL( h, s, l );
 					light.position.set( x, y, z );
 					scene.add( light );
@@ -170,9 +163,9 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( scene.fog.color, 1 );
-
 				container.appendChild( renderer.domElement );
 
 				//

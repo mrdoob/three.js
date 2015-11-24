@@ -10,6 +10,7 @@ THREE.ShaderPass = function ( shader, textureID ) {
 
 	this.material = new THREE.ShaderMaterial( {
 
+		defines: shader.defines || {},
 		uniforms: this.uniforms,
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader
@@ -23,10 +24,10 @@ THREE.ShaderPass = function ( shader, textureID ) {
 	this.clear = false;
 
 
-	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene  = new THREE.Scene();
 
-	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
+	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.scene.add( this.quad );
 
 };

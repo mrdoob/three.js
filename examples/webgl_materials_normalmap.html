@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - normal map</title>
+		<title>three.js webgl - materials - normal map [Lee Perry-Smith]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -14,7 +14,9 @@
 				overflow:hidden;
 			}
 
-			a {	color: #ffffff;	}
+			a {
+				color: #ffffff;
+			}
 
 			#info {
 				position: absolute;
@@ -34,24 +36,37 @@
 
 			#vt { display:none }
 			#vt, #vt a { color:orange; }
+			.code { }
+
 		</style>
 	</head>
 
 	<body>
-
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl (<span id="description">normal + ao + displacement + environment + shadow</span>) map demo.
-			ninja head from <a href="http://developer.amd.com/archive/gpu/MeshMapper/pages/default.aspx" target="_blank">AMD GPU MeshMapper</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl normalmap demo.
+			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank">Lee Perry-Smith</a> head.
 
-			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)</div>
+			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)<br/>
+			on Windows use <span class="code">Chrome --use-gl=desktop</span> or Firefox 4<br/>
+			please star this <a href="http://code.google.com/p/chromium/issues/detail?id=52497">Chrome issue</a> to get ANGLE support
+			</div>
 		</div>
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/loaders/BinaryLoader.js"></script>
-
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+
+		<script src="js/shaders/BleachBypassShader.js"></script>
+		<script src="js/shaders/ColorCorrectionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+
 
 		<script>
 
@@ -63,10 +78,10 @@
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, geometry;
-			var mesh1, mesh2;
+			var mesh, zmesh, lightMesh, geometry;
+			var mesh1;
 
-			var spotLight, pointLight, ambientLight;
+			var directionalLight, pointLight, ambientLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -74,9 +89,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var r = 0.0;
-
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			var composer, effectFXAA;
 
 			init();
 			animate();
@@ -86,128 +99,41 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
-				camera.position.z = 1500;
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1200;
 
 				scene = new THREE.Scene();
 
 				// LIGHTS
 
-				ambientLight = new THREE.AmbientLight( 0x111111 );
+				ambientLight = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xff0000 );
-				pointLight.position.z = 10000;
-				pointLight.distance = 4000;
+				pointLight = new THREE.PointLight( 0xffffff, 1.25, 1000 );
+				pointLight.position.set( 0, 0, 600 );
+
 				scene.add( pointLight );
 
-				pointLight2 = new THREE.PointLight( 0xff5500 );
-				pointLight2.position.z = 1000;
-				pointLight2.distance = 2000;
-				scene.add( pointLight2 );
+				directionalLight = new THREE.DirectionalLight( 0xffffff );
+				directionalLight.position.set( 1, -0.5, -1 );
+				scene.add( directionalLight );
 
-				pointLight3 = new THREE.PointLight( 0x0000ff );
-				pointLight3.position.x = -1000;
-				pointLight3.position.z = 1000;
-				pointLight3.distance = 2000;
-				scene.add( pointLight3 );
-
-				spotLight = new THREE.SpotLight( 0xaaaaaa );
-				spotLight.position.set( 1000, 500, 1000 );
-				spotLight.castShadow = true;
-				spotLight.shadowCameraNear = 500;
-				spotLight.shadowCameraFov = 70;
-				spotLight.shadowBias = 0.001;
-				spotLight.shadowMapWidth = 1024;
-				spotLight.shadowMapHeight = 1024;
-				scene.add( spotLight );
-
-				directionalLight2 = new THREE.DirectionalLight( 0xaaff33, 0 );
-				directionalLight2.position.set( -1, 1, 0.5 ).normalize();
-				//scene.add( directionalLight2 );
-
-				directionalLight3 = new THREE.DirectionalLight( 0xaaff33 );
-				directionalLight3.position.set( -1, 1, 0.5 ).normalize();
-				//scene.add( directionalLight3 );
-
-
-				// light representation
-
-				var sphere = new THREE.SphereGeometry( 100, 16, 8 );
-
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
-
-				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
-
-				// common material parameters
-
-				var ambient = 0x050505, diffuse = 0x331100, specular = 0xffffff, shininess = 10, scale = 23;
-
-				// normal map shader
-
-				var shader = THREE.ShaderLib[ "normalmap" ];
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-				uniforms[ "enableAO" ].value = true;
-				uniforms[ "enableDiffuse" ].value = false;
-				uniforms[ "enableSpecular" ].value = false;
-				uniforms[ "enableReflection" ].value = true;
-				uniforms[ "enableDisplacement" ].value = true;
-
-				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
-				uniforms[ "tAO" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
-
-				uniforms[ "tDisplacement" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
-				uniforms[ "uDisplacementBias" ].value = - 0.428408;
-				uniforms[ "uDisplacementScale" ].value = 2.436143;
-
-				uniforms[ "uNormalScale" ].value.y = -1;
-
-				uniforms[ "diffuse" ].value.setHex( diffuse );
-				uniforms[ "specular" ].value.setHex( specular );
-				uniforms[ "ambient" ].value.setHex( ambient );
-
-				uniforms[ "shininess" ].value = shininess;
-
-				uniforms[ "tCube" ].value = reflectionCube;
-				uniforms[ "reflectivity" ].value = 0.1;
-
-				uniforms[ "diffuse" ].value.convertGammaToLinear();
-				uniforms[ "specular" ].value.convertGammaToLinear();
-				uniforms[ "ambient" ].value.convertGammaToLinear();
-
-
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
-				var material1 = new THREE.ShaderMaterial( parameters );
-
-				var material2 = new THREE.MeshPhongMaterial( {
-					color: diffuse,
-					specular: specular,
-					ambient: ambient,
-					shininess: shininess,
-					normalMap: uniforms[ "tNormal" ].value,
-					normalScale: uniforms[ "uNormalScale" ].value,
-					envMap: reflectionCube,
-					combine: THREE.MixOperation,
-					reflectivity: 0.1
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xdddddd,
+					specular: 0x222222,
+					shininess: 35,
+					map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ),
+					specularMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" ),
+					normalMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					normalScale: new THREE.Vector2( 0.8, 0.8 )
 				} );
 
-				//
+				loader = new THREE.JSONLoader();
+				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
-				loader = new THREE.BinaryLoader( true );
-				document.body.appendChild( loader.statusDomElement );
-
-				loader.load( "obj/ninja/NinjaLo_bin.js", function( geometry ) { createScene( geometry, scale, material1, material2 ) } );
-
-				//
-
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( 0x111111 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -217,16 +143,6 @@
 				renderer.gammaOutput = true;
 
 				//
-
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapType = THREE.PCFShadowMap;
-
-
-				//
-
-				var description = "normal + ao" + ( renderer.supportsVertexTextures() ? " + displacement + environment + shadow" : " + <strike>displacement</strike>" );
-				document.getElementById( "description" ).innerHTML = description;
-				document.getElementById( "vt" ).style.display = renderer.supportsVertexTextures() ? "none" : "block";
 
 				if ( statsEnabled ) {
 
@@ -238,47 +154,66 @@
 
 				}
 
-				//
+				// COMPOSER
 
+				renderer.autoClear = false;
+
+				var renderModel = new THREE.RenderPass( scene, camera );
+
+				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
+				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+
+				effectBleach.uniforms[ 'opacity' ].value = 0.4;
+
+				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
+				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
+
+				effectFXAA.renderToScreen = true;
+
+				composer = new THREE.EffectComposer( renderer );
+
+				composer.addPass( renderModel );
+
+				composer.addPass( effectBleach );
+				composer.addPass( effectColor );
+				composer.addPass( effectFXAA );
+
+				// EVENTS
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-			function onWindowResize() {
+			function createScene( geometry, scale, material ) {
 
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
+				mesh1 = new THREE.Mesh( geometry, material );
 
-				camera.left = window.innerWidth / - 2;
-				camera.right = window.innerWidth / 2;
-				camera.top = window.innerHeight / 2;
-				camera.bottom = window.innerHeight / - 2;
+				mesh1.position.y = - 50;
+				mesh1.scale.x = mesh1.scale.y = mesh1.scale.z = scale;
 
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				scene.add( mesh1 );
 
 			}
 
-			function createScene( geometry, scale, material1, material2 ) {
+			//
 
-				geometry.computeTangents();
+			function onWindowResize( event ) {
 
-				mesh1 = new THREE.Mesh( geometry, material1 );
-				mesh1.position.x = - scale * 12;
-				mesh1.scale.set( scale, scale, scale );
-				mesh1.castShadow = true;
-				mesh1.receiveShadow = true;
-				scene.add( mesh1 );
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight;
 
-				mesh2 = new THREE.Mesh( geometry, material2 );
-				mesh2.position.x = scale * 12;
-				mesh2.scale.set( scale, scale, scale );
-				mesh2.castShadow = true;
-				mesh2.receiveShadow = true;
-				scene.add( mesh2 );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				loader.statusDomElement.style.display = "none";
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+				composer.reset();
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
 
 			}
 
@@ -311,22 +246,10 @@
 
 				}
 
-				if( mesh2 ) {
-
-					mesh2.rotation.y = ry;
-					mesh2.rotation.x = rx;
-
-				}
-
-				pointLight.position.x = 2500 * Math.cos( r );
-				pointLight.position.z = 2500 * Math.sin( r );
-
-				r += 0.01;
-
-				renderer.render( scene, camera );
+				//renderer.render( scene, camera );
+				composer.render();
 
 			}
-
 
 		</script>
 

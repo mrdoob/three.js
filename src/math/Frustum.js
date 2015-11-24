@@ -1,7 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  */
 
 THREE.Frustum = function ( p0, p1, p2, p3, p4, p5 ) {
@@ -35,6 +35,12 @@ THREE.Frustum.prototype = {
 		planes[ 5 ].copy( p5 );
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
 
 	},
 
@@ -143,9 +149,11 @@ THREE.Frustum.prototype = {
 					return false;
 
 				}
+
 			}
 
 			return true;
+
 		};
 
 	}(),
@@ -166,12 +174,6 @@ THREE.Frustum.prototype = {
 		}
 
 		return true;
-
-	},
-
-	clone: function () {
-
-		return new THREE.Frustum().copy( this );
 
 	}
 

@@ -68,22 +68,17 @@
 
 				scene = new THREE.Scene();
 
-				loader = new THREE.BinaryLoader( true );
-				document.body.appendChild( loader.statusDomElement );
+				loader = new THREE.BinaryLoader();
 
 				var callback = function( geometry ) {
 
-					object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: THREE.SmoothShading }  )  );
+					object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffffff, shininess: 50 }  )  );
 					object.scale.x = object.scale.y = object.scale.z = 0.80;
 					scene.add( object );
-
-					loader.statusDomElement.style.display = "none";
 
 				};
 
 				loader.load( "obj/walt/WaltHead_bin.js", callback );
-
-				scene.add( new THREE.AmbientLight( 0x000000 ) );
 
 				var sphere = new THREE.SphereGeometry( 0.5, 16, 8 );
 
@@ -104,6 +99,7 @@
 				scene.add( light4 );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

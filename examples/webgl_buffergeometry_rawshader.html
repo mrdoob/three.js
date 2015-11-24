@@ -24,7 +24,6 @@
 			}
 
 			a {
-
 				color: #ffffff;
 			}
 
@@ -113,9 +112,9 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				var vertices = new THREE.BufferAttribute( new Float32Array( triangles * 3 * 3 ), 3 );
+				var vertices = new THREE.Float32Attribute( triangles * 3 * 3, 3 );
 
-				for ( var i = 0; i < vertices.length; i ++ ) {
+				for ( var i = 0, l = vertices.count; i < l; i ++ ) {
 
 					vertices.setXYZ( i, Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
 
@@ -123,9 +122,9 @@
 
 				geometry.addAttribute( 'position', vertices );
 
-				var colors = new THREE.BufferAttribute(new Float32Array( triangles * 3 * 4 ), 4 );
+				var colors = new THREE.Float32Attribute( triangles * 3 * 4, 4 );
 
-				for ( var i = 0; i < colors.length; i ++ ) {
+				for ( var i = 0, l = colors.count; i < l; i ++ ) {
 
 					colors.setXYZW( i, Math.random(), Math.random(), Math.random(), Math.random() );
 
@@ -152,14 +151,14 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0x101010 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
-
-				onWindowResize();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

@@ -39,15 +39,6 @@
 				display:none;
 			}
 
-			#start {
-				color:#fff;
-				text-shadow: #000 0px 0px 2px;
-				padding:0.1em 0.3em;
-				width:3em;
-				text-align: center;
-				display:none;
-			}
-
 			.shadow {
 				-moz-box-shadow: 0px 0px 5px #000;
 				-webkit-box-shadow: 0px 0px 5px #000;
@@ -97,11 +88,14 @@
 
 			<center>
 				<div id="progressbar" class="shadow"><div id="bar" class="shadow"></div></div>
-				<div id="start" class="disabled">Start</div>
 			</center>
 		</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/MorphAnimMesh.js"></script>
+		<script src="js/loaders/collada/Animation.js"></script>
+		<script src="js/loaders/collada/AnimationHandler.js"></script>
+		<script src="js/loaders/collada/KeyFrameAnimation.js"></script>
 
 		<script src="js/loaders/DDSLoader.js"></script>
 
@@ -109,7 +103,7 @@
 		<script src="js/loaders/ctm/ctm.js"></script>
 		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
-		<script src="js/loaders/SceneLoader.js"></script>
+		<script src="js/loaders/deprecated/SceneLoader.js"></script>
 		<script src="js/loaders/BinaryLoader.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/loaders/VTKLoader.js"></script>
@@ -135,11 +129,12 @@
 
 			var mouseX = 0, mouseY = 0;
 
+			var mixers = [];
+
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
 			var rotatingObjects = [];
-			var morphAnimatedObjects = [];
 
 			var clock = new THREE.Clock();
 
@@ -160,36 +155,6 @@
 
 			}
 
-			function handle_update( result, pieces ) {
-
-				var m, material, count = 0;
-
-				for ( m in result.materials ) {
-
-					material = result.materials[ m ];
-					if ( ! ( material instanceof THREE.MeshFaceMaterial || material instanceof THREE.ShaderMaterial || material.morphTargets ) ) {
-
-						if( !material.program ) {
-
-							renderer.initMaterial( material, result.scene.__lights, result.scene.fog );
-
-							count += 1;
-
-							if( count > pieces ) {
-
-								//console.log("xxxxxxxxx");
-								break;
-
-							}
-
-						}
-
-					}
-
-				}
-
-			}
-
 			function init() {
 
 				container = document.createElement( 'div' );
@@ -201,6 +166,7 @@
 				scene = loadScene.scene;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
@@ -215,8 +181,6 @@
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
 
-				$( "start" ).addEventListener( 'click', onStartClick, false );
-
 				var callbackProgress = function( progress, result ) {
 
 					var bar = 250,
@@ -228,30 +192,7 @@
 
 					$( "bar" ).style.width = bar + "px";
 
-					count = 0;
-					for ( var m in result.materials ) count++;
-
-					handle_update( result, Math.floor( count/total ) );
-
-				}
-
-				var callbackSync = function( result ) {
-
-					/*
-
-					// uncomment to see progressive scene loading
-
-					scene = result.scene;
-					camera = result.currentCamera;
-
-					camera.aspect = window.innerWidth / window.innerHeight;
-					camera.updateProjectionMatrix();
-
-					*/
-
-					//handle_update( result, 1 );
-
-				}
+				};
 
 				var callbackFinished = function ( result ) {
 
@@ -259,10 +200,6 @@
 
 					$( "message" ).style.display = "none";
 					$( "progressbar" ).style.display = "none";
-					$( "start" ).style.display = "block";
-					$( "start" ).className = "enabled";
-
-					handle_update( result, 1 );
 
 					result.scene.traverse( function ( object ) {
 
@@ -272,18 +209,13 @@
 
 						}
 
-						if ( object instanceof THREE.MorphAnimMesh ) {
+						if ( object instanceof THREE.Mesh ) {
 
-							morphAnimatedObjects.push( object );
+							if( object.geometry && object.geometry.animations && object.geometry.animations.length > 0 ) {
 
-						}
-
-						if ( object instanceof THREE.SkinnedMesh ) {
-
-							if ( object.geometry.animation ) {
-
-								var animation = new THREE.Animation( object, object.geometry.animation );
-								animation.play();
+								var mixer = new THREE.AnimationMixer( object );
+								mixer.addAction( new THREE.AnimationAction( object.geometry.animations[0] ) );
+								mixers.push( mixer );
 
 							}
 
@@ -291,7 +223,17 @@
 
 					} );
 
-				}
+					//
+
+					$( "progress" ).style.display = "none";
+
+					camera = loaded.currentCamera;
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+
+					scene = loaded.scene;
+
+				};
 
 				$( "progress" ).style.display = "block";
 
@@ -308,7 +250,6 @@
 				loader.addHierarchyHandler( "dae", THREE.ColladaLoader );
 				loader.addHierarchyHandler( "utf8", THREE.UTF8Loader );
 
-				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
 
 				loader.load( "scenes/test_scene.js", callbackFinished );
@@ -328,24 +269,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function setButtonActive( id ) {
-
-				$( "start" ).style.backgroundColor = "green";
-
-			}
-
-			function onStartClick() {
-
-				$( "progress" ).style.display = "none";
-
-				camera = loaded.currentCamera;
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				scene = loaded.scene;
 
 			}
 
@@ -438,11 +361,10 @@
 
 				}
 
-				for ( var i = 0; i < morphAnimatedObjects.length; i ++ ) {
+				
+				for ( var i = 0; i < mixers.length; i ++ ) {
 
-					var object = morphAnimatedObjects[ i ];
-
-					object.updateAnimation( 1000 * delta );
+					mixers[ i ].update( delta );
 
 				}
 

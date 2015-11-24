@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - ShadowMapViewer example </title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> - ShadowMapViewer example by <a href="https://github.com/arya-s">arya-s</a>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
+
+		<script src="js/utils/ShadowMapViewer.js"></script>
+
+		<script src="js/Detector.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer, clock, stats;
+			var dirLight, spotLight;
+			var torusKnot, cube;
+			var dirLightShadowMapViewer, spotLightShadowMapViewer;
+
+			init();
+			animate();
+
+
+			function init() {
+
+				initScene();
+				initShadowMapViewers();
+				initMisc();
+
+				document.body.appendChild( renderer.domElement );
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function initScene() {
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 15, 35 );
+
+				scene = new THREE.Scene();
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+				spotLight = new THREE.SpotLight( 0xffffff );
+				spotLight.name = 'Spot Light';
+				spotLight.position.set( 10, 10, 5 );
+				spotLight.castShadow = true;
+				spotLight.shadowCameraNear = 8;
+				spotLight.shadowCameraFar = 30;
+				spotLight.shadowMapWidth = 1024;
+				spotLight.shadowMapHeight = 1024;
+				scene.add( spotLight );
+
+				scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
+
+				dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				dirLight.name = 'Dir. Light';
+				dirLight.position.set( 0, 10, 0 );
+				dirLight.castShadow = true;
+				dirLight.shadowCameraNear = 1;
+				dirLight.shadowCameraFar = 10;
+				dirLight.shadowCameraRight = 15;
+				dirLight.shadowCameraLeft = -15;
+				dirLight.shadowCameraTop	= 15;
+				dirLight.shadowCameraBottom = -15;
+				dirLight.shadowMapWidth = 1024;
+				dirLight.shadowMapHeight = 1024;
+				scene.add( dirLight );
+
+				scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+
+				// Geometry
+				var geometry = new THREE.TorusKnotGeometry( 25, 8, 75, 20 );
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xff0000,
+					shininess: 150,
+					specular: 0x222222,
+					shading: THREE.SmoothShading,
+				} );
+
+				torusKnot = new THREE.Mesh( geometry, material );
+				torusKnot.scale.multiplyScalar( 1 / 18 );
+				torusKnot.position.y = 3;
+				torusKnot.castShadow = true;
+				torusKnot.receiveShadow = true;
+				scene.add( torusKnot );
+
+				var geometry = new THREE.BoxGeometry( 3, 3, 3 );
+				cube = new THREE.Mesh( geometry, material );
+				cube.position.set( 8, 3, 8 );
+				cube.castShadow = true;
+				cube.receiveShadow = true;
+				scene.add( cube );
+
+				var geometry = new THREE.BoxGeometry( 10, 0.15, 10 );
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xa0adaf,
+					shininess: 150,
+					specular: 0xffffff,
+					shading: THREE.SmoothShading
+				} );
+
+				var ground = new THREE.Mesh( geometry, material );
+				ground.scale.multiplyScalar( 3 );
+				ground.castShadow = false;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+			}
+
+			function initShadowMapViewers() {
+
+				dirLightShadowMapViewer = new THREE.ShadowMapViewer( dirLight );
+				dirLightShadowMapViewer.position.x = 10;
+				dirLightShadowMapViewer.position.y = 10;
+				dirLightShadowMapViewer.size.width = 256;
+				dirLightShadowMapViewer.size.height = 256;
+				dirLightShadowMapViewer.update(); //Required when setting position or size directly
+
+				spotLightShadowMapViewer = new THREE.ShadowMapViewer( spotLight );
+				spotLightShadowMapViewer.size.set( 256, 256 );
+				spotLightShadowMapViewer.position.set( 276, 10 );
+				// spotLightShadowMapViewer.update();	//NOT required because .set updates automatically
+
+			}
+
+			function initMisc() {
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x000000 );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.BasicShadowMap;
+
+				// Mouse control
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2, 0 );
+				controls.update();
+
+				clock = new THREE.Clock();
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.right = '0px';
+				stats.domElement.style.top = '0px';
+				document.body.appendChild( stats.domElement );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				dirLightShadowMapViewer.updateForWindowResize();
+				spotLightShadowMapViewer.updateForWindowResize();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+				stats.update();
+
+			}
+
+			function renderScene() {
+
+				renderer.render( scene, camera );
+
+			}
+
+			function renderShadowMapViewers() {
+
+				dirLightShadowMapViewer.render( renderer );
+				spotLightShadowMapViewer.render( renderer );
+
+			}
+
+			function render() {
+
+				var delta = clock.getDelta();
+
+				renderScene();
+				renderShadowMapViewers();
+
+				torusKnot.rotation.x += 0.25 * delta;
+				torusKnot.rotation.y += 2 * delta;
+				torusKnot.rotation.z += 1 * delta;
+
+				cube.rotation.x += 0.25 * delta;
+				cube.rotation.y += 2 * delta;
+				cube.rotation.z += 1 * delta;
+
+			}
+
+		</script>
+	</body>
+</html>

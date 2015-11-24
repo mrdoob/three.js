@@ -46,6 +46,9 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/geometries/hilbert3D.js"></script>
@@ -77,10 +80,9 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.CanvasRenderer( { antialias: false } );
-				renderer.setClearColor( 0x000000, 1 );
+				renderer = new THREE.CanvasRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				var geometry3 = new THREE.Geometry(),

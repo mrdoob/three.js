@@ -91,6 +91,9 @@
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+
+		<script src="js/geometries/TextGeometry.js"></script>
+		<script src="js/utils/FontUtils.js"></script>
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
 
 		<script>
@@ -122,9 +125,9 @@
 				{ size: 3400000,       scale: 1.0,  label: "moon-sized (3,400 Km)", scale: 1 },
 				{ size: 12000000,      scale: 1.0,  label: "planet-sized (12,000 km)", scale: 1 },
 				{ size: 1400000000,    scale: 1.0,  label: "sun-sized (1,400,000 km)", scale: 1 },
- 				{ size: 7.47e12,       scale: 1.0,  label: "solar system-sized (50Au)", scale: 1 },
-   				{ size: 9.4605284e15,  scale: 1.0,  label: "gargantuan (1 light year)", scale: 1 },
-   				{ size: 3.08567758e16, scale: 1.0,  label: "ludicrous (1 parsec)", scale: 1 },
+				{ size: 7.47e12,       scale: 1.0,  label: "solar system-sized (50Au)", scale: 1 },
+				{ size: 9.4605284e15,  scale: 1.0,  label: "gargantuan (1 light year)", scale: 1 },
+				{ size: 3.08567758e16, scale: 1.0,  label: "ludicrous (1 parsec)", scale: 1 },
 				{ size: 1e19,          scale: 1.0,  label: "mind boggling (1000 light years)", scale: 1 },
 				{ size: 1.135e21,      scale: 1.0,  label: "galaxy-sized (120,000 light years)", scale: 1 },
 				{ size: 9.46e23,       scale: 1.0,  label: "... (100,000,000 light years)", scale: 1 }
@@ -137,9 +140,11 @@
 
 				container = document.getElementById( 'container' );
 
+				var scene = initScene();
+
 				// Initialize two copies of the same scene, one with normal z-buffer and one with logarithmic z-buffer
-				objects.normal = initScene('normal', false);
-				objects.logzbuf = initScene('logzbuf', true);
+				objects.normal = initView( scene, 'normal', false );
+				objects.logzbuf = initView( scene, 'logzbuf', true );
 
 				stats = new Stats();
 				container.appendChild(stats.domElement);
@@ -150,19 +155,33 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 				window.addEventListener( 'mousewheel', onMouseWheel, false );
-				window.addEventListener( 'DOMMouseScroll', onMouseWheel, false );
+				window.addEventListener( 'MozMousePixelScroll', onMouseWheel, false );
 				window.addEventListener( 'mousemove', onMouseMove, false );
 
 				render();
 			}
 
-			function initScene(name, logDepthBuf) {
+			function initView( scene, name, logDepthBuf ) {
 
-				var scene = new THREE.Scene();
 				var framecontainer = document.getElementById('container_' + name);
 
 				var camera = new THREE.PerspectiveCamera( 50, screensplit * SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
 				scene.add(camera);
+
+				var renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: logDepthBuf });
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize(SCREEN_WIDTH/2, SCREEN_HEIGHT);
+				renderer.domElement.style.position = "relative";
+				renderer.domElement.id = 'renderer_' + name;
+				framecontainer.appendChild(renderer.domElement);
+
+				return { container: framecontainer, renderer: renderer, scene: scene, camera: camera }
+
+			}
+
+			function initScene() {
+
+				var scene = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight(0xffffff, 1);
 				light.position.set(100,100,100);
@@ -170,18 +189,18 @@
 
 				var materialargs = {
 					color: 0xffffff,
-					specular: 0xffaa00,
+					specular: 0x050505,
 					shininess: 50,
 					shading: THREE.SmoothShading,
 					emissive: 0x000000
 				};
 
-				var geomtransform = new THREE.Matrix4();
-				var tmpvec = new THREE.Vector3();
 				var meshes = [];
 				var coloroffset = 0;
 				var colorskip = ['black', 'antiquewhite', 'bisque', 'beige', 'blanchedalmond', 'darkblue', 'darkcyan'];
 				var colorkeys = Object.keys( THREE.ColorKeywords );
+
+				var geometry = new THREE.SphereBufferGeometry(0.5, 24, 12);
 
 				for (var i = 0; i < labeldata.length; i++) {
 					var scale = labeldata[i].scale || 1;
@@ -193,8 +212,7 @@
 					labelgeo.computeBoundingSphere();
 
 					// center text
-					geomtransform.setPosition( tmpvec.set( -labelgeo.boundingSphere.radius, 0, 0 ) );
-					labelgeo.applyMatrix( geomtransform );
+					labelgeo.translate( - labelgeo.boundingSphere.radius, 0, 0 );
 
 					// Pick a color at "random".  Exclude black, because it looks bad.
 					while ( colorskip.indexOf( colorkeys[ i + coloroffset ] ) != -1 ) {
@@ -204,33 +222,25 @@
 
 					var material = new THREE.MeshPhongMaterial( materialargs );
 
+					var group = new THREE.Group();
+					group.position.z = -labeldata[i].size * scale;
+					scene.add(group);
+
 					var textmesh = new THREE.Mesh( labelgeo, material );
 					textmesh.scale.set(scale, scale, scale);
 					textmesh.position.z = -labeldata[i].size * scale;
 					textmesh.position.y = labeldata[i].size / 4 * scale;
-					textmesh.updateMatrix();
+					group.add(textmesh);
 
-					var dotmesh = new THREE.Mesh(new THREE.SphereGeometry(labeldata[i].size * scale / 2, 24, 12), material);
+					var dotmesh = new THREE.Mesh(geometry, material);
 					dotmesh.position.y = -labeldata[i].size / 4 * scale;
-					dotmesh.updateMatrix();
+					dotmesh.scale.multiplyScalar(labeldata[i].size * scale);
+					group.add(dotmesh);
 
-					var merged = new THREE.Geometry();
-					merged.merge( textmesh.geometry, textmesh.matrix );
-					merged.merge( dotmesh.geometry, dotmesh.matrix );
-
-					var mesh = new THREE.Mesh(merged, material);
-					mesh.position.z = -labeldata[i].size * 1 * scale;
-
-					scene.add(mesh);
 				}
 
-				var renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: logDepthBuf });
-				renderer.setSize(SCREEN_WIDTH/2, SCREEN_HEIGHT);
-				renderer.domElement.style.position = "relative";
-				renderer.domElement.id = 'renderer_' + name;
-				framecontainer.appendChild(renderer.domElement);
+				return scene;
 
-				return { container: framecontainer, renderer: renderer, scene: scene, camera: camera }
 			}
 
 			function updateRendererSizes() {
@@ -330,6 +340,7 @@
 			}
 			function onMouseWheel(ev) {
 				var amount = -ev.wheelDeltaY || ev.detail;
+				if ( amount === 0 ) return;
 				var dir = amount / Math.abs(amount);
 				zoomspeed = dir/10;
 

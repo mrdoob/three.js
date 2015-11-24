@@ -48,7 +48,7 @@
 
 				scene = new THREE.Scene();
 
-				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
+				var material = new THREE.MeshNormalMaterial();
 
 				var loader = new THREE.JSONLoader();
 				loader.load( 'obj/Suzanne.js', function ( geometry ) {
@@ -76,6 +76,7 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 

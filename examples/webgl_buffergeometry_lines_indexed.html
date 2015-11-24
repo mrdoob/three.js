@@ -23,7 +23,6 @@
 			}
 
 			a {
-
 				color: #0080ff;
 			}
 
@@ -182,12 +181,12 @@
 				);
 				// --------------------------------
 
-				geometry.addAttribute( 'index', new THREE.BufferAttribute( new Uint16Array( indices_array ), 1 ) );
+				geometry.setIndex( new THREE.BufferAttribute( new Uint16Array( indices_array ), 1 ) );
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 				geometry.computeBoundingSphere();
 
-				mesh = new THREE.Line( geometry, material, THREE.LinePieces );
+				mesh = new THREE.LineSegments( geometry, material );
 				mesh.position.x -= 1200;
 				mesh.position.y -= 1200;
 
@@ -197,6 +196,7 @@
 				scene.add( parent_node );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.gammaInput = true;

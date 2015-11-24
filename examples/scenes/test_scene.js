@@ -514,11 +514,10 @@
 				"DbgColor" : 15658734,
 				"DbgIndex" : 0,
 				"DbgName" : "Material",
-				"colorAmbient" : [0.0, 0.0, 0.0],
 				"colorDiffuse" : [0.8, 0.8, 0.8],
 				"colorSpecular" : [0.5, 0.5, 0.5],
 				"specularCoef" : 50,
-				"transparency" : 1.0,
+				"opacity" : 1.0,
 				"vertexColors" : true
 			}],
 
@@ -562,47 +561,47 @@
 
 		"phong_ben": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 1118481, "ambient": 1118481, "specular": 5601245, "shininess": 12, "bumpMap": "texture_bump_repeat", "bumpScale": 0.125 }
+			"parameters": { "color": 1118481, "specular": 5601245, "shininess": 12, "bumpMap": "texture_bump_repeat", "bumpScale": 0.125 }
 		},
 
 		"phong_man": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 16737894, "ambient": 16737894, "specular": 2236962, "shininess": 40, "wrapAround": true, "wrapRGB": [ 0.15, 0.02, 0.01 ] }
+			"parameters": { "color": 16737894, "specular": 2236962, "shininess": 40 }
 		},
 
 		"phong_hand": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 14531481, "ambient": 14531481, "specular": 2236962, "shininess": 40, "wrapAround": true, "wrapRGB": [ 0.15, 0.02, 0.01 ] }
+			"parameters": { "color": 14531481, "specular": 2236962, "shininess": 40 }
 		},
 
 		"phong_bunny": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 16777215, "ambient": 16777215, "specular": 1118481, "shininess": 10 }
+			"parameters": { "color": 16777215, "specular": 1118481, "shininess": 10 }
 		},
 
 		"phong_monster": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 16777215, "ambient": 16777215, "specular": 1118481, "shininess": 10 }
+			"parameters": { "color": 16777215, "specular": 1118481, "shininess": 10 }
 		},
 
 		"phong_disk": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 16733491, "ambient": 16733491, "specular": 1118481, "shininess": 30, "wireframe": false }
+			"parameters": { "color": 16733491, "specular": 1118481, "shininess": 30, "wireframe": false }
 		},
 
 		"phong_normal": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 0, "specular": 16777215, "shininess": 25, "envMap": "cube_reflection", "reflectivity": 0.1, "lightMap": "texture_ao", "normalMap": "texture_normal", "normalScale": [ 1, -1 ], "displacementMap": "texture_displacement", "displacementScale": 2.436143, "displacementBias": -0.428408 }
+			"parameters": { "color": 0, "specular": 16777215, "shininess": 25, "envMap": "cube_reflection", "reflectivity": 0.1, "lightMap": "texture_ao", "normalMap": "texture_normal", "normalScale": [ 1, -1 ] }
 		},
 
 		"phong_morph": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 0, "ambient": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.125, "combine": "MixOperation", "shading": "flat", "side": "double", "morphTargets": true, "morphNormals" : true }
+			"parameters": { "color": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.125, "combine": "MixOperation", "shading": "flat", "side": "double", "morphTargets": true }
 		},
 
 		"phong_skin": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 0, "ambient": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.5, "combine": "MixOperation", "skinning": true, "morphTargets": true }
+			"parameters": { "color": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.5, "combine": "MixOperation", "skinning": true, "morphTargets": true }
 		},
 
 		"phong_compressed_cube": {

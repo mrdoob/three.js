@@ -90,7 +90,7 @@
 				var loader = new THREE.DDSLoader();
 				
 				var textureCube = loader.load( urls );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } )
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 				var geometry = new THREE.SphereGeometry( 100, 96, 64 );
 
 				var mesh = new THREE.Mesh( geometry, material );
@@ -117,6 +117,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

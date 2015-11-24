@@ -18,6 +18,7 @@
 	"src/cameras/Camera.js",
 	"src/cameras/PerspectiveCamera.js",
 	"src/lights/Light.js",
+	"src/objects/Group.js",
 	"src/objects/Bone.js",
 	"src/scenes/Scene.js",
 	"examples/js/renderers/CSS3DRenderer.js"

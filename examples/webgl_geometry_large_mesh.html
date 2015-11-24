@@ -49,6 +49,9 @@
 
 		<script src="js/loaders/BinaryLoader.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -129,19 +132,21 @@
 					try {
 
 						webglRenderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+						webglRenderer.setPixelRatio( window.devicePixelRatio );
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
 						container.appendChild( webglRenderer.domElement );
 						has_gl = 1;
 
-					}
-					catch (e) {
+					} catch (e) {
+
 					}
 				}
 
 				if( render_canvas ) {
 
 					canvasRenderer = new THREE.CanvasRenderer();
+					canvasRenderer.setPixelRatio( window.devicePixelRatio );
 					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 					container.appendChild( canvasRenderer.domElement );
 
@@ -157,19 +162,16 @@
 				bcanvas.addEventListener( "click", toggleCanvas, false );
 				bwebgl.addEventListener( "click", toggleWebGL, false );
 
-				loader = new THREE.BinaryLoader( true );
-				document.body.appendChild( loader.statusDomElement );
+				loader = new THREE.BinaryLoader();
 
 				var start = Date.now();
 
 				loader.load( 'obj/lucy/Lucy100k_bin.js', function ( geometry, materials ) {
 
-					addMesh( geometry, 0.75, 900, 0, 0,  0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x990000, shininess: 30 } ) );
+					addMesh( geometry, 0.75, 900, 0, 0,  0,0,0, new THREE.MeshPhongMaterial( { color: 0x030303, specular: 0x990000, shininess: 30 } ) );
 					addMesh( geometry, 0.75, 300, 0, 0,  0,0,0, new THREE.MeshFaceMaterial( materials ) );
-					addMesh( geometry, 0.75, -300, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x111111, specular: 0xffaa00, shininess: 10 } ) );
-					addMesh( geometry, 0.75, -900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x555555, specular: 0x666666, shininess: 10 } ) );
-
-					loader.statusDomElement.style.display = "none";
+					addMesh( geometry, 0.75, -300, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { color: 0x111111, specular: 0xffaa00, shininess: 10 } ) );
+					addMesh( geometry, 0.75, -900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0x666666, shininess: 10 } ) );
 
 					log( "geometry.vertices: " + geometry.vertices.length );
 					log( "geometry.faces: " + geometry.faces.length );
@@ -216,7 +218,7 @@
 			}
 
 			function render() {
-			
+
 				var time = Date.now() * 0.001;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;

@@ -45,7 +45,7 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - webgl bump mapping without tangents using <a href="http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html">Morten Mikkelsen's</a> method -
-			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head
+			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank">Lee Perry-Smith</a> head
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -65,7 +65,7 @@
 
 			var mesh;
 
-			var directionalLight, directionalLight2, pointLight, ambientLight, spotLight;
+			var spotLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -93,28 +93,14 @@
 
 				// LIGHTS
 
-				ambientLight = new THREE.AmbientLight( 0x444444 );
-				scene.add( ambientLight );
+				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
 
-				//
-
-				pointLight = new THREE.PointLight( 0xffffff, 1.5, 1000 );
-				pointLight.color.setHSL( 0.05, 1, 0.95 );
-				pointLight.position.set( 0, 0, 600 );
-
-				scene.add( pointLight );
-
-				// shadow for PointLight
-
-				spotLight = new THREE.SpotLight( 0xffffff, 1.5 );
-				spotLight.position.set( 0.05, 0.05, 1 );
-				spotLight.color.setHSL( 0.6, 1, 0.95 );
+				spotLight = new THREE.SpotLight( 0xffffbb, 2 );
+				spotLight.position.set( 0.5, 0, 1 );
+				spotLight.position.multiplyScalar( 700 );
 				scene.add( spotLight );
 
-				spotLight.position.multiplyScalar( 700 );
-
 				spotLight.castShadow = true;
-				spotLight.onlyShadow = true;
 				// spotLight.shadowCameraVisible = true;
 
 				spotLight.shadowMapWidth = 2048;
@@ -126,63 +112,36 @@
 				spotLight.shadowCameraFov = 40;
 
 				spotLight.shadowBias = -0.005;
-				spotLight.shadowDarkness = 0.35;
 
 				//
-
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				directionalLight.position.set( 1, -0.5, 1 );
-				directionalLight.color.setHSL( 0.6, 1, 0.95 );
-				scene.add( directionalLight );
-
-				directionalLight.position.multiplyScalar( 500 );
-
-				directionalLight.castShadow = true;
-				// directionalLight.shadowCameraVisible = true;
-
-				directionalLight.shadowMapWidth = 2048;
-				directionalLight.shadowMapHeight = 2048;
-
-				directionalLight.shadowCameraNear = 200;
-				directionalLight.shadowCameraFar = 1500;
-
-				directionalLight.shadowCameraLeft = -500;
-				directionalLight.shadowCameraRight = 500;
-				directionalLight.shadowCameraTop = 500;
-				directionalLight.shadowCameraBottom = -500;
-
-				directionalLight.shadowBias = -0.005;
-				directionalLight.shadowDarkness = 0.35;
-
-				//
-
-				directionalLight2 = new THREE.DirectionalLight( 0xffffff, 1.2 );
-				directionalLight2.position.set( 1, -0.5, -1 );
-				directionalLight2.color.setHSL( 0.08, 1, 0.825 );
-				scene.add( directionalLight2 );
 
 				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
 				mapHeight.anisotropy = 4;
 				mapHeight.repeat.set( 0.998, 0.998 );
-				mapHeight.offset.set( 0.001, 0.001 )
+				mapHeight.offset.set( 0.001, 0.001 );
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 				mapHeight.format = THREE.RGBFormat;
 
-				var material = new THREE.MeshPhongMaterial( { ambient: 0x552811, color: 0x552811, specular: 0x333333, shininess: 25, bumpMap: mapHeight, bumpScale: 19, metal: false } );
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0x552811,
+					specular: 0x222222,
+					shininess: 25,
+					bumpMap: mapHeight,
+					bumpScale: 12
+				} );
 
-				loader = new THREE.JSONLoader( true );
-				document.body.appendChild( loader.statusDomElement );
-
+				loader = new THREE.JSONLoader();
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0x060708, 1 );
+				renderer.setClearColor( 0x060708 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapCullFace = THREE.CullFaceBack;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.cullFace = THREE.CullFaceBack;
 
 				//
 
@@ -216,8 +175,6 @@
 				mesh.receiveShadow = true;
 
 				scene.add( mesh );
-
-				loader.statusDomElement.style.display = "none";
 
 			}
 

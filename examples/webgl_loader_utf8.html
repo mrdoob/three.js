@@ -96,7 +96,7 @@
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
-				//directionalLight.shadowCameraVisible = true;
+				// directionalLight.shadowCameraVisible = true;
 
 				directionalLight.shadowMapWidth = 2048;
 				directionalLight.shadowMaHeight = 2048;
@@ -115,10 +115,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				renderer.setClearColor( scene.fog.color, 1 );
-
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
@@ -127,8 +126,8 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapType = THREE.PCFShadowMap;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
 
 				// STATS
 
@@ -160,13 +159,6 @@
 						node.castShadow = true;
 						node.receiveShadow = true;
 
-						if ( node.material && node.material.name === "skin" ) {
-
-							node.material.wrapAround = true;
-							node.material.wrapRGB.set( 0.6, 0.2, 0.1 );
-
-						}
-
 					} );
 
 				}, { normalizeRGB: true } );
@@ -186,13 +178,6 @@
 
 						node.castShadow = true;
 						node.receiveShadow = true;
-
-						if ( node.material && ( node.material.name === "head" || node.material.name === "skinbody" ) ) {
-
-							node.material.wrapAround = true;
-							node.material.wrapRGB.set( 0.6, 0.2, 0.1 );
-
-						}
 
 					} );
 

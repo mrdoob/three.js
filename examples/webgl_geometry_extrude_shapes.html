@@ -46,6 +46,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0x222222 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -115,7 +116,7 @@
 
 				}
 
-				var randomSpline =  new THREE.SplineCurve3( randomPoints );
+				var randomSpline =  new THREE.CatmullRomCurve3( randomPoints );
 
 				//
 

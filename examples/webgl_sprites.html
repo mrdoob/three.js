@@ -6,7 +6,6 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				background:#fff;
 				padding:0;
 				margin:0;
 				font-weight: bold;
@@ -57,7 +56,7 @@
 				var mapB = THREE.ImageUtils.loadTexture( "textures/sprite1.png" );
 				mapC = THREE.ImageUtils.loadTexture( "textures/sprite2.png" );
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 
 				var materialC = new THREE.SpriteMaterial( { map: mapC, color: 0xffffff, fog: true } );
 				var materialB = new THREE.SpriteMaterial( { map: mapB, color: 0xffffff, fog: true } );
@@ -96,9 +95,10 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false; // To allow render overlay on top of sprited sphere
-				
+
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -136,7 +136,7 @@
 
 				updateHUDSprites();
 
-			};
+			}
 
 			function updateHUDSprites () {
 
@@ -154,14 +154,14 @@
 				spriteBR.position.set(   width - imageWidth, - height + imageHeight, 1 ); // bottom right
 				spriteC.position.set( 0, 0, 1 ); // center
 
-			};
+			}
 
 			function onWindowResize() {
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
-				camera.aspect = width / height;				
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
 				cameraOrtho.left = - width / 2;

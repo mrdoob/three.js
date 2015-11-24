@@ -15,10 +15,10 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orth
 
 	this.fov = fov;
 
-	this.left = -width / 2;
-	this.right = width / 2
+	this.left = - width / 2;
+	this.right = width / 2;
 	this.top = height / 2;
-	this.bottom = -height / 2;
+	this.bottom = - height / 2;
 
 	// We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
 
@@ -29,11 +29,10 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orth
 
 	this.toPerspective();
 
-	var aspect = width/height;
-
 };
 
 THREE.CombinedCamera.prototype = Object.create( THREE.Camera.prototype );
+THREE.CombinedCamera.prototype.constructor = THREE.CombinedCamera;
 
 THREE.CombinedCamera.prototype.toPerspective = function () {
 
@@ -66,7 +65,7 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 
 	var hyperfocus = ( near + far ) / 2;
 
-	var halfHeight = Math.tan( fov / 2 ) * hyperfocus;
+	var halfHeight = Math.tan( fov * Math.PI / 180 / 2 ) * hyperfocus;
 	var planeHeight = 2 * halfHeight;
 	var planeWidth = planeHeight * aspect;
 	var halfWidth = planeWidth / 2;
@@ -74,10 +73,10 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 	halfHeight /= this.zoom;
 	halfWidth /= this.zoom;
 
-	this.cameraO.left = -halfWidth;
+	this.cameraO.left = - halfWidth;
 	this.cameraO.right = halfWidth;
 	this.cameraO.top = halfHeight;
-	this.cameraO.bottom = -halfHeight;
+	this.cameraO.bottom = - halfHeight;
 
 	// this.cameraO.left = -farHalfWidth;
 	// this.cameraO.right = farHalfWidth;
@@ -104,10 +103,10 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 THREE.CombinedCamera.prototype.setSize = function( width, height ) {
 
 	this.cameraP.aspect = width / height;
-	this.left = -width / 2;
-	this.right = width / 2
+	this.left = - width / 2;
+	this.right = width / 2;
 	this.top = height / 2;
-	this.bottom = -height / 2;
+	this.bottom = - height / 2;
 
 };
 
@@ -128,7 +127,7 @@ THREE.CombinedCamera.prototype.setFov = function( fov ) {
 
 };
 
-// For mantaining similar API with PerspectiveCamera
+// For maintaining similar API with PerspectiveCamera
 
 THREE.CombinedCamera.prototype.updateProjectionMatrix = function() {
 
@@ -159,6 +158,7 @@ THREE.CombinedCamera.prototype.setLens = function ( focalLength, frameHeight ) {
 	this.setFov( fov );
 
 	return fov;
+
 };
 
 

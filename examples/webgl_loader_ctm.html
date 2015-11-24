@@ -38,7 +38,7 @@
 		<a href="http://openctm.sourceforge.net/" target="_blank">CTM format</a> loader test -
 		using <a href="http://code.google.com/p/js-openctm/">js-openctm</a> -
 		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank">The Utah 3D Animation Repository</a>,
-		<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a>,
+		<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank">Lee Perry-Smith</a>,
 		<a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>
 		</div>
 
@@ -114,10 +114,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				renderer.setClearColor( scene.fog.color, 1 );
-
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
@@ -126,7 +125,7 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				renderer.shadowMapEnabled = true;
+				renderer.shadowMap.enabled = true;
 
 				// STATS
 
@@ -180,44 +179,16 @@
 
 				loader.load( "models/ctm/LeePerry.ctm",  function( geometry ) {
 
-					/*
-					var material = new THREE.MeshPhongMaterial( { wrapAround: true, color: 0xffffff, specular: 0x232323, shininess: 50, map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ) } );
-					material.wrapRGB.set( 0.65, 0.5, 0.5 );
-					*/
+					var material = new THREE.MeshPhongMaterial( {
 
-					var ambient = 0xffffff, diffuse = 0xffffff, specular = 0x0e0e0e, shininess = 50;
+						specular: 0x303030,
+						shininess: 50,
+						map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ),
+						specularMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" ),
+						normalMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+						normalScale: new THREE.Vector2( 0.8, 0.8 )
 
-					var shader = THREE.ShaderLib[ "normalmap" ];
-					var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-					uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-					uniforms[ "uNormalScale" ].value.set( 0.8, 0.8 );
-
-					uniforms[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
-					uniforms[ "tSpecular" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" );
-
-					uniforms[ "enableAO" ].value = false;
-					uniforms[ "enableDiffuse" ].value = true;
-					uniforms[ "enableSpecular" ].value = true;
-
-					uniforms[ "diffuse" ].value.setHex( diffuse );
-					uniforms[ "specular" ].value.setHex( specular );
-					uniforms[ "ambient" ].value.setHex( ambient );
-
-					uniforms[ "shininess" ].value = shininess;
-
-					uniforms[ "wrapRGB" ].value.set( 0.75, 0.5, 0.5 );
-
-					var material = new THREE.ShaderMaterial( {
-						fragmentShader: shader.fragmentShader,
-						vertexShader: shader.vertexShader,
-						uniforms: uniforms,
-						lights: true
 					} );
-
-					material.wrapAround = true;
-
-					geometry.computeTangents();
 
 					callbackModel( geometry, 1300, material, 200, 50, 0, 0, 0 );
 					checkTime();

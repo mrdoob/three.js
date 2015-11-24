@@ -2,13 +2,14 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Mesh] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<div class="desc">A helper object to show the world-axis-aligned bounding box for an object.</div>
@@ -26,7 +27,7 @@
 		bbox.update();
 		scene.add( bbox );
 		</code>
-
+		<div>Note that this helper will create a wireframe [page:Mesh] object with a [page:BoxGeometry]; the resulting bounding box object will therefore have face diagonals. You may want to use [page:BoxHelper], which generates a [page:Line] object without face diagonals.</div>
 
 
 		<h2>Constructor</h2>
@@ -46,19 +47,19 @@
 
 
 
-		<h3>.[page:Object3D object]</h3>
+		<h3>[property:Object3D object]</h3>
 		<div>
 		Contains the object3D to show the world-axis-aligned boundingbox.
-		</div> 
+		</div>
 
-		<h3>.[page:Box3 box]</h3>
+		<h3>[property:Box3 box]</h3>
 		<div>
 		Contains the bounding box of the object.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 
-		<h3>.update()</h3>
+		<h3>[method:null update]()</h3>
 		<div>
 		Updates the BoundingBoxHelper based on the object property.
 		</div>

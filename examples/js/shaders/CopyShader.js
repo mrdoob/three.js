@@ -24,7 +24,7 @@ THREE.CopyShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -41,6 +41,6 @@ THREE.CopyShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

@@ -23,7 +23,6 @@
 			}
 
 			a {
-
 				color: #0080ff;
 			}
 
@@ -105,6 +104,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.gammaInput = true;

@@ -98,13 +98,6 @@
 
 			scene = new THREE.Scene();
 
-			var attributes = {
-
-				size:        { type: 'f', value: null },
-				customColor: { type: 'c', value: null }
-
-			};
-
 			uniforms = {
 
 				color:     { type: "c", value: new THREE.Color( 0xffffff ) },
@@ -115,7 +108,6 @@
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms:       uniforms,
-				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
@@ -131,36 +123,37 @@
 			geometry = new THREE.BufferGeometry();
 
 			var positions = new Float32Array( particles * 3 );
-			var values_color = new Float32Array( particles * 3 );
-			var values_size = new Float32Array( particles );
+			var colors = new Float32Array( particles * 3 );
+			var sizes = new Float32Array( particles );
 
 			var color = new THREE.Color();
 
-			for( var v = 0; v < particles; v++ ) {
+			for ( var i = 0, i3 = 0; i < particles; i ++, i3 += 3 ) {
 
-				values_size[ v ] = 20;
+				positions[ i3 + 0 ] = ( Math.random() * 2 - 1 ) * radius;
+				positions[ i3 + 1 ] = ( Math.random() * 2 - 1 ) * radius;
+				positions[ i3 + 2 ] = ( Math.random() * 2 - 1 ) * radius;
 
-				positions[ v * 3 + 0 ] = ( Math.random() * 2 - 1 ) * radius;
-				positions[ v * 3 + 1 ] = ( Math.random() * 2 - 1 ) * radius;
-				positions[ v * 3 + 2 ] = ( Math.random() * 2 - 1 ) * radius;
+				color.setHSL( i / particles, 1.0, 0.5 );
 
-				color.setHSL( v / particles, 1.0, 0.5 );
+				colors[ i3 + 0 ] = color.r;
+				colors[ i3 + 1 ] = color.g;
+				colors[ i3 + 2 ] = color.b;
 
-				values_color[ v * 3 + 0 ] = color.r;
-				values_color[ v * 3 + 1 ] = color.g;
-				values_color[ v * 3 + 2 ] = color.b;
+				sizes[ i ] = 20;
 
 			}
 
 			geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-			geometry.addAttribute( 'customColor', new THREE.BufferAttribute( values_color, 3 ) );
-			geometry.addAttribute( 'size', new THREE.BufferAttribute( values_size, 1 ) );
+			geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+			geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
 
-			particleSystem = new THREE.PointCloud( geometry, shaderMaterial );
+			particleSystem = new THREE.Points( geometry, shaderMaterial );
 
 			scene.add( particleSystem );
 
 			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( WIDTH, HEIGHT );
 
 			var container = document.getElementById( 'container' );
@@ -201,11 +194,11 @@
 
 			particleSystem.rotation.z = 0.01 * time;
 
-			var size = geometry.attributes.size.array;
+			var sizes = geometry.attributes.size.array;
 
-			for( var i = 0; i < particles; i++ ) {
+			for ( var i = 0; i < particles; i++ ) {
 
-				size[ i ] = 10 * ( 1 + Math.sin( 0.1 * i + time ) );
+				sizes[ i ] = 10 * ( 1 + Math.sin( 0.1 * i + time ) );
 
 			}
 
@@ -215,9 +208,7 @@
 
 		}
 
-
 	</script>
 
 </body>
-
 </html>

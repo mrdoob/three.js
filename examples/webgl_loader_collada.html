@@ -33,6 +33,9 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/loaders/collada/Animation.js"></script>
+		<script src="js/loaders/collada/AnimationHandler.js"></script>
+		<script src="js/loaders/collada/KeyFrameAnimation.js"></script>
 
 		<script src="js/loaders/ColladaLoader.js"></script>
 
@@ -101,7 +104,7 @@
 
 				}
 
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				var line = new THREE.LineSegments( geometry, material );
 				scene.add( line );
 
 				// Add the COLLADA
@@ -126,8 +129,8 @@
 				particleLight.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

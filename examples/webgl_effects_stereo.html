@@ -76,7 +76,7 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.SphereGeometry( 100, 32, 16 );
+				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
 
 				var path = "textures/cube/skybox/";
 				var format = '.jpg';
@@ -86,7 +86,7 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls, new THREE.CubeRefractionMapping() );
+				var textureCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeRefractionMapping );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
 
 				for ( var i = 0; i < 500; i ++ ) {
@@ -122,10 +122,11 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.StereoEffect( renderer );
-				effect.separation = 10;
+				effect.eyeSeparation = 10;
 				effect.setSize( window.innerWidth, window.innerHeight );
 
 				//

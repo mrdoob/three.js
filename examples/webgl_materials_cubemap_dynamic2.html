@@ -45,7 +45,7 @@
 			lat = 0, onMouseDownLat = 0,
 			phi = 0, theta = 0;
 
-			var texture = THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg', new THREE.UVMapping(), function () {
+			var texture = THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg', THREE.UVMapping, function () {
 
 				init();
 				animate();
@@ -63,6 +63,7 @@
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				cubeCamera = new THREE.CubeCamera( 1, 1000, 256 );
@@ -88,7 +89,7 @@
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
-				document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false);
+				document.addEventListener( 'MozMousePixelScroll', onDocumentMouseWheel, false);
 				window.addEventListener( 'resize', onWindowResized, false );
 
 				onWindowResized( null );

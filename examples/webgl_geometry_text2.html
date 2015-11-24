@@ -27,7 +27,6 @@
 
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank">zz85</a> &amp; alteredq
-		(fonts from <a href="http://typeface.neocracy.org/">typeface.js</a> and <a href="http://en.wikipedia.org/wiki/Droid_%28font%29">Droid</a>)
 		<br/>built-in shape triangulation has been replaced with <a href="https://github.com/jahting/pnltri.js">PnlTri.js</a> by <a href="https://github.com/jahting" target="_blank">j ahting</a>
 		<br/>type to enter new text, drag to spin the text
 		<br/><span class="button" id="color">change color</span>,
@@ -57,7 +56,8 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<!-- load the font files -->
+		<script src="js/geometries/TextGeometry.js"></script>
+		<script src="js/utils/FontUtils.js"></script>
 
 		<script src="fonts/gentilis_bold.typeface.js"></script>
 		<script src="fonts/gentilis_regular.typeface.js"></script>
@@ -70,21 +70,18 @@
 		<script src="fonts/droid/droid_serif_regular.typeface.js"></script>
 		<script src="fonts/droid/droid_serif_bold.typeface.js"></script>
 
-		<!-- todo async loader for fonts -->
-
-
 		<!-- replace built-in triangulation with PnlTri.js -->
 		<script src="js/libs/pnltri.min.js"></script>
 		<script>
 			THREE.Shape.Utils.triangulateShape = ( function () {
 				var pnlTriangulator = new PNLTRI.Triangulator();
-				return function ( contour, holes ) {
+				return function triangulateShape( contour, holes ) {
 					// console.log("new Triangulation: PnlTri.js " + PNLTRI.REVISION );
 					return pnlTriangulator.triangulate_polygon( [ contour ].concat(holes) );
 				};
 			} )();
 		</script>
-		
+
 
 		<script>
 
@@ -238,19 +235,22 @@
 
 				}
 
-				material = new THREE.MeshFaceMaterial( [ 
+				material = new THREE.MeshFaceMaterial( [
 					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } ), // front
 					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } ) // side
 				] );
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 				group.position.y = 100;
 
 				scene.add( group );
 
 				createText();
 
-				var plane = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000 ), new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } ) );
+				var plane = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 10000, 10000 ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
+				);
 				plane.position.y = 100;
 				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
@@ -258,10 +258,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				renderer.setClearColor( scene.fog.color, 1 );
-
 				container.appendChild( renderer.domElement );
 
 				// STATS

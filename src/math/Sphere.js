@@ -1,5 +1,5 @@
 /**
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -20,13 +20,14 @@ THREE.Sphere.prototype = {
 		this.radius = radius;
 
 		return this;
+
 	},
 
 	setFromPoints: function () {
 
 		var box = new THREE.Box3();
 
-		return function ( points, optionalCenter )  {
+		return function ( points, optionalCenter ) {
 
 			var center = this.center;
 
@@ -52,9 +53,15 @@ THREE.Sphere.prototype = {
 
 			return this;
 
- 		};
+		};
 
 	}(),
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
 
 	copy: function ( sphere ) {
 
@@ -140,12 +147,6 @@ THREE.Sphere.prototype = {
 	equals: function ( sphere ) {
 
 		return sphere.center.equals( this.center ) && ( sphere.radius === this.radius );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Sphere().copy( this );
 
 	}
 

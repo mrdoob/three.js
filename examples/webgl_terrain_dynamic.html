@@ -56,7 +56,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/shaders/BleachBypassShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
@@ -73,6 +73,7 @@
 		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/SavePass.js"></script>
 
+		<script src="js/BufferGeometryUtils.js"></script>
 		<script src="js/ShaderTerrain.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -279,18 +280,12 @@
 				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 2, 4000 );
 				camera.position.set( -1200, 800, 1200 );
 
-				controls = new THREE.TrackballControls( camera );
+				controls = new THREE.OrbitControls( camera );
 				controls.target.set( 0, 0, 0 );
 
 				controls.rotateSpeed = 1.0;
 				controls.zoomSpeed = 1.2;
 				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = false;
-				controls.dynamicDampingFactor = 0.15;
 
 				controls.keys = [ 65, 83, 68 ];
 
@@ -317,10 +312,13 @@
 				var normalShader = THREE.NormalMapShader;
 
 				var rx = 256, ry = 256;
-				var pars = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 
 				heightMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
+				heightMap.generateMipmaps = false;
+
 				normalMap = new THREE.WebGLRenderTarget( rx, ry, pars );
+				normalMap.generateMipmaps = false;
 
 				uniformsNoise = {
 
@@ -341,6 +339,7 @@
 				// TEXTURES
 
 				var specularMap = new THREE.WebGLRenderTarget( 2048, 2048, pars );
+				specularMap.generateMipmaps = false;
 
 				var diffuseTexture1 = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg", null, function () {
 
@@ -379,7 +378,6 @@
 
 				uniformsTerrain[ "diffuse" ].value.setHex( 0xffffff );
 				uniformsTerrain[ "specular" ].value.setHex( 0xffffff );
-				uniformsTerrain[ "ambient" ].value.setHex( 0x111111 );
 
 				uniformsTerrain[ "shininess" ].value = 30;
 
@@ -409,7 +407,7 @@
 				}
 
 
-				var plane = new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT );
+				var plane = new THREE.PlaneBufferGeometry( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				quadTarget = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
 				quadTarget.position.z = -500;
@@ -417,8 +415,9 @@
 
 				// TERRAIN MESH
 
-				var geometryTerrain = new THREE.PlaneGeometry( 6000, 6000, 256, 256 );
-				geometryTerrain.computeTangents();
+				var geometryTerrain = new THREE.PlaneBufferGeometry( 6000, 6000, 256, 256 );
+
+				THREE.BufferGeometryUtils.computeTangents( geometryTerrain );
 
 				terrain = new THREE.Mesh( geometryTerrain, mlib[ "terrain" ] );
 				terrain.position.set( 0, -125, 0 );
@@ -429,8 +428,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.setClearColor( scene.fog.color, 1 );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -457,7 +457,9 @@
 				renderer.autoClear = false;
 
 				renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+
 				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
+				renderTarget.generateMipmaps = false;
 
 				effectBloom = new THREE.BloomPass( 0.6 );
 				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
@@ -496,37 +498,23 @@
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
 
-					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.speed = speed;
 
-					meshAnim.speed = speed;
-					meshAnim.duration = duration;
-					meshAnim.time = 600 * Math.random();
+					var mixer = new THREE.AnimationMixer( mesh );
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( duration ) );
+					mixer.update( 600 * Math.random() );
+					mesh.mixer = mixer;
 
-					meshAnim.position.set( x, y, z );
-					meshAnim.rotation.y = Math.PI/2;
+					mesh.position.set( x, y, z );
+					mesh.rotation.y = Math.PI/2;
 
-					meshAnim.castShadow = true;
-					meshAnim.receiveShadow = false;
+					mesh.castShadow = true;
+					mesh.receiveShadow = false;
 
-					scene.add( meshAnim );
+					scene.add( mesh );
 
-					morphs.push( meshAnim );
-
-				}
-
-				function morphColorsToFaceColors( geometry ) {
-
-					if ( geometry.morphColors && geometry.morphColors.length ) {
-
-						var colorMap = geometry.morphColors[ 0 ];
-
-						for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-
-							geometry.faces[ i ].color = colorMap.colors[ i ];
-
-						}
-
-					}
+					morphs.push( mesh );
 
 				}
 
@@ -536,25 +524,22 @@
 
 				loader.load( "models/animated/parrot.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 250, 500, startX -500, 500, 700 );
-					addMorph( geometry, 250, 500, startX - Math.random() * 500, 500, -200 );
-					addMorph( geometry, 250, 500, startX - Math.random() * 500, 500, 200 );
-					addMorph( geometry, 250, 500, startX - Math.random() * 500, 500, 1000 );
+					addMorph( geometry, 250, 0.5, startX -500, 500, 700 );
+					addMorph( geometry, 250, 0.5, startX - Math.random() * 500, 500, -200 );
+					addMorph( geometry, 250, 0.5, startX - Math.random() * 500, 500, 200 );
+					addMorph( geometry, 250, 0.5, startX - Math.random() * 500, 500, 1000 );
 
 				} );
 
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 500, 1000, startX - Math.random() * 500, 350, 40 );
+					addMorph( geometry, 500, 1, startX - Math.random() * 500, 350, 40 );
 
 				} );
 
 				loader.load( "models/animated/stork.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 350, 1000, startX - Math.random() * 500, 350, 340 );
+					addMorph( geometry, 350, 1, startX - Math.random() * 500, 350, 340 );
 
 				} );
 
@@ -585,7 +570,7 @@
 
 				}
 
-			};
+			}
 
 			//
 
@@ -603,14 +588,14 @@
 
 				var sceneTmp = new THREE.Scene();
 
-				var meshTmp = new THREE.Mesh( new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), shaderMaterial );
+				var meshTmp = new THREE.Mesh( new THREE.PlaneBufferGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), shaderMaterial );
 				meshTmp.position.z = -500;
 
 				sceneTmp.add( meshTmp );
 
 				renderer.render( sceneTmp, cameraOrtho, target, true );
 
-			};
+			}
 
 			//
 
@@ -655,7 +640,7 @@
 
 					scene.fog.color.setHSL( 0.1, 0.5, lightVal );
 
-					renderer.setClearColor( scene.fog.color, 1 );
+					renderer.setClearColor( scene.fog.color );
 
 					directionalLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.1, 1.15 );
 					pointLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.9, 1.5 );
@@ -686,7 +671,7 @@
 
 						morph = morphs[ i ];
 
-						morph.updateAnimation( 1000 * delta );
+						morph.mixer.update( delta );
 
 						morph.position.x += morph.speed * delta;
 

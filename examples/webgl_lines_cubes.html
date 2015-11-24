@@ -67,7 +67,7 @@
 
 			function init() {
 
-				var i, material, container;
+				var i, container;
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -78,6 +78,7 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

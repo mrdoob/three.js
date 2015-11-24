@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr; [page:Light] &rarr;
@@ -17,6 +18,15 @@
 
 
 		<h2>Example</h2>
+		<div>[example:canvas_morphtargets_horse morphtargets / horse ]</div>
+		<div>[example:misc_controls_fly controls / fly ]</div>
+		<div>[example:misc_lights_test lights / test ]</div>
+		<div>[example:vr_cubes cubes ]</div>
+		<div>[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]</div>
+		<div>[example:webgl_effects_stereo effects / stereo ]</div>
+		<div>[example:webgl_geometry_extrude_splines geometry / extrude / splines ]</div>
+		<div>[example:webgl_materials_bumpmap materials / bumpmap ]</div>
+		<div>[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection ]</div>
 
 		<code>// White directional light at half intensity shining from the top.
 
@@ -42,169 +52,119 @@ scene.add( directionalLight );</code>
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Object3D target]</h3>
+		<h3>[property:Object3D target]</h3>
 		<div>
 			Target used for shadow camera orientation.
 		</div>
 
-		<h3>.[page:Float intensity]</h3>
+		<h3>[property:Float intensity]</h3>
 		<div>
 			Light's intensity.<br />
 			Default — *1.0*.
 		</div>
 
-		<h3>.[page:Boolean onlyShadow]</h3>
+		<h3>[property:Boolean onlyShadow]</h3>
 		<div>
 			If set to *true* light will only cast shadow but not contribute any lighting (as if *intensity* was 0 but cheaper to compute).<br />
 			Default — *false*.
 		</div>
 
-		<h3>.[page:Float shadowCameraNear]</h3>
+		<h3>[property:Boolean castShadow]</h3>
+		<div>
+			If set to true light will cast dynamic shadows. Warning: This is expensive and requires tweaking to get shadows looking right.<br />
+			Default — *false*.
+		</div>
+
+		<h3>[property:Float shadowCameraNear]</h3>
 		<div>
 			Orthographic shadow camera frustum parameter.<br />
 			Default — *50*.
 		</div>
 
-		<h3>.[page:Float shadowCameraFar]</h3>
+		<h3>[property:Float shadowCameraFar]</h3>
 		<div>
 			Orthographic shadow camera frustum parameter.<br />
 			Default — *5000*.
 		</div>
 
-		<h3>.[page:Float shadowCameraLeft]</h3>
+		<h3>[property:Float shadowCameraLeft]</h3>
 		<div>
 			Orthographic shadow camera frustum parameter.<br />
 			Default — *-500*.
 		</div>
 
-		<h3>.[page:Float shadowCameraRight]</h3>
+		<h3>[property:Float shadowCameraRight]</h3>
 		<div>
 			Orthographic shadow camera frustum parameter.<br />
 			Default — *500*.
 		</div>
 
-		<h3>.[page:Float shadowCameraTop]</h3>
+		<h3>[property:Float shadowCameraTop]</h3>
 		<div>
 			Orthographic shadow camera frustum parameter.<br />
 			Default — *500*.
 		</div>
 
-		<h3>.[page:Float shadowCameraBottom]</h3>
+		<h3>[property:Float shadowCameraBottom]</h3>
 		<div>
 			Orthographic shadow camera frustum parameter.<br />
 			Default — *-500*.
 		</div>
 
-		<h3>.[page:Boolean shadowCameraVisible]</h3>
+		<h3>[property:Boolean shadowCameraVisible]</h3>
 		<div>
 			Show debug shadow camera frustum.<br />
 			Default — *false*.
 		</div>
 
-		<h3>.[page:Float shadowBias]</h3>
+		<h3>[property:Float shadowBias]</h3>
 		<div>
-			Shadow map bias.<br />
+			Shadow map bias, how much to add or subtract from the normalized depth when deciding whether a surface is in shadow.<br />
 			Default — *0*.
 		</div>
 
-		<h3>.[page:Float shadowDarkness]</h3>
-		<div>
-			Darkness of shadow casted by this light (from *0* to *1*).<br />
-			Default — *0.5*.
-		</div>
-
-		<h3>.[page:Integer shadowMapWidth]</h3>
+		<h3>[property:Integer shadowMapWidth]</h3>
 		<div>
 			Shadow map texture width in pixels.<br />
 			Default — *512*.
 		</div>
 
-		<h3>.[page:Integer shadowMapHeight]</h3>
+		<h3>[property:Integer shadowMapHeight]</h3>
 		<div>
 			Shadow map texture height in pixels.<br />
 			Default — *512*.
 		</div>
 
-		<h3>.[page:Boolean shadowCascade]</h3>
+		<h3>[property:Vector2 shadowMapSize]</h3>
 		<div>
-			??? <br />
-			Default — *false*.
+			The shadowMapWidth and shadowMapHeight stored in a [page:Vector2 THREE.Vector2]. Set internally during rendering.
 		</div>
 
-		<h3>.[page:Vector3 shadowCascadeOffset]</h3>
+		<h3>[property:OrthographicCamera shadowCamera]</h3>
 		<div>
-			??? <br />
-			Default — *Three.Vector3( 0, 0, -1000 )*.
+			The shadow's view of the world. Computed internally during rendering from the shadowCamera* settings.
 		</div>
 
-		<h3>.[page:Integer shadowCascadeCount]</h3>
+		<h3>[property:Matrix4 shadowMatrix]</h3>
 		<div>
-			??? <br />
-			Default — *2*.
+			Model to shadow camera space, to compute location and depth in shadow map. Computed internally during rendering.
 		</div>
 
-		<h3>.[page:Array shadowCascadeBias]</h3>
+		<h3>[property:WebGLRenderTarget shadowMap]</h3>
 		<div>
-			??? <br />
-			Default — <strong>[ 0, 0, 0 ]</strong>.
+		    The depth map generated using the shadowCamera; a location beyond a pixel's depth is in shadow. Computed internally during rendering.
 		</div>
 
-		<h3>.[page:Array shadowCascadeWidth]</h3>
-		<div>
-			??? <br />
-			Default — <strong>[ 512, 512, 512 ]</strong>.
-		</div>
-
-		<h3>.[page:Array shadowCascadeHeight]</h3>
-		<div>
-			??? <br />
-			Default — <strong>[ 512, 512, 512 ]</strong>.
-		</div>
-
-		<h3>.[page:Array shadowCascadeNearZ]</h3>
-		<div>
-			??? <br />
-			Default — <strong>[ -1.000, 0.990, 0.998 ]</strong>.
-		</div>
-
-		<h3>.[page:Array shadowCascadeFarZ]</h3>
-		<div>
-			??? <br />
-			Default — <strong>[ 0.990, 0.998, 1.000 ]</strong>.
-		</div>
-
-		<h3>.[page:Array shadowCascadeArray]</h3>
-		<div>
-			??? <br />
-			Default — <strong>[ ]</strong>.
-		</div>
-
-		<h3>.[page:RenderTarget shadowMap]</h3>
-		<div>
-			??? <br />
-			Default — *null*.
-		</div>
-
-		<h3>.[page:Integer shadowMapSize]</h3>
-		<div>
-			??? <br />
-			Default — *null*.
-		</div>
-
-		<h3>.[page:Camera shadowCamera]</h3>
-		<div>
-			??? <br />
-			Default — *null*.
-		</div>
-
-		<h3>.[page:Matrix shadowMatrix]</h3>
-		<div>
-			??? <br />
-			Default — *null*.
-		</div>
-		
 		<h2>Methods</h2>
+		<h3>[method:DirectionalLight clone]()</h3>
+		<div>
+		It returns a clone of DirectionalLight.
+		</div>
 
+		<h3>[method:JSON toJSON]()</h3>
+		<div>
+		Return DirectionalLight data in JSON format.
+		</div>
 
 		<h2>Source</h2>
 

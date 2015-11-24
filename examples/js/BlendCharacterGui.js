@@ -2,12 +2,11 @@
  * @author Michael Guerrero / http://realitymeltdown.com
  */
 
-function BlendCharacterGui(animations) {
+function BlendCharacterGui( blendMesh ) {
 
 	var controls = {
 
 		gui: null,
-		"Lock Camera": false,
 		"Show Model": true,
 		"Show Skeleton": false,
 		"Time Scale": 1.0,
@@ -19,31 +18,40 @@ function BlendCharacterGui(animations) {
 
 	};
 
-	var animations = animations;
+	var blendMesh = blendMesh;
 
 	this.showModel = function() {
 
-		return controls['Show Model'];
+		return controls[ 'Show Model' ];
 
 	};
 
 	this.showSkeleton = function() {
 
-		return controls['Show Skeleton'];
+		return controls[ 'Show Skeleton' ];
 
 	};
 
 	this.getTimeScale = function() {
 
-		return controls['Time Scale'];
+		return controls[ 'Time Scale' ];
 
 	};
 
-	this.update = function() {
+	this.update = function( time ) {
 
-		controls[ 'idle'] = animations[ 'idle' ].weight;
-		controls[ 'walk'] = animations[ 'walk' ].weight;
-		controls[ 'run'] = animations[ 'run' ].weight;
+		var getWeight = function( actionName ) {
+			for( var i = 0; i < blendMesh.mixer.actions.length; i ++ ) {
+				var action = blendMesh.mixer.actions[i];
+				if( action.clip.name === actionName ) {
+					return action.getWeightAt( time );	
+				}
+			}
+			return 0;
+		}
+		controls[ 'idle' ] = getWeight( 'idle' );
+		controls[ 'walk' ] = getWeight( 'walk' );
+		controls[ 'run' ] = getWeight( 'run' );
 
 	};
 
@@ -55,7 +63,6 @@ function BlendCharacterGui(animations) {
 		var playback = controls.gui.addFolder( 'Playback' );
 		var blending = controls.gui.addFolder( 'Blend Tuning' );
 
-		settings.add( controls, "Lock Camera" ).onChange( controls.lockCameraChanged );
 		settings.add( controls, "Show Model" ).onChange( controls.showModelChanged );
 		settings.add( controls, "Show Skeleton" ).onChange( controls.showSkeletonChanged );
 		settings.add( controls, "Time Scale", 0, 1, 0.01 );
@@ -70,15 +77,15 @@ function BlendCharacterGui(animations) {
 		playback.add( controls, "walk to run" );
 		playback.add( controls, "warp walk to run" );
 
-		blending.add( controls, "idle", 0, 1, 0.01).listen().onChange( controls.weight );
-		blending.add( controls, "walk", 0, 1, 0.01).listen().onChange( controls.weight );
-		blending.add( controls, "run", 0, 1, 0.01).listen().onChange( controls.weight );
+		blending.add( controls, "idle", 0, 1, 0.01 ).listen().onChange( controls.weight );
+		blending.add( controls, "walk", 0, 1, 0.01 ).listen().onChange( controls.weight );
+		blending.add( controls, "run", 0, 1, 0.01 ).listen().onChange( controls.weight );
 
 		settings.open();
 		playback.open();
 		blending.open();
 
-	}
+	};
 
 	var getAnimationData = function() {
 
@@ -88,18 +95,19 @@ function BlendCharacterGui(animations) {
 
 				anims: [ "idle", "walk", "run" ],
 
-				weights: [ controls['idle'],
-						   controls['walk'],
-						   controls['run'] ]
+				weights: [ controls[ 'idle' ],
+						   controls[ 'walk' ],
+						   controls[ 'run' ] ]
 			}
 
 		};
-	}
+
+	};
 
 	controls.start = function() {
 
 		var startEvent = new CustomEvent( 'start-animation', getAnimationData() );
-		window.dispatchEvent(startEvent);
+		window.dispatchEvent( startEvent );
 
 	};
 
@@ -119,21 +127,22 @@ function BlendCharacterGui(animations) {
 
 	controls.step = function() {
 
-		var stepData = { detail: { stepSize: controls['Step Size'] } };
-		window.dispatchEvent( new CustomEvent('step-animation', stepData ));
+		var stepData = { detail: { stepSize: controls[ 'Step Size' ] } };
+		window.dispatchEvent( new CustomEvent( 'step-animation', stepData ) );
 
 	};
 
 	controls.weight = function() {
 
 		// renormalize
-		var sum = controls['idle'] + controls['walk'] + controls['run'];
-		controls['idle'] /= sum;
-		controls['walk'] /= sum;
-		controls['run'] /= sum;
+		var sum = controls[ 'idle' ] + controls[ 'walk' ] + controls[ 'run' ];
+		controls[ 'idle' ] /= sum;
+		controls[ 'walk' ] /= sum;
+		controls[ 'run' ] /= sum;
 
 		var weightEvent = new CustomEvent( 'weight-animation', getAnimationData() );
-		window.dispatchEvent(weightEvent);
+		window.dispatchEvent( weightEvent );
+
 	};
 
 	controls.crossfade = function( from, to ) {
@@ -144,7 +153,8 @@ function BlendCharacterGui(animations) {
 		fadeData.detail.time = controls[ "Crossfade Time" ];
 
 		window.dispatchEvent( new CustomEvent( 'crossfade', fadeData ) );
-	}
+
+	};
 
 	controls.warp = function( from, to ) {
 
@@ -154,61 +164,53 @@ function BlendCharacterGui(animations) {
 		warpData.detail.time = controls[ "Crossfade Time" ];
 
 		window.dispatchEvent( new CustomEvent( 'warp', warpData ) );
-	}
 
-	controls['idle to walk'] = function() {
+	};
+
+	controls[ 'idle to walk' ] = function() {
 
 		controls.crossfade( 'idle', 'walk' );
 
 	};
 
-	controls['walk to run'] = function() {
+	controls[ 'walk to run' ] = function() {
 
 		controls.crossfade( 'walk', 'run' );
 
 	};
 
-	controls['warp walk to run'] = function() {
+	controls[ 'warp walk to run' ] = function() {
 
 		controls.warp( 'walk', 'run' );
 
 	};
 
-	controls.lockCameraChanged = function() {
-
-		var data = {
-			detail: {
-				shouldLock: controls['Lock Camera']
-			}
-		}
-
-		window.dispatchEvent( new CustomEvent( 'toggle-lock-camera', data ) );
-	}
-
 	controls.showSkeletonChanged = function() {
 
 		var data = {
 			detail: {
-				shouldShow: controls['Show Skeleton']
+				shouldShow: controls[ 'Show Skeleton' ]
 			}
-		}
+		};
 
 		window.dispatchEvent( new CustomEvent( 'toggle-show-skeleton', data ) );
-	}
+
+	};
 
 
 	controls.showModelChanged = function() {
 
 		var data = {
 			detail: {
-				shouldShow: controls['Show Model']
+				shouldShow: controls[ 'Show Model' ]
 			}
-		}
+		};
 
 		window.dispatchEvent( new CustomEvent( 'toggle-show-model', data ) );
-	}
+
+	};
 
 
-	init.call(this);
+	init.call( this );
 
 }

@@ -103,11 +103,11 @@
 							 r + "py.jpg", r + "ny.jpg",
 							 r + "pz.jpg", r + "nz.jpg" ];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls, new THREE.CubeRefractionMapping() );
+				var textureCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeRefractionMapping );
 
 				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity:0.9 } );
 				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
-				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } )
+				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
 
 				// Skybox
 
@@ -129,6 +129,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
@@ -139,9 +140,7 @@
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
 
-				loader = new THREE.BinaryLoader( true );
-				document.body.appendChild( loader.statusDomElement );
-
+				loader = new THREE.BinaryLoader();
 				loader.load( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
@@ -187,8 +186,6 @@
 				mesh.position.z = z;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
-
-				loader.statusDomElement.style.display = "none";
 
 			}
 

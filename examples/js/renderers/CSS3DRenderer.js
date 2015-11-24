@@ -23,6 +23,7 @@ THREE.CSS3DObject = function ( element ) {
 };
 
 THREE.CSS3DObject.prototype = Object.create( THREE.Object3D.prototype );
+THREE.CSS3DObject.prototype.constructor = THREE.CSS3DObject;
 
 THREE.CSS3DSprite = function ( element ) {
 
@@ -31,6 +32,7 @@ THREE.CSS3DSprite = function ( element ) {
 };
 
 THREE.CSS3DSprite.prototype = Object.create( THREE.CSS3DObject.prototype );
+THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite;
 
 //
 
@@ -42,7 +44,7 @@ THREE.CSS3DRenderer = function () {
 	var _widthHalf, _heightHalf;
 
 	var matrix = new THREE.Matrix4();
-	
+
 	var cache = {
 		camera: { fov: 0, style: '' },
 		objects: {}
@@ -67,7 +69,14 @@ THREE.CSS3DRenderer = function () {
 
 	domElement.appendChild( cameraElement );
 
-	this.setClearColor = function () {
+	this.setClearColor = function () {};
+
+	this.getSize = function() {
+
+		return {
+			width: _width,
+			height: _height
+		};
 
 	};
 
@@ -89,7 +98,7 @@ THREE.CSS3DRenderer = function () {
 
 	var epsilon = function ( value ) {
 
-		return Math.abs( value ) < 0.000001 ? 0 : value;
+		return Math.abs( value ) < Number.EPSILON ? 0 : value;
 
 	};
 
@@ -218,7 +227,7 @@ THREE.CSS3DRenderer = function () {
 
 		scene.updateMatrixWorld();
 
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
@@ -231,7 +240,7 @@ THREE.CSS3DRenderer = function () {
 			cameraElement.style.MozTransform = style;
 			cameraElement.style.oTransform = style;
 			cameraElement.style.transform = style;
-			
+
 			cache.camera.style = style;
 
 		}

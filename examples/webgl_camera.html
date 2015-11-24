@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - cameras</title>
@@ -93,7 +93,7 @@
 				cameraOrtho.rotation.y = Math.PI;
 				cameraPerspective.rotation.y = Math.PI;
 
-				cameraRig = new THREE.Object3D();
+				cameraRig = new THREE.Group();
 
 				cameraRig.add( cameraPerspective );
 				cameraRig.add( cameraOrtho );
@@ -102,14 +102,23 @@
 
 				//
 
-				mesh = new THREE.Mesh( new THREE.SphereGeometry( 100, 16, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } ) );
+				mesh = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 100, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } )
+				);
 				scene.add( mesh );
 
-				var mesh2 = new THREE.Mesh( new THREE.SphereGeometry( 50, 16, 8 ), new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } ) );
+				var mesh2 = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 50, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } )
+				);
 				mesh2.position.y = 150;
 				mesh.add( mesh2 );
 
-				var mesh3 = new THREE.Mesh( new THREE.SphereGeometry( 5, 16, 8 ), new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } ) );
+				var mesh3 = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 5, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } )
+				);
 				mesh3.position.z = 150;
 				cameraRig.add( mesh3 );
 
@@ -128,13 +137,14 @@
 
 				}
 
-				var particles = new THREE.PointCloud( geometry, new THREE.PointCloudMaterial( { color: 0x888888 } ) );
+				var particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
 
 				//
 
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
@@ -175,7 +185,7 @@
 
 				}
 
-			};
+			}
 
 			//
 

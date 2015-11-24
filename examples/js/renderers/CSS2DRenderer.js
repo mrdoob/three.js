@@ -22,6 +22,7 @@ THREE.CSS2DObject = function ( element ) {
 };
 
 THREE.CSS2DObject.prototype = Object.create( THREE.Object3D.prototype );
+THREE.CSS2DObject.prototype.constructor = THREE.CSS2DObject;
 
 //
 
@@ -89,7 +90,7 @@ THREE.CSS2DRenderer = function () {
 
 		scene.updateMatrixWorld();
 
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 

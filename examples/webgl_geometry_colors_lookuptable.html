@@ -105,14 +105,14 @@
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor(0xffffff, 1);
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize(  window.innerWidth,  window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				window.addEventListener( "keypress", onKeyPress, true);
+				window.addEventListener( "keydown", onKeyDown, true);
 
 			}
 
@@ -170,10 +170,7 @@
 					var material = new THREE.MeshLambertMaterial( {
 
 						side: THREE.DoubleSide,
-						specular: 0xF5F5F5,
 						color: 0xF5F5F5,
-						ambient : 0xFFFFFF,
-						shininess: 5,
 						vertexColors: THREE.VertexColors
 
 					} );
@@ -273,7 +270,7 @@
 			}
 
 
-			function onKeyPress ( e ) {
+			function onKeyDown ( e ) {
 
 				var maps = [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ];
 

@@ -30,7 +30,7 @@ THREE.VerticalTiltShiftShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -60,6 +60,6 @@ THREE.VerticalTiltShiftShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

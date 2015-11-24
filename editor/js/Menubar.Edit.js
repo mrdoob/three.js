@@ -1,102 +1,160 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.Edit = function ( editor ) {
 
-	// event handlers
+	var container = new UI.Panel();
+	container.setClass( 'menu' );
 
-	// function onUndoOptionClick () {
+	var title = new UI.Panel();
+	title.setClass( 'title' );
+	title.setTextContent( 'Edit' );
+	container.add( title );
 
-	// 	console.log( 'UNDO not implemented yet' );
+	var options = new UI.Panel();
+	options.setClass( 'options' );
+	container.add( options );
 
-	// }
+	// Undo
 
-	// function onRedoOptionClick () {
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Undo' );
+	option.onClick( function () {
 
-	// 	console.log( 'REDO not implemented yet' );
+		editor.history.undo();
 
-	// }
+	} );
+	options.add( option );
 
-	function onCloneOptionClick () {
+	// Redo
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Redo' );
+	option.onClick( function () {
+
+		editor.history.redo();
+
+	} );
+	options.add( option );
+
+	// ---
+
+	options.add( new UI.HorizontalRule() );
+
+	// Clone
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Clone' );
+	option.onClick( function () {
 
 		var object = editor.selected;
 
-		if ( object.parent === undefined ) return; // avoid cloning the camera or scene
+		if ( object.parent === null ) return; // avoid cloning the camera or scene
 
 		object = object.clone();
 
 		editor.addObject( object );
 		editor.select( object );
 
-	}
+	} );
+	options.add( option );
 
-	function onDeleteOptionClick () {
+	// Delete
 
-		var parent = editor.selected.parent;
-		editor.removeObject( editor.selected );
-		editor.select( parent );
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Delete' );
+	option.onClick( function () {
 
-	}
-
-	function onConvertOptionClick () {
-
-		// convert to BufferGeometry
-		
 		var object = editor.selected;
 
-		if ( object.geometry instanceof THREE.Geometry ) {
+		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
-			if ( object.parent === undefined ) return; // avoid flattening the camera or scene
+		var parent = object.parent;
+		editor.removeObject( object );
+		editor.select( parent );
 
-			if ( confirm( 'Convert ' + object.name + ' to BufferGeometry?' ) === false ) return;
+	} );
+	options.add( option );
 
-			object.geometry = new THREE.BufferGeometry().fromGeometry( object.geometry );
+	// Minify shaders
 
-			editor.signals.objectChanged.dispatch( object );
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Minify Shaders' );
+	option.onClick( function() {
+
+		var root = editor.selected || editor.scene;
+
+		var errors = [];
+		var nMaterialsChanged = 0;
+
+		var path = [];
+
+		function getPath ( object ) {
+
+			path.length = 0;
+
+			var parent = object.parent;
+			if ( parent !== undefined ) getPath( parent );
+
+			path.push( object.name || object.uuid );
+
+			return path;
 
 		}
 
-	}
+		root.traverse( function ( object ) {
 
-	function onFlattenOptionClick () {
+			var material = object.material;
 
-		var object = editor.selected;
+			if ( material instanceof THREE.ShaderMaterial ) {
 
-		if ( object.parent === undefined ) return; // avoid flattening the camera or scene
+				try {
 
-		if ( confirm( 'Flatten ' + object.name + '?' ) === false ) return;
+					var shader = glslprep.minifyGlsl( [
+							material.vertexShader, material.fragmentShader ] );
 
-		var geometry = object.geometry.clone();
-		geometry.applyMatrix( object.matrix );
+					material.vertexShader = shader[ 0 ];
+					material.fragmentShader = shader[ 1 ];
+
+					++nMaterialsChanged;
+
+				} catch ( e ) {
+
+					var path = getPath( object ).join( "/" );
+
+					if ( e instanceof glslprep.SyntaxError )
+
+						errors.push( path + ":" +
+								e.line + ":" + e.column + ": " + e.message );
+
+					else {
+
+						errors.push( path +
+								": Unexpected error (see console for details)." );
+
+						console.error( e.stack || e );
+
+					}
+
+				}
+
+			}
+
+		} );
+
+		window.alert( nMaterialsChanged +
+				" material(s) were changed.\n" + errors.join( "\n" ) );
+
+	} );
+	options.add( option );
 
 
-		object.geometry = geometry;
+	return container;
 
-		object.position.set( 0, 0, 0 );
-		object.rotation.set( 0, 0, 0 );
-		object.scale.set( 1, 1, 1 );
-		
-		object.geometry.buffersNeedUpdate = true;
-		editor.signals.objectChanged.dispatch( object );
-
-	}
-
-	// configure menu contents
-
-	var createOption = UI.MenubarHelper.createOption;
-	var createDivider = UI.MenubarHelper.createDivider;
-
-	var menuConfig = [
-		// createOption( 'Undo', onUndoOptionClick ),
-		// createOption( 'Redo', onRedoOptionClick ),
-		// createDivider(),
-
-		createOption( 'Clone', onCloneOptionClick ),
-		createOption( 'Delete', onDeleteOptionClick ),
-		createDivider(),
-
-		createOption( 'Convert', onConvertOptionClick ),
-		createOption( 'Flatten', onFlattenOptionClick )
-	];
-
-	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
-
-	return UI.MenubarHelper.createMenuContainer( 'Edit', optionsPanel );
-}
+};

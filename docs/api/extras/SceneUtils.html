@@ -2,20 +2,21 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A class containing usefull utility functions for scene manipulation.</div>
+		<div class="desc">A class containing useful utility functions for scene manipulation.</div>
 
 
 		<h2>Methods</h2>
 
 
-		<h3>.createMultiMaterialObject([page:Geometry geometry], [page:Array materials]) [page:Object3D]</h3>
+		<h3>[method:Object3D createMultiMaterialObject]([page:Geometry geometry], [page:Array materials])</h3>
 		<div>
 		geometry -- The geometry for the Object. <br />
 		materials -- The materials for the object.
@@ -25,24 +26,24 @@
 		This is mostly useful for object that need a material and a wireframe implementation.
 		</div>
 
-		<h3>.attach([page:Object3D child], [page:Object3D scene], [page:Object3D parent])</h3>
+		<h3>[method:null attach]([page:Object3D child], [page:Object3D scene], [page:Object3D parent])</h3>
 		<div>
 		child -- The object to add to the parent  <br />
 		scene -- The scene to detach the object on. <br />
 		parent -- The parent to attach the object from.
 		</div>
 		<div>
-		Attaches the object to the parent without the moving the object in the worldspace.
+		Attaches the object to the parent without the moving the object in the worldspace. Beware that to do this the matrixWorld needs to be updated, this can be done by calling the updateMatrixWorld method on the parent object.
 		</div>
 
-		<h3>.detach([page:Object3D child], [page:Object3D parent], [page:Object3D scene])</h3>
+		<h3>[method:null detach]([page:Object3D child], [page:Object3D parent], [page:Object3D scene])</h3>
 		<div>
 		child -- The object to remove from the parent  <br />
 		scene -- The scene to attach the object on. <br />
 		parent -- The parent to detach the object from.
 		</div>
 		<div>
-		Detaches the object from the parent and adds it back to the scene without moving in worldspace.
+		Detaches the object from the parent and adds it back to the scene without moving in worldspace. Beware that to do this the matrixWorld needs to be updated, this can be done by calling the updateMatrixWorld method on the parent object.
 		</div>
 
 		<h2>Source</h2>

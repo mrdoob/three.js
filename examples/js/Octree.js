@@ -7,7 +7,9 @@
  * based on Dynamic Octree by Piko3D @ http://www.piko3d.com/ and Octree by Marek Pawlowski @ pawlowski.it
  *
  */
- ( function ( THREE ) { "use strict";
+ ( function ( THREE ) {
+
+	"use strict";
 	
 	/*===================================================
 
@@ -16,20 +18,26 @@
 	=====================================================*/
 	
 	function isNumber ( n ) {
-		return !isNaN( n ) && isFinite( n );
+
+		return ! isNaN( n ) && isFinite( n );
+
 	}
 	
 	function isArray ( target ) {
+
 		return Object.prototype.toString.call( target ) === '[object Array]';
+
 	}
 	
 	function toArray ( target ) {
+
 		return target ? ( isArray ( target ) !== true ? [ target ] : target ) : [];
+
 	}
 	
 	function indexOfValue( array, value ) {
 		
-		for ( var i = 0, il = array.length; i < il; i++ ) {
+		for ( var i = 0, il = array.length; i < il; i ++ ) {
 			
 			if ( array[ i ] === value ) {
 				
@@ -39,13 +47,13 @@
 			
 		}
 		
-		return -1;
+		return - 1;
 		
 	}
 	
 	function indexOfPropertyWithValue( array, property, value ) {
 		
-		for ( var i = 0, il = array.length; i < il; i++ ) {
+		for ( var i = 0, il = array.length; i < il; i ++ ) {
 			
 			if ( array[ i ][ property ] === value ) {
 				
@@ -55,7 +63,7 @@
 			
 		}
 		
-		return -1;
+		return - 1;
 		
 	}
 
@@ -77,7 +85,7 @@
 		
 		this.nodeCount = 0;
 		
-		this.INDEX_INSIDE_CROSS = -1;
+		this.INDEX_INSIDE_CROSS = - 1;
 		this.INDEX_OUTSIDE_OFFSET = 2;
 		
 		this.INDEX_OUTSIDE_POS_X = isNumber( parameters.INDEX_OUTSIDE_POS_X ) ? parameters.INDEX_OUTSIDE_POS_X : 0;
@@ -89,11 +97,11 @@
 		
 		this.INDEX_OUTSIDE_MAP = [];
 		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_POS_X ] = { index: this.INDEX_OUTSIDE_POS_X, count: 0, x: 1, y: 0, z: 0 };
-		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_NEG_X ] = { index: this.INDEX_OUTSIDE_NEG_X, count: 0, x: -1, y: 0, z: 0 };
+		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_NEG_X ] = { index: this.INDEX_OUTSIDE_NEG_X, count: 0, x: - 1, y: 0, z: 0 };
 		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_POS_Y ] = { index: this.INDEX_OUTSIDE_POS_Y, count: 0, x: 0, y: 1, z: 0 };
-		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_NEG_Y ] = { index: this.INDEX_OUTSIDE_NEG_Y, count: 0, x: 0, y: -1, z: 0 };
+		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_NEG_Y ] = { index: this.INDEX_OUTSIDE_NEG_Y, count: 0, x: 0, y: - 1, z: 0 };
 		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_POS_Z ] = { index: this.INDEX_OUTSIDE_POS_Z, count: 0, x: 0, y: 0, z: 1 };
-		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_NEG_Z ] = { index: this.INDEX_OUTSIDE_NEG_Z, count: 0, x: 0, y: 0, z: -1 };
+		this.INDEX_OUTSIDE_MAP[ this.INDEX_OUTSIDE_NEG_Z ] = { index: this.INDEX_OUTSIDE_NEG_Z, count: 0, x: 0, y: 0, z: - 1 };
 		
 		this.FLAG_POS_X = 1 << ( this.INDEX_OUTSIDE_POS_X + 1 );
 		this.FLAG_NEG_X = 1 << ( this.INDEX_OUTSIDE_NEG_X + 1 );
@@ -140,7 +148,7 @@
 			
 			if ( this.objectsDeferred.length > 0 ) {
 				
-				for ( var i = 0, il = this.objectsDeferred.length; i < il; i++ ) {
+				for ( var i = 0, il = this.objectsDeferred.length; i < il; i ++ ) {
 					
 					var deferred = this.objectsDeferred[ i ];
 					
@@ -194,13 +202,13 @@
 			
 			// check uuid to avoid duplicates
 			
-			if ( !object.uuid ) {
+			if ( ! object.uuid ) {
 				
 				object.uuid = THREE.Math.generateUUID();
 				
 			}
 			
-			if ( !this.objectsMap[ object.uuid ] ) {
+			if ( ! this.objectsMap[ object.uuid ] ) {
 				
 				// store
 				
@@ -221,7 +229,7 @@
 					geometry = object.geometry;
 					vertices = geometry.vertices;
 					
-					for ( i = 0, l = vertices.length; i < l; i++ ) {
+					for ( i = 0, l = vertices.length; i < l; i ++ ) {
 						
 						this.addObjectData( object, vertices[ i ] );
 						
@@ -232,7 +240,7 @@
 					geometry = object.geometry;
 					faces = geometry.faces;
 					
-					for ( i = 0, l = faces.length; i < l; i++ ) {
+					for ( i = 0, l = faces.length; i < l; i ++ ) {
 						
 						this.addObjectData( object, faces[ i ] );
 						
@@ -287,7 +295,7 @@
 				
 				index = indexOfValue( this.objects, object );
 				
-				if ( index !== -1 ) {
+				if ( index !== - 1 ) {
 					
 					this.objects.splice( index, 1 );
 					
@@ -297,13 +305,13 @@
 					
 					// remove from objects data list
 					
-					for ( i = 0, l = objectsDataRemoved.length; i < l; i++ ) {
+					for ( i = 0, l = objectsDataRemoved.length; i < l; i ++ ) {
 						
 						objectData = objectsDataRemoved[ i ];
 						
 						index = indexOfValue( this.objectsData, objectData );
 						
-						if ( index !== -1 ) {
+						if ( index !== - 1 ) {
 							
 							this.objectsData.splice( index, 1 );
 							
@@ -319,7 +327,7 @@
 				
 				index = indexOfPropertyWithValue( this.objectsDeferred, 'object', object );
 				
-				if ( index !== -1 ) {
+				if ( index !== - 1 ) {
 					
 					this.objectsDeferred.splice( index, 1 );
 					
@@ -341,7 +349,7 @@
 				
 				objectsData = octree.objectsData;
 				
-				for ( i = 0, l = objectsData.length; i < l; i++ ) {
+				for ( i = 0, l = objectsData.length; i < l; i ++ ) {
 					
 					objectData = objectsData[ i ];
 					
@@ -366,7 +374,7 @@
 			// check all object data for changes in position
 			// assumes all object matrices are up to date
 			
-			for ( i = 0, l = this.objectsData.length; i < l; i++ ) {
+			for ( i = 0, l = this.objectsData.length; i < l; i ++ ) {
 				
 				objectData = this.objectsData[ i ];
 				
@@ -378,7 +386,7 @@
 				
 				// if position has changed since last organization of object in tree
 				
-				if ( node instanceof THREE.OctreeNode && !objectData.positionLast.equals( objectData.position ) ) {
+				if ( node instanceof THREE.OctreeNode && ! objectData.positionLast.equals( objectData.position ) ) {
 					
 					// get octant index of object within current node
 					
@@ -402,7 +410,7 @@
 			
 			// update changed objects
 			
-			for ( i = 0, l = objectsUpdate.length; i < l; i++ ) {
+			for ( i = 0, l = objectsUpdate.length; i < l; i ++ ) {
 				
 				objectData = objectsUpdate[ i ];
 				
@@ -429,14 +437,14 @@
 			
 			parent = object.parent;
 			
-			while( parent ) {
+			while ( parent ) {
 				
 				parentCascade.push( parent );
 				parent = parent.parent;
 				
 			}
 			
-			for ( i = 0, l = parentCascade.length; i < l; i++ ) {
+			for ( i = 0, l = parentCascade.length; i < l; i ++ ) {
 				
 				parent = parentCascade[ i ];
 				
@@ -477,7 +485,7 @@
 			
 			// ensure radius (i.e. distance of ray) is a number
 			
-			if ( !( radius > 0 ) ) {
+			if ( ! ( radius > 0 ) ) {
 				
 				radius = Number.MAX_VALUE;
 				
@@ -494,7 +502,7 @@
 			
 			// search each node of root
 			
-			for ( i = 0, l = this.root.nodesIndices.length; i < l; i++ ) {
+			for ( i = 0, l = this.root.nodesIndices.length; i < l; i ++ ) {
 				
 				node = this.root.nodesByIndex[ this.root.nodesIndices[ i ] ];
 				
@@ -511,7 +519,7 @@
 				
 				// for each object data found
 				
-				for ( i = 0, l = objects.length; i < l; i++ ) {
+				for ( i = 0, l = objects.length; i < l; i ++ ) {
 					
 					objectData = objects[ i ];
 					object = objectData.object;
@@ -520,7 +528,7 @@
 					
 					// if needed, create new result data
 					
-					if ( resultObjectIndex === -1 ) {
+					if ( resultObjectIndex === - 1 ) {
 						
 						resultData = {
 							object: object,
@@ -739,7 +747,7 @@
 		
 		// basic properties
 		
-		this.id = this.tree.nodeCount++;
+		this.id = this.tree.nodeCount ++;
 		this.position = parameters.position instanceof THREE.Vector3 ? parameters.position : new THREE.Vector3();
 		this.radius = parameters.radius > 0 ? parameters.radius : 1;
 		this.indexOctant = parameters.indexOctant;
@@ -811,7 +819,7 @@
 			
 			// cascade
 			
-			for ( i = 0, l = this.nodesIndices.length; i < l; i++ ) {
+			for ( i = 0, l = this.nodesIndices.length; i < l; i ++ ) {
 				
 				this.nodesByIndex[ this.nodesIndices[ i ] ].updateProperties();
 				
@@ -832,7 +840,7 @@
 			
 			// unset parent in nodes
 			
-			for ( i = 0, l = nodesIndices.length; i < l; i++ ) {
+			for ( i = 0, l = nodesIndices.length; i < l; i ++ ) {
 				
 				node = nodesByIndex[ nodesIndices[ i ] ];
 				
@@ -860,7 +868,7 @@
 			
 			node.indexOctant = indexOctant;
 			
-			if ( indexOfValue( this.nodesIndices, indexOctant ) === -1 ) {
+			if ( indexOfValue( this.nodesIndices, indexOctant ) === - 1 ) {
 				
 				this.nodesIndices.push( indexOctant );
 				
@@ -908,13 +916,13 @@
 			indexOctant = this.getOctantIndex( object );
 			
 			// if object fully contained by an octant, add to subtree
-			if ( indexOctant > -1 && this.nodesIndices.length > 0 ) {
+			if ( indexOctant > - 1 && this.nodesIndices.length > 0 ) {
 				
 				node = this.branch( indexOctant );
 				
 				node.addObject( object );
 				
-			} else if ( indexOctant < -1 && this.parent instanceof THREE.OctreeNode ) {
+			} else if ( indexOctant < - 1 && this.parent instanceof THREE.OctreeNode ) {
 				
 				// if object lies outside bounds, add to parent node
 				
@@ -926,7 +934,7 @@
 				
 				index = indexOfValue( this.objects, object );
 				
-				if ( index === -1 ) {
+				if ( index === - 1 ) {
 					
 					this.objects.push( object );
 					
@@ -949,7 +957,7 @@
 			var i, l,
 				object;
 
-			for ( i = 0, l = objects.length; i < l; i++ ) {
+			for ( i = 0, l = objects.length; i < l; i ++ ) {
 				
 				object = objects[ i ];
 				
@@ -977,7 +985,7 @@
 			
 			if ( nodesRemovedFrom.length > 0 ) {
 				
-				for ( i = 0, l = nodesRemovedFrom.length; i < l; i++ ) {
+				for ( i = 0, l = nodesRemovedFrom.length; i < l; i ++ ) {
 					
 					nodesRemovedFrom[ i ].shrink();
 					
@@ -992,7 +1000,7 @@
 		removeObjectRecursive: function ( object, removeData ) {
 			
 			var i, l,
-				index = -1,
+				index = - 1,
 				objectData,
 				node,
 				objectRemoved;
@@ -1006,7 +1014,7 @@
 				
 				index = indexOfValue( this.objects, object );
 				
-				if ( index !== -1 ) {
+				if ( index !== - 1 ) {
 					
 					this.objects.splice( index, 1 );
 					object.node = undefined;
@@ -1021,7 +1029,7 @@
 			
 				// search each object data for object and remove (slow)
 				
-				for ( i = this.objects.length - 1; i >= 0; i-- ) {
+				for ( i = this.objects.length - 1; i >= 0; i -- ) {
 					
 					objectData = this.objects[ i ];
 					
@@ -1034,7 +1042,7 @@
 						
 						objectRemoved = true;
 						
-						if ( !objectData.faces && !objectData.vertices ) {
+						if ( ! objectData.faces && ! objectData.vertices ) {
 							
 							removeData.searchComplete = true;
 							break;
@@ -1059,7 +1067,7 @@
 			
 			if ( removeData.searchComplete !== true ) {
 				
-				for ( i = 0, l = this.nodesIndices.length; i < l; i++ ) {
+				for ( i = 0, l = this.nodesIndices.length; i < l; i ++ ) {
 					
 					node = this.nodesByIndex[ this.nodesIndices[ i ] ];
 					
@@ -1106,7 +1114,7 @@
 			
 			// for each object
 			
-			for ( i = 0, l = this.objects.length; i < l; i++ ) {
+			for ( i = 0, l = this.objects.length; i < l; i ++ ) {
 				
 				object = this.objects[ i ];
 				
@@ -1115,12 +1123,12 @@
 				indexOctant = this.getOctantIndex( object );
 				
 				// if lies within octant
-				if ( indexOctant > -1 ) {
+				if ( indexOctant > - 1 ) {
 					
 					objectsSplit.push( object );
 					objectsSplitOctants.push( indexOctant );
 				
-				} else if ( indexOctant < -1 ) {
+				} else if ( indexOctant < - 1 ) {
 					
 					// lies outside radius
 					
@@ -1139,7 +1147,7 @@
 			
 			// if has objects to split
 			
-			if ( objectsSplit.length > 0) {
+			if ( objectsSplit.length > 0 ) {
 				
 				objectsRemaining = objectsRemaining.concat( this.split( objectsSplit, objectsSplitOctants ) );
 				
@@ -1147,7 +1155,7 @@
 			
 			// if has objects to expand
 			
-			if ( objectsExpand.length > 0) {
+			if ( objectsExpand.length > 0 ) {
 				
 				objectsRemaining = objectsRemaining.concat( this.expand( objectsExpand, objectsExpandOctants ) );
 				
@@ -1183,7 +1191,7 @@
 				
 				// for each object
 				
-				for ( i = 0, l = objects.length; i < l; i++ ) {
+				for ( i = 0, l = objects.length; i < l; i ++ ) {
 					
 					object = objects[ i ];
 					
@@ -1193,7 +1201,7 @@
 					
 					// if object contained by octant, branch this tree
 					
-					if ( indexOctant > -1 ) {
+					if ( indexOctant > - 1 ) {
 						
 						node = this.branch( indexOctant );
 						
@@ -1247,7 +1255,7 @@
 				radius = ( this.radiusOverlap ) * 0.5;
 				overlap = radius * this.tree.overlapPct;
 				radiusOffset = radius - overlap;
-				offset = this.utilVec31Branch.set( indexOctant & 1 ? radiusOffset : -radiusOffset, indexOctant & 2 ? radiusOffset : -radiusOffset, indexOctant & 4 ? radiusOffset : -radiusOffset );
+				offset = this.utilVec31Branch.set( indexOctant & 1 ? radiusOffset : - radiusOffset, indexOctant & 2 ? radiusOffset : - radiusOffset, indexOctant & 4 ? radiusOffset : - radiusOffset );
 				position = new THREE.Vector3().addVectors( this.position, offset );
 				
 				// node
@@ -1314,7 +1322,7 @@
 				
 				// reset counts
 				
-				for ( i = 0, l = iom.length; i < l; i++ ) {
+				for ( i = 0, l = iom.length; i < l; i ++ ) {
 					
 					iom[ i ].count = 0;
 					
@@ -1322,7 +1330,7 @@
 				
 				// for all outside objects, find outside octants containing most objects
 				
-				for ( i = 0, l = objects.length; i < l; i++ ) {
+				for ( i = 0, l = objects.length; i < l; i ++ ) {
 					
 					object = objects[ i ];
 					
@@ -1332,11 +1340,11 @@
 					
 					// if object outside this, include in calculations
 					
-					if ( indexOctant < -1 ) {
+					if ( indexOctant < - 1 ) {
 						
 						// convert octant index to outside flags
 						
-						flagsOutside = -indexOctant - this.tree.INDEX_OUTSIDE_OFFSET;
+						flagsOutside = - indexOctant - this.tree.INDEX_OUTSIDE_OFFSET;
 						
 						// check against bitwise flags
 						
@@ -1344,11 +1352,11 @@
 						
 						if ( flagsOutside & this.tree.FLAG_POS_X ) {
 							
-							iom[ this.tree.INDEX_OUTSIDE_POS_X ].count++;
+							iom[ this.tree.INDEX_OUTSIDE_POS_X ].count ++;
 							
 						} else if ( flagsOutside & this.tree.FLAG_NEG_X ) {
 							
-							iom[ this.tree.INDEX_OUTSIDE_NEG_X ].count++;
+							iom[ this.tree.INDEX_OUTSIDE_NEG_X ].count ++;
 							
 						}
 						
@@ -1356,11 +1364,11 @@
 						
 						if ( flagsOutside & this.tree.FLAG_POS_Y ) {
 							
-							iom[ this.tree.INDEX_OUTSIDE_POS_Y ].count++;
+							iom[ this.tree.INDEX_OUTSIDE_POS_Y ].count ++;
 							
 						} else if ( flagsOutside & this.tree.FLAG_NEG_Y ) {
 							
-							iom[ this.tree.INDEX_OUTSIDE_NEG_Y ].count++;
+							iom[ this.tree.INDEX_OUTSIDE_NEG_Y ].count ++;
 							
 						}
 						
@@ -1368,11 +1376,11 @@
 						
 						if ( flagsOutside & this.tree.FLAG_POS_Z ) {
 							
-							iom[ this.tree.INDEX_OUTSIDE_POS_Z ].count++;
+							iom[ this.tree.INDEX_OUTSIDE_POS_Z ].count ++;
 							
 						} else if ( flagsOutside & this.tree.FLAG_NEG_Z ) {
 							
-							iom[ this.tree.INDEX_OUTSIDE_NEG_Z ].count++;
+							iom[ this.tree.INDEX_OUTSIDE_NEG_Z ].count ++;
 							
 						}
 						
@@ -1438,7 +1446,7 @@
 					// get this octant indices based on octant normal
 					
 					indexOctant = this.getOctantIndexFromPosition( octantX, octantY, octantZ );
-					indexOctantInverse = this.getOctantIndexFromPosition( -octantX, -octantY, -octantZ );
+					indexOctantInverse = this.getOctantIndexFromPosition( - octantX, - octantY, - octantZ );
 					
 					// properties
 					
@@ -1453,7 +1461,7 @@
 					// parent offset is difference between radius + overlap of parent and child
 					
 					radiusOffset = ( radiusParent + overlapParent ) - ( radius + overlap );
-					offset.set( indexOctant & 1 ? radiusOffset : -radiusOffset, indexOctant & 2 ? radiusOffset : -radiusOffset, indexOctant & 4 ? radiusOffset : -radiusOffset );
+					offset.set( indexOctant & 1 ? radiusOffset : - radiusOffset, indexOctant & 2 ? radiusOffset : - radiusOffset, indexOctant & 4 ? radiusOffset : - radiusOffset );
 					position = new THREE.Vector3().addVectors( this.position, offset );
 					
 					// parent
@@ -1474,7 +1482,7 @@
 					
 					// add all expand objects to parent
 					
-					for ( i = 0, l = objectsExpand.length; i < l; i++ ) {
+					for ( i = 0, l = objectsExpand.length; i < l; i ++ ) {
 						
 						this.tree.root.addObject( objectsExpand[ i ] );
 						
@@ -1546,7 +1554,7 @@
 			
 			nodes = toArray( nodes );
 			
-			for ( i = 0, l = nodes.length; i < l; i++ ) {
+			for ( i = 0, l = nodes.length; i < l; i ++ ) {
 				
 				node = nodes[ i ];
 				
@@ -1586,7 +1594,7 @@
 				nodeHeaviestObjectsCount = 0;
 				outsideHeaviestObjectsCount = this.objects.length;
 				
-				for ( i = 0, l = this.nodesIndices.length; i < l; i++ ) {
+				for ( i = 0, l = this.nodesIndices.length; i < l; i ++ ) {
 					
 					node = this.nodesByIndex[ this.nodesIndices[ i ] ];
 					
@@ -1625,7 +1633,7 @@
 			
 			// handle all nodes
 			
-			for ( i = 0, l = this.nodesIndices.length; i < l; i++ ) {
+			for ( i = 0, l = this.nodesIndices.length; i < l; i ++ ) {
 				
 				node = this.nodesByIndex[ this.nodesIndices[ i ] ];
 				
@@ -1735,7 +1743,7 @@
 					
 				}
 				
-				objectData.indexOctant = -indexOctant - this.tree.INDEX_OUTSIDE_OFFSET;
+				objectData.indexOctant = - indexOctant - this.tree.INDEX_OUTSIDE_OFFSET;
 				
 				return objectData.indexOctant;
 				
@@ -1743,13 +1751,13 @@
 			
 			// return octant index from delta xyz
 			
-			if ( deltaX - radiusObj > -overlap ) {
+			if ( deltaX - radiusObj > - overlap ) {
 				
 				// x right
 				
 				indexOctant = indexOctant | 1;
 				
-			} else if ( !( deltaX + radiusObj < overlap ) ) {
+			} else if ( ! ( deltaX + radiusObj < overlap ) ) {
 				
 				// x left
 				
@@ -1758,13 +1766,13 @@
 				
 			}
 			
-			if ( deltaY - radiusObj > -overlap ) {
+			if ( deltaY - radiusObj > - overlap ) {
 				
 				// y right
 				
 				indexOctant = indexOctant | 2;
 				
-			} else if ( !( deltaY + radiusObj < overlap ) ) {
+			} else if ( ! ( deltaY + radiusObj < overlap ) ) {
 				
 				// y left
 				
@@ -1774,13 +1782,13 @@
 			}
 			
 			
-			if ( deltaZ - radiusObj > -overlap ) {
+			if ( deltaZ - radiusObj > - overlap ) {
 				
 				// z right
 				
 				indexOctant = indexOctant | 4;
 				
-			} else if ( !( deltaZ + radiusObj < overlap ) ) {
+			} else if ( ! ( deltaZ + radiusObj < overlap ) ) {
 				
 				// z left
 				
@@ -1848,7 +1856,7 @@
 				
 				// search subtree
 				
-				for ( i = 0, l = this.nodesIndices.length; i < l; i++ ) {
+				for ( i = 0, l = this.nodesIndices.length; i < l; i ++ ) {
 					
 					node = this.nodesByIndex[ this.nodesIndices[ i ] ];
 					
@@ -1870,21 +1878,33 @@
 				pz = position.z;
 			
 			if ( px < this.left ) {
+
 				distance -= Math.pow( px - this.left, 2 );
+
 			} else if ( px > this.right ) {
+
 				distance -= Math.pow( px - this.right, 2 );
+
 			}
 			
 			if ( py < this.bottom ) {
+
 				distance -= Math.pow( py - this.bottom, 2 );
+
 			} else if ( py > this.top ) {
+
 				distance -= Math.pow( py - this.top, 2 );
+
 			}
 			
 			if ( pz < this.back ) {
+
 				distance -= Math.pow( pz - this.back, 2 );
+
 			} else if ( pz > this.front ) {
+
 				distance -= Math.pow( pz - this.front, 2 );
+
 			}
 			
 			return distance >= 0;
@@ -1905,20 +1925,23 @@
 				t4 = ( this.top - origin.y ) * directionPct.y,
 				t5 = ( this.back - origin.z ) * directionPct.z,
 				t6 = ( this.front - origin.z ) * directionPct.z,
-				tmax = Math.min( Math.min( Math.max( t1, t2), Math.max( t3, t4) ), Math.max( t5, t6) ),
+				tmax = Math.min( Math.min( Math.max( t1, t2 ), Math.max( t3, t4 ) ), Math.max( t5, t6 ) ),
 				tmin;
 
 			// ray would intersect in reverse direction, i.e. this is behind ray
-			if (tmax < 0)
-			{
+			if ( tmax < 0 ) {
+
 				return false;
+
 			}
 			
-			tmin = Math.max( Math.max( Math.min( t1, t2), Math.min( t3, t4)), Math.min( t5, t6));
+			tmin = Math.max( Math.max( Math.min( t1, t2 ), Math.min( t3, t4 ) ), Math.min( t5, t6 ) );
 			
 			// if tmin > tmax or tmin > ray distance, ray doesn't intersect AABB
-			if( tmin > tmax || tmin > distance ) {
+			if ( tmin > tmax || tmin > distance ) {
+
 				return false;
+
 			}
 			
 			return true;
@@ -1932,7 +1955,7 @@
 
 			if ( this.nodesIndices.length > 0 ) {
 				
-				for ( i = 0, l = this.nodesIndices.length; i < l; i++ ) {
+				for ( i = 0, l = this.nodesIndices.length; i < l; i ++ ) {
 
 					node = this.nodesByIndex[ this.nodesIndices[ i ] ];
 
@@ -1942,7 +1965,7 @@
 				
 			} else {
 
-				depth = !depth || this.depth > depth ? this.depth : depth;
+				depth = ! depth || this.depth > depth ? this.depth : depth;
 
 			}
 
@@ -1961,7 +1984,7 @@
 			var i, l,
 				count = this.nodesIndices.length;
 			
-			for ( i = 0, l = this.nodesIndices.length; i < l; i++ ) {
+			for ( i = 0, l = this.nodesIndices.length; i < l; i ++ ) {
 				
 				count += this.nodesByIndex[ this.nodesIndices[ i ] ].getNodeCountRecursive();
 				
@@ -1978,7 +2001,7 @@
 			
 			objects = ( objects || [] ).concat( this.objects );
 			
-			for ( i = 0, l = this.nodesIndices.length; i < l; i++ ) {
+			for ( i = 0, l = this.nodesIndices.length; i < l; i ++ ) {
 				
 				node = this.nodesByIndex[ this.nodesIndices[ i ] ];
 				
@@ -1995,7 +2018,7 @@
 			var i, l,
 				count = this.objects.length;
 			
-			for ( i = 0, l = this.nodesIndices.length; i < l; i++ ) {
+			for ( i = 0, l = this.nodesIndices.length; i < l; i ++ ) {
 				
 				count += this.nodesByIndex[ this.nodesIndices[ i ] ].getObjectCountEnd();
 				
@@ -2010,7 +2033,7 @@
 			var count = this.objects.length,
 				parent = this.parent;
 			
-			while( parent instanceof THREE.OctreeNode ) {
+			while ( parent instanceof THREE.OctreeNode ) {
 				
 				count += parent.objects.length;
 				parent = parent.parent;
@@ -2033,7 +2056,7 @@
 			console.log( ( this.parent ? space + ' ' : ' ' ), '+ objects ( ', this.objects.length, ' ) ', this.objects );
 			console.log( ( this.parent ? space + ' ' : ' ' ), '+ children ( ', this.nodesIndices.length, ' )', this.nodesIndices, this.nodesByIndex );
 			
-			for ( i = 0, l = this.nodesIndices.length; i < l; i++ ) {
+			for ( i = 0, l = this.nodesIndices.length; i < l; i ++ ) {
 				
 				node = this.nodesByIndex[ this.nodesIndices[ i ] ];
 				
@@ -2101,7 +2124,7 @@
 		var i, il,
 			intersects = [];
 		
-		for ( i = 0, il = objects.length; i < il; i++ ) {
+		for ( i = 0, il = objects.length; i < il; i ++ ) {
 			
 			intersects = intersects.concat( this.intersectOctreeObject( objects[ i ], recursive ) );
 		

@@ -151,8 +151,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var loader = new THREE.BinaryLoader( true );
-			document.body.appendChild( loader.statusDomElement );
+			var loader = new THREE.BinaryLoader();
 
 			init();
 			animate();
@@ -210,6 +209,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setFaceCulling( THREE.CullFaceNone );
 				renderer.autoClear = false;
@@ -240,19 +240,19 @@
 
 				var mlib = {
 
-				"Orange": 	new THREE.MeshLambertMaterial( { color: 0xff6600, ambient: 0xff2200, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ),
-				"Blue": 	new THREE.MeshLambertMaterial( { color: 0x001133, ambient: 0x001133, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ),
-				"Red": 		new THREE.MeshLambertMaterial( { color: 0x660000, ambient: 0x330000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
-				"Black": 	new THREE.MeshLambertMaterial( { color: 0x000000, ambient: 0x000000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.15 } ),
-				"White":	new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0x666666, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
+				"Orange": 	new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ),
+				"Blue": 	new THREE.MeshLambertMaterial( { color: 0x001133, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ),
+				"Red": 		new THREE.MeshLambertMaterial( { color: 0x660000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
+				"Black": 	new THREE.MeshLambertMaterial( { color: 0x000000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.15 } ),
+				"White":	new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
 
 				"Carmine": 	new THREE.MeshPhongMaterial( { color: 0x770000, specular:0xffaaaa, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Gold": 	new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Bronze":	new THREE.MeshPhongMaterial( { color: 0x150505, specular:0xee6600, shininess:10, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
-				"Chrome": 	new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, envMap: textureCube, combine: THREE.Multiply } ),
+				"Chrome": 	new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 
-				"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, ambient: 0xff2200, envMap: textureCube, combine: THREE.MultiplyOperation } ),
-				"Blue metal": 	new THREE.MeshLambertMaterial( { color: 0x001133, ambient: 0x002266, envMap: textureCube, combine: THREE.MultiplyOperation } ),
+				"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: textureCube, combine: THREE.MultiplyOperation } ),
+				"Blue metal": 	new THREE.MeshLambertMaterial( { color: 0x001133, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Red metal": 	new THREE.MeshLambertMaterial( { color: 0x770000, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Green metal": 	new THREE.MeshLambertMaterial( { color: 0x007711, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Black metal":	new THREE.MeshLambertMaterial( { color: 0x222222, envMap: textureCube, combine: THREE.MultiplyOperation } ),
@@ -281,7 +281,7 @@
 				"Darkgray shiny":	new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x050505 } ),
 				"Gray shiny":		new THREE.MeshPhongMaterial( { color: 0x050505, shininess: 20 } )
 
-				}
+				};
 
 				// Gallardo materials
 
@@ -307,7 +307,7 @@
 
 					]
 
-				}
+				};
 
 				m = CARS[ "gallardo" ].materials;
 				mi = CARS[ "gallardo" ].init_material;
@@ -322,7 +322,7 @@
 					5: mlib[ "Yellow glass" ],  // front lights
 					6: mlib[ "Dark chrome" ]	// windshield rim
 
-				}
+				};
 
 				// Veyron materials
 
@@ -342,7 +342,7 @@
 
 					],
 
-				}
+				};
 
 				m = CARS[ "veyron" ].materials;
 				mi = CARS[ "veyron" ].init_material;
@@ -358,7 +358,7 @@
 					6: mlib[ "Red glass 50" ],		// backlights
 					7: mlib[ "Orange glass 50" ]	// backsignals
 
-				}
+				};
 
 				// F50 materials
 
@@ -383,7 +383,7 @@
 
 					],
 
-				}
+				};
 
 				m = CARS[ "f50" ].materials;
 				mi = CARS[ "f50" ].init_material;
@@ -416,7 +416,7 @@
 					23: m.body[ mi ][ 1 ], 			// back torso
 					24: m.body[ mi ][ 1 ] 			// back torso center
 
-				}
+				};
 
 
 				// Camero materials
@@ -443,7 +443,7 @@
 
 					],
 
-				}
+				};
 
 				m = CARS[ "camaro" ].materials;
 				mi = CARS[ "camaro" ].init_material;
@@ -460,7 +460,7 @@
 					7: mlib[ "Fullblack rough" ],   // tireling
 					8: mlib[ "Fullblack rough" ]    // behind grille
 
-				}
+				};
 
 				loader.load( CARS[ "veyron" ].url, function( geometry ) { createScene( geometry, "veyron" ) } );
 
@@ -493,7 +493,6 @@
 
 					if ( ! CARS[ car ].object ) {
 
-						loader.statusDomElement.style.display = "block";
 						loader.load( CARS[ car ].url, function( geometry ) { createScene( geometry, car ) } );
 
 					} else {
@@ -569,7 +568,7 @@
 
 			function createScene( geometry, car ) {
 
-				loader.statusDomElement.innerHTML = "Creating model ...";
+				geometry.sortFacesByMaterialIndex();
 
 				var m = new THREE.MeshFaceMaterial(),
 					s = CARS[ car ].scale * 1,
@@ -600,9 +599,6 @@
 				attachButtonMaterials( materials.body, m, bm, car );
 
 				switchCar( car );
-
-				loader.statusDomElement.style.display = "none";
-				loader.statusDomElement.innerHTML = "Loading model ...";
 
 			}
 

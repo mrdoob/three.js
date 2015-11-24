@@ -3,492 +3,488 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.JSONLoader = function ( showStatus ) {
+THREE.JSONLoader = function ( manager ) {
 
-	THREE.Loader.call( this, showStatus );
+	if ( typeof manager === 'boolean' ) {
+
+		console.warn( 'THREE.JSONLoader: showStatus parameter has been removed from constructor.' );
+		manager = undefined;
+
+	}
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 	this.withCredentials = false;
 
 };
 
-THREE.JSONLoader.prototype = Object.create( THREE.Loader.prototype );
+THREE.JSONLoader.prototype = {
 
-THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
+	constructor: THREE.JSONLoader,
 
-	var scope = this;
+	// Deprecated
 
-	// todo: unify load API to for easier SceneLoader use
+	get statusDomElement () {
 
-	texturePath = texturePath && ( typeof texturePath === 'string' ) ? texturePath : this.extractUrlBase( url );
+		if ( this._statusDomElement === undefined ) {
 
-	this.onLoadStart();
-	this.loadAjaxJSON( this, url, callback, texturePath );
-
-};
-
-THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, texturePath, callbackProgress ) {
-
-	var xhr = new XMLHttpRequest();
-
-	var length = 0;
-
-	xhr.onreadystatechange = function () {
-
-		if ( xhr.readyState === xhr.DONE ) {
-
-			if ( xhr.status === 200 || xhr.status === 0 ) {
-
-				if ( xhr.responseText ) {
-
-					var json = JSON.parse( xhr.responseText );
-
-					if ( json.metadata !== undefined && json.metadata.type === 'scene' ) {
-
-						console.error( 'THREE.JSONLoader: "' + url + '" seems to be a Scene. Use THREE.SceneLoader instead.' );
-						return;
-
-					}
-
-					var result = context.parse( json, texturePath );
-					callback( result.geometry, result.materials );
-
-				} else {
-
-					console.error( 'THREE.JSONLoader: "' + url + '" seems to be unreachable or the file is empty.' );
-
-				}
-
-				// in context of more complex asset initialization
-				// do not block on single failed file
-				// maybe should go even one more level up
-
-				context.onLoadComplete();
-
-			} else {
-
-				console.error( 'THREE.JSONLoader: Couldn\'t load "' + url + '" (' + xhr.status + ')' );
-
-			}
-
-		} else if ( xhr.readyState === xhr.LOADING ) {
-
-			if ( callbackProgress ) {
-
-				if ( length === 0 ) {
-
-					length = xhr.getResponseHeader( 'Content-Length' );
-
-				}
-
-				callbackProgress( { total: length, loaded: xhr.responseText.length } );
-
-			}
-
-		} else if ( xhr.readyState === xhr.HEADERS_RECEIVED ) {
-
-			if ( callbackProgress !== undefined ) {
-
-				length = xhr.getResponseHeader( 'Content-Length' );
-
-			}
+			this._statusDomElement = document.createElement( 'div' );
 
 		}
 
-	};
+		console.warn( 'THREE.JSONLoader: .statusDomElement has been removed.' );
+		return this._statusDomElement;
 
-	xhr.open( 'GET', url, true );
-	xhr.withCredentials = this.withCredentials;
-	xhr.send( null );
+	},
 
-};
+	load: function( url, onLoad, onProgress, onError ) {
 
-THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
+		var scope = this;
 
-	var scope = this,
-	geometry = new THREE.Geometry(),
-	scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
+		var texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : THREE.Loader.prototype.extractUrlBase( url );
 
-	parseModel( scale );
+		var loader = new THREE.XHRLoader( this.manager );
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.setWithCredentials( this.withCredentials );
+		loader.load( url, function ( text ) {
 
-	parseSkin();
-	parseMorphing( scale );
+			var json = JSON.parse( text );
+			var metadata = json.metadata;
 
-	geometry.computeFaceNormals();
-	geometry.computeBoundingSphere();
+			if ( metadata !== undefined ) {
 
-	function parseModel( scale ) {
+				if ( metadata.type === 'object' ) {
 
-		function isBitSet( value, position ) {
+					console.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.ObjectLoader instead.' );
+					return;
 
-			return value & ( 1 << position );
+				}
 
-		}
+				if ( metadata.type === 'scene' ) {
 
-		var i, j, fi,
+					console.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.SceneLoader instead.' );
+					return;
 
-		offset, zLength,
+				}
+
+			}
+
+			var object = scope.parse( json, texturePath );
+			onLoad( object.geometry, object.materials );
+
+		} );
+
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
+	setTexturePath: function ( value ) {
+
+		this.texturePath = value;
+
+	},
+
+	parse: function ( json, texturePath ) {
+
+		var geometry = new THREE.Geometry(),
+		scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
+
+		parseModel( scale );
+
+		parseSkin();
+		parseMorphing( scale );
+		parseAnimations();
+
+		geometry.computeFaceNormals();
+		geometry.computeBoundingSphere();
+
+		function parseModel( scale ) {
+
+			function isBitSet( value, position ) {
+
+				return value & ( 1 << position );
+
+			}
+
+			var i, j, fi,
+
+			offset, zLength,
 
 		colorIndex, normalIndex, uvIndex, materialIndex,
 
-		type,
-		isQuad,
-		hasMaterial,
-		hasFaceVertexUv,
-		hasFaceNormal, hasFaceVertexNormal,
-		hasFaceColor, hasFaceVertexColor,
+			type,
+			isQuad,
+			hasMaterial,
+			hasFaceVertexUv,
+			hasFaceNormal, hasFaceVertexNormal,
+			hasFaceColor, hasFaceVertexColor,
 
-		vertex, face, faceA, faceB, color, hex, normal,
+		vertex, face, faceA, faceB, hex, normal,
 
-		uvLayer, uv, u, v,
+			uvLayer, uv, u, v,
 
-		faces = json.faces,
-		vertices = json.vertices,
-		normals = json.normals,
-		colors = json.colors,
+			faces = json.faces,
+			vertices = json.vertices,
+			normals = json.normals,
+			colors = json.colors,
 
-		nUvLayers = 0;
+			nUvLayers = 0;
 
-		if ( json.uvs !== undefined ) {
+			if ( json.uvs !== undefined ) {
 
-			// disregard empty arrays
+				// disregard empty arrays
 
-			for ( i = 0; i < json.uvs.length; i ++ ) {
+				for ( i = 0; i < json.uvs.length; i ++ ) {
 
-				if ( json.uvs[ i ].length ) nUvLayers ++;
-
-			}
-
-			for ( i = 0; i < nUvLayers; i ++ ) {
-
-				geometry.faceVertexUvs[ i ] = [];
-
-			}
-
-		}
-
-		offset = 0;
-		zLength = vertices.length;
-
-		while ( offset < zLength ) {
-
-			vertex = new THREE.Vector3();
-
-			vertex.x = vertices[ offset ++ ] * scale;
-			vertex.y = vertices[ offset ++ ] * scale;
-			vertex.z = vertices[ offset ++ ] * scale;
-
-			geometry.vertices.push( vertex );
-
-		}
-
-		offset = 0;
-		zLength = faces.length;
-
-		while ( offset < zLength ) {
-
-			type = faces[ offset ++ ];
-
-
-			isQuad              = isBitSet( type, 0 );
-			hasMaterial         = isBitSet( type, 1 );
-			hasFaceVertexUv     = isBitSet( type, 3 );
-			hasFaceNormal       = isBitSet( type, 4 );
-			hasFaceVertexNormal = isBitSet( type, 5 );
-			hasFaceColor	     = isBitSet( type, 6 );
-			hasFaceVertexColor  = isBitSet( type, 7 );
-
-			// console.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
-
-			if ( isQuad ) {
-
-				faceA = new THREE.Face3();
-				faceA.a = faces[ offset ];
-				faceA.b = faces[ offset + 1 ];
-				faceA.c = faces[ offset + 3 ];
-
-				faceB = new THREE.Face3();
-				faceB.a = faces[ offset + 1 ];
-				faceB.b = faces[ offset + 2 ];
-				faceB.c = faces[ offset + 3 ];
-
-				offset += 4;
-
-				if ( hasMaterial ) {
-
-					materialIndex = faces[ offset ++ ];
-					faceA.materialIndex = materialIndex;
-					faceB.materialIndex = materialIndex;
+					if ( json.uvs[ i ].length ) nUvLayers ++;
 
 				}
 
-				// to get face <=> uv index correspondence
+				for ( i = 0; i < nUvLayers; i ++ ) {
 
-				fi = geometry.faces.length;
+					geometry.faceVertexUvs[ i ] = [];
 
-				if ( hasFaceVertexUv ) {
+				}
 
-					for ( i = 0; i < nUvLayers; i ++ ) {
+			}
 
-						uvLayer = json.uvs[ i ];
+			offset = 0;
+			zLength = vertices.length;
 
-						geometry.faceVertexUvs[ i ][ fi ] = [];
-						geometry.faceVertexUvs[ i ][ fi + 1 ] = []
+			while ( offset < zLength ) {
 
-						for ( j = 0; j < 4; j ++ ) {
+				vertex = new THREE.Vector3();
 
-							uvIndex = faces[ offset ++ ];
+				vertex.x = vertices[ offset ++ ] * scale;
+				vertex.y = vertices[ offset ++ ] * scale;
+				vertex.z = vertices[ offset ++ ] * scale;
 
-							u = uvLayer[ uvIndex * 2 ];
-							v = uvLayer[ uvIndex * 2 + 1 ];
+				geometry.vertices.push( vertex );
 
-							uv = new THREE.Vector2( u, v );
+			}
 
-							if ( j !== 2 ) geometry.faceVertexUvs[ i ][ fi ].push( uv );
-							if ( j !== 0 ) geometry.faceVertexUvs[ i ][ fi + 1 ].push( uv );
+			offset = 0;
+			zLength = faces.length;
+
+			while ( offset < zLength ) {
+
+				type = faces[ offset ++ ];
+
+
+				isQuad              = isBitSet( type, 0 );
+				hasMaterial         = isBitSet( type, 1 );
+				hasFaceVertexUv     = isBitSet( type, 3 );
+				hasFaceNormal       = isBitSet( type, 4 );
+				hasFaceVertexNormal = isBitSet( type, 5 );
+				hasFaceColor	     = isBitSet( type, 6 );
+				hasFaceVertexColor  = isBitSet( type, 7 );
+
+				// console.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
+
+				if ( isQuad ) {
+
+					faceA = new THREE.Face3();
+					faceA.a = faces[ offset ];
+					faceA.b = faces[ offset + 1 ];
+					faceA.c = faces[ offset + 3 ];
+
+					faceB = new THREE.Face3();
+					faceB.a = faces[ offset + 1 ];
+					faceB.b = faces[ offset + 2 ];
+					faceB.c = faces[ offset + 3 ];
+
+					offset += 4;
+
+					if ( hasMaterial ) {
+
+						materialIndex = faces[ offset ++ ];
+						faceA.materialIndex = materialIndex;
+						faceB.materialIndex = materialIndex;
+
+					}
+
+					// to get face <=> uv index correspondence
+
+					fi = geometry.faces.length;
+
+					if ( hasFaceVertexUv ) {
+
+						for ( i = 0; i < nUvLayers; i ++ ) {
+
+							uvLayer = json.uvs[ i ];
+
+							geometry.faceVertexUvs[ i ][ fi ] = [];
+							geometry.faceVertexUvs[ i ][ fi + 1 ] = [];
+
+							for ( j = 0; j < 4; j ++ ) {
+
+								uvIndex = faces[ offset ++ ];
+
+								u = uvLayer[ uvIndex * 2 ];
+								v = uvLayer[ uvIndex * 2 + 1 ];
+
+								uv = new THREE.Vector2( u, v );
+
+								if ( j !== 2 ) geometry.faceVertexUvs[ i ][ fi ].push( uv );
+								if ( j !== 0 ) geometry.faceVertexUvs[ i ][ fi + 1 ].push( uv );
+
+							}
 
 						}
 
 					}
 
-				}
-
-				if ( hasFaceNormal ) {
-
-					normalIndex = faces[ offset ++ ] * 3;
-
-					faceA.normal.set(
-						normals[ normalIndex ++ ],
-						normals[ normalIndex ++ ],
-						normals[ normalIndex ]
-					);
-
-					faceB.normal.copy( faceA.normal );
-
-				}
-
-				if ( hasFaceVertexNormal ) {
-
-					for ( i = 0; i < 4; i ++ ) {
+					if ( hasFaceNormal ) {
 
 						normalIndex = faces[ offset ++ ] * 3;
 
-						normal = new THREE.Vector3(
+						faceA.normal.set(
 							normals[ normalIndex ++ ],
 							normals[ normalIndex ++ ],
 							normals[ normalIndex ]
 						);
 
-
-						if ( i !== 2 ) faceA.vertexNormals.push( normal );
-						if ( i !== 0 ) faceB.vertexNormals.push( normal );
+						faceB.normal.copy( faceA.normal );
 
 					}
 
-				}
+					if ( hasFaceVertexNormal ) {
+
+						for ( i = 0; i < 4; i ++ ) {
+
+							normalIndex = faces[ offset ++ ] * 3;
+
+							normal = new THREE.Vector3(
+								normals[ normalIndex ++ ],
+								normals[ normalIndex ++ ],
+								normals[ normalIndex ]
+							);
 
 
-				if ( hasFaceColor ) {
+							if ( i !== 2 ) faceA.vertexNormals.push( normal );
+							if ( i !== 0 ) faceB.vertexNormals.push( normal );
 
-					colorIndex = faces[ offset ++ ];
-					hex = colors[ colorIndex ];
+						}
 
-					faceA.color.setHex( hex );
-					faceB.color.setHex( hex );
-
-				}
+					}
 
 
-				if ( hasFaceVertexColor ) {
-
-					for ( i = 0; i < 4; i ++ ) {
+					if ( hasFaceColor ) {
 
 						colorIndex = faces[ offset ++ ];
 						hex = colors[ colorIndex ];
 
-						if ( i !== 2 ) faceA.vertexColors.push( new THREE.Color( hex ) );
-						if ( i !== 0 ) faceB.vertexColors.push( new THREE.Color( hex ) );
+						faceA.color.setHex( hex );
+						faceB.color.setHex( hex );
 
 					}
 
-				}
 
-				geometry.faces.push( faceA );
-				geometry.faces.push( faceB );
+					if ( hasFaceVertexColor ) {
 
-			} else {
+						for ( i = 0; i < 4; i ++ ) {
 
-				face = new THREE.Face3();
-				face.a = faces[ offset ++ ];
-				face.b = faces[ offset ++ ];
-				face.c = faces[ offset ++ ];
+							colorIndex = faces[ offset ++ ];
+							hex = colors[ colorIndex ];
 
-				if ( hasMaterial ) {
-
-					materialIndex = faces[ offset ++ ];
-					face.materialIndex = materialIndex;
-
-				}
-
-				// to get face <=> uv index correspondence
-
-				fi = geometry.faces.length;
-
-				if ( hasFaceVertexUv ) {
-
-					for ( i = 0; i < nUvLayers; i ++ ) {
-
-						uvLayer = json.uvs[ i ];
-
-						geometry.faceVertexUvs[ i ][ fi ] = [];
-
-						for ( j = 0; j < 3; j ++ ) {
-
-							uvIndex = faces[ offset ++ ];
-
-							u = uvLayer[ uvIndex * 2 ];
-							v = uvLayer[ uvIndex * 2 + 1 ];
-
-							uv = new THREE.Vector2( u, v );
-
-							geometry.faceVertexUvs[ i ][ fi ].push( uv );
+							if ( i !== 2 ) faceA.vertexColors.push( new THREE.Color( hex ) );
+							if ( i !== 0 ) faceB.vertexColors.push( new THREE.Color( hex ) );
 
 						}
 
 					}
 
-				}
+					geometry.faces.push( faceA );
+					geometry.faces.push( faceB );
 
-				if ( hasFaceNormal ) {
+				} else {
 
-					normalIndex = faces[ offset ++ ] * 3;
+					face = new THREE.Face3();
+					face.a = faces[ offset ++ ];
+					face.b = faces[ offset ++ ];
+					face.c = faces[ offset ++ ];
 
-					face.normal.set(
-						normals[ normalIndex ++ ],
-						normals[ normalIndex ++ ],
-						normals[ normalIndex ]
-					);
+					if ( hasMaterial ) {
 
-				}
+						materialIndex = faces[ offset ++ ];
+						face.materialIndex = materialIndex;
 
-				if ( hasFaceVertexNormal ) {
+					}
 
-					for ( i = 0; i < 3; i ++ ) {
+					// to get face <=> uv index correspondence
+
+					fi = geometry.faces.length;
+
+					if ( hasFaceVertexUv ) {
+
+						for ( i = 0; i < nUvLayers; i ++ ) {
+
+							uvLayer = json.uvs[ i ];
+
+							geometry.faceVertexUvs[ i ][ fi ] = [];
+
+							for ( j = 0; j < 3; j ++ ) {
+
+								uvIndex = faces[ offset ++ ];
+
+								u = uvLayer[ uvIndex * 2 ];
+								v = uvLayer[ uvIndex * 2 + 1 ];
+
+								uv = new THREE.Vector2( u, v );
+
+								geometry.faceVertexUvs[ i ][ fi ].push( uv );
+
+							}
+
+						}
+
+					}
+
+					if ( hasFaceNormal ) {
 
 						normalIndex = faces[ offset ++ ] * 3;
 
-						normal = new THREE.Vector3(
+						face.normal.set(
 							normals[ normalIndex ++ ],
 							normals[ normalIndex ++ ],
 							normals[ normalIndex ]
 						);
 
-						face.vertexNormals.push( normal );
+					}
+
+					if ( hasFaceVertexNormal ) {
+
+						for ( i = 0; i < 3; i ++ ) {
+
+							normalIndex = faces[ offset ++ ] * 3;
+
+							normal = new THREE.Vector3(
+								normals[ normalIndex ++ ],
+								normals[ normalIndex ++ ],
+								normals[ normalIndex ]
+							);
+
+							face.vertexNormals.push( normal );
+
+						}
 
 					}
 
-				}
 
-
-				if ( hasFaceColor ) {
-
-					colorIndex = faces[ offset ++ ];
-					face.color.setHex( colors[ colorIndex ] );
-
-				}
-
-
-				if ( hasFaceVertexColor ) {
-
-					for ( i = 0; i < 3; i ++ ) {
+					if ( hasFaceColor ) {
 
 						colorIndex = faces[ offset ++ ];
-						face.vertexColors.push( new THREE.Color( colors[ colorIndex ] ) );
+						face.color.setHex( colors[ colorIndex ] );
 
 					}
 
+
+					if ( hasFaceVertexColor ) {
+
+						for ( i = 0; i < 3; i ++ ) {
+
+							colorIndex = faces[ offset ++ ];
+							face.vertexColors.push( new THREE.Color( colors[ colorIndex ] ) );
+
+						}
+
+					}
+
+					geometry.faces.push( face );
+
 				}
 
-				geometry.faces.push( face );
+			}
+
+		};
+
+		function parseSkin() {
+
+			var influencesPerVertex = ( json.influencesPerVertex !== undefined ) ? json.influencesPerVertex : 2;
+
+			if ( json.skinWeights ) {
+
+				for ( var i = 0, l = json.skinWeights.length; i < l; i += influencesPerVertex ) {
+
+					var x =                               json.skinWeights[ i ];
+					var y = ( influencesPerVertex > 1 ) ? json.skinWeights[ i + 1 ] : 0;
+					var z = ( influencesPerVertex > 2 ) ? json.skinWeights[ i + 2 ] : 0;
+					var w = ( influencesPerVertex > 3 ) ? json.skinWeights[ i + 3 ] : 0;
+
+					geometry.skinWeights.push( new THREE.Vector4( x, y, z, w ) );
+
+				}
 
 			}
 
-		}
+			if ( json.skinIndices ) {
 
-	};
+				for ( var i = 0, l = json.skinIndices.length; i < l; i += influencesPerVertex ) {
 
-	function parseSkin() {
-		var influencesPerVertex = ( json.influencesPerVertex !== undefined ) ? json.influencesPerVertex : 2;
+					var a =                               json.skinIndices[ i ];
+					var b = ( influencesPerVertex > 1 ) ? json.skinIndices[ i + 1 ] : 0;
+					var c = ( influencesPerVertex > 2 ) ? json.skinIndices[ i + 2 ] : 0;
+					var d = ( influencesPerVertex > 3 ) ? json.skinIndices[ i + 3 ] : 0;
 
-		if ( json.skinWeights ) {
+					geometry.skinIndices.push( new THREE.Vector4( a, b, c, d ) );
 
-			for ( var i = 0, l = json.skinWeights.length; i < l; i += influencesPerVertex ) {
-
-				var x =                               json.skinWeights[ i     ];
-				var y = ( influencesPerVertex > 1 ) ? json.skinWeights[ i + 1 ] : 0;
-				var z = ( influencesPerVertex > 2 ) ? json.skinWeights[ i + 2 ] : 0;
-				var w = ( influencesPerVertex > 3 ) ? json.skinWeights[ i + 3 ] : 0;
-
-				geometry.skinWeights.push( new THREE.Vector4( x, y, z, w ) );
+				}
 
 			}
 
-		}
+			geometry.bones = json.bones;
 
-		if ( json.skinIndices ) {
-
-			for ( var i = 0, l = json.skinIndices.length; i < l; i += influencesPerVertex ) {
-
-				var a =                               json.skinIndices[ i     ];
-				var b = ( influencesPerVertex > 1 ) ? json.skinIndices[ i + 1 ] : 0;
-				var c = ( influencesPerVertex > 2 ) ? json.skinIndices[ i + 2 ] : 0;
-				var d = ( influencesPerVertex > 3 ) ? json.skinIndices[ i + 3 ] : 0;
-
-				geometry.skinIndices.push( new THREE.Vector4( a, b, c, d ) );
-
-			}
-
-		}
-
-		geometry.bones = json.bones;
-
-		if ( geometry.bones && geometry.bones.length > 0 && ( geometry.skinWeights.length !== geometry.skinIndices.length || geometry.skinIndices.length !== geometry.vertices.length ) ) {
+			if ( geometry.bones && geometry.bones.length > 0 && ( geometry.skinWeights.length !== geometry.skinIndices.length || geometry.skinIndices.length !== geometry.vertices.length ) ) {
 
 				console.warn( 'When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
 					geometry.skinIndices.length + '), and skinWeights (' + geometry.skinWeights.length + ') should match.' );
 
-		}
+			}
 
+		};
 
-		// could change this to json.animations[0] or remove completely
+		function parseMorphing( scale ) {
 
-		geometry.animation = json.animation;
-		geometry.animations = json.animations;
+			if ( json.morphTargets !== undefined ) {
 
-	};
+				for ( var i = 0, l = json.morphTargets.length; i < l; i ++ ) {
 
-	function parseMorphing( scale ) {
+					geometry.morphTargets[ i ] = {};
+					geometry.morphTargets[ i ].name = json.morphTargets[ i ].name;
+					geometry.morphTargets[ i ].vertices = [];
 
-		if ( json.morphTargets !== undefined ) {
+					var dstVertices = geometry.morphTargets[ i ].vertices;
+					var srcVertices = json.morphTargets[ i ].vertices;
 
-			var i, l, v, vl, dstVertices, srcVertices;
+					for ( var v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
 
-			for ( i = 0, l = json.morphTargets.length; i < l; i ++ ) {
+						var vertex = new THREE.Vector3();
+						vertex.x = srcVertices[ v ] * scale;
+						vertex.y = srcVertices[ v + 1 ] * scale;
+						vertex.z = srcVertices[ v + 2 ] * scale;
 
-				geometry.morphTargets[ i ] = {};
-				geometry.morphTargets[ i ].name = json.morphTargets[ i ].name;
-				geometry.morphTargets[ i ].vertices = [];
+						dstVertices.push( vertex );
 
-				dstVertices = geometry.morphTargets[ i ].vertices;
-				srcVertices = json.morphTargets [ i ].vertices;
+					}
 
-				for ( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
+				}
 
-					var vertex = new THREE.Vector3();
-					vertex.x = srcVertices[ v ] * scale;
-					vertex.y = srcVertices[ v + 1 ] * scale;
-					vertex.z = srcVertices[ v + 2 ] * scale;
+			}
 
-					dstVertices.push( vertex );
+			if ( json.morphColors !== undefined && json.morphColors.length > 0 ) {
+
+				console.warn( 'THREE.JSONLoader: "morphColors" no longer supported. Using them as face colors.' );
+
+				var faces = geometry.faces;
+				var morphColors = json.morphColors[ 0 ].colors;
+
+				for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+					faces[ i ].color.fromArray( morphColors, i * 3 );
 
 				}
 
@@ -496,48 +492,54 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		}
 
-		if ( json.morphColors !== undefined ) {
+		function parseAnimations() {
 
-			var i, l, c, cl, dstColors, srcColors, color;
+			var outputAnimations = [];
 
-			for ( i = 0, l = json.morphColors.length; i < l; i ++ ) {
-
-				geometry.morphColors[ i ] = {};
-				geometry.morphColors[ i ].name = json.morphColors[ i ].name;
-				geometry.morphColors[ i ].colors = [];
-
-				dstColors = geometry.morphColors[ i ].colors;
-				srcColors = json.morphColors [ i ].colors;
-
-				for ( c = 0, cl = srcColors.length; c < cl; c += 3 ) {
-
-					color = new THREE.Color( 0xffaa00 );
-					color.setRGB( srcColors[ c ], srcColors[ c + 1 ], srcColors[ c + 2 ] );
-					dstColors.push( color );
-
+			// parse old style Bone/Hierarchy animations
+			var animations = [];
+			if ( json.animation !== undefined ) {
+				animations.push( json.animation );
+			}
+			if ( json.animations !== undefined ) {
+				if ( json.animations.length ) {
+					animations = animations.concat( json.animations );
+				} else {
+					animations.push( json.animations );
 				}
+			}
+
+			for ( var i = 0; i < animations.length; i ++ ) {
+
+				var clip = THREE.AnimationClip.parseAnimation( animations[i], geometry.bones );
+				if ( clip ) outputAnimations.push( clip );
 
 			}
 
+			// parse implicit morph animations
+			if ( geometry.morphTargets ) {
+
+				// TODO: Figure out what an appropraite FPS is for morph target animations -- defaulting to 10, but really it is completely arbitrary.
+				var morphAnimationClips = THREE.AnimationClip.CreateClipsFromMorphTargetSequences( geometry.morphTargets, 10 );
+				outputAnimations = outputAnimations.concat( morphAnimationClips );
+
+			}
+
+			if ( outputAnimations.length > 0 ) geometry.animations = outputAnimations;
+
+		};
+
+		if ( json.materials === undefined || json.materials.length === 0 ) {
+
+			return { geometry: geometry };
+
+		} else {
+
+			var materials = THREE.Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
+
+			return { geometry: geometry, materials: materials };
+
 		}
-
-	};
-
-	if ( json.materials === undefined || json.materials.length === 0 ) {
-
-		return { geometry: geometry };
-
-	} else {
-
-		var materials = this.initMaterials( json.materials, texturePath );
-
-		if ( this.needsTangents( materials ) ) {
-
-			geometry.computeTangents();
-
-		}
-
-		return { geometry: geometry, materials: materials };
 
 	}
 

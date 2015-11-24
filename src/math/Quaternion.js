@@ -2,7 +2,7 @@
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  */
 
 THREE.Quaternion = function ( x, y, z, w ) {
@@ -17,8 +17,6 @@ THREE.Quaternion = function ( x, y, z, w ) {
 THREE.Quaternion.prototype = {
 
 	constructor: THREE.Quaternion,
-
-	_x: 0,_y: 0, _z: 0, _w: 0,
 
 	get x () {
 
@@ -85,6 +83,12 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	clone: function () {
+
+		return new this.constructor( this._x, this._y, this._z, this._w );
+
+	},
+
 	copy: function ( quaternion ) {
 
 		this._x = quaternion.x;
@@ -103,6 +107,7 @@ THREE.Quaternion.prototype = {
 		if ( euler instanceof THREE.Euler === false ) {
 
 			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
+
 		}
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/
@@ -116,42 +121,44 @@ THREE.Quaternion.prototype = {
 		var s2 = Math.sin( euler._y / 2 );
 		var s3 = Math.sin( euler._z / 2 );
 
-		if ( euler.order === 'XYZ' ) {
+		var order = euler.order;
+
+		if ( order === 'XYZ' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
 			this._z = c1 * c2 * s3 + s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( euler.order === 'YXZ' ) {
+		} else if ( order === 'YXZ' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( euler.order === 'ZXY' ) {
+		} else if ( order === 'ZXY' ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 + s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( euler.order === 'ZYX' ) {
+		} else if ( order === 'ZYX' ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( euler.order === 'YZX' ) {
+		} else if ( order === 'YZX' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( euler.order === 'XZY' ) {
+		} else if ( order === 'XZY' ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
@@ -399,6 +406,9 @@ THREE.Quaternion.prototype = {
 
 	slerp: function ( qb, t ) {
 
+		if ( t === 0 ) return this;
+		if ( t === 1 ) return this.copy( qb );
+
 		var x = this._x, y = this._y, z = this._z, w = this._w;
 
 		// http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/
@@ -465,12 +475,14 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function ( array, offset ) {
 
-		this._x = array[ 0 ];
-		this._y = array[ 1 ];
-		this._z = array[ 2 ];
-		this._w = array[ 3 ];
+		if ( offset === undefined ) offset = 0;
+
+		this._x = array[ offset ];
+		this._y = array[ offset + 1 ];
+		this._z = array[ offset + 2 ];
+		this._w = array[ offset + 3 ];
 
 		this.onChangeCallback();
 
@@ -478,9 +490,17 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		return [ this._x, this._y, this._z, this._w ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
+
+		array[ offset ] = this._x;
+		array[ offset + 1 ] = this._y;
+		array[ offset + 2 ] = this._z;
+		array[ offset + 3 ] = this._w;
+
+		return array;
 
 	},
 
@@ -492,13 +512,7 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	onChangeCallback: function () {},
-
-	clone: function () {
-
-		return new THREE.Quaternion( this._x, this._y, this._z, this._w );
-
-	}
+	onChangeCallback: function () {}
 
 };
 
@@ -506,4 +520,4 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 
 	return qm.copy( qa ).slerp( qb, t );
 
-}
+};

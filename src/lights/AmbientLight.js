@@ -6,16 +6,11 @@ THREE.AmbientLight = function ( color ) {
 
 	THREE.Light.call( this, color );
 
+	this.type = 'AmbientLight';
+
+	this.castShadow = undefined;
+
 };
 
 THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
-
-THREE.AmbientLight.prototype.clone = function () {
-
-	var light = new THREE.AmbientLight();
-
-	THREE.Light.prototype.clone.call( this, light );
-
-	return light;
-
-};
+THREE.AmbientLight.prototype.constructor = THREE.AmbientLight;

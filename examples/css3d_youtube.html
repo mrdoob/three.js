@@ -69,7 +69,7 @@
 				image.style.position = 'absolute';
 				image.style.width = '480px';
 				image.style.height = '360px';
-				image.src = entry.media$group.media$thumbnail[ 2 ].url;
+				image.src = entry.snippet.thumbnails.default.url;
 				dom.appendChild( image );
 
 				var button = document.createElement( 'img' );
@@ -140,7 +140,7 @@
 					player.style.width = '480px';
 					player.style.height = '360px';
 					player.style.border = '0px';
-					player.src = 'http://www.youtube.com/embed/' + entry.id.$t.split( ':' ).pop() + '?rel=0&autoplay=1&controls=1&showinfo=0';
+					player.src = 'http://www.youtube.com/embed/' + entry.id.videoId + '?rel=0&autoplay=1&controls=1&showinfo=0';
 					this.appendChild( player );
 
 					//
@@ -265,7 +265,7 @@
 
 				var request = new XMLHttpRequest();
 				request.addEventListener( 'load', onData, false );
-				request.open( 'GET', 'https://gdata.youtube.com/feeds/api/videos?v=2&alt=json&max-results=50&q=' + query, true );
+				request.open( 'GET', 'https://www.googleapis.com/youtube/v3/search?key={YOUR_API_KEY}&part=snippet&q=' + query, true );
 				request.send( null );
 
 			}
@@ -273,9 +273,7 @@
 			function onData( event ) {
 
 				var data = JSON.parse( event.target.responseText );
-				var entries = data.feed.entry;
-
-				// console.log( entries );
+				var entries = data.items;
 
 				for ( var i = 0; i < entries.length; i ++ ) {
 

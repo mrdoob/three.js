@@ -11,7 +11,7 @@ THREE.DirectionalLightHelper = function ( light, size ) {
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	this.matrixWorld = light.matrixWorld;
+	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	size = size || 1;
@@ -48,13 +48,15 @@ THREE.DirectionalLightHelper = function ( light, size ) {
 };
 
 THREE.DirectionalLightHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.DirectionalLightHelper.prototype.constructor = THREE.DirectionalLightHelper;
 
 THREE.DirectionalLightHelper.prototype.dispose = function () {
-	
+
 	this.lightPlane.geometry.dispose();
 	this.lightPlane.material.dispose();
 	this.targetLine.geometry.dispose();
 	this.targetLine.material.dispose();
+
 };
 
 THREE.DirectionalLightHelper.prototype.update = function () {
@@ -76,7 +78,6 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 		this.targetLine.geometry.verticesNeedUpdate = true;
 		this.targetLine.material.color.copy( this.lightPlane.material.color );
 
-	}
+	};
 
 }();
-

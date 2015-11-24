@@ -14,13 +14,13 @@ THREE.QuadraticBezierCurve3 = THREE.Curve.create(
 
 	function ( t ) {
 
-		var tx, ty, tz;
+		var b2 = THREE.ShapeUtils.b2;		
 
-		tx = THREE.Shape.Utils.b2( t, this.v0.x, this.v1.x, this.v2.x );
-		ty = THREE.Shape.Utils.b2( t, this.v0.y, this.v1.y, this.v2.y );
-		tz = THREE.Shape.Utils.b2( t, this.v0.z, this.v1.z, this.v2.z );
-
-		return new THREE.Vector3( tx, ty, tz );
+		return new THREE.Vector3(
+			b2( t, this.v0.x, this.v1.x, this.v2.x ),
+			b2( t, this.v0.y, this.v1.y, this.v2.y ),
+			b2( t, this.v0.z, this.v1.z, this.v2.z )
+		);
 
 	}
 

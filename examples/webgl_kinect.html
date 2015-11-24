@@ -23,8 +23,7 @@
 				font-weight: bold;
 
 				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
+				top: 5px; width: 100%;
 			}
 
 			a {
@@ -145,9 +144,9 @@
 				video = document.createElement( 'video' );
 				video.addEventListener( 'loadedmetadata', function ( event ) {
 
-					texture = new THREE.Texture( video );
-					texture.generateMipmaps = false;
-					
+					texture = new THREE.VideoTexture( video );
+					texture.minFilter = THREE.NearestFilter;
+
 					var width = 640, height = 480;
 					var nearClipping = 850, farClipping = 4000;
 
@@ -186,19 +185,8 @@
 
 					} );
 
-					mesh = new THREE.PointCloud( geometry, material );
+					mesh = new THREE.Points( geometry, material );
 					scene.add( mesh );
-
-					setInterval( function () {
-
-						if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
-
-							texture.needsUpdate = true;
-
-						}
-
-					}, 1000 / 30 );
-
 
 					var gui = new dat.GUI();
 					gui.add( material.uniforms.nearClipping, 'value', 1, 10000, 1.0 ).name( 'nearClipping' );
@@ -214,6 +202,7 @@
 				video.play();
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

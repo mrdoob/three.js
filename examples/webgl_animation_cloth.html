@@ -14,11 +14,10 @@
 			}
 
 			#info {
-				text-align: center;
-				padding: 10px;
-				z-index: 10;
-				width: 100%;
 				position: absolute;
+				padding: 10px;
+				width: 100%;
+				text-align: center;
 			}
 
 			a {
@@ -128,7 +127,7 @@
 
 			var clothGeometry;
 			var sphere;
-			var object, arrow;
+			var object;
 
 			var rotate = true;
 
@@ -143,7 +142,6 @@
 				// scene
 
 				scene = new THREE.Scene();
-
 				scene.fog = new THREE.Fog( 0xcce0ff, 500, 10000 );
 
 				// camera
@@ -164,7 +162,7 @@
 				light.position.multiplyScalar( 1.3 );
 
 				light.castShadow = true;
-				//light.shadowCameraVisible = true;
+				// light.shadowCameraVisible = true;
 
 				light.shadowMapWidth = 1024;
 				light.shadowMapHeight = 1024;
@@ -177,12 +175,6 @@
 				light.shadowCameraBottom = -d;
 
 				light.shadowCameraFar = 1000;
-				light.shadowDarkness = 0.5;
-
-				scene.add( light );
-
-				light = new THREE.DirectionalLight( 0x3dff0c, 0.35 );
-				light.position.set( 0, -1, 0 );
 
 				scene.add( light );
 
@@ -192,12 +184,17 @@
 				clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
 				clothTexture.anisotropy = 16;
 
-				var clothMaterial = new THREE.MeshPhongMaterial( { alphaTest: 0.5, ambient: 0xffffff, color: 0xffffff, specular: 0x030303, emissive: 0x111111, shiness: 10, map: clothTexture, side: THREE.DoubleSide } );
+				var clothMaterial = new THREE.MeshPhongMaterial( {
+					specular: 0x030303,
+					emissive: 0x111111,
+					map: clothTexture,
+					side: THREE.DoubleSide,
+					alphaTest: 0.5
+				} );
 
 				// cloth geometry
 				clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h );
 				clothGeometry.dynamic = true;
-				clothGeometry.computeFaceNormals();
 
 				var uniforms = { texture:  { type: "t", value: clothTexture } };
 				var vertexShader = document.getElementById( 'vertexShaderDepth' ).textContent;
@@ -208,26 +205,24 @@
 				object = new THREE.Mesh( clothGeometry, clothMaterial );
 				object.position.set( 0, 0, 0 );
 				object.castShadow = true;
-				object.receiveShadow = true;
 				scene.add( object );
 
-				object.customDepthMaterial = new THREE.ShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader } );
+				object.customDepthMaterial = new THREE.ShaderMaterial( {
+					uniforms: uniforms,
+					vertexShader: vertexShader,
+					fragmentShader: fragmentShader,
+					side: THREE.DoubleSide
+				} );
 
 				// sphere
 
 				var ballGeo = new THREE.SphereGeometry( ballSize, 20, 20 );
-				var ballMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+				var ballMaterial = new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
 
 				sphere = new THREE.Mesh( ballGeo, ballMaterial );
 				sphere.castShadow = true;
 				sphere.receiveShadow = true;
 				scene.add( sphere );
-
-				// arrow
-
-				arrow = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50, 0xff0000 );
-				arrow.position.set( -200, 0, -200 );
-				// scene.add( arrow );
 
 				// ground
 
@@ -235,10 +230,10 @@
 				groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
 				groundTexture.repeat.set( 25, 25 );
 				groundTexture.anisotropy = 16;
-				
+
 				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, map: groundTexture } );
 
-				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 20000, 20000 ), groundMaterial );
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
 				mesh.position.y = -250;
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
@@ -247,7 +242,7 @@
 				// poles
 
 				var poleGeo = new THREE.BoxGeometry( 5, 375, 5 );
-				var poleMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shiness: 100 } );
+				var poleMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 100 } );
 
 				var mesh = new THREE.Mesh( poleGeo, poleMat );
 				mesh.position.x = -125;
@@ -288,6 +283,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( scene.fog.color );
 
@@ -296,7 +292,7 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				renderer.shadowMapEnabled = true;
+				renderer.shadowMap.enabled = true;
 
 				//
 
@@ -332,8 +328,6 @@
 
 				windStrength = Math.cos( time / 7000 ) * 20 + 40;
 				windForce.set( Math.sin( time / 2000 ), Math.cos( time / 3000 ), Math.sin( time / 1000 ) ).normalize().multiplyScalar( windStrength );
-				arrow.setLength( windStrength );
-				arrow.setDirection( windForce );
 
 				simulate(time);
 				render();

@@ -58,6 +58,8 @@
 
 				scene = new THREE.Scene();
 
+				scene.add( new THREE.AmbientLight( 0x050505 ) );
+
 				var light = new THREE.PointLight( 0x0011ff, 1, 5500 );
 				light.position.set( 4000, 0, 0 );
 				scene.add( light );
@@ -82,8 +84,6 @@
 				reflectionCube.format = THREE.RGBFormat;
 
 				var material = new THREE.MeshPhongMaterial( { specular: 0x101010, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, side: THREE.DoubleSide } );
-				material.wrapAround = true;
-				material.wrapRGB.set( 0.5, 0.5, 0.5 );
 
 				var geometry = new THREE.SphereGeometry( 1, 32, 16, 0, Math.PI );
 
@@ -107,7 +107,8 @@
 				}
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x050505, 1 );
+				renderer.setClearColor( 0x050505 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				renderer.gammaInput = true;

@@ -77,12 +77,8 @@
 				var vertexShader = shader.vertexShader;
 				var fragmentShader = shader.fragmentShader;
 
-				var texture1 = new THREE.Texture( generateTexture( 0, 0.5, 1 ), new THREE.UVMapping() );
-				var texture2 = new THREE.Texture( generateTexture( 0, 1, 0 ), new THREE.SphericalReflectionMapping() );
-				var texture3 = THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' )
-
-				texture1.needsUpdate = true;
-				texture2.needsUpdate = true;
+				var texture1 = new THREE.CanvasTexture( generateTexture( 0, 0.5, 1 ), THREE.UVMapping );
+				var texture2 = THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' );
 
 				var materials = [
 
@@ -91,24 +87,17 @@
 					new THREE.MeshBasicMaterial( { color: 0x0066ff, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false } ),
 					new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ),
 					new THREE.MeshBasicMaterial( { map: texture1, fog: false } ),
-					new THREE.MeshBasicMaterial( { map: texture3 } ),
+					new THREE.MeshBasicMaterial( { map: texture2 } ),
 					new THREE.ShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader, transparent: true } ),
-					new THREE.MeshLambertMaterial( { map: texture3 } ),
+					new THREE.MeshLambertMaterial( { map: texture2 } ),
 					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ),
 					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ),
-					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ),
-					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } )
+					new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ),
+					new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } )
 
 				];
 
-				var geometries = [];
-
-				for ( var i = 0, l = materials.length; i < l; i ++ ) {
-
-					var geometry = new THREE.SphereGeometry( 50, 32, 16 );
-					geometries.push( geometry );
-
-				}
+				var geometry = new THREE.SphereGeometry( 50, 32, 16 );
 
 				for ( var i = 0; i < 5000; i ++ ) {
 
@@ -119,7 +108,6 @@
 					var index = Math.floor( ( i / 5000 ) * materials.length );
 
 					var material = materials[ index ];
-					var geometry = geometries[ index ];
 
 					var mesh = new THREE.Mesh( geometry, material );
 
@@ -137,6 +125,7 @@
 				}
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

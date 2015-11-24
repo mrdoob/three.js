@@ -75,7 +75,7 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.SphereGeometry( 100, 32, 16 );
+				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
 
 				var path = "textures/cube/pisa/";
 				var format = '.png';
@@ -124,6 +124,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
 				var width = window.innerWidth || 2;

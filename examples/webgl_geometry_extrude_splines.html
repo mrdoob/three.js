@@ -16,11 +16,6 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
-		<!--
-		<script src="../src/extras/core/Curve.js"></script>
-		<script src="../src/extras/geometries/TubeGeometry.js"></script>
-		<script src="../src/extras/helpers/CameraHelper.js"></script>
-		-->
 
 		<!-- where curves formulas are defined -->
 		<script src="js/CurveExtras.js"></script>
@@ -48,7 +43,7 @@
 		var normal = new THREE.Vector3();
 
 
-		var pipeSpline = new THREE.SplineCurve3([
+		var pipeSpline = new THREE.CatmullRomCurve3([
 				new THREE.Vector3(0, 10, -10), new THREE.Vector3(10, 0, -10), new THREE.Vector3(20, 0, 0), new THREE.Vector3(30, 0, 10), new THREE.Vector3(30, 0, 20), new THREE.Vector3(20, 0, 30), new THREE.Vector3(10, 0, 30), new THREE.Vector3(0, 0, 30), new THREE.Vector3(-10, 10, 30), new THREE.Vector3(-10, 20, 30), new THREE.Vector3(0, 30, 30), new THREE.Vector3(10, 30, 30), new THREE.Vector3(20, 30, 15), new THREE.Vector3(10, 30, 10), new THREE.Vector3(0, 30, 10), new THREE.Vector3(-10, 20, 10), new THREE.Vector3(-10, 10, 10), new THREE.Vector3(0, 0, 10), new THREE.Vector3(10, -10, 10), new THREE.Vector3(20, -15, 10), new THREE.Vector3(30, -15, 10), new THREE.Vector3(40, -15, 10), new THREE.Vector3(50, -15, 10), new THREE.Vector3(60, 0, 10), new THREE.Vector3(70, 0, 0), new THREE.Vector3(80, 0, 0), new THREE.Vector3(90, 0, 0), new THREE.Vector3(100, 0, 0)]);
 
 		var sampleClosedSpline = new THREE.ClosedSplineCurve3([
@@ -110,7 +105,6 @@
 
 			var radiusSegments = parseInt(document.getElementById('radiusSegments').value);
 
-			console.log('adding tube', value, closed2, radiusSegments);
 			if (tubeMesh) parent.remove(tubeMesh);
 
 			extrudePath = splines[value];
@@ -228,8 +222,8 @@
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0xf0f0f0 );
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-
 			container.appendChild( renderer.domElement );
 
 			stats = new Stats();

@@ -17,6 +17,7 @@ THREE.BoundingBoxHelper = function ( object, hex ) {
 };
 
 THREE.BoundingBoxHelper.prototype = Object.create( THREE.Mesh.prototype );
+THREE.BoundingBoxHelper.prototype.constructor = THREE.BoundingBoxHelper;
 
 THREE.BoundingBoxHelper.prototype.update = function () {
 
