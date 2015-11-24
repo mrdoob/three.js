@@ -137,6 +137,16 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 	this.render = function ( scene, camera ) {
 
+		var sceneJSON = scene.toJSON();
+		var cameraJSON = camera.toJSON();
+
+		pool.forEach(function(worker) {
+			worker.postMessage({
+				scene: sceneJSON,
+				camera: cameraJSON
+			});
+		});
+
 		context.clearRect( 0, 0, canvasWidth, canvasHeight );
 		reallyThen = Date.now();
 

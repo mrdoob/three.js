@@ -2,6 +2,11 @@ var workers, worker;
 var BLOCK = 128;
 var startX, startY, division, completed = 0;
 
+var scene, camera, renderer, loader;
+
+importScripts('../../../build/three.min.js');
+
+
 self.onmessage = function(e) {
 	var data = e.data;
 	if (!data) return;
@@ -12,27 +17,31 @@ self.onmessage = function(e) {
 			width = data.init[0],
 			height = data.init[1];
 
-		eval(data.initScene);
-		initScene(width, height);
 		worker = data.worker;
 		workers = data.workers;
 		BLOCK = data.blockSize;
+		eval(data.initScene);
+		initScene(width, height);
 
-		if (data.maxRecursionDepth) maxRecursionDepth = data.maxRecursionDepth;
+		renderer = new THREE.RaytracingRendererWorker();
+		loader = new THREE.ObjectLoader();
+		renderer.setSize( width, height );
 
-		var xblocks = Math.ceil(width / BLOCK);
-		var yblocks = Math.ceil(height / BLOCK);
-
-		division = Math.ceil(xblocks * yblocks / workers);
-
-		var start = division * worker;
-		startX = (start % xblocks) * BLOCK;
-		startY = (start / xblocks | 0) * BLOCK;
+		// TODO fix passing maxRecursionDepth as parameter.
+		// if (data.maxRecursionDepth) maxRecursionDepth = data.maxRecursionDepth;
 
 		completed = 0;
 	}
 
-	if (data.render) {
+	if (data.scene) {
+
+		// console.log('scene!!!', scene, camera)
+		// scene = loader.parse(data.scene);
+		// camera = loader.parse(data.camera);
+
+	}
+
+	if (data.render && scene && camera) {
 		startX = data.x;
 		startY = data.y;
 		renderer.render(scene, camera);
@@ -40,16 +49,12 @@ self.onmessage = function(e) {
 
 }
 
-importScripts('../../../build/three.min.js');
-
 /**
  * DOM-less version of Raytracing Renderer
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author zz95 / http://github.com/zz85
  */
-
-THREE.RaytracingRenderer =
 
 THREE.RaytracingRendererWorker = function ( parameters ) {
 

@@ -38,7 +38,6 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	var objects;
 	var lights = [];
 	var cache = {};
-	var timeRendering = 0;
 
 	var animationFrameId = null;
 
