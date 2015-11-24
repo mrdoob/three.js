@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - raytracing renderer with web workers</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				color: #ffffff;
+				margin: 0px;
+				padding: 0px;
+			}
+		</style>
+	</head>
+	<body>
+		<script src="../build/three.min.js"></script>
+		<script src="js/renderers/RaytracingWorkerRenderer.js"></script>
+
+		<script>
+
+			var hash = location.hash ? location.hash.substring(1) : '4';
+
+			var WORKERS = +hash || navigator.hardwareConcurrency || 4;
+
+			var container;
+
+			var camera, controls, scene, renderer;
+
+			var torus, cube;
+
+			init();
+			render();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.zIndex = '100';
+				info.style.textAlign = 'center';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js<a/> - raytracing renderer (using  '  + WORKERS + ' web workers)';
+				container.appendChild( info );
+
+				//
+
+				renderer = new THREE.RaytracingWorkerRenderer({
+					workers: WORKERS
+				});
+				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.domElement.style.position = "absolute";
+				renderer.domElement.style.top = "0px";
+				renderer.domElement.style.left = "0px";
+
+				container.appendChild( renderer.domElement );
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
