@@ -82,14 +82,19 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 		context.fillStyle = 'white';
 
-		pool.forEach(function(p, i) {
+		pool.forEach( function( p, i ) {
+
 			p.postMessage({
+
 				init: [ width, height ],
 				worker: i,
 				workers: pool.length,
-				blockSize: 64
-			})
-		})
+				blockSize: 64,
+				initScene: initScene.toString()
+
+			});
+
+		});
 
 	};
 

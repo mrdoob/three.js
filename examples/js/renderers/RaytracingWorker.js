@@ -12,6 +12,7 @@ self.onmessage = function(e) {
 			width = data.init[0],
 			height = data.init[1];
 
+		eval(data.initScene);
 		initScene(width, height);
 		worker = data.worker;
 		workers = data.workers;
@@ -34,11 +35,10 @@ self.onmessage = function(e) {
 	if (data.render) {
 		renderer.render(scene, camera)
 	}
+
 }
 
 importScripts('../../../build/three.min.js');
-importScripts('../../../examples/raytrace_scene.js');
-
 
 /**
  * DOM-less version of Raytracing Renderer
