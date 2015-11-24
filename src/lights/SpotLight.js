@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay ) {
+THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay, radius ) {
 
 	THREE.Light.call( this, color );
 
@@ -18,6 +18,7 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay 
 	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
 	this.exponent = ( exponent !== undefined ) ? exponent : 10;
 	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
+	this.radius = ( radius !== undefined ) ? radius : 0.05; // default bulb size is 5cm
 
 	this.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 50, 5000 ) );
 
@@ -35,6 +36,7 @@ THREE.SpotLight.prototype.copy = function ( source ) {
 	this.angle = source.angle;
 	this.exponent = source.exponent;
 	this.decay = source.decay;
+	this.radius = source.radius;
 
 	this.target = source.target.clone();
 
