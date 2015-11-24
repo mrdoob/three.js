@@ -51,7 +51,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 			if (data.blockSize) {
 				var d = data.data;
 				var imagedata = new ImageData(new Uint8ClampedArray(d), data.blockSize, data.blockSize);
-				renderer.ctx.putImageData( imagedata, data.blockX, data.blockY );
+				context.putImageData( imagedata, data.blockX, data.blockY );
 			} else if (data.type == 'complete') {
 				// TODO can terminate worker here or schedule more other jobs...
 			}
@@ -111,8 +111,6 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 		});
 
 	};
-
-	this.ctx = context;
 
 };
 
