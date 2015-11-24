@@ -38,6 +38,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 	this.autoClear = true;
 
 	var workers = parameters.workers || navigator.hardwareConcurrency || 4;
+	var blockSize = parameters.blockSize || 64;
 
 	console.log('%cSpinning off ' + workers + ' Workers ', 'font-size: 20px; background: black; color: white; font-family: monospace;');
 
@@ -89,7 +90,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 				init: [ width, height ],
 				worker: i,
 				workers: pool.length,
-				blockSize: 64,
+				blockSize: blockSize,
 				initScene: initScene.toString()
 
 			});
@@ -107,7 +108,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 	//
 
 	this.render = function ( scene, camera ) {
-		reallyThen = Date.now()
+		reallyThen = Date.now();
 
 		pool.forEach(function(p) {
 			p.postMessage({
