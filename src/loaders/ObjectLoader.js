@@ -491,19 +491,19 @@ THREE.ObjectLoader.prototype = {
 
 				case 'DirectionalLight':
 
-					object = new THREE.DirectionalLight( data.color, data.intensity );
+					object = new THREE.DirectionalLight( data.color, data.intensity, data.radius );
 
 					break;
 
 				case 'PointLight':
 
-					object = new THREE.PointLight( data.color, data.intensity, data.distance, data.decay );
+					object = new THREE.PointLight( data.color, data.intensity, data.distance, data.decay, data.radius );
 
 					break;
 
 				case 'SpotLight':
 
-					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent, data.decay );
+					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent, data.decay, data.radius );
 
 					break;
 
