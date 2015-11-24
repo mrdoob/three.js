@@ -33,7 +33,9 @@ self.onmessage = function(e) {
 	}
 
 	if (data.render) {
-		renderer.render(scene, camera)
+		startX = data.x;
+		startY = data.y;
+		renderer.render(scene, camera);
 	}
 
 }
@@ -76,7 +78,6 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 	var objects;
 	var lights = [];
 	var cache = {};
-	var timeRendering = 0;
 
 	var animationFrameId = null;
 
@@ -455,13 +456,6 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 
 			}
 
-			// self.postMessage({
-			// 	blockX: blockX,
-			// 	blockY: blockY,
-			// 	blockSize: blockSize,
-			// 	data: data
-			// })
-
 			// Use transferable objects! :)
 			self.postMessage({
 				data: data.buffer,
@@ -474,42 +468,13 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 
 			// OK Done!
 
-			blockX += blockSize;
-
 			completed++;
 
-			if ( blockX >= canvasWidth ) {
-
-				blockX = 0;
-				blockY += blockSize;
-
-			}
-
-			console.log('Worker', worker, 'completed', completed, '/', division)
-
-			if ( blockY >= canvasHeight || completed === division ) {
-				console.log('Total Renderering time', timeRendering / 1000, 's');
-				console.log('Absolute time', (Date.now() - reallyThen) / 1000, 's');
-				scope.dispatchEvent( { type: "complete" } );
-				self.postMessage({
-					type: 'complete',
-					time: Date.now() - reallyThen
-				});
-				return;
-			}
-
-
-			function next () {
-				console.time('render')
-				var then = Date.now();
-				renderBlock( blockX, blockY );
-				timeRendering += Date.now() - then;
-				console.timeEnd('render')
-			}
-
-			// animationFrameId = requestAnimationFrame( next );
-			next();
-
+			self.postMessage({
+				type: 'complete',
+				worker: worker,
+				time: Date.now() - reallyThen
+			});
 		};
 
 	}() );
