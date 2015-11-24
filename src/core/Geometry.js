@@ -312,7 +312,7 @@ THREE.Geometry.prototype = {
 
 		} else {
 
-			for ( var i = 0; i < vertices.length / 3; i += 3 ) {
+			for ( var i = 0; i < vertices.length; i += 3 ) {
 
 				addFace( i, i + 1, i + 2 );
 
