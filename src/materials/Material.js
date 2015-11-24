@@ -172,7 +172,10 @@ THREE.Material.prototype = {
 		}
 		if ( this.roughnessMap instanceof THREE.Texture ) data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
 		if ( this.metalnessMap instanceof THREE.Texture ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
+
+		if ( this.emissiveMap instanceof THREE.Texture ) data.emissiveMap = this.emissiveMap.toJSON( meta ).uuid;
 		if ( this.specularMap instanceof THREE.Texture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
+
 		if ( this.envMap instanceof THREE.Texture ) {
 
 			data.envMap = this.envMap.toJSON( meta ).uuid;
@@ -197,13 +200,19 @@ THREE.Material.prototype = {
 		// TODO: Copied from Object3D.toJSON
 
 		function extractFromCache ( cache ) {
+
 			var values = [];
+
 			for ( var key in cache ) {
+
 				var data = cache[ key ];
 				delete data.metadata;
 				values.push( data );
+
 			}
+
 			return values;
+
 		}
 
 		if ( isRoot ) {

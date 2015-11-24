@@ -26,7 +26,7 @@ THREE.AudioBuffer.prototype.load = function ( file ) {
 
 			for ( var i = 0; i < scope.readyCallbacks.length; i ++ ) {
 
-				scope.readyCallbacks[i](scope.buffer);
+				scope.readyCallbacks[ i ]( scope.buffer );
 
 			}
 

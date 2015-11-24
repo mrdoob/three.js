@@ -242,6 +242,7 @@ class ThreeJsWriter(object):
         }
         if isinstance(mat, nodetypes.Phong):
             result["colorSpecular"] = mat.getSpecularColor().rgb
+            result["reflectivity"] = mat.getReflectivity()
             result["specularCoef"] = mat.getCosPower()
             if self.options["specularMaps"]:
                 self._exportSpecularMap(result, mat)

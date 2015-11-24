@@ -56,13 +56,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Plane' );
 	option.onClick( function () {
 
-		var width = 200;
-		var height = 200;
-
-		var widthSegments = 1;
-		var heightSegments = 1;
-
-		var geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
+		var geometry = new THREE.PlaneGeometry( 2, 2 );
 		var material = new THREE.MeshStandardMaterial();
 		var mesh = new THREE.Mesh( geometry, material );
 		mesh.name = 'Plane ' + ( ++ meshCount );
@@ -79,15 +73,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Box' );
 	option.onClick( function () {
 
-		var width = 100;
-		var height = 100;
-		var depth = 100;
-
-		var widthSegments = 1;
-		var heightSegments = 1;
-		var depthSegments = 1;
-
-		var geometry = new THREE.BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
+		var geometry = new THREE.BoxGeometry( 1, 1, 1 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Box ' + ( ++ meshCount );
 
@@ -103,7 +89,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Circle' );
 	option.onClick( function () {
 
-		var radius = 20;
+		var radius = 1;
 		var segments = 32;
 
 		var geometry = new THREE.CircleGeometry( radius, segments );
@@ -122,9 +108,9 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Cylinder' );
 	option.onClick( function () {
 
-		var radiusTop = 20;
-		var radiusBottom = 20;
-		var height = 100;
+		var radiusTop = 1;
+		var radiusBottom = 1;
+		var height = 2;
 		var radiusSegments = 32;
 		var heightSegments = 1;
 		var openEnded = false;
@@ -145,7 +131,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Sphere' );
 	option.onClick( function () {
 
-		var radius = 75;
+		var radius = 1;
 		var widthSegments = 32;
 		var heightSegments = 16;
 		var phiStart = 0;
@@ -169,7 +155,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Icosahedron' );
 	option.onClick( function () {
 
-		var radius = 75;
+		var radius = 1;
 		var detail = 2;
 
 		var geometry = new THREE.IcosahedronGeometry( radius, detail );
@@ -188,10 +174,10 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Torus' );
 	option.onClick( function () {
 
-		var radius = 100;
-		var tube = 40;
-		var radialSegments = 8;
-		var tubularSegments = 6;
+		var radius = 2;
+		var tube = 1;
+		var radialSegments = 32;
+		var tubularSegments = 12;
 		var arc = Math.PI * 2;
 
 		var geometry = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
@@ -210,10 +196,10 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'TorusKnot' );
 	option.onClick( function () {
 
-		var radius = 100;
-		var tube = 40;
+		var radius = 2;
+		var tube = 0.8;
 		var radialSegments = 64;
-		var tubularSegments = 8;
+		var tubularSegments = 12;
 		var p = 2;
 		var q = 3;
 		var heightScale = 1;
@@ -311,7 +297,7 @@ Menubar.Add = function ( editor ) {
 		light.name = 'SpotLight ' + ( ++ lightCount );
 		light.target.name = 'SpotLight ' + ( lightCount ) + ' Target';
 
-		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
+		light.position.set( 5, 10, 7.5 );
 
 		editor.execute( new AddObjectCommand( light ) );
 
@@ -332,7 +318,7 @@ Menubar.Add = function ( editor ) {
 		light.name = 'DirectionalLight ' + ( ++ lightCount );
 		light.target.name = 'DirectionalLight ' + ( lightCount ) + ' Target';
 
-		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
+		light.position.set( 5, 10, 7.5 );
 
 		editor.execute( new AddObjectCommand( light ) );
 
@@ -353,7 +339,7 @@ Menubar.Add = function ( editor ) {
 		var light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
 		light.name = 'HemisphereLight ' + ( ++ lightCount );
 
-		light.position.set( 0, 100, 0 );
+		light.position.set( 0, 10, 0 );
 
 		editor.execute( new AddObjectCommand( light ) );
 

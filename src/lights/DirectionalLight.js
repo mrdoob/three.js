@@ -5,7 +5,7 @@
 
 THREE.DirectionalLight = function ( color, intensity, radius ) {
 
-	THREE.Light.call( this, color );
+	THREE.Light.call( this, color, intensity );
 
 	this.type = 'DirectionalLight';
 
@@ -14,10 +14,9 @@ THREE.DirectionalLight = function ( color, intensity, radius ) {
 
 	this.target = new THREE.Object3D();
 
-	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.radius = ( radius !== undefined ) ? radius : 0.05; // default bulb size is 5cm
 
-	this.shadow = new THREE.LightShadow( new THREE.OrthographicCamera( - 500, 500, 500, - 500, 50, 5000 ) );
+	this.shadow = new THREE.LightShadow( new THREE.OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
 };
 
@@ -28,8 +27,8 @@ THREE.DirectionalLight.prototype.copy = function ( source ) {
 
 	THREE.Light.prototype.copy.call( this, source );
 
-	this.intensity = source.intensity;
 	this.radius = source.radius;
+
 	this.target = source.target.clone();
 
 	this.shadow = source.shadow.clone();

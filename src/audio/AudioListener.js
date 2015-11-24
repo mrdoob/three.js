@@ -37,7 +37,7 @@ THREE.AudioListener.prototype.removeFilter = function ( ) {
 
 	}
 
-}
+};
 
 THREE.AudioListener.prototype.setFilter = function ( value ) {
 

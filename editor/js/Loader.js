@@ -151,7 +151,7 @@ var Loader = function ( editor ) {
 
 					// 2.0
 
-					if ( contents.indexOf( 'postMessage' ) !== -1 ) {
+					if ( contents.indexOf( 'postMessage' ) !== - 1 ) {
 
 						var blob = new Blob( [ contents ], { type: 'text/javascript' } );
 						var url = URL.createObjectURL( blob );
@@ -194,46 +194,46 @@ var Loader = function ( editor ) {
 				break;
 
 
-				case 'kmz':
+			case 'kmz':
 
-					var reader = new FileReader();
-					reader.addEventListener( 'load', function ( event ) {
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
 
-						var loader = new THREE.KMZLoader();
-						var collada = loader.parse( event.target.result );
+					var loader = new THREE.KMZLoader();
+					var collada = loader.parse( event.target.result );
 
-						collada.scene.name = filename;
+					collada.scene.name = filename;
 
-						editor.execute( new AddObjectCommand( collada.scene ) );
+					editor.execute( new AddObjectCommand( collada.scene ) );
 
-					}, false );
-					reader.readAsArrayBuffer( file );
+				}, false );
+				reader.readAsArrayBuffer( file );
 
-					break;
+				break;
 
-				case 'md2':
+			case 'md2':
 
-					var reader = new FileReader();
-					reader.addEventListener( 'load', function ( event ) {
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
 
-						var contents = event.target.result;
+					var contents = event.target.result;
 
-						var geometry = new THREE.MD2Loader().parse( contents );
-						var material = new THREE.MeshStandardMaterial( {
-							morphTargets: true,
-							morphNormals: true
-						} );
+					var geometry = new THREE.MD2Loader().parse( contents );
+					var material = new THREE.MeshStandardMaterial( {
+						morphTargets: true,
+						morphNormals: true
+					} );
 
-						var mesh = new THREE.Mesh( geometry, material );
-						mesh.mixer = new THREE.AnimationMixer( mesh )
-						mesh.name = filename;
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.mixer = new THREE.AnimationMixer( mesh );
+					mesh.name = filename;
 
-						editor.execute( new AddObjectCommand( mesh ) );
+					editor.execute( new AddObjectCommand( mesh ) );
 
-					}, false );
-					reader.readAsArrayBuffer( file );
+				}, false );
+				reader.readAsArrayBuffer( file );
 
-					break;
+				break;
 
 			case 'obj':
 
@@ -393,7 +393,7 @@ var Loader = function ( editor ) {
 
 		}
 
-	}
+	};
 
 	function handleJSON( data, file, filename ) {
 
@@ -519,4 +519,4 @@ var Loader = function ( editor ) {
 
 	}
 
-}
+};

@@ -939,6 +939,17 @@ THREE.OrbitControls.prototype.constructor = THREE.OrbitControls;
 
 Object.defineProperties( THREE.OrbitControls.prototype, {
 
+	center: {
+
+		get: function () {
+
+			console.warn( 'THREE.OrbitControls: .center has been renamed to .target' );
+			return this.target;
+
+		}
+
+	},
+
 	// backward compatibility
 
 	noZoom: {
@@ -1050,4 +1061,3 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
 	}
 
 } );
-

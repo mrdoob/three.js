@@ -296,7 +296,7 @@ THREE.Quaternion.prototype = {
 
 			return this;
 
-		}
+		};
 
 	}(),
 
@@ -522,12 +522,12 @@ Object.assign( THREE.Quaternion, {
 
 		// fuzz-free, array-based Quaternion SLERP operation
 
-		var x0 = src0[   srcOffset0   ],
+		var x0 = src0[ srcOffset0 + 0 ],
 			y0 = src0[ srcOffset0 + 1 ],
 			z0 = src0[ srcOffset0 + 2 ],
 			w0 = src0[ srcOffset0 + 3 ],
 
-			x1 = src1[   srcOffset1   ],
+			x1 = src1[ srcOffset1 + 0 ],
 			y1 = src1[ srcOffset1 + 1 ],
 			z1 = src1[ srcOffset1 + 2 ],
 			w1 = src1[ srcOffset1 + 3 ];
@@ -538,7 +538,7 @@ Object.assign( THREE.Quaternion, {
 
 				cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
 
-				dir = ( cos >= 0 ? 1 : -1 ),
+				dir = ( cos >= 0 ? 1 : - 1 ),
 				sqrSin = 1 - cos * cos;
 
 			// Skip the Slerp for tiny steps to avoid numeric problems:
@@ -573,7 +573,7 @@ Object.assign( THREE.Quaternion, {
 
 		}
 
-		dst[   dstOffset   ] = x0;
+		dst[ dstOffset ] = x0;
 		dst[ dstOffset + 1 ] = y0;
 		dst[ dstOffset + 2 ] = z0;
 		dst[ dstOffset + 3 ] = w0;

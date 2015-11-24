@@ -62,11 +62,13 @@ THREE.Audio.prototype.setBuffer = function ( audioBuffer ) {
 
 	var scope = this;
 
-	audioBuffer.onReady(function(buffer) {
+	audioBuffer.onReady( function( buffer ) {
+
 		scope.source.buffer = buffer;
 		scope.sourceType = 'buffer';
 		if ( scope.autoplay ) scope.play();
-	});
+
+	} );
 
 	return this;
 

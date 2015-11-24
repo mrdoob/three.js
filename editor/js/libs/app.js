@@ -48,14 +48,17 @@ var APP = {
 				update: []
 			};
 
-			var scriptWrapParams = 'player,renderer,scene';
+			var scriptWrapParams = 'player,renderer,scene,camera';
 			var scriptWrapResultObj = {};
+
 			for ( var eventKey in events ) {
+
 				scriptWrapParams += ',' + eventKey;
 				scriptWrapResultObj[ eventKey ] = eventKey;
+
 			}
-			var scriptWrapResult =
-					JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
+
+			var scriptWrapResult = JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
 
 			for ( var uuid in json.scripts ) {
 
@@ -74,8 +77,7 @@ var APP = {
 
 					var script = scripts[ i ];
 
-					var functions = ( new Function( scriptWrapParams,
-							script.source + '\nreturn ' + scriptWrapResult+ ';' ).bind( object ) )( this, renderer, scene );
+					var functions = ( new Function( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( this, renderer, scene, camera );
 
 					for ( var name in functions ) {
 
@@ -97,12 +99,6 @@ var APP = {
 			}
 
 			dispatch( events.init, arguments );
-
-		};
-
-		this.getCamera = function () {
-
-			return camera;
 
 		};
 
@@ -154,7 +150,7 @@ var APP = {
 
 			scene = value;
 
-		},
+		};
 
 		this.setSize = function ( width, height ) {
 
@@ -178,7 +174,7 @@ var APP = {
 
 					array[ i ]( event );
 
-				} catch (e) {
+				} catch ( e ) {
 
 					console.error( ( e.message || e ), ( e.stack || "" ) );
 
@@ -225,7 +221,8 @@ var APP = {
 			dispatch( events.start, arguments );
 
 			request = requestAnimationFrame( animate );
-			prevTime = ( window.performance || Date ).now();
+			prevTime = performance.now();
+
 		};
 
 		this.stop = function () {
@@ -242,6 +239,7 @@ var APP = {
 			dispatch( events.stop, arguments );
 
 			cancelAnimationFrame( request );
+
 		};
 
 		//

@@ -31,16 +31,16 @@ struct GeometricContext {
 };
 
 
-vec3 transformDirection( in vec3 normal, in mat4 matrix ) {
+vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
-	return normalize( ( matrix * vec4( normal, 0.0 ) ).xyz );
+	return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );
 
 }
 
 // http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
-vec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {
+vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
 
-	return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );
+	return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );
 
 }
 

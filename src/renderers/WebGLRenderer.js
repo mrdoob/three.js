@@ -312,7 +312,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			return value;
 
-		}
+		};
 
 	} )();
 
@@ -1917,6 +1917,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			uvScaleMap = material.bumpMap;
 
+		} else if ( material.roughnessMap ) {
+
+			uvScaleMap = material.roughnessMap;
+
+		} else if ( material.metalnessMap ) {
+
+			uvScaleMap = material.metalnessMap;
+
 		} else if ( material.alphaMap ) {
 
 			uvScaleMap = material.alphaMap;
@@ -1929,7 +1937,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( uvScaleMap !== undefined ) {
 
-			if ( uvScaleMap instanceof THREE.WebGLRenderTarget ) uvScaleMap = uvScaleMap.texture;
+			if ( uvScaleMap instanceof THREE.WebGLRenderTarget ) {
+
+				uvScaleMap = uvScaleMap.texture;
+
+			}
+
 			var offset = uvScaleMap.offset;
 			var repeat = uvScaleMap.repeat;
 
@@ -2337,9 +2350,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 				case 'sa':
 
 					// TODO: Optimize this.
-					for( var i = 0; i < value.length; i ++ ) {
+					for ( var i = 0; i < value.length; i ++ ) {
 
-						for( var propertyName in uniform.properties ) {
+						for ( var propertyName in uniform.properties ) {
 
 							var property = uniform.properties[ propertyName ];
 							var locationProperty =  location[ i ][ propertyName ];
@@ -2650,9 +2663,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.AmbientLight ) {
 
-				r += color.r;
-				g += color.g;
-				b += color.b;
+				r += color.r * intensity;
+				g += color.g * intensity;
+				b += color.b * intensity;
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
@@ -2672,7 +2685,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else {
 
-					uniforms.shadow = -1;
+					uniforms.shadow = - 1;
 
 				}
 
@@ -2698,7 +2711,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else {
 
-					uniforms.shadow = -1;
+					uniforms.shadow = - 1;
 
 				}
 
@@ -2731,7 +2744,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else {
 
-					uniforms.shadow = -1;
+					uniforms.shadow = - 1;
 
 				}
 

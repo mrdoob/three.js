@@ -319,7 +319,7 @@ THREE.ObjectLoader.prototype = {
 
 		for ( var i = 0; i < json.length; i ++ ) {
 
-			var clip = THREE.AnimationClip.parse( json[i] );
+			var clip = THREE.AnimationClip.parse( json[ i ] );
 
 			animations.push( clip );
 
@@ -485,7 +485,7 @@ THREE.ObjectLoader.prototype = {
 
 				case 'AmbientLight':
 
-					object = new THREE.AmbientLight( data.color );
+					object = new THREE.AmbientLight( data.color, data.intensity );
 
 					break;
 

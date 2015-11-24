@@ -46,10 +46,9 @@ def _parse_action(func, armature, options):
     animations = []
     logger.info("Parsing %d actions", len(data.actions))
     for action in data.actions:
-        if action == armature.animation_data.action:
-            logger.info("Parsing action %s", action.name)
-            animation = func(action, armature, options)
-            animations.append(animation)
+        logger.info("Parsing action %s", action.name)
+        animation = func(action, armature, options)
+        animations.append(animation)
     return animations
 
 
