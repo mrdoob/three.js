@@ -110,7 +110,7 @@ input.Number {
 		}
 
 			#menubar .menu .options hr {
-				border-color: #333;
+				border-color: #222;
 			}
 
 			#menubar .menu .options .option {
@@ -166,16 +166,29 @@ input.Number {
 		margin-bottom: 0;
 	}
 
-	#sidebar > .Panel {
-		color: #888;
-		padding: 10px;
-		border-top: 1px solid #333;
+	#sidebar .Panel.Material canvas {
+		border: solid 1px #5A5A5A;
 	}
 
-	#sidebar .Panel.Material canvas {
+	#sidebar > .Panel, #sidebar > span > .Panel {
+		color: #888;
+		padding: 10px;
+		border-top: 1px solid #222;
+	}
 
-		border: solid 1px #5A5A5A;
+#tabs {
+	background-color: #1b1b1b;
+	border-top: 1px solid #222;
+}
 
+	#tabs span {
+		color: #888;
+		border-right: 1px solid #222;
+		padding: 10px;
+	}
+
+	#tabs span.selected {
+		background-color: #111;
 	}
 
 #toolbar {

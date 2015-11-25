@@ -165,6 +165,20 @@ UI.Span = function () {
 UI.Span.prototype = Object.create( UI.Element.prototype );
 UI.Span.prototype.constructor = UI.Span;
 
+// Div
+
+UI.Div = function () {
+
+	UI.Element.call( this );
+
+	this.dom = document.createElement( 'div' );
+
+	return this;
+
+};
+
+UI.Div.prototype = Object.create( UI.Element.prototype );
+UI.Div.prototype.constructor = UI.Div;
 
 // Panel
 

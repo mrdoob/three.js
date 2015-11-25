@@ -17,16 +17,8 @@ Sidebar.Project = function ( editor ) {
 
 	};
 
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( config.getKey( 'ui/sidebar/project/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
-
-		config.setKey( 'ui/sidebar/project/collapsed', boolean );
-
-	} );
-
-	container.addStatic( new UI.Text( 'PROJECT' ) );
-	container.add( new UI.Break() );
+	var container = new UI.Panel();
+	container.setBorderTop( '0' );
 
 	// class
 

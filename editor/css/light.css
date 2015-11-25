@@ -159,10 +159,25 @@ input.Number {
 		margin-bottom: 0;
 	}
 
-	#sidebar > .Panel {
+	#sidebar > .Panel, #sidebar > span > .Panel {
 		color: #888;
 		padding: 10px;
 		border-top: 1px solid #ccc;
+	}
+
+#tabs {
+	background-color: #ddd;
+	border-top: 1px solid #ccc;
+}
+
+	#tabs span {
+		color: #888;
+		border-right: 1px solid #ccc;
+		padding: 10px;
+	}
+
+	#tabs span.selected {
+		background-color: #eee;
 	}
 
 #toolbar {
