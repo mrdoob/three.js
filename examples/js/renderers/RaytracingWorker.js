@@ -22,8 +22,6 @@ self.onmessage = function( e ) {
 		worker = data.worker;
 		workers = data.workers;
 		BLOCK = data.blockSize;
-		eval( data.initScene );
-		initScene( width, height );
 
 		renderer = new THREE.RaytracingRendererWorker();
 		loader = new THREE.ObjectLoader();
@@ -41,11 +39,25 @@ self.onmessage = function( e ) {
 		scene = loader.parse( data.scene );
 		camera = loader.parse( data.camera );
 
-		var positions = data.positions;
-		copyPositions( camera, positions );
+		var meta = data.annex;
 		scene.traverse( function( o ) {
 
-			copyPositions( o, positions );
+			if ( o instanceof THREE.PointLight ) {
+
+				o.physicalAttenuation = true;
+
+			}
+
+			var mat = o.material;
+
+			if (!mat) return;
+
+			var material = meta[ mat.uuid ];
+			for (var m in material) {
+
+				mat[ m ] = material[ m ];
+
+			}
 
 		} );
 
@@ -58,16 +70,6 @@ self.onmessage = function( e ) {
 		renderer.render( scene, camera );
 
 	}
-
-}
-
-function copyPositions( object, positions ) {
-
-	var info = positions[ object.uuid ];
-
-	object.position.fromArray( info.position );
-	object.scale.fromArray( info.scale );
-	object.rotation.fromArray( info.rotation );
 
 }
 

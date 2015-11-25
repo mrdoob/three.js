@@ -144,8 +144,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 				init: [ width, height ],
 				worker: i,
 				workers: pool.length,
-				blockSize: blockSize,
-				initScene: initScene.toString()
+				blockSize: blockSize
 
 			} );
 
@@ -188,34 +187,60 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 	}
 
-	var all = {};
+	var materials = {};
+
+	var _annex = {
+		mirror: 1,
+		reflectivity: 1,
+		refractionRatio: 1,
+		glass: 1,
+		vertexColors: 1,
+		shading: 1
+	};
+
 	function serializeObject( o ) {
 
-		all[ o.uuid ] = {
-			position: o.position.toArray(),
-			rotation: o.rotation.toArray(),
-			scale: o.scale.toArray()
+		var mat = o.material;
+
+		if ( ! mat || mat.uuid in materials ) return;
+
+		console.log(mat);
+
+		var props = {};
+		for (var m in _annex) {
+			if ( mat[m] !== undefined ) {
+				props[ m ] = mat[ m ];
+			}
 		}
 
+		materials[ mat.uuid ] = props;
 	}
 
 	this.render = function ( scene, camera ) {
 
 		renderering = true;
 
-		// var sceneJSON = scene.toJSON();
-		// var cameraJSON = camera.toJSON();
+		// update scene graph
 
-		// scene.traverse( serializeObject );
-		// serializeObject( camera );
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
-		// pool.forEach(function(worker) {
-		// 	worker.postMessage({
-		// 		scene: sceneJSON,
-		// 		camera: cameraJSON,
-		// 		positions: all
-		// 	});
-		// });
+		// update camera matrices
+
+		if ( camera.parent === null ) camera.updateMatrixWorld();
+
+
+		var sceneJSON = scene.toJSON();
+		var cameraJSON = camera.toJSON();
+
+		scene.traverse( serializeObject );
+
+		pool.forEach(function(worker) {
+			worker.postMessage({
+				scene: sceneJSON,
+				camera: cameraJSON,
+				annex: materials
+			});
+		});
 
 		context.clearRect( 0, 0, canvasWidth, canvasHeight );
 		reallyThen = Date.now();
