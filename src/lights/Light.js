@@ -43,6 +43,7 @@ THREE.Light.prototype.toJSON = function ( meta ) {
 	if ( this.angle !== undefined ) data.object.angle = this.angle;
 	if ( this.decay !== undefined ) data.object.decay = this.decay;
 	if ( this.exponent !== undefined ) data.object.exponent = this.exponent;
+	if ( this.radius !== undefined ) data.object.radius = this.radius;
 
 	return data;
 

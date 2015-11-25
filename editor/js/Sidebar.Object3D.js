@@ -243,6 +243,16 @@ Sidebar.Object3D = function ( editor ) {
 
 	container.add( objectDecayRow );
 
+	// decay
+
+	var objectRadiusRow = new UI.Panel();
+	var objectRadius = new UI.Number().setRange( 0, Infinity ).onChange( update );
+
+	objectRadiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ) );
+	objectRadiusRow.add( objectRadius );
+
+	container.add( objectRadiusRow );
+
 	// shadow
 
 	var objectShadowRow = new UI.Panel();
@@ -451,7 +461,11 @@ Sidebar.Object3D = function ( editor ) {
 				editor.execute( new SetValueCommand( object, 'decay', objectDecay.getValue() ) );
 
 			}
+			if ( object.radius !== undefined && Math.abs( object.radius - objectRadius.getValue() ) >= 0.01 ) {
 
+				editor.execute( new SetValueCommand( object, 'radius', objectRadius.getValue() ) );
+
+			}
 			if ( object.visible !== objectVisible.getValue() ) {
 
 				editor.execute( new SetValueCommand( object, 'visible', objectVisible.getValue() ) );
@@ -508,6 +522,7 @@ Sidebar.Object3D = function ( editor ) {
 			'angle' : objectAngleRow,
 			'exponent' : objectExponentRow,
 			'decay' : objectDecayRow,
+			'radius' : objectRadiusRow,
 			'castShadow' : objectShadowRow,
 			'receiveShadow' : objectReceiveShadow
 		};
@@ -676,6 +691,12 @@ Sidebar.Object3D = function ( editor ) {
 
 		}
 
+		if ( object.radius !== undefined ) {
+
+			objectRadius.setValue( object.radius );
+
+		}
+		
 		if ( object.castShadow !== undefined ) {
 
 			objectCastShadow.setValue( object.castShadow );
