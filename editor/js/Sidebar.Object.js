@@ -9,6 +9,7 @@ Sidebar.Object = function ( editor ) {
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
+	container.setDisplay( 'none' );
 
 	// Actions
 
@@ -51,6 +52,16 @@ Sidebar.Object = function ( editor ) {
 	} );
 	// container.addStatic( objectActions );
 
+	// type
+
+	var objectTypeRow = new UI.Row();
+	var objectType = new UI.Text();
+
+	objectTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
+	objectTypeRow.add( objectType );
+
+	container.add( objectTypeRow );
+
 	// uuid
 
 	var objectUUIDRow = new UI.Row();
@@ -82,17 +93,6 @@ Sidebar.Object = function ( editor ) {
 	objectNameRow.add( objectName );
 
 	container.add( objectNameRow );
-
-	// type
-
-	var objectTypeRow = new UI.Row();
-	var objectType = new UI.Text();
-
-	objectTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
-	objectTypeRow.add( objectType );
-
-	container.add( objectTypeRow );
-
 
 	/*
 	// parent
@@ -710,4 +710,4 @@ Sidebar.Object = function ( editor ) {
 
 	return container;
 
-}
+};

@@ -81,6 +81,16 @@ Sidebar.Geometry = function ( editor ) {
 	} );
 	// container.addStatic( objectActions );
 
+	// type
+
+	var geometryTypeRow = new UI.Row();
+	var geometryType = new UI.Text();
+
+	geometryTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
+	geometryTypeRow.add( geometryType );
+
+	container.add( geometryTypeRow );
+
 	// uuid
 
 	var geometryUUIDRow = new UI.Row();
@@ -112,16 +122,6 @@ Sidebar.Geometry = function ( editor ) {
 	geometryNameRow.add( geometryName );
 
 	container.add( geometryNameRow );
-
-	// type
-
-	var geometryTypeRow = new UI.Row();
-	var geometryType = new UI.Text();
-
-	geometryTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
-	geometryTypeRow.add( geometryType );
-
-	container.add( geometryTypeRow );
 
 	// geometry
 
@@ -181,4 +181,4 @@ Sidebar.Geometry = function ( editor ) {
 
 	return container;
 
-}
+};

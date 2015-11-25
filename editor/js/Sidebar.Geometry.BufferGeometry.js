@@ -47,11 +47,11 @@ Sidebar.Geometry.BufferGeometry = function ( editor ) {
 
 		}
 
-	};
+	}
 
 	signals.objectSelected.add( update );
 	signals.geometryChanged.add( update );
 
 	return container;
 
-}
+};

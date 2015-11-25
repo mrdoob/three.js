@@ -11,7 +11,7 @@ Sidebar.Geometry.Geometry = function ( editor ) {
 	// vertices
 
 	var verticesRow = new UI.Row();
-	var vertices = new UI.Text().setFontSize( '12px' );
+	var vertices = new UI.Text();
 
 	verticesRow.add( new UI.Text( 'Vertices' ).setWidth( '90px' ) );
 	verticesRow.add( vertices );
@@ -21,7 +21,7 @@ Sidebar.Geometry.Geometry = function ( editor ) {
 	// faces
 
 	var facesRow = new UI.Row();
-	var faces = new UI.Text().setFontSize( '12px' );
+	var faces = new UI.Text();
 
 	facesRow.add( new UI.Text( 'Faces' ).setWidth( '90px' ) );
 	facesRow.add( faces );
@@ -36,7 +36,7 @@ Sidebar.Geometry.Geometry = function ( editor ) {
 
 		var geometry = object.geometry;
 
-		if ( geometry instanceof THREE.Geometry ) { 
+		if ( geometry instanceof THREE.Geometry ) {
 
 			container.setDisplay( 'block' );
 

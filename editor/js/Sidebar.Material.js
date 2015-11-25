@@ -11,6 +11,29 @@ Sidebar.Material = function ( editor ) {
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
 
+	// type
+
+	var materialClassRow = new UI.Row();
+	var materialClass = new UI.Select().setOptions( {
+
+		'LineBasicMaterial': 'LineBasicMaterial',
+		'LineDashedMaterial': 'LineDashedMaterial',
+		'MeshBasicMaterial': 'MeshBasicMaterial',
+		'MeshDepthMaterial': 'MeshDepthMaterial',
+		'MeshNormalMaterial': 'MeshNormalMaterial',
+		'MeshLambertMaterial': 'MeshLambertMaterial',
+		'MeshPhongMaterial': 'MeshPhongMaterial',
+		'MeshStandardMaterial': 'MeshStandardMaterial',
+		'ShaderMaterial': 'ShaderMaterial',
+		'SpriteMaterial': 'SpriteMaterial'
+
+	} ).setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
+
+	materialClassRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
+	materialClassRow.add( materialClass );
+
+	container.add( materialClassRow );
+
 	// uuid
 
 	var materialUUIDRow = new UI.Row();
@@ -41,29 +64,6 @@ Sidebar.Material = function ( editor ) {
 	materialNameRow.add( materialName );
 
 	container.add( materialNameRow );
-
-	// class
-
-	var materialClassRow = new UI.Row();
-	var materialClass = new UI.Select().setOptions( {
-
-		'LineBasicMaterial': 'LineBasicMaterial',
-		'LineDashedMaterial': 'LineDashedMaterial',
-		'MeshBasicMaterial': 'MeshBasicMaterial',
-		'MeshDepthMaterial': 'MeshDepthMaterial',
-		'MeshNormalMaterial': 'MeshNormalMaterial',
-		'MeshLambertMaterial': 'MeshLambertMaterial',
-		'MeshPhongMaterial': 'MeshPhongMaterial',
-		'MeshStandardMaterial': 'MeshStandardMaterial',
-		'ShaderMaterial': 'ShaderMaterial',
-		'SpriteMaterial': 'SpriteMaterial'
-
-	} ).setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
-
-	materialClassRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
-	materialClassRow.add( materialClass );
-
-	container.add( materialClassRow );
 
 	// program
 

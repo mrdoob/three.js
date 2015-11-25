@@ -607,9 +607,9 @@ UI.Color = function () {
 	var dom = document.createElement( 'input' );
 	dom.className = 'Color';
 	dom.style.width = '64px';
-	dom.style.height = '16px';
+	dom.style.height = '17px';
 	dom.style.border = '0px';
-	dom.style.padding = '0px';
+	dom.style.padding = '2px';
 	dom.style.backgroundColor = 'transparent';
 
 	try {
@@ -770,7 +770,6 @@ UI.Number = function ( number ) {
 	function onFocus( event ) {
 
 		dom.style.backgroundColor = '';
-		dom.style.borderColor = '#ccc';
 		dom.style.cursor = '';
 
 	}
@@ -778,10 +777,11 @@ UI.Number = function ( number ) {
 	function onBlur( event ) {
 
 		dom.style.backgroundColor = 'transparent';
-		dom.style.borderColor = 'transparent';
 		dom.style.cursor = 'col-resize';
 
 	}
+
+	onBlur();
 
 	dom.addEventListener( 'mousedown', onMouseDown, false );
 	dom.addEventListener( 'change', onChange, false );
@@ -942,7 +942,6 @@ UI.Integer = function ( number ) {
 	function onFocus( event ) {
 
 		dom.style.backgroundColor = '';
-		dom.style.borderColor = '#ccc';
 		dom.style.cursor = '';
 
 	}
@@ -950,10 +949,11 @@ UI.Integer = function ( number ) {
 	function onBlur( event ) {
 
 		dom.style.backgroundColor = 'transparent';
-		dom.style.borderColor = 'transparent';
 		dom.style.cursor = 'col-resize';
 
 	}
+
+	onBlur();
 
 	dom.addEventListener( 'mousedown', onMouseDown, false );
 	dom.addEventListener( 'change', onChange, false );

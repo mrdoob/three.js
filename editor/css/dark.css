@@ -29,9 +29,8 @@
 
 input.Number {
 	color: #2A75B7!important;
-	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
-	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
-	border: 1px solid transparent;
+	font-size: 12px;
+	border: 0px;
 	padding: 2px;
 	cursor: col-resize;
 }
@@ -173,6 +172,7 @@ input.Number {
 	}
 
 	#sidebar .Row {
+		min-height: 20px;
 		margin-bottom: 10px;
 	}
 
