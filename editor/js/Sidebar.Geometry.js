@@ -93,7 +93,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	// uuid
 
-	var geometryUUIDRow = new UI.Panel();
+	var geometryUUIDRow = new UI.Row();
 	var geometryUUID = new UI.Input().setWidth( '115px' ).setFontSize( '12px' ).setDisabled( true );
 	var geometryUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
 
@@ -111,7 +111,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	// name
 
-	var geometryNameRow = new UI.Panel();
+	var geometryNameRow = new UI.Row();
 	var geometryName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
 		editor.execute( new SetGeometryValueCommand( editor.selected, 'name', geometryName.getValue() ) );
@@ -133,7 +133,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	// parameters
 
-	var parameters = new UI.Panel();
+	var parameters = new UI.Span();
 	container.add( parameters );
 
 

@@ -159,7 +159,9 @@ input.Number {
 	}
 
 	#sidebar .Panel {
-		margin-bottom: 10px;
+		color: #888;
+		padding: 10px;
+		border-top: 1px solid #222;
 	}
 
 	#sidebar .Panel.collapsed {
@@ -170,10 +172,8 @@ input.Number {
 		border: solid 1px #5A5A5A;
 	}
 
-	#sidebar > .Panel, #sidebar > span > .Panel {
-		color: #888;
-		padding: 10px;
-		border-top: 1px solid #222;
+	#sidebar .Row {
+		margin-bottom: 10px;
 	}
 
 #tabs {

@@ -32,7 +32,7 @@ Sidebar.Project = function ( editor ) {
 
 	}
 
-	var rendererTypeRow = new UI.Panel();
+	var rendererTypeRow = new UI.Row();
 	var rendererType = new UI.Select().setOptions( options ).setWidth( '150px' ).onChange( function () {
 
 		var value = this.getValue();
@@ -56,7 +56,7 @@ Sidebar.Project = function ( editor ) {
 
 	// antialiasing
 
-	var rendererPropertiesRow = new UI.Panel();
+	var rendererPropertiesRow = new UI.Row();
 	rendererPropertiesRow.add( new UI.Text( '' ).setWidth( '90px' ) );
 
 	var rendererAntialias = new UI.THREE.Boolean( config.getKey( 'project/renderer/antialias' ), 'antialias' ).onChange( function () {
@@ -81,7 +81,7 @@ Sidebar.Project = function ( editor ) {
 
 	// VR
 
-	var vrRow = new UI.Panel();
+	var vrRow = new UI.Row();
 	var vr = new UI.Checkbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
 
 		config.setKey( 'project/vr', this.getValue() );

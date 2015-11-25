@@ -63,7 +63,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// uuid
 
-	var objectUUIDRow = new UI.Panel();
+	var objectUUIDRow = new UI.Row();
 	var objectUUID = new UI.Input().setWidth( '115px' ).setFontSize( '12px' ).setDisabled( true );
 	var objectUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
 
@@ -81,7 +81,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// name
 
-	var objectNameRow = new UI.Panel();
+	var objectNameRow = new UI.Row();
 	var objectName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
 		editor.execute( new SetValueCommand( editor.selected, 'name', objectName.getValue() ) );
@@ -96,7 +96,7 @@ Sidebar.Object3D = function ( editor ) {
 	/*
 	// parent
 
-	var objectParentRow = new UI.Panel();
+	var objectParentRow = new UI.Row();
 	var objectParent = new UI.Select().setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
 
 	objectParentRow.add( new UI.Text( 'Parent' ).setWidth( '90px' ) );
@@ -107,7 +107,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// position
 
-	var objectPositionRow = new UI.Panel();
+	var objectPositionRow = new UI.Row();
 	var objectPositionX = new UI.Number().setWidth( '50px' ).onChange( update );
 	var objectPositionY = new UI.Number().setWidth( '50px' ).onChange( update );
 	var objectPositionZ = new UI.Number().setWidth( '50px' ).onChange( update );
@@ -119,7 +119,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// rotation
 
-	var objectRotationRow = new UI.Panel();
+	var objectRotationRow = new UI.Row();
 	var objectRotationX = new UI.Number().setWidth( '50px' ).onChange( update );
 	var objectRotationY = new UI.Number().setWidth( '50px' ).onChange( update );
 	var objectRotationZ = new UI.Number().setWidth( '50px' ).onChange( update );
@@ -131,7 +131,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// scale
 
-	var objectScaleRow = new UI.Panel();
+	var objectScaleRow = new UI.Row();
 	var objectScaleLock = new UI.Checkbox( true ).setPosition( 'absolute' ).setLeft( '75px' );
 	var objectScaleX = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleX );
 	var objectScaleY = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleY );
@@ -145,7 +145,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// fov
 
-	var objectFovRow = new UI.Panel();
+	var objectFovRow = new UI.Row();
 	var objectFov = new UI.Number().onChange( update );
 
 	objectFovRow.add( new UI.Text( 'Fov' ).setWidth( '90px' ) );
@@ -155,7 +155,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// near
 
-	var objectNearRow = new UI.Panel();
+	var objectNearRow = new UI.Row();
 	var objectNear = new UI.Number().onChange( update );
 
 	objectNearRow.add( new UI.Text( 'Near' ).setWidth( '90px' ) );
@@ -165,7 +165,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// far
 
-	var objectFarRow = new UI.Panel();
+	var objectFarRow = new UI.Row();
 	var objectFar = new UI.Number().onChange( update );
 
 	objectFarRow.add( new UI.Text( 'Far' ).setWidth( '90px' ) );
@@ -175,7 +175,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// intensity
 
-	var objectIntensityRow = new UI.Panel();
+	var objectIntensityRow = new UI.Row();
 	var objectIntensity = new UI.Number().setRange( 0, Infinity ).onChange( update );
 
 	objectIntensityRow.add( new UI.Text( 'Intensity' ).setWidth( '90px' ) );
@@ -185,7 +185,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// color
 
-	var objectColorRow = new UI.Panel();
+	var objectColorRow = new UI.Row();
 	var objectColor = new UI.Color().onChange( update );
 
 	objectColorRow.add( new UI.Text( 'Color' ).setWidth( '90px' ) );
@@ -195,7 +195,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// ground color
 
-	var objectGroundColorRow = new UI.Panel();
+	var objectGroundColorRow = new UI.Row();
 	var objectGroundColor = new UI.Color().onChange( update );
 
 	objectGroundColorRow.add( new UI.Text( 'Ground color' ).setWidth( '90px' ) );
@@ -205,7 +205,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// distance
 
-	var objectDistanceRow = new UI.Panel();
+	var objectDistanceRow = new UI.Row();
 	var objectDistance = new UI.Number().setRange( 0, Infinity ).onChange( update );
 
 	objectDistanceRow.add( new UI.Text( 'Distance' ).setWidth( '90px' ) );
@@ -215,7 +215,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// angle
 
-	var objectAngleRow = new UI.Panel();
+	var objectAngleRow = new UI.Row();
 	var objectAngle = new UI.Number().setPrecision( 3 ).setRange( 0, Math.PI / 2 ).onChange( update );
 
 	objectAngleRow.add( new UI.Text( 'Angle' ).setWidth( '90px' ) );
@@ -225,7 +225,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// exponent
 
-	var objectExponentRow = new UI.Panel();
+	var objectExponentRow = new UI.Row();
 	var objectExponent = new UI.Number().setRange( 0, Infinity ).onChange( update );
 
 	objectExponentRow.add( new UI.Text( 'Exponent' ).setWidth( '90px' ) );
@@ -235,7 +235,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// decay
 
-	var objectDecayRow = new UI.Panel();
+	var objectDecayRow = new UI.Row();
 	var objectDecay = new UI.Number().setRange( 0, Infinity ).onChange( update );
 
 	objectDecayRow.add( new UI.Text( 'Decay' ).setWidth( '90px' ) );
@@ -245,7 +245,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// shadow
 
-	var objectShadowRow = new UI.Panel();
+	var objectShadowRow = new UI.Row();
 
 	objectShadowRow.add( new UI.Text( 'Shadow' ).setWidth( '90px' ) );
 
@@ -259,7 +259,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	// visible
 
-	var objectVisibleRow = new UI.Panel();
+	var objectVisibleRow = new UI.Row();
 	var objectVisible = new UI.Checkbox().onChange( update );
 
 	objectVisibleRow.add( new UI.Text( 'Visible' ).setWidth( '90px' ) );
@@ -271,7 +271,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	var timeout;
 
-	var objectUserDataRow = new UI.Panel();
+	var objectUserDataRow = new UI.Row();
 	var objectUserData = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' ).setFontSize( '12px' ).onChange( update );
 	objectUserData.onKeyUp( function () {
 

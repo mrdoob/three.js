@@ -32,7 +32,7 @@ Menubar.Add = function ( editor ) {
 
 	// Group
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Group' );
 	option.onClick( function () {
@@ -51,7 +51,7 @@ Menubar.Add = function ( editor ) {
 
 	// Plane
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Plane' );
 	option.onClick( function () {
@@ -68,7 +68,7 @@ Menubar.Add = function ( editor ) {
 
 	// Box
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Box' );
 	option.onClick( function () {
@@ -84,7 +84,7 @@ Menubar.Add = function ( editor ) {
 
 	// Circle
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Circle' );
 	option.onClick( function () {
@@ -103,7 +103,7 @@ Menubar.Add = function ( editor ) {
 
 	// Cylinder
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Cylinder' );
 	option.onClick( function () {
@@ -126,7 +126,7 @@ Menubar.Add = function ( editor ) {
 
 	// Sphere
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Sphere' );
 	option.onClick( function () {
@@ -150,7 +150,7 @@ Menubar.Add = function ( editor ) {
 
 	// Icosahedron
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Icosahedron' );
 	option.onClick( function () {
@@ -169,7 +169,7 @@ Menubar.Add = function ( editor ) {
 
 	// Torus
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Torus' );
 	option.onClick( function () {
@@ -191,7 +191,7 @@ Menubar.Add = function ( editor ) {
 
 	// TorusKnot
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'TorusKnot' );
 	option.onClick( function () {
@@ -216,7 +216,7 @@ Menubar.Add = function ( editor ) {
 	/*
 	// Teapot
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Teapot' );
 	option.onClick( function () {
@@ -244,7 +244,7 @@ Menubar.Add = function ( editor ) {
 
 	// Sprite
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Sprite' );
 	option.onClick( function () {
@@ -263,7 +263,7 @@ Menubar.Add = function ( editor ) {
 
 	// PointLight
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'PointLight' );
 	option.onClick( function () {
@@ -282,7 +282,7 @@ Menubar.Add = function ( editor ) {
 
 	// SpotLight
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'SpotLight' );
 	option.onClick( function () {
@@ -306,7 +306,7 @@ Menubar.Add = function ( editor ) {
 
 	// DirectionalLight
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'DirectionalLight' );
 	option.onClick( function () {
@@ -327,7 +327,7 @@ Menubar.Add = function ( editor ) {
 
 	// HemisphereLight
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'HemisphereLight' );
 	option.onClick( function () {
@@ -348,7 +348,7 @@ Menubar.Add = function ( editor ) {
 
 	// AmbientLight
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'AmbientLight' );
 	option.onClick( function() {
@@ -369,7 +369,7 @@ Menubar.Add = function ( editor ) {
 
 	// PerspectiveCamera
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'PerspectiveCamera' );
 	option.onClick( function() {

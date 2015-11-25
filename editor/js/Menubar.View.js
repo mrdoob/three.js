@@ -18,7 +18,7 @@ Menubar.View = function ( editor ) {
 
 	// Light theme
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Light theme' );
 	option.onClick( function () {
@@ -31,7 +31,7 @@ Menubar.View = function ( editor ) {
 
 	// Dark theme
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Dark theme' );
 	option.onClick( function () {
@@ -48,7 +48,7 @@ Menubar.View = function ( editor ) {
 
 	// fullscreen
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Fullscreen' );
 	option.onClick( function () {

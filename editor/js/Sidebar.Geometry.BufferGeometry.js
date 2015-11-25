@@ -6,7 +6,7 @@ Sidebar.Geometry.BufferGeometry = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.Row();
 
 	function update( object ) {
 
@@ -23,7 +23,7 @@ Sidebar.Geometry.BufferGeometry = function ( editor ) {
 
 			if ( index !== null ) {
 
-				var panel = new UI.Panel();
+				var panel = new UI.Row();
 				panel.add( new UI.Text( 'index' ).setWidth( '90px' ) );
 				panel.add( new UI.Text( ( index.count ).format() ).setFontSize( '12px' ) );
 				container.add( panel );
@@ -34,7 +34,7 @@ Sidebar.Geometry.BufferGeometry = function ( editor ) {
 
 			for ( var name in attributes ) {
 
-				var panel = new UI.Panel();
+				var panel = new UI.Row();
 				panel.add( new UI.Text( name ).setWidth( '90px' ) );
 				panel.add( new UI.Text( ( attributes[ name ].count ).format() ).setFontSize( '12px' ) );
 				container.add( panel );

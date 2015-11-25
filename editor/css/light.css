@@ -152,17 +152,17 @@ input.Number {
 	}
 
 	#sidebar .Panel {
-		margin-bottom: 10px;
+		color: #888;
+		padding: 10px;
+		border-top: 1px solid #ccc;
 	}
 
 	#sidebar .Panel.collapsed {
 		margin-bottom: 0;
 	}
 
-	#sidebar > .Panel, #sidebar > span > .Panel {
-		color: #888;
-		padding: 10px;
-		border-top: 1px solid #ccc;
+	#sidebar .Row {
+		margin-bottom: 10px;
 	}
 
 #tabs {

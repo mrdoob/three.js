@@ -6,11 +6,11 @@ Sidebar.Geometry.Geometry = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.Row();
 
 	// vertices
 
-	var verticesRow = new UI.Panel();
+	var verticesRow = new UI.Row();
 	var vertices = new UI.Text().setFontSize( '12px' );
 
 	verticesRow.add( new UI.Text( 'Vertices' ).setWidth( '90px' ) );
@@ -20,7 +20,7 @@ Sidebar.Geometry.Geometry = function ( editor ) {
 
 	// faces
 
-	var facesRow = new UI.Panel();
+	var facesRow = new UI.Row();
 	var faces = new UI.Text().setFontSize( '12px' );
 
 	facesRow.add( new UI.Text( 'Faces' ).setWidth( '90px' ) );
