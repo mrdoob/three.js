@@ -267,6 +267,13 @@
 
 				container.appendChild( renderer.domElement );
 
+
+				window.addEventListener( 'resize', function( e ) {
+
+					renderer.setSize( innerWidth, innerHeight );
+
+				} );
+
 			}
 
 			function updateWorkers( x ) {
@@ -295,7 +302,6 @@
 				} );
 
 			}
-
 
 
 			function render() {

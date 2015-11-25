@@ -262,12 +262,16 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 		// Randomize painting :)
 
-		for ( var i = 0; i < totalBlocks; i ++ ) {
+		if ( scope.randomize ) {
 
-			var swap = Math.random()  * totalBlocks | 0;
-			var tmp = toRender[ swap ];
-			toRender[ swap ] = toRender[ i ];
-			toRender[ i ] = tmp;
+			for ( var i = 0; i < totalBlocks; i ++ ) {
+
+				var swap = Math.random()  * totalBlocks | 0;
+				var tmp = toRender[ swap ];
+				toRender[ swap ] = toRender[ i ];
+				toRender[ i ] = tmp;
+
+			}
 
 		}
 
