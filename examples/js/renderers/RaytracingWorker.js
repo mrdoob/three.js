@@ -4,24 +4,26 @@ var startX, startY, division, completed = 0;
 
 var scene, camera, renderer, loader;
 
-importScripts('../../../build/three.min.js');
+importScripts( '../../../build/three.min.js' );
 
 
-self.onmessage = function(e) {
+self.onmessage = function( e ) {
+
 	var data = e.data;
-	if (!data) return;
+	if ( ! data ) return;
 
-	if (data.init) {
-		console.log('init')
+	if ( data.init ) {
+
+		console.log( 'init' )
 		var
-			width = data.init[0],
-			height = data.init[1];
+			width = data.init[ 0 ],
+			height = data.init[ 1 ];
 
 		worker = data.worker;
 		workers = data.workers;
 		BLOCK = data.blockSize;
-		eval(data.initScene);
-		initScene(width, height);
+		eval( data.initScene );
+		initScene( width, height );
 
 		renderer = new THREE.RaytracingRendererWorker();
 		loader = new THREE.ObjectLoader();
@@ -31,35 +33,42 @@ self.onmessage = function(e) {
 		// if (data.maxRecursionDepth) maxRecursionDepth = data.maxRecursionDepth;
 
 		completed = 0;
+
 	}
 
-	if (data.scene) {
+	if ( data.scene ) {
 
-		scene = loader.parse(data.scene);
-		camera = loader.parse(data.camera);
-		
+		scene = loader.parse( data.scene );
+		camera = loader.parse( data.camera );
+
 		var positions = data.positions;
-		copyPositions(camera, positions);
-		scene.traverse( function(o) {
+		copyPositions( camera, positions );
+		scene.traverse( function( o ) {
+
 			copyPositions( o, positions );
+
 		} );
-		
+
 	}
 
-	if (data.render && scene && camera) {
+	if ( data.render && scene && camera ) {
+
 		startX = data.x;
 		startY = data.y;
-		renderer.render(scene, camera);
+		renderer.render( scene, camera );
+
 	}
 
 }
 
-function copyPositions(object, positions) {
-	var info = positions[object.uuid];
+function copyPositions( object, positions ) {
 
-	object.position.fromArray(info.position);
-	object.scale.fromArray(info.scale);
-	object.rotation.fromArray(info.rotation);
+	var info = positions[ object.uuid ];
+
+	object.position.fromArray( info.position );
+	object.scale.fromArray( info.scale );
+	object.rotation.fromArray( info.rotation );
+
 }
 
 /**
@@ -100,11 +109,13 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 	var animationFrameId = null;
 
 	this.setSize = function ( width, height ) {
+
 		canvasWidth = width;
 		canvasHeight = height;
 
 		canvasWidthHalf = Math.floor( canvasWidth / 2 );
 		canvasHeightHalf = Math.floor( canvasHeight / 2 );
+
 	};
 
 	//
@@ -442,7 +453,7 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 
 		var blockSize = BLOCK;
 
-		var data = new Uint8ClampedArray(blockSize * blockSize * 4);
+		var data = new Uint8ClampedArray( blockSize * blockSize * 4 );
 
 		var pixelColor = new THREE.Color();
 
@@ -475,29 +486,31 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 			}
 
 			// Use transferable objects! :)
-			self.postMessage({
+			self.postMessage( {
 				data: data.buffer,
 				blockX: blockX,
 				blockY: blockY,
 				blockSize: blockSize,
-			}, [data.buffer]);
+			}, [ data.buffer ] );
 
-			data = new Uint8ClampedArray(blockSize * blockSize * 4);
+			data = new Uint8ClampedArray( blockSize * blockSize * 4 );
 
 			// OK Done!
 
-			completed++;
+			completed ++;
 
-			self.postMessage({
+			self.postMessage( {
 				type: 'complete',
 				worker: worker,
 				time: Date.now() - reallyThen
-			});
+			} );
+
 		};
 
 	}() );
 
 	this.render = function ( scene, camera ) {
+
 		reallyThen = Date.now()
 
 		cancelAnimationFrame( animationFrameId );
