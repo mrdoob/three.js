@@ -7,18 +7,9 @@ Sidebar.Material = function ( editor ) {
 	var signals = editor.signals;
 	var currentObject;
 
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/material/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
-
-		editor.config.setKey( 'ui/sidebar/material/collapsed', boolean );
-
-	} );
-	container.setDisplay( 'none' );
-	container.dom.classList.add( 'Material' );
-
-	container.addStatic( new UI.Text().setValue( 'MATERIAL' ) );
-	container.add( new UI.Break() );
+	var container = new UI.Panel();
+	container.setBorderTop( '0' );
+	container.setPaddingTop( '20px' );
 
 	// uuid
 

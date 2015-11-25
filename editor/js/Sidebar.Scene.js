@@ -8,6 +8,7 @@ Sidebar.Scene = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
+	container.setPaddingTop( '20px' );
 
 	var ignoreObjectSelectedSignal = false;
 

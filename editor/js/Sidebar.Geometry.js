@@ -6,21 +6,13 @@ Sidebar.Geometry = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/geometry/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
-
-		editor.config.setKey( 'ui/sidebar/geometry/collapsed', boolean );
-
-	} );
-	container.setDisplay( 'none' );
-
-	var geometryType = new UI.Text().setTextTransform( 'uppercase' );
-	container.addStatic( geometryType );
+	var container = new UI.Panel();
+	container.setBorderTop( '0' );
+	container.setPaddingTop( '20px' );
 
 	// Actions
 
-	var objectActions = new UI.Select().setPosition('absolute').setRight( '8px' ).setFontSize( '11px' );
+	var objectActions = new UI.Select().setPosition( 'absolute' ).setRight( '8px' ).setFontSize( '11px' );
 	objectActions.setOptions( {
 
 		'Actions': 'Actions',
@@ -87,9 +79,7 @@ Sidebar.Geometry = function ( editor ) {
 		this.setValue( 'Actions' );
 
 	} );
-	container.addStatic( objectActions );
-
-	container.add( new UI.Break() );
+	// container.addStatic( objectActions );
 
 	// uuid
 
@@ -122,6 +112,16 @@ Sidebar.Geometry = function ( editor ) {
 	geometryNameRow.add( geometryName );
 
 	container.add( geometryNameRow );
+
+	// type
+
+	var geometryTypeRow = new UI.Row();
+	var geometryType = new UI.Text();
+
+	geometryTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
+	geometryTypeRow.add( geometryType );
+
+	container.add( geometryTypeRow );
 
 	// geometry
 

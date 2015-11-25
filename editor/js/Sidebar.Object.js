@@ -2,21 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Object3D = function ( editor ) {
+Sidebar.Object = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/object3d/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
-
-		editor.config.setKey( 'ui/sidebar/object3d/collapsed', boolean );
-
-	} );
-	container.setDisplay( 'none' );
-
-	var objectType = new UI.Text().setTextTransform( 'uppercase' );
-	container.addStatic( objectType );
+	var container = new UI.Panel();
+	container.setBorderTop( '0' );
+	container.setPaddingTop( '20px' );
 
 	// Actions
 
@@ -57,9 +49,7 @@ Sidebar.Object3D = function ( editor ) {
 		this.setValue( 'Actions' );
 
 	} );
-	container.addStatic( objectActions );
-
-	container.add( new UI.Break() );
+	// container.addStatic( objectActions );
 
 	// uuid
 
@@ -92,6 +82,17 @@ Sidebar.Object3D = function ( editor ) {
 	objectNameRow.add( objectName );
 
 	container.add( objectNameRow );
+
+	// type
+
+	var objectTypeRow = new UI.Row();
+	var objectType = new UI.Text();
+
+	objectTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
+	objectTypeRow.add( objectType );
+
+	container.add( objectTypeRow );
+
 
 	/*
 	// parent

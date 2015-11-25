@@ -182,12 +182,13 @@ input.Number {
 }
 
 	#tabs span {
-		color: #888;
+		color: #555;
 		border-right: 1px solid #222;
 		padding: 10px;
 	}
 
 	#tabs span.selected {
+		color: #888;
 		background-color: #111;
 	}
 

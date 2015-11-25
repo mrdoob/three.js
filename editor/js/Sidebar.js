@@ -9,12 +9,12 @@ var Sidebar = function ( editor ) {
 
 	//
 
-	var tabScene = new UI.Text( 'SCENE' ).onClick( onClick );
-	var tabProject = new UI.Text( 'PROJECT' ).onClick( onClick );
+	var sceneTab = new UI.Text( 'SCENE' ).onClick( onClick );
+	var projectTab = new UI.Text( 'PROJECT' ).onClick( onClick );
 
 	var tabs = new UI.Div();
 	tabs.setId( 'tabs' );
-	tabs.add( tabScene, tabProject );
+	tabs.add( sceneTab, projectTab );
 	container.add( tabs );
 
 	function onClick( event ) {
@@ -27,9 +27,7 @@ var Sidebar = function ( editor ) {
 
 	var scene = new UI.Span().add(
 		new Sidebar.Scene( editor ),
-		new Sidebar.Object3D( editor ),
-		new Sidebar.Geometry( editor ),
-		new Sidebar.Material( editor ),
+		new Sidebar.Properties( editor ),
 		new Sidebar.Animation( editor ),
 		new Sidebar.Script( editor )
 	);
@@ -41,20 +39,24 @@ var Sidebar = function ( editor ) {
 	);
 	container.add( project );
 
+	//
+
 	function select( section ) {
+
+		sceneTab.setClass( '' );
+		projectTab.setClass( '' );
+
+		scene.setDisplay( 'none' );
+		project.setDisplay( 'none' );
 
 		switch ( section ) {
 			case 'SCENE':
-				tabScene.setClass( 'selected' );
-				tabProject.setClass( '' );
-				project.setDisplay( 'none' );
+				sceneTab.setClass( 'selected' );
 				scene.setDisplay( '' );
 				break;
 			case 'PROJECT':
-				tabScene.setClass( '' );
-				tabProject.setClass( 'selected' );
+				projectTab.setClass( 'selected' );
 				project.setDisplay( '' );
-				scene.setDisplay( 'none' );
 				break;
 		}
 
