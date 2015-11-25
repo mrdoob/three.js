@@ -27,7 +27,7 @@
 
 			var camera, controls, scene, renderer;
 
-			var torus, cube;
+			var torus, cube, objects = [];
 
 			init();
 			render();
@@ -150,11 +150,13 @@
 				sphere.scale.multiplyScalar( 0.5 );
 				sphere.position.set( - 50, - 250 + 5, - 50 );
 				scene.add( sphere );
+				objects.push ( sphere );
 
 				sphere2 = new THREE.Mesh( sphereGeometry, mirrorMaterialSmooth );
 				sphere2.scale.multiplyScalar( 0.5 );
 				sphere2.position.set( 175, - 250 + 5, - 150 );
 				scene.add( sphere2 );
+				objects.push ( sphere2 );
 
 				// Box
 
@@ -162,6 +164,7 @@
 				box.position.set( - 175, - 250 + 2.5, - 150 );
 				box.rotation.y = 0.5;
 				scene.add( box );
+				objects.push ( box );
 
 				// Glass
 
@@ -275,8 +278,21 @@
 
 				}
 
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js<a/> - raytracing renderer (using '  + WORKERS + ' <button onclick="updateWorkers(-1)">-</button><button onclick="updateWorkers(1)">+</button> web workers)';
-				// <br/><button onclick="render()">Render</button>
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js<a/> - raytracing renderer (using '  + WORKERS + ' <button onclick="updateWorkers(-1)">-</button><button onclick="updateWorkers(1)">+</button> web workers)' +
+				'<br/><button onclick="rearrange()">Rearrange</button><button onclick="render()">Render</button>';
+
+
+			}
+
+			function rearrange() {
+
+				objects.forEach( function( o ) {
+
+					o.position.y += ( Math.random() - 0.5 ) * 100;
+					o.position.x += ( Math.random() - 0.5 ) * 400;
+					o.position.z += ( Math.random() - 0.5 ) * 400;
+
+				} );
 
 			}
 

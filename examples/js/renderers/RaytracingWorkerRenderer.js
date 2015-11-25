@@ -204,13 +204,15 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 		if ( ! mat || mat.uuid in materials ) return;
 
-		console.log(mat);
-
 		var props = {};
-		for (var m in _annex) {
+		for ( var m in _annex ) {
+
 			if ( mat[m] !== undefined ) {
+
 				props[ m ] = mat[ m ];
+
 			}
+
 		}
 
 		materials[ mat.uuid ] = props;
