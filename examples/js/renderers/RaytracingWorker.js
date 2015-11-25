@@ -20,8 +20,8 @@ self.onmessage = function(e) {
 		worker = data.worker;
 		workers = data.workers;
 		BLOCK = data.blockSize;
-		// eval(data.initScene);
-		// initScene(width, height);
+		eval(data.initScene);
+		initScene(width, height);
 
 		renderer = new THREE.RaytracingRendererWorker();
 		loader = new THREE.ObjectLoader();

@@ -19,6 +19,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 	var scope = this;
 	var pool = [];
+	var renderering = false;
 
 	var canvas = document.createElement( 'canvas' );
 	var context = canvas.getContext( '2d', {
@@ -36,37 +37,74 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 	this.autoClear = true;
 
-	var workers = parameters.workers || navigator.hardwareConcurrency || 4;
+	var workers = parameters.workers;
 	var blockSize = parameters.blockSize || 64;
 
 	console.log('%cSpinning off ' + workers + ' Workers ', 'font-size: 20px; background: black; color: white; font-family: monospace;');
 
-	for (var i = 0; i < workers; i++) {
+	this.setWorkers = function( w ) {
 
-		var worker = new Worker('js/renderers/RaytracingWorker.js');
+		workers = w || navigator.hardwareConcurrency || 4;
 
-		worker.onmessage = function(e) {
-			var data = e.data;
+		while (pool.length < workers ) {
 
-			if (!data) return;
+			console.log('New Worker!!');
 
-			if (data.blockSize) {
-				var d = data.data;
-				var imagedata = new ImageData(new Uint8ClampedArray(d), data.blockSize, data.blockSize);
-				context.putImageData( imagedata, data.blockX, data.blockY );
-			} else if (data.type == 'complete') {
-				// TODO can terminate workers after all is done?
-				console.log('Worker ' + data.worker, data.time / 1000, (Date.now() - reallyThen) / 1000 + ' s');
+			var i = pool.length;
 
-				renderNext(this);
+			var worker = new Worker('js/renderers/RaytracingWorker.js');
+
+			worker.onmessage = function(e) {
+				var data = e.data;
+
+				if (!data) return;
+
+				if (data.blockSize) {
+					var d = data.data;
+					var imagedata = new ImageData(new Uint8ClampedArray(d), data.blockSize, data.blockSize);
+					context.putImageData( imagedata, data.blockX, data.blockY );
+				} else if (data.type == 'complete') {
+					console.log('Worker ' + data.worker, data.time / 1000, (Date.now() - reallyThen) / 1000 + ' s');
+
+					if ( pool.length > workers ) {
+						pool.splice( pool.indexOf( this ), 1)
+						return this.terminate();
+					}
+
+					renderNext(this);
+				}
+
+			}
+
+			worker.color = new THREE.Color().setHSL(i / workers, 0.8, 0.8).getHexString();
+			pool.push(worker);
+
+			if (renderering) {
+
+				worker.postMessage({
+
+					init: [ canvasWidth, canvasHeight ],
+					worker: i,
+					workers: pool.length,
+					blockSize: blockSize,
+					initScene: initScene.toString()
+
+				});
+
+				renderNext(worker);
 			}
 
 		}
 
-		worker.color = new THREE.Color().setHSL(i / workers, 0.8, 0.8).getHexString();
-		pool.push(worker);
+		if (!renderering) {
+			while ( pool.length > workers ) {
+				pool.pop().terminate();
+			}
+		}
 
-	}
+	};
+
+	this.setWorkers( workers );
 
 	this.setClearColor = function ( color, alpha ) {
 
@@ -101,7 +139,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 			});
 
-		});
+		} );
 
 	};
 
@@ -118,6 +156,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 	function renderNext(worker) {
 		var current = nextBlock++;
 		if (nextBlock > totalBlocks) {
+			renderering = false;
 			return scope.dispatchEvent( { type: "complete" } );
 		}
 
@@ -146,20 +185,21 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 	this.render = function ( scene, camera ) {
 
+		renderering = true;
+
 		var sceneJSON = scene.toJSON();
 		var cameraJSON = camera.toJSON();
 
-		scene.traverse( serializeObject );
-		serializeObject( camera );
+		// scene.traverse( serializeObject );
+		// serializeObject( camera );
 
-
-		pool.forEach(function(worker) {
-			worker.postMessage({
-				scene: sceneJSON,
-				camera: cameraJSON,
-				positions: all
-			});
-		});
+		// pool.forEach(function(worker) {
+		// 	worker.postMessage({
+		// 		scene: sceneJSON,
+		// 		camera: cameraJSON,
+		// 		positions: all
+		// 	});
+		// });
 
 		context.clearRect( 0, 0, canvasWidth, canvasHeight );
 		reallyThen = Date.now();

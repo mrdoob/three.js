@@ -23,7 +23,7 @@
 
 			var WORKERS = +hash || navigator.hardwareConcurrency || 3;
 
-			var container;
+			var container, info;
 
 			var camera, controls, scene, renderer;
 
@@ -236,14 +236,15 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var info = document.createElement( 'div' );
+				info = document.createElement( 'div' );
 				info.style.position = 'absolute';
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.zIndex = '100';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js<a/> - raytracing renderer (using  '  + WORKERS + ' web workers)';
 				container.appendChild( info );
+
+				updateWorkers()
 
 				//
 
@@ -264,6 +265,19 @@
 				container.appendChild( renderer.domElement );
 
 			}
+
+			function updateWorkers(x) {
+				if (x) {
+					WORKERS = Math.max(1, WORKERS + x);
+					renderer.setWorkers( WORKERS );
+				}
+
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js<a/> - raytracing renderer (using '  + WORKERS + ' <button onclick="updateWorkers(-1)">-</button><button onclick="updateWorkers(1)">+</button> web workers)';
+				// <br/><button onclick="render()">Render</button>
+
+			}
+
+
 
 			function render() {
 
