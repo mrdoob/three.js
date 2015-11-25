@@ -36,8 +36,10 @@
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/libs/charsetencoder.min.js"></script>
+		<script src="js/libs/ammo.js"></script>
 		<script src="js/loaders/MMDLoader.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
+		<script src="js/animation/MMDPhysics.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -47,10 +49,15 @@
 			var container, stats;
 
 			var mesh, camera, mixer, scene, renderer;
+			var ikSolver;
+
+			/*
+			 * Caution: Physics calculation is pretty heavy.
+			 *          It may be not acceptable for most mobile devices yet.
+			 */
+			var physics;
 
 			var mouseX = 0, mouseY = 0;
-
-			var ikSolver;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -59,7 +66,6 @@
 
 			init();
 			animate();
-
 
 			function init() {
 
@@ -104,6 +110,12 @@
 					mixer.clipAction( mesh.geometry.morphAnimations[ 0 ] ).play();
 
 					ikSolver = new THREE.CCDIKSolver( mesh );
+					physics = new THREE.MMDPhysics( mesh );
+
+					// see below for what this's for
+					initBackupBones( mesh );
+
+					physics.warmup( 10 );
 
 				}, onProgress, onError );
 
@@ -160,22 +172,75 @@
 
 				if( mesh ) {
 
-					mixer.update( clock.getDelta() );
+					var delta = clock.getDelta();
+					mixer.update( delta );
 
-					/* Note: ikSolver.resetLinks() is workaround for r74dev.
-					 *       THREE.PropertyMixer.apply() seems to have buffer cache
-					 *       when mixer.update() is called.
-					 *       ikSolver.update() change bone position/quaternion
-					 *       without mixer.update() then buffer cache will be inconsistent.
-					 *       ikSolver.resetLinks() explicitly resets IK link bones quaternion and
-					 *       tries to avoid issues caused by this inconsistent.
-					 */
-					ikSolver.resetLinks();
+					// see below for what this's for
+					backupBones( mesh );
+
 					ikSolver.update();
+					physics.update( delta );
 
 				}
 
 				renderer.render( scene, camera );
+
+				if ( mesh ) {
+
+					// see below for what this's for
+					restoreBones( mesh );
+
+				}
+
+			}
+
+			/*
+			 * Note: These following three functions are workaround for r74dev.
+			 *       THREE.PropertyMixer.apply() seems to save values into buffer cache
+			 *       when mixer.update() is called.
+			 *       ikSolver.update() and physics.update() change bone position/quaternion
+			 *       without mixer.update() then buffer cache will be inconsistent.
+			 *       So trying to avoid buffer cache inconsistency by doing
+			 *       backup bones position/quaternion right after mixer.update() call
+			 *       and then restore them after rendering.
+			 */
+			function initBackupBones ( mesh ) {
+
+				mesh.skeleton.backupBones = [];
+
+				for ( var i = 0; i < mesh.skeleton.bones.length; i++ ) {
+
+					mesh.skeleton.backupBones.push( mesh.skeleton.bones[ i ].clone() );
+
+				}
+
+			}
+
+			function backupBones ( mesh ) {
+
+				for ( var i = 0; i < mesh.skeleton.bones.length; i++ ) {
+
+					var b = mesh.skeleton.backupBones[ i ];
+					var b2 = mesh.skeleton.bones[ i ];
+
+					b.position.copy( b2.position );
+					b.quaternion.copy( b2.quaternion );
+
+				}
+
+			}
+
+			function restoreBones ( mesh ) {
+
+				for ( var i = 0; i < mesh.skeleton.bones.length; i++ ) {
+
+					var b = mesh.skeleton.bones[ i ];
+					var b2 = mesh.skeleton.backupBones[ i ];
+
+					b.position.copy( b2.position );
+					b.quaternion.copy( b2.quaternion );
+
+				}
 
 			}
 

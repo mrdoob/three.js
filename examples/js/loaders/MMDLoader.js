@@ -2,7 +2,7 @@
  * @author takahiro / https://github.com/takahirox
  *
  * Dependencies
- *  charset-encoder-js https://github.com/takahirox/charset-encoder-js
+ *  - charset-encoder-js https://github.com/takahirox/charset-encoder-js
  *
  *
  * This loader loads and parses PMD/PMX and VMD binary files
@@ -24,27 +24,26 @@
  *  http://gulshan-i-raz.geo.jp/labs/2012/10/17/pmx-format1/
  *
  * Model data requirements
- *  convert .tga files to .png files if exist. (Should I use THREE.TGALoader?)
- *  resize the texture image files to power_of_2*power_of_2
+ *  - convert .tga files to .png files if exist. (Should I use THREE.TGALoader?)
+ *  - resize the texture image files to power_of_2*power_of_2
  *
  *
  * TODO
- *  separate model/vmd loaders.
- *  multi vmd files support.
- *  edge(outline) support.
- *  culling support.
- *  toon(cel) shadering support.
- *  add-sphere-mapping support.
- *  physics support.
- *  camera motion in vmd support.
- *  light motion in vmd support.
- *  music support.
- *  make own shader for the performance and functionarity.
- *  SDEF support.
- *  uv/material/bone morphing support.
- *  tga file loading support.
- *  supply skinning support.
- *  shadow support.
+ *  - separate model/vmd loaders.
+ *  - multi vmd files support.
+ *  - edge(outline) support.
+ *  - culling support.
+ *  - toon(cel) shadering support.
+ *  - add-sphere-mapping support.
+ *  - camera motion in vmd support.
+ *  - light motion in vmd support.
+ *  - music support.
+ *  - make own shader for the performance and functionarity.
+ *  - SDEF support.
+ *  - uv/material/bone morphing support.
+ *  - tga file loading support.
+ *  - supply skinning support.
+ *  - shadow support.
  */
 
 THREE.MMDLoader = function ( showStatus, manager ) {
@@ -267,10 +266,10 @@ THREE.MMDLoader.prototype.parsePmd = function ( buffer ) {
 			// So using charcode strings as workaround and keep original strings in .originalName.
 			p.originalName = dv.getSjisStringsAsUnicode( 20 );
 			p.name = dv.toCharcodeStrings( p.originalName );
-			p.parentIndex = dv.getUint16();
-			p.tailIndex = dv.getUint16();
+			p.parentIndex = dv.getInt16();
+			p.tailIndex = dv.getInt16();
 			p.type = dv.getUint8();
-			p.ikIndex = dv.getUint16();
+			p.ikIndex = dv.getInt16();
 			p.position = dv.getFloat32Array( 3 );
 			return p;
 
@@ -363,6 +362,265 @@ THREE.MMDLoader.prototype.parsePmd = function ( buffer ) {
 
 	};
 
+	var parseMorphFrames = function () {
+
+		var parseMorphFrame = function () {
+
+			var p = {};
+			p.index = dv.getUint16();
+			return p;
+
+		};
+
+		var metadata = pmd.metadata;
+		metadata.morphFrameCount = dv.getUint8();
+
+		pmd.morphFrames = [];
+
+		for ( var i = 0; i < metadata.morphFrameCount; i++ ) {
+
+			pmd.morphFrames.push( parseMorphFrame() );
+
+		}
+
+	};
+
+	var parseBoneFrameNames = function () {
+
+		var parseBoneFrameName = function () {
+
+			var p = {};
+			p.name = dv.getSjisStringsAsUnicode( 50 );
+			return p;
+
+		};
+
+		var metadata = pmd.metadata;
+		metadata.boneFrameNameCount = dv.getUint8();
+
+		pmd.boneFrameNames = [];
+
+		for ( var i = 0; i < metadata.boneFrameNameCount; i++ ) {
+
+			pmd.boneFrameNames.push( parseBoneFrameName() );
+
+		}
+
+	};
+
+	var parseBoneFrames = function () {
+
+		var parseBoneFrame = function () {
+
+			var p = {};
+			p.boneIndex = dv.getInt16();
+			p.frameIndex = dv.getUint8();
+			return p;
+
+		};
+
+		var metadata = pmd.metadata;
+		metadata.boneFrameCount = dv.getUint32();
+
+		pmd.boneFrames = [];
+
+		for ( var i = 0; i < metadata.boneFrameCount; i++ ) {
+
+			pmd.boneFrames.push( parseBoneFrame() );
+
+		}
+
+	};
+
+	var parseEnglishHeader = function () {
+
+		var metadata = pmd.metadata;
+		metadata.englishCompatibility = dv.getUint8();
+
+		if ( metadata.englishCompatibility > 0 ) {
+
+			metadata.englishModelName = dv.getSjisStringsAsUnicode( 20 );
+			metadata.englishComment = dv.getSjisStringsAsUnicode( 256 );
+
+		}
+
+	};
+
+	var parseEnglishBoneNames = function () {
+
+		var parseEnglishBoneName = function () {
+
+			var p = {};
+			p.name = dv.getSjisStringsAsUnicode( 20 );
+			return p;
+
+		};
+
+		var metadata = pmd.metadata;
+
+		if ( metadata.englishCompatibility === 0 ) {
+
+			return;
+
+		}
+
+		pmd.englishBoneNames = [];
+
+		for ( var i = 0; i < metadata.boneCount; i++ ) {
+
+			pmd.englishBoneNames.push( parseEnglishBoneName() );
+
+		}
+
+	};
+
+	var parseEnglishMorphNames = function () {
+
+		var parseEnglishMorphName = function () {
+
+			var p = {};
+			p.name = dv.getSjisStringsAsUnicode( 20 );
+			return p;
+
+		};
+
+		var metadata = pmd.metadata;
+
+		if ( metadata.englishCompatibility === 0 ) {
+
+			return;
+
+		}
+
+		pmd.englishMorphNames = [];
+
+		for ( var i = 0; i < metadata.morphCount - 1; i++ ) {
+
+			pmd.englishMorphNames.push( parseEnglishMorphName() );
+
+		}
+
+	};
+
+	var parseEnglishBoneFrameNames = function () {
+
+		var parseEnglishBoneFrameName = function () {
+
+			var p = {};
+			p.name = dv.getSjisStringsAsUnicode( 50 );
+			return p;
+
+		};
+
+		var metadata = pmd.metadata;
+
+		if ( metadata.englishCompatibility === 0 ) {
+
+			return;
+
+		}
+
+		pmd.englishBoneFrameNames = [];
+
+		for ( var i = 0; i < metadata.boneFrameNameCount; i++ ) {
+
+			pmd.englishBoneFrameNames.push( parseEnglishBoneFrameName() );
+
+		}
+
+	};
+
+	var parseToonTextures = function () {
+
+		var parseToonTexture = function () {
+
+			var p = {};
+			p.fileName = dv.getSjisStringsAsUnicode( 100 );
+			return p;
+
+		};
+
+		pmd.toonTextures = [];
+
+		for ( var i = 0; i < 10; i++ ) {
+
+			pmd.toonTextures.push( parseToonTexture() );
+
+		}
+
+	};
+
+	var parseRigidBodies = function () {
+
+		var parseRigidBody = function () {
+
+			var p = {};
+			p.name = dv.getSjisStringsAsUnicode( 20 );
+			p.boneIndex = dv.getInt16();
+			p.groupIndex = dv.getUint8();
+			p.groupTarget = dv.getUint16();
+			p.shapeType = dv.getUint8();
+			p.width = dv.getFloat32();
+			p.height = dv.getFloat32();
+			p.depth = dv.getFloat32();
+			p.position = dv.getFloat32Array( 3 );
+			p.rotation = dv.getFloat32Array( 3 );
+			p.weight = dv.getFloat32();
+			p.positionDamping = dv.getFloat32();
+			p.rotationDamping = dv.getFloat32();
+			p.restriction = dv.getFloat32();
+			p.friction = dv.getFloat32();
+			p.type = dv.getUint8();
+			return p;
+
+		};
+
+		var metadata = pmd.metadata;
+		metadata.rigidBodyCount = dv.getUint32();
+
+		pmd.rigidBodies = [];
+
+		for ( var i = 0; i < metadata.rigidBodyCount; i++ ) {
+
+			pmd.rigidBodies.push( parseRigidBody() );
+
+		}
+
+	};
+
+	var parseConstraints = function () {
+
+		var parseConstraint = function () {
+
+			var p = {};
+			p.name = dv.getSjisStringsAsUnicode( 20 );
+			p.rigidBodyIndex1 = dv.getUint32();
+			p.rigidBodyIndex2 = dv.getUint32();
+			p.position = dv.getFloat32Array( 3 );
+			p.rotation = dv.getFloat32Array( 3 );
+			p.translationLimitation1 = dv.getFloat32Array( 3 );
+			p.translationLimitation2 = dv.getFloat32Array( 3 );
+			p.rotationLimitation1 = dv.getFloat32Array( 3 );
+			p.rotationLimitation2 = dv.getFloat32Array( 3 );
+			p.springPosition = dv.getFloat32Array( 3 );
+			p.springRotation = dv.getFloat32Array( 3 );
+			return p;
+
+		};
+
+		var metadata = pmd.metadata;
+		metadata.constraintCount = dv.getUint32();
+
+		pmd.constraints = [];
+
+		for ( var i = 0; i < metadata.constraintCount; i++ ) {
+
+			pmd.constraints.push( parseConstraint() );
+
+		}
+
+	};
+
 	parseHeader();
 	parseVertices();
 	parseFaces();
@@ -370,6 +628,18 @@ THREE.MMDLoader.prototype.parsePmd = function ( buffer ) {
 	parseBones();
 	parseIks();
 	parseMorphs();
+	parseMorphFrames();
+	parseBoneFrameNames();
+	parseBoneFrames();
+	parseEnglishHeader();
+	parseEnglishBoneNames();
+	parseEnglishMorphNames();
+	parseEnglishBoneFrameNames();
+	parseToonTextures();
+	parseRigidBodies();
+	parseConstraints();
+
+	// console.log( pmd ); // for console debug
 
 	return pmd;
 
@@ -412,7 +682,7 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 		metadata.materialIndexSize = dv.getUint8();
 		metadata.boneIndexSize = dv.getUint8();
 		metadata.morphIndexSize = dv.getUint8();
-		metadata.rigidbodyIndexSize = dv.getUint8();
+		metadata.rigidBodyIndexSize = dv.getUint8();
 		metadata.modelName = dv.getTextBuffer();
 		metadata.englishModelName = dv.getTextBuffer();
 		metadata.comment = dv.getTextBuffer();
@@ -771,6 +1041,117 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 
 	};
 
+	var parseFrames = function () {
+
+		var parseFrame = function () {
+
+			var p = {};
+			p.name = dv.getTextBuffer();
+			p.englishName = dv.getTextBuffer();
+			p.type = dv.getUint8();
+			p.elementCount = dv.getUint32();
+			p.elements = [];
+
+			for ( var i = 0; i < p.elementCount; i++ ) {
+
+				var e = {};
+				e.target = dv.getUint8();
+				e.index = ( e.target === 0 ) ? dv.getNumber( pmx.metadata.boneIndexSize ) : dv.getNumber( pmx.metadata.morphIndexSize );
+				p.elements.push( e );
+
+			}
+
+			return p;
+
+		};
+
+		var metadata = pmx.metadata;
+		metadata.frameCount = dv.getUint32();
+
+		pmx.frames = [];
+
+		for ( var i = 0; i < metadata.frameCount; i++ ) {
+
+			pmx.frames.push( parseFrame() );
+
+		}
+
+	};
+
+	var parseRigidBodies = function () {
+
+		var parseRigidBody = function () {
+
+			var p = {};
+			p.name = dv.getTextBuffer();
+			p.englishName = dv.getTextBuffer();
+			p.boneIndex = dv.getNumber( pmx.metadata.boneIndexSize );
+			p.groupIndex = dv.getUint8();
+			p.groupTarget = dv.getUint16();
+			p.shapeType = dv.getUint8();
+			p.width = dv.getFloat32();
+			p.height = dv.getFloat32();
+			p.depth = dv.getFloat32();
+			p.position = dv.getFloat32Array( 3 );
+			p.rotation = dv.getFloat32Array( 3 );
+			p.weight = dv.getFloat32();
+			p.positionDamping = dv.getFloat32();
+			p.rotationDamping = dv.getFloat32();
+			p.restriction = dv.getFloat32();
+			p.friction = dv.getFloat32();
+			p.type = dv.getUint8();
+			return p;
+
+		};
+
+		var metadata = pmx.metadata;
+		metadata.rigidBodyCount = dv.getUint32();
+
+		pmx.rigidBodies = [];
+
+		for ( var i = 0; i < metadata.rigidBodyCount; i++ ) {
+
+			pmx.rigidBodies.push( parseRigidBody() );
+
+		}
+
+	};
+
+	var parseConstraints = function () {
+
+		var parseConstraint = function () {
+
+			var p = {};
+			p.name = dv.getTextBuffer();
+			p.englishName = dv.getTextBuffer();
+			p.type = dv.getUint8();
+			p.rigidBodyIndex1 = dv.getNumber( pmx.metadata.rigidBodyIndexSize );
+			p.rigidBodyIndex2 = dv.getNumber( pmx.metadata.rigidBodyIndexSize );
+			p.position = dv.getFloat32Array( 3 );
+			p.rotation = dv.getFloat32Array( 3 );
+			p.translationLimitation1 = dv.getFloat32Array( 3 );
+			p.translationLimitation2 = dv.getFloat32Array( 3 );
+			p.rotationLimitation1 = dv.getFloat32Array( 3 );
+			p.rotationLimitation2 = dv.getFloat32Array( 3 );
+			p.springPosition = dv.getFloat32Array( 3 );
+			p.springRotation = dv.getFloat32Array( 3 );
+			return p;
+
+		};
+
+		var metadata = pmx.metadata;
+		metadata.constraintCount = dv.getUint32();
+
+		pmx.constraints = [];
+
+		for ( var i = 0; i < metadata.constraintCount; i++ ) {
+
+			pmx.constraints.push( parseConstraint() );
+
+		}
+
+	};
+
 	parseHeader();
 	parseVertices();
 	parseFaces();
@@ -778,6 +1159,9 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 	parseMaterials();
 	parseBones();
 	parseMorphs();
+	parseFrames();
+	parseRigidBodies();
+	parseConstraints();
 
 	// console.log( pmx ); // for console debug
 
@@ -892,11 +1276,37 @@ THREE.MMDLoader.prototype.createMesh = function ( model, vmd, texturePath, onPro
 
 		};
 
+		var convertEuler = function ( r ) {
+
+			r[ 0 ] = -r[ 0 ];
+			r[ 1 ] = -r[ 1 ];
+
+		};
+
 		var convertIndexOrder = function ( p ) {
 
 			var tmp = p[ 2 ];
 			p[ 2 ] = p[ 0 ];
 			p[ 0 ] = tmp;
+
+		};
+
+		var convertVectorRange = function ( v1, v2 ) {
+
+			var tmp = -v2[ 2 ];
+			v2[ 2 ] = -v1[ 2 ];
+			v1[ 2 ] = tmp;
+
+		};
+
+		var convertEulerRange = function ( r1, r2 ) {
+
+			var tmp1 = -r2[ 0 ];
+			var tmp2 = -r2[ 1 ];
+			r2[ 0 ] = -r1[ 0 ];
+			r2[ 1 ] = -r1[ 1 ];
+			r1[ 0 ] = tmp1;
+			r1[ 1 ] = tmp2;
 
 		};
 
@@ -943,6 +1353,22 @@ THREE.MMDLoader.prototype.createMesh = function ( model, vmd, texturePath, onPro
 				convertVector( m.elements[ j ].position );
 
 			}
+
+		}
+
+		for ( var i = 0; i < model.metadata.rigidBodyCount; i++ ) {
+
+			convertVector( model.rigidBodies[ i ].position );
+			convertEuler( model.rigidBodies[ i ].rotation );
+
+		}
+
+		for ( var i = 0; i < model.metadata.constraintCount; i++ ) {
+
+			convertVector( model.constraints[ i ].position );
+			convertEuler( model.constraints[ i ].rotation );
+			convertVectorRange( model.constraints[ i ].translationLimitation1, model.constraints[ i ].translationLimitation2 );
+			convertEulerRange( model.constraints[ i ].rotationLimitation1, model.constraints[ i ].rotationLimitation2 );
 
 		}
 
@@ -1034,13 +1460,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, vmd, texturePath, onPro
 			var b = model.bones[ i ];
 
 			bone.parent = b.parentIndex;
-
-			if ( model.metadata.format === 'pmd' ) {
-
-				bone.parent = ( b.parentIndex === 0xFFFF ) ? -1 : b.parentIndex;
-
-			}
-
 			bone.name = b.name;
 			bone.pos = [ b.position[ 0 ], b.position[ 1 ], b.position[ 2 ] ];
 			bone.rotq = [ 0, 0, 0, 1 ];
@@ -1403,6 +1822,88 @@ THREE.MMDLoader.prototype.createMesh = function ( model, vmd, texturePath, onPro
 
 	};
 
+	var initPhysics = function () {
+
+		var rigidBodies = [];
+		var constraints = [];
+
+		for ( var i = 0; i < model.metadata.rigidBodyCount; i++ ) {
+
+			var b = model.rigidBodies[ i ];
+			var keys = Object.keys( b );
+
+			var p = {};
+
+			for ( var j = 0; j < keys.length; j++ ) {
+
+				var key = keys[ j ];
+				p[ key ] = b[ key ];
+
+			}
+
+			/*
+			 * RigidBody position parameter in PMX seems global position
+			 * while the one in PMD seems offset from corresponding bone.
+			 * So unify being offset.
+			 */
+			if ( model.metadata.format === 'pmx' ) {
+
+				if ( p.boneIndex !== -1 ) {
+
+					var bone = model.bones[ p.boneIndex ];
+					p.position[ 0 ] -= bone.position[ 0 ];
+					p.position[ 1 ] -= bone.position[ 1 ];
+					p.position[ 2 ] -= bone.position[ 2 ];
+
+				}
+
+			}
+
+			rigidBodies.push( p );
+
+		}
+
+		for ( var i = 0; i < model.metadata.constraintCount; i++ ) {
+
+			var c = model.constraints[ i ];
+			var keys = Object.keys( c );
+
+			var p = {};
+
+			for ( var j = 0; j < keys.length; j++ ) {
+
+				var key = keys[ j ];
+				p[ key ] = c[ key ];
+
+			}
+
+			var bodyA = rigidBodies[ p.rigidBodyIndex1 ];
+			var bodyB = rigidBodies[ p.rigidBodyIndex2 ];
+
+			/*
+			 * Refer http://www20.atpages.jp/katwat/wp/?p=4135 
+			 * for what this is for
+			 */
+			if ( bodyA.type !== 0 && bodyB.type === 2 ) {
+
+				if ( bodyA.boneIndex !== -1 && bodyB.boneIndex !== -1 &&
+				     model.bones[ bodyB.boneIndex ].parentIndex === bodyA.boneIndex ) {
+
+					bodyB.type = 1;
+
+				}
+
+			}
+
+			constraints.push( p );
+
+		}
+
+		geometry.rigidBodies = rigidBodies;
+		geometry.constraints = constraints;
+
+	};
+
 	var initMotionAnimations = function () {
 
 		var orderedMotions = [];
@@ -1680,6 +2181,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, vmd, texturePath, onPro
 	initIKs();
 	initMorphs();
 	initMaterials();
+	initPhysics();
 
 	if ( vmd !== null ) {
 
