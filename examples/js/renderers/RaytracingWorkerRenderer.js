@@ -135,15 +135,29 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 		context.fillRect( blockX, blockY, blockSize, blockSize );
 	}
 
+	var all = {};
+	function serializeObject( o ) {
+		all[o.uuid] = {
+			position: o.position.toArray(),
+			rotation: o.rotation.toArray(),
+			scale: o.scale.toArray()
+		}
+	}
+
 	this.render = function ( scene, camera ) {
 
 		var sceneJSON = scene.toJSON();
 		var cameraJSON = camera.toJSON();
 
+		scene.traverse( serializeObject );
+		serializeObject( camera );
+
+
 		pool.forEach(function(worker) {
 			worker.postMessage({
 				scene: sceneJSON,
-				camera: cameraJSON
+				camera: cameraJSON,
+				positions: all
 			});
 		});
 

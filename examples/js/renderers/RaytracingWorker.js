@@ -20,8 +20,8 @@ self.onmessage = function(e) {
 		worker = data.worker;
 		workers = data.workers;
 		BLOCK = data.blockSize;
-		eval(data.initScene);
-		initScene(width, height);
+		// eval(data.initScene);
+		// initScene(width, height);
 
 		renderer = new THREE.RaytracingRendererWorker();
 		loader = new THREE.ObjectLoader();
@@ -35,10 +35,15 @@ self.onmessage = function(e) {
 
 	if (data.scene) {
 
-		// console.log('scene!!!', scene, camera)
-		// scene = loader.parse(data.scene);
-		// camera = loader.parse(data.camera);
-
+		scene = loader.parse(data.scene);
+		camera = loader.parse(data.camera);
+		
+		var positions = data.positions;
+		copyPositions(camera, positions);
+		scene.traverse( function(o) {
+			copyPositions( o, positions );
+		} );
+		
 	}
 
 	if (data.render && scene && camera) {
@@ -47,6 +52,14 @@ self.onmessage = function(e) {
 		renderer.render(scene, camera);
 	}
 
+}
+
+function copyPositions(object, positions) {
+	var info = positions[object.uuid];
+
+	object.position.fromArray(info.position);
+	object.scale.fromArray(info.scale);
+	object.rotation.fromArray(info.rotation);
 }
 
 /**
