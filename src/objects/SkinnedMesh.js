@@ -140,7 +140,7 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 			}
 
-			skinWeight.setXYZ( i, vec.x, vec.y, vec.z, vec.w )
+			skinWeight.setXYZW( i, vec.x, vec.y, vec.z, vec.w );
 
 		}
 
