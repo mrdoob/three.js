@@ -39,6 +39,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 	var workers = parameters.workers;
 	var blockSize = parameters.blockSize || 64;
+	var toRender = [], workerId = 0;
 
 	console.log( '%cSpinning off ' + workers + ' Workers ', 'font-size: 20px; background: black; color: white; font-family: monospace;' );
 
@@ -48,9 +49,12 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 		while ( pool.length < workers ) {
 
+			console.log( workers, pool.length );
+
 			var i = pool.length;
 
 			var worker = new Worker( 'js/renderers/RaytracingWorker.js' );
+			worker.id = workerId++;
 
 			worker.onmessage = function( e ) {
 
@@ -70,7 +74,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 					if ( pool.length > workers ) {
 
-						pool.splice( pool.indexOf( this ), 1 )
+						pool.splice( pool.indexOf( this ), 1 );
 						return this.terminate();
 
 					}
@@ -86,15 +90,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 			if ( renderering ) {
 
-				worker.postMessage( {
-
-					init: [ canvasWidth, canvasHeight ],
-					worker: i,
-					workers: pool.length,
-					blockSize: blockSize,
-					initScene: initScene.toString()
-
-				} );
+				updateSettings( worker );
 
 				renderNext( worker );
 
@@ -137,18 +133,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 		context.fillStyle = 'white';
 
-		pool.forEach( function( p, i ) {
-
-			p.postMessage( {
-
-				init: [ width, height ],
-				worker: i,
-				workers: pool.length,
-				blockSize: blockSize
-
-			} );
-
-		} );
+		pool.forEach( updateSettings );
 
 	};
 
@@ -160,17 +145,30 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 	//
 
-	var nextBlock, totalBlocks, xblocks, yblocks;
+	var totalBlocks, xblocks, yblocks;
+
+	function updateSettings( worker ) {
+
+		worker.postMessage( {
+
+			init: [ canvasWidth, canvasHeight ],
+			worker: worker.id,
+			// workers: pool.length,
+			blockSize: blockSize
+
+		} );
+
+	}
 
 	function renderNext( worker ) {
-
-		var current = nextBlock ++;
-		if ( nextBlock > totalBlocks ) {
+		if ( ! toRender.length ) {
 
 			renderering = false;
 			return scope.dispatchEvent( { type: "complete" } );
 
 		}
+
+		var current = toRender.pop();
 
 		var blockX = ( current % xblocks ) * blockSize;
 		var blockY = ( current / xblocks | 0 ) * blockSize;
@@ -189,13 +187,15 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 	var materials = {};
 
+	// additional properties that were not serialize automatically
+
 	var _annex = {
+
 		mirror: 1,
 		reflectivity: 1,
 		refractionRatio: 1,
 		glass: 1,
-		vertexColors: 1,
-		shading: 1
+
 	};
 
 	function serializeObject( o ) {
@@ -207,7 +207,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 		var props = {};
 		for ( var m in _annex ) {
 
-			if ( mat[m] !== undefined ) {
+			if ( mat[ m ] !== undefined ) {
 
 				props[ m ] = mat[ m ];
 
@@ -249,8 +249,29 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 		xblocks = Math.ceil( canvasWidth / blockSize );
 		yblocks = Math.ceil( canvasHeight / blockSize );
-		nextBlock = 0;
 		totalBlocks = xblocks * yblocks;
+
+		toRender = [];
+
+		for ( var i = 0; i < totalBlocks; i ++ ) {
+
+			toRender.push( i );
+
+		}
+
+
+		// Randomize painting :)
+
+		for ( var i = 0; i < totalBlocks; i ++ ) {
+
+			var swap = Math.random()  * totalBlocks | 0;
+			var tmp = toRender[ swap ];
+			toRender[ swap ] = toRender[ i ];
+			toRender[ i ] = tmp;
+
+		}
+
+
 
 		pool.forEach( renderNext );
 

@@ -23,8 +23,9 @@ self.onmessage = function( e ) {
 		workers = data.workers;
 		BLOCK = data.blockSize;
 
-		renderer = new THREE.RaytracingRendererWorker();
-		loader = new THREE.ObjectLoader();
+		if (!renderer) renderer = new THREE.RaytracingRendererWorker();
+		if (!loader) loader = new THREE.ObjectLoader();
+
 		renderer.setSize( width, height );
 
 		// TODO fix passing maxRecursionDepth as parameter.
@@ -82,7 +83,7 @@ self.onmessage = function( e ) {
 
 THREE.RaytracingRendererWorker = function ( parameters ) {
 
-	console.log( 'THREE.RaytracingRenderer', THREE.REVISION );
+	console.log( 'THREE.RaytracingRendererWorker', THREE.REVISION );
 
 	parameters = parameters || {};
 
