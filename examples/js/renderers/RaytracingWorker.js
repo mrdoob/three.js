@@ -2,7 +2,7 @@ var workers, worker;
 var BLOCK = 128;
 var startX, startY, division, completed = 0;
 
-var scene, camera, renderer, loader;
+var scene, camera, renderer, loader, sceneId;
 
 importScripts( '../../../build/three.min.js' );
 
@@ -14,7 +14,6 @@ self.onmessage = function( e ) {
 
 	if ( data.init ) {
 
-		console.log( 'init' )
 		var
 			width = data.init[ 0 ],
 			height = data.init[ 1 ];
@@ -23,8 +22,8 @@ self.onmessage = function( e ) {
 		workers = data.workers;
 		BLOCK = data.blockSize;
 
-		if (!renderer) renderer = new THREE.RaytracingRendererWorker();
-		if (!loader) loader = new THREE.ObjectLoader();
+		if ( ! renderer ) renderer = new THREE.RaytracingRendererWorker();
+		if ( ! loader ) loader = new THREE.ObjectLoader();
 
 		renderer.setSize( width, height );
 
@@ -62,6 +61,7 @@ self.onmessage = function( e ) {
 
 		} );
 
+		sceneId = data.sceneId;
 	}
 
 	if ( data.render && scene && camera ) {
@@ -487,26 +487,21 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 				}
 
 			}
-
+			
 			// Use transferable objects! :)
 			self.postMessage( {
 				data: data.buffer,
 				blockX: blockX,
 				blockY: blockY,
 				blockSize: blockSize,
+				sceneId: sceneId,
+				time: Date.now() - reallyThen, // time for this renderer
 			}, [ data.buffer ] );
 
 			data = new Uint8ClampedArray( blockSize * blockSize * 4 );
 
 			// OK Done!
-
 			completed ++;
-
-			self.postMessage( {
-				type: 'complete',
-				worker: worker,
-				time: Date.now() - reallyThen
-			} );
 
 		};
 

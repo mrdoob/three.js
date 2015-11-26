@@ -39,7 +39,7 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 	var workers = parameters.workers;
 	var blockSize = parameters.blockSize || 64;
-	var toRender = [], workerId = 0;
+	var toRender = [], workerId = 0, sceneId = 0;
 
 	console.log( '%cSpinning off ' + workers + ' Workers ', 'font-size: 20px; background: black; color: white; font-family: monospace;' );
 
@@ -48,11 +48,6 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 		workers = w || navigator.hardwareConcurrency || 4;
 
 		while ( pool.length < workers ) {
-
-			console.log( workers, pool.length );
-
-			var i = pool.length;
-
 			var worker = new Worker( 'js/renderers/RaytracingWorker.js' );
 			worker.id = workerId++;
 
@@ -62,15 +57,14 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 				if ( ! data ) return;
 
-				if ( data.blockSize ) {
+				if ( data.blockSize && sceneId == data.sceneId ) { // we match sceneId here to be sure
 
-					var d = data.data;
-					var imagedata = new ImageData( new Uint8ClampedArray( d ), data.blockSize, data.blockSize );
+					var imagedata = new ImageData( new Uint8ClampedArray( data.data ), data.blockSize, data.blockSize );
 					context.putImageData( imagedata, data.blockX, data.blockY );
 
-				} else if ( data.type == 'complete' ) {
+					// completed
 
-					console.log( 'Worker ' + data.worker, data.time / 1000, ( Date.now() - reallyThen ) / 1000 + ' s' );
+					console.log( 'Worker ' + this.id, data.time / 1000, ( Date.now() - reallyThen ) / 1000 + ' s' );
 
 					if ( pool.length > workers ) {
 
@@ -85,12 +79,19 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 
 			}
 
-			worker.color = new THREE.Color().setHSL( i / workers, 0.8, 0.8 ).getHexString();
+			worker.color = new THREE.Color().setHSL( Math.random() , 0.8, 0.8 ).getHexString();
 			pool.push( worker );
 
 			if ( renderering ) {
 
 				updateSettings( worker );
+
+				worker.postMessage( {
+					scene: sceneJSON,
+					camera: cameraJSON,
+					annex: materials,
+					sceneId: sceneId
+				} );
 
 				renderNext( worker );
 
@@ -176,7 +177,8 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 		worker.postMessage( {
 			render: true,
 			x: blockX,
-			y: blockY
+			y: blockY,
+			sceneId: sceneId
 		} );
 
 		context.fillStyle = '#' + worker.color;
@@ -186,6 +188,8 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 	}
 
 	var materials = {};
+
+	var sceneJSON, cameraJSON, reallyThen;
 
 	// additional properties that were not serialize automatically
 
@@ -231,18 +235,21 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 
-		var sceneJSON = scene.toJSON();
-		var cameraJSON = camera.toJSON();
+		sceneJSON = scene.toJSON();
+		cameraJSON = camera.toJSON();
+		++ sceneId;
 
 		scene.traverse( serializeObject );
 
-		pool.forEach(function(worker) {
-			worker.postMessage({
+		pool.forEach( function( worker ) {
+
+			worker.postMessage( {
 				scene: sceneJSON,
 				camera: cameraJSON,
-				annex: materials
-			});
-		});
+				annex: materials,
+				sceneId: sceneId
+			} );
+		} );
 
 		context.clearRect( 0, 0, canvasWidth, canvasHeight );
 		reallyThen = Date.now();
@@ -274,7 +281,6 @@ THREE.RaytracingWorkerRenderer = function ( parameters ) {
 			}
 
 		}
-
 
 
 		pool.forEach( renderNext );
