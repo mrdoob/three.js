@@ -109,7 +109,7 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 			} else {
 
-				// do nothing
+				sw.set( 1, 0, 0, 0 ); // do something reasonable
 
 			}
 
@@ -136,7 +136,7 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 			} else {
 
-				// do nothing
+				vec.set( 1, 0, 0, 0 ); // do something reasonable
 
 			}
 
