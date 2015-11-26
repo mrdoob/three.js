@@ -95,3 +95,31 @@ test( "centripetal basic check", function() {
 	ok( !error, 'Lists of Vectors3 should be equal.' + desc );
 
 });
+
+test( "closed catmullrom basic check", function() {
+
+	var curve = new THREE.CatmullRomCurve3( positions );
+	curve.type = 'catmullrom';
+	curve.closed = true;
+
+	var closedSplinePoints = [
+		new THREE.Vector3(-60,-100,60),
+		new THREE.Vector3(-67.5,-46.25,67.5),
+		new THREE.Vector3(-60,20,60),
+		new THREE.Vector3(-67.5,83.75,67.5),
+		new THREE.Vector3(-60,120,60),
+		new THREE.Vector3(0,83.75,0),
+		new THREE.Vector3(60,20,-60),
+		new THREE.Vector3(75,-46.25,-75),
+		new THREE.Vector3(60,-100,-60),
+		new THREE.Vector3(0,-115,0),
+		new THREE.Vector3(-60,-100,60),
+	];
+
+	var getPoints = curve.getPoints(10);
+	var error = vectorsAreEqual( getPoints , closedSplinePoints );
+	ok( getPoints.length == 11, 'getPoints should be equal.');
+	var desc = error ? ' ' + error : '';
+	ok( !error, 'Lists of Vectors3 should be equal.' + desc );
+
+});
