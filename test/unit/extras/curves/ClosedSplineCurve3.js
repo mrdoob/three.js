@@ -13,8 +13,6 @@ function vectorsAreEqual( check, that ) {
 	for ( var i = 0; i < check.length; i ++ ) {
 
 		var a = check[ i ], b = that[ i ];
-		console.log( a.distanceToSquared( b ) )
-
 		if ( a.distanceToSquared( b ) > threshold ) {
 
 			return 'Vector differs at index ' + i +
@@ -53,6 +51,7 @@ test( "basic check", function() {
 	var getPoints = closedSpline.getPoints(10);
 	var error = vectorsAreEqual( getPoints , closedSplinePoints );
 	ok( getPoints.length == 11, 'getPoints should be equal.');
-	ok( !error, 'Lists of Vectors3 should be equal.' + error );
+	var desc = error ? ' ' + error : '';
+	ok( !error, 'Lists of Vectors3 should be equal.' + desc );
 
 });
