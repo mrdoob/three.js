@@ -76,13 +76,6 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	extractPosition: function ( m ) {
-
-		console.warn( 'THREE.Matrix4: .extractPosition() has been renamed to .copyPosition().' );
-		return this.copyPosition( m );
-
-	},
-
 	copyPosition: function ( m ) {
 
 		var te = this.elements;
@@ -282,14 +275,6 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setRotationFromQuaternion: function ( q ) {
-
-		console.warn( 'THREE.Matrix4: .setRotationFromQuaternion() has been renamed to .makeRotationFromQuaternion().' );
-
-		return this.makeRotationFromQuaternion( q );
-
-	},
-
 	makeRotationFromQuaternion: function ( q ) {
 
 		var te = this.elements;
@@ -450,27 +435,6 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	multiplyVector3: function ( vector ) {
-
-		console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
-		return vector.applyProjection( this );
-
-	},
-
-	multiplyVector4: function ( vector ) {
-
-		console.warn( 'THREE.Matrix4: .multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
-		return vector.applyMatrix4( this );
-
-	},
-
-	multiplyVector3Array: function ( a ) {
-
-		console.warn( 'THREE.Matrix4: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
-		return this.applyToVector3Array( a );
-
-	},
-
 	applyToVector3Array: function () {
 
 		var v1;
@@ -522,21 +486,6 @@ THREE.Matrix4.prototype = {
 		};
 
 	}(),
-
-	rotateAxis: function ( v ) {
-
-		console.warn( 'THREE.Matrix4: .rotateAxis() has been removed. Use Vector3.transformDirection( matrix ) instead.' );
-
-		v.transformDirection( this );
-
-	},
-
-	crossVector: function ( vector ) {
-
-		console.warn( 'THREE.Matrix4: .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
-		return vector.applyMatrix4( this );
-
-	},
 
 	determinant: function () {
 
@@ -714,36 +663,6 @@ THREE.Matrix4.prototype = {
 		this.multiplyScalar( 1 / det );
 
 		return this;
-
-	},
-
-	translate: function ( v ) {
-
-		console.error( 'THREE.Matrix4: .translate() has been removed.' );
-
-	},
-
-	rotateX: function ( angle ) {
-
-		console.error( 'THREE.Matrix4: .rotateX() has been removed.' );
-
-	},
-
-	rotateY: function ( angle ) {
-
-		console.error( 'THREE.Matrix4: .rotateY() has been removed.' );
-
-	},
-
-	rotateZ: function ( angle ) {
-
-		console.error( 'THREE.Matrix4: .rotateZ() has been removed.' );
-
-	},
-
-	rotateByAxis: function ( axis, angle ) {
-
-		console.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
 
 	},
 

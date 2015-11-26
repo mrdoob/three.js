@@ -1,12 +1,16 @@
+vec3 shadowMask = vec3( 1.0 );
+
 #ifdef USE_SHADOWMAP
 
-	for ( int i = 0; i < MAX_SHADOWS; i ++ ) {
+	float shadows[ NUM_SHADOWS ];
+
+	for ( int i = 0; i < NUM_SHADOWS; i ++ ) {
 
 		float texelSizeY =  1.0 / shadowMapSize[ i ].y;
 
 		float shadow = 0.0;
 
-#if defined( POINT_LIGHT_SHADOWS )
+#ifdef POINT_LIGHT_SHADOWS
 
 		// to save on uniform space, we use the sign of @shadowDarkness[ i ] to determine
 		// whether or not this light is a point light ( shadowDarkness[ i ] < 0 == point light)
@@ -249,13 +253,15 @@
 
 #endif
 
-#if defined( POINT_LIGHT_SHADOWS )
+#ifdef POINT_LIGHT_SHADOWS
 
 		}
 
 #endif
 
 		shadowMask = shadowMask * vec3( 1.0 - shadow );
+
+		shadows[ i ] = 1.0 - shadow;
 
 	}
 

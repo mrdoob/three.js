@@ -19,7 +19,7 @@ THREE.MTLLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( this.manager );
-		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
@@ -28,7 +28,15 @@ THREE.MTLLoader.prototype = {
 
 	},
 
+	setPath: function ( value ) {
+
+		this.path = value;
+
+	},
+
 	setBaseUrl: function( value ) {
+
+		// TODO: Merge with setPath()? Or rename to setTexturePath?
 
 		this.baseUrl = value;
 
@@ -124,8 +132,6 @@ THREE.MTLLoader.prototype = {
  *                                Default: false, assumed to be already normalized
  *                  ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's
  *                                  Default: false
- *                  invertTransparency: If transparency need to be inverted (inversion is needed if d = 0 is fully opaque)
- *                                      Default: false (d = 1 is fully opaque)
  * @constructor
  */
 
@@ -218,20 +224,6 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 						break;
 
-					case 'd':
-
-						// According to MTL format (http://paulbourke.net/dataformats/mtl/):
-						//   d is dissolve for current material
-						//   factor of 1.0 is fully opaque, a factor of 0 is fully dissolved (completely transparent)
-
-						if ( this.options && this.options.invertTransparency ) {
-
-							value = 1 - value;
-
-						}
-
-						break;
-
 					default:
 
 						break;
@@ -311,6 +303,10 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 			var value = mat[ prop ];
 
+			if ( value === '' ) {
+				continue;
+			}
+
 			switch ( prop.toLowerCase() ) {
 
 				// Ns is material specular exponent
@@ -320,12 +316,6 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					// Diffuse color (color under white light) using RGB values
 
 					params[ 'color' ] = new THREE.Color().fromArray( value );
-
-					break;
-
-				case 'ka':
-
-					// Ambient color (color under shadow) using RGB values
 
 					break;
 
@@ -357,14 +347,21 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 				case 'd':
 
-					// According to MTL format (http://paulbourke.net/dataformats/mtl/):
-					//   d is dissolve for current material
-					//   factor of 1.0 is fully opaque, a factor of 0 is fully dissolved (completely transparent)
-
 					if ( value < 1 ) {
 
-						params[ 'transparent' ] = true;
 						params[ 'opacity' ] = value;
+						params[ 'transparent' ] = true;
+
+					}
+
+					break;
+
+				case 'Tr':
+
+					if ( value > 0 ) {
+
+						params[ 'opacity' ] = 1 - value;
+						params[ 'transparent' ] = true;
 
 					}
 
@@ -402,64 +399,20 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 		var loader = THREE.Loader.Handlers.get( url );
 		var manager = ( this.manager !== undefined ) ? this.manager : THREE.DefaultLoadingManager;
 
-		if ( loader !== null ) {
+		if ( loader === null ) {
 
-			texture = loader.load( url, onLoad );
-
-		} else {
-
-			texture = new THREE.Texture();
-
-			loader = new THREE.ImageLoader( manager );
-			loader.setCrossOrigin( this.crossOrigin );
-			loader.load( url, function ( image ) {
-
-				texture.image = THREE.MTLLoader.ensurePowerOfTwo_( image );
-				texture.needsUpdate = true;
-
-				if ( onLoad ) onLoad( texture );
-
-			}, onProgress, onError );
+			loader = new THREE.TextureLoader( manager );
 
 		}
+
+		if ( loader.setCrossOrigin ) loader.setCrossOrigin( this.crossOrigin );
+		texture = loader.load( url, onLoad, onProgress, onError );
 
 		if ( mapping !== undefined ) texture.mapping = mapping;
 
 		return texture;
 
 	}
-
-};
-
-THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
-
-	if ( ! THREE.Math.isPowerOfTwo( image.width ) || ! THREE.Math.isPowerOfTwo( image.height ) ) {
-
-		var canvas = document.createElement( "canvas" );
-		canvas.width = THREE.MTLLoader.nextHighestPowerOfTwo_( image.width );
-		canvas.height = THREE.MTLLoader.nextHighestPowerOfTwo_( image.height );
-
-		var ctx = canvas.getContext( "2d" );
-		ctx.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
-		return canvas;
-
-	}
-
-	return image;
-
-};
-
-THREE.MTLLoader.nextHighestPowerOfTwo_ = function( x ) {
-
-	-- x;
-
-	for ( var i = 1; i < 32; i <<= 1 ) {
-
-		x = x | x >> i;
-
-	}
-
-	return x + 1;
 
 };
 

@@ -14,6 +14,8 @@ THREE.XHRLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		if ( this.path !== undefined ) url = this.path + url;
+
 		var scope = this;
 
 		var cached = THREE.Cache.get( url );
@@ -35,6 +37,7 @@ THREE.XHRLoader.prototype = {
 		}
 
 		var request = new XMLHttpRequest();
+		request.overrideMimeType( 'text/plain' );
 		request.open( 'GET', url, true );
 
 		request.addEventListener( 'load', function ( event ) {
@@ -43,9 +46,19 @@ THREE.XHRLoader.prototype = {
 
 			THREE.Cache.add( url, response );
 
-			if ( onLoad ) onLoad( response );
+			if ( this.status === 200 && this.readyState === 4 ) {
 
-			scope.manager.itemEnd( url );
+				if ( onLoad ) onLoad( response );
+
+				scope.manager.itemEnd( url );
+
+			} else {
+
+				if ( onError ) onError( event );
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, false );
 
@@ -67,7 +80,6 @@ THREE.XHRLoader.prototype = {
 
 		}, false );
 
-		if ( this.crossOrigin !== undefined ) request.crossOrigin = this.crossOrigin;
 		if ( this.responseType !== undefined ) request.responseType = this.responseType;
 		if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
@@ -79,15 +91,15 @@ THREE.XHRLoader.prototype = {
 
 	},
 
-	setResponseType: function ( value ) {
+	setPath: function ( value ) {
 
-		this.responseType = value;
+		this.path = value;
 
 	},
 
-	setCrossOrigin: function ( value ) {
+	setResponseType: function ( value ) {
 
-		this.crossOrigin = value;
+		this.responseType = value;
 
 	},
 

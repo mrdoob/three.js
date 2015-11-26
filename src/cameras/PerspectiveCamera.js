@@ -123,18 +123,18 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 };
 
 THREE.PerspectiveCamera.prototype.copy = function ( source ) {
-	
+
 	THREE.Camera.prototype.copy.call( this, source );
-	
+
 	this.fov = source.fov;
 	this.aspect = source.aspect;
 	this.near = source.near;
 	this.far = source.far;
-	
+
 	this.zoom = source.zoom;
-	
+
 	return this;
-		
+
 };
 
 THREE.PerspectiveCamera.prototype.toJSON = function ( meta ) {

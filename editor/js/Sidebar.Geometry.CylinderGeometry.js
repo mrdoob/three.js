@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
+Sidebar.Geometry.CylinderGeometry = function ( editor, object ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 
@@ -72,20 +74,14 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 
 	function update() {
 
-		object.geometry.dispose();
-
-		object.geometry = new THREE.CylinderGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE.CylinderGeometry(
 			radiusTop.getValue(),
 			radiusBottom.getValue(),
 			height.getValue(),
 			radialSegments.getValue(),
 			heightSegments.getValue(),
 			openEnded.getValue()
-		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.geometryChanged.dispatch( object );
+		) ) );
 
 	}
 
