@@ -4,15 +4,22 @@
 
 module( "ClosedSplineCurve3" );
 
+var threshold = 0.000001;
+
 function vectorsAreEqual( check, that ) {
 
 	if ( check.length !== that.length ) return 'Length not equal';
 
 	for ( var i = 0; i < check.length; i ++ ) {
 
-		if ( ! check[ i ] .equals( that[ i ] ) ) {
+		var a = check[ i ], b = that[ i ];
+		console.log( a.distanceToSquared( b ) )
 
-			return 'Vector differs at index ' + i;
+		if ( a.distanceToSquared( b ) > threshold ) {
+
+			return 'Vector differs at index ' + i +
+				'. Should be ' + [ a.x, a.y, a.z ] +
+				' instead of ' + [ b.x, b.y, b.z ];
 		}
 	}
 
@@ -45,7 +52,7 @@ test( "basic check", function() {
 
 	var getPoints = closedSpline.getPoints(10);
 	var error = vectorsAreEqual( getPoints , closedSplinePoints );
-	ok( getPoints.length == 11, 'getPoints are equal.' + error );
-	ok( !error, 'Points are equal.' + error );
+	ok( getPoints.length == 11, 'getPoints should be equal.');
+	ok( !error, 'Lists of Vectors3 should be equal.' + error );
 
 });
