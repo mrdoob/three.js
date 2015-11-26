@@ -34,6 +34,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	var workers = parameters.workers;
 	var blockSize = parameters.blockSize || 64;
+	this.randomize = parameters.randomize;
+
 	var toRender = [], workerId = 0, sceneId = 0;
 
 	console.log( '%cSpinning off ' + workers + ' Workers ', 'font-size: 20px; background: black; color: white; font-family: monospace;' );
