@@ -1,4 +1,4 @@
-var workers, worker;
+var worker;
 var BLOCK = 128;
 var startX, startY, division, completed = 0;
 
@@ -19,7 +19,6 @@ self.onmessage = function( e ) {
 			height = data.init[ 1 ];
 
 		worker = data.worker;
-		workers = data.workers;
 		BLOCK = data.blockSize;
 
 		if ( ! renderer ) renderer = new THREE.RaytracingRendererWorker();
@@ -487,7 +486,7 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 				}
 
 			}
-			
+
 			// Use transferable objects! :)
 			self.postMessage( {
 				data: data.buffer,
