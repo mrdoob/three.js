@@ -16,10 +16,19 @@
  *  - if possible, make this class being non-MMD specific.
  */
 
-THREE.MMDPhysics = function ( mesh ) {
+THREE.MMDPhysics = function ( mesh, params ) {
 
 	this.mesh = mesh;
 	this.helper = new THREE.MMDPhysics.PhysicsHelper();
+
+	/*
+	 * Note: Default 1 / 65 unit step is a workaround that
+	 *       some bones go wrong at near 60fps if it's 1 / 60.
+	 *       Be careful that small unitStep could cause heavy
+	 *       physics calculation.
+	 */
+	this.unitStep = ( params && params.unitStep ) ? params.unitStep : 1 / 65;
+	this.maxStepNum = ( params && params.maxStepNum ) ? params.maxStepNum : 3;
 
 	this.world = null;
 	this.bodies = [];
@@ -86,13 +95,13 @@ THREE.MMDPhysics.prototype = {
 
 	update: function ( delta ) {
 
-		var unitStep = 1 / 60;
+		var unitStep = this.unitStep;
 		var stepTime = delta;
 		var maxStepNum = ( ( delta / unitStep ) | 0 ) + 1;
 
-		if ( maxStepNum > 3 ) {
+		if ( maxStepNum > this.maxStepNum ) {
 
-			maxStepNum = 3;
+			maxStepNum = this.maxStepNum;
 
 		}
 
@@ -790,16 +799,21 @@ THREE.MMDPhysics.RigidBody.prototype = {
 
 		var thQ = helper.allocThreeQuaternion();
 		var thQ2 = helper.allocThreeQuaternion();
+		var thQ3 = helper.allocThreeQuaternion();
 
 		thQ.set( q.x(), q.y(), q.z(), q.w() );
 		thQ2.setFromRotationMatrix( this.bone.matrixWorld );
 		thQ2.conjugate()
 		thQ2.multiply( thQ );
 
-		this.bone.quaternion.multiply( thQ2 );
+		//this.bone.quaternion.multiply( thQ2 );
+
+		thQ3.setFromRotationMatrix( this.bone.matrix );
+		this.bone.quaternion.copy( thQ2.multiply( thQ3 ) );
 
 		helper.freeThreeQuaternion( thQ );
 		helper.freeThreeQuaternion( thQ2 );
+		helper.freeThreeQuaternion( thQ3 );
 
 		helper.freeQuaternion( q );
 		helper.freeTransform( tr );
