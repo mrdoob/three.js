@@ -272,7 +272,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 							var group = groups[ k ];
 							var groupMaterial = materials[ group.materialIndex ];
 
-							if ( groupMaterial.visible === true ) {
+							if ( groupMaterial && groupMaterial.visible === true ) {
 
 								var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
 								_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );

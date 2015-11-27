@@ -1317,7 +1317,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 								var group = groups[ i ];
 								var groupMaterial = materials[ group.materialIndex ];
 
-								if ( groupMaterial.visible === true ) {
+								if ( groupMaterial && groupMaterial.visible === true ) {
 
 									pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
 
