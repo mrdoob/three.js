@@ -8,6 +8,7 @@ THREE.LightShadow = function ( camera ) {
 
 	this.bias = 0;
 	this.darkness = 1;
+	this.lightRadius = 0.05; // default bulb size is 5cm
 
 	this.mapSize = new THREE.Vector2( 512, 512 );
 
@@ -26,6 +27,7 @@ THREE.LightShadow.prototype = {
 
 		this.bias = source.bias;
 		this.darkness = source.darkness;
+		this.lightRadius = source.lightRadius;
 
 		this.mapSize.copy( source.mapSize );
 
