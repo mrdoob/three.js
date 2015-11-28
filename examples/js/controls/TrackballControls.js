@@ -9,9 +9,18 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	var _this = this;
 	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
+	var currentWindow, currentDocument;
+
+	if (domElement !== undefined) {
+		currentWindow = domElement.ownerDocument.defaultView || domElement.ownerDocument.parentWindow;
+		currentDocument = domElement.ownerDocument;
+		this.domElement = domElement;
+	} else {
+		currentWindow = window;
+		this.domElement = currentDocument = currentWindow.document;
+	}
 
 	this.object = object;
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
 	// API
 
@@ -80,20 +89,20 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.handleResize = function () {
 
-		if ( this.domElement === document ) {
+		if ( this.domElement === currentDocument ) {
 
 			this.screen.left = 0;
 			this.screen.top = 0;
-			this.screen.width = window.innerWidth;
-			this.screen.height = window.innerHeight;
+			this.screen.width = currentWindow.innerWidth;
+			this.screen.height = currentWindow.innerHeight;
 
 		} else {
 
 			var box = this.domElement.getBoundingClientRect();
 			// adjustments come from similar code in the jquery offset() function
 			var d = this.domElement.ownerDocument.documentElement;
-			this.screen.left = box.left + window.pageXOffset - d.clientLeft;
-			this.screen.top = box.top + window.pageYOffset - d.clientTop;
+			this.screen.left = box.left + currentWindow.pageXOffset - d.clientLeft;
+			this.screen.top = box.top + currentWindow.pageYOffset - d.clientTop;
 			this.screen.width = box.width;
 			this.screen.height = box.height;
 
@@ -356,7 +365,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _this.enabled === false ) return;
 
-		window.removeEventListener( 'keydown', keydown );
+		currentWindow.removeEventListener( 'keydown', keydown );
 
 		_prevState = _state;
 
@@ -386,7 +395,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		_state = _prevState;
 
-		window.addEventListener( 'keydown', keydown, false );
+		currentWindow.addEventListener( 'keydown', keydown, false);
 
 	}
 
@@ -420,8 +429,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		}
 
-		document.addEventListener( 'mousemove', mousemove, false );
-		document.addEventListener( 'mouseup', mouseup, false );
+		currentDocument.addEventListener( 'mousemove', mousemove, false );
+		currentDocument.addEventListener( 'mouseup', mouseup, false );
 
 		_this.dispatchEvent( startEvent );
 
@@ -460,8 +469,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		_state = STATE.NONE;
 
-		document.removeEventListener( 'mousemove', mousemove );
-		document.removeEventListener( 'mouseup', mouseup );
+		currentDocument.removeEventListener( 'mousemove', mousemove );
+		currentDocument.removeEventListener( 'mouseup', mouseup );
 		_this.dispatchEvent( endEvent );
 
 	}
@@ -603,13 +612,13 @@ THREE.TrackballControls = function ( object, domElement ) {
 		this.domElement.removeEventListener( 'touchend', touchend, false );
 		this.domElement.removeEventListener( 'touchmove', touchmove, false );
 
-		document.removeEventListener( 'mousemove', mousemove, false );
-		document.removeEventListener( 'mouseup', mouseup, false );
+		currentDocument.removeEventListener( 'mousemove', mousemove, false );
+		currentDocument.removeEventListener( 'mouseup', mouseup, false );
 
-		window.removeEventListener( 'keydown', keydown, false );
-		window.removeEventListener( 'keyup', keyup, false );
+		currentWindow.removeEventListener( 'keydown', keydown, false );
+		currentWindow.removeEventListener( 'keyup', keyup, false );
 
-	}
+	};
 
 	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 	this.domElement.addEventListener( 'mousedown', mousedown, false );
@@ -620,8 +629,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'touchend', touchend, false );
 	this.domElement.addEventListener( 'touchmove', touchmove, false );
 
-	window.addEventListener( 'keydown', keydown, false );
-	window.addEventListener( 'keyup', keyup, false );
+	currentWindow.addEventListener( 'keydown', keydown, false );
+	currentWindow.addEventListener( 'keyup', keyup, false );
 
 	this.handleResize();
 
