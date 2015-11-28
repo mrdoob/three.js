@@ -6,6 +6,11 @@ var Editor = function () {
 
 	var SIGNALS = signals;
 
+	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 1, 10000 );
+	this.DEFAULT_CAMERA.name = 'Camera';
+	this.DEFAULT_CAMERA.position.set( 20, 10, 20 );
+	this.DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
+
 	this.signals = {
 
 		// script
@@ -74,10 +79,7 @@ var Editor = function () {
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
-	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 10000 );
-	this.camera.position.set( 20, 10, 20 );
-	this.camera.lookAt( new THREE.Vector3() );
-	this.camera.name = 'Camera';
+	this.camera = this.DEFAULT_CAMERA.clone();
 
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
@@ -408,8 +410,7 @@ Editor.prototype = {
 		this.history.clear();
 		this.storage.clear();
 
-		this.camera.position.set( 20, 10, 20 );
-		this.camera.lookAt( new THREE.Vector3() );
+		this.camera.copy( this.DEFAULT_CAMERA );
 
 		var objects = this.scene.children;
 
@@ -456,11 +457,7 @@ Editor.prototype = {
 
 		var camera = loader.parse( json.camera );
 
-		this.camera.position.copy( camera.position );
-		this.camera.rotation.copy( camera.rotation );
-		this.camera.aspect = camera.aspect;
-		this.camera.near = camera.near;
-		this.camera.far = camera.far;
+		this.camera.copy( camera );
 
 		this.setScene( loader.parse( json.scene ) );
 		this.scripts = json.scripts;
@@ -529,4 +526,4 @@ Editor.prototype = {
 
 	}
 
-}
+};
