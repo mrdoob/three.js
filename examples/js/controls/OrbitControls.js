@@ -424,7 +424,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// event callbacks - update the object state
 	//
 
-	handleMouseDownRotate = function( event ) {
+	var handleMouseDownRotate = function( event ) {
 
 		//console.log( 'handleMouseDownRotate' );
 
@@ -432,7 +432,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleMouseDownDolly = function( event ) {
+	var handleMouseDownDolly = function( event ) {
 
 		//console.log( 'handleMouseDownDolly' );
 
@@ -440,7 +440,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleMouseDownPan = function( event ) {
+	var handleMouseDownPan = function( event ) {
 
 		//console.log( 'handleMouseDownPan' );
 
@@ -448,7 +448,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleMouseMoveRotate = function( event ) {
+	var handleMouseMoveRotate = function( event ) {
 
 		//console.log( 'handleMouseMoveRotate' );
 
@@ -469,7 +469,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleMouseMoveDolly = function( event ) {
+	var handleMouseMoveDolly = function( event ) {
 
 		//console.log( 'handleMouseMoveDolly' );
 
@@ -493,7 +493,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleMouseMovePan = function( event ) {
+	var handleMouseMovePan = function( event ) {
 
 		//console.log( 'handleMouseMovePan' );
 
@@ -509,13 +509,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleMouseUp = function( event ) {
+	var handleMouseUp = function( event ) {
 
 		//console.log( 'handleMouseUp' );
 
 	};
 
-	handleMouseWheel = function( event ) {
+	var handleMouseWheel = function( event ) {
 
 		//console.log( 'handleMouseWheel' );
 
@@ -549,7 +549,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleKeyDown = function( event ) {
+	var handleKeyDown = function( event ) {
 
 		//console.log( 'handleKeyDown' );
 
@@ -579,7 +579,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleTouchStartRotate = function( event ) {
+	var handleTouchStartRotate = function( event ) {
 
 		//console.log( 'handleTouchStartRotate' );
 
@@ -587,7 +587,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleTouchStartDolly = function( event ) {
+	var handleTouchStartDolly = function( event ) {
 
 		//console.log( 'handleTouchStartDolly' );
 
@@ -600,7 +600,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleTouchStartPan = function( event ) {
+	var handleTouchStartPan = function( event ) {
 
 		//console.log( 'handleTouchStartPan' );
 
@@ -608,7 +608,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleTouchMoveRotate = function( event ) {
+	var handleTouchMoveRotate = function( event ) {
 
 		//console.log( 'handleTouchMoveRotate' );
 
@@ -629,7 +629,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleTouchMoveDolly = function( event ) {
+	var handleTouchMoveDolly = function( event ) {
 
 		//console.log( 'handleTouchMoveDolly' );
 
@@ -658,7 +658,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleTouchMovePan = function( event ) {
+	var handleTouchMovePan = function( event ) {
 
 		//console.log( 'handleTouchMovePan' );
 
@@ -674,7 +674,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	handleTouchEnd = function( event ) {
+	var handleTouchEnd = function( event ) {
 
 		//console.log( 'handleTouchEnd' );
 
