@@ -13,6 +13,7 @@ Sidebar.Scene = function ( editor ) {
 	var ignoreObjectSelectedSignal = false;
 
 	var outliner = new UI.Outliner( editor );
+	outliner.setId( 'outliner' );
 	outliner.onChange( function () {
 
 		ignoreObjectSelectedSignal = true;
