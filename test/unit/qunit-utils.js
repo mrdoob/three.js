@@ -207,9 +207,11 @@ function checkLightClone( light ) {
 function checkLightJsonWriting( light, json ) {
 
 	QUnit.assert.equal( json.metadata.version, "4.4", "check metadata version" );
-	QUnit.assert.equalKey( light, json, 'type' );
-	QUnit.assert.equalKey( light, json, 'uuid' );
-	QUnit.assert.equal( json.id, undefined, "should not persist id" );
+
+	var object = json.object;
+	QUnit.assert.equalKey( light, object, 'type' );
+	QUnit.assert.equalKey( light, object, 'uuid' );
+	QUnit.assert.equal( object.id, undefined, "should not persist id" );
 
 }
 
@@ -227,7 +229,7 @@ function checkLightJsonReading( json, light ) {
 function checkLightJsonRoundtrip( light ) {
 
 	var json = light.toJSON();
-	checkLightJsonWriting( light, json.object );
+	checkLightJsonWriting( light, json );
 	checkLightJsonReading( json, light );
 
 }
