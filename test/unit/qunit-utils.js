@@ -58,9 +58,11 @@ function checkGeometryClone( geom ) {
 	QUnit.assert.notEqual( copy.id, geom.id, "clone id should differ from original" );
 
 	var excludedProperties = [ 'parameters', 'widthSegments', 'heightSegments', 'depthSegments' ];
-	var differingProp = getDifferingProp( geom, copy, excludedProperties );
-	var differingProp = getDifferingProp( copy, geom, excludedProperties );
 
+	var differingProp = getDifferingProp( geom, copy, excludedProperties );
+	ok( differingProp === undefined, 'properties are equal' );
+
+	differingProp = getDifferingProp( copy, geom, excludedProperties );
 	ok( differingProp === undefined, 'properties are equal' );
 
 	// json round trip with clone
@@ -68,7 +70,9 @@ function checkGeometryClone( geom ) {
 
 }
 
-function getDifferingProp( geometryA, geometryB, excludedProperties ) {
+function getDifferingProp( geometryA, geometryB, excludedProperties) {
+	excludedProperties = excludedProperties || [];
+
 	var geometryKeys = Object.keys( geometryA );
 	var cloneKeys = Object.keys( geometryB );
 
@@ -137,7 +141,20 @@ function checkGeometryJsonReading( json, geom ) {
 	var output = loader.parseGeometries( wrap );
 
 	QUnit.assert.ok( output[ geom.uuid ], 'geometry matching source uuid not in output' );
-	QUnit.assert.smartEqual( output[ geom.uuid ], geom, 'Reconstruct geometry from ObjectLoader' );
+	// QUnit.assert.smartEqual( output[ geom.uuid ], geom, 'Reconstruct geometry from ObjectLoader' );
+
+	var differing = getDifferingProp(output[ geom.uuid ], geom, ['bones']);
+	if (differing) {
+		console.log(differing);
+	}
+
+	var excludedProperties = [ 'bones' ];
+
+	var differingProp = getDifferingProp( output[ geom.uuid ], geom, excludedProperties );
+	ok( differingProp === undefined, 'properties are equal' );
+
+	differingProp = getDifferingProp( geom, output[ geom.uuid ], excludedProperties );
+	ok( differingProp === undefined, 'properties are equal' );
 }
 
 // Verify geom -> json -> geom
