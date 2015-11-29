@@ -56,12 +56,41 @@ function checkGeometryClone( geom ) {
 	var copy = geom.clone();
 	QUnit.assert.notEqual( copy.uuid, geom.uuid, "clone uuid should differ from original" );
 	QUnit.assert.notEqual( copy.id, geom.id, "clone id should differ from original" );
-	QUnit.assert.smartEqual( copy, geom, "clone is equal to original" );
 
+	var excludedProperties = [ 'parameters', 'widthSegments', 'heightSegments', 'depthSegments' ];
+	var differingProp = getDifferingProp( geom, copy, excludedProperties );
+	var differingProp = getDifferingProp( copy, geom, excludedProperties );
+
+	ok( differingProp === undefined, 'properties are equal' );
 
 	// json round trip with clone
 	checkGeometryJsonRoundtrip( copy );
 
+}
+
+function getDifferingProp( geometryA, geometryB, excludedProperties ) {
+	var geometryKeys = Object.keys( geometryA );
+	var cloneKeys = Object.keys( geometryB );
+
+	var keysWhichAreNotChecked = [ 'parameters', 'widthSegments', 'heightSegments', 'depthSegments' ];
+	var differingProp = undefined;
+
+	for ( var i = 0, l = geometryKeys.length; i < l; i++ ) {
+
+		var key = geometryKeys[ i ];
+
+		if ( excludedProperties.indexOf(key) >= 0 ) {
+			continue;
+		}
+
+		if ( cloneKeys.indexOf( key ) < 0 ) {
+			differingProp = key;
+			break;
+		}
+
+	}
+
+	return differingProp;
 }
 
 // Compare json file with its source geometry.
