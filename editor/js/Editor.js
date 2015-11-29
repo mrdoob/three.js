@@ -458,10 +458,10 @@ Editor.prototype = {
 		var camera = loader.parse( json.camera );
 
 		this.camera.copy( camera );
+		this.history.fromJSON( json.history );
+		this.scripts = json.scripts;
 
 		this.setScene( loader.parse( json.scene ) );
-		this.scripts = json.scripts;
-		this.history.fromJSON( json.history );
 
 	},
 

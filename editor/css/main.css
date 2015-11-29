@@ -158,3 +158,9 @@ textarea, input { outline: none; } /* osx */
 #outliner .MeshPhongMaterial {
 	color: #ffaa88;
 }
+
+/* */
+
+#outliner .Script:after {
+	content: '{...}' /* ❮/❯ */
+}

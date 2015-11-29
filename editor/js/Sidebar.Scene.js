@@ -128,7 +128,19 @@ Sidebar.Scene = function ( editor ) {
 		var options = [];
 
 		options.push( { static: true, value: camera.id, html: '<span class="type ' + camera.type + '"></span> ' + camera.name } );
-		options.push( { static: true, value: scene.id, html: '<span class="type ' + scene.type + '"></span> ' + scene.name } );
+		options.push( { static: true, value: scene.id, html: '<span class="type ' + scene.type + '"></span> ' + scene.name + getScript( scene.uuid ) } );
+
+		function getScript( uuid ) {
+
+			if ( editor.scripts[ uuid ] !== undefined ) {
+
+				return ' <span class="type Script"></span>';
+
+			}
+
+			return '';
+
+		}
 
 		( function addObjects( objects, pad ) {
 
@@ -147,6 +159,8 @@ Sidebar.Scene = function ( editor ) {
 					html += ' <span class="type ' + material.type + '"></span> ' + material.name;
 
 				}
+
+				html += getScript( object.uuid );
 
 				options.push( { value: object.id, html: html } );
 
