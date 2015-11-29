@@ -18,6 +18,14 @@ THREE.WebGLLights = function () {
 
 		switch ( light.type ) {
 
+			case 'HemisphereLight':
+				uniforms = {
+					direction: new THREE.Vector3(),
+					skyColor: new THREE.Color(),
+					groundColor: new THREE.Color()
+				};
+				break;
+
 			case 'DirectionalLight':
 				uniforms = {
 					direction: new THREE.Vector3(),
@@ -42,16 +50,10 @@ THREE.WebGLLights = function () {
 					direction: new THREE.Vector3(),
 					color: new THREE.Color(),
 					distance: 0,
+					angleCos: 0,
+					exponent: 0,
 					decay: 0,
-					angleCos: 0
-				};
-				break;
-
-			case 'HemisphereLight':
-				uniforms = {
-					direction: new THREE.Vector3(),
-					skyColor: new THREE.Color(),
-					groundColor: new THREE.Color()
+					shadow: -1
 				};
 				break;
 
