@@ -22698,7 +22698,7 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 	if ( this.geometry instanceof THREE.Geometry ) {
 
-		for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
+		for ( var i = 0; i < this.geometry.skinWeights.length; i ++ ) {
 
 			var sw = this.geometry.skinWeights[ i ];
 
@@ -22710,15 +22710,40 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 			} else {
 
-				sw.set( 1 ); // this will be normalized by the shader anyway
+				sw.set( 1, 0, 0, 0 ); // do something reasonable
 
 			}
 
 		}
 
-	} else {
+	} else if ( this.geometry instanceof THREE.BufferGeometry ) {
 
-		// skinning weights assumed to be normalized for THREE.BufferGeometry
+		var vec = new THREE.Vector4();
+
+		var skinWeight = this.geometry.attributes.skinWeight;
+
+		for ( var i = 0; i < skinWeight.count; i ++ ) {
+
+			vec.x = skinWeight.getX( i );
+			vec.y = skinWeight.getY( i );
+			vec.z = skinWeight.getZ( i );
+			vec.w = skinWeight.getW( i );
+
+			var scale = 1.0 / vec.lengthManhattan();
+
+			if ( scale !== Infinity ) {
+
+				vec.multiplyScalar( scale );
+
+			} else {
+
+				vec.set( 1, 0, 0, 0 ); // do something reasonable
+
+			}
+
+			skinWeight.setXYZW( i, vec.x, vec.y, vec.z, vec.w );
+
+		}
 
 	}
 
@@ -28101,8 +28126,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
 		var isTargetPowerOfTwo = THREE.Math.isPowerOfTwo( renderTarget.width ) && THREE.Math.isPowerOfTwo( renderTarget.height );
-		var glFormat = paramThreeToGL( renderTarget.texture.format );
-		var glType = paramThreeToGL( renderTarget.texture.type );
 
 		// Setup framebuffer
 
@@ -28623,8 +28646,6 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		}
 
-		var index = geometry.index;
-
 		extension.drawElementsInstancedANGLE( mode, count, type, start * size, geometry.maxInstancedCount );
 
 	}
@@ -28908,6 +28929,14 @@ THREE.WebGLLights = function () {
 
 		switch ( light.type ) {
 
+			case 'HemisphereLight':
+				uniforms = {
+					direction: new THREE.Vector3(),
+					skyColor: new THREE.Color(),
+					groundColor: new THREE.Color()
+				};
+				break;
+
 			case 'DirectionalLight':
 				uniforms = {
 					direction: new THREE.Vector3(),
@@ -28932,16 +28961,10 @@ THREE.WebGLLights = function () {
 					direction: new THREE.Vector3(),
 					color: new THREE.Color(),
 					distance: 0,
+					angleCos: 0,
+					exponent: 0,
 					decay: 0,
-					angleCos: 0
-				};
-				break;
-
-			case 'HemisphereLight':
-				uniforms = {
-					direction: new THREE.Vector3(),
-					skyColor: new THREE.Color(),
-					groundColor: new THREE.Color()
+					shadow: -1
 				};
 				break;
 
@@ -30121,9 +30144,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_state = _renderer.state,
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
-
-	_min = new THREE.Vector3(),
-	_max = new THREE.Vector3(),
 
 	_lookTarget = new THREE.Vector3(),
 	_lightPositionWorld = new THREE.Vector3(),
