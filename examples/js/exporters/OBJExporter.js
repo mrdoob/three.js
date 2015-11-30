@@ -121,9 +121,9 @@ THREE.OBJExporter.prototype = {
 					var face = faces[ i ];
 
 					output += 'f ';
-					output += ( indexVertex + face.a + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j     ) : '' ) + '/' + ( indexNormals + j     ) + ' ';
-					output += ( indexVertex + face.b + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + 1 ) : '' ) + '/' + ( indexNormals + j + 1 ) + ' ';
-					output += ( indexVertex + face.c + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + 2 ) : '' ) + '/' + ( indexNormals + j + 2 ) + '\n';
+					output += ( indexVertex + face.a + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + 0 + 1 ) : '' ) + '/' + ( indexNormals + j + 0 + 1 ) + ' ';
+					output += ( indexVertex + face.b + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + 1 + 1 ) : '' ) + '/' + ( indexNormals + j + 1 + 1 ) + ' ';
+					output += ( indexVertex + face.c + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + 2 + 1 ) : '' ) + '/' + ( indexNormals + j + 2 + 1 ) + '\n';
 
 				}
 
