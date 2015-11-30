@@ -15,8 +15,8 @@ THREE.OBJExporter.prototype = {
 		var indexVertex = 0;
 		var indexVertexUvs = 0;
 		var indexNormals = 0;
-		
-		var faceVertexKeys = ["a", "b", "c"];
+
+		var faceVertexKeys = [ "a", "b", "c" ];
 
 		var parseMesh = function ( mesh ) {
 
@@ -28,7 +28,7 @@ THREE.OBJExporter.prototype = {
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
-				geometry = new THREE.Geometry().fromBufferGeometry(geometry);
+				geometry = new THREE.Geometry().fromBufferGeometry( geometry );
 
 			}
 
@@ -114,18 +114,20 @@ THREE.OBJExporter.prototype = {
 					}
 
 				}
-				
+	
 				// faces
-				
+	
 				for ( var i = 0, j = 1, l = faces.length; i < l; i ++, j += 3 ) {
 
 					var face = faces[ i ];
 
 					output += 'f ';
-					
+	
 					for ( var m = 0; m < 3; m ++ ) {
+
 						output += ( indexVertex + face[ faceVertexKeys[ m ] ] + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + m + 1 ) : '' ) + '/' + ( indexNormals + j + m + 1 );
 						output += m === 2 ? "\n" : " ";
+
 					}
 
 				}
