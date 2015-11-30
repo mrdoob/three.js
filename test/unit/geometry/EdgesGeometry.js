@@ -171,8 +171,7 @@ function addDrawCalls ( geometry ) {
 		var start = i * 3;
 		var count = 3;
 
-		geometry.addDrawCall ( start, count, offset );
-
+		geometry.addGroup( start, count );
 	}
 
 	return geometry;
