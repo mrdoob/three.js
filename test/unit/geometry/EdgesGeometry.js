@@ -152,7 +152,7 @@ function createIndexedBufferGeometry ( vertList, idxList ) {
 
 	vertices = vertices.subarray( 0, 3 * numVerts );
 
-	geom.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+	geom.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 	geom.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 	geom.computeFaceNormals();
