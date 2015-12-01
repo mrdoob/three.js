@@ -67,8 +67,6 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.specular = new THREE.Color( 0x111111 );
 	this.shininess = 30;
 
-	this.metal = false;
-
 	this.map = null;
 
 	this.lightMap = null;
@@ -128,8 +126,6 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.emissive.copy( source.emissive );
 	this.specular.copy( source.specular );
 	this.shininess = source.shininess;
-
-	this.metal = source.metal;
 
 	this.map = source.map;
 

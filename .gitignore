@@ -2,3 +2,4 @@
 *.swp
 .project
 node_modules
+.idea/

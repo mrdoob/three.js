@@ -6,6 +6,11 @@ var Editor = function () {
 
 	var SIGNALS = signals;
 
+	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 1, 10000 );
+	this.DEFAULT_CAMERA.name = 'Camera';
+	this.DEFAULT_CAMERA.position.set( 20, 10, 20 );
+	this.DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
+
 	this.signals = {
 
 		// script
@@ -62,7 +67,15 @@ var Editor = function () {
 		fogParametersChanged: new SIGNALS.Signal(),
 		windowResize: new SIGNALS.Signal(),
 
-		showGridChanged: new SIGNALS.Signal()
+		showGridChanged: new SIGNALS.Signal(),
+		refreshSidebarObject3D: new SIGNALS.Signal(),
+		historyChanged: new SIGNALS.Signal(),
+		refreshScriptEditor: new SIGNALS.Signal(),
+
+		cameraPositionSnap: new SIGNALS.Signal(),
+		undo: new SIGNALS.Signal(),
+		redo: new SIGNALS.Signal()
+
 
 	};
 
@@ -71,10 +84,7 @@ var Editor = function () {
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
-	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 100000 );
-	this.camera.position.set( 500, 250, 500 );
-	this.camera.lookAt( new THREE.Vector3() );
-	this.camera.name = 'Camera';
+	this.camera = this.DEFAULT_CAMERA.clone();
 
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
@@ -89,6 +99,9 @@ var Editor = function () {
 
 	this.selected = null;
 	this.helpers = {};
+
+	this.shortcuts = new EditorShortCutsList();
+	this.isolationMode = false;
 
 };
 
@@ -145,6 +158,33 @@ Editor.prototype = {
 		this.signals.objectAdded.dispatch( object );
 		this.signals.sceneGraphChanged.dispatch();
 
+	},
+
+	cloneObject: function(){
+
+		var object = this.selected;
+
+		if( object === null ) return;
+
+		if ( object.parent === undefined ) return; // avoid cloning the camera or scene
+
+		object = object.clone();
+
+		this.addObject( object );
+		this.select( object );
+	},
+
+	destoryCurrent: function(){
+
+		var object = this.selected;
+
+		if(object === null) return;
+
+		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
+
+		var parent = object.parent;
+		this.removeObject( object );
+		this.select( null );
 	},
 
 	moveObject: function ( object, parent, before ) {
@@ -233,7 +273,7 @@ Editor.prototype = {
 
 	addHelper: function () {
 
-		var geometry = new THREE.SphereBufferGeometry( 20, 4, 2 );
+		var geometry = new THREE.SphereBufferGeometry( 2, 4, 2 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
 
 		return function ( object ) {
@@ -242,23 +282,23 @@ Editor.prototype = {
 
 			if ( object instanceof THREE.Camera ) {
 
-				helper = new THREE.CameraHelper( object, 10 );
+				helper = new THREE.CameraHelper( object, 1 );
 
 			} else if ( object instanceof THREE.PointLight ) {
 
-				helper = new THREE.PointLightHelper( object, 10 );
+				helper = new THREE.PointLightHelper( object, 1 );
 
 			} else if ( object instanceof THREE.DirectionalLight ) {
 
-				helper = new THREE.DirectionalLightHelper( object, 20 );
+				helper = new THREE.DirectionalLightHelper( object, 1 );
 
 			} else if ( object instanceof THREE.SpotLight ) {
 
-				helper = new THREE.SpotLightHelper( object, 10 );
+				helper = new THREE.SpotLightHelper( object, 1 );
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
-				helper = new THREE.HemisphereLightHelper( object, 10 );
+				helper = new THREE.HemisphereLightHelper( object, 1 );
 
 			} else if ( object instanceof THREE.SkinnedMesh ) {
 
@@ -390,7 +430,8 @@ Editor.prototype = {
 
 	focus: function ( object ) {
 
-		this.signals.objectFocused.dispatch( object );
+		if ( this.selected === null ) return;
+			this.signals.objectFocused.dispatch( object );
 
 	},
 
@@ -400,13 +441,57 @@ Editor.prototype = {
 
 	},
 
+
+	hide: function(){
+
+		if(this.selected !== null){
+			this.selected.visible = false;
+			this.deselect();
+		}
+	},
+
+	unhideAll: function(){
+
+		this.scene.traverse( function ( child ) {
+
+			child.visible = true;
+
+		} );
+
+		this.signals.sceneGraphChanged.dispatch();
+	},
+
+	isolate: function(){
+
+		var mode = !this.isolationMode;
+		this.isolationMode = mode;
+
+		if(this.selected !== null){
+			this.scene.traverse( function ( child ) {
+
+				if ( !(child instanceof THREE.Light )){ 
+					if(child.name !== "Scene" ){
+					
+						child.visible = mode;
+
+					}
+				}
+			} );
+
+			this.selected.visible = true;
+
+			//TODO: Add parent iteration so all parents of an object stay visible and don't hide the child
+			this.signals.sceneGraphChanged.dispatch();
+
+		}
+	},
+
 	clear: function () {
 
 		this.history.clear();
 		this.storage.clear();
 
-		this.camera.position.set( 500, 250, 500 );
-		this.camera.lookAt( new THREE.Vector3() );
+		this.camera.copy( this.DEFAULT_CAMERA );
 
 		var objects = this.scene.children;
 
@@ -444,33 +529,82 @@ Editor.prototype = {
 
 		// TODO: Clean this up somehow
 
+		if ( json.project !== undefined ) {
+
+			this.config.setKey( 'project/renderer/shadows', json.project.shadows );
+			this.config.setKey( 'project/vr', json.project.vr );
+
+		}
+
 		var camera = loader.parse( json.camera );
 
-		this.camera.position.copy( camera.position );
-		this.camera.rotation.copy( camera.rotation );
-		this.camera.aspect = camera.aspect;
-		this.camera.near = camera.near;
-		this.camera.far = camera.far;
+		this.camera.copy( camera );
+		this.history.fromJSON( json.history );
+		this.scripts = json.scripts;
 
 		this.setScene( loader.parse( json.scene ) );
-		this.scripts = json.scripts;
 
 	},
 
 	toJSON: function () {
 
+		// scripts clean up
+
+		var scene = this.scene;
+		var scripts = this.scripts;
+
+		for ( var key in scripts ) {
+
+			var script = scripts[ key ];
+
+			if ( script.length === 0 || scene.getObjectByProperty( 'uuid', key ) === undefined ) {
+
+				delete scripts[ key ];
+
+			}
+
+		}
+
+		//
+
 		return {
 
+			metadata: {},
 			project: {
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				vr: this.config.getKey( 'project/vr' )
 			},
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
-			scripts: this.scripts
+			scripts: this.scripts,
+			history: this.history.toJSON()
 
 		};
 
+	},
+
+	objectByUuid: function ( uuid ) {
+
+		return this.scene.getObjectByProperty( 'uuid', uuid, true );
+
+	},
+
+	execute: function ( cmd, optionalName ) {
+
+		this.history.execute( cmd, optionalName );
+
+	},
+
+	undo: function () {
+
+		this.history.undo();
+
+	},
+
+	redo: function () {
+
+		this.history.redo();
+
 	}
 
-}
+};
