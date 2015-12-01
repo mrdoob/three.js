@@ -123,6 +123,9 @@
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
 
+		<script src="js/EditorShortCuts.js"></script>
+		<script src="js/EditorShortCutsList.js"></script>
+
 		<script>
 
 			window.URL = window.URL || window.webkitURL;
@@ -156,6 +159,8 @@
 
 			var modal = new UI.Modal();
 			document.body.appendChild( modal.dom );
+
+			var shortcuts = new EditorShortCuts(editor);
 
 			//
 
@@ -256,15 +261,10 @@
 
 					case 8:
 						event.preventDefault(); // prevent browser back
+						break;
 
-						var object = editor.selected;
-
-						if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
-
-						var parent = object.parent;
-						editor.removeObject( object );
-						editor.select( parent );
-
+					default:
+						shortcuts.keyCheck( event.keyCode );
 						break;
 
 				}

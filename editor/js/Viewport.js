@@ -275,6 +275,75 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	console.log(signals);
+
+	signals.cameraPositionSnap.add( function ( mode ) {
+
+		//Needs Update to work without selected object
+
+		var distance = camera.position.length();
+		var newPos;
+
+		console.log(distance);
+
+		if(editor.selected)
+			distance = editor.selected.position.distanceTo(camera.position);
+
+		switch(mode){
+
+			case "top" :
+				newPos = new THREE.Vector3(0, distance, 0);
+			break;
+
+			case "bottom" :
+				newPos = new THREE.Vector3(0, -distance, 0);
+			break;
+
+			case "left" :
+				newPos = new THREE.Vector3(distance, 0, 0);
+			break;
+
+			case "right" :
+				newPos = new THREE.Vector3(-distance, 0, 0);
+			break;
+
+			case "front" :
+				newPos = new THREE.Vector3(0, 0, -distance);
+			break;
+
+			case "back" :
+				newPos = new THREE.Vector3(0, 0, distance);
+			break;
+
+		}
+		
+		if(editor.selected){
+
+			camera.position.set(newPos.x + editor.selected.position.x, 
+				newPos.y + editor.selected.position.y, 
+				newPos.z + editor.selected.position.z);
+
+			controls.focus(editor.selected);
+
+		}
+		else
+		{
+
+			// console.log(newPos);
+			// controls.center.set( 0, 0, 0 );
+			// controls.focus
+			// render();
+			camera.position.set(newPos.x,  
+				newPos.y, 
+				newPos.z);
+
+			controls.focus(editor.scene);
+		}
+
+		signals.cameraChanged.dispatch( camera );
+
+	} );
+
 	signals.transformModeChanged.add( function ( mode ) {
 
 		transformControls.setMode( mode );

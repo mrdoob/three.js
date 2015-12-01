@@ -1,27 +1,35 @@
 /**
- * @author mrdoob / http://mrdoob.com/
+ * @author elephantatWork, Samuel Vonäsch
  */
 
-var Config = function () {
+var EditorShortCutsList = function () {
 
-	var name = 'threejs-editor';
+	var name = 'threejs-editor-shortcuts';
 
 	var storage = {
-		'autosave': true,
-		'theme': 'css/light.css',
 
-		'project/renderer': 'WebGLRenderer',
-		'project/renderer/antialias': true,
-		'project/renderer/shadows': true,
-		'project/vr': false,
+		'file/exportscene':"ctrl+e",
 
-		'ui/sidebar/animation/collapsed': true,
-		'ui/sidebar/geometry/collapsed': true,
-		'ui/sidebar/material/collapsed': true,
-		'ui/sidebar/object3d/collapsed': false,
-		'ui/sidebar/project/collapsed': true,
-		'ui/sidebar/scene/collapsed': false,
-		'ui/sidebar/script/collapsed': true
+		'history/undo':"ctrl+z",
+		'history/redo':"ctrl+y",
+
+		'transform/move':'g',
+		'transform/rotate':'r',
+		'transform/scale':'s',
+
+		'edit/clone':'shift+D',
+		'edit/duplicate':'',
+		'edit/delete':'x',
+
+		'view/hide':'h',
+		'view/unhideAll':'alt+h',
+		'view/isolate':'i',
+		'view/focus':'f',
+		'view/showgrid':'space',
+
+		'camera/front':'1',
+		'camera/left':'3',
+		'camera/top':'7',
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {
@@ -57,8 +65,8 @@ var Config = function () {
 			}
 
 			window.localStorage[ name ] = JSON.stringify( storage );
-
-			console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved config to LocalStorage.' );
+ 
+			console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved config to shortcuts.' );
 
 		},
 
