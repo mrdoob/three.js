@@ -70,7 +70,7 @@ var Editor = function () {
 		showGridChanged: new SIGNALS.Signal(),
 		refreshSidebarObject3D: new SIGNALS.Signal(),
 		historyChanged: new SIGNALS.Signal(),
-		refreshScriptEditor: new SIGNALS.Signal()
+		refreshScriptEditor: new SIGNALS.Signal(),
 
 		cameraPositionSnap: new SIGNALS.Signal(),
 		undo: new SIGNALS.Signal(),
