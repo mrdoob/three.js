@@ -101,7 +101,6 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 
 	this.uniforms = THREE.UniformsUtils.clone( source.uniforms );
 
-	this.attributes = source.attributes;
 	this.defines = source.defines;
 
 	this.shading = source.shading;
@@ -131,7 +130,6 @@ THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
 	var data = THREE.Material.prototype.toJSON.call( this, meta );
 
 	data.uniforms = this.uniforms;
-	data.attributes = this.attributes;
 	data.vertexShader = this.vertexShader;
 	data.fragmentShader = this.fragmentShader;
 
