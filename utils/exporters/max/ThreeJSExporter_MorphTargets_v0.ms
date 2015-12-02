@@ -115,10 +115,20 @@ function eav_get_range_from_mods_con obj &i_t1 &i_t2 =
 		for pr in props do
 		(
 			mod_con = (getPropertyController cmod pr)
-			
+		
+			--format "% = % (Animatable - %)\n" pr mod_con	(isPropertyAnimatable obj pr)	
 			if mod_con == undefined then
 			(
-				continue
+				if cmod.name == "Morpher" then
+				(
+					format "% = %" pr cmod[pr]
+					mod_con = cmod[pr]
+				)
+				
+				if mod_con == undefined then
+				(
+					continue
+				)
 			)
 			
 			if mod_con.keys.count <= 0 then

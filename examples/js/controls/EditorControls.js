@@ -214,7 +214,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		domElement.removeEventListener( 'contextmenu', contextmenu, false );
 		domElement.removeEventListener( 'mousedown', onMouseDown, false );
 		domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
-		domElement.removeEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+		domElement.removeEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
 
 		domElement.removeEventListener( 'mousemove', onMouseMove, false );
 		domElement.removeEventListener( 'mouseup', onMouseUp, false );
@@ -229,7 +229,7 @@ THREE.EditorControls = function ( object, domElement ) {
 	domElement.addEventListener( 'contextmenu', contextmenu, false );
 	domElement.addEventListener( 'mousedown', onMouseDown, false );
 	domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-	domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+	domElement.addEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
 
 	// touch
 
@@ -272,7 +272,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		var getClosest = function( touch, touches ) {
+		function getClosest( touch, touches ) {
 
 			var closest = touches[ 0 ];
 
@@ -284,7 +284,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 			return closest;
 
-		};
+		}
 
 		switch ( event.touches.length ) {
 

@@ -50,9 +50,7 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 
 	for ( var i = 1; i <= segments; i ++ ) {
 
-		indices.push( i );
-		indices.push( i + 1 );
-		indices.push( 0 );
+		indices.push( i, i + 1, 0 );
 
 	}
 
@@ -67,18 +65,3 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 
 THREE.CircleBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.CircleBufferGeometry.prototype.constructor = THREE.CircleBufferGeometry;
-
-THREE.CircleBufferGeometry.prototype.clone = function () {
-
-	var geometry = new THREE.CircleBufferGeometry(
-		this.parameters.radius,
-		this.parameters.segments,
-		this.parameters.thetaStart,
-		this.parameters.thetaLength
-	);
-
-	geometry.copy( this );
-
-	return geometry;
-
-};

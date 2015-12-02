@@ -17,7 +17,6 @@ THREE.AnimationLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
@@ -26,17 +25,11 @@ THREE.AnimationLoader.prototype = {
 
 	},
 
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-
-	},
-
 	parse: function ( json, onLoad ) {
 
 		var animations = [];
 
-		for( var i = 0; i < json.length; i ++ ) {
+		for ( var i = 0; i < json.length; i ++ ) {
 
 			var clip = THREE.AnimationClip.parse( json[i] );
 

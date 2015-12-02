@@ -34,13 +34,10 @@ THREE.AMFLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.setResponseType( 'arraybuffer' );
-
 		loader.load( url, function( text ) {
 
-			var amfObject = scope.parse( text );
-			onLoad( amfObject );
+			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
 
@@ -77,7 +74,7 @@ THREE.AMFLoader.prototype = {
 
 				for ( file in zip.files ) {
 
-					if ( file.toLowerCase().endsWith( ".amf" ) ) {
+					if ( file.toLowerCase().substr( - 4 ) === '.amf' ) {
 
 						break;
 
@@ -145,7 +142,7 @@ THREE.AMFLoader.prototype = {
 
 			var matName = "AMF Material";
 			var matId = node.attributes[ 'id' ].textContent;
-			var color;
+			var color = { r: 1.0, g: 1.0, b: 1.0, a: 1.0 };
 
 			var loadedMaterial = null;
 
@@ -175,10 +172,10 @@ THREE.AMFLoader.prototype = {
 				name: matName
 			} );
 
-			if ( color.opacity !== 1.0 ) {
+			if ( color.a !== 1.0 ) {
 
 				loadedMaterial.transparent = true;
-				loadedMaterial.opacity = color.opacity;
+				loadedMaterial.opacity = color.a;
 
 			}
 
@@ -188,7 +185,7 @@ THREE.AMFLoader.prototype = {
 
 		function loadColor( node ) {
 
-			var color = { 'r': 1.0, 'g': 1.0, 'b': 1.0, 'a': 1.0, opacity: 1.0 };
+			var color = { 'r': 1.0, 'g': 1.0, 'b': 1.0, 'a': 1.0 };
 
 			for ( var i = 0; i < node.children.length; i ++ ) {
 
@@ -208,7 +205,7 @@ THREE.AMFLoader.prototype = {
 
 				} else if ( matColor.nodeName === 'a' ) {
 
-					color.opacity = matColor.textContent;
+					color.a = matColor.textContent;
 
 				}
 
@@ -299,7 +296,7 @@ THREE.AMFLoader.prototype = {
 							normalArray.push(nz);
 
 						}
-						
+
 						vNode = vNode.nextElementSibling;
 
 					}
@@ -480,9 +477,9 @@ THREE.AMFLoader.prototype = {
 
 					}
 
-					if ( amfMaterials[ volume.materialid ] !== undefined ) {
+					if ( amfMaterials[ volume.materialId ] !== undefined ) {
 
-						material = amfMaterials[ volume.materialid ];
+						material = amfMaterials[ volume.materialId ];
 
 					}
 

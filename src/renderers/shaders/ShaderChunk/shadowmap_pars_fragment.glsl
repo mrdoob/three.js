@@ -1,12 +1,12 @@
 #ifdef USE_SHADOWMAP
 
-	uniform sampler2D shadowMap[ MAX_SHADOWS ];
-	uniform vec2 shadowMapSize[ MAX_SHADOWS ];
+	uniform sampler2D shadowMap[ NUM_SHADOWS ];
+	uniform vec2 shadowMapSize[ NUM_SHADOWS ];
 
-	uniform float shadowDarkness[ MAX_SHADOWS ];
-	uniform float shadowBias[ MAX_SHADOWS ];
+	uniform float shadowDarkness[ NUM_SHADOWS ];
+	uniform float shadowBias[ NUM_SHADOWS ];
 
-	varying vec4 vShadowCoord[ MAX_SHADOWS ];
+	varying vec4 vShadowCoord[ NUM_SHADOWS ];
 
 	float unpackDepth( const in vec4 rgba_depth ) {
 
@@ -16,7 +16,7 @@
 
 	}
 
-	#if defined(POINT_LIGHT_SHADOWS)
+	#ifdef POINT_LIGHT_SHADOWS
 
 		// adjustShadowValue1K() upacks the depth value stored in @textureData, adds @bias to it, and then
 		// comapres the result with @testDepth. If @testDepth is larger than or equal to that result, then
@@ -25,7 +25,7 @@
 		void adjustShadowValue1K( const float testDepth, const vec4 textureData, const float bias, inout float shadowValue ) {
 
 			const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
-			if( testDepth >= dot( textureData, bitSh ) * 1000.0 + bias )
+			if ( testDepth >= dot( textureData, bitSh ) * 1000.0 + bias )
 				shadowValue += 1.0;
 
 		}
@@ -100,30 +100,6 @@
 			return vec2( 0.125, 0.25 ) * planar + vec2( 0.375, 0.75 );
 
 		}
-
-		// gsdXX = grid sampling disk XX
-		// these values are used when rendering PCF shadow maps for point lights
-		
-		const vec3 gsd0 = vec3( 1, 1, 1 );
-		const vec3 gsd1 = vec3( 1, - 1, 1 );
-		const vec3 gsd2 = vec3( - 1, - 1, 1 );
-		const vec3 gsd3 = vec3( - 1, 1, 1 );
-		const vec3 gsd4 = vec3( 1, 1, - 1 );
-		const vec3 gsd5 = vec3( 1, - 1, - 1 );
-		const vec3 gsd6 = vec3( - 1, - 1, - 1 );
-		const vec3 gsd7 = vec3( -1, 1, - 1 );
-		const vec3 gsd8 = vec3( 1, 1, 0 );
-		const vec3 gsd9 = vec3( 1, - 1, 0 );
-		const vec3 gsd10 = vec3( - 1, - 1, 0 );
-		const vec3 gsd11 = vec3( - 1, 1, 0 );
-		const vec3 gsd12 = vec3( 1, 0, 1 );
-		const vec3 gsd13 = vec3( - 1, 0, 1 );
-		const vec3 gsd14 = vec3( 1, 0, - 1 );
-		const vec3 gsd15 = vec3( - 1, 0, - 1 );
-		const vec3 gsd16 = vec3( 0, 1, 1 );
-		const vec3 gsd17 = vec3( 0, - 1, 1 );
-		const vec3 gsd18 = vec3( 0, - 1, - 1 );
-		const vec3 gsd19 = vec3( 0, 1, - 1 );
 
 	#endif
 

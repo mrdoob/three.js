@@ -41,6 +41,8 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
+		<script src="js/geometries/TextGeometry.js"></script>
+		<script src="js/utils/FontUtils.js"></script>
 		<script src="fonts/helvetiker_bold.typeface.js"></script>
 
 		<script>
@@ -62,7 +64,7 @@
 
 			var sceneHUD, cameraOrtho, hudMesh;
 
-			var morphs = [];
+			var mixer, morphs = [];
 
 			var light;
 
@@ -120,7 +122,6 @@
 				//light.shadowCameraVisible = true;
 
 				light.shadowBias = 0.0001;
-				light.shadowDarkness = 0.5;
 
 				light.shadowMapWidth = SHADOW_MAP_WIDTH;
 				light.shadowMapHeight = SHADOW_MAP_HEIGHT;
@@ -305,6 +306,8 @@
 
 				// MORPHS
 
+				mixer = new THREE.AnimationMixer( scene );
+
 				function addMorph( geometry, speed, duration, x, y, z, fudgeColor ) {
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
@@ -318,44 +321,29 @@
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.speed = speed;
 
-					var mixer = new THREE.AnimationMixer( mesh );
-					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( duration ) );
-					mixer.update( 600 * Math.random() );
-					mesh.mixer = mixer;
+					var clip = geometry.animations[ 0 ];
+
+					mixer.clipAction( clip, mesh ).
+							setDuration( duration ).
+							// to shift the playback out of phase:
+							startAt( - duration * Math.random() ).
+							play();
 
 					mesh.position.set( x, y, z );
 					mesh.rotation.y = Math.PI/2;
 
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
-				
+
 					scene.add( mesh );
 
 					morphs.push( mesh );
 
 				}
 
-				function morphColorsToFaceColors( geometry ) {
-
-					if ( geometry.morphColors && geometry.morphColors.length ) {
-
-						var colorMap = geometry.morphColors[ 0 ];
-
-						for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-
-							geometry.faces[ i ].color = colorMap.colors[ i ];
-
-						}
-
-					}
-
-				}
-
 				var loader = new THREE.JSONLoader();
 
 				loader.load( "models/animated/horse.js", function( geometry ) {
-
-					morphColorsToFaceColors( geometry );
 
 					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, 300, true );
 					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, 450, true );
@@ -369,21 +357,18 @@
 
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 500, 1, 500 - Math.random() * 500, FLOOR + 350, 40 );
 
 				} );
 
 				loader.load( "models/animated/stork.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 350, 1, 500 - Math.random() * 500, FLOOR + 350, 340 );
 
 				} );
 
 				loader.load( "models/animated/parrot.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 450, 0.5, 500 - Math.random() * 500, FLOOR + 300, 700 );
 
 				} );
@@ -403,11 +388,11 @@
 
 				var delta = clock.getDelta();
 
+				mixer.update( delta );
+
 				for ( var i = 0; i < morphs.length; i ++ ) {
 
 					morph = morphs[ i ];
-
-					morph.mixer.update( delta );
 
 					morph.position.x += morph.speed * delta;
 

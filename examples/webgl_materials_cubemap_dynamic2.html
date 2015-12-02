@@ -89,7 +89,7 @@
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
-				document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false);
+				document.addEventListener( 'MozMousePixelScroll', onDocumentMouseWheel, false);
 				window.addEventListener( 'resize', onWindowResized, false );
 
 				onWindowResized( null );

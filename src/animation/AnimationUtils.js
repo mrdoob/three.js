@@ -1,116 +1,159 @@
 /**
+ * @author tschw
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
- THREE.AnimationUtils = {
+THREE.AnimationUtils = {
 
- 	getEqualsFunc: function( exemplarValue ) {
+	// same as Array.prototype.slice, but also works on typed arrays
+	arraySlice: function( array, from, to ) {
 
-		if( exemplarValue.equals ) {
-			return function equals_object( a, b ) {
-				return a.equals( b );
-			}
+		if ( THREE.AnimationUtils.isTypedArray( array ) ) {
+
+			return new array.constructor( array.subarray( from, to ) );
+
 		}
 
-		return function equals_primitive( a, b ) {
-			return ( a === b );	
-		};
+		return array.slice( from, to );
 
 	},
 
- 	clone: function( exemplarValue ) {
+	// converts an array to a specific type
+	convertArray: function( array, type, forceClone ) {
 
- 		var typeName = typeof exemplarValue;
-		if( typeName === "object" ) {
-			if( exemplarValue.clone ) {
-				return exemplarValue.clone();
-			}
-			console.error( "can not figure out how to copy exemplarValue", exemplarValue );
+		if ( ! array || // let 'undefined' and 'null' pass
+				! forceClone && array.constructor === type ) return array;
+
+		if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
+
+			return new type( array ); // create typed array
+
 		}
 
-		return exemplarValue;
+		return Array.prototype.slice.call( array ); // create Array
 
 	},
 
- 	lerp: function( a, b, alpha, interTrack ) {
+	isTypedArray: function( object ) {
 
-		var lerpFunc = THREE.AnimationUtils.getLerpFunc( a, interTrack );
-
-		return lerpFunc( a, b, alpha );
+		return ArrayBuffer.isView( object ) &&
+				! ( object instanceof DataView );
 
 	},
 
-	lerp_object: function( a, b, alpha ) {
-		return a.lerp( b, alpha );
+	// returns an array by which times and values can be sorted
+	getKeyframeOrder: function( times ) {
+
+		function compareTime( i, j ) {
+
+			return times[ i ] - times[ j ];
+
+		}
+
+		var n = times.length;
+		var result = new Array( n );
+		for ( var i = 0; i !== n; ++ i ) result[ i ] = i;
+
+		result.sort( compareTime );
+
+		return result;
+
 	},
-	
-	slerp_object: function( a, b, alpha ) {
-		return a.slerp( b, alpha );
-	},
 
-	lerp_number: function( a, b, alpha ) {
-		return a * ( 1 - alpha ) + b * alpha;
-	},
+	// uses the array previously returned by 'getKeyframeOrder' to sort data
+	sortedArray: function( values, stride, order ) {
 
-	lerp_boolean: function( a, b, alpha ) {
-		return ( alpha < 0.5 ) ? a : b;
-	},
+		var nValues = values.length;
+		var result = new values.constructor( nValues );
 
-	lerp_boolean_immediate: function( a, b, alpha ) {
-		return a;
-	},
-	
-	lerp_string: function( a, b, alpha ) {
-		return ( alpha < 0.5 ) ? a : b;
-	},
-	
-	lerp_string_immediate: function( a, b, alpha ) {
- 		return a;		 		
- 	},
+		for ( var i = 0, dstOffset = 0; dstOffset !== nValues; ++ i ) {
 
-	// NOTE: this is an accumulator function that modifies the first argument (e.g. a).  This is to minimize memory alocations.
-	getLerpFunc: function( exemplarValue, interTrack ) {
+			var srcOffset = order[ i ] * stride;
 
-		if( exemplarValue === undefined || exemplarValue === null ) throw new Error( "examplarValue is null" );
+			for ( var j = 0; j !== stride; ++ j ) {
 
-		var typeName = typeof exemplarValue;
-		switch( typeName ) {
-		 	case "object": {
+				result[ dstOffset ++ ] = values[ srcOffset + j ];
 
-				if( exemplarValue.lerp ) {
-
-					return THREE.AnimationUtils.lerp_object;
-
-				}
-				if( exemplarValue.slerp ) {
-
-					return THREE.AnimationUtils.slerp_object;
-
-				}
-				break;
 			}
-		 	case "number": {
-				return THREE.AnimationUtils.lerp_number;
-		 	}	
-		 	case "boolean": {
-		 		if( interTrack ) {
-					return THREE.AnimationUtils.lerp_boolean;
-		 		}
-		 		else {
-					return THREE.AnimationUtils.lerp_boolean_immediate;
-		 		}
-		 	}
-		 	case "string": {
-		 		if( interTrack ) {
-					return THREE.AnimationUtils.lerp_string;
-		 		}
-		 		else {
-					return THREE.AnimationUtils.lerp_string_immediate;
-			 	}
-		 	}
-		};
+
+		}
+
+		return result;
+
+	},
+
+	// function for parsing AOS keyframe formats
+	flattenJSON: function( jsonKeys, times, values, valuePropertyName ) {
+
+		var i = 1, key = jsonKeys[ 0 ];
+
+		while ( key !== undefined && key[ valuePropertyName ] === undefined ) {
+
+			key = jsonKeys[ i ++ ];
+
+		}
+
+		if ( key === undefined ) return; // no data
+
+		var value = key[ valuePropertyName ];
+		if ( value === undefined ) return; // no data
+
+		if ( Array.isArray( value ) ) {
+
+			do {
+
+				value = key[ valuePropertyName ];
+
+				if ( value !== undefined ) {
+
+					times.push( key.time );
+					values.push.apply( values, value ); // push all elements
+
+				}
+
+				key = jsonKeys[ i ++ ];
+
+			} while ( key !== undefined );
+
+		} else if ( value.toArray !== undefined ) {
+			// ...assume THREE.Math-ish
+
+			do {
+
+				value = key[ valuePropertyName ];
+
+				if ( value !== undefined ) {
+
+					times.push( key.time );
+					value.toArray( values, values.length );
+
+				}
+
+				key = jsonKeys[ i ++ ];
+
+			} while ( key !== undefined );
+
+		} else {
+			// otherwise push as-is
+
+			do {
+
+				value = key[ valuePropertyName ];
+
+				if ( value !== undefined ) {
+
+					times.push( key.time );
+					values.push( value );
+
+				}
+
+				key = jsonKeys[ i ++ ];
+
+			} while ( key !== undefined );
+
+		}
 
 	}
-	
+
 };

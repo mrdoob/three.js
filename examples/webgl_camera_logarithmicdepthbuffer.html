@@ -91,6 +91,9 @@
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+
+		<script src="js/geometries/TextGeometry.js"></script>
+		<script src="js/utils/FontUtils.js"></script>
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
 
 		<script>
@@ -152,7 +155,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 				window.addEventListener( 'mousewheel', onMouseWheel, false );
-				window.addEventListener( 'DOMMouseScroll', onMouseWheel, false );
+				window.addEventListener( 'MozMousePixelScroll', onMouseWheel, false );
 				window.addEventListener( 'mousemove', onMouseMove, false );
 
 				render();
@@ -337,6 +340,7 @@
 			}
 			function onMouseWheel(ev) {
 				var amount = -ev.wheelDeltaY || ev.detail;
+				if ( amount === 0 ) return;
 				var dir = amount / Math.abs(amount);
 				zoomspeed = dir/10;
 

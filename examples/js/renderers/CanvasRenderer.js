@@ -36,8 +36,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	console.log( 'THREE.CanvasRenderer', THREE.REVISION );
 
-	var smoothstep = THREE.Math.smoothstep;
-
 	parameters = parameters || {};
 
 	var _this = this,
@@ -114,11 +112,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_normal = new THREE.Vector3(),
 	_normalViewMatrix = new THREE.Matrix3();
 
+	/* TODO
+	_canvas.mozImageSmoothingEnabled = false;
+	_canvas.webkitImageSmoothingEnabled = false;
+	_canvas.msImageSmoothingEnabled = false;
+	_canvas.imageSmoothingEnabled = false;
+	*/
+
 	// dash+gap fallbacks for Firefox and everything else
 
 	if ( _context.setLineDash === undefined ) {
 
-		_context.setLineDash = function () {}
+		_context.setLineDash = function () {};
 
 	}
 
@@ -365,7 +370,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 					_v2.positionScreen
 				] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+				if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
 					renderLine( _v1, _v2, element, material );
 
@@ -397,7 +402,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 					_v3.positionScreen
 				] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+				if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
 					renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material );
 
@@ -760,14 +765,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			}
 
-		} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			_color.r = _color.g = _color.b = 1 - smoothstep( v1.positionScreen.z * v1.positionScreen.w, _camera.near, _camera.far );
-
-			material.wireframe === true
-					 ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-					 : fillPath( _color );
-
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
 			_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix );
@@ -829,13 +826,22 @@ THREE.CanvasRenderer = function ( parameters ) {
 			texture instanceof THREE.DataTexture ) {
 
 			return {
-					canvas: undefined,
-					version: texture.version
-				}
+				canvas: undefined,
+				version: texture.version
+			};
 
 		}
 
 		var image = texture.image;
+
+		if ( image.complete === false ) {
+
+			return {
+				canvas: undefined,
+				version: 0
+			};
+
+		}
 
 		var canvas = document.createElement( 'canvas' );
 		canvas.width = image.width;
@@ -864,10 +870,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
+		var pattern = _context.createPattern( canvas, repeat );
+
+		if ( texture.onUpdate ) texture.onUpdate( texture );
+
 		return {
-			canvas: _context.createPattern( canvas, repeat ),
+			canvas: pattern,
 			version: texture.version
-		}
+		};
 
 	}
 

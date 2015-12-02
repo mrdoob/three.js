@@ -14,11 +14,15 @@ THREE.ImageLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		if ( this.path !== undefined ) url = this.path + url;
+
 		var scope = this;
 
 		var cached = THREE.Cache.get( url );
 
 		if ( cached !== undefined ) {
+
+			scope.manager.itemStart( url );
 
 			if ( onLoad ) {
 
@@ -26,7 +30,13 @@ THREE.ImageLoader.prototype = {
 
 					onLoad( cached );
 
+					scope.manager.itemEnd( url );
+
 				}, 0 );
+
+			} else {
+
+				scope.manager.itemEnd( url );
 
 			}
 
@@ -77,6 +87,12 @@ THREE.ImageLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
 
 	}
 

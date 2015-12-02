@@ -27,6 +27,7 @@ var APP = {
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
+			if ( json.project.shadows ) renderer.shadowMap.enabled = true;
 			this.dom = renderer.domElement;
 
 			this.setScene( loader.parse( json.scene ) );
@@ -47,18 +48,28 @@ var APP = {
 				update: []
 			};
 
-			var scriptWrapParams = 'player,renderer,scene';
+			var scriptWrapParams = 'player,renderer,scene,camera';
 			var scriptWrapResultObj = {};
+
 			for ( var eventKey in events ) {
+
 				scriptWrapParams += ',' + eventKey;
 				scriptWrapResultObj[ eventKey ] = eventKey;
+
 			}
-			var scriptWrapResult =
-					JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
+
+			var scriptWrapResult = JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
 
 			for ( var uuid in json.scripts ) {
 
 				var object = scene.getObjectByProperty( 'uuid', uuid, true );
+
+				if ( object === undefined ) {
+
+					console.warn( 'APP.Player: Script without object.', uuid );
+					continue;
+
+				}
 
 				var scripts = json.scripts[ uuid ];
 
@@ -66,8 +77,7 @@ var APP = {
 
 					var script = scripts[ i ];
 
-					var functions = ( new Function( scriptWrapParams,
-							script.source + '\nreturn ' + scriptWrapResult+ ';' ).bind( object ) )( this, renderer, scene );
+					var functions = ( new Function( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( this, renderer, scene, camera );
 
 					for ( var name in functions ) {
 
@@ -75,7 +85,7 @@ var APP = {
 
 						if ( events[ name ] === undefined ) {
 
-							console.warn( 'APP.Player: event type not supported (', name, ')' );
+							console.warn( 'APP.Player: Event type not supported (', name, ')' );
 							continue;
 
 						}
@@ -97,7 +107,6 @@ var APP = {
 			camera = value;
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
-
 
 			if ( vr === true ) {
 
@@ -141,7 +150,7 @@ var APP = {
 
 			scene = value;
 
-		},
+		};
 
 		this.setSize = function ( width, height ) {
 
@@ -157,7 +166,7 @@ var APP = {
 
 		};
 
-		var dispatch = function ( array, event ) {
+		function dispatch( array, event ) {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
@@ -165,7 +174,7 @@ var APP = {
 
 					array[ i ]( event );
 
-				} catch (e) {
+				} catch ( e ) {
 
 					console.error( ( e.message || e ), ( e.stack || "" ) );
 
@@ -173,11 +182,11 @@ var APP = {
 
 			}
 
-		};
+		}
 
 		var prevTime, request;
 
-		var animate = function ( time ) {
+		function animate( time ) {
 
 			request = requestAnimationFrame( animate );
 
@@ -196,7 +205,7 @@ var APP = {
 
 			prevTime = time;
 
-		};
+		}
 
 		this.play = function () {
 
@@ -212,7 +221,8 @@ var APP = {
 			dispatch( events.start, arguments );
 
 			request = requestAnimationFrame( animate );
-			prevTime = ( window.performance || Date ).now();
+			prevTime = performance.now();
+
 		};
 
 		this.stop = function () {
@@ -229,57 +239,58 @@ var APP = {
 			dispatch( events.stop, arguments );
 
 			cancelAnimationFrame( request );
+
 		};
 
 		//
 
-		var onDocumentKeyDown = function ( event ) {
+		function onDocumentKeyDown( event ) {
 
 			dispatch( events.keydown, event );
 
-		};
+		}
 
-		var onDocumentKeyUp = function ( event ) {
+		function onDocumentKeyUp( event ) {
 
 			dispatch( events.keyup, event );
 
-		};
+		}
 
-		var onDocumentMouseDown = function ( event ) {
+		function onDocumentMouseDown( event ) {
 
 			dispatch( events.mousedown, event );
 
-		};
+		}
 
-		var onDocumentMouseUp = function ( event ) {
+		function onDocumentMouseUp( event ) {
 
 			dispatch( events.mouseup, event );
 
-		};
+		}
 
-		var onDocumentMouseMove = function ( event ) {
+		function onDocumentMouseMove( event ) {
 
 			dispatch( events.mousemove, event );
 
-		};
+		}
 
-		var onDocumentTouchStart = function ( event ) {
+		function onDocumentTouchStart( event ) {
 
 			dispatch( events.touchstart, event );
 
-		};
+		}
 
-		var onDocumentTouchEnd = function ( event ) {
+		function onDocumentTouchEnd( event ) {
 
 			dispatch( events.touchend, event );
 
-		};
+		}
 
-		var onDocumentTouchMove = function ( event ) {
+		function onDocumentTouchMove( event ) {
 
 			dispatch( events.touchmove, event );
 
-		};
+		}
 
 	}
 
