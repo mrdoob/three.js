@@ -90,18 +90,3 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 
 THREE.RingGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.RingGeometry.prototype.constructor = THREE.RingGeometry;
-
-THREE.RingGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.RingGeometry(
-		parameters.innerRadius,
-		parameters.outerRadius,
-		parameters.thetaSegments,
-		parameters.phiSegments,
-		parameters.thetaStart,
-		parameters.thetaLength
-	);
-
-};
