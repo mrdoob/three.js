@@ -225,13 +225,120 @@ THREE.ColladaLoader.prototype = {
 				name: xml.getAttribute( 'name' )
 			};
 
-			library.cameras[ xml.getAttribute( 'id' ) ] = {};
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'optics':
+						data.optics = parseCameraOptics( child );
+						break;
+
+				}
+
+			}
+
+			library.cameras[ xml.getAttribute( 'id' ) ] = data;
+
+		}
+
+		function parseCameraOptics( xml ) {
+
+			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				switch ( child.nodeName ) {
+
+					case 'technique_common':
+						return parseCameraTechnique( child );
+
+				}
+
+			}
+
+			return {};
+
+		}
+
+		function parseCameraTechnique( xml ) {
+
+			var data = {};
+
+			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				switch ( child.nodeName ) {
+
+					case 'perspective':
+					case 'orthographic':
+
+						data.technique = child.nodeName;
+						data.parameters = parseCameraParameters( child );
+
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseCameraParameters( xml ) {
+
+			var data = {};
+
+			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				switch ( child.nodeName ) {
+
+					case 'xfov':
+					case 'yfov':
+					case 'xmag':
+					case 'ymag':
+					case 'znear':
+					case 'zfar':
+					case 'aspect_ratio':
+						data[ child.nodeName ] = parseFloat( child.textContent );
+						break;
+
+				}
+
+			}
+
+			return data;
 
 		}
 
 		function buildCamera( data ) {
 
-			var camera = new THREE.PerspectiveCamera();
+			var camera;
+
+			switch ( data.optics.technique ) {
+
+				case 'perspective':
+					camera = new THREE.PerspectiveCamera(
+						data.optics.parameters.yfov,
+						data.optics.parameters.aspect_ratio,
+						data.optics.parameters.znear,
+						data.optics.parameters.zfar
+					);
+					break;
+
+				case 'orthographic':
+					camera = new THREE.OrthographicCamera( /* TODO */ );
+					break;
+
+			}
+
 			camera.name = data.name;
 
 			return camera;
