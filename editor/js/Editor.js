@@ -458,6 +458,9 @@ Editor.prototype = {
 		var camera = loader.parse( json.camera );
 
 		this.camera.copy( camera );
+		this.camera.aspect = this.DEFAULT_CAMERA.aspect;
+		this.camera.updateProjectionMatrix();
+
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
