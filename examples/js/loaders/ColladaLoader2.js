@@ -337,6 +337,10 @@ THREE.ColladaLoader.prototype = {
 					camera = new THREE.OrthographicCamera( /* TODO */ );
 					break;
 
+				default:
+					camera = new THREE.PerspectiveCamera();
+					break;
+
 			}
 
 			camera.name = data.name;
