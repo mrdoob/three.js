@@ -85,6 +85,7 @@ test( "tetrahedron", function() {
 // HELPERS
 //
 
+
 function testEdges ( vertList, idxList, numAfter ) {
 
 	var geoms = createGeometries ( vertList, idxList );
@@ -192,8 +193,8 @@ function countEdges ( geom ) {
 
 	}
 
-	var indices = geom.getAttribute( 'index' );
-	if ( indices !== undefined ) {
+	var indices = geom.index;
+	if ( indices ) {
 
 		return indices.count;
 
