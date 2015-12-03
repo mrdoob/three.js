@@ -117,7 +117,7 @@ THREE.OBJExporter.prototype = {
 
 				// faces
 				var indices = [];
-	
+
 				for ( var i = 0, j = 1, l = faces.length; i < l; i ++, j += 3 ) {
 
 					var face = faces[ i ];
