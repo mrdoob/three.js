@@ -120,15 +120,15 @@ THREE.OBJExporter.prototype = {
 				for ( var i = 0, j = 1, l = faces.length; i < l; i ++, j += 3 ) {
 
 					var face = faces[ i ];
+					var indices = [];
 
-					output += 'f ';
-	
 					for ( var m = 0; m < 3; m ++ ) {
-
-						output += ( indexVertex + face[ faceVertexKeys[ m ] ] + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + m + 1 ) : '' ) + '/' + ( indexNormals + j + m + 1 );
-						output += m === 2 ? "\n" : " ";
-
+					
+					    indices[ m ] = ( indexVertex + face[ faceVertexKeys[ m ] ] + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + m + 1 ) : '' ) + '/' + ( indexNormals + j + m + 1 );
+					
 					}
+					
+					output += 'f ' + indices.join( ' ' ) + "\n";
 
 				}
 
