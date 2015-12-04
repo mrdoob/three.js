@@ -21747,21 +21747,28 @@ THREE.Points.prototype.raycast = ( function () {
 
 	var inverseMatrix = new THREE.Matrix4();
 	var ray = new THREE.Ray();
+	var sphere = new THREE.Sphere();
 
 	return function raycast( raycaster, intersects ) {
 
 		var object = this;
-		var geometry = object.geometry;
+		var geometry = this.geometry;
+		var matrixWorld = this.matrixWorld;
 		var threshold = raycaster.params.Points.threshold;
 
-		inverseMatrix.getInverse( this.matrixWorld );
+		// Checking boundingSphere distance to ray
+
+		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+		sphere.copy( geometry.boundingSphere );
+		sphere.applyMatrix4( matrixWorld );
+
+		if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
+
+		//
+
+		inverseMatrix.getInverse( matrixWorld );
 		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
-
-		if ( geometry.boundingBox !== null ) {
-
-			if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
-
-		}
 
 		var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 		var localThresholdSq = localThreshold * localThreshold;
@@ -21774,7 +21781,7 @@ THREE.Points.prototype.raycast = ( function () {
 			if ( rayPointDistanceSq < localThresholdSq ) {
 
 				var intersectPoint = ray.closestPointToPoint( point );
-				intersectPoint.applyMatrix4( object.matrixWorld );
+				intersectPoint.applyMatrix4( matrixWorld );
 
 				var distance = raycaster.ray.origin.distanceTo( intersectPoint );
 
@@ -21888,17 +21895,20 @@ THREE.Line.prototype.raycast = ( function () {
 		var precisionSq = precision * precision;
 
 		var geometry = this.geometry;
-
-		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+		var matrixWorld = this.matrixWorld;
 
 		// Checking boundingSphere distance to ray
 
+		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
 		sphere.copy( geometry.boundingSphere );
-		sphere.applyMatrix4( this.matrixWorld );
+		sphere.applyMatrix4( matrixWorld );
 
 		if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
-		inverseMatrix.getInverse( this.matrixWorld );
+		//
+
+		inverseMatrix.getInverse( matrixWorld );
 		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
 		var vStart = new THREE.Vector3();
@@ -22156,7 +22166,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 	}
 
-	function checkIntersection( object, raycaster, ray, pA, pB, pC, point ){
+	function checkIntersection( object, raycaster, ray, pA, pB, pC, point ) {
 
 		var intersect;
 		var material = object.material;
@@ -22221,6 +22231,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		var geometry = this.geometry;
 		var material = this.material;
+		var matrixWorld = this.matrixWorld;
 
 		if ( material === undefined ) return;
 
@@ -22228,17 +22239,17 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		var matrixWorld = this.matrixWorld;
-
 		sphere.copy( geometry.boundingSphere );
 		sphere.applyMatrix4( matrixWorld );
 
 		if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
-		// Check boundingBox before continuing
+		//
 
 		inverseMatrix.getInverse( matrixWorld );
 		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+
+		// Check boundingBox before continuing
 
 		if ( geometry.boundingBox !== null ) {
 
@@ -22255,7 +22266,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 			var attributes = geometry.attributes;
 			var positions = attributes.position.array;
 
-			if ( attributes.uv !== undefined ){
+			if ( attributes.uv !== undefined ) {
 
 				uvs = attributes.uv.array;
 
