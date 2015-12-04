@@ -6918,12 +6918,10 @@ THREE.Math = {
 
 	},
 
-	// Random float from <0, 1> with 16 bits of randomness
-	// (standard Math.random() creates repetitive patterns when applied over larger space)
-
 	random16: function () {
 
-		return ( 65280 * Math.random() + 255 * Math.random() ) / 65535;
+		console.warn( 'THREE.Math.random16() has been deprecated. Use Math.random() instead.' );
+		return Math.random();
 
 	},
 
@@ -17788,7 +17786,18 @@ THREE.XHRLoader.prototype = {
 
 			THREE.Cache.add( url, response );
 
-			if ( this.status === 200 && this.readyState === 4 ) {
+			if ( this.status === 200 ) {
+
+				if ( onLoad ) onLoad( response );
+
+				scope.manager.itemEnd( url );
+
+			} else if ( this.status === 0 ) {
+
+				// Some browsers return HTTP Status 0 when using non-http protocol
+				// e.g. 'file://' or 'data://'. Handle as success.
+
+				console.warn( 'THREE.XHRLoader: HTTP Status 0 received.' );
 
 				if ( onLoad ) onLoad( response );
 
@@ -21184,7 +21193,6 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 
 	this.uniforms = THREE.UniformsUtils.clone( source.uniforms );
 
-	this.attributes = source.attributes;
 	this.defines = source.defines;
 
 	this.shading = source.shading;
@@ -21214,7 +21222,6 @@ THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
 	var data = THREE.Material.prototype.toJSON.call( this, meta );
 
 	data.uniforms = this.uniforms;
-	data.attributes = this.attributes;
 	data.vertexShader = this.vertexShader;
 	data.fragmentShader = this.fragmentShader;
 
@@ -28845,10 +28852,29 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		delete geometries[ geometry.id ];
 
+		// TODO
+
 		var property = properties.get( geometry );
-		if ( property.wireframe ) deleteAttribute( property.wireframe );
+
+		if ( property.wireframe ) {
+
+			deleteAttribute( property.wireframe );
+
+		}
 
 		properties.delete( geometry );
+
+		var bufferproperty = properties.get( buffergeometry );
+
+		if ( bufferproperty.wireframe ) {
+
+			deleteAttribute( bufferproperty.wireframe );
+
+		}
+
+		properties.delete( buffergeometry );
+
+		//
 
 		info.memory.geometries --;
 
