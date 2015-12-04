@@ -21921,11 +21921,11 @@ THREE.Line.prototype.raycast = ( function () {
 
 			var index = geometry.index;
 			var attributes = geometry.attributes;
+			var positions = attributes.position.array;
 
 			if ( index !== null ) {
 
 				var indices = index.array;
-				var positions = attributes.position.array;
 
 				for ( var i = 0, l = indices.length - 1; i < l; i += step ) {
 
@@ -21961,8 +21961,6 @@ THREE.Line.prototype.raycast = ( function () {
 				}
 
 			} else {
-
-				var positions = attributes.position.array;
 
 				for ( var i = 0, l = positions.length / 3 - 1; i < l; i += step ) {
 
