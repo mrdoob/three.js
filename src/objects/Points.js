@@ -25,19 +25,20 @@ THREE.Points.prototype.raycast = ( function () {
 	return function raycast( raycaster, intersects ) {
 
 		var object = this;
-		var geometry = object.geometry;
+		var geometry = this.geometry;
+		var matrixWorld = this.matrixWorld;
 		var threshold = raycaster.params.Points.threshold;
 
 		// Checking boundingSphere distance to ray
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		var matrixWorld = this.matrixWorld;
-
 		sphere.copy( geometry.boundingSphere );
 		sphere.applyMatrix4( matrixWorld );
 
 		if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
+
+		//
 
 		inverseMatrix.getInverse( matrixWorld );
 		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );

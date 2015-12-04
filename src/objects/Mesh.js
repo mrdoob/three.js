@@ -165,6 +165,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		var geometry = this.geometry;
 		var material = this.material;
+		var matrixWorld = this.matrixWorld;
 
 		if ( material === undefined ) return;
 
@@ -172,17 +173,17 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		var matrixWorld = this.matrixWorld;
-
 		sphere.copy( geometry.boundingSphere );
 		sphere.applyMatrix4( matrixWorld );
 
 		if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
-		// Check boundingBox before continuing
+		//
 
 		inverseMatrix.getInverse( matrixWorld );
 		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+
+		// Check boundingBox before continuing
 
 		if ( geometry.boundingBox !== null ) {
 

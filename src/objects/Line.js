@@ -35,17 +35,18 @@ THREE.Line.prototype.raycast = ( function () {
 		var precisionSq = precision * precision;
 
 		var geometry = this.geometry;
+		var matrixWorld = this.matrixWorld;
 
 		// Checking boundingSphere distance to ray
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		var matrixWorld = this.matrixWorld;
-
 		sphere.copy( geometry.boundingSphere );
 		sphere.applyMatrix4( matrixWorld );
 
 		if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
+
+		//
 
 		inverseMatrix.getInverse( matrixWorld );
 		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
