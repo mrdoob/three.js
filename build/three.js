@@ -24921,6 +24921,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// internal state cache
 
 	_currentProgram = null,
+	_currentRenderTarget = null,
 	_currentFramebuffer = null,
 	_currentMaterialId = - 1,
 	_currentGeometryProgram = '',
@@ -25057,6 +25058,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var indexedBufferRenderer = new THREE.WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
 
 	//
+
+	function getTargetPixelRatio() {
+
+		return _currentRenderTarget === null ? pixelRatio : 1;
+
+	}
 
 	function glClearColor( r, g, b, a ) {
 
@@ -25684,7 +25691,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material.wireframe === true ) {
 
-				state.setLineWidth( material.wireframeLinewidth * pixelRatio );
+				state.setLineWidth( material.wireframeLinewidth * getTargetPixelRatio() );
 				renderer.setMode( _gl.LINES );
 
 			} else {
@@ -25714,7 +25721,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( lineWidth === undefined ) lineWidth = 1; // Not using Line*Material
 
-			state.setLineWidth( lineWidth * pixelRatio );
+			state.setLineWidth( lineWidth * getTargetPixelRatio() );
 
 			if ( object instanceof THREE.LineSegments ) {
 
@@ -26818,7 +26825,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.psColor.value = material.color;
 		uniforms.opacity.value = material.opacity;
-		uniforms.size.value = material.size * pixelRatio;
+		uniforms.size.value = material.size * getTargetPixelRatio();
 		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
 
 		uniforms.map.value = material.map;
@@ -28198,6 +28205,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	this.setRenderTarget = function ( renderTarget ) {
+
+		_currentRenderTarget = renderTarget;
 
 		if ( renderTarget && properties.get( renderTarget ).__webglFramebuffer === undefined ) {
 
