@@ -67,6 +67,7 @@
 					color: #2194CE;
 					text-decoration: none;
 					cursor: pointer;
+					display: block;
 				}
 
 				#panel #content .selected {
@@ -531,7 +532,7 @@
 		button.style.display = 'none';
 		document.body.appendChild( button );
 
-		var divs = {};
+		var links = {};
 		var selected = null;
 
 		for ( var key in files ) {
@@ -550,18 +551,25 @@
 					name.shift();
 					name = name.join( ' / ' );
 
-					var div = document.createElement( 'div' );
-					div.className = 'link';
-					div.textContent = name;
-					div.addEventListener( 'click', function () {
+					var link = document.createElement( 'a' );
+					link.className = 'link';
+					link.textContent = name;
+					link.href = "#" + file;
 
-						panel.classList.toggle( 'collapsed' );
-						load( file );
+					link.addEventListener( 'click', function (ev) {
+
+						if (ev.button === 0) {
+
+							panel.classList.toggle( 'collapsed' );
+							load( file );
+							ev.preventDefault()
+
+						}
 
 					} );
-					container.appendChild( div );
+					container.appendChild( link );
 
-					divs[ file ] = div;
+					links[ file ] = link;
 
 				} )( section[ i ] );
 
@@ -571,9 +579,9 @@
 
 		var load = function ( file ) {
 
-			if ( selected !== null ) divs[ selected ].className = 'link';
+			if ( selected !== null ) links[ selected ].className = 'link';
 
-			divs[ file ].className = 'link selected';
+			links[ file ].className = 'link selected';
 
 			window.location.hash = file;
 			viewer.src = file + '.html';
