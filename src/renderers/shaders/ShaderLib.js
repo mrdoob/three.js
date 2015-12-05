@@ -598,16 +598,14 @@ THREE.ShaderLib = {
 			"void main() {",
 
 				THREE.ShaderChunk[ "color_vertex" ],
-
-			"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+				THREE.ShaderChunk[ "begin_vertex" ],
+				THREE.ShaderChunk[ "project_vertex" ],
 
 			"	#ifdef USE_SIZEATTENUATION",
-			"		gl_PointSize = size * ( scale / -mvPosition.z );",
+			"		gl_PointSize = size * ( scale / - mvPosition.z );",
 			"	#else",
 			"		gl_PointSize = size;",
 			"	#endif",
-
-			"	gl_Position = projectionMatrix * mvPosition;",
 
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 				THREE.ShaderChunk[ "worldpos_vertex" ],
