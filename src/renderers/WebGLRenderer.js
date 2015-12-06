@@ -739,7 +739,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			activeInfluences.sort( numericalSort );
+			activeInfluences.sort( absNumericalSort );
 
 			if ( activeInfluences.length > 8 ) {
 
@@ -1037,9 +1037,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Sorting
 
-	function numericalSort ( a, b ) {
+	function absNumericalSort( a, b ) {
 
-		return b[ 0 ] - a[ 0 ];
+		return Math.abs( b[ 0 ] ) - Math.abs( a[ 0 ] );
 
 	}
 
