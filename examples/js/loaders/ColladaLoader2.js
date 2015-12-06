@@ -176,7 +176,7 @@ THREE.ColladaLoader.prototype = {
 		function parseImage( xml ) {
 
 			var data = {
-				url: getElementsByTagName( xml, 'init_from' )[ 0 ].textContent
+				init_from: getElementsByTagName( xml, 'init_from' )[ 0 ].textContent
 			};
 
 			library.images[ xml.getAttribute( 'id' ) ] = data;
@@ -187,7 +187,7 @@ THREE.ColladaLoader.prototype = {
 
 			if ( data.build !== undefined ) return data.build;
 
-			var url = data.url;
+			var url = data.init_from;
 
 			if ( baseUrl !== undefined ) url = baseUrl + url;
 
@@ -205,15 +205,317 @@ THREE.ColladaLoader.prototype = {
 
 		function parseEffect( xml ) {
 
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'profile_COMMON':
+						data.profile = parseEffectProfileCOMMON( child );
+						break;
+
+				}
+
+			}
+
+			library.effects[ xml.getAttribute( 'id' ) ] = data;
+
+		}
+
+		function parseEffectProfileCOMMON( xml ) {
+
+			var data = {
+				surfaces: {},
+				samplers: {}
+			};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'newparam':
+						parseEffectNewparam( child, data );
+						break;
+
+					case 'technique':
+						data.technique = parseEffectTechnique( child );
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseEffectNewparam( xml, data ) {
+
+			var sid = xml.getAttribute( 'sid' );
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'surface':
+						data.surfaces[ sid ] = parseEffectSurface( child );
+						break;
+
+					case 'sampler2D':
+						data.samplers[ sid ] = parseEffectSampler( child );
+						break;
+
+				}
+
+			}
+
+		}
+
+		function parseEffectSurface( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'init_from':
+						data.init_from = child.textContent;
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseEffectSampler( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'source':
+						data.source = child.textContent;
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseEffectTechnique( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'constant':
+					case 'lambert':
+					case 'blinn':
+					case 'phong':
+						data.type = child.nodeName;
+						data.parameters = parseEffectParameters( child );
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseEffectParameters( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'emission':
+					case 'diffuse':
+					case 'specular':
+					case 'transparent':
+						data[ child.nodeName ] = parseEffectParameter( child );
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseEffectParameter( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'color':
+						data[ child.nodeName ] = parseFloats( child.textContent );
+						break;
+
+					case 'texture':
+						data[ child.nodeName ] = child.getAttribute( 'texture' );
+						break;
+
+				}
+
+			}
+
+			return data;
+
 		}
 
 		function buildEffect( data ) {
+
+			var material;
+			var technique = data.profile.technique;
+
+			switch ( technique.type ) {
+
+				case 'lambert':
+					material = new THREE.MeshLambertMaterial();
+					break;
+
+				case 'phong':
+				case 'blinn':
+					material = new THREE.MeshPhongMaterial();
+					break;
+
+				default:
+					material = new THREE.MeshBasicMaterial();
+					break;
+
+			}
+
+			var parameters = technique.parameters;
+
+			function getTexture( sid ) {
+
+				var sampler = data.profile.samplers[ sid ];
+				var surface = data.profile.surfaces[ sampler.source ];
+
+				var texture = new THREE.Texture( getImage( surface.init_from ) );
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+				texture.needsUpdate = true;
+
+				return texture;
+
+			}
+
+			for ( var key in parameters ) {
+
+				var parameter = parameters[ key ];
+
+				switch ( key ) {
+					case 'diffuse':
+						if ( parameter.color ) material.color.fromArray( parameter.color );
+						if ( parameter.texture ) material.map = getTexture( parameter.texture );
+						break;
+					case 'emissive':
+						if ( parameter.color ) material.emissive.fromArray( parameter.color );
+						break;
+				}
+
+			}
+
+			return material;
 
 		}
 
 		function getEffect( id ) {
 
 			return getBuild( library.effects[ id ], buildEffect );
+
+		}
+
+		// material
+
+		function parseMaterial( xml ) {
+
+			var data = {
+				name: xml.getAttribute( 'name' )
+			};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'instance_effect':
+						data.url = parseId( child.getAttribute( 'url' ) );
+						break;
+
+				}
+
+			}
+
+			library.materials[ xml.getAttribute( 'id' ) ] = data;
+
+		}
+
+		function buildMaterial( data ) {
+
+			return getEffect( data.url );
+
+		}
+
+		function getMaterial( id ) {
+
+			return getBuild( library.materials[ id ], buildMaterial );
 
 		}
 
@@ -576,6 +878,7 @@ THREE.ColladaLoader.prototype = {
 
 			var primitive = {
 				type: xml.nodeName,
+				material: xml.getAttribute( 'material' ),
 				inputs: {},
 				stride: 0
 			};
@@ -612,11 +915,12 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		var DEFAULT_MATERIAL = new THREE.MeshPhongMaterial();
+		var DEFAULT_LINEMATERIAL = new THREE.LineBasicMaterial();
+		var DEFAULT_MESHMATERIAL = new THREE.MeshPhongMaterial();
 
 		function buildGeometry( data ) {
 
-			var group = new THREE.Group();
+			var group = {};
 
 			var sources = data.sources;
 			var primitives = data.primitives;
@@ -632,7 +936,6 @@ THREE.ColladaLoader.prototype = {
 				var vcount = primitive.vcount;
 
 				var indices = primitive.p;
-				var vcount = primitive.vcount;
 
 				var maxcount = 0;
 
@@ -655,6 +958,7 @@ THREE.ColladaLoader.prototype = {
 
 						var index = indices[ i + offset ] * sourceStride;
 
+						/*
 						if ( asset.upAxis === 'Z_UP' ) {
 
 							array.push( sourceArray[ index + 0 ], sourceArray[ index + 2 ], - sourceArray[ index + 1 ] );
@@ -664,6 +968,10 @@ THREE.ColladaLoader.prototype = {
 							array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
 
 						}
+						*/
+
+						array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
+
 
 					}
 
@@ -727,6 +1035,10 @@ THREE.ColladaLoader.prototype = {
 							geometry.addAttribute( 'normal', new THREE.Float32Attribute( array, 3 ) );
 							break;
 
+						case 'TEXCOORD':
+							geometry.addAttribute( 'uv', new THREE.Float32Attribute( array, stride ) );
+							break;
+
 					}
 
 				}
@@ -737,40 +1049,26 @@ THREE.ColladaLoader.prototype = {
 
 				}
 
+				var object;
+
 				switch ( primitive.type ) {
 
 					case 'lines':
-						group.add( new THREE.LineSegments( geometry ) );
+						object = new THREE.LineSegments( geometry, DEFAULT_LINEMATERIAL );
 						break;
 
 					case 'linestrips':
-						group.add( new THREE.Line( geometry ) );
+						object = new THREE.Line( geometry, DEFAULT_LINEMATERIAL );
 						break;
 
 					case 'triangles':
 					case 'polylist':
-						var material = DEFAULT_MATERIAL;
-						if ( geometry.attributes.color !== undefined ) {
-
-							// Temporal Workaround for EXTW models
-
-							material = new THREE.MeshBasicMaterial( {
-								vertexColors: THREE.VertexColors
-							} );
-
-						}
-						group.add( new THREE.Mesh( geometry, material ) );
+						object = new THREE.Mesh( geometry, DEFAULT_MESHMATERIAL );
 						break;
 
 				}
 
-			}
-
-			// flatten
-
-			if ( group.children.length === 1 ) {
-
-				return group.children[ 0 ];
+				group[ primitive.material ] = object;
 
 			}
 
@@ -823,7 +1121,7 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'instance_geometry':
-						data.instanceGeometries.push( parseId( child.getAttribute( 'url' ) ) );
+						data.instanceGeometries.push( parseNodeInstanceGeometry( child ) );
 						break;
 
 					case 'instance_node':
@@ -872,6 +1170,41 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		function parseNodeInstanceGeometry( xml ) {
+
+			var data = {
+				id: parseId( xml.getAttribute( 'url' ) ),
+				materials: {}
+			};
+
+			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeName === 'bind_material' ) {
+
+					var instances = child.getElementsByTagName( 'instance_material' );
+
+					for ( var j = 0; j < instances.length; j ++ ) {
+
+						var instance = instances[ j ];
+						var symbol = instance.getAttribute( 'symbol' );
+						var target = instance.getAttribute( 'target' );
+
+						data.materials[ symbol ] = parseId( target );
+
+					}
+
+					break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
 		function buildNode( data ) {
 
 			var objects = [];
@@ -903,7 +1236,22 @@ THREE.ColladaLoader.prototype = {
 
 			for ( var i = 0, l = instanceGeometries.length; i < l; i ++ ) {
 
-				objects.push( getGeometry( instanceGeometries[ i ] ).clone() );
+				var instance = instanceGeometries[ i ];
+				var geometries = getGeometry( instance.id );
+
+				for ( var key in geometries ) {
+
+					var object = geometries[ key ].clone();
+
+					if ( instance.materials[ key ] !== undefined ) {
+
+						object.material = getMaterial( instance.materials[ key ] );
+
+					}
+
+					objects.push( object );
+
+				}
 
 			}
 
@@ -1018,7 +1366,8 @@ THREE.ColladaLoader.prototype = {
 
 		var library = {
 			images: {},
-			// effects: {},
+			effects: {},
+			materials: {},
 			cameras: {},
 			lights: {},
 			geometries: {},
@@ -1029,7 +1378,8 @@ THREE.ColladaLoader.prototype = {
 		console.time( 'ColladaLoader: Parse' );
 
 		parseLibrary( collada, library.images, 'library_images', 'image', parseImage );
-		// parseLibrary( collada, library.effects, 'library_effects', 'effect', parseEffect );
+		parseLibrary( collada, library.effects, 'library_effects', 'effect', parseEffect );
+		parseLibrary( collada, library.materials, 'library_materials', 'material', parseMaterial );
 		parseLibrary( collada, library.cameras, 'library_cameras', 'camera', parseCamera );
 		parseLibrary( collada, library.lights, 'library_lights', 'light', parseLight );
 		parseLibrary( collada, library.geometries, 'library_geometries', 'geometry', parseGeometry );
@@ -1040,8 +1390,9 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'ColladaLoader: Build' );
 
-		// buildLibrary( library.images, buildImage );
-		// buildLibrary( library.effects, buildEffect );
+		buildLibrary( library.images, buildImage );
+		buildLibrary( library.effects, buildEffect );
+		buildLibrary( library.materials, buildMaterial );
 		buildLibrary( library.cameras, buildCamera );
 		buildLibrary( library.lights, buildLight );
 		buildLibrary( library.geometries, buildGeometry );
