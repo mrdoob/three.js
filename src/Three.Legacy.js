@@ -727,3 +727,7 @@ THREE.TextGeometry = function () {
 	console.error( 'THREE.FontUtils has been moved to /examples/js/utils/FontUtils.js' );
 
 };
+
+//
+
+THREE.MeshFaceMaterial = THREE.MultiMaterial;
