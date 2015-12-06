@@ -422,13 +422,13 @@ THREE.ColladaLoader.prototype = {
 
 			switch ( technique.type ) {
 
-				case 'lambert':
-					material = new THREE.MeshLambertMaterial();
-					break;
-
 				case 'phong':
 				case 'blinn':
 					material = new THREE.MeshPhongMaterial();
+					break;
+
+				case 'lambert':
+					material = new THREE.MeshLambertMaterial();
 					break;
 
 				default:
@@ -462,8 +462,13 @@ THREE.ColladaLoader.prototype = {
 						if ( parameter.color ) material.color.fromArray( parameter.color );
 						if ( parameter.texture ) material.map = getTexture( parameter.texture );
 						break;
-					case 'emissive':
-						if ( parameter.color ) material.emissive.fromArray( parameter.color );
+					case 'specular':
+						if ( parameter.color && material.specular )
+							material.specular.fromArray( parameter.color );
+						break;
+					case 'emission':
+						if ( parameter.color && material.emissive )
+							material.emissive.fromArray( parameter.color );
 						break;
 				}
 
