@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "cd ./utils/build && node build.js --include common --include extras",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --reporter dot $(find test/unit -name '*.test.mocha.js')"
   },
   "repository": {
     "type": "git",
@@ -30,7 +30,9 @@
   "homepage": "http://threejs.org/",
   "devDependencies": {
     "argparse": "^1.0.3",
+    "chai": "^3.4.1",
     "jscs": "^1.13.1",
+    "mocha": "^2.3.4",
     "uglify-js": "^2.6.0"
   }
 }
