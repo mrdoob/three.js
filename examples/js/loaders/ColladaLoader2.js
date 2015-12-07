@@ -417,64 +417,7 @@ THREE.ColladaLoader.prototype = {
 
 		function buildEffect( data ) {
 
-			var material;
-			var technique = data.profile.technique;
-
-			switch ( technique.type ) {
-
-				case 'phong':
-				case 'blinn':
-					material = new THREE.MeshPhongMaterial();
-					break;
-
-				case 'lambert':
-					material = new THREE.MeshLambertMaterial();
-					break;
-
-				default:
-					material = new THREE.MeshBasicMaterial();
-					break;
-
-			}
-
-			var parameters = technique.parameters;
-
-			function getTexture( sid ) {
-
-				var sampler = data.profile.samplers[ sid ];
-				var surface = data.profile.surfaces[ sampler.source ];
-
-				var texture = new THREE.Texture( getImage( surface.init_from ) );
-				texture.wrapS = THREE.RepeatWrapping;
-				texture.wrapT = THREE.RepeatWrapping;
-				texture.needsUpdate = true;
-
-				return texture;
-
-			}
-
-			for ( var key in parameters ) {
-
-				var parameter = parameters[ key ];
-
-				switch ( key ) {
-					case 'diffuse':
-						if ( parameter.color ) material.color.fromArray( parameter.color );
-						if ( parameter.texture ) material.map = getTexture( parameter.texture );
-						break;
-					case 'specular':
-						if ( parameter.color && material.specular )
-							material.specular.fromArray( parameter.color );
-						break;
-					case 'emission':
-						if ( parameter.color && material.emissive )
-							material.emissive.fromArray( parameter.color );
-						break;
-				}
-
-			}
-
-			return material;
+			return data;
 
 		}
 
@@ -514,7 +457,68 @@ THREE.ColladaLoader.prototype = {
 
 		function buildMaterial( data ) {
 
-			return getEffect( data.url );
+			var effect = getEffect( data.url );
+			var technique = effect.profile.technique;
+
+			var material;
+
+			switch ( technique.type ) {
+
+				case 'phong':
+				case 'blinn':
+					material = new THREE.MeshPhongMaterial();
+					break;
+
+				case 'lambert':
+					material = new THREE.MeshLambertMaterial();
+					break;
+
+				default:
+					material = new THREE.MeshBasicMaterial();
+					break;
+
+			}
+
+			material.name = data.name;
+
+			function getTexture( sid ) {
+
+				var sampler = effect.profile.samplers[ sid ];
+				var surface = effect.profile.surfaces[ sampler.source ];
+
+				var texture = new THREE.Texture( getImage( surface.init_from ) );
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+				texture.needsUpdate = true;
+
+				return texture;
+
+			}
+
+			var parameters = technique.parameters;
+
+			for ( var key in parameters ) {
+
+				var parameter = parameters[ key ];
+
+				switch ( key ) {
+					case 'diffuse':
+						if ( parameter.color ) material.color.fromArray( parameter.color );
+						if ( parameter.texture ) material.map = getTexture( parameter.texture );
+						break;
+					case 'specular':
+						if ( parameter.color && material.specular )
+							material.specular.fromArray( parameter.color );
+						break;
+					case 'emission':
+						if ( parameter.color && material.emissive )
+							material.emissive.fromArray( parameter.color );
+						break;
+				}
+
+			}
+
+			return material;
 
 		}
 
