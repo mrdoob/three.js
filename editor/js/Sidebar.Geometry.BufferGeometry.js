@@ -34,9 +34,11 @@ Sidebar.Geometry.BufferGeometry = function ( editor ) {
 
 			for ( var name in attributes ) {
 
+				var attribute = attributes[ name ];
+
 				var panel = new UI.Row();
 				panel.add( new UI.Text( name ).setWidth( '90px' ) );
-				panel.add( new UI.Text( ( attributes[ name ].count ).format() ).setFontSize( '12px' ) );
+				panel.add( new UI.Text( ( attribute.count ).format() + ' (' + attribute.itemSize + ')' ).setFontSize( '12px' ) );
 				container.add( panel );
 
 			}
