@@ -793,7 +793,59 @@ THREE.ColladaLoader.prototype = {
 
 		// geometry
 
-		function parseSource( xml ) {
+		function parseGeometry( xml ) {
+
+			var data = {
+				name: xml.getAttribute( 'name' ),
+				sources: {},
+				vertices: {},
+				primitives: []
+			};
+
+			var mesh = getElementsByTagName( xml, 'mesh' )[ 0 ];
+
+			for ( var i = 0; i < mesh.childNodes.length; i ++ ) {
+
+				var child = mesh.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				var id = child.getAttribute( 'id' );
+
+				switch ( child.nodeName ) {
+
+					case 'source':
+						data.sources[ id ] = parseGeometrySource( child );
+						break;
+
+					case 'vertices':
+						// data.sources[ id ] = data.sources[ parseId( getElementsByTagName( child, 'input' )[ 0 ].getAttribute( 'source' ) ) ];
+						data.vertices = parseGeometryVertices( child );
+						break;
+
+					case 'polygons':
+						console.log( 'ColladaLoader: Unsupported primitive type: ', child.nodeName );
+						break;
+
+					case 'lines':
+					case 'linestrips':
+					case 'polylist':
+					case 'triangles':
+						data.primitives.push( parseGeometryPrimitive( child ) );
+						break;
+
+					default:
+						console.log( child );
+
+				}
+
+			}
+
+			library.geometries[ xml.getAttribute( 'id' ) ] = data;
+
+		}
+
+		function parseGeometrySource( xml ) {
 
 			var data = {
 				array: [],
@@ -833,53 +885,21 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function parseGeometry( xml ) {
+		function parseGeometryVertices( xml ) {
 
-			var data = {
-				name: xml.getAttribute( 'name' ),
-				sources: {},
-				primitives: []
-			};
+			var data = {};
 
-			var mesh = getElementsByTagName( xml, 'mesh' )[ 0 ];
+			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
 
-			for ( var i = 0; i < mesh.childNodes.length; i ++ ) {
-
-				var child = mesh.childNodes[ i ];
+				var child = xml.childNodes[ i ];
 
 				if ( child.nodeType !== 1 ) continue;
 
-				var id = child.getAttribute( 'id' );
-
-				switch ( child.nodeName ) {
-
-					case 'source':
-						data.sources[ id ] = parseSource( child );
-						break;
-
-					case 'vertices':
-						data.sources[ id ] = data.sources[ parseId( getElementsByTagName( child, 'input' )[ 0 ].getAttribute( 'source' ) ) ];
-						break;
-
-					case 'polygons':
-						console.log( 'ColladaLoader: Unsupported primitive type: ', child.nodeName );
-						break;
-
-					case 'lines':
-					case 'linestrips':
-					case 'polylist':
-					case 'triangles':
-						data.primitives.push( parseGeometryPrimitive( child ) );
-						break;
-
-					default:
-						console.log( child );
-
-				}
+				data[ child.getAttribute( 'semantic' ) ] = parseId( child.getAttribute( 'source' ) );
 
 			}
 
-			library.geometries[ xml.getAttribute( 'id' ) ] = data;
+			return data;
 
 		}
 
@@ -932,6 +952,7 @@ THREE.ColladaLoader.prototype = {
 			var group = {};
 
 			var sources = data.sources;
+			var vertices = data.vertices;
 			var primitives = data.primitives;
 
 			if ( primitives.length === 0 ) return group;
@@ -939,122 +960,39 @@ THREE.ColladaLoader.prototype = {
 			for ( var p = 0; p < primitives.length; p ++ ) {
 
 				var primitive = primitives[ p ];
-
 				var inputs = primitive.inputs;
-				var stride = primitive.stride;
-				var vcount = primitive.vcount;
-
-				var indices = primitive.p;
-
-				var maxcount = 0;
 
 				var geometry = new THREE.BufferGeometry();
+
 				if ( data.name ) geometry.name = data.name;
 
 				for ( var name in inputs ) {
 
 					var input = inputs[ name ];
 
-					var source = sources[ input.id ];
-					var sourceArray = source.array;
-					var sourceStride = source.stride;
-
-					var offset = input.offset;
-
-					var array = [];
-
-					function pushVector( i ) {
-
-						var index = indices[ i + offset ] * sourceStride;
-
-						/*
-						if ( asset.upAxis === 'Z_UP' ) {
-
-							array.push( sourceArray[ index + 0 ], sourceArray[ index + 2 ], - sourceArray[ index + 1 ] );
-
-						} else {
-
-							array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
-
-						}
-						*/
-
-						array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
-
-
-					}
-
-					if ( primitive.vcount !== undefined ) {
-
-						var index = 0;
-
-						for ( var i = 0, l = vcount.length; i < l; i ++ ) {
-
-							var count = vcount[ i ];
-
-							if ( count === 4 ) {
-
-								var a = index + stride * 0;
-								var b = index + stride * 1;
-								var c = index + stride * 2;
-								var d = index + stride * 3;
-
-								pushVector( a ); pushVector( b ); pushVector( d );
-								pushVector( b ); pushVector( c ); pushVector( d );
-
-							} else if ( count === 3 ) {
-
-								var a = index + stride * 0;
-								var b = index + stride * 1;
-								var c = index + stride * 2;
-
-								pushVector( a ); pushVector( b ); pushVector( c );
-
-							} else {
-
-								maxcount = Math.max( maxcount, count );
-
-							}
-
-							index += stride * count;
-
-						}
-
-					} else {
-
-						for ( var i = 0, l = indices.length; i < l; i += stride ) {
-
-							pushVector( i );
-
-						}
-
-					}
-
 					switch ( name )	{
 
 						case 'VERTEX':
-							geometry.addAttribute( 'position', new THREE.Float32Attribute( array, 3 ) );
-							break;
+							for ( var key in vertices ) {
 
-						case 'COLOR':
-							geometry.addAttribute( 'color', new THREE.Float32Attribute( array, 3 ) );
+								geometry.addAttribute( key.toLowerCase(), buildGeometryAttribute( primitive, sources[ vertices[ key ] ], input.offset ) );
+
+							}
 							break;
 
 						case 'NORMAL':
-							geometry.addAttribute( 'normal', new THREE.Float32Attribute( array, 3 ) );
+							geometry.addAttribute( 'normal', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
+							break;
+
+						case 'COLOR':
+							geometry.addAttribute( 'color', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
 							break;
 
 						case 'TEXCOORD':
-							geometry.addAttribute( 'uv', new THREE.Float32Attribute( array, stride ) );
+							geometry.addAttribute( 'uv', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
 							break;
 
 					}
-
-				}
-
-				if ( maxcount > 0 ) {
-
-					console.log( 'ColladaLoader: Geometry', data.id, 'has faces with more than 4 vertices.' );
 
 				}
 
@@ -1082,6 +1020,95 @@ THREE.ColladaLoader.prototype = {
 			}
 
 			return group;
+
+		}
+
+		function buildGeometryAttribute( primitive, source, offset ) {
+
+			var indices = primitive.p;
+			var stride = primitive.stride;
+			var vcount = primitive.vcount;
+
+			function pushVector( i ) {
+
+				var index = indices[ i + offset ] * sourceStride;
+
+				/*
+				if ( asset.upAxis === 'Z_UP' ) {
+
+					array.push( sourceArray[ index + 0 ], sourceArray[ index + 2 ], - sourceArray[ index + 1 ] );
+
+				} else {
+
+					array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
+
+				}
+				*/
+
+				array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
+
+			}
+
+			var maxcount = 0;
+
+			var sourceArray = source.array;
+			var sourceStride = source.stride;
+
+			var array = [];
+
+			if ( primitive.vcount !== undefined ) {
+
+				var index = 0;
+
+				for ( var i = 0, l = vcount.length; i < l; i ++ ) {
+
+					var count = vcount[ i ];
+
+					if ( count === 4 ) {
+
+						var a = index + stride * 0;
+						var b = index + stride * 1;
+						var c = index + stride * 2;
+						var d = index + stride * 3;
+
+						pushVector( a ); pushVector( b ); pushVector( d );
+						pushVector( b ); pushVector( c ); pushVector( d );
+
+					} else if ( count === 3 ) {
+
+						var a = index + stride * 0;
+						var b = index + stride * 1;
+						var c = index + stride * 2;
+
+						pushVector( a ); pushVector( b ); pushVector( c );
+
+					} else {
+
+						maxcount = Math.max( maxcount, count );
+
+					}
+
+					index += stride * count;
+
+				}
+
+				if ( maxcount > 0 ) {
+
+					console.log( 'ColladaLoader: Geometry has faces with more than 4 vertices.' );
+
+				}
+
+			} else {
+
+				for ( var i = 0, l = indices.length; i < l; i += stride ) {
+
+					pushVector( i );
+
+				}
+
+			}
+
+			return new THREE.Float32Attribute( array, sourceStride );
 
 		}
 
