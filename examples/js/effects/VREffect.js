@@ -92,13 +92,13 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		if ( vrHMD ) {
 
-      var eyeParamsL = vrHMD.getEyeParameters( 'left' );
-      var eyeParamsR = vrHMD.getEyeParameters( 'right' );
+			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
+			var eyeParamsR = vrHMD.getEyeParameters( 'right' );
 
-      eyeTranslationL = eyeParamsL.eyeTranslation;
-      eyeTranslationR = eyeParamsR.eyeTranslation;
-      eyeFOVL = eyeParamsL.recommendedFieldOfView;
-      eyeFOVR = eyeParamsR.recommendedFieldOfView;
+			eyeTranslationL = eyeParamsL.eyeTranslation;
+			eyeTranslationR = eyeParamsR.eyeTranslation;
+			eyeFOVL = eyeParamsL.recommendedFieldOfView;
+			eyeFOVR = eyeParamsR.recommendedFieldOfView;
 
 			var sceneL, sceneR;
 
