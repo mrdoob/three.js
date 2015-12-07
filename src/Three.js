@@ -14,10 +14,9 @@ if ( typeof define === 'function' && define.amd ) {
 
 	module.exports = THREE;
 
-	// detects wheather self is not defined and uses global in node environment
 	if ( typeof self === 'undefined' ) {
 
-		// self gets hoisted!
+		/** @suppress {duplicate, const} */
 		var self = global;
 
 	}
