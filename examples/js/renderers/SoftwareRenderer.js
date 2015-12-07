@@ -158,6 +158,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			var material = element.material;
 			var shader = getMaterialShader( material );
 
+			if ( !shader ) continue;
+
 			if ( element instanceof THREE.RenderableFace ) {
 
 				if ( ! element.uvs ) {
@@ -520,6 +522,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var id = material.id;
 		var shader = shaders[ id ];
 
+		if ( shader && !textures[ material.map.id ] ) delete shaders[ id ];
+
 		if ( shaders[ id ] === undefined ) {
 
 			material.addEventListener( 'update', onMaterialUpdate );
@@ -555,6 +559,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 					var texture = new THREE.SoftwareRenderer.Texture();
 					texture.fromImage( material.map.image );
+
+					if ( !texture.data ) return;
 
 					textures[ material.map.id ] = texture;
 
