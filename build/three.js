@@ -16,6 +16,13 @@ if ( typeof define === 'function' && define.amd ) {
 
 	module.exports = THREE;
 
+	if ( typeof self === 'undefined' ) {
+
+		/** @suppress {duplicate, const} */
+		var self = global;
+
+	}
+
 }
 
 
@@ -21017,10 +21024,6 @@ THREE.MultiMaterial.prototype = {
 
 };
 
-// backwards compatibility
-
-THREE.MeshFaceMaterial = THREE.MultiMaterial;
-
 // File:src/materials/PointsMaterial.js
 
 /**
@@ -26153,7 +26156,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						var geometry = objects.update( object );
 
-						if ( material instanceof THREE.MeshFaceMaterial ) {
+						if ( material instanceof THREE.MultiMaterial ) {
 
 							var groups = geometry.groups;
 							var materials = material.materials;
@@ -32702,6 +32705,10 @@ THREE.TextGeometry = function () {
 	console.error( 'THREE.FontUtils has been moved to /examples/js/utils/FontUtils.js' );
 
 };
+
+//
+
+THREE.MeshFaceMaterial = THREE.MultiMaterial;
 
 // File:src/extras/CurveUtils.js
 
