@@ -23,27 +23,6 @@ THREE.VREffect = function ( renderer, onError ) {
 
 				vrHMD = devices[ i ];
 
-				if ( vrHMD.getEyeParameters !== undefined ) {
-
-					var eyeParamsL = vrHMD.getEyeParameters( 'left' );
-					var eyeParamsR = vrHMD.getEyeParameters( 'right' );
-
-					eyeTranslationL = eyeParamsL.eyeTranslation;
-					eyeTranslationR = eyeParamsR.eyeTranslation;
-					eyeFOVL = eyeParamsL.recommendedFieldOfView;
-					eyeFOVR = eyeParamsR.recommendedFieldOfView;
-
-				} else {
-
-					// TODO: This is an older code path and not spec compliant.
-					// It should be removed at some point in the near future.
-					eyeTranslationL = vrHMD.getEyeTranslation( 'left' );
-					eyeTranslationR = vrHMD.getEyeTranslation( 'right' );
-					eyeFOVL = vrHMD.getRecommendedEyeFieldOfView( 'left' );
-					eyeFOVR = vrHMD.getRecommendedEyeFieldOfView( 'right' );
-
-				}
-
 				break; // We keep the first we encounter
 
 			}
@@ -112,6 +91,14 @@ THREE.VREffect = function ( renderer, onError ) {
 	this.render = function ( scene, camera ) {
 
 		if ( vrHMD ) {
+
+			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
+			var eyeParamsR = vrHMD.getEyeParameters( 'right' );
+
+			eyeTranslationL = eyeParamsL.eyeTranslation;
+			eyeTranslationR = eyeParamsR.eyeTranslation;
+			eyeFOVL = eyeParamsL.recommendedFieldOfView;
+			eyeFOVR = eyeParamsR.recommendedFieldOfView;
 
 			var sceneL, sceneR;
 
