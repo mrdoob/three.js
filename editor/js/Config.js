@@ -18,12 +18,6 @@ var Config = function () {
 		'settings/history': false,
 
 		'ui/sidebar/animation/collapsed': true,
-		'ui/sidebar/geometry/collapsed': true,
-		'ui/sidebar/history/collapsed': true,
-		'ui/sidebar/material/collapsed': true,
-		'ui/sidebar/object3d/collapsed': false,
-		'ui/sidebar/project/collapsed': true,
-		'ui/sidebar/scene/collapsed': false,
 		'ui/sidebar/script/collapsed': true
 	};
 
