@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<title>three.js css3d - youtube</title>
+
+	</head>
+	<body>
+		<script src="../build/three.min.js"></script>
+		<script src="js/renderers/CSS3DRenderer.js"></script>
+
+		<div id="container"></div>
+
+		<script>
+			var camera, scene, renderer;
+			var player;
+			
+			var dom = document.createElement( 'div' );
+				dom.style.width = '480px';
+				dom.style.height = '360px';
+				
+			var object = new THREE.CSS3DObject( dom );
+				object.position.x = 0;
+				object.position.y = 0;
+				object.position.z = -400;
+
+			var Element = function ( entry ) {
+				
+				player = document.createElement( 'iframe' );
+				player.style.position = 'absolute';
+				player.style.width = '480px';
+				player.style.height = '360px';
+				player.style.border = '0px';
+				player.src = 'http://www.youtube.com/embed/HDh4uK9PvJU?rel=0&autoplay=1&controls=0&showinfo=0';		
+				dom.appendChild( player );
+
+				return object;
+
+			};
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.y = - 25;
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.CSS3DRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.domElement.style.position = 'absolute';
+				renderer.domElement.style.top = 0;
+				document.getElementById( 'container' ).appendChild( renderer.domElement );
+
+				scene.add( new Element( ) );
+				
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				renderer.render( scene, camera );
+				object.rotation.y += .01;
+
+			}
+
+		</script>
+	</body>
+</html>
