@@ -76,6 +76,8 @@ THREE.ColladaLoader.prototype = {
 
 		function parseFloats( text ) {
 
+			if ( text.length === 0 ) return [];
+
 			var parts = text.trim().split( /\s+/ );
 			var array = new Array( parts.length );
 
@@ -90,6 +92,8 @@ THREE.ColladaLoader.prototype = {
 		}
 
 		function parseInts( text ) {
+
+			if ( text.length === 0 ) return [];
 
 			var parts = text.trim().split( /\s+/ );
 			var array = new Array( parts.length );
