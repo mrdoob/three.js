@@ -10,11 +10,12 @@ var Config = function () {
 		'autosave': true,
 		'theme': 'css/light.css',
 
-		'project/history/stored': true,
 		'project/renderer': 'WebGLRenderer',
 		'project/renderer/antialias': true,
 		'project/renderer/shadows': true,
 		'project/vr': false,
+
+		'settings/history': false,
 
 		'ui/sidebar/animation/collapsed': true,
 		'ui/sidebar/geometry/collapsed': true,

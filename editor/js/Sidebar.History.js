@@ -24,12 +24,13 @@ Sidebar.History = function ( editor ) {
 	// Checkbox 'Save History'
 
 	var saveHistorySpan = new UI.Span().setPosition( 'absolute' ).setRight( '8px' );
-	var saveHistoryCheckbox = new UI.Checkbox( config.getKey( 'project/history/stored' ) ).onChange( function () {
+	var saveHistoryCheckbox = new UI.Checkbox( config.getKey( 'settings/history' ) ).onChange( function () {
 
-		config.setKey( 'project/history/stored', this.getValue() );
-		var saveHistory = this.getValue();
+		var value = this.getValue();
 
-		if ( saveHistory ) {
+		config.setKey( 'settings/history', value );
+
+		if ( value ) {
 
 			alert( 'The history will be preserved across sessions.\nThis can have an impact on performance when working with textures.' );
 
