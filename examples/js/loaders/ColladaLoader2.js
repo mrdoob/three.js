@@ -1301,16 +1301,26 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			var object = new THREE.Group();
-			object.name = data.name;
+			var object;
 
-			matrix.decompose( object.position, object.quaternion, object.scale );
+			if ( nodes.length === 0 && objects.length === 1 ) {
 
-			for ( var i = 0; i < objects.length; i ++ ) {
+				object = objects[ 0 ];
 
-				object.add( objects[ i ] );
+			} else {
+
+				object = new THREE.Group();
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					object.add( objects[ i ] );
+
+				}
 
 			}
+
+			object.name = data.name;
+			matrix.decompose( object.position, object.quaternion, object.scale );
 
 			return object;
 
