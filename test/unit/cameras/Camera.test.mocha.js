@@ -2,18 +2,18 @@
  * @author simonThiele / https://github.com/simonThiele
  */
 
-var expect = require('chai').expect;
-var assert = require('chai').assert;
+var expect = require( 'chai' ).expect;
+var assert = require( 'chai' ).assert;
 
 self = global;
-var THREE = require('../../../build/three');
+var THREE = require( '../../../build/three' );
 
 
-describe('Camera', function() {
+describe( 'Camera', function() {
 
-	describe('lookAt', function () {
+	describe( 'lookAt', function () {
 
-		it('should calculate the correct x rotation value', function () {
+		it( 'should calculate the correct x rotation value', function () {
 
 		  var cam = new THREE.Camera();
 			cam.lookAt( new THREE.Vector3( 0, 1, -1 ) );
@@ -22,7 +22,7 @@ describe('Camera', function() {
 
     });
 
-		it('should clone', function () {
+		it( 'should clone', function () {
 
 				var cam = new THREE.Camera();
 
@@ -32,8 +32,8 @@ describe('Camera', function() {
 
 				var clonedCam = cam.clone();
 
-				assert.equal(cam.matrixWorldInverse.equals( clonedCam.matrixWorldInverse ), true, "matrixWorldInverse is equal");
-				assert.equal(cam.projectionMatrix.equals(clonedCam.projectionMatrix), true, "projectionMatrix is equal");
+				assert.equal( cam.matrixWorldInverse.equals( clonedCam.matrixWorldInverse ), true, "matrixWorldInverse is equal" );
+				assert.equal( cam.projectionMatrix.equals( clonedCam.projectionMatrix ), true, "projectionMatrix is equal" );
 
     });
 
