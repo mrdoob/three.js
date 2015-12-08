@@ -1387,6 +1387,12 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'ColladaLoader' );
 
+		if ( text.length === 0 ) {
+
+			return { scene: new THREE.Scene() };
+
+		}
+
 		console.time( 'ColladaLoader: DOMParser' );
 
 		var xml = new DOMParser().parseFromString( text, 'application/xml' );
