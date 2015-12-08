@@ -2,10 +2,13 @@
  * @author simonThiele / https://github.com/simonThiele
  */
 
-var expect = require( 'chai' ).expect;
-var assert = require( 'chai' ).assert;
+var chai = require( 'chai' );
+var expect = chai.expect;
+var assert = chai.assert;
 
+// is needed until three.js build file contains the self fix
 self = global;
+
 var THREE = require( '../../../build/three' );
 
 
