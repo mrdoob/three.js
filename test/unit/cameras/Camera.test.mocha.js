@@ -14,8 +14,6 @@ var THREE = require( '../../../build/three' );
 
 describe( 'Camera', function() {
 
-	describe( 'lookAt', function () {
-
 		it( 'should calculate the correct x rotation value', function () {
 
 		  var cam = new THREE.Camera();
@@ -39,7 +37,5 @@ describe( 'Camera', function() {
 				assert.equal( cam.projectionMatrix.equals( clonedCam.projectionMatrix ), true, "projectionMatrix is equal" );
 
     });
-
-  });
 
 });
