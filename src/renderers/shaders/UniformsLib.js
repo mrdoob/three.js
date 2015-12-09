@@ -125,7 +125,7 @@ THREE.UniformsLib = {
 
 	points: {
 
-		"psColor" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
+		"diffuse" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
 		"opacity" : { type: "f", value: 1.0 },
 		"size" : { type: "f", value: 1.0 },
 		"scale" : { type: "f", value: 1.0 },

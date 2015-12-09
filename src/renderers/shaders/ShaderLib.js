@@ -617,7 +617,7 @@ THREE.ShaderLib = {
 
 		fragmentShader: [
 
-			"uniform vec3 psColor;",
+			"uniform vec3 diffuse;",
 			"uniform float opacity;",
 
 			THREE.ShaderChunk[ "common" ],
@@ -630,7 +630,7 @@ THREE.ShaderLib = {
 			"void main() {",
 
 			"	vec3 outgoingLight = vec3( 0.0 );",
-			"	vec4 diffuseColor = vec4( psColor, opacity );",
+			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_particle_fragment" ],

@@ -1982,7 +1982,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsPoints ( uniforms, material ) {
 
-		uniforms.psColor.value = material.color;
+		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size * getTargetPixelRatio();
 		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
