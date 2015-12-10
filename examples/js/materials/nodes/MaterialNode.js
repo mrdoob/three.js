@@ -1,0 +1,467 @@
+/**
+ * @author sunag / http://www.sunag.com.br/
+ */
+
+THREE.MaterialNode = function( vertex, fragment ) {
+	
+	THREE.ShaderMaterial.call( this );
+	
+	this.vertex = vertex || new THREE.RawNode( new THREE.PositionNode( THREE.PositionNode.PROJECTION ) );
+	this.fragment = fragment || new THREE.RawNode( new THREE.ColorNode( 0xFF0000 ) );
+	
+};
+
+THREE.MaterialNode.prototype = Object.create( THREE.ShaderMaterial.prototype );
+THREE.MaterialNode.prototype.constructor = THREE.MaterialNode;
+
+THREE.MaterialNode.Type = {
+	t : 'sampler2D',
+	tc : 'samplerCube',
+	bv1 : 'bool',
+	iv1 : 'int',
+	fv1 : 'float',
+	c : 'vec3',
+	v2 : 'vec2',
+	v3 : 'vec3',
+	v4 : 'vec4'
+};
+
+THREE.MaterialNode.GetShortcuts = function( prop, name ) {
+	
+	return {
+		get: function () { return this[prop][name]; },
+		set: function ( val ) { this[prop][name] = val; }
+	};
+
+};
+
+THREE.MaterialNode.Shortcuts = function( proto, prop, list ) {
+	
+	var shortcuts = {};
+	
+	for(var i = 0; i < list.length; ++i) {
+		
+		var name = list[i];
+		
+		shortcuts[name] =  this.GetShortcuts( prop, name );
+	
+	}
+	
+	Object.defineProperties( proto, shortcuts );
+
+};
+
+THREE.MaterialNode.prototype.updateAnimation = function( delta ) {
+	
+	for(var i = 0; i < this.requestUpdate.length; ++i) {
+
+		this.requestUpdate[i].updateAnimation( delta );
+	
+	}
+	
+};
+
+THREE.MaterialNode.prototype.build = function() {
+	
+	var vertex, fragment;
+	
+	this.defines = {};
+	this.uniforms = {}; 
+	
+	this.nodeData = {};	
+	
+	this.vertexUniform = [];
+	this.fragmentUniform = [];
+	
+	this.vertexTemps = [];
+	this.fragmentTemps = [];
+	
+	this.uniformList = [];
+	
+	this.consts = [];
+	this.functions = [];
+	
+	this.requestUpdate = [];
+	
+	this.requestAttrib = {
+		uv:[],
+		color:[]
+	};
+	
+	this.needsColor = false;
+	this.needsLight = false;
+	this.needsPosition = false;
+	this.needsTransparent = false;
+	
+	this.vertexPars = '';
+	this.fragmentPars = '';
+	
+	this.vertexCode = '';
+	this.fragmentCode = '';
+	
+	this.vertexNode = '';
+	this.fragmentNode = '';
+	
+	var builder = new THREE.BuilderNode(this);
+	
+	vertex = this.vertex.build( builder.setShader('vertex'), 'v4' );
+	fragment = this.fragment.build( builder.setShader('fragment'), 'v4' );
+	
+	if (this.requestAttrib.uv[0]) {
+		
+		this.addVertexPars( 'varying vec2 vUv;' );
+		this.addFragmentPars( 'varying vec2 vUv;' );
+		
+		this.addVertexCode( 'vUv = uv;' );
+		
+	}
+	
+	if (this.requestAttrib.uv[1]) {
+		
+		this.addVertexPars( 'varying vec2 vUv2; attribute vec2 uv2;' );
+		this.addFragmentPars( 'varying vec2 vUv2;' );
+		
+		this.addVertexCode( 'vUv2 = uv2;' );
+		
+	}
+	
+	if (this.requestAttrib.color[0]) {
+
+		this.addVertexPars( 'varying vec4 vColor; attribute vec4 color;' );
+		this.addFragmentPars( 'varying vec4 vColor;' );
+		
+		this.addVertexCode( 'vColor = color;' );
+		
+	}
+	
+	if (this.requestAttrib.color[1]) {
+
+		this.addVertexPars( 'varying vec4 vColor2; attribute vec4 color2;' );
+		this.addFragmentPars( 'varying vec4 vColor2;' );
+		
+		this.addVertexCode( 'vColor2 = color2;' );
+		
+	}
+	
+	if (this.requestAttrib.position) {
+
+		this.addVertexPars( 'varying vec3 vPosition;' );
+		this.addFragmentPars( 'varying vec3 vPosition;' );
+		
+		this.addVertexCode( 'vPosition = transformed;' );
+		
+	}
+	
+	if (this.requestAttrib.worldPosition) {
+		
+		// for future update replace from the native "varying vec3 vWorldPosition" for optimization
+		
+		this.addVertexPars( 'varying vec3 vWPosition;' );
+		this.addFragmentPars( 'varying vec3 vWPosition;' );
+		
+		this.addVertexCode( 'vWPosition = worldPosition.xyz;' );
+
+	}
+	
+	if (this.requestAttrib.normal) {
+
+		this.addVertexPars( 'varying vec3 vObjectNormal;' );
+		this.addFragmentPars( 'varying vec3 vObjectNormal;' );
+		
+		this.addVertexCode( 'vObjectNormal = normal;' );
+		
+	}
+	
+	if (this.requestAttrib.worldNormal) {
+
+		this.addVertexPars( 'varying vec3 vWNormal;' );
+		this.addFragmentPars( 'varying vec3 vWNormal;' );
+		
+		this.addVertexCode( 'vWNormal = ( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz;' );
+		
+	}
+	
+	this.lights = this.needsLight;
+	this.transparent = this.needsTransparent;
+	
+	this.vertexShader = [
+		this.vertexPars,
+		this.getCodePars( this.vertexUniform, 'uniform' ),
+		this.getIncludes(this.consts['vertex']),
+		this.getIncludes(this.functions['vertex']),
+		'void main(){',
+		this.getCodePars( this.vertexTemps ),
+		vertex,
+		this.vertexCode,
+		'}'
+	].join( "\n" );
+
+	this.fragmentShader = [
+		this.fragmentPars,
+		this.getCodePars( this.fragmentUniform, 'uniform' ),
+		this.getIncludes(this.consts['fragment']),
+		this.getIncludes(this.functions['fragment']),
+		'void main(){',
+		this.getCodePars( this.fragmentTemps ),
+		this.fragmentCode,
+		fragment,
+		'}'
+	].join( "\n" );
+	
+	this.needsUpdate = true;
+	this.dispose(); // force update
+	
+	return this;
+};
+
+THREE.MaterialNode.prototype.define = function(name, value) {
+
+	this.defines[name] = value == undefined ? 1 : value;
+
+};
+
+THREE.MaterialNode.prototype.isDefined = function(name) {
+
+	return this.defines[name] != undefined;
+
+};
+
+THREE.MaterialNode.prototype.mergeUniform = function( uniforms ) {
+	
+	for (var name in uniforms) {
+		
+		this.uniforms[ name ] = uniforms[ name ];
+	
+	}
+	
+};
+
+THREE.MaterialNode.prototype.createUniform = function( value, type, needsUpdate ) {
+	
+	var index = this.uniformList.length;
+	
+	var uniform = {
+		type : type,
+		value : value,
+		needsUpdate : needsUpdate,
+		name : 'nVu' + index
+	};
+	
+	this.uniformList.push(uniform);
+	
+	return uniform;
+	
+};
+
+THREE.MaterialNode.prototype.getVertexTemp = function( uuid, type ) {
+	
+	if (!this.vertexTemps[ uuid ]) {
+		
+		var index = this.vertexTemps.length,
+			name = 'nVt' + index,
+			data = { name : name, type : type };
+		
+		this.vertexTemps.push( data );
+		this.vertexTemps[uuid] = data;
+		
+	}
+	
+	return this.vertexTemps[uuid];
+	
+};
+
+THREE.MaterialNode.prototype.getIncludes = function( incs ) {
+	
+	function sortByPosition(a, b){
+		return b.deps - a.deps;
+	}
+	
+	return function( incs ) {
+		
+		if (!incs) return '';
+		
+		var code = '';
+		var incs = incs.sort(sortByPosition);
+		
+		for(var i = 0; i < incs.length; i++) {
+			
+			code += incs[i].node.src + '\n';
+		
+		}
+		
+		return code;
+	}
+}();
+
+THREE.MaterialNode.prototype.getFragmentTemp = function( uuid, type ) {
+	
+	if (!this.fragmentTemps[ uuid ]) {
+		
+		var index = this.fragmentTemps.length,
+			name = 'nVt' + index,
+			data = { name : name, type : type };
+		
+		this.fragmentTemps.push( data );
+		this.fragmentTemps[uuid] = data;
+		
+	}
+	
+	return this.fragmentTemps[uuid];
+	
+};
+
+THREE.MaterialNode.prototype.addVertexPars = function( code ) {
+
+	this.vertexPars += code + '\n';
+
+};
+
+THREE.MaterialNode.prototype.addFragmentPars = function( code ) {
+
+	this.fragmentPars += code + '\n';
+
+};
+
+THREE.MaterialNode.prototype.addVertexCode = function( code ) {
+
+	this.vertexCode += code + '\n';
+
+};
+
+THREE.MaterialNode.prototype.addFragmentCode = function( code ) {
+
+	this.fragmentCode += code + '\n';
+
+};
+
+THREE.MaterialNode.prototype.addVertexNode = function( code ) {
+
+	this.vertexNode += code + '\n';
+
+};
+
+THREE.MaterialNode.prototype.clearVertexNode = function() {
+
+	var code = this.fragmentNode;
+	
+	this.fragmentNode = '';
+	
+	return code;
+
+};
+
+THREE.MaterialNode.prototype.addFragmentNode = function( code ) {
+
+	this.fragmentNode += code + '\n';
+
+};
+
+THREE.MaterialNode.prototype.clearFragmentNode = function() {
+
+	var code = this.fragmentNode;
+	
+	this.fragmentNode = '';
+	
+	return code;
+
+};
+
+THREE.MaterialNode.prototype.getCodePars = function( pars, prefix ) {
+
+	prefix = prefix || '';
+
+	var code = '';
+	
+	for (var i = 0, l = pars.length; i < l; ++i) {
+		
+		var parsType = pars[i].type;
+		var parsName = pars[i].name;
+		var parsValue = pars[i].value;
+		
+		if (parsType == 't' && parsValue instanceof THREE.CubeTexture) parsType = 'tc';
+		
+		var type = THREE.MaterialNode.Type[ parsType ];
+		
+		if (type == undefined) throw new Error( "Node pars " + parsType + " not found." );
+		
+		code += prefix + ' ' + type + ' ' + parsName + ';\n';
+	}
+
+	return code;
+
+};
+
+THREE.MaterialNode.prototype.getVertexUniform = function( value, type, needsUpdate ) {
+
+	var uniform = this.createUniform( value, type, needsUpdate );
+	
+	this.vertexUniform.push(uniform);
+	this.vertexUniform[uniform.name] = uniform;
+	
+	this.uniforms[ uniform.name ] = uniform;
+	
+	return uniform;
+
+};
+
+THREE.MaterialNode.prototype.getFragmentUniform = function( value, type, needsUpdate ) {
+
+	var uniform = this.createUniform( value, type, needsUpdate );
+	
+	this.fragmentUniform.push(uniform);
+	this.fragmentUniform[uniform.name] = uniform;
+	
+	this.uniforms[ uniform.name ] = uniform;
+	
+	return uniform;
+
+};
+
+THREE.MaterialNode.prototype.getDataNode = function( uuid ) {
+
+	return this.nodeData[uuid] = this.nodeData[uuid] || {};
+
+};
+
+THREE.MaterialNode.prototype.include = function( shader, node ) {
+	
+	var includes;
+	
+	node = typeof node === 'string' ? THREE.LibNode.get(node) : node;
+	
+	if (node instanceof THREE.FunctionNode) {
+	
+		for (var i = 0; i < node.includes.length; i++) {
+			
+			this.include( shader, node.includes[i] );
+		
+		}
+		
+		includes = this.functions[shader] = this.functions[shader] || [];
+		
+	}
+	else if (node instanceof THREE.ConstNode) {
+		
+		includes = this.consts[shader] = this.consts[shader] || [];
+	
+	}
+	
+	if (includes[node.name] === undefined) {
+			
+		for (var ext in node.extensions) {
+			
+			this.extensions[ext] = true;
+			
+		}
+		
+		includes[node.name] = { 
+			node : node,
+			deps : 1
+		};
+		
+		includes.push(includes[node.name]);
+		
+	}
+	else ++includes[node.name].deps;
+
+};
