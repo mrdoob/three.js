@@ -13,4 +13,4 @@ THREE.ColorNode = function( color ) {
 THREE.ColorNode.prototype = Object.create( THREE.InputNode.prototype );
 THREE.ColorNode.prototype.constructor = THREE.ColorNode;
 
-THREE.MaterialNode.Shortcuts( THREE.ColorNode.prototype, 'value', [ 'r', 'g', 'b' ] );
+THREE.NodeMaterial.Shortcuts( THREE.ColorNode.prototype, 'value', [ 'r', 'g', 'b' ] );

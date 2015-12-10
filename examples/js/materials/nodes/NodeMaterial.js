@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.MaterialNode = function( vertex, fragment ) {
+THREE.NodeMaterial = function( vertex, fragment ) {
 	
 	THREE.ShaderMaterial.call( this );
 	
@@ -11,10 +11,10 @@ THREE.MaterialNode = function( vertex, fragment ) {
 	
 };
 
-THREE.MaterialNode.prototype = Object.create( THREE.ShaderMaterial.prototype );
-THREE.MaterialNode.prototype.constructor = THREE.MaterialNode;
+THREE.NodeMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
+THREE.NodeMaterial.prototype.constructor = THREE.NodeMaterial;
 
-THREE.MaterialNode.Type = {
+THREE.NodeMaterial.Type = {
 	t : 'sampler2D',
 	tc : 'samplerCube',
 	bv1 : 'bool',
@@ -26,7 +26,7 @@ THREE.MaterialNode.Type = {
 	v4 : 'vec4'
 };
 
-THREE.MaterialNode.GetShortcuts = function( prop, name ) {
+THREE.NodeMaterial.GetShortcuts = function( prop, name ) {
 	
 	return {
 		get: function () { return this[prop][name]; },
@@ -35,7 +35,7 @@ THREE.MaterialNode.GetShortcuts = function( prop, name ) {
 
 };
 
-THREE.MaterialNode.Shortcuts = function( proto, prop, list ) {
+THREE.NodeMaterial.Shortcuts = function( proto, prop, list ) {
 	
 	var shortcuts = {};
 	
@@ -51,7 +51,7 @@ THREE.MaterialNode.Shortcuts = function( proto, prop, list ) {
 
 };
 
-THREE.MaterialNode.prototype.updateAnimation = function( delta ) {
+THREE.NodeMaterial.prototype.updateAnimation = function( delta ) {
 	
 	for(var i = 0; i < this.requestUpdate.length; ++i) {
 
@@ -61,7 +61,7 @@ THREE.MaterialNode.prototype.updateAnimation = function( delta ) {
 	
 };
 
-THREE.MaterialNode.prototype.build = function() {
+THREE.NodeMaterial.prototype.build = function() {
 	
 	var vertex, fragment;
 	
@@ -214,19 +214,19 @@ THREE.MaterialNode.prototype.build = function() {
 	return this;
 };
 
-THREE.MaterialNode.prototype.define = function(name, value) {
+THREE.NodeMaterial.prototype.define = function(name, value) {
 
 	this.defines[name] = value == undefined ? 1 : value;
 
 };
 
-THREE.MaterialNode.prototype.isDefined = function(name) {
+THREE.NodeMaterial.prototype.isDefined = function(name) {
 
 	return this.defines[name] != undefined;
 
 };
 
-THREE.MaterialNode.prototype.mergeUniform = function( uniforms ) {
+THREE.NodeMaterial.prototype.mergeUniform = function( uniforms ) {
 	
 	for (var name in uniforms) {
 		
@@ -236,7 +236,7 @@ THREE.MaterialNode.prototype.mergeUniform = function( uniforms ) {
 	
 };
 
-THREE.MaterialNode.prototype.createUniform = function( value, type, needsUpdate ) {
+THREE.NodeMaterial.prototype.createUniform = function( value, type, needsUpdate ) {
 	
 	var index = this.uniformList.length;
 	
@@ -253,7 +253,7 @@ THREE.MaterialNode.prototype.createUniform = function( value, type, needsUpdate 
 	
 };
 
-THREE.MaterialNode.prototype.getVertexTemp = function( uuid, type ) {
+THREE.NodeMaterial.prototype.getVertexTemp = function( uuid, type ) {
 	
 	if (!this.vertexTemps[ uuid ]) {
 		
@@ -270,7 +270,7 @@ THREE.MaterialNode.prototype.getVertexTemp = function( uuid, type ) {
 	
 };
 
-THREE.MaterialNode.prototype.getIncludes = function( incs ) {
+THREE.NodeMaterial.prototype.getIncludes = function( incs ) {
 	
 	function sortByPosition(a, b){
 		return b.deps - a.deps;
@@ -293,7 +293,7 @@ THREE.MaterialNode.prototype.getIncludes = function( incs ) {
 	}
 }();
 
-THREE.MaterialNode.prototype.getFragmentTemp = function( uuid, type ) {
+THREE.NodeMaterial.prototype.getFragmentTemp = function( uuid, type ) {
 	
 	if (!this.fragmentTemps[ uuid ]) {
 		
@@ -310,37 +310,37 @@ THREE.MaterialNode.prototype.getFragmentTemp = function( uuid, type ) {
 	
 };
 
-THREE.MaterialNode.prototype.addVertexPars = function( code ) {
+THREE.NodeMaterial.prototype.addVertexPars = function( code ) {
 
 	this.vertexPars += code + '\n';
 
 };
 
-THREE.MaterialNode.prototype.addFragmentPars = function( code ) {
+THREE.NodeMaterial.prototype.addFragmentPars = function( code ) {
 
 	this.fragmentPars += code + '\n';
 
 };
 
-THREE.MaterialNode.prototype.addVertexCode = function( code ) {
+THREE.NodeMaterial.prototype.addVertexCode = function( code ) {
 
 	this.vertexCode += code + '\n';
 
 };
 
-THREE.MaterialNode.prototype.addFragmentCode = function( code ) {
+THREE.NodeMaterial.prototype.addFragmentCode = function( code ) {
 
 	this.fragmentCode += code + '\n';
 
 };
 
-THREE.MaterialNode.prototype.addVertexNode = function( code ) {
+THREE.NodeMaterial.prototype.addVertexNode = function( code ) {
 
 	this.vertexNode += code + '\n';
 
 };
 
-THREE.MaterialNode.prototype.clearVertexNode = function() {
+THREE.NodeMaterial.prototype.clearVertexNode = function() {
 
 	var code = this.fragmentNode;
 	
@@ -350,13 +350,13 @@ THREE.MaterialNode.prototype.clearVertexNode = function() {
 
 };
 
-THREE.MaterialNode.prototype.addFragmentNode = function( code ) {
+THREE.NodeMaterial.prototype.addFragmentNode = function( code ) {
 
 	this.fragmentNode += code + '\n';
 
 };
 
-THREE.MaterialNode.prototype.clearFragmentNode = function() {
+THREE.NodeMaterial.prototype.clearFragmentNode = function() {
 
 	var code = this.fragmentNode;
 	
@@ -366,7 +366,7 @@ THREE.MaterialNode.prototype.clearFragmentNode = function() {
 
 };
 
-THREE.MaterialNode.prototype.getCodePars = function( pars, prefix ) {
+THREE.NodeMaterial.prototype.getCodePars = function( pars, prefix ) {
 
 	prefix = prefix || '';
 
@@ -380,7 +380,7 @@ THREE.MaterialNode.prototype.getCodePars = function( pars, prefix ) {
 		
 		if (parsType == 't' && parsValue instanceof THREE.CubeTexture) parsType = 'tc';
 		
-		var type = THREE.MaterialNode.Type[ parsType ];
+		var type = THREE.NodeMaterial.Type[ parsType ];
 		
 		if (type == undefined) throw new Error( "Node pars " + parsType + " not found." );
 		
@@ -391,7 +391,7 @@ THREE.MaterialNode.prototype.getCodePars = function( pars, prefix ) {
 
 };
 
-THREE.MaterialNode.prototype.getVertexUniform = function( value, type, needsUpdate ) {
+THREE.NodeMaterial.prototype.getVertexUniform = function( value, type, needsUpdate ) {
 
 	var uniform = this.createUniform( value, type, needsUpdate );
 	
@@ -404,7 +404,7 @@ THREE.MaterialNode.prototype.getVertexUniform = function( value, type, needsUpda
 
 };
 
-THREE.MaterialNode.prototype.getFragmentUniform = function( value, type, needsUpdate ) {
+THREE.NodeMaterial.prototype.getFragmentUniform = function( value, type, needsUpdate ) {
 
 	var uniform = this.createUniform( value, type, needsUpdate );
 	
@@ -417,13 +417,13 @@ THREE.MaterialNode.prototype.getFragmentUniform = function( value, type, needsUp
 
 };
 
-THREE.MaterialNode.prototype.getDataNode = function( uuid ) {
+THREE.NodeMaterial.prototype.getDataNode = function( uuid ) {
 
 	return this.nodeData[uuid] = this.nodeData[uuid] || {};
 
 };
 
-THREE.MaterialNode.prototype.include = function( shader, node ) {
+THREE.NodeMaterial.prototype.include = function( shader, node ) {
 	
 	var includes;
 	

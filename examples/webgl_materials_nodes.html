@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>WebGL MaterialNode</title>
+		<title>WebGL NodeMaterial</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -39,13 +39,13 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		
-		<!-- MaterialNode Base -->
+		<!-- NodeMaterial Base -->
 		<script src="js/materials/nodes/GLNode.js"></script>
 		<script src="js/materials/nodes/BuilderNode.js"></script>
 		<script src="js/materials/nodes/RawNode.js"></script>
 		<script src="js/materials/nodes/TempNode.js"></script>
 		<script src="js/materials/nodes/InputNode.js"></script>
-		<script src="js/materials/nodes/MaterialNode.js"></script>
+		<script src="js/materials/nodes/NodeMaterial.js"></script>
 		<script src="js/materials/nodes/ConstNode.js"></script>
 		<script src="js/materials/nodes/FunctionNode.js"></script>
 		<script src="js/materials/nodes/FunctionCallNode.js"></script>
@@ -83,9 +83,9 @@
 		
 		<!-- Interfaces -->
 		<script src="js/materials/nodes/interfaces/PhongNode.js"></script>
-		<script src="js/materials/nodes/interfaces/PhongMaterialNode.js"></script>
+		<script src="js/materials/nodes/interfaces/PhongNodeMaterial.js"></script>
 		<script src="js/materials/nodes/interfaces/StandardNode.js"></script>
-		<script src="js/materials/nodes/interfaces/StandardMaterialNode.js"></script>
+		<script src="js/materials/nodes/interfaces/StandardNodeMaterial.js"></script>
 		
 		<!-- Extras -->
 		<script src="js/materials/nodes/extras/VelocityNode.js"></script>
@@ -253,7 +253,7 @@
 					
 					//	MATERIAL
 					
-					mtl = new THREE.PhongMaterialNode();
+					mtl = new THREE.PhongNodeMaterial();
 					
 					//mtl.color = // albedo color
 					//mtl.alpha = // opacity (0 at 1)
@@ -285,7 +285,7 @@
 					
 					//	MATERIAL
 					
-					mtl = new THREE.StandardMaterialNode();
+					mtl = new THREE.StandardNodeMaterial();
 					
 					//mtl.color = // albedo color
 					//mtl.alpha = // opacity (0 at 1)
@@ -382,7 +382,7 @@
 					
 					//	MATERIAL
 					
-					mtl = new THREE.PhongMaterialNode();
+					mtl = new THREE.PhongNodeMaterial();
 					
 					var time = new THREE.TimeNode();
 					var speed = new THREE.FloatNode(5);
@@ -494,7 +494,7 @@
 					
 					//	MATERIAL
 					
-					mtl = new THREE.PhongMaterialNode();
+					mtl = new THREE.PhongNodeMaterial();
 					
 					var intensity = 1.3;
 					var power = new THREE.FloatNode(3);
@@ -580,7 +580,7 @@
 					
 					//	MATERIAL
 					
-					mtl = new THREE.PhongMaterialNode();
+					mtl = new THREE.PhongNodeMaterial();
 					
 					var reflectance = new THREE.FloatNode(1.3);
 					var power = new THREE.FloatNode(1);
@@ -634,7 +634,7 @@
 					
 					//	MATERIAL
 					
-					mtl = new THREE.PhongMaterialNode();
+					mtl = new THREE.PhongNodeMaterial();
 					
 					var tex1 = new THREE.TextureNode(grass);
 					var tex2 = new THREE.TextureNode(brick);
@@ -687,7 +687,7 @@
 					
 					//	MATERIAL
 					
-					mtl = new THREE.StandardMaterialNode();
+					mtl = new THREE.StandardNodeMaterial();
 					
 					var tex = new THREE.TextureNode(brick);
 					var sat = new THREE.FloatNode(0);
@@ -726,7 +726,7 @@
 					
 					//	MATERIAL
 					
-					mtl = new THREE.PhongMaterialNode();
+					mtl = new THREE.PhongNodeMaterial();
 					
 					var top = new THREE.TextureNode(grass);
 					var bottom = new THREE.TextureNode(brick);
@@ -775,7 +775,7 @@
 					
 					//	MATERIAL
 					
-					mtl = new THREE.PhongMaterialNode();
+					mtl = new THREE.PhongNodeMaterial();
 					
 					var time = new THREE.TimeNode();
 					var scale = new THREE.FloatNode(2);
@@ -861,7 +861,7 @@
 					
 					//	MATERIAL
 					
-					mtl = new THREE.PhongMaterialNode();
+					mtl = new THREE.PhongNodeMaterial();
 					
 					var time = new THREE.TimeNode();
 					var uv = new THREE.UVNode();
@@ -930,7 +930,7 @@
 						THREE.Math3Node.MIX
 					);
 					
-					mtl = new THREE.PhongMaterialNode();
+					mtl = new THREE.PhongNodeMaterial();
 					mtl.color = colors;
 					
 					//	GUI
@@ -965,7 +965,7 @@
 					
 					//	MATERIAL
 					
-					mtl = new THREE.StandardMaterialNode();
+					mtl = new THREE.StandardNodeMaterial();
 					
 					var hash2 = new THREE.FunctionNode([
 					"vec2 hash2(vec2 p) {",
@@ -1136,7 +1136,7 @@
 					
 					move = true;
 					
-					mtl = new THREE.StandardMaterialNode();
+					mtl = new THREE.StandardNodeMaterial();
 					
 					var scale = new THREE.FloatNode(2);
 					var colorA = new THREE.ColorNode(0xFF6633);
@@ -1219,7 +1219,7 @@
 					
 					//	MATERIAL
 					
-					mtl = new THREE.PhongMaterialNode();
+					mtl = new THREE.PhongNodeMaterial();
 					
 					var time = new THREE.TimeNode();
 					var speed = new THREE.FloatNode(.5);
