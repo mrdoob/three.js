@@ -308,7 +308,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				if ( intersection ) {
 
-					if ( uvs ) {
+				    if ( uvs && uvs[ f ] ) {
 
 						var uvs_f = uvs[ f ];
 						uvA.copy( uvs_f[ 0 ] );
