@@ -15,10 +15,11 @@ Sidebar.History = function ( editor ) {
 
 	container.add( new UI.Text( 'HISTORY' ) );
 
-	// Checkbox 'Save History'
+	//
 
-	var saveHistorySpan = new UI.Span().setPosition( 'absolute' ).setRight( '8px' );
-	var saveHistoryCheckbox = new UI.Checkbox( config.getKey( 'settings/history' ) ).onChange( function () {
+	var persistent = new UI.THREE.Boolean( config.getKey( 'settings/history' ), 'persistent' );
+	persistent.setPosition( 'absolute' ).setRight( '8px' );
+	persistent.onChange( function () {
 
 		var value = this.getValue();
 
@@ -39,16 +40,7 @@ Sidebar.History = function ( editor ) {
 		}
 
 	} );
-
-	saveHistorySpan.add( saveHistoryCheckbox );
-
-	saveHistorySpan.onClick( function ( event ) {
-
-		event.stopPropagation(); // Avoid panel collapsing
-
-	} );
-
-	container.add( saveHistorySpan );
+	container.add( persistent );
 
 	container.add( new UI.Break(), new UI.Break() );
 
@@ -62,11 +54,6 @@ Sidebar.History = function ( editor ) {
 		editor.history.goToState( parseInt( outliner.getValue() ) );
 
 		ignoreObjectSelectedSignal = false;
-
-	} );
-	outliner.onDblClick( function () {
-
-		//editor.focusById( parseInt( outliner.getValue() ) );
 
 	} );
 	container.add( outliner );
