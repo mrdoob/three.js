@@ -4,36 +4,50 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<title>three.js css3d - youtube</title>
-
+		<style>
+			html, body {
+				height: 100%;
+				overflow: hidden;
+			}
+			#blocker {
+				position: absolute;
+				/* background-color: rgba(255, 0, 0, 0.5); */
+				top: 0px;
+				left: 0px;
+				width: 100%;
+				height: 100%;
+			}
+		</style>
 	</head>
 	<body>
 		<script src="../build/three.min.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/renderers/CSS3DRenderer.js"></script>
 
 		<div id="container"></div>
+		<div id="blocker"></div>
 
 		<script>
-			var camera, scene, renderer;
-			var player;
-			
-			var dom = document.createElement( 'div' );
-				dom.style.width = '480px';
-				dom.style.height = '360px';
-				
-			var object = new THREE.CSS3DObject( dom );
-				object.position.x = 0;
-				object.position.y = 0;
-				object.position.z = -400;
 
-			var Element = function ( entry ) {
-				
-				player = document.createElement( 'iframe' );
-				player.style.position = 'absolute';
-				player.style.width = '480px';
-				player.style.height = '360px';
-				player.style.border = '0px';
-				player.src = 'http://www.youtube.com/embed/HDh4uK9PvJU?rel=0&autoplay=1&controls=0&showinfo=0';		
-				dom.appendChild( player );
+			var camera, scene, renderer;
+
+			var Element = function ( id, x, y, z, ry ) {
+
+				var div = document.createElement( 'div' );
+				div.style.width = '480px';
+				div.style.height = '360px';
+				div.style.backgroundColor = '#000';
+
+				var iframe = document.createElement( 'iframe' );
+				iframe.style.width = '480px';
+				iframe.style.height = '360px';
+				iframe.style.border = '0px';
+				iframe.src = [ 'http://www.youtube.com/embed/', id, '?rel=0' ].join( '' );
+				div.appendChild( iframe );
+
+				var object = new THREE.CSS3DObject( div );
+				object.position.set( x, y, z );
+				object.rotation.y = ry;
 
 				return object;
 
@@ -44,8 +58,10 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
-				camera.position.y = - 25;
+				var container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.set( 500, 350, 750 );
 
 				scene = new THREE.Scene();
 
@@ -53,11 +69,27 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.domElement.style.position = 'absolute';
 				renderer.domElement.style.top = 0;
-				document.getElementById( 'container' ).appendChild( renderer.domElement );
+				container.appendChild( renderer.domElement );
 
-				scene.add( new Element( ) );
-				
+				var group = new THREE.Group();
+				group.add( new Element( 'njCDZWTI-xg', 0, 0, 240, 0 ) );
+				group.add( new Element( 'HDh4uK9PvJU', 240, 0, 0, Math.PI / 2 ) );
+				group.add( new Element( 'OX9I1KyNa8M', 0, 0, - 240, Math.PI ) );
+				group.add( new Element( 'nhORZ6Ep_jE', - 240, 0, 0, - Math.PI / 2 ) );
+				scene.add( group );
+
+				controls = new THREE.TrackballControls( camera );
+				controls.rotateSpeed = 4;
+
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				// Block iframe events when dragging camera
+
+				var blocker = document.getElementById( 'blocker' );
+				blocker.style.display = 'none';
+
+				document.addEventListener( 'mousedown', function () { blocker.style.display = ''; } );
+				document.addEventListener( 'mouseup', function () { blocker.style.display = 'none'; } );
 
 			}
 
@@ -72,8 +104,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				controls.update();
 				renderer.render( scene, camera );
-				object.rotation.y += .01;
 
 			}
 
