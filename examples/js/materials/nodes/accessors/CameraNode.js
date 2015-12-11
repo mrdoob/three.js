@@ -6,8 +6,33 @@ THREE.CameraNode = function( scope, camera ) {
 
 	THREE.TempNode.call( this, 'v3' );
 
-	this.scope = scope || THREE.CameraNode.POSITION;
+	this.setScope( scope || THREE.CameraNode.POSITION );
 	this.camera = camera;
+
+	this.requestUpdate = this.camera !== undefined;
+
+};
+
+THREE.CameraNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.CameraNode.prototype.constructor = THREE.CameraNode;
+
+THREE.CameraNode.POSITION = 'position';
+THREE.CameraNode.DEPTH = 'depth';
+
+THREE.CameraNode.prototype.setScope = function( scope ) {
+
+	switch ( this.scope ) {
+
+		case THREE.CameraNode.DEPTH:
+
+			delete this.near;
+			delete this.far;
+
+			break;
+
+	}
+
+	this.scope = scope;
 
 	switch ( scope ) {
 
@@ -20,15 +45,7 @@ THREE.CameraNode = function( scope, camera ) {
 
 	}
 
-	this.requestUpdate = this.camera !== undefined;
-
 };
-
-THREE.CameraNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.CameraNode.prototype.constructor = THREE.CameraNode;
-
-THREE.CameraNode.POSITION = 'position';
-THREE.CameraNode.DEPTH = 'depth';
 
 THREE.CameraNode.prototype.getType = function( builder ) {
 

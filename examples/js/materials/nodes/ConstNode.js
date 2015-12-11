@@ -4,12 +4,28 @@
 
 THREE.ConstNode = function( name, useDefine ) {
 
-	name = name || THREE.ConstNode.PI;
+	THREE.TempNode.call( this );
+
+	this.parse( name || THREE.ConstNode.PI, useDefine );
+
+};
+
+THREE.ConstNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.ConstNode.prototype.constructor = THREE.ConstNode;
+
+THREE.ConstNode.PI = 'PI';
+THREE.ConstNode.PI2 = 'PI2';
+THREE.ConstNode.RECIPROCAL_PI = 'RECIPROCAL_PI';
+THREE.ConstNode.RECIPROCAL_PI2 = 'RECIPROCAL_PI2';
+THREE.ConstNode.LOG2 = 'LOG2';
+THREE.ConstNode.EPSILON = 'EPSILON';
+
+THREE.ConstNode.prototype.parse = function( src, useDefine ) {
+
+	var name, type;
 
 	var rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=(.*?)\;/i;
-	var type = 'fv1';
-
-	var match = name.match( rDeclaration );
+	var match = src.match( rDeclaration );
 
 	if ( match && match.length > 1 ) {
 
@@ -28,22 +44,17 @@ THREE.ConstNode = function( name, useDefine ) {
 		}
 
 	}
+	else {
+
+		name = src;
+		type = 'fv1';
+
+	}
 
 	this.name = name;
-
-	THREE.TempNode.call( this, type );
+	this.type = type;
 
 };
-
-THREE.ConstNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.ConstNode.prototype.constructor = THREE.ConstNode;
-
-THREE.ConstNode.PI = 'PI';
-THREE.ConstNode.PI2 = 'PI2';
-THREE.ConstNode.RECIPROCAL_PI = 'RECIPROCAL_PI';
-THREE.ConstNode.RECIPROCAL_PI2 = 'RECIPROCAL_PI2';
-THREE.ConstNode.LOG2 = 'LOG2';
-THREE.ConstNode.EPSILON = 'EPSILON';
 
 THREE.ConstNode.prototype.generate = function( builder, output ) {
 
