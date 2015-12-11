@@ -1025,10 +1025,9 @@
 					var worldPos = new THREE.PositionNode( THREE.PositionNode.WORLD );
 					var worldPosTop = new THREE.SwitchNode( worldPos, 'xz' );
 
-					var pos = new THREE.PositionNode( THREE.PositionNode.WORLD );
-					var posNorm = new THREE.Math1Node( pos, THREE.Math1Node.NORMALIZE );
+					var worldNormal = new THREE.NormalNode( THREE.NormalNode.WORLD );
 
-					var mask = new THREE.SwitchNode( posNorm, 'y' );
+					var mask = new THREE.SwitchNode( worldNormal, 'y' );
 
 					// clamp0at1
 					mask = new THREE.Math1Node( mask, THREE.Math1Node.SAT );
