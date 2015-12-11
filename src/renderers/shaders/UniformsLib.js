@@ -85,9 +85,13 @@ THREE.UniformsLib = {
 
 	},
 
-	lights: {
+	ambient: {
 
-		"ambientLightColor" : { type: "fv", value: [] },
+		"ambientLightColor" : { type: "fv", value: [] }
+
+	},
+
+	lights: {
 
 		"directionalLights" : { type: "sa", value: [], properties: {
 			"direction": { type: "v3" },
@@ -119,7 +123,6 @@ THREE.UniformsLib = {
 			"decay": { type: "f" },
 			"shadow": { type: "i" }
 		} }
-
 
 	},
 
