@@ -3,13 +3,13 @@
  */
 
 THREE.Math1Node = function( a, method ) {
-	
+
 	THREE.TempNode.call( this );
-	
+
 	this.a = a;
-	
+
 	this.method = method || THREE.Math1Node.SIN;
-	
+
 };
 
 THREE.Math1Node.prototype = Object.create( THREE.TempNode.prototype );
@@ -40,39 +40,39 @@ THREE.Math1Node.NEGATE = 'negate';
 THREE.Math1Node.INVERT = 'invert';
 
 THREE.Math1Node.prototype.getType = function( builder ) {
-	
-	switch(this.method) {
+
+	switch ( this.method ) {
 		case THREE.Math1Node.DISTANCE:
 			return 'fv1';
 	}
-	
+
 	return this.a.getType( builder );
-	
+
 };
 
 THREE.Math1Node.prototype.generate = function( builder, output ) {
-	
+
 	var material = builder.material;
-	
+
 	var type = this.getType( builder );
-	
+
 	var result = this.a.build( builder, type );
-	
-	switch(this.method) {
-		
+
+	switch ( this.method ) {
+
 		case THREE.Math1Node.NEGATE:
 			result = '(-' + result + ')';
 			break;
-		
+
 		case THREE.Math1Node.INVERT:
 			result = '(1.0-' + result + ')';
 			break;
-		
+
 		default:
 			result = this.method + '(' + result + ')';
 			break;
 	}
-	
+
 	return builder.format( result, type, output );
 
 };

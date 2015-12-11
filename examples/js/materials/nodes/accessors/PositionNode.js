@@ -3,11 +3,11 @@
  */
 
 THREE.PositionNode = function( scope ) {
-	
+
 	THREE.TempNode.call( this, 'v3' );
-	
+
 	this.scope = scope || THREE.PositionNode.LOCAL;
-	
+
 };
 
 THREE.PositionNode.prototype = Object.create( THREE.TempNode.prototype );
@@ -19,69 +19,69 @@ THREE.PositionNode.VIEW = 'view';
 THREE.PositionNode.PROJECTION = 'projection';
 
 THREE.PositionNode.prototype.getType = function( builder ) {
-	
-	switch(this.method) {
+
+	switch ( this.method ) {
 		case THREE.PositionNode.PROJECTION:
 			return 'v4';
 	}
-	
+
 	return this.type;
-	
+
 };
 
 THREE.PositionNode.prototype.isShared = function( builder ) {
-	
-	switch(this.method) {
+
+	switch ( this.method ) {
 		case THREE.PositionNode.LOCAL:
 		case THREE.PositionNode.WORLD:
 			return false;
 	}
-	
+
 	return true;
-	
+
 };
 
 THREE.PositionNode.prototype.generate = function( builder, output ) {
-	
+
 	var material = builder.material;
 	var result;
-	
-	switch (this.scope) {
-	
+
+	switch ( this.scope ) {
+
 		case THREE.PositionNode.LOCAL:
-	
+
 			material.requestAttrib.position = true;
-			
-			if (builder.isShader('vertex')) result = 'transformed';
+
+			if ( builder.isShader( 'vertex' ) ) result = 'transformed';
 			else result = 'vPosition';
-			
+
 			break;
-			
+
 		case THREE.PositionNode.WORLD:
-	
+
 			material.requestAttrib.worldPosition = true;
-			
-			if (builder.isShader('vertex')) result = 'vWPosition';
+
+			if ( builder.isShader( 'vertex' ) ) result = 'vWPosition';
 			else result = 'vWPosition';
-			
+
 			break;
-			
+
 		case THREE.PositionNode.VIEW:
-	
-			if (builder.isShader('vertex')) result = '-mvPosition.xyz';
+
+			if ( builder.isShader( 'vertex' ) ) result = '-mvPosition.xyz';
 			else result = 'vViewPosition';
-			
+
 			break;
-			
+
 		case THREE.PositionNode.PROJECTION:
-	
-			if (builder.isShader('vertex')) result = '(projectionMatrix * modelViewMatrix * vec4( position, 1.0 ))';
+
+			if ( builder.isShader( 'vertex' ) ) result = '(projectionMatrix * modelViewMatrix * vec4( position, 1.0 ))';
 			else result = 'vec4( 0.0 )';
-			
+
 			break;
-			
+
 	}
-	
+
 	return builder.format( result, this.getType( builder ), output );
 
 };

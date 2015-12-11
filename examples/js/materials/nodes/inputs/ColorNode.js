@@ -3,11 +3,11 @@
  */
 
 THREE.ColorNode = function( color ) {
-	
-	THREE.InputNode.call( this, 'c', {share:false} );
-	
+
+	THREE.InputNode.call( this, 'c', { share: false } );
+
 	this.value = new THREE.Color( color || 0 );
-	
+
 };
 
 THREE.ColorNode.prototype = Object.create( THREE.InputNode.prototype );

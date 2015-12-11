@@ -3,11 +3,11 @@
  */
 
 THREE.Vector2Node = function( x, y ) {
-	
-	THREE.InputNode.call( this, 'v2', {share:false} );
-	
+
+	THREE.InputNode.call( this, 'v2', { share: false } );
+
 	this.value = new THREE.Vector2( x, y );
-	
+
 };
 
 THREE.Vector2Node.prototype = Object.create( THREE.InputNode.prototype );

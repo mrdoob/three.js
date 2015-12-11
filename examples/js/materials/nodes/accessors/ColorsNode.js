@@ -3,29 +3,29 @@
  */
 
 THREE.ColorsNode = function( index ) {
-	
-	THREE.TempNode.call( this, 'v4', {share:false} );
-	
+
+	THREE.TempNode.call( this, 'v4', { share: false } );
+
 	this.index = index || 0;
-	
+
 };
 
 THREE.ColorsNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.ColorsNode.prototype.constructor = THREE.ColorsNode;
 
-THREE.ColorsNode.vertexDict = ['color', 'color2'];
-THREE.ColorsNode.fragmentDict = ['vColor', 'vColor2'];
+THREE.ColorsNode.vertexDict = [ 'color', 'color2' ];
+THREE.ColorsNode.fragmentDict = [ 'vColor', 'vColor2' ];
 
 THREE.ColorsNode.prototype.generate = function( builder, output ) {
-	
+
 	var material = builder.material;
 	var result;
-	
-	material.requestAttrib.color[this.index] = true; 
-	
-	if (builder.isShader('vertex')) result = THREE.ColorsNode.vertexDict[this.index];
-	else result = THREE.ColorsNode.fragmentDict[this.index];
-	
+
+	material.requestAttrib.color[ this.index ] = true;
+
+	if ( builder.isShader( 'vertex' ) ) result = THREE.ColorsNode.vertexDict[ this.index ];
+	else result = THREE.ColorsNode.fragmentDict[ this.index ];
+
 	return builder.format( result, this.getType( builder ), output );
 
 };
