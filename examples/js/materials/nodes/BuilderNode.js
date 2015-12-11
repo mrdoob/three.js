@@ -125,7 +125,7 @@ THREE.BuilderNode.prototype = {
 };
 
 THREE.BuilderNode.type = {
-	float : 'fv1',
+	'float' : 'fv1',
 	vec2 : 'v2',
 	vec3 : 'v3',
 	vec4 : 'v4'
