@@ -2200,6 +2200,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			if ( m.map !== null ) {
 
+				// Check if this part of the texture image the material uses requires transparency
 				function checkTextureTransparency ( m ) {
 
 					m.map.readyCallbacks.push( function ( t ) {
