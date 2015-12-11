@@ -234,8 +234,6 @@ THREE.Ray.prototype = {
 
 	intersectSphere: function () {
 
-		// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
-
 		var v1 = new THREE.Vector3();
 
 		return function ( sphere, optionalTarget ) {
@@ -349,8 +347,6 @@ THREE.Ray.prototype = {
 	},
 
 	intersectBox: function ( box, optionalTarget ) {
-
-		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
 
 		var tmin, tmax, tymin, tymax, tzmin, tzmax;
 
