@@ -49,12 +49,8 @@ THREE.MaterialLoader.prototype = {
 	parse: function ( json ) {
 
 		var material = new THREE[ json.type ];
-		if ( json.uuid !== undefined) {
-			material.uuid = json.uuid;
-		} else {
-			material.uuid = THREE.Math.generateUUID();
-		}
 
+		if ( json.uuid !== undefined ) material.uuid = json.uuid;
 		if ( json.name !== undefined ) material.name = json.name;
 		if ( json.color !== undefined ) material.color.setHex( json.color );
 		if ( json.roughness !== undefined ) material.roughness = json.roughness;
