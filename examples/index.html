@@ -67,6 +67,7 @@
 					color: #2194CE;
 					text-decoration: none;
 					cursor: pointer;
+					display: block;
 				}
 
 				#panel #content .selected {
@@ -198,6 +199,7 @@
 				"webgl_decals",
 				"webgl_effects_anaglyph",
 				"webgl_effects_parallaxbarrier",
+				"webgl_effects_peppersghost",
 				"webgl_effects_stereo",
 				"webgl_exporter_obj",
 				"webgl_geometries",
@@ -225,7 +227,8 @@
 				"webgl_geometry_terrain_fog",
 				"webgl_geometry_terrain_raycast",
 				"webgl_geometry_text",
-				"webgl_geometry_text2",
+				"webgl_geometry_text_earcut",
+				"webgl_geometry_text_pnltri",
 				"webgl_gpgpu_birds",
 				"webgl_gpu_particle_system",
 				"webgl_hdr",
@@ -233,6 +236,7 @@
 				"webgl_interactive_buffergeometry",
 				"webgl_interactive_cubes",
 				"webgl_interactive_cubes_gpu",
+				"webgl_interactive_instances_gpu",
 				"webgl_interactive_cubes_ortho",
 				"webgl_interactive_draggablecubes",
 				"webgl_interactive_lines",
@@ -249,6 +253,7 @@
 				"webgl_lines_dashed",
 				"webgl_lines_sphere",
 				"webgl_lines_splines",
+				"webgl_loader_3mf",
 				"webgl_loader_amf",
 				"webgl_loader_assimp2json",
 				"webgl_loader_awd",
@@ -265,6 +270,9 @@
 				"webgl_loader_json_objconverter",
 				"webgl_loader_md2",
 				"webgl_loader_md2_control",
+				"webgl_loader_mmd",
+				"webgl_loader_mmd_pose",
+				"webgl_loader_mmd_audio",
 				"webgl_loader_msgpack",
 				"webgl_loader_obj",
 				"webgl_loader_obj_mtl",
@@ -284,7 +292,6 @@
 				"webgl_lod",
 				"webgl_marchingcubes",
 				"webgl_materials",
-				"webgl_materials2",
 				"webgl_materials_blending",
 				"webgl_materials_blending_custom",
 				"webgl_materials_bumpmap",
@@ -312,6 +319,11 @@
 				"webgl_materials_texture_manualmipmap",
 				"webgl_materials_texture_pvrtc",
 				"webgl_materials_texture_tga",
+				"webgl_materials_variations_basic",
+				"webgl_materials_variations_lambert",
+				"webgl_materials_variations_phong",
+				"webgl_materials_variations_standard",
+				"webgl_materials_variations_standard2",
 				"webgl_materials_video",
 				"webgl_materials_wireframe",
 				"webgl_mirror",
@@ -347,6 +359,7 @@
 				"webgl_postprocessing_dof2",
 				"webgl_postprocessing_glitch",
 				"webgl_postprocessing_godrays",
+				"webgl_postprocessing_masking",
 				"webgl_postprocessing_ssao",
 				"webgl_raycast_texture",
 				"webgl_read_float_buffer",
@@ -387,6 +400,7 @@
 				"webgl_buffergeometry_lines_indexed",
 				"webgl_buffergeometry_points",
 				"webgl_buffergeometry_rawshader",
+				"webgl_buffergeometry_selective_draw",
 				"webgl_buffergeometry_uint",
 				"webgl_custom_attributes",
 				"webgl_custom_attributes_lines",
@@ -411,6 +425,7 @@
 				"css3dstereo_periodictable",
 			],
 			"misc": [
+				"misc_animation_authoring",
 				"misc_animation_keys",
 				"misc_controls_deviceorientation",
 				"misc_controls_fly",
@@ -517,7 +532,7 @@
 		button.style.display = 'none';
 		document.body.appendChild( button );
 
-		var divs = {};
+		var links = {};
 		var selected = null;
 
 		for ( var key in files ) {
@@ -536,18 +551,25 @@
 					name.shift();
 					name = name.join( ' / ' );
 
-					var div = document.createElement( 'div' );
-					div.className = 'link';
-					div.textContent = name;
-					div.addEventListener( 'click', function () {
+					var link = document.createElement( 'a' );
+					link.className = 'link';
+					link.textContent = name;
+					link.href = "#" + file;
+					link.addEventListener( 'click', function ( event ) {
 
-						panel.classList.toggle( 'collapsed' );
-						load( file );
+						if ( event.button === 0 ) {
+
+							event.preventDefault();
+
+							panel.classList.toggle( 'collapsed' );
+							load( file );
+
+						}
 
 					} );
-					container.appendChild( div );
+					container.appendChild( link );
 
-					divs[ file ] = div;
+					links[ file ] = link;
 
 				} )( section[ i ] );
 
@@ -557,9 +579,9 @@
 
 		var load = function ( file ) {
 
-			if ( selected !== null ) divs[ selected ].className = 'link';
+			if ( selected !== null ) links[ selected ].className = 'link';
 
-			divs[ file ].className = 'link selected';
+			links[ file ].className = 'link selected';
 
 			window.location.hash = file;
 			viewer.src = file + '.html';

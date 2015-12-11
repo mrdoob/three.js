@@ -36,17 +36,3 @@ test( "clock with performance", function() {
 	self.performance.next(1000);
 	ok( clock.getElapsedTime() === 0.223 , "don't update time if the clock was stopped");
 });
-
-test( "clock with date", function() {
-	// remove the performance object so that clock takes Date()
-	self.performance = undefined;
-
-	var clock = new THREE.Clock();
-
-	clock.start();
-
-	// if a value was calculated, the clock took the alternative Date() object
-	ok( clock.getElapsedTime() >= 0 , "okay");
-
-	clock.stop();
-});

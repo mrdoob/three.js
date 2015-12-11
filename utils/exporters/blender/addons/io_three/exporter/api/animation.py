@@ -7,7 +7,6 @@ import mathutils
 from bpy import data, context, ops
 from .. import constants, logger
 
-
 def pose_animation(armature, options):
     """Query armature animation using pose bones
 

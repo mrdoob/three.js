@@ -38,8 +38,8 @@ THREE.GeometryUtils = {
 
 			var point = new THREE.Vector3();
 
-			var a = THREE.Math.random16();
-			var b = THREE.Math.random16();
+			var a = Math.random();
+			var b = Math.random();
 
 			if ( ( a + b ) > 1 ) {
 
@@ -162,7 +162,7 @@ THREE.GeometryUtils = {
 
 		for ( i = 0; i < n; i ++ ) {
 
-			r = THREE.Math.random16() * totalArea;
+			r = Math.random() * totalArea;
 
 			index = binarySearchIndices( r );
 
@@ -255,7 +255,7 @@ THREE.GeometryUtils = {
 
 		for ( i = 0; i < n; i ++ ) {
 
-			r = THREE.Math.random16() * totalArea;
+			r = Math.random() * totalArea;
 
 			index = binarySearchIndices( r );
 

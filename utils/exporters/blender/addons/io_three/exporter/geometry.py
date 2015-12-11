@@ -568,7 +568,6 @@ class Geometry(base_classes.BaseNode):
             mt = api.mesh.blend_shapes(self.node, self.options) or []
             self[constants.MORPH_TARGETS] = mt
             if len(mt) > 0 and self._scene:  # there's blend shapes, let check for animation
-                #self[constants.CLIPS] = api.mesh.animated_blend_shapes(self.node, self.options) or []
                 tracks = api.mesh.animated_blend_shapes(self.node, self[constants.NAME], self.options) or []
                 merge = self._scene[constants.ANIMATION][0][constants.KEYFRAMES]
                 for track in tracks:
