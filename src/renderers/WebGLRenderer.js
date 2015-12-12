@@ -499,7 +499,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		properties.clear();
 
-	};
+	}
 
 	function onTextureDispose( event ) {
 
@@ -826,7 +826,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( index !== null ) {
 
-			dataCount = index.count
+			dataCount = index.count;
 
 		} else if ( position !== undefined ) {
 
@@ -1482,7 +1482,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			material.numSupportedMorphNormals = 0;
 
-			for ( i = 0; i < _this.maxMorphNormals; i ++ ) {
+			for ( var i = 0; i < _this.maxMorphNormals; i ++ ) {
 
 				if ( attributes[ 'morphNormal' + i ] >= 0 ) {
 
@@ -2385,7 +2385,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 								case 'c':
 									_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
 									break;
-							};
+							}
 
 						}
 
@@ -3334,6 +3334,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
 			setTextureParameters( _gl.TEXTURE_CUBE_MAP, renderTarget.texture, isTargetPowerOfTwo );
+
 			for ( var i = 0; i < 6; i ++ ) {
 
 				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ i ], renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
