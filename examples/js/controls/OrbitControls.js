@@ -16,7 +16,9 @@
 THREE.OrbitControls = function ( object, domElement ) {
 
 	this.object = object;
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+	this.domElement = ( domElement !== undefined ) ?
+		domElement :
+		( typeof document !== 'undefined' ? document : null );
 
 	// API - new
 
@@ -732,34 +734,46 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.dispose = function() {
 
-		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
-		this.domElement.removeEventListener( 'mousedown', onMouseDown, false );
-		this.domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
-		this.domElement.removeEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
+		if ( this.domElement ) {
 
-		this.domElement.removeEventListener( 'touchstart', touchstart, false );
-		this.domElement.removeEventListener( 'touchend', touchend, false );
-		this.domElement.removeEventListener( 'touchmove', touchmove, false );
+			this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
+			this.domElement.removeEventListener( 'mousedown', onMouseDown, false );
+			this.domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
+			this.domElement.removeEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'mouseup', onMouseUp, false );
-		document.removeEventListener( 'mouseout', onMouseUp, false );
+			this.domElement.removeEventListener( 'touchstart', touchstart, false );
+			this.domElement.removeEventListener( 'touchend', touchend, false );
+			this.domElement.removeEventListener( 'touchmove', touchmove, false );
 
-		window.removeEventListener( 'keydown', onKeyDown, false );
+			document.removeEventListener( 'mousemove', onMouseMove, false );
+			document.removeEventListener( 'mouseup', onMouseUp, false );
+			document.removeEventListener( 'mouseout', onMouseUp, false );
+		}
+		
+		if ( typeof window !== 'undefined' ) {
+	
+			window.removeEventListener( 'keydown', onKeyDown, false );
 
+		}
 	}
 
-	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
+	if ( this.domElement ) {
 
-	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
-	this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-	this.domElement.addEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
+		this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 
-	this.domElement.addEventListener( 'touchstart', touchstart, false );
-	this.domElement.addEventListener( 'touchend', touchend, false );
-	this.domElement.addEventListener( 'touchmove', touchmove, false );
+		this.domElement.addEventListener( 'mousedown', onMouseDown, false );
+		this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
+		this.domElement.addEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
 
-	window.addEventListener( 'keydown', onKeyDown, false );
+		this.domElement.addEventListener( 'touchstart', touchstart, false );
+		this.domElement.addEventListener( 'touchend', touchend, false );
+		this.domElement.addEventListener( 'touchmove', touchmove, false );
+		
+	}
+
+	if ( typeof window !== 'undefined' ) {
+		window.addEventListener( 'keydown', onKeyDown, false );
+	}
 
 	// force an update at start
 	this.update();
