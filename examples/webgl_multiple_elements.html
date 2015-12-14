@@ -107,7 +107,7 @@
 				var template = document.getElementById( "template" ).text;
 				var content = document.getElementById( "content" );
 
-				for ( var i =  0; i < 10; i ++ ) {
+				for ( var i =  0; i < 20; i ++ ) {
 
 					var scene = new THREE.Scene();
 
@@ -193,6 +193,9 @@
 
 				scenes.forEach( function( scene ) {
 
+					// so something moves
+					scene.children[0].rotation.y = Date.now() * 0.001;
+
 					// get the element that is a place holder for where we want to
 					// draw the scene
 					var element = scene.userData.element;
@@ -214,12 +217,15 @@
 					var left   = rect.left;
 					var bottom = renderer.domElement.clientHeight - rect.bottom;
 
-					var camera = scene.userData.camera;
-
-					//scene.userData.controls.update();
-
 					renderer.setViewport( left, bottom, width, height );
 					renderer.setScissor( left, bottom, width, height );
+
+					var camera = scene.userData.camera;
+
+					//camera.aspect = width / height; // not changing in this example
+					//camera.updateProjectionMatrix();
+
+					//scene.userData.controls.update();
 
 					renderer.render( scene, camera );
 
