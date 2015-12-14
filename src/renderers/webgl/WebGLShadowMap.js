@@ -295,6 +295,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
+		_renderer.setRenderTarget( null );
 		_renderer.setViewport( _vector4.x, _vector4.y, _vector4.z, _vector4.w );
 
 		// Restore GL state.

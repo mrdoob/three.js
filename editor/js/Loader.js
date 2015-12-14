@@ -14,11 +14,19 @@ var Loader = function ( editor ) {
 		var filename = file.name;
 		var extension = filename.split( '.' ).pop().toLowerCase();
 
+		var reader = new FileReader();
+		reader.addEventListener( 'progress', function ( event ) {
+
+			var size = '(' + Math.floor( event.total / 1000 ).format() + ' KB)';
+			var progress = Math.floor( ( event.loaded / event.total ) * 100 ) + '%'
+			console.log( 'Loading', filename, size, progress );
+
+		} );
+
 		switch ( extension ) {
 
 			case 'amf':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var loader = new THREE.AMFLoader();
@@ -33,7 +41,6 @@ var Loader = function ( editor ) {
 
 			case 'awd':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var loader = new THREE.AWDLoader();
@@ -48,7 +55,6 @@ var Loader = function ( editor ) {
 
 			case 'babylon':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -66,7 +72,6 @@ var Loader = function ( editor ) {
 
 			case 'babylonmeshdata':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -89,7 +94,6 @@ var Loader = function ( editor ) {
 
 			case 'ctm':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var data = new Uint8Array( event.target.result );
@@ -119,7 +123,6 @@ var Loader = function ( editor ) {
 
 			case 'dae':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -144,7 +147,6 @@ var Loader = function ( editor ) {
 			case '3obj':
 			case '3scn':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -196,7 +198,6 @@ var Loader = function ( editor ) {
 
 			case 'kmz':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var loader = new THREE.KMZLoader();
@@ -213,7 +214,6 @@ var Loader = function ( editor ) {
 
 			case 'md2':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -237,7 +237,6 @@ var Loader = function ( editor ) {
 
 			case 'obj':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -254,7 +253,6 @@ var Loader = function ( editor ) {
 
 			case 'playcanvas':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -272,7 +270,6 @@ var Loader = function ( editor ) {
 
 			case 'ply':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -295,7 +292,6 @@ var Loader = function ( editor ) {
 
 			case 'stl':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -328,7 +324,6 @@ var Loader = function ( editor ) {
 			/*
 			case 'utf8':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -348,7 +343,6 @@ var Loader = function ( editor ) {
 
 			case 'vtk':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -371,7 +365,6 @@ var Loader = function ( editor ) {
 
 			case 'wrl':
 
-				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;

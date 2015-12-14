@@ -1,11 +1,3 @@
-uniform vec3 ambientLightColor;
-
-vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
-
-	return PI * ambientLightColor;
-
-}
-
 #if NUM_DIR_LIGHTS > 0
 
 	struct DirectionalLight {

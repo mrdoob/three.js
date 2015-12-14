@@ -135,6 +135,6 @@ geometry.viewDir = normalize( vViewPosition );
 
 		RE_IndirectSpecular( radiance, geometry, material, reflectedLight );
 
-    }
+	}
 
 #endif
