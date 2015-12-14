@@ -14,9 +14,15 @@ if ( typeof define === 'function' && define.amd ) {
 
 	module.exports = THREE;
 
+}
+
+// check if node is running the code
+if ( typeof module !== 'undefined' && module.exports ) {
+
+	// self should be undefined under node
 	if ( typeof self === 'undefined' ) {
 
-		/** @suppress {duplicate, const} */
+		// set self to nodes global object and hoist it
 		var self = global;
 
 	}
