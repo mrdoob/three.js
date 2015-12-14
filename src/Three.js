@@ -16,23 +16,31 @@ if ( typeof define === 'function' && define.amd ) {
 
 }
 
-// check if node is running the code
+var scope;
+
+// the code is running under node
 if ( typeof module !== 'undefined' && module.exports ) {
 
-	// self should be undefined under node
 	if ( typeof self === 'undefined' ) {
 
-		// set self to nodes global object and hoist it
-		var self = global;
+		scope = global;
 
 	}
+} else if ( typeof self !== 'undefined' ) {
+
+	scope = self;
+
+} else {
+
+	scope = window;
 
 }
 
 
+
 // polyfills
 
-if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === undefined ) {
+if ( scope.requestAnimationFrame === undefined || scope.cancelAnimationFrame === undefined ) {
 
 	// Missing in Android stock browser.
 
@@ -41,19 +49,19 @@ if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === u
 		var lastTime = 0;
 		var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
 
-		for ( var x = 0; x < vendors.length && ! self.requestAnimationFrame; ++ x ) {
+		for ( var x = 0; x < vendors.length && ! scope.requestAnimationFrame; ++ x ) {
 
-			self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
-			self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
+			scope.requestAnimationFrame = scope[ vendors[ x ] + 'RequestAnimationFrame' ];
+			scope.cancelAnimationFrame = scope[ vendors[ x ] + 'CancelAnimationFrame' ] || scope[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
 
 		}
 
-		if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
+		if ( scope.requestAnimationFrame === undefined && scope.setTimeout !== undefined ) {
 
-			self.requestAnimationFrame = function ( callback ) {
+			scope.requestAnimationFrame = function ( callback ) {
 
 				var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-				var id = self.setTimeout( function () {
+				var id = scope.setTimeout( function () {
 
 					callback( currTime + timeToCall );
 
@@ -65,11 +73,11 @@ if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === u
 
 		}
 
-		if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
+		if ( scope.cancelAnimationFrame === undefined && scope.clearTimeout !== undefined ) {
 
-			self.cancelAnimationFrame = function ( id ) {
+			scope.cancelAnimationFrame = function ( id ) {
 
-				self.clearTimeout( id );
+				scope.clearTimeout( id );
 
 			};
 
@@ -81,19 +89,19 @@ if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === u
 
 //
 
-if ( self.performance === undefined ) {
+if ( scope.performance === undefined ) {
 
-	self.performance = {};
+	scope.performance = {};
 
 }
 
-if ( self.performance.now === undefined ) {
+if ( scope.performance.now === undefined ) {
 
 	( function () {
 
 		var start = Date.now();
 
-		self.performance.now = function () {
+		scope.performance.now = function () {
 
 			return Date.now() - start;
 
