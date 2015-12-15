@@ -3423,8 +3423,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_currentWidth = width;
-		_currentHeight = height;
+		_currentWidth = viewport.width;
+		_currentHeight = viewport.height;
 
 	};
 
