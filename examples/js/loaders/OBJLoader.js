@@ -20,7 +20,7 @@ THREE.OBJLoader.prototype = {
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			onLoad( scope.parse( text, onError ) );
 
 		}, onProgress, onError );
 
@@ -32,7 +32,7 @@ THREE.OBJLoader.prototype = {
 
 	},
 
-	parse: function ( text ) {
+	parse: function ( text, onError ) {
 
 		console.time( 'OBJLoader' );
 
@@ -334,7 +334,7 @@ THREE.OBJLoader.prototype = {
 
 			} else {
 
-				// console.log( "THREE.OBJLoader: Unhandled line " + line );
+				onError( "THREE.OBJLoader: Unhandled line: " + line );
 
 			}
 
