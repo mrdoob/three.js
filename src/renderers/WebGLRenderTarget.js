@@ -40,11 +40,11 @@ THREE.WebGLRenderTarget.prototype = {
 			this.width = width;
 			this.height = height;
 
-			this.viewport.set( 0, 0, width, height );
-
 			this.dispose();
 
 		}
+
+		this.viewport.set( 0, 0, width, height );
 
 	},
 
@@ -64,6 +64,8 @@ THREE.WebGLRenderTarget.prototype = {
 
 		this.width = source.width;
 		this.height = source.height;
+
+		this.viewport.copy( source.viewport );
 
 		this.texture = source.texture.clone();
 

@@ -21,6 +21,17 @@ THREE.Rectangle.prototype = {
 
 		return this;
 
+	},
+
+	copy: function ( source ) {
+
+		this.x = source.x;
+		this.y = source.y;
+		this.width = source.width;
+		this.height = source.height;
+
+		return this;
+
 	}
 
 };
