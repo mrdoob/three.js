@@ -370,9 +370,7 @@
 
 				if ( mesh ) mesh.rotation.y = -time;
 
-				renderer.setViewport( 0, 0, 2 * halfWidth, 2 * halfHeight );
-
-				renderer.clear();
+				renderer.setViewport( 0, 0, halfWidth, halfHeight );
 				composerScene.render( delta );
 
 				renderer.setViewport( 0, 0, halfWidth, halfHeight );
