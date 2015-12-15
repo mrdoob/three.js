@@ -16,20 +16,25 @@ if ( typeof define === 'function' && define.amd ) {
 
 }
 
-var scope;
 
-// the code is running under node
+// this is the variable which should be used to access the global scope
+var scope = undefined;
+
+// the code is running under node environment
 if ( typeof module !== 'undefined' && module.exports ) {
 
+  // if self wasn't defined before, set to nodes global scope
 	if ( typeof self === 'undefined' ) {
 
 		scope = global;
 
 	}
+// if the code is running under other environments e.g. webworker, self is defined
 } else if ( typeof self !== 'undefined' ) {
 
 	scope = self;
 
+// the code is running in the browser, so window is defined as the global scope
 } else {
 
 	scope = window;
