@@ -16,6 +16,8 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 	this.width = width;
 	this.height = height;
 
+	this.viewport = new THREE.Rectangle( 0, 0, width, height );
+
 	options = options || {};
 
 	if ( options.minFilter === undefined ) options.minFilter = THREE.LinearFilter;
@@ -38,9 +40,17 @@ THREE.WebGLRenderTarget.prototype = {
 			this.width = width;
 			this.height = height;
 
+			this.viewport.set( 0, 0, width, height );
+
 			this.dispose();
 
 		}
+
+	},
+
+	setViewport: function ( x, y, width, height ) {
+
+		this.viewport.set( x, y, width, height );
 
 	},
 

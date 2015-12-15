@@ -88,10 +88,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_usedTextureUnits = 0,
 
-	_viewportX = 0,
-	_viewportY = 0,
-	_viewportWidth = _canvas.width,
-	_viewportHeight = _canvas.height,
+	_viewport = new THREE.Rectangle( 0, 0, _canvas.width, _canvas.height ),
+
 	_currentWidth = 0,
 	_currentHeight = 0,
 
@@ -240,7 +238,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.init();
 
-		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
+		_gl.viewport( _viewport.x, _viewport.y, _viewport.width, _viewport.height );
 
 		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
@@ -374,11 +372,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _currentRenderTarget === null ) {
 
-			_viewportX = x *= pixelRatio;
-			_viewportY = y *= pixelRatio;
+			x *= pixelRatio;
+			y *= pixelRatio;
 
-			_viewportWidth = width *= pixelRatio;
-			_viewportHeight = height *= pixelRatio;
+			width *= pixelRatio;
+			height *= pixelRatio;
+
+			_viewport.set( x, y, width, height );
 
 		}
 
@@ -3381,7 +3381,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
-		var framebuffer, width, height, vx, vy;
+		var framebuffer, viewport;
 
 		if ( renderTarget ) {
 
@@ -3397,28 +3397,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			width = renderTarget.width;
-			height = renderTarget.height;
-
-			vx = 0;
-			vy = 0;
+			viewport = renderTarget.viewport;
 
 		} else {
 
 			framebuffer = null;
 
-			width = _viewportWidth;
-			height = _viewportHeight;
-
-			vx = _viewportX;
-			vy = _viewportY;
+			viewport = _viewport;
 
 		}
 
 		if ( framebuffer !== _currentFramebuffer ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-			_gl.viewport( vx, vy, width, height );
+			_gl.viewport( viewport.x, viewport.y, viewport.width, viewport.height );
 
 			_currentFramebuffer = framebuffer;
 
