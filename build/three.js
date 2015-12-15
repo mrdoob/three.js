@@ -3449,7 +3449,7 @@ THREE.Euler.prototype = {
 
 	clone: function () {
 
-		return new this.constructor( this._x, this._y, this._z, this._order);
+		return new this.constructor( this._x, this._y, this._z, this._order );
 
 	},
 
@@ -3846,7 +3846,7 @@ THREE.Box2.prototype = {
 
 		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-			this.expandByPoint( points[ i ] )
+			this.expandByPoint( points[ i ] );
 
 		}
 
@@ -6999,6 +6999,46 @@ THREE.Math = {
 		value ++;
 
 		return value;
+
+	}
+
+};
+
+// File:src/math/Rectangle.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.Rectangle = function ( x, y, width, height ) {
+
+	this.set( x, y, width, height );
+
+};
+
+THREE.Rectangle.prototype = {
+
+	constructor: THREE.Rectangle,
+
+	set: function ( x, y, width, height ) {
+
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+
+		return this;
+
+	},
+
+	copy: function ( source ) {
+
+		this.x = source.x;
+		this.y = source.y;
+		this.width = source.width;
+		this.height = source.height;
+
+		return this;
 
 	}
 
@@ -24940,10 +24980,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_usedTextureUnits = 0,
 
-	_viewportX = 0,
-	_viewportY = 0,
-	_viewportWidth = _canvas.width,
-	_viewportHeight = _canvas.height,
+	_viewport = new THREE.Rectangle( 0, 0, _canvas.width, _canvas.height ),
+
 	_currentWidth = 0,
 	_currentHeight = 0,
 
@@ -25092,7 +25130,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.init();
 
-		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
+		_gl.viewport( _viewport.x, _viewport.y, _viewport.width, _viewport.height );
 
 		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
@@ -25226,11 +25264,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _currentRenderTarget === null ) {
 
-			_viewportX = x *= pixelRatio;
-			_viewportY = y *= pixelRatio;
+			x *= pixelRatio;
+			y *= pixelRatio;
 
-			_viewportWidth = width *= pixelRatio;
-			_viewportHeight = height *= pixelRatio;
+			width *= pixelRatio;
+			height *= pixelRatio;
+
+			_viewport.set( x, y, width, height );
 
 		}
 
@@ -28233,7 +28273,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
-		var framebuffer, width, height, vx, vy;
+		var framebuffer, viewport;
 
 		if ( renderTarget ) {
 
@@ -28249,28 +28289,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			width = renderTarget.width;
-			height = renderTarget.height;
-
-			vx = 0;
-			vy = 0;
+			viewport = renderTarget.viewport;
 
 		} else {
 
 			framebuffer = null;
 
-			width = _viewportWidth;
-			height = _viewportHeight;
-
-			vx = _viewportX;
-			vy = _viewportY;
+			viewport = _viewport;
 
 		}
 
 		if ( framebuffer !== _currentFramebuffer ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-			_gl.viewport( vx, vy, width, height );
+			_gl.viewport( viewport.x, viewport.y, viewport.width, viewport.height );
 
 			_currentFramebuffer = framebuffer;
 
@@ -28283,8 +28315,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_currentWidth = width;
-		_currentHeight = height;
+		_currentWidth = viewport.width;
+		_currentHeight = viewport.height;
 
 	};
 
@@ -28500,6 +28532,8 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 	this.width = width;
 	this.height = height;
 
+	this.viewport = new THREE.Rectangle( 0, 0, width, height );
+
 	options = options || {};
 
 	if ( options.minFilter === undefined ) options.minFilter = THREE.LinearFilter;
@@ -28526,6 +28560,14 @@ THREE.WebGLRenderTarget.prototype = {
 
 		}
 
+		this.viewport.set( 0, 0, width, height );
+
+	},
+
+	setViewport: function ( x, y, width, height ) {
+
+		this.viewport.set( x, y, width, height );
+
 	},
 
 	clone: function () {
@@ -28538,6 +28580,8 @@ THREE.WebGLRenderTarget.prototype = {
 
 		this.width = source.width;
 		this.height = source.height;
+
+		this.viewport.copy( source.viewport );
 
 		this.texture = source.texture.clone();
 
