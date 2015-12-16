@@ -33,7 +33,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 		if ( index !== undefined ) {
 
-			var typedArray = new scope[ index.type ]( index.array );
+			var typedArray = new self[ index.type ]( index.array );
 			geometry.setIndex( new THREE.BufferAttribute( typedArray, 1 ) );
 
 		}
@@ -43,7 +43,7 @@ THREE.BufferGeometryLoader.prototype = {
 		for ( var key in attributes ) {
 
 			var attribute = attributes[ key ];
-			var typedArray = new scope[ attribute.type ]( attribute.array );
+			var typedArray = new self[ attribute.type ]( attribute.array );
 
 			geometry.addAttribute( key, new THREE.BufferAttribute( typedArray, attribute.itemSize ) );
 
