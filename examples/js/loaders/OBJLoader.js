@@ -14,7 +14,7 @@ THREE.OBJLoader.prototype = {
 
 	constructor: THREE.OBJLoader,
 
-	load: function ( url, onLoad, onProgress, onError, onParseFail ) {
+	load: function ( url, onLoad, onProgress, onError, onWarning ) {
 
 		var scope = this;
 
@@ -22,7 +22,7 @@ THREE.OBJLoader.prototype = {
 		loader.setPath( this.path );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text, onParseFail || onError ) );
+			onLoad( scope.parse( text, onWarning ) );
 
 		}, onProgress, onError );
 
@@ -40,7 +40,7 @@ THREE.OBJLoader.prototype = {
 
 	},
 
-	parse: function ( text, onParseFail ) {
+	parse: function ( text, onWarning ) {
 
 		console.time( 'OBJLoader' );
 
@@ -337,7 +337,11 @@ THREE.OBJLoader.prototype = {
 
 			} else {
 				
-				onParseFail("THREE.OBJLoader: Unknown line", line)
+				if (onWarning) {
+
+					onWarning("THREE.OBJLoader: Unknown line", line)
+
+				}
 
 			}
 
