@@ -84,6 +84,8 @@ THREE.Object3D = function () {
 
 	this.userData = {};
 
+	this.onWillRender = function(){};
+
 };
 
 THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 1, 0 );
