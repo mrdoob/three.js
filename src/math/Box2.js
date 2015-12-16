@@ -28,7 +28,7 @@ THREE.Box2.prototype = {
 
 		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-			this.expandByPoint( points[ i ] )
+			this.expandByPoint( points[ i ] );
 
 		}
 
