@@ -342,13 +342,18 @@ THREE.ObjectLoader.prototype = {
 
 				scope.manager.itemEnd( url );
 
-			} );
+			}, undefined, function() {
+			
+				scope.manager.itemError( url );
+
+			});
 
 		}
 
 		if ( json !== undefined && json.length > 0 ) {
 
 			var manager = new THREE.LoadingManager( onLoad );
+			manager.setAllowErrors(true);
 
 			var loader = new THREE.ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
