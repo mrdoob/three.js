@@ -14,13 +14,6 @@ if ( typeof define === 'function' && define.amd ) {
 
 	module.exports = THREE;
 
-	if ( typeof self === 'undefined' ) {
-
-		/** @suppress {duplicate, const} */
-		var self = global;
-
-	}
-
 }
 
 
