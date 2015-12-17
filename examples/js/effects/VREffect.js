@@ -105,7 +105,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			if ( Array.isArray( scene ) ) {
 
-				console.warn( 'THREE.VREffect.render() no longer supports arrays. Use object.layers.set() instead.' );
+				console.warn( 'THREE.VREffect.render() no longer supports arrays. Use object.layers instead.' );
 				scene = scene[ 0 ];
 
 			}
