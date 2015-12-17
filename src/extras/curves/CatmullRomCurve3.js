@@ -100,11 +100,11 @@ THREE.CatmullRomCurve3 = ( function() {
 			point = ( l - ( this.closed ? 0 : 1 ) ) * t;
 			intPoint = Math.floor( point );
 			weight = point - intPoint;
-			
+
 			if ( this.closed ) {
-				
+
 				intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
-				
+
 			} else if ( weight === 0 && intPoint === l - 1 ) {
 
 				intPoint = l - 2;
@@ -131,7 +131,7 @@ THREE.CatmullRomCurve3 = ( function() {
 
 			if ( this.closed || intPoint + 2 < l ) {
 
-				p3 = points[ ( intPoint + 2 ) % l ]
+				p3 = points[ ( intPoint + 2 ) % l ];
 
 			} else {
 
