@@ -333,10 +333,10 @@
 						// PASS
 
 						var normal = new THREE.TextureNode( decalNormal );
-						var normalY = new THREE.SwitchNode( normal, 'y' );
+						var normalXY = new THREE.SwitchNode( normal, 'xy' );
 
 						var offsetNormal = new THREE.OperatorNode(
-							normalY,
+							normalXY,
 							new THREE.FloatNode( .5 ),
 							THREE.OperatorNode.ADD
 						);
