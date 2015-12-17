@@ -18,12 +18,10 @@
 			}
 
 			#info {
-				position: relative;
-				margin: 0 auto -2.1em;
-				top: 0px;
-				width: 550px;
+				position: absolute;
+				width: 100%;
+				text-align: center;
 				padding: 5px;
-				z-index:100;
 			}
 
 			a { color: skyblue; }
@@ -38,7 +36,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - webgl physically based shading testbed
 		</div>
--
+
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
@@ -51,16 +49,6 @@
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<script>
-
-			var MARGIN = 0;
-
-			var WIDTH = window.innerWidth || 2;
-			var HEIGHT = window.innerHeight || ( 2 + 2 * MARGIN );
-
-			var SCREEN_WIDTH = WIDTH;
-			var SCREEN_HEIGHT = HEIGHT - 2 * MARGIN;
-
-			var FAR = 10000;
 
 			var DAY = 0;
 
@@ -88,10 +76,6 @@
 				shadowCameraFov: 30,
 				shadowBias: -0.0002
 
-			}, gamma = {
-				gammaFactor: 2.0,
-				gammaInput: true,
-				gammaOutput: true
 			};
 
 			init();
@@ -104,40 +88,19 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 2, FAR );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 2, 10000 );
 				camera.position.set( 500, 400, 1200 );
 
 				// SCENE
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x00aaff, 1000, FAR );
+				scene.fog = new THREE.Fog( 0x00aaff, 1000, 10000 );
 
 				// CUBE CAMERA
 
-				cubeCamera = new THREE.CubeCamera( 1, FAR, 128 );
-				scene.add( cubeCamera );
+				cubeCamera = new THREE.CubeCamera( 1, 10000, 128 );
 
 				// TEXTURES
-
-				var x = document.createElement( "canvas" );
-				var xc = x.getContext("2d");
-				x.width = x.height = 128;
-				xc.fillStyle = "#fff";
-				xc.fillRect(0, 0, 128, 128);
-				xc.fillStyle = "#000";
-				xc.fillRect(0, 0, 64, 64);
-				xc.fillStyle = "#999";
-				xc.fillRect(32, 32, 32, 32);
-				xc.fillStyle = "#000";
-				xc.fillRect(64, 64, 64, 64);
-				xc.fillStyle = "#555";
-				xc.fillRect(96, 96, 32, 32);
-
-				var texturePattern = new THREE.CanvasTexture( x )
-				texturePattern.format = THREE.RGBFormat;
-				texturePattern.repeat.set( 1000, 1000 );
-				texturePattern.wrapS = THREE.RepeatWrapping;
-				texturePattern.wrapT = THREE.RepeatWrapping;
 
 				var textureSquares = THREE.ImageUtils.loadTexture( "textures/patterns/bright_squares256.png" );
 				textureSquares.repeat.set( 50, 50 );
@@ -182,9 +145,7 @@
 				ground.position.set( 0, 0, 0 );
 				ground.rotation.x = - Math.PI / 2;
 				ground.scale.set( 1000, 1000, 1000 );
-
 				ground.receiveShadow = true;
-
 				scene.add( ground );
 
 				// MATERIALS
@@ -213,7 +174,9 @@
 
 				addObject( torusGeometry, materialPhong, 0, 100, 0, 0 );
 				addObject( cubeGeometry, materialLambert, 350, 75, 300, 0 );
+
 				mesh = addObject( sphereGeometry, materialPhongCube, 350, 100, -350, 0 );
+				mesh.add( cubeCamera );
 
 				function addObjectColor( geometry, color, x, y, z, ry ) {
 
@@ -271,11 +234,11 @@
 
 					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, shading: THREE.FlatShading } );
 
-					mesh = new THREE.Mesh( geometry, morphMaterial );
+					var mesh = new THREE.Mesh( geometry, morphMaterial );
 
 					mixer = new THREE.AnimationMixer( mesh );
 
-					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( 10 ) );
+					mixer.clipAction( geometry.animations[0] ).setDuration( 10 ).play();
 
 					var s = 200;
 					mesh.scale.set( s, s, s );
@@ -331,12 +294,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				renderer.domElement.style.position = "absolute";
-				renderer.domElement.style.top = MARGIN + "px";
-				renderer.domElement.style.left = "0px";
-
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -427,45 +385,16 @@
 
 				shadowGUI.open();
 
-				gammaGUI = gui.addFolder( "Gamma" );
-
-				gammaGUI.add( gamma, 'gammaFactor', 0.1, 4.0 ).onChange( function() {
-
-					renderer.gammaFactor = gamma.gammaFactor;
-
-				});
-				gammaGUI.open();
-
-				/*
-
-				Not exposed because they are not easily dynamically updated - as all shaders need to be recompiled.  -bhouston
-
-				gammaGUI.add( gamma, 'gammaInput', true ).onChange( function() {
-
-					renderer.gammaInput = gamma.gammaInput;
-
-				});
-
-				gammaGUI.add( gamma, 'gammaOutput', true ).onChange( function() {
-
-					renderer.gammaOutput = gamma.gammaOutput;
-
-				});*/
-
 			}
 
 			//
 
-
 			function onWindowResize( event ) {
 
-				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
-
-				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				controls.handleResize();
 
@@ -538,12 +467,7 @@
 				// render cube map
 
 				mesh.visible = false;
-
-				renderer.autoClear = true;
-				cubeCamera.position.copy( mesh.position );
 				cubeCamera.updateCubeMap( renderer, scene );
-				renderer.autoClear = false;
-
 				mesh.visible = true;
 
 				// render scene

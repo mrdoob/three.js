@@ -1,5 +1,6 @@
 /**
  * @author bhouston / http://exocortex.com
+ * @author tschw
  */
 
 module( "Quaternion" );
@@ -173,7 +174,7 @@ test( "multiplyQuaternions/multiply", function() {
 });
 
 test( "multiplyVector3", function() {
-	
+
 	var angles = [ new THREE.Euler( 1, 0, 0 ), new THREE.Euler( 0, 1, 0 ), new THREE.Euler( 0, 0, 1 ) ];
 
 	// ensure euler conversion for Quaternion matches that of Matrix4
@@ -185,7 +186,7 @@ test( "multiplyVector3", function() {
 			var v0 = new THREE.Vector3(1, 0, 0);
 			var qv = v0.clone().applyQuaternion( q );
 			var mv = v0.clone().applyMatrix4( m );
-		
+
 			ok( qv.distanceTo( mv ) < 0.001, "Passed!" );
 		}
 	}
@@ -195,7 +196,7 @@ test( "multiplyVector3", function() {
 test( "equals", function() {
 	var a = new THREE.Quaternion( x, y, z, w );
 	var b = new THREE.Quaternion( -x, -y, -z, -w );
-	
+
 	ok( a.x != b.x, "Passed!" );
 	ok( a.y != b.y, "Passed!" );
 
@@ -210,10 +211,140 @@ test( "equals", function() {
 	ok( b.equals( a ), "Passed!" );
 });
 
-test( "slerp", function() {
-	var a = new THREE.Quaternion( 0.675341, 0.408783, 0.328567, 0.518512 );
-	var b = new THREE.Quaternion( 0.660279, 0.436474, 0.35119, 0.500187 );
 
-	ok( a.slerp( b, 0 ).equals( a ), "Passed!" );
-	ok( a.slerp( b, 1 ).equals( b ), "Passed!" );
-});
+function doSlerpObject( aArr, bArr, t ) {
+
+	var a = new THREE.Quaternion().fromArray( aArr ),
+		b = new THREE.Quaternion().fromArray( bArr ),
+		c = new THREE.Quaternion().fromArray( aArr );
+
+	c.slerp( b, t );
+
+	return {
+
+		equals: function( x, y, z, w, maxError ) {
+
+			if ( maxError === undefined ) maxError = Number.EPSILON;
+
+			return 	Math.abs( x - c.x ) <= maxError &&
+					Math.abs( y - c.y ) <= maxError &&
+					Math.abs( z - c.z ) <= maxError &&
+					Math.abs( w - c.w ) <= maxError;
+
+		},
+
+		length: c.length(),
+
+		dotA: c.dot( a ),
+		dotB: c.dot( b )
+
+	};
+
+};
+
+function doSlerpArray( a, b, t ) {
+
+	var result = [ 0, 0, 0, 0 ];
+
+	THREE.Quaternion.slerpFlat( result, 0, a, 0, b, 0, t );
+
+	function arrDot( a, b ) {
+
+		return 	a[ 0 ] * b[ 0 ] + a[ 1 ] * b[ 1 ] +
+				a[ 2 ] * b[ 2 ] + a[ 3 ] * b[ 3 ];
+
+	}
+
+	return {
+
+		equals: function( x, y, z, w, maxError ) {
+
+			if ( maxError === undefined ) maxError = Number.EPSILON;
+
+			return 	Math.abs( x - result[ 0 ] ) <= maxError &&
+					Math.abs( y - result[ 1 ] ) <= maxError &&
+					Math.abs( z - result[ 2 ] ) <= maxError &&
+					Math.abs( w - result[ 3 ] ) <= maxError;
+
+		},
+
+		length: Math.sqrt( arrDot( result, result ) ),
+
+		dotA: arrDot( result, a ),
+		dotB: arrDot( result, b )
+
+	};
+
+}
+
+function slerpTestSkeleton( doSlerp, maxError ) {
+
+	var a, b, result;
+
+	a = [
+		0.6753410084407496,
+		0.4087830051091744,
+		0.32856700410659473,
+		0.5185120064806223,
+	];
+
+	b = [
+		0.6602792107657797,
+		0.43647413932562285,
+		0.35119011210236006,
+		0.5001871596632682
+	];
+
+	var maxNormError = 0;
+
+	function isNormal( result ) {
+
+		var normError = Math.abs( 1 - result.length );
+		maxNormError = Math.max( maxNormError, normError );
+		return normError <= maxError;
+
+	}
+
+	result = doSlerp( a, b, 0 );
+	ok( result.equals(
+			a[ 0 ], a[ 1 ], a[ 2 ], a[ 3 ], 0 ), "Exactly A @ t = 0" );
+
+	result = doSlerp( a, b, 1 );
+	ok( result.equals(
+			b[ 0 ], b[ 1 ], b[ 2 ], b[ 3 ], 0 ), "Exactly B @ t = 1" );
+
+	result = doSlerp( a, b, 0.5 );
+	ok( Math.abs( result.dotA - result.dotB ) <= Number.EPSILON, "Symmetry at 0.5" );
+	ok( isNormal( result ), "Approximately normal (at 0.5)" );
+
+	result = doSlerp( a, b, 0.25 );
+	ok( result.dotA > result.dotB, "Interpolating at 0.25" );
+	ok( isNormal( result ), "Approximately normal (at 0.25)" );
+
+	result = doSlerp( a, b, 0.75 );
+	ok( result.dotA < result.dotB, "Interpolating at 0.75" );
+	ok( isNormal( result ), "Approximately normal (at 0.75)" );
+
+	var D = Math.SQRT1_2;
+
+	result = doSlerp( [ 1, 0, 0, 0 ], [ 0, 0, 1, 0 ], 0.5 );
+	ok( result.equals( D, 0, D, 0 ), "X/Z diagonal from axes" );
+	ok( isNormal( result ), "Approximately normal (X/Z diagonal)" );
+
+	result = doSlerp( [ 0, D, 0, D ], [ 0, -D, 0, D ], 0.5 );
+	ok( result.equals( 0, 0, 0, 1 ), "W-Unit from diagonals" );
+	ok( isNormal( result ), "Approximately normal (W-Unit)" );
+}
+
+
+test( "slerp", function() {
+
+	slerpTestSkeleton( doSlerpObject, Number.EPSILON );
+
+} );
+
+test( "slerpFlat", function() {
+
+	slerpTestSkeleton( doSlerpArray, Number.EPSILON );
+
+} );

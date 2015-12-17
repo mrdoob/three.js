@@ -28,7 +28,7 @@ THREE.Box2.prototype = {
 
 		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-			this.expandByPoint( points[ i ] )
+			this.expandByPoint( points[ i ] );
 
 		}
 
@@ -51,7 +51,7 @@ THREE.Box2.prototype = {
 		};
 
 	}(),
-	
+
 	clone: function () {
 
 		return new this.constructor().copy( this );
@@ -165,7 +165,7 @@ THREE.Box2.prototype = {
 
 	},
 
-	isIntersectionBox: function ( box ) {
+	intersectsBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 

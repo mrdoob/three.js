@@ -79,7 +79,6 @@ var list = {
 			[ "PointsMaterial", "api/materials/PointsMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
-			[ "SpriteCanvasMaterial", "api/materials/SpriteCanvasMaterial" ],
 			[ "SpriteMaterial", "api/materials/SpriteMaterial" ]
 		],
 
@@ -151,8 +150,8 @@ var list = {
 		],
 
 		"Textures": [
-			[ "CubeTexture", "api/textures/CubeTexture" ],
 			[ "CompressedTexture", "api/textures/CompressedTexture" ],
+			[ "CubeTexture", "api/textures/CubeTexture" ],			
 			[ "DataTexture", "api/textures/DataTexture" ],
 			[ "Texture", "api/textures/Texture" ]
 		],
@@ -160,7 +159,6 @@ var list = {
 		"Extras": [
 			[ "FontUtils", "api/extras/FontUtils" ],
 			[ "GeometryUtils", "api/extras/GeometryUtils" ],
-			[ "ImageUtils", "api/extras/ImageUtils" ],
 			[ "SceneUtils", "api/extras/SceneUtils" ]
 		],
 
@@ -180,6 +178,7 @@ var list = {
 
 		"Extras / Curves": [
 			[ "ArcCurve", "api/extras/curves/ArcCurve" ],
+			[ "CatmullRomCurve3", "api/extras/curves/CatmullRomCurve3" ],
 			[ "ClosedSplineCurve3", "api/extras/curves/ClosedSplineCurve3" ],
 			[ "CubicBezierCurve", "api/extras/curves/CubicBezierCurve" ],
 			[ "CubicBezierCurve3", "api/extras/curves/CubicBezierCurve3" ],
@@ -195,7 +194,6 @@ var list = {
 		"Extras / Geometries": [
 			[ "BoxGeometry", "api/extras/geometries/BoxGeometry" ],
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
-			[ "CubeGeometry", "api/extras/geometries/CubeGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
 			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
 			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
@@ -239,7 +237,8 @@ var list = {
 
 		"Examples" : [
 			[ "CombinedCamera", "api/examples/cameras/CombinedCamera" ],
-			[ "LookupTable", "api/examples/Lut" ]
+			[ "LookupTable", "api/examples/Lut" ],
+			[ "SpriteCanvasMaterial", "api/examples/SpriteCanvasMaterial" ]
 
 		]
 

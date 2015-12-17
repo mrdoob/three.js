@@ -22,9 +22,8 @@
 
 input.Number {
 	color: #0080f0!important;
-	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
-	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
-	border: 1px solid transparent;
+	font-size: 12px;
+	border: 0px;
 	padding: 2px;
 	cursor: col-resize;
 }
@@ -32,20 +31,20 @@ input.Number {
 #viewport {
 	position: absolute;
 	top: 32px;
-	left: 0px;
+	left: 0;
 	right: 300px;
 	bottom: 32px;
 }
 
 	#viewport #info {
-		text-shadow: 1px 1px 0px rgba(0,0,0,0.25);
+		text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
 		pointer-events: none;
 	}
 
 #script {
 	position: absolute;
 	top: 32px;
-	left: 0px;
+	left: 0;
 	right: 300px;
 	bottom: 32px;
 	opacity: 0.9;
@@ -54,7 +53,7 @@ input.Number {
 #player {
 	position: absolute;
 	top: 32px;
-	left: 0px;
+	left: 0;
 	right: 300px;
 	bottom: 32px;
 }
@@ -64,10 +63,10 @@ input.Number {
 	width: 100%;
 	height: 32px;
 	background: #eee;
-	padding: 0px;
-	margin: 0px;
-	right: 0px;
-	top: 0px;
+	padding: 0;
+	margin: 0;
+	right: 0;
+	top: 0;
 }
 
 	#menubar .menu {
@@ -79,21 +78,21 @@ input.Number {
 	#menubar .menu.right {
 		float: right;
 		cursor: auto;
-		padding-right: 0px;
+		padding-right: 0;
 		text-align: right;
 	}
 
 		#menubar .menu .title {
 			display: inline-block;
 			color: #888;
-			margin: 0px;
+			margin: 0;
 			padding: 8px;
 		}
 
 		#menubar .menu .options {
 			position: absolute;
 			display: none;
-			padding: 5px 0px;
+			padding: 5px 0;
 			background: #eee;
 			width: 150px;
 		}
@@ -110,7 +109,7 @@ input.Number {
 				color: #666;
 				background-color: transparent;
 				padding: 5px 10px;
-				margin: 0px !important;
+				margin: 0 !important;
 			}
 
 				#menubar .menu .options .option:hover {
@@ -123,11 +122,18 @@ input.Number {
 					background: transparent;
 				}
 
+		#menubar .menu .options .inactive {
+			color: #bbb;
+			background-color: transparent;
+			padding: 5px 10px;
+			margin: 0 !important;
+		}
+
 #sidebar {
 	position: absolute;
-	right: 0px;
+	right: 0;
 	top: 32px;
-	bottom: 0px;
+	bottom: 0;
 	width: 300px;
 	background: #eee;
 	overflow: auto;
@@ -145,24 +151,41 @@ input.Number {
 	}
 
 	#sidebar .Panel {
-		margin-bottom: 10px;
-	}
-
-	#sidebar .Panel.collapsed {
-		margin-bottom: 0px;
-	}
-
-	#sidebar > .Panel {
 		color: #888;
 		padding: 10px;
 		border-top: 1px solid #ccc;
 	}
 
+	#sidebar .Panel.collapsed {
+		margin-bottom: 0;
+	}
+
+	#sidebar .Row {
+		min-height: 20px;
+		margin-bottom: 10px;
+	}
+
+#tabs {
+	background-color: #ddd;
+	border-top: 1px solid #ccc;
+}
+
+	#tabs span {
+		color: #aaa;
+		border-right: 1px solid #ccc;
+		padding: 10px;
+	}
+
+	#tabs span.selected {
+		color: #888;
+		background-color: #eee;
+	}
+
 #toolbar {
 	position: absolute;
-	left: 0px;
+	left: 0;
 	right: 300px;
-	bottom: 0px;
+	bottom: 0;
 	height: 32px;
 	background: #eee;
 	color: #333;

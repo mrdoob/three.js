@@ -36,7 +36,7 @@
 
 		<script>
 
-			var camera, sceneLeft, sceneRight, renderer;
+			var camera, scene, renderer;
 			var video, texture;
 
 			var controls, effect;
@@ -55,6 +55,7 @@
 				} );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.layers.enable( 1 ); // render left view when no stereo available
 
 				// video
 
@@ -68,9 +69,9 @@
 				texture.format = THREE.RGBFormat;
 				texture.generateMipmaps = false;
 
-				// left
+				scene = new THREE.Scene();
 
-				sceneLeft = new THREE.Scene();
+				// left
 
 				var geometry = new THREE.SphereGeometry( 500, 60, 40 );
 				geometry.scale( - 1, 1, 1 );
@@ -91,11 +92,10 @@
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.y = - Math.PI / 2;
-				sceneLeft.add( mesh );
+				mesh.layers.set( 1 ); // render for left eye only
+				scene.add( mesh );
 
 				// right
-
-				sceneRight = new THREE.Scene();
 
 				var geometry = new THREE.SphereGeometry( 500, 60, 40 );
 				geometry.scale( - 1, 1, 1 );
@@ -117,12 +117,14 @@
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.y = - Math.PI / 2;
-				sceneRight.add( mesh );
+				mesh.layers.set( 2 ); // render for right eye only
+				scene.add( mesh );
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0x101010 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -160,7 +162,7 @@
 
 				controls.update();
 
-				effect.render( [ sceneLeft, sceneRight ], camera );
+				effect.render( scene, camera );
 
 			}
 

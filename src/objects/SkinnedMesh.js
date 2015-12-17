@@ -43,7 +43,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 			gbone = this.geometry.bones[ b ];
 
-			if ( gbone.parent !== - 1 && gbone.parent !== null) {
+			if ( gbone.parent !== - 1 && gbone.parent !== null ) {
 
 				bones[ gbone.parent ].add( bones[ b ] );
 
@@ -75,7 +75,7 @@ THREE.SkinnedMesh.prototype.bind = function( skeleton, bindMatrix ) {
 	if ( bindMatrix === undefined ) {
 
 		this.updateMatrixWorld( true );
-		
+
 		this.skeleton.calculateInverses();
 
 		bindMatrix = this.matrixWorld;
@@ -97,7 +97,7 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 	if ( this.geometry instanceof THREE.Geometry ) {
 
-		for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
+		for ( var i = 0; i < this.geometry.skinWeights.length; i ++ ) {
 
 			var sw = this.geometry.skinWeights[ i ];
 
@@ -109,15 +109,40 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 			} else {
 
-				sw.set( 1 ); // this will be normalized by the shader anyway
+				sw.set( 1, 0, 0, 0 ); // do something reasonable
 
 			}
 
 		}
 
-	} else {
+	} else if ( this.geometry instanceof THREE.BufferGeometry ) {
 
-		// skinning weights assumed to be normalized for THREE.BufferGeometry
+		var vec = new THREE.Vector4();
+
+		var skinWeight = this.geometry.attributes.skinWeight;
+
+		for ( var i = 0; i < skinWeight.count; i ++ ) {
+
+			vec.x = skinWeight.getX( i );
+			vec.y = skinWeight.getY( i );
+			vec.z = skinWeight.getZ( i );
+			vec.w = skinWeight.getW( i );
+
+			var scale = 1.0 / vec.lengthManhattan();
+
+			if ( scale !== Infinity ) {
+
+				vec.multiplyScalar( scale );
+
+			} else {
+
+				vec.set( 1, 0, 0, 0 ); // do something reasonable
+
+			}
+
+			skinWeight.setXYZW( i, vec.x, vec.y, vec.z, vec.w );
+
+		}
 
 	}
 
