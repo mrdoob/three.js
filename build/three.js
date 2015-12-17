@@ -17175,9 +17175,11 @@ THREE.StereoCamera = function ( fov, aspect, near, far ) {
 	this.focalLength = 125;
 
 	this.cameraL = new THREE.PerspectiveCamera();
+	this.cameraL.layers.enable( 1 );
 	this.cameraL.matrixAutoUpdate = false;
 
 	this.cameraR = new THREE.PerspectiveCamera();
+	this.cameraR.layers.enable( 2 );
 	this.cameraR.matrixAutoUpdate = false;
 
 };
