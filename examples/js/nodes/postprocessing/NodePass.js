@@ -6,14 +6,14 @@ THREE.NodePass = function() {
 
 	THREE.ShaderPass.call( this );
 
+	this.textureID = 'renderTexture';
+
 	this.fragment = new THREE.RawNode( new THREE.ScreenNode() );
 
 	this.node = new THREE.NodeMaterial();
 	this.node.fragment = this.fragment;
 
 	this.build();
-
-	this.textureID = 'renderTexture';
 
 };
 
