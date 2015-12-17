@@ -19,7 +19,7 @@ THREE.NormalNode.VIEW = 'view';
 
 THREE.NormalNode.prototype.isShared = function( builder ) {
 
-	switch ( this.method ) {
+	switch ( this.scope ) {
 		case THREE.NormalNode.WORLD:
 			return true;
 	}

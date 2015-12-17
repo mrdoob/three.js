@@ -63,6 +63,6 @@ THREE.SwitchNode.prototype.generate = function( builder, output ) {
 
 	}
 
-	return builder.format( a, this.type, output );
+	return builder.format( a, this.getType( builder ), output );
 
 };

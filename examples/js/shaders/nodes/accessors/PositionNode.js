@@ -20,7 +20,7 @@ THREE.PositionNode.PROJECTION = 'projection';
 
 THREE.PositionNode.prototype.getType = function( builder ) {
 
-	switch ( this.method ) {
+	switch ( this.scope ) {
 		case THREE.PositionNode.PROJECTION:
 			return 'v4';
 	}
@@ -31,7 +31,7 @@ THREE.PositionNode.prototype.getType = function( builder ) {
 
 THREE.PositionNode.prototype.isShared = function( builder ) {
 
-	switch ( this.method ) {
+	switch ( this.scope ) {
 		case THREE.PositionNode.LOCAL:
 		case THREE.PositionNode.WORLD:
 			return false;
@@ -55,7 +55,7 @@ THREE.PositionNode.prototype.generate = function( builder, output ) {
 			if ( builder.isShader( 'vertex' ) ) result = 'transformed';
 			else result = 'vPosition';
 
-			break;
+		break;
 
 		case THREE.PositionNode.WORLD:
 
@@ -64,21 +64,21 @@ THREE.PositionNode.prototype.generate = function( builder, output ) {
 			if ( builder.isShader( 'vertex' ) ) result = 'vWPosition';
 			else result = 'vWPosition';
 
-			break;
+		break;
 
 		case THREE.PositionNode.VIEW:
 
 			if ( builder.isShader( 'vertex' ) ) result = '-mvPosition.xyz';
 			else result = 'vViewPosition';
 
-			break;
+		break;
 
 		case THREE.PositionNode.PROJECTION:
 
 			if ( builder.isShader( 'vertex' ) ) result = '(projectionMatrix * modelViewMatrix * vec4( position, 1.0 ))';
 			else result = 'vec4( 0.0 )';
 
-			break;
+		break;
 
 	}
 

@@ -96,11 +96,6 @@ THREE.NodeMaterial.prototype.build = function() {
 		color: []
 	};
 
-	this.needsColor = false;
-	this.needsLight = false;
-	this.needsPosition = false;
-	this.needsTransparent = false;
-
 	this.vertexPars = '';
 	this.fragmentPars = '';
 
@@ -189,8 +184,8 @@ THREE.NodeMaterial.prototype.build = function() {
 
 	}
 
-	this.lights = this.needsLight;
-	this.transparent = this.needsTransparent;
+	this.lights = this.requestAttrib.light;
+	this.transparent = this.requestAttrib.transparent;
 
 	this.vertexShader = [
 		this.vertexPars,
@@ -245,15 +240,15 @@ THREE.NodeMaterial.prototype.mergeUniform = function( uniforms ) {
 
 };
 
-THREE.NodeMaterial.prototype.createUniform = function( value, type, needsUpdate ) {
+THREE.NodeMaterial.prototype.createUniform = function( value, type, ns, needsUpdate ) {
 
 	var index = this.uniformList.length;
 
 	var uniform = {
 		type : type,
 		value : value,
-		needsUpdate : needsUpdate,
-		name : 'nVu' + index
+		name : ns ? ns : 'nVu' + index,
+		needsUpdate : needsUpdate
 	};
 
 	this.uniformList.push( uniform );
@@ -262,12 +257,12 @@ THREE.NodeMaterial.prototype.createUniform = function( value, type, needsUpdate 
 
 };
 
-THREE.NodeMaterial.prototype.getVertexTemp = function( uuid, type ) {
+THREE.NodeMaterial.prototype.getVertexTemp = function( uuid, type, ns ) {
 
 	if ( ! this.vertexTemps[ uuid ] ) {
 
 		var index = this.vertexTemps.length,
-			name = 'nVt' + index,
+			name = ns ? ns : 'nVt' + index,
 			data = { name : name, type : type };
 
 		this.vertexTemps.push( data );
@@ -276,6 +271,23 @@ THREE.NodeMaterial.prototype.getVertexTemp = function( uuid, type ) {
 	}
 
 	return this.vertexTemps[ uuid ];
+
+};
+
+THREE.NodeMaterial.prototype.getFragmentTemp = function( uuid, type, ns ) {
+
+	if ( ! this.fragmentTemps[ uuid ] ) {
+
+		var index = this.fragmentTemps.length,
+			name = ns ? ns : 'nVt' + index,
+			data = { name : name, type : type };
+
+		this.fragmentTemps.push( data );
+		this.fragmentTemps[ uuid ] = data;
+
+	}
+
+	return this.fragmentTemps[ uuid ];
 
 };
 
@@ -305,23 +317,6 @@ THREE.NodeMaterial.prototype.getIncludes = function( incs ) {
 	}
 
 }();
-
-THREE.NodeMaterial.prototype.getFragmentTemp = function( uuid, type ) {
-
-	if ( ! this.fragmentTemps[ uuid ] ) {
-
-		var index = this.fragmentTemps.length,
-			name = 'nVt' + index,
-			data = { name : name, type : type };
-
-		this.fragmentTemps.push( data );
-		this.fragmentTemps[ uuid ] = data;
-
-	}
-
-	return this.fragmentTemps[ uuid ];
-
-};
 
 THREE.NodeMaterial.prototype.addVertexPars = function( code ) {
 
@@ -405,9 +400,9 @@ THREE.NodeMaterial.prototype.getCodePars = function( pars, prefix ) {
 
 };
 
-THREE.NodeMaterial.prototype.getVertexUniform = function( value, type, needsUpdate ) {
+THREE.NodeMaterial.prototype.getVertexUniform = function( value, type, ns, needsUpdate ) {
 
-	var uniform = this.createUniform( value, type, needsUpdate );
+	var uniform = this.createUniform( value, type, ns, needsUpdate );
 
 	this.vertexUniform.push( uniform );
 	this.vertexUniform[ uniform.name ] = uniform;
@@ -418,9 +413,9 @@ THREE.NodeMaterial.prototype.getVertexUniform = function( value, type, needsUpda
 
 };
 
-THREE.NodeMaterial.prototype.getFragmentUniform = function( value, type, needsUpdate ) {
+THREE.NodeMaterial.prototype.getFragmentUniform = function( value, type, ns, needsUpdate ) {
 
-	var uniform = this.createUniform( value, type, needsUpdate );
+	var uniform = this.createUniform( value, type, ns, needsUpdate );
 
 	this.fragmentUniform.push( uniform );
 	this.fragmentUniform[ uniform.name ] = uniform;

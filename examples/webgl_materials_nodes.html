@@ -34,62 +34,62 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
-		
+
 		<script src='js/geometries/TeapotBufferGeometry.js'></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
-		
-		<!-- NodeMaterial Base -->
-		<script src="js/materials/nodes/GLNode.js"></script>
-		<script src="js/materials/nodes/RawNode.js"></script>
-		<script src="js/materials/nodes/TempNode.js"></script>
-		<script src="js/materials/nodes/InputNode.js"></script>
-		<script src="js/materials/nodes/ConstNode.js"></script>
-		<script src="js/materials/nodes/FunctionNode.js"></script>
-		<script src="js/materials/nodes/FunctionCallNode.js"></script>
-		<script src="js/materials/nodes/BuilderNode.js"></script>
-		<script src="js/materials/nodes/LibNode.js"></script>
-		<script src="js/materials/nodes/NodeMaterial.js"></script>
-		
+
+		<!-- NodeLibrary -->
+		<script src="js/shaders/nodes/GLNode.js"></script>
+		<script src="js/shaders/nodes/RawNode.js"></script>
+		<script src="js/shaders/nodes/TempNode.js"></script>
+		<script src="js/shaders/nodes/InputNode.js"></script>
+		<script src="js/shaders/nodes/ConstNode.js"></script>
+		<script src="js/shaders/nodes/FunctionNode.js"></script>
+		<script src="js/shaders/nodes/FunctionCallNode.js"></script>
+		<script src="js/shaders/nodes/BuilderNode.js"></script>
+		<script src="js/shaders/nodes/LibNode.js"></script>
+		<script src="js/shaders/nodes/NodeMaterial.js"></script>
+
 		<!-- Accessors -->
-		<script src="js/materials/nodes/accessors/PositionNode.js"></script>
-		<script src="js/materials/nodes/accessors/NormalNode.js"></script>
-		<script src="js/materials/nodes/accessors/UVNode.js"></script>
-		<script src="js/materials/nodes/accessors/ColorsNode.js"></script>
-		<script src="js/materials/nodes/accessors/CameraNode.js"></script>
-		<script src="js/materials/nodes/accessors/ReflectNode.js"></script>
-		
+		<script src="js/shaders/nodes/accessors/PositionNode.js"></script>
+		<script src="js/shaders/nodes/accessors/NormalNode.js"></script>
+		<script src="js/shaders/nodes/accessors/UVNode.js"></script>
+		<script src="js/shaders/nodes/accessors/ColorsNode.js"></script>
+		<script src="js/shaders/nodes/accessors/CameraNode.js"></script>
+		<script src="js/shaders/nodes/accessors/ReflectNode.js"></script>
+
 		<!-- Inputs -->
-		<script src="js/materials/nodes/inputs/IntNode.js"></script>
-		<script src="js/materials/nodes/inputs/FloatNode.js"></script>
-		<script src="js/materials/nodes/inputs/ColorNode.js"></script>
-		<script src="js/materials/nodes/inputs/Vector2Node.js"></script>
-		<script src="js/materials/nodes/inputs/Vector3Node.js"></script>
-		<script src="js/materials/nodes/inputs/Vector4Node.js"></script>
-		<script src="js/materials/nodes/inputs/TextureNode.js"></script>
-		<script src="js/materials/nodes/inputs/CubeTextureNode.js"></script>
-		
+		<script src="js/shaders/nodes/inputs/IntNode.js"></script>
+		<script src="js/shaders/nodes/inputs/FloatNode.js"></script>
+		<script src="js/shaders/nodes/inputs/ColorNode.js"></script>
+		<script src="js/shaders/nodes/inputs/Vector2Node.js"></script>
+		<script src="js/shaders/nodes/inputs/Vector3Node.js"></script>
+		<script src="js/shaders/nodes/inputs/Vector4Node.js"></script>
+		<script src="js/shaders/nodes/inputs/TextureNode.js"></script>
+		<script src="js/shaders/nodes/inputs/CubeTextureNode.js"></script>
+
 		<!-- Math -->
-		<script src="js/materials/nodes/math/Math1Node.js"></script>
-		<script src="js/materials/nodes/math/Math2Node.js"></script>
-		<script src="js/materials/nodes/math/Math3Node.js"></script>
-		<script src="js/materials/nodes/math/OperatorNode.js"></script>
-		
+		<script src="js/shaders/nodes/math/Math1Node.js"></script>
+		<script src="js/shaders/nodes/math/Math2Node.js"></script>
+		<script src="js/shaders/nodes/math/Math3Node.js"></script>
+		<script src="js/shaders/nodes/math/OperatorNode.js"></script>
+
 		<!-- Utils -->
-		<script src="js/materials/nodes/utils/SwitchNode.js"></script>
-		<script src="js/materials/nodes/utils/JoinNode.js"></script>
-		<script src="js/materials/nodes/utils/TimeNode.js"></script>
-		<script src="js/materials/nodes/utils/RoughnessToBlinnExponentNode.js"></script>
-		
-		<!-- Interfaces -->
-		<script src="js/materials/nodes/interfaces/PhongNode.js"></script>
-		<script src="js/materials/nodes/interfaces/PhongNodeMaterial.js"></script>
-		<script src="js/materials/nodes/interfaces/StandardNode.js"></script>
-		<script src="js/materials/nodes/interfaces/StandardNodeMaterial.js"></script>
-		
-		<!-- Extras -->
-		<script src="js/materials/nodes/extras/VelocityNode.js"></script>
-		
+		<script src="js/shaders/nodes/utils/SwitchNode.js"></script>
+		<script src="js/shaders/nodes/utils/JoinNode.js"></script>
+		<script src="js/shaders/nodes/utils/TimeNode.js"></script>
+		<script src="js/shaders/nodes/utils/RoughnessToBlinnExponentNode.js"></script>
+		<script src="js/shaders/nodes/utils/VelocityNode.js"></script>
+
+		<!-- Phong Material -->
+		<script src="js/shaders/nodes/materials/PhongNode.js"></script>
+		<script src="js/shaders/nodes/materials/PhongNodeMaterial.js"></script>
+
+		<!-- Standard Material -->
+		<script src="js/shaders/nodes/materials/StandardNode.js"></script>
+		<script src="js/shaders/nodes/materials/StandardNodeMaterial.js"></script>
+
 		<script>
 
 		var container = document.getElementById( 'container' );
@@ -108,8 +108,6 @@
 
 		var decalDiffuse = new THREE.TextureLoader().load( 'textures/decal/decal-diffuse.png' );
 		decalDiffuse.wrapS = decalDiffuse.wrapT = THREE.RepeatWrapping;
-
-		var decalNormal = new THREE.TextureLoader().load( 'textures/decal/decal-normal.jpg' );
 
 		var cloud = new THREE.TextureLoader().load( 'textures/lava/cloud.png' );
 		cloud.wrapS = cloud.wrapT = THREE.RepeatWrapping;
@@ -222,6 +220,15 @@
 				} );
 
 			}
+			else if (typeof value == 'object') {
+
+				node = gui.add( param, name, value ).onChange( function() {
+
+					callback( param[ name ] );
+
+				} );
+
+			}
 			else {
 
 				node = gui.add( param, name, min, max ).onChange( function() {
@@ -251,7 +258,7 @@
 
 				case 'phong':
 
-					//	MATERIAL
+					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
 
@@ -283,7 +290,7 @@
 
 				case 'standard':
 
-					//	MATERIAL
+					// MATERIAL
 
 					mtl = new THREE.StandardNodeMaterial();
 
@@ -380,7 +387,7 @@
 
 				case 'wave':
 
-					//	MATERIAL
+					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
 
@@ -448,7 +455,7 @@
 					mtl.color = color;
 					mtl.transform = blend;
 
-					//	GUI
+					// GUI
 
 					addGui( 'speed', speed.number, function( val ) {
 
@@ -492,7 +499,7 @@
 
 				case 'rim':
 
-					//	MATERIAL
+					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
 
@@ -527,7 +534,7 @@
 					mtl.color = new THREE.ColorNode( 0x111111 );
 					mtl.emissive = rimColor;
 
-					//	GUI
+					// GUI
 
 					addGui( 'color', color.value.getHex(), function( val ) {
 
@@ -578,7 +585,7 @@
 
 				case 'fresnel':
 
-					//	MATERIAL
+					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
 
@@ -614,7 +621,7 @@
 					mtl.environment = color;
 					mtl.reflectivity = new THREE.Math1Node( fresnel, THREE.Math1Node.SAT );
 
-					//	GUI
+					// GUI
 
 					addGui( 'reflectance', reflectance.number, function( val ) {
 
@@ -632,7 +639,7 @@
 
 				case 'layers':
 
-					//	MATERIAL
+					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
 
@@ -667,7 +674,7 @@
 
 					mtl.color = blend;
 
-					//	GUI
+					// GUI
 
 					addGui( 'offset', offset.number, function( val ) {
 
@@ -685,7 +692,7 @@
 
 				case 'saturation':
 
-					//	MATERIAL
+					// MATERIAL
 
 					mtl = new THREE.StandardNodeMaterial();
 
@@ -712,7 +719,7 @@
 					mtl.color = saturation;
 					mtl.environment = new THREE.CubeTextureNode( cubemap ); // optional
 
-					//	GUI
+					// GUI
 
 					addGui( 'saturation', sat.number, function( val ) {
 
@@ -724,7 +731,7 @@
 
 				case 'top-bottom':
 
-					//	MATERIAL
+					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
 
@@ -755,7 +762,7 @@
 
 					mtl.color = blend;
 
-					//	GUI
+					// GUI
 
 					addGui( 'hard', hard.number, function( val ) {
 
@@ -773,7 +780,7 @@
 
 				case 'displace':
 
-					//	MATERIAL
+					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
 
@@ -829,7 +836,7 @@
 					mtl.emissive = color;
 					mtl.transform = blend;
 
-					//	GUI
+					// GUI
 
 					addGui( 'speed', speed.number, function( val ) {
 
@@ -859,7 +866,7 @@
 
 				case 'smoke':
 
-					//	MATERIAL
+					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
 
@@ -902,7 +909,7 @@
 					mtl.environment = new THREE.ColorNode( 0xFFFFFF );
 					mtl.alpha = clouds;
 
-					//	GUI
+					// GUI
 
 					addGui( 'color', mtl.environment.value.getHex(), function( val ) {
 
@@ -914,7 +921,7 @@
 
 				case 'camera-depth':
 
-					//	MATERIAL
+					// MATERIAL
 
 					var colorA = new THREE.ColorNode( 0xFFFFFF );
 					var colorB = new THREE.ColorNode( 0x0054df );
@@ -933,7 +940,7 @@
 					mtl = new THREE.PhongNodeMaterial();
 					mtl.color = colors;
 
-					//	GUI
+					// GUI
 
 					addGui( 'near', depth.near.number, function( val ) {
 
@@ -963,7 +970,7 @@
 
 				case 'caustic':
 
-					//	MATERIAL
+					// MATERIAL
 
 					mtl = new THREE.StandardNodeMaterial();
 
@@ -1083,7 +1090,7 @@
 					mtl.color = caustic;
 					mtl.ambient = causticLights;
 
-					//	GUI
+					// GUI
 
 					addGui( 'timeScale', timeScale.number, function( val ) {
 
@@ -1131,7 +1138,7 @@
 
 				case 'soft-body':
 
-					//	MATERIAL
+					// MATERIAL
 
 					move = true;
 
@@ -1180,7 +1187,7 @@
 					mtl.color = colors;
 					mtl.transform = softPosition;
 
-					//	GUI
+					// GUI
 
 					addGui( 'spring', velocity.params.spring, function( val ) {
 
@@ -1216,7 +1223,7 @@
 
 				case 'firefly':
 
-					//	MATERIAL
+					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
 
@@ -1250,7 +1257,7 @@
 					mtl.color = new THREE.ColorNode( 0 );
 					mtl.emissive = cos;
 
-					//	GUI
+					// GUI
 
 					addGui( 'speed', speed.number, function( val ) {
 

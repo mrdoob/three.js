@@ -17,7 +17,7 @@ THREE.TempNode = function( type, params ) {
 THREE.TempNode.prototype = Object.create( THREE.GLNode.prototype );
 THREE.TempNode.prototype.constructor = THREE.TempNode;
 
-THREE.TempNode.prototype.build = function( builder, output, uuid ) {
+THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 
 	var material = builder.material;
 
@@ -31,7 +31,7 @@ THREE.TempNode.prototype.build = function( builder, output, uuid ) {
 
 		}
 
-		uuid = builder.getUuid( uuid || this.constructor.uuid || this.uuid, ! isUnique );
+		uuid = builder.getUuid( uuid || this.getUuid(), ! isUnique );
 
 		var data = material.getDataNode( uuid );
 
@@ -63,7 +63,7 @@ THREE.TempNode.prototype.build = function( builder, output, uuid ) {
 		}
 		else {
 
-			name = THREE.TempNode.prototype.generate.call( this, builder, output, uuid, data.output );
+			name = THREE.TempNode.prototype.generate.call( this, builder, output, uuid, data.output, ns );
 
 			var code = this.generate( builder, type, uuid );
 
@@ -77,7 +77,7 @@ THREE.TempNode.prototype.build = function( builder, output, uuid ) {
 	}
 	else {
 
-		return builder.format( this.generate( builder, this.getType( builder ), uuid ), type, output );
+		return builder.format( this.generate( builder, this.getType( builder ), uuid ), this.getType( builder ), output );
 
 	}
 
@@ -95,6 +95,12 @@ THREE.TempNode.prototype.isUnique = function() {
 
 };
 
+THREE.TempNode.prototype.getUuid = function() {
+
+	return this.constructor.uuid || this.uuid;
+
+};
+
 THREE.TempNode.prototype.getTemp = function( builder, uuid ) {
 
 	uuid = uuid || this.uuid;
@@ -106,13 +112,13 @@ THREE.TempNode.prototype.getTemp = function( builder, uuid ) {
 
 };
 
-THREE.TempNode.prototype.generate = function( builder, output, uuid, type ) {
+THREE.TempNode.prototype.generate = function( builder, output, uuid, type, ns ) {
 
 	if ( ! this.isShared() ) console.error( "THREE.TempNode is not shared!" );
 
 	uuid = uuid || this.uuid;
 
-	if ( builder.isShader( 'vertex' ) ) return builder.material.getVertexTemp( uuid, type || this.getType( builder ) ).name;
-	else return builder.material.getFragmentTemp( uuid, type || this.getType( builder ) ).name;
+	if ( builder.isShader( 'vertex' ) ) return builder.material.getVertexTemp( uuid, type || this.getType( builder ), ns ).name;
+	else return builder.material.getFragmentTemp( uuid, type || this.getType( builder ), ns ).name;
 
 };

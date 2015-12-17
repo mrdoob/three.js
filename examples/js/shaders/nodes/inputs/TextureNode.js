@@ -15,9 +15,15 @@ THREE.TextureNode = function( value, coord, bias ) {
 THREE.TextureNode.prototype = Object.create( THREE.InputNode.prototype );
 THREE.TextureNode.prototype.constructor = THREE.TextureNode;
 
+THREE.TextureNode.prototype.getTexture = function( builder, output ) {
+
+	return THREE.InputNode.prototype.generate.call( this, builder, output, this.value.uuid, 't' );
+
+};
+
 THREE.TextureNode.prototype.generate = function( builder, output ) {
 
-	var tex = THREE.InputNode.prototype.generate.call( this, builder, output, this.value.uuid, 't' );
+	var tex = this.getTexture( builder, output );
 	var coord = this.coord.build( builder, 'v2' );
 	var bias = this.bias ? this.bias.build( builder, 'fv1' ) : undefined;
 
