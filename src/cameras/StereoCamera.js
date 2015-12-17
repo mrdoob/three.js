@@ -38,14 +38,14 @@ THREE.StereoCamera.prototype.updateMatrixWorld = ( function () {
 
 		if ( needsUpdate ) {
 
-			// Off-axis stereoscopic effect based on
-			// http://paulbourke.net/stereographics/stereorender/
-
 			focalLength = this.focalLength;
 			fov = this.fov;
 			aspect = this.aspect;
 			near = this.near;
 			far = this.far;
+
+			// Off-axis stereoscopic effect based on
+			// http://paulbourke.net/stereographics/stereorender/
 
 			var projectionMatrix = this.projectionMatrix.clone();
 			var eyeSep = focalLength / 30 * 0.5;
