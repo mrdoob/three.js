@@ -47,7 +47,7 @@ THREE.StereoCamera.prototype.updateMatrixWorld = ( function () {
 			near = this.near;
 			far = this.far;
 
-			var projectionMatrix = camera.projectionMatrix.clone();
+			var projectionMatrix = this.projectionMatrix.clone();
 			var eyeSep = focalLength / 30 * 0.5;
 			var eyeSepOnProjection = eyeSep * near / focalLength;
 			var ymax = near * Math.tan( THREE.Math.degToRad( fov * 0.5 ) );
