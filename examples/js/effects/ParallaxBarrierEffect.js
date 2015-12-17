@@ -81,11 +81,8 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 	this.setSize = function ( width, height ) {
 
-		_renderTargetL = new THREE.WebGLRenderTarget( width, height, _params );
-		_renderTargetR = new THREE.WebGLRenderTarget( width, height, _params );
-
-		_material.uniforms[ "mapLeft" ].value = _renderTargetL;
-		_material.uniforms[ "mapRight" ].value = _renderTargetR;
+		_renderTargetL.setSize( width, height );
+		_renderTargetR.setSize( width, height );
 
 		renderer.setSize( width, height );
 
