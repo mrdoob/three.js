@@ -15,7 +15,7 @@ THREE.FunctionCallNode.prototype.constructor = THREE.FunctionCallNode;
 
 THREE.FunctionCallNode.prototype.setFunction = function( val ) {
 
-	this.input = [];
+	this.inputs = [];
 	this.value = val;
 
 };
@@ -44,10 +44,10 @@ THREE.FunctionCallNode.prototype.generate = function( builder, output ) {
 	var code = func.name + '(';
 	var params = [];
 
-	for ( var i = 0; i < func.input.length; i ++ ) {
+	for ( var i = 0; i < func.inputs.length; i ++ ) {
 
-		var inpt = func.input[ i ];
-		var param = this.input[ i ] || this.input[ inpt.name ];
+		var inpt = func.inputs[ i ];
+		var param = this.inputs[ i ] || this.inputs[ inpt.name ];
 
 		params.push( param.build( builder, builder.getType( inpt.type ) ) );
 
