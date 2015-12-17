@@ -92,7 +92,7 @@
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.y = - Math.PI / 2;
-				mesh.layers.set( 1 ); // render for left eye only
+				mesh.layers.set( 1 ); // display in left eye only
 				scene.add( mesh );
 
 				// right
@@ -117,7 +117,7 @@
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.y = - Math.PI / 2;
-				mesh.layers.set( 2 ); // render for right eye only
+				mesh.layers.set( 2 ); // display in right eye only
 				scene.add( mesh );
 
 				//
