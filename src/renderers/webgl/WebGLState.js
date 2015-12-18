@@ -27,6 +27,14 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var currentColorWrite = null;
 
+	var currentStencilWrite = null;
+	var currentStencilFunc = null;
+	var currentStencilRef = null;
+	var currentStencilMask = null;
+	var currentStencilFail  = null;
+	var currentStencilZFail = null;
+	var currentStencilZPass = null;
+
 	var currentFlipSided = null;
 
 	var currentLineWidth = null;
@@ -263,59 +271,51 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		if ( currentDepthFunc !== depthFunc ) {
 
-			if ( depthFunc ) {
+			switch ( depthFunc ) {
 
-				switch ( depthFunc ) {
+				case THREE.NeverDepth:
 
-					case THREE.NeverDepth:
+					gl.depthFunc( gl.NEVER );
+					break;
 
-						gl.depthFunc( gl.NEVER );
-						break;
+				case THREE.AlwaysDepth:
 
-					case THREE.AlwaysDepth:
+					gl.depthFunc( gl.ALWAYS );
+					break;
 
-						gl.depthFunc( gl.ALWAYS );
-						break;
+				case THREE.LessDepth:
 
-					case THREE.LessDepth:
+					gl.depthFunc( gl.LESS );
+					break;
 
-						gl.depthFunc( gl.LESS );
-						break;
+				case THREE.LessEqualDepth:
 
-					case THREE.LessEqualDepth:
+					gl.depthFunc( gl.LEQUAL );
+					break;
 
-						gl.depthFunc( gl.LEQUAL );
-						break;
+				case THREE.EqualDepth:
 
-					case THREE.EqualDepth:
+					gl.depthFunc( gl.EQUAL );
+					break;
 
-						gl.depthFunc( gl.EQUAL );
-						break;
+				case THREE.GreaterEqualDepth:
 
-					case THREE.GreaterEqualDepth:
+					gl.depthFunc( gl.GEQUAL );
+					break;
 
-						gl.depthFunc( gl.GEQUAL );
-						break;
+				case THREE.GreaterDepth:
 
-					case THREE.GreaterDepth:
+					gl.depthFunc( gl.GREATER );
+					break;
 
-						gl.depthFunc( gl.GREATER );
-						break;
+				case THREE.NotEqualDepth:
 
-					case THREE.NotEqualDepth:
+					gl.depthFunc( gl.NOTEQUAL );
+					break;
 
-						gl.depthFunc( gl.NOTEQUAL );
-						break;
+				default:
 
-					default:
-
-						gl.depthFunc( gl.LEQUAL );
-
-				}
-
-			} else {
-
-				gl.depthFunc( gl.LEQUAL );
+					console.error( 'THREE.WebGLState: Invalid depth function: %s', depthFunc );
 
 			}
 
@@ -358,6 +358,115 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 			currentColorWrite = colorWrite;
 
 		}
+
+	};
+
+	this.setStencilFunc = function ( stencilFunc, stencilRef, stencilMask ) {
+
+	  if( currentStencilFunc !== stencilFunc ||
+	      currentStencilRef  !== stencilRef  ||
+	      currentStencilMask !== stencilMask ) {
+
+      switch ( stencilFunc ) {
+
+        case THREE.NeverStencil:
+
+          gl.stencilFunc( gl.NEVER,  stencilRef, stencilMask );
+          break;
+
+        case THREE.AlwaysStencil:
+
+          gl.stencilFunc( gl.ALWAYS,  stencilRef, stencilMask );
+          break;
+
+        case THREE.LessStencil:
+
+          gl.stencilFunc( gl.LESS,  stencilRef, stencilMask );
+          break;
+
+        case THREE.LessEqualStencil:
+
+          gl.stencilFunc( gl.LEQUAL,  stencilRef, stencilMask );
+          break;
+
+        case THREE.EqualStencil:
+
+          gl.stencilFunc( gl.EQUAL,  stencilRef, stencilMask );
+          break;
+
+        case THREE.GreaterEqualStencil:
+
+          gl.stencilFunc( gl.GEQUAL,  stencilRef, stencilMask );
+          break;
+
+        case THREE.GreaterStencil:
+
+          gl.stencilFunc( gl.GREATER,  stencilRef, stencilMask );
+          break;
+
+        case THREE.NotEqualStencil:
+
+          gl.stencilFunc( gl.NOTEQUAL,  stencilRef, stencilMask );
+          break;
+
+        default:
+
+          console.error( 'THREE.WebGLState: Invalid stencil function: %s', stencilFunc );
+
+      }
+
+	    currentStencilFunc = stencilFunc;
+	    currentStencilRef  = stencilRef;
+	    currentStencilMask = stencilMask;
+
+	  }
+
+	};
+
+	this.setStencilOp = function ( stencilFail, stencilZFail, stencilZPass ) {
+
+	  var fail, zFail, zPass;
+
+	  if( currentStencilFail  !== stencilFail   ||
+	      currentStencilZFail !== stencilZFail  ||
+	      currentStencilZPass !== stencilZPass ) {
+
+	    fail  = getStencilOp( stencilFail );
+	    zFail = getStencilOp( stencilZFail );
+	    zPass = getStencilOp( stencilZPass )
+
+	    gl.stencilOp( fail,  zFail, zPass );
+
+	    currentStencilFail  = stencilFail;
+	    currentStencilZFail = stencilZFail;
+	    currentStencilZPass = stencilZPass;
+
+	  }
+
+	};
+
+	this.setStencilTest = function ( stencilTest ) {
+
+	  if ( stencilTest ) {
+
+	    this.enable( gl.STENCIL_TEST );
+
+	  } else {
+
+	    this.disable( gl.STENCIL_TEST );
+
+	  }
+
+	};
+
+	this.setStencilWrite = function ( stencilWrite ) {
+
+	  if ( currentStencilWrite !== stencilWrite ) {
+
+	    gl.stencilMask( stencilWrite );
+	    currentStencilWrite = stencilWrite;
+
+	  }
 
 	};
 
@@ -509,8 +618,6 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
-	//
-
 	this.reset = function () {
 
 		for ( var i = 0; i < enabledAttributes.length; i ++ ) {
@@ -536,5 +643,58 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 		currentFlipSided = null;
 
 	};
+
+	// private
+
+	function getStencilOp( stencilOp ){
+
+		var op;
+
+		switch ( stencilOp ) {
+
+			case THREE.KeepStencil:
+
+				op = gl.KEEP;
+				break;
+
+			case THREE.ReplaceStencil:
+
+				op = gl.REPLACE;
+				break;
+
+			case THREE.IncrStencil:
+
+				op = gl.INCR;
+				break;
+
+			case THREE.DecrStencil:
+
+				op = gl.DECR;
+				break;
+
+			case THREE.InvertStencil:
+
+				op = gl.INVERT;
+				break;
+
+			case THREE.IncrWrapStencil:
+
+				op = gl.INCR_WRAP;
+				break;
+
+			case THREE.DecrWrapStencil:
+
+				op = gl.DECR_WRAP;
+				break;
+
+			default:
+
+				console.error( 'THREE.WebGLState: Invalid stencil operation: %s', stencilOp );
+
+		}
+
+		return op;
+
+	}
 
 };
