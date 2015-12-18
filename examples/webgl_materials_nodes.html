@@ -708,13 +708,13 @@
 					].join( "\n" ) );
 
 					var saturation = new THREE.FunctionCallNode( satrgb );
-					saturation.input.rgb = tex;
-					saturation.input.adjustment = sat;
+					saturation.inputs.rgb = tex;
+					saturation.inputs.adjustment = sat;
 
 					// or try
 
-					//saturation.input[0] = tex;
-					//saturation.input[1] = sat;
+					//saturation.inputs[0] = tex;
+					//saturation.inputs[1] = sat;
 
 					mtl.color = saturation;
 					mtl.environment = new THREE.CubeTextureNode( cubemap ); // optional
@@ -1052,8 +1052,8 @@
 					);
 
 					var voronoi = new THREE.FunctionCallNode( voronoiLayers );
-					voronoi.input.p = uvPos;
-					voronoi.input.time = timeOffset;
+					voronoi.inputs.p = uvPos;
+					voronoi.inputs.time = timeOffset;
 
 					var maskCaustic = new THREE.OperatorNode(
 						alpha,

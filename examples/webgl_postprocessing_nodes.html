@@ -313,8 +313,8 @@
 						].join( "\n" ) );
 
 						var saturation = new THREE.FunctionCallNode( satrgb );
-						saturation.input.rgb = screen;
-						saturation.input.adjustment = sat;
+						saturation.inputs.rgb = screen;
+						saturation.inputs.adjustment = sat;
 
 						nodepass.value = saturation;
 
