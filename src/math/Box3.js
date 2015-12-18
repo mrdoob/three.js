@@ -254,7 +254,7 @@ THREE.Box3.prototype = {
 
 		var min, max;
 
-		if( plane.normal.x > 0 ) {
+		if ( plane.normal.x > 0 ) {
 
 			min = plane.normal.x * this.min.x;
 			max = plane.normal.x * this.max.x;
@@ -266,7 +266,7 @@ THREE.Box3.prototype = {
 
 		}
 
-		if( plane.normal.y > 0 ) {
+		if ( plane.normal.y > 0 ) {
 
 			min += plane.normal.y * this.min.y;
 			max += plane.normal.y * this.max.y;
@@ -278,7 +278,7 @@ THREE.Box3.prototype = {
 
 		}
 
-		if( plane.normal.z > 0 ) {
+		if ( plane.normal.z > 0 ) {
 
 			min += plane.normal.z * this.min.z;
 			max += plane.normal.z * this.max.z;
