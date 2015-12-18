@@ -261,7 +261,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.clear = function () {
 
-		if ( _clearBox.empty() === false ) {
+		if ( _clearBox.isEmpty() === false ) {
 
 			_clearBox.intersect( _clipBox );
 			_clearBox.expandByScalar( 2 );
