@@ -16,6 +16,9 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 	this.width = width;
 	this.height = height;
 
+	this.scissor = new THREE.Rectangle( 0, 0, width, height );
+	this.scissorTest = false;
+
 	this.viewport = new THREE.Rectangle( 0, 0, width, height );
 
 	options = options || {};
@@ -45,12 +48,7 @@ THREE.WebGLRenderTarget.prototype = {
 		}
 
 		this.viewport.set( 0, 0, width, height );
-
-	},
-
-	setViewport: function ( x, y, width, height ) {
-
-		this.viewport.set( x, y, width, height );
+		this.scissor.set( 0, 0, width, height );
 
 	},
 
