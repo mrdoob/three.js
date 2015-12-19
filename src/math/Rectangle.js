@@ -32,6 +32,12 @@ THREE.Rectangle.prototype = {
 
 		return this;
 
+	},
+
+	equals: function ( rectangle ) {
+
+		return this.x === rectangle.x && this.y === rectangle.y && this.width === rectangle.width && this.height === rectangle.height;
+
 	}
 
 };
