@@ -275,26 +275,6 @@ THREE.GreaterEqualDepth = 5;
 THREE.GreaterDepth = 6;
 THREE.NotEqualDepth = 7;
 
-// stencil functions
-
-THREE.NeverStencil = 0;
-THREE.AlwaysStencil = 1;
-THREE.LessStencil = 2;
-THREE.LessEqualStencil = 3;
-THREE.EqualStencil = 4;
-THREE.GreaterEqualStencil = 5;
-THREE.GreaterStencil = 6;
-THREE.NotEqualStencil = 7;
-
-// stencil operations
-
-THREE.KeepStencil = 0;
-THREE.ReplaceStencil = 1;
-THREE.IncrStencil = 2;
-THREE.DecrStencil = 3;
-THREE.InvertStencil = 4;
-THREE.IncrWrapStencil = 5;
-THREE.DecrWrapStencil = 6;
 
 // TEXTURE CONSTANTS
 
