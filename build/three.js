@@ -32538,8 +32538,9 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 		}
 	},
 	enableScissorTest: {
-		value: function () {
+		value: function ( boolean ) {
 			console.warn( 'THREE.WebGLRenderer: .enableScissorTest() is now .setScissorTest().' );
+			this.setScissorTest( boolean );
 		}
 	},
 	initMaterial: {
