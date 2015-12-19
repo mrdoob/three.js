@@ -1799,6 +1799,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				refreshUniformsPoints( m_uniforms, material );
 
+			} else if ( material instanceof THREE.MeshLambertMaterial ) {
+
+				refreshUniformsLambert( m_uniforms, material );
+
 			} else if ( material instanceof THREE.MeshPhongMaterial ) {
 
 				refreshUniformsPhong( m_uniforms, material );
@@ -2018,6 +2022,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( fog instanceof THREE.FogExp2 ) {
 
 			uniforms.fogDensity.value = fog.density;
+
+		}
+
+	}
+
+	function refreshUniformsLambert ( uniforms, material ) {
+
+		if ( material.lightMap ) {
+
+			uniforms.lightMap.value = material.lightMap;
+			uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
+		}
+
+		if ( material.emissiveMap ) {
+
+			uniforms.emissiveMap.value = material.emissiveMap;
 
 		}
 
