@@ -38726,7 +38726,7 @@ THREE.BoxHelper.prototype.update = ( function () {
 
 		box.setFromObject( object );
 
-		if ( box.empty() ) return;
+		if ( box.isEmpty() ) return;
 
 		var min = box.min;
 		var max = box.max;
@@ -38763,7 +38763,7 @@ THREE.BoxHelper.prototype.update = ( function () {
 
 		this.geometry.computeBoundingSphere();
 
-	}
+	};
 
 } )();
 
