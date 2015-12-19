@@ -1376,6 +1376,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
+			object.onWillRender();
+
 			if ( object instanceof THREE.ImmediateRenderObject ) {
 
 				setMaterial( material );
