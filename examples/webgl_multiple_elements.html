@@ -171,7 +171,7 @@
 				renderer.clear( true );
 				renderer.setClearColor( 0xE0E0E0 );
 
-				renderer.enableScissorTest( true );
+				renderer.setScissorTest( true );
 				scenes.forEach( function( scene ) {
 					// so something moves
 					scene.children[0].rotation.x = Date.now() * 0.00111;
@@ -203,7 +203,7 @@
 					renderer.render( scene, camera );
 
 				} );
-				renderer.enableScissorTest( false );
+				renderer.setScissorTest( false );
 
 			}
 

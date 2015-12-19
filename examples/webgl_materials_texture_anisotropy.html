@@ -196,15 +196,16 @@
 
 				camera.lookAt( scene1.position );
 
-				renderer.enableScissorTest( false );
 				renderer.clear();
-				renderer.enableScissorTest( true );
+				renderer.setScissorTest( true );
 
 				renderer.setScissor( 0, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene1, camera );
 
 				renderer.setScissor( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT  );
 				renderer.render( scene2, camera );
+
+				renderer.setScissorTest( false );
 
 
 			}

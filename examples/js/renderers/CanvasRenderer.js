@@ -222,7 +222,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	};
 
 	this.setScissor = function () {};
-	this.enableScissorTest = function () {};
+	this.setScissorTest = function () {};
 
 	this.setClearColor = function ( color, alpha ) {
 
