@@ -446,6 +446,11 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 			return this.extensions.get( 'ANGLE_instanced_arrays' );
 		}
 	},
+	enableScissorTest: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .enableScissorTest() is now .setScissorTest().' );
+		}
+	},
 	initMaterial: {
 		value: function () {
 			console.warn( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );

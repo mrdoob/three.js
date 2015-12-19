@@ -88,6 +88,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_usedTextureUnits = 0,
 
+	_scissor = new THREE.Vector4( 0, 0, _canvas.width, _canvas.height ),
+	_scissorTest = false,
+
 	_viewport = new THREE.Vector4( 0, 0, _canvas.width, _canvas.height ),
 
 	_currentWidth = 0,
@@ -238,7 +241,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.init();
 
-		_gl.viewport( _viewport.x, _viewport.y, _viewport.z, _viewport.w );
+		state.scissor( _scissor );
+		state.viewport( _viewport );
 
 		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
@@ -370,39 +374,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		if ( _currentRenderTarget === null ) {
+		_viewport.set( x, y, width, height ).multiplyScalar( pixelRatio );
 
-			x *= pixelRatio;
-			y *= pixelRatio;
-
-			width *= pixelRatio;
-			height *= pixelRatio;
-
-			_viewport.set( x, y, width, height );
-
-		}
-
-		_gl.viewport( x, y, width, height );
+		state.viewport( _viewport );
 
 	};
 
 	this.setScissor = function ( x, y, width, height ) {
 
-		if ( _currentRenderTarget === null ) {
+		_scissor.set( x, y, width, height ).multiplyScalar( pixelRatio );
 
-			x *= pixelRatio;
-			y *= pixelRatio;
-
-			width *= pixelRatio;
-			height *= pixelRatio;
-
-		}
-
-		_gl.scissor( x, y, width, height );
+		state.scissor( _scissor );
 
 	};
 
-	this.enableScissorTest = function ( boolean ) {
+	this.setScissorTest = function ( boolean ) {
+
+		_scissorTest = boolean;
 
 		state.setScissorTest( boolean );
 
@@ -3381,7 +3369,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
-		var framebuffer, viewport;
+		var framebuffer, scissor, scissorTest, viewport;
 
 		if ( renderTarget ) {
 
@@ -3397,11 +3385,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			scissor = renderTarget.scissor;
+			scissorTest = renderTarget.scissorTest;
+
 			viewport = renderTarget.viewport;
 
 		} else {
 
 			framebuffer = null;
+
+			scissor = _scissor;
+			scissorTest = _scissorTest;
 
 			viewport = _viewport;
 
@@ -3410,11 +3404,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( framebuffer !== _currentFramebuffer ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-			_gl.viewport( viewport.x, viewport.y, viewport.z, viewport.w );
 
 			_currentFramebuffer = framebuffer;
 
 		}
+
+		state.scissor( scissor );
+		state.setScissorTest( scissorTest );
+
+		state.viewport( viewport );
 
 		if ( isCube ) {
 
@@ -3423,8 +3421,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_currentWidth = viewport.width;
-		_currentHeight = viewport.height;
+		_currentWidth = viewport.z;
+		_currentHeight = viewport.w;
 
 	};
 
