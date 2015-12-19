@@ -42,8 +42,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	var maxZVal = ( 1 << 24 ); // Note: You want to size this so you don't get overflows.
 	var lineMode = false;
 	var lookVector = new THREE.Vector3( 0, 0, 1 );
-	var crossVector = new THREE.Vector3();        
-    
+	var crossVector = new THREE.Vector3();
+
 	var rectx1 = Infinity, recty1 = Infinity;
 	var rectx2 = 0, recty2 = 0;
 
@@ -259,7 +259,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				}
 
 			} else if ( element instanceof THREE.RenderableLine ) {
-				
+
 				var shader = getMaterialShader( material );
 
 				drawLine(
@@ -307,7 +307,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	};
 
 	function setSize( width, height ) {
-        
+
 		canvasWBlocks = Math.floor( width / blockSize );
 		canvasHBlocks = Math.floor( height / blockSize );
 		canvasWidth   = canvasWBlocks * blockSize;
@@ -318,11 +318,11 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		viewportXScale =  fixScale * canvasWidth  / 2;
 		viewportYScale = -fixScale * canvasHeight / 2;
 		viewportZScale =             maxZVal      / 2;
-              
+
 		viewportXOffs  =  fixScale * canvasWidth  / 2 + 0.5;
 		viewportYOffs  =  fixScale * canvasHeight / 2 + 0.5;
 		viewportZOffs  =             maxZVal      / 2 + 0.5;
-        
+
 		canvas.width = canvasWidth;
 		canvas.height = canvasHeight;
 
@@ -352,7 +352,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		cleanColorBuffer();
 	}
-    
+
 	function cleanColorBuffer() {
 
 		var size = canvasWidth * canvasHeight * 4;
@@ -607,7 +607,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				}
 
 			} else if ( material instanceof THREE.LineBasicMaterial ) {
-                
+
 				var string = [
 					'var colorOffset = offset * 4;',
 					'buffer[ colorOffset ] = material.color.r * (color1.r+color2.r) * 0.5 * 255;',
@@ -1199,15 +1199,15 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		}
 
 	}
-    
+
 	// When drawing line, the blockShiftShift has to be zero. In order to clean pixel
 	// Using color1 and color2 to interpolation pixel color
 	// LineWidth is according to material.linewidth
 	function drawLine( v1, v2, color1, color2, shader, material ) {
-        
+
 		// While the line mode is enable, blockSize has to be changed to 0.
 		if ( !lineMode ) {
-			lineMode = true;            
+			lineMode = true;
 			blockShift = 0;
 			blockSize = 1 << blockShift;
 
@@ -1218,7 +1218,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 ) return;
 
 		var halfLineWidth = Math.floor( (material.linewidth-1) * 0.5 );
-      
+
 		// https://gist.github.com/2486101
 		// explanation: http://pouet.net/topic.php?which=8760&page=1
 
@@ -1252,19 +1252,19 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var length = Math.sqrt((dy12 * dy12) + (dx12 * dx12));
 		var unitX = (dx12 / length);
 		var unitY = (dy12 / length);
-		var unitZ = (dz12 / length);        
+		var unitZ = (dz12 / length);
 		var pixelX, pixelY, pixelZ;
 		var pX, pY, pZ;
 		crossVector.set( unitX, unitY, unitZ );
 		crossVector.cross( lookVector );
 		crossVector.normalize();
-            
+
 		while (length > 0) {
 
 			// Get this pixel.
 			pixelX = (x2 + length * unitX);
 			pixelY = (y2 + length * unitY);
-			pixelZ = (z2 + length * unitZ);               
+			pixelZ = (z2 + length * unitZ);
 
 			pixelX = (pixelX + subpixelBias) >> subpixelBits;
 			pixelY = (pixelY + subpixelBias) >> subpixelBits;
@@ -1276,10 +1276,10 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				// Compute the line pixels.
 				// Get the pixels on the vector that crosses to the line vector
 				pX = Math.floor((pixelX + crossVector.x * i));
-				pY = Math.floor((pixelY + crossVector.y * i));                    
+				pY = Math.floor((pixelY + crossVector.y * i));
 
 				// if pixel is over the rect. Continue
-				if ( rectx1 >= pX || rectx2 <= pX || recty1 >= pY 
+				if ( rectx1 >= pX || rectx2 <= pX || recty1 >= pY
 					|| recty2 <= pY )
 				continue;
 
@@ -1291,25 +1291,25 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				// Compare the pixel depth width z block.
 				if ( blockMaxZ[ blockId ] < minz ) continue;
 
-				blockMaxZ[ blockId ] = Math.min( blockMaxZ[ blockId ], maxz );                    
+				blockMaxZ[ blockId ] = Math.min( blockMaxZ[ blockId ], maxz );
 
 				var bflags = blockFlags[ blockId ];
 				if ( bflags & BLOCK_NEEDCLEAR ) clearBlock( blockX, blockY );
-				blockFlags[ blockId ] = bflags & ~( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );                   
-		        
+				blockFlags[ blockId ] = bflags & ~( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );
+
 				// draw pixel
 				var offset = pX + pY * canvasWidth;
 
-				if ( pZ < zbuffer[ offset ] ) {		 
-					shader( data, zbuffer, offset, pZ, color1, color2, material );								
+				if ( pZ < zbuffer[ offset ] ) {
+					shader( data, zbuffer, offset, pZ, color1, color2, material );
 				}
 			}
 
 			--length;
-		}           
+		}
 
 	}
-    
+
 	function clearBlock( blockX, blockY ) {
 
 		var zoffset = blockX * blockSize + blockY * blockSize * canvasWidth;
