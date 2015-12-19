@@ -8,6 +8,7 @@ var files = {
 		"webgl_camera_logarithmicdepthbuffer",
 		"webgl_decals",
 		"webgl_effects_anaglyph",
+		"webgl_effects_cardboard",
 		"webgl_effects_parallaxbarrier",
 		"webgl_effects_peppersghost",
 		"webgl_effects_stereo",
