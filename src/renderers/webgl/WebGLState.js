@@ -41,8 +41,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	var currentTextureSlot = undefined;
 	var currentBoundTextures = {};
 
-	var currentScissor = new THREE.Rectangle();
-	var currentViewport = new THREE.Rectangle();
+	var currentScissor = new THREE.Vector4();
+	var currentViewport = new THREE.Vector4();
 
 	this.init = function () {
 
@@ -516,7 +516,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		if ( currentScissor.equals( scissor ) === false ) {
 
-			gl.scissor( scissor.x, scissor.y, scissor.width, scissor.height );
+			gl.scissor( scissor.x, scissor.y, scissor.z, scissor.w );
 			currentScissor.copy( scissor );
 
 		}
@@ -527,7 +527,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		if ( currentViewport.equals( viewport ) === false ) {
 
-			gl.viewport( viewport.x, viewport.y, viewport.width, viewport.height );
+			gl.viewport( viewport.x, viewport.y, viewport.z, viewport.w );
 			currentViewport.copy( viewport );
 
 		}

@@ -88,7 +88,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_usedTextureUnits = 0,
 
-	_viewport = new THREE.Rectangle( 0, 0, _canvas.width, _canvas.height ),
+	_viewport = new THREE.Vector4( 0, 0, _canvas.width, _canvas.height ),
 
 	_currentWidth = 0,
 	_currentHeight = 0,
@@ -238,7 +238,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.init();
 
-		_gl.viewport( _viewport.x, _viewport.y, _viewport.width, _viewport.height );
+		_gl.viewport( _viewport.x, _viewport.y, _viewport.z, _viewport.w );
 
 		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
@@ -3410,7 +3410,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( framebuffer !== _currentFramebuffer ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-			_gl.viewport( viewport.x, viewport.y, viewport.width, viewport.height );
+			_gl.viewport( viewport.x, viewport.y, viewport.z, viewport.w );
 
 			_currentFramebuffer = framebuffer;
 

@@ -16,10 +16,10 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 	this.width = width;
 	this.height = height;
 
-	this.scissor = new THREE.Rectangle( 0, 0, width, height );
+	this.scissor = new THREE.Vector4( 0, 0, width, height );
 	this.scissorTest = false;
 
-	this.viewport = new THREE.Rectangle( 0, 0, width, height );
+	this.viewport = new THREE.Vector4( 0, 0, width, height );
 
 	options = options || {};
 

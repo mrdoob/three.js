@@ -16,7 +16,6 @@
 	"src/math/Frustum.js",
 	"src/math/Plane.js",
 	"src/math/Math.js",
-	"src/math/Rectangle.js",
 	"src/math/Spline.js",
 	"src/math/Triangle.js",
 	"src/math/Interpolant.js",
