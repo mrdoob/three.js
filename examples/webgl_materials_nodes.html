@@ -78,7 +78,7 @@
 		<!-- Utils -->
 		<script src="js/nodes/utils/SwitchNode.js"></script>
 		<script src="js/nodes/utils/JoinNode.js"></script>
-		<script src="js/nodes/utils/TimeNode.js"></script>
+		<script src="js/nodes/utils/TimerNode.js"></script>
 		<script src="js/nodes/utils/RoughnessToBlinnExponentNode.js"></script>
 		<script src="js/nodes/utils/VelocityNode.js"></script>
 
@@ -391,7 +391,7 @@
 
 					mtl = new THREE.PhongNodeMaterial();
 
-					var time = new THREE.TimeNode();
+					var time = new THREE.TimerNode();
 					var speed = new THREE.FloatNode( 5 );
 					var scale = new THREE.FloatNode( 1 );
 					var worldScale = new THREE.FloatNode( .4 );
@@ -784,7 +784,7 @@
 
 					mtl = new THREE.PhongNodeMaterial();
 
-					var time = new THREE.TimeNode();
+					var time = new THREE.TimerNode();
 					var scale = new THREE.FloatNode( 2 );
 					var speed = new THREE.FloatNode( .2 );
 					var colorA = new THREE.ColorNode( 0xFFFFFF );
@@ -870,7 +870,7 @@
 
 					mtl = new THREE.PhongNodeMaterial();
 
-					var time = new THREE.TimeNode();
+					var time = new THREE.TimerNode();
 					var uv = new THREE.UVNode();
 
 					var timeSpeedA = new THREE.OperatorNode(
@@ -1018,7 +1018,7 @@
 					"}"
 					].join( "\n" ), [ voronoi ] ); // define voronoi as dependencies
 
-					var time = new THREE.TimeNode();
+					var time = new THREE.TimerNode();
 					var timeScale = new THREE.FloatNode( 2 );
 
 					var alpha = new THREE.FloatNode( 1 );
@@ -1227,7 +1227,7 @@
 
 					mtl = new THREE.PhongNodeMaterial();
 
-					var time = new THREE.TimeNode();
+					var time = new THREE.TimerNode();
 					var speed = new THREE.FloatNode( .5 );
 
 					var color = new THREE.ColorNode( 0x98ff00 );
