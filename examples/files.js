@@ -221,9 +221,9 @@ var files = {
 		"webgl_custom_attributes_points2",
 		"webgl_custom_attributes_points3"
 	],
-	"vr": [
-		"vr_cubes",
-		"vr_video"
+	"webvr": [
+		"webvr_cubes",
+		"webvr_video"
 	],
 	"css3d": [
 		"css3d_molecules",
