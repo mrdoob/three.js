@@ -522,7 +522,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var id = material.id;
 		var shader = shaders[ id ];
 
-		if ( shader && !textures[ material.map.id ] ) delete shaders[ id ];
+		if ( shader && material.map && !textures[ material.map.id ] ) delete shaders[ id ];
 
 		if ( shaders[ id ] === undefined ) {
 
