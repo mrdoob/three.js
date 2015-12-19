@@ -6997,46 +6997,6 @@ THREE.Math = {
 
 };
 
-// File:src/math/Rectangle.js
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.Rectangle = function ( x, y, width, height ) {
-
-	this.set( x, y, width, height );
-
-};
-
-THREE.Rectangle.prototype = {
-
-	constructor: THREE.Rectangle,
-
-	set: function ( x, y, width, height ) {
-
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-
-		return this;
-
-	},
-
-	copy: function ( source ) {
-
-		this.x = source.x;
-		this.y = source.y;
-		this.width = source.width;
-		this.height = source.height;
-
-		return this;
-
-	}
-
-};
-
 // File:src/math/Spline.js
 
 /**
@@ -25066,7 +25026,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_usedTextureUnits = 0,
 
-	_viewport = new THREE.Rectangle( 0, 0, _canvas.width, _canvas.height ),
+	_scissor = new THREE.Vector4( 0, 0, _canvas.width, _canvas.height ),
+	_scissorTest = false,
+
+	_viewport = new THREE.Vector4( 0, 0, _canvas.width, _canvas.height ),
 
 	_currentWidth = 0,
 	_currentHeight = 0,
@@ -25216,7 +25179,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.init();
 
-		_gl.viewport( _viewport.x, _viewport.y, _viewport.width, _viewport.height );
+		state.scissor( _scissor );
+		state.viewport( _viewport );
 
 		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
@@ -25348,39 +25312,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		if ( _currentRenderTarget === null ) {
+		_viewport.set( x, y, width, height ).multiplyScalar( pixelRatio );
 
-			x *= pixelRatio;
-			y *= pixelRatio;
-
-			width *= pixelRatio;
-			height *= pixelRatio;
-
-			_viewport.set( x, y, width, height );
-
-		}
-
-		_gl.viewport( x, y, width, height );
+		state.viewport( _viewport );
 
 	};
 
 	this.setScissor = function ( x, y, width, height ) {
 
-		if ( _currentRenderTarget === null ) {
+		_scissor.set( x, y, width, height ).multiplyScalar( pixelRatio );
 
-			x *= pixelRatio;
-			y *= pixelRatio;
-
-			width *= pixelRatio;
-			height *= pixelRatio;
-
-		}
-
-		_gl.scissor( x, y, width, height );
+		state.scissor( _scissor );
 
 	};
 
-	this.enableScissorTest = function ( boolean ) {
+	this.setScissorTest = function ( boolean ) {
+
+		_scissorTest = boolean;
 
 		state.setScissorTest( boolean );
 
@@ -28359,7 +28307,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
-		var framebuffer, viewport;
+		var framebuffer, scissor, scissorTest, viewport;
 
 		if ( renderTarget ) {
 
@@ -28375,11 +28323,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			scissor = renderTarget.scissor;
+			scissorTest = renderTarget.scissorTest;
+
 			viewport = renderTarget.viewport;
 
 		} else {
 
 			framebuffer = null;
+
+			scissor = _scissor;
+			scissorTest = _scissorTest;
 
 			viewport = _viewport;
 
@@ -28388,11 +28342,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( framebuffer !== _currentFramebuffer ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-			_gl.viewport( viewport.x, viewport.y, viewport.width, viewport.height );
 
 			_currentFramebuffer = framebuffer;
 
 		}
+
+		state.scissor( scissor );
+		state.setScissorTest( scissorTest );
+
+		state.viewport( viewport );
 
 		if ( isCube ) {
 
@@ -28401,8 +28359,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_currentWidth = viewport.width;
-		_currentHeight = viewport.height;
+		_currentWidth = viewport.z;
+		_currentHeight = viewport.w;
 
 	};
 
@@ -28618,7 +28576,10 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 	this.width = width;
 	this.height = height;
 
-	this.viewport = new THREE.Rectangle( 0, 0, width, height );
+	this.scissor = new THREE.Vector4( 0, 0, width, height );
+	this.scissorTest = false;
+
+	this.viewport = new THREE.Vector4( 0, 0, width, height );
 
 	options = options || {};
 
@@ -28647,12 +28608,7 @@ THREE.WebGLRenderTarget.prototype = {
 		}
 
 		this.viewport.set( 0, 0, width, height );
-
-	},
-
-	setViewport: function ( x, y, width, height ) {
-
-		this.viewport.set( x, y, width, height );
+		this.scissor.set( 0, 0, width, height );
 
 	},
 
@@ -30423,10 +30379,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
-		// Save GL state
-
-		var currentScissorTest = _state.getScissorTest();
-
 		// Set GL state for depth map.
 		_gl.clearColor( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
@@ -30536,8 +30488,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 					_lookTarget.add( cubeDirections[ face ] );
 					shadowCamera.up.copy( cubeUps[ face ] );
 					shadowCamera.lookAt( _lookTarget );
+
 					var vpDimensions = cube2DViewPorts[ face ];
-					_renderer.setViewport( vpDimensions.x, vpDimensions.y, vpDimensions.z, vpDimensions.w );
+					_state.viewport( vpDimensions );
 
 				} else {
 
@@ -30621,13 +30574,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var clearColor = _renderer.getClearColor(),
 		clearAlpha = _renderer.getClearAlpha();
 		_renderer.setClearColor( clearColor, clearAlpha );
+
 		_state.enable( _gl.BLEND );
-
-		if ( currentScissorTest === true ) {
-
-			_state.setScissorTest( true );
-
-		}
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
 
@@ -30768,6 +30716,9 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var currentTextureSlot = undefined;
 	var currentBoundTextures = {};
+
+	var currentScissor = new THREE.Vector4();
+	var currentViewport = new THREE.Vector4();
 
 	this.init = function () {
 
@@ -31230,6 +31181,30 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 		} catch ( error ) {
 
 			console.error( error );
+
+		}
+
+	};
+
+	//
+
+	this.scissor = function ( scissor ) {
+
+		if ( currentScissor.equals( scissor ) === false ) {
+
+			gl.scissor( scissor.x, scissor.y, scissor.z, scissor.w );
+			currentScissor.copy( scissor );
+
+		}
+
+	};
+
+	this.viewport = function ( viewport ) {
+
+		if ( currentViewport.equals( viewport ) === false ) {
+
+			gl.viewport( viewport.x, viewport.y, viewport.z, viewport.w );
+			currentViewport.copy( viewport );
 
 		}
 
@@ -32560,6 +32535,11 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 		value: function () {
 			console.warn( 'THREE.WebGLRenderer: .supportsInstancedArrays() is now .extensions.get( \'ANGLE_instanced_arrays\' ).' );
 			return this.extensions.get( 'ANGLE_instanced_arrays' );
+		}
+	},
+	enableScissorTest: {
+		value: function () {
+			console.warn( 'THREE.WebGLRenderer: .enableScissorTest() is now .setScissorTest().' );
 		}
 	},
 	initMaterial: {
