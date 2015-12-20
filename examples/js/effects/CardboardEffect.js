@@ -13,62 +13,84 @@ THREE.CardboardEffect = function ( renderer ) {
 	var _renderTarget = new THREE.WebGLRenderTarget( 512, 512, _params );
 	_renderTarget.scissorTest = true;
 
+	// Distortion Mesh ported from:
 	// https://github.com/borismus/webvr-boilerplate/blob/master/src/distortion/barrel-distortion-fragment.js
 
-	var _material = new THREE.ShaderMaterial( {
+	var distortion = new THREE.Vector2( 0.441, 0.156 );
 
-		uniforms: {
-			'texture': { type: 't', value: _renderTarget },
-			'distortion': { type: 'v2', value: new THREE.Vector2( 0.441, 0.156 ) },
-			'leftCenter': { type: 'v2', value: new THREE.Vector2( 0.5, 0.5 ) },
-			'rightCenter': { type: 'v2', value: new THREE.Vector2( 0.5, 0.5 ) },
-			'background': { type: 'v4', value: new THREE.Vector4( 0.0, 0.0, 0.0, 1.0 ) },
-		},
+	var geometry = new THREE.PlaneBufferGeometry( 1, 1, 10, 20 );
 
-		vertexShader: [
-			'varying vec2 vUV;',
+	var indices = geometry.index.array;
+	var positions = geometry.attributes.position.array;
+	var uvs = geometry.attributes.uv.array;
 
-			'void main() {',
-				'vUV = uv;',
-				'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
-			'}'
+	var vector = new THREE.Vector2();
 
-		].join( '\n' ),
+	function poly( val ) {
 
-		fragmentShader: [
-			'uniform sampler2D texture;',
+		return 1.5 + ( distortion.x + distortion.y * val ) * val;
 
-			'uniform vec2 distortion;',
-			'uniform vec2 leftCenter;',
-			'uniform vec2 rightCenter;',
-			'uniform vec4 background;',
+	}
 
-			'varying vec2 vUV;',
+	for ( var i = 0; i < indices.length; i ++ ) {
 
-			'float poly(float val) {',
-				'return 1.0 + (distortion.x + distortion.y * val) * val;',
-			'}',
+		vector.x = positions[ i * 3 + 0 ];
+		vector.y = positions[ i * 3 + 1 ];
 
-			'vec2 barrel(vec2 v, vec2 center) {',
-				'vec2 w = v - center;',
-				'return poly(dot(w, w)) * w + center;',
-			'}',
-			'void main() {',
-				'bool isLeft = (vUV.x < 0.5);',
-				'float offset = isLeft ? 0.0 : 0.5;',
-				'vec2 a = barrel(vec2((vUV.x - offset) / 0.5, vUV.y), isLeft ? leftCenter : rightCenter);',
-				'if (a.x < 0.0 || a.x > 1.0 || a.y < 0.0 || a.y > 1.0) {',
-					'gl_FragColor = background;',
-				'} else {',
-					'gl_FragColor = texture2D(texture, vec2(a.x * 0.5 + offset, a.y));',
-				'}',
-			'}'
-		].join( '\n' )
+		var scalar = poly( vector.dot( vector ) );
 
-	} );
+		positions[ i * 3 + 0 ] = ( vector.x / scalar ) * 1.5 - 0.5;
+		positions[ i * 3 + 1 ] = ( vector.y / scalar ) * 3.0;
 
-	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), _material );
+		uvs[ i * 2 ] *= 0.5;
+
+	}
+
+	// clone geometry
+
+	function copyArray( array1, array2, offset ) {
+
+		for ( var i = 0, l = array2.length; i < l; i ++ ) {
+
+			array1[ i + offset ] = array2[ i ];
+
+		}
+
+	}
+
+	var indices2 = new Uint16Array( indices.length * 2 );
+	var positions2 = new Float32Array( positions.length * 2 );
+	var uvs2 = new Float32Array( uvs.length * 2 );
+
+	copyArray( indices2, indices, 0 );
+	copyArray( positions2, positions, 0 );
+	copyArray( uvs2, uvs, 0 );
+
+	var offset = positions.length / 3;
+
+	for ( i = 0; i < indices.length; i ++ ) {
+
+		indices[ i ] += offset;
+		positions[ i * 3 ] += 1.0;
+		uvs[ i * 2 ] += 0.5;
+
+	}
+
+	copyArray( indices2, indices, indices.length );
+	copyArray( positions2, positions, positions.length );
+	copyArray( uvs2, uvs, uvs.length );
+
+	var geometry2 = new THREE.BufferGeometry();
+	geometry2.setIndex( new THREE.BufferAttribute( indices2, 1 ) );
+	geometry2.addAttribute( 'position', new THREE.BufferAttribute( positions2, 3 ) );
+	geometry2.addAttribute( 'uv', new THREE.BufferAttribute( uvs2, 2 ) );
+
+	// var material = new THREE.MeshBasicMaterial( { wireframe: true } );
+	var material = new THREE.MeshBasicMaterial( { map: _renderTarget } );
+	var mesh = new THREE.Mesh( geometry2, material );
 	_scene.add( mesh );
+
+	//
 
 	this.setSize = function ( width, height ) {
 
