@@ -107,7 +107,7 @@
 				var template = document.getElementById( "template" ).text;
 				var content = document.getElementById( "content" );
 
-				for ( var i =  0; i < 20; i ++ ) {
+				for ( var i =  0; i < 40; i ++ ) {
 
 					var scene = new THREE.Scene();
 
@@ -129,6 +129,7 @@
 					controls.minDistance = 2;
 					controls.maxDistance = 5;
 					controls.enablePan = false;
+					controls.enableZoom = false;
 					scene.userData.controls = controls;
 
 					// add one random mesh to each scene
