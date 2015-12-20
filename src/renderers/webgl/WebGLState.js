@@ -27,6 +27,14 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var currentColorWrite = null;
 
+	var currentStencilWrite = null;
+	var currentStencilFunc = null;
+	var currentStencilRef = null;
+	var currentStencilMask = null;
+	var currentStencilFail  = null;
+	var currentStencilZFail = null;
+	var currentStencilZPass = null;
+
 	var currentFlipSided = null;
 
 	var currentLineWidth = null;
@@ -357,6 +365,63 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 			gl.colorMask( colorWrite, colorWrite, colorWrite, colorWrite );
 			currentColorWrite = colorWrite;
+
+		}
+
+	};
+
+	this.setStencilFunc = function ( stencilFunc, stencilRef, stencilMask ) {
+
+		if ( currentStencilFunc !== stencilFunc ||
+				 currentStencilRef 	!== stencilRef 	||
+				 currentStencilMask !== stencilMask ) {
+
+			gl.stencilFunc( stencilFunc,  stencilRef, stencilMask );
+
+			currentStencilFunc = stencilFunc;
+			currentStencilRef  = stencilRef;
+			currentStencilMask = stencilMask;
+
+		}
+
+	};
+
+	this.setStencilOp = function ( stencilFail, stencilZFail, stencilZPass ) {
+
+		if ( currentStencilFail	 !== stencilFail 	||
+				 currentStencilZFail !== stencilZFail ||
+				 currentStencilZPass !== stencilZPass ) {
+
+			gl.stencilOp( stencilFail,  stencilZFail, stencilZPass );
+
+			currentStencilFail  = stencilFail;
+			currentStencilZFail = stencilZFail;
+			currentStencilZPass = stencilZPass;
+
+		}
+
+	};
+
+	this.setStencilTest = function ( stencilTest ) {
+
+		if ( stencilTest ) {
+
+			this.enable( gl.STENCIL_TEST );
+
+		} else {
+
+			this.disable( gl.STENCIL_TEST );
+
+		}
+
+	};
+
+	this.setStencilWrite = function ( stencilWrite ) {
+
+		if ( currentStencilWrite !== stencilWrite ) {
+
+			gl.stencilMask( stencilWrite );
+			currentStencilWrite = stencilWrite;
 
 		}
 
