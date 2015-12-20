@@ -108,3 +108,12 @@ THREE.FaceNormalsHelper.prototype.update = ( function () {
 	}
 
 }() );
+
+THREE.FaceNormalsHelper.prototype.clone = function() {
+	
+	var hex = this.material.color;
+	var linewidth = this.material.linewidth;
+	
+	return new this.constructor( this.object, this.size, hex, linewidth );
+	
+}

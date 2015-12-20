@@ -14,7 +14,7 @@ THREE.DirectionalLightHelper = function ( light, size ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	size = size || 1;
+	this.size = size = size || 1;
 
 	var geometry = new THREE.Geometry();
 	geometry.vertices.push(
@@ -81,3 +81,9 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 	};
 
 }();
+
+THREE.DirectionalLightHelper.prototype.clone = function () {
+
+	return new this.constructor( this.light, this.size );
+
+};

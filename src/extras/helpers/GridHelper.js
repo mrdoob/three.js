@@ -38,3 +38,9 @@ THREE.GridHelper.prototype.setColors = function( colorCenterLine, colorGrid ) {
 	this.geometry.colorsNeedUpdate = true;
 
 };
+
+THREE.GridHelper.prototype.clone = function() {
+
+	return new THREE.LineSegments( this.geometry, this.material ).copy( this );
+
+};

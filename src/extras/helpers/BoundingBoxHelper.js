@@ -28,3 +28,9 @@ THREE.BoundingBoxHelper.prototype.update = function () {
 	this.box.center( this.position );
 
 };
+
+THREE.BoundingBoxHelper.prototype.clone = function() {
+	
+	return new this.constructor( this, this.material.color );
+	
+}

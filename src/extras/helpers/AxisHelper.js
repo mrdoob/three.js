@@ -5,7 +5,7 @@
 
 THREE.AxisHelper = function ( size ) {
 
-	size = size || 1;
+	this.size = size = size || 1;
 
 	var vertices = new Float32Array( [
 		0, 0, 0,  size, 0, 0,
@@ -31,3 +31,10 @@ THREE.AxisHelper = function ( size ) {
 
 THREE.AxisHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREE.AxisHelper.prototype.constructor = THREE.AxisHelper;
+
+
+THREE.AxisHelper.prototype.clone = function () {
+
+	return new this.constructor( this.size );
+
+};

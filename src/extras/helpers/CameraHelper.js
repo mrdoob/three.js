@@ -187,3 +187,9 @@ THREE.CameraHelper.prototype.update = function () {
 	};
 
 }();
+
+THREE.CameraHelper.prototype.clone = function() {
+	
+	return new this.constructor( this.camera );
+	
+}

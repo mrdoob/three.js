@@ -68,7 +68,15 @@ THREE.BoxHelper.prototype.update = ( function () {
 		position.needsUpdate = true;
 
 		this.geometry.computeBoundingSphere();
+		
+		return this;
 
 	};
 
 } )();
+
+THREE.BoxHelper.prototype.clone = function() {
+	
+	return new this.constructor( this );
+	
+}
