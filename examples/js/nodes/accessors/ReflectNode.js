@@ -30,7 +30,7 @@ THREE.ReflectNode.prototype.generate = function( builder, output ) {
 	}
 	else {
 
-		console.warn( "THREE.ReflectNode is not compatible with " + builder.shader + " shader" );
+		console.warn( "THREE.ReflectNode is not compatible with " + builder.shader + " shader." );
 
 		return builder.format( 'vec3( 0.0 )', this.type, output );
 
