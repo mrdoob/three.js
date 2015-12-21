@@ -79,6 +79,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// internal state cache
 
+	_currentViewport = null,
 	_currentProgram = null,
 	_currentRenderTarget = null,
 	_currentFramebuffer = null,
@@ -92,9 +93,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_scissorTest = false,
 
 	_viewport = new THREE.Vector4( 0, 0, _canvas.width, _canvas.height ),
-
-	_currentWidth = 0,
-	_currentHeight = 0,
 
 	// frustum
 
@@ -1175,7 +1173,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// custom render plugins (post pass)
 
 		spritePlugin.render( scene, camera );
-		lensFlarePlugin.render( scene, camera, _currentWidth, _currentHeight );
+		lensFlarePlugin.render( scene, camera, _currentViewport );
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 
@@ -3442,8 +3440,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_currentWidth = viewport.z;
-		_currentHeight = viewport.w;
+		_currentViewport = viewport;
 
 	};
 

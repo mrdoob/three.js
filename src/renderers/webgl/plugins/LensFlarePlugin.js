@@ -272,17 +272,17 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 	 *         reads these back and calculates occlusion.
 	 */
 
-	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
+	this.render = function ( scene, camera, viewport ) {
 
 		if ( flares.length === 0 ) return;
 
 		var tempPosition = new THREE.Vector3();
 
-		var invAspect = viewportHeight / viewportWidth,
-			halfViewportWidth = viewportWidth * 0.5,
-			halfViewportHeight = viewportHeight * 0.5;
+		var invAspect = viewport.w / viewport.z,
+			halfViewportWidth = viewport.z * 0.5,
+			halfViewportHeight = viewport.w * 0.5;
 
-		var size = 16 / viewportHeight,
+		var size = 16 / viewport.w,
 			scale = new THREE.Vector2( size * invAspect, size );
 
 		var screenPosition = new THREE.Vector3( 1, 1, 0 ),
@@ -318,7 +318,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		for ( var i = 0, l = flares.length; i < l; i ++ ) {
 
-			size = 16 / viewportHeight;
+			size = 16 / viewport.w;
 			scale.set( size * invAspect, size );
 
 			// calc object screen position
@@ -341,9 +341,9 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 			if ( hasVertexTexture || (
 				screenPositionPixels.x > 0 &&
-				screenPositionPixels.x < viewportWidth &&
+				screenPositionPixels.x < viewport.z &&
 				screenPositionPixels.y > 0 &&
-				screenPositionPixels.y < viewportHeight ) ) {
+				screenPositionPixels.y < viewport.w ) ) {
 
 				// save current RGB to temp texture
 
@@ -412,7 +412,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 						screenPosition.y = sprite.y;
 						screenPosition.z = sprite.z;
 
-						size = sprite.size * sprite.scale / viewportHeight;
+						size = sprite.size * sprite.scale / viewport.w;
 
 						scale.x = size * invAspect;
 						scale.y = size;
