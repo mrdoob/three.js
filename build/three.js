@@ -17708,6 +17708,7 @@ THREE.Loader.prototype = {
 						break;
 					case 'depthTest':
 					case 'depthWrite':
+					case 'colorWrite':
 					case 'opacity':
 					case 'reflectivity':
 					case 'transparent':
@@ -18796,6 +18797,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
+		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 
@@ -20121,6 +20123,8 @@ THREE.Material.prototype = {
 		this.depthFunc = source.depthFunc;
 		this.depthTest = source.depthTest;
 		this.depthWrite = source.depthWrite;
+
+		this.colorWrite = source.colorWrite;
 
 		this.precision = source.precision;
 
@@ -25008,6 +25012,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// internal state cache
 
+	_currentViewport = null,
 	_currentProgram = null,
 	_currentRenderTarget = null,
 	_currentFramebuffer = null,
@@ -25021,9 +25026,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_scissorTest = false,
 
 	_viewport = new THREE.Vector4( 0, 0, _canvas.width, _canvas.height ),
-
-	_currentWidth = 0,
-	_currentHeight = 0,
 
 	// frustum
 
@@ -26104,7 +26106,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// custom render plugins (post pass)
 
 		spritePlugin.render( scene, camera );
-		lensFlarePlugin.render( scene, camera, _currentWidth, _currentHeight );
+		lensFlarePlugin.render( scene, camera, _currentViewport );
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 
@@ -28371,8 +28373,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_currentWidth = viewport.z;
-		_currentHeight = viewport.w;
+		_currentViewport = viewport;
 
 	};
 
@@ -31038,6 +31039,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.setDepthWrite = function ( depthWrite ) {
 
+		// TODO: Rename to setDepthMask
+
 		if ( currentDepthWrite !== depthWrite ) {
 
 			gl.depthMask( depthWrite );
@@ -31048,6 +31051,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	};
 
 	this.setColorWrite = function ( colorWrite ) {
+
+		// TODO: Rename to setColorMask
 
 		if ( currentColorWrite !== colorWrite ) {
 
@@ -31105,6 +31110,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	};
 
 	this.setStencilWrite = function ( stencilWrite ) {
+
+		// TODO: Rename to setStencilMask
 
 		if ( currentStencilWrite !== stencilWrite ) {
 
@@ -31593,17 +31600,17 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 	 *         reads these back and calculates occlusion.
 	 */
 
-	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
+	this.render = function ( scene, camera, viewport ) {
 
 		if ( flares.length === 0 ) return;
 
 		var tempPosition = new THREE.Vector3();
 
-		var invAspect = viewportHeight / viewportWidth,
-			halfViewportWidth = viewportWidth * 0.5,
-			halfViewportHeight = viewportHeight * 0.5;
+		var invAspect = viewport.w / viewport.z,
+			halfViewportWidth = viewport.z * 0.5,
+			halfViewportHeight = viewport.w * 0.5;
 
-		var size = 16 / viewportHeight,
+		var size = 16 / viewport.w,
 			scale = new THREE.Vector2( size * invAspect, size );
 
 		var screenPosition = new THREE.Vector3( 1, 1, 0 ),
@@ -31635,11 +31642,11 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
 
 		state.disable( gl.CULL_FACE );
-		gl.depthMask( false );
+		state.setDepthWrite( false );
 
 		for ( var i = 0, l = flares.length; i < l; i ++ ) {
 
-			size = 16 / viewportHeight;
+			size = 16 / viewport.w;
 			scale.set( size * invAspect, size );
 
 			// calc object screen position
@@ -31662,9 +31669,9 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 			if ( hasVertexTexture || (
 				screenPositionPixels.x > 0 &&
-				screenPositionPixels.x < viewportWidth &&
+				screenPositionPixels.x < viewport.z &&
 				screenPositionPixels.y > 0 &&
-				screenPositionPixels.y < viewportHeight ) ) {
+				screenPositionPixels.y < viewport.w ) ) {
 
 				// save current RGB to temp texture
 
@@ -31672,7 +31679,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				state.bindTexture( gl.TEXTURE_2D, null );
 				state.activeTexture( gl.TEXTURE1 );
 				state.bindTexture( gl.TEXTURE_2D, tempTexture );
-				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
+				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, viewport.x + screenPositionPixels.x - 8, viewport.y + screenPositionPixels.y - 8, 16, 16, 0 );
 
 
 				// render pink quad
@@ -31691,7 +31698,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 				state.activeTexture( gl.TEXTURE0 );
 				state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
-				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
+				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, viewport.x + screenPositionPixels.x - 8, viewport.y + screenPositionPixels.y - 8, 16, 16, 0 );
 
 
 				// restore graphics
@@ -31733,7 +31740,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 						screenPosition.y = sprite.y;
 						screenPosition.z = sprite.z;
 
-						size = sprite.size * sprite.scale / viewportHeight;
+						size = sprite.size * sprite.scale / viewport.w;
 
 						scale.x = size * invAspect;
 						scale.y = size;
@@ -31762,7 +31769,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		state.enable( gl.CULL_FACE );
 		state.enable( gl.DEPTH_TEST );
-		gl.depthMask( true );
+		state.setDepthWrite( true );
 
 		renderer.resetGLState();
 
