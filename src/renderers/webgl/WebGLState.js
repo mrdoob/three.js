@@ -350,6 +350,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.setDepthWrite = function ( depthWrite ) {
 
+		// TODO: Rename to setDepthMask
+
 		if ( currentDepthWrite !== depthWrite ) {
 
 			gl.depthMask( depthWrite );
@@ -360,6 +362,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	};
 
 	this.setColorWrite = function ( colorWrite ) {
+
+		// TODO: Rename to setColorMask
 
 		if ( currentColorWrite !== colorWrite ) {
 
@@ -417,6 +421,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	};
 
 	this.setStencilWrite = function ( stencilWrite ) {
+
+		// TODO: Rename to setStencilMask
 
 		if ( currentStencilWrite !== stencilWrite ) {
 
