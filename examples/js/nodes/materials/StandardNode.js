@@ -96,9 +96,11 @@ THREE.StandardNode.prototype.build = function( builder ) {
 	}
 	else {
 
-		// CubeMap blur effect (PBR)
+		// autoblur textures for PBR Material effect
 
-		builder.require.cubeTextureBias = builder.require.cubeTextureBias || new THREE.RoughnessToBlinnExponentNode();
+		var requires = {
+			bias : new THREE.RoughnessToBlinnExponentNode()
+		};
 
 		// verify all nodes to reuse generate codes
 
@@ -116,7 +118,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		if ( this.normal ) this.normal.verify( builder );
 		if ( this.normalScale && this.normal ) this.normalScale.verify( builder );
 
-		if ( this.environment ) this.environment.verify( builder.setCache( 'env' ) ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
+		if ( this.environment ) this.environment.verify( builder, 'env', requires ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 		if ( this.reflectivity && this.environment ) this.reflectivity.verify( builder );
 
 		// build code
@@ -135,7 +137,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
 		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'fv1' ) : undefined;
 
-		var environment = this.environment ? this.environment.buildCode( builder.setCache( 'env' ), 'c' ) : undefined;
+		var environment = this.environment ? this.environment.buildCode( builder, 'c', 'env', requires ) : undefined;
 		var reflectivity = this.reflectivity && this.environment ? this.reflectivity.buildCode( builder, 'fv1' ) : undefined;
 
 		material.requestAttrib.transparent = alpha != undefined;

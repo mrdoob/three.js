@@ -6,18 +6,59 @@ THREE.BuilderNode = function( material ) {
 
 	this.material = material;
 
-	this.require = {};
+	this.caches = [];
 	this.isVerify = false;
-	this.cache = '';
+
+	this.addCache();
 
 };
 
 THREE.BuilderNode.prototype = {
 	constructor: THREE.BuilderNode,
 
+	addCache : function( name, requires ) {
+
+		this.caches.push( {
+			name : name || '',
+			requires : requires || {}
+		} );
+
+		return this.updateCache();
+
+	},
+
+	removeCache : function() {
+
+		this.caches.pop();
+
+		return this.updateCache();
+
+	},
+
+	updateCache : function() {
+
+		var cache = this.caches[ this.caches.length - 1 ];
+
+		this.cache = cache.name;
+		this.requires = cache.requires;
+
+		return this;
+
+	},
+
+	require : function( name, node ) {
+
+		this.requires[ name ] = node;
+
+		return this;
+
+	},
+
 	include : function( func ) {
 
 		this.material.include( this.shader, func );
+
+		return this;
 
 	},
 
@@ -86,14 +127,6 @@ THREE.BuilderNode.prototype = {
 		if ( useCache && this.cache ) uuid = this.cache + '-' + uuid;
 
 		return uuid;
-
-	},
-
-	setCache : function( name ) {
-
-		this.cache = name || '';
-
-		return this;
 
 	},
 
