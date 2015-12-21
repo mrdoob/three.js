@@ -61,7 +61,7 @@ THREE.SpotLightHelper.prototype.update = function () {
 
 }();
 
-THREE.PointLightHelper.prototype.clone = function () {
+THREE.SpotLightHelper.prototype.clone = function () {
 
 	return new this.constructor( this.light );
 
