@@ -436,7 +436,7 @@ THREE.NodeMaterial.prototype.include = function( shader, node ) {
 
 	var includes;
 
-	node = typeof node === 'string' ? THREE.LibNode.get( node ) : node;
+	node = typeof node === 'string' ? THREE.NodeLib.get( node ) : node;
 
 	if ( node instanceof THREE.FunctionNode ) {
 
