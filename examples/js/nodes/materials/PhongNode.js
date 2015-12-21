@@ -132,7 +132,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
 		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'fv1' ) : undefined;
 
-		var environment = this.environment ? this.environment.buildCode( builder.setCache( 'env' ), 'c' ) : undefined;
+		var environment = this.environment ? this.environment.buildCode( builder, 'c' ) : undefined;
 		var reflectivity = this.reflectivity && this.environment ? this.reflectivity.buildCode( builder, 'fv1' ) : undefined;
 
 		material.requestAttrib.transparent = alpha != undefined;

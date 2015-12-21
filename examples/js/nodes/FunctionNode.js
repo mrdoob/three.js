@@ -138,9 +138,9 @@ THREE.FunctionNode.prototype.parse = function( src, includes, extensions ) {
 
 			}
 
-			if ( this.getInclude( reference ) === undefined && THREE.LibNode.contains( reference ) ) {
+			if ( this.getInclude( reference ) === undefined && THREE.NodeLib.contains( reference ) ) {
 
-				this.includes.push( THREE.LibNode.get( reference ) );
+				this.includes.push( THREE.NodeLib.get( reference ) );
 
 			}
 

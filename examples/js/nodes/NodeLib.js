@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.LibNode = {
+THREE.NodeLib = {
 	nodes: {},
 	add: function( node ) {
 
@@ -30,13 +30,13 @@ THREE.LibNode = {
 //	Luma
 //
 
-THREE.LibNode.add( new THREE.ConstNode( "vec3 LUMA = vec3(0.2125, 0.7154, 0.0721);" ) );
+THREE.NodeLib.add( new THREE.ConstNode( "vec3 LUMA = vec3(0.2125, 0.7154, 0.0721);" ) );
 
 //
 //	DepthColor
 //
 
-THREE.LibNode.add( new THREE.FunctionNode( [
+THREE.NodeLib.add( new THREE.FunctionNode( [
 "float depthcolor( float mNear, float mFar ) {",
 
 	"#ifdef USE_LOGDEPTHBUF_EXT",
@@ -53,7 +53,7 @@ THREE.LibNode.add( new THREE.FunctionNode( [
 //	NormalMap
 //
 
-THREE.LibNode.add( new THREE.FunctionNode( [
+THREE.NodeLib.add( new THREE.FunctionNode( [
 // Per-Pixel Tangent Space Normal Mapping
 // http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
 "vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 mUv, float scale ) {",
@@ -75,7 +75,7 @@ THREE.LibNode.add( new THREE.FunctionNode( [
 //	Saturation
 //
 
-THREE.LibNode.add( new THREE.FunctionNode( [
+THREE.NodeLib.add( new THREE.FunctionNode( [
 // Algorithm from Chapter 16 of OpenGL Shading Language
 "vec3 saturation_rgb(vec3 rgb, float adjustment) {",
 	"vec3 intensity = vec3(dot(rgb, LUMA));",
@@ -87,7 +87,7 @@ THREE.LibNode.add( new THREE.FunctionNode( [
 //	Luminance
 //
 
-THREE.LibNode.add( new THREE.FunctionNode( [
+THREE.NodeLib.add( new THREE.FunctionNode( [
 // Algorithm from Chapter 10 of Graphics Shaders.
 "float luminance_rgb(vec3 rgb) {",
 	"return dot(rgb, LUMA);",

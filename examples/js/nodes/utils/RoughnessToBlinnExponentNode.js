@@ -24,7 +24,7 @@ THREE.RoughnessToBlinnExponentNode.prototype.generate = function( builder, outpu
 		}
 		else {
 
-			console.warn( "THREE.RoughnessToBlinnExponentNode is compatible with StandardMaterial only" );
+			console.warn( "THREE.RoughnessToBlinnExponentNode is compatible with StandardMaterial only." );
 
 			material.addFragmentNode( 'float specularMIPLevel = 0.0;' );
 
@@ -35,7 +35,7 @@ THREE.RoughnessToBlinnExponentNode.prototype.generate = function( builder, outpu
 	}
 	else {
 
-		console.warn( "THREE.RoughnessToBlinnExponentNode is not compatible with " + builder.shader + " shader" );
+		console.warn( "THREE.RoughnessToBlinnExponentNode is not compatible with " + builder.shader + " shader." );
 
 		return builder.format( '0.0', this.type, output );
 

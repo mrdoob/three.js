@@ -13,40 +13,41 @@ THREE.GLNode = function( type ) {
 
 };
 
-THREE.GLNode.prototype.verify = function( builder ) {
+THREE.GLNode.prototype.verify = function( builder, cache, requires ) {
 
 	builder.isVerify = true;
 
 	var material = builder.material;
 
-	this.build( builder, 'v4' );
+	this.build( builder.addCache( cache, requires ), 'v4' );
 
 	material.clearVertexNode();
 	material.clearFragmentNode();
 
-	builder.setCache(); // reset cache
+	builder.removeCache();
 
 	builder.isVerify = false;
 
 };
 
-THREE.GLNode.prototype.verifyAndBuildCode = function( builder, output, cache ) {
+THREE.GLNode.prototype.verifyAndBuildCode = function( builder, output, cache, requires ) {
 
-	this.verify( builder.setCache( cache ) );
+	this.verify( builder, cache, requires );
 
-	return this.buildCode( builder.setCache( cache ), output );
+	return this.buildCode( builder, output, cache, requires );
 
 };
 
-THREE.GLNode.prototype.buildCode = function( builder, output, uuid ) {
+THREE.GLNode.prototype.buildCode = function( builder, output, cache, requires ) {
 
 	var material = builder.material;
-	var data = { result : this.build( builder, output, uuid ) };
+
+	var data = { result : this.build( builder.addCache( cache, requires ), output ) };
 
 	if ( builder.isShader( 'vertex' ) ) data.code = material.clearVertexNode();
 	else data.code = material.clearFragmentNode();
 
-	builder.setCache(); // reset cache
+	builder.removeCache();
 
 	return data;
 
