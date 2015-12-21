@@ -61,7 +61,7 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 
 }();
 
-THREE.DirectionalLightHelper.prototype.clone = function () {
+THREE.HemisphereLightHelper.prototype.clone = function () {
 
 	return new this.constructor( this.light, this.sphereSize );
 
