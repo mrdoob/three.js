@@ -131,7 +131,7 @@ THREE.CatmullRomCurve3 = ( function() {
 			} else {
 
 				// extrapolate last point
-				tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 2 ] );
+				tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 1 ] );
 				p3 = tmp;
 
 			}
