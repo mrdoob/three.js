@@ -273,7 +273,7 @@
 					//mtl.shadow = // shadowmap
 					//mtl.ao = // ambient occlusion
 					//mtl.environment = // reflection map (CubeMap recommended)
-					//mtl.reflectivity = // environment intensity
+					//mtl.environmentAlpha = // environment alpha
 					//mtl.transform = // vertex transformation
 
 					var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
@@ -282,7 +282,7 @@
 					mtl.specular = new THREE.FloatNode( .5 );
 					mtl.shininess = new THREE.FloatNode( 15 );
 					mtl.environment = new THREE.CubeTextureNode( cubemap );
-					mtl.reflectivity = mask;
+					mtl.environmentAlpha = mask;
 					mtl.normal = new THREE.TextureNode( grassNormal );
 					mtl.normalScale = new THREE.Math1Node( mask, THREE.Math1Node.INVERT );
 
@@ -305,7 +305,7 @@
 					//mtl.shadow = // shadowmap
 					//mtl.ao = // ambient occlusion
 					//mtl.environment = // reflection map (CubeMap recommended)
-					//mtl.reflectivity = // environment intensity
+					//mtl.environmentAlpha = // environment alpha
 					//mtl.transform = // vertex transformation
 
 					var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
@@ -619,7 +619,7 @@
 
 					mtl.color = new THREE.ColorNode( 0x3399FF );
 					mtl.environment = color;
-					mtl.reflectivity = new THREE.Math1Node( fresnel, THREE.Math1Node.SAT );
+					mtl.environmentAlpha = new THREE.Math1Node( fresnel, THREE.Math1Node.SAT );
 
 					// GUI
 
