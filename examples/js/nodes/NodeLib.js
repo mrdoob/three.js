@@ -56,7 +56,7 @@ THREE.NodeLib.add( new THREE.FunctionNode( [
 THREE.NodeLib.add( new THREE.FunctionNode( [
 // Per-Pixel Tangent Space Normal Mapping
 // http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
-"vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 mUv, float scale ) {",
+"vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 mUv, vec2 scale ) {",
 	"vec3 q0 = dFdx( eye_pos );",
 	"vec3 q1 = dFdy( eye_pos );",
 	"vec2 st0 = dFdx( mUv.st );",
