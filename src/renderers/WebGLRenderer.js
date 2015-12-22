@@ -2025,6 +2025,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.emissiveMap ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
+			uniforms.emissiveMapIntensity.value = material.emissiveMapIntensity;
 
 		}
 
@@ -2045,6 +2046,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.emissiveMap ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
+			uniforms.emissiveMapIntensity.value = material.emissiveMapIntensity;
 
 		}
 
@@ -2099,6 +2101,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.emissiveMap ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
+			uniforms.emissiveMapIntensity.value = material.emissiveMapIntensity;
 
 		}
 

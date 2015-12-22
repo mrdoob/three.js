@@ -16,6 +16,7 @@
  *  aoMapIntensity: <float>
  *
  *  emissiveMap: new THREE.Texture( <Image> ),
+ *  emissiveMapIntensity: <float>
  *
  *  specularMap: new THREE.Texture( <Image> ),
  *
@@ -61,6 +62,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.aoMapIntensity = 1.0;
 
 	this.emissiveMap = null;
+	this.emissiveMapIntensity = 1.0;
 
 	this.specularMap = null;
 
@@ -107,6 +109,7 @@ THREE.MeshLambertMaterial.prototype.copy = function ( source ) {
 	this.aoMapIntensity = source.aoMapIntensity;
 
 	this.emissiveMap = source.emissiveMap;
+	this.emissiveMapIntensity = source.emissiveMapIntensity;
 
 	this.specularMap = source.specularMap;
 

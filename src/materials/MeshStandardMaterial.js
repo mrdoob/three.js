@@ -18,6 +18,7 @@
  *  aoMapIntensity: <float>
  *
  *  emissiveMap: new THREE.Texture( <Image> ),
+ *  emissiveMapIntensity: <float>
  *
  *  bumpMap: new THREE.Texture( <Image> ),
  *  bumpScale: <float>,
@@ -79,6 +80,7 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.aoMapIntensity = 1.0;
 
 	this.emissiveMap = null;
+	this.emissiveMapIntensity = 1.0;
 
 	this.bumpMap = null;
 	this.bumpScale = 1;
@@ -142,6 +144,7 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.aoMapIntensity = source.aoMapIntensity;
 
 	this.emissiveMap = source.emissiveMap;
+	this.emissiveMapIntensity = source.emissiveMapIntensity;
 
 	this.bumpMap = source.bumpMap;
 	this.bumpScale = source.bumpScale;
