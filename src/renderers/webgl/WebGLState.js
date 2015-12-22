@@ -627,6 +627,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 		currentBlending = null;
 
 		currentDepthWrite = null;
+		currentStencilWrite = null;
 		currentColorWrite = null;
 
 		currentFlipSided = null;
