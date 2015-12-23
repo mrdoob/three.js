@@ -114,7 +114,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 		if ( this.normalScale && this.normal ) this.normalScale.verify( builder );
 
 		if ( this.environment ) this.environment.verify( builder );
-		if ( this.environmentAlpha && this.environment ) this.environmentAlpha.verify( builder );
+		if ( this.environmentIntensity && this.environment ) this.environmentIntensity.verify( builder );
 
 		// build code
 
@@ -133,7 +133,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
 
 		var environment = this.environment ? this.environment.buildCode( builder, 'c' ) : undefined;
-		var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.buildCode( builder, 'fv1' ) : undefined;
+		var environmentIntensity = this.environmentIntensity && this.environment ? this.environmentIntensity.buildCode( builder, 'fv1' ) : undefined;
 
 		material.requestAttrib.transparent = alpha != undefined;
 
@@ -236,11 +236,11 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 			output.push( environment.code );
 
-			if ( environmentAlpha ) {
+			if ( environmentIntensity ) {
 
-				output.push( environmentAlpha.code );
+				output.push( environmentIntensity.code );
 
-				output.push( "outgoingLight = mix(" + 'outgoingLight' + "," + environment.result + "," + environmentAlpha.result + ");" );
+				output.push( "outgoingLight = mix(" + 'outgoingLight' + "," + environment.result + "," + environmentIntensity.result + ");" );
 
 			}
 			else {
