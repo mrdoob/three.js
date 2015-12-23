@@ -4,7 +4,7 @@
 
 THREE.JoinNode = function( x, y, z, w ) {
 
-	THREE.GLNode.call( this, 'fv1' );
+	THREE.TempNode.call( this, 'fv1' );
 
 	this.x = x;
 	this.y = y;
@@ -13,7 +13,7 @@ THREE.JoinNode = function( x, y, z, w ) {
 
 };
 
-THREE.JoinNode.prototype = Object.create( THREE.GLNode.prototype );
+THREE.JoinNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.JoinNode.prototype.constructor = THREE.JoinNode;
 
 THREE.JoinNode.inputs = [ 'x', 'y', 'z', 'w' ];
