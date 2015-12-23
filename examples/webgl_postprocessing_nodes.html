@@ -334,18 +334,29 @@
 
 						var normal = new THREE.TextureNode( decalNormal );
 						var normalXY = new THREE.SwitchNode( normal, 'xy' );
+						var scale = new THREE.FloatNode( .5 );
+						var flip = new THREE.Vector2Node( -1, 1 );
+
+						var normalXYFlip = new THREE.Math1Node(
+							normalXY,
+							THREE.Math1Node.INVERT
+						);
 
 						var offsetNormal = new THREE.OperatorNode(
-							normalXY,
+							normalXYFlip,
 							new THREE.FloatNode( .5 ),
 							THREE.OperatorNode.ADD
 						);
 
-						var scale = new THREE.FloatNode( .5 );
+						var scaleTexture = new THREE.OperatorNode(
+							new THREE.SwitchNode( normal, 'z' ),
+							offsetNormal,
+							THREE.OperatorNode.MUL
+						);
 
 						var scaleNormal = new THREE.Math3Node(
 							new THREE.FloatNode( 1 ),
-							offsetNormal,
+							scaleTexture,
 							scale,
 							THREE.Math3Node.MIX
 						);
@@ -367,6 +378,14 @@
 							scale.number = val;
 
 						}, false, 0, 1 );
+
+						addGui( 'invert', false, function( val ) {
+
+							offsetNormal.a = val ? normalXYFlip : normalXY;
+
+							nodepass.build();
+
+						} );
 
 					break;
 
@@ -435,7 +454,7 @@
 
 							nodepass.build();
 
-						}, false, 0, 1 );
+						} );
 
 					break;
 

@@ -120,7 +120,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		if ( this.normalScale && this.normal ) this.normalScale.verify( builder );
 
 		if ( this.environment ) this.environment.verify( builder, 'env', requires ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
-		if ( this.reflectivity && this.environment ) this.reflectivity.verify( builder );
+		if ( this.environmentIntensity && this.environment ) this.environmentIntensity.verify( builder );
 
 		// build code
 
@@ -136,10 +136,10 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c' ) : undefined;
 
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
-		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'fv1' ) : undefined;
+		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
 
 		var environment = this.environment ? this.environment.buildCode( builder, 'c', 'env', requires ) : undefined;
-		var reflectivity = this.reflectivity && this.environment ? this.reflectivity.buildCode( builder, 'fv1' ) : undefined;
+		var environmentIntensity = this.environmentIntensity && this.environment ? this.environmentIntensity.buildCode( builder, 'fv1' ) : undefined;
 
 		material.requestAttrib.transparent = alpha != undefined;
 
@@ -204,7 +204,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 				'normal = perturbNormal2Arb(-vViewPosition,normal,' +
 				normal.result + ',' +
 				new THREE.UVNode().build( builder, 'v2' ) + ',' +
-				( normalScale ? normalScale.result : '1.0' ) + ');'
+				( normalScale ? normalScale.result : 'vec2( 1.0 )' ) + ');'
 			);
 
 		}
@@ -254,12 +254,12 @@ THREE.StandardNode.prototype.build = function( builder ) {
 			output.push( environment.code );
 			output.push( "RE_IndirectSpecular(" + environment.result + ", geometry, material, reflectedLight );" );
 
-		}
+			if ( environmentIntensity ) {
 
-		if ( reflectivity ) {
+				output.push( environmentIntensity.code );
+				output.push( "reflectedLight.indirectSpecular *= " + environmentIntensity.result + ";" );
 
-			output.push( reflectivity.code );
-			output.push( "reflectedLight.indirectSpecular *= " + reflectivity.result + ";" );
+			}
 
 		}
 
