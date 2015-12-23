@@ -68,7 +68,7 @@ THREE.BuilderNode.prototype = {
 
 	},
 
-	getFormat : function( format ) {
+	getFormatName : function( format ) {
 
 		return format.replace( 'c', 'v3' ).replace( /fv1|iv1/, 'v1' );
 
@@ -76,7 +76,7 @@ THREE.BuilderNode.prototype = {
 
 	getFormatLength : function( format ) {
 
-		return parseInt( this.getFormat( format ).substr( 1 ) );
+		return parseInt( this.getFormatName( format ).substr( 1 ) );
 
 	},
 
@@ -90,7 +90,7 @@ THREE.BuilderNode.prototype = {
 
 	format : function( code, from, to ) {
 
-		var format = this.getFormat( from + '=' + to );
+		var format = this.getFormatName( from + '=' + to );
 
 		switch ( format ) {
 			case 'v1=v2': return 'vec2(' + code + ')';
