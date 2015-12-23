@@ -27,7 +27,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var transform = this.transform ? this.transform.verifyAndBuildCode( builder, 'v3' ) : undefined;
+		var transform = this.transform ? this.transform.verifyAndBuildCode( builder, 'v3', 'transform' ) : undefined;
 
 		material.mergeUniform( THREE.UniformsUtils.merge( [
 
