@@ -2,13 +2,12 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.SwitchNode = function( a, component ) {
+THREE.SwitchNode = function( node, component ) {
 
 	THREE.GLNode.call( this, 'fv1' );
 
+	this.node = node;
 	this.component = component || 'x';
-
-	this.a = a;
 
 };
 
@@ -23,10 +22,10 @@ THREE.SwitchNode.prototype.getType = function( builder ) {
 
 THREE.SwitchNode.prototype.generate = function( builder, output ) {
 
-	var type = this.a.getType( builder );
+	var type = this.node.getType( builder );
 	var inputLength = builder.getFormatLength( type ) - 1;
 
-	var a = this.a.build( builder, type );
+	var node = this.node.build( builder, type );
 
 	var outputLength = 0;
 
@@ -44,7 +43,7 @@ THREE.SwitchNode.prototype.generate = function( builder, output ) {
 
 	// build switch
 
-	a += '.';
+	node += '.';
 
 	for ( i = 0; i < len; i ++ ) {
 
@@ -59,10 +58,10 @@ THREE.SwitchNode.prototype.generate = function( builder, output ) {
 
 		}
 
-		a += builder.getElementByIndex( idx );
+		node += builder.getElementByIndex( idx );
 
 	}
 
-	return builder.format( a, this.getType( builder ), output );
+	return builder.format( node, this.getType( builder ), output );
 
 };
