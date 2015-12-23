@@ -136,7 +136,7 @@ THREE.BuilderNode.prototype = {
 
 	},
 
-	getElementIndex : function( elm ) {
+	getIndexByElement : function( elm ) {
 
 		return THREE.BuilderNode.elements.indexOf( elm );
 

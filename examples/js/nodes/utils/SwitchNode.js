@@ -36,7 +36,7 @@ THREE.SwitchNode.prototype.generate = function( builder, output ) {
 
 	for ( i = 0; i < len; i ++ ) {
 
-		outputLength = Math.max( outputLength, builder.getElementIndex( this.component.charAt( i ) ) );
+		outputLength = Math.max( outputLength, builder.getIndexByElement( this.component.charAt( i ) ) );
 
 	}
 
@@ -49,7 +49,7 @@ THREE.SwitchNode.prototype.generate = function( builder, output ) {
 	for ( i = 0; i < len; i ++ ) {
 
 		var elm = this.component.charAt( i );
-		var idx = builder.getElementIndex( this.component.charAt( i ) );
+		var idx = builder.getIndexByElement( this.component.charAt( i ) );
 
 		if ( idx > outputLength ) idx = outputLength;
 
