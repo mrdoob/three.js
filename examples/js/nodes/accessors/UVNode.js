@@ -10,11 +10,11 @@ THREE.UVNode = function( index ) {
 
 };
 
-THREE.UVNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.UVNode.prototype.constructor = THREE.UVNode;
-
 THREE.UVNode.vertexDict = [ 'uv', 'uv2' ];
 THREE.UVNode.fragmentDict = [ 'vUv', 'vUv2' ];
+
+THREE.UVNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.UVNode.prototype.constructor = THREE.UVNode;
 
 THREE.UVNode.prototype.generate = function( builder, output ) {
 
