@@ -13,4 +13,4 @@ THREE.Vector4Node = function( x, y, z, w ) {
 THREE.Vector4Node.prototype = Object.create( THREE.InputNode.prototype );
 THREE.Vector4Node.prototype.constructor = THREE.Vector4Node;
 
-THREE.NodeMaterial.Shortcuts( THREE.Vector4Node.prototype, 'value', [ 'x', 'y', 'z', 'w' ] );
+THREE.NodeMaterial.addShortcuts( THREE.Vector4Node.prototype, 'value', [ 'x', 'y', 'z', 'w' ] );

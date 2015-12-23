@@ -11,10 +11,7 @@ THREE.NodeMaterial = function( vertex, fragment ) {
 
 };
 
-THREE.NodeMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
-THREE.NodeMaterial.prototype.constructor = THREE.NodeMaterial;
-
-THREE.NodeMaterial.Type = {
+THREE.NodeMaterial.types = {
 	t : 'sampler2D',
 	tc : 'samplerCube',
 	bv1 : 'bool',
@@ -26,38 +23,45 @@ THREE.NodeMaterial.Type = {
 	v4 : 'vec4'
 };
 
-THREE.NodeMaterial.GetShortcuts = function( prop, name ) {
+THREE.NodeMaterial.addShortcuts = function( proto, prop, list ) {
 
-	return {
-		get: function() {
+	function applyShortcut( prop, name ) {
 
-			return this[ prop ][ name ];
+		return {
+			get: function() {
 
-		},
-		set: function( val ) {
+				return this[ prop ][ name ];
 
-			this[ prop ][ name ] = val;
+			},
+			set: function( val ) {
 
-		}
+				this[ prop ][ name ] = val;
+
+			}
+		};
+
 	};
 
+	return (function() {
+
+		var shortcuts = {};
+
+		for ( var i = 0; i < list.length; ++ i ) {
+
+			var name = list[ i ];
+
+			shortcuts[ name ] = applyShortcut( prop, name );
+
+		}
+
+		Object.defineProperties( proto, shortcuts );
+
+	})();
+
 };
 
-THREE.NodeMaterial.Shortcuts = function( proto, prop, list ) {
-
-	var shortcuts = {};
-
-	for ( var i = 0; i < list.length; ++ i ) {
-
-		var name = list[ i ];
-
-		shortcuts[ name ] = this.GetShortcuts( prop, name );
-
-	}
-
-	Object.defineProperties( proto, shortcuts );
-
-};
+THREE.NodeMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
+THREE.NodeMaterial.prototype.constructor = THREE.NodeMaterial;
 
 THREE.NodeMaterial.prototype.updateAnimation = function( delta ) {
 
@@ -388,7 +392,7 @@ THREE.NodeMaterial.prototype.getCodePars = function( pars, prefix ) {
 
 		if ( parsType == 't' && parsValue instanceof THREE.CubeTexture ) parsType = 'tc';
 
-		var type = THREE.NodeMaterial.Type[ parsType ];
+		var type = THREE.NodeMaterial.types[ parsType ];
 
 		if ( type == undefined ) throw new Error( "Node pars " + parsType + " not found." );
 

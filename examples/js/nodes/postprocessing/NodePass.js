@@ -20,6 +20,9 @@ THREE.NodePass = function() {
 THREE.NodePass.prototype = Object.create( THREE.ShaderPass.prototype );
 THREE.NodePass.prototype.constructor = THREE.NodePass;
 
+THREE.NodeMaterial.addShortcuts( THREE.NodePass.prototype, 'fragment',
+[ 'value' ] );
+
 THREE.NodePass.prototype.build = function() {
 
 	this.node.build();
@@ -28,6 +31,3 @@ THREE.NodePass.prototype.build = function() {
 	this.material = this.node;
 
 };
-
-THREE.NodeMaterial.Shortcuts( THREE.NodePass.prototype, 'fragment',
-[ 'value' ] );
