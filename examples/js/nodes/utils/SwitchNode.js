@@ -2,12 +2,12 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.SwitchNode = function( node, component ) {
+THREE.SwitchNode = function( node, components ) {
 
 	THREE.GLNode.call( this, 'fv1' );
 
 	this.node = node;
-	this.component = component || 'x';
+	this.components = components || 'x';
 
 };
 
@@ -16,7 +16,7 @@ THREE.SwitchNode.prototype.constructor = THREE.SwitchNode;
 
 THREE.SwitchNode.prototype.getType = function( builder ) {
 
-	return builder.getFormatByLength( this.component.length );
+	return builder.getFormatByLength( this.components.length );
 
 };
 
@@ -29,13 +29,13 @@ THREE.SwitchNode.prototype.generate = function( builder, output ) {
 
 	var outputLength = 0;
 
-	var i, len = this.component.length;
+	var i, len = this.components.length;
 
 	// get max length
 
 	for ( i = 0; i < len; i ++ ) {
 
-		outputLength = Math.max( outputLength, builder.getIndexByElement( this.component.charAt( i ) ) );
+		outputLength = Math.max( outputLength, builder.getIndexByElement( this.components.charAt( i ) ) );
 
 	}
 
@@ -47,8 +47,8 @@ THREE.SwitchNode.prototype.generate = function( builder, output ) {
 
 	for ( i = 0; i < len; i ++ ) {
 
-		var elm = this.component.charAt( i );
-		var idx = builder.getIndexByElement( this.component.charAt( i ) );
+		var elm = this.components.charAt( i );
+		var idx = builder.getIndexByElement( this.components.charAt( i ) );
 
 		if ( idx > outputLength ) idx = outputLength;
 
