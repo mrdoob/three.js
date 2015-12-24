@@ -14,4 +14,4 @@ THREE.StandardNodeMaterial.prototype = Object.create( THREE.NodeMaterial.prototy
 THREE.StandardNodeMaterial.prototype.constructor = THREE.StandardNodeMaterial;
 
 THREE.NodeMaterial.addShortcuts( THREE.StandardNodeMaterial.prototype, 'node',
-[ 'color', 'alpha', 'roughness', 'metalness', 'normal', 'normalScale', 'emissive', 'ambient', 'shadow', 'ao', 'environment', 'environmentIntensity', 'transform' ] );
+[ 'color', 'alpha', 'roughness', 'metalness', 'normal', 'normalScale', 'emissive', 'ambient', 'shadow', 'ao', 'environment', 'transform' ] );
