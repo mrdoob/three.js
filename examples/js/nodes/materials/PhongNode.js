@@ -124,7 +124,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'fv1' ) : undefined;
 
-		var ao = this.ao ? this.ao.buildCode( builder, 'c' ) : undefined;
+		var ao = this.ao ? this.ao.buildCode( builder, 'fv1' ) : undefined;
 		var ambient = this.ambient ? this.ambient.buildCode( builder, 'c' ) : undefined;
 		var shadow = this.shadow ? this.shadow.buildCode( builder, 'c' ) : undefined;
 		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c' ) : undefined;
