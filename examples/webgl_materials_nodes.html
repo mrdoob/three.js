@@ -262,19 +262,19 @@
 
 					mtl = new THREE.PhongNodeMaterial();
 
-					//mtl.color = // albedo color
-					//mtl.alpha = // opacity (0 at 1)
-					//mtl.specular = // specular color
+					//mtl.color = // albedo (vec3)
+					//mtl.alpha = // opacity (float)
+					//mtl.specular = // specular color (vec3)
 					//mtl.shininess = // shininess (float)
-					//mtl.normal = // normalmap
-					//mtl.normalScale = // normalmap scale
-					//mtl.emissive = // emissive color
-					//mtl.ambient = // ambient color
-					//mtl.shadow = // shadowmap
-					//mtl.ao = // ambient occlusion
-					//mtl.environment = // reflection map (CubeMap recommended)
-					//mtl.environmentAlpha = // environment alpha
-					//mtl.transform = // vertex transformation
+					//mtl.normal = // normalmap (vec3)
+					//mtl.normalScale = // normalmap scale (vec2)
+					//mtl.emissive = // emissive color (vec3)
+					//mtl.ambient = // ambient color (vec3)
+					//mtl.shadow = // shadowmap (vec3)
+					//mtl.ao = // ambient occlusion (float)
+					//mtl.environment = // reflection/refraction (vec3) 
+					//mtl.environmentAlpha = // environment alpha (float)
+					//mtl.transform = // vertex transformation (vec3)
 
 					var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
 
@@ -294,19 +294,18 @@
 
 					mtl = new THREE.StandardNodeMaterial();
 
-					//mtl.color = // albedo color
-					//mtl.alpha = // opacity (0 at 1)
+					//mtl.color = // albedo (vec3)
+					//mtl.alpha = // opacity (float)
 					//mtl.roughness = // roughness (float)
 					//mtl.metalness = // metalness (float)
-					//mtl.normal = // normalmap
-					//mtl.normalScale = // normalmap scale
-					//mtl.emissive = // emissive color
-					//mtl.ambient = // ambient color
-					//mtl.shadow = // shadowmap
-					//mtl.ao = // ambient occlusion
-					//mtl.environment = // reflection map (CubeMap recommended)
-					//mtl.environmentAlpha = // environment alpha
-					//mtl.transform = // vertex transformation
+					//mtl.normal = // normalmap (vec3)
+					//mtl.normalScale = // normalmap scale (vec2)
+					//mtl.emissive = // emissive color (vec3)
+					//mtl.ambient = // ambient color (vec3)
+					//mtl.shadow = // shadowmap (vec3)
+					//mtl.ao = // ambient occlusion (float)
+					//mtl.environment = // reflection/refraction (vec3)
+					//mtl.transform = // vertex transformation (vec3)
 
 					var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
 
