@@ -13,9 +13,6 @@ THREE.Math2Node = function( a, b, method ) {
 
 };
 
-THREE.Math2Node.prototype = Object.create( THREE.TempNode.prototype );
-THREE.Math2Node.prototype.constructor = THREE.Math2Node;
-
 THREE.Math2Node.MIN = 'min';
 THREE.Math2Node.MAX = 'max';
 THREE.Math2Node.MOD = 'mod';
@@ -25,6 +22,9 @@ THREE.Math2Node.DISTANCE = 'distance';
 THREE.Math2Node.DOT = 'dot';
 THREE.Math2Node.CROSS = 'cross';
 THREE.Math2Node.POW = 'pow';
+
+THREE.Math2Node.prototype = Object.create( THREE.TempNode.prototype );
+THREE.Math2Node.prototype.constructor = THREE.Math2Node;
 
 THREE.Math2Node.prototype.getInputType = function( builder ) {
 

@@ -10,13 +10,13 @@ THREE.PositionNode = function( scope ) {
 
 };
 
-THREE.PositionNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.PositionNode.prototype.constructor = THREE.PositionNode;
-
 THREE.PositionNode.LOCAL = 'local';
 THREE.PositionNode.WORLD = 'world';
 THREE.PositionNode.VIEW = 'view';
 THREE.PositionNode.PROJECTION = 'projection';
+
+THREE.PositionNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.PositionNode.prototype.constructor = THREE.PositionNode;
 
 THREE.PositionNode.prototype.getType = function( builder ) {
 

@@ -6,20 +6,19 @@ THREE.OperatorNode = function( a, b, op ) {
 
 	THREE.TempNode.call( this );
 
-	this.op = op || THREE.OperatorNode.ADD;
-
 	this.a = a;
 	this.b = b;
+	this.op = op || THREE.OperatorNode.ADD;
 
 };
-
-THREE.OperatorNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.OperatorNode.prototype.constructor = THREE.OperatorNode;
 
 THREE.OperatorNode.ADD = '+';
 THREE.OperatorNode.SUB = '-';
 THREE.OperatorNode.MUL = '*';
 THREE.OperatorNode.DIV = '/';
+
+THREE.OperatorNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.OperatorNode.prototype.constructor = THREE.OperatorNode;
 
 THREE.OperatorNode.prototype.getType = function( builder ) {
 

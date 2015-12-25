@@ -10,12 +10,12 @@ THREE.NormalNode = function( scope ) {
 
 };
 
-THREE.NormalNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.NormalNode.prototype.constructor = THREE.NormalNode;
-
 THREE.NormalNode.LOCAL = 'local';
 THREE.NormalNode.WORLD = 'world';
 THREE.NormalNode.VIEW = 'view';
+
+THREE.NormalNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.NormalNode.prototype.constructor = THREE.NormalNode;
 
 THREE.NormalNode.prototype.isShared = function( builder ) {
 

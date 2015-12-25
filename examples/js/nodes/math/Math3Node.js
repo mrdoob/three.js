@@ -14,13 +14,13 @@ THREE.Math3Node = function( a, b, c, method ) {
 
 };
 
-THREE.Math3Node.prototype = Object.create( THREE.TempNode.prototype );
-THREE.Math3Node.prototype.constructor = THREE.Math3Node;
-
 THREE.Math3Node.MIX = 'mix';
 THREE.Math3Node.REFRACT = 'refract';
 THREE.Math3Node.SMOOTHSTEP = 'smoothstep';
 THREE.Math3Node.FACEFORWARD = 'faceforward';
+
+THREE.Math3Node.prototype = Object.create( THREE.TempNode.prototype );
+THREE.Math3Node.prototype.constructor = THREE.Math3Node;
 
 THREE.Math3Node.prototype.getType = function( builder ) {
 

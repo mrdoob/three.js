@@ -10,11 +10,11 @@ THREE.ColorsNode = function( index ) {
 
 };
 
-THREE.ColorsNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.ColorsNode.prototype.constructor = THREE.ColorsNode;
-
 THREE.ColorsNode.vertexDict = [ 'color', 'color2' ];
 THREE.ColorsNode.fragmentDict = [ 'vColor', 'vColor2' ];
+
+THREE.ColorsNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.ColorsNode.prototype.constructor = THREE.ColorsNode;
 
 THREE.ColorsNode.prototype.generate = function( builder, output ) {
 

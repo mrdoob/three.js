@@ -10,15 +10,15 @@ THREE.ConstNode = function( name, useDefine ) {
 
 };
 
-THREE.ConstNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.ConstNode.prototype.constructor = THREE.ConstNode;
-
 THREE.ConstNode.PI = 'PI';
 THREE.ConstNode.PI2 = 'PI2';
 THREE.ConstNode.RECIPROCAL_PI = 'RECIPROCAL_PI';
 THREE.ConstNode.RECIPROCAL_PI2 = 'RECIPROCAL_PI2';
 THREE.ConstNode.LOG2 = 'LOG2';
 THREE.ConstNode.EPSILON = 'EPSILON';
+
+THREE.ConstNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.ConstNode.prototype.constructor = THREE.ConstNode;
 
 THREE.ConstNode.prototype.parse = function( src, useDefine ) {
 

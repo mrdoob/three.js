@@ -12,9 +12,6 @@ THREE.Math1Node = function( a, method ) {
 
 };
 
-THREE.Math1Node.prototype = Object.create( THREE.TempNode.prototype );
-THREE.Math1Node.prototype.constructor = THREE.Math1Node;
-
 THREE.Math1Node.RAD = 'radians';
 THREE.Math1Node.DEG = 'degrees';
 THREE.Math1Node.EXP = 'exp';
@@ -38,6 +35,9 @@ THREE.Math1Node.SIGN = 'sign';
 THREE.Math1Node.LENGTH = 'length';
 THREE.Math1Node.NEGATE = 'negate';
 THREE.Math1Node.INVERT = 'invert';
+
+THREE.Math1Node.prototype = Object.create( THREE.TempNode.prototype );
+THREE.Math1Node.prototype.constructor = THREE.Math1Node;
 
 THREE.Math1Node.prototype.getType = function( builder ) {
 

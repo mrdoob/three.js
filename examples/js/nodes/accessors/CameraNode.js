@@ -11,11 +11,11 @@ THREE.CameraNode = function( scope, camera ) {
 
 };
 
-THREE.CameraNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.CameraNode.prototype.constructor = THREE.CameraNode;
-
 THREE.CameraNode.POSITION = 'position';
 THREE.CameraNode.DEPTH = 'depth';
+
+THREE.CameraNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.CameraNode.prototype.constructor = THREE.CameraNode;
 
 THREE.CameraNode.prototype.setCamera = function( camera ) {
 
