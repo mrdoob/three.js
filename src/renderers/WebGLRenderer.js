@@ -14,11 +14,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
-	_width = _canvas.width,
-	_height = _canvas.height,
-
-	pixelRatio = 1,
-
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 	_depth = parameters.depth !== undefined ? parameters.depth : true,
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
@@ -27,7 +22,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 
 	_clearColor = new THREE.Color( 0x000000 ),
-	_clearAlpha = 0;
+	_clearAlpha = 0,
+
+	_pixelRatio = 1;
 
 	var lights = [];
 
@@ -90,6 +87,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentScissorTest = null,
 
 	_currentViewport = new THREE.Vector4(),
+
+	//
 
 	_usedTextureUnits = 0,
 
@@ -223,7 +222,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function getTargetPixelRatio() {
 
-		return _currentRenderTarget === null ? pixelRatio : 1;
+		return _currentRenderTarget === null ? _pixelRatio : 1;
 
 	}
 
@@ -243,8 +242,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.init();
 
-		state.scissor( _scissor );
-		state.viewport( _viewport );
+		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
+		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
 		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
@@ -336,32 +335,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.getPixelRatio = function () {
 
-		return pixelRatio;
+		return _pixelRatio;
 
 	};
 
 	this.setPixelRatio = function ( value ) {
 
-		if ( value !== undefined ) pixelRatio = value;
+		if ( value === undefined ) return;
+
+		_pixelRatio = value;
+
+		this.setSize( _viewport.z, _viewport.w, false );
 
 	};
 
 	this.getSize = function () {
 
 		return {
-			width: _width,
-			height: _height
+			width: _viewport.z,
+			height: _viewport.w
 		};
 
 	};
 
 	this.setSize = function ( width, height, updateStyle ) {
 
-		_width = width;
-		_height = height;
-
-		_canvas.width = width * pixelRatio;
-		_canvas.height = height * pixelRatio;
+		_canvas.width = width * _pixelRatio;
+		_canvas.height = height * _pixelRatio;
 
 		if ( updateStyle !== false ) {
 
@@ -376,25 +376,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		_viewport.set( x, y, width, height ).multiplyScalar( pixelRatio );
-
-		state.viewport( _viewport );
+		_viewport.set( x, y, width, height );
 
 	};
 
 	this.setScissor = function ( x, y, width, height ) {
 
-		_scissor.set( x, y, width, height ).multiplyScalar( pixelRatio );
-
-		state.scissor( _scissor );
+		_scissor.set( x, y, width, height );
 
 	};
 
 	this.setScissorTest = function ( boolean ) {
 
 		_scissorTest = boolean;
-
-		state.setScissorTest( boolean );
 
 	};
 
@@ -3424,10 +3418,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			framebuffer = null;
 
-			_currentScissor.copy( _scissor );
+			_currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio );
 			_currentScissorTest = _scissorTest;
 
-			_currentViewport.copy( _viewport );
+			_currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio );
 
 		}
 
