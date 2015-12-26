@@ -79,7 +79,7 @@ THREE.Math2Node.prototype.generate = function( builder, output ) {
 
 		case THREE.Math2Node.MIN:
 		case THREE.Math2Node.MAX:
-		case THREE.Math2Node.MODULO:
+		case THREE.Math2Node.MOD:
 			a = this.a.build( builder, type );
 			b = this.b.build( builder, bl == 1 ? 'fv1' : type );
 			break;
