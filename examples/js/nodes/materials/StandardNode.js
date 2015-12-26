@@ -74,8 +74,10 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		if ( transform ) {
 
-			output.push( transform.code );
-			output.push( "transformed = " + transform.result + ";" );
+			output.push(
+				transform.code,
+				"transformed = " + transform.result + ";"
+			);
 
 		}
 
@@ -111,6 +113,8 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		if ( this.alpha ) this.alpha.verify( builder );
 
+		if ( this.light ) this.light.verify( builder, 'light' );
+
 		if ( this.ao ) this.ao.verify( builder );
 		if ( this.ambient ) this.ambient.verify( builder );
 		if ( this.shadow ) this.shadow.verify( builder );
@@ -123,11 +127,13 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		// build code
 
-		var color = this.color.buildCode( builder, 'v4' );
+		var color = this.color.buildCode( builder, 'c' );
 		var roughness = this.roughness.buildCode( builder, 'fv1' );
 		var metalness = this.metalness.buildCode( builder, 'fv1' );
 
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'fv1' ) : undefined;
+
+		var light = this.light ? this.light.buildCode( builder, 'v3', 'light' ) : undefined;
 
 		var ao = this.ao ? this.ao.buildCode( builder, 'fv1' ) : undefined;
 		var ambient = this.ambient ? this.ambient.buildCode( builder, 'c' ) : undefined;
@@ -167,9 +173,10 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 				// prevent undeclared material
 			"	StandardMaterial material;",
+			"	material.diffuseColor = vec3( 1.0 );",
 
 				color.code,
-			"	vec4 diffuseColor = " + color.result + ";",
+			"	vec3 diffuseColor = " + color.result + ";",
 			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
@@ -211,46 +218,72 @@ THREE.StandardNode.prototype.build = function( builder ) {
 			THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 			// accumulation
-			'material.diffuseColor = diffuseColor.rgb * ( 1.0 - metalnessFactor );',
 			'material.specularRoughness = clamp( roughnessFactor, 0.001, 1.0 );', // disney's remapping of [ 0, 1 ] roughness to [ 0.001, 1 ]
 			'material.specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );',
 
 			THREE.ShaderChunk[ "lights_template" ]
 		);
 
+		if ( light ) {
+
+			output.push(
+				light.code,
+				"reflectedLight.directDiffuse = " + light.result + ";"
+			);
+
+		}
+
+		// apply color
+		output.push(
+			"diffuseColor *= 1.0 - metalnessFactor;",
+
+			"reflectedLight.directDiffuse *= diffuseColor;",
+			"reflectedLight.indirectDiffuse *= diffuseColor;"
+		);
+
 		if ( ao ) {
 
-			output.push( ao.code );
-			output.push( "reflectedLight.indirectDiffuse *= " + ao.result + ";" );
+			output.push(
+				ao.code,
+				"reflectedLight.indirectDiffuse *= " + ao.result + ";"
+			);
 
 		}
 
 		if ( ambient ) {
 
-			output.push( ambient.code );
-			output.push( "reflectedLight.indirectDiffuse += " + ambient.result + ";" );
+			output.push(
+				ambient.code,
+				"reflectedLight.indirectDiffuse += " + ambient.result + ";"
+			);
 
 		}
 
 		if ( shadow ) {
 
-			output.push( shadow.code );
-			output.push( "reflectedLight.directDiffuse *= " + shadow.result + ";" );
-			output.push( "reflectedLight.directSpecular *= " + shadow.result + ";" );
+			output.push(
+				shadow.code,
+				"reflectedLight.directDiffuse *= " + shadow.result + ";",
+				"reflectedLight.directSpecular *= " + shadow.result + ";"
+			);
 
 		}
 
 		if ( emissive ) {
 
-			output.push( emissive.code );
-			output.push( "reflectedLight.directDiffuse += " + emissive.result + ";" );
+			output.push(
+				emissive.code,
+				"reflectedLight.directDiffuse += " + emissive.result + ";"
+			);
 
 		}
 
 		if ( environment ) {
 
-			output.push( environment.code );
-			output.push( "RE_IndirectSpecular(" + environment.result + ", geometry, material, reflectedLight );" );
+			output.push(
+				environment.code,
+				"RE_IndirectSpecular(" + environment.result + ", geometry, material, reflectedLight );"
+			);
 
 		}
 

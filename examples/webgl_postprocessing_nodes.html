@@ -79,7 +79,7 @@
 		<script src="js/nodes/utils/SwitchNode.js"></script>
 		<script src="js/nodes/utils/JoinNode.js"></script>
 		<script src="js/nodes/utils/TimerNode.js"></script>
-		<script src="js/nodes/utils/NormalMapNode.js"></script>
+		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
 
 		<!-- Post-Processing -->
 		<script src="js/nodes/postprocessing/NodePass.js"></script>
@@ -90,7 +90,7 @@
 			var object, light, nodepass;
 			var gui, guiElements = [];
 
-			var param = { example: 'brightness' };
+			var param = { example: 'color-adjustment' };
 
 			var lensflare2 = new THREE.TextureLoader().load( 'textures/lensflare2.jpg' );
 			lensflare2.wrapS = lensflare2.wrapT = THREE.RepeatWrapping;
@@ -171,42 +171,57 @@
 
 				switch ( name ) {
 
-					case 'brightness':
+					case 'color-adjustment':
 
 						var screen = new THREE.ScreenNode();
 
-						var brightness = new THREE.FloatNode( - 1 );
-						var contrast = new THREE.FloatNode( 3 );
+						var hue = new THREE.FloatNode();
+						var sataturation = new THREE.FloatNode( 1 );
+						var vibrance = new THREE.FloatNode();
+						var brightness = new THREE.FloatNode( 0 );
+						var contrast = new THREE.FloatNode( 1 );
 
-						var contrastResult = new THREE.OperatorNode(
-							screen,
-							contrast,
-							THREE.OperatorNode.MUL
-						);
+						var hueNode = new THREE.ColorAdjustmentNode( screen, hue, THREE.ColorAdjustmentNode.HUE );
+						var satNode = new THREE.ColorAdjustmentNode( hueNode, sataturation, THREE.ColorAdjustmentNode.SATURATION );
+						var vibranceNode = new THREE.ColorAdjustmentNode( satNode, vibrance, THREE.ColorAdjustmentNode.VIBRANCE );
+						var brightnessNode = new THREE.ColorAdjustmentNode( vibranceNode, brightness, THREE.ColorAdjustmentNode.BRIGHTNESS );
+						var contrastNode = new THREE.ColorAdjustmentNode( brightnessNode, contrast, THREE.ColorAdjustmentNode.CONTRAST );
 
-						var brightnessResult = new THREE.OperatorNode(
-							contrastResult,
-							brightness,
-							THREE.OperatorNode.ADD
-						);
-
-						nodepass.value = brightnessResult;
+						nodepass.value = contrastNode;
 
 						// GUI
+
+						addGui( 'hue', hue.number, function( val ) {
+
+							hue.number = val;
+
+						}, false, 0, Math.PI * 2 );
+
+						addGui( 'saturation', sataturation.number, function( val ) {
+
+							sataturation.number = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'vibrance', vibrance.number, function( val ) {
+
+							vibrance.number = val;
+
+						}, false, - 1, 1 );
 
 						addGui( 'brightness', brightness.number, function( val ) {
 
 							brightness.number = val;
 
-						}, false, - 1, 2 );
+						}, false, 0, .5 );
 
 						addGui( 'contrast', contrast.number, function( val ) {
 
 							contrast.number = val;
 
-						}, false, 0, 4 );
+						}, false, 0, 2 );
 
-					break;
+						break;
 
 					case 'fade':
 
@@ -238,7 +253,7 @@
 
 						}, false, 0, 1 );
 
-					break;
+						break;
 
 					case 'invert':
 
@@ -266,7 +281,7 @@
 
 						}, false, 0, 1 );
 
-					break;
+						break;
 
 					case 'blends':
 
@@ -295,7 +310,7 @@
 
 						} );
 
-					break;
+						break;
 
 					case 'saturation':
 
@@ -326,7 +341,7 @@
 
 						}, false, 0, 2 );
 
-					break;
+						break;
 
 					case 'refraction':
 
@@ -335,7 +350,7 @@
 						var normal = new THREE.TextureNode( decalNormal );
 						var normalXY = new THREE.SwitchNode( normal, 'xy' );
 						var scale = new THREE.FloatNode( .5 );
-						var flip = new THREE.Vector2Node( -1, 1 );
+						var flip = new THREE.Vector2Node( - 1, 1 );
 
 						var normalXYFlip = new THREE.Math1Node(
 							normalXY,
@@ -387,7 +402,7 @@
 
 						} );
 
-					break;
+						break;
 
 					case 'mosaic':
 
@@ -456,7 +471,7 @@
 
 						} );
 
-					break;
+						break;
 
 				}
 

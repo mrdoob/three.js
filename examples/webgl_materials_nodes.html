@@ -58,6 +58,7 @@
 		<script src="js/nodes/accessors/ColorsNode.js"></script>
 		<script src="js/nodes/accessors/CameraNode.js"></script>
 		<script src="js/nodes/accessors/ReflectNode.js"></script>
+		<script src="js/nodes/accessors/LightNode.js"></script>
 
 		<!-- Inputs -->
 		<script src="js/nodes/inputs/IntNode.js"></script>
@@ -81,6 +82,9 @@
 		<script src="js/nodes/utils/TimerNode.js"></script>
 		<script src="js/nodes/utils/RoughnessToBlinnExponentNode.js"></script>
 		<script src="js/nodes/utils/VelocityNode.js"></script>
+		<script src="js/nodes/utils/LuminanceNode.js"></script>
+		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
+		<script src="js/nodes/utils/NoiseNode.js"></script>
 
 		<!-- Phong Material -->
 		<script src="js/nodes/materials/PhongNode.js"></script>
@@ -185,11 +189,16 @@
 				'basic / phong': 'phong',
 				'basic / layers': 'layers',
 				'basic / rim': 'rim',
+				'basic / color-adjustment': 'color-adjustment',
 				'adv / fresnel': 'fresnel',
 				'adv / saturation': 'saturation',
 				'adv / top-bottom': 'top-bottom',
+				'adv / skin': 'skin',
+				'adv / skin-phong': 'skin-phong',
 				'adv / caustic': 'caustic',
 				'adv / displace': 'displace',
+				'adv / plush': 'plush',
+				'adv / toon': 'toon',
 				'adv / camera-depth': 'camera-depth',
 				'adv / soft-body': 'soft-body',
 				'adv / wave': 'wave',
@@ -220,7 +229,7 @@
 				} );
 
 			}
-			else if (typeof value == 'object') {
+			else if ( typeof value == 'object' ) {
 
 				node = gui.add( param, name, value ).onChange( function() {
 
@@ -271,8 +280,10 @@
 					//mtl.emissive = // emissive color (vec3)
 					//mtl.ambient = // ambient color (vec3)
 					//mtl.shadow = // shadowmap (vec3)
+					//mtl.light = // custom-light (vec3)
 					//mtl.ao = // ambient occlusion (float)
-					//mtl.environment = // reflection/refraction (vec3) 
+					//mtl.light = // input/output light (vec3)
+					//mtl.environment = // reflection/refraction (vec3)
 					//mtl.environmentAlpha = // environment alpha (float)
 					//mtl.transform = // vertex transformation (vec3)
 
@@ -303,6 +314,7 @@
 					//mtl.emissive = // emissive color (vec3)
 					//mtl.ambient = // ambient color (vec3)
 					//mtl.shadow = // shadowmap (vec3)
+					//mtl.light = // custom-light (vec3)
 					//mtl.ao = // ambient occlusion (float)
 					//mtl.environment = // reflection/refraction (vec3)
 					//mtl.transform = // vertex transformation (vec3)
@@ -579,6 +591,62 @@
 						mtl.build();
 
 					} );
+
+					break;
+
+				case 'color-adjustment':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var texture = new THREE.TextureNode( brick );
+
+					var hue = new THREE.FloatNode();
+					var sataturation = new THREE.FloatNode( 1 );
+					var vibrance = new THREE.FloatNode();
+					var brightness = new THREE.FloatNode( 0 );
+					var contrast = new THREE.FloatNode( 1 );
+
+					var hueNode = new THREE.ColorAdjustmentNode( texture, hue, THREE.ColorAdjustmentNode.HUE );
+					var satNode = new THREE.ColorAdjustmentNode( hueNode, sataturation, THREE.ColorAdjustmentNode.SATURATION );
+					var vibranceNode = new THREE.ColorAdjustmentNode( satNode, vibrance, THREE.ColorAdjustmentNode.VIBRANCE );
+					var brightnessNode = new THREE.ColorAdjustmentNode( vibranceNode, brightness, THREE.ColorAdjustmentNode.BRIGHTNESS );
+					var contrastNode = new THREE.ColorAdjustmentNode( brightnessNode, contrast, THREE.ColorAdjustmentNode.CONTRAST );
+
+					mtl.color = contrastNode;
+
+					// GUI
+
+					addGui( 'hue', hue.number, function( val ) {
+
+						hue.number = val;
+
+					}, false, 0, Math.PI * 2 );
+
+					addGui( 'saturation', sataturation.number, function( val ) {
+
+						sataturation.number = val;
+
+					}, false, 0, 2 );
+
+					addGui( 'vibrance', vibrance.number, function( val ) {
+
+						vibrance.number = val;
+
+					}, false, - 1, 1 );
+
+					addGui( 'brightness', brightness.number, function( val ) {
+
+						brightness.number = val;
+
+					}, false, 0, .5 );
+
+					addGui( 'contrast', contrast.number, function( val ) {
+
+						contrast.number = val;
+
+					}, false, 0, 2 );
 
 					break;
 
@@ -1217,6 +1285,271 @@
 						colorB.value.setHex( val );
 
 					}, true );
+
+					break;
+
+				case 'plush':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var color = new THREE.ColorNode( 0x8D8677 );
+					var mildness = new THREE.FloatNode( 1.6 );
+					var fur = new THREE.FloatNode( .5 );
+
+					var posDirection = new THREE.Math1Node( new THREE.PositionNode( THREE.PositionNode.VIEW ), THREE.Math1Node.NORMALIZE );
+					var norDirection = new THREE.Math1Node( new THREE.NormalNode( THREE.NormalNode.VIEW ), THREE.Math1Node.NORMALIZE );
+
+					var viewZ = new THREE.Math2Node(
+						posDirection,
+						norDirection,
+						THREE.Math2Node.DOT
+					);
+
+					// without luma correction for now
+					var mildnessColor = new THREE.OperatorNode(
+						color,
+						mildness,
+						THREE.OperatorNode.MUL
+					);
+
+					var furScale = new THREE.OperatorNode(
+						viewZ,
+						fur,
+						THREE.OperatorNode.MUL
+					);
+
+					mtl.color = color;
+					mtl.normal = new THREE.TextureNode( grassNormal );
+					mtl.normalScale = furScale;
+					mtl.environment = mildnessColor;
+					mtl.environmentAlpha = new THREE.Math1Node( viewZ, THREE.Math1Node.INVERT );
+					mtl.shininess = new THREE.FloatNode( 0 );
+
+					// GUI
+
+					addGui( 'color', color.value.getHex(), function( val ) {
+
+						color.value.setHex( val );
+
+					}, true );
+
+					addGui( 'mildness', mildness.number, function( val ) {
+
+						mildness.number = val;
+
+					}, false, 1, 2 );
+
+					addGui( 'fur', fur.number, function( val ) {
+
+						fur.number = val;
+
+					}, false, 0, 2 );
+
+					break;
+
+				case 'skin':
+				case 'skin-phong':
+
+					// MATERIAL
+
+					mtl = name == 'skin' ? new THREE.StandardNodeMaterial() : new THREE.PhongNodeMaterial();
+
+					var skinColor = new THREE.ColorNode( 0xFFC495 );
+					var bloodColor = new THREE.ColorNode( 0x6b0602 );
+					var wrapLight = new THREE.FloatNode( 2.5 );
+
+					var directLight = new THREE.LightNode();
+
+					var lightLuminance = new THREE.LuminanceNode( directLight );
+
+					var lightWrap = new THREE.Math3Node(
+						new THREE.FloatNode( - 1 ),
+						wrapLight,
+						lightLuminance,
+						THREE.Math3Node.SMOOTHSTEP
+					);
+
+					var lightTransition = new THREE.OperatorNode(
+						lightWrap,
+						new THREE.ConstNode( THREE.ConstNode.PI2 ),
+						THREE.OperatorNode.MUL
+					);
+
+					var wrappedLight = new THREE.Math1Node( lightTransition, THREE.Math1Node.SIN );
+
+					var wrappedLightColor = new THREE.OperatorNode(
+						wrappedLight,
+						bloodColor,
+						THREE.OperatorNode.MUL
+					);
+
+					var bloodArea = new THREE.Math1Node( wrappedLightColor, THREE.Math1Node.SAT );
+
+					var totalLight = new THREE.OperatorNode(
+						directLight,
+						bloodArea,
+						THREE.OperatorNode.ADD
+					);
+
+					mtl.color = skinColor;
+					mtl.light = totalLight;
+
+					if ( name == 'skin' ) {
+
+						// StandardNodeMaterial
+
+						mtl.metalness = new THREE.FloatNode( .05 );
+						mtl.roughness = new THREE.FloatNode( .5 );
+						mtl.environment = new THREE.CubeTextureNode( cubemap );
+
+					}
+					else {
+
+						// PhongNodeMaterial
+
+						mtl.specular = new THREE.ColorNode( 0x2f2e2d );
+						mtl.shininess = new THREE.FloatNode( 10 );
+
+					}
+
+					// GUI
+
+					addGui( 'skinColor', skinColor.value.getHex(), function( val ) {
+
+						skinColor.value.setHex( val );
+
+					}, true );
+
+					addGui( 'bloodColor', bloodColor.value.getHex(), function( val ) {
+
+						bloodColor.value.setHex( val );
+
+					}, true );
+
+					addGui( 'wrapLight', wrapLight.number, function( val ) {
+
+						wrapLight.number = val;
+
+					}, false, 0, 3 );
+
+					break;
+
+				case 'toon':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var count = new THREE.FloatNode( 3.43 );
+					var sceneDirectLight = new THREE.LightNode();
+					var color = new THREE.ColorNode( 0xAABBFF );
+
+					var lineColor = new THREE.ColorNode( 0xFF0000 );
+					var lineSize = new THREE.FloatNode( 0.23 );
+					var lineInner = new THREE.FloatNode( 0 );
+
+					// CEL
+
+					var lightLuminance = new THREE.LuminanceNode( sceneDirectLight );
+
+					var preCelLight = new THREE.OperatorNode(
+						lightLuminance,
+						count,
+						THREE.OperatorNode.MUL
+					);
+
+					var celLight = new THREE.Math1Node(
+						preCelLight,
+						THREE.Math1Node.CEIL
+					);
+
+					var posCelLight = new THREE.OperatorNode(
+						celLight,
+						count,
+						THREE.OperatorNode.DIV
+					);
+
+					// LINE
+
+					var posDirection = new THREE.Math1Node( new THREE.PositionNode( THREE.PositionNode.VIEW ), THREE.Math1Node.NORMALIZE );
+					var norDirection = new THREE.Math1Node( new THREE.NormalNode( THREE.NormalNode.VIEW ), THREE.Math1Node.NORMALIZE );
+
+					var viewZ = new THREE.Math2Node(
+						posDirection,
+						norDirection,
+						THREE.Math2Node.DOT
+					);
+
+					var lineOutside = new THREE.Math1Node(
+						viewZ,
+						THREE.Math1Node.ABS
+					);
+
+					var line = new THREE.OperatorNode(
+						lineOutside,
+						new THREE.FloatNode( 1 ),
+						THREE.OperatorNode.DIV
+					);
+
+					var lineScaled = new THREE.Math3Node(
+						line,
+						lineSize,
+						lineInner,
+						THREE.Math3Node.SMOOTHSTEP
+					);
+
+					var innerContour = new THREE.Math1Node( new THREE.Math1Node( lineScaled, THREE.Math1Node.SAT ), THREE.Math1Node.INVERT );
+
+					// APPLY
+
+					mtl.color = color;
+					mtl.light = posCelLight;
+					mtl.shininess = new THREE.FloatNode( 0 );
+
+					mtl.environment = lineColor;
+					mtl.environmentAlpha = innerContour;
+
+					// GUI
+
+					addGui( 'color', color.value.getHex(), function( val ) {
+
+						color.value.setHex( val );
+
+					}, true );
+
+					addGui( 'lineColor', lineColor.value.getHex(), function( val ) {
+
+						lineColor.value.setHex( val );
+
+					}, true );
+
+					addGui( 'count', count.number, function( val ) {
+
+						count.number = val;
+
+					}, false, 1, 8 );
+
+					addGui( 'lineSize', lineSize.number, function( val ) {
+
+						lineSize.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'lineInner', lineInner.number, function( val ) {
+
+						lineInner.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'ignoreIndirectLight', false, function( val ) {
+
+						mtl.ao = val ? new THREE.FloatNode() : undefined;
+
+						mtl.build();
+
+					} );
 
 					break;
 

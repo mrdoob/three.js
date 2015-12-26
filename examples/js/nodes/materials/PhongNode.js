@@ -74,8 +74,10 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		if ( transform ) {
 
-			output.push( transform.code );
-			output.push( "transformed = " + transform.result + ";" );
+			output.push(
+				transform.code,
+				"transformed = " + transform.result + ";"
+			);
 
 		}
 
@@ -105,6 +107,8 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		if ( this.alpha ) this.alpha.verify( builder );
 
+		if ( this.light ) this.light.verify( builder, 'light' );
+
 		if ( this.ao ) this.ao.verify( builder );
 		if ( this.ambient ) this.ambient.verify( builder );
 		if ( this.shadow ) this.shadow.verify( builder );
@@ -118,11 +122,13 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		// build code
 
-		var color = this.color.buildCode( builder, 'v4' );
+		var color = this.color.buildCode( builder, 'c' );
 		var specular = this.specular.buildCode( builder, 'c' );
 		var shininess = this.shininess.buildCode( builder, 'fv1' );
 
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'fv1' ) : undefined;
+
+		var light = this.light ? this.light.buildCode( builder, 'v3', 'light' ) : undefined;
 
 		var ao = this.ao ? this.ao.buildCode( builder, 'fv1' ) : undefined;
 		var ambient = this.ambient ? this.ambient.buildCode( builder, 'c' ) : undefined;
@@ -152,8 +158,12 @@ THREE.PhongNode.prototype.build = function( builder ) {
 				// prevent undeclared normal
 				THREE.ShaderChunk[ "normal_fragment" ],
 
+				// prevent undeclared material
+			"	BlinnPhongMaterial material;",
+			"	material.diffuseColor = vec3( 1.0 );",
+
 				color.code,
-			"	vec4 diffuseColor = " + color.result + ";",
+			"	vec3 diffuseColor = " + color.result + ";",
 			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
@@ -197,40 +207,66 @@ THREE.PhongNode.prototype.build = function( builder ) {
 			THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 			// accumulation
-			THREE.ShaderChunk[ "lights_phong_fragment" ],
+			'material.specularColor = specular;',
+			'material.specularShininess = shininess;',
+			'material.specularStrength = specularStrength;',
+
 			THREE.ShaderChunk[ "lights_template" ]
+		);
+
+		if ( light ) {
+
+			output.push(
+				light.code,
+				"reflectedLight.directDiffuse = " + light.result + ";"
+			);
+
+		}
+
+		// apply color
+		output.push(
+			"reflectedLight.directDiffuse *= diffuseColor;",
+			"reflectedLight.indirectDiffuse *= diffuseColor;"
 		);
 
 		if ( ao ) {
 
-			output.push( ao.code );
-			output.push( "reflectedLight.indirectDiffuse *= " + ao.result + ";" );
+			output.push(
+				ao.code,
+				"reflectedLight.indirectDiffuse *= " + ao.result + ";"
+			);
 
 		}
 
 		if ( ambient ) {
 
-			output.push( ambient.code );
-			output.push( "reflectedLight.indirectDiffuse += " + ambient.result + ";" );
+			output.push(
+				ambient.code,
+				"reflectedLight.indirectDiffuse += " + ambient.result + ";"
+			);
 
 		}
 
 		if ( shadow ) {
 
-			output.push( shadow.code );
-			output.push( "reflectedLight.directDiffuse *= " + shadow.result + ";" );
-			output.push( "reflectedLight.directSpecular *= " + shadow.result + ";" );
+			output.push(
+				shadow.code,
+				"reflectedLight.directDiffuse *= " + shadow.result + ";",
+				"reflectedLight.directSpecular *= " + shadow.result + ";"
+			);
 
 		}
 
 		if ( emissive ) {
 
-			output.push( emissive.code );
-			output.push( "reflectedLight.directDiffuse += " + emissive.result + ";" );
+			output.push(
+				emissive.code,
+				"reflectedLight.directDiffuse += " + emissive.result + ";"
+			);
 
 		}
 
-		output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" );
+		output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular;" );
 
 		if ( environment ) {
 
@@ -238,9 +274,10 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 			if ( environmentAlpha ) {
 
-				output.push( environmentAlpha.code );
-
-				output.push( "outgoingLight = mix(" + 'outgoingLight' + "," + environment.result + "," + environmentAlpha.result + ");" );
+				output.push(
+					environmentAlpha.code,
+					"outgoingLight = mix(" + 'outgoingLight' + "," + environment.result + "," + environmentAlpha.result + ");"
+				);
 
 			}
 			else {
