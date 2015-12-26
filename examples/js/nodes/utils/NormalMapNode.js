@@ -29,14 +29,14 @@ THREE.NormalMapNode.prototype.generate = function( builder, output ) {
 			this.normal.build( builder, 'v3' ) + ',' +
 			this.value.build( builder, 'v3' ) + ',' +
 			this.value.coord.build( builder, 'v2' ) + ',' +
-			this.scale.build( builder, 'fv1' ) + ')', this.type, output );
+			this.scale.build( builder, 'v2' ) + ')', this.getType( builder ), output );
 
 	}
 	else {
 
 		console.warn( "THREE.NormalMapNode is not compatible with " + builder.shader + " shader." );
 
-		return builder.format( 'vec3( 0.0 )', this.type, output );
+		return builder.format( 'vec3( 0.0 )', this.getType( builder ), output );
 
 	}
 
