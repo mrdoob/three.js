@@ -124,7 +124,7 @@ THREE.NodeLib.add( new THREE.FunctionNode( [
 //
 
 THREE.NodeLib.add( new THREE.FunctionNode( [
-// Shader by Evan Wallace adapted from @lo-th
+// Shader by Evan Wallace adapted by @lo-th
 "vec3 vibrance_rgb(vec3 rgb, float adjustment) {",
 	"float average = (rgb.r + rgb.g + rgb.b) / 3.0;",
 	"float mx = max(rgb.r, max(rgb.g, rgb.b));",
