@@ -79,13 +79,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// internal state cache
 
-	_currentViewport = null,
 	_currentProgram = null,
 	_currentRenderTarget = null,
 	_currentFramebuffer = null,
 	_currentMaterialId = - 1,
 	_currentGeometryProgram = '',
 	_currentCamera = null,
+
+	_currentScissor = new THREE.Vector4(),
+	_currentScissorTest = null,
+
+	_currentViewport = new THREE.Vector4(),
 
 	_usedTextureUnits = 0,
 
@@ -3395,7 +3399,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
-		var framebuffer, scissor, scissorTest, viewport;
+		var framebuffer;
 
 		if ( renderTarget ) {
 
@@ -3411,19 +3415,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			scissor = renderTarget.scissor;
-			scissorTest = renderTarget.scissorTest;
+			_currentScissor.copy( renderTarget.scissor );
+			_currentScissorTest = renderTarget.scissorTest;
 
-			viewport = renderTarget.viewport;
+			_currentViewport.copy( renderTarget.viewport );
 
 		} else {
 
 			framebuffer = null;
 
-			scissor = _scissor;
-			scissorTest = _scissorTest;
+			_currentScissor.copy( _scissor );
+			_currentScissorTest = _scissorTest;
 
-			viewport = _viewport;
+			_currentViewport.copy( _viewport );
 
 		}
 
@@ -3435,10 +3439,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		state.scissor( scissor );
-		state.setScissorTest( scissorTest );
+		state.scissor( _currentScissor );
+		state.setScissorTest( _currentScissorTest );
 
-		state.viewport( viewport );
+		state.viewport( _currentViewport );
 
 		if ( isCube ) {
 
@@ -3446,8 +3450,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, textureProperties.__webglTexture, 0 );
 
 		}
-
-		_currentViewport = viewport;
 
 	};
 
