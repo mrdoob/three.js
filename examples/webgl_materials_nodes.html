@@ -1358,14 +1358,15 @@
 
 					var skinColor = new THREE.ColorNode( 0xFFC495 );
 					var bloodColor = new THREE.ColorNode( 0x6b0602 );
-					var wrapLight = new THREE.FloatNode( 2.5 );
+					var wrapLight = new THREE.FloatNode( 1.5 );
+					var wrapShadow = new THREE.FloatNode( 0 );
 
 					var directLight = new THREE.LightNode();
 
 					var lightLuminance = new THREE.LuminanceNode( directLight );
 
 					var lightWrap = new THREE.Math3Node(
-						new THREE.FloatNode( - 1 ),
+						wrapShadow,
 						wrapLight,
 						lightLuminance,
 						THREE.Math3Node.SMOOTHSTEP
@@ -1433,6 +1434,12 @@
 						wrapLight.number = val;
 
 					}, false, 0, 3 );
+
+					addGui( 'wrapShadow', wrapShadow.number, function( val ) {
+
+						wrapShadow.number = val;
+
+					}, false, -1, 0 );
 
 					break;
 
