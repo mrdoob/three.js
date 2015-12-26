@@ -35,6 +35,20 @@ THREE.BuilderNode.prototype = {
 
 	},
 
+	isCache : function( name ) {
+
+		var i = this.caches.length;
+
+		while ( i -- ) {
+
+			if ( this.caches[ i ].name == name ) return true;
+
+		}
+
+		return false;
+
+	},
+
 	updateCache : function() {
 
 		var cache = this.caches[ this.caches.length - 1 ];
@@ -59,6 +73,12 @@ THREE.BuilderNode.prototype = {
 		this.material.include( this.shader, func );
 
 		return this;
+
+	},
+
+	colorToVector : function( color ) {
+
+		return color.replace( 'r', 'x' ).replace( 'g', 'y' ).replace( 'b', 'z' ).replace( 'a', 'w' );
 
 	},
 

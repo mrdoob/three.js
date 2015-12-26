@@ -62,20 +62,19 @@ THREE.Math3Node.prototype.generate = function( builder, output ) {
 			a = this.a.build( builder, type );
 			b = this.b.build( builder, type );
 			c = this.c.build( builder, 'fv1' );
-		break;
+			break;
 
 		case THREE.Math3Node.MIX:
-		case THREE.Math3Node.SMOOTHSTEP:
 			a = this.a.build( builder, type );
 			b = this.b.build( builder, type );
 			c = this.c.build( builder, cl == 1 ? 'fv1' : type );
-		break;
+			break;
 
 		default:
 			a = this.a.build( builder, type );
 			b = this.b.build( builder, type );
 			c = this.c.build( builder, type );
-		break;
+			break;
 
 	}
 
