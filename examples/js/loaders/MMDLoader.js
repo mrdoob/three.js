@@ -221,13 +221,13 @@ THREE.MMDLoader.prototype.mergeVmds = function ( vmds ) {
 
 };
 
-THREE.MMDLoader.prototype.pourVmdIntoModel = function ( mesh, vmd ) {
+THREE.MMDLoader.prototype.pourVmdIntoModel = function ( mesh, vmd, name ) {
 
-	this.createAnimation( mesh, vmd );
+	this.createAnimation( mesh, vmd, name );
 
 };
 
-THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd ) {
+THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd, name ) {
 
 	var helper = new THREE.MMDLoader.DataCreationHelper();
 
@@ -295,7 +295,7 @@ THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd ) {
 
 		}
 
-		camera.animations.push( new THREE.AnimationClip( 'cameraAnimation', -1, tracks ) );
+		camera.animations.push( new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name, -1, tracks ) );
 
 	};
 
@@ -2598,7 +2598,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 };
 
-THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd ) {
+THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 	var scope = this;
 
@@ -2610,7 +2610,7 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd ) {
 		var orderedMotions = helper.createOrderedMotionArrays( bones, vmd.motions, 'boneName' );
 
 		var animation = {
-			name: 'Action',
+			name: name === undefined ? THREE.Math.generateUUID() : name,
 			fps: 30,
 			length: 0.0,
 			hierarchy: []
@@ -2746,7 +2746,7 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd ) {
 
 		}
 
-		mesh.geometry.morphAnimations.push( new THREE.AnimationClip( 'morphAnimation', -1, tracks ) );
+		mesh.geometry.morphAnimations.push( new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name + 'Morph', -1, tracks ) );
 
 	};
 
@@ -4039,13 +4039,33 @@ THREE.MMDHelper.prototype = {
 
 		if ( mesh.geometry.animations !== undefined ) {
 
-			mesh.mixer.clipAction( mesh.geometry.animations[ 0 ] ).play();
+			for ( var i = 0; i < mesh.geometry.animations.length; i++ ) {
+
+				var action = mesh.mixer.clipAction( mesh.geometry.animations[ i ] );
+
+				if ( i === 0 ) {
+
+					action.play();
+
+				}
+
+			}
 
 		}
 
 		if ( mesh.geometry.morphAnimations !== undefined ) {
 
-			mesh.mixer.clipAction( mesh.geometry.morphAnimations[ 0 ] ).play() ;
+			for ( var i = 0; i < mesh.geometry.morphAnimations.length; i++ ) {
+
+				var action = mesh.mixer.clipAction( mesh.geometry.morphAnimations[ i ] );
+
+				if ( i === 0 ) {
+
+					action.play();
+
+				}
+
+			}
 
 		}
 
