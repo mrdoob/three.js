@@ -214,12 +214,16 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		}
 
+		// optimization for now
+
+		output.push( 'material.diffuseColor = ' + ( light ? 'vec3( 1.0 )' : 'diffuseColor * (1.0 - metalnessFactor)' ) + ';' );
+
 		output.push(
 			THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 			// accumulation
 			'material.specularRoughness = clamp( roughnessFactor, 0.001, 1.0 );', // disney's remapping of [ 0, 1 ] roughness to [ 0.001, 1 ]
-			'material.specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );',
+			'material.specularColor = mix( vec3( 0.04 ), diffuseColor, metalnessFactor );',
 
 			THREE.ShaderChunk[ "lights_template" ]
 		);
@@ -231,15 +235,16 @@ THREE.StandardNode.prototype.build = function( builder ) {
 				"reflectedLight.directDiffuse = " + light.result + ";"
 			);
 
+			// apply color
+
+			output.push(
+				"diffuseColor *= 1.0 - metalnessFactor;",
+
+				"reflectedLight.directDiffuse *= diffuseColor;",
+				"reflectedLight.indirectDiffuse *= diffuseColor;"
+			);
+
 		}
-
-		// apply color
-		output.push(
-			"diffuseColor *= 1.0 - metalnessFactor;",
-
-			"reflectedLight.directDiffuse *= diffuseColor;",
-			"reflectedLight.indirectDiffuse *= diffuseColor;"
-		);
 
 		if ( ao ) {
 

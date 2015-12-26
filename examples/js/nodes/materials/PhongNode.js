@@ -160,7 +160,6 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 				// prevent undeclared material
 			"	BlinnPhongMaterial material;",
-			"	material.diffuseColor = vec3( 1.0 );",
 
 				color.code,
 			"	vec3 diffuseColor = " + color.result + ";",
@@ -203,6 +202,10 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		}
 
+		// optimization for now
+
+		output.push( 'material.diffuseColor = ' + ( light ? 'vec3( 1.0 )' : 'diffuseColor' ) + ';' );
+
 		output.push(
 			THREE.ShaderChunk[ "shadowmap_fragment" ],
 
@@ -221,13 +224,14 @@ THREE.PhongNode.prototype.build = function( builder ) {
 				"reflectedLight.directDiffuse = " + light.result + ";"
 			);
 
-		}
+			// apply color
 
-		// apply color
-		output.push(
-			"reflectedLight.directDiffuse *= diffuseColor;",
-			"reflectedLight.indirectDiffuse *= diffuseColor;"
-		);
+			output.push(
+				"reflectedLight.directDiffuse *= diffuseColor;",
+				"reflectedLight.indirectDiffuse *= diffuseColor;"
+			);
+
+		}
 
 		if ( ao ) {
 
