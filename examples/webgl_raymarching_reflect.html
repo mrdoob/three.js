@@ -249,7 +249,7 @@
 
 		<script>
 
-			var scene, camera, renderer;
+			var scene, camera, dummyCamera, renderer;
 			var geometry, material, mesh;
 			var mouse = new THREE.Vector2( 0.5, 0.5 );
 			var canvas;
@@ -273,6 +273,7 @@
 
 				scene = new THREE.Scene();
 				camera = new THREE.Camera();
+				dummyCamera = new THREE.Camera();
 				camera.lookAt( new THREE.Vector3( 0.0, -0.3, 1.0 ) );
 
 				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
@@ -325,7 +326,7 @@
 				material.uniforms.resolution.value = new THREE.Vector2( canvas.width, canvas.height );
 				material.uniforms.cameraPos.value = camera.getWorldPosition();
 				material.uniforms.cameraDir.value = camera.getWorldDirection();
-				renderer.render( scene, camera );
+				renderer.render( scene, dummyCamera );
 
 				stats.end();
 				requestAnimationFrame( render );
