@@ -9,12 +9,7 @@
 	<script src="js/controls/OrbitControls.js"></script>	
 	<script src="js/loaders/OBJLoader.js"></script>
 	<script src='js/libs/dat.gui.min.js'></script>
-	<script src="js/particles_general/Atlas.js"></script>
-	<script src="js/particles_general/Particles.js"></script>
-	<script src="js/particles_general/ParticleSystem.js"></script>
-	<script src="js/particles_general/ParticleSystemFrameset.js"></script>
-	<script src="js/particles_general/ParticleModifiers.js"></script>
-	<script src="js/particles_general/ParticleSystemUtil.js"></script>
+	<script src="js/GeneralParticleSystem.min.js"></script>
 
     <style>
 		body {
@@ -39,7 +34,9 @@
 <body>
 
 <div id="info">
-	<a href="http://threejs.org" target="_blank">three.js</a> - General Purpose Particle System by <a href="https://github.com/mkkellogg">mkkellogg</a>
+	<a href="http://threejs.org" target="_blank">three.js</a> - General purpose particle system by <a href="https://github.com/mkkellogg" target="_new">mkkellogg</a>
+	<br />
+	Full source on <a href="https://github.com/mkkellogg/ParticleSystemJS" target="_new">GitHub</a>
 </div>
 
 <div id="renderingContainer" style="position: absolute; left:0px; top:0px"></div>
@@ -95,7 +92,7 @@
 			startParticleSystemEnvironment ( ParticleEnvironmentIDs.Campfire );
 			initRenderer();
 			initControls();
-			    initStats();
+			initStats();
 			animate();
 
 		} );
@@ -208,10 +205,10 @@
 		};
 
 		var particleSystem1 = new THREE.Particles.ParticleSystem();
-		particleSystem1.initialize( camera, particleSystemParams1 );
+		particleSystem1.initialize( camera, scene, particleSystemParams1 );
 
 		var particleSystem2 = new THREE.Particles.ParticleSystem();
-		particleSystem2.initialize( camera, particleSystemParams2 );
+		particleSystem2.initialize( camera, scene, particleSystemParams2 );
 
 		var positionModifier = new THREE.Particles.RandomModifier(
 			{
@@ -326,7 +323,7 @@
 
 		};
 		var particleSystem = new THREE.Particles.ParticleSystem();
-		particleSystem.initialize( camera, particleSystemParams );
+		particleSystem.initialize( camera, scene, particleSystemParams );
 
 		particleSystem.bindModifier( "atlas", new THREE.Particles.EvenIntervalIndexModifier ( 64 ) );
 
@@ -355,7 +352,6 @@
 
 		particleSystem.bindInitializer( 'position', new THREE.Particles.RandomModifier(
 			{
-				isScalar: false,
 				offset: new THREE.Vector3( 0, 0, 0 ),
 				range: new THREE.Vector3( 0, 0, 0 ),
 				rangeEdgeClamp: false,
@@ -364,7 +360,6 @@
 
 		particleSystem.bindInitializer( 'velocity', new THREE.Particles.RandomModifier(
 			{
-				isScalar: false,
 				offset: new THREE.Vector3( 0, 25, 0 ),
 				range: new THREE.Vector3( 10, 2, 10 ),
 				rangeEdgeClamp: false,
@@ -392,13 +387,12 @@
 
 		};
 		particleSystem = new THREE.Particles.ParticleSystem();
-		particleSystem.initialize( camera, particleSystemParams );
+		particleSystem.initialize( camera, scene, particleSystemParams );
 
 		particleSystem.bindModifier( "atlas", new THREE.Particles.EvenIntervalIndexModifier ( 1 ) );
 
 		particleSystem.bindModifier( 'size', new THREE.Particles.RandomModifier(
 			{
-				isScalar: false,
 				offset: new THREE.Vector3( .25, .25, 0.0 ),
 				range: new THREE.Vector3( 0.05, 0.05, 0.0 ),
 				rangeEdgeClamp: false,
@@ -424,7 +418,6 @@
 
 		particleSystem.bindInitializer( 'position', new THREE.Particles.RandomModifier(
 			{
-				isScalar: false,
 				offset: new THREE.Vector3( 0, 7, 0 ),
 				range: new THREE.Vector3( 3, 0, 3 ),
 				rangeEdgeClamp: false,
@@ -433,7 +426,6 @@
 
 		particleSystem.bindInitializer( 'velocity', new THREE.Particles.RandomModifier(
 			{
-				isScalar: false,
 				offset: new THREE.Vector3( 0, 25, 0 ),
 				range: new THREE.Vector3( 15, 25, 15 ),
 				rangeEdgeClamp: true,
@@ -442,7 +434,6 @@
 
 		particleSystem.bindModifier( 'acceleration', new THREE.Particles.RandomModifier(
 			{
-				isScalar: false,
 				offset: new THREE.Vector3( 0, 15, 0 ),
 				range: new THREE.Vector3( 180, 280, 180 ),
 				rangeEdgeClamp: true,
@@ -496,7 +487,7 @@
 
 		window.addEventListener( 'resize', onWindowResize, false );
 
-	    }
+	}
 
 	function initRenderer() {
 
