@@ -31,9 +31,9 @@
 
 		<script src="../build/three.min.js"></script>
 
-        <script src="js/controls/OrbitControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
-        <script src="js/loaders/FBXLoader.js"></script>
+		<script src="js/loaders/FBXLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -45,9 +45,9 @@
 			var container, stats, controls;
 			var camera, scene, renderer;
 
-            var clock = new THREE.Clock();
+			var clock = new THREE.Clock();
 
-            var mixers = [];
+			var mixers = [];
 
 			init();
 
@@ -61,7 +61,7 @@
 
 				scene = new THREE.Scene();
 
-                //////////////////////////////////////////////////////////////
+				//////////////////////////////////////////////////////////////
 				// Grid
 
 				var size = 14, step = 1;
@@ -82,19 +82,19 @@
 				var line = new THREE.LineSegments( geometry, material );
 				scene.add( line );
 
-                //////////////////////////////////////////////////////////////
+				//////////////////////////////////////////////////////////////
 				// Lights
-                scene.add( new THREE.AmbientLight( 0xcccccc ) );
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
 
-                //////////////////////////////////////////////////////////////
-                // stats
+				//////////////////////////////////////////////////////////////
+				// stats
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-                container.appendChild( stats.domElement );
+				container.appendChild( stats.domElement );
 
 
-                //////////////////////////////////////////////////////////////
+				//////////////////////////////////////////////////////////////
 				// model
 				var manager = new THREE.LoadingManager();
 				manager.onProgress = function ( item, loaded, total ) {
@@ -113,7 +113,7 @@
 				var onError = function ( xhr ) {
 				};
 
-                var loader = new THREE.FBXLoader( manager );
+				var loader = new THREE.FBXLoader( manager );
 				loader.load( 'models/fbx/xsi_man_skinning.fbx', function ( object ) {
 
 					object.traverse( function ( child ) {
@@ -122,47 +122,47 @@
 
 							// pass
 
-                        }
+						}
 
 						if ( child instanceof THREE.SkinnedMesh ) {
 
-                            if ( child.geometry.animations !== undefined || child.geometry.morphAnimations !== undefined ) {
+							if ( child.geometry.animations !== undefined || child.geometry.morphAnimations !== undefined ) {
 
-                                child.mixer = new THREE.AnimationMixer( child );
-                                mixers.push( child.mixer );
+								child.mixer = new THREE.AnimationMixer( child );
+								mixers.push( child.mixer );
 
-                                var action = child.mixer.clipAction( child.geometry.animations[0] );
-                                action.play();
+								var action = child.mixer.clipAction( child.geometry.animations[0] );
+								action.play();
 
-                            }
+							}
 
 
-                        }
+						}
 
 
 					} );
-                    scene.add( object );
+					scene.add( object );
 
 
-                }, onProgress, onError );
+				}, onProgress, onError );
 
-                //////////////////////////////////////////////////////////////
+				//////////////////////////////////////////////////////////////
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
-                renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000 );
-                container.appendChild( renderer.domElement );
+				container.appendChild( renderer.domElement );
 
-                //////////////////////////////////////////////////////////////
-                // controls, camera
-                controls = new THREE.OrbitControls( camera, renderer.domElement );
-                controls.target.set( 0, 12, 0 );
+				//////////////////////////////////////////////////////////////
+				// controls, camera
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 12, 0 );
 				camera.position.set( 2, 18, 28 );
 				camera.lookAt( new THREE.Vector3( 0, 15, 0 ) );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-                animate();
+				animate();
 			}
 
 			function onWindowResize() {
@@ -175,20 +175,20 @@
 			}
 
 			//
-            function animate() {
+			function animate() {
 
-                requestAnimationFrame( animate );
+				requestAnimationFrame( animate );
 
-                if( mixers.length > 0 ){
-                    for ( var i=0; i < mixers.length; i++ ){
-                        mixers[i].update( clock.getDelta() );
+				if( mixers.length > 0 ){
+					for ( var i=0; i < mixers.length; i++ ){
+						mixers[i].update( clock.getDelta() );
 
-                    }
+					}
 
-                }
+				}
 
 				controls.update();
-                stats.update();
+				stats.update();
 				render();
 
 			}
