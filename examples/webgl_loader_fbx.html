@@ -63,28 +63,10 @@
 
 				//////////////////////////////////////////////////////////////
 				// Grid
-
-				var size = 14, step = 1;
-
-				var geometry = new THREE.Geometry();
-				var material = new THREE.LineBasicMaterial( { color: 0x303030 } );
-
-				for ( var i = - size; i <= size; i += step ) {
-
-					geometry.vertices.push( new THREE.Vector3( - size, - 0.04, i ) );
-					geometry.vertices.push( new THREE.Vector3(   size, - 0.04, i ) );
-
-					geometry.vertices.push( new THREE.Vector3( i, - 0.04, - size ) );
-					geometry.vertices.push( new THREE.Vector3( i, - 0.04,   size ) );
-
-				}
-
-				var line = new THREE.LineSegments( geometry, material );
-				scene.add( line );
-
-				//////////////////////////////////////////////////////////////
-				// Lights
-				scene.add( new THREE.AmbientLight( 0xcccccc ) );
+				var gridHelper = new THREE.GridHelper( 14, 1 );
+				gridHelper.setColors( 0x303030, 0x303030 );
+				gridHelper.position.set( 0, -0.04, 0);
+				scene.add( gridHelper );
 
 				//////////////////////////////////////////////////////////////
 				// stats
@@ -92,7 +74,6 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
-
 
 				//////////////////////////////////////////////////////////////
 				// model
@@ -136,11 +117,10 @@
 
 							}
 
-
 						}
 
-
 					} );
+
 					scene.add( object );
 
 
@@ -158,11 +138,11 @@
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 12, 0 );
 				camera.position.set( 2, 18, 28 );
-				camera.lookAt( new THREE.Vector3( 0, 15, 0 ) );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				animate();
+
 			}
 
 			function onWindowResize() {
@@ -187,7 +167,6 @@
 
 				}
 
-				controls.update();
 				stats.update();
 				render();
 
