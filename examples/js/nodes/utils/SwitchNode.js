@@ -4,7 +4,7 @@
 
 THREE.SwitchNode = function( node, components ) {
 
-	THREE.GLNode.call( this, 'fv1' );
+	THREE.GLNode.call( this );
 
 	this.node = node;
 	this.components = components || 'x';
@@ -42,24 +42,28 @@ THREE.SwitchNode.prototype.generate = function( builder, output ) {
 
 	if ( outputLength > inputLength ) outputLength = inputLength;
 
-	// build switch
+	if ( inputLength > 0 ) {
 
-	node += '.';
+		// split
 
-	for ( i = 0; i < len; i ++ ) {
+		node += '.';
 
-		var elm = components.charAt( i );
-		var idx = builder.getIndexByElement( components.charAt( i ) );
+		for ( i = 0; i < len; i ++ ) {
 
-		if ( idx > outputLength ) idx = outputLength;
+			var elm = components.charAt( i );
+			var idx = builder.getIndexByElement( components.charAt( i ) );
 
-		if ( builder.getElementByIndex( idx ) == undefined ) {
+			if ( idx > outputLength ) idx = outputLength;
 
-			console.log( builder.getElementByIndex( idx ) );
+			node += builder.getElementByIndex( idx );
 
 		}
 
-		node += builder.getElementByIndex( idx );
+	} else {
+
+		// join
+
+		node = builder.format( node, type, this.getType( builder ) )
 
 	}
 
