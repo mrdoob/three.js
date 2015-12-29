@@ -59,14 +59,14 @@ THREE.SwitchNode.prototype.generate = function( builder, output ) {
 
 		}
 
+		return builder.format( node, this.getType( builder ), output );
+
 	} else {
 
 		// join
 
-		node = builder.format( node, type, this.getType( builder ) )
+		return builder.format( node, type, output )
 
 	}
-
-	return builder.format( node, this.getType( builder ), output );
 
 };
