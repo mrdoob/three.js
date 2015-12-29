@@ -261,7 +261,7 @@
 			var config = {
 				saveImage: function() {
 
-					renderer.render( scene, camera );
+					renderer.render( scene, dummyCamera );
 					window.open( canvas.toDataURL() );
 
 				},
