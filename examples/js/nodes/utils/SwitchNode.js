@@ -24,25 +24,25 @@ THREE.SwitchNode.prototype.generate = function( builder, output ) {
 
 	var type = this.node.getType( builder );
 	var inputLength = builder.getFormatLength( type ) - 1;
-	var components = builder.colorToVector( this.components );
 
 	var node = this.node.build( builder, type );
 
-	var outputLength = 0;
-
-	var i, len = components.length;
-
-	// get max length
-
-	for ( i = 0; i < len; i ++ ) {
-
-		outputLength = Math.max( outputLength, builder.getIndexByElement( components.charAt( i ) ) );
-
-	}
-
-	if ( outputLength > inputLength ) outputLength = inputLength;
-
 	if ( inputLength > 0 ) {
+
+		// get max length
+
+		var outputLength = 0;
+		var components = builder.colorToVector( this.components );
+
+		var i, len = components.length;
+
+		for ( i = 0; i < len; i ++ ) {
+
+			outputLength = Math.max( outputLength, builder.getIndexByElement( components.charAt( i ) ) );
+
+		}
+
+		if ( outputLength > inputLength ) outputLength = inputLength;
 
 		// split
 
