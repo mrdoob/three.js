@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>three.js webgl - loaders - FBX loader</title>
+		<title>three.js webgl - FBX loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -51,7 +51,6 @@
 
 			init();
 
-
 			function init() {
 
 				container = document.createElement( 'div' );
@@ -61,43 +60,44 @@
 
 				scene = new THREE.Scene();
 
-				//////////////////////////////////////////////////////////////
-				// Grid
+				// grid
 				var gridHelper = new THREE.GridHelper( 14, 1 );
 				gridHelper.setColors( 0x303030, 0x303030 );
-				gridHelper.position.set( 0, -0.04, 0);
+				gridHelper.position.set( 0, - 0.04, 0 );
 				scene.add( gridHelper );
 
-				//////////////////////////////////////////////////////////////
 				// stats
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
 
-				//////////////////////////////////////////////////////////////
 				// model
 				var manager = new THREE.LoadingManager();
-				manager.onProgress = function ( item, loaded, total ) {
+				manager.onProgress = function( item, loaded, total ) {
 
 					console.log( item, loaded, total );
 
 				};
 
-				var onProgress = function ( xhr ) {
+				var onProgress = function( xhr ) {
+
 					if ( xhr.lengthComputable ) {
+
 						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
 					}
+
 				};
 
-				var onError = function ( xhr ) {
+				var onError = function( xhr ) {
 				};
 
 				var loader = new THREE.FBXLoader( manager );
-				loader.load( 'models/fbx/xsi_man_skinning.fbx', function ( object ) {
+				loader.load( 'models/fbx/xsi_man_skinning.fbx', function( object ) {
 
-					object.traverse( function ( child ) {
+					object.traverse( function( child ) {
 
 						if ( child instanceof THREE.Mesh ) {
 
@@ -112,7 +112,7 @@
 								child.mixer = new THREE.AnimationMixer( child );
 								mixers.push( child.mixer );
 
-								var action = child.mixer.clipAction( child.geometry.animations[0] );
+								var action = child.mixer.clipAction( child.geometry.animations[ 0 ] );
 								action.play();
 
 							}
@@ -126,18 +126,17 @@
 
 				}, onProgress, onError );
 
-				//////////////////////////////////////////////////////////////
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000 );
 				container.appendChild( renderer.domElement );
 
-				//////////////////////////////////////////////////////////////
 				// controls, camera
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 12, 0 );
 				camera.position.set( 2, 18, 28 );
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -155,25 +154,31 @@
 			}
 
 			//
+
 			function animate() {
 
 				requestAnimationFrame( animate );
 
-				if( mixers.length > 0 ){
-					for ( var i=0; i < mixers.length; i++ ){
-						mixers[i].update( clock.getDelta() );
+				if ( mixers.length > 0 ) {
+
+					for ( var i = 0; i < mixers.length; i ++ ) {
+
+						mixers[ i ].update( clock.getDelta() );
 
 					}
 
 				}
 
 				stats.update();
+
 				render();
 
 			}
 
 			function render() {
+
 				renderer.render( scene, camera );
+
 			}
 
 		</script>
