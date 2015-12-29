@@ -4395,7 +4395,7 @@ THREE.MMDHelper.prototype = {
 
 	poseAsVpd: function ( mesh, vpd, params ) {
 
-		if ( ! ( params && params.preventRestPose === true ) ) {
+		if ( ! ( params && params.preventResetPose === true ) ) {
 
 			this.resetPose( mesh );
 
