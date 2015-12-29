@@ -7410,7 +7410,7 @@ THREE.Interpolant = function(
 
 THREE.Interpolant.prototype = {
 
-	constructor: THREE.Intepolant,
+	constructor: THREE.Interpolant,
 
 	evaluate: function( t ) {
 
@@ -10123,6 +10123,8 @@ THREE.Geometry.prototype = {
 
 	computeVertexNormals: function ( areaWeighted ) {
 
+		if ( areaWeighted === undefined ) areaWeighted = true;
+
 		var v, vl, f, fl, face, vertices;
 
 		vertices = new Array( this.vertices.length );
@@ -10198,6 +10200,12 @@ THREE.Geometry.prototype = {
 				vertexNormals[ 2 ] = vertices[ face.c ].clone();
 
 			}
+
+		}
+
+		if ( this.faces.length > 0 ) {
+
+			this.normalsNeedUpdate = true;
 
 		}
 
@@ -17708,6 +17716,8 @@ THREE.Loader.prototype = {
 						break;
 					case 'depthTest':
 					case 'depthWrite':
+					case 'stencilTest':
+					case 'stencilWrite':
 					case 'colorWrite':
 					case 'opacity':
 					case 'reflectivity':
@@ -18797,6 +18807,8 @@ THREE.MaterialLoader.prototype = {
 		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
+		if ( json.stencilTest !== undefined ) material.stencilTest = json.stencilTest;
+		if ( json.stencilWrite !== undefined ) material.stencilWrite = json.stencilWrite;
 		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
@@ -18844,6 +18856,8 @@ THREE.MaterialLoader.prototype = {
 		if ( json.metalnessMap !== undefined ) material.metalnessMap = this.getTexture( json.metalnessMap );
 
 		if ( json.emissiveMap !== undefined ) material.emissiveMap = this.getTexture( json.emissiveMap );
+		if ( json.emissiveMapIntensity !== undefined ) material.emissiveMapIntensity = json.emissiveMapIntensity;
+
 		if ( json.specularMap !== undefined ) material.specularMap = this.getTexture( json.specularMap );
 
 		if ( json.envMap !== undefined ) {
@@ -19897,6 +19911,9 @@ THREE.Material = function () {
 	this.depthTest = true;
 	this.depthWrite = true;
 
+	this.stencilTest = false;
+	this.stencilWrite = false;
+
 	this.colorWrite = true;
 
 	this.precision = null; // override the renderer's default precision for this material
@@ -20123,6 +20140,9 @@ THREE.Material.prototype = {
 		this.depthFunc = source.depthFunc;
 		this.depthTest = source.depthTest;
 		this.depthWrite = source.depthWrite;
+
+		this.stencilTest = source.stencilTest;
+		this.stencilWrite = source.stencilWrite;
 
 		this.colorWrite = source.colorWrite;
 
@@ -20436,6 +20456,7 @@ THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
  *  aoMapIntensity: <float>
  *
  *  emissiveMap: new THREE.Texture( <Image> ),
+ *  emissiveMapIntensity: <float>
  *
  *  specularMap: new THREE.Texture( <Image> ),
  *
@@ -20481,6 +20502,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.aoMapIntensity = 1.0;
 
 	this.emissiveMap = null;
+	this.emissiveMapIntensity = 1.0;
 
 	this.specularMap = null;
 
@@ -20527,6 +20549,7 @@ THREE.MeshLambertMaterial.prototype.copy = function ( source ) {
 	this.aoMapIntensity = source.aoMapIntensity;
 
 	this.emissiveMap = source.emissiveMap;
+	this.emissiveMapIntensity = source.emissiveMapIntensity;
 
 	this.specularMap = source.specularMap;
 
@@ -20576,6 +20599,7 @@ THREE.MeshLambertMaterial.prototype.copy = function ( source ) {
  *  aoMapIntensity: <float>
  *
  *  emissiveMap: new THREE.Texture( <Image> ),
+ *  emissiveMapIntensity: <float>
  *
  *  bumpMap: new THREE.Texture( <Image> ),
  *  bumpScale: <float>,
@@ -20634,6 +20658,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.aoMapIntensity = 1.0;
 
 	this.emissiveMap = null;
+	this.emissiveMapIntensity = 1.0;
 
 	this.bumpMap = null;
 	this.bumpScale = 1;
@@ -20694,6 +20719,7 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.aoMapIntensity = source.aoMapIntensity;
 
 	this.emissiveMap = source.emissiveMap;
+	this.emissiveMapIntensity = source.emissiveMapIntensity;
 
 	this.bumpMap = source.bumpMap;
 	this.bumpScale = source.bumpScale;
@@ -20755,6 +20781,7 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
  *  aoMapIntensity: <float>
  *
  *  emissiveMap: new THREE.Texture( <Image> ),
+ *  emissiveMapIntensity: <float>
  *
  *  bumpMap: new THREE.Texture( <Image> ),
  *  bumpScale: <float>,
@@ -20816,6 +20843,7 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.aoMapIntensity = 1.0;
 
 	this.emissiveMap = null;
+	this.emissiveMapIntensity = 1.0;
 
 	this.bumpMap = null;
 	this.bumpScale = 1;
@@ -20879,6 +20907,7 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.aoMapIntensity = source.aoMapIntensity;
 
 	this.emissiveMap = source.emissiveMap;
+	this.emissiveMapIntensity = source.emissiveMapIntensity;
 
 	this.bumpMap = source.bumpMap;
 	this.bumpScale = source.bumpScale;
@@ -23365,11 +23394,11 @@ THREE.ShaderChunk[ 'displacementmap_pars_vertex' ] = "#ifdef USE_DISPLACEMENTMAP
 
 // File:src/renderers/shaders/ShaderChunk/emissivemap_fragment.glsl
 
-THREE.ShaderChunk[ 'emissivemap_fragment' ] = "#ifdef USE_EMISSIVEMAP\n	vec4 emissiveColor = texture2D( emissiveMap, vUv );\n	emissiveColor.rgb = inputToLinear( emissiveColor.rgb );\n	totalEmissiveLight *= emissiveColor.rgb;\n#endif\n";
+THREE.ShaderChunk[ 'emissivemap_fragment' ] = "#ifdef USE_EMISSIVEMAP\n	vec4 emissiveColor = texture2D( emissiveMap, vUv );\n	emissiveColor.rgb = inputToLinear( emissiveColor.rgb );\n	totalEmissiveLight *= emissiveColor.rgb * emissiveMapIntensity;\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/emissivemap_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'emissivemap_pars_fragment' ] = "#ifdef USE_EMISSIVEMAP\n	uniform sampler2D emissiveMap;\n#endif\n";
+THREE.ShaderChunk[ 'emissivemap_pars_fragment' ] = "#ifdef USE_EMISSIVEMAP\n	uniform sampler2D emissiveMap;\n	uniform float emissiveMapIntensity;\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/envmap_fragment.glsl
 
@@ -23395,9 +23424,9 @@ THREE.ShaderChunk[ 'fog_fragment' ] = "#ifdef USE_FOG\n	#ifdef USE_LOGDEPTHBUF_E
 
 THREE.ShaderChunk[ 'fog_pars_fragment' ] = "#ifdef USE_FOG\n	uniform vec3 fogColor;\n	#ifdef FOG_EXP2\n		uniform float fogDensity;\n	#else\n		uniform float fogNear;\n		uniform float fogFar;\n	#endif\n#endif";
 
-// File:src/renderers/shaders/ShaderChunk/lights_pars.glsl
+// File:src/renderers/shaders/ShaderChunk/lightmap_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_pars' ] = "#if NUM_DIR_LIGHTS > 0\n	struct DirectionalLight {\n	  vec3 direction;\n	  vec3 color;\n	  int shadow;\n	};\n	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\n	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		directLight.color = directionalLight.color;\n		directLight.direction = directionalLight.direction;\n		return directLight;\n	}\n#endif\n#if NUM_POINT_LIGHTS > 0\n	struct PointLight {\n	  vec3 position;\n	  vec3 color;\n	  float distance;\n	  float decay;\n	  int shadow;\n	};\n	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];\n	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		vec3 lVector = pointLight.position - geometry.position;\n		directLight.direction = normalize( lVector );\n		directLight.color = pointLight.color;\n		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay );\n		return directLight;\n	}\n#endif\n#if NUM_SPOT_LIGHTS > 0\n	struct SpotLight {\n	  vec3 position;\n	  vec3 direction;\n	  vec3 color;\n	  float distance;\n	  float decay;\n	  float angleCos;\n	  float exponent;\n	  int shadow;\n	};\n	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];\n	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		vec3 lVector = spotLight.position - geometry.position;\n		directLight.direction = normalize( lVector );\n		float spotEffect = dot( directLight.direction, spotLight.direction );\n		if ( spotEffect > spotLight.angleCos ) {\n			float spotEffect = dot( spotLight.direction, directLight.direction );\n			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );\n			directLight.color = spotLight.color;\n			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );\n		} else {\n			directLight.color = vec3( 0.0 );\n		}\n		return directLight;\n	}\n#endif\n#if NUM_HEMI_LIGHTS > 0\n	struct HemisphereLight {\n	  vec3 direction;\n	  vec3 skyColor;\n	  vec3 groundColor;\n	};\n	uniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];\n	vec3 getHemisphereLightIrradiance( const in HemisphereLight hemiLight, const in GeometricContext geometry ) {\n		float dotNL = dot( geometry.normal, hemiLight.direction );\n		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;\n		return PI * mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );\n	}\n#endif\n#if defined( USE_ENVMAP ) && defined( STANDARD )\n	vec3 getLightProbeIndirectIrradiance( const in GeometricContext geometry, const in int maxMIPLevel ) {\n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );\n		#ifdef ENVMAP_TYPE_CUBE\n			vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = textureCubeLodEXT( envMap, queryVec, float( maxMIPLevel ) );\n			#else\n				vec4 envMapColor = textureCube( envMap, queryVec, float( maxMIPLevel ) );\n			#endif\n		#else\n			vec3 envMapColor = vec3( 0.0 );\n		#endif\n		envMapColor.rgb = inputToLinear( envMapColor.rgb );\n		return PI * envMapColor.rgb * envMapIntensity;\n	}\n	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {\n		float maxMIPLevelScalar = float( maxMIPLevel );\n		float desiredMIPLevel = maxMIPLevelScalar - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );\n		return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );\n	}\n	vec3 getLightProbeIndirectRadiance( const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) {\n		#ifdef ENVMAP_MODE_REFLECTION\n			vec3 reflectVec = reflect( -geometry.viewDir, geometry.normal );\n		#else\n			vec3 reflectVec = refract( -geometry.viewDir, geometry.normal, refractionRatio );\n		#endif\n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		reflectVec = inverseTransformDirection( reflectVec, viewMatrix );\n		float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );\n		#ifdef ENVMAP_TYPE_CUBE\n			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );\n			#else\n				vec4 envMapColor = textureCube( envMap, queryReflectVec, specularMIPLevel );\n			#endif\n		#elif defined( ENVMAP_TYPE_EQUIREC )\n			vec2 sampleUV;\n			sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n			sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = texture2DLodEXT( envMap, sampleUV, specularMIPLevel );\n			#else\n				vec4 envMapColor = texture2D( envMap, sampleUV, specularMIPLevel );\n			#endif\n		#elif defined( ENVMAP_TYPE_SPHERE )\n			vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = texture2DLodEXT( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );\n			#else\n				vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );\n			#endif\n		#endif\n		envMapColor.rgb = inputToLinear( envMapColor.rgb );\n		return envMapColor.rgb * envMapIntensity;\n	}\n#endif\n";
+THREE.ShaderChunk[ 'lightmap_fragment' ] = "#ifdef USE_LIGHTMAP\n	reflectedLight.indirectDiffuse += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/lightmap_pars_fragment.glsl
 
@@ -23406,6 +23435,10 @@ THREE.ShaderChunk[ 'lightmap_pars_fragment' ] = "#ifdef USE_LIGHTMAP\n	uniform s
 // File:src/renderers/shaders/ShaderChunk/lights_lambert_vertex.glsl
 
 THREE.ShaderChunk[ 'lights_lambert_vertex' ] = "vec3 diffuse = vec3( 1.0 );\nGeometricContext geometry;\ngeometry.position = mvPosition.xyz;\ngeometry.normal = normalize( transformedNormal );\ngeometry.viewDir = normalize( -mvPosition.xyz );\nGeometricContext backGeometry;\nbackGeometry.position = geometry.position;\nbackGeometry.normal = -geometry.normal;\nbackGeometry.viewDir = geometry.viewDir;\nvLightFront = vec3( 0.0 );\n#ifdef DOUBLE_SIDED\n	vLightBack = vec3( 0.0 );\n#endif\n#if NUM_POINT_LIGHTS > 0\n	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );\n		float dotNL = dot( geometry.normal, directLight.direction );\n		vec3 directLightColor_Diffuse = PI * directLight.color;\n		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n		#ifdef DOUBLE_SIDED\n			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n		#endif\n	}\n#endif\n#if NUM_SPOT_LIGHTS > 0\n	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );\n		float dotNL = dot( geometry.normal, directLight.direction );\n		vec3 directLightColor_Diffuse = PI * directLight.color;\n		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n		#ifdef DOUBLE_SIDED\n			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n		#endif\n	}\n#endif\n#if NUM_DIR_LIGHTS > 0\n	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );\n		float dotNL = dot( geometry.normal, directLight.direction );\n		vec3 directLightColor_Diffuse = PI * directLight.color;\n		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n		#ifdef DOUBLE_SIDED\n			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n		#endif\n	}\n#endif\n	{\n		#if NUM_HEMI_LIGHTS > 0\n			for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n				vLightFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );\n				#ifdef DOUBLE_SIDED\n					vLightBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );\n				#endif\n			}\n		#endif\n	}\n";
+
+// File:src/renderers/shaders/ShaderChunk/lights_pars.glsl
+
+THREE.ShaderChunk[ 'lights_pars' ] = "#if NUM_DIR_LIGHTS > 0\n	struct DirectionalLight {\n	  vec3 direction;\n	  vec3 color;\n	  int shadow;\n	};\n	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\n	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		directLight.color = directionalLight.color;\n		directLight.direction = directionalLight.direction;\n		return directLight;\n	}\n#endif\n#if NUM_POINT_LIGHTS > 0\n	struct PointLight {\n	  vec3 position;\n	  vec3 color;\n	  float distance;\n	  float decay;\n	  int shadow;\n	};\n	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];\n	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		vec3 lVector = pointLight.position - geometry.position;\n		directLight.direction = normalize( lVector );\n		directLight.color = pointLight.color;\n		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay );\n		return directLight;\n	}\n#endif\n#if NUM_SPOT_LIGHTS > 0\n	struct SpotLight {\n	  vec3 position;\n	  vec3 direction;\n	  vec3 color;\n	  float distance;\n	  float decay;\n	  float angleCos;\n	  float exponent;\n	  int shadow;\n	};\n	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];\n	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		vec3 lVector = spotLight.position - geometry.position;\n		directLight.direction = normalize( lVector );\n		float spotEffect = dot( directLight.direction, spotLight.direction );\n		if ( spotEffect > spotLight.angleCos ) {\n			float spotEffect = dot( spotLight.direction, directLight.direction );\n			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );\n			directLight.color = spotLight.color;\n			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );\n		} else {\n			directLight.color = vec3( 0.0 );\n		}\n		return directLight;\n	}\n#endif\n#if NUM_HEMI_LIGHTS > 0\n	struct HemisphereLight {\n	  vec3 direction;\n	  vec3 skyColor;\n	  vec3 groundColor;\n	};\n	uniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];\n	vec3 getHemisphereLightIrradiance( const in HemisphereLight hemiLight, const in GeometricContext geometry ) {\n		float dotNL = dot( geometry.normal, hemiLight.direction );\n		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;\n		return PI * mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );\n	}\n#endif\n#if defined( USE_ENVMAP ) && defined( STANDARD )\n	vec3 getLightProbeIndirectIrradiance( const in GeometricContext geometry, const in int maxMIPLevel ) {\n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );\n		#ifdef ENVMAP_TYPE_CUBE\n			vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = textureCubeLodEXT( envMap, queryVec, float( maxMIPLevel ) );\n			#else\n				vec4 envMapColor = textureCube( envMap, queryVec, float( maxMIPLevel ) );\n			#endif\n		#else\n			vec3 envMapColor = vec3( 0.0 );\n		#endif\n		envMapColor.rgb = inputToLinear( envMapColor.rgb );\n		return PI * envMapColor.rgb * envMapIntensity;\n	}\n	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {\n		float maxMIPLevelScalar = float( maxMIPLevel );\n		float desiredMIPLevel = maxMIPLevelScalar - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );\n		return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );\n	}\n	vec3 getLightProbeIndirectRadiance( const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) {\n		#ifdef ENVMAP_MODE_REFLECTION\n			vec3 reflectVec = reflect( -geometry.viewDir, geometry.normal );\n		#else\n			vec3 reflectVec = refract( -geometry.viewDir, geometry.normal, refractionRatio );\n		#endif\n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		reflectVec = inverseTransformDirection( reflectVec, viewMatrix );\n		float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );\n		#ifdef ENVMAP_TYPE_CUBE\n			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );\n			#else\n				vec4 envMapColor = textureCube( envMap, queryReflectVec, specularMIPLevel );\n			#endif\n		#elif defined( ENVMAP_TYPE_EQUIREC )\n			vec2 sampleUV;\n			sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n			sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = texture2DLodEXT( envMap, sampleUV, specularMIPLevel );\n			#else\n				vec4 envMapColor = texture2D( envMap, sampleUV, specularMIPLevel );\n			#endif\n		#elif defined( ENVMAP_TYPE_SPHERE )\n			vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = texture2DLodEXT( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );\n			#else\n				vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );\n			#endif\n		#endif\n		envMapColor.rgb = inputToLinear( envMapColor.rgb );\n		return envMapColor.rgb * envMapIntensity;\n	}\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_fragment.glsl
 
@@ -23692,6 +23725,7 @@ THREE.UniformsLib = {
 	emissivemap: {
 
 		"emissiveMap" : { type: "t", value: null },
+		"emissiveMapIntensity" : { type: "f", value: 1 },
 
 	},
 
@@ -24024,6 +24058,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
 			THREE.ShaderChunk[ "emissivemap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
+			THREE.ShaderChunk[ "bsdfs" ],
 			THREE.ShaderChunk[ "ambient_pars" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
@@ -24032,9 +24067,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	vec3 totalAmbientLight = getAmbientLightIrradiance( ambientLightColor );",
+			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
 			"	vec3 totalEmissiveLight = emissive;",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
@@ -24046,32 +24080,29 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "emissivemap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
-				// former lightmap_fragment.glsl
-			"	#ifdef USE_LIGHTMAP",
+				// accumulation
+			"	reflectedLight.indirectDiffuse = getAmbientLightIrradiance( ambientLightColor );",
 
-			"		totalAmbientLight += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;", // factor of PI should not be present; included here to prevent breakage
+				THREE.ShaderChunk[ "lightmap_fragment" ],
 
-			"	#endif",
-
-				// former aomap_fragment.glsl
-			"	#ifdef USE_AOMAP",
-
-			"		totalAmbientLight *= ( texture2D( aoMap, vUv2 ).r - 1.0 ) * aoMapIntensity + 1.0;",
-
-			"	#endif",
+			"	reflectedLight.indirectDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb );",
 
 			"	#ifdef DOUBLE_SIDED",
 
-			"		if ( gl_FrontFacing )",
-			"			outgoingLight += RECIPROCAL_PI * diffuseColor.rgb * ( vLightFront * shadowMask + totalAmbientLight ) + totalEmissiveLight;",
-			"		else",
-			"			outgoingLight += RECIPROCAL_PI * diffuseColor.rgb * ( vLightBack * shadowMask + totalAmbientLight ) + totalEmissiveLight;",
+			"		reflectedLight.directDiffuse = ( gl_FrontFacing ) ? vLightFront : vLightBack;",
 
 			"	#else",
 
-			"		outgoingLight += RECIPROCAL_PI * diffuseColor.rgb * ( vLightFront * shadowMask + totalAmbientLight ) + totalEmissiveLight;",
+			"		reflectedLight.directDiffuse = vLightFront;",
 
 			"	#endif",
+
+			"	reflectedLight.directDiffuse *= ( BRDF_Diffuse_Lambert( diffuseColor.rgb ) * shadowMask );",
+
+				// modulation
+				THREE.ShaderChunk[ "aomap_fragment" ],
+
+			"	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveLight;",
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
 
@@ -24947,11 +24978,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
-	_width = _canvas.width,
-	_height = _canvas.height,
-
-	pixelRatio = 1,
-
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 	_depth = parameters.depth !== undefined ? parameters.depth : true,
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
@@ -24960,7 +24986,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 
 	_clearColor = new THREE.Color( 0x000000 ),
-	_clearAlpha = 0;
+	_clearAlpha = 0,
+
+	_pixelRatio = 1;
 
 	var lights = [];
 
@@ -25012,13 +25040,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// internal state cache
 
-	_currentViewport = null,
 	_currentProgram = null,
 	_currentRenderTarget = null,
 	_currentFramebuffer = null,
 	_currentMaterialId = - 1,
 	_currentGeometryProgram = '',
 	_currentCamera = null,
+
+	_currentScissor = new THREE.Vector4(),
+	_currentScissorTest = null,
+
+	_currentViewport = new THREE.Vector4(),
+
+	//
 
 	_usedTextureUnits = 0,
 
@@ -25152,7 +25186,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function getTargetPixelRatio() {
 
-		return _currentRenderTarget === null ? pixelRatio : 1;
+		return _currentRenderTarget === null ? _pixelRatio : 1;
 
 	}
 
@@ -25172,8 +25206,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.init();
 
-		state.scissor( _scissor );
-		state.viewport( _viewport );
+		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
+		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
 		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
@@ -25265,32 +25299,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.getPixelRatio = function () {
 
-		return pixelRatio;
+		return _pixelRatio;
 
 	};
 
 	this.setPixelRatio = function ( value ) {
 
-		if ( value !== undefined ) pixelRatio = value;
+		if ( value === undefined ) return;
+
+		_pixelRatio = value;
+
+		this.setSize( _viewport.z, _viewport.w, false );
 
 	};
 
 	this.getSize = function () {
 
 		return {
-			width: _width,
-			height: _height
+			width: _canvas.width / _pixelRatio,
+			height: _canvas.height / _pixelRatio
 		};
 
 	};
 
 	this.setSize = function ( width, height, updateStyle ) {
 
-		_width = width;
-		_height = height;
-
-		_canvas.width = width * pixelRatio;
-		_canvas.height = height * pixelRatio;
+		_canvas.width = width * _pixelRatio;
+		_canvas.height = height * _pixelRatio;
 
 		if ( updateStyle !== false ) {
 
@@ -25305,25 +25340,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		_viewport.set( x, y, width, height ).multiplyScalar( pixelRatio );
-
-		state.viewport( _viewport );
+		_viewport.set( x, y, width, height );
 
 	};
 
 	this.setScissor = function ( x, y, width, height ) {
 
-		_scissor.set( x, y, width, height ).multiplyScalar( pixelRatio );
-
-		state.scissor( _scissor );
+		_scissor.set( x, y, width, height );
 
 	};
 
 	this.setScissorTest = function ( boolean ) {
 
 		_scissorTest = boolean;
-
-		state.setScissorTest( boolean );
 
 	};
 
@@ -26124,10 +26153,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// Ensure depth buffer writing is enabled so it can be cleared on next render
+		// Ensure buffer writing is enabled so they can be cleared on next render
 
 		state.setDepthTest( true );
 		state.setDepthWrite( true );
+		state.setStencilTest( true );
+		state.setStencilWrite( true );
 		state.setColorWrite( true );
 
 		// _gl.finish();
@@ -26490,6 +26521,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		state.setDepthFunc( material.depthFunc );
 		state.setDepthTest( material.depthTest );
 		state.setDepthWrite( material.depthWrite );
+		state.setStencilTest( material.stencilTest );
+		state.setStencilWrite( material.stencilWrite );
 		state.setColorWrite( material.colorWrite );
 		state.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
@@ -26958,6 +26991,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.emissiveMap ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
+			uniforms.emissiveMapIntensity.value = material.emissiveMapIntensity;
 
 		}
 
@@ -26978,6 +27012,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.emissiveMap ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
+			uniforms.emissiveMapIntensity.value = material.emissiveMapIntensity;
 
 		}
 
@@ -27032,6 +27067,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.emissiveMap ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
+			uniforms.emissiveMapIntensity.value = material.emissiveMapIntensity;
 
 		}
 
@@ -28321,7 +28357,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
-		var framebuffer, scissor, scissorTest, viewport;
+		var framebuffer;
 
 		if ( renderTarget ) {
 
@@ -28337,19 +28373,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			scissor = renderTarget.scissor;
-			scissorTest = renderTarget.scissorTest;
+			_currentScissor.copy( renderTarget.scissor );
+			_currentScissorTest = renderTarget.scissorTest;
 
-			viewport = renderTarget.viewport;
+			_currentViewport.copy( renderTarget.viewport );
 
 		} else {
 
 			framebuffer = null;
 
-			scissor = _scissor;
-			scissorTest = _scissorTest;
+			_currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio );
+			_currentScissorTest = _scissorTest;
 
-			viewport = _viewport;
+			_currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio );
 
 		}
 
@@ -28361,10 +28397,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		state.scissor( scissor );
-		state.setScissorTest( scissorTest );
+		state.scissor( _currentScissor );
+		state.setScissorTest( _currentScissorTest );
 
-		state.viewport( viewport );
+		state.viewport( _currentViewport );
 
 		if ( isCube ) {
 
@@ -28372,8 +28408,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, textureProperties.__webglTexture, 0 );
 
 		}
-
-		_currentViewport = viewport;
 
 	};
 
@@ -31316,6 +31350,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 		currentBlending = null;
 
 		currentDepthWrite = null;
+		currentStencilWrite = null;
 		currentColorWrite = null;
 
 		currentFlipSided = null;
@@ -35605,7 +35640,7 @@ THREE.CatmullRomCurve3 = ( function() {
 			} else {
 
 				// extrapolate last point
-				tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 2 ] );
+				tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 1 ] );
 				p3 = tmp;
 
 			}
