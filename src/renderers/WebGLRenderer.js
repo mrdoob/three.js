@@ -352,8 +352,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.getSize = function () {
 
 		return {
-			width: _viewport.z,
-			height: _viewport.w
+			width: _canvas.width / _pixelRatio,
+			height: _canvas.height / _pixelRatio
 		};
 
 	};
