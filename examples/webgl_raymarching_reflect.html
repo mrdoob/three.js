@@ -301,9 +301,8 @@
 				window.addEventListener( 'resize', onWindowResize );
 				document.body.appendChild( canvas );
 
-				controls = new THREE.FlyControls( camera );
+				controls = new THREE.FlyControls( camera, canvas );
 
-				controls.domElement = canvas;
 				controls.autoForward = true;
 				controls.dragToLook = false;
 				controls.rollSpeed = Math.PI / 12;
