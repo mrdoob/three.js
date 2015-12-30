@@ -7,16 +7,10 @@
 
 THREE.StereoEffect = function ( renderer ) {
 
-	var _width, _height;
-
-	// initialization
-
-	renderer.autoClear = false;
+	var _stereo = new THREE.StereoCamera();
+	_stereo.aspect = 0.5;
 
 	this.setSize = function ( width, height ) {
-
-		_width = width / 2;
-		_height = height;
 
 		renderer.setSize( width, height );
 
@@ -24,27 +18,24 @@ THREE.StereoEffect = function ( renderer ) {
 
 	this.render = function ( scene, camera ) {
 
-		if ( camera instanceof THREE.StereoCamera === false ) {
-
-			console.error( 'THREE.StereoCamera.render(): camera should now be an insteance of THREE.StereoCamera.' );
-			return;
-
-		}
-
 		scene.updateMatrixWorld();
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		renderer.clear();
+		_stereo.update( camera );
+
+		var size = renderer.getSize();
+
 		renderer.setScissorTest( true );
+		renderer.clear();
 
-		renderer.setScissor( 0, 0, _width, _height );
-		renderer.setViewport( 0, 0, _width, _height );
-		renderer.render( scene, camera.cameraL );
+		renderer.setScissor( 0, 0, size.width / 2, size.height );
+		renderer.setViewport( 0, 0, size.width / 2, size.height );
+		renderer.render( scene, _stereo.cameraL );
 
-		renderer.setScissor( _width, 0, _width, _height );
-		renderer.setViewport( _width, 0, _width, _height );
-		renderer.render( scene, camera.cameraR );
+		renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
+		renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
+		renderer.render( scene, _stereo.cameraR );
 
 		renderer.setScissorTest( false );
 

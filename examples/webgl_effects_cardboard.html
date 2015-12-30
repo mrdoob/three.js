@@ -25,7 +25,7 @@
 
 			function init() {
 
-				camera = new THREE.StereoCamera( 50, window.innerWidth / window.innerHeight / 2, 1, 100 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.set( 3, 2, 3 );
 				camera.lookAt( new THREE.Vector3() );
 				camera.focalLength = camera.position.distanceTo( new THREE.Vector3() );
@@ -80,7 +80,7 @@
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight / 2;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				effect.setSize( window.innerWidth, window.innerHeight );

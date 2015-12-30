@@ -10,6 +10,8 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 	var _scene = new THREE.Scene();
 
+	var _stereo = new THREE.StereoCamera();
+
 	var _params = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
 
 	var _renderTargetL = new THREE.WebGLRenderTarget( 512, 512, _params );
@@ -77,19 +79,14 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 	this.render = function ( scene, camera ) {
 
-		if ( camera instanceof THREE.StereoCamera === false ) {
-
-			console.error( 'THREE.StereoCamera.render(): camera should now be an insteance of THREE.StereoCamera.' );
-			return;
-
-		}
-
 		scene.updateMatrixWorld();
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		renderer.render( scene, camera.cameraL, _renderTargetL, true );
-		renderer.render( scene, camera.cameraR, _renderTargetR, true );
+		_stereo.update( camera );
+
+		renderer.render( scene, _stereo.cameraL, _renderTargetL, true );
+		renderer.render( scene, _stereo.cameraR, _renderTargetR, true );
 		renderer.render( _scene, _camera );
 
 	};

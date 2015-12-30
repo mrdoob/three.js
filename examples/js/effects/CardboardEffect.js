@@ -8,6 +8,9 @@ THREE.CardboardEffect = function ( renderer ) {
 
 	var _scene = new THREE.Scene();
 
+	var _stereo = new THREE.StereoCamera();
+	_stereo.aspect = 0.5;
+
 	var _params = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
 
 	var _renderTarget = new THREE.WebGLRenderTarget( 512, 512, _params );
@@ -102,27 +105,22 @@ THREE.CardboardEffect = function ( renderer ) {
 
 	this.render = function ( scene, camera ) {
 
-		if ( camera instanceof THREE.StereoCamera === false ) {
-
-			console.error( 'THREE.StereoCamera.render(): camera should now be an insteance of THREE.StereoCamera.' );
-			return;
-
-		}
-
 		scene.updateMatrixWorld();
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
+
+		_stereo.update( camera );
 
 		var width = _renderTarget.width / 2;
 		var height = _renderTarget.height;
 
 		_renderTarget.scissor.set( 0, 0, width, height );
 		_renderTarget.viewport.set( 0, 0, width, height );
-		renderer.render( scene, camera.cameraL, _renderTarget );
+		renderer.render( scene, _stereo.cameraL, _renderTarget );
 
 		_renderTarget.scissor.set( width, 0, width, height );
 		_renderTarget.viewport.set( width, 0, width, height );
-		renderer.render( scene, camera.cameraR, _renderTarget );
+		renderer.render( scene, _stereo.cameraR, _renderTarget );
 
 		renderer.render( _scene, _camera );
 
