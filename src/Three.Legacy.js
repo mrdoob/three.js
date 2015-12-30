@@ -792,7 +792,4 @@ THREE.CanvasRenderer = function () {
 
 //
 
-THREE.Curve.Utils = THREE.CurveUtils;
-THREE.CubeGeometry = THREE.BoxGeometry;
 THREE.MeshFaceMaterial = THREE.MultiMaterial;
-THREE.Shape.Utils = THREE.ShapeUtils;
