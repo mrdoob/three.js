@@ -2,12 +2,13 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.TimerNode = function( value ) {
+THREE.TimerNode = function( value, scale ) {
 
 	THREE.FloatNode.call( this, value );
 
 	this.requestUpdate = true;
-	this.scale = 1;
+
+	this.scale = scale !== undefined ? scale : 1;
 
 };
 
