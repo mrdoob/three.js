@@ -8,8 +8,6 @@ THREE.StereoCamera = function ( fov, aspect, near, far ) {
 
 	this.type = 'StereoCamera';
 
-	this.focalLength = 125;
-
 	this.cameraL = new THREE.PerspectiveCamera();
 	this.cameraL.layers.enable( 1 );
 	this.cameraL.matrixAutoUpdate = false;
