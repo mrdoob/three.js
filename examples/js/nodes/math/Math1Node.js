@@ -18,7 +18,8 @@ THREE.Math1Node.EXP = 'exp';
 THREE.Math1Node.EXP2 = 'exp2';
 THREE.Math1Node.LOG = 'log';
 THREE.Math1Node.LOG2 = 'log2';
-THREE.Math1Node.INVERSE_SQRT = 'inversesqrt';
+THREE.Math1Node.SQRT = 'sqrt';
+THREE.Math1Node.INV_SQRT = 'inversesqrt';
 THREE.Math1Node.FLOOR = 'floor';
 THREE.Math1Node.CEIL = 'ceil';
 THREE.Math1Node.NORMALIZE = 'normalize';
@@ -42,7 +43,7 @@ THREE.Math1Node.prototype.constructor = THREE.Math1Node;
 THREE.Math1Node.prototype.getType = function( builder ) {
 
 	switch ( this.method ) {
-		case THREE.Math1Node.DISTANCE:
+		case THREE.Math1Node.LENGTH:
 			return 'fv1';
 	}
 

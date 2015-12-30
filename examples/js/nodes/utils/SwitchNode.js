@@ -4,7 +4,7 @@
 
 THREE.SwitchNode = function( node, components ) {
 
-	THREE.GLNode.call( this, 'fv1' );
+	THREE.GLNode.call( this );
 
 	this.node = node;
 	this.components = components || 'x';
@@ -24,45 +24,49 @@ THREE.SwitchNode.prototype.generate = function( builder, output ) {
 
 	var type = this.node.getType( builder );
 	var inputLength = builder.getFormatLength( type ) - 1;
-	var components = builder.colorToVector( this.components );
 
 	var node = this.node.build( builder, type );
 
-	var outputLength = 0;
+	if ( inputLength > 0 ) {
 
-	var i, len = components.length;
+		// get max length
 
-	// get max length
+		var outputLength = 0;
+		var components = builder.colorToVector( this.components );
 
-	for ( i = 0; i < len; i ++ ) {
+		var i, len = components.length;
 
-		outputLength = Math.max( outputLength, builder.getIndexByElement( components.charAt( i ) ) );
+		for ( i = 0; i < len; i ++ ) {
 
-	}
-
-	if ( outputLength > inputLength ) outputLength = inputLength;
-
-	// build switch
-
-	node += '.';
-
-	for ( i = 0; i < len; i ++ ) {
-
-		var elm = components.charAt( i );
-		var idx = builder.getIndexByElement( components.charAt( i ) );
-
-		if ( idx > outputLength ) idx = outputLength;
-
-		if ( builder.getElementByIndex( idx ) == undefined ) {
-
-			console.log( builder.getElementByIndex( idx ) );
+			outputLength = Math.max( outputLength, builder.getIndexByElement( components.charAt( i ) ) );
 
 		}
 
-		node += builder.getElementByIndex( idx );
+		if ( outputLength > inputLength ) outputLength = inputLength;
+
+		// split
+
+		node += '.';
+
+		for ( i = 0; i < len; i ++ ) {
+
+			var elm = components.charAt( i );
+			var idx = builder.getIndexByElement( components.charAt( i ) );
+
+			if ( idx > outputLength ) idx = outputLength;
+
+			node += builder.getElementByIndex( idx );
+
+		}
+
+		return builder.format( node, this.getType( builder ), output );
+
+	} else {
+
+		// join
+
+		return builder.format( node, type, output )
 
 	}
-
-	return builder.format( node, this.getType( builder ), output );
 
 };
