@@ -16934,6 +16934,7 @@ THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 
 	this.type = 'PerspectiveCamera';
 
+	this.focalLength = 100;
 	this.zoom = 1;
 
 	this.fov = fov !== undefined ? fov : 50;
@@ -17050,12 +17051,13 @@ THREE.PerspectiveCamera.prototype.copy = function ( source ) {
 
 	THREE.Camera.prototype.copy.call( this, source );
 
+	this.focalLength = source.focalLength;
+	this.zoom = source.zoom;
+
 	this.fov = source.fov;
 	this.aspect = source.aspect;
 	this.near = source.near;
 	this.far = source.far;
-
-	this.zoom = source.zoom;
 
 	return this;
 
@@ -17065,7 +17067,9 @@ THREE.PerspectiveCamera.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
+	data.object.focalLength = this.focalLength;
 	data.object.zoom = this.zoom;
+
 	data.object.fov = this.fov;
 	data.object.aspect = this.aspect;
 	data.object.near = this.near;
@@ -17081,13 +17085,11 @@ THREE.PerspectiveCamera.prototype.toJSON = function ( meta ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.StereoCamera = function ( fov, aspect, near, far ) {
-
-	THREE.PerspectiveCamera.call( this, fov, aspect, near, far );
+THREE.StereoCamera = function () {
 
 	this.type = 'StereoCamera';
 
-	this.focalLength = 125;
+	this.aspect = 1;
 
 	this.cameraL = new THREE.PerspectiveCamera();
 	this.cameraL.layers.enable( 1 );
@@ -17099,74 +17101,75 @@ THREE.StereoCamera = function ( fov, aspect, near, far ) {
 
 };
 
-THREE.StereoCamera.prototype = Object.create( THREE.PerspectiveCamera.prototype );
-THREE.StereoCamera.prototype.constructor = THREE.StereoCamera;
+THREE.StereoCamera.prototype = {
 
-THREE.StereoCamera.prototype.updateMatrixWorld = ( function () {
+	constructor: THREE.StereoCamera,
 
-	var focalLength, fov, aspect, near, far;
+	update: ( function () {
 
-	var eyeRight = new THREE.Matrix4();
-	var eyeLeft = new THREE.Matrix4();
+		var focalLength, fov, aspect, near, far;
 
-	return function updateMatrixWorld ( force ) {
+		var eyeRight = new THREE.Matrix4();
+		var eyeLeft = new THREE.Matrix4();
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+		return function update ( camera ) {
 
-		var needsUpdate = focalLength !== this.focalLength || fov !== this.fov ||
-											aspect !== this.aspect || near !== this.near ||
-											far !== this.far;
+			var needsUpdate = focalLength !== camera.focalLength || fov !== camera.fov ||
+												aspect !== camera.aspect * this.aspect || near !== camera.near ||
+												far !== camera.far;
 
-		if ( needsUpdate ) {
+			if ( needsUpdate ) {
 
-			focalLength = this.focalLength;
-			fov = this.fov;
-			aspect = this.aspect;
-			near = this.near;
-			far = this.far;
+				focalLength = camera.focalLength;
+				fov = camera.fov;
+				aspect = camera.aspect * this.aspect;
+				near = camera.near;
+				far = camera.far;
 
-			// Off-axis stereoscopic effect based on
-			// http://paulbourke.net/stereographics/stereorender/
+				// Off-axis stereoscopic effect based on
+				// http://paulbourke.net/stereographics/stereorender/
 
-			var projectionMatrix = this.projectionMatrix.clone();
-			var eyeSep = focalLength / 30 * 0.5;
-			var eyeSepOnProjection = eyeSep * near / focalLength;
-			var ymax = near * Math.tan( THREE.Math.degToRad( fov * 0.5 ) );
-			var xmin, xmax;
+				var projectionMatrix = camera.projectionMatrix.clone();
+				var eyeSep = focalLength / 30 * 0.5;
+				var eyeSepOnProjection = eyeSep * near / focalLength;
+				var ymax = near * Math.tan( THREE.Math.degToRad( fov * 0.5 ) );
+				var xmin, xmax;
 
-			// translate xOffset
+				// translate xOffset
 
-			eyeLeft.elements[ 12 ] = - eyeSep;
-			eyeRight.elements[ 12 ] = eyeSep;
+				eyeLeft.elements[ 12 ] = - eyeSep;
+				eyeRight.elements[ 12 ] = eyeSep;
 
-			// for left eye
+				// for left eye
 
-			xmin = - ymax * aspect + eyeSepOnProjection;
-			xmax = ymax * aspect + eyeSepOnProjection;
+				xmin = - ymax * aspect + eyeSepOnProjection;
+				xmax = ymax * aspect + eyeSepOnProjection;
 
-			projectionMatrix.elements[ 0 ] = 2 * near / ( xmax - xmin );
-			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
+				projectionMatrix.elements[ 0 ] = 2 * near / ( xmax - xmin );
+				projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
-			this.cameraL.projectionMatrix.copy( projectionMatrix );
+				this.cameraL.projectionMatrix.copy( projectionMatrix );
 
-			// for right eye
+				// for right eye
 
-			xmin = - ymax * aspect - eyeSepOnProjection;
-			xmax = ymax * aspect - eyeSepOnProjection;
+				xmin = - ymax * aspect - eyeSepOnProjection;
+				xmax = ymax * aspect - eyeSepOnProjection;
 
-			projectionMatrix.elements[ 0 ] = 2 * near / ( xmax - xmin );
-			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
+				projectionMatrix.elements[ 0 ] = 2 * near / ( xmax - xmin );
+				projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
-			this.cameraR.projectionMatrix.copy( projectionMatrix );
+				this.cameraR.projectionMatrix.copy( projectionMatrix );
 
-		}
+			}
 
-		this.cameraL.matrixWorld.copy( this.matrixWorld ).multiply( eyeLeft );
-		this.cameraR.matrixWorld.copy( this.matrixWorld ).multiply( eyeRight );
+			this.cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( eyeLeft );
+			this.cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( eyeRight );
 
-	};
+		};
 
-} )();
+	} )()
+
+};
 
 // File:src/lights/Light.js
 
