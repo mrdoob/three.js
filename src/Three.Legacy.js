@@ -377,6 +377,13 @@ Object.defineProperties( THREE.BufferGeometry.prototype, {
 	}
 } );
 
+THREE.TextGeometry = function () {
+
+	console.error( 'THREE.TextGeometry has been moved to /examples/js/geometries/TextGeometry.js' );
+	console.error( 'THREE.FontUtils has been moved to /examples/js/utils/FontUtils.js' );
+
+};
+
 //
 
 Object.defineProperties( THREE.Material.prototype, {
@@ -729,13 +736,13 @@ THREE.ImageUtils = {
 
 	loadCompressedTexture: function () {
 
-		console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' )
+		console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' );
 
 	},
 
 	loadCompressedTextureCube: function () {
 
-		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' )
+		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' );
 
 	}
 
@@ -785,13 +792,7 @@ THREE.CanvasRenderer = function () {
 
 //
 
-THREE.TextGeometry = function () {
-
-	console.error( 'THREE.TextGeometry has been moved to /examples/js/geometries/TextGeometry.js' );
-	console.error( 'THREE.FontUtils has been moved to /examples/js/utils/FontUtils.js' );
-
-};
-
-//
-
+THREE.Curve.Utils = THREE.CurveUtils;
+THREE.CubeGeometry = THREE.BoxGeometry;
 THREE.MeshFaceMaterial = THREE.MultiMaterial;
+THREE.Shape.Utils = THREE.ShapeUtils;
