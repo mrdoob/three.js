@@ -55,6 +55,7 @@
 		<script src="js/nodes/accessors/PositionNode.js"></script>
 		<script src="js/nodes/accessors/NormalNode.js"></script>
 		<script src="js/nodes/accessors/UVNode.js"></script>
+		<script src="js/nodes/accessors/ScreenUVNode.js"></script>
 		<script src="js/nodes/accessors/ColorsNode.js"></script>
 		<script src="js/nodes/accessors/CameraNode.js"></script>
 		<script src="js/nodes/accessors/ReflectNode.js"></script>
@@ -85,6 +86,7 @@
 		<script src="js/nodes/utils/LuminanceNode.js"></script>
 		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
 		<script src="js/nodes/utils/NoiseNode.js"></script>
+		<script src="js/nodes/utils/ResolutionNode.js"></script>
 
 		<!-- Phong Material -->
 		<script src="js/nodes/materials/PhongNode.js"></script>
@@ -102,9 +104,10 @@
 		var teapot, mesh;
 		var controls;
 		var move = false;
+		var rtTexture, rtMaterial;
 		var gui, guiElements = [];
 
-		var param = { example: 'standard' };
+		var param = { example: 'sss' };
 
 		var brick = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
 		var grass = new THREE.TextureLoader().load( 'textures/terrain/grasslight-big.jpg' );
@@ -202,6 +205,7 @@
 				'adv / camera-depth': 'camera-depth',
 				'adv / soft-body': 'soft-body',
 				'adv / wave': 'wave',
+				'adv / sss' : 'sss',
 				'misc / smoke' : 'smoke',
 				'misc / firefly' : 'firefly'
 			} ).onFinishChange( function() {
@@ -1439,7 +1443,7 @@
 
 						wrapShadow.number = val;
 
-					}, false, -1, 0 );
+					}, false, - 1, 0 );
 
 					break;
 
@@ -1605,6 +1609,117 @@
 					}, false, 0, 3 );
 
 					break;
+
+				case 'sss':
+
+					// DISTANCE FORMULA
+
+					var modelPos = new THREE.Vector3Node();
+
+					var viewPos = new THREE.PositionNode( THREE.PositionNode.VIEW );
+					var cameraPosition = new THREE.CameraNode( THREE.CameraNode.POSITION );
+
+					var cameraDistance = new THREE.Math2Node(
+						modelPos,
+						cameraPosition,
+						THREE.Math2Node.DISTANCE
+					);
+
+					var viewPosZ = new THREE.SwitchNode( viewPos, 'z' );
+
+					var distance = new THREE.OperatorNode(
+						cameraDistance,
+						viewPosZ,
+						THREE.OperatorNode.SUB
+					);
+
+					var distanceRadius = new THREE.OperatorNode(
+						distance,
+						new THREE.FloatNode( 70 ),
+						THREE.OperatorNode.ADD
+					);
+
+					var objectDepth = new THREE.Math3Node(
+						distanceRadius,
+						new THREE.FloatNode( 0 ),
+						new THREE.FloatNode( 50 ),
+						THREE.Math3Node.SMOOTHSTEP
+					);
+
+					// RTT ( get back distance )
+
+					rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+
+					var distanceMtl = new THREE.PhongNodeMaterial();
+					distanceMtl.environment = objectDepth;
+					distanceMtl.side = THREE.BackSide;
+					distanceMtl.build();
+
+					rtMaterial = distanceMtl;
+
+					// MATERIAL
+
+					mtl = new THREE.StandardNodeMaterial();
+
+					var backSideDepth = new THREE.TextureNode( rtTexture, new THREE.ScreenUVNode( new THREE.ResolutionNode( renderer ) ) );
+
+					var difference = new THREE.OperatorNode(
+						objectDepth,
+						backSideDepth,
+						THREE.OperatorNode.SUB
+					);
+
+					difference = new THREE.Math3Node(
+						new THREE.FloatNode( - .1 ),
+						new THREE.FloatNode( .5 ),
+						difference,
+						THREE.Math3Node.SMOOTHSTEP
+					);
+
+					var internalColor = new THREE.ColorNode( 0x1a0e14 );
+					var surfaceColor = new THREE.ColorNode( 0xd04327 );
+
+					var color = new THREE.Math3Node(
+						surfaceColor,
+						internalColor,
+						new THREE.Math1Node( difference, THREE.Math1Node.SAT ),
+						THREE.Math3Node.MIX
+					);
+
+					var light = new THREE.OperatorNode(
+						new THREE.LightNode(),
+						color,
+						THREE.OperatorNode.ADD
+					);
+
+					mtl.color = new THREE.ColorNode( 0xffffff );
+					mtl.roughness = new THREE.FloatNode( .1 );
+					mtl.metalness = new THREE.FloatNode( .5 );
+
+					mtl.light = light;
+					mtl.environment = color;
+
+					// GUI
+
+					addGui( 'internalColor', internalColor.value.getHex(), function( val ) {
+
+						internalColor.value.setHex( val );
+
+					}, true );
+
+					addGui( 'surfaceColor', surfaceColor.value.getHex(), function( val ) {
+
+						surfaceColor.value.setHex( val );
+
+					}, true );
+
+					addGui( 'area', difference.b.number, function( val ) {
+
+						difference.b.number = val;
+
+					}, false, 0, 1 );
+
+					break;
 			}
 
 			// build shader
@@ -1646,6 +1761,17 @@
 
 			// update material animation and/or gpu calcs (pre-renderer)
 			mesh.material.updateAnimation( delta );
+
+			// render to texture for SSS material only
+			if ( rtTexture ) {
+
+				scene.overrideMaterial = rtMaterial;
+
+				renderer.render( scene, camera, rtTexture, true );
+
+				scene.overrideMaterial = null;
+
+			}
 
 			renderer.render( scene, camera );
 
