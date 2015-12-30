@@ -38,6 +38,10 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
 	this.version = 0;
+	this.patchVersion = 0;
+
+	this.patchSet = [];
+
 	this.onUpdate = null;
 
 };
@@ -189,7 +193,7 @@ THREE.Texture.prototype = {
 
 	transformUv: function ( uv ) {
 
-		if ( this.mapping !== THREE.UVMapping )  return;
+		if ( this.mapping !== THREE.UVMapping )	 return;
 
 		uv.multiply( this.repeat );
 		uv.add( this.offset );
@@ -261,6 +265,34 @@ THREE.Texture.prototype = {
 			uv.y = 1 - uv.y;
 
 		}
+
+	},
+
+	patchTexture: function ( texture, x, y ) {
+
+		var patchVersion = ++ this.patchVersion;
+		var patch = new THREE.TexturePatch( this, patchVersion, texture, x, y );
+
+		this.patchSet.push( patch );
+
+		return patch;
+
+	},
+
+	getPatchRange: function ( patchVersion ) {
+
+		if ( typeof patchVersion === 'undefined' )
+			patchVersion = 0;
+
+		if ( this.patchVersion === 0 || this.patchVersion <= patchVersion )
+			return [];
+
+		var index = this.patchSet.length;
+
+		while ( index >= 1 && this.patchSet[ index - 1 ].patchVersion > patchVersion )
+			index -= 1;
+
+		return this.patchSet.slice( index );
 
 	}
 
