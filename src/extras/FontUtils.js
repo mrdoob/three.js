@@ -35,7 +35,7 @@ THREE.FontUtils = {
 
 		} catch ( e ) {
 
-			throw "The font " + this.face + " with " + this.weight + " weight and " + this.style + " style is missing."
+			throw "The font " + this.face + " with " + this.weight + " weight and " + this.style + " style is missing.";
 
 		}
 
@@ -269,8 +269,3 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 	return shapes;
 
 };
-
-// To use the typeface.js face files, hook up the API
-
-THREE.typeface_js = { faces: THREE.FontUtils.faces, loadFace: THREE.FontUtils.loadFace };
-if ( typeof self !== 'undefined' ) self._typeface_js = THREE.typeface_js;

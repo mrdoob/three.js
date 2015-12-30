@@ -1,5 +1,6 @@
 [
 	"src/extras/CurveUtils.js",
+	"src/extras/FontUtils.js",
 	"src/extras/SceneUtils.js",
 	"src/extras/ShapeUtils.js",
 	"src/extras/core/Curve.js",
@@ -31,6 +32,7 @@
 	"src/extras/geometries/RingGeometry.js",
 	"src/extras/geometries/SphereGeometry.js",
 	"src/extras/geometries/SphereBufferGeometry.js",
+	"src/extras/geometries/TextGeometry.js",
 	"src/extras/geometries/TorusGeometry.js",
 	"src/extras/geometries/TorusKnotGeometry.js",
 	"src/extras/geometries/TubeGeometry.js",
