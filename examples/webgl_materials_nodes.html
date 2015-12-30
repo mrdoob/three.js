@@ -206,6 +206,7 @@
 				'adv / soft-body': 'soft-body',
 				'adv / wave': 'wave',
 				'adv / sss' : 'sss',
+				'adv / translucent' : 'translucent',
 				'misc / smoke' : 'smoke',
 				'misc / firefly' : 'firefly'
 			} ).onFinishChange( function() {
@@ -261,6 +262,20 @@
 			move = false;
 
 			if ( mesh.material ) mesh.material.dispose();
+
+			if ( rtTexture ) {
+
+				rtTexture.dispose();
+				rtTexture = null;
+
+			}
+
+			if ( rtMaterial ) {
+
+				rtMaterial.dispose();
+				rtMaterial = null;
+
+			}
 
 			var name = param.example;
 			var mtl;
@@ -1611,6 +1626,7 @@
 					break;
 
 				case 'sss':
+				case 'translucent':
 
 					// DISTANCE FORMULA
 
@@ -1669,53 +1685,93 @@
 						THREE.OperatorNode.SUB
 					);
 
-					difference = new THREE.Math3Node(
+					var sss = new THREE.Math3Node(
 						new THREE.FloatNode( - .1 ),
 						new THREE.FloatNode( .5 ),
 						difference,
 						THREE.Math3Node.SMOOTHSTEP
 					);
 
-					var internalColor = new THREE.ColorNode( 0x1a0e14 );
-					var surfaceColor = new THREE.ColorNode( 0xd04327 );
+					var sssAlpha = new THREE.Math1Node( sss, THREE.Math1Node.SAT );
 
-					var color = new THREE.Math3Node(
-						surfaceColor,
-						internalColor,
-						new THREE.Math1Node( difference, THREE.Math1Node.SAT ),
-						THREE.Math3Node.MIX
-					);
+					var frontColor, backColor;
 
-					var light = new THREE.OperatorNode(
-						new THREE.LightNode(),
-						color,
-						THREE.OperatorNode.ADD
-					);
+					if ( name == 'sss' ) {
 
-					mtl.color = new THREE.ColorNode( 0xffffff );
-					mtl.roughness = new THREE.FloatNode( .1 );
-					mtl.metalness = new THREE.FloatNode( .5 );
+						var sssOut = new THREE.Math2Node(
+							objectDepth,
+							sssAlpha,
+							THREE.Math2Node.MIN
+						);
 
-					mtl.light = light;
-					mtl.environment = color;
+						frontColor = new THREE.ColorNode( 0xd4cfbb );
+						backColor = new THREE.ColorNode( 0xd04327 );
+
+						var color = new THREE.Math3Node(
+							backColor,
+							frontColor,
+							sssOut,
+							THREE.Math3Node.MIX
+						);
+
+						var light = new THREE.OperatorNode(
+							new THREE.LightNode(),
+							color,
+							THREE.OperatorNode.ADD
+						);
+
+						mtl.color = frontColor;
+						mtl.roughness = new THREE.FloatNode( .1 );
+						mtl.metalness = new THREE.FloatNode( .5 );
+
+						mtl.light = light;
+						mtl.environment = color;
+
+					}
+					else {
+
+						frontColor = new THREE.ColorNode( 0xd04327 );
+						backColor = new THREE.ColorNode( 0x1a0e14 );
+
+						var color = new THREE.Math3Node(
+							frontColor,
+							backColor,
+							sssAlpha,
+							THREE.Math3Node.MIX
+						);
+
+						var light = new THREE.OperatorNode(
+							new THREE.LightNode(),
+							color,
+							THREE.OperatorNode.ADD
+						);
+
+						mtl.color = new THREE.ColorNode( 0xffffff );
+						mtl.roughness = new THREE.FloatNode( .1 );
+						mtl.metalness = new THREE.FloatNode( .5 );
+
+						mtl.light = light;
+						mtl.environment = color;
+
+					}
 
 					// GUI
 
-					addGui( 'internalColor', internalColor.value.getHex(), function( val ) {
+					addGui( 'frontColor', frontColor.value.getHex(), function( val ) {
 
-						internalColor.value.setHex( val );
-
-					}, true );
-
-					addGui( 'surfaceColor', surfaceColor.value.getHex(), function( val ) {
-
-						surfaceColor.value.setHex( val );
+						frontColor.value.setHex( val );
 
 					}, true );
 
-					addGui( 'area', difference.b.number, function( val ) {
+					addGui( 'backColor', backColor.value.getHex(), function( val ) {
 
-						difference.b.number = val;
+						backColor.value.setHex( val );
+
+					}, true );
+
+					addGui( 'area', sss.b.number, function( val ) {
+
+						sss.b.number = val;
 
 					}, false, 0, 1 );
 
@@ -1732,10 +1788,14 @@
 
 		function onWindowResize() {
 
-			camera.aspect = window.innerWidth / window.innerHeight;
+			var width = window.innerWidth, height = window.innerHeight;
+
+			camera.aspect = width / height;
 			camera.updateProjectionMatrix();
 
-			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setSize( width, height );
+
+			if ( rtTexture ) rtTexture.setSize( width, height );
 
 		}
 
@@ -1762,7 +1822,7 @@
 			// update material animation and/or gpu calcs (pre-renderer)
 			mesh.material.updateAnimation( delta );
 
-			// render to texture for SSS material only
+			// render to texture for sss/translucent material only
 			if ( rtTexture ) {
 
 				scene.overrideMaterial = rtMaterial;
