@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+
+	<meta charset="utf-8">
+	<title>three.js webgl - materials - HDR texture loader</title>
+        <script src="../build/three.js"></script>
+
+        <style>
+            body {
+                background: #000000;
+            }
+
+	    canvas {
+                position: absolute;
+                left: 0; right: 0;
+                top: 0; bottom: 0;
+	    }
+        </style>
+
+    </head>
+
+    <body>
+    </body>
+
+    <script>
+
+        var screenWidth = window.innerWidth;
+        var screenHeight = window.innerHeight;
+
+        var renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize( screenWidth, screenHeight );
+        document.body.appendChild( renderer.domElement );
+
+        var camera = new THREE.PerspectiveCamera( 35, screenWidth / screenHeight, 1, 10000 );
+        camera.position.set( 0, 0, 500 );
+        camera.updateMatrixWorld();
+        camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+        var scene = new THREE.Scene();
+        var mesh1, mesh2;
+
+        function initMesh1() {
+
+            var loader = new THREE.TextureLoader();
+
+            loader.load( './textures/UV_Grid_Sm.jpg', function ( texture ) {
+
+                var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+                var material = new THREE.MeshBasicMaterial( { map : texture, transparent: true } );
+
+                mesh1 = new THREE.Mesh( geometry, material );
+                scene.add( mesh );
+
+                loader.load( './textures/terrain/backgrounddetailed6.jpg', function ( subTexture ) {
+                    var x = ( texture.image.width - subTexture.image.width ) / 2;
+                    var y = ( texture.image.height - subTexture.image.height ) / 2;
+                    texture.patchTexture( subTexture, x, y );
+                } );
+
+            } );
+
+        }
+
+        function initMesh2() {
+
+            var texture = new THREE.GridTexture( 72, 72, 2, 2 );
+
+            var geometry = new THREE.PlaneBufferGeometry( 50, 50 );
+            var material = new THREE.MeshBasicMaterial( { map: texture, transparent: true } );
+
+            mesh2 = new THREE.Mesh( geometry, material );
+            scene.add( mesh2 );
+
+            var units = [ 'lord', 'shaman', 'archer', 'fighter' ];
+            var loader = new THREE.TextureLoader();
+
+            units.forEach( function ( unit ) { setTimeout(function() {
+
+                var result = texture.getLocator( unit );
+
+                var locator = result[ 0 ];
+                var created = result[ 1 ];
+
+                if ( created ) {
+                    loader.load( './textures/wesnoth/' + unit + '.png', function ( unitTexture ) {
+                        mesh2.geometry.switchUvSystem( locator.uvSystem );
+                        locator.draw( unitTexture );
+                    } );
+                }
+
+            }, Math.random() * 5000); } );
+
+        }
+
+        initMesh2();
+
+        function render() {
+            window.requestAnimationFrame( render );
+            mesh1 && ( mesh1.rotation.z += .01 );
+            renderer.render( scene, camera );
+        }
+
+        render();
+
+    </script>
+
+</html>
