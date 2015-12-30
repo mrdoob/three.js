@@ -48,9 +48,7 @@
 			} else {
 
 				scope.textureBasePath = scope.extractUrlBase( url );
-				parser = new FBXParser();
-				var nodes = parser.parse( text );
-				onLoad( scope.parse( nodes ) );
+				onLoad( scope.parse( text ) );
 
 			}
 
@@ -108,9 +106,15 @@
 
 	};
 
-	THREE.FBXLoader.prototype.parse = function ( allNodes ) {
+	THREE.FBXLoader.prototype.parse = function ( text ) {
 
 		var scope = this;
+
+		console.time( 'FBXLoader' );
+
+		console.time( 'FBXLoader: TextParser' );
+		var allNodes = new FBXParser().parse( text );
+		console.timeEnd( 'FBXLoader: TextParser' );
 
 		console.time( 'FBXLoader: ObjectParser' );
 		scope.hierarchy = ( new Bones() ).parseHierarchy( allNodes );
@@ -147,7 +151,7 @@
 
 		}
 
-		console.timeEnd( 'FBXLoader: total' );
+		console.timeEnd( 'FBXLoader' );
 		return container;
 
 	};
@@ -742,15 +746,11 @@
 		// ----------parse ---------------------------------------------------
 		parse: function ( text ) {
 
-			console.time( 'FBXLoader: total' );
-
 			this.currentIndent = 0;
 			this.allNodes = new FBXNodes();
 			this.nodeStack = [];
 			this.currentProp = [];
 			this.currentPropName = '';
-
-			console.time( 'FBXLoader: TextParser' );
 
 			var split = text.split( "\n" );
 			for ( var line in split ) {
@@ -825,9 +825,7 @@
 
 			}
 
-			console.timeEnd( 'FBXLoader: TextParser' );
 			return this.allNodes;
-
 
 		},
 
