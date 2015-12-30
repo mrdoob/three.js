@@ -32,6 +32,8 @@ THREE.Geometry = function () {
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
+	this.uvSystem = null;
+
 	// update flags
 
 	this.verticesNeedUpdate = false;
@@ -914,6 +916,49 @@ THREE.Geometry.prototype = {
 
 		if ( newUvs1 ) this.faceVertexUvs[ 0 ] = newUvs1;
 		if ( newUvs2 ) this.faceVertexUvs[ 1 ] = newUvs2;
+
+	},
+
+	switchUvSystem: function ( newSystem, n ) {
+
+		if ( typeof n === 'undefined' )
+			n = 0;
+
+		var oldSystem = this.uvSystem;
+		this.uvSystem = newSystem;
+
+		this.uvsNeedUpdate = true;
+
+		if ( ! oldSystem ) {
+
+			for ( var i = 0, il = this.faceVertexUvs[ 0 ]; i < il; ++ i ) {
+				for ( var j = 0, jl = this.faceVertexUvs[ 0 ][ i ]; j < jl; ++ j ) {
+
+					var uv = this.faceVertexUvs[ 0 ][ i ][ j ];
+
+					uv.x = newSystem.topLeft.x + uv.x * newSystem.width;
+					uv.y = newSystem.topLeft.y + uv.y * newSystem.height;
+
+				}
+
+			}
+
+		} else {
+
+			for ( var i = 0, il = this.faceVertexUvs[ 0 ]; i < il; ++ i ) {
+				for ( var j = 0, jl = this.faceVertexUvs[ 0 ][ i ]; j < jl; ++ j ) {
+
+					var uv = this.faceVertexUvs[ 0 ][ i ][ j ];
+
+					uv.x = newSystem.topLeft.x + ( uv.x - oldSystem.topLeft.x ) / oldSystem.width * newSystem.width;
+					uv.y = newSystem.topLeft.y + ( uv.y - oldSystem.topLeft.y ) / oldSystem.height * newSystem.height;
+
+				}
+
+			}
+
+		}
+
 
 	},
 
