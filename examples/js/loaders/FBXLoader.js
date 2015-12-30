@@ -113,21 +113,22 @@
 		console.time( 'FBXLoader' );
 
 		console.time( 'FBXLoader: TextParser' );
-		var allNodes = new FBXParser().parse( text );
+		var nodes = new FBXParser().parse( text );
 		console.timeEnd( 'FBXLoader: TextParser' );
 
 		console.time( 'FBXLoader: ObjectParser' );
-		scope.hierarchy = ( new Bones() ).parseHierarchy( allNodes );
-		scope.weights	= ( new Weights() ).parse( allNodes, scope.hierarchy );
-		scope.animations = ( new Animation() ).parse( allNodes, scope.hierarchy );
-		scope.textures = ( new Textures() ).parse( allNodes, scope.hierarchy );
+		scope.hierarchy = ( new Bones() ).parseHierarchy( nodes );
+		scope.weights	= ( new Weights() ).parse( nodes, scope.hierarchy );
+		scope.animations = ( new Animation() ).parse( nodes, scope.hierarchy );
+		scope.textures = ( new Textures() ).parse( nodes, scope.hierarchy );
 		console.timeEnd( 'FBXLoader: ObjectParser' );
 
 		console.time( 'FBXLoader: GeometryParser' );
-		geometries = this.parseGeometries( allNodes );
+		geometries = this.parseGeometries( nodes );
 		console.timeEnd( 'FBXLoader: GeometryParser' );
 
-		var container = new THREE.Object3D();
+		var container = new THREE.Group();
+
 		for ( var i = 0; i < geometries.length; ++ i ) {
 
 			if ( geometries[ i ] === undefined ) {
