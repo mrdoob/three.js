@@ -10,30 +10,16 @@ THREE.FontLoader = function ( manager ) {
 
 THREE.FontLoader.prototype = {
 
-	constructor: THREE.TextureLoader,
+	constructor: THREE.FontLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
-
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.XHRLoader( this.manager );
 		loader.load( url, function ( text ) {
 
-			onLoad( THREE.FontUtils.loadFace( JSON.parse( text ) ) );
+			onLoad( new THREE.Font( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
 
 	}
 

@@ -2,45 +2,35 @@
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * @author alteredq / http://alteredqualia.com/
  *
- * For creating 3D text geometry in three.js
- *
  * Text = 3D Text
  *
  * parameters = {
- *  size: 			<float>, 	// size of the text
- *  height: 		<float>, 	// thickness to extrude text
- *  curveSegments: 	<int>,		// number of points on the curves
+ *  font: <THREE.Font>, // font
  *
- *  font: 			<string>,		// font name
- *  weight: 		<string>,		// font weight (normal, bold)
- *  style: 			<string>,		// font style  (normal, italics)
+ *  size: <float>, // size of the text
+ *  height: <float>, // thickness to extrude text
+ *  curveSegments: <int>, // number of points on the curves
  *
- *  bevelEnabled:	<bool>,			// turn on bevel
- *  bevelThickness: <float>, 		// how deep into text bevel goes
- *  bevelSize:		<float>, 		// how far from text outline is bevel
- *  }
- *
+ *  bevelEnabled: <bool>, // turn on bevel
+ *  bevelThickness: <float>, // how deep into text bevel goes
+ *  bevelSize: <float> // how far from text outline is bevel
+ * }
  */
-
-/*	Usage Examples
-
-	// TextGeometry wrapper
-
-	var text3d = new TextGeometry( text, options );
-
-	// Complete manner
-
-	var textShapes = THREE.FontUtils.generateShapes( text, options );
-	var text3d = new ExtrudeGeometry( textShapes, options );
-
-*/
-
 
 THREE.TextGeometry = function ( text, parameters ) {
 
 	parameters = parameters || {};
 
-	var textShapes = THREE.FontUtils.generateShapes( text, parameters );
+	var font = parameters.font;
+
+	if ( font instanceof THREE.Font === false ) {
+
+		console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
+		return new THREE.Geometry();
+
+	}
+
+	var shapes = font.generateShapes( text, parameters.size, parameters.curveSegments );
 
 	// translate parameters to ExtrudeGeometry API
 
@@ -52,7 +42,7 @@ THREE.TextGeometry = function ( text, parameters ) {
 	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
 	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
 
-	THREE.ExtrudeGeometry.call( this, textShapes, parameters );
+	THREE.ExtrudeGeometry.call( this, shapes, parameters );
 
 	this.type = 'TextGeometry';
 

@@ -1,10 +1,10 @@
 [
 	"src/extras/CurveUtils.js",
-	"src/extras/FontUtils.js",
 	"src/extras/SceneUtils.js",
 	"src/extras/ShapeUtils.js",
 	"src/extras/core/Curve.js",
 	"src/extras/core/CurvePath.js",
+	"src/extras/core/Font.js",
 	"src/extras/core/Path.js",
 	"src/extras/core/Shape.js",
 	"src/extras/curves/LineCurve.js",
