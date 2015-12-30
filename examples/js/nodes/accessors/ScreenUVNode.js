@@ -4,7 +4,7 @@
 
 THREE.ScreenUVNode = function( resolution ) {
 
-	THREE.TempNode.call( this, 'v2', { shared: false } );
+	THREE.TempNode.call( this, 'v2' );
 
 	this.resolution = resolution;
 
@@ -20,7 +20,7 @@ THREE.ScreenUVNode.prototype.generate = function( builder, output ) {
 
 	if ( builder.isShader( 'fragment' ) ) {
 
-		result = 'gl_FragCoord.xy/' + this.resolution.build( builder, 'v2' );
+		result = '(gl_FragCoord.xy/' + this.resolution.build( builder, 'v2' ) + ')';
 
 	}
 	else {
