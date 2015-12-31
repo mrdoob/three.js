@@ -157,6 +157,7 @@ var files = {
 		"webgl_octree",
 		"webgl_octree_raycasting",
 		"webgl_panorama_equirectangular",
+		"webgl_particles_general",
 		"webgl_performance",
 		"webgl_performance_doublesided",
 		"webgl_performance_static",
