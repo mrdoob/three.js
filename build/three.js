@@ -34361,7 +34361,7 @@ THREE.Font.prototype = {
 
 	constructor: THREE.Font,
 
-	generateShapes: function ( text, size, curveSegments ) {
+	generateShapes: function ( text, size, divisions ) {
 
 		function createPaths( text ) {
 
@@ -34373,9 +34373,7 @@ THREE.Font.prototype = {
 
 			for ( var i = 0; i < chars.length; i ++ ) {
 
-				var path = new THREE.Path();
-
-				var ret = extractGlyphPoints( chars[ i ], scale, offset, path );
+				var ret = createPath( chars[ i ], scale, offset );
 				offset += ret.offset;
 
 				paths.push( ret.path );
@@ -34386,118 +34384,102 @@ THREE.Font.prototype = {
 
 		}
 
-		function extractGlyphPoints( c, scale, offset, path ) {
+		function createPath( c, scale, offset ) {
 
-			var pts = [];
-
-			var b2 = THREE.ShapeUtils.b2;
-			var b3 = THREE.ShapeUtils.b3;
-
-			var i, i2, divisions,
-				outline, action, length,
-				scaleX, scaleY,
-				x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2,
-				laste,
-				glyph = data.glyphs[ c ] || data.glyphs[ '?' ];
+			var glyph = data.glyphs[ c ] || data.glyphs[ '?' ];
 
 			if ( ! glyph ) return;
 
+			var path = new THREE.Path();
+
+			var pts = [], b2 = THREE.ShapeUtils.b2, b3 = THREE.ShapeUtils.b3;
+			var x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2, laste;
+
 			if ( glyph.o ) {
 
-				outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
-				length = outline.length;
+				var outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
 
-				scaleX = scale;
-				scaleY = scale;
+				for ( var i = 0, l = outline.length; i < l; ) {
 
-				for ( i = 0; i < length; ) {
-
-					action = outline[ i ++ ];
-
-					//console.log( action );
+					var action = outline[ i ++ ];
 
 					switch ( action ) {
 
-					case 'm':
+						case 'm': // moveTo
 
-						// Move To
+							x = outline[ i ++ ] * scale + offset;
+							y = outline[ i ++ ] * scale;
 
-						x = outline[ i ++ ] * scaleX + offset;
-						y = outline[ i ++ ] * scaleY;
+							path.moveTo( x, y );
 
-						path.moveTo( x, y );
-						break;
+							break;
 
-					case 'l':
+						case 'l': // lineTo
 
-						// Line To
+							x = outline[ i ++ ] * scale + offset;
+							y = outline[ i ++ ] * scale;
 
-						x = outline[ i ++ ] * scaleX + offset;
-						y = outline[ i ++ ] * scaleY;
-						path.lineTo( x, y );
-						break;
+							path.lineTo( x, y );
 
-					case 'q':
+							break;
 
-						// QuadraticCurveTo
+						case 'q': // quadraticCurveTo
 
-						cpx  = outline[ i ++ ] * scaleX + offset;
-						cpy  = outline[ i ++ ] * scaleY;
-						cpx1 = outline[ i ++ ] * scaleX + offset;
-						cpy1 = outline[ i ++ ] * scaleY;
+							cpx  = outline[ i ++ ] * scale + offset;
+							cpy  = outline[ i ++ ] * scale;
+							cpx1 = outline[ i ++ ] * scale + offset;
+							cpy1 = outline[ i ++ ] * scale;
 
-						path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
+							path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
 
-						laste = pts[ pts.length - 1 ];
+							laste = pts[ pts.length - 1 ];
 
-						if ( laste ) {
+							if ( laste ) {
 
-							cpx0 = laste.x;
-							cpy0 = laste.y;
+								cpx0 = laste.x;
+								cpy0 = laste.y;
 
-							for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
+								for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
 
-								var t = i2 / divisions;
-								b2( t, cpx0, cpx1, cpx );
-								b2( t, cpy0, cpy1, cpy );
+									var t = i2 / divisions;
+									b2( t, cpx0, cpx1, cpx );
+									b2( t, cpy0, cpy1, cpy );
 
-							}
-
-						}
-
-						break;
-
-					case 'b':
-
-						// Cubic Bezier Curve
-
-						cpx  = outline[ i ++ ] * scaleX + offset;
-						cpy  = outline[ i ++ ] * scaleY;
-						cpx1 = outline[ i ++ ] * scaleX + offset;
-						cpy1 = outline[ i ++ ] * scaleY;
-						cpx2 = outline[ i ++ ] * scaleX + offset;
-						cpy2 = outline[ i ++ ] * scaleY;
-
-						path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
-
-						laste = pts[ pts.length - 1 ];
-
-						if ( laste ) {
-
-							cpx0 = laste.x;
-							cpy0 = laste.y;
-
-							for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
-
-								var t = i2 / divisions;
-								b3( t, cpx0, cpx1, cpx2, cpx );
-								b3( t, cpy0, cpy1, cpy2, cpy );
+								}
 
 							}
 
-						}
+							break;
 
-						break;
+						case 'b': // bezierCurveTo
+
+							cpx  = outline[ i ++ ] * scale + offset;
+							cpy  = outline[ i ++ ] * scale;
+							cpx1 = outline[ i ++ ] * scale + offset;
+							cpy1 = outline[ i ++ ] * scale;
+							cpx2 = outline[ i ++ ] * scale + offset;
+							cpy2 = outline[ i ++ ] * scale;
+
+							path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
+
+							laste = pts[ pts.length - 1 ];
+
+							if ( laste ) {
+
+								cpx0 = laste.x;
+								cpy0 = laste.y;
+
+								for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
+
+									var t = i2 / divisions;
+									b3( t, cpx0, cpx1, cpx2, cpx );
+									b3( t, cpy0, cpy1, cpy2, cpy );
+
+								}
+
+							}
+
+							break;
 
 					}
 
@@ -34512,7 +34494,7 @@ THREE.Font.prototype = {
 		//
 
 		if ( size === undefined ) size = 100;
-		if ( curveSegments === undefined ) curveSegments = 4;
+		if ( divisions === undefined ) divisions = 4;
 
 		var data = this.data;
 
