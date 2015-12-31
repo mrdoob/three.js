@@ -156,14 +156,7 @@
 				var data = event.detail;
 				for ( var i = 0; i < data.anims.length; ++i ) {
 
-					for( var j = 0; j < blendMesh.mixer.actions.length; j ++ ) {
-						var action = blendMesh.mixer.actions[j];
-						if( action.clip.name === data.anims[i] ) {
-							if( action.getWeightAt( blendMesh.mixer.time ) !== data.weights[i] ) {
-								action.weight = data.weights[i];
-							}
-						}
-					}
+					blendMesh.applyWeight( data.anims[ i ], data.weights[ i ] );
 
 				}
 

@@ -170,7 +170,7 @@ THREE.SVGRenderer = function () {
 
 				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+				if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
 					renderLine( _v1, _v2, element, material );
 
@@ -194,7 +194,7 @@ THREE.SVGRenderer = function () {
 					_v3.positionScreen
 				] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+				if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
 					renderFace3( _v1, _v2, _v3, element, material );
 

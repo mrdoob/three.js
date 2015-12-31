@@ -18,6 +18,7 @@
  *  aoMapIntensity: <float>
  *
  *  emissiveMap: new THREE.Texture( <Image> ),
+ *  emissiveMapIntensity: <float>
  *
  *  bumpMap: new THREE.Texture( <Image> ),
  *  bumpScale: <float>,
@@ -67,8 +68,6 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.specular = new THREE.Color( 0x111111 );
 	this.shininess = 30;
 
-	this.metal = false;
-
 	this.map = null;
 
 	this.lightMap = null;
@@ -78,6 +77,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.aoMapIntensity = 1.0;
 
 	this.emissiveMap = null;
+	this.emissiveMapIntensity = 1.0;
 
 	this.bumpMap = null;
 	this.bumpScale = 1;
@@ -129,8 +129,6 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.specular.copy( source.specular );
 	this.shininess = source.shininess;
 
-	this.metal = source.metal;
-
 	this.map = source.map;
 
 	this.lightMap = source.lightMap;
@@ -140,6 +138,7 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.aoMapIntensity = source.aoMapIntensity;
 
 	this.emissiveMap = source.emissiveMap;
+	this.emissiveMapIntensity = source.emissiveMapIntensity;
 
 	this.bumpMap = source.bumpMap;
 	this.bumpScale = source.bumpScale;

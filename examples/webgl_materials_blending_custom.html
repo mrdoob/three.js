@@ -189,20 +189,16 @@
 				for ( var i = 0; i < images.length; i ++ ) {
 
 					var map = THREE.ImageUtils.loadTexture( images[ i ] );
+					mapsNoPre.push( map );
 
-					var mapPre = map.clone();
-
+					var mapPre = THREE.ImageUtils.loadTexture( images[ i ] );
 					mapPre.premultiplyAlpha = true;
 					mapPre.needsUpdate = true;
-
-					mapsNoPre.push( map );
 					mapsPre.push( mapPre );
 
 				}
 
 				// FOREGROUND OBJECTS
-
-				var blendings = [ "NoBlending", "NormalBlending", "AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "AdditiveAlphaBlending" ];
 
 				var src = [ "ZeroFactor", "OneFactor", "SrcAlphaFactor", "OneMinusSrcAlphaFactor", "DstAlphaFactor", "OneMinusDstAlphaFactor", "DstColorFactor", "OneMinusDstColorFactor", "SrcAlphaSaturateFactor" ];
 				var dst = [ "ZeroFactor", "OneFactor", "SrcColorFactor", "OneMinusSrcColorFactor", "SrcAlphaFactor", "OneMinusSrcAlphaFactor", "DstAlphaFactor", "OneMinusDstAlphaFactor" ];

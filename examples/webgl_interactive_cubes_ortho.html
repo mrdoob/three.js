@@ -25,7 +25,8 @@
 			var camera, scene, raycaster, renderer;
 
 			var mouse = new THREE.Vector2(), INTERSECTED;
-			var radius = 100, theta = 0;
+			var radius = 500, theta = 0;
+			var frustumSize = 1000;
 
 			init();
 			animate();
@@ -43,7 +44,8 @@
 				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes';
 				container.appendChild( info );
 
-				camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 500, 1000 );
+				var aspect = window.innerWidth / window.innerHeight;
+				camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 );
 
 				scene = new THREE.Scene();
 
@@ -97,10 +99,12 @@
 
 			function onWindowResize() {
 
-				camera.left = window.innerWidth / - 2;
-				camera.right = window.innerWidth / 2;
-				camera.top = window.innerHeight / 2;
-				camera.bottom = window.innerHeight / - 2;
+				var aspect = window.innerWidth / window.innerHeight;
+
+				camera.left   = - frustumSize * aspect / 2;
+				camera.right  =   frustumSize * aspect / 2;
+				camera.top    =   frustumSize / 2;
+				camera.bottom = - frustumSize / 2;
 
 				camera.updateProjectionMatrix();
 

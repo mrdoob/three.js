@@ -67,6 +67,9 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var textureLoader = new THREE.TextureLoader();
+			var cubeTextureLoader = new THREE.CubeTextureLoader();
+
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
 
 			init();
@@ -92,7 +95,7 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+				reflectionCube = cubeTextureLoader.load( urls );
 
 				// LIGHTS
 
@@ -157,7 +160,7 @@
 
 				loader.load( "models/ctm/ben.ctm",   function( geometry ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: THREE.ImageUtils.loadTexture( "textures/UV_Grid_Sm.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: textureLoader.load( "textures/UV_Grid_Sm.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 					callbackModel( geometry, 450, material, 0, -200, 0, 0, 0 );
 					checkTime();
 
@@ -183,9 +186,9 @@
 
 						specular: 0x303030,
 						shininess: 50,
-						map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ),
-						specularMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" ),
-						normalMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+						map: textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" ),
+						specularMap: textureLoader.load( "obj/leeperrysmith/Map-SPEC.jpg" ),
+						normalMap: textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 						normalScale: new THREE.Vector2( 0.8, 0.8 )
 
 					} );

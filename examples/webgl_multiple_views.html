@@ -286,7 +286,7 @@
 					var height = Math.floor( windowHeight * view.height );
 					renderer.setViewport( left, bottom, width, height );
 					renderer.setScissor( left, bottom, width, height );
-					renderer.enableScissorTest ( true );
+					renderer.setScissorTest( true );
 					renderer.setClearColor( view.background );
 
 					camera.aspect = width / height;
