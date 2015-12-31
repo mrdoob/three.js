@@ -408,8 +408,7 @@ var guis = {
 			height : 2,
 			curveSegments : 12,
 			font : "helvetiker",
-			weight : "normal",
-			style : "normal",
+			weight : "regular",
 			bevelEnabled : false,
 			bevelThickness : 1,
 			bevelSize : 0.5
@@ -419,40 +418,52 @@ var guis = {
 			"helvetiker",
 			"optimer",
 			"gentilis",
-			"droid serif"
-		]
+			"droid/droid_serif"
+		];
 
 		var weights = [
-			"normal", "bold"
-		]
+			"regular", "bold"
+		];
 
 		function generateGeometry() {
 
-			var geometry = new THREE.TextGeometry( data.text, data )
+			var loader = new THREE.FontLoader();
+			loader.load( '../../examples/fonts/' + data.font + '_' + data.weight + '.typeface.json', function ( font ) {
 
-			geometry.center()
+				var geometry = new THREE.TextGeometry( data.text, {
+					font: font,
+					size: data.size,
+					height: data.height,
+					curveSegments: data.curveSegments,
+					bevelEnabled: data.bevelEnabled,
+					bevelThickness: data.bevelThickness,
+					bevelSize: data.bevelSize
+				} );
+				geometry.center();
 
-			updateGroupGeometry( mesh, geometry );
+				updateGroupGeometry( mesh, geometry );
+
+			} );
 
 		}
 
 		//Hide the wireframe
-		mesh.children[0].visible = false;
+		mesh.children[ 0 ].visible = false;
 
-		var folder = gui.addFolder('THREE.TextGeometry');
+		var folder = gui.addFolder( 'THREE.TextGeometry' );
 
 		folder.add( data, 'text' ).onChange( generateGeometry );
 		folder.add( data, 'size', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'height', 1, 20 ).onChange( generateGeometry );
-		folder.add( data, 'curveSegments', 1, 20 ).step(1).onChange( generateGeometry );
+		folder.add( data, 'curveSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'font', fonts ).onChange( generateGeometry );
 		folder.add( data, 'weight', weights ).onChange( generateGeometry );
-		// folder.add( data, 'style', 1, 1 ).onChange( generateGeometry );
 		folder.add( data, 'bevelEnabled' ).onChange( generateGeometry );
 		folder.add( data, 'bevelThickness', 0.1, 3 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSize', 0.1, 3 ).onChange( generateGeometry );
 
 		generateGeometry();
+
 	},
 
 	TorusGeometry : function( mesh ) {

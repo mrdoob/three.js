@@ -9,11 +9,11 @@ var list = {
 
 	"Reference": {
 		"Constants": [
-			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations"],
-			[ "GLState", "api/constants/GLState"],
-			[ "Materials", "api/constants/Materials"],
-			[ "ShadowingTypes", "api/constants/ShadowingTypes"],
-			[ "Textures", "api/constants/Textures"]
+			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
+			[ "GLState", "api/constants/GLState" ],
+			[ "Materials", "api/constants/Materials" ],
+			[ "ShadowingTypes", "api/constants/ShadowingTypes" ],
+			[ "Textures", "api/constants/Textures" ]
 		],
 
 		"Cameras": [
@@ -151,13 +151,12 @@ var list = {
 
 		"Textures": [
 			[ "CompressedTexture", "api/textures/CompressedTexture" ],
-			[ "CubeTexture", "api/textures/CubeTexture" ],			
+			[ "CubeTexture", "api/textures/CubeTexture" ],
 			[ "DataTexture", "api/textures/DataTexture" ],
 			[ "Texture", "api/textures/Texture" ]
 		],
 
 		"Extras": [
-			[ "FontUtils", "api/extras/FontUtils" ],
 			[ "GeometryUtils", "api/extras/GeometryUtils" ],
 			[ "SceneUtils", "api/extras/SceneUtils" ]
 		],
