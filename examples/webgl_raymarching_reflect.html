@@ -45,9 +45,9 @@
 
 			precision highp float;
 
-			uniform float time;
 			uniform vec2 resolution;
-			uniform vec2 mouse;
+			uniform vec3 cameraPos;
+			uniform vec3 cameraDir;
 
 			const float EPS = 0.01;
 			const float OFFSET = EPS * 100.0;
@@ -201,10 +201,10 @@
 				vec2 p = ( gl_FragCoord.xy * 2.0 - resolution ) / min( resolution.x, resolution.y );
 
 				// camera and ray
-				vec3 cPos  = vec3( mouse.x - 0.5, mouse.y * 4.0 - 0.2, time );
-				vec3 cDir  = normalize( vec3( 0.0, -0.3, 1.0 ) );
-				vec3 cUp   = cross( cDir, vec3( 1.0, 0.0 ,0.0 ) );
-				vec3 cSide = cross( cDir, cUp );
+				vec3 cPos  = cameraPos;
+				vec3 cDir  = cameraDir;
+				vec3 cSide = normalize( cross( cDir, vec3( 0.0, 1.0 ,0.0 ) ) );
+				vec3 cUp   = normalize( cross( cSide, cDir ) );
 				float targetDepth = 1.3;
 				vec3 ray = normalize( cSide * p.x + cUp * p.y + cDir * targetDepth );
 
@@ -243,26 +243,29 @@
 		</script>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/controls/FlyControls.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			var scene, camera, renderer;
+			var camera, dummyCamera, scene, controls, renderer;
 			var geometry, material, mesh;
 			var mouse = new THREE.Vector2( 0.5, 0.5 );
 			var canvas;
 			var stats;
 
+			var clock = new THREE.Clock();
+
 			var config = {
 				saveImage: function() {
 
-					renderer.render( scene, camera );
+					renderer.render( scene, dummyCamera );
 					window.open( canvas.toDataURL() );
 
 				},
-				recursion: 3,
+				freeCamera: false,
 				resolution: '512',
 			};
 
@@ -273,13 +276,15 @@
 
 				scene = new THREE.Scene();
 				camera = new THREE.Camera();
+				dummyCamera = new THREE.Camera();
+				camera.lookAt( new THREE.Vector3( 0.0, -0.3, 1.0 ) );
 
 				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
 				material = new THREE.RawShaderMaterial( {
 					uniforms: {
-						time: { type: 'f', value: 0.0 },
 						resolution: { type: 'v2', value: new THREE.Vector2( 512, 512 ) },
-						mouse: { type: 'v2', value: mouse },
+						cameraPos: { type: 'v3', value: camera.getWorldPosition() },
+						cameraDir: { type: 'v3', value: camera.getWorldDirection() },
 					},
 					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader' ).textContent
@@ -296,8 +301,16 @@
 				window.addEventListener( 'resize', onWindowResize );
 				document.body.appendChild( canvas );
 
+				controls = new THREE.FlyControls( camera, canvas );
+
+				controls.autoForward = true;
+				controls.dragToLook = false;
+				controls.rollSpeed = Math.PI / 12;
+				controls.movementSpeed = 0.5;
+
 				var gui = new dat.GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
+				gui.add( config, 'freeCamera' ).name( 'Free Camera' );
 				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( function( value ) {
 
 					if ( value !== 'full' ) {
@@ -317,12 +330,27 @@
 
 			function render( timestamp ) {
 
+				var delta = clock.getDelta();
+
 				stats.begin();
 
-				material.uniforms.time.value = timestamp * 0.001;
+				if ( config.freeCamera ) {
+
+					controls.update( delta );
+
+				} else {
+
+					camera.position.set( mouse.x - 0.5, mouse.y * 4, timestamp * 0.001 );
+					camera.lookAt( new THREE.Vector3( 0.0, -0.3, 1.0 ).add( camera.position ) );
+
+				}
+
+				if ( camera.position.y < 0 ) camera.position.y = 0;
+
 				material.uniforms.resolution.value = new THREE.Vector2( canvas.width, canvas.height );
-				material.uniforms.mouse.value = mouse;
-				renderer.render( scene, camera );
+				material.uniforms.cameraPos.value = camera.getWorldPosition();
+				material.uniforms.cameraDir.value = camera.getWorldDirection();
+				renderer.render( scene, dummyCamera );
 
 				stats.end();
 				requestAnimationFrame( render );
