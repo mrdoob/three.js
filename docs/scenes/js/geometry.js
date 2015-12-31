@@ -435,7 +435,7 @@ var guis = {
 		function generateGeometry() {
 
 			var loader = new THREE.FontLoader();
-			loader.load( '../../examples/fonts/' + data.font + '_' + data.weight + '.typeface.json', function ( font ) {
+			loader.load( '../../examples/fonts/' + data.font + '_' + data.weight + '.typeface.js', function ( font ) {
 
 				var geometry = new THREE.TextGeometry( data.text, {
 					font: font,

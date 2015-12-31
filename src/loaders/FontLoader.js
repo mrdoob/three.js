@@ -17,7 +17,7 @@ THREE.FontLoader.prototype = {
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.load( url, function ( text ) {
 
-			onLoad( new THREE.Font( JSON.parse( text ) ) );
+			onLoad( new THREE.Font( JSON.parse( text.substring( 65, text.length - 2 ) ) ) );
 
 		}, onProgress, onError );
 
