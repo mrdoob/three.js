@@ -5,13 +5,13 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-					body {
+			body {
 				color: #fff;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
 
-				background-color: #fff;
+				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -30,9 +30,6 @@
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/geometries/TextGeometry.js"></script>
-		<script src="js/utils/FontUtils.js"></script>
-		<script src="fonts/gentilis_regular.typeface.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -46,10 +43,15 @@
 			var camera, scene, renderer, controls, objects = [];
 			var particleLight;
 
-			init();
-			animate();
+			var loader = new THREE.FontLoader();
+			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
-			function init() {
+				init( font );
+				animate();
+
+			} );
+
+			function init( font ) {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -128,16 +130,11 @@
 				function addLabel( name, location ) {
 					var textGeo = new THREE.TextGeometry( name, {
 
+						font: font,
+
 						size: 20,
-						height: 5,
-						curveSegments: 10,
-
-						font: 'gentilis',
-						weight: 'normal',
-						style: 'normal',
-
-						material: 0,
-						extrudeMaterial: 1
+						height: 1,
+						curveSegments: 1
 
 					});
 
