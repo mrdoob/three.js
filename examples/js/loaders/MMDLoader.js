@@ -4293,8 +4293,13 @@ THREE.MMDHelper.prototype = {
 
 	renderOutline: function ( scene, camera ) {
 
+		var tmpEnabled = this.renderer.shadowMap.enabled;
+		this.renderer.shadowMap.enabled = false;
+
 		this.setupOutlineRendering();
 		this.renderer.render( scene, camera );
+
+		this.renderer.shadowMap.enabled = tmpEnabled;
 
 	},
 
