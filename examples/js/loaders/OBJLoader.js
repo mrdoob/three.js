@@ -2,11 +2,6 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ParseException = function(message) {
-   this.message = message;
-   this.name = "ParseException";
-}
-
 THREE.OBJLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
@@ -339,7 +334,7 @@ THREE.OBJLoader.prototype = {
 
 			} else {
 
-                throw new THREE.ParseException("Unexpected line: " + line);
+                throw new Error("Unexpected line: " + line);
 
 			}
 
