@@ -207,10 +207,11 @@ THREE.KeyframeTrack.prototype = {
 			var from = firstKeysToRemove;
 			var to = nKeys - lastKeysToRemove - firstKeysToRemove;
 
+			var stride = this.getValueSize();
+
 			this.times = THREE.AnimationUtils.arraySlice( times, from, to );
 
 			var values = this.values;
-			var stride = this.getValueSize();
 			this.values = THREE.AnimationUtils.arraySlice( values, from * stride, to * stride );
 
 		}
