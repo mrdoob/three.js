@@ -10,9 +10,9 @@
  *		http://www.cs.rutgers.edu/~decarlo/readings/subdiv-sg00c.pdf
  *
  *	Known Issues:
- *		- currently doesn't handle UVs
  *		- currently doesn't handle "Sharp Edges"
- *
+ * **UV Support By Matthew Adams / http://www.centerionware.com
+ * * DDS Images need to be upside down or UV's will be upside down. 
  */
 
 THREE.SubdivisionModifier = function ( subdivisions ) {
@@ -126,7 +126,12 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		newFaces.push( new THREE.Face3( a, b, c ) );
 
 	}
-
+	function midpoint(a, b) {
+	    return (Math.abs(b - a) / 2) + Math.min(a, b);
+	}
+	function newUv(newUvs, a, b, c) {
+	    newUvs.push([new THREE.Vector2(a.x, a.y), new THREE.Vector2(b.x, b.y), new THREE.Vector2(c.x, c.y)]);
+	}
 
 	/////////////////////////////
 
@@ -135,8 +140,8 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 		var tmp = new THREE.Vector3();
 
-		var oldVertices, oldFaces;
-		var newVertices, newFaces; // newUVs = [];
+		var oldVertices, oldFaces, oldUvs;
+		var newVertices, newFaces, newUVs = [];
 
 		var n, l, i, il, j, k;
 		var metaVertices, sourceEdges;
@@ -146,7 +151,9 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 		oldVertices = geometry.vertices; // { x, y, z}
 		oldFaces = geometry.faces; // { a: oldVertex1, b: oldVertex2, c: oldVertex3 }
-
+		oldUvs = geometry.faceVertexUvs[0];
+		var doUvs = false;
+		if (typeof (oldUvs) != 'undefined' && oldUvs.length != 0) doUvs = true;
 		/******************************************************
 		 *
 		 * Step 0: Preprocess Geometry to Generate edges Lookup
@@ -319,6 +326,10 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		var sl = newSourceVertices.length, edge1, edge2, edge3;
 		newFaces = [];
 
+		var x3 = new THREE.Vector2(0, 0);
+		var x4 = new THREE.Vector2(0, 0);
+		var x5 = new THREE.Vector2(0, 0);
+
 		for ( i = 0, il = oldFaces.length; i < il; i ++ ) {
 
 			face = oldFaces[ i ];
@@ -335,13 +346,66 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 			newFace( newFaces, face.a, edge1, edge3 );
 			newFace( newFaces, face.b, edge2, edge1 );
 			newFace( newFaces, face.c, edge3, edge2 );
+		    // create 4 new uv's
 
+		    /*
+        
+
+0___________________C___________________2
+ \                 /\                  /
+  \              /   \      F4        /
+   \     F2    /       \             /
+    \        /            \         /
+     \     /                \      /
+      \  /         F1         \   /
+       \/_______________________\/
+      A \                       / B
+         \       F3            /
+          \                   /
+           \                 /
+            \               /
+             \             /
+              \           /
+               \         /
+                   \/
+                    1
+
+
+Draw orders: 
+F1: ABC x3,x4,x5
+F2: 0AC x0,x3,x5
+F3: 1BA x1,x4,x3
+F4: 2CB x2,x5,x4
+
+0: x0
+1: x1
+2: x2
+A: x3
+B: x4 
+C: x5
+*/
+			if (doUvs) {
+			    uv = oldUvs[i];
+			    x0 = uv[0];
+			    x1 = uv[1];
+			    x2 = uv[2];
+
+			    x3.set(midpoint(x0.x, x1.x), midpoint(x0.y, x1.y));
+			    x4.set(midpoint(x1.x, x2.x), midpoint(x1.y, x2.y));
+			    x5.set(midpoint(x0.x, x2.x), midpoint(x0.y, x2.y));
+			    newUv(newUVs, x3, x4, x5);
+			    newUv(newUVs, x0, x3, x5);
+
+			    newUv(newUVs, x1, x4, x3);
+			    newUv(newUVs, x2, x5, x4);
+			}
 		}
 
 		// Overwrite old arrays
 		geometry.vertices = newVertices;
 		geometry.faces = newFaces;
-
+        if(doUvs)
+		    geometry.faceVertexUvs[0] = newUVs;
 		// console.log('done');
 
 	};
