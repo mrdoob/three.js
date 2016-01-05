@@ -127,13 +127,33 @@ THREE.VREffect = function ( renderer, onError ) {
 			cameraR.translateX( eyeTranslationR.x * this.scale );
 
 			// render left eye
-			renderer.setViewport( 0, 0, size.width / 2, size.height );
-			renderer.setScissor( 0, 0, size.width / 2, size.height );
+			if (size.width > size.height) {
+
+				renderer.setViewport( 0, 0, size.width / 2, size.height );
+				renderer.setScissor( 0, 0, size.width / 2, size.height );
+
+			} else {
+
+				renderer.setViewport( 0, 0, size.width, size.height / 2 );
+				renderer.setScissor( 0, 0, size.width, size.height / 2 );
+
+			}
+
 			renderer.render( scene, cameraL );
 
 			// render right eye
-			renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
-			renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
+			if (size.width > size.height) {
+
+				renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
+				renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
+
+			} else {
+
+				renderer.setViewport( 0, size.height / 2, size.width, size.height / 2 );
+				renderer.setScissor( 0, size.height / 2, size.width, size.height / 2 );
+
+			}
+
 			renderer.render( scene, cameraR );
 
 			renderer.setScissorTest( false );
