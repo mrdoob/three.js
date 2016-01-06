@@ -511,7 +511,7 @@ THREE.ColladaLoader.prototype = {
 
 				console.error( 'ColladaLoder: Undefined sampler', sid );
 
-				return;
+				return null;
 
 			}
 
