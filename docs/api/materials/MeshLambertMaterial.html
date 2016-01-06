@@ -56,6 +56,9 @@
 		Emissive (light) color of the material, essentially a solid color unaffected by other lighting. Default is black.<br />
 		</div>
 
+		<h3>[property:Float emissiveIntensity]</h3>
+		<div>Intensity of the emissive light. Modulates the emissive color. Default is 1.</div>
+
 		<h3>[property:Texture map]</h3>
 		<div>Set color texture map. Default is null.</div>
 
@@ -66,7 +69,7 @@
 		<div>Set ambient occlusion map. Default is null. The aoMap requires a second set of UVs.</div>
 
 		<h3>[property:Texture emissiveMap]</h3>
-		<div>Set emisssive (glow) map. Default is null. The emissive map color is modulated by the emissive color. If you have an emissive map, be sure to set the emissive color to something other than black.</div>
+		<div>Set emisssive (glow) map. Default is null. The emissive map color is modulated by the emissive color and the emissive intensity. If you have an emissive map, be sure to set the emissive color to something other than black.</div>
 
 		<h3>[property:Texture specularMap]</h3>
 		<div>Since this material does not have a specular component, the specular value affects only how much of the environment map affects the surface. Default is null.</div>
