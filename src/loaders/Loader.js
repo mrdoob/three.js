@@ -126,7 +126,7 @@ THREE.Loader.prototype = {
 
 				switch ( name ) {
 					case 'DbgColor':
-						json.color = value;
+						if (json.color === undefined) json.color = value;
 						break;
 					case 'DbgIndex':
 					case 'opticalDensity':
