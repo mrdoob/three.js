@@ -675,6 +675,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		// https://gist.github.com/2486101
 		// explanation: http://pouet.net/topic.php?which=8760&page=1
 
+		var fixscale = ( 1 << subpixelBits );
+
 		// 28.4 fixed-point coordinates
 
 		var x1 = ( v1.x * viewportXScale + viewportXOffs ) | 0;
@@ -684,6 +686,88 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var y1 = ( v1.y * viewportYScale + viewportYOffs ) | 0;
 		var y2 = ( v2.y * viewportYScale + viewportYOffs ) | 0;
 		var y3 = ( v3.y * viewportYScale + viewportYOffs ) | 0;
+
+		var bHasNormal = face.vertexNormalsModel && face.vertexNormalsModel.length;
+
+		var longestSide = Math.max(
+			Math.sqrt( (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2) ),
+			Math.sqrt( (x2 - x3)*(x2 - x3) + (y2 - y3)*(y2 - y3) ),
+			Math.sqrt( (x3 - x1)*(x3 - x1) + (y3 - y1)*(y3 - y1) )
+		);
+		if( longestSide > 100 * fixscale ) {
+
+			// 1
+			// |\
+			// |a\
+			// |__\
+			// |\c|\
+			// |b\|d\
+			// |__\__\
+			// 2      3
+			var	mpV12 = new THREE.Vector4(),
+				mpV23 = new THREE.Vector4(),
+				mpV31 = new THREE.Vector4(),
+				mpN12 = new THREE.Vector3(),
+				mpN23 = new THREE.Vector3(),
+				mpN31 = new THREE.Vector3(),
+				mpUV12 = new THREE.Vector2(),
+				mpUV23 = new THREE.Vector2(),
+				mpUV31 = new THREE.Vector2(),
+				tempFace = { vertexNormalsModel : [] };
+
+			var weight;
+
+			weight = (1 + v2.z) * (v2.w / v1.w) / (1 + v1.z);
+			mpUV12.copy( uv1 ).multiplyScalar( weight ).add( uv2 ).multiplyScalar( 1 / (weight + 1) );
+			weight = (1 + v3.z) * (v3.w / v2.w) / (1 + v2.z);
+			mpUV23.copy( uv2 ).multiplyScalar( weight ).add( uv3 ).multiplyScalar( 1 / (weight + 1) );
+			weight = (1 + v1.z) * (v1.w / v3.w) / (1 + v3.z);
+			mpUV31.copy( uv3 ).multiplyScalar( weight ).add( uv1 ).multiplyScalar( 1 / (weight + 1) );
+
+			mpV12.copy( v1 ).add( v2 ).multiplyScalar( 0.5 );
+			mpV23.copy( v2 ).add( v3 ).multiplyScalar( 0.5 );
+			mpV31.copy( v3 ).add( v1 ).multiplyScalar( 0.5 );
+
+			if( bHasNormal ) {
+				mpN12.copy( face.vertexNormalsModel[ 0 ] ).add( face.vertexNormalsModel[ 1 ] ).normalize();
+				mpN23.copy( face.vertexNormalsModel[ 1 ] ).add( face.vertexNormalsModel[ 2 ] ).normalize();
+				mpN31.copy( face.vertexNormalsModel[ 2 ] ).add( face.vertexNormalsModel[ 0 ] ).normalize();
+			}
+
+			// a
+			if( bHasNormal ) {
+				tempFace.vertexNormalsModel[ 0 ] = face.vertexNormalsModel[ 0 ];
+				tempFace.vertexNormalsModel[ 1 ] = mpN12;
+				tempFace.vertexNormalsModel[ 2 ] = mpN31;
+			}
+			drawTriangle( v1, mpV12, mpV31, uv1, mpUV12, mpUV31, shader, tempFace, material );
+
+			// b
+			if( bHasNormal ) {
+				tempFace.vertexNormalsModel[ 0 ] = face.vertexNormalsModel[ 1 ];
+				tempFace.vertexNormalsModel[ 1 ] = mpN23;
+				tempFace.vertexNormalsModel[ 2 ] = mpN12;
+			}
+			drawTriangle( v2, mpV23, mpV12, uv2, mpUV23, mpUV12, shader, tempFace, material );
+
+			// c
+			if( bHasNormal ) {
+				tempFace.vertexNormalsModel[ 0 ] = mpN12;
+				tempFace.vertexNormalsModel[ 1 ] = mpN23;
+				tempFace.vertexNormalsModel[ 2 ] = mpN31;
+			}
+			drawTriangle( mpV12, mpV23, mpV31, mpUV12, mpUV23, mpUV31, shader, tempFace, material );
+
+			// d
+			if( bHasNormal ) {
+				tempFace.vertexNormalsModel[ 0 ] = face.vertexNormalsModel[ 2 ];
+				tempFace.vertexNormalsModel[ 1 ] = mpN31;
+				tempFace.vertexNormalsModel[ 2 ] = mpN23;
+			}
+			drawTriangle( v3, mpV31, mpV23, uv3, mpUV31, mpUV23, shader, tempFace, material );
+
+			return;
+		}
 
 		// Z values (.28 fixed-point)
 
@@ -709,12 +793,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		}
 
 		// Normal values
-		var bHasNormal = false;
 		var n1, n2, n3, nz1, nz2, nz3;
 
-		if ( face.vertexNormalsModel ) {
-
-			bHasNormal = true;
+		if ( bHasNormal ) {
 
 			n1 = face.vertexNormalsModel[ 0 ];
 			n2 = face.vertexNormalsModel[ 1 ];
@@ -786,7 +867,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		// Z pixel steps
 
-		var fixscale = ( 1 << subpixelBits );
 		dzdx = ( dzdx * fixscale ) | 0;
 		dzdy = ( dzdy * fixscale ) | 0;
 

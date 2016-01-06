@@ -2606,6 +2606,12 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 	var initMotionAnimations = function () {
 
+		if ( vmd.metadata.motionCount === 0 ) {
+
+			return;
+
+		}
+
 		var bones = mesh.geometry.bones;
 		var orderedMotions = helper.createOrderedMotionArrays( bones, vmd.motions, 'boneName' );
 
@@ -2653,8 +2659,6 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		}
 
-		// add 2 secs as afterglow
-		maxTime += 2.0;
 		animation.length = maxTime;
 
 		for ( var i = 0; i < orderedMotions.length; i++ ) {
@@ -2665,8 +2669,6 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 			helper.insertStartBoneAnimationKey( keys );
 
 		}
-
-//		mesh.geometry.animation = animation;
 
 		if ( mesh.geometry.animations === undefined ) {
 
@@ -2679,6 +2681,12 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 	};
 
 	var initMorphAnimations = function () {
+
+		if ( vmd.metadata.morphCount === 0 ) {
+
+			return;
+
+		}
 
 		var orderedMorphs = helper.createOrderedMotionArrays( mesh.geometry.morphTargets, vmd.morphs, 'morphName' );
 
@@ -2718,19 +2726,7 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		}
 
-		// add 2 secs as afterglow
-		maxTime += 2.0;
 		morphAnimation.length = maxTime;
-
-		for ( var i = 0; i < orderedMorphs.length; i++ ) {
-
-			var keys = morphAnimation.hierarchy[ i ].keys;
-			helper.insertAnimationKeyAtTimeZero( keys, 0.0 );
-			helper.insertStartAnimationKey( keys );
-
-		}
-
-//		geometry.morphAnimation = morphAnimation;
 
 		if ( mesh.geometry.morphAnimations === undefined ) {
 
@@ -2742,7 +2738,15 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		for ( var i = 0; i < orderedMorphs.length; i++ ) {
 
-			tracks.push( helper.generateTrackFromAnimationKeys( morphAnimation.hierarchy[ i ].keys, 'NumberKeyframeTrackEx', '.morphTargetInfluences[' + i + ']' ) );
+			var keys = morphAnimation.hierarchy[ i ].keys;
+
+			if ( keys.length === 0 ) {
+
+				continue;
+
+			}
+
+			tracks.push( helper.generateTrackFromAnimationKeys( keys, 'NumberKeyframeTrackEx', '.morphTargetInfluences[' + i + ']' ) );
 
 		}
 
@@ -4094,7 +4098,9 @@ THREE.MMDHelper.prototype = {
 	 * TODO: touching private properties ( ._actions and ._clip ) so consider better way
 	 *       to access them for safe and modularity.
 	 */
-	unifyAnimationDuration: function () {
+	unifyAnimationDuration: function ( params ) {
+
+		params = params === undefined ? {} : params;
 
 		var max = 0.0;
 
@@ -4138,6 +4144,12 @@ THREE.MMDHelper.prototype = {
 		if ( audioManager !== null ) {
 
 			max = Math.max( max, audioManager.duration );
+
+		}
+
+		if ( params.afterglow !== undefined ) {
+
+			max += params.afterglow;
 
 		}
 
@@ -4293,8 +4305,13 @@ THREE.MMDHelper.prototype = {
 
 	renderOutline: function ( scene, camera ) {
 
+		var tmpEnabled = this.renderer.shadowMap.enabled;
+		this.renderer.shadowMap.enabled = false;
+
 		this.setupOutlineRendering();
 		this.renderer.render( scene, camera );
+
+		this.renderer.shadowMap.enabled = tmpEnabled;
 
 	},
 
