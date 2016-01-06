@@ -1036,19 +1036,6 @@ THREE.ColladaLoader.prototype = {
 			function pushVector( i ) {
 
 				var index = indices[ i + offset ] * sourceStride;
-
-				/*
-				if ( asset.upAxis === 'Z_UP' ) {
-
-					array.push( sourceArray[ index + 0 ], sourceArray[ index + 2 ], - sourceArray[ index + 1 ] );
-
-				} else {
-
-					array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
-
-				}
-				*/
-
 				array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
 
 			}
@@ -1450,6 +1437,12 @@ THREE.ColladaLoader.prototype = {
 		// console.log( library );
 
 		var scene = parseScene( getElementsByTagName( collada, 'scene' )[ 0 ] );
+
+		if ( asset.upAxis === 'Z_UP' ) {
+
+			scene.rotation.x = - Math.PI / 2;
+
+		}
 
 		console.timeEnd( 'ColladaLoader' );
 
