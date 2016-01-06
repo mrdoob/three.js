@@ -495,14 +495,23 @@ THREE.ColladaLoader.prototype = {
 			function getTexture( sid ) {
 
 				var sampler = effect.profile.samplers[ sid ];
-				var surface = effect.profile.surfaces[ sampler.source ];
 
-				var texture = new THREE.Texture( getImage( surface.init_from ) );
-				texture.wrapS = THREE.RepeatWrapping;
-				texture.wrapT = THREE.RepeatWrapping;
-				texture.needsUpdate = true;
+				if ( sampler !== undefined ) {
 
-				return texture;
+					var surface = effect.profile.surfaces[ sampler.source ];
+
+					var texture = new THREE.Texture( getImage( surface.init_from ) );
+					texture.wrapS = THREE.RepeatWrapping;
+					texture.wrapT = THREE.RepeatWrapping;
+					texture.needsUpdate = true;
+
+					return texture;
+
+				}
+
+				console.error( 'ColladaLoder: Undefined sampler', sid );
+
+				return;
 
 			}
 
