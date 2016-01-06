@@ -119,8 +119,15 @@ THREE.ColladaLoader.prototype = {
 		function parseAsset( xml ) {
 
 			return {
+				unit: parseAssetUnit( getElementsByTagName( xml, 'unit' )[ 0 ] ),
 				upAxis: parseAssetUpAxis( getElementsByTagName( xml, 'up_axis' )[ 0 ] )
 			};
+
+		}
+
+		function parseAssetUnit( xml ) {
+
+			return xml !== undefined ? parseFloat( xml.getAttribute( 'meter' ) ) : 1;
 
 		}
 
@@ -1443,6 +1450,8 @@ THREE.ColladaLoader.prototype = {
 			scene.rotation.x = - Math.PI / 2;
 
 		}
+
+		scene.scale.multiplyScalar( asset.unit );
 
 		console.timeEnd( 'ColladaLoader' );
 
