@@ -360,28 +360,32 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object.layers.test( camera.layers ) && ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points ) ) {
+		if ( object.layers.test( camera.layers ) ) {
 
-			if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+			if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points ) {
 
-				var material = object.material;
+				if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-				if ( material.visible === true ) {
+					var material = object.material;
 
-					object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-					_renderList.push( object );
+					if ( material.visible === true ) {
+
+						object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
+						_renderList.push( object );
+
+					}
 
 				}
-
+			
 			}
 
-		}
+			var children = object.children;
 
-		var children = object.children;
+			for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-		for ( var i = 0, l = children.length; i < l; i ++ ) {
+				projectObject( children[ i ], camera, shadowCamera );
 
-			projectObject( children[ i ], camera, shadowCamera );
+			}
 
 		}
 
