@@ -9,7 +9,7 @@
 	<script src="js/controls/OrbitControls.js"></script>	
 	<script src="js/loaders/OBJLoader.js"></script>
 	<script src='js/libs/dat.gui.min.js'></script>
-	<script src="js/GeneralParticleSystem.min.js"></script>
+	<script src="js/libs/photons.min.js"></script>
 
     <style>
 		body {
@@ -34,9 +34,9 @@
 <body>
 
 <div id="info">
-	<a href="http://threejs.org" target="_blank">three.js</a> - General purpose particle system by <a href="https://github.com/mkkellogg" target="_new">mkkellogg</a>
+	<a href="http://threejs.org" target="_blank">three.js</a> - Photons: General purpose particle system by <a href="https://github.com/mkkellogg" target="_new">mkkellogg</a>
 	<br />
-	Full source on <a href="https://github.com/mkkellogg/ParticleSystemJS" target="_new">GitHub</a>
+	Full source on <a href="https://github.com/mkkellogg/Photons" target="_new">GitHub</a>
 </div>
 
 <div id="renderingContainer" style="position: absolute; left:0px; top:0px"></div>
@@ -85,7 +85,7 @@
 		initListeners();
 
 		initLights();
-		ParticleSystemUtil.initializeLoadingManager();
+		PHOTONS.Util.initializeLoadingManager();
 		initSceneGeometry( function() {
 
 			initParticleSystems();
@@ -109,19 +109,19 @@
 
 	function initializeSmokeSystem() {
 
-		var _TPSV = THREE.Particles.SingularVector;
+		var _TPSV = PHOTONS.SingularVector;
 
 		smokeType = ParticleSystemIDs.Smoke1;
 
-		var smoke1Atlas = new THREE.Atlas( THREE.ImageUtils.loadTexture( 'textures/campfire/smokeparticle.png' ), true );
-		var smoke2Atlas = THREE.Atlas.createGridAtlas( THREE.ImageUtils.loadTexture( 'textures/campfire/smokeparticles.png' ), 0.0, 1.0, 1.0, 0.0, 4.0, 4.0, false, true );
+		var smoke1Atlas = new PHOTONS.Atlas( THREE.ImageUtils.loadTexture( 'textures/campfire/smokeparticle.png' ), true );
+		var smoke2Atlas = PHOTONS.Atlas.createGridAtlas( THREE.ImageUtils.loadTexture( 'textures/campfire/smokeparticles.png' ), 0.0, 1.0, 1.0, 0.0, 4.0, 4.0, false, true );
 
 		var altVertexShader = [
 
-			THREE.Particles.ParticleSystem.Shader.VertexVars,
+			PHOTONS.ParticleSystem.Shader.VertexVars,
 			"varying vec4 vPosition;",
 
-			THREE.Particles.ParticleSystem.Shader.ParticleVertexQuadPositionFunction,
+			PHOTONS.ParticleSystem.Shader.ParticleVertexQuadPositionFunction,
 
 			"void main()",
 			"{",
@@ -136,7 +136,7 @@
 
 		var altFragmentShader = [
 
-			THREE.Particles.ParticleSystem.Shader.FragmentVars,
+			PHOTONS.ParticleSystem.Shader.FragmentVars,
 			"varying vec4 vPosition;",
 
 			THREE.ShaderChunk[ "common" ],
@@ -171,7 +171,7 @@
 
 		var customUniforms1 = THREE.UniformsUtils.merge( [ THREE.UniformsLib[ 'lights' ], THREE.UniformsLib[ 'ambient' ] ] );
 
-		var altMaterial1 = THREE.Particles.ParticleSystem.createMaterial( altVertexShader, altFragmentShader, customUniforms1 );
+		var altMaterial1 = PHOTONS.ParticleSystem.createMaterial( altVertexShader, altFragmentShader, customUniforms1 );
 		altMaterial1.lights = true;
 		altMaterial1.blending = THREE.CustomBlending;
 		altMaterial1.blendSrc = THREE.SrcAlphaFactor;
@@ -204,67 +204,67 @@
 
 		};
 
-		var particleSystem1 = new THREE.Particles.ParticleSystem();
+		var particleSystem1 = new PHOTONS.ParticleSystem();
 		particleSystem1.initialize( camera, scene, particleSystemParams1 );
 
-		var particleSystem2 = new THREE.Particles.ParticleSystem();
+		var particleSystem2 = new PHOTONS.ParticleSystem();
 		particleSystem2.initialize( camera, scene, particleSystemParams2 );
 
-		var positionModifier = new THREE.Particles.RandomModifier(
+		var positionModifier = new PHOTONS.RandomModifier(
 			{
 				offset: new THREE.Vector3( 0, 0, 0 ),
 				range: new THREE.Vector3( 10, 0, 10 ),
 				rangeEdgeClamp: false,
-				rangeType: THREE.Particles.RangeType.Sphere
+				rangeType: PHOTONS.RangeType.Sphere
 			} );
 
-		var velocityModifier = new THREE.Particles.RandomModifier(
+		var velocityModifier = new PHOTONS.RandomModifier(
 			{
 				offset: new THREE.Vector3( 0, 75, 0 ),
 				range: new THREE.Vector3( 5, 30, 5 ),
 				rangeEdgeClamp: false,
-				rangeType: THREE.Particles.RangeType.Sphere
+				rangeType: PHOTONS.RangeType.Sphere
 			} );
 
-		var accelerationModifier = new THREE.Particles.RandomModifier(
+		var accelerationModifier = new PHOTONS.RandomModifier(
 			{
 				offset: new THREE.Vector3( 0, - 22, 0 ),
 				range: new THREE.Vector3( 35, 20, 35 ),
 				rangeEdgeClamp: false,
-				rangeType: THREE.Particles.RangeType.Cube
+				rangeType: PHOTONS.RangeType.Cube
 			} );
 
-		var rotationModifier = new THREE.Particles.RandomModifier(
+		var rotationModifier = new PHOTONS.RandomModifier(
 			{
-				offset: new THREE.Particles.SingularVector( 0 ),
-				range: new THREE.Particles.SingularVector( 360 )
+				offset: new PHOTONS.SingularVector( 0 ),
+				range: new PHOTONS.SingularVector( 360 )
 			} );
 
-		var rotationalSpeedModifier = new THREE.Particles.RandomModifier(
+		var rotationalSpeedModifier = new PHOTONS.RandomModifier(
 			{
-				offset: new THREE.Particles.SingularVector( 50 ),
-				range: new THREE.Particles.SingularVector( 400 )
+				offset: new PHOTONS.SingularVector( 50 ),
+				range: new PHOTONS.SingularVector( 400 )
 			} );
 
-		var atlas1Modifier = new THREE.Particles.EvenIntervalIndexModifier ( 1 );
+		var atlas1Modifier = new PHOTONS.EvenIntervalIndexModifier ( 1 );
 
-		var sizeModifier = new THREE.Particles.FrameSetModifier(
-			new THREE.Particles.FrameSet(
+		var sizeModifier = new PHOTONS.FrameSetModifier(
+			new PHOTONS.FrameSet(
 				[ 0, 3 ],
 				[ new THREE.Vector2( 10, 10 ),
 				new THREE.Vector2( 40, 40 ) ],
 				false )
 		);
 
-		var alphaModifier = new THREE.Particles.FrameSetModifier(
-			new THREE.Particles.FrameSet(
+		var alphaModifier = new PHOTONS.FrameSetModifier(
+			new PHOTONS.FrameSet(
 				[ 0, 1.0, 2.0, 3.0 ],
 				[ new _TPSV( 0.0 ), new _TPSV( 0.1 ), new _TPSV( 0.075 ), new _TPSV( 0.0 ) ],
 				true
 				) );
 
-		var colorModifier = new THREE.Particles.FrameSetModifier(
-			new THREE.Particles.FrameSet(
+		var colorModifier = new PHOTONS.FrameSetModifier(
+			new PHOTONS.FrameSet(
 				[ 0.0, 1.5, 3 ],
 				[ new THREE.Vector3( 0.1, 0.1, 0.1 ),
 				new THREE.Vector3( 0.35, 0.35, 0.35 ),
@@ -282,7 +282,7 @@
 		particleSystem1.bindModifier( 'alpha', alphaModifier );
 		particleSystem1.bindModifier( 'color', colorModifier );
 
-		var atlas2Modifier = new THREE.Particles.EvenIntervalIndexModifier ( 16 );
+		var atlas2Modifier = new PHOTONS.EvenIntervalIndexModifier ( 16 );
 
 		particleSystem2.bindInitializer( 'position', positionModifier );
 		particleSystem2.bindInitializer( 'velocity', velocityModifier );
@@ -304,66 +304,66 @@
 
 	function initializeFlameSystem() {
 
-		var _TPSV = THREE.Particles.SingularVector;
+		var _TPSV = PHOTONS.SingularVector;
 
 		// ---------------------
 		// flame particle system
 		// ---------------------
 
-		var flameMaterial = THREE.Particles.ParticleSystem.createMaterial();
+		var flameMaterial = PHOTONS.ParticleSystem.createMaterial();
 		flameMaterial.blending = THREE.AdditiveBlending;
 
 		var particleSystemParams = {
 
 			material: flameMaterial,
-			particleAtlas : THREE.Atlas.createGridAtlas( THREE.ImageUtils.loadTexture( 'textures/campfire/fireloop3.jpg' ), 0.0, 1.0, 1.0, 0.0, 8.0, 8.0, false, true ),
+			particleAtlas : PHOTONS.Atlas.createGridAtlas( THREE.ImageUtils.loadTexture( 'textures/campfire/fireloop3.jpg' ), 0.0, 1.0, 1.0, 0.0, 8.0, 8.0, false, true ),
 			particleReleaseRate : 3,
 			particleLifeSpan : 3,
 			lifespan : 0
 
 		};
-		var particleSystem = new THREE.Particles.ParticleSystem();
+		var particleSystem = new PHOTONS.ParticleSystem();
 		particleSystem.initialize( camera, scene, particleSystemParams );
 
-		particleSystem.bindModifier( "atlas", new THREE.Particles.EvenIntervalIndexModifier ( 64 ) );
+		particleSystem.bindModifier( "atlas", new PHOTONS.EvenIntervalIndexModifier ( 64 ) );
 
-		particleSystem.bindModifier( "size", new THREE.Particles.FrameSetModifier(
-			new THREE.Particles.FrameSet(
+		particleSystem.bindModifier( "size", new PHOTONS.FrameSetModifier(
+			new PHOTONS.FrameSet(
 				[ 0, 3 ],
 				[ new THREE.Vector3( 20, 25 ),
 				new THREE.Vector3( 20, 25 ) ],
 				false )
 		) );
 
-		particleSystem.bindModifier( "alpha", new THREE.Particles.FrameSetModifier(
-			new THREE.Particles.FrameSet(
+		particleSystem.bindModifier( "alpha", new PHOTONS.FrameSetModifier(
+			new PHOTONS.FrameSet(
 				[ 0, 0.2, 1.2, 2.0, 3 ],
 				[ new _TPSV( 0 ), new _TPSV( .3 ), new _TPSV( 1 ), new _TPSV( 1 ), new _TPSV( 0 ) ],
 				true )
 		) );
 
-		particleSystem.bindModifier( "color", new THREE.Particles.FrameSetModifier(
-			new THREE.Particles.FrameSet(
+		particleSystem.bindModifier( "color", new PHOTONS.FrameSetModifier(
+			new PHOTONS.FrameSet(
 				[ 0, 3 ],
 				[ new THREE.Vector3( 1.4, 1.4, 1.4 ),
 				new THREE.Vector3( 1.4, 1.4, 1.4 ) ],
 				false )
 		) );
 
-		particleSystem.bindInitializer( 'position', new THREE.Particles.RandomModifier(
+		particleSystem.bindInitializer( 'position', new PHOTONS.RandomModifier(
 			{
 				offset: new THREE.Vector3( 0, 0, 0 ),
 				range: new THREE.Vector3( 0, 0, 0 ),
 				rangeEdgeClamp: false,
-				rangeType: THREE.Particles.RangeType.Sphere
+				rangeType: PHOTONS.RangeType.Sphere
 			} ) );
 
-		particleSystem.bindInitializer( 'velocity', new THREE.Particles.RandomModifier(
+		particleSystem.bindInitializer( 'velocity', new PHOTONS.RandomModifier(
 			{
 				offset: new THREE.Vector3( 0, 25, 0 ),
 				range: new THREE.Vector3( 10, 2, 10 ),
 				rangeEdgeClamp: false,
-				rangeType: THREE.Particles.RangeType.Sphere
+				rangeType: PHOTONS.RangeType.Sphere
 			} ) );
 
 		particleSystems[ ParticleSystemIDs.Flame ] = particleSystem;
@@ -374,41 +374,41 @@
 		// flame embers particle system
 		// ---------------------
 
-		var emberMaterial = THREE.Particles.ParticleSystem.createMaterial();
+		var emberMaterial = PHOTONS.ParticleSystem.createMaterial();
 		emberMaterial.blending = THREE.AdditiveBlending;
 
 		particleSystemParams = {
 
 			material: emberMaterial,
-			particleAtlas : new THREE.Atlas( THREE.ImageUtils.loadTexture( 'textures/campfire/Puff.png' ), true ),
+			particleAtlas : new PHOTONS.Atlas( THREE.ImageUtils.loadTexture( 'textures/campfire/Puff.png' ), true ),
 			particleReleaseRate : 18,
 			particleLifeSpan : 3,
 			lifespan : 0
 
 		};
-		particleSystem = new THREE.Particles.ParticleSystem();
+		particleSystem = new PHOTONS.ParticleSystem();
 		particleSystem.initialize( camera, scene, particleSystemParams );
 
-		particleSystem.bindModifier( "atlas", new THREE.Particles.EvenIntervalIndexModifier ( 1 ) );
+		particleSystem.bindModifier( "atlas", new PHOTONS.EvenIntervalIndexModifier ( 1 ) );
 
-		particleSystem.bindModifier( 'size', new THREE.Particles.RandomModifier(
+		particleSystem.bindModifier( 'size', new PHOTONS.RandomModifier(
 			{
 				offset: new THREE.Vector3( .25, .25, 0.0 ),
 				range: new THREE.Vector3( 0.05, 0.05, 0.0 ),
 				rangeEdgeClamp: false,
-				rangeType: THREE.Particles.RangeType.Sphere,
+				rangeType: PHOTONS.RangeType.Sphere,
 				runOnce: true
 			} ) );
 
-		particleSystem.bindModifier( "alpha", new THREE.Particles.FrameSetModifier(
-			new THREE.Particles.FrameSet(
+		particleSystem.bindModifier( "alpha", new PHOTONS.FrameSetModifier(
+			new PHOTONS.FrameSet(
 				[ 0, 0.2, 1.2, 2.0, 3 ],
 				[ new _TPSV( 0 ), new _TPSV( 1 ), new _TPSV( 1 ), new _TPSV( 1 ), new _TPSV( 0 ) ],
 				true )
 		) );
 
-		particleSystem.bindModifier( "color", new THREE.Particles.FrameSetModifier(
-			new THREE.Particles.FrameSet(
+		particleSystem.bindModifier( "color", new PHOTONS.FrameSetModifier(
+			new PHOTONS.FrameSet(
 				[ 0, 2, 3 ],
 				[ new THREE.Vector3( 1.3, 1.3, 0 ),
 				new THREE.Vector3( .75, .4, .4 ),
@@ -416,28 +416,28 @@
 				false )
 		) );
 
-		particleSystem.bindInitializer( 'position', new THREE.Particles.RandomModifier(
+		particleSystem.bindInitializer( 'position', new PHOTONS.RandomModifier(
 			{
 				offset: new THREE.Vector3( 0, 7, 0 ),
 				range: new THREE.Vector3( 3, 0, 3 ),
 				rangeEdgeClamp: false,
-				rangeType: THREE.Particles.RangeType.Sphere
+				rangeType: PHOTONS.RangeType.Sphere
 			} ) );
 
-		particleSystem.bindInitializer( 'velocity', new THREE.Particles.RandomModifier(
+		particleSystem.bindInitializer( 'velocity', new PHOTONS.RandomModifier(
 			{
 				offset: new THREE.Vector3( 0, 25, 0 ),
 				range: new THREE.Vector3( 15, 25, 15 ),
 				rangeEdgeClamp: true,
-				rangeType: THREE.Particles.RangeType.Sphere
+				rangeType: PHOTONS.RangeType.Sphere
 			} ) );
 
-		particleSystem.bindModifier( 'acceleration', new THREE.Particles.RandomModifier(
+		particleSystem.bindModifier( 'acceleration', new PHOTONS.RandomModifier(
 			{
 				offset: new THREE.Vector3( 0, 15, 0 ),
 				range: new THREE.Vector3( 180, 280, 180 ),
 				rangeEdgeClamp: true,
-				rangeType: THREE.Particles.RangeType.Sphere
+				rangeType: PHOTONS.RangeType.Sphere
 			} ) );
 
 		particleSystems[ ParticleSystemIDs.FlameEmbers ] = particleSystem;
@@ -487,7 +487,7 @@
 
 		window.addEventListener( 'resize', onWindowResize, false );
 
-	}
+	    }
 
 	function initRenderer() {
 
@@ -577,7 +577,7 @@
 
 		} );
 
-		ParticleSystemUtil.loadObj( 'models/campfire/campfire.obj', 'models/campfire/campfire_texture.png', campFireMaterial,
+		PHOTONS.Util.loadObj( 'models/campfire/campfire.obj', 'models/campfire/campfire_texture.png', campFireMaterial,
 
 			function( mesh ) {
 
@@ -610,7 +610,7 @@
 
 		} );
 
-		ParticleSystemUtil.loadObj( 'models/campfire/brownrock.obj', 'models/campfire/brownrock.png', rockMaterial,
+		PHOTONS.Util.loadObj( 'models/campfire/brownrock.obj', 'models/campfire/brownrock.png', rockMaterial,
 
 			function( mesh ) {
 
@@ -657,7 +657,7 @@
 
 		} );
 
-		ParticleSystemUtil.loadObj( 'models/campfire/pinetree_doubleface.obj', 'models/campfire/pinetree.jpg', treeMaterial,
+		PHOTONS.Util.loadObj( 'models/campfire/pinetree_doubleface.obj', 'models/campfire/pinetree.jpg', treeMaterial,
 
 			function( mesh ) {
 
