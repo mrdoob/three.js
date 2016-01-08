@@ -116,7 +116,7 @@ THREE.KeyframeTrack.prototype = {
 		}
 
 		var lastKeysToRemove = 0;
-		for ( var i = this.keys.length - 2; i > 0; i ++ ) {
+		for ( var i = this.keys.length - 2; i > 0; -- i ) {
 			if ( this.keys[i] >= endTime ) {
 				lastKeysToRemove ++;
 			} else {
