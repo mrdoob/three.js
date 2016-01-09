@@ -88,7 +88,7 @@
 
 			var canvas;
 
-			var scenes = [], renderer;
+			var scenes = [], renderer, globalScene, globalCamera;
 
 			init();
 			animate();
@@ -158,7 +158,9 @@
 
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
-				renderer.setClearColor( 0xffffff, 1 );
+
+				globalScene = new THREE.Scene();
+				globalCamera = new THREE.Camera();
 
 			}
 
@@ -187,7 +189,8 @@
 				updateSize();
 
 				renderer.setClearColor( 0xffffff );
-				renderer.clear();
+				renderer.render( globalScene, globalCamera );
+				
 				renderer.setClearColor( 0xe0e0e0 );
 
 				renderer.setScissorTest( true );
