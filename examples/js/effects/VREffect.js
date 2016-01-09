@@ -53,6 +53,13 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
+	// field of view
+
+	this.setFOV = function(fovL, fovR) {
+		eyeFOVL = fovL;
+		eyeFOVR = fovR;
+	};
+
 	// fullscreen
 
 	var isFullscreen = false;
