@@ -1052,7 +1052,13 @@ THREE.ColladaLoader.prototype = {
 			function pushVector( i ) {
 
 				var index = indices[ i + offset ] * sourceStride;
-				array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
+				var length = index + sourceStride;
+
+				for ( ; index < length; index ++ ) {
+
+					array.push( sourceArray[ index ] );
+
+				}
 
 			}
 
