@@ -159,6 +159,7 @@
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
 				renderer.setClearColor( 0xffffff, 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 
 			}
 
@@ -169,7 +170,7 @@
 
 				if ( canvas.width !== width || canvas.height != height ) {
 
-					renderer.setSize ( width, height, false );
+					renderer.setSize( width, height, false );
 
 				}
 
@@ -187,7 +188,9 @@
 				updateSize();
 
 				renderer.setClearColor( 0xffffff );
+				renderer.setViewport( 0, 0, canvas.clientWidth, canvas.clientHeight );
 				renderer.clear();
+
 				renderer.setClearColor( 0xe0e0e0 );
 
 				renderer.setScissorTest( true );
