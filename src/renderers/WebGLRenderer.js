@@ -234,7 +234,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_gl.clearColor( r, g, b, a );
+		state.clearColor( r, g, b, a );
 
 	}
 

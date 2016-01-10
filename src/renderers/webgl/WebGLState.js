@@ -6,6 +6,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var _this = this;
 
+	var color = new THREE.Vector4();
+
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
 	var attributeDivisors = new Uint8Array( 16 );
@@ -49,12 +51,13 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	var currentTextureSlot = undefined;
 	var currentBoundTextures = {};
 
+	var currentClearColor = new THREE.Vector4();
 	var currentScissor = new THREE.Vector4();
 	var currentViewport = new THREE.Vector4();
 
 	this.init = function () {
 
-		gl.clearColor( 0, 0, 0, 1 );
+		this.clearColor( 0, 0, 0, 1 );
 		gl.clearDepth( 1 );
 		gl.clearStencil( 0 );
 
@@ -523,7 +526,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		}
 
-	}
+	};
 
 	this.bindTexture = function ( webglType, webglTexture ) {
 
@@ -582,6 +585,19 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	};
 
 	//
+
+	this.clearColor = function ( r, g, b, a ) {
+
+		color.set( r, g, b, a );
+
+		if ( currentClearColor.equals( color ) === false ) {
+
+			gl.clearColor( r, g, b, a );
+			currentClearColor.copy( color );
+
+		}
+
+	};
 
 	this.scissor = function ( scissor ) {
 
