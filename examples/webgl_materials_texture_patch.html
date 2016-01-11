@@ -86,7 +86,7 @@
                 if ( created ) {
                     loader.load( './textures/wesnoth/' + unit + '.png', function ( unitTexture ) {
                         mesh2.geometry.switchUvSystem( locator.uvSystem );
-                        locator.draw( unitTexture );
+                        locator.setTexture( unitTexture );
                     } );
                 }
 

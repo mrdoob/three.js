@@ -51,7 +51,7 @@ THREE.GridTextureLocator.prototype.destroy = function () {
 
 };
 
-THREE.GridTextureLocator.prototype.draw = function ( texture ) {
+THREE.GridTextureLocator.prototype.setTexture = function ( texture ) {
 
 	if ( this.textureGrid === null )
 		return ;
