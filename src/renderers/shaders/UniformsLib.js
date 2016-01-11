@@ -39,7 +39,6 @@ THREE.UniformsLib = {
 	emissivemap: {
 
 		"emissiveMap" : { type: "t", value: null },
-		"emissiveMapIntensity" : { type: "f", value: 1 },
 
 	},
 

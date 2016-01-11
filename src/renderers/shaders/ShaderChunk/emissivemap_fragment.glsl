@@ -4,6 +4,6 @@
 
 	emissiveColor.rgb = inputToLinear( emissiveColor.rgb );
 
-	totalEmissiveLight *= emissiveColor.rgb * emissiveMapIntensity;
+	totalEmissiveLight *= emissiveColor.rgb;
 
 #endif
