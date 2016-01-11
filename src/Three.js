@@ -352,6 +352,10 @@ THREE.RGB_PVRTC_2BPPV1_Format = 2101;
 THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 
+// ETC compressed texture formats
+
+THREE.RGB_ETC1_Format = 2151;
+
 // Loop styles for AnimationAction
 
 THREE.LoopOnce = 2200;
