@@ -169,8 +169,8 @@
 		Return a [page:Boolean] true if the context supports vertex textures.
 		</div>
 
-		<h3>[method:null setSize]( [page:Integer width], [page:Integer height] )</h3>
-		<div>Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0).</div>
+		<h3>[method:null setSize]( [page:Integer width], [page:Integer height], [page:Boolean updateStyle] )</h3>
+		<div>Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0). Setting updateStyle to true adds explicit pixel units to the output canvas style.</div>
 
 		<h3>[method:null setViewport]( [page:Integer x], [page:Integer y], [page:Integer width], [page:Integer height] )</h3>
 		<div>Sets the viewport to render from (x, y) to (x + width, y + height).</div>
@@ -200,7 +200,7 @@
 		<div>Returns a [page:Float float] with the current clear alpha. Ranges from 0 to 1.</div>
 
 		<h3>[method:null clear]( [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
-		<div>Tells the renderer to clear its color, depth or stencil drawing buffer(s).</div>
+		<div>Tells the renderer to clear its color, depth or stencil drawing buffer(s). This method initializes the color buffer to the current clear color value.</div>
 		<div>Arguments default to true.</div>
 
 		<h3>[method:null renderBufferImmediate]( [page:Object3D object], [page:shaderprogram program], [page:Material shading] )</h3>
