@@ -2618,7 +2618,6 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 		var animation = {
 			name: name === undefined ? THREE.Math.generateUUID() : name,
 			fps: 30,
-			length: 0.0,
 			hierarchy: []
 		};
 
@@ -2632,8 +2631,6 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 			);
 
 		}
-
-		var maxTime = 0.0;
 
 		for ( var i = 0; i < orderedMotions.length; i++ ) {
 
@@ -2651,15 +2648,7 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 			}
 
-			if ( keys.length > 0 ) {
-
-				maxTime = Math.max( keys[ keys.length - 1 ].time, maxTime );
-
-			}
-
 		}
-
-		animation.length = maxTime;
 
 		for ( var i = 0; i < orderedMotions.length; i++ ) {
 
@@ -2676,7 +2665,13 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		}
 
-		mesh.geometry.animations.push( THREE.AnimationClip.parseAnimation( animation, mesh.geometry.bones ) );
+		var clip = THREE.AnimationClip.parseAnimation( animation, mesh.geometry.bones );
+
+		if ( clip !== null ) {
+
+			mesh.geometry.animations.push( clip );
+
+		}
 
 	};
 
@@ -2692,7 +2687,6 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		var morphAnimation = {
 			fps: 30,
-			length: 0.0,
 			hierarchy: []
 		};
 
@@ -2701,8 +2695,6 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 			morphAnimation.hierarchy.push( { keys: [] } );
 
 		}
-
-		var maxTime = 0.0;
 
 		for ( var i = 0; i < orderedMorphs.length; i++ ) {
 
@@ -2717,20 +2709,6 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 				helper.pushAnimationKey( keys, t, w );
 
 			}
-
-			if ( keys.length > 0 ) {
-
-				maxTime = Math.max( keys[ keys.length - 1 ].time, maxTime );
-
-			}
-
-		}
-
-		morphAnimation.length = maxTime;
-
-		if ( mesh.geometry.morphAnimations === undefined ) {
-
-			mesh.geometry.morphAnimations = [];
 
 		}
 
@@ -2750,7 +2728,19 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		}
 
-		mesh.geometry.morphAnimations.push( new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name + 'Morph', -1, tracks ) );
+		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name + 'Morph', -1, tracks );
+
+		if ( clip !== null ) {
+
+			if ( mesh.geometry.morphAnimations === undefined ) {
+
+				mesh.geometry.morphAnimations = [];
+
+			}
+
+			mesh.geometry.morphAnimations.push( clip );
+
+		}
 
 	};
 
@@ -3221,7 +3211,6 @@ THREE.MMDLoader.VectorKeyframeTrackEx = function ( name, times, values, interpol
 THREE.MMDLoader.VectorKeyframeTrackEx.prototype = Object.create( THREE.VectorKeyframeTrack.prototype );
 THREE.MMDLoader.VectorKeyframeTrackEx.prototype.constructor = THREE.MMDLoader.VectorKeyframeTrackEx;
 THREE.MMDLoader.VectorKeyframeTrackEx.prototype.TimeBufferType = Float64Array;
-THREE.MMDLoader.VectorKeyframeTrackEx.prototype.ValueBufferType = Float64Array;
 
 THREE.MMDLoader.NumberKeyframeTrackEx = function ( name, times, values, interpolation ) {
 
@@ -3232,7 +3221,6 @@ THREE.MMDLoader.NumberKeyframeTrackEx = function ( name, times, values, interpol
 THREE.MMDLoader.NumberKeyframeTrackEx.prototype = Object.create( THREE.NumberKeyframeTrack.prototype );
 THREE.MMDLoader.NumberKeyframeTrackEx.prototype.constructor = THREE.MMDLoader.NumberKeyframeTrackEx;
 THREE.MMDLoader.NumberKeyframeTrackEx.prototype.TimeBufferType = Float64Array;
-THREE.MMDLoader.NumberKeyframeTrackEx.prototype.ValueBufferType = Float64Array;
 
 THREE.MMDLoader.DataView = function ( buffer, littleEndian ) {
 
