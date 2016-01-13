@@ -188,11 +188,10 @@
 				updateSize();
 
 				renderer.setClearColor( 0xffffff );
-				renderer.setViewport( 0, 0, canvas.clientWidth, canvas.clientHeight );
+				renderer.setScissorTest( false );
 				renderer.clear();
 
 				renderer.setClearColor( 0xe0e0e0 );
-
 				renderer.setScissorTest( true );
 
 				scenes.forEach( function( scene ) {
@@ -234,8 +233,6 @@
 					renderer.render( scene, camera );
 
 				} );
-
-				renderer.setScissorTest( false );
 
 			}
 
