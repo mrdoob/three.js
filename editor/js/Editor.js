@@ -70,7 +70,12 @@ var Editor = function () {
 		showGridChanged: new SIGNALS.Signal(),
 		refreshSidebarObject3D: new SIGNALS.Signal(),
 		historyChanged: new SIGNALS.Signal(),
-		refreshScriptEditor: new SIGNALS.Signal()
+		refreshScriptEditor: new SIGNALS.Signal(),
+
+		cameraPositionSnap: new SIGNALS.Signal(),
+		undo: new SIGNALS.Signal(),
+		redo: new SIGNALS.Signal()
+
 
 	};
 
@@ -94,6 +99,9 @@ var Editor = function () {
 
 	this.selected = null;
 	this.helpers = {};
+
+	this.shortcuts = new EditorShortCutsList();
+	this.isolationMode = false;
 
 };
 
@@ -150,6 +158,33 @@ Editor.prototype = {
 		this.signals.objectAdded.dispatch( object );
 		this.signals.sceneGraphChanged.dispatch();
 
+	},
+
+	cloneObject: function(){
+
+		var object = this.selected;
+
+		if( object === null ) return;
+
+		if ( object.parent === undefined ) return; // avoid cloning the camera or scene
+
+		object = object.clone();
+
+		this.addObject( object );
+		this.select( object );
+	},
+
+	destoryCurrent: function(){
+
+		var object = this.selected;
+
+		if(object === null) return;
+
+		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
+
+		var parent = object.parent;
+		this.removeObject( object );
+		this.select( null );
 	},
 
 	moveObject: function ( object, parent, before ) {
@@ -395,7 +430,8 @@ Editor.prototype = {
 
 	focus: function ( object ) {
 
-		this.signals.objectFocused.dispatch( object );
+		if ( this.selected === null ) return;
+			this.signals.objectFocused.dispatch( object );
 
 	},
 
@@ -403,6 +439,51 @@ Editor.prototype = {
 
 		this.focus( this.scene.getObjectById( id, true ) );
 
+	},
+
+
+	hide: function(){
+
+		if(this.selected !== null){
+			this.selected.visible = false;
+			this.deselect();
+		}
+	},
+
+	unhideAll: function(){
+
+		this.scene.traverse( function ( child ) {
+
+			child.visible = true;
+
+		} );
+
+		this.signals.sceneGraphChanged.dispatch();
+	},
+
+	isolate: function(){
+
+		var mode = !this.isolationMode;
+		this.isolationMode = mode;
+
+		if(this.selected !== null){
+			this.scene.traverse( function ( child ) {
+
+				if ( !(child instanceof THREE.Light )){ 
+					if(child.name !== "Scene" ){
+					
+						child.visible = mode;
+
+					}
+				}
+			} );
+
+			this.selected.visible = true;
+
+			//TODO: Add parent iteration so all parents of an object stay visible and don't hide the child
+			this.signals.sceneGraphChanged.dispatch();
+
+		}
 	},
 
 	clear: function () {
