@@ -1,0 +1,16 @@
+{
+  "name": "three.js",
+  "version": "0.73.2",
+  "description": "Note: 'three.js' npm package has been deprecated in favor of the 'three' npm package.",
+  "main": "shim.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrdoob/three.js.git"
+  },
+  "author": {
+    "name": "mrdoob"
+  },
+  "dependencies": {
+    "three": "0.73.0"
+  }
+}
