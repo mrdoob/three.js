@@ -18,80 +18,6 @@ if ( typeof define === 'function' && define.amd ) {
 
 }
 
-
-// polyfills
-
-if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === undefined ) {
-
-	// Missing in Android stock browser.
-
-	( function () {
-
-		var lastTime = 0;
-		var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
-
-		for ( var x = 0; x < vendors.length && ! self.requestAnimationFrame; ++ x ) {
-
-			self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
-			self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
-
-		}
-
-		if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
-
-			self.requestAnimationFrame = function ( callback ) {
-
-				var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-				var id = self.setTimeout( function () {
-
-					callback( currTime + timeToCall );
-
-				}, timeToCall );
-				lastTime = currTime + timeToCall;
-				return id;
-
-			};
-
-		}
-
-		if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
-
-			self.cancelAnimationFrame = function ( id ) {
-
-				self.clearTimeout( id );
-
-			};
-
-		}
-
-	} )();
-
-}
-
-//
-
-if ( self.performance === undefined ) {
-
-	self.performance = {};
-
-}
-
-if ( self.performance.now === undefined ) {
-
-	( function () {
-
-		var start = Date.now();
-
-		self.performance.now = function () {
-
-			return Date.now() - start;
-
-		}
-
-	} )();
-
-}
-
 //
 
 if ( Number.EPSILON === undefined ) {
@@ -7934,7 +7860,7 @@ THREE.Clock.prototype = {
 
 	start: function () {
 
-		this.startTime = self.performance.now();
+		this.startTime = performance.now();
 
 		this.oldTime = this.startTime;
 		this.running = true;
@@ -7967,7 +7893,7 @@ THREE.Clock.prototype = {
 
 		if ( this.running ) {
 
-			var newTime = self.performance.now();
+			var newTime = performance.now();
 
 			diff = 0.001 * ( newTime - this.oldTime );
 			this.oldTime = newTime;
@@ -18702,9 +18628,21 @@ THREE.BufferGeometryLoader.prototype = {
 
 		var index = json.data.index;
 
+		var TYPED_ARRAYS = {
+			'Int8Array': Int8Array,
+			'Uint8Array': Uint8Array,
+			'Uint8ClampedArray': Uint8ClampedArray,
+			'Int16Array': Int16Array,
+			'Uint16Array': Uint16Array,
+			'Int32Array': Int32Array,
+			'Uint32Array': Uint32Array,
+			'Float32Array': Float32Array,
+			'Float64Array': Float64Array
+		};
+
 		if ( index !== undefined ) {
 
-			var typedArray = new self[ index.type ]( index.array );
+			var typedArray = new TYPED_ARRAYS[ index.type ]( index.array );
 			geometry.setIndex( new THREE.BufferAttribute( typedArray, 1 ) );
 
 		}
@@ -18714,7 +18652,7 @@ THREE.BufferGeometryLoader.prototype = {
 		for ( var key in attributes ) {
 
 			var attribute = attributes[ key ];
-			var typedArray = new self[ attribute.type ]( attribute.array );
+			var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
 
 			geometry.addAttribute( key, new THREE.BufferAttribute( typedArray, attribute.itemSize ) );
 
