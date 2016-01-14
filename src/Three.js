@@ -17,6 +17,27 @@ if ( typeof define === 'function' && define.amd ) {
 }
 
 
+if ( typeof module !== 'undefined' && module.exports ) {
+	// the code is running under node environment
+
+	if ( typeof self === 'undefined' ) {
+
+		// if self wasn't defined before, set to nodes global scope
+		self = global;
+
+	}
+} else if ( typeof self !== 'undefined' ) {
+
+	// if the code is running under other environments e.g. webworker, self is defined
+
+} else {
+
+	// the code is running in the browser, so window is defined as the global scope
+	self = window;
+
+}
+
+
 // polyfills
 
 if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === undefined ) {
