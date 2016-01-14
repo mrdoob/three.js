@@ -6,7 +6,7 @@ function Transition ( sceneA, sceneB ) {
 
 	this.textures = [];
 	for ( var i = 0; i < 6; i ++ )
-		this.textures[ i ] = new THREE.ImageUtils.loadTexture( 'textures/transition/transition' + ( i + 1 ) + '.png' );
+		this.textures[ i ] = new THREE.TextureLoader().load( 'textures/transition/transition' + ( i + 1 ) + '.png' );
 
 	this.quadmaterial = new THREE.ShaderMaterial( {
 
