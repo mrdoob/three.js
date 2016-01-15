@@ -159,7 +159,6 @@
                     float s = mipInfo.y;
                     float level0 = mipInfo.x;
                     float level1 = level0 + 1.0;
-                    level1 = level1 > 5.0 ? 5.0 : level1;
                     // Tri linear interpolation.
                     vec2 uv_10 = getCubeUV(reflectedDirection, r1, level0);
                     vec2 uv_11 = getCubeUV(reflectedDirection, r1, level1);

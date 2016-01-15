@@ -386,10 +386,12 @@
 				cubeCamera.updateCubeMap( renderer, scene );
 
 				sphere.visible = true; // *cough*
-                                                                if(pmremGenerator!==undefined) {
-                                                                    pmremGenerator.update(renderer);
-                                                                    pmremCubeUVPacker.update(renderer);
-                                                                }
+                                
+				if(pmremGenerator!==undefined) {
+
+                                   pmremGenerator.update(renderer);
+                                   pmremCubeUVPacker.update(renderer);
+                                }
 				renderer.render( scene, camera );
 
 			}
