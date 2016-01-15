@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>three.js webgl - loaders - OBJ loader</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                font-family: Monospace;
+                background-color: #000;
+                color: #fff;
+                margin: 0px;
+                overflow: hidden;
+            }
+            #info {
+                color: #fff;
+                position: absolute;
+                top: 10px;
+                width: 100%;
+                text-align: center;
+                z-index: 100;
+                display:block;
+            }
+            #info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+        </style>
+    </head>
+
+    <body>
+
+        <script src="../build/three.js"></script>
+        <script src="js/controls/OrbitControls.js"></script>
+        <script src="js/Detector.js"></script>
+        <script src="../src/extras/PMREMGenerator.js"></script>
+        <script src="../src/extras/PMREM_CubeUVPacker.js"></script>
+        
+        <script id="vertexShader" type="x-shader/x-vertex">
+                varying vec3 worldNormal;
+                varying vec3 vecPos;
+                varying vec3 viewPos;
+                void main(){
+                        worldNormal = (modelMatrix * vec4(normal,0.0)).xyz;
+                        vecPos = (modelMatrix * vec4(position, 1.0 )).xyz;
+                        viewPos = (modelViewMatrix * vec4(position, 1.0 )).xyz;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+                }
+        </script>
+        
+        <script id="fragmentShader" type="x-shader/x-fragment">
+                #extension GL_EXT_shader_texture_lod : enable
+                varying vec3 worldNormal;
+                varying vec3 vecPos;
+                varying vec3 viewPos;
+                uniform samplerCube cubeTexture;
+                uniform float mapSize;
+                
+                vec3 fixSeams(vec3 vec) {
+                    float scale = 1.0 - 1.0 / mapSize;
+                    float M = max(max(abs(vec.x), abs(vec.y)), abs(vec.z));
+                    if (abs(vec.x) != M) vec.x *= scale;
+                    if (abs(vec.y) != M) vec.y *= scale;
+                    if (abs(vec.z) != M) vec.z *= scale;
+                    return vec;
+                }
+
+                void main() {
+                        vec3 viewVector = normalize(vecPos - cameraPosition);
+                        vec3 Normal = normalize(worldNormal);
+                        vec3 reflectedDirection = fixSeams(reflect(viewVector, Normal));
+                        vec4 colorRefl = textureCube( cubeTexture, reflectedDirection);
+                        gl_FragColor = colorRefl;
+                }
+        </script>
+        
+        <script>
+
+var container;
+var camera, backgroundCamera, scene, renderer, controls;
+var rootNode = new THREE.Object3D();
+
+var testMaterial;
+
+var onTextureLoad = function() {
+    pmremGenerator = new PMREMGenerator(reflectionCube);
+    pmremGenerator.update(renderer);
+    initMaterials();
+    initTestScene();
+    animate();
+};
+
+var initMaterials = function() {
+    testMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+            "mapSize" : {type: "f", value: 0},
+            "cubeTexture": {type: "t", value: null},
+        },
+        vertexShader: document.getElementById( 'vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+    });
+};
+
+var initTestScene = function() {
+    var sphereRadius = 0.5;
+    var sphereGeometry = new THREE.SphereGeometry(sphereRadius,25,16);
+    var sphereMesh = new THREE.Mesh(sphereGeometry, testMaterial);
+    
+    var x = -2.5;
+    for( var i=0; i<pmremGenerator.numLods; i++) {
+        var cloneMesh = sphereMesh.clone();
+        cloneMesh.material = testMaterial.clone();
+        cloneMesh.material.uniforms["cubeTexture"].value = pmremGenerator.cubeLods[i];    
+        cloneMesh.material.uniforms["mapSize"].value = pmremGenerator.cubeLods[i].width;    
+        cloneMesh.position.x = x;
+        rootNode.add(cloneMesh);
+        x += 2.1 * sphereRadius;
+    }
+    scene.add(rootNode);
+};
+
+var path = "textures/cube/pisa/";
+                var format = '.png';
+                var urls = [
+                    path + 'px' + format, path + 'nx' + format,
+                    path + 'py' + format, path + 'ny' + format,
+                    path + 'pz' + format, path + 'nz' + format
+                ];
+var reflectionCube = THREE.ImageUtils.loadTextureCube(urls, undefined, onTextureLoad);
+reflectionCube.generateMipmaps = false;
+reflectionCube.magFilter = THREE.LinearFilter;
+reflectionCube.minFilter = THREE.LinearFilter;
+
+var pmremGenerator;
+
+var windowHalfX = window.innerWidth / 2;
+var windowHalfY = window.innerHeight / 2;
+
+var cameraPosition = new THREE.Vector3();
+
+initScene();
+animate();
+
+function initScene() {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+    camera.position.z = 4;
+    camera.position.x = 0;
+     
+    controls = new THREE.OrbitControls(camera);
+    controls.addEventListener('change', render);
+    // scene
+    scene = new THREE.Scene();
+    
+    renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true, antialias: true});
+    renderer.context.getExtension('EXT_shader_texture_lod');
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+        
+    document.addEventListener('mousemove', onDocumentMouseMove, false);
+    document.addEventListener('mousedown', onDocumentMouseDown, false);
+    document.addEventListener('mouseup', onDocumentMouseUp, false);
+    document.addEventListener('mousewheel', onDocumentMouseWheel, false);
+    window.addEventListener('resize', onWindowResize, false);
+}
+
+function onDocumentMouseMove(event)
+{
+}
+
+function onDocumentMouseWheel(event)
+{
+    var pos = camera.position;
+    var d = pos.length();
+    cameraPosition.x = pos.x;
+    cameraPosition.y = pos.y;
+    cameraPosition.z = pos.z;
+    var min = 0.1;
+    var max = 100;
+    if (d < min)
+    {
+        cameraPosition.normalize();
+        pos.x = cameraPosition.x * min;
+        pos.y = cameraPosition.y * min;
+        pos.z = cameraPosition.z * min;
+    }
+    if (d > max)
+    {
+        cameraPosition.normalize();
+        pos.x = cameraPosition.x * max;
+        pos.y = cameraPosition.y * max;
+        pos.z = cameraPosition.z * max;
+    }
+
+}
+
+function onDocumentMouseDown(e)
+{
+}
+
+function onDocumentMouseUp(e)
+{
+}
+
+function onWindowResize() {
+    windowHalfX = window.innerWidth / 2;
+    windowHalfY = window.innerHeight / 2;
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+    
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    render();
+}
+
+function render() {
+    renderer.setClearColor(0xFFFFFF);
+    renderer.render(scene, camera);
+}
+
+        </script>
+
+    </body>
+</html>
