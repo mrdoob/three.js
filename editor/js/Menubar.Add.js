@@ -242,6 +242,39 @@ Menubar.Add = function ( editor ) {
 	options.add( option );
 	*/
 
+	// Lathe
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Lathe geometry' );
+	option.onClick( function() {
+
+		var points = [];
+		var segments = 20;
+		var phiStart = 0;
+		var phiLength = 2 * Math.PI;
+
+		points.push( new THREE.Vector3( 0, 0, 0 ) );
+		points.push( new THREE.Vector3( 4, 0, 0 ) );
+		points.push( new THREE.Vector3( 3.5, 0, 0.5 ) );
+		points.push( new THREE.Vector3( 1, 0, 0.75 ) );
+		points.push( new THREE.Vector3( 0.8, 0, 1 ) );
+		points.push( new THREE.Vector3( 0.8, 0, 4 ) );
+		points.push( new THREE.Vector3( 1, 0, 4.2 ) );
+		points.push( new THREE.Vector3( 1.4, 0, 4.8 ) );
+		points.push( new THREE.Vector3( 2, 0, 5 ) );
+		points.push( new THREE.Vector3( 2.5, 0, 5.4 ) );
+		points.push( new THREE.Vector3( 2.5, 0, 12 ) );
+
+		var geometry = new THREE.LatheGeometry( points, segments, phiStart, phiLength );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { side: THREE.DoubleSide } ) );
+		mesh.name = 'Lathe ' + ( ++meshCount );
+
+		editor.execute( new AddObjectCommand( mesh ) );
+
+	} );
+	options.add( option );
+
 	// Sprite
 
 	var option = new UI.Row();
