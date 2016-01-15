@@ -246,7 +246,7 @@ Menubar.Add = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Lathe geometry' );
+	option.setTextContent( 'Lathe' );
 	option.onClick( function() {
 
 		var points = [];
@@ -268,7 +268,7 @@ Menubar.Add = function ( editor ) {
 
 		var geometry = new THREE.LatheGeometry( points, segments, phiStart, phiLength );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { side: THREE.DoubleSide } ) );
-		mesh.name = 'Lathe ' + ( ++meshCount );
+		mesh.name = 'Lathe ' + ( ++ meshCount );
 
 		editor.execute( new AddObjectCommand( mesh ) );
 
