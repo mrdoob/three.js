@@ -45,6 +45,12 @@ THREE.Ray.prototype = {
 
 	},
 
+	lookAt: function ( v ) {
+
+		this.direction = v.clone().sub(this.origin).normalize();
+
+	},
+
 	recast: function () {
 
 		var v1 = new THREE.Vector3();
