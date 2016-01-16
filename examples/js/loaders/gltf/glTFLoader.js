@@ -77,7 +77,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 	function LoadTexture(src) {
 		if (!src) { return null; }
-		return THREE.ImageUtils.loadTexture(src);
+		return new THREE.TextureLoader().load(src);
 	}
 
     // Geometry processing
@@ -103,8 +103,8 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         // Build indexed mesh
 		var geometry = this.geometry;
 
-		geometry.addAttribute( 'index', new THREE.BufferAttribute( this.indexArray, 1 ) );
-		geometry.addDrawCall( 0, this.indexArray.length );
+		geometry.setIndex( new THREE.BufferAttribute( this.indexArray, 1 ) );
+		geometry.addGroup( 0, this.indexArray.length );
 
 		geometry.computeBoundingSphere();
 	};
