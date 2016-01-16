@@ -560,35 +560,7 @@ THREE.BufferGeometry.prototype = {
 
 			if ( positions ) {
 
-				var bb = this.boundingBox;
-				bb.makeEmpty();
-
-				var minX = +Infinity;
-				var minY = +Infinity;
-				var minZ = +Infinity;
-
-				var maxX = -Infinity;
-				var maxY = -Infinity;
-				var maxZ = -Infinity;
-
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-					var x = positions[ i     ];
-					var y = positions[ i + 1 ];
-					var z = positions[ i + 2 ];
-
-					minX = Math.min( minX, x );
-					minY = Math.min( minY, y );
-					minZ = Math.min( minZ, z );
-
-					maxX = Math.max( maxX, x );
-					maxY = Math.max( maxY, y );
-					maxZ = Math.max( maxZ, z );
-
-				}
-
-				this.boundingBox.min.set( minX, minY, minZ );
-				this.boundingBox.max.set( maxX, maxY, maxZ );
+				this.boundingBox.setFromArray( positions );
 
 			}
 
