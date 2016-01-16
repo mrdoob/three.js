@@ -910,7 +910,8 @@ THREE.SceneLoader.prototype = {
 
 				} else {
 
-					texture = THREE.ImageUtils.loadTextureCube( url_array, textureJSON.mapping, generateTextureCallback( count ) );
+					texture = new THREE.CubeTextureLoader().load( urls, generateTextureCallback( count ) );
+					texture.mapping = textureJSON.mapping;
 
 				}
 

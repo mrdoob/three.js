@@ -78,17 +78,19 @@
 							 r + "py.jpg", r + "ny.jpg",
 							 r + "pz.jpg", r + "nz.jpg" ];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				*/
 
 				var r = "textures/cube/Escher/dds/";
 
-				var urls = [ r + "px.dds", r + "nx.dds",
-							 r + "py.dds", r + "ny.dds",
-							 r + "pz.dds", r + "nz.dds" ];
+				var urls = [
+					r + "px.dds", r + "nx.dds",
+					r + "py.dds", r + "ny.dds",
+					r + "pz.dds", r + "nz.dds"
+				];
 
 				var loader = new THREE.DDSLoader();
-				
+
 				var textureCube = loader.load( urls );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 				var geometry = new THREE.SphereGeometry( 100, 96, 64 );

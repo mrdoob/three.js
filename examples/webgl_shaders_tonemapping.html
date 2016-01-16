@@ -320,7 +320,7 @@
 							 r + "dark-s_py.jpg", r + "dark-s_ny.jpg",
 							 r + "dark-s_pz.jpg", r + "dark-s_nz.jpg" ];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
 				var skyboxShader = THREE.ShaderLib[ "cube" ];
 				skyboxShader.uniforms[ "tCube" ].value = textureCube;

@@ -214,7 +214,7 @@
 			// init 3D stuff
 
 			function makeSkybox( urls, size ) {
-				var skyboxCubemap = THREE.ImageUtils.loadTextureCube( urls );
+				var skyboxCubemap = new THREE.CubeTextureLoader().load( urls );
 				skyboxCubemap.format = THREE.RGBFormat;
 
 				var skyboxShader = THREE.ShaderLib['cube'];
