@@ -121,11 +121,13 @@
 
 				// REFLECTION MAP
 				var path = "textures/cube/skybox/";
-				var urls = [ path + "px.jpg", path + "nx.jpg",
-							 path + "py.jpg", path + "ny.jpg",
-							 path + "pz.jpg", path + "nz.jpg" ];
+				var urls = [
+					path + "px.jpg", path + "nx.jpg",
+					path + "py.jpg", path + "ny.jpg",
+					path + "pz.jpg", path + "nz.jpg"
+				];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 
 				// MATERIALS
 				var materialColor = new THREE.Color();

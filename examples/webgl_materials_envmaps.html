@@ -24,7 +24,7 @@
 	</head>
 
 	<body>
-		
+
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
@@ -78,7 +78,7 @@
 							 r + "posy.jpg", r + "negy.jpg",
 							 r + "posz.jpg", r + "negz.jpg" ];
 
-				textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
 				textureCube.mapping = THREE.CubeReflectionMapping;
 

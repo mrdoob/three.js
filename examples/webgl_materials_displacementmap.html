@@ -134,7 +134,7 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeReflectionMapping );
+				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 
 				// material
 

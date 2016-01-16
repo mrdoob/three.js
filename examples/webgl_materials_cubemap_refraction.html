@@ -99,11 +99,14 @@
 
 				var r = "textures/cube/Park3Med/";
 
-				var urls = [ r + "px.jpg", r + "nx.jpg",
-							 r + "py.jpg", r + "ny.jpg",
-							 r + "pz.jpg", r + "nz.jpg" ];
+				var urls = [
+					r + "px.jpg", r + "nx.jpg",
+					r + "py.jpg", r + "ny.jpg",
+					r + "pz.jpg", r + "nz.jpg"
+				];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeRefractionMapping );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.mapping = THREE.CubeRefractionMapping;
 
 				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity:0.9 } );
 				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
