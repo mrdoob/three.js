@@ -3,7 +3,7 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.Box3 = function ( min, max ) {
+THREE.Box3 = function( min, max ) {
 
 	this.min = ( min !== undefined ) ? min : new THREE.Vector3( Infinity, Infinity, Infinity );
 	this.max = ( max !== undefined ) ? max : new THREE.Vector3( - Infinity, - Infinity, - Infinity );
@@ -14,7 +14,7 @@ THREE.Box3.prototype = {
 
 	constructor: THREE.Box3,
 
-	set: function ( min, max ) {
+	set: function( min, max ) {
 
 		this.min.copy( min );
 		this.max.copy( max );
@@ -23,7 +23,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	setFromPoints: function ( points ) {
+	setFromPoints: function( points ) {
 
 		this.makeEmpty();
 
@@ -37,11 +37,11 @@ THREE.Box3.prototype = {
 
 	},
 
-	setFromCenterAndSize: function () {
+	setFromCenterAndSize: function() {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( center, size ) {
+		return function( center, size ) {
 
 			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 
@@ -54,14 +54,14 @@ THREE.Box3.prototype = {
 
 	}(),
 
-	setFromObject: function () {
+	setFromObject: function() {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
 		var box;
 
-		return function ( object ) {
+		return function( object ) {
 
 			if ( box === undefined ) box = new THREE.Box3();
 
@@ -71,7 +71,7 @@ THREE.Box3.prototype = {
 
 			object.updateMatrixWorld( true );
 
-			object.traverse( function ( node ) {
+			object.traverse( function( node ) {
 
 				var geometry = node.geometry;
 
@@ -97,13 +97,13 @@ THREE.Box3.prototype = {
 
 	}(),
 
-	clone: function () {
+	clone: function() {
 
 		return new this.constructor().copy( this );
 
 	},
 
-	copy: function ( box ) {
+	copy: function( box ) {
 
 		this.min.copy( box.min );
 		this.max.copy( box.max );
@@ -112,7 +112,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	makeEmpty: function () {
+	makeEmpty: function() {
 
 		this.min.x = this.min.y = this.min.z = Infinity;
 		this.max.x = this.max.y = this.max.z = - Infinity;
@@ -121,7 +121,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	isEmpty: function () {
+	isEmpty: function() {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
 
@@ -129,21 +129,21 @@ THREE.Box3.prototype = {
 
 	},
 
-	center: function ( optionalTarget ) {
+	center: function( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
-	size: function ( optionalTarget ) {
+	size: function( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 		return result.subVectors( this.max, this.min );
 
 	},
 
-	expandByPoint: function ( point ) {
+	expandByPoint: function( point ) {
 
 		this.min.min( point );
 		this.max.max( point );
@@ -152,7 +152,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	expandByVector: function ( vector ) {
+	expandByVector: function( vector ) {
 
 		this.min.sub( vector );
 		this.max.add( vector );
@@ -161,7 +161,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	expandByScalar: function ( scalar ) {
+	expandByScalar: function( scalar ) {
 
 		this.min.addScalar( - scalar );
 		this.max.addScalar( scalar );
@@ -170,7 +170,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	containsPoint: function ( point ) {
+	containsPoint: function( point ) {
 
 		if ( point.x < this.min.x || point.x > this.max.x ||
 				 point.y < this.min.y || point.y > this.max.y ||
@@ -184,7 +184,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	containsBox: function ( box ) {
+	containsBox: function( box ) {
 
 		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
 			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
@@ -198,7 +198,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	getParameter: function ( point, optionalTarget ) {
+	getParameter: function( point, optionalTarget ) {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
@@ -213,7 +213,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	intersectsBox: function ( box ) {
+	intersectsBox: function( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 
@@ -229,7 +229,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	intersectsSphere: ( function () {
+	intersectsSphere: ( function() {
 
 		var closestPoint;
 
@@ -247,7 +247,7 @@ THREE.Box3.prototype = {
 
 	} )(),
 
-	intersectsPlane: function ( plane ) {
+	intersectsPlane: function( plane ) {
 
 		// We compute the minimum and maximum dot product values. If those values
 		// are on the same side (back or front) of the plane, then there is no intersection.
@@ -294,18 +294,18 @@ THREE.Box3.prototype = {
 
 	},
 
-	clampPoint: function ( point, optionalTarget ) {
+	clampPoint: function( point, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 		return result.copy( point ).clamp( this.min, this.max );
 
 	},
 
-	distanceToPoint: function () {
+	distanceToPoint: function() {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( point ) {
+		return function( point ) {
 
 			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
 			return clampedPoint.sub( point ).length();
@@ -314,11 +314,11 @@ THREE.Box3.prototype = {
 
 	}(),
 
-	getBoundingSphere: function () {
+	getBoundingSphere: function() {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( optionalTarget ) {
+		return function( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Sphere();
 
@@ -331,7 +331,7 @@ THREE.Box3.prototype = {
 
 	}(),
 
-	intersect: function ( box ) {
+	intersect: function( box ) {
 
 		this.min.max( box.min );
 		this.max.min( box.max );
@@ -340,7 +340,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	union: function ( box ) {
+	union: function( box ) {
 
 		this.min.min( box.min );
 		this.max.max( box.max );
@@ -349,7 +349,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	applyMatrix4: function () {
+	applyMatrix4: function() {
 
 		var points = [
 			new THREE.Vector3(),
@@ -362,7 +362,7 @@ THREE.Box3.prototype = {
 			new THREE.Vector3()
 		];
 
-		return function ( matrix ) {
+		return function( matrix ) {
 
 			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
 			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
@@ -383,7 +383,7 @@ THREE.Box3.prototype = {
 
 	}(),
 
-	translate: function ( offset ) {
+	translate: function( offset ) {
 
 		this.min.add( offset );
 		this.max.add( offset );
@@ -392,7 +392,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	equals: function ( box ) {
+	equals: function( box ) {
 
 		return box.min.equals( this.min ) && box.max.equals( this.max );
 
