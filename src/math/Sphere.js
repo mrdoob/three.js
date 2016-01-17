@@ -169,6 +169,24 @@ THREE.Sphere.prototype = {
 
 		return sphere.center.equals( this.center ) && ( sphere.radius === this.radius );
 
-	}
+	},
+
+	pushSphere: function () {
+
+		var ray = new THREE.Ray();
+
+		return function ( sphere, normal ) {
+
+			if ( this.intersectsSphere( sphere ) ) {
+
+				ray.set( this.center, normal ).at( this.radius + sphere.radius, sphere.center );
+
+			}
+
+			return this;
+
+		};
+
+	}()
 
 };
