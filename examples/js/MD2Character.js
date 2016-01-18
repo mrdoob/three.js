@@ -223,13 +223,13 @@ THREE.MD2Character = function () {
 
 	function loadTextures( baseUrl, textureUrls ) {
 
-		var mapping = THREE.UVMapping;
+		var textureLoader = new THREE.TextureLoader();
 		var textures = [];
 
 		for ( var i = 0; i < textureUrls.length; i ++ ) {
 
-			textures[ i ] = new THREE.TextureLoader().load( baseUrl + textureUrls[ i ], checkLoadingComplete );
-			textures[ i ].mapping = mapping;
+			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
+			textures[ i ].mapping = THREE.UVMapping;
 			textures[ i ].name = textureUrls[ i ];
 
 		}
