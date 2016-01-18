@@ -693,6 +693,49 @@ THREE.Vector3.prototype = {
 
 	},
 
+	distanceAlongPlaneTo: function( v, layer ) {
+
+		var p1 = 0;
+		var p2 = 0;
+		var p3 = 0;
+		var p4 = 0;
+
+		switch ( layer ) {
+
+			case "XY" :
+
+				p1 = this.x;
+				p2 = this.y;
+				p3 = v.x;
+				p4 = v.y;
+				break;
+
+			case "XZ" :
+
+				p1 = this.x;
+				p2 = this.z;
+				p3 = v.x;
+				p4 = v.z;
+				break;
+
+			case "YZ" :
+
+				p1 = this.y;
+				p2 = this.z;
+				p3 = v.y;
+				p4 = v.z;
+				break;
+
+			default :
+
+				console.error( "THREE.Vector3: Invalid plane '" + layer + "'" );
+
+		}
+
+		return Math.sqrt( ( p1 - p3 ) * ( p1 - p3 ) + ( p2 - p4 ) * ( p2 - p4 ) );
+
+	}
+
 	setFromMatrixPosition: function ( m ) {
 
 		this.x = m.elements[ 12 ];
