@@ -40,6 +40,16 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 	container.add( phiLengthRow );
 
+	// axe
+
+	var axeRow = new UI.Row();
+	var axe = new UI.Input( parameters.axe ).setWidth( '10px' ).onChange( update );
+
+	axeRow.add( new UI.Text( 'Axe' ).setWidth( '90px' ) );
+	axeRow.add( axe );
+
+	container.add( axeRow );
+
 	// points
 
 	var lastPointIdx = 0;
@@ -57,7 +67,7 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 	for ( var i = 0; i < parameters.points.length; i ++ ) {
 
 		var point = parameters.points[ i ];
-		pointsList.add( createPointRow( point.x, point.z ) );
+		pointsList.add( createPointRow( point.x, point.y ) );
 
 	}
 
@@ -119,7 +129,7 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 			if ( ! pointUI ) continue;
 
-			points.push( new THREE.Vector3( pointUI.x.getValue(), 0, pointUI.y.getValue() ) );
+			points.push( new THREE.Vector2( pointUI.x.getValue(), pointUI.y.getValue() ) );
 			count ++;
 			pointUI.lbl.setValue( count );
 
@@ -129,7 +139,8 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 			points,
 			segments.getValue(),
 			phiStart.getValue() / 180 * Math.PI,
-			phiLength.getValue() / 180 * Math.PI
+			phiLength.getValue() / 180 * Math.PI,
+			axe.getValue()
 		);
 
 		editor.execute( new SetGeometryCommand( object, geometry ) );
