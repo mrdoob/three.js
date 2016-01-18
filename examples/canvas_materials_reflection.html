@@ -67,7 +67,10 @@
 
 					geometry.computeVertexNormals();
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', THREE.SphericalReflectionMapping ), overdraw: 0.5 } ) );
+					var envMap = new THREE.TextureLoader().load( 'textures/metal.jpg' );
+					envMap.mapping = THREE.SphericalReflectionMapping;
+
+					mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { envMap: envMap, overdraw: 0.5 } ) );
 					scene.add( mesh );
 
 				} );

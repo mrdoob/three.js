@@ -64,7 +64,7 @@
 
 				// Materials
 
-				var imgTexture = THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" );
+				var imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 				imgTexture.anisotropy = 16;
 				imgTexture = null;

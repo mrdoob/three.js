@@ -125,7 +125,7 @@ var textureMaps = (function () {
 
 	return {
 		none : null,
-		grass : THREE.ImageUtils.loadTexture( "../../examples/textures/terrain/grasslight-thin.jpg" )
+		grass : new THREE.TextureLoader().load( "../../examples/textures/terrain/grasslight-thin.jpg" )
 	};
 
 })();

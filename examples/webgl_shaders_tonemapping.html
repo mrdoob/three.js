@@ -202,16 +202,18 @@
 					shininess: 200
 				} );
 
-				var earthDiffuse = THREE.ImageUtils.loadTexture( 'textures/planets/earth_atmos_4096.jpg', undefined, function( tex ) {
+				var textureLoader = new THREE.TextureLoader();
+
+				var earthDiffuse = textureLoader.load( 'textures/planets/earth_atmos_4096.jpg', function( tex ) {
 					earthMat.map = tex;
 					earthMat.needsUpdate = true;
 				} );
-				var earthSpecular = THREE.ImageUtils.loadTexture( 'textures/planets/earth_specular_2048.jpg', undefined, function( tex ) {
+				var earthSpecular = textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function( tex ) {
 					earthMat.specularMap = tex;
 					earthMat.needsUpdate = true;
 				} );
 
-				// var earthNormal = THREE.ImageUtils.loadTexture( 'textures/planets/earth-new-normal-2048.jpg', undefined, function( tex ) {
+				// var earthNormal = textureLoader.load( 'textures/planets/earth-new-normal-2048.jpg', function( tex ) {
 				// 	earthMat.normalMap = tex;
 				// 	earthMat.needsUpdate = true;
 				// } );
@@ -223,7 +225,7 @@
 					depthTest: false
 				} );
 
-				var earthLights = THREE.ImageUtils.loadTexture( 'textures/planets/earth_lights_2048.png', undefined, function( tex ) {
+				var earthLights = textureLoader.load( 'textures/planets/earth_lights_2048.png', function( tex ) {
 					earthLightsMat.map = tex;
 					earthLightsMat.needsUpdate = true;
 				} );
@@ -235,7 +237,7 @@
 					depthTest: false
 				} );
 
-				var earthClouds = THREE.ImageUtils.loadTexture( 'textures/planets/earth_clouds_2048.png', undefined, function( tex ) {
+				var earthClouds = textureLoader.load( 'textures/planets/earth_clouds_2048.png', function( tex ) {
 					earthCloudsMat.map = tex;
 					earthCloudsMat.needsUpdate = true;
 				} );
