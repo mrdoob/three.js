@@ -37,11 +37,23 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-			extension.drawArraysInstancedANGLE( mode, 0, position.data.count, geometry.maxInstancedCount );
+			var count = position.data.count;
+
+			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
+
+			_infoRender.calls ++;
+			_infoRender.vertices += count * geometry.maxInstancedCount;
+			if ( mode === _gl.TRIANGLES ) _infoRender.faces += geometry.maxInstancedCount * count / 3;
 
 		} else {
 
-			extension.drawArraysInstancedANGLE( mode, 0, position.count, geometry.maxInstancedCount );
+			var count = position.count;
+
+			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
+
+			_infoRender.calls ++;
+			_infoRender.vertices += count * geometry.maxInstancedCount;
+			if ( mode === _gl.TRIANGLES ) _infoRender.faces += geometry.maxInstancedCount * count / 3;
 
 		}
 
