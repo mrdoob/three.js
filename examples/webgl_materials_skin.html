@@ -122,10 +122,12 @@
 
 				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniformsUV[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				var textureLoader = new THREE.TextureLoader();
+
+				uniformsUV[ "tNormal" ].value = textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniformsUV[ "uNormalScale" ].value = -1.5;
 
-				uniformsUV[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				uniformsUV[ "tDiffuse" ].value = textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" );
 
 				uniformsUV[ "passID" ].value = 0;
 

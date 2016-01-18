@@ -241,9 +241,10 @@
 				mlib.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
 
 				// FLARES
+				var textureLoader = new THREE.TextureLoader();
 
-				flareA = THREE.ImageUtils.loadTexture( "textures/lensflare2.jpg" );
-				flareB = THREE.ImageUtils.loadTexture( "textures/lensflare0.png" );
+				flareA = textureLoader.load( "textures/lensflare2.jpg" );
+				flareB = textureLoader.load( "textures/lensflare0.png" );
 
 				// CARS - VEYRON
 
@@ -493,7 +494,7 @@
 
 				// GROUND
 
-				var texture = THREE.ImageUtils.loadTexture( "textures/cube/Park3Med/ny.jpg" );
+				var texture = new THREE.TextureLoader().load( "textures/cube/Park3Med/ny.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 50, 50 );
 

@@ -261,10 +261,12 @@
 				path + 'pz' + format, path + 'nz' + format
 			];
 
-			var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+			var cubeTextureLoader = new THREE.CubeTextureLoader();
+
+			var reflectionCube = cubeTextureLoader.load( urls );
 			reflectionCube.format = THREE.RGBFormat;
 
-			var refractionCube = new THREE.CubeTextureLoader().load( urls );
+			var refractionCube = cubeTextureLoader.load( urls );
 			reflectionCube.format = THREE.RGBFormat;
 			refractionCube.mapping = THREE.CubeRefractionMapping;
 
@@ -286,7 +288,7 @@
 			dottedMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
 			dottedMaterial2.uniforms.uLineColor1.value.setHSL( 0.05, 1.0, 0.5 );
 
-			var texture = THREE.ImageUtils.loadTexture( "textures/UV_Grid_Sm.jpg" );
+			var texture = new THREE.TextureLoader().load( "textures/UV_Grid_Sm.jpg" );
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 			var materials = {

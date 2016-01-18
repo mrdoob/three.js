@@ -14,7 +14,7 @@
 				text-align:center;
 				overflow: hidden;
 			}
-			
+
 			#info {
 				color: #fff;
 				position: absolute;
@@ -29,7 +29,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - Node-Based Post-Processing
 		</div>
-	
+
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
@@ -92,10 +92,12 @@
 
 			var param = { example: 'color-adjustment' };
 
-			var lensflare2 = new THREE.TextureLoader().load( 'textures/lensflare2.jpg' );
+			var textureLoader = new THREE.TextureLoader();
+
+			var lensflare2 = textureLoader.load( 'textures/lensflare2.jpg' );
 			lensflare2.wrapS = lensflare2.wrapT = THREE.RepeatWrapping;
 
-			var decalNormal = new THREE.TextureLoader().load( 'textures/decal/decal-normal.jpg' );
+			var decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
 			decalNormal.wrapS = decalNormal.wrapT = THREE.RepeatWrapping;
 
 			init();

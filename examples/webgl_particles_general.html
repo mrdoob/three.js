@@ -6,7 +6,7 @@
     <script src="../build/three.js"></script>
 	<script src="js/Detector.js"></script>
 	<script src="js/libs/stats.min.js"></script>
-	<script src="js/controls/OrbitControls.js"></script>	
+	<script src="js/controls/OrbitControls.js"></script>
 	<script src="js/loaders/OBJLoader.js"></script>
 	<script src='js/libs/dat.gui.min.js'></script>
 	<script src="js/libs/photons.min.js"></script>
@@ -113,8 +113,10 @@
 
 		smokeType = ParticleSystemIDs.Smoke1;
 
-		var smoke1Atlas = new PHOTONS.Atlas( THREE.ImageUtils.loadTexture( 'textures/campfire/smokeparticle.png' ), true );
-		var smoke2Atlas = PHOTONS.Atlas.createGridAtlas( THREE.ImageUtils.loadTexture( 'textures/campfire/smokeparticles.png' ), 0.0, 1.0, 1.0, 0.0, 4.0, 4.0, false, true );
+    var textureLoader = new THREE.TextureLoader();
+
+		var smoke1Atlas = new PHOTONS.Atlas( textureLoader.load( 'textures/campfire/smokeparticle.png' ), true );
+		var smoke2Atlas = PHOTONS.Atlas.createGridAtlas( textureLoader.load( 'textures/campfire/smokeparticles.png' ), 0.0, 1.0, 1.0, 0.0, 4.0, 4.0, false, true );
 
 		var altVertexShader = [
 
@@ -316,7 +318,7 @@
 		var particleSystemParams = {
 
 			material: flameMaterial,
-			particleAtlas : PHOTONS.Atlas.createGridAtlas( THREE.ImageUtils.loadTexture( 'textures/campfire/fireloop3.jpg' ), 0.0, 1.0, 1.0, 0.0, 8.0, 8.0, false, true ),
+			particleAtlas : PHOTONS.Atlas.createGridAtlas( new THREE.TextureLoader().load( 'textures/campfire/fireloop3.jpg' ), 0.0, 1.0, 1.0, 0.0, 8.0, 8.0, false, true ),
 			particleReleaseRate : 3,
 			particleLifeSpan : 3,
 			lifespan : 0
@@ -380,7 +382,7 @@
 		particleSystemParams = {
 
 			material: emberMaterial,
-			particleAtlas : new PHOTONS.Atlas( THREE.ImageUtils.loadTexture( 'textures/campfire/Puff.png' ), true ),
+			particleAtlas : new PHOTONS.Atlas( new THREE.TextureLoader().load( 'textures/campfire/Puff.png' ), true ),
 			particleReleaseRate : 18,
 			particleLifeSpan : 3,
 			lifespan : 0
@@ -543,7 +545,7 @@
 		// create ground
 		// ---------------------
 
-		var groundTexture = new THREE.ImageUtils.loadTexture( 'textures/campfire/grass1.jpg' );
+		var groundTexture = new THREE.TextureLoader().load( 'textures/campfire/grass1.jpg' );
 		groundTexture.wrapS = THREE.RepeatWrapping;
 		groundTexture.wrapT = THREE.RepeatWrapping;
 		groundTexture.repeat.set( 10, 10 );
@@ -581,7 +583,7 @@
 
 			function( mesh ) {
 
-				mesh.castShadow = true; 
+				mesh.castShadow = true;
 				mesh.receiveShadow = false;
 
 			},
@@ -614,7 +616,7 @@
 
 			function( mesh ) {
 
-				mesh.castShadow = true;	
+				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 
 			},
@@ -661,7 +663,7 @@
 
 			function( mesh ) {
 
-				mesh.castShadow = true;	
+				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 
 			},

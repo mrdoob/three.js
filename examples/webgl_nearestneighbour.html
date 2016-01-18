@@ -94,14 +94,16 @@
 				controls.movementSpeed = 100;
 				controls.lookSpeed = 0.1;
 
+				var textureLoader = new THREE.TextureLoader();
+
 				var materials = [
 
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/cube/skybox/px.jpg' ) } ), // right
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/cube/skybox/nx.jpg' ) } ), // left
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/cube/skybox/py.jpg' ) } ), // top
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/cube/skybox/ny.jpg' ) } ), // bottom
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/cube/skybox/pz.jpg' ) } ), // back
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/cube/skybox/nz.jpg' ) } )  // front
+					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/px.jpg' ) } ), // right
+					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/nx.jpg' ) } ), // left
+					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/py.jpg' ) } ), // top
+					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/ny.jpg' ) } ), // bottom
+					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/pz.jpg' ) } ), // back
+					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/nz.jpg' ) } )  // front
 
 				];
 
@@ -117,7 +119,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				// create the custom shader
-				var imagePreviewTexture = THREE.ImageUtils.loadTexture( 'textures/crate.gif');
+				var imagePreviewTexture = textureLoader.load( 'textures/crate.gif');
 				imagePreviewTexture.minFilter = THREE.LinearMipMapLinearFilter;
 				imagePreviewTexture.magFilter = THREE.LinearFilter;
 
