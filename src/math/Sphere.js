@@ -104,10 +104,16 @@ THREE.Sphere.prototype = {
 
 	},
 
+	intersectsCylinder: function( cylinder ) {
+
+		return cylinder.intersectsSphere( this );
+
+	},
+
 	intersectsPlane: function( plane ) {
 
 		// We use the following equation to compute the signed distance from
-		// the center of the sphere to the plane.
+		// the center of the sphere to the plane:
 		//
 		// distance = q * n - d
 		//
@@ -145,6 +151,12 @@ THREE.Sphere.prototype = {
 		box.expandByScalar( this.radius );
 
 		return box;
+
+	},
+
+	getBoundingCylinder: function( optionalTarget ) {
+
+		return ( optionalTarget || new THREE.Cylinder() ).set( this.center, this.radius, this.radius * 2 );
 
 	},
 
