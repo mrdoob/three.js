@@ -37272,9 +37272,9 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 
 			var vertex = new THREE.Vector3();
 
-			vertex.x = point.x * cos;
+			vertex.x = point.x * sin;
 			vertex.y = point.y;
-			vertex.z = point.x * sin;
+			vertex.z = point.x * cos;
 
 			this.vertices.push( vertex );
 
