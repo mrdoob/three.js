@@ -88,9 +88,9 @@
 
 				var sphere = new THREE.SphereGeometry( 20, 32, 16 );
 
-				material_sphere1 = new THREE.MeshLambertMaterial( { color: 0xffaa00, shading: THREE.FlatShading } );
-				material_sphere2 = new THREE.MeshLambertMaterial( { color: 0xff2200, shading: THREE.FlatShading } );
-				material_sphere3 = new THREE.MeshLambertMaterial( { color: 0x6622aa, shading: THREE.FlatShading } );
+				material_sphere1 = new THREE.MeshPhongMaterial( { color: 0xffaa00, shading: THREE.FlatShading, shininess: 0 } );
+				material_sphere2 = new THREE.MeshPhongMaterial( { color: 0xff2200, shading: THREE.FlatShading, shininess: 0 } );
+				material_sphere3 = new THREE.MeshPhongMaterial( { color: 0x6622aa, shading: THREE.FlatShading, shininess: 0 } );
 
 				// sound spheres
 
