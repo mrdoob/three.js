@@ -10,78 +10,43 @@
 // phiStart - the starting radian
 // phiLength - the radian (0 to 2*PI) range of the lathed section
 //    2*pi is a closed lathe, less than 2PI is a portion.
-// axe - the axis of revolution ('X', 'Y' or 'Z')
 
-THREE.LatheGeometry = function( points, segments, phiStart, phiLength, axe ) {
-
-	var thePoints = points;
-	if ( points.length && points[ 0 ] instanceof THREE.Vector3 ) {
-
-		console.warn( 'THREE.LatheGeometry has been updated. Use an array of THREE.Vector2 as first parameter.' );
-
-		thePoints = [];
-		axe = 'Z';
-		for ( var i = 0; i < points.length; i ++ ) {
-
-			var pt = points[ i ];
-			thePoints.push( new THREE.Vector2( Math.sqrt( pt.x * pt.x + pt.y * pt.y ), pt.z ) );
-
-		}
-
-	}
+THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 
 	THREE.Geometry.call( this );
 
 	this.type = 'LatheGeometry';
 
 	this.parameters = {
-		points: thePoints,
+		points: points,
 		segments: segments,
 		phiStart: phiStart,
-		phiLength: phiLength,
-		axe: axe
+		phiLength: phiLength
 	};
 
 	segments = segments || 12;
 	phiStart = phiStart || 0;
 	phiLength = phiLength || 2 * Math.PI;
-	axe = axe || 'Y';
 
-	var inversePointLength = 1.0 / ( thePoints.length - 1 );
+	var inversePointLength = 1.0 / ( points.length - 1 );
 	var inverseSegments = 1.0 / segments;
 
 	for ( var i = 0, il = segments; i <= il; i ++ ) {
 
 		var phi = phiStart + i * inverseSegments * phiLength;
 
-		var c = Math.cos( phi ),
-			s = Math.sin( phi );
+		var sin = Math.sin( phi );
+		var cos = Math.cos( phi );
 
-		for ( var j = 0, jl = thePoints.length; j < jl; j ++ ) {
+		for ( var j = 0, jl = points.length; j < jl; j ++ ) {
 
-			var pt = thePoints[ j ];
+			var point = points[ j ];
 
 			var vertex = new THREE.Vector3();
 
-			if ( axe === 'Z' ) {
-
-				vertex.x = c * pt.x;
-				vertex.y = s * pt.x;
-				vertex.z = pt.y;
-
-			} else if ( axe === 'X' ) {
-
-				vertex.y = c * pt.x;
-				vertex.z = s * pt.x;
-				vertex.x = pt.y;
-
-			} else {
-
-				vertex.z = c * pt.x;
-				vertex.x = s * pt.x;
-				vertex.y = pt.y;
-
-			}
+			vertex.x = point.x * cos;
+			vertex.y = point.y;
+			vertex.z = point.x * sin;
 
 			this.vertices.push( vertex );
 
@@ -89,11 +54,11 @@ THREE.LatheGeometry = function( points, segments, phiStart, phiLength, axe ) {
 
 	}
 
-	var np = thePoints.length;
+	var np = points.length;
 
 	for ( var i = 0, il = segments; i < il; i ++ ) {
 
-		for ( var j = 0, jl = thePoints.length - 1; j < jl; j ++ ) {
+		for ( var j = 0, jl = points.length - 1; j < jl; j ++ ) {
 
 			var base = j + np * i;
 			var a = base;

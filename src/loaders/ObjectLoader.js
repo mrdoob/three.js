@@ -263,8 +263,7 @@ THREE.ObjectLoader.prototype = {
 							data.points,
 							data.segments,
 							data.phiStart,
-							data.phiLength,
-							data.axe
+							data.phiLength
 						);
 
 						break;

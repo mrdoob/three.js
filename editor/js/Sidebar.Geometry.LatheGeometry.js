@@ -40,16 +40,6 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 	container.add( phiLengthRow );
 
-	// axe
-
-	var axeRow = new UI.Row();
-	var axe = new UI.Input( parameters.axe ).setWidth( '10px' ).onChange( update );
-
-	axeRow.add( new UI.Text( 'Axe' ).setWidth( '90px' ) );
-	axeRow.add( axe );
-
-	container.add( axeRow );
-
 	// points
 
 	var lastPointIdx = 0;
@@ -139,8 +129,7 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 			points,
 			segments.getValue(),
 			phiStart.getValue() / 180 * Math.PI,
-			phiLength.getValue() / 180 * Math.PI,
-			axe.getValue()
+			phiLength.getValue() / 180 * Math.PI
 		);
 
 		editor.execute( new SetGeometryCommand( object, geometry ) );
