@@ -325,7 +325,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		newVertices = newSourceVertices.concat( newEdgeVertices );
 		var sl = newSourceVertices.length, edge1, edge2, edge3;
 		newFaces = [];
-
+                var uv, x0, x1, x2;
 		var x3 = new THREE.Vector2(0, 0);
 		var x4 = new THREE.Vector2(0, 0);
 		var x5 = new THREE.Vector2(0, 0);
