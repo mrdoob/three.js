@@ -24,6 +24,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0,
 
+	_width = _canvas.width,
+	_height = _canvas.height,
+
 	_pixelRatio = 1;
 
 	var lights = [];
@@ -352,13 +355,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.getSize = function () {
 
 		return {
-			width: _canvas.width / _pixelRatio,
-			height: _canvas.height / _pixelRatio
+			width: _width,
+			height: _height
 		};
 
 	};
 
 	this.setSize = function ( width, height, updateStyle ) {
+
+		_width = width;
+		_height = height;
 
 		_canvas.width = width * _pixelRatio;
 		_canvas.height = height * _pixelRatio;
