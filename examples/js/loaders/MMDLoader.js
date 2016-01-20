@@ -1693,7 +1693,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	var scope = this;
 	var geometry = new THREE.Geometry();
-        var material = new THREE.MeshFaceMaterial();
+        var material = new THREE.MultiMaterial();
 	var helper = new THREE.MMDLoader.DataCreationHelper();
 
 	var initVartices = function () {
@@ -2534,7 +2534,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			var bodyB = rigidBodies[ p.rigidBodyIndex2 ];
 
 			/*
-			 * Refer http://www20.atpages.jp/katwat/wp/?p=4135 
+			 * Refer http://www20.atpages.jp/katwat/wp/?p=4135
 			 * for what this is for
 			 */
 			if ( bodyA.type !== 0 && bodyB.type === 2 ) {
@@ -4516,4 +4516,3 @@ THREE.MMDHelper.prototype = {
 	}
 
 };
-

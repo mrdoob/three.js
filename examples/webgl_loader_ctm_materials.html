@@ -278,7 +278,7 @@
 
 				hackMaterials( materials );
 
-				var material = new THREE.MeshFaceMaterial( materials );
+				var material = new THREE.MultiMaterial( materials );
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( x, y, z );

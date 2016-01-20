@@ -92,7 +92,7 @@
 
 				var centerOffset = -0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
 
-				var material = new THREE.MeshFaceMaterial( [
+				var material = new THREE.MultiMaterial( [
 					new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, overdraw: 0.5 } ),
 					new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 } )
 				] );

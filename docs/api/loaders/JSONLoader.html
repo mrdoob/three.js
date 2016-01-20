@@ -61,7 +61,7 @@
 			'models/animated/monster/monster.js',
 			// Function when resource is loaded
 			function ( geometry, materials ) {
-				var material = new THREE.MeshFaceMaterial( materials );
+				var material = new THREE.MultiMaterial( materials );
 				var object = new THREE.Mesh( geometry, material );
 				scene.add( object );
 			}
