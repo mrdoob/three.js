@@ -108,7 +108,7 @@
 
 				}
 
-				addMesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+				addMesh( geometry, new THREE.MultiMaterial( materials ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );

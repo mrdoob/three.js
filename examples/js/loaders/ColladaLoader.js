@@ -1169,7 +1169,7 @@ THREE.ColladaLoader = function () {
 
 				if ( num_materials > 1 ) {
 
-					material = new THREE.MeshFaceMaterial( used_materials_array );
+					material = new THREE.MultiMaterial( used_materials_array );
 
 				}
 

@@ -169,7 +169,7 @@
 				loader.load( 'obj/lucy/Lucy100k_bin.js', function ( geometry, materials ) {
 
 					addMesh( geometry, 0.75, 900, 0, 0,  0,0,0, new THREE.MeshPhongMaterial( { color: 0x030303, specular: 0x990000, shininess: 30 } ) );
-					addMesh( geometry, 0.75, 300, 0, 0,  0,0,0, new THREE.MeshFaceMaterial( materials ) );
+					addMesh( geometry, 0.75, 300, 0, 0,  0,0,0, new THREE.MultiMaterial( materials ) );
 					addMesh( geometry, 0.75, -300, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { color: 0x111111, specular: 0xffaa00, shininess: 10 } ) );
 					addMesh( geometry, 0.75, -900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0x666666, shininess: 10 } ) );
 

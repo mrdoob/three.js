@@ -61,45 +61,45 @@
 
 				//
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( -400, 0, 200 );
 				scene.add( object );
 				objectNewGeometry = object;
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( -200, 0, 200 );
 				scene.add( object );
 				objectToggleAddRemove = object;
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( 0, 0, 200 );
 				scene.add( object );
 				objectRandomizeFaces = object;
 /*
 				These are not yet used but they are ready to be shown
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( 200, 0, 200 );
 				scene.add( object );
 
 				//
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( -400, 0, 0 );
 				scene.add( object );
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( -200, 0, 0 );
 				scene.add( object );
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( 0, 0, 0 );
 				scene.add( object );
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( 200, 0, 0 );
 				scene.add( object );
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( 400, 0, 0 );
 				scene.add( object );
 				*/
@@ -136,7 +136,7 @@
 				return geometry;
 			}
 
-			function createMeshFaceMaterial(){
+			function createMultiMaterial(){
 				var materials = [];
 				materials.push(new THREE.MeshBasicMaterial({color: 0xff0000}));
 				materials.push(new THREE.MeshBasicMaterial({color: 0xffff00}));
@@ -144,7 +144,7 @@
 				materials.push(new THREE.MeshBasicMaterial({color: 0x00ffff}));
 				materials.push(new THREE.MeshBasicMaterial({color: 0x0000ff}));
 				materials.push(new THREE.MeshBasicMaterial({color: 0xff00ff}));
-				var material = new THREE.MeshFaceMaterial(materials);
+				var material = new THREE.MultiMaterial(materials);
 				return material;
 			}
 

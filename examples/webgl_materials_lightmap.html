@@ -154,7 +154,7 @@
 
 					}
 
-					var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+					var mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
 
 					mesh.scale.multiplyScalar( 100 );
 					scene.add( mesh );

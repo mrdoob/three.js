@@ -72,7 +72,7 @@ var list = {
 			[ "Material", "api/materials/Material" ],
 			[ "MeshBasicMaterial", "api/materials/MeshBasicMaterial" ],
 			[ "MeshDepthMaterial", "api/materials/MeshDepthMaterial" ],
-			[ "MeshFaceMaterial", "api/materials/MeshFaceMaterial" ],
+			[ "MultiMaterial", "api/materials/MultiMaterial" ],
 			[ "MeshLambertMaterial", "api/materials/MeshLambertMaterial" ],
 			[ "MeshNormalMaterial", "api/materials/MeshNormalMaterial" ],
 			[ "MeshPhongMaterial", "api/materials/MeshPhongMaterial" ],

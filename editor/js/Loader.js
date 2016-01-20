@@ -451,7 +451,7 @@ var Loader = function ( editor ) {
 
 					if ( result.materials.length > 1 ) {
 
-						material = new THREE.MeshFaceMaterial( result.materials );
+						material = new THREE.MultiMaterial( result.materials );
 
 					} else {
 
