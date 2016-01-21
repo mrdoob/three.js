@@ -3022,6 +3022,36 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function uploadTexturePatch( textureProperties, texturePatch, slot ) {
+
+		var texture = texturePatch.patchTexture;
+		var image = texture.image;
+
+		var glFormat = paramThreeToGL( texture.format );
+		var glType = paramThreeToGL( texture.type );
+
+		var x = texturePatch.x;
+		var y = texturePatch.y;
+
+		state.activeTexture( _gl.TEXTURE0 + slot );
+		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
+
+		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+
+		if ( texture instanceof THREE.DataTexture ) {
+
+			state.texSubImage2D( _gl.TEXTURE_2D, 0, x, y, image.width, image.height, 0, glFormat, glType, image.data );
+
+		} else {
+
+			state.texSubImage2D( _gl.TEXTURE_2D, 0, x, y, glFormat, glType, image );
+
+		}
+
+	}
+
 	this.setTexture = function ( texture, slot ) {
 
 		var textureProperties = properties.get( texture );
@@ -3046,12 +3076,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			uploadTexture( textureProperties, texture, slot );
 
-			return;
+		} else {
+
+			state.activeTexture( _gl.TEXTURE0 + slot );
+			state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
 
 		}
 
-		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
+		if ( texture.patchVersion > 0 && textureProperties.__patchVersion !== texture.patchVersion ) {
+
+			var patchRange = texture.getPatchRange( textureProperties.__patchVersion );
+
+			for ( var i = 0, il = patchRange.length; i < il; ++ i )
+				uploadTexturePatch( textureProperties, patchRange[ i ], slot );
+
+			if ( texture.generateMipmaps && isPowerOfTwo( texture.image ) ) _gl.generateMipmap( _gl.TEXTURE_2D );
+
+			textureProperties.__patchVersion = texture.patchVersion;
+
+		}
 
 	};
 

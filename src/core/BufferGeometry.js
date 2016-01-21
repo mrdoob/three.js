@@ -22,6 +22,8 @@ THREE.BufferGeometry = function () {
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
+	this.uvSystem = null;
+
 	this.drawRange = { start: 0, count: Infinity };
 
 };
@@ -758,6 +760,38 @@ THREE.BufferGeometry.prototype = {
 			attributes.normal.needsUpdate = true;
 
 		}
+
+	},
+
+	switchUvSystem: function ( newSystem, attribute ) {
+
+		if ( typeof attribute === 'undefined' )
+			attribute = 'uv';
+
+		var oldSystem = this.uvSystem;
+		this.uvSystem = newSystem;
+
+		var attribute = this.getAttribute( attribute );
+		attribute.needsUpdate = true;
+
+		var uvs = attribute.array;
+
+		if ( ! oldSystem ) {
+
+			for ( var i = 0, il = uvs.length; i < il; i += 2 ) {
+				uvs[ i + 0 ] = newSystem.topLeft.x + uvs[ i + 0 ] * newSystem.width;
+				uvs[ i + 1 ] = newSystem.topLeft.y + uvs[ i + 1 ] * newSystem.height;
+			}
+
+		} else {
+
+			for ( var i = 0, il = uvs.length; i < il; i += 2 ) {
+				uvs[ i + 0 ] = newSystem.topLeft.x + ( uvs[ i + 0 ] - oldSystem.topLeft.x ) / oldSystem.width * newSystem.width;
+				uvs[ i + 1 ] = newSystem.topLeft.y + ( uvs[ i + 1 ] - oldSystem.topLeft.y ) / oldSystem.height * newSystem.height;
+			}
+
+		}
+
 
 	},
 
