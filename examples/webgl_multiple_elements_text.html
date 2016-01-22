@@ -116,7 +116,7 @@
 				var size = .25;
 
 				var colors = [ 'rgb(0,127,255)', 'rgb(255,0,0)', 'rgb(0,255,0)', 'rgb(0,255,255)',
-        				       'rgb(255,0,255)', 'rgb(255,0,127)', 'rgb(255,255,0)', 'rgb(0,255,127)' ]; 
+        				       'rgb(255,0,255)', 'rgb(255,0,127)', 'rgb(255,255,0)', 'rgb(0,255,127)' ];
 
 				canvas = document.getElementById( 'c' );
 
@@ -150,7 +150,7 @@
 							}
 
 						}
- 
+
 					} else {
 
 						for ( var m = 0 ; m < Math.pow( balls, 3 ) ; m++ ) {
@@ -191,7 +191,7 @@
 
 					var controls = new THREE.OrbitControls( camera, views[n] );
 					scene.userData.controls = controls;
-	
+
 					scenes.push( scene );
 
 				}
@@ -213,12 +213,12 @@
 				}
 
 			}
-			
+
 			function animate() {
-			
+
 				render();
 				requestAnimationFrame( animate );
-				
+
 			}
 
 			function render() {
@@ -226,11 +226,10 @@
 				updateSize();
 
 				renderer.setClearColor( 0xffffff );
-				renderer.setViewport( 0, 0, canvas.clientWidth, canvas.clientHeight );
+				renderer.setScissorTest( false );
 				renderer.clear();
 
 				renderer.setClearColor( 0x000000 );
-
 				renderer.setScissorTest( true );
 
 				scenes.forEach( function( scene ) {
@@ -251,7 +250,7 @@
 
 					renderer.render( scene, scene.userData.camera );
 					scene.userData.controls.update();
-				
+
 					for ( var i = 0 ; i < scene.children[0].geometry.vertices.length ; i++ ) {
 
 						var v0 = scene.userData.geometry0.vertices[i];
@@ -264,8 +263,7 @@
 
 				} );
 
-				renderer.setScissorTest( false );
-				t++;
+				t ++;
 
 			}
 

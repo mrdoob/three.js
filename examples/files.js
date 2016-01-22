@@ -150,6 +150,7 @@ var files = {
 		"webgl_multiple_canvases_complex",
 		"webgl_multiple_canvases_grid",
 		"webgl_multiple_elements",
+		"webgl_multiple_elements_text",
 		"webgl_multiple_renderers",
 		"webgl_multiple_views",
 		"webgl_nearestneighbour",
