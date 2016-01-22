@@ -30,6 +30,9 @@ THREE.Material = function () {
 	this.depthTest = true;
 	this.depthWrite = true;
 
+	this.stencilTest = false;
+	this.stencilWrite = false;
+
 	this.colorWrite = true;
 
 	this.precision = null; // override the renderer's default precision for this material
@@ -256,6 +259,9 @@ THREE.Material.prototype = {
 		this.depthFunc = source.depthFunc;
 		this.depthTest = source.depthTest;
 		this.depthWrite = source.depthWrite;
+
+		this.stencilTest = source.stencilTest;
+		this.stencilWrite = source.stencilWrite;
 
 		this.colorWrite = source.colorWrite;
 

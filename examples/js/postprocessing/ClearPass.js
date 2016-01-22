@@ -10,9 +10,12 @@ THREE.ClearPass = function () {
 
 THREE.ClearPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		renderer.setRenderTarget( readBuffer );
+		renderer.clear();
+
+		renderer.setRenderTarget( writeBuffer );
 		renderer.clear();
 
 	}

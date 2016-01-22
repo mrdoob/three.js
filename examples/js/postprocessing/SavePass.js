@@ -45,7 +45,7 @@ THREE.SavePass = function ( renderTarget ) {
 
 THREE.SavePass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		if ( this.uniforms[ this.textureID ] ) {
 
@@ -54,6 +54,7 @@ THREE.SavePass.prototype = {
 		}
 
 		this.quad.material = this.material;
+		this.quad.material.stencilTest = maskActive;
 
 		renderer.render( this.scene, this.camera, this.renderTarget, this.clear );
 

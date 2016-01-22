@@ -24,13 +24,10 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 	this.writeBuffer = this.renderTarget1;
 	this.readBuffer = this.renderTarget2;
 
+	if ( THREE.MaskPass === undefined )
+		console.error( "THREE.EffectComposer relies on THREE.MaskPass" );
+
 	this.passes = [];
-
-	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.EffectComposer relies on THREE.CopyShader" );
-
-	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
-
 };
 
 THREE.EffectComposer.prototype = {
@@ -57,10 +54,10 @@ THREE.EffectComposer.prototype = {
 
 	render: function ( delta ) {
 
+		var maskActive = false;
+
 		this.writeBuffer = this.renderTarget1;
 		this.readBuffer = this.renderTarget2;
-
-		var maskActive = false;
 
 		var pass, i, il = this.passes.length;
 
@@ -73,18 +70,6 @@ THREE.EffectComposer.prototype = {
 			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
 
 			if ( pass.needsSwap ) {
-
-				if ( maskActive ) {
-
-					var context = this.renderer.context;
-
-					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
-
-					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
-
-					context.stencilFunc( context.EQUAL, 1, 0xffffffff );
-
-				}
 
 				this.swapBuffers();
 
