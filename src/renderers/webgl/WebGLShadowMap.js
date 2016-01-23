@@ -86,7 +86,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	this.autoUpdate = true;
 	this.needsUpdate = false;
 
-	this.type = THREE.PCFShadowMap;
+	this.type = THREE.BasicShadowMap;
 	this.cullFace = THREE.CullFaceFront;
 
 	this.render = function ( scene, camera ) {

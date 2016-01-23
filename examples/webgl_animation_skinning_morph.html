@@ -115,7 +115,7 @@
 
 				scene.add( new THREE.HemisphereLight( 0x111111, 0x444444 ) );
 
-				var light = new THREE.DirectionalLight( 0xebf3ff, 1.5 );
+				var light = new THREE.DirectionalLight( 0x88ffff, 1.5 );
 				light.position.set( 0, 140, 500 ).multiplyScalar( 1.1 );
 				scene.add( light );
 
@@ -141,6 +141,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
+				renderer.s
 
 				container.appendChild( renderer.domElement );
 
