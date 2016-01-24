@@ -49,13 +49,11 @@
 
     var SCREEN_WIDTH = window.innerWidth;
     var SCREEN_HEIGHT = window.innerHeight;
-    var FLOOR = -250;
 
     var container,stats;
 
     var camera, scene;
     var renderer;
-
 
     var mouseX = 0, mouseY = 0;
 
@@ -77,18 +75,11 @@
     // RENDERER
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setClearColor( '#000');
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
     renderer.domElement.style.position = "relative";
 
     container.appendChild( renderer.domElement );
-
-    renderer.gammaInput = true;
-    renderer.gammaOutput = true;
-
-    renderer.shadowMap.enabled = true;
-
 
     // STATS
     stats = new Stats();
@@ -166,7 +157,7 @@
         mesh.scale.set(0.1,0.1,0.1);
         mesh.position.set(-50, 0, 50);
         mesh.addEventListener('update', function(event){
-            mixer.update(event.dt);
+            this.mixer.update(event.dt);
         });
         scene.add( mesh );
     } );
