@@ -2,7 +2,7 @@
 
 	for ( int i = 0; i < NUM_SHADOWS; i ++ ) {
 
-			vShadowCoord[ i ] = shadowMatrix[ i ] * worldPosition;
+		vShadowCoord[ i ] = shadowMatrix[ i ] * worldPosition;
 
 	}
 
