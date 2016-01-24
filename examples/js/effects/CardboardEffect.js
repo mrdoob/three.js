@@ -21,76 +21,49 @@ THREE.CardboardEffect = function ( renderer ) {
 
 	var distortion = new THREE.Vector2( 0.441, 0.156 );
 
-	var geometry = new THREE.PlaneBufferGeometry( 1, 1, 10, 20 );
+	var geometry = new THREE.PlaneBufferGeometry( 1, 1, 10, 20 ).removeAttribute( 'normal' ).toNonIndexed();
 
-	var indices = geometry.index.array;
 	var positions = geometry.attributes.position.array;
 	var uvs = geometry.attributes.uv.array;
 
-	var vector = new THREE.Vector2();
+	// duplicate
 
-	function poly( val ) {
-
-		return 1.5 + ( distortion.x + distortion.y * val ) * val;
-
-	}
-
-	for ( var i = 0; i < indices.length; i ++ ) {
-
-		vector.x = positions[ i * 3 + 0 ];
-		vector.y = positions[ i * 3 + 1 ];
-
-		var scalar = poly( vector.dot( vector ) );
-
-		positions[ i * 3 + 0 ] = ( vector.x / scalar ) * 1.5 - 0.5;
-		positions[ i * 3 + 1 ] = ( vector.y / scalar ) * 3.0;
-
-		uvs[ i * 2 ] *= 0.5;
-
-	}
-
-	// clone geometry
-
-	function copyArray( array1, array2, offset ) {
-
-		for ( var i = 0, l = array2.length; i < l; i ++ ) {
-
-			array1[ i + offset ] = array2[ i ];
-
-		}
-
-	}
-
-	var indices2 = new Uint16Array( indices.length * 2 );
 	var positions2 = new Float32Array( positions.length * 2 );
+	positions2.set( positions );
+	positions2.set( positions, positions.length );
+
 	var uvs2 = new Float32Array( uvs.length * 2 );
+	uvs2.set( uvs );
+	uvs2.set( uvs, uvs.length );
 
-	copyArray( indices2, indices, 0 );
-	copyArray( positions2, positions, 0 );
-	copyArray( uvs2, uvs, 0 );
+	var vector = new THREE.Vector2();
+	var length = positions.length / 3;
 
-	var offset = positions.length / 3;
+	for ( var i = 0, l = positions2.length / 3; i < l; i ++ ) {
 
-	for ( i = 0; i < indices.length; i ++ ) {
+		vector.x = positions2[ i * 3 + 0 ];
+		vector.y = positions2[ i * 3 + 1 ];
 
-		indices[ i ] += offset;
-		positions[ i * 3 ] += 1.0;
-		uvs[ i * 2 ] += 0.5;
+		var dot = vector.dot( vector );
+		var scalar = 1.5 + ( distortion.x + distortion.y * dot ) * dot;
+
+		var offset = i < length ? 0 : 1;
+
+		positions2[ i * 3 + 0 ] = ( vector.x / scalar ) * 1.5 - 0.5 + offset;
+		positions2[ i * 3 + 1 ] = ( vector.y / scalar ) * 3.0;
+
+		uvs2[ i * 2 ] = ( uvs2[ i * 2 ] + offset ) * 0.5;
 
 	}
 
-	copyArray( indices2, indices, indices.length );
-	copyArray( positions2, positions, positions.length );
-	copyArray( uvs2, uvs, uvs.length );
+	geometry.attributes.position.array = positions2;
+	geometry.attributes.uv.array = uvs2;
 
-	var geometry2 = new THREE.BufferGeometry();
-	geometry2.setIndex( new THREE.BufferAttribute( indices2, 1 ) );
-	geometry2.addAttribute( 'position', new THREE.BufferAttribute( positions2, 3 ) );
-	geometry2.addAttribute( 'uv', new THREE.BufferAttribute( uvs2, 2 ) );
+	//
 
 	// var material = new THREE.MeshBasicMaterial( { wireframe: true } );
 	var material = new THREE.MeshBasicMaterial( { map: _renderTarget } );
-	var mesh = new THREE.Mesh( geometry2, material );
+	var mesh = new THREE.Mesh( geometry, material );
 	_scene.add( mesh );
 
 	//
