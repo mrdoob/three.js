@@ -47,7 +47,7 @@ THREE.StereoCamera.prototype = {
 				// http://paulbourke.net/stereographics/stereorender/
 
 				var projectionMatrix = camera.projectionMatrix.clone();
-				var eyeSep = 0.064;
+				var eyeSep = 0.064 / 2;
 				var eyeSepOnProjection = eyeSep * near / focalLength;
 				var ymax = near * Math.tan( THREE.Math.degToRad( fov * 0.5 ) );
 				var xmin, xmax;
