@@ -8,7 +8,7 @@ THREE.MaskPass = function ( scene, camera ) {
 	this.camera = camera;
 
 	this.enabled = true;
-	this.clear = true;
+	this.clear = false;
 	this.needsSwap = false;
 
 	this.inverse = false;
@@ -17,20 +17,16 @@ THREE.MaskPass = function ( scene, camera ) {
 
 THREE.MaskPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
-
-		var context = renderer.context;
-
-		// don't update color or depth
-
-		context.colorMask( false, false, false, false );
-		context.depthMask( false );
-
-		// set up stencil
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		var writeValue, clearValue;
 
-		if ( this.inverse ) {
+		var context = renderer.context;
+		var state = renderer.state;
+
+		// check inverse masking
+
+		if ( this.inverse === true ) {
 
 			writeValue = 0;
 			clearValue = 1;
@@ -42,26 +38,28 @@ THREE.MaskPass.prototype = {
 
 		}
 
-		context.enable( context.STENCIL_TEST );
-		context.stencilOp( context.REPLACE, context.REPLACE, context.REPLACE );
-		context.stencilFunc( context.ALWAYS, writeValue, 0xffffffff );
-		context.clearStencil( clearValue );
+		// setup WebGL state to prepare the stencil test
+
+		state.clearStencil( clearValue );
+
+		state.setStencilFunc( context.ALWAYS, writeValue, 0xffffffff );
+		state.setStencilOp( context.REPLACE, context.REPLACE, context.REPLACE );
+
+		// clear the stencil buffer before drawing
+
+		renderer.clearTarget( readBuffer, false, false, true );
+		renderer.clearTarget( writeBuffer, false, false, true );
 
 		// draw into the stencil buffer
 
 		renderer.render( this.scene, this.camera, readBuffer, this.clear );
 		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
 
-		// re-enable update of color and depth
-
-		context.colorMask( true, true, true, true );
-		context.depthMask( true );
-
+		// setup WebGL state for upcoming stencil tests.
 		// only render where stencil is set to 1
 
-		context.stencilFunc( context.EQUAL, 1, 0xffffffff );  // draw if == 1
-		context.stencilOp( context.KEEP, context.KEEP, context.KEEP );
-
+		state.setStencilFunc( context.EQUAL, 1, 0xffffffff );  // draw if == 1
+		state.setStencilOp( context.KEEP, context.KEEP, context.KEEP );
 	}
 
 };
@@ -75,11 +73,7 @@ THREE.ClearMaskPass = function () {
 
 THREE.ClearMaskPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
-
-		var context = renderer.context;
-
-		context.disable( context.STENCIL_TEST );
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 	}
 

@@ -1196,10 +1196,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// Ensure depth buffer writing is enabled so it can be cleared on next render
+		// Ensure buffer writing is enabled so they can be cleared on next render
 
 		state.setDepthTest( true );
 		state.setDepthWrite( true );
+		state.setStencilTest( true );
+		state.setStencilWrite( true );
 		state.setColorWrite( true );
 
 		// _gl.finish();
@@ -1562,6 +1564,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		state.setDepthFunc( material.depthFunc );
 		state.setDepthTest( material.depthTest );
 		state.setDepthWrite( material.depthWrite );
+		state.setStencilTest( material.stencilTest );
+		state.setStencilWrite( material.stencilWrite );
 		state.setColorWrite( material.colorWrite );
 		state.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 

@@ -39,12 +39,13 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 
 THREE.FilmPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		this.uniforms[ "tDiffuse" ].value = readBuffer;
 		this.uniforms[ "time" ].value += delta;
 
 		this.quad.material = this.material;
+		this.quad.material.stencilTest = maskActive;
 
 		if ( this.renderToScreen ) {
 

@@ -61,6 +61,7 @@
 		<script src="js/postprocessing/TexturePass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ClearPass.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -157,7 +158,7 @@
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				//container.appendChild( stats.domElement );
+				container.appendChild( stats.domElement );
 
 				//
 
@@ -193,18 +194,16 @@
 				effectColorify1.uniforms[ 'color' ].value.setRGB( 1, 0.8, 0.8 );
 				effectColorify2.uniforms[ 'color' ].value.setRGB( 1, 0.75, 0.5 );
 
+				effectColorify1.needsSwap = false;
+
+				var clear = new THREE.ClearPass();
 				var clearMask = new THREE.ClearMaskPass();
 				var renderMask = new THREE.MaskPass( sceneModel, cameraPerspective );
 				var renderMaskInverse = new THREE.MaskPass( sceneModel, cameraPerspective );
 
 				renderMaskInverse.inverse = true;
 
-				//effectFilm.renderToScreen = true;
-				//effectFilmBW.renderToScreen = true;
-				//effectDotScreen.renderToScreen = true;
-				//effectBleach.renderToScreen = true;
 				effectVignette.renderToScreen = true;
-				//effectCopy.renderToScreen = true;
 
 				//
 
@@ -227,6 +226,7 @@
 
 				composerScene = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth * 2, rtHeight * 2, rtParameters ) );
 
+				composerScene.addPass( clear );
 				composerScene.addPass( renderBackground );
 				composerScene.addPass( renderModel );
 				composerScene.addPass( renderMaskInverse );
@@ -238,20 +238,22 @@
 
 				renderScene = new THREE.TexturePass( composerScene.renderTarget2 );
 
-				//
+				// bottom left
 
 				composer1 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
+				composer1.addPass( clear );
 				composer1.addPass( renderScene );
 				//composer1.addPass( renderMask );
 				composer1.addPass( effectFilmBW );
 				//composer1.addPass( clearMask );
 				composer1.addPass( effectVignette );
 
-				//
+				// bottom right
 
 				composer2 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
+				composer2.addPass( clear );
 				composer2.addPass( renderScene );
 				composer2.addPass( effectDotScreen );
 				composer2.addPass( renderMask );
@@ -262,10 +264,11 @@
 				composer2.addPass( clearMask );
 				composer2.addPass( effectVignette );
 
-				//
+				// top left
 
 				composer3 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
+				composer3.addPass( clear );
 				composer3.addPass( renderScene );
 				//composer3.addPass( renderMask );
 				composer3.addPass( effectSepia );
@@ -273,10 +276,11 @@
 				//composer3.addPass( clearMask );
 				composer3.addPass( effectVignette );
 
-				//
+				// top right
 
 				composer4 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
+				composer4.addPass( clear );
 				composer4.addPass( renderScene );
 				//composer4.addPass( renderMask );
 				composer4.addPass( effectBloom );
@@ -286,8 +290,6 @@
 				composer4.addPass( effectVignette );
 
 				//
-
-				//onWindowResize();
 
 				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2;
 
@@ -341,7 +343,9 @@
 					shininess: 20,
 					map: new THREE.TextureLoader().load( "obj/leeperrysmith/Map-COL.jpg" ),
 					normalMap: new THREE.TextureLoader().load("obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
-					normalScale: new THREE.Vector2( 0.75, 0.75 )
+					normalScale: new THREE.Vector2( 0.75, 0.75 ),
+					stencilTest: true,
+					stencilWrite: true
 
 				} );
 

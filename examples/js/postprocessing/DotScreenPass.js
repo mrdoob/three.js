@@ -38,12 +38,13 @@ THREE.DotScreenPass = function ( center, angle, scale ) {
 
 THREE.DotScreenPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		this.uniforms[ "tDiffuse" ].value = readBuffer;
 		this.uniforms[ "tSize" ].value.set( readBuffer.width, readBuffer.height );
 
 		this.quad.material = this.material;
+		this.quad.material.stencilTest = maskActive;
 
 		if ( this.renderToScreen ) {
 

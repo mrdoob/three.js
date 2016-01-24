@@ -25,7 +25,6 @@ THREE.TexturePass = function ( texture, opacity ) {
 	this.enabled = true;
 	this.needsSwap = false;
 
-
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene  = new THREE.Scene();
 
@@ -36,9 +35,10 @@ THREE.TexturePass = function ( texture, opacity ) {
 
 THREE.TexturePass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		this.quad.material = this.material;
+		this.quad.material.stencilTest = maskActive;
 
 		renderer.render( this.scene, this.camera, readBuffer );
 

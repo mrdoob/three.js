@@ -23,7 +23,7 @@ THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clear
 
 THREE.RenderPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		this.scene.overrideMaterial = this.overrideMaterial;
 
