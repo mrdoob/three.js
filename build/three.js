@@ -16882,7 +16882,7 @@ THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 
 	this.type = 'PerspectiveCamera';
 
-	this.focalLength = 100;
+	this.focalLength = 10;
 	this.zoom = 1;
 
 	this.fov = fov !== undefined ? fov : 50;
@@ -17078,7 +17078,7 @@ THREE.StereoCamera.prototype = {
 				// http://paulbourke.net/stereographics/stereorender/
 
 				var projectionMatrix = camera.projectionMatrix.clone();
-				var eyeSep = focalLength / 30 * 0.5;
+				var eyeSep = 0.064 / 2;
 				var eyeSepOnProjection = eyeSep * near / focalLength;
 				var ymax = near * Math.tan( THREE.Math.degToRad( fov * 0.5 ) );
 				var xmin, xmax;
@@ -17667,6 +17667,8 @@ THREE.Loader.prototype = {
 						break;
 					case 'depthTest':
 					case 'depthWrite':
+					case 'stencilTest':
+					case 'stencilWrite':
 					case 'colorWrite':
 					case 'opacity':
 					case 'reflectivity':
@@ -18797,6 +18799,8 @@ THREE.MaterialLoader.prototype = {
 		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
+		if ( json.stencilTest !== undefined ) material.stencilTest = json.stencilTest;
+		if ( json.stencilWrite !== undefined ) material.stencilWrite = json.stencilWrite;
 		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
@@ -19912,6 +19916,9 @@ THREE.Material = function () {
 
 	this.colorWrite = true;
 
+	this.stencilTest = false;
+	this.stencilWrite = false;
+
 	this.precision = null; // override the renderer's default precision for this material
 
 	this.polygonOffset = false;
@@ -20138,6 +20145,9 @@ THREE.Material.prototype = {
 		this.depthWrite = source.depthWrite;
 
 		this.colorWrite = source.colorWrite;
+
+		this.stencilTest = source.stencilTest;
+		this.stencilWrite = source.stencilWrite;
 
 		this.precision = source.precision;
 
@@ -26150,10 +26160,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// Ensure depth buffer writing is enabled so it can be cleared on next render
+		// Ensure buffer writing is enabled so they can be cleared on next render
 
 		state.setDepthTest( true );
 		state.setDepthWrite( true );
+		state.setStencilTest( true );
+		state.setStencilWrite( true );
 		state.setColorWrite( true );
 
 		// _gl.finish();
@@ -26516,6 +26528,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		state.setDepthFunc( material.depthFunc );
 		state.setDepthTest( material.depthTest );
 		state.setDepthWrite( material.depthWrite );
+		state.setStencilTest( material.stencilTest );
+		state.setStencilWrite( material.stencilWrite );
 		state.setColorWrite( material.colorWrite );
 		state.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
