@@ -65,6 +65,8 @@ THREE.BufferGeometry.prototype = {
 
 		this.attributes[ name ] = attribute;
 
+		return this;
+
 	},
 
 	getAttribute: function ( name ) {
@@ -76,6 +78,8 @@ THREE.BufferGeometry.prototype = {
 	removeAttribute: function ( name ) {
 
 		delete this.attributes[ name ];
+
+		return this;
 
 	},
 
@@ -817,6 +821,52 @@ THREE.BufferGeometry.prototype = {
 			normals[ i + 2 ] *= n;
 
 		}
+
+	},
+
+	toNonIndexed: function () {
+
+		if ( this.index === null ) {
+
+			console.warn( 'THREE.BufferGeometry.toNonIndexed(): Geometry is already non-indexed.' );
+			return this;
+
+		}
+
+		var geometry2 = new THREE.BufferGeometry();
+
+		var indices = this.index.array;
+		var attributes = this.attributes;
+
+		for ( var name in attributes ) {
+
+			var attribute = attributes[ name ];
+
+			var array = attribute.array;
+			var itemSize = attribute.itemSize;
+
+			var array2 = new array.constructor( indices.length * itemSize );
+
+			var index = 0;
+			var index2 = 0;
+
+			for ( var i = 0; i < indices.length; i ++ ) {
+
+				index = indices[ i ] * itemSize;
+
+				for ( var j = 0; j < itemSize; j ++ ) {
+
+					array2[ index2 ++ ] = array[ index ++ ];
+
+				}
+
+			}
+
+			geometry2.addAttribute( name, new THREE.BufferAttribute( array2, itemSize ) );
+
+		}
+
+		return geometry2;
 
 	},
 
