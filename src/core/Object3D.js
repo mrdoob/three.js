@@ -8,7 +8,7 @@
 
 THREE.Object3D = function () {
 
-	Object.defineProperty( this, 'id', { value: THREE.Object3DIdCount ++ } );
+	Object.defineProperty( this, 'id', { value: THREE.Object3DIdCount ++, configurable: true } );
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -43,25 +43,31 @@ THREE.Object3D = function () {
 	Object.defineProperties( this, {
 		position: {
 			enumerable: true,
-			value: position
+			value: position,
+			configurable: true
 		},
 		rotation: {
 			enumerable: true,
-			value: rotation
+			value: rotation,
+			configurable: true
 		},
 		quaternion: {
 			enumerable: true,
-			value: quaternion
+			value: quaternion,
+			configurable: true
 		},
 		scale: {
 			enumerable: true,
-			value: scale
+			value: scale,
+			configurable: true
 		},
 		modelViewMatrix: {
-			value: new THREE.Matrix4()
+			value: new THREE.Matrix4(),
+			configurable: true
 		},
 		normalMatrix: {
-			value: new THREE.Matrix3()
+			value: new THREE.Matrix3(),
+			configurable: true
 		}
 	} );
 

@@ -13,7 +13,8 @@ THREE.LOD = function () {
 	Object.defineProperties( this, {
 		levels: {
 			enumerable: true,
-			value: []
+			value: [],
+			configurable: true
 		},
 		objects: {
 			get: function () {
