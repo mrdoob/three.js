@@ -12049,10 +12049,9 @@ THREE.BufferGeometry.prototype = {
 
 			var array2 = new array.constructor( indices.length * itemSize );
 
-			var index = 0;
-			var index2 = 0;
+			var index = 0, index2 = 0;
 
-			for ( var i = 0; i < indices.length; i ++ ) {
+			for ( var i = 0, l = indices.length; i < l; i ++ ) {
 
 				index = indices[ i ] * itemSize;
 
