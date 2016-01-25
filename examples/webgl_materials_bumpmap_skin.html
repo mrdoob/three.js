@@ -236,7 +236,8 @@
 
 				uniforms[ "bumpScale" ].value = 8;
 
-				var material = new THREE.ShaderMaterial( { fragmentShader: fragmentShader, vertexShader: vertexShader, uniforms: uniforms, lights: true, derivatives: true } );
+				var material = new THREE.ShaderMaterial( { fragmentShader: fragmentShader, vertexShader: vertexShader, uniforms: uniforms, lights: true } );
+				material.extensions.derivatives = true;
 
 				mesh = new THREE.Mesh( geometry, material );
 
