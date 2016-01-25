@@ -144,11 +144,14 @@
 				uniforms[ "passID" ].value = 1;
 
 
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, derivatives: true };
-				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true, derivatives: true };
+				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
+				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true };
 
 				material = new THREE.ShaderMaterial( parameters );
+				material.extensions.derivatives = true;
+
 				var materialUV = new THREE.ShaderMaterial( parametersUV );
+				materialUV.extensions.derivatives = true;
 
 				// LOADER
 
