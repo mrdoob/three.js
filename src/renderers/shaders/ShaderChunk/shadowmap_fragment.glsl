@@ -6,7 +6,7 @@ vec3 shadowMask = vec3( 1.0 );
 
 	for ( int i = 0; i < NUM_SHADOWS; i ++ ) {
 
-		float texelSizeY =  1.0 / shadowMapSize[ i ].y;
+		float texelSizeY = 1.0 / shadowMapSize[ i ].y;
 
 		float shadow = 0.0;
 
@@ -87,7 +87,7 @@ vec3 shadowMask = vec3( 1.0 );
 
 #endif // POINT_LIGHT_SHADOWS
 
-			float texelSizeX =  1.0 / shadowMapSize[ i ].x;
+			float texelSizeX = 1.0 / shadowMapSize[ i ].x;
 
 			vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;
 
@@ -103,83 +103,34 @@ vec3 shadowMask = vec3( 1.0 );
 
 			if ( frustumTest ) {
 
-	#if defined( SHADOWMAP_TYPE_PCF )
-
-				// Percentage-close filtering
-				// (9 pixel kernel)
-				// http://fabiensanglard.net/shadowmappingPCF/
-
-				/*
-						// nested loops breaks shader compiler / validator on some ATI cards when using OpenGL
-						// must enroll loop manually
-					for ( float y = -1.25; y <= 1.25; y += 1.25 )
-						for ( float x = -1.25; x <= 1.25; x += 1.25 ) {
-							vec4 rgbaDepth = texture2D( shadowMap[ i ], vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy );
-									// doesn't seem to produce any noticeable visual difference compared to simple texture2D lookup
-									//vec4 rgbaDepth = texture2DProj( shadowMap[ i ], vec4( vShadowCoord[ i ].w * ( vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy ), 0.05, vShadowCoord[ i ].w ) );
-							float fDepth = unpackDepth( rgbaDepth );
-							if ( fDepth < shadowCoord.z )
-								shadow += 1.0;
-					}
-					shadow /= 9.0;
-				*/
-
 				shadowCoord.z += shadowBias[ i ];
 
-				const float ShadowDelta = 1.0 / 9.0;
+	#if defined( SHADOWMAP_TYPE_PCF )
 
-				float xPixelOffset = texelSizeX;
-				float yPixelOffset = texelSizeY;
+				float dx0 = - texelSizeX;
+				float dy0 = - texelSizeY;
+				float dx1 = + texelSizeX;
+				float dy1 = + texelSizeY;
 
-				float dx0 = - 1.25 * xPixelOffset;
-				float dy0 = - 1.25 * yPixelOffset;
-				float dx1 = 1.25 * xPixelOffset;
-				float dy1 = 1.25 * yPixelOffset;
-
-				float fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );
-				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;
-
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );
-				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;
-
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );
-				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;
-
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );
-				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;
-
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );
-				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;
-
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );
-				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;
-
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );
-				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;
-
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );
-				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;
-
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );
-				if ( fDepth < shadowCoord.z ) shadow += ShadowDelta;
+				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) ), shadowCoord.z );
+				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) ), shadowCoord.z );
+				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) ), shadowCoord.z );
+				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) ), shadowCoord.z );
+				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) ), shadowCoord.z );
+				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) ), shadowCoord.z );
+				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) ), shadowCoord.z );
+				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) ), shadowCoord.z );
+				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) ), shadowCoord.z );
+				shadow *= 1.0 / 9.0;
 
 				shadow *= shadowDarkness[ i ];
 
 	#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
 
-				// Percentage-close filtering
-				// (9 pixel kernel)
-				// http://fabiensanglard.net/shadowmappingPCF/
-
-				shadowCoord.z += shadowBias[ i ];
-
-				float xPixelOffset = texelSizeX;
-				float yPixelOffset = texelSizeY;
-
-				float dx0 = - 1.0 * xPixelOffset;
-				float dy0 = - 1.0 * yPixelOffset;
-				float dx1 = 1.0 * xPixelOffset;
-				float dy1 = 1.0 * yPixelOffset;
+				float dx0 = - texelSizeX;
+				float dy0 = - texelSizeY;
+				float dx1 = + texelSizeX;
+				float dy1 = + texelSizeY;
 
 				mat3 shadowKernel;
 				mat3 depthKernel;
@@ -219,13 +170,8 @@ vec3 shadowMask = vec3( 1.0 );
 
 	#else // no percentage-closer filtering:
 
-				shadowCoord.z += shadowBias[ i ];
-
 				vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );
-				float fDepth = unpackDepth( rgbaDepth );
-
-				if ( fDepth < shadowCoord.z )
-					shadow = shadowDarkness[ i ];
+				shadow = step( unpackDepth( rgbaDepth ), shadowCoord.z ) * shadowDarkness[ i ];
 
 	#endif
 
