@@ -21,7 +21,11 @@ THREE.VRControls = function ( object, onError ) {
 
 		}
 
-		if ( onError ) onError( 'HMD not available' );
+		if ( vrInputs.length === 0 ) {
+
+			if ( onError ) onError( 'PositionSensorVRDevice not available' );
+
+		}
 
 	}
 
