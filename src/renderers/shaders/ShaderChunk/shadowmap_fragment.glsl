@@ -143,28 +143,6 @@ vec3 shadowMask = vec3( 1.0 );
 
 			}
 
-#ifdef SHADOWMAP_DEBUG
-
-			if ( inFrustum ) {
-
-				if ( i == 0 ) {
-
-					outgoingLight *= vec3( 1.0, 0.5, 0.0 );
-
-				} else if ( i == 1 ) {
-
-					outgoingLight *= vec3( 0.0, 1.0, 0.8 );
-
-				} else {
-
-					outgoingLight *= vec3( 0.0, 0.5, 1.0 );
-
-				}
-
-			}
-
-#endif
-
 #ifdef POINT_LIGHT_SHADOWS
 
 		}

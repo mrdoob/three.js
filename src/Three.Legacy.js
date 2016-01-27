@@ -553,15 +553,6 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
 			this.shadowMap.cullFace = value;
 		}
-	},
-	shadowMapDebug: {
-		get: function () {
-			return this.shadowMap.debug;
-		},
-		set: function ( value ) {
-			console.warn( 'THREE.WebGLRenderer: .shadowMapDebug is now .shadowMap.debug.' );
-			this.shadowMap.debug = value;
-		}
 	}
 } );
 

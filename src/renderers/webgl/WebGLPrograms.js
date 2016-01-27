@@ -24,7 +24,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"maxMorphTargets", "maxMorphNormals",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
 		"numShadows", "shadowMapEnabled", "pointLightShadows",
-		"shadowMapType", "shadowMapDebug",
+		"shadowMapType",
 		"alphaTest", "doubleSided", "flipSided"
 	];
 
@@ -141,7 +141,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
-			shadowMapDebug: renderer.shadowMap.debug,
 
 			alphaTest: material.alphaTest,
 			doubleSided: material.side === THREE.DoubleSide,
