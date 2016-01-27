@@ -23,18 +23,6 @@
 
 	#ifdef POINT_LIGHT_SHADOWS
 
-		// adjustShadowValue1K() upacks the depth value stored in @textureData, adds @bias to it, and then
-		// comapres the result with @testDepth. If @testDepth is larger than or equal to that result, then
-		// @shadowValue is incremented by 1.0.
-
-		void adjustShadowValue1K( const float testDepth, const vec4 textureData, const float bias, inout float shadowValue ) {
-
-			const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
-			if ( testDepth >= dot( textureData, bitSh ) * 1000.0 + bias )
-				shadowValue += 1.0;
-
-		}
-
 		// cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
 		// vector suitable for 2D texture mapping. This code uses the following layout for the
 		// 2D texture:

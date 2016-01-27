@@ -25,15 +25,12 @@ vec3 shadowMask = vec3( 1.0 );
 			// the distance from the light to the world-space position of the fragment.
 			vec3 lightToPosition = vShadowCoord[ i ].xyz;
 
-	#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )
-
 			// bd3D = base direction 3D
 			vec3 bd3D = normalize( lightToPosition );
 			// dp = distance from light to fragment position
-			float dp = length( lightToPosition );
+			float dp = ( length( lightToPosition ) - shadowBias[ i ] ) / 1000.0;
 
-			// base measurement
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ) ), shadowBias[ i ], shadow );
+	#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )
 
 			// Dr = disk radius
 
@@ -44,42 +41,37 @@ vec3 shadowMask = vec3( 1.0 );
 	#endif
 
 			// os = offset scale
-			float os = Dr *  2.0 * texelSizeY;
+			float os = Dr * 2.0 * texelSizeY;
 
 			const vec3 Gsd = vec3( - 1, 0, 1 );
 
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzz * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxz * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxz * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzz * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzx * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxx * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxx * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzx * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzy * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxy * os, texelSizeY ) ), shadowBias[ i ], shadow );
-
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxy * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzy * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zyz * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xyz * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.zyx * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.xyx * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.yzz * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.yxz * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.yxx * os, texelSizeY ) ), shadowBias[ i ], shadow );
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D + Gsd.yzx * os, texelSizeY ) ), shadowBias[ i ], shadow );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzz * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxz * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxz * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzz * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzx * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxx * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxx * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzx * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzy * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxy * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxy * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzy * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zyz * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xyz * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zyx * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xyx * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.yzz * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.yxz * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.yxx * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.yzx * os, texelSizeY ), dp );
 
 			shadow *= realShadowDarkness * ( 1.0 / 21.0 );
 
-	#else // no percentage-closer filtering:
+	#else // no percentage-closer filtering
 
-			vec3 bd3D = normalize( lightToPosition );
-			float dp = length( lightToPosition );
-
-			adjustShadowValue1K( dp, texture2D( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ) ), shadowBias[ i ], shadow );
-
-			shadow *= realShadowDarkness;
+			shadow = texture2DCompare( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ), dp ) * realShadowDarkness;
 
 	#endif
 
