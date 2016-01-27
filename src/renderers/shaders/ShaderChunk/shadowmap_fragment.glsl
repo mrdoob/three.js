@@ -6,7 +6,7 @@ vec3 shadowMask = vec3( 1.0 );
 
 	for ( int i = 0; i < NUM_SHADOWS; i ++ ) {
 
-		float texelSizeY = 1.0 / shadowMapSize[ i ].y;
+		vec2 texelSize = vec2( 1.0 ) / shadowMapSize[ i ];
 
 		float shadow = 0.0;
 
@@ -41,45 +41,43 @@ vec3 shadowMask = vec3( 1.0 );
 	#endif
 
 			// os = offset scale
-			float os = Dr * 2.0 * texelSizeY;
+			float os = Dr * 2.0 * texelSize.y;
 
 			const vec3 Gsd = vec3( - 1, 0, 1 );
 
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzz * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxz * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxz * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzz * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzx * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxx * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxx * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzx * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzy * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxy * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxy * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzy * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zyz * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xyz * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zyx * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xyx * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.yzz * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.yxz * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.yxx * os, texelSizeY ), dp );
-			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.yzx * os, texelSizeY ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzz * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxz * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxz * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzz * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzx * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxx * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxx * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzx * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zzy * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zxy * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xxy * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xzy * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zyz * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xyz * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.zyx * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.xyx * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.yzz * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.yxz * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.yxx * os, texelSize.y ), dp );
+			shadow += texture2DCompare( shadowMap[ i ], cubeToUV( bd3D + Gsd.yzx * os, texelSize.y ), dp );
 
 			shadow *= realShadowDarkness * ( 1.0 / 21.0 );
 
 	#else // no percentage-closer filtering
 
-			shadow = texture2DCompare( shadowMap[ i ], cubeToUV( bd3D, texelSizeY ), dp ) * realShadowDarkness;
+			shadow = texture2DCompare( shadowMap[ i ], cubeToUV( bd3D, texelSize.y ), dp ) * realShadowDarkness;
 
 	#endif
 
 		} else {
 
 #endif // POINT_LIGHT_SHADOWS
-
-			float texelSizeX = 1.0 / shadowMapSize[ i ].x;
 
 			vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;
 
@@ -99,10 +97,10 @@ vec3 shadowMask = vec3( 1.0 );
 
 	#if defined( SHADOWMAP_TYPE_PCF )
 
-				float dx0 = - texelSizeX;
-				float dy0 = - texelSizeY;
-				float dx1 = + texelSizeX;
-				float dy1 = + texelSizeY;
+				float dx0 = - texelSize.x;
+				float dy0 = - texelSize.y;
+				float dx1 = + texelSize.x;
+				float dy1 = + texelSize.y;
 
 				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z );
 				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z );
@@ -119,10 +117,10 @@ vec3 shadowMask = vec3( 1.0 );
 
 	#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
 
-				float dx0 = - texelSizeX;
-				float dy0 = - texelSizeY;
-				float dx1 = + texelSizeX;
-				float dy1 = + texelSizeY;
+				float dx0 = - texelSize.x;
+				float dy0 = - texelSize.y;
+				float dx1 = + texelSize.x;
+				float dy1 = + texelSize.y;
 
 				mat3 shadowKernel;
 				mat3 depthKernel;
