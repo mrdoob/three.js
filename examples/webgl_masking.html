@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - masking - stencil buffer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+
+			body {
+				color: #cccccc;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+				color: #0080ff;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - masking - stencil buffer </div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+		var composer, renderer, stats, scene, sceneMasking, camera;
+
+		var box, torus;
+
+		init();
+		animate();
+
+		function init() {
+
+			// setup camera
+
+			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera.position.set( 0, 10, 30 );
+			camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+			scene = new THREE.Scene();
+
+			// setup scene
+
+			box = new THREE.Mesh( new THREE.BoxGeometry( 4, 4, 4 ), new THREE.MeshBasicMaterial( { color: 0x0000ff, stencilTest: true } ) );
+			scene.add( box );
+
+			torus = new THREE.Mesh( new THREE.TorusGeometry( 3, 1, 16, 32 ), new THREE.MeshBasicMaterial( { color: 0xff0000, stencilTest: true } ) );
+			scene.add( torus );
+
+			// setup renderer
+
+			renderer = new THREE.WebGLRenderer( { antialias: false } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.autoClear = false;
+			document.body.appendChild( renderer.domElement );
+
+			// setup performance monitor
+
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '0px';
+			document.body.appendChild( stats.domElement );
+
+			// setup scene for masking
+
+			sceneMasking = new THREE.Scene();
+
+			var maskMaterial = new THREE.MeshBasicMaterial( { color: 0xe0e0e0, stencilTest: true, stencilWrite: true, colorWrite: true, depthWrite: false } );
+			var maskMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20, 10 ), maskMaterial );
+
+			sceneMasking.add( maskMesh );
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			render();
+
+			stats.update();
+
+		}
+
+		function render() {
+
+			var time = performance.now() * 0.001;
+
+			// animate 3d objects
+
+			box.position.x = Math.cos( time / 1.5 ) * 10;
+			box.position.y = Math.sin( time ) * 10;
+			box.rotation.x = time;
+			box.rotation.y = time / 2;
+
+			torus.position.x = Math.cos( time ) * 2;
+			torus.position.y = Math.sin( time / 1.5 ) * 2;
+			torus.rotation.x = time;
+			torus.rotation.y = time / 2;
+
+			// render
+			renderer.clear();
+
+			updateMasking();
+
+			renderer.render( scene, camera );
+
+		}
+
+		function updateMasking(){
+
+			var gl = renderer.context;
+
+			// config the stencil buffer to collect data for testing
+			renderer.state.setStencilFunc( gl.ALWAYS, 1, 0xff );
+			renderer.state.setStencilOp( gl.REPLACE, gl.REPLACE, gl.REPLACE );
+
+			// write data of shapes to stencil buffer
+			renderer.render( sceneMasking, camera );
+
+			// set stencil buffer for testing
+			renderer.state.setStencilFunc( gl.EQUAL, 1, 0xff );
+			renderer.state.setStencilOp( gl.KEEP, gl.KEEP, gl.KEEP );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		</script>
+	</body>
+</html>
