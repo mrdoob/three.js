@@ -112,15 +112,15 @@ vec3 shadowMask = vec3( 1.0 );
 				float dx1 = + texelSizeX;
 				float dy1 = + texelSizeY;
 
-				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) ), shadowCoord.z );
-				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) ), shadowCoord.z );
-				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) ), shadowCoord.z );
-				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) ), shadowCoord.z );
-				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) ), shadowCoord.z );
-				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) ), shadowCoord.z );
-				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) ), shadowCoord.z );
-				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) ), shadowCoord.z );
-				shadow += step( unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) ), shadowCoord.z );
+				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z );
+				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z );
+				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z );
+				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z );
+				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy, shadowCoord.z );
+				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z );
+				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z );
+				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z );
+				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z );
 				shadow *= 1.0 / 9.0;
 
 				shadow *= shadowDarkness[ i ];
@@ -170,8 +170,7 @@ vec3 shadowMask = vec3( 1.0 );
 
 	#else // no percentage-closer filtering:
 
-				vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );
-				shadow = step( unpackDepth( rgbaDepth ), shadowCoord.z ) * shadowDarkness[ i ];
+				shadow = texture2DCompare( shadowMap[ i ], shadowCoord.xy, shadowCoord.z ) * shadowDarkness[ i ];
 
 	#endif
 
