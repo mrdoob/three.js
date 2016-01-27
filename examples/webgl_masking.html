@@ -47,6 +47,8 @@
 
 		var box, torus;
 
+		var objects = [];
+
 		init();
 		animate();
 
@@ -55,18 +57,25 @@
 			// setup camera
 
 			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
-			camera.position.set( 0, 10, 30 );
+			camera.position.set( 0, 40, 30 );
 			camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
 			scene = new THREE.Scene();
 
 			// setup scene
 
-			box = new THREE.Mesh( new THREE.BoxGeometry( 4, 4, 4 ), new THREE.MeshBasicMaterial( { color: 0x0000ff, stencilTest: true } ) );
-			scene.add( box );
+			var geometry = new THREE.TorusGeometry( 1, 0.25, 16, 32 );
+			var material = new THREE.MeshNormalMaterial( { stencilTest: true } );
 
-			torus = new THREE.Mesh( new THREE.TorusGeometry( 3, 1, 16, 32 ), new THREE.MeshBasicMaterial( { color: 0xff0000, stencilTest: true } ) );
-			scene.add( torus );
+			for ( var i = 0; i < 100; i ++ ) {
+
+				var torus = new THREE.Mesh( geometry, material );
+				torus.position.set( 40 * ( Math.random() - 0.5 ), 40 * ( Math.random() - 0.5 ), 40 * ( Math.random() - 0.5 ) );
+				torus.rotation.set( Math.random(), Math.random(), Math.random() );
+				scene.add( torus );
+				objects.push( torus );
+
+			}
 
 			// setup renderer
 
@@ -87,9 +96,9 @@
 
 			sceneMasking = new THREE.Scene();
 
-			var maskMaterial = new THREE.MeshBasicMaterial( { color: 0xe0e0e0, stencilTest: true, stencilWrite: true, colorWrite: true, depthWrite: false } );
-			var maskMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20, 10 ), maskMaterial );
+			var maskMaterial = new THREE.MeshBasicMaterial( { stencilTest: true, stencilWrite: true, colorWrite: false, depthWrite: false } );
 
+			maskMesh = new THREE.Mesh( new THREE.BoxGeometry( 20, 20, 20 ), maskMaterial );
 			sceneMasking.add( maskMesh );
 
 			window.addEventListener( 'resize', onWindowResize, false );
@@ -112,15 +121,17 @@
 
 			// animate 3d objects
 
-			box.position.x = Math.cos( time / 1.5 ) * 10;
-			box.position.y = Math.sin( time ) * 10;
-			box.rotation.x = time;
-			box.rotation.y = time / 2;
+			for ( var i = 0; i < objects.length; i ++ ) {
 
-			torus.position.x = Math.cos( time ) * 2;
-			torus.position.y = Math.sin( time / 1.5 ) * 2;
-			torus.rotation.x = time;
-			torus.rotation.y = time / 2;
+				objects[ i ].rotation.x += 0.01;
+				objects[ i ].rotation.y += 0.01;
+				objects[ i ].rotation.z += 0.01;
+
+			}
+
+			maskMesh.rotation.x += 0.01;
+			maskMesh.rotation.y += 0.01;
+			maskMesh.rotation.z += 0.01;
 
 			// render
 			renderer.clear();
