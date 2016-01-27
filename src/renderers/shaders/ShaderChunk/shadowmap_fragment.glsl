@@ -111,9 +111,8 @@ vec3 shadowMask = vec3( 1.0 );
 				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z );
 				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z );
 				shadow += texture2DCompare( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z );
-				shadow *= 1.0 / 9.0;
 
-				shadow *= shadowDarkness[ i ];
+				shadow *= shadowDarkness[ i ] * ( 1.0 / 9.0 );
 
 	#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
 
@@ -131,9 +130,8 @@ vec3 shadowMask = vec3( 1.0 );
 				shadow += texture2DShadowLerp( shadowMap[ i ], shadowMapSize[ i ], shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z );
 				shadow += texture2DShadowLerp( shadowMap[ i ], shadowMapSize[ i ], shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z );
 				shadow += texture2DShadowLerp( shadowMap[ i ], shadowMapSize[ i ], shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z );
-				shadow *= 1.0 / 9.0;
 
-				shadow *= shadowDarkness[ i ];
+				shadow *= shadowDarkness[ i ] * ( 1.0 / 9.0 );
 
 	#else // no percentage-closer filtering:
 
