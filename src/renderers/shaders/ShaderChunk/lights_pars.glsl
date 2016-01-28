@@ -1,9 +1,9 @@
 #if NUM_DIR_LIGHTS > 0
 
 	struct DirectionalLight {
-	  vec3 direction;
-	  vec3 color;
-	  int shadow;
+		vec3 direction;
+		vec3 color;
+		int shadow;
 	};
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
@@ -25,11 +25,11 @@
 #if NUM_POINT_LIGHTS > 0
 
 	struct PointLight {
-	  vec3 position;
-	  vec3 color;
-	  float distance;
-	  float decay;
-	  int shadow;
+		vec3 position;
+		vec3 color;
+		float distance;
+		float decay;
+		int shadow;
 	};
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
@@ -54,14 +54,14 @@
 #if NUM_SPOT_LIGHTS > 0
 
 	struct SpotLight {
-	  vec3 position;
-	  vec3 direction;
-	  vec3 color;
-	  float distance;
-	  float decay;
-	  float angleCos;
-	  float exponent;
-	  int shadow;
+		vec3 position;
+		vec3 direction;
+		vec3 color;
+		float distance;
+		float decay;
+		float angleCos;
+		float exponent;
+		int shadow;
 	};
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
@@ -99,9 +99,9 @@
 #if NUM_HEMI_LIGHTS > 0
 
 	struct HemisphereLight {
-	  vec3 direction;
-	  vec3 skyColor;
-	  vec3 groundColor;
+		vec3 direction;
+		vec3 skyColor;
+		vec3 groundColor;
 	};
 
 	uniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];
