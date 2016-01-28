@@ -37,7 +37,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 		console.error( "THREE.BokehPass relies on THREE.BokehShader" );
 
 	}
-
+	
 	var bokehShader = THREE.BokehShader;
 	var bokehUniforms = THREE.UniformsUtils.clone( bokehShader.uniforms );
 
@@ -63,8 +63,8 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene2  = new THREE.Scene();
 
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.scene2.add( this.quad );
+	this.quad2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.scene2.add( this.quad2 );
 
 };
 
@@ -72,8 +72,7 @@ THREE.BokehPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		this.quad.material = this.materialBokeh;
-		this.quad.material.stencilTest = maskActive;
+		this.quad2.material = this.materialBokeh;
 
 		// Render depth into texture
 
@@ -100,3 +99,4 @@ THREE.BokehPass.prototype = {
 	}
 
 };
+

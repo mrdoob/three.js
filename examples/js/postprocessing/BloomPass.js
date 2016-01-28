@@ -78,6 +78,8 @@ THREE.BloomPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
+		if ( maskActive ) renderer.context.disable( renderer.context.STENCIL_TEST );
+
 		// Render quad with blured scene into texture (convolution pass 1)
 
 		this.quad.material = this.materialConvolution;
@@ -98,11 +100,13 @@ THREE.BloomPass.prototype = {
 		// Render original scene with superimposed blur to texture
 
 		this.quad.material = this.materialCopy;
-		this.quad.material.stencilTest = maskActive;
 
 		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetY;
 
+		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
+
 		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+
 	}
 
 };

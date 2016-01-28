@@ -45,7 +45,7 @@ THREE.ShaderPass = function( shader, textureID ) {
 
 THREE.ShaderPass.prototype = {
 
-	render: function( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function( renderer, writeBuffer, readBuffer, delta ) {
 
 		if ( this.uniforms[ this.textureID ] ) {
 
@@ -54,7 +54,6 @@ THREE.ShaderPass.prototype = {
 		}
 
 		this.quad.material = this.material;
-		this.quad.material.stencilTest = maskActive;
 
 		if ( this.renderToScreen ) {
 
