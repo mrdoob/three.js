@@ -322,7 +322,7 @@ def restore_export_settings(properties, settings):
         constants.INDEX_TYPE,
         constants.EXPORT_OPTIONS[constants.INDEX_TYPE])
     ## }
-   
+
     ## Materials {
     properties.option_materials = settings.get(
         constants.MATERIALS,
@@ -373,6 +373,10 @@ def restore_export_settings(properties, settings):
     properties.option_indent = settings.get(
         constants.INDENT,
         constants.EXPORT_OPTIONS[constants.INDENT])
+
+    properties.option_compact_separators = settings.get(
+        constants.COMPACT_SEPARATORS,
+        constants.EXPORT_OPTIONS[constants.COMPACT_SEPARATORS])
 
     properties.option_copy_textures = settings.get(
         constants.COPY_TEXTURES,
@@ -467,6 +471,7 @@ def set_settings(properties):
         constants.LOGGING: properties.option_logging,
         constants.COMPRESSION: properties.option_compression,
         constants.INDENT: properties.option_indent,
+        constants.COMPACT_SEPARATORS: properties.option_compact_separators,
         constants.COPY_TEXTURES: properties.option_copy_textures,
         constants.TEXTURE_FOLDER: properties.option_texture_folder,
 
@@ -730,6 +735,11 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Disable this to reduce the file size",
         default=constants.EXPORT_OPTIONS[constants.INDENT])
 
+    option_compact_separators = BoolProperty(
+        name="Compact JSON separators",
+        description="Enable this to reduce the file size",
+        default=constants.EXPORT_OPTIONS[constants.COMPACT_SEPARATORS])
+
     option_compression = EnumProperty(
         name="",
         description="Compression options",
@@ -943,6 +953,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_indent')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_compact_separators')
         ## }
 
         ## Operators {
