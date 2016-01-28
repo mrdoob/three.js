@@ -32,9 +32,6 @@ THREE.Material = function () {
 
 	this.colorWrite = true;
 
-	this.stencilTest = false;
-	this.stencilWrite = false;
-
 	this.precision = null; // override the renderer's default precision for this material
 
 	this.polygonOffset = false;
@@ -261,9 +258,6 @@ THREE.Material.prototype = {
 		this.depthWrite = source.depthWrite;
 
 		this.colorWrite = source.colorWrite;
-
-		this.stencilTest = source.stencilTest;
-		this.stencilWrite = source.stencilWrite;
 
 		this.precision = source.precision;
 

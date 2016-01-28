@@ -47,12 +47,10 @@
 				var scene1 = new THREE.Scene();
 				var scene2 = new THREE.Scene();
 
-				var maskMaterial = new THREE.MeshBasicMaterial( { stencilTest: true, stencilWrite: true, colorWrite: false, depthWrite: false } );
-
-				box = new THREE.Mesh( new THREE.BoxGeometry( 4, 4, 4 ), maskMaterial );
+				box = new THREE.Mesh( new THREE.BoxGeometry( 4, 4, 4 ) );
 				scene1.add( box );
 
-				torus = new THREE.Mesh( new THREE.TorusGeometry( 3, 1, 16, 32 ), maskMaterial );
+				torus = new THREE.Mesh( new THREE.TorusGeometry( 3, 1, 16, 32 ) );
 				scene2.add( torus );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );

@@ -163,7 +163,6 @@ THREE.AdaptiveToneMappingPass.prototype = {
 		}
 
 		this.quad.material = this.materialToneMap;
-		this.quad.material.stencilTest = maskActive;
 		this.materialToneMap.uniforms.tDiffuse.value = readBuffer;
 		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
 
