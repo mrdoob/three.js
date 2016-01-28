@@ -74,7 +74,7 @@ THREE.GlitchPass.prototype = {
 		this.curF ++;
 
 		this.quad.material = this.material;
-		this.quad.material.stencilTest = maskActive;
+    this.quad.material.stencilTest = maskActive;
     
 		if ( this.renderToScreen ) {
 
