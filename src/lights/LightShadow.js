@@ -7,7 +7,6 @@ THREE.LightShadow = function ( camera ) {
 	this.camera = camera;
 
 	this.bias = 0;
-	this.darkness = 1;
 
 	this.mapSize = new THREE.Vector2( 512, 512 );
 
@@ -25,7 +24,6 @@ THREE.LightShadow.prototype = {
 		this.camera = source.camera.clone();
 
 		this.bias = source.bias;
-		this.darkness = source.darkness;
 
 		this.mapSize.copy( source.mapSize );
 

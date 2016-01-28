@@ -246,11 +246,6 @@ THREE.ShaderSkin = {
 
 				"#endif",
 
-				THREE.ShaderChunk[ "shadowmap_fragment" ],
-
-				"totalDiffuseLight *= shadowMask;",
-				"totalSpecularLight *= shadowMask;",
-
 				"outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse ) + totalSpecularLight;",
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],

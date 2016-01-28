@@ -3822,8 +3822,6 @@ THREE.ShaderLib[ 'mmd' ] = {
 			THREE.ShaderChunk[ "normal_fragment" ],
 			THREE.ShaderChunk[ "emissivemap_fragment" ],
 
-			THREE.ShaderChunk[ "shadowmap_fragment" ],
-
 			// accumulation
 			THREE.ShaderChunk[ "lights_phong_fragment" ],
 			THREE.ShaderChunk[ "lights_template" ],

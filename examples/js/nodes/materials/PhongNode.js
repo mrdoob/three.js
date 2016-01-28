@@ -207,8 +207,6 @@ THREE.PhongNode.prototype.build = function( builder ) {
 		output.push( 'material.diffuseColor = ' + ( light ? 'vec3( 1.0 )' : 'diffuseColor' ) + ';' );
 
 		output.push(
-			THREE.ShaderChunk[ "shadowmap_fragment" ],
-
 			// accumulation
 			'material.specularColor = specular;',
 			'material.specularShininess = shininess;',

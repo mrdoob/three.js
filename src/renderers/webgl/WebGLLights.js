@@ -30,7 +30,7 @@ THREE.WebGLLights = function () {
 				uniforms = {
 					direction: new THREE.Vector3(),
 					color: new THREE.Color(),
-					shadow: -1
+					shadow: - 1
 				};
 				break;
 
@@ -40,7 +40,7 @@ THREE.WebGLLights = function () {
 					color: new THREE.Color(),
 					distance: 0,
 					decay: 0,
-					shadow: -1
+					shadow: - 1
 				};
 				break;
 
@@ -53,7 +53,7 @@ THREE.WebGLLights = function () {
 					angleCos: 0,
 					exponent: 0,
 					decay: 0,
-					shadow: -1
+					shadow: - 1
 				};
 				break;
 

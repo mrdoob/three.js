@@ -123,4 +123,4 @@ Sidebar.Project = function ( editor ) {
 
 	return container;
 
-}
+};

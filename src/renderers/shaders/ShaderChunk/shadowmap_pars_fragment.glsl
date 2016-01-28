@@ -2,8 +2,6 @@
 
 	uniform sampler2D shadowMap[ NUM_SHADOWS ];
 	uniform vec2 shadowMapSize[ NUM_SHADOWS ];
-
-	uniform float shadowDarkness[ NUM_SHADOWS ];
 	uniform float shadowBias[ NUM_SHADOWS ];
 
 	varying vec4 vShadowCoord[ NUM_SHADOWS ];
@@ -17,7 +15,7 @@
 
 	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
 
-		return step( unpackDepth( texture2D( depths, uv ) ), compare );
+		return step( compare, unpackDepth( texture2D( depths, uv ) ) );
 
 	}
 
@@ -43,79 +41,227 @@
 
 	}
 
-	#ifdef POINT_LIGHT_SHADOWS
+	float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, vec4 vShadowCoord ) {
 
-		// cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
-		// vector suitable for 2D texture mapping. This code uses the following layout for the
-		// 2D texture:
-		//
-		// xzXZ
-		//  y Y
-		//
-		// Y - Positive y direction
-		// y - Negative y direction
-		// X - Positive x direction
-		// x - Negative x direction
-		// Z - Positive z direction
-		// z - Negative z direction
-		//
-		// Source and test bed:
-		// https://gist.github.com/tschw/da10c43c467ce8afd0c4
+		vec3 shadowCoord = vShadowCoord.xyz / vShadowCoord.w;
+		shadowCoord.z += shadowBias;
 
-		vec2 cubeToUV( vec3 v, float texelSizeY ) {
+		// if ( something && something ) breaks ATI OpenGL shader compiler
+		// if ( all( something, something ) ) using this instead
 
-			// Number of texels to avoid at the edge of each square
+		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
+		bool inFrustum = all( inFrustumVec );
 
-			vec3 absV = abs( v );
+		bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
 
-			// Intersect unit cube
+		bool frustumTest = all( frustumTestVec );
 
-			float scaleToCube = 1.0 / max( absV.x, max( absV.y, absV.z ) );
-			absV *= scaleToCube;
+		if ( frustumTest ) {
 
-			// Apply scale to avoid seams
+		#if defined( SHADOWMAP_TYPE_PCF )
 
-			// two texels less per square (one texel will do for NEAREST)
-			v *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );
+			vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
 
-			// Unwrap
+			float dx0 = - texelSize.x;
+			float dy0 = - texelSize.y;
+			float dx1 = + texelSize.x;
+			float dy1 = + texelSize.y;
 
-			// space: -1 ... 1 range for each square
-			//
-			// #X##		dim    := ( 4 , 2 )
-			//  # #		center := ( 1 , 1 )
+			return (
+				texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
+				texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
+				texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
+				texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
+				texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +
+				texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
+				texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
+				texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
+				texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
+			) * ( 1.0 / 9.0 );
 
-			vec2 planar = v.xy;
+		#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
 
-			float almostATexel = 1.5 * texelSizeY;
-			float almostOne = 1.0 - almostATexel;
+			vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
 
-			if ( absV.z >= almostOne ) {
+			float dx0 = - texelSize.x;
+			float dy0 = - texelSize.y;
+			float dx1 = + texelSize.x;
+			float dy1 = + texelSize.y;
 
-				if ( v.z > 0.0 )
-					planar.x = 4.0 - v.x;
+			return (
+				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
+				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
+				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
+				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
+				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy, shadowCoord.z ) +
+				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
+				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
+				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
+				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
+			) * ( 1.0 / 9.0 );
 
-			} else if ( absV.x >= almostOne ) {
+		#else // no percentage-closer filtering:
 
-				float signX = sign( v.x );
-				planar.x = v.z * signX + 2.0 * signX;
+			return texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
 
-			} else if ( absV.y >= almostOne ) {
-
-				float signY = sign( v.y );
-				planar.x = v.x + 2.0 * signY + 2.0;
-				planar.y = v.z * signY - 2.0;
-
-			}
-
-			// Transform to UV space
-
-			// scale := 0.5 / dim
-			// translate := ( center + 0.5 ) / dim
-			return vec2( 0.125, 0.25 ) * planar + vec2( 0.375, 0.75 );
+		#endif
 
 		}
 
-	#endif
+		return 1.0;
+
+	}
+
+	float getShadowById( const int i ) {
+
+		if ( i == - 1 ) return 1.0;
+
+		for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
+			if ( j == i ) {
+				return getShadow( shadowMap[ j ], shadowMapSize[ j ], shadowBias[ j ], vShadowCoord[ j ] );
+			}
+		}
+
+	}
+
+	// cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
+	// vector suitable for 2D texture mapping. This code uses the following layout for the
+	// 2D texture:
+	//
+	// xzXZ
+	//  y Y
+	//
+	// Y - Positive y direction
+	// y - Negative y direction
+	// X - Positive x direction
+	// x - Negative x direction
+	// Z - Positive z direction
+	// z - Negative z direction
+	//
+	// Source and test bed:
+	// https://gist.github.com/tschw/da10c43c467ce8afd0c4
+
+	vec2 cubeToUV( vec3 v, float texelSizeY ) {
+
+		// Number of texels to avoid at the edge of each square
+
+		vec3 absV = abs( v );
+
+		// Intersect unit cube
+
+		float scaleToCube = 1.0 / max( absV.x, max( absV.y, absV.z ) );
+		absV *= scaleToCube;
+
+		// Apply scale to avoid seams
+
+		// two texels less per square (one texel will do for NEAREST)
+		v *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );
+
+		// Unwrap
+
+		// space: -1 ... 1 range for each square
+		//
+		// #X##		dim    := ( 4 , 2 )
+		//  # #		center := ( 1 , 1 )
+
+		vec2 planar = v.xy;
+
+		float almostATexel = 1.5 * texelSizeY;
+		float almostOne = 1.0 - almostATexel;
+
+		if ( absV.z >= almostOne ) {
+
+			if ( v.z > 0.0 )
+				planar.x = 4.0 - v.x;
+
+		} else if ( absV.x >= almostOne ) {
+
+			float signX = sign( v.x );
+			planar.x = v.z * signX + 2.0 * signX;
+
+		} else if ( absV.y >= almostOne ) {
+
+			float signY = sign( v.y );
+			planar.x = v.x + 2.0 * signY + 2.0;
+			planar.y = v.z * signY - 2.0;
+
+		}
+
+		// Transform to UV space
+
+		// scale := 0.5 / dim
+		// translate := ( center + 0.5 ) / dim
+		return vec2( 0.125, 0.25 ) * planar + vec2( 0.375, 0.75 );
+
+	}
+
+	float getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, vec4 vShadowCoord ) {
+
+		vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
+
+		// for point lights, the uniform @vShadowCoord is re-purposed to hold
+		// the distance from the light to the world-space position of the fragment.
+		vec3 lightToPosition = vShadowCoord.xyz;
+
+		// bd3D = base direction 3D
+		vec3 bd3D = normalize( lightToPosition );
+		// dp = distance from light to fragment position
+		float dp = ( length( lightToPosition ) - shadowBias ) / 1000.0;
+
+		#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )
+
+			// DR = disk radius
+
+			#if defined( SHADOWMAP_TYPE_PCF )
+				const float DR = 1.25;
+			#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
+				const float DR = 2.25;
+			#endif
+
+			vec3 offset = vec3( - 1, 0, 1 ) * DR * 2.0 * texelSize.y;
+
+			return (
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.zzz, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.zxz, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxz, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xzz, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.zzx, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.zxx, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxx, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xzx, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.zzy, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.zxy, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxy, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xzy, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.zyz, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyz, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.zyx, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyx, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yzz, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxz, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxx, texelSize.y ), dp ) +
+				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yzx, texelSize.y ), dp )
+			) * ( 1.0 / 21.0 );
+
+		#else // no percentage-closer filtering
+
+			return texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp );
+
+		#endif
+
+	}
+
+	float getPointShadowById( const int i ) {
+
+		if ( i == - 1 ) return 1.0;
+
+		for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
+			if ( j == i ) {
+				return getPointShadow( shadowMap[ j ], shadowMapSize[ j ], shadowBias[ j ], vShadowCoord[ j ] );
+			}
+		}
+
+	}
 
 #endif

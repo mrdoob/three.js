@@ -2169,13 +2169,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
 					shadow.matrix.identity().setPosition( _vector3 );
 
-					// for point lights we set the sign of the shadowDarkness uniform to be negative
-					uniforms.shadowDarkness.value[ i ] = - shadow.darkness;
-
-				} else {
-
-					uniforms.shadowDarkness.value[ i ] = shadow.darkness;
-
 				}
 
 				uniforms.shadowBias.value[ i ] = shadow.bias;

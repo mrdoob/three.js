@@ -173,7 +173,6 @@
 	"src/renderers/shaders/ShaderChunk/project_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/roughnessmap_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/roughnessmap_pars_fragment.glsl",
-	"src/renderers/shaders/ShaderChunk/shadowmap_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/shadowmap_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/shadowmap_pars_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/shadowmap_vertex.glsl",
