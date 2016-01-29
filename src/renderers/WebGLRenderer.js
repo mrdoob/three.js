@@ -2673,10 +2673,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowMatrix = light.shadow.matrix;
 
 					_lights.shadows[ shadowsLength ++ ] = light;
-					_lights.directionalShadow[ directionalLength ] = light.shadow.map;
 
 				}
 
+				_lights.directionalShadow[ directionalLength ] = light.shadow.map;
 				_lights.directional[ directionalLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.SpotLight ) {
@@ -2708,10 +2708,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowMatrix = light.shadow.matrix;
 
 					_lights.shadows[ shadowsLength ++ ] = light;
-					_lights.spotShadow[ spotLength ] = light.shadow.map;
 
 				}
 
+				_lights.spotShadow[ spotLength ] = light.shadow.map;
 				_lights.spot[ spotLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.PointLight ) {
@@ -2739,10 +2739,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowMatrix.identity().setPosition( _vector3 );
 
 					_lights.shadows[ shadowsLength ++ ] = light;
-					_lights.pointShadow[ pointLength ] = light.shadow.map;
 
 				}
 
+				_lights.pointShadow[ pointLength ] = light.shadow.map;
 				_lights.point[ pointLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
