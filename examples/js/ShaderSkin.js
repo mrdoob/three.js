@@ -27,7 +27,6 @@ THREE.ShaderSkin = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
-			THREE.UniformsLib[ "shadowmap" ],
 
 			{
 
@@ -268,6 +267,7 @@ THREE.ShaderSkin = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
+			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",

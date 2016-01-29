@@ -33,8 +33,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
-			THREE.UniformsLib[ "lights" ],
-			THREE.UniformsLib[ "shadowmap" ]
+			THREE.UniformsLib[ "lights" ]
 
 		] ) );
 
