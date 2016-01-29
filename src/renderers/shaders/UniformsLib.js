@@ -139,9 +139,11 @@ THREE.UniformsLib = {
 
 	shadowmap: {
 
+		"shadowBias": { type: "fv1", value: [] },
+		"shadowRadius": { type: "fv1", value: [] },
+
 		"shadowMap": { type: "tv", value: [] },
 		"shadowMapSize": { type: "v2v", value: [] },
-		"shadowBias": { type: "fv1", value: [] },
 		"shadowMatrix": { type: "m4v", value: [] }
 
 	}

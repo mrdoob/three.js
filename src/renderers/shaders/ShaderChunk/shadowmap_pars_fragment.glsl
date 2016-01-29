@@ -1,8 +1,10 @@
 #ifdef USE_SHADOWMAP
 
+	uniform float shadowBias[ NUM_SHADOWS ];
+	uniform float shadowRadius[ NUM_SHADOWS ];
+
 	uniform sampler2D shadowMap[ NUM_SHADOWS ];
 	uniform vec2 shadowMapSize[ NUM_SHADOWS ];
-	uniform float shadowBias[ NUM_SHADOWS ];
 
 	varying vec4 vShadowCoord[ NUM_SHADOWS ];
 
@@ -41,7 +43,7 @@
 
 	}
 
-	float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, vec4 vShadowCoord ) {
+	float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 vShadowCoord ) {
 
 		vec3 shadowCoord = vShadowCoord.xyz / vShadowCoord.w;
 		shadowCoord.z += shadowBias;
@@ -62,10 +64,10 @@
 
 			vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
 
-			float dx0 = - texelSize.x;
-			float dy0 = - texelSize.y;
-			float dx1 = + texelSize.x;
-			float dy1 = + texelSize.y;
+			float dx0 = - texelSize.x * shadowRadius;
+			float dy0 = - texelSize.y * shadowRadius;
+			float dx1 = + texelSize.x * shadowRadius;
+			float dy1 = + texelSize.y * shadowRadius;
 
 			return (
 				texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
@@ -83,10 +85,10 @@
 
 			vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
 
-			float dx0 = - texelSize.x;
-			float dy0 = - texelSize.y;
-			float dx1 = + texelSize.x;
-			float dy1 = + texelSize.y;
+			float dx0 = - texelSize.x * shadowRadius;
+			float dy0 = - texelSize.y * shadowRadius;
+			float dx1 = + texelSize.x * shadowRadius;
+			float dy1 = + texelSize.y * shadowRadius;
 
 			return (
 				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
@@ -118,7 +120,7 @@
 
 		for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
 			if ( j == i ) {
-				return getShadow( shadowMap[ j ], shadowMapSize[ j ], shadowBias[ j ], vShadowCoord[ j ] );
+				return getShadow( shadowMap[ j ], shadowMapSize[ j ], shadowBias[ j ], shadowRadius[ j ], vShadowCoord[ j ] );
 			}
 		}
 
@@ -195,7 +197,7 @@
 
 	}
 
-	float getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, vec4 vShadowCoord ) {
+	float getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 vShadowCoord ) {
 
 		vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
 
@@ -210,15 +212,7 @@
 
 		#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )
 
-			// DR = disk radius
-
-			#if defined( SHADOWMAP_TYPE_PCF )
-				const float DR = 1.25;
-			#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
-				const float DR = 2.25;
-			#endif
-
-			vec3 offset = vec3( - 1, 0, 1 ) * DR * 2.0 * texelSize.y;
+			vec3 offset = vec3( - 1, 0, 1 ) * shadowRadius * 2.0 * texelSize.y;
 
 			return (
 				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.zzz, texelSize.y ), dp ) +
@@ -258,7 +252,7 @@
 
 		for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
 			if ( j == i ) {
-				return getPointShadow( shadowMap[ j ], shadowMapSize[ j ], shadowBias[ j ], vShadowCoord[ j ] );
+				return getPointShadow( shadowMap[ j ], shadowMapSize[ j ], shadowBias[ j ], shadowRadius[ j ], vShadowCoord[ j ] );
 			}
 		}
 

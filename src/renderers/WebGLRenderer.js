@@ -2172,6 +2172,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				uniforms.shadowBias.value[ i ] = shadow.bias;
+				uniforms.shadowRadius.value[ i ] = shadow.radius;
+
 				uniforms.shadowMap.value[ i ] = shadow.map;
 				uniforms.shadowMapSize.value[ i ] = shadow.mapSize;
 				uniforms.shadowMatrix.value[ i ] = shadow.matrix;
