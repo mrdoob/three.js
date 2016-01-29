@@ -27665,10 +27665,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowMatrix = light.shadow.matrix;
 
 					_lights.shadows[ shadowsLength ++ ] = light;
-					_lights.directionalShadow[ directionalLength ] = light.shadow.map;
 
 				}
 
+				_lights.directionalShadow[ directionalLength ] = light.shadow.map;
 				_lights.directional[ directionalLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.SpotLight ) {
@@ -27700,10 +27700,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowMatrix = light.shadow.matrix;
 
 					_lights.shadows[ shadowsLength ++ ] = light;
-					_lights.spotShadow[ spotLength ] = light.shadow.map;
 
 				}
 
+				_lights.spotShadow[ spotLength ] = light.shadow.map;
 				_lights.spot[ spotLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.PointLight ) {
@@ -27731,10 +27731,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowMatrix.identity().setPosition( _vector3 );
 
 					_lights.shadows[ shadowsLength ++ ] = light;
-					_lights.pointShadow[ pointLength ] = light.shadow.map;
 
 				}
 
+				_lights.pointShadow[ pointLength ] = light.shadow.map;
 				_lights.point[ pointLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
@@ -29870,6 +29870,9 @@ THREE.WebGLProgram = ( function () {
 		var vertexGlsl = prefixVertex + vertexShader;
 		var fragmentGlsl = prefixFragment + fragmentShader;
 
+		// console.log( '*VERTEX*', vertexGlsl );
+		// console.log( '*FRAGMENT*', fragmentGlsl );
+
 		var glVertexShader = THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
 		var glFragmentShader = THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
 
@@ -29897,6 +29900,9 @@ THREE.WebGLProgram = ( function () {
 
 		var runnable = true;
 		var haveDiagnostics = true;
+
+		// console.log( '**VERTEX**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
+		// console.log( '**FRAGMENT**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
 
 		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
