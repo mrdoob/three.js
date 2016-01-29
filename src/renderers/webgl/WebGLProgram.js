@@ -429,6 +429,9 @@ THREE.WebGLProgram = ( function () {
 		var vertexGlsl = prefixVertex + vertexShader;
 		var fragmentGlsl = prefixFragment + fragmentShader;
 
+		// console.log( '*VERTEX*', vertexGlsl );
+		// console.log( '*FRAGMENT*', fragmentGlsl );
+
 		var glVertexShader = THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
 		var glFragmentShader = THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
 
@@ -456,6 +459,9 @@ THREE.WebGLProgram = ( function () {
 
 		var runnable = true;
 		var haveDiagnostics = true;
+
+		// console.log( '**VERTEX**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
+		// console.log( '**FRAGMENT**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
 
 		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
