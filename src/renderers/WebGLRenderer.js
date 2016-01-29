@@ -119,8 +119,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		ambient: [ 0, 0, 0 ],
 		directional: [],
-		point: [],
+		directionalShadow: [],
 		spot: [],
+		spotShadow: [],
+		point: [],
+		pointShadow: [],
 		hemi: [],
 
 		shadows: [],
@@ -1520,8 +1523,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			uniforms.ambientLightColor.value = _lights.ambient;
 			uniforms.directionalLights.value = _lights.directional;
-			uniforms.pointLights.value = _lights.point;
+			uniforms.directionalLightsShadowMap.value = _lights.directionalShadow;
 			uniforms.spotLights.value = _lights.spot;
+			uniforms.spotLightsShadowMap.value = _lights.spotShadow;
+			uniforms.pointLights.value = _lights.point;
+			uniforms.pointLightsShadowMap.value = _lights.pointShadow;
 			uniforms.hemisphereLights.value = _lights.hemi;
 
 		}
@@ -1811,16 +1817,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
 				m_uniforms.opacity.value = material.opacity;
-
-			}
-
-			if ( shadowMap.enabled ) {
-
-				if ( object.receiveShadow && ! material._shadowPass ) {
-
-					refreshUniformsShadow( m_uniforms, camera );
-
-				}
 
 			}
 
@@ -2151,39 +2147,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function refreshUniformsShadow ( uniforms, camera ) {
-
-		if ( uniforms.shadowMatrix ) {
-
-			var shadows = _lights.shadows;
-
-			for ( var i = 0, l = shadows.length; i < l; i ++ ) {
-
-				var light = shadows[ i ];
-				var shadow = light.shadow;
-
-				if ( light instanceof THREE.PointLight ) {
-
-					// for point lights we set the shadow matrix to be a translation-only matrix
-					// equal to inverse of the light's position
-					_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-					shadow.matrix.identity().setPosition( _vector3 );
-
-				}
-
-				uniforms.shadowBias.value[ i ] = shadow.bias;
-				uniforms.shadowRadius.value[ i ] = shadow.radius;
-
-				uniforms.shadowMap.value[ i ] = shadow.map;
-				uniforms.shadowMapSize.value[ i ] = shadow.mapSize;
-				uniforms.shadowMatrix.value[ i ] = shadow.matrix;
-
-			}
-
-		}
-
-	}
-
 	// Uniforms (load to GPU)
 
 	function loadUniformsMatrices ( uniforms, object ) {
@@ -2396,6 +2359,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 									break;
 								case 'c':
 									_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
+									break;
+								case 'm4':
+									_gl.uniformMatrix4fv( locationProperty, false, valueProperty.elements );
 									break;
 							}
 
@@ -2697,45 +2663,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.direction.transformDirection( viewMatrix );
 				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
 
+				uniforms.shadowEnabled = light.castShadow;
+
 				if ( light.castShadow ) {
 
-					uniforms.shadow = shadowsLength;
+					uniforms.shadowBias = light.shadow.bias;
+					uniforms.shadowRadius = light.shadow.radius;
+					uniforms.shadowMapSize = light.shadow.mapSize;
+					uniforms.shadowMatrix = light.shadow.matrix;
 
 					_lights.shadows[ shadowsLength ++ ] = light;
-
-				} else {
-
-					uniforms.shadow = - 1;
+					_lights.directionalShadow[ directionalLength ] = light.shadow.map;
 
 				}
 
 				_lights.directional[ directionalLength ++ ] = uniforms;
-
-			} else if ( light instanceof THREE.PointLight ) {
-
-				var uniforms = lightCache.get( light );
-
-				uniforms.position.setFromMatrixPosition( light.matrixWorld );
-				uniforms.position.applyMatrix4( viewMatrix );
-
-				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
-				uniforms.distance = light.distance;
-				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
-
-				if ( light.castShadow ) {
-
-					uniforms.shadow = shadowsLength;
-
-					_lights.shadows[ shadowsLength ++ ] = light;
-					_lights.shadowsPointLight ++;
-
-				} else {
-
-					uniforms.shadow = - 1;
-
-				}
-
-				_lights.point[ pointLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
@@ -2756,19 +2698,52 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.exponent = light.exponent;
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
+				uniforms.shadowEnabled = light.castShadow;
+
 				if ( light.castShadow ) {
 
-					uniforms.shadow = shadowsLength;
+					uniforms.shadowBias = light.shadow.bias;
+					uniforms.shadowRadius = light.shadow.radius;
+					uniforms.shadowMapSize = light.shadow.mapSize;
+					uniforms.shadowMatrix = light.shadow.matrix;
 
 					_lights.shadows[ shadowsLength ++ ] = light;
-
-				} else {
-
-					uniforms.shadow = - 1;
+					_lights.spotShadow[ spotLength ] = light.shadow.map;
 
 				}
 
 				_lights.spot[ spotLength ++ ] = uniforms;
+
+			} else if ( light instanceof THREE.PointLight ) {
+
+				var uniforms = lightCache.get( light );
+
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
+
+				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
+				uniforms.distance = light.distance;
+				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
+
+				uniforms.shadowEnabled = light.castShadow;
+
+				if ( light.castShadow ) {
+
+					uniforms.shadowBias = light.shadow.bias;
+					uniforms.shadowRadius = light.shadow.radius;
+					uniforms.shadowMapSize = light.shadow.mapSize;
+
+					// for point lights we set the shadow matrix to be a translation-only matrix
+					// equal to inverse of the light's position
+					_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
+					uniforms.shadowMatrix.identity().setPosition( _vector3 );
+
+					_lights.shadows[ shadowsLength ++ ] = light;
+					_lights.pointShadow[ pointLength ] = light.shadow.map;
+
+				}
+
+				_lights.point[ pointLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 

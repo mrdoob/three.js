@@ -96,22 +96,15 @@ THREE.UniformsLib = {
 		"directionalLights": { type: "sa", value: [], properties: {
 			"direction": { type: "v3" },
 			"color": { type: "c" },
-			"shadow": { type: "i" }
+
+			"shadowEnabled": { type: "i" },
+			"shadowBias": { type: "f" },
+			"shadowRadius": { type: "f" },
+			"shadowMapSize": { type: "v2" },
+			"shadowMatrix": { type: "m4" }
 		} },
 
-		"hemisphereLights": { type: "sa", value: [], properties: {
-			"direction": { type: "v3" },
-			"skyColor": { type: "c" },
-			"groundColor": { type: "c" }
-		} },
-
-		"pointLights": { type: "sa", value: [], properties: {
-			"color": { type: "c" },
-			"position": { type: "v3" },
-			"decay": { type: "f" },
-			"distance": { type: "f" },
-			"shadow": { type: "i" }
-		} },
+		"directionalLightsShadowMap": { type: "tv", value: [] },
 
 		"spotLights": { type: "sa", value: [], properties: {
 			"color": { type: "c" },
@@ -121,7 +114,35 @@ THREE.UniformsLib = {
 			"angleCos": { type: "f" },
 			"exponent": { type: "f" },
 			"decay": { type: "f" },
-			"shadow": { type: "i" }
+
+			"shadowEnabled": { type: "i" },
+			"shadowBias": { type: "f" },
+			"shadowRadius": { type: "f" },
+			"shadowMapSize": { type: "v2" },
+			"shadowMatrix": { type: "m4" }
+		} },
+
+		"spotLightsShadowMap": { type: "tv", value: [] },
+
+		"pointLights": { type: "sa", value: [], properties: {
+			"color": { type: "c" },
+			"position": { type: "v3" },
+			"decay": { type: "f" },
+			"distance": { type: "f" },
+
+			"shadowEnabled": { type: "i" },
+			"shadowBias": { type: "f" },
+			"shadowRadius": { type: "f" },
+			"shadowMapSize": { type: "v2" },
+			"shadowMatrix": { type: "m4" }
+		} },
+
+		"pointLightsShadowMap": { type: "tv", value: [] },
+
+		"hemisphereLights": { type: "sa", value: [], properties: {
+			"direction": { type: "v3" },
+			"skyColor": { type: "c" },
+			"groundColor": { type: "c" }
 		} }
 
 	},
@@ -134,17 +155,6 @@ THREE.UniformsLib = {
 		"scale": { type: "f", value: 1.0 },
 		"map": { type: "t", value: null },
 		"offsetRepeat": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) }
-
-	},
-
-	shadowmap: {
-
-		"shadowBias": { type: "fv1", value: [] },
-		"shadowRadius": { type: "fv1", value: [] },
-
-		"shadowMap": { type: "tv", value: [] },
-		"shadowMapSize": { type: "v2v", value: [] },
-		"shadowMatrix": { type: "m4v", value: [] }
 
 	}
 

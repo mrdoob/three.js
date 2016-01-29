@@ -3,7 +3,12 @@
 	struct DirectionalLight {
 		vec3 direction;
 		vec3 color;
-		int shadow;
+
+		bool shadowEnabled;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
+		mat4 shadowMatrix;
 	};
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
@@ -29,7 +34,12 @@
 		vec3 color;
 		float distance;
 		float decay;
-		int shadow;
+
+		bool shadowEnabled;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
+		mat4 shadowMatrix;
 	};
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
@@ -61,7 +71,12 @@
 		float decay;
 		float angleCos;
 		float exponent;
-		int shadow;
+
+		bool shadowEnabled;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
+		mat4 shadowMatrix;
 	};
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];

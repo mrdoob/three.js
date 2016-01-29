@@ -28,7 +28,9 @@ geometry.viewDir = normalize( vViewPosition );
 		IncidentLight directLight = getPointDirectLight( pointLight, geometry );
 
 		#ifdef USE_SHADOWMAP
-			directLight.color *= getPointShadowById( pointLight.shadow );
+			if ( pointLight.shadowEnabled ) {
+				directLight.color *= getPointShadow( pointLightsShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ] );
+			}
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -46,7 +48,9 @@ geometry.viewDir = normalize( vViewPosition );
 		IncidentLight directLight = getSpotDirectLight( spotLight, geometry );
 
 		#ifdef USE_SHADOWMAP
-			directLight.color *= getShadowById( spotLight.shadow );
+			if ( spotLight.shadowEnabled ) {
+				directLight.color *= getShadow( spotLightsShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] );
+			}
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -64,7 +68,9 @@ geometry.viewDir = normalize( vViewPosition );
 		IncidentLight directLight = getDirectionalDirectLight( directionalLight, geometry );
 
 		#ifdef USE_SHADOWMAP
-			directLight.color *= getShadowById( directionalLight.shadow );
+			if ( directionalLight.shadowEnabled ) {
+				directLight.color *= getShadow( directionalLightsShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] );
+			}
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );

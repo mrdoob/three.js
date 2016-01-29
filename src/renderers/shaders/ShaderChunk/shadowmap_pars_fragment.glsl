@@ -1,12 +1,25 @@
 #ifdef USE_SHADOWMAP
 
-	uniform float shadowBias[ NUM_SHADOWS ];
-	uniform float shadowRadius[ NUM_SHADOWS ];
+	#if NUM_DIR_LIGHTS > 0
 
-	uniform sampler2D shadowMap[ NUM_SHADOWS ];
-	uniform vec2 shadowMapSize[ NUM_SHADOWS ];
+		uniform sampler2D directionalLightsShadowMap[ NUM_DIR_LIGHTS ];
+		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
 
-	varying vec4 vShadowCoord[ NUM_SHADOWS ];
+	#endif
+
+	#if NUM_SPOT_LIGHTS > 0
+
+		uniform sampler2D spotLightsShadowMap[ NUM_SPOT_LIGHTS ];
+		varying vec4 vSpotShadowCoord[ NUM_SPOT_LIGHTS ];
+
+	#endif
+
+	#if NUM_POINT_LIGHTS > 0
+
+		uniform sampler2D pointLightsShadowMap[ NUM_POINT_LIGHTS ];
+		varying vec4 vPointShadowCoord[ NUM_POINT_LIGHTS ];
+
+	#endif
 
 	float unpackDepth( const in vec4 rgba_depth ) {
 
@@ -43,9 +56,9 @@
 
 	}
 
-	float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 vShadowCoord ) {
+	float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
 
-		vec3 shadowCoord = vShadowCoord.xyz / vShadowCoord.w;
+		shadowCoord.xyz /= shadowCoord.w;
 		shadowCoord.z += shadowBias;
 
 		// if ( something && something ) breaks ATI OpenGL shader compiler
@@ -111,18 +124,6 @@
 		}
 
 		return 1.0;
-
-	}
-
-	float getShadowById( const int i ) {
-
-		if ( i == - 1 ) return 1.0;
-
-		for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
-			if ( j == i ) {
-				return getShadow( shadowMap[ j ], shadowMapSize[ j ], shadowBias[ j ], shadowRadius[ j ], vShadowCoord[ j ] );
-			}
-		}
 
 	}
 
@@ -197,13 +198,13 @@
 
 	}
 
-	float getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 vShadowCoord ) {
+	float getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
 
 		vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
 
 		// for point lights, the uniform @vShadowCoord is re-purposed to hold
 		// the distance from the light to the world-space position of the fragment.
-		vec3 lightToPosition = vShadowCoord.xyz;
+		vec3 lightToPosition = shadowCoord.xyz;
 
 		// bd3D = base direction 3D
 		vec3 bd3D = normalize( lightToPosition );
@@ -243,18 +244,6 @@
 			return texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp );
 
 		#endif
-
-	}
-
-	float getPointShadowById( const int i ) {
-
-		if ( i == - 1 ) return 1.0;
-
-		for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
-			if ( j == i ) {
-				return getPointShadow( shadowMap[ j ], shadowMapSize[ j ], shadowBias[ j ], shadowRadius[ j ], vShadowCoord[ j ] );
-			}
-		}
 
 	}
 

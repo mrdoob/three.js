@@ -12,7 +12,7 @@ THREE.LightShadow = function ( camera ) {
 	this.mapSize = new THREE.Vector2( 512, 512 );
 
 	this.map = null;
-	this.matrix = null;
+	this.matrix = new THREE.Matrix4();
 
 };
 

@@ -15,8 +15,7 @@ THREE.ShaderLib = {
 
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "aomap" ],
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "shadowmap" ]
+			THREE.UniformsLib[ "fog" ]
 
 		] ),
 
@@ -26,6 +25,8 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "uv_pars_vertex" ],
 			THREE.ShaderChunk[ "uv2_pars_vertex" ],
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
+			THREE.ShaderChunk[ "bsdfs" ],
+			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
@@ -130,7 +131,6 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
-			THREE.UniformsLib[ "shadowmap" ],
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) }
@@ -286,7 +286,6 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
-			THREE.UniformsLib[ "shadowmap" ],
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -313,6 +312,8 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "uv2_pars_vertex" ],
 			THREE.ShaderChunk[ "displacementmap_pars_vertex" ],
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
+			THREE.ShaderChunk[ "bsdfs" ],
+			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
@@ -440,7 +441,6 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
-			THREE.UniformsLib[ "shadowmap" ],
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -468,6 +468,8 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "uv2_pars_vertex" ],
 			THREE.ShaderChunk[ "displacementmap_pars_vertex" ],
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
+			THREE.ShaderChunk[ "bsdfs" ],
+			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
@@ -595,8 +597,7 @@ THREE.ShaderLib = {
 		uniforms: THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "points" ],
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "shadowmap" ]
+			THREE.UniformsLib[ "fog" ]
 
 		] ),
 
@@ -606,6 +607,8 @@ THREE.ShaderLib = {
 			"uniform float scale;",
 
 			THREE.ShaderChunk[ "common" ],
+			THREE.ShaderChunk[ "bsdfs" ],
+			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
