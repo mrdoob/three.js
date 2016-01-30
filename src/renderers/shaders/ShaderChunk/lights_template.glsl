@@ -19,18 +19,20 @@ geometry.position = - vViewPosition;
 geometry.normal = normal;
 geometry.viewDir = normalize( vViewPosition );
 
+IncidentLight directLight;
+
 #if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )
+
+	PointLight pointLight;
 
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
-		PointLight pointLight = pointLights[ i ];
+		pointLight = pointLights[ i ];
 
-		IncidentLight directLight = getPointDirectLight( pointLight, geometry );
+		directLight = getPointDirectLight( pointLight, geometry );
 
 		#ifdef USE_SHADOWMAP
-			if ( pointLight.shadowEnabled ) {
-				directLight.color *= getPointShadow( pointLightsShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ] );
-			}
+		if ( pointLight.shadowEnabled ) directLight.color *= getPointShadow( pointLightsShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ] );
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -41,16 +43,16 @@ geometry.viewDir = normalize( vViewPosition );
 
 #if ( NUM_SPOT_LIGHTS > 0 ) && defined( RE_Direct )
 
+	SpotLight spotLight;
+
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
-		SpotLight spotLight = spotLights[ i ];
+		spotLight = spotLights[ i ];
 
-		IncidentLight directLight = getSpotDirectLight( spotLight, geometry );
+		directLight = getSpotDirectLight( spotLight, geometry );
 
 		#ifdef USE_SHADOWMAP
-			if ( spotLight.shadowEnabled ) {
-				directLight.color *= getShadow( spotLightsShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] );
-			}
+		if ( spotLight.shadowEnabled ) directLight.color *= getShadow( spotLightsShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] );
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -61,16 +63,16 @@ geometry.viewDir = normalize( vViewPosition );
 
 #if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )
 
+	DirectionalLight directionalLight;
+
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
-		DirectionalLight directionalLight = directionalLights[ i ];
+		directionalLight = directionalLights[ i ];
 
-		IncidentLight directLight = getDirectionalDirectLight( directionalLight, geometry );
+		directLight = getDirectionalDirectLight( directionalLight, geometry );
 
 		#ifdef USE_SHADOWMAP
-			if ( directionalLight.shadowEnabled ) {
-				directLight.color *= getShadow( directionalLightsShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] );
-			}
+		if ( directionalLight.shadowEnabled ) directLight.color *= getShadow( directionalLightsShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] );
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
