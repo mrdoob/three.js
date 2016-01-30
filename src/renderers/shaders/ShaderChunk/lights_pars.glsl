@@ -13,7 +13,7 @@
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
 
-	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
+	IncidentLight getDirectionalDirectIrradiance( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
 
@@ -44,7 +44,7 @@
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
 
-	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) {
+	IncidentLight getPointDirectIrradiance( const in PointLight pointLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
 
@@ -52,7 +52,7 @@
 		directLight.direction = normalize( lVector );
 
 		directLight.color = pointLight.color;
-		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay );
+		directLight.color *= intensityToIrradianceSphericalFalloffCoefficient( length( lVector ), pointLight.distance, pointLight.decay );
 
 		return directLight;
 
@@ -81,7 +81,7 @@
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
 
-	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {
+	IncidentLight getSpotDirectIrradiance( const in SpotLight spotLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
 
@@ -96,7 +96,7 @@
 			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
 
 			directLight.color = spotLight.color;
-			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
+			directLight.color *= ( spotEffect * intensityToIrradianceSphericalFalloffCoefficient( length( lVector ), spotLight.distance, spotLight.decay ) );
 
 		} else {
 

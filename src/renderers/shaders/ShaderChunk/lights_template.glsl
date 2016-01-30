@@ -25,7 +25,7 @@ geometry.viewDir = normalize( vViewPosition );
 
 		PointLight pointLight = pointLights[ i ];
 
-		IncidentLight directLight = getPointDirectLight( pointLight, geometry );
+		IncidentLight directLight = getPointDirectIrradiance( pointLight, geometry );
 
 		#ifdef USE_SHADOWMAP
 			if ( pointLight.shadowEnabled ) {
@@ -45,7 +45,7 @@ geometry.viewDir = normalize( vViewPosition );
 
 		SpotLight spotLight = spotLights[ i ];
 
-		IncidentLight directLight = getSpotDirectLight( spotLight, geometry );
+		IncidentLight directLight = getSpotDirectIrradiance( spotLight, geometry );
 
 		#ifdef USE_SHADOWMAP
 			if ( spotLight.shadowEnabled ) {
@@ -65,7 +65,7 @@ geometry.viewDir = normalize( vViewPosition );
 
 		DirectionalLight directionalLight = directionalLights[ i ];
 
-		IncidentLight directLight = getDirectionalDirectLight( directionalLight, geometry );
+		IncidentLight directLight = getDirectionalDirectIrradiance( directionalLight, geometry );
 
 		#ifdef USE_SHADOWMAP
 			if ( directionalLight.shadowEnabled ) {
