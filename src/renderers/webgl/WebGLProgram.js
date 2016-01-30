@@ -267,8 +267,6 @@ THREE.WebGLProgram = ( function () {
 				'#define NUM_SPOT_LIGHTS ' + parameters.numSpotLights,
 				'#define NUM_HEMI_LIGHTS ' + parameters.numHemiLights,
 
-				'#define NUM_SHADOWS ' + parameters.numShadows,
-
 				'#define MAX_BONES ' + parameters.maxBones,
 
 				parameters.map ? '#define USE_MAP' : '',
@@ -375,8 +373,6 @@ THREE.WebGLProgram = ( function () {
 				'#define NUM_POINT_LIGHTS ' + parameters.numPointLights,
 				'#define NUM_SPOT_LIGHTS ' + parameters.numSpotLights,
 				'#define NUM_HEMI_LIGHTS ' + parameters.numHemiLights,
-
-				'#define NUM_SHADOWS ' + parameters.numShadows,
 
 				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
 
