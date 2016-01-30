@@ -21365,6 +21365,7 @@ THREE.RawShaderMaterial = function ( parameters ) {
 
 THREE.RawShaderMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
 THREE.RawShaderMaterial.prototype.constructor = THREE.RawShaderMaterial;
+
 // File:src/materials/SpriteMaterial.js
 
 /**
@@ -29885,11 +29886,15 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		vertexShader = replaceLightNums( vertexShader, parameters );
-		vertexShader = unrollLoops( vertexShader );
+		if ( material instanceof THREE.ShaderMaterial === false ) {
 
-		fragmentShader = replaceLightNums( fragmentShader, parameters );
-		fragmentShader = unrollLoops( fragmentShader );
+			vertexShader = replaceLightNums( vertexShader, parameters );
+			vertexShader = unrollLoops( vertexShader );
+
+			fragmentShader = replaceLightNums( fragmentShader, parameters );
+			fragmentShader = unrollLoops( fragmentShader );
+
+		}
 
 		var vertexGlsl = prefixVertex + vertexShader;
 		var fragmentGlsl = prefixFragment + fragmentShader;
