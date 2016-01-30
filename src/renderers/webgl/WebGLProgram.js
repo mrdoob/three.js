@@ -151,6 +151,16 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
+	function replaceLightNums( string, parameters ) {
+
+		return string
+			.replace( /NUM_DIR_LIGHTS/g, parameters.numDirLights )
+			.replace( /NUM_SPOT_LIGHTS/g, parameters.numSpotLights )
+			.replace( /NUM_POINT_LIGHTS/g, parameters.numPointLights )
+			.replace( /NUM_HEMI_LIGHTS/g, parameters.numHemiLights );
+
+	}
+
 	return function WebGLProgram( renderer, code, material, parameters ) {
 
 		var gl = renderer.context;
@@ -262,11 +272,6 @@ THREE.WebGLProgram = ( function () {
 				renderer.gammaOutput ? '#define GAMMA_OUTPUT' : '',
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
-				'#define NUM_DIR_LIGHTS ' + parameters.numDirLights,
-				'#define NUM_POINT_LIGHTS ' + parameters.numPointLights,
-				'#define NUM_SPOT_LIGHTS ' + parameters.numSpotLights,
-				'#define NUM_HEMI_LIGHTS ' + parameters.numHemiLights,
-
 				'#define MAX_BONES ' + parameters.maxBones,
 
 				parameters.map ? '#define USE_MAP' : '',
@@ -369,11 +374,6 @@ THREE.WebGLProgram = ( function () {
 
 				customDefines,
 
-				'#define NUM_DIR_LIGHTS ' + parameters.numDirLights,
-				'#define NUM_POINT_LIGHTS ' + parameters.numPointLights,
-				'#define NUM_SPOT_LIGHTS ' + parameters.numSpotLights,
-				'#define NUM_HEMI_LIGHTS ' + parameters.numHemiLights,
-
 				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
 
 				renderer.gammaInput ? '#define GAMMA_INPUT' : '',
@@ -421,6 +421,9 @@ THREE.WebGLProgram = ( function () {
 			].filter( filterEmptyLine ).join( '\n' );
 
 		}
+
+		vertexShader = replaceLightNums( vertexShader, parameters );
+		fragmentShader = replaceLightNums( fragmentShader, parameters );
 
 		var vertexGlsl = prefixVertex + vertexShader;
 		var fragmentGlsl = prefixFragment + fragmentShader;
