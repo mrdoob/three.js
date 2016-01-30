@@ -160,15 +160,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			if ( shadow.map === null ) {
 
-				var shadowFilter = THREE.LinearFilter;
-
-				if ( scope.type === THREE.PCFSoftShadowMap ) {
-
-					shadowFilter = THREE.NearestFilter;
-
-				}
-
-				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
+				var pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
 
 				shadow.map = new THREE.WebGLRenderTarget( shadowMapSize.x, shadowMapSize.y, pars );
 
