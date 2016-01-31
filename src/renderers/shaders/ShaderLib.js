@@ -1087,7 +1087,7 @@ THREE.ShaderLib = {
 			"   depth /= 1000.0;",
 			"   const vec4 bitSh = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
   			"	const vec4 bitMsk = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
-   			"	vec4 res = fract( depth * bitSh );",
+				"	vec4 res = mod( depth * bitSh * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );",
    			"	res -= res.xxyz * bitMsk;",
    			"	return res; ",
 
