@@ -37,7 +37,7 @@ struct GeometricContext {
 		vec3 direction;
 		vec3 color;
 
-		bool shadowEnabled;
+		int shadowEnabled;
 		float shadowBias;
 		float shadowRadius;
 		vec2 shadowMapSize;
@@ -59,7 +59,7 @@ struct GeometricContext {
 		float angleCos;
 		float exponent;
 
-		bool shadowEnabled;
+		int shadowEnabled;
 		float shadowBias;
 		float shadowRadius;
 		vec2 shadowMapSize;
@@ -78,7 +78,7 @@ struct GeometricContext {
 		float distance;
 		float decay;
 
-		bool shadowEnabled;
+		int shadowEnabled;
 		float shadowBias;
 		float shadowRadius;
 		vec2 shadowMapSize;
