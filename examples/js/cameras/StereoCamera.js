@@ -4,8 +4,12 @@
  * @authod arodic / http://aleksandarrodic.com/
  * @authod fonserbc / http://fonserbc.github.io/
  * @authod owntheweb / http://christopherstevens.cc/
- *
+ * 
  * Off-axis stereoscopic camera based on http://paulbourke.net/stereographics/stereorender/
+ * 
+ * altered from StereoEffect.js, returning L/R cameras instead of rendering as an effect,
+ *	pairs well with EffectComposer and other effects
+ *
  */
 
 THREE.StereoCamera = function () {
