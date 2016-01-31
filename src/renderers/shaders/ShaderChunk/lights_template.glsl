@@ -83,48 +83,40 @@ IncidentLight directLight;
 
 #if defined( RE_IndirectDiffuse )
 
-	{
+	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
 
-		vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
+	#ifdef USE_LIGHTMAP
 
-		#ifdef USE_LIGHTMAP
+		irradiance += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity; // factor of PI should not be present; included here to prevent breakage
 
-			irradiance += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity; // factor of PI should not be present; included here to prevent breakage
+	#endif
 
-		#endif
+	#if ( NUM_HEMI_LIGHTS > 0 )
 
-		#if ( NUM_HEMI_LIGHTS > 0 )
+		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-			for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
+			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
 
-				irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
+		}
 
-			}
+	#endif
 
-		#endif
+	// #if defined( USE_ENVMAP ) && defined( STANDARD )
 
-		// #if defined( USE_ENVMAP ) && defined( STANDARD )
+		// TODO, replace 8 with the real maxMIPLevel
+		// irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 ); // comment out until seams are fixed
 
-			// TODO, replace 8 with the real maxMIPLevel
-			// irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 ); // comment out until seams are fixed
+	// #endif
 
-		// #endif
-
-		RE_IndirectDiffuse( irradiance, geometry, material, reflectedLight );
-
-	}
+	RE_IndirectDiffuse( irradiance, geometry, material, reflectedLight );
 
 #endif
 
 #if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )
 
-	{
+	// TODO, replace 8 with the real maxMIPLevel
+	vec3 radiance = getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry, Material_BlinnShininessExponent( material ), 8 );
 
-		// TODO, replace 8 with the real maxMIPLevel
-		vec3 radiance = getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry, Material_BlinnShininessExponent( material ), 8 );
-
-		RE_IndirectSpecular( radiance, geometry, material, reflectedLight );
-
-	}
+	RE_IndirectSpecular( radiance, geometry, material, reflectedLight );
 
 #endif
