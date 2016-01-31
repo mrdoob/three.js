@@ -444,12 +444,12 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
+		vertexShader = replaceLightNums( vertexShader, parameters );
+		fragmentShader = replaceLightNums( fragmentShader, parameters );
+
 		if ( material instanceof THREE.ShaderMaterial === false ) {
 
-			vertexShader = replaceLightNums( vertexShader, parameters );
 			vertexShader = unrollLoops( vertexShader );
-
-			fragmentShader = replaceLightNums( fragmentShader, parameters );
 			fragmentShader = unrollLoops( fragmentShader );
 
 		}
