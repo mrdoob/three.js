@@ -1,10 +1,16 @@
 #ifdef USE_SHADOWMAP
 
-	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+	#if NUM_DIR_LIGHTS > 0
 
-		vDirectionalShadowCoord[ i ] = directionalLights[ i ].shadowMatrix * worldPosition;
+		for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
-	}
+			vDirectionalShadowCoord[ i ] = directionalLights[ i ].shadowMatrix * worldPosition;
+
+		}
+
+	#endif
+
+	#if NUM_SPOT_LIGHTS > 0
 
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
@@ -12,10 +18,16 @@
 
 	}
 
+	#endif
+
+	#if NUM_POINT_LIGHTS > 0
+
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
 		vPointShadowCoord[ i ] = pointLights[ i ].shadowMatrix * worldPosition;
 
 	}
+
+	#endif
 
 #endif
