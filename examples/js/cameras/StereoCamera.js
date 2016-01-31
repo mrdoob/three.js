@@ -90,18 +90,6 @@ THREE.StereoCamera = function () {
 	var _ndfl, _halfFocalWidth, _halfFocalHeight;
 	var _innerFactor, _outerFactor;
 
-	// initialization
-
-	/*
-	this.setSize = function ( width, height ) {
-
-		_width = width / 2;
-		_height = height;
-
-		renderer.setSize( width, height );
-
-	};
-	*/
 
 	this.update = function ( scene, camera, width, height ) {
 
