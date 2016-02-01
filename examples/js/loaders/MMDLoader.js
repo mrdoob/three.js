@@ -3636,6 +3636,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.UniformsLib[ "fog" ],
 		THREE.UniformsLib[ "ambient" ],
 		THREE.UniformsLib[ "lights" ],
+		THREE.UniformsLib[ "shadowmap" ],
 
 		{
 			"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -3824,7 +3825,6 @@ THREE.ShaderLib[ 'mmd' ] = {
 			// accumulation
 			THREE.ShaderChunk[ "lights_phong_fragment" ],
 			THREE.ShaderChunk[ "lights_template" ],
-			THREE.ShaderChunk[ "lightmap_fragment" ],
 
 			// modulation
 			THREE.ShaderChunk[ "aomap_fragment" ],
