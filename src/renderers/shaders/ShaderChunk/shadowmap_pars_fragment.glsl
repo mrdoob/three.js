@@ -2,21 +2,36 @@
 
 	#if NUM_DIR_LIGHTS > 0
 
-		uniform sampler2D directionalLightsShadowMap[ NUM_DIR_LIGHTS ];
+		uniform bool directionalShadow[ NUM_DIR_LIGHTS ];
+		uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];
+		uniform vec2 directionalShadowMapSize[ NUM_DIR_LIGHTS ];
+		uniform float directionalShadowBias[ NUM_DIR_LIGHTS ];
+		uniform float directionalShadowRadius[ NUM_DIR_LIGHTS ];
+
 		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
 
 	#endif
 
 	#if NUM_SPOT_LIGHTS > 0
 
-		uniform sampler2D spotLightsShadowMap[ NUM_SPOT_LIGHTS ];
+		uniform bool spotShadow[ NUM_SPOT_LIGHTS ];
+		uniform sampler2D spotShadowMap[ NUM_SPOT_LIGHTS ];
+		uniform vec2 spotShadowMapSize[ NUM_SPOT_LIGHTS ];
+		uniform float spotShadowBias[ NUM_SPOT_LIGHTS ];
+		uniform float spotShadowRadius[ NUM_SPOT_LIGHTS ];
+
 		varying vec4 vSpotShadowCoord[ NUM_SPOT_LIGHTS ];
 
 	#endif
 
 	#if NUM_POINT_LIGHTS > 0
 
-		uniform sampler2D pointLightsShadowMap[ NUM_POINT_LIGHTS ];
+		uniform bool pointShadow[ NUM_POINT_LIGHTS ];
+		uniform sampler2D pointShadowMap[ NUM_POINT_LIGHTS ];
+		uniform vec2 pointShadowMapSize[ NUM_POINT_LIGHTS ];
+		uniform float pointShadowBias[ NUM_POINT_LIGHTS ];
+		uniform float pointShadowRadius[ NUM_POINT_LIGHTS ];
+
 		varying vec4 vPointShadowCoord[ NUM_POINT_LIGHTS ];
 
 	#endif

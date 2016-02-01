@@ -36,12 +36,6 @@ struct GeometricContext {
 	struct DirectionalLight {
 		vec3 direction;
 		vec3 color;
-
-		int shadowEnabled;
-		float shadowBias;
-		float shadowRadius;
-		vec2 shadowMapSize;
-		mat4 shadowMatrix;
 	};
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
@@ -58,12 +52,6 @@ struct GeometricContext {
 		float decay;
 		float angleCos;
 		float exponent;
-
-		int shadowEnabled;
-		float shadowBias;
-		float shadowRadius;
-		vec2 shadowMapSize;
-		mat4 shadowMatrix;
 	};
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
@@ -77,12 +65,6 @@ struct GeometricContext {
 		vec3 color;
 		float distance;
 		float decay;
-
-		int shadowEnabled;
-		float shadowBias;
-		float shadowRadius;
-		vec2 shadowMapSize;
-		mat4 shadowMatrix;
 	};
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];

@@ -95,16 +95,8 @@ THREE.UniformsLib = {
 
 		"directionalLights": { type: "sa", value: [], properties: {
 			"direction": { type: "v3" },
-			"color": { type: "c" },
-
-			"shadowEnabled": { type: "i" },
-			"shadowBias": { type: "f" },
-			"shadowRadius": { type: "f" },
-			"shadowMapSize": { type: "v2" },
-			"shadowMatrix": { type: "m4" }
+			"color": { type: "c" }
 		} },
-
-		"directionalLightsShadowMap": { type: "tv", value: [] },
 
 		"spotLights": { type: "sa", value: [], properties: {
 			"color": { type: "c" },
@@ -113,31 +105,15 @@ THREE.UniformsLib = {
 			"distance": { type: "f" },
 			"angleCos": { type: "f" },
 			"exponent": { type: "f" },
-			"decay": { type: "f" },
-
-			"shadowEnabled": { type: "i" },
-			"shadowBias": { type: "f" },
-			"shadowRadius": { type: "f" },
-			"shadowMapSize": { type: "v2" },
-			"shadowMatrix": { type: "m4" }
+			"decay": { type: "f" }
 		} },
-
-		"spotLightsShadowMap": { type: "tv", value: [] },
 
 		"pointLights": { type: "sa", value: [], properties: {
 			"color": { type: "c" },
 			"position": { type: "v3" },
 			"decay": { type: "f" },
-			"distance": { type: "f" },
-
-			"shadowEnabled": { type: "i" },
-			"shadowBias": { type: "f" },
-			"shadowRadius": { type: "f" },
-			"shadowMapSize": { type: "v2" },
-			"shadowMatrix": { type: "m4" }
+			"distance": { type: "f" }
 		} },
-
-		"pointLightsShadowMap": { type: "tv", value: [] },
 
 		"hemisphereLights": { type: "sa", value: [], properties: {
 			"direction": { type: "v3" },
@@ -155,6 +131,31 @@ THREE.UniformsLib = {
 		"scale": { type: "f", value: 1.0 },
 		"map": { type: "t", value: null },
 		"offsetRepeat": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) }
+
+	},
+
+	shadowmap: {
+
+		"directionalShadow": { type: "1iv", value: [] },
+		"directionalShadowMap": { type: "tv", value: [] },
+		"directionalShadowMapSize": { type: "v2v", value: [] },
+		"directionalShadowBias": { type: "1fv", value: [] },
+		"directionalShadowRadius": { type: "1fv", value: [] },
+		"directionalShadowMatrix": { type: "m4v", value: [] },
+
+		"spotShadow": { type: "1iv", value: [] },
+		"spotShadowMap": { type: "tv", value: [] },
+		"spotShadowMapSize": { type: "v2v", value: [] },
+		"spotShadowBias": { type: "1fv", value: [] },
+		"spotShadowRadius": { type: "1fv", value: [] },
+		"spotShadowMatrix": { type: "m4v", value: [] },
+
+		"pointShadow": { type: "1iv", value: [] },
+		"pointShadowMap": { type: "tv", value: [] },
+		"pointShadowMapSize": { type: "v2v", value: [] },
+		"pointShadowBias": { type: "1fv", value: [] },
+		"pointShadowRadius": { type: "1fv", value: [] },
+		"pointShadowMatrix": { type: "m4v", value: [] }
 
 	}
 
