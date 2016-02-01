@@ -75,7 +75,6 @@
 			effect = new THREE.VREffect( renderer );
 			vrControls = new THREE.VRControls( camera );
 
-
 			var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe_stereo.jpg", 12 );
 
 
@@ -83,7 +82,7 @@
 
 			for ( var i = 0; i < 6; i ++ ) {
 
-					materials.push( new THREE.MeshBasicMaterial( { map: textures[i] } ) );
+				materials.push( new THREE.MeshBasicMaterial( { map: textures[i] } ) );
 
 			}
 
@@ -97,7 +96,7 @@
 
 			for ( var i = 6; i < 12; i ++ ) {
 
-					materialsR.push( new THREE.MeshBasicMaterial( { map: textures[i] } ) );
+				materialsR.push( new THREE.MeshBasicMaterial( { map: textures[i] } ) );
 
 			}
 
@@ -150,7 +149,7 @@
 
 		function requestFullscreen() {
 
-				effect.setFullScreen( true );
+			effect.setFullScreen( true );
 
 		}
 
