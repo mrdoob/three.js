@@ -89,9 +89,34 @@ class Material(base_classes.BaseNode):
 
             for func, map_key, scale_key, scale_func in mapping:
                 map_node = func(self.node)
-                if not map_node: 
+                if not map_node:
                     continue
                 logger.info("Found map node %s for %s", map_node, map_key)
                 tex_inst = self.scene.texture(map_node.name)
                 self[map_key] = tex_inst[constants.UUID]
                 self[scale_key] = scale_func(self.node)
+
+
+class MultiMaterial(base_classes.BaseNode):
+    def __init__(self, name):
+        logger.debug("MultiMaterial().__init__(%s)", name)
+
+        base_classes.BaseNode.__init__(self, None, None,
+                                       constants.MATERIAL)
+
+        self._name = name
+        self._materials = []
+
+        self[constants.TYPE] = constants.THREE_MULTI
+        self[constants.NAME] = name
+        self[constants.MATERIALS] = self._materials
+        # self['node'] = multi_mat[constants.NAME]
+
+    @property
+    def node(self):
+        return self._name
+
+    @property
+    def materials(self):
+        return self._materials
+

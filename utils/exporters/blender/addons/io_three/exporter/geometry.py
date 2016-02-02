@@ -242,7 +242,7 @@ class Geometry(base_classes.BaseNode):
                       constants.SKIN_WEIGHTS,
                       constants.SKIN_INDICES, constants.NAME,
                       constants.INFLUENCES_PER_VERTEX,
-                      constants.INDEX]
+                      constants.INDEX, constants.GROUPS]
 
         data = {}
         anim_components = [constants.MORPH_TARGETS, constants.ANIMATION, constants.MORPH_TARGETS_ANIM, constants.CLIPS]
@@ -363,6 +363,9 @@ class Geometry(base_classes.BaseNode):
                 data[constants.DATA] = geometry_data = {}
 
             geometry_data[constants.ATTRIBUTES] = component_data
+            groups = self.get(constants.GROUPS)
+            if groups is not None:
+                geometry_data[constants.GROUPS] = groups
             index = self.get(constants.INDEX)
             if index is not None:
                 geometry_data[constants.INDEX] = index
@@ -408,6 +411,8 @@ class Geometry(base_classes.BaseNode):
                 constants.TYPE: constants.FLOAT_32,
                 constants.ARRAY: array
             }
+
+        self[constants.GROUPS] = api.mesh.buffer_mat_groups(self.node)
 
         for name, index in api.mesh.extra_vertex_groups(self.node,
                                                         option_extra_vgroups):
@@ -522,20 +527,15 @@ class Geometry(base_classes.BaseNode):
             self[constants.COLORS] = api.mesh.vertex_colors(
                 self.node) or []
 
-        if self.options.get(constants.FACE_MATERIALS):
-            logger.info("Parsing %s", constants.FACE_MATERIALS)
-            self[constants.MATERIALS] = api.mesh.materials(
-                self.node, self.options) or []
-
         if self.options.get(constants.UVS):
             logger.info("Parsing %s", constants.UVS)
             self[constants.UVS] = api.mesh.uvs(self.node) or []
 
         if self.options.get(constants.FACES):
             logger.info("Parsing %s", constants.FACES)
-            material_list = self.get(constants.MATERIALS)
+            mesh_materials = api.mesh.materials(self.node)
             self[constants.FACES] = api.mesh.faces(
-                self.node, self.options, material_list=material_list) or []
+                self.node, self.options, material_list=mesh_materials) or []
 
         no_anim = (None, False, constants.OFF)
         if self.options.get(constants.ANIMATION) not in no_anim:
