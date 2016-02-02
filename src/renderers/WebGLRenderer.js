@@ -1536,6 +1536,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material instanceof THREE.MeshPhongMaterial ||
 				material instanceof THREE.MeshLambertMaterial ||
 				material instanceof THREE.MeshStandardMaterial ||
+				material instanceof THREE.MeshPBSMaterial ||
 				material.lights ) {
 
 			// store the light setup it was created for
@@ -1544,7 +1545,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// wire up the material to this renderer's lighting state
 
-			uniforms.ambientLightColor.value = _lights.ambient;
+			if(uniforms.ambientLightColor != undefined)
+				uniforms.ambientLightColor.value = _lights.ambient;
+
 			uniforms.directionalLights.value = _lights.directional;
 			uniforms.spotLights.value = _lights.spot;
 			uniforms.pointLights.value = _lights.point;
@@ -1707,6 +1710,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.ShaderMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshPBSMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
 				 material.envMap ) {
 
@@ -1720,6 +1724,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			if ( material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshPBSMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshBasicMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
@@ -1792,6 +1797,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( refreshMaterial ) {
 
 			if ( material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshPBSMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
 				 material.lights ) {
@@ -1963,78 +1969,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
-
-		}
-
-		if ( material.detailMap0 ) {
-
-			uniforms.detailMap0.value = material.detailMap0;
-
-			var offset = material.detailMap0.offset;
-			var repeat = material.detailMap0.repeat;
-
-			uniforms.detailMap0offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
-
-		}
-
-		if ( material.detailMap1 ) {
-
-			uniforms.detailMap1.value = material.detailMap1;
-
-			var offset = material.detailMap1.offset;
-			var repeat = material.detailMap1.repeat;
-
-			uniforms.detailMap1offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
-
-		}
-
-		if ( material.detailMap2 ) {
-
-			uniforms.detailMap2.value = material.detailMap2;
-
-			var offset = material.detailMap2.offset;
-			var repeat = material.detailMap2.repeat;
-
-			uniforms.detailMap2offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
-
-		}
-
-		if ( material.detailMap3 ) {
-
-			uniforms.detailMap3.value = material.detailMap3;
-
-			var offset = material.detailMap3.offset;
-			var repeat = material.detailMap3.repeat;
-
-			uniforms.detailMap3offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
-
-		}
-
-		if ( material.detailnormalMap0 ) {
-
-			uniforms.detailnormalMap0.value = material.detailnormalMap0;
-			uniforms.detailnormalScale0.value.copy( material.detailnormalScale0 );
-
-		}
-
-		if ( material.detailnormalMap1 ) {
-
-			uniforms.detailnormalMap1.value = material.detailnormalMap1;
-			uniforms.detailnormalScale1.value.copy( material.detailnormalScale1 );
-
-		}
-
-		if ( material.detailnormalMap2 ) {
-
-			uniforms.detailnormalMap2.value = material.detailnormalMap2;
-			uniforms.detailnormalScale2.value.copy( material.detailnormalScale2 );
-
-		}
-
-		if ( material.detailnormalMap3 ) {
-
-			uniforms.detailnormalMap3.value = material.detailnormalMap3;
-			uniforms.detailnormalScale3.value.copy( material.detailnormalScale3 );
 
 		}
 
@@ -2403,7 +2337,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function markUniformsLightsNeedsUpdate ( uniforms, value ) {
 
-		uniforms.ambientLightColor.needsUpdate = value;
+		if(uniforms.ambientLightColor != undefined)
+			uniforms.ambientLightColor.needsUpdate = value;
 
 		uniforms.directionalLights.needsUpdate = value;
 		uniforms.pointLights.needsUpdate = value;

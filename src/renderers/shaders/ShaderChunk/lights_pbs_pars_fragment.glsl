@@ -16,27 +16,41 @@ varying vec2 var_d2Uv;
 
 #if LIGHT_DIR_COUNT > 0
 
-	uniform vec3 lightDirColors[ LIGHT_DIR_COUNT ];
-	uniform vec3 lightDirDirections_es[ LIGHT_DIR_COUNT ];
+	struct DirectionalLight {
+		vec3 direction;
+		vec3 color;
+	};
 
-#endif
-
-#if LIGHT_POINT_COUNT > 0
-
-	uniform vec3 lightPointColors[ LIGHT_POINT_COUNT ];
-	uniform vec3 lightPointPositions_es[ LIGHT_POINT_COUNT ];
-	uniform float lightPointDistance[ LIGHT_POINT_COUNT ];
+	uniform DirectionalLight directionalLights[ LIGHT_DIR_COUNT ];
 
 #endif
 
 #if LIGHT_SPOT_COUNT > 0
 
-	uniform vec3 lightSpotColors[ LIGHT_SPOT_COUNT ];
-	uniform vec3 lightSpotPositions_es[ LIGHT_SPOT_COUNT ];
-	uniform vec3 lightSpotDirections_es[ LIGHT_SPOT_COUNT ];
-	uniform float lightSpotAngleCos[ LIGHT_SPOT_COUNT ];
-	uniform float lightSpotExponent[ LIGHT_SPOT_COUNT ];
-	uniform float lightSpotDistance[ LIGHT_SPOT_COUNT ];
+	struct SpotLight {
+		vec3 position;
+		vec3 direction;
+		vec3 color;
+		float distance;
+		float decay;
+		float angleCos;
+		float exponent;
+	};
+
+	uniform SpotLight spotLights[ LIGHT_SPOT_COUNT ];
+
+#endif
+
+#if LIGHT_POINT_COUNT > 0
+
+	struct PointLight {
+		vec3 position;
+		vec3 color;
+		float distance;
+		float decay;
+	};
+
+	uniform PointLight pointLights[ LIGHT_POINT_COUNT ];
 
 #endif
 

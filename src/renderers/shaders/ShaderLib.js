@@ -425,22 +425,8 @@ THREE.ShaderLib = {
 	'pbs': {
 
 		uniforms: THREE.UniformsUtils.merge( [
-			{
-				"lightDirDirections_es": {type: "fv", value: []},
-				"lightDirColors": {type: "fv", value: []},
-
-				"lightPointColors": {type: "fv", value: []},
-				"lightPointPositions_es": {type: "fv", value: []},
-				"lightPointDistance": {type: "fv1", value: []},
-
-				"lightSpotColors": {type: "fv", value: []},
-				"lightSpotPositions_es": {type: "fv", value: []},
-				"lightSpotDirections_es": {type: "fv", value: []},
-				"lightSpotAngleCos": {type: "fv1", value: []},
-				"lightSpotExponent": {type: "fv1", value: []},
-				"lightSpotDistance": {type: "fv1", value: []}
-			},
-
+			THREE.UniformsLib[ "common" ],
+			THREE.UniformsLib[ "lights" ],
 			{
 				in_map_environment: {type: "t", value: null},
 				in_map_environment_intensity: {type: "f", value: 0.0},
@@ -505,7 +491,6 @@ THREE.ShaderLib = {
 		].join("\n"),
 
 		fragmentShader: [
-
 			THREE.ShaderChunk[ "lights_pbs_pars_fragment" ],
 			"",
 			"// ----------------------------------------------------------------------------------",

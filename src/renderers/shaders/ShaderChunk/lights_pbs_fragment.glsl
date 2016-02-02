@@ -109,7 +109,7 @@
 	#if LIGHT_DIR_COUNT > 0
         for( int i = 0; i < LIGHT_DIR_COUNT; i++ )
         {
-            vec3 lightDir_es = lightDirDirections_es[i];
+            vec3 lightDir_es = directionalLights[i].direction;
 
             vec3 halfWay_es = normalize( lightDir_es + viewDir_es );
             float NoL = clamp( dot( normal_es, lightDir_es), 0.0, 1.0 );
@@ -119,7 +119,7 @@
             vec3 fs = microfacetBRDF_GGX(NoV, NoL, NoH, VoH, halfWay_es, tangent_es, binormal_es, alpha, alpha2, f0);
             vec3 fd = diffuseBRDF_Disney(NoV, NoL, NoH, VoH, roughnessBiased.z, f0);
 
-            finalColour += (fd * albedoColor.xyz + fs) * lightDirColors[i] * NoL;
+            finalColour += (fd * albedoColor.xyz + fs) * directionalLights[i].color * NoL;
         }
     #endif
 
@@ -129,13 +129,13 @@
 	#if LIGHT_POINT_COUNT > 0
         for( int i = 0; i < LIGHT_POINT_COUNT; i++ )
         {
-            vec3 lightDir_es = lightPointPositions_es[i] - var_position_es;
+            vec3 lightDir_es = pointLights[i].position - var_position_es;
             float distance = length( lightDir_es );
             lightDir_es /= distance;
 
             float atten = 1.0;
-            if(lightPointDistance[i] > 0.0)
-                atten = 1.0 - distance / lightPointDistance[i];
+            if(pointLights[i].distance > 0.0)
+                atten = 1.0 - distance / pointLights[i].distance;
 
             if(atten > 0.0)
             {
@@ -147,7 +147,7 @@
             	vec3 fs = microfacetBRDF_GGX(NoV, NoL, NoH, VoH, halfWay_es, tangent_es, binormal_es, alpha, alpha2, f0);
                 vec3 fd = diffuseBRDF_Disney(NoV, NoL, NoH, VoH, roughnessBiased.z, f0);
 
-                finalColour += (fd * albedoColor.xyz + fs) * lightPointColors[i] * NoL * atten;
+                finalColour += (fd * albedoColor.xyz + fs) * pointLights[i].color * NoL * atten;
             }
         }
 	#endif
@@ -158,20 +158,20 @@
 	#if LIGHT_SPOT_COUNT > 0
         for( int i = 0; i < LIGHT_SPOT_COUNT; i++ )
         {
-            vec3 lightDir_es = lightSpotPositions_es[i] - var_position_es;
+            vec3 lightDir_es = spotLights[i].position - var_position_es;
             float distance = length( lightDir_es );
             lightDir_es /= distance;
 
             float atten = 1.0;
-            if(lightSpotDistance[i] > 0.0)
-                atten = 1.0 - distance / lightSpotDistance[i];
+            if(spotLights[i].distance > 0.0)
+                atten = 1.0 - distance / spotLights[i].distance;
 
             if(atten > 0.0)
             {
-                float spotEffect = dot( lightSpotDirections_es[i], lightDir_es );
-                if ( spotEffect > lightSpotAngleCos[i] )
+                float spotEffect = dot( spotLights[i].direction, lightDir_es );
+                if ( spotEffect > spotLights[i].angleCos )
                 {
-                    spotEffect = pow(spotEffect, lightSpotExponent[i]);
+                    spotEffect = pow(spotEffect, spotLights[i].exponent);
 
                     vec3 halfWay_es = normalize( lightDir_es + viewDir_es );
                     float NoL = clamp( dot( normal_es, lightDir_es), 0.0, 1.0 );
@@ -181,7 +181,7 @@
             		vec3 fs = microfacetBRDF_GGX(NoV, NoL, NoH, VoH, halfWay_es, tangent_es, binormal_es, alpha, alpha2, f0);
                     vec3 fd = diffuseBRDF_Disney(NoV, NoL, NoH, VoH, roughnessBiased.z, f0);
 
-                    finalColour += (fd * albedoColor.xyz + fs) * lightSpotColors[i] * NoL * atten * spotEffect;
+                    finalColour += (fd * albedoColor.xyz + fs) * spotLights[i].color * NoL * atten * spotEffect;
                 }
             }
         }

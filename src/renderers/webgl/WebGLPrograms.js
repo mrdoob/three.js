@@ -65,32 +65,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			return maxBones;
 
 		}
-
 	}
 
-	function allocateLights( lights ) {
-
-		var dirLights = 0;
-		var pointLights = 0;
-		var spotLights = 0;
-		var hemiLights = 0;
-
-		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
-
-			var light = lights[ l ];
-
-			if ( light.onlyShadow || light.visible === false ) continue;
-
-			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
-			if ( light instanceof THREE.PointLight ) pointLights ++;
-			if ( light instanceof THREE.SpotLight ) spotLights ++;
-			if ( light instanceof THREE.HemisphereLight ) hemiLights ++;
-
-		}
-
-		return { 'directional': dirLights, 'point': pointLights, 'spot': spotLights, 'hemi': hemiLights };
-
-	};
 
 	function allocateShadows( lights ) {
 
@@ -136,16 +112,14 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 		if ( shaderID === 'pbs' ){
 
-			var maxLightCount = allocateLights( lights );
-
 			parameters = {
 				shaderID: shaderID,
 
 				precision: precision,
 
-				pbs_light_dir_count: maxLightCount.directional,
-				pbs_light_point_count: maxLightCount.point,
-				pbs_light_spot_count: maxLightCount.spot,
+				pbs_light_dir_count: lights.directional.length,
+				pbs_light_point_count: lights.point.length,
+				pbs_light_spot_count: lights.spot.length,
 
 				pbs_map_environment: !!material.environment.map,
 
