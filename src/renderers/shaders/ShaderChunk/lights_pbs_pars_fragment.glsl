@@ -1,6 +1,7 @@
 #define texture2DLod texture2DLodEXT
 #define texture2DProjLod texture2DProjLodEXT
 #define textureCubeLod textureCubeLodEXT
+#extension GL_OES_standard_derivatives : enable
 
 varying vec3 var_position_es;
 varying vec3 var_normal_es;

@@ -26,7 +26,7 @@
 <body>
 
 <div id="container"></div>
-<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - Phong Material Variantions by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - PBS Material Variantions by <a href="https://coderabbit.at/" target="_blank">Murat Sari / Stefan Tomitsch</a>.</div>
 
 
 <script src="../build/three.js"></script>
@@ -62,7 +62,14 @@
         var imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
         imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
         imgTexture.anisotropy = 16;
-        imgTexture = null;
+
+        var imgDecalTexture = new THREE.TextureLoader().load( "textures/decal/decal-diffuse.png" );
+        imgDecalTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
+        imgDecalTexture.anisotropy = 16;
+
+        var imgDecalNomralTexture = new THREE.TextureLoader().load( "textures/decal/decal-normal.png" );
+        imgDecalNomralTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
+        imgDecalNomralTexture.anisotropy = 16;
 
         var shininess = 50, specular = 0x333333, bumpScale = 1, shading = THREE.SmoothShading;
 
@@ -76,8 +83,8 @@
             path + 'pz' + format, path + 'nz' + format
         ];
 
-        var reflectionCube = new THREE.CubeTextureLoader().load( urls );
-        reflectionCube.format = THREE.RGBFormat;
+        var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+        //reflectionCube.format = THREE.RGBFormat;
 
         var cubeWidth = 400;
         var numberOfSphersPerSide = 5;
@@ -86,17 +93,8 @@
 
         var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
-
-        var localReflectionCube;
-
         for( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
-            if( alphaIndex % 2 === 0 ) {
-                localReflectionCube = null;
-            }
-            else {
-                localReflectionCube = reflectionCube;
-            }
 
             var specularShininess = Math.pow( 2, alpha * 10 );
 
@@ -111,24 +109,30 @@
                     var diffuseColor = new THREE.Color( 0, 0, gamma ).multiplyScalar( 1 - beta * 0.2 );
 
                     var params = {
-                        albedo : new THREE.Color( 0xffffff),
-                        roughness : 0.1,
+                        albedo : diffuseColor,
+                        roughness : beta,
                         lightRoughnessOffset : 0,
-                        f0 : new THREE.Color( 0x191919),
+                        f0 : new THREE.Color( gamma, gamma, gamma),
 
                         mainmaps:  {
-                            'albedo' : {'map': imgTexture, 'blend' : 1, 'blendop' : 0 },
-                            'normalr' : {'map': null, 'blend1' : 0, 'blend2' : 0 },
+                            'albedo' : {'map': imgTexture, 'blend' : 0.5, 'blendop' : 0 },
+                            'normalr' : {'map': imgDecalNomralTexture, 'blend1' : 1, 'blend2' : 0 },
                             'f0' : {'map': null, 'blend' : 0, 'blendop' : 0 },
                             'tiling' : new THREE.Vector2(1, 1),
                             'offset' : new THREE.Vector2(0, 0),
                             'uvset' : {'slot' : 0 }
                         },
-                        roughness: 1
+                        environment : { map : reflectionCube, 'intensity' : 1.5},
+                        detailmap0 : {
+                            'enabled' : true,
+                            'albedo' : {'map': imgDecalTexture, 'blend' : 1, 'blendop' : 5 },
+                            'normalr' : {'map': imgDecalNomralTexture, 'blend1' : 1, 'blend2' : 0 },
+                            'f0' : {'map': null, 'blend' : 0, 'blendop' : 0 },
+                            'tiling' : new THREE.Vector2(1, 1),
+                            'offset' : new THREE.Vector2(0, 0),
+                            'uvset' : {'slot' : 0 }
+                        }
                     }
-
-                    //if(localReflectionCube != null)
-                    //   params.environment = { map : localReflectionCube};
 
                     var material = new THREE.MeshPBSMaterial(params);
 
@@ -144,31 +148,6 @@
                 }
             }
         }
-
-
-        function addLabel( name, location ) {
-            var textGeo = new THREE.TextGeometry( name, {
-
-                size: 20,
-                height: 1,
-                curveSegments: 1
-
-            });
-
-            var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-            var textMesh = new THREE.Mesh( textGeo, textMaterial );
-            textMesh.position.copy( location );
-            scene.add( textMesh );
-        }
-
-        addLabel( "-shininess", new THREE.Vector3( -350, 0, 0 ) );
-        addLabel( "+shininess", new THREE.Vector3( 350, 0, 0 ) );
-
-        addLabel( "-specular, -reflectivity", new THREE.Vector3( 0, -300, 0 ) );
-        addLabel( "+specular, +reflectivity", new THREE.Vector3( 0, 300, 0 ) );
-
-        addLabel( "-diffuse", new THREE.Vector3( 0, 0, -300 ) );
-        addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
 
         particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
         scene.add( particleLight );
