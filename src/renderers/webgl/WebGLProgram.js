@@ -276,6 +276,50 @@ THREE.WebGLProgram = ( function () {
 
 			prefixVertex = '';
 			prefixFragment = '';
+		} else if(material instanceof THREE.MeshPBSMaterial) {
+
+			prefixVertex = [
+				"#version 100",
+				'precision ' + parameters.precision + ' float;',
+				'precision ' + parameters.precision + ' int;',
+				""
+
+			].join( '\n' );
+			prefixFragment = [
+				"#version 100",
+				"#extension GL_EXT_shader_texture_lod : enable",
+				"#define PI 3.14159265359",
+				"#define ROUGHNESS_BIAS 0.005",
+				"",
+				"precision highp float;",
+				"",
+				"#define LIGHT_DIR_COUNT " + parameters.pbs_light_dir_count,
+				"#define LIGHT_POINT_COUNT " + parameters.pbs_light_point_count,
+				"#define LIGHT_SPOT_COUNT " + parameters.pbs_light_spot_count,
+				"",
+				parameters.pbs_map_environment ? "#define MAP_ENVIRONMENT" : "",
+				"",
+				parameters.pbs_map_main_albedo ? "#define MAP_MAIN_ALBEDO" : "",
+				parameters.pbs_map_main_normalr ? "#define MAP_MAIN_NORMALR" : "",
+				parameters.pbs_map_main_f0 ? "#define MAP_MAIN_F0" : "",
+				"",
+				parameters.pbs_map_d1_albedo ? "#define MAP_D1_ALBEDO" : "",
+				parameters.pbs_map_d1_normalr ? "#define MAP_D1_NORMALR" : "",
+				parameters.pbs_map_d1_f0 ? "#define MAP_D1_F0" : "",
+				"",
+				parameters.pbs_map_d2_albedo ? "#define MAP_D2_ALBEDO" : "",
+				parameters.pbs_map_d2_normalr ? "#define MAP_D2_NORMALR" : "",
+				parameters.pbs_map_d2_f0 ? "#define MAP_D2_F0" : "",
+				"",
+				"#define BLENDFUNC_MAIN_ALBEDO blendFunc" + parameters.pbs_blendFunc_main_albedo,
+				"#define BLENDFUNC_D1_ALBEDO blendFunc" + parameters.pbs_blendFunc_d1_albedo,
+				"#define BLENDFUNC_D2_ALBEDO blendFunc" + parameters.pbs_blendFunc_d2_albedo,
+				"",
+				"#define BLENDFUNC_MAIN_F0 blendFunc" + parameters.pbs_blendFunc_main_f0,
+				"#define BLENDFUNC_D1_F0 blendFunc" + parameters.pbs_blendFunc_d1_f0,
+				"#define BLENDFUNC_D2_F0 blendFunc" + parameters.pbs_blendFunc_d2_f0,
+				""
+			].join( '\n' );
 
 		} else {
 
