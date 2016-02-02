@@ -464,6 +464,13 @@ def extract_mesh(obj, options, recalculate=False):
         bpy.ops.object.modifier_add(type='TRIANGULATE')
         bpy.ops.object.modifier_apply(apply_as='DATA',
                                       modifier='Triangulate')
+
+        # sort vertices by material id
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.sort_elements(type='MATERIAL', elements={'FACE'})
+        bpy.ops.object.mode_set(mode='OBJECT')
+
         obj.data = original_mesh
         obj.select = False
         obj.hide = hidden_state

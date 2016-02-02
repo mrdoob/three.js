@@ -155,6 +155,47 @@ def buffer_position(mesh):
 
 
 @_mesh
+def buffer_mat_groups(mesh):
+    """
+
+    :param mesh:
+    :rtype: []
+
+    """
+    mat_indexes = []
+
+    mat_by_face_index = {}
+    materials_list = materials(mesh)
+
+    for face in mesh.tessfaces:
+        vert_count = len(face.vertices)
+        if vert_count is not 3:
+            msg = "Non-triangulated face detected"
+            raise exceptions.BufferGeometryError(msg)
+
+        if not face.material_index in mat_by_face_index:
+            for mat_index, mat in enumerate(materials_list):
+                if mat == mesh.materials[face.material_index]:
+                    mat_by_face_index[face.material_index] = mat_index
+
+        for vertex_index in face.vertices:
+            mat_indexes.append(mat_by_face_index[face.material_index])
+
+    groups = []
+    cur_mat_idx = None
+    group = None
+    for idx, mat_idx in enumerate(mat_indexes):
+        if cur_mat_idx != mat_idx:
+            group = {'start': idx, 'count': 0, 'materialIndex': mat_idx}
+            groups.append(group)
+            cur_mat_idx = mat_idx
+
+        group['count'] += 1
+
+    return groups
+
+
+@_mesh
 def buffer_uv(mesh, layer=0):
     """
 
@@ -335,7 +376,7 @@ def faces(mesh, options, material_list=None):
 
         if mask[constants.MATERIALS]:
             for mat_index, mat in enumerate(material_list):
-                if mat[constants.DBG_INDEX] == face.material_index:
+                if mat == mesh.materials[face.material_index]:
                     face_data.append(mat_index)
                     break
             else:
@@ -497,106 +538,20 @@ def animated_blend_shapes(mesh, name, options):
     return tracks
 
 @_mesh
-def materials(mesh, options):
+def materials(mesh):
     """
 
     :param mesh:
-    :param options:
 
     """
-    logger.debug("mesh.materials(%s, %s)", mesh, options)
+    logger.debug("mesh.materials(%s)", mesh)
 
     indices = []
     for face in mesh.tessfaces:
         if face.material_index not in indices:
             indices.append(face.material_index)
 
-    material_sets = [(mesh.materials[index], index) for index in indices]
-    materials_ = []
-
-    maps = options.get(constants.MAPS)
-
-    mix = options.get(constants.MIX_COLORS)
-    use_colors = options.get(constants.COLORS)
-    logger.info("Colour mix is set to %s", mix)
-    logger.info("Vertex colours set to %s", use_colors)
-
-    for mat, index in material_sets:
-        if mat == None:     # undefined material for a specific index is skipped
-            continue
-
-        try:
-            dbg_color = constants.DBG_COLORS[index]
-        except IndexError:
-            dbg_color = constants.DBG_COLORS[0]
-
-        logger.info("Compiling attributes for %s", mat.name)
-        attributes = {
-            constants.COLOR_EMISSIVE: material.emissive_color(mat),
-            constants.SHADING: material.shading(mat),
-            constants.OPACITY: material.opacity(mat),
-            constants.TRANSPARENT: material.transparent(mat),
-            constants.VISIBLE: material.visible(mat),
-            constants.WIREFRAME: material.wireframe(mat),
-            constants.BLENDING: material.blending(mat),
-            constants.DEPTH_TEST: material.depth_test(mat),
-            constants.DEPTH_WRITE: material.depth_write(mat),
-            constants.DBG_NAME: mat.name,
-            constants.DBG_COLOR: dbg_color,
-            constants.DBG_INDEX: index
-        }
-
-        if use_colors:
-            colors = material.use_vertex_colors(mat)
-            attributes[constants.VERTEX_COLORS] = colors
-
-        if (use_colors and mix) or (not use_colors):
-            colors = material.diffuse_color(mat)
-            attributes[constants.COLOR_DIFFUSE] = colors
-
-        if attributes[constants.SHADING] == constants.PHONG:
-            logger.info("Adding specular attributes")
-            attributes.update({
-                constants.SPECULAR_COEF: material.specular_coef(mat),
-                constants.COLOR_SPECULAR: material.specular_color(mat)
-            })
-
-        if mesh.show_double_sided:
-            logger.info("Double sided is on")
-            attributes[constants.DOUBLE_SIDED] = True
-
-        materials_.append(attributes)
-
-        if not maps:
-            continue
-
-        diffuse = _diffuse_map(mat)
-        if diffuse:
-            logger.info("Diffuse map found")
-            attributes.update(diffuse)
-
-        light = _light_map(mat)
-        if light:
-            logger.info("Light map found")
-            attributes.update(light)
-
-        specular = _specular_map(mat)
-        if specular:
-            logger.info("Specular map found")
-            attributes.update(specular)
-
-        if attributes[constants.SHADING] == constants.PHONG:
-            normal = _normal_map(mat)
-            if normal:
-                logger.info("Normal map found")
-                attributes.update(normal)
-
-            bump = _bump_map(mat)
-            if bump:
-                logger.info("Bump map found")
-                attributes.update(bump)
-
-    return materials_
+    return [mesh.materials[index] for index in indices if mesh.materials[index] is not None]
 
 
 @_mesh
