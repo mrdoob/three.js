@@ -97,7 +97,7 @@ THREE.AnimationAction.prototype = {
 
 		if ( this.loopCount !== previousLoopCount ) {
 
-   			this.mixer.dispatchEvent( { type: 'loop', action: this, loopDelta: ( this.loopCount - this.loopCount ) } );
+   			this.mixer.dispatchEvent( { type: 'loop', action: this, loopDelta: ( this.loopCount - previousLoopCount ) } );
 
    		}
 
