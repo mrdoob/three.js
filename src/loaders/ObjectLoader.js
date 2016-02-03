@@ -219,6 +219,19 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'RingBufferGeometry':
+
+						geometry = new THREE.RingBufferGeometry(
+							data.innerRadius,
+							data.outerRadius,
+							data.thetaSegments,
+							data.phiSegments,
+							data.thetaStart,
+							data.thetaLength
+						);
+
+						break;
+
 					case 'RingGeometry':
 
 						geometry = new THREE.RingGeometry(
