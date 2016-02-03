@@ -257,6 +257,8 @@ THREE.Material.prototype = {
 		this.depthTest = source.depthTest;
 		this.depthWrite = source.depthWrite;
 
+		this.colorWrite = source.colorWrite;
+
 		this.precision = source.precision;
 
 		this.polygonOffset = source.polygonOffset;

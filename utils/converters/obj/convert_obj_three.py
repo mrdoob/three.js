@@ -53,7 +53,7 @@ How to use generated JS file in your HTML document
 
         function createScene( geometry, materials ) {
 
-            var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+            var mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
 
         }
 

@@ -26,7 +26,6 @@
 			}
 
 			a {
-
 				color: #0080ff;
 			}
 
@@ -92,10 +91,6 @@
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/geometries/TextGeometry.js"></script>
-		<script src="js/utils/FontUtils.js"></script>
-		<script src="fonts/helvetiker_regular.typeface.js"></script>
-
 		<script>
 
 			// 1 micrometer to 100 billion light years in one scene, with 1 unit = 1 meter?  preposterous!  and yet...
@@ -134,17 +129,23 @@
 			];
 
 			init();
-			animate();
 
 			function init() {
 
 				container = document.getElementById( 'container' );
 
-				var scene = initScene();
+				var loader = new THREE.FontLoader();
+				loader.load( 'fonts/helvetiker_regular.typeface.js', function ( font ) {
 
-				// Initialize two copies of the same scene, one with normal z-buffer and one with logarithmic z-buffer
-				objects.normal = initView( scene, 'normal', false );
-				objects.logzbuf = initView( scene, 'logzbuf', true );
+					var scene = initScene( font );
+
+					// Initialize two copies of the same scene, one with normal z-buffer and one with logarithmic z-buffer
+					objects.normal = initView( scene, 'normal', false );
+					objects.logzbuf = initView( scene, 'logzbuf', true );
+
+					animate();
+
+				} );
 
 				stats = new Stats();
 				container.appendChild(stats.domElement);
@@ -158,7 +159,6 @@
 				window.addEventListener( 'MozMousePixelScroll', onMouseWheel, false );
 				window.addEventListener( 'mousemove', onMouseMove, false );
 
-				render();
 			}
 
 			function initView( scene, name, logDepthBuf ) {
@@ -179,7 +179,7 @@
 
 			}
 
-			function initScene() {
+			function initScene( font ) {
 
 				var scene = new THREE.Scene();
 
@@ -203,12 +203,15 @@
 				var geometry = new THREE.SphereBufferGeometry(0.5, 24, 12);
 
 				for (var i = 0; i < labeldata.length; i++) {
+
 					var scale = labeldata[i].scale || 1;
+
 					var labelgeo = new THREE.TextGeometry( labeldata[i].label, {
+						font: font,
 						size: labeldata[i].size,
 						height: labeldata[i].size / 2,
-						font: 'helvetiker',
-					});
+					} );
+
 					labelgeo.computeBoundingSphere();
 
 					// center text

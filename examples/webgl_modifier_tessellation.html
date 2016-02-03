@@ -47,10 +47,6 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/geometries/TextGeometry.js"></script>
-		<script src="js/utils/FontUtils.js"></script>
-		<script src="fonts/helvetiker_bold.typeface.js"></script>
-
 		<script type="x-shader/x-vertex" id="vertexshader">
 
 			uniform float amplitude;
@@ -105,10 +101,15 @@
 		var WIDTH = window.innerWidth,
 			HEIGHT = window.innerHeight;
 
-		init();
-		animate();
+		var loader = new THREE.FontLoader();
+		loader.load( 'fonts/helvetiker_bold.typeface.js', function ( font ) {
 
-		function init() {
+			init( font );
+			animate();
+
+		} );
+
+		function init( font ) {
 
 			camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
 			camera.position.set( -100, 100, 200 );
@@ -121,13 +122,11 @@
 
 			var geometry = new THREE.TextGeometry( "THREE.JS", {
 
+				font: font,
+
 				size: 40,
 				height: 5,
 				curveSegments: 3,
-
-				font: "helvetiker",
-				weight: "bold",
-				style: "normal",
 
 				bevelThickness: 2,
 				bevelSize: 1,

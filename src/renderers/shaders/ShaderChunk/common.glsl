@@ -31,6 +31,59 @@ struct GeometricContext {
 };
 
 
+#if NUM_DIR_LIGHTS > 0
+
+	struct DirectionalLight {
+		vec3 direction;
+		vec3 color;
+	};
+
+	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
+
+#endif
+
+#if NUM_SPOT_LIGHTS > 0
+
+	struct SpotLight {
+		vec3 position;
+		vec3 direction;
+		vec3 color;
+		float distance;
+		float decay;
+		float angleCos;
+		float exponent;
+	};
+
+	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
+
+#endif
+
+#if NUM_POINT_LIGHTS > 0
+
+	struct PointLight {
+		vec3 position;
+		vec3 color;
+		float distance;
+		float decay;
+	};
+
+	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
+
+#endif
+
+#if NUM_HEMI_LIGHTS > 0
+
+	struct HemisphereLight {
+		vec3 direction;
+		vec3 skyColor;
+		vec3 groundColor;
+	};
+
+	uniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];
+
+#endif
+
+
 vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
 	return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );

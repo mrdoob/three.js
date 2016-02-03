@@ -180,7 +180,8 @@
 
 				// cloth material
 
-				var clothTexture = THREE.ImageUtils.loadTexture( 'textures/patterns/circuit_pattern.png' );
+				var loader = new THREE.TextureLoader();
+				var clothTexture = loader.load( 'textures/patterns/circuit_pattern.png' );
 				clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
 				clothTexture.anisotropy = 16;
 
@@ -225,7 +226,7 @@
 
 				// ground
 
-				var groundTexture = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg" );
+				var groundTexture = loader.load( "textures/terrain/grasslight-big.jpg" );
 				groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
 				groundTexture.repeat.set( 25, 25 );
 				groundTexture.anisotropy = 16;

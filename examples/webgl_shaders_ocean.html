@@ -88,7 +88,7 @@
 				controls.minDistance = 1000.0;
 				controls.maxDistance = 5000.0;
 				controls.maxPolarAngle = Math.PI * 0.495;
-				controls.center.set( 0, 500, 0 );
+				controls.target.set( 0, 500, 0 );
 
 				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
@@ -97,7 +97,7 @@
 				scene.add( light );
 
 
-				waterNormals = new THREE.ImageUtils.loadTexture( 'textures/waternormals.jpg' );
+				waterNormals = new THREE.TextureLoader().load( 'textures/waternormals.jpg' );
 				waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
 
 				water = new THREE.Water( renderer, camera, scene, {

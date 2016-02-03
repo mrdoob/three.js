@@ -18,29 +18,16 @@ THREE.WebGLLights = function () {
 
 		switch ( light.type ) {
 
-			case 'HemisphereLight':
-				uniforms = {
-					direction: new THREE.Vector3(),
-					skyColor: new THREE.Color(),
-					groundColor: new THREE.Color()
-				};
-				break;
-
 			case 'DirectionalLight':
 				uniforms = {
 					direction: new THREE.Vector3(),
 					color: new THREE.Color(),
-					shadow: -1
-				};
-				break;
 
-			case 'PointLight':
-				uniforms = {
-					position: new THREE.Vector3(),
-					color: new THREE.Color(),
-					distance: 0,
-					decay: 0,
-					shadow: -1
+					shadowEnabled: false,
+					shadowBias: 0,
+					shadowRadius: 1,
+					shadowMapSize: new THREE.Vector2(),
+					shadowMatrix: new THREE.Matrix4()
 				};
 				break;
 
@@ -53,7 +40,35 @@ THREE.WebGLLights = function () {
 					angleCos: 0,
 					exponent: 0,
 					decay: 0,
-					shadow: -1
+
+					shadowEnabled: false,
+					shadowBias: 0,
+					shadowRadius: 1,
+					shadowMapSize: new THREE.Vector2(),
+					shadowMatrix: new THREE.Matrix4()
+				};
+				break;
+
+			case 'PointLight':
+				uniforms = {
+					position: new THREE.Vector3(),
+					color: new THREE.Color(),
+					distance: 0,
+					decay: 0,
+
+					shadowEnabled: false,
+					shadowBias: 0,
+					shadowRadius: 1,
+					shadowMapSize: new THREE.Vector2(),
+					shadowMatrix: new THREE.Matrix4()
+				};
+				break;
+
+			case 'HemisphereLight':
+				uniforms = {
+					direction: new THREE.Vector3(),
+					skyColor: new THREE.Color(),
+					groundColor: new THREE.Color()
 				};
 				break;
 

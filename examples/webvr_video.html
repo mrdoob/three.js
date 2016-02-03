@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - vr video</title>
+		<title>three.js webgl - webvr video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -36,7 +36,7 @@
 
 		<script>
 
-			var camera, sceneLeft, sceneRight, renderer;
+			var camera, scene, renderer;
 			var video, texture;
 
 			var controls, effect;
@@ -55,6 +55,7 @@
 				} );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.layers.enable( 1 ); // render left view when no stereo available
 
 				// video
 
@@ -68,9 +69,9 @@
 				texture.format = THREE.RGBFormat;
 				texture.generateMipmaps = false;
 
-				// left
+				scene = new THREE.Scene();
 
-				sceneLeft = new THREE.Scene();
+				// left
 
 				var geometry = new THREE.SphereGeometry( 500, 60, 40 );
 				geometry.scale( - 1, 1, 1 );
@@ -91,11 +92,10 @@
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.y = - Math.PI / 2;
-				sceneLeft.add( mesh );
+				mesh.layers.set( 1 ); // display in left eye only
+				scene.add( mesh );
 
 				// right
-
-				sceneRight = new THREE.Scene();
 
 				var geometry = new THREE.SphereGeometry( 500, 60, 40 );
 				geometry.scale( - 1, 1, 1 );
@@ -117,7 +117,8 @@
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.y = - Math.PI / 2;
-				sceneRight.add( mesh );
+				mesh.layers.set( 2 ); // display in right eye only
+				scene.add( mesh );
 
 				//
 
@@ -161,7 +162,7 @@
 
 				controls.update();
 
-				effect.render( [ sceneLeft, sceneRight ], camera );
+				effect.render( scene, camera );
 
 			}
 

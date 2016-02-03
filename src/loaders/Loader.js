@@ -229,6 +229,7 @@ THREE.Loader.prototype = {
 						break;
 					case 'depthTest':
 					case 'depthWrite':
+					case 'colorWrite':
 					case 'opacity':
 					case 'reflectivity':
 					case 'transparent':

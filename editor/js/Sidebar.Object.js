@@ -256,6 +256,9 @@ Sidebar.Object = function ( editor ) {
 	var objectReceiveShadow = new UI.THREE.Boolean( false, 'receive' ).onChange( update );
 	objectShadowRow.add( objectReceiveShadow );
 
+	var objectShadowRadius = new UI.Number( 1 ).onChange( update );
+	objectShadowRow.add( objectShadowRadius );
+
 	container.add( objectShadowRow );
 
 	// visible
@@ -476,6 +479,16 @@ Sidebar.Object = function ( editor ) {
 
 			}
 
+			if ( object.shadow !== undefined ) {
+
+				if ( object.shadow.radius !== objectShadowRadius.getValue() ) {
+
+					editor.execute( new SetValueCommand( object.shadow, 'radius', objectShadowRadius.getValue() ) );
+
+				}
+
+			}
+
 			try {
 
 				var userData = JSON.parse( objectUserData.getValue() );
@@ -510,7 +523,8 @@ Sidebar.Object = function ( editor ) {
 			'exponent' : objectExponentRow,
 			'decay' : objectDecayRow,
 			'castShadow' : objectShadowRow,
-			'receiveShadow' : objectReceiveShadow
+			'receiveShadow' : objectReceiveShadow,
+			'shadow': objectShadowRadius
 		};
 
 		for ( var property in properties ) {
@@ -686,6 +700,12 @@ Sidebar.Object = function ( editor ) {
 		if ( object.receiveShadow !== undefined ) {
 
 			objectReceiveShadow.setValue( object.receiveShadow );
+
+		}
+
+		if ( object.shadow !== undefined ) {
+
+			objectShadowRadius.setValue( object.shadow.radius );
 
 		}
 

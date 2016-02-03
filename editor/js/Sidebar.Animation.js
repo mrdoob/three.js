@@ -36,7 +36,7 @@ Sidebar.Animation = function ( editor ) {
 
 				var material = child.material;
 
-				if ( material instanceof THREE.MeshFaceMaterial ) {
+				if ( material instanceof THREE.MultiMaterial ) {
 
 					for ( var i = 0; i < material.materials.length; i ++ ) {
 

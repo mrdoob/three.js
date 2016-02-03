@@ -119,7 +119,7 @@
 
 				//  GROUND
 
-				var gt = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg" );
+				var gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
 				var gg = new THREE.PlaneBufferGeometry( 2000, 2000 );
 				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 

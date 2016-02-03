@@ -18,7 +18,7 @@ var Loader = function ( editor ) {
 		reader.addEventListener( 'progress', function ( event ) {
 
 			var size = '(' + Math.floor( event.total / 1000 ).format() + ' KB)';
-			var progress = Math.floor( ( event.loaded / event.total ) * 100 ) + '%'
+			var progress = Math.floor( ( event.loaded / event.total ) * 100 ) + '%';
 			console.log( 'Loading', filename, size, progress );
 
 		} );
@@ -133,6 +133,22 @@ var Loader = function ( editor ) {
 					collada.scene.name = filename;
 
 					editor.execute( new AddObjectCommand( collada.scene ) );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
+			case 'fbx':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var loader = new THREE.FBXLoader();
+					var object = loader.parse( contents );
+
+					editor.execute( new AddObjectCommand( object ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -435,7 +451,7 @@ var Loader = function ( editor ) {
 
 					if ( result.materials.length > 1 ) {
 
-						material = new THREE.MeshFaceMaterial( result.materials );
+						material = new THREE.MultiMaterial( result.materials );
 
 					} else {
 

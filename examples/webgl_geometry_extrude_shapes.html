@@ -168,7 +168,7 @@
 
 				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+				var mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
 
 				mesh.position.set( 50, 100, 50 );
 

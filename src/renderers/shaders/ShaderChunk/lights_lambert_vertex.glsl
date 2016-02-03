@@ -16,14 +16,18 @@ vLightFront = vec3( 0.0 );
 	vLightBack = vec3( 0.0 );
 #endif
 
+IncidentLight directLight;
+float dotNL;
+vec3 directLightColor_Diffuse;
+
 #if NUM_POINT_LIGHTS > 0
 
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
-		IncidentLight directLight = getPointDirectLight( pointLights[ i ], geometry );
+		directLight = getPointDirectLight( pointLights[ i ], geometry );
 
-		float dotNL = dot( geometry.normal, directLight.direction );
-		vec3 directLightColor_Diffuse = PI * directLight.color;
+		dotNL = dot( geometry.normal, directLight.direction );
+		directLightColor_Diffuse = PI * directLight.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 
@@ -41,10 +45,10 @@ vLightFront = vec3( 0.0 );
 
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
-		IncidentLight directLight = getSpotDirectLight( spotLights[ i ], geometry );
+		directLight = getSpotDirectLight( spotLights[ i ], geometry );
 
-		float dotNL = dot( geometry.normal, directLight.direction );
-		vec3 directLightColor_Diffuse = PI * directLight.color;
+		dotNL = dot( geometry.normal, directLight.direction );
+		directLightColor_Diffuse = PI * directLight.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 
@@ -61,10 +65,10 @@ vLightFront = vec3( 0.0 );
 
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
-		IncidentLight directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
+		directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
 
-		float dotNL = dot( geometry.normal, directLight.direction );
-		vec3 directLightColor_Diffuse = PI * directLight.color;
+		dotNL = dot( geometry.normal, directLight.direction );
+		directLightColor_Diffuse = PI * directLight.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 
@@ -78,23 +82,18 @@ vLightFront = vec3( 0.0 );
 
 #endif
 
-	{
+#if NUM_HEMI_LIGHTS > 0
 
+	for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-		#if NUM_HEMI_LIGHTS > 0
+		vLightFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
 
-			for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
+		#ifdef DOUBLE_SIDED
 
-				vLightFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
-
-				#ifdef DOUBLE_SIDED
-
-					vLightBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );
-
-				#endif
-
-			}
+			vLightBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );
 
 		#endif
 
 	}
+
+#endif

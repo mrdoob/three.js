@@ -25,8 +25,8 @@ THREE.ShaderSkin = {
 		uniforms: THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
-			THREE.UniformsLib[ "shadowmap" ],
 
 			{
 
@@ -84,6 +84,7 @@ THREE.ShaderSkin = {
 
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "bsdfs" ],
+			THREE.ShaderChunk[ "ambient_pars" ],
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
@@ -136,7 +137,6 @@ THREE.ShaderSkin = {
 
 				"vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
 				"vec4 diffuseColor = vec4( diffuse, opacity );",
-				"vec3 shadowMask = vec3( 1.0 );",
 
 				"vec4 colDiffuse = texture2D( tDiffuse, vUv );",
 				"colDiffuse.rgb *= colDiffuse.rgb;",
@@ -245,11 +245,6 @@ THREE.ShaderSkin = {
 
 				"#endif",
 
-				THREE.ShaderChunk[ "shadowmap_fragment" ],
-
-				"totalDiffuseLight *= shadowMask;",
-				"totalSpecularLight *= shadowMask;",
-
 				"outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse ) + totalSpecularLight;",
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
@@ -272,6 +267,7 @@ THREE.ShaderSkin = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
+			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
@@ -315,6 +311,7 @@ THREE.ShaderSkin = {
 		uniforms: THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
 
 			{
@@ -373,6 +370,7 @@ THREE.ShaderSkin = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
+			THREE.ShaderChunk[ "ambient_pars" ],
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 

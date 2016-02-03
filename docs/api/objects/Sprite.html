@@ -17,7 +17,7 @@
                 <h2>Example</h2>
 
                 <code>
-                var map = THREE.ImageUtils.loadTexture( "sprite.png" );
+                var map = new THREE.TextureLoader().load( "sprite.png" );
                 var material = new THREE.SpriteMaterial( { map: map, color: 0xffffff, fog: true } );
                 var sprite = new THREE.Sprite( material );
                 scene.add( sprite );
@@ -48,7 +48,7 @@
                 <div>
                 This creates a new clone of the sprite.
                 </div>
-		
+
 		<h3>[method:Object3D clone]([page:Object3D object])</h3>
 		<div>
 		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned Sprite Object.

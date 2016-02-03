@@ -69,11 +69,13 @@
 
 				geometry = new THREE.Geometry();
 
-				sprite1 = THREE.ImageUtils.loadTexture( "textures/sprites/snowflake1.png" );
-				sprite2 = THREE.ImageUtils.loadTexture( "textures/sprites/snowflake2.png" );
-				sprite3 = THREE.ImageUtils.loadTexture( "textures/sprites/snowflake3.png" );
-				sprite4 = THREE.ImageUtils.loadTexture( "textures/sprites/snowflake4.png" );
-				sprite5 = THREE.ImageUtils.loadTexture( "textures/sprites/snowflake5.png" );
+				var textureLoader = new THREE.TextureLoader();
+
+				sprite1 = textureLoader.load( "textures/sprites/snowflake1.png" );
+				sprite2 = textureLoader.load( "textures/sprites/snowflake2.png" );
+				sprite3 = textureLoader.load( "textures/sprites/snowflake3.png" );
+				sprite4 = textureLoader.load( "textures/sprites/snowflake4.png" );
+				sprite5 = textureLoader.load( "textures/sprites/snowflake5.png" );
 
 				for ( i = 0; i < 10000; i ++ ) {
 

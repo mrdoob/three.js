@@ -113,7 +113,7 @@
 					material.morphTargets = true;
 					material.color.setHex( 0xffaaaa );
 
-					var faceMaterial = new THREE.MeshFaceMaterial( materials );
+					var faceMaterial = new THREE.MultiMaterial( materials );
 
 					for ( var i = 0; i < 729; i ++ ) {
 
@@ -138,7 +138,7 @@
 						mesh.updateMatrix();
 
 						scene.add( mesh );
-						
+
 						mixer.clipAction( geometry.animations[0], mesh )
 								.setDuration( 1 )			// one second
 								.startAt( - Math.random() )	// random phase (already running)
