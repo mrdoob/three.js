@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<meta charset="utf-8" name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+<script src="../build/three.min.js"></script>
+<script src="js/renderers/CSS3DRenderer.js"></script>
+<script src="js/controls/OrbitControls.js"></script>
+
+<style media="screen">
+html, body {
+        margin: 0px; 
+        overflow: hidden; 
+        height: 100%;
+}
+</style>
+<body><script>
+//////////////////////////////////////////////////////////////////////////////////
+//		Import render loop
+//////////////////////////////////////////////////////////////////////////////////
+// array of functions for the rendering loop
+var onRenderFcts= [];
+
+//////////////////////////////////////////////////////////////////////////////////
+//		Comments
+//////////////////////////////////////////////////////////////////////////////////
+
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild(renderer.domElement)
+
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+camera.position.set(0,5,15);
+
+
+var controls = new THREE.OrbitControls( camera, renderer.domElement );
+onRenderFcts.push(function(){
+        controls.update();
+})
+
+//////////////////////////////////////////////////////////////////////////////////
+//		initialize renderer for css coverflow
+//////////////////////////////////////////////////////////////////////////////////
+
+// var rendererCss = new THREE.CSS3DStereoRenderer();
+var rendererCss = new THREE.CSS3DRenderer();
+
+rendererCss.separation = 2;
+rendererCss.targetDistance = 500;
+
+rendererCss.setSize( window.innerWidth, window.innerHeight );
+rendererCss.domElement.style.position = 'absolute';
+rendererCss.domElement.style.top = '0px';
+rendererCss.domElement.style.pointerEvents = 'none';
+rendererCss.domElement.classList.add('css3dContainer')
+document.body.appendChild( rendererCss.domElement );
+// render the scene
+onRenderFcts.push(function(){
+        // to actually render the scene   
+        rendererCss.render( sceneCss, camera );
+})
+
+
+var sceneCss = new THREE.Scene()
+
+
+var domElement = document.createElement('div');
+domElement.style.width = '5px'
+domElement.style.height = '1px'
+domElement.style.backgroundColor = 'rgba(255,0,0, 0.5)'
+
+var css3DObject = new THREE.CSS3DObject( domElement );          
+sceneCss.add(css3DObject);
+
+//////////////////////////////////////////////////////////////////////////////
+//              Code Separator
+//////////////////////////////////////////////////////////////////////////////
+
+var light	= new THREE.AmbientLight( 0x080808 )
+scene.add( light )
+// add a light in front
+var light2	= new THREE.DirectionalLight('white', 0.5)
+light2.position.set(0.5, 2, 0.1)
+scene.add( light2 )
+
+//////////////////////////////////////////////////////////////////////////////
+//              Code Separator
+//////////////////////////////////////////////////////////////////////////////
+
+var geometry = new THREE.BoxGeometry( 5, 1, 0.1 );
+var material = new THREE.MeshNormalMaterial();
+var cube = new THREE.Mesh( geometry, material );
+cube.position.z=3
+scene.add( cube );
+
+// grid
+var gridHelper = new THREE.GridHelper( 10, 1 ); 
+scene.add( gridHelper );
+
+//////////////////////////////////////////////////////////////////////////////
+//              STEREO rendererCss
+//////////////////////////////////////////////////////////////////////////////
+
+onRenderFcts.push(function(){
+        renderer.render( scene, camera );
+})
+
+//////////////////////////////////////////////////////////////////////////////
+//              Code Separator
+//////////////////////////////////////////////////////////////////////////////
+
+var mouse = new THREE.Vector2();
+
+document.addEventListener( 'mousemove', onDocumentMouseMove, false )
+function onDocumentMouseMove( event ) {
+	event.preventDefault();
+	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+        
+        computeIntersect(mouse)
+}
+
+function computeIntersect(mouse){
+        var raycaster = new THREE.Raycaster();
+	raycaster.setFromCamera( mouse, camera );
+
+        // var objects = [cube]
+        var objects = sceneCss.children
+        // var objects = scene.children
+
+	var intersects = raycaster.intersectObjects( objects );
+
+	if ( intersects.length > 0 ) {
+
+                css3DObject.element.style.backgroundColor = 'rgba(0,255,0, 0.5)';
+                // console.log('intersects', intersects[0].distance)
+                // console.log('intersects', intersects)
+
+	} else {
+
+                css3DObject.element.style.backgroundColor = 'rgba(255,0,0, 0.5)';
+                // console.log('no intersection')
+
+	}        
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//              STEREO
+//////////////////////////////////////////////////////////////////////////////
+
+// run the rendering loop
+var lastTimeMsec= null
+requestAnimationFrame(function animate(nowMsec){
+        // keep looping
+        requestAnimationFrame( animate );
+        // measure time
+        lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+        var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+        lastTimeMsec	= nowMsec
+        // call each update function
+        onRenderFcts.forEach(function(onRenderFct){
+                onRenderFct(deltaMsec/1000, nowMsec/1000)
+        })
+})
+</script></body>

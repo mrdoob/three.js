@@ -38,10 +38,7 @@ THREE.CSS3DObject.prototype.raycast = ( function () {
 
 	return function raycast( raycaster, intersects ) {
 
-		//////////////////////////////////////////////////////////////////////////////
-		//              Get the size of the DOMElement
-		//////////////////////////////////////////////////////////////////////////////
-		
+		// Get the size of the DOMElement		
                 var computedStyle = window.getComputedStyle(this.element);
                 var width = parseInt(computedStyle.width);
                 var height = parseInt(computedStyle.height);
