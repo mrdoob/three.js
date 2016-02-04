@@ -378,6 +378,10 @@ def restore_export_settings(properties, settings):
         constants.COPY_TEXTURES,
         constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
 
+    properties.option_embed_textures = settings.get(
+        constants.EMBED_TEXTURES,
+        constants.EXPORT_OPTIONS[constants.EMBED_TEXTURES])
+
     properties.option_texture_folder = settings.get(
         constants.TEXTURE_FOLDER,
         constants.EXPORT_OPTIONS[constants.TEXTURE_FOLDER])
@@ -468,6 +472,7 @@ def set_settings(properties):
         constants.COMPRESSION: properties.option_compression,
         constants.INDENT: properties.option_indent,
         constants.COPY_TEXTURES: properties.option_copy_textures,
+        constants.EMBED_TEXTURES: properties.option_embed_textures,
         constants.TEXTURE_FOLDER: properties.option_texture_folder,
 
         constants.SCENE: properties.option_export_scene,
@@ -520,6 +525,10 @@ def animation_options():
     ]
 
     return anim
+
+def resolve_conflicts(self, context):
+    if(self.option_embed_textures):
+        self.option_copy_textures = False;
 
 class ExportThree(bpy.types.Operator, ExportHelper):
     """Class that handles the export properties"""
@@ -669,6 +678,12 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         name="Copy textures",
         description="Copy textures",
         default=constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
+
+    option_embed_textures = BoolProperty(
+        name="Embed textures",
+        description="Embed base64 textures in .json",
+        default=constants.EXPORT_OPTIONS[constants.EMBED_TEXTURES],
+        update=resolve_conflicts)
 
     option_texture_folder = StringProperty(
         name="Texture folder",
@@ -915,6 +930,10 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_copy_textures')
+        row.enabled = not self.properties.option_embed_textures
+
+        row = layout.row()
+        row.prop(self.properties, 'option_embed_textures')
 
         row = layout.row()
         row.prop(self.properties, 'option_texture_folder')
