@@ -32,7 +32,7 @@ IncidentLight directLight;
 		directLight = getPointDirectLight( pointLight, geometry );
 
 		#ifdef USE_SHADOWMAP
-		directLight.color *= pointShadow[ i ] ? getPointShadow( pointShadowMap[ i ], pointShadowMapSize[ i ], pointShadowBias[ i ], pointShadowRadius[ i ], vPointShadowCoord[ i ] ) : 1.0;
+		directLight.color *= bool( pointLight.shadow ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ] ) : 1.0;
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -52,7 +52,7 @@ IncidentLight directLight;
 		directLight = getSpotDirectLight( spotLight, geometry );
 
 		#ifdef USE_SHADOWMAP
-		directLight.color *= spotShadow[ i ] ? getShadow( spotShadowMap[ i ], spotShadowMapSize[ i ], spotShadowBias[ i ], spotShadowRadius[ i ], vSpotShadowCoord[ i ] ) : 1.0;
+		directLight.color *= bool( spotLight.shadow ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -72,7 +72,7 @@ IncidentLight directLight;
 		directLight = getDirectionalDirectLight( directionalLight, geometry );
 
 		#ifdef USE_SHADOWMAP
-		directLight.color *= directionalShadow[ i ] ? getShadow( directionalShadowMap[ i ], directionalShadowMapSize[ i ], directionalShadowBias[ i ], directionalShadowRadius[ i ], vDirectionalShadowCoord[ i ] ) : 1.0;
+		directLight.color *= bool( directionalLight.shadow ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );

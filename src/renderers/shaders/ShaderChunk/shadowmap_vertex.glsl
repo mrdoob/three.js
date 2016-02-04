@@ -2,11 +2,11 @@
 
 	#if NUM_DIR_LIGHTS > 0
 
-		for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
-			vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * worldPosition;
+		vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * worldPosition;
 
-		}
+	}
 
 	#endif
 

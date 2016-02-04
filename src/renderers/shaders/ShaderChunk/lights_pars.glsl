@@ -1,5 +1,17 @@
 #if NUM_DIR_LIGHTS > 0
 
+	struct DirectionalLight {
+		vec3 direction;
+		vec3 color;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
+	};
+
+	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
+
 	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
@@ -15,6 +27,20 @@
 
 
 #if NUM_POINT_LIGHTS > 0
+
+	struct PointLight {
+		vec3 position;
+		vec3 color;
+		float distance;
+		float decay;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
+	};
+
+	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
 
 	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) {
 
@@ -34,6 +60,23 @@
 
 
 #if NUM_SPOT_LIGHTS > 0
+
+	struct SpotLight {
+		vec3 position;
+		vec3 direction;
+		vec3 color;
+		float distance;
+		float decay;
+		float angleCos;
+		float exponent;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
+	};
+
+	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
 
 	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {
 
@@ -66,6 +109,14 @@
 
 
 #if NUM_HEMI_LIGHTS > 0
+
+	struct HemisphereLight {
+		vec3 direction;
+		vec3 skyColor;
+		vec3 groundColor;
+	};
+
+	uniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];
 
 	vec3 getHemisphereLightIrradiance( const in HemisphereLight hemiLight, const in GeometricContext geometry ) {
 
