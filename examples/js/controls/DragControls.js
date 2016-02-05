@@ -4,7 +4,6 @@
  */
 THREE.DragControls = function( _camera, _objects, _domElement ) {
 
-	var _projector = new THREE.Projector();
 	var _raycaster = new THREE.Raycaster();
 
 	var _mouse = new THREE.Vector3(),
