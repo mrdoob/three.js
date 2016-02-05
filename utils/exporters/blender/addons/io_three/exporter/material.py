@@ -110,7 +110,6 @@ class MultiMaterial(base_classes.BaseNode):
         self[constants.TYPE] = constants.THREE_MULTI
         self[constants.NAME] = name
         self[constants.MATERIALS] = self._materials
-        # self['node'] = multi_mat[constants.NAME]
 
     @property
     def node(self):
