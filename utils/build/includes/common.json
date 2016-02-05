@@ -176,6 +176,7 @@
 	"src/renderers/shaders/ShaderChunk/shadowmap_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/shadowmap_pars_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/shadowmap_vertex.glsl",
+	"src/renderers/shaders/ShaderChunk/shadowmask_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/skinbase_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/skinning_pars_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/skinning_vertex.glsl",
