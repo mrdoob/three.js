@@ -41,13 +41,13 @@ THREE.Box3.prototype = {
 			var y = array[ i + 1 ];
 			var z = array[ i + 2 ];
 
-			minX = Math.min( minX, x );
-			minY = Math.min( minY, y );
-			minZ = Math.min( minZ, z );
+			if( x < minX ) minX = x;
+			if( y < minY ) minY = y;
+			if( z < minZ ) minZ = z;
 
-			maxX = Math.max( maxX, x );
-			maxY = Math.max( maxY, y );
-			maxZ = Math.max( maxZ, z );
+			if( x > maxX ) maxX = x;
+			if( y > maxY ) maxY = y;
+			if( z > maxZ ) maxZ = z;
 
 		}
 
