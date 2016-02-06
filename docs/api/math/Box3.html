@@ -22,7 +22,7 @@
 		max -- Upper (x, y, z) boundary of the box.
 		</div>
 		<div>
-		Creates a box bounded by min and max. 
+		Creates a box bounded by min and max.
 		</div>
 
 		<h2>Properties</h2>
@@ -37,7 +37,7 @@
 		<h3>[property:Vector3 max]</h3>
 		<div>
 		Upper (x, y, z) boundary of this box.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 
@@ -51,7 +51,7 @@
 		<div>
 		Sets the lower and upper (x, y, z) boundaries of this box.
 		</div>
-		
+
 		<h3>[method:Box3 applyMatrix4]([page:Matrix4 matrix]) [page:Box3 this]</h3>
 		<div>
 		matrix -- The [page:Matrix4] to apply
@@ -69,7 +69,7 @@
 		Clamps *point* within the bounds of this box.
 		</div>
 
-		<h3>[method:Boolean isIntersectionBox]([page:Box3 box])</h3>
+		<h3>[method:Boolean intersectsBox]([page:Box3 box])</h3>
 		<div>
 		box -- Box to check for intersection against.
 		</div>
@@ -84,7 +84,7 @@
 		<div>
 		Sets the upper and lower bounds of this box to include all of the points in *points*.
 		</div>
-		
+
 		<h3>[method:Box3 setFromObject]([page:Object3D object]) [page:Box3 this]</h3>
 		<div>
 		object -- [page:Object3D] to compute the bounding box for.
@@ -93,8 +93,8 @@
 		Computes the world-axis-aligned bounding box of an object (including its children),
 		accounting for both the object's, and childrens', world transforms
 		</div>
-		
-		
+
+
 
 		<h3>[method:Vector3 size]([page:Vector3 optionalTarget])</h3>
 		<div>
@@ -109,7 +109,7 @@
 		box -- Box that will be unioned with this box.
 		</div>
 		<div>
-		Unions this box with *box* setting the upper bound of this box to the greater of the 
+		Unions this box with *box* setting the upper bound of this box to the greater of the
 		two boxes' upper bounds and the lower bound of this box to the lesser of the two boxes'
 		lower bounds.
 		</div>
@@ -139,7 +139,7 @@
 		</div>
 		<div>
 		Returns true if this box includes the entirety of *box*. If this and *box* overlap exactly,</br>
-		this function also returns true. 
+		this function also returns true.
 		</div>
 
 		<h3>[method:Boolean containsPoint]([page:Vector3 point])</h3>
@@ -149,7 +149,7 @@
 		<div>
 		Returns true if the specified point lies within the boundaries of this box.
 		</div>
-		
+
 		<h3>[method:Box3 translate]([page:Vector3 offset]) [page:Box3 this]</h3>
 		<div>
 		offset -- Direction and distance of offset.
@@ -186,7 +186,7 @@
 		<div>
 		Expands the boundaries of this box to include *point*.
 		</div>
-		
+
 		<h3>[method:Box3 expandByScalar]([page:float scalar]) [page:Box3 this]</h3>
 		<div>
 		scalar -- Distance to expand.
@@ -195,14 +195,14 @@
 		Expands each dimension of the box by *scalar*. If negative, the dimensions of the box <br/>
 		will be contracted.
 		</div>
-		
+
 		<h3>[method:Box3 expandByVector]([page:Vector3 vector]) [page:Box3 this]</h3>
 		<div>
 		vector -- Amount to expand this box in each dimension.
 		</div>
 		<div>
 		Expands this box equilaterally by *vector*. The width of this box will be
-		expanded by the x component of *vector* in both directions. The height of 
+		expanded by the x component of *vector* in both directions. The height of
 		this box will be expanded by the y component of *vector* in both directions.
 		The depth of this box will be expanded by the z component of *vector* in
 		both directions.
@@ -249,7 +249,7 @@
 		<h3>[method:Box3 setFromCenterAndSize]([page:Vector3 center], [page:Vector3 size]) [page:Box3 this]</h3>
 		<div>
 		center -- Desired center position of the box. <br />
-		size -- Desired x and y dimensions of the box. 
+		size -- Desired x and y dimensions of the box.
 		</div>
 		<div>
 		Centers this box on *center* and sets this box's width and height to the values specified

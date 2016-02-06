@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -24,7 +23,7 @@
 	</head>
 
 	<body>
-		
+
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
@@ -78,17 +77,18 @@
 							 r + "posy.jpg", r + "negy.jpg",
 							 r + "posz.jpg", r + "negz.jpg" ];
 
-				textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
 				textureCube.mapping = THREE.CubeReflectionMapping;
 
-				textureEquirec = THREE.ImageUtils.loadTexture( "textures/2294472375_24a3b8ef46_o.jpg" );
-				textureEquirec.format = THREE.RGBAFormat;
+				var textureLoader = new THREE.TextureLoader();
+
+				textureEquirec = textureLoader.load( "textures/2294472375_24a3b8ef46_o.jpg" );
 				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
 				textureEquirec.magFilter = THREE.LinearFilter;
 				textureEquirec.minFilter = THREE.LinearMipMapLinearFilter;
 
-				textureSphere = THREE.ImageUtils.loadTexture( "textures/metal.jpg" );
+				textureSphere = textureLoader.load( "textures/metal.jpg" );
 				textureSphere.mapping = THREE.SphericalReflectionMapping;
 
 				// Materials

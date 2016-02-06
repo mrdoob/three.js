@@ -27,7 +27,7 @@
 			var container, stats;
 
 			var camera, scene, renderer;
-			
+
 			var objectNewGeometry;
 			var objectToggleAddRemove;
 			var objectRandomizeFaces;
@@ -53,7 +53,7 @@
 				light.position.set( 0, 1, 0 );
 				scene.add( light );
 
-				var map = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
+				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
@@ -61,45 +61,45 @@
 
 				//
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( -400, 0, 200 );
 				scene.add( object );
 				objectNewGeometry = object;
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( -200, 0, 200 );
 				scene.add( object );
 				objectToggleAddRemove = object;
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( 0, 0, 200 );
 				scene.add( object );
 				objectRandomizeFaces = object;
 /*
 				These are not yet used but they are ready to be shown
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( 200, 0, 200 );
 				scene.add( object );
 
 				//
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( -400, 0, 0 );
 				scene.add( object );
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( -200, 0, 0 );
 				scene.add( object );
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( 0, 0, 0 );
 				scene.add( object );
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( 200, 0, 0 );
 				scene.add( object );
 
-				object = createObject( createMeshFaceMaterial(), 4 );
+				object = createObject( createMultiMaterial(), 4 );
 				object.position.set( 400, 0, 0 );
 				scene.add( object );
 				*/
@@ -122,7 +122,7 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
-			
+
 			function createObject(material, segments ){
 				var geometry = createGeometry(segments);
 				var mesh = new THREE.Mesh( geometry , material);
@@ -135,8 +135,8 @@
 				geometry.applyMatrix(matrix.makeRotationFromEuler(euler.set(parseInt(Math.random()*2,10)*Math.PI,parseInt(Math.random()*2,10)*Math.PI,parseInt(Math.random()*2,10)*Math.PI)));
 				return geometry;
 			}
-			
-			function createMeshFaceMaterial(){
+
+			function createMultiMaterial(){
 				var materials = [];
 				materials.push(new THREE.MeshBasicMaterial({color: 0xff0000}));
 				materials.push(new THREE.MeshBasicMaterial({color: 0xffff00}));
@@ -144,7 +144,7 @@
 				materials.push(new THREE.MeshBasicMaterial({color: 0x00ffff}));
 				materials.push(new THREE.MeshBasicMaterial({color: 0x0000ff}));
 				materials.push(new THREE.MeshBasicMaterial({color: 0xff00ff}));
-				var material = new THREE.MeshFaceMaterial(materials);
+				var material = new THREE.MultiMaterial(materials);
 				return material;
 			}
 
@@ -167,12 +167,12 @@
 				stats.update();
 
 			}
-			
+
 			function randomizeFaces(object){
 				for(var i = 0,l=object.geometry.faces.length;i<l;i++){
-					
+
 					object.geometry.faces[i].materialIndex = Math.floor(Math.random() * 6);
-					
+
 				}
 				object.geometry.groupsNeedUpdate = true;
 			}
@@ -180,30 +180,30 @@
 			function render() {
 
 				var timer = Date.now() * 0.001;
-				
+
 				if (parseInt(timer,10)%2 === 0){
 
 					if (scene.children.indexOf(objectToggleAddRemove) === -1) {
-						
-					
+
+
 						objectNewGeometry.geometry = createGeometry(1);
 						randomizeFaces(objectRandomizeFaces);
-					
+
 						scene.add(objectToggleAddRemove);
-						
+
 					}
-					
+
 				} else {
-					
+
 					if (scene.children.indexOf(objectToggleAddRemove) !== -1) {
-											
+
 						objectNewGeometry.geometry = createGeometry(1);
 						randomizeFaces(objectRandomizeFaces);
-					
+
 						scene.remove(objectToggleAddRemove);
-						
+
 					}
-					
+
 				}
 
 				camera.lookAt( scene.position );

@@ -49,8 +49,7 @@
 
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-				//gl_PointSize = size;
-				gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );
+				gl_PointSize = size * ( 300.0 / -mvPosition.z );
 
 				gl_Position = projectionMatrix * mvPosition;
 
@@ -139,7 +138,7 @@
 
 			//
 
-			var texture = THREE.ImageUtils.loadTexture( "textures/sprites/disc.png" );
+			var texture = new THREE.TextureLoader().load( "textures/sprites/disc.png" );
 			texture.wrapS = THREE.RepeatWrapping;
 			texture.wrapT = THREE.RepeatWrapping;
 

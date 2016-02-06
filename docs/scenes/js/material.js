@@ -104,10 +104,10 @@ var envMaps = (function () {
 		path + 'pz' + format, path + 'nz' + format
 	];
 
-	var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+	var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 	reflectionCube.format = THREE.RGBFormat;
 
-	var refractionCube = THREE.ImageUtils.loadTextureCube( urls );
+	var refractionCube = new THREE.CubeTextureLoader().load( urls );
 	refractionCube.mapping = THREE.CubeRefractionMapping;
 	refractionCube.format = THREE.RGBFormat;
 
@@ -125,7 +125,7 @@ var textureMaps = (function () {
 
 	return {
 		none : null,
-		grass : THREE.ImageUtils.loadTexture( "../../examples/textures/terrain/grasslight-thin.jpg" )
+		grass : new THREE.TextureLoader().load( "../../examples/textures/terrain/grasslight-thin.jpg" )
 	};
 
 })();

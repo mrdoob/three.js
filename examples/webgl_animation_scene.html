@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - scene animation</title>
@@ -59,7 +59,7 @@
 			var mesh, helper;
 
 			var mixer;
-		
+
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -128,10 +128,10 @@
 					scene = loadedScene;
 					scene.add( camera );
 					scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
-		
+
 					mixer = new THREE.AnimationMixer( scene );
-			
-					mixer.addAction( new THREE.AnimationAction( sceneAnimationClip ) );
+
+					mixer.clipAction( sceneAnimationClip ).play();
 
 				} );
 

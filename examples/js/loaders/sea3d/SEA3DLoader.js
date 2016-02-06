@@ -22,6 +22,7 @@ THREE.SEA3D = function( config ) {
 	if ( this.config.timeLimit == undefined ) this.config.timeLimit = 10;
 	if ( this.config.streaming == undefined ) this.config.streaming = true;
 	if ( this.config.lights == undefined ) this.config.lights = true;
+	if ( this.config.useVertexTexture == undefined ) this.config.useVertexTexture = true;
 
 };
 
@@ -58,6 +59,10 @@ THREE.SEA3D.RTT_SIZE = 512;
 //	Shader
 //
 
+//
+//	Shader
+//
+
 THREE.SEA3D.ShaderLib = {};
 
 THREE.SEA3D.ShaderLib.replaceCode = function( src, target, replace ) {
@@ -84,12 +89,12 @@ THREE.SEA3D.ShaderLib.replaceCode = function( src, target, replace ) {
 
 THREE.SEA3D.ShaderLib.fragStdMtl = THREE.SEA3D.ShaderLib.replaceCode( THREE.ShaderLib.phong.fragmentShader, [
 	//	Target
-	'outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + totalEmissiveLight;', // METAL
-	'outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;'
+	'vec3 outgoingLight = ( reflectedLight.directDiffuse + reflectedLight.indirectDiffuse ) * specular + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;', // METAL
+	'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;'
 ], [
 	//	Replace To
-	'outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight + totalEmissiveLight ) * specular + totalSpecularLight;', // METAL
-	'outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight + totalEmissiveLight ) + totalSpecularLight;'
+	'vec3 outgoingLight = ( reflectedLight.directDiffuse + reflectedLight.indirectDiffuse ) * specular + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight * specular;', // METAL
+	'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight * diffuse;'
 ] );
 
 //
@@ -105,6 +110,29 @@ THREE.SEA3D.StandardMaterial = function () {
 THREE.SEA3D.StandardMaterial.prototype = Object.create( THREE.MeshPhongMaterial.prototype );
 THREE.SEA3D.StandardMaterial.prototype.constructor = THREE.SEA3D.StandardMaterial;
 
+THREE.SEA3D.StandardMaterial.prototype.lightMapUV = 1;
+
+
+THREE.SEA3D.StandardMaterial.prototype.__defineSetter__( "__webglShader", function( val ) {
+
+	val.fragmentShader = THREE.SEA3D.ShaderLib.fragStdMtl;
+
+	if ( this.lightMapUV == 0 ) {
+
+		val.fragmentShader = THREE.SEA3D.ShaderLib.replaceCode( val.fragmentShader, "texture2D( aoMap, vUv2 )", "texture2D( aoMap, vUv )" );
+
+	}
+
+	this.__webglShader__ = val;
+
+} );
+
+THREE.SEA3D.StandardMaterial.prototype.__defineGetter__( "__webglShader", function() {
+
+	return this.__webglShader__;
+
+} );
+
 THREE.SEA3D.StandardMaterial.prototype.copy = function ( source ) {
 
 	THREE.MeshPhongMaterial.prototype.copy.call( this, source );
@@ -115,22 +143,9 @@ THREE.SEA3D.StandardMaterial.prototype.copy = function ( source ) {
 
 THREE.SEA3D.StandardMaterial.prototype.clone = function() {
 
-	return new THREE.SEA3D.StandardMaterial().copy( this );
+	return new this.constructor().copy( this );
 
 };
-
-THREE.SEA3D.StandardMaterial.prototype.__defineSetter__( "__webglShader", function( val ) {
-
-	val.fragmentShader = THREE.SEA3D.ShaderLib.fragStdMtl;
-	this.__webglShader__ = val;
-
-} )
-
-THREE.SEA3D.StandardMaterial.prototype.__defineGetter__( "__webglShader", function() {
-
-	return this.__webglShader__;
-
-} )
 
 //
 //	Container
@@ -247,7 +262,7 @@ THREE.SEA3D.Dummy.MATERIAL = new THREE.MeshBasicMaterial( { wireframe: true, col
 
 THREE.SEA3D.Dummy.prototype.clone = function ( object ) {
 
-	return new THREE.SEA3D.Dummy( this.width, this.height, this.depth ).copy( this );
+	return new this.constructor( this.width, this.height, this.depth ).copy( this );
 
 };
 
@@ -298,7 +313,7 @@ THREE.SEA3D.Mesh.prototype.copy = function ( source ) {
 
 THREE.SEA3D.Mesh.prototype.clone = function ( object ) {
 
-	return new THREE.SEA3D.Mesh( this.geometry, this.material ).copy( this );
+	return new this.constructor( this.geometry, this.material ).copy( this );
 
 };
 
@@ -361,36 +376,28 @@ THREE.SEA3D.SkinnedMesh.prototype.resume = function() {
 
 THREE.SEA3D.SkinnedMesh.prototype.play = function( name, crossfade, offset ) {
 
-	this.previousAnimation = this.currentAnimation;
-	this.currentAnimation = this.animations[ name ];
+	var animation = this.animations[ name ];
 
-	if ( ! this.currentAnimation )
+	if ( ! animation )
 		throw new Error( 'Animation "' + name + '" not found.' );
 
-	if ( this.previousAnimation && this.previousAnimation !== this.currentAnimation && crossfade > 0 ) {
+	animation.play( offset !== undefined ? offset : animation.currentTime, animation.weight );
 
-		this.previousAnimation.play( this.previousAnimation.currentTime, this.previousAnimation.weight );
-		this.currentAnimation.play( offset !== undefined ? offset : this.currentAnimation.currentTime, this.currentAnimation.weight );
-
-		THREE.SEA3D.AnimationHandler.addCrossfade( this, crossfade );
-
-	} else {
-
-		this.currentAnimation.play( offset !== undefined ? offset : this.currentAnimation.currentTime, 1 );
-
-	}
+	this.currentAnimation = animation;
 
 	this.isPlaying = true;
+
+	THREE.SEA3D.AnimationHandler.addCrossfade( this, crossfade !== undefined ? crossfade : 0 );
 
 };
 
 THREE.SEA3D.SkinnedMesh.prototype.setAnimations = function( animations ) {
 
-	this.animations = [];
-	this.weightSchedule = [];
-	this.warpSchedule = [];
-
 	var nsIndex = animations[ 0 ].name.indexOf( "/" ) + 1;
+
+	this.animations = [];
+	this.easeSpeed = 2;
+	this.blendMethod = SEA3D.AnimationBlendMethod.LINEAR;
 	this.animationNamespace = animations[ 0 ].name.substring( 0, nsIndex );
 
 	for ( var i = 0; i < animations.length; i ++ ) {
@@ -428,25 +435,9 @@ THREE.SEA3D.SkinnedMesh.prototype.copy = function ( source ) {
 	if ( this.animation )
 		this.animation = source.animation.clone( this );
 
-	this.animations = [];
+	if ( this.geometry.animations ) {
 
-	if ( source.geometry.animations ) {
-
-		var refAnimations = source.geometry.animations;
-		var nsIndex = refAnimations[ 0 ].name.indexOf( "/" ) + 1;
-
-		for ( var i = 0; i < refAnimations.length; i ++ ) {
-
-			var name = refAnimations[ i ].name.substring( nsIndex );
-			var data = refAnimations[ i ];
-
-			data.initialized = false;
-
-			this.animations[ i ] = new THREE.SEA3D.Animation( this, data );
-			this.animations[ i ].loop = refAnimations[ i ].repeat;
-			this.animations[ i ].name = name;
-
-		}
+		this.setAnimations( this.geometry.animations );
 
 	}
 
@@ -456,7 +447,7 @@ THREE.SEA3D.SkinnedMesh.prototype.copy = function ( source ) {
 
 THREE.SEA3D.SkinnedMesh.prototype.clone = function ( object ) {
 
-	return new THREE.SEA3D.SkinnedMesh( this.geometry, this.material, this.useVertexTexture ).copy( this );
+	return new this.constructor( this.geometry, this.material, this.useVertexTexture ).copy( this );
 
 };
 
@@ -532,7 +523,7 @@ THREE.SEA3D.VertexAnimationMesh.prototype.stop = function() {
 
 THREE.SEA3D.VertexAnimationMesh.prototype.clone = function ( object ) {
 
-	return new THREE.SEA3D.VertexAnimationMesh( this.geometry, this.material, this.fps ).copy( this );
+	return new this.constructor( this.geometry, this.material, this.fps ).copy( this );
 
 };
 
@@ -571,31 +562,63 @@ THREE.SEA3D.AnimationHandler = {
 
 	update : function( dt ) {
 
-		var i, cf = THREE.SEA3D.AnimationHandler.crossfade, ups = THREE.SEA3D.AnimationHandler.updates;
+		var i, j, cf = THREE.SEA3D.AnimationHandler.crossfade, ups = THREE.SEA3D.AnimationHandler.updates;
 
 		// crossfade
+
 		i = 0;
 		while ( i < cf.length ) {
 
-			var mesh = cf[ i ];
+			var mesh = cf[ i ],
+				len = mesh.animations.length,
+				weight = 1,
+				delta = Math.abs( dt ) / mesh.crossfade;
 
-			mesh.currentAnimation.weight += dt / mesh.crossfade;
+			if ( mesh.blendMethod === SEA3D.AnimationBlendMethod.EASING ) {
 
-			if ( mesh.currentAnimation.weight > 1 ) {
+				delta *= mesh.easeSpeed;
 
-				mesh.previousAnimation.weight = 0;
-				mesh.currentAnimation.weight = 1;
+			}
 
-				if ( mesh.onCrossfadeComplete ) mesh.onCrossfadeComplete( mesh );
+			while ( len ) {
+
+				var state = mesh.animations[ -- len ];
+
+				if ( state.weight > 0 && state != mesh.currentAnimation ) {
+
+					if ( mesh.blendMethod === SEA3D.AnimationBlendMethod.LINEAR ) {
+
+						state.weight -= delta;
+
+					}
+					else if ( mesh.blendMethod === SEA3D.AnimationBlendMethod.EASING ) {
+
+						state.weight -= state.weight * delta;
+
+					}
+
+					if ( state.weight < 0 ) state.weight = 0;
+
+					weight -= state.weight;
+
+				}
+
+			}
+
+			if ( weight < 0 ) weight = 0;
+
+			mesh.currentAnimation.weight = weight;
+
+			if ( weight == 1 ) {
 
 				cf.splice( i, 1 );
 
 				delete mesh.crossfade;
 
+				if ( mesh.onCrossfadeComplete ) mesh.onCrossfadeComplete( mesh );
+
 			}
 			else ++ i;
-
-			mesh.previousAnimation.weight = 1 - mesh.currentAnimation.weight;
 
 		}
 
@@ -613,15 +636,40 @@ THREE.SEA3D.AnimationHandler = {
 
 	addCrossfade : function( mesh, crossfade ) {
 
-		if ( mesh.crossfade !== undefined ) {
+		var fadelist = THREE.SEA3D.AnimationHandler.crossfade;
 
-			THREE.SEA3D.AnimationHandler.crossfade.splice( THREE.SEA3D.AnimationHandler.crossfade.indexOf( mesh ), 1 );
+		if ( crossfade > 0 )
+		{
+
+			if ( ! mesh.crossfade ) fadelist.push( mesh );
+
+			mesh.crossfade = crossfade;
 
 		}
+		else
+		{
 
-		mesh.crossfade = crossfade;
+			var len = mesh.animations.length;
 
-		THREE.SEA3D.AnimationHandler.crossfade.push( mesh );
+			while ( len ) {
+
+				mesh.animations[ -- len ].weight = 0;
+
+			}
+
+			if ( mesh.crossfade ) {
+
+				fadelist.splice( fadelist.indexOf( mesh ), 1 );
+
+				delete mesh.crossfade;
+
+				if ( mesh.onCrossfadeComplete ) mesh.onCrossfadeComplete( mesh );
+
+			}
+
+			mesh.currentAnimation.weight = 1;
+
+		}
 
 	},
 
@@ -637,7 +685,7 @@ THREE.SEA3D.AnimationHandler = {
 
 		if ( index !== - 1 ) {
 
-			THREE.SEA3D.AnimationHandler.crossfade.splice( THREE.SEA3D.AnimationHandler.updates.indexOf( func ), 1 );
+			THREE.SEA3D.AnimationHandler.updates.splice( THREE.SEA3D.AnimationHandler.updates.indexOf( func ), 1 );
 
 		}
 
@@ -680,6 +728,7 @@ THREE.SEA3D.Animation.prototype.reset = function() {
 
 THREE.SEA3D.MTXBUF = new THREE.Matrix4();
 THREE.SEA3D.VECBUF = new THREE.Vector3();
+THREE.SEA3D.QUABUF = new THREE.Quaternion();
 
 THREE.SEA3D.prototype.setShadowMap = function( light, opacity ) {
 
@@ -687,7 +736,7 @@ THREE.SEA3D.prototype.setShadowMap = function( light, opacity ) {
 	light.shadowMapHeight = 2048;
 
 	light.castShadow = true;
-	light.shadowDarkness = opacity !== undefined ? opacity : 1;
+	light.shadowDarkness = opacity == undefined ? 1 : opacity;
 
 };
 
@@ -869,6 +918,8 @@ THREE.SEA3D.prototype.addSceneObject = function( sea ) {
 		sea.parent.tag.add( obj3d );
 	else if ( this.config.container )
 		this.config.container.add( obj3d );
+
+	obj3d.visible = sea.visible;
 
 };
 
@@ -1103,6 +1154,7 @@ THREE.SEA3D.prototype.readGeometryBuffer = function( sea ) {
 	for ( var i = 0; i < sea.groups.length; i ++ ) {
 
 		var g = sea.groups[ i ];
+
 		geo.addGroup( g.start, g.count, i );
 
 	}
@@ -1126,8 +1178,8 @@ THREE.SEA3D.prototype.readGeometryBuffer = function( sea ) {
 
 	if ( sea.joint ) {
 
-		geo.addAttribute( 'skinIndex', new THREE.Float32Attribute( sea.joint, 4 ) );
-		geo.addAttribute( 'skinWeight', new THREE.Float32Attribute( sea.weight, 4 ) );
+		geo.addAttribute( 'skinIndex', new THREE.Float32Attribute( sea.joint, sea.jointPerVertex ) );
+		geo.addAttribute( 'skinWeight', new THREE.Float32Attribute( sea.weight, sea.jointPerVertex ) );
 
 	}
 
@@ -1261,6 +1313,7 @@ THREE.SEA3D.prototype.readMesh = function( sea ) {
 		var mod = sea.modifiers[ i ];
 
 		switch ( mod.type ) {
+			case SEA3D.Skeleton.prototype.type:
 			case SEA3D.SkeletonLocal.prototype.type:
 				skeleton = mod;
 
@@ -1338,7 +1391,7 @@ THREE.SEA3D.prototype.readMesh = function( sea ) {
 
 	if ( skeleton ) {
 
-		mesh = new THREE.SEA3D.SkinnedMesh( geo, mat, false );
+		mesh = new THREE.SEA3D.SkinnedMesh( geo, mat, this.config.useVertexTexture );
 
 		if ( skeletonAnimation ) {
 
@@ -1401,7 +1454,7 @@ THREE.SEA3D.prototype.readSoundPoint = function( sea ) {
 
 	}
 
-	var sound3d = new THREE.Audio( this.audioListener );
+	var sound3d = new THREE.PositionalAudio( this.audioListener );
 
 	sound3d.load( sea.sound.tag );
 	sound3d.autoplay = sea.autoPlay;
@@ -1447,39 +1500,14 @@ THREE.SEA3D.prototype.readCubeRender = function( sea ) {
 
 THREE.SEA3D.prototype.readImage = function( sea ) {
 
-	var image = new Image(), texture = new THREE.Texture(), scope = this;
+	var image = new Image(), texture = new THREE.Texture();
+	image.src = this.bufferToTexture( sea.data.buffer );
 
 	texture.name = sea.name;
 	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 	texture.flipY = false;
-
-	image.onload = function () {
-
-		if ( ! scope.isPowerOfTwo( image.width ) ||
-			! scope.isPowerOfTwo( image.height ) ) {
-
-			var width = scope.nearestPowerOfTwo( image.width ),
-				height = scope.nearestPowerOfTwo( image.height );
-
-			var canvas = document.createElement( "canvas" );
-
-			canvas.width = width;
-			canvas.height = height;
-
-			var ctx = canvas.getContext( "2d" );
-
-			ctx.drawImage( image, 0, 0, width, height );
-
-			image = canvas;
-
-		}
-
-		texture.image = image;
-		texture.needsUpdate = true;
-
-	}
-
-	image.src = this.bufferToTexture( sea.data.buffer );
+	texture.image = image;
+	texture.needsUpdate = true;
 
 	this.domain.textures = this.textures = this.textures || [];
 	this.textures.push( this.objects[ "tex/" + sea.name ] = sea.tag = texture );
@@ -1555,7 +1583,7 @@ THREE.SEA3D.prototype.readSound = function( sea ) {
 
 THREE.SEA3D.prototype.readTextureURL = function( sea ) {
 
-	var texture = THREE.ImageUtils.loadTexture( sea.url );
+	var texture = new THREE.TextureLoader().load( sea.url );
 
 	texture.name = sea.name;
 	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -1571,6 +1599,15 @@ THREE.SEA3D.prototype.readTextureURL = function( sea ) {
 //
 
 THREE.SEA3D.SCRIPT = new SEA3D.ScriptManager();
+
+THREE.SEA3D.SCRIPT.dispatchUpdate = function( delta ) {
+
+	this.dispatchEvent( {
+		type : "update",
+		delta : delta
+	} );
+
+};
 
 THREE.SEA3D.Domain = function( id, objects, container, extensions ) {
 
@@ -1883,6 +1920,8 @@ THREE.SEA3D.prototype.materialTechnique =
 		if ( tech.blendMode == "multiply" ) mat.aoMap = tech.texture.tag;
 		else mat.lightMap = tech.texture.tag;
 
+		mat.lightMapUV = tech.channel;
+
 	}
 
 	return techniques;
@@ -2025,7 +2064,7 @@ THREE.SEA3D.prototype.readCamera = function( sea ) {
 	var camera = new THREE.SEA3D.Camera( sea.fov );
 	camera.name = sea.name;
 
-	this.domain.cameras = this.cameras = this.camera || [];
+	this.domain.cameras = this.cameras = this.cameras || [];
 	this.cameras.push( this.objects[ "cam/" + sea.name ] = sea.tag = camera );
 
 	this.addSceneObject( sea );
@@ -2083,8 +2122,7 @@ THREE.SEA3D.prototype.getSkeletonAnimation = function( sea, skl ) {
 	if ( sea.tag ) return sea.tag;
 
 	var animations = [],
-		delta = sea.frameRate / 1000,
-		scale = [ 1, 1, 1 ];
+		delta = ( 1000 / sea.frameRate ) / 1000;
 
 	for ( var i = 0; i < sea.sequence.length; i ++ ) {
 
@@ -2121,7 +2159,7 @@ THREE.SEA3D.prototype.getSkeletonAnimation = function( sea, skl ) {
 					time: time,
 					pos: [ raw[ idx ], raw[ idx + 1 ], raw[ idx + 2 ] ],
 					rot: [ raw[ idx + 3 ], raw[ idx + 4 ], raw[ idx + 5 ], raw[ idx + 6 ] ],
-					scl: scale
+					scl: [ 1, 1, 1 ]
 				} );
 
 				time += delta;
@@ -2387,7 +2425,7 @@ THREE.SEA3D.prototype.onHead = function( args ) {
 
 	if ( args.sign != 'TJS' ) {
 
-		throw "Sign '" + args.sign + "' not supported! Use SEA3D Studio to export.";
+		throw new Error( "Sign '" + args.sign + "' not supported! Use SEA3D Studio to publish or SEA3DLegacy.js" );
 
 	}
 
@@ -2401,6 +2439,7 @@ THREE.SEA3D.prototype.loadBytes = function( data ) {
 
 	this.file = new SEA3D.File();
 	this.file.scope = this;
+	this.file.config = this.config;
 	this.file.streaming = this.config.streaming;
 	this.file.timeLimit = this.config.timeLimit;
 	this.file.onProgress = this.onLoadProgress;

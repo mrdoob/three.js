@@ -109,16 +109,18 @@
 
 				// GROUND
 
+				var textureLoader = new THREE.TextureLoader();
+
 				var maxAnisotropy = renderer.getMaxAnisotropy();
 
-				var texture1 = THREE.ImageUtils.loadTexture( "textures/crate.gif" );
+				var texture1 = textureLoader.load( "textures/crate.gif" );
 				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 
 				texture1.anisotropy = maxAnisotropy;
 				texture1.wrapS = texture1.wrapT = THREE.RepeatWrapping;
 				texture1.repeat.set( 512, 512 );
 
-				var texture2 = THREE.ImageUtils.loadTexture( "textures/crate.gif" );
+				var texture2 = textureLoader.load( "textures/crate.gif" );
 				var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
 
 				texture2.anisotropy = 1;
@@ -196,15 +198,16 @@
 
 				camera.lookAt( scene1.position );
 
-				renderer.enableScissorTest( false );
 				renderer.clear();
-				renderer.enableScissorTest( true );
+				renderer.setScissorTest( true );
 
 				renderer.setScissor( 0, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene1, camera );
 
 				renderer.setScissor( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT  );
 				renderer.render( scene2, camera );
+
+				renderer.setScissorTest( false );
 
 
 			}

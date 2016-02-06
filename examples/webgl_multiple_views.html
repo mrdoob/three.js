@@ -207,7 +207,7 @@
 
 				var materials = [
 
-					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, shininess: 0 } ),
 					new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
 
 				];
@@ -286,7 +286,7 @@
 					var height = Math.floor( windowHeight * view.height );
 					renderer.setViewport( left, bottom, width, height );
 					renderer.setScissor( left, bottom, width, height );
-					renderer.enableScissorTest ( true );
+					renderer.setScissorTest( true );
 					renderer.setClearColor( view.background );
 
 					camera.aspect = width / height;

@@ -72,7 +72,7 @@ UI.Texture = function ( mapping ) {
 
 		}
 
-	}
+	};
 
 	this.dom = dom;
 	this.texture = null;
@@ -158,12 +158,12 @@ UI.Outliner = function ( editor ) {
 
 			if ( item.nextSibling === null ) {
 
-				editor.moveObject( object, editor.scene );
+				editor.execute( new MoveObjectCommand( object, editor.scene ) );
 
 			} else {
 
 				var nextObject = scene.getObjectById( item.nextSibling.value );
-				editor.moveObject( object, nextObject.parent, nextObject );
+				editor.execute( new MoveObjectCommand( object, nextObject.parent, nextObject ) );
 
 			}
 
@@ -171,48 +171,54 @@ UI.Outliner = function ( editor ) {
 	} );
 
 	// Broadcast for object selection after arrow navigation
-	var changeEvent = document.createEvent('HTMLEvents');
+	var changeEvent = document.createEvent( 'HTMLEvents' );
 	changeEvent.initEvent( 'change', true, true );
 
 	// Prevent native scroll behavior
-	dom.addEventListener( 'keydown', function (event) {
+	dom.addEventListener( 'keydown', function ( event ) {
 
 		switch ( event.keyCode ) {
 			case 38: // up
 			case 40: // down
-			event.preventDefault();
-			event.stopPropagation();
-			break;
+				event.preventDefault();
+				event.stopPropagation();
+				break;
 		}
 
-	}, false);
+	}, false );
 
 	// Keybindings to support arrow navigation
-	dom.addEventListener( 'keyup', function (event) {
+	dom.addEventListener( 'keyup', function ( event ) {
 
-		switch ( event.keyCode ) {
-			case 38: // up
-			case 40: // down
-			scope.selectedIndex += ( event.keyCode == 38 ) ? -1 : 1;
+		function select( index ) {
 
-			if ( scope.selectedIndex >= 0 && scope.selectedIndex < scope.options.length ) {
+			if ( index >= 0 && index < scope.options.length ) {
+
+				scope.selectedIndex = index;
 
 				// Highlight selected dom elem and scroll parent if needed
-				scope.setValue( scope.options[ scope.selectedIndex ].value );
-
+				scope.setValue( scope.options[ index ].value );
 				scope.dom.dispatchEvent( changeEvent );
 
 			}
 
-			break;
 		}
 
-	}, false);
+		switch ( event.keyCode ) {
+			case 38: // up
+				select( scope.selectedIndex - 1 );
+				break;
+			case 40: // down
+				select( scope.selectedIndex + 1 );
+				break;
+		}
+
+	}, false );
 
 	this.dom = dom;
 
 	this.options = [];
-	this.selectedIndex = -1;
+	this.selectedIndex = - 1;
 	this.selectedValue = null;
 
 	return this;
@@ -242,7 +248,7 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 		var option = options[ i ];
 
 		var div = document.createElement( 'div' );
-		div.className = 'option ' + ( option.static === true ? '': 'draggable' );
+		div.className = 'option ' + ( option.static === true ? '' : 'draggable' );
 		div.innerHTML = option.html;
 		div.value = option.value;
 		scope.dom.appendChild( div );
@@ -286,7 +292,7 @@ UI.Outliner.prototype.setValue = function ( value ) {
 
 			if ( this.dom.scrollTop > y ) {
 
-				this.dom.scrollTop = y
+				this.dom.scrollTop = y;
 
 			} else if ( this.dom.scrollTop < minScroll ) {
 
@@ -307,5 +313,36 @@ UI.Outliner.prototype.setValue = function ( value ) {
 	this.selectedValue = value;
 
 	return this;
+
+};
+
+UI.THREE = {};
+
+UI.THREE.Boolean = function ( boolean, text ) {
+
+	UI.Span.call( this );
+
+	this.setMarginRight( '10px' );
+
+	this.checkbox = new UI.Checkbox( boolean );
+	this.text = new UI.Text( text ).setMarginLeft( '3px' );
+
+	this.add( this.checkbox );
+	this.add( this.text );
+
+};
+
+UI.THREE.Boolean.prototype = Object.create( UI.Span.prototype );
+UI.THREE.Boolean.prototype.constructor = UI.THREE.Boolean;
+
+UI.THREE.Boolean.prototype.getValue = function () {
+
+	return this.checkbox.getValue();
+
+};
+
+UI.THREE.Boolean.prototype.setValue = function ( value ) {
+
+	return this.checkbox.setValue( value );
 
 };

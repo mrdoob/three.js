@@ -2,9 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.Modifiers = function ( signals, object ) {
+Sidebar.Geometry.Modifiers = function ( editor, object ) {
 
-	var container = new UI.Panel().setPaddingLeft( '90px' );
+	var signals = editor.signals;
+
+	var container = new UI.Row().setPaddingLeft( '90px' );
 
 	var geometry = object.geometry;
 
@@ -35,4 +37,4 @@ Sidebar.Geometry.Modifiers = function ( signals, object ) {
 
 	return container;
 
-}
+};

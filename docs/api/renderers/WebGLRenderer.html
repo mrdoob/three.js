@@ -98,11 +98,6 @@
 		<div>Default is THREE.CullFaceFront. The faces that needed to be culled. Possible values: THREE.CullFaceFront and THREE.CullFaceBack</div>
 
 
-		<h3>[page:Boolean shadowMapDebug]</h3>
-
-		<div>Default is false. If set, then the shadowmaps get a specific color to identify which shadow is from which shadowmap.</div>
-
-
 		<h3>[property:Boolean shadowMapCascade]</h3>
 
 		<div>Default is false. If Set, use cascaded shadowmaps. See [link:http://developer.download.nvidia.com/SDK/10.5/opengl/src/cascaded_shadow_maps/doc/cascaded_shadow_maps.pdf cascaded shadowmaps] for more information.</div>
@@ -169,8 +164,8 @@
 		Return a [page:Boolean] true if the context supports vertex textures.
 		</div>
 
-		<h3>[method:null setSize]( [page:Integer width], [page:Integer height] )</h3>
-		<div>Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0).</div>
+		<h3>[method:null setSize]( [page:Integer width], [page:Integer height], [page:Boolean updateStyle] )</h3>
+		<div>Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0). Setting updateStyle to true adds explicit pixel units to the output canvas style.</div>
 
 		<h3>[method:null setViewport]( [page:Integer x], [page:Integer y], [page:Integer width], [page:Integer height] )</h3>
 		<div>Sets the viewport to render from (x, y) to (x + width, y + height).</div>
@@ -179,8 +174,10 @@
 		<h3>[method:null setScissor]( [page:Integer x], [page:Integer y], [page:Integer width], [page:Integer height] )</h3>
 		<div>Sets the scissor area from (x, y) to (x + width, y + height).</div>
 
-		<h3>[method:null enableScissorTest]( [page:Boolean enable] )</h3>
-		<div>Enable the scissor test. When this is enabled, only the pixels within the defined scissor area will be affected by further renderer actions.</div>
+		<div>NOTE: The point (x, y) is the lower left corner of the area to be set for both of these methods. The area is defined from left to right in width but bottom to top in height. The sense of the vertical definition is opposite to the fill direction of an HTML canvas element.</div>
+
+		<h3>[method:null setScissorTest]( [page:Boolean boolean] )</h3>
+		<div>Enable or disable the scissor test. When this is enabled, only the pixels within the defined scissor area will be affected by further renderer actions.</div>
 
 		<h3>[method:null setClearColor]( [page:Color color], [page:Float alpha] )</h3>
 		<div>Sets the clear color and opacity.</div>
@@ -198,7 +195,7 @@
 		<div>Returns a [page:Float float] with the current clear alpha. Ranges from 0 to 1.</div>
 
 		<h3>[method:null clear]( [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
-		<div>Tells the renderer to clear its color, depth or stencil drawing buffer(s).</div>
+		<div>Tells the renderer to clear its color, depth or stencil drawing buffer(s). This method initializes the color buffer to the current clear color value.</div>
 		<div>Arguments default to true.</div>
 
 		<h3>[method:null renderBufferImmediate]( [page:Object3D object], [page:shaderprogram program], [page:Material shading] )</h3>
@@ -224,6 +221,9 @@
 		<div>The render is done to the renderTarget (if specified) or to the canvas as usual.</div>
 		<div>If forceClear is true, the depth, stencil and color buffers will be cleared before rendering even if the renderer's autoClear property is false.</div>
 		<div>Even with forceClear set to true you can prevent certain buffers being cleared by setting either the .autoClearColor, .autoClearStencil or .autoClearDepth properties to false.</div>
+
+		<h3>[method:null readRenderTargetPixels]( [page:WebGLRenderTarget renderTarget], [page:Float x], [page:Float y], [page:Float width], [page:Float height], buffer )</h3>
+		<div>Reads the pixel data from the renderTarget into the buffer you pass in. Buffer should be a Javascript Uint8Array instantiated with new Uint8Array( renderTargetWidth * renderTargetWidth * 4 ) to account for size and color information. This is a wrapper around gl.readPixels.</div>
 
 		<h3>[method:null renderImmediateObject]( camera, lights, fog, material, object )</h3>
 		<div>Renders an immediate Object using a camera.</div>

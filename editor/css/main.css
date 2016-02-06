@@ -6,7 +6,7 @@ body {
 }
 
 hr {
-	border: 0px;
+	border: 0;
 	border-top: 1px solid #ccc;
 }
 
@@ -42,14 +42,14 @@ textarea, input { outline: none; } /* osx */
 }
 
 	.Panel.Collapsible .Static {
-		margin: 0px;
+		margin: 0;
 	}
 
 	.Panel.Collapsible .Static .Button {
 		float: left;
 		margin-right: 6px;
-		width: 0px;
-		height: 0px;
+		width: 0;
+		height: 0;
 		border: 6px solid transparent;
 	}
 
@@ -88,71 +88,79 @@ textarea, input { outline: none; } /* osx */
 
 		color: #f00;
 		text-align: right;
-		padding: 0px 20px;
+		padding: 0 20px;
 
 	}
 
-/* scene types */
+/* outliner */
 
-.type {
+#outliner .type {
 	position:relative;
 	top:-2px;
-	padding: 0px 2px;
+	padding: 0 2px;
 	color: #ddd;
 }
-.type:after {
+
+#outliner .type:after {
 	content: '■';
 }
 
-.Scene {
+#outliner .Scene {
 	color: #ccccff;
 }
 
-.Object3D {
+#outliner .Object3D {
 	color: #aaaaee;
 }
 
-.Mesh {
+#outliner .Mesh {
 	color: #8888ee;
 }
 
-.Line {
+#outliner .Line {
 	color: #88ee88;
 }
 
-.LineSegments {
+#outliner .LineSegments {
 	color: #88ee88;
 }
 
-.Points {
+#outliner .Points {
 	color: #ee8888;
 }
 
 /* */
 
-.PointLight {
+#outliner .PointLight {
 	color: #dddd00;
 }
 
 /* */
 
-.Geometry {
+#outliner .Geometry {
 	color: #88ff88;
 }
 
-.BoxGeometry {
+#outliner .BoxGeometry {
 	color: #bbeebb;
 }
-.TorusGeometry {
+
+#outliner .TorusGeometry {
 	color: #aaeeaa;
 }
 
 /* */
 
-.Material {
+#outliner .Material {
 	color: #ff8888;
 }
 
-.MeshPhongMaterial {
+#outliner .MeshPhongMaterial {
 	color: #ffaa88;
+}
+
+/* */
+
+#outliner .Script:after {
+	content: '{...}' /* ❮/❯ */
 }

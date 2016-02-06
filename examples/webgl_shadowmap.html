@@ -41,10 +41,6 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/geometries/TextGeometry.js"></script>
-		<script src="js/utils/FontUtils.js"></script>
-		<script src="fonts/helvetiker_bold.typeface.js"></script>
-
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -64,7 +60,7 @@
 
 			var sceneHUD, cameraOrtho, hudMesh;
 
-			var morphs = [];
+			var mixer, morphs = [];
 
 			var light;
 
@@ -252,35 +248,38 @@
 
 				// TEXT
 
-				var textGeo = new THREE.TextGeometry( "THREE.JS", {
+				var loader = new THREE.FontLoader();
+				loader.load( 'fonts/helvetiker_bold.typeface.js', function ( font ) {
 
-					size: 200,
-					height: 50,
-					curveSegments: 12,
+					var textGeo = new THREE.TextGeometry( "THREE.JS", {
 
-					font: "helvetiker",
-					weight: "bold",
-					style: "normal",
+						font: font,
 
-					bevelThickness: 2,
-					bevelSize: 5,
-					bevelEnabled: true
+						size: 200,
+						height: 50,
+						curveSegments: 12,
 
-				});
+						bevelThickness: 2,
+						bevelSize: 5,
+						bevelEnabled: true
 
-				textGeo.computeBoundingBox();
-				var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+					});
 
-				var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
+					textGeo.computeBoundingBox();
+					var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
-				var mesh = new THREE.Mesh( textGeo, textMaterial );
-				mesh.position.x = centerOffset;
-				mesh.position.y = FLOOR + 67;
+					var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
 
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
+					var mesh = new THREE.Mesh( textGeo, textMaterial );
+					mesh.position.x = centerOffset;
+					mesh.position.y = FLOOR + 67;
 
-				scene.add( mesh );
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+
+					scene.add( mesh );
+
+				} );
 
 				// CUBES
 
@@ -306,6 +305,8 @@
 
 				// MORPHS
 
+				mixer = new THREE.AnimationMixer( scene );
+
 				function addMorph( geometry, speed, duration, x, y, z, fudgeColor ) {
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
@@ -319,10 +320,13 @@
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.speed = speed;
 
-					var mixer = new THREE.AnimationMixer( mesh );
-					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( duration ) );
-					mixer.update( 600 * Math.random() );
-					mesh.mixer = mixer;
+					var clip = geometry.animations[ 0 ];
+
+					mixer.clipAction( clip, mesh ).
+							setDuration( duration ).
+							// to shift the playback out of phase:
+							startAt( - duration * Math.random() ).
+							play();
 
 					mesh.position.set( x, y, z );
 					mesh.rotation.y = Math.PI/2;
@@ -383,11 +387,11 @@
 
 				var delta = clock.getDelta();
 
+				mixer.update( delta );
+
 				for ( var i = 0; i < morphs.length; i ++ ) {
 
 					morph = morphs[ i ];
-
-					morph.mixer.update( delta );
 
 					morph.position.x += morph.speed * delta;
 

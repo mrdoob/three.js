@@ -65,11 +65,11 @@
 				geometry.scale( - 1, 1, 1 );
 
 				var material = new THREE.MeshBasicMaterial( {
-					map: THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' )
+					map: new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' )
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );
-				
+
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();

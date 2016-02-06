@@ -2,8 +2,8 @@
 <html lang="en">
 	<head>
 		<title> three.js webgl - ShadowMesh </title>
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				background-color: rgb(0, 0, 0);
@@ -66,6 +66,7 @@
 			function init() {
 
 				renderer.setClearColor( 'rgb(0,150,255)' );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.getElementById( "container" ).appendChild( renderer.domElement );
 				window.addEventListener( 'resize' , onWindowResize, false );
@@ -162,7 +163,7 @@
 
 				// YELLOW PYRAMID and PYRAMID'S SHADOW
 				var pyramidGeometry = new THREE.CylinderGeometry( 0, 0.5, 2, 4 );
-				var pyramidMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, shading: THREE.FlatShading } );
+				var pyramidMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, shading: THREE.FlatShading, shininess: 0 } );
 				pyramid = new THREE.Mesh( pyramidGeometry, pyramidMaterial );
 				pyramid.position.set( - 4, 1, 2 );
 				scene.add( pyramid );

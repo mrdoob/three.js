@@ -49,7 +49,7 @@
 
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-				gl_PointSize = size * ( 150.0 / length( mvPosition.xyz ) );
+				gl_PointSize = size * ( 150.0 / -mvPosition.z );
 
 				gl_Position = projectionMatrix * mvPosition;
 
@@ -210,7 +210,7 @@
 
 			//
 
-			var texture = THREE.ImageUtils.loadTexture( "textures/sprites/ball.png" );
+			var texture = new THREE.TextureLoader().load( "textures/sprites/ball.png" );
 			texture.wrapS = THREE.RepeatWrapping;
 			texture.wrapT = THREE.RepeatWrapping;
 

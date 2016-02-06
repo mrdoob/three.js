@@ -170,8 +170,8 @@
 		// rotate a mesh towards a target quaternion
 		mesh.quaternion.slerp( endQuaternion, 0.01 );
 		</code>
-		
-		
+
+
 		<h2>Static Methods</h2>
 
 		<h3>[method:Quaternion slerp]( [page:Quaternion qStart], [page:Quaternion qEnd], [page:Quaternion qTarget], [page:Float t] )</h3>
@@ -195,7 +195,7 @@
 		t = ( t + 0.01 ) % 1; // constant angular momentum
 		THREE.Quaternion.slerp( startQuaternion, endQuaternion, mesh.quaternion, t );
 		</code>
-		
+
 		<!-- Note: Do not add non-static methods to the bottom of this page. Put them above the <h2>Static Methods</h2> -->
 
 		<h2>Source</h2>

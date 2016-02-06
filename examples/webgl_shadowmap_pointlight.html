@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - PointLight ShadowMap </title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				font-family: Monospace;
@@ -75,7 +76,6 @@
 					pointLight.shadowMapWidth = 2048;
 					pointLight.shadowMapHeight = 1024;
 					pointLight.shadowBias = 0.01;
-					pointLight.shadowDarkness = 0.5;
 
 					var geometry = new THREE.SphereGeometry( 0.3, 32, 32 );
 					var material = new THREE.MeshBasicMaterial( { color: color } );
@@ -163,8 +163,9 @@
 			function initMisc() {
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.BasicShadowMap;
 

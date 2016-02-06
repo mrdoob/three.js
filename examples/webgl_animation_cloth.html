@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - cloth simulation</title>
@@ -180,13 +180,13 @@
 
 				// cloth material
 
-				var clothTexture = THREE.ImageUtils.loadTexture( 'textures/patterns/circuit_pattern.png' );
+				var loader = new THREE.TextureLoader();
+				var clothTexture = loader.load( 'textures/patterns/circuit_pattern.png' );
 				clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
 				clothTexture.anisotropy = 16;
 
 				var clothMaterial = new THREE.MeshPhongMaterial( {
 					specular: 0x030303,
-					emissive: 0x111111,
 					map: clothTexture,
 					side: THREE.DoubleSide,
 					alphaTest: 0.5
@@ -226,7 +226,7 @@
 
 				// ground
 
-				var groundTexture = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg" );
+				var groundTexture = loader.load( "textures/terrain/grasslight-big.jpg" );
 				groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
 				groundTexture.repeat.set( 25, 25 );
 				groundTexture.anisotropy = 16;

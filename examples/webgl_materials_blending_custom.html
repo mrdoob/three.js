@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - materials - custom blending</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				margin: 0px;
@@ -103,6 +104,10 @@
 
 				scene = new THREE.Scene();
 
+				// TEXTURE LOADER
+
+				var textureLoader = new THREE.TextureLoader();
+
 				// BACKGROUND IMAGES
 
 				var x = document.createElement( "canvas" );
@@ -148,23 +153,23 @@
 				mapBg1.repeat.set( 128, 64 );
 				mapBg1.needsUpdate = true;
 
-				var mapBg2 = THREE.ImageUtils.loadTexture( "textures/disturb.jpg" );
+				var mapBg2 = textureLoader.load( "textures/disturb.jpg" );
 				mapBg2.wrapS = mapBg2.wrapT = THREE.RepeatWrapping;
 				mapBg2.repeat.set( 8, 4 );
 
-				var mapBg3 = THREE.ImageUtils.loadTexture( "textures/crate.gif" );
+				var mapBg3 = textureLoader.load( "textures/crate.gif" );
 				mapBg3.wrapS = mapBg3.wrapT = THREE.RepeatWrapping;
 				mapBg3.repeat.set( 32, 16 );
 
-				var mapBg4 = THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" );
+				var mapBg4 = textureLoader.load( "textures/lava/lavatile.jpg" );
 				mapBg4.wrapS = mapBg4.wrapT = THREE.RepeatWrapping;
 				mapBg4.repeat.set( 8, 4 );
 
-				var mapBg5 = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
+				var mapBg5 = textureLoader.load( "textures/water.jpg" );
 				mapBg5.wrapS = mapBg5.wrapT = THREE.RepeatWrapping;
 				mapBg5.repeat.set( 8, 4 );
 
-				var mapBg6 = THREE.ImageUtils.loadTexture( "textures/lava/cloud.png" );
+				var mapBg6 = textureLoader.load( "textures/lava/cloud.png" );
 				mapBg6.wrapS = mapBg6.wrapT = THREE.RepeatWrapping;
 				mapBg6.repeat.set( 2, 1 );
 
@@ -188,21 +193,17 @@
 
 				for ( var i = 0; i < images.length; i ++ ) {
 
-					var map = THREE.ImageUtils.loadTexture( images[ i ] );
+					var map = textureLoader.load( images[ i ] );
+					mapsNoPre.push( map );
 
-					var mapPre = map.clone();
-
+					var mapPre = textureLoader.load( images[ i ] );
 					mapPre.premultiplyAlpha = true;
 					mapPre.needsUpdate = true;
-
-					mapsNoPre.push( map );
 					mapsPre.push( mapPre );
 
 				}
 
 				// FOREGROUND OBJECTS
-
-				var blendings = [ "NoBlending", "NormalBlending", "AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "AdditiveAlphaBlending" ];
 
 				var src = [ "ZeroFactor", "OneFactor", "SrcAlphaFactor", "OneMinusSrcAlphaFactor", "DstAlphaFactor", "OneMinusDstAlphaFactor", "DstColorFactor", "OneMinusDstColorFactor", "SrcAlphaSaturateFactor" ];
 				var dst = [ "ZeroFactor", "OneFactor", "SrcColorFactor", "OneMinusSrcColorFactor", "SrcAlphaFactor", "OneMinusSrcAlphaFactor", "DstAlphaFactor", "OneMinusDstAlphaFactor" ];
