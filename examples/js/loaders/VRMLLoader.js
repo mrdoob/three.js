@@ -203,6 +203,8 @@ THREE.VRMLLoader.prototype = {
 
 			};
 
+			var index = [];
+
 			var parseProperty = function ( node, line ) {
 
 				var parts = [], part, property = {}, fieldName;
@@ -213,7 +215,7 @@ THREE.VRMLLoader.prototype = {
 				 */
 				var regex = /[^\s,\[\]]+/g;
 
-				var point, index, angles, colors;
+				var point, angles, colors;
 
 				while ( null != ( part = regex.exec( line ) ) ) {
 
@@ -255,8 +257,6 @@ THREE.VRMLLoader.prototype = {
 					// the parts hold the indexes as strings
 					if ( parts.length > 0 ) {
 
-						index = [];
-
 						for ( var ind = 0; ind < parts.length; ind ++ ) {
 
 							// the part should either be positive integer or -1
@@ -290,6 +290,15 @@ THREE.VRMLLoader.prototype = {
 
 					// end
 					if ( /]/.exec( line ) ) {
+
+						if ( index.length > 0 ) {
+
+							this.indexes.push( index );
+
+						}
+
+						// start new one
+						index = [];
 
 						this.isRecordingFaces = false;
 						node[this.recordingFieldname] = this.indexes;
