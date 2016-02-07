@@ -54,7 +54,6 @@ NUMERIC = {
 JSON = 'json'
 EXTENSION = '.%s' % JSON
 INDENT = 'indent'
-COMPACT_SEPARATORS = 'compactSeparators'
 
 
 MATERIALS = 'materials'
@@ -163,8 +162,7 @@ EXPORT_OPTIONS = {
     EMBED_ANIMATION: True,
     GEOMETRY_TYPE: GEOMETRY,
     INFLUENCES_PER_VERTEX: 2,
-    INDENT: True,
-    COMPACT_SEPARATORS: False
+    INDENT: True
 }
 
 
