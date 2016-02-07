@@ -59,7 +59,7 @@
 		var effect;
 		var renderer;
 		var scene;
-		var TwitchStream = false;
+		var vrMode = false;
 
 		function init() {
 
@@ -159,7 +159,7 @@
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
 
-			if (TwitchStream) {
+			if (vrMode) {
 
 				effect.setSize(window.innerWidth, window.innerHeight);
 
@@ -179,7 +179,7 @@
 
 			if ( !fsElement ) {
 
-				TwitchStream = false;
+				vrMode = false;
 
 			} else {
 
@@ -191,7 +191,7 @@
 
 		function animate() {
 
-			if ( TwitchStream ) {
+			if ( vrMode ) {
 
 				effect.render( scene, camera );
 
@@ -209,7 +209,7 @@
 
 		document.querySelector( '#VrMode' ).addEventListener( 'click', function() {
 
-			TwitchStream = TwitchStream ? false : true;
+			vrMode = vrMode ? false : true;
 			requestFullscreen();
 			onWindowResize();
 
