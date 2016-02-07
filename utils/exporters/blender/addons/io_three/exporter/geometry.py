@@ -389,9 +389,11 @@ class Geometry(base_classes.BaseNode):
                      api.mesh.buffer_position, 3)
         uvs_tuple = (constants.UV, option_uvs,
                      api.mesh.buffer_uv, 2)
+        uvs2_tuple = (constants.UV2, option_uvs,
+                     lambda m: api.mesh.buffer_uv(m, layer=1), 2)
         normals_tuple = (constants.NORMAL, option_normals,
                          api.mesh.buffer_normal, 3)
-        dispatch = (pos_tuple, uvs_tuple, normals_tuple)
+        dispatch = (pos_tuple, uvs_tuple, uvs2_tuple, normals_tuple)
 
         for key, option, func, size in dispatch:
 
