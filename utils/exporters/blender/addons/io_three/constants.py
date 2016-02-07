@@ -224,6 +224,7 @@ ATTRIBUTES = 'attributes'
 NORMAL = 'normal'
 ITEM_SIZE = 'itemSize'
 ARRAY = 'array'
+GROUPS = 'groups'
 
 FLOAT_32 = 'Float32Array'
 
@@ -333,6 +334,7 @@ SIDE_DOUBLE = 2
 THREE_BASIC = 'MeshBasicMaterial'
 THREE_LAMBERT = 'MeshLambertMaterial'
 THREE_PHONG = 'MeshPhongMaterial'
+THREE_MULTI = 'MultiMaterial'
 
 INTENSITY = 'intensity'
 DISTANCE = 'distance'

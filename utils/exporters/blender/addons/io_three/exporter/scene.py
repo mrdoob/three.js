@@ -101,6 +101,10 @@ class Scene(base_classes.BaseScene):
         if self.options.get(constants.MAPS):
             self._parse_textures()
 
+        # this is an important step. please refer to the doc string
+        # on the function for more information
+        api.object.prep_meshes(self.options)
+
         if self.options.get(constants.MATERIALS):
             self._parse_materials()
 
@@ -181,9 +185,6 @@ class Scene(base_classes.BaseScene):
         """Locate all geometry nodes and parse them"""
         logger.debug("Scene()._parse_geometries()")
 
-        # this is an important step. please refer to the doc string
-        # on the function for more information
-        api.object.prep_meshes(self.options)
         geometries = []
 
         # now iterate over all the extracted mesh nodes and parse each one
@@ -200,10 +201,24 @@ class Scene(base_classes.BaseScene):
         """Locate all non-orphaned materials and parse them"""
         logger.debug("Scene()._parse_materials()")
         materials = []
+        root_uuid_mats = set()
 
-        for material_name in api.material.used_materials():
-            logger.info("Parsing material %s", material_name)
-            materials.append(material.Material(material_name, parent=self))
+        for mesh in api.object.extracted_meshes():
+            mesh_materials = api.mesh.materials(mesh)
+            mat = None
+
+            if len(mesh_materials) > 1:
+                mat = material.MultiMaterial(','.join([m.name for m in mesh_materials]))
+
+                for sub_mat in mesh_materials:
+                    mat.materials.append(material.Material(sub_mat.name, parent=self))
+
+            elif len(mesh_materials) == 1:
+                mat = material.Material(mesh_materials[0].name, parent=self)
+
+            if mat and not mat[constants.UUID] in root_uuid_mats:
+                root_uuid_mats.add(mat[constants.UUID])
+                materials.append(mat)
 
         logger.info("Added %d material nodes", len(materials))
         self[constants.MATERIALS] = materials

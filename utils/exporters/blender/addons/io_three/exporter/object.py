@@ -88,7 +88,13 @@ class Object(base_classes.BaseNode):
 
         if self.options.get(constants.MATERIALS):
             logger.info("Parsing materials for %s", self.node)
-            material_name = api.object.material(self.node)
+
+            material_name = None
+            if self[constants.TYPE] == constants.MESH:
+                mesh = api.object.mesh(self.node, self.options)
+                mesh_materials = api.mesh.materials(mesh)
+                material_name = ','.join([m.name for m in mesh_materials])
+
             if material_name:
                 logger.info("Material found %s", material_name)
                 material_inst = self.scene.material(material_name)
