@@ -86,7 +86,7 @@ function Scene ( type, numObjects, cameraZ, fov, rotationSpeed, clearColor ) {
 	this.scene.add( light );
 
 	this.rotationSpeed = rotationSpeed;
-	defaultMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors	} );
+	defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } );
 	this.mesh = new THREE.Mesh( generateGeometry( type, numObjects ), defaultMaterial );
 	this.scene.add( this.mesh );
 

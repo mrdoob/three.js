@@ -1,17 +1,13 @@
-uniform vec3 ambientLightColor;
-
-vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
-
-	return PI * ambientLightColor;
-
-}
-
 #if NUM_DIR_LIGHTS > 0
 
 	struct DirectionalLight {
-	  vec3 direction;
-	  vec3 color;
-	  int shadow;
+		vec3 direction;
+		vec3 color;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
 	};
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
@@ -33,11 +29,15 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 #if NUM_POINT_LIGHTS > 0
 
 	struct PointLight {
-	  vec3 position;
-	  vec3 color;
-	  float distance;
-	  float decay;
-	  int shadow;
+		vec3 position;
+		vec3 color;
+		float distance;
+		float decay;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
 	};
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
@@ -62,14 +62,18 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 #if NUM_SPOT_LIGHTS > 0
 
 	struct SpotLight {
-	  vec3 position;
-	  vec3 direction;
-	  vec3 color;
-	  float distance;
-	  float decay;
-	  float angleCos;
-	  float exponent;
-	  int shadow;
+		vec3 position;
+		vec3 direction;
+		vec3 color;
+		float distance;
+		float decay;
+		float angleCos;
+		float penumbra;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
 	};
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
@@ -86,7 +90,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		if ( spotEffect > spotLight.angleCos ) {
 
 			float spotEffect = dot( spotLight.direction, directLight.direction );
-			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
+			spotEffect *= clamp( ( spotEffect - spotLight.angleCos ) / spotLight.penumbra, 0.0, 1.0 );
 
 			directLight.color = spotLight.color;
 			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
@@ -107,9 +111,9 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 #if NUM_HEMI_LIGHTS > 0
 
 	struct HemisphereLight {
-	  vec3 direction;
-	  vec3 skyColor;
-	  vec3 groundColor;
+		vec3 direction;
+		vec3 skyColor;
+		vec3 groundColor;
 	};
 
 	uniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];

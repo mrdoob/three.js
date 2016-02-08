@@ -221,13 +221,13 @@ THREE.MMDLoader.prototype.mergeVmds = function ( vmds ) {
 
 };
 
-THREE.MMDLoader.prototype.pourVmdIntoModel = function ( mesh, vmd ) {
+THREE.MMDLoader.prototype.pourVmdIntoModel = function ( mesh, vmd, name ) {
 
-	this.createAnimation( mesh, vmd );
+	this.createAnimation( mesh, vmd, name );
 
 };
 
-THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd ) {
+THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd, name ) {
 
 	var helper = new THREE.MMDLoader.DataCreationHelper();
 
@@ -295,7 +295,7 @@ THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd ) {
 
 		}
 
-		camera.animations.push( new THREE.AnimationClip( 'cameraAnimation', -1, tracks ) );
+		camera.animations.push( new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name, -1, tracks ) );
 
 	};
 
@@ -1693,7 +1693,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	var scope = this;
 	var geometry = new THREE.Geometry();
-        var material = new THREE.MeshFaceMaterial();
+        var material = new THREE.MultiMaterial();
 	var helper = new THREE.MMDLoader.DataCreationHelper();
 
 	var initVartices = function () {
@@ -1998,20 +1998,27 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			}
 
-			var isSphericalReflectionMapping = params.sphericalReflectionMapping;
 			var texture = loader.load( fullPath, function ( t ) {
 
 				t.flipY = false;
 				t.wrapS = THREE.RepeatWrapping;
 				t.wrapT = THREE.RepeatWrapping;
 
-				if ( isSphericalReflectionMapping === true ) {
+				if ( params.sphericalReflectionMapping === true ) {
 
 					t.mapping = THREE.SphericalReflectionMapping;
 
 				}
 
+				for ( var i = 0; i < texture.readyCallbacks.length; i++ ) {
+
+					texture.readyCallbacks[ i ]( texture );
+
+				}
+
 			} );
+
+			texture.readyCallbacks = [];
 
 			var uuid = THREE.Math.generateUUID();
 
@@ -2036,6 +2043,9 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				type: 'MMDMaterial'
 
 			};
+
+			params.faceOffset = offset;
+			params.faceNum = m.faceCount;
 
 			for ( var j = 0; j < m.faceCount; j++ ) {
 
@@ -2062,12 +2072,17 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			params.specular = color.fromArray( [ m.specular[ 0 ], m.specular[ 1 ], m.specular[ 2 ] ] ).getHex();
 			params.shininess = m.shininess;
 
-			// Note: always transparent so far.
-			//if ( params.opacity < 1 ) {
+			if ( params.opacity === 1.0 ) {
 
+				params.side = THREE.FrontSide;
+				params.transparent = false;
+
+			} else {
+
+				params.side = THREE.DoubleSide;
 				params.transparent = true;
 
-			//}
+			}
 
 			if ( model.metadata.format === 'pmd' ) {
 
@@ -2146,7 +2161,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			}
 
-			if ( params.map === undefined ) {
+			// TODO: check if this logic is right
+			if ( params.map === undefined /* && params.envMap === undefined */ ) {
 
 				params.emissive = color.fromArray( [ m.emissive[ 0 ], m.emissive[ 1 ], m.emissive[ 2 ] ] ).getHex();
 
@@ -2169,8 +2185,11 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			var p2 = model.materials[ i ];
 			var m = materialLoader.parse( p );
 
-			m.skinning = true;
-			m.morphTargets = true;
+			m.faceOffset = p.faceOffset;
+			m.faceNum = p.faceNum;
+
+			m.skinning = geometry.bones.length > 0 ? true : false;
+			m.morphTargets = geometry.morphTargets.length > 0 ? true : false;
 			m.lights = true;
 
 			m.blending = THREE.CustomBlending;
@@ -2179,9 +2198,136 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			m.blendSrcAlpha = THREE.SrcAlphaFactor;
 			m.blendDstAlpha = THREE.DstAlphaFactor;
 
-			if ( p.envMap !== undefined ) {
+			if ( m.map !== null ) {
+
+				// Check if this part of the texture image the material uses requires transparency
+				function checkTextureTransparency ( m ) {
+
+					m.map.readyCallbacks.push( function ( t ) {
+
+						// Is there any efficient ways?
+						function createImageData ( image ) {
+
+							var c = document.createElement( 'canvas' );
+							c.width = image.width;
+							c.height = image.height;
+
+							var ctx = c.getContext( '2d' );
+							ctx.drawImage( image, 0, 0 );
+
+							return ctx.getImageData( 0, 0, c.width, c.height );
+
+						};
+
+						function detectTextureTransparency ( image, uvs ) {
+
+							var width = image.width;
+							var height = image.height;
+							var data = image.data;
+							var threshold = 253;
+
+							if ( data.length / ( width * height ) !== 4 ) {
+
+								return false;
+
+							}
+
+							for ( var i = 0; i < uvs.length; i++ ) {
+
+								var centerUV = { x: 0.0, y: 0.0 };
+
+								for ( var j = 0; j < 3; j++ ) {
+
+									var uv = uvs[ i ][ j ];
+
+									if ( getAlphaByUv( image, uv ) < threshold ) {
+
+										return true;
+
+									}
+
+									centerUV.x += uv.x;
+									centerUV.y += uv.y;
+
+								}
+
+								centerUV.x /= 3;
+								centerUV.y /= 3;
+
+
+								if ( getAlphaByUv( image, centerUV ) < threshold ) {
+
+									return true;
+
+								}
+
+							}
+
+							return false;
+
+						};
+
+						/*
+						 * This method expects
+						 *   t.flipY = false
+						 *   t.wrapS = THREE.RepeatWrapping
+						 *   t.wrapT = THREE.RepeatWrapping
+						 * TODO: more precise
+						 */
+						function getAlphaByUv ( image, uv ) {
+
+							var width = image.width;
+							var height = image.height;
+
+							var x = Math.round( uv.x * width ) % width;
+							var y = Math.round( uv.y * height ) % height;
+
+							if ( x < 0 ) {
+
+								x += width;
+
+							}
+
+							if ( y < 0 ) {
+
+								y += height;
+
+							}
+
+							var index = y * width + x;
+
+							return image.data[ index * 4 + 3 ];
+
+						};
+
+						var imageData = t.image.data !== undefined ? t.image : createImageData( t.image );
+						var uvs = geometry.faceVertexUvs[ 0 ].slice( m.faceOffset, m.faceOffset + m.faceNum );
+
+						m.textureTransparency = detectTextureTransparency( imageData, uvs );
+
+					} );
+
+				}
+
+				checkTextureTransparency( m );
+
+			}
+
+			if ( m.envMap !== null ) {
+
+				// TODO: WebGLRenderer should automatically update?
+				function updateMaterialWhenTextureIsReady ( m ) {
+
+					m.envMap.readyCallbacks.push( function ( t ) {
+
+						m.needsUpdate = true;
+
+					} );
+
+				}
 
 				m.combine = p.envMapType;
+				updateMaterialWhenTextureIsReady( m );
 
 			}
 
@@ -2219,11 +2365,17 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				m.uniforms.toonMap.value = textures[ p2.toonIndex ];
 				m.uniforms.celShading.value = 1;
 
-				// temporal workaround
-				// TODO: handle correctly
-				var n = model.toonTextures[ p2.toonIndex === -1 ? 0 : p2.toonIndex ].fileName;
-				var uuid = loadTexture( n, { defaultTexturePath: isDefaultToonTexture( n ) } );
-				m.uniforms.toonMap.value = textures[ uuid ];
+				if ( p2.toonIndex === -1 ) {
+
+					m.uniforms.hasToonTexture.value = 0;
+
+				} else {
+
+					var n = model.toonTextures[ p2.toonIndex ].fileName;
+					var uuid = loadTexture( n, { defaultTexturePath: isDefaultToonTexture( n ) } );
+					m.uniforms.toonMap.value = textures[ uuid ];
+					m.uniforms.hasToonTexture.value = 1;
+				}
 
 			} else {
 
@@ -2232,29 +2384,92 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				m.uniforms.outlineAlpha.value = p2.edgeColor[ 3 ];
 				m.uniforms.celShading.value = 1;
 
-				// temporal workaround
-				// TODO: handle correctly
-				var index = p2.toonIndex === -1 ? -1 : p2.toonIndex;
-				var flag = p2.toonIndex === -1 ? 1 : p2.toonFlag;
+				if ( p2.toonIndex === -1 ) {
 
-				if ( flag === 0 ) {
-
-					var n = model.textures[ index ];
-					var uuid = loadTexture( n );
-					m.uniforms.toonMap.value = textures[ uuid ];
+					m.uniforms.hasToonTexture.value = 0;
 
 				} else {
 
-					var num = index + 1;
-					var fileName = 'toon' + ( num < 10 ? '0' + num : num ) + '.bmp';
-					var uuid = loadTexture( fileName, { defaultTexturePath: true } );
-					m.uniforms.toonMap.value = textures[ uuid ];
+					if ( p2.toonFlag === 0 ) {
+
+						var n = model.textures[ p2.toonIndex ];
+						var uuid = loadTexture( n );
+						m.uniforms.toonMap.value = textures[ uuid ];
+
+					} else {
+
+						var num = p2.toonIndex + 1;
+						var fileName = 'toon' + ( num < 10 ? '0' + num : num ) + '.bmp';
+						var uuid = loadTexture( fileName, { defaultTexturePath: true } );
+						m.uniforms.toonMap.value = textures[ uuid ];
+
+					}
+
+					m.uniforms.hasToonTexture.value = 1;
 
 				}
 
 			}
 
 			material.materials.push( m );
+
+		}
+
+		if ( model.metadata.format === 'pmx' ) {
+
+			function checkAlphaMorph ( morph, elements ) {
+
+				if ( morph.type !== 8 ) {
+
+					return;
+
+				}
+
+				for ( var i = 0; i < elements.length; i++ ) {
+
+					var e = elements[ i ];
+
+					if ( e.index === -1 ) {
+
+						continue;
+
+					}
+
+					var m = material.materials[ e.index ];
+
+					if ( m.opacity !== e.diffuse[ 3 ] ) {
+
+						m.morphTransparency = true;
+
+					}
+
+				}
+
+			}
+
+			for ( var i = 0; i < model.morphs.length; i++ ) {
+
+				var morph = model.morphs[ i ];
+				var elements = morph.elements;
+
+				if ( morph.type === 0 ) {
+
+					for ( var j = 0; j < elements.length; j++ ) {
+
+						var morph2 = model.morphs[ elements[ j ].index ];
+						var elements2 = morph2.elements;
+
+						checkAlphaMorph( morph2, elements2 );
+
+					}
+
+				} else {
+
+					checkAlphaMorph( morph, elements );
+
+				}
+
+			}
 
 		}
 
@@ -2319,7 +2534,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			var bodyB = rigidBodies[ p.rigidBodyIndex2 ];
 
 			/*
-			 * Refer http://www20.atpages.jp/katwat/wp/?p=4135 
+			 * Refer http://www20.atpages.jp/katwat/wp/?p=4135
 			 * for what this is for
 			 */
 			if ( bodyA.type !== 0 && bodyB.type === 2 ) {
@@ -2383,7 +2598,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 };
 
-THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd ) {
+THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 	var scope = this;
 
@@ -2391,13 +2606,18 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd ) {
 
 	var initMotionAnimations = function () {
 
+		if ( vmd.metadata.motionCount === 0 ) {
+
+			return;
+
+		}
+
 		var bones = mesh.geometry.bones;
 		var orderedMotions = helper.createOrderedMotionArrays( bones, vmd.motions, 'boneName' );
 
 		var animation = {
-			name: 'Action',
+			name: name === undefined ? THREE.Math.generateUUID() : name,
 			fps: 30,
-			length: 0.0,
 			hierarchy: []
 		};
 
@@ -2411,8 +2631,6 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd ) {
 			);
 
 		}
-
-		var maxTime = 0.0;
 
 		for ( var i = 0; i < orderedMotions.length; i++ ) {
 
@@ -2430,17 +2648,7 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd ) {
 
 			}
 
-			if ( keys.length > 0 ) {
-
-				maxTime = Math.max( keys[ keys.length - 1 ].time, maxTime );
-
-			}
-
 		}
-
-		// add 2 secs as afterglow
-		maxTime += 2.0;
-		animation.length = maxTime;
 
 		for ( var i = 0; i < orderedMotions.length; i++ ) {
 
@@ -2451,25 +2659,34 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd ) {
 
 		}
 
-//		mesh.geometry.animation = animation;
-
 		if ( mesh.geometry.animations === undefined ) {
 
 			mesh.geometry.animations = [];
 
 		}
 
-		mesh.geometry.animations.push( THREE.AnimationClip.parseAnimation( animation, mesh.geometry.bones ) );
+		var clip = THREE.AnimationClip.parseAnimation( animation, mesh.geometry.bones );
+
+		if ( clip !== null ) {
+
+			mesh.geometry.animations.push( clip );
+
+		}
 
 	};
 
 	var initMorphAnimations = function () {
 
+		if ( vmd.metadata.morphCount === 0 ) {
+
+			return;
+
+		}
+
 		var orderedMorphs = helper.createOrderedMotionArrays( mesh.geometry.morphTargets, vmd.morphs, 'morphName' );
 
 		var morphAnimation = {
 			fps: 30,
-			length: 0.0,
 			hierarchy: []
 		};
 
@@ -2478,8 +2695,6 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd ) {
 			morphAnimation.hierarchy.push( { keys: [] } );
 
 		}
-
-		var maxTime = 0.0;
 
 		for ( var i = 0; i < orderedMorphs.length; i++ ) {
 
@@ -2495,43 +2710,37 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd ) {
 
 			}
 
-			if ( keys.length > 0 ) {
-
-				maxTime = Math.max( keys[ keys.length - 1 ].time, maxTime );
-
-			}
-
-		}
-
-		// add 2 secs as afterglow
-		maxTime += 2.0;
-		morphAnimation.length = maxTime;
-
-		for ( var i = 0; i < orderedMorphs.length; i++ ) {
-
-			var keys = morphAnimation.hierarchy[ i ].keys;
-			helper.insertAnimationKeyAtTimeZero( keys, 0.0 );
-			helper.insertStartAnimationKey( keys );
-
-		}
-
-//		geometry.morphAnimation = morphAnimation;
-
-		if ( mesh.geometry.morphAnimations === undefined ) {
-
-			mesh.geometry.morphAnimations = [];
-
 		}
 
 		var tracks = [];
 
 		for ( var i = 0; i < orderedMorphs.length; i++ ) {
 
-			tracks.push( helper.generateTrackFromAnimationKeys( morphAnimation.hierarchy[ i ].keys, 'NumberKeyframeTrackEx', '.morphTargetInfluences[' + i + ']' ) );
+			var keys = morphAnimation.hierarchy[ i ].keys;
+
+			if ( keys.length === 0 ) {
+
+				continue;
+
+			}
+
+			tracks.push( helper.generateTrackFromAnimationKeys( keys, 'NumberKeyframeTrackEx', '.morphTargetInfluences[' + i + ']' ) );
 
 		}
 
-		mesh.geometry.morphAnimations.push( new THREE.AnimationClip( 'morphAnimation', -1, tracks ) );
+		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name + 'Morph', -1, tracks );
+
+		if ( clip !== null ) {
+
+			if ( mesh.geometry.morphAnimations === undefined ) {
+
+				mesh.geometry.morphAnimations = [];
+
+			}
+
+			mesh.geometry.morphAnimations.push( clip );
+
+		}
 
 	};
 
@@ -3002,7 +3211,6 @@ THREE.MMDLoader.VectorKeyframeTrackEx = function ( name, times, values, interpol
 THREE.MMDLoader.VectorKeyframeTrackEx.prototype = Object.create( THREE.VectorKeyframeTrack.prototype );
 THREE.MMDLoader.VectorKeyframeTrackEx.prototype.constructor = THREE.MMDLoader.VectorKeyframeTrackEx;
 THREE.MMDLoader.VectorKeyframeTrackEx.prototype.TimeBufferType = Float64Array;
-THREE.MMDLoader.VectorKeyframeTrackEx.prototype.ValueBufferType = Float64Array;
 
 THREE.MMDLoader.NumberKeyframeTrackEx = function ( name, times, values, interpolation ) {
 
@@ -3013,7 +3221,6 @@ THREE.MMDLoader.NumberKeyframeTrackEx = function ( name, times, values, interpol
 THREE.MMDLoader.NumberKeyframeTrackEx.prototype = Object.create( THREE.NumberKeyframeTrack.prototype );
 THREE.MMDLoader.NumberKeyframeTrackEx.prototype.constructor = THREE.MMDLoader.NumberKeyframeTrackEx;
 THREE.MMDLoader.NumberKeyframeTrackEx.prototype.TimeBufferType = Float64Array;
-THREE.MMDLoader.NumberKeyframeTrackEx.prototype.ValueBufferType = Float64Array;
 
 THREE.MMDLoader.DataView = function ( buffer, littleEndian ) {
 
@@ -3349,6 +3556,11 @@ THREE.MMDMaterial = function ( parameters ) {
 
 //	this.type = 'MMDMaterial';
 
+	this.faceOffset = null;
+	this.faceNum = null;
+	this.textureTransparency = false;
+	this.morphTransparency = false;
+
 	// the followings are copied from MeshPhongMaterial
 	this.color = new THREE.Color( 0xffffff ); // diffuse
 	this.emissive = new THREE.Color( 0x000000 );
@@ -3422,8 +3634,8 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.UniformsLib[ "normalmap" ],
 		THREE.UniformsLib[ "displacementmap" ],
 		THREE.UniformsLib[ "fog" ],
+		THREE.UniformsLib[ "ambient" ],
 		THREE.UniformsLib[ "lights" ],
-		THREE.UniformsLib[ "shadowmap" ],
 
 		{
 			"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -3438,7 +3650,8 @@ THREE.ShaderLib[ 'mmd' ] = {
 			"outlineColor"    : { type: "c", value: new THREE.Color( 0x000000 ) },
 			"outlineAlpha"    : { type: "f", value: 1.0 },
 			"celShading"      : { type: "i", value: 0 },
-			"toonMap"         : { type: "t", value: null }
+			"toonMap"         : { type: "t", value: null },
+			"hasToonTexture"  : { type: "i", value: 0 }
 		}
 		// ---- MMD specific for cel shading(outline drawing and toon mapping)
 
@@ -3542,6 +3755,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.ShaderChunk[ "envmap_pars_fragment" ],
 		THREE.ShaderChunk[ "fog_pars_fragment" ],
 		THREE.ShaderChunk[ "bsdfs" ],
+		THREE.ShaderChunk[ "ambient_pars" ],
 		THREE.ShaderChunk[ "lights_pars" ],
 		THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 		THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
@@ -3556,8 +3770,12 @@ THREE.ShaderLib[ 'mmd' ] = {
 		"	uniform float outlineAlpha;",
 		"	uniform bool celShading;",
 		"	uniform sampler2D toonMap;",
+		"	uniform bool hasToonTexture;",
 
 		"	vec3 toon ( vec3 lightDirection, vec3 norm ) {",
+		"		if ( ! hasToonTexture ) {",
+		"			return vec3( 1.0 );",
+		"		}",
 		"		vec2 coord = vec2( 0.0, 0.5 * ( 1.0 - dot( lightDirection, norm ) ) );",
 		"		return texture2D( toonMap, coord ).rgb;",
 		"	}",
@@ -3603,12 +3821,9 @@ THREE.ShaderLib[ 'mmd' ] = {
 			THREE.ShaderChunk[ "normal_fragment" ],
 			THREE.ShaderChunk[ "emissivemap_fragment" ],
 
-			THREE.ShaderChunk[ "shadowmap_fragment" ],
-
 			// accumulation
 			THREE.ShaderChunk[ "lights_phong_fragment" ],
 			THREE.ShaderChunk[ "lights_template" ],
-			THREE.ShaderChunk[ "lightmap_fragment" ],
 
 			// modulation
 			THREE.ShaderChunk[ "aomap_fragment" ],
@@ -3812,13 +4027,33 @@ THREE.MMDHelper.prototype = {
 
 		if ( mesh.geometry.animations !== undefined ) {
 
-			mesh.mixer.clipAction( mesh.geometry.animations[ 0 ] ).play();
+			for ( var i = 0; i < mesh.geometry.animations.length; i++ ) {
+
+				var action = mesh.mixer.clipAction( mesh.geometry.animations[ i ] );
+
+				if ( i === 0 ) {
+
+					action.play();
+
+				}
+
+			}
 
 		}
 
 		if ( mesh.geometry.morphAnimations !== undefined ) {
 
-			mesh.mixer.clipAction( mesh.geometry.morphAnimations[ 0 ] ).play() ;
+			for ( var i = 0; i < mesh.geometry.morphAnimations.length; i++ ) {
+
+				var action = mesh.mixer.clipAction( mesh.geometry.morphAnimations[ i ] );
+
+				if ( i === 0 ) {
+
+					action.play();
+
+				}
+
+			}
 
 		}
 
@@ -3847,7 +4082,9 @@ THREE.MMDHelper.prototype = {
 	 * TODO: touching private properties ( ._actions and ._clip ) so consider better way
 	 *       to access them for safe and modularity.
 	 */
-	unifyAnimationDuration: function () {
+	unifyAnimationDuration: function ( params ) {
+
+		params = params === undefined ? {} : params;
 
 		var max = 0.0;
 
@@ -3891,6 +4128,12 @@ THREE.MMDHelper.prototype = {
 		if ( audioManager !== null ) {
 
 			max = Math.max( max, audioManager.duration );
+
+		}
+
+		if ( params.afterglow !== undefined ) {
+
+			max += params.afterglow;
 
 		}
 
@@ -4046,8 +4289,13 @@ THREE.MMDHelper.prototype = {
 
 	renderOutline: function ( scene, camera ) {
 
+		var tmpEnabled = this.renderer.shadowMap.enabled;
+		this.renderer.shadowMap.enabled = false;
+
 		this.setupOutlineRendering();
 		this.renderer.render( scene, camera );
+
+		this.renderer.shadowMap.enabled = tmpEnabled;
 
 	},
 
@@ -4067,7 +4315,25 @@ THREE.MMDHelper.prototype = {
 
 			var m = mesh.material.materials[ i ];
 			m.uniforms.outlineDrawing.value = 0;
-			m.side = THREE.DoubleSide;
+			m.visible = true;
+
+			if ( m.opacity === 1.0 ) {
+
+				m.side = THREE.FrontSide;
+				m.transparent = false;
+
+			} else {
+
+				m.side = THREE.DoubleSide;
+				m.transparent = true;
+
+			}
+
+			if ( m.textureTransparency === true || m.morphTransparency === true ) {
+
+				m.transparent = true;
+
+			}
 
 		}
 
@@ -4081,8 +4347,6 @@ THREE.MMDHelper.prototype = {
 
 		}
 
-		this.renderer.state.setBlending( THREE.NoBlending );
-
 	},
 
 	setupOutlineRenderingOneMesh: function ( mesh ) {
@@ -4092,6 +4356,18 @@ THREE.MMDHelper.prototype = {
 			var m = mesh.material.materials[ i ];
 			m.uniforms.outlineDrawing.value = 1;
 			m.side = THREE.BackSide;
+
+			if ( m.uniforms.outlineAlpha.value < 1.0 ) {
+
+				m.transparent = true;
+
+			}
+
+			if ( m.uniforms.outlineThickness.value === 0.0 ) {
+
+				m.visible = false;
+
+			}
 
 		}
 
@@ -4120,7 +4396,7 @@ THREE.MMDHelper.prototype = {
 
 	poseAsVpd: function ( mesh, vpd, params ) {
 
-		if ( ! ( params && params.preventRestPose === true ) ) {
+		if ( ! ( params && params.preventResetPose === true ) ) {
 
 			this.resetPose( mesh );
 
@@ -4236,4 +4512,3 @@ THREE.MMDHelper.prototype = {
 	}
 
 };
-

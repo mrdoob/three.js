@@ -100,7 +100,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 	}
 
-	function checkIntersection( object, raycaster, ray, pA, pB, pC, point ){
+	function checkIntersection( object, raycaster, ray, pA, pB, pC, point ) {
 
 		var intersect;
 		var material = object.material;
@@ -165,6 +165,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		var geometry = this.geometry;
 		var material = this.material;
+		var matrixWorld = this.matrixWorld;
 
 		if ( material === undefined ) return;
 
@@ -172,17 +173,17 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		var matrixWorld = this.matrixWorld;
-
 		sphere.copy( geometry.boundingSphere );
 		sphere.applyMatrix4( matrixWorld );
 
 		if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
-		// Check boundingBox before continuing
+		//
 
 		inverseMatrix.getInverse( matrixWorld );
 		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+
+		// Check boundingBox before continuing
 
 		if ( geometry.boundingBox !== null ) {
 
@@ -199,7 +200,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 			var attributes = geometry.attributes;
 			var positions = attributes.position.array;
 
-			if ( attributes.uv !== undefined ){
+			if ( attributes.uv !== undefined ) {
 
 				uvs = attributes.uv.array;
 
@@ -251,7 +252,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 		} else if ( geometry instanceof THREE.Geometry ) {
 
 			var fvA, fvB, fvC;
-			var isFaceMaterial = material instanceof THREE.MeshFaceMaterial;
+			var isFaceMaterial = material instanceof THREE.MultiMaterial;
 			var materials = isFaceMaterial === true ? material.materials : null;
 
 			var vertices = geometry.vertices;

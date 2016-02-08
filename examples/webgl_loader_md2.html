@@ -95,31 +95,31 @@
 
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var light = new THREE.SpotLight( 0xffffff, 10, 1000 );
+				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
 				light.position.set( 200, 250, 500 );
 
 				light.castShadow = true;
-				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 1024;
-				light.shadowMapDarkness = 0.95;
-				//light.shadowCameraVisible = true;
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 1024;
+				light.shadow.camera.far = 2000;
 
+				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 				scene.add( light );
 
-				var light = new THREE.SpotLight( 0xffffff, 5, 500 );
-				light.position.set( -100, 350, 250 );
+				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
+				light.position.set( -100, 350, 350 );
 
 				light.castShadow = true;
-				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 1024;
-				light.shadowMapDarkness = 0.95;
-				//light.shadowCameraVisible = true;
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 1024;
+				light.shadow.camera.far = 1000;
 
+				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 				scene.add( light );
 
 				//  GROUND
 
-				var gt = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg" );
+				var gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
 				var gg = new THREE.PlaneBufferGeometry( 2000, 2000 );
 				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 

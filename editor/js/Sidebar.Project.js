@@ -114,7 +114,14 @@ Sidebar.Project = function ( editor ) {
 		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
 
 		var renderer = new rendererTypes[ type ]( { antialias: antialias } );
-		if ( shadows && renderer.shadowMap ) renderer.shadowMap.enabled = true;
+
+		if ( shadows && renderer.shadowMap ) {
+
+			renderer.shadowMap.enabled = true;
+			// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+		}
+
 		signals.rendererChanged.dispatch( renderer );
 
 	}
@@ -123,4 +130,4 @@ Sidebar.Project = function ( editor ) {
 
 	return container;
 
-}
+};

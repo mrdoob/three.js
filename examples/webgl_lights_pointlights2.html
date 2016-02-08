@@ -115,13 +115,14 @@
 
 
 				// TEXTURES
+				var textureLoader = new THREE.TextureLoader();
 
-				var texture = THREE.ImageUtils.loadTexture( "textures/disturb.jpg" );
+				var texture = textureLoader.load( "textures/disturb.jpg" );
 				texture.repeat.set( 20, 10 );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.format = THREE.RGBFormat;
 
-				var texture2 = THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" );
+				var texture2 = textureLoader.load( "textures/planets/moon_1024.jpg" );
 				texture2.repeat.set( 2, 1 );
 				texture2.wrapS = texture2.wrapT = THREE.RepeatWrapping;
 				texture2.format = THREE.RGBFormat;
@@ -129,7 +130,7 @@
 				// MATERIALS
 
 				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture } );
-				var objectMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xffffff, metal: true, map: texture2 } );
+				var objectMaterial = new THREE.MeshStandardMaterial( { color: 0x000000, map: texture2, roughness: 0.2, metalness: 1.0 } );
 
 				// GROUND
 

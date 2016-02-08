@@ -84,6 +84,7 @@ THREE.CatmullRomCurve3 = ( function() {
 		function ( p /* array of Vector3 */ ) {
 
 			this.points = p || [];
+			this.closed = false;
 
 		},
 
@@ -96,42 +97,46 @@ THREE.CatmullRomCurve3 = ( function() {
 
 			if ( l < 2 ) console.log( 'duh, you need at least 2 points' );
 
-			point = ( l - 1 ) * t;
+			point = ( l - ( this.closed ? 0 : 1 ) ) * t;
 			intPoint = Math.floor( point );
 			weight = point - intPoint;
 
-			if ( weight === 0 && intPoint === l - 1 ) {
+			if ( this.closed ) {
+
+				intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
+
+			} else if ( weight === 0 && intPoint === l - 1 ) {
 
 				intPoint = l - 2;
 				weight = 1;
 
 			}
 
-			var p0, p1, p2, p3;
+			var p0, p1, p2, p3; // 4 points
 
-			if ( intPoint === 0 ) {
+			if ( this.closed || intPoint > 0 ) {
+
+				p0 = points[ ( intPoint - 1 ) % l ];
+
+			} else {
 
 				// extrapolate first point
 				tmp.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] );
 				p0 = tmp;
 
-			} else {
-
-				p0 = points[ intPoint - 1 ];
-
 			}
 
-			p1 = points[ intPoint ];
-			p2 = points[ intPoint + 1 ];
+			p1 = points[ intPoint % l ];
+			p2 = points[ ( intPoint + 1 ) % l ];
 
-			if ( intPoint + 2 < l ) {
+			if ( this.closed || intPoint + 2 < l ) {
 
-				p3 = points[ intPoint + 2 ]
+				p3 = points[ ( intPoint + 2 ) % l ];
 
 			} else {
 
 				// extrapolate last point
-				tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 2 ] );
+				tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 1 ] );
 				p3 = tmp;
 
 			}

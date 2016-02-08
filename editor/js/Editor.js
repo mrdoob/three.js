@@ -6,7 +6,7 @@ var Editor = function () {
 
 	var SIGNALS = signals;
 
-	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 1, 10000 );
+	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.1, 10000 );
 	this.DEFAULT_CAMERA.name = 'Camera';
 	this.DEFAULT_CAMERA.position.set( 20, 10, 20 );
 	this.DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
@@ -458,6 +458,9 @@ Editor.prototype = {
 		var camera = loader.parse( json.camera );
 
 		this.camera.copy( camera );
+		this.camera.aspect = this.DEFAULT_CAMERA.aspect;
+		this.camera.updateProjectionMatrix();
+
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 

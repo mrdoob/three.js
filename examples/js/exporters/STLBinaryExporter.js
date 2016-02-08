@@ -34,9 +34,16 @@ THREE.STLBinaryExporter.prototype = {
 			scene.traverse( function ( object ) {
 
 				if ( ! ( object instanceof THREE.Mesh ) ) return;
-				if ( ! ( object.geometry instanceof THREE.Geometry ) ) return;
 
 				var geometry = object.geometry;
+				if ( geometry instanceof THREE.BufferGeometry ) {
+                            
+					geometry = new THREE.Geometry().fromBufferGeometry( geometry );
+                            
+				}
+
+				if ( ! ( geometry instanceof THREE.Geometry ) ) return;
+
 				var matrixWorld = object.matrixWorld;
 
 				var vertices = geometry.vertices;

@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - transform controls</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				margin: 0px;
@@ -60,8 +61,8 @@
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-
-				var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif', THREE.UVMapping, render );
+				var texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
+				texture.mapping = THREE.UVMapping;
 				texture.anisotropy = renderer.getMaxAnisotropy();
 
 				var geometry = new THREE.BoxGeometry( 200, 200, 200 );

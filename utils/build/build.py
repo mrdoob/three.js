@@ -60,7 +60,7 @@ def main(argv=None):
 			sources.append(filename)
 			with open(filename, 'r', encoding='utf-8') as f:
 				if filename.endswith(".glsl"):
-					tmp.write(u'THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + u'\'] = "')
+					tmp.write(u'THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + u'\' ] = "')
 					text = f.read()
 					text = re.sub(r"[ \t]*//.*\n", "", text) # remove //
 					text = re.sub(r"[ \t]*/\*[\s\S]*?\*/", "", text) # remove /* */
@@ -90,7 +90,7 @@ def main(argv=None):
 
 		externs = ' --externs '.join(args.externs)
 		source = ' '.join(sources)
-		cmd = 'java -jar compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --externs %s --jscomp_off=checkTypes --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s %s' % (externs, path, output, sourcemapargs)
+		cmd = 'java -jar compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs %s --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s %s' % (externs, path, output, sourcemapargs)
 		os.system(cmd)
 
 		# header

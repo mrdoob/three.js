@@ -80,7 +80,7 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 				reflectionCube.format = THREE.RGBFormat;
 
 				var material = new THREE.MeshPhongMaterial( { specular: 0x101010, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, side: THREE.DoubleSide } );

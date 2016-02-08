@@ -89,7 +89,7 @@
 					];
 
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
 
 				var shader = THREE.FresnelShader;

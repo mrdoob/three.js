@@ -38,8 +38,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()
 	];
 
-	var _vector4 = new THREE.Vector4();
-
 	// init
 
 	var depthShader = THREE.ShaderLib[ "depthRGBA" ];
@@ -98,15 +96,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
-		// Save GL state
-
-		var currentScissorTest = _state.getScissorTest();
-
-		// save the existing viewport so it can be restored later
-		_renderer.getViewport( _vector4 );
-
 		// Set GL state for depth map.
-		_gl.clearColor( 1, 1, 1, 1 );
+		_state.clearColor( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
 		_state.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
@@ -169,18 +160,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			if ( shadow.map === null ) {
 
-				var shadowFilter = THREE.LinearFilter;
-
-				if ( scope.type === THREE.PCFSoftShadowMap ) {
-
-					shadowFilter = THREE.NearestFilter;
-
-				}
-
-				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
 
 				shadow.map = new THREE.WebGLRenderTarget( shadowMapSize.x, shadowMapSize.y, pars );
-				shadow.matrix = new THREE.Matrix4();
 
 				//
 
@@ -214,8 +196,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 					_lookTarget.add( cubeDirections[ face ] );
 					shadowCamera.up.copy( cubeUps[ face ] );
 					shadowCamera.lookAt( _lookTarget );
+
 					var vpDimensions = cube2DViewPorts[ face ];
-					_renderer.setViewport( vpDimensions.x, vpDimensions.y, vpDimensions.z, vpDimensions.w );
+					_state.viewport( vpDimensions );
 
 				} else {
 
@@ -259,7 +242,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 					var geometry = _objects.update( object );
 					var material = object.material;
 
-					if ( material instanceof THREE.MeshFaceMaterial ) {
+					if ( material instanceof THREE.MultiMaterial ) {
 
 						var groups = geometry.groups;
 						var materials = material.materials;
@@ -295,19 +278,12 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
-		_renderer.setViewport( _vector4.x, _vector4.y, _vector4.z, _vector4.w );
-
 		// Restore GL state.
 		var clearColor = _renderer.getClearColor(),
 		clearAlpha = _renderer.getClearAlpha();
 		_renderer.setClearColor( clearColor, clearAlpha );
+
 		_state.enable( _gl.BLEND );
-
-		if ( currentScissorTest === true ) {
-
-			_state.setScissorTest( true );
-
-		}
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
 

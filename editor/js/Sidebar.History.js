@@ -11,25 +11,21 @@ Sidebar.History = function ( editor ) {
 
 	var history = editor.history;
 
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/history/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
+	var container = new UI.Panel();
 
-		editor.config.setKey( 'ui/sidebar/history/collapsed', boolean );
+	container.add( new UI.Text( 'HISTORY' ) );
 
-	} );
+	//
 
-	container.addStatic( new UI.Text( 'HISTORY' ) );
+	var persistent = new UI.THREE.Boolean( config.getKey( 'settings/history' ), 'persistent' );
+	persistent.setPosition( 'absolute' ).setRight( '8px' );
+	persistent.onChange( function () {
 
-	// Checkbox 'Save History'
+		var value = this.getValue();
 
-	var saveHistorySpan = new UI.Span().setPosition( 'absolute' ).setRight( '8px' );
-	var saveHistoryCheckbox = new UI.Checkbox( config.getKey( 'project/history/stored' ) ).onChange( function () {
+		config.setKey( 'settings/history', value );
 
-		config.setKey( 'project/history/stored', this.getValue() );
-		var saveHistory = this.getValue();
-
-		if ( saveHistory ) {
+		if ( value ) {
 
 			alert( 'The history will be preserved across sessions.\nThis can have an impact on performance when working with textures.' );
 
@@ -44,18 +40,9 @@ Sidebar.History = function ( editor ) {
 		}
 
 	} );
+	container.add( persistent );
 
-	saveHistorySpan.add( saveHistoryCheckbox );
-
-	saveHistorySpan.onClick( function ( event ) {
-
-		event.stopPropagation(); // Avoid panel collapsing
-
-	} );
-
-	container.addStatic( saveHistorySpan );
-
-	container.add( new UI.Break() );
+	container.add( new UI.Break(), new UI.Break() );
 
 	var ignoreObjectSelectedSignal = false;
 
@@ -67,11 +54,6 @@ Sidebar.History = function ( editor ) {
 		editor.history.goToState( parseInt( outliner.getValue() ) );
 
 		ignoreObjectSelectedSignal = false;
-
-	} );
-	outliner.onDblClick( function () {
-
-		//editor.focusById( parseInt( outliner.getValue() ) );
 
 	} );
 	container.add( outliner );

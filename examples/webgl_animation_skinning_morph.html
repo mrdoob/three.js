@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - skinning + morphing [knight]</title>
@@ -223,7 +223,7 @@
 
 				}
 
-				mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+				mesh = new THREE.SkinnedMesh( geometry, new THREE.MultiMaterial( materials ) );
 				mesh.name = "Knight Mesh";
 				mesh.position.set( x, y - bb.min.y * s, z );
 				mesh.scale.set( s, s, s );
@@ -233,7 +233,7 @@
 				mesh.receiveShadow = true;
 
 
-				mesh2 = new THREE.SkinnedMesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+				mesh2 = new THREE.SkinnedMesh( geometry, new THREE.MultiMaterial( materials ) );
 				mesh2.name = "Lil' Bro Mesh";
 				mesh2.position.set( x - 240, y - bb.min.y * s, z + 500 );
 				mesh2.scale.set( s / 2, s / 2, s / 2 );

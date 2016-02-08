@@ -155,22 +155,19 @@ def buffer_position(mesh):
 
 
 @_mesh
-def buffer_uv(mesh):
+def buffer_uv(mesh, layer=0):
     """
 
     :param mesh:
+    :param layer: (Default value = 0)
     :rtype: []
 
     """
     uvs_ = []
-    if len(mesh.uv_layers) is 0:
+    if len(mesh.uv_layers) <= layer:
         return uvs_
-    elif len(mesh.uv_layers) > 1:
-        # if memory serves me correctly buffer geometry
-        # only uses one UV layer
-        logger.warning("%s has more than 1 UV layer", mesh.name)
 
-    for uv_data in mesh.uv_layers[0].data:
+    for uv_data in mesh.uv_layers[layer].data:
         uv_tuple = (uv_data.uv[0], uv_data.uv[1])
         uvs_.extend(uv_tuple)
 

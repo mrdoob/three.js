@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '74dev' };
+var THREE = { REVISION: '75dev' };
 
 //
 
@@ -13,80 +13,6 @@ if ( typeof define === 'function' && define.amd ) {
 } else if ( 'undefined' !== typeof exports && 'undefined' !== typeof module ) {
 
 	module.exports = THREE;
-
-}
-
-
-// polyfills
-
-if ( self.requestAnimationFrame === undefined || self.cancelAnimationFrame === undefined ) {
-
-	// Missing in Android stock browser.
-
-	( function () {
-
-		var lastTime = 0;
-		var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
-
-		for ( var x = 0; x < vendors.length && ! self.requestAnimationFrame; ++ x ) {
-
-			self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
-			self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
-
-		}
-
-		if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
-
-			self.requestAnimationFrame = function ( callback ) {
-
-				var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-				var id = self.setTimeout( function () {
-
-					callback( currTime + timeToCall );
-
-				}, timeToCall );
-				lastTime = currTime + timeToCall;
-				return id;
-
-			};
-
-		}
-
-		if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
-
-			self.cancelAnimationFrame = function ( id ) {
-
-				self.clearTimeout( id );
-
-			};
-
-		}
-
-	} )();
-
-}
-
-//
-
-if ( self.performance === undefined ) {
-
-	self.performance = {};
-
-}
-
-if ( self.performance.now === undefined ) {
-
-	( function () {
-
-		var start = Date.now();
-
-		self.performance.now = function () {
-
-			return Date.now() - start;
-
-		}
-
-	} )();
 
 }
 
@@ -351,6 +277,10 @@ THREE.RGB_PVRTC_4BPPV1_Format = 2100;
 THREE.RGB_PVRTC_2BPPV1_Format = 2101;
 THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
+
+// ETC compressed texture formats
+
+THREE.RGB_ETC1_Format = 2151;
 
 // Loop styles for AnimationAction
 

@@ -19,22 +19,20 @@ geometry.position = - vViewPosition;
 geometry.normal = normal;
 geometry.viewDir = normalize( vViewPosition );
 
+IncidentLight directLight;
+
 #if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )
+
+	PointLight pointLight;
 
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
-		PointLight pointLight = pointLights[ i ];
+		pointLight = pointLights[ i ];
 
-		IncidentLight directLight = getPointDirectLight( pointLight, geometry );
+		directLight = getPointDirectLight( pointLight, geometry );
 
 		#ifdef USE_SHADOWMAP
-		if ( pointLight.shadow > - 1 ) {
-			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
-				if ( j == pointLight.shadow ) {
-					directLight.color *= shadows[ j ];
-				}
-			}
-		}
+		directLight.color *= bool( pointLight.shadow ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ] ) : 1.0;
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -45,20 +43,16 @@ geometry.viewDir = normalize( vViewPosition );
 
 #if ( NUM_SPOT_LIGHTS > 0 ) && defined( RE_Direct )
 
+	SpotLight spotLight;
+
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
-		SpotLight spotLight = spotLights[ i ];
+		spotLight = spotLights[ i ];
 
-		IncidentLight directLight = getSpotDirectLight( spotLight, geometry );
+		directLight = getSpotDirectLight( spotLight, geometry );
 
 		#ifdef USE_SHADOWMAP
-		if ( spotLight.shadow > - 1 ) {
-			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
-				if ( j == spotLight.shadow ) {
-					directLight.color *= shadows[ j ];
-				}
-			}
-		}
+		directLight.color *= bool( spotLight.shadow ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -69,20 +63,16 @@ geometry.viewDir = normalize( vViewPosition );
 
 #if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )
 
+	DirectionalLight directionalLight;
+
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
-		DirectionalLight directionalLight = directionalLights[ i ];
+		directionalLight = directionalLights[ i ];
 
-		IncidentLight directLight = getDirectionalDirectLight( directionalLight, geometry );
+		directLight = getDirectionalDirectLight( directionalLight, geometry );
 
 		#ifdef USE_SHADOWMAP
-		if ( directionalLight.shadow > - 1 ) {
-			for ( int j = 0; j < NUM_SHADOWS; j ++ ) {
-				if ( j == directionalLight.shadow ) {
-					directLight.color *= shadows[ j ];
-				}
-			}
-		}
+		directLight.color *= bool( directionalLight.shadow ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -93,48 +83,40 @@ geometry.viewDir = normalize( vViewPosition );
 
 #if defined( RE_IndirectDiffuse )
 
-	{
+	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
 
-		vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
+	#ifdef USE_LIGHTMAP
 
-		#ifdef USE_LIGHTMAP
+		irradiance += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity; // factor of PI should not be present; included here to prevent breakage
 
-			irradiance += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity; // factor of PI should not be present; included here to prevent breakage
+	#endif
 
-		#endif
+	#if ( NUM_HEMI_LIGHTS > 0 )
 
-		#if ( NUM_HEMI_LIGHTS > 0 )
+		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-			for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
+			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
 
-				irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
+		}
 
-			}
+	#endif
 
-		#endif
+	// #if defined( USE_ENVMAP ) && defined( STANDARD )
 
-		// #if defined( USE_ENVMAP ) && defined( STANDARD )
+		// TODO, replace 8 with the real maxMIPLevel
+		// irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 ); // comment out until seams are fixed
 
-			// TODO, replace 8 with the real maxMIPLevel
-			// irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 ); // comment out until seams are fixed
+	// #endif
 
-		// #endif
-
-		RE_IndirectDiffuse( irradiance, geometry, material, reflectedLight );
-
-	}
+	RE_IndirectDiffuse( irradiance, geometry, material, reflectedLight );
 
 #endif
 
 #if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )
 
-	{
+	// TODO, replace 8 with the real maxMIPLevel
+	vec3 radiance = getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry, Material_BlinnShininessExponent( material ), 8 );
 
-		// TODO, replace 8 with the real maxMIPLevel
-		vec3 radiance = getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry, Material_BlinnShininessExponent( material ), 8 );
-
-		RE_IndirectSpecular( radiance, geometry, material, reflectedLight );
-
-    }
+	RE_IndirectSpecular( radiance, geometry, material, reflectedLight );
 
 #endif
