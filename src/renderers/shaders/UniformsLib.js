@@ -112,7 +112,7 @@ THREE.UniformsLib = {
 			"direction": { type: "v3" },
 			"distance": { type: "f" },
 			"angleCos": { type: "f" },
-			"exponent": { type: "f" },
+			"penumbra": { type: "f" },
 			"decay": { type: "f" },
 
 			"shadow": { type: "i" },

@@ -37,7 +37,7 @@ THREE.WebGLLights = function () {
 					color: new THREE.Color(),
 					distance: 0,
 					angleCos: 0,
-					exponent: 0,
+					penumbra: 0,
 					decay: 0,
 
 					shadow: false,

@@ -68,7 +68,7 @@
 		float distance;
 		float decay;
 		float angleCos;
-		float exponent;
+		float penumbra;
 
 		int shadow;
 		float shadowBias;
@@ -90,7 +90,7 @@
 		if ( spotEffect > spotLight.angleCos ) {
 
 			float spotEffect = dot( spotLight.direction, directLight.direction );
-			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
+			spotEffect *= clamp( ( spotEffect - spotLight.angleCos ) / spotLight.penumbra, 0.0, 1.0 );
 
 			directLight.color = spotLight.color;
 			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
