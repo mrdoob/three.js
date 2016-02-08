@@ -1258,7 +1258,6 @@ THREE.ColladaLoader = function () {
 				var intensity = lparams.intensity;
 				var distance = lparams.distance;
 				var angle = lparams.falloff_angle;
-				var exponent; // Intentionally undefined, don't know what this is yet
 
 				switch ( lparams.technique ) {
 
@@ -1275,7 +1274,7 @@ THREE.ColladaLoader = function () {
 
 					case 'spot':
 
-						light = new THREE.SpotLight( color, intensity, distance, angle, exponent );
+						light = new THREE.SpotLight( color, intensity, distance, angle );
 						light.position.set(0, 0, 1);
 						break;
 

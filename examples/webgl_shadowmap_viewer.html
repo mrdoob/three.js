@@ -72,6 +72,8 @@
 
 				spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.name = 'Spot Light';
+				spotLight.angle = Math.PI / 5;
+				spotLight.penumbra = 0.3;
 				spotLight.position.set( 10, 10, 5 );
 				spotLight.castShadow = true;
 				spotLight.shadowCameraNear = 8;

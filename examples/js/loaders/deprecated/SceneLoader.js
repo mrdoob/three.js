@@ -345,7 +345,7 @@ THREE.SceneLoader.prototype = {
 								break;
 
 							case 'SpotLight':
-								light = new THREE.SpotLight( color, intensity, distance, 1 );
+								light = new THREE.SpotLight( color, intensity, distance );
 								light.angle = objJSON.angle;
 								light.position.fromArray( position );
 								light.target.set( position[ 0 ], position[ 1 ] - distance, position[ 2 ] );
