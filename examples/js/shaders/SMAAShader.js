@@ -188,7 +188,7 @@ THREE.SMAAShader = [ {
 			// e = float2(bias, 0.0) + 0.5 * SEARCH_TEX_PIXEL_SIZE +
 			//     e * float2(scale, 1.0) * float2(64.0, 32.0) * SEARCH_TEX_PIXEL_SIZE;
 			"e.r = bias + e.r * scale;",
-			"return 255.0 * texture2D( searchTex, e, 0.0 ).a;",
+			"return 255.0 * texture2D( searchTex, e, 0.0 ).r;",
 		"}",
 
 		"float SMAASearchXLeft( sampler2D edgesTex, sampler2D searchTex, vec2 texcoord, float end ) {",

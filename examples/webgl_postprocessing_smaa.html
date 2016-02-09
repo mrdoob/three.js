@@ -33,14 +33,12 @@
 
 			var textureLoader = new THREE.TextureLoader();
 
-			textureLoader.load( "textures/smaa-area.png", function( areaTexture ) {
-				textureLoader.load( "textures/brick_diffuse.jpg", function( meshTexture ) {
-					init( areaTexture, meshTexture );
-					animate();
-				});
-			} );
+			textureLoader.load( "textures/brick_diffuse.jpg", function( meshTexture ) {
+				init( meshTexture );
+				animate();
+			});
 
-			function init( areaTexture, meshTexture ) {
+			function init( meshTexture ) {
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -67,7 +65,7 @@
 				composer = new THREE.EffectComposer( renderer );
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
-				pass = new THREE.SMAAPass( window.innerWidth, window.innerHeight, areaTexture );
+				pass = new THREE.SMAAPass( window.innerWidth, window.innerHeight );
 				pass.renderToScreen = true;
 				composer.addPass( pass );
 
