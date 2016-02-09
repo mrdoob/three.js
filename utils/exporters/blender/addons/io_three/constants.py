@@ -93,7 +93,7 @@ LIGHTS = 'lights'
 HIERARCHY = 'hierarchy'
 FACE_MATERIALS = 'faceMaterials'
 SKINNING = 'skinning'
-COPY_TEXTURES = 'copyTextures'
+EXPORT_TEXTURES = 'exportTextures'
 EMBED_TEXTURES = 'embedTextures'
 TEXTURE_FOLDER = 'textureFolder'
 ENABLE_PRECISION = 'enablePrecision'
@@ -154,7 +154,7 @@ EXPORT_OPTIONS = {
     CAMERAS: False,
     LIGHTS: False,
     HIERARCHY: False,
-    COPY_TEXTURES: True,
+    EXPORT_TEXTURES: True,
     EMBED_TEXTURES: False,
     TEXTURE_FOLDER: '',
     LOGGING: DEBUG,

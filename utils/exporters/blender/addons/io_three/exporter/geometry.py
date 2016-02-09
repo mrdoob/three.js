@@ -148,7 +148,7 @@ class Geometry(base_classes.BaseNode):
     def copy_textures(self, texture_folder=''):
         """Copy the textures to the destination directory."""
         logger.debug("Geometry().copy_textures()")
-        if self.options.get(constants.COPY_TEXTURES):
+        if self.options.get(constants.EXPORT_TEXTURES) and not self.options.get(constants.EMBED_TEXTURES):
             texture_registration = self.register_textures()
             if texture_registration:
                 logger.info("%s has registered textures", self.node)
