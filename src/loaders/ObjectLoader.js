@@ -24,7 +24,7 @@ THREE.ObjectLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.load( url, function ( text ) {
+		return loader.load( url, function ( text ) {
 
 			scope.parse( JSON.parse( text ), onLoad );
 

@@ -31,7 +31,7 @@ THREE.VRMLLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( this.manager );
-		loader.load( url, function ( text ) {
+		return loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
 

@@ -17,7 +17,7 @@ THREE.PDBLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.load( url, function ( text ) {
+		return loader.load( url, function ( text ) {
 
 			var json = scope.parsePDB( text );
 			scope.createModel( json, onLoad );
