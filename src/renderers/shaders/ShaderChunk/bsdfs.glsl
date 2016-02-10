@@ -1,6 +1,6 @@
 bool testLightInRange( const in float lightDistance, const in float cutoffDistance ) {
 
-	return any( bvec2( lightDistance == 0.0, lightDistance < cutoffDistance ) );
+	return any( bvec2( cutoffDistance == 0.0, lightDistance < cutoffDistance ) );
 
 }
 
