@@ -200,7 +200,7 @@
 
 	float getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
 
-		vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
+		vec2 texelSize = vec2( 1.0 ) / ( shadowMapSize * vec2( 4.0, 2.0 ) );
 
 		// for point lights, the uniform @vShadowCoord is re-purposed to hold
 		// the distance from the light to the world-space position of the fragment.
@@ -213,7 +213,7 @@
 
 		#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )
 
-			vec2 offset = vec2( - 1, 1 ) * shadowRadius * 2.0 * texelSize.y;
+			vec2 offset = vec2( - 1, 1 ) * shadowRadius * texelSize.y;
 
 			return (
 				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyy, texelSize.y ), dp ) +
