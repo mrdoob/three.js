@@ -18,6 +18,7 @@
 
 		directLight.color = directionalLight.color;
 		directLight.direction = directionalLight.direction;
+		directLight.visible = true;
 
 		return directLight;
 
@@ -55,10 +56,12 @@
 
 			directLight.color = pointLight.color;
 			directLight.color *= calcLightAttenuation( lightDistance, pointLight.distance, pointLight.decay );
+			directLight.visible = true;
 
 		} else {
 
 			directLight.color = vec3( 0.0 );
+			directLight.visible = false;
 
 		}
 
@@ -105,10 +108,12 @@
 
 			directLight.color = spotLight.color;
 			directLight.color *= ( spotEffect * calcLightAttenuation( lightDistance, spotLight.distance, spotLight.decay ) );
+			directLight.visible = true;
 
 		} else {
 
 			directLight.color = vec3( 0.0 );
+			directLight.visible = false;
 
 		}
 
