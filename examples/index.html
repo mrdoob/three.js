@@ -59,24 +59,24 @@
 				background: #fafafa;
 			}
 
-				#panel #content {
-					padding: 0px 20px 20px 20px;
-				}
+			#panel #content {
+				padding: 0px 20px 20px 20px;
+			}
 
-				#panel #content .link {
-					color: #2194CE;
-					text-decoration: none;
-					cursor: pointer;
-					display: block;
-				}
+			#panel #content .link {
+				color: #2194CE;
+				text-decoration: none;
+				cursor: pointer;
+				display: block;
+			}
 
-				#panel #content .selected {
-					color: #ff0000;
-				}
+			#panel #content .selected {
+				color: #ff0000;
+			}
 
-					#panel #content .link:hover {
-						text-decoration: underline;
-					}
+			#panel #content .link:hover {
+				text-decoration: underline;
+			}
 
 			#viewer {
 				position: absolute;
@@ -97,10 +97,59 @@
 				opacity: 0.7;
 			}
 
-				#button:hover {
-					cursor: pointer;
-					opacity: 1;
-				}
+			#button:hover {
+				cursor: pointer;
+				opacity: 1;
+			}
+
+			.filterBlock{
+				margin: 20px;
+				position: relative;
+			}
+
+			.filterBlock p {
+				margin: 0;
+			}
+
+			#filterInput {
+				width: 100%;
+				padding: 5px;
+				font-family: inherit;
+				font-size: 15px;
+				outline: none;
+				border: 1px solid #dedede;
+			}
+
+			#filterInput:focus{
+				border: 1px solid #2194CE;
+			}
+
+			#clearFilterButton {
+				position: absolute;
+				right: 6px;
+				top: 50%;
+				margin-top: -8px;
+				width: 16px;
+				height: 16px;
+				font-size: 14px;
+				color: grey;
+				text-align: center;
+				line-height: 0;
+				padding-top: 7px;
+				opacity: .5;
+			}
+
+			#clearFilterButton:hover {
+				opacity: 1;
+			}
+
+			.filtered {
+				display: none !important;
+			}
+
+			#panel li b {
+				font-weight: bold;
+			}
 
 			/* mobile */
 
@@ -113,22 +162,22 @@
 				height: 32px;
 			}
 
-				#expandButton span {
-					height: 2px;
-					background-color: #2194CE;
-					width: 16px;
-					position: absolute;
-					left: 8px;
-					top: 10px;
-				}
+			#expandButton span {
+				height: 2px;
+				background-color: #2194CE;
+				width: 16px;
+				position: absolute;
+				left: 8px;
+				top: 10px;
+			}
 
-				#expandButton span:nth-child(1) {
-					top: 16px;
-				}
+			#expandButton span:nth-child(1) {
+				top: 16px;
+			}
 
-				#expandButton span:nth-child(2) {
-					top: 22px;
-				}
+			#expandButton span:nth-child(2) {
+				top: 22px;
+			}
 
 			@media all and ( max-width: 640px ) {
 				h1{
@@ -149,7 +198,7 @@
 				#content{
 					position: absolute;
 					left: 0;
-					top: 60px;
+					top: 90px;
 					right: 0;
 					bottom: 0;
 					font-size: 17px;
@@ -182,6 +231,10 @@
 				<span></span>
 				<span></span>
 			</a>
+			<div class="filterBlock" >
+				<input type="text" id="filterInput" placeholder="Type to filter"/>
+				<a href="#" id="clearFilterButton" >x</a>
+			</div>
 			<div id="content"></div>
 		</div>
 		<iframe id="viewer" allowfullscreen onmousewheel=""></iframe>
@@ -192,6 +245,9 @@
 		var panel = document.getElementById( 'panel' );
 		var content = document.getElementById( 'content' );
 		var viewer = document.getElementById( 'viewer' );
+
+		var filterInput = document.getElementById( 'filterInput' );
+		var clearFilterButton = document.getElementById( 'clearFilterButton' );
 
 		var expandButton = document.getElementById( 'expandButton' );
 		expandButton.addEventListener( 'click', function ( event ) {
@@ -236,17 +292,16 @@
 
 			var section = files[ key ];
 
-			var div = document.createElement( 'h2' );
-			div.textContent = key;
-			container.appendChild( div );
+			var header = document.createElement( 'h2' );
+			header.textContent = key;
+			header.setAttribute( 'data-category', key );
+			container.appendChild( header );
 
 			for ( var i = 0; i < section.length; i ++ ) {
 
 				( function ( file ) {
 
-					var name = file.split( '_' );
-					name.shift();
-					name = name.join( ' / ' );
+					var name = getName( file );
 
 					var link = document.createElement( 'a' );
 					link.className = 'link';
@@ -293,6 +348,112 @@
 		if ( window.location.hash !== '' ) {
 
 			load( window.location.hash.substring( 1 ) );
+
+		}
+
+		// filter
+
+		filterInput.addEventListener( 'input', function( e ) {
+
+			updateFilter();
+
+		} );
+
+		clearFilterButton.addEventListener( 'click', function( e ) {
+
+			filterInput.value = '';
+			updateFilter();
+			e.preventDefault();
+
+		} );
+
+		function updateFilter() {
+
+			var exp = new RegExp( filterInput.value, 'gi' );
+
+			for ( var key in files ) {
+
+				var section = files[ key ];
+
+				for ( var i = 0; i < section.length; i ++ ) {
+
+					filterExample( section[ i ], exp );
+
+				}
+
+			}
+
+			layoutList();
+
+		}
+
+		function filterExample( file, exp ){
+
+			var link = links[ file ];
+			var name = getName( file );
+			var res = file.match( exp );
+			var text;
+
+			if ( res && res.length > 0 ) {
+
+				link.classList.remove( 'filtered' );
+
+				for( var i = 0; i < res.length; i++ ) {
+					text = name.replace( res[ i ], '<b>' + res[ i ] + '</b>' );
+				}
+
+				link.innerHTML = text;
+
+			} else {
+
+				link.classList.add( 'filtered' );
+				link.innerHTML = name;
+
+			}
+		}
+
+		function getName( file ) {
+
+			var name = file.split( '_' );
+			name.shift();
+			return name.join( ' / ' );
+
+		}
+
+		function layoutList() {
+
+			for ( var key in files ) {
+
+				var collapsed = true;
+
+				var section = files[ key ];
+
+				for ( var i = 0; i < section.length; i ++ ) {
+
+					var file = section[ i ];
+
+					if( !links[ file ].classList.contains( 'filtered' ) ){
+
+						collapsed = false;
+						break;
+
+					}
+
+				}
+
+				var element = document.querySelector( 'h2[data-category="' + key + '"]' );
+
+				if( collapsed ){
+
+					element.classList.add( 'filtered' );
+
+				} else {
+
+					element.classList.remove( 'filtered' );
+
+				}
+
+			}
 
 		}
 
