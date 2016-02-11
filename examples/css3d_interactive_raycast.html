@@ -119,26 +119,21 @@ function onDocumentMouseMove( event ) {
         computeIntersect(mouse)
 }
 
+var raycaster = new THREE.Raycaster();
 function computeIntersect(mouse){
-        var raycaster = new THREE.Raycaster();
 	raycaster.setFromCamera( mouse, camera );
 
-        // var objects = [cube]
         var objects = sceneCss.children
-        // var objects = scene.children
 
 	var intersects = raycaster.intersectObjects( objects );
 
 	if ( intersects.length > 0 ) {
 
                 css3DObject.element.style.backgroundColor = 'rgba(0,255,0, 0.5)';
-                // console.log('intersects', intersects[0].distance)
-                // console.log('intersects', intersects)
 
 	} else {
 
                 css3DObject.element.style.backgroundColor = 'rgba(255,0,0, 0.5)';
-                // console.log('no intersection')
 
 	}        
 }
