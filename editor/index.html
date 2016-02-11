@@ -193,6 +193,8 @@
 
 				editor.storage.get( function ( state ) {
 
+					if ( isLoadingFromHash ) return;
+
 					if ( state !== undefined ) {
 
 						editor.fromJSON( state );
@@ -324,6 +326,7 @@
 
 			//
 
+			var isLoadingFromHash = false;
 			var hash = window.location.hash;
 
 			if ( hash.substr( 1, 5 ) === 'file=' ) {
@@ -336,12 +339,12 @@
 					loader.crossOrigin = '';
 					loader.load( file, function ( text ) {
 
-						var json = JSON.parse( text );
-
 						editor.clear();
-						editor.fromJSON( json );
+						editor.fromJSON( JSON.parse( text ) );
 
 					} );
+
+					isLoadingFromHash = true;
 
 				}
 
