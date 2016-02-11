@@ -17,6 +17,18 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 
 	this.type = 'LatheGeometry';
 
+	if ( arguments.length === 1 && arguments[ 0 ].type === 'LatheGeometry' ) {
+
+		// Called by ObjectLoader.
+		var data = arguments[ 0 ];
+
+		points = data.points;
+		segments = data.segments;
+		phiStart = data.phiStart;
+		phiLength = data.phiLength;
+
+	}
+
 	this.parameters = {
 		points: points,
 		segments: segments,
