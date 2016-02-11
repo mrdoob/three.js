@@ -324,9 +324,9 @@ Menubar.Add = function ( editor ) {
 		var intensity = 1;
 		var distance = 0;
 		var angle = Math.PI * 0.1;
-		var exponent = 10;
+		var penumbra = 0;
 
-		var light = new THREE.SpotLight( color, intensity, distance, angle, exponent );
+		var light = new THREE.SpotLight( color, intensity, distance, angle, penumbra );
 		light.name = 'SpotLight ' + ( ++ lightCount );
 		light.target.name = 'SpotLight ' + ( lightCount ) + ' Target';
 

@@ -1,3 +1,9 @@
+bool testLightInRange( const in float lightDistance, const in float cutoffDistance ) {
+
+	return any( bvec2( cutoffDistance == 0.0, lightDistance < cutoffDistance ) );
+
+}
+
 float calcLightAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
 
 	if ( decayExponent > 0.0 ) {

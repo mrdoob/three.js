@@ -73,7 +73,6 @@
 		<script src="js/libs/ternjs/doc_comment.js"></script>
 		<script src="js/libs/tern-threejs/threejs.js"></script>
 
-		<script src="js/libs/sortable.min.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
 		<script src="js/libs/ui.three.js"></script>
@@ -192,6 +191,8 @@
 			editor.storage.init( function () {
 
 				editor.storage.get( function ( state ) {
+
+					if ( isLoadingFromHash ) return;
 
 					if ( state !== undefined ) {
 
@@ -324,6 +325,7 @@
 
 			//
 
+			var isLoadingFromHash = false;
 			var hash = window.location.hash;
 
 			if ( hash.substr( 1, 5 ) === 'file=' ) {
@@ -336,12 +338,12 @@
 					loader.crossOrigin = '';
 					loader.load( file, function ( text ) {
 
-						var json = JSON.parse( text );
-
 						editor.clear();
-						editor.fromJSON( json );
+						editor.fromJSON( JSON.parse( text ) );
 
 					} );
+
+					isLoadingFromHash = true;
 
 				}
 

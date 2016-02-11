@@ -23,11 +23,10 @@ THREE.WebGLLights = function () {
 					direction: new THREE.Vector3(),
 					color: new THREE.Color(),
 
-					shadowEnabled: false,
+					shadow: false,
 					shadowBias: 0,
 					shadowRadius: 1,
-					shadowMapSize: new THREE.Vector2(),
-					shadowMatrix: new THREE.Matrix4()
+					shadowMapSize: new THREE.Vector2()
 				};
 				break;
 
@@ -38,14 +37,13 @@ THREE.WebGLLights = function () {
 					color: new THREE.Color(),
 					distance: 0,
 					angleCos: 0,
-					exponent: 0,
+					penumbra: 0,
 					decay: 0,
 
-					shadowEnabled: false,
+					shadow: false,
 					shadowBias: 0,
 					shadowRadius: 1,
-					shadowMapSize: new THREE.Vector2(),
-					shadowMatrix: new THREE.Matrix4()
+					shadowMapSize: new THREE.Vector2()
 				};
 				break;
 
@@ -56,11 +54,10 @@ THREE.WebGLLights = function () {
 					distance: 0,
 					decay: 0,
 
-					shadowEnabled: false,
+					shadow: false,
 					shadowBias: 0,
 					shadowRadius: 1,
-					shadowMapSize: new THREE.Vector2(),
-					shadowMatrix: new THREE.Matrix4()
+					shadowMapSize: new THREE.Vector2()
 				};
 				break;
 

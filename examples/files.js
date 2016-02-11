@@ -126,6 +126,7 @@ var files = {
 		"webgl_materials_parallaxmap",
 		"webgl_materials_shaders_fresnel",
 		"webgl_materials_skin",
+		"webgl_materials_standard",
 		"webgl_materials_texture_anisotropy",
 		"webgl_materials_texture_compressed",
 		"webgl_materials_texture_filters",
@@ -177,6 +178,7 @@ var files = {
 		"webgl_postprocessing_godrays",
 		"webgl_postprocessing_masking",
 		"webgl_postprocessing_nodes",
+		"webgl_postprocessing_smaa",
 		"webgl_postprocessing_ssao",
 		"webgl_raycast_texture",
 		"webgl_read_float_buffer",
@@ -228,7 +230,8 @@ var files = {
 	],
 	"webvr": [
 		"webvr_cubes",
-		"webvr_video"
+		"webvr_video",
+		"webvr_stereo_pano"
 	],
 	"css3d": [
 		"css3d_molecules",

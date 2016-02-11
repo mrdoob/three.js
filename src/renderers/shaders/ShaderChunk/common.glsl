@@ -15,6 +15,7 @@ float average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }
 struct IncidentLight {
 	vec3 color;
 	vec3 direction;
+	bool visible;
 };
 
 struct ReflectedLight {
@@ -29,59 +30,6 @@ struct GeometricContext {
 	vec3 normal;
 	vec3 viewDir;
 };
-
-
-#if NUM_DIR_LIGHTS > 0
-
-	struct DirectionalLight {
-		vec3 direction;
-		vec3 color;
-	};
-
-	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
-
-#endif
-
-#if NUM_SPOT_LIGHTS > 0
-
-	struct SpotLight {
-		vec3 position;
-		vec3 direction;
-		vec3 color;
-		float distance;
-		float decay;
-		float angleCos;
-		float exponent;
-	};
-
-	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
-
-#endif
-
-#if NUM_POINT_LIGHTS > 0
-
-	struct PointLight {
-		vec3 position;
-		vec3 color;
-		float distance;
-		float decay;
-	};
-
-	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
-
-#endif
-
-#if NUM_HEMI_LIGHTS > 0
-
-	struct HemisphereLight {
-		vec3 direction;
-		vec3 skyColor;
-		vec3 groundColor;
-	};
-
-	uniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];
-
-#endif
 
 
 vec3 transformDirection( in vec3 dir, in mat4 matrix ) {

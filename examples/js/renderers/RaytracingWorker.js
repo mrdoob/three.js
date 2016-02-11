@@ -108,8 +108,6 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 	var lights = [];
 	var cache = {};
 
-	var animationFrameId = null;
-
 	this.setSize = function ( width, height ) {
 
 		canvasWidth = width;
@@ -509,8 +507,6 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 	this.render = function ( scene, camera ) {
 
 		reallyThen = Date.now()
-
-		cancelAnimationFrame( animationFrameId );
 
 		// update scene graph
 
