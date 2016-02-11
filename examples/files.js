@@ -178,6 +178,7 @@ var files = {
 		"webgl_postprocessing_godrays",
 		"webgl_postprocessing_masking",
 		"webgl_postprocessing_nodes",
+		"webgl_postprocessing_smaa",
 		"webgl_postprocessing_ssao",
 		"webgl_raycast_texture",
 		"webgl_read_float_buffer",
