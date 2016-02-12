@@ -2892,6 +2892,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function getTextureTarget ( texture ) {
+		var textureTarget = _gl.TEXTURE_2D;
+		if ( texture instanceof THREE.Texture3D ) {
+			if ( !_isWebGL2 ) {
+				throw new Error('3D Textures are only supported in WebGL2 contexts.');
+			}
+			textureTarget = _gl.TEXTURE_3D;
+		}
+		return textureTarget;
+	}
+
 	function uploadTexture( textureProperties, texture, slot ) {
 
 		if ( textureProperties.__webglInit === undefined ) {
@@ -2906,8 +2917,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		var textureTarget = getTextureTarget( texture );
 		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
+		state.bindTexture( textureTarget, textureProperties.__webglTexture );
 
 		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
@@ -2925,13 +2937,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		glFormat = paramThreeToGL( texture.format ),
 		glType = paramThreeToGL( texture.type );
 
-		var textureTarget = _gl.TEXTURE_2D;
-		if ( texture instanceof THREE.Texture3D ) {
-			if ( !_isWebGL2 ) {
-				throw new Error('3D Textures are only supported in WebGL2 contexts.');
-			}
-			textureTarget = _gl.TEXTURE_3D;
-		}
 		setTextureParameters( textureTarget, texture, isPowerOfTwoImage );
 
 		var mipmap, mipmaps = texture.mipmaps;
@@ -2997,7 +3002,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 					mipmap = mipmaps[ i ];
-					state.texImage3D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, mipmap.depth, 0, glFormat, glType, mipmap.data );
+					state.texImage3D( _gl.TEXTURE_3D, i, glFormat, mipmap.width, mipmap.height, mipmap.depth, 0, glFormat, glType, mipmap.data );
 
 				}
 
@@ -3005,7 +3010,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				state.texImage3D( _gl.TEXTURE_2D, 0, glFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
+				state.texImage3D( _gl.TEXTURE_3D, 0, glFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
 
 			}
 		} else {
@@ -3035,7 +3040,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( texture.generateMipmaps && isPowerOfTwoImage ) _gl.generateMipmap( _gl.TEXTURE_2D );
+		if ( texture.generateMipmaps && isPowerOfTwoImage ) _gl.generateMipmap( textureTarget );
 
 		textureProperties.__version = texture.version;
 
@@ -3072,7 +3077,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
+		state.bindTexture( getTextureTarget( texture ), textureProperties.__webglTexture );
 
 	};
 
