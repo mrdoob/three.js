@@ -134,8 +134,8 @@
 
 			} );
 
-			var onTextureLoad = function () {
-			  pmremGenerator = new THREE.PMREMGenerator(reflectionCube);
+			var onTextureLoad = function ( cubeMap ) {
+			  pmremGenerator = new THREE.PMREMGenerator(cubeMap);
 			  pmremCubeUVPacker = new THREE.PMREM_CubeUVPacker(pmremGenerator.cubeLods);
 			  pmremGenerator.update(renderer);
 			  pmremCubeUVPacker.update(renderer);
@@ -155,8 +155,8 @@
 			  scene.add( torusMesh1 );
 			};
 
-			function onHdrCubeMapLoad() {
-			  pmremGenerator = new THREE.PMREMGenerator(hdrCubeMap);
+			function onHdrCubeMapLoad( cubeMap ) {
+			  pmremGenerator = new THREE.PMREMGenerator( cubeMap );
 			  pmremCubeUVPacker = new THREE.PMREM_CubeUVPacker(pmremGenerator.cubeLods);
 			  pmremGenerator.update(renderer);
 			  pmremCubeUVPacker.update(renderer);
@@ -212,11 +212,11 @@
 						hdrpath + 'py' + hdrformat, hdrpath + 'ny' + hdrformat,
 						hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 					];
-					reflectionCube = THREE.ImageUtils.loadTextureCube( urls, undefined, onTextureLoad );
-					reflectionCube.encoding = THREE.sRGB;
+					//reflectionCube = THREE.ImageUtils.loadTextureCube( urls, undefined, onTextureLoad );
+					//reflectionCube.encoding = THREE.sRGB;
 					//reflectionCube.format = THREE.RGBFormat;
 
-					//                                                                hdrCubeMap = new HDRCubeMapLoader().load(hdrurls, onHdrCubeMapLoad);
+					hdrCubeMap = new THREE.HDRCubeMapLoader().load(hdrurls, onTextureLoad);
 
 					//                                                                hdrTexture = new THREE.RGBELoader().load( '../examples/textures/cube/hdrPisa/px.hdr', onHdrLoad );
 					var grass = new THREE.TextureLoader().load( '../examples/textures/terrain/grasslight-big.jpg' );

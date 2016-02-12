@@ -4,7 +4,7 @@
  */
 
  THREE.PMREMGenerator = function( cubeTexture ) {
-
+   console.trace( 'cubeTexture', cubeTexture );
 	if ( cubeTexture instanceof THREE.CubeTexture ) {
 
 		if ( cubeTexture.images[ 0 ] === undefined )
