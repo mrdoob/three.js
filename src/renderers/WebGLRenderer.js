@@ -2988,7 +2988,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( texture instanceof THREE.Texture3D ) {
 
 			// WebGL2 only cube texture
-			if (!_isWebGL2) 
+			if (!_isWebGL2) {
 				throw new Error('3D Textures are only supported in WebGL2 contexts.');
 			}
 
