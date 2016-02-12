@@ -2843,6 +2843,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrapS ) );
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrapT ) );
 
+			if ( texture instanceof THREE.Texture3D ) {
+				if ( !_isWebGL2 ) throw new Error('3D Textures are only supported in WebGL2 contexts.');
+				if ( !texture.wrapR ) console.warn('Texture3D is missing a .texture.wrapR option!');
+				else _gl.texParameteri( textureType, _gl.TEXTURE_WRAP_R, paramThreeToGL( texture.wrapR ) );
+			}
+
 			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.magFilter ) );
 			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.minFilter ) );
 
@@ -2919,7 +2925,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		glFormat = paramThreeToGL( texture.format ),
 		glType = paramThreeToGL( texture.type );
 
-		setTextureParameters( _gl.TEXTURE_2D, texture, isPowerOfTwoImage );
+		var textureTarget = _gl.TEXTURE_2D;
+		if ( texture instanceof THREE.Texture3D ) {
+			if ( !_isWebGL2 ) {
+				throw new Error('3D Textures are only supported in WebGL2 contexts.');
+			}
+			textureTarget = _gl.TEXTURE_3D;
+		}
+		setTextureParameters( textureTarget, texture, isPowerOfTwoImage );
 
 		var mipmap, mipmaps = texture.mipmaps;
 
@@ -2972,6 +2985,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+		} else if ( texture instanceof THREE.Texture3D ) {
+
+			// WebGL2 only cube texture
+			if (!_isWebGL2) 
+				throw new Error('3D Textures are only supported in WebGL2 contexts.');
+			}
+
+			if ( mipmaps.length > 0 ) { // WebGL2 supports NPOT mipmapping
+
+				for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+					mipmap = mipmaps[ i ];
+					state.texImage3D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, mipmap.depth, 0, glFormat, glType, mipmap.data );
+
+				}
+
+				texture.generateMipmaps = false;
+
+			} else {
+
+				state.texImage3D( _gl.TEXTURE_2D, 0, glFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
+
+			}
 		} else {
 
 			// regular Texture (image, video, canvas)
