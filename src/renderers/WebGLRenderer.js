@@ -3010,7 +3010,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				state.texImage3D( _gl.TEXTURE_3D, 0, glFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
+				// Chrome fails if internal format is RGB or RGBA
+				var internalFormat = _gl.RGB32F;
+				if ( texture.format === THREE.RGBAFormat ) {
+					internalFormat = _gl.RGBA32F;
+				}
+				state.texImage3D( _gl.TEXTURE_3D, 0, internalFormat, image.width, image.height, image.depth, 0, _gl.RGB, glType, image.data );
 
 			}
 		} else {
