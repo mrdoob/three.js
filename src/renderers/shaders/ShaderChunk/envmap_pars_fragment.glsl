@@ -10,6 +10,7 @@
 		uniform sampler2D envMap;
 	#endif
 	uniform float flipEnvMap;
+	uniform int envMapEncoding;
 
 	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( STANDARD )
 

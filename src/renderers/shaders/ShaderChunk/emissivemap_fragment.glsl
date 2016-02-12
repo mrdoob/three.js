@@ -2,7 +2,7 @@
 
 	vec4 emissiveColor = texture2D( emissiveMap, vUv );
 
-	emissiveColor.rgb = inputToLinear( emissiveColor.rgb );
+	emissiveColor.rgb = texelDecode( emissiveColor, emissiveMapEncoding ).rgb;
 
 	totalEmissiveLight *= emissiveColor.rgb;
 

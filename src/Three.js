@@ -305,3 +305,13 @@ THREE.WrapAroundEnding = 2402;
 THREE.TrianglesDrawMode = 0;
 THREE.TriangleStripDrawMode = 1;
 THREE.TriangleFanDrawMode = 2;
+
+// Texture Encodings
+
+THREE.Linear = 3000; // No encoding at all.
+THREE.sRGB = 3001; // AKA gamma 2.2.
+THREE.RGBE = 3002; // AKA Radiance
+//THREE.LogLuv = 3003; TODO
+THREE.RGBM7 = 3004;
+THREE.RGBM16 = 3005;
+//THREE.RGBD = 3006; TODO
