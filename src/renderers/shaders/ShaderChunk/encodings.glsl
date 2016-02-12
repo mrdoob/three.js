@@ -1,3 +1,5 @@
+// For a discussion of what this is, please read this: http://lousodrome.net/blog/light/2013/05/26/gamma-correct-and-hdr-rendering-in-a-32-bits-buffer/
+
 // These encodings should have the same integer values as THREE.Linear, THREE.sRGB, etc...
 #define ENCODING_Linear 3000
 #define ENCODING_sRGB   3001
@@ -23,7 +25,7 @@ vec4 texelDecode( in vec4 encodedTexel, in int encoding ) {
     return vec4( encodedTexel.xyz * exp2( encodedTexel.w*256.0 - 128.0 ), 1.0 );
   }
 
-  // TODO
+  // TODO, see here http://graphicrants.blogspot.ca/2009/04/rgbm-color-encoding.html
   //if( encoding == ENCODING_LogLuv ) {
   //}
 
@@ -63,7 +65,7 @@ vec4 texelEncode( in vec4 linearRgba, in int encoding )
     return vec4( linearRgba.rgb / exp2(fExp), (fExp + 128.0) / 255.0 );
   }
 
-  // TODO
+  // TODO, see here http://graphicrants.blogspot.ca/2009/04/rgbm-color-encoding.html
   //if( encoding == ENCODING_LogLuv ) {
   //}
 
