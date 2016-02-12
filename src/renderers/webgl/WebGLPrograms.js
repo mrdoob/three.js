@@ -98,6 +98,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			map: !! material.map,
 			envMap: !! material.envMap,
 			envMapMode: material.envMap && material.envMap.mapping,
+			envMapCubeUV: (!!material.envMap) && ((material.envMap.mapping === THREE.CubeUVReflectionMapping) ||
+							(material.envMap.mapping === THREE.CubeUVRefractionMapping)),
 			lightMap: !! material.lightMap,
 			aoMap: !! material.aoMap,
 			emissiveMap: !! material.emissiveMap,

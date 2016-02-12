@@ -546,6 +546,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "bsdfs" ],
 			THREE.ShaderChunk[ "encodings" ],
 			THREE.ShaderChunk[ "ambient_pars" ],
+			THREE.ShaderChunk[ "cube_uv_reflection_fragment" ],
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "lights_standard_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
