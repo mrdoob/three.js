@@ -28,7 +28,7 @@
 	this.sourceTexture = cubeTexture;
 
   // encoded formats do not interpolate well, thus turn off interpolation for them
-  var textureFilter = ( sourceTexture.encoding === THREE.Linear ) ? THREE.LinearFilter : THREE.NearestFilter;
+  var textureFilter = ( this.sourceTexture.encoding === THREE.Linear ) ? THREE.LinearFilter : THREE.NearestFilter;
   this.sourceTexture.minFilter = this.sourceTexture.magFilter = textureFilter;
 
 	this.cubeLods = [];
@@ -60,7 +60,7 @@
 
 THREE.PMREMGenerator.prototype = {
 
-	constructor : PMREMGenerator,
+	constructor : THREE.PMREMGenerator,
 
 	update: function( renderer ) {
 
@@ -172,8 +172,8 @@ THREE.PMREMGenerator.prototype = {
            else\n\
                color = vec4(1.0,0.0,1.0,1.0);\n\
            return color;\n\
-        }",
-  			THREE.ShaderChunk[ "encodings" ],
+        }" +
+  			THREE.ShaderChunk[ "encodings" ] +
         "void main() {\n\
            vec3 sampleDirection;\n\
            vec2 uv = vUv*2.0 - 1.0;\n\
@@ -215,7 +215,7 @@ THREE.PMREMGenerator.prototype = {
                rgbColor.rgb += color;\n\
            }\n\
            rgbColor /= float(NumSamples);\n\
-           gl_FragColor = texelEncode( rgbColor, encoding );\n\
+           gl_FragColor = texelEncode( vec4( rgbColor, 1.0 ), encoding );\n\
         }"
       }
     );

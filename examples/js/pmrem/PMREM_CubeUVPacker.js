@@ -2,73 +2,8 @@
  * @author Prashant Sharma / spidersharma03
  */
 
-var vertexShaderPMREMCubeUV = "precision highp float;\
-                   varying vec2 vUv;\
-                   void main() {\
-                        vUv = uv;\
-                        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-                   }";
 
-var fragmentShaderPMREMCubeUV = "precision highp float;\
-    varying vec2 vUv;\
-    uniform samplerCube cubeTexture;\
-    uniform float mapSize;\
-    uniform vec3 testColor;\
-    uniform int faceIndex;\
-    \
-    const float PI = 3.14159265358979;\
-    vec4 sampleCubeMap(float phi, float theta) {\
-        float sinTheta = sin(theta);\
-        float cosTheta = cos(theta);\
-        vec3 sampleDir = vec3(cos(phi) * sinTheta, cosTheta, sin(phi) * sinTheta);\
-        vec4 color = textureCube(cubeTexture, sampleDir);\
-        return color * vec4(testColor, 1.0);\
-    }\
-    void main() {\
-        vec3 sampleDirection;\
-        vec2 uv = vUv;\
-        uv = uv * 2.0 - 1.0;\
-        uv.y *= -1.0;\
-        if(faceIndex == 0) {\
-            sampleDirection = normalize(vec3(1.0, uv.y, -uv.x));\
-        }\
-        else if(faceIndex == 1) {\
-            sampleDirection = normalize(vec3(uv.x, 1.0, uv.y));\
-        }\
-        else if(faceIndex == 2) {\
-            sampleDirection = normalize(vec3(uv.x, uv.y, 1.0));\
-        }\
-        else if(faceIndex == 3) {\
-            sampleDirection = normalize(vec3(-1.0, uv.y, uv.x));\
-        }\
-        else if(faceIndex == 4) {\
-            sampleDirection = normalize(vec3(uv.x, -1.0, -uv.y));\
-        }\
-        else {\
-            sampleDirection = normalize(vec3(-uv.x, uv.y, -1.0));\
-        }\
-        vec4 color = textureCube(cubeTexture, (sampleDirection));\
-        gl_FragColor = color * vec4(testColor, 1.0);\
-    }\
-";
-var uniformsPMREMCubeUV = {
-	"faceIndex": { type: 'i', value: 0 },
-	"mapSize": { type: 'f', value: 0 },
-	"cubeTexture": { type: 't', value: null },
-	"testColor": { type: 'v3', value: new THREE.Vector3( 1, 1, 1 ) }
-};
-
-var testColor = [];
-testColor.push( new THREE.Vector3( 1, 0, 0 ) );
-testColor.push( new THREE.Vector3( 0, 1, 0 ) );
-testColor.push( new THREE.Vector3( 0, 0, 1 ) );
-testColor.push( new THREE.Vector3( 1, 1, 0 ) );
-testColor.push( new THREE.Vector3( 0, 1, 1 ) );
-testColor.push( new THREE.Vector3( 1, 0, 1 ) );
-testColor.push( new THREE.Vector3( 1, 1, 1 ) );
-testColor.push( new THREE.Vector3( 0.5, 1, 0.5 ) );
-
-var PMREM_CubeUVPacker = function( cubeTextureLods, numLods ) {
+THREE.PMREM_CubeUVPacker = function( cubeTextureLods, numLods ) {
 
 	this.cubeLods = cubeTextureLods;
 	this.numLods = numLods;
@@ -109,16 +44,25 @@ var PMREM_CubeUVPacker = function( cubeTextureLods, numLods ) {
 		var mipOffsetX = 0;
 		var mipOffsetY = 0;
 		var mipSize = size;
+
+    /*
+    var testColor = [];
+    testColor.push( new THREE.Vector3( 1, 0, 0 ) );
+    testColor.push( new THREE.Vector3( 0, 1, 0 ) );
+    testColor.push( new THREE.Vector3( 0, 0, 1 ) );
+    testColor.push( new THREE.Vector3( 1, 1, 0 ) );
+    testColor.push( new THREE.Vector3( 0, 1, 1 ) );
+    testColor.push( new THREE.Vector3( 1, 0, 1 ) );
+    testColor.push( new THREE.Vector3( 1, 1, 1 ) );
+    testColor.push( new THREE.Vector3( 0.5, 1, 0.5 ) );*/
+
 		for ( var j = 0; j < nMips; j ++ ) {
 
 			// Mip Maps
 			for ( var k = 0; k < 6; k ++ ) {
 
 				// 6 Cube Faces
-				var material = new THREE.ShaderMaterial();
-				material.vertexShader = vertexShaderPMREMCubeUV;
-				material.fragmentShader = fragmentShaderPMREMCubeUV;
-				material.uniforms = THREE.UniformsUtils.clone( uniformsPMREMCubeUV );
+				var material = this.getShader();
 				material.uniforms[ "cubeTexture" ].value = this.cubeLods[ i ];
 				material.uniforms[ "faceIndex" ].value = k;
 				material.uniforms[ "mapSize" ].value = mipSize;
@@ -147,12 +91,79 @@ var PMREM_CubeUVPacker = function( cubeTextureLods, numLods ) {
 
 };
 
-PMREM_CubeUVPacker.prototype = {
-	constructor : PMREM_CubeUVPacker,
+THREE.PMREM_CubeUVPacker.prototype = {
+
+	constructor : THREE.PMREM_CubeUVPacker,
 
 	update: function( renderer ) {
 
 		renderer.render( this.scene, this.camera, this.CubeUVRenderTarget, true );
 
-	}
+	},
+
+  getShader: function() {
+
+    return new THREE.ShaderMaterial( {
+
+      uniforms: {
+       	"faceIndex": { type: 'i', value: 0 },
+       	"mapSize": { type: 'f', value: 0 },
+       	"cubeTexture": { type: 't', value: null },
+       	"testColor": { type: 'v3', value: new THREE.Vector3( 1, 1, 1 ) }
+      },
+
+      vertexShader:
+        "precision highp float;\
+         varying vec2 vUv;\
+         void main() {\
+            vUv = uv;\
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
+         }",
+
+      fragmentShader:
+       "precision highp float;\
+        varying vec2 vUv;\
+        uniform samplerCube cubeTexture;\
+        uniform float mapSize;\
+        uniform vec3 testColor;\
+        uniform int faceIndex;\
+        \
+        const float PI = 3.14159265358979;\
+        vec4 sampleCubeMap(float phi, float theta) {\
+          float sinTheta = sin(theta);\
+          float cosTheta = cos(theta);\
+          vec3 sampleDir = vec3(cos(phi) * sinTheta, cosTheta, sin(phi) * sinTheta);\
+          vec4 color = textureCube(cubeTexture, sampleDir);\
+          return color * vec4(testColor, 1.0);\
+        }\
+        void main() {\
+          vec3 sampleDirection;\
+          vec2 uv = vUv;\
+          uv = uv * 2.0 - 1.0;\
+          uv.y *= -1.0;\
+          if(faceIndex == 0) {\
+              sampleDirection = normalize(vec3(1.0, uv.y, -uv.x));\
+          }\
+          else if(faceIndex == 1) {\
+              sampleDirection = normalize(vec3(uv.x, 1.0, uv.y));\
+          }\
+          else if(faceIndex == 2) {\
+              sampleDirection = normalize(vec3(uv.x, uv.y, 1.0));\
+          }\
+          else if(faceIndex == 3) {\
+              sampleDirection = normalize(vec3(-1.0, uv.y, uv.x));\
+          }\
+          else if(faceIndex == 4) {\
+              sampleDirection = normalize(vec3(uv.x, -1.0, -uv.y));\
+          }\
+          else {\
+              sampleDirection = normalize(vec3(-uv.x, uv.y, -1.0));\
+          }\
+          vec4 color = textureCube(cubeTexture, (sampleDirection));\
+          gl_FragColor = color * vec4(testColor, 1.0);\
+        }"
+    });
+
+  }
+
 };
