@@ -7,15 +7,6 @@ THREE.MSAAPass = function ( scene, camera, params, clearColor, clearAlpha ) {
   this.scene = scene;
   this.camera = camera;
 
-  // any set of samples in equal area weighting pattern is fine (3 or +4 samples would also work as well)
-  this.sampleOffsets = [];
-  this.sampleOffsets[0] = null;
-  this.sampleOffsets[1] = this.standardDirctX11_MSAA2();
-  this.sampleOffsets[2] = this.standardDirctX11_MSAA4();
-  this.sampleOffsets[3] = this.standardDirctX11_MSAA8();
-  this.sampleOffsets[4] = this.standardDirctX11_MSAA16();
-  this.sampleOffsets[5] = this.standardDirctX11_MSAA32();
-
   this.currentSampleLevel = 4;
 
   this.params = params || { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
@@ -83,7 +74,7 @@ THREE.MSAAPass.prototype = {
 
     var camera = ( this.camera || this.scene.camera );
 
-    var currentSampleOffsets = this.sampleOffsets[ Math.max( 0, Math.min( this.currentSampleLevel, 5 ) ) ];
+    var currentSampleOffsets = THREE.MSAAPass.JitterVectors[ Math.max( 0, Math.min( this.currentSampleLevel, 5 ) ) ];
 
     if( ! currentSampleOffsets ) {
 
@@ -144,138 +135,105 @@ THREE.MSAAPass.prototype = {
 
     renderer.setClearColor( this.oldClearColor, this.oldClearAlpha );
 
-  },
+  }
+};
 
-  // DirectX 11 standard MSAA sample pattern
-  standardDirctX11_MSAA2: function() {
-    var vectors = [
-      new THREE.Vector3(  4,  4, 0 ),
-      new THREE.Vector3( -4, -4, 0 )
-    ];
-    var xfrm = new THREE.Matrix4().makeScale( 1 / 16.0, 1/ 16.0, 0 );
+THREE.MSAAPass.normalizedJitterVectors = function() {
+  var xfrm = new THREE.Matrix4().makeScale( 1 / 16.0, 1/ 16.0, 0 );
+
+  return function( jitterVectors ) {
     var vectors2 = [];
-    for( var i = 0; i < vectors.length; i ++ ) {
-      vectors2.push( vectors[i].clone().applyMatrix4( xfrm ) );
-    }
-    return vectors2;
-  },
-
-  // DirectX 11 standard MSAA sample pattern
-  standardDirctX11_MSAA4: function() {
-    var vectors = [
-      new THREE.Vector3( -2, -6, 0 ),
-      new THREE.Vector3(  6, -2, 0 ),
-      new THREE.Vector3( -6,  2, 0 ),
-      new THREE.Vector3(  2,  6, 0 )
-    ];
-    var xfrm = new THREE.Matrix4().makeScale( 1 / 16.0, 1/ 16.0, 0 );
-    var vectors2 = [];
-    for( var i = 0; i < vectors.length; i ++ ) {
-      vectors2.push( vectors[i].clone().applyMatrix4( xfrm ) );
-    }
-    return vectors2;
-  },
-
-  // DirectX 11 standard MSAA sample pattern
-  standardDirctX11_MSAA8: function() {
-    var vectors = [
-      new THREE.Vector3(  1, -3, 0 ),
-      new THREE.Vector3( -1,  3, 0 ),
-      new THREE.Vector3(  5,  1, 0 ),
-      new THREE.Vector3( -3, -5, 0 ),
-      new THREE.Vector3( -5,  5, 0 ),
-      new THREE.Vector3( -7, -1, 0 ),
-      new THREE.Vector3(  3,  7, 0 ),
-      new THREE.Vector3(  7, -7, 0 ),
-    ];
-    var xfrm = new THREE.Matrix4().makeScale( 1 / 16.0, 1/ 16.0, 0 );
-    var vectors2 = [];
-    for( var i = 0; i < vectors.length; i ++ ) {
-      vectors2.push( vectors[i].clone().applyMatrix4( xfrm ) );
-    }
-    return vectors2;
-  },
-
-  // DirectX 11 standard MSAA sample pattern
-  standardDirctX11_MSAA16: function() {
-    var vectors = [
-      new THREE.Vector3(  1,  1, 0 ),
-      new THREE.Vector3( -1, -3, 0 ),
-      new THREE.Vector3( -3,  2, 0 ),
-      new THREE.Vector3(  4, -1, 0 ),
-
-      new THREE.Vector3( -5, -2, 0 ),
-      new THREE.Vector3(  2,  5, 0 ),
-      new THREE.Vector3(  5,  3, 0 ),
-      new THREE.Vector3(  3, -5, 0 ),
-
-      new THREE.Vector3( -2,  6, 0 ),
-      new THREE.Vector3(  0, -7, 0 ),
-      new THREE.Vector3( -4, -6, 0 ),
-      new THREE.Vector3( -6,  4, 0 ),
-
-      new THREE.Vector3( -8,  0, 0 ),
-      new THREE.Vector3(  7, -4, 0 ),
-      new THREE.Vector3(  6,  7, 0 ),
-      new THREE.Vector3( -7, -8, 0 ),
-    ];
-    var xfrm = new THREE.Matrix4().makeScale( 1 / 16.0, 1/ 16.0, 0 );
-    var vectors2 = [];
-    for( var i = 0; i < vectors.length; i ++ ) {
-      vectors2.push( vectors[i].clone().applyMatrix4( xfrm ) );
-    }
-    return vectors2;
-  },
-
-  // based on this: http://images.anandtech.com/reviews/video/NVIDIA/GF100/CSAA.png
-  standardDirctX11_MSAA32: function() {
-    var vectors = [
-      new THREE.Vector3( -4, -7, 0 ),
-      new THREE.Vector3( -7, -5, 0 ),
-      new THREE.Vector3( -3, -5, 0 ),
-      new THREE.Vector3( -5, -4, 0 ),
-
-      new THREE.Vector3( -1, -4, 0 ),
-      new THREE.Vector3( -2, -2, 0 ),
-      new THREE.Vector3( -6, -1, 0 ),
-      new THREE.Vector3( -4,  0, 0 ),
-
-      new THREE.Vector3( -7,  1, 0 ),
-      new THREE.Vector3( -1,  2, 0 ),
-      new THREE.Vector3( -6,  3, 0 ),
-      new THREE.Vector3( -3,  3, 0 ),
-
-      new THREE.Vector3( -7,  6, 0 ),
-      new THREE.Vector3( -3,  6, 0 ),
-      new THREE.Vector3( -5,  7, 0 ),
-      new THREE.Vector3( -1,  7, 0 ),
-
-      new THREE.Vector3(  5, -7, 0 ),
-      new THREE.Vector3(  1, -6, 0 ),
-      new THREE.Vector3(  6, -5, 0 ),
-      new THREE.Vector3(  4, -4, 0 ),
-
-      new THREE.Vector3(  2, -3, 0 ),
-      new THREE.Vector3(  7, -2, 0 ),
-      new THREE.Vector3(  1, -1, 0 ),
-      new THREE.Vector3(  4, -1, 0 ),
-
-      new THREE.Vector3(  2,  1, 0 ),
-      new THREE.Vector3(  6,  2, 0 ),
-      new THREE.Vector3(  0,  4, 0 ),
-      new THREE.Vector3(  4,  4, 0 ),
-
-      new THREE.Vector3(  2,  5, 0 ),
-      new THREE.Vector3(  7,  5, 0 ),
-      new THREE.Vector3(  5,  6, 0 ),
-      new THREE.Vector3(  3,  7, 0 ),
-    ];
-    var xfrm = new THREE.Matrix4().makeScale( 1 / 16.0, 1/ 16.0, 0 );
-    var vectors2 = [];
-    for( var i = 0; i < vectors.length; i ++ ) {
-      vectors2.push( vectors[i].clone().applyMatrix4( xfrm ) );
+    for( var i = 0; i < jitterVectors.length; i ++ ) {
+      vectors2.push( new THREE.Vector3( jitterVectors[i][0], jitterVectors[i][0] ).applyMatrix4( xfrm ) );
     }
     return vectors2;
   }
+}(),
 
-};
+THREE.MSAAPass.JitterVectors = [
+  THREE.MSAAPass.normalizedJitterVectors( [
+    [  0,  0 ]
+  ] ),
+  THREE.MSAAPass.normalizedJitterVectors( [
+    [  4,  4 ],
+    [ -4, -4 ]
+  ] ),
+  THREE.MSAAPass.normalizedJitterVectors( [
+    [ -2, -6 ],
+    [  6, -2 ],
+    [ -6,  2 ],
+    [  2,  6 ]
+  ] ),
+  THREE.MSAAPass.normalizedJitterVectors( [
+    [  1, -3 ],
+    [ -1,  3 ],
+    [  5,  1 ],
+    [ -3, -5 ],
+    [ -5,  5 ],
+    [ -7, -1 ],
+    [  3,  7 ],
+    [  7, -7 ]
+  ] ),
+  THREE.MSAAPass.normalizedJitterVectors( [
+    [  1,  1 ],
+    [ -1, -3 ],
+    [ -3,  2 ],
+    [  4, -1 ],
+
+    [ -5, -2 ],
+    [  2,  5 ],
+    [  5,  3 ],
+    [  3, -5 ],
+
+    [ -2,  6 ],
+    [  0, -7 ],
+    [ -4, -6 ],
+    [ -6,  4 ],
+
+    [ -8,  0 ],
+    [  7, -4 ],
+    [  6,  7 ],
+    [ -7, -8 ]
+  ] ),
+  THREE.MSAAPass.normalizedJitterVectors( [
+    [ -4, -7 ],
+    [ -7, -5 ],
+    [ -3, -5 ],
+    [ -5, -4 ],
+
+    [ -1, -4 ],
+    [ -2, -2 ],
+    [ -6, -1 ],
+    [ -4,  0 ],
+
+    [ -7,  1 ],
+    [ -1,  2 ],
+    [ -6,  3 ],
+    [ -3,  3 ],
+
+    [ -7,  6 ],
+    [ -3,  6 ],
+    [ -5,  7 ],
+    [ -1,  7 ],
+
+    [  5, -7 ],
+    [  1, -6 ],
+    [  6, -5 ],
+    [  4, -4 ],
+
+    [  2, -3 ],
+    [  7, -2 ],
+    [  1, -1 ],
+    [  4, -1 ],
+
+    [  2,  1 ],
+    [  6,  2 ],
+    [  0,  4 ],
+    [  4,  4 ],
+
+    [  2,  5 ],
+    [  7,  5 ],
+    [  5,  6 ],
+    [  3,  7 ]
+  ] )
+];

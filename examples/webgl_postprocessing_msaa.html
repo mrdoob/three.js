@@ -48,8 +48,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				//
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 400;
 
@@ -66,10 +64,9 @@
 				// postprocessing
 
 				composer = new THREE.EffectComposer( renderer );
-				//composer.addPass( new THREE.RenderPass( scene, camera ) );
 
 				var massPass = new THREE.MSAAPass( scene, camera, new THREE.Color( 1.0, 1.0, 1.0 ), 1.0 );
-				massPass.currentSampleLevel = 1;
+				massPass.currentSampleLevel = 4;
 				composer.addPass( massPass );
 
 				var copyPass = new THREE.ShaderPass(THREE.CopyShader);
