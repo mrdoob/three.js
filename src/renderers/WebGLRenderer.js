@@ -3246,18 +3246,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( renderTarget.depthBuffer && ! renderTarget.stencilBuffer ) {
 
-			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTarget.width, renderTarget.height );
+			if (_isWebGL2 && renderTarget.samples) {
+				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, renderTarget.samples, _gl.DEPTH_COMPONENT16, renderTarget.width, renderTarget.height );
+			} else {
+				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTarget.width, renderTarget.height );
+			}
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
 
 		} else if ( renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
 
-			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
+			if (_isWebGL2 && renderTarget.samples) {
+				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, renderTarget.samples, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
+			} else {
+				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
+			}
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
 
 		} else {
 
 			// FIXME: We don't support !depth !stencil
-			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.RGBA4, renderTarget.width, renderTarget.height );
+			if (_isWebGL2 && renderTarget.samples) {
+				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, renderTarget.samples, _gl.RGBA4, renderTarget.width, renderTarget.height );			
+			} else {
+				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.RGBA4, renderTarget.width, renderTarget.height );
+			}
 
 		}
 

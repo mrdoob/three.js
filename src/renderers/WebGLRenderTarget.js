@@ -30,6 +30,7 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
 
+	this.samples = undefined;
 };
 
 THREE.WebGLRenderTarget.prototype = {
@@ -66,6 +67,7 @@ THREE.WebGLRenderTarget.prototype = {
 		this.viewport.copy( source.viewport );
 
 		this.texture = source.texture.clone();
+		this.samples = source.samples;
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
