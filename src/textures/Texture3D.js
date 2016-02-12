@@ -13,7 +13,7 @@ THREE.Texture3D = function ( data, width, height, depth, format, type, mapping, 
   
   this.flipY = false;
   this.generateMipmaps  = false;
-  this.texture.wrapR = wrapR !== undefined ? wrapR : THREE.ClampToEdgeWrapping;
+  this.wrapR = wrapR !== undefined ? wrapR : THREE.ClampToEdgeWrapping;
 };
 
 THREE.Texture3D.prototype = Object.create( THREE.Texture.prototype );
@@ -21,6 +21,6 @@ THREE.Texture3D.prototype.constructor = THREE.Texture3D;
 
 THREE.Texture3D.prototype.copy = function ( source ) {
   THREE.Texture.prototype.copy.call(this, source);
-  this.texture.wrapR = source.texture.wrapR;
+  this.wrapR = source.wrapR;
   return this;
 };
