@@ -150,8 +150,8 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			} else {
 
-        renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
-        renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
+				renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
+				renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
 
 			}
 			renderer.render( scene, cameraR );
