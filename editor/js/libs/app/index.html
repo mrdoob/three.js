@@ -52,7 +52,7 @@
 					button.addEventListener( 'click', function ( event ) {
 
 						var url = location.href.split( '/' ).slice( 0, - 1 ).join( '/' );
-						location.href = 'http://threejs.org/editor/#file=https://crossorigin.me/' + url + '/app.json';
+						window.open( 'http://threejs.org/editor/#file=https://crossorigin.me/' + url + '/app.json' );
 
 					}, false );
 					document.body.appendChild( button );
