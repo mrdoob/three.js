@@ -213,6 +213,7 @@
 						hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 					];
 					reflectionCube = THREE.ImageUtils.loadTextureCube( urls, undefined, onTextureLoad );
+					reflectionCube.encoding = THREE.sRGB;
 					//reflectionCube.format = THREE.RGBFormat;
 
 					//                                                                hdrCubeMap = new HDRCubeMapLoader().load(hdrurls, onHdrCubeMapLoad);
