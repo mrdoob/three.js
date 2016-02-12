@@ -1,7 +1,7 @@
 // These encodings should have the same integer values as THREE.Linear, THREE.sRGB, etc...
 #define ENCODING_Linear 3000
-#define ENCODING_sRGB   3001  // AKA gamma 2.2.
-#define ENCODING_RGBE   3002  // Radiance
+#define ENCODING_sRGB   3001
+#define ENCODING_RGBE   3002
 //#define ENCODING_LogLuv 3003
 #define ENCODING_RGBM7  3004
 #define ENCODING_RGBM16 3005
@@ -54,7 +54,7 @@ vec4 texelEncode( in vec4 linearRgba, in int encoding )
   }
 
   if( encoding == ENCODING_sRGB ) {
-    return vec4( pow( linearRgba.xyz, vec3( 0.4545 ) ), encodedTexel.w );
+    return vec4( pow( linearRgba.xyz, vec3( 0.4545 ) ), linearRgba.w );
   }
 
   if( encoding == ENCODING_RGBE ) {

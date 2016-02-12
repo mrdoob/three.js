@@ -1962,7 +1962,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.envMap.value = material.envMap;
-		uniforms.envMapEncoding.value = material.envMap.encoding;
+		uniforms.envMapEncoding.value = ( material.envMap ? material.envMap.encoding : THREE.Linear );
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
 
 		uniforms.reflectivity.value = material.reflectivity;
