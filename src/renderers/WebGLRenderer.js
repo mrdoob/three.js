@@ -200,6 +200,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	var _isWebGL2 = (typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext);
 	var extensions = new THREE.WebGLExtensions( _gl );
 
 	extensions.get( 'OES_texture_float' );
