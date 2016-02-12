@@ -12,8 +12,8 @@
 THREE.VREffect = function ( renderer, onError ) {
 
 	var vrHMD;
-	var eyeTranslationL, eyeFOVL;
-	var eyeTranslationR, eyeFOVR;
+	var eyeTranslationL, eyeFOVL, rectL;
+	var eyeTranslationR, eyeFOVR, rectR;
 
 	function gotVRDevices( devices ) {
 
@@ -102,6 +102,8 @@ THREE.VREffect = function ( renderer, onError ) {
 			eyeTranslationR = eyeParamsR.eyeTranslation;
 			eyeFOVL = eyeParamsL.recommendedFieldOfView;
 			eyeFOVR = eyeParamsR.recommendedFieldOfView;
+			rectL = eyeParamsL.renderRect;
+			rectR = eyeParamsR.renderRect;
 
 			if ( Array.isArray( scene ) ) {
 
@@ -127,13 +129,31 @@ THREE.VREffect = function ( renderer, onError ) {
 			cameraR.translateX( eyeTranslationR.x * this.scale );
 
 			// render left eye
-			renderer.setViewport( 0, 0, size.width / 2, size.height );
-			renderer.setScissor( 0, 0, size.width / 2, size.height );
+			if ( rectL ) {
+
+				renderer.setViewport( rectL.x, rectL.y, rectL.width, rectL.height );
+				renderer.setScissor( rectL.x, rectL.y, rectL.width, rectL.height );
+
+			} else {
+
+				renderer.setViewport( 0, 0, size.width / 2, size.height );
+				renderer.setScissor( 0, 0, size.width / 2, size.height );
+
+			}
 			renderer.render( scene, cameraL );
 
 			// render right eye
-			renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
-			renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
+			if ( rectR ) {
+
+				renderer.setViewport( rectR.x, rectR.y, rectR.width, rectR.height );
+				renderer.setScissor( rectR.x, rectR.y, rectR.width, rectR.height );
+
+			} else {
+
+        renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
+        renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
+
+			}
 			renderer.render( scene, cameraR );
 
 			renderer.setScissorTest( false );
