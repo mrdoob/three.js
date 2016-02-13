@@ -123,11 +123,11 @@ THREE.OBJExporter.prototype = {
 					var face = faces[ i ];
 
 					for ( var m = 0; m < 3; m ++ ) {
-					
+
 					    indices[ m ] = ( indexVertex + face[ faceVertexKeys[ m ] ] + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + m + 1 ) : '' ) + '/' + ( indexNormals + j + m + 1 );
-					
+
 					}
-					
+
 					output += 'f ' + indices.join( ' ' ) + "\n";
 
 				}
@@ -145,9 +145,76 @@ THREE.OBJExporter.prototype = {
 
 		};
 
+		var parseLine = function( line ) {
+
+			var geometry = line.geometry;
+			var type = line.type;
+
+			if ( geometry instanceof THREE.BufferGeometry ) {
+
+				geometry = new THREE.Geometry().fromBufferGeometry( geometry );
+
+			}
+
+			if ( geometry instanceof THREE.Geometry ) {
+
+				output += 'o ' + line.name + '\n';
+
+				var vertices = geometry.vertices;
+
+				for ( var i = 0, l = vertices.length; i < l; i++ ) {
+
+					var vertex = vertices[ i ].clone();
+					vertex.applyMatrix4( line.matrixWorld );
+
+					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+
+				}
+
+				if ( type === 'Line' ) {
+
+					output += 'l ';
+
+					for ( var j = 1, m = vertices.length; j <= m; j++ ) {
+
+						output += j + ' ';
+
+					}
+
+					output += '\n';
+
+				}
+
+				if ( type === 'LineSegments' ) {
+
+					for ( var j = 1, k = j + 1, m = vertices.length; j < m; j += 2, k = j + 1 ) {
+
+						output += 'l ' + j + ' ' + k + '\n';
+
+					}
+
+				}
+
+			} else {
+
+				console.warn('THREE.OBJExporter.parseLine(): geometry type unsupported', line);
+
+			}
+		};
+
 		object.traverse( function ( child ) {
 
-			if ( child instanceof THREE.Mesh ) parseMesh( child );
+			if ( child instanceof THREE.Mesh ) {
+
+				parseMesh( child );
+
+			}
+
+			if ( child instanceof THREE.Line ) {
+
+				parseLine( child );
+
+			}
 
 		} );
 
