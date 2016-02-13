@@ -52,13 +52,20 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	var projector = new THREE.Projector();
 
-	var vector1 = new THREE.Vector3();
-	var vector2 = new THREE.Vector3();
-	var vector3 = new THREE.Vector3();
+	var spriteV1 = new THREE.Vector4();
+	var spriteV2 = new THREE.Vector4();
+	var spriteV3 = new THREE.Vector4();
 
-	var texCoord1 = new THREE.Vector2();
-	var texCoord2 = new THREE.Vector2();
-	var texCoord3 = new THREE.Vector2();
+	var spriteUV1 = new THREE.Vector2();
+	var spriteUV2 = new THREE.Vector2();
+	var spriteUV3 = new THREE.Vector2();
+
+	var mpVPool = [];
+	var mpVPoolCount = 0;
+	var mpNPool = [];
+	var mpNPoolCount = 0;
+	var mpUVPool = [];
+	var mpUVPoolCount = 0;
 
 	this.domElement = canvas;
 
@@ -134,6 +141,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		recty1 = Infinity;
 		rectx2 = 0;
 		recty2 = 0;
+		mpVPoolCount = 0;
+		mpNPoolCount = 0;
+		mpUVPoolCount = 0;
 
 		for ( var i = 0; i < numBlocks; i ++ ) {
 
@@ -190,68 +200,68 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				var scaleX = element.scale.x * 0.5;
 				var scaleY = element.scale.y * 0.5;
 
-				vector1.copy( element );
-				vector1.x -= scaleX;
-				vector1.y += scaleY;
+				spriteV1.copy( element );
+				spriteV1.x -= scaleX;
+				spriteV1.y += scaleY;
 
-				vector2.copy( element );
-				vector2.x -= scaleX;
-				vector2.y -= scaleY;
+				spriteV2.copy( element );
+				spriteV2.x -= scaleX;
+				spriteV2.y -= scaleY;
 
-				vector3.copy( element );
-				vector3.x += scaleX;
-				vector3.y += scaleY;
+				spriteV3.copy( element );
+				spriteV3.x += scaleX;
+				spriteV3.y += scaleY;
 
 				if ( material.map ) {
 
-					texCoord1.set( 0, 1 );
-					texCoord2.set( 0, 0 );
-					texCoord3.set( 1, 1 );
+					spriteUV1.set( 0, 1 );
+					spriteUV2.set( 0, 0 );
+					spriteUV3.set( 1, 1 );
 
 					drawTriangle(
-						vector1, vector2, vector3,
-						texCoord1, texCoord2, texCoord3,
+						spriteV1, spriteV2, spriteV3,
+						spriteUV1, spriteUV2, spriteUV3,
 						shader, element, material
 					);
 
 				} else {
 
 					drawTriangle(
-						vector1, vector2, vector3,
+						spriteV1, spriteV2, spriteV3,
 						null, null, null,
 						shader, element, material
 					);
 
 				}
 
-				vector1.copy( element );
-				vector1.x += scaleX;
-				vector1.y += scaleY;
+				spriteV1.copy( element );
+				spriteV1.x += scaleX;
+				spriteV1.y += scaleY;
 
-				vector2.copy( element );
-				vector2.x -= scaleX;
-				vector2.y -= scaleY;
+				spriteV2.copy( element );
+				spriteV2.x -= scaleX;
+				spriteV2.y -= scaleY;
 
-				vector3.copy( element );
-				vector3.x += scaleX;
-				vector3.y -= scaleY;
+				spriteV3.copy( element );
+				spriteV3.x += scaleX;
+				spriteV3.y -= scaleY;
 
 				if ( material.map ) {
 
-					texCoord1.set( 1, 1 );
-					texCoord2.set( 0, 0 );
-					texCoord3.set( 1, 0 );
+					spriteUV1.set( 1, 1 );
+					spriteUV2.set( 0, 0 );
+					spriteUV3.set( 1, 0 );
 
 					drawTriangle(
-						vector1, vector2, vector3,
-						texCoord1, texCoord2, texCoord3,
+						spriteV1, spriteV2, spriteV3,
+						spriteUV1, spriteUV2, spriteUV3,
 						shader, element, material
 					);
 
 				} else {
 
 					drawTriangle(
-						vector1, vector2, vector3,
+						spriteV1, spriteV2, spriteV3,
 						null, null, null,
 						shader, element, material
 					);
@@ -437,25 +447,26 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			buffer[ colorOffset ] = tdata[ tIndex ];
 			buffer[ colorOffset + 1 ] = tdata[ tIndex + 1 ];
 			buffer[ colorOffset + 2 ] = tdata[ tIndex + 2 ];
-			buffer[ colorOffset + 3 ] = material.opacity * 255;
+			buffer[ colorOffset + 3 ] = ( material.opacity << 8 ) - 1;
 			depthBuf[ offset ] = depth;
 
 		} else {
 
-			var opaci = tdata[ tIndex + 3 ] * material.opacity;
-			var texel = ( tdata[ tIndex ] << 16 ) + ( tdata[ tIndex + 1 ] << 8 ) + tdata[ tIndex + 2 ];
-			if ( opaci < 250 ) {
+			var srcR = tdata[ tIndex ];
+			var srcG = tdata[ tIndex + 1 ];
+			var srcB = tdata[ tIndex + 2 ];
+			var opaci = tdata[ tIndex + 3 ] * material.opacity / 255;
+			var destR = buffer[ colorOffset ];
+			var destG = buffer[ colorOffset + 1 ];
+			var destB = buffer[ colorOffset + 2 ];
+	
+			buffer[ colorOffset ] = ( srcR * opaci + destR * ( 1 - opaci ) );
+			buffer[ colorOffset + 1 ] = ( srcG * opaci + destG * ( 1 - opaci ) );
+			buffer[ colorOffset + 2 ] = ( srcB * opaci + destB * ( 1 - opaci ) );
+			buffer[ colorOffset + 3 ] = ( material.opacity << 8 ) - 1;
 
-				var backColor = ( buffer[ colorOffset ] << 16 ) + ( buffer[ colorOffset + 1 ] << 8 ) + buffer[ colorOffset + 2 ];
-				texel = texel * opaci + backColor * ( 1 - opaci );
-
-			}
-
-			buffer[ colorOffset ] = ( texel & 0xff0000 ) >> 16;
-			buffer[ colorOffset + 1 ] = ( texel & 0xff00 ) >> 8;
-			buffer[ colorOffset + 2 ] = texel & 0xff;
-			buffer[ colorOffset + 3 ] = material.opacity * 255;
-
+			if ( buffer[ colorOffset + 3 ] == 255 )	// Only opaue pixls write to the depth buffer
+				depthBuf[ offset ] = depth;
 		}
 
 	}
@@ -481,28 +492,26 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			buffer[ colorOffset ] = ( material.palette[ cIndex ] * tdata[ tIndex ] ) >> 8;
 			buffer[ colorOffset + 1 ] = ( material.palette[ cIndex + 1 ] * tdata[ tIndex + 1 ] ) >> 8;
 			buffer[ colorOffset + 2 ] = ( material.palette[ cIndex + 2 ] * tdata[ tIndex + 2 ] ) >> 8;
-			buffer[ colorOffset + 3 ] = material.opacity * 255;
+			buffer[ colorOffset + 3 ] = ( material.opacity << 8 ) - 1;
 			depthBuf[ offset ] = depth;
 
 		} else {
 
-			var opaci = tdata[ tIndex + 3 ] * material.opacity;
-			var foreColor = ( ( material.palette[ cIndex ] * tdata[ tIndex ] ) << 16 )
-							+ ( ( material.palette[ cIndex + 1 ] * tdata[ tIndex + 1 ] ) << 8 )
-							+ ( material.palette[ cIndex + 2 ] * tdata[ tIndex + 2 ] );
+			var foreColorR = material.palette[ cIndex ] * tdata[ tIndex ];
+			var foreColorG = material.palette[ cIndex + 1 ] * tdata[ tIndex + 1 ];
+			var foreColorB = material.palette[ cIndex + 2 ] * tdata[ tIndex + 2 ];
+			var opaci = tdata[ tIndex + 3 ] * material.opacity / 256;
+			var destR = buffer[ colorOffset ];
+			var destG = buffer[ colorOffset + 1 ];
+			var destB = buffer[ colorOffset + 2 ];
 
-			if ( opaci < 250 ) {
+			buffer[ colorOffset ] = foreColorR * opaci + destR * ( 1 - opaci );
+			buffer[ colorOffset + 1 ] = foreColorG * opaci + destG * ( 1 - opaci );
+			buffer[ colorOffset + 2 ] = foreColorB * opaci + destB * ( 1 - opaci );
+			buffer[ colorOffset + 3 ] = ( material.opacity << 8 ) - 1;
 
-				var backColor = buffer[ colorOffset ] << 24 + buffer[ colorOffset + 1 ] << 16 + buffer[ colorOffset + 2 ] << 8;
-				foreColor = foreColor * opaci + backColor * ( 1 - opaci );
-
-			}
-
-			buffer[ colorOffset ] = ( foreColor & 0xff0000 ) >> 16;
-			buffer[ colorOffset + 1 ] = ( foreColor & 0xff00 ) >> 8;
-			buffer[ colorOffset + 2 ] = ( foreColor & 0xff );
-			buffer[ colorOffset + 3 ] = material.opacity * 255;
-
+			if ( buffer[ colorOffset + 3 ] == 255 )	// Only opaue pixls write to the depth buffer
+				depthBuf[ offset ] = depth;
 		}
 
 	}
@@ -688,13 +697,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var y3 = ( v3.y * viewportYScale + viewportYOffs ) | 0;
 
 		var bHasNormal = face.vertexNormalsModel && face.vertexNormalsModel.length;
+		var bHasUV = uv1 && uv2 && uv3;
 
 		var longestSide = Math.max(
 			Math.sqrt( (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2) ),
 			Math.sqrt( (x2 - x3)*(x2 - x3) + (y2 - y3)*(y2 - y3) ),
 			Math.sqrt( (x3 - x1)*(x3 - x1) + (y3 - y1)*(y3 - y1) )
 		);
-		if( longestSide > 100 * fixscale ) {
+
+		if( !(face instanceof THREE.RenderableSprite) 
+			&& (longestSide > 100 * fixscale) ) {
 
 			// 1
 			// |\
@@ -704,32 +716,90 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			// |b\|d\
 			// |__\__\
 			// 2      3
-			var	mpV12 = new THREE.Vector4(),
-				mpV23 = new THREE.Vector4(),
-				mpV31 = new THREE.Vector4(),
-				mpN12 = new THREE.Vector3(),
-				mpN23 = new THREE.Vector3(),
-				mpN31 = new THREE.Vector3(),
-				mpUV12 = new THREE.Vector2(),
-				mpUV23 = new THREE.Vector2(),
-				mpUV31 = new THREE.Vector2(),
-				tempFace = { vertexNormalsModel : []
-							, color : { r: face.color.r, g: face.color.b, b: face.color.b } };
+			var tempFace = { vertexNormalsModel : [], 
+						color : face.color };
+			var mpUV12, mpUV23, mpUV31;
+			if ( bHasUV ) {
+				if ( mpUVPoolCount === mpUVPool.length ) {
+					mpUV12 = new THREE.Vector2();
+					mpUVPool.push( mpUV12 );
+					++mpUVPoolCount;
 
-			var weight;
+					mpUV23 = new THREE.Vector2();
+					mpUVPool.push( mpUV23 );
+					++mpUVPoolCount;
 
-			weight = (1 + v2.z) * (v2.w / v1.w) / (1 + v1.z);
-			mpUV12.copy( uv1 ).multiplyScalar( weight ).add( uv2 ).multiplyScalar( 1 / (weight + 1) );
-			weight = (1 + v3.z) * (v3.w / v2.w) / (1 + v2.z);
-			mpUV23.copy( uv2 ).multiplyScalar( weight ).add( uv3 ).multiplyScalar( 1 / (weight + 1) );
-			weight = (1 + v1.z) * (v1.w / v3.w) / (1 + v3.z);
-			mpUV31.copy( uv3 ).multiplyScalar( weight ).add( uv1 ).multiplyScalar( 1 / (weight + 1) );
+					mpUV31 = new THREE.Vector2();
+					mpUVPool.push( mpUV31 );
+					++mpUVPoolCount;
+				} else {
+					mpUV12 = mpUVPool[ mpUVPoolCount ];
+					++mpUVPoolCount;				
+					mpUV23 = mpUVPool[ mpUVPoolCount ];
+					++mpUVPoolCount;
+					mpUV31 = mpUVPool[ mpUVPoolCount ];
+					++mpUVPoolCount;
+				}
+
+				var weight;
+
+				weight = (1 + v2.z) * (v2.w / v1.w) / (1 + v1.z);
+				mpUV12.copy( uv1 ).multiplyScalar( weight ).add( uv2 ).multiplyScalar( 1 / (weight + 1) );
+				weight = (1 + v3.z) * (v3.w / v2.w) / (1 + v2.z);
+				mpUV23.copy( uv2 ).multiplyScalar( weight ).add( uv3 ).multiplyScalar( 1 / (weight + 1) );
+				weight = (1 + v1.z) * (v1.w / v3.w) / (1 + v3.z);
+				mpUV31.copy( uv3 ).multiplyScalar( weight ).add( uv1 ).multiplyScalar( 1 / (weight + 1) );
+			}
+			
+			var mpV12, mpV23, mpV31;
+			if ( mpVPoolCount === mpVPool.length ) {
+				mpV12 = new THREE.Vector4();
+				mpVPool.push( mpV12 );
+				++mpVPoolCount;
+
+				mpV23 = new THREE.Vector4();
+				mpVPool.push( mpV23 );
+				++mpVPoolCount;
+
+				mpV31 = new THREE.Vector4();
+				mpVPool.push( mpV31 );
+				++mpVPoolCount;
+			} else {
+				mpV12 = mpVPool[ mpVPoolCount ];
+				++mpVPoolCount;				
+				mpV23 = mpVPool[ mpVPoolCount ];
+				++mpVPoolCount;
+				mpV31 = mpVPool[ mpVPoolCount ];
+				++mpVPoolCount;
+			}
 
 			mpV12.copy( v1 ).add( v2 ).multiplyScalar( 0.5 );
 			mpV23.copy( v2 ).add( v3 ).multiplyScalar( 0.5 );
 			mpV31.copy( v3 ).add( v1 ).multiplyScalar( 0.5 );
 
+			var mpN12, mpN23, mpN31;
 			if( bHasNormal ) {
+				if ( mpNPoolCount === mpNPool.length ) {
+					mpN12 = new THREE.Vector3();
+					mpNPool.push( mpN12 );
+					++mpNPoolCount;
+
+					mpN23 = new THREE.Vector3();
+					mpNPool.push( mpN23 );
+					++mpNPoolCount;
+
+					mpN31 = new THREE.Vector3();
+					mpNPool.push( mpN31 );
+					++mpNPoolCount;
+				} else {
+					mpN12 = mpNPool[ mpNPoolCount ];
+					++mpNPoolCount;				
+					mpN23 = mpNPool[ mpNPoolCount ];
+					++mpNPoolCount;
+					mpN31 = mpNPool[ mpNPoolCount ];
+					++mpNPoolCount;
+				}
+
 				mpN12.copy( face.vertexNormalsModel[ 0 ] ).add( face.vertexNormalsModel[ 1 ] ).normalize();
 				mpN23.copy( face.vertexNormalsModel[ 1 ] ).add( face.vertexNormalsModel[ 2 ] ).normalize();
 				mpN31.copy( face.vertexNormalsModel[ 2 ] ).add( face.vertexNormalsModel[ 0 ] ).normalize();
@@ -1298,20 +1368,20 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		// TODO: Implement per-pixel z-clipping
 		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 ) return;
 
-		var halfLineWidth = Math.floor( (material.linewidth-1) * 0.5 );
+		var halfLineWidth = Math.floor( ( material.linewidth - 1 ) * 0.5 );
 
 		// https://gist.github.com/2486101
 		// explanation: http://pouet.net/topic.php?which=8760&page=1
 
 		// 28.4 fixed-point coordinates
-		var x1 = (v1.x * viewportXScale + viewportXOffs) | 0;
-		var x2 = (v2.x * viewportXScale + viewportXOffs) | 0;
+		var x1 = ( v1.x * viewportXScale + viewportXOffs ) | 0;
+		var x2 = ( v2.x * viewportXScale + viewportXOffs ) | 0;
 
-		var y1 = (v1.y * viewportYScale + viewportYOffs) | 0;
-		var y2 = (v2.y * viewportYScale + viewportYOffs) | 0;
+		var y1 = ( v1.y * viewportYScale + viewportYOffs ) | 0;
+		var y2 = ( v2.y * viewportYScale + viewportYOffs ) | 0;
 
-		var z1 = (v1.z * viewportZScale + viewportZOffs) | 0;
-		var z2 = (v2.z * viewportZScale + viewportZOffs) | 0;
+		var z1 = ( v1.z * viewportZScale + viewportZOffs ) | 0;
+		var z2 = ( v2.z * viewportZScale + viewportZOffs ) | 0;
 
 		// Deltas
 		var dx12 = x1 - x2, dy12 = y1 - y2, dz12 = z1 - z2;
@@ -1322,7 +1392,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var miny = Math.max( ( Math.min( y1, y2 ) + subpixelBias ) >> subpixelBits, 0 );
 		var maxy = Math.min( ( Math.max( y1, y2 ) + subpixelBias ) >> subpixelBits, canvasHeight );
 		var minz = Math.max( ( Math.min( z1, z2 ) + subpixelBias ) >> subpixelBits, 0 );
-		var maxz = Math.min( ( Math.max( z1, z2 ) + subpixelBias ) >> subpixelBits, 0 );
+		var maxz = ( Math.max( z1, z2 ) + subpixelBias ) >> subpixelBits;
 
 		rectx1 = Math.min( minx, rectx1 );
 		rectx2 = Math.max( maxx, rectx2 );
@@ -1330,10 +1400,10 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		recty2 = Math.max( maxy, recty2 );
 
 		// Get the line's unit vector and cross vector
-		var length = Math.sqrt((dy12 * dy12) + (dx12 * dx12));
-		var unitX = (dx12 / length);
-		var unitY = (dy12 / length);
-		var unitZ = (dz12 / length);
+		var length = Math.sqrt( ( dy12 * dy12 ) + ( dx12 * dx12 ) );
+		var unitX = ( dx12 / length );
+		var unitY = ( dy12 / length );
+		var unitZ = ( dz12 / length );
 		var pixelX, pixelY, pixelZ;
 		var pX, pY, pZ;
 		crossVector.set( unitX, unitY, unitZ );
@@ -1343,21 +1413,21 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		while (length > 0) {
 
 			// Get this pixel.
-			pixelX = (x2 + length * unitX);
-			pixelY = (y2 + length * unitY);
-			pixelZ = (z2 + length * unitZ);
+			pixelX = x2 + length * unitX;
+			pixelY = y2 + length * unitY;
+			pixelZ = z2 + length * unitZ;
 
-			pixelX = (pixelX + subpixelBias) >> subpixelBits;
-			pixelY = (pixelY + subpixelBias) >> subpixelBits;
-			pZ = (pixelZ + subpixelBias) >> subpixelBits;
+			pixelX = ( pixelX + subpixelBias ) >> subpixelBits;
+			pixelY = ( pixelY + subpixelBias ) >> subpixelBits;
+			pZ = ( pixelZ + subpixelBias ) >> subpixelBits;
 
 			// Draw line with line width
 			for ( var i = -halfLineWidth; i <= halfLineWidth; ++i ) {
 
 				// Compute the line pixels.
 				// Get the pixels on the vector that crosses to the line vector
-				pX = Math.floor((pixelX + crossVector.x * i));
-				pY = Math.floor((pixelY + crossVector.y * i));
+				pX = Math.floor( ( pixelX + crossVector.x * i ) );
+				pY = Math.floor( ( pixelY + crossVector.y * i ) );
 
 				// if pixel is over the rect. Continue
 				if ( rectx1 >= pX || rectx2 <= pX || recty1 >= pY

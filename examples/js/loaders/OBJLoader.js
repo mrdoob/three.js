@@ -217,7 +217,7 @@ THREE.OBJLoader.prototype = {
 
 		var object_pattern = /^[og]\s+(.+)/;
 
-		var smoothing_pattern = /^s\s+([01]|on|off)/;
+		var smoothing_pattern = /^s\s+(\d+|on|off)/;
 
 		//
 

@@ -178,6 +178,7 @@ var files = {
 		"webgl_postprocessing_godrays",
 		"webgl_postprocessing_masking",
 		"webgl_postprocessing_nodes",
+		"webgl_postprocessing_smaa",
 		"webgl_postprocessing_ssao",
 		"webgl_raycast_texture",
 		"webgl_read_float_buffer",
@@ -229,7 +230,8 @@ var files = {
 	],
 	"webvr": [
 		"webvr_cubes",
-		"webvr_video"
+		"webvr_video",
+		"webvr_stereo_pano"
 	],
 	"css3d": [
 		"css3d_molecules",

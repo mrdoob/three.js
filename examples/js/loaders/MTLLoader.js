@@ -303,9 +303,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 			var value = mat[ prop ];
 
-			if ( value === '' ) {
-				continue;
-			}
+			if ( value === '' ) continue;
 
 			switch ( prop.toLowerCase() ) {
 

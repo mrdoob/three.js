@@ -164,7 +164,7 @@
 				ambientLight = new THREE.AmbientLight( 0x555555 );
 				scene.add( ambientLight );
 
-				spotLight = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI/2, 1 );
+				spotLight = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI/2 );
 				spotLight.position.set( 0, 1800, 1500 );
 				spotLight.target.position.set( 0, 0, 0 );
 				spotLight.castShadow = true;
