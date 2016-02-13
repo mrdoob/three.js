@@ -21,7 +21,7 @@
 
 		<script src="js/postprocessing/MSAAPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/MSAAShader.js"></script>
+		<script src="js/shaders/CompositeShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -55,7 +55,7 @@
 
 				geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				material = new THREE.MeshBasicMaterial( { map: meshTexture } );
-				meshTexture.anisotropy = 4;
+				meshTexture.anisotropy = 0;
 
 				object = new THREE.Mesh( geometry, material );
 
@@ -65,11 +65,11 @@
 
 				composer = new THREE.EffectComposer( renderer );
 
-				var massPass = new THREE.MSAAPass( scene, camera, new THREE.Color( 1.0, 1.0, 1.0 ), 1.0 );
-				massPass.currentSampleLevel = 4;
+				var massPass = new THREE.MSAAPass( scene, camera, new THREE.Color( 0.0, 0.0, 0.0 ), 0.0 );
+				massPass.sampleLevel = 2;
 				composer.addPass( massPass );
 
-				var copyPass = new THREE.ShaderPass(THREE.CopyShader);
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
 		    copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
 
