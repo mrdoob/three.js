@@ -78,14 +78,17 @@ THREE.MSAAPass.prototype = {
 
     for( var i = 0; i < jitterOffsets.length; i ++ ) {
 
+      // only jitters perspective cameras.  TODO: add support for jittering orthogonal cameras
       if( camera.setViewOffset ) camera.setViewOffset( readBuffer.width, readBuffer.height, jitterOffsets[i].x, jitterOffsets[i].y, readBuffer.width, readBuffer.height );
 
-      renderer.render( this.scene, camera, this.sampleRenderTarget, false );
+      renderer.render( this.scene, camera, this.sampleRenderTarget, true );
 
-      renderer.render( this.scene2, this.camera2, writeBuffer, false );
+      // clear on the first render, accumulate the others
+      renderer.render( this.scene2, this.camera2, writeBuffer, i === 0 );
 
     }
 
+    // reset jitter to nothing.  TODO: add support for orthogonal cameras
     if( camera.setViewOffset ) camera.setViewOffset( undefined, undefined, undefined, undefined, undefined, undefined );
 
   }
@@ -94,17 +97,21 @@ THREE.MSAAPass.prototype = {
 
 THREE.MSAAPass.normalizedJitterOffsets = function( jitterVectors ) {
 
-  var vectors2 = [];
+  var scaledJitterOffsets = [];
 
   for( var i = 0; i < jitterVectors.length; i ++ ) {
 
-    vectors2.push( new THREE.Vector2( jitterVectors[i][0], jitterVectors[i][1] ).multiplyScalar( 1.0 / 16.0 ) );
+    scaledJitterOffsets.push( new THREE.Vector2( jitterVectors[i][0], jitterVectors[i][1] ).multiplyScalar( 1.0 / 16.0 ) );
 
   }
 
-  return vectors2;
+  return scaledJitterOffsets;
+  
 },
 
+// These jitter vectors are specified in integers because it is easier.
+// I am assuming a [-8,8] integer grid, but it needs to be mapped onto [-0.5,0.5]
+// before being used, thus these integers need to be scaled by 1/16.
 THREE.MSAAPass.JitterVectors = [
   THREE.MSAAPass.normalizedJitterOffsets( [
     [  0,  0 ]
