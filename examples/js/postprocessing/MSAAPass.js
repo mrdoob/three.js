@@ -7,7 +7,7 @@ THREE.MSAAPass = function ( scene, camera, params ) {
   this.scene = scene;
   this.camera = camera;
 
-  this.sampleLevel = 4;
+  this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
 
   this.params = params || { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
   this.params.minFilter = THREE.NearestFilter;
@@ -74,8 +74,7 @@ THREE.MSAAPass.prototype = {
     this.uniforms[ "tForeground" ].value = this.sampleRenderTarget;
     this.uniforms[ "scale" ].value = 1.0 / jitterOffsets.length;
 
-    //renderer.setClearColor( new THREE.Color( 0, 0, 0 ), 0.0 );
-
+    // render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
     for( var i = 0; i < jitterOffsets.length; i ++ ) {
 
       // only jitters perspective cameras.  TODO: add support for jittering orthogonal cameras
@@ -106,7 +105,7 @@ THREE.MSAAPass.normalizedJitterOffsets = function( jitterVectors ) {
   }
 
   return scaledJitterOffsets;
-  
+
 },
 
 // These jitter vectors are specified in integers because it is easier.
