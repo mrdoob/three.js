@@ -39,8 +39,6 @@ THREE.MSAAPass = function ( scene, camera, params ) {
 
 	} );
 
-  console.log( 'this.materialComposite', this.materialComposite );
-
   this.camera2 = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
   this.scene2  = new THREE.Scene();
   this.quad2 = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), this.materialComposite );
