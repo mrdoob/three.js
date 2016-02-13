@@ -65,8 +65,8 @@
 
 				composer = new THREE.EffectComposer( renderer );
 
-				var massPass = new THREE.MSAAPass( scene, camera, new THREE.Color( 0.0, 0.0, 0.0 ), 0.0 );
-				massPass.sampleLevel = 2;
+				var massPass = new THREE.MSAAPass( scene, camera );
+				massPass.sampleLevel = 1;
 				composer.addPass( massPass );
 
 				var copyPass = new THREE.ShaderPass( THREE.CopyShader );

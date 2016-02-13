@@ -2,7 +2,7 @@
  * @author bhouston / http://clara.io/
  */
 
-THREE.MSAAPass = function ( scene, camera, params, clearColor, clearAlpha ) {
+THREE.MSAAPass = function ( scene, camera, params ) {
 
   this.scene = scene;
   this.camera = camera;
@@ -12,15 +12,9 @@ THREE.MSAAPass = function ( scene, camera, params, clearColor, clearAlpha ) {
   this.params = params || { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
   this.params.minFilter = THREE.NearestFilter;
   this.params.maxFilter = THREE.NearestFilter;
-
-  this.clearColor = clearColor;
-  this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 1;
-
-  this.oldClearColor = new THREE.Color();
-  this.oldClearAlpha = 1;
-
+  console.log( 'this.params', this.params );
   this.enabled = true;
-  this.clear = false;
+
   this.needsSwap = true;
 
   if ( THREE.CompositeShader === undefined ) {
@@ -44,6 +38,8 @@ THREE.MSAAPass = function ( scene, camera, params, clearColor, clearAlpha ) {
     depthWrite: false
 
 	} );
+
+  console.log( 'this.materialComposite', this.materialComposite );
 
   this.camera2 = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
   this.scene2  = new THREE.Scene();
@@ -80,13 +76,15 @@ THREE.MSAAPass.prototype = {
     this.uniforms[ "tForeground" ].value = this.sampleRenderTarget;
     this.uniforms[ "scale" ].value = 1.0 / jitterOffsets.length;
 
+    //renderer.setClearColor( new THREE.Color( 0, 0, 0 ), 0.0 );
+
     for( var i = 0; i < jitterOffsets.length; i ++ ) {
 
       if( camera.setViewOffset ) camera.setViewOffset( readBuffer.width, readBuffer.height, jitterOffsets[i].x, jitterOffsets[i].y, readBuffer.width, readBuffer.height );
 
-      renderer.render( this.scene, camera, this.sampleRenderTarget, true );
+      renderer.render( this.scene, camera, this.sampleRenderTarget, false );
 
-      renderer.render( this.scene2, this.camera2, writeBuffer, i === 0 );
+      renderer.render( this.scene2, this.camera2, writeBuffer, false );
 
     }
 
@@ -97,10 +95,15 @@ THREE.MSAAPass.prototype = {
 };
 
 THREE.MSAAPass.normalizedJitterOffsets = function( jitterVectors ) {
+
   var vectors2 = [];
+
   for( var i = 0; i < jitterVectors.length; i ++ ) {
+
     vectors2.push( new THREE.Vector2( jitterVectors[i][0], jitterVectors[i][1] ).multiplyScalar( 1.0 / 16.0 ) );
+
   }
+
   return vectors2;
 },
 
