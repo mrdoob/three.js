@@ -2844,9 +2844,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrapT ) );
 
 			if ( texture instanceof THREE.Texture3D ) {
-				if ( !_isWebGL2 ) throw new Error('3D Textures are only supported in WebGL2 contexts.');
-				if ( !texture.wrapR ) console.warn('Texture3D is missing a .texture.wrapR option!');
-				else _gl.texParameteri( textureType, _gl.TEXTURE_WRAP_R, paramThreeToGL( texture.wrapR ) );
+				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_R, paramThreeToGL( texture.wrapR ) );
 			}
 
 			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.magFilter ) );
