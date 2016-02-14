@@ -171,7 +171,7 @@ class Scene(base_classes.BaseScene):
 
         io.dump(self.filepath, data, options=self.options)
 
-        if self.options.get(constants.COPY_TEXTURES):
+        if self.options.get(constants.EXPORT_TEXTURES) and not self.options.get(constants.EMBED_TEXTURES):
             texture_folder = self.options.get(constants.TEXTURE_FOLDER)
             for geo in self[constants.GEOMETRIES]:
                 logger.info("Copying textures from %s", geo.node)
