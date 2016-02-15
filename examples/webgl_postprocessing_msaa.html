@@ -50,13 +50,10 @@
 
 		<script>
 
-			var camera, scene, renderer, composer, pass;
-			var geometry, material, gui, object, msaaPass, stats;
+			var camera, scene, renderer, composer, copyPass, msaaPass;
+			var geometry, material, gui, object, stats;
 
 			var param = { MSAASampleLevel: 2 };
-
-
-			var clock = new THREE.Clock();
 
 			var textureLoader = new THREE.TextureLoader();
 
@@ -129,7 +126,7 @@
 				massPass.sampleLevel = param.MSAASampleLevel;
 				composer.addPass( massPass );
 
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				copyPass = new THREE.ShaderPass( THREE.CopyShader );
 		    copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
 
@@ -151,7 +148,7 @@
 				var newWidth  = Math.floor( width / pixelRatio ) || 1;
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				composer.setSize( newWidth, newHeight );
-				pass.setSize( newWidth, newHeight );
+				if( msaaPass ) msaaPass.setSize( newWidth, newHeight );
 
 			}
 

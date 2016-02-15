@@ -69,6 +69,13 @@ THREE.MSAAPass.prototype = {
 
   },
 
+
+	setSize: function ( width, height ) {
+
+		this.sampleRenderTarget.setSize( width, height );
+
+	},
+
   render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
     if( ! this.sampleRenderTarget ) {
