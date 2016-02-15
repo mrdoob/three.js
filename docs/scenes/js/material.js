@@ -525,13 +525,13 @@ function chooseFromHash ( gui, mesh, geometry ) {
 
 	case "MeshStandardMaterial" :
 
-			material = new THREE.MeshStandardMaterial({color: 0x2194CE});
-			guiMaterial( gui, mesh, material, geometry );
-			guiMeshStandardMaterial( gui, mesh, material, geometry );
+		material = new THREE.MeshStandardMaterial({color: 0x2194CE});
+		guiMaterial( gui, mesh, material, geometry );
+		guiMeshStandardMaterial( gui, mesh, material, geometry );
 
-			return material;
+		return material;
 
-			break;
+		break;
 
 	case "MeshDepthMaterial" :
 
