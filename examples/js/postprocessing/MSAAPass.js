@@ -115,7 +115,7 @@ THREE.MSAAPass.normalizedJitterOffsets = function( jitterVectors ) {
 
   for( var i = 0; i < jitterVectors.length; i ++ ) {
 
-    scaledJitterOffsets.push( new THREE.Vector2( jitterVectors[i][0], jitterVectors[i][1] ).multiplyScalar( 1.0 / 16.0 ) );
+    scaledJitterOffsets.push( new THREE.Vector2( jitterVectors[i][0], jitterVectors[i][1] ).multiplyScalar( 1.0 / 17.0 ) );
 
   }
 
