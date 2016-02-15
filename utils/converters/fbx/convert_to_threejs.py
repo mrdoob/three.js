@@ -290,8 +290,7 @@ def triangulate_scene(scene):
 def detect_texture_transparency(texture_path):
     args = ('identify', '-verbose', texture_path)
     popen = subprocess.Popen(args, stdout=subprocess.PIPE)
-    popen.wait()
-    output = popen.stdout.read()
+    output = popen.communicate()[0]
     match = re.search('Alpha:\s*\n\s*min: [0-9]+ \([0-9.]+\)\s*\n\s*max: [0-9]+ \([0-9.]+\)\s*\n\s*mean: ([0-9.]+)', output)
 
     try:
@@ -510,8 +509,7 @@ def copy_texture(source_path):
         if texture_conversion_enabled:
             args = ('identify', '-format', '%m', source_path)
             popen = subprocess.Popen(args, stdout=subprocess.PIPE)
-            popen.wait()
-            image_format = popen.stdout.read().strip()
+            image_format = popen.communicate()[0].strip()
             convert = image_format not in WEB_FORMATS
             if convert:
                 extension = '.png' if detect_texture_transparency(source_path) else '.jpg'
@@ -539,7 +537,7 @@ def copy_texture(source_path):
                 try:
                     args = ('convert', source_path, destination_path)
                     popen = subprocess.Popen(args)
-                    popen.wait()
+                    popen.communicate()
                 except (OSError) as e:
                     sys.exit(-1)
             else:
@@ -1975,7 +1973,7 @@ if __name__ == "__main__":
     identify_present = False
     try:
         popen = subprocess.Popen(('identify', '-help'), stdout=subprocess.PIPE)
-        popen.wait()
+        popen.communicate()
         identify_present = True
     except OSError as e:
         pass
@@ -1991,7 +1989,7 @@ if __name__ == "__main__":
         convert_present = False
         try:
             popen = subprocess.Popen(('convert', '-help'), stdout=subprocess.PIPE)
-            popen.wait()
+            popen.communicate()
             convert_present = True
         except OSError as e:
             pass
