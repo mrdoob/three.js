@@ -1,15 +1,5 @@
 /**
- * @author bhouston / http://clara.io/
- *
- * NOTE: Accumulating a lot of samples with a 8-bit-per-channel RGB/RGBA buffer will
- * lead to discretization effects.  For accurate sample accumulation use a floating
- * point buffer.
- *
- * It is also possible to reduce the discretization effects by having more buffers
- * and doing less combines.  So render to 4 buffers and combine them 4 times for
- * 16 samples and you'll get 4x less discretization artifacts and then current
- * approach.
- *
+ * @author bhouston / http://clara.io/ *
  */
 
 THREE.MSAAPass = function ( scene, camera, params ) {
@@ -42,7 +32,7 @@ THREE.MSAAPass = function ( scene, camera, params ) {
     transparent: true,
     blending: THREE.CustomBlending,
     blendSrc: THREE.OneFactor,
-    blendDst: THREE.OneFactor,
+    blendDst: THREE.OneMinusSrcAlphaFactor,
     blendEquation: THREE.AddEquation,
     depthTest: false,
     depthWrite: false
@@ -89,7 +79,8 @@ THREE.MSAAPass.prototype = {
     var jitterOffsets = THREE.MSAAPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
 
     this.uniforms[ "tForeground" ].value = this.sampleRenderTarget;
-    this.uniforms[ "scale" ].value = 1.0 / jitterOffsets.length;
+
+    var weight = 1.0;
 
     // render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
     for( var i = 0; i < jitterOffsets.length; i ++ ) {
@@ -99,7 +90,11 @@ THREE.MSAAPass.prototype = {
 
       renderer.render( this.scene, camera, this.sampleRenderTarget, true );
 
-      // clear on the first render, accumulate the others
+      // this accumulation strategy is used to prevent decimation at low bit depths with lots of samples.
+      this.uniforms[ "scale" ].value = weight;
+      weight *= 0.5;
+
+    // clear on the first render, accumulate the others
       var autoClear = renderer.autoClear;
       renderer.autoClear = false;
       renderer.render( this.scene2, this.camera2, writeBuffer, i === 0 );
