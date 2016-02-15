@@ -5,6 +5,11 @@
  * lead to discretization effects.  For accurate sample accumulation use a floating
  * point buffer.
  *
+ * It is also possible to reduce the discretization effects by having more buffers
+ * and doing less combines.  So render to 4 buffers and combine them 4 times for
+ * 16 samples and you'll get 4x less discretization artifacts and then current
+ * approach.
+ *
  */
 
 THREE.MSAAPass = function ( scene, camera, params ) {
