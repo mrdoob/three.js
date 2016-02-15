@@ -7,17 +7,36 @@
 		<style>
 			body {
 				margin: 0px;
-				background-color: #000000;
+				background-color: #000;
 				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				margin: 0px;
+				text-align:center;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				display:block;
 			}
 		</style>
 	</head>
 	<body>
-		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Manual Multi-Sample Anti-Aliasing (MSAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - Manual Multi-Sample Anti-Aliasing (MSAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a></br></br>
+			WARNING: High MSAA samples count will lead</br>to discretization effects when used with 8-bit per channel Render Buffers.
 		</div>
+
+		<div id="container"></div>
+
 		<script src="../build/three.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/postprocessing/MSAAPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
@@ -32,14 +51,55 @@
 		<script>
 
 			var camera, scene, renderer, composer, pass;
-			var geometry, material, object;
+			var geometry, material, gui, object, msaaPass, stats;
+
+			var param = { MSAASampleLevel: 2 };
+
+
+			var clock = new THREE.Clock();
 
 			var textureLoader = new THREE.TextureLoader();
+
+			container = document.getElementById( "container" );
+
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '0px';
+			container.appendChild( stats.domElement );
 
 			textureLoader.load( "textures/brick_diffuse.jpg", function( meshTexture ) {
 				init( meshTexture );
 				animate();
+				clearGui();
+
+
 			});
+
+
+			function clearGui() {
+
+				if ( gui ) gui.destroy();
+
+				gui = new dat.GUI();
+
+				var example = gui.add( param, 'MSAASampleLevel', {
+					'Level 0: 1 Sample': 0,
+					'Level 1: 2 Samples': 1,
+					'Level 2: 4 Samples': 2,
+					'Level 3: 8 Samples': 3,
+					'Level 4: 16 Samples': 4,
+					'Level 5: 32 Samples': 5
+				} ).onFinishChange( function() {
+
+					if( massPass ) {
+						massPass.sampleLevel = param.MSAASampleLevel;
+					}
+
+				} );
+
+				gui.open();
+
+			}
 
 			function init( meshTexture ) {
 
@@ -65,8 +125,8 @@
 
 				composer = new THREE.EffectComposer( renderer );
 
-				var massPass = new THREE.MSAAPass( scene, camera );
-				massPass.sampleLevel = 1;
+				massPass = new THREE.MSAAPass( scene, camera );
+				massPass.sampleLevel = param.MSAASampleLevel;
 				composer.addPass( massPass );
 
 				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
@@ -104,9 +164,11 @@
 
 				composer.render();
 
+				stats.update();
+
 			}
 
 		</script>
-
+		<div>
 	</body>
 </html>

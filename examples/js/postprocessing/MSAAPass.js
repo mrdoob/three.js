@@ -1,5 +1,10 @@
 /**
  * @author bhouston / http://clara.io/
+ *
+ * NOTE: Accumulating a lot of samples with a 8-bit-per-channel RGB/RGBA buffer will
+ * lead to discretization effects.  For accurate sample accumulation use a floating
+ * point buffer.
+ *
  */
 
 THREE.MSAAPass = function ( scene, camera, params ) {
@@ -83,7 +88,10 @@ THREE.MSAAPass.prototype = {
       renderer.render( this.scene, camera, this.sampleRenderTarget, true );
 
       // clear on the first render, accumulate the others
+      var autoClear = renderer.autoClear;
+      renderer.autoClear = false;
       renderer.render( this.scene2, this.camera2, writeBuffer, i === 0 );
+      renderer.autoClear = true;
 
     }
 
