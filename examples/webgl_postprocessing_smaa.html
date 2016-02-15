@@ -14,7 +14,10 @@
 	</head>
 	<body>
 
+		<div id="container"></div>
+
 		<script src="../build/three.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/postprocessing/SMAAPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
@@ -28,10 +31,17 @@
 
 		<script>
 
-			var camera, scene, renderer, composer, pass;
+			var camera, scene, renderer, composer, pass, stats;
 			var geometry, material, object;
 
 			var textureLoader = new THREE.TextureLoader();
+
+			container = document.getElementById( "container" );
+
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '0px';
+			container.appendChild( stats.domElement );
 
 			textureLoader.load( "./textures/brick_diffuse.jpg", function( meshTexture ) {
 				init( meshTexture );
@@ -100,9 +110,11 @@
 
 				composer.render();
 
+				stats.update();
+
 			}
 
 		</script>
-
+	</div>
 	</body>
 </html>
