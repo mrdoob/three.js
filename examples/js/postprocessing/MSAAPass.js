@@ -78,9 +78,10 @@ THREE.MSAAPass.prototype = {
 
     var jitterOffsets = THREE.MSAAPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
 
-    this.uniforms[ "tForeground" ].value = this.sampleRenderTarget;
+    var autoClear = renderer.autoClear;
+    renderer.autoClear = false;
 
-    var weight = 1.0;
+    this.uniforms[ "tForeground" ].value = this.sampleRenderTarget;
 
     // render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
     for( var i = 0; i < jitterOffsets.length; i ++ ) {
@@ -88,22 +89,26 @@ THREE.MSAAPass.prototype = {
       // only jitters perspective cameras.  TODO: add support for jittering orthogonal cameras
       if( camera.setViewOffset ) camera.setViewOffset( readBuffer.width, readBuffer.height, jitterOffsets[i].x, jitterOffsets[i].y, readBuffer.width, readBuffer.height );
 
-      renderer.render( this.scene, camera, this.sampleRenderTarget, true );
+      if( i == 0 ) {
 
-      // this accumulation strategy is used to prevent decimation at low bit depths with lots of samples.
-      this.uniforms[ "scale" ].value = weight;
-      weight = 1.0 / (i+1);
+        renderer.render( this.scene, camera, writeBuffer, true );
 
-    // clear on the first render, accumulate the others
-      var autoClear = renderer.autoClear;
-      renderer.autoClear = false;
-      renderer.render( this.scene2, this.camera2, writeBuffer, i === 0 );
-      renderer.autoClear = true;
+      }
+      else {
+        renderer.render( this.scene, camera, this.sampleRenderTarget, true );
+
+        // this accumulation strategy is used to prevent decimation at low bit depths with lots of samples.
+        this.uniforms[ "scale" ].value = 1.0 / ( i + 1 );
+
+      // clear on the first render, accumulate the others
+        renderer.render( this.scene2, this.camera2, writeBuffer, false );
+      }
 
     }
 
     // reset jitter to nothing.  TODO: add support for orthogonal cameras
     if( camera.setViewOffset ) camera.setViewOffset( undefined, undefined, undefined, undefined, undefined, undefined );
+    renderer.autoClear = true;
 
   }
 
