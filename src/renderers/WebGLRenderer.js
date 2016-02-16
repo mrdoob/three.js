@@ -3257,11 +3257,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// Render targets
 
 	// Setup storage for target texture and bind it to correct framebuffer
-	function setupFrameBufferTexture ( framebuffer, renderTarget, attachment, textureTarget ) {
+	function setupFrameBufferTexture ( framebuffer, renderTarget, attachment, textureTarget, internalFormat ) {
 
 		var glFormat = paramThreeToGL( renderTarget.texture.format );
 		var glType = paramThreeToGL( renderTarget.texture.type );
-		state.texImage2D( textureTarget, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
+		state.texImage2D( textureTarget, 0, internalFormat || glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
@@ -3269,7 +3269,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
-	function setupRenderBufferStorage ( renderbuffer, renderTarget, samples ) {
+	function setupRenderBufferStorage ( renderbuffer, renderTarget, samples, internalColorFormat ) {
 
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
 
@@ -3292,12 +3292,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
 
 		} else {
+			internalColorFormat = internalColorFormat || _gl.RGBA4;
 
 			// FIXME: We don't support !depth !stencil
 			if ( samples ) {
-				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, _gl.RGBA4, renderTarget.width, renderTarget.height );
+				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, internalColorFormat, renderTarget.width, renderTarget.height );
 			} else {
-				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.RGBA4, renderTarget.width, renderTarget.height );
+				_gl.renderbufferStorage( _gl.RENDERBUFFER, internalColorFormat, renderTarget.width, renderTarget.height );
 			}
 
 		}
@@ -3307,7 +3308,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	// Setup GL resources for a non-texture depth buffer
-	function setupDepthRenderbuffer( renderTarget, samples ) {
+	function setupDepthRenderbuffer( renderTarget, samples, internalColorFormat ) {
 
 		var renderTargetProperties = properties.get( renderTarget );
 
@@ -3321,7 +3322,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
 				renderTargetProperties.__webglDepthbuffer[ i ] = _gl.createRenderbuffer();
-				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget, samples );
+				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget, samples, internalColorFormat );
 
 			}
 
@@ -3329,7 +3330,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 			renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
-			setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget, samples );
+			setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget, samples, internalColorFormat );
 
 		}
 
@@ -3379,6 +3380,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		var internalFormat; // let it default to glFormat unless MSAA is enabled
+
 		// The WebGLRenderTargetMultisample internally contains
 		// a color + depth renderbuffer. The render target holds
 		// a 0-sample texture FBO which the MSAA blits to.
@@ -3387,19 +3390,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 			renderTargetProperties.__webglMSAAFramebuffer = _gl.createFramebuffer();
 			renderTargetProperties.__webglMSAAColorbuffer = _gl.createRenderbuffer();
 
+			// Ensure internalFormat is correct
+			if ( renderTarget.texture.format === THREE.RGBAFormat ) internalFormat = _gl.RGBA8;
+			else if ( renderTarget.texture.format === THREE.RGBFormat ) internalFormat = _gl.RGB8;
+			else throw new Error( 'WebGLRenderTargetMultisample only supports RGBFormat and RGBAFormat' );
+
 			// Our MSAA FBO
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMSAAFramebuffer );
 
 			// Setup MSAA color render buffer
 			_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderTargetProperties.__webglMSAAColorbuffer );
-			_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, msaaSamples, _gl.RGBA8, renderTarget.width, renderTarget.height );
+			_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, msaaSamples, internalFormat, renderTarget.width, renderTarget.height );
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.RENDERBUFFER, renderTargetProperties.__webglMSAAColorbuffer );
 
 			// Setup MSAA depth render buffer
 			if ( renderTarget.depthBuffer ) {
 
 				renderTargetProperties.__webglMSAADepthbuffer = _gl.createRenderbuffer();
-				setupRenderBufferStorage( renderTargetProperties.__webglMSAADepthbuffer, renderTarget, msaaSamples );
+				setupRenderBufferStorage( renderTargetProperties.__webglMSAADepthbuffer, renderTarget, msaaSamples, internalFormat );
 
 			}
 
@@ -3426,7 +3434,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
 			setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
-			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
+			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, internalFormat );
 
 			if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
 			state.bindTexture( _gl.TEXTURE_2D, null );
@@ -3438,7 +3446,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( renderTarget.depthBuffer ) {
 
 			// We specify 0 samples here because the MSAA FBO has its own renderbuffers.
-			setupDepthRenderbuffer( renderTarget, 0 );
+			setupDepthRenderbuffer( renderTarget, 0, internalFormat );
 
 		}
 
