@@ -11,3 +11,11 @@ THREE.WebGLRenderTargetMultisample = function ( width, height, options ) {
 
 THREE.WebGLRenderTargetMultisample.prototype = Object.create( THREE.WebGLRenderTarget.prototype );
 THREE.WebGLRenderTargetMultisample.prototype.constructor = THREE.WebGLRenderTargetMultisample;
+
+THREE.WebGLRenderTargetMultisample.copy = function ( source ) {
+
+  THREE.WebGLRenderTarget.prototype.copy.call( this, source );
+  this.samples = source.samples;
+  return this;
+
+};

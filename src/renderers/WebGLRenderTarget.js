@@ -66,7 +66,6 @@ THREE.WebGLRenderTarget.prototype = {
 		this.viewport.copy( source.viewport );
 
 		this.texture = source.texture.clone();
-		this.samples = source.samples;
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
