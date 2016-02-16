@@ -30,7 +30,7 @@
 
 		<code>// White directional light at half intensity shining from the top.
 
-var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+var directionalLight = new THREE.DirectionalLight( new THREE.Color( 1, 1, 1 ), 0.5 );
 directionalLight.position.set( 0, 1, 0 );
 scene.add( directionalLight );</code>
 
@@ -38,9 +38,9 @@ scene.add( directionalLight );</code>
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Integer hex], [page:Float intensity])</h3>
+		<h3>[name]([page:Color color], [page:Float intensity])</h3>
 		<div>
-		[page:Integer hex] -- Numeric value of the RGB component of the color. <br />
+		[page:Color color] -- The color of the light. Can be a THREE.Color or any value accepted by the [page:Color THREE.Color] constructor.<br />
 		[page:Float intensity] -- Numeric value of the light's strength/intensity.
 		</div>
 		<div>

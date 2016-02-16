@@ -29,7 +29,7 @@
 		<div>[example:webgl_geometry_text geometry / text ]</div>
 		<div>[example:webgl_lensflares lensflares ]</div>
 		
-		<code>var light = new THREE.PointLight( 0xff0000, 1, 100 );
+		<code>var light = new THREE.PointLight( new THREE.Color( 1, 0 0 ), 1, 100 );
 light.position.set( 50, 50, 50 );
 scene.add( light );</code>
 
@@ -37,9 +37,9 @@ scene.add( light );</code>
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Integer hex], [page:Float intensity], [page:Number distance], [page:Float decay])</h3>
+		<h3>[name]([page:Color color], [page:Float intensity], [page:Number distance], [page:Float decay])</h3>
 		<div>
-		[page:Integer hex] — Numeric value of the RGB component of the color. <br />
+        [page:Color color] -- The color of the light. Can be a THREE.Color or any value accepted by the [page:Color THREE.Color] constructor.<br />
 		[page:Float intensity] — Numeric value of the light's strength/intensity. <br />
 		[page:Number distance] -- The distance of the light where the intensity is 0. When distance is 0, then the distance is endless. <br />
 		[page:Float decay] -- The amount the light dims along the distance of the light.

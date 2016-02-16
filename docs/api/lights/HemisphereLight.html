@@ -23,22 +23,23 @@
 		<div>[example:webgl_materials_lightmap materials / lightmap ]</div>
 		<div>[example:webgl_shaders_ocean shaders / ocean ]</div>
 		
-<code>var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+<code>var light = new THREE.HemisphereLight( new THREE.Color( 1, 1, 0.8 ), new THREE.Color( 0.4, 0.4, 0.2 ), 1 );
 scene.add( light );</code>
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Integer skyColorHex], [page:Integer groundColorHex], [page:Float intensity])</h3>
+		<h3>[name]([page:Color skyColor], [page:Integer groundColor], [page:Float intensity])</h3>
         <div>
-		[page:Integer skyColorHex] — Numeric value of the RGB sky color.<br />
-		[page:Integer groundColorHex] — Numeric value of the RGB ground color.<br />
+		[page:Color skyColor] -- The color of the sky. Can be a THREE.Color or any value accepted by the [page:Color THREE.Color] constructor.<br />
+
+		[page:Color groundColor] -- The color of the sky. Can be a THREE.Color or any value accepted by the [page:Color THREE.Color] constructor.<br />
 		[page:Float intensity] — Numeric value of the light's strength/intensity.
 		</div>
 
 		<h2>Properties</h2>
 
-		<h3>[property:Float groundColor]</h3>
+		<h3>[property:Color groundColor]</h3>
 
 		<div>
 			Light's ground color.<br />
