@@ -92,7 +92,7 @@ THREE.MSAAPass.prototype = {
 
       // this accumulation strategy is used to prevent decimation at low bit depths with lots of samples.
       this.uniforms[ "scale" ].value = weight;
-      weight *= 0.5;
+      weight = 1.0 / (i+1);
 
     // clear on the first render, accumulate the others
       var autoClear = renderer.autoClear;
