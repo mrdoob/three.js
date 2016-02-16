@@ -61,7 +61,7 @@
 		[page:Float intensity] — Numeric value of the light's strength/intensity. <br />
 		[page:Float distance] -- Maximum distance from origin where light will shine whose intensity is attenuated linearly based on distance from origin. <br />
 		[page:Radians angle] -- Maximum angle of light dispersion from its direction whose upper bound is Math.PI/2.<br />
-		[page:Float penumbra] -- Rapidity of the falloff of light from its target direction.<br />
+		[page:Float penumbra] -- Percent of the spotlight cone that is attenuated due to penumbra. Takes values between zero and 1. Default is zero.<br />
 		[page:Float decay] -- The amount the light dims along the distance of the light.
 		</div>
 
@@ -94,8 +94,7 @@
 
 		<h3>[property:Float penumbra]</h3>
 		<div>
-			Rapidity of the falloff of light from its target direction. A lower value spreads out the light, while a higher
-			focuses it towards the center.<br />
+			Percent of the spotlight cone that is attenuated due to penumbra. Takes values between zero and 1.<br />
 			Default — *0.0*.
 		</div>
 
