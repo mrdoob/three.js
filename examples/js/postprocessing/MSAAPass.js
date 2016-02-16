@@ -115,7 +115,7 @@ THREE.MSAAPass.normalizedJitterOffsets = function( jitterVectors ) {
 
   for( var i = 0; i < jitterVectors.length; i ++ ) {
 
-    scaledJitterOffsets.push( new THREE.Vector2( jitterVectors[i][0], jitterVectors[i][1] ).multiplyScalar( 1.0 / 17.0 ) );
+    scaledJitterOffsets.push( new THREE.Vector2( jitterVectors[i][0], jitterVectors[i][1] ).multiplyScalar( 1.0 / 16.0 ) );
 
   }
 
@@ -124,7 +124,7 @@ THREE.MSAAPass.normalizedJitterOffsets = function( jitterVectors ) {
 },
 
 // These jitter vectors are specified in integers because it is easier.
-// I am assuming a [-8,8] integer grid, but it needs to be mapped onto [-0.5,0.5]
+// I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
 // before being used, thus these integers need to be scaled by 1/16.
 //
 // Sample patterns reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ff476218%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
