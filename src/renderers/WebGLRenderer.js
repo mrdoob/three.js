@@ -3295,7 +3295,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// FIXME: We don't support !depth !stencil
 			if ( samples ) {
-				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, _gl.RGBA4, renderTarget.width, renderTarget.height );			
+				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, _gl.RGBA4, renderTarget.width, renderTarget.height );
 			} else {
 				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.RGBA4, renderTarget.width, renderTarget.height );
 			}
@@ -3350,7 +3350,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var renderTargetProperties = properties.get( renderTarget );
 		var textureProperties = properties.get( renderTarget.texture );
-		var msaaSamples = getRenderTargetSamples( renderTargetProperties );
+		var msaaSamples = getRenderTargetSamples( renderTarget );
 
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
@@ -3402,8 +3402,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				setupRenderBufferStorage( renderTargetProperties.__webglMSAADepthbuffer, renderTarget, msaaSamples );
 
 			}
-
-			// console.log("is complete", _gl.checkFramebufferStatus( _gl.FRAMEBUFFER ) === _gl.FRAMEBUFFER_COMPLETE)
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 		}
