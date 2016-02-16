@@ -28,7 +28,8 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Manual Multi-Sample Anti-Aliasing (MSAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - Manual Multi-Sample Anti-Aliasing (MSAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
+			Texture interpolation, mipmapping and anistropy sampling is disabled to emphasize<br/> the effect MSAA levels have one the resulting render quality.
 		</div>
 
 		<div id="container"></div>
@@ -50,7 +51,7 @@
 		<script>
 
 			var camera, scene, renderer, composer, copyPass, msaaPass;
-			var geometry, material, gui, object, stats;
+			var geometry, material, gui, object, stats, texture;
 
 			var param = { MSAASampleLevel: 2 };
 
@@ -65,6 +66,7 @@
 
 			textureLoader.load( "./textures/brick_diffuse.jpg", function( meshTexture ) {
 				init( meshTexture );
+				texture = meshTexture;
 				animate();
 				clearGui();
 
@@ -99,6 +101,11 @@
 
 			function init( meshTexture ) {
 
+				meshTexture.minFilter = THREE.NearestFilter;
+				meshTexture.magFilter = THREE.NearestFilter;
+				meshTexture.anisotropy = 1;
+				meshTexture.generateMipmaps = false;
+
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -111,7 +118,6 @@
 
 				geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				material = new THREE.MeshBasicMaterial( { map: meshTexture } );
-				meshTexture.anisotropy = 0;
 
 				object = new THREE.Mesh( geometry, material );
 
