@@ -6,12 +6,12 @@
 
 THREE.CompositeShader = {
 
-  shaderID: "composite",
+	shaderID: "composite",
 
 	uniforms: {
 
-		"tForeground":   { type: "t", value: null },
-    "scale":   { type: "f", value: 1.0 }
+		"tForeground": { type: "t", value: null },
+		"scale": { type: "f", value: 1.0 }
 
 	},
 
@@ -26,7 +26,7 @@ THREE.CompositeShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( '\n' ),
 
 	fragmentShader: [
 
@@ -37,12 +37,12 @@ THREE.CompositeShader = {
 
 		"void main() {",
 
-      "vec4 foreground = texture2D( tForeground, vUv );",
+			"vec4 foreground = texture2D( tForeground, vUv );",
 
 			"gl_FragColor = foreground * scale;",
 
 		"}"
 
-	].join("\n")
+	].join( '\n' )
 
 };
