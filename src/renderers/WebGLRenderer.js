@@ -3340,7 +3340,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function getRenderTargetSamples ( renderTarget ) {
 
-		return ( _isWebGL2 && renderTarget instanceof THREE.WebGLRenderTargetMultisample )
+		return ( _isWebGL2 && renderTarget instanceof THREE.WebGLMultisampleRenderTarget )
 			? Math.min( capabilities.maxSamples, renderTarget.samples )
 			: 0;
 
@@ -3382,7 +3382,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var internalFormat; // let it default to glFormat unless MSAA is enabled
 
-		// The WebGLRenderTargetMultisample internally contains
+		// The WebGLMultisampleRenderTarget internally contains
 		// a color + depth renderbuffer. The render target holds
 		// a 0-sample texture FBO which the MSAA blits to.
 		if ( msaaSamples ) {
@@ -3393,7 +3393,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// Ensure internalFormat is correct
 			if ( renderTarget.texture.format === THREE.RGBAFormat ) internalFormat = _gl.RGBA8;
 			else if ( renderTarget.texture.format === THREE.RGBFormat ) internalFormat = _gl.RGB8;
-			else throw new Error( 'WebGLRenderTargetMultisample only supports RGBFormat and RGBAFormat' );
+			else throw new Error( 'WebGLMultisampleRenderTarget only supports RGBFormat and RGBAFormat' );
 
 			// Our MSAA FBO
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMSAAFramebuffer );

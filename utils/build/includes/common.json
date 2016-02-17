@@ -196,7 +196,7 @@
 	"src/renderers/WebGLRenderer.js",
 	"src/renderers/WebGLRenderTarget.js",
 	"src/renderers/WebGLRenderTargetCube.js",
-	"src/renderers/WebGLRenderTargetMultiSample.js",
+	"src/renderers/WebGLMultisampleRenderTarget.js",
 	"src/renderers/webgl/WebGLBufferRenderer.js",
 	"src/renderers/webgl/WebGLIndexedBufferRenderer.js",
 	"src/renderers/webgl/WebGLExtensions.js",
