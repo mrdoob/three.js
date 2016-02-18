@@ -38,7 +38,7 @@
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/postprocessing/MSAAPass.js"></script>
+		<script src="js/postprocessing/ManualMSAARenderPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/CompositeShader.js"></script>
 
@@ -50,7 +50,7 @@
 
 		<script>
 
-			var camera, scene, renderer, composer, copyPass, msaaPass;
+			var camera, scene, renderer, composer, copyPass, manualMSAARenderPass;
 			var gui, stats, texture;
 
 			var param = { MSAASampleLevel: 2 };
@@ -71,12 +71,11 @@
 					'Level 1: 2 Samples': 1,
 					'Level 2: 4 Samples': 2,
 					'Level 3: 8 Samples': 3,
-					'Level 4: 16 Samples': 4,
-					'Level 5: 32 Samples': 5
+					'Level 4: 16 Samples': 4
 				} ).onFinishChange( function() {
 
-					if( massPass ) {
-						massPass.sampleLevel = param.MSAASampleLevel;
+					if( manualMSAARenderPass ) {
+						manualMSAARenderPass.sampleLevel = param.MSAASampleLevel;
 					}
 
 				} );
@@ -129,9 +128,9 @@
 
 				composer = new THREE.EffectComposer( renderer );
 
-				massPass = new THREE.MSAAPass( scene, camera );
-				massPass.sampleLevel = param.MSAASampleLevel;
-				composer.addPass( massPass );
+				manualMSAARenderPass = new THREE.ManualMSAARenderPass( scene, camera );
+				manualMSAARenderPass.sampleLevel = param.MSAASampleLevel;
+				composer.addPass( manualMSAARenderPass );
 
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
 		    copyPass.renderToScreen = true;
@@ -155,7 +154,7 @@
 				var newWidth  = Math.floor( width / pixelRatio ) || 1;
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				composer.setSize( newWidth, newHeight );
-				if( msaaPass ) msaaPass.setSize( newWidth, newHeight );
+				msaaPass.setSize( newWidth, newHeight );
 
 			}
 
