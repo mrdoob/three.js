@@ -220,6 +220,7 @@ ROTATION = 'rotation'
 SCALE = 'scale'
 
 UV = 'uv'
+UV2 = 'uv2'
 ATTRIBUTES = 'attributes'
 NORMAL = 'normal'
 ITEM_SIZE = 'itemSize'

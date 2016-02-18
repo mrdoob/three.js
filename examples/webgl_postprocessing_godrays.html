@@ -307,14 +307,14 @@
 					screenSpacePosition.y *= window.innerHeight;
 
 					renderer.setScissor( screenSpacePosition.x - sunsqW / 2, screenSpacePosition.y - sunsqH / 2, sunsqW, sunsqH );
-					renderer.enableScissorTest( true );
+					renderer.setScissorTest( true );
 
 					postprocessing.godraysFakeSunUniforms[ "fAspect" ].value = window.innerWidth / window.innerHeight;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysFakeSun;
 					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureColors );
 
-					renderer.enableScissorTest( false );
+					renderer.setScissorTest( false );
 
 					// -- Draw scene objects --
 

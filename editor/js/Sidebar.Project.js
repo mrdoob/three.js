@@ -80,6 +80,20 @@ Sidebar.Project = function ( editor ) {
 
 	container.add( rendererPropertiesRow );
 
+	// Editable
+
+	var editableRow = new UI.Row();
+	var editable = new UI.Checkbox( config.getKey( 'project/editable' ) ).setLeft( '100px' ).onChange( function () {
+
+		config.setKey( 'project/editable', this.getValue() );
+
+	} );
+
+	editableRow.add( new UI.Text( 'Editable' ).setWidth( '90px' ) );
+	editableRow.add( editable );
+
+	container.add( editableRow );
+
 	// VR
 
 	var vrRow = new UI.Row();
@@ -114,7 +128,14 @@ Sidebar.Project = function ( editor ) {
 		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
 
 		var renderer = new rendererTypes[ type ]( { antialias: antialias } );
-		if ( shadows && renderer.shadowMap ) renderer.shadowMap.enabled = true;
+
+		if ( shadows && renderer.shadowMap ) {
+
+			renderer.shadowMap.enabled = true;
+			// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+		}
+
 		signals.rendererChanged.dispatch( renderer );
 
 	}
@@ -123,4 +144,4 @@ Sidebar.Project = function ( editor ) {
 
 	return container;
 
-}
+};

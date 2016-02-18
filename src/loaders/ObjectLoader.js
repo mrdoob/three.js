@@ -257,6 +257,17 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'LatheGeometry':
+
+						geometry = new THREE.LatheGeometry(
+							data.points,
+							data.segments,
+							data.phiStart,
+							data.phiLength
+						);
+
+						break;
+
 					case 'BufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
@@ -503,7 +514,7 @@ THREE.ObjectLoader.prototype = {
 
 				case 'SpotLight':
 
-					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent, data.decay );
+					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
 
 					break;
 

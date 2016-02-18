@@ -14,20 +14,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
-	_width = _canvas.width,
-	_height = _canvas.height,
-
-	pixelRatio = 1,
-
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 	_depth = parameters.depth !== undefined ? parameters.depth : true,
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
-	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
-
-	_clearColor = new THREE.Color( 0x000000 ),
-	_clearAlpha = 0;
+	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false;
 
 	var lights = [];
 
@@ -37,7 +29,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var transparentObjectsLastIndex = - 1;
 
 	var morphInfluences = new Float32Array( 8 );
-
 
 	var sprites = [];
 	var lensFlares = [];
@@ -86,18 +77,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentGeometryProgram = '',
 	_currentCamera = null,
 
+	_currentScissor = new THREE.Vector4(),
+	_currentScissorTest = null,
+
+	_currentViewport = new THREE.Vector4(),
+
+	//
+
 	_usedTextureUnits = 0,
 
-	_viewport = new THREE.Rectangle( 0, 0, _canvas.width, _canvas.height ),
+	//
 
-	_currentWidth = 0,
-	_currentHeight = 0,
+	_clearColor = new THREE.Color( 0x000000 ),
+	_clearAlpha = 0,
+
+	_width = _canvas.width,
+	_height = _canvas.height,
+
+	_pixelRatio = 1,
+
+	_scissor = new THREE.Vector4( 0, 0, _width, _height ),
+	_scissorTest = false,
+
+	_viewport = new THREE.Vector4( 0, 0, _width, _height ),
 
 	// frustum
 
 	_frustum = new THREE.Frustum(),
 
-	 // camera matrices cache
+	// camera matrices cache
 
 	_projScreenMatrix = new THREE.Matrix4(),
 
@@ -111,8 +119,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		ambient: [ 0, 0, 0 ],
 		directional: [],
-		point: [],
+		directionalShadowMap: [],
+		directionalShadowMatrix: [],
 		spot: [],
+		spotShadowMap: [],
+		spotShadowMatrix: [],
+		point: [],
+		pointShadowMap: [],
+		pointShadowMatrix: [],
 		hemi: [],
 
 		shadows: [],
@@ -218,7 +232,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function getTargetPixelRatio() {
 
-		return _currentRenderTarget === null ? pixelRatio : 1;
+		return _currentRenderTarget === null ? _pixelRatio : 1;
 
 	}
 
@@ -230,7 +244,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_gl.clearColor( r, g, b, a );
+		state.clearColor( r, g, b, a );
 
 	}
 
@@ -238,7 +252,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.init();
 
-		_gl.viewport( _viewport.x, _viewport.y, _viewport.width, _viewport.height );
+		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
+		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
 		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
@@ -330,13 +345,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.getPixelRatio = function () {
 
-		return pixelRatio;
+		return _pixelRatio;
 
 	};
 
 	this.setPixelRatio = function ( value ) {
 
-		if ( value !== undefined ) pixelRatio = value;
+		if ( value === undefined ) return;
+
+		_pixelRatio = value;
+
+		this.setSize( _viewport.z, _viewport.w, false );
 
 	};
 
@@ -354,8 +373,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_width = width;
 		_height = height;
 
-		_canvas.width = width * pixelRatio;
-		_canvas.height = height * pixelRatio;
+		_canvas.width = width * _pixelRatio;
+		_canvas.height = height * _pixelRatio;
 
 		if ( updateStyle !== false ) {
 
@@ -370,41 +389,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		if ( _currentRenderTarget === null ) {
-
-			x *= pixelRatio;
-			y *= pixelRatio;
-
-			width *= pixelRatio;
-			height *= pixelRatio;
-
-			_viewport.set( x, y, width, height );
-
-		}
-
-		_gl.viewport( x, y, width, height );
+		state.viewport( _viewport.set( x, y, width, height ) );
 
 	};
 
 	this.setScissor = function ( x, y, width, height ) {
 
-		if ( _currentRenderTarget === null ) {
-
-			x *= pixelRatio;
-			y *= pixelRatio;
-
-			width *= pixelRatio;
-			height *= pixelRatio;
-
-		}
-
-		_gl.scissor( x, y, width, height );
+		state.scissor( _scissor.set( x, y, width, height ) );
 
 	};
 
-	this.enableScissorTest = function ( boolean ) {
+	this.setScissorTest = function ( boolean ) {
 
-		state.setScissorTest( boolean );
+		state.setScissorTest( _scissorTest = boolean );
 
 	};
 
@@ -454,19 +451,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.clearColor = function () {
 
-		_gl.clear( _gl.COLOR_BUFFER_BIT );
+		this.clear( true, false, false );
 
 	};
 
 	this.clearDepth = function () {
 
-		_gl.clear( _gl.DEPTH_BUFFER_BIT );
+		this.clear( false, true, false );
 
 	};
 
 	this.clearStencil = function () {
 
-		_gl.clear( _gl.STENCIL_BUFFER_BIT );
+		this.clear( false, false, true );
 
 	};
 
@@ -1187,7 +1184,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// custom render plugins (post pass)
 
 		spritePlugin.render( scene, camera );
-		lensFlarePlugin.render( scene, camera, _currentWidth, _currentHeight );
+		lensFlarePlugin.render( scene, camera, _currentViewport );
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 
@@ -1529,9 +1526,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			uniforms.ambientLightColor.value = _lights.ambient;
 			uniforms.directionalLights.value = _lights.directional;
-			uniforms.pointLights.value = _lights.point;
 			uniforms.spotLights.value = _lights.spot;
+			uniforms.pointLights.value = _lights.point;
 			uniforms.hemisphereLights.value = _lights.hemi;
+
+			uniforms.directionalShadowMap.value = _lights.directionalShadowMap;
+			uniforms.directionalShadowMatrix.value = _lights.directionalShadowMatrix;
+			uniforms.spotShadowMap.value = _lights.spotShadowMap;
+			uniforms.spotShadowMatrix.value = _lights.spotShadowMatrix;
+			uniforms.pointShadowMap.value = _lights.pointShadowMap;
+			uniforms.pointShadowMatrix.value = _lights.pointShadowMatrix;
 
 		}
 
@@ -1799,6 +1803,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				refreshUniformsPoints( m_uniforms, material );
 
+			} else if ( material instanceof THREE.MeshLambertMaterial ) {
+
+				refreshUniformsLambert( m_uniforms, material );
+
 			} else if ( material instanceof THREE.MeshPhongMaterial ) {
 
 				refreshUniformsPhong( m_uniforms, material );
@@ -1816,16 +1824,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
 				m_uniforms.opacity.value = material.opacity;
-
-			}
-
-			if ( shadowMap.enabled ) {
-
-				if ( object.receiveShadow && ! material._shadowPass ) {
-
-					refreshUniformsShadow( m_uniforms, camera );
-
-				}
 
 			}
 
@@ -1885,7 +1883,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.emissive ) {
 
-			uniforms.emissive.value = material.emissive;
+			uniforms.emissive.value.copy( material.emissive ).multiplyScalar( material.emissiveIntensity );
 
 		}
 
@@ -1990,8 +1988,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
-		uniforms.size.value = material.size;
-		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
+		uniforms.size.value = material.size * _pixelRatio;
+		uniforms.scale.value = _canvas.clientHeight / 2.0; // TODO: Cache this.
 
 		uniforms.map.value = material.map;
 
@@ -2018,6 +2016,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( fog instanceof THREE.FogExp2 ) {
 
 			uniforms.fogDensity.value = fog.density;
+
+		}
+
+	}
+
+	function refreshUniformsLambert ( uniforms, material ) {
+
+		if ( material.lightMap ) {
+
+			uniforms.lightMap.value = material.lightMap;
+			uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
+		}
+
+		if ( material.emissiveMap ) {
+
+			uniforms.emissiveMap.value = material.emissiveMap;
 
 		}
 
@@ -2136,44 +2151,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.pointLights.needsUpdate = value;
 		uniforms.spotLights.needsUpdate = value;
 		uniforms.hemisphereLights.needsUpdate = value;
-
-	}
-
-	function refreshUniformsShadow ( uniforms, camera ) {
-
-		if ( uniforms.shadowMatrix ) {
-
-			var shadows = _lights.shadows;
-
-			for ( var i = 0, l = shadows.length; i < l; i ++ ) {
-
-				var light = shadows[ i ];
-				var shadow = light.shadow;
-
-				if ( light instanceof THREE.PointLight ) {
-
-					// for point lights we set the shadow matrix to be a translation-only matrix
-					// equal to inverse of the light's position
-					_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-					shadow.matrix.identity().setPosition( _vector3 );
-
-					// for point lights we set the sign of the shadowDarkness uniform to be negative
-					uniforms.shadowDarkness.value[ i ] = - shadow.darkness;
-
-				} else {
-
-					uniforms.shadowDarkness.value[ i ] = shadow.darkness;
-
-				}
-
-				uniforms.shadowBias.value[ i ] = shadow.bias;
-				uniforms.shadowMap.value[ i ] = shadow.map;
-				uniforms.shadowMapSize.value[ i ] = shadow.mapSize;
-				uniforms.shadowMatrix.value[ i ] = shadow.matrix;
-
-			}
-
-		}
 
 	}
 
@@ -2389,6 +2366,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 									break;
 								case 'c':
 									_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
+									break;
+								case 'm4':
+									_gl.uniformMatrix4fv( locationProperty, false, valueProperty.elements );
 									break;
 							}
 
@@ -2684,51 +2664,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var uniforms = lightCache.get( light );
 
+				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
 				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
 				uniforms.direction.sub( _vector3 );
 				uniforms.direction.transformDirection( viewMatrix );
-				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
+
+				uniforms.shadow = light.castShadow;
 
 				if ( light.castShadow ) {
 
-					uniforms.shadow = shadowsLength;
+					uniforms.shadowBias = light.shadow.bias;
+					uniforms.shadowRadius = light.shadow.radius;
+					uniforms.shadowMapSize = light.shadow.mapSize;
 
 					_lights.shadows[ shadowsLength ++ ] = light;
 
-				} else {
-
-					uniforms.shadow = - 1;
-
 				}
 
+				_lights.directionalShadowMap[ directionalLength ] = light.shadow.map;
+				_lights.directionalShadowMatrix[ directionalLength ] = light.shadow.matrix;
 				_lights.directional[ directionalLength ++ ] = uniforms;
-
-			} else if ( light instanceof THREE.PointLight ) {
-
-				var uniforms = lightCache.get( light );
-
-				uniforms.position.setFromMatrixPosition( light.matrixWorld );
-				uniforms.position.applyMatrix4( viewMatrix );
-
-				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
-				uniforms.distance = light.distance;
-				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
-
-				if ( light.castShadow ) {
-
-					uniforms.shadow = shadowsLength;
-
-					_lights.shadows[ shadowsLength ++ ] = light;
-					_lights.shadowsPointLight ++;
-
-				} else {
-
-					uniforms.shadow = - 1;
-
-				}
-
-				_lights.point[ pointLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.SpotLight ) {
 
@@ -2746,22 +2702,62 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.direction.transformDirection( viewMatrix );
 
 				uniforms.angleCos = Math.cos( light.angle );
-				uniforms.exponent = light.exponent;
+				uniforms.penumbra = Math.cos( light.angle ) * light.penumbra;
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
+
+				uniforms.shadow = light.castShadow;
 
 				if ( light.castShadow ) {
 
-					uniforms.shadow = shadowsLength;
+					uniforms.shadowBias = light.shadow.bias;
+					uniforms.shadowRadius = light.shadow.radius;
+					uniforms.shadowMapSize = light.shadow.mapSize;
 
 					_lights.shadows[ shadowsLength ++ ] = light;
 
-				} else {
+				}
 
-					uniforms.shadow = - 1;
+				_lights.spotShadowMap[ spotLength ] = light.shadow.map;
+				_lights.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
+				_lights.spot[ spotLength ++ ] = uniforms;
+
+			} else if ( light instanceof THREE.PointLight ) {
+
+				var uniforms = lightCache.get( light );
+
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
+
+				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
+				uniforms.distance = light.distance;
+				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
+
+				uniforms.shadow = light.castShadow;
+
+				if ( light.castShadow ) {
+
+					uniforms.shadowBias = light.shadow.bias;
+					uniforms.shadowRadius = light.shadow.radius;
+					uniforms.shadowMapSize = light.shadow.mapSize;
+
+					_lights.shadows[ shadowsLength ++ ] = light;
 
 				}
 
-				_lights.spot[ spotLength ++ ] = uniforms;
+				_lights.pointShadowMap[ pointLength ] = light.shadow.map;
+
+				if ( _lights.pointShadowMatrix[ pointLength ] === undefined ) {
+
+					_lights.pointShadowMatrix[ pointLength ] = new THREE.Matrix4();
+
+				}
+
+				// for point lights we set the shadow matrix to be a translation-only matrix
+				// equal to inverse of the light's position
+				_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
+				_lights.pointShadowMatrix[ pointLength ].identity().setPosition( _vector3 );
+
+				_lights.point[ pointLength ++ ] = uniforms;
 
 			} else if ( light instanceof THREE.HemisphereLight ) {
 
@@ -2785,8 +2781,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lights.ambient[ 2 ] = b;
 
 		_lights.directional.length = directionalLength;
-		_lights.point.length = pointLength;
 		_lights.spot.length = spotLength;
+		_lights.point.length = pointLength;
 		_lights.hemi.length = hemiLength;
 
 		_lights.shadows.length = shadowsLength;
@@ -2837,11 +2833,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Textures
 
-	function setTextureParameters ( textureType, texture, isImagePowerOfTwo ) {
+	function setTextureParameters ( textureType, texture, isPowerOfTwoImage ) {
 
 		var extension;
 
-		if ( isImagePowerOfTwo ) {
+		if ( isPowerOfTwoImage ) {
 
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrapS ) );
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrapT ) );
@@ -2910,20 +2906,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
-		texture.image = clampToMaxSize( texture.image, capabilities.maxTextureSize );
+		var image = clampToMaxSize( texture.image, capabilities.maxTextureSize );
 
-		if ( textureNeedsPowerOfTwo( texture ) && isPowerOfTwo( texture.image ) === false ) {
+		if ( textureNeedsPowerOfTwo( texture ) && isPowerOfTwo( image ) === false ) {
 
-			texture.image = makePowerOfTwo( texture.image );
+			image = makePowerOfTwo( image );
 
 		}
 
-		var image = texture.image,
-		isImagePowerOfTwo = isPowerOfTwo( image ),
+		var isPowerOfTwoImage = isPowerOfTwo( image ),
 		glFormat = paramThreeToGL( texture.format ),
 		glType = paramThreeToGL( texture.type );
 
-		setTextureParameters( _gl.TEXTURE_2D, texture, isImagePowerOfTwo );
+		setTextureParameters( _gl.TEXTURE_2D, texture, isPowerOfTwoImage );
 
 		var mipmap, mipmaps = texture.mipmaps;
 
@@ -2933,7 +2928,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// if there are no manual mipmaps
 			// set 0 level mipmap and then use GL to generate other mipmap levels
 
-			if ( mipmaps.length > 0 && isImagePowerOfTwo ) {
+			if ( mipmaps.length > 0 && isPowerOfTwoImage ) {
 
 				for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
@@ -2984,7 +2979,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// if there are no manual mipmaps
 			// set 0 level mipmap and then use GL to generate other mipmap levels
 
-			if ( mipmaps.length > 0 && isImagePowerOfTwo ) {
+			if ( mipmaps.length > 0 && isPowerOfTwoImage ) {
 
 				for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
@@ -2997,13 +2992,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, texture.image );
+				state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, image );
 
 			}
 
 		}
 
-		if ( texture.generateMipmaps && isImagePowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
+		if ( texture.generateMipmaps && isPowerOfTwoImage ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
 		textureProperties.__version = texture.version;
 
@@ -3149,11 +3144,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var image = cubeImage[ 0 ],
-				isImagePowerOfTwo = isPowerOfTwo( image ),
+				isPowerOfTwoImage = isPowerOfTwo( image ),
 				glFormat = paramThreeToGL( texture.format ),
 				glType = paramThreeToGL( texture.type );
 
-				setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, isImagePowerOfTwo );
+				setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, isPowerOfTwoImage );
 
 				for ( var i = 0; i < 6; i ++ ) {
 
@@ -3201,7 +3196,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( texture.generateMipmaps && isImagePowerOfTwo ) {
+				if ( texture.generateMipmaps && isPowerOfTwoImage ) {
 
 					_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
 
@@ -3381,7 +3376,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
-		var framebuffer, viewport;
+		var framebuffer;
 
 		if ( renderTarget ) {
 
@@ -3397,24 +3392,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			viewport = renderTarget.viewport;
+			_currentScissor.copy( renderTarget.scissor );
+			_currentScissorTest = renderTarget.scissorTest;
+
+			_currentViewport.copy( renderTarget.viewport );
 
 		} else {
 
 			framebuffer = null;
 
-			viewport = _viewport;
+			_currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio );
+			_currentScissorTest = _scissorTest;
+
+			_currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio );
 
 		}
 
-		if ( framebuffer !== _currentFramebuffer ) {
+		if ( _currentFramebuffer !== framebuffer ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-			_gl.viewport( viewport.x, viewport.y, viewport.width, viewport.height );
-
 			_currentFramebuffer = framebuffer;
 
 		}
+
+		state.scissor( _currentScissor );
+		state.setScissorTest( _currentScissorTest );
+
+		state.viewport( _currentViewport );
 
 		if ( isCube ) {
 
@@ -3422,9 +3426,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, textureProperties.__webglTexture, 0 );
 
 		}
-
-		_currentWidth = viewport.width;
-		_currentHeight = viewport.height;
 
 	};
 
@@ -3602,6 +3603,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( p === THREE.RGB_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
 			if ( p === THREE.RGBA_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
 			if ( p === THREE.RGBA_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+
+		}
+
+		extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
+
+		if ( extension !== null ) {
+
+			if ( p === THREE.RGB_ETC1_Format ) return extension.COMPRESSED_RGB_ETC1_WEBGL;
 
 		}
 

@@ -47,10 +47,11 @@
 
 				scene = new THREE.Scene();
 
+				var textureLoader = new THREE.TextureLoader();
 
 				// MESH - Repeat Pattern
 
-				texture = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
+				texture = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
 				texture.wrapS = THREE.RepeatWrapping;
 				texture.wrapT = THREE.RepeatWrapping;
 
@@ -63,7 +64,7 @@
 
 				// SPRITES - from Sprite Sheet
 
-				texture1 = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg', undefined, function() {
+				texture1 = textureLoader.load( 'textures/UV_Grid_Sm.jpg', function() {
 
 					texture1.wrapS = THREE.ClampToEdgeWrapping;
 					texture1.wrapT = THREE.ClampToEdgeWrapping;
@@ -99,7 +100,7 @@
 
 				// SPRITES - Repeat Pattern
 
-				texture2 = THREE.ImageUtils.loadTexture( 'textures/sprite0.jpg' );
+				texture2 = textureLoader.load( 'textures/sprite0.jpg' );
 				texture2.wrapS = THREE.RepeatWrapping;
 				texture2.wrapT = THREE.RepeatWrapping;
 
@@ -123,7 +124,7 @@
 
 				// SPRITES - PNG
 
-				texture3 = THREE.ImageUtils.loadTexture( 'textures/sprite1.png' );
+				texture3 = textureLoader.load( 'textures/sprite1.png' );
 				texture3.wrapS = THREE.ClampToEdgeWrapping;
 				texture3.wrapT = THREE.ClampToEdgeWrapping;
 

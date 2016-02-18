@@ -10,6 +10,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 
+	_shadowMapSize = new THREE.Vector2(),
+
 	_lookTarget = new THREE.Vector3(),
 	_lightPositionWorld = new THREE.Vector3(),
 
@@ -96,12 +98,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
-		// Save GL state
-
-		var currentScissorTest = _state.getScissorTest();
-
 		// Set GL state for depth map.
-		_gl.clearColor( 1, 1, 1, 1 );
+		_state.clearColor( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
 		_state.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
@@ -119,15 +117,16 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			var shadow = light.shadow;
 			var shadowCamera = shadow.camera;
-			var shadowMapSize = shadow.mapSize;
+
+			_shadowMapSize.copy( shadow.mapSize );
 
 			if ( light instanceof THREE.PointLight ) {
 
 				faceCount = 6;
 				isPointLight = true;
 
-				var vpWidth = shadowMapSize.x / 4.0;
-				var vpHeight = shadowMapSize.y / 2.0;
+				var vpWidth = _shadowMapSize.x;
+				var vpHeight = _shadowMapSize.y;
 
 				// These viewports map a cube-map onto a 2D texture with the
 				// following orientation:
@@ -155,6 +154,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				// negative Y
 				cube2DViewPorts[ 5 ].set( vpWidth, 0, vpWidth, vpHeight );
 
+				_shadowMapSize.x *= 4.0;
+				_shadowMapSize.y *= 2.0;
+
 			} else {
 
 				faceCount = 1;
@@ -164,24 +166,15 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			if ( shadow.map === null ) {
 
-				var shadowFilter = THREE.LinearFilter;
+				var pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
 
-				if ( scope.type === THREE.PCFSoftShadowMap ) {
-
-					shadowFilter = THREE.NearestFilter;
-
-				}
-
-				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
-
-				shadow.map = new THREE.WebGLRenderTarget( shadowMapSize.x, shadowMapSize.y, pars );
-				shadow.matrix = new THREE.Matrix4();
+				shadow.map = new THREE.WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 
 				//
 
 				if ( light instanceof THREE.SpotLight ) {
 
-					shadowCamera.aspect = shadowMapSize.x / shadowMapSize.y;
+					shadowCamera.aspect = _shadowMapSize.x / _shadowMapSize.y;
 
 				}
 
@@ -209,8 +202,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 					_lookTarget.add( cubeDirections[ face ] );
 					shadowCamera.up.copy( cubeUps[ face ] );
 					shadowCamera.lookAt( _lookTarget );
+
 					var vpDimensions = cube2DViewPorts[ face ];
-					_renderer.setViewport( vpDimensions.x, vpDimensions.y, vpDimensions.z, vpDimensions.w );
+					_state.viewport( vpDimensions );
 
 				} else {
 
@@ -254,7 +248,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 					var geometry = _objects.update( object );
 					var material = object.material;
 
-					if ( material instanceof THREE.MeshFaceMaterial ) {
+					if ( material instanceof THREE.MultiMaterial ) {
 
 						var groups = geometry.groups;
 						var materials = material.materials;
@@ -294,13 +288,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var clearColor = _renderer.getClearColor(),
 		clearAlpha = _renderer.getClearAlpha();
 		_renderer.setClearColor( clearColor, clearAlpha );
+
 		_state.enable( _gl.BLEND );
-
-		if ( currentScissorTest === true ) {
-
-			_state.setScissorTest( true );
-
-		}
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
 

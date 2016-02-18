@@ -149,6 +149,8 @@
 
 				scene = new THREE.Scene();
 
+				var textureLoader = new THREE.TextureLoader();
+
 				uniforms = {
 
 					fogDensity: { type: "f", value: 0.45 },
@@ -156,8 +158,8 @@
 					time: { type: "f", value: 1.0 },
 					resolution: { type: "v2", value: new THREE.Vector2() },
 					uvScale: { type: "v2", value: new THREE.Vector2( 3.0, 1.0 ) },
-					texture1: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/lava/cloud.png" ) },
-					texture2: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" ) }
+					texture1: { type: "t", value: textureLoader.load( "textures/lava/cloud.png" ) },
+					texture2: { type: "t", value: textureLoader.load( "textures/lava/lavatile.jpg" ) }
 
 				};
 

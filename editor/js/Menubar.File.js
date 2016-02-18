@@ -251,6 +251,26 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
+	/*
+	// Publish (Dropbox)
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Publish (Dropbox)' );
+	option.onClick( function () {
+
+		var parameters = {
+			files: [
+				{ 'url': 'data:text/plain;base64,' + window.btoa( "Hello, World" ), 'filename': 'app/test.txt' }
+			]
+		};
+
+		Dropbox.save( parameters );
+
+	} );
+	options.add( option );
+	*/
+
 
 	//
 

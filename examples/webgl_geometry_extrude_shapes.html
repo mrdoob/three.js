@@ -4,7 +4,6 @@
 		<title>three.js webgl - geometry - extrude shapes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
 		<style>
 			body {
 				font-family: Monospace;
@@ -168,7 +167,7 @@
 
 				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+				var mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
 
 				mesh.position.set( 50, 100, 50 );
 

@@ -199,14 +199,14 @@
 
 				};
 
-				var texturePainting1 = THREE.ImageUtils.loadTexture( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", THREE.UVMapping, callbackPainting ),
-					texturePainting2 = new THREE.Texture(),
-					materialPainting1 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting1 } ),
-					materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
+				var texturePainting1 = new THREE.TextureLoader().load( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", callbackPainting );
+				var texturePainting2 = new THREE.Texture();
+				var materialPainting1 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting1 } );
+				var materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
 
 				texturePainting2.minFilter = texturePainting2.magFilter = THREE.NearestFilter;
 				texturePainting1.minFilter = texturePainting1.magFilter = THREE.LinearFilter;
-
+				texturePainting1.mapping = THREE.UVMapping;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( scene1.fog.color );
@@ -252,15 +252,16 @@
 
 				camera.lookAt( scene1.position );
 
-				renderer.enableScissorTest( false );
 				renderer.clear();
-				renderer.enableScissorTest( true );
+				renderer.setScissorTest( true );
 
 				renderer.setScissor( 0, 0, SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene1, camera );
 
 				renderer.setScissor( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene2, camera );
+
+				renderer.setScissorTest( false );
 
 			}
 

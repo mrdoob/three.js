@@ -212,7 +212,7 @@ THREE.MD2Character = function () {
 			}
 
 		}
-			
+
 	}
 
 	this.update = function ( delta ) {
@@ -223,12 +223,13 @@ THREE.MD2Character = function () {
 
 	function loadTextures( baseUrl, textureUrls ) {
 
-		var mapping = THREE.UVMapping;
+		var textureLoader = new THREE.TextureLoader();
 		var textures = [];
 
 		for ( var i = 0; i < textureUrls.length; i ++ ) {
 
-			textures[ i ] = THREE.ImageUtils.loadTexture( baseUrl + textureUrls[ i ], mapping, checkLoadingComplete );
+			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
+			textures[ i ].mapping = THREE.UVMapping;
 			textures[ i ].name = textureUrls[ i ];
 
 		}
@@ -254,7 +255,7 @@ THREE.MD2Character = function () {
 
 		mesh.materialTexture = materialTexture;
 		mesh.materialWireframe = materialWireframe;
-	
+
 		return mesh;
 
 	}

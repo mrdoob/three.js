@@ -12,8 +12,8 @@
 THREE.VREffect = function ( renderer, onError ) {
 
 	var vrHMD;
-	var eyeTranslationL, eyeFOVL;
-	var eyeTranslationR, eyeFOVR;
+	var eyeTranslationL, eyeFOVL, renderRectL;
+	var eyeTranslationR, eyeFOVR, renderRectR;
 
 	function gotVRDevices( devices ) {
 
@@ -47,7 +47,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.scale = 1;
 
-	this.setSize = function( width, height ) {
+	this.setSize = function ( width, height ) {
 
 		renderer.setSize( width, height );
 
@@ -86,7 +86,10 @@ THREE.VREffect = function ( renderer, onError ) {
 	// render
 
 	var cameraL = new THREE.PerspectiveCamera();
+	cameraL.layers.enable( 1 );
+
 	var cameraR = new THREE.PerspectiveCamera();
+	cameraR.layers.enable( 2 );
 
 	this.render = function ( scene, camera ) {
 
@@ -99,25 +102,19 @@ THREE.VREffect = function ( renderer, onError ) {
 			eyeTranslationR = eyeParamsR.eyeTranslation;
 			eyeFOVL = eyeParamsL.recommendedFieldOfView;
 			eyeFOVR = eyeParamsR.recommendedFieldOfView;
-
-			var sceneL, sceneR;
+			renderRectL = eyeParamsL.renderRect;
+			renderRectR = eyeParamsR.renderRect;
 
 			if ( Array.isArray( scene ) ) {
 
-				sceneL = scene[ 0 ];
-				sceneR = scene[ 1 ];
-
-			} else {
-
-				sceneL = scene;
-				sceneR = scene;
+				console.warn( 'THREE.VREffect.render() no longer supports arrays. Use object.layers instead.' );
+				scene = scene[ 0 ];
 
 			}
 
 			var size = renderer.getSize();
-			size.width /= 2;
 
-			renderer.enableScissorTest( true );
+			renderer.setScissorTest( true );
 			renderer.clear();
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
@@ -132,24 +129,33 @@ THREE.VREffect = function ( renderer, onError ) {
 			cameraR.translateX( eyeTranslationR.x * this.scale );
 
 			// render left eye
-			renderer.setViewport( 0, 0, size.width, size.height );
-			renderer.setScissor( 0, 0, size.width, size.height );
-			renderer.render( sceneL, cameraL );
+			if ( renderRectL === undefined ) {
+
+				renderRectL = { x: 0, y: 0, width: size.width / 2, height: size.height };
+
+			}
+			renderer.setViewport( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
+			renderer.setScissor( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
+			renderer.render( scene, cameraL );
 
 			// render right eye
-			renderer.setViewport( size.width, 0, size.width, size.height );
-			renderer.setScissor( size.width, 0, size.width, size.height );
-			renderer.render( sceneR, cameraR );
+			if ( renderRectR === undefined ) {
 
-			renderer.enableScissorTest( false );
+				renderRectR = { x: size.width / 2, y: 0, width: size.width / 2, height: size.height };
+
+			}
+
+			renderer.setViewport( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
+			renderer.setScissor( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
+			renderer.render( scene, cameraR );
+
+			renderer.setScissorTest( false );
 
 			return;
 
 		}
 
 		// Regular render mode if not HMD
-
-		if ( Array.isArray( scene ) ) scene = scene[ 0 ];
 
 		renderer.render( scene, camera );
 

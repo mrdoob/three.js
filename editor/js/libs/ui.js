@@ -763,7 +763,7 @@ UI.Number = function ( number ) {
 
 		}
 
-		scope.setValue( parseFloat( value ) );
+		scope.setValue( value );
 
 	}
 
@@ -804,6 +804,11 @@ UI.Number.prototype.getValue = function () {
 UI.Number.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
+
+		value = parseFloat( value );
+
+		if ( value < this.min ) value = this.min;
+		if ( value > this.max ) value = this.max;
 
 		this.value = value;
 		this.dom.value = value.toFixed( this.precision );

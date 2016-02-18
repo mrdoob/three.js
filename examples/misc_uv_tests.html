@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset=utf-8 />
 		<title>three.js - uv mapping tests</title>
+		<meta charset=utf-8 />
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	</head>
 
 	<body>
@@ -12,9 +13,9 @@
 
 		<script>
 
-			/* 
-			 * This is to help debug UVs problems in geometry, 
-			 * as well as allow a new user to visualize what UVs are about. 
+			/*
+			 * This is to help debug UVs problems in geometry,
+			 * as well as allow a new user to visualize what UVs are about.
 			 */
 
 			function test(name, geometry) {
@@ -47,7 +48,7 @@
 
 			for ( var i = 0; i < 10; i ++ ) {
 
-			    points.push( new THREE.Vector3( Math.sin( i * 0.2 ) * 15 + 50, 0, ( i - 5 ) * 2 ) );
+			    points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 15 + 50, ( i - 5 ) * 2 ) );
 
 			}
 

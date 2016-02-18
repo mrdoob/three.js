@@ -151,6 +151,38 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
+	function replaceLightNums( string, parameters ) {
+
+		return string
+			.replace( /NUM_DIR_LIGHTS/g, parameters.numDirLights )
+			.replace( /NUM_SPOT_LIGHTS/g, parameters.numSpotLights )
+			.replace( /NUM_POINT_LIGHTS/g, parameters.numPointLights )
+			.replace( /NUM_HEMI_LIGHTS/g, parameters.numHemiLights );
+
+	}
+
+	function unrollLoops( string ) {
+
+		var pattern = /for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
+
+		function replace( match, start, end, snippet ) {
+
+			var unroll = '';
+
+			for ( var i = parseInt( start ); i < parseInt( end ); i ++ ) {
+
+				unroll += snippet.replace( /\[ i \]/g, '[ ' + i + ' ]' );
+
+			}
+
+			return unroll;
+
+		}
+
+		return string.replace( pattern, replace );
+
+	}
+
 	return function WebGLProgram( renderer, code, material, parameters ) {
 
 		var gl = renderer.context;
@@ -262,13 +294,6 @@ THREE.WebGLProgram = ( function () {
 				renderer.gammaOutput ? '#define GAMMA_OUTPUT' : '',
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
-				'#define NUM_DIR_LIGHTS ' + parameters.numDirLights,
-				'#define NUM_POINT_LIGHTS ' + parameters.numPointLights,
-				'#define NUM_SPOT_LIGHTS ' + parameters.numSpotLights,
-				'#define NUM_HEMI_LIGHTS ' + parameters.numHemiLights,
-
-				'#define NUM_SHADOWS ' + parameters.numShadows,
-
 				'#define MAX_BONES ' + parameters.maxBones,
 
 				parameters.map ? '#define USE_MAP' : '',
@@ -298,7 +323,6 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
 				parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
-				parameters.shadowMapDebug ? '#define SHADOWMAP_DEBUG' : '',
 				parameters.pointLightShadows > 0 ? '#define POINT_LIGHT_SHADOWS' : '',
 
 				parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
@@ -372,13 +396,6 @@ THREE.WebGLProgram = ( function () {
 
 				customDefines,
 
-				'#define NUM_DIR_LIGHTS ' + parameters.numDirLights,
-				'#define NUM_POINT_LIGHTS ' + parameters.numPointLights,
-				'#define NUM_SPOT_LIGHTS ' + parameters.numSpotLights,
-				'#define NUM_HEMI_LIGHTS ' + parameters.numHemiLights,
-
-				'#define NUM_SHADOWS ' + parameters.numShadows,
-
 				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
 
 				renderer.gammaInput ? '#define GAMMA_INPUT' : '',
@@ -411,7 +428,6 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
 				parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
-				parameters.shadowMapDebug ? '#define SHADOWMAP_DEBUG' : '',
 				parameters.pointLightShadows > 0 ? '#define POINT_LIGHT_SHADOWS' : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
@@ -428,8 +444,21 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
+		vertexShader = replaceLightNums( vertexShader, parameters );
+		fragmentShader = replaceLightNums( fragmentShader, parameters );
+
+		if ( material instanceof THREE.ShaderMaterial === false ) {
+
+			vertexShader = unrollLoops( vertexShader );
+			fragmentShader = unrollLoops( fragmentShader );
+
+		}
+
 		var vertexGlsl = prefixVertex + vertexShader;
 		var fragmentGlsl = prefixFragment + fragmentShader;
+
+		// console.log( '*VERTEX*', vertexGlsl );
+		// console.log( '*FRAGMENT*', fragmentGlsl );
 
 		var glVertexShader = THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
 		var glFragmentShader = THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
@@ -458,6 +487,9 @@ THREE.WebGLProgram = ( function () {
 
 		var runnable = true;
 		var haveDiagnostics = true;
+
+		// console.log( '**VERTEX**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
+		// console.log( '**FRAGMENT**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
 
 		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 

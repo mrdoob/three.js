@@ -119,8 +119,15 @@ THREE.ColladaLoader.prototype = {
 		function parseAsset( xml ) {
 
 			return {
+				unit: parseAssetUnit( getElementsByTagName( xml, 'unit' )[ 0 ] ),
 				upAxis: parseAssetUpAxis( getElementsByTagName( xml, 'up_axis' )[ 0 ] )
 			};
+
+		}
+
+		function parseAssetUnit( xml ) {
+
+			return xml !== undefined ? parseFloat( xml.getAttribute( 'meter' ) ) : 1;
 
 		}
 
@@ -379,7 +386,8 @@ THREE.ColladaLoader.prototype = {
 					case 'emission':
 					case 'diffuse':
 					case 'specular':
-					case 'transparent':
+					case 'shininess':
+					case 'transparency':
 						data[ child.nodeName ] = parseEffectParameter( child );
 						break;
 
@@ -405,6 +413,10 @@ THREE.ColladaLoader.prototype = {
 
 					case 'color':
 						data[ child.nodeName ] = parseFloats( child.textContent );
+						break;
+
+					case 'float':
+						data[ child.nodeName ] = parseFloat( child.textContent );
 						break;
 
 					case 'texture':
@@ -488,14 +500,23 @@ THREE.ColladaLoader.prototype = {
 			function getTexture( sid ) {
 
 				var sampler = effect.profile.samplers[ sid ];
-				var surface = effect.profile.surfaces[ sampler.source ];
 
-				var texture = new THREE.Texture( getImage( surface.init_from ) );
-				texture.wrapS = THREE.RepeatWrapping;
-				texture.wrapT = THREE.RepeatWrapping;
-				texture.needsUpdate = true;
+				if ( sampler !== undefined ) {
 
-				return texture;
+					var surface = effect.profile.surfaces[ sampler.source ];
+
+					var texture = new THREE.Texture( getImage( surface.init_from ) );
+					texture.wrapS = THREE.RepeatWrapping;
+					texture.wrapT = THREE.RepeatWrapping;
+					texture.needsUpdate = true;
+
+					return texture;
+
+				}
+
+				console.error( 'ColladaLoder: Undefined sampler', sid );
+
+				return null;
 
 			}
 
@@ -514,9 +535,19 @@ THREE.ColladaLoader.prototype = {
 						if ( parameter.color && material.specular )
 							material.specular.fromArray( parameter.color );
 						break;
+					case 'shininess':
+						if ( parameter.float && material.shininess )
+							material.shininess = parameter.float;
+						break;
 					case 'emission':
 						if ( parameter.color && material.emissive )
 							material.emissive.fromArray( parameter.color );
+						break;
+					case 'transparency':
+						if ( parameter.float )
+							material.opacity = parameter.float;
+						if ( parameter.float !== 1 )
+							material.transparent = true;
 						break;
 				}
 
@@ -1036,20 +1067,13 @@ THREE.ColladaLoader.prototype = {
 			function pushVector( i ) {
 
 				var index = indices[ i + offset ] * sourceStride;
+				var length = index + sourceStride;
 
-				/*
-				if ( asset.upAxis === 'Z_UP' ) {
+				for ( ; index < length; index ++ ) {
 
-					array.push( sourceArray[ index + 0 ], sourceArray[ index + 2 ], - sourceArray[ index + 1 ] );
-
-				} else {
-
-					array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
+					array.push( sourceArray[ index ] );
 
 				}
-				*/
-
-				array.push( sourceArray[ index + 0 ], sourceArray[ index + 1 ], sourceArray[ index + 2 ] );
 
 			}
 
@@ -1450,6 +1474,14 @@ THREE.ColladaLoader.prototype = {
 		// console.log( library );
 
 		var scene = parseScene( getElementsByTagName( collada, 'scene' )[ 0 ] );
+
+		if ( asset.upAxis === 'Z_UP' ) {
+
+			scene.rotation.x = - Math.PI / 2;
+
+		}
+
+		scene.scale.multiplyScalar( asset.unit );
 
 		console.timeEnd( 'ColladaLoader' );
 

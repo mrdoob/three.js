@@ -4,7 +4,6 @@
  */
 THREE.DragControls = function( _camera, _objects, _domElement ) {
 
-	var _projector = new THREE.Projector();
 	var _raycaster = new THREE.Raycaster();
 
 	var _mouse = new THREE.Vector3(),
@@ -24,23 +23,23 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 	var me = this;
 	this.on = function( event, handler ) {
-		
+
 		if ( ! _listeners[ event ] ) _listeners[ event ] = [];
 
 		_listeners[ event ].push( handler );
 		return me;
-	
+
 	};
 
 	this.off = function( event, handler ) {
-		
+
 		var l = _listeners[ event ];
 		if ( ! l ) return me;
 
 		if ( l.indexOf( handler ) > - 1 ) {
-			
+
 			l.splice( handler, 1 );
-		
+
 		}
 
 		return me;
@@ -48,52 +47,52 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 	};
 
 	var notify = function( event, data, member ) {
-			
+
 		var l = _listeners[ event ];
 		if ( ! l ) return;
 
 		if ( ! member ) {
-					
+
 			for ( var i = 0; i < l.length; i ++ ) {
-						
+
 				l[ i ]( data );
-					
+
 			}
-				
+
 		}
-		
+
 	};
 
 	this.setObjects = function( objects ) {
-		
+
 		if ( objects instanceof THREE.Scene ) {
-			
+
 			_objects = objects.children;
-		
+
 		} else {
-			
+
 			_objects = objects;
-		
+
 		}
-	
+
 	};
 
 	this.setObjects( _objects );
 
 	this.activate = function() {
-		
+
 		_domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
 		_domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
-	
+
 	};
 
 	this.deactivate = function() {
-		
+
 		_domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
 		_domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-	
+
 	};
 
 	this.dispose = function() {
@@ -116,7 +115,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 
 		if ( _selected && me.enabled ) {
-			
+
 			var normal = _selected.normal;
 
 			// I found this article useful about plane-line intersections
@@ -128,7 +127,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 				// bail
 				console.log( 'no or infinite solutions' );
 				return;
-			
+
 			}
 
 			var num = normal.dot( p3subp1.copy( _selected.point ).sub( ray.origin ) );
@@ -140,24 +139,24 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 			var xLock, yLock, zLock = false;
 
 			var moveX, moveY, moveZ;
-			
+
 
 			if ( xLock ) {
-				
+
 				moveX = true;
 				moveY = false;
 				moveZ = false;
-			
+
 			} else if ( yLock ) {
-							
+
 				moveX = false;
 				moveY = true;
 				moveZ = false;
-						
+
 			} else {
-							
+
 				moveX = moveY = moveZ = true;
-						
+
 			}
 
 			// Reverse Matrix?
@@ -181,7 +180,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 			notify( 'hoveron', _hovered );
 
 		} else {
-			
+
 			notify( 'hoveroff', _hovered );
 			_hovered = null;
 			_domElement.style.cursor = 'auto';
@@ -203,7 +202,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 		var normal = ray.direction; // normal ray to the camera position
 		if ( intersects.length > 0 ) {
-			
+
 			_selected = intersects[ 0 ];
 			_selected.ray = ray;
 			_selected.normal = normal ;
@@ -226,7 +225,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 			notify( 'dragend', _selected );
 			_selected = null;
-		
+
 		}
 
 		_domElement.style.cursor = 'auto';

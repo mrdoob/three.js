@@ -1502,7 +1502,7 @@ THREE.SEA3D.prototype.readImage = function( sea ) {
 
 	var image = new Image(), texture = new THREE.Texture();
 	image.src = this.bufferToTexture( sea.data.buffer );
-	
+
 	texture.name = sea.name;
 	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 	texture.flipY = false;
@@ -1583,7 +1583,7 @@ THREE.SEA3D.prototype.readSound = function( sea ) {
 
 THREE.SEA3D.prototype.readTextureURL = function( sea ) {
 
-	var texture = THREE.ImageUtils.loadTexture( sea.url );
+	var texture = new THREE.TextureLoader().load( sea.url );
 
 	texture.name = sea.name;
 	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;

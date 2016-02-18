@@ -1,9 +1,13 @@
 #if NUM_DIR_LIGHTS > 0
 
 	struct DirectionalLight {
-	  vec3 direction;
-	  vec3 color;
-	  int shadow;
+		vec3 direction;
+		vec3 color;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
 	};
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
@@ -14,6 +18,7 @@
 
 		directLight.color = directionalLight.color;
 		directLight.direction = directionalLight.direction;
+		directLight.visible = true;
 
 		return directLight;
 
@@ -25,11 +30,15 @@
 #if NUM_POINT_LIGHTS > 0
 
 	struct PointLight {
-	  vec3 position;
-	  vec3 color;
-	  float distance;
-	  float decay;
-	  int shadow;
+		vec3 position;
+		vec3 color;
+		float distance;
+		float decay;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
 	};
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
@@ -41,8 +50,20 @@
 		vec3 lVector = pointLight.position - geometry.position;
 		directLight.direction = normalize( lVector );
 
-		directLight.color = pointLight.color;
-		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay );
+		float lightDistance = length( lVector );
+
+		if ( testLightInRange( lightDistance, pointLight.distance ) ) {
+
+			directLight.color = pointLight.color;
+			directLight.color *= calcLightAttenuation( lightDistance, pointLight.distance, pointLight.decay );
+			directLight.visible = true;
+
+		} else {
+
+			directLight.color = vec3( 0.0 );
+			directLight.visible = false;
+
+		}
 
 		return directLight;
 
@@ -54,14 +75,18 @@
 #if NUM_SPOT_LIGHTS > 0
 
 	struct SpotLight {
-	  vec3 position;
-	  vec3 direction;
-	  vec3 color;
-	  float distance;
-	  float decay;
-	  float angleCos;
-	  float exponent;
-	  int shadow;
+		vec3 position;
+		vec3 direction;
+		vec3 color;
+		float distance;
+		float decay;
+		float angleCos;
+		float penumbra;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
 	};
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
@@ -73,19 +98,22 @@
 		vec3 lVector = spotLight.position - geometry.position;
 		directLight.direction = normalize( lVector );
 
+		float lightDistance = length( lVector );
 		float spotEffect = dot( directLight.direction, spotLight.direction );
 
-		if ( spotEffect > spotLight.angleCos ) {
+		if ( all( bvec2( spotEffect > spotLight.angleCos, testLightInRange( lightDistance, spotLight.distance ) ) ) ) {
 
 			float spotEffect = dot( spotLight.direction, directLight.direction );
-			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
+			spotEffect *= clamp( ( spotEffect - spotLight.angleCos ) / spotLight.penumbra, 0.0, 1.0 );
 
 			directLight.color = spotLight.color;
-			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
+			directLight.color *= ( spotEffect * calcLightAttenuation( lightDistance, spotLight.distance, spotLight.decay ) );
+			directLight.visible = true;
 
 		} else {
 
 			directLight.color = vec3( 0.0 );
+			directLight.visible = false;
 
 		}
 
@@ -99,9 +127,9 @@
 #if NUM_HEMI_LIGHTS > 0
 
 	struct HemisphereLight {
-	  vec3 direction;
-	  vec3 skyColor;
-	  vec3 groundColor;
+		vec3 direction;
+		vec3 skyColor;
+		vec3 groundColor;
 	};
 
 	uniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];

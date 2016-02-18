@@ -3,6 +3,12 @@
  */
 
 Object.defineProperties( THREE.Box2.prototype, {
+	empty: {
+		value: function () {
+			console.warn( 'THREE.Box2: .empty() has been renamed to .isEmpty().' );
+			return this.isEmpty();
+		}
+	},
 	isIntersectionBox: {
 		value: function ( box ) {
 			console.warn( 'THREE.Box2: .isIntersectionBox() has been renamed to .intersectsBox().' );
@@ -12,6 +18,12 @@ Object.defineProperties( THREE.Box2.prototype, {
 } );
 
 Object.defineProperties( THREE.Box3.prototype, {
+	empty: {
+		value: function () {
+			console.warn( 'THREE.Box3: .empty() has been renamed to .isEmpty().' );
+			return this.isEmpty();
+		}
+	},
 	isIntersectionBox: {
 		value: function ( box ) {
 			console.warn( 'THREE.Box3: .isIntersectionBox() has been renamed to .intersectsBox().' );
@@ -183,6 +195,15 @@ Object.defineProperties( THREE.Vector3.prototype, {
 
 //
 
+THREE.Face4 = function ( a, b, c, d, normal, color, materialIndex ) {
+
+	console.warn( 'THREE.Face4 has been removed. A THREE.Face3 will be created instead.' );
+	return new THREE.Face3( a, b, c, normal, color, materialIndex );
+
+};
+
+//
+
 Object.defineProperties( THREE.Object3D.prototype, {
 	eulerOrder: {
 		get: function () {
@@ -248,36 +269,43 @@ Object.defineProperties( THREE.Light.prototype, {
 	},
 	shadowCameraFov: {
 		set: function ( value ) {
+			console.warn( 'THREE.Light: .shadowCameraFov is now .shadow.camera.fov.' );
 			this.shadow.camera.fov = value;
 		}
 	},
 	shadowCameraLeft: {
 		set: function ( value ) {
+			console.warn( 'THREE.Light: .shadowCameraLeft is now .shadow.camera.left.' );
 			this.shadow.camera.left = value;
 		}
 	},
 	shadowCameraRight: {
 		set: function ( value ) {
+			console.warn( 'THREE.Light: .shadowCameraRight is now .shadow.camera.right.' );
 			this.shadow.camera.right = value;
 		}
 	},
 	shadowCameraTop: {
 		set: function ( value ) {
+			console.warn( 'THREE.Light: .shadowCameraTop is now .shadow.camera.top.' );
 			this.shadow.camera.top = value;
 		}
 	},
 	shadowCameraBottom: {
 		set: function ( value ) {
+			console.warn( 'THREE.Light: .shadowCameraBottom is now .shadow.camera.bottom.' );
 			this.shadow.camera.bottom = value;
 		}
 	},
 	shadowCameraNear: {
 		set: function ( value ) {
+			console.warn( 'THREE.Light: .shadowCameraNear is now .shadow.camera.near.' );
 			this.shadow.camera.near = value;
 		}
 	},
 	shadowCameraFar: {
 		set: function ( value ) {
+			console.warn( 'THREE.Light: .shadowCameraFar is now .shadow.camera.far.' );
 			this.shadow.camera.far = value;
 		}
 	},
@@ -288,21 +316,24 @@ Object.defineProperties( THREE.Light.prototype, {
 	},
 	shadowBias: {
 		set: function ( value ) {
+			console.warn( 'THREE.Light: .shadowBias is now .shadow.bias.' );
 			this.shadow.bias = value;
 		}
 	},
 	shadowDarkness: {
 		set: function ( value ) {
-			this.shadow.darkness = value;
+			console.warn( 'THREE.Light: .shadowDarkness has been removed.' );
 		}
 	},
 	shadowMapWidth: {
 		set: function ( value ) {
+			console.warn( 'THREE.Light: .shadowMapWidth is now .shadow.mapSize.width.' );
 			this.shadow.mapSize.width = value;
 		}
 	},
 	shadowMapHeight: {
 		set: function ( value ) {
+			console.warn( 'THREE.Light: .shadowMapHeight is now .shadow.mapSize.height.' );
 			this.shadow.mapSize.height = value;
 		}
 	}
@@ -315,6 +346,52 @@ Object.defineProperties( THREE.BufferAttribute.prototype, {
 		get: function () {
 			console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
 			return this.array.length;
+		}
+	}
+} );
+
+Object.defineProperties( THREE.BufferGeometry.prototype, {
+	drawcalls: {
+		get: function () {
+			console.error( 'THREE.BufferGeometry: .drawcalls has been renamed to .groups.' );
+			return this.groups;
+		}
+	},
+	offsets: {
+		get: function () {
+			console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .groups.' );
+			return this.groups;
+		}
+	},
+	addIndex: {
+		value: function ( index ) {
+			console.warn( 'THREE.BufferGeometry: .addIndex() has been renamed to .setIndex().' );
+			this.setIndex( index );
+		}
+	},
+	addDrawCall: {
+		value: function ( start, count, indexOffset ) {
+			if ( indexOffset !== undefined ) {
+				console.warn( 'THREE.BufferGeometry: .addDrawCall() no longer supports indexOffset.' );
+			}
+			console.warn( 'THREE.BufferGeometry: .addDrawCall() is now .addGroup().' );
+			this.addGroup( start, count );
+		}
+	},
+	clearDrawCalls: {
+		value: function () {
+			console.warn( 'THREE.BufferGeometry: .clearDrawCalls() is now .clearGroups().' );
+			this.clearGroups();
+		}
+	},
+	computeTangents: {
+		value: function () {
+			console.warn( 'THREE.BufferGeometry: .computeTangents() has been removed.' );
+		}
+	},
+	computeOffsets: {
+		value: function () {
+			console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.' );
 		}
 	}
 } );
@@ -434,6 +511,12 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 			return this.extensions.get( 'ANGLE_instanced_arrays' );
 		}
 	},
+	enableScissorTest: {
+		value: function ( boolean ) {
+			console.warn( 'THREE.WebGLRenderer: .enableScissorTest() is now .setScissorTest().' );
+			this.setScissorTest( boolean );
+		}
+	},
 	initMaterial: {
 		value: function () {
 			console.warn( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );
@@ -479,15 +562,6 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 		set: function ( value ) {
 			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
 			this.shadowMap.cullFace = value;
-		}
-	},
-	shadowMapDebug: {
-		get: function () {
-			return this.shadowMap.debug;
-		},
-		set: function ( value ) {
-			console.warn( 'THREE.WebGLRenderer: .shadowMapDebug is now .shadowMap.debug.' );
-			this.shadowMap.debug = value;
 		}
 	}
 } );
@@ -665,13 +739,13 @@ THREE.ImageUtils = {
 
 	loadCompressedTexture: function () {
 
-		console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' )
+		console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' );
 
 	},
 
 	loadCompressedTextureCube: function () {
 
-		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' )
+		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' );
 
 	}
 
@@ -716,15 +790,6 @@ THREE.CanvasRenderer = function () {
 	this.render = function () {};
 	this.setClearColor = function () {};
 	this.setSize = function () {};
-
-};
-
-//
-
-THREE.TextGeometry = function () {
-
-	console.error( 'THREE.TextGeometry has been moved to /examples/js/geometries/TextGeometry.js' );
-	console.error( 'THREE.FontUtils has been moved to /examples/js/utils/FontUtils.js' );
 
 };
 

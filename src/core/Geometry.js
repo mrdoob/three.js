@@ -399,6 +399,8 @@ THREE.Geometry.prototype = {
 
 	computeVertexNormals: function ( areaWeighted ) {
 
+		if ( areaWeighted === undefined ) areaWeighted = true;
+
 		var v, vl, f, fl, face, vertices;
 
 		vertices = new Array( this.vertices.length );
@@ -474,6 +476,12 @@ THREE.Geometry.prototype = {
 				vertexNormals[ 2 ] = vertices[ face.c ].clone();
 
 			}
+
+		}
+
+		if ( this.faces.length > 0 ) {
+
+			this.normalsNeedUpdate = true;
 
 		}
 

@@ -64,11 +64,11 @@
 
 			var mixer;
 
-			var parameters, tweenDirection, tweenDay, tweenNight;
+			var parameters, tweenDay, tweenNight;
 
 			var clock = new THREE.Clock();
 
-			var gui, shadowConfig = {
+			var gui, shadowCameraHelper, shadowConfig = {
 
 				shadowCameraVisible: false,
 				shadowCameraNear: 750,
@@ -76,6 +76,10 @@
 				shadowCameraFov: 30,
 				shadowBias: -0.0002
 
+			};
+
+			var lightingConfig = {
+				daylight: false
 			};
 
 			init();
@@ -101,19 +105,20 @@
 				cubeCamera = new THREE.CubeCamera( 1, 10000, 128 );
 
 				// TEXTURES
+				var textureLoader = new THREE.TextureLoader();
 
-				var textureSquares = THREE.ImageUtils.loadTexture( "textures/patterns/bright_squares256.png" );
+				var textureSquares = textureLoader.load( "textures/patterns/bright_squares256.png" );
 				textureSquares.repeat.set( 50, 50 );
 				textureSquares.wrapS = textureSquares.wrapT = THREE.RepeatWrapping;
 				textureSquares.magFilter = THREE.NearestFilter;
 				textureSquares.format = THREE.RGBFormat;
 
-				var textureNoiseColor = THREE.ImageUtils.loadTexture( "textures/disturb.jpg" );
+				var textureNoiseColor = textureLoader.load( "textures/disturb.jpg" );
 				textureNoiseColor.repeat.set( 1, 1 );
 				textureNoiseColor.wrapS = textureNoiseColor.wrapT = THREE.RepeatWrapping;
 				textureNoiseColor.format = THREE.RGBFormat;
 
-				var textureLava = THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" );
+				var textureLava = textureLoader.load( "textures/lava/lavatile.jpg" );
 				textureLava.repeat.set( 6, 2 );
 				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
 				textureLava.format = THREE.RGBFormat;
@@ -128,7 +133,7 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 
 				// GROUND
 
@@ -149,18 +154,6 @@
 				scene.add( ground );
 
 				// MATERIALS
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = cubeCamera.renderTarget;
-				shader.uniforms[ "tFlip" ].value = 1;
-
-				var materialCube = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms
-
-				} );
 
 				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
 				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
@@ -274,20 +267,24 @@
 				pointLight.position.set( 0, 0, 0 );
 				scene.add( pointLight );
 
-				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity, 0, Math.PI/2, 1 );
+				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity, 0, Math.PI/2 );
 				sunLight.position.set( 1000, 2000, 1000 );
 
 				sunLight.castShadow = true;
 
-				sunLight.shadowBias = -0.0002;
+				sunLight.shadow.bias = shadowConfig.shadowBias;
 
-				sunLight.shadowCameraNear = 750;
-				sunLight.shadowCameraFar = 4000;
-				sunLight.shadowCameraFov = 30;
-
-				sunLight.shadowCameraVisible = false;
+				sunLight.shadow.camera.far = shadowConfig.shadowCameraFar;
+				sunLight.shadow.camera.near = shadowConfig.shadowCameraNear;
+				sunLight.shadow.camera.fov = shadowConfig.shadowCameraFov;
 
 				scene.add( sunLight );
+
+				// SHADOW CAMERA HELPER
+
+				shadowCameraHelper = new THREE.CameraHelper( sunLight.shadow.camera );
+				shadowCameraHelper.visible = shadowConfig.shadowCameraVisible;
+				scene.add( shadowCameraHelper );
 
 				// RENDERER
 
@@ -333,57 +330,83 @@
 				// EVENTS
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				document.addEventListener( 'keydown', onKeyDown, false );
 
 				// TWEEN
 
 				parameters = { control: 0 };
-
-				tweenDirection = -1;
 
 				tweenDay = new TWEEN.Tween( parameters ).to( { control: 1 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
 				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
 
 				// GUI
 
-				gui = new dat.GUI();
+				gui = new dat.GUI( { width: 400 } );
 
-				shadowGUI = gui.addFolder( "Shadow" );
+				// SHADOW
 
-    			shadowGUI.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
+				var shadowGUI = gui.addFolder( "Shadow" );
 
-					sunLight.shadowCameraVisible = shadowConfig.shadowCameraVisible;
+    		shadowGUI.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
+
+					shadowCameraHelper.visible = shadowConfig.shadowCameraVisible;
 
 				});
 
 				shadowGUI.add( shadowConfig, 'shadowCameraNear', 1, 1500 ).onChange( function() {
 
-					sunLight.shadowCamera.near = shadowConfig.shadowCameraNear;
-					sunLight.shadowCamera.updateProjectionMatrix();
+					sunLight.shadow.camera.near = shadowConfig.shadowCameraNear;
+					sunLight.shadow.camera.updateProjectionMatrix();
+					shadowCameraHelper.update();
 
 				});
 
 				shadowGUI.add( shadowConfig, 'shadowCameraFar', 1501, 5000 ).onChange( function() {
 
-					sunLight.shadowCamera.far = shadowConfig.shadowCameraFar;
-					sunLight.shadowCamera.updateProjectionMatrix();
+					sunLight.shadow.camera.far = shadowConfig.shadowCameraFar;
+					sunLight.shadow.camera.updateProjectionMatrix();
+					shadowCameraHelper.update();
 
 				});
 
 				shadowGUI.add( shadowConfig, 'shadowCameraFov', 1, 120 ).onChange( function() {
 
-					sunLight.shadowCamera.fov = shadowConfig.shadowCameraFov;
-					sunLight.shadowCamera.updateProjectionMatrix();
+					sunLight.shadow.camera.fov = shadowConfig.shadowCameraFov;
+					sunLight.shadow.camera.updateProjectionMatrix();
+					shadowCameraHelper.update();
 
 				});
 
 				shadowGUI.add( shadowConfig, 'shadowBias', -0.01, 0.01 ).onChange( function() {
 
-					sunLight.shadowBias = shadowConfig.shadowBias;
+					sunLight.shadow.bias = shadowConfig.shadowBias;
 
 				});
 
 				shadowGUI.open();
+
+				// LIGHTING
+
+				var lightingGUI = gui.addFolder( "Lighting" );
+
+				lightingGUI.add( lightingConfig, 'daylight' ).onChange( function() {
+
+					// change between day and night
+
+					if( lightingConfig.daylight === true ) {
+
+						tweenNight.stop();
+						tweenDay.start();
+
+					} else {
+
+						tweenDay.stop();
+						tweenNight.start();
+
+					};
+
+				});
+
+				lightingGUI.open();
 
 			}
 
@@ -397,36 +420,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				controls.handleResize();
-
-			}
-
-			//
-
-			function onKeyDown ( event ) {
-
-				switch ( event.keyCode ) {
-
-					case 78: /*N*/
-
-						if ( tweenDirection == 1 ) {
-
-							tweenDay.stop();
-							tweenNight.start();
-
-							tweenDirection = -1;
-
-						} else {
-
-							tweenNight.stop();
-							tweenDay.start();
-
-							tweenDirection = 1;
-
-						}
-
-					break;
-
-				}
 
 			}
 

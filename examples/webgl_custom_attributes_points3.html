@@ -210,7 +210,7 @@
 
 			//
 
-			var texture = THREE.ImageUtils.loadTexture( "textures/sprites/ball.png" );
+			var texture = new THREE.TextureLoader().load( "textures/sprites/ball.png" );
 			texture.wrapS = THREE.RepeatWrapping;
 			texture.wrapT = THREE.RepeatWrapping;
 

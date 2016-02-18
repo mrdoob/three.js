@@ -51,7 +51,7 @@ THREE.OBJLoader.prototype = {
 		var normals = [];
 		var uvs = [];
 
-		function addObject(name) {
+		function addObject( name ) {
 
 			var geometry = {
 				vertices: [],
@@ -192,7 +192,7 @@ THREE.OBJLoader.prototype = {
 
 		}
 
-		addObject("");
+		addObject( '' );
 
 		// v float float float
 		var vertex_pattern = /^v\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/;
@@ -217,7 +217,7 @@ THREE.OBJLoader.prototype = {
 
 		var object_pattern = /^[og]\s+(.+)/;
 
-		var smoothing_pattern = /^s\s+([01]|on|off)/;
+		var smoothing_pattern = /^s\s+(\d+|on|off)/;
 
 		//
 
@@ -306,7 +306,7 @@ THREE.OBJLoader.prototype = {
 				// or
 				// g group_name
 
-				var name = result[1].trim();
+				var name = result[ 1 ].trim();
 
 				if ( foundObjects === false ) {
 
@@ -315,7 +315,7 @@ THREE.OBJLoader.prototype = {
 
 				} else {
 
-					addObject(name);
+					addObject( name );
 
 				}
 
@@ -337,7 +337,7 @@ THREE.OBJLoader.prototype = {
 
 			} else {
 
-				// console.log( "THREE.OBJLoader: Unhandled line " + line );
+				throw new Error( "Unexpected line: " + line );
 
 			}
 
