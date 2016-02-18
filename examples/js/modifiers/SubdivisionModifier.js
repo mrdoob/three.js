@@ -1,5 +1,6 @@
 /*
  *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
+ *	@author centerionware / http://www.centerionware.com
  *
  *	Subdivision Geometry Modifier
  *		using Loop Subdivision Scheme
@@ -11,8 +12,6 @@
  *
  *	Known Issues:
  *		- currently doesn't handle "Sharp Edges"
- * **UV Support By Matthew Adams / http://www.centerionware.com
- * * DDS Images need to be upside down or UV's will be upside down.
  */
 
 THREE.SubdivisionModifier = function ( subdivisions ) {
