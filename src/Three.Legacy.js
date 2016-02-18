@@ -202,6 +202,13 @@ THREE.Face4 = function ( a, b, c, d, normal, color, materialIndex ) {
 
 };
 
+THREE.Vertex = function ( x, y, z ) {
+
+	console.warn( 'THREE.Vertex has been removed. Use THREE.Vector3 instead.' );
+	return new THREE.Vector3( x, y, z );
+
+};
+
 //
 
 Object.defineProperties( THREE.Object3D.prototype, {

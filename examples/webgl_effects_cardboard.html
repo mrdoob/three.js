@@ -64,7 +64,7 @@
 				renderer.setClearColor( 0x101010 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = window.location.search === "";
+				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
 				//
