@@ -272,6 +272,16 @@ THREE.WebGLProgram = ( function () {
 
 		var prefixVertex, prefixFragment;
 
+		var gammaInput = renderer.gammaInput;
+		var gammaOutput = renderer.gammaOutput;
+
+		if ( typeof material.gammaInput === 'boolean' ) {
+			gammaInput = material.gammaInput;
+		}
+		if ( typeof material.gammaOutput === 'boolean' ) {
+			gammaOutput = material.gammaOutput;
+		}
+
 		if ( material instanceof THREE.RawShaderMaterial ) {
 
 			prefixVertex = '';
@@ -290,8 +300,8 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
 
-				renderer.gammaInput ? '#define GAMMA_INPUT' : '',
-				renderer.gammaOutput ? '#define GAMMA_OUTPUT' : '',
+				gammaInput ? '#define GAMMA_INPUT' : '',
+				gammaOutput ? '#define GAMMA_OUTPUT' : '',
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 				'#define MAX_BONES ' + parameters.maxBones,
@@ -398,8 +408,8 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
 
-				renderer.gammaInput ? '#define GAMMA_INPUT' : '',
-				renderer.gammaOutput ? '#define GAMMA_OUTPUT' : '',
+				gammaInput ? '#define GAMMA_INPUT' : '',
+				gammaOutput ? '#define GAMMA_OUTPUT' : '',
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 				( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
