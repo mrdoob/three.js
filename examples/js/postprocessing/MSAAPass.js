@@ -129,6 +129,10 @@ THREE.MSAAPass.normalizedJitterOffsets = function( jitterVectors ) {
 
 	}
 
+	scaledJitterOffsets.sort( function( a, b ) {
+		return a.length() < b.length();
+	});
+
 	return scaledJitterOffsets;
 
 },
