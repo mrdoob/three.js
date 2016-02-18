@@ -765,40 +765,75 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	merge: function ( geometry, offset ) {
+	merge: function( geometry ) {
 
 		if ( geometry instanceof THREE.BufferGeometry === false ) {
 
 			console.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
+
 			return;
 
 		}
 
-		if ( offset === undefined ) offset = 0;
-
 		var attributes = this.attributes;
+
+		if ( this.index ) {
+
+			var indices = geometry.index.array;
+
+			var offset = attributes[ 'position' ].count;
+
+			for ( var i = 0, il = indices.length; i < il; i ++ ) {
+
+				indices[ i ] = offset + indices[ i ];
+
+			}
+
+			this.index.array = Uint32ArrayConcat( this.index.array, indices );
+
+		}
 
 		for ( var key in attributes ) {
 
 			if ( geometry.attributes[ key ] === undefined ) continue;
 
-			var attribute1 = attributes[ key ];
-			var attributeArray1 = attribute1.array;
-
-			var attribute2 = geometry.attributes[ key ];
-			var attributeArray2 = attribute2.array;
-
-			var attributeSize = attribute2.itemSize;
-
-			for ( var i = 0, j = attributeSize * offset; i < attributeArray2.length; i ++, j ++ ) {
-
-				attributeArray1[ j ] = attributeArray2[ i ];
-
-			}
+			attributes[ key ].array = Float32ArrayConcat( attributes[ key ].array, geometry.attributes[ key ].array );
 
 		}
 
 		return this;
+
+		/**
+		 * @param {Float32Array} first
+		 * @param {Float32Array} second
+		 * @returns {Float32Array}
+		 */
+		function Float32ArrayConcat( first, second ) {
+
+			var firstLength = first.length,
+					result = new Float32Array( firstLength + second.length );
+
+			result.set( first );
+			result.set( second, firstLength );
+			return result;
+
+		}
+
+		/**
+		 * @param {Uint32Array} first
+		 * @param {Uint32Array} second
+		 * @returns {Uint32Array}
+		 */
+		function Uint32ArrayConcat( first, second ) {
+
+			var firstLength = first.length,
+					result = new Uint32Array( firstLength + second.length );
+
+			result.set( first );
+			result.set( second, firstLength );
+			return result;
+
+		}
 
 	},
 
