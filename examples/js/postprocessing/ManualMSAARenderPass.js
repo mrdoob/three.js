@@ -88,7 +88,6 @@ THREE.ManualMSAARenderPass.prototype = {
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		// this accumulation strategy is used to prevent decimation at low bit depths with lots of samples.
 		this.uniforms[ "scale" ].value = 1.0 / ( jitterOffsets.length );
 		this.uniforms[ "tForeground" ].value = this.sampleRenderTarget;
 
