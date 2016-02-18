@@ -159,7 +159,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		oldFaces = geometry.faces; // { a: oldVertex1, b: oldVertex2, c: oldVertex3 }
 		oldUvs = geometry.faceVertexUvs[ 0 ];
 
-		var doUvs = oldUvs !== undefined && oldUvs.length > 0;
+		var hasUvs = oldUvs !== undefined && oldUvs.length > 0;
 
 		/******************************************************
 		 *
@@ -356,7 +356,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 			// create 4 new uv's
 
-			if ( doUvs ) {
+			if ( hasUvs ) {
 
 				uv = oldUvs[ i ];
 
@@ -381,7 +381,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		// Overwrite old arrays
 		geometry.vertices = newVertices;
 		geometry.faces = newFaces;
-		if ( doUvs ) geometry.faceVertexUvs[ 0 ] = newUVs;
+		if ( hasUvs ) geometry.faceVertexUvs[ 0 ] = newUVs;
 
 		// console.log('done');
 
