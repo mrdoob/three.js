@@ -131,6 +131,9 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 
 	}
 
+	// TODO: Add smooth transition from holdRenderTarget to sampleRenderTarget either while the sampleRenderTarget is being created or once it is done.
+	//   This should be possible with BlendShader I think.
+
 	this.accumulateUniforms[ "scale" ].value = 1.0;
 	this.accumulateUniforms[ "tForeground" ].value = ( this.accumulateIndex < jitterOffsets.length ) ? this.holdRenderTarget : this.sampleRenderTarget;
 	renderer.render( this.scene3, this.camera3, writeBuffer );
