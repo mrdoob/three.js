@@ -91,15 +91,16 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 			THREE.ManualMSAARenderPass.prototype.render.call( this, renderer, this.holdRenderTarget, readBuffer, delta );
 
 			this.accumulateIndex = 0;
-			return;
 
 	}
+
+	var sampleWeight = 1.0 / ( jitterOffsets.length );
 
 	if( this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length ) {
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		this.accumulateUniforms[ "scale" ].value = 1.0 / ( jitterOffsets.length );
+		this.accumulateUniforms[ "scale" ].value = sampleWeight;
 		this.accumulateUniforms[ "tForeground" ].value = writeBuffer;
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
