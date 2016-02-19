@@ -57,7 +57,6 @@ var list = {
 			[ "MaterialLoader", "api/loaders/MaterialLoader" ],
 			[ "MTLLoader", "api/loaders/MTLLoader" ],
 			[ "OBJLoader", "api/loaders/OBJLoader" ],
-			[ "OBJMTLLoader", "api/loaders/OBJMTLLoader" ],
 			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
 			[ "PDBLoader", "api/loaders/PDBLoader" ],
 			[ "SVGLoader", "api/loaders/SVGLoader" ],
