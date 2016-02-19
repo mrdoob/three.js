@@ -18,16 +18,16 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 
 	if ( THREE.CompositeShader === undefined ) {
 
-		console.error( "THREE.MSAAPass relies on THREE.CompositeShader" );
+		console.error( "THREE.ManualMSAARenderPass relies on THREE.CompositeShader" );
 
 	}
 
 	var compositeShader = THREE.CompositeShader;
-	this.uniforms = THREE.UniformsUtils.clone( compositeShader.uniforms );
+	this.compositeUniforms = THREE.UniformsUtils.clone( compositeShader.uniforms );
 
 	this.materialComposite = new THREE.ShaderMaterial(	{
 
-		uniforms: this.uniforms,
+		uniforms: this.compositeUniforms,
 		vertexShader: compositeShader.vertexShader,
 		fragmentShader: compositeShader.fragmentShader,
 		transparent: true,
@@ -48,6 +48,8 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 };
 
 THREE.ManualMSAARenderPass.prototype = {
+
+	constructor: THREE.ManualMSAARenderPass,
 
 	dispose: function() {
 
@@ -88,8 +90,8 @@ THREE.ManualMSAARenderPass.prototype = {
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		this.uniforms[ "scale" ].value = 1.0 / ( jitterOffsets.length );
-		this.uniforms[ "tForeground" ].value = this.sampleRenderTarget;
+		this.compositeUniforms[ "scale" ].value = 1.0 / ( jitterOffsets.length );
+		this.compositeUniforms[ "tForeground" ].value = this.sampleRenderTarget;
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( var i = 0; i < jitterOffsets.length; i ++ ) {
