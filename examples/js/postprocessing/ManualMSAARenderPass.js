@@ -1,6 +1,14 @@
 /**
- * @author bhouston / http://clara.io/ *
- */
+*
+* Manual Multi-Sample Anti-Aliasing Render Pass
+*
+* @author bhouston / http://clara.io/
+*
+* This manual approach to MSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
+*
+* References: https://en.wikipedia.org/wiki/Multisample_anti-aliasing
+*
+*/
 
 THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 

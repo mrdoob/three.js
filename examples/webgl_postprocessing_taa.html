@@ -29,7 +29,8 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - Temporal Anti-Aliasing (TAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
-			When there is no motion in the scene, the TAA render pass accumulates jittered camera samples across frames to create a high quality anti-aliased result.<br/><br/>
+			When there is no motion in the scene, the TAA render pass accumulates jittered camera samples<br/>
+			across frames to create a high quality anti-aliased result.<br/><br/>
 			Texture interpolation, mipmapping and anistropic sampling is disabled to emphasize<br/> the effect MSAA levels have one the resulting render quality.
 		</div>
 
@@ -121,7 +122,7 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.BoxGeometry( 120, 120, 120 );
+				var geometry = new THREE.BoxGeometry( 120, 120, 120, 20, 5, 3 );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
 				var mesh = new THREE.Mesh( geometry, material );

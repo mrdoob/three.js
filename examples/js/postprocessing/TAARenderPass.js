@@ -1,5 +1,15 @@
 /**
- * @author bhouston / http://clara.io/ *
+ *
+ * Temporal Anti-Aliasing Render Pass
+ *
+ * @author bhouston / http://clara.io/
+ *
+ * When there is no motion in the scene, the TAA render pass accumulates jittered camera samples across frames to create a high quality anti-aliased result.
+ *
+ * References:
+ *
+ * TODO: Add support for motion vector pas so that accumulation of samples across frames can occur on dynamics scenes.
+ *
  */
 
 THREE.TAARenderPass = function ( scene, camera, params ) {
@@ -31,7 +41,7 @@ THREE.TAARenderPass = function ( scene, camera, params ) {
 		transparent: true,
 		blending: THREE.CustomBlending,
 		blendSrc: THREE.OneFactor,
-		blendDst: THREE.OneMinusSrcAlphaFactor,
+		blendDst: THREE.OneFactor,
 		blendEquation: THREE.AddEquation,
 		depthTest: false,
 		depthWrite: false
@@ -55,7 +65,7 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 
 			THREE.ManualMSAARenderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, delta );
 
-			this.accumulateIndex = 0;
+			this.accumulateIndex = -1;
 			return;
 
 	}
@@ -70,8 +80,22 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 
 	}
 
+	if ( ! this.holdRenderTarget ) {
 
-	if( this.accumulateIndex < jitterOffsets.length ) {
+		this.holdRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
+
+	}
+
+	if( this.accumulate && this.accumulateIndex === -1 ) {
+
+			THREE.ManualMSAARenderPass.prototype.render.call( this, renderer, this.holdRenderTarget, readBuffer, delta );
+
+			this.accumulateIndex = 0;
+			return;
+
+	}
+
+	if( this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length ) {
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
@@ -93,7 +117,6 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 
 			renderer.render( this.scene, this.camera, writeBuffer, true );
 
-			this.accumulateUniforms[ "scale" ].value = 1.0 / ( this.accumulateIndex + 1 );
 			renderer.render( this.scene3, this.camera3, this.sampleRenderTarget, ( this.accumulateIndex == 0 ) );
 
 			this.accumulateIndex ++;
@@ -108,7 +131,7 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 	}
 
 	this.accumulateUniforms[ "scale" ].value = 1.0;
-	this.accumulateUniforms[ "tForeground" ].value = this.sampleRenderTarget;
+	this.accumulateUniforms[ "tForeground" ].value = ( this.accumulateIndex < jitterOffsets.length ) ? this.holdRenderTarget : this.sampleRenderTarget;
 	renderer.render( this.scene3, this.camera3, writeBuffer );
 
 }
