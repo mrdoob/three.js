@@ -50,7 +50,6 @@ THREE.TAARenderPass = function ( scene, camera, params ) {
 
 	} );
 
-	this.camera3 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene3	= new THREE.Scene();
 	this.quad3 = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), this.materialAccumulate );
 	this.scene3.add( this.quad3 );
@@ -96,11 +95,12 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 
 	}
 
+	var autoClear = renderer.autoClear;
+	renderer.autoClear = false;
+
 	var sampleWeight = 1.0 / ( jitterOffsets.length );
 
 	if( this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length ) {
-		var autoClear = renderer.autoClear;
-		renderer.autoClear = false;
 
 		this.accumulateUniforms[ "scale" ].value = sampleWeight;
 		this.accumulateUniforms[ "tForeground" ].value = writeBuffer;
@@ -120,7 +120,7 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 
 			renderer.render( this.scene, this.camera, writeBuffer, true );
 
-			renderer.render( this.scene3, this.camera3, this.sampleRenderTarget, ( this.accumulateIndex == 0 ) );
+			renderer.render( this.scene3, this.camera2, this.sampleRenderTarget, ( this.accumulateIndex == 0 ) );
 
 			this.accumulateIndex ++;
 			if( this.accumulateIndex >= jitterOffsets.length ) break;
@@ -129,15 +129,23 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 		// reset jitter to nothing.	TODO: add support for orthogonal cameras
 		if ( camera.setViewOffset ) camera.setViewOffset( undefined, undefined, undefined, undefined, undefined, undefined );
 
-		renderer.autoClear = true;
-
 	}
 
-	// TODO: Add smooth transition from holdRenderTarget to sampleRenderTarget either while the sampleRenderTarget is being created or once it is done.
-	//   This should be possible with BlendShader I think.
+	var accumulationWeight = this.accumulateIndex * sampleWeight;
 
-	this.accumulateUniforms[ "scale" ].value = 1.0;
-	this.accumulateUniforms[ "tForeground" ].value = ( this.accumulateIndex < jitterOffsets.length ) ? this.holdRenderTarget : this.sampleRenderTarget;
-	renderer.render( this.scene3, this.camera3, writeBuffer );
+	if( accumulationWeight > 0 ) {
+		this.accumulateUniforms[ "scale" ].value = 1.0;
+		this.accumulateUniforms[ "tForeground" ].value = this.sampleRenderTarget;
+		renderer.render( this.scene3, this.camera2, writeBuffer, true );
+	}
+
+	if( accumulationWeight < 1.0 ) {
+		this.accumulateUniforms[ "scale" ].value = 1.0 - accumulationWeight;
+		this.accumulateUniforms[ "tForeground" ].value = this.holdRenderTarget;
+		renderer.render( this.scene3, this.camera2, writeBuffer, ( accumulationWeight === 0 ) );
+	}
+
+	renderer.autoClear = autoClear;
+
 
 }
