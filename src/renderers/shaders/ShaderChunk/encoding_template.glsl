@@ -3,19 +3,19 @@
 
 #if defined( MACRO_DECODE )
 
-  #if ( MACRO_ENCODING_TYPE == ENCODING_Linear )
+  #if ( MACRO_DECODE == ENCODING_Linear )
     return value;
-  #elif ( MACRO_ENCODING_TYPE == ENCODING_sRGB )
+  #elif ( MACRO_DECODE == ENCODING_sRGB )
     return sRGBToLinear( value );
-  #elif ( MACRO_ENCODING_TYPE == ENCODING_RGBE )
+  #elif ( MACRO_DECODE == ENCODING_RGBE )
     return RGBEToLinear( value );
-  //#elif ( MACRO_ENCODING_TYPE == ENCODING_LogLuv )  TODO
+  //#elif ( MACRO_DECODE == ENCODING_LogLuv )  TODO
   //  return LogLuvToLinear( value );
-  #elif ( MACRO_ENCODING_TYPE == ENCODING_RGBM7 )
+  #elif ( MACRO_DECODE == ENCODING_RGBM7 )
     return RGBM7ToLinear( value );
-  #elif ( MACRO_ENCODING_TYPE == ENCODING_RGBM16 )
+  #elif ( MACRO_DECODE == ENCODING_RGBM16 )
     return RGBM16ToLinear( value );
-  //#elif ( MACRO_ENCODING_TYPE == ENCODING_RGBD )  TODO
+  //#elif ( MACRO_DECODE == ENCODING_RGBD )  TODO
   //  return RGBMDToLinear( value );
   #else
     return vec4( 1.0, 0.0, 0.0, 1.0 );
@@ -23,19 +23,19 @@
 
 #elif defined( MACRO_ENCODE )
 
-  #if ( MACRO_ENCODING_TYPE == ENCODING_Linear )
+  #if ( MACRO_ENCODE == ENCODING_Linear )
     return value;
-  #elif ( MACRO_ENCODING_TYPE == ENCODING_sRGB )
+  #elif ( MACRO_ENCODE == ENCODING_sRGB )
     return LinearTosRGB( value );
-  #elif ( MACRO_ENCODING_TYPE == ENCODING_RGBE )
+  #elif ( MACRO_ENCODE == ENCODING_RGBE )
     return LinearToRGBE( value );
-  //#elif ( MACRO_ENCODING_TYPE == ENCODING_LogLuv )  TODO
+  //#elif ( MACRO_ENCODE == ENCODING_LogLuv )  TODO
   //  return LinearToLogLuv( value );
-  //#elif ( MACRO_ENCODING_TYPE == ENCODING_RGBM7 )  TODO
+  //#elif ( MACRO_ENCODE == ENCODING_RGBM7 )  TODO
   //  return LinearToRGBM7( value );
-  //#elif ( MACRO_ENCODING_TYPE == ENCODING_RGBM16 )  TODO
+  //#elif ( MACRO_ENCODE == ENCODING_RGBM16 )  TODO
   //  return LinearToRGBM16( value );
-  //#elif ( MACRO_ENCODING_TYPE == ENCODING_RGBD )  TODO
+  //#elif ( MACRO_ENCODE == ENCODING_RGBD )  TODO
   //  return LinearToRGBMD( value );
   #else
     return vec4( 1.0, 0.0, 0.0, 1.0 );

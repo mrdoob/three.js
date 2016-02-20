@@ -278,7 +278,7 @@
 
 		#endif
 
-		envMapColor.rgb = EncodingToLinear( envMapColor, envMapEncoding ).rgb;
+		envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
 
 		return envMapColor.rgb * envMapIntensity;
 
