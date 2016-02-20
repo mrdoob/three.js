@@ -1888,7 +1888,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.map.value = material.map;
-		uniforms.mapEncoding.value = (( material.map && material.map.encoding !== THREE.DefaultEncoding ) ? material.map.encoding : THREE.sRGBEncoding );
+		uniforms.mapEncoding.value = (( material.map && material.map.encoding !== THREE.DefaultEncoding ) ? material.map.encoding : THREE.LinearEncoding );
 		uniforms.specularMap.value = material.specularMap;
 		uniforms.alphaMap.value = material.alphaMap;
 
