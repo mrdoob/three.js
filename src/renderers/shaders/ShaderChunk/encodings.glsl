@@ -9,79 +9,96 @@
 #define ENCODING_RGBM16 3005
 //#define ENCODING_RGBM16 3007
 
-vec4 texelDecode( in vec4 encodedTexel, in int encoding ) {
+vec4 LinearToLinear( in vec4 value ) {
+  return value;
+}
 
-  // Q: should we use a switch statement here instead of a set of ifs?
+vec4 sRGBToLinear( in vec4 value ) {
+  return vec4( pow( value.xyz, vec3( float( GAMMA_FACTOR ) ) ), value.w );
+}
 
-  if( encoding == ENCODING_Linear ) {
-    return encodedTexel;
+vec4 RGBEToLinear( in vec4 value ) {
+  return vec4( value.xyz * exp2( value.w*256.0 - 128.0 ), 1.0 );
+}
+
+vec4 RGBM7ToLinear( in vec4 value ) {
+  return vec4( value.xyz * value.w * 7.0, 1.0 );
+}
+
+vec4 RGBM16ToLinear( in vec4 value ) {
+  return vec4( value.xyz * value.w * 16.0, 1.0 );
+}
+
+vec4 LinearTosRGB( in vec4 value ) {
+  return vec4( pow( value.xyz, vec3( 1.0 / float( GAMMA_FACTOR ) ) ), value.w );
+}
+
+vec4 LinearToRGBE( in vec4 value ) {
+  float maxComponent = max(max(value.r, value.g), value.b );
+  float fExp = ceil( log2(maxComponent) );
+  return vec4( value.rgb / exp2(fExp), (fExp + 128.0) / 255.0 );
+}
+
+vec4 EncodingToLinear( in vec4 value, in int fromEncoding ) {
+
+  switch( fromEncoding ) {
+
+    case ENCODING_Linear:
+      return value;
+
+    case ENCODING_sRGB:
+      return LinearTosRGB( value );
+
+    //case ENCODING_LogLuv:
+    //  return LinearToLogLuv( value );
+
+    case ENCODING_RGBE:
+      return LinearToRGBE( value );
+
+    case ENCODING_RGBM7:
+      return LinearToRGBM7( value );
+
+    case ENCODING_RGBM16:
+      return LinearToRGBM16( value );
+
+    //case ENCODING_RGBD:
+    //  return LinearToRGBD( value );
+
+    default:
+      return vec4( 1.0, 0.0, 0.0, 1.0 );
+
   }
-
-  if( encoding == ENCODING_sRGB ) {
-    return vec4( pow( encodedTexel.xyz, vec3( float( GAMMA_FACTOR ) ) ), encodedTexel.w );
-  }
-
-  if( encoding == ENCODING_RGBE ) {
-    return vec4( encodedTexel.xyz * exp2( encodedTexel.w*256.0 - 128.0 ), 1.0 );
-  }
-
-  // TODO, see here http://graphicrants.blogspot.ca/2009/04/rgbm-color-encoding.html
-  //if( encoding == ENCODING_LogLuv ) {
-  //}
-
-  if( encoding == ENCODING_RGBM7 ) {
-    return vec4( encodedTexel.xyz * encodedTexel.w * 7.0, 1.0 );
-  }
-
-  if( encoding == ENCODING_RGBM16 ) {
-    return vec4( encodedTexel.xyz * encodedTexel.w * 16.0, 1.0 );
-  }
-
-  // TODO
-  //if( encoding == ENCODING_RGBD ) {
-  //}
-
-  // return red when encoding not supported
-  return vec4( 1.0, 0.0, 0.0, 1.0 );
 
 }
 
-vec4 texelEncode( in vec4 linearRgba, in int encoding )
+vec4 LinearToEncoding( in vec4 value, in int toEncoding )
 {
+  switch( toEncoding ) {
 
-  // Q: should we use a switch statement here instead of a set of ifs?
+    case ENCODING_Linear:
+      return value;
 
-  if( encoding == ENCODING_Linear ) {
-    return linearRgba;
+    case ENCODING_sRGB:
+      return sRGBToLinear( value );
+
+    //case ENCODING_LogLuv:
+    //  return LogLuvToLinear( value );
+
+    case ENCODING_RGBE:
+      return RGBEToLinear( value );
+
+    //case ENCODING_RGBM7:
+    //  return RGBM7ToLinear( value );
+
+    //case ENCODING_RGBM16:
+    //  return RGBM16ToLinear( value );
+
+    //case ENCODING_RGBD:
+    //  return RGBDToLinear( value );
+
+    default:
+      return vec4( 1.0, 0.0, 0.0, 1.0 );
+
   }
-
-  if( encoding == ENCODING_sRGB ) {
-    return vec4( pow( linearRgba.xyz, vec3( 1.0 / float( GAMMA_FACTOR ) ) ), linearRgba.w );
-  }
-
-  if( encoding == ENCODING_RGBE ) {
-    float maxComponent = max(max(linearRgba.r, linearRgba.g), linearRgba.b );
-    float fExp = ceil( log2(maxComponent) );
-    return vec4( linearRgba.rgb / exp2(fExp), (fExp + 128.0) / 255.0 );
-  }
-
-  // TODO, see here http://graphicrants.blogspot.ca/2009/04/rgbm-color-encoding.html
-  //if( encoding == ENCODING_LogLuv ) {
-  //}
-
-  // TODO
-  //if( encoding == ENCODING_RGBM7 ) {
-  //}
-
-  // TODO
-  //if( encoding == ENCODING_RGBM16 ) {
-  //}
-
-  // TODO
-  //if( encoding == ENCODING_RGBD ) {
-  //}
-
-  // return red when encoding not supported
-  return vec4( 1.0, 0.0, 0.0, 1.0 );
 
 }

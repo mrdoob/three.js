@@ -43,7 +43,7 @@
 		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
 	#endif
 
-	envColor = texelDecode( envColor, envMapEncoding );
+	envColor = EncodingToLinear( envColor, envMapEncoding );
 
 	#ifdef ENVMAP_BLENDING_MULTIPLY
 

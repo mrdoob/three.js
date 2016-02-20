@@ -186,7 +186,7 @@
 
 		#endif
 
-		envMapColor.rgb = texelDecode( envMapColor, envMapEncoding ).rgb;
+		envMapColor.rgb = EncodingToLinear( envMapColor, envMapEncoding ).rgb;
 
 		return PI * envMapColor.rgb * envMapIntensity;
 
@@ -278,7 +278,7 @@
 
 		#endif
 
-		envMapColor.rgb = texelDecode( envMapColor, envMapEncoding ).rgb;
+		envMapColor.rgb = EncodingToLinear( envMapColor, envMapEncoding ).rgb;
 
 		return envMapColor.rgb * envMapIntensity;
 

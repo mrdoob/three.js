@@ -2,7 +2,7 @@
 
 	vec4 texelColor = texture2D( map, vUv );
 
-	texelColor = texelDecode( texelColor, mapEncoding );
+	texelColor = EncodingToLinear( texelColor, mapEncoding );
 	diffuseColor *= texelColor;
 
 #endif
