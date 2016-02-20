@@ -80,8 +80,8 @@
 		vec3 color;
 		float distance;
 		float decay;
-		float angleCos;
-		float penumbra;
+		float coneCos;
+		float penumbraCos;
 
 		int shadow;
 		float shadowBias;
@@ -99,12 +99,11 @@
 		directLight.direction = normalize( lVector );
 
 		float lightDistance = length( lVector );
-		float spotEffect = dot( directLight.direction, spotLight.direction );
+		float angleCos = dot( directLight.direction, spotLight.direction );
 
-		if ( all( bvec2( spotEffect > spotLight.angleCos, testLightInRange( lightDistance, spotLight.distance ) ) ) ) {
+		if ( all( bvec2( angleCos > spotLight.coneCos, testLightInRange( lightDistance, spotLight.distance ) ) ) ) {
 
-			float spotEffect = dot( spotLight.direction, directLight.direction );
-			spotEffect *= clamp( ( spotEffect - spotLight.angleCos ) / spotLight.penumbra, 0.0, 1.0 );
+			float spotEffect = smoothstep( spotLight.coneCos, spotLight.penumbraCos, angleCos );
 
 			directLight.color = spotLight.color;
 			directLight.color *= ( spotEffect * calcLightAttenuation( lightDistance, spotLight.distance, spotLight.decay ) );

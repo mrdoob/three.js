@@ -25,10 +25,6 @@
 				cursor: pointer;
 			}
 
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -164,17 +160,17 @@
 				light.castShadow = true;
 				// light.shadowCameraVisible = true;
 
-				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 1024;
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 1024;
 
 				var d = 300;
 
-				light.shadowCameraLeft = -d;
-				light.shadowCameraRight = d;
-				light.shadowCameraTop = d;
-				light.shadowCameraBottom = -d;
+				light.shadow.camera.left = -d;
+				light.shadow.camera.right = d;
+				light.shadow.camera.top = d;
+				light.shadow.camera.bottom = -d;
 
-				light.shadowCameraFar = 1000;
+				light.shadow.camera.far = 1000;
 
 				scene.add( light );
 
@@ -297,6 +293,8 @@
 				//
 
 				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
 
 				//

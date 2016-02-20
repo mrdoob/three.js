@@ -446,15 +446,6 @@ Editor.prototype = {
 
 		}
 
-		// TODO: Clean this up somehow
-
-		if ( json.project !== undefined ) {
-
-			this.config.setKey( 'project/renderer/shadows', json.project.shadows );
-			this.config.setKey( 'project/vr', json.project.vr );
-
-		}
-
 		var camera = loader.parse( json.camera );
 
 		this.camera.copy( camera );
@@ -494,6 +485,7 @@ Editor.prototype = {
 			metadata: {},
 			project: {
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
+				editable: this.config.getKey( 'project/editable' ),
 				vr: this.config.getKey( 'project/vr' )
 			},
 			camera: this.camera.toJSON(),

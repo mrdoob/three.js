@@ -13,7 +13,7 @@
 		<h1>[name]</h1>
 
 		<div class="desc">A point light that can cast shadow in one direction.</div>
-		
+
 		<div class="desc">Affects objects using [page:MeshLambertMaterial] or [page:MeshPhongMaterial].</div>
 
 
@@ -24,7 +24,7 @@
 		<div>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</div>
 		<div>[example:webgl_morphtargets_md2 morphtargets / md2 ]</div>
 		<div>[example:webgl_shading_physical shading / physical ]</div>
-		
+
 		<code>
 		// white spotlight shining from the side, casting shadow
 
@@ -55,13 +55,13 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Integer hex], [page:Float intensity], [page:Float distance], [page:Radians angle], [page:Float exponent], [page:Float decay])</h3>
+		<h3>[name]([page:Integer hex], [page:Float intensity], [page:Float distance], [page:Radians angle], [page:Float penumbra], [page:Float decay])</h3>
 		<div>
 		[page:Integer hex] — Numeric value of the RGB component of the color. <br />
 		[page:Float intensity] — Numeric value of the light's strength/intensity. <br />
 		[page:Float distance] -- Maximum distance from origin where light will shine whose intensity is attenuated linearly based on distance from origin. <br />
 		[page:Radians angle] -- Maximum angle of light dispersion from its direction whose upper bound is Math.PI/2.<br />
-		[page:Float exponent] -- Rapidity of the falloff of light from its target direction.<br />
+		[page:Float penumbra] -- Percent of the spotlight cone that is attenuated due to penumbra. Takes values between zero and 1. Default is zero.<br />
 		[page:Float decay] -- The amount the light dims along the distance of the light.
 		</div>
 
@@ -73,50 +73,43 @@
 			Default position — *(0,0,0)*.<br />
 			*Note*: Currently for target property to work properly, it must be part of the [page:Scene scene], e.g. this will help: <code>scene.add( light.target )</code>
 		</div>
-	
+
 		<h3>[property:Float intensity]</h3>
 		<div>
 			Light's intensity.<br />
 			Default — *1.0*.
 		</div>
-	
+
 		<h3>[property:Float distance]</h3>
 		<div>
 			If non-zero, light will attenuate linearly from maximum intensity at light *position* down to zero at *distance*.<br />
 			Default — *0.0*.
 		</div>
-	
+
 		<h3>[property:Float angle]</h3>
 		<div>
 			Maximum extent of the spotlight, in radians, from its direction. Should be no more than *Math.PI/2*.<br />
 			Default — *Math.PI/3*.
 		</div>
-	
-		<h3>[property:Float exponent]</h3>
+
+		<h3>[property:Float penumbra]</h3>
 		<div>
-			Rapidity of the falloff of light from its target direction. A lower value spreads out the light, while a higher
-			focuses it towards the center.<br />
-			Default — *10.0*.
+			Percent of the spotlight cone that is attenuated due to penumbra. Takes values between zero and 1.<br />
+			Default — *0.0*.
 		</div>
-		
+
 		<h3>[property:Float decay]</h3>
 		<div>
 			The amount the light dims along the distance of the light<br />
 			Default — *1*.
 		</div>
-	
+
 		<h3>[property:Boolean castShadow]</h3>
 		<div>
 			If set to *true* light will cast dynamic shadows. *Warning*: This is expensive and requires tweaking to get shadows looking right.<br />
 			Default — *false*.
 		</div>
-		
-		<h3>[property:Boolean onlyShadow]</h3>
-		<div>
-			If set to *true* light will only cast shadow but not contribute any lighting (as if *intensity* was 0 but cheaper to compute).<br />
-			Default — *false*.
-		</div>
-		
+
 		<h3>[property:Float shadowCameraNear]</h3>
 		<div>
 			Perspective shadow camera frustum <em>near</em> parameter.<br />
@@ -134,13 +127,13 @@
 			Perspective shadow camera frustum <em>field of view</em> parameter.<br />
 			Default — *50*.
 		</div>
-		
+
 		<h3>[property:Boolean shadowCameraVisible]</h3>
 		<div>
 			Show debug shadow camera frustum.<br />
 			Default — *false*.
 		</div>
-		
+
 		<h3>[property:Float shadowBias]</h3>
 		<div>
 			Shadow map bias, how much to add or subtract from the normalized depth when deciding whether a surface is in shadow.<br />
@@ -158,34 +151,34 @@
 			Shadow map texture height in pixels.<br />
 			Default — *512*.
 		</div>
-		
+
 		<h3>[property:Vector2 shadowMapSize]</h3>
 		<div>
 			The shadowMapWidth and shadowMapHeight stored in a [page:Vector2 THREE.Vector2]. Set internally during rendering.
-		</div> 
+		</div>
 
 		<h3>[property:PerspectiveCamera shadowCamera]</h3>
 		<div>
 			The shadow's view of the world. Computed internally during rendering from the shadowCamera* settings.
-		</div> 
+		</div>
 
 		<h3>[property:Matrix4 shadowMatrix]</h3>
 		<div>
 			Model to shadow camera space, to compute location and depth in shadow map. Computed internally during rendering.
-		</div> 
+		</div>
 
 		<h3>[property:WebGLRenderTarget shadowMap]</h3>
 		<div>
 		    The depth map generated using the shadowCamera; a location beyond a pixel's depth is in shadow. Computed internally during rendering.
-		</div> 
+		</div>
 
-		<h2>Methods</h2>		
+		<h2>Methods</h2>
 		<h3>[method:SpotLight clone]()</h3>
 		<div>
 		<br />
 		It returns a clone of SpotLight.
 		</div>
-		
+
 		<h3>[method:JSON toJSON]()</h3>
 		<div>
 		Return SpotLight data in JSON format.
