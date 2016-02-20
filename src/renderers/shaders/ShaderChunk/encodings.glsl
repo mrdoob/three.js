@@ -18,7 +18,7 @@ vec4 texelDecode( in vec4 encodedTexel, in int encoding ) {
   }
 
   if( encoding == ENCODING_sRGB ) {
-    return vec4( pow( encodedTexel.xyz, vec3( GAMMA_FACTOR ) ), encodedTexel.w );
+    return vec4( pow( encodedTexel.xyz, vec3( float( GAMMA_FACTOR ) ) ), encodedTexel.w );
   }
 
   if( encoding == ENCODING_RGBE ) {
@@ -56,7 +56,7 @@ vec4 texelEncode( in vec4 linearRgba, in int encoding )
   }
 
   if( encoding == ENCODING_sRGB ) {
-    return vec4( pow( linearRgba.xyz, vec3( 1.0 / GAMMA_FACTOR ) ), linearRgba.w );
+    return vec4( pow( linearRgba.xyz, vec3( 1.0 / float( GAMMA_FACTOR ) ) ), linearRgba.w );
   }
 
   if( encoding == ENCODING_RGBE ) {

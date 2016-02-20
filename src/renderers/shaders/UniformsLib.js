@@ -10,6 +10,7 @@ THREE.UniformsLib = {
 		"opacity": { type: "f", value: 1.0 },
 
 		"map": { type: "t", value: null },
+		"mapEncoding" : { type: "i", value: THREE.sRGBEncoding },
 		"offsetRepeat": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
 		"specularMap": { type: "t", value: null },
