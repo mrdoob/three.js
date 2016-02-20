@@ -315,4 +315,3 @@ THREE.RGBEEncoding = 3002; // AKA Radiance
 THREE.RGBM7Encoding = 3004;
 THREE.RGBM16Encoding = 3005;
 //THREE.RGBDEncoding = 3006; TODO
-THREE.DefaultEncoding = 3007; // Use sRGB or Linear as appropriate.

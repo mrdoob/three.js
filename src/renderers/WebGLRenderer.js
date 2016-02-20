@@ -1888,7 +1888,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.map.value = material.map;
-		uniforms.mapEncoding.value = (( material.map && material.map.encoding !== THREE.DefaultEncoding ) ? material.map.encoding : THREE.LinearEncoding );
 		uniforms.specularMap.value = material.specularMap;
 		uniforms.alphaMap.value = material.alphaMap;
 
@@ -1963,7 +1962,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.envMap.value = material.envMap;
-		uniforms.envMapEncoding.value = (( material.envMap  && material.envMap.encoding !== THREE.DefaultEncoding )? material.envMap.encoding : THREE.LinearEncoding );
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
 
 		uniforms.reflectivity.value = material.reflectivity;
@@ -2035,7 +2033,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.emissiveMap ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
-			uniforms.emissiveMapEncoding.value = ( material.emissiveMap.encoding !== THREE.DefaultEncoding ) ? material.emissiveMap.encoding : THREE.LinearEncoding;
 
 		}
 
@@ -2056,7 +2053,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.emissiveMap ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
-			uniforms.emissiveMapEncoding.value = ( material.emissiveMap.encoding !== THREE.DefaultEncoding ) ? material.emissiveMap.encoding : THREE.LinearEncoding;
 
 		}
 
@@ -2111,7 +2107,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.emissiveMap ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
-			uniforms.emissiveMapEncoding.value = ( material.emissiveMap.encoding !== THREE.DefaultEncoding ) ? material.emissiveMap.encoding : THREE.LinearEncoding;
 
 		}
 

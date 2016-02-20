@@ -10,14 +10,12 @@ THREE.UniformsLib = {
 		"opacity": { type: "f", value: 1.0 },
 
 		"map": { type: "t", value: null },
-		"mapEncoding" : { type: "i", value: THREE.sRGBEncoding },
 		"offsetRepeat": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
 		"specularMap": { type: "t", value: null },
 		"alphaMap": { type: "t", value: null },
 
 		"envMap": { type: "t", value: null },
-		"envMapEncoding" : { type: "i", value: THREE.LinearEncoding },
 		"flipEnvMap": { type: "f", value: - 1 },
 		"reflectivity": { type: "f", value: 1.0 },
 		"refractionRatio": { type: "f", value: 0.98 }
@@ -41,7 +39,6 @@ THREE.UniformsLib = {
 	emissivemap: {
 
 		"emissiveMap": { type: "t", value: null },
-		"emissiveMapEncoding": { type: "i", value: THREE.LinearEncoding }
 
 	},
 

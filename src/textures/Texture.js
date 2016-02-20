@@ -36,7 +36,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.premultiplyAlpha = false;
 	this.flipY = true;
 	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
-	this.encoding = THREE.DefaultEncoding;	// Values !== THREE.LinearEncoding only supported on map, envMap and emissiveMap (as these maps regularly have unbounded intensity values, i.e. via an *.hdr or *.exr image.)
+	this.encoding = THREE.LinearEncoding;	// Values !== THREE.LinearEncoding only supported on map, envMap and emissiveMap (as these maps regularly have unbounded intensity values, i.e. via an *.hdr or *.exr image.)
 
 	this.version = 0;
 	this.onUpdate = null;
