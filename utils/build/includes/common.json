@@ -138,6 +138,7 @@
 	"src/renderers/shaders/ShaderChunk/emissivemap_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/emissivemap_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/encodings.glsl",
+	"src/renderers/shaders/ShaderChunk/encoding_template.glsl",
 	"src/renderers/shaders/ShaderChunk/envmap_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/envmap_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/envmap_pars_vertex.glsl",
