@@ -1,6 +1,6 @@
 // For a discussion of what this is, please read this: http://lousodrome.net/blog/light/2013/05/26/gamma-correct-and-hdr-rendering-in-a-32-bits-buffer/
 
-// These encodings should have the same integer values as THREE.Linear, THREE.sRGB, etc...
+// These encodings should have the same integer values as THREE.LinearEncoding, THREE.sRGBEncoding, etc...
 #define ENCODING_Linear 3000
 #define ENCODING_sRGB   3001
 #define ENCODING_RGBE   3002
