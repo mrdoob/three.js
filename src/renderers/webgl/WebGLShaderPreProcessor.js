@@ -23,7 +23,6 @@ THREE.WebGLShaderPreProcessor.compile = function() {
         var includeChunk = includeResolver( includeFileName );
         if( ! includeChunk ) throw new Error( "can not find include file for line: " + line );
         var includeLines = includeChunk.split( '\n' ).reverse();
-        console.log( "#including " + includeFileName );
         while( includeLines.length > 0 ) {
           lines.unshift( includeLines.shift() );
         }
