@@ -460,6 +460,8 @@ THREE.WebGLProgram = ( function () {
 		var vertexGlsl = prefixVertex + vertexShader;
 		var fragmentGlsl = prefixFragment + fragmentShader;
 
+		vertexGlsl = THREE.WebGLShaderPreProcessor.compile( vertexGlsl );
+		fragmentGlsl = THREE.WebGLShaderPreProcessor.compile( fragmentGlsl );
 		// console.log( '*VERTEX*', vertexGlsl );
 		// console.log( '*FRAGMENT*', fragmentGlsl );
 
