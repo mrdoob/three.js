@@ -21,39 +21,9 @@ THREE.TAARenderPass = function ( scene, camera, params ) {
 	}
 	THREE.ManualMSAARenderPass.call( this, scene, camera, params );
 
-	this.sampleLevel = 1;
+	this.sampleLevel = 0;
 	this.accumulate = false;
-
-	if ( THREE.CompositeShader === undefined ) {
-
-		console.error( "THREE.TAARenderPass relies on THREE.CompositeShader" );
-
-	}
-
-	var accumulateShader = THREE.CompositeShader;
-	this.accumulateUniforms = THREE.UniformsUtils.clone( accumulateShader.uniforms );
-
-	this.materialAccumulate = new THREE.ShaderMaterial(	{
-
-		uniforms: this.accumulateUniforms,
-		vertexShader: accumulateShader.vertexShader,
-		fragmentShader: accumulateShader.fragmentShader,
-		transparent: true,
-		blending: THREE.CustomBlending,
-		blendSrc: THREE.OneFactor,
-		blendDst: THREE.OneFactor,
-		blendSrcAlpha: THREE.OneFactor,
-		blendDstAlpha: THREE.OneFactor,
-		blendEquation: THREE.AddEquation,
-		depthTest: false,
-		depthWrite: false
-
-	} );
-
-	this.scene3	= new THREE.Scene();
-	this.quad3 = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), this.materialAccumulate );
-	this.scene3.add( this.quad3 );
-
+	
 };
 
 THREE.TAARenderPass.prototype = Object.create( THREE.ManualMSAARenderPass.prototype );
@@ -71,7 +41,7 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 
 	}
 
-	var jitterOffsets = THREE.TAARenderPass.JitterVectors[ 4 ];
+	var jitterOffsets = THREE.TAARenderPass.JitterVectors[ 5 ];
 
 	var camera = ( this.camera || this.scene.camera );
 
@@ -102,8 +72,8 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 
 	if( this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length ) {
 
-		this.accumulateUniforms[ "scale" ].value = sampleWeight;
-		this.accumulateUniforms[ "tForeground" ].value = writeBuffer;
+		this.compositeUniforms[ "scale" ].value = sampleWeight;
+		this.compositeUniforms[ "tForeground" ].value = writeBuffer;
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		var numSamplesPerFrame = Math.pow( 2, this.sampleLevel );
@@ -120,7 +90,7 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 
 			renderer.render( this.scene, this.camera, writeBuffer, true );
 
-			renderer.render( this.scene3, this.camera2, this.sampleRenderTarget, ( this.accumulateIndex == 0 ) );
+			renderer.render( this.scene2, this.camera2, this.sampleRenderTarget, ( this.accumulateIndex == 0 ) );
 
 			this.accumulateIndex ++;
 			if( this.accumulateIndex >= jitterOffsets.length ) break;
@@ -134,15 +104,15 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 	var accumulationWeight = this.accumulateIndex * sampleWeight;
 
 	if( accumulationWeight > 0 ) {
-		this.accumulateUniforms[ "scale" ].value = 1.0;
-		this.accumulateUniforms[ "tForeground" ].value = this.sampleRenderTarget;
-		renderer.render( this.scene3, this.camera2, writeBuffer, true );
+		this.compositeUniforms[ "scale" ].value = 1.0;
+		this.compositeUniforms[ "tForeground" ].value = this.sampleRenderTarget;
+		renderer.render( this.scene2, this.camera2, writeBuffer, true );
 	}
 
 	if( accumulationWeight < 1.0 ) {
-		this.accumulateUniforms[ "scale" ].value = 1.0 - accumulationWeight;
-		this.accumulateUniforms[ "tForeground" ].value = this.holdRenderTarget;
-		renderer.render( this.scene3, this.camera2, writeBuffer, ( accumulationWeight === 0 ) );
+		this.compositeUniforms[ "scale" ].value = 1.0 - accumulationWeight;
+		this.compositeUniforms[ "tForeground" ].value = this.holdRenderTarget;
+		renderer.render( this.scene2, this.camera2, writeBuffer, ( accumulationWeight === 0 ) );
 	}
 
 	renderer.autoClear = autoClear;
