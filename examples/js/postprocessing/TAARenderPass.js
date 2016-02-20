@@ -42,6 +42,8 @@ THREE.TAARenderPass = function ( scene, camera, params ) {
 		blending: THREE.CustomBlending,
 		blendSrc: THREE.OneFactor,
 		blendDst: THREE.OneFactor,
+		blendSrcAlpha: THREE.OneFactor,
+		blendDstAlpha: THREE.OneFactor,
 		blendEquation: THREE.AddEquation,
 		depthTest: false,
 		depthWrite: false
