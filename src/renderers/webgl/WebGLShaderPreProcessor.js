@@ -22,9 +22,9 @@ THREE.WebGLShaderPreProcessor.compile = function() {
         var includeFileName = matcheInclude[1];
         var includeChunk = includeResolver( includeFileName );
         if( ! includeChunk ) throw new Error( "can not find include file for line: " + line );
-        var includeLines = includeChunk.split( '\n' ).reverse();
+        var includeLines = includeChunk.split( '\n' );
         while( includeLines.length > 0 ) {
-          lines.unshift( includeLines.shift() );
+          lines.unshift( includeLines.pop() );
         }
       }
       else {
