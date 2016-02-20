@@ -2,10 +2,10 @@
 
 	uniform sampler2D map;
 
-	vec4 mapTexelToLinear( vec4 texel ) {
-		#define DECODE_MACRO MAP_ENCODING
-			#include "encoding_template.glsl"
-		#undef DECODE_MACRO
+	vec4 mapTexelToLinear( vec4 value ) {
+		#define MACRO_DECODE MAP_ENCODING
+			#include <encoding_template>
+		#undef MACRO_DECODE
 	}
 
 #endif

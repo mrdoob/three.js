@@ -38,7 +38,7 @@ vec4 LinearToRGBE( in vec4 value ) {
   float fExp = ceil( log2(maxComponent) );
   return vec4( value.rgb / exp2(fExp), (fExp + 128.0) / 255.0 );
 }
-
+/*
 vec4 EncodingToLinear( in vec4 value, in int fromEncoding ) {
 
   switch( fromEncoding ) {
@@ -102,3 +102,4 @@ vec4 LinearToEncoding( in vec4 value, in int toEncoding )
   }
 
 }
+*/

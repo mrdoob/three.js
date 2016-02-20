@@ -11,10 +11,10 @@
 	#endif
 	uniform float flipEnvMap;
 
-	vec4 envMapTexelToLinear( vec4 texel ) {
-		#define DECODE_MACRO ENVMAP_ENCODING
-			#include "encoding_template.glsl"
-		#undef DECODE_MACRO
+	vec4 envMapTexelToLinear( vec4 value ) {
+		#define MACRO_DECODE ENVMAP_ENCODING
+			#include <encoding_template>
+		#undef MACRO_DECODE
 	}
 
 	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( STANDARD )
