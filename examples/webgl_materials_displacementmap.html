@@ -55,6 +55,7 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src='js/libs/dat.gui.min.js'></script>
 
 		<script>
 
@@ -63,8 +64,9 @@
 			var stats, loader;
 
 			var camera, scene, renderer, controls;
+			var settings = { aoMapIntensity: 1.0, metalness: 1.0, roughness: 0.0, displacementScale: 1.0, normalScale: 1.0  };
 
-			var mesh;
+			var mesh, material;
 
 			var pointLight;
 
@@ -80,6 +82,28 @@
 
 			init();
 			animate();
+			initGui();
+
+			// Init gui
+			function initGui() {
+				var gui = new dat.GUI();
+				//var gui = gui.addFolder( "Material" );
+				gui.add( settings, "metalness" ).min( 0 ).max( 1 ).onChange( function( value ) {
+					material.metalness = value;
+				}  );
+				gui.add( settings, "roughness" ).min( 0 ).max( 1 ).onChange( function( value ) {
+					material.roughness = value;
+				}  );
+				gui.add( settings, "aoMapIntensity" ).min( 0 ).max( 1 ).onChange( function( value ) {
+					material.aoMapIntensity = value;
+				} );
+				gui.add( settings, "displacementScale" ).min( 0 ).max( 3.0 ).onChange( function( value ) {
+					material.displacementScale = value;
+				}  );
+				gui.add( settings, "normalScale" ).min( -1 ).max( 1 ).onChange( function( value ) {
+					material.normalScale = new THREE.Vector2( 1, - 1 ).multiplyScalar( value );
+				}  );
+			}
 
 			function init() {
 
@@ -148,11 +172,10 @@
 
 				// material
 
-				var material = new THREE.MeshPhongMaterial( {
+				material = new THREE.MeshStandardMaterial( {
 
-					color: 0x0a0100,
-					specular: 0xffffff,
-					shininess: 10,
+					color: 0x888888,
+					roughness: 0.4,
 
 					normalMap: normalMap,
 					normalScale: new THREE.Vector2( 1, - 1 ), // why does the normal map require negation in this case?
@@ -165,8 +188,6 @@
 					displacementBias: - 0.428408,
 
 					envMap: reflectionCube,
-					combine: THREE.AddOperation,
-					reflectivity: 0.2,
 
 					side: THREE.DoubleSide
 
