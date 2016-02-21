@@ -28,8 +28,9 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Manual Multi-Sample Anti-Aliasing (MSAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
-			This manual approach to MSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.<br/><br/>
+			<a href="http://threejs.org" target="_blank">three.js</a> - Temporal Anti-Aliasing (TAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
+			When there is no motion in the scene, the TAA render pass accumulates jittered camera samples<br/>
+			across frames to create a high quality anti-aliased result.<br/><br/>
 			Texture interpolation, mipmapping and anistropic sampling is disabled to emphasize<br/> the effect MSAA levels have one the resulting render quality.
 		</div>
 
@@ -40,6 +41,7 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/postprocessing/ManualMSAARenderPass.js"></script>
+		<script src="js/postprocessing/TAARenderPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/CompositeShader.js"></script>
 
@@ -51,10 +53,10 @@
 
 		<script>
 
-			var camera, scene, renderer, composer, copyPass, msaaRenderPass;
+			var camera, scene, renderer, composer, copyPass, taaRenderPass, renderPass;
 			var gui, stats, texture;
 
-			var param = { MSAASampleLevel: 2 };
+			var param = { TAAEnabled: "1", TAASampleLevel: 0 };
 
 			init();
 			animate();
@@ -67,7 +69,21 @@
 
 				gui = new dat.GUI();
 
-				var example = gui.add( param, 'MSAASampleLevel', {
+				gui.add( param, 'TAAEnabled', {
+					'Disabled': '0',
+					'Enabled': '1'
+				} ).onFinishChange( function() {
+
+					if( taaRenderPass ) {
+
+						taaRenderPass.enabled = ( param.TAAEnabled === "1" );
+						renderPass.enabled = ( param.TAAEnabled !== "1" );
+
+					}
+
+				} );
+
+				gui.add( param, 'TAASampleLevel', {
 					'Level 0: 1 Sample': 0,
 					'Level 1: 2 Samples': 1,
 					'Level 2: 4 Samples': 2,
@@ -76,8 +92,8 @@
 					'Level 5: 32 Samples': 5
 				} ).onFinishChange( function() {
 
-					if( msaaRenderPass ) {
-						msaaRenderPass.sampleLevel = param.MSAASampleLevel;
+					if( taaRenderPass ) {
+						taaRenderPass.sampleLevel = param.TAASampleLevel;
 					}
 
 				} );
@@ -130,9 +146,12 @@
 
 				composer = new THREE.EffectComposer( renderer );
 
-				msaaRenderPass = new THREE.ManualMSAARenderPass( scene, camera );
-				msaaRenderPass.sampleLevel = param.MSAASampleLevel;
-				composer.addPass( msaaRenderPass );
+				taaRenderPass = new THREE.TAARenderPass( scene, camera );
+				composer.addPass( taaRenderPass );
+
+				renderPass = new THREE.RenderPass( scene, camera );
+				renderPass.enabled = false;
+				composer.addPass( renderPass );
 
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
 		    copyPass.renderToScreen = true;
@@ -156,21 +175,31 @@
 				var newWidth  = Math.floor( width / pixelRatio ) || 1;
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				composer.setSize( newWidth, newHeight );
-				msaaRenderPass.setSize( newWidth, newHeight );
+				taaRenderPass.setSize( newWidth, newHeight );
 
 			}
 
 			function animate() {
 
+				this.index = this.index || 0;
+
 				requestAnimationFrame( animate );
 
-				for ( var i = 0; i < scene.children.length; i ++ ) {
+				this.index ++;
 
-					var child = scene.children[ i ];
+				if( Math.round( this.index / 200 ) % 2 === 0 ) {
+					for ( var i = 0; i < scene.children.length; i ++ ) {
 
-					child.rotation.x += 0.005;
-					child.rotation.y += 0.01;
+						var child = scene.children[ i ];
 
+						child.rotation.x += 0.005;
+						child.rotation.y += 0.01;
+
+					}
+					if( taaRenderPass ) taaRenderPass.accumulate = false;
+				}
+				else {
+					if( taaRenderPass ) taaRenderPass.accumulate = true;
 				}
 
 				composer.render();
