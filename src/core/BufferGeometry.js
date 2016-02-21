@@ -142,6 +142,8 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		return this;
+
 	},
 
 	rotateX: function () {
