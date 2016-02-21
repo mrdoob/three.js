@@ -127,7 +127,7 @@
 
 				var fullScreenButton = document.querySelector( '.full-screen' );
 
-				if ( navigator.getVRDevices === undefined ) {
+				if ( navigator.getVRDisplays === undefined && navigator.getVRDevices === undefined ) {
 
 					fullScreenButton.innerHTML = 'Your browser doesn\'t support WebVR';
 					fullScreenButton.classList.add('error');

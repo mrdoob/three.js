@@ -13,7 +13,8 @@ THREE.VRControls = function ( object, onError ) {
 
 		for ( var i = 0; i < devices.length; i ++ ) {
 
-			if ( devices[ i ] instanceof PositionSensorVRDevice ) {
+			if ( devices[ i ] instanceof VRDisplay ||
+				 devices[ i ] instanceof PositionSensorVRDevice ) {
 
 				vrInputs.push( devices[ i ] );
 
@@ -23,14 +24,19 @@ THREE.VRControls = function ( object, onError ) {
 
 		if ( vrInputs.length === 0 ) {
 
-			if ( onError ) onError( 'PositionSensorVRDevice not available' );
+			if ( onError ) onError( 'VR inputs not available' );
 
 		}
 
 	}
 
-	if ( navigator.getVRDevices ) {
+	if ( navigator.getVRDisplays ) {
 
+		navigator.getVRDisplays().then( gotVRDevices );
+
+	} else if ( navigator.getVRDevices ) {
+
+		// Deprecated API.
 		navigator.getVRDevices().then( gotVRDevices );
 
 	}
@@ -47,17 +53,38 @@ THREE.VRControls = function ( object, onError ) {
 
 			var vrInput = vrInputs[ i ];
 
-			var state = vrInput.getState();
+			if ( vrInput.getPose ) {
 
-			if ( state.orientation !== null ) {
+				var pose = vrInput.getPose();
 
-				object.quaternion.copy( state.orientation );
+				if ( pose.orientation !== null ) {
 
-			}
+					object.quaternion.fromArray( pose.orientation );
 
-			if ( state.position !== null ) {
+				}
 
-				object.position.copy( state.position ).multiplyScalar( scope.scale );
+				if ( pose.position !== null ) {
+
+					object.position.fromArray( pose.position ).multiplyScalar( scope.scale );
+
+				}
+
+			} else {
+
+				// Deprecated API.
+				var state = vrInput.getState();
+
+				if ( state.orientation !== null ) {
+
+					object.quaternion.copy( state.orientation );
+
+				}
+
+				if ( state.position !== null ) {
+
+					object.position.copy( state.position ).multiplyScalar( scope.scale );
+
+				}
 
 			}
 
@@ -71,12 +98,18 @@ THREE.VRControls = function ( object, onError ) {
 
 			var vrInput = vrInputs[ i ];
 
-			if ( vrInput.resetSensor !== undefined ) {
+			if ( vrInput.resetPose !== undefined ) {
 
+				vrInput.resetPose();
+
+			} else if ( vrInput.resetSensor !== undefined ) {
+
+				// Deprecated API.
 				vrInput.resetSensor();
 
 			} else if ( vrInput.zeroSensor !== undefined ) {
 
+				// Really deprecated API.
 				vrInput.zeroSensor();
 
 			}

@@ -59,7 +59,7 @@
 			effect = new THREE.VREffect( renderer );
 
 
-			if ( navigator.getVRDevices ) {
+			if ( navigator.getVRDisplays || navigator.getVRDevices ) {
 
 				vrControls = new THREE.VRControls( camera, vrFallback );
 

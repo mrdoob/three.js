@@ -12,17 +12,26 @@
 THREE.VREffect = function ( renderer, onError ) {
 
 	var vrHMD;
-	var eyeTranslationL, eyeFOVL, renderRectL;
-	var eyeTranslationR, eyeFOVR, renderRectR;
+	var deprecatedAPI = false;
+	var eyeTranslationL = new THREE.Vector3();
+	var eyeTranslationR = new THREE.Vector3();
+	var renderRectL, renderRectR;
+	var eyeFOVL, eyeFOVR;
 
 	function gotVRDevices( devices ) {
 
 		for ( var i = 0; i < devices.length; i ++ ) {
 
-			if ( devices[ i ] instanceof HMDVRDevice ) {
+			if ( devices[ i ] instanceof VRDisplay ) {
 
 				vrHMD = devices[ i ];
+				deprecatedAPI = false;
+				break; // We keep the first we encounter
 
+			} else if ( devices[ i ] instanceof HMDVRDevice ) {
+
+				vrHMD = devices[ i ];
+				deprecatedAPI = true;
 				break; // We keep the first we encounter
 
 			}
@@ -37,8 +46,13 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	}
 
-	if ( navigator.getVRDevices ) {
+	if ( navigator.getVRDisplays ) {
 
+		navigator.getVRDisplays().then( gotVRDevices );
+
+	} else if ( navigator.getVRDevices ) {
+
+		// Deprecated API.
 		navigator.getVRDevices().then( gotVRDevices );
 
 	}
@@ -55,32 +69,70 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	// fullscreen
 
-	var isFullscreen = false;
+	var isPresenting = false;
 
 	var canvas = renderer.domElement;
 	var fullscreenchange = canvas.mozRequestFullScreen ? 'mozfullscreenchange' : 'webkitfullscreenchange';
 
-	document.addEventListener( fullscreenchange, function ( event ) {
+	document.addEventListener( fullscreenchange, function () {
 
-		isFullscreen = document.mozFullScreenElement || document.webkitFullscreenElement;
+		if ( deprecatedAPI ) {
+
+			isPresenting = document.mozFullScreenElement || document.webkitFullscreenElement;
+
+		}
+
+	}, false );
+
+	window.addEventListener( 'vrdisplaypresentchange', function () {
+
+		isPresenting = vrHMD.isPresenting;
 
 	}, false );
 
 	this.setFullScreen = function ( boolean ) {
 
 		if ( vrHMD === undefined ) return;
-		if ( isFullscreen === boolean ) return;
+		if ( isPresenting === boolean ) return;
 
-		if ( canvas.mozRequestFullScreen ) {
+		if ( !deprecatedAPI ) {
 
-			canvas.mozRequestFullScreen( { vrDisplay: vrHMD } );
+			if ( boolean ) {
 
-		} else if ( canvas.webkitRequestFullscreen ) {
+				vrHMD.requestPresent( { source: canvas } );
 
-			canvas.webkitRequestFullscreen( { vrDisplay: vrHMD } );
+			} else {
+
+				vrHMD.exitPresent();
+
+			}
+
+		} else {
+
+			if ( canvas.mozRequestFullScreen ) {
+
+				canvas.mozRequestFullScreen( { vrDisplay: vrHMD } );
+
+			} else if ( canvas.webkitRequestFullscreen ) {
+
+				canvas.webkitRequestFullscreen( { vrDisplay: vrHMD } );
+
+			} else {
+
+				console.error( 'No compatible requestFullscreen method found' );
+
+			}
 
 		}
 
+	};
+
+	this.requestPresent = function () {
+		this.setFullScreen( true );
+	};
+
+	this.exitPresent = function () {
+		this.setFullScreen( false );
 	};
 
 	// render
@@ -98,12 +150,38 @@ THREE.VREffect = function ( renderer, onError ) {
 			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
 			var eyeParamsR = vrHMD.getEyeParameters( 'right' );
 
-			eyeTranslationL = eyeParamsL.eyeTranslation;
-			eyeTranslationR = eyeParamsR.eyeTranslation;
-			eyeFOVL = eyeParamsL.recommendedFieldOfView;
-			eyeFOVR = eyeParamsR.recommendedFieldOfView;
-			renderRectL = eyeParamsL.renderRect;
-			renderRectR = eyeParamsR.renderRect;
+			if ( !deprecatedAPI ) {
+
+				var renderWidth = Math.max(eyeParamsL.renderWidth, eyeParamsR.renderWidth);
+				var renderHeight = Math.max(eyeParamsL.renderHeight, eyeParamsR.renderHeight);
+
+				eyeTranslationL.fromArray(eyeParamsL.offset);
+				eyeTranslationR.fromArray(eyeParamsR.offset);
+				eyeFOVL = eyeParamsL.fieldOfView;
+				eyeFOVR = eyeParamsR.fieldOfView;
+				renderRectL = {
+					x: 0,
+					y: 0,
+					width: renderWidth,
+					height: renderHeight
+				};
+				renderRectR =  {
+					x: renderWidth,
+					y: 0,
+					width: renderWidth,
+					height: renderHeight
+				};
+
+			} else {
+
+				eyeTranslationL.copy(eyeParamsL.eyeTranslation);
+				eyeTranslationR.copy(eyeParamsR.eyeTranslation);
+				eyeFOVL = eyeParamsL.recommendedFieldOfView;
+				eyeFOVR = eyeParamsR.recommendedFieldOfView;
+				renderRectL = eyeParamsL.renderRect;
+				renderRectR = eyeParamsR.renderRect;
+
+			}
 
 			if ( Array.isArray( scene ) ) {
 
@@ -150,6 +228,12 @@ THREE.VREffect = function ( renderer, onError ) {
 			renderer.render( scene, cameraR );
 
 			renderer.setScissorTest( false );
+
+			if ( isPresenting && !deprecatedAPI ) {
+
+				vrHMD.submitFrame();
+
+			}
 
 			return;
 
