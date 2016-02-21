@@ -9,14 +9,14 @@
     return sRGBToLinear( value );
   #elif ( MACRO_DECODE == ENCODING_RGBE )
     return RGBEToLinear( value );
-  //#elif ( MACRO_DECODE == ENCODING_LogLuv )  TODO
-  //  return LogLuvToLinear( value );
+  #elif ( MACRO_DECODE == ENCODING_LogLuv )
+    return LogLuvToLinear( value );
   #elif ( MACRO_DECODE == ENCODING_RGBM7 )
-    return RGBM7ToLinear( value );
+    return RGBMToLinear( value, 7.0 );
   #elif ( MACRO_DECODE == ENCODING_RGBM16 )
-    return RGBM16ToLinear( value );
-  //#elif ( MACRO_DECODE == ENCODING_RGBD )  TODO
-  //  return RGBMDToLinear( value );
+    return RGBMToLinear( value, 16.0 );
+  #elif ( MACRO_DECODE == ENCODING_RGBD )
+    return RGBDToLinear( value, 256.0 );
   #else
     return vec4( 1.0, 0.0, 0.0, 1.0 );
   #endif
@@ -29,14 +29,14 @@
     return LinearTosRGB( value );
   #elif ( MACRO_ENCODE == ENCODING_RGBE )
     return LinearToRGBE( value );
-  //#elif ( MACRO_ENCODE == ENCODING_LogLuv )  TODO
-  //  return LinearToLogLuv( value );
-  //#elif ( MACRO_ENCODE == ENCODING_RGBM7 )  TODO
-  //  return LinearToRGBM7( value );
-  //#elif ( MACRO_ENCODE == ENCODING_RGBM16 )  TODO
-  //  return LinearToRGBM16( value );
-  //#elif ( MACRO_ENCODE == ENCODING_RGBD )  TODO
-  //  return LinearToRGBMD( value );
+  #elif ( MACRO_ENCODE == ENCODING_LogLuv )
+    return LinearToLogLuv( value );
+  #elif ( MACRO_ENCODE == ENCODING_RGBM7 )
+    return LinearToRGBM( value, 7.0 );
+  #elif ( MACRO_ENCODE == ENCODING_RGBM16 )
+    return LinearToRGBM( value, 16.0 );
+  #elif ( MACRO_ENCODE == ENCODING_RGBD )
+    return LinearToRGBD( value, 256.0 );
   #else
     return vec4( 1.0, 0.0, 0.0, 1.0 );
   #endif
