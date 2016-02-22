@@ -17,6 +17,8 @@
     return RGBMToLinear( value, 16.0 );
   #elif ( MACRO_DECODE == ENCODING_RGBD )
     return RGBDToLinear( value, 256.0 );
+  #elif ( MACRO_DECODE == ENCODING_Gamma )
+      return GammaToLinear( value, float( GAMMA_FACTOR ) );
   #else
     return vec4( 1.0, 0.0, 0.0, 1.0 );
   #endif
@@ -37,6 +39,8 @@
     return LinearToRGBM( value, 16.0 );
   #elif ( MACRO_ENCODE == ENCODING_RGBD )
     return LinearToRGBD( value, 256.0 );
+  #elif ( MACRO_ENCODE == ENCODING_Gamma )
+    return LinearToGamma( value, float( GAMMA_FACTOR ) );
   #else
     return vec4( 1.0, 0.0, 0.0, 1.0 );
   #endif
