@@ -67,6 +67,28 @@
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
+				renderer.domElement.addEventListener( 'click', function () {
+
+					if ( this.requestFullscreen ) {
+
+						this.requestFullscreen();
+
+					} else if ( this.msRequestFullscreen ) {
+
+						this.msRequestFullscreen();
+
+					} else if ( this.mozRequestFullScreen ) {
+
+						this.mozRequestFullScreen();
+
+					} else if ( this.webkitRequestFullscreen ) {
+
+						this.webkitRequestFullscreen();
+
+					}
+
+				} );
+
 				//
 
 				effect = new THREE.CardboardEffect( renderer );
