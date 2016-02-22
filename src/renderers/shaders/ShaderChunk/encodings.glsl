@@ -21,18 +21,11 @@ vec4 LinearTosGamma( in vec4 value, in float gammaFactor ) {
   return vec4( pow( value.xyz, vec3( 1.0 / gammaFactor ) ), value.w );
 }
 
-float sRGBToLinear_Component( float c ) {
-    return ( c <= 0.04045 ) ? ( c * 0.0773993808 ) : pow( c * 0.9478672986 + 0.0521327014, 2.4 );
-}
-float LinearTosRGB_Component( float c ) {
-    return ( c <= 0.0031308 ) ? ( c * 12.92 ) : ( pow( c, 0.41666 ) - 0.055 );
-}
-
 vec4 sRGBToLinear( in vec4 value ) {
-  return vec4( sRGBToLinear_Component( value.r ), sRGBToLinear_Component( value.g ), sRGBToLinear_Component( value.b ), value.w );
+  return vec4( mix( value.rgb * 0.0773993808, pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), lessThanEqual( value.rgb, vec3( 0.04045 ) ) ), value.w );
 }
 vec4 LinearTosRGB( in vec4 value ) {
-  return vec4( LinearTosRGB_Component( value.r ), LinearTosRGB_Component( value.g ), LinearTosRGB_Component( value.b ), value.w );
+  return vec4( mix( value.rgb * 12.92, pow( value.rgb, vec3( 0.41666 ) ) - vec3( 0.055 ), lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ), value.w );
 }
 
 vec4 RGBEToLinear( in vec4 value ) {
