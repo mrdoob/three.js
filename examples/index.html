@@ -276,10 +276,7 @@
 		button.textContent = 'View source';
 		button.addEventListener( 'click', function ( event ) {
 
-			var array = location.href.split( '/' );
-			array.pop();
-
-			window.open( 'view-source:' + array.join( '/' ) + '/' + selected + '.html' );
+			window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
 
 		}, false );
 		button.style.display = 'none';
