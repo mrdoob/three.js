@@ -49,18 +49,18 @@
 				scene.add( mesh );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( -1, 1.5, 0.5 );
+				light.position.set( - 1, 1.5, 0.5 );
 				light.castShadow = true;
 				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0xff0000, 1.5 );
-				light.position.set( 1, 1.5, -0.5 );
+				light.position.set( 1, 1.5, - 0.5 );
 				light.castShadow = true;
 				scene.add( light );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setClearColor( 0x101010 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
