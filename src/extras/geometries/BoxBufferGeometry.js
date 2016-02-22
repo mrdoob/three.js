@@ -17,6 +17,8 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
     depthSegments: depthSegments
   };
 
+  var scope = this;
+
   // segments
   widthSegments  = Math.floor( widthSegments )  || 1;
   heightSegments = Math.floor( heightSegments ) || 1;
@@ -36,15 +38,18 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
   var vertexBufferOffset = 0;
   var uvBufferOffset = 0;
   var indexBufferOffset = 0;
-  var numberOfIndices = 0;
+  var numberOfVertices = 0;
+
+  // group variables
+  var groupStart = 0;
 
   // build each side of the box geometry
-  buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height,   width,  depthSegments, heightSegments ); // px
-  buildPlane( 'z', 'y', 'x',   1, - 1, depth, height, - width,  depthSegments, heightSegments ); // nx
-  buildPlane( 'x', 'z', 'y',   1,   1, width, depth,    height, widthSegments, depthSegments  ); // py
-  buildPlane( 'x', 'z', 'y',   1, - 1, width, depth,  - height, widthSegments, depthSegments  ); // ny
-  buildPlane( 'x', 'y', 'z',   1, - 1, width, height,   depth,  widthSegments, heightSegments ); // pz
-  buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth,  widthSegments, heightSegments ); // nz
+  buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height,   width,  depthSegments, heightSegments, 0 ); // px
+  buildPlane( 'z', 'y', 'x',   1, - 1, depth, height, - width,  depthSegments, heightSegments, 1 ); // nx
+  buildPlane( 'x', 'z', 'y',   1,   1, width, depth,    height, widthSegments, depthSegments,  2  ); // py
+  buildPlane( 'x', 'z', 'y',   1, - 1, width, depth,  - height, widthSegments, depthSegments,  3  ); // ny
+  buildPlane( 'x', 'y', 'z',   1, - 1, width, height,   depth,  widthSegments, heightSegments, 4 ); // pz
+  buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth,  widthSegments, heightSegments, 5 ); // nz
 
   // build geometry
   this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
@@ -67,7 +72,7 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 
   }
 
-  function buildPlane ( u, v, w, udir, vdir, width, height, depth, gridX, gridY ) {
+  function buildPlane ( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
 
     var segmentWidth  = width / gridX;
     var segmentHeight = height / gridY;
@@ -79,7 +84,8 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
     var gridX1 = gridX + 1;
     var gridY1 = gridY + 1;
 
-    var indexCounter = 0;
+    var vertexCounter = 0;
+    var groupCount = 0;
 
     var vector = new THREE.Vector3();
 
@@ -117,10 +123,10 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
         uvs[ uvBufferOffset ] = ix / gridX;
         uvs[ uvBufferOffset + 1 ] = 1 - ( iy / gridY );
 
-        // update offsets
+        // update offsets and counters
         vertexBufferOffset += 3;
         uvBufferOffset += 2;
-        indexCounter += 1;
+        vertexCounter += 1;
 
       }
 
@@ -135,10 +141,10 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
       for ( ix = 0; ix < gridX; ix ++ ) {
 
         // indices
-        var a = numberOfIndices + ix + gridX1 * iy;
-        var b = numberOfIndices + ix + gridX1 * ( iy + 1 );
-        var c = numberOfIndices + ( ix + 1 ) + gridX1 * ( iy + 1 );
-        var d = numberOfIndices + ( ix + 1 ) + gridX1 * iy;
+        var a = numberOfVertices + ix + gridX1 * iy;
+        var b = numberOfVertices + ix + gridX1 * ( iy + 1 );
+        var c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
+        var d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
 
         // face one
         indices[ indexBufferOffset ] = a;
@@ -150,15 +156,21 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
         indices[ indexBufferOffset + 4 ] = c;
         indices[ indexBufferOffset + 5 ] = d;
 
-        // update offset
+        // update offsets and counters
         indexBufferOffset += 6;
-
+        groupCount += 6;
       }
 
     }
 
-    // update total number of indices
-    numberOfIndices += indexCounter;
+    // add a group to the geometry. this will ensure multi material support
+    scope.addGroup( groupStart, groupCount, materialIndex );
+
+    // calculate new start value for groups
+    groupStart += groupCount;
+
+    // update total number of vertices
+    numberOfVertices += vertexCounter;
 
   }
 
