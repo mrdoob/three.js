@@ -1,6 +1,14 @@
 /**
- * @author bhouston / http://clara.io/ *
- */
+*
+* Manual Multi-Sample Anti-Aliasing Render Pass
+*
+* @author bhouston / http://clara.io/
+*
+* This manual approach to MSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
+*
+* References: https://en.wikipedia.org/wiki/Multisample_anti-aliasing
+*
+*/
 
 THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 
@@ -18,22 +26,24 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 
 	if ( THREE.CompositeShader === undefined ) {
 
-		console.error( "THREE.MSAAPass relies on THREE.CompositeShader" );
+		console.error( "THREE.ManualMSAARenderPass relies on THREE.CompositeShader" );
 
 	}
 
 	var compositeShader = THREE.CompositeShader;
-	this.uniforms = THREE.UniformsUtils.clone( compositeShader.uniforms );
+	this.compositeUniforms = THREE.UniformsUtils.clone( compositeShader.uniforms );
 
 	this.materialComposite = new THREE.ShaderMaterial(	{
 
-		uniforms: this.uniforms,
+		uniforms: this.compositeUniforms,
 		vertexShader: compositeShader.vertexShader,
 		fragmentShader: compositeShader.fragmentShader,
 		transparent: true,
 		blending: THREE.CustomBlending,
 		blendSrc: THREE.OneFactor,
 		blendDst: THREE.OneFactor,
+		blendSrcAlpha: THREE.OneFactor,
+		blendDstAlpha: THREE.OneFactor,
 		blendEquation: THREE.AddEquation,
 		depthTest: false,
 		depthWrite: false
@@ -48,6 +58,8 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 };
 
 THREE.ManualMSAARenderPass.prototype = {
+
+	constructor: THREE.ManualMSAARenderPass,
 
 	dispose: function() {
 
@@ -70,7 +82,7 @@ THREE.ManualMSAARenderPass.prototype = {
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
 		var camera = ( this.camera || this.scene.camera );
-		var jitterOffsets = THREE.ManualMSAARenderPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 4 ) ) ];
+		var jitterOffsets = THREE.ManualMSAARenderPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
 
 		if( jitterOffsets.length === 1 ) {
 
@@ -88,8 +100,8 @@ THREE.ManualMSAARenderPass.prototype = {
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		this.uniforms[ "scale" ].value = 1.0 / ( jitterOffsets.length );
-		this.uniforms[ "tForeground" ].value = this.sampleRenderTarget;
+		this.compositeUniforms[ "scale" ].value = 1.0 / ( jitterOffsets.length );
+		this.compositeUniforms[ "tForeground" ].value = this.sampleRenderTarget;
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( var i = 0; i < jitterOffsets.length; i ++ ) {
@@ -140,5 +152,15 @@ THREE.ManualMSAARenderPass.JitterVectors = [
 		[ - 5, - 2 ], [ 2, 5 ], [ 5, 3 ], [ 3, - 5 ],
 		[ - 2, 6 ], [ 0, - 7 ], [ - 4, - 6 ], [ - 6, 4 ],
 		[ - 8, 0 ], [ 7, - 4 ], [ 6, 7 ], [ - 7, - 8 ]
+	],
+	[
+		[ - 4, - 7 ], [ - 7, - 5 ], [ - 3, - 5 ], [ - 5, - 4 ],
+		[ - 1, - 4 ], [ - 2, - 2 ], [ - 6, - 1 ], [ - 4, 0 ],
+		[ - 7, 1 ], [ - 1, 2 ], [ - 6, 3 ], [ - 3, 3 ],
+		[ - 7, 6 ], [ - 3, 6 ], [ - 5, 7 ], [ - 1, 7 ],
+		[ 5, - 7 ], [ 1, - 6 ], [ 6, - 5 ], [ 4, - 4 ],
+		[ 2, - 3 ], [ 7, - 2 ], [ 1, - 1 ], [ 4, - 1 ],
+		[ 2, 1 ], [ 6, 2 ], [ 0, 4 ], [ 4, 4 ],
+		[ 2, 5 ], [ 7, 5 ], [ 5, 6 ], [ 3, 7 ]
 	]
 ];

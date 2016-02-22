@@ -61,7 +61,7 @@ This code creates a scene, a camera, and a geometric cube, and it adds the cube 
 
 </script>
 ```
-If everything went well you should see [this](http://jsfiddle.net/f17Lz5ux/).
+If everything went well you should see [this](http://jsfiddle.net/hfj7gm6t/).
 
 ### Change log ###
 
