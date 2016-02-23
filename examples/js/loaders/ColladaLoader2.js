@@ -470,7 +470,7 @@ THREE.ColladaLoader.prototype = {
 					case 'technique':
 						data[ child.nodeName ] = parseEffectParameterTextureExtraTechnique( child );
 						break;
-						
+
 				}
 
 			}
@@ -492,29 +492,17 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'repeatU':
-						data[ child.nodeName ] = parseFloat( child.textContent );
-						break;
-
 					case 'repeatV':
-						data[ child.nodeName ] = parseFloat( child.textContent );
-						break;
-
 					case 'offsetU':
-						data[ child.nodeName ] = parseFloat( child.textContent );
-						break;
-
 					case 'offsetV':
 						data[ child.nodeName ] = parseFloat( child.textContent );
 						break;
 
 					case 'wrapU':
-						data[ child.nodeName ] = parseInt( child.textContent );
-						break;
-
 					case 'wrapV':
 						data[ child.nodeName ] = parseInt( child.textContent );
 						break;
-						
+
 				}
 
 			}
@@ -599,18 +587,18 @@ THREE.ColladaLoader.prototype = {
 
 					var texture = new THREE.Texture( getImage( surface.init_from ) );
 
-					//find techniques
-					if (textureObject.extra !== undefined) {
-						if (textureObject.extra.technique !== undefined) {
-							texture.wrapS = textureObject.extra.technique.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-							texture.wrapT = textureObject.extra.technique.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-							var offsetU = textureObject.extra.technique.offsetU;
-							var offsetV = textureObject.extra.technique.offsetV;
-							texture.offset.set(offsetU, offsetV);
-							var repeatU = textureObject.extra.technique.repeatU;
-							var repeatV = textureObject.extra.technique.repeatV;
-							texture.repeat.set(repeatU, repeatV);
-						}
+					var extra = textureObject.extra;
+
+					if ( extra !== undefined && extra.technique !== undefined ) {
+
+						var technique = extra.technique;
+
+						texture.wrapS = technique.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+						texture.wrapT = technique.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+
+						texture.offset.set( technique.offsetU, technique.offsetV );
+						texture.repeat.set( technique.repeatU, technique.repeatV );
+
 					}
 
 					texture.needsUpdate = true;
