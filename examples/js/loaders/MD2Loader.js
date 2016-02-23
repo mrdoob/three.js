@@ -18,7 +18,7 @@ THREE.MD2Loader.prototype = {
 
 		var loader = new THREE.XHRLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function ( buffer ) {
+		return loader.load( url, function ( buffer ) {
 
 			onLoad( scope.parse( buffer ) );
 

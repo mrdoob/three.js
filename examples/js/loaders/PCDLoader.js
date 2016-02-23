@@ -23,7 +23,7 @@ THREE.PCDLoader.prototype = {
 
 		var loader = new THREE.XHRLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function( data ) {
+		return loader.load( url, function( data ) {
 
 			onLoad( scope.parse( data, url ) );
 

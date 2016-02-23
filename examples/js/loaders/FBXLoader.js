@@ -35,7 +35,7 @@
 
 		var loader = new THREE.XHRLoader( scope.manager );
 		// loader.setCrossOrigin( this.crossOrigin );
-		loader.load( url, function ( text ) {
+		return loader.load( url, function ( text ) {
 
 			if ( ! scope.isFbxFormatASCII( text ) ) {
 

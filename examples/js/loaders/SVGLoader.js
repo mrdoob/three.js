@@ -20,7 +20,7 @@ THREE.SVGLoader.prototype = {
 		var parser = new DOMParser();
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.load( url, function ( svgString ) {
+		return loader.load( url, function ( svgString ) {
 
 			var doc = parser.parseFromString( svgString, 'image/svg+xml' );  // application/xml
 

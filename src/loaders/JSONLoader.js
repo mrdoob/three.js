@@ -45,7 +45,7 @@ THREE.JSONLoader.prototype = {
 
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setWithCredentials( this.withCredentials );
-		loader.load( url, function ( text ) {
+		return loader.load( url, function ( text ) {
 
 			var json = JSON.parse( text );
 			var metadata = json.metadata;

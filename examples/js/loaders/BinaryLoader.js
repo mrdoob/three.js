@@ -53,7 +53,7 @@ THREE.BinaryLoader.prototype = {
 		var scope = this;
 
 		var jsonloader = new THREE.XHRLoader( this.manager );
-		jsonloader.load( url, function ( data ) {
+		return jsonloader.load( url, function ( data ) {
 
 			var json = JSON.parse( data );
 

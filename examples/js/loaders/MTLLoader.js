@@ -20,7 +20,7 @@ THREE.MTLLoader.prototype = {
 
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setPath( this.path );
-		loader.load( url, function ( text ) {
+		return loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
 
