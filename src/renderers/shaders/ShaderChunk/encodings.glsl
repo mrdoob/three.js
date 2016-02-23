@@ -22,7 +22,7 @@ vec4 texelDecode( in vec4 encodedTexel, in int encoding ) {
   }
 
   if( encoding == ENCODING_RGBE ) {
-    return vec4( encodedTexel.xyz * exp2( encodedTexel.w*256.0 - 128.0 ), 1.0 );
+    return vec4( encodedTexel.xyz * exp2( encodedTexel.w*255.0 - 128.0 ), 1.0 );
   }
 
   // TODO, see here http://graphicrants.blogspot.ca/2009/04/rgbm-color-encoding.html
