@@ -10,7 +10,12 @@
 		uniform sampler2D envMap;
 	#endif
 	uniform float flipEnvMap;
-	uniform int envMapEncoding;
+
+	vec4 envMapTexelToLinear( vec4 value ) {
+		#define MACRO_DECODE ENVMAP_ENCODING
+			#include <encoding_template>
+		#undef MACRO_DECODE
+	}
 
 	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( STANDARD )
 

@@ -14,7 +14,10 @@
 	</head>
 	<body>
 
+		<div id="container"></div>
+
 		<script src="../build/three.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/postprocessing/SMAAPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
@@ -28,37 +31,47 @@
 
 		<script>
 
-			var camera, scene, renderer, composer, pass;
-			var geometry, material, object;
+			var camera, scene, renderer, composer, pass, stats;
 
-			var textureLoader = new THREE.TextureLoader();
-
-			textureLoader.load( "textures/brick_diffuse.jpg", function( meshTexture ) {
-				init( meshTexture );
-				animate();
-			});
+			init();
+			animate();
 
 			function init( meshTexture ) {
+
+				container = document.getElementById( "container" );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
 				//
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 400;
+				camera.position.z = 300;
 
 				scene = new THREE.Scene();
 
-				geometry = new THREE.BoxGeometry( 200, 200, 200 );
-				material = new THREE.MeshBasicMaterial( { map: meshTexture } );
-				meshTexture.anisotropy = 4;
+				var geometry = new THREE.BoxGeometry( 120, 120, 120 );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
-				object = new THREE.Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.x = - 100;
+				scene.add( mesh );
 
-				scene.add( object );
+				var texture = new THREE.TextureLoader().load( "textures/brick_diffuse.jpg" );
+				texture.anisotropy = 4;
+
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
+
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.x = 100;
+				scene.add( mesh );
 
 				// postprocessing
 
@@ -95,10 +108,18 @@
 
 				requestAnimationFrame( animate );
 
-				object.rotation.x += 0.005;
-				object.rotation.y += 0.01;
+				for ( var i = 0; i < scene.children.length; i ++ ) {
+
+					var child = scene.children[ i ];
+
+					child.rotation.x += 0.005;
+					child.rotation.y += 0.01;
+
+				}
 
 				composer.render();
+
+				stats.update();
 
 			}
 

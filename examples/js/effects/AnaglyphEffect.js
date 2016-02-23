@@ -71,10 +71,12 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	this.setSize = function ( width, height ) {
 
-		_renderTargetL.setSize( width, height );
-		_renderTargetR.setSize( width, height );
-
 		renderer.setSize( width, height );
+
+		var pixelRatio = renderer.getPixelRatio();
+
+		_renderTargetL.setSize( width * pixelRatio, height * pixelRatio );
+		_renderTargetR.setSize( width * pixelRatio, height * pixelRatio );
 
 	};
 

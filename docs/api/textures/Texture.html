@@ -128,6 +128,11 @@
 		False by default, which is the norm for PNG images. Set to true if the RGB values have been stored premultiplied by alpha.
 		</div>
 
+		<h3>[property:number encoding]</h3>
+		<div>
+		Set to THREE.LinearEncoding by default, but supports sRGB, RGBE, RGBM, RGBD, LogLuv and Gamma corrected encodings.  IMPORTANT: If this value is changed on a texture after the material has been used, it is necessary to trigger a Material.needsUpdate for this value to be realized in the shader.
+		</div>
+
 		<h3>[property:object onUpdate]</h3>
 		<div>
 		A callback function, called when the texture is updated (e.g., when needsUpdate has been set to true and then the texture is used).
