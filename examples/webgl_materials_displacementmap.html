@@ -66,14 +66,16 @@
 			var settings = {
 				metalness: 1.0,
 				roughness: 0.4,
+				ambientIntensity: 0.2,
 				aoMapIntensity: 1.0,
-				displacementScale: 1.0,
+				envMapIntensity: 1.0,
+				displacementScale: 2.436143, // from original model
 				normalScale: 1.0
 			};
 
 			var mesh, material;
 
-			var pointLight;
+			var pointLight, ambientLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -112,6 +114,18 @@
 
 				} );
 
+				gui.add( settings, "ambientIntensity" ).min( 0 ).max( 1 ).onChange( function( value ) {
+
+					ambientLight.intensity = value;
+
+				} );
+
+				gui.add( settings, "envMapIntensity" ).min( 0 ).max( 3 ).onChange( function( value ) {
+
+					material.envMapIntensity = value;
+
+				} );
+
 				gui.add( settings, "displacementScale" ).min( 0 ).max( 3.0 ).onChange( function( value ) {
 
 					material.displacementScale = value;
@@ -120,7 +134,7 @@
 
 				gui.add( settings, "normalScale" ).min( - 1 ).max( 1 ).onChange( function( value ) {
 
-					material.normalScale = new THREE.Vector2( 1, - 1 ).multiplyScalar( value );
+					material.normalScale.set( 1, - 1 ).multiplyScalar( value );
 
 				} );
 
@@ -154,7 +168,7 @@
 
 				// lights
 
-				var ambientLight = new THREE.AmbientLight( 0x111111 );
+				ambientLight = new THREE.AmbientLight( 0xffffff, settings.ambientIntensity );
 				scene.add( ambientLight );
 
 				pointLight = new THREE.PointLight( 0xff0000, 0.5 );
@@ -206,10 +220,11 @@
 					aoMapIntensity: 1,
 
 					displacementMap: displacementMap,
-					displacementScale: 2.436143,
-					displacementBias: - 0.428408,
+					displacementScale: settings.displacementScale,
+					displacementBias: - 0.428408, // from original model
 
 					envMap: reflectionCube,
+					envMapIntensity: settings.envMapIntensity,
 
 					side: THREE.DoubleSide
 
