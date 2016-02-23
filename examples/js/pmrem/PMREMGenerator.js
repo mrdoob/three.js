@@ -34,7 +34,7 @@
 	this.cubeLods = [];
 
 	var size = this.resolution;
-  var params = { format: THREE.RGBAFormat, magFilter: textureFilter, minFilter: textureFilter };
+  var params = { format: THREE.RGBAFormat, magFilter: textureFilter, minFilter: textureFilter, type: this.sourceTexture.type };
 
 	this.numLods = Math.log2( size ) - 2;
   for ( var i = 0; i < this.numLods; i ++ ) {

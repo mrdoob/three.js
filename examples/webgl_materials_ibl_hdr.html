@@ -29,7 +29,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - PMREM Generator by Prashant Sharma and <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
 		<script src="../src/loaders/BinaryTextureLoader.js"></script>
 		<script src="../examples/js/loaders/RGBELoader.js"></script>
@@ -113,7 +113,7 @@
 			var container, stats;
 			var params = {
 				projection: 'normal',
-				roughnessFactor: 1,
+				roughnessFactor: 0,
 				background: true,
 			};
 			var camera, scene, renderer, controls, objects = [];
@@ -216,7 +216,7 @@
 					//reflectionCube.encoding = THREE.sRGB;
 					//reflectionCube.format = THREE.RGBFormat;
 
-					hdrCubeMap = new THREE.HDRCubeMapLoader().load(hdrurls, onTextureLoad);
+					hdrCubeMap = new THREE.HDRCubeMapLoader().load(THREE.UnsignedByteType, hdrurls, onTextureLoad);
 
 					//                                                                hdrTexture = new THREE.RGBELoader().load( '../examples/textures/cube/hdrPisa/px.hdr', onHdrLoad );
 					var grass = new THREE.TextureLoader().load( '../examples/textures/terrain/grasslight-big.jpg' );

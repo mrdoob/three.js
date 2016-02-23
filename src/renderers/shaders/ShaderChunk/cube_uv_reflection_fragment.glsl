@@ -7,7 +7,7 @@ int getFaceFromDirection(vec3 direction) {
         if(absDirection.x > absDirection.y )
             face = direction.x > 0.0 ? 0 : 3;
         else
-            face = direction.y > 0.0 ? 1 : 4;                            
+            face = direction.y > 0.0 ? 1 : 4;
     }
     else {
         if(absDirection.z > absDirection.y )
@@ -18,11 +18,13 @@ int getFaceFromDirection(vec3 direction) {
     return face;
 }
 
-vec2 MipLevelInfo( vec3 vec, float textureSize ) {
+vec2 MipLevelInfo( vec3 vec, float textureSize, float roughnessLevel, float roughness ) {
     float s = log2(textureSize*0.25) - 1.0;
-    float scale = pow(2.0, s);
-    vec3 dx = dFdx( vec * scale );
-    vec3 dy = dFdy( vec * scale );
+    float scale = pow(2.0, s - roughnessLevel);
+    float dxRoughness = dFdx(roughness);
+    float dyRoughness = dFdy(roughness);
+    vec3 dx = dFdx( vec * scale * dxRoughness );
+    vec3 dy = dFdy( vec * scale * dyRoughness );
     float d = max( dot( dx, dx ), dot( dy, dy ) );
     // Clamp the value to the max mip level counts. hard coded to 6 mips
     float rangeClamp = pow(2.0, (6.0 - 1.0) * 2.0);
@@ -81,7 +83,7 @@ vec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel, float textu
     float s2 = (r.z/abs(r.x) + 1.0)*0.5;
     vec2 uv = offset + vec2(s1*scale, s2*scale);
     float min_x = offset.x + texelOffset; float max_x = offset.x + scale - texelOffset;
-    float min_y = offset.y + texelOffset; 
+    float min_y = offset.y + texelOffset;
     float max_y = offset.y + scale - texelOffset;
     float delx = max_x - min_x;
     float dely = max_y - min_y;
@@ -113,7 +115,7 @@ vec4 textureCubeUV(vec3 reflectedDirection, float roughness, float textureSize) 
     float r1 = floor(roughnessVal);
     float r2 = r1 + 1.0;
     float t = fract(roughnessVal);
-    vec2 mipInfo = MipLevelInfo(reflectedDirection, textureSize);
+    vec2 mipInfo = MipLevelInfo(reflectedDirection, textureSize, r1, roughness);
     float s = mipInfo.y;
     float level0 = mipInfo.x;
     float level1 = level0 + 1.0;
@@ -130,7 +132,7 @@ vec4 textureCubeUV(vec3 reflectedDirection, float roughness, float textureSize) 
     vec4 c1 = mix(color10 , color11,  s);
     vec4 c2 = mix(color20 , color21,  s);
     vec4 c3 = mix(c1 , c2,  t);
-    return vec4((c3.rgb)/(c3.rgb+1.0), 1.0);
+    return vec4(c3.rgb, 1.0);
 }
 
 #endif

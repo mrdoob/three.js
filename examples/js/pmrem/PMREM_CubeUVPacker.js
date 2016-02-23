@@ -11,7 +11,7 @@ THREE.PMREM_CubeUVPacker = function( cubeTextureLods, numLods ) {
 	var size = cubeTextureLods[ 0 ].width * 4;
 
 	this.CubeUVRenderTarget = new THREE.WebGLRenderTarget( size, size,
-	{ format: THREE.RGBAFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter } );
+	{ format: THREE.RGBAFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter, type:cubeTextureLods[ 0 ].type } );
 	this.CubeUVRenderTarget.texture.generateMipmaps = false;
                 this.CubeUVRenderTarget.mapping = THREE.CubeUVReflectionMapping;
 	this.camera = new THREE.OrthographicCamera( - size * 0.5, size * 0.5, - size * 0.5, size * 0.5, 0.0, 1000 );
