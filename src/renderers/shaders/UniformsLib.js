@@ -38,7 +38,7 @@ THREE.UniformsLib = {
 
 	emissivemap: {
 
-		"emissiveMap": { type: "t", value: null },
+		"emissiveMap": { type: "t", value: null }
 
 	},
 
