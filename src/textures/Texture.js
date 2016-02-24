@@ -36,7 +36,13 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.premultiplyAlpha = false;
 	this.flipY = true;
 	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
-	this.encoding = THREE.LinearEncoding;	// Values !== THREE.LinearEncoding only supported on map, envMap and emissiveMap (as these maps regularly have unbounded intensity values, i.e. via an *.hdr or *.exr image.)
+
+
+	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
+	//
+	// Also changing the encoding after already used by a Material will not automatically make the Material
+	// update.  You need to explicitly call Material.needsUpdate to trigger it to recompile.
+	this.encoding = THREE.LinearEncoding;
 
 	this.version = 0;
 	this.onUpdate = null;
