@@ -7,46 +7,35 @@ THREE.WebGLProgram = ( function () {
 	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/;
 	var arrayRe = /^([\w\d_]+)\[0\]$/;
 
-	function getTexelDecodingMacro( encoding ) {
+	function getTexelDecodingFunction( functionName, encoding ) {
+		var code = "vec4 " + functionName + "( vec4 value ) { return ";
 		switch( encoding ) {
 			case THREE.LinearEncoding:
-				return "(value)";
+				code += "value";
+				break;
 			case THREE.sRGBEncoding:
-				return "sRGBToLinear( value )";
+				code += "sRGBToLinear( value )";
+				break;
 			case THREE.RGBEEncoding:
-				return "RGBEToLinear( value )";
+				code += "RGBEToLinear( value )";
+				break;
 			case THREE.RGBM7Encoding:
-				return "RGBMToLinear( value, 7.0 )";
+				code += "RGBMToLinear( value, 7.0 )";
+				break;
 			case THREE.RGBM16Encoding:
-				return "RGBMToLinear( value, 16.0 )";
+				code += "RGBMToLinear( value, 16.0 )";
+				break;
 			case THREE.RGBDEncoding:
-				return "RGBDToLinear( value, 256.0 )";
+				code += "RGBDToLinear( value, 256.0 )";
+				break;
 			case THREE.GammaEncoding:
-				return "GammaToLinear( value, float( GAMMA_FACTOR ) )";
+				code += "GammaToLinear( value, float( GAMMA_FACTOR ) )";
+				break;
 			default:
 			 throw new Error( "unsupported encoding: " + encoding );
 		}
-	}
-
-	function getTexelEncodingMacro( encoding ) {
-		switch( encoding ) {
-			case THREE.LinearEncoding:
-				return "(value)";
-			case THREE.sRGBEncoding:
-				return "LinearTosRGB( value )";
-			case THREE.RGBEEncoding:
-				return "LinearToRGBE( value )";
-			case THREE.RGBM7Encoding:
-				return "LinearToRGBM( value, 7.0 )";
-			case THREE.RGBM16Encoding:
-				return "LinearToRGBM( value, 16.0 )";
-			case THREE.RGBDEncoding:
-				return "LinearToRGBD( value, 256.0 )";
-			case THREE.GammaEncoding:
-				return "LinearToGamma( value, float( GAMMA_FACTOR ) )";
-			default:
-			 throw new Error( "unsupported encoding: " + encoding );
-		}
+		code += "; }";
+		return code;
 	}
 
 	function generateExtensions( extensions, parameters, rendererExtensions ) {
@@ -340,7 +329,6 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.map ? '#define USE_MAP' : '',
 				parameters.envMap ? '#define USE_ENVMAP' : '',
-				parameters.envMap ? '#define ' + envMapModeDefine : '',
 				parameters.lightMap ? '#define USE_LIGHTMAP' : '',
 				parameters.aoMap ? '#define USE_AOMAP' : '',
 				parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
@@ -448,16 +436,16 @@ THREE.WebGLProgram = ( function () {
 				( parameters.useFog && parameters.fogExp ) ? '#define FOG_EXP2' : '',
 
 				parameters.map ? '#define USE_MAP' : '',
-				parameters.mapEncoding ? '#define MAP_ENCODING ' + material.map.encoding : '',
+				parameters.mapEncoding ? getTexelDecodingFunction( "mapTexelToLinear", material.map.encoding ) : '',
 				parameters.envMap ? '#define USE_ENVMAP' : '',
 				parameters.envMap ? '#define ' + envMapTypeDefine : '',
 				parameters.envMap ? '#define ' + envMapModeDefine : '',
 				parameters.envMap ? '#define ' + envMapBlendingDefine : '',
-				parameters.envMapEncoding ? '#define ENVMAP_ENCODING ' + material.envMap.encoding : '',
 				parameters.lightMap ? '#define USE_LIGHTMAP' : '',
+				parameters.envMapEncoding ? getTexelDecodingFunction( "envMapTexelToLinear", material.envMap.encoding ) : '',
 				parameters.aoMap ? '#define USE_AOMAP' : '',
 				parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
-				parameters.emissiveMapEncoding ? '#define EMISSIVEMAP_ENCODING ' + material.emissiveMap.encoding : '',
+				parameters.emissiveMapEncoding ? getTexelDecodingFunction( "emissiveMapTexelToLinear", material.emissiveMap.encoding ) : '',
 				parameters.bumpMap ? '#define USE_BUMPMAP' : '',
 				parameters.normalMap ? '#define USE_NORMALMAP' : '',
 				parameters.specularMap ? '#define USE_SPECULARMAP' : '',
