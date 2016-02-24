@@ -305,3 +305,14 @@ THREE.WrapAroundEnding = 2402;
 THREE.TrianglesDrawMode = 0;
 THREE.TriangleStripDrawMode = 1;
 THREE.TriangleFanDrawMode = 2;
+
+// Texture Encodings
+
+THREE.LinearEncoding = 3000; // No encoding at all.
+THREE.sRGBEncoding = 3001;
+THREE.RGBEEncoding = 3002; // AKA Radiance
+THREE.LogLuvEncoding = 3003;
+THREE.RGBM7Encoding = 3004;
+THREE.RGBM16Encoding = 3005;
+THREE.RGBDEncoding = 3006; // MaxRange is 256
+THREE.GammaEncoding = 3007; // uses GAMMA_FACTOR

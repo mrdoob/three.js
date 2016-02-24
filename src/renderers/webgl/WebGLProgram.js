@@ -7,6 +7,37 @@ THREE.WebGLProgram = ( function () {
 	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/;
 	var arrayRe = /^([\w\d_]+)\[0\]$/;
 
+	function getTexelDecodingFunction( functionName, encoding ) {
+		var code = "vec4 " + functionName + "( vec4 value ) { return ";
+		switch( encoding ) {
+			case THREE.LinearEncoding:
+				code += "value";
+				break;
+			case THREE.sRGBEncoding:
+				code += "sRGBToLinear( value )";
+				break;
+			case THREE.RGBEEncoding:
+				code += "RGBEToLinear( value )";
+				break;
+			case THREE.RGBM7Encoding:
+				code += "RGBMToLinear( value, 7.0 )";
+				break;
+			case THREE.RGBM16Encoding:
+				code += "RGBMToLinear( value, 16.0 )";
+				break;
+			case THREE.RGBDEncoding:
+				code += "RGBDToLinear( value, 256.0 )";
+				break;
+			case THREE.GammaEncoding:
+				code += "GammaToLinear( value, float( GAMMA_FACTOR ) )";
+				break;
+			default:
+			 throw new Error( "unsupported encoding: " + encoding );
+		}
+		code += "; }";
+		return code;
+	}
+
 	function generateExtensions( extensions, parameters, rendererExtensions ) {
 
 		extensions = extensions || {};
@@ -420,13 +451,16 @@ THREE.WebGLProgram = ( function () {
 				( parameters.useFog && parameters.fogExp ) ? '#define FOG_EXP2' : '',
 
 				parameters.map ? '#define USE_MAP' : '',
+				parameters.mapEncoding ? getTexelDecodingFunction( "mapTexelToLinear", material.map.encoding ) : '',
 				parameters.envMap ? '#define USE_ENVMAP' : '',
 				parameters.envMap ? '#define ' + envMapTypeDefine : '',
 				parameters.envMap ? '#define ' + envMapModeDefine : '',
 				parameters.envMap ? '#define ' + envMapBlendingDefine : '',
 				parameters.lightMap ? '#define USE_LIGHTMAP' : '',
+				parameters.envMapEncoding ? getTexelDecodingFunction( "envMapTexelToLinear", material.envMap.encoding ) : '',
 				parameters.aoMap ? '#define USE_AOMAP' : '',
 				parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
+				parameters.emissiveMapEncoding ? getTexelDecodingFunction( "emissiveMapTexelToLinear", material.emissiveMap.encoding ) : '',
 				parameters.bumpMap ? '#define USE_BUMPMAP' : '',
 				parameters.normalMap ? '#define USE_NORMALMAP' : '',
 				parameters.specularMap ? '#define USE_SPECULARMAP' : '',

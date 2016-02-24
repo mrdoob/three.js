@@ -185,7 +185,7 @@
 
 		#endif
 
-		envMapColor.rgb = inputToLinear( envMapColor.rgb );
+		envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
 
 		return PI * envMapColor.rgb * envMapIntensity;
 
@@ -277,7 +277,7 @@
 
 		#endif
 
-		envMapColor.rgb = inputToLinear( envMapColor.rgb );
+		envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
 
 		return envMapColor.rgb * envMapIntensity;
 
