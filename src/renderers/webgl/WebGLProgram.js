@@ -7,6 +7,48 @@ THREE.WebGLProgram = ( function () {
 	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/;
 	var arrayRe = /^([\w\d_]+)\[0\]$/;
 
+	function getTexelDecodingMacro( encoding ) {
+		switch( encoding ) {
+			case THREE.LinearEncoding:
+				return "(value)";
+			case THREE.sRGBEncoding:
+				return "sRGBToLinear( value )";
+			case THREE.RGBEEncoding:
+				return "RGBEToLinear( value )";
+			case THREE.RGBM7Encoding:
+				return "RGBMToLinear( value, 7.0 )";
+			case THREE.RGBM16Encoding:
+				return "RGBMToLinear( value, 16.0 )";
+			case THREE.RGBDEncoding:
+				return "RGBDToLinear( value, 256.0 )";
+			case THREE.GammaEncoding:
+				return "GammaToLinear( value, float( GAMMA_FACTOR ) )";
+			default:
+			 throw new Error( "unsupported encoding: " + encoding );
+		}
+	}
+
+	function getTexelEncodingMacro( encoding ) {
+		switch( encoding ) {
+			case THREE.LinearEncoding:
+				return "(value)";
+			case THREE.sRGBEncoding:
+				return "LinearTosRGB( value )";
+			case THREE.RGBEEncoding:
+				return "LinearToRGBE( value )";
+			case THREE.RGBM7Encoding:
+				return "LinearToRGBM( value, 7.0 )";
+			case THREE.RGBM16Encoding:
+				return "LinearToRGBM( value, 16.0 )";
+			case THREE.RGBDEncoding:
+				return "LinearToRGBD( value, 256.0 )";
+			case THREE.GammaEncoding:
+				return "LinearToGamma( value, float( GAMMA_FACTOR ) )";
+			default:
+			 throw new Error( "unsupported encoding: " + encoding );
+		}
+	}
+
 	function generateExtensions( extensions, parameters, rendererExtensions ) {
 
 		extensions = extensions || {};
