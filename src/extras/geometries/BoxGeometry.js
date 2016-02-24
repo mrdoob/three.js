@@ -19,8 +19,8 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 	};
 
 	this.fromBufferGeometry( new THREE.BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) );
-
 	this.mergeVertices();
+
 };
 
 THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
