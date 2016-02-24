@@ -194,11 +194,10 @@ THREE.WebGLProgram = ( function () {
 
 	function parseIncludes( string ) {
 
-		var pattern = /#include +<([\w\d.]+)>/g;
+		var pattern = /#include[ \t]+<([\w\d.]+)>/g;
 
 		function replace( match, include ) {
-
-			return THREE.ShaderChunk[ include ];
+			return parseIncludes( THREE.ShaderChunk[ include ] );
 
 		}
 
