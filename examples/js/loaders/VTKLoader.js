@@ -34,9 +34,17 @@ THREE.VTKLoader.prototype = {
 		//get the 5 first lines of the files to check if there is the key word binary
 		var meta = String.fromCharCode.apply( null, new Uint8Array( data, 0, 250 ) ).split( '\n' );
 		console.log( meta );
-		if ( meta[ 2 ] === 'ASCII' ) {
+		if ( meta[ 2 ].includes( 'ASCII' ) ) {
 
-			return this.parseASCII( String.fromCharCode.apply( null, new Uint8Array( data ) ) );
+			var stringFile = '';
+			var charArray = new Uint8Array( data );
+			for ( var i = 0; i < charArray.length; i ++ ) {
+
+				stringFile += String.fromCharCode( charArray[ i ] );
+
+			}
+
+			return this.parseASCII( stringFile );
 
 		} else {
 
@@ -276,7 +284,7 @@ THREE.VTKLoader.prototype = {
 
 			// Nodal. Use BufferGeometry
 			geometry = new THREE.BufferGeometry();
-			geometry.setIndex( new THREE.BufferAttribute( new ( indices.length > 65535 ? Uint32Array : Uint16Array )( indices ), 1 ) );
+			geometry.setIndex( new THREE.BufferAttribute( new Uint32Array( indices ), 1 ) );
 			geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
 
 			if ( colors.length == positions.length ) {
