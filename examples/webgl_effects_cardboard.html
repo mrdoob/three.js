@@ -25,37 +25,39 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
-				camera.position.set( 3, 2, 3 );
-				camera.lookAt( new THREE.Vector3() );
-				camera.focalLength = camera.position.distanceTo( new THREE.Vector3() );
-
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.CubeGeometry( 1, 1, 1 );
-				var material = new THREE.MeshStandardMaterial();
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.set( 3, 2, 3 );
+				camera.focalLength = camera.position.distanceTo( scene.position );
+				camera.lookAt( scene.position );
+
+				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );;
+				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2 } );
 				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.y = 0.5;
+				mesh.position.y = 0.75;
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var geometry = new THREE.PlaneGeometry( 4, 4 );
-				geometry.rotateX( - Math.PI / 2 );
-				var material = new THREE.MeshStandardMaterial();
+				var geometry = new THREE.BoxGeometry( 3, 0.1, 3 );
+				var material = new THREE.MeshStandardMaterial( { roughness: 1.0, metalness: 0.0 } );
 				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.y = - 0.1;
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				var light = new THREE.DirectionalLight( 0x8800ff );
 				light.position.set( - 1, 1.5, 0.5 );
 				light.castShadow = true;
+				light.shadow.camera.zoom = 4;
 				scene.add( light );
 
-				var light = new THREE.DirectionalLight( 0xff0000, 1.5 );
+				var light = new THREE.DirectionalLight( 0xff0000 );
 				light.position.set( 1, 1.5, - 0.5 );
 				light.castShadow = true;
+				light.shadow.camera.zoom = 4;
 				scene.add( light );
 
 				//
@@ -118,10 +120,14 @@
 
 			function render() {
 
-				var time = performance.now() * 0.0005;
+				var time = performance.now() * 0.0002;
 				camera.position.x = Math.cos( time ) * 4;
 				camera.position.z = Math.sin( time ) * 4;
 				camera.lookAt( new THREE.Vector3() );
+
+				var mesh = scene.children[ 0 ];
+				mesh.rotation.x = time * 2;
+				mesh.rotation.y = time * 5;
 
 				effect.render( scene, camera );
 
