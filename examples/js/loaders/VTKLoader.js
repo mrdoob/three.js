@@ -3,7 +3,7 @@
  * @author Alex Pletzer
  */
 
-THREE.VTKLoader = function ( manager ) {
+THREE.VTKLoader = function( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
@@ -13,22 +13,40 @@ THREE.VTKLoader.prototype = {
 
 	constructor: THREE.VTKLoader,
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load: function( url, onLoad, onProgress, onError ) {
 
 		// Will we bump into trouble reading the whole file into memory?
 		var scope = this;
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.load( url, function ( text ) {
+		loader.setResponseType( 'arraybuffer' );
+		loader.load( url, function( text ) {
 
 			onLoad( scope.parse( text ) );
 
 		},
 
-		onProgress, onError );
+					onProgress, onError );
 
 	},
 
-	parse: function ( data ) {
+	parse: function( data ) {
+
+		//get the 5 first lines of the files to check if there is the key word binary
+		var meta = String.fromCharCode.apply( null, new Uint8Array( data, 0, 250 ) ).split( '\n' );
+		console.log( meta );
+		if ( meta[ 2 ] === 'ASCII' ) {
+
+			return this.parseASCII( String.fromCharCode.apply( null, new Uint8Array( data ) ) );
+
+		} else {
+
+			return this.parseBinary( data );
+
+		}
+
+	},
+
+	parseASCII: function( data ) {
 
 		// connectivity of the triangles
 		var indices = [];
@@ -57,6 +75,9 @@ THREE.VTKLoader.prototype = {
 		// indicates start of polygon connectivity section
 		var patPOLYGONS = /^POLYGONS /;
 
+		// indicates start of triangle strips section
+		var patTRIANGLE_STRIPS = /^TRIANGLE_STRIPS /;
+
 		// POINT_DATA number_of_values
 		var patPOINT_DATA = /^POINT_DATA[ ]+(\d+)/;
 
@@ -71,6 +92,7 @@ THREE.VTKLoader.prototype = {
 
 		var inPointsSection = false;
 		var inPolygonsSection = false;
+		var inTriangleStripSection = false;
 		var inPointDataSection = false;
 		var inCellDataSection = false;
 		var inColorSection = false;
@@ -111,9 +133,45 @@ THREE.VTKLoader.prototype = {
 						for ( var j = 0; j < numVertices - 2; ++ j ) {
 
 							i1 = parseInt( inds[ k ] );
-							i2 = parseInt( inds[ k  + 1 ] );
+							i2 = parseInt( inds[ k + 1 ] );
 							indices.push( i0, i1, i2 );
 							k ++;
+
+						}
+
+					}
+
+				}
+
+			} else if ( inTriangleStripSection ) {
+
+				if ( ( result = patConnectivity.exec( line ) ) !== null ) {
+
+					// numVertices i0 i1 i2 ...
+					var numVertices = parseInt( result[ 1 ] );
+					var inds = result[ 2 ].split( /\s+/ );
+
+					if ( numVertices >= 3 ) {
+
+						var i0, i1, i2;
+						// split the polygon in numVertices - 2 triangles
+						for ( var j = 0; j < numVertices - 2; j ++ ) {
+
+							if ( j % 2 === 1 ) {
+
+								i0 = parseInt( inds[ j ] );
+								i1 = parseInt( inds[ j + 2 ] );
+								i2 = parseInt( inds[ j + 1 ] );
+								indices.push( i0, i1, i2 );
+
+							} else {
+
+								i0 = parseInt( inds[ j ] );
+								i1 = parseInt( inds[ j + 1 ] );
+								i2 = parseInt( inds[ j + 2 ] );
+								indices.push( i0, i1, i2 );
+
+							}
 
 						}
 
@@ -157,23 +215,33 @@ THREE.VTKLoader.prototype = {
 
 				inPolygonsSection = true;
 				inPointsSection = false;
+				inTriangleStripSection = false;
 
 			} else if ( patPOINTS.exec( line ) !== null ) {
 
 				inPolygonsSection = false;
 				inPointsSection = true;
+				inTriangleStripSection = false;
+
+			} else if ( patTRIANGLE_STRIPS.exec( line ) !== null ) {
+
+				inPolygonsSection = false;
+				inPointsSection = false;
+				inTriangleStripSection = true;
 
 			} else if ( patPOINT_DATA.exec( line ) !== null ) {
 
 				inPointDataSection = true;
 				inPointsSection = false;
 				inPolygonsSection = false;
+				inTriangleStripSection = false;
 
 			} else if ( patCELL_DATA.exec( line ) !== null ) {
 
 				inCellDataSection = true;
 				inPointsSection = false;
 				inPolygonsSection = false;
+				inTriangleStripSection = false;
 
 			} else if ( patCOLOR_SCALARS.exec( line ) !== null ) {
 
@@ -181,6 +249,7 @@ THREE.VTKLoader.prototype = {
 				inNormalsSection = false;
 				inPointsSection = false;
 				inPolygonsSection = false;
+				inTriangleStripSection = false;
 
 			} else if ( patNORMALS.exec( line ) !== null ) {
 
@@ -188,6 +257,7 @@ THREE.VTKLoader.prototype = {
 				inColorSection = false;
 				inPointsSection = false;
 				inPolygonsSection = false;
+				inTriangleStripSection = false;
 
 			}
 
@@ -265,9 +335,213 @@ THREE.VTKLoader.prototype = {
 
 				}
 
-			 }
+			}
 
 		}
+
+		return geometry;
+
+	},
+
+	parseBinary: function( data ) {
+
+		var count, pointIndex, i, numberOfPoints, pt, s;
+		var buffer = new Uint8Array ( data );
+		var dataView = new DataView ( data );
+
+		// Points and normals, by default, are empty
+		var points = [];
+		var normals = [];
+		var indices = [];
+
+		// Going to make a big array of strings
+		var vtk = [];
+		var index = 0;
+
+		var findString = function( buffer, start ) {
+
+			var index = start;
+			var c = buffer[ index ];
+			var s = [];
+			while ( c != 10 ) {
+
+				s.push ( String.fromCharCode ( c ) );
+				index ++;
+				c = buffer[ index ];
+
+			}
+
+			return { start: start,
+					end: index,
+					next: index + 1,
+					parsedString: s.join( '' ) };
+
+		}
+
+
+		var state, line;
+
+		while ( true ) {
+
+			// Get a string
+			state = findString ( buffer, index );
+			line = state.parsedString;
+			if ( line.indexOf ( "POINTS" ) == 0 ) {
+
+				vtk.push ( line );
+				// Add the points
+				numberOfPoints = parseInt ( line.split( " " )[ 1 ], 10 );
+
+				// Each point is 3 4-byte floats
+				count = numberOfPoints * 4 * 3;
+
+				points = new Float32Array( numberOfPoints * 3 );
+
+				pointIndex = state.next;
+				for ( i = 0; i < numberOfPoints; i ++ ) {
+
+					points[ 3 * i ] = dataView.getFloat32( pointIndex, false );
+					points[ 3 * i + 1 ] = dataView.getFloat32( pointIndex + 4, false );
+					points[ 3 * i + 2 ] = dataView.getFloat32( pointIndex + 8, false );
+					pointIndex = pointIndex + 12;
+
+				}
+				// increment our next pointer
+				state.next = state.next + count + 1;
+
+			} else if ( line.indexOf ( "TRIANGLE_STRIPS" ) === 0 ) {
+
+				var numberOfStrips = parseInt ( line.split( " " )[ 1 ], 10 );
+				var size = parseInt ( line.split ( " " )[ 2 ], 10 );
+				// 4 byte integers
+				count = size * 4;
+
+				indices = new Uint32Array( 3 * size - 9 * numberOfStrips );
+				var indicesIndex = 0;
+
+				pointIndex = state.next;
+				for ( i = 0; i < numberOfStrips; i ++ ) {
+
+					// For each strip, read the first value, then record that many more points
+					var indexCount = dataView.getInt32( pointIndex, false );
+					var strip = [];
+					pointIndex += 4;
+					for ( s = 0; s < indexCount; s ++ ) {
+
+						strip.push ( dataView.getInt32( pointIndex, false ) );
+						pointIndex += 4;
+
+					}
+
+					// retrieves the n-2 triangles from the triangle strip
+					for ( var j = 0; j < indexCount - 2; j ++ ) {
+
+						if ( j % 2 ) {
+
+							indices[ indicesIndex ++ ] = strip[ j ];
+							indices[ indicesIndex ++ ] = strip[ j + 2 ];
+							indices[ indicesIndex ++ ] = strip[ j + 1 ];
+
+						} else {
+
+
+							indices[ indicesIndex ++ ] = strip[ j ];
+							indices[ indicesIndex ++ ] = strip[ j + 1 ];
+							indices[ indicesIndex ++ ] = strip[ j + 2 ];
+
+						}
+
+					}
+
+				}
+				// increment our next pointer
+				state.next = state.next + count + 1;
+
+			} else if ( line.indexOf ( "POLYGONS" ) === 0 ) {
+
+				var numberOfStrips = parseInt ( line.split( " " )[ 1 ], 10 );
+				var size = parseInt ( line.split ( " " )[ 2 ], 10 );
+				// 4 byte integers
+				count = size * 4;
+
+				indices = new Uint32Array( 3 * size - 9 * numberOfStrips );
+				var indicesIndex = 0;
+
+				pointIndex = state.next;
+				for ( i = 0; i < numberOfStrips; i ++ ) {
+
+					// For each strip, read the first value, then record that many more points
+					var indexCount = dataView.getInt32( pointIndex, false );
+					var strip = [];
+					pointIndex += 4;
+					for ( s = 0; s < indexCount; s ++ ) {
+
+						strip.push ( dataView.getInt32( pointIndex, false ) );
+						pointIndex += 4;
+
+					}
+					var i0 = strip[ 0 ]
+					// divide the polygon in n-2 triangle
+					for ( var j = 1; j < indexCount - 1; j ++ ) {
+
+						indices[ indicesIndex ++ ] = strip[ 0 ];
+						indices[ indicesIndex ++ ] = strip[ j ];
+						indices[ indicesIndex ++ ] = strip[ j + 1 ];
+
+					}
+
+				}
+				// increment our next pointer
+				state.next = state.next + count + 1;
+
+			} else if ( line.indexOf ( "POINT_DATA" ) == 0 ) {
+
+				numberOfPoints = parseInt ( line.split( " " )[ 1 ], 10 );
+
+				// Grab the next line
+				state = findString ( buffer, state.next );
+
+				// Now grab the binary data
+				count = numberOfPoints * 4 * 3;
+
+				normals = new Float32Array( numberOfPoints * 3 );
+				pointIndex = state.next;
+				for ( i = 0; i < numberOfPoints; i ++ ) {
+
+					normals[ 3 * i ] = dataView.getFloat32( pointIndex, false );
+					normals[ 3 * i + 1 ] = dataView.getFloat32( pointIndex + 4, false );
+					normals[ 3 * i + 2 ] = dataView.getFloat32( pointIndex + 8, false );
+					pointIndex += 12;
+
+				}
+
+				// Increment past our data
+				state.next = state.next + count;
+
+			}
+
+			// Increment index
+			index = state.next;
+			if ( index >= buffer.byteLength ) {
+
+				break;
+
+			}
+
+		}
+
+
+		var geometry = new THREE.BufferGeometry();
+		geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
+
+
+		if ( normals.length == points.length ) {
+
+			geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+
+		}
+
 
 		return geometry;
 
