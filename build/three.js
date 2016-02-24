@@ -9947,12 +9947,12 @@ THREE.Geometry.prototype = {
 
 		}
 
-		function addFace( a, b, c ) {
+		function addFace( a, b, c, materialIndex ) {
 
 			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
 
-			var face = new THREE.Face3( a, b, c, vertexNormals, vertexColors );
+			var face = new THREE.Face3( a, b, c, vertexNormals, vertexColors, materialIndex );
 
 			scope.faces.push( face );
 
@@ -9985,7 +9985,7 @@ THREE.Geometry.prototype = {
 
 					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
-						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ] );
+						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex  );
 
 					}
 
@@ -36026,108 +36026,7 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 		depthSegments: depthSegments
 	};
 
-	this.widthSegments = widthSegments || 1;
-	this.heightSegments = heightSegments || 1;
-	this.depthSegments = depthSegments || 1;
-
-	var scope = this;
-
-	var width_half = width / 2;
-	var height_half = height / 2;
-	var depth_half = depth / 2;
-
-	buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, 0 ); // px
-	buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, 1 ); // nx
-	buildPlane( 'x', 'z',   1,   1, width, depth, height_half, 2 ); // py
-	buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, 3 ); // ny
-	buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, 4 ); // pz
-	buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, 5 ); // nz
-
-	function buildPlane( u, v, udir, vdir, width, height, depth, materialIndex ) {
-
-		var w, ix, iy,
-		gridX = scope.widthSegments,
-		gridY = scope.heightSegments,
-		width_half = width / 2,
-		height_half = height / 2,
-		offset = scope.vertices.length;
-
-		if ( ( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' ) ) {
-
-			w = 'z';
-
-		} else if ( ( u === 'x' && v === 'z' ) || ( u === 'z' && v === 'x' ) ) {
-
-			w = 'y';
-			gridY = scope.depthSegments;
-
-		} else if ( ( u === 'z' && v === 'y' ) || ( u === 'y' && v === 'z' ) ) {
-
-			w = 'x';
-			gridX = scope.depthSegments;
-
-		}
-
-		var gridX1 = gridX + 1,
-		gridY1 = gridY + 1,
-		segment_width = width / gridX,
-		segment_height = height / gridY,
-		normal = new THREE.Vector3();
-
-		normal[ w ] = depth > 0 ? 1 : - 1;
-
-		for ( iy = 0; iy < gridY1; iy ++ ) {
-
-			for ( ix = 0; ix < gridX1; ix ++ ) {
-
-				var vector = new THREE.Vector3();
-				vector[ u ] = ( ix * segment_width - width_half ) * udir;
-				vector[ v ] = ( iy * segment_height - height_half ) * vdir;
-				vector[ w ] = depth;
-
-				scope.vertices.push( vector );
-
-			}
-
-		}
-
-		for ( iy = 0; iy < gridY; iy ++ ) {
-
-			for ( ix = 0; ix < gridX; ix ++ ) {
-
-				var a = ix + gridX1 * iy;
-				var b = ix + gridX1 * ( iy + 1 );
-				var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
-				var d = ( ix + 1 ) + gridX1 * iy;
-
-				var uva = new THREE.Vector2( ix / gridX, 1 - iy / gridY );
-				var uvb = new THREE.Vector2( ix / gridX, 1 - ( iy + 1 ) / gridY );
-				var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iy + 1 ) / gridY );
-				var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iy / gridY );
-
-				var face = new THREE.Face3( a + offset, b + offset, d + offset );
-				face.normal.copy( normal );
-				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-				face.materialIndex = materialIndex;
-
-				scope.faces.push( face );
-				scope.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
-
-				face = new THREE.Face3( b + offset, c + offset, d + offset );
-				face.normal.copy( normal );
-				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-				face.materialIndex = materialIndex;
-
-				scope.faces.push( face );
-				scope.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
-
-			}
-
-		}
-
-	}
-
-	this.mergeVertices();
+	this.fromBufferGeometry( new THREE.BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) );
 
 };
 
@@ -36135,6 +36034,189 @@ THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.BoxGeometry.prototype.constructor = THREE.BoxGeometry;
 
 THREE.CubeGeometry = THREE.BoxGeometry;
+
+// File:src/extras/geometries/BoxBufferGeometry.js
+
+/**
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
+THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+
+  THREE.BufferGeometry.call( this );
+
+  this.type = 'BoxBufferGeometry';
+
+  this.parameters = {
+    width: width,
+    height: height,
+    depth: depth,
+    widthSegments: widthSegments,
+    heightSegments: heightSegments,
+    depthSegments: depthSegments
+  };
+
+  var scope = this;
+
+  // segments
+  widthSegments  = Math.floor( widthSegments )  || 1;
+  heightSegments = Math.floor( heightSegments ) || 1;
+  depthSegments  = Math.floor( depthSegments )  || 1;
+
+  // these are used to calculate buffer length
+  var vertexCount = calculateVertexCount( widthSegments, heightSegments, depthSegments );
+  var indexCount = ( vertexCount / 4 ) * 6;
+
+  // buffers
+  var indices = new ( ( vertexCount ) > 65535 ? Uint32Array : Uint16Array )( indexCount );
+  var vertices = new Float32Array( vertexCount * 3 );
+  var normals = new Float32Array( vertexCount * 3 );
+  var uvs = new Float32Array( vertexCount * 2 );
+
+  // offset variables
+  var vertexBufferOffset = 0;
+  var uvBufferOffset = 0;
+  var indexBufferOffset = 0;
+  var numberOfVertices = 0;
+
+  // group variables
+  var groupStart = 0;
+
+  // build each side of the box geometry
+  buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height,   width,  depthSegments, heightSegments, 0 ); // px
+  buildPlane( 'z', 'y', 'x',   1, - 1, depth, height, - width,  depthSegments, heightSegments, 1 ); // nx
+  buildPlane( 'x', 'z', 'y',   1,   1, width, depth,    height, widthSegments, depthSegments,  2  ); // py
+  buildPlane( 'x', 'z', 'y',   1, - 1, width, depth,  - height, widthSegments, depthSegments,  3  ); // ny
+  buildPlane( 'x', 'y', 'z',   1, - 1, width, height,   depth,  widthSegments, heightSegments, 4 ); // pz
+  buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth,  widthSegments, heightSegments, 5 ); // nz
+
+  // build geometry
+  this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+  this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+  this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+  this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+  // helper functions
+
+  function calculateVertexCount ( w, h, d ) {
+
+    var segments = 0;
+
+    // calculate the amount of segments for each side
+    segments += w * h * 2; // xy
+    segments += w * d * 2; // xz
+    segments += d * h * 2; // zy
+
+    return segments * 4; // four vertices per segments
+
+  }
+
+  function buildPlane ( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
+
+    var segmentWidth  = width / gridX;
+    var segmentHeight = height / gridY;
+
+    var widthHalf = width / 2;
+    var heightHalf = height / 2;
+    var depthHalf = depth / 2;
+
+    var gridX1 = gridX + 1;
+    var gridY1 = gridY + 1;
+
+    var vertexCounter = 0;
+    var groupCount = 0;
+
+    var vector = new THREE.Vector3();
+
+    // generate vertices, normals and uvs
+
+    for ( var iy = 0; iy < gridY1; iy ++ ) {
+
+      var y = iy * segmentHeight - heightHalf;
+
+      for ( var ix = 0; ix < gridX1; ix ++ ) {
+
+        var x = ix * segmentWidth - widthHalf;
+
+        // set values to correct vector component
+        vector[ u ] = x * udir;
+        vector[ v ] = y * vdir;
+        vector[ w ] = depthHalf;
+
+        // now apply vector to vertex buffer
+        vertices[ vertexBufferOffset ] = vector.x;
+        vertices[ vertexBufferOffset + 1 ] = vector.y;
+        vertices[ vertexBufferOffset + 2 ] = vector.z;
+
+        // set values to correct vector component
+        vector[ u ] = 0;
+        vector[ v ] = 0;
+        vector[ w ] = depth > 0 ? 1 : - 1;
+
+        // now apply vector to normal buffer
+        normals[ vertexBufferOffset ] = vector.x;
+        normals[ vertexBufferOffset + 1 ] = vector.y;
+        normals[ vertexBufferOffset + 2 ] = vector.z;
+
+        // uvs
+        uvs[ uvBufferOffset ] = ix / gridX;
+        uvs[ uvBufferOffset + 1 ] = 1 - ( iy / gridY );
+
+        // update offsets and counters
+        vertexBufferOffset += 3;
+        uvBufferOffset += 2;
+        vertexCounter += 1;
+
+      }
+
+    }
+
+    // 1. you need three indices to draw a single face
+    // 2. a single segment consists of two faces
+    // 3. so we need to generate six (2*3) indices per segment
+
+    for ( iy = 0; iy < gridY; iy ++ ) {
+
+      for ( ix = 0; ix < gridX; ix ++ ) {
+
+        // indices
+        var a = numberOfVertices + ix + gridX1 * iy;
+        var b = numberOfVertices + ix + gridX1 * ( iy + 1 );
+        var c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
+        var d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
+
+        // face one
+        indices[ indexBufferOffset ] = a;
+        indices[ indexBufferOffset + 1 ] = b;
+        indices[ indexBufferOffset + 2 ] = d;
+
+        // face two
+        indices[ indexBufferOffset + 3 ] = b;
+        indices[ indexBufferOffset + 4 ] = c;
+        indices[ indexBufferOffset + 5 ] = d;
+
+        // update offsets and counters
+        indexBufferOffset += 6;
+        groupCount += 6;
+      }
+
+    }
+
+    // add a group to the geometry. this will ensure multi material support
+    scope.addGroup( groupStart, groupCount, materialIndex );
+
+    // calculate new start value for groups
+    groupStart += groupCount;
+
+    // update total number of vertices
+    numberOfVertices += vertexCounter;
+
+  }
+
+};
+
+THREE.BoxBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.BoxBufferGeometry.prototype.constructor = THREE.BoxBufferGeometry;
 
 // File:src/extras/geometries/CircleGeometry.js
 
