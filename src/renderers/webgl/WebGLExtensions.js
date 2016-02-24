@@ -34,6 +34,10 @@ THREE.WebGLExtensions = function ( gl ) {
 				extension = gl.getExtension( 'WEBGL_compressed_texture_etc1' );
 				break;
 
+			case 'EXT_shader_texture_lod':
+				extension = gl.getExtension( 'EXT_shader_texture_lod' );
+				break;
+
 			default:
 				extension = gl.getExtension( name );
 

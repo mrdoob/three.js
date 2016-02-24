@@ -136,6 +136,7 @@ var files = {
 		"webgl_materials_texture_tga",
 		"webgl_materials_variations_basic",
 		"webgl_materials_variations_lambert",
+		"webgl_materials_variations_pbs",
 		"webgl_materials_variations_phong",
 		"webgl_materials_variations_standard",
 		"webgl_materials_variations_standard2",

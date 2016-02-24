@@ -208,6 +208,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	extensions.get( 'OES_texture_half_float_linear' );
 	extensions.get( 'OES_standard_derivatives' );
 	extensions.get( 'ANGLE_instanced_arrays' );
+	extensions.get( 'EXT_shader_texture_lod' );
 
 	if ( extensions.get( 'OES_element_index_uint' ) ) {
 
@@ -1516,6 +1517,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material instanceof THREE.MeshPhongMaterial ||
 				material instanceof THREE.MeshLambertMaterial ||
 				material instanceof THREE.MeshStandardMaterial ||
+				material instanceof THREE.MeshPBSMaterial ||
 				material.lights ) {
 
 			// store the light setup it was created for
@@ -1524,7 +1526,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// wire up the material to this renderer's lighting state
 
-			uniforms.ambientLightColor.value = _lights.ambient;
+			if(uniforms.ambientLightColor != undefined)
+				uniforms.ambientLightColor.value = _lights.ambient;
+
 			uniforms.directionalLights.value = _lights.directional;
 			uniforms.spotLights.value = _lights.spot;
 			uniforms.pointLights.value = _lights.point;
@@ -1669,6 +1673,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.ShaderMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshPBSMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
 				 material.envMap ) {
 
@@ -1682,6 +1687,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			if ( material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshPBSMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshBasicMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
@@ -1754,6 +1760,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( refreshMaterial ) {
 
 			if ( material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshPBSMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
 				 material.lights ) {
@@ -1810,6 +1817,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( material instanceof THREE.MeshPhongMaterial ) {
 
 				refreshUniformsPhong( m_uniforms, material );
+
+			} else if ( material instanceof THREE.MeshPBSMaterial ) {
+
+				refreshUniformsPBS( m_uniforms, material, camera.matrixWorld );
 
 			} else if ( material instanceof THREE.MeshStandardMaterial ) {
 
@@ -1879,7 +1890,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.opacity.value = material.opacity;
 
-		uniforms.diffuse.value = material.color;
+		if ( _this.gammaInput ) {
+
+			uniforms.diffuse.value.copyGammaToLinear( material.color );
+
+		} else {
+
+			uniforms.diffuse.value = material.color;
+
+		}
+
+		uniforms.map.value = material.map;
+		uniforms.specularMap.value = material.specularMap;
+		uniforms.alphaMap.value = material.alphaMap;
 
 		if ( material.emissive ) {
 
@@ -1895,6 +1918,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			uniforms.aoMap.value = material.aoMap;
 			uniforms.aoMapIntensity.value = material.aoMapIntensity;
+
+		}
+
+		if ( material.bumpMap ) {
+
+			uniforms.bumpMap.value = material.bumpMap;
+			uniforms.bumpScale.value = material.bumpScale;
+
+		}
+
+		if ( material.normalMap ) {
+
+			uniforms.normalMap.value = material.normalMap;
+			uniforms.normalScale.value.copy( material.normalScale );
 
 		}
 
@@ -1964,9 +2001,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.envMap.value = material.envMap;
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
 
+
 		uniforms.reflectivity.value = material.reflectivity;
 		uniforms.refractionRatio.value = material.refractionRatio;
-
 	}
 
 	function refreshUniformsLine ( uniforms, material ) {
@@ -2080,6 +2117,124 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function refreshUniformsPBS ( uniforms, material, invViewMatrix ) {
+
+		// ensure that the filters are set correct
+		if(material.environment.map)
+		{
+			material.environment.map.magFilter = THREE.LinearFilter;
+			material.environment.map.minFilter = THREE.LinearMipMapLinearFilter;
+		}
+
+		if(material.mainmaps.albedo != undefined && material.mainmaps.albedo.map)
+		{
+			material.mainmaps.albedo.map.magFilter = THREE.LinearFilter;
+			material.mainmaps.albedo.map.minFilter = THREE.LinearMipMapLinearFilter;
+		}
+		if(material.mainmaps.normalr != undefined && material.mainmaps.normalr.map)
+		{
+			material.mainmaps.normalr.map.magFilter = THREE.LinearFilter;
+			material.mainmaps.normalr.map.minFilter = THREE.LinearMipMapLinearFilter;
+		}
+		if(material.mainmaps.f0 != undefined && material.mainmaps.f0.map)
+		{
+			material.mainmaps.f0.map.magFilter = THREE.LinearFilter;
+			material.mainmaps.f0.map.minFilter = THREE.LinearMipMapLinearFilter;
+		}
+
+		if(material.detailmap0.albedo != undefined && material.detailmap0.albedo.map)
+		{
+			material.detailmap0.albedo.map.magFilter = THREE.LinearFilter;
+			material.detailmap0.albedo.map.minFilter = THREE.LinearMipMapLinearFilter;
+		}
+		if(material.detailmap0.normalr != undefined && material.detailmap0.normalr.map)
+		{
+			material.detailmap0.normalr.map.magFilter = THREE.LinearFilter;
+			material.detailmap0.normalr.map.minFilter = THREE.LinearMipMapLinearFilter;
+		}
+		if(material.detailmap0.f0 != undefined && material.detailmap0.f0.map)
+		{
+			material.detailmap0.f0.map.magFilter = THREE.LinearFilter;
+			material.detailmap0.f0.map.minFilter = THREE.LinearMipMapLinearFilter;
+		}
+
+		if(material.detailmap1.albedo != undefined && material.detailmap1.albedo.map)
+		{
+			material.detailmap1.albedo.map.magFilter = THREE.LinearFilter;
+			material.detailmap1.albedo.map.minFilter = THREE.LinearMipMapLinearFilter;
+		}
+		if(material.detailmap1.normalr != undefined && material.detailmap1.normalr.map)
+		{
+			material.detailmap1.normalr.map.magFilter = THREE.LinearFilter;
+			material.detailmap1.normalr.map.minFilter = THREE.LinearMipMapLinearFilter;
+		}
+		if(material.detailmap1.f0 != undefined && material.detailmap1.f0.map)
+		{
+			material.detailmap1.f0.map.magFilter = THREE.LinearFilter;
+			material.detailmap1.f0.map.minFilter = THREE.LinearMipMapLinearFilter;
+		}
+
+		uniforms.ivMat.value.copy(invViewMatrix);
+
+		uniforms.in_map_environment.value = material.environment.map;
+		uniforms.in_map_environment_intensity.value = material.environment.intensity;
+		uniforms.in_map_environment_mipmapcount.value = 0;
+		if(material.environment.map) {
+			try {
+				if (material.environment.map instanceof THREE.CubeTexture) {
+					uniforms.in_map_environment_mipmapcount.value = Math.log2(material.environment.map.image[0].width);
+				} else {
+					uniforms.in_map_environment_mipmapcount.value = material.environment.map.image[0].mipmaps.length - 1;
+				}
+			}catch(e) {
+				//TODO warn here
+			}
+		}
+
+		uniforms.in_albedo.value.copy(material.albedo);
+		uniforms.in_f0.value.copy(material.f0);
+		uniforms.in_roughness.value = material.roughness;
+		uniforms.in_light_roughness_offset.value = material.lightRoughnessOffset;
+
+		uniforms.in_offset_main.value.copy(material.mainmaps.offset);
+		uniforms.in_scale_main.value.copy(material.mainmaps.tiling);
+		uniforms.in_offset_d1.value.copy(material.detailmap0.offset);
+		uniforms.in_scale_d1.value.copy(material.detailmap0.tiling);
+		uniforms.in_offset_d2.value.copy(material.detailmap1.offset);
+		uniforms.in_scale_d2.value.copy(material.detailmap1.tiling);
+
+		uniforms.in_map_main_albedo.value = material.mainmaps.albedo.map;
+		uniforms.in_blendfactor1_main_albedo.value = material.mainmaps.albedo.blend;
+
+		uniforms.in_map_main_normalr.value = material.mainmaps.normalr.map;
+		uniforms.in_blendfactor1_main_normalr.value = material.mainmaps.normalr.blend1;
+		uniforms.in_blendfactor2_main_normalr.value = material.mainmaps.normalr.blend2;
+
+		uniforms.in_map_main_f0.value = material.mainmaps.f0.map;
+		uniforms.in_blendfactor1_main_f0.value = material.mainmaps.f0.blend;
+
+		uniforms.in_map_d1_albedo.value = material.detailmap0.albedo.map;
+		uniforms.in_blendfactor1_d1_albedo.value = material.detailmap0.albedo.blend;
+
+		uniforms.in_map_d1_normalr.value = material.detailmap0.normalr.map;
+		uniforms.in_blendfactor1_d1_normalr.value = material.detailmap0.normalr.blend1;
+		uniforms.in_blendfactor2_d1_normalr.value = material.detailmap0.normalr.blend2;
+
+		uniforms.in_map_d1_f0.value = material.detailmap0.f0.map;
+		uniforms.in_blendfactor1_d1_f0.value = material.detailmap0.f0.blend;
+
+
+		uniforms.in_map_d2_albedo.value = material.detailmap1.albedo.map;
+		uniforms.in_blendfactor1_d2_albedo.value = material.detailmap1.albedo.blend;
+
+		uniforms.in_map_d2_normalr.value = material.detailmap1.normalr.map;
+		uniforms.in_blendfactor1_d2_normalr.value = material.detailmap1.normalr.blend1;
+		uniforms.in_blendfactor2_d2_normalr.value = material.detailmap1.normalr.blend2;
+
+		uniforms.in_map_d2_f0.value = material.detailmap1.f0.map;
+		uniforms.in_blendfactor1_d2_f0.value = material.detailmap1.f0.blend;
+	};
+
 	function refreshUniformsStandard ( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
@@ -2145,7 +2300,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function markUniformsLightsNeedsUpdate ( uniforms, value ) {
 
-		uniforms.ambientLightColor.needsUpdate = value;
+		if(uniforms.ambientLightColor != undefined)
+			uniforms.ambientLightColor.needsUpdate = value;
 
 		uniforms.directionalLights.needsUpdate = value;
 		uniforms.pointLights.needsUpdate = value;

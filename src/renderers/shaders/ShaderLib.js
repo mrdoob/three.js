@@ -420,6 +420,88 @@ THREE.ShaderLib = {
 
 	},
 
+	'pbs': {
+
+		uniforms: THREE.UniformsUtils.merge( [
+			THREE.UniformsLib[ "common" ],
+			THREE.UniformsLib[ "lights" ],
+			{
+				in_map_environment: {type: "t", value: null},
+				in_map_environment_intensity: {type: "f", value: 0.0},
+				in_map_environment_mipmapcount: {type: "f", value: 0},
+
+				ivMat: {type: "m4", value: new THREE.Matrix4()},
+				in_albedo: {type: "c", value: new THREE.Color(0xffffff)},
+				in_f0: {type: "c", value: new THREE.Color(0x191919)},
+				in_roughness: {type: "f", value: 0.1},
+				in_light_roughness_offset: {type: "f", value: 0},
+
+				in_offset_main: {type: "v2", value: new THREE.Vector2(0, 0)},
+				in_scale_main: {type: "v2", value: new THREE.Vector2(0, 0)},
+				in_offset_d1: {type: "v2", value: new THREE.Vector2(0, 0)},
+				in_scale_d1: {type: "v2", value: new THREE.Vector2(0, 0)},
+				in_offset_d2: {type: "v2", value: new THREE.Vector2(0, 0)},
+				in_scale_d2: {type: "v2", value: new THREE.Vector2(0, 0)},
+
+				in_map_main_albedo: {type: "t", value: null},
+				in_blendfactor1_main_albedo: {type: "f", value: 0.0},
+
+				in_map_main_normalr: {type: "t", value: null},
+				in_blendfactor1_main_normalr: {type: "f", value: 0.0},
+				in_blendfactor2_main_normalr: {type: "f", value: 0.0},
+
+				in_map_main_f0: {type: "t", value: null},
+				in_blendfactor1_main_f0: {type: "f", value: 0.0},
+
+				in_map_d1_albedo: {type: "t", value: null},
+				in_blendfactor1_d1_albedo: {type: "f", value: 0.0},
+
+				in_map_d1_normalr: {type: "t", value: null},
+				in_blendfactor1_d1_normalr: {type: "f", value: 0.0},
+				in_blendfactor2_d1_normalr: {type: "f", value: 0.0},
+
+				in_map_d1_f0: {type: "t", value: null},
+				in_blendfactor1_d1_f0: {type: "f", value: 0.0},
+
+				in_map_d2_albedo: {type: "t", value: null},
+				in_blendfactor1_d2_albedo: {type: "f", value: 0.0},
+
+				in_map_d2_normalr: {type: "t", value: null},
+				in_blendfactor1_d2_normalr: {type: "f", value: 0.0},
+				in_blendfactor2_d2_normalr: {type: "f", value: 0.0},
+
+				in_map_d2_f0: {type: "t", value: null},
+				in_blendfactor1_d2_f0: {type: "f", value: 0.0}
+			}
+		] ),
+
+		vertexShader: [
+
+			THREE.ShaderChunk[ "lights_pbs_pars_vertex" ],
+			"",
+			"// ----------------------------------------------------------------------------------",
+			"// Main function",
+			"// ----------------------------------------------------------------------------------",
+			"void main() {",
+			THREE.ShaderChunk[ "lights_pbs_vertex" ],
+			"}"
+
+		].join("\n"),
+
+		fragmentShader: [
+			THREE.ShaderChunk[ "lights_pbs_pars_fragment" ],
+			"",
+			"// ----------------------------------------------------------------------------------",
+			"// Main function",
+			"// ----------------------------------------------------------------------------------",
+			"void main() {",
+			THREE.ShaderChunk[ "lights_pbs_fragment" ],
+			"}"
+
+		].join("\n")
+
+	},
+
 	'standard': {
 
 		uniforms: THREE.UniformsUtils.merge( [
