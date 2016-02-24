@@ -71,7 +71,6 @@ THREE.ShaderLib = {
 			"#endif",
 
 			'#include <common>',
-			'#include <encodings>',
 			'#include <color_pars_fragment>',
 			'#include <uv_pars_fragment>',
 			'#include <uv2_pars_fragment>',
@@ -200,7 +199,6 @@ THREE.ShaderLib = {
 			"#endif",
 
 			'#include <common>',
-			'#include <encodings>',
 			'#include <color_pars_fragment>',
 			'#include <uv_pars_fragment>',
 			'#include <uv2_pars_fragment>',
@@ -365,7 +363,6 @@ THREE.ShaderLib = {
 			"uniform float opacity;",
 
 			'#include <common>',
-			'#include <encodings>',
 			'#include <color_pars_fragment>',
 			'#include <uv_pars_fragment>',
 			'#include <uv2_pars_fragment>',
@@ -529,7 +526,6 @@ THREE.ShaderLib = {
 			"#endif",
 
 			'#include <common>',
-			'#include <encodings>',
 			'#include <color_pars_fragment>',
 			'#include <uv_pars_fragment>',
 			'#include <uv2_pars_fragment>',
@@ -634,7 +630,6 @@ THREE.ShaderLib = {
 			"uniform float opacity;",
 
 			'#include <common>',
-			'#include <encodings>',
 			'#include <color_pars_fragment>',
 			'#include <map_particle_pars_fragment>',
 			'#include <fog_pars_fragment>',
