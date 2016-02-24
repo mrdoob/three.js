@@ -197,7 +197,9 @@ THREE.WebGLProgram = ( function () {
 		var pattern = /#include[ \t]+<([\w\d.]+)>/g;
 
 		function replace( match, include ) {
-			return parseIncludes( THREE.ShaderChunk[ include ] );
+			var replace = THREE.ShaderChunk[ include ];
+			if( ! replace ) throw new Error( "can not resolve #include <"+include+">");
+			return parseIncludes( replace );
 
 		}
 
