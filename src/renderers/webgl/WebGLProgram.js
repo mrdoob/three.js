@@ -343,6 +343,7 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.map ? '#define USE_MAP' : '',
 				parameters.envMap ? '#define USE_ENVMAP' : '',
+				parameters.envMap ? '#define ' + envMapModeDefine : '',
 				parameters.lightMap ? '#define USE_LIGHTMAP' : '',
 				parameters.aoMap ? '#define USE_AOMAP' : '',
 				parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
@@ -507,8 +508,6 @@ THREE.WebGLProgram = ( function () {
 		var vertexGlsl = prefixVertex + vertexShader;
 		var fragmentGlsl = prefixFragment + fragmentShader;
 
-		vertexGlsl = THREE.WebGLShaderPreProcessor.compile( vertexGlsl );
-		fragmentGlsl = THREE.WebGLShaderPreProcessor.compile( fragmentGlsl );
 		// console.log( '*VERTEX*', vertexGlsl );
 		// console.log( '*FRAGMENT*', fragmentGlsl );
 
