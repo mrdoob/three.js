@@ -236,9 +236,19 @@
 		size - Defaults to 65535 or 4294967296 if extension OES_element_index_uint supported, but allows for larger or smaller chunks.
 		</div>
 
-		<h3>[method:null merge]( [page:BufferGeometry bufferGeometry], [page:Integer offset] )</h3>
+		<h3>[method:BufferGeometry toNonIndexed]() </h3>
 		<div>
-		Merge in another BufferGeometry with an optional offset of where to start merging in.
+			Converts a indexed BufferGeometry to a non-indexed BufferGeometry.
+		</div>
+
+		<h3>[method:BufferGeometry merge]( geometry ) </h3>
+		<div>
+			Merges this BufferGeometry with another BufferGeometry.
+			The method will throw an error when merging indexed with non-indexed buffer geometries. To be able to merge
+			non-indexed and indexed geometries the indexed buffer geometry should first be converted to a non-indexed
+			buffer geometry using the method [page:.toNonIndexed]
+
+			The method will throw an error if the attributes of the two buffer geometries are not corresponding.
 		</div>
 
 		<h3>[method:null dispose]()</h3>
