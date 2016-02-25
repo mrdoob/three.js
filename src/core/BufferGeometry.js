@@ -791,7 +791,7 @@ THREE.BufferGeometry.prototype = {
 
 				}
 
-				this.index = this.index.merge( geometry.index );
+				this.index.merge( geometry.index );
 
 			}
 
@@ -811,7 +811,7 @@ THREE.BufferGeometry.prototype = {
 
 				if ( hasAttribute ) {
 
-					this.attributes[ attribute ] = this.attributes[ attribute ].merge( geometry.attributes[ attribute ] );
+					this.attributes[ attribute ].merge( geometry.attributes[ attribute ] );
 
 				}
 
