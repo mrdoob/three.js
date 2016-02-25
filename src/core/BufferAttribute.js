@@ -298,6 +298,26 @@ THREE.BufferAttribute.prototype = {
 
 		return new this.constructor().copy( this );
 
+	},
+
+	merge: function( attribute ) {
+
+		var result, first = this.array, second = attribute.array, length = first.length;
+
+		if ( first.constructor !== second.constructor || this.itemSize !== attribute.itemSize ) {
+
+			console.error( 'THREE.BufferAttribute.merge(): type mismatch', attribute );
+
+		}
+
+		result = new first.constructor( length + second.length );
+		result.set( first );
+		result.set( second, length );
+
+		this.array = result;
+
+		return this;
+
 	}
 
 };
