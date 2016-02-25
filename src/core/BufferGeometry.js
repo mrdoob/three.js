@@ -777,7 +777,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 				var indices = geometry.index.array;
 
-				var i, il, offset = attributes[ 'position' ].count;
+				var i, il, offset = this.attributes[ 'position' ].count;
 
 				for ( i = 0, il = indices.length; i < il; i ++ ) {
 
