@@ -93,16 +93,16 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 				return false;
 			}
 			var encoding;
-			if( map.encoding !== undefined ) { // standard texture
+			if( map instanceof THREE.Texture ) {
 				encoding = map.encoding;
 			}
-			else if( map.texture !== undefined ) {  // render target pretending to be a texture, get the texture inside it.
+			else if( map instanceof THREE.WebGLRenderTarget ) {
 				encoding = map.texture.encoding;
 			}
 			else {
 				throw new Error( "can not determine texture encoding from map: " + map );
 			}
-			// add backwards compatibility for WebGLRenderer.gammaInput parameter, should probably be removed at some point. 
+			// add backwards compatibility for WebGLRenderer.gammaInput parameter, should probably be removed at some point.
 			if( encoding === THREE.LinearEncoding && renderer.gammaInput ) {
 				encoding = THREE.GammaEncoding;
 			}
