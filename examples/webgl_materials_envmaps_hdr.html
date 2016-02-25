@@ -38,6 +38,8 @@
 		<script src="../examples/js/Detector.js"></script>
 		<script src="../examples/js/libs/stats.min.js"></script>
 
+		<script src="../examples/js/Half.js"></script>
+		<script src="../examples/js/Encodings.js"></script>
     <script src="../examples/js/pmrem/PMREMGenerator.js"></script>
     <script src="../examples/js/pmrem/PMREM_CubeUVPacker.js"></script>
     <script src="../examples/js/libs/dat.gui.min.js"></script>
@@ -301,7 +303,7 @@
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.gammaOutput = false;
 
                                                                 var renderScene = new THREE.RenderPass(scene, camera);
 

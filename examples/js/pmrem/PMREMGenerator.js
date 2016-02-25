@@ -28,7 +28,7 @@
 	this.sourceTexture = cubeTexture;
 
   // encoded formats do not interpolate well, thus turn off interpolation for them
-  var textureFilter = ( this.sourceTexture.encoding === THREE.Linear ) ? THREE.LinearFilter : THREE.NearestFilter;
+  var textureFilter = ( this.sourceTexture.encoding === THREE.LinearEncoding ) ? THREE.LinearFilter : THREE.NearestFilter;
   this.sourceTexture.minFilter = this.sourceTexture.magFilter = textureFilter;
 
 	this.cubeLods = [];
@@ -40,7 +40,7 @@
   for ( var i = 0; i < this.numLods; i ++ ) {
 		var renderTarget = new THREE.WebGLRenderTargetCube( size, size, params );
 		renderTarget.texture.generateMipmaps = false;
-    renderTarget.encoding = this.sourceTexture.encoding;
+    renderTarget.texture.encoding = this.sourceTexture.encoding;
 		this.cubeLods.push( renderTarget );
 		size = Math.max( 16, size / 2 );
 	}
@@ -54,8 +54,8 @@
 	this.scene.add( this.planeMesh );
 	this.scene.add( this.camera );
 
-	this.shader.uniforms[ "sourceTexture" ].value = this.sourceTexture;
-	this.shader.uniforms[ "encoding" ].value = this.sourceTexture.encoding;
+	this.shader.uniforms[ "envMap" ].value = this.sourceTexture;
+  this.shader.envMap = this.sourceTexture;
 };
 
 THREE.PMREMGenerator.prototype = {
@@ -64,7 +64,8 @@ THREE.PMREMGenerator.prototype = {
 
 	update: function( renderer ) {
 
-		this.shader.uniforms[ "sourceTexture" ].value = this.sourceTexture;
+		this.shader.uniforms[ "envMap" ].value = this.sourceTexture;
+    this.shader.envMap = this.sourceTexture;
 		for ( var i = 0; i < this.numLods; i ++ ) {
 
 			var r = i / ( this.numLods - 1 );
@@ -73,7 +74,7 @@ THREE.PMREMGenerator.prototype = {
 			this.shader.uniforms[ "mapSize" ].value = size;
 			this.renderToCubeMapTarget( renderer, this.cubeLods[ i ] );
 			if ( i < 5 )
-			this.shader.uniforms[ "sourceTexture" ].value = this.cubeLods[ i ];
+			this.shader.uniforms[ "envMap" ].value = this.cubeLods[ i ];
 
 		}
 
@@ -104,8 +105,7 @@ THREE.PMREMGenerator.prototype = {
         "faceIndex": { type: 'i', value: 0 },
         "roughness": { type: 'f', value: 0.5 },
         "mapSize": { type: 'f', value: 0.5 },
-        "sourceTexture": { type: 't', value: null },
-        "encoding": { type: 'i', value: 3002},
+        "envMap": { type: 't', value: null },
         "testColor": { type: 'v3', value: new THREE.Vector3( 1, 1, 1 ) }
       },
 
@@ -120,10 +120,9 @@ THREE.PMREMGenerator.prototype = {
         "varying vec2 vUv;\n\
         uniform int faceIndex;\n\
         uniform float roughness;\n\
-        uniform samplerCube sourceTexture;\n\
+        uniform samplerCube envMap;\n\
         uniform float mapSize;\n\
         uniform vec3 testColor;\n\
-        uniform int encoding;\n\
         \n\
         float rnd(vec2 uv) {\n\
            return fract(sin(dot(uv, vec2(12.9898, 78.233) * 2.0)) * 43758.5453);\n\
@@ -172,9 +171,8 @@ THREE.PMREMGenerator.prototype = {
            else\n\
                color = vec4(1.0,0.0,1.0,1.0);\n\
            return color;\n\
-        }" +
-  			THREE.ShaderChunk[ "encodings" ] +
-        "void main() {\n\
+        }\n\
+        void main() {\n\
            vec3 sampleDirection;\n\
            vec2 uv = vUv*2.0 - 1.0;\n\
            float offset = -1.0/mapSize;\n\
@@ -211,11 +209,11 @@ THREE.PMREMGenerator.prototype = {
                vect = ImportanceSampleGGX(vec2(float(i) / float(NumSamples), rand), vecSpace, roughness);\n\
                float dotProd = dot(vect, normalize(sampleDirection));\n\
                weight += dotProd;\n\
-               vec3 color = texelDecode(textureCube(sourceTexture, vect), encoding).rgb;\n\
+               vec3 color = envMapTexelToLinear(textureCube(envMap,vect)).rgb;\n\
                rgbColor.rgb += color;\n\
            }\n\
            rgbColor /= float(NumSamples);\n\
-           gl_FragColor = texelEncode( vec4( rgbColor, 1.0 ), encoding );\n\
+           gl_FragColor = linearToOutputTexel( vec4( rgbColor, 1.0 ) );\n\
         }"
       }
     );

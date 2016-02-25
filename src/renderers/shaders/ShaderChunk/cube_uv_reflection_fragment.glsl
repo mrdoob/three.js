@@ -125,10 +125,10 @@ vec4 textureCubeUV(vec3 reflectedDirection, float roughness, float textureSize) 
     vec2 uv_11 = getCubeUV(reflectedDirection, r1, level1, textureSize);
     vec2 uv_20 = getCubeUV(reflectedDirection, r2, level0, textureSize);
     vec2 uv_21 = getCubeUV(reflectedDirection, r2, level1, textureSize);
-    vec4 color10 = texelDecode(texture2D(envMap, uv_10), envMapEncoding);
-    vec4 color11 = texelDecode(texture2D(envMap, uv_11), envMapEncoding);
-    vec4 color20 = texelDecode(texture2D(envMap, uv_20), envMapEncoding);
-    vec4 color21 = texelDecode(texture2D(envMap, uv_21), envMapEncoding);
+    vec4 color10 = envMapTexelToLinear(texture2D(envMap, uv_10));
+    vec4 color11 = envMapTexelToLinear(texture2D(envMap, uv_11));
+    vec4 color20 = envMapTexelToLinear(texture2D(envMap, uv_20));
+    vec4 color21 = envMapTexelToLinear(texture2D(envMap, uv_21));
     vec4 c1 = mix(color10 , color11,  s);
     vec4 c2 = mix(color20 , color21,  s);
     vec4 c3 = mix(c1 , c2,  t);
