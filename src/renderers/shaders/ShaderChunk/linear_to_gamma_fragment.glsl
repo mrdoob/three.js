@@ -1,2 +1,0 @@
-
-	outgoingLight = linearToOutputTexel( outgoingLight );
