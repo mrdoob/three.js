@@ -23457,7 +23457,7 @@ THREE.ShaderChunk[ 'emissivemap_pars_fragment' ] = "#ifdef USE_EMISSIVEMAP\n	uni
 
 // File:src/renderers/shaders/ShaderChunk/encodings.glsl
 
-THREE.ShaderChunk[ 'encodings' ] = "\n#define ENCODING_Linear 3000\n#define ENCODING_sRGB   3001\n#define ENCODING_RGBE   3002\n#define ENCODING_LogLuv 3003\n#define ENCODING_RGBM7  3004\n#define ENCODING_RGBM16 3005\n#define ENCODING_RGBD   3006\n#define ENCODING_Gamma  3007\nvec4 LinearToLinear( in vec4 value ) {\n  return value;\n}\nvec4 GammaToLinear( in vec4 value, in float gammaFactor ) {\n  return vec4( pow( value.xyz, vec3( gammaFactor ) ), value.w );\n}\nvec4 LinearTosGamma( in vec4 value, in float gammaFactor ) {\n  return vec4( pow( value.xyz, vec3( 1.0 / gammaFactor ) ), value.w );\n}\nvec4 sRGBToLinear( in vec4 value ) {\n  return vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.w );\n}\nvec4 LinearTosRGB( in vec4 value ) {\n  return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.w );\n}\nvec4 RGBEToLinear( in vec4 value ) {\n  return vec4( value.xyz * exp2( value.w*256.0 - 128.0 ), 1.0 );\n}\nvec4 LinearToRGBE( in vec4 value ) {\n  float maxComponent = max(max(value.r, value.g), value.b );\n  float fExp = ceil( log2(maxComponent) );\n  return vec4( value.rgb / exp2(fExp), (fExp + 128.0) / 255.0 );\n}\nvec4 RGBMToLinear( in vec4 value, in float maxRange ) {\n  return vec4( value.xyz * value.w * maxRange, 1.0 );\n}\nvec4 LinearToRGBM( in vec4 value, in float maxRange ) {\n  float maxRGB = max( value.x, max( value.g, value.b ) );\n  float M      = maxRGB / maxRange;\n  M            = ceil( M * 255.0 ) / 255.0;\n  return vec4( value.rgb / ( M * maxRange ), M );\n}\nvec4 RGBDToLinear( in vec4 value, in float maxRange ) {\n    return vec4( value.rgb * ( ( maxRange / 255.0 ) / value.a ), 1.0 );\n}\nvec4 LinearToRGBD( in vec4 value, in float maxRange ) {\n    float maxRGB = max( value.x, max( value.g, value.b ) );\n    float D      = max( maxRange / maxRGB, 1.0 );\n    D            = saturate( floor( D ) / 255.0 );\n    return vec4( value.rgb * ( D * ( 255.0 / maxRange ) ), D );\n}\nconst mat3 cLogLuvM = mat3(\n  0.2209, 0.3390, 0.4184,\n  0.1138, 0.6780, 0.7319,\n  0.0102, 0.1130, 0.2969);\nvec4 LinearToLogLuv( in vec4 value )  {\n  vec3 Xp_Y_XYZp = value.rgb * cLogLuvM;\n  Xp_Y_XYZp = max(Xp_Y_XYZp, vec3(1e-6, 1e-6, 1e-6));\n  vec4 vResult;\n  vResult.xy = Xp_Y_XYZp.xy / Xp_Y_XYZp.z;\n  float Le = 2.0 * log2(Xp_Y_XYZp.y) + 127.0;\n  vResult.w = fract(Le);\n  vResult.z = (Le - (floor(vResult.w*255.0))/255.0)/255.0;\n  return vResult;\n}\nconst mat3 cLogLuvInverseM = mat3(\n  6.0014, -2.7008, -1.7996,\n  -1.3320,  3.1029, -5.7721,\n  0.3008, -1.0882,  5.6268);\nvec4 LogLuvToLinear( in vec4 value ) {\n  float Le = value.z * 255.0 + value.w;\n  vec3 Xp_Y_XYZp;\n  Xp_Y_XYZp.y = exp2((Le - 127.0) / 2.0);\n  Xp_Y_XYZp.z = Xp_Y_XYZp.y / value.y;\n  Xp_Y_XYZp.x = value.x * Xp_Y_XYZp.z;\n  vec3 vRGB = Xp_Y_XYZp.rgb * cLogLuvInverseM;\n  return vec4( max(vRGB, 0.0), 1.0 );\n}\n";
+THREE.ShaderChunk[ 'encodings' ] = "\nvec4 LinearToLinear( in vec4 value ) {\n  return value;\n}\nvec4 GammaToLinear( in vec4 value, in float gammaFactor ) {\n  return vec4( pow( value.xyz, vec3( gammaFactor ) ), value.w );\n}\nvec4 LinearTosGamma( in vec4 value, in float gammaFactor ) {\n  return vec4( pow( value.xyz, vec3( 1.0 / gammaFactor ) ), value.w );\n}\nvec4 sRGBToLinear( in vec4 value ) {\n  return vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.w );\n}\nvec4 LinearTosRGB( in vec4 value ) {\n  return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.w );\n}\nvec4 RGBEToLinear( in vec4 value ) {\n  return vec4( value.xyz * exp2( value.w*256.0 - 128.0 ), 1.0 );\n}\nvec4 LinearToRGBE( in vec4 value ) {\n  float maxComponent = max(max(value.r, value.g), value.b );\n  float fExp = ceil( log2(maxComponent) );\n  return vec4( value.rgb / exp2(fExp), (fExp + 128.0) / 255.0 );\n}\nvec4 RGBMToLinear( in vec4 value, in float maxRange ) {\n  return vec4( value.xyz * value.w * maxRange, 1.0 );\n}\nvec4 LinearToRGBM( in vec4 value, in float maxRange ) {\n  float maxRGB = max( value.x, max( value.g, value.b ) );\n  float M      = maxRGB / maxRange;\n  M            = ceil( M * 255.0 ) / 255.0;\n  return vec4( value.rgb / ( M * maxRange ), M );\n}\nvec4 RGBDToLinear( in vec4 value, in float maxRange ) {\n    return vec4( value.rgb * ( ( maxRange / 255.0 ) / value.a ), 1.0 );\n}\nvec4 LinearToRGBD( in vec4 value, in float maxRange ) {\n    float maxRGB = max( value.x, max( value.g, value.b ) );\n    float D      = max( maxRange / maxRGB, 1.0 );\n    D            = min( floor( D ) / 255.0, 1.0 );\n    return vec4( value.rgb * ( D * ( 255.0 / maxRange ) ), D );\n}\nconst mat3 cLogLuvM = mat3( 0.2209, 0.3390, 0.4184, 0.1138, 0.6780, 0.7319, 0.0102, 0.1130, 0.2969 );\nvec4 LinearToLogLuv( in vec4 value )  {\n  vec3 Xp_Y_XYZp = value.rgb * cLogLuvM;\n  Xp_Y_XYZp = max(Xp_Y_XYZp, vec3(1e-6, 1e-6, 1e-6));\n  vec4 vResult;\n  vResult.xy = Xp_Y_XYZp.xy / Xp_Y_XYZp.z;\n  float Le = 2.0 * log2(Xp_Y_XYZp.y) + 127.0;\n  vResult.w = fract(Le);\n  vResult.z = (Le - (floor(vResult.w*255.0))/255.0)/255.0;\n  return vResult;\n}\nconst mat3 cLogLuvInverseM = mat3( 6.0014, -2.7008, -1.7996, -1.3320, 3.1029, -5.7721, 0.3008, -1.0882, 5.6268 );\nvec4 LogLuvToLinear( in vec4 value ) {\n  float Le = value.z * 255.0 + value.w;\n  vec3 Xp_Y_XYZp;\n  Xp_Y_XYZp.y = exp2((Le - 127.0) / 2.0);\n  Xp_Y_XYZp.z = Xp_Y_XYZp.y / value.y;\n  Xp_Y_XYZp.x = value.x * Xp_Y_XYZp.z;\n  vec3 vRGB = Xp_Y_XYZp.rgb * cLogLuvInverseM;\n  return vec4( max(vRGB, 0.0), 1.0 );\n}\n";
 
 // File:src/renderers/shaders/ShaderChunk/envmap_fragment.glsl
 
@@ -23905,6 +23905,102 @@ THREE.UniformsLib = {
 
 };
 
+// File:src/renderers/shaders/ShaderLib/cube_frag.glsl
+
+THREE.ShaderChunk[ 'cube_frag' ] = "uniform samplerCube tCube;\nuniform float tFlip;\nvarying vec3 vWorldPosition;\n#include <common>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n  gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );\n  #include <logdepthbuf_fragment>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/cube_vert.glsl
+
+THREE.ShaderChunk[ 'cube_vert' ] = "varying vec3 vWorldPosition;\n#include <common>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n  vWorldPosition = transformDirection( position, modelMatrix );\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n  #include <logdepthbuf_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/depth_frag.glsl
+
+THREE.ShaderChunk[ 'depth_frag' ] = "uniform float mNear;\nuniform float mFar;\nuniform float opacity;\n#include <common>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n  #include <logdepthbuf_fragment>\n  #ifdef USE_LOGDEPTHBUF_EXT\n    float depth = gl_FragDepthEXT / gl_FragCoord.w;\n  #else\n    float depth = gl_FragCoord.z / gl_FragCoord.w;\n  #endif\n  float color = 1.0 - smoothstep( mNear, mFar, depth );\n  gl_FragColor = vec4( vec3( color ), opacity );\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/depth_vert.glsl
+
+THREE.ShaderChunk[ 'depth_vert' ] = "#include <common>\n#include <morphtarget_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n  #include <begin_vertex>\n  #include <morphtarget_vertex>\n  #include <project_vertex>\n  #include <logdepthbuf_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/depthRGBA_frag.glsl
+
+THREE.ShaderChunk[ 'depthRGBA_frag' ] = "#include <common>\n#include <logdepthbuf_pars_fragment>\nvec4 pack_depth( const in float depth ) {\n  const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );\n  const vec4 bit_mask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );\n  vec4 res = mod( depth * bit_shift * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );\n  res -= res.xxyz * bit_mask;\n  return res;\n}\nvoid main() {\n  #include <logdepthbuf_fragment>\n  #ifdef USE_LOGDEPTHBUF_EXT\n    gl_FragData[ 0 ] = pack_depth( gl_FragDepthEXT );\n  #else\n    gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );\n  #endif\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/depthRGBA_vert.glsl
+
+THREE.ShaderChunk[ 'depthRGBA_vert' ] = "#include <common>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n  #include <skinbase_vertex>\n  #include <begin_vertex>\n  #include <morphtarget_vertex>\n  #include <skinning_vertex>\n  #include <project_vertex>\n  #include <logdepthbuf_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/distanceRGBA_frag.glsl
+
+THREE.ShaderChunk[ 'distanceRGBA_frag' ] = "uniform vec3 lightPos;\nvarying vec4 vWorldPosition;\n#include <common>\nvec4 pack1K ( float depth ) {\n  depth /= 1000.0;\n  const vec4 bitSh = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );\n  const vec4 bitMsk = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );\n  vec4 res = mod( depth * bitSh * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );\n  res -= res.xxyz * bitMsk;\n  return res;\n}\nfloat unpack1K ( vec4 color ) {\n  const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );\n  return dot( color, bitSh ) * 1000.0;\n}\nvoid main () {\n  gl_FragColor = pack1K( length( vWorldPosition.xyz - lightPos.xyz ) );\n";
+
+// File:src/renderers/shaders/ShaderLib/distanceRGBA_vert.glsl
+
+THREE.ShaderChunk[ 'distanceRGBA_vert' ] = "varying vec4 vWorldPosition;\n#include <common>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\nvoid main() {\n  #include <skinbase_vertex>\n  #include <begin_vertex>\n  #include <morphtarget_vertex>\n  #include <skinning_vertex>\n  #include <project_vertex>\n  #include <worldpos_vertex>\n  vWorldPosition = worldPosition;\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/equirect_frag.glsl
+
+THREE.ShaderChunk[ 'equirect_frag' ] = "uniform sampler2D tEquirect;\nuniform float tFlip;\nvarying vec3 vWorldPosition;\n#include <common>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n  vec3 direction = normalize( vWorldPosition );\n  vec2 sampleUV;\n  sampleUV.y = saturate( tFlip * direction.y * -0.5 + 0.5 );\n  sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;\n  gl_FragColor = texture2D( tEquirect, sampleUV );\n  #include <logdepthbuf_fragment>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/equirect_vert.glsl
+
+THREE.ShaderChunk[ 'equirect_vert' ] = "varying vec3 vWorldPosition;\n#include <common>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n  vWorldPosition = transformDirection( position, modelMatrix );\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n  #include <logdepthbuf_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/linedashed_frag.glsl
+
+THREE.ShaderChunk[ 'linedashed_frag' ] = "uniform vec3 diffuse;\nuniform float opacity;\nuniform float dashSize;\nuniform float totalSize;\nvarying float vLineDistance;\n#include <common>\n#include <color_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n  if ( mod( vLineDistance, totalSize ) > dashSize ) {\n    discard;\n  }\n  vec3 outgoingLight = vec3( 0.0 );\n  vec4 diffuseColor = vec4( diffuse, opacity );\n  #include <logdepthbuf_fragment>\n  #include <color_fragment>\n  outgoingLight = diffuseColor.rgb;\n  #include <fog_fragment>\n  gl_FragColor = vec4( outgoingLight, diffuseColor.a );\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/linedashed_vert.glsl
+
+THREE.ShaderChunk[ 'linedashed_vert' ] = "uniform float scale;\nattribute float lineDistance;\nvarying float vLineDistance;\n#include <common>\n#include <color_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n  #include <color_vertex>\n  vLineDistance = scale * lineDistance;\n  vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );\n  gl_Position = projectionMatrix * mvPosition;\n  #include <logdepthbuf_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshbasic_frag.glsl
+
+THREE.ShaderChunk[ 'meshbasic_frag' ] = "uniform vec3 diffuse;\nuniform float opacity;\n#ifndef FLAT_SHADED\n  varying vec3 vNormal;\n#endif\n#include <common>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n  vec4 diffuseColor = vec4( diffuse, opacity );\n  #include <logdepthbuf_fragment>\n  #include <map_fragment>\n  #include <color_fragment>\n  #include <alphamap_fragment>\n  #include <alphatest_fragment>\n  #include <specularmap_fragment>\n  ReflectedLight reflectedLight;\n  reflectedLight.directDiffuse = vec3( 0.0 );\n  reflectedLight.directSpecular = vec3( 0.0 );\n  reflectedLight.indirectDiffuse = diffuseColor.rgb;\n  reflectedLight.indirectSpecular = vec3( 0.0 );\n  #include <aomap_fragment>\n  vec3 outgoingLight = reflectedLight.indirectDiffuse;\n  #include <envmap_fragment>\n  #include <linear_to_gamma_fragment>\n  #include <fog_fragment>\n  gl_FragColor = vec4( outgoingLight, diffuseColor.a );\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshbasic_vert.glsl
+
+THREE.ShaderChunk[ 'meshbasic_vert' ] = "#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n  #include <uv_vertex>\n  #include <uv2_vertex>\n  #include <color_vertex>\n  #include <skinbase_vertex>\n  #ifdef USE_ENVMAP\n  #include <beginnormal_vertex>\n  #include <morphnormal_vertex>\n  #include <skinnormal_vertex>\n  #include <defaultnormal_vertex>\n  #endif\n  #include <begin_vertex>\n  #include <morphtarget_vertex>\n  #include <skinning_vertex>\n  #include <project_vertex>\n  #include <logdepthbuf_vertex>\n  #include <worldpos_vertex>\n  #include <envmap_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshlambert_frag.glsl
+
+THREE.ShaderChunk[ 'meshlambert_frag' ] = "uniform vec3 diffuse;\nuniform vec3 emissive;\nuniform float opacity;\nvarying vec3 vLightFront;\n#ifdef DOUBLE_SIDED\n  varying vec3 vLightBack;\n#endif\n#include <common>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <bsdfs>\n#include <ambient_pars>\n#include <lights_pars>\n#include <fog_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n  vec4 diffuseColor = vec4( diffuse, opacity );\n  ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n  vec3 totalEmissiveLight = emissive;\n  #include <logdepthbuf_fragment>\n  #include <map_fragment>\n  #include <color_fragment>\n  #include <alphamap_fragment>\n  #include <alphatest_fragment>\n  #include <specularmap_fragment>\n  #include <emissivemap_fragment>\n  reflectedLight.indirectDiffuse = getAmbientLightIrradiance( ambientLightColor );\n  #include <lightmap_fragment>\n  reflectedLight.indirectDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb );\n  #ifdef DOUBLE_SIDED\n    reflectedLight.directDiffuse = ( gl_FrontFacing ) ? vLightFront : vLightBack;\n  #else\n    reflectedLight.directDiffuse = vLightFront;\n  #endif\n  reflectedLight.directDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb ) * getShadowMask();\n  #include <aomap_fragment>\n  vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveLight;\n  #include <envmap_fragment>\n  #include <linear_to_gamma_fragment>\n  #include <fog_fragment>\n  gl_FragColor = vec4( outgoingLight, diffuseColor.a );\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshlambert_vert.glsl
+
+THREE.ShaderChunk[ 'meshlambert_vert' ] = "#define LAMBERT\nvarying vec3 vLightFront;\n#ifdef DOUBLE_SIDED\n  varying vec3 vLightBack;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <envmap_pars_vertex>\n#include <bsdfs>\n#include <lights_pars>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n  #include <uv_vertex>\n  #include <uv2_vertex>\n  #include <color_vertex>\n  #include <beginnormal_vertex>\n  #include <morphnormal_vertex>\n  #include <skinbase_vertex>\n  #include <skinnormal_vertex>\n  #include <defaultnormal_vertex>\n  #include <begin_vertex>\n  #include <morphtarget_vertex>\n  #include <skinning_vertex>\n  #include <project_vertex>\n  #include <logdepthbuf_vertex>\n  #include <worldpos_vertex>\n  #include <envmap_vertex>\n  #include <lights_lambert_vertex>\n  #include <shadowmap_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshphong_frag.glsl
+
+THREE.ShaderChunk[ 'meshphong_frag' ] = "#define PHONG\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform vec3 specular;\nuniform float shininess;\nuniform float opacity;\n#include <common>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <ambient_pars>\n#include <lights_pars>\n#include <lights_phong_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n  vec4 diffuseColor = vec4( diffuse, opacity );\n  ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n  vec3 totalEmissiveLight = emissive;\n  #include <logdepthbuf_fragment>\n  #include <map_fragment>\n  #include <color_fragment>\n  #include <alphamap_fragment>\n  #include <alphatest_fragment>\n  #include <specularmap_fragment>\n  #include <normal_fragment>\n  #include <emissivemap_fragment>\n  #include <lights_phong_fragment>\n  #include <lights_template>\n  #include <aomap_fragment>\n  vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;\n  #include <envmap_fragment>\n  #include <linear_to_gamma_fragment>\n  #include <fog_fragment>\n  gl_FragColor = vec4( outgoingLight, diffuseColor.a );\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshphong_vert.glsl
+
+THREE.ShaderChunk[ 'meshphong_vert' ] = "#define PHONG\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n  varying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <lights_phong_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n  #include <uv_vertex>\n  #include <uv2_vertex>\n  #include <color_vertex>\n  #include <beginnormal_vertex>\n  #include <morphnormal_vertex>\n  #include <skinbase_vertex>\n  #include <skinnormal_vertex>\n  #include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n  vNormal = normalize( transformedNormal );\n#endif\n  #include <begin_vertex>\n  #include <displacementmap_vertex>\n  #include <morphtarget_vertex>\n  #include <skinning_vertex>\n  #include <project_vertex>\n  #include <logdepthbuf_vertex>\n  vViewPosition = - mvPosition.xyz;\n  #include <worldpos_vertex>\n  #include <envmap_vertex>\n  #include <lights_phong_vertex>\n  #include <shadowmap_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshstandard_frag.glsl
+
+THREE.ShaderChunk[ 'meshstandard_frag' ] = "#define STANDARD\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform float roughness;\nuniform float metalness;\nuniform float opacity;\nuniform float envMapIntensity;\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\n#include <common>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <ambient_pars>\n#include <lights_pars>\n#include <lights_standard_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <roughnessmap_pars_fragment>\n#include <metalnessmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n	vec4 diffuseColor = vec4( diffuse, opacity );\n	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n	vec3 totalEmissiveLight = emissive;\n	#include <logdepthbuf_fragment>\n	#include <map_fragment>\n	#include <color_fragment>\n	#include <alphamap_fragment>\n	#include <alphatest_fragment>\n	#include <specularmap_fragment>\n	#include <roughnessmap_fragment>\n	#include <metalnessmap_fragment>\n	#include <normal_fragment>\n	#include <emissivemap_fragment>\n	#include <lights_standard_fragment>\n	#include <lights_template>\n	#include <aomap_fragment>\n	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;\n	#include <linear_to_gamma_fragment>\n	#include <fog_fragment>\n	gl_FragColor = vec4( outgoingLight, diffuseColor.a );\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshstandard_vert.glsl
+
+THREE.ShaderChunk[ 'meshstandard_vert' ] = "#define STANDARD\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <uv_vertex>\n	#include <uv2_vertex>\n	#include <color_vertex>\n	#include <beginnormal_vertex>\n	#include <morphnormal_vertex>\n	#include <skinbase_vertex>\n	#include <skinnormal_vertex>\n	#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n	vNormal = normalize( transformedNormal );\n#endif\n	#include <begin_vertex>\n	#include <displacementmap_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	vViewPosition = - mvPosition.xyz;\n	#include <worldpos_vertex>\n	#include <envmap_vertex>\n	#include <shadowmap_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/normal_frag.glsl
+
+THREE.ShaderChunk[ 'normal_frag' ] = "uniform float opacity;\nvarying vec3 vNormal;\n#include <common>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n  gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, opacity );\n  #include <logdepthbuf_fragment>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/normal_vert.glsl
+
+THREE.ShaderChunk[ 'normal_vert' ] = "varying vec3 vNormal;\n#include <common>\n#include <morphtarget_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n  vNormal = normalize( normalMatrix * normal );\n  #include <begin_vertex>\n  #include <morphtarget_vertex>\n  #include <project_vertex>\n  #include <logdepthbuf_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/points_frag.glsl
+
+THREE.ShaderChunk[ 'points_frag' ] = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <color_pars_fragment>\n#include <map_particle_pars_fragment>\n#include <fog_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n  vec3 outgoingLight = vec3( 0.0 );\n  vec4 diffuseColor = vec4( diffuse, opacity );\n  #include <logdepthbuf_fragment>\n  #include <map_particle_fragment>\n  #include <color_fragment>\n  #include <alphatest_fragment>\n  outgoingLight = diffuseColor.rgb;\n  #include <fog_fragment>\n  gl_FragColor = vec4( outgoingLight, diffuseColor.a );\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/points_vert.glsl
+
+THREE.ShaderChunk[ 'points_vert' ] = "uniform float size;\nuniform float scale;\n#include <common>\n#include <color_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n  #include <color_vertex>\n  #include <begin_vertex>\n  #include <project_vertex>\n  #ifdef USE_SIZEATTENUATION\n    gl_PointSize = size * ( scale / - mvPosition.z );\n  #else\n    gl_PointSize = size;\n  #endif\n  #include <logdepthbuf_vertex>\n  #include <worldpos_vertex>\n  #include <shadowmap_vertex>\n}\n";
+
 // File:src/renderers/shaders/ShaderLib.js
 
 /**
@@ -23928,100 +24024,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			'#include <common>',
-			'#include <uv_pars_vertex>',
-			'#include <uv2_pars_vertex>',
-			'#include <envmap_pars_vertex>',
-			'#include <color_pars_vertex>',
-			'#include <morphtarget_pars_vertex>',
-			'#include <skinning_pars_vertex>',
-			'#include <logdepthbuf_pars_vertex>',
-
-			"void main() {",
-
-				'#include <uv_vertex>',
-				'#include <uv2_vertex>',
-				'#include <color_vertex>',
-				'#include <skinbase_vertex>',
-
-			"	#ifdef USE_ENVMAP",
-
-				'#include <beginnormal_vertex>',
-				'#include <morphnormal_vertex>',
-				'#include <skinnormal_vertex>',
-				'#include <defaultnormal_vertex>',
-
-			"	#endif",
-
-				'#include <begin_vertex>',
-				'#include <morphtarget_vertex>',
-				'#include <skinning_vertex>',
-				'#include <project_vertex>',
-				'#include <logdepthbuf_vertex>',
-
-				'#include <worldpos_vertex>',
-				'#include <envmap_vertex>',
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform vec3 diffuse;",
-			"uniform float opacity;",
-
-			"#ifndef FLAT_SHADED",
-
-			"	varying vec3 vNormal;",
-
-			"#endif",
-
-			'#include <common>',
-			'#include <encodings>',
-			'#include <color_pars_fragment>',
-			'#include <uv_pars_fragment>',
-			'#include <uv2_pars_fragment>',
-			'#include <map_pars_fragment>',
-			'#include <alphamap_pars_fragment>',
-			'#include <aomap_pars_fragment>',
-			'#include <envmap_pars_fragment>',
-			'#include <fog_pars_fragment>',
-			'#include <specularmap_pars_fragment>',
-			'#include <logdepthbuf_pars_fragment>',
-
-			"void main() {",
-
-			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-
-				'#include <logdepthbuf_fragment>',
-				'#include <map_fragment>',
-				'#include <color_fragment>',
-				'#include <alphamap_fragment>',
-				'#include <alphatest_fragment>',
-				'#include <specularmap_fragment>',
-
-			"	ReflectedLight reflectedLight;",
-			"	reflectedLight.directDiffuse = vec3( 0.0 );",
-			"	reflectedLight.directSpecular = vec3( 0.0 );",
-			"	reflectedLight.indirectDiffuse = diffuseColor.rgb;",
-			"	reflectedLight.indirectSpecular = vec3( 0.0 );",
-
-				'#include <aomap_fragment>',
-
-			"	vec3 outgoingLight = reflectedLight.indirectDiffuse;",
-
-				'#include <envmap_fragment>',
-				'#include <linear_to_gamma_fragment>',
-				'#include <fog_fragment>',
-
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['meshbasic_vert'],
+		fragmentShader: THREE.ShaderChunk['meshbasic_frag']
 
 	},
 
@@ -24043,140 +24047,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			"#define LAMBERT",
-
-			"varying vec3 vLightFront;",
-
-			"#ifdef DOUBLE_SIDED",
-
-			"	varying vec3 vLightBack;",
-
-			"#endif",
-
-			'#include <common>',
-			'#include <uv_pars_vertex>',
-			'#include <uv2_pars_vertex>',
-			'#include <envmap_pars_vertex>',
-			'#include <bsdfs>',
-			'#include <lights_pars>',
-			'#include <color_pars_vertex>',
-			'#include <morphtarget_pars_vertex>',
-			'#include <skinning_pars_vertex>',
-			'#include <shadowmap_pars_vertex>',
-			'#include <logdepthbuf_pars_vertex>',
-
-			"void main() {",
-
-				'#include <uv_vertex>',
-				'#include <uv2_vertex>',
-				'#include <color_vertex>',
-
-				'#include <beginnormal_vertex>',
-				'#include <morphnormal_vertex>',
-				'#include <skinbase_vertex>',
-				'#include <skinnormal_vertex>',
-				'#include <defaultnormal_vertex>',
-
-				'#include <begin_vertex>',
-				'#include <morphtarget_vertex>',
-				'#include <skinning_vertex>',
-				'#include <project_vertex>',
-				'#include <logdepthbuf_vertex>',
-
-				'#include <worldpos_vertex>',
-				'#include <envmap_vertex>',
-				'#include <lights_lambert_vertex>',
-				'#include <shadowmap_vertex>',
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform vec3 diffuse;",
-			"uniform vec3 emissive;",
-			"uniform float opacity;",
-
-			"varying vec3 vLightFront;",
-
-			"#ifdef DOUBLE_SIDED",
-
-			"	varying vec3 vLightBack;",
-
-			"#endif",
-
-			'#include <common>',
-			'#include <encodings>',
-			'#include <color_pars_fragment>',
-			'#include <uv_pars_fragment>',
-			'#include <uv2_pars_fragment>',
-			'#include <map_pars_fragment>',
-			'#include <alphamap_pars_fragment>',
-			'#include <aomap_pars_fragment>',
-			'#include <lightmap_pars_fragment>',
-			'#include <emissivemap_pars_fragment>',
-			'#include <envmap_pars_fragment>',
-			'#include <bsdfs>',
-			'#include <ambient_pars>',
-			'#include <lights_pars>',
-			'#include <fog_pars_fragment>',
-			'#include <shadowmap_pars_fragment>',
-			'#include <shadowmask_pars_fragment>',
-			'#include <specularmap_pars_fragment>',
-			'#include <logdepthbuf_pars_fragment>',
-
-			"void main() {",
-
-			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
-			"	vec3 totalEmissiveLight = emissive;",
-
-				'#include <logdepthbuf_fragment>',
-				'#include <map_fragment>',
-				'#include <color_fragment>',
-				'#include <alphamap_fragment>',
-				'#include <alphatest_fragment>',
-				'#include <specularmap_fragment>',
-				'#include <emissivemap_fragment>',
-
-				// accumulation
-			"	reflectedLight.indirectDiffuse = getAmbientLightIrradiance( ambientLightColor );",
-
-				'#include <lightmap_fragment>',
-
-			"	reflectedLight.indirectDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb );",
-
-			"	#ifdef DOUBLE_SIDED",
-
-			"		reflectedLight.directDiffuse = ( gl_FrontFacing ) ? vLightFront : vLightBack;",
-
-			"	#else",
-
-			"		reflectedLight.directDiffuse = vLightFront;",
-
-			"	#endif",
-
-			"	reflectedLight.directDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb ) * getShadowMask();",
-
-				// modulation
-				'#include <aomap_fragment>',
-
-			"	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveLight;",
-
-				'#include <envmap_fragment>',
-
-				'#include <linear_to_gamma_fragment>',
-
-				'#include <fog_fragment>',
-
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['meshlambert_vert'],
+		fragmentShader: THREE.ShaderChunk['meshlambert_frag']
 
 	},
 
@@ -24203,132 +24075,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			"#define PHONG",
-
-			"varying vec3 vViewPosition;",
-
-			"#ifndef FLAT_SHADED",
-
-			"	varying vec3 vNormal;",
-
-			"#endif",
-
-			'#include <common>',
-			'#include <uv_pars_vertex>',
-			'#include <uv2_pars_vertex>',
-			'#include <displacementmap_pars_vertex>',
-			'#include <envmap_pars_vertex>',
-			'#include <lights_phong_pars_vertex>',
-			'#include <color_pars_vertex>',
-			'#include <morphtarget_pars_vertex>',
-			'#include <skinning_pars_vertex>',
-			'#include <shadowmap_pars_vertex>',
-			'#include <logdepthbuf_pars_vertex>',
-
-			"void main() {",
-
-				'#include <uv_vertex>',
-				'#include <uv2_vertex>',
-				'#include <color_vertex>',
-
-				'#include <beginnormal_vertex>',
-				'#include <morphnormal_vertex>',
-				'#include <skinbase_vertex>',
-				'#include <skinnormal_vertex>',
-				'#include <defaultnormal_vertex>',
-
-			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
-
-			"	vNormal = normalize( transformedNormal );",
-
-			"#endif",
-
-				'#include <begin_vertex>',
-				'#include <displacementmap_vertex>',
-				'#include <morphtarget_vertex>',
-				'#include <skinning_vertex>',
-				'#include <project_vertex>',
-				'#include <logdepthbuf_vertex>',
-
-			"	vViewPosition = - mvPosition.xyz;",
-
-				'#include <worldpos_vertex>',
-				'#include <envmap_vertex>',
-				'#include <lights_phong_vertex>',
-				'#include <shadowmap_vertex>',
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"#define PHONG",
-
-			"uniform vec3 diffuse;",
-			"uniform vec3 emissive;",
-			"uniform vec3 specular;",
-			"uniform float shininess;",
-			"uniform float opacity;",
-
-			'#include <common>',
-			'#include <encodings>',
-			'#include <color_pars_fragment>',
-			'#include <uv_pars_fragment>',
-			'#include <uv2_pars_fragment>',
-			'#include <map_pars_fragment>',
-			'#include <alphamap_pars_fragment>',
-			'#include <aomap_pars_fragment>',
-			'#include <lightmap_pars_fragment>',
-			'#include <emissivemap_pars_fragment>',
-			'#include <envmap_pars_fragment>',
-			'#include <fog_pars_fragment>',
-			'#include <bsdfs>',
-			'#include <ambient_pars>',
-			'#include <lights_pars>',
-			'#include <lights_phong_pars_fragment>',
-			'#include <shadowmap_pars_fragment>',
-			'#include <bumpmap_pars_fragment>',
-			'#include <normalmap_pars_fragment>',
-			'#include <specularmap_pars_fragment>',
-			'#include <logdepthbuf_pars_fragment>',
-
-			"void main() {",
-
-			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
-			"	vec3 totalEmissiveLight = emissive;",
-
-				'#include <logdepthbuf_fragment>',
-				'#include <map_fragment>',
-				'#include <color_fragment>',
-				'#include <alphamap_fragment>',
-				'#include <alphatest_fragment>',
-				'#include <specularmap_fragment>',
-				'#include <normal_fragment>',
-				'#include <emissivemap_fragment>',
-
-				// accumulation
-				'#include <lights_phong_fragment>',
-				'#include <lights_template>',
-
-				// modulation
-				'#include <aomap_fragment>',
-
-				"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
-
-				'#include <envmap_fragment>',
-				'#include <linear_to_gamma_fragment>',
-
-				'#include <fog_fragment>',
-
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['meshphong_vert'],
+		fragmentShader: THREE.ShaderChunk['meshphong_frag']
 
 	},
 
@@ -24358,143 +24106,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			"#define STANDARD",
-
-			"varying vec3 vViewPosition;",
-
-			"#ifndef FLAT_SHADED",
-
-			"	varying vec3 vNormal;",
-
-			"#endif",
-
-			'#include <common>',
-			'#include <uv_pars_vertex>',
-			'#include <uv2_pars_vertex>',
-			'#include <displacementmap_pars_vertex>',
-			'#include <envmap_pars_vertex>',
-			'#include <color_pars_vertex>',
-			'#include <morphtarget_pars_vertex>',
-			'#include <skinning_pars_vertex>',
-			'#include <shadowmap_pars_vertex>',
-			'#include <specularmap_pars_fragment>',
-			'#include <logdepthbuf_pars_vertex>',
-
-			"void main() {", // STANDARD
-
-				'#include <uv_vertex>',
-				'#include <uv2_vertex>',
-				'#include <color_vertex>',
-
-				'#include <beginnormal_vertex>',
-				'#include <morphnormal_vertex>',
-				'#include <skinbase_vertex>',
-				'#include <skinnormal_vertex>',
-				'#include <defaultnormal_vertex>',
-
-			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
-
-			"	vNormal = normalize( transformedNormal );",
-
-			"#endif",
-
-				'#include <begin_vertex>',
-				'#include <displacementmap_vertex>',
-				'#include <morphtarget_vertex>',
-				'#include <skinning_vertex>',
-				'#include <project_vertex>',
-				'#include <logdepthbuf_vertex>',
-
-			"	vViewPosition = - mvPosition.xyz;",
-
-				'#include <worldpos_vertex>',
-				'#include <envmap_vertex>',
-				'#include <shadowmap_vertex>',
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"#define STANDARD",
-
-			"uniform vec3 diffuse;",
-			"uniform vec3 emissive;",
-			"uniform float roughness;",
-			"uniform float metalness;",
-			"uniform float opacity;",
-
-			"uniform float envMapIntensity;", // temporary
-
-			"varying vec3 vViewPosition;",
-
-			"#ifndef FLAT_SHADED",
-
-			"	varying vec3 vNormal;",
-
-			"#endif",
-
-			'#include <common>',
-			'#include <encodings>',
-			'#include <color_pars_fragment>',
-			'#include <uv_pars_fragment>',
-			'#include <uv2_pars_fragment>',
-			'#include <map_pars_fragment>',
-			'#include <alphamap_pars_fragment>',
-			'#include <aomap_pars_fragment>',
-			'#include <lightmap_pars_fragment>',
-			'#include <emissivemap_pars_fragment>',
-			'#include <envmap_pars_fragment>',
-			'#include <fog_pars_fragment>',
-			'#include <bsdfs>',
-			'#include <ambient_pars>',
-			'#include <lights_pars>',
-			'#include <lights_standard_pars_fragment>',
-			'#include <shadowmap_pars_fragment>',
-			'#include <bumpmap_pars_fragment>',
-			'#include <normalmap_pars_fragment>',
-			'#include <roughnessmap_pars_fragment>',
-			'#include <metalnessmap_pars_fragment>',
-			'#include <logdepthbuf_pars_fragment>',
-
-			"void main() {",
-
-			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
-			"	vec3 totalEmissiveLight = emissive;",
-
-				'#include <logdepthbuf_fragment>',
-				'#include <map_fragment>',
-				'#include <color_fragment>',
-				'#include <alphamap_fragment>',
-				'#include <alphatest_fragment>',
-				'#include <specularmap_fragment>',
-				'#include <roughnessmap_fragment>',
-				'#include <metalnessmap_fragment>',
-				'#include <normal_fragment>',
-				'#include <emissivemap_fragment>',
-
-				// accumulation
-				'#include <lights_standard_fragment>',
-				'#include <lights_template>',
-
-				// modulation
-				'#include <aomap_fragment>',
-
-				"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
-
-				'#include <linear_to_gamma_fragment>',
-
-				'#include <fog_fragment>',
-
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['meshstandard_vert'],
+		fragmentShader: THREE.ShaderChunk['meshstandard_frag']
 
 	},
 
@@ -24507,68 +24120,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			"uniform float size;",
-			"uniform float scale;",
-
-			'#include <common>',
-			'#include <color_pars_vertex>',
-			'#include <shadowmap_pars_vertex>',
-			'#include <logdepthbuf_pars_vertex>',
-
-			"void main() {",
-
-				'#include <color_vertex>',
-				'#include <begin_vertex>',
-				'#include <project_vertex>',
-
-			"	#ifdef USE_SIZEATTENUATION",
-			"		gl_PointSize = size * ( scale / - mvPosition.z );",
-			"	#else",
-			"		gl_PointSize = size;",
-			"	#endif",
-
-				'#include <logdepthbuf_vertex>',
-				'#include <worldpos_vertex>',
-				'#include <shadowmap_vertex>',
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform vec3 diffuse;",
-			"uniform float opacity;",
-
-			'#include <common>',
-			'#include <encodings>',
-			'#include <color_pars_fragment>',
-			'#include <map_particle_pars_fragment>',
-			'#include <fog_pars_fragment>',
-			'#include <shadowmap_pars_fragment>',
-			'#include <logdepthbuf_pars_fragment>',
-
-			"void main() {",
-
-			"	vec3 outgoingLight = vec3( 0.0 );",
-			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-
-				'#include <logdepthbuf_fragment>',
-				'#include <map_particle_fragment>',
-				'#include <color_fragment>',
-				'#include <alphatest_fragment>',
-
-			"	outgoingLight = diffuseColor.rgb;",
-
-				'#include <fog_fragment>',
-
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['points_vert'],
+		fragmentShader: THREE.ShaderChunk['points_frag']
 
 	},
 
@@ -24587,70 +24140,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			"uniform float scale;",
-			"attribute float lineDistance;",
-
-			"varying float vLineDistance;",
-
-			'#include <common>',
-			'#include <color_pars_vertex>',
-			'#include <logdepthbuf_pars_vertex>',
-
-			"void main() {",
-
-				'#include <color_vertex>',
-
-			"	vLineDistance = scale * lineDistance;",
-
-			"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-			"	gl_Position = projectionMatrix * mvPosition;",
-
-				'#include <logdepthbuf_vertex>',
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform vec3 diffuse;",
-			"uniform float opacity;",
-
-			"uniform float dashSize;",
-			"uniform float totalSize;",
-
-			"varying float vLineDistance;",
-
-			'#include <common>',
-			'#include <color_pars_fragment>',
-			'#include <fog_pars_fragment>',
-			'#include <logdepthbuf_pars_fragment>',
-
-			"void main() {",
-
-			"	if ( mod( vLineDistance, totalSize ) > dashSize ) {",
-
-			"		discard;",
-
-			"	}",
-
-			"	vec3 outgoingLight = vec3( 0.0 );",
-			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-
-				'#include <logdepthbuf_fragment>',
-				'#include <color_fragment>',
-
-			"	outgoingLight = diffuseColor.rgb;", // simple shader
-
-				'#include <fog_fragment>',
-
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['linedashed_vert'],
+		fragmentShader: THREE.ShaderChunk['linedashed_frag']
 
 	},
 
@@ -24664,52 +24155,8 @@ THREE.ShaderLib = {
 
 		},
 
-		vertexShader: [
-
-			'#include <common>',
-			'#include <morphtarget_pars_vertex>',
-			'#include <logdepthbuf_pars_vertex>',
-
-			"void main() {",
-
-				'#include <begin_vertex>',
-				'#include <morphtarget_vertex>',
-				'#include <project_vertex>',
-				'#include <logdepthbuf_vertex>',
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform float mNear;",
-			"uniform float mFar;",
-			"uniform float opacity;",
-
-			'#include <common>',
-			'#include <logdepthbuf_pars_fragment>',
-
-			"void main() {",
-
-				'#include <logdepthbuf_fragment>',
-
-			"	#ifdef USE_LOGDEPTHBUF_EXT",
-
-			"		float depth = gl_FragDepthEXT / gl_FragCoord.w;",
-
-			"	#else",
-
-			"		float depth = gl_FragCoord.z / gl_FragCoord.w;",
-
-			"	#endif",
-
-			"	float color = 1.0 - smoothstep( mNear, mFar, depth );",
-			"	gl_FragColor = vec4( vec3( color ), opacity );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['depth_vert'],
+		fragmentShader: THREE.ShaderChunk['depth_frag']
 
 	},
 
@@ -24721,44 +24168,8 @@ THREE.ShaderLib = {
 
 		},
 
-		vertexShader: [
-
-			"varying vec3 vNormal;",
-
-			'#include <common>',
-			'#include <morphtarget_pars_vertex>',
-			'#include <logdepthbuf_pars_vertex>',
-
-			"void main() {",
-
-			"	vNormal = normalize( normalMatrix * normal );",
-
-				'#include <begin_vertex>',
-				'#include <morphtarget_vertex>',
-				'#include <project_vertex>',
-				'#include <logdepthbuf_vertex>',
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform float opacity;",
-			"varying vec3 vNormal;",
-
-			'#include <common>',
-			'#include <logdepthbuf_pars_fragment>',
-
-			"void main() {",
-
-			"	gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, opacity );",
-
-				'#include <logdepthbuf_fragment>',
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['normal_vert'],
+		fragmentShader: THREE.ShaderChunk['normal_frag']
 
 	},
 
@@ -24773,44 +24184,8 @@ THREE.ShaderLib = {
 			"tFlip": { type: "f", value: - 1 }
 		},
 
-		vertexShader: [
-
-			"varying vec3 vWorldPosition;",
-
-			'#include <common>',
-			'#include <logdepthbuf_pars_vertex>',
-
-			"void main() {",
-
-			"	vWorldPosition = transformDirection( position, modelMatrix );",
-
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-				'#include <logdepthbuf_vertex>',
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform samplerCube tCube;",
-			"uniform float tFlip;",
-
-			"varying vec3 vWorldPosition;",
-
-			'#include <common>',
-			'#include <logdepthbuf_pars_fragment>',
-
-			"void main() {",
-
-			"	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
-
-				'#include <logdepthbuf_fragment>',
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['cube_vert'],
+		fragmentShader: THREE.ShaderChunk['cube_frag']
 
 	},
 
@@ -24825,49 +24200,8 @@ THREE.ShaderLib = {
 			"tFlip": { type: "f", value: - 1 }
 		},
 
-		vertexShader: [
-
-			"varying vec3 vWorldPosition;",
-
-			'#include <common>',
-			'#include <logdepthbuf_pars_vertex>',
-
-			"void main() {",
-
-			"	vWorldPosition = transformDirection( position, modelMatrix );",
-
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-				'#include <logdepthbuf_vertex>',
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform sampler2D tEquirect;",
-			"uniform float tFlip;",
-
-			"varying vec3 vWorldPosition;",
-
-			'#include <common>',
-			'#include <logdepthbuf_pars_fragment>',
-
-			"void main() {",
-
-				// "	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
-				"vec3 direction = normalize( vWorldPosition );",
-				"vec2 sampleUV;",
-				"sampleUV.y = saturate( tFlip * direction.y * -0.5 + 0.5 );",
-				"sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;",
-				"gl_FragColor = texture2D( tEquirect, sampleUV );",
-
-				'#include <logdepthbuf_fragment>',
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['equirect_vert'],
+		fragmentShader: THREE.ShaderChunk['equirect_frag']
 
 	},
 
@@ -24887,64 +24221,8 @@ THREE.ShaderLib = {
 
 		uniforms: {},
 
-		vertexShader: [
-
-			'#include <common>',
-			'#include <morphtarget_pars_vertex>',
-			'#include <skinning_pars_vertex>',
-			'#include <logdepthbuf_pars_vertex>',
-
-			"void main() {",
-
-				'#include <skinbase_vertex>',
-
-				'#include <begin_vertex>',
-				'#include <morphtarget_vertex>',
-				'#include <skinning_vertex>',
-				'#include <project_vertex>',
-				'#include <logdepthbuf_vertex>',
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			'#include <common>',
-			'#include <logdepthbuf_pars_fragment>',
-
-			"vec4 pack_depth( const in float depth ) {",
-
-			"	const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
-			"	const vec4 bit_mask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
-			"	vec4 res = mod( depth * bit_shift * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );",
-			"	res -= res.xxyz * bit_mask;",
-			"	return res;",
-
-			"}",
-
-			"void main() {",
-
-				'#include <logdepthbuf_fragment>',
-
-			"	#ifdef USE_LOGDEPTHBUF_EXT",
-
-			"		gl_FragData[ 0 ] = pack_depth( gl_FragDepthEXT );",
-
-			"	#else",
-
-			"		gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );",
-
-			"	#endif",
-
-				//"gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z / gl_FragCoord.w );",
-				//"float z = ( ( gl_FragCoord.z / gl_FragCoord.w ) - 3.0 ) / ( 4000.0 - 3.0 );",
-				//"gl_FragData[ 0 ] = pack_depth( z );",
-				//"gl_FragData[ 0 ] = vec4( z, z, z, 1.0 );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['depthRGBA_vert'],
+		fragmentShader: THREE.ShaderChunk['depthRGBA_frag']
 
 	},
 
@@ -24957,61 +24235,8 @@ THREE.ShaderLib = {
 
 		},
 
-		vertexShader: [
-
-			"varying vec4 vWorldPosition;",
-
-			'#include <common>',
-			'#include <morphtarget_pars_vertex>',
-			'#include <skinning_pars_vertex>',
-
-			"void main() {",
-
-				'#include <skinbase_vertex>',
-				'#include <begin_vertex>',
-				'#include <morphtarget_vertex>',
-				'#include <skinning_vertex>',
-				'#include <project_vertex>',
-				'#include <worldpos_vertex>',
-
-				"vWorldPosition = worldPosition;",
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform vec3 lightPos;",
-			"varying vec4 vWorldPosition;",
-
-			'#include <common>',
-
-			"vec4 pack1K ( float depth ) {",
-
-			"	depth /= 1000.0;",
-			"	const vec4 bitSh = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
-			"	const vec4 bitMsk = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
-			"	vec4 res = mod( depth * bitSh * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );",
-			"	res -= res.xxyz * bitMsk;",
-			"	return res; ",
-
-			"}",
-
-			"float unpack1K ( vec4 color ) {",
-
-			"	const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );",
-			"	return dot( color, bitSh ) * 1000.0;",
-
-			"}",
-
-			"void main () {",
-
-			"	gl_FragColor = pack1K( length( vWorldPosition.xyz - lightPos.xyz ) );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['distanceRGBA_vert'],
+		fragmentShader: THREE.ShaderChunk['distanceRGBA_frag']
 
 	}
 
@@ -29489,8 +28714,11 @@ THREE.WebGLProgram = ( function () {
 	var arrayRe = /^([\w\d_]+)\[0\]$/;
 
 	function getTexelDecodingFunction( functionName, encoding ) {
+
 		var code = "vec4 " + functionName + "( vec4 value ) { return ";
-		switch( encoding ) {
+
+		switch ( encoding ) {
+
 			case THREE.LinearEncoding:
 				code += "value";
 				break;
@@ -29513,10 +28741,13 @@ THREE.WebGLProgram = ( function () {
 				code += "GammaToLinear( value, float( GAMMA_FACTOR ) )";
 				break;
 			default:
-			 throw new Error( "unsupported encoding: " + encoding );
+				throw new Error( 'unsupported encoding: ' + encoding );
+
 		}
+
 		code += "; }";
 		return code;
+
 	}
 
 	function generateExtensions( extensions, parameters, rendererExtensions ) {
@@ -29679,7 +28910,15 @@ THREE.WebGLProgram = ( function () {
 
 		function replace( match, include ) {
 
-			return THREE.ShaderChunk[ include ];
+			var replace = THREE.ShaderChunk[ include ];
+
+			if ( replace === undefined ) {
+
+				throw new Error( 'Can not resolve #include <' + include + '>' );
+
+			}
+
+			return parseIncludes( replace );
 
 		}
 
@@ -29910,7 +29149,6 @@ THREE.WebGLProgram = ( function () {
 
 			].filter( filterEmptyLine ).join( '\n' );
 
-
 			prefixFragment = [
 
 				customExtensions,
@@ -29932,16 +29170,13 @@ THREE.WebGLProgram = ( function () {
 				( parameters.useFog && parameters.fogExp ) ? '#define FOG_EXP2' : '',
 
 				parameters.map ? '#define USE_MAP' : '',
-				parameters.mapEncoding ? getTexelDecodingFunction( "mapTexelToLinear", material.map.encoding ) : '',
 				parameters.envMap ? '#define USE_ENVMAP' : '',
 				parameters.envMap ? '#define ' + envMapTypeDefine : '',
 				parameters.envMap ? '#define ' + envMapModeDefine : '',
 				parameters.envMap ? '#define ' + envMapBlendingDefine : '',
 				parameters.lightMap ? '#define USE_LIGHTMAP' : '',
-				parameters.envMapEncoding ? getTexelDecodingFunction( "envMapTexelToLinear", material.envMap.encoding ) : '',
 				parameters.aoMap ? '#define USE_AOMAP' : '',
 				parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
-				parameters.emissiveMapEncoding ? getTexelDecodingFunction( "emissiveMapTexelToLinear", material.emissiveMap.encoding ) : '',
 				parameters.bumpMap ? '#define USE_BUMPMAP' : '',
 				parameters.normalMap ? '#define USE_NORMALMAP' : '',
 				parameters.specularMap ? '#define USE_SPECULARMAP' : '',
@@ -29966,6 +29201,12 @@ THREE.WebGLProgram = ( function () {
 
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
+
+				( parameters.mapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ? THREE.ShaderChunk[ 'encodings' ] : '',
+
+				parameters.mapEncoding ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',
+				parameters.envMapEncoding ? getTexelDecodingFunction( 'envMapTexelToLinear', parameters.envMapEncoding ) : '',
+				parameters.emissiveMapEncoding ? getTexelDecodingFunction( 'emissiveMapTexelToLinear', parameters.emissiveMapEncoding ) : '',
 
 				'\n'
 
@@ -30244,6 +29485,27 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 		}
 
+		var getTextureEncodingFromMap = function( map ) {
+			if( ! map ) { // no texture
+				return false;
+			}
+			var encoding;
+			if( map.encoding !== undefined ) { // standard texture
+				encoding = map.encoding;
+			}
+			else if( map.texture !== undefined ) {  // render target pretending to be a texture, get the texture inside it.
+				encoding = map.texture.encoding;
+			}
+			else {
+				throw new Error( "can not determine texture encoding from map: " + map );
+			}
+			// add backwards compatibility for WebGLRenderer.gammaInput parameter, should probably be removed at some point. 
+			if( encoding === THREE.LinearEncoding && renderer.gammaInput ) {
+				encoding = THREE.GammaEncoding;
+			}
+			return encoding;
+		}
+
 		var parameters = {
 
 			shaderID: shaderID,
@@ -30252,14 +29514,14 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			supportsVertexTextures: capabilities.vertexTextures,
 
 			map: !! material.map,
-			mapEncoding: ( !! material.map ) ? material.map.encoding : false,
+			mapEncoding: getTextureEncodingFromMap( material.map ),
 			envMap: !! material.envMap,
 			envMapMode: material.envMap && material.envMap.mapping,
-			envMapEncoding: ( !! material.envMap ) ? material.envMap.encoding : false,
+			envMapEncoding: getTextureEncodingFromMap( material.envMap ),
 			lightMap: !! material.lightMap,
 			aoMap: !! material.aoMap,
 			emissiveMap: !! material.emissiveMap,
-			emissiveMapEncoding: ( !! material.emissiveMap ) ? material.emissiveMap.encoding : false,
+			emissiveMapEncoding: getTextureEncodingFromMap( material.emissiveMap ),
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			displacementMap: !! material.displacementMap,
@@ -38030,6 +37292,135 @@ THREE.TextGeometry = function ( text, parameters ) {
 THREE.TextGeometry.prototype = Object.create( THREE.ExtrudeGeometry.prototype );
 THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
 
+// File:src/extras/geometries/TorusBufferGeometry.js
+
+/**
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
+THREE.TorusBufferGeometry = function ( radius, tube, radialSegments, tubularSegments, arc ) {
+
+	THREE.BufferGeometry.call( this );
+
+	this.type = 'TorusBufferGeometry';
+
+	this.parameters = {
+		radius: radius,
+		tube: tube,
+		radialSegments: radialSegments,
+		tubularSegments: tubularSegments,
+		arc: arc
+	};
+
+	radius = radius || 100;
+	tube = tube || 40;
+	radialSegments = Math.floor( radialSegments ) || 8;
+	tubularSegments = Math.floor( tubularSegments ) || 6;
+	arc = arc || Math.PI * 2;
+
+	// used to calculate buffer length
+	var vertexCount = ( ( radialSegments + 1 ) * ( tubularSegments + 1 ) );
+	var indexCount = radialSegments * tubularSegments * 2 * 3;
+
+	// buffers
+	var indices = new ( vertexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+	var vertices = new Float32Array( vertexCount * 3 );
+	var normals = new Float32Array( vertexCount * 3 );
+	var uvs = new Float32Array( vertexCount * 2 );
+
+	// offset variables
+	var vertexBufferOffset = 0;
+	var uvBufferOffset = 0;
+	var indexBufferOffset = 0;
+
+	// helper variables
+	var center = new THREE.Vector3();
+	var vertex = new THREE.Vector3();
+	var normal = new THREE.Vector3();
+
+	var j, i;
+
+	// generate vertices, normals and uvs
+
+	for ( j = 0; j <= radialSegments; j ++ ) {
+
+		for ( i = 0; i <= tubularSegments; i ++ ) {
+
+			var u = i / tubularSegments * arc;
+			var v = j / radialSegments * Math.PI * 2;
+
+			// vertex
+			vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
+			vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
+			vertex.z = tube * Math.sin( v );
+
+			vertices[ vertexBufferOffset ] = vertex.x;
+			vertices[ vertexBufferOffset + 1 ] = vertex.y;
+			vertices[ vertexBufferOffset + 2 ] = vertex.z;
+
+			// this vector is used to calculate the normal
+			center.x = radius * Math.cos( u );
+			center.y = radius * Math.sin( u );
+
+			// normal
+			normal.subVectors( vertex, center ).normalize();
+
+			normals[ vertexBufferOffset ] = normal.x;
+			normals[ vertexBufferOffset + 1 ] = normal.y;
+			normals[ vertexBufferOffset + 2 ] = normal.z;
+
+			// uv
+			uvs[ uvBufferOffset ] = i / tubularSegments;
+			uvs[ uvBufferOffset + 1 ] = j / radialSegments;
+
+			// update offsets
+			vertexBufferOffset += 3;
+			uvBufferOffset += 2;
+
+		}
+
+	}
+
+	// generate indices
+
+	for ( j = 1; j <= radialSegments; j ++ ) {
+
+		for ( i = 1; i <= tubularSegments; i ++ ) {
+
+			// indices
+			var a = ( tubularSegments + 1 ) * j + i - 1;
+			var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
+			var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
+			var d = ( tubularSegments + 1 ) * j + i;
+
+			// face one
+			indices[ indexBufferOffset ] = a;
+			indices[ indexBufferOffset + 1 ] = b;
+			indices[ indexBufferOffset + 2 ] = d;
+
+			// face two
+			indices[ indexBufferOffset + 3 ] = b;
+			indices[ indexBufferOffset + 4 ] = c;
+			indices[ indexBufferOffset + 5 ] = d;
+
+			// update offset
+			indexBufferOffset += 6;
+
+		}
+
+	}
+
+	// build geometry
+	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+};
+
+THREE.TorusBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.TorusBufferGeometry.prototype.constructor = THREE.TorusBufferGeometry;
+
 // File:src/extras/geometries/TorusGeometry.js
 
 /**
@@ -38052,60 +37443,7 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 		arc: arc
 	};
 
-	radius = radius || 100;
-	tube = tube || 40;
-	radialSegments = radialSegments || 8;
-	tubularSegments = tubularSegments || 6;
-	arc = arc || Math.PI * 2;
-
-	var center = new THREE.Vector3(), uvs = [], normals = [];
-
-	for ( var j = 0; j <= radialSegments; j ++ ) {
-
-		for ( var i = 0; i <= tubularSegments; i ++ ) {
-
-			var u = i / tubularSegments * arc;
-			var v = j / radialSegments * Math.PI * 2;
-
-			center.x = radius * Math.cos( u );
-			center.y = radius * Math.sin( u );
-
-			var vertex = new THREE.Vector3();
-			vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
-			vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
-			vertex.z = tube * Math.sin( v );
-
-			this.vertices.push( vertex );
-
-			uvs.push( new THREE.Vector2( i / tubularSegments, j / radialSegments ) );
-			normals.push( vertex.clone().sub( center ).normalize() );
-
-		}
-
-	}
-
-	for ( var j = 1; j <= radialSegments; j ++ ) {
-
-		for ( var i = 1; i <= tubularSegments; i ++ ) {
-
-			var a = ( tubularSegments + 1 ) * j + i - 1;
-			var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
-			var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
-			var d = ( tubularSegments + 1 ) * j + i;
-
-			var face = new THREE.Face3( a, b, d, [ normals[ a ].clone(), normals[ b ].clone(), normals[ d ].clone() ] );
-			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [ uvs[ a ].clone(), uvs[ b ].clone(), uvs[ d ].clone() ] );
-
-			face = new THREE.Face3( b, c, d, [ normals[ b ].clone(), normals[ c ].clone(), normals[ d ].clone() ] );
-			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [ uvs[ b ].clone(), uvs[ c ].clone(), uvs[ d ].clone() ] );
-
-		}
-
-	}
-
-	this.computeFaceNormals();
+	this.fromBufferGeometry( new THREE.TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
 
 };
 
