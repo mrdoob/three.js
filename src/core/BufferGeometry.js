@@ -769,9 +769,9 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		}
 
-		hasAttribute = this.hasOwnProperty( 'index' );
+		hasAttribute = this.index === null;
 
-		if ( hasAttribute === geometry.hasOwnProperty( 'index' ) ) {
+		if ( hasAttribute === ( geometry.index === null ) ) {
 
 			if ( hasAttribute ) {
 
@@ -785,7 +785,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 				}
 
-				this.index.merge( indices.constructor( indices ) );
+				this.index.merge( new indices.constructor( indices ) );
 
 			}
 
