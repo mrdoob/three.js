@@ -6,11 +6,11 @@ varying vec3 vNormal;
 
 void main() {
 
-  vNormal = normalize( normalMatrix * normal );
+	vNormal = normalize( normalMatrix * normal );
 
-  #include <begin_vertex>
-  #include <morphtarget_vertex>
-  #include <project_vertex>
-  #include <logdepthbuf_vertex>
+	#include <begin_vertex>
+	#include <morphtarget_vertex>
+	#include <project_vertex>
+	#include <logdepthbuf_vertex>
 
 }

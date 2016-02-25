@@ -6,13 +6,13 @@ varying vec4 vWorldPosition;
 
 void main() {
 
-  #include <skinbase_vertex>
-  #include <begin_vertex>
-  #include <morphtarget_vertex>
-  #include <skinning_vertex>
-  #include <project_vertex>
-  #include <worldpos_vertex>
+	#include <skinbase_vertex>
+	#include <begin_vertex>
+	#include <morphtarget_vertex>
+	#include <skinning_vertex>
+	#include <project_vertex>
+	#include <worldpos_vertex>
 
-  vWorldPosition = worldPosition;
+	vWorldPosition = worldPosition;
 
 }

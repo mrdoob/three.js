@@ -10,18 +10,18 @@ uniform float opacity;
 
 void main() {
 
-  vec3 outgoingLight = vec3( 0.0 );
-  vec4 diffuseColor = vec4( diffuse, opacity );
+	vec3 outgoingLight = vec3( 0.0 );
+	vec4 diffuseColor = vec4( diffuse, opacity );
 
-  #include <logdepthbuf_fragment>
-  #include <map_particle_fragment>
-  #include <color_fragment>
-  #include <alphatest_fragment>
+	#include <logdepthbuf_fragment>
+	#include <map_particle_fragment>
+	#include <color_fragment>
+	#include <alphatest_fragment>
 
-  outgoingLight = diffuseColor.rgb;
+	outgoingLight = diffuseColor.rgb;
 
-  #include <fog_fragment>
+	#include <fog_fragment>
 
-  gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
 }

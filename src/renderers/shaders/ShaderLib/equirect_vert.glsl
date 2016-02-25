@@ -5,10 +5,10 @@ varying vec3 vWorldPosition;
 
 void main() {
 
-  vWorldPosition = transformDirection( position, modelMatrix );
+	vWorldPosition = transformDirection( position, modelMatrix );
 
-  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-  #include <logdepthbuf_vertex>
+	#include <logdepthbuf_vertex>
 
 }

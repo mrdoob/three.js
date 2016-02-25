@@ -9,27 +9,27 @@
 
 void main() {
 
-  #include <uv_vertex>
-  #include <uv2_vertex>
-  #include <color_vertex>
-  #include <skinbase_vertex>
+	#include <uv_vertex>
+	#include <uv2_vertex>
+	#include <color_vertex>
+	#include <skinbase_vertex>
 
-  #ifdef USE_ENVMAP
+	#ifdef USE_ENVMAP
 
-  #include <beginnormal_vertex>
-  #include <morphnormal_vertex>
-  #include <skinnormal_vertex>
-  #include <defaultnormal_vertex>
+	#include <beginnormal_vertex>
+	#include <morphnormal_vertex>
+	#include <skinnormal_vertex>
+	#include <defaultnormal_vertex>
 
-  #endif
+	#endif
 
-  #include <begin_vertex>
-  #include <morphtarget_vertex>
-  #include <skinning_vertex>
-  #include <project_vertex>
-  #include <logdepthbuf_vertex>
+	#include <begin_vertex>
+	#include <morphtarget_vertex>
+	#include <skinning_vertex>
+	#include <project_vertex>
+	#include <logdepthbuf_vertex>
 
-  #include <worldpos_vertex>
-  #include <envmap_vertex>
+	#include <worldpos_vertex>
+	#include <envmap_vertex>
 
 }

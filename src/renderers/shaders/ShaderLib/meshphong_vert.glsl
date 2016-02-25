@@ -4,7 +4,7 @@ varying vec3 vViewPosition;
 
 #ifndef FLAT_SHADED
 
-  varying vec3 vNormal;
+	varying vec3 vNormal;
 
 #endif
 
@@ -22,34 +22,34 @@ varying vec3 vViewPosition;
 
 void main() {
 
-  #include <uv_vertex>
-  #include <uv2_vertex>
-  #include <color_vertex>
+	#include <uv_vertex>
+	#include <uv2_vertex>
+	#include <color_vertex>
 
-  #include <beginnormal_vertex>
-  #include <morphnormal_vertex>
-  #include <skinbase_vertex>
-  #include <skinnormal_vertex>
-  #include <defaultnormal_vertex>
+	#include <beginnormal_vertex>
+	#include <morphnormal_vertex>
+	#include <skinbase_vertex>
+	#include <skinnormal_vertex>
+	#include <defaultnormal_vertex>
 
 #ifndef FLAT_SHADED // Normal computed with derivatives when FLAT_SHADED
 
-  vNormal = normalize( transformedNormal );
+	vNormal = normalize( transformedNormal );
 
 #endif
 
-  #include <begin_vertex>
-  #include <displacementmap_vertex>
-  #include <morphtarget_vertex>
-  #include <skinning_vertex>
-  #include <project_vertex>
-  #include <logdepthbuf_vertex>
+	#include <begin_vertex>
+	#include <displacementmap_vertex>
+	#include <morphtarget_vertex>
+	#include <skinning_vertex>
+	#include <project_vertex>
+	#include <logdepthbuf_vertex>
 
-  vViewPosition = - mvPosition.xyz;
+	vViewPosition = - mvPosition.xyz;
 
-  #include <worldpos_vertex>
-  #include <envmap_vertex>
-  #include <lights_phong_vertex>
-  #include <shadowmap_vertex>
+	#include <worldpos_vertex>
+	#include <envmap_vertex>
+	#include <lights_phong_vertex>
+	#include <shadowmap_vertex>
 
 }

@@ -8,8 +8,8 @@ varying vec3 vWorldPosition;
 
 void main() {
 
-  gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );
+	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );
 
-  #include <logdepthbuf_fragment>
+	#include <logdepthbuf_fragment>
 
 }

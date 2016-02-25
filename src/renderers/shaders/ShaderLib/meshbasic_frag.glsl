@@ -3,7 +3,7 @@ uniform float opacity;
 
 #ifndef FLAT_SHADED
 
-  varying vec3 vNormal;
+	varying vec3 vNormal;
 
 #endif
 
@@ -21,29 +21,29 @@ uniform float opacity;
 
 void main() {
 
-  vec4 diffuseColor = vec4( diffuse, opacity );
+	vec4 diffuseColor = vec4( diffuse, opacity );
 
-  #include <logdepthbuf_fragment>
-  #include <map_fragment>
-  #include <color_fragment>
-  #include <alphamap_fragment>
-  #include <alphatest_fragment>
-  #include <specularmap_fragment>
+	#include <logdepthbuf_fragment>
+	#include <map_fragment>
+	#include <color_fragment>
+	#include <alphamap_fragment>
+	#include <alphatest_fragment>
+	#include <specularmap_fragment>
 
-  ReflectedLight reflectedLight;
-  reflectedLight.directDiffuse = vec3( 0.0 );
-  reflectedLight.directSpecular = vec3( 0.0 );
-  reflectedLight.indirectDiffuse = diffuseColor.rgb;
-  reflectedLight.indirectSpecular = vec3( 0.0 );
+	ReflectedLight reflectedLight;
+	reflectedLight.directDiffuse = vec3( 0.0 );
+	reflectedLight.directSpecular = vec3( 0.0 );
+	reflectedLight.indirectDiffuse = diffuseColor.rgb;
+	reflectedLight.indirectSpecular = vec3( 0.0 );
 
-  #include <aomap_fragment>
+	#include <aomap_fragment>
 
-  vec3 outgoingLight = reflectedLight.indirectDiffuse;
+	vec3 outgoingLight = reflectedLight.indirectDiffuse;
 
-  #include <envmap_fragment>
-  #include <linear_to_gamma_fragment>
-  #include <fog_fragment>
+	#include <envmap_fragment>
+	#include <linear_to_gamma_fragment>
+	#include <fog_fragment>
 
-  gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
 }

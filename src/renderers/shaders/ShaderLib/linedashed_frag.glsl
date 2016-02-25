@@ -13,22 +13,22 @@ varying float vLineDistance;
 
 void main() {
 
-  if ( mod( vLineDistance, totalSize ) > dashSize ) {
+	if ( mod( vLineDistance, totalSize ) > dashSize ) {
 
-    discard;
+		discard;
 
-  }
+	}
 
-  vec3 outgoingLight = vec3( 0.0 );
-  vec4 diffuseColor = vec4( diffuse, opacity );
+	vec3 outgoingLight = vec3( 0.0 );
+	vec4 diffuseColor = vec4( diffuse, opacity );
 
-  #include <logdepthbuf_fragment>
-  #include <color_fragment>
+	#include <logdepthbuf_fragment>
+	#include <color_fragment>
 
-  outgoingLight = diffuseColor.rgb; // simple shader
+	outgoingLight = diffuseColor.rgb; // simple shader
 
-  #include <fog_fragment>
+	#include <fog_fragment>
 
-  gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
 }

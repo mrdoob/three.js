@@ -4,9 +4,9 @@
 
 void main() {
 
-  #include <begin_vertex>
-  #include <morphtarget_vertex>
-  #include <project_vertex>
-  #include <logdepthbuf_vertex>
+	#include <begin_vertex>
+	#include <morphtarget_vertex>
+	#include <project_vertex>
+	#include <logdepthbuf_vertex>
 
 }

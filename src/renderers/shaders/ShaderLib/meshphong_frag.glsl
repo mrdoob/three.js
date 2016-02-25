@@ -29,33 +29,33 @@ uniform float opacity;
 
 void main() {
 
-  vec4 diffuseColor = vec4( diffuse, opacity );
-  ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
-  vec3 totalEmissiveLight = emissive;
+	vec4 diffuseColor = vec4( diffuse, opacity );
+	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
+	vec3 totalEmissiveLight = emissive;
 
-  #include <logdepthbuf_fragment>
-  #include <map_fragment>
-  #include <color_fragment>
-  #include <alphamap_fragment>
-  #include <alphatest_fragment>
-  #include <specularmap_fragment>
-  #include <normal_fragment>
-  #include <emissivemap_fragment>
+	#include <logdepthbuf_fragment>
+	#include <map_fragment>
+	#include <color_fragment>
+	#include <alphamap_fragment>
+	#include <alphatest_fragment>
+	#include <specularmap_fragment>
+	#include <normal_fragment>
+	#include <emissivemap_fragment>
 
-  // accumulation
-  #include <lights_phong_fragment>
-  #include <lights_template>
+	// accumulation
+	#include <lights_phong_fragment>
+	#include <lights_template>
 
-  // modulation
-  #include <aomap_fragment>
+	// modulation
+	#include <aomap_fragment>
 
-  vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;
+	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;
 
-  #include <envmap_fragment>
-  #include <linear_to_gamma_fragment>
+	#include <envmap_fragment>
+	#include <linear_to_gamma_fragment>
 
-  #include <fog_fragment>
+	#include <fog_fragment>
 
-  gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
 }

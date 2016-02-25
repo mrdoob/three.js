@@ -7,19 +7,19 @@ uniform float opacity;
 
 void main() {
 
-  #include <logdepthbuf_fragment>
+	#include <logdepthbuf_fragment>
 
-  #ifdef USE_LOGDEPTHBUF_EXT
+	#ifdef USE_LOGDEPTHBUF_EXT
 
-    float depth = gl_FragDepthEXT / gl_FragCoord.w;
+		float depth = gl_FragDepthEXT / gl_FragCoord.w;
 
-  #else
+	#else
 
-    float depth = gl_FragCoord.z / gl_FragCoord.w;
+		float depth = gl_FragCoord.z / gl_FragCoord.w;
 
-  #endif
+	#endif
 
-  float color = 1.0 - smoothstep( mNear, mFar, depth );
-  gl_FragColor = vec4( vec3( color ), opacity );
+	float color = 1.0 - smoothstep( mNear, mFar, depth );
+	gl_FragColor = vec4( vec3( color ), opacity );
 
 }

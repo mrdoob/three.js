@@ -5,12 +5,12 @@
 
 void main() {
 
-  #include <skinbase_vertex>
+	#include <skinbase_vertex>
 
-  #include <begin_vertex>
-  #include <morphtarget_vertex>
-  #include <skinning_vertex>
-  #include <project_vertex>
-  #include <logdepthbuf_vertex>
+	#include <begin_vertex>
+	#include <morphtarget_vertex>
+	#include <skinning_vertex>
+	#include <project_vertex>
+	#include <logdepthbuf_vertex>
 
 }

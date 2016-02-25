@@ -9,13 +9,13 @@ varying float vLineDistance;
 
 void main() {
 
-  #include <color_vertex>
+	#include <color_vertex>
 
-  vLineDistance = scale * lineDistance;
+	vLineDistance = scale * lineDistance;
 
-  vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-  gl_Position = projectionMatrix * mvPosition;
+	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+	gl_Position = projectionMatrix * mvPosition;
 
-  #include <logdepthbuf_vertex>
+	#include <logdepthbuf_vertex>
 
 }

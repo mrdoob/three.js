@@ -8,18 +8,18 @@ uniform float scale;
 
 void main() {
 
-  #include <color_vertex>
-  #include <begin_vertex>
-  #include <project_vertex>
+	#include <color_vertex>
+	#include <begin_vertex>
+	#include <project_vertex>
 
-  #ifdef USE_SIZEATTENUATION
-    gl_PointSize = size * ( scale / - mvPosition.z );
-  #else
-    gl_PointSize = size;
-  #endif
+	#ifdef USE_SIZEATTENUATION
+		gl_PointSize = size * ( scale / - mvPosition.z );
+	#else
+		gl_PointSize = size;
+	#endif
 
-  #include <logdepthbuf_vertex>
-  #include <worldpos_vertex>
-  #include <shadowmap_vertex>
+	#include <logdepthbuf_vertex>
+	#include <worldpos_vertex>
+	#include <shadowmap_vertex>
 
 }

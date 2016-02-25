@@ -4,7 +4,7 @@ varying vec3 vLightFront;
 
 #ifdef DOUBLE_SIDED
 
-  varying vec3 vLightBack;
+	varying vec3 vLightBack;
 
 #endif
 
@@ -22,25 +22,25 @@ varying vec3 vLightFront;
 
 void main() {
 
-  #include <uv_vertex>
-  #include <uv2_vertex>
-  #include <color_vertex>
+	#include <uv_vertex>
+	#include <uv2_vertex>
+	#include <color_vertex>
 
-  #include <beginnormal_vertex>
-  #include <morphnormal_vertex>
-  #include <skinbase_vertex>
-  #include <skinnormal_vertex>
-  #include <defaultnormal_vertex>
+	#include <beginnormal_vertex>
+	#include <morphnormal_vertex>
+	#include <skinbase_vertex>
+	#include <skinnormal_vertex>
+	#include <defaultnormal_vertex>
 
-  #include <begin_vertex>
-  #include <morphtarget_vertex>
-  #include <skinning_vertex>
-  #include <project_vertex>
-  #include <logdepthbuf_vertex>
+	#include <begin_vertex>
+	#include <morphtarget_vertex>
+	#include <skinning_vertex>
+	#include <project_vertex>
+	#include <logdepthbuf_vertex>
 
-  #include <worldpos_vertex>
-  #include <envmap_vertex>
-  #include <lights_lambert_vertex>
-  #include <shadowmap_vertex>
+	#include <worldpos_vertex>
+	#include <envmap_vertex>
+	#include <lights_lambert_vertex>
+	#include <shadowmap_vertex>
 
 }
