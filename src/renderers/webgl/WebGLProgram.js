@@ -8,8 +8,11 @@ THREE.WebGLProgram = ( function () {
 	var arrayRe = /^([\w\d_]+)\[0\]$/;
 
 	function getTexelDecodingFunction( functionName, encoding ) {
+
 		var code = "vec4 " + functionName + "( vec4 value ) { return ";
-		switch( encoding ) {
+
+		switch ( encoding ) {
+
 			case THREE.LinearEncoding:
 				code += "value";
 				break;
@@ -32,10 +35,13 @@ THREE.WebGLProgram = ( function () {
 				code += "GammaToLinear( value, float( GAMMA_FACTOR ) )";
 				break;
 			default:
-			 throw new Error( "unsupported encoding: " + encoding );
+				throw new Error( 'unsupported encoding: ' + encoding );
+
 		}
+
 		code += "; }";
 		return code;
+
 	}
 
 	function generateExtensions( extensions, parameters, rendererExtensions ) {
@@ -198,7 +204,15 @@ THREE.WebGLProgram = ( function () {
 
 		function replace( match, include ) {
 
-			return THREE.ShaderChunk[ include ];
+			var replace = THREE.ShaderChunk[ include ];
+
+			if ( replace === undefined ) {
+
+				throw new Error( 'Can not resolve #include <' + include + '>' );
+
+			}
+
+			return parseIncludes( replace );
 
 		}
 
@@ -482,11 +496,11 @@ THREE.WebGLProgram = ( function () {
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
 
-				( parameters.mapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ? THREE.ShaderChunk['encodings'] : "",
+				( parameters.mapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ? THREE.ShaderChunk[ 'encodings' ] : '',
 
-				parameters.mapEncoding ? getTexelDecodingFunction( "mapTexelToLinear", parameters.mapEncoding ) : '',
-				parameters.envMapEncoding ? getTexelDecodingFunction( "envMapTexelToLinear", parameters.envMapEncoding ) : '',
-				parameters.emissiveMapEncoding ? getTexelDecodingFunction( "emissiveMapTexelToLinear", parameters.emissiveMapEncoding ) : '',
+				parameters.mapEncoding ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',
+				parameters.envMapEncoding ? getTexelDecodingFunction( 'envMapTexelToLinear', parameters.envMapEncoding ) : '',
+				parameters.emissiveMapEncoding ? getTexelDecodingFunction( 'emissiveMapTexelToLinear', parameters.emissiveMapEncoding ) : '',
 
 				'\n'
 
