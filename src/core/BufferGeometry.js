@@ -817,7 +817,7 @@ THREE.BufferGeometry.prototype = {
 
 			} else {
 
-				console.error( 'THREE.BufferGeometry.merge(): attribute ' + key + ' mismatch' );
+				console.error( 'THREE.BufferGeometry.merge(): attribute ' + attribute + ' mismatch' );
 
 			}
 
