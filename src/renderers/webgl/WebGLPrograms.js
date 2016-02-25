@@ -88,6 +88,27 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 		}
 
+		var getTextureEncodingFromMap = function( map ) {
+			if( ! map ) { // no texture
+				return false;
+			}
+			var encoding;
+			if( map.encoding !== undefined ) { // standard texture
+				encoding = map.encoding;
+			}
+			else if( map.texture !== undefined ) {  // render target pretending to be a texture, get the texture inside it.
+				encoding = map.texture.encoding;
+			}
+			else {
+				throw new Error( "can not determine texture encoding from map: " + map );
+			}
+			// add backwards compatibility for WebGLRenderer.gammaInput parameter, should probably be removed at some point. 
+			if( encoding === THREE.LinearEncoding && renderer.gammaInput ) {
+				encoding = THREE.GammaEncoding;
+			}
+			return encoding;
+		}
+
 		var parameters = {
 
 			shaderID: shaderID,
@@ -96,14 +117,14 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			supportsVertexTextures: capabilities.vertexTextures,
 
 			map: !! material.map,
-			mapEncoding: ( !! material.map ) ? material.map.encoding : false,
+			mapEncoding: getTextureEncodingFromMap( material.map ),
 			envMap: !! material.envMap,
 			envMapMode: material.envMap && material.envMap.mapping,
-			envMapEncoding: ( !! material.envMap ) ? material.envMap.encoding : false,
+			envMapEncoding: getTextureEncodingFromMap( material.envMap ),
 			lightMap: !! material.lightMap,
 			aoMap: !! material.aoMap,
 			emissiveMap: !! material.emissiveMap,
-			emissiveMapEncoding: ( !! material.emissiveMap ) ? material.emissiveMap.encoding : false,
+			emissiveMapEncoding: getTextureEncodingFromMap( material.emissiveMap ),
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			displacementMap: !! material.displacementMap,

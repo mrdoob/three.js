@@ -429,7 +429,6 @@ THREE.WebGLProgram = ( function () {
 
 			].filter( filterEmptyLine ).join( '\n' );
 
-
 			prefixFragment = [
 
 				customExtensions,
@@ -451,16 +450,13 @@ THREE.WebGLProgram = ( function () {
 				( parameters.useFog && parameters.fogExp ) ? '#define FOG_EXP2' : '',
 
 				parameters.map ? '#define USE_MAP' : '',
-				parameters.mapEncoding ? getTexelDecodingFunction( "mapTexelToLinear", material.map.encoding ) : '',
 				parameters.envMap ? '#define USE_ENVMAP' : '',
 				parameters.envMap ? '#define ' + envMapTypeDefine : '',
 				parameters.envMap ? '#define ' + envMapModeDefine : '',
 				parameters.envMap ? '#define ' + envMapBlendingDefine : '',
 				parameters.lightMap ? '#define USE_LIGHTMAP' : '',
-				parameters.envMapEncoding ? getTexelDecodingFunction( "envMapTexelToLinear", material.envMap.encoding ) : '',
 				parameters.aoMap ? '#define USE_AOMAP' : '',
 				parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
-				parameters.emissiveMapEncoding ? getTexelDecodingFunction( "emissiveMapTexelToLinear", material.emissiveMap.encoding ) : '',
 				parameters.bumpMap ? '#define USE_BUMPMAP' : '',
 				parameters.normalMap ? '#define USE_NORMALMAP' : '',
 				parameters.specularMap ? '#define USE_SPECULARMAP' : '',
@@ -485,6 +481,12 @@ THREE.WebGLProgram = ( function () {
 
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
+
+				( parameters.mapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ? THREE.ShaderChunk['encodings'] : "",
+
+				parameters.mapEncoding ? getTexelDecodingFunction( "mapTexelToLinear", parameters.mapEncoding ) : '',
+				parameters.envMapEncoding ? getTexelDecodingFunction( "envMapTexelToLinear", parameters.envMapEncoding ) : '',
+				parameters.emissiveMapEncoding ? getTexelDecodingFunction( "emissiveMapTexelToLinear", parameters.emissiveMapEncoding ) : '',
 
 				'\n'
 
