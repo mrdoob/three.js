@@ -759,7 +759,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 	merge: function( geometry ) {
 
-		var hasAttribute, attributes = [ 'position', 'normal', 'color', 'uv' ];
+		var i, il, attribute, hasAttribute, attributes = [ 'position', 'normal', 'color', 'uv' ];
 
 		if ( geometry instanceof THREE.BufferGeometry === false ) {
 
@@ -775,9 +775,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 			if ( hasAttribute ) {
 
-				var indices = geometry.index.array;
-
-				var i, il, offset = this.attributes[ 'position' ].count;
+				var indices = geometry.index.array, offset = this.attributes[ 'position' ].count;
 
 				for ( i = 0, il = indices.length; i < il; i ++ ) {
 
@@ -785,7 +783,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 				}
 
-				this.index.merge( geometry.index );
+				this.index = this.index.merge( geometry.index );
 
 			}
 
@@ -795,15 +793,17 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		}
 
-		for ( var key in attributes ) {
+		for ( i = 0, il = attributes.length; i < il; i ++ ) {
 
-			hasAttribute = this.attributes.hasOwnProperty( key );
+			attribute = attributes[ i ];
 
-			if ( hasAttribute === geometry.attributes.hasOwnProperty( key ) ) {
+			hasAttribute = this.attributes.hasOwnProperty( attribute );
+
+			if ( hasAttribute === geometry.attributes.hasOwnProperty( attribute ) ) {
 
 				if ( hasAttribute ) {
 
-					this.attributes[ key ].merge( geometry.attributes[ key ] );
+					this.attributes[ attribute ] = this.attributes[ attribute ].merge( geometry.attributes[ attribute ] );
 
 				}
 
@@ -812,8 +812,6 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 				console.error( 'THREE.BufferGeometry.merge(): attribute ' + key + ' mismatch' );
 
 			}
-
-			attributes[ key ].merge( geometry.attributes[ key ] );
 
 		}
 
