@@ -793,7 +793,7 @@ THREE.BufferGeometry.prototype = {
 
 				}
 
-				this.index.merge( indices );
+				this.index.merge( geometry.index );
 
 			}
 
