@@ -785,7 +785,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 				}
 
-				this.index.merge( indices );
+				this.index.merge( geometry.index );
 
 			}
 
