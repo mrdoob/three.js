@@ -767,6 +767,8 @@ THREE.BufferGeometry.prototype = {
 
 	merge: function( geometry ) {
 
+		var hasAttribute, attributes = [ 'position', 'normal', 'color', 'uv' ];
+
 		if ( geometry instanceof THREE.BufferGeometry === false ) {
 
 			console.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
@@ -775,65 +777,55 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		var attributes = this.attributes;
+		hasAttribute = this.hasOwnProperty( 'index' );
 
-		if ( this.index ) {
+		if ( hasAttribute === geometry.hasOwnProperty( 'index' ) ) {
 
-			var indices = geometry.index.array;
+			if ( hasAttribute ) {
 
-			var offset = attributes[ 'position' ].count;
+				var indices = geometry.index.array;
 
-			for ( var i = 0, il = indices.length; i < il; i ++ ) {
+				var i, il, offset = attributes[ 'position' ].count;
 
-				indices[ i ] = offset + indices[ i ];
+				for ( i = 0, il = indices.length; i < il; i ++ ) {
+
+					indices[ i ] = offset + indices[ i ];
+
+				}
+
+				this.index.merge( indices.constructor( indices ) );
 
 			}
 
-			this.index.array = Uint32ArrayConcat( this.index.array, indices );
+		} else {
+
+			console.error( 'THREE.BufferGeometry: unable to merge non indexed with indexed geometries' );
 
 		}
 
 		for ( var key in attributes ) {
 
-			if ( geometry.attributes[ key ] === undefined ) continue;
+			hasAttribute = this.attributes.hasOwnProperty( key );
 
-			attributes[ key ].array = Float32ArrayConcat( attributes[ key ].array, geometry.attributes[ key ].array );
+			if ( hasAttribute === geometry.attributes.hasOwnProperty( key ) ) {
+
+				if ( hasAttribute ) {
+
+					this.attributes[ key ].merge( geometry.attributes[ key ] );
+
+				}
+
+			} else {
+
+				console.error( 'THREE.BufferGeometry.merge(): attribute ' + key + ' mismatch' );
+
+			}
+
+			attributes[ key ].merge( geometry.attributes[ key ] );
 
 		}
 
 		return this;
-
-		/**
-		 * @param {Float32Array} first
-		 * @param {Float32Array} second
-		 * @returns {Float32Array}
-		 */
-		function Float32ArrayConcat( first, second ) {
-
-			var firstLength = first.length,
-					result = new Float32Array( firstLength + second.length );
-
-			result.set( first );
-			result.set( second, firstLength );
-			return result;
-
-		}
-
-		/**
-		 * @param {Uint32Array} first
-		 * @param {Uint32Array} second
-		 * @returns {Uint32Array}
-		 */
-		function Uint32ArrayConcat( first, second ) {
-
-			var firstLength = first.length,
-					result = new Uint32Array( firstLength + second.length );
-
-			result.set( first );
-			result.set( second, firstLength );
-			return result;
-
-		}
 
 	},
 
