@@ -24,3 +24,5 @@ float unpack1K ( vec4 color ) {
 void main () {
 
   gl_FragColor = pack1K( length( vWorldPosition.xyz - lightPos.xyz ) );
+
+}
