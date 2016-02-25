@@ -22,6 +22,6 @@ void main() {
 
 	#include <fog_fragment>
 
-	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+	gl_FragColor = linearToOutputTexel( vec4( outgoingLight, diffuseColor.a ) );
 
 }
