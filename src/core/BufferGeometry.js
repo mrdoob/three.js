@@ -777,9 +777,9 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		hasAttribute = this.index === null;
+		hasAttribute = this.index !== null;
 
-		if ( hasAttribute === ( geometry.index === null ) ) {
+		if ( hasAttribute === ( geometry.index !== null ) ) {
 
 			if ( hasAttribute ) {
 
