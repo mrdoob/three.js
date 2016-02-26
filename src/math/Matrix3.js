@@ -153,6 +153,12 @@ THREE.Matrix3.prototype = {
 
 	getInverse: function ( matrix, throwOnDegenerate ) {
 
+		if ( matrix instanceof THREE.Matrix4 ) {
+
+			console.warn( "THREE.Matrix3.getInverse no longer takes a Matrix4 argument." );
+
+		}
+
 		var me = matrix.elements,
 			te = this.elements,
 
