@@ -117,6 +117,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			}
 
 		}
+		console.log( "renderer.getCurrentRenderTarget()", renderer.getCurrentRenderTarget() );
 		var parameters = {
 
 			shaderID: shaderID,
@@ -180,7 +181,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			flipSided: material.side === THREE.BackSide
 
 		};
-
+		console.log( 'parameters', parameters );
 		return parameters;
 
 	};

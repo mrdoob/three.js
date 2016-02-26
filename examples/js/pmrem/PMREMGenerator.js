@@ -24,17 +24,12 @@
 	else {
 		console.error( "Wrong Input to PMREMGenerator" );
 	}
-
 	this.sourceTexture = cubeTexture;
-
-  // encoded formats do not interpolate well, thus turn off interpolation for them
-  var textureFilter = ( this.sourceTexture.encoding === THREE.LinearEncoding ) ? THREE.LinearFilter : THREE.NearestFilter;
-  this.sourceTexture.minFilter = this.sourceTexture.magFilter = textureFilter;
 
 	this.cubeLods = [];
 
 	var size = this.resolution;
-  var params = { format: THREE.RGBAFormat, magFilter: textureFilter, minFilter: textureFilter, type: this.sourceTexture.type };
+  var params = { format: this.sourceTexture.format, magFilter: this.sourceTexture.magFilter, minFilter: this.sourceTexture.minFilter, type: this.sourceTexture.type };
 
 	this.numLods = Math.log2( size ) - 2;
   for ( var i = 0; i < this.numLods; i ++ ) {
@@ -89,8 +84,7 @@ THREE.PMREMGenerator.prototype = {
 	},
 
 	renderToCubeMapTargetFace: function( renderer, renderTarget, faceIndex ) {
-
-		renderTarget.texture.generateMipmaps = false;
+    console.log( 'renderTarget', renderTarget );
 		renderTarget.activeCubeFace = faceIndex;
 		this.shader.uniforms[ "faceIndex" ].value = faceIndex;
 		renderer.render( this.scene, this.camera, renderTarget, true );
