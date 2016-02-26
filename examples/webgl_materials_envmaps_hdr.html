@@ -60,8 +60,9 @@
 			var container, stats;
 			var params = {
 				projection: 'normal',
-				roughnessFactor: 0,
-				background: true,
+				roughness: 1.0,
+				bumpScale: 0.3,
+				background: false,
 			};
 			var camera, scene, renderer, controls, objects = [];
 			var hdrCubeMap;
@@ -90,7 +91,6 @@
 				scene = new THREE.Scene();
 
 				// Materials
-
 				var hdrpath = "../examples/textures/cube/hdrPisa/";
 				var hdrformat = '.hdr';
 				var hdrurls = [
@@ -99,7 +99,7 @@
 					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 				];
 
-				var hdrCubeMap = new THREE.HDRCubeMapLoader().load( THREE.HalfFloatType, hdrurls, function ( hdrCubeMap ) {
+				var hdrCubeMap = new THREE.HDRCubeMapLoader().load( THREE.FloatType, hdrurls, function ( hdrCubeMap ) {
 				  var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
 					pmremGenerator.update(renderer);
 
@@ -112,10 +112,12 @@
 				  roughnessTexture.repeat.set( 3, 3 );
 
 				  var diffuseColor = new THREE.Color( 1, 1.0, 1.0 ).multiplyScalar( 1 - 0.08 );
-				  standardMaterial = new THREE.MeshStandardMaterial( { map: null, bumpMap: null, roughnessMap: null, bumpScale: 1.0, color: diffuseColor, metalness: 1.0, roughness: 0.5, shading: THREE.SmoothShading, envMap: pmremCubeUVPacker.CubeUVRenderTarget } )
-				  var torusMesh1 = new THREE.Mesh( torusGeometry, standardMaterial );
+				  standardMaterial = new THREE.MeshStandardMaterial( { map: null, bumpMap: null, roughnessMap: roughnessTexture, bumpScale: -0.05, bumpMap: roughnessTexture, color: diffuseColor, metalness: 0.9, roughness: 1.0, shading: THREE.SmoothShading, envMap: pmremCubeUVPacker.CubeUVRenderTarget } )
+					var geometry = new THREE.TorusKnotGeometry( 12, 6, 150, 20 );;
+				  var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
 				  torusMesh1.position.x = 0.0;
 				  scene.add( torusMesh1 );
+					objects.push( torusMesh1 );
 				} );
 
 				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
@@ -180,8 +182,9 @@
 				var gui = new dat.GUI();
 
 				//gui.add( params, 'projection', { 'From cam to mesh': 'camera', 'Normal to mesh': 'normal' } );
-				gui.add( params, 'roughnessFactor', 0, 1 );
-				gui.add( params, 'background' );
+				gui.add( params, 'roughness', 0, 1 );
+				gui.add( params, 'bumpScale', -1, 1 );
+				//gui.add( params, 'background' );
 				gui.open();
 			}
 
@@ -206,13 +209,16 @@
 			}
 
 			function render() {
-                                                                if(standardMaterial !== undefined)
-                                                                    standardMaterial.roughness = params.roughnessFactor;
-                                                                var body = document.getElementsByTagName("BODY")[0];
-                                                                if(params.background)
-                                                                    body.style.backgroundImage = "url('../examples/textures/roughness_map.jpg')";
-                                                                else
-                                                                    body.style.backgroundImage = "none";
+				if(standardMaterial !== undefined) {
+					standardMaterial.roughness = params.roughness;
+					standardMaterial.bumpScale = -0.05 * params.bumpScale;
+				}
+
+				var body = document.getElementsByTagName("BODY")[0];
+				if(params.background)
+					body.style.backgroundImage = "url('../examples/textures/roughness_map.jpg')";
+				else
+					body.style.backgroundImage = "none";
 
 				var timer = Date.now() * 0.00025;
 
