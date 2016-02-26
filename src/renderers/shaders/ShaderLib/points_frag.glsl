@@ -20,8 +20,8 @@ void main() {
 
 	outgoingLight = diffuseColor.rgb;
 
-	#include <fog_fragment>
-
 	gl_FragColor = linearToOutputTexel( vec4( outgoingLight, diffuseColor.a ) );
+
+	#include <fog_fragment>
 
 }
