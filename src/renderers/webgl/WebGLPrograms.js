@@ -67,26 +67,35 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 	}
 
-
-	function getTextureEncodingFromMap ( map, gammaOverrideLinear ) {
+	function getTextureEncodingFromMap( map, gammaOverrideLinear ) {
 
 		var encoding;
+
 		if( ! map ) {
+
 			encoding = THREE.LinearEncoding;
+
 		}
 		else if( map instanceof THREE.Texture ) {
+
 			encoding = map.encoding;
+
 		}
 		else if( map instanceof THREE.WebGLRenderTarget ) {
+
 			encoding = map.texture.encoding;
+
 		}
 
 		// add backwards compatibility for WebGLRenderer.gammaInput/gammaOutput parameter, should probably be removed at some point.
 		if( encoding === THREE.LinearEncoding && gammaOverrideLinear ) {
+
 			encoding = THREE.GammaEncoding;
+
 		}
 
 		return encoding;
+
 	}
 
 	this.getParameters = function ( material, lights, fog, object ) {
