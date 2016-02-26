@@ -45,17 +45,6 @@ THREE.PMREM_CubeUVPacker = function( cubeTextureLods, numLods ) {
 		var mipOffsetY = 0;
 		var mipSize = size;
 
-    /*
-    var testColor = [];
-    testColor.push( new THREE.Vector3( 1, 0, 0 ) );
-    testColor.push( new THREE.Vector3( 0, 1, 0 ) );
-    testColor.push( new THREE.Vector3( 0, 0, 1 ) );
-    testColor.push( new THREE.Vector3( 1, 1, 0 ) );
-    testColor.push( new THREE.Vector3( 0, 1, 1 ) );
-    testColor.push( new THREE.Vector3( 1, 0, 1 ) );
-    testColor.push( new THREE.Vector3( 1, 1, 1 ) );
-    testColor.push( new THREE.Vector3( 0.5, 1, 0.5 ) );*/
-
 		for ( var j = 0; j < nMips; j ++ ) {
 
 			// Mip Maps
@@ -137,14 +126,6 @@ THREE.PMREM_CubeUVPacker.prototype = {
         uniform vec3 testColor;\
         uniform int faceIndex;\
         \
-        const float PI = 3.14159265358979;\
-        vec4 sampleCubeMap(float phi, float theta) {\
-          float sinTheta = sin(theta);\
-          float cosTheta = cos(theta);\
-          vec3 sampleDir = vec3(cos(phi) * sinTheta, cosTheta, sin(phi) * sinTheta);\
-          vec4 color = envMapTexelToLinear( textureCube(envMap, sampleDir) );\
-          return color * vec4(testColor, 1.0);\
-        }\
         void main() {\
           vec3 sampleDirection;\
           vec2 uv = vUv;\
