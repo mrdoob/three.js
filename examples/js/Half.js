@@ -1,5 +1,5 @@
 /**
- * @author Prashant Sharma / spidersharma03
+ * Source: http://gamedev.stackexchange.com/questions/17326/conversion-of-a-number-from-single-precision-floating-point-representation-to-a/17410#17410
  */
 
 THREE.toHalf = (function() {
