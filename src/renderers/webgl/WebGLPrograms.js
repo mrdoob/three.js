@@ -67,6 +67,28 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 	}
 
+
+	function getTextureEncodingFromMap ( map, gammaOverrideLinear ) {
+
+		var encoding;
+		if( ! map ) {
+			encoding = THREE.LinearEncoding;
+		}
+		else if( map instanceof THREE.Texture ) {
+			encoding = map.encoding;
+		}
+		else if( map instanceof THREE.WebGLRenderTarget ) {
+			encoding = map.texture.encoding;
+		}
+
+		// add backwards compatibility for WebGLRenderer.gammaInput/gammaOutput parameter, should probably be removed at some point.
+		if( encoding === THREE.LinearEncoding && gammaOverrideLinear ) {
+			encoding = THREE.GammaEncoding;
+		}
+
+		return encoding;
+	}
+
 	this.getParameters = function ( material, lights, fog, object ) {
 		var shaderID = shaderIDs[ material.type ];
 		// heuristics to create shader parameters according to lights in the scene
@@ -85,19 +107,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			}
 
-		}
-
-		var getTextureEncodingFromMap = function( map, gammaOverrideLinear ) {
-			var encoding;
-			if( ! map ) {
-				encoding = THREE.LinearEncoding;
-			}
-			else if( map instanceof THREE.Texture ) {
-			// add backwards compatibility for WebGLRenderer.gammaInput parameter, should probably be removed at some point.
-			if( encoding === THREE.LinearEncoding && renderer.gammaInput ) {
-				encoding = THREE.GammaEncoding;
-			}
-			return encoding;
 		}
 
 		var parameters = {
