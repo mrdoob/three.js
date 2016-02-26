@@ -12,7 +12,7 @@
 				text-align:center;
 
 				background-color: #000;
-                                                                background-image:url("../examples/textures/roughness_map.jpg");
+
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -27,7 +27,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - PMREM Generator by Prashant Sharma and <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - HDR Environment Maps along with a PMREM Generator by Prashant Sharma and <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
 		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
@@ -67,10 +67,7 @@
 			var camera, scene, renderer, controls, objects = [];
 			var hdrCubeMap;
 			var composer;
-			var particleLight;
 			var standardMaterial;
-			var torusGeometry = new THREE.TorusGeometry( 15, 6, 16, 100 );
-			//var torusGeometry = new THREE.SphereGeometry( 15, 32, 32 );
 
 			var loader = new THREE.FontLoader();
 			loader.load( '../examples/fonts/gentilis_regular.typeface.js', function ( font ) {
@@ -109,37 +106,34 @@
 				  var roughnessTexture = THREE.ImageUtils.loadTexture( "../examples/textures/roughness_map.jpg" );
 				  roughnessTexture.wrapS = THREE.RepeatWrapping;
 				  roughnessTexture.wrapT = THREE.RepeatWrapping;
-				  roughnessTexture.repeat.set( 3, 3 );
+				  roughnessTexture.repeat.set( 9, 2 );
 
-				  var diffuseColor = new THREE.Color( 1, 1.0, 1.0 ).multiplyScalar( 1 - 0.08 );
-				  standardMaterial = new THREE.MeshStandardMaterial( { map: null, bumpMap: null, roughnessMap: roughnessTexture, bumpScale: -0.05, bumpMap: roughnessTexture, color: diffuseColor, metalness: 0.9, roughness: 1.0, shading: THREE.SmoothShading, envMap: pmremCubeUVPacker.CubeUVRenderTarget } )
-					var geometry = new THREE.TorusKnotGeometry( 12, 6, 150, 20 );;
+				  standardMaterial = new THREE.MeshStandardMaterial( {
+						map: null,
+						roughnessMap: roughnessTexture,
+						bumpScale: -0.05,
+						bumpMap: roughnessTexture,
+						color: 0xffffff,
+						metalness: 0.9,
+						roughness: 1.0,
+						envMap: pmremCubeUVPacker.CubeUVRenderTarget,
+						shading: THREE.SmoothShading
+					});
+					var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
 				  var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
 				  torusMesh1.position.x = 0.0;
 				  scene.add( torusMesh1 );
 					objects.push( torusMesh1 );
 				} );
 
-				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
-
 				// Lights
 
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
-
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.set( 1, 1, 1 ).normalize();
-				//scene.add( directionalLight );
-
-				var pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
-				particleLight.add( pointLight );
 
 				var spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.position.set( 10, 100, 10 );
 				spotLight.angle = Math.PI/10;
 				scene.add( spotLight );
-
-				var spotLightHelper = new THREE.SpotLightHelper( spotLight );
-				scene.add( spotLightHelper );
 
 				renderer = new THREE.WebGLRenderer( { alpha:true, antialias: false } );
 				renderer.setClearColor( 0x0a0a0a, 0 );
@@ -235,12 +229,7 @@
 
 				}
 
-				particleLight.position.x = Math.sin( timer * 7 ) * 100;
-				particleLight.position.y = Math.cos( timer * 5 ) * 100;
-				particleLight.position.z = Math.cos( timer * 3 ) * 100;
-
-				//renderer.render( scene, camera );
-                                                                composer.render();
+				composer.render();
 
 			}
 
