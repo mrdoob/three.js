@@ -98,7 +98,15 @@ THREE.PMREM_CubeUVPacker.prototype = {
 
 	update: function( renderer ) {
 
+		var gammaInput = renderer.gammaInput;
+    var gammaOutput = renderer.gammaOutput;
+    renderer.gammaInput = false;
+    renderer.gammaOutput = false;
+
 		renderer.render( this.scene, this.camera, this.CubeUVRenderTarget, true );
+
+    renderer.gammaInput = renderer.gammaInput;
+    renderer.gammaOutput = renderer.gammaOutput;
 
 	},
 

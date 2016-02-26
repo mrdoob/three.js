@@ -63,6 +63,11 @@ THREE.PMREMGenerator.prototype = {
 
 		this.shader.uniforms[ "envMap" ].value = this.sourceTexture;
     this.shader.envMap = this.sourceTexture;
+
+    var gammaInput = renderer.gammaInput;
+    var gammaOutput = renderer.gammaOutput;
+    renderer.gammaInput = false;
+    renderer.gammaOutput = false;
 		for ( var i = 0; i < this.numLods; i ++ ) {
 
 			var r = i / ( this.numLods - 1 );
@@ -75,6 +80,9 @@ THREE.PMREMGenerator.prototype = {
 
 		}
 
+    renderer.gammaInput = renderer.gammaInput;
+    renderer.gammaOutput = renderer.gammaOutput;
+    
 	},
 
 	renderToCubeMapTarget: function( renderer, renderTarget ) {
