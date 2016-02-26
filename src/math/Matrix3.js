@@ -31,9 +31,9 @@ THREE.Matrix3.prototype = {
 
 		var te = this.elements;
 
-		te[ 0 ] = n11; te[ 3 ] = n12; te[ 6 ] = n13;
-		te[ 1 ] = n21; te[ 4 ] = n22; te[ 7 ] = n23;
-		te[ 2 ] = n31; te[ 5 ] = n32; te[ 8 ] = n33;
+		te[ 0 ] = n11; te[ 1 ] = n21; te[ 2 ] = n31;
+		te[ 3 ] = n12; te[ 4 ] = n22; te[ 5 ] = n32;
+		te[ 6 ] = n13; te[ 7 ] = n23; te[ 8 ] = n33;
 
 		return this;
 
@@ -68,6 +68,22 @@ THREE.Matrix3.prototype = {
 			me[ 0 ], me[ 3 ], me[ 6 ],
 			me[ 1 ], me[ 4 ], me[ 7 ],
 			me[ 2 ], me[ 5 ], me[ 8 ]
+
+		);
+
+		return this;
+
+	},
+
+	setFromMatrix4: function( m ) {
+
+		var me = m.elements;
+
+		this.set(
+
+			me[ 0 ], me[ 4 ], me[  8 ],
+			me[ 1 ], me[ 5 ], me[  9 ],
+			me[ 2 ], me[ 6 ], me[ 10 ]
 
 		);
 
@@ -237,35 +253,9 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	getNormalMatrix: function ( matrix ) {
+	getNormalMatrix: function ( matrix4 ) {
 
-		// input: THREE.Matrix4
-		// ( based on http://code.google.com/p/webgl-mjs/ )
-
-		var me = matrix.elements;
-		var te = this.elements;
-
-		te[ 0 ] =	me[ 10 ] * me[ 5 ] - me[ 6 ] * me[ 9 ];
-		te[ 1 ] = - me[ 10 ] * me[ 1 ] + me[ 2 ] * me[ 9 ];
-		te[ 2 ] =	me[ 6 ] * me[ 1 ] - me[ 2 ] * me[ 5 ];
-		te[ 3 ] = - me[ 10 ] * me[ 4 ] + me[ 6 ] * me[ 8 ];
-		te[ 4 ] =	me[ 10 ] * me[ 0 ] - me[ 2 ] * me[ 8 ];
-		te[ 5 ] = - me[ 6 ] * me[ 0 ] + me[ 2 ] * me[ 4 ];
-		te[ 6 ] =	me[ 9 ] * me[ 4 ] - me[ 5 ] * me[ 8 ];
-		te[ 7 ] = - me[ 9 ] * me[ 0 ] + me[ 1 ] * me[ 8 ];
-		te[ 8 ] =	me[ 5 ] * me[ 0 ] - me[ 1 ] * me[ 4 ];
-
-		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 3 ] + me[ 2 ] * te[ 6 ];
-
-		if ( det === 0 ) {
-
-			console.warn(
-					"THREE.Matrix3.getNormalMatrix(): can't invert matrix, determinant is 0" );
-			return this.identity();
-
-		}
-
-		return this.multiplyScalar( 1.0 / det ).transpose();
+		return this.setFromMatrix4( matrix4 ).getInverse( this ).transpose();
 
 	},
 
