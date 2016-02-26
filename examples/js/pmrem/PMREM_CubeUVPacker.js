@@ -13,9 +13,8 @@ THREE.PMREM_CubeUVPacker = function( cubeTextureLods, numLods ) {
 	this.CubeUVRenderTarget = new THREE.WebGLRenderTarget( size, size,
 	{ format: THREE.RGBAFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter, type:cubeTextureLods[ 0 ].type } );
 	this.CubeUVRenderTarget.texture.generateMipmaps = false;
-                this.CubeUVRenderTarget.mapping = THREE.CubeUVReflectionMapping;
+  this.CubeUVRenderTarget.mapping = THREE.CubeUVReflectionMapping;
 	this.camera = new THREE.OrthographicCamera( - size * 0.5, size * 0.5, - size * 0.5, size * 0.5, 0.0, 1000 );
-                this.CubeUVRenderTarget.encoding = this.cubeLods[0].encoding;
 
 	this.scene = new THREE.Scene();
 	this.scene.add( this.camera );
@@ -64,7 +63,8 @@ THREE.PMREM_CubeUVPacker = function( cubeTextureLods, numLods ) {
 
 				// 6 Cube Faces
 				var material = this.getShader();
-				material.uniforms[ "cubeTexture" ].value = this.cubeLods[ i ];
+				material.uniforms[ "envMap" ].value = this.cubeLods[ i ];
+				material.envMap = this.cubeLods[ i ]
 				material.uniforms[ "faceIndex" ].value = k;
 				material.uniforms[ "mapSize" ].value = mipSize;
 				var color = material.uniforms[ "testColor" ].value;
@@ -104,12 +104,12 @@ THREE.PMREM_CubeUVPacker.prototype = {
 
   getShader: function() {
 
-    return new THREE.ShaderMaterial( {
+    var shaderMaterial = new THREE.ShaderMaterial( {
 
       uniforms: {
        	"faceIndex": { type: 'i', value: 0 },
        	"mapSize": { type: 'f', value: 0 },
-       	"cubeTexture": { type: 't', value: null },
+       	"envMap": { type: 't', value: null },
        	"testColor": { type: 'v3', value: new THREE.Vector3( 1, 1, 1 ) }
       },
 
@@ -124,7 +124,7 @@ THREE.PMREM_CubeUVPacker.prototype = {
       fragmentShader:
        "precision highp float;\
         varying vec2 vUv;\
-        uniform samplerCube cubeTexture;\
+        uniform samplerCube envMap;\
         uniform float mapSize;\
         uniform vec3 testColor;\
         uniform int faceIndex;\
@@ -134,7 +134,7 @@ THREE.PMREM_CubeUVPacker.prototype = {
           float sinTheta = sin(theta);\
           float cosTheta = cos(theta);\
           vec3 sampleDir = vec3(cos(phi) * sinTheta, cosTheta, sin(phi) * sinTheta);\
-          vec4 color = textureCube(cubeTexture, sampleDir);\
+          vec4 color = envMapTexelToLinear( textureCube(envMap, sampleDir) );\
           return color * vec4(testColor, 1.0);\
         }\
         void main() {\
@@ -160,10 +160,19 @@ THREE.PMREM_CubeUVPacker.prototype = {
           else {\
               sampleDirection = normalize(vec3(-uv.x, uv.y, -1.0));\
           }\
-          vec4 color = textureCube(cubeTexture, (sampleDirection));\
-          gl_FragColor = color * vec4(testColor, 1.0);\
-        }"
+          vec4 color = envMapTexelToLinear( textureCube( envMap, sampleDirection ) );\
+          gl_FragColor = linearToOutputTexel( color * vec4(testColor, 1.0) );\
+        }",
+
+			blending: THREE.CustomBlending,
+			blendSrc: THREE.OneFactor,
+			blendDst: THREE.ZeroFactor,
+			blendSrcAlpha: THREE.OneFactor,
+			blendDstAlpha: THREE.ZeroFactor,
+			blendEquation: THREE.AddEquation
     });
+
+		return shaderMaterial;
 
   }
 

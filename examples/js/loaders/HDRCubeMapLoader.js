@@ -17,9 +17,10 @@ THREE.HDRCubeMapLoader.prototype.load = function(type, urls, onLoad, onProgress,
   texture.type = type;
   texture.encoding = (type === THREE.UnsignedByteType) ? THREE.RGBEEncoding : THREE.LinearEncoding;
   texture.format = (type === THREE.UnsignedByteType ) ? THREE.RGBAFormat : THREE.RGBFormat;
-  texture.minFilter = THREE.LinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = false;
+  texture.minFilter = (texture.encoding === THREE.RGBEEncoding ) ? THREE.NearestFilter : THREE.LinearFilter;
+  texture.magFilter = (texture.encoding === THREE.RGBEEncoding ) ? THREE.NearestFilter : THREE.LinearFilter;
+  texture.generateMipmaps = (texture.encoding !== THREE.RGBEEncoding );
+  texture.anisotropy = 0;
 
   var scope = this.hdrLoader;
 
@@ -48,9 +49,9 @@ THREE.HDRCubeMapLoader.prototype.load = function(type, urls, onLoad, onProgress,
         var numElements = ( texData.data.length / 4 )*3;
         var halfdata = new Uint16Array( numElements );
         for( var j=0; j<numElements; j++) {
-          THREE.Encodings.RGBEByteToRGBHalf( texData.data, j*4, floatdata, j*3 );
+          THREE.Encodings.RGBEByteToRGBHalf( texData.data, j*4, halfdata, j*3 );
         }
-        texData.data = floatdata;
+        texData.data = halfdata;
       }
 
       if ( undefined !== texData.image ) {

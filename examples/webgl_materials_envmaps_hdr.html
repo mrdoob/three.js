@@ -29,7 +29,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - PMREM Generator by Prashant Sharma and <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
-		<script src="../build/three.js"></script>
+		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
 		<script src="../src/loaders/BinaryTextureLoader.js"></script>
 		<script src="../examples/js/loaders/RGBELoader.js"></script>
@@ -149,8 +149,6 @@
 			  var metalness = 1;
 			  var roughness = 0.50;
 			  var diffuseColor = new THREE.Color( 1, 1.0, 1.0 ).multiplyScalar( 1 - 0.08 );
-			  //reflectionCube.mapping = THREE.CubeUVReflectionMapping;
-			  //pmremCubeUVPacker.CubeUVRenderTarget.mapping = THREE.CubeUVReflectionMapping;
 			  standardMaterial = new THREE.MeshStandardMaterial( { map: null, bumpMap: null, roughnessMap: null, bumpScale: 1.0, color: diffuseColor, metalness: metalness, roughness: roughness, shading: THREE.SmoothShading, envMap: pmremCubeUVPacker.CubeUVRenderTarget } )
 			  var torusMesh1 = new THREE.Mesh( torusGeometry, standardMaterial );
 			  torusMesh1.position.x = -30.0;
@@ -218,7 +216,7 @@
 					//reflectionCube.encoding = THREE.sRGB;
 					//reflectionCube.format = THREE.RGBFormat;
 
-					hdrCubeMap = new THREE.HDRCubeMapLoader().load(THREE.UnsignedByteType, hdrurls, onTextureLoad);
+					hdrCubeMap = new THREE.HDRCubeMapLoader().load(THREE.HalfFloatType, hdrurls, onTextureLoad);
 
 					//                                                                hdrTexture = new THREE.RGBELoader().load( '../examples/textures/cube/hdrPisa/px.hdr', onHdrLoad );
 					var grass = new THREE.TextureLoader().load( '../examples/textures/terrain/grasslight-big.jpg' );
@@ -237,40 +235,7 @@
 					  textureCube.format = THREE.RGBFormat;
 					  return textureCube;
 					}();
-					var standardNodeMaterial = new THREE.StandardNodeMaterial();
-					var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
-					var normalScale = new THREE.FloatNode( 0.3 );
-					var roughnessA = new THREE.FloatNode( 0.5 );
-					var metalnessA = new THREE.FloatNode( 0.5 );
-					var roughnessB = new THREE.FloatNode( 0 );
-					var metalnessB = new THREE.FloatNode( 1 );
-					var roughness = new THREE.Math3Node(
-					  roughnessA,
-					  roughnessB,
-					  mask,
-					  THREE.Math3Node.MIX
-					);
-					var metalness = new THREE.Math3Node(
-					  metalnessA,
-					  metalnessB,
-					  mask,
-					  THREE.Math3Node.MIX
-					);
-					var normalMask = new THREE.OperatorNode(
-					  new THREE.Math1Node( mask, THREE.Math1Node.INVERT ),
-					  normalScale,
-					  THREE.OperatorNode.MUL
-					);
-					standardNodeMaterial.color = new THREE.ColorNode( 0xFFFFFF );
-					standardNodeMaterial.roughness = roughness;
-					standardNodeMaterial.metalness = metalness;
-					standardNodeMaterial.environment = new THREE.CubeTextureNode( cubemap );
-					standardNodeMaterial.normal = new THREE.TextureNode( grassNormal );
-					standardNodeMaterial.normalScale = normalMask;
-					standardNodeMaterial.build();
-					var torusMesh2 = new THREE.Mesh( torusGeometry, standardNodeMaterial );
-					torusMesh2.position.x = 30.0;
-					scene.add( torusMesh2 );
+
 
 					particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				//scene.add( particleLight );
@@ -303,7 +268,7 @@
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;
-				renderer.gammaOutput = false;
+				renderer.gammaOutput = true;
 
                                                                 var renderScene = new THREE.RenderPass(scene, camera);
 

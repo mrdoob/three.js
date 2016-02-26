@@ -70,18 +70,17 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 	function getTextureEncodingFromMap( map, gammaOverrideLinear ) {
 
 		var encoding;
-
 		if( ! map ) {
 
 			encoding = THREE.LinearEncoding;
 
 		}
-		else if( map instanceof THREE.Texture ) {
+		else if( map instanceof THREE.Texture || map instanceof THREE.CubeTexture ) {
 
 			encoding = map.encoding;
 
 		}
-		else if( map instanceof THREE.WebGLRenderTarget ) {
+		else if( map instanceof THREE.WebGLRenderTarget || map instanceof THREE.THREE.WebGLRenderTargetCube ) {
 
 			encoding = map.texture.encoding;
 
@@ -117,7 +116,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			}
 
 		}
-		console.log( "renderer.getCurrentRenderTarget()", renderer.getCurrentRenderTarget() );
+
 		var parameters = {
 
 			shaderID: shaderID,
@@ -181,7 +180,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			flipSided: material.side === THREE.BackSide
 
 		};
-		console.log( 'parameters', parameters );
+
 		return parameters;
 
 	};

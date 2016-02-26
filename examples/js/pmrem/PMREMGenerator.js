@@ -4,7 +4,6 @@
  */
 
  THREE.PMREMGenerator = function( cubeTexture ) {
-   console.trace( 'cubeTexture', cubeTexture );
 	if ( cubeTexture instanceof THREE.CubeTexture ) {
 
 		if ( cubeTexture.images[ 0 ] === undefined )
@@ -34,8 +33,11 @@
 	this.numLods = Math.log2( size ) - 2;
   for ( var i = 0; i < this.numLods; i ++ ) {
 		var renderTarget = new THREE.WebGLRenderTargetCube( size, size, params );
-		renderTarget.texture.generateMipmaps = false;
+		renderTarget.texture.generateMipmaps = this.sourceTexture.generateMipmaps;
+    renderTarget.texture.anisotropy = this.sourceTexture.anisotropy;
     renderTarget.texture.encoding = this.sourceTexture.encoding;
+    renderTarget.texture.minFilter = this.sourceTexture.minFilter;
+    renderTarget.texture.magFilter = this.sourceTexture.magFilter;
 		this.cubeLods.push( renderTarget );
 		size = Math.max( 16, size / 2 );
 	}
@@ -84,7 +86,6 @@ THREE.PMREMGenerator.prototype = {
 	},
 
 	renderToCubeMapTargetFace: function( renderer, renderTarget, faceIndex ) {
-    console.log( 'renderTarget', renderTarget );
 		renderTarget.activeCubeFace = faceIndex;
 		this.shader.uniforms[ "faceIndex" ].value = faceIndex;
 		renderer.render( this.scene, this.camera, renderTarget, true );
@@ -150,7 +151,7 @@ THREE.PMREMGenerator.prototype = {
            return mat3(b1, b2, n);\n\
         }\n\
         \n\
-        vec4 testColorMap() {\n\
+        vec4 testColorMap(float Roughness) {\n\
            vec4 color;\n\
            if(faceIndex == 0)\n\
                color = vec4(1.0,0.0,0.0,1.0);\n\
@@ -164,6 +165,7 @@ THREE.PMREMGenerator.prototype = {
                color = vec4(0.0,1.0,1.0,1.0);\n\
            else\n\
                color = vec4(1.0,0.0,1.0,1.0);\n\
+           color *= ( 1.0 - Roughness );\n\
            return color;\n\
         }\n\
         void main() {\n\
@@ -207,6 +209,7 @@ THREE.PMREMGenerator.prototype = {
                rgbColor.rgb += color;\n\
            }\n\
            rgbColor /= float(NumSamples);\n\
+           //rgbColor = testColorMap( roughness ).rgb;\n\
            gl_FragColor = linearToOutputTexel( vec4( rgbColor, 1.0 ) );\n\
         }"
       }
