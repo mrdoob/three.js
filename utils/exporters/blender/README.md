@@ -33,7 +33,12 @@ OR (for 2.6)
 In your user's library for user installed Blender addons:
 
     /Users/(myuser)/Library/Application Support/Blender/2.7X/scripts/addons
+    
+    If the Blender folder doesn't exist in Application Support RMB on blender app and put into the following folder *:
+   
+    blender.app/Contents/Resources/<version>/scripts
 
+    * <version> changes depending on version
 ### Linux
 
 By default, this should look like:
