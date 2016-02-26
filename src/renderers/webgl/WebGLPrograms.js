@@ -117,14 +117,13 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			}
 
 		}
-
 		var parameters = {
 
 			shaderID: shaderID,
 
 			precision: precision,
 			supportsVertexTextures: capabilities.vertexTextures,
-			outputEncoding: getTextureEncodingFromMap( renderer._currentRenderTarget, renderer.gammaOutput ),
+			outputEncoding: getTextureEncodingFromMap( renderer.getCurrentRenderTarget(), renderer.gammaOutput ),
 			map: !! material.map,
 			mapEncoding: getTextureEncodingFromMap( material.map, renderer.gammaInput ),
 			envMap: !! material.envMap,
