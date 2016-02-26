@@ -130,6 +130,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			envMap: !! material.envMap,
 			envMapMode: material.envMap && material.envMap.mapping,
 			envMapEncoding: getTextureEncodingFromMap( material.envMap, renderer.gammaInput ),
+			envMapCubeUV: (!!material.envMap) && ((material.envMap.mapping === THREE.CubeUVReflectionMapping) ||
+							(material.envMap.mapping === THREE.CubeUVRefractionMapping)),
 			lightMap: !! material.lightMap,
 			aoMap: !! material.aoMap,
 			emissiveMap: !! material.emissiveMap,

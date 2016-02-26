@@ -29,6 +29,7 @@ varying vec3 vViewPosition;
 #include <fog_pars_fragment>
 #include <bsdfs>
 #include <ambient_pars>
+#include <cube_uv_reflection_fragment>
 #include <lights_pars>
 #include <lights_standard_pars_fragment>
 #include <shadowmap_pars_fragment>
