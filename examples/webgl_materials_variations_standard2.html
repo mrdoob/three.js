@@ -105,14 +105,12 @@
 
 					for( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
-						var reflectivity = beta;
-
 						for( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
 							// basic monochromatic energy preservation
 							var diffuseColor = new THREE.Color( gamma, 0, 0 ).multiplyScalar( 1 - 0.08 );
 
-							var material = new THREE.MeshStandardMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: diffuseColor, reflectivity: reflectivity, roughness: roughness, shading: THREE.SmoothShading, envMap: localReflectionCube } )
+							var material = new THREE.MeshStandardMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: diffuseColor, roughness: roughness, shading: THREE.SmoothShading, envMap: localReflectionCube } )
 
 							var mesh = new THREE.Mesh( geometry, material );
 
@@ -146,9 +144,6 @@
 
 				addLabel( "+roughness", new THREE.Vector3( -350, 0, 0 ) );
 				addLabel( "-roughness", new THREE.Vector3( 350, 0, 0 ) );
-
-				addLabel( "-reflectivity", new THREE.Vector3( 0, -300, 0 ) );
-				addLabel( "+reflectivity", new THREE.Vector3( 0, 300, 0 ) );
 
 				addLabel( "-diffuse", new THREE.Vector3( 0, 0, -300 ) );
 				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
