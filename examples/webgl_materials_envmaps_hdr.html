@@ -124,6 +124,22 @@
 				  torusMesh1.position.x = 0.0;
 				  scene.add( torusMesh1 );
 					objects.push( torusMesh1 );
+
+					var floorMaterial = new THREE.MeshStandardMaterial( {
+						map: null,
+						roughnessMap: null,
+						color: 0xffffff,
+						metalness: 0.0,
+						roughness: 0.0,
+						envMap: pmremCubeUVPacker.CubeUVRenderTarget,
+						shading: THREE.SmoothShading
+					});
+
+					var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				  var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
+					planeMesh1.position.y = -50;
+					planeMesh1.rotation.x = -Math.PI * 0.5;
+					scene.add( planeMesh1 );
 				} );
 
 				// Lights
@@ -133,6 +149,7 @@
 				var spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.position.set( 10, 100, 10 );
 				spotLight.angle = Math.PI/10;
+				spotLight.penumbra = 0.2
 				scene.add( spotLight );
 
 				renderer = new THREE.WebGLRenderer( { alpha:true, antialias: false } );
