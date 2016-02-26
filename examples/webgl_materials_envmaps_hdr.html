@@ -152,7 +152,7 @@
 				spotLight.penumbra = 0.2
 				scene.add( spotLight );
 
-				renderer = new THREE.WebGLRenderer( { alpha:true, antialias: false } );
+				renderer = new THREE.WebGLRenderer( { alpha:true, antialias: true } );
 				renderer.setClearColor( 0x0a0a0a, 0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -201,10 +201,20 @@
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( width, height );
+
+				var pixelRatio = renderer.getPixelRatio();
+				var newWidth  = Math.floor( width / pixelRatio ) || 1;
+				var newHeight = Math.floor( height / pixelRatio ) || 1;
+				composer.setSize( newWidth, newHeight );
+
+				effectFXAA.uniforms['resolution'].value.set(1 / (window.innerWidth), 1 / (window.innerHeight));
 
 			}
 
@@ -224,12 +234,6 @@
 					standardMaterial.roughness = params.roughness;
 					standardMaterial.bumpScale = -0.05 * params.bumpScale;
 				}
-
-				var body = document.getElementsByTagName("BODY")[0];
-				if(params.background)
-					body.style.backgroundImage = "url('../examples/textures/roughness_map.jpg')";
-				else
-					body.style.backgroundImage = "none";
 
 				var timer = Date.now() * 0.00025;
 
