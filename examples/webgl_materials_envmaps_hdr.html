@@ -96,7 +96,17 @@
 					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 				];
 
-				var hdrCubeMap = new THREE.HDRCubeMapLoader().load( THREE.FloatType, hdrurls, function ( hdrCubeMap ) {
+				renderer = new THREE.WebGLRenderer( { alpha:true, antialias: true } );
+
+				var hdrType = THREE.UnsignedByteType;
+		  /*  if ( renderer.extensions.get( 'OES_texture_half_float' ) && renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
+		      hdrType = THREE.HalfFloatType;
+		    }
+				else if ( renderer.extensions.get( 'OES_texture_float' ) && renderer.extensions.get( 'OES_texture_float_linear' ) ) {
+		      hdrType = THREE.FloatType;
+		    }*/
+
+				var hdrCubeMap = new THREE.HDRCubeMapLoader().load( hdrType, hdrurls, function ( hdrCubeMap ) {
 				  var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
 					pmremGenerator.update(renderer);
 
@@ -152,7 +162,6 @@
 				spotLight.penumbra = 0.2
 				scene.add( spotLight );
 
-				renderer = new THREE.WebGLRenderer( { alpha:true, antialias: true } );
 				renderer.setClearColor( 0x0a0a0a, 0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
