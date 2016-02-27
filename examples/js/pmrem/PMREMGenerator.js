@@ -82,7 +82,7 @@ THREE.PMREMGenerator.prototype = {
 
     renderer.gammaInput = renderer.gammaInput;
     renderer.gammaOutput = renderer.gammaOutput;
-    
+
 	},
 
 	renderToCubeMapTarget: function( renderer, renderTarget ) {
@@ -219,7 +219,13 @@ THREE.PMREMGenerator.prototype = {
            rgbColor /= float(NumSamples);\n\
            //rgbColor = testColorMap( roughness ).rgb;\n\
            gl_FragColor = linearToOutputTexel( vec4( rgbColor, 1.0 ) );\n\
-        }"
+        }",
+        blending: THREE.CustomBlending,
+        blendSrc: THREE.OneFactor,
+        blendDst: THREE.ZeroFactor,
+        blendSrcAlpha: THREE.OneFactor,
+        blendDstAlpha: THREE.ZeroFactor,
+        blendEquation: THREE.AddEquation
       }
     );
   }
