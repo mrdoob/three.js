@@ -12,19 +12,19 @@ THREE.WebGLProgram = ( function () {
 		switch ( encoding ) {
 
 			case THREE.LinearEncoding:
-				return ['Linear','( value )'];
+				return [ 'Linear','( value )' ];
 			case THREE.sRGBEncoding:
-				return ['sRGB','( value )'];
+				return [ 'sRGB','( value )' ];
 			case THREE.RGBEEncoding:
-				return ['RGBE','( value )'];
+				return [ 'RGBE','( value )' ];
 			case THREE.RGBM7Encoding:
-				return ['RGBM','( value, 7.0 )'];
+				return [ 'RGBM','( value, 7.0 )' ];
 			case THREE.RGBM16Encoding:
-				return ['RGBM','( value, 16.0 )'];
+				return [ 'RGBM','( value, 16.0 )' ];
 			case THREE.RGBDEncoding:
-				return ['RGBD','( value, 256.0 )'];
+				return [ 'RGBD','( value, 256.0 )' ];
 			case THREE.GammaEncoding:
-				return ['Gamma','( value, float( GAMMA_FACTOR ) )'];
+				return [ 'Gamma','( value, float( GAMMA_FACTOR ) )' ];
 			default:
 				throw new Error( 'unsupported encoding: ' + encoding );
 
@@ -35,14 +35,14 @@ THREE.WebGLProgram = ( function () {
 	function getTexelDecodingFunction( functionName, encoding ) {
 
 		var components = getEncodingComponents( encoding );
-		return "vec4 " + functionName + "( vec4 value ) { return " + components[0] + "ToLinear" + components[1] + "; }";
+		return "vec4 " + functionName + "( vec4 value ) { return " + components[ 0 ] + "ToLinear" + components[ 1 ] + "; }";
 
 	}
 
 	function getTexelEncodingFunction( functionName, encoding ) {
 
 		var components = getEncodingComponents( encoding );
-		return "vec4 " + functionName + "( vec4 value ) { return LinearTo" + components[0] + components[1] + "; }";
+		return "vec4 " + functionName + "( vec4 value ) { return LinearTo" + components[ 0 ] + components[ 1 ] + "; }";
 
 	}
 
@@ -51,7 +51,7 @@ THREE.WebGLProgram = ( function () {
 		extensions = extensions || {};
 
 		var chunks = [
-			( extensions.derivatives  || parameters.envMapCubeUV || parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+			( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 			( extensions.fragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 			( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
 			( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
