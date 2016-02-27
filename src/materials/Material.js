@@ -46,6 +46,9 @@ THREE.Material = function () {
 
 	this._needsUpdate = true;
 
+	this.gammaInput = undefined; // default to renderer values
+	this.gammaOutput = undefined;
+
 };
 
 THREE.Material.prototype = {
@@ -270,6 +273,9 @@ THREE.Material.prototype = {
 		this.overdraw = source.overdraw;
 
 		this.visible = source.visible;
+
+		this.gammaInput = source.gammaInput;
+		this.gammaOutput = source.gammaOutput;
 
 		return this;
 
