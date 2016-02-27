@@ -23,6 +23,7 @@
 	"src/extras/geometries/BoxBufferGeometry.js",
 	"src/extras/geometries/CircleGeometry.js",
 	"src/extras/geometries/CircleBufferGeometry.js",
+	"src/extras/geometries/CylinderBufferGeometry.js",
 	"src/extras/geometries/CylinderGeometry.js",
 	"src/extras/geometries/EdgesGeometry.js",
 	"src/extras/geometries/ExtrudeGeometry.js",
