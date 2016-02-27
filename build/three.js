@@ -29464,38 +29464,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 	}
 
-	function getTextureEncodingFromMap( map ) {
-
-		if ( ! map ) return false;
-
-		var encoding;
-
-		if ( map instanceof THREE.Texture ) {
-
-			encoding = map.encoding;
-
-		} else if ( map instanceof THREE.WebGLRenderTarget ) {
-
-			encoding = map.texture.encoding;
-
-		} else {
-
-			throw new Error( "can not determine texture encoding from map: " + map );
-
-		}
-
-		// add backwards compatibility for WebGLRenderer.gammaInput parameter, should probably be removed at some point.
-
-		if ( encoding === THREE.LinearEncoding && renderer.gammaInput ) {
-
-			encoding = THREE.GammaEncoding;
-
-		}
-
-		return encoding;
-
-	}
-
 	this.getParameters = function ( material, lights, fog, object ) {
 
 		var shaderID = shaderIDs[ material.type ];
@@ -29515,6 +29483,27 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			}
 
+		}
+
+		var getTextureEncodingFromMap = function( map ) {
+			if( ! map ) { // no texture
+				return false;
+			}
+			var encoding;
+			if( map.encoding !== undefined ) { // standard texture
+				encoding = map.encoding;
+			}
+			else if( map.texture !== undefined ) {  // render target pretending to be a texture, get the texture inside it.
+				encoding = map.texture.encoding;
+			}
+			else {
+				throw new Error( "can not determine texture encoding from map: " + map );
+			}
+			// add backwards compatibility for WebGLRenderer.gammaInput parameter, should probably be removed at some point. 
+			if( encoding === THREE.LinearEncoding && renderer.gammaInput ) {
+				encoding = THREE.GammaEncoding;
+			}
+			return encoding;
 		}
 
 		var parameters = {

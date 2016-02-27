@@ -7,7 +7,7 @@ vec4 LinearToLinear( in vec4 value ) {
 vec4 GammaToLinear( in vec4 value, in float gammaFactor ) {
   return vec4( pow( value.xyz, vec3( gammaFactor ) ), value.w );
 }
-vec4 LinearTosGamma( in vec4 value, in float gammaFactor ) {
+vec4 LinearToGamma( in vec4 value, in float gammaFactor ) {
   return vec4( pow( value.xyz, vec3( 1.0 / gammaFactor ) ), value.w );
 }
 

@@ -155,7 +155,6 @@
 	"src/renderers/shaders/ShaderChunk/lights_standard_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/lights_standard_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/lights_template.glsl",
-	"src/renderers/shaders/ShaderChunk/linear_to_gamma_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/logdepthbuf_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/logdepthbuf_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/logdepthbuf_pars_vertex.glsl",

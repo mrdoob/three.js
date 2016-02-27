@@ -41,9 +41,9 @@ void main() {
 	vec3 outgoingLight = reflectedLight.indirectDiffuse;
 
 	#include <envmap_fragment>
-	#include <linear_to_gamma_fragment>
-	#include <fog_fragment>
 
-	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+	gl_FragColor = linearToOutputTexel( vec4( outgoingLight, diffuseColor.a ) );
+
+	#include <fog_fragment>
 
 }

@@ -3365,6 +3365,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	this.getCurrentRenderTarget = function() {
+
+		return _currentRenderTarget;
+
+	}
+
 	this.setRenderTarget = function ( renderTarget ) {
 
 		_currentRenderTarget = renderTarget;
