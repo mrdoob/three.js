@@ -27,7 +27,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL) using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
+		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
 			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
 		<script src="../build/three.min.js"></script>
@@ -70,15 +70,10 @@
 			var composer;
 			var standardMaterial;
 
-			var loader = new THREE.FontLoader();
-			loader.load( '../examples/fonts/gentilis_regular.typeface.js', function ( font ) {
+			init();
+			animate();
 
-				init( font );
-				animate();
-
-			} );
-
-			function init( font ) {
+			function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -97,7 +92,7 @@
 					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 				];
 
-				renderer = new THREE.WebGLRenderer( { alpha: false, antialias: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 
 				var roughnessTexture = THREE.ImageUtils.loadTexture( "../examples/textures/roughness_map.jpg" );
 				roughnessTexture.wrapS = THREE.RepeatWrapping;
@@ -164,13 +159,12 @@
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
 				var spotLight = new THREE.SpotLight( 0xffffff );
-				spotLight.position.set( 10, 100, 10 );
-				spotLight.angle = Math.PI / 10;
-				spotLight.penumbra = 0.2
+				spotLight.position.set( 50, 100, 50 );
+				spotLight.angle = Math.PI / 7;
+				spotLight.penumbra = 0.8
 				spotLight.castShadow = true;
 				scene.add( spotLight );
 
-				renderer.setClearColor( 0x0a0a0a, 0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -249,7 +243,6 @@
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 					var object = objects[ i ];
-
 					object.rotation.y += 0.005;
 
 				}
