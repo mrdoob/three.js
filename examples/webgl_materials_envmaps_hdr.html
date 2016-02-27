@@ -136,6 +136,7 @@
 					var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
 					var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
 					torusMesh1.position.x = 0.0;
+					torusMesh1.castShadow = true;
 					scene.add( torusMesh1 );
 					objects.push( torusMesh1 );
 
@@ -153,6 +154,7 @@
 					var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
 					planeMesh1.position.y = - 50;
 					planeMesh1.rotation.x = - Math.PI * 0.5;
+					planeMesh1.receiveShadow = true;
 					scene.add( planeMesh1 );
 
 				} );
@@ -165,12 +167,13 @@
 				spotLight.position.set( 10, 100, 10 );
 				spotLight.angle = Math.PI / 10;
 				spotLight.penumbra = 0.2
+				spotLight.castShadow = true;
 				scene.add( spotLight );
 
 				renderer.setClearColor( 0x0a0a0a, 0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;
