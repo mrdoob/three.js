@@ -4,7 +4,7 @@
  */
 
 
-THREE.PMREM_CubeUVPacker = function( cubeTextureLods, numLods ) {
+THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 
 	this.cubeLods = cubeTextureLods;
 	this.numLods = numLods;
@@ -81,9 +81,9 @@ THREE.PMREM_CubeUVPacker = function( cubeTextureLods, numLods ) {
 
 };
 
-THREE.PMREM_CubeUVPacker.prototype = {
+THREE.PMREMCubeUVPacker.prototype = {
 
-	constructor : THREE.PMREM_CubeUVPacker,
+	constructor : THREE.PMREMCubeUVPacker,
 
 	update: function( renderer ) {
 

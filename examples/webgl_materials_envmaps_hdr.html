@@ -41,7 +41,7 @@
 		<script src="../examples/js/Half.js"></script>
 		<script src="../examples/js/Encodings.js"></script>
     <script src="../examples/js/pmrem/PMREMGenerator.js"></script>
-    <script src="../examples/js/pmrem/PMREM_CubeUVPacker.js"></script>
+    <script src="../examples/js/pmrem/PMREMCubeUVPacker.js"></script>
     <script src="../examples/js/libs/dat.gui.min.js"></script>
 
 		<script src="../examples/js/postprocessing/EffectComposer.js"></script>
@@ -117,7 +117,7 @@
 					pmremGenerator.update(renderer);
 
 
-				  var pmremCubeUVPacker = new THREE.PMREM_CubeUVPacker(pmremGenerator.cubeLods);
+				  var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker(pmremGenerator.cubeLods);
 				  pmremCubeUVPacker.update(renderer);
 
 				  standardMaterial = new THREE.MeshStandardMaterial( {
