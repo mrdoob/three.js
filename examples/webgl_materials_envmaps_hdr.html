@@ -96,7 +96,7 @@
 					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 				];
 
-				renderer = new THREE.WebGLRenderer( { alpha:true, antialias: true } );
+				renderer = new THREE.WebGLRenderer( { alpha: false, antialias: false } );
 
 				var hdrType = THREE.UnsignedByteType;
 		    if ( renderer.extensions.get( 'OES_texture_half_float' ) && renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
