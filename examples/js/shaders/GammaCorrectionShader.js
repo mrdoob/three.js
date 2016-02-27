@@ -28,7 +28,6 @@ THREE.GammaCorrectionShader = {
 
 	fragmentShader: [
 
-		"#define GAMMA_OUTPUT",
 		"#define GAMMA_FACTOR 2",
 
 		"uniform sampler2D tDiffuse;",
