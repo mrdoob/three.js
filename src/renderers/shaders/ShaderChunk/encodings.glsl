@@ -19,12 +19,13 @@ vec4 LinearTosRGB( in vec4 value ) {
 }
 
 vec4 RGBEToLinear( in vec4 value ) {
-  return vec4( value.xyz * exp2( value.w*256.0 - 128.0 ), 1.0 );
+  return vec4( value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0 );
 }
 vec4 LinearToRGBE( in vec4 value ) {
-  float maxComponent = max(max(value.r, value.g), value.b );
-  float fExp = ceil( log2(maxComponent) );
-  return vec4( value.rgb / exp2(fExp), (fExp + 128.0) / 255.0 );
+  float maxComponent = max( max( value.r, value.g ), value.b );
+  float fExp = clamp( ceil( log2( maxComponent ) ), -128.0, 127.0 );
+  return vec4( value.rgb / exp2( fExp ), ( fExp + 128.0 ) / 255.0 );
+//  return vec4( value.brg, ( 3.0 + 128.0 ) / 256.0 );
 }
 
 // reference: http://iwasbeingirony.blogspot.ca/2010/06/difference-between-rgbm-and-rgbd.html
@@ -33,7 +34,7 @@ vec4 RGBMToLinear( in vec4 value, in float maxRange ) {
 }
 vec4 LinearToRGBM( in vec4 value, in float maxRange ) {
   float maxRGB = max( value.x, max( value.g, value.b ) );
-  float M      = maxRGB / maxRange;
+  float M      = clamp( maxRGB / maxRange, 0.0, 1.0 );
   M            = ceil( M * 255.0 ) / 255.0;
   return vec4( value.rgb / ( M * maxRange ), M );
 }

@@ -70,18 +70,17 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 	function getTextureEncodingFromMap( map, gammaOverrideLinear ) {
 
 		var encoding;
-
 		if( ! map ) {
 
 			encoding = THREE.LinearEncoding;
 
 		}
-		else if( map instanceof THREE.Texture ) {
+		else if( map instanceof THREE.Texture || map instanceof THREE.CubeTexture ) {
 
 			encoding = map.encoding;
 
 		}
-		else if( map instanceof THREE.WebGLRenderTarget ) {
+		else if( map instanceof THREE.WebGLRenderTarget || map instanceof THREE.THREE.WebGLRenderTargetCube ) {
 
 			encoding = map.texture.encoding;
 
@@ -129,6 +128,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			envMap: !! material.envMap,
 			envMapMode: material.envMap && material.envMap.mapping,
 			envMapEncoding: getTextureEncodingFromMap( material.envMap, renderer.gammaInput ),
+			envMapCubeUV: (!!material.envMap) && ((material.envMap.mapping === THREE.CubeUVReflectionMapping) ||
+							(material.envMap.mapping === THREE.CubeUVRefractionMapping)),
 			lightMap: !! material.lightMap,
 			aoMap: !! material.aoMap,
 			emissiveMap: !! material.emissiveMap,

@@ -101,12 +101,12 @@ IncidentLight directLight;
 
 	#endif
 
-	// #if defined( USE_ENVMAP ) && defined( STANDARD )
+	#if defined( USE_ENVMAP ) && defined( STANDARD ) && defined( ENVMAP_TYPE_CUBE_UV )
 
 		// TODO, replace 8 with the real maxMIPLevel
-		// irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 ); // comment out until seams are fixed
+	 	irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 );
 
-	// #endif
+	#endif
 
 	RE_IndirectDiffuse( irradiance, geometry, material, reflectedLight );
 
