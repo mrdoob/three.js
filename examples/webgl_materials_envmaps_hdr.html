@@ -41,9 +41,9 @@
 
 		<script src="../examples/js/Half.js"></script>
 		<script src="../examples/js/Encodings.js"></script>
-    <script src="../examples/js/pmrem/PMREMGenerator.js"></script>
-    <script src="../examples/js/pmrem/PMREMCubeUVPacker.js"></script>
-    <script src="../examples/js/libs/dat.gui.min.js"></script>
+		<script src="../examples/js/pmrem/PMREMGenerator.js"></script>
+		<script src="../examples/js/pmrem/PMREMCubeUVPacker.js"></script>
+		<script src="../examples/js/libs/dat.gui.min.js"></script>
 
 		<script src="../examples/js/postprocessing/EffectComposer.js"></script>
 		<script src="../examples/js/postprocessing/RenderPass.js"></script>
@@ -99,43 +99,44 @@
 
 				renderer = new THREE.WebGLRenderer( { alpha: false, antialias: false } );
 
-			  var roughnessTexture = THREE.ImageUtils.loadTexture( "../examples/textures/roughness_map.jpg" );
-			  roughnessTexture.wrapS = THREE.RepeatWrapping;
-			  roughnessTexture.wrapT = THREE.RepeatWrapping;
-			  roughnessTexture.repeat.set( 9, 2 );
+				var roughnessTexture = THREE.ImageUtils.loadTexture( "../examples/textures/roughness_map.jpg" );
+				roughnessTexture.wrapS = THREE.RepeatWrapping;
+				roughnessTexture.wrapT = THREE.RepeatWrapping;
+				roughnessTexture.repeat.set( 9, 2 );
 
 				var hdrType = THREE.UnsignedByteType;
-		  /*  if ( renderer.extensions.get( 'OES_texture_half_float' ) && renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
-		      hdrType = THREE.HalfFloatType;
-		    }
-				else if ( renderer.extensions.get( 'OES_texture_float' ) && renderer.extensions.get( 'OES_texture_float_linear' ) ) {
-		      hdrType = THREE.FloatType;
-		    }*/
+
+				/*
+				if ( renderer.extensions.get( 'OES_texture_half_float' ) && renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
+					hdrType = THREE.HalfFloatType;
+				} else if ( renderer.extensions.get( 'OES_texture_float' ) && renderer.extensions.get( 'OES_texture_float_linear' ) ) {
+					hdrType = THREE.FloatType;
+				}
+				*/
 
 				var hdrCubeMap = new THREE.HDRCubeMapLoader().load( hdrType, hdrurls, function ( hdrCubeMap ) {
 
-				  var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
-					pmremGenerator.update(renderer);
+					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+					pmremGenerator.update( renderer );
 
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
 
-				  var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker(pmremGenerator.cubeLods);
-				  pmremCubeUVPacker.update(renderer);
-
-				  standardMaterial = new THREE.MeshStandardMaterial( {
+					standardMaterial = new THREE.MeshStandardMaterial( {
 						map: null,
 						roughnessMap: roughnessTexture,
-						bumpScale: -0.05,
+						bumpScale: - 0.05,
 						bumpMap: roughnessTexture,
 						color: 0xffffff,
 						metalness: 0.9,
 						roughness: 1.0,
 						envMap: pmremCubeUVPacker.CubeUVRenderTarget,
 						shading: THREE.SmoothShading
-					});
+					} );
 					var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
-				  var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
-				  torusMesh1.position.x = 0.0;
-				  scene.add( torusMesh1 );
+					var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
+					torusMesh1.position.x = 0.0;
+					scene.add( torusMesh1 );
 					objects.push( torusMesh1 );
 
 					var floorMaterial = new THREE.MeshStandardMaterial( {
@@ -146,13 +147,14 @@
 						roughness: 0.0,
 						envMap: pmremCubeUVPacker.CubeUVRenderTarget,
 						shading: THREE.SmoothShading
-					});
+					} );
 
 					var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				  var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
-					planeMesh1.position.y = -50;
-					planeMesh1.rotation.x = -Math.PI * 0.5;
+					var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
+					planeMesh1.position.y = - 50;
+					planeMesh1.rotation.x = - Math.PI * 0.5;
 					scene.add( planeMesh1 );
+
 				} );
 
 				// Lights
@@ -161,7 +163,7 @@
 
 				var spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.position.set( 10, 100, 10 );
-				spotLight.angle = Math.PI/10;
+				spotLight.angle = Math.PI / 10;
 				spotLight.penumbra = 0.2
 				scene.add( spotLight );
 
@@ -174,15 +176,15 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				composer = new THREE.EffectComposer(renderer);
-				composer.setSize(window.innerWidth, window.innerHeight);
+				composer = new THREE.EffectComposer( renderer );
+				composer.setSize( window.innerWidth, window.innerHeight );
 
-				var renderScene = new THREE.RenderPass(scene, camera);
-				composer.addPass(renderScene);
+				var renderScene = new THREE.RenderPass( scene, camera );
+				composer.addPass( renderScene );
 
-				var copyPass = new THREE.ShaderPass(THREE.CopyShader);
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				copyPass.renderToScreen = true;
-				composer.addPass(copyPass);
+				composer.addPass( copyPass );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -190,7 +192,7 @@
 
 				container.appendChild( stats.domElement );
 
-				controls = new THREE.OrbitControls( camera );
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 0, 0 );
 				controls.update();
 
@@ -199,8 +201,9 @@
 				var gui = new dat.GUI();
 
 				gui.add( params, 'roughness', 0, 1 );
-				gui.add( params, 'bumpScale', -1, 1 );
+				gui.add( params, 'bumpScale', - 1, 1 );
 				gui.open();
+
 			}
 
 			function onWindowResize() {
@@ -228,9 +231,12 @@
 			}
 
 			function render() {
-				if(standardMaterial !== undefined) {
+
+				if ( standardMaterial !== undefined ) {
+
 					standardMaterial.roughness = params.roughness;
-					standardMaterial.bumpScale = -0.05 * params.bumpScale;
+					standardMaterial.bumpScale = - 0.05 * params.bumpScale;
+
 				}
 
 				var timer = Date.now() * 0.00025;
