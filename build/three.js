@@ -4447,6 +4447,7 @@ THREE.Box3.prototype = {
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author bhouston / http://clara.io
+ * @author tschw
  */
 
 THREE.Matrix3 = function () {
@@ -4475,9 +4476,9 @@ THREE.Matrix3.prototype = {
 
 		var te = this.elements;
 
-		te[ 0 ] = n11; te[ 3 ] = n12; te[ 6 ] = n13;
-		te[ 1 ] = n21; te[ 4 ] = n22; te[ 7 ] = n23;
-		te[ 2 ] = n31; te[ 5 ] = n32; te[ 8 ] = n33;
+		te[ 0 ] = n11; te[ 1 ] = n21; te[ 2 ] = n31;
+		te[ 3 ] = n12; te[ 4 ] = n22; te[ 5 ] = n32;
+		te[ 6 ] = n13; te[ 7 ] = n23; te[ 8 ] = n33;
 
 		return this;
 
@@ -4512,6 +4513,22 @@ THREE.Matrix3.prototype = {
 			me[ 0 ], me[ 3 ], me[ 6 ],
 			me[ 1 ], me[ 4 ], me[ 7 ],
 			me[ 2 ], me[ 5 ], me[ 8 ]
+
+		);
+
+		return this;
+
+	},
+
+	setFromMatrix4: function( m ) {
+
+		var me = m.elements;
+
+		this.set(
+
+			me[ 0 ], me[ 4 ], me[  8 ],
+			me[ 1 ], me[ 5 ], me[  9 ],
+			me[ 2 ], me[ 6 ], me[ 10 ]
 
 		);
 
@@ -4597,25 +4614,24 @@ THREE.Matrix3.prototype = {
 
 	getInverse: function ( matrix, throwOnDegenerate ) {
 
-		// input: THREE.Matrix4
-		// ( based on http://code.google.com/p/webgl-mjs/ )
+		if ( matrix instanceof THREE.Matrix4 ) {
 
-		var me = matrix.elements;
-		var te = this.elements;
+			console.warn( "THREE.Matrix3.getInverse no longer takes a Matrix4 argument." );
 
-		te[ 0 ] =   me[ 10 ] * me[ 5 ] - me[ 6 ] * me[ 9 ];
-		te[ 1 ] = - me[ 10 ] * me[ 1 ] + me[ 2 ] * me[ 9 ];
-		te[ 2 ] =   me[ 6 ] * me[ 1 ] - me[ 2 ] * me[ 5 ];
-		te[ 3 ] = - me[ 10 ] * me[ 4 ] + me[ 6 ] * me[ 8 ];
-		te[ 4 ] =   me[ 10 ] * me[ 0 ] - me[ 2 ] * me[ 8 ];
-		te[ 5 ] = - me[ 6 ] * me[ 0 ] + me[ 2 ] * me[ 4 ];
-		te[ 6 ] =   me[ 9 ] * me[ 4 ] - me[ 5 ] * me[ 8 ];
-		te[ 7 ] = - me[ 9 ] * me[ 0 ] + me[ 1 ] * me[ 8 ];
-		te[ 8 ] =   me[ 5 ] * me[ 0 ] - me[ 1 ] * me[ 4 ];
+		}
 
-		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 3 ] + me[ 2 ] * te[ 6 ];
+		var me = matrix.elements,
+			te = this.elements,
 
-		// no inverse
+			n11 = me[ 0 ], n21 = me[ 1 ], n31 = me[ 2 ],
+			n12 = me[ 3 ], n22 = me[ 4 ], n32 = me[ 5 ],
+			n13 = me[ 6 ], n23 = me[ 7 ], n33 = me[ 8 ],
+
+			t11 = n33 * n22 - n32 * n23,
+			t12 = n32 * n13 - n33 * n12,
+			t13 = n23 * n12 - n22 * n13,
+
+			det = n11 * t11 + n21 * t12 + n31 * t13;
 
 		if ( det === 0 ) {
 
@@ -4631,15 +4647,22 @@ THREE.Matrix3.prototype = {
 
 			}
 
-			this.identity();
-
-			return this;
-
+			return this.identity();
 		}
 
-		this.multiplyScalar( 1.0 / det );
+		te[ 0 ] = t11;
+		te[ 1 ] = n31 * n23 - n33 * n21;
+		te[ 2 ] = n32 * n21 - n31 * n22;
 
-		return this;
+		te[ 3 ] = t12;
+		te[ 4 ] = n33 * n11 - n31 * n13;
+		te[ 5 ] = n31 * n12 - n32 * n11;
+
+		te[ 6 ] = t13;
+		te[ 7 ] = n21 * n13 - n23 * n11;
+		te[ 8 ] = n22 * n11 - n21 * n12;
+
+		return this.multiplyScalar( 1 / det );
 
 	},
 
@@ -4675,13 +4698,9 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	getNormalMatrix: function ( m ) {
+	getNormalMatrix: function ( matrix4 ) {
 
-		// input: THREE.Matrix4
-
-		this.getInverse( m ).transpose();
-
-		return this;
+		return this.setFromMatrix4( matrix4 ).getInverse( this ).transpose();
 
 	},
 
@@ -5339,41 +5358,29 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	getInverse: function ( m, throwOnInvertible ) {
+	getInverse: function ( m, throwOnDegenerate ) {
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
-		var te = this.elements;
-		var me = m.elements;
+		var te = this.elements,
+			me = m.elements,
 
-		var n11 = me[ 0 ], n12 = me[ 4 ], n13 = me[ 8 ], n14 = me[ 12 ];
-		var n21 = me[ 1 ], n22 = me[ 5 ], n23 = me[ 9 ], n24 = me[ 13 ];
-		var n31 = me[ 2 ], n32 = me[ 6 ], n33 = me[ 10 ], n34 = me[ 14 ];
-		var n41 = me[ 3 ], n42 = me[ 7 ], n43 = me[ 11 ], n44 = me[ 15 ];
+			n11 = me[ 0 ], n21 = me[ 1 ], n31 = me[ 2 ], n41 = me[ 3 ],
+			n12 = me[ 4 ], n22 = me[ 5 ], n32 = me[ 6 ], n42 = me[ 7 ],
+			n13 = me[ 8 ], n23 = me[ 9 ], n33 = me[ 10 ], n43 = me[ 11 ],
+			n14 = me[ 12 ], n24 = me[ 13 ], n34 = me[ 14 ], n44 = me[ 15 ],
 
-		te[ 0 ] = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44;
-		te[ 4 ] = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44;
-		te[ 8 ] = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44;
-		te[ 12 ] = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
-		te[ 1 ] = n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44;
-		te[ 5 ] = n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44;
-		te[ 9 ] = n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44;
-		te[ 13 ] = n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34;
-		te[ 2 ] = n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44;
-		te[ 6 ] = n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44;
-		te[ 10 ] = n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44;
-		te[ 14 ] = n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34;
-		te[ 3 ] = n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43;
-		te[ 7 ] = n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43;
-		te[ 11 ] = n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43;
-		te[ 15 ] = n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33;
+			t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44,
+			t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44,
+			t13 = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44,
+			t14 = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
 
-		var det = n11 * te[ 0 ] + n21 * te[ 4 ] + n31 * te[ 8 ] + n41 * te[ 12 ];
+		var det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
 
 		if ( det === 0 ) {
 
 			var msg = "THREE.Matrix4.getInverse(): can't invert matrix, determinant is 0";
 
-			if ( throwOnInvertible || false ) {
+			if ( throwOnDegenerate || false ) {
 
 				throw new Error( msg );
 
@@ -5383,15 +5390,31 @@ THREE.Matrix4.prototype = {
 
 			}
 
-			this.identity();
-
-			return this;
+			return this.identity();
 
 		}
 
-		this.multiplyScalar( 1 / det );
+		te[ 0 ] = t11;
+		te[ 1 ] = n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44;
+		te[ 2 ] = n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44;
+		te[ 3 ] = n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43;
 
-		return this;
+		te[ 4 ] = t12;
+		te[ 5 ] = n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44;
+		te[ 6 ] = n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44;
+		te[ 7 ] = n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43;
+
+		te[ 8 ] = t13;
+		te[ 9 ] = n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44;
+		te[ 10 ] = n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44;
+		te[ 11 ] = n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43;
+
+		te[ 12 ] = t14;
+		te[ 13 ] = n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34;
+		te[ 14 ] = n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34;
+		te[ 15 ] = n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33;
+
+		return this.multiplyScalar( 1 / det );
 
 	},
 
@@ -26450,365 +26473,388 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var value = uniform.value;
 			var location = uniforms[ j ][ 1 ];
 
-			switch ( type ) {
+			if ( type === '1i' ) {
 
-				case '1i':
-					_gl.uniform1i( location, value );
-					break;
+				_gl.uniform1i( location, value );
 
-				case '1f':
-					_gl.uniform1f( location, value );
-					break;
+			} else if ( type === '1f' ) {
 
-				case '2f':
-					_gl.uniform2f( location, value[ 0 ], value[ 1 ] );
-					break;
+				_gl.uniform1f( location, value );
 
-				case '3f':
-					_gl.uniform3f( location, value[ 0 ], value[ 1 ], value[ 2 ] );
-					break;
+			} else if ( type === '2f' ) {
 
-				case '4f':
-					_gl.uniform4f( location, value[ 0 ], value[ 1 ], value[ 2 ], value[ 3 ] );
-					break;
+				_gl.uniform2f( location, value[ 0 ], value[ 1 ] );
 
-				case '1iv':
-					_gl.uniform1iv( location, value );
-					break;
+			} else if ( type === '3f' ) {
 
-				case '3iv':
-					_gl.uniform3iv( location, value );
-					break;
+				_gl.uniform3f( location, value[ 0 ], value[ 1 ], value[ 2 ] );
 
-				case '1fv':
-					_gl.uniform1fv( location, value );
-					break;
+			} else if ( type === '4f' ) {
 
-				case '2fv':
-					_gl.uniform2fv( location, value );
-					break;
+				_gl.uniform4f( location, value[ 0 ], value[ 1 ], value[ 2 ], value[ 3 ] );
 
-				case '3fv':
-					_gl.uniform3fv( location, value );
-					break;
+			} else if ( type === '1iv' ) {
 
-				case '4fv':
-					_gl.uniform4fv( location, value );
-					break;
+				_gl.uniform1iv( location, value );
 
-				case 'Matrix2fv':
-					_gl.uniformMatrix2fv( location, false, value );
-					break;
+			} else if ( type === '3iv' ) {
 
-				case 'Matrix3fv':
-					_gl.uniformMatrix3fv( location, false, value );
-					break;
+				_gl.uniform3iv( location, value );
 
-				case 'Matrix4fv':
-					_gl.uniformMatrix4fv( location, false, value );
-					break;
+			} else if ( type === '1fv' ) {
 
-				//
+				_gl.uniform1fv( location, value );
 
-				case 'i':
+			} else if ( type === '2fv' ) {
 
-					// single integer
-					_gl.uniform1i( location, value );
+				_gl.uniform2fv( location, value );
 
-					break;
+			} else if ( type === '3fv' ) {
 
-				case 'f':
+				_gl.uniform3fv( location, value );
 
-					// single float
-					_gl.uniform1f( location, value );
+			} else if ( type === '4fv' ) {
 
-					break;
+				_gl.uniform4fv( location, value );
 
-				case 'v2':
+			} else if ( type === 'Matrix2fv' ) {
 
-					// single THREE.Vector2
-					_gl.uniform2f( location, value.x, value.y );
+				_gl.uniformMatrix2fv( location, false, value );
 
-					break;
+			} else if ( type === 'Matrix3fv' ) {
 
-				case 'v3':
+				_gl.uniformMatrix3fv( location, false, value );
 
-					// single THREE.Vector3
-					_gl.uniform3f( location, value.x, value.y, value.z );
+			} else if ( type === 'Matrix4fv' ) {
 
-					break;
+				_gl.uniformMatrix4fv( location, false, value );
 
-				case 'v4':
+			//
 
-					// single THREE.Vector4
-					_gl.uniform4f( location, value.x, value.y, value.z, value.w );
+			} else if ( type === 'i' ) {
 
-					break;
+				// single integer
+				_gl.uniform1i( location, value );
 
-				case 'c':
+			} else if ( type === 'f' ) {
 
-					// single THREE.Color
-					_gl.uniform3f( location, value.r, value.g, value.b );
+				// single float
+				_gl.uniform1f( location, value );
 
-					break;
+			} else if ( type === 'v2' ) {
 
-				/*
-				case 's':
+				// single THREE.Vector2
+				_gl.uniform2f( location, value.x, value.y );
 
-					// TODO: Optimize this.
-					for( var propertyName in uniform.properties ) {
+			} else if ( type === 'v3' ) {
 
-						var property = uniform.properties[ propertyName ];
-						var locationProperty =  location[ propertyName ];
-						var valueProperty = value[ propertyName ];
+				// single THREE.Vector3
+				_gl.uniform3f( location, value.x, value.y, value.z );
 
-						switch( property.type ) {
-							case 'i':
-								_gl.uniform1i( locationProperty, valueProperty );
-								break;
-							case 'f':
-								_gl.uniform1f( locationProperty, valueProperty );
-								break;
-							case 'v2':
-								_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
-								break;
-							case 'v3':
-								_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
-								break;
-							case 'v4':
-								_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
-								break;
-							case 'c':
-								_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
-								break;
-						};
+			} else if ( type === 'v4' ) {
+
+				// single THREE.Vector4
+				_gl.uniform4f( location, value.x, value.y, value.z, value.w );
+
+			} else if ( type === 'c' ) {
+
+				// single THREE.Color
+				_gl.uniform3f( location, value.r, value.g, value.b );
+
+			/*
+			} else if ( type === 's' ) {
+
+				// TODO: Optimize this
+
+				for ( var propertyName in uniform.properties ) {
+
+					var property = uniform.properties[ propertyName ];
+					var locationProperty =  location[ propertyName ];
+					var valueProperty = value[ propertyName ];
+
+					type = property.type;
+
+					if ( type === 'i' ) {
+
+						_gl.uniform1i( locationProperty, valueProperty );
+
+					} else if ( type === 'f' ) {
+
+						_gl.uniform1f( locationProperty, valueProperty );
+
+					} else if ( type === 'v2' ) {
+
+						_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
+
+					} else if ( type === 'v3' ) {
+
+						_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
+
+					} else if ( type === 'v4' ) {
+
+						_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
+
+					} else if ( type === 'c' ) {
+
+						_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
 
 					}
 
-					break;
-				*/
+				}
 
-				case 'sa':
 
-					// TODO: Optimize this.
-					for ( var i = 0; i < value.length; i ++ ) {
+			*/
 
-						for ( var propertyName in uniform.properties ) {
+			} else if ( type === 'sa' ) {
 
-							var property = uniform.properties[ propertyName ];
-							var locationProperty =  location[ i ][ propertyName ];
-							var valueProperty = value[ i ][ propertyName ];
+				// TODO: Optimize this
 
-							switch ( property.type ) {
-								case 'i':
-									_gl.uniform1i( locationProperty, valueProperty );
-									break;
-								case 'f':
-									_gl.uniform1f( locationProperty, valueProperty );
-									break;
-								case 'v2':
-									_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
-									break;
-								case 'v3':
-									_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
-									break;
-								case 'v4':
-									_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
-									break;
-								case 'c':
-									_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
-									break;
-								case 'm4':
-									_gl.uniformMatrix4fv( locationProperty, false, valueProperty.elements );
-									break;
-							}
+				for ( var i = 0; i < value.length; i ++ ) {
+
+					for ( var propertyName in uniform.properties ) {
+
+						var property = uniform.properties[ propertyName ];
+						var locationProperty =  location[ i ][ propertyName ];
+						var valueProperty = value[ i ][ propertyName ];
+
+						type = property.type;
+
+						if ( type === 'i' ) {
+
+							_gl.uniform1i( locationProperty, valueProperty );
+
+						} else if ( type === 'f' ) {
+
+							_gl.uniform1f( locationProperty, valueProperty );
+
+						} else if ( type === 'v2' ) {
+
+							_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
+
+						} else if ( type === 'v3' ) {
+
+							_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
+
+						} else if ( type === 'v4' ) {
+
+							_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
+
+						} else if ( type === 'c' ) {
+
+							_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
+
+						} else if ( type === 'm4' ) {
+
+							_gl.uniformMatrix4fv( locationProperty, false, valueProperty.elements );
 
 						}
 
 					}
 
-					break;
+				}
 
-				case 'iv1':
+			} else if ( type === 'iv1' ) {
 
-					// flat array of integers (JS or typed array)
-					_gl.uniform1iv( location, value );
+				// flat array of integers (JS or typed array)
+				_gl.uniform1iv( location, value );
 
-					break;
+			} else if ( type === 'iv' ) {
 
-				case 'iv':
+				// flat array of integers with 3 x N size (JS or typed array)
+				_gl.uniform3iv( location, value );
 
-					// flat array of integers with 3 x N size (JS or typed array)
-					_gl.uniform3iv( location, value );
+			} else if ( type === 'fv1' ) {
 
-					break;
+				// flat array of floats (JS or typed array)
+				_gl.uniform1fv( location, value );
 
-				case 'fv1':
+			} else if ( type === 'fv' ) {
 
-					// flat array of floats (JS or typed array)
-					_gl.uniform1fv( location, value );
+				// flat array of floats with 3 x N size (JS or typed array)
+				_gl.uniform3fv( location, value );
 
-					break;
+			} else if ( type === 'v2v' ) {
 
-				case 'fv':
+				// array of THREE.Vector2
 
-					// flat array of floats with 3 x N size (JS or typed array)
-					_gl.uniform3fv( location, value );
+				if ( uniform._array === undefined ) {
 
-					break;
+					uniform._array = new Float32Array( 2 * value.length );
 
-				case 'v2v':
+				}
 
-					// array of THREE.Vector2
+				for ( var i = 0, i2 = 0, il = value.length; i < il; i ++, i2 += 2 ) {
 
-					if ( uniform._array === undefined ) {
+					uniform._array[ i2 + 0 ] = value[ i ].x;
+					uniform._array[ i2 + 1 ] = value[ i ].y;
 
-						uniform._array = new Float32Array( 2 * value.length );
+				}
 
-					}
+				_gl.uniform2fv( location, uniform._array );
 
-					for ( var i = 0, i2 = 0, il = value.length; i < il; i ++, i2 += 2 ) {
+			} else if ( type === 'v3v' ) {
 
-						uniform._array[ i2 + 0 ] = value[ i ].x;
-						uniform._array[ i2 + 1 ] = value[ i ].y;
+				// array of THREE.Vector3
 
-					}
+				if ( uniform._array === undefined ) {
 
-					_gl.uniform2fv( location, uniform._array );
+					uniform._array = new Float32Array( 3 * value.length );
 
-					break;
+				}
 
-				case 'v3v':
+				for ( var i = 0, i3 = 0, il = value.length; i < il; i ++, i3 += 3 ) {
 
-					// array of THREE.Vector3
+					uniform._array[ i3 + 0 ] = value[ i ].x;
+					uniform._array[ i3 + 1 ] = value[ i ].y;
+					uniform._array[ i3 + 2 ] = value[ i ].z;
 
-					if ( uniform._array === undefined ) {
+				}
 
-						uniform._array = new Float32Array( 3 * value.length );
+				_gl.uniform3fv( location, uniform._array );
 
-					}
+			} else if ( type === 'v4v' ) {
 
-					for ( var i = 0, i3 = 0, il = value.length; i < il; i ++, i3 += 3 ) {
+				// array of THREE.Vector4
 
-						uniform._array[ i3 + 0 ] = value[ i ].x;
-						uniform._array[ i3 + 1 ] = value[ i ].y;
-						uniform._array[ i3 + 2 ] = value[ i ].z;
+				if ( uniform._array === undefined ) {
 
-					}
+					uniform._array = new Float32Array( 4 * value.length );
 
-					_gl.uniform3fv( location, uniform._array );
+				}
 
-					break;
+				for ( var i = 0, i4 = 0, il = value.length; i < il; i ++, i4 += 4 ) {
 
-				case 'v4v':
+					uniform._array[ i4 + 0 ] = value[ i ].x;
+					uniform._array[ i4 + 1 ] = value[ i ].y;
+					uniform._array[ i4 + 2 ] = value[ i ].z;
+					uniform._array[ i4 + 3 ] = value[ i ].w;
 
-					// array of THREE.Vector4
+				}
 
-					if ( uniform._array === undefined ) {
+				_gl.uniform4fv( location, uniform._array );
 
-						uniform._array = new Float32Array( 4 * value.length );
+			} else if ( type === 'm2' ) {
 
-					}
+				// single THREE.Matrix2
+				_gl.uniformMatrix2fv( location, false, value.elements );
 
-					for ( var i = 0, i4 = 0, il = value.length; i < il; i ++, i4 += 4 ) {
+			} else if ( type === 'm3' ) {
 
-						uniform._array[ i4 + 0 ] = value[ i ].x;
-						uniform._array[ i4 + 1 ] = value[ i ].y;
-						uniform._array[ i4 + 2 ] = value[ i ].z;
-						uniform._array[ i4 + 3 ] = value[ i ].w;
+				// single THREE.Matrix3
+				_gl.uniformMatrix3fv( location, false, value.elements );
 
-					}
+			} else if ( type === 'm3v' ) {
 
-					_gl.uniform4fv( location, uniform._array );
+				// array of THREE.Matrix3
 
-					break;
+				if ( uniform._array === undefined ) {
 
-				case 'm2':
+					uniform._array = new Float32Array( 9 * value.length );
 
-					// single THREE.Matrix2
-					_gl.uniformMatrix2fv( location, false, value.elements );
+				}
 
-					break;
+				for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-				case 'm3':
+					value[ i ].flattenToArrayOffset( uniform._array, i * 9 );
 
-					// single THREE.Matrix3
-					_gl.uniformMatrix3fv( location, false, value.elements );
+				}
 
-					break;
+				_gl.uniformMatrix3fv( location, false, uniform._array );
 
-				case 'm3v':
+			} else if ( type === 'm4' ) {
 
-					// array of THREE.Matrix3
+				// single THREE.Matrix4
+				_gl.uniformMatrix4fv( location, false, value.elements );
 
-					if ( uniform._array === undefined ) {
+			} else if ( type === 'm4v' ) {
 
-						uniform._array = new Float32Array( 9 * value.length );
+				// array of THREE.Matrix4
 
-					}
+				if ( uniform._array === undefined ) {
 
-					for ( var i = 0, il = value.length; i < il; i ++ ) {
+					uniform._array = new Float32Array( 16 * value.length );
 
-						value[ i ].flattenToArrayOffset( uniform._array, i * 9 );
+				}
 
-					}
+				for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-					_gl.uniformMatrix3fv( location, false, uniform._array );
+					value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
 
-					break;
+				}
 
-				case 'm4':
+				_gl.uniformMatrix4fv( location, false, uniform._array );
 
-					// single THREE.Matrix4
-					_gl.uniformMatrix4fv( location, false, value.elements );
+			} else if ( type === 't' ) {
 
-					break;
+				// single THREE.Texture (2d or cube)
 
-				case 'm4v':
+				texture = value;
+				textureUnit = getTextureUnit();
 
-					// array of THREE.Matrix4
+				_gl.uniform1i( location, textureUnit );
 
-					if ( uniform._array === undefined ) {
+				if ( ! texture ) continue;
 
-						uniform._array = new Float32Array( 16 * value.length );
+				if ( texture instanceof THREE.CubeTexture ||
+					 ( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
 
-					}
+					// CompressedTexture can have Array in image :/
 
-					for ( var i = 0, il = value.length; i < il; i ++ ) {
+					setCubeTexture( texture, textureUnit );
 
-						value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
+				} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
 
-					}
+					setCubeTextureDynamic( texture.texture, textureUnit );
 
-					_gl.uniformMatrix4fv( location, false, uniform._array );
+				} else if ( texture instanceof THREE.WebGLRenderTarget ) {
 
-					break;
+					_this.setTexture( texture.texture, textureUnit );
 
-				case 't':
+				} else {
 
-					// single THREE.Texture (2d or cube)
+					_this.setTexture( texture, textureUnit );
 
-					texture = value;
-					textureUnit = getTextureUnit();
+				}
 
-					_gl.uniform1i( location, textureUnit );
+			} else if ( type === 'tv' ) {
+
+				// array of THREE.Texture (2d or cube)
+
+				if ( uniform._array === undefined ) {
+
+					uniform._array = [];
+
+				}
+
+				for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
+
+					uniform._array[ i ] = getTextureUnit();
+
+				}
+
+				_gl.uniform1iv( location, uniform._array );
+
+				for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
+
+					texture = uniform.value[ i ];
+					textureUnit = uniform._array[ i ];
 
 					if ( ! texture ) continue;
 
 					if ( texture instanceof THREE.CubeTexture ||
-						 ( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
+						 ( texture.image instanceof Array && texture.image.length === 6 ) ) {
 
 						// CompressedTexture can have Array in image :/
 
 						setCubeTexture( texture, textureUnit );
 
-					} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
-
-						setCubeTextureDynamic( texture.texture, textureUnit );
-
 					} else if ( texture instanceof THREE.WebGLRenderTarget ) {
 
 						_this.setTexture( texture.texture, textureUnit );
+
+					} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
+
+						setCubeTextureDynamic( texture.texture, textureUnit );
 
 					} else {
 
@@ -26816,61 +26862,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					break;
+				}
 
-				case 'tv':
+			} else {
 
-					// array of THREE.Texture (2d or cube)
-
-					if ( uniform._array === undefined ) {
-
-						uniform._array = [];
-
-					}
-
-					for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
-
-						uniform._array[ i ] = getTextureUnit();
-
-					}
-
-					_gl.uniform1iv( location, uniform._array );
-
-					for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
-
-						texture = uniform.value[ i ];
-						textureUnit = uniform._array[ i ];
-
-						if ( ! texture ) continue;
-
-						if ( texture instanceof THREE.CubeTexture ||
-							 ( texture.image instanceof Array && texture.image.length === 6 ) ) {
-
-							// CompressedTexture can have Array in image :/
-
-							setCubeTexture( texture, textureUnit );
-
-						} else if ( texture instanceof THREE.WebGLRenderTarget ) {
-
-							_this.setTexture( texture.texture, textureUnit );
-
-						} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
-
-							setCubeTextureDynamic( texture.texture, textureUnit );
-
-						} else {
-
-							_this.setTexture( texture, textureUnit );
-
-						}
-
-					}
-
-					break;
-
-				default:
-
-					console.warn( 'THREE.WebGLRenderer: Unknown uniform type: ' + type );
+				console.warn( 'THREE.WebGLRenderer: Unknown uniform type: ' + type );
 
 			}
 
