@@ -98,13 +98,18 @@
 
 				renderer = new THREE.WebGLRenderer( { alpha: false, antialias: false } );
 
+			  var roughnessTexture = THREE.ImageUtils.loadTexture( "../examples/textures/roughness_map.jpg" );
+			  roughnessTexture.wrapS = THREE.RepeatWrapping;
+			  roughnessTexture.wrapT = THREE.RepeatWrapping;
+			  roughnessTexture.repeat.set( 9, 2 );
+
 				var hdrType = THREE.UnsignedByteType;
-		    if ( renderer.extensions.get( 'OES_texture_half_float' ) && renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
+		  /*  if ( renderer.extensions.get( 'OES_texture_half_float' ) && renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
 		      hdrType = THREE.HalfFloatType;
 		    }
 				else if ( renderer.extensions.get( 'OES_texture_float' ) && renderer.extensions.get( 'OES_texture_float_linear' ) ) {
 		      hdrType = THREE.FloatType;
-		    }
+		    }*/
 
 				var hdrCubeMap = new THREE.HDRCubeMapLoader().load( hdrType, hdrurls, function ( hdrCubeMap ) {
 
@@ -114,12 +119,6 @@
 
 				  var pmremCubeUVPacker = new THREE.PMREM_CubeUVPacker(pmremGenerator.cubeLods);
 				  pmremCubeUVPacker.update(renderer);
-
-
-				  var roughnessTexture = THREE.ImageUtils.loadTexture( "../examples/textures/roughness_map.jpg" );
-				  roughnessTexture.wrapS = THREE.RepeatWrapping;
-				  roughnessTexture.wrapT = THREE.RepeatWrapping;
-				  roughnessTexture.repeat.set( 9, 2 );
 
 				  standardMaterial = new THREE.MeshStandardMaterial( {
 						map: null,
@@ -168,27 +167,21 @@
 				renderer.setClearColor( 0x0a0a0a, 0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = true;
 
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				var renderScene = new THREE.RenderPass(scene, camera);
-
 				composer = new THREE.EffectComposer(renderer);
 				composer.setSize(window.innerWidth, window.innerHeight);
+
+				var renderScene = new THREE.RenderPass(scene, camera);
 				composer.addPass(renderScene);
 
-				bloomPass = new THREE.BloomPass(1.0, 9, 0.25, 1024);
-				composer.addPass(bloomPass);
-
-				//
-				effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
-				effectFXAA.uniforms['resolution'].value.set(1 / (window.innerWidth), 1 / (window.innerHeight));
-				effectFXAA.renderToScreen = true;
-				composer.addPass(effectFXAA);
+				var copyPass = new THREE.ShaderPass(THREE.CopyShader);
+				copyPass.renderToScreen = true;
+				composer.addPass(copyPass);
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -204,10 +197,8 @@
 
 				var gui = new dat.GUI();
 
-				//gui.add( params, 'projection', { 'From cam to mesh': 'camera', 'Normal to mesh': 'normal' } );
 				gui.add( params, 'roughness', 0, 1 );
 				gui.add( params, 'bumpScale', -1, 1 );
-				//gui.add( params, 'background' );
 				gui.open();
 			}
 
@@ -220,13 +211,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-
-				var pixelRatio = renderer.getPixelRatio();
-				var newWidth  = Math.floor( width / pixelRatio ) || 1;
-				var newHeight = Math.floor( height / pixelRatio ) || 1;
-				composer.setSize( newWidth, newHeight );
-
-				effectFXAA.uniforms['resolution'].value.set(1 / (window.innerWidth), 1 / (window.innerHeight));
+				composer.setSize( width, height );
 
 			}
 
@@ -248,9 +233,6 @@
 				}
 
 				var timer = Date.now() * 0.00025;
-
-				//camera.position.x = Math.cos( timer ) * 800;
-				//camera.position.z = Math.sin( timer ) * 800;
 
 				camera.lookAt( scene.position );
 
