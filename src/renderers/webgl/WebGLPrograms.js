@@ -75,11 +75,11 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			encoding = THREE.LinearEncoding;
 
-		} else if ( map instanceof THREE.Texture || map instanceof THREE.CubeTexture ) {
+		} else if ( map instanceof THREE.Texture ) {
 
 			encoding = map.encoding;
 
-		} else if ( map instanceof THREE.WebGLRenderTarget || map instanceof THREE.THREE.WebGLRenderTargetCube ) {
+		} else if ( map instanceof THREE.WebGLRenderTarget ) {
 
 			encoding = map.texture.encoding;
 
