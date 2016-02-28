@@ -4,7 +4,7 @@
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
  */
 
-THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, arc ) {
+THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, arc, closedEnded ) {
 
 	THREE.Geometry.call( this );
 
@@ -15,7 +15,8 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 		tube: tube,
 		radialSegments: radialSegments,
 		tubularSegments: tubularSegments,
-		arc: arc
+		arc: arc,
+        closedEnded: closedEnded
 	};
 
 	radius = radius || 100;
@@ -70,6 +71,41 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 		}
 
 	}
+
+    if (closedEnded) {
+        var startCenter = new THREE.Vector3(radius,0,0);
+        var centerIndex = this.vertices.length;
+        this.vertices.push( startCenter );
+        var normal = new THREE.Vector3(0,0,-1);
+	    for ( var j = 0; j < radialSegments; j ++ ) {
+            var v1 = j*(tubularSegments+1);
+            var v2 = (j+1)*(tubularSegments+1);
+            var v3 = centerIndex;
+            var uv1 = new THREE.Vector2( 0, 1 );
+            var uv2 = new THREE.Vector2( 1, 1 );
+            var uv3 = new THREE.Vector2( 0, 0 );
+            face = new THREE.Face3( v1, v2, v3, [normal.clone(), normal.clone(), normal.clone() ] );
+            this.faces.push( face );
+            this.faceVertexUvs[0].push( [ uv1, uv2, uv3 ] );
+        }
+        
+        var centerIndex = this.vertices.length;
+        var endCenter = new THREE.Vector3( radius * Math.cos( arc ), radius*Math.sin( arc ), 0 );        
+        this.vertices.push( endCenter );
+        normal = new THREE.Vector3(0,0,1);
+	    for ( var j = 0; j < radialSegments; j ++ ) {
+            var v1 = (j+1)*(tubularSegments+1)-1;
+            var v2 = (j+2)*(tubularSegments+1)-1;
+            var v3 = centerIndex;
+            var uv1 = new THREE.Vector2( 0, 1 );
+            var uv2 = new THREE.Vector2( 1, 1 );
+            var uv3 = new THREE.Vector2( 0, 0 );
+            face = new THREE.Face3( v1, v2, v3, [normal.clone(), normal.clone(), normal.clone() ] );
+            this.faces.push( face );
+            this.faceVertexUvs[0].push( [ uv1, uv2, uv3 ] );
+        }
+        
+    }
 
 	this.computeFaceNormals();
 
