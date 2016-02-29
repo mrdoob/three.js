@@ -206,6 +206,7 @@ var files = {
 		"webgl_terrain_dynamic",
 		"webgl_test_memory",
 		"webgl_test_memory2",
+		"webgl_tonemapping",
 		"webgl_trails",
 		"webgl_video_panorama_equirectangular"
 	],
