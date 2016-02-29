@@ -37,6 +37,13 @@
 		<script src="../examples/js/libs/stats.min.js"></script>
 
 		<script src="../examples/js/libs/dat.gui.min.js"></script>
+		<script src="../src/loaders/BinaryTextureLoader.js"></script>
+		<script src="../examples/js/loaders/RGBELoader.js"></script>
+		<script src="../examples/js/loaders/HDRCubeMapLoader.js"></script>
+		<script src="../examples/js/Half.js"></script>
+		<script src="../examples/js/Encodings.js"></script>
+		<script src="../examples/js/pmrem/PMREMGenerator.js"></script>
+		<script src="../examples/js/pmrem/PMREMCubeUVPacker.js"></script>
 
 		<script src="../examples/js/postprocessing/EffectComposer.js"></script>
 		<script src="../examples/js/postprocessing/RenderPass.js"></script>
@@ -70,7 +77,7 @@
 
 			var camera, scene, renderer, controls, objects = [];
 			var composer;
-			var standardMaterial, standardMaterialPremultiplied;
+			var standardMaterial, standardMaterialPremultiplied, floorMaterial;
 
 			init();
 			animate();
@@ -92,59 +99,77 @@
 				roughnessTexture.wrapT = THREE.RepeatWrapping;
 				roughnessTexture.repeat.set( 9, 2 );
 
-				standardMaterial = new THREE.MeshStandardMaterial( {
-					map: null,
-					roughnessMap: roughnessTexture,
-					bumpScale: - 0.05,
-					bumpMap: roughnessTexture,
-					color: 0xffffff,
-					metalness: 0.9,
-					roughness: 1.0,
-					shading: THREE.SmoothShading,
-					transparent: true
-				} );
-				var geometry = new THREE.SphereGeometry( 18, 30, 30 );
-				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
-				torusMesh1.position.x = -20.0;
-				torusMesh1.castShadow = true;
-				scene.add( torusMesh1 );
-				objects.push( torusMesh1 );
 
-				standardMaterialPremultiplied = new THREE.MeshStandardMaterial( {
-					map: null,
-					roughnessMap: roughnessTexture,
-					bumpScale: - 0.05,
-					bumpMap: roughnessTexture,
-					color: 0xffffff,
-					metalness: 0.9,
-					roughness: 1.0,
-					shading: THREE.SmoothShading,
-					blending: THREE.PremultipliedAlphaBlending,
-					transparent: true
-				} );
+								// Materials
+								var hdrpath = "../examples/textures/cube/hdrPisa/";
+								var hdrformat = '.hdr';
+								var hdrurls = [
+									hdrpath + 'px' + hdrformat, hdrpath + 'nx' + hdrformat,
+									hdrpath + 'py' + hdrformat, hdrpath + 'ny' + hdrformat,
+									hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
+								];
 
-				var torusMesh2 = new THREE.Mesh( geometry, standardMaterialPremultiplied );
-				torusMesh2.position.x = 20.0;
-				torusMesh2.castShadow = true;
-				scene.add( torusMesh2 );
-				objects.push( torusMesh2 );
+								renderer = new THREE.WebGLRenderer( { antialias: false } );
 
-				var floorMaterial = new THREE.MeshStandardMaterial( {
-					map: null,
-					roughnessMap: null,
-					color: 0xffffff,
-					metalness: 0.0,
-					roughness: 0.0,
-					shading: THREE.SmoothShading
-				} );
+								var roughnessTexture = THREE.ImageUtils.loadTexture( "../examples/textures/roughness_map.jpg" );
+								roughnessTexture.wrapS = THREE.RepeatWrapping;
+								roughnessTexture.wrapT = THREE.RepeatWrapping;
+								roughnessTexture.repeat.set( 9, 2 );
 
-				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
-				planeMesh1.position.y = - 50;
-				planeMesh1.rotation.x = - Math.PI * 0.5;
-				planeMesh1.receiveShadow = true;
-				scene.add( planeMesh1 );
+								var hdrType = THREE.UnsignedByteType;
 
+								/*
+								if ( renderer.extensions.get( 'OES_texture_half_float' ) && renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
+									hdrType = THREE.HalfFloatType;
+								} else if ( renderer.extensions.get( 'OES_texture_float' ) && renderer.extensions.get( 'OES_texture_float_linear' ) ) {
+									hdrType = THREE.FloatType;
+								}
+								*/
+
+								var hdrCubeMap = new THREE.HDRCubeMapLoader().load( hdrType, hdrurls, function ( hdrCubeMap ) {
+
+									var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+									pmremGenerator.update( renderer );
+
+									var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+									pmremCubeUVPacker.update( renderer );
+
+									standardMaterial = new THREE.MeshStandardMaterial( {
+										map: null,
+										roughnessMap: roughnessTexture,
+										bumpScale: - 0.05,
+										bumpMap: roughnessTexture,
+										color: 0xffffff,
+										metalness: 0.9,
+										roughness: 1.0,
+										envMap: pmremCubeUVPacker.CubeUVRenderTarget,
+										shading: THREE.SmoothShading
+									} );
+									var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
+									var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
+									torusMesh1.position.x = 0.0;
+									torusMesh1.castShadow = true;
+									scene.add( torusMesh1 );
+									objects.push( torusMesh1 );
+
+									floorMaterial = new THREE.MeshStandardMaterial( {
+										map: null,
+										roughnessMap: null,
+										color: 0xffffff,
+										metalness: 0.0,
+										roughness: 0.0,
+										envMap: pmremCubeUVPacker.CubeUVRenderTarget,
+										shading: THREE.SmoothShading
+									} );
+
+									var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
+									var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
+									planeMesh1.position.y = - 50;
+									planeMesh1.rotation.x = - Math.PI * 0.5;
+									planeMesh1.receiveShadow = true;
+									scene.add( planeMesh1 );
+
+								} );
 
 				// Lights
 
@@ -190,9 +215,6 @@
 				var gui = new dat.GUI();
 
 				gui.add( params, 'toneMapping', Object.keys( toneMappingOptions ) );
-				gui.add( params, 'roughness', 0, 1 );
-				gui.add( params, 'bumpScale', - 1, 1 );
-				gui.add( params, 'opacity', 0, 1 );
 				gui.add( params, 'exposure', 0, 5 );
 				gui.add( params, 'whitePoint', 0, 5 );
 				gui.open();
@@ -229,19 +251,14 @@
 
 
 					standardMaterial.roughness = params.roughness;
-					standardMaterialPremultiplied.roughness = params.roughness;
-
 					standardMaterial.bumpScale = - 0.05 * params.bumpScale;
-					standardMaterialPremultiplied.bumpScale = - 0.05 * params.bumpScale;
-
 					standardMaterial.opacity = params.opacity;
-					standardMaterialPremultiplied.opacity = params.opacity;
 
 				}
 				if( renderer.toneMapping !== toneMappingOptions[ params.toneMapping ] ) {
 					renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
-					standardMaterial.needsUpdate = true;
-					standardMaterialPremultiplied.needsUpdate = true;
+					if( standardMaterial ) standardMaterial.needsUpdate = true;
+					if( floorMaterial ) floorMaterial.needsUpdate = true;
 				}
 				renderer.toneMappingExposure = params.exposure;
 				renderer.toneMappingWhitePoint = params.whitePoint;
