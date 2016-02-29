@@ -209,6 +209,13 @@ THREE.MultiplyOperation = 0;
 THREE.MixOperation = 1;
 THREE.AddOperation = 2;
 
+// Tone Mapping modes
+
+THREE.NoToneMapping = 0; // do not even apply exposure.
+THREE.LinearToneMapping = 0; // only apply exposure.
+THREE.ReinhardToneMapping = 1;
+THREE.Uncharted2ToneMapping = 2;
+
 // Mapping modes
 
 THREE.UVMapping = 300;
