@@ -759,8 +759,6 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 	merge: function( geometry ) {
 
-		var i, il, attribute, hasAttribute, attributes = [ 'position', 'normal', 'color', 'uv' ];
-
 		if ( geometry instanceof THREE.BufferGeometry === false ) {
 
 			console.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
@@ -769,11 +767,13 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		}
 
-		hasAttribute = this.index !== null;
+		var i, il, attribute, attributes = getAttributes(),
 
-		if ( hasAttribute === ( geometry.index !== null ) ) {
+		indexed = this.index !== null;
 
-			if ( hasAttribute ) {
+		if ( indexed === ( geometry.index !== null ) ) {
+
+			if ( indexed ) {
 
 				var indices = geometry.index.array, offset = this.attributes[ 'position' ].count;
 
@@ -797,25 +797,41 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 			attribute = attributes[ i ];
 
-			hasAttribute = this.attributes.hasOwnProperty( attribute );
-
-			if ( hasAttribute === geometry.attributes.hasOwnProperty( attribute ) ) {
-
-				if ( hasAttribute ) {
-
-					this.attributes[ attribute ].merge( geometry.attributes[ attribute ] );
-
-				}
-
-			} else {
-
-				console.error( 'THREE.BufferGeometry.merge(): attribute ' + attribute + ' mismatch' );
-
-			}
+			this.attributes[ attribute ].merge( geometry.attributes[ attribute ] );
 
 		}
 
 		return this;
+
+		/**
+		 * Get attributes to merge as array.
+		 * Throws an error on attribute mismatch.
+		 *
+		 * @returns {Array}
+         */
+		function getAttributes() {
+
+			var attributes = [];
+
+			for ( var key in this.attributes ) {
+
+				attributes.push( data );
+
+			}
+
+			for ( var key in geometry.attributes ) {
+
+				if ( attributes.indexOf( key ) === - 1 ) {
+
+					console.error( 'THREE.BufferGeometry.merge(): attribute ' + attribute + ' mismatch' );
+
+				}
+
+			}
+
+			return attributes;
+
+		}
 
 	},
 
