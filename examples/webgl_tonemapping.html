@@ -143,7 +143,9 @@
 										metalness: 0.9,
 										roughness: 1.0,
 										envMap: pmremCubeUVPacker.CubeUVRenderTarget,
-										shading: THREE.SmoothShading
+										shading: THREE.SmoothShading,
+										transparent: true,
+										blending: THREE.PremultipliedAlphaBlending
 									} );
 									var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
 									var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
@@ -217,6 +219,7 @@
 				gui.add( params, 'toneMapping', Object.keys( toneMappingOptions ) );
 				gui.add( params, 'exposure', 0, 5 );
 				gui.add( params, 'whitePoint', 0, 5 );
+				gui.add( params, 'opacity', 0, 1 );
 				gui.open();
 
 			}
