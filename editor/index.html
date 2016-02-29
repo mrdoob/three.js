@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js / editor</title>
+		<title>OpenSim 4.0 Visualizer 022916</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	</head>
@@ -11,29 +11,10 @@
 
 		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/libs/system.min.js"></script>
-		<script src="websocket.js" type="text/javascript"></script>
+		<script src="../examples/js/libs/dat.gui.min.js"></script>
 
 		<script src="../examples/js/controls/EditorControls.js"></script>
 		<script src="../examples/js/controls/TransformControls.js"></script>
-
-		<script src="../examples/js/libs/jszip.min.js"></script>
-		<script src="../examples/js/loaders/AMFLoader.js"></script>
-		<script src="../examples/js/loaders/AWDLoader.js"></script>
-		<script src="../examples/js/loaders/BabylonLoader.js"></script>
-		<script src="../examples/js/loaders/ColladaLoader.js"></script>
-		<script src="../examples/js/loaders/KMZLoader.js"></script>
-		<script src="../examples/js/loaders/MD2Loader.js"></script>
-		<script src="../examples/js/loaders/OBJLoader.js"></script>
-		<script src="../examples/js/loaders/PLYLoader.js"></script>
-		<script src="../examples/js/loaders/STLLoader.js"></script>
-		<script src="../examples/js/loaders/UTF8Loader.js"></script>
-		<script src="../examples/js/loaders/VRMLLoader.js"></script>
-		<script src="../examples/js/loaders/VTKLoader.js"></script>
-		<script src="../examples/js/loaders/ctm/lzma.js"></script>
-		<script src="../examples/js/loaders/ctm/ctm.js"></script>
-		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
-		<script src="../examples/js/exporters/OBJExporter.js"></script>
-		<script src="../examples/js/exporters/STLExporter.js"></script>
 
 		<script src="../examples/js/renderers/Projector.js"></script>
 		<script src="../examples/js/renderers/CanvasRenderer.js"></script>
@@ -82,6 +63,7 @@
 		<script src="js/Storage.js"></script>
 
 		<script src="js/Editor.js"></script>
+		<script src="js/OpenSimEditor.js"></script>
 		<script src="js/Config.js"></script>
 		<script src="js/History.js"></script>
 		<script src="js/Loader.js"></script>
@@ -89,7 +71,9 @@
 		<script src="js/Menubar.File.js"></script>
 		<script src="js/Menubar.Edit.js"></script>
 		<script src="js/Menubar.Add.js"></script>
+		//<script src="js/Menubar.Play.js"></script>
 		<script src="js/Menubar.View.js"></script>
+		//<script src="js/Menubar.Examples.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Menubar.Status.js"></script>
 		<script src="js/Sidebar.js"></script>
@@ -114,6 +98,7 @@
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
+		<script src="js/OpenSimViewport.js"></script>
 		<script type="text/javascript" src="websocket.js"></script>
 		<script>
 
@@ -126,9 +111,9 @@
 
 			//
 
-			var editor = new Editor();
+			var editor = new OpenSimEditor();
 
-			var viewport = new Viewport( editor );
+			var viewport = new OpenSimViewport( editor );
 			document.body.appendChild( viewport.dom );
 
 			var player = new Player( editor );
@@ -146,8 +131,10 @@
 			var sidebar = new Sidebar( editor );
 			document.body.appendChild( sidebar.dom );
 
-			var modal = new UI.Modal();
-			document.body.appendChild( modal.dom );
+			/*
+			var dialog = new UI.Dialog();
+			document.body.appendChild( dialog.dom );
+			*/
 
 			//
 
@@ -179,7 +166,7 @@
 
 				function saveState( scene ) {
 
-					if ( true ) { // avoid saving state for now
+					if ( editor.config.getKey( 'autosave' ) === false ) {
 
 						return;
 
@@ -205,6 +192,7 @@
 
 				var signals = editor.signals;
 
+				signals.editorCleared.add( saveState );
 				signals.geometryChanged.add( saveState );
 				signals.objectAdded.add( saveState );
 				signals.objectChanged.add( saveState );
@@ -283,7 +271,7 @@
 
 			if ( file !== null ) {
 
-				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
+				if ( true ) {
 
 					var loader = new THREE.XHRLoader();
 					loader.crossOrigin = '';
