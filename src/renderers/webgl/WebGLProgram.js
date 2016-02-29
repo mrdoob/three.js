@@ -59,6 +59,9 @@ THREE.WebGLProgram = ( function () {
 			case THREE.Uncharted2ToneMapping:
 				toneMappingName = "Uncharted2";
 				break;
+			case THREE.CineonToneMapping:
+				toneMappingName = "OptimizedCineon";
+				break;
 			default:
 				throw new Error( 'unsupported toneMapping: ' + toneMapping );
 
