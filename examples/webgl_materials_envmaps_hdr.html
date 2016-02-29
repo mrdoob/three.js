@@ -112,6 +112,7 @@
 					roughness: 1.0,
 					shading: THREE.SmoothShading
 				} );
+
 				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
 				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
 				torusMesh1.position.x = 0.0;
@@ -160,7 +161,6 @@
 
 					floorMaterial.envMap = hdrCubeRenderTarget;
 					floorMaterial.needsUpdate = true;
-
 				} );
 
 				var ldrUrls = genCubeUrls( "../examples/textures/cube/pisa/", ".png" );
@@ -175,12 +175,6 @@
 					pmremCubeUVPacker.update( renderer );
 
 					ldrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-			/*		standardMaterial.envMap = ldrCubeRenderTarget;
-					standardMaterial.needsUpdate = true;
-					floorMaterial.envMap = ldrCubeRenderTarget;
-					floorMaterial.needsUpdate = true;*/
-
 				} );
 
 
@@ -196,12 +190,6 @@
 					pmremCubeUVPacker.update( renderer );
 
 					rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-			/*		standardMaterial.envMap = rgbmCubeRenderTarget;
-					standardMaterial.needsUpdate = true;
-					floorMaterial.envMap = rgbmCubeRenderTarget;
-					floorMaterial.needsUpdate = true;*/
-
 				} );
 
 				// Lights
