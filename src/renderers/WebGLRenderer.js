@@ -1706,6 +1706,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( p_uniforms.toneMappingExposure !== undefined ) {
 
 				_gl.uniform1f( p_uniforms.toneMappingExposure, _this.toneMappingExposure );
+
 			}
 
 			if ( p_uniforms.toneMappingWhitePoint !== undefined ) {
