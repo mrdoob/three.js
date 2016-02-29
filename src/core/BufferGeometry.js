@@ -815,7 +815,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 			for ( var key in this.attributes ) {
 
-				attributes.push( data );
+				attributes.push( key );
 
 			}
 
@@ -823,7 +823,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 				if ( attributes.indexOf( key ) === - 1 ) {
 
-					console.error( 'THREE.BufferGeometry.merge(): attribute ' + attribute + ' mismatch' );
+					console.error( 'THREE.BufferGeometry.merge(): ' + attribute + ' attribute mismatch' );
 
 				}
 
