@@ -156,6 +156,7 @@ THREE.AdditiveBlending = 2;
 THREE.SubtractiveBlending = 3;
 THREE.MultiplyBlending = 4;
 THREE.CustomBlending = 5;
+THREE.PremultipiedAlphaBlending = 6;
 
 // custom blending equations
 // (numbers start from 100 not to clash with other

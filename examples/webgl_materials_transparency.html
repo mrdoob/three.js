@@ -108,11 +108,7 @@
 					metalness: 0.9,
 					roughness: 1.0,
 					shading: THREE.SmoothShading,
-					premultipliedAlpha: true,
-					blending: THREE.CustomBlending,
-					blendSrc: THREE.OneFactor,	// output of shader must be premultiplied
-					blendDst: THREE.OneMinusSrcAlphaFactor,
-					blendEquation: THREE.AddEquation,
+					blending: THREE.PremultipiedAlphaBlending,
 					transparent: true
 				} );
 

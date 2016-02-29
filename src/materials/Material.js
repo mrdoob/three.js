@@ -40,8 +40,6 @@ THREE.Material = function () {
 
 	this.alphaTest = 0;
 
-	this.premultipliedAlpha = false;
-
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
 	this.visible = true;
@@ -184,8 +182,6 @@ THREE.Material.prototype = {
 			data.reflectivity = this.reflectivity; // Scale behind envMap
 
 		}
-
-		if( this.premultipliedAlpha ) data.premultipliedAlpha = this.premultipliedAlpha;
 
 		if ( this.size !== undefined ) data.size = this.size;
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
