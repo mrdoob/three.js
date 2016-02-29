@@ -185,6 +185,8 @@ THREE.Material.prototype = {
 
 		}
 
+		if( this.premultipliedAlpha ) data.premultipliedAlpha = this.premultipliedAlpha;
+
 		if ( this.size !== undefined ) data.size = this.size;
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
 

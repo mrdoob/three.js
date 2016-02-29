@@ -21,7 +21,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
-		"maxMorphTargets", "maxMorphNormals",
+		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
 		"shadowMapEnabled", "pointLightShadows",
 		"shadowMapType",
@@ -181,7 +181,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			flipSided: material.side === THREE.BackSide
 
 		};
-
 		return parameters;
 
 	};
