@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js / editor</title>
@@ -15,6 +15,25 @@
 
 		<script src="../examples/js/controls/EditorControls.js"></script>
 		<script src="../examples/js/controls/TransformControls.js"></script>
+
+		<script src="../examples/js/libs/jszip.min.js"></script>
+		<script src="../examples/js/loaders/AMFLoader.js"></script>
+		<script src="../examples/js/loaders/AWDLoader.js"></script>
+		<script src="../examples/js/loaders/BabylonLoader.js"></script>
+		<script src="../examples/js/loaders/ColladaLoader.js"></script>
+		<script src="../examples/js/loaders/KMZLoader.js"></script>
+		<script src="../examples/js/loaders/MD2Loader.js"></script>
+		<script src="../examples/js/loaders/OBJLoader.js"></script>
+		<script src="../examples/js/loaders/PLYLoader.js"></script>
+		<script src="../examples/js/loaders/STLLoader.js"></script>
+		<script src="../examples/js/loaders/UTF8Loader.js"></script>
+		<script src="../examples/js/loaders/VRMLLoader.js"></script>
+		<script src="../examples/js/loaders/VTKLoader.js"></script>
+		<script src="../examples/js/loaders/ctm/lzma.js"></script>
+		<script src="../examples/js/loaders/ctm/ctm.js"></script>
+		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
+		<script src="../examples/js/exporters/OBJExporter.js"></script>
+		<script src="../examples/js/exporters/STLExporter.js"></script>
 
 		<script src="../examples/js/renderers/Projector.js"></script>
 		<script src="../examples/js/renderers/CanvasRenderer.js"></script>
@@ -51,7 +70,6 @@
 		<script src="js/libs/ternjs/doc_comment.js"></script>
 		<script src="js/libs/tern-threejs/threejs.js"></script>
 
-		<script src="js/libs/jszip.min.js"></script>
 		<script src="js/libs/sortable.min.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
@@ -128,10 +146,8 @@
 			var sidebar = new Sidebar( editor );
 			document.body.appendChild( sidebar.dom );
 
-			/*
-			var dialog = new UI.Dialog();
-			document.body.appendChild( dialog.dom );
-			*/
+			var modal = new UI.Modal();
+			document.body.appendChild( modal.dom );
 
 			//
 
@@ -161,7 +177,7 @@
 
 				var timeout;
 
-				var saveState = function ( scene ) {
+				function saveState( scene ) {
 
 					if ( true ) { // avoid saving state for now
 
@@ -189,7 +205,6 @@
 
 				var signals = editor.signals;
 
-				signals.editorCleared.add( saveState );
 				signals.geometryChanged.add( saveState );
 				signals.objectAdded.add( saveState );
 				signals.objectChanged.add( saveState );
@@ -198,18 +213,11 @@
 				signals.sceneGraphChanged.add( saveState );
 				signals.scriptChanged.add( saveState );
 
-				/*
-				var showDialog = function ( content ) {
+				signals.showModal.add( function ( content ) {
 
-					dialog.clear();
+					modal.show( content );
 
-					dialog.add( content );
-					dialog.showModal();
-
-				};
-
-				signals.showDialog.add( showDialog );
-				*/
+				} );
 
 			} );
 
@@ -255,11 +263,11 @@
 
 			}, false );
 
-			var onWindowResize = function ( event ) {
+			function onWindowResize( event ) {
 
 				editor.signals.windowResize.dispatch();
 
-			};
+			}
 
 			window.addEventListener( 'resize', onWindowResize, false );
 

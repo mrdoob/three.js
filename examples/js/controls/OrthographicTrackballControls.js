@@ -245,7 +245,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 			if ( Math.abs( factor - 1.0 ) > EPS && factor > 0.0 ) {
 
-				_this.object.zoom *= factor;
+				_this.object.zoom /= factor;
 
 				if ( _this.staticMoving ) {
 
@@ -617,7 +617,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
 		this.domElement.removeEventListener( 'mousedown', mousedown, false );
 		this.domElement.removeEventListener( 'mousewheel', mousewheel, false );
-		this.domElement.removeEventListener( 'DOMMouseScroll', mousewheel, false ); // firefox
+		this.domElement.removeEventListener( 'MozMousePixelScroll', mousewheel, false ); // firefox
 
 		this.domElement.removeEventListener( 'touchstart', touchstart, false );
 		this.domElement.removeEventListener( 'touchend', touchend, false );
@@ -635,7 +635,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 	this.domElement.addEventListener( 'mousedown', mousedown, false );
 	this.domElement.addEventListener( 'mousewheel', mousewheel, false );
-	this.domElement.addEventListener( 'DOMMouseScroll', mousewheel, false ); // firefox
+	this.domElement.addEventListener( 'MozMousePixelScroll', mousewheel, false ); // firefox
 
 	this.domElement.addEventListener( 'touchstart', touchstart, false );
 	this.domElement.addEventListener( 'touchend', touchend, false );

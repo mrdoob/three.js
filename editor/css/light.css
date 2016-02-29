@@ -79,6 +79,7 @@ input.Number {
 	#menubar .menu.right {
 		float: right;
 		cursor: auto;
+		padding-right: 0px;
 		text-align: right;
 	}
 

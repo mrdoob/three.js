@@ -26,7 +26,7 @@
 
 			var container, stats;
 			var camera, scene, projector, renderer;
-			var mesh, animation;
+			var mesh, mixer;
 
 			init();
 			animate();
@@ -54,23 +54,31 @@
 
 				//
 
-				var light = new THREE.DirectionalLight( 0xefefff, 2 );
+				var light = new THREE.DirectionalLight( 0xefefff, 1.5 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var light = new THREE.DirectionalLight( 0xffefef, 2 );
+				var light = new THREE.DirectionalLight( 0xffefef, 1.5 );
 				light.position.set( -1, -1, -1 ).normalize();
 				scene.add( light );
 
 				var loader = new THREE.JSONLoader();
 				loader.load( "models/animated/horse.js", function ( geometry ) {
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x606060, morphTargets: true, overdraw: 0.5 } ) );
+					var material = new THREE.MeshLambertMaterial( {
+						vertexColors: THREE.FaceColors,
+						morphTargets: true,
+						overdraw: 0.5
+					} );
+
+					mesh = new THREE.Mesh( geometry, material );
 					mesh.scale.set( 1.5, 1.5, 1.5 );
 					scene.add( mesh );
 
-					animation = new THREE.MorphAnimation( mesh );
-					animation.play();
+					mixer = new THREE.AnimationMixer( mesh );
+
+					var clip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'gallop', geometry.morphTargets, 30 );
+					mixer.addAction( new THREE.AnimationAction( clip ).warpToDuration( 1 ) );
 
 				} );
 
@@ -129,11 +137,11 @@
 
 				camera.lookAt( camera.target );
 
-				if ( animation ) {
+				if ( mixer ) {
 
 					var time = Date.now();
 
-					animation.update( time - prevTime );
+					mixer.update( ( time - prevTime ) * 0.001 );
 
 					prevTime = time;
 

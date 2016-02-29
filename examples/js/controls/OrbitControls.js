@@ -778,7 +778,7 @@
 			this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
 			this.domElement.removeEventListener( 'mousedown', onMouseDown, false );
 			this.domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
-			this.domElement.removeEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+			this.domElement.removeEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
 
 			this.domElement.removeEventListener( 'touchstart', touchstart, false );
 			this.domElement.removeEventListener( 'touchend', touchend, false );
@@ -795,7 +795,7 @@
 
 		this.domElement.addEventListener( 'mousedown', onMouseDown, false );
 		this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-		this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+		this.domElement.addEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
 
 		this.domElement.addEventListener( 'touchstart', touchstart, false );
 		this.domElement.addEventListener( 'touchend', touchend, false );

@@ -115,16 +115,16 @@ THREE.TorusKnotGeometry.prototype.constructor = THREE.TorusKnotGeometry;
 
 THREE.TorusKnotGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.TorusKnotGeometry(
-		this.parameters.radius,
-		this.parameters.tube,
-		this.parameters.radialSegments,
-		this.parameters.tubularSegments,
-		this.parameters.p,
-		this.parameters.q,
-		this.parameters.heightScale
-	);
+	var parameters = this.parameters;
 
-	return geometry;
+	return new THREE.TorusKnotGeometry(
+		parameters.radius,
+		parameters.tube,
+		parameters.radialSegments,
+		parameters.tubularSegments,
+		parameters.p,
+		parameters.q,
+		parameters.heightScale
+	);
 
 };

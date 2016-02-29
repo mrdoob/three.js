@@ -45,7 +45,7 @@ class Geometry(base_classes.BaseNode):
             ext = constants.PACK
 
         key = ''
-        for key in (constants.MORPH_TARGETS, constants.ANIMATION):
+        for key in (constants.MORPH_TARGETS, constants.ANIMATION, constants.CLIPS):
             if key in self.keys():
                 break
         else:
@@ -152,7 +152,7 @@ class Geometry(base_classes.BaseNode):
             texture_registration = self.register_textures()
             if texture_registration:
                 logger.info("%s has registered textures", self.node)
-                dirname = os.path.dirname(self.scene.filepath)
+                dirname = os.path.dirname(os.path.abspath(self.scene.filepath))
                 full_path = os.path.join(dirname, texture_folder)
                 io.copy_registered_textures(
                     full_path, texture_registration)
@@ -206,7 +206,7 @@ class Geometry(base_classes.BaseNode):
         """
         logger.debug("Geometry().write_animation(%s)", filepath)
 
-        for key in (constants.MORPH_TARGETS, constants.ANIMATION):
+        for key in (constants.MORPH_TARGETS, constants.ANIMATION, constants.CLIPS):
             try:
                 data = self[key]
                 break
@@ -245,7 +245,7 @@ class Geometry(base_classes.BaseNode):
                       constants.INDEX]
 
         data = {}
-        anim_components = [constants.MORPH_TARGETS, constants.ANIMATION]
+        anim_components = [constants.MORPH_TARGETS, constants.ANIMATION, constants.MORPH_TARGETS_ANIM, constants.CLIPS]
         if self.options.get(constants.EMBED_ANIMATION):
             components.extend(anim_components)
         else:
@@ -563,7 +563,17 @@ class Geometry(base_classes.BaseNode):
             self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(
                 self.node, bone_map, influences) or []
 
-        if self.options.get(constants.MORPH_TARGETS):
+        if self.options.get(constants.BLEND_SHAPES):
+            logger.info("Parsing %s", constants.BLEND_SHAPES)
+            mt = api.mesh.blend_shapes(self.node, self.options) or []
+            self[constants.MORPH_TARGETS] = mt
+            if len(mt) > 0 and self._scene:  # there's blend shapes, let check for animation
+                #self[constants.CLIPS] = api.mesh.animated_blend_shapes(self.node, self.options) or []
+                tracks = api.mesh.animated_blend_shapes(self.node, self[constants.NAME], self.options) or []
+                merge = self._scene[constants.ANIMATION][0][constants.KEYFRAMES]
+                for track in tracks:
+                    merge.append(track)
+        elif self.options.get(constants.MORPH_TARGETS):
             logger.info("Parsing %s", constants.MORPH_TARGETS)
             self[constants.MORPH_TARGETS] = api.mesh.morph_targets(
                 self.node, self.options) or []

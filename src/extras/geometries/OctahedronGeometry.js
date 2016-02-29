@@ -28,13 +28,11 @@ THREE.OctahedronGeometry.prototype.constructor = THREE.OctahedronGeometry;
 
 THREE.OctahedronGeometry.prototype.clone = function () {
 
-	var geometry = new THREE.OctahedronGeometry(
-		this.parameters.radius,
-		this.parameters.detail
+	var parameters = this.parameters;
+
+	return new THREE.OctahedronGeometry(
+		parameters.radius,
+		parameters.detail
 	);
-
-	geometry.copy( this );
-
-	return geometry;
 
 };

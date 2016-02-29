@@ -38,10 +38,11 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - webgl physically based shading testbed
 		</div>
-
+-
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/AnimationClipCreator.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -73,7 +74,7 @@
 
 			var sunLight, pointLight, ambientLight;
 
-			var morph;
+			var mixer;
 
 			var parameters, tweenDirection, tweenDay, tweenNight;
 
@@ -85,8 +86,7 @@
 				shadowCameraNear: 750,
 				shadowCameraFar: 4000,
 				shadowCameraFov: 30,
-				shadowBias: -0.0002,
-				shadowDarkness: 0.3
+				shadowBias: -0.0002
 
 			}, gamma = {
 				gammaFactor: 2.0,
@@ -271,18 +271,22 @@
 
 					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, shading: THREE.FlatShading } );
 
-					morph = new THREE.MorphAnimMesh( geometry, morphMaterial );
+					mesh = new THREE.Mesh( geometry, morphMaterial );
+
+					mixer = new THREE.AnimationMixer( mesh );
+
+					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( 10 ) );
 
 					var s = 200;
-					morph.scale.set( s, s, s );
+					mesh.scale.set( s, s, s );
 
-					morph.duration = 8000;
-					morph.mirroredLoop = true;
+					//morph.duration = 8000;
+					//morph.mirroredLoop = true;
 
-					morph.castShadow = true;
-					morph.receiveShadow = true;
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
 
-					scene.add( morph );
+					scene.add( mesh );
 
 				} );
 
@@ -312,7 +316,6 @@
 
 				sunLight.castShadow = true;
 
-				sunLight.shadowDarkness = 0.3 * sunIntensity;
 				sunLight.shadowBias = -0.0002;
 
 				sunLight.shadowCameraNear = 750;
@@ -422,9 +425,6 @@
 
 				});
 
-				shadowGUI.add( shadowConfig, 'shadowDarkness', 0, 1 ).onChange( function() {
-
-				});
 				shadowGUI.open();
 
 				gammaGUI = gui.addFolder( "Gamma" );
@@ -516,12 +516,16 @@
 
 				// update
 
-				var delta = 1000 * clock.getDelta();
+				var delta = clock.getDelta();
 
 				TWEEN.update();
 				controls.update();
 
-				if ( morph ) morph.updateAnimation( delta );
+				if ( mixer ) {
+
+					mixer.update( delta );
+
+				}
 
 				scene.fog.color.setHSL( 0.63, 0.05, parameters.control );
 				renderer.setClearColor( scene.fog.color );
@@ -530,8 +534,6 @@
 				pointLight.intensity = - parameters.control * 0.5 + 1;
 
 				pointLight.color.setHSL( 0.1, 0.75, parameters.control * 0.5 + 0.5 );
-
-				sunLight.shadowDarkness = shadowConfig.shadowDarkness * sunLight.intensity;
 
 				// render cube map
 

@@ -1,5 +1,3 @@
-uniform vec3 ambientLightColor;
-
 #if MAX_DIR_LIGHTS > 0
 
 	uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];

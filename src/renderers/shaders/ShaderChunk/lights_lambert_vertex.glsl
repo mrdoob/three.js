@@ -126,11 +126,3 @@ vec3 normal = normalize( transformedNormal );
 	}
 
 #endif
-
-vLightFront += ambientLightColor;
-
-#ifdef DOUBLE_SIDED
-
-	vLightBack += ambientLightColor;
-
-#endif
