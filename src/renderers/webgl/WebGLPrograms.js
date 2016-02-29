@@ -175,6 +175,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
 
+			premultipliedAlpha: material.premultipliedAlpha,
 			alphaTest: material.alphaTest,
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide
