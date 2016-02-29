@@ -23,5 +23,6 @@ void main() {
 	gl_FragColor = linearToOutputTexel( vec4( outgoingLight, diffuseColor.a ) );
 
 	#include <fog_fragment>
+	#include <premultiply_alpha_fragment>
 
 }
