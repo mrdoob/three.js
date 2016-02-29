@@ -775,7 +775,7 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		var i, il, attribute, attributes = getAttributes(),
+		var i, il, key, attributes = getAttributes(),
 
 		indexed = this.index !== null;
 
@@ -803,9 +803,9 @@ THREE.BufferGeometry.prototype = {
 
 		for ( i = 0, il = attributes.length; i < il; i ++ ) {
 
-			attribute = attributes[ i ];
+			key = attributes[ i ];
 
-			this.attributes[ attribute ].merge( geometry.attributes[ attribute ] );
+			this.attributes[ key ].merge( geometry.attributes[ key ] );
 
 		}
 
@@ -819,19 +819,19 @@ THREE.BufferGeometry.prototype = {
          */
 		function getAttributes() {
 
-			var attributes = [];
+			var key, attributes = [];
 
-			for ( var key in this.attributes ) {
+			for ( key in this.attributes ) {
 
 				attributes.push( key );
 
 			}
 
-			for ( var key in geometry.attributes ) {
+			for ( key in geometry.attributes ) {
 
 				if ( attributes.indexOf( key ) === - 1 ) {
 
-					console.error( 'THREE.BufferGeometry.merge(): ' + attribute + ' attribute mismatch' );
+					console.error( 'THREE.BufferGeometry.merge(): ' + key + ' attribute mismatch' );
 
 				}
 
