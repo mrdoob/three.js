@@ -823,7 +823,7 @@ THREE.BufferGeometry.prototype = {
 
 			for ( var key in this.attributes ) {
 
-				attributes.push( data );
+				attributes.push( key );
 
 			}
 
@@ -831,7 +831,7 @@ THREE.BufferGeometry.prototype = {
 
 				if ( attributes.indexOf( key ) === - 1 ) {
 
-					console.error( 'THREE.BufferGeometry.merge(): attribute ' + attribute + ' mismatch' );
+					console.error( 'THREE.BufferGeometry.merge(): ' + attribute + ' attribute mismatch' );
 
 				}
 
