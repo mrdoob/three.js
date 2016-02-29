@@ -779,6 +779,22 @@ THREE.BufferGeometry.prototype = {
 
 		indexed = this.index !== null;
 
+		for ( key in this.attributes ) {
+
+			attributes.push( key );
+
+		}
+
+		for ( key in geometry.attributes ) {
+
+			if ( attributes.indexOf( key ) === - 1 ) {
+
+				console.error( 'THREE.BufferGeometry.merge(): ' + key + ' attribute mismatch' );
+
+			}
+
+		}
+
 		if ( indexed === ( geometry.index !== null ) ) {
 
 			if ( indexed ) {
@@ -798,22 +814,6 @@ THREE.BufferGeometry.prototype = {
 		} else {
 
 			console.error( 'THREE.BufferGeometry: unable to merge non indexed with indexed geometries' );
-
-		}
-
-		for ( key in this.attributes ) {
-
-			attributes.push( key );
-
-		}
-
-		for ( key in geometry.attributes ) {
-
-			if ( attributes.indexOf( key ) === - 1 ) {
-
-				console.error( 'THREE.BufferGeometry.merge(): ' + key + ' attribute mismatch' );
-
-			}
 
 		}
 
