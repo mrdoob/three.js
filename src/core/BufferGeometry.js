@@ -816,7 +816,7 @@ THREE.BufferGeometry.prototype = {
 		 * Throws an error on attribute mismatch.
 		 *
 		 * @returns {Array}
-         */
+		 */
 		function getAttributes() {
 
 			var key, attributes = [];
