@@ -218,7 +218,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.dispose = function() {
 
-		scope.domElement.removeEventListener( 'contextmenu', contextmenu, false );
+		scope.domElement.removeEventListener( 'contextmenu', onContextMenu, false );
 		scope.domElement.removeEventListener( 'mousedown', onMouseDown, false );
 		scope.domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
 		scope.domElement.removeEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
@@ -235,7 +235,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
-	}
+	};
 
 	//
 	// internals
@@ -424,31 +424,31 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// event callbacks - update the object state
 	//
 
-	handleMouseDownRotate = function( event ) {
+	function handleMouseDownRotate( event ) {
 
 		//console.log( 'handleMouseDownRotate' );
 
 		rotateStart.set( event.clientX, event.clientY );
 
-	};
+	}
 
-	handleMouseDownDolly = function( event ) {
+	function handleMouseDownDolly( event ) {
 
 		//console.log( 'handleMouseDownDolly' );
 
 		dollyStart.set( event.clientX, event.clientY );
 
-	};
+	}
 
-	handleMouseDownPan = function( event ) {
+	function handleMouseDownPan( event ) {
 
 		//console.log( 'handleMouseDownPan' );
 
 		panStart.set( event.clientX, event.clientY );
 
-	};
+	}
 
-	handleMouseMoveRotate = function( event ) {
+	function handleMouseMoveRotate( event ) {
 
 		//console.log( 'handleMouseMoveRotate' );
 
@@ -467,9 +467,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		scope.update();
 
-	};
+	}
 
-	handleMouseMoveDolly = function( event ) {
+	function handleMouseMoveDolly( event ) {
 
 		//console.log( 'handleMouseMoveDolly' );
 
@@ -491,9 +491,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		scope.update();
 
-	};
+	}
 
-	handleMouseMovePan = function( event ) {
+	function handleMouseMovePan( event ) {
 
 		//console.log( 'handleMouseMovePan' );
 
@@ -507,15 +507,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		scope.update();
 
-	};
+	}
 
-	handleMouseUp = function( event ) {
+	function handleMouseUp( event ) {
 
 		//console.log( 'handleMouseUp' );
 
-	};
+	}
 
-	handleMouseWheel = function( event ) {
+	function handleMouseWheel( event ) {
 
 		//console.log( 'handleMouseWheel' );
 
@@ -547,9 +547,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		scope.update();
 
-	};
+	}
 
-	handleKeyDown = function( event ) {
+	function handleKeyDown( event ) {
 
 		//console.log( 'handleKeyDown' );
 
@@ -577,17 +577,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
-	};
+	}
 
-	handleTouchStartRotate = function( event ) {
+	function handleTouchStartRotate( event ) {
 
 		//console.log( 'handleTouchStartRotate' );
 
 		rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-	};
+	}
 
-	handleTouchStartDolly = function( event ) {
+	function handleTouchStartDolly( event ) {
 
 		//console.log( 'handleTouchStartDolly' );
 
@@ -598,17 +598,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		dollyStart.set( 0, distance );
 
-	};
+	}
 
-	handleTouchStartPan = function( event ) {
+	function handleTouchStartPan( event ) {
 
 		//console.log( 'handleTouchStartPan' );
 
 		panStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-	};
+	}
 
-	handleTouchMoveRotate = function( event ) {
+	function handleTouchMoveRotate( event ) {
 
 		//console.log( 'handleTouchMoveRotate' );
 
@@ -627,9 +627,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		scope.update();
 
-	};
+	}
 
-	handleTouchMoveDolly = function( event ) {
+	function handleTouchMoveDolly( event ) {
 
 		//console.log( 'handleTouchMoveDolly' );
 
@@ -656,9 +656,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		scope.update();
 
-	};
+	}
 
-	handleTouchMovePan = function( event ) {
+	function handleTouchMovePan( event ) {
 
 		//console.log( 'handleTouchMovePan' );
 
@@ -672,13 +672,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		scope.update();
 
-	};
+	}
 
-	handleTouchEnd = function( event ) {
+	function handleTouchEnd( event ) {
 
 		//console.log( 'handleTouchEnd' );
 
-	};
+	}
 
 	//
 	// event handlers - FSM: listen for events and reset state
@@ -726,7 +726,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
-	};
+	}
 
 	function onMouseMove( event ) {
 
@@ -754,7 +754,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
-	};
+	}
 
 	function onMouseUp( event ) {
 
@@ -770,7 +770,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		state = STATE.NONE;
 
-	};
+	}
 
 	function onMouseWheel( event ) {
 
@@ -784,7 +784,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		scope.dispatchEvent( startEvent ); // not sure why these are here...
 		scope.dispatchEvent( endEvent );
 
-	};
+	}
 
 	function onKeyDown( event ) {
 
@@ -792,7 +792,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		handleKeyDown( event );
 
-	};
+	}
 
 	function onTouchStart( event ) {
 
@@ -842,7 +842,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
-	};
+	}
 
 	function onTouchMove( event ) {
 
@@ -886,7 +886,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
-	};
+	}
 
 	function onTouchEnd( event ) {
 
@@ -898,11 +898,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		state = STATE.NONE;
 
-	};
+	}
 
-	onContextMenu = function( event ) {
-
-		//console.log( 'onContextMenu' );
+	function onContextMenu( event ) {
 
 		event.preventDefault();
 
@@ -910,23 +908,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	//
 
-	function init() {
+	scope.domElement.addEventListener( 'contextmenu', onContextMenu, false );
 
-		scope.domElement.addEventListener( 'contextmenu', onContextMenu, false );
+	scope.domElement.addEventListener( 'mousedown', onMouseDown, false );
+	scope.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
+	scope.domElement.addEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
 
-		scope.domElement.addEventListener( 'mousedown', onMouseDown, false );
-		scope.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-		scope.domElement.addEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
+	scope.domElement.addEventListener( 'touchstart', onTouchStart, false );
+	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
+	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
 
-		scope.domElement.addEventListener( 'touchstart', onTouchStart, false );
-		scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
-		scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
-
-		window.addEventListener( 'keydown', onKeyDown, false );
-
-	};
-
-	init();
+	window.addEventListener( 'keydown', onKeyDown, false );
 
 	// force an update at start
 

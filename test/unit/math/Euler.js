@@ -7,7 +7,7 @@ module( "Euler" );
 var eulerZero = new THREE.Euler( 0, 0, 0, "XYZ" );
 var eulerAxyz = new THREE.Euler( 1, 0, 0, "XYZ" );
 var eulerAzyx = new THREE.Euler( 0, 1, 0, "ZYX" );
-	
+
 var matrixEquals4 = function( a, b, tolerance ) {
 	tolerance = tolerance || 0.0001;
 	if( a.elements.length != b.elements.length ) {
@@ -24,14 +24,14 @@ var matrixEquals4 = function( a, b, tolerance ) {
 
 var eulerEquals = function( a, b, tolerance ) {
 	tolerance = tolerance || 0.0001;
-	var diff = Math.abs( a.x - b.x ) + Math.abs( a.y - b.y ) + Math.abs( a.z - b.z );	
+	var diff = Math.abs( a.x - b.x ) + Math.abs( a.y - b.y ) + Math.abs( a.z - b.z );
 	return ( diff < tolerance );
 };
 
 
 var quatEquals = function( a, b, tolerance ) {
 	tolerance = tolerance || 0.0001;
-	var diff = Math.abs( a.x - b.x ) + Math.abs( a.y - b.y ) + Math.abs( a.z - b.z ) + Math.abs( a.w - b.w );	
+	var diff = Math.abs( a.x - b.x ) + Math.abs( a.y - b.y ) + Math.abs( a.z - b.z ) + Math.abs( a.w - b.w );
 	return ( diff < tolerance );
 };
 
@@ -66,11 +66,9 @@ test( "set/setFromVector3/toVector3", function() {
 	var vec = new THREE.Vector3( 0, 1, 0 );
 
 	var b = new THREE.Euler().setFromVector3( vec, "ZYX" );
-	console.log( a, b );
 	ok( a.equals( b ), "Passed!" );
 
 	var c = b.toVector3();
-	console.log( c, vec );
 	ok( c.equals( vec ), "Passed!" );	
 });
 
@@ -82,7 +80,7 @@ test( "Quaternion.setFromEuler/Euler.fromQuaternion", function() {
 
 		var v2 = new THREE.Euler().setFromQuaternion( q, v.order );
 		var q2 = new THREE.Quaternion().setFromEuler( v2 );
-		ok( eulerEquals( q, q2 ), "Passed!" );	
+		ok( eulerEquals( q, q2 ), "Passed!" );
 	}
 });
 
@@ -95,7 +93,7 @@ test( "Matrix4.setFromEuler/Euler.fromRotationMatrix", function() {
 
 		var v2 = new THREE.Euler().setFromRotationMatrix( m, v.order );
 		var m2 = new THREE.Matrix4().makeRotationFromEuler( v2 );
-		ok( matrixEquals4( m, m2, 0.0001 ), "Passed!" );	
+		ok( matrixEquals4( m, m2, 0.0001 ), "Passed!" );
 	}
 });
 
@@ -105,13 +103,13 @@ test( "reorder", function() {
 		var v = testValues[i];
 		var q = new THREE.Quaternion().setFromEuler( v );
 
-		v.reorder( 'YZX' );		
+		v.reorder( 'YZX' );
 		var q2 = new THREE.Quaternion().setFromEuler( v );
-		ok( quatEquals( q, q2 ), "Passed!" );	
+		ok( quatEquals( q, q2 ), "Passed!" );
 
 		v.reorder( 'ZXY' );
 		var q3 = new THREE.Quaternion().setFromEuler( v );
-		ok( quatEquals( q, q3 ), "Passed!" );	
+		ok( quatEquals( q, q3 ), "Passed!" );
 	}
 });
 

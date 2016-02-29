@@ -6,13 +6,13 @@ Sidebar.Geometry.CylinderGeometry = function ( editor, object ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.Row();
 
 	var parameters = object.geometry.parameters;
 
 	// radiusTop
 
-	var radiusTopRow = new UI.Panel();
+	var radiusTopRow = new UI.Row();
 	var radiusTop = new UI.Number( parameters.radiusTop ).onChange( update );
 
 	radiusTopRow.add( new UI.Text( 'Radius top' ).setWidth( '90px' ) );
@@ -22,7 +22,7 @@ Sidebar.Geometry.CylinderGeometry = function ( editor, object ) {
 
 	// radiusBottom
 
-	var radiusBottomRow = new UI.Panel();
+	var radiusBottomRow = new UI.Row();
 	var radiusBottom = new UI.Number( parameters.radiusBottom ).onChange( update );
 
 	radiusBottomRow.add( new UI.Text( 'Radius bottom' ).setWidth( '90px' ) );
@@ -32,7 +32,7 @@ Sidebar.Geometry.CylinderGeometry = function ( editor, object ) {
 
 	// height
 
-	var heightRow = new UI.Panel();
+	var heightRow = new UI.Row();
 	var height = new UI.Number( parameters.height ).onChange( update );
 
 	heightRow.add( new UI.Text( 'Height' ).setWidth( '90px' ) );
@@ -42,7 +42,7 @@ Sidebar.Geometry.CylinderGeometry = function ( editor, object ) {
 
 	// radialSegments
 
-	var radialSegmentsRow = new UI.Panel();
+	var radialSegmentsRow = new UI.Row();
 	var radialSegments = new UI.Integer( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
 	radialSegmentsRow.add( new UI.Text( 'Radial segments' ).setWidth( '90px' ) );
@@ -52,7 +52,7 @@ Sidebar.Geometry.CylinderGeometry = function ( editor, object ) {
 
 	// heightSegments
 
-	var heightSegmentsRow = new UI.Panel();
+	var heightSegmentsRow = new UI.Row();
 	var heightSegments = new UI.Integer( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
 	heightSegmentsRow.add( new UI.Text( 'Height segments' ).setWidth( '90px' ) );
@@ -62,7 +62,7 @@ Sidebar.Geometry.CylinderGeometry = function ( editor, object ) {
 
 	// openEnded
 
-	var openEndedRow = new UI.Panel();
+	var openEndedRow = new UI.Row();
 	var openEnded = new UI.Checkbox( parameters.openEnded ).onChange( update );
 
 	openEndedRow.add( new UI.Text( 'Open ended' ).setWidth( '90px' ) );

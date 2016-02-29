@@ -5,8 +5,6 @@
  *  color: <hex>,
  *  roughness: <float>,
  *  metalness: <float>,
-
- *  emissive: <hex>,
  *  opacity: <float>,
  *
  *  map: new THREE.Texture( <Image> ),
@@ -17,6 +15,8 @@
  *  aoMap: new THREE.Texture( <Image> ),
  *  aoMapIntensity: <float>
  *
+ *  emissive: <hex>,
+ *  emissiveIntensity: <float>
  *  emissiveMap: new THREE.Texture( <Image> ),
  *
  *  bumpMap: new THREE.Texture( <Image> ),
@@ -68,8 +68,6 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.roughness = 0.5;
 	this.metalness = 0.5;
 
-	this.emissive = new THREE.Color( 0x000000 );
-
 	this.map = null;
 
 	this.lightMap = null;
@@ -78,6 +76,8 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.aoMap = null;
 	this.aoMapIntensity = 1.0;
 
+	this.emissive = new THREE.Color( 0x000000 );
+	this.emissiveIntensity = 1.0;
 	this.emissiveMap = null;
 
 	this.bumpMap = null;
@@ -131,8 +131,6 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.roughness = source.roughness;
 	this.metalness = source.metalness;
 
-	this.emissive.copy( source.emissive );
-
 	this.map = source.map;
 
 	this.lightMap = source.lightMap;
@@ -141,7 +139,9 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.aoMap = source.aoMap;
 	this.aoMapIntensity = source.aoMapIntensity;
 
+	this.emissive.copy( source.emissive );
 	this.emissiveMap = source.emissiveMap;
+	this.emissiveIntensity = source.emissiveIntensity;
 
 	this.bumpMap = source.bumpMap;
 	this.bumpScale = source.bumpScale;

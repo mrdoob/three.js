@@ -17,7 +17,7 @@
 
 
 		<h3>[name]( [page:Array points] )</h3>
-		
+
 		<div>Initialises the spline with *points*, which are the places through which the spline will go.</div>
 
 
@@ -40,11 +40,11 @@
 		k — point index
 		</div>
 		<div>Return the interpolated point at *k*.</div>
-		
+
 		<h3>[method:Array getControlPointsArray]( )</h3>
 		<div>Returns an array with triplets of x, y, z coordinates that correspond to the current control points.
 		</div>
-		
+
 		<h3>[method:Object getLength]( [page:Integer nSubDivisions] )</h3>
 		<div>
 		nSubDivisions — number of subdivisions between control points. Default is *100*.
@@ -54,7 +54,7 @@
 			the length of the spline when using nSubDivisions. The property .[page:Array chunkLength]
 			contains an array with the total length from the beginning of the spline to the end of that chunk.
 		</div>
-		
+
 		<h3>[method:null reparametrizeByArcLength]( [page:Float samplingCoef] )</h3>
 		<div>
 		samplingCoef — how many intermediate values to use between spline points

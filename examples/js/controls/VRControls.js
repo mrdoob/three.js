@@ -9,35 +9,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	var vrInputs = [];
 
-	function filterInvalidDevices( devices ) {
-
-		// Exclude Cardboard position sensor if Oculus exists.
-
-		var oculusDevices = devices.filter( function ( device ) {
-
-			return device.deviceName.toLowerCase().indexOf( 'oculus' ) !== - 1;
-
-		} );
-
-		if ( oculusDevices.length >= 1 ) {
-
-			return devices.filter( function ( device ) {
-
-				return device.deviceName.toLowerCase().indexOf( 'cardboard' ) === - 1;
-
-			} );
-
-		} else {
-
-			return devices;
-
-		}
-
-	}
-
 	function gotVRDevices( devices ) {
-
-		devices = filterInvalidDevices( devices );
 
 		for ( var i = 0; i < devices.length; i ++ ) {
 
@@ -49,7 +21,11 @@ THREE.VRControls = function ( object, onError ) {
 
 		}
 
-		if ( onError ) onError( 'HMD not available' );
+		if ( vrInputs.length === 0 ) {
+
+			if ( onError ) onError( 'PositionSensorVRDevice not available' );
+
+		}
 
 	}
 

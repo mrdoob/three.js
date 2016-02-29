@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - materials - blending</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				margin: 0px;
@@ -22,6 +23,8 @@
 
 			var camera, scene, renderer;
 			var mesh, mapBg;
+
+			var textureLoader = new THREE.TextureLoader();
 
 			init();
 			animate();
@@ -59,7 +62,7 @@
 				mapBg.needsUpdate = true;
 
 				/*
-				var mapBg = THREE.ImageUtils.loadTexture( "textures/disturb.jpg" );
+				var mapBg = textureLoader.load( "textures/disturb.jpg" );
 				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
 				mapBg.repeat.set( 8, 4 );
 				*/
@@ -72,13 +75,13 @@
 
 				// OBJECTS
 
-				var blendings = [ "NoBlending", "NormalBlending", "AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "AdditiveAlphaBlending" ];
+				var blendings = [ "NoBlending", "NormalBlending", "AdditiveBlending", "SubtractiveBlending", "MultiplyBlending" ];
 
-				var map0 = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
-				var map1 = THREE.ImageUtils.loadTexture( 'textures/sprite0.jpg' );
-				var map2 = THREE.ImageUtils.loadTexture( 'textures/sprite0.png' );
-				var map3 = THREE.ImageUtils.loadTexture( 'textures/lensflare/lensflare0.png' );
-				var map4 = THREE.ImageUtils.loadTexture( 'textures/lensflare/lensflare0_alpha.png' );
+				var map0 = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
+				var map1 = textureLoader.load( 'textures/sprite0.jpg' );
+				var map2 = textureLoader.load( 'textures/sprite0.png' );
+				var map3 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
+				var map4 = textureLoader.load( 'textures/lensflare/lensflare0_alpha.png' );
 
 				var geo1 = new THREE.PlaneBufferGeometry( 100, 100 );
 				var geo2 = new THREE.PlaneBufferGeometry( 100, 25 );
@@ -168,7 +171,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				
+
 				var time = Date.now() * 0.00025;
 				var ox = ( time * -0.01 * mapBg.repeat.x ) % 1;
 				var oy = ( time * -0.01 * mapBg.repeat.y ) % 1;

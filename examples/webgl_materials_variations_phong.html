@@ -5,13 +5,13 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-					body {
+			body {
 				color: #fff;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
 
-				background-color: #fff;
+				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -31,9 +31,6 @@
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/geometries/TextGeometry.js"></script>
-		<script src="js/utils/FontUtils.js"></script>
-		<script src="fonts/gentilis_regular.typeface.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -47,10 +44,15 @@
 			var camera, scene, renderer, controls, objects = [];
 			var particleLight;
 
-			init();
-			animate();
+			var loader = new THREE.FontLoader();
+			loader.load( 'fonts/gentilis_regular.typeface.js', function ( font ) {
 
-			function init() {
+				init( font );
+				animate();
+
+			} );
+
+			function init( font ) {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -62,7 +64,7 @@
 
 				// Materials
 
-				var imgTexture = THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" );
+				var imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
@@ -79,9 +81,9 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 				reflectionCube.format = THREE.RGBFormat;
-		
+
 				var cubeWidth = 400;
 				var numberOfSphersPerSide = 5;
 				var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
@@ -89,9 +91,9 @@
 
 				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
-	
+
 				var localReflectionCube;
-				
+
 				for( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
 					if( alphaIndex % 2 === 0 ) {
@@ -127,21 +129,16 @@
 						}
 					}
 				}
-	
-	
+
+
 				function addLabel( name, location ) {
 					var textGeo = new THREE.TextGeometry( name, {
 
+						font: font,
+
 						size: 20,
-						height: 5,
-						curveSegments: 10,
-
-						font: 'gentilis',
-						weight: 'normal',
-						style: 'normal',
-
-						material: 0,
-						extrudeMaterial: 1
+						height: 1,
+						curveSegments: 1
 
 					});
 

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<title>three.js css3d stereo - periodic table</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<title>three.js css3d stereo - periodic table</title>
 		<style>
 			html, body {
 				height: 100%;
@@ -66,7 +66,7 @@
 	<body>
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/tween.min.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/DeviceOrientationControls.js"></script>
 		<script src="js/renderers/CSS3DStereoRenderer.js"></script>
 
 		<div id="container"></div>
@@ -196,7 +196,7 @@
 
 			var camera, scene, renderer;
 			var controls;
-			
+
 			var state = 0;
 
 			var objects = [];
@@ -208,7 +208,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 3000;
+				camera.position.z = 200;
 
 				scene = new THREE.Scene();
 
@@ -323,11 +323,7 @@
 
 				//
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 0.5;
-				controls.minDistance = 500;
-				controls.maxDistance = 6000;
-				controls.addEventListener( 'change', render );
+				controls = new THREE.DeviceOrientationControls( camera );
 
 				transform( targets.table, 5000 );
 
@@ -351,13 +347,13 @@
 					isFullscreen = true;
 
 				} else {
-				
+
 					document.webkitExitFullscreen();
-					
+
 					isFullscreen = false;
-				
+
 				}
-			
+
 			} );
 
 			function transform( positions, duration ) {
@@ -428,6 +424,8 @@
 				TWEEN.update();
 
 				controls.update();
+
+				render();
 
 			}
 

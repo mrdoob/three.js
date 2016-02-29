@@ -6,13 +6,13 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.Row();
 
 	var parameters = object.geometry.parameters;
 
 	// radius
 
-	var radiusRow = new UI.Panel();
+	var radiusRow = new UI.Row();
 	var radius = new UI.Number( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ) );
@@ -22,7 +22,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	// tube
 
-	var tubeRow = new UI.Panel();
+	var tubeRow = new UI.Row();
 	var tube = new UI.Number( parameters.tube ).onChange( update );
 
 	tubeRow.add( new UI.Text( 'Tube' ).setWidth( '90px' ) );
@@ -32,7 +32,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	// radialSegments
 
-	var radialSegmentsRow = new UI.Panel();
+	var radialSegmentsRow = new UI.Row();
 	var radialSegments = new UI.Integer( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
 	radialSegmentsRow.add( new UI.Text( 'Radial segments' ).setWidth( '90px' ) );
@@ -42,7 +42,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	// tubularSegments
 
-	var tubularSegmentsRow = new UI.Panel();
+	var tubularSegmentsRow = new UI.Row();
 	var tubularSegments = new UI.Integer( parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
 
 	tubularSegmentsRow.add( new UI.Text( 'Tubular segments' ).setWidth( '90px' ) );
@@ -52,7 +52,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	// p
 
-	var pRow = new UI.Panel();
+	var pRow = new UI.Row();
 	var p = new UI.Number( parameters.p ).onChange( update );
 
 	pRow.add( new UI.Text( 'P' ).setWidth( '90px' ) );
@@ -62,7 +62,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	// q
 
-	var qRow = new UI.Panel();
+	var qRow = new UI.Row();
 	var q = new UI.Number( parameters.q ).onChange( update );
 
 	pRow.add( new UI.Text( 'Q' ).setWidth( '90px' ) );
@@ -72,7 +72,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	// heightScale
 
-	var heightScaleRow = new UI.Panel();
+	var heightScaleRow = new UI.Row();
 	var heightScale = new UI.Number( parameters.heightScale ).onChange( update );
 
 	pRow.add( new UI.Text( 'Height scale' ).setWidth( '90px' ) );

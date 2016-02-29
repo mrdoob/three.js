@@ -29,9 +29,8 @@
 
 input.Number {
 	color: #2A75B7!important;
-	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
-	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
-	border: 1px solid transparent;
+	font-size: 12px;
+	border: 0px;
 	padding: 2px;
 	cursor: col-resize;
 }
@@ -110,7 +109,7 @@ input.Number {
 		}
 
 			#menubar .menu .options hr {
-				border-color: #333;
+				border-color: #222;
 			}
 
 			#menubar .menu .options .option {
@@ -159,23 +158,38 @@ input.Number {
 	}
 
 	#sidebar .Panel {
-		margin-bottom: 10px;
+		color: #888;
+		padding: 10px;
+		border-top: 1px solid #222;
 	}
 
 	#sidebar .Panel.collapsed {
 		margin-bottom: 0;
 	}
 
-	#sidebar > .Panel {
-		color: #888;
-		padding: 10px;
-		border-top: 1px solid #333;
+	#sidebar .Panel.Material canvas {
+		border: solid 1px #5A5A5A;
 	}
 
-	#sidebar .Panel.Material canvas {
+	#sidebar .Row {
+		min-height: 20px;
+		margin-bottom: 10px;
+	}
 
-		border: solid 1px #5A5A5A;
+#tabs {
+	background-color: #1b1b1b;
+	border-top: 1px solid #222;
+}
 
+	#tabs span {
+		color: #555;
+		border-right: 1px solid #222;
+		padding: 10px;
+	}
+
+	#tabs span.selected {
+		color: #888;
+		background-color: #111;
 	}
 
 #toolbar {

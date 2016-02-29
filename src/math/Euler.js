@@ -88,7 +88,7 @@ THREE.Euler.prototype = {
 
 	clone: function () {
 
-		return new this.constructor( this._x, this._y, this._z, this._order);
+		return new this.constructor( this._x, this._y, this._z, this._order );
 
 	},
 

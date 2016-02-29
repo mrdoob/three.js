@@ -16,6 +16,11 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 	this.width = width;
 	this.height = height;
 
+	this.scissor = new THREE.Vector4( 0, 0, width, height );
+	this.scissorTest = false;
+
+	this.viewport = new THREE.Vector4( 0, 0, width, height );
+
 	options = options || {};
 
 	if ( options.minFilter === undefined ) options.minFilter = THREE.LinearFilter;
@@ -42,6 +47,9 @@ THREE.WebGLRenderTarget.prototype = {
 
 		}
 
+		this.viewport.set( 0, 0, width, height );
+		this.scissor.set( 0, 0, width, height );
+
 	},
 
 	clone: function () {
@@ -54,6 +62,8 @@ THREE.WebGLRenderTarget.prototype = {
 
 		this.width = source.width;
 		this.height = source.height;
+
+		this.viewport.copy( source.viewport );
 
 		this.texture = source.texture.clone();
 

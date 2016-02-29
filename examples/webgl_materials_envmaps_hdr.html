@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - materials</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
+			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="../examples/js/controls/OrbitControls.js"></script>
+		<script src="../src/loaders/BinaryTextureLoader.js"></script>
+		<script src="../examples/js/loaders/RGBELoader.js"></script>
+		<script src="../examples/js/loaders/HDRCubeMapLoader.js"></script>
+
+		<script src="../examples/js/Detector.js"></script>
+		<script src="../examples/js/libs/stats.min.js"></script>
+
+		<script src="../examples/js/Half.js"></script>
+		<script src="../examples/js/Encodings.js"></script>
+		<script src="../examples/js/pmrem/PMREMGenerator.js"></script>
+		<script src="../examples/js/pmrem/PMREMCubeUVPacker.js"></script>
+		<script src="../examples/js/libs/dat.gui.min.js"></script>
+
+		<script src="../examples/js/postprocessing/EffectComposer.js"></script>
+		<script src="../examples/js/postprocessing/RenderPass.js"></script>
+		<script src="../examples/js/postprocessing/MaskPass.js"></script>
+		<script src="../examples/js/postprocessing/ShaderPass.js"></script>
+		<script src="../examples/js/shaders/CopyShader.js"></script>
+		<script src="../examples/js/shaders/FXAAShader.js"></script>
+		<script src="../examples/js/postprocessing/BloomPass.js"></script>
+		<script src="../examples/js/shaders/ConvolutionShader.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+			var params = {
+				projection: 'normal',
+				roughness: 1.0,
+				bumpScale: 0.3,
+				background: false,
+			};
+			var camera, scene, renderer, controls, objects = [];
+			var hdrCubeMap;
+			var composer;
+			var standardMaterial;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0.0, 40, 40 * 3.5 );
+
+				scene = new THREE.Scene();
+
+				// Materials
+				var hdrpath = "../examples/textures/cube/hdrPisa/";
+				var hdrformat = '.hdr';
+				var hdrurls = [
+					hdrpath + 'px' + hdrformat, hdrpath + 'nx' + hdrformat,
+					hdrpath + 'py' + hdrformat, hdrpath + 'ny' + hdrformat,
+					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
+				];
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+
+				var roughnessTexture = THREE.ImageUtils.loadTexture( "../examples/textures/roughness_map.jpg" );
+				roughnessTexture.wrapS = THREE.RepeatWrapping;
+				roughnessTexture.wrapT = THREE.RepeatWrapping;
+				roughnessTexture.repeat.set( 9, 2 );
+
+				var hdrType = THREE.UnsignedByteType;
+
+				/*
+				if ( renderer.extensions.get( 'OES_texture_half_float' ) && renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
+					hdrType = THREE.HalfFloatType;
+				} else if ( renderer.extensions.get( 'OES_texture_float' ) && renderer.extensions.get( 'OES_texture_float_linear' ) ) {
+					hdrType = THREE.FloatType;
+				}
+				*/
+
+				var hdrCubeMap = new THREE.HDRCubeMapLoader().load( hdrType, hdrurls, function ( hdrCubeMap ) {
+
+					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					standardMaterial = new THREE.MeshStandardMaterial( {
+						map: null,
+						roughnessMap: roughnessTexture,
+						bumpScale: - 0.05,
+						bumpMap: roughnessTexture,
+						color: 0xffffff,
+						metalness: 0.9,
+						roughness: 1.0,
+						envMap: pmremCubeUVPacker.CubeUVRenderTarget,
+						shading: THREE.SmoothShading
+					} );
+					var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
+					var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
+					torusMesh1.position.x = 0.0;
+					torusMesh1.castShadow = true;
+					scene.add( torusMesh1 );
+					objects.push( torusMesh1 );
+
+					var floorMaterial = new THREE.MeshStandardMaterial( {
+						map: null,
+						roughnessMap: null,
+						color: 0xffffff,
+						metalness: 0.0,
+						roughness: 0.0,
+						envMap: pmremCubeUVPacker.CubeUVRenderTarget,
+						shading: THREE.SmoothShading
+					} );
+
+					var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
+					var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
+					planeMesh1.position.y = - 50;
+					planeMesh1.rotation.x = - Math.PI * 0.5;
+					planeMesh1.receiveShadow = true;
+					scene.add( planeMesh1 );
+
+				} );
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+				var spotLight = new THREE.SpotLight( 0xffffff );
+				spotLight.position.set( 50, 100, 50 );
+				spotLight.angle = Math.PI / 7;
+				spotLight.penumbra = 0.8
+				spotLight.castShadow = true;
+				scene.add( spotLight );
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				composer = new THREE.EffectComposer( renderer );
+				composer.setSize( window.innerWidth, window.innerHeight );
+
+				var renderScene = new THREE.RenderPass( scene, camera );
+				composer.addPass( renderScene );
+
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				copyPass.renderToScreen = true;
+				composer.addPass( copyPass );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+
+				container.appendChild( stats.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0, 0 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				var gui = new dat.GUI();
+
+				gui.add( params, 'roughness', 0, 1 );
+				gui.add( params, 'bumpScale', - 1, 1 );
+				gui.open();
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				if ( standardMaterial !== undefined ) {
+
+					standardMaterial.roughness = params.roughness;
+					standardMaterial.bumpScale = - 0.05 * params.bumpScale;
+
+				}
+
+				var timer = Date.now() * 0.00025;
+
+				camera.lookAt( scene.position );
+
+				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+					var object = objects[ i ];
+					object.rotation.y += 0.005;
+
+				}
+
+				composer.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>

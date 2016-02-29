@@ -1,3 +1,9 @@
+bool testLightInRange( const in float lightDistance, const in float cutoffDistance ) {
+
+	return any( bvec2( cutoffDistance == 0.0, lightDistance < cutoffDistance ) );
+
+}
+
 float calcLightAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
 
 	if ( decayExponent > 0.0 ) {
@@ -141,4 +147,8 @@ vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in Ge
 // source: http://simonstechblog.blogspot.ca/2011/12/microfacet-brdf.html
 float GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {
 	return ( 2.0 / square( ggxRoughness + 0.0001 ) - 2.0 );
+}
+
+float BlinnExponentToGGXRoughness( const in float blinnExponent ) {
+	return sqrt( 2.0 / ( blinnExponent + 2.0 ) );
 }

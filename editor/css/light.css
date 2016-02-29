@@ -17,14 +17,13 @@
 	}
 
 	.Outliner .option.active {
-		background-color: #f8f8f8;
+		background-color: rgba(0,0,0,0.02);
 	}
 
 input.Number {
 	color: #0080f0!important;
-	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
-	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
-	border: 1px solid transparent;
+	font-size: 12px;
+	border: 0px;
 	padding: 2px;
 	cursor: col-resize;
 }
@@ -152,17 +151,34 @@ input.Number {
 	}
 
 	#sidebar .Panel {
-		margin-bottom: 10px;
+		color: #888;
+		padding: 10px;
+		border-top: 1px solid #ccc;
 	}
 
 	#sidebar .Panel.collapsed {
 		margin-bottom: 0;
 	}
 
-	#sidebar > .Panel {
-		color: #888;
+	#sidebar .Row {
+		min-height: 20px;
+		margin-bottom: 10px;
+	}
+
+#tabs {
+	background-color: #ddd;
+	border-top: 1px solid #ccc;
+}
+
+	#tabs span {
+		color: #aaa;
+		border-right: 1px solid #ccc;
 		padding: 10px;
-		border-top: 1px solid #ccc;
+	}
+
+	#tabs span.selected {
+		color: #888;
+		background-color: #eee;
 	}
 
 #toolbar {

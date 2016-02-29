@@ -9,11 +9,11 @@ var list = {
 
 	"Reference": {
 		"Constants": [
-			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations"],
-			[ "GLState", "api/constants/GLState"],
-			[ "Materials", "api/constants/Materials"],
-			[ "ShadowingTypes", "api/constants/ShadowingTypes"],
-			[ "Textures", "api/constants/Textures"]
+			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
+			[ "GLState", "api/constants/GLState" ],
+			[ "Materials", "api/constants/Materials" ],
+			[ "ShadowingTypes", "api/constants/ShadowingTypes" ],
+			[ "Textures", "api/constants/Textures" ]
 		],
 
 		"Cameras": [
@@ -57,7 +57,6 @@ var list = {
 			[ "MaterialLoader", "api/loaders/MaterialLoader" ],
 			[ "MTLLoader", "api/loaders/MTLLoader" ],
 			[ "OBJLoader", "api/loaders/OBJLoader" ],
-			[ "OBJMTLLoader", "api/loaders/OBJMTLLoader" ],
 			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
 			[ "PDBLoader", "api/loaders/PDBLoader" ],
 			[ "SVGLoader", "api/loaders/SVGLoader" ],
@@ -72,10 +71,11 @@ var list = {
 			[ "Material", "api/materials/Material" ],
 			[ "MeshBasicMaterial", "api/materials/MeshBasicMaterial" ],
 			[ "MeshDepthMaterial", "api/materials/MeshDepthMaterial" ],
-			[ "MeshFaceMaterial", "api/materials/MeshFaceMaterial" ],
+			[ "MultiMaterial", "api/materials/MultiMaterial" ],
 			[ "MeshLambertMaterial", "api/materials/MeshLambertMaterial" ],
 			[ "MeshNormalMaterial", "api/materials/MeshNormalMaterial" ],
 			[ "MeshPhongMaterial", "api/materials/MeshPhongMaterial" ],
+			[ "MeshStandardMaterial", "api/materials/MeshStandardMaterial" ],
 			[ "PointsMaterial", "api/materials/PointsMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
@@ -150,14 +150,13 @@ var list = {
 		],
 
 		"Textures": [
-			[ "CubeTexture", "api/textures/CubeTexture" ],
 			[ "CompressedTexture", "api/textures/CompressedTexture" ],
+			[ "CubeTexture", "api/textures/CubeTexture" ],
 			[ "DataTexture", "api/textures/DataTexture" ],
 			[ "Texture", "api/textures/Texture" ]
 		],
 
 		"Extras": [
-			[ "FontUtils", "api/extras/FontUtils" ],
 			[ "GeometryUtils", "api/extras/GeometryUtils" ],
 			[ "SceneUtils", "api/extras/SceneUtils" ]
 		],
@@ -178,6 +177,7 @@ var list = {
 
 		"Extras / Curves": [
 			[ "ArcCurve", "api/extras/curves/ArcCurve" ],
+			[ "CatmullRomCurve3", "api/extras/curves/CatmullRomCurve3" ],
 			[ "ClosedSplineCurve3", "api/extras/curves/ClosedSplineCurve3" ],
 			[ "CubicBezierCurve", "api/extras/curves/CubicBezierCurve" ],
 			[ "CubicBezierCurve3", "api/extras/curves/CubicBezierCurve3" ],
@@ -191,7 +191,9 @@ var list = {
 		],
 
 		"Extras / Geometries": [
+			[ "BoxBufferGeometry", "api/extras/geometries/BoxBufferGeometry" ],
 			[ "BoxGeometry", "api/extras/geometries/BoxGeometry" ],
+			[ "CircleBufferGeometry", "api/extras/geometries/CircleBufferGeometry" ],
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
 			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
@@ -200,13 +202,16 @@ var list = {
 			[ "LatheGeometry", "api/extras/geometries/LatheGeometry" ],
 			[ "OctahedronGeometry", "api/extras/geometries/OctahedronGeometry" ],
 			[ "ParametricGeometry", "api/extras/geometries/ParametricGeometry" ],
+			[ "PlaneBufferGeometry", "api/extras/geometries/PlaneBufferGeometry" ],
 			[ "PlaneGeometry", "api/extras/geometries/PlaneGeometry" ],
 			[ "PolyhedronGeometry", "api/extras/geometries/PolyhedronGeometry" ],
 			[ "RingGeometry", "api/extras/geometries/RingGeometry" ],
 			[ "ShapeGeometry", "api/extras/geometries/ShapeGeometry" ],
+			[ "SphereBufferGeometry", "api/extras/geometries/SphereBufferGeometry" ],
 			[ "SphereGeometry", "api/extras/geometries/SphereGeometry" ],
 			[ "TetrahedronGeometry", "api/extras/geometries/TetrahedronGeometry" ],
 			[ "TextGeometry", "api/extras/geometries/TextGeometry" ],
+			[ "TorusBufferGeometry", "api/extras/geometries/TorusBufferGeometry" ],
 			[ "TorusGeometry", "api/extras/geometries/TorusGeometry" ],
 			[ "TorusKnotGeometry", "api/extras/geometries/TorusKnotGeometry" ],
 			[ "TubeGeometry", "api/extras/geometries/TubeGeometry" ]

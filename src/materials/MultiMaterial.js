@@ -65,7 +65,3 @@ THREE.MultiMaterial.prototype = {
 	}
 
 };
-
-// backwards compatibility
-
-THREE.MeshFaceMaterial = THREE.MultiMaterial;

@@ -18,7 +18,7 @@ Menubar.Edit = function ( editor ) {
 
 	// Undo
 
-	var undo = new UI.Panel();
+	var undo = new UI.Row();
 	undo.setClass( 'option' );
 	undo.setTextContent( 'Undo (Ctrl+Z)' );
 	undo.onClick( function () {
@@ -30,7 +30,7 @@ Menubar.Edit = function ( editor ) {
 
 	// Redo
 
-	var redo = new UI.Panel();
+	var redo = new UI.Row();
 	redo.setClass( 'option' );
 	redo.setTextContent( 'Redo (Ctrl+Shift+Z)' );
 	redo.onClick( function () {
@@ -42,7 +42,7 @@ Menubar.Edit = function ( editor ) {
 
 	// Clear History
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Clear History' );
 	option.onClick( function () {
@@ -84,7 +84,7 @@ Menubar.Edit = function ( editor ) {
 
 	// Clone
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Clone' );
 	option.onClick( function () {
@@ -102,7 +102,7 @@ Menubar.Edit = function ( editor ) {
 
 	// Delete
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Delete' );
 	option.onClick( function () {
@@ -121,7 +121,7 @@ Menubar.Edit = function ( editor ) {
 
 	// Minify shaders
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Minify Shaders' );
 	option.onClick( function() {

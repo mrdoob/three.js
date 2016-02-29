@@ -56,7 +56,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_viewportWidth = _canvasWidth,
 	_viewportHeight = _canvasHeight,
 
-	pixelRatio = 1,
+	_pixelRatio = 1,
 
 	_context = _canvas.getContext( '2d', {
 		alpha: parameters.alpha === true
@@ -165,20 +165,20 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.getPixelRatio = function () {
 
-		return pixelRatio;
+		return _pixelRatio;
 
 	};
 
 	this.setPixelRatio = function ( value ) {
 
-		if ( value !== undefined ) pixelRatio = value;
+		if ( value !== undefined ) _pixelRatio = value;
 
 	};
 
 	this.setSize = function ( width, height, updateStyle ) {
 
-		_canvasWidth = width * pixelRatio;
-		_canvasHeight = height * pixelRatio;
+		_canvasWidth = width * _pixelRatio;
+		_canvasHeight = height * _pixelRatio;
 
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
@@ -213,16 +213,16 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		_viewportX = x * pixelRatio;
-		_viewportY = y * pixelRatio;
+		_viewportX = x * _pixelRatio;
+		_viewportY = y * _pixelRatio;
 
-		_viewportWidth = width * pixelRatio;
-		_viewportHeight = height * pixelRatio;
+		_viewportWidth = width * _pixelRatio;
+		_viewportHeight = height * _pixelRatio;
 
 	};
 
 	this.setScissor = function () {};
-	this.enableScissorTest = function () {};
+	this.setScissorTest = function () {};
 
 	this.setClearColor = function ( color, alpha ) {
 
@@ -261,7 +261,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.clear = function () {
 
-		if ( _clearBox.empty() === false ) {
+		if ( _clearBox.isEmpty() === false ) {
 
 			_clearBox.intersect( _clipBox );
 			_clearBox.expandByScalar( 2 );

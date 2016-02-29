@@ -15,6 +15,7 @@ float average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }
 struct IncidentLight {
 	vec3 color;
 	vec3 direction;
+	bool visible;
 };
 
 struct ReflectedLight {
@@ -61,33 +62,5 @@ float sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {
 vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {
 
 	return lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;
-
-}
-
-vec3 inputToLinear( in vec3 a ) {
-
-	#ifdef GAMMA_INPUT
-
-		return pow( a, vec3( float( GAMMA_FACTOR ) ) );
-
-	#else
-
-		return a;
-
-	#endif
-
-}
-
-vec3 linearToOutput( in vec3 a ) {
-
-	#ifdef GAMMA_OUTPUT
-
-		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );
-
-	#else
-
-		return a;
-
-	#endif
 
 }

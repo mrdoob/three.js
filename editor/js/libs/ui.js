@@ -165,6 +165,38 @@ UI.Span = function () {
 UI.Span.prototype = Object.create( UI.Element.prototype );
 UI.Span.prototype.constructor = UI.Span;
 
+// Div
+
+UI.Div = function () {
+
+	UI.Element.call( this );
+
+	this.dom = document.createElement( 'div' );
+
+	return this;
+
+};
+
+UI.Div.prototype = Object.create( UI.Element.prototype );
+UI.Div.prototype.constructor = UI.Div;
+
+// Row
+
+UI.Row = function () {
+
+	UI.Element.call( this );
+
+	var dom = document.createElement( 'div' );
+	dom.className = 'Row';
+
+	this.dom = dom;
+
+	return this;
+
+};
+
+UI.Row.prototype = Object.create( UI.Element.prototype );
+UI.Row.prototype.constructor = UI.Row;
 
 // Panel
 
@@ -575,9 +607,9 @@ UI.Color = function () {
 	var dom = document.createElement( 'input' );
 	dom.className = 'Color';
 	dom.style.width = '64px';
-	dom.style.height = '16px';
+	dom.style.height = '17px';
 	dom.style.border = '0px';
-	dom.style.padding = '0px';
+	dom.style.padding = '2px';
 	dom.style.backgroundColor = 'transparent';
 
 	try {
@@ -731,14 +763,13 @@ UI.Number = function ( number ) {
 
 		}
 
-		scope.setValue( parseFloat( value ) );
+		scope.setValue( value );
 
 	}
 
 	function onFocus( event ) {
 
 		dom.style.backgroundColor = '';
-		dom.style.borderColor = '#ccc';
 		dom.style.cursor = '';
 
 	}
@@ -746,10 +777,11 @@ UI.Number = function ( number ) {
 	function onBlur( event ) {
 
 		dom.style.backgroundColor = 'transparent';
-		dom.style.borderColor = 'transparent';
 		dom.style.cursor = 'col-resize';
 
 	}
+
+	onBlur();
 
 	dom.addEventListener( 'mousedown', onMouseDown, false );
 	dom.addEventListener( 'change', onChange, false );
@@ -772,6 +804,11 @@ UI.Number.prototype.getValue = function () {
 UI.Number.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
+
+		value = parseFloat( value );
+
+		if ( value < this.min ) value = this.min;
+		if ( value > this.max ) value = this.max;
 
 		this.value = value;
 		this.dom.value = value.toFixed( this.precision );
@@ -910,7 +947,6 @@ UI.Integer = function ( number ) {
 	function onFocus( event ) {
 
 		dom.style.backgroundColor = '';
-		dom.style.borderColor = '#ccc';
 		dom.style.cursor = '';
 
 	}
@@ -918,10 +954,11 @@ UI.Integer = function ( number ) {
 	function onBlur( event ) {
 
 		dom.style.backgroundColor = 'transparent';
-		dom.style.borderColor = 'transparent';
 		dom.style.cursor = 'col-resize';
 
 	}
+
+	onBlur();
 
 	dom.addEventListener( 'mousedown', onMouseDown, false );
 	dom.addEventListener( 'change', onChange, false );

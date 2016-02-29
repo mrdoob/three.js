@@ -22,17 +22,11 @@ THREE.WebGLLights = function () {
 				uniforms = {
 					direction: new THREE.Vector3(),
 					color: new THREE.Color(),
-					shadow: -1
-				};
-				break;
 
-			case 'PointLight':
-				uniforms = {
-					position: new THREE.Vector3(),
-					color: new THREE.Color(),
-					distance: 0,
-					decay: 0,
-					shadow: -1
+					shadow: false,
+					shadowBias: 0,
+					shadowRadius: 1,
+					shadowMapSize: new THREE.Vector2()
 				};
 				break;
 
@@ -42,8 +36,28 @@ THREE.WebGLLights = function () {
 					direction: new THREE.Vector3(),
 					color: new THREE.Color(),
 					distance: 0,
+					coneCos: 0,
+					penumbraCos: 0,
 					decay: 0,
-					angleCos: 0
+
+					shadow: false,
+					shadowBias: 0,
+					shadowRadius: 1,
+					shadowMapSize: new THREE.Vector2()
+				};
+				break;
+
+			case 'PointLight':
+				uniforms = {
+					position: new THREE.Vector3(),
+					color: new THREE.Color(),
+					distance: 0,
+					decay: 0,
+
+					shadow: false,
+					shadowBias: 0,
+					shadowRadius: 1,
+					shadowMapSize: new THREE.Vector2()
 				};
 				break;
 

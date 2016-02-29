@@ -220,7 +220,7 @@
 
 			function createScene( geometry, materials, x, y, z, b ) {
 
-				zmesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+				zmesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
 				zmesh.position.set( x, y, z );
 				zmesh.scale.set( 3, 3, 3 );
 				scene.add( zmesh );

@@ -1,17 +1,13 @@
-uniform vec3 ambientLightColor;
-
-vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
-
-	return PI * ambientLightColor;
-
-}
-
 #if NUM_DIR_LIGHTS > 0
 
 	struct DirectionalLight {
-	  vec3 direction;
-	  vec3 color;
-	  int shadow;
+		vec3 direction;
+		vec3 color;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
 	};
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
@@ -22,6 +18,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		directLight.color = directionalLight.color;
 		directLight.direction = directionalLight.direction;
+		directLight.visible = true;
 
 		return directLight;
 
@@ -33,11 +30,15 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 #if NUM_POINT_LIGHTS > 0
 
 	struct PointLight {
-	  vec3 position;
-	  vec3 color;
-	  float distance;
-	  float decay;
-	  int shadow;
+		vec3 position;
+		vec3 color;
+		float distance;
+		float decay;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
 	};
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
@@ -49,8 +50,20 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		vec3 lVector = pointLight.position - geometry.position;
 		directLight.direction = normalize( lVector );
 
-		directLight.color = pointLight.color;
-		directLight.color *= calcLightAttenuation( length( lVector ), pointLight.distance, pointLight.decay );
+		float lightDistance = length( lVector );
+
+		if ( testLightInRange( lightDistance, pointLight.distance ) ) {
+
+			directLight.color = pointLight.color;
+			directLight.color *= calcLightAttenuation( lightDistance, pointLight.distance, pointLight.decay );
+			directLight.visible = true;
+
+		} else {
+
+			directLight.color = vec3( 0.0 );
+			directLight.visible = false;
+
+		}
 
 		return directLight;
 
@@ -62,14 +75,18 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 #if NUM_SPOT_LIGHTS > 0
 
 	struct SpotLight {
-	  vec3 position;
-	  vec3 direction;
-	  vec3 color;
-	  float distance;
-	  float decay;
-	  float angleCos;
-	  float exponent;
-	  int shadow;
+		vec3 position;
+		vec3 direction;
+		vec3 color;
+		float distance;
+		float decay;
+		float coneCos;
+		float penumbraCos;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
 	};
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
@@ -81,19 +98,21 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		vec3 lVector = spotLight.position - geometry.position;
 		directLight.direction = normalize( lVector );
 
-		float spotEffect = dot( directLight.direction, spotLight.direction );
+		float lightDistance = length( lVector );
+		float angleCos = dot( directLight.direction, spotLight.direction );
 
-		if ( spotEffect > spotLight.angleCos ) {
+		if ( all( bvec2( angleCos > spotLight.coneCos, testLightInRange( lightDistance, spotLight.distance ) ) ) ) {
 
-			float spotEffect = dot( spotLight.direction, directLight.direction );
-			spotEffect = saturate( pow( saturate( spotEffect ), spotLight.exponent ) );
+			float spotEffect = smoothstep( spotLight.coneCos, spotLight.penumbraCos, angleCos );
 
 			directLight.color = spotLight.color;
-			directLight.color *= ( spotEffect * calcLightAttenuation( length( lVector ), spotLight.distance, spotLight.decay ) );
+			directLight.color *= ( spotEffect * calcLightAttenuation( lightDistance, spotLight.distance, spotLight.decay ) );
+			directLight.visible = true;
 
 		} else {
 
 			directLight.color = vec3( 0.0 );
+			directLight.visible = false;
 
 		}
 
@@ -107,9 +126,9 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 #if NUM_HEMI_LIGHTS > 0
 
 	struct HemisphereLight {
-	  vec3 direction;
-	  vec3 skyColor;
-	  vec3 groundColor;
+		vec3 direction;
+		vec3 skyColor;
+		vec3 groundColor;
 	};
 
 	uniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];
@@ -160,13 +179,18 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 			#endif
 
+		#elif defined( ENVMAP_TYPE_CUBE_UV )
+
+				vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );
+				vec4 envMapColor = textureCubeUV(queryVec, 1.0, 1024.0);
+
 		#else
 
 			vec3 envMapColor = vec3( 0.0 );
 
 		#endif
 
-		envMapColor.rgb = inputToLinear( envMapColor.rgb );
+		envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
 
 		return PI * envMapColor.rgb * envMapIntensity;
 
@@ -226,6 +250,11 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 			#endif
 
+		#elif defined( ENVMAP_TYPE_CUBE_UV )
+
+			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
+			vec4 envMapColor = textureCubeUV(queryReflectVec, BlinnExponentToGGXRoughness(blinnShininessExponent), 1024.0);
+
 		#elif defined( ENVMAP_TYPE_EQUIREC )
 
 			vec2 sampleUV;
@@ -258,7 +287,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		#endif
 
-		envMapColor.rgb = inputToLinear( envMapColor.rgb );
+		envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
 
 		return envMapColor.rgb * envMapIntensity;
 

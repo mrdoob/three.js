@@ -18,7 +18,7 @@ Menubar.File = function ( editor ) {
 
 	// New
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'New' );
 	option.onClick( function () {
@@ -46,7 +46,7 @@ Menubar.File = function ( editor ) {
 
 	} );
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Import' );
 	option.onClick( function () {
@@ -62,7 +62,7 @@ Menubar.File = function ( editor ) {
 
 	// Export Geometry
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Geometry' );
 	option.onClick( function () {
@@ -105,7 +105,7 @@ Menubar.File = function ( editor ) {
 
 	// Export Object
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Object' );
 	option.onClick( function () {
@@ -139,7 +139,7 @@ Menubar.File = function ( editor ) {
 
 	// Export Scene
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Scene' );
 	option.onClick( function () {
@@ -164,7 +164,7 @@ Menubar.File = function ( editor ) {
 
 	// Export OBJ
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export OBJ' );
 	option.onClick( function () {
@@ -187,7 +187,7 @@ Menubar.File = function ( editor ) {
 
 	// Export STL
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export STL' );
 	option.onClick( function () {
@@ -205,7 +205,7 @@ Menubar.File = function ( editor ) {
 
 	// Publish
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Publish' );
 	option.onClick( function () {
@@ -250,6 +250,26 @@ Menubar.File = function ( editor ) {
 
 	} );
 	options.add( option );
+
+	/*
+	// Publish (Dropbox)
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Publish (Dropbox)' );
+	option.onClick( function () {
+
+		var parameters = {
+			files: [
+				{ 'url': 'data:text/plain;base64,' + window.btoa( "Hello, World" ), 'filename': 'app/test.txt' }
+			]
+		};
+
+		Dropbox.save( parameters );
+
+	} );
+	options.add( option );
+	*/
 
 
 	//
