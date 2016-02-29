@@ -3,27 +3,34 @@
  * @author Ben Houston / bhouston, https://clara.io
  */
 
- THREE.PMREMGenerator = function( cubeTexture ) {
-	if ( cubeTexture instanceof THREE.CubeTexture ) {
+ THREE.PMREMGenerator = function( sourceTexture ) {
+	if ( sourceTexture instanceof THREE.CubeTexture ) {
 
-		if ( cubeTexture.images[ 0 ] === undefined )
-		  console.error( "CubeTexture Not Initialized" );
-      if(cubeTexture.images[ 0 ] instanceof THREE.DataTexture) {
-          this.resolution = cubeTexture.images[ 0 ].image.width;
+		if ( sourceTexture.images[ 0 ] === undefined )
+		  console.error( "sourceTexture Not Initialized" );
+      if(sourceTexture.images[ 0 ] instanceof THREE.DataTexture) {
+          this.resolution = sourceTexture.images[ 0 ].image.width;
       }
       else {
-          this.resolution = cubeTexture.images[ 0 ].width;
+          this.resolution = sourceTexture.images[ 0 ].width;
       }
 
 	}
-	else if ( cubeTexture instanceof THREE.WebGLRenderTargetCube ) {
-		if ( cubeTexture === undefined ) console.error( "Render Target Not Initialized" );
-		this.resolution = cubeTexture.width;
+	else if ( sourceTexture instanceof THREE.WebGLRenderTargetCube ) {
+		if ( sourceTexture === undefined ) console.error( "Render Target Not Initialized" );
+		this.resolution = sourceTexture.width;
 	}
 	else {
 		console.error( "Wrong Input to PMREMGenerator" );
 	}
-	this.sourceTexture = cubeTexture;
+	this.sourceTexture = sourceTexture;
+
+  var monotonicEncoding = ( sourceTexture.encoding === THREE.LinearEncoding ) ||
+    ( sourceTexture.encoding === THREE.GammaEncoding ) || ( sourceTexture.encoding === THREE.sRGBEncoding );
+
+  this.sourceTexture.minFilter = ( monotonicEncoding ) ? THREE.LinearFilter : THREE.NearestFilter;
+  this.sourceTexture.magFilter = ( monotonicEncoding ) ? THREE.LinearFilter : THREE.NearestFilter;
+  this.sourceTexture.generateMipmaps = this.sourceTexture.generateMipmaps && monotonicEncoding;
 
 	this.cubeLods = [];
 
