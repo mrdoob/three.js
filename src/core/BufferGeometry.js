@@ -808,7 +808,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 		 * Throws an error on attribute mismatch.
 		 *
 		 * @returns {Array}
-         */
+		 */
 		function getAttributes() {
 
 			var key, attributes = [];
