@@ -116,6 +116,7 @@
 				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
 				torusMesh1.position.x = 0.0;
 				torusMesh1.castShadow = true;
+				torusMesh1.receiveShadow = true;
 				scene.add( torusMesh1 );
 				objects.push( torusMesh1 );
 
