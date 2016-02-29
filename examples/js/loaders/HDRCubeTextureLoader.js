@@ -3,7 +3,7 @@
 * @author Ben Houston / http://clara.io / bhouston
 */
 
-THREE.HDRCubeMapLoader = function (manager) {
+THREE.HDRCubeTextureLoader = function (manager) {
   this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
   // override in sub classes
   this.hdrLoader = new THREE.RGBELoader();
@@ -11,7 +11,7 @@ THREE.HDRCubeMapLoader = function (manager) {
   if( THREE.Encodings === undefined ) throw new Error( "HDRCubeMapLoader requires THREE.Encodings" );
 }
 
-THREE.HDRCubeMapLoader.prototype.load = function(type, urls, onLoad, onProgress, onError) {
+THREE.HDRCubeTextureLoader.prototype.load = function(type, urls, onLoad, onProgress, onError) {
   var texture = new THREE.CubeTexture( [] );
 
   texture.type = type;
