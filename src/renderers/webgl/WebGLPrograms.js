@@ -177,7 +177,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			toneMapping: renderer.toneMapping,
 
-			premultipliedAlpha: ( material.blending === THREE.PremultipliedAlphaBlending ),
+			premultipliedAlpha: material.premultipliedAlpha,
 			alphaTest: material.alphaTest,
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide
