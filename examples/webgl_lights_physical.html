@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - point lights</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
+
+			a {
+				color: #ff0080;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #0080ff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - point lights WebGL demo.<br />
+			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="../examples/js/libs/stats.min.js"></script>
+		<script src="../examples/js/libs/dat.gui.min.js"></script>
+		<script src="../examples/js/controls/OrbitControls.js"></script>
+		<script src="js/Detector.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer,
+			bulbLight,
+			object, loader, stats;
+
+			var lightTypes = {
+				"60W Bulb (450 cd)": 450,
+				"40W Bulb (300 cd)": 300,
+				"20W Bulb (150 cd)": 120
+			};
+
+			var params = {
+				exposure: 1.0,
+				lightType: Object.keys( lightTypes )[0]
+			};
+
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 7;
+				camera.position.y = 2;
+
+				scene = new THREE.Scene();
+
+				var bulbGeometry = new THREE.SphereGeometry( 0.02, 16, 8 );
+				bulbLight = new THREE.PointLight( 0xffffee, 1, 100, 2 );
+				bulbLight.add( new THREE.Mesh( bulbGeometry, new THREE.MeshBasicMaterial( { color: 0xffffee } ) ) );
+				bulbLight.position.set( 0, 2, 0 );
+				bulbLight.castShadow = true;
+				scene.add( bulbLight );
+
+				var ambientLight = new THREE.AmbientLight( 0xffffee, 0.2 );
+				scene.add( ambientLight );
+
+				var floorMat = new THREE.MeshStandardMaterial( {
+					roughness: 1.0,
+					color: 0xffffff,
+					metalness: 0
+				});
+				var textureLoader = new THREE.TextureLoader();
+				textureLoader.load( "../examples/textures/crate.gif", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 12, 12 );
+					floorMat.map = map;
+					floorMat.needsUpdate = true;
+				} );
+
+				var cubeMat = new THREE.MeshStandardMaterial( {
+					roughness: 0.7,
+					color: 0xffffff,
+					bumpScale: 0.002,
+					metalness: 0.2
+				});
+				textureLoader.load( "../examples/textures/brick_diffuse.jpg", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 1, 1 );
+					cubeMat.map = map;
+					cubeMat.needsUpdate = true;
+				} );
+				textureLoader.load( "../examples/textures/brick_bump.jpg", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 1, 1 );
+					cubeMat.bumpMap = map;
+					cubeMat.needsUpdate = true;
+				} );
+
+				var ballMat = new THREE.MeshStandardMaterial( {
+					roughness: 0,
+					metalness: 0.0,
+					color: 0xffffff
+				});
+				textureLoader.load( "../examples/textures/planets/earth_atmos_2048.jpg", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 1, 1 );
+					ballMat.map = map;
+					ballMat.needsUpdate = true;
+				} );
+				textureLoader.load( "../examples/textures/planets/earth_specular_2048.jpg", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 1, 1 );
+					ballMat.roughnessMap = map;
+					ballMat.needsUpdate = true;
+				} );
+
+				var floorGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+				var floorMesh = new THREE.Mesh( floorGeometry, floorMat );
+				floorMesh.receiveShadow = true;
+				floorMesh.rotation.x = -Math.PI / 2.0;
+				scene.add( floorMesh );
+
+				var ballGeometry = new THREE.SphereGeometry( 0.1213, 16, 8 );
+				var ballMesh = new THREE.Mesh( ballGeometry, ballMat );
+				ballMesh.position.set( 1, 0.1213, 1 );
+				ballMesh.castShadow = true;
+				scene.add( ballMesh );
+
+				var boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+				var boxMesh = new THREE.Mesh( boxGeometry, cubeMat );
+				boxMesh.position.set( -3, 0.5, -2 );
+				boxMesh.castShadow = true;
+				scene.add( boxMesh );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.physicalLights = true;
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0, 0 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+
+				var gui = new dat.GUI();
+
+				gui.add( params, 'lightType', Object.keys( lightTypes ) );
+				gui.add( params, 'exposure', 0, 1 );
+				gui.open();
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.toneMappingExposure = params.exposure;
+				bulbLight.power = lightTypes[ params.lightType ];
+
+				var time = Date.now() * 0.0005;
+				var delta = clock.getDelta();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
