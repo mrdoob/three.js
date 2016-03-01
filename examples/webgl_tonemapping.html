@@ -39,7 +39,7 @@
 		<script src="../examples/js/libs/dat.gui.min.js"></script>
 		<script src="../src/loaders/BinaryTextureLoader.js"></script>
 		<script src="../examples/js/loaders/RGBELoader.js"></script>
-		<script src="../examples/js/loaders/HDRCubeMapLoader.js"></script>
+		<script src="../examples/js/loaders/HDRCubeTextureLoader.js"></script>
 		<script src="../examples/js/Half.js"></script>
 		<script src="../examples/js/Encodings.js"></script>
 		<script src="../examples/js/pmrem/PMREMGenerator.js"></script>
@@ -165,7 +165,7 @@
 					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 				];
 
-				var hdrCubeMap = new THREE.HDRCubeMapLoader().load( THREE.UnsignedByteType, hdrurls, function ( hdrCubeMap ) {
+				var hdrCubeMap = new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrurls, function ( hdrCubeMap ) {
 
 					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
 					pmremGenerator.update( renderer );
