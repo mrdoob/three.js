@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>threejs webgl - materials</title>
+		<title>threejs webgl - materials - hdr environment mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #fff;
+				color: #000;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
@@ -16,6 +16,7 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+			a { color: #00f }
 
 			#info {
 				position: absolute;
@@ -65,6 +66,7 @@
 				roughness: 1.0,
 				bumpScale: 0.3,
 				background: false,
+				exposure: 1.0,
 			};
 			var camera, scene, renderer, controls, objects = [];
 			var hdrCubeMap;
@@ -86,27 +88,12 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-
-				var roughnessTexture = THREE.ImageUtils.loadTexture( "../examples/textures/roughness_map.jpg" );
-				roughnessTexture.wrapS = THREE.RepeatWrapping;
-				roughnessTexture.wrapT = THREE.RepeatWrapping;
-				roughnessTexture.repeat.set( 9, 2 );
-
-				var hdrType = THREE.UnsignedByteType;
-
-				/*
-				if ( renderer.extensions.get( 'OES_texture_half_float' ) && renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
-					hdrType = THREE.HalfFloatType;
-				} else if ( renderer.extensions.get( 'OES_texture_float' ) && renderer.extensions.get( 'OES_texture_float_linear' ) ) {
-					hdrType = THREE.FloatType;
-				}
-				*/
+				renderer.setClearColor( new THREE.Color( 0xffffff ) );
+				renderer.toneMapping = THREE.LinearToneMapping;
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
-					roughnessMap: roughnessTexture,
 					bumpScale: - 0.05,
-					bumpMap: roughnessTexture,
 					color: 0xffffff,
 					metalness: 0.9,
 					roughness: 1.0,
@@ -137,6 +124,17 @@
 				planeMesh1.receiveShadow = true;
 				scene.add( planeMesh1 );
 
+				var textureLoader = new THREE.TextureLoader();
+				textureLoader.load( "../examples/textures/roughness_map.jpg", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 9, 2 );
+					standardMaterial.roughnessMap = map;
+					standardMaterial.bumpMap = map;
+					standardMaterial.needsUpdate = true;
+				} );
+
 				var genCubeUrls = function( prefix, postfix ) {
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
@@ -146,7 +144,7 @@
 				};
 
 				var hdrUrls = genCubeUrls( "../examples/textures/cube/pisaHDR/", ".hdr" );
-				new THREE.HDRCubeTextureLoader().load( hdrType, hdrUrls, function ( hdrCubeMap ) {
+				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
 
 					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
 					pmremGenerator.update( renderer );
@@ -158,9 +156,6 @@
 
 					standardMaterial.envMap = hdrCubeRenderTarget;
 					standardMaterial.needsUpdate = true;
-
-					floorMaterial.envMap = hdrCubeRenderTarget;
-					floorMaterial.needsUpdate = true;
 				} );
 
 				var ldrUrls = genCubeUrls( "../examples/textures/cube/pisa/", ".png" );
@@ -238,6 +233,7 @@
 				gui.add( params, 'envMap', [ 'LDR', 'HDR', 'RGBM16' ] );
 				gui.add( params, 'roughness', 0, 1 );
 				gui.add( params, 'bumpScale', - 1, 1 );
+				gui.add( params, 'exposure', 0.1, 2 );
 				gui.open();
 
 			}
@@ -279,6 +275,8 @@
 					}
 
 				}
+
+				renderer.toneMappingExposure = params.exposure;
 
 				var timer = Date.now() * 0.00025;
 
