@@ -65,7 +65,8 @@
 				bumpScale: 1.0,
 				exposure: 3.0,
 				whitePoint: 1.0,
-				toneMapping: "Cineon"
+				toneMapping: "Cineon",
+				renderMode: "Renderer"
 			};
 
 			var toneMappingOptions = {
@@ -161,17 +162,7 @@
 					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 				];
 
-				var hdrType = THREE.UnsignedByteType;
-
-				/*
-				if ( renderer.extensions.get( 'OES_texture_half_float' ) && renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
-					hdrType = THREE.HalfFloatType;
-				} else if ( renderer.extensions.get( 'OES_texture_float' ) && renderer.extensions.get( 'OES_texture_float_linear' ) ) {
-					hdrType = THREE.FloatType;
-				}
-				*/
-
-				var hdrCubeMap = new THREE.HDRCubeMapLoader().load( hdrType, hdrurls, function ( hdrCubeMap ) {
+				var hdrCubeMap = new THREE.HDRCubeMapLoader().load( THREE.UnsignedByteType, hdrurls, function ( hdrCubeMap ) {
 
 					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
 					pmremGenerator.update( renderer );
@@ -231,6 +222,7 @@
 				gui.add( params, 'exposure', 0, 10 );
 				gui.add( params, 'whitePoint', 0, 10 );
 				gui.add( params, 'opacity', 0, 1 );
+				gui.add( params, 'renderMode', [ 'Renderer', 'Composer'] );
 				gui.open();
 
 			}
@@ -288,7 +280,12 @@
 
 				}
 
-				composer.render();
+				if( params.renderMode === "Composer" ) {
+					composer.render();
+				}
+				else {
+					renderer.render( scene, camera );
+				}
 
 			}
 
