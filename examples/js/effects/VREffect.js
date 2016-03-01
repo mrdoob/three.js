@@ -22,13 +22,13 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		for ( var i = 0; i < devices.length; i ++ ) {
 
-			if ( devices[ i ] instanceof VRDisplay ) {
+			if ( 'VRDisplay' in window && devices[ i ] instanceof VRDisplay ) {
 
 				vrHMD = devices[ i ];
 				deprecatedAPI = false;
 				break; // We keep the first we encounter
 
-			} else if ( devices[ i ] instanceof HMDVRDevice ) {
+			} else if ( 'HMDVRDevice' in window && devices[ i ] instanceof HMDVRDevice ) {
 
 				vrHMD = devices[ i ];
 				deprecatedAPI = true;
@@ -86,7 +86,11 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	window.addEventListener( 'vrdisplaypresentchange', function () {
 
-		isPresenting = vrHMD.isPresenting;
+		if (vrHMD) {
+
+			isPresenting = vrHMD.isPresenting;
+
+		}
 
 	}, false );
 
@@ -119,7 +123,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			} else {
 
-				console.error( 'No compatible requestFullscreen method found' );
+				console.error( 'No compatible requestFullscreen method found.' );
 
 			}
 
@@ -145,32 +149,17 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.render = function ( scene, camera ) {
 
-		if ( vrHMD ) {
+		if ( vrHMD && isPresenting ) {
 
 			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
 			var eyeParamsR = vrHMD.getEyeParameters( 'right' );
 
 			if ( !deprecatedAPI ) {
 
-				var renderWidth = Math.max(eyeParamsL.renderWidth, eyeParamsR.renderWidth);
-				var renderHeight = Math.max(eyeParamsL.renderHeight, eyeParamsR.renderHeight);
-
 				eyeTranslationL.fromArray(eyeParamsL.offset);
 				eyeTranslationR.fromArray(eyeParamsR.offset);
 				eyeFOVL = eyeParamsL.fieldOfView;
 				eyeFOVR = eyeParamsR.fieldOfView;
-				renderRectL = {
-					x: 0,
-					y: 0,
-					width: renderWidth,
-					height: renderHeight
-				};
-				renderRectR =  {
-					x: renderWidth,
-					y: 0,
-					width: renderWidth,
-					height: renderHeight
-				};
 
 			} else {
 
@@ -178,8 +167,6 @@ THREE.VREffect = function ( renderer, onError ) {
 				eyeTranslationR.copy(eyeParamsR.eyeTranslation);
 				eyeFOVL = eyeParamsL.recommendedFieldOfView;
 				eyeFOVR = eyeParamsR.recommendedFieldOfView;
-				renderRectL = eyeParamsL.renderRect;
-				renderRectR = eyeParamsR.renderRect;
 
 			}
 
@@ -190,7 +177,11 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
+			// When rendering we don't care what the recommended size is, only what the actual size
+			// of the backbuffer is.
 			var size = renderer.getSize();
+			renderRectL = { x: 0, y: 0, width: size.width / 2, height: size.height };
+			renderRectR = { x: size.width / 2, y: 0, width: size.width / 2, height: size.height };
 
 			renderer.setScissorTest( true );
 			renderer.clear();
@@ -207,22 +198,11 @@ THREE.VREffect = function ( renderer, onError ) {
 			cameraR.translateX( eyeTranslationR.x * this.scale );
 
 			// render left eye
-			if ( renderRectL === undefined ) {
-
-				renderRectL = { x: 0, y: 0, width: size.width / 2, height: size.height };
-
-			}
 			renderer.setViewport( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
 			renderer.setScissor( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
 			renderer.render( scene, cameraL );
 
 			// render right eye
-			if ( renderRectR === undefined ) {
-
-				renderRectR = { x: size.width / 2, y: 0, width: size.width / 2, height: size.height };
-
-			}
-
 			renderer.setViewport( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
 			renderer.setScissor( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
 			renderer.render( scene, cameraR );
