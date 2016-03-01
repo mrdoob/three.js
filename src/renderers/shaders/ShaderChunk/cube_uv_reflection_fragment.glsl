@@ -92,23 +92,6 @@ vec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel, float textu
     return uv;
 }
 
-vec3 convertRGBEToRGB(vec4 rgbe) {
-    float d = pow(2.0, rgbe.w*256.0 - 128.0);
-    return vec3(rgbe) * d;
-}
-
-vec3 tonemap(vec3 RGB) {
-    float LogAvgLum = 0.08;//0.08
-    float key = 1.0;
-    float Ywhite = 1e3;
-    Ywhite *= Ywhite;
-    float sat = 1.0;
-    float Ylum = dot(RGB ,vec3(0.2126, 0.7152, 0.0722));
-    float Y = key/LogAvgLum * Ylum ;
-    float Yd = Y * ( 1.0 + Y/Ywhite)/( 1.0 + Y) ;
-    return Yd * pow(RGB/Ylum ,vec3(sat, sat, sat));
- }
-
 vec4 textureCubeUV(vec3 reflectedDirection, float roughness, float textureSize) {
     float maxLods =  log2(textureSize*0.25) - 3.0;
     float roughnessVal = roughness*maxLods;
