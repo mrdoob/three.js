@@ -35,8 +35,9 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - point lights WebGL demo.<br />
-			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - Physically accurate lighting example using a incandescent bulb - by <a href="http://clara.io" target="_blank">Ben Houston</a><br />
+			Using real world scale: Brick cube is 1 meter in size.  Light is 2 meters from floor.  Globe is 25 cm in diameter.<br/>
+			Using Reinhard inline tonemapping with real-world light falloff (decay = 2).
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -50,7 +51,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer,
-			bulbLight,
+			bulbLight, bulbMat,
 			object, loader, stats;
 
 			var lightTypes = {
@@ -82,18 +83,24 @@
 
 				var bulbGeometry = new THREE.SphereGeometry( 0.02, 16, 8 );
 				bulbLight = new THREE.PointLight( 0xffffee, 1, 100, 2 );
-				bulbLight.add( new THREE.Mesh( bulbGeometry, new THREE.MeshBasicMaterial( { color: 0xffffee } ) ) );
+
+				bulbMat = new THREE.MeshStandardMaterial( {
+					emissive: 0xffffee,
+					emissiveIntensity: 1,
+					color: 0x000000
+				});
+				bulbLight.add( new THREE.Mesh( bulbGeometry, bulbMat ) );
 				bulbLight.position.set( 0, 2, 0 );
 				bulbLight.castShadow = true;
 				scene.add( bulbLight );
 
-				var ambientLight = new THREE.AmbientLight( 0xffffee, 0.2 );
+				var ambientLight = new THREE.AmbientLight( 0xffffee, 0.05 );
 				scene.add( ambientLight );
 
 				var floorMat = new THREE.MeshStandardMaterial( {
-					roughness: 1.0,
+					roughness: 0.5,
 					color: 0xffffff,
-					metalness: 0
+					metalness: 0.2
 				});
 				var textureLoader = new THREE.TextureLoader();
 				textureLoader.load( "../examples/textures/crate.gif", function( map ) {
@@ -170,6 +177,8 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.physicalLights = true;
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -214,9 +223,12 @@
 
 				renderer.toneMappingExposure = params.exposure;
 				bulbLight.power = lightTypes[ params.lightType ];
+				bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 ); // convert from intensity to irradiance at bulb surface
 
 				var time = Date.now() * 0.0005;
 				var delta = clock.getDelta();
+
+				bulbLight.position.y = Math.cos( time ) * 0.99 + 1.0;
 
 				renderer.render( scene, camera );
 
