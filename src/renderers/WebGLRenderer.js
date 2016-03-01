@@ -55,6 +55,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.gammaInput = false;
 	this.gammaOutput = false;
 
+	// tone mapping
+
+	this.toneMapping = THREE.LinearToneMapping;
+	this.toneMappingExposure = 1.0;
+	this.toneMappingWhitePoint = 1.0;
+
 	// morphs
 
 	this.maxMorphTargets = 8;
@@ -1696,6 +1702,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+
+			if ( p_uniforms.toneMappingExposure !== undefined ) {
+
+				_gl.uniform1f( p_uniforms.toneMappingExposure, _this.toneMappingExposure );
+
+			}
+
+			if ( p_uniforms.toneMappingWhitePoint !== undefined ) {
+
+				_gl.uniform1f( p_uniforms.toneMappingWhitePoint, _this.toneMappingWhitePoint );
+
+			}
 		}
 
 		// skinning uniforms must be set even if material didn't change
