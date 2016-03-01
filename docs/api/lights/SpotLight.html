@@ -77,6 +77,7 @@
 		<h3>[property:Float intensity]</h3>
 		<div>
 			Light's intensity.<br />
+			In "physical lights" mode, the product of color * intensity is interpreted as luminous intensity measured in candela.<br/>
 			Default — *1.0*.
 		</div>
 
@@ -101,6 +102,7 @@
 		<h3>[property:Float decay]</h3>
 		<div>
 			The amount the light dims along the distance of the light<br />
+			In "physical lights" mode, decay = 2 leads to physically realistic light falloff.<br/>
 			Default — *1*.
 		</div>
 
