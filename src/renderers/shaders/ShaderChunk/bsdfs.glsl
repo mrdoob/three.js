@@ -4,26 +4,24 @@ bool testLightInRange( const in float lightDistance, const in float cutoffDistan
 
 }
 
-float calcLightAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
-
-	if ( decayExponent > 0.0 ) {
-
-	  return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
-
-	}
-
-	return 1.0;
-
-}
-
-// based upon Frostbite 3 Moving to Physically-based Rendering
-// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
-// this is intended to be used on spot and point lights.
 float punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
 
 		if( decayExponent > 0.0 ) {
 
-			return pow( saturate( 1.0 - pow4( lightDistance / maxDistance ), decayExponent ) / max( pow( lightDistance, decayExponent ), 0.01 );
+#if defined ( PHYSICAL_LIGHTS )
+
+			// based upon Frostbite 3 Moving to Physically-based Rendering
+			// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+			// this is intended to be used on spot and point lights who are represented as luminous intensity
+			// but who must be converted to luminous irradiance for surface lighting calculation
+			return pow( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ), decayExponent ) /
+				max( pow( lightDistance, decayExponent ), 0.01 );
+
+#else
+
+			return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
+
+#endif
 
 		}
 

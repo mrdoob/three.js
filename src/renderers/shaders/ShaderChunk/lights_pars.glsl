@@ -55,16 +55,7 @@
 		if ( testLightInRange( lightDistance, pointLight.distance ) ) {
 
 			directLight.color = pointLight.color;
-
-#if defined( PHYSICAL_LIGHTS )
-
 			directLight.color *= punctualLightIntensityToIrradianceFactor( lightDistance, pointLight.distance, pointLight.decay );
-
-#else
-
-			directLight.color *= calcLightAttenuation( lightDistance, pointLight.distance, pointLight.decay );
-
-#endif
 
 			directLight.visible = true;
 
@@ -116,17 +107,7 @@
 			float spotEffect = smoothstep( spotLight.coneCos, spotLight.penumbraCos, angleCos );
 
 			directLight.color = spotLight.color;
-			directLight.color *= spotEffect;
-
-			#if defined( PHYSICAL_LIGHTS )
-
-						directLight.color *= punctualLightIntensityToIrradianceFactor( lightDistance, pointLight.distance, pointLight.decay );
-
-			#else
-
-						directLight.color *= calcLightAttenuation( lightDistance, pointLight.distance, pointLight.decay );
-
-			#endif
+			directLight.color *= spotEffect * punctualLightIntensityToIrradianceFactor( lightDistance, pointLight.distance, pointLight.decay );
 
 			directLight.visible = true;
 
