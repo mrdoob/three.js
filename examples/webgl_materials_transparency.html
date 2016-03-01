@@ -76,16 +76,9 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 
-				var roughnessTexture = THREE.ImageUtils.loadTexture( "../examples/textures/roughness_map.jpg" );
-				roughnessTexture.wrapS = THREE.RepeatWrapping;
-				roughnessTexture.wrapT = THREE.RepeatWrapping;
-				roughnessTexture.repeat.set( 9, 2 );
-
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
-					roughnessMap: roughnessTexture,
 					bumpScale: - 0.05,
-					bumpMap: roughnessTexture,
 					color: 0xffffff,
 					metalness: 0.9,
 					roughness: 1.0,
@@ -101,9 +94,7 @@
 
 				standardMaterialPremultiplied = new THREE.MeshStandardMaterial( {
 					map: null,
-					roughnessMap: roughnessTexture,
 					bumpScale: - 0.05,
-					bumpMap: roughnessTexture,
 					color: 0xffffff,
 					metalness: 0.9,
 					roughness: 1.0,
@@ -111,6 +102,20 @@
 					blending: THREE.PremultipliedAlphaBlending,
 					transparent: true
 				} );
+
+				var textureLoader = new THREE.TextureLoader();
+				textureLoader.load( "../examples/textures/roughness_map.jpg", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 9, 2 );
+					standardMaterial.roughnessMap = map;
+					standardMaterial.bumpMap = map;
+					standardMaterial.needsUpdate = true;
+					standardMaterialPremultiplied.roughnessMap = map;
+					standardMaterialPremultiplied.bumpMap = map;
+					standardMaterialPremultiplied.needsUpdate = true;
+			} );
 
 				var torusMesh2 = new THREE.Mesh( geometry, standardMaterialPremultiplied );
 				torusMesh2.position.x = 20.0;
