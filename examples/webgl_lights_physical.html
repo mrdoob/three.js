@@ -51,11 +51,11 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer,
-			bulbLight, bulbMat,
+			bulbLight, bulbMat, ambientLight,
 			object, loader, stats;
 
 			// ref for lumens: http://www.power-sure.com/lumens.htm
-			var lightPowers = {
+			var bulbPowers = {
 				"1700 lm (100W)": 1700,
 				"800 lm (60W)": 800,
 				"400 lm (40W)": 400,
@@ -63,9 +63,18 @@
 				"20 lm (4W)": 20,
 			};
 
+			// ref for solar irradiances: https://en.wikipedia.org/wiki/Sunlight
+			var ambientIrradiances = {
+				"0 W/m^2 (Full Dark)": 0,
+				"0.02 W/m^2 (Near Dark)": 0.02,
+				"120 W/m^2 (Morning Sun)": 120,
+				"1120 W/m^2 (Noon Sun)": 1050,
+			};
+
 			var params = {
 				exposure: 1.0,
-				bulbPower: Object.keys( lightPowers )[0]
+				bulbPower: Object.keys( bulbPowers )[0],
+				ambientIrradiance: Object.keys( ambientIrradiances )[0]
 			};
 
 
@@ -97,23 +106,41 @@
 				bulbLight.castShadow = true;
 				scene.add( bulbLight );
 
-				var ambientLight = new THREE.AmbientLight( 0xffee88, 0.05 );
+				ambientLight = new THREE.AmbientLight( 0xffee88, 0.02 );
 				scene.add( ambientLight );
 
 				var floorMat = new THREE.MeshStandardMaterial( {
-					roughness: 0.5,
+					roughness: 0.8,
 					color: 0xffffff,
-					metalness: 0.2
+					metalness: 0.2,
+					bumpScale: 0.0005,
 				});
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "../examples/textures/crate.gif", function( map ) {
+				textureLoader.load( "../examples/textures/hardwood2_diffuse.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
-					map.repeat.set( 12, 12 );
+					map.repeat.set( 10, 24 );
 					floorMat.map = map;
 					floorMat.needsUpdate = true;
 				} );
+				textureLoader.load( "../examples/textures/hardwood2_bump.jpg", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 10, 24 );
+					floorMat.bumpMap = map;
+					floorMat.needsUpdate = true;
+				} );
+				textureLoader.load( "../examples/textures/hardwood2_roughness.jpg", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 10, 24 );
+					floorMat.roughnessMap = map;
+					floorMat.needsUpdate = true;
+				} );
+
 
 				var cubeMat = new THREE.MeshStandardMaterial( {
 					roughness: 0.7,
@@ -166,7 +193,7 @@
 				floorMesh.rotation.x = -Math.PI / 2.0;
 				scene.add( floorMesh );
 
-				var ballGeometry = new THREE.SphereGeometry( 0.1213, 16, 8 );
+				var ballGeometry = new THREE.SphereGeometry( 0.1213, 32, 32 );
 				var ballMesh = new THREE.Mesh( ballGeometry, ballMat );
 				ballMesh.position.set( 1, 0.1213, 1 );
 				ballMesh.castShadow = true;
@@ -198,8 +225,9 @@
 
 				var gui = new dat.GUI();
 
-				gui.add( params, 'bulbPower', Object.keys( lightPowers ) );
-				gui.add( params, 'exposure', 0, 3 );
+				gui.add( params, 'ambientIrradiance', Object.keys( ambientIrradiances ) );
+				gui.add( params, 'bulbPower', Object.keys( bulbPowers ) );
+				gui.add( params, 'exposure', 0, 1 );
 				gui.open();
 			}
 
@@ -225,9 +253,9 @@
 			function render() {
 
 				renderer.toneMappingExposure = params.exposure;
-				bulbLight.power = lightPowers[ params.bulbPower ];
+				bulbLight.power = bulbPowers[ params.bulbPower ];
 				bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 ); // convert from intensity to irradiance at bulb surface
-
+				ambientLight.intensity = ambientIrradiances[ params.ambientIrradiance ];
 				var time = Date.now() * 0.0005;
 				var delta = clock.getDelta();
 
