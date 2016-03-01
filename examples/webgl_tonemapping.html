@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>threejs webgl - materials</title>
+		<title>threejs webgl - inline tone mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #fff;
+				color: #000;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
@@ -16,6 +16,8 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+
+			a { color: #222 }
 
 			#info {
 				position: absolute;
@@ -95,6 +97,7 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					bumpScale: - 0.05,

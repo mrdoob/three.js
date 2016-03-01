@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>threejs webgl - materials</title>
+		<title>threejs webgl - materials - transparency</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -16,6 +16,7 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+			a { color: #eee }
 
 			#info {
 				position: absolute;
@@ -53,7 +54,7 @@
 
 			var container, stats;
 			var params = {
-				opacity: 0.5,
+				opacity: 0.2,
 				roughness: 1.0,
 				bumpScale: 0.3
 			};
@@ -79,9 +80,9 @@
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
 					bumpScale: - 0.05,
-					color: 0xffffff,
+					color: 0x0304ff,
 					metalness: 0.9,
-					roughness: 1.0,
+					roughness: 0.5,
 					shading: THREE.SmoothShading,
 					transparent: true
 				} );
@@ -95,9 +96,9 @@
 				standardMaterialPremultiplied = new THREE.MeshStandardMaterial( {
 					map: null,
 					bumpScale: - 0.05,
-					color: 0xffffff,
+					color: 0x0304ff,
 					metalness: 0.9,
-					roughness: 1.0,
+					roughness: 0.5,
 					shading: THREE.SmoothShading,
 					blending: THREE.PremultipliedAlphaBlending,
 					transparent: true
@@ -108,12 +109,14 @@
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
-					map.repeat.set( 9, 2 );
+					map.repeat.set( 2, 2 );
+					standardMaterial.map = map;
 					standardMaterial.roughnessMap = map;
-					standardMaterial.bumpMap = map;
+					//standardMaterial.bumpMap = map;
 					standardMaterial.needsUpdate = true;
+					standardMaterialPremultiplied.map = map;
 					standardMaterialPremultiplied.roughnessMap = map;
-					standardMaterialPremultiplied.bumpMap = map;
+					//standardMaterialPremultiplied.bumpMap = map;
 					standardMaterialPremultiplied.needsUpdate = true;
 			} );
 
@@ -139,7 +142,6 @@
 				planeMesh1.receiveShadow = true;
 				scene.add( planeMesh1 );
 
-
 				// Lights
 
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
@@ -148,6 +150,7 @@
 				spotLight.position.set( 50, 100, 50 );
 				spotLight.angle = Math.PI / 7;
 				spotLight.penumbra = 0.8
+				spotLight.intensity = 5;
 				spotLight.castShadow = true;
 				scene.add( spotLight );
 
