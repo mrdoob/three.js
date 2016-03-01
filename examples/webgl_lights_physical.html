@@ -67,17 +67,17 @@
 
 			// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
 			var ambientLuminousIrradiances = {
-				"0.0001 lux (Moonless Night)": 0.0001,
-				"0.002 lux (Night Airglow)": 0.002,
-				"0.5 lux (Full Moon)": 0.5,
-				"3.4 lux (City Twilight)": 3.4,
-				"50 lux (Living Room)": 50,
-				"100 lux (Very Overcast)": 100,
-				"350 lux (Office Room)": 350,
-				"400 lux (Sunrise/Sunset)": 400,
-				"1000 lux (Overcast)": 1000,
-				"18000 lux (Daylight)": 18000,
-				"50000 lux (Direct Sun)": 50000,
+				"0.0001 lx (Moonless Night)": 0.0001,
+				"0.002 lx (Night Airglow)": 0.002,
+				"0.5 lx (Full Moon)": 0.5,
+				"3.4 lx (City Twilight)": 3.4,
+				"50 lx (Living Room)": 50,
+				"100 lx (Very Overcast)": 100,
+				"350 lx (Office Room)": 350,
+				"400 lx (Sunrise/Sunset)": 400,
+				"1000 lx (Overcast)": 1000,
+				"18000 lx (Daylight)": 18000,
+				"50000 lx (Direct Sun)": 50000,
 			};
 
 			var params = {
@@ -272,7 +272,7 @@
 
 				bulbLight.power = bulbLuminousPowers[ params.bulbPower ];
 				bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 ); // convert from intensity to irradiance at bulb surface
-				
+
 				ambientLight.intensity = ambientLuminousIrradiances[ params.ambientIrradiance ];
 				var time = Date.now() * 0.0005;
 				var delta = clock.getDelta();
