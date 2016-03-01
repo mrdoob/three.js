@@ -54,10 +54,13 @@
 			bulbLight, bulbMat,
 			object, loader, stats;
 
+			// ref for lumens: http://www.power-sure.com/lumens.htm
 			var lightTypes = {
-				"60W Bulb (450 cd)": 450,
-				"40W Bulb (300 cd)": 300,
-				"20W Bulb (150 cd)": 120
+				"100W Bulb (1700 lumen)": 1700,
+				"60W Bulb (800 lumen)": 800,
+				"40W Bulb (400 lumen)": 400,
+				"25W Bulb (180 lumen)": 180,
+				"4W Bulb (20 lumen)": 20,
 			};
 
 			var params = {
@@ -196,7 +199,7 @@
 				var gui = new dat.GUI();
 
 				gui.add( params, 'lightType', Object.keys( lightTypes ) );
-				gui.add( params, 'exposure', 0, 1 );
+				gui.add( params, 'exposure', 0, 3 );
 				gui.open();
 			}
 
@@ -228,7 +231,7 @@
 				var time = Date.now() * 0.0005;
 				var delta = clock.getDelta();
 
-				bulbLight.position.y = Math.cos( time ) * 0.99 + 1.0;
+				bulbLight.position.y = Math.cos( time ) * 0.75 + 1.25;
 
 				renderer.render( scene, camera );
 
