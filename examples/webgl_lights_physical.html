@@ -55,7 +55,7 @@
 			object, loader, stats;
 
 			// ref for lumens: http://www.power-sure.com/lumens.htm
-			var bulbPowers = {
+			var bulbLuminousPowers = {
 				"1700 lm (100W)": 1700,
 				"800 lm (60W)": 800,
 				"400 lm (40W)": 400,
@@ -63,18 +63,25 @@
 				"20 lm (4W)": 20,
 			};
 
-			// ref for solar irradiances: https://en.wikipedia.org/wiki/Sunlight
-			var ambientIrradiances = {
-				"0 W/m^2 (Full Dark)": 0,
-				"0.02 W/m^2 (Near Dark)": 0.02,
-				"120 W/m^2 (Morning Sun)": 120,
-				"1120 W/m^2 (Noon Sun)": 1050,
+			// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
+			var ambientLuminousIrradiances = {
+				"0.0001 lux (Moonless Night)": 0.0001,
+				"0.002 lux (Night Airglow)": 0.002,
+				"0.5 lux (Full Moon)": 0.5,
+				"3.4 lux (City Twilight)": 3.4,
+				"50 lux (Living Room)": 50,
+				"100 lux (Very Overcast)": 100,
+				"350 lux (Office Room)": 350,
+				"400 lux (Sunrise/Sunset)": 400,
+				"1000 lux (Overcast)": 1000,
+				"18000 lux (Daylight)": 18000,
+				"50000 lux (Direct Sun)": 50000,
 			};
 
 			var params = {
 				exposure: 1.0,
-				bulbPower: Object.keys( bulbPowers )[0],
-				ambientIrradiance: Object.keys( ambientIrradiances )[0]
+				bulbPower: Object.keys( bulbLuminousPowers )[0],
+				ambientIrradiance: Object.keys( ambientLuminousIrradiances )[0]
 			};
 
 
@@ -225,8 +232,8 @@
 
 				var gui = new dat.GUI();
 
-				gui.add( params, 'ambientIrradiance', Object.keys( ambientIrradiances ) );
-				gui.add( params, 'bulbPower', Object.keys( bulbPowers ) );
+				gui.add( params, 'ambientIrradiance', Object.keys( ambientLuminousIrradiances ) );
+				gui.add( params, 'bulbPower', Object.keys( bulbLuminousPowers ) );
 				gui.add( params, 'exposure', 0, 1 );
 				gui.open();
 			}
@@ -253,9 +260,9 @@
 			function render() {
 
 				renderer.toneMappingExposure = params.exposure;
-				bulbLight.power = bulbPowers[ params.bulbPower ];
+				bulbLight.power = bulbLuminousPowers[ params.bulbPower ];
 				bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 ); // convert from intensity to irradiance at bulb surface
-				ambientLight.intensity = ambientIrradiances[ params.ambientIrradiance ];
+				ambientLight.intensity = ambientLuminousIrradiances[ params.ambientIrradiance ];
 				var time = Date.now() * 0.0005;
 				var delta = clock.getDelta();
 
