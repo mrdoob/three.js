@@ -55,17 +55,17 @@
 			object, loader, stats;
 
 			// ref for lumens: http://www.power-sure.com/lumens.htm
-			var lightTypes = {
-				"100W Bulb (1700 lumen)": 1700,
-				"60W Bulb (800 lumen)": 800,
-				"40W Bulb (400 lumen)": 400,
-				"25W Bulb (180 lumen)": 180,
-				"4W Bulb (20 lumen)": 20,
+			var lightPowers = {
+				"1700 lm (100W)": 1700,
+				"800 lm (60W)": 800,
+				"400 lm (40W)": 400,
+				"180 lm (25W)": 180,
+				"20 lm (4W)": 20,
 			};
 
 			var params = {
 				exposure: 1.0,
-				lightType: Object.keys( lightTypes )[0]
+				bulbPower: Object.keys( lightPowers )[0]
 			};
 
 
@@ -85,7 +85,7 @@
 				scene = new THREE.Scene();
 
 				var bulbGeometry = new THREE.SphereGeometry( 0.02, 16, 8 );
-				bulbLight = new THREE.PointLight( 0xffffee, 1, 100, 2 );
+				bulbLight = new THREE.PointLight( 0xffee88, 1, 100, 2 );
 
 				bulbMat = new THREE.MeshStandardMaterial( {
 					emissive: 0xffffee,
@@ -97,7 +97,7 @@
 				bulbLight.castShadow = true;
 				scene.add( bulbLight );
 
-				var ambientLight = new THREE.AmbientLight( 0xffffee, 0.05 );
+				var ambientLight = new THREE.AmbientLight( 0xffee88, 0.05 );
 				scene.add( ambientLight );
 
 				var floorMat = new THREE.MeshStandardMaterial( {
@@ -198,7 +198,7 @@
 
 				var gui = new dat.GUI();
 
-				gui.add( params, 'lightType', Object.keys( lightTypes ) );
+				gui.add( params, 'bulbPower', Object.keys( lightPowers ) );
 				gui.add( params, 'exposure', 0, 3 );
 				gui.open();
 			}
@@ -225,7 +225,7 @@
 			function render() {
 
 				renderer.toneMappingExposure = params.exposure;
-				bulbLight.power = lightTypes[ params.lightType ];
+				bulbLight.power = lightPowers[ params.bulbPower ];
 				bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 ); // convert from intensity to irradiance at bulb surface
 
 				var time = Date.now() * 0.0005;
