@@ -56,6 +56,8 @@
 
 			// ref for lumens: http://www.power-sure.com/lumens.htm
 			var bulbLuminousPowers = {
+				"110000 lm (1000W)": 110000,
+				"3500 lm (300W)": 3500,
 				"1700 lm (100W)": 1700,
 				"800 lm (60W)": 800,
 				"400 lm (40W)": 400,
@@ -80,7 +82,7 @@
 
 			var params = {
 				exposure: 1.0,
-				bulbPower: Object.keys( bulbLuminousPowers )[0],
+				bulbPower: Object.keys( bulbLuminousPowers )[3],
 				ambientIrradiance: Object.keys( ambientLuminousIrradiances )[0]
 			};
 
@@ -93,6 +95,13 @@
 			function init() {
 
 				var container = document.getElementById( 'container' );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+
+				container.appendChild( stats.domElement );
+
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.z = 7;
@@ -259,9 +268,11 @@
 
 			function render() {
 
-				renderer.toneMappingExposure = params.exposure;
+				renderer.toneMappingExposure = Math.pow( params.exposure, 5.0 ); // to allow for very bright scenes.
+
 				bulbLight.power = bulbLuminousPowers[ params.bulbPower ];
 				bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 ); // convert from intensity to irradiance at bulb surface
+				
 				ambientLight.intensity = ambientLuminousIrradiances[ params.ambientIrradiance ];
 				var time = Date.now() * 0.0005;
 				var delta = clock.getDelta();
@@ -269,6 +280,8 @@
 				bulbLight.position.y = Math.cos( time ) * 0.75 + 1.25;
 
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 
