@@ -95,11 +95,62 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 
-				var roughnessTexture = THREE.ImageUtils.loadTexture( "../examples/textures/roughness_map.jpg" );
-				roughnessTexture.wrapS = THREE.RepeatWrapping;
-				roughnessTexture.wrapT = THREE.RepeatWrapping;
-				roughnessTexture.repeat.set( 9, 2 );
+				standardMaterial = new THREE.MeshStandardMaterial( {
+					bumpScale: - 0.05,
+					color: 0xffffff,
+					metalness: 0.9,
+					roughness: 0.8,
+					shading: THREE.SmoothShading,
+					transparent: true,
+					blending: THREE.PremultipliedAlphaBlending
+				} );
 
+				var textureLoader = new THREE.TextureLoader();
+				textureLoader.load( "../examples/textures/brick_diffuse.jpg", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.repeat.set( 9, 0.5 );
+					standardMaterial.map = map;
+					standardMaterial.needsUpdate = true;
+				} );
+				textureLoader.load( "../examples/textures/brick_bump.jpg", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.repeat.set( 9, 0.5 );
+					standardMaterial.bumpMap = map;
+					standardMaterial.needsUpdate = true;
+				} );
+				textureLoader.load( "../examples/textures/brick_roughness.jpg", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.repeat.set( 9, 0.5 );
+					standardMaterial.roughnessMap = map;
+					standardMaterial.needsUpdate = true;
+				} );
+
+				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
+				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
+				torusMesh1.position.x = 0.0;
+				torusMesh1.castShadow = true;
+				torusMesh1.receiveShadow = true;
+				scene.add( torusMesh1 );
+				objects.push( torusMesh1 );
+
+				floorMaterial = new THREE.MeshStandardMaterial( {
+					map: null,
+					roughnessMap: null,
+					color: 0xffffff,
+					metalness: 0.0,
+					roughness: 0.0,
+					shading: THREE.SmoothShading
+				} );
+
+				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
+				planeMesh1.position.y = - 50;
+				planeMesh1.rotation.x = - Math.PI * 0.5;
+				planeMesh1.receiveShadow = true;
+				scene.add( planeMesh1 );
 
 				// Materials
 				var hdrpath = "../examples/textures/cube/hdrPisa/";
@@ -109,8 +160,6 @@
 					hdrpath + 'py' + hdrformat, hdrpath + 'ny' + hdrformat,
 					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 				];
-
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
 
 				var hdrType = THREE.UnsignedByteType;
 
@@ -130,56 +179,8 @@
 					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
 					pmremCubeUVPacker.update( renderer );
 
-					var brickDiffuse = THREE.ImageUtils.loadTexture( "../examples/textures/brick_diffuse.jpg" );
-					brickDiffuse.wrapS = THREE.RepeatWrapping;
-					brickDiffuse.wrapT = THREE.RepeatWrapping;
-					brickDiffuse.repeat.set( 9, 0.5 );
-					var brickBump = THREE.ImageUtils.loadTexture( "../examples/textures/brick_bump.jpg" );
-					brickBump.wrapS = THREE.RepeatWrapping;
-					brickBump.wrapT = THREE.RepeatWrapping;
-					brickBump.repeat.set( 9, 0.5 );
-					var brickRoughness = THREE.ImageUtils.loadTexture( "../examples/textures/brick_roughness.jpg" );
-					brickRoughness.wrapS = THREE.RepeatWrapping;
-					brickRoughness.wrapT = THREE.RepeatWrapping;
-					brickRoughness.repeat.set( 9, 0.5 );
-
-					standardMaterial = new THREE.MeshStandardMaterial( {
-						map: brickDiffuse,
-						roughnessMap: brickRoughness,
-						bumpScale: - 0.05,
-						bumpMap: brickBump,
-						color: 0xffffff,
-						metalness: 0.9,
-						roughness: 0.8,
-						envMap: pmremCubeUVPacker.CubeUVRenderTarget,
-						shading: THREE.SmoothShading,
-						transparent: true,
-						blending: THREE.PremultipliedAlphaBlending
-					} );
-					var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
-					var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
-					torusMesh1.position.x = 0.0;
-					torusMesh1.castShadow = true;
-					torusMesh1.receiveShadow = true;
-					scene.add( torusMesh1 );
-					objects.push( torusMesh1 );
-
-					floorMaterial = new THREE.MeshStandardMaterial( {
-						map: null,
-						roughnessMap: null,
-						color: 0xffffff,
-						metalness: 0.0,
-						roughness: 0.0,
-						envMap: pmremCubeUVPacker.CubeUVRenderTarget,
-						shading: THREE.SmoothShading
-					} );
-
-					var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
-					var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
-					planeMesh1.position.y = - 50;
-					planeMesh1.rotation.x = - Math.PI * 0.5;
-					planeMesh1.receiveShadow = true;
-					scene.add( planeMesh1 );
+					standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget;
+					standardMaterial.needsUpdate = true;
 
 				} );
 
