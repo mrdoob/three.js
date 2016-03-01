@@ -60,12 +60,12 @@
 
 			var container, stats;
 			var params = {
-				opacity: 0.5,
+				opacity: 1.0,
 				roughness: 1.0,
-				bumpScale: 0.3,
-				exposure: 1.0,
+				bumpScale: 1.0,
+				exposure: 3.0,
 				whitePoint: 1.0,
-				toneMapping: "Uncharted2"
+				toneMapping: "Cineon"
 			};
 
 			var toneMappingOptions = {
@@ -101,78 +101,87 @@
 				roughnessTexture.repeat.set( 9, 2 );
 
 
-								// Materials
-								var hdrpath = "../examples/textures/cube/hdrPisa/";
-								var hdrformat = '.hdr';
-								var hdrurls = [
-									hdrpath + 'px' + hdrformat, hdrpath + 'nx' + hdrformat,
-									hdrpath + 'py' + hdrformat, hdrpath + 'ny' + hdrformat,
-									hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
-								];
+				// Materials
+				var hdrpath = "../examples/textures/cube/hdrPisa/";
+				var hdrformat = '.hdr';
+				var hdrurls = [
+					hdrpath + 'px' + hdrformat, hdrpath + 'nx' + hdrformat,
+					hdrpath + 'py' + hdrformat, hdrpath + 'ny' + hdrformat,
+					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
+				];
 
-								renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 
-								var roughnessTexture = THREE.ImageUtils.loadTexture( "../examples/textures/roughness_map.jpg" );
-								roughnessTexture.wrapS = THREE.RepeatWrapping;
-								roughnessTexture.wrapT = THREE.RepeatWrapping;
-								roughnessTexture.repeat.set( 9, 2 );
+				var hdrType = THREE.UnsignedByteType;
 
-								var hdrType = THREE.UnsignedByteType;
+				/*
+				if ( renderer.extensions.get( 'OES_texture_half_float' ) && renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
+					hdrType = THREE.HalfFloatType;
+				} else if ( renderer.extensions.get( 'OES_texture_float' ) && renderer.extensions.get( 'OES_texture_float_linear' ) ) {
+					hdrType = THREE.FloatType;
+				}
+				*/
 
-								/*
-								if ( renderer.extensions.get( 'OES_texture_half_float' ) && renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
-									hdrType = THREE.HalfFloatType;
-								} else if ( renderer.extensions.get( 'OES_texture_float' ) && renderer.extensions.get( 'OES_texture_float_linear' ) ) {
-									hdrType = THREE.FloatType;
-								}
-								*/
+				var hdrCubeMap = new THREE.HDRCubeMapLoader().load( hdrType, hdrurls, function ( hdrCubeMap ) {
 
-								var hdrCubeMap = new THREE.HDRCubeMapLoader().load( hdrType, hdrurls, function ( hdrCubeMap ) {
+					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+					pmremGenerator.update( renderer );
 
-									var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
-									pmremGenerator.update( renderer );
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
 
-									var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-									pmremCubeUVPacker.update( renderer );
+					var brickDiffuse = THREE.ImageUtils.loadTexture( "../examples/textures/brick_diffuse.jpg" );
+					brickDiffuse.wrapS = THREE.RepeatWrapping;
+					brickDiffuse.wrapT = THREE.RepeatWrapping;
+					brickDiffuse.repeat.set( 9, 0.5 );
+					var brickBump = THREE.ImageUtils.loadTexture( "../examples/textures/brick_bump.jpg" );
+					brickBump.wrapS = THREE.RepeatWrapping;
+					brickBump.wrapT = THREE.RepeatWrapping;
+					brickBump.repeat.set( 9, 0.5 );
+					var brickRoughness = THREE.ImageUtils.loadTexture( "../examples/textures/brick_roughness.jpg" );
+					brickRoughness.wrapS = THREE.RepeatWrapping;
+					brickRoughness.wrapT = THREE.RepeatWrapping;
+					brickRoughness.repeat.set( 9, 0.5 );
 
-									standardMaterial = new THREE.MeshStandardMaterial( {
-										map: null,
-										roughnessMap: roughnessTexture,
-										bumpScale: - 0.05,
-										bumpMap: roughnessTexture,
-										color: 0xffffff,
-										metalness: 0.9,
-										roughness: 1.0,
-										envMap: pmremCubeUVPacker.CubeUVRenderTarget,
-										shading: THREE.SmoothShading,
-										transparent: true,
-										blending: THREE.PremultipliedAlphaBlending
-									} );
-									var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
-									var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
-									torusMesh1.position.x = 0.0;
-									torusMesh1.castShadow = true;
-									scene.add( torusMesh1 );
-									objects.push( torusMesh1 );
+					standardMaterial = new THREE.MeshStandardMaterial( {
+						map: brickDiffuse,
+						roughnessMap: brickRoughness,
+						bumpScale: - 0.05,
+						bumpMap: brickBump,
+						color: 0xffffff,
+						metalness: 0.9,
+						roughness: 0.8,
+						envMap: pmremCubeUVPacker.CubeUVRenderTarget,
+						shading: THREE.SmoothShading,
+						transparent: true,
+						blending: THREE.PremultipliedAlphaBlending
+					} );
+					var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
+					var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
+					torusMesh1.position.x = 0.0;
+					torusMesh1.castShadow = true;
+					torusMesh1.receiveShadow = true;
+					scene.add( torusMesh1 );
+					objects.push( torusMesh1 );
 
-									floorMaterial = new THREE.MeshStandardMaterial( {
-										map: null,
-										roughnessMap: null,
-										color: 0xffffff,
-										metalness: 0.0,
-										roughness: 0.0,
-										envMap: pmremCubeUVPacker.CubeUVRenderTarget,
-										shading: THREE.SmoothShading
-									} );
+					floorMaterial = new THREE.MeshStandardMaterial( {
+						map: null,
+						roughnessMap: null,
+						color: 0xffffff,
+						metalness: 0.0,
+						roughness: 0.0,
+						envMap: pmremCubeUVPacker.CubeUVRenderTarget,
+						shading: THREE.SmoothShading
+					} );
 
-									var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
-									var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
-									planeMesh1.position.y = - 50;
-									planeMesh1.rotation.x = - Math.PI * 0.5;
-									planeMesh1.receiveShadow = true;
-									scene.add( planeMesh1 );
+					var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
+					var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
+					planeMesh1.position.y = - 50;
+					planeMesh1.rotation.x = - Math.PI * 0.5;
+					planeMesh1.receiveShadow = true;
+					scene.add( planeMesh1 );
 
-								} );
+				} );
 
 				// Lights
 
@@ -218,8 +227,8 @@
 				var gui = new dat.GUI();
 
 				gui.add( params, 'toneMapping', Object.keys( toneMappingOptions ) );
-				gui.add( params, 'exposure', 0, 5 );
-				gui.add( params, 'whitePoint', 0, 5 );
+				gui.add( params, 'exposure', 0, 10 );
+				gui.add( params, 'whitePoint', 0, 10 );
 				gui.add( params, 'opacity', 0, 1 );
 				gui.open();
 
