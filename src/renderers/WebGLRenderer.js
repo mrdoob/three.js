@@ -55,6 +55,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.gammaInput = false;
 	this.gammaOutput = false;
 
+	// physical lights
+
+	this.physicalLights = false;
+	
 	// tone mapping
 
 	this.toneMapping = THREE.LinearToneMapping;

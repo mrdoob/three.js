@@ -12,7 +12,7 @@
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
 
-	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
+	IncidentLight getDirectionalDirectLightIrradiance( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
 
@@ -43,7 +43,7 @@
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
 
-	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) {
+	IncidentLight getPointDirectLightIrradiance( const in PointLight pointLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
 
@@ -55,7 +55,17 @@
 		if ( testLightInRange( lightDistance, pointLight.distance ) ) {
 
 			directLight.color = pointLight.color;
+
+#if defined( PHYSICAL_LIGHTS )
+
+			directLight.color *= punctualLightIntensityToIrradianceFactor( lightDistance, pointLight.distance, pointLight.decay );
+
+#else
+
 			directLight.color *= calcLightAttenuation( lightDistance, pointLight.distance, pointLight.decay );
+
+#endif
+
 			directLight.visible = true;
 
 		} else {
@@ -91,7 +101,7 @@
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
 
-	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {
+	IncidentLight getSpotDirectLightIrradiance( const in SpotLight spotLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
 
@@ -106,7 +116,18 @@
 			float spotEffect = smoothstep( spotLight.coneCos, spotLight.penumbraCos, angleCos );
 
 			directLight.color = spotLight.color;
-			directLight.color *= ( spotEffect * calcLightAttenuation( lightDistance, spotLight.distance, spotLight.decay ) );
+			directLight.color *= spotEffect;
+
+			#if defined( PHYSICAL_LIGHTS )
+
+						directLight.color *= punctualLightIntensityToIrradianceFactor( lightDistance, pointLight.distance, pointLight.decay );
+
+			#else
+
+						directLight.color *= calcLightAttenuation( lightDistance, pointLight.distance, pointLight.decay );
+
+			#endif
+
 			directLight.visible = true;
 
 		} else {

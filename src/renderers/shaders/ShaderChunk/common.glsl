@@ -9,6 +9,8 @@
 #define whiteCompliment(a) ( 1.0 - saturate( a ) )
 
 float square( const in float x ) { return x*x; }
+float cube( const in float x ) { return x*x*x; }
+float pow4( const in float x ) { return x*x*x*x; }
 float average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }
 
 
