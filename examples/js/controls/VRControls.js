@@ -7,24 +7,25 @@ THREE.VRControls = function ( object, onError ) {
 
 	var scope = this;
 
-	var vrInputs = [];
+	var vrInput;
 
 	function gotVRDevices( devices ) {
 
 		for ( var i = 0; i < devices.length; i ++ ) {
 
-			if ( ('VRDisplay' in window && devices[ i ] instanceof VRDisplay) ||
-				 ('PositionSensorVRDevice' in window && devices[ i ] instanceof PositionSensorVRDevice) ) {
+			if ( ( 'VRDisplay' in window && devices[ i ] instanceof VRDisplay ) ||
+				 ( 'PositionSensorVRDevice' in window && devices[ i ] instanceof PositionSensorVRDevice ) ) {
 
-				vrInputs.push( devices[ i ] );
+				vrInput = devices[ i ];
+				break;  // We keep the first we encounter
 
 			}
 
 		}
 
-		if ( vrInputs.length === 0 ) {
+		if ( !vrInput ) {
 
-			if ( onError ) onError( 'VR inputs not available.' );
+			if ( onError ) onError( 'VR input not available.' );
 
 		}
 
@@ -49,9 +50,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.update = function () {
 
-		for ( var i = 0; i < vrInputs.length; i ++ ) {
-
-			var vrInput = vrInputs[ i ];
+		if ( vrInput ) {
 
 			if ( vrInput.getPose ) {
 
@@ -94,9 +93,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.resetSensor = function () {
 
-		for ( var i = 0; i < vrInputs.length; i ++ ) {
-
-			var vrInput = vrInputs[ i ];
+		if ( vrInput ) {
 
 			if ( vrInput.resetPose !== undefined ) {
 
@@ -127,7 +124,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.dispose = function () {
 
-		vrInputs = [];
+		vrInput = null;
 
 	};
 
