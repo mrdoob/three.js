@@ -14,7 +14,7 @@ THREE.TextureSlot = function ( name, uvChannel, uvTransform, texelTransform ) {
   this.uvTransform = uvTransform || false;
   this.uvOffset = new THREE.Vector2( 0, 0 );
   this.uvRepeat = new THREE.Vector2( 1.0, 1.0 );
-  this.uvRotation = 0;
+  //this.uvRotation = 0;
 
   this.texelTransform = uvTransform || false;
   this.texelScale = 1.0;
@@ -38,7 +38,7 @@ THREE.TextureSlot.prototype = {
     this.uvTransform = source.uvTransform;
     this.uvOffset = source.uvOffset;
     this.uvRepeat = source.uvRepeat;
-    this.uvRotation = source.uvRotation;
+    //this.uvRotation = source.uvRotation;
 
     this.texelTransform = source.texelTransform;
     this.texelScale = source.texelScale;
