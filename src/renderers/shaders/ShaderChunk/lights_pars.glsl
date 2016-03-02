@@ -140,7 +140,15 @@
 		float dotNL = dot( geometry.normal, hemiLight.direction );
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
 
+	#if defined( PHYSICAL_LIGHTS )
+
+		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
+
+	#else
+
 		return PI * mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
+
+	#endif
 
 	}
 
