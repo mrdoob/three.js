@@ -92,15 +92,19 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.setFullScreen = function ( boolean ) {
 
-		return new Promise(function(resolve, reject) {
+		return new Promise( function ( resolve, reject ) {
 
 			if ( vrHMD === undefined ) {
+
 				reject( new Error( 'No VR hardware found.' ) );
 				return;
+
 			}
 			if ( isPresenting === boolean ) {
+
 				resolve();
 				return;
+
 			}
 
 			if ( !deprecatedAPI ) {
@@ -114,8 +118,6 @@ THREE.VREffect = function ( renderer, onError ) {
 					resolve( vrHMD.exitPresent() );
 
 				}
-
-				return;
 
 			} else {
 
