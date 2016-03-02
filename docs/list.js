@@ -195,6 +195,7 @@ var list = {
 			[ "BoxGeometry", "api/extras/geometries/BoxGeometry" ],
 			[ "CircleBufferGeometry", "api/extras/geometries/CircleBufferGeometry" ],
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
+			[ "CylinderBufferGeometry", "api/extras/geometries/CylinderBufferGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
 			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
 			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
