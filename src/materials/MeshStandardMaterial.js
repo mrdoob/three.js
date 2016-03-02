@@ -1,5 +1,6 @@
 /**
  * @author WestLangley / http://github.com/WestLangley
+ * @author Ben Houston / bhouston / http://clara.io
  *
  * parameters = {
  *  color: <hex>,
@@ -41,7 +42,7 @@
  *  refractionRatio: <float>,
  *
  *  shading: THREE.SmoothShading,
- *  blending: THREE.PremultipliedAlphaBlending,
+ *  blending: THREE.PremultipliedAlphaNormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -68,33 +69,46 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.roughness = 0.5;
 	this.metalness = 0.5;
 
-	this.map = null;
+	//this.map = null;
+	this.mapSlot = new THREE.TextureSlot( "map", 0, false, false );
 
-	this.lightMap = null;
-	this.lightMapIntensity = 1.0;
+	//this.lightMap = null;
+	//this.lightMapIntensity = 1.0;
+	this.lightMapSlot = new THREE.TextureSlot( "lightMap", 1, false, true );
 
-	this.aoMap = null;
-	this.aoMapIntensity = 1.0;
+	//this.aoMap = null;
+	//this.aoMapIntensity = 1.0;
+	this.aoMapSlot = new THREE.TextureSlot( "aoMap", 1, false, true );
 
 	this.emissive = new THREE.Color( 0x000000 );
 	this.emissiveIntensity = 1.0;
-	this.emissiveMap = null;
+	//this.emissiveMap = null;
+	this.emissiveMapSlot = new THREE.TextureSlot( "emissiveMap", 0, false, false );
 
-	this.bumpMap = null;
-	this.bumpScale = 1;
+	//this.bumpMap = null;
+	//this.bumpScale = 1;
+	this.bumpMapSlot = new THREE.TextureSlot( "bumpMap", 0, false, true );
 
-	this.normalMap = null;
+	//this.normalMap = null;
 	this.normalScale = new THREE.Vector2( 1, 1 );
+	this.normalMapSlot = new THREE.TextureSlot( "normalMap", 0, false, false );
 
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
+	//this.displacementMap = null;
+	//this.displacementScale = 1;
+	//this.displacementBias = 0;
+	this.displacementMapSlot = new THREE.TextureSlot( "displacementMap", 0, false, true );
 
-	this.roughnessMap = null;
+	//this.roughnessMap = null;
+	this.roughnessMapSlot = new THREE.TextureSlot( "roughnessMap", 0, false, false );
 
-	this.metalnessMap = null;
+	//this.metalnessMap = null;
+	this.metalnessMapSlot = new THREE.TextureSlot( "metalnessMap", 0, false, false );
 
-	this.alphaMap = null;
+	//this.alphaMap = null;
+	this.alphaMapSlot = new THREE.TextureSlot( "alphaMap", 0, false, false );
+
+	this.slots = [ this.mapSlot, this.lightMapSlot, this.aoMapSlot, this.emissiveMapSlot, this.bumpMapSlot,
+		this.normalMapSlot, this.roughnessMapSlot, this.metalnessMapSlot, this.alphaMapSlot ];
 
 	this.envMap = null;
 	this.envMapIntensity = 1.0;
@@ -104,7 +118,7 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
-	this.blending = THREE.PremultipliedAlphaBlending;
+	this.blending = THREE.PremultipliedAlphaNormalBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -124,6 +138,134 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 THREE.MeshStandardMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.MeshStandardMaterial.prototype.constructor = THREE.MeshStandardMaterial;
 
+var closure = function () {
+	var propertyMappings = {
+		"map": {
+		  get: function() {
+				return this.mapSlot.texture;
+		  },
+			set: function( value ) {
+				this.mapSlot.texture = value;
+			}
+		},
+		"lightMap": {
+		  get: function() {
+				return this.lightMapSlot.texture;
+		  },
+			set: function( value ) {
+				this.lightMapSlot.texture = value;
+			}
+		},
+		"lightMapIntensity": {
+		  get: function() {
+				return this.lightMapSlot.texelScale;
+		  },
+			set: function( value ) {
+				this.lightMapSlot.texelScale = value;
+			}
+		},
+		"aoMap": {
+		  get: function() {
+				return this.aoMapSlot.texture;
+		  },
+			set: function( value ) {
+				this.aoMapSlot.texture = value;
+			}
+		},
+		"aoMapIntensity": {
+		  get: function() {
+				return this.aoMapSlot.texelScale;
+		  },
+			set: function( value ) {
+				this.aoMapSlot.texelScale = value;
+			}
+		},
+		"emissiveMap": {
+		  get: function() {
+				return this.emissiveMapSlot.texture;
+		  },
+			set: function( value ) {
+				this.emissiveMapSlot.texture = value;
+			}
+		},
+		"bumpMap": {
+		  get: function() {
+				return this.bumpMapSlot.texture;
+		  },
+			set: function( value ) {
+				this.bumpMapSlot.texture = value;
+			}
+		},
+		"bumpScale": {
+		  get: function() {
+				return this.emissiveMapSlot.texelScale;
+		  },
+			set: function( value ) {
+				this.emissiveMapSlot.texelScale = value;
+			}
+		},
+		"normalMap": {
+		  get: function() {
+				return this.normalMapSlot.texture;
+		  },
+			set: function( value ) {
+				this.normalMapSlot.texture = value;
+			}
+		},
+		"displacementMap": {
+		  get: function() {
+				return this.displacementMapSlot.texture;
+		  },
+			set: function( value ) {
+				this.displacementMapSlot.texture = value;
+			}
+		},
+		"displacementScale": {
+		  get: function() {
+				return this.displacementMapSlot.texelScale;
+		  },
+			set: function( value ) {
+				this.displacementMapSlot.texelScale = value;
+			}
+		},
+		"displacementBias": {
+		  get: function() {
+				return this.displacementMapSlot.texelOffset;
+		  },
+			set: function( value ) {
+				this.displacementMapSlot.texelOffset = value;
+			}
+		},
+		"roughnessMap": {
+		  get: function() {
+				return this.roughnessMapSlot.texture;
+		  },
+			set: function( value ) {
+				this.roughnessMapSlot.texture = value;
+			}
+		},
+		"metalnessMap": {
+		  get: function() {
+				return this.metalnessMapSlot.texture;
+		  },
+			set: function( value ) {
+				this.metalnessMapSlot.texture = value;
+			}
+		},
+		"alphaMap": {
+		  get: function() {
+				return this.alphaMapSlot.texture;
+		  },
+			set: function( value ) {
+				this.alphaMapSlot.texture = value;
+			}
+		}
+	};
+	for( var propertyName in propertyMappings ) {
+		Object.defineProperty(THREE.MeshStandardMaterial.prototype, propertyName, propertyMappings[ propertyName ] );
+	}
+}();
+
 THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 
 	THREE.Material.prototype.copy.call( this, source );
@@ -132,27 +274,21 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.roughness = source.roughness;
 	this.metalness = source.metalness;
 
-	this.map = source.map;
-
-	this.lightMap = source.lightMap;
-	this.lightMapIntensity = source.lightMapIntensity;
-
-	this.aoMap = source.aoMap;
-	this.aoMapIntensity = source.aoMapIntensity;
+	this.mapSlot.copy( source.mapSlot );
+	this.lightMapSlot.copy( source.lightMapSlot );
+	this.aoMapSlot.copy( source.aoMapSlot );
+	this.emissiveMapSlot.copy( source.emissiveMapSlot );
+	this.bumpMapSlot.copy( source.bumpMapSlot );
+	this.normalMapSlot.copy( source.normalMapSlot );
+	this.displacementMapSlot.copy( source.displacementMapSlot );
+	this.roughnessMapSlot.copy( source.roughnessMapSlot );
+	this.metalnessMapSlot.copy( source.metalnessMapSlot );
+	this.alphaMapSlot.copy( source.alphaMapSlot );
 
 	this.emissive.copy( source.emissive );
-	this.emissiveMap = source.emissiveMap;
 	this.emissiveIntensity = source.emissiveIntensity;
 
-	this.bumpMap = source.bumpMap;
-	this.bumpScale = source.bumpScale;
-
-	this.normalMap = source.normalMap;
 	this.normalScale.copy( source.normalScale );
-
-	this.displacementMap = source.displacementMap;
-	this.displacementScale = source.displacementScale;
-	this.displacementBias = source.displacementBias;
 
 	this.roughnessMap = source.roughnessMap;
 
