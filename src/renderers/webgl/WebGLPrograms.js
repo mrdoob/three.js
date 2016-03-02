@@ -14,7 +14,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		PointsMaterial: 'points'
 	};
 
-	var slots = [
+	var supportedSlots = [
 		'map', 'lightMap', 'aoMap', 'emissiveMap', 'specularMap', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'alphaMap'
 	];
 
@@ -31,8 +31,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"alphaTest", "doubleSided", "flipSided"
 	];
 
-	for( var i = 0; i < slots.length; i ++ ) {
-		var name = slots[i];
+	for( var i = 0; i < supportedSlots.length; i ++ ) {
+		var name = supportedSlots[i];
 		parameterNames.push( name );
 		parameterNames.push( name + 'UVChannel' );
 		parameterNames.push( name + 'UVTransform' );
@@ -183,8 +183,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 		};
 
-		for( var i = 0; i < slots.length; i ++ ) {
-			var name = slots[i];
+		for( var i = 0; i < supportedSlots.length; i ++ ) {
+			var name = supportedSlots[i];
 			// backwards compatibility
 			parameters[name] = !! material[ name ];
 

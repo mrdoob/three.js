@@ -7,6 +7,10 @@ THREE.WebGLProgram = ( function () {
 	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/;
 	var arrayRe = /^([\w\d_]+)\[0\]$/;
 
+	var supportedSlots = [
+		'map', 'lightMap', 'aoMap', 'emissiveMap', 'specularMap', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'alphaMap'
+	];
+
 	function getEncodingComponents( encoding ) {
 
 		switch ( encoding ) {
@@ -46,10 +50,10 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
-	function getTexelTransformFunction( slot ) {
+	function getTexelTransformFunction( slotName, slot ) {
 
-		if( ! slot.texelTransform ) {
-			return "vec4 " + slot.name + "TexelTransform( vec4 value ) { return value; }";
+		if( ! slot || ! slot.texelTransform ) {
+			return "vec4 " + slotName + "TexelTransform( vec4 value ) { return value; }\n";
 		}
 
 		var transform = slot.getFlattenedTexelTransform();
@@ -59,15 +63,15 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
-	function getUVFunction( slot, isVertexShader ) {
+	function getUVFunction( slotName, slot, isVertexShader ) {
 
-		var uvVariableName = ( isVertexShader ) ? "vUv" : "uv";
-		if( slot.uvChannel > 0 ) {
-			uvVariableName += slot.uvChannel;
+		var uvVariableName = ( isVertexShader ) ? "uv" : "vUv";
+		if( slot && slot.uvChannel > 0 ) {
+			uvVariableName += ( slot.uvChannel + 1 );
 		}
 
-		if( ! slot.uvTransform ) {
-			return "vec2 " + slot.name + "UV() { return " + uvName + "; }";
+		if( ! slot || ! slot.uvTransform ) {
+			return "vec2 " + slotName + "UV() { return " + uvVariableName + "; }\n";
 		}
 
 		var transform = slot.getFlattenedTexelTransform();
@@ -572,6 +576,30 @@ THREE.WebGLProgram = ( function () {
 
 			].filter( filterEmptyLine ).join( '\n' );
 
+			var slotCode = "";
+			var slotUvChannels = [];
+			for( var i = 0; i < supportedSlots.length; i ++ ) {
+				var slotName = supportedSlots[i];
+				var slot = material[ slotName + 'Slot' ];
+				if( slot || material[ slotName ] ) {
+					if( slot && ! slotUvChannels[ slot.uvChannel ]) slotUvChannels[ slot.uvChannel ] = true;
+					slotCode += getTexelTransformFunction( slotName, slot );
+					slotCode += getUVFunction( slotName, slot, false );
+				}
+			}
+			if( Object.keys( slotUvChannels ).length > 0 ) {
+				var slotPrefix = "";
+				slotPrefix += "#define TEXTURE_SLOTS\n";
+				for( var uvChannel in slotUvChannels ) {
+					uvChannel = parseInt( uvChannel );
+					var uvChannelName = "vUv";
+					if( uvChannel > 0 ) uvChannelName += '' + ( uvChannel + 1 );
+					slotPrefix += "varying vec2 " + uvChannelName + ";\n";
+				}
+				console.log( slotPrefix );
+				console.log( slotCode );
+				prefixFragment += slotPrefix + slotCode;
+			}
 		}
 
 		vertexShader = parseIncludes( vertexShader, parameters );
