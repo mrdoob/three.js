@@ -105,7 +105,8 @@
 				} );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "../examples/textures/roughness_map.jpg", function( map ) {
+				textureLoader.load( "../examples/textures/roughness_map.jpg", function ( map ) {
+
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -118,10 +119,11 @@
 					standardMaterialPremultiplied.roughnessMap = map;
 					//standardMaterialPremultiplied.bumpMap = map;
 					standardMaterialPremultiplied.needsUpdate = true;
-			} );
+
+				} );
 
 				var torusMesh2 = new THREE.Mesh( geometry, standardMaterialPremultiplied );
-				torusMesh2.position.x = -20.0;
+				torusMesh2.position.x = - 20.0;
 				torusMesh2.castShadow = true;
 				scene.add( torusMesh2 );
 				objects.push( torusMesh2 );
