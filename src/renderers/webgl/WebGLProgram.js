@@ -46,6 +46,38 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
+	function getTexelTransformFunction( slot ) {
+
+		if( ! slot.texelTransform ) {
+			return "vec4 " + slot.name + "TexelTransform( vec4 value ) { return value; }";
+		}
+
+		var transform = slot.getFlattenedTexelTransform();
+		var template = THREE.ShaderChunk[ 'slot_texel_transform_template' ];
+		var result = template.replace( "<SLOT_NAME>", slot.name );
+		return result;
+
+	}
+
+	function getUVFunction( slot, isVertexShader ) {
+
+		var uvVariableName = ( isVertexShader ) ? "vUv" : "uv";
+		if( slot.uvChannel > 0 ) {
+			uvVariableName += slot.uvChannel;
+		}
+
+		if( ! slot.uvTransform ) {
+			return "vec2 " + slot.name + "UV() { return " + uvName + "; }";
+		}
+
+		var transform = slot.getFlattenedTexelTransform();
+		var template = THREE.ShaderChunk[ 'slot_texel_transform_template' ];
+		var result = template.replace( "<SLOT_NAME>", slot.name );
+		result = result.replace( "<UV_VAR_NAME>", uvVariableName );
+		return result;
+
+	}
+
 	function getToneMappingFunction( functionName, toneMapping ) {
 		var toneMappingName;
 

@@ -187,6 +187,8 @@
 	"src/renderers/shaders/ShaderChunk/skinnormal_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/specularmap_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/specularmap_pars_fragment.glsl",
+	"src/renderers/shaders/ShaderChunk/slot_texel_transform_template.glsl",
+	"src/renderers/shaders/ShaderChunk/slot_uv_transform_template.glsl",
 	"src/renderers/shaders/ShaderChunk/tonemapping_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/tonemapping_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/uv2_pars_fragment.glsl",
