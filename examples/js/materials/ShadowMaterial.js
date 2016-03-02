@@ -29,7 +29,7 @@ THREE.ShadowMaterial = function () {
 			THREE.ShaderChunk[ "shadowmask_pars_fragment" ],
 			"uniform float opacity;",
 			"void main() {",
-			"	gl_FragColor = vec4( 0.0, 0.0, 0.0, opacity - getShadowMask() );",
+			"	gl_FragColor = vec4( 0.0, 0.0, 0.0, opacity * ( 1.0  - getShadowMask() ) );",
 			"}"
 		].join( '\n' )
 	} );

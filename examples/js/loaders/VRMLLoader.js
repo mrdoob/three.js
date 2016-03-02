@@ -582,7 +582,7 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /USE/.exec( data ) ) {
 
-						var defineKey = /USE\s+?(\w+)/.exec( data )[ 1 ];
+						var defineKey = /USE\s+?([^\s]+)/.exec( data )[ 1 ];
 
 						if ( undefined == defines[ defineKey ] ) {
 
@@ -629,7 +629,7 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /DEF/.exec( data.string ) ) {
 
-						object.name = /DEF\s+(\w+)/.exec( data.string )[ 1 ];
+						object.name = /DEF\s+([^\s]+)/.exec( data.string )[ 1 ];
 						defines[ object.name ] = object;
 
 					}
@@ -666,7 +666,7 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /DEF/.exec( data.string ) ) {
 
-						object.name = /DEF\s+(\w+)/.exec( data.string )[ 1 ];
+						object.name = /DEF\s+([^\s]+)/.exec( data.string )[ 1 ];
 
 						defines[ object.name ] = object;
 
@@ -772,7 +772,7 @@ THREE.VRMLLoader.prototype = {
 
 								if ( child.string.indexOf ( 'DEF' ) > -1 ) {
 
-									var name = /DEF\s+(\w+)/.exec( child.string )[ 1 ];
+									var name = /DEF\s+([^\s]+)/.exec( child.string )[ 1 ];
 
 									defines[ name ] = geometry.vertices;
 
@@ -780,7 +780,7 @@ THREE.VRMLLoader.prototype = {
 
 								if ( child.string.indexOf ( 'USE' ) > -1 ) {
 
-									var defineKey = /USE\s+(\w+)/.exec( child.string )[ 1 ];
+									var defineKey = /USE\s+([^\s]+)/.exec( child.string )[ 1 ];
 
 									geometry.vertices = defines[ defineKey ];
 								}
@@ -862,7 +862,7 @@ THREE.VRMLLoader.prototype = {
 						// see if it's a define
 						if ( /DEF/.exec( data.string ) ) {
 
-							geometry.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+							geometry.name = /DEF ([^\s]+)/.exec( data.string )[ 1 ];
 							defines[ geometry.name ] = geometry;
 
 						}
@@ -920,7 +920,7 @@ THREE.VRMLLoader.prototype = {
 
 							if ( /DEF/.exec( data.string ) ) {
 
-								material.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+								material.name = /DEF ([^\s]+)/.exec( data.string )[ 1 ];
 
 								defines[ material.name ] = material;
 

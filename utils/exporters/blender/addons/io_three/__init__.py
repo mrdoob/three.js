@@ -374,9 +374,13 @@ def restore_export_settings(properties, settings):
         constants.INDENT,
         constants.EXPORT_OPTIONS[constants.INDENT])
 
-    properties.option_copy_textures = settings.get(
-        constants.COPY_TEXTURES,
-        constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
+    properties.option_export_textures = settings.get(
+        constants.EXPORT_TEXTURES,
+        constants.EXPORT_OPTIONS[constants.EXPORT_TEXTURES])
+
+    properties.option_embed_textures = settings.get(
+        constants.EMBED_TEXTURES,
+        constants.EXPORT_OPTIONS[constants.EMBED_TEXTURES])
 
     properties.option_texture_folder = settings.get(
         constants.TEXTURE_FOLDER,
@@ -467,7 +471,8 @@ def set_settings(properties):
         constants.LOGGING: properties.option_logging,
         constants.COMPRESSION: properties.option_compression,
         constants.INDENT: properties.option_indent,
-        constants.COPY_TEXTURES: properties.option_copy_textures,
+        constants.EXPORT_TEXTURES: properties.option_export_textures,
+        constants.EMBED_TEXTURES: properties.option_embed_textures,
         constants.TEXTURE_FOLDER: properties.option_texture_folder,
 
         constants.SCENE: properties.option_export_scene,
@@ -520,6 +525,10 @@ def animation_options():
     ]
 
     return anim
+
+def resolve_conflicts(self, context):
+    if(not self.option_export_textures):
+        self.option_embed_textures = False;
 
 class ExportThree(bpy.types.Operator, ExportHelper):
     """Class that handles the export properties"""
@@ -665,10 +674,16 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Embed animation data with the geometry data",
         default=constants.EXPORT_OPTIONS[constants.EMBED_ANIMATION])
 
-    option_copy_textures = BoolProperty(
-        name="Copy textures",
-        description="Copy textures",
-        default=constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
+    option_export_textures = BoolProperty(
+        name="Export textures",
+        description="Export textures",
+        default=constants.EXPORT_OPTIONS[constants.EXPORT_TEXTURES],
+        update=resolve_conflicts)
+
+    option_embed_textures = BoolProperty(
+        name="Embed textures",
+        description="Embed base64 textures in .json",
+        default=constants.EXPORT_OPTIONS[constants.EMBED_TEXTURES])
 
     option_texture_folder = StringProperty(
         name="Texture folder",
@@ -914,7 +929,11 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_maps')
 
         row = layout.row()
-        row.prop(self.properties, 'option_copy_textures')
+        row.prop(self.properties, 'option_export_textures')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_embed_textures')
+        row.enabled = self.properties.option_export_textures
 
         row = layout.row()
         row.prop(self.properties, 'option_texture_folder')
