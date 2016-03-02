@@ -47,7 +47,7 @@
 		<!-- replace built-in triangulation with PnlTri.js -->
 		<script src="js/libs/pnltri.min.js"></script>
 		<script>
-			THREE.Shape.Utils.triangulateShape = ( function () {
+			THREE.ShapeUtils.triangulateShape = ( function () {
 				var pnlTriangulator = new PNLTRI.Triangulator();
 				return function triangulateShape( contour, holes ) {
 					// console.log("new Triangulation: PnlTri.js " + PNLTRI.REVISION );
