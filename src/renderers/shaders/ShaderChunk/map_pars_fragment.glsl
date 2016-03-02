@@ -1,5 +1,7 @@
-#ifdef USE_MAP
+#if ! defined( TEXTURE_SLOTS )
+	#ifdef USE_MAP
 
-	uniform sampler2D map;
+		uniform sampler2D map;
 
+	#endif
 #endif

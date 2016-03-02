@@ -1,6 +1,12 @@
 #ifdef USE_AOMAP
 
-	float ambientOcclusion = ( texture2D( aoMap, vUv2 ).r - 1.0 ) * aoMapIntensity + 1.0;
+#if defined( TEXTURE_SLOTS )
+	vec2 aoUv = aoMapUV();
+#else
+	vec2 aoUv = vUv2;
+#endif
+
+	float ambientOcclusion = ( aoMapTexelTransform( texture2D( aoMap, aoUv ) ).r - 1.0 ) * aoMapIntensity + 1.0;
 
 	reflectedLight.indirectDiffuse *= ambientOcclusion;
 

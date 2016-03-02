@@ -1,5 +1,7 @@
-#ifdef USE_ALPHAMAP
+#if ! defined( TEXTURE_SLOTS )
+	#ifdef USE_ALPHAMAP
 
-	uniform sampler2D alphaMap;
+		uniform sampler2D alphaMap;
 
+	#endif
 #endif

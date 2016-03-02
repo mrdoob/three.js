@@ -1,5 +1,7 @@
-#ifdef USE_ROUGHNESSMAP
+#if ! defined( TEXTURE_SLOTS )
+	#ifdef USE_ROUGHNESSMAP
 
-	uniform sampler2D roughnessMap;
+		uniform sampler2D roughnessMap;
 
+	#endif
 #endif

@@ -1,8 +1,14 @@
 #ifdef USE_EMISSIVEMAP
 
-	vec4 emissiveColor = texture2D( emissiveMap, vUv );
+#if defined( TEXTURE_SLOTS )
+	vec2 emissiveUv = emissiveMapUV();
+#else
+	vec2 emissiveUv = vUv;
+#endif
 
-	emissiveColor.rgb = emissiveMapTexelToLinear( emissiveColor ).rgb;
+	vec4 emissiveColor = texture2D( emissiveMap, emissiveUv );
+
+	emissiveColor.rgb = emissiveMapTexelTransform( emissiveMapTexelToLinear( emissiveColor ) ).rgb;
 
 	totalEmissiveLight *= emissiveColor.rgb;
 

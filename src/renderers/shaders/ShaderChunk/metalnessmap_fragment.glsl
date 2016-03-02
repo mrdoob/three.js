@@ -2,7 +2,13 @@ float metalnessFactor = metalness;
 
 #ifdef USE_METALNESSMAP
 
-	vec4 texelMetalness = texture2D( metalnessMap, vUv );
+	#if defined( TEXTURE_SLOTS )
+		vec2 metalnessUv = metalnessMapUV();
+	#else
+		vec2 metalnessUv = vUv;
+	#endif
+
+	vec4 texelMetalness = metalnessTexelTransform( texture2D( metalnessMap, metalnessUv ) );
 	metalnessFactor *= texelMetalness.r;
 
 #endif

@@ -77,7 +77,7 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.lightMapSlot = new THREE.TextureSlot( "lightMap", 1, false, true );
 
 	//this.aoMap = null;
-	//this.aoMapIntensity = 1.0;
+	this.aoMapIntensity = 1.0;
 	this.aoMapSlot = new THREE.TextureSlot( "aoMap", 1, false, true );
 
 	this.emissive = new THREE.Color( 0x000000 );
@@ -107,8 +107,8 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	//this.alphaMap = null;
 	this.alphaMapSlot = new THREE.TextureSlot( "alphaMap", 0, false, false );
 
-	this.slots = [ this.mapSlot, this.lightMapSlot, this.aoMapSlot, this.emissiveMapSlot, this.bumpMapSlot,
-		this.normalMapSlot, this.roughnessMapSlot, this.metalnessMapSlot, this.alphaMapSlot ];
+	//this.slots = [ this.mapSlot, this.lightMapSlot, this.aoMapSlot, this.emissiveMapSlot, this.bumpMapSlot,
+	//	this.normalMapSlot, this.roughnessMapSlot, this.metalnessMapSlot, this.alphaMapSlot ];
 
 	this.envMap = null;
 	this.envMapIntensity = 1.0;
@@ -161,6 +161,7 @@ var closure = function () {
 				return this.lightMapSlot.texelScale;
 		  },
 			set: function( value ) {
+				this.lightMapSlot.texelTransform = true;
 				this.lightMapSlot.texelScale = value;
 			}
 		},
@@ -170,14 +171,6 @@ var closure = function () {
 		  },
 			set: function( value ) {
 				this.aoMapSlot.texture = value;
-			}
-		},
-		"aoMapIntensity": {
-		  get: function() {
-				return this.aoMapSlot.texelScale;
-		  },
-			set: function( value ) {
-				this.aoMapSlot.texelScale = value;
 			}
 		},
 		"emissiveMap": {
@@ -201,6 +194,7 @@ var closure = function () {
 				return this.emissiveMapSlot.texelScale;
 		  },
 			set: function( value ) {
+				this.emissiveMapSlot.texelTransform = true;
 				this.emissiveMapSlot.texelScale = value;
 			}
 		},
@@ -225,6 +219,7 @@ var closure = function () {
 				return this.displacementMapSlot.texelScale;
 		  },
 			set: function( value ) {
+				this.displacementMapSlot.texelTransform = true;
 				this.displacementMapSlot.texelScale = value;
 			}
 		},
@@ -233,6 +228,7 @@ var closure = function () {
 				return this.displacementMapSlot.texelOffset;
 		  },
 			set: function( value ) {
+				this.displacementMapSlot.texelTransform = true;
 				this.displacementMapSlot.texelOffset = value;
 			}
 		},
@@ -289,12 +285,6 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.emissiveIntensity = source.emissiveIntensity;
 
 	this.normalScale.copy( source.normalScale );
-
-	this.roughnessMap = source.roughnessMap;
-
-	this.metalnessMap = source.metalnessMap;
-
-	this.alphaMap = source.alphaMap;
 
 	this.envMap = source.envMap;
 	this.envMapIntensity = source.envMapIntensity;

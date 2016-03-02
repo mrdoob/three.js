@@ -2,7 +2,13 @@ float specularStrength;
 
 #ifdef USE_SPECULARMAP
 
-	vec4 texelSpecular = texture2D( specularMap, vUv );
+	#if defined( TEXTURE_SLOTS )
+		vec2 specularUv = specularMapUV();
+	#else
+		vec2 specularUv = vUv;
+	#endif
+
+	vec4 texelSpecular = specularMapTexelTransform( texture2D( specularMap, specularUv ) );
 	specularStrength = texelSpecular.r;
 
 #else

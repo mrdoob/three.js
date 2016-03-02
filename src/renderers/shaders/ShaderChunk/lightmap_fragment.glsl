@@ -1,5 +1,11 @@
 #ifdef USE_LIGHTMAP
 
-	reflectedLight.indirectDiffuse += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity; // factor of PI should not be present; included here to prevent breakage
+#if defined( TEXTURE_SLOTS )
+	vec2 lightUv = lightMapUV();
+#else
+	vec2 lightUv = vUv2;
+#endif
+
+	reflectedLight.indirectDiffuse += PI * emissiveMapTexelTransform( texture2D( lightMap, lightUv ) ).xyz; // factor of PI should not be present; included here to prevent breakage
 
 #endif

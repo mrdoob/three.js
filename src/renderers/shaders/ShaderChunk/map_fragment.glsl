@@ -1,8 +1,14 @@
 #ifdef USE_MAP
 
-	vec4 texelColor = texture2D( map, vUv );
+#if defined( TEXTURE_SLOTS )
+	vec2 mapUv = mapUV();
+#else
+	vec2 mapUv = vUv;
+#endif
 
-	texelColor = mapTexelToLinear( texelColor );
+	vec4 texelColor = texture2D( map, mapUv );
+
+	texelColor = mapTexelTransform( mapTexelToLinear( texelColor ) );
 	diffuseColor *= texelColor;
 
 #endif

@@ -1,5 +1,7 @@
-#ifdef USE_SPECULARMAP
+#if ! defined( TEXTURE_SLOTS )
+	#ifdef USE_SPECULARMAP
 
-	uniform sampler2D specularMap;
+		uniform sampler2D specularMap;
 
+	#endif
 #endif

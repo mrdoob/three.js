@@ -1,7 +1,11 @@
 #ifdef USE_BUMPMAP
 
+#if ! defined( TEXTURE_SLOTS )
+
 	uniform sampler2D bumpMap;
 	uniform float bumpScale;
+
+#endif
 
 	// Derivative maps - bump mapping unparametrized surfaces by Morten Mikkelsen
 	// http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html
@@ -10,12 +14,18 @@
 
 	vec2 dHdxy_fwd() {
 
-		vec2 dSTdx = dFdx( vUv );
-		vec2 dSTdy = dFdy( vUv );
+#if defined( TEXTURE_SLOTS )
+		vec2 bumpUv = bumpMapUV();
+#else
+		vec2 bumpUv = vUv;
+#endif
 
-		float Hll = bumpScale * texture2D( bumpMap, vUv ).x;
-		float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;
-		float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;
+		vec2 dSTdx = dFdx( bumpUv );
+		vec2 dSTdy = dFdy( bumpUv );
+
+		float Hll = bumpMapTexelTransform( texture2D( bumpMap, bumpUv ) ).x;
+		float dBx = bumpMapTexelTransform( texture2D( bumpMap, bumpUv + dSTdx ) ).x - Hll;
+		float dBy = bumpMapTexelTransform( texture2D( bumpMap, bumpUv + dSTdy ) ).x - Hll;
 
 		return vec2( dBx, dBy );
 
