@@ -1714,6 +1714,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.uniform1f( p_uniforms.toneMappingWhitePoint, _this.toneMappingWhitePoint );
 
 			}
+
 		}
 
 		// skinning uniforms must be set even if material didn't change

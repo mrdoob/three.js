@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>threejs webgl - materials</title>
+		<title>threejs webgl - inline tone mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #fff;
+				color: #000;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
@@ -16,6 +16,8 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+
+			a { color: #222 }
 
 			#info {
 				position: absolute;
@@ -27,7 +29,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Inline Tone Mapping (within a Material's fragment shader) without using a pre-processing step or float/half buffers by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Inline Tone Mapping (within a Material's fragment shader) without<br/>using a pre-processing step or float/half buffers by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
 		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
@@ -39,7 +41,7 @@
 		<script src="../examples/js/libs/dat.gui.min.js"></script>
 		<script src="../src/loaders/BinaryTextureLoader.js"></script>
 		<script src="../examples/js/loaders/RGBELoader.js"></script>
-		<script src="../examples/js/loaders/HDRCubeMapLoader.js"></script>
+		<script src="../examples/js/loaders/HDRCubeTextureLoader.js"></script>
 		<script src="../examples/js/Half.js"></script>
 		<script src="../examples/js/Encodings.js"></script>
 		<script src="../examples/js/pmrem/PMREMGenerator.js"></script>
@@ -64,8 +66,8 @@
 				roughness: 1.0,
 				bumpScale: 1.0,
 				exposure: 3.0,
-				whitePoint: 1.0,
-				toneMapping: "Cineon",
+				whitePoint: 5.0,
+				toneMapping: "Uncharted2",
 				renderMode: "Renderer"
 			};
 
@@ -95,6 +97,7 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					bumpScale: - 0.05,
@@ -165,7 +168,7 @@
 					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 				];
 
-				var hdrCubeMap = new THREE.HDRCubeMapLoader().load( THREE.UnsignedByteType, hdrurls, function ( hdrCubeMap ) {
+				var hdrCubeMap = new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrurls, function ( hdrCubeMap ) {
 
 					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
 					pmremGenerator.update( renderer );

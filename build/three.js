@@ -15699,7 +15699,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	//	  .bone[Armature.DEF_cog].position
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_. ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
+	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_.:\- ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
 	var matches = re.exec(trackName);
 
 	if( ! matches ) {
@@ -20275,13 +20275,13 @@ THREE.MaterialIdCount = 0;
  *  color: <hex>,
  *  opacity: <float>,
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *  linewidth: <float>,
  *  linecap: "round",
  *  linejoin: "round",
+ *
+ *  blending: THREE.PremultipliedAlphaBlending,
+ *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  vertexColors: <bool>
  *
@@ -20300,6 +20300,8 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.linewidth = 1;
 	this.linecap = 'round';
 	this.linejoin = 'round';
+
+	this.blending = THREE.PremultipliedAlphaBlending;
 
 	this.vertexColors = THREE.NoColors;
 
@@ -20339,15 +20341,15 @@ THREE.LineBasicMaterial.prototype.copy = function ( source ) {
  *  color: <hex>,
  *  opacity: <float>,
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *  linewidth: <float>,
  *
  *  scale: <float>,
  *  dashSize: <float>,
  *  gapSize: <float>,
+ *
+ *  blending: THREE.PremultipliedAlphaBlending,
+ *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  vertexColors: THREE.NoColors / THREE.FaceColors / THREE.VertexColors
  *
@@ -20369,6 +20371,8 @@ THREE.LineDashedMaterial = function ( parameters ) {
 	this.dashSize = 3;
 	this.gapSize = 1;
 
+	this.blending = THREE.PremultipliedAlphaBlending;
+
 	this.vertexColors = THREE.NoColors;
 
 	this.fog = true;
@@ -20385,7 +20389,7 @@ THREE.LineDashedMaterial.prototype.copy = function ( source ) {
 	THREE.Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
-	
+
 	this.linewidth = source.linewidth;
 
 	this.scale = source.scale;
@@ -20424,7 +20428,7 @@ THREE.LineDashedMaterial.prototype.copy = function ( source ) {
  *  refractionRatio: <float>,
  *
  *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
+ *  blending: THREE.PremultipliedAlphaBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -20465,6 +20469,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
+	this.blending = THREE.PremultipliedAlphaBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -20552,7 +20557,7 @@ THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *
- *  blending: THREE.NormalBlending,
+ *  blending: THREE.PremultipliedAlphaBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -20599,6 +20604,8 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.refractionRatio = 0.98;
 
 	this.fog = true;
+
+	this.blending = THREE.PremultipliedAlphaBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -20706,7 +20713,7 @@ THREE.MeshLambertMaterial.prototype.copy = function ( source ) {
  *  refractionRatio: <float>,
  *
  *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
+ *  blending: THREE.PremultipliedAlphaBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -20767,6 +20774,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
+	this.blending = THREE.PremultipliedAlphaBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -20889,7 +20897,7 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
  *  refractionRatio: <float>,
  *
  *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
+ *  blending: THREE.PremultipliedAlphaBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -20952,6 +20960,7 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
+	this.blending = THREE.PremultipliedAlphaBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -21207,7 +21216,7 @@ THREE.MultiMaterial.prototype = {
  *  size: <float>,
  *  sizeAttenuation: <bool>,
  *
- *  blending: THREE.NormalBlending,
+ *  blending: THREE.PremultipliedAlphaBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -21229,6 +21238,8 @@ THREE.PointsMaterial = function ( parameters ) {
 
 	this.size = 1;
 	this.sizeAttenuation = true;
+
+	this.blending = THREE.PremultipliedAlphaBlending;
 
 	this.vertexColors = THREE.NoColors;
 
@@ -23634,7 +23645,7 @@ THREE.ShaderChunk[ 'normalmap_pars_fragment' ] = "#ifdef USE_NORMALMAP\n	uniform
 
 // File:src/renderers/shaders/ShaderChunk/premultiplied_alpha_fragment.glsl
 
-THREE.ShaderChunk[ 'premultiplied_alpha_fragment' ] = "#ifdef PREMULTIPLIED_ALPHA\n  gl_FragColor.rgb *= gl_FragColor.a;\n#endif\n";
+THREE.ShaderChunk[ 'premultiplied_alpha_fragment' ] = "#ifdef PREMULTIPLIED_ALPHA\n	gl_FragColor.rgb *= gl_FragColor.a;\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/project_vertex.glsl
 
@@ -30468,7 +30479,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
 
-			} else if( blending === THREE.PremultipliedAlphaBlending ) {
+			} else if ( blending === THREE.PremultipliedAlphaBlending ) {
 
 				gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
 				gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
@@ -35762,6 +35773,294 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 THREE.CircleBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.CircleBufferGeometry.prototype.constructor = THREE.CircleBufferGeometry;
 
+// File:src/extras/geometries/CylinderBufferGeometry.js
+
+/**
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
+THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+
+	THREE.BufferGeometry.call( this );
+
+	this.type = 'CylinderBufferGeometry';
+
+	this.parameters = {
+		radiusTop: radiusTop,
+		radiusBottom: radiusBottom,
+		height: height,
+		radialSegments: radialSegments,
+		heightSegments: heightSegments,
+		openEnded: openEnded,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength
+	};
+
+	radiusTop = radiusTop !== undefined ? radiusTop : 20;
+	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
+	height = height !== undefined ? height : 100;
+
+	radialSegments = Math.floor( radialSegments )  || 8;
+	heightSegments = Math.floor( heightSegments ) || 1;
+
+	openEnded = openEnded !== undefined ? openEnded : false;
+	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
+
+	// used to calculate buffer length
+
+	var vertexCount = calculateVertexCount();
+	var indexCount = calculateIndexCount();
+
+	// buffers
+
+	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+	// helper variables
+
+	var index = 0, indexOffset = 0, indexArray = [], halfHeight = height / 2;
+
+	// generate geometry
+
+	generateTorso();
+
+	if( openEnded === false ) {
+
+		if( radiusTop > 0 ) {
+
+			generateCap( true );
+
+		}
+
+		if( radiusBottom > 0 ) {
+
+			generateCap( false );
+
+		}
+
+	}
+
+	// build geometry
+
+	this.setIndex( indices );
+	this.addAttribute( 'position', vertices );
+	this.addAttribute( 'normal', normals );
+	this.addAttribute( 'uv', uvs );
+
+	// helper functions
+
+	function calculateVertexCount () {
+
+		var count = ( radialSegments + 1 ) * ( heightSegments + 1 );
+
+		if ( openEnded === false ) {
+
+			count += ( ( radialSegments + 1 ) * 2 ) + ( radialSegments * 2 );
+
+		}
+
+		return count;
+
+	}
+
+	function calculateIndexCount () {
+
+		var count = radialSegments * heightSegments * 2 * 3;
+
+		if ( openEnded === false ) {
+
+			count += radialSegments * 2 * 3;
+
+		}
+
+		return count;
+
+	}
+
+	function generateTorso () {
+
+		var x, y;
+		var normal = new THREE.Vector3();
+		var vertex = new THREE.Vector3();
+
+		// this will be used to calculate the normal
+		var tanTheta = ( radiusBottom - radiusTop ) / height;
+
+		// generate vertices, normals and uvs
+
+		for ( y = 0; y <= heightSegments; y ++ ) {
+
+			var indexRow = [];
+
+			var v = y / heightSegments;
+
+			// calculate the radius of the current row
+			var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
+
+			for ( x = 0; x <= radialSegments; x ++ ) {
+
+				var u = x / radialSegments;
+
+				// vertex
+				vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+				vertex.y = - v * height + halfHeight;
+				vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+				// normal
+				normal.copy( vertex );
+				normal.setY( Math.sqrt( normal.x * normal.x + normal.z * normal.z ) * tanTheta ).normalize();
+				normals.setXYZ( index, normal.x, normal.y, normal.z );
+
+				// uv
+				uvs.setXY( index, u, 1 - v );
+
+				// save index of vertex in respective row
+				indexRow.push( index );
+
+				// increase index
+				index ++;
+
+			}
+
+			// now save vertices of the row in our index array
+			indexArray.push( indexRow );
+
+		}
+
+		// generate indices
+
+		for ( x = 0; x < radialSegments; x ++ ) {
+
+			for ( y = 0; y < heightSegments; y ++ ) {
+
+				// we use the index array to access the correct indices
+				var i1 = indexArray[ y ][ x ];
+				var i2 = indexArray[ y + 1 ][ x ];
+				var i3 = indexArray[ y + 1 ][ x + 1 ];
+				var i4 = indexArray[ y ][ x + 1 ];
+
+				// face one
+				indices.setX( indexOffset, i1 ); indexOffset++;
+				indices.setX( indexOffset, i2 ); indexOffset++;
+				indices.setX( indexOffset, i4 ); indexOffset++;
+
+				// face two
+				indices.setX( indexOffset, i2 ); indexOffset++;
+				indices.setX( indexOffset, i3 ); indexOffset++;
+				indices.setX( indexOffset, i4 ); indexOffset++;
+
+			}
+
+		}
+
+	}
+
+	function generateCap ( top ) {
+
+		var x, centerIndexStart, centerIndexEnd;
+		var uv = new THREE.Vector2();
+		var vertex = new THREE.Vector3();
+
+		var radius = ( top === true ) ? radiusTop : radiusBottom;
+		var sign = ( top === true ) ? 1 : - 1;
+
+		// save the index of the first center vertex
+		centerIndexStart = index;
+
+		// first we generate the center vertex data of the cap.
+		// because the geometry needs one set of uvs per face,
+		// we must generate a center vertex per face/segment
+
+		for ( x = 1; x <= radialSegments; x ++ ) {
+
+			// vertex
+			vertices.setXYZ( index, 0, halfHeight * sign, 0 );
+
+			// normal
+			normals.setXYZ( index, 0, sign, 0 );
+
+			// uv
+			if( top === true ) {
+
+				uv.x = x / radialSegments;
+				uv.y = 0;
+
+			} else {
+
+				uv.x = ( x - 1 ) / radialSegments;
+				uv.y = 1;
+
+			}
+
+			uvs.setXY( index, uv.x, uv.y );
+
+			// increase index
+			index++;
+
+		}
+
+		// save the index of the last center vertex
+		centerIndexEnd = index;
+
+		// now we generate the surrounding vertices, normals and uvs
+
+		for ( x = 0; x <= radialSegments; x ++ ) {
+
+			var u = x / radialSegments;
+
+			// vertex
+			vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+			vertex.y = halfHeight * sign;
+			vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+			// normal
+			normals.setXYZ( index, 0, sign, 0 );
+
+			// uv
+			uvs.setXY( index, u, ( top === true ) ? 1 : 0 );
+
+			// increase index
+			index ++;
+
+		}
+
+		// generate indices
+
+		for ( x = 0; x < radialSegments; x ++ ) {
+
+			var c = centerIndexStart + x;
+			var i = centerIndexEnd + x;
+
+			if( top === true ) {
+
+				// face top
+				indices.setX( indexOffset, i ); indexOffset++;
+				indices.setX( indexOffset, i + 1 ); indexOffset++;
+				indices.setX( indexOffset, c ); indexOffset++;
+
+			} else {
+
+				// face bottom
+				indices.setX( indexOffset, i + 1); indexOffset++;
+				indices.setX( indexOffset, i ); indexOffset++;
+				indices.setX( indexOffset, c ); indexOffset++;
+
+			}
+
+		}
+
+	}
+
+};
+
+THREE.CylinderBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.CylinderBufferGeometry.prototype.constructor = THREE.CylinderBufferGeometry;
+
 // File:src/extras/geometries/CylinderGeometry.js
 
 /**
@@ -35785,152 +36084,8 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 		thetaLength: thetaLength
 	};
 
-	radiusTop = radiusTop !== undefined ? radiusTop : 20;
-	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
-	height = height !== undefined ? height : 100;
-
-	radialSegments = radialSegments || 8;
-	heightSegments = heightSegments || 1;
-
-	openEnded = openEnded !== undefined ? openEnded : false;
-	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
-
-	var heightHalf = height / 2;
-
-	var x, y, vertices = [], uvs = [];
-
-	for ( y = 0; y <= heightSegments; y ++ ) {
-
-		var verticesRow = [];
-		var uvsRow = [];
-
-		var v = y / heightSegments;
-		var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
-
-		for ( x = 0; x <= radialSegments; x ++ ) {
-
-			var u = x / radialSegments;
-
-			var vertex = new THREE.Vector3();
-			vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
-			vertex.y = - v * height + heightHalf;
-			vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
-
-			this.vertices.push( vertex );
-
-			verticesRow.push( this.vertices.length - 1 );
-			uvsRow.push( new THREE.Vector2( u, 1 - v ) );
-
-		}
-
-		vertices.push( verticesRow );
-		uvs.push( uvsRow );
-
-	}
-
-	var tanTheta = ( radiusBottom - radiusTop ) / height;
-	var na, nb;
-
-	for ( x = 0; x < radialSegments; x ++ ) {
-
-		if ( radiusTop !== 0 ) {
-
-			na = this.vertices[ vertices[ 0 ][ x ] ].clone();
-			nb = this.vertices[ vertices[ 0 ][ x + 1 ] ].clone();
-
-		} else {
-
-			na = this.vertices[ vertices[ 1 ][ x ] ].clone();
-			nb = this.vertices[ vertices[ 1 ][ x + 1 ] ].clone();
-
-		}
-
-		na.setY( Math.sqrt( na.x * na.x + na.z * na.z ) * tanTheta ).normalize();
-		nb.setY( Math.sqrt( nb.x * nb.x + nb.z * nb.z ) * tanTheta ).normalize();
-
-		for ( y = 0; y < heightSegments; y ++ ) {
-
-			var v1 = vertices[ y ][ x ];
-			var v2 = vertices[ y + 1 ][ x ];
-			var v3 = vertices[ y + 1 ][ x + 1 ];
-			var v4 = vertices[ y ][ x + 1 ];
-
-			var n1 = na.clone();
-			var n2 = na.clone();
-			var n3 = nb.clone();
-			var n4 = nb.clone();
-
-			var uv1 = uvs[ y ][ x ].clone();
-			var uv2 = uvs[ y + 1 ][ x ].clone();
-			var uv3 = uvs[ y + 1 ][ x + 1 ].clone();
-			var uv4 = uvs[ y ][ x + 1 ].clone();
-
-			this.faces.push( new THREE.Face3( v1, v2, v4, [ n1, n2, n4 ] ) );
-			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv4 ] );
-
-			this.faces.push( new THREE.Face3( v2, v3, v4, [ n2.clone(), n3, n4.clone() ] ) );
-			this.faceVertexUvs[ 0 ].push( [ uv2.clone(), uv3, uv4.clone() ] );
-
-		}
-
-	}
-
-	// top cap
-
-	if ( openEnded === false && radiusTop > 0 ) {
-
-		this.vertices.push( new THREE.Vector3( 0, heightHalf, 0 ) );
-
-		for ( x = 0; x < radialSegments; x ++ ) {
-
-			var v1 = vertices[ 0 ][ x ];
-			var v2 = vertices[ 0 ][ x + 1 ];
-			var v3 = this.vertices.length - 1;
-
-			var n1 = new THREE.Vector3( 0, 1, 0 );
-			var n2 = new THREE.Vector3( 0, 1, 0 );
-			var n3 = new THREE.Vector3( 0, 1, 0 );
-
-			var uv1 = uvs[ 0 ][ x ].clone();
-			var uv2 = uvs[ 0 ][ x + 1 ].clone();
-			var uv3 = new THREE.Vector2( uv2.x, 0 );
-
-			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ], undefined, 1 ) );
-			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
-
-		}
-
-	}
-
-	// bottom cap
-
-	if ( openEnded === false && radiusBottom > 0 ) {
-
-		this.vertices.push( new THREE.Vector3( 0, - heightHalf, 0 ) );
-
-		for ( x = 0; x < radialSegments; x ++ ) {
-
-			var v1 = vertices[ heightSegments ][ x + 1 ];
-			var v2 = vertices[ heightSegments ][ x ];
-			var v3 = this.vertices.length - 1;
-
-			var n1 = new THREE.Vector3( 0, - 1, 0 );
-			var n2 = new THREE.Vector3( 0, - 1, 0 );
-			var n3 = new THREE.Vector3( 0, - 1, 0 );
-
-			var uv1 = uvs[ heightSegments ][ x + 1 ].clone();
-			var uv2 = uvs[ heightSegments ][ x ].clone();
-			var uv3 = new THREE.Vector2( uv2.x, 1 );
-
-			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ], undefined, 2 ) );
-			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
-
-		}
-
-	}
-
-	this.computeFaceNormals();
+	this.fromBufferGeometry( new THREE.CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) );
+	this.mergeVertices();
 
 };
 
