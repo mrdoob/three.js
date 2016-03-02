@@ -575,33 +575,34 @@ THREE.WebGLProgram = ( function () {
 				'\n'
 
 			].filter( filterEmptyLine ).join( '\n' );
-
-			var slotUVChannelsCode = "";
-			var slotTexelTransformCode = "";
-			var slotUvChannels = [];
-			for( var i = 0; i < supportedSlots.length; i ++ ) {
-				var slotName = supportedSlots[i];
-				var slot = material[ slotName + 'Slot' ];
-				if( slot || material[ slotName ] ) {
-					if( slot && ! slotUvChannels[ slot.uvChannel ]) slotUvChannels[ slot.uvChannel ] = true;
-					slotTexelTransformCode += getTexelTransformFunction( slotName, slot );
-					slotUVChannelsCode += "uniform sampler2D " + slotName + ";\n";
-					slotUVChannelsCode += getUVFunction( slotName, slot, false );
-				}
-			}
-			if( Object.keys( slotUvChannels ).length > 0 ) {
-				var slotUVPrefix = "";
-				slotUVPrefix += "#define TEXTURE_SLOTS\n";
-				for( var uvChannel in slotUvChannels ) {
-					uvChannel = parseInt( uvChannel );
-					var uvChannelName = "vUv";
-					if( uvChannel > 0 ) uvChannelName += '' + ( uvChannel + 1 );
-					slotUVPrefix += "varying vec2 " + uvChannelName + ";\n";
-				}
-				prefixFragment += slotUVPrefix + slotUVChannelsCode;
-			}
-			prefixFragment += slotTexelTransformCode;
 		}
+
+
+		var slotUVChannelsCode = "";
+		var slotTexelTransformCode = "";
+		var slotUvChannels = [];
+		for( var i = 0; i < supportedSlots.length; i ++ ) {
+			var slotName = supportedSlots[i];
+			var slot = material[ slotName + 'Slot' ];
+			if( material[ slotName ] || ( slot && slot.texture ) ) {
+				if( slot && ! slotUvChannels[ slot.uvChannel ]) slotUvChannels[ slot.uvChannel ] = true;
+				slotTexelTransformCode += getTexelTransformFunction( slotName, slot );
+				slotUVChannelsCode += "uniform sampler2D " + slotName + ";\n";
+				slotUVChannelsCode += getUVFunction( slotName, slot, false );
+			}
+		}
+		if( Object.keys( slotUvChannels ).length > 0 ) {
+			var slotUVPrefix = "";
+			slotUVPrefix += "#define TEXTURE_SLOTS\n";
+			for( var uvChannel in slotUvChannels ) {
+				uvChannel = parseInt( uvChannel );
+				var uvChannelName = "vUv";
+				if( uvChannel > 0 ) uvChannelName += '' + ( uvChannel + 1 );
+				slotUVPrefix += "varying vec2 " + uvChannelName + ";\n";
+			}
+			prefixFragment += slotUVPrefix + slotUVChannelsCode;
+		}
+		prefixFragment += slotTexelTransformCode;
 
 		vertexShader = parseIncludes( vertexShader, parameters );
 		vertexShader = replaceLightNums( vertexShader, parameters );

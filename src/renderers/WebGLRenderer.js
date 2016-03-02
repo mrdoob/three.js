@@ -1894,6 +1894,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Uniforms (refresh uniforms objects)
 
+	var supportedSlots = [
+		'map', 'lightMap', 'aoMap', 'emissiveMap', 'specularMap', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'alphaMap'
+	];
+
 	function refreshUniformsCommon ( uniforms, material ) {
 
 		uniforms.opacity.value = material.opacity;
@@ -1906,13 +1910,36 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		uniforms.map.value = material.map;
-		uniforms.specularMap.value = material.specularMap;
-		uniforms.alphaMap.value = material.alphaMap;
+		for( var i = 0; i < supportedSlots.length; i ++ ) {
+			var slotName = supportedSlots[i];
+			var slot = material[ slotName + 'Slot' ];
+			if( slot ) {
+				uniforms[slotName].value = slot.texture;
+				if( slot.uvTransform ) {
+					uniforms[slotName +"UVTransformParams"].value.set(
+						slot.uvOffset.x,
+						slot.uvOffset.y,
+						slot.uvRepeat.x,
+						slot.uvRepeat.y );
+				}
+				if( slot.texelTransform ) {
+					var texelTransform = slot.getFlattenedTexelTransform();
+					uniforms[slotName +"TexelTransformParams"].value.set(
+						texelTransform.texelScale,
+						texelTransform.texelOffset );
+				}
+			}
+			else if( material[ slotName ] ) {
+				uniforms[slotName].value = material[slotName];
+			}
+		}
+		//uniforms.map.value = material.map;
+		//uniforms.specularMap.value = material.specularMap;
+		//uniforms.alphaMap.value = material.alphaMap;
 
 		if ( material.aoMap ) {
 
-			uniforms.aoMap.value = material.aoMap;
+			//uniforms.aoMap.value = material.aoMap;
 			uniforms.aoMapIntensity.value = material.aoMapIntensity;
 
 		}

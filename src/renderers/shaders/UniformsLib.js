@@ -10,10 +10,17 @@ THREE.UniformsLib = {
 		"opacity": { type: "f", value: 1.0 },
 
 		"map": { type: "t", value: null },
+		"mapUVTransformParams": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"mapTexelTransformParams": { type: "v2", value: new THREE.Vector2( 1, 0 ) },
 		"offsetRepeat": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
 		"specularMap": { type: "t", value: null },
+		"specularMapUVTransformParams": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"specularMapTexelTransformParams": { type: "v2", value: new THREE.Vector2( 1, 0 ) },
+
 		"alphaMap": { type: "t", value: null },
+		"alphaMapUVTransformParams": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"alphaMapTexelTransformParams": { type: "v2", value: new THREE.Vector2( 1, 0 ) },
 
 		"envMap": { type: "t", value: null },
 		"flipEnvMap": { type: "f", value: - 1 },
@@ -25,6 +32,8 @@ THREE.UniformsLib = {
 	aomap: {
 
 		"aoMap": { type: "t", value: null },
+		"aoMapUVTransformParams": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"aoMapTexelTransformParams": { type: "v2", value: new THREE.Vector2( 1, 0 ) },
 		"aoMapIntensity": { type: "f", value: 1 }
 
 	},
@@ -32,47 +41,62 @@ THREE.UniformsLib = {
 	lightmap: {
 
 		"lightMap": { type: "t", value: null },
+		"lightMapUVTransformParams": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"lightMapTexelTransformParams": { type: "v2", value: new THREE.Vector2( 1, 0 ) },
 		"lightMapIntensity": { type: "f", value: 1 }
 
 	},
 
 	emissivemap: {
 
-		"emissiveMap": { type: "t", value: null }
+		"emissiveMap": { type: "t", value: null },
+		"emissiveMapUVTransformParams": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"emissiveMapTexelTransformParams": { type: "v2", value: new THREE.Vector2( 1, 0 ) }
 
 	},
 
 	bumpmap: {
 
 		"bumpMap": { type: "t", value: null },
-		"bumpScale": { type: "f", value: 1 }
+		"bumpScale": { type: "f", value: 1 }, // for backwards compatibility
+		"bumpMapUVTransformParams": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"bumpMapTexelTransformParams": { type: "v2", value: new THREE.Vector2( 1, 0 ) }
 
 	},
 
 	normalmap: {
 
 		"normalMap": { type: "t", value: null },
-		"normalScale": { type: "v2", value: new THREE.Vector2( 1, 1 ) }
+		"normalScale": { type: "v2", value: new THREE.Vector2( 1, 1 ) }, // for backwards compatibility
+		"normalScale": { type: "v2", value: new THREE.Vector2( 1, 1 ) },
+		"normalMapUVTransformParams": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"normalMapTexelTransformParams": { type: "v2", value: new THREE.Vector2( 1, 0 ) }
 
 	},
 
 	displacementmap: {
 
 		"displacementMap": { type: "t", value: null },
-		"displacementScale": { type: "f", value: 1 },
-		"displacementBias": { type: "f", value: 0 }
+		"displacementScale": { type: "f", value: 1 }, // for backwards compatibility
+		"displacementBias": { type: "f", value: 0 }, // for backwards compatibility
+		"displacementMapUVTransformParams": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"displacementMapTexelTransformParams": { type: "v2", value: new THREE.Vector2( 1, 0 ) }
 
 	},
 
 	roughnessmap: {
 
-		"roughnessMap": { type: "t", value: null }
+		"roughnessMap": { type: "t", value: null },
+		"roughnessMapUVTransformParams": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"roughnessMapTexelTransformParams": { type: "v2", value: new THREE.Vector2( 1, 0 ) }
 
 	},
 
 	metalnessmap: {
 
-		"metalnessMap": { type: "t", value: null }
+		"metalnessMap": { type: "t", value: null },
+		"metalnessMapUVTransformParams": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"metalnessMapTexelTransformParams": { type: "v2", value: new THREE.Vector2( 1, 0 ) }
 
 	},
 
