@@ -7,10 +7,6 @@ THREE.WebGLProgram = ( function () {
 	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/;
 	var arrayRe = /^([\w\d_]+)\[0\]$/;
 
-	var supportedSlots = [
-		'map', 'lightMap', 'aoMap', 'emissiveMap', 'specularMap', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'alphaMap'
-	];
-
 	function getEncodingComponents( encoding ) {
 
 		switch ( encoding ) {
@@ -577,6 +573,8 @@ THREE.WebGLProgram = ( function () {
 			].filter( filterEmptyLine ).join( '\n' );
 		}
 
+
+		var supportedSlots = THREE.TextureSlot.SupportedSlotNames;
 
 		var slotUVChannelsCode = "";
 		var slotTexelTransformCode = "";

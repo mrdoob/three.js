@@ -1894,10 +1894,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Uniforms (refresh uniforms objects)
 
-	var supportedSlots = [
-		'map', 'lightMap', 'aoMap', 'emissiveMap', 'specularMap', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'alphaMap'
-	];
-
 	function refreshUniformsCommon ( uniforms, material ) {
 
 		uniforms.opacity.value = material.opacity;
@@ -1910,6 +1906,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		var supportedSlots = THREE.TextureSlot.SupportedSlotNames;
 		for( var i = 0; i < supportedSlots.length; i ++ ) {
 			var slotName = supportedSlots[i];
 			var slot = material[ slotName + 'Slot' ];

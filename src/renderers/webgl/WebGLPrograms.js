@@ -14,10 +14,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		PointsMaterial: 'points'
 	};
 
-	var supportedSlots = [
-		'map', 'lightMap', 'aoMap', 'emissiveMap', 'specularMap', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'alphaMap'
-	];
-
 	var parameterNames = [
 		"precision", "supportsVertexTextures", "mapEncoding", "envMap", "envMapMode", "envMapEncoding",
 		"emissiveMapEncoding",
@@ -31,6 +27,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"alphaTest", "doubleSided", "flipSided"
 	];
 
+	var supportedSlots = THREE.TextureSlot.SupportedSlotNames;
 	for( var i = 0; i < supportedSlots.length; i ++ ) {
 		var name = supportedSlots[i];
 		parameterNames.push( name );
@@ -182,6 +179,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			flipSided: material.side === THREE.BackSide
 
 		};
+
+		var supportedSlots = THREE.TextureSlot.SupportedSlotNames;
 
 		for( var i = 0; i < supportedSlots.length; i ++ ) {
 			var name = supportedSlots[i];

@@ -65,3 +65,7 @@ THREE.TextureSlot.prototype = {
   }
 
 };
+
+THREE.TextureSlot.SupportedSlotNames = [
+	'map', 'lightMap', 'aoMap', 'emissiveMap', 'specularMap', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'alphaMap'
+];
