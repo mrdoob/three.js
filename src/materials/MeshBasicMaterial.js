@@ -20,7 +20,7 @@
  *  refractionRatio: <float>,
  *
  *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
+ *  blending: THREE.PremultipliedAlphaBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -61,6 +61,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
+	this.blending = THREE.PremultipliedAlphaBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
