@@ -14,8 +14,9 @@ float punctualLightIntensityToIrradianceFactor( const in float lightDistance, co
 			// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
 			// this is intended to be used on spot and point lights who are represented as luminous intensity
 			// but who must be converted to luminous irradiance for surface lighting calculation
-			return pow( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ), decayExponent ) /
-				max( pow( lightDistance, decayExponent ), 0.01 );
+			float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
+			float maxDistanceCutoffFactor = exp2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) ) ;
+			return distanceFalloff * maxDistanceCutoffFactor;
 
 #else
 
