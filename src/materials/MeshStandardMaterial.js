@@ -191,11 +191,11 @@ var closure = function () {
 		},
 		"bumpScale": {
 		  get: function() {
-				return this.emissiveMapSlot.texelScale;
+				return this.bumpMapSlot.texelScale;
 		  },
 			set: function( value ) {
-				this.emissiveMapSlot.texelTransform = true;
-				this.emissiveMapSlot.texelScale = value;
+				this.bumpMapSlot.texelTransform = true;
+				this.bumpMapSlot.texelScale = value;
 			}
 		},
 		"normalMap": {
