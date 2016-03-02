@@ -118,7 +118,7 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
-	this.blending = THREE.PremultipliedAlphaNormalBlending;
+	this.blending = THREE.PremultipliedAlphaBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
