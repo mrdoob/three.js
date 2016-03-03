@@ -75,7 +75,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 0.0, 40, 40 * 3.5 );
+				camera.position.set( 0.0, 80, 40 * 3.5 );
 
 				scene = new THREE.Scene();
 
@@ -85,62 +85,53 @@
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					bumpScale: - 0.05,
 					color: 0xffffff,
+					emissive: 0xffffff,
 					metalness: 0.9,
 					roughness: 0.8,
+					normalScale: new THREE.Vector2( 1, -1 ),
 					shading: THREE.SmoothShading,
 					transparent: true,
 					blending: THREE.PremultipliedAlphaBlending
 				} );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "../examples/textures/brick_diffuse.jpg", function( map ) {
+				textureLoader.load( "../examples/textures/planets/earth_atmos_2048.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
-					standardMaterial.mapSlot.uvRepeat.set( 9, 0.5 );
 					standardMaterial.map = map;
 					standardMaterial.needsUpdate = true;
 				} );
-				textureLoader.load( "../examples/textures/brick_bump.jpg", function( map ) {
+				textureLoader.load( "../examples/textures/planets/earth_normal_2048.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
-					standardMaterial.bumpMapSlot.uvRepeat.set( 9, 0.5 );
-					standardMaterial.bumpMap = map;
+					standardMaterial.normalMap = map;
 					standardMaterial.needsUpdate = true;
 				} );
-				textureLoader.load( "../examples/textures/brick_roughness.jpg", function( map ) {
+				textureLoader.load( "../examples/textures/planets/earth_specular_2048.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
-					standardMaterial.roughnessMapSlot.uvRepeat.set( 9, 0.5 );
 					standardMaterial.roughnessMap = map;
 					standardMaterial.needsUpdate = true;
 				} );
+				textureLoader.load( "../examples/textures/planets/earth_lights_2048.png", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					standardMaterial.emissiveMap = map;
+					standardMaterial.needsUpdate = true;
+				} );
 
-				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
+
+				var geometry = new THREE.SphereGeometry( 35, 36, 36 );
 				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
 				torusMesh1.position.x = 0.0;
 				torusMesh1.castShadow = true;
 				torusMesh1.receiveShadow = true;
 				scene.add( torusMesh1 );
 				objects.push( torusMesh1 );
-
-				floorMaterial = new THREE.MeshStandardMaterial( {
-					map: null,
-					roughnessMap: null,
-					color: 0xffffff,
-					metalness: 0.0,
-					roughness: 0.0,
-					shading: THREE.SmoothShading
-				} );
-
-				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
-				planeMesh1.position.y = - 50;
-				planeMesh1.rotation.x = - Math.PI * 0.5;
-				planeMesh1.receiveShadow = true;
-				scene.add( planeMesh1 );
 
 				// Materials
 				var hdrpath = "../examples/textures/cube/hdrPisa/";
@@ -160,6 +151,7 @@
 					pmremCubeUVPacker.update( renderer );
 
 					standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget;
+					standardMaterial.envMapIntensity = 3;
 					standardMaterial.needsUpdate = true;
 
 				} );
@@ -180,6 +172,8 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMappingExposure = 4;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
@@ -210,7 +204,7 @@
 				params = {};
 
 				var slotParams = function( slotName ) {
-					params[ slotName + 'TexelInvert'] = false;
+					params[ slotName + 'TexelInvert'] = ( slotName === 'rough' );
 					gui.add( params, slotName + 'TexelInvert' );
 					if( slotName === "bump" ) {
 						params[ slotName + 'TexelOffset'] = 0;
@@ -218,23 +212,28 @@
 						gui.add( params, slotName + 'TexelScale', -0.1, 0.1 );
 					}
 					else {
-						params[ slotName + 'TexelOffset'] = 0;
-						gui.add( params, slotName + 'TexelOffset', -1, 1 );
-						params[ slotName + 'TexelScale'] = 1;
-						gui.add( params, slotName + 'TexelScale', -1, 1 );
+						params[ slotName + 'TexelOffset'] = ( slotName === 'rough' ) ? 0.4 : 0;
+						if( slotName === 'rough' ) params[ slotName + 'TexelScale'] = 0.6;
+						else if( slotName === 'emissive' ) params[ slotName + 'TexelScale'] = 0.3;
+						else params[ slotName + 'TexelScale'] = 1.0;
+						if( slotName !== "normal" ) {
+							gui.add( params, slotName + 'TexelOffset', -1, 1 );
+							gui.add( params, slotName + 'TexelScale', -1, 1 );
+						}
 					}
 					params[ slotName + 'UVOffsetX'] = 0;
 					gui.add( params, slotName + 'UVOffsetX', 0, 1 );
 					params[ slotName + 'UVOffsetY'] = 0;
 					gui.add( params, slotName + 'UVOffsetY', 0, 1 );
-					params[ slotName + 'UVRepeatX'] = 4;
-					gui.add( params, slotName + 'UVRepeatX', -5, 5 );
+					params[ slotName + 'UVRepeatX'] = 1;
+					gui.add( params, slotName + 'UVRepeatX', 0.01, 5 );
 					params[ slotName + 'UVRepeatY'] = 1;
-					gui.add( params, slotName + 'UVRepeatY', -5, 5 );
+					gui.add( params, slotName + 'UVRepeatY', 0.01, 5 );
 				};
 				slotParams( "map" );
-				slotParams( "bump" );
+				slotParams( "normal" );
 				slotParams( "rough" );
+				slotParams( "emissive" );
 				gui.open();
 
 			}
@@ -279,8 +278,9 @@
 						slot.uvOffset.y = params[ name + 'UVOffsetY'];
 					}
 					setSlot( standardMaterial.mapSlot, "map" );
-					setSlot( standardMaterial.bumpMapSlot, "bump" );
+					setSlot( standardMaterial.normalMapSlot, "normal" );
 					setSlot( standardMaterial.roughnessMapSlot, "rough" );
+					setSlot( standardMaterial.emissiveMapSlot, "emissive" );
 				}
 
 				var timer = Date.now() * 0.00025;
