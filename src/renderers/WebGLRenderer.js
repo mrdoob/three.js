@@ -1914,10 +1914,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms[slotName].value = slot.texture;
 				if( slot.uvTransform ) {
 					uniforms[slotName +"UVTransformParams"].value.set(
-						slot.uvOffset.x,
-						slot.uvOffset.y,
 						slot.uvRepeat.x,
-						slot.uvRepeat.y );
+						slot.uvRepeat.y,
+						slot.uvOffset.x,
+						slot.uvOffset.y );
 				}
 				if( slot.texelTransform ) {
 					var texelTransform = slot.getFlattenedTexelTransform();
