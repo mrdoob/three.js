@@ -43,9 +43,16 @@ const float cubeUV_rcpTextureSize = 1.0 / float(CUBE_UV_TEXTURE_SIZE);
 vec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel) {
     mipLevel = roughnessLevel > cubeUV_maxLods2 - 3.0 ? 0.0 : mipLevel;
     float a = 16.0 * cubeUV_rcpTextureSize;
-    float powScale = exp2(roughnessLevel + mipLevel);
-    float scale = 1.0/exp2(roughnessLevel + 2.0 + mipLevel);
-    float mipOffset = 0.75*(1.0 - 1.0/exp2(mipLevel))/exp2(roughnessLevel);
+
+    vec2 exp2_packed = exp2( vec2( roughnessLevel, mipLevel ) );
+    vec2 rcp_exp2_packed = vec2( 1.0 ) / exp2_packed;
+    // float powScale = exp2(roughnessLevel + mipLevel);
+    float powScale = exp2_packed.x * exp2_packed.y;
+    // float scale =  1.0 / exp2(roughnessLevel + 2.0 + mipLevel);
+    float scale = rcp_exp2_packed.x * rcp_exp2_packed.y * 0.25;
+    // float mipOffset = 0.75*(1.0 - 1.0/exp2(mipLevel))/exp2(roughnessLevel);
+    float mipOffset = 0.75*(1.0 - rcp_exp2_packed.y) * rcp_exp2_packed.x;
+
     bool bRes = mipLevel == 0.0;
     scale =  bRes && (scale < a) ? a : scale;
 
