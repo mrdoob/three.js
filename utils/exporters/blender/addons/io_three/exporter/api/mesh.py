@@ -179,7 +179,8 @@ def buffer_mat_groups(mesh):
                     mat_by_face_index[face.material_index] = mat_index
 
         for vertex_index in face.vertices:
-            mat_indexes.append(mat_by_face_index[face.material_index])
+            if face.material_index in mat_by_face_index:
+                mat_indexes.append(mat_by_face_index[face.material_index])
 
     groups = []
     cur_mat_idx = None
@@ -545,6 +546,9 @@ def materials(mesh):
 
     """
     logger.debug("mesh.materials(%s)", mesh)
+
+    if len(mesh.materials) == 0:
+        return []
 
     indices = []
     for face in mesh.tessfaces:
