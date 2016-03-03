@@ -2,6 +2,7 @@
 
 #ifdef ENVMAP_TYPE_CUBE_UV
 
+#define CUBE_UV_TEXTURE_SIZE 1024
 
 int getFaceFromDirection(vec3 direction) {
     vec3 absDirection = abs(direction);
@@ -21,28 +22,28 @@ int getFaceFromDirection(vec3 direction) {
     return face;
 }
 
-vec2 MipLevelInfo( vec3 vec, float textureSize, float roughnessLevel, float roughness ) {
-    float s = log2(textureSize*0.25) - 1.0;
-    float scale = pow(2.0, s - roughnessLevel);
+vec2 MipLevelInfo( vec3 vec, float roughnessLevel, float roughness ) {
+    float s = log2(float(CUBE_UV_TEXTURE_SIZE)*0.25) - 1.0;
+    float scale = exp2(s - roughnessLevel);
     float dxRoughness = dFdx(roughness);
     float dyRoughness = dFdy(roughness);
     vec3 dx = dFdx( vec * scale * dxRoughness );
     vec3 dy = dFdy( vec * scale * dyRoughness );
     float d = max( dot( dx, dx ), dot( dy, dy ) );
     // Clamp the value to the max mip level counts. hard coded to 6 mips
-    float rangeClamp = pow(2.0, (6.0 - 1.0) * 2.0);
+    float rangeClamp = exp2((6.0 - 1.0) * 2.0);
     d = clamp(d, 1.0, rangeClamp);
     float mipLevel = 0.5 * log2(d);
     return vec2(floor(mipLevel), fract(mipLevel));
 }
 
-vec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel, float textureSize) {
-    float maxLods =  log2(textureSize*0.25) - 2.0;
+vec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel) {
+    float maxLods = log2(float(CUBE_UV_TEXTURE_SIZE)*0.25) - 2.0;
     mipLevel = roughnessLevel > maxLods - 3.0 ? 0.0 : mipLevel;
-    float a = 16.0/textureSize;
-    float powScale = pow(2.0,roughnessLevel + mipLevel);
-    float scale = 1.0/pow(2.0,roughnessLevel + 2.0 + mipLevel);
-    float mipOffset = 0.75*(1.0 - 1.0/pow(2.0, mipLevel))/pow(2.0,roughnessLevel);
+    float a = 16.0/float(CUBE_UV_TEXTURE_SIZE);
+    float powScale = exp2(roughnessLevel + mipLevel);
+    float scale = 1.0/exp2(roughnessLevel + 2.0 + mipLevel);
+    float mipOffset = 0.75*(1.0 - 1.0/exp2(mipLevel))/exp2(roughnessLevel);
     bool bRes = mipLevel == 0.0;
     scale =  bRes && (scale < a) ? a : scale;
 
@@ -50,42 +51,45 @@ vec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel, float textu
     vec2 offset;
     int face = getFaceFromDirection(direction);
 
+    float rcpPowScale = 1.0 / powScale;
+
     if( face == 0) {
         r = vec3(direction.x, -direction.z, direction.y);
-        offset = vec2(0.0+mipOffset,0.75/powScale);
+        offset = vec2(0.0+mipOffset,0.75 * rcpPowScale);
         offset.y = bRes && (offset.y < 2.0*a) ?  a : offset.y;
     }
     else if( face == 1) {
         r = vec3(direction.y, direction.x, direction.z);
-        offset = vec2(scale+mipOffset, 0.75/powScale);
+        offset = vec2(scale+mipOffset, 0.75 * rcpPowScale);
         offset.y = bRes && (offset.y < 2.0*a) ?  a : offset.y;
     }
     else if( face == 2) {
         r = vec3(direction.z, direction.x, direction.y);
-        offset = vec2(2.0*scale+mipOffset, 0.75/powScale);
+        offset = vec2(2.0*scale+mipOffset, 0.75 * rcpPowScale);
         offset.y = bRes && (offset.y < 2.0*a) ?  a : offset.y;
     }
     else if( face == 3) {
         r = vec3(direction.x, direction.z, direction.y);
-        offset = vec2(0.0+mipOffset,0.5/powScale);
+        offset = vec2(0.0+mipOffset,0.5 * rcpPowScale);
         offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;
     }
     else if( face == 4) {
         r = vec3(direction.y, direction.x, -direction.z);
-        offset = vec2(scale+mipOffset, 0.5/powScale);
+        offset = vec2(scale+mipOffset, 0.5 * rcpPowScale);
         offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;
     }
     else {
         r = vec3(direction.z, -direction.x, direction.y);
-        offset = vec2(2.0*scale+mipOffset, 0.5/powScale);
+        offset = vec2(2.0*scale+mipOffset, 0.5 * rcpPowScale);
         offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;
     }
     r = normalize(r);
-    float texelOffset = 0.5/textureSize;
+    float texelOffset = 0.5/float(CUBE_UV_TEXTURE_SIZE);
     float s1 = (r.y/abs(r.x) + 1.0)*0.5;
     float s2 = (r.z/abs(r.x) + 1.0)*0.5;
-    vec2 uv = offset + vec2(s1*scale, s2*scale);
-    float min_x = offset.x + texelOffset; float max_x = offset.x + scale - texelOffset;
+    vec2 uv = offset + vec2(s1, s2) * scale;
+    float min_x = offset.x + texelOffset;
+    float max_x = offset.x + scale - texelOffset;
     float min_y = offset.y + texelOffset;
     float max_y = offset.y + scale - texelOffset;
     float delx = max_x - min_x;
@@ -95,13 +99,13 @@ vec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel, float textu
     return uv;
 }
 
-vec4 textureCubeUV(vec3 reflectedDirection, float roughness, float textureSize) {
-    float maxLods =  log2(textureSize*0.25) - 3.0;
+vec4 textureCubeUV(vec3 reflectedDirection, float roughness ) {
+    float maxLods =  log2(float(CUBE_UV_TEXTURE_SIZE)*0.25) - 3.0;
     float roughnessVal = roughness*maxLods;
     float r1 = floor(roughnessVal);
     float r2 = r1 + 1.0;
     float t = fract(roughnessVal);
-    vec2 mipInfo = MipLevelInfo(reflectedDirection, textureSize, r1, roughness);
+    vec2 mipInfo = MipLevelInfo(reflectedDirection, r1, roughness);
     float s = mipInfo.y;
     float level0 = mipInfo.x;
     float level1 = level0 + 1.0;
@@ -113,20 +117,20 @@ vec4 textureCubeUV(vec3 reflectedDirection, float roughness, float textureSize) 
 #endif
 
     // Tri linear interpolation.
-    vec2 uv_10 = getCubeUV(reflectedDirection, r1, level0, textureSize);
+    vec2 uv_10 = getCubeUV(reflectedDirection, r1, level0);
     vec4 color10 = envMapTexelToLinear(texture2D(envMap, uv_10));
 
-    vec2 uv_20 = getCubeUV(reflectedDirection, r2, level0, textureSize);
+    vec2 uv_20 = getCubeUV(reflectedDirection, r2, level0);
     vec4 color20 = envMapTexelToLinear(texture2D(envMap, uv_20));
 
     vec4 result = mix(color10, color20, t);
 
 #if ! defined( DISABLE_CUBE_UV_MIPMAP_INTERPOLATION )
 
-    vec2 uv_11 = getCubeUV(reflectedDirection, r1, level1, textureSize);
+    vec2 uv_11 = getCubeUV(reflectedDirection, r1, level1);
     vec4 color11 = envMapTexelToLinear(texture2D(envMap, uv_11));
 
-    vec2 uv_21 = getCubeUV(reflectedDirection, r2, level1, textureSize);
+    vec2 uv_21 = getCubeUV(reflectedDirection, r2, level1);
     vec4 color21 = envMapTexelToLinear(texture2D(envMap, uv_21));
 
     vec4 c2 = mix(color11, color21, t);
