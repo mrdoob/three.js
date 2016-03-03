@@ -94,18 +94,9 @@ vec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel) {
     }
     r = normalize(r);
     float texelOffset = 0.5 * cubeUV_rcpTextureSize;
-    float s1 = (r.y/abs(r.x) + 1.0)*0.5;
-    float s2 = (r.z/abs(r.x) + 1.0)*0.5;
-    vec2 uv = offset + vec2(s1, s2) * scale;
-    float min_x = offset.x + texelOffset;
-    float max_x = offset.x + scale - texelOffset;
-    float min_y = offset.y + texelOffset;
-    float max_y = offset.y + scale - texelOffset;
-    float delx = max_x - min_x;
-    float dely = max_y - min_y;
-    uv.x = min_x + s1*delx;
-    uv.y = min_y + s2*dely;
-    return uv;
+    vec2 s = ( r.yz / abs( r.x ) + vec2( 1.0 ) ) * 0.5;
+    vec2 base = offset + vec2( texelOffset );
+    return base + s * ( scale - 2.0 * texelOffset );
 }
 
 const float cubeUV_maxLods3 = log2(float(CUBE_UV_TEXTURE_SIZE)*0.25) - 3.0;
