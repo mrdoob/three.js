@@ -68,7 +68,6 @@ THREE.UniformsLib = {
 
 		"normalMap": { type: "t", value: null },
 		"normalScale": { type: "v2", value: new THREE.Vector2( 1, 1 ) }, // for backwards compatibility
-		"normalScale": { type: "v2", value: new THREE.Vector2( 1, 1 ) },
 		"normalMapUVTransformParams": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 		"normalMapTexelTransformParams": { type: "v2", value: new THREE.Vector2( 1, 0 ) }
 
