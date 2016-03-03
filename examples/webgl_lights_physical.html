@@ -63,6 +63,7 @@
 				"400 lm (40W)": 400,
 				"180 lm (25W)": 180,
 				"20 lm (4W)": 20,
+				"Off": 0
 			};
 
 			// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
@@ -215,11 +216,22 @@
 				ballMesh.castShadow = true;
 				scene.add( ballMesh );
 
-				var boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+				var boxGeometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
 				var boxMesh = new THREE.Mesh( boxGeometry, cubeMat );
-				boxMesh.position.set( -3, 0.5, -2 );
+				boxMesh.position.set( -0.5, 0.25, -1 );
 				boxMesh.castShadow = true;
 				scene.add( boxMesh );
+
+				var boxMesh2 = new THREE.Mesh( boxGeometry, cubeMat );
+				boxMesh2.position.set( 0, 0.25, -5 );
+				boxMesh2.castShadow = true;
+				scene.add( boxMesh2 );
+
+				var boxMesh3 = new THREE.Mesh( boxGeometry, cubeMat );
+				boxMesh3.position.set( 7, 0.25, 0 );
+				boxMesh3.castShadow = true;
+				scene.add( boxMesh3 );
+
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.physicallyCorrect = true;
