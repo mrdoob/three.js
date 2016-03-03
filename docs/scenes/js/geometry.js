@@ -451,6 +451,40 @@ var guis = {
 
 	},
 
+	RingBufferGeometry : function( mesh ) {
+
+		var data = {
+			innerRadius : 5,
+			outerRadius : 10,
+			thetaSegments : 8,
+			phiSegments : 8,
+			thetaStart : 0,
+			thetaLength : twoPi,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.RingBufferGeometry(
+					data.innerRadius, data.outerRadius, data.thetaSegments, data.phiSegments, data.thetaStart, data.thetaLength
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.RingBufferGeometry' );
+
+		folder.add( data, 'innerRadius', 0, 30 ).onChange( generateGeometry );
+		folder.add( data, 'outerRadius', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'thetaSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'phiSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	RingGeometry : function( mesh ) {
 
 		var data = {
