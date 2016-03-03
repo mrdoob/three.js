@@ -1,4 +1,7 @@
+#define DISABLE_CUBE_UV_MIPMAP_INTERPOLATION
+
 #ifdef ENVMAP_TYPE_CUBE_UV
+
 
 int getFaceFromDirection(vec3 direction) {
     vec3 absDirection = abs(direction);
@@ -103,19 +106,38 @@ vec4 textureCubeUV(vec3 reflectedDirection, float roughness, float textureSize) 
     float level0 = mipInfo.x;
     float level1 = level0 + 1.0;
     level1 = level1 > 5.0 ? 5.0 : level1;
+
+#if defined( DISABLE_CUBE_UV_MIPMAP_INTERPOLATION )
+    level0 += min( floor( s + 1.0 ), 5.0 );
+#endif
+
     // Tri linear interpolation.
     vec2 uv_10 = getCubeUV(reflectedDirection, r1, level0, textureSize);
-    vec2 uv_11 = getCubeUV(reflectedDirection, r1, level1, textureSize);
-    vec2 uv_20 = getCubeUV(reflectedDirection, r2, level0, textureSize);
-    vec2 uv_21 = getCubeUV(reflectedDirection, r2, level1, textureSize);
     vec4 color10 = envMapTexelToLinear(texture2D(envMap, uv_10));
-    vec4 color11 = envMapTexelToLinear(texture2D(envMap, uv_11));
+
+    vec2 uv_20 = getCubeUV(reflectedDirection, r2, level0, textureSize);
     vec4 color20 = envMapTexelToLinear(texture2D(envMap, uv_20));
+
+    vec4 result = mix(color10 , color20,  t);
+
+#if ! defined( DISABLE_CUBE_UV_MIPMAP_INTERPOLATION )
+
+    vec2 uv_11 = getCubeUV(reflectedDirection, r1, level1, textureSize);
+    vec4 color11 = envMapTexelToLinear(texture2D(envMap, uv_11));
+
+    vec2 uv_21 = getCubeUV(reflectedDirection, r2, level1, textureSize);
     vec4 color21 = envMapTexelToLinear(texture2D(envMap, uv_21));
+
+    vec4 c2 = mix(color11 , color21,  t);
+    result = mix(result , c2,  s);
+    
+#endif
+/*
     vec4 c1 = mix(color10 , color11,  s);
     vec4 c2 = mix(color20 , color21,  s);
-    vec4 c3 = mix(c1 , c2,  t);
-    return vec4(c3.rgb, 1.0);
+    vec4 c3 = mix(c1 , c2,  t);*/
+
+    return vec4(result.rgb, 1.0);
 }
 
 #endif
