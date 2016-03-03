@@ -66,19 +66,16 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.type = 'MeshStandardMaterial';
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
-	this.roughness = 0.5;
-	this.metalness = 0.5;
-
 	//this.map = null;
 	this.mapSlot = new THREE.TextureSlot( "map", 0, false, false );
 
-	//this.lightMap = null;
-	//this.lightMapIntensity = 1.0;
-	this.lightMapSlot = new THREE.TextureSlot( "lightMap", 1, false, true );
+	this.roughness = 0.5;
+	//this.roughnessMap = null;
+	this.roughnessMapSlot = new THREE.TextureSlot( "roughnessMap", 0, false, false );
 
-	//this.aoMap = null;
-	this.aoMapIntensity = 1.0;
-	this.aoMapSlot = new THREE.TextureSlot( "aoMap", 1, false, true );
+	this.metalness = 0.5;
+	//this.metalnessMap = null;
+	this.metalnessMapSlot = new THREE.TextureSlot( "metalnessMap", 0, false, false );
 
 	this.emissive = new THREE.Color( 0x000000 );
 	this.emissiveIntensity = 1.0;
@@ -98,17 +95,16 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	//this.displacementBias = 0;
 	this.displacementMapSlot = new THREE.TextureSlot( "displacementMap", 0, false, true );
 
-	//this.roughnessMap = null;
-	this.roughnessMapSlot = new THREE.TextureSlot( "roughnessMap", 0, false, false );
+	//this.lightMap = null;
+	//this.lightMapIntensity = 1.0;
+	this.lightMapSlot = new THREE.TextureSlot( "lightMap", 1, false, true );
 
-	//this.metalnessMap = null;
-	this.metalnessMapSlot = new THREE.TextureSlot( "metalnessMap", 0, false, false );
+	//this.aoMap = null;
+	this.aoMapIntensity = 1.0;
+	this.aoMapSlot = new THREE.TextureSlot( "aoMap", 1, false, true );
 
 	//this.alphaMap = null;
 	this.alphaMapSlot = new THREE.TextureSlot( "alphaMap", 0, false, false );
-
-	//this.slots = [ this.mapSlot, this.lightMapSlot, this.aoMapSlot, this.emissiveMapSlot, this.bumpMapSlot,
-	//	this.normalMapSlot, this.roughnessMapSlot, this.metalnessMapSlot, this.alphaMapSlot ];
 
 	this.envMap = null;
 	this.envMapIntensity = 1.0;
@@ -267,24 +263,31 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	THREE.Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
-	this.roughness = source.roughness;
-	this.metalness = source.metalness;
-
 	this.mapSlot.copy( source.mapSlot );
-	this.lightMapSlot.copy( source.lightMapSlot );
-	this.aoMapSlot.copy( source.aoMapSlot );
-	this.emissiveMapSlot.copy( source.emissiveMapSlot );
-	this.bumpMapSlot.copy( source.bumpMapSlot );
-	this.normalMapSlot.copy( source.normalMapSlot );
-	this.displacementMapSlot.copy( source.displacementMapSlot );
+
+	this.roughness = source.roughness;
 	this.roughnessMapSlot.copy( source.roughnessMapSlot );
+
+	this.metalness = source.metalness;
 	this.metalnessMapSlot.copy( source.metalnessMapSlot );
-	this.alphaMapSlot.copy( source.alphaMapSlot );
+
+	this.lightMapSlot.copy( source.lightMapSlot );
+
+	this.aoMapIntensity = source.aoMapIntensity;
+	this.aoMapSlot.copy( source.aoMapSlot );
 
 	this.emissive.copy( source.emissive );
 	this.emissiveIntensity = source.emissiveIntensity;
+	this.emissiveMapSlot.copy( source.emissiveMapSlot );
+
+	this.bumpMapSlot.copy( source.bumpMapSlot );
 
 	this.normalScale.copy( source.normalScale );
+	this.normalMapSlot.copy( source.normalMapSlot );
+
+	this.displacementMapSlot.copy( source.displacementMapSlot );
+
+	this.alphaMapSlot.copy( source.alphaMapSlot );
 
 	this.envMap = source.envMap;
 	this.envMapIntensity = source.envMapIntensity;
