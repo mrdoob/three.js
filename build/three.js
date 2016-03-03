@@ -25211,9 +25211,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
+		if ( geometry instanceof THREE.InstancedBufferGeometry ) {
 
-			renderer.renderInstances( geometry, drawStart, drawCount );
+			if ( geometry.maxInstancedCount > 0 ) {
+
+				renderer.renderInstances( geometry, drawStart, drawCount );
+
+			}
 
 		} else {
 
@@ -26024,6 +26028,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.uniform1f( p_uniforms.toneMappingWhitePoint, _this.toneMappingWhitePoint );
 
 			}
+
 		}
 
 		// skinning uniforms must be set even if material didn't change
