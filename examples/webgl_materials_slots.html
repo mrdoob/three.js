@@ -29,7 +29,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Per-Map Per-Material UV Repeat/Offset, Texel Scale/Offset/Invert<br/>via THREE.TextureSlot by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Per-Map Per-Material UV Channel, UV Repeat/Offset, and Texel Scale/Offset/Invert<br/>via THREE.TextureSlot by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
 		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
@@ -125,7 +125,7 @@
 				} );
 
 
-				var geometry = new THREE.SphereGeometry( 35, 36, 36 );
+				var geometry = new THREE.SphereGeometry( 35, 48, 48 );
 				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
 				torusMesh1.position.x = 0.0;
 				torusMesh1.castShadow = true;
@@ -158,7 +158,7 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				//scene.add( new THREE.AmbientLight( 0x222222 ) );
 
 				var spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.position.set( 50, 100, 50 );
@@ -173,7 +173,7 @@
 				container.appendChild( renderer.domElement );
 
 				renderer.toneMapping = THREE.ReinhardToneMapping;
-				renderer.toneMappingExposure = 4;
+				renderer.toneMappingExposure = 6;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
