@@ -108,7 +108,7 @@ vec4 textureCubeUV(vec3 reflectedDirection, float roughness, float textureSize) 
     level1 = level1 > 5.0 ? 5.0 : level1;
 
 #if defined( DISABLE_CUBE_UV_MIPMAP_INTERPOLATION )
-    level0 += min( floor( s + 1.0 ), 5.0 );
+    level0 += min( floor( s + 0.5 ), 5.0 );
 #endif
 
     // Tri linear interpolation.
@@ -130,14 +130,14 @@ vec4 textureCubeUV(vec3 reflectedDirection, float roughness, float textureSize) 
 
     vec4 c2 = mix(color11 , color21,  t);
     result = mix(result , c2,  s);
-    
+
 #endif
 /*
     vec4 c1 = mix(color10 , color11,  s);
     vec4 c2 = mix(color20 , color21,  s);
     vec4 c3 = mix(c1 , c2,  t);*/
 
-    return vec4(result.rgb, 1.0);
+    return vec4( result.rgb, 1.0);
 }
 
 #endif
