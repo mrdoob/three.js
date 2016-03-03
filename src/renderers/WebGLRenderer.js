@@ -902,8 +902,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if ( geometry instanceof THREE.InstancedBufferGeometry ) {
-			if( geometry.maxInstancedCount > 0 ) {
+
+			if ( geometry.maxInstancedCount > 0 ) {
+
 				renderer.renderInstances( geometry, drawStart, drawCount );
+
 			}
 
 		} else {
