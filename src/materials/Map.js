@@ -3,7 +3,7 @@
  *
  */
 
-THREE.TextureSlot = function ( name, uvChannel, uvTransform, texelTransform ) {
+THREE.Map = function ( name, uvChannel, uvTransform, texelTransform ) {
 
   this.name = name || "unnamed";
 
@@ -14,7 +14,7 @@ THREE.TextureSlot = function ( name, uvChannel, uvTransform, texelTransform ) {
   this.uvTransform = uvTransform || false;
   this.uvOffset = new THREE.Vector2( 0, 0 );
   this.uvRepeat = new THREE.Vector2( 1.0, 1.0 );
-  //this.uvRotation = 0;
+  //this.uvRotation = 0;  - not implemented because offset/repeat fix in a vec4 uniform, rotation doesn't.
 
   this.texelTransform = uvTransform || false;
   this.texelScale = 1.0;
@@ -23,9 +23,9 @@ THREE.TextureSlot = function ( name, uvChannel, uvTransform, texelTransform ) {
 
 };
 
-THREE.TextureSlot.prototype = {
+THREE.Map.prototype = {
 
-  constructor: THREE.TextureSlot,
+  constructor: THREE.Map,
 
   copy: function ( source ) {
 
@@ -66,6 +66,6 @@ THREE.TextureSlot.prototype = {
 
 };
 
-THREE.TextureSlot.SupportedSlotNames = [
+THREE.Map.SupportedMapNames = [
 	'map', 'lightMap', 'aoMap', 'emissiveMap', 'specularMap', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'alphaMap', 'displacementMap'
 ];

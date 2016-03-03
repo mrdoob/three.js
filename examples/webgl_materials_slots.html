@@ -29,7 +29,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Per-Map Per-Material UV Channel, UV Repeat/Offset, and Texel Scale/Offset/Invert<br/>via THREE.TextureSlot by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Per-Map Per-Material UV Channel, UV Repeat/Offset, and Texel Scale/Offset/Invert<br/>via THREE.Map by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
 		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
@@ -203,37 +203,37 @@
 
 				params = {};
 
-				var slotParams = function( slotName ) {
-					params[ slotName + 'TexelInvert'] = ( slotName === 'rough' );
-					gui.add( params, slotName + 'TexelInvert' );
-					if( slotName === "bump" ) {
-						params[ slotName + 'TexelOffset'] = 0;
-						params[ slotName + 'TexelScale'] = 0.05;
-						gui.add( params, slotName + 'TexelScale', -0.1, 0.1 );
+				var mapParams = function( mapName ) {
+					params[ mapName + 'TexelInvert'] = ( mapName === 'rough' );
+					gui.add( params, mapName + 'TexelInvert' );
+					if( mapName === "bump" ) {
+						params[ mapName + 'TexelOffset'] = 0;
+						params[ mapName + 'TexelScale'] = 0.05;
+						gui.add( params, mapName + 'TexelScale', -0.1, 0.1 );
 					}
 					else {
-						params[ slotName + 'TexelOffset'] = ( slotName === 'rough' ) ? 0.4 : 0;
-						if( slotName === 'rough' ) params[ slotName + 'TexelScale'] = 0.6;
-						else if( slotName === 'emissive' ) params[ slotName + 'TexelScale'] = 0.3;
-						else params[ slotName + 'TexelScale'] = 1.0;
-						if( slotName !== "normal" ) {
-							gui.add( params, slotName + 'TexelOffset', -1, 1 );
-							gui.add( params, slotName + 'TexelScale', -1, 1 );
+						params[ mapName + 'TexelOffset'] = ( mapName === 'rough' ) ? 0.4 : 0;
+						if( mapName === 'rough' ) params[ mapName + 'TexelScale'] = 0.6;
+						else if( mapName === 'emissive' ) params[ mapName + 'TexelScale'] = 0.3;
+						else params[ mapName + 'TexelScale'] = 1.0;
+						if( mapName !== "normal" ) {
+							gui.add( params, mapName + 'TexelOffset', -1, 1 );
+							gui.add( params, mapName + 'TexelScale', -1, 1 );
 						}
 					}
-					params[ slotName + 'UVOffsetX'] = 0;
-					gui.add( params, slotName + 'UVOffsetX', 0, 1 );
-					params[ slotName + 'UVOffsetY'] = 0;
-					gui.add( params, slotName + 'UVOffsetY', 0, 1 );
-					params[ slotName + 'UVRepeatX'] = 1;
-					gui.add( params, slotName + 'UVRepeatX', 0.01, 5 );
-					params[ slotName + 'UVRepeatY'] = 1;
-					gui.add( params, slotName + 'UVRepeatY', 0.01, 5 );
+					params[ mapName + 'UVOffsetX'] = 0;
+					gui.add( params, mapName + 'UVOffsetX', 0, 1 );
+					params[ mapName + 'UVOffsetY'] = 0;
+					gui.add( params, mapName + 'UVOffsetY', 0, 1 );
+					params[ mapName + 'UVRepeatX'] = 1;
+					gui.add( params, mapName + 'UVRepeatX', 0.01, 5 );
+					params[ mapName + 'UVRepeatY'] = 1;
+					gui.add( params, mapName + 'UVRepeatY', 0.01, 5 );
 				};
-				slotParams( "map" );
-				slotParams( "normal" );
-				slotParams( "rough" );
-				slotParams( "emissive" );
+				mapParams( "map" );
+				mapParams( "normal" );
+				mapParams( "rough" );
+				mapParams( "emissive" );
 				gui.open();
 
 			}
@@ -266,16 +266,16 @@
 
 				if ( standardMaterial !== undefined ) {
 
-					var setSlot = function( slot, name ) {
-						slot.texelTransform = true;
-						slot.texelScale = params[ name + 'TexelScale'];
-						slot.texelOffset = params[ name + 'TexelOffset'];
-						slot.texelInvert = params[ name + 'TexelInvert'];
-						slot.uvTransform = true;
-						slot.uvRepeat.x = params[ name + 'UVRepeatX'];
-						slot.uvRepeat.y = params[ name + 'UVRepeatY'];
-						slot.uvOffset.x = params[ name + 'UVOffsetX'];
-						slot.uvOffset.y = params[ name + 'UVOffsetY'];
+					var setSlot = function( map, name ) {
+						map.texelTransform = true;
+						map.texelScale = params[ name + 'TexelScale'];
+						map.texelOffset = params[ name + 'TexelOffset'];
+						map.texelInvert = params[ name + 'TexelInvert'];
+						map.uvTransform = true;
+						map.uvRepeat.x = params[ name + 'UVRepeatX'];
+						map.uvRepeat.y = params[ name + 'UVRepeatY'];
+						map.uvOffset.x = params[ name + 'UVOffsetX'];
+						map.uvOffset.y = params[ name + 'UVOffsetY'];
 					}
 					setSlot( standardMaterial.mapSlot, "map" );
 					setSlot( standardMaterial.normalMapSlot, "normal" );

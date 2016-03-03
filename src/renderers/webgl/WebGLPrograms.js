@@ -27,9 +27,9 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"alphaTest", "doubleSided", "flipSided"
 	];
 
-	var supportedSlots = THREE.TextureSlot.SupportedSlotNames;
-	for( var i = 0; i < supportedSlots.length; i ++ ) {
-		var name = supportedSlots[i];
+	var supportedMaps = THREE.Map.SupportedMapNames;
+	for( var i = 0; i < supportedMaps.length; i ++ ) {
+		var name = supportedMaps[i];
 		parameterNames.push( name );
 		parameterNames.push( name + 'UVChannel' );
 		parameterNames.push( name + 'UVTransform' );
@@ -180,18 +180,18 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 		};
 
-		var supportedSlots = THREE.TextureSlot.SupportedSlotNames;
+		var supportedMapNames = THREE.Map.SupportedMapNames;
 
-		for( var i = 0; i < supportedSlots.length; i ++ ) {
-			var name = supportedSlots[i];
+		for( var i = 0; i < supportedMapNames.length; i ++ ) {
+			var mapName = supportedMapNames[i];
 			// backwards compatibility
-			parameters[name] = !! material[ name ];
+			parameters[mapName] = !! material[ mapName ];
 
 			// new functional for slot-based maps
-			var slot = material[ name + 'Slot' ];
-			parameters[name + "UVChannel" ] = ( slot !== undefined ) ? slot.uvChannel : 0;
-			parameters[name + "UVTransform" ] = ( slot !== undefined ) ? slot.uvTransform : false;
-			parameters[name + "TexelTransform" ] = ( slot !== undefined ) ? slot.texelTransform : false;
+			var map = material[ mapName + 'Slot' ];
+			parameters[mapName + "UVChannel" ] = ( map !== undefined ) ? map.uvChannel : 0;
+			parameters[mapName + "UVTransform" ] = ( map !== undefined ) ? map.uvTransform : false;
+			parameters[mapName + "TexelTransform" ] = ( map !== undefined ) ? map.texelTransform : false;
 		}
 
 		return parameters;

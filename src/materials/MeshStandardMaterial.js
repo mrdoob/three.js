@@ -67,44 +67,44 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
 	//this.map = null;
-	this.mapSlot = new THREE.TextureSlot( "map", 0, false, false );
+	this.mapSlot = new THREE.Map( "map", 0, false, false );
 
 	this.roughness = 0.5;
 	//this.roughnessMap = null;
-	this.roughnessMapSlot = new THREE.TextureSlot( "roughnessMap", 0, false, false );
+	this.roughnessMapSlot = new THREE.Map( "roughnessMap", 0, false, false );
 
 	this.metalness = 0.5;
 	//this.metalnessMap = null;
-	this.metalnessMapSlot = new THREE.TextureSlot( "metalnessMap", 0, false, false );
+	this.metalnessMapSlot = new THREE.Map( "metalnessMap", 0, false, false );
 
 	this.emissive = new THREE.Color( 0x000000 );
 	this.emissiveIntensity = 1.0;
 	//this.emissiveMap = null;
-	this.emissiveMapSlot = new THREE.TextureSlot( "emissiveMap", 0, false, false );
+	this.emissiveMapSlot = new THREE.Map( "emissiveMap", 0, false, false );
 
 	//this.bumpMap = null;
 	//this.bumpScale = 1;
-	this.bumpMapSlot = new THREE.TextureSlot( "bumpMap", 0, false, true );
+	this.bumpMapSlot = new THREE.Map( "bumpMap", 0, false, true );
 
 	//this.normalMap = null;
 	this.normalScale = new THREE.Vector2( 1, 1 );
-	this.normalMapSlot = new THREE.TextureSlot( "normalMap", 0, false, false );
+	this.normalMapSlot = new THREE.Map( "normalMap", 0, false, false );
 
 	//this.displacementMap = null;
 	//this.displacementScale = 1;
 	//this.displacementBias = 0;
-	this.displacementMapSlot = new THREE.TextureSlot( "displacementMap", 0, false, true );
+	this.displacementMapSlot = new THREE.Map( "displacementMap", 0, false, true );
 
 	//this.lightMap = null;
 	//this.lightMapIntensity = 1.0;
-	this.lightMapSlot = new THREE.TextureSlot( "lightMap", 1, false, true );
+	this.lightMapSlot = new THREE.Map( "lightMap", 1, false, true );
 
 	//this.aoMap = null;
 	this.aoMapIntensity = 1.0;
-	this.aoMapSlot = new THREE.TextureSlot( "aoMap", 1, false, true );
+	this.aoMapSlot = new THREE.Map( "aoMap", 1, false, true );
 
 	//this.alphaMap = null;
-	this.alphaMapSlot = new THREE.TextureSlot( "alphaMap", 0, false, false );
+	this.alphaMapSlot = new THREE.Map( "alphaMap", 0, false, false );
 
 	this.envMap = null;
 	this.envMapIntensity = 1.0;
