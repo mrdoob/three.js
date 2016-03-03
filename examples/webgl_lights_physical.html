@@ -67,7 +67,7 @@
 			};
 
 			// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
-			var ambientLuminousIrradiances = {
+			var hemiLuminousIrradiances = {
 				"0.0001 lx (Moonless Night)": 0.0001,
 				"0.002 lx (Night Airglow)": 0.002,
 				"0.5 lx (Full Moon)": 0.5,
@@ -82,9 +82,9 @@
 			};
 
 			var params = {
-				exposure: 1.0,
-				bulbPower: Object.keys( bulbLuminousPowers )[3],
-				ambientIrradiance: Object.keys( ambientLuminousIrradiances )[0]
+				exposure: 0.68,
+				bulbPower: Object.keys( bulbLuminousPowers )[2],
+				hemiIrradiance: Object.keys( hemiLuminousIrradiances )[0]
 			};
 
 
@@ -105,8 +105,9 @@
 
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.z = 7;
-				camera.position.y = 2;
+				camera.position.x = -4;
+				camera.position.z = 4;
+				camera.position.y = 3;
 
 				scene = new THREE.Scene();
 
@@ -123,8 +124,8 @@
 				bulbLight.castShadow = true;
 				scene.add( bulbLight );
 
-				ambientLight = new THREE.AmbientLight( 0xffee88, 0.02 );
-				scene.add( ambientLight );
+				hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 0.02 );
+				scene.add( hemiLight );
 
 				var floorMat = new THREE.MeshStandardMaterial( {
 					roughness: 0.8,
@@ -253,7 +254,7 @@
 
 				var gui = new dat.GUI();
 
-				gui.add( params, 'ambientIrradiance', Object.keys( ambientLuminousIrradiances ) );
+				gui.add( params, 'hemiIrradiance', Object.keys( hemiLuminousIrradiances ) );
 				gui.add( params, 'bulbPower', Object.keys( bulbLuminousPowers ) );
 				gui.add( params, 'exposure', 0, 1 );
 				gui.open();
@@ -285,7 +286,7 @@
 				bulbLight.power = bulbLuminousPowers[ params.bulbPower ];
 				bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 ); // convert from intensity to irradiance at bulb surface
 
-				ambientLight.intensity = ambientLuminousIrradiances[ params.ambientIrradiance ];
+				hemiLight.intensity = hemiLuminousIrradiances[ params.hemiIrradiance ];
 				var time = Date.now() * 0.0005;
 				var delta = clock.getDelta();
 
