@@ -26,7 +26,7 @@ void RE_Direct_BlinnPhong( const in IncidentLight directLight, const in Geometri
 
 	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
 
-#if defined ( PHYSICAL_LIGHTS )
+#if defined ( PHYSICALLY_CORRECT )
 
 	vec3 irradiance = dotNL * directLight.color;
 

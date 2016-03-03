@@ -87,7 +87,7 @@ IncidentLight directLight;
 
 	#ifdef USE_LIGHTMAP
 
-		#if defined ( PHYSICAL_LIGHTS )
+		#if defined ( PHYSICALLY_CORRECT )
 
 			irradiance += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
 

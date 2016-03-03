@@ -107,7 +107,7 @@
 			float spotEffect = smoothstep( spotLight.coneCos, spotLight.penumbraCos, angleCos );
 
 			directLight.color = spotLight.color;
-			directLight.color *= spotEffect * punctualLightIntensityToIrradianceFactor( lightDistance, pointLight.distance, pointLight.decay );
+			directLight.color *= spotEffect * punctualLightIntensityToIrradianceFactor( lightDistance, spotLight.distance, spotLight.decay );
 
 			directLight.visible = true;
 
@@ -140,7 +140,7 @@
 		float dotNL = dot( geometry.normal, hemiLight.direction );
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
 
-	#if defined( PHYSICAL_LIGHTS )
+	#if defined( PHYSICALLY_CORRECT )
 
 		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
 

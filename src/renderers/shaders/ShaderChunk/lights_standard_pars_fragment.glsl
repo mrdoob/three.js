@@ -10,7 +10,7 @@ void RE_Direct_Standard( const in IncidentLight directLight, const in GeometricC
 
 	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
 
-#if defined ( PHYSICAL_LIGHTS )
+#if defined ( PHYSICALLY_CORRECT )
 
 	vec3 irradiance = dotNL * directLight.color;
 

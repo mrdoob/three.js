@@ -8,7 +8,7 @@ float punctualLightIntensityToIrradianceFactor( const in float lightDistance, co
 
 		if( decayExponent > 0.0 ) {
 
-#if defined ( PHYSICAL_LIGHTS )
+#if defined ( PHYSICALLY_CORRECT )
 
 			// based upon Frostbite 3 Moving to Physically-based Rendering
 			// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
