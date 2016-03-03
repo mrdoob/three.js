@@ -21,26 +21,28 @@ int getFaceFromDirection(vec3 direction) {
     }
     return face;
 }
+const float cubeUV_maxLods1 = log2(float(CUBE_UV_TEXTURE_SIZE)*0.25) - 1.0;
+const float cubeUV_rangeClamp = exp2((6.0 - 1.0) * 2.0);
 
 vec2 MipLevelInfo( vec3 vec, float roughnessLevel, float roughness ) {
-    float s = log2(float(CUBE_UV_TEXTURE_SIZE)*0.25) - 1.0;
-    float scale = exp2(s - roughnessLevel);
+    float scale = exp2(cubeUV_maxLods1 - roughnessLevel);
     float dxRoughness = dFdx(roughness);
     float dyRoughness = dFdy(roughness);
     vec3 dx = dFdx( vec * scale * dxRoughness );
     vec3 dy = dFdy( vec * scale * dyRoughness );
     float d = max( dot( dx, dx ), dot( dy, dy ) );
     // Clamp the value to the max mip level counts. hard coded to 6 mips
-    float rangeClamp = exp2((6.0 - 1.0) * 2.0);
-    d = clamp(d, 1.0, rangeClamp);
+    d = clamp(d, 1.0, cubeUV_rangeClamp);
     float mipLevel = 0.5 * log2(d);
     return vec2(floor(mipLevel), fract(mipLevel));
 }
 
+const float cubeUV_maxLods2 = log2(float(CUBE_UV_TEXTURE_SIZE)*0.25) - 2.0;
+const float cubeUV_rcpTextureSize = 1.0 / float(CUBE_UV_TEXTURE_SIZE);
+
 vec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel) {
-    float maxLods = log2(float(CUBE_UV_TEXTURE_SIZE)*0.25) - 2.0;
-    mipLevel = roughnessLevel > maxLods - 3.0 ? 0.0 : mipLevel;
-    float a = 16.0/float(CUBE_UV_TEXTURE_SIZE);
+    mipLevel = roughnessLevel > cubeUV_maxLods2 - 3.0 ? 0.0 : mipLevel;
+    float a = 16.0 * cubeUV_rcpTextureSize;
     float powScale = exp2(roughnessLevel + mipLevel);
     float scale = 1.0/exp2(roughnessLevel + 2.0 + mipLevel);
     float mipOffset = 0.75*(1.0 - 1.0/exp2(mipLevel))/exp2(roughnessLevel);
@@ -84,7 +86,7 @@ vec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel) {
         offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;
     }
     r = normalize(r);
-    float texelOffset = 0.5/float(CUBE_UV_TEXTURE_SIZE);
+    float texelOffset = 0.5 * cubeUV_rcpTextureSize;
     float s1 = (r.y/abs(r.x) + 1.0)*0.5;
     float s2 = (r.z/abs(r.x) + 1.0)*0.5;
     vec2 uv = offset + vec2(s1, s2) * scale;
@@ -99,9 +101,10 @@ vec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel) {
     return uv;
 }
 
+const float cubeUV_maxLods3 = log2(float(CUBE_UV_TEXTURE_SIZE)*0.25) - 3.0;
+
 vec4 textureCubeUV(vec3 reflectedDirection, float roughness ) {
-    float maxLods =  log2(float(CUBE_UV_TEXTURE_SIZE)*0.25) - 3.0;
-    float roughnessVal = roughness*maxLods;
+    float roughnessVal = roughness* cubeUV_maxLods3;
     float r1 = floor(roughnessVal);
     float r2 = r1 + 1.0;
     float t = fract(roughnessVal);
