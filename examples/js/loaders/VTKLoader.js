@@ -1,11 +1,8 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author Alex Pletzer
- * @author Sagar DV / https://dvenkatsagar.github.io
  */
 
-// Work In Progress
-// Custom VTKLoader based on the original but with extra xml polydata support
 THREE.VTKLoader = function( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
