@@ -2359,45 +2359,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// TODO: Optimize this
 
-			for ( var i = 0; i < value.length; i ++ ) {
+			var properties = uniform.properties;
 
-				for ( var propertyName in uniform.properties ) {
+			for ( var i = 0, l = value.length; i < l; i ++ ) {
 
-					var property = uniform.properties[ propertyName ];
-					var locationProperty =  location[ i ][ propertyName ];
-					var valueProperty = value[ i ][ propertyName ];
+				for ( var name in properties ) {
 
-					type = property.type;
+					var property = properties[ name ];
+					var locationProperty =  location[ i ][ name ];
+					var valueProperty = value[ i ][ name ];
 
-					if ( type === 'i' ) {
-
-						_gl.uniform1i( locationProperty, valueProperty );
-
-					} else if ( type === 'f' ) {
-
-						_gl.uniform1f( locationProperty, valueProperty );
-
-					} else if ( type === 'v2' ) {
-
-						_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
-
-					} else if ( type === 'v3' ) {
-
-						_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
-
-					} else if ( type === 'v4' ) {
-
-						_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
-
-					} else if ( type === 'c' ) {
-
-						_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
-
-					} else if ( type === 'm4' ) {
-
-						_gl.uniformMatrix4fv( locationProperty, false, valueProperty.elements );
-
-					}
+					loadUniform( property, property.type, locationProperty, valueProperty );
 
 				}
 
