@@ -21,7 +21,10 @@ var OpenSimViewport = function ( editor ) {
 
 	var grid = new THREE.GridHelper( 500, 25 );
 	sceneHelpers.add( grid );
-
+        grid.visible = false;
+        
+        var backdrop = createBackdrop('Sky', scene);
+        //backdrop.visible = false;
 	//
 
 	var camera = editor.camera;
@@ -618,7 +621,31 @@ var OpenSimViewport = function ( editor ) {
 		}
 
 	}
+        function createBackdrop(choice, sceneObject) {
+            // load the cube textures
+            var urlPrefix	= "images/sky/";
+            var urls = [ urlPrefix + "px.jpg", urlPrefix + "nx.jpg",
+                            urlPrefix + "py.jpg", urlPrefix + "ny.jpg",
+                            urlPrefix + "pz.jpg", urlPrefix + "nz.jpg" ];
+            var textureCube	=  THREE.ImageUtils.loadTextureCube(urls);
 
+            // init the cube shadder
+            var shader	= THREE.ShaderLib['cube'];
+            var uniforms	= THREE.UniformsUtils.clone( shader.uniforms );
+            uniforms['tCube'].value= textureCube;
+            var material = new THREE.ShaderMaterial({
+                    fragmentShader	: shader.fragmentShader,
+                    vertexShader	: shader.vertexShader,
+                    uniforms	: uniforms,
+                    depthWrite: false,
+                    side: THREE.DoubleSide
+            });
+
+            // build the skybox Mesh
+            skyboxMesh	= new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1), material );
+            // add it to the scene
+            this.editor.addObject( skyboxMesh );
+        }
 	return container;
 
 }
