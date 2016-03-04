@@ -198,8 +198,9 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'RingGeometry':
+					case 'RingBufferGeometry':
 
-						geometry = new THREE.RingGeometry(
+						geometry = new THREE[ data.type ](
 							data.innerRadius,
 							data.outerRadius,
 							data.thetaSegments,

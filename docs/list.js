@@ -206,6 +206,7 @@ var list = {
 			[ "PlaneBufferGeometry", "api/extras/geometries/PlaneBufferGeometry" ],
 			[ "PlaneGeometry", "api/extras/geometries/PlaneGeometry" ],
 			[ "PolyhedronGeometry", "api/extras/geometries/PolyhedronGeometry" ],
+			[ "RingBufferGeometry", "api/extras/geometries/RingBufferGeometry" ],
 			[ "RingGeometry", "api/extras/geometries/RingGeometry" ],
 			[ "ShapeGeometry", "api/extras/geometries/ShapeGeometry" ],
 			[ "SphereBufferGeometry", "api/extras/geometries/SphereBufferGeometry" ],
