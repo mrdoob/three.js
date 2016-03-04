@@ -198,6 +198,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// Some experimental-webgl implementations do not have getShaderPrecisionFormat
+
+		if ( _gl.getShaderPrecisionFormat === undefined ) {
+
+			_gl.getShaderPrecisionFormat = function () {
+
+				return { 'rangeMin': 1, 'rangeMax': 1, 'precision': 1 };
+
+			};
+
+		}
+
 		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 
 	} catch ( error ) {
@@ -218,20 +230,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	if ( extensions.get( 'OES_element_index_uint' ) ) {
 
 		THREE.BufferGeometry.MaxIndex = 4294967296;
-
-	}
-
-	if ( _gl.getShaderPrecisionFormat === undefined ) {
-
-		_gl.getShaderPrecisionFormat = function () {
-
-			return {
-				'rangeMin': 1,
-				'rangeMax': 1,
-				'precision': 1
-			};
-
-		}
 
 	}
 
