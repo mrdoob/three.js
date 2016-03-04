@@ -221,6 +221,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	if ( _gl.getShaderPrecisionFormat === undefined ) {
+
+		_gl.getShaderPrecisionFormat = function () {
+
+			return {
+				'rangeMin': 1,
+				'rangeMax': 1,
+				'precision': 1
+			};
+
+		}
+
+	}
+
 	var capabilities = new THREE.WebGLCapabilities( _gl, extensions, parameters );
 
 	var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
