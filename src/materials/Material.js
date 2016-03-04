@@ -38,6 +38,8 @@ THREE.Material = function () {
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
 
+	this.layerTextureMaps = false;
+
 	this.alphaTest = 0;
 
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
@@ -183,6 +185,9 @@ THREE.Material.prototype = {
 
 		}
 
+		if( this.layerTextureMaps != undefined ) data.layerTextureMaps = this.layerTextureMaps;
+
+
 		if ( this.size !== undefined ) data.size = this.size;
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
 
@@ -196,6 +201,8 @@ THREE.Material.prototype = {
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
+
+		if ( this.layerTextureMaps !== undefined ) data.layerTextureMaps = this.layerTextureMaps;
 
 		// TODO: Copied from Object3D.toJSON
 
@@ -270,6 +277,8 @@ THREE.Material.prototype = {
 		this.overdraw = source.overdraw;
 
 		this.visible = source.visible;
+
+		this.layerTextureMaps = source.layerTextureMaps;
 
 		return this;
 

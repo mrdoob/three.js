@@ -136,6 +136,9 @@ THREE.MaterialLoader.prototype = {
 		if ( json.aoMap !== undefined ) material.aoMap = this.getTexture( json.aoMap );
 		if ( json.aoMapIntensity !== undefined ) material.aoMapIntensity = json.aoMapIntensity;
 
+		if ( json.layerTextureMaps !== undefined ) material.layerTextureMaps = json.layerTextureMaps;
+
+
 		// MultiMaterial
 
 		if ( json.materials !== undefined ) {

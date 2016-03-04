@@ -25,7 +25,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
 		"shadowMapEnabled", "pointLightShadows",
 		"shadowMapType",
-		"alphaTest", "doubleSided", "flipSided"
+		"alphaTest", "doubleSided", "flipSided",
+		"layerTextureMaps",
 	];
 
 
@@ -143,7 +144,9 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			alphaTest: material.alphaTest,
 			doubleSided: material.side === THREE.DoubleSide,
-			flipSided: material.side === THREE.BackSide
+			flipSided: material.side === THREE.BackSide,
+
+			layerTextureMaps: material.layerTextureMaps
 
 		};
 

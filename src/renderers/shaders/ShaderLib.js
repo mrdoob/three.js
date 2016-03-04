@@ -81,6 +81,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "layered_textures_pars_fragment" ],
 
 			"void main() {",
 
@@ -92,6 +93,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
+				THREE.ShaderChunk[ "layered_textures_fragment" ],
 
 			"	ReflectedLight reflectedLight;",
 			"	reflectedLight.directDiffuse = vec3( 0.0 );",
@@ -216,6 +218,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmask_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "layered_textures_pars_fragment" ],
 
 			"void main() {",
 
@@ -230,6 +233,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 				THREE.ShaderChunk[ "emissivemap_fragment" ],
+				THREE.ShaderChunk[ "layered_textures_fragment" ],
 
 				// accumulation
 			"	reflectedLight.indirectDiffuse = getAmbientLightIrradiance( ambientLightColor );",
@@ -382,6 +386,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "normalmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "layertextures_pars_fragment" ],
 
 			"void main() {",
 
@@ -397,6 +402,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 				THREE.ShaderChunk[ "normal_fragment" ],
 				THREE.ShaderChunk[ "emissivemap_fragment" ],
+				THREE.ShaderChunk[ "layertextures_fragment" ],
 
 				// accumulation
 				THREE.ShaderChunk[ "lights_phong_fragment" ],
@@ -546,6 +552,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "roughnessmap_pars_fragment" ],
 			THREE.ShaderChunk[ "metalnessmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "layertextures_pars_fragment" ],
 
 			"void main() {",
 
@@ -563,6 +570,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "metalnessmap_fragment" ],
 				THREE.ShaderChunk[ "normal_fragment" ],
 				THREE.ShaderChunk[ "emissivemap_fragment" ],
+				THREE.ShaderChunk[ "layertextures_fragment" ],
 
 				// accumulation
 				THREE.ShaderChunk[ "lights_standard_fragment" ],

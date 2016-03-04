@@ -4,6 +4,14 @@
 
 THREE.UniformsLib = {
 
+	layertexturemaps:{
+		layer1_LookupMode:{type: 'i', value: 0 },
+		layer1_textureIndex:{type: 'i', value: 1 },
+		layer1_maskIndex:{type: 'i', value: 1 },
+		layer1_textureRepeat: { type: 'f', value: 1.0},
+		layer1_maskRepeat: { type: 'f', value: 1.0},
+	},
+
 	common: {
 
 		"diffuse": { type: "c", value: new THREE.Color( 0xeeeeee ) },

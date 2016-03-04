@@ -421,6 +421,8 @@ THREE.WebGLProgram = ( function () {
 				parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
 
+				parameters.layerTextureMaps ? '#define USE_LAYER_TEXTURE_MAPS' : '',
+
 				parameters.flatShading ? '#define FLAT_SHADED' : '',
 
 				parameters.doubleSided ? '#define DOUBLE_SIDED' : '',

@@ -228,6 +228,7 @@ THREE.Loader.prototype = {
 						console.warn( 'THREE.Loader.createMaterial: transparency has been renamed to opacity' );
 						json.opacity = value;
 						break;
+					case 'layerTextureMaps':
 					case 'depthTest':
 					case 'depthWrite':
 					case 'colorWrite':
