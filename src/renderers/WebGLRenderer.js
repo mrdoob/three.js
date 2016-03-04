@@ -2311,49 +2311,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// single THREE.Color
 			_gl.uniform3f( location, value.r, value.g, value.b );
 
-		/*
 		} else if ( type === 's' ) {
 
 			// TODO: Optimize this
 
-			for ( var propertyName in uniform.properties ) {
+			var properties = uniform.properties;
 
-				var property = uniform.properties[ propertyName ];
-				var locationProperty =  location[ propertyName ];
-				var valueProperty = value[ propertyName ];
+			for ( var name in properties ) {
 
-				type = property.type;
+				var property = properties[ name ];
+				var locationProperty = location[ name ];
+				var valueProperty = value[ name ];
 
-				if ( type === 'i' ) {
-
-					_gl.uniform1i( locationProperty, valueProperty );
-
-				} else if ( type === 'f' ) {
-
-					_gl.uniform1f( locationProperty, valueProperty );
-
-				} else if ( type === 'v2' ) {
-
-					_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
-
-				} else if ( type === 'v3' ) {
-
-					_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
-
-				} else if ( type === 'v4' ) {
-
-					_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
-
-				} else if ( type === 'c' ) {
-
-					_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
-
-				}
+				loadUniform( property, property.type, locationProperty, valueProperty );
 
 			}
-
-
-		*/
 
 		} else if ( type === 'sa' ) {
 
