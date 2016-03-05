@@ -9,7 +9,7 @@ THREE.Spherical = function ( phi, theta ) {
 	this.theta = ( theta !== undefined ) ? theta : 0; // around the equator of the sphere
 
 	return this;
-	
+
 };
 
 THREE.Spherical.prototype = {
@@ -54,6 +54,14 @@ THREE.Spherical.prototype = {
 
     return this;
   },
+
+	// restrict phi to be betwee EPS and PI-EPS
+	makeSafe: function() {
+
+		var EPS = 0.000001;
+		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
+
+	},
 
   fromDirection: function( direction ) {
 
