@@ -26,6 +26,7 @@ THREE.EditorControls = function ( object, domElement ) {
 	var normalMatrix = new THREE.Matrix3();
 	var pointer = new THREE.Vector2();
 	var pointerOld = new THREE.Vector2();
+	var spherical = new THREE.Spherical();
 
 	// events
 
@@ -86,15 +87,15 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		vector.copy( object.position ).sub( center );
 
-		var spherical = new THREE.Spherical().fromVector3( vector );
+		spherical.fromVector3( vector );
 
 		spherical.theta += delta.x;
 		spherical.phi += delta.y;
 
 		spherical.makeSafe();
 
-		vector = spherical.toVector3();
-		
+		vector = spherical.toVector3( vector );
+
 		object.position.copy( center ).add( vector );
 
 		object.lookAt( center );
