@@ -747,6 +747,45 @@ var guis = {
 
 	},
 
+	TorusKnotBufferGeometry : function( mesh ) {
+
+		var data = {
+			radius : 10,
+			tube : 3,
+			radialSegments : 64,
+			tubularSegments : 8,
+			p : 2,
+			q : 3,
+			heightScale : 1,
+			arc : twoPi
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.TorusKnotBufferGeometry(
+					data.radius, data.tube, data.radialSegments, data.tubularSegments,
+					data.p, data.q, data.heightScale, data.arc
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TorusKnotBufferGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'tube', 0.1, 10 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 300 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'tubularSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'p', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'q', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'heightScale', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'arc', 0.1, twoPi ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	TorusKnotGeometry : function( mesh ) {
 
 		var data = {
@@ -756,7 +795,8 @@ var guis = {
 			tubularSegments : 8,
 			p : 2,
 			q : 3,
-			heightScale : 1
+			heightScale : 1,
+			arc : twoPi
 		};
 
 		function generateGeometry() {
@@ -764,13 +804,13 @@ var guis = {
 			updateGroupGeometry( mesh,
 				new THREE.TorusKnotGeometry(
 					data.radius, data.tube, data.radialSegments, data.tubularSegments,
-					data.p, data.q, data.heightScale
+					data.p, data.q, data.heightScale, data.arc
 				)
 			);
 
 		}
 
-		var folder = gui.addFolder( 'THREE.TorusGeometry' );
+		var folder = gui.addFolder( 'THREE.TorusKnotGeometry' );
 
 		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'tube', 0.1, 10 ).onChange( generateGeometry );
@@ -779,6 +819,7 @@ var guis = {
 		folder.add( data, 'p', 1, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'q', 1, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightScale', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'arc', 0.1, twoPi ).onChange( generateGeometry );
 
 		generateGeometry();
 
