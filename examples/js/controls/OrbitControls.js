@@ -141,7 +141,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			}
 
-			spherical.add( sphericalDelta );
+			spherical.theta += sphericalDelta.theta;
+			spherical.phi += sphericalDelta.phi;
 
 			// restrict theta to be between desired limits
 			spherical.theta = Math.max( scope.minAzimuthAngle, Math.min( scope.maxAzimuthAngle, spherical.theta ) );
@@ -171,7 +172,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			if ( scope.enableDamping === true ) {
 
-				sphericalDelta.multiplyScalar( 1 - scope.dampingFactor );
+				spherical.theta *= ( 1 - scope.dampingFactor );
+				spherical.phi *= ( 1 - scope.dampingFactor );
 
 			} else {
 

@@ -47,25 +47,6 @@ THREE.Spherical.prototype = {
 
 	},
 
-  add: function ( other ) {
-
-		this.radius += other.radius;
-    this.phi += other.phi;
-    this.theta += other.theta;
-
-    return this;
-
-  },
-
-  multiplyScalar: function( scalar ) {
-
-		this.radius *= scalar;
-    this.phi *= scalar;
-    this.theta *= scalar;
-
-    return this;
-  },
-
 	// restrict phi to be betwee EPS and PI-EPS
 	makeSafe: function() {
 
