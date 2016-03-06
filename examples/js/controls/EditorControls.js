@@ -86,17 +86,15 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		vector.copy( object.position ).sub( center );
 
-		var spherical = new THREE.Spherical().fromDirection( vector );
+		var spherical = new THREE.Spherical().fromVector3( vector );
 
 		spherical.theta += delta.x;
 		spherical.phi += delta.y;
 
 		spherical.makeSafe();
 
-		var radius = vector.length();
-
-		vector = spherical.direction().multiplyScalar( radius );
-
+		vector = spherical.toVector3();
+		
 		object.position.copy( center ).add( vector );
 
 		object.lookAt( center );

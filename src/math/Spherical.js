@@ -1,10 +1,14 @@
 /**
  * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
+ *
+ * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system
+ *
  */
 
-THREE.Spherical = function ( phi, theta ) {
+THREE.Spherical = function ( radius, phi, theta ) {
 
+	this.radius = ( radius !== undefined ) ? radius : 1.0;
 	this.phi = ( phi !== undefined ) ? phi : 0; // up / down towards top and bottom pole
 	this.theta = ( theta !== undefined ) ? theta : 0; // around the equator of the sphere
 
@@ -16,8 +20,9 @@ THREE.Spherical.prototype = {
 
 	constructor: THREE.Spherical,
 
-	set: function ( phi, theta ) {
+	set: function ( radius, phi, theta ) {
 
+		this.radius = radius;
     this.phi = phi;
     this.theta = theta;
 
@@ -31,6 +36,7 @@ THREE.Spherical.prototype = {
 
 	copy: function ( other ) {
 
+		this.radius.copy( other.radius );
 		this.phi.copy( other.phi );
 		this.theta.copy( other.theta );
 
@@ -40,6 +46,7 @@ THREE.Spherical.prototype = {
 
   add: function ( other ) {
 
+		this.radius += other.radius;
     this.phi += other.phi;
     this.theta += other.theta;
 
@@ -49,6 +56,7 @@ THREE.Spherical.prototype = {
 
   multiplyScalar: function( scalar ) {
 
+		this.radius *= scalar;
     this.phi *= scalar;
     this.theta *= scalar;
 
@@ -63,23 +71,30 @@ THREE.Spherical.prototype = {
 
 	},
 
-  fromDirection: function( direction ) {
+  fromVector3: function( vec3 ) {
 
-    this.theta = Math.atan2( direction.x, direction.z ); // equator angle around y-up axis
-    this.phi = Math.atan2( Math.sqrt( direction.x * direction.x + direction.z * direction.z ), direction.y ); // polar angle
+		this.radius = vec3.length();
+		if( this.radius === 0 ) {
+			this.theta = 0;
+			this.phi = 0;
+		}
+		else {
+    	this.theta = Math.atan2( vec3.x, vec3.z ); // equator angle around y-up axis
+    	this.phi = Math.acos( vec3.y / this.radius ); // polar angle
+		}
 
     return this;
 
   },
 
-  direction: function( optionalTarget ) {
+  toVector3: function( optionalTarget ) {
 
     var result = optionalTarget || new THREE.Vector3();
-		var sinPhi = Math.sin( this.phi );
+		var sinPhiRadius = Math.sin( this.phi ) * this.radius;
     result.set(
-      sinPhi * Math.sin( this.theta ),
-      Math.cos( this.phi ),
-      sinPhi * Math.cos( this.theta )
+      sinPhiRadius * Math.sin( this.theta ),
+      Math.cos( this.phi ) * this.radius,
+      sinPhiRadius * Math.cos( this.theta )
     );
 
     return result;

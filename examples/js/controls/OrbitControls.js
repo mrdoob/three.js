@@ -133,7 +133,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			offset.applyQuaternion( quat );
 
 			// angle from z-axis around y-axis
-			spherical.fromDirection( offset );
+			spherical.fromVector3( offset );
 
 			if ( scope.autoRotate && state === STATE.NONE ) {
 
@@ -149,18 +149,18 @@ THREE.OrbitControls = function ( object, domElement ) {
 			// restrict phi to be between desired limits
 			spherical.phi = Math.max( scope.minPolarAngle, Math.min( scope.maxPolarAngle, spherical.phi ) );
 
-			// restrict phi to be betwee EPS and PI-EPS
-			spherical.phi = Math.max( EPS, Math.min( Math.PI - EPS, spherical.phi ) );
+			spherical.makeSafe();
 
-			var radius = offset.length() * scale;
+
+			spherical.radius *= scale;
 
 			// restrict radius to be between desired limits
-			radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, radius ) );
+			spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
 
 			// move target to panned location
 			scope.target.add( panOffset );
 
-			offset = spherical.direction( offset ).multiplyScalar( radius );
+			offset = spherical.toVector3( offset );
 
 			// rotate offset back to "camera-up-vector-is-up" space
 			offset.applyQuaternion( quatInverse );
@@ -175,7 +175,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			} else {
 
-				sphericalDelta.set( 0, 0 );
+				sphericalDelta.set( 0, 0, 0 );
 
 			}
 
