@@ -37235,14 +37235,14 @@ THREE.RingBufferGeometry = function ( innerRadius, outerRadius, thetaSegments, p
 		thetaLength: thetaLength
 	};
 
-	innerRadius = innerRadius || 0;
+	innerRadius = innerRadius || 20;
 	outerRadius = outerRadius || 50;
 
 	thetaStart = thetaStart !== undefined ? thetaStart : 0;
 	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
 	thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
-	phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 8;
+	phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 1;
 
 	// these are used to calculate buffer length
 	var vertexCount = ( thetaSegments + 1 ) * ( phiSegments + 1 );
@@ -37263,7 +37263,7 @@ THREE.RingBufferGeometry = function ( innerRadius, outerRadius, thetaSegments, p
 	var j, i;
 
 	// generate vertices, normals and uvs
-	
+
 	// values are generate from the inside of the ring to the outside
 
 	for ( j = 0; j <= phiSegments; j ++ ) {
