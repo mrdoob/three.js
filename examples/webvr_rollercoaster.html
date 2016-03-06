@@ -28,7 +28,11 @@
 
 		<script>
 
-			WEBVR.test();
+			if ( WEBVR.isAvailable() !== true ) {
+
+				document.body.appendChild( WEBVR.getMessage() );
+
+			}
 
 			//
 
@@ -172,7 +176,7 @@
 			var effect = new THREE.VREffect( renderer );
 			var controls = new THREE.VRControls( camera );
 
-			WEBVR.button( effect );
+			document.body.appendChild( WEBVR.getButton( effect ) );
 
 			//
 
