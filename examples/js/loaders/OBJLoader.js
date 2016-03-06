@@ -306,7 +306,7 @@ THREE.OBJLoader.prototype = {
 				// or
 				// g group_name
 
-				var name = result[ 0 ].substr(1).trim();
+				var name = result[ 0 ].substr( 1 ).trim();
 
 				if ( foundObjects === false ) {
 
