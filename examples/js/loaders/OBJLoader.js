@@ -230,7 +230,7 @@ THREE.OBJLoader.prototype = {
 
 			var result;
 
-			if ( line.length === 0 || line.charAt( 0 ) === '#' ) {
+			if ( line.length === 0 || line.charAt( 0 ) === '#' line === "o") {
 
 				continue;
 
