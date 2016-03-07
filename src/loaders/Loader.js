@@ -159,6 +159,22 @@ THREE.Loader.prototype = {
 					case 'mapDiffuse':
 						json.map = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
 						break;
+					case 'layerTexture1':
+					case 'layerTexture2':
+					case 'layerTexture3':
+					case 'layerTexture4':
+					case 'layerTexture5':
+					case 'layerTexture6':
+						// TODO - LAYERED TEXTURES - parameterise the repeat and offsets.
+						console.log("LOADER - Layer = "+ name+ " url: "+value);
+						json[name] = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, ["repeat","repeat"], m.mapDiffuseAnisotropy );
+						break;
+					case 'layerMask1':
+					case 'layerMask2':
+						// TODO - LAYERED TEXTURES - parameterise the repeat and offsets.
+						console.log("LOADER - Mask = "+ name+ " url: "+value);
+						json[name] = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, ["repeat","repeat"], m.mapDiffuseAnisotropy );
+						break;
 					case 'mapDiffuseRepeat':
 					case 'mapDiffuseOffset':
 					case 'mapDiffuseWrap':

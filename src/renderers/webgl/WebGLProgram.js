@@ -52,7 +52,7 @@ THREE.WebGLProgram = ( function () {
 			var name = info.name;
 			var location = gl.getUniformLocation( program, name );
 
-			//console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
+			console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
 
 			var matches = structRe.exec( name );
 			if ( matches ) {
@@ -313,6 +313,14 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.flatShading ? '#define FLAT_SHADED' : '',
 
+				// **************************
+				// Start - Layered Texture maps
+				// **************************
+				parameters.layerTextureMaps ? '#define USE_LAYER_TEXTURE_MAPS' : '',
+				// **************************
+				// END - Layered Texture Maps
+				// **************************
+
 				parameters.skinning ? '#define USE_SKINNING' : '',
 				parameters.useVertexTexture ? '#define BONE_TEXTURE' : '',
 
@@ -421,8 +429,13 @@ THREE.WebGLProgram = ( function () {
 				parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
 
+				// **************************
+				// Start - Layered Texture maps
+				// **************************
 				parameters.layerTextureMaps ? '#define USE_LAYER_TEXTURE_MAPS' : '',
-
+				// **************************
+				// END - Layered Texture Maps
+				// **************************
 				parameters.flatShading ? '#define FLAT_SHADED' : '',
 
 				parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
@@ -459,8 +472,8 @@ THREE.WebGLProgram = ( function () {
 		var vertexGlsl = prefixVertex + vertexShader;
 		var fragmentGlsl = prefixFragment + fragmentShader;
 
-		// console.log( '*VERTEX*', vertexGlsl );
-		// console.log( '*FRAGMENT*', fragmentGlsl );
+		 //console.log( '*VERTEX*', vertexGlsl );
+		 //console.log( '*FRAGMENT*', fragmentGlsl );
 
 		var glVertexShader = THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
 		var glFragmentShader = THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );

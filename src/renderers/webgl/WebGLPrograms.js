@@ -146,7 +146,24 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide,
 
-			layerTextureMaps: material.layerTextureMaps
+			// **************************
+			// Start - Layered Texture maps
+			// **************************
+			layerTextureMaps: material.layerTextureMaps,
+			//layerTexture1: !! material.layerTexture1,
+			//layerTexture2: !! material.layerTexture2,
+			//layerTexture3: !! material.layerTexture3,
+			//layerTexture4: !! material.layerTexture4,
+			//layerTexture5: !! material.layerTexture5,
+			//layerTexture6: !! material.layerTexture6,
+            //
+			//layerMask1: !! material.layerMask1,
+			//layerMask2: !! material.layerMask2,
+
+			// **************************
+			// End - Layered Texture maps
+			// **************************
+
 
 		};
 

@@ -10,6 +10,16 @@ THREE.UniformsLib = {
 		layer1_maskIndex:{type: 'i', value: 1 },
 		layer1_textureRepeat: { type: 'f', value: 1.0},
 		layer1_maskRepeat: { type: 'f', value: 1.0},
+
+		"layerTexture1": { type: "t", value: null },
+		"layerTexture2": { type: "t", value: null },
+		"layerTexture3": { type: "t", value: null },
+		"layerTexture4": { type: "t", value: null },
+		"layerTexture5": { type: "t", value: null },
+		"layerTexture6": { type: "t", value: null },
+		"layerMask1": { type: "t", value: null },
+		"layerMask2": { type: "t", value: null },
+
 	},
 
 	common: {

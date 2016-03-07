@@ -82,6 +82,32 @@ THREE.MaterialLoader.prototype = {
 
 		if ( json.map !== undefined ) material.map = this.getTexture( json.map );
 
+
+		// **************************
+		// Start - Layered Texture maps
+		// **************************
+
+		if ( json.layerTextureMaps !== undefined ) material.layerTextureMaps = json.layerTextureMaps;
+
+		if ( json.layerTexture1 !== undefined ){
+			material.layerTexture1 = this.getTexture( json.layerTexture1 );
+			material.layerTexture1.name = "layerTexture1";
+			material.layerTexture1.source = json.layerTexture1;
+
+		}
+		if ( json.layerTexture2 !== undefined ) material.layerTexture2 = this.getTexture( json.layerTexture2 );
+		if ( json.layerTexture3 !== undefined ) material.layerTexture3 = this.getTexture( json.layerTexture3 );
+		if ( json.layerTexture4 !== undefined ) material.layerTexture4 = this.getTexture( json.layerTexture4 );
+		if ( json.layerTexture5 !== undefined ) material.layerTexture5 = this.getTexture( json.layerTexture5 );
+		if ( json.layerTexture6 !== undefined ) material.layerTexture6 = this.getTexture( json.layerTexture6 );
+
+		if ( json.layerMask1 !== undefined ) material.layerMask1 = this.getTexture( json.layerMask1 );
+		if ( json.layerMask2 !== undefined ) material.layerMask2 = this.getTexture( json.layerMask2 );
+
+		// **************************
+		// END - Layered Texture maps
+		// **************************
+
 		if ( json.alphaMap !== undefined ) {
 
 			material.alphaMap = this.getTexture( json.alphaMap );
@@ -136,7 +162,6 @@ THREE.MaterialLoader.prototype = {
 		if ( json.aoMap !== undefined ) material.aoMap = this.getTexture( json.aoMap );
 		if ( json.aoMapIntensity !== undefined ) material.aoMapIntensity = json.aoMapIntensity;
 
-		if ( json.layerTextureMaps !== undefined ) material.layerTextureMaps = json.layerTextureMaps;
 
 
 		// MultiMaterial

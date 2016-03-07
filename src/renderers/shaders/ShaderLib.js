@@ -15,7 +15,8 @@ THREE.ShaderLib = {
 
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "aomap" ],
-			THREE.UniformsLib[ "fog" ]
+			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "layertexturemaps" ],
 
 		] ),
 
@@ -128,6 +129,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
+			THREE.UniformsLib[ "layertexturemaps" ],
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) }
@@ -287,6 +289,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
+			THREE.UniformsLib[ "layertexturemaps" ],
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -442,6 +445,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
+			THREE.UniformsLib[ "layertexturemaps" ],
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },

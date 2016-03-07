@@ -95,7 +95,7 @@
 
 				controls = new THREE.OrbitControls( camera );
 				controls.maxPolarAngle = 0.9 * Math.PI / 2;
-				controls.enableZoom = false;
+				controls.enableZoom = true;
 
 				// LIGHTS
 
@@ -146,7 +146,7 @@
 				// MODEL
 
 				var loader = new THREE.JSONLoader();
-				loader.load( "obj/lightmap/lightmap.js", function ( geometry, materials ) {
+				loader.load( "obj/layertextures/lightmap.js", function ( geometry, materials ) {
 
 					for ( var i = 0; i < materials.length; i ++ ) {
 						console.log("Material Name: "+materials[ i ].name);
@@ -161,6 +161,8 @@
 					scene.add( mesh );
 
 				} );
+
+
 
 				//
 

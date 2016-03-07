@@ -38,7 +38,21 @@ THREE.Material = function () {
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
 
+	// ************************************
+	// Start - Layered Texture maps
+	// ************************************
 	this.layerTextureMaps = false;
+	this.layerTexture1 = null;
+	this.layerTexture2 = null;
+	this.layerTexture3 = null;
+	this.layerTexture4 = null;
+	this.layerTexture5 = null;
+	this.layerTexture6 = null;
+	this.layerMask1= null;
+	this.layerMask2= null;
+	// ************************************
+	// END - Layered Texture Maps
+	// ************************************
 
 	this.alphaTest = 0;
 
@@ -185,8 +199,24 @@ THREE.Material.prototype = {
 
 		}
 
+		// ******************************
+		// START - Layered Texture Maps
+		// Layered Textures - why 6 ? mobile can handle loading 8 textures, so 6 custom textures + 2 masks. Masks use rgb channels to allow masking the 6 layers.
+		// ******************************
 		if( this.layerTextureMaps != undefined ) data.layerTextureMaps = this.layerTextureMaps;
 
+		if ( this.layerTexture1 instanceof THREE.Texture ) data.layerTexture1 = this.layerTexture1.toJSON( meta ).uuid;
+		if ( this.layerTexture2 instanceof THREE.Texture ) data.layerTexture2 = this.layerTexture2.toJSON( meta ).uuid;
+		if ( this.layerTexture3 instanceof THREE.Texture ) data.layerTexture3 = this.layerTexture3.toJSON( meta ).uuid;
+		if ( this.layerTexture4 instanceof THREE.Texture ) data.layerTexture4 = this.layerTexture4.toJSON( meta ).uuid;
+		if ( this.layerTexture5 instanceof THREE.Texture ) data.layerTexture5 = this.layerTexture5.toJSON( meta ).uuid;
+		if ( this.layerTexture6 instanceof THREE.Texture ) data.layerTexture6 = this.layerTexture6.toJSON( meta ).uuid;
+
+		if ( this.layerMask1 instanceof THREE.Texture ) data.layerMask1 = this.layerMask1.toJSON( meta ).uuid;
+		if ( this.layerMask2 instanceof THREE.Texture ) data.layerMask2 = this.layerMask2.toJSON( meta ).uuid;
+		// ******************************
+		// END Layered Textures
+		// ******************************
 
 		if ( this.size !== undefined ) data.size = this.size;
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
@@ -278,7 +308,21 @@ THREE.Material.prototype = {
 
 		this.visible = source.visible;
 
+		// ******************************
+		// START - Layered Texture Maps
+		// ******************************
 		this.layerTextureMaps = source.layerTextureMaps;
+		this.layerTexture1 = source.layerTexture1;
+		this.layerTexture2 = source.layerTexture2;
+		this.layerTexture3 = source.layerTexture3;
+		this.layerTexture4 = source.layerTexture4;
+		this.layerTexture5 = source.layerTexture5;
+		this.layerTexture6 = source.layerTexture6;
+		this.layerMask1 = source.layerMask1;
+		this.layerMask2 = source.layerMask2;
+		// ******************************
+		// END - Layered Texture Maps
+		// ******************************
 
 		return this;
 

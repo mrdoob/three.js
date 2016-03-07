@@ -45,47 +45,47 @@
     // *********************
     // MASKS
     // *********************
-    uniform sampler2D masks_1;
-    uniform float masks_1_Loaded;
+    uniform sampler2D layerMask1;
+    uniform float layerMask1_Loaded;
 
-    uniform sampler2D masks_2;
-    uniform float masks_2_Loaded;
+    uniform sampler2D layerMask2;
+    uniform float layerMask2_Loaded;
 
     // *********************
     // Texture 1
     // *********************
-    uniform sampler2D texture1_Map;
-    uniform float texture1_Map_Loaded;
+    uniform sampler2D layerTexture1;
+    uniform float layerTexture1_Loaded;
 
     // *********************
     // Texture 2
     // *********************
-    uniform sampler2D texture2_Map;
-    uniform float texture2_Map_Loaded;
+    uniform sampler2D layerTexture2;
+    uniform float layerTexture2_Loaded;
 
     // *********************
     // Texture 3
     // *********************
-    uniform sampler2D texture3_Map;
-    uniform float texture3_Map_Loaded;
+    uniform sampler2D layerTexture3;
+    uniform float layerTexture3_Loaded;
 
     // *********************
     // Texture 4
     // *********************
-    uniform sampler2D texture4_Map;
-    uniform float texture4_Map_Loaded;
+    uniform sampler2D layerTexture4;
+    uniform float layerTexture4_Loaded;
 
     // *********************
     // Texture 5
     // *********************
-    uniform sampler2D texture5_Map;
-    uniform float texture5_Map_Loaded;
+    uniform sampler2D layerTexture5;
+    uniform float layerTexture5_Loaded;
 
     // *********************
     // Texture 6
     // *********************
-    uniform sampler2D texture6_Map;
-    uniform float texture6_Map_Loaded;
+    uniform sampler2D layerTexture6;
+    uniform float layerTexture6_Loaded;
 
     // Look up texture based on UV and if texture has multiple tiles.
     vec4 textureLookup(vec2 vUv, sampler2D texture, int quadrant){
@@ -128,32 +128,32 @@
         float loaded = 0.0;
         if(textureIndex == 1)
         {
-           loaded = texture1_Map_Loaded;
+           loaded = layerTexture1_Loaded;
         }
 
         if(textureIndex == 2)
         {
-           loaded = texture2_Map_Loaded;
+           loaded = layerTexture2_Loaded;
         }
 
         if(textureIndex == 3)
         {
-            loaded = texture3_Map_Loaded;
+            loaded = layerTexture3_Loaded;
         }
 
         if(textureIndex == 4)
         {
-            loaded = texture4_Map_Loaded;
+            loaded = layerTexture4_Loaded;
         }
 
         if(textureIndex == 5)
         {
-            loaded = texture5_Map_Loaded;
+            loaded = layerTexture5_Loaded;
         }
 
         if(textureIndex == 6)
         {
-            loaded = texture6_Map_Loaded;
+            loaded = layerTexture6_Loaded;
         }
 
         return loaded;
@@ -163,32 +163,32 @@
         float loaded = 0.0;
         if(maskIndex == 1)
         {
-           loaded = masks_1_Loaded;
+           loaded = layerMask1_Loaded;
         }
 
         if(maskIndex == 2)
         {
-           loaded = masks_1_Loaded;
+           loaded = layerMask1_Loaded;
         }
 
         if(maskIndex == 3)
         {
-            loaded = masks_1_Loaded;
+            loaded = layerMask1_Loaded;
         }
 
         if(maskIndex == 4)
         {
-            loaded = masks_2_Loaded;
+            loaded = layerMask2_Loaded;
         }
 
         if(maskIndex == 5)
         {
-            loaded = masks_2_Loaded;
+            loaded = layerMask2_Loaded;
         }
 
         if(maskIndex == 6)
         {
-            loaded = masks_2_Loaded;
+            loaded = layerMask2_Loaded;
         }
 
         return loaded;
@@ -204,27 +204,27 @@
         vec4 map = vec4(0.0,0.0,0.0,1.0);
         if(textureIndex == 1)
         {
-           map = textureLookup(vUv * repeatTexture, texture1_Map, textureLookupMode);
+           map = textureLookup(vUv * repeatTexture, layerTexture1, textureLookupMode);
         }
         if(textureIndex == 2)
         {
-            map = textureLookup(vUv * repeatTexture, texture2_Map, textureLookupMode);
+            map = textureLookup(vUv * repeatTexture, layerTexture2, textureLookupMode);
         }
         if(textureIndex == 3)
         {
-            map = textureLookup(vUv * repeatTexture, texture3_Map, textureLookupMode);
+            map = textureLookup(vUv * repeatTexture, layerTexture3, textureLookupMode);
         }
         if(textureIndex == 4)
         {
-            map = textureLookup(vUv * repeatTexture, texture4_Map, textureLookupMode);
+            map = textureLookup(vUv * repeatTexture, layerTexture4, textureLookupMode);
         }
         if(textureIndex == 5)
         {
-            map = textureLookup(vUv * repeatTexture, texture5_Map, textureLookupMode);
+            map = textureLookup(vUv * repeatTexture, layerTexture5, textureLookupMode);
         }
         if(textureIndex == 6)
         {
-            map = textureLookup(vUv * repeatTexture, texture6_Map, textureLookupMode);
+            map = textureLookup(vUv * repeatTexture, layerTexture6, textureLookupMode);
         }
         float textureLoaded = isTextureLoaded(textureIndex);
         map = clamp(map+vec4(textureLoaded), 0.0, 1.0);
@@ -238,44 +238,44 @@
         float maskLoaded = 1.0;
         if(maskIndex == 1)
         {
-           mask = textureLookup(vUv * repeatMask, masks_1, 0).rgb;
+           mask = textureLookup(vUv * repeatMask, layerMask1, 0).rgb;
            maskColor = vec3(1.0,0.0,0.0);
-           maskLoaded = masks_1_Loaded;
+           maskLoaded = layerMask1_Loaded;
         }
 
         if(maskIndex == 2)
         {
-            mask = textureLookup(vUv * repeatMask, masks_1, 0).rgb;
+            mask = textureLookup(vUv * repeatMask, layerMask1, 0).rgb;
             maskColor = vec3(0.0,1.0,0.0);
-            maskLoaded = masks_1_Loaded;
+            maskLoaded = layerMask1_Loaded;
         }
 
         if(maskIndex == 3)
         {
-            mask = textureLookup(vUv * repeatMask, masks_1, 0).rgb;
+            mask = textureLookup(vUv * repeatMask, layerMask1, 0).rgb;
             maskColor = vec3(0.0,0.0,1.0);
-            maskLoaded = masks_1_Loaded;
+            maskLoaded = layerMask1_Loaded;
         }
 
         if(maskIndex == 4)
         {
-            mask = textureLookup(vUv * repeatMask, masks_2, 0).rgb;
+            mask = textureLookup(vUv * repeatMask, layerMask2, 0).rgb;
             maskColor = vec3(1.0,0.0,0.0);
-            maskLoaded = masks_2_Loaded;
+            maskLoaded = layerMask2_Loaded;
         }
 
         if(maskIndex == 5)
         {
-            mask = textureLookup(vUv * repeatMask, masks_2, 0).rgb;
+            mask = textureLookup(vUv * repeatMask, layerMask2, 0).rgb;
             maskColor = vec3(0.0,1.0,0.0);
-            maskLoaded = masks_2_Loaded;
+            maskLoaded = layerMask2_Loaded;
         }
 
         if(maskIndex == 6)
         {
-            mask = textureLookup(vUv * repeatMask, masks_2, 0).rgb;
+            mask = textureLookup(vUv * repeatMask, layerMask2, 0).rgb;
             maskColor = vec3(0.0,0.0,1.0);
-            maskLoaded = masks_2_Loaded;
+            maskLoaded = layerMask2_Loaded;
         }
 
         mask = clamp(mask, vec3(0.0), maskColor);                   // THRESHOLD
@@ -300,6 +300,8 @@
 
         //
         return color;
+        //return mix(color, texture2D(layerTexture1, vUv), mixAmount);
+
     }
 
 #endif

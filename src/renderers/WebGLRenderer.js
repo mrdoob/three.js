@@ -1898,6 +1898,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// **************************
+		// Start - Layered Texture maps
+		// **************************
+		uniforms.layerTexture1.value = material.layerTexture1;
+		uniforms.layerTexture2.value = material.layerTexture2;
+		uniforms.layerTexture3.value = material.layerTexture3;
+		uniforms.layerTexture4.value = material.layerTexture4;
+		uniforms.layerTexture5.value = material.layerTexture5;
+		uniforms.layerTexture6.value = material.layerTexture6;
+		uniforms.layerMask1.value = material.layerMask1;
+		uniforms.layerMask2.value = material.layerMask2;
+
+
+
+		// **************************
+		// End - Layered Texture maps
+		// **************************
+
 		// uv repeat and offset setting priorities
 		// 1. color map
 		// 2. specular map

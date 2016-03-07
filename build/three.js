@@ -17636,6 +17636,22 @@ THREE.Loader.prototype = {
 					case 'mapDiffuse':
 						json.map = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
 						break;
+					case 'layerTexture1':
+					case 'layerTexture2':
+					case 'layerTexture3':
+					case 'layerTexture4':
+					case 'layerTexture5':
+					case 'layerTexture6':
+						// TODO - LAYERED TEXTURES - parameterise the repeat and offsets.
+						console.log("LOADER - Layer = "+ name+ " url: "+value);
+						json[name] = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, ["repeat","repeat"], m.mapDiffuseAnisotropy );
+						break;
+					case 'layerMask1':
+					case 'layerMask2':
+						// TODO - LAYERED TEXTURES - parameterise the repeat and offsets.
+						console.log("LOADER - Mask = "+ name+ " url: "+value);
+						json[name] = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, ["repeat","repeat"], m.mapDiffuseAnisotropy );
+						break;
 					case 'mapDiffuseRepeat':
 					case 'mapDiffuseOffset':
 					case 'mapDiffuseWrap':
@@ -18850,6 +18866,32 @@ THREE.MaterialLoader.prototype = {
 
 		if ( json.map !== undefined ) material.map = this.getTexture( json.map );
 
+
+		// **************************
+		// Start - Layered Texture maps
+		// **************************
+
+		if ( json.layerTextureMaps !== undefined ) material.layerTextureMaps = json.layerTextureMaps;
+
+		if ( json.layerTexture1 !== undefined ){
+			material.layerTexture1 = this.getTexture( json.layerTexture1 );
+			material.layerTexture1.name = "layerTexture1";
+			material.layerTexture1.source = json.layerTexture1;
+
+		}
+		if ( json.layerTexture2 !== undefined ) material.layerTexture2 = this.getTexture( json.layerTexture2 );
+		if ( json.layerTexture3 !== undefined ) material.layerTexture3 = this.getTexture( json.layerTexture3 );
+		if ( json.layerTexture4 !== undefined ) material.layerTexture4 = this.getTexture( json.layerTexture4 );
+		if ( json.layerTexture5 !== undefined ) material.layerTexture5 = this.getTexture( json.layerTexture5 );
+		if ( json.layerTexture6 !== undefined ) material.layerTexture6 = this.getTexture( json.layerTexture6 );
+
+		if ( json.layerMask1 !== undefined ) material.layerMask1 = this.getTexture( json.layerMask1 );
+		if ( json.layerMask2 !== undefined ) material.layerMask2 = this.getTexture( json.layerMask2 );
+
+		// **************************
+		// END - Layered Texture maps
+		// **************************
+
 		if ( json.alphaMap !== undefined ) {
 
 			material.alphaMap = this.getTexture( json.alphaMap );
@@ -18904,7 +18946,6 @@ THREE.MaterialLoader.prototype = {
 		if ( json.aoMap !== undefined ) material.aoMap = this.getTexture( json.aoMap );
 		if ( json.aoMapIntensity !== undefined ) material.aoMapIntensity = json.aoMapIntensity;
 
-		if ( json.layerTextureMaps !== undefined ) material.layerTextureMaps = json.layerTextureMaps;
 
 
 		// MultiMaterial
@@ -19962,7 +20003,21 @@ THREE.Material = function () {
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
 
+	// ************************************
+	// Start - Layered Texture maps
+	// ************************************
 	this.layerTextureMaps = false;
+	this.layerTexture1 = null;
+	this.layerTexture2 = null;
+	this.layerTexture3 = null;
+	this.layerTexture4 = null;
+	this.layerTexture5 = null;
+	this.layerTexture6 = null;
+	this.layerMask1= null;
+	this.layerMask2= null;
+	// ************************************
+	// END - Layered Texture Maps
+	// ************************************
 
 	this.alphaTest = 0;
 
@@ -20109,8 +20164,24 @@ THREE.Material.prototype = {
 
 		}
 
+		// ******************************
+		// START - Layered Texture Maps
+		// Layered Textures - why 6 ? mobile can handle loading 8 textures, so 6 custom textures + 2 masks. Masks use rgb channels to allow masking the 6 layers.
+		// ******************************
 		if( this.layerTextureMaps != undefined ) data.layerTextureMaps = this.layerTextureMaps;
 
+		if ( this.layerTexture1 instanceof THREE.Texture ) data.layerTexture1 = this.layerTexture1.toJSON( meta ).uuid;
+		if ( this.layerTexture2 instanceof THREE.Texture ) data.layerTexture2 = this.layerTexture2.toJSON( meta ).uuid;
+		if ( this.layerTexture3 instanceof THREE.Texture ) data.layerTexture3 = this.layerTexture3.toJSON( meta ).uuid;
+		if ( this.layerTexture4 instanceof THREE.Texture ) data.layerTexture4 = this.layerTexture4.toJSON( meta ).uuid;
+		if ( this.layerTexture5 instanceof THREE.Texture ) data.layerTexture5 = this.layerTexture5.toJSON( meta ).uuid;
+		if ( this.layerTexture6 instanceof THREE.Texture ) data.layerTexture6 = this.layerTexture6.toJSON( meta ).uuid;
+
+		if ( this.layerMask1 instanceof THREE.Texture ) data.layerMask1 = this.layerMask1.toJSON( meta ).uuid;
+		if ( this.layerMask2 instanceof THREE.Texture ) data.layerMask2 = this.layerMask2.toJSON( meta ).uuid;
+		// ******************************
+		// END Layered Textures
+		// ******************************
 
 		if ( this.size !== undefined ) data.size = this.size;
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
@@ -20202,7 +20273,21 @@ THREE.Material.prototype = {
 
 		this.visible = source.visible;
 
+		// ******************************
+		// START - Layered Texture Maps
+		// ******************************
 		this.layerTextureMaps = source.layerTextureMaps;
+		this.layerTexture1 = source.layerTexture1;
+		this.layerTexture2 = source.layerTexture2;
+		this.layerTexture3 = source.layerTexture3;
+		this.layerTexture4 = source.layerTexture4;
+		this.layerTexture5 = source.layerTexture5;
+		this.layerTexture6 = source.layerTexture6;
+		this.layerMask1 = source.layerMask1;
+		this.layerMask2 = source.layerMask2;
+		// ******************************
+		// END - Layered Texture Maps
+		// ******************************
 
 		return this;
 
@@ -23472,11 +23557,11 @@ THREE.ShaderChunk[ 'fog_pars_fragment' ] ="#ifdef USE_FOG\n\n\tuniform vec3 fogC
 
 // File:src/renderers/shaders/ShaderChunk/layertextures_fragment.glsl
 
-THREE.ShaderChunk[ 'layertextures_fragment' ] ="\n#ifdef USE_LAYER_TEXTURE_MAPS\n\n    // ***************\n    // TEXTURE 2 (special masked texture)\n    // ***************\n    float mixAmount = 0.5;\n    //diffuseColor = layerTexture(diffuseColor, mixAmount, layer2_textureIndex, layer2_textureRepeat, layer2_maskIndex, layer2_maskRepeat, layer2_LookupMode);\n    diffuseColor = layerTexture(diffuseColor, mixAmount, layer2_textureIndex, layer2_textureRepeat, layer2_maskIndex, layer2_maskRepeat, layer2_LookupMode);\n\n#endif";
+THREE.ShaderChunk[ 'layertextures_fragment' ] ="\n#ifdef USE_LAYER_TEXTURE_MAPS\n\n    // ***************\n    // TEXTURE 2 (special masked texture)\n    // ***************\n    float mixAmount = 1.0;\n    //diffuseColor = layerTexture(diffuseColor, mixAmount, layer2_textureIndex, layer2_textureRepeat, layer2_maskIndex, layer2_maskRepeat, layer2_LookupMode);\n\n    // diffuseColor - Original Material/Texture Color.\n    // mixAmount - How much of the overlay texture to mix.\n    // textureIndex - which texture to use as the source.\n    // textureRepeat - how much to tile the texture\n    // maskIndex - Which texture to use as the mask\n    // maskRepeate - How much to tile the mask\n    // LookupMode - Supports basic atlas from the texture. Currrently hardcoded to an atlas of 512,\n    int texture_index = 1;\n    float texture_repeat = 4.0;\n    int texture_lookupMode = 0;\n    int maskIndex = 1;\n    float maskRepeat = 4.0;\n\n    //layerTexture( vec4 color, float mixAmount, int textureIndex,  float repeatTexture,  int maskIndex, float repeatMask, int textureLookupMode)\n    diffuseColor = layerTexture(diffuseColor, mixAmount, texture_index, texture_repeat, maskIndex, maskRepeat, texture_lookupMode);\n\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/layertextures_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'layertextures_pars_fragment' ] ="\n#ifdef USE_LAYER_TEXTURE_MAPS\n    // Material.parameters.layerTextureMaps\n\n    // Supports pulling texture from an image with tiled textures. 0 - normal, 1..4 = top left, top right, bottom left, bottom right; Lookup points.\n    uniform int layer1_LookupMode;\n    uniform int layer2_LookupMode;\n    uniform int layer3_LookupMode;\n    uniform int layer4_LookupMode;\n    uniform int layer5_LookupMode;\n    uniform int layer6_LookupMode;\n\n    // TEXTURE TO LOAD INTO LAYER\n    uniform int layer1_textureIndex;\n    uniform int layer2_textureIndex;\n    uniform int layer3_textureIndex;\n    uniform int layer4_textureIndex;\n    uniform int layer5_textureIndex;\n    uniform int layer6_textureIndex;\n\n    // MASK TO USE FOR LAYER\n    uniform int layer1_maskIndex;\n    uniform int layer2_maskIndex;\n    uniform int layer3_maskIndex;\n    uniform int layer4_maskIndex;\n    uniform int layer5_maskIndex;\n    uniform int layer6_maskIndex;\n\n    // LAYER REPEAT VALUES FOR TEXTURES.\n    uniform float layer1_textureRepeat;\n    uniform float layer2_textureRepeat;\n    uniform float layer3_textureRepeat;\n    uniform float layer4_textureRepeat;\n    uniform float layer5_textureRepeat;\n    uniform float layer6_textureRepeat;\n\n    // LAYER REPEAT VALUES FOR MASKS.\n    uniform float layer1_maskRepeat;\n    uniform float layer2_maskRepeat;\n    uniform float layer3_maskRepeat;\n    uniform float layer4_maskRepeat;\n    uniform float layer5_maskRepeat;\n    uniform float layer6_maskRepeat;\n\n    // *********************\n    // MASKS\n    // *********************\n    uniform sampler2D masks_1;\n    uniform float masks_1_Loaded;\n\n    uniform sampler2D masks_2;\n    uniform float masks_2_Loaded;\n\n    // *********************\n    // Texture 1\n    // *********************\n    uniform sampler2D texture1_Map;\n    uniform float texture1_Map_Loaded;\n\n    // *********************\n    // Texture 2\n    // *********************\n    uniform sampler2D texture2_Map;\n    uniform float texture2_Map_Loaded;\n\n    // *********************\n    // Texture 3\n    // *********************\n    uniform sampler2D texture3_Map;\n    uniform float texture3_Map_Loaded;\n\n    // *********************\n    // Texture 4\n    // *********************\n    uniform sampler2D texture4_Map;\n    uniform float texture4_Map_Loaded;\n\n    // *********************\n    // Texture 5\n    // *********************\n    uniform sampler2D texture5_Map;\n    uniform float texture5_Map_Loaded;\n\n    // *********************\n    // Texture 6\n    // *********************\n    uniform sampler2D texture6_Map;\n    uniform float texture6_Map_Loaded;\n\n    // Look up texture based on UV and if texture has multiple tiles.\n    vec4 textureLookup(vec2 vUv, sampler2D texture, int quadrant){\n\n        if(quadrant == 0)\n        {\n            return texture2D(texture, vUv);\n        }else{\n\n            // texturePack is 1024\n            vec2 offset = vec2 (0.0,0.5);\n            if(quadrant == 2)\n            {\n                offset = vec2 (0.5,0.5);\n            }\n            if(quadrant == 3)\n            {\n                offset = vec2 (0.5,0.0);\n            }\n            if(quadrant == 4)\n            {\n                offset = vec2 (0.0,0.0);\n            }\n            vec2 texSize = normalize(vec2(512.0,512.0));\n\n            // Step 1 - Modulus or rather tile.\n            // Step 2 - my texture is twice the size.\n            // Step 3 - My texture has 4 textures, set the offset.\n\n            vUv = mod(vUv,texSize);\n            //vUv /= 2.0;\n            //vUv += offset;\n            vUv = offset + texSize * fract(vUv);\n            // image 1024 x 1024\n\n            return texture2D(texture, vUv);\n        }\n    }\n    float isTextureLoaded( int textureIndex){\n        float loaded = 0.0;\n        if(textureIndex == 1)\n        {\n           loaded = texture1_Map_Loaded;\n        }\n\n        if(textureIndex == 2)\n        {\n           loaded = texture2_Map_Loaded;\n        }\n\n        if(textureIndex == 3)\n        {\n            loaded = texture3_Map_Loaded;\n        }\n\n        if(textureIndex == 4)\n        {\n            loaded = texture4_Map_Loaded;\n        }\n\n        if(textureIndex == 5)\n        {\n            loaded = texture5_Map_Loaded;\n        }\n\n        if(textureIndex == 6)\n        {\n            loaded = texture6_Map_Loaded;\n        }\n\n        return loaded;\n    }\n\n    float isMaskLoaded( int maskIndex){\n        float loaded = 0.0;\n        if(maskIndex == 1)\n        {\n           loaded = masks_1_Loaded;\n        }\n\n        if(maskIndex == 2)\n        {\n           loaded = masks_1_Loaded;\n        }\n\n        if(maskIndex == 3)\n        {\n            loaded = masks_1_Loaded;\n        }\n\n        if(maskIndex == 4)\n        {\n            loaded = masks_2_Loaded;\n        }\n\n        if(maskIndex == 5)\n        {\n            loaded = masks_2_Loaded;\n        }\n\n        if(maskIndex == 6)\n        {\n            loaded = masks_2_Loaded;\n        }\n\n        return loaded;\n    }\n\n    // Masks texture.\n    vec4 layerTexture( vec4 color, float mixAmount, int textureIndex,  float repeatTexture,  int maskIndex, float repeatMask, int textureLookupMode)\n    {\n\n        //\n        // GET TEXTURE AND CLAMP IF NOT LOADED\n        //\n        vec4 map = vec4(0.0,0.0,0.0,1.0);\n        if(textureIndex == 1)\n        {\n           map = textureLookup(vUv * repeatTexture, texture1_Map, textureLookupMode);\n        }\n        if(textureIndex == 2)\n        {\n            map = textureLookup(vUv * repeatTexture, texture2_Map, textureLookupMode);\n        }\n        if(textureIndex == 3)\n        {\n            map = textureLookup(vUv * repeatTexture, texture3_Map, textureLookupMode);\n        }\n        if(textureIndex == 4)\n        {\n            map = textureLookup(vUv * repeatTexture, texture4_Map, textureLookupMode);\n        }\n        if(textureIndex == 5)\n        {\n            map = textureLookup(vUv * repeatTexture, texture5_Map, textureLookupMode);\n        }\n        if(textureIndex == 6)\n        {\n            map = textureLookup(vUv * repeatTexture, texture6_Map, textureLookupMode);\n        }\n        float textureLoaded = isTextureLoaded(textureIndex);\n        map = clamp(map+vec4(textureLoaded), 0.0, 1.0);\n\n\n        //\n        // GET MASK AND CLAMP IF NOT LOADED\n        //\n        vec3 mask = vec3(0.0,0.0,0.0);//texture2D(maskTexture, vUv * repeatMask).rgb;\n        vec3 maskColor = vec3(0.0);\n        float maskLoaded = 1.0;\n        if(maskIndex == 1)\n        {\n           mask = textureLookup(vUv * repeatMask, masks_1, 0).rgb;\n           maskColor = vec3(1.0,0.0,0.0);\n           maskLoaded = masks_1_Loaded;\n        }\n\n        if(maskIndex == 2)\n        {\n            mask = textureLookup(vUv * repeatMask, masks_1, 0).rgb;\n            maskColor = vec3(0.0,1.0,0.0);\n            maskLoaded = masks_1_Loaded;\n        }\n\n        if(maskIndex == 3)\n        {\n            mask = textureLookup(vUv * repeatMask, masks_1, 0).rgb;\n            maskColor = vec3(0.0,0.0,1.0);\n            maskLoaded = masks_1_Loaded;\n        }\n\n        if(maskIndex == 4)\n        {\n            mask = textureLookup(vUv * repeatMask, masks_2, 0).rgb;\n            maskColor = vec3(1.0,0.0,0.0);\n            maskLoaded = masks_2_Loaded;\n        }\n\n        if(maskIndex == 5)\n        {\n            mask = textureLookup(vUv * repeatMask, masks_2, 0).rgb;\n            maskColor = vec3(0.0,1.0,0.0);\n            maskLoaded = masks_2_Loaded;\n        }\n\n        if(maskIndex == 6)\n        {\n            mask = textureLookup(vUv * repeatMask, masks_2, 0).rgb;\n            maskColor = vec3(0.0,0.0,1.0);\n            maskLoaded = masks_2_Loaded;\n        }\n\n        mask = clamp(mask, vec3(0.0), maskColor);                   // THRESHOLD\n        mask = clamp(mask+maskLoaded, 0.0, 1.0);                    // UNLOADED == VISIBLE\n\n        //\n        // CONVERT MASK VALUE TO BLACK AND WHITE\n        //\n        float maskValue = (dot(mask,vec3(1.0)));\n        maskValue = smoothstep(0.2,1.0,maskValue); // 0.0 if x < edge; step(edge,x); ++ Smoothing.\n        vec4 finalMask = vec4(vec3(maskValue),1.0);\n\n        //\n        // MIX EXISTING COLOUR WITH TEXTURE COLOUR.\n        //\n        // for Mixing; 0 = color 1 = texture;\n        // Given unloaded mask = 1.0\n        // Given unloaded map = 1.0\n        // if textureLoaded.x == 1. then mixAmount should be 0. ... mixAmount = clamp(mixAmount - textureLoaded.x,0,1)\n        mixAmount = clamp(mixAmount - textureLoaded,0.0,1.0);\n        color = mix(color,map, (maskValue * mixAmount)); // maskValue was mask.x\n\n        //\n        return color;\n    }\n\n#endif";
+THREE.ShaderChunk[ 'layertextures_pars_fragment' ] ="\n#ifdef USE_LAYER_TEXTURE_MAPS\n    // Material.parameters.layerTextureMaps\n\n    // Supports pulling texture from an image with tiled textures. 0 - normal, 1..4 = top left, top right, bottom left, bottom right; Lookup points.\n    uniform int layer1_LookupMode;\n    uniform int layer2_LookupMode;\n    uniform int layer3_LookupMode;\n    uniform int layer4_LookupMode;\n    uniform int layer5_LookupMode;\n    uniform int layer6_LookupMode;\n\n    // TEXTURE TO LOAD INTO LAYER\n    uniform int layer1_textureIndex;\n    uniform int layer2_textureIndex;\n    uniform int layer3_textureIndex;\n    uniform int layer4_textureIndex;\n    uniform int layer5_textureIndex;\n    uniform int layer6_textureIndex;\n\n    // MASK TO USE FOR LAYER\n    uniform int layer1_maskIndex;\n    uniform int layer2_maskIndex;\n    uniform int layer3_maskIndex;\n    uniform int layer4_maskIndex;\n    uniform int layer5_maskIndex;\n    uniform int layer6_maskIndex;\n\n    // LAYER REPEAT VALUES FOR TEXTURES.\n    uniform float layer1_textureRepeat;\n    uniform float layer2_textureRepeat;\n    uniform float layer3_textureRepeat;\n    uniform float layer4_textureRepeat;\n    uniform float layer5_textureRepeat;\n    uniform float layer6_textureRepeat;\n\n    // LAYER REPEAT VALUES FOR MASKS.\n    uniform float layer1_maskRepeat;\n    uniform float layer2_maskRepeat;\n    uniform float layer3_maskRepeat;\n    uniform float layer4_maskRepeat;\n    uniform float layer5_maskRepeat;\n    uniform float layer6_maskRepeat;\n\n    // *********************\n    // MASKS\n    // *********************\n    uniform sampler2D layerMask1;\n    uniform float layerMask1_Loaded;\n\n    uniform sampler2D layerMask2;\n    uniform float layerMask2_Loaded;\n\n    // *********************\n    // Texture 1\n    // *********************\n    uniform sampler2D layerTexture1;\n    uniform float layerTexture1_Loaded;\n\n    // *********************\n    // Texture 2\n    // *********************\n    uniform sampler2D layerTexture2;\n    uniform float layerTexture2_Loaded;\n\n    // *********************\n    // Texture 3\n    // *********************\n    uniform sampler2D layerTexture3;\n    uniform float layerTexture3_Loaded;\n\n    // *********************\n    // Texture 4\n    // *********************\n    uniform sampler2D layerTexture4;\n    uniform float layerTexture4_Loaded;\n\n    // *********************\n    // Texture 5\n    // *********************\n    uniform sampler2D layerTexture5;\n    uniform float layerTexture5_Loaded;\n\n    // *********************\n    // Texture 6\n    // *********************\n    uniform sampler2D layerTexture6;\n    uniform float layerTexture6_Loaded;\n\n    // Look up texture based on UV and if texture has multiple tiles.\n    vec4 textureLookup(vec2 vUv, sampler2D texture, int quadrant){\n\n        if(quadrant == 0)\n        {\n            return texture2D(texture, vUv);\n        }else{\n\n            // texturePack is 1024\n            vec2 offset = vec2 (0.0,0.5);\n            if(quadrant == 2)\n            {\n                offset = vec2 (0.5,0.5);\n            }\n            if(quadrant == 3)\n            {\n                offset = vec2 (0.5,0.0);\n            }\n            if(quadrant == 4)\n            {\n                offset = vec2 (0.0,0.0);\n            }\n            vec2 texSize = normalize(vec2(512.0,512.0));\n\n            // Step 1 - Modulus or rather tile.\n            // Step 2 - my texture is twice the size.\n            // Step 3 - My texture has 4 textures, set the offset.\n\n            vUv = mod(vUv,texSize);\n            //vUv /= 2.0;\n            //vUv += offset;\n            vUv = offset + texSize * fract(vUv);\n            // image 1024 x 1024\n\n            return texture2D(texture, vUv);\n        }\n    }\n    float isTextureLoaded( int textureIndex){\n        float loaded = 0.0;\n        if(textureIndex == 1)\n        {\n           loaded = layerTexture1_Loaded;\n        }\n\n        if(textureIndex == 2)\n        {\n           loaded = layerTexture2_Loaded;\n        }\n\n        if(textureIndex == 3)\n        {\n            loaded = layerTexture3_Loaded;\n        }\n\n        if(textureIndex == 4)\n        {\n            loaded = layerTexture4_Loaded;\n        }\n\n        if(textureIndex == 5)\n        {\n            loaded = layerTexture5_Loaded;\n        }\n\n        if(textureIndex == 6)\n        {\n            loaded = layerTexture6_Loaded;\n        }\n\n        return loaded;\n    }\n\n    float isMaskLoaded( int maskIndex){\n        float loaded = 0.0;\n        if(maskIndex == 1)\n        {\n           loaded = layerMask1_Loaded;\n        }\n\n        if(maskIndex == 2)\n        {\n           loaded = layerMask1_Loaded;\n        }\n\n        if(maskIndex == 3)\n        {\n            loaded = layerMask1_Loaded;\n        }\n\n        if(maskIndex == 4)\n        {\n            loaded = layerMask2_Loaded;\n        }\n\n        if(maskIndex == 5)\n        {\n            loaded = layerMask2_Loaded;\n        }\n\n        if(maskIndex == 6)\n        {\n            loaded = layerMask2_Loaded;\n        }\n\n        return loaded;\n    }\n\n    // Masks texture.\n    vec4 layerTexture( vec4 color, float mixAmount, int textureIndex,  float repeatTexture,  int maskIndex, float repeatMask, int textureLookupMode)\n    {\n\n        //\n        // GET TEXTURE AND CLAMP IF NOT LOADED\n        //\n        vec4 map = vec4(0.0,0.0,0.0,1.0);\n        if(textureIndex == 1)\n        {\n           map = textureLookup(vUv * repeatTexture, layerTexture1, textureLookupMode);\n        }\n        if(textureIndex == 2)\n        {\n            map = textureLookup(vUv * repeatTexture, layerTexture2, textureLookupMode);\n        }\n        if(textureIndex == 3)\n        {\n            map = textureLookup(vUv * repeatTexture, layerTexture3, textureLookupMode);\n        }\n        if(textureIndex == 4)\n        {\n            map = textureLookup(vUv * repeatTexture, layerTexture4, textureLookupMode);\n        }\n        if(textureIndex == 5)\n        {\n            map = textureLookup(vUv * repeatTexture, layerTexture5, textureLookupMode);\n        }\n        if(textureIndex == 6)\n        {\n            map = textureLookup(vUv * repeatTexture, layerTexture6, textureLookupMode);\n        }\n        float textureLoaded = isTextureLoaded(textureIndex);\n        map = clamp(map+vec4(textureLoaded), 0.0, 1.0);\n\n\n        //\n        // GET MASK AND CLAMP IF NOT LOADED\n        //\n        vec3 mask = vec3(0.0,0.0,0.0);//texture2D(maskTexture, vUv * repeatMask).rgb;\n        vec3 maskColor = vec3(0.0);\n        float maskLoaded = 1.0;\n        if(maskIndex == 1)\n        {\n           mask = textureLookup(vUv * repeatMask, layerMask1, 0).rgb;\n           maskColor = vec3(1.0,0.0,0.0);\n           maskLoaded = layerMask1_Loaded;\n        }\n\n        if(maskIndex == 2)\n        {\n            mask = textureLookup(vUv * repeatMask, layerMask1, 0).rgb;\n            maskColor = vec3(0.0,1.0,0.0);\n            maskLoaded = layerMask1_Loaded;\n        }\n\n        if(maskIndex == 3)\n        {\n            mask = textureLookup(vUv * repeatMask, layerMask1, 0).rgb;\n            maskColor = vec3(0.0,0.0,1.0);\n            maskLoaded = layerMask1_Loaded;\n        }\n\n        if(maskIndex == 4)\n        {\n            mask = textureLookup(vUv * repeatMask, layerMask2, 0).rgb;\n            maskColor = vec3(1.0,0.0,0.0);\n            maskLoaded = layerMask2_Loaded;\n        }\n\n        if(maskIndex == 5)\n        {\n            mask = textureLookup(vUv * repeatMask, layerMask2, 0).rgb;\n            maskColor = vec3(0.0,1.0,0.0);\n            maskLoaded = layerMask2_Loaded;\n        }\n\n        if(maskIndex == 6)\n        {\n            mask = textureLookup(vUv * repeatMask, layerMask2, 0).rgb;\n            maskColor = vec3(0.0,0.0,1.0);\n            maskLoaded = layerMask2_Loaded;\n        }\n\n        mask = clamp(mask, vec3(0.0), maskColor);                   // THRESHOLD\n        mask = clamp(mask+maskLoaded, 0.0, 1.0);                    // UNLOADED == VISIBLE\n\n        //\n        // CONVERT MASK VALUE TO BLACK AND WHITE\n        //\n        float maskValue = (dot(mask,vec3(1.0)));\n        maskValue = smoothstep(0.2,1.0,maskValue); // 0.0 if x < edge; step(edge,x); ++ Smoothing.\n        vec4 finalMask = vec4(vec3(maskValue),1.0);\n\n        //\n        // MIX EXISTING COLOUR WITH TEXTURE COLOUR.\n        //\n        // for Mixing; 0 = color 1 = texture;\n        // Given unloaded mask = 1.0\n        // Given unloaded map = 1.0\n        // if textureLoaded.x == 1. then mixAmount should be 0. ... mixAmount = clamp(mixAmount - textureLoaded.x,0,1)\n        mixAmount = clamp(mixAmount - textureLoaded,0.0,1.0);\n        color = mix(color,map, (maskValue * mixAmount)); // maskValue was mask.x\n\n        //\n        return color;\n        //return mix(color, texture2D(layerTexture1, vUv), mixAmount);\n\n    }\n\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/lightmap_fragment.glsl
 
@@ -23652,15 +23737,15 @@ THREE.ShaderChunk[ 'uv2_vertex' ] ="#if defined( USE_LIGHTMAP ) || defined( USE_
 
 // File:src/renderers/shaders/ShaderChunk/uv_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'uv_pars_fragment' ] ="#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )\n\n\tvarying vec2 vUv;\n\n#endif";
+THREE.ShaderChunk[ 'uv_pars_fragment' ] ="#if defined ( USE_LAYER_TEXTURE_MAPS) || defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )\n\n\tvarying vec2 vUv;\n\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/uv_pars_vertex.glsl
 
-THREE.ShaderChunk[ 'uv_pars_vertex' ] ="#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )\n\n\tvarying vec2 vUv;\n\tuniform vec4 offsetRepeat;\n\n#endif\n";
+THREE.ShaderChunk[ 'uv_pars_vertex' ] ="#if defined ( USE_LAYER_TEXTURE_MAPS) || defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )\n\n\tvarying vec2 vUv;\n\tuniform vec4 offsetRepeat;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/uv_vertex.glsl
 
-THREE.ShaderChunk[ 'uv_vertex' ] ="#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )\n\n\tvUv = uv * offsetRepeat.zw + offsetRepeat.xy;\n\n#endif";
+THREE.ShaderChunk[ 'uv_vertex' ] ="#if defined ( USE_LAYER_TEXTURE_MAPS) || defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )\n\n\tvUv = uv * offsetRepeat.zw + offsetRepeat.xy;\n\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/worldpos_vertex.glsl
 
@@ -23750,6 +23835,16 @@ THREE.UniformsLib = {
 		layer1_maskIndex:{type: 'i', value: 1 },
 		layer1_textureRepeat: { type: 'f', value: 1.0},
 		layer1_maskRepeat: { type: 'f', value: 1.0},
+
+		"layerTexture1": { type: "t", value: null },
+		"layerTexture2": { type: "t", value: null },
+		"layerTexture3": { type: "t", value: null },
+		"layerTexture4": { type: "t", value: null },
+		"layerTexture5": { type: "t", value: null },
+		"layerTexture6": { type: "t", value: null },
+		"layerMask1": { type: "t", value: null },
+		"layerMask2": { type: "t", value: null },
+
 	},
 
 	common: {
@@ -23927,7 +24022,8 @@ THREE.ShaderLib = {
 
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "aomap" ],
-			THREE.UniformsLib[ "fog" ]
+			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "layertexturemaps" ],
 
 		] ),
 
@@ -24011,7 +24107,6 @@ THREE.ShaderLib = {
 			"	reflectedLight.directDiffuse = vec3( 0.0 );",
 			"	reflectedLight.directSpecular = vec3( 0.0 );",
 			"	reflectedLight.indirectDiffuse = diffuseColor.rgb;",
-
 			"	reflectedLight.indirectSpecular = vec3( 0.0 );",
 
 				THREE.ShaderChunk[ "aomap_fragment" ],
@@ -24041,6 +24136,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
+			THREE.UniformsLib[ "layertexturemaps" ],
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) }
@@ -24200,6 +24296,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
+			THREE.UniformsLib[ "layertexturemaps" ],
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -24232,7 +24329,6 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
 
 			"void main() {",
 
@@ -24356,6 +24452,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
+			THREE.UniformsLib[ "layertexturemaps" ],
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -26926,6 +27023,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 			uniforms.aoMapIntensity.value = material.aoMapIntensity;
 
 		}
+
+		// **************************
+		// Start - Layered Texture maps
+		// **************************
+		uniforms.layerTexture1.value = material.layerTexture1;
+		uniforms.layerTexture2.value = material.layerTexture2;
+		uniforms.layerTexture3.value = material.layerTexture3;
+		uniforms.layerTexture4.value = material.layerTexture4;
+		uniforms.layerTexture5.value = material.layerTexture5;
+		uniforms.layerTexture6.value = material.layerTexture6;
+		uniforms.layerMask1.value = material.layerMask1;
+		uniforms.layerMask2.value = material.layerMask2;
+
+
+
+		// **************************
+		// End - Layered Texture maps
+		// **************************
 
 		// uv repeat and offset setting priorities
 		// 1. color map
@@ -29541,7 +29656,7 @@ THREE.WebGLProgram = ( function () {
 			var name = info.name;
 			var location = gl.getUniformLocation( program, name );
 
-			//console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
+			console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
 
 			var matches = structRe.exec( name );
 			if ( matches ) {
@@ -29802,6 +29917,14 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.flatShading ? '#define FLAT_SHADED' : '',
 
+				// **************************
+				// Start - Layered Texture maps
+				// **************************
+				parameters.layerTextureMaps ? '#define USE_LAYER_TEXTURE_MAPS' : '',
+				// **************************
+				// END - Layered Texture Maps
+				// **************************
+
 				parameters.skinning ? '#define USE_SKINNING' : '',
 				parameters.useVertexTexture ? '#define BONE_TEXTURE' : '',
 
@@ -29910,8 +30033,13 @@ THREE.WebGLProgram = ( function () {
 				parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
 
+				// **************************
+				// Start - Layered Texture maps
+				// **************************
 				parameters.layerTextureMaps ? '#define USE_LAYER_TEXTURE_MAPS' : '',
-
+				// **************************
+				// END - Layered Texture Maps
+				// **************************
 				parameters.flatShading ? '#define FLAT_SHADED' : '',
 
 				parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
@@ -29948,8 +30076,8 @@ THREE.WebGLProgram = ( function () {
 		var vertexGlsl = prefixVertex + vertexShader;
 		var fragmentGlsl = prefixFragment + fragmentShader;
 
-		// console.log( '*VERTEX*', vertexGlsl );
-		 console.log( '*FRAGMENT*', fragmentGlsl );
+		 //console.log( '*VERTEX*', vertexGlsl );
+		 //console.log( '*FRAGMENT*', fragmentGlsl );
 
 		var glVertexShader = THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
 		var glFragmentShader = THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
@@ -30261,7 +30389,24 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide,
 
-			layerTextureMaps: material.layerTextureMaps
+			// **************************
+			// Start - Layered Texture maps
+			// **************************
+			layerTextureMaps: material.layerTextureMaps,
+			//layerTexture1: !! material.layerTexture1,
+			//layerTexture2: !! material.layerTexture2,
+			//layerTexture3: !! material.layerTexture3,
+			//layerTexture4: !! material.layerTexture4,
+			//layerTexture5: !! material.layerTexture5,
+			//layerTexture6: !! material.layerTexture6,
+            //
+			//layerMask1: !! material.layerMask1,
+			//layerMask2: !! material.layerMask2,
+
+			// **************************
+			// End - Layered Texture maps
+			// **************************
+
 
 		};
 
@@ -30330,8 +30475,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		if ( program === undefined ) {
 
 			program = new THREE.WebGLProgram( renderer, code, material, parameters );
-			console.log("Program == ");
-			console.log("Program == "+JSON.stringify(program));
 			programs.push( program );
 
 		}
