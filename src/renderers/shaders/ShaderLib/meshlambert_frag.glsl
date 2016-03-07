@@ -21,7 +21,6 @@ varying vec3 vLightFront;
 #include <emissivemap_pars_fragment>
 #include <envmap_pars_fragment>
 #include <bsdfs>
-#include <ambient_pars>
 #include <lights_pars>
 #include <fog_pars_fragment>
 #include <shadowmap_pars_fragment>

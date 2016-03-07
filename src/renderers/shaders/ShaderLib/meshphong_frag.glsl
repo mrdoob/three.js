@@ -18,7 +18,6 @@ uniform float opacity;
 #include <envmap_pars_fragment>
 #include <fog_pars_fragment>
 #include <bsdfs>
-#include <ambient_pars>
 #include <lights_pars>
 #include <lights_phong_pars_fragment>
 #include <shadowmap_pars_fragment>
