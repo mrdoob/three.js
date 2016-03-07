@@ -135,6 +135,15 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 
 				// normal
 				normal.copy( vertex );
+
+				// handle special case if radiusTop/radiusBottom is zero
+				if( ( radiusTop === 0  && y === 0 ) || ( radiusBottom === 0  && y === heightSegments ) ) {
+
+					normal.x = Math.sin( u * thetaLength + thetaStart );
+					normal.z = Math.cos( u * thetaLength + thetaStart );
+
+				}
+
 				normal.setY( Math.sqrt( normal.x * normal.x + normal.z * normal.z ) * tanTheta ).normalize();
 				normals.setXYZ( index, normal.x, normal.y, normal.z );
 
