@@ -186,7 +186,7 @@
 
 		#else
 
-			vec3 envMapColor = vec3( 0.0 );
+			vec4 envMapColor = vec4( 0.0 );
 
 		#endif
 
