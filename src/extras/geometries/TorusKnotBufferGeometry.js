@@ -3,7 +3,7 @@
  *
  * see: http://www.blackpawn.com/texts/pqtorus/
  */
-THREE.TorusKnotBufferGeometry = function ( radius, tube, radialSegments, tubularSegments, p, q, heightScale, arc ) {
+THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -12,22 +12,20 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, radialSegments, tubular
 	this.parameters = {
 		radius: radius,
 		tube: tube,
-		radialSegments: radialSegments,
 		tubularSegments: tubularSegments,
+		radialSegments: radialSegments,
 		p: p,
-		q: q,
-		heightScale: heightScale,
-		arc: arc
+		q: q
 	};
+
+	if( heightScale !== undefined ) console.warn( 'THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.' );
 
 	radius = radius || 100;
 	tube = tube || 40;
-	radialSegments = Math.floor( radialSegments ) || 64;
-	tubularSegments = Math.floor( tubularSegments ) || 6;
+	tubularSegments = Math.floor( tubularSegments ) || 64;
+	radialSegments = Math.floor( radialSegments ) || 8;
 	p = p || 2;
 	q = q || 3;
-	heightScale = heightScale || 1;
-	arc = arc || Math.PI * 2;
 
 	// used to calculate buffer length
 	var vertexCount = ( ( radialSegments + 1 ) * ( tubularSegments + 1 ) );
@@ -55,17 +53,17 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, radialSegments, tubular
 
 	// generate vertices, normals and uvs
 
-	for ( i = 0; i <= radialSegments; ++ i ) {
+	for ( i = 0; i <= tubularSegments; ++ i ) {
 
-		// the radian "u" is used to calculate the position on the torus curve of the current radial segement
+		// the radian "u" is used to calculate the position on the torus curve of the current tubular segement
 
-		var u = i / radialSegments * p * arc;
+		var u = i / tubularSegments * p * Math.PI * 2;
 
 		// now we calculate two points. P1 is our current position on the curve, P2 is a little farther ahead.
 		// these points are used to create a special "coordinate space", which is necessary to calculate the correct vertex positions
 
-		calculatePositionOnCurve( u, p, q, radius, heightScale, P1 );
-		calculatePositionOnCurve( u + 0.01, p, q, radius, heightScale, P2 );
+		calculatePositionOnCurve( u, p, q, radius, P1 );
+		calculatePositionOnCurve( u + 0.01, p, q, radius, P2 );
 
 		// calculate orthonormal basis
 
@@ -79,12 +77,12 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, radialSegments, tubular
 		B.normalize();
 		N.normalize();
 
-		for ( j = 0; j <= tubularSegments; ++ j ) {
+		for ( j = 0; j <= radialSegments; ++ j ) {
 
 			// now calculate the vertices. they are nothing more than an extrusion of the torus curve.
 			// because we extrude a shape in the xy-plane, there is no need to calculate a z-value.
 
-			var v = j / tubularSegments * Math.PI * 2;
+			var v = j / radialSegments * Math.PI * 2;
 			var cx = - tube * Math.cos( v );
 			var cy = tube * Math.sin( v );
 
@@ -103,8 +101,8 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, radialSegments, tubular
 			normals.setXYZ( index, normal.x, normal.y, normal.z );
 
 			// uv
-			uv.x = i / radialSegments;
-			uv.y = j / tubularSegments;
+			uv.x = i / tubularSegments;
+			uv.y = j / radialSegments;
 			uvs.setXY( index, uv.x, uv.y );
 
 			// increase index
@@ -116,15 +114,15 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, radialSegments, tubular
 
 	// generate indices
 
-	for ( j = 1; j <= radialSegments; j ++ ) {
+	for ( j = 1; j <= tubularSegments; j ++ ) {
 
-		for ( i = 1; i <= tubularSegments; i ++ ) {
+		for ( i = 1; i <= radialSegments; i ++ ) {
 
 			// indices
-			var a = ( tubularSegments + 1 ) * ( j - 1 ) + ( i - 1 );
-			var b = ( tubularSegments + 1 ) * j + ( i - 1 );
-			var c = ( tubularSegments + 1 ) * j + i;
-			var d = ( tubularSegments + 1 ) * ( j - 1 ) + i;
+			var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
+			var b = ( radialSegments + 1 ) * j + ( i - 1 );
+			var c = ( radialSegments + 1 ) * j + i;
+			var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
 
 			// face one
 			indices.setX( indexOffset, a ); indexOffset++;
@@ -149,7 +147,7 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, radialSegments, tubular
 
 	// this function calculates the current position on the torus curve
 
-	function calculatePositionOnCurve( u, p, q, radius, heightScale, position ) {
+	function calculatePositionOnCurve( u, p, q, radius, position ) {
 
 		var cu = Math.cos( u );
 		var su = Math.sin( u );
@@ -158,7 +156,7 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, radialSegments, tubular
 
 		position.x = radius * ( 2 + cs ) * 0.5 * cu;
 		position.y = radius * ( 2 + cs ) * su * 0.5;
-		position.z = heightScale * radius * Math.sin( quOverP ) * 0.5;
+		position.z = radius * Math.sin( quOverP ) * 0.5;
 
 	}
 
