@@ -47,29 +47,35 @@ THREE.WebGLProgram = ( function () {
 	}
 
 	function getToneMappingFunction( functionName, toneMapping ) {
+
 		var toneMappingName;
 
-		switch( toneMapping ) {
+		switch ( toneMapping ) {
+
 			case THREE.LinearToneMapping:
 				toneMappingName = "Linear";
 				break;
+
 			case THREE.ReinhardToneMapping:
 				toneMappingName = "Reinhard";
 				break;
+
 			case THREE.Uncharted2ToneMapping:
 				toneMappingName = "Uncharted2";
 				break;
+
 			case THREE.CineonToneMapping:
 				toneMappingName = "OptimizedCineon";
 				break;
+
 			default:
 				throw new Error( 'unsupported toneMapping: ' + toneMapping );
 
 		}
+
 		return "vec3 " + functionName + "( vec3 color ) { return " + toneMappingName + "ToneMapping( color ); }";
 
 	}
-
 
 	function generateExtensions( extensions, parameters, rendererExtensions ) {
 
