@@ -15,6 +15,7 @@
 	"src/math/Sphere.js",
 	"src/math/Frustum.js",
 	"src/math/Plane.js",
+	"src/math/Spherical.js",
 	"src/math/Math.js",
 	"src/math/Spline.js",
 	"src/math/Triangle.js",
