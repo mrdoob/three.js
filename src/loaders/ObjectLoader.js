@@ -230,8 +230,8 @@ THREE.ObjectLoader.prototype = {
 						geometry = new THREE[ data.type ](
 							data.radius,
 							data.tube,
-							data.radialSegments,
 							data.tubularSegments,
+							data.radialSegments,
 							data.p,
 							data.q
 						);
