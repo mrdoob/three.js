@@ -32,7 +32,6 @@ THREE.PhongNode.prototype.build = function( builder ) {
 		material.mergeUniform( THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ]
 
 		] ) );

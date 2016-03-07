@@ -3634,7 +3634,6 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.UniformsLib[ "normalmap" ],
 		THREE.UniformsLib[ "displacementmap" ],
 		THREE.UniformsLib[ "fog" ],
-		THREE.UniformsLib[ "ambient" ],
 		THREE.UniformsLib[ "lights" ],
 
 		{
