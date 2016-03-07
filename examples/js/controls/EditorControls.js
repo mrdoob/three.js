@@ -87,14 +87,14 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		vector.copy( object.position ).sub( center );
 
-		spherical.fromVector3( vector );
+		spherical.setFromVector3( vector );
 
 		spherical.theta += delta.x;
 		spherical.phi += delta.y;
 
 		spherical.makeSafe();
 
-		vector = spherical.toVector3( vector );
+		vector.setFromSpherical( spherical );
 
 		object.position.copy( center ).add( vector );
 

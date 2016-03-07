@@ -133,7 +133,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			offset.applyQuaternion( quat );
 
 			// angle from z-axis around y-axis
-			spherical.fromVector3( offset );
+			spherical.setFromVector3( offset );
 
 			if ( scope.autoRotate && state === STATE.NONE ) {
 
@@ -161,8 +161,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 			// move target to panned location
 			scope.target.add( panOffset );
 
-			offset = spherical.toVector3( offset );
-
+			offset.setFromSpherical( spherical );
+			
 			// rotate offset back to "camera-up-vector-is-up" space
 			offset.applyQuaternion( quatInverse );
 

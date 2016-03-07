@@ -55,7 +55,7 @@ THREE.Spherical.prototype = {
 
 	},
 
-  fromVector3: function( vec3 ) {
+  setFromVector3: function( vec3 ) {
 
 		this.radius = vec3.length();
 		if( this.radius === 0 ) {
@@ -64,25 +64,11 @@ THREE.Spherical.prototype = {
 		}
 		else {
     	this.theta = Math.atan2( vec3.x, vec3.z ); // equator angle around y-up axis
-    	this.phi = Math.acos( vec3.y / this.radius ); // polar angle
+    	this.phi = Math.acos( THREE.Math.clamp( vec3.y / this.radius, -1, 1 ) ); // polar angle
 		}
 
     return this;
 
   },
-
-  toVector3: function( optionalTarget ) {
-
-    var result = optionalTarget || new THREE.Vector3();
-		var sinPhiRadius = Math.sin( this.phi ) * this.radius;
-    result.set(
-      sinPhiRadius * Math.sin( this.theta ),
-      Math.cos( this.phi ) * this.radius,
-      sinPhiRadius * Math.cos( this.theta )
-    );
-
-    return result;
-
-  }
 
 };
