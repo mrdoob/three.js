@@ -6,7 +6,6 @@
  *
  * The poles (phi) are at the positive and negative y axis.
  * The equator starts at positive z.
- *
  */
 
 THREE.Spherical = function ( radius, phi, theta ) {
@@ -26,10 +25,10 @@ THREE.Spherical.prototype = {
 	set: function ( radius, phi, theta ) {
 
 		this.radius = radius;
-    this.phi = phi;
-    this.theta = theta;
+		this.phi = phi;
+		this.theta = theta;
 
-  },
+	},
 
 	clone: function () {
 
@@ -55,20 +54,24 @@ THREE.Spherical.prototype = {
 
 	},
 
-  setFromVector3: function( vec3 ) {
+	setFromVector3: function( vec3 ) {
 
 		this.radius = vec3.length();
-		if( this.radius === 0 ) {
+
+		if ( this.radius === 0 ) {
+
 			this.theta = 0;
 			this.phi = 0;
-		}
-		else {
-    	this.theta = Math.atan2( vec3.x, vec3.z ); // equator angle around y-up axis
-    	this.phi = Math.acos( THREE.Math.clamp( vec3.y / this.radius, -1, 1 ) ); // polar angle
+
+		} else {
+
+			this.theta = Math.atan2( vec3.x, vec3.z ); // equator angle around y-up axis
+			this.phi = Math.acos( THREE.Math.clamp( vec3.y / this.radius, - 1, 1 ) ); // polar angle
+
 		}
 
-    return this;
+		return this;
 
-  },
+	},
 
 };
