@@ -1,26 +1,36 @@
 {
     "accessors": {
-        "attribute_23": {
+        "accessor_21": {
             "bufferView": "bufferView_29",
             "byteOffset": 0,
+            "byteStride": 0,
+            "componentType": 5123,
+            "count": 12636,
+            "type": "SCALAR"
+        },
+        "accessor_23": {
+            "bufferView": "bufferView_30",
+            "byteOffset": 0,
             "byteStride": 12,
+            "componentType": 5126,
             "count": 2399,
             "max": [
-                96.1799,
-                163.97,
-                53.9252
+                0.961799,
+                1.6397,
+                0.539252
             ],
             "min": [
-                -69.2985,
-                9.92937,
-                -61.3282
+                -0.692985,
+                0.0992937,
+                -0.613282
             ],
-            "type": 35665
+            "type": "VEC3"
         },
-        "attribute_25": {
-            "bufferView": "bufferView_29",
+        "accessor_25": {
+            "bufferView": "bufferView_30",
             "byteOffset": 28788,
             "byteStride": 12,
+            "componentType": 5126,
             "count": 2399,
             "max": [
                 0.999599,
@@ -32,12 +42,13 @@
                 -1,
                 -0.999832
             ],
-            "type": 35665
+            "type": "VEC3"
         },
-        "attribute_27": {
-            "bufferView": "bufferView_29",
+        "accessor_27": {
+            "bufferView": "bufferView_30",
             "byteOffset": 57576,
             "byteStride": 8,
+            "componentType": 5126,
             "count": 2399,
             "max": [
                 0.983346,
@@ -47,101 +58,84 @@
                 0.026409,
                 0.019963
             ],
-            "type": 35664
-        },
-        "indices_21": {
-            "bufferView": "bufferView_30",
-            "byteOffset": 0,
-            "count": 12636,
-            "type": 5123
+            "type": "VEC2"
         }
     },
     "animations": {},
     "asset": {
-        "generator": "collada2gltf@75061f683116dc0ffdad48f33c226e933132e98c"
+        "generator": "collada2gltf@ceec062e3d5793f2f249f53cbd843aee382ad40b",
+        "premultipliedAlpha": true,
+        "profile": {
+            "api": "WebGL",
+            "version": "1.0.2"
+        },
+        "version": 1
     },
     "bufferViews": {
         "bufferView_29": {
             "buffer": "duck",
-            "byteLength": 76768,
+            "byteLength": 25272,
             "byteOffset": 0,
-            "target": 34962
+            "target": 34963
         },
         "bufferView_30": {
             "buffer": "duck",
-            "byteLength": 25272,
-            "byteOffset": 76768,
-            "target": 34963
-        },
-        "bufferView_31": {
-            "buffer": "duck",
-            "byteLength": 0,
-            "byteOffset": 102040
+            "byteLength": 76768,
+            "byteOffset": 25272,
+            "target": 34962
         }
     },
     "buffers": {
         "duck": {
             "byteLength": 102040,
-            "path": "duck.bin",
-            "type": "arraybuffer"
+            "type": "arraybuffer",
+            "uri": "duck.bin"
         }
     },
     "cameras": {
-        "camera_0": {
+        "cameraShape1": {
+            "name": "cameraShape1",
             "perspective": {
                 "aspect_ratio": 1.5,
-                "yfov": 37.8492,
-                "zfar": 10000,
-                "znear": 1
+                "yfov": 0.660593,
+                "zfar": 100,
+                "znear": 0.01
             },
             "type": "perspective"
         }
     },
     "images": {
-        "image_0": {
-            "path": "duckCM.png"
-        }
-    },
-    "lights": {
-        "directionalLightShape1-lib": {
-            "directional": {
-                "color": [
-                    1,
-                    1,
-                    1
-                ]
-            },
-            "type": "directional"
+        "file2": {
+            "name": "file2",
+            "uri": "duckCM.png"
         }
     },
     "materials": {
         "blinn3-fx": {
-            "instanceTechnique": {
-                "technique": "technique1",
-                "values": {
-                    "ambient": [
-                        0,
-                        0,
-                        0,
-                        1
-                    ],
-                    "diffuse": "texture_image_0",
-                    "emission": [
-                        0,
-                        0,
-                        0,
-                        1
-                    ],
-                    "shininess": 38.4,
-                    "specular": [
-                        0,
-                        0,
-                        0,
-                        1
-                    ]
-                }
-            },
-            "name": "blinn3"
+            "name": "blinn3",
+            "technique": "technique0",
+            "values": {
+                "ambient": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "diffuse": "texture_file2",
+                "emission": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "shininess": 38.4,
+                "specular": [
+                    0,
+                    0,
+                    0,
+                    1
+                ]
+            }
         }
     },
     "meshes": {
@@ -150,13 +144,13 @@
             "primitives": [
                 {
                     "attributes": {
-                        "NORMAL": "attribute_25",
-                        "POSITION": "attribute_23",
-                        "TEXCOORD_0": "attribute_27"
+                        "NORMAL": "accessor_25",
+                        "POSITION": "accessor_23",
+                        "TEXCOORD_0": "accessor_27"
                     },
-                    "indices": "indices_21",
+                    "indices": "accessor_21",
                     "material": "blinn3-fx",
-                    "primitive": 4
+                    "mode": 4
                 }
             ]
         }
@@ -188,7 +182,7 @@
             "name": "LOD3sp"
         },
         "camera1": {
-            "camera": "camera_0",
+            "camera": "cameraShape1",
             "children": [],
             "matrix": [
                 -0.728969,
@@ -203,22 +197,21 @@
                 0.621148,
                 -0.571288,
                 0,
-                400.113,
-                463.264,
-                -431.078,
+                4.00113,
+                4.63264,
+                -4.31078,
                 1
             ],
             "name": "camera1"
         },
         "directionalLight1": {
             "children": [],
-            "light": "directionalLightShape1-lib",
             "matrix": [
                 -0.954692,
                 0.218143,
-                -0.202428,
+                -0.202429,
                 0,
-                0.0146721,
+                0.014672,
                 0.713885,
                 0.700109,
                 0,
@@ -226,15 +219,14 @@
                 0.665418,
                 -0.684741,
                 0,
-                148.654,
-                183.672,
-                -292.179,
+                1.48654,
+                1.83672,
+                -2.92179,
                 1
             ],
             "name": "directionalLight1"
         }
     },
-    "profile": "WebGL 1.0.2",
     "programs": {
         "program_0": {
             "attributes": [
@@ -266,15 +258,22 @@
     },
     "shaders": {
         "duck0FS": {
-            "path": "duck0FS.glsl"
+            "type": 35632,
+            "uri": "duck0FS.glsl"
         },
         "duck0VS": {
-            "path": "duck0VS.glsl"
+            "type": 35633,
+            "uri": "duck0VS.glsl"
         }
     },
     "skins": {},
     "techniques": {
-        "technique1": {
+        "technique0": {
+            "attributes": {
+                "a_normal": "normal",
+                "a_position": "position",
+                "a_texcoord0": "texcoord0"
+            },
             "parameters": {
                 "ambient": {
                     "type": 35666
@@ -294,7 +293,8 @@
                     ]
                 },
                 "light0Transform": {
-                    "source": "directionalLight1",
+                    "node": "directionalLight1",
+                    "semantic": "MODELVIEW",
                     "type": 35676
                 },
                 "modelViewMatrix": {
@@ -328,70 +328,35 @@
                     "type": 35664
                 }
             },
-            "pass": "defaultPass",
-            "passes": {
-                "defaultPass": {
-                    "details": {
-                        "commonProfile": {
-                            "extras": {
-                                "doubleSided": false
-                            },
-                            "lightingModel": "Blinn",
-                            "parameters": [
-                                "ambient",
-                                "diffuse",
-                                "emission",
-                                "light0Color",
-                                "light0Transform",
-                                "modelViewMatrix",
-                                "normalMatrix",
-                                "projectionMatrix",
-                                "shininess",
-                                "specular"
-                            ],
-                            "texcoordBindings": {
-                                "diffuse": "TEXCOORD_0"
-                            }
-                        },
-                        "type": "COLLADA-1.4.1/commonProfile"
-                    },
-                    "instanceProgram": {
-                        "attributes": {
-                            "a_normal": "normal",
-                            "a_position": "position",
-                            "a_texcoord0": "texcoord0"
-                        },
-                        "program": "program_0",
-                        "uniforms": {
-                            "u_ambient": "ambient",
-                            "u_diffuse": "diffuse",
-                            "u_emission": "emission",
-                            "u_light0Color": "light0Color",
-                            "u_light0Transform": "light0Transform",
-                            "u_modelViewMatrix": "modelViewMatrix",
-                            "u_normalMatrix": "normalMatrix",
-                            "u_projectionMatrix": "projectionMatrix",
-                            "u_shininess": "shininess",
-                            "u_specular": "specular"
-                        }
-                    },
-                    "states": {
-                        "blendEnable": 0,
-                        "cullFaceEnable": 1,
-                        "depthMask": 1,
-                        "depthTestEnable": 1
-                    }
-                }
+            "program": "program_0",
+            "states": {
+                "enable": [
+                    2929,
+                    2884
+                ]
+            },
+            "uniforms": {
+                "u_ambient": "ambient",
+                "u_diffuse": "diffuse",
+                "u_emission": "emission",
+                "u_light0Color": "light0Color",
+                "u_light0Transform": "light0Transform",
+                "u_modelViewMatrix": "modelViewMatrix",
+                "u_normalMatrix": "normalMatrix",
+                "u_projectionMatrix": "projectionMatrix",
+                "u_shininess": "shininess",
+                "u_specular": "specular"
             }
         }
     },
     "textures": {
-        "texture_image_0": {
+        "texture_file2": {
             "format": 6408,
             "internalFormat": 6408,
             "sampler": "sampler_0",
-            "source": "image_0",
-            "target": 3553
+            "source": "file2",
+            "target": 3553,
+            "type": 5121
         }
     }
 }
