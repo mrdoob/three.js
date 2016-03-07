@@ -1,6 +1,6 @@
 ##### Description of the problem 
 
-
+...
 
 ##### Three.js version
 
