@@ -1,5 +1,3 @@
-#define DISABLE_CUBE_UV_MIPMAP_INTERPOLATION
-
 #ifdef ENVMAP_TYPE_CUBE_UV
 
 const float cubeUV_textureSize = 1024.0;
@@ -112,10 +110,8 @@ vec4 textureCubeUV(vec3 reflectedDirection, float roughness ) {
     float level1 = level0 + 1.0;
     level1 = level1 > 5.0 ? 5.0 : level1;
 
-#if defined( DISABLE_CUBE_UV_MIPMAP_INTERPOLATION )
     // round to nearest mipmap if we are not interpolating.
     level0 += min( floor( s + 0.5 ), 5.0 );
-#endif
 
     // Tri linear interpolation.
     vec2 uv_10 = getCubeUV(reflectedDirection, r1, level0);
@@ -125,19 +121,6 @@ vec4 textureCubeUV(vec3 reflectedDirection, float roughness ) {
     vec4 color20 = envMapTexelToLinear(texture2D(envMap, uv_20));
 
     vec4 result = mix(color10, color20, t);
-
-#if ! defined( DISABLE_CUBE_UV_MIPMAP_INTERPOLATION )
-
-    vec2 uv_11 = getCubeUV(reflectedDirection, r1, level1);
-    vec4 color11 = envMapTexelToLinear(texture2D(envMap, uv_11));
-
-    vec2 uv_21 = getCubeUV(reflectedDirection, r2, level1);
-    vec4 color21 = envMapTexelToLinear(texture2D(envMap, uv_21));
-
-    vec4 c2 = mix(color11, color21, t);
-    result = mix(result, c2, s);
-
-#endif
 
     return vec4(result.rgb, 1.0);
 }
