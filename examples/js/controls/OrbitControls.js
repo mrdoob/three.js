@@ -162,7 +162,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			scope.target.add( panOffset );
 
 			offset.setFromSpherical( spherical );
-			
+
 			// rotate offset back to "camera-up-vector-is-up" space
 			offset.applyQuaternion( quatInverse );
 
@@ -172,8 +172,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			if ( scope.enableDamping === true ) {
 
-				spherical.theta *= ( 1 - scope.dampingFactor );
-				spherical.phi *= ( 1 - scope.dampingFactor );
+				sphericalDelta.theta *= ( 1 - scope.dampingFactor );
+				sphericalDelta.phi *= ( 1 - scope.dampingFactor );
 
 			} else {
 
