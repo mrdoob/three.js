@@ -3,7 +3,7 @@
  *
  * see: http://www.blackpawn.com/texts/pqtorus/
  */
-THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
+THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radialSegments, p, q ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -17,8 +17,6 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radial
 		p: p,
 		q: q
 	};
-
-	if( heightScale !== undefined ) console.warn( 'THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.' );
 
 	radius = radius || 100;
 	tube = tube || 40;
