@@ -8,18 +8,18 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">Creates a torus knot, the particular shape of which is defined by a pair of coprime integers, p and q.  If p and q are not coprime, the result will be a torus link.</div>
+		<div class="desc">This is the [page:BufferGeometry] port of [page:TorusKnotGeometry].</div>
 
-		<iframe src='scenes/geometry-browser.html#TorusKnotGeometry'></iframe>
+		<iframe src='scenes/geometry-browser.html#TorusKnotBufferGeometry'></iframe>
 
 
 		<h2>Example</h2>
 
-		<code>var geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
+		<code>var geometry = new THREE.TorusKnotBufferGeometry( 10, 3, 100, 16 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 		var torusKnot = new THREE.Mesh( geometry, material );
 		scene.add( torusKnot );
