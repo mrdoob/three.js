@@ -518,7 +518,7 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.premultipliedAlpha ? "#define PREMULTIPLIED_ALPHA" : '',
 
-				parameters.physicallyCorrect ? "#define PHYSICALLY_CORRECT" : '',
+				parameters.physicallyCorrectLights ? "#define PHYSICALLY_CORRECT_LIGHTS" : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',

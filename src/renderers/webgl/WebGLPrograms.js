@@ -23,7 +23,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
-		"shadowMapEnabled", "pointLightShadows", "toneMapping", 'physicallyCorrect',
+		"shadowMapEnabled", "pointLightShadows", "toneMapping", 'physicallyCorrectLights',
 		"shadowMapType",
 		"alphaTest", "doubleSided", "flipSided"
 	];
@@ -176,7 +176,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			shadowMapType: renderer.shadowMap.type,
 
 			toneMapping: renderer.toneMapping,
-			physicallyCorrect: renderer.physicallyCorrect,
+			physicallyCorrectLights: renderer.physicallyCorrectLights,
 
 			premultipliedAlpha: ( material.blending === THREE.PremultipliedAlphaBlending ),
 			alphaTest: material.alphaTest,

@@ -57,7 +57,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// physical lights
 
-	this.physicallyCorrect = false;
+	this.physicallyCorrectLights = false;
 
 	// tone mapping
 
