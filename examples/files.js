@@ -57,6 +57,7 @@ var files = {
 		"webgl_kinect",
 		"webgl_lensflares",
 		"webgl_lights_hemisphere",
+		"webgl_lights_physical",
 		"webgl_lights_pointlights",
 		"webgl_lights_pointlights2",
 		"webgl_lines_colors",
