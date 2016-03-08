@@ -2,14 +2,14 @@ uniform vec3 ambientLightColor;
 
 vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
-#if defined ( PHYSICALLY_CORRECT_LIGHTS )
+	vec3 irradiance = ambientLightColor;
 
-	return ambientLightColor;
+	#ifndef PHYSICALLY_CORRECT_LIGHTS
 
-#else
+		irradiance *= PI;
 
-	return PI * ambientLightColor;
+	#endif
 
-#endif
+	return irradiance;
 
 }

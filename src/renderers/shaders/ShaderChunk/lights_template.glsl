@@ -87,15 +87,15 @@ IncidentLight directLight;
 
 	#ifdef USE_LIGHTMAP
 
-		#if defined ( PHYSICALLY_CORRECT_LIGHTS )
+		vec3 lightMapIrradiance = texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
 
-			irradiance += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
+		#ifndef PHYSICALLY_CORRECT_LIGHTS
 
-		#else
-
-			irradiance += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity; // factor of PI should not be present; included here to prevent breakage
+			lightMapIrradiance *= PI; // factor of PI should not be present; included here to prevent breakage
 
 		#endif
+
+		irradiance += lightMapIrradiance;
 
 	#endif
 

@@ -10,15 +10,13 @@ void RE_Direct_Standard( const in IncidentLight directLight, const in GeometricC
 
 	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
 
-#if defined ( PHYSICALLY_CORRECT_LIGHTS )
-
 	vec3 irradiance = dotNL * directLight.color;
 
-#else
+	#ifndef PHYSICALLY_CORRECT_LIGHTS
 
-	vec3 irradiance = dotNL * PI * directLight.color; // punctual light
+		irradiance *= PI; // punctual light
 
-#endif
+	#endif
 
 	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
 
