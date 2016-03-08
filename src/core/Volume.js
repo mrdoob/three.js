@@ -100,6 +100,7 @@ THREE.Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
     this.rotationMatrix.identity();
     this.lowerThreshold = -Infinity;
     this.upperThreshold = Infinity;
+    this.sliceList = [];
 
 }
 
@@ -112,7 +113,7 @@ THREE.Volume.prototype = {
         return this.data[ k * this.xLength * this.yLength + j * this.xLength + i ];
 
     },
-    
+
     access : function ( i, j, k ) {
 
         return k * this.xLength * this.yLength + j * this.xLength + i;
@@ -142,86 +143,105 @@ THREE.Volume.prototype = {
 
     },
 
-    extractPlan : function ( axis, index ) {
+    extractPerpendicularPlane : function ( axis, RASIndex ) {
 
-        var iLength, jLength, sliceAccess;
-        var volume = this;
+        var iLength,
+            jLength,
+            sliceAccess,
+            planeMatrix = (new THREE.Matrix4()).identity(),
+            volume = this,
+            planeWidth,
+            planeHeight,
+            firstSpacing,
+            secondSpacing,
+            positionOffset,
+            IJKIndex;
+
+        var axisInIJK = new THREE.Vector3(),
+            firstDirection = new THREE.Vector3(),
+            secondDirection = new THREE.Vector3();
+
+        var dimensions = new THREE.Vector3(this.xLength, this.yLength, this.zLength);
+
 
         switch ( axis ) {
 
             case 'x' :
-                iLength = this.yLength;
-                jLength = this.zLength;
-                sliceAccess = function (i,j) {
-                    return volume.access( index, this.yLength - i - 1, this.zLength - j - 1 );
-                }
+                axisInIJK.set(1,0,0);
+                firstDirection.set(0,0,-1);
+                secondDirection.set(0,-1,0);
+                firstSpacing = this.spacing[2];
+                secondSpacing = this.spacing[1];
+                IJKIndex = new THREE.Vector3(RASIndex,0,0);
+
+                planeMatrix.multiply((new THREE.Matrix4()).makeRotationY(Math.PI/2));
+                positionOffset = (volume.RASDimensions[0]-1)/2;
+                planeMatrix.setPosition(new THREE.Vector3( RASIndex-positionOffset, 0, 0));
                 break;
             case 'y' :
-                var iLength = this.xLength;
-                var jLength = this.zLength;
-                sliceAccess = function (i,j) {
-                    return  volume.access( i, index, this.zLength - j - 1 );
-                }
+                axisInIJK.set(0,1,0);
+                firstDirection.set(1,0,0);
+                secondDirection.set(0,0,1);
+                firstSpacing = this.spacing[0];
+                secondSpacing = this.spacing[2];
+                IJKIndex = new THREE.Vector3(0, RASIndex,0);
+
+                planeMatrix.multiply((new THREE.Matrix4()).makeRotationX(-Math.PI/2));
+                positionOffset = (volume.RASDimensions[1]-1)/2;
+                planeMatrix.setPosition(new THREE.Vector3(0, RASIndex-positionOffset, 0));
                 break;
             case 'z' :
             default :
-                iLength = this.xLength;
-                jLength = this.yLength;
-                sliceAccess = function (i,j) {
-                    return  volume.access( i, j , index);
-                }
+                axisInIJK.set(0,0,1);
+                firstDirection.set(1,0,0);
+                secondDirection.set(0,-1,0);
+                firstSpacing = this.spacing[0];
+                secondSpacing = this.spacing[1];
+                IJKIndex = new THREE.Vector3(0,0,RASIndex);
+                
+                positionOffset = (volume.RASDimensions[2]-1)/2;
+                planeMatrix.setPosition(new THREE.Vector3(0, 0, RASIndex-positionOffset));
                 break;
         }
 
-        var canvasBuffer   = document.createElement('canvas');
-        canvasBuffer.width = iLength;
-        canvasBuffer.height = jLength;
-        var ctx = canvasBuffer.getContext('2d');
+        firstDirection.applyMatrix4(volume.inverseMatrix).normalize();
+        firstDirection.argVar = 'i';
+        secondDirection.applyMatrix4(volume.inverseMatrix).normalize();
+        secondDirection.argVar = 'j';
+        axisInIJK.applyMatrix4(volume.inverseMatrix).normalize();
+        iLength = Math.floor(Math.abs(firstDirection.dot(dimensions)));
+        jLength = Math.floor(Math.abs(secondDirection.dot(dimensions)));
+        planeWidth = Math.abs(iLength*firstSpacing);
+        planeHeight = Math.abs(jLength*secondSpacing);
+
+        IJKIndex = Math.abs(Math.round(IJKIndex.applyMatrix4(volume.inverseMatrix).dot(axisInIJK)));
+        var base = [new THREE.Vector3(1,0,0),new THREE.Vector3(0,1,0),new THREE.Vector3(0,0,1)]
+        var iDirection = [firstDirection, secondDirection, axisInIJK].find(x=>Math.abs(x.dot(base[0])) > 0.9);
+        var jDirection = [firstDirection, secondDirection, axisInIJK].find(x=>Math.abs(x.dot(base[1])) > 0.9);
+        var kDirection = [firstDirection, secondDirection, axisInIJK].find(x=>Math.abs(x.dot(base[2])) > 0.9);
+        var argumentsWithInversion = ['volume.xLength-1-', 'volume.yLength-1-', 'volume.zLength-1-'];
+        var arguments = ['i','j','k'];
+        var argArray = [iDirection,jDirection,kDirection].map((direction,n) =>  (direction.dot(base[n]) > 0 ? '' : argumentsWithInversion[n])+(direction === axisInIJK ? 'IJKIndex' : direction.argVar));
+        var argString = argArray.join(',');
+        sliceAccess = eval('(function sliceAccess (i,j) {return volume.access( '+argString+');})');
 
 
-        // get the imageData and pixel array from the canvas
-        var imgData=ctx.getImageData(0,0,iLength, jLength);
-        var data=imgData.data;
-
-        // manipulate some pixel elements
-        var pixelCount = 0;
-
-        if (this.dataType === 'label') {
-
-            for (var i=0; i < jLength; i++) {
-                for (var j=0; j < iLength; j++) {
-                    var label = this.data[sliceAccess(j,i)];
-                    label = label >= this.colorMap.length ? (label % this.colorMap.length)+1 : label;
-                    var color = this.colorMap[label];
-                    data[4*pixelCount] = (color >> 24) & 0xff;
-                    data[4*pixelCount + 1] = (color >> 16) & 0xff;
-                    data[4*pixelCount + 2] = (color >> 8) & 0xff;
-                    data[4*pixelCount + 3] = color & 0xff;
-                    pixelCount++;
-                }
-            }
+        return  {
+            iLength : iLength,
+            jLength : jLength,
+            sliceAccess : sliceAccess,
+            matrix : planeMatrix,
+            planeWidth : planeWidth,
+            planeHeight : planeHeight
         }
-        else {
-            
-            for (var i=0; i < jLength; i++) {
-                for (var j=0; j < iLength; j++) {
-                    var value = this.data[sliceAccess(j,i)];
-                    //apply threshold
-                    value = this.upperThreshold>=value ? (this.lowerThreshold<=value ? value : 0) :0;
-                    //apply window level
-                    value = Math.floor(255*(value-this.windowLow) / (this.windowHigh-this.windowLow));
-                    
-                    data[4*pixelCount] = value;
-                    data[4*pixelCount + 1] = value;
-                    data[4*pixelCount + 2] = value;
-                    data[4*pixelCount + 3] = 0xff;
-                    pixelCount++;
-                }
-            }
-        }
-        ctx.putImageData(imgData,0,0);
 
-        return canvasBuffer;
+    },
+
+    extractSlice : function (axis, index) {
+
+        var slice = new THREE.VolumeSlice(this, index, axis);
+        this.sliceList.push(slice);
+        return slice;
 
     },
 

@@ -40,6 +40,7 @@
 	"src/core/InstancedBufferGeometry.js",
 	"src/core/Uniform.js",
     "src/core/Volume.js",
+    "src/core/VolumeSlice.js",
 	"src/animation/AnimationClip.js",
 	"src/animation/AnimationMixer.js",
 	"src/animation/AnimationObjectGroup.js",

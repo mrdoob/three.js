@@ -1,21 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>three.js webgl - loaders - nrrd loader</title>
+        <title>three.js webgl - loaders - vtk loader</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <style>
-
+            body {
+                font-family: Monospace;
+                background-color: #000;
+                color: #fff;
+                margin: 0px;
+                overflow: hidden;
+            }
+            #info {
+                color: #fff;
+                position: absolute;
+                top: 10px;
+                width: 100%;
+                text-align: center;
+                z-index: 100;
+                display:block;
+            }
+            #info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
         </style>
     </head>
 
     <body>
+        <div id="info">
+            <a href="http://threejs.org" target="_blank">three.js</a> -
+            nrrd format loader test 
+        </div>
 
         <script src="../build/three.js"></script>
 
+        <script src="js/controls/TrackballControls.js"></script>
+
         <script src="js/loaders/NRRDLoader.js"></script>
+        <script src="js/loaders/VTKLoader.js"></script>
 
         <script src="js/Detector.js"></script>
+        <script src="js/libs/stats.min.js"></script>
         <script src="js/libs/zlib_and_gzip.min.js"></script>
 
         <script>
@@ -36,6 +60,18 @@
                 camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
                 camera.position.z = 300;
 
+                controls = new THREE.TrackballControls( camera );
+
+                controls.rotateSpeed = 5.0;
+                controls.zoomSpeed = 5;
+                controls.panSpeed = 2;
+
+                controls.noZoom = false;
+                controls.noPan = false;
+
+                controls.staticMoving = true;
+                controls.dynamicDampingFactor = 0.3;
+
                 scene = new THREE.Scene();
 
                 scene.add( camera );
@@ -48,20 +84,99 @@
                 camera.add( dirLight );
                 camera.add( dirLight.target );
 
+                //add arrow helper to help with orientation
+                var dir = new THREE.Vector3( 1, 0, 0 );
+                var origin = new THREE.Vector3( 150, 0, 0 );
+                var length = 30;
+                var hex = 0xff0000;
+                var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+                scene.add( arrowHelper );
+
+                var dir = new THREE.Vector3( 0, 1, 0 );
+                var origin = new THREE.Vector3( 0, 320, 0 );
+                var length = 30;
+                var hex = 0x00ff00;
+                var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+                scene.add( arrowHelper );
+
+                var dir = new THREE.Vector3( 0, 0, 1);
+                var origin = new THREE.Vector3( 0, 0, 220 );
+                var length = 30;
+                var hex = 0x0000ff;
+                var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+                scene.add( arrowHelper );
+
                 var loader = new THREE.NRRDLoader();
                 loader.load( "models/nrrd/A1_grayT1.nrrd", function ( volume ) {
+                    var geometry,
+                        canvas,
+                        canvasMap,
+                        material,
+                        plane,
+                        sliceZ,
+                        sliceY,
+                        sliceX;
+                    var time = Date.now();
 
-                    console.log(volume);
-                    var geometry = new THREE.PlaneGeometry( volume.xLength, volume.yLength );
-                    var canvas = volume.extractPlan('z',Math.floor(volume.zLength/2));
-                    var material = new THREE.Texture(canvas);
-                    var plane = new THREE.Mesh( geometry, material );
-                    console.log(canvas);
-                    document.body.appendChild(canvas);
-                    scene.add( plane );
+                    //box helper to see the extend of the volume
+                    var geometry = new THREE.BoxGeometry( volume.xLength, volume.yLength, volume.zLength );
+                    var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+                    var cube = new THREE.Mesh( geometry, material );
+                    cube.visible = false;
+                    var box = new THREE.BoxHelper( cube );
+                    scene.add( box );
+                    box.applyMatrix(volume.matrix);
+                    scene.add( cube );
+                    
+                    //z plane
+
+                    var indexZ = 0;
+                    sliceZ = volume.extractSlice('z',Math.floor(volume.RASDimensions[2]/4));
+                    console.debug(sliceZ);
+                    scene.add( sliceZ.mesh );
+                    setInterval(function(){
+                        sliceZ.index = indexZ++;
+                        indexZ = indexZ % volume.RASDimensions[2];
+                        sliceZ.repaint();
+                    },50);
+                    
+                    //y plane
+                    var indexY = 0;
+                    sliceY = volume.extractSlice('y',Math.floor(volume.RASDimensions[1]/2));
+                    console.debug(sliceY);
+                    scene.add( sliceY.mesh );
+                    setInterval(function(){
+                        sliceY.index = indexY++;
+                        indexY = indexY % volume.RASDimensions[1];
+                        sliceY.repaint();
+                    },50);
+
+                    //x plane
+                    var indexX = 0;
+                    sliceX = volume.extractSlice('x',Math.floor(volume.RASDimensions[0]/2));
+                    console.debug(sliceX);
+                    scene.add( sliceX.mesh );
+                    setInterval(function(){
+                        sliceX.index = indexX++;
+                        indexX = indexX % volume.RASDimensions[0];
+                        sliceX.repaint();
+                    },50);
+
+                    console.log('generating slices in ' +(Date.now()-time)+ ' ms');;
 
                 } );
 
+                var vtkmaterial = new THREE.MeshLambertMaterial( {wireframe : false, morphTargets : false, side : THREE.DoubleSide, color : 0xff0000} );
+
+				var vtkloader = new THREE.VTKLoader();
+				vtkloader.load( "models/vtk/femur.vtk", function ( geometry ) {
+
+					geometry.computeVertexNormals();
+
+					var mesh = new THREE.Mesh( geometry, vtkmaterial );
+					//scene.add( mesh );
+
+				} );
                 // renderer
 
                 renderer = new THREE.WebGLRenderer( { antialias: false } );
@@ -71,6 +186,13 @@
                 container = document.createElement( 'div' );
                 document.body.appendChild( container );
                 container.appendChild( renderer.domElement );
+
+                stats = new Stats();
+                stats.domElement.style.position = 'absolute';
+                stats.domElement.style.top = '0px';
+                container.appendChild( stats.domElement );
+
+                //
 
                 window.addEventListener( 'resize', onWindowResize, false );
 
@@ -83,6 +205,7 @@
 
                 renderer.setSize( window.innerWidth, window.innerHeight );
 
+                controls.handleResize();
 
             }
 
@@ -90,8 +213,18 @@
 
                 requestAnimationFrame( animate );
 
+                controls.update();
                 renderer.render( scene, camera );
 
+                stats.update();
+
+            }
+
+            function rotateAroundWorldAxis(object, axis, radians) {
+                var rotWorldMatrix = new THREE.Matrix4();
+                rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
+
+                object.applyMatrix(rotWorldMatrix);
 
             }
 

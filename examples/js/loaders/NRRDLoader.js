@@ -276,12 +276,63 @@ THREE.NRRDLoader.prototype = {
         volume.zLength = volume.dimensions[2];
         // spacing
         var spacingX = (new THREE.Vector3(headerObject.vectors[0][0], headerObject.vectors[0][1],
-                                     headerObject.vectors[0][2])).length();
+                                          headerObject.vectors[0][2])).length();
         var spacingY = (new THREE.Vector3(headerObject.vectors[1][0], headerObject.vectors[1][1],
-                                     headerObject.vectors[1][2])).length();
+                                          headerObject.vectors[1][2])).length();
         var spacingZ = (new THREE.Vector3(headerObject.vectors[2][0], headerObject.vectors[2][1],
-                                     headerObject.vectors[2][2])).length();
+                                          headerObject.vectors[2][2])).length();
         volume.spacing = [ spacingX, spacingY, spacingZ ];
+
+        
+        // Create IJKtoRAS matrix
+        volume.matrix = new THREE.Matrix4();
+
+        var _spaceX = 1;
+        var _spaceY = 1;
+        var _spaceZ = 1;
+
+        if (headerObject.space == "left-posterior-superior") {
+
+            _spaceX = -1;
+            _spaceY = -1;
+
+        }
+        else if (headerObject.space === 'left-anterior-superior') {
+
+            _spaceX = -1
+
+        }
+
+
+        if(!headerObject.vectors){
+            volume.matrix.set(_spaceX,0,0,0,
+                            0, _spaceY,0,0,
+                            0,0,_spaceZ,0,
+                            0,0,0,1);
+        }
+        else{
+            var v = headerObject.vectors;
+            var origin = headerObject.space_origin;
+            
+            if (!origin) {
+                origin = [0,0,0];
+            }
+            
+            volume.matrix.set(_spaceX*v[0][0], _spaceX*v[1][0], _spaceX*v[2][0],0,
+                            _spaceY*v[0][1], _spaceY*v[1][1], _spaceY*v[2][1], 0,
+                            _spaceZ*v[0][2], _spaceZ*v[1][2], _spaceZ*v[2][2], 0,
+                            0,0,0,1);
+            
+            /*volume.matrix.set(_spaceX*v[0][0], _spaceX*v[1][0], _spaceX*v[2][0], _spaceX*origin[0],
+                            _spaceY*v[0][1], _spaceY*v[1][1], _spaceY*v[2][1], _spaceY*origin[1],
+                            _spaceZ*v[0][2], _spaceZ*v[1][2], _spaceZ*v[2][2], _spaceZ*origin[2],
+                            0,0,0,1);*/
+        }
+        
+        volume.inverseMatrix = new THREE.Matrix4();
+        volume.inverseMatrix.getInverse(volume.matrix);
+        volume.RASDimensions = (new THREE.Vector3(volume.xLength, volume.yLength, volume.zLength)).applyMatrix4(volume.matrix).round().toArray().map(Math.abs);
+
         // .. and set the default threshold
         // only if the threshold was not already set
         if (volume.lowerThreshold === -Infinity) {
@@ -290,7 +341,7 @@ THREE.NRRDLoader.prototype = {
         if (volume.upperThreshold === Infinity) {
             volume.upperThreshold = max;
         }
-        
+
         return volume;
 
     },
