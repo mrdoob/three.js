@@ -53,6 +53,8 @@
 			var camera, scene, renderer,
 			bulbLight, bulbMat, ambientLight,
 			object, loader, stats;
+			var ballMat, cubeMat, floorMat;
+
 
 			// ref for lumens: http://www.power-sure.com/lumens.htm
 			var bulbLuminousPowers = {
@@ -82,6 +84,7 @@
 			};
 
 			var params = {
+				shadows: true,
 				exposure: 0.68,
 				bulbPower: Object.keys( bulbLuminousPowers )[2],
 				hemiIrradiance: Object.keys( hemiLuminousIrradiances )[0]
@@ -127,7 +130,7 @@
 				hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 0.02 );
 				scene.add( hemiLight );
 
-				var floorMat = new THREE.MeshStandardMaterial( {
+				floorMat = new THREE.MeshStandardMaterial( {
 					roughness: 0.8,
 					color: 0xffffff,
 					metalness: 0.2,
@@ -159,8 +162,7 @@
 					floorMat.needsUpdate = true;
 				} );
 
-
-				var cubeMat = new THREE.MeshStandardMaterial( {
+				cubeMat = new THREE.MeshStandardMaterial( {
 					roughness: 0.7,
 					color: 0xffffff,
 					bumpScale: 0.002,
@@ -183,7 +185,7 @@
 					cubeMat.needsUpdate = true;
 				} );
 
-				var ballMat = new THREE.MeshStandardMaterial( {
+				ballMat = new THREE.MeshStandardMaterial( {
 					roughness: 0,
 					metalness: 0.0,
 					color: 0xffffff
@@ -257,6 +259,7 @@
 				gui.add( params, 'hemiIrradiance', Object.keys( hemiLuminousIrradiances ) );
 				gui.add( params, 'bulbPower', Object.keys( bulbLuminousPowers ) );
 				gui.add( params, 'exposure', 0, 1 );
+				gui.add( params, 'shadows' );
 				gui.open();
 			}
 
@@ -279,10 +282,19 @@
 
 			}
 
+			var previousShadowMap = false;
+
 			function render() {
 
 				renderer.toneMappingExposure = Math.pow( params.exposure, 5.0 ); // to allow for very bright scenes.
-
+				renderer.shadowMap.enabled = params.shadows;
+				bulbLight.castShadow = params.shadows;
+				if( params.shadows !== previousShadowMap ) {
+					ballMat.needsUpdate = true;
+					cubeMat.needsUpdate = true;
+					floorMat.needsUpdate = true;
+					previousShadowMap = params.shadows;
+				}
 				bulbLight.power = bulbLuminousPowers[ params.bulbPower ];
 				bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 ); // convert from intensity to irradiance at bulb surface
 
