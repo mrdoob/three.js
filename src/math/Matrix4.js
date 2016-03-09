@@ -91,9 +91,9 @@ THREE.Matrix4.prototype = {
 
 	extractBasis: function ( xAxis, yAxis, zAxis ) {
 
-		xAxis.setFromMatrixColumn( 0, this );
-		yAxis.setFromMatrixColumn( 1, this );
-		zAxis.setFromMatrixColumn( 2, this );
+		xAxis.setFromMatrixColumn( this, 0 );
+		yAxis.setFromMatrixColumn( this, 1 );
+		zAxis.setFromMatrixColumn( this, 2 );
 
 		return this;
 
@@ -123,9 +123,9 @@ THREE.Matrix4.prototype = {
 			var te = this.elements;
 			var me = m.elements;
 
-			var scaleX = 1 / v1.setFromMatrixColumn( 0, m ).length();
-			var scaleY = 1 / v1.setFromMatrixColumn( 1, m ).length();
-			var scaleZ = 1 / v1.setFromMatrixColumn( 2, m ).length();
+			var scaleX = 1 / v1.setFromMatrixColumn( m, 0 ).length();
+			var scaleY = 1 / v1.setFromMatrixColumn( m, 1 ).length();
+			var scaleZ = 1 / v1.setFromMatrixColumn( m, 2 ).length();
 
 			te[ 0 ] = me[ 0 ] * scaleX;
 			te[ 1 ] = me[ 1 ] * scaleX;
@@ -589,7 +589,7 @@ THREE.Matrix4.prototype = {
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 			console.warn( 'THREE.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
 
-			return v1.setFromMatrixColumn( 3, this );
+			return v1.setFromMatrixColumn( this, 3 );
 
 		};
 

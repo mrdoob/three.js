@@ -706,7 +706,7 @@ THREE.Vector3.prototype = {
 
 	setFromMatrixPosition: function ( m ) {
 
-		this.setFromMatrixColumn( 3, m );
+		this.setFromMatrixColumn( m, 3 );
 
 		return this;
 
@@ -714,9 +714,9 @@ THREE.Vector3.prototype = {
 
 	setFromMatrixScale: function ( m ) {
 
-		var sx = this.setFromMatrixColumn( 0, m ).length();
-		var sy = this.setFromMatrixColumn( 1, m ).length();
-		var sz = this.setFromMatrixColumn( 2, m ).length();
+		var sx = this.setFromMatrixColumn( m, 0 ).length();
+		var sy = this.setFromMatrixColumn( m, 1 ).length();
+		var sz = this.setFromMatrixColumn( m, 2 ).length();
 
 		this.x = sx;
 		this.y = sy;
@@ -726,11 +726,11 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setFromMatrixColumn: function ( index, matrix ) {
+	setFromMatrixColumn: function ( m, index ) {
 
 		var offset = index * 4;
 
-		var me = matrix.elements;
+		var me = m.elements;
 
 		this.x = me[ offset ];
 		this.y = me[ offset + 1 ];
