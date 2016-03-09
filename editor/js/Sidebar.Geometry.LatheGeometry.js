@@ -63,9 +63,17 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 	var addPointButton = new UI.Button( '+' ).onClick( function() {
 
-		var point = pointsUI[ pointsUI.length - 1 ];
+		if( pointsUI.length === 0 ){
 
-		pointsList.add( createPointRow( point.x.getValue(), point.y.getValue() ) );
+			pointsList.add( createPointRow( 0, 0 ) );
+
+		} else {
+
+			var point = pointsUI[ pointsUI.length - 1 ];
+
+			pointsList.add( createPointRow( point.x.getValue(), point.y.getValue() ) );
+
+		}
 
 		update();
 
