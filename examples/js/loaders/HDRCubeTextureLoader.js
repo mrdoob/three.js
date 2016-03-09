@@ -12,7 +12,7 @@ THREE.HDRCubeTextureLoader = function (manager) {
 }
 
 THREE.HDRCubeTextureLoader.prototype.load = function(type, urls, onLoad, onProgress, onError) {
-  var texture = new THREE.CubeTexture( [] );
+  var texture = new THREE.CubeTexture();
 
   texture.type = type;
   texture.encoding = (type === THREE.UnsignedByteType) ? THREE.RGBEEncoding : THREE.LinearEncoding;
