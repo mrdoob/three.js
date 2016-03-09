@@ -646,7 +646,7 @@ THREE.Vector3.prototype = {
 
 			return this.sub( v1 );
 
-		}
+		};
 
 	}(),
 
@@ -663,7 +663,7 @@ THREE.Vector3.prototype = {
 
 			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
-		}
+		};
 
 	}(),
 
@@ -696,6 +696,7 @@ THREE.Vector3.prototype = {
 	setFromSpherical: function( s ) {
 
 		var sinPhiRadius = Math.sin( s.phi ) * s.radius;
+
 		this.x = sinPhiRadius * Math.sin( s.theta );
 		this.y = Math.cos( s.phi ) * s.radius;
 		this.z = sinPhiRadius * Math.cos( s.theta );
@@ -706,21 +707,15 @@ THREE.Vector3.prototype = {
 
 	setFromMatrixPosition: function ( m ) {
 
-		this.setFromMatrixColumn( m, 3 );
-
-		return this;
+		return this.setFromMatrixColumn( m, 3 );
 
 	},
 
 	setFromMatrixScale: function ( m ) {
 
-		var sx = this.setFromMatrixColumn( m, 0 ).length();
-		var sy = this.setFromMatrixColumn( m, 1 ).length();
-		var sz = this.setFromMatrixColumn( m, 2 ).length();
-
-		this.x = sx;
-		this.y = sy;
-		this.z = sz;
+		this.x = this.setFromMatrixColumn( m, 0 ).length();
+		this.y = this.setFromMatrixColumn( m, 1 ).length();
+		this.z = this.setFromMatrixColumn( m, 2 ).length();
 
 		return this;
 
@@ -728,15 +723,7 @@ THREE.Vector3.prototype = {
 
 	setFromMatrixColumn: function ( m, index ) {
 
-		var offset = index * 4;
-
-		var me = m.elements;
-
-		this.x = me[ offset ];
-		this.y = me[ offset + 1 ];
-		this.z = me[ offset + 2 ];
-
-		return this;
+		return this.fromArray( m.elements, index * 4 );
 
 	},
 
