@@ -16,12 +16,18 @@ THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilt
 THREE.CubeTexture.prototype = Object.create( THREE.Texture.prototype );
 THREE.CubeTexture.prototype.constructor = THREE.CubeTexture;
 
-Object.defineProperty(THREE.CubeTexture.prototype, "images", {
-		  get: function() {
-				return this.image;
-		  },
-			set: function( value ) {
-				this.image = value;
-			}
-		}
-);
+Object.defineProperty( THREE.CubeTexture.prototype, 'images', {
+
+	get: function () {
+
+		return this.image;
+
+	},
+
+	set: function ( value ) {
+
+		this.image = value;
+
+	}
+
+} );
