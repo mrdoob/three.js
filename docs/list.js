@@ -195,6 +195,7 @@ var list = {
 			[ "BoxGeometry", "api/extras/geometries/BoxGeometry" ],
 			[ "CircleBufferGeometry", "api/extras/geometries/CircleBufferGeometry" ],
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
+			[ "CylinderBufferGeometry", "api/extras/geometries/CylinderBufferGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
 			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
 			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
@@ -205,6 +206,7 @@ var list = {
 			[ "PlaneBufferGeometry", "api/extras/geometries/PlaneBufferGeometry" ],
 			[ "PlaneGeometry", "api/extras/geometries/PlaneGeometry" ],
 			[ "PolyhedronGeometry", "api/extras/geometries/PolyhedronGeometry" ],
+			[ "RingBufferGeometry", "api/extras/geometries/RingBufferGeometry" ],
 			[ "RingGeometry", "api/extras/geometries/RingGeometry" ],
 			[ "ShapeGeometry", "api/extras/geometries/ShapeGeometry" ],
 			[ "SphereBufferGeometry", "api/extras/geometries/SphereBufferGeometry" ],
@@ -213,6 +215,7 @@ var list = {
 			[ "TextGeometry", "api/extras/geometries/TextGeometry" ],
 			[ "TorusBufferGeometry", "api/extras/geometries/TorusBufferGeometry" ],
 			[ "TorusGeometry", "api/extras/geometries/TorusGeometry" ],
+			[ "TorusKnotBufferGeometry", "api/extras/geometries/TorusKnotBufferGeometry" ],
 			[ "TorusKnotGeometry", "api/extras/geometries/TorusKnotGeometry" ],
 			[ "TubeGeometry", "api/extras/geometries/TubeGeometry" ]
 		],

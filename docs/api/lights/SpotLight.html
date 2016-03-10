@@ -77,7 +77,15 @@
 		<h3>[property:Float intensity]</h3>
 		<div>
 			Light's intensity.<br />
+			In "physically correct" mode, the product of color * intensity is interpreted as luminous intensity measured in candela.<br/>
 			Default — *1.0*.
+		</div>
+
+		<h3>[property:Float power]</h3>
+		<div>
+			Light's power.<br />
+			In "physically correct" mode, the luminous power of the light measured in lumens.<br/>
+			Default - *4PI*.
 		</div>
 
 		<h3>[property:Float distance]</h3>
@@ -101,6 +109,7 @@
 		<h3>[property:Float decay]</h3>
 		<div>
 			The amount the light dims along the distance of the light<br />
+			In "physically correct" mode, decay = 2 leads to physically realistic light falloff.<br/>
 			Default — *1*.
 		</div>
 

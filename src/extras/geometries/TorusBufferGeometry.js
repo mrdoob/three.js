@@ -27,7 +27,7 @@ THREE.TorusBufferGeometry = function ( radius, tube, radialSegments, tubularSegm
 	var indexCount = radialSegments * tubularSegments * 2 * 3;
 
 	// buffers
-	var indices = new ( vertexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
 	var vertices = new Float32Array( vertexCount * 3 );
 	var normals = new Float32Array( vertexCount * 3 );
 	var uvs = new Float32Array( vertexCount * 2 );

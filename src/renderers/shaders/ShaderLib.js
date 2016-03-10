@@ -33,7 +33,6 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "lightmap" ],
 			THREE.UniformsLib[ "emissivemap" ],
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
 
 			{
@@ -59,7 +58,6 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "normalmap" ],
 			THREE.UniformsLib[ "displacementmap" ],
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
 
 			{
@@ -89,7 +87,6 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "roughnessmap" ],
 			THREE.UniformsLib[ "metalnessmap" ],
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
 
 			{

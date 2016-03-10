@@ -6,7 +6,6 @@ THREE.ShadowMaterial = function () {
 
 	THREE.ShaderMaterial.call( this, {
 		uniforms: THREE.UniformsUtils.merge( [
-			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
 			{
 				opacity:  { type: 'f', value: 1.0 }

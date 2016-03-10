@@ -29,7 +29,7 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 	var indexCount = ( vertexCount / 4 ) * 6;
 
 	// buffers
-	var indices = new ( vertexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
 	var vertices = new Float32Array( vertexCount * 3 );
 	var normals = new Float32Array( vertexCount * 3 );
 	var uvs = new Float32Array( vertexCount * 2 );

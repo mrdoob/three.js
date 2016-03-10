@@ -57,6 +57,7 @@ var files = {
 		"webgl_kinect",
 		"webgl_lensflares",
 		"webgl_lights_hemisphere",
+		"webgl_lights_physical",
 		"webgl_lights_pointlights",
 		"webgl_lights_pointlights2",
 		"webgl_lines_colors",
@@ -135,6 +136,7 @@ var files = {
 		"webgl_materials_texture_manualmipmap",
 		"webgl_materials_texture_pvrtc",
 		"webgl_materials_texture_tga",
+		"webgl_materials_transparency",
 		"webgl_materials_variations_basic",
 		"webgl_materials_variations_lambert",
 		"webgl_materials_variations_phong",
@@ -159,6 +161,7 @@ var files = {
 		"webgl_objects_update",
 		"webgl_octree",
 		"webgl_octree_raycasting",
+		"webgl_panorama_dualfisheye",
 		"webgl_panorama_equirectangular",
 		"webgl_particles_general",
 		"webgl_performance",
@@ -205,6 +208,7 @@ var files = {
 		"webgl_terrain_dynamic",
 		"webgl_test_memory",
 		"webgl_test_memory2",
+		"webgl_tonemapping",
 		"webgl_trails",
 		"webgl_video_panorama_equirectangular"
 	],
@@ -232,8 +236,9 @@ var files = {
 	],
 	"webvr": [
 		"webvr_cubes",
-		"webvr_video",
-		"webvr_stereo_pano"
+		"webvr_rollercoaster",
+		"webvr_stereo_pano",
+		"webvr_video"
 	],
 	"css3d": [
 		"css3d_molecules",

@@ -1,3 +1,19 @@
+uniform vec3 ambientLightColor;
+
+vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
+
+	vec3 irradiance = ambientLightColor;
+
+	#ifndef PHYSICALLY_CORRECT_LIGHTS
+
+		irradiance *= PI;
+
+	#endif
+
+	return irradiance;
+
+}
+
 #if NUM_DIR_LIGHTS > 0
 
 	struct DirectionalLight {
@@ -12,7 +28,7 @@
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
 
-	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
+	IncidentLight getDirectionalDirectLightIrradiance( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
 
@@ -43,7 +59,7 @@
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
 
-	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) {
+	IncidentLight getPointDirectLightIrradiance( const in PointLight pointLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
 
@@ -55,7 +71,8 @@
 		if ( testLightInRange( lightDistance, pointLight.distance ) ) {
 
 			directLight.color = pointLight.color;
-			directLight.color *= calcLightAttenuation( lightDistance, pointLight.distance, pointLight.decay );
+			directLight.color *= punctualLightIntensityToIrradianceFactor( lightDistance, pointLight.distance, pointLight.decay );
+
 			directLight.visible = true;
 
 		} else {
@@ -91,7 +108,7 @@
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
 
-	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {
+	IncidentLight getSpotDirectLightIrradiance( const in SpotLight spotLight, const in GeometricContext geometry ) {
 
 		IncidentLight directLight;
 
@@ -106,7 +123,8 @@
 			float spotEffect = smoothstep( spotLight.coneCos, spotLight.penumbraCos, angleCos );
 
 			directLight.color = spotLight.color;
-			directLight.color *= ( spotEffect * calcLightAttenuation( lightDistance, spotLight.distance, spotLight.decay ) );
+			directLight.color *= spotEffect * punctualLightIntensityToIrradianceFactor( lightDistance, spotLight.distance, spotLight.decay );
+
 			directLight.visible = true;
 
 		} else {
@@ -138,7 +156,15 @@
 		float dotNL = dot( geometry.normal, hemiLight.direction );
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
 
-		return PI * mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
+		vec3 irradiance = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
+
+		#ifndef PHYSICALLY_CORRECT_LIGHTS
+
+			irradiance *= PI;
+
+		#endif
+
+		return irradiance;
 
 	}
 
@@ -181,12 +207,12 @@
 
 		#elif defined( ENVMAP_TYPE_CUBE_UV )
 
-				vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );
-				vec4 envMapColor = textureCubeUV(queryVec, 1.0, 1024.0);
+			vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );
+			vec4 envMapColor = textureCubeUV( queryVec, 1.0 );
 
 		#else
 
-			vec3 envMapColor = vec3( 0.0 );
+			vec4 envMapColor = vec4( 0.0 );
 
 		#endif
 
@@ -200,10 +226,10 @@
 	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {
 
 		//float envMapWidth = pow( 2.0, maxMIPLevelScalar );
-		//float desiredMIPLevel = log2( envMapWidth * sqrt( 3.0 ) ) - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
+		//float desiredMIPLevel = log2( envMapWidth * sqrt( 3.0 ) ) - 0.5 * log2( pow2( blinnShininessExponent ) + 1.0 );
 
 		float maxMIPLevelScalar = float( maxMIPLevel );
-		float desiredMIPLevel = maxMIPLevelScalar - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );
+		float desiredMIPLevel = maxMIPLevelScalar - 0.79248 - 0.5 * log2( pow2( blinnShininessExponent ) + 1.0 );
 
 		// clamp to allowable LOD ranges.
 		return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
@@ -253,7 +279,7 @@
 		#elif defined( ENVMAP_TYPE_CUBE_UV )
 
 			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
-			vec4 envMapColor = textureCubeUV(queryReflectVec, BlinnExponentToGGXRoughness(blinnShininessExponent), 1024.0);
+			vec4 envMapColor = textureCubeUV(queryReflectVec, BlinnExponentToGGXRoughness(blinnShininessExponent));
 
 		#elif defined( ENVMAP_TYPE_EQUIREC )
 

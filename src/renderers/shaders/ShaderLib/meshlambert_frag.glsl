@@ -21,7 +21,6 @@ varying vec3 vLightFront;
 #include <emissivemap_pars_fragment>
 #include <envmap_pars_fragment>
 #include <bsdfs>
-#include <ambient_pars>
 #include <lights_pars>
 #include <fog_pars_fragment>
 #include <shadowmap_pars_fragment>
@@ -33,7 +32,7 @@ void main() {
 
 	vec4 diffuseColor = vec4( diffuse, opacity );
 	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
-	vec3 totalEmissiveLight = emissive;
+	vec3 totalEmissiveRadiance = emissive;
 
 	#include <logdepthbuf_fragment>
 	#include <map_fragment>
@@ -65,12 +64,15 @@ void main() {
 	// modulation
 	#include <aomap_fragment>
 
-	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveLight;
+	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;
 
 	#include <envmap_fragment>
 
-	gl_FragColor = linearToOutputTexel( vec4( outgoingLight, diffuseColor.a ) );
+	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
+	#include <premultiplied_alpha_fragment>
+	#include <tonemapping_fragment>
+	#include <encodings_fragment>
 	#include <fog_fragment>
 
 }

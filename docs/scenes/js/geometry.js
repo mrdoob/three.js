@@ -161,6 +161,52 @@ var guis = {
 
 	},
 
+	CylinderBufferGeometry : function( mesh ) {
+
+		var data = {
+			radiusTop : 5,
+			radiusBottom : 5,
+			height : 10,
+			radiusSegments : 8,
+			heightSegments : 1,
+			openEnded : false,
+			thetaStart : 0,
+			thetaLength : twoPi,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.CylinderBufferGeometry(
+					data.radiusTop,
+					data.radiusBottom,
+					data.height,
+					data.radiusSegments,
+					data.heightSegments,
+					data.openEnded,
+					data.thetaStart,
+					data.thetaLength
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.CylinderBufferGeometry' );
+
+		folder.add( data, 'radiusTop', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'radiusBottom', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
+		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'openEnded' ).onChange( generateGeometry );
+		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
+
+
+		generateGeometry();
+
+	},
+
 	CylinderGeometry : function( mesh ) {
 
 		var data = {
@@ -400,6 +446,40 @@ var guis = {
 		folder.add( data, 'height', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'widthSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	RingBufferGeometry : function( mesh ) {
+
+		var data = {
+			innerRadius : 5,
+			outerRadius : 10,
+			thetaSegments : 8,
+			phiSegments : 8,
+			thetaStart : 0,
+			thetaLength : twoPi,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.RingBufferGeometry(
+					data.innerRadius, data.outerRadius, data.thetaSegments, data.phiSegments, data.thetaStart, data.thetaLength
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.RingBufferGeometry' );
+
+		folder.add( data, 'innerRadius', 0, 30 ).onChange( generateGeometry );
+		folder.add( data, 'outerRadius', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'thetaSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'phiSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
 
 		generateGeometry();
 
@@ -667,38 +747,71 @@ var guis = {
 
 	},
 
+	TorusKnotBufferGeometry : function( mesh ) {
+
+		var data = {
+			radius : 10,
+			tube : 3,
+			tubularSegments : 64,
+			radialSegments : 8,
+			p : 2,
+			q : 3
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.TorusKnotBufferGeometry(
+					data.radius, data.tube, data.tubularSegments, data.radialSegments,
+					data.p, data.q
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TorusKnotBufferGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'tube', 0.1, 10 ).onChange( generateGeometry );
+		folder.add( data, 'tubularSegments', 3, 300 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'p', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'q', 1, 20 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	TorusKnotGeometry : function( mesh ) {
 
 		var data = {
 			radius : 10,
 			tube : 3,
-			radialSegments : 64,
-			tubularSegments : 8,
+			tubularSegments : 64,
+			radialSegments : 8,
 			p : 2,
-			q : 3,
-			heightScale : 1
+			q : 3
 		};
 
 		function generateGeometry() {
 
 			updateGroupGeometry( mesh,
 				new THREE.TorusKnotGeometry(
-					data.radius, data.tube, data.radialSegments, data.tubularSegments,
-					data.p, data.q, data.heightScale
+					data.radius, data.tube, data.tubularSegments, data.radialSegments,
+					data.p, data.q
 				)
 			);
 
 		}
 
-		var folder = gui.addFolder( 'THREE.TorusGeometry' );
+		var folder = gui.addFolder( 'THREE.TorusKnotGeometry' );
 
 		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'tube', 0.1, 10 ).onChange( generateGeometry );
-		folder.add( data, 'radialSegments', 3, 300 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'tubularSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'tubularSegments', 3, 300 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'p', 1, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'q', 1, 20 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'heightScale', 1, 20 ).onChange( generateGeometry );
 
 		generateGeometry();
 

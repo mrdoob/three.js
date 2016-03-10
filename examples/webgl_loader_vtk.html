@@ -28,10 +28,11 @@
 	<body>
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> -
-		vtk format loader test -
-		model from <a href="http://www.cc.gatech.edu/projects/large_models/" target="_blank">The GeorgiaTech Lagre Geometric Model Archive</a>,
+		vtk formats loader test<br />
+		Legacy vtk model from <a href="http://www.cc.gatech.edu/projects/large_models/" target="_blank">The GeorgiaTech Lagre Geometric Model Archive</a>,
 		</div>
 
+		<script src='js/libs/inflate.min.js'></script>
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
@@ -83,15 +84,68 @@
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 
-				var material = new THREE.MeshLambertMaterial( { color:0xffffff, side: THREE.DoubleSide } );
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
 
 				var loader = new THREE.VTKLoader();
 				loader.load( "models/vtk/bunny.vtk", function ( geometry ) {
 
+					geometry.center();
 					geometry.computeVertexNormals();
 
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.setY( - 0.09 );
+					mesh.position.set( - 0.075, 0.005, 0 );
+					mesh.scale.multiplyScalar( 0.2 );
+					scene.add( mesh );
+
+				} );
+
+				var loader1 = new THREE.VTKLoader();
+				loader1.load( 'models/vtk/cube_ascii.vtp', function ( geometry ) {
+
+					geometry.computeVertexNormals();
+					geometry.center();
+
+					var material = new THREE.MeshLambertMaterial( { color: 0x00ff00, side: THREE.DoubleSide } );
+					var mesh = new THREE.Mesh( geometry, material );
+
+					mesh.position.set( - 0.025, 0, 0 );
+					mesh.scale.multiplyScalar( 0.01 );
+
+
+					scene.add( mesh );
+
+				} );
+
+				var loader2 = new THREE.VTKLoader();
+				loader2.load( 'models/vtk/cube_binary.vtp', function ( geometry ) {
+
+					geometry.computeVertexNormals();
+					geometry.center();
+
+					var material = new THREE.MeshLambertMaterial( { color: 0x0000ff, side: THREE.DoubleSide } );
+					var mesh = new THREE.Mesh( geometry, material );
+
+					mesh.position.set( 0.025, 0, 0 );
+					mesh.scale.multiplyScalar( 0.01 );
+
+
+					scene.add( mesh );
+
+				} );
+
+				var loader3 = new THREE.VTKLoader();
+				loader3.load( 'models/vtk/cube_no_compression.vtp', function ( geometry ) {
+
+					geometry.computeVertexNormals();
+					geometry.center();
+
+					var material = new THREE.MeshLambertMaterial( { color: 0xff0000, side: THREE.DoubleSide } );
+					var mesh = new THREE.Mesh( geometry, material );
+
+					mesh.position.set( 0.075, 0, 0 );
+					mesh.scale.multiplyScalar( 0.01 );
+
+
 					scene.add( mesh );
 
 				} );
