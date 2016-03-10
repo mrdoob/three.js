@@ -28,7 +28,7 @@
 		<div>[example:webgl_geometry_large_mesh geometry / large / mesh ]</div>
 		<div>[example:webgl_geometry_text geometry / text ]</div>
 		<div>[example:webgl_lensflares lensflares ]</div>
-		
+
 		<code>var light = new THREE.PointLight( 0xff0000, 1, 100 );
 light.position.set( 50, 50, 50 );
 scene.add( light );</code>
@@ -46,7 +46,7 @@ scene.add( light );</code>
 		</div>
 		<div>
 		Creates a light at a specific position in the scene.  The light shines in all directions (roughly similar to a light bulb.)
-	
+
 		</div>
 
 
@@ -55,7 +55,15 @@ scene.add( light );</code>
 		<h3>[property:Float intensity]</h3>
 		<div>
 			Light's intensity.<br />
+			In "physically correct" mode, the product of color * intensity is interpreted as luminous intensity measured in candela.<br/>
 			Default - *1.0*.
+		</div>
+
+		<h3>[property:Float power]</h3>
+		<div>
+			Light's power.<br />
+			In "physically correct" mode, the luminous power of the light measured in lumens.<br/>
+			Default - *4PI*.
 		</div>
 
 		<h3>[property:Float distance]</h3>
@@ -63,21 +71,22 @@ scene.add( light );</code>
 			If non-zero, light will attenuate linearly from maximum intensity at light *position* down to zero at *distance*.<br />
 			Default — *0.0*.
 		</div>
-		
+
 		<h3>[property:Float decay]</h3>
 		<div>
 			The amount the light dims along the distance of the light<br />
+			In "physically correct" mode, decay = 2 leads to physically realistic light falloff.<br/>
 			Default — *1*.
 		</div>
-		
+
 		<h2>Methods</h2>
-		
+
 		<h3>[method:PointLight clone]()</h3>
 		<div>
 		<br />
 		It returns a clone of PointLight.
 		</div>
-		
+
 		<h3>[method:JSON toJSON]()</h3>
 		<div>
 		Return PointLight data in JSON format.

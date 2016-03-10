@@ -10,7 +10,7 @@
  *  size: <float>,
  *  sizeAttenuation: <bool>,
  *
- *  blending: THREE.NormalBlending,
+ *  blending: THREE.PremultipliedAlphaBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -32,6 +32,8 @@ THREE.PointsMaterial = function ( parameters ) {
 
 	this.size = 1;
 	this.sizeAttenuation = true;
+
+	this.blending = THREE.PremultipliedAlphaBlending;
 
 	this.vertexColors = THREE.NoColors;
 

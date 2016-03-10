@@ -1,5 +1,6 @@
 /*
  *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
+ *	@author centerionware / http://www.centerionware.com
  *
  *	Subdivision Geometry Modifier
  *		using Loop Subdivision Scheme
@@ -11,8 +12,6 @@
  *
  *	Known Issues:
  *		- currently doesn't handle "Sharp Edges"
- * **UV Support By Matthew Adams / http://www.centerionware.com
- * * DDS Images need to be upside down or UV's will be upside down.
  */
 
 THREE.SubdivisionModifier = function ( subdivisions ) {
@@ -31,8 +30,6 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		this.smooth( geometry );
 
 	}
-
-	delete geometry.__tmpVertices;
 
 	geometry.computeFaceNormals();
 	geometry.computeVertexNormals();
@@ -159,7 +156,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		oldFaces = geometry.faces; // { a: oldVertex1, b: oldVertex2, c: oldVertex3 }
 		oldUvs = geometry.faceVertexUvs[ 0 ];
 
-		var doUvs = oldUvs !== undefined && oldUvs.length > 0;
+		var hasUvs = oldUvs !== undefined && oldUvs.length > 0;
 
 		/******************************************************
 		 *
@@ -356,7 +353,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 			// create 4 new uv's
 
-			if ( doUvs ) {
+			if ( hasUvs ) {
 
 				uv = oldUvs[ i ];
 
@@ -381,7 +378,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		// Overwrite old arrays
 		geometry.vertices = newVertices;
 		geometry.faces = newFaces;
-		if ( doUvs ) geometry.faceVertexUvs[ 0 ] = newUVs;
+		if ( hasUvs ) geometry.faceVertexUvs[ 0 ] = newUVs;
 
 		// console.log('done');
 

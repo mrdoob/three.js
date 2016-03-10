@@ -29,6 +29,7 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - Manual Multi-Sample Anti-Aliasing (MSAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
+			This manual approach to MSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.<br/><br/>
 			Texture interpolation, mipmapping and anistropic sampling is disabled to emphasize<br/> the effect MSAA levels have one the resulting render quality.
 		</div>
 
@@ -38,7 +39,7 @@
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/postprocessing/MSAAPass.js"></script>
+		<script src="js/postprocessing/ManualMSAARenderPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/CompositeShader.js"></script>
 
@@ -50,7 +51,7 @@
 
 		<script>
 
-			var camera, scene, renderer, composer, copyPass, msaaPass;
+			var camera, scene, renderer, composer, copyPass, msaaRenderPass;
 			var gui, stats, texture;
 
 			var param = { MSAASampleLevel: 2 };
@@ -75,8 +76,8 @@
 					'Level 5: 32 Samples': 5
 				} ).onFinishChange( function() {
 
-					if( massPass ) {
-						massPass.sampleLevel = param.MSAASampleLevel;
+					if( msaaRenderPass ) {
+						msaaRenderPass.sampleLevel = param.MSAASampleLevel;
 					}
 
 				} );
@@ -129,9 +130,9 @@
 
 				composer = new THREE.EffectComposer( renderer );
 
-				massPass = new THREE.MSAAPass( scene, camera );
-				massPass.sampleLevel = param.MSAASampleLevel;
-				composer.addPass( massPass );
+				msaaRenderPass = new THREE.ManualMSAARenderPass( scene, camera );
+				msaaRenderPass.sampleLevel = param.MSAASampleLevel;
+				composer.addPass( msaaRenderPass );
 
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
 		    copyPass.renderToScreen = true;
@@ -155,7 +156,7 @@
 				var newWidth  = Math.floor( width / pixelRatio ) || 1;
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				composer.setSize( newWidth, newHeight );
-				if( msaaPass ) msaaPass.setSize( newWidth, newHeight );
+				msaaRenderPass.setSize( newWidth, newHeight );
 
 			}
 
