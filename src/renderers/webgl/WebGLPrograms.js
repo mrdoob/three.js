@@ -8,6 +8,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		MeshBasicMaterial: 'basic',
 		MeshLambertMaterial: 'lambert',
 		MeshPhongMaterial: 'phong',
+		MeshStandardMaterial: 'standard',
 		LineBasicMaterial: 'basic',
 		LineDashedMaterial: 'dashed',
 		PointsMaterial: 'points'
@@ -16,13 +17,15 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 	var parameterNames = [
 		"precision", "supportsVertexTextures", "map", "envMap", "envMapMode",
 		"lightMap", "aoMap", "emissiveMap", "bumpMap", "normalMap", "displacementMap", "specularMap",
+		"roughnessMap", "metalnessMap",
 		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
-		"maxMorphTargets", "maxMorphNormals", "maxDirLights", "maxPointLights",
-		"maxSpotLights", "maxHemiLights", "maxShadows", "shadowMapEnabled", "pointLightShadows",
-		"shadowMapType", "shadowMapDebug", "alphaTest", "metal", "doubleSided",
-		"flipSided"
+		"maxMorphTargets", "maxMorphNormals",
+		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
+		"shadowMapEnabled", "pointLightShadows",
+		"shadowMapType",
+		"alphaTest", "doubleSided", "flipSided"
 	];
 
 
@@ -64,63 +67,12 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 	}
 
-	function allocateLights( lights ) {
-
-		var dirLights = 0;
-		var pointLights = 0;
-		var spotLights = 0;
-		var hemiLights = 0;
-
-		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
-
-			var light = lights[ l ];
-
-			if ( light.visible === false ) continue;
-
-			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
-			if ( light instanceof THREE.PointLight ) pointLights ++;
-			if ( light instanceof THREE.SpotLight ) spotLights ++;
-			if ( light instanceof THREE.HemisphereLight ) hemiLights ++;
-
-		}
-
-		return { 'directional': dirLights, 'point': pointLights, 'spot': spotLights, 'hemi': hemiLights };
-
-	}
-
-	function allocateShadows( lights ) {
-
-		var maxShadows = 0;
-		var pointLightShadows = 0;
-
-		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
-
-			var light = lights[ l ];
-
-			if ( ! light.castShadow ) continue;
-
-			if ( light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) maxShadows ++;
-			if ( light instanceof THREE.PointLight ) {
-
-				maxShadows ++;
-				pointLightShadows ++;
-
-			}
-
-		}
-
-		return { 'maxShadows': maxShadows, 'pointLightShadows': pointLightShadows };
-
-	}
-
 	this.getParameters = function ( material, lights, fog, object ) {
 
 		var shaderID = shaderIDs[ material.type ];
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
 
-		var maxLightCount = allocateLights( lights );
-		var allocatedShadows = allocateShadows( lights );
 		var maxBones = allocateBones( object );
 		var precision = renderer.getPrecision();
 
@@ -130,7 +82,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			if ( precision !== material.precision ) {
 
-				console.warn( 'THREE.WebGLRenderer.initMaterial:', material.precision, 'not supported, using', precision, 'instead.' );
+				console.warn( 'THREE.WebGLProgram.getParameters:', material.precision, 'not supported, using', precision, 'instead.' );
 
 			}
 
@@ -152,6 +104,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			displacementMap: !! material.displacementMap,
+			roughnessMap: !! material.roughnessMap,
+			metalnessMap: !! material.metalnessMap,
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
 
@@ -177,19 +131,17 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			maxMorphTargets: renderer.maxMorphTargets,
 			maxMorphNormals: renderer.maxMorphNormals,
 
-			maxDirLights: maxLightCount.directional,
-			maxPointLights: maxLightCount.point,
-			maxSpotLights: maxLightCount.spot,
-			maxHemiLights: maxLightCount.hemi,
+			numDirLights: lights.directional.length,
+			numPointLights: lights.point.length,
+			numSpotLights: lights.spot.length,
+			numHemiLights: lights.hemi.length,
 
-			maxShadows: allocatedShadows.maxShadows,
-			pointLightShadows: allocatedShadows.pointLightShadows,
-			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && allocatedShadows.maxShadows > 0,
+			pointLightShadows: lights.shadowsPointLight,
+
+			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
-			shadowMapDebug: renderer.shadowMap.debug,
 
 			alphaTest: material.alphaTest,
-			metal: material.metal,
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide
 

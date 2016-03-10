@@ -18,7 +18,7 @@ THREE.MultiMaterial.prototype = {
 
 	constructor: THREE.MultiMaterial,
 
-	toJSON: function () {
+	toJSON: function ( meta ) {
 
 		var output = {
 			metadata: {
@@ -31,9 +31,14 @@ THREE.MultiMaterial.prototype = {
 			materials: []
 		};
 
-		for ( var i = 0, l = this.materials.length; i < l; i ++ ) {
+		var materials = this.materials;
 
-			output.materials.push( this.materials[ i ].toJSON() );
+		for ( var i = 0, l = materials.length; i < l; i ++ ) {
+
+			var material = materials[ i ].toJSON( meta );
+			delete material.metadata;
+
+			output.materials.push( material );
 
 		}
 
@@ -60,7 +65,3 @@ THREE.MultiMaterial.prototype = {
 	}
 
 };
-
-// backwards compatibility
-
-THREE.MeshFaceMaterial = THREE.MultiMaterial;

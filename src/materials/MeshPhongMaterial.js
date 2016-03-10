@@ -4,7 +4,6 @@
  *
  * parameters = {
  *  color: <hex>,
- *  emissive: <hex>,
  *  specular: <hex>,
  *  shininess: <float>,
  *  opacity: <float>,
@@ -17,6 +16,8 @@
  *  aoMap: new THREE.Texture( <Image> ),
  *  aoMapIntensity: <float>
  *
+ *  emissive: <hex>,
+ *  emissiveIntensity: <float>
  *  emissiveMap: new THREE.Texture( <Image> ),
  *
  *  bumpMap: new THREE.Texture( <Image> ),
@@ -63,11 +64,8 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.type = 'MeshPhongMaterial';
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
-	this.emissive = new THREE.Color( 0x000000 );
 	this.specular = new THREE.Color( 0x111111 );
 	this.shininess = 30;
-
-	this.metal = false;
 
 	this.map = null;
 
@@ -77,6 +75,8 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.aoMap = null;
 	this.aoMapIntensity = 1.0;
 
+	this.emissive = new THREE.Color( 0x000000 );
+	this.emissiveIntensity = 1.0;
 	this.emissiveMap = null;
 
 	this.bumpMap = null;
@@ -125,11 +125,8 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 	THREE.Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
-	this.emissive.copy( source.emissive );
 	this.specular.copy( source.specular );
 	this.shininess = source.shininess;
-
-	this.metal = source.metal;
 
 	this.map = source.map;
 
@@ -139,7 +136,9 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.aoMap = source.aoMap;
 	this.aoMapIntensity = source.aoMapIntensity;
 
+	this.emissive.copy( source.emissive );
 	this.emissiveMap = source.emissiveMap;
+	this.emissiveIntensity = source.emissiveIntensity;
 
 	this.bumpMap = source.bumpMap;
 	this.bumpScale = source.bumpScale;

@@ -94,7 +94,7 @@
 				loader = new THREE.JSONLoader();
 				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } ) );
+					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } ) );
 					scene.add( mesh );
 
 				} );

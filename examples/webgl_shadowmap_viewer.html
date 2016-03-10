@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - ShadowMapViewer example </title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				font-family: Monospace;
@@ -28,15 +29,10 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
-
 		<script src="js/controls/OrbitControls.js"></script>
-
 		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
-
 		<script src="js/utils/ShadowMapViewer.js"></script>
-
 		<script src="js/Detector.js"></script>
-
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -76,6 +72,8 @@
 
 				spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.name = 'Spot Light';
+				spotLight.angle = Math.PI / 5;
+				spotLight.penumbra = 0.3;
 				spotLight.position.set( 10, 10, 5 );
 				spotLight.castShadow = true;
 				spotLight.shadowCameraNear = 8;
@@ -160,8 +158,9 @@
 			function initMisc() {
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.BasicShadowMap;
 

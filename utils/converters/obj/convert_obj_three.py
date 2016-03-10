@@ -15,7 +15,6 @@ Notes:
         -a center|centerxz|top|bottom|none model alignment
         -s smooth|flat			smooth = export vertex normals, flat = no normals (face normals computed in loader)
         -t ascii|binary			export ascii or binary format (ascii has more features, binary just supports vertices, faces, normals, uvs and materials)
-        -d invert|normal		invert transparency
         -b						bake material colors into face colors
         -x 10.0                 scale and truncate
         -f 2                    morph frame sampling step
@@ -23,7 +22,6 @@ Notes:
     - by default:
         use smooth shading (if there were vertex normals in the original model)
         will be in ASCII format
-        original model is assumed to use non-inverted transparency / dissolve (0.0 fully transparent, 1.0 fully opaque)
         no face colors baking
         no scale and truncate
         morph frame step = 1 (all files will be processed)
@@ -55,7 +53,7 @@ How to use generated JS file in your HTML document
 
         function createScene( geometry, materials ) {
 
-            var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+            var mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
 
         }
 
@@ -138,7 +136,6 @@ import glob
 ALIGN = "none"        	# center centerxz bottom top none
 SHADING = "smooth"      # smooth flat
 TYPE = "ascii"          # ascii binary
-TRANSPARENCY = "normal" # normal invert
 
 TRUNCATE = False
 SCALE = 1.0
@@ -393,11 +390,6 @@ def parse_mtl(fname):
             if chunks[0] == "map_Kd" and len(chunks) == 2:
                 materials[identifier]["mapDiffuse"] = texture_relative_path(chunks[1])
 
-            # Ambient texture
-            # map_Ka texture_ambient.jpg
-            if chunks[0] == "map_Ka" and len(chunks) == 2:
-                materials[identifier]["mapAmbient"] = texture_relative_path(chunks[1])
-
             # Specular texture
             # map_Ks texture_specular.jpg
             if chunks[0] == "map_Ks" and len(chunks) == 2:
@@ -423,11 +415,6 @@ def parse_mtl(fname):
             if chunks[0] == "Kd" and len(chunks) == 4:
                 materials[identifier]["colorDiffuse"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
 
-            # Ambient color
-            # Ka 1.000 1.000 1.000
-            if chunks[0] == "Ka" and len(chunks) == 4:
-                materials[identifier]["colorAmbient"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
-
             # Specular color
             # Ks 1.000 1.000 1.000
             if chunks[0] == "Ks" and len(chunks) == 4:
@@ -438,14 +425,19 @@ def parse_mtl(fname):
             if chunks[0] == "Ns" and len(chunks) == 2:
                 materials[identifier]["specularCoef"] = float(chunks[1])
 
+            # Dissolves
+            # d 0.9
+            if chunks[0] == "d" and len(chunks) == 2:
+                materials[identifier]["opacity"] = float(chunks[1])
+                if materials[identifier]["opacity"] < 1.0:
+                    materials[identifier]["transparent"] = True
+
             # Transparency
-            # Tr 0.9 or d 0.9
-            if (chunks[0] == "Tr" or chunks[0] == "d") and len(chunks) == 2:
-                materials[identifier]["transparent"] = True
-                if TRANSPARENCY == "invert":
-                    materials[identifier]["opacity"] = float(chunks[1])
-                else:
-                    materials[identifier]["opacity"] = 1.0 - float(chunks[1])
+            # Tr 0.1
+            if chunks[0] == "Tr" and len(chunks) == 2:
+                materials[identifier]["opacity"] = 1.0 - float(chunks[1])
+                if materials[identifier]["opacity"] < 1.0:
+                    materials[identifier]["transparent"] = True
 
             # Optical density
             # Ni 1.0
@@ -1545,7 +1537,7 @@ if __name__ == "__main__":
 
     # get parameters from the command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hbi:m:c:b:o:a:s:t:d:x:f:", ["help", "bakecolors", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "dissolve=", "truncatescale=", "framestep="])
+        opts, args = getopt.getopt(sys.argv[1:], "hbi:m:c:b:o:a:s:t:d:x:f:", ["help", "bakecolors", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "truncatescale=", "framestep="])
 
     except getopt.GetoptError:
         usage()
@@ -1584,10 +1576,6 @@ if __name__ == "__main__":
             if a in ("binary", "ascii"):
                 TYPE = a
 
-        elif o in ("-d", "--dissolve"):
-            if a in ("normal", "invert"):
-                TRANSPARENCY = a
-
         elif o in ("-b", "--bakecolors"):
             BAKE_COLORS = True
 
@@ -1614,4 +1602,3 @@ if __name__ == "__main__":
         convert_ascii(infile, morphfiles, colorfiles, outfile)
     elif TYPE == "binary":
         convert_binary(infile, outfile)
-

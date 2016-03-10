@@ -4,10 +4,19 @@
  *
  * parameters = {
  *  color: <hex>,
- *  emissive: <hex>,
  *  opacity: <float>,
  *
  *  map: new THREE.Texture( <Image> ),
+ *
+ *  lightMap: new THREE.Texture( <Image> ),
+ *  lightMapIntensity: <float>
+ *
+ *  aoMap: new THREE.Texture( <Image> ),
+ *  aoMapIntensity: <float>
+ *
+ *  emissive: <hex>,
+ *  emissiveIntensity: <float>
+ *  emissiveMap: new THREE.Texture( <Image> ),
  *
  *  specularMap: new THREE.Texture( <Image> ),
  *
@@ -42,9 +51,18 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.type = 'MeshLambertMaterial';
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
-	this.emissive = new THREE.Color( 0x000000 );
 
 	this.map = null;
+
+	this.lightMap = null;
+	this.lightMapIntensity = 1.0;
+
+	this.aoMap = null;
+	this.aoMapIntensity = 1.0;
+
+	this.emissive = new THREE.Color( 0x000000 );
+	this.emissiveIntensity = 1.0;
+	this.emissiveMap = null;
 
 	this.specularMap = null;
 
@@ -80,9 +98,18 @@ THREE.MeshLambertMaterial.prototype.copy = function ( source ) {
 	THREE.Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
-	this.emissive.copy( source.emissive );
 
 	this.map = source.map;
+
+	this.lightMap = source.lightMap;
+	this.lightMapIntensity = source.lightMapIntensity;
+
+	this.aoMap = source.aoMap;
+	this.aoMapIntensity = source.aoMapIntensity;
+
+	this.emissive.copy( source.emissive );
+	this.emissiveMap = source.emissiveMap;
+	this.emissiveIntensity = source.emissiveIntensity;
 
 	this.specularMap = source.specularMap;
 

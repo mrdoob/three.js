@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - dynamic procedural terrain</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style type="text/css">
 			body {
 				background: #000;
@@ -315,10 +316,10 @@
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 
 				heightMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
-				heightMap.generateMipmaps = false;
+				heightMap.texture.generateMipmaps = false;
 
 				normalMap = new THREE.WebGLRenderTarget( rx, ry, pars );
-				normalMap.generateMipmaps = false;
+				normalMap.texture.generateMipmaps = false;
 
 				uniformsNoise = {
 
@@ -338,23 +339,25 @@
 
 				// TEXTURES
 
-				var specularMap = new THREE.WebGLRenderTarget( 2048, 2048, pars );
-				specularMap.generateMipmaps = false;
+				var textureLoader = new THREE.TextureLoader();
 
-				var diffuseTexture1 = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg", null, function () {
+				var specularMap = new THREE.WebGLRenderTarget( 2048, 2048, pars );
+				specularMap.texture.generateMipmaps = false;
+
+				var diffuseTexture1 = textureLoader.load( "textures/terrain/grasslight-big.jpg", function () {
 
 					loadTextures();
 					applyShader( THREE.LuminosityShader, diffuseTexture1, specularMap );
 
 				} );
 
-				var diffuseTexture2 = THREE.ImageUtils.loadTexture( "textures/terrain/backgrounddetailed6.jpg", null, loadTextures );
-				var detailTexture = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big-nm.jpg", null, loadTextures );
+				var diffuseTexture2 = textureLoader.load( "textures/terrain/backgrounddetailed6.jpg", loadTextures );
+				var detailTexture = textureLoader.load( "textures/terrain/grasslight-big-nm.jpg", loadTextures );
 
 				diffuseTexture1.wrapS = diffuseTexture1.wrapT = THREE.RepeatWrapping;
 				diffuseTexture2.wrapS = diffuseTexture2.wrapT = THREE.RepeatWrapping;
 				detailTexture.wrapS = detailTexture.wrapT = THREE.RepeatWrapping;
-				specularMap.wrapS = specularMap.wrapT = THREE.RepeatWrapping;
+				specularMap.texture.wrapS = specularMap.texture.wrapT = THREE.RepeatWrapping;
 
 				// TERRAIN SHADER
 
@@ -459,7 +462,7 @@
 				renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 
 				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
-				renderTarget.generateMipmaps = false;
+				renderTarget.texture.generateMipmaps = false;
 
 				effectBloom = new THREE.BloomPass( 0.6 );
 				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
@@ -502,7 +505,7 @@
 					mesh.speed = speed;
 
 					var mixer = new THREE.AnimationMixer( mesh );
-					mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( duration ) );
+					mixer.clipAction( geometry.animations[ 0 ] ).setDuration( duration ).play();
 					mixer.update( 600 * Math.random() );
 					mesh.mixer = mixer;
 

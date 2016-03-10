@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				margin: 0px;
+				text-align:center;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				display:block;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - Node-Based Post-Processing
+		</div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script src="js/shaders/CopyShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+
+		<!-- NodeLibrary -->
+		<script src="js/nodes/GLNode.js"></script>
+		<script src="js/nodes/RawNode.js"></script>
+		<script src="js/nodes/TempNode.js"></script>
+		<script src="js/nodes/InputNode.js"></script>
+		<script src="js/nodes/ConstNode.js"></script>
+		<script src="js/nodes/FunctionNode.js"></script>
+		<script src="js/nodes/FunctionCallNode.js"></script>
+		<script src="js/nodes/BuilderNode.js"></script>
+		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeMaterial.js"></script>
+
+		<!-- Accessors -->
+		<script src="js/nodes/accessors/PositionNode.js"></script>
+		<script src="js/nodes/accessors/NormalNode.js"></script>
+		<script src="js/nodes/accessors/UVNode.js"></script>
+		<script src="js/nodes/accessors/ColorsNode.js"></script>
+
+		<!-- Inputs -->
+		<script src="js/nodes/inputs/IntNode.js"></script>
+		<script src="js/nodes/inputs/FloatNode.js"></script>
+		<script src="js/nodes/inputs/ColorNode.js"></script>
+		<script src="js/nodes/inputs/Vector2Node.js"></script>
+		<script src="js/nodes/inputs/Vector3Node.js"></script>
+		<script src="js/nodes/inputs/Vector4Node.js"></script>
+		<script src="js/nodes/inputs/TextureNode.js"></script>
+		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
+		<script src="js/nodes/inputs/ScreenNode.js"></script>
+
+		<!-- Math -->
+		<script src="js/nodes/math/Math1Node.js"></script>
+		<script src="js/nodes/math/Math2Node.js"></script>
+		<script src="js/nodes/math/Math3Node.js"></script>
+		<script src="js/nodes/math/OperatorNode.js"></script>
+
+		<!-- Utils -->
+		<script src="js/nodes/utils/SwitchNode.js"></script>
+		<script src="js/nodes/utils/JoinNode.js"></script>
+		<script src="js/nodes/utils/TimerNode.js"></script>
+		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
+
+		<!-- Post-Processing -->
+		<script src="js/nodes/postprocessing/NodePass.js"></script>
+
+		<script>
+
+			var camera, scene, renderer, composer;
+			var object, light, nodepass;
+			var gui, guiElements = [];
+
+			var param = { example: 'color-adjustment' };
+
+			var textureLoader = new THREE.TextureLoader();
+
+			var lensflare2 = textureLoader.load( 'textures/lensflare2.jpg' );
+			lensflare2.wrapS = lensflare2.wrapT = THREE.RepeatWrapping;
+
+			var decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
+			decalNormal.wrapS = decalNormal.wrapT = THREE.RepeatWrapping;
+
+			init();
+			animate();
+
+			function clearGui() {
+
+				if ( gui ) gui.destroy();
+
+				gui = new dat.GUI();
+
+				var example = gui.add( param, 'example', {
+					'basic / color-adjustment': 'color-adjustment',
+					'basic / blends': 'blends',
+					'basic / fade': 'fade',
+					'basic / invert': 'invert',
+					'adv / saturation': 'saturation',
+					'adv / refraction': 'refraction',
+					'adv / mosaic': 'mosaic'
+				} ).onFinishChange( function() {
+
+					updateMaterial();
+
+				} );
+
+				gui.open();
+
+			}
+
+			function addGui( name, value, callback, isColor, min, max ) {
+
+				var node;
+
+				param[ name ] = value;
+
+				if ( isColor ) {
+
+					node = gui.addColor( param, name ).onChange( function() {
+
+						callback( param[ name ] );
+
+					} );
+
+				}
+				else if ( typeof value == 'object' ) {
+
+					node = gui.add( param, name, value ).onChange( function() {
+
+						callback( param[ name ] );
+
+					} );
+
+				}
+				else {
+
+					node = gui.add( param, name, min, max ).onChange( function() {
+
+						callback( param[ name ] );
+
+					} );
+
+				}
+
+				return node;
+
+			}
+
+			function updateMaterial() {
+
+				var name = param.example;
+
+				clearGui();
+
+				switch ( name ) {
+
+					case 'color-adjustment':
+
+						var screen = new THREE.ScreenNode();
+
+						var hue = new THREE.FloatNode();
+						var sataturation = new THREE.FloatNode( 1 );
+						var vibrance = new THREE.FloatNode();
+						var brightness = new THREE.FloatNode( 0 );
+						var contrast = new THREE.FloatNode( 1 );
+
+						var hueNode = new THREE.ColorAdjustmentNode( screen, hue, THREE.ColorAdjustmentNode.HUE );
+						var satNode = new THREE.ColorAdjustmentNode( hueNode, sataturation, THREE.ColorAdjustmentNode.SATURATION );
+						var vibranceNode = new THREE.ColorAdjustmentNode( satNode, vibrance, THREE.ColorAdjustmentNode.VIBRANCE );
+						var brightnessNode = new THREE.ColorAdjustmentNode( vibranceNode, brightness, THREE.ColorAdjustmentNode.BRIGHTNESS );
+						var contrastNode = new THREE.ColorAdjustmentNode( brightnessNode, contrast, THREE.ColorAdjustmentNode.CONTRAST );
+
+						nodepass.value = contrastNode;
+
+						// GUI
+
+						addGui( 'hue', hue.number, function( val ) {
+
+							hue.number = val;
+
+						}, false, 0, Math.PI * 2 );
+
+						addGui( 'saturation', sataturation.number, function( val ) {
+
+							sataturation.number = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'vibrance', vibrance.number, function( val ) {
+
+							vibrance.number = val;
+
+						}, false, - 1, 1 );
+
+						addGui( 'brightness', brightness.number, function( val ) {
+
+							brightness.number = val;
+
+						}, false, 0, .5 );
+
+						addGui( 'contrast', contrast.number, function( val ) {
+
+							contrast.number = val;
+
+						}, false, 0, 2 );
+
+						break;
+
+					case 'fade':
+
+						// PASS
+
+						var color = new THREE.ColorNode( 0xFFFFFF );
+						var percent = new THREE.FloatNode( .5 );
+
+						var fade = new THREE.Math3Node(
+							new THREE.ScreenNode(),
+							color,
+							percent,
+							THREE.Math3Node.MIX
+						);
+
+						nodepass.value = fade;
+
+						// GUI
+
+						addGui( 'color', color.value.getHex(), function( val ) {
+
+							color.value.setHex( val );
+
+						}, true );
+
+						addGui( 'fade', percent.number, function( val ) {
+
+							percent.number = val;
+
+						}, false, 0, 1 );
+
+						break;
+
+					case 'invert':
+
+						// PASS
+
+						var alpha = new THREE.FloatNode( 1 );
+
+						var screen = new THREE.ScreenNode();
+						var inverted = new THREE.Math1Node( screen, THREE.Math1Node.INVERT );
+
+						var fade = new THREE.Math3Node(
+							screen,
+							inverted,
+							alpha,
+							THREE.Math3Node.MIX
+						);
+
+						nodepass.value = fade;
+
+						// GUI
+
+						addGui( 'alpha', alpha.number, function( val ) {
+
+							alpha.number = val;
+
+						}, false, 0, 1 );
+
+						break;
+
+					case 'blends':
+
+						// PASS
+
+						var multiply = new THREE.OperatorNode(
+							new THREE.ScreenNode(),
+							new THREE.TextureNode( lensflare2 ),
+							THREE.OperatorNode.ADD
+						);
+
+						nodepass.value = multiply;
+
+						// GUI
+
+						addGui( 'blend', {
+							'addition' : THREE.OperatorNode.ADD,
+							'subtract' : THREE.OperatorNode.SUB,
+							'multiply' : THREE.OperatorNode.MUL,
+							'division' : THREE.OperatorNode.DIV
+						}, function( val ) {
+
+							multiply.op = val;
+
+							nodepass.build();
+
+						} );
+
+						break;
+
+					case 'saturation':
+
+						// PASS
+
+						var screen = new THREE.ScreenNode();
+						var sat = new THREE.FloatNode( 0 );
+
+						var satrgb = new THREE.FunctionNode( [
+						"vec3 satrgb(vec3 rgb, float adjustment) {",
+							//"const vec3 W = vec3(0.2125, 0.7154, 0.0721);", // LUMA
+							"vec3 intensity = vec3(dot(rgb, LUMA));",
+							"return mix(intensity, rgb, adjustment);",
+						"}"
+						].join( "\n" ) );
+
+						var saturation = new THREE.FunctionCallNode( satrgb );
+						saturation.inputs.rgb = screen;
+						saturation.inputs.adjustment = sat;
+
+						nodepass.value = saturation;
+
+						// GUI
+
+						addGui( 'saturation', sat.number, function( val ) {
+
+							sat.number = val;
+
+						}, false, 0, 2 );
+
+						break;
+
+					case 'refraction':
+
+						// PASS
+
+						var normal = new THREE.TextureNode( decalNormal );
+						var normalXY = new THREE.SwitchNode( normal, 'xy' );
+						var scale = new THREE.FloatNode( .5 );
+						var flip = new THREE.Vector2Node( - 1, 1 );
+
+						var normalXYFlip = new THREE.Math1Node(
+							normalXY,
+							THREE.Math1Node.INVERT
+						);
+
+						var offsetNormal = new THREE.OperatorNode(
+							normalXYFlip,
+							new THREE.FloatNode( .5 ),
+							THREE.OperatorNode.ADD
+						);
+
+						var scaleTexture = new THREE.OperatorNode(
+							new THREE.SwitchNode( normal, 'z' ),
+							offsetNormal,
+							THREE.OperatorNode.MUL
+						);
+
+						var scaleNormal = new THREE.Math3Node(
+							new THREE.FloatNode( 1 ),
+							scaleTexture,
+							scale,
+							THREE.Math3Node.MIX
+						);
+
+						var offsetCoord = new THREE.OperatorNode(
+							new THREE.UVNode(),
+							scaleNormal,
+							THREE.OperatorNode.MUL
+						);
+
+						var screen = new THREE.ScreenNode( offsetCoord );
+
+						nodepass.value = screen;
+
+						// GUI
+
+						addGui( 'scale', scale.number, function( val ) {
+
+							scale.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'invert', false, function( val ) {
+
+							offsetNormal.a = val ? normalXYFlip : normalXY;
+
+							nodepass.build();
+
+						} );
+
+						break;
+
+					case 'mosaic':
+
+						// PASS
+
+						var scale = new THREE.FloatNode( 128 );
+						var fade = new THREE.FloatNode( 1 );
+						var uv = new THREE.UVNode();
+						var tex = new THREE.TextureNode( lensflare2 );
+
+						var mask = new THREE.Math1Node( new THREE.SwitchNode( tex, 'x' ), THREE.Math1Node.INVERT );
+
+						var blocks = new THREE.OperatorNode(
+							uv,
+							scale,
+							THREE.OperatorNode.MUL
+						);
+
+						var blocksSize = new THREE.Math1Node(
+							blocks,
+							THREE.Math1Node.FLOOR
+						);
+
+						var coord = new THREE.OperatorNode(
+							blocksSize,
+							scale,
+							THREE.OperatorNode.DIV
+						);
+
+						var maskAlpha = new THREE.OperatorNode(
+							mask,
+							fade,
+							THREE.OperatorNode.MUL
+						);
+
+						var fadeCoord = new THREE.Math3Node(
+							uv,
+							coord,
+							maskAlpha,
+							THREE.Math3Node.MIX
+						);
+
+						var screen = new THREE.ScreenNode( fadeCoord );
+
+						nodepass.value = screen;
+
+						// GUI
+
+						addGui( 'scale', scale.number, function( val ) {
+
+							scale.number = val;
+
+						}, false, 16, 1024 );
+
+						addGui( 'fade', fade.number, function( val ) {
+
+							fade.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'mask', true, function( val ) {
+
+							fadeCoord.c = val ? maskAlpha : fade;
+
+							nodepass.build();
+
+						} );
+
+						break;
+
+				}
+
+				nodepass.build();
+
+			}
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 400;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x0066FF, 1, 1000 );
+
+				object = new THREE.Object3D();
+				scene.add( object );
+
+				var geometry = new THREE.SphereGeometry( 1, 4, 4 );
+
+				for ( var i = 0; i < 100; i ++ ) {
+
+					var material = new THREE.MeshPhongMaterial( { color: 0x888888 + ( Math.random() * 0x888888 ), shading: THREE.FlatShading } );
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
+					mesh.position.multiplyScalar( Math.random() * 400 );
+					mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = 10 + ( Math.random() * 40 );
+					object.add( mesh );
+
+				}
+
+				scene.add( new THREE.AmbientLight( 0x999999 ) );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 );
+				scene.add( light );
+
+				// postprocessing
+
+				composer = new THREE.EffectComposer( renderer );
+				composer.addPass( new THREE.RenderPass( scene, camera ) );
+
+				nodepass = new THREE.NodePass();
+				nodepass.renderToScreen = true;
+
+				composer.addPass( nodepass );
+
+				//
+
+				updateMaterial();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				composer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				object.rotation.x += 0.005;
+				object.rotation.y += 0.01;
+
+				composer.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>

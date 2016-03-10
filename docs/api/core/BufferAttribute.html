@@ -15,17 +15,17 @@
 		</div>
 
 		<h2>Constructor</h2>
-		<h3>[name]([page:Array array], [page:Integer itemSize])</h3>
+		<h3>[name]([page:TypedArray array], [page:Integer itemSize])</h3>
 		<div>
-		Instantiates this attribute with data from the associated buffer. The array can either be a regular Array or a Typed Array.
+		Instantiates this attribute with data from the associated buffer.
 		itemSize gives the number of values of the array that should be associated with a particular vertex.
 		</div>
 
 		<h2>Properties</h2>
 
-		<h3>[property:Array array]</h3>
+		<h3>[property:TypedArray array]</h3>
 		<div>
-		Stores the data associated with this attribute; can be an Array or a Typed Array. This element should have <code>itemSize * numVertices</code> elements, where numVertices is the number of vertices in the associated [page:BufferGeometry geometry].
+		Stores the data associated with this attribute. This element should have <code>itemSize * numVertices</code> elements, where numVertices is the number of vertices in the associated [page:BufferGeometry geometry].
 		</div>
 
 		<h3>[property:Integer itemSize]</h3>

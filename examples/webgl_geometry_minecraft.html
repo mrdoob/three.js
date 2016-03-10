@@ -181,7 +181,7 @@
 				var geometry = new THREE.BufferGeometry().fromGeometry( tmpGeometry );
 				geometry.computeBoundingSphere();
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/minecraft/atlas.png' );
+				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
 				texture.magFilter = THREE.NearestFilter;
 				texture.minFilter = THREE.LinearMipMapLinearFilter;
 

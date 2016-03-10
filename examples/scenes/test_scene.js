@@ -685,22 +685,22 @@
 		},
 
 		"face": {
-			"type": "MeshFaceMaterial",
+			"type": "MultiMaterial",
 			"parameters": {}
 		},
 
 		"multi_1": {
-			"type": "MeshFaceMaterial",
+			"type": "MultiMaterial",
 			"parameters": {}
 		},
 
 		"multi_2": {
-			"type": "MeshFaceMaterial",
+			"type": "MultiMaterial",
 			"parameters": { "materials": [ "phong_compressed_cube", "phong_man", "phong_hand", "minecraft", "backsignals" ] }
 		},
 
 		"multi_veyron": {
-			"type": "MeshFaceMaterial",
+			"type": "MultiMaterial",
 			"parameters": { "materials": [ "interior", "chrome", "darkerchrome", "glass", "chrome", "chrome", "backlights", "backsignals" ] }
 		}
 

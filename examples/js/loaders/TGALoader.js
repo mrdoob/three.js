@@ -477,7 +477,9 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 	return {
 		width: header.width,
 		height: header.height,
-		data: rgbaData
+		data: rgbaData,
+		magFilter: THREE.NearestFilter,
+		minFilter: THREE.NearestFilter
 	};
 
 };

@@ -115,6 +115,17 @@ THREE.Material.prototype = {
 
 	toJSON: function ( meta ) {
 
+		var isRoot = meta === undefined;
+
+		if ( isRoot ) {
+
+			meta = {
+				textures: {},
+				images: {}
+			};
+
+		}
+
 		var data = {
 			metadata: {
 				version: 4.4,
@@ -129,6 +140,10 @@ THREE.Material.prototype = {
 		if ( this.name !== '' ) data.name = this.name;
 
 		if ( this.color instanceof THREE.Color ) data.color = this.color.getHex();
+
+		if ( this.roughness !== 0.5 ) data.roughness = this.roughness;
+		if ( this.metalness !== 0.5 ) data.metalness = this.metalness;
+
 		if ( this.emissive instanceof THREE.Color ) data.emissive = this.emissive.getHex();
 		if ( this.specular instanceof THREE.Color ) data.specular = this.specular.getHex();
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
@@ -145,7 +160,7 @@ THREE.Material.prototype = {
 		if ( this.normalMap instanceof THREE.Texture ) {
 
 			data.normalMap = this.normalMap.toJSON( meta ).uuid;
-			data.normalScale = this.normalScale; // Removed for now, causes issue in editor ui.js
+			data.normalScale = this.normalScale.toArray();
 
 		}
 		if ( this.displacementMap instanceof THREE.Texture ) {
@@ -155,7 +170,12 @@ THREE.Material.prototype = {
 			data.displacementBias = this.displacementBias;
 
 		}
+		if ( this.roughnessMap instanceof THREE.Texture ) data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
+		if ( this.metalnessMap instanceof THREE.Texture ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
+
+		if ( this.emissiveMap instanceof THREE.Texture ) data.emissiveMap = this.emissiveMap.toJSON( meta ).uuid;
 		if ( this.specularMap instanceof THREE.Texture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
+
 		if ( this.envMap instanceof THREE.Texture ) {
 
 			data.envMap = this.envMap.toJSON( meta ).uuid;
@@ -176,6 +196,34 @@ THREE.Material.prototype = {
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
+
+		// TODO: Copied from Object3D.toJSON
+
+		function extractFromCache ( cache ) {
+
+			var values = [];
+
+			for ( var key in cache ) {
+
+				var data = cache[ key ];
+				delete data.metadata;
+				values.push( data );
+
+			}
+
+			return values;
+
+		}
+
+		if ( isRoot ) {
+
+			var textures = extractFromCache( meta.textures );
+			var images = extractFromCache( meta.images );
+
+			if ( textures.length > 0 ) data.textures = textures;
+			if ( images.length > 0 ) data.images = images;
+
+		}
 
 		return data;
 
@@ -209,6 +257,8 @@ THREE.Material.prototype = {
 		this.depthTest = source.depthTest;
 		this.depthWrite = source.depthWrite;
 
+		this.colorWrite = source.colorWrite;
+
 		this.precision = source.precision;
 
 		this.polygonOffset = source.polygonOffset;
@@ -234,27 +284,6 @@ THREE.Material.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
-
-	},
-
-	// Deprecated
-
-	get wrapAround () {
-
-		console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
-
-	},
-
-	set wrapAround ( boolean ) {
-
-		console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
-
-	},
-
-	get wrapRGB () {
-
-		console.warn( 'THREE.' + this.type + ': .wrapRGB has been removed.' );
-		return new THREE.Color();
 
 	}
 

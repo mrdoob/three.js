@@ -56,7 +56,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_viewportWidth = _canvasWidth,
 	_viewportHeight = _canvasHeight,
 
-	pixelRatio = 1,
+	_pixelRatio = 1,
 
 	_context = _canvas.getContext( '2d', {
 		alpha: parameters.alpha === true
@@ -112,11 +112,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_normal = new THREE.Vector3(),
 	_normalViewMatrix = new THREE.Matrix3();
 
+	/* TODO
+	_canvas.mozImageSmoothingEnabled = false;
+	_canvas.webkitImageSmoothingEnabled = false;
+	_canvas.msImageSmoothingEnabled = false;
+	_canvas.imageSmoothingEnabled = false;
+	*/
+
 	// dash+gap fallbacks for Firefox and everything else
 
 	if ( _context.setLineDash === undefined ) {
 
-		_context.setLineDash = function () {}
+		_context.setLineDash = function () {};
 
 	}
 
@@ -158,20 +165,20 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.getPixelRatio = function () {
 
-		return pixelRatio;
+		return _pixelRatio;
 
 	};
 
 	this.setPixelRatio = function ( value ) {
 
-		if ( value !== undefined ) pixelRatio = value;
+		if ( value !== undefined ) _pixelRatio = value;
 
 	};
 
 	this.setSize = function ( width, height, updateStyle ) {
 
-		_canvasWidth = width * pixelRatio;
-		_canvasHeight = height * pixelRatio;
+		_canvasWidth = width * _pixelRatio;
+		_canvasHeight = height * _pixelRatio;
 
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
@@ -206,16 +213,16 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		_viewportX = x * pixelRatio;
-		_viewportY = y * pixelRatio;
+		_viewportX = x * _pixelRatio;
+		_viewportY = y * _pixelRatio;
 
-		_viewportWidth = width * pixelRatio;
-		_viewportHeight = height * pixelRatio;
+		_viewportWidth = width * _pixelRatio;
+		_viewportHeight = height * _pixelRatio;
 
 	};
 
 	this.setScissor = function () {};
-	this.enableScissorTest = function () {};
+	this.setScissorTest = function () {};
 
 	this.setClearColor = function ( color, alpha ) {
 
@@ -254,7 +261,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.clear = function () {
 
-		if ( _clearBox.empty() === false ) {
+		if ( _clearBox.isEmpty() === false ) {
 
 			_clearBox.intersect( _clipBox );
 			_clearBox.expandByScalar( 2 );
@@ -363,7 +370,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 					_v2.positionScreen
 				] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+				if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
 					renderLine( _v1, _v2, element, material );
 
@@ -395,7 +402,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 					_v3.positionScreen
 				] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+				if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
 					renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material );
 
@@ -819,13 +826,22 @@ THREE.CanvasRenderer = function ( parameters ) {
 			texture instanceof THREE.DataTexture ) {
 
 			return {
-					canvas: undefined,
-					version: texture.version
-				}
+				canvas: undefined,
+				version: texture.version
+			};
 
 		}
 
 		var image = texture.image;
+
+		if ( image.complete === false ) {
+
+			return {
+				canvas: undefined,
+				version: 0
+			};
+
+		}
 
 		var canvas = document.createElement( 'canvas' );
 		canvas.width = image.width;
@@ -854,10 +870,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
+		var pattern = _context.createPattern( canvas, repeat );
+
+		if ( texture.onUpdate ) texture.onUpdate( texture );
+
 		return {
-			canvas: _context.createPattern( canvas, repeat ),
+			canvas: pattern,
 			version: texture.version
-		}
+		};
 
 	}
 

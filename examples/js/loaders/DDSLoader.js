@@ -102,6 +102,7 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 	var FOURCC_DXT1 = fourCCToInt32( "DXT1" );
 	var FOURCC_DXT3 = fourCCToInt32( "DXT3" );
 	var FOURCC_DXT5 = fourCCToInt32( "DXT5" );
+	var FOURCC_ETC1 = fourCCToInt32( "ETC1" );
 
 	var headerLengthInt = 31; // The header length in 32 bit ints
 
@@ -171,6 +172,12 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 
 			blockBytes = 16;
 			dds.format = THREE.RGBA_S3TC_DXT5_Format;
+			break;
+
+		case FOURCC_ETC1:
+
+			blockBytes = 8;
+			dds.format = THREE.RGB_ETC1_Format;
 			break;
 
 		default:

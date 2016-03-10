@@ -99,8 +99,9 @@
 
 				// RENDERER
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setSize( canvasWidth, canvasHeight );
 				renderer.setClearColor( 0xAAAAAA );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( canvasWidth, canvasHeight );
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 				container.appendChild( renderer.domElement );
@@ -114,17 +115,19 @@
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
-				var textureMap = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
+				var textureMap = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
 
 				// REFLECTION MAP
 				var path = "textures/cube/skybox/";
-				var urls = [ path + "px.jpg", path + "nx.jpg",
-							 path + "py.jpg", path + "ny.jpg",
-							 path + "pz.jpg", path + "nz.jpg" ];
+				var urls = [
+					path + "px.jpg", path + "nx.jpg",
+					path + "py.jpg", path + "ny.jpg",
+					path + "pz.jpg", path + "nz.jpg"
+				];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 
 				// MATERIALS
 				var materialColor = new THREE.Color();
@@ -134,7 +137,7 @@
 
 				flatMaterial = new THREE.MeshPhongMaterial( { color: materialColor, specular: 0x0, shading: THREE.FlatShading, side: THREE.DoubleSide } );
 
-				gouraudMaterial = new THREE.MeshLambertMaterial( { color: materialColor, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
+				gouraudMaterial = new THREE.MeshLambertMaterial( { color: materialColor, side: THREE.DoubleSide } );
 
 				phongMaterial = new THREE.MeshPhongMaterial( { color: materialColor, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
 

@@ -1,35 +1,39 @@
+vec3 diffuse = vec3( 1.0 );
+
+GeometricContext geometry;
+geometry.position = mvPosition.xyz;
+geometry.normal = normalize( transformedNormal );
+geometry.viewDir = normalize( -mvPosition.xyz );
+
+GeometricContext backGeometry;
+backGeometry.position = geometry.position;
+backGeometry.normal = -geometry.normal;
+backGeometry.viewDir = geometry.viewDir;
+
 vLightFront = vec3( 0.0 );
 
 #ifdef DOUBLE_SIDED
-
 	vLightBack = vec3( 0.0 );
-
 #endif
 
-vec3 normal = normalize( transformedNormal );
+IncidentLight directLight;
+float dotNL;
+vec3 directLightColor_Diffuse;
 
-#if MAX_POINT_LIGHTS > 0
+#if NUM_POINT_LIGHTS > 0
 
-	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
+	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
-		vec3 lightColor = pointLightColor[ i ];
+		directLight = getPointDirectLight( pointLights[ i ], geometry );
 
-		vec3 lVector = pointLightPosition[ i ] - mvPosition.xyz;
-		vec3 lightDir = normalize( lVector );
+		dotNL = dot( geometry.normal, directLight.direction );
+		directLightColor_Diffuse = PI * directLight.color;
 
-		// attenuation
-
-		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );
-
-		// diffuse
-
-		float dotProduct = dot( normal, lightDir );
-
-		vLightFront += lightColor * attenuation * saturate( dotProduct );
+		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 
 		#ifdef DOUBLE_SIDED
 
-			vLightBack += lightColor * attenuation * saturate( - dotProduct );
+			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;
 
 		#endif
 
@@ -37,63 +41,40 @@ vec3 normal = normalize( transformedNormal );
 
 #endif
 
-#if MAX_SPOT_LIGHTS > 0
+#if NUM_SPOT_LIGHTS > 0
 
-	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
+	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
-		vec3 lightColor = spotLightColor[ i ];
+		directLight = getSpotDirectLight( spotLights[ i ], geometry );
 
-		vec3 lightPosition = spotLightPosition[ i ];
-		vec3 lVector = lightPosition - mvPosition.xyz;
-		vec3 lightDir = normalize( lVector );
+		dotNL = dot( geometry.normal, directLight.direction );
+		directLightColor_Diffuse = PI * directLight.color;
 
-		float spotEffect = dot( spotLightDirection[ i ], lightDir );
+		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 
-		if ( spotEffect > spotLightAngleCos[ i ] ) {
+		#ifdef DOUBLE_SIDED
 
-			spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ i ] ) );
+			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;
 
-			// attenuation
-
-			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );
-
-			attenuation *= spotEffect;
-
-			// diffuse
-
-			float dotProduct = dot( normal, lightDir );
-
-			vLightFront += lightColor * attenuation * saturate( dotProduct );
-
-			#ifdef DOUBLE_SIDED
-
-				vLightBack += lightColor * attenuation * saturate( - dotProduct );
-
-			#endif
-
-		}
-
+		#endif
 	}
 
 #endif
 
-#if MAX_DIR_LIGHTS > 0
+#if NUM_DIR_LIGHTS > 0
 
-	for ( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
+	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
-		vec3 lightColor = directionalLightColor[ i ];
+		directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
 
-		vec3 lightDir = directionalLightDirection[ i ];
+		dotNL = dot( geometry.normal, directLight.direction );
+		directLightColor_Diffuse = PI * directLight.color;
 
-		// diffuse
-
-		float dotProduct = dot( normal, lightDir );
-
-		vLightFront += lightColor * saturate( dotProduct );
+		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 
 		#ifdef DOUBLE_SIDED
 
-			vLightBack += lightColor * saturate( - dotProduct );
+			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;
 
 		#endif
 
@@ -101,25 +82,15 @@ vec3 normal = normalize( transformedNormal );
 
 #endif
 
-#if MAX_HEMI_LIGHTS > 0
+#if NUM_HEMI_LIGHTS > 0
 
-	for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
+	for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-		vec3 lightDir = hemisphereLightDirection[ i ];
-
-		// diffuse
-
-		float dotProduct = dot( normal, lightDir );
-
-		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;
-
-		vLightFront += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );
+		vLightFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
 
 		#ifdef DOUBLE_SIDED
 
-			float hemiDiffuseWeightBack = - 0.5 * dotProduct + 0.5;
-
-			vLightBack += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeightBack );
+			vLightBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );
 
 		#endif
 

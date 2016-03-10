@@ -368,7 +368,7 @@
         },
         "materialIndex": {
           "!type": "number",
-          "!doc": "Material index (points to [page:MeshFaceMaterial MeshFaceMaterial.materials])."
+          "!doc": "Material index (points to [page:MultiMaterial MultiMaterial.materials])."
         },
         "clone": {
           "!type": "fn() -> +THREE.Face3",
@@ -960,7 +960,7 @@
       "prototype": {
         "createMultiMaterialObject": {
           "!type": "fn(geometry: +THREE.Geometry, materials: []) -> +THREE.Object3D",
-          "!doc": "Creates an new Object3D an new mesh for each material defined in materials. Beware that this is not the same as Meshfacematerial which defines multiple material for 1 mesh.<br>\n\t\tThis is mostly useful for object that need a material and a wireframe implementation."
+          "!doc": "Creates an new Object3D an new mesh for each material defined in materials. Beware that this is not the same as MultiMaterial which defines multiple material for 1 mesh.<br>\n\t\tThis is mostly useful for object that need a material and a wireframe implementation."
         },
         "attach": {
           "!type": "fn(child: +THREE.Object3D, scene: +THREE.Object3D, parent: +THREE.Object3D)",
@@ -1618,7 +1618,7 @@
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
-      "!doc": "Class for generating meshes with axial symmetry. Possible uses include donuts, pipes, vases etc. The lathe rotate around the Z axis.",
+      "!doc": "Class for generating meshes with axial symmetry. Possible uses include donuts, pipes, vases etc. The lathe rotate around the Y axis.",
       "!type": "fn(points: [], segments: number, phiStart: number, phiLength: number)"
     },
     "OctahedronGeometry": {
@@ -2839,8 +2839,8 @@
       "!doc": "A material for drawing geometry by depth. Depth is based off of the camera near and far plane. White is nearest, black is farthest.",
       "!type": "fn(parameters: object)"
     },
-    "MeshFaceMaterial": {
-      "!url": "http://threejs.org/docs/#Reference/materials/MeshFaceMaterial",
+    "MultiMaterial": {
+      "!url": "http://threejs.org/docs/#Reference/materials/MultiMaterial",
       "prototype": {
         "materials": {
           "!type": "[]",

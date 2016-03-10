@@ -71,5 +71,3 @@ THREE.Shape.prototype.extractPoints = function ( divisions ) {
 	return this.extractAllPoints( divisions );
 
 };
-
-THREE.Shape.Utils = THREE.ShapeUtils; // backwards compatibility

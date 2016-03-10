@@ -10,6 +10,7 @@ THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 
 	this.type = 'PerspectiveCamera';
 
+	this.focalLength = 10;
 	this.zoom = 1;
 
 	this.fov = fov !== undefined ? fov : 50;
@@ -123,25 +124,28 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 };
 
 THREE.PerspectiveCamera.prototype.copy = function ( source ) {
-	
+
 	THREE.Camera.prototype.copy.call( this, source );
-	
+
+	this.focalLength = source.focalLength;
+	this.zoom = source.zoom;
+
 	this.fov = source.fov;
 	this.aspect = source.aspect;
 	this.near = source.near;
 	this.far = source.far;
-	
-	this.zoom = source.zoom;
-	
+
 	return this;
-		
+
 };
 
 THREE.PerspectiveCamera.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
+	data.object.focalLength = this.focalLength;
 	data.object.zoom = this.zoom;
+
 	data.object.fov = this.fov;
 	data.object.aspect = this.aspect;
 	data.object.near = this.near;

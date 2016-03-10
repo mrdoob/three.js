@@ -19,10 +19,6 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/geometries/TextGeometry.js"></script>
-		<script src="js/utils/FontUtils.js"></script>
-		<script src="fonts/helvetiker_regular.typeface.js"></script>
-
 		<script>
 
 			var container, stats;
@@ -37,7 +33,7 @@
 
 				var F = function( klass, args ) {
 
-				    return klass.apply( this, args );
+					return klass.apply( this, args );
 
 				};
 
@@ -58,8 +54,6 @@
 
 			}
 
-
-
 			var geometriesParams = [
 
 				{ type: 'BoxGeometry', args: [ 200, 200, 200, 2, 2, 2, materials ] },
@@ -72,33 +66,38 @@
 				{ type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ]} ,
 				{ type: 'OctahedronGeometry', args: [200, 0] },
 				{ type: 'LatheGeometry', args: [ [
-					new THREE.Vector3(0,0,-100),
-					new THREE.Vector3(0,50,-50),
-					new THREE.Vector3(0,10,0),
-					new THREE.Vector3(0,50,050),
-					new THREE.Vector3(0,0,100) ] ]},
+					new THREE.Vector2(0,-100),
+					new THREE.Vector2(50,-50),
+					new THREE.Vector2(10,0),
+					new THREE.Vector2(50,050),
+					new THREE.Vector2(0,100) ] ]},
 				{ type: 'LatheGeometry', args: [ [
-					new THREE.Vector3(0,0,-100),
-					new THREE.Vector3(0,50,-50),
-					new THREE.Vector3(0,10,0),
-					new THREE.Vector3(0,50,050),
-					new THREE.Vector3(0,100,100) ], 12, 0, Math.PI ] },
+					new THREE.Vector2(0,-100),
+					new THREE.Vector2(50,-50),
+					new THREE.Vector2(10,0),
+					new THREE.Vector2(50,050),
+					new THREE.Vector2(100,100) ], 12, 0, Math.PI ] },
 				{ type: 'LatheGeometry', args: [ [
-					new THREE.Vector3(0,10,-100),
-					new THREE.Vector3(0,50,-50),
-					new THREE.Vector3(0,10,0),
-					new THREE.Vector3(0,50,050),
-					new THREE.Vector3(0,0,100) ], 12, Math.PI*2/3, Math.PI*3/2 ] },
+					new THREE.Vector2(10,-100),
+					new THREE.Vector2(50,-50),
+					new THREE.Vector2(10,0),
+					new THREE.Vector2(50,050),
+					new THREE.Vector2(0,100) ], 12, Math.PI*2/3, Math.PI*3/2 ] },
 				{ type: 'TextGeometry', args: ['&', {
-										size: 200,
-										height: 50,
-										curveSegments: 1,
-										font: "helvetiker"
-
-									}]},
+						size: 200,
+						height: 50,
+						curveSegments: 1
+					}]},
 				{ type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }
 
 			];
+
+			var loader = new THREE.FontLoader();
+			loader.load( 'fonts/helvetiker_regular.typeface.js', function ( font ) {
+
+				geometriesParams[ 12 ].args[ 1 ].font = font;
+
+			} );
 
 			var info;
 			var geometryIndex = 0;
@@ -196,7 +195,6 @@
 				for ( i = 0; i < geometry.faces.length; i ++ ) {
 
 					f  = geometry.faces[ i ];
-
 
 					n = ( f instanceof THREE.Face3 ) ? 3 : 4;
 

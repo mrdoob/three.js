@@ -19,7 +19,7 @@ var Viewport = function ( editor ) {
 
 	// helpers
 
-	var grid = new THREE.GridHelper( 500, 25 );
+	var grid = new THREE.GridHelper( 30, 1 );
 	sceneHelpers.add( grid );
 
 	//
@@ -34,7 +34,9 @@ var Viewport = function ( editor ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
-	var matrix = new THREE.Matrix4();
+	var objectPositionOnDown = null;
+	var objectRotationOnDown = null;
+	var objectScaleOnDown = null;
 
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
@@ -51,6 +53,8 @@ var Viewport = function ( editor ) {
 
 			}
 
+			signals.refreshSidebarObject3D.dispatch( object );
+
 		}
 
 		render();
@@ -60,7 +64,9 @@ var Viewport = function ( editor ) {
 
 		var object = transformControls.object;
 
-		matrix.copy( object.matrix );
+		objectPositionOnDown = object.position.clone();
+		objectRotationOnDown = object.rotation.clone();
+		objectScaleOnDown = object.scale.clone();
 
 		controls.enabled = false;
 
@@ -69,26 +75,44 @@ var Viewport = function ( editor ) {
 
 		var object = transformControls.object;
 
-		if ( matrix.equals( object.matrix ) === false ) {
+		if ( object !== null ) {
 
-			( function ( matrix1, matrix2 ) {
+			switch ( transformControls.getMode() ) {
 
-				editor.history.add(
-					function () {
-						matrix1.decompose( object.position, object.quaternion, object.scale );
-						signals.objectChanged.dispatch( object );
-					},
-					function () {
-						matrix2.decompose( object.position, object.quaternion, object.scale );
-						signals.objectChanged.dispatch( object );
+				case 'translate':
+
+					if ( ! objectPositionOnDown.equals( object.position ) ) {
+
+						editor.execute( new SetPositionCommand( object, object.position, objectPositionOnDown ) );
+
 					}
-				);
 
-			} )( matrix.clone(), object.matrix.clone() );
+					break;
+
+				case 'rotate':
+
+					if ( ! objectRotationOnDown.equals( object.rotation ) ) {
+
+						editor.execute( new SetRotationCommand( object, object.rotation, objectRotationOnDown ) );
+
+					}
+
+					break;
+
+				case 'scale':
+
+					if ( ! objectScaleOnDown.equals( object.scale ) ) {
+
+						editor.execute( new SetScaleCommand( object, object.scale, objectScaleOnDown ) );
+
+					}
+
+					break;
+
+			}
 
 		}
 
-		signals.objectChanged.dispatch( object );
 		controls.enabled = true;
 
 	} );
@@ -118,7 +142,7 @@ var Viewport = function ( editor ) {
 
 		return raycaster.intersectObjects( objects );
 
-	};
+	}
 
 	var onDownPosition = new THREE.Vector2();
 	var onUpPosition = new THREE.Vector2();
@@ -129,11 +153,11 @@ var Viewport = function ( editor ) {
 		var rect = dom.getBoundingClientRect();
 		return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
 
-	};
+	}
 
 	function handleClick() {
 
-		if ( onDownPosition.distanceTo( onUpPosition ) == 0 ) {
+		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
 			var intersects = getIntersects( onUpPosition, objects );
 
@@ -163,7 +187,7 @@ var Viewport = function ( editor ) {
 
 		}
 
-	};
+	}
 
 	function onMouseDown( event ) {
 
@@ -174,7 +198,7 @@ var Viewport = function ( editor ) {
 
 		document.addEventListener( 'mouseup', onMouseUp, false );
 
-	};
+	}
 
 	function onMouseUp( event ) {
 
@@ -185,7 +209,7 @@ var Viewport = function ( editor ) {
 
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-	};
+	}
 
 	function onTouchStart( event ) {
 
@@ -196,7 +220,7 @@ var Viewport = function ( editor ) {
 
 		document.addEventListener( 'touchend', onTouchEnd, false );
 
-	};
+	}
 
 	function onTouchEnd( event ) {
 
@@ -209,7 +233,7 @@ var Viewport = function ( editor ) {
 
 		document.removeEventListener( 'touchend', onTouchEnd, false );
 
-	};
+	}
 
 	function onDoubleClick( event ) {
 
@@ -226,7 +250,7 @@ var Viewport = function ( editor ) {
 
 		}
 
-	};
+	}
 
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
 	container.dom.addEventListener( 'touchstart', onTouchStart, false );
@@ -358,9 +382,13 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.geometryChanged.add( function ( geometry ) {
+	signals.geometryChanged.add( function ( object ) {
 
-		selectionBox.update( editor.selected );
+		if ( object !== null ) {
+
+			selectionBox.update( object );
+
+		}
 
 		render();
 
@@ -368,24 +396,22 @@ var Viewport = function ( editor ) {
 
 	signals.objectAdded.add( function ( object ) {
 
-		var materialsNeedUpdate = false;
-
 		object.traverse( function ( child ) {
-
-			if ( child instanceof THREE.Light ) materialsNeedUpdate = true;
 
 			objects.push( child );
 
 		} );
 
-		if ( materialsNeedUpdate === true ) updateMaterials();
-
 	} );
 
 	signals.objectChanged.add( function ( object ) {
 
-		selectionBox.update( object );
-		transformControls.update();
+		if ( editor.selected === object ) {
+
+			selectionBox.update( object );
+			transformControls.update();
+
+		}
 
 		if ( object instanceof THREE.PerspectiveCamera ) {
 
@@ -405,17 +431,11 @@ var Viewport = function ( editor ) {
 
 	signals.objectRemoved.add( function ( object ) {
 
-		var materialsNeedUpdate = false;
-
 		object.traverse( function ( child ) {
-
-			if ( child instanceof THREE.Light ) materialsNeedUpdate = true;
 
 			objects.splice( objects.indexOf( child ), 1 );
 
 		} );
-
-		if ( materialsNeedUpdate === true ) updateMaterials();
 
 	} );
 
@@ -455,8 +475,6 @@ var Viewport = function ( editor ) {
 
 			}
 
-			updateMaterials();
-
 			oldFogType = fogType;
 
 		}
@@ -489,6 +507,11 @@ var Viewport = function ( editor ) {
 
 	signals.windowResize.add( function () {
 
+		// TODO: Move this out?
+
+		editor.DEFAULT_CAMERA.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+		editor.DEFAULT_CAMERA.updateProjectionMatrix();
+
 		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
 		camera.updateProjectionMatrix();
 
@@ -512,30 +535,6 @@ var Viewport = function ( editor ) {
 	animate();
 
 	//
-
-	function updateMaterials() {
-
-		editor.scene.traverse( function ( node ) {
-
-			if ( node.material ) {
-
-				node.material.needsUpdate = true;
-
-				if ( node.material instanceof THREE.MeshFaceMaterial ) {
-
-					for ( var i = 0; i < node.material.materials.length; i ++ ) {
-
-						node.material.materials[ i ].needsUpdate = true;
-
-					}
-
-				}
-
-			}
-
-		} );
-
-	}
 
 	function updateFog( root ) {
 
@@ -601,4 +600,4 @@ var Viewport = function ( editor ) {
 
 	return container;
 
-}
+};

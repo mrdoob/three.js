@@ -96,7 +96,7 @@
 				scene.fog = new THREE.FogExp2( 0xffffff, 0.00015 );
 
 				// sides
-				
+
 				var light = new THREE.Color( 0xffffff );
 				var shadow = new THREE.Color( 0x505050 );
 
@@ -199,7 +199,7 @@
 							colors[ 0 ] = c === 0 ? shadow : light;
 							colors[ 1 ] = d === 0 ? shadow : light;
 							colors[ 2 ] = a === 0 ? shadow : light;
-							
+
 							geometry.merge( py2Geometry, matrix );
 
 						} else {
@@ -213,7 +213,7 @@
 							colors[ 0 ] = b === 0 ? shadow : light;
 							colors[ 1 ] = c === 0 ? shadow : light;
 							colors[ 2 ] = d === 0 ? shadow : light;
-							
+
 							geometry.merge( pyGeometry, matrix );
 
 						}
@@ -274,7 +274,7 @@
 
 				}
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/minecraft/atlas.png' );
+				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
 				texture.magFilter = THREE.NearestFilter;
 				texture.minFilter = THREE.LinearMipMapLinearFilter;
 

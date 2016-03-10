@@ -30,12 +30,12 @@
 		<h3>[property:Vector3 origin]</h3>
 		<div>
 		The origin of the [page:Ray].
-		</div> 
+		</div>
 
 		<h3>[property:Vector3 direction]</h3>
 		<div>
 		The direction of the [page:Ray]. This must be normalized (with [page:Vector3].normalize) for the methods to operate properly.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 
@@ -77,7 +77,7 @@
 		<div>
 		Copy the properties of the provided [page:Ray], then return this [page:Ray].
 		</div>
-		
+
 		<h3>.distanceSqToSegment([page:Vector3 v0], [page:Vector3 v1], [page:Vector3 optionalPointOnRay] = null, [page:Vector3 optionalPointOnSegment] = null) [page:Float]</h3>
 		<div>
 		v0 -- [page:Vector3] The start of the line segment.
@@ -129,7 +129,7 @@
 		<div>
 		Intersect this [page:Ray] with a [page:Box3], returning the intersection point or *null* if there is no intersection.
 		</div>
-		
+
 		<h3>.intersectPlane([page:Plane plane], [page:Vector3 optionalTarget] = null) [page:Vector3]?</h3>
 		<div>
 		plane -- [page:Plane] The [page:Plane] to intersect with.<br />
@@ -139,7 +139,7 @@
 		Intersect this [page:Ray] with a [page:Plane], returning the intersection point or *null* if there is no intersection.
 		</div>
 		function ( a, b, c, backfaceCulling, optionalTarget )
-		
+
 		<h3>.intersectTriangle([page:Vector3 a], [page:Vector3 b], [page:Vector3 c], [page:Boolean backfaceCulling], [page:Vector3 optionalTarget] = null) [page:Vector3]?</h3>
 		<div>
 		a, b, c -- [page:Vector3] The [page:Vector3] points on the triangle.<br />
@@ -149,8 +149,8 @@
 		<div>
 		Intersect this [page:Ray] with a triangle, returning the intersection point or *null* if there is no intersection.
 		</div>
-		
-		<h3>[method:Boolean isIntersectionBox]([page:Box3 box])</h3>
+
+		<h3>[method:Boolean intersectsBox]([page:Box3 box])</h3>
 		<div>
 		box -- [page:Box3] The [page:Box3] to intersect with.
 		</div>
@@ -158,7 +158,7 @@
 		Return whether or not this [page:Ray] intersects with the [page:Box3].
 		</div>
 
-		<h3>[method:Boolean isIntersectionPlane]([page:Plane plane])</h3>
+		<h3>[method:Boolean intersectsPlane]([page:Plane plane])</h3>
 		<div>
 		plane -- [page:Plane] The [page:Plane] to intersect with.
 		</div>
@@ -166,7 +166,7 @@
 		Return whether or not this [page:Ray] intersects with the [page:Plane].
 		</div>
 
-		<h3>[method:Boolean isIntersectionSphere]([page:Sphere sphere])</h3>
+		<h3>[method:Boolean intersectsSphere]([page:Sphere sphere])</h3>
 		<div>
 		sphere -- [page:Sphere] The [page:Sphere] to intersect with.
 		</div>
@@ -189,6 +189,14 @@
 		</div>
 		<div>
 		Copy the parameters to the origin and direction properties.
+		</div>
+
+		<h3>[method:Ray lookAt]([page:Vector3 v])</h3>
+		<div>
+		v -- [page:Vector3] The vector to look at.
+		</div>
+		<div>
+		Adjusts the direction of the ray to point at the vector in world coordinates.
 		</div>
 
 		<h2>Source</h2>
