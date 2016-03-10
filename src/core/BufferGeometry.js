@@ -818,9 +818,13 @@ THREE.BufferGeometry.prototype = {
 
 			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
 
-			normals[ i ] *= n;
-			normals[ i + 1 ] *= n;
-			normals[ i + 2 ] *= n;
+			if( isFinite( n ) ) {
+
+				normals[ i ] *= n;
+				normals[ i + 1 ] *= n;
+				normals[ i + 2 ] *= n;
+
+			}
 
 		}
 
