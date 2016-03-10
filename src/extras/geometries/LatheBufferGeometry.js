@@ -113,7 +113,7 @@ THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
 
 	this.computeVertexNormals();
 
-	// if the geometry is closed, we need to merge the first and last normal of a vertex row
+	// if the geometry is closed, we need to average the normals along the seam.
 	// because the corresponding vertices are identical (but still have different UVs).
 
 	if( phiLength === Math.PI * 2 ) {
@@ -138,7 +138,7 @@ THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
 			n2.y = normals[ base + j + 1 ];
 			n2.z = normals[ base + j + 2 ];
 
-			// merge normals
+			// average normals
 			n.addVectors( n1, n2 ).normalize();
 
 			// assign the new values to both normals
