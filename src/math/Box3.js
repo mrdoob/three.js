@@ -116,7 +116,7 @@ THREE.Box3.prototype = {
 
 					}
 
-					if ( ! geometry.boundingBox.isEmpty() ) {
+					if ( geometry.boundingBox.isEmpty() === false ) {
 
 						box.copy( geometry.boundingBox );
 						box.applyMatrix4( node.matrixWorld );
