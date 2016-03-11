@@ -18,8 +18,11 @@
                 top: 10px;
                 width: 100%;
                 text-align: center;
-                z-index: 100;
+                z-index: 5;
                 display:block;
+            }
+            .dg {
+                z-index: 10 !important;
             }
             #info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
         </style>
@@ -41,16 +44,19 @@
         <script src="js/Detector.js"></script>
         <script src="js/libs/stats.min.js"></script>
         <script src="js/libs/zlib_and_gzip.min.js"></script>
+        <script src="js/libs/dat.gui.min.js"></script>
 
         <script>
 
             if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-            var container, stats;
-
-            var camera, controls, scene, renderer;
-
-            var cross;
+            var container,
+                stats,
+                camera,
+                controls,
+                scene,
+                renderer,
+                gui;
 
             init();
             animate();
@@ -60,17 +66,7 @@
                 camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
                 camera.position.z = 300;
 
-                controls = new THREE.TrackballControls( camera );
 
-                controls.rotateSpeed = 5.0;
-                controls.zoomSpeed = 5;
-                controls.panSpeed = 2;
-
-                controls.noZoom = false;
-                controls.noPan = false;
-
-                controls.staticMoving = true;
-                controls.dynamicDampingFactor = 0.3;
 
                 scene = new THREE.Scene();
 
@@ -107,7 +103,7 @@
                 scene.add( arrowHelper );
 
                 var loader = new THREE.NRRDLoader();
-                loader.load( "models/nrrd/A1_grayT1.nrrd", function ( volume ) {
+                loader.load( "models/nrrd/I.nrrd", function ( volume ) {
                     var geometry,
                         canvas,
                         canvasMap,
@@ -127,56 +123,68 @@
                     scene.add( box );
                     box.applyMatrix(volume.matrix);
                     scene.add( cube );
-                    
+
                     //z plane
 
                     var indexZ = 0;
                     sliceZ = volume.extractSlice('z',Math.floor(volume.RASDimensions[2]/4));
                     console.debug(sliceZ);
                     scene.add( sliceZ.mesh );
-                    setInterval(function(){
-                        sliceZ.index = indexZ++;
-                        indexZ = indexZ % volume.RASDimensions[2];
-                        sliceZ.repaint();
-                    },50);
-                    
+//                    setInterval(function(){
+//                        sliceZ.index = indexZ++;
+//                        indexZ = indexZ % volume.RASDimensions[2];
+//                        sliceZ.repaint();
+//                    },50);
+
                     //y plane
                     var indexY = 0;
                     sliceY = volume.extractSlice('y',Math.floor(volume.RASDimensions[1]/2));
                     console.debug(sliceY);
                     scene.add( sliceY.mesh );
-                    setInterval(function(){
-                        sliceY.index = indexY++;
-                        indexY = indexY % volume.RASDimensions[1];
-                        sliceY.repaint();
-                    },50);
+//                    setInterval(function(){
+//                        sliceY.index = indexY++;
+//                        indexY = indexY % volume.RASDimensions[1];
+//                        sliceY.repaint();
+//                    },50);
 
                     //x plane
                     var indexX = 0;
                     sliceX = volume.extractSlice('x',Math.floor(volume.RASDimensions[0]/2));
                     console.debug(sliceX);
                     scene.add( sliceX.mesh );
-                    setInterval(function(){
-                        sliceX.index = indexX++;
-                        indexX = indexX % volume.RASDimensions[0];
-                        sliceX.repaint();
-                    },50);
+//                    setInterval(function(){
+//                        sliceX.index = indexX++;
+//                        indexX = indexX % volume.RASDimensions[0];
+//                        sliceX.repaint();
+//                    },50);
 
-                    console.log('generating slices in ' +(Date.now()-time)+ ' ms');;
+                    console.log('generating slices in ' +(Date.now()-time)+ ' ms');
+
+                    gui.add( sliceX, "index", 0, volume.RASDimensions[0], 1 ).name( "indexX" ).onChange( function () {sliceX.repaint.call(sliceX);} );
+                    gui.add( sliceY, "index", 0, volume.RASDimensions[1], 1 ).name( "indexY" ).onChange( function () {sliceY.repaint.call(sliceY);} );
+                    gui.add( sliceZ, "index", 0, volume.RASDimensions[2], 1 ).name( "indexZ" ).onChange( function () {sliceZ.repaint.call(sliceZ);} );
 
                 } );
 
                 var vtkmaterial = new THREE.MeshLambertMaterial( {wireframe : false, morphTargets : false, side : THREE.DoubleSide, color : 0xff0000} );
 
-				var vtkloader = new THREE.VTKLoader();
-				vtkloader.load( "models/vtk/femur.vtk", function ( geometry ) {
+                var vtkloader = new THREE.VTKLoader();
+                vtkloader.load( "models/vtk/femur.vtk", function ( geometry ) {
 
-					geometry.computeVertexNormals();
+                    geometry.computeVertexNormals();
 
-					var mesh = new THREE.Mesh( geometry, vtkmaterial );
-					//scene.add( mesh );
+                    var mesh = new THREE.Mesh( geometry, vtkmaterial );
+                    scene.add( mesh );
+                    var visibilityControl = {
+                        visible : true
+                    };
+                    gui.add(visibilityControl, "visible").name( "Model Visible").onChange( function () {
+                        mesh.visible = visibilityControl.visible;
+                        renderer.render( scene, camera );
+                    });
+                    console.log(mesh);
 
-				} );
+                } );
                 // renderer
 
                 renderer = new THREE.WebGLRenderer( { antialias: false } );
@@ -187,10 +195,21 @@
                 document.body.appendChild( container );
                 container.appendChild( renderer.domElement );
 
+                controls = new THREE.TrackballControls( camera, renderer.domElement );
+                controls.rotateSpeed = 5.0;
+                controls.zoomSpeed = 5;
+                controls.panSpeed = 2;
+                controls.noZoom = false;
+                controls.noPan = false;
+                controls.staticMoving = true;
+                controls.dynamicDampingFactor = 0.3;
+
                 stats = new Stats();
                 stats.domElement.style.position = 'absolute';
                 stats.domElement.style.top = '0px';
                 container.appendChild( stats.domElement );
+
+                var gui = new dat.GUI();
 
                 //
 
@@ -227,6 +246,7 @@
                 object.applyMatrix(rotWorldMatrix);
 
             }
+
 
         </script>
 
