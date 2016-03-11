@@ -164,6 +164,8 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				for ( var i = 0; i < scene.children.length; i ++ ) {
 
 					var child = scene.children[ i ];
@@ -174,8 +176,7 @@
 				}
 
 				composer.render();
-
-				stats.update();
+				stats.end();
 
 			}
 
