@@ -27,7 +27,7 @@ THREE.VolumeSlice = function ( volume, index, axis ) {
     var canvasMap = new THREE.Texture(this.canvas);
     canvasMap.minFilter = THREE.LinearFilter;
     canvasMap.wrapS = canvasMap.wrapT = THREE.ClampToEdgeWrapping; 
-    var material = new THREE.MeshBasicMaterial( { map: canvasMap, side: THREE.DoubleSide } );
+    var material = new THREE.MeshBasicMaterial( { map: canvasMap, side: THREE.DoubleSide, transparent : true } );
     this.mesh = new THREE.Mesh( this.geometry, material );
     this.geometryNeedsUpdate = true;
     this.repaint();
@@ -88,9 +88,10 @@ THREE.VolumeSlice.prototype = {
                     var value = volumeData[sliceAccess(i,j)];
                     var alpha = 0xff;
                     //apply threshold
-                    value = upperThreshold>=value ? (lowerThreshold<=value ? value : (alpha=0)) :(alpha = 0);
+                    alpha = upperThreshold>=value ? (lowerThreshold<=value ? alpha : 0) :0;
                     //apply window level
                     value = Math.floor(255*(value-windowLow) / (windowHigh-windowLow));
+                    value = value > 255 ? 255 : (value <0 ? 0 : value|0);
 
                     data[4*pixelCount] = value;
                     data[4*pixelCount + 1] = value;

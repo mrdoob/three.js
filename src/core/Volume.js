@@ -98,8 +98,26 @@ THREE.Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
     this.offset = [ 0, 0, 0 ];
     this.rotationMatrix = new THREE.Matrix3();
     this.rotationMatrix.identity();
-    this.lowerThreshold = -Infinity;
-    this.upperThreshold = Infinity;
+    var lowerThreshold = -Infinity;
+    Object.defineProperty(this, 'lowerThreshold', {
+        get : function () {
+            return lowerThreshold;
+        },
+        set : function (value) {
+            lowerThreshold = value;
+            this.sliceList.forEach( slice => slice.geometryNeedsUpdate = true);
+        }
+    });
+    var upperThreshold = Infinity;
+    Object.defineProperty(this, 'upperThreshold', {
+        get : function () {
+            return upperThreshold;
+        },
+        set : function (value) {
+            upperThreshold = value;
+            this.sliceList.forEach( slice => slice.geometryNeedsUpdate = true);
+        }
+    });
     this.sliceList = [];
 
 }
@@ -242,6 +260,16 @@ THREE.Volume.prototype = {
         var slice = new THREE.VolumeSlice(this, index, axis);
         this.sliceList.push(slice);
         return slice;
+
+    },
+
+    repaintAllSlices : function () {
+
+        this.sliceList.forEach( function (slice) {
+            slice.repaint();
+        });
+
+        return this;
 
     },
 
