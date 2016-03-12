@@ -23,6 +23,7 @@ THREE.NRRDLoader.prototype = {
 
     },
 
+    //this parser is largely inspired from the XTK NRRD parser : https://github.com/xtk/X
     parse: function ( data ) {
 
 
@@ -139,7 +140,7 @@ THREE.NRRDLoader.prototype = {
 
         //parse the header
         function parseHeader (header) {
-            var data, field, fn, i, l, lines, m, _i, _len, _results;
+            var data, field, fn, i, l, lines, m, _i, _len;
             lines = header.split(/\r?\n/);
             for (_i = 0, _len = lines.length; _i < _len; _i++) {
                 l = lines[_i];
@@ -163,17 +164,16 @@ THREE.NRRDLoader.prototype = {
             if (headerObject.encoding === 'bz2' || headerObject.encoding === 'bzip2') {
                 throw new Error('Bzip is not supported');
             }
-            //TODO : understand and check this part
             if (!headerObject.vectors) {
-                headerObject.vectors = [ new goog.math.Vec3(1, 0, 0), new goog.math.Vec3(0, 1, 0),
-                                        new goog.math.Vec3(0, 0, 1) ];
+                //if no space direction is set, let's use the identity
+                headerObject.vectors = [ new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1) ];
+                //apply spacing if defined
                 if (headerObject.spacings) {
-                    _results = [];
                     for (i = 0; i <= 2; i++) {
-                        _results.push(!isNaN(headerObject.spacings[i]) ? headerObject.vectors[i]
-                                      .scale(headerObject.spacings[i]) : void 0);
+                        if (!isNaN(headerObject.spacings[i])) {
+                            headerObject.vectors[i].multiplyScalar(headerObject.spacings[i]);
+                        }
                     }
-                    return _results;
                 }
             }
         }
@@ -323,10 +323,6 @@ THREE.NRRDLoader.prototype = {
                             _spaceZ*v[0][2], _spaceZ*v[1][2], _spaceZ*v[2][2], 0,
                             0,0,0,1);
             
-            /*volume.matrix.set(_spaceX*v[0][0], _spaceX*v[1][0], _spaceX*v[2][0], _spaceX*origin[0],
-                            _spaceY*v[0][1], _spaceY*v[1][1], _spaceY*v[2][1], _spaceY*origin[1],
-                            _spaceZ*v[0][2], _spaceZ*v[1][2], _spaceZ*v[2][2], _spaceZ*origin[2],
-                            0,0,0,1);*/
         }
         
         volume.inverseMatrix = new THREE.Matrix4();

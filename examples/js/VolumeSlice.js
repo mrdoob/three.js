@@ -1,11 +1,22 @@
 /**
- * @author stity / https://github.com/stity
+ * This class has been made to hold a slice of a volume data
+ * @class
+ * @author Valentin Demeusy / https://github.com/stity
+ * @param   {THREE.Volume} volume    The associated volume  
+ * @param   {number}       [index=0] The index of the slice
+ * @param   {string}       [axis='z']      For now only 'x', 'y' or 'z' but later it will change to a normal vector
+ * @see THREE.Volume
  */
-
 THREE.VolumeSlice = function ( volume, index, axis ) {
 
     var slice = this;
+    /**
+     * @member {THREE.Volume} volume The associated volume
+     */
     this.volume = volume;
+    /**
+     * @member {Number} index The index of the slice, if changed, will automatically call updateGeometry at the next repaint
+     */
     index = index || 0;
     Object.defineProperty(this, 'index', {
         get : function () {
@@ -17,9 +28,24 @@ THREE.VolumeSlice = function ( volume, index, axis ) {
             return index;
         }
     });
+    /**
+     * @member {String} axis The normal axis
+     */
     this.axis = axis || 'z';
 
+    /**
+     * @member {HTMLCanvasElement} canvas The final canvas used for the texture
+     */
+    /**
+     * @member {CanvasRenderingContext2D} ctx Context of the canvas
+     */
     this.canvas   = document.createElement('canvas');
+    /**
+     * @member {HTMLCanvasElement} canvasBuffer The intermediary canvas used to paint the data
+     */
+    /**
+     * @member {CanvasRenderingContext2D} ctxBuffer Context of the canvas buffer
+     */
     this.canvasBuffer   = document.createElement('canvas');
     this.updateGeometry();
 
@@ -28,9 +54,32 @@ THREE.VolumeSlice = function ( volume, index, axis ) {
     canvasMap.minFilter = THREE.LinearFilter;
     canvasMap.wrapS = canvasMap.wrapT = THREE.ClampToEdgeWrapping; 
     var material = new THREE.MeshBasicMaterial( { map: canvasMap, side: THREE.DoubleSide, transparent : true } );
+    /**
+     * @member {THREE.Mesh} mesh The mesh ready to get used in the scene
+     */
     this.mesh = new THREE.Mesh( this.geometry, material );
+    /**
+     * @member {Boolean} geometryNeedsUpdate If set to true, updateGeometry will be triggered at the next repaint
+     */
     this.geometryNeedsUpdate = true;
     this.repaint();
+    
+    /**
+     * @member {Number} iLength Width of slice in the original coordinate system, corresponds to the width of the buffer canvas
+     */
+    
+    /**
+     * @member {Number} jLength Height of slice in the original coordinate system, corresponds to the height of the buffer canvas
+     */
+    
+    /**
+     * @member {Function} sliceAccess Function that allow the slice to access right data
+     * @see THREE.Volume.extractPerpendicularPlane
+     * @param {Number} i The first coordinate
+     * @param {Number} j The second coordinate
+     * @returns {Number} the index corresponding to the voxel in volume.data of the given position in the slice
+     */
+    
 
 }
 
@@ -38,8 +87,12 @@ THREE.VolumeSlice.prototype = {
 
     constructor : THREE.VolumeSlice,
 
+    /**
+     * @member {Function} repaint Refresh the texture and the geometry if geometryNeedsUpdate is set to true
+     * @memberof THREE.VolumeSlice
+     */
     repaint : function () {
-        
+
         if (this.geometryNeedsUpdate) {
             this.updateGeometry();
         }
@@ -66,8 +119,8 @@ THREE.VolumeSlice.prototype = {
         // manipulate some pixel elements
         var pixelCount = 0;
 
-        if (this.dataType === 'label') {
-
+        if (volume.dataType === 'label') {
+            //this part is currently useless but will be used when colortables will be handled
             for (var j=0; j < jLength; j++) {
                 for (var i=0; i < iLength; i++) {
                     var label = volumeData[sliceAccess(i,j)];
@@ -109,6 +162,11 @@ THREE.VolumeSlice.prototype = {
 
     },
 
+    /**
+     * @member {Function} Refresh the geometry according to axis and index
+     * @see THREE.Volume.extractPerpendicularPlane
+     * @memberof THREE.VolumeSlice
+     */
     updateGeometry : function () {
 
         var extracted = this.volume.extractPerpendicularPlane( this.axis, this.index );
@@ -125,14 +183,14 @@ THREE.VolumeSlice.prototype = {
         this.ctxBuffer = this.canvasBuffer.getContext('2d');
 
         this.geometry = new THREE.PlaneGeometry( extracted.planeWidth, extracted.planeHeight );
-        
+
         if (this.mesh) {
             this.mesh.geometry = this.geometry;
             //reset mesh matrix
             this.mesh.matrix = (new THREE.Matrix4()).identity();
             this.mesh.applyMatrix(this.matrix);
         }
-        
+
         this.geometryNeedsUpdate = false;
 
     }
