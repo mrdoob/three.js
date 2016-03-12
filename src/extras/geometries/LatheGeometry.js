@@ -10,8 +10,12 @@
 // phiStart - the starting radian
 // phiLength - the radian (0 to 2*PI) range of the lathed section
 //    2*pi is a closed lathe, less than 2PI is a portion.
+// mapping - the way V of UV is calculated.
+//    'index',  V is calculated using the number of points (default value)
+//    'length', V is calculated using the geometrical length of the
+//              curve defined by points
 
-THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
+THREE.LatheGeometry = function ( points, segments, phiStart, phiLength, mapping ) {
 
 	THREE.Geometry.call( this );
 
@@ -21,15 +25,47 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 		points: points,
 		segments: segments,
 		phiStart: phiStart,
-		phiLength: phiLength
+		phiLength: phiLength,
+		mapping: mapping
 	};
 
 	segments = segments || 12;
 	phiStart = phiStart || 0;
 	phiLength = phiLength || 2 * Math.PI;
+	mapping = mapping || 'index';
 
 	var inversePointLength = 1.0 / ( points.length - 1 );
 	var inverseSegments = 1.0 / segments;
+	var Vs = [ 0 ];
+	if ( mapping.toLowerCase() === 'length' ) {
+
+		var length = 0;
+
+		for ( var i = 1; i < points.length; i++) {
+
+			var pt1 = points[ i - 1 ];
+			var pt2 = points[ i ];
+			var lgX = pt2.x - pt1.x;
+			var lgY = pt2.y - pt1.y;
+			length += Math.sqrt( lgX * lgX + lgY * lgY);
+			Vs.push(length);
+
+		}
+
+		for ( var i = 1; i < points.length; i++) {
+
+			Vs[ i ] /=  length;
+
+		}
+	} else {
+
+		for ( var i = 1; i < points.length; i++) {
+
+			Vs.push( i * inversePointLength );
+
+		}
+
+	}
 
 	for ( var i = 0, il = segments; i <= il; i ++ ) {
 
@@ -67,9 +103,9 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 			var d = base + 1;
 
 			var u0 = i * inverseSegments;
-			var v0 = j * inversePointLength;
+			var v0 = Vs[ j ];
 			var u1 = u0 + inverseSegments;
-			var v1 = v0 + inversePointLength;
+			var v1 = Vs[ j + 1 ];
 
 			this.faces.push( new THREE.Face3( a, b, d ) );
 
