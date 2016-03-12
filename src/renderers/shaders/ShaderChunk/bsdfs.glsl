@@ -56,11 +56,11 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 
 	// geometry term = G(l)⋅G(v) / 4(n⋅l)(n⋅v)
 
-	float a2 = alpha * alpha;
+	float a2 = pow2( alpha );
 
-	float gl = dotNL + pow( a2 + ( 1.0 - a2 ) * pow2( dotNL ), 0.5 );
+	float gl = dotNL + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
 
-	float gv = dotNV + pow( a2 + ( 1.0 - a2 ) * pow2( dotNV ), 0.5 );
+	float gv = dotNV + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );
 
 	return 1.0 / ( gl * gv );
 
@@ -84,7 +84,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 // GGX Distribution, Schlick Fresnel, GGX-Smith Visibility
 vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {
 
-	float alpha = roughness * roughness; // UE4's roughness
+	float alpha = pow2( roughness ); // UE4's roughness
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 
