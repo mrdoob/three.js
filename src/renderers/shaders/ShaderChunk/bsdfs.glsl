@@ -62,7 +62,9 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 
 	float gv = dotNV + pow( a2 + ( 1.0 - a2 ) * pow2( dotNV ), 0.5 );
 
-	return 1.0 / ( gl * gv );
+	float denominator = ( gl * gv ) + 0.00001; // avoid possible divide by 0 on the next line
+	
+	return 1.0 / denominator;
 
 } // validated
 
