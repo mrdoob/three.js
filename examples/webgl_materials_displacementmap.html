@@ -236,7 +236,7 @@
 
 				loader.load( "obj/ninja/NinjaLo_bin.js", function( geometry ) {
 
-					geometry.faceVertexUvs[ 1 ] = geometry.faceVertexUvs[ 0 ]; // 2nd set of UVs required for aoMap and displacementMap with MeshPhongMaterial
+					geometry.faceVertexUvs[ 1 ] = geometry.faceVertexUvs[ 0 ]; // 2nd set of UVs required for aoMap
 
 					mesh = new THREE.Mesh( geometry, material );
 					mesh.scale.multiplyScalar( 25 );
