@@ -25,6 +25,18 @@
                 z-index: 10 !important;
             }
             #info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+            #inset  {
+                width: 150px;
+                height: 150px;
+                background-color: transparent; /* or transparent; will show through only if renderer alpha: true */
+                border: none; /* or none; */
+                margin: 0;
+                padding: 0px;
+                position: absolute;
+                left: 20px;
+                bottom: 20px;
+                z-index: 100;
+            }
         </style>
     </head>
 
@@ -33,6 +45,7 @@
             <a href="http://threejs.org" target="_blank">three.js</a> -
             nrrd format loader test 
         </div>
+        <div id="inset"></div>
 
         <script src="../build/three.js"></script>
 
@@ -58,7 +71,12 @@
                 controls,
                 scene,
                 renderer,
-                gui;
+                gui,
+                container2,
+                renderer2,
+                camera2,
+                axes2,
+                scene2;
 
             init();
             animate();
@@ -81,28 +99,6 @@
 
                 camera.add( dirLight );
                 camera.add( dirLight.target );
-
-                //add arrow helper to help with orientation
-                var dir = new THREE.Vector3( 1, 0, 0 );
-                var origin = new THREE.Vector3( 150, 0, 0 );
-                var length = 30;
-                var hex = 0xff0000;
-                var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
-                scene.add( arrowHelper );
-
-                var dir = new THREE.Vector3( 0, 1, 0 );
-                var origin = new THREE.Vector3( 0, 320, 0 );
-                var length = 30;
-                var hex = 0x00ff00;
-                var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
-                scene.add( arrowHelper );
-
-                var dir = new THREE.Vector3( 0, 0, 1);
-                var origin = new THREE.Vector3( 0, 0, 220 );
-                var length = 30;
-                var hex = 0x0000ff;
-                var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
-                scene.add( arrowHelper );
 
                 var loader = new THREE.NRRDLoader();
                 loader.load( "models/nrrd/I.nrrd", function ( volume ) {
@@ -132,33 +128,18 @@
                     sliceZ = volume.extractSlice('z',Math.floor(volume.RASDimensions[2]/4));
                     console.debug(sliceZ);
                     scene.add( sliceZ.mesh );
-//                    setInterval(function(){
-//                        sliceZ.index = indexZ++;
-//                        indexZ = indexZ % volume.RASDimensions[2];
-//                        sliceZ.repaint();
-//                    },50);
 
                     //y plane
                     var indexY = 0;
                     sliceY = volume.extractSlice('y',Math.floor(volume.RASDimensions[1]/2));
                     console.debug(sliceY);
                     scene.add( sliceY.mesh );
-//                    setInterval(function(){
-//                        sliceY.index = indexY++;
-//                        indexY = indexY % volume.RASDimensions[1];
-//                        sliceY.repaint();
-//                    },50);
 
                     //x plane
                     var indexX = 0;
                     sliceX = volume.extractSlice('x',Math.floor(volume.RASDimensions[0]/2));
                     console.debug(sliceX);
                     scene.add( sliceX.mesh );
-//                    setInterval(function(){
-//                        sliceX.index = indexX++;
-//                        indexX = indexX % volume.RASDimensions[0];
-//                        sliceX.repaint();
-//                    },50);
 
                     console.log('generating slices in ' +(Date.now()-time)+ ' ms');
 
@@ -226,7 +207,7 @@
 
                 var gui = new dat.GUI();
 
-                //
+                setupInset();
 
                 window.addEventListener( 'resize', onWindowResize, false );
 
@@ -248,7 +229,15 @@
                 requestAnimationFrame( animate );
 
                 controls.update();
+
+                //copy position of the camera into inset
+                camera2.position.copy( camera.position );
+                camera2.position.sub( controls.target );
+                camera2.position.setLength( 300 );
+                camera2.lookAt( scene2.position );
+
                 renderer.render( scene, camera );
+                renderer2.render( scene2, camera2);
 
                 stats.update();
 
@@ -260,6 +249,31 @@
 
                 object.applyMatrix(rotWorldMatrix);
 
+            }
+
+            function setupInset () {
+                var insetWidth = 150,
+                    insetHeight = 150;
+                container2 = document.getElementById('inset');
+                container2.width = insetWidth;
+                container2.height = insetHeight;
+
+                // renderer
+                renderer2 = new THREE.WebGLRenderer({alpha : true});
+                renderer2.setClearColor( 0x000000, 0 );
+                renderer2.setSize( insetWidth, insetHeight );
+                container2.appendChild( renderer2.domElement );
+
+                // scene
+                scene2 = new THREE.Scene();
+
+                // camera
+                camera2 = new THREE.PerspectiveCamera( 50, insetWidth / insetHeight, 1, 1000 );
+                camera2.up = camera.up; // important!
+
+                // axes
+                axes2 = new THREE.AxisHelper( 100 );
+                scene2.add( axes2 );
             }
 
 
