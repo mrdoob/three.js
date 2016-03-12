@@ -178,7 +178,9 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			toneMapping: renderer.toneMapping,
 			physicallyCorrectLights: renderer.physicallyCorrectLights,
 
-			premultipliedAlpha: ( material.blending === THREE.PremultipliedAlphaBlending ),
+			premultipliedAlpha: ( material.blending === THREE.PremultipliedAlphaNormalBlending ) || ( material.blending === THREE.PremultipliedAlphaAdditiveBlending ) ||
+				( material.blending === THREE.PremultipliedAlphaSubtractiveBlending ) || ( material.blending === THREE.PremultipliedAlphaMultiplyBlending ) || ( material.blending === THREE.PremultipliedAlphaCustomBlending ),
+				
 			alphaTest: material.alphaTest,
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide

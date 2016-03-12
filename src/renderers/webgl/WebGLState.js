@@ -230,10 +230,25 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
 
-			} else if ( blending === THREE.PremultipliedAlphaBlending ) {
+			} else if( blending === THREE.PremultipliedAlphaNormalBlending ) {
 
 				gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
 				gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+
+			} else if( blending === THREE.PremultipliedAlphaAdditiveBlending ) {
+
+				gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+				gl.blendFuncSeparate( gl.ONE, gl.ONE, gl.ONE, gl.ONE );
+
+			} else if( blending === THREE.PremultipliedAlphaSubtractiveBlending ) {
+
+				gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+				gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA );
+
+			} else if( blending === THREE.PremultipliedAlphaMultiplyBlending ) {
+
+				gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+				gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.SRC_COLOR, gl.SRC_ALPHA );
 
 			} else {
 
@@ -246,7 +261,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		}
 
-		if ( blending === THREE.CustomBlending ) {
+		if ( blending === THREE.CustomBlending || blending === THREE.PremultipliedAlphaCustomBlending ) {
 
 			blendEquationAlpha = blendEquationAlpha || blendEquation;
 			blendSrcAlpha = blendSrcAlpha || blendSrc;
