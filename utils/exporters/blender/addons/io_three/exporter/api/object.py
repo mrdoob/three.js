@@ -236,6 +236,19 @@ def animated_xform(obj, options):
     return tracks
 
 @_object
+def custom_properties(obj):
+    """
+
+    :param obj:
+
+    """
+    logger.debug('object.custom_properties(%s)', obj)
+    # Grab any properties except those marked private (by underscore
+    # prefix) or those with types that would be rejected by the JSON
+    # serializer object model.
+    return {kvp[0]: kvp[1] for kvp in obj.data.items() if kvp[0][:1] != '_' and isinstance(kvp[1], constants.VALID_DATA_TYPES)}
+
+@_object
 def mesh(obj, options):
     """
 

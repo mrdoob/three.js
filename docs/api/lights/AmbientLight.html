@@ -24,7 +24,7 @@
 		<div>[example:canvas_sandbox sandbox ]</div>
 		<div>[example:webgl_animation_cloth animation / cloth ]</div>
 		<div>[example:webgl_animation_skinning_blending animation / skinning / blending ]</div>
-		
+
 <code>var light = new THREE.AmbientLight( 0x404040 ); // soft white light
 scene.add( light );</code>
 
@@ -39,19 +39,29 @@ scene.add( light );</code>
 		This creates an Ambientlight with a color.
 		</div>
 
+		<h2>Properties</h2>
+
+		<h3>[property:Float intensity]</h3>
+		<div>
+			Light's intensity.<br />
+			In "physically correct" mode, the product of color * intensity is interpreted as luminous irradiance measured in lux at the material surface.<br/>
+			Default — *1.0*.
+		</div>
+
+
 		<h2>Methods</h2>
-		
+
 		<h3>[method:AmbientLight clone]()</h3>
 		<div>
 		<br />
 		It returns a clone of Ambientlight.
 		</div>
-		
+
 		<h3>[method:JSON toJSON]()</h3>
 		<div>
 		Return Ambientlight data in JSON format.
 		</div>
-		
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

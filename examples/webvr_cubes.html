@@ -15,7 +15,7 @@
 			.menu {
 				position: fixed;
 				bottom: 20px;
-				right: 20px;
+				left: 20px;
 			}
 
 			.button {
@@ -26,7 +26,7 @@
 			}
 
 			.button.enabled {
-				background-color: rgb(18, 36, 70);
+				background-color: rgb(18, 140, 36);
 			}
 
 			.button:hover {
@@ -127,10 +127,14 @@
 
 				var fullScreenButton = document.querySelector( '.full-screen' );
 
-				if ( navigator.getVRDevices === undefined ) {
+				if ( navigator.getVRDisplays === undefined && navigator.getVRDevices === undefined ) {
 
 					fullScreenButton.innerHTML = 'Your browser doesn\'t support WebVR';
-					fullScreenButton.classList.add('error');
+					fullScreenButton.classList.add( 'error' );
+
+				} else {
+
+					fullScreenButton.classList.add( 'enabled' );
 
 				}
 
@@ -138,7 +142,7 @@
 				vrEffect = new THREE.VREffect( renderer, function ( error ) {
 
 					fullScreenButton.innerHTML = error;
-					fullScreenButton.classList.add('error');
+					fullScreenButton.classList.add( 'error' );
 
 				} );
 
@@ -155,7 +159,7 @@
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
+				stats.domElement.style.top = '0';
 				container.appendChild( stats.domElement );
 
 				//
