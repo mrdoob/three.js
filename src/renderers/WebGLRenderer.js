@@ -1590,7 +1590,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.transparent === true ) {
 
-			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
+			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
 
 		} else {
 

@@ -5,10 +5,6 @@
  * parameters = {
  *  opacity: <float>,
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
  * }

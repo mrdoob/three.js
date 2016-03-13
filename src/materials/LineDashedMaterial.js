@@ -11,7 +11,7 @@
  *  dashSize: <float>,
  *  gapSize: <float>,
  *
- *  blending: THREE.PremultipliedAlphaNormalBlending,
+ *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -35,7 +35,7 @@ THREE.LineDashedMaterial = function ( parameters ) {
 	this.dashSize = 3;
 	this.gapSize = 1;
 
-	this.blending = THREE.PremultipliedAlphaNormalBlending;
+	this.blending = THREE.NormalBlending;
 
 	this.vertexColors = THREE.NoColors;
 
