@@ -27,7 +27,7 @@
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *
- *  blending: THREE.NormalBlending,
+ *  blending: THREE.PremultipliedAlphaNormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -74,6 +74,8 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.refractionRatio = 0.98;
 
 	this.fog = true;
+
+	this.blending = THREE.PremultipliedAlphaNormalBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;

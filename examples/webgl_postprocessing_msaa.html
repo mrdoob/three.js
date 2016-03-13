@@ -29,6 +29,7 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - Manual Multi-Sample Anti-Aliasing (MSAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
+			This manual approach to MSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.<br/><br/>
 			Texture interpolation, mipmapping and anistropic sampling is disabled to emphasize<br/> the effect MSAA levels have one the resulting render quality.
 		</div>
 
@@ -50,7 +51,7 @@
 
 		<script>
 
-			var camera, scene, renderer, composer, copyPass, manualMSAARenderPass;
+			var camera, scene, renderer, composer, copyPass, msaaRenderPass;
 			var gui, stats, texture;
 
 			var param = { MSAASampleLevel: 2 };
@@ -71,11 +72,12 @@
 					'Level 1: 2 Samples': 1,
 					'Level 2: 4 Samples': 2,
 					'Level 3: 8 Samples': 3,
-					'Level 4: 16 Samples': 4
+					'Level 4: 16 Samples': 4,
+					'Level 5: 32 Samples': 5
 				} ).onFinishChange( function() {
 
-					if( manualMSAARenderPass ) {
-						manualMSAARenderPass.sampleLevel = param.MSAASampleLevel;
+					if( msaaRenderPass ) {
+						msaaRenderPass.sampleLevel = param.MSAASampleLevel;
 					}
 
 				} );
@@ -128,9 +130,9 @@
 
 				composer = new THREE.EffectComposer( renderer );
 
-				manualMSAARenderPass = new THREE.ManualMSAARenderPass( scene, camera );
-				manualMSAARenderPass.sampleLevel = param.MSAASampleLevel;
-				composer.addPass( manualMSAARenderPass );
+				msaaRenderPass = new THREE.ManualMSAARenderPass( scene, camera );
+				msaaRenderPass.sampleLevel = param.MSAASampleLevel;
+				composer.addPass( msaaRenderPass );
 
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
 		    copyPass.renderToScreen = true;
@@ -154,13 +156,15 @@
 				var newWidth  = Math.floor( width / pixelRatio ) || 1;
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				composer.setSize( newWidth, newHeight );
-				msaaPass.setSize( newWidth, newHeight );
+				msaaRenderPass.setSize( newWidth, newHeight );
 
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				stats.begin();
 
 				for ( var i = 0; i < scene.children.length; i ++ ) {
 
@@ -172,8 +176,7 @@
 				}
 
 				composer.render();
-
-				stats.update();
+				stats.end();
 
 			}
 
