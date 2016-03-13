@@ -143,8 +143,8 @@ function addNormal(old, newn) {
     else old.x = (old.x + newn.x) / 2;
     if (old.y == 0) old.y = newn.y;
     else old.y = (old.y + newn.y) / 2;
-    if (old.z == 0) old.z = newn.y;
-    else old.z = (old.z + newn.y) / 2;
+    if (old.z == 0) old.z = newn.z;
+    else old.z = (old.z + newn.z) / 2;
    // */
 }
 function findArea(a, b, c) {
@@ -186,7 +186,7 @@ function compute_vertex_normals(geometry) {
         newNormals.register[0].subVectors(oldVertices.register[1], oldVertices.register[0]);
         newNormals.register[1].subVectors(oldVertices.register[2], oldVertices.register[1]);
         newNormals.register[0].cross(newNormals.register[1]);
-        my_weight = newNormals.register[0].length();
+        my_weight = Math.abs(newNormals.register[0].length());
         //my_weight = findArea(oldVertices.register[0], oldVertices.register[1], oldVertices.register[2]);
         newNormalFaces.buffer[oldFaces.register[0].a] += my_weight;
         newNormalFaces.buffer[oldFaces.register[0].b] += my_weight;
@@ -195,7 +195,7 @@ function compute_vertex_normals(geometry) {
     var tmpx;
     var tmpy;
     var tmpz;
-
+    var t_len;
     for (var i = 0, il = oldFaces.length; i < il; i++) {
         oldFaces.index_to_register(i, 0);
         oldVertices.index_to_register(oldFaces.register[0].a, 0);
@@ -204,13 +204,26 @@ function compute_vertex_normals(geometry) {
 
         newNormals.register[0].subVectors(oldVertices.register[1], oldVertices.register[0]);
         newNormals.register[1].subVectors(oldVertices.register[2], oldVertices.register[0]);
-        newNormals.register[0].cross(newNormals.register[1]);
+/*
+      //  newNormals.register[0].cross(newNormals.register[1]);
 
         newNormals.register[3].copy(newNormals.register[0]);//(a, b, c);
-        newNormals.register[3].x = newNormals.register[3].x / (newNormals.register[3].x + newNormals.register[3].y + newNormals.register[3].z);
-        newNormals.register[3].y = newNormals.register[3].y / (newNormals.register[3].x + newNormals.register[3].y + newNormals.register[3].z);
-        newNormals.register[3].z = newNormals.register[3].z / (newNormals.register[3].x + newNormals.register[3].y + newNormals.register[3].z);
-        my_weight = newNormals.register[0].length() ;
+
+        t_len = (newNormals.register[3].x + newNormals.register[3].y + newNormals.register[3].z);
+        newNormals.register[3].x = newNormals.register[3].x / t_len;
+        newNormals.register[3].y = newNormals.register[3].y / t_len;
+        newNormals.register[3].z = newNormals.register[3].z / t_len;
+*/
+        newNormals.register[3].set(0,0,0);
+        newNormals.register[3].x = (newNormals.register[0].y*newNormals.register[1].z )-(newNormals.register[0].z*newNormals.register[1].y);
+        newNormals.register[3].y = (newNormals.register[0].z*newNormals.register[1].x )-(newNormals.register[0].x*newNormals.register[1].z);
+        newNormals.register[3].z = (newNormals.register[0].x*newNormals.register[1].y )-(newNormals.register[0].y*newNormals.register[1].x);
+         
+	newNormals.register[0].cross(newNormals.register[1]);
+
+
+
+        my_weight = Math.abs(newNormals.register[0].length() );
        // oldVertices.register[3].subVectors(oldVertices.register[2],oldVertices.register[0]);
        // oldVertices.register[4].subVectors(oldVertices.register[2],oldVertices.register[1]);
        // var angle = find_angle2d(oldVertices.register[3],oldVertices.register[4]);
