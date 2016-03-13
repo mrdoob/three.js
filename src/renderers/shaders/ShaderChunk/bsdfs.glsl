@@ -89,9 +89,9 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 
-	float dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );
-	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
-	float dotNH = saturate( dot( geometry.normal, halfDir ) );
+	float dotNL = clamp( dot( geometry.normal, incidentLight.direction ), EPSILON, 1.0 ); // avoid artifacts from divides by zero
+	float dotNV = clamp( dot( geometry.normal, geometry.viewDir ), EPSILON, 1.0 ); // avoid artifacts from divides by zero
+	float dotNH = clamp( dot( geometry.normal, halfDir ), EPSILON, 1.0 ); // avoid artifacts from divides by zero
 	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
 
 	vec3 F = F_Schlick( specularColor, dotLH );
