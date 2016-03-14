@@ -11,10 +11,10 @@
  *  by this class.
  */
 
-THREE.PMREMGenerator = function( sourceTexture, resolution ) {
+THREE.PMREMGenerator = function( sourceTexture ) {
 
 	this.sourceTexture = sourceTexture;
-  this.resolution = ( resolution !== undefined ) ? resolution : 256;
+  this.resolution = 256; // NODE: 256 is currently hard coded in the glsl code for performance reasons
 
   var monotonicEncoding = ( sourceTexture.encoding === THREE.LinearEncoding ) ||
     ( sourceTexture.encoding === THREE.GammaEncoding ) || ( sourceTexture.encoding === THREE.sRGBEncoding );
