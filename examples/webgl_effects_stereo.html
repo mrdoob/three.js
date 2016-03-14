@@ -88,7 +88,7 @@
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.mapping = THREE.CubeRefractionMapping;
-				
+
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
 
 				for ( var i = 0; i < 500; i ++ ) {
@@ -128,7 +128,6 @@
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.StereoEffect( renderer );
-				effect.eyeSeparation = 10;
 				effect.setSize( window.innerWidth, window.innerHeight );
 
 				//
