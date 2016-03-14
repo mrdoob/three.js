@@ -121,10 +121,7 @@ THREE.Loader.prototype = {
 			};
 
 			for ( var name in m ) {
-				if ( !m.hasOwnProperty( name ) ) {
-					continue;
-				}
-
+				
 				var value = m[ name ];
 
 				switch ( name ) {
