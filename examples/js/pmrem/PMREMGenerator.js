@@ -11,27 +11,10 @@
  *  by this class.
  */
 
- THREE.PMREMGenerator = function( sourceTexture ) {
-	if ( sourceTexture instanceof THREE.CubeTexture ) {
+THREE.PMREMGenerator = function( sourceTexture, resolution ) {
 
-		if ( sourceTexture.images[ 0 ] === undefined )
-		  console.error( "sourceTexture Not Initialized" );
-      if(sourceTexture.images[ 0 ] instanceof THREE.DataTexture) {
-          this.resolution = sourceTexture.images[ 0 ].image.width;
-      }
-      else {
-          this.resolution = sourceTexture.images[ 0 ].width;
-      }
-
-	}
-	else if ( sourceTexture instanceof THREE.WebGLRenderTargetCube ) {
-		if ( sourceTexture === undefined ) console.error( "Render Target Not Initialized" );
-		this.resolution = sourceTexture.width;
-	}
-	else {
-		console.error( "Wrong Input to PMREMGenerator" );
-	}
 	this.sourceTexture = sourceTexture;
+  this.resolution = ( resolution !== undefined ) ? resolution : 256;
 
   var monotonicEncoding = ( sourceTexture.encoding === THREE.LinearEncoding ) ||
     ( sourceTexture.encoding === THREE.GammaEncoding ) || ( sourceTexture.encoding === THREE.sRGBEncoding );
