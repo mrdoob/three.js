@@ -7,7 +7,7 @@ var WEBVR = {
 
 	isAvailable: function () {
 
-		return navigator.getVRDisplays;
+		return navigator.getVRDisplays !== undefined;
 
 	},
 
