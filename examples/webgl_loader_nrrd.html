@@ -110,7 +110,6 @@
                         sliceZ,
                         sliceY,
                         sliceX;
-                    var time = Date.now();
 
                     //box helper to see the extend of the volume
                     var geometry = new THREE.BoxGeometry( volume.xLength, volume.yLength, volume.zLength );
@@ -126,22 +125,17 @@
 
                     var indexZ = 0;
                     sliceZ = volume.extractSlice('z',Math.floor(volume.RASDimensions[2]/4));
-                    console.debug(sliceZ);
                     scene.add( sliceZ.mesh );
 
                     //y plane
                     var indexY = 0;
                     sliceY = volume.extractSlice('y',Math.floor(volume.RASDimensions[1]/2));
-                    console.debug(sliceY);
                     scene.add( sliceY.mesh );
 
                     //x plane
                     var indexX = 0;
                     sliceX = volume.extractSlice('x',Math.floor(volume.RASDimensions[0]/2));
-                    console.debug(sliceX);
                     scene.add( sliceX.mesh );
-
-                    console.log('generating slices in ' +(Date.now()-time)+ ' ms');
 
                     gui.add( sliceX, "index", 0, volume.RASDimensions[0], 1 ).name( "indexX" ).onChange( function () {sliceX.repaint.call(sliceX);} );
                     gui.add( sliceY, "index", 0, volume.RASDimensions[1], 1 ).name( "indexY" ).onChange( function () {sliceY.repaint.call(sliceY);} );
@@ -165,7 +159,7 @@
                 var vtkmaterial = new THREE.MeshLambertMaterial( {wireframe : false, morphTargets : false, side : THREE.DoubleSide, color : 0xff0000} );
 
                 var vtkloader = new THREE.VTKLoader();
-                vtkloader.load( "models/vtk/femur.vtk", function ( geometry ) {
+                vtkloader.load( "models/vtk/liver.vtk", function ( geometry ) {
 
                     geometry.computeVertexNormals();
 
@@ -178,7 +172,6 @@
                         mesh.visible = visibilityControl.visible;
                         renderer.render( scene, camera );
                     });
-                    console.log(mesh);
 
                 } );
                 // renderer
