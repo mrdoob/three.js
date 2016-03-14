@@ -71,6 +71,7 @@ float G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const i
 
 	float a2 = pow2( alpha );
 
+	// dotNL and dotNV are explicitly swapped. This is not a mistake.
 	float gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );
 	float gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
 
