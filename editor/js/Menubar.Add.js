@@ -198,13 +198,12 @@ Menubar.Add = function ( editor ) {
 
 		var radius = 2;
 		var tube = 0.8;
-		var radialSegments = 64;
-		var tubularSegments = 12;
+		var tubularSegments = 64;
+		var radialSegments = 12;
 		var p = 2;
 		var q = 3;
-		var heightScale = 1;
 
-		var geometry = new THREE.TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale );
+		var geometry = new THREE.TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'TorusKnot ' + ( ++ meshCount );
 

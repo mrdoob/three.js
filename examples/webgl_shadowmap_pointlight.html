@@ -39,27 +39,14 @@
 			var camera, scene, renderer, stats;
 			var pointLight, pointLight2;
 			var torusKnot;
-			var torusKnotMaterial;
-			var wallMaterial;
-			var ground;
 
 			init();
 			animate();
 
 			function init() {
 
-				initScene();
-				initMisc();
-
-				document.body.appendChild( renderer.domElement );
-				window.addEventListener( 'resize', onWindowResize, false );
-
-			}
-
-			function initScene() {
-
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( 0, 10, 60 );
+				camera.position.set( 0, 10, 40 );
 
 				scene = new THREE.Scene();
 				scene.add( new THREE.AmbientLight( 0x222233 ) );
@@ -84,85 +71,46 @@
 
 				}
 
-				pointLight = createLight( 0xaaffaa );
+				pointLight = createLight( 0xffffff );
 				scene.add( pointLight );
 
-				pointLight2 = createLight( 0xaaaaff );
+				pointLight2 = createLight( 0xff0000 );
 				scene.add( pointLight2 );
 
-				torusKnotMaterial = new THREE.MeshPhongMaterial( {
+				var geometry = new THREE.TorusKnotGeometry( 14, 1, 150, 20 );
+				var material = new THREE.MeshPhongMaterial( {
 					color: 0xff0000,
 					shininess: 100,
-					//wireframe: true,
-					//wireframeLinewidth: 2,
 					specular: 0x222222
 				} );
-
-				var torusKnotGeometry = new THREE.TorusKnotGeometry( 8, 1, 150, 20 );
-				torusKnot = new THREE.Mesh( torusKnotGeometry, torusKnotMaterial );
-				torusKnot.position.set( 0, 9, 0 );
+				torusKnot = new THREE.Mesh( geometry, material );
+				torusKnot.position.set( 0, 5, 0 );
 				torusKnot.castShadow = true;
 				torusKnot.receiveShadow = true;
 				scene.add( torusKnot );
 
-				wallMaterial = new THREE.MeshPhongMaterial( {
-					color: 0xffffff,
+				var geometry = new THREE.BoxGeometry( 30, 30, 30 );
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xa0adaf,
 					shininess: 10,
 					specular: 0x111111,
-					shading: THREE.SmoothShading
-				} );
+					side: THREE.BackSide
+				} )
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.y = 10;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
 
-				var wallGeometry = new THREE.BoxGeometry( 10, 0.15, 10 );
-				ground = new THREE.Mesh( wallGeometry, wallMaterial );
-				ground.position.set( 0, - 5, 0 );
-				ground.scale.multiplyScalar( 3 );
-				ground.receiveShadow = true;
-				scene.add( ground );
-
-				var ceiling = new THREE.Mesh( wallGeometry, wallMaterial );
-				ceiling.position.set( 0, 24, 0 );
-				ceiling.scale.multiplyScalar( 3 );
-				ceiling.receiveShadow = true;
-				scene.add( ceiling );
-
-				var wall = new THREE.Mesh( wallGeometry, wallMaterial );
-				wall.position.set( - 14, 10, 0 );
-				wall.rotation.z = Math.PI / 2;
-				wall.scale.multiplyScalar( 3 );
-				wall.receiveShadow = true;
-				scene.add( wall );
-
-				wall = new THREE.Mesh( wallGeometry, wallMaterial );
-				wall.position.set( 14, 10, 0 );
-				wall.rotation.z = Math.PI / 2;
-				wall.scale.multiplyScalar( 3 );
-				wall.receiveShadow = true;
-				scene.add( wall );
-
-				wall = new THREE.Mesh( wallGeometry, wallMaterial );
-				wall.position.set( 0, 10, - 14 );
-				wall.rotation.y = Math.PI / 2;
-				wall.rotation.z = Math.PI / 2;
-				wall.scale.multiplyScalar( 3 );
-				wall.receiveShadow = true;
-				scene.add( wall );
-
-			}
-
-			function initMisc() {
+				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.BasicShadowMap;
+				document.body.appendChild( renderer.domElement );
 
-				// Mouse control
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 12;
-				controls.maxDistance = 60;
-				controls.enablePan = false;
 				controls.target.set( 0, 10, 0 );
 				controls.update();
 
@@ -171,6 +119,10 @@
 				stats.domElement.style.right = '0px';
 				stats.domElement.style.top = '0px';
 				document.body.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
@@ -187,13 +139,6 @@
 
 				requestAnimationFrame( animate );
 				render();
-				stats.update();
-
-			}
-
-			function renderScene() {
-
-				renderer.render( scene, camera );
 
 			}
 
@@ -211,9 +156,11 @@
 				pointLight2.position.y = Math.sin( time * 1.1 ) * 9 + 5;
 				pointLight2.position.z = Math.sin( time * 1.2 ) * 9;
 
-				renderScene();
-
 				torusKnot.rotation.y = time * 0.1;
+
+				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

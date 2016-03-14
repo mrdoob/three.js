@@ -6,10 +6,6 @@
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *	uvOffset: new THREE.Vector2(),
  *	uvScale: new THREE.Vector2(),
  *

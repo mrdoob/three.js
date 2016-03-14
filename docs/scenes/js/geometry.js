@@ -93,6 +93,40 @@ function updateGroupGeometry( mesh, geometry ) {
 
 var guis = {
 
+	BoxBufferGeometry : function( mesh ) {
+
+		var data = {
+			width : 15,
+			height : 15,
+			depth : 15,
+			widthSegments : 1,
+			heightSegments : 1,
+			depthSegments : 1
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.BoxBufferGeometry(
+					data.width, data.height, data.depth, data.widthSegments, data.heightSegments, data.depthSegments
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.BoxBufferGeometry' );
+
+		folder.add( data, 'width', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'height', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'depth', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'widthSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'heightSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'depthSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	BoxGeometry : function( mesh ) {
 
 		var data = {
@@ -122,6 +156,52 @@ var guis = {
 		folder.add( data, 'widthSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'depthSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	CylinderBufferGeometry : function( mesh ) {
+
+		var data = {
+			radiusTop : 5,
+			radiusBottom : 5,
+			height : 10,
+			radiusSegments : 8,
+			heightSegments : 1,
+			openEnded : false,
+			thetaStart : 0,
+			thetaLength : twoPi,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.CylinderBufferGeometry(
+					data.radiusTop,
+					data.radiusBottom,
+					data.height,
+					data.radiusSegments,
+					data.heightSegments,
+					data.openEnded,
+					data.thetaStart,
+					data.thetaLength
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.CylinderBufferGeometry' );
+
+		folder.add( data, 'radiusTop', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'radiusBottom', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
+		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'openEnded' ).onChange( generateGeometry );
+		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
+
 
 		generateGeometry();
 
@@ -168,6 +248,36 @@ var guis = {
 		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
 		folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
 
+
+		generateGeometry();
+
+	},
+
+	CircleBufferGeometry : function( mesh ) {
+
+		var data = {
+			radius : 10,
+			segments : 32,
+			thetaStart : 0,
+			thetaLength : twoPi,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.CircleBufferGeometry(
+					data.radius, data.segments, data.thetaStart, data.thetaLength
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.CircleBufferGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'segments', 0, 128 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
 
 		generateGeometry();
 
@@ -281,6 +391,36 @@ var guis = {
 
 	},
 
+	PlaneBufferGeometry : function( mesh ) {
+
+		var data = {
+			width : 10,
+			height : 10,
+			widthSegments : 1,
+			heightSegments : 1
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.PlaneBufferGeometry(
+					data.width, data.height, data.widthSegments, data.heightSegments
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.PlaneBufferGeometry' );
+
+		folder.add( data, 'width', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'height', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'widthSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'heightSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	PlaneGeometry : function( mesh ) {
 
 		var data = {
@@ -306,6 +446,40 @@ var guis = {
 		folder.add( data, 'height', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'widthSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	RingBufferGeometry : function( mesh ) {
+
+		var data = {
+			innerRadius : 5,
+			outerRadius : 10,
+			thetaSegments : 8,
+			phiSegments : 8,
+			thetaStart : 0,
+			thetaLength : twoPi,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.RingBufferGeometry(
+					data.innerRadius, data.outerRadius, data.thetaSegments, data.phiSegments, data.thetaStart, data.thetaLength
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.RingBufferGeometry' );
+
+		folder.add( data, 'innerRadius', 0, 30 ).onChange( generateGeometry );
+		folder.add( data, 'outerRadius', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'thetaSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'phiSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
 
 		generateGeometry();
 
@@ -338,6 +512,42 @@ var guis = {
 		folder.add( data, 'outerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'thetaSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'phiSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	SphereBufferGeometry : function( mesh ) {
+
+		var data = {
+			radius : 15,
+			widthSegments : 8,
+			heightSegments : 6,
+			phiStart : 0,
+			phiLength : twoPi,
+			thetaStart : 0,
+			thetaLength : Math.PI,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.SphereBufferGeometry(
+					data.radius, data.widthSegments, data.heightSegments, data.phiStart, data.phiLength, data.thetaStart, data.thetaLength
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.SphereBufferGeometry' );
+
+		folder.add( data, 'radius', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'widthSegments', 3, 32 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'heightSegments', 2, 32 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'phiStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'phiLength', 0, twoPi ).onChange( generateGeometry );
 		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
 		folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
 
@@ -473,6 +683,38 @@ var guis = {
 
 	},
 
+	TorusBufferGeometry : function( mesh ) {
+
+		var data = {
+			radius : 10,
+			tube : 3,
+			radialSegments : 16,
+			tubularSegments : 100,
+			arc : twoPi
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.TorusBufferGeometry(
+					data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TorusBufferGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'tube', 0.1, 10 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 2, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'tubularSegments', 3, 200 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'arc', 0.1, twoPi ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	TorusGeometry : function( mesh ) {
 
 		var data = {
@@ -505,38 +747,71 @@ var guis = {
 
 	},
 
+	TorusKnotBufferGeometry : function( mesh ) {
+
+		var data = {
+			radius : 10,
+			tube : 3,
+			tubularSegments : 64,
+			radialSegments : 8,
+			p : 2,
+			q : 3
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.TorusKnotBufferGeometry(
+					data.radius, data.tube, data.tubularSegments, data.radialSegments,
+					data.p, data.q
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TorusKnotBufferGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'tube', 0.1, 10 ).onChange( generateGeometry );
+		folder.add( data, 'tubularSegments', 3, 300 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'p', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'q', 1, 20 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	TorusKnotGeometry : function( mesh ) {
 
 		var data = {
 			radius : 10,
 			tube : 3,
-			radialSegments : 64,
-			tubularSegments : 8,
+			tubularSegments : 64,
+			radialSegments : 8,
 			p : 2,
-			q : 3,
-			heightScale : 1
+			q : 3
 		};
 
 		function generateGeometry() {
 
 			updateGroupGeometry( mesh,
 				new THREE.TorusKnotGeometry(
-					data.radius, data.tube, data.radialSegments, data.tubularSegments,
-					data.p, data.q, data.heightScale
+					data.radius, data.tube, data.tubularSegments, data.radialSegments,
+					data.p, data.q
 				)
 			);
 
 		}
 
-		var folder = gui.addFolder( 'THREE.TorusGeometry' );
+		var folder = gui.addFolder( 'THREE.TorusKnotGeometry' );
 
 		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'tube', 0.1, 10 ).onChange( generateGeometry );
-		folder.add( data, 'radialSegments', 3, 300 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'tubularSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'tubularSegments', 3, 300 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'p', 1, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'q', 1, 20 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'heightScale', 1, 20 ).onChange( generateGeometry );
 
 		generateGeometry();
 

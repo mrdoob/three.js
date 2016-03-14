@@ -101,6 +101,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
+	this.blending = THREE.NormalBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;

@@ -39,6 +39,7 @@ THREE.Material = function () {
 	this.polygonOffsetUnits = 0;
 
 	this.alphaTest = 0;
+	this.premultipliedAlpha = false;
 
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
@@ -194,6 +195,7 @@ THREE.Material.prototype = {
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
 		if ( this.transparent === true ) data.transparent = this.transparent;
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
+		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
 
@@ -266,6 +268,8 @@ THREE.Material.prototype = {
 		this.polygonOffsetUnits = source.polygonOffsetUnits;
 
 		this.alphaTest = source.alphaTest;
+
+		this.premultipliedAlpha = source.premultipliedAlpha;
 
 		this.overdraw = source.overdraw;
 

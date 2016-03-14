@@ -7,30 +7,37 @@ THREE.VRControls = function ( object, onError ) {
 
 	var scope = this;
 
-	var vrInputs = [];
+	var vrInput;
 
 	function gotVRDevices( devices ) {
 
 		for ( var i = 0; i < devices.length; i ++ ) {
 
-			if ( devices[ i ] instanceof PositionSensorVRDevice ) {
+			if ( ( 'VRDisplay' in window && devices[ i ] instanceof VRDisplay ) ||
+				 ( 'PositionSensorVRDevice' in window && devices[ i ] instanceof PositionSensorVRDevice ) ) {
 
-				vrInputs.push( devices[ i ] );
+				vrInput = devices[ i ];
+				break;  // We keep the first we encounter
 
 			}
 
 		}
 
-		if ( vrInputs.length === 0 ) {
+		if ( !vrInput ) {
 
-			if ( onError ) onError( 'PositionSensorVRDevice not available' );
+			if ( onError ) onError( 'VR input not available.' );
 
 		}
 
 	}
 
-	if ( navigator.getVRDevices ) {
+	if ( navigator.getVRDisplays ) {
 
+		navigator.getVRDisplays().then( gotVRDevices );
+
+	} else if ( navigator.getVRDevices ) {
+
+		// Deprecated API.
 		navigator.getVRDevices().then( gotVRDevices );
 
 	}
@@ -43,21 +50,40 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.update = function () {
 
-		for ( var i = 0; i < vrInputs.length; i ++ ) {
+		if ( vrInput ) {
 
-			var vrInput = vrInputs[ i ];
+			if ( vrInput.getPose ) {
 
-			var state = vrInput.getState();
+				var pose = vrInput.getPose();
 
-			if ( state.orientation !== null ) {
+				if ( pose.orientation !== null ) {
 
-				object.quaternion.copy( state.orientation );
+					object.quaternion.fromArray( pose.orientation );
 
-			}
+				}
 
-			if ( state.position !== null ) {
+				if ( pose.position !== null ) {
 
-				object.position.copy( state.position ).multiplyScalar( scope.scale );
+					object.position.fromArray( pose.position ).multiplyScalar( scope.scale );
+
+				}
+
+			} else {
+
+				// Deprecated API.
+				var state = vrInput.getState();
+
+				if ( state.orientation !== null ) {
+
+					object.quaternion.copy( state.orientation );
+
+				}
+
+				if ( state.position !== null ) {
+
+					object.position.copy( state.position ).multiplyScalar( scope.scale );
+
+				}
 
 			}
 
@@ -67,16 +93,20 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.resetSensor = function () {
 
-		for ( var i = 0; i < vrInputs.length; i ++ ) {
+		if ( vrInput ) {
 
-			var vrInput = vrInputs[ i ];
+			if ( vrInput.resetPose !== undefined ) {
 
-			if ( vrInput.resetSensor !== undefined ) {
+				vrInput.resetPose();
 
+			} else if ( vrInput.resetSensor !== undefined ) {
+
+				// Deprecated API.
 				vrInput.resetSensor();
 
 			} else if ( vrInput.zeroSensor !== undefined ) {
 
+				// Really deprecated API.
 				vrInput.zeroSensor();
 
 			}
@@ -94,7 +124,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.dispose = function () {
 
-		vrInputs = [];
+		vrInput = null;
 
 	};
 

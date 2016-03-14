@@ -4,18 +4,31 @@ bool testLightInRange( const in float lightDistance, const in float cutoffDistan
 
 }
 
-float calcLightAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
+float punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
 
-	if ( decayExponent > 0.0 ) {
+		if( decayExponent > 0.0 ) {
 
-	  return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
+#if defined ( PHYSICALLY_CORRECT_LIGHTS )
 
-	}
+			// based upon Frostbite 3 Moving to Physically-based Rendering
+			// page 32, equation 26: E[window1]
+			// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr_v2.pdf
+			// this is intended to be used on spot and point lights who are represented as luminous intensity
+			// but who must be converted to luminous irradiance for surface lighting calculation
+			float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
+			float maxDistanceCutoffFactor = pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );
+			return distanceFalloff * maxDistanceCutoffFactor;
 
-	return 1.0;
+#else
 
+			return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
+
+#endif
+
+		}
+
+		return 1.0;
 }
-
 
 vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 
@@ -44,11 +57,11 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 
 	// geometry term = G(l)⋅G(v) / 4(n⋅l)(n⋅v)
 
-	float a2 = alpha * alpha;
+	float a2 = pow2( alpha );
 
-	float gl = dotNL + pow( a2 + ( 1.0 - a2 ) * dotNL * dotNL, 0.5 );
+	float gl = dotNL + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
 
-	float gv = dotNV + pow( a2 + ( 1.0 - a2 ) * dotNV * dotNV, 0.5 );
+	float gv = dotNV + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );
 
 	return 1.0 / ( gl * gv );
 
@@ -60,11 +73,11 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 // alpha is "roughness squared" in Disney’s reparameterization
 float D_GGX( const in float alpha, const in float dotNH ) {
 
-	float a2 = alpha * alpha;
+	float a2 = pow2( alpha );
 
-	float denom = dotNH * dotNH * ( a2 - 1.0 ) + 1.0; // avoid alpha = 0 with dotNH = 1
+	float denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0; // avoid alpha = 0 with dotNH = 1
 
-	return RECIPROCAL_PI * a2 / ( denom * denom );
+	return RECIPROCAL_PI * a2 / pow2( denom );
 
 }
 
@@ -72,7 +85,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 // GGX Distribution, Schlick Fresnel, GGX-Smith Visibility
 vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {
 
-	float alpha = roughness * roughness; // UE4's roughness
+	float alpha = pow2( roughness ); // UE4's roughness
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 
@@ -146,5 +159,9 @@ vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in Ge
 
 // source: http://simonstechblog.blogspot.ca/2011/12/microfacet-brdf.html
 float GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {
-	return ( 2.0 / square( ggxRoughness + 0.0001 ) - 2.0 );
+	return ( 2.0 / pow2( ggxRoughness + 0.0001 ) - 2.0 );
+}
+
+float BlinnExponentToGGXRoughness( const in float blinnExponent ) {
+	return sqrt( 2.0 / ( blinnExponent + 2.0 ) );
 }

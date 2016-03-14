@@ -255,8 +255,9 @@
 
 				requestAnimationFrame( animate, renderer.domElement );
 
+				stats.begin();
 				render();
-				stats.update();
+				stats.end();
 
 			}
 

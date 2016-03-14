@@ -235,6 +235,8 @@
 
 				requestAnimationFrame( animate, renderer.domElement );
 
+				stats.begin();
+
 				// step forward in time based on whether we're stepping and scale
 
 				var scale = gui.getTimeScale();
@@ -248,7 +250,7 @@
 				gui.update( blendMesh.mixer.time );
 
 				renderer.render( scene, camera );
-				stats.update();
+				stats.end();
 
 				// if we are stepping, consume time
 				// ( will equal step size next time a single step is desired )

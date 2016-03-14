@@ -8,13 +8,14 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	if ( renderTarget === undefined ) {
 
-		var pixelRatio = renderer.getPixelRatio();
-
-		var width  = Math.floor( renderer.context.canvas.width  / pixelRatio ) || 1;
-		var height = Math.floor( renderer.context.canvas.height / pixelRatio ) || 1;
-		var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, stencilBuffer: false };
-
-		renderTarget = new THREE.WebGLRenderTarget( width, height, parameters );
+		var parameters = {
+			minFilter: THREE.LinearFilter,
+			magFilter: THREE.LinearFilter,
+			format: THREE.RGBAFormat,
+			stencilBuffer: false
+		};
+		var size = renderer.getSize();
+		renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, parameters );
 
 	}
 
@@ -108,20 +109,16 @@ THREE.EffectComposer.prototype = {
 
 		if ( renderTarget === undefined ) {
 
+			var size = this.renderer.getSize();
+
 			renderTarget = this.renderTarget1.clone();
-
-			var pixelRatio = this.renderer.getPixelRatio();
-
-			renderTarget.setSize(
-				Math.floor( this.renderer.context.canvas.width  / pixelRatio ),
-				Math.floor( this.renderer.context.canvas.height / pixelRatio )
-			);
+			renderTarget.setSize( width, height );
 
 		}
 
 		this.renderTarget1.dispose();
-		this.renderTarget1 = renderTarget;
 		this.renderTarget2.dispose();
+		this.renderTarget1 = renderTarget;
 		this.renderTarget2 = renderTarget.clone();
 
 		this.writeBuffer = this.renderTarget1;
