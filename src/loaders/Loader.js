@@ -121,7 +121,7 @@ THREE.Loader.prototype = {
 			};
 
 			for ( var name in m ) {
-				
+
 				var value = m[ name ];
 
 				switch ( name ) {
