@@ -32,28 +32,27 @@
 			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
 		<script src="../build/three.min.js"></script>
-		<script src="../examples/js/controls/OrbitControls.js"></script>
-		<script src="../src/loaders/BinaryTextureLoader.js"></script>
-		<script src="../examples/js/loaders/RGBELoader.js"></script>
-		<script src="../examples/js/loaders/HDRCubeTextureLoader.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/RGBELoader.js"></script>
+		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
 
-		<script src="../examples/js/Detector.js"></script>
-		<script src="../examples/js/libs/stats.min.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
-		<script src="../examples/js/Half.js"></script>
-		<script src="../examples/js/Encodings.js"></script>
-		<script src="../examples/js/pmrem/PMREMGenerator.js"></script>
-		<script src="../examples/js/pmrem/PMREMCubeUVPacker.js"></script>
-		<script src="../examples/js/libs/dat.gui.min.js"></script>
+		<script src="js/Half.js"></script>
+		<script src="js/Encodings.js"></script>
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="../examples/js/postprocessing/EffectComposer.js"></script>
-		<script src="../examples/js/postprocessing/RenderPass.js"></script>
-		<script src="../examples/js/postprocessing/MaskPass.js"></script>
-		<script src="../examples/js/postprocessing/ShaderPass.js"></script>
-		<script src="../examples/js/shaders/CopyShader.js"></script>
-		<script src="../examples/js/shaders/FXAAShader.js"></script>
-		<script src="../examples/js/postprocessing/BloomPass.js"></script>
-		<script src="../examples/js/shaders/ConvolutionShader.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
 
 		<script>
 
@@ -125,7 +124,7 @@
 				scene.add( planeMesh1 );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "../examples/textures/roughness_map.jpg", function( map ) {
+				textureLoader.load( "./textures/roughness_map.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -143,7 +142,7 @@
 					];
 				};
 
-				var hdrUrls = genCubeUrls( "../examples/textures/cube/pisaHDR/", ".hdr" );
+				var hdrUrls = genCubeUrls( "./textures/cube/pisaHDR/", ".hdr" );
 				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
 
 					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
@@ -158,7 +157,7 @@
 					standardMaterial.needsUpdate = true;
 				} );
 
-				var ldrUrls = genCubeUrls( "../examples/textures/cube/pisa/", ".png" );
+				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
 				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
 
 					ldrCubeMap.encoding = THREE.GammaEncoding;
@@ -173,7 +172,7 @@
 				} );
 
 
-				var rgbmUrls = genCubeUrls( "../examples/textures/cube/pisaRGBM16/", ".png" );
+				var rgbmUrls = genCubeUrls( "./textures/cube/pisaRGBM16/", ".png" );
 				new THREE.CubeTextureLoader().load( rgbmUrls, function ( rgbmCubeMap ) {
 
 					rgbmCubeMap.encoding = THREE.RGBM16Encoding;
