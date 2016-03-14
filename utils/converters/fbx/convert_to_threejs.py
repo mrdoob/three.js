@@ -26,6 +26,7 @@ option_forced_y_up = False
 option_default_camera = False
 option_default_light = False
 option_pretty_print = False
+option_optimise_geometry = False
 
 texture_conversion_enabled = True
 
@@ -73,6 +74,10 @@ class NoIndent(object):
         if not self.value:
             return None
         return '[ %s ]' % self.separator.join(str(f) for f in self.value)
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 # Force an array into chunks rather than printing each element on a new line
 class ChunkedIndent(object):
@@ -91,6 +96,10 @@ class ChunkedIndent(object):
             return ['{CHUNK}%s' % ', '.join(str(round(f, 6)) for f in self.value[i:i+self.size]) for i in range(0, len(self.value), self.size)]
         else:
             return ['{CHUNK}%s' % ', '.join(str(f) for f in self.value[i:i+self.size]) for i in range(0, len(self.value), self.size)]
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 # This custom encoder looks for instances of NoIndent or ChunkedIndent.
 class CustomEncoder(json.JSONEncoder):
@@ -1574,6 +1583,41 @@ def generate_geometry_list_from_hierarchy(node, geometry_list, geometry_dict):
     for i in range(node.GetChildCount()):
         generate_geometry_list_from_hierarchy(node.GetChild(i), geometry_list, geometry_dict)
 
+def find_duplicate_geometry(geometry_list, geometry_index):
+    geometry = geometry_list[geometry_index]
+    meta = geometry[data_key][metadata_key]
+
+    data = geometry[data_key].copy()
+    data.pop(name_key)
+    data.pop(metadata_key)
+
+    for i in range(geometry_index):
+        test_geometry = geometry_list[i]
+        test_meta = test_geometry[data_key][metadata_key]
+
+        if meta == test_meta:
+            test_data = test_geometry[data_key].copy()
+            test_data.pop(name_key)
+            test_data.pop(metadata_key)
+
+            if test_data == data:
+                return test_geometry
+
+    return None
+
+def optimise_geometry(geometry_list, geometry_dict):
+    duplicate_geometry_indexes = []
+
+    for i in range(len(geometry_list)):
+        duplicate_geometry = find_duplicate_geometry(geometry_list, i)
+
+        if duplicate_geometry is not None:
+            duplicate_geometry_indexes.append(i)
+            geometry_dict[geometry_list[i][data_key][name_key]] = duplicate_geometry[uuid_key]
+
+    for index in reversed(duplicate_geometry_indexes):
+        del geometry_list[index]
+
 def generate_geometry_list(scene):
     geometry_list = []
     geometry_dict = {}
@@ -1582,6 +1626,9 @@ def generate_geometry_list(scene):
     if node:
         for i in range(node.GetChildCount()):
             generate_geometry_list_from_hierarchy(node.GetChild(i), geometry_list, geometry_dict)
+
+    if option_optimise_geometry:
+        optimise_geometry(geometry_list, geometry_dict)
 
     return geometry_list, geometry_dict
 
@@ -1950,6 +1997,7 @@ if __name__ == "__main__":
     parser.add_option('-c', '--add-camera', action='store_true', dest='defcamera', help="include default camera in output scene", default=False)
     parser.add_option('-l', '--add-light', action='store_true', dest='deflight', help="include default light in output scene", default=False)
     parser.add_option('-p', '--pretty-print', action='store_true', dest='pretty', help="nicely format the output JSON", default=False)
+    parser.add_option('-g', '--optimise-geometry', action='store_true', dest='optimisegeometry', help="remove duplicate geometry", default=False)
 
     (options, args) = parser.parse_args()
 
@@ -1965,6 +2013,7 @@ if __name__ == "__main__":
     option_default_camera = options.defcamera
     option_default_light = options.deflight
     option_pretty_print = options.pretty
+    option_optimise_geometry = options.optimisegeometry
 
     # Prepare the FBX SDK.
     sdk_manager, scene = InitializeSdkObjects()
