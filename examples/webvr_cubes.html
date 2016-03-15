@@ -63,7 +63,7 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
 				scene.add( camera );
 
 				crosshair = new THREE.Mesh(
@@ -77,19 +77,27 @@
 				crosshair.position.z = - 40;
 				camera.add( crosshair );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				var mesh = new THREE.Mesh(
+					new THREE.BoxGeometry( 200, 200, 200, 10, 10, 10 ),
+					new THREE.MeshBasicMaterial( { color: 0x202020, wireframe: true } )
+				);
+				scene.add( mesh );
+
+				scene.add( new THREE.AmbientLight( 0x202040 ) );
+
+				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 20, 20, 20 );
+				var geometry = new THREE.BoxGeometry( 3, 3, 3 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
-					object.position.x = Math.random() * 800 - 400;
-					object.position.y = Math.random() * 800 - 400;
-					object.position.z = Math.random() * 800 - 400;
+					object.position.x = Math.random() * 100 - 50;
+					object.position.y = Math.random() * 100 - 50;
+					object.position.z = Math.random() * 100 - 50;
 
 					object.rotation.x = Math.random() * 2 * Math.PI;
 					object.rotation.y = Math.random() * 2 * Math.PI;
@@ -98,6 +106,11 @@
 					object.scale.x = Math.random() + 0.5;
 					object.scale.y = Math.random() + 0.5;
 					object.scale.z = Math.random() + 0.5;
+
+					object.userData.velocity = new THREE.Vector3();
+					object.userData.velocity.x = ( Math.random() - 0.5 ) * 0.1;
+					object.userData.velocity.y = ( Math.random() - 0.5 ) * 0.1;
+					object.userData.velocity.z = ( Math.random() - 0.5 ) * 0.1;
 
 					scene.add( object );
 					cubes.push( object );
@@ -182,6 +195,24 @@
 				}
 
 				controls.update();
+
+				for ( var i = 0; i < cubes.length; i ++ ) {
+
+					var cube = cubes[ i ];
+
+					cube.position.add( cube.userData.velocity );
+
+					if ( cube.position.x < 100 ) cube.position.x += 200;
+					if ( cube.position.y < 100 ) cube.position.y += 200;
+					if ( cube.position.z < 100 ) cube.position.z += 200;
+
+					if ( cube.position.x > 100 ) cube.position.x -= 200;
+					if ( cube.position.y > 100 ) cube.position.y -= 200;
+					if ( cube.position.z > 100 ) cube.position.z -= 200;
+
+					cube.rotation.x += 0.01;
+
+				}
 
 				effect.render( scene, camera );
 
