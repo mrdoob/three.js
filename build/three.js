@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '74' };
+var THREE = { REVISION: '75' };
 
 //
 
@@ -210,6 +210,14 @@ THREE.MultiplyOperation = 0;
 THREE.MixOperation = 1;
 THREE.AddOperation = 2;
 
+// Tone Mapping modes
+
+THREE.NoToneMapping = 0; // do not do any tone mapping, not even exposure (required for special purpose passes.)
+THREE.LinearToneMapping = 1; // only apply exposure.
+THREE.ReinhardToneMapping = 2;
+THREE.Uncharted2ToneMapping = 3; // John Hable
+THREE.CineonToneMapping = 4;  // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
+
 // Mapping modes
 
 THREE.UVMapping = 300;
@@ -221,6 +229,8 @@ THREE.EquirectangularReflectionMapping = 303;
 THREE.EquirectangularRefractionMapping = 304;
 
 THREE.SphericalReflectionMapping = 305;
+THREE.CubeUVReflectionMapping = 306;
+THREE.CubeUVRefractionMapping = 307;
 
 // Wrapping modes
 
@@ -307,6 +317,20 @@ THREE.WrapAroundEnding = 2402;
 THREE.TrianglesDrawMode = 0;
 THREE.TriangleStripDrawMode = 1;
 THREE.TriangleFanDrawMode = 2;
+
+// Texture Encodings
+
+THREE.LinearEncoding = 3000; // No encoding at all.
+THREE.sRGBEncoding = 3001;
+THREE.GammaEncoding = 3007; // uses GAMMA_FACTOR, for backwards compatibility with WebGLRenderer.gammaInput/gammaOutput
+
+// The following Texture Encodings are for RGB-only (no alpha) HDR light emission sources.
+// These encodings should not specified as output encodings except in rare situations.
+THREE.RGBEEncoding = 3002; // AKA Radiance.
+THREE.LogLuvEncoding = 3003;
+THREE.RGBM7Encoding = 3004;
+THREE.RGBM16Encoding = 3005;
+THREE.RGBDEncoding = 3006; // MaxRange is 256.
 
 // File:src/math/Color.js
 
@@ -2526,7 +2550,7 @@ THREE.Vector3.prototype = {
 
 			return this.sub( v1 );
 
-		}
+		};
 
 	}(),
 
@@ -2543,7 +2567,7 @@ THREE.Vector3.prototype = {
 
 			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
-		}
+		};
 
 	}(),
 
@@ -2573,21 +2597,29 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setFromMatrixPosition: function ( m ) {
+	setFromSpherical: function( s ) {
 
-		this.x = m.elements[ 12 ];
-		this.y = m.elements[ 13 ];
-		this.z = m.elements[ 14 ];
+		var sinPhiRadius = Math.sin( s.phi ) * s.radius;
+
+		this.x = sinPhiRadius * Math.sin( s.theta );
+		this.y = Math.cos( s.phi ) * s.radius;
+		this.z = sinPhiRadius * Math.cos( s.theta );
 
 		return this;
 
 	},
 
+	setFromMatrixPosition: function ( m ) {
+
+		return this.setFromMatrixColumn( m, 3 );
+
+	},
+
 	setFromMatrixScale: function ( m ) {
 
-		var sx = this.set( m.elements[ 0 ], m.elements[ 1 ], m.elements[ 2 ] ).length();
-		var sy = this.set( m.elements[ 4 ], m.elements[ 5 ], m.elements[ 6 ] ).length();
-		var sz = this.set( m.elements[ 8 ], m.elements[ 9 ], m.elements[ 10 ] ).length();
+		var sx = this.setFromMatrixColumn( m, 0 ).length();
+		var sy = this.setFromMatrixColumn( m, 1 ).length();
+		var sz = this.setFromMatrixColumn( m, 2 ).length();
 
 		this.x = sx;
 		this.y = sy;
@@ -2597,17 +2629,18 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setFromMatrixColumn: function ( index, matrix ) {
+	setFromMatrixColumn: function ( m, index ) {
 
-		var offset = index * 4;
+		if ( typeof m === 'number' ) {
 
-		var me = matrix.elements;
+			console.warn( 'THREE.Vector3: setFromMatrixColumn now expects ( matrix, index ).' );
 
-		this.x = me[ offset ];
-		this.y = me[ offset + 1 ];
-		this.z = me[ offset + 2 ];
+			m = arguments[ 1 ];
+			index = arguments[ 0 ];
 
-		return this;
+		}
+
+		return this.fromArray( m.elements, index * 4 );
 
 	},
 
@@ -4108,9 +4141,13 @@ THREE.Box3.prototype = {
 
 					}
 
-					box.copy( geometry.boundingBox );
-					box.applyMatrix4( node.matrixWorld );
-					scope.union( box );
+					if ( geometry.boundingBox.isEmpty() === false ) {
+
+						box.copy( geometry.boundingBox );
+						box.applyMatrix4( node.matrixWorld );
+						scope.union( box );
+
+					}
 
 				}
 
@@ -4431,6 +4468,7 @@ THREE.Box3.prototype = {
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author bhouston / http://clara.io
+ * @author tschw
  */
 
 THREE.Matrix3 = function () {
@@ -4459,9 +4497,9 @@ THREE.Matrix3.prototype = {
 
 		var te = this.elements;
 
-		te[ 0 ] = n11; te[ 3 ] = n12; te[ 6 ] = n13;
-		te[ 1 ] = n21; te[ 4 ] = n22; te[ 7 ] = n23;
-		te[ 2 ] = n31; te[ 5 ] = n32; te[ 8 ] = n33;
+		te[ 0 ] = n11; te[ 1 ] = n21; te[ 2 ] = n31;
+		te[ 3 ] = n12; te[ 4 ] = n22; te[ 5 ] = n32;
+		te[ 6 ] = n13; te[ 7 ] = n23; te[ 8 ] = n33;
 
 		return this;
 
@@ -4496,6 +4534,22 @@ THREE.Matrix3.prototype = {
 			me[ 0 ], me[ 3 ], me[ 6 ],
 			me[ 1 ], me[ 4 ], me[ 7 ],
 			me[ 2 ], me[ 5 ], me[ 8 ]
+
+		);
+
+		return this;
+
+	},
+
+	setFromMatrix4: function( m ) {
+
+		var me = m.elements;
+
+		this.set(
+
+			me[ 0 ], me[ 4 ], me[  8 ],
+			me[ 1 ], me[ 5 ], me[  9 ],
+			me[ 2 ], me[ 6 ], me[ 10 ]
 
 		);
 
@@ -4581,25 +4635,24 @@ THREE.Matrix3.prototype = {
 
 	getInverse: function ( matrix, throwOnDegenerate ) {
 
-		// input: THREE.Matrix4
-		// ( based on http://code.google.com/p/webgl-mjs/ )
+		if ( matrix instanceof THREE.Matrix4 ) {
 
-		var me = matrix.elements;
-		var te = this.elements;
+			console.warn( "THREE.Matrix3.getInverse no longer takes a Matrix4 argument." );
 
-		te[ 0 ] =   me[ 10 ] * me[ 5 ] - me[ 6 ] * me[ 9 ];
-		te[ 1 ] = - me[ 10 ] * me[ 1 ] + me[ 2 ] * me[ 9 ];
-		te[ 2 ] =   me[ 6 ] * me[ 1 ] - me[ 2 ] * me[ 5 ];
-		te[ 3 ] = - me[ 10 ] * me[ 4 ] + me[ 6 ] * me[ 8 ];
-		te[ 4 ] =   me[ 10 ] * me[ 0 ] - me[ 2 ] * me[ 8 ];
-		te[ 5 ] = - me[ 6 ] * me[ 0 ] + me[ 2 ] * me[ 4 ];
-		te[ 6 ] =   me[ 9 ] * me[ 4 ] - me[ 5 ] * me[ 8 ];
-		te[ 7 ] = - me[ 9 ] * me[ 0 ] + me[ 1 ] * me[ 8 ];
-		te[ 8 ] =   me[ 5 ] * me[ 0 ] - me[ 1 ] * me[ 4 ];
+		}
 
-		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 3 ] + me[ 2 ] * te[ 6 ];
+		var me = matrix.elements,
+			te = this.elements,
 
-		// no inverse
+			n11 = me[ 0 ], n21 = me[ 1 ], n31 = me[ 2 ],
+			n12 = me[ 3 ], n22 = me[ 4 ], n32 = me[ 5 ],
+			n13 = me[ 6 ], n23 = me[ 7 ], n33 = me[ 8 ],
+
+			t11 = n33 * n22 - n32 * n23,
+			t12 = n32 * n13 - n33 * n12,
+			t13 = n23 * n12 - n22 * n13,
+
+			det = n11 * t11 + n21 * t12 + n31 * t13;
 
 		if ( det === 0 ) {
 
@@ -4615,15 +4668,22 @@ THREE.Matrix3.prototype = {
 
 			}
 
-			this.identity();
-
-			return this;
-
+			return this.identity();
 		}
 
-		this.multiplyScalar( 1.0 / det );
+		te[ 0 ] = t11;
+		te[ 1 ] = n31 * n23 - n33 * n21;
+		te[ 2 ] = n32 * n21 - n31 * n22;
 
-		return this;
+		te[ 3 ] = t12;
+		te[ 4 ] = n33 * n11 - n31 * n13;
+		te[ 5 ] = n31 * n12 - n32 * n11;
+
+		te[ 6 ] = t13;
+		te[ 7 ] = n21 * n13 - n23 * n11;
+		te[ 8 ] = n22 * n11 - n21 * n12;
+
+		return this.multiplyScalar( 1 / det );
 
 	},
 
@@ -4659,13 +4719,9 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	getNormalMatrix: function ( m ) {
+	getNormalMatrix: function ( matrix4 ) {
 
-		// input: THREE.Matrix4
-
-		this.getInverse( m ).transpose();
-
-		return this;
+		return this.setFromMatrix4( matrix4 ).getInverse( this ).transpose();
 
 	},
 
@@ -4804,11 +4860,9 @@ THREE.Matrix4.prototype = {
 
 	extractBasis: function ( xAxis, yAxis, zAxis ) {
 
-		var te = this.elements;
-
-		xAxis.set( te[ 0 ], te[ 1 ], te[ 2 ] );
-		yAxis.set( te[ 4 ], te[ 5 ], te[ 6 ] );
-		zAxis.set( te[ 8 ], te[ 9 ], te[ 10 ] );
+		xAxis.setFromMatrixColumn( this, 0 );
+		yAxis.setFromMatrixColumn( this, 1 );
+		zAxis.setFromMatrixColumn( this, 2 );
 
 		return this;
 
@@ -4838,9 +4892,9 @@ THREE.Matrix4.prototype = {
 			var te = this.elements;
 			var me = m.elements;
 
-			var scaleX = 1 / v1.set( me[ 0 ], me[ 1 ], me[ 2 ] ).length();
-			var scaleY = 1 / v1.set( me[ 4 ], me[ 5 ], me[ 6 ] ).length();
-			var scaleZ = 1 / v1.set( me[ 8 ], me[ 9 ], me[ 10 ] ).length();
+			var scaleX = 1 / v1.setFromMatrixColumn( m, 0 ).length();
+			var scaleY = 1 / v1.setFromMatrixColumn( m, 1 ).length();
+			var scaleZ = 1 / v1.setFromMatrixColumn( m, 2 ).length();
 
 			te[ 0 ] = me[ 0 ] * scaleX;
 			te[ 1 ] = me[ 1 ] * scaleX;
@@ -5304,8 +5358,7 @@ THREE.Matrix4.prototype = {
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 			console.warn( 'THREE.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
 
-			var te = this.elements;
-			return v1.set( te[ 12 ], te[ 13 ], te[ 14 ] );
+			return v1.setFromMatrixColumn( this, 3 );
 
 		};
 
@@ -5323,41 +5376,29 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	getInverse: function ( m, throwOnInvertible ) {
+	getInverse: function ( m, throwOnDegenerate ) {
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
-		var te = this.elements;
-		var me = m.elements;
+		var te = this.elements,
+			me = m.elements,
 
-		var n11 = me[ 0 ], n12 = me[ 4 ], n13 = me[ 8 ], n14 = me[ 12 ];
-		var n21 = me[ 1 ], n22 = me[ 5 ], n23 = me[ 9 ], n24 = me[ 13 ];
-		var n31 = me[ 2 ], n32 = me[ 6 ], n33 = me[ 10 ], n34 = me[ 14 ];
-		var n41 = me[ 3 ], n42 = me[ 7 ], n43 = me[ 11 ], n44 = me[ 15 ];
+			n11 = me[ 0 ], n21 = me[ 1 ], n31 = me[ 2 ], n41 = me[ 3 ],
+			n12 = me[ 4 ], n22 = me[ 5 ], n32 = me[ 6 ], n42 = me[ 7 ],
+			n13 = me[ 8 ], n23 = me[ 9 ], n33 = me[ 10 ], n43 = me[ 11 ],
+			n14 = me[ 12 ], n24 = me[ 13 ], n34 = me[ 14 ], n44 = me[ 15 ],
 
-		te[ 0 ] = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44;
-		te[ 4 ] = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44;
-		te[ 8 ] = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44;
-		te[ 12 ] = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
-		te[ 1 ] = n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44;
-		te[ 5 ] = n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44;
-		te[ 9 ] = n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44;
-		te[ 13 ] = n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34;
-		te[ 2 ] = n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44;
-		te[ 6 ] = n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44;
-		te[ 10 ] = n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44;
-		te[ 14 ] = n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34;
-		te[ 3 ] = n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43;
-		te[ 7 ] = n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43;
-		te[ 11 ] = n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43;
-		te[ 15 ] = n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33;
+			t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44,
+			t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44,
+			t13 = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44,
+			t14 = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
 
-		var det = n11 * te[ 0 ] + n21 * te[ 4 ] + n31 * te[ 8 ] + n41 * te[ 12 ];
+		var det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
 
 		if ( det === 0 ) {
 
 			var msg = "THREE.Matrix4.getInverse(): can't invert matrix, determinant is 0";
 
-			if ( throwOnInvertible || false ) {
+			if ( throwOnDegenerate || false ) {
 
 				throw new Error( msg );
 
@@ -5367,15 +5408,31 @@ THREE.Matrix4.prototype = {
 
 			}
 
-			this.identity();
-
-			return this;
+			return this.identity();
 
 		}
 
-		this.multiplyScalar( 1 / det );
+		te[ 0 ] = t11;
+		te[ 1 ] = n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44;
+		te[ 2 ] = n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44;
+		te[ 3 ] = n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43;
 
-		return this;
+		te[ 4 ] = t12;
+		te[ 5 ] = n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44;
+		te[ 6 ] = n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44;
+		te[ 7 ] = n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43;
+
+		te[ 8 ] = t13;
+		te[ 9 ] = n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44;
+		te[ 10 ] = n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44;
+		te[ 11 ] = n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43;
+
+		te[ 12 ] = t14;
+		te[ 13 ] = n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34;
+		te[ 14 ] = n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34;
+		te[ 15 ] = n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33;
+
+		return this.multiplyScalar( 1 / det );
 
 	},
 
@@ -5612,17 +5669,17 @@ THREE.Matrix4.prototype = {
 	makeOrthographic: function ( left, right, top, bottom, near, far ) {
 
 		var te = this.elements;
-		var w = right - left;
-		var h = top - bottom;
-		var p = far - near;
+		var w = 1.0 / ( right - left );
+		var h = 1.0 / ( top - bottom );
+		var p = 1.0 / ( far - near );
 
-		var x = ( right + left ) / w;
-		var y = ( top + bottom ) / h;
-		var z = ( far + near ) / p;
+		var x = ( right + left ) * w;
+		var y = ( top + bottom ) * h;
+		var z = ( far + near ) * p;
 
-		te[ 0 ] = 2 / w;	te[ 4 ] = 0;	te[ 8 ] = 0;	te[ 12 ] = - x;
-		te[ 1 ] = 0;	te[ 5 ] = 2 / h;	te[ 9 ] = 0;	te[ 13 ] = - y;
-		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = - 2 / p;	te[ 14 ] = - z;
+		te[ 0 ] = 2 * w;	te[ 4 ] = 0;	te[ 8 ] = 0;	te[ 12 ] = - x;
+		te[ 1 ] = 0;	te[ 5 ] = 2 * h;	te[ 9 ] = 0;	te[ 13 ] = - y;
+		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = - 2 * p;	te[ 14 ] = - z;
 		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = 0;	te[ 15 ] = 1;
 
 		return this;
@@ -6796,6 +6853,86 @@ THREE.Plane.prototype = {
 		return plane.normal.equals( this.normal ) && ( plane.constant === this.constant );
 
 	}
+
+};
+
+// File:src/math/Spherical.js
+
+/**
+ * @author bhouston / http://clara.io
+ * @author WestLangley / http://github.com/WestLangley
+ *
+ * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system
+ *
+ * The poles (phi) are at the positive and negative y axis.
+ * The equator starts at positive z.
+ */
+
+THREE.Spherical = function ( radius, phi, theta ) {
+
+	this.radius = ( radius !== undefined ) ? radius : 1.0;
+	this.phi = ( phi !== undefined ) ? phi : 0; // up / down towards top and bottom pole
+	this.theta = ( theta !== undefined ) ? theta : 0; // around the equator of the sphere
+
+	return this;
+
+};
+
+THREE.Spherical.prototype = {
+
+	constructor: THREE.Spherical,
+
+	set: function ( radius, phi, theta ) {
+
+		this.radius = radius;
+		this.phi = phi;
+		this.theta = theta;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
+	copy: function ( other ) {
+
+		this.radius.copy( other.radius );
+		this.phi.copy( other.phi );
+		this.theta.copy( other.theta );
+
+		return this;
+
+	},
+
+	// restrict phi to be betwee EPS and PI-EPS
+	makeSafe: function() {
+
+		var EPS = 0.000001;
+		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
+
+	},
+
+	setFromVector3: function( vec3 ) {
+
+		this.radius = vec3.length();
+
+		if ( this.radius === 0 ) {
+
+			this.theta = 0;
+			this.phi = 0;
+
+		} else {
+
+			this.theta = Math.atan2( vec3.x, vec3.z ); // equator angle around y-up axis
+			this.phi = Math.acos( THREE.Math.clamp( vec3.y / this.radius, - 1, 1 ) ); // polar angle
+
+		}
+
+		return this;
+
+	},
 
 };
 
@@ -9776,6 +9913,8 @@ THREE.Geometry.prototype = {
 		this.verticesNeedUpdate = true;
 		this.normalsNeedUpdate = true;
 
+		return this;
+
 	},
 
 	rotateX: function () {
@@ -9945,12 +10084,12 @@ THREE.Geometry.prototype = {
 
 		}
 
-		function addFace( a, b, c ) {
+		function addFace( a, b, c, materialIndex ) {
 
 			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
 
-			var face = new THREE.Face3( a, b, c, vertexNormals, vertexColors );
+			var face = new THREE.Face3( a, b, c, vertexNormals, vertexColors, materialIndex );
 
 			scope.faces.push( face );
 
@@ -9983,7 +10122,7 @@ THREE.Geometry.prototype = {
 
 					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
-						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ] );
+						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex  );
 
 					}
 
@@ -11333,6 +11472,8 @@ THREE.BufferGeometry.prototype = {
 			this.computeBoundingSphere();
 
 		}
+
+		return this;
 
 	},
 
@@ -15647,7 +15788,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	//	  .bone[Armature.DEF_cog].position
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_. ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
+	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_.:\- ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
 	var matches = re.exec(trackName);
 
 	if( ! matches ) {
@@ -17368,6 +17509,26 @@ THREE.PointLight = function ( color, intensity, distance, decay ) {
 THREE.PointLight.prototype = Object.create( THREE.Light.prototype );
 THREE.PointLight.prototype.constructor = THREE.PointLight;
 
+Object.defineProperty( THREE.PointLight.prototype, "power", {
+
+	get: function () {
+
+		// intensity = power per solid angle.
+		// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+		return this.intensity * 4 * Math.PI;
+
+	},
+
+	set: function ( power ) {
+
+		// intensity = power per solid angle.
+		// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+		this.intensity = power / ( 4 * Math.PI );
+
+	}
+
+} );
+
 THREE.PointLight.prototype.copy = function ( source ) {
 
 	THREE.Light.prototype.copy.call( this, source );
@@ -17409,6 +17570,26 @@ THREE.SpotLight = function ( color, intensity, distance, angle, penumbra, decay 
 
 THREE.SpotLight.prototype = Object.create( THREE.Light.prototype );
 THREE.SpotLight.prototype.constructor = THREE.SpotLight;
+
+Object.defineProperty( THREE.SpotLight.prototype, "power", {
+
+	get: function () {
+
+		// intensity = power per solid angle.
+		// ref: equation (17) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+		return this.intensity * Math.PI;
+
+	},
+
+	set: function ( power ) {
+
+		// intensity = power per solid angle.
+		// ref: equation (17) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+		this.intensity = power / Math.PI;
+
+	}
+
+} );
 
 THREE.SpotLight.prototype.copy = function ( source ) {
 
@@ -19029,9 +19210,10 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'BoxGeometry':
+					case 'BoxBufferGeometry':
 					case 'CubeGeometry': // backwards compatible
 
-						geometry = new THREE.BoxGeometry(
+						geometry = new THREE[ data.type ](
 							data.width,
 							data.height,
 							data.depth,
@@ -19042,20 +19224,10 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'CircleGeometry':
 					case 'CircleBufferGeometry':
 
-						geometry = new THREE.CircleBufferGeometry(
-							data.radius,
-							data.segments,
-							data.thetaStart,
-							data.thetaLength
-						);
-
-						break;
-
-					case 'CircleGeometry':
-
-						geometry = new THREE.CircleGeometry(
+						geometry = new THREE[ data.type ](
 							data.radius,
 							data.segments,
 							data.thetaStart,
@@ -19065,8 +19237,9 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'CylinderGeometry':
+					case 'CylinderBufferGeometry':
 
-						geometry = new THREE.CylinderGeometry(
+						geometry = new THREE[ data.type ](
 							data.radiusTop,
 							data.radiusBottom,
 							data.height,
@@ -19080,22 +19253,9 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'SphereGeometry':
-
-						geometry = new THREE.SphereGeometry(
-							data.radius,
-							data.widthSegments,
-							data.heightSegments,
-							data.phiStart,
-							data.phiLength,
-							data.thetaStart,
-							data.thetaLength
-						);
-
-						break;
-
 					case 'SphereBufferGeometry':
 
-						geometry = new THREE.SphereBufferGeometry(
+						geometry = new THREE[ data.type ](
 							data.radius,
 							data.widthSegments,
 							data.heightSegments,
@@ -19144,8 +19304,9 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'RingGeometry':
+					case 'RingBufferGeometry':
 
-						geometry = new THREE.RingGeometry(
+						geometry = new THREE[ data.type ](
 							data.innerRadius,
 							data.outerRadius,
 							data.thetaSegments,
@@ -19157,8 +19318,9 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'TorusGeometry':
+					case 'TorusBufferGeometry':
 
-						geometry = new THREE.TorusGeometry(
+						geometry = new THREE[ data.type ](
 							data.radius,
 							data.tube,
 							data.radialSegments,
@@ -19169,15 +19331,15 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'TorusKnotGeometry':
+					case 'TorusKnotBufferGeometry':
 
-						geometry = new THREE.TorusKnotGeometry(
+						geometry = new THREE[ data.type ](
 							data.radius,
 							data.tube,
-							data.radialSegments,
 							data.tubularSegments,
+							data.radialSegments,
 							data.p,
-							data.q,
-							data.heightScale
+							data.q
 						);
 
 						break;
@@ -19556,7 +19718,7 @@ THREE.ObjectLoader.prototype = {
 
 			return object;
 
-		}
+		};
 
 	}()
 
@@ -19634,7 +19796,7 @@ THREE.CubeTextureLoader.prototype = {
 
 	load: function ( urls, onLoad, onProgress, onError ) {
 
-		var texture = new THREE.CubeTexture( [] );
+		var texture = new THREE.CubeTexture();
 
 		var loader = new THREE.ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
@@ -19959,6 +20121,7 @@ THREE.Material = function () {
 	this.polygonOffsetUnits = 0;
 
 	this.alphaTest = 0;
+	this.premultipliedAlpha = false;
 
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
@@ -20114,6 +20277,7 @@ THREE.Material.prototype = {
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
 		if ( this.transparent === true ) data.transparent = this.transparent;
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
+		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
 
@@ -20187,6 +20351,8 @@ THREE.Material.prototype = {
 
 		this.alphaTest = source.alphaTest;
 
+		this.premultipliedAlpha = source.premultipliedAlpha;
+
 		this.overdraw = source.overdraw;
 
 		this.visible = source.visible;
@@ -20223,13 +20389,13 @@ THREE.MaterialIdCount = 0;
  *  color: <hex>,
  *  opacity: <float>,
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *  linewidth: <float>,
  *  linecap: "round",
  *  linejoin: "round",
+ *
+ *  blending: THREE.NormalBlending,
+ *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  vertexColors: <bool>
  *
@@ -20248,6 +20414,8 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.linewidth = 1;
 	this.linecap = 'round';
 	this.linejoin = 'round';
+
+	this.blending = THREE.NormalBlending;
 
 	this.vertexColors = THREE.NoColors;
 
@@ -20287,15 +20455,15 @@ THREE.LineBasicMaterial.prototype.copy = function ( source ) {
  *  color: <hex>,
  *  opacity: <float>,
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *  linewidth: <float>,
  *
  *  scale: <float>,
  *  dashSize: <float>,
  *  gapSize: <float>,
+ *
+ *  blending: THREE.NormalBlending,
+ *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  vertexColors: THREE.NoColors / THREE.FaceColors / THREE.VertexColors
  *
@@ -20317,6 +20485,8 @@ THREE.LineDashedMaterial = function ( parameters ) {
 	this.dashSize = 3;
 	this.gapSize = 1;
 
+	this.blending = THREE.NormalBlending;
+
 	this.vertexColors = THREE.NoColors;
 
 	this.fog = true;
@@ -20333,7 +20503,7 @@ THREE.LineDashedMaterial.prototype.copy = function ( source ) {
 	THREE.Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
-	
+
 	this.linewidth = source.linewidth;
 
 	this.scale = source.scale;
@@ -20413,6 +20583,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
+	this.blending = THREE.NormalBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -20547,6 +20718,8 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.refractionRatio = 0.98;
 
 	this.fog = true;
+
+	this.blending = THREE.NormalBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -20715,6 +20888,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
+	this.blending = THREE.NormalBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -20900,6 +21074,7 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
+	this.blending = THREE.NormalBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -20988,10 +21163,6 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
  * parameters = {
  *  opacity: <float>,
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
  * }
@@ -21032,11 +21203,6 @@ THREE.MeshDepthMaterial.prototype.copy = function ( source ) {
  *
  * parameters = {
  *  opacity: <float>,
- *
- *  shading: THREE.FlatShading,
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
@@ -21179,6 +21345,8 @@ THREE.PointsMaterial = function ( parameters ) {
 	this.size = 1;
 	this.sizeAttenuation = true;
 
+	this.blending = THREE.NormalBlending;
+
 	this.vertexColors = THREE.NoColors;
 
 	this.fog = true;
@@ -21222,9 +21390,6 @@ THREE.PointsMaterial.prototype.copy = function ( source ) {
  *  vertexShader: <string>,
  *
  *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
@@ -21377,10 +21542,6 @@ THREE.RawShaderMaterial.prototype.constructor = THREE.RawShaderMaterial;
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *	uvOffset: new THREE.Vector2(),
  *	uvScale: new THREE.Vector2(),
  *
@@ -21464,7 +21625,14 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
 	this.flipY = true;
-	this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
+	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
+
+
+	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
+	//
+	// Also changing the encoding after already used by a Material will not automatically make the Material
+	// update.  You need to explicitly call Material.needsUpdate to trigger it to recompile.
+	this.encoding = THREE.LinearEncoding;
 
 	this.version = 0;
 	this.onUpdate = null;
@@ -21515,6 +21683,7 @@ THREE.Texture.prototype = {
 		this.premultiplyAlpha = source.premultiplyAlpha;
 		this.flipY = source.flipY;
 		this.unpackAlignment = source.unpackAlignment;
+		this.encoding = source.encoding;
 
 		return this;
 
@@ -21724,11 +21893,11 @@ THREE.CanvasTexture.prototype.constructor = THREE.CanvasTexture;
 
 THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
+	images = images !== undefined ? images : [];
 	mapping = mapping !== undefined ? mapping : THREE.CubeReflectionMapping;
 
 	THREE.Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
-	this.images = images;
 	this.flipY = false;
 
 };
@@ -21736,15 +21905,21 @@ THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilt
 THREE.CubeTexture.prototype = Object.create( THREE.Texture.prototype );
 THREE.CubeTexture.prototype.constructor = THREE.CubeTexture;
 
-THREE.CubeTexture.prototype.copy = function ( source ) {
+Object.defineProperty( THREE.CubeTexture.prototype, 'images', {
 
-	THREE.Texture.prototype.copy.call( this, source );
+	get: function () {
 
-	this.images = source.images;
+		return this.image;
 
-	return this;
+	},
 
-};
+	set: function ( value ) {
+
+		this.image = value;
+
+	}
+
+} );
 
 // File:src/textures/CompressedTexture.js
 
@@ -21788,7 +21963,7 @@ THREE.DataTexture = function ( data, width, height, format, type, mapping, wrapS
 
 	this.magFilter = magFilter !== undefined ? magFilter : THREE.NearestFilter;
 	this.minFilter = minFilter !== undefined ? minFilter : THREE.NearestFilter;
-	
+
 	this.flipY = false;
 	this.generateMipmaps  = false;
 
@@ -23365,13 +23540,9 @@ THREE.ShaderChunk[ 'alphamap_pars_fragment' ] = "#ifdef USE_ALPHAMAP\n	uniform s
 
 THREE.ShaderChunk[ 'alphatest_fragment' ] = "#ifdef ALPHATEST\n	if ( diffuseColor.a < ALPHATEST ) discard;\n#endif\n";
 
-// File:src/renderers/shaders/ShaderChunk/ambient_pars.glsl
-
-THREE.ShaderChunk[ 'ambient_pars' ] = "uniform vec3 ambientLightColor;\nvec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {\n	return PI * ambientLightColor;\n}\n";
-
 // File:src/renderers/shaders/ShaderChunk/aomap_fragment.glsl
 
-THREE.ShaderChunk[ 'aomap_fragment' ] = "#ifdef USE_AOMAP\n	reflectedLight.indirectDiffuse *= ( texture2D( aoMap, vUv2 ).r - 1.0 ) * aoMapIntensity + 1.0;\n#endif\n";
+THREE.ShaderChunk[ 'aomap_fragment' ] = "#ifdef USE_AOMAP\n	float ambientOcclusion = ( texture2D( aoMap, vUv2 ).r - 1.0 ) * aoMapIntensity + 1.0;\n	reflectedLight.indirectDiffuse *= ambientOcclusion;\n	#if defined( USE_ENVMAP ) && defined( STANDARD )\n		float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n		reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, ambientOcclusion, material.specularRoughness );\n	#endif\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/aomap_pars_fragment.glsl
 
@@ -23387,7 +23558,7 @@ THREE.ShaderChunk[ 'beginnormal_vertex' ] = "\nvec3 objectNormal = vec3( normal 
 
 // File:src/renderers/shaders/ShaderChunk/bsdfs.glsl
 
-THREE.ShaderChunk[ 'bsdfs' ] = "bool testLightInRange( const in float lightDistance, const in float cutoffDistance ) {\n	return any( bvec2( cutoffDistance == 0.0, lightDistance < cutoffDistance ) );\n}\nfloat calcLightAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {\n	if ( decayExponent > 0.0 ) {\n	  return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );\n	}\n	return 1.0;\n}\nvec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\n	return RECIPROCAL_PI * diffuseColor;\n}\nvec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\n	float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\n	return ( 1.0 - specularColor ) * fresnel + specularColor;\n}\nfloat G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {\n	float a2 = alpha * alpha;\n	float gl = dotNL + pow( a2 + ( 1.0 - a2 ) * dotNL * dotNL, 0.5 );\n	float gv = dotNV + pow( a2 + ( 1.0 - a2 ) * dotNV * dotNV, 0.5 );\n	return 1.0 / ( gl * gv );\n}\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n	float a2 = alpha * alpha;\n	float denom = dotNH * dotNH * ( a2 - 1.0 ) + 1.0;\n	return RECIPROCAL_PI * a2 / ( denom * denom );\n}\nvec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n	float alpha = roughness * roughness;\n	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n	float dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );\n	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n	float dotNH = saturate( dot( geometry.normal, halfDir ) );\n	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n	vec3 F = F_Schlick( specularColor, dotLH );\n	float G = G_GGX_Smith( alpha, dotNL, dotNV );\n	float D = D_GGX( alpha, dotNH );\n	return F * ( G * D );\n}\nvec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n	const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );\n	const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );\n	vec4 r = roughness * c0 + c1;\n	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;\n	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;\n	return specularColor * AB.x + AB.y;\n}\nfloat G_BlinnPhong_Implicit( ) {\n	return 0.25;\n}\nfloat D_BlinnPhong( const in float shininess, const in float dotNH ) {\n	return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n}\nvec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\n	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n	float dotNH = saturate( dot( geometry.normal, halfDir ) );\n	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n	vec3 F = F_Schlick( specularColor, dotLH );\n	float G = G_BlinnPhong_Implicit( );\n	float D = D_BlinnPhong( shininess, dotNH );\n	return F * ( G * D );\n}\nfloat GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n	return ( 2.0 / square( ggxRoughness + 0.0001 ) - 2.0 );\n}\n";
+THREE.ShaderChunk[ 'bsdfs' ] = "bool testLightInRange( const in float lightDistance, const in float cutoffDistance ) {\n	return any( bvec2( cutoffDistance == 0.0, lightDistance < cutoffDistance ) );\n}\nfloat punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {\n		if( decayExponent > 0.0 ) {\n#if defined ( PHYSICALLY_CORRECT_LIGHTS )\n			float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );\n			float maxDistanceCutoffFactor = pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );\n			return distanceFalloff * maxDistanceCutoffFactor;\n#else\n			return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );\n#endif\n		}\n		return 1.0;\n}\nvec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\n	return RECIPROCAL_PI * diffuseColor;\n}\nvec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\n	float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\n	return ( 1.0 - specularColor ) * fresnel + specularColor;\n}\nfloat G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {\n	float a2 = pow2( alpha );\n	float gl = dotNL + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n	float gv = dotNV + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n	return 1.0 / ( gl * gv );\n}\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n	float a2 = pow2( alpha );\n	float denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0;\n	return RECIPROCAL_PI * a2 / pow2( denom );\n}\nvec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n	float alpha = pow2( roughness );\n	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n	float dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );\n	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n	float dotNH = saturate( dot( geometry.normal, halfDir ) );\n	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n	vec3 F = F_Schlick( specularColor, dotLH );\n	float G = G_GGX_Smith( alpha, dotNL, dotNV );\n	float D = D_GGX( alpha, dotNH );\n	return F * ( G * D );\n}\nvec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n	const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );\n	const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );\n	vec4 r = roughness * c0 + c1;\n	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;\n	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;\n	return specularColor * AB.x + AB.y;\n}\nfloat G_BlinnPhong_Implicit( ) {\n	return 0.25;\n}\nfloat D_BlinnPhong( const in float shininess, const in float dotNH ) {\n	return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n}\nvec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\n	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n	float dotNH = saturate( dot( geometry.normal, halfDir ) );\n	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n	vec3 F = F_Schlick( specularColor, dotLH );\n	float G = G_BlinnPhong_Implicit( );\n	float D = D_BlinnPhong( shininess, dotNH );\n	return F * ( G * D );\n}\nfloat GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n	return ( 2.0 / pow2( ggxRoughness + 0.0001 ) - 2.0 );\n}\nfloat BlinnExponentToGGXRoughness( const in float blinnExponent ) {\n	return sqrt( 2.0 / ( blinnExponent + 2.0 ) );\n}\n";
 
 // File:src/renderers/shaders/ShaderChunk/bumpmap_pars_fragment.glsl
 
@@ -23411,7 +23582,11 @@ THREE.ShaderChunk[ 'color_vertex' ] = "#ifdef USE_COLOR\n	vColor.xyz = color.xyz
 
 // File:src/renderers/shaders/ShaderChunk/common.glsl
 
-THREE.ShaderChunk[ 'common' ] = "#define PI 3.14159\n#define PI2 6.28318\n#define RECIPROCAL_PI 0.31830988618\n#define RECIPROCAL_PI2 0.15915494\n#define LOG2 1.442695\n#define EPSILON 1e-6\n#define saturate(a) clamp( a, 0.0, 1.0 )\n#define whiteCompliment(a) ( 1.0 - saturate( a ) )\nfloat square( const in float x ) { return x*x; }\nfloat average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }\nstruct IncidentLight {\n	vec3 color;\n	vec3 direction;\n	bool visible;\n};\nstruct ReflectedLight {\n	vec3 directDiffuse;\n	vec3 directSpecular;\n	vec3 indirectDiffuse;\n	vec3 indirectSpecular;\n};\nstruct GeometricContext {\n	vec3 position;\n	vec3 normal;\n	vec3 viewDir;\n};\nvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n	return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n}\nvec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {\n	return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );\n}\nvec3 projectOnPlane(in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n	float distance = dot( planeNormal, point - pointOnPlane );\n	return - distance * planeNormal + point;\n}\nfloat sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n	return sign( dot( point - pointOnPlane, planeNormal ) );\n}\nvec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {\n	return lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;\n}\nvec3 inputToLinear( in vec3 a ) {\n	#ifdef GAMMA_INPUT\n		return pow( a, vec3( float( GAMMA_FACTOR ) ) );\n	#else\n		return a;\n	#endif\n}\nvec3 linearToOutput( in vec3 a ) {\n	#ifdef GAMMA_OUTPUT\n		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );\n	#else\n		return a;\n	#endif\n}\n";
+THREE.ShaderChunk[ 'common' ] = "#define PI 3.14159\n#define PI2 6.28318\n#define RECIPROCAL_PI 0.31830988618\n#define RECIPROCAL_PI2 0.15915494\n#define LOG2 1.442695\n#define EPSILON 1e-6\n#define saturate(a) clamp( a, 0.0, 1.0 )\n#define whiteCompliment(a) ( 1.0 - saturate( a ) )\nfloat pow2( const in float x ) { return x*x; }\nfloat pow3( const in float x ) { return x*x*x; }\nfloat pow4( const in float x ) { float x2 = x*x; return x2*x2; }\nfloat average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }\nstruct IncidentLight {\n	vec3 color;\n	vec3 direction;\n	bool visible;\n};\nstruct ReflectedLight {\n	vec3 directDiffuse;\n	vec3 directSpecular;\n	vec3 indirectDiffuse;\n	vec3 indirectSpecular;\n};\nstruct GeometricContext {\n	vec3 position;\n	vec3 normal;\n	vec3 viewDir;\n};\nvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n	return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n}\nvec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {\n	return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );\n}\nvec3 projectOnPlane(in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n	float distance = dot( planeNormal, point - pointOnPlane );\n	return - distance * planeNormal + point;\n}\nfloat sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n	return sign( dot( point - pointOnPlane, planeNormal ) );\n}\nvec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {\n	return lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;\n}\n";
+
+// File:src/renderers/shaders/ShaderChunk/cube_uv_reflection_fragment.glsl
+
+THREE.ShaderChunk[ 'cube_uv_reflection_fragment' ] = "#ifdef ENVMAP_TYPE_CUBE_UV\nconst float cubeUV_textureSize = 1024.0;\nint getFaceFromDirection(vec3 direction) {\n    vec3 absDirection = abs(direction);\n    int face = -1;\n    if( absDirection.x > absDirection.z ) {\n        if(absDirection.x > absDirection.y )\n            face = direction.x > 0.0 ? 0 : 3;\n        else\n            face = direction.y > 0.0 ? 1 : 4;\n    }\n    else {\n        if(absDirection.z > absDirection.y )\n            face = direction.z > 0.0 ? 2 : 5;\n        else\n            face = direction.y > 0.0 ? 1 : 4;\n    }\n    return face;\n}\nconst float cubeUV_maxLods1 = log2(cubeUV_textureSize*0.25) - 1.0;\nconst float cubeUV_rangeClamp = exp2((6.0 - 1.0) * 2.0);\nvec2 MipLevelInfo( vec3 vec, float roughnessLevel, float roughness ) {\n    float scale = exp2(cubeUV_maxLods1 - roughnessLevel);\n    float dxRoughness = dFdx(roughness);\n    float dyRoughness = dFdy(roughness);\n    vec3 dx = dFdx( vec * scale * dxRoughness );\n    vec3 dy = dFdy( vec * scale * dyRoughness );\n    float d = max( dot( dx, dx ), dot( dy, dy ) );\n    d = clamp(d, 1.0, cubeUV_rangeClamp);\n    float mipLevel = 0.5 * log2(d);\n    return vec2(floor(mipLevel), fract(mipLevel));\n}\nconst float cubeUV_maxLods2 = log2(cubeUV_textureSize*0.25) - 2.0;\nconst float cubeUV_rcpTextureSize = 1.0 / cubeUV_textureSize;\nvec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel) {\n    mipLevel = roughnessLevel > cubeUV_maxLods2 - 3.0 ? 0.0 : mipLevel;\n    float a = 16.0 * cubeUV_rcpTextureSize;\n    vec2 exp2_packed = exp2( vec2( roughnessLevel, mipLevel ) );\n    vec2 rcp_exp2_packed = vec2( 1.0 ) / exp2_packed;\n    float powScale = exp2_packed.x * exp2_packed.y;\n    float scale = rcp_exp2_packed.x * rcp_exp2_packed.y * 0.25;\n    float mipOffset = 0.75*(1.0 - rcp_exp2_packed.y) * rcp_exp2_packed.x;\n    bool bRes = mipLevel == 0.0;\n    scale =  bRes && (scale < a) ? a : scale;\n    vec3 r;\n    vec2 offset;\n    int face = getFaceFromDirection(direction);\n    float rcpPowScale = 1.0 / powScale;\n    if( face == 0) {\n        r = vec3(direction.x, -direction.z, direction.y);\n        offset = vec2(0.0+mipOffset,0.75 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  a : offset.y;\n    }\n    else if( face == 1) {\n        r = vec3(direction.y, direction.x, direction.z);\n        offset = vec2(scale+mipOffset, 0.75 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  a : offset.y;\n    }\n    else if( face == 2) {\n        r = vec3(direction.z, direction.x, direction.y);\n        offset = vec2(2.0*scale+mipOffset, 0.75 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  a : offset.y;\n    }\n    else if( face == 3) {\n        r = vec3(direction.x, direction.z, direction.y);\n        offset = vec2(0.0+mipOffset,0.5 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;\n    }\n    else if( face == 4) {\n        r = vec3(direction.y, direction.x, -direction.z);\n        offset = vec2(scale+mipOffset, 0.5 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;\n    }\n    else {\n        r = vec3(direction.z, -direction.x, direction.y);\n        offset = vec2(2.0*scale+mipOffset, 0.5 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;\n    }\n    r = normalize(r);\n    float texelOffset = 0.5 * cubeUV_rcpTextureSize;\n    vec2 s = ( r.yz / abs( r.x ) + vec2( 1.0 ) ) * 0.5;\n    vec2 base = offset + vec2( texelOffset );\n    return base + s * ( scale - 2.0 * texelOffset );\n}\nconst float cubeUV_maxLods3 = log2(cubeUV_textureSize*0.25) - 3.0;\nvec4 textureCubeUV(vec3 reflectedDirection, float roughness ) {\n    float roughnessVal = roughness* cubeUV_maxLods3;\n    float r1 = floor(roughnessVal);\n    float r2 = r1 + 1.0;\n    float t = fract(roughnessVal);\n    vec2 mipInfo = MipLevelInfo(reflectedDirection, r1, roughness);\n    float s = mipInfo.y;\n    float level0 = mipInfo.x;\n    float level1 = level0 + 1.0;\n    level1 = level1 > 5.0 ? 5.0 : level1;\n    level0 += min( floor( s + 0.5 ), 5.0 );\n    vec2 uv_10 = getCubeUV(reflectedDirection, r1, level0);\n    vec4 color10 = envMapTexelToLinear(texture2D(envMap, uv_10));\n    vec2 uv_20 = getCubeUV(reflectedDirection, r2, level0);\n    vec4 color20 = envMapTexelToLinear(texture2D(envMap, uv_20));\n    vec4 result = mix(color10, color20, t);\n    return vec4(result.rgb, 1.0);\n}\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/defaultnormal_vertex.glsl
 
@@ -23427,15 +23602,23 @@ THREE.ShaderChunk[ 'displacementmap_pars_vertex' ] = "#ifdef USE_DISPLACEMENTMAP
 
 // File:src/renderers/shaders/ShaderChunk/emissivemap_fragment.glsl
 
-THREE.ShaderChunk[ 'emissivemap_fragment' ] = "#ifdef USE_EMISSIVEMAP\n	vec4 emissiveColor = texture2D( emissiveMap, vUv );\n	emissiveColor.rgb = inputToLinear( emissiveColor.rgb );\n	totalEmissiveLight *= emissiveColor.rgb;\n#endif\n";
+THREE.ShaderChunk[ 'emissivemap_fragment' ] = "#ifdef USE_EMISSIVEMAP\n	vec4 emissiveColor = texture2D( emissiveMap, vUv );\n	emissiveColor.rgb = emissiveMapTexelToLinear( emissiveColor ).rgb;\n	totalEmissiveRadiance *= emissiveColor.rgb;\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/emissivemap_pars_fragment.glsl
 
 THREE.ShaderChunk[ 'emissivemap_pars_fragment' ] = "#ifdef USE_EMISSIVEMAP\n	uniform sampler2D emissiveMap;\n#endif\n";
 
+// File:src/renderers/shaders/ShaderChunk/encodings_pars_fragment.glsl
+
+THREE.ShaderChunk[ 'encodings_pars_fragment' ] = "\nvec4 LinearToLinear( in vec4 value ) {\n  return value;\n}\nvec4 GammaToLinear( in vec4 value, in float gammaFactor ) {\n  return vec4( pow( value.xyz, vec3( gammaFactor ) ), value.w );\n}\nvec4 LinearToGamma( in vec4 value, in float gammaFactor ) {\n  return vec4( pow( value.xyz, vec3( 1.0 / gammaFactor ) ), value.w );\n}\nvec4 sRGBToLinear( in vec4 value ) {\n  return vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.w );\n}\nvec4 LinearTosRGB( in vec4 value ) {\n  return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.w );\n}\nvec4 RGBEToLinear( in vec4 value ) {\n  return vec4( value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0 );\n}\nvec4 LinearToRGBE( in vec4 value ) {\n  float maxComponent = max( max( value.r, value.g ), value.b );\n  float fExp = clamp( ceil( log2( maxComponent ) ), -128.0, 127.0 );\n  return vec4( value.rgb / exp2( fExp ), ( fExp + 128.0 ) / 255.0 );\n}\nvec4 RGBMToLinear( in vec4 value, in float maxRange ) {\n  return vec4( value.xyz * value.w * maxRange, 1.0 );\n}\nvec4 LinearToRGBM( in vec4 value, in float maxRange ) {\n  float maxRGB = max( value.x, max( value.g, value.b ) );\n  float M      = clamp( maxRGB / maxRange, 0.0, 1.0 );\n  M            = ceil( M * 255.0 ) / 255.0;\n  return vec4( value.rgb / ( M * maxRange ), M );\n}\nvec4 RGBDToLinear( in vec4 value, in float maxRange ) {\n    return vec4( value.rgb * ( ( maxRange / 255.0 ) / value.a ), 1.0 );\n}\nvec4 LinearToRGBD( in vec4 value, in float maxRange ) {\n    float maxRGB = max( value.x, max( value.g, value.b ) );\n    float D      = max( maxRange / maxRGB, 1.0 );\n    D            = min( floor( D ) / 255.0, 1.0 );\n    return vec4( value.rgb * ( D * ( 255.0 / maxRange ) ), D );\n}\nconst mat3 cLogLuvM = mat3( 0.2209, 0.3390, 0.4184, 0.1138, 0.6780, 0.7319, 0.0102, 0.1130, 0.2969 );\nvec4 LinearToLogLuv( in vec4 value )  {\n  vec3 Xp_Y_XYZp = value.rgb * cLogLuvM;\n  Xp_Y_XYZp = max(Xp_Y_XYZp, vec3(1e-6, 1e-6, 1e-6));\n  vec4 vResult;\n  vResult.xy = Xp_Y_XYZp.xy / Xp_Y_XYZp.z;\n  float Le = 2.0 * log2(Xp_Y_XYZp.y) + 127.0;\n  vResult.w = fract(Le);\n  vResult.z = (Le - (floor(vResult.w*255.0))/255.0)/255.0;\n  return vResult;\n}\nconst mat3 cLogLuvInverseM = mat3( 6.0014, -2.7008, -1.7996, -1.3320, 3.1029, -5.7721, 0.3008, -1.0882, 5.6268 );\nvec4 LogLuvToLinear( in vec4 value ) {\n  float Le = value.z * 255.0 + value.w;\n  vec3 Xp_Y_XYZp;\n  Xp_Y_XYZp.y = exp2((Le - 127.0) / 2.0);\n  Xp_Y_XYZp.z = Xp_Y_XYZp.y / value.y;\n  Xp_Y_XYZp.x = value.x * Xp_Y_XYZp.z;\n  vec3 vRGB = Xp_Y_XYZp.rgb * cLogLuvInverseM;\n  return vec4( max(vRGB, 0.0), 1.0 );\n}\n";
+
+// File:src/renderers/shaders/ShaderChunk/encodings_fragment.glsl
+
+THREE.ShaderChunk[ 'encodings_fragment' ] = "  gl_FragColor = linearToOutputTexel( gl_FragColor );\n";
+
 // File:src/renderers/shaders/ShaderChunk/envmap_fragment.glsl
 
-THREE.ShaderChunk[ 'envmap_fragment' ] = "#ifdef USE_ENVMAP\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );\n		vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n		#ifdef ENVMAP_MODE_REFLECTION\n			vec3 reflectVec = reflect( cameraToVertex, worldNormal );\n		#else\n			vec3 reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );\n		#endif\n	#else\n		vec3 reflectVec = vReflect;\n	#endif\n	#ifdef DOUBLE_SIDED\n		float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n	#else\n		float flipNormal = 1.0;\n	#endif\n	#ifdef ENVMAP_TYPE_CUBE\n		vec4 envColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n	#elif defined( ENVMAP_TYPE_EQUIREC )\n		vec2 sampleUV;\n		sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n		vec4 envColor = texture2D( envMap, sampleUV );\n	#elif defined( ENVMAP_TYPE_SPHERE )\n		vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );\n	#endif\n	envColor.xyz = inputToLinear( envColor.xyz );\n	#ifdef ENVMAP_BLENDING_MULTIPLY\n		outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );\n	#elif defined( ENVMAP_BLENDING_MIX )\n		outgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );\n	#elif defined( ENVMAP_BLENDING_ADD )\n		outgoingLight += envColor.xyz * specularStrength * reflectivity;\n	#endif\n#endif\n";
+THREE.ShaderChunk[ 'envmap_fragment' ] = "#ifdef USE_ENVMAP\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );\n		vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n		#ifdef ENVMAP_MODE_REFLECTION\n			vec3 reflectVec = reflect( cameraToVertex, worldNormal );\n		#else\n			vec3 reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );\n		#endif\n	#else\n		vec3 reflectVec = vReflect;\n	#endif\n	#ifdef DOUBLE_SIDED\n		float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n	#else\n		float flipNormal = 1.0;\n	#endif\n	#ifdef ENVMAP_TYPE_CUBE\n		vec4 envColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n	#elif defined( ENVMAP_TYPE_EQUIREC )\n		vec2 sampleUV;\n		sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n		vec4 envColor = texture2D( envMap, sampleUV );\n	#elif defined( ENVMAP_TYPE_SPHERE )\n		vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );\n	#endif\n	envColor = envMapTexelToLinear( envColor );\n	#ifdef ENVMAP_BLENDING_MULTIPLY\n		outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );\n	#elif defined( ENVMAP_BLENDING_MIX )\n		outgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );\n	#elif defined( ENVMAP_BLENDING_ADD )\n		outgoingLight += envColor.xyz * specularStrength * reflectivity;\n	#endif\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/envmap_pars_fragment.glsl
 
@@ -23451,7 +23634,7 @@ THREE.ShaderChunk[ 'envmap_vertex' ] = "#if defined( USE_ENVMAP ) && ! defined( 
 
 // File:src/renderers/shaders/ShaderChunk/fog_fragment.glsl
 
-THREE.ShaderChunk[ 'fog_fragment' ] = "#ifdef USE_FOG\n	#ifdef USE_LOGDEPTHBUF_EXT\n		float depth = gl_FragDepthEXT / gl_FragCoord.w;\n	#else\n		float depth = gl_FragCoord.z / gl_FragCoord.w;\n	#endif\n	#ifdef FOG_EXP2\n		float fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * depth * depth * LOG2 ) );\n	#else\n		float fogFactor = smoothstep( fogNear, fogFar, depth );\n	#endif\n	\n	outgoingLight = mix( outgoingLight, fogColor, fogFactor );\n#endif";
+THREE.ShaderChunk[ 'fog_fragment' ] = "#ifdef USE_FOG\n	#ifdef USE_LOGDEPTHBUF_EXT\n		float depth = gl_FragDepthEXT / gl_FragCoord.w;\n	#else\n		float depth = gl_FragCoord.z / gl_FragCoord.w;\n	#endif\n	#ifdef FOG_EXP2\n		float fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * depth * depth * LOG2 ) );\n	#else\n		float fogFactor = smoothstep( fogNear, fogFar, depth );\n	#endif\n	gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/fog_pars_fragment.glsl
 
@@ -23467,11 +23650,11 @@ THREE.ShaderChunk[ 'lightmap_pars_fragment' ] = "#ifdef USE_LIGHTMAP\n	uniform s
 
 // File:src/renderers/shaders/ShaderChunk/lights_lambert_vertex.glsl
 
-THREE.ShaderChunk[ 'lights_lambert_vertex' ] = "vec3 diffuse = vec3( 1.0 );\nGeometricContext geometry;\ngeometry.position = mvPosition.xyz;\ngeometry.normal = normalize( transformedNormal );\ngeometry.viewDir = normalize( -mvPosition.xyz );\nGeometricContext backGeometry;\nbackGeometry.position = geometry.position;\nbackGeometry.normal = -geometry.normal;\nbackGeometry.viewDir = geometry.viewDir;\nvLightFront = vec3( 0.0 );\n#ifdef DOUBLE_SIDED\n	vLightBack = vec3( 0.0 );\n#endif\nIncidentLight directLight;\nfloat dotNL;\nvec3 directLightColor_Diffuse;\n#if NUM_POINT_LIGHTS > 0\n	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n		directLight = getPointDirectLight( pointLights[ i ], geometry );\n		dotNL = dot( geometry.normal, directLight.direction );\n		directLightColor_Diffuse = PI * directLight.color;\n		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n		#ifdef DOUBLE_SIDED\n			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n		#endif\n	}\n#endif\n#if NUM_SPOT_LIGHTS > 0\n	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n		directLight = getSpotDirectLight( spotLights[ i ], geometry );\n		dotNL = dot( geometry.normal, directLight.direction );\n		directLightColor_Diffuse = PI * directLight.color;\n		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n		#ifdef DOUBLE_SIDED\n			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n		#endif\n	}\n#endif\n#if NUM_DIR_LIGHTS > 0\n	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n		directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );\n		dotNL = dot( geometry.normal, directLight.direction );\n		directLightColor_Diffuse = PI * directLight.color;\n		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n		#ifdef DOUBLE_SIDED\n			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n		#endif\n	}\n#endif\n#if NUM_HEMI_LIGHTS > 0\n	for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n		vLightFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );\n		#ifdef DOUBLE_SIDED\n			vLightBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );\n		#endif\n	}\n#endif\n";
+THREE.ShaderChunk[ 'lights_lambert_vertex' ] = "vec3 diffuse = vec3( 1.0 );\nGeometricContext geometry;\ngeometry.position = mvPosition.xyz;\ngeometry.normal = normalize( transformedNormal );\ngeometry.viewDir = normalize( -mvPosition.xyz );\nGeometricContext backGeometry;\nbackGeometry.position = geometry.position;\nbackGeometry.normal = -geometry.normal;\nbackGeometry.viewDir = geometry.viewDir;\nvLightFront = vec3( 0.0 );\n#ifdef DOUBLE_SIDED\n	vLightBack = vec3( 0.0 );\n#endif\nIncidentLight directLight;\nfloat dotNL;\nvec3 directLightColor_Diffuse;\n#if NUM_POINT_LIGHTS > 0\n	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n		directLight = getPointDirectLightIrradiance( pointLights[ i ], geometry );\n		dotNL = dot( geometry.normal, directLight.direction );\n		directLightColor_Diffuse = PI * directLight.color;\n		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n		#ifdef DOUBLE_SIDED\n			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n		#endif\n	}\n#endif\n#if NUM_SPOT_LIGHTS > 0\n	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n		directLight = getSpotDirectLightIrradiance( spotLights[ i ], geometry );\n		dotNL = dot( geometry.normal, directLight.direction );\n		directLightColor_Diffuse = PI * directLight.color;\n		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n		#ifdef DOUBLE_SIDED\n			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n		#endif\n	}\n#endif\n#if NUM_DIR_LIGHTS > 0\n	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n		directLight = getDirectionalDirectLightIrradiance( directionalLights[ i ], geometry );\n		dotNL = dot( geometry.normal, directLight.direction );\n		directLightColor_Diffuse = PI * directLight.color;\n		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n		#ifdef DOUBLE_SIDED\n			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n		#endif\n	}\n#endif\n#if NUM_HEMI_LIGHTS > 0\n	for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n		vLightFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );\n		#ifdef DOUBLE_SIDED\n			vLightBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );\n		#endif\n	}\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_pars.glsl
 
-THREE.ShaderChunk[ 'lights_pars' ] = "#if NUM_DIR_LIGHTS > 0\n	struct DirectionalLight {\n		vec3 direction;\n		vec3 color;\n		int shadow;\n		float shadowBias;\n		float shadowRadius;\n		vec2 shadowMapSize;\n	};\n	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\n	IncidentLight getDirectionalDirectLight( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		directLight.color = directionalLight.color;\n		directLight.direction = directionalLight.direction;\n		directLight.visible = true;\n		return directLight;\n	}\n#endif\n#if NUM_POINT_LIGHTS > 0\n	struct PointLight {\n		vec3 position;\n		vec3 color;\n		float distance;\n		float decay;\n		int shadow;\n		float shadowBias;\n		float shadowRadius;\n		vec2 shadowMapSize;\n	};\n	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];\n	IncidentLight getPointDirectLight( const in PointLight pointLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		vec3 lVector = pointLight.position - geometry.position;\n		directLight.direction = normalize( lVector );\n		float lightDistance = length( lVector );\n		if ( testLightInRange( lightDistance, pointLight.distance ) ) {\n			directLight.color = pointLight.color;\n			directLight.color *= calcLightAttenuation( lightDistance, pointLight.distance, pointLight.decay );\n			directLight.visible = true;\n		} else {\n			directLight.color = vec3( 0.0 );\n			directLight.visible = false;\n		}\n		return directLight;\n	}\n#endif\n#if NUM_SPOT_LIGHTS > 0\n	struct SpotLight {\n		vec3 position;\n		vec3 direction;\n		vec3 color;\n		float distance;\n		float decay;\n		float angleCos;\n		float penumbra;\n		int shadow;\n		float shadowBias;\n		float shadowRadius;\n		vec2 shadowMapSize;\n	};\n	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];\n	IncidentLight getSpotDirectLight( const in SpotLight spotLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		vec3 lVector = spotLight.position - geometry.position;\n		directLight.direction = normalize( lVector );\n		float lightDistance = length( lVector );\n		float spotEffect = dot( directLight.direction, spotLight.direction );\n		if ( all( bvec2( spotEffect > spotLight.angleCos, testLightInRange( lightDistance, spotLight.distance ) ) ) ) {\n			float spotEffect = dot( spotLight.direction, directLight.direction );\n			spotEffect *= clamp( ( spotEffect - spotLight.angleCos ) / spotLight.penumbra, 0.0, 1.0 );\n			directLight.color = spotLight.color;\n			directLight.color *= ( spotEffect * calcLightAttenuation( lightDistance, spotLight.distance, spotLight.decay ) );\n			directLight.visible = true;\n		} else {\n			directLight.color = vec3( 0.0 );\n			directLight.visible = false;\n		}\n		return directLight;\n	}\n#endif\n#if NUM_HEMI_LIGHTS > 0\n	struct HemisphereLight {\n		vec3 direction;\n		vec3 skyColor;\n		vec3 groundColor;\n	};\n	uniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];\n	vec3 getHemisphereLightIrradiance( const in HemisphereLight hemiLight, const in GeometricContext geometry ) {\n		float dotNL = dot( geometry.normal, hemiLight.direction );\n		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;\n		return PI * mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );\n	}\n#endif\n#if defined( USE_ENVMAP ) && defined( STANDARD )\n	vec3 getLightProbeIndirectIrradiance( const in GeometricContext geometry, const in int maxMIPLevel ) {\n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );\n		#ifdef ENVMAP_TYPE_CUBE\n			vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = textureCubeLodEXT( envMap, queryVec, float( maxMIPLevel ) );\n			#else\n				vec4 envMapColor = textureCube( envMap, queryVec, float( maxMIPLevel ) );\n			#endif\n		#else\n			vec3 envMapColor = vec3( 0.0 );\n		#endif\n		envMapColor.rgb = inputToLinear( envMapColor.rgb );\n		return PI * envMapColor.rgb * envMapIntensity;\n	}\n	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {\n		float maxMIPLevelScalar = float( maxMIPLevel );\n		float desiredMIPLevel = maxMIPLevelScalar - 0.79248 - 0.5 * log2( square( blinnShininessExponent ) + 1.0 );\n		return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );\n	}\n	vec3 getLightProbeIndirectRadiance( const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) {\n		#ifdef ENVMAP_MODE_REFLECTION\n			vec3 reflectVec = reflect( -geometry.viewDir, geometry.normal );\n		#else\n			vec3 reflectVec = refract( -geometry.viewDir, geometry.normal, refractionRatio );\n		#endif\n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		reflectVec = inverseTransformDirection( reflectVec, viewMatrix );\n		float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );\n		#ifdef ENVMAP_TYPE_CUBE\n			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );\n			#else\n				vec4 envMapColor = textureCube( envMap, queryReflectVec, specularMIPLevel );\n			#endif\n		#elif defined( ENVMAP_TYPE_EQUIREC )\n			vec2 sampleUV;\n			sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n			sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = texture2DLodEXT( envMap, sampleUV, specularMIPLevel );\n			#else\n				vec4 envMapColor = texture2D( envMap, sampleUV, specularMIPLevel );\n			#endif\n		#elif defined( ENVMAP_TYPE_SPHERE )\n			vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = texture2DLodEXT( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );\n			#else\n				vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );\n			#endif\n		#endif\n		envMapColor.rgb = inputToLinear( envMapColor.rgb );\n		return envMapColor.rgb * envMapIntensity;\n	}\n#endif\n";
+THREE.ShaderChunk[ 'lights_pars' ] = "uniform vec3 ambientLightColor;\nvec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {\n	vec3 irradiance = ambientLightColor;\n	#ifndef PHYSICALLY_CORRECT_LIGHTS\n		irradiance *= PI;\n	#endif\n	return irradiance;\n}\n#if NUM_DIR_LIGHTS > 0\n	struct DirectionalLight {\n		vec3 direction;\n		vec3 color;\n		int shadow;\n		float shadowBias;\n		float shadowRadius;\n		vec2 shadowMapSize;\n	};\n	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\n	IncidentLight getDirectionalDirectLightIrradiance( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		directLight.color = directionalLight.color;\n		directLight.direction = directionalLight.direction;\n		directLight.visible = true;\n		return directLight;\n	}\n#endif\n#if NUM_POINT_LIGHTS > 0\n	struct PointLight {\n		vec3 position;\n		vec3 color;\n		float distance;\n		float decay;\n		int shadow;\n		float shadowBias;\n		float shadowRadius;\n		vec2 shadowMapSize;\n	};\n	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];\n	IncidentLight getPointDirectLightIrradiance( const in PointLight pointLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		vec3 lVector = pointLight.position - geometry.position;\n		directLight.direction = normalize( lVector );\n		float lightDistance = length( lVector );\n		if ( testLightInRange( lightDistance, pointLight.distance ) ) {\n			directLight.color = pointLight.color;\n			directLight.color *= punctualLightIntensityToIrradianceFactor( lightDistance, pointLight.distance, pointLight.decay );\n			directLight.visible = true;\n		} else {\n			directLight.color = vec3( 0.0 );\n			directLight.visible = false;\n		}\n		return directLight;\n	}\n#endif\n#if NUM_SPOT_LIGHTS > 0\n	struct SpotLight {\n		vec3 position;\n		vec3 direction;\n		vec3 color;\n		float distance;\n		float decay;\n		float coneCos;\n		float penumbraCos;\n		int shadow;\n		float shadowBias;\n		float shadowRadius;\n		vec2 shadowMapSize;\n	};\n	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];\n	IncidentLight getSpotDirectLightIrradiance( const in SpotLight spotLight, const in GeometricContext geometry ) {\n		IncidentLight directLight;\n		vec3 lVector = spotLight.position - geometry.position;\n		directLight.direction = normalize( lVector );\n		float lightDistance = length( lVector );\n		float angleCos = dot( directLight.direction, spotLight.direction );\n		if ( all( bvec2( angleCos > spotLight.coneCos, testLightInRange( lightDistance, spotLight.distance ) ) ) ) {\n			float spotEffect = smoothstep( spotLight.coneCos, spotLight.penumbraCos, angleCos );\n			directLight.color = spotLight.color;\n			directLight.color *= spotEffect * punctualLightIntensityToIrradianceFactor( lightDistance, spotLight.distance, spotLight.decay );\n			directLight.visible = true;\n		} else {\n			directLight.color = vec3( 0.0 );\n			directLight.visible = false;\n		}\n		return directLight;\n	}\n#endif\n#if NUM_HEMI_LIGHTS > 0\n	struct HemisphereLight {\n		vec3 direction;\n		vec3 skyColor;\n		vec3 groundColor;\n	};\n	uniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];\n	vec3 getHemisphereLightIrradiance( const in HemisphereLight hemiLight, const in GeometricContext geometry ) {\n		float dotNL = dot( geometry.normal, hemiLight.direction );\n		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;\n		vec3 irradiance = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );\n		#ifndef PHYSICALLY_CORRECT_LIGHTS\n			irradiance *= PI;\n		#endif\n		return irradiance;\n	}\n#endif\n#if defined( USE_ENVMAP ) && defined( STANDARD )\n	vec3 getLightProbeIndirectIrradiance( const in GeometricContext geometry, const in int maxMIPLevel ) {\n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );\n		#ifdef ENVMAP_TYPE_CUBE\n			vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = textureCubeLodEXT( envMap, queryVec, float( maxMIPLevel ) );\n			#else\n				vec4 envMapColor = textureCube( envMap, queryVec, float( maxMIPLevel ) );\n			#endif\n		#elif defined( ENVMAP_TYPE_CUBE_UV )\n			vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );\n			vec4 envMapColor = textureCubeUV( queryVec, 1.0 );\n		#else\n			vec4 envMapColor = vec4( 0.0 );\n		#endif\n		envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;\n		return PI * envMapColor.rgb * envMapIntensity;\n	}\n	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {\n		float maxMIPLevelScalar = float( maxMIPLevel );\n		float desiredMIPLevel = maxMIPLevelScalar - 0.79248 - 0.5 * log2( pow2( blinnShininessExponent ) + 1.0 );\n		return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );\n	}\n	vec3 getLightProbeIndirectRadiance( const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) {\n		#ifdef ENVMAP_MODE_REFLECTION\n			vec3 reflectVec = reflect( -geometry.viewDir, geometry.normal );\n		#else\n			vec3 reflectVec = refract( -geometry.viewDir, geometry.normal, refractionRatio );\n		#endif\n		#ifdef DOUBLE_SIDED\n			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n		#else\n			float flipNormal = 1.0;\n		#endif\n		reflectVec = inverseTransformDirection( reflectVec, viewMatrix );\n		float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );\n		#ifdef ENVMAP_TYPE_CUBE\n			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );\n			#else\n				vec4 envMapColor = textureCube( envMap, queryReflectVec, specularMIPLevel );\n			#endif\n		#elif defined( ENVMAP_TYPE_CUBE_UV )\n			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );\n			vec4 envMapColor = textureCubeUV(queryReflectVec, BlinnExponentToGGXRoughness(blinnShininessExponent));\n		#elif defined( ENVMAP_TYPE_EQUIREC )\n			vec2 sampleUV;\n			sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n			sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = texture2DLodEXT( envMap, sampleUV, specularMIPLevel );\n			#else\n				vec4 envMapColor = texture2D( envMap, sampleUV, specularMIPLevel );\n			#endif\n		#elif defined( ENVMAP_TYPE_SPHERE )\n			vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n			#ifdef TEXTURE_LOD_EXT\n				vec4 envMapColor = texture2DLodEXT( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );\n			#else\n				vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );\n			#endif\n		#endif\n		envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;\n		return envMapColor.rgb * envMapIntensity;\n	}\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_fragment.glsl
 
@@ -23479,7 +23662,7 @@ THREE.ShaderChunk[ 'lights_phong_fragment' ] = "BlinnPhongMaterial material;\nma
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_phong_pars_fragment' ] = "#ifdef USE_ENVMAP\n	varying vec3 vWorldPosition;\n#endif\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\nstruct BlinnPhongMaterial {\n	vec3	diffuseColor;\n	vec3	specularColor;\n	float	specularShininess;\n	float	specularStrength;\n};\nvoid RE_Direct_BlinnPhong( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	vec3 irradiance = dotNL * PI * directLight.color;\n	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;\n}\nvoid RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\n#define RE_Direct				RE_Direct_BlinnPhong\n#define RE_IndirectDiffuse		RE_IndirectDiffuse_BlinnPhong\n#define Material_LightProbeLOD( material )	(0)\n";
+THREE.ShaderChunk[ 'lights_phong_pars_fragment' ] = "#ifdef USE_ENVMAP\n	varying vec3 vWorldPosition;\n#endif\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\nstruct BlinnPhongMaterial {\n	vec3	diffuseColor;\n	vec3	specularColor;\n	float	specularShininess;\n	float	specularStrength;\n};\nvoid RE_Direct_BlinnPhong( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	vec3 irradiance = dotNL * directLight.color;\n	#ifndef PHYSICALLY_CORRECT_LIGHTS\n		irradiance *= PI;\n	#endif\n	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;\n}\nvoid RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\n#define RE_Direct				RE_Direct_BlinnPhong\n#define RE_IndirectDiffuse		RE_IndirectDiffuse_BlinnPhong\n#define Material_LightProbeLOD( material )	(0)\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_pars_vertex.glsl
 
@@ -23495,15 +23678,11 @@ THREE.ShaderChunk[ 'lights_standard_fragment' ] = "StandardMaterial material;\nm
 
 // File:src/renderers/shaders/ShaderChunk/lights_standard_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_standard_pars_fragment' ] = "struct StandardMaterial {\n	vec3	diffuseColor;\n	float	specularRoughness;\n	vec3	specularColor;\n};\nvoid RE_Direct_Standard( const in IncidentLight directLight, const in GeometricContext geometry, const in StandardMaterial material, inout ReflectedLight reflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	vec3 irradiance = dotNL * PI * directLight.color;\n	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n	reflectedLight.directSpecular += irradiance * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.specularRoughness );\n}\nvoid RE_IndirectDiffuse_Standard( const in vec3 irradiance, const in GeometricContext geometry, const in StandardMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\nvoid RE_IndirectSpecular_Standard( const in vec3 radiance, const in GeometricContext geometry, const in StandardMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectSpecular += radiance * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );\n}\n#define RE_Direct				RE_Direct_Standard\n#define RE_IndirectDiffuse		RE_IndirectDiffuse_Standard\n#define RE_IndirectSpecular		RE_IndirectSpecular_Standard\n#define Material_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.specularRoughness )\n";
+THREE.ShaderChunk[ 'lights_standard_pars_fragment' ] = "struct StandardMaterial {\n	vec3	diffuseColor;\n	float	specularRoughness;\n	vec3	specularColor;\n};\nvoid RE_Direct_Standard( const in IncidentLight directLight, const in GeometricContext geometry, const in StandardMaterial material, inout ReflectedLight reflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	vec3 irradiance = dotNL * directLight.color;\n	#ifndef PHYSICALLY_CORRECT_LIGHTS\n		irradiance *= PI;\n	#endif\n	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n	reflectedLight.directSpecular += irradiance * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.specularRoughness );\n}\nvoid RE_IndirectDiffuse_Standard( const in vec3 irradiance, const in GeometricContext geometry, const in StandardMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\nvoid RE_IndirectSpecular_Standard( const in vec3 radiance, const in GeometricContext geometry, const in StandardMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectSpecular += radiance * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );\n}\n#define RE_Direct				RE_Direct_Standard\n#define RE_IndirectDiffuse		RE_IndirectDiffuse_Standard\n#define RE_IndirectSpecular		RE_IndirectSpecular_Standard\n#define Material_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.specularRoughness )\nfloat computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {\n	return saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );\n}\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_template.glsl
 
-THREE.ShaderChunk[ 'lights_template' ] = "\nGeometricContext geometry;\ngeometry.position = - vViewPosition;\ngeometry.normal = normal;\ngeometry.viewDir = normalize( vViewPosition );\nIncidentLight directLight;\n#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )\n	PointLight pointLight;\n	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n		pointLight = pointLights[ i ];\n		directLight = getPointDirectLight( pointLight, geometry );\n		#ifdef USE_SHADOWMAP\n		directLight.color *= all( bvec2( pointLight.shadow, directLight.visible ) ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ] ) : 1.0;\n		#endif\n		RE_Direct( directLight, geometry, material, reflectedLight );\n	}\n#endif\n#if ( NUM_SPOT_LIGHTS > 0 ) && defined( RE_Direct )\n	SpotLight spotLight;\n	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n		spotLight = spotLights[ i ];\n		directLight = getSpotDirectLight( spotLight, geometry );\n		#ifdef USE_SHADOWMAP\n		directLight.color *= all( bvec2( spotLight.shadow, directLight.visible ) ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;\n		#endif\n		RE_Direct( directLight, geometry, material, reflectedLight );\n	}\n#endif\n#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )\n	DirectionalLight directionalLight;\n	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n		directionalLight = directionalLights[ i ];\n		directLight = getDirectionalDirectLight( directionalLight, geometry );\n		#ifdef USE_SHADOWMAP\n		directLight.color *= all( bvec2( directionalLight.shadow, directLight.visible ) ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;\n		#endif\n		RE_Direct( directLight, geometry, material, reflectedLight );\n	}\n#endif\n#if defined( RE_IndirectDiffuse )\n	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );\n	#ifdef USE_LIGHTMAP\n		irradiance += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;\n	#endif\n	#if ( NUM_HEMI_LIGHTS > 0 )\n		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );\n		}\n	#endif\n	RE_IndirectDiffuse( irradiance, geometry, material, reflectedLight );\n#endif\n#if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )\n	vec3 radiance = getLightProbeIndirectRadiance( geometry, Material_BlinnShininessExponent( material ), 8 );\n	RE_IndirectSpecular( radiance, geometry, material, reflectedLight );\n#endif\n";
-
-// File:src/renderers/shaders/ShaderChunk/linear_to_gamma_fragment.glsl
-
-THREE.ShaderChunk[ 'linear_to_gamma_fragment' ] = "\n	outgoingLight = linearToOutput( outgoingLight );\n";
+THREE.ShaderChunk[ 'lights_template' ] = "\nGeometricContext geometry;\ngeometry.position = - vViewPosition;\ngeometry.normal = normal;\ngeometry.viewDir = normalize( vViewPosition );\nIncidentLight directLight;\n#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )\n	PointLight pointLight;\n	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n		pointLight = pointLights[ i ];\n		directLight = getPointDirectLightIrradiance( pointLight, geometry );\n		#ifdef USE_SHADOWMAP\n		directLight.color *= all( bvec2( pointLight.shadow, directLight.visible ) ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ] ) : 1.0;\n		#endif\n		RE_Direct( directLight, geometry, material, reflectedLight );\n	}\n#endif\n#if ( NUM_SPOT_LIGHTS > 0 ) && defined( RE_Direct )\n	SpotLight spotLight;\n	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n		spotLight = spotLights[ i ];\n		directLight = getSpotDirectLightIrradiance( spotLight, geometry );\n		#ifdef USE_SHADOWMAP\n		directLight.color *= all( bvec2( spotLight.shadow, directLight.visible ) ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;\n		#endif\n		RE_Direct( directLight, geometry, material, reflectedLight );\n	}\n#endif\n#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )\n	DirectionalLight directionalLight;\n	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n		directionalLight = directionalLights[ i ];\n		directLight = getDirectionalDirectLightIrradiance( directionalLight, geometry );\n		#ifdef USE_SHADOWMAP\n		directLight.color *= all( bvec2( directionalLight.shadow, directLight.visible ) ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;\n		#endif\n		RE_Direct( directLight, geometry, material, reflectedLight );\n	}\n#endif\n#if defined( RE_IndirectDiffuse )\n	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );\n	#ifdef USE_LIGHTMAP\n		vec3 lightMapIrradiance = texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;\n		#ifndef PHYSICALLY_CORRECT_LIGHTS\n			lightMapIrradiance *= PI;\n		#endif\n		irradiance += lightMapIrradiance;\n	#endif\n	#if ( NUM_HEMI_LIGHTS > 0 )\n		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );\n		}\n	#endif\n	#if defined( USE_ENVMAP ) && defined( STANDARD ) && defined( ENVMAP_TYPE_CUBE_UV )\n	 	irradiance += getLightProbeIndirectIrradiance( geometry, 8 );\n	#endif\n	RE_IndirectDiffuse( irradiance, geometry, material, reflectedLight );\n#endif\n#if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )\n	vec3 radiance = getLightProbeIndirectRadiance( geometry, Material_BlinnShininessExponent( material ), 8 );\n	RE_IndirectSpecular( radiance, geometry, material, reflectedLight );\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/logdepthbuf_fragment.glsl
 
@@ -23523,15 +23702,15 @@ THREE.ShaderChunk[ 'logdepthbuf_vertex' ] = "#ifdef USE_LOGDEPTHBUF\n	gl_Positio
 
 // File:src/renderers/shaders/ShaderChunk/map_fragment.glsl
 
-THREE.ShaderChunk[ 'map_fragment' ] = "#ifdef USE_MAP\n	vec4 texelColor = texture2D( map, vUv );\n	texelColor.xyz = inputToLinear( texelColor.xyz );\n	diffuseColor *= texelColor;\n#endif\n";
+THREE.ShaderChunk[ 'map_fragment' ] = "#ifdef USE_MAP\n	vec4 texelColor = texture2D( map, vUv );\n	texelColor = mapTexelToLinear( texelColor );\n	diffuseColor *= texelColor;\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/map_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'map_pars_fragment' ] = "#ifdef USE_MAP\n	uniform sampler2D map;\n#endif";
+THREE.ShaderChunk[ 'map_pars_fragment' ] = "#ifdef USE_MAP\n	uniform sampler2D map;\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/map_particle_fragment.glsl
 
-THREE.ShaderChunk[ 'map_particle_fragment' ] = "#ifdef USE_MAP\n	diffuseColor *= texture2D( map, vec2( gl_PointCoord.x, 1.0 - gl_PointCoord.y ) * offsetRepeat.zw + offsetRepeat.xy );\n#endif\n";
+THREE.ShaderChunk[ 'map_particle_fragment' ] = "#ifdef USE_MAP\n	vec4 mapTexel = texture2D( map, vec2( gl_PointCoord.x, 1.0 - gl_PointCoord.y ) * offsetRepeat.zw + offsetRepeat.xy );\n	diffuseColor *= mapTexelToLinear( mapTexel );\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/map_particle_pars_fragment.glsl
 
@@ -23564,6 +23743,10 @@ THREE.ShaderChunk[ 'normal_fragment' ] = "#ifdef FLAT_SHADED\n	vec3 fdx = vec3( 
 // File:src/renderers/shaders/ShaderChunk/normalmap_pars_fragment.glsl
 
 THREE.ShaderChunk[ 'normalmap_pars_fragment' ] = "#ifdef USE_NORMALMAP\n	uniform sampler2D normalMap;\n	uniform vec2 normalScale;\n	vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm ) {\n		vec3 q0 = dFdx( eye_pos.xyz );\n		vec3 q1 = dFdy( eye_pos.xyz );\n		vec2 st0 = dFdx( vUv.st );\n		vec2 st1 = dFdy( vUv.st );\n		vec3 S = normalize( q0 * st1.t - q1 * st0.t );\n		vec3 T = normalize( -q0 * st1.s + q1 * st0.s );\n		vec3 N = normalize( surf_norm );\n		vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n		mapN.xy = normalScale * mapN.xy;\n		mat3 tsn = mat3( S, T, N );\n		return normalize( tsn * mapN );\n	}\n#endif\n";
+
+// File:src/renderers/shaders/ShaderChunk/premultiplied_alpha_fragment.glsl
+
+THREE.ShaderChunk[ 'premultiplied_alpha_fragment' ] = "#ifdef PREMULTIPLIED_ALPHA\n	gl_FragColor.rgb *= gl_FragColor.a;\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/project_vertex.glsl
 
@@ -23616,6 +23799,14 @@ THREE.ShaderChunk[ 'specularmap_fragment' ] = "float specularStrength;\n#ifdef U
 // File:src/renderers/shaders/ShaderChunk/specularmap_pars_fragment.glsl
 
 THREE.ShaderChunk[ 'specularmap_pars_fragment' ] = "#ifdef USE_SPECULARMAP\n	uniform sampler2D specularMap;\n#endif";
+
+// File:src/renderers/shaders/ShaderChunk/tonemapping_fragment.glsl
+
+THREE.ShaderChunk[ 'tonemapping_fragment' ] = "#if defined( TONE_MAPPING )\n  gl_FragColor.rgb = toneMapping( gl_FragColor.rgb );\n#endif\n";
+
+// File:src/renderers/shaders/ShaderChunk/tonemapping_pars_fragment.glsl
+
+THREE.ShaderChunk[ 'tonemapping_pars_fragment' ] = "#define saturate(a) clamp( a, 0.0, 1.0 )\nuniform float toneMappingExposure;\nuniform float toneMappingWhitePoint;\nvec3 LinearToneMapping( vec3 color ) {\n  return toneMappingExposure * color;\n}\nvec3 ReinhardToneMapping( vec3 color ) {\n  color *= toneMappingExposure;\n  return saturate( color / ( vec3( 1.0 ) + color ) );\n}\n#define Uncharted2Helper( x ) max( ( ( x * ( 0.15 * x + 0.10 * 0.50 ) + 0.20 * 0.02 ) / ( x * ( 0.15 * x + 0.50 ) + 0.20 * 0.30 ) ) - 0.02 / 0.30, vec3( 0.0 ) )\nvec3 Uncharted2ToneMapping( vec3 color ) {\n  color *= toneMappingExposure;\n  return saturate( Uncharted2Helper( color ) / Uncharted2Helper( vec3( toneMappingWhitePoint ) ) );\n}\nvec3 OptimizedCineonToneMapping( vec3 color ) {\n  color *= toneMappingExposure;\n  color = max( vec3( 0.0 ), color - 0.004 );\n  return pow( ( color * ( 6.2 * color + 0.5 ) ) / ( color * ( 6.2 * color + 1.7 ) + 0.06 ), vec3( 2.2 ) );\n}\n";
 
 // File:src/renderers/shaders/ShaderChunk/uv2_pars_fragment.glsl
 
@@ -23804,13 +23995,9 @@ THREE.UniformsLib = {
 
 	},
 
-	ambient: {
-
-		"ambientLightColor": { type: "fv", value: [] }
-
-	},
-
 	lights: {
+
+		"ambientLightColor": { type: "fv", value: [] },
 
 		"directionalLights": { type: "sa", value: [], properties: {
 			"direction": { type: "v3" },
@@ -23830,8 +24017,8 @@ THREE.UniformsLib = {
 			"position": { type: "v3" },
 			"direction": { type: "v3" },
 			"distance": { type: "f" },
-			"angleCos": { type: "f" },
-			"penumbra": { type: "f" },
+			"coneCos": { type: "f" },
+			"penumbraCos": { type: "f" },
 			"decay": { type: "f" },
 
 			"shadow": { type: "i" },
@@ -23879,6 +24066,102 @@ THREE.UniformsLib = {
 
 };
 
+// File:src/renderers/shaders/ShaderLib/cube_frag.glsl
+
+THREE.ShaderChunk[ 'cube_frag' ] = "uniform samplerCube tCube;\nuniform float tFlip;\nvarying vec3 vWorldPosition;\n#include <common>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );\n	#include <logdepthbuf_fragment>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/cube_vert.glsl
+
+THREE.ShaderChunk[ 'cube_vert' ] = "varying vec3 vWorldPosition;\n#include <common>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	vWorldPosition = transformDirection( position, modelMatrix );\n	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n	#include <logdepthbuf_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/depth_frag.glsl
+
+THREE.ShaderChunk[ 'depth_frag' ] = "uniform float mNear;\nuniform float mFar;\nuniform float opacity;\n#include <common>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n	#include <logdepthbuf_fragment>\n	#ifdef USE_LOGDEPTHBUF_EXT\n		float depth = gl_FragDepthEXT / gl_FragCoord.w;\n	#else\n		float depth = gl_FragCoord.z / gl_FragCoord.w;\n	#endif\n	float color = 1.0 - smoothstep( mNear, mFar, depth );\n	gl_FragColor = vec4( vec3( color ), opacity );\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/depth_vert.glsl
+
+THREE.ShaderChunk[ 'depth_vert' ] = "#include <common>\n#include <morphtarget_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <begin_vertex>\n	#include <morphtarget_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/depthRGBA_frag.glsl
+
+THREE.ShaderChunk[ 'depthRGBA_frag' ] = "#include <common>\n#include <logdepthbuf_pars_fragment>\nvec4 pack_depth( const in float depth ) {\n	const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );\n	const vec4 bit_mask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );\n	vec4 res = mod( depth * bit_shift * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );\n	res -= res.xxyz * bit_mask;\n	return res;\n}\nvoid main() {\n	#include <logdepthbuf_fragment>\n	#ifdef USE_LOGDEPTHBUF_EXT\n		gl_FragData[ 0 ] = pack_depth( gl_FragDepthEXT );\n	#else\n		gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );\n	#endif\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/depthRGBA_vert.glsl
+
+THREE.ShaderChunk[ 'depthRGBA_vert' ] = "#include <common>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <skinbase_vertex>\n	#include <begin_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/distanceRGBA_frag.glsl
+
+THREE.ShaderChunk[ 'distanceRGBA_frag' ] = "uniform vec3 lightPos;\nvarying vec4 vWorldPosition;\n#include <common>\nvec4 pack1K ( float depth ) {\n	depth /= 1000.0;\n	const vec4 bitSh = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );\n	const vec4 bitMsk = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );\n	vec4 res = mod( depth * bitSh * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );\n	res -= res.xxyz * bitMsk;\n	return res;\n}\nfloat unpack1K ( vec4 color ) {\n	const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );\n	return dot( color, bitSh ) * 1000.0;\n}\nvoid main () {\n	gl_FragColor = pack1K( length( vWorldPosition.xyz - lightPos.xyz ) );\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/distanceRGBA_vert.glsl
+
+THREE.ShaderChunk[ 'distanceRGBA_vert' ] = "varying vec4 vWorldPosition;\n#include <common>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\nvoid main() {\n	#include <skinbase_vertex>\n	#include <begin_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <worldpos_vertex>\n	vWorldPosition = worldPosition;\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/equirect_frag.glsl
+
+THREE.ShaderChunk[ 'equirect_frag' ] = "uniform sampler2D tEquirect;\nuniform float tFlip;\nvarying vec3 vWorldPosition;\n#include <common>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n	vec3 direction = normalize( vWorldPosition );\n	vec2 sampleUV;\n	sampleUV.y = saturate( tFlip * direction.y * -0.5 + 0.5 );\n	sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;\n	gl_FragColor = texture2D( tEquirect, sampleUV );\n	#include <logdepthbuf_fragment>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/equirect_vert.glsl
+
+THREE.ShaderChunk[ 'equirect_vert' ] = "varying vec3 vWorldPosition;\n#include <common>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	vWorldPosition = transformDirection( position, modelMatrix );\n	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n	#include <logdepthbuf_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/linedashed_frag.glsl
+
+THREE.ShaderChunk[ 'linedashed_frag' ] = "uniform vec3 diffuse;\nuniform float opacity;\nuniform float dashSize;\nuniform float totalSize;\nvarying float vLineDistance;\n#include <common>\n#include <color_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n	if ( mod( vLineDistance, totalSize ) > dashSize ) {\n		discard;\n	}\n	vec3 outgoingLight = vec3( 0.0 );\n	vec4 diffuseColor = vec4( diffuse, opacity );\n	#include <logdepthbuf_fragment>\n	#include <color_fragment>\n	outgoingLight = diffuseColor.rgb;\n	gl_FragColor = vec4( outgoingLight, diffuseColor.a );\n	#include <premultiplied_alpha_fragment>\n	#include <tonemapping_fragment>\n	#include <encodings_fragment>\n	#include <fog_fragment>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/linedashed_vert.glsl
+
+THREE.ShaderChunk[ 'linedashed_vert' ] = "uniform float scale;\nattribute float lineDistance;\nvarying float vLineDistance;\n#include <common>\n#include <color_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <color_vertex>\n	vLineDistance = scale * lineDistance;\n	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );\n	gl_Position = projectionMatrix * mvPosition;\n	#include <logdepthbuf_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshbasic_frag.glsl
+
+THREE.ShaderChunk[ 'meshbasic_frag' ] = "uniform vec3 diffuse;\nuniform float opacity;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\n#include <common>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n	vec4 diffuseColor = vec4( diffuse, opacity );\n	#include <logdepthbuf_fragment>\n	#include <map_fragment>\n	#include <color_fragment>\n	#include <alphamap_fragment>\n	#include <alphatest_fragment>\n	#include <specularmap_fragment>\n	ReflectedLight reflectedLight;\n	reflectedLight.directDiffuse = vec3( 0.0 );\n	reflectedLight.directSpecular = vec3( 0.0 );\n	reflectedLight.indirectDiffuse = diffuseColor.rgb;\n	reflectedLight.indirectSpecular = vec3( 0.0 );\n	#include <aomap_fragment>\n	vec3 outgoingLight = reflectedLight.indirectDiffuse;\n	#include <envmap_fragment>\n	gl_FragColor = vec4( outgoingLight, diffuseColor.a );\n	#include <premultiplied_alpha_fragment>\n	#include <tonemapping_fragment>\n	#include <encodings_fragment>\n	#include <fog_fragment>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshbasic_vert.glsl
+
+THREE.ShaderChunk[ 'meshbasic_vert' ] = "#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <uv_vertex>\n	#include <uv2_vertex>\n	#include <color_vertex>\n	#include <skinbase_vertex>\n	#ifdef USE_ENVMAP\n	#include <beginnormal_vertex>\n	#include <morphnormal_vertex>\n	#include <skinnormal_vertex>\n	#include <defaultnormal_vertex>\n	#endif\n	#include <begin_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	#include <worldpos_vertex>\n	#include <envmap_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshlambert_frag.glsl
+
+THREE.ShaderChunk[ 'meshlambert_frag' ] = "uniform vec3 diffuse;\nuniform vec3 emissive;\nuniform float opacity;\nvarying vec3 vLightFront;\n#ifdef DOUBLE_SIDED\n	varying vec3 vLightBack;\n#endif\n#include <common>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <bsdfs>\n#include <lights_pars>\n#include <fog_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n	vec4 diffuseColor = vec4( diffuse, opacity );\n	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n	vec3 totalEmissiveRadiance = emissive;\n	#include <logdepthbuf_fragment>\n	#include <map_fragment>\n	#include <color_fragment>\n	#include <alphamap_fragment>\n	#include <alphatest_fragment>\n	#include <specularmap_fragment>\n	#include <emissivemap_fragment>\n	reflectedLight.indirectDiffuse = getAmbientLightIrradiance( ambientLightColor );\n	#include <lightmap_fragment>\n	reflectedLight.indirectDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb );\n	#ifdef DOUBLE_SIDED\n		reflectedLight.directDiffuse = ( gl_FrontFacing ) ? vLightFront : vLightBack;\n	#else\n		reflectedLight.directDiffuse = vLightFront;\n	#endif\n	reflectedLight.directDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb ) * getShadowMask();\n	#include <aomap_fragment>\n	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;\n	#include <envmap_fragment>\n	gl_FragColor = vec4( outgoingLight, diffuseColor.a );\n	#include <premultiplied_alpha_fragment>\n	#include <tonemapping_fragment>\n	#include <encodings_fragment>\n	#include <fog_fragment>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshlambert_vert.glsl
+
+THREE.ShaderChunk[ 'meshlambert_vert' ] = "#define LAMBERT\nvarying vec3 vLightFront;\n#ifdef DOUBLE_SIDED\n	varying vec3 vLightBack;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <envmap_pars_vertex>\n#include <bsdfs>\n#include <lights_pars>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <uv_vertex>\n	#include <uv2_vertex>\n	#include <color_vertex>\n	#include <beginnormal_vertex>\n	#include <morphnormal_vertex>\n	#include <skinbase_vertex>\n	#include <skinnormal_vertex>\n	#include <defaultnormal_vertex>\n	#include <begin_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	#include <worldpos_vertex>\n	#include <envmap_vertex>\n	#include <lights_lambert_vertex>\n	#include <shadowmap_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshphong_frag.glsl
+
+THREE.ShaderChunk[ 'meshphong_frag' ] = "#define PHONG\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform vec3 specular;\nuniform float shininess;\nuniform float opacity;\n#include <common>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars>\n#include <lights_phong_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n	vec4 diffuseColor = vec4( diffuse, opacity );\n	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n	vec3 totalEmissiveRadiance = emissive;\n	#include <logdepthbuf_fragment>\n	#include <map_fragment>\n	#include <color_fragment>\n	#include <alphamap_fragment>\n	#include <alphatest_fragment>\n	#include <specularmap_fragment>\n	#include <normal_fragment>\n	#include <emissivemap_fragment>\n	#include <lights_phong_fragment>\n	#include <lights_template>\n	#include <aomap_fragment>\n	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;\n	#include <envmap_fragment>\n	gl_FragColor = vec4( outgoingLight, diffuseColor.a );\n	#include <premultiplied_alpha_fragment>\n	#include <tonemapping_fragment>\n	#include <encodings_fragment>\n	#include <fog_fragment>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshphong_vert.glsl
+
+THREE.ShaderChunk[ 'meshphong_vert' ] = "#define PHONG\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <lights_phong_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <uv_vertex>\n	#include <uv2_vertex>\n	#include <color_vertex>\n	#include <beginnormal_vertex>\n	#include <morphnormal_vertex>\n	#include <skinbase_vertex>\n	#include <skinnormal_vertex>\n	#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n	vNormal = normalize( transformedNormal );\n#endif\n	#include <begin_vertex>\n	#include <displacementmap_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	vViewPosition = - mvPosition.xyz;\n	#include <worldpos_vertex>\n	#include <envmap_vertex>\n	#include <lights_phong_vertex>\n	#include <shadowmap_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshstandard_frag.glsl
+
+THREE.ShaderChunk[ 'meshstandard_frag' ] = "#define STANDARD\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform float roughness;\nuniform float metalness;\nuniform float opacity;\nuniform float envMapIntensity;\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\n#include <common>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <cube_uv_reflection_fragment>\n#include <lights_pars>\n#include <lights_standard_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <roughnessmap_pars_fragment>\n#include <metalnessmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n	vec4 diffuseColor = vec4( diffuse, opacity );\n	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n	vec3 totalEmissiveRadiance = emissive;\n	#include <logdepthbuf_fragment>\n	#include <map_fragment>\n	#include <color_fragment>\n	#include <alphamap_fragment>\n	#include <alphatest_fragment>\n	#include <specularmap_fragment>\n	#include <roughnessmap_fragment>\n	#include <metalnessmap_fragment>\n	#include <normal_fragment>\n	#include <emissivemap_fragment>\n	#include <lights_standard_fragment>\n	#include <lights_template>\n	#include <aomap_fragment>\n	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;\n	gl_FragColor = vec4( outgoingLight, diffuseColor.a );\n	#include <premultiplied_alpha_fragment>\n	#include <tonemapping_fragment>\n	#include <encodings_fragment>\n	#include <fog_fragment>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/meshstandard_vert.glsl
+
+THREE.ShaderChunk[ 'meshstandard_vert' ] = "#define STANDARD\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <uv_vertex>\n	#include <uv2_vertex>\n	#include <color_vertex>\n	#include <beginnormal_vertex>\n	#include <morphnormal_vertex>\n	#include <skinbase_vertex>\n	#include <skinnormal_vertex>\n	#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n	vNormal = normalize( transformedNormal );\n#endif\n	#include <begin_vertex>\n	#include <displacementmap_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	vViewPosition = - mvPosition.xyz;\n	#include <worldpos_vertex>\n	#include <envmap_vertex>\n	#include <shadowmap_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/normal_frag.glsl
+
+THREE.ShaderChunk[ 'normal_frag' ] = "uniform float opacity;\nvarying vec3 vNormal;\n#include <common>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n	gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, opacity );\n	#include <logdepthbuf_fragment>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/normal_vert.glsl
+
+THREE.ShaderChunk[ 'normal_vert' ] = "varying vec3 vNormal;\n#include <common>\n#include <morphtarget_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	vNormal = normalize( normalMatrix * normal );\n	#include <begin_vertex>\n	#include <morphtarget_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/points_frag.glsl
+
+THREE.ShaderChunk[ 'points_frag' ] = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <color_pars_fragment>\n#include <map_particle_pars_fragment>\n#include <fog_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n	vec3 outgoingLight = vec3( 0.0 );\n	vec4 diffuseColor = vec4( diffuse, opacity );\n	#include <logdepthbuf_fragment>\n	#include <map_particle_fragment>\n	#include <color_fragment>\n	#include <alphatest_fragment>\n	outgoingLight = diffuseColor.rgb;\n	gl_FragColor = vec4( outgoingLight, diffuseColor.a );\n	#include <premultiplied_alpha_fragment>\n	#include <tonemapping_fragment>\n	#include <encodings_fragment>\n	#include <fog_fragment>\n}\n";
+
+// File:src/renderers/shaders/ShaderLib/points_vert.glsl
+
+THREE.ShaderChunk[ 'points_vert' ] = "uniform float size;\nuniform float scale;\n#include <common>\n#include <color_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <color_vertex>\n	#include <begin_vertex>\n	#include <project_vertex>\n	#ifdef USE_SIZEATTENUATION\n		gl_PointSize = size * ( scale / - mvPosition.z );\n	#else\n		gl_PointSize = size;\n	#endif\n	#include <logdepthbuf_vertex>\n	#include <worldpos_vertex>\n	#include <shadowmap_vertex>\n}\n";
+
 // File:src/renderers/shaders/ShaderLib.js
 
 /**
@@ -23902,99 +24185,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "uv_pars_vertex" ],
-			THREE.ShaderChunk[ "uv2_pars_vertex" ],
-			THREE.ShaderChunk[ "envmap_pars_vertex" ],
-			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
-			"void main() {",
-
-				THREE.ShaderChunk[ "uv_vertex" ],
-				THREE.ShaderChunk[ "uv2_vertex" ],
-				THREE.ShaderChunk[ "color_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-
-			"	#ifdef USE_ENVMAP",
-
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "morphnormal_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-
-			"	#endif",
-
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-
-				THREE.ShaderChunk[ "worldpos_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform vec3 diffuse;",
-			"uniform float opacity;",
-
-			"#ifndef FLAT_SHADED",
-
-			"	varying vec3 vNormal;",
-
-			"#endif",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "color_pars_fragment" ],
-			THREE.ShaderChunk[ "uv_pars_fragment" ],
-			THREE.ShaderChunk[ "uv2_pars_fragment" ],
-			THREE.ShaderChunk[ "map_pars_fragment" ],
-			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
-			THREE.ShaderChunk[ "aomap_pars_fragment" ],
-			THREE.ShaderChunk[ "envmap_pars_fragment" ],
-			THREE.ShaderChunk[ "fog_pars_fragment" ],
-			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
-			"void main() {",
-
-			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-				THREE.ShaderChunk[ "map_fragment" ],
-				THREE.ShaderChunk[ "color_fragment" ],
-				THREE.ShaderChunk[ "alphamap_fragment" ],
-				THREE.ShaderChunk[ "alphatest_fragment" ],
-				THREE.ShaderChunk[ "specularmap_fragment" ],
-
-			"	ReflectedLight reflectedLight;",
-			"	reflectedLight.directDiffuse = vec3( 0.0 );",
-			"	reflectedLight.directSpecular = vec3( 0.0 );",
-			"	reflectedLight.indirectDiffuse = diffuseColor.rgb;",
-			"	reflectedLight.indirectSpecular = vec3( 0.0 );",
-
-				THREE.ShaderChunk[ "aomap_fragment" ],
-
-			"	vec3 outgoingLight = reflectedLight.indirectDiffuse;",
-
-				THREE.ShaderChunk[ "envmap_fragment" ],
-				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-				THREE.ShaderChunk[ "fog_fragment" ],
-
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['meshbasic_vert'],
+		fragmentShader: THREE.ShaderChunk['meshbasic_frag']
 
 	},
 
@@ -24007,7 +24199,6 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "lightmap" ],
 			THREE.UniformsLib[ "emissivemap" ],
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
 
 			{
@@ -24016,139 +24207,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			"#define LAMBERT",
-
-			"varying vec3 vLightFront;",
-
-			"#ifdef DOUBLE_SIDED",
-
-			"	varying vec3 vLightBack;",
-
-			"#endif",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "uv_pars_vertex" ],
-			THREE.ShaderChunk[ "uv2_pars_vertex" ],
-			THREE.ShaderChunk[ "envmap_pars_vertex" ],
-			THREE.ShaderChunk[ "bsdfs" ],
-			THREE.ShaderChunk[ "lights_pars" ],
-			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
-			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
-			"void main() {",
-
-				THREE.ShaderChunk[ "uv_vertex" ],
-				THREE.ShaderChunk[ "uv2_vertex" ],
-				THREE.ShaderChunk[ "color_vertex" ],
-
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "morphnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-
-				THREE.ShaderChunk[ "worldpos_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
-				THREE.ShaderChunk[ "lights_lambert_vertex" ],
-				THREE.ShaderChunk[ "shadowmap_vertex" ],
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform vec3 diffuse;",
-			"uniform vec3 emissive;",
-			"uniform float opacity;",
-
-			"varying vec3 vLightFront;",
-
-			"#ifdef DOUBLE_SIDED",
-
-			"	varying vec3 vLightBack;",
-
-			"#endif",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "color_pars_fragment" ],
-			THREE.ShaderChunk[ "uv_pars_fragment" ],
-			THREE.ShaderChunk[ "uv2_pars_fragment" ],
-			THREE.ShaderChunk[ "map_pars_fragment" ],
-			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
-			THREE.ShaderChunk[ "aomap_pars_fragment" ],
-			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
-			THREE.ShaderChunk[ "emissivemap_pars_fragment" ],
-			THREE.ShaderChunk[ "envmap_pars_fragment" ],
-			THREE.ShaderChunk[ "bsdfs" ],
-			THREE.ShaderChunk[ "ambient_pars" ],
-			THREE.ShaderChunk[ "lights_pars" ],
-			THREE.ShaderChunk[ "fog_pars_fragment" ],
-			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
-			THREE.ShaderChunk[ "shadowmask_pars_fragment" ],
-			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
-			"void main() {",
-
-			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
-			"	vec3 totalEmissiveLight = emissive;",
-
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-				THREE.ShaderChunk[ "map_fragment" ],
-				THREE.ShaderChunk[ "color_fragment" ],
-				THREE.ShaderChunk[ "alphamap_fragment" ],
-				THREE.ShaderChunk[ "alphatest_fragment" ],
-				THREE.ShaderChunk[ "specularmap_fragment" ],
-				THREE.ShaderChunk[ "emissivemap_fragment" ],
-
-				// accumulation
-			"	reflectedLight.indirectDiffuse = getAmbientLightIrradiance( ambientLightColor );",
-
-				THREE.ShaderChunk[ "lightmap_fragment" ],
-
-			"	reflectedLight.indirectDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb );",
-
-			"	#ifdef DOUBLE_SIDED",
-
-			"		reflectedLight.directDiffuse = ( gl_FrontFacing ) ? vLightFront : vLightBack;",
-
-			"	#else",
-
-			"		reflectedLight.directDiffuse = vLightFront;",
-
-			"	#endif",
-
-			"	reflectedLight.directDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb ) * getShadowMask();",
-
-				// modulation
-				THREE.ShaderChunk[ "aomap_fragment" ],
-
-			"	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveLight;",
-
-				THREE.ShaderChunk[ "envmap_fragment" ],
-
-				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-
-				THREE.ShaderChunk[ "fog_fragment" ],
-
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['meshlambert_vert'],
+		fragmentShader: THREE.ShaderChunk['meshlambert_frag']
 
 	},
 
@@ -24164,7 +24224,6 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "normalmap" ],
 			THREE.UniformsLib[ "displacementmap" ],
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
 
 			{
@@ -24175,131 +24234,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			"#define PHONG",
-
-			"varying vec3 vViewPosition;",
-
-			"#ifndef FLAT_SHADED",
-
-			"	varying vec3 vNormal;",
-
-			"#endif",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "uv_pars_vertex" ],
-			THREE.ShaderChunk[ "uv2_pars_vertex" ],
-			THREE.ShaderChunk[ "displacementmap_pars_vertex" ],
-			THREE.ShaderChunk[ "envmap_pars_vertex" ],
-			THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
-			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
-			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
-			"void main() {",
-
-				THREE.ShaderChunk[ "uv_vertex" ],
-				THREE.ShaderChunk[ "uv2_vertex" ],
-				THREE.ShaderChunk[ "color_vertex" ],
-
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "morphnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-
-			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
-
-			"	vNormal = normalize( transformedNormal );",
-
-			"#endif",
-
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "displacementmap_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-
-			"	vViewPosition = - mvPosition.xyz;",
-
-				THREE.ShaderChunk[ "worldpos_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
-				THREE.ShaderChunk[ "lights_phong_vertex" ],
-				THREE.ShaderChunk[ "shadowmap_vertex" ],
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"#define PHONG",
-
-			"uniform vec3 diffuse;",
-			"uniform vec3 emissive;",
-			"uniform vec3 specular;",
-			"uniform float shininess;",
-			"uniform float opacity;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "color_pars_fragment" ],
-			THREE.ShaderChunk[ "uv_pars_fragment" ],
-			THREE.ShaderChunk[ "uv2_pars_fragment" ],
-			THREE.ShaderChunk[ "map_pars_fragment" ],
-			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
-			THREE.ShaderChunk[ "aomap_pars_fragment" ],
-			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
-			THREE.ShaderChunk[ "emissivemap_pars_fragment" ],
-			THREE.ShaderChunk[ "envmap_pars_fragment" ],
-			THREE.ShaderChunk[ "fog_pars_fragment" ],
-			THREE.ShaderChunk[ "bsdfs" ],
-			THREE.ShaderChunk[ "ambient_pars" ],
-			THREE.ShaderChunk[ "lights_pars" ],
-			THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
-			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
-			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
-			THREE.ShaderChunk[ "normalmap_pars_fragment" ],
-			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
-			"void main() {",
-
-			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
-			"	vec3 totalEmissiveLight = emissive;",
-
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-				THREE.ShaderChunk[ "map_fragment" ],
-				THREE.ShaderChunk[ "color_fragment" ],
-				THREE.ShaderChunk[ "alphamap_fragment" ],
-				THREE.ShaderChunk[ "alphatest_fragment" ],
-				THREE.ShaderChunk[ "specularmap_fragment" ],
-				THREE.ShaderChunk[ "normal_fragment" ],
-				THREE.ShaderChunk[ "emissivemap_fragment" ],
-
-				// accumulation
-				THREE.ShaderChunk[ "lights_phong_fragment" ],
-				THREE.ShaderChunk[ "lights_template" ],
-
-				// modulation
-				THREE.ShaderChunk[ "aomap_fragment" ],
-
-				"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
-
-				THREE.ShaderChunk[ "envmap_fragment" ],
-				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-
-				THREE.ShaderChunk[ "fog_fragment" ],
-
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['meshphong_vert'],
+		fragmentShader: THREE.ShaderChunk['meshphong_frag']
 
 	},
 
@@ -24317,7 +24253,6 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "roughnessmap" ],
 			THREE.UniformsLib[ "metalnessmap" ],
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
 
 			{
@@ -24329,142 +24264,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			"#define STANDARD",
-
-			"varying vec3 vViewPosition;",
-
-			"#ifndef FLAT_SHADED",
-
-			"	varying vec3 vNormal;",
-
-			"#endif",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "uv_pars_vertex" ],
-			THREE.ShaderChunk[ "uv2_pars_vertex" ],
-			THREE.ShaderChunk[ "displacementmap_pars_vertex" ],
-			THREE.ShaderChunk[ "envmap_pars_vertex" ],
-			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
-			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
-			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
-			"void main() {", // STANDARD
-
-				THREE.ShaderChunk[ "uv_vertex" ],
-				THREE.ShaderChunk[ "uv2_vertex" ],
-				THREE.ShaderChunk[ "color_vertex" ],
-
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "morphnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-
-			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
-
-			"	vNormal = normalize( transformedNormal );",
-
-			"#endif",
-
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "displacementmap_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-
-			"	vViewPosition = - mvPosition.xyz;",
-
-				THREE.ShaderChunk[ "worldpos_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
-				THREE.ShaderChunk[ "shadowmap_vertex" ],
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"#define STANDARD",
-
-			"uniform vec3 diffuse;",
-			"uniform vec3 emissive;",
-			"uniform float roughness;",
-			"uniform float metalness;",
-			"uniform float opacity;",
-
-			"uniform float envMapIntensity;", // temporary
-
-			"varying vec3 vViewPosition;",
-
-			"#ifndef FLAT_SHADED",
-
-			"	varying vec3 vNormal;",
-
-			"#endif",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "color_pars_fragment" ],
-			THREE.ShaderChunk[ "uv_pars_fragment" ],
-			THREE.ShaderChunk[ "uv2_pars_fragment" ],
-			THREE.ShaderChunk[ "map_pars_fragment" ],
-			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
-			THREE.ShaderChunk[ "aomap_pars_fragment" ],
-			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
-			THREE.ShaderChunk[ "emissivemap_pars_fragment" ],
-			THREE.ShaderChunk[ "envmap_pars_fragment" ],
-			THREE.ShaderChunk[ "fog_pars_fragment" ],
-			THREE.ShaderChunk[ "bsdfs" ],
-			THREE.ShaderChunk[ "ambient_pars" ],
-			THREE.ShaderChunk[ "lights_pars" ],
-			THREE.ShaderChunk[ "lights_standard_pars_fragment" ],
-			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
-			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
-			THREE.ShaderChunk[ "normalmap_pars_fragment" ],
-			THREE.ShaderChunk[ "roughnessmap_pars_fragment" ],
-			THREE.ShaderChunk[ "metalnessmap_pars_fragment" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
-			"void main() {",
-
-			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
-			"	vec3 totalEmissiveLight = emissive;",
-
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-				THREE.ShaderChunk[ "map_fragment" ],
-				THREE.ShaderChunk[ "color_fragment" ],
-				THREE.ShaderChunk[ "alphamap_fragment" ],
-				THREE.ShaderChunk[ "alphatest_fragment" ],
-				THREE.ShaderChunk[ "specularmap_fragment" ],
-				THREE.ShaderChunk[ "roughnessmap_fragment" ],
-				THREE.ShaderChunk[ "metalnessmap_fragment" ],
-				THREE.ShaderChunk[ "normal_fragment" ],
-				THREE.ShaderChunk[ "emissivemap_fragment" ],
-
-				// accumulation
-				THREE.ShaderChunk[ "lights_standard_fragment" ],
-				THREE.ShaderChunk[ "lights_template" ],
-
-				// modulation
-				THREE.ShaderChunk[ "aomap_fragment" ],
-
-				"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
-
-				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-
-				THREE.ShaderChunk[ "fog_fragment" ],
-
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['meshstandard_vert'],
+		fragmentShader: THREE.ShaderChunk['meshstandard_frag']
 
 	},
 
@@ -24477,67 +24278,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			"uniform float size;",
-			"uniform float scale;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
-			"void main() {",
-
-				THREE.ShaderChunk[ "color_vertex" ],
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
-
-			"	#ifdef USE_SIZEATTENUATION",
-			"		gl_PointSize = size * ( scale / - mvPosition.z );",
-			"	#else",
-			"		gl_PointSize = size;",
-			"	#endif",
-
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-				THREE.ShaderChunk[ "worldpos_vertex" ],
-				THREE.ShaderChunk[ "shadowmap_vertex" ],
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform vec3 diffuse;",
-			"uniform float opacity;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "color_pars_fragment" ],
-			THREE.ShaderChunk[ "map_particle_pars_fragment" ],
-			THREE.ShaderChunk[ "fog_pars_fragment" ],
-			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
-			"void main() {",
-
-			"	vec3 outgoingLight = vec3( 0.0 );",
-			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-				THREE.ShaderChunk[ "map_particle_fragment" ],
-				THREE.ShaderChunk[ "color_fragment" ],
-				THREE.ShaderChunk[ "alphatest_fragment" ],
-
-			"	outgoingLight = diffuseColor.rgb;",
-
-				THREE.ShaderChunk[ "fog_fragment" ],
-
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['points_vert'],
+		fragmentShader: THREE.ShaderChunk['points_frag']
 
 	},
 
@@ -24556,70 +24298,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			"uniform float scale;",
-			"attribute float lineDistance;",
-
-			"varying float vLineDistance;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
-			"void main() {",
-
-				THREE.ShaderChunk[ "color_vertex" ],
-
-			"	vLineDistance = scale * lineDistance;",
-
-			"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-			"	gl_Position = projectionMatrix * mvPosition;",
-
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform vec3 diffuse;",
-			"uniform float opacity;",
-
-			"uniform float dashSize;",
-			"uniform float totalSize;",
-
-			"varying float vLineDistance;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "color_pars_fragment" ],
-			THREE.ShaderChunk[ "fog_pars_fragment" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
-			"void main() {",
-
-			"	if ( mod( vLineDistance, totalSize ) > dashSize ) {",
-
-			"		discard;",
-
-			"	}",
-
-			"	vec3 outgoingLight = vec3( 0.0 );",
-			"	vec4 diffuseColor = vec4( diffuse, opacity );",
-
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-				THREE.ShaderChunk[ "color_fragment" ],
-
-			"	outgoingLight = diffuseColor.rgb;", // simple shader
-
-				THREE.ShaderChunk[ "fog_fragment" ],
-
-			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['linedashed_vert'],
+		fragmentShader: THREE.ShaderChunk['linedashed_frag']
 
 	},
 
@@ -24633,52 +24313,8 @@ THREE.ShaderLib = {
 
 		},
 
-		vertexShader: [
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
-			"void main() {",
-
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform float mNear;",
-			"uniform float mFar;",
-			"uniform float opacity;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
-			"void main() {",
-
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-
-			"	#ifdef USE_LOGDEPTHBUF_EXT",
-
-			"		float depth = gl_FragDepthEXT / gl_FragCoord.w;",
-
-			"	#else",
-
-			"		float depth = gl_FragCoord.z / gl_FragCoord.w;",
-
-			"	#endif",
-
-			"	float color = 1.0 - smoothstep( mNear, mFar, depth );",
-			"	gl_FragColor = vec4( vec3( color ), opacity );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['depth_vert'],
+		fragmentShader: THREE.ShaderChunk['depth_frag']
 
 	},
 
@@ -24690,44 +24326,8 @@ THREE.ShaderLib = {
 
 		},
 
-		vertexShader: [
-
-			"varying vec3 vNormal;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
-			"void main() {",
-
-			"	vNormal = normalize( normalMatrix * normal );",
-
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform float opacity;",
-			"varying vec3 vNormal;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
-			"void main() {",
-
-			"	gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, opacity );",
-
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['normal_vert'],
+		fragmentShader: THREE.ShaderChunk['normal_frag']
 
 	},
 
@@ -24742,44 +24342,8 @@ THREE.ShaderLib = {
 			"tFlip": { type: "f", value: - 1 }
 		},
 
-		vertexShader: [
-
-			"varying vec3 vWorldPosition;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
-			"void main() {",
-
-			"	vWorldPosition = transformDirection( position, modelMatrix );",
-
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform samplerCube tCube;",
-			"uniform float tFlip;",
-
-			"varying vec3 vWorldPosition;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
-			"void main() {",
-
-			"	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
-
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['cube_vert'],
+		fragmentShader: THREE.ShaderChunk['cube_frag']
 
 	},
 
@@ -24794,49 +24358,8 @@ THREE.ShaderLib = {
 			"tFlip": { type: "f", value: - 1 }
 		},
 
-		vertexShader: [
-
-			"varying vec3 vWorldPosition;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
-			"void main() {",
-
-			"	vWorldPosition = transformDirection( position, modelMatrix );",
-
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform sampler2D tEquirect;",
-			"uniform float tFlip;",
-
-			"varying vec3 vWorldPosition;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
-			"void main() {",
-
-				// "	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
-				"vec3 direction = normalize( vWorldPosition );",
-				"vec2 sampleUV;",
-				"sampleUV.y = saturate( tFlip * direction.y * -0.5 + 0.5 );",
-				"sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;",
-				"gl_FragColor = texture2D( tEquirect, sampleUV );",
-
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['equirect_vert'],
+		fragmentShader: THREE.ShaderChunk['equirect_frag']
 
 	},
 
@@ -24856,64 +24379,8 @@ THREE.ShaderLib = {
 
 		uniforms: {},
 
-		vertexShader: [
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
-			"void main() {",
-
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
-			"vec4 pack_depth( const in float depth ) {",
-
-			"	const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
-			"	const vec4 bit_mask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
-			"	vec4 res = mod( depth * bit_shift * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );",
-			"	res -= res.xxyz * bit_mask;",
-			"	return res;",
-
-			"}",
-
-			"void main() {",
-
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-
-			"	#ifdef USE_LOGDEPTHBUF_EXT",
-
-			"		gl_FragData[ 0 ] = pack_depth( gl_FragDepthEXT );",
-
-			"	#else",
-
-			"		gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );",
-
-			"	#endif",
-
-				//"gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z / gl_FragCoord.w );",
-				//"float z = ( ( gl_FragCoord.z / gl_FragCoord.w ) - 3.0 ) / ( 4000.0 - 3.0 );",
-				//"gl_FragData[ 0 ] = pack_depth( z );",
-				//"gl_FragData[ 0 ] = vec4( z, z, z, 1.0 );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['depthRGBA_vert'],
+		fragmentShader: THREE.ShaderChunk['depthRGBA_frag']
 
 	},
 
@@ -24926,61 +24393,8 @@ THREE.ShaderLib = {
 
 		},
 
-		vertexShader: [
-
-			"varying vec4 vWorldPosition;",
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
-
-			"void main() {",
-
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
-				THREE.ShaderChunk[ "worldpos_vertex" ],
-
-				"vWorldPosition = worldPosition;",
-
-			"}"
-
-		].join( "\n" ),
-
-		fragmentShader: [
-
-			"uniform vec3 lightPos;",
-			"varying vec4 vWorldPosition;",
-
-			THREE.ShaderChunk[ "common" ],
-
-			"vec4 pack1K ( float depth ) {",
-
-			"	depth /= 1000.0;",
-			"	const vec4 bitSh = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
-			"	const vec4 bitMsk = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
-			"	vec4 res = mod( depth * bitSh * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );",
-			"	res -= res.xxyz * bitMsk;",
-			"	return res; ",
-
-			"}",
-
-			"float unpack1K ( vec4 color ) {",
-
-			"	const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );",
-			"	return dot( color, bitSh ) * 1000.0;",
-
-			"}",
-
-			"void main () {",
-
-			"	gl_FragColor = pack1K( length( vWorldPosition.xyz - lightPos.xyz ) );",
-
-			"}"
-
-		].join( "\n" )
+		vertexShader: THREE.ShaderChunk['distanceRGBA_vert'],
+		fragmentShader: THREE.ShaderChunk['distanceRGBA_frag']
 
 	}
 
@@ -25044,6 +24458,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.gammaFactor = 2.0;	// for backwards compatibility
 	this.gammaInput = false;
 	this.gammaOutput = false;
+
+	// physical lights
+
+	this.physicallyCorrectLights = false;
+
+	// tone mapping
+
+	this.toneMapping = THREE.LinearToneMapping;
+	this.toneMappingExposure = 1.0;
+	this.toneMappingWhitePoint = 1.0;
 
 	// morphs
 
@@ -25179,6 +24603,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 				throw 'Error creating WebGL context.';
 
 			}
+
+		}
+
+		// Some experimental-webgl implementations do not have getShaderPrecisionFormat
+
+		if ( _gl.getShaderPrecisionFormat === undefined ) {
+
+			_gl.getShaderPrecisionFormat = function () {
+
+				return { 'rangeMin': 1, 'rangeMax': 1, 'precision': 1 };
+
+			};
 
 		}
 
@@ -25885,9 +25321,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
+		if ( geometry instanceof THREE.InstancedBufferGeometry ) {
 
-			renderer.renderInstances( geometry, drawStart, drawCount );
+			if ( geometry.maxInstancedCount > 0 ) {
+
+				renderer.renderInstances( geometry, drawStart, drawCount );
+
+			}
 
 		} else {
 
@@ -26554,7 +25994,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.transparent === true ) {
 
-			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
+			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
 
 		} else {
 
@@ -26683,6 +26123,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, camera.matrixWorldInverse.elements );
 
 				}
+
+			}
+
+
+			if ( p_uniforms.toneMappingExposure !== undefined ) {
+
+				_gl.uniform1f( p_uniforms.toneMappingExposure, _this.toneMappingExposure );
+
+			}
+
+			if ( p_uniforms.toneMappingWhitePoint !== undefined ) {
+
+				_gl.uniform1f( p_uniforms.toneMappingWhitePoint, _this.toneMappingWhitePoint );
 
 			}
 
@@ -27174,444 +26627,367 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function loadUniformsGeneric ( uniforms ) {
+	function loadUniform( uniform, type, location, value ) {
 
 		var texture, textureUnit;
 
-		for ( var j = 0, jl = uniforms.length; j < jl; j ++ ) {
+		if ( type === '1i' ) {
 
-			var uniform = uniforms[ j ][ 0 ];
+			_gl.uniform1i( location, value );
+
+		} else if ( type === '1f' ) {
+
+			_gl.uniform1f( location, value );
+
+		} else if ( type === '2f' ) {
+
+			_gl.uniform2f( location, value[ 0 ], value[ 1 ] );
+
+		} else if ( type === '3f' ) {
+
+			_gl.uniform3f( location, value[ 0 ], value[ 1 ], value[ 2 ] );
+
+		} else if ( type === '4f' ) {
+
+			_gl.uniform4f( location, value[ 0 ], value[ 1 ], value[ 2 ], value[ 3 ] );
+
+		} else if ( type === '1iv' ) {
+
+			_gl.uniform1iv( location, value );
+
+		} else if ( type === '3iv' ) {
+
+			_gl.uniform3iv( location, value );
+
+		} else if ( type === '1fv' ) {
+
+			_gl.uniform1fv( location, value );
+
+		} else if ( type === '2fv' ) {
+
+			_gl.uniform2fv( location, value );
+
+		} else if ( type === '3fv' ) {
+
+			_gl.uniform3fv( location, value );
+
+		} else if ( type === '4fv' ) {
+
+			_gl.uniform4fv( location, value );
+
+		} else if ( type === 'Matrix2fv' ) {
+
+			_gl.uniformMatrix2fv( location, false, value );
+
+		} else if ( type === 'Matrix3fv' ) {
+
+			_gl.uniformMatrix3fv( location, false, value );
+
+		} else if ( type === 'Matrix4fv' ) {
+
+			_gl.uniformMatrix4fv( location, false, value );
+
+		//
+
+		} else if ( type === 'i' ) {
+
+			// single integer
+			_gl.uniform1i( location, value );
+
+		} else if ( type === 'f' ) {
+
+			// single float
+			_gl.uniform1f( location, value );
+
+		} else if ( type === 'v2' ) {
+
+			// single THREE.Vector2
+			_gl.uniform2f( location, value.x, value.y );
+
+		} else if ( type === 'v3' ) {
+
+			// single THREE.Vector3
+			_gl.uniform3f( location, value.x, value.y, value.z );
+
+		} else if ( type === 'v4' ) {
+
+			// single THREE.Vector4
+			_gl.uniform4f( location, value.x, value.y, value.z, value.w );
+
+		} else if ( type === 'c' ) {
+
+			// single THREE.Color
+			_gl.uniform3f( location, value.r, value.g, value.b );
+
+		} else if ( type === 's' ) {
+
+			// TODO: Optimize this
+
+			var properties = uniform.properties;
+
+			for ( var name in properties ) {
+
+				var property = properties[ name ];
+				var locationProperty = location[ name ];
+				var valueProperty = value[ name ];
+
+				loadUniform( property, property.type, locationProperty, valueProperty );
+
+			}
+
+		} else if ( type === 'sa' ) {
+
+			// TODO: Optimize this
+
+			var properties = uniform.properties;
+
+			for ( var i = 0, l = value.length; i < l; i ++ ) {
+
+				for ( var name in properties ) {
+
+					var property = properties[ name ];
+					var locationProperty =  location[ i ][ name ];
+					var valueProperty = value[ i ][ name ];
+
+					loadUniform( property, property.type, locationProperty, valueProperty );
+
+				}
+
+			}
+
+		} else if ( type === 'iv1' ) {
+
+			// flat array of integers (JS or typed array)
+			_gl.uniform1iv( location, value );
+
+		} else if ( type === 'iv' ) {
+
+			// flat array of integers with 3 x N size (JS or typed array)
+			_gl.uniform3iv( location, value );
+
+		} else if ( type === 'fv1' ) {
+
+			// flat array of floats (JS or typed array)
+			_gl.uniform1fv( location, value );
+
+		} else if ( type === 'fv' ) {
+
+			// flat array of floats with 3 x N size (JS or typed array)
+			_gl.uniform3fv( location, value );
+
+		} else if ( type === 'v2v' ) {
+
+			// array of THREE.Vector2
+
+			if ( uniform._array === undefined ) {
+
+				uniform._array = new Float32Array( 2 * value.length );
+
+			}
+
+			for ( var i = 0, i2 = 0, il = value.length; i < il; i ++, i2 += 2 ) {
+
+				uniform._array[ i2 + 0 ] = value[ i ].x;
+				uniform._array[ i2 + 1 ] = value[ i ].y;
+
+			}
+
+			_gl.uniform2fv( location, uniform._array );
+
+		} else if ( type === 'v3v' ) {
+
+			// array of THREE.Vector3
+
+			if ( uniform._array === undefined ) {
+
+				uniform._array = new Float32Array( 3 * value.length );
+
+			}
+
+			for ( var i = 0, i3 = 0, il = value.length; i < il; i ++, i3 += 3 ) {
+
+				uniform._array[ i3 + 0 ] = value[ i ].x;
+				uniform._array[ i3 + 1 ] = value[ i ].y;
+				uniform._array[ i3 + 2 ] = value[ i ].z;
+
+			}
+
+			_gl.uniform3fv( location, uniform._array );
+
+		} else if ( type === 'v4v' ) {
+
+			// array of THREE.Vector4
+
+			if ( uniform._array === undefined ) {
+
+				uniform._array = new Float32Array( 4 * value.length );
+
+			}
+
+			for ( var i = 0, i4 = 0, il = value.length; i < il; i ++, i4 += 4 ) {
+
+				uniform._array[ i4 + 0 ] = value[ i ].x;
+				uniform._array[ i4 + 1 ] = value[ i ].y;
+				uniform._array[ i4 + 2 ] = value[ i ].z;
+				uniform._array[ i4 + 3 ] = value[ i ].w;
+
+			}
+
+			_gl.uniform4fv( location, uniform._array );
+
+		} else if ( type === 'm2' ) {
+
+			// single THREE.Matrix2
+			_gl.uniformMatrix2fv( location, false, value.elements );
+
+		} else if ( type === 'm3' ) {
+
+			// single THREE.Matrix3
+			_gl.uniformMatrix3fv( location, false, value.elements );
+
+		} else if ( type === 'm3v' ) {
+
+			// array of THREE.Matrix3
+
+			if ( uniform._array === undefined ) {
+
+				uniform._array = new Float32Array( 9 * value.length );
+
+			}
+
+			for ( var i = 0, il = value.length; i < il; i ++ ) {
+
+				value[ i ].flattenToArrayOffset( uniform._array, i * 9 );
+
+			}
+
+			_gl.uniformMatrix3fv( location, false, uniform._array );
+
+		} else if ( type === 'm4' ) {
+
+			// single THREE.Matrix4
+			_gl.uniformMatrix4fv( location, false, value.elements );
+
+		} else if ( type === 'm4v' ) {
+
+			// array of THREE.Matrix4
+
+			if ( uniform._array === undefined ) {
+
+				uniform._array = new Float32Array( 16 * value.length );
+
+			}
+
+			for ( var i = 0, il = value.length; i < il; i ++ ) {
+
+				value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
+
+			}
+
+			_gl.uniformMatrix4fv( location, false, uniform._array );
+
+		} else if ( type === 't' ) {
+
+			// single THREE.Texture (2d or cube)
+
+			texture = value;
+			textureUnit = getTextureUnit();
+
+			_gl.uniform1i( location, textureUnit );
+
+			if ( ! texture ) return;
+
+			if ( texture instanceof THREE.CubeTexture ||
+				 ( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
+
+				// CompressedTexture can have Array in image :/
+
+				setCubeTexture( texture, textureUnit );
+
+			} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
+
+				setCubeTextureDynamic( texture.texture, textureUnit );
+
+			} else if ( texture instanceof THREE.WebGLRenderTarget ) {
+
+				_this.setTexture( texture.texture, textureUnit );
+
+			} else {
+
+				_this.setTexture( texture, textureUnit );
+
+			}
+
+		} else if ( type === 'tv' ) {
+
+			// array of THREE.Texture (2d or cube)
+
+			if ( uniform._array === undefined ) {
+
+				uniform._array = [];
+
+			}
+
+			for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
+
+				uniform._array[ i ] = getTextureUnit();
+
+			}
+
+			_gl.uniform1iv( location, uniform._array );
+
+			for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
+
+				texture = uniform.value[ i ];
+				textureUnit = uniform._array[ i ];
+
+				if ( ! texture ) continue;
+
+				if ( texture instanceof THREE.CubeTexture ||
+					 ( texture.image instanceof Array && texture.image.length === 6 ) ) {
+
+					// CompressedTexture can have Array in image :/
+
+					setCubeTexture( texture, textureUnit );
+
+				} else if ( texture instanceof THREE.WebGLRenderTarget ) {
+
+					_this.setTexture( texture.texture, textureUnit );
+
+				} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
+
+					setCubeTextureDynamic( texture.texture, textureUnit );
+
+				} else {
+
+					_this.setTexture( texture, textureUnit );
+
+				}
+
+			}
+
+		} else {
+
+			console.warn( 'THREE.WebGLRenderer: Unknown uniform type: ' + type );
+
+		}
+
+	}
+
+	function loadUniformsGeneric( uniforms ) {
+
+		for ( var i = 0, l = uniforms.length; i < l; i ++ ) {
+
+			var uniform = uniforms[ i ][ 0 ];
 
 			// needsUpdate property is not added to all uniforms.
 			if ( uniform.needsUpdate === false ) continue;
 
 			var type = uniform.type;
+			var location = uniforms[ i ][ 1 ];
 			var value = uniform.value;
-			var location = uniforms[ j ][ 1 ];
 
-			switch ( type ) {
-
-				case '1i':
-					_gl.uniform1i( location, value );
-					break;
-
-				case '1f':
-					_gl.uniform1f( location, value );
-					break;
-
-				case '2f':
-					_gl.uniform2f( location, value[ 0 ], value[ 1 ] );
-					break;
-
-				case '3f':
-					_gl.uniform3f( location, value[ 0 ], value[ 1 ], value[ 2 ] );
-					break;
-
-				case '4f':
-					_gl.uniform4f( location, value[ 0 ], value[ 1 ], value[ 2 ], value[ 3 ] );
-					break;
-
-				case '1iv':
-					_gl.uniform1iv( location, value );
-					break;
-
-				case '3iv':
-					_gl.uniform3iv( location, value );
-					break;
-
-				case '1fv':
-					_gl.uniform1fv( location, value );
-					break;
-
-				case '2fv':
-					_gl.uniform2fv( location, value );
-					break;
-
-				case '3fv':
-					_gl.uniform3fv( location, value );
-					break;
-
-				case '4fv':
-					_gl.uniform4fv( location, value );
-					break;
-
-				case 'Matrix2fv':
-					_gl.uniformMatrix2fv( location, false, value );
-					break;
-
-				case 'Matrix3fv':
-					_gl.uniformMatrix3fv( location, false, value );
-					break;
-
-				case 'Matrix4fv':
-					_gl.uniformMatrix4fv( location, false, value );
-					break;
-
-				//
-
-				case 'i':
-
-					// single integer
-					_gl.uniform1i( location, value );
-
-					break;
-
-				case 'f':
-
-					// single float
-					_gl.uniform1f( location, value );
-
-					break;
-
-				case 'v2':
-
-					// single THREE.Vector2
-					_gl.uniform2f( location, value.x, value.y );
-
-					break;
-
-				case 'v3':
-
-					// single THREE.Vector3
-					_gl.uniform3f( location, value.x, value.y, value.z );
-
-					break;
-
-				case 'v4':
-
-					// single THREE.Vector4
-					_gl.uniform4f( location, value.x, value.y, value.z, value.w );
-
-					break;
-
-				case 'c':
-
-					// single THREE.Color
-					_gl.uniform3f( location, value.r, value.g, value.b );
-
-					break;
-
-				/*
-				case 's':
-
-					// TODO: Optimize this.
-					for( var propertyName in uniform.properties ) {
-
-						var property = uniform.properties[ propertyName ];
-						var locationProperty =  location[ propertyName ];
-						var valueProperty = value[ propertyName ];
-
-						switch( property.type ) {
-							case 'i':
-								_gl.uniform1i( locationProperty, valueProperty );
-								break;
-							case 'f':
-								_gl.uniform1f( locationProperty, valueProperty );
-								break;
-							case 'v2':
-								_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
-								break;
-							case 'v3':
-								_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
-								break;
-							case 'v4':
-								_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
-								break;
-							case 'c':
-								_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
-								break;
-						};
-
-					}
-
-					break;
-				*/
-
-				case 'sa':
-
-					// TODO: Optimize this.
-					for ( var i = 0; i < value.length; i ++ ) {
-
-						for ( var propertyName in uniform.properties ) {
-
-							var property = uniform.properties[ propertyName ];
-							var locationProperty =  location[ i ][ propertyName ];
-							var valueProperty = value[ i ][ propertyName ];
-
-							switch ( property.type ) {
-								case 'i':
-									_gl.uniform1i( locationProperty, valueProperty );
-									break;
-								case 'f':
-									_gl.uniform1f( locationProperty, valueProperty );
-									break;
-								case 'v2':
-									_gl.uniform2f( locationProperty, valueProperty.x, valueProperty.y );
-									break;
-								case 'v3':
-									_gl.uniform3f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z );
-									break;
-								case 'v4':
-									_gl.uniform4f( locationProperty, valueProperty.x, valueProperty.y, valueProperty.z, valueProperty.w );
-									break;
-								case 'c':
-									_gl.uniform3f( locationProperty, valueProperty.r, valueProperty.g, valueProperty.b );
-									break;
-								case 'm4':
-									_gl.uniformMatrix4fv( locationProperty, false, valueProperty.elements );
-									break;
-							}
-
-						}
-
-					}
-
-					break;
-
-				case 'iv1':
-
-					// flat array of integers (JS or typed array)
-					_gl.uniform1iv( location, value );
-
-					break;
-
-				case 'iv':
-
-					// flat array of integers with 3 x N size (JS or typed array)
-					_gl.uniform3iv( location, value );
-
-					break;
-
-				case 'fv1':
-
-					// flat array of floats (JS or typed array)
-					_gl.uniform1fv( location, value );
-
-					break;
-
-				case 'fv':
-
-					// flat array of floats with 3 x N size (JS or typed array)
-					_gl.uniform3fv( location, value );
-
-					break;
-
-				case 'v2v':
-
-					// array of THREE.Vector2
-
-					if ( uniform._array === undefined ) {
-
-						uniform._array = new Float32Array( 2 * value.length );
-
-					}
-
-					for ( var i = 0, i2 = 0, il = value.length; i < il; i ++, i2 += 2 ) {
-
-						uniform._array[ i2 + 0 ] = value[ i ].x;
-						uniform._array[ i2 + 1 ] = value[ i ].y;
-
-					}
-
-					_gl.uniform2fv( location, uniform._array );
-
-					break;
-
-				case 'v3v':
-
-					// array of THREE.Vector3
-
-					if ( uniform._array === undefined ) {
-
-						uniform._array = new Float32Array( 3 * value.length );
-
-					}
-
-					for ( var i = 0, i3 = 0, il = value.length; i < il; i ++, i3 += 3 ) {
-
-						uniform._array[ i3 + 0 ] = value[ i ].x;
-						uniform._array[ i3 + 1 ] = value[ i ].y;
-						uniform._array[ i3 + 2 ] = value[ i ].z;
-
-					}
-
-					_gl.uniform3fv( location, uniform._array );
-
-					break;
-
-				case 'v4v':
-
-					// array of THREE.Vector4
-
-					if ( uniform._array === undefined ) {
-
-						uniform._array = new Float32Array( 4 * value.length );
-
-					}
-
-					for ( var i = 0, i4 = 0, il = value.length; i < il; i ++, i4 += 4 ) {
-
-						uniform._array[ i4 + 0 ] = value[ i ].x;
-						uniform._array[ i4 + 1 ] = value[ i ].y;
-						uniform._array[ i4 + 2 ] = value[ i ].z;
-						uniform._array[ i4 + 3 ] = value[ i ].w;
-
-					}
-
-					_gl.uniform4fv( location, uniform._array );
-
-					break;
-
-				case 'm2':
-
-					// single THREE.Matrix2
-					_gl.uniformMatrix2fv( location, false, value.elements );
-
-					break;
-
-				case 'm3':
-
-					// single THREE.Matrix3
-					_gl.uniformMatrix3fv( location, false, value.elements );
-
-					break;
-
-				case 'm3v':
-
-					// array of THREE.Matrix3
-
-					if ( uniform._array === undefined ) {
-
-						uniform._array = new Float32Array( 9 * value.length );
-
-					}
-
-					for ( var i = 0, il = value.length; i < il; i ++ ) {
-
-						value[ i ].flattenToArrayOffset( uniform._array, i * 9 );
-
-					}
-
-					_gl.uniformMatrix3fv( location, false, uniform._array );
-
-					break;
-
-				case 'm4':
-
-					// single THREE.Matrix4
-					_gl.uniformMatrix4fv( location, false, value.elements );
-
-					break;
-
-				case 'm4v':
-
-					// array of THREE.Matrix4
-
-					if ( uniform._array === undefined ) {
-
-						uniform._array = new Float32Array( 16 * value.length );
-
-					}
-
-					for ( var i = 0, il = value.length; i < il; i ++ ) {
-
-						value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
-
-					}
-
-					_gl.uniformMatrix4fv( location, false, uniform._array );
-
-					break;
-
-				case 't':
-
-					// single THREE.Texture (2d or cube)
-
-					texture = value;
-					textureUnit = getTextureUnit();
-
-					_gl.uniform1i( location, textureUnit );
-
-					if ( ! texture ) continue;
-
-					if ( texture instanceof THREE.CubeTexture ||
-						 ( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
-
-						// CompressedTexture can have Array in image :/
-
-						setCubeTexture( texture, textureUnit );
-
-					} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
-
-						setCubeTextureDynamic( texture.texture, textureUnit );
-
-					} else if ( texture instanceof THREE.WebGLRenderTarget ) {
-
-						_this.setTexture( texture.texture, textureUnit );
-
-					} else {
-
-						_this.setTexture( texture, textureUnit );
-
-					}
-
-					break;
-
-				case 'tv':
-
-					// array of THREE.Texture (2d or cube)
-
-					if ( uniform._array === undefined ) {
-
-						uniform._array = [];
-
-					}
-
-					for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
-
-						uniform._array[ i ] = getTextureUnit();
-
-					}
-
-					_gl.uniform1iv( location, uniform._array );
-
-					for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
-
-						texture = uniform.value[ i ];
-						textureUnit = uniform._array[ i ];
-
-						if ( ! texture ) continue;
-
-						if ( texture instanceof THREE.CubeTexture ||
-							 ( texture.image instanceof Array && texture.image.length === 6 ) ) {
-
-							// CompressedTexture can have Array in image :/
-
-							setCubeTexture( texture, textureUnit );
-
-						} else if ( texture instanceof THREE.WebGLRenderTarget ) {
-
-							_this.setTexture( texture.texture, textureUnit );
-
-						} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
-
-							setCubeTextureDynamic( texture.texture, textureUnit );
-
-						} else {
-
-							_this.setTexture( texture, textureUnit );
-
-						}
-
-					}
-
-					break;
-
-				default:
-
-					console.warn( 'THREE.WebGLRenderer: Unknown uniform type: ' + type );
-
-			}
+			loadUniform( uniform, type, location, value );
 
 		}
 
@@ -27691,8 +27067,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms.direction.sub( _vector3 );
 				uniforms.direction.transformDirection( viewMatrix );
 
-				uniforms.angleCos = Math.cos( light.angle );
-				uniforms.penumbra = Math.cos( light.angle ) * light.penumbra;
+				uniforms.coneCos = Math.cos( light.angle );
+				uniforms.penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
 				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
 
 				uniforms.shadow = light.castShadow;
@@ -28355,6 +27731,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	this.getCurrentRenderTarget = function() {
+
+		return _currentRenderTarget;
+
+	}
+
 	this.setRenderTarget = function ( renderTarget ) {
 
 		_currentRenderTarget = renderTarget;
@@ -28413,7 +27795,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( isCube ) {
 
 			var textureProperties = properties.get( renderTarget.texture );
-			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, textureProperties.__webglTexture, 0 );
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, textureProperties.__webglTexture, renderTarget.activeMipMapLevel );
 
 		}
 
@@ -28693,8 +28075,6 @@ THREE.WebGLRenderTarget.prototype = {
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
 
-		this.shareDepthFrom = source.shareDepthFrom;
-
 		return this;
 
 	},
@@ -28720,6 +28100,7 @@ THREE.WebGLRenderTargetCube = function ( width, height, options ) {
 	THREE.WebGLRenderTarget.call( this, width, height, options );
 
 	this.activeCubeFace = 0; // PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5
+	this.activeMipMapLevel = 0;
 
 };
 
@@ -29175,8 +28556,8 @@ THREE.WebGLLights = function () {
 					direction: new THREE.Vector3(),
 					color: new THREE.Color(),
 					distance: 0,
-					angleCos: 0,
-					penumbra: 0,
+					coneCos: 0,
+					penumbraCos: 0,
 					decay: 0,
 
 					shadow: false,
@@ -29457,12 +28838,82 @@ THREE.WebGLProgram = ( function () {
 	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/;
 	var arrayRe = /^([\w\d_]+)\[0\]$/;
 
+	function getEncodingComponents( encoding ) {
+
+		switch ( encoding ) {
+
+			case THREE.LinearEncoding:
+				return [ 'Linear','( value )' ];
+			case THREE.sRGBEncoding:
+				return [ 'sRGB','( value )' ];
+			case THREE.RGBEEncoding:
+				return [ 'RGBE','( value )' ];
+			case THREE.RGBM7Encoding:
+				return [ 'RGBM','( value, 7.0 )' ];
+			case THREE.RGBM16Encoding:
+				return [ 'RGBM','( value, 16.0 )' ];
+			case THREE.RGBDEncoding:
+				return [ 'RGBD','( value, 256.0 )' ];
+			case THREE.GammaEncoding:
+				return [ 'Gamma','( value, float( GAMMA_FACTOR ) )' ];
+			default:
+				throw new Error( 'unsupported encoding: ' + encoding );
+
+		}
+
+	}
+
+	function getTexelDecodingFunction( functionName, encoding ) {
+
+		var components = getEncodingComponents( encoding );
+		return "vec4 " + functionName + "( vec4 value ) { return " + components[ 0 ] + "ToLinear" + components[ 1 ] + "; }";
+
+	}
+
+	function getTexelEncodingFunction( functionName, encoding ) {
+
+		var components = getEncodingComponents( encoding );
+		return "vec4 " + functionName + "( vec4 value ) { return LinearTo" + components[ 0 ] + components[ 1 ] + "; }";
+
+	}
+
+	function getToneMappingFunction( functionName, toneMapping ) {
+
+		var toneMappingName;
+
+		switch ( toneMapping ) {
+
+			case THREE.LinearToneMapping:
+				toneMappingName = "Linear";
+				break;
+
+			case THREE.ReinhardToneMapping:
+				toneMappingName = "Reinhard";
+				break;
+
+			case THREE.Uncharted2ToneMapping:
+				toneMappingName = "Uncharted2";
+				break;
+
+			case THREE.CineonToneMapping:
+				toneMappingName = "OptimizedCineon";
+				break;
+
+			default:
+				throw new Error( 'unsupported toneMapping: ' + toneMapping );
+
+		}
+
+		return "vec3 " + functionName + "( vec3 color ) { return " + toneMappingName + "ToneMapping( color ); }";
+
+	}
+
 	function generateExtensions( extensions, parameters, rendererExtensions ) {
 
 		extensions = extensions || {};
 
 		var chunks = [
-			( extensions.derivatives || parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+			( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 			( extensions.fragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 			( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
 			( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
@@ -29611,6 +29062,28 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
+	function parseIncludes( string ) {
+
+		var pattern = /#include +<([\w\d.]+)>/g;
+
+		function replace( match, include ) {
+
+			var replace = THREE.ShaderChunk[ include ];
+
+			if ( replace === undefined ) {
+
+				throw new Error( 'Can not resolve #include <' + include + '>' );
+
+			}
+
+			return parseIncludes( replace );
+
+		}
+
+		return string.replace( pattern, replace );
+
+	}
+
 	function unrollLoops( string ) {
 
 		var pattern = /for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
@@ -29666,6 +29139,11 @@ THREE.WebGLProgram = ( function () {
 				case THREE.CubeReflectionMapping:
 				case THREE.CubeRefractionMapping:
 					envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
+					break;
+
+				case THREE.CubeUVReflectionMapping:
+				case THREE.CubeUVRefractionMapping:
+					envMapTypeDefine = 'ENVMAP_TYPE_CUBE_UV';
 					break;
 
 				case THREE.EquirectangularReflectionMapping:
@@ -29740,8 +29218,6 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
 
-				renderer.gammaInput ? '#define GAMMA_INPUT' : '',
-				renderer.gammaOutput ? '#define GAMMA_OUTPUT' : '',
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 				'#define MAX_BONES ' + parameters.maxBones,
@@ -29834,7 +29310,6 @@ THREE.WebGLProgram = ( function () {
 
 			].filter( filterEmptyLine ).join( '\n' );
 
-
 			prefixFragment = [
 
 				customExtensions,
@@ -29848,8 +29323,6 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
 
-				renderer.gammaInput ? '#define GAMMA_INPUT' : '',
-				renderer.gammaOutput ? '#define GAMMA_OUTPUT' : '',
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 				( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
@@ -29880,6 +29353,10 @@ THREE.WebGLProgram = ( function () {
 				parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
 				parameters.pointLightShadows > 0 ? '#define POINT_LIGHT_SHADOWS' : '',
 
+				parameters.premultipliedAlpha ? "#define PREMULTIPLIED_ALPHA" : '',
+
+				parameters.physicallyCorrectLights ? "#define PHYSICALLY_CORRECT_LIGHTS" : '',
+
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
@@ -29888,13 +29365,26 @@ THREE.WebGLProgram = ( function () {
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
 
+				( parameters.toneMapping !== THREE.NoToneMapping ) ? "#define TONE_MAPPING" : '',
+				( parameters.toneMapping !== THREE.NoToneMapping ) ? THREE.ShaderChunk[ 'tonemapping_pars_fragment' ] : '',  // this code is required here because it is used by the toneMapping() function defined below
+				( parameters.toneMapping !== THREE.NoToneMapping ) ? getToneMappingFunction( "toneMapping", parameters.toneMapping ) : '',
+
+				( parameters.outputEncoding || parameters.mapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ? THREE.ShaderChunk[ 'encodings_pars_fragment' ] : '', // this code is required here because it is used by the various encoding/decoding function defined below
+				parameters.mapEncoding ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',
+				parameters.envMapEncoding ? getTexelDecodingFunction( 'envMapTexelToLinear', parameters.envMapEncoding ) : '',
+				parameters.emissiveMapEncoding ? getTexelDecodingFunction( 'emissiveMapTexelToLinear', parameters.emissiveMapEncoding ) : '',
+				parameters.outputEncoding ? getTexelEncodingFunction( "linearToOutputTexel", parameters.outputEncoding ) : '',
+
 				'\n'
 
 			].filter( filterEmptyLine ).join( '\n' );
 
 		}
 
+		vertexShader = parseIncludes( vertexShader, parameters );
 		vertexShader = replaceLightNums( vertexShader, parameters );
+
+		fragmentShader = parseIncludes( fragmentShader, parameters );
 		fragmentShader = replaceLightNums( fragmentShader, parameters );
 
 		if ( material instanceof THREE.ShaderMaterial === false ) {
@@ -30089,15 +29579,15 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 	};
 
 	var parameterNames = [
-		"precision", "supportsVertexTextures", "map", "envMap", "envMapMode",
-		"lightMap", "aoMap", "emissiveMap", "bumpMap", "normalMap", "displacementMap", "specularMap",
+		"precision", "supportsVertexTextures", "map", "mapEncoding", "envMap", "envMapMode", "envMapEncoding",
+		"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "displacementMap", "specularMap",
 		"roughnessMap", "metalnessMap",
 		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
-		"maxMorphTargets", "maxMorphNormals",
+		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
-		"shadowMapEnabled", "pointLightShadows",
+		"shadowMapEnabled", "pointLightShadows", "toneMapping", 'physicallyCorrectLights',
 		"shadowMapType",
 		"alphaTest", "doubleSided", "flipSided"
 	];
@@ -30141,9 +29631,39 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 	}
 
+	function getTextureEncodingFromMap( map, gammaOverrideLinear ) {
+
+		var encoding;
+
+		if ( ! map ) {
+
+			encoding = THREE.LinearEncoding;
+
+		} else if ( map instanceof THREE.Texture ) {
+
+			encoding = map.encoding;
+
+		} else if ( map instanceof THREE.WebGLRenderTarget ) {
+
+			encoding = map.texture.encoding;
+
+		}
+
+		// add backwards compatibility for WebGLRenderer.gammaInput/gammaOutput parameter, should probably be removed at some point.
+		if ( encoding === THREE.LinearEncoding && gammaOverrideLinear ) {
+
+			encoding = THREE.GammaEncoding;
+
+		}
+
+		return encoding;
+
+	}
+
 	this.getParameters = function ( material, lights, fog, object ) {
 
 		var shaderID = shaderIDs[ material.type ];
+
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
 
@@ -30168,13 +29688,17 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			precision: precision,
 			supportsVertexTextures: capabilities.vertexTextures,
-
+			outputEncoding: getTextureEncodingFromMap( renderer.getCurrentRenderTarget(), renderer.gammaOutput ),
 			map: !! material.map,
+			mapEncoding: getTextureEncodingFromMap( material.map, renderer.gammaInput ),
 			envMap: !! material.envMap,
 			envMapMode: material.envMap && material.envMap.mapping,
+			envMapEncoding: getTextureEncodingFromMap( material.envMap, renderer.gammaInput ),
+			envMapCubeUV: ( !! material.envMap ) && ( ( material.envMap.mapping === THREE.CubeUVReflectionMapping ) || ( material.envMap.mapping === THREE.CubeUVRefractionMapping ) ),
 			lightMap: !! material.lightMap,
 			aoMap: !! material.aoMap,
 			emissiveMap: !! material.emissiveMap,
+			emissiveMapEncoding: getTextureEncodingFromMap( material.emissiveMap, renderer.gammaInput ),
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			displacementMap: !! material.displacementMap,
@@ -30214,6 +29738,11 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
+
+			toneMapping: renderer.toneMapping,
+			physicallyCorrectLights: renderer.physicallyCorrectLights,
+
+			premultipliedAlpha: material.premultipliedAlpha,
 
 			alphaTest: material.alphaTest,
 			doubleSided: material.side === THREE.DoubleSide,
@@ -30466,19 +29995,18 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			skinning: useSkinning
 		} );
 
-		depthMaterial._shadowPass = true;
-
 		_depthMaterials[ i ] = depthMaterial;
 
 		var distanceMaterial = new THREE.ShaderMaterial( {
+			defines: {
+				'USE_SHADOWMAP': ''
+			},
 			uniforms: distanceUniforms,
 			vertexShader: distanceShader.vertexShader,
 			fragmentShader: distanceShader.fragmentShader,
 			morphTargets: useMorphing,
 			skinning: useSkinning
 		} );
-
-		distanceMaterial._shadowPass = true;
 
 		_distanceMaterials[ i ] = distanceMaterial;
 
@@ -30499,6 +30027,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	this.render = function ( scene, camera ) {
 
 		var faceCount, isPointLight;
+		var shadows = _lights.shadows;
+
+		if ( shadows.length === 0 ) return;
 
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
@@ -30513,8 +30044,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		_state.setScissorTest( false );
 
 		// render depth map
-
-		var shadows = _lights.shadows;
 
 		for ( var i = 0, il = shadows.length; i < il; i ++ ) {
 
@@ -30683,10 +30212,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			}
 
-			// We must call _renderer.resetGLState() at the end of each iteration of
-			// the light loop in order to force material updates for each light.
-			_renderer.resetGLState();
-
 		}
 
 		// Restore GL state.
@@ -30701,8 +30226,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			_gl.cullFace( _gl.BACK );
 
 		}
-
-		_renderer.resetGLState();
 
 		scope.needsUpdate = false;
 
@@ -30818,6 +30341,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	var currentBlendEquationAlpha = null;
 	var currentBlendSrcAlpha = null;
 	var currentBlendDstAlpha = null;
+	var currentPremultipledAlpha = false;
 
 	var currentDepthFunc = null;
 	var currentDepthWrite = null;
@@ -30852,6 +30376,11 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var currentScissor = new THREE.Vector4();
 	var currentViewport = new THREE.Vector4();
+
+	var emptyTexture = gl.createTexture();
+	gl.bindTexture( gl.TEXTURE_2D, emptyTexture );
+	gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR );
+	gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, new Uint8Array( 3 ) );
 
 	this.init = function () {
 
@@ -30969,7 +30498,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) ||
 			     extensions.get( 'WEBGL_compressed_texture_s3tc' ) ||
-			     extensions.get( 'WEBGL_compressed_texture_etc1' )) {
+			     extensions.get( 'WEBGL_compressed_texture_etc1' ) ) {
 
 				var formats = gl.getParameter( gl.COMPRESSED_TEXTURE_FORMATS );
 
@@ -30987,7 +30516,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
-	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha ) {
+	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
 		if ( blending === THREE.NoBlending ) {
 
@@ -30999,35 +30528,68 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		}
 
-		if ( blending !== currentBlending ) {
+		if ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) {
 
 			if ( blending === THREE.AdditiveBlending ) {
 
-				gl.blendEquation( gl.FUNC_ADD );
-				gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+				if ( premultipliedAlpha ) {
+
+					gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+					gl.blendFuncSeparate( gl.ONE, gl.ONE, gl.ONE, gl.ONE );
+
+				} else {
+
+					gl.blendEquation( gl.FUNC_ADD );
+					gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+
+				}
 
 			} else if ( blending === THREE.SubtractiveBlending ) {
 
-				// TODO: Find blendFuncSeparate() combination
+				if ( premultipliedAlpha ) {
 
-				gl.blendEquation( gl.FUNC_ADD );
-				gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
+					gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+					gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA );
+
+				} else {
+
+					gl.blendEquation( gl.FUNC_ADD );
+					gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
+
+				}
 
 			} else if ( blending === THREE.MultiplyBlending ) {
 
-				// TODO: Find blendFuncSeparate() combination
+				if ( premultipliedAlpha ) {
 
-				gl.blendEquation( gl.FUNC_ADD );
-				gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
+					gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+					gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.SRC_COLOR, gl.SRC_ALPHA );
+
+				} else {
+
+					gl.blendEquation( gl.FUNC_ADD );
+					gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
+
+				}
 
 			} else {
 
-				gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-				gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+				if ( premultipliedAlpha ) {
+
+					gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+					gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+
+				} else {
+
+					gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+					gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+
+				}
 
 			}
 
 			currentBlending = blending;
+			currentPremultipledAlpha = premultipliedAlpha;
 
 		}
 
@@ -31346,7 +30908,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
 
-			gl.bindTexture( webglType, webglTexture );
+			gl.bindTexture( webglType, webglTexture || emptyTexture );
 
 			boundTexture.type = webglType;
 			boundTexture.texture = webglTexture;
@@ -31462,6 +31024,9 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 		capabilities = {};
 
 		compressedTextureFormats = null;
+
+		currentTextureSlot = undefined;
+		currentBoundTextures = {};
 
 		currentBlending = null;
 
@@ -32529,6 +32094,13 @@ THREE.Face4 = function ( a, b, c, d, normal, color, materialIndex ) {
 
 	console.warn( 'THREE.Face4 has been removed. A THREE.Face3 will be created instead.' );
 	return new THREE.Face3( a, b, c, normal, color, materialIndex );
+
+};
+
+THREE.Vertex = function ( x, y, z ) {
+
+	console.warn( 'THREE.Vertex has been removed. Use THREE.Vector3 instead.' );
+	return new THREE.Vector3( x, y, z );
 
 };
 
@@ -36012,107 +35584,7 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 		depthSegments: depthSegments
 	};
 
-	this.widthSegments = widthSegments || 1;
-	this.heightSegments = heightSegments || 1;
-	this.depthSegments = depthSegments || 1;
-
-	var scope = this;
-
-	var width_half = width / 2;
-	var height_half = height / 2;
-	var depth_half = depth / 2;
-
-	buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, 0 ); // px
-	buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, 1 ); // nx
-	buildPlane( 'x', 'z',   1,   1, width, depth, height_half, 2 ); // py
-	buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, 3 ); // ny
-	buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, 4 ); // pz
-	buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, 5 ); // nz
-
-	function buildPlane( u, v, udir, vdir, width, height, depth, materialIndex ) {
-
-		var w, ix, iy,
-		gridX = scope.widthSegments,
-		gridY = scope.heightSegments,
-		width_half = width / 2,
-		height_half = height / 2,
-		offset = scope.vertices.length;
-
-		if ( ( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' ) ) {
-
-			w = 'z';
-
-		} else if ( ( u === 'x' && v === 'z' ) || ( u === 'z' && v === 'x' ) ) {
-
-			w = 'y';
-			gridY = scope.depthSegments;
-
-		} else if ( ( u === 'z' && v === 'y' ) || ( u === 'y' && v === 'z' ) ) {
-
-			w = 'x';
-			gridX = scope.depthSegments;
-
-		}
-
-		var gridX1 = gridX + 1,
-		gridY1 = gridY + 1,
-		segment_width = width / gridX,
-		segment_height = height / gridY,
-		normal = new THREE.Vector3();
-
-		normal[ w ] = depth > 0 ? 1 : - 1;
-
-		for ( iy = 0; iy < gridY1; iy ++ ) {
-
-			for ( ix = 0; ix < gridX1; ix ++ ) {
-
-				var vector = new THREE.Vector3();
-				vector[ u ] = ( ix * segment_width - width_half ) * udir;
-				vector[ v ] = ( iy * segment_height - height_half ) * vdir;
-				vector[ w ] = depth;
-
-				scope.vertices.push( vector );
-
-			}
-
-		}
-
-		for ( iy = 0; iy < gridY; iy ++ ) {
-
-			for ( ix = 0; ix < gridX; ix ++ ) {
-
-				var a = ix + gridX1 * iy;
-				var b = ix + gridX1 * ( iy + 1 );
-				var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
-				var d = ( ix + 1 ) + gridX1 * iy;
-
-				var uva = new THREE.Vector2( ix / gridX, 1 - iy / gridY );
-				var uvb = new THREE.Vector2( ix / gridX, 1 - ( iy + 1 ) / gridY );
-				var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iy + 1 ) / gridY );
-				var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iy / gridY );
-
-				var face = new THREE.Face3( a + offset, b + offset, d + offset );
-				face.normal.copy( normal );
-				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-				face.materialIndex = materialIndex;
-
-				scope.faces.push( face );
-				scope.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
-
-				face = new THREE.Face3( b + offset, c + offset, d + offset );
-				face.normal.copy( normal );
-				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-				face.materialIndex = materialIndex;
-
-				scope.faces.push( face );
-				scope.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
-
-			}
-
-		}
-
-	}
-
+	this.fromBufferGeometry( new THREE.BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) );
 	this.mergeVertices();
 
 };
@@ -36121,6 +35593,190 @@ THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.BoxGeometry.prototype.constructor = THREE.BoxGeometry;
 
 THREE.CubeGeometry = THREE.BoxGeometry;
+
+// File:src/extras/geometries/BoxBufferGeometry.js
+
+/**
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
+THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+
+	THREE.BufferGeometry.call( this );
+
+	this.type = 'BoxBufferGeometry';
+
+	this.parameters = {
+		width: width,
+		height: height,
+		depth: depth,
+		widthSegments: widthSegments,
+		heightSegments: heightSegments,
+		depthSegments: depthSegments
+	};
+
+	var scope = this;
+
+	// segments
+	widthSegments = Math.floor( widthSegments ) || 1;
+	heightSegments = Math.floor( heightSegments ) || 1;
+	depthSegments = Math.floor( depthSegments ) || 1;
+
+	// these are used to calculate buffer length
+	var vertexCount = calculateVertexCount( widthSegments, heightSegments, depthSegments );
+	var indexCount = ( vertexCount / 4 ) * 6;
+
+	// buffers
+	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+	var vertices = new Float32Array( vertexCount * 3 );
+	var normals = new Float32Array( vertexCount * 3 );
+	var uvs = new Float32Array( vertexCount * 2 );
+
+	// offset variables
+	var vertexBufferOffset = 0;
+	var uvBufferOffset = 0;
+	var indexBufferOffset = 0;
+	var numberOfVertices = 0;
+
+	// group variables
+	var groupStart = 0;
+
+	// build each side of the box geometry
+	buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height,   width,  depthSegments, heightSegments, 0 ); // px
+	buildPlane( 'z', 'y', 'x',   1, - 1, depth, height, - width,  depthSegments, heightSegments, 1 ); // nx
+	buildPlane( 'x', 'z', 'y',   1,   1, width, depth,    height, widthSegments, depthSegments,  2 ); // py
+	buildPlane( 'x', 'z', 'y',   1, - 1, width, depth,  - height, widthSegments, depthSegments,  3 ); // ny
+	buildPlane( 'x', 'y', 'z',   1, - 1, width, height,   depth,  widthSegments, heightSegments, 4 ); // pz
+	buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth,  widthSegments, heightSegments, 5 ); // nz
+
+	// build geometry
+	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+	// helper functions
+
+	function calculateVertexCount ( w, h, d ) {
+
+		var segments = 0;
+
+		// calculate the amount of segments for each side
+		segments += w * h * 2; // xy
+		segments += w * d * 2; // xz
+		segments += d * h * 2; // zy
+
+		return segments * 4; // four vertices per segments
+
+	}
+
+	function buildPlane ( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
+
+		var segmentWidth	= width / gridX;
+		var segmentHeight = height / gridY;
+
+		var widthHalf = width / 2;
+		var heightHalf = height / 2;
+		var depthHalf = depth / 2;
+
+		var gridX1 = gridX + 1;
+		var gridY1 = gridY + 1;
+
+		var vertexCounter = 0;
+		var groupCount = 0;
+
+		var vector = new THREE.Vector3();
+
+		// generate vertices, normals and uvs
+
+		for ( var iy = 0; iy < gridY1; iy ++ ) {
+
+			var y = iy * segmentHeight - heightHalf;
+
+			for ( var ix = 0; ix < gridX1; ix ++ ) {
+
+				var x = ix * segmentWidth - widthHalf;
+
+				// set values to correct vector component
+				vector[ u ] = x * udir;
+				vector[ v ] = y * vdir;
+				vector[ w ] = depthHalf;
+
+				// now apply vector to vertex buffer
+				vertices[ vertexBufferOffset ] = vector.x;
+				vertices[ vertexBufferOffset + 1 ] = vector.y;
+				vertices[ vertexBufferOffset + 2 ] = vector.z;
+
+				// set values to correct vector component
+				vector[ u ] = 0;
+				vector[ v ] = 0;
+				vector[ w ] = depth > 0 ? 1 : - 1;
+
+				// now apply vector to normal buffer
+				normals[ vertexBufferOffset ] = vector.x;
+				normals[ vertexBufferOffset + 1 ] = vector.y;
+				normals[ vertexBufferOffset + 2 ] = vector.z;
+
+				// uvs
+				uvs[ uvBufferOffset ] = ix / gridX;
+				uvs[ uvBufferOffset + 1 ] = 1 - ( iy / gridY );
+
+				// update offsets and counters
+				vertexBufferOffset += 3;
+				uvBufferOffset += 2;
+				vertexCounter += 1;
+
+			}
+
+		}
+
+		// 1. you need three indices to draw a single face
+		// 2. a single segment consists of two faces
+		// 3. so we need to generate six (2*3) indices per segment
+
+		for ( iy = 0; iy < gridY; iy ++ ) {
+
+			for ( ix = 0; ix < gridX; ix ++ ) {
+
+				// indices
+				var a = numberOfVertices + ix + gridX1 * iy;
+				var b = numberOfVertices + ix + gridX1 * ( iy + 1 );
+				var c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
+				var d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
+
+				// face one
+				indices[ indexBufferOffset ] = a;
+				indices[ indexBufferOffset + 1 ] = b;
+				indices[ indexBufferOffset + 2 ] = d;
+
+				// face two
+				indices[ indexBufferOffset + 3 ] = b;
+				indices[ indexBufferOffset + 4 ] = c;
+				indices[ indexBufferOffset + 5 ] = d;
+
+				// update offsets and counters
+				indexBufferOffset += 6;
+				groupCount += 6;
+
+			}
+
+		}
+
+		// add a group to the geometry. this will ensure multi material support
+		scope.addGroup( groupStart, groupCount, materialIndex );
+
+		// calculate new start value for groups
+		groupStart += groupCount;
+
+		// update total number of vertices
+		numberOfVertices += vertexCounter;
+
+	}
+
+};
+
+THREE.BoxBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.BoxBufferGeometry.prototype.constructor = THREE.BoxBufferGeometry;
 
 // File:src/extras/geometries/CircleGeometry.js
 
@@ -36218,6 +35874,303 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 THREE.CircleBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.CircleBufferGeometry.prototype.constructor = THREE.CircleBufferGeometry;
 
+// File:src/extras/geometries/CylinderBufferGeometry.js
+
+/**
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
+THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+
+	THREE.BufferGeometry.call( this );
+
+	this.type = 'CylinderBufferGeometry';
+
+	this.parameters = {
+		radiusTop: radiusTop,
+		radiusBottom: radiusBottom,
+		height: height,
+		radialSegments: radialSegments,
+		heightSegments: heightSegments,
+		openEnded: openEnded,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength
+	};
+
+	radiusTop = radiusTop !== undefined ? radiusTop : 20;
+	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
+	height = height !== undefined ? height : 100;
+
+	radialSegments = Math.floor( radialSegments )  || 8;
+	heightSegments = Math.floor( heightSegments ) || 1;
+
+	openEnded = openEnded !== undefined ? openEnded : false;
+	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
+
+	// used to calculate buffer length
+
+	var vertexCount = calculateVertexCount();
+	var indexCount = calculateIndexCount();
+
+	// buffers
+
+	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+	// helper variables
+
+	var index = 0, indexOffset = 0, indexArray = [], halfHeight = height / 2;
+
+	// generate geometry
+
+	generateTorso();
+
+	if( openEnded === false ) {
+
+		if( radiusTop > 0 ) {
+
+			generateCap( true );
+
+		}
+
+		if( radiusBottom > 0 ) {
+
+			generateCap( false );
+
+		}
+
+	}
+
+	// build geometry
+
+	this.setIndex( indices );
+	this.addAttribute( 'position', vertices );
+	this.addAttribute( 'normal', normals );
+	this.addAttribute( 'uv', uvs );
+
+	// helper functions
+
+	function calculateVertexCount () {
+
+		var count = ( radialSegments + 1 ) * ( heightSegments + 1 );
+
+		if ( openEnded === false ) {
+
+			count += ( ( radialSegments + 1 ) * 2 ) + ( radialSegments * 2 );
+
+		}
+
+		return count;
+
+	}
+
+	function calculateIndexCount () {
+
+		var count = radialSegments * heightSegments * 2 * 3;
+
+		if ( openEnded === false ) {
+
+			count += radialSegments * 2 * 3;
+
+		}
+
+		return count;
+
+	}
+
+	function generateTorso () {
+
+		var x, y;
+		var normal = new THREE.Vector3();
+		var vertex = new THREE.Vector3();
+
+		// this will be used to calculate the normal
+		var tanTheta = ( radiusBottom - radiusTop ) / height;
+
+		// generate vertices, normals and uvs
+
+		for ( y = 0; y <= heightSegments; y ++ ) {
+
+			var indexRow = [];
+
+			var v = y / heightSegments;
+
+			// calculate the radius of the current row
+			var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
+
+			for ( x = 0; x <= radialSegments; x ++ ) {
+
+				var u = x / radialSegments;
+
+				// vertex
+				vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+				vertex.y = - v * height + halfHeight;
+				vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+				// normal
+				normal.copy( vertex );
+
+				// handle special case if radiusTop/radiusBottom is zero
+				if( ( radiusTop === 0  && y === 0 ) || ( radiusBottom === 0  && y === heightSegments ) ) {
+
+					normal.x = Math.sin( u * thetaLength + thetaStart );
+					normal.z = Math.cos( u * thetaLength + thetaStart );
+
+				}
+
+				normal.setY( Math.sqrt( normal.x * normal.x + normal.z * normal.z ) * tanTheta ).normalize();
+				normals.setXYZ( index, normal.x, normal.y, normal.z );
+
+				// uv
+				uvs.setXY( index, u, 1 - v );
+
+				// save index of vertex in respective row
+				indexRow.push( index );
+
+				// increase index
+				index ++;
+
+			}
+
+			// now save vertices of the row in our index array
+			indexArray.push( indexRow );
+
+		}
+
+		// generate indices
+
+		for ( x = 0; x < radialSegments; x ++ ) {
+
+			for ( y = 0; y < heightSegments; y ++ ) {
+
+				// we use the index array to access the correct indices
+				var i1 = indexArray[ y ][ x ];
+				var i2 = indexArray[ y + 1 ][ x ];
+				var i3 = indexArray[ y + 1 ][ x + 1 ];
+				var i4 = indexArray[ y ][ x + 1 ];
+
+				// face one
+				indices.setX( indexOffset, i1 ); indexOffset++;
+				indices.setX( indexOffset, i2 ); indexOffset++;
+				indices.setX( indexOffset, i4 ); indexOffset++;
+
+				// face two
+				indices.setX( indexOffset, i2 ); indexOffset++;
+				indices.setX( indexOffset, i3 ); indexOffset++;
+				indices.setX( indexOffset, i4 ); indexOffset++;
+
+			}
+
+		}
+
+	}
+
+	function generateCap ( top ) {
+
+		var x, centerIndexStart, centerIndexEnd;
+		var uv = new THREE.Vector2();
+		var vertex = new THREE.Vector3();
+
+		var radius = ( top === true ) ? radiusTop : radiusBottom;
+		var sign = ( top === true ) ? 1 : - 1;
+
+		// save the index of the first center vertex
+		centerIndexStart = index;
+
+		// first we generate the center vertex data of the cap.
+		// because the geometry needs one set of uvs per face,
+		// we must generate a center vertex per face/segment
+
+		for ( x = 1; x <= radialSegments; x ++ ) {
+
+			// vertex
+			vertices.setXYZ( index, 0, halfHeight * sign, 0 );
+
+			// normal
+			normals.setXYZ( index, 0, sign, 0 );
+
+			// uv
+			if( top === true ) {
+
+				uv.x = x / radialSegments;
+				uv.y = 0;
+
+			} else {
+
+				uv.x = ( x - 1 ) / radialSegments;
+				uv.y = 1;
+
+			}
+
+			uvs.setXY( index, uv.x, uv.y );
+
+			// increase index
+			index++;
+
+		}
+
+		// save the index of the last center vertex
+		centerIndexEnd = index;
+
+		// now we generate the surrounding vertices, normals and uvs
+
+		for ( x = 0; x <= radialSegments; x ++ ) {
+
+			var u = x / radialSegments;
+
+			// vertex
+			vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+			vertex.y = halfHeight * sign;
+			vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+			// normal
+			normals.setXYZ( index, 0, sign, 0 );
+
+			// uv
+			uvs.setXY( index, u, ( top === true ) ? 1 : 0 );
+
+			// increase index
+			index ++;
+
+		}
+
+		// generate indices
+
+		for ( x = 0; x < radialSegments; x ++ ) {
+
+			var c = centerIndexStart + x;
+			var i = centerIndexEnd + x;
+
+			if( top === true ) {
+
+				// face top
+				indices.setX( indexOffset, i ); indexOffset++;
+				indices.setX( indexOffset, i + 1 ); indexOffset++;
+				indices.setX( indexOffset, c ); indexOffset++;
+
+			} else {
+
+				// face bottom
+				indices.setX( indexOffset, i + 1); indexOffset++;
+				indices.setX( indexOffset, i ); indexOffset++;
+				indices.setX( indexOffset, c ); indexOffset++;
+
+			}
+
+		}
+
+	}
+
+};
+
+THREE.CylinderBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.CylinderBufferGeometry.prototype.constructor = THREE.CylinderBufferGeometry;
+
 // File:src/extras/geometries/CylinderGeometry.js
 
 /**
@@ -36241,152 +36194,8 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 		thetaLength: thetaLength
 	};
 
-	radiusTop = radiusTop !== undefined ? radiusTop : 20;
-	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
-	height = height !== undefined ? height : 100;
-
-	radialSegments = radialSegments || 8;
-	heightSegments = heightSegments || 1;
-
-	openEnded = openEnded !== undefined ? openEnded : false;
-	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
-
-	var heightHalf = height / 2;
-
-	var x, y, vertices = [], uvs = [];
-
-	for ( y = 0; y <= heightSegments; y ++ ) {
-
-		var verticesRow = [];
-		var uvsRow = [];
-
-		var v = y / heightSegments;
-		var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
-
-		for ( x = 0; x <= radialSegments; x ++ ) {
-
-			var u = x / radialSegments;
-
-			var vertex = new THREE.Vector3();
-			vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
-			vertex.y = - v * height + heightHalf;
-			vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
-
-			this.vertices.push( vertex );
-
-			verticesRow.push( this.vertices.length - 1 );
-			uvsRow.push( new THREE.Vector2( u, 1 - v ) );
-
-		}
-
-		vertices.push( verticesRow );
-		uvs.push( uvsRow );
-
-	}
-
-	var tanTheta = ( radiusBottom - radiusTop ) / height;
-	var na, nb;
-
-	for ( x = 0; x < radialSegments; x ++ ) {
-
-		if ( radiusTop !== 0 ) {
-
-			na = this.vertices[ vertices[ 0 ][ x ] ].clone();
-			nb = this.vertices[ vertices[ 0 ][ x + 1 ] ].clone();
-
-		} else {
-
-			na = this.vertices[ vertices[ 1 ][ x ] ].clone();
-			nb = this.vertices[ vertices[ 1 ][ x + 1 ] ].clone();
-
-		}
-
-		na.setY( Math.sqrt( na.x * na.x + na.z * na.z ) * tanTheta ).normalize();
-		nb.setY( Math.sqrt( nb.x * nb.x + nb.z * nb.z ) * tanTheta ).normalize();
-
-		for ( y = 0; y < heightSegments; y ++ ) {
-
-			var v1 = vertices[ y ][ x ];
-			var v2 = vertices[ y + 1 ][ x ];
-			var v3 = vertices[ y + 1 ][ x + 1 ];
-			var v4 = vertices[ y ][ x + 1 ];
-
-			var n1 = na.clone();
-			var n2 = na.clone();
-			var n3 = nb.clone();
-			var n4 = nb.clone();
-
-			var uv1 = uvs[ y ][ x ].clone();
-			var uv2 = uvs[ y + 1 ][ x ].clone();
-			var uv3 = uvs[ y + 1 ][ x + 1 ].clone();
-			var uv4 = uvs[ y ][ x + 1 ].clone();
-
-			this.faces.push( new THREE.Face3( v1, v2, v4, [ n1, n2, n4 ] ) );
-			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv4 ] );
-
-			this.faces.push( new THREE.Face3( v2, v3, v4, [ n2.clone(), n3, n4.clone() ] ) );
-			this.faceVertexUvs[ 0 ].push( [ uv2.clone(), uv3, uv4.clone() ] );
-
-		}
-
-	}
-
-	// top cap
-
-	if ( openEnded === false && radiusTop > 0 ) {
-
-		this.vertices.push( new THREE.Vector3( 0, heightHalf, 0 ) );
-
-		for ( x = 0; x < radialSegments; x ++ ) {
-
-			var v1 = vertices[ 0 ][ x ];
-			var v2 = vertices[ 0 ][ x + 1 ];
-			var v3 = this.vertices.length - 1;
-
-			var n1 = new THREE.Vector3( 0, 1, 0 );
-			var n2 = new THREE.Vector3( 0, 1, 0 );
-			var n3 = new THREE.Vector3( 0, 1, 0 );
-
-			var uv1 = uvs[ 0 ][ x ].clone();
-			var uv2 = uvs[ 0 ][ x + 1 ].clone();
-			var uv3 = new THREE.Vector2( uv2.x, 0 );
-
-			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ], undefined, 1 ) );
-			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
-
-		}
-
-	}
-
-	// bottom cap
-
-	if ( openEnded === false && radiusBottom > 0 ) {
-
-		this.vertices.push( new THREE.Vector3( 0, - heightHalf, 0 ) );
-
-		for ( x = 0; x < radialSegments; x ++ ) {
-
-			var v1 = vertices[ heightSegments ][ x + 1 ];
-			var v2 = vertices[ heightSegments ][ x ];
-			var v3 = this.vertices.length - 1;
-
-			var n1 = new THREE.Vector3( 0, - 1, 0 );
-			var n2 = new THREE.Vector3( 0, - 1, 0 );
-			var n3 = new THREE.Vector3( 0, - 1, 0 );
-
-			var uv1 = uvs[ heightSegments ][ x + 1 ].clone();
-			var uv2 = uvs[ heightSegments ][ x ].clone();
-			var uv3 = new THREE.Vector2( uv2.x, 1 );
-
-			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ], undefined, 2 ) );
-			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
-
-		}
-
-	}
-
-	this.computeFaceNormals();
+	this.fromBufferGeometry( new THREE.CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) );
+	this.mergeVertices();
 
 };
 
@@ -37332,6 +37141,165 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 };
 
+// File:src/extras/geometries/LatheBufferGeometry.js
+
+/**
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
+ // points - to create a closed torus, one must use a set of points
+ //    like so: [ a, b, c, d, a ], see first is the same as last.
+ // segments - the number of circumference segments to create
+ // phiStart - the starting radian
+ // phiLength - the radian (0 to 2PI) range of the lathed section
+ //    2PI is a closed lathe, less than 2PI is a portion.
+
+THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
+
+	THREE.BufferGeometry.call( this );
+
+	this.type = 'LatheBufferGeometry';
+
+	this.parameters = {
+		points: points,
+		segments: segments,
+		phiStart: phiStart,
+		phiLength: phiLength
+	};
+
+	segments = Math.floor( segments ) || 12;
+	phiStart = phiStart || 0;
+	phiLength = phiLength || Math.PI * 2;
+
+	// clamp phiLength so it's in range of [ 0, 2PI ]
+	phiLength = THREE.Math.clamp( phiLength, 0, Math.PI * 2 );
+
+	// these are used to calculate buffer length
+	var vertexCount = ( segments + 1 ) * points.length;
+	var indexCount = segments * points.length * 2 * 3;
+
+	// buffers
+	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+	// helper variables
+	var index = 0, indexOffset = 0, base;
+	var inversePointLength = 1.0 / ( points.length - 1 );
+	var inverseSegments = 1.0 / segments;
+	var vertex = new THREE.Vector3();
+	var uv = new THREE.Vector2();
+	var i, j;
+
+	// generate vertices and uvs
+
+	for ( i = 0; i <= segments; i ++ ) {
+
+		var phi = phiStart + i * inverseSegments * phiLength;
+
+		var sin = Math.sin( phi );
+		var cos = Math.cos( phi );
+
+		for ( j = 0; j <= ( points.length - 1 ); j ++ ) {
+
+			// vertex
+			vertex.x = points[ j ].x * sin;
+			vertex.y = points[ j ].y;
+			vertex.z = points[ j ].x * cos;
+			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+			// uv
+			uv.x = i / segments;
+			uv.y = j / ( points.length - 1 );
+			uvs.setXY( index, uv.x, uv.y );
+
+			// increase index
+			index ++;
+
+		}
+
+	}
+
+	// generate indices
+
+	for ( i = 0; i < segments; i ++ ) {
+
+		for ( j = 0; j < ( points.length - 1 ); j ++ ) {
+
+			base = j + i * points.length;
+
+			// indices
+			var a = base;
+			var b = base + points.length;
+			var c = base + points.length + 1;
+			var d = base + 1;
+
+			// face one
+			indices.setX( indexOffset, a ); indexOffset++;
+			indices.setX( indexOffset, b ); indexOffset++;
+			indices.setX( indexOffset, d ); indexOffset++;
+
+			// face two
+			indices.setX( indexOffset, b ); indexOffset++;
+			indices.setX( indexOffset, c ); indexOffset++;
+			indices.setX( indexOffset, d ); indexOffset++;
+
+		}
+
+	}
+
+	// build geometry
+
+	this.setIndex( indices );
+	this.addAttribute( 'position', vertices );
+	this.addAttribute( 'uv', uvs );
+
+	// generate normals
+
+	this.computeVertexNormals();
+
+	// if the geometry is closed, we need to average the normals along the seam.
+	// because the corresponding vertices are identical (but still have different UVs).
+
+	if( phiLength === Math.PI * 2 ) {
+
+		var normals = this.attributes.normal.array;
+		var n1 = new THREE.Vector3();
+		var n2 = new THREE.Vector3();
+		var n = new THREE.Vector3();
+
+		// this is the buffer offset for the last line of vertices
+		base = segments * points.length * 3;
+
+		for( i = 0, j = 0; i < points.length; i ++, j += 3 ) {
+
+			// select the normal of the vertex in the first line
+			n1.x = normals[ j + 0 ];
+			n1.y = normals[ j + 1 ];
+			n1.z = normals[ j + 2 ];
+
+			// select the normal of the vertex in the last line
+			n2.x = normals[ base + j + 0 ];
+			n2.y = normals[ base + j + 1 ];
+			n2.z = normals[ base + j + 2 ];
+
+			// average normals
+			n.addVectors( n1, n2 ).normalize();
+
+			// assign the new values to both normals
+			normals[ j + 0 ] = normals[ base + j + 0 ] = n.x;
+			normals[ j + 1 ] = normals[ base + j + 1 ] = n.y;
+			normals[ j + 2 ] = normals[ base + j + 2 ] = n.z;
+
+		} // next row
+
+	}
+
+};
+
+THREE.LatheBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.LatheBufferGeometry.prototype.constructor = THREE.LatheBufferGeometry;
+
 // File:src/extras/geometries/LatheGeometry.js
 
 /**
@@ -37344,8 +37312,8 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 //    like so: [ a, b, c, d, a ], see first is the same as last.
 // segments - the number of circumference segments to create
 // phiStart - the starting radian
-// phiLength - the radian (0 to 2*PI) range of the lathed section
-//    2*pi is a closed lathe, less than 2PI is a portion.
+// phiLength - the radian (0 to 2PI) range of the lathed section
+//    2PI is a closed lathe, less than 2PI is a portion.
 
 THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 
@@ -37360,81 +37328,8 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 		phiLength: phiLength
 	};
 
-	segments = segments || 12;
-	phiStart = phiStart || 0;
-	phiLength = phiLength || 2 * Math.PI;
-
-	var inversePointLength = 1.0 / ( points.length - 1 );
-	var inverseSegments = 1.0 / segments;
-
-	for ( var i = 0, il = segments; i <= il; i ++ ) {
-
-		var phi = phiStart + i * inverseSegments * phiLength;
-
-		var sin = Math.sin( phi );
-		var cos = Math.cos( phi );
-
-		for ( var j = 0, jl = points.length; j < jl; j ++ ) {
-
-			var point = points[ j ];
-
-			var vertex = new THREE.Vector3();
-
-			vertex.x = point.x * sin;
-			vertex.y = point.y;
-			vertex.z = point.x * cos;
-
-			this.vertices.push( vertex );
-
-		}
-
-	}
-
-	var np = points.length;
-
-	for ( var i = 0, il = segments; i < il; i ++ ) {
-
-		for ( var j = 0, jl = points.length - 1; j < jl; j ++ ) {
-
-			var base = j + np * i;
-			var a = base;
-			var b = base + np;
-			var c = base + 1 + np;
-			var d = base + 1;
-
-			var u0 = i * inverseSegments;
-			var v0 = j * inversePointLength;
-			var u1 = u0 + inverseSegments;
-			var v1 = v0 + inversePointLength;
-
-			this.faces.push( new THREE.Face3( a, b, d ) );
-
-			this.faceVertexUvs[ 0 ].push( [
-
-				new THREE.Vector2( u0, v0 ),
-				new THREE.Vector2( u1, v0 ),
-				new THREE.Vector2( u0, v1 )
-
-			] );
-
-			this.faces.push( new THREE.Face3( b, c, d ) );
-
-			this.faceVertexUvs[ 0 ].push( [
-
-				new THREE.Vector2( u1, v0 ),
-				new THREE.Vector2( u1, v1 ),
-				new THREE.Vector2( u0, v1 )
-
-			] );
-
-
-		}
-
-	}
-
+	this.fromBufferGeometry( new THREE.LatheBufferGeometry( points, segments, phiStart, phiLength ) );
 	this.mergeVertices();
-	this.computeFaceNormals();
-	this.computeVertexNormals();
 
 };
 
@@ -37567,6 +37462,129 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 THREE.PlaneBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.PlaneBufferGeometry.prototype.constructor = THREE.PlaneBufferGeometry;
 
+// File:src/extras/geometries/RingBufferGeometry.js
+
+/**
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
+THREE.RingBufferGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+
+	THREE.BufferGeometry.call( this );
+
+	this.type = 'RingBufferGeometry';
+
+	this.parameters = {
+		innerRadius: innerRadius,
+		outerRadius: outerRadius,
+		thetaSegments: thetaSegments,
+		phiSegments: phiSegments,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength
+	};
+
+	innerRadius = innerRadius || 20;
+	outerRadius = outerRadius || 50;
+
+	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+
+	thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
+	phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 1;
+
+	// these are used to calculate buffer length
+	var vertexCount = ( thetaSegments + 1 ) * ( phiSegments + 1 );
+	var indexCount = thetaSegments * phiSegments * 2 * 3;
+
+	// buffers
+	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+	// some helper variables
+	var index = 0, indexOffset = 0, segment;
+	var radius = innerRadius;
+	var radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
+	var vertex = new THREE.Vector3();
+	var uv = new THREE.Vector2();
+	var j, i;
+
+	// generate vertices, normals and uvs
+
+	// values are generate from the inside of the ring to the outside
+
+	for ( j = 0; j <= phiSegments; j ++ ) {
+
+		for ( i = 0; i <= thetaSegments; i ++ ) {
+
+			segment = thetaStart + i / thetaSegments * thetaLength;
+
+			// vertex
+			vertex.x = radius * Math.cos( segment );
+			vertex.y = radius * Math.sin( segment );
+			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+			// normal
+			normals.setXYZ( index, 0, 0, 1 );
+
+			// uv
+			uv.x = ( vertex.x / outerRadius + 1 ) / 2;
+			uv.y = ( vertex.y / outerRadius + 1 ) / 2;
+			uvs.setXY( index, uv.x, uv.y );
+
+			// increase index
+			index++;
+
+		}
+
+		// increase the radius for next row of vertices
+		radius += radiusStep;
+
+	}
+
+	// generate indices
+
+	for ( j = 0; j < phiSegments; j ++ ) {
+
+		var thetaSegmentLevel = j * ( thetaSegments + 1 );
+
+		for ( i = 0; i < thetaSegments; i ++ ) {
+
+			segment = i + thetaSegmentLevel;
+
+			// indices
+			var a = segment;
+			var b = segment + thetaSegments + 1;
+			var c = segment + thetaSegments + 2;
+			var d = segment + 1;
+
+			// face one
+			indices.setX( indexOffset, a ); indexOffset++;
+			indices.setX( indexOffset, b ); indexOffset++;
+			indices.setX( indexOffset, c ); indexOffset++;
+
+			// face two
+			indices.setX( indexOffset, a ); indexOffset++;
+			indices.setX( indexOffset, c ); indexOffset++;
+			indices.setX( indexOffset, d ); indexOffset++;
+
+		}
+
+	}
+
+	// build geometry
+
+	this.setIndex( indices );
+	this.addAttribute( 'position', vertices );
+	this.addAttribute( 'normal', normals );
+	this.addAttribute( 'uv', uvs );
+
+};
+
+THREE.RingBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.RingBufferGeometry.prototype.constructor = THREE.RingBufferGeometry;
+
 // File:src/extras/geometries/RingGeometry.js
 
 /**
@@ -37588,74 +37606,7 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 		thetaLength: thetaLength
 	};
 
-	innerRadius = innerRadius || 0;
-	outerRadius = outerRadius || 50;
-
-	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
-
-	thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
-	phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 8;
-
-	var i, o, uvs = [], radius = innerRadius, radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
-
-	for ( i = 0; i < phiSegments + 1; i ++ ) {
-
-		// concentric circles inside ring
-
-		for ( o = 0; o < thetaSegments + 1; o ++ ) {
-
-			// number of segments per circle
-
-			var vertex = new THREE.Vector3();
-			var segment = thetaStart + o / thetaSegments * thetaLength;
-			vertex.x = radius * Math.cos( segment );
-			vertex.y = radius * Math.sin( segment );
-
-			this.vertices.push( vertex );
-			uvs.push( new THREE.Vector2( ( vertex.x / outerRadius + 1 ) / 2, ( vertex.y / outerRadius + 1 ) / 2 ) );
-
-		}
-
-		radius += radiusStep;
-
-	}
-
-	var n = new THREE.Vector3( 0, 0, 1 );
-
-	for ( i = 0; i < phiSegments; i ++ ) {
-
-		// concentric circles inside ring
-
-		var thetaSegment = i * ( thetaSegments + 1 );
-
-		for ( o = 0; o < thetaSegments ; o ++ ) {
-
-			// number of segments per circle
-
-			var segment = o + thetaSegment;
-
-			var v1 = segment;
-			var v2 = segment + thetaSegments + 1;
-			var v3 = segment + thetaSegments + 2;
-
-			this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
-			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v2 ].clone(), uvs[ v3 ].clone() ] );
-
-			v1 = segment;
-			v2 = segment + thetaSegments + 2;
-			v3 = segment + 1;
-
-			this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
-			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v2 ].clone(), uvs[ v3 ].clone() ] );
-
-		}
-
-	}
-
-	this.computeFaceNormals();
-
-	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
+	this.fromBufferGeometry( new THREE.RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
 
 };
 
@@ -37850,6 +37801,135 @@ THREE.TextGeometry = function ( text, parameters ) {
 THREE.TextGeometry.prototype = Object.create( THREE.ExtrudeGeometry.prototype );
 THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
 
+// File:src/extras/geometries/TorusBufferGeometry.js
+
+/**
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
+THREE.TorusBufferGeometry = function ( radius, tube, radialSegments, tubularSegments, arc ) {
+
+	THREE.BufferGeometry.call( this );
+
+	this.type = 'TorusBufferGeometry';
+
+	this.parameters = {
+		radius: radius,
+		tube: tube,
+		radialSegments: radialSegments,
+		tubularSegments: tubularSegments,
+		arc: arc
+	};
+
+	radius = radius || 100;
+	tube = tube || 40;
+	radialSegments = Math.floor( radialSegments ) || 8;
+	tubularSegments = Math.floor( tubularSegments ) || 6;
+	arc = arc || Math.PI * 2;
+
+	// used to calculate buffer length
+	var vertexCount = ( ( radialSegments + 1 ) * ( tubularSegments + 1 ) );
+	var indexCount = radialSegments * tubularSegments * 2 * 3;
+
+	// buffers
+	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+	var vertices = new Float32Array( vertexCount * 3 );
+	var normals = new Float32Array( vertexCount * 3 );
+	var uvs = new Float32Array( vertexCount * 2 );
+
+	// offset variables
+	var vertexBufferOffset = 0;
+	var uvBufferOffset = 0;
+	var indexBufferOffset = 0;
+
+	// helper variables
+	var center = new THREE.Vector3();
+	var vertex = new THREE.Vector3();
+	var normal = new THREE.Vector3();
+
+	var j, i;
+
+	// generate vertices, normals and uvs
+
+	for ( j = 0; j <= radialSegments; j ++ ) {
+
+		for ( i = 0; i <= tubularSegments; i ++ ) {
+
+			var u = i / tubularSegments * arc;
+			var v = j / radialSegments * Math.PI * 2;
+
+			// vertex
+			vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
+			vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
+			vertex.z = tube * Math.sin( v );
+
+			vertices[ vertexBufferOffset ] = vertex.x;
+			vertices[ vertexBufferOffset + 1 ] = vertex.y;
+			vertices[ vertexBufferOffset + 2 ] = vertex.z;
+
+			// this vector is used to calculate the normal
+			center.x = radius * Math.cos( u );
+			center.y = radius * Math.sin( u );
+
+			// normal
+			normal.subVectors( vertex, center ).normalize();
+
+			normals[ vertexBufferOffset ] = normal.x;
+			normals[ vertexBufferOffset + 1 ] = normal.y;
+			normals[ vertexBufferOffset + 2 ] = normal.z;
+
+			// uv
+			uvs[ uvBufferOffset ] = i / tubularSegments;
+			uvs[ uvBufferOffset + 1 ] = j / radialSegments;
+
+			// update offsets
+			vertexBufferOffset += 3;
+			uvBufferOffset += 2;
+
+		}
+
+	}
+
+	// generate indices
+
+	for ( j = 1; j <= radialSegments; j ++ ) {
+
+		for ( i = 1; i <= tubularSegments; i ++ ) {
+
+			// indices
+			var a = ( tubularSegments + 1 ) * j + i - 1;
+			var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
+			var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
+			var d = ( tubularSegments + 1 ) * j + i;
+
+			// face one
+			indices[ indexBufferOffset ] = a;
+			indices[ indexBufferOffset + 1 ] = b;
+			indices[ indexBufferOffset + 2 ] = d;
+
+			// face two
+			indices[ indexBufferOffset + 3 ] = b;
+			indices[ indexBufferOffset + 4 ] = c;
+			indices[ indexBufferOffset + 5 ] = d;
+
+			// update offset
+			indexBufferOffset += 6;
+
+		}
+
+	}
+
+	// build geometry
+	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+};
+
+THREE.TorusBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.TorusBufferGeometry.prototype.constructor = THREE.TorusBufferGeometry;
+
 // File:src/extras/geometries/TorusGeometry.js
 
 /**
@@ -37872,74 +37952,187 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 		arc: arc
 	};
 
-	radius = radius || 100;
-	tube = tube || 40;
-	radialSegments = radialSegments || 8;
-	tubularSegments = tubularSegments || 6;
-	arc = arc || Math.PI * 2;
-
-	var center = new THREE.Vector3(), uvs = [], normals = [];
-
-	for ( var j = 0; j <= radialSegments; j ++ ) {
-
-		for ( var i = 0; i <= tubularSegments; i ++ ) {
-
-			var u = i / tubularSegments * arc;
-			var v = j / radialSegments * Math.PI * 2;
-
-			center.x = radius * Math.cos( u );
-			center.y = radius * Math.sin( u );
-
-			var vertex = new THREE.Vector3();
-			vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
-			vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
-			vertex.z = tube * Math.sin( v );
-
-			this.vertices.push( vertex );
-
-			uvs.push( new THREE.Vector2( i / tubularSegments, j / radialSegments ) );
-			normals.push( vertex.clone().sub( center ).normalize() );
-
-		}
-
-	}
-
-	for ( var j = 1; j <= radialSegments; j ++ ) {
-
-		for ( var i = 1; i <= tubularSegments; i ++ ) {
-
-			var a = ( tubularSegments + 1 ) * j + i - 1;
-			var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
-			var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
-			var d = ( tubularSegments + 1 ) * j + i;
-
-			var face = new THREE.Face3( a, b, d, [ normals[ a ].clone(), normals[ b ].clone(), normals[ d ].clone() ] );
-			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [ uvs[ a ].clone(), uvs[ b ].clone(), uvs[ d ].clone() ] );
-
-			face = new THREE.Face3( b, c, d, [ normals[ b ].clone(), normals[ c ].clone(), normals[ d ].clone() ] );
-			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [ uvs[ b ].clone(), uvs[ c ].clone(), uvs[ d ].clone() ] );
-
-		}
-
-	}
-
-	this.computeFaceNormals();
+	this.fromBufferGeometry( new THREE.TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
 
 };
 
 THREE.TorusGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TorusGeometry.prototype.constructor = THREE.TorusGeometry;
 
+// File:src/extras/geometries/TorusKnotBufferGeometry.js
+
+/**
+ * @author Mugen87 / https://github.com/Mugen87
+ *
+ * see: http://www.blackpawn.com/texts/pqtorus/
+ */
+THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radialSegments, p, q ) {
+
+	THREE.BufferGeometry.call( this );
+
+	this.type = 'TorusKnotBufferGeometry';
+
+	this.parameters = {
+		radius: radius,
+		tube: tube,
+		tubularSegments: tubularSegments,
+		radialSegments: radialSegments,
+		p: p,
+		q: q
+	};
+
+	radius = radius || 100;
+	tube = tube || 40;
+	tubularSegments = Math.floor( tubularSegments ) || 64;
+	radialSegments = Math.floor( radialSegments ) || 8;
+	p = p || 2;
+	q = q || 3;
+
+	// used to calculate buffer length
+	var vertexCount = ( ( radialSegments + 1 ) * ( tubularSegments + 1 ) );
+	var indexCount = radialSegments * tubularSegments * 2 * 3;
+
+	// buffers
+	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+	// helper variables
+	var i, j, index = 0, indexOffset = 0;
+
+	var vertex = new THREE.Vector3();
+	var normal = new THREE.Vector3();
+	var uv = new THREE.Vector2();
+
+	var P1 = new THREE.Vector3();
+	var P2 = new THREE.Vector3();
+
+	var B = new THREE.Vector3();
+	var T = new THREE.Vector3();
+	var N = new THREE.Vector3();
+
+	// generate vertices, normals and uvs
+
+	for ( i = 0; i <= tubularSegments; ++ i ) {
+
+		// the radian "u" is used to calculate the position on the torus curve of the current tubular segement
+
+		var u = i / tubularSegments * p * Math.PI * 2;
+
+		// now we calculate two points. P1 is our current position on the curve, P2 is a little farther ahead.
+		// these points are used to create a special "coordinate space", which is necessary to calculate the correct vertex positions
+
+		calculatePositionOnCurve( u, p, q, radius, P1 );
+		calculatePositionOnCurve( u + 0.01, p, q, radius, P2 );
+
+		// calculate orthonormal basis
+
+		T.subVectors( P2, P1 );
+		N.addVectors( P2, P1 );
+		B.crossVectors( T, N );
+		N.crossVectors( B, T );
+
+		// normalize B, N. T can be ignored, we don't use it
+
+		B.normalize();
+		N.normalize();
+
+		for ( j = 0; j <= radialSegments; ++ j ) {
+
+			// now calculate the vertices. they are nothing more than an extrusion of the torus curve.
+			// because we extrude a shape in the xy-plane, there is no need to calculate a z-value.
+
+			var v = j / radialSegments * Math.PI * 2;
+			var cx = - tube * Math.cos( v );
+			var cy = tube * Math.sin( v );
+
+			// now calculate the final vertex position.
+			// first we orient the extrusion with our basis vectos, then we add it to the current position on the curve
+
+			vertex.x = P1.x + ( cx * N.x + cy * B.x );
+			vertex.y = P1.y + ( cx * N.y + cy * B.y );
+			vertex.z = P1.z + ( cx * N.z + cy * B.z );
+
+			// vertex
+			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+			// normal (P1 is always the center/origin of the extrusion, thus we can use it to calculate the normal)
+			normal.subVectors( vertex, P1 ).normalize();
+			normals.setXYZ( index, normal.x, normal.y, normal.z );
+
+			// uv
+			uv.x = i / tubularSegments;
+			uv.y = j / radialSegments;
+			uvs.setXY( index, uv.x, uv.y );
+
+			// increase index
+			index ++;
+
+		}
+
+	}
+
+	// generate indices
+
+	for ( j = 1; j <= tubularSegments; j ++ ) {
+
+		for ( i = 1; i <= radialSegments; i ++ ) {
+
+			// indices
+			var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
+			var b = ( radialSegments + 1 ) * j + ( i - 1 );
+			var c = ( radialSegments + 1 ) * j + i;
+			var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
+
+			// face one
+			indices.setX( indexOffset, a ); indexOffset++;
+			indices.setX( indexOffset, b ); indexOffset++;
+			indices.setX( indexOffset, d ); indexOffset++;
+
+			// face two
+			indices.setX( indexOffset, b ); indexOffset++;
+			indices.setX( indexOffset, c ); indexOffset++;
+			indices.setX( indexOffset, d ); indexOffset++;
+
+		}
+
+	}
+
+	// build geometry
+
+	this.setIndex( indices );
+	this.addAttribute( 'position', vertices );
+	this.addAttribute( 'normal', normals );
+	this.addAttribute( 'uv', uvs );
+
+	// this function calculates the current position on the torus curve
+
+	function calculatePositionOnCurve( u, p, q, radius, position ) {
+
+		var cu = Math.cos( u );
+		var su = Math.sin( u );
+		var quOverP = q / p * u;
+		var cs = Math.cos( quOverP );
+
+		position.x = radius * ( 2 + cs ) * 0.5 * cu;
+		position.y = radius * ( 2 + cs ) * su * 0.5;
+		position.z = radius * Math.sin( quOverP ) * 0.5;
+
+	}
+
+};
+
+THREE.TorusKnotBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.TorusKnotBufferGeometry.prototype.constructor = THREE.TorusKnotBufferGeometry;
+
 // File:src/extras/geometries/TorusKnotGeometry.js
 
 /**
  * @author oosmoxiecode
- * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3D/src/away3d/primitives/TorusKnot.as?spec=svn2473&r=2473
  */
 
-THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegments, p, q, heightScale ) {
+THREE.TorusKnotGeometry = function ( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
 
 	THREE.Geometry.call( this );
 
@@ -37948,101 +38141,16 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 	this.parameters = {
 		radius: radius,
 		tube: tube,
-		radialSegments: radialSegments,
 		tubularSegments: tubularSegments,
+		radialSegments: radialSegments,
 		p: p,
-		q: q,
-		heightScale: heightScale
+		q: q
 	};
 
-	radius = radius || 100;
-	tube = tube || 40;
-	radialSegments = radialSegments || 64;
-	tubularSegments = tubularSegments || 8;
-	p = p || 2;
-	q = q || 3;
-	heightScale = heightScale || 1;
+	if( heightScale !== undefined ) console.warn( 'THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.' );
 
-	var grid = new Array( radialSegments );
-	var tang = new THREE.Vector3();
-	var n = new THREE.Vector3();
-	var bitan = new THREE.Vector3();
-
-	for ( var i = 0; i < radialSegments; ++ i ) {
-
-		grid[ i ] = new Array( tubularSegments );
-		var u = i / radialSegments * 2 * p * Math.PI;
-		var p1 = getPos( u, q, p, radius, heightScale );
-		var p2 = getPos( u + 0.01, q, p, radius, heightScale );
-		tang.subVectors( p2, p1 );
-		n.addVectors( p2, p1 );
-
-		bitan.crossVectors( tang, n );
-		n.crossVectors( bitan, tang );
-		bitan.normalize();
-		n.normalize();
-
-		for ( var j = 0; j < tubularSegments; ++ j ) {
-
-			var v = j / tubularSegments * 2 * Math.PI;
-			var cx = - tube * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
-			var cy = tube * Math.sin( v );
-
-			var pos = new THREE.Vector3();
-			pos.x = p1.x + cx * n.x + cy * bitan.x;
-			pos.y = p1.y + cx * n.y + cy * bitan.y;
-			pos.z = p1.z + cx * n.z + cy * bitan.z;
-
-			grid[ i ][ j ] = this.vertices.push( pos ) - 1;
-
-		}
-
-	}
-
-	for ( var i = 0; i < radialSegments; ++ i ) {
-
-		for ( var j = 0; j < tubularSegments; ++ j ) {
-
-			var ip = ( i + 1 ) % radialSegments;
-			var jp = ( j + 1 ) % tubularSegments;
-
-			var a = grid[ i ][ j ];
-			var b = grid[ ip ][ j ];
-			var c = grid[ ip ][ jp ];
-			var d = grid[ i ][ jp ];
-
-			var uva = new THREE.Vector2( i / radialSegments, j / tubularSegments );
-			var uvb = new THREE.Vector2( ( i + 1 ) / radialSegments, j / tubularSegments );
-			var uvc = new THREE.Vector2( ( i + 1 ) / radialSegments, ( j + 1 ) / tubularSegments );
-			var uvd = new THREE.Vector2( i / radialSegments, ( j + 1 ) / tubularSegments );
-
-			this.faces.push( new THREE.Face3( a, b, d ) );
-			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
-
-			this.faces.push( new THREE.Face3( b, c, d ) );
-			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
-
-		}
-
-	}
-
-	this.computeFaceNormals();
-	this.computeVertexNormals();
-
-	function getPos( u, in_q, in_p, radius, heightScale ) {
-
-		var cu = Math.cos( u );
-		var su = Math.sin( u );
-		var quOverP = in_q / in_p * u;
-		var cs = Math.cos( quOverP );
-
-		var tx = radius * ( 2 + cs ) * 0.5 * cu;
-		var ty = radius * ( 2 + cs ) * su * 0.5;
-		var tz = heightScale * radius * Math.sin( quOverP ) * 0.5;
-
-		return new THREE.Vector3( tx, ty, tz );
-
-	}
+	this.fromBufferGeometry( new THREE.TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) );
+	this.mergeVertices();
 
 };
 

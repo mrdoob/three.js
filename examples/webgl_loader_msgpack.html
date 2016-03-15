@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <!--
 Requires msgpack-js.js
 
@@ -22,7 +22,7 @@ https://github.com/creationix/msgpack-js-browser
 				background: #1b1c1e;
 				background-image: linear-gradient(#7d8fa3, #1b1c1e);
 			}
-		
+
 			#info {
 				color: #fff;
 				position: absolute;
@@ -43,13 +43,13 @@ https://github.com/creationix/msgpack-js-browser
 	</head>
 	<body>
 		<div id='info'>
-			<p>Robo Pigeon, from <a href='http://www.tearsofsteel.org' target='_blank'>Tears of Steel</a>, is licensed under 
+			<p>Robo Pigeon, from <a href='http://www.tearsofsteel.org' target='_blank'>Tears of Steel</a>, is licensed under
 			<a href='http://creativecommons.org/licenses/by/3.0/' target='_blank'>Creative Commons Attribution 3.0</a>.
 			</p>
 		</div>
 		<div id='viewport'></div>
 		<script>
-			
+
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			requirejs.config( { baseUrl: 'js/libs' } );

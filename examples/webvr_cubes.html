@@ -1,62 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - webvr cubes</title>
+		<title>three.js webvr - cubes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				font-family: Monospace;
-				background-color: #f0f0f0;
+				background-color: #101010;
+				color: #fff;
 				margin: 0px;
 				overflow: hidden;
 			}
-
-			.menu {
-				position: fixed;
-				bottom: 20px;
-				right: 20px;
+			a {
+				color: #f00;
 			}
-
-			.button {
-				display: inline-block;
-				padding: 8px;
-				color: #FFF;
-				background-color: #555;
-			}
-
-			.button.enabled {
-				background-color: rgb(18, 36, 70);
-			}
-
-			.button:hover {
-				cursor: pointer;
-				background-color: rgb(18, 36, 70);
-			}
-
-			.button.error {
-				pointer-events: none;
-				background-color: red;
-			}
-
 		</style>
 	</head>
 	<body>
-		<div class="menu">
-			<div class="button full-screen">Start VR Mode</div>
-		</div>
 
 		<script src="../build/three.min.js"></script>
+
+		<script src="js/WebVR.js"></script>
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			var container, stats;
+			if ( WEBVR.isLatestAvailable() === false ) {
+
+				document.body.appendChild( WEBVR.getMessage() );
+
+			}
+
+			//
+
+			var container;
 			var camera, scene, raycaster, renderer;
-			var vrEffect;
-			var vrControls;
+			var effect, controls;
 
 			var cubes = [];
 			var INTERSECTED;
@@ -79,33 +60,43 @@
 				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes';
 				container.appendChild( info );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-
 				scene = new THREE.Scene();
 
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				scene.add( camera );
+
 				crosshair = new THREE.Mesh(
-					new THREE.RingGeometry( 0.5, 1, 32 ),
+					new THREE.RingGeometry( 0.02, 0.04, 32 ),
 					new THREE.MeshBasicMaterial( {
-						color: 0x00bb00,
-						transparent: true,
-						opacity: 0.5
+						color: 0xffffff,
+						opacity: 0.5,
+						transparent: true
 					} )
 				);
-				scene.add( crosshair );
+				crosshair.position.z = - 2;
+				camera.add( crosshair );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				var mesh = new THREE.Mesh(
+					new THREE.BoxGeometry( 200, 200, 200, 10, 10, 10 ),
+					new THREE.MeshBasicMaterial( { color: 0x202020, wireframe: true } )
+				);
+				scene.add( mesh );
+
+				scene.add( new THREE.HemisphereLight( 0x404020, 0x202040, 0.5 ) );
+
+				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 20, 20, 20 );
+				var geometry = new THREE.BoxGeometry( 5, 5, 5 );
 
-				for ( var i = 0; i < 2000; i ++ ) {
+				for ( var i = 0; i < 200; i ++ ) {
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
-					object.position.x = Math.random() * 800 - 400;
-					object.position.y = Math.random() * 800 - 400;
-					object.position.z = Math.random() * 800 - 400;
+					object.position.x = Math.random() * 200 - 100;
+					object.position.y = Math.random() * 200 - 100;
+					object.position.z = Math.random() * 200 - 100;
 
 					object.rotation.x = Math.random() * 2 * Math.PI;
 					object.rotation.y = Math.random() * 2 * Math.PI;
@@ -115,6 +106,11 @@
 					object.scale.y = Math.random() + 0.5;
 					object.scale.z = Math.random() + 0.5;
 
+					object.userData.velocity = new THREE.Vector3();
+					object.userData.velocity.x = Math.random() * 0.4 - 0.2;
+					object.userData.velocity.y = Math.random() * 0.4 - 0.2;
+					object.userData.velocity.z = Math.random() * 0.4 - 0.2;
+
 					scene.add( object );
 					cubes.push( object );
 
@@ -123,40 +119,20 @@
 				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0x101010 );
 				renderer.setPixelRatio( window.devicePixelRatio );
-
-				var fullScreenButton = document.querySelector( '.full-screen' );
-
-				if ( navigator.getVRDisplays === undefined && navigator.getVRDevices === undefined ) {
-
-					fullScreenButton.innerHTML = 'Your browser doesn\'t support WebVR';
-					fullScreenButton.classList.add('error');
-
-				}
-
-				vrControls = new THREE.VRControls( camera );
-				vrEffect = new THREE.VREffect( renderer, function ( error ) {
-
-					fullScreenButton.innerHTML = error;
-					fullScreenButton.classList.add('error');
-
-				} );
-
-				fullScreenButton.onclick = function() {
-
-					vrEffect.setFullScreen( true );
-
-				};
-
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				controls = new THREE.VRControls( camera );
+				effect = new THREE.VREffect( renderer );
+
+				if ( WEBVR.isAvailable() === true ) {
+
+					document.body.appendChild( WEBVR.getButton( effect ) );
+
+				}
 
 				//
 
@@ -169,7 +145,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				vrEffect.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -178,9 +154,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
 				render();
-				stats.update();
 
 			}
 
@@ -212,26 +186,40 @@
 
 				}
 
-				vrControls.update();
+				controls.update();
 
-				crosshair.quaternion.copy( camera.quaternion );
-				crosshair.position.set( 0, 0, 0 );
+				for ( var i = 0; i < cubes.length; i ++ ) {
 
-				if ( INTERSECTED ) {
+					var cube = cubes[ i ];
 
-					crosshair.translateZ(
-						-scene.position.distanceTo( INTERSECTED.position ) +
-						INTERSECTED.geometry.boundingSphere.radius + 5
-					);
+					cube.position.add( cube.userData.velocity );
+
+					if ( cube.position.x < - 100 || cube.position.x > 100 ) {
+
+						cube.position.x = THREE.Math.clamp( cube.position.x, - 100, 100 );
+						cube.userData.velocity.x = - cube.userData.velocity.x;
+
+					}
+
+					if ( cube.position.y < - 100 || cube.position.y > 100 ) {
+
+						cube.position.y = THREE.Math.clamp( cube.position.y, - 100, 100 );
+						cube.userData.velocity.y = - cube.userData.velocity.y;
+
+					}
+
+					if ( cube.position.z < - 100 || cube.position.z > 100 ) {
+
+						cube.position.z = THREE.Math.clamp( cube.position.z, - 100, 100 );
+						cube.userData.velocity.z = - cube.userData.velocity.z;
+
+					}
+
+					cube.rotation.x += 0.01;
 
 				}
-				else {
 
-					crosshair.translateZ(-40);
-
-				}
-
-				vrEffect.render( scene, camera );
+				effect.render( scene, camera );
 
 			}
 
