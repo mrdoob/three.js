@@ -86,6 +86,35 @@ test( "getWorldRotation", function() {
 	ok( obj.getWorldRotation().y * RadToDeg === 90 , "y is equal" );
 });
 
+test( "dispatchEvent", function() {
+	var obj = new THREE.Object3D();
+	var child = new THREE.Object3D();
+	var deepChild = new THREE.Object3D();
+
+	obj.add(child);
+	child.add(deepChild);
+
+	var callCount = 0;
+	var listener = function() { callCount++; };
+
+	obj.addEventListener( 'anyType', listener );
+	ok( callCount === 0, "no event, no call" );
+
+	child.dispatchEvent( { type: 'anyType', bubbles: true } );
+	ok( callCount === 1, "one event, one call" );
+
+	child.dispatchEvent( { type: 'anyType' } );
+	ok( callCount === 1, "no bubbling, still one call" );
+
+	child.addEventListener( 'anyType', function(e) {
+		ok( e.target.uuid === deepChild.uuid, "'deepChild' is the target" );
+		ok( e.currentTarget.uuid === child.uuid, "'child' is the currentTarget" );
+		e.stopPropagation();
+	} );
+	deepChild.dispatchEvent( { type: 'anyType', bubbles: true } );
+	ok( callCount === 1, "propagation stopped, still one call" );
+});
+
 function checkIfPropsAreEqual(reference, obj) {
 	ok( obj.x === reference.x , "x is equal" );
 	ok( obj.y === reference.y , "y is equal!" );

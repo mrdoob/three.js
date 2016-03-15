@@ -718,4 +718,31 @@ THREE.Object3D.prototype = {
 
 THREE.EventDispatcher.prototype.apply( THREE.Object3D.prototype );
 
+//
+// Override EventDispatcher#dispatchEvent to allow event bubbling throughout
+// parent nodes
+//
+THREE.Object3D.prototype.dispatchEvent = function ( event ) {
+
+	if (event.stopPropagation === undefined) {
+
+		event.stopPropagation = function() {
+
+			event.propagationStopped = true;
+
+		}
+
+	}
+
+	THREE.EventDispatcher.prototype.dispatchEvent.call( this, event );
+
+		if ( !event.propagationStopped && event.bubbles && this.parent ) {
+
+			this.parent.dispatchEvent(event);
+
+		}
+
+};
+
+
 THREE.Object3DIdCount = 0;

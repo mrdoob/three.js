@@ -76,6 +76,13 @@ THREE.EventDispatcher.prototype = {
 
 	dispatchEvent: function ( event ) {
 
+		if (event.target === undefined) {
+
+			// node which event is dispatched.
+			event.target = this;
+
+		}
+
 		if ( this._listeners === undefined ) return;
 
 		var listeners = this._listeners;
@@ -83,7 +90,8 @@ THREE.EventDispatcher.prototype = {
 
 		if ( listenerArray !== undefined ) {
 
-			event.target = this;
+			// node whose event listener’s callback is currently being invoked.
+			event.currentTarget = this;
 
 			var array = [];
 			var length = listenerArray.length;
