@@ -67,14 +67,14 @@
 				scene.add( camera );
 
 				crosshair = new THREE.Mesh(
-					new THREE.RingGeometry( 0.5, 1, 32 ),
+					new THREE.RingGeometry( 0.02, 0.04, 32 ),
 					new THREE.MeshBasicMaterial( {
 						color: 0xffffff,
 						opacity: 0.5,
 						transparent: true
 					} )
 				);
-				crosshair.position.z = - 40;
+				crosshair.position.z = - 2;
 				camera.add( crosshair );
 
 				var mesh = new THREE.Mesh(
@@ -89,15 +89,15 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 3, 3, 3 );
+				var geometry = new THREE.BoxGeometry( 5, 5, 5 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
-					object.position.x = Math.random() * 100 - 50;
-					object.position.y = Math.random() * 100 - 50;
-					object.position.z = Math.random() * 100 - 50;
+					object.position.x = Math.random() * 200 - 100;
+					object.position.y = Math.random() * 200 - 100;
+					object.position.z = Math.random() * 200 - 100;
 
 					object.rotation.x = Math.random() * 2 * Math.PI;
 					object.rotation.y = Math.random() * 2 * Math.PI;
@@ -202,13 +202,23 @@
 
 					cube.position.add( cube.userData.velocity );
 
-					if ( cube.position.x < 100 ) cube.position.x += 200;
-					if ( cube.position.y < 100 ) cube.position.y += 200;
-					if ( cube.position.z < 100 ) cube.position.z += 200;
+					if ( cube.position.x < - 100 || cube.position.x > 100 ) {
 
-					if ( cube.position.x > 100 ) cube.position.x -= 200;
-					if ( cube.position.y > 100 ) cube.position.y -= 200;
-					if ( cube.position.z > 100 ) cube.position.z -= 200;
+						cube.userData.velocity.x = - cube.userData.velocity.x;
+
+					}
+
+					if ( cube.position.y < - 100 || cube.position.y > 100 ) {
+
+						cube.userData.velocity.y = - cube.userData.velocity.y;
+
+					}
+
+					if ( cube.position.z < - 100 || cube.position.z > 100 ) {
+
+						cube.userData.velocity.z = - cube.userData.velocity.z;
+
+					}
 
 					cube.rotation.x += 0.01;
 
