@@ -1,5 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author Reece Aaron Lecrivain / http://reecenotes.com/
  */
 
 THREE.Audio = function ( listener ) {
@@ -36,14 +37,9 @@ THREE.Audio.prototype.getOutput = function () {
 
 };
 
-THREE.Audio.prototype.load = function ( file ) {
+THREE.Audio.prototype.load = function () {
 
-	var buffer = new THREE.AudioBuffer( this.context );
-	buffer.load( file );
-
-	this.setBuffer( buffer );
-
-	return this;
+	console.warn( 'THREE.Audio: .load has been deprecated. Please use THREE.AudioLoader.' );
 
 };
 
@@ -62,13 +58,9 @@ THREE.Audio.prototype.setBuffer = function ( audioBuffer ) {
 
 	var scope = this;
 
-	audioBuffer.onReady( function( buffer ) {
-
-		scope.source.buffer = buffer;
-		scope.sourceType = 'buffer';
-		if ( scope.autoplay ) scope.play();
-
-	} );
+	scope.source.buffer = audioBuffer;
+	scope.sourceType = 'buffer';
+	if ( scope.autoplay ) scope.play();
 
 	return this;
 
