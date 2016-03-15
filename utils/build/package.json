@@ -9,10 +9,11 @@
     },
 
     "devDependencies": {
-        "uglify-js": "^2.4.17",
-        "argparse" : "*"
+        "argparse": "*",
+        "temp-path": "1.0.0",
+        "google-closure-compiler": "20160208.7.0"
     },
-    
+
     "repository" : {
         "type" : "git",
          "url" : "git://github.com/mrdoob/three.js.git"
