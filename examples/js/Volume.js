@@ -16,21 +16,21 @@ THREE.Volume = function( xLength, yLength, zLength, type, arrayBuffer ) {
 	if ( arguments.length > 0 ) {
 
 		/**
-         * @member {number} xLength Width of the volume in the IJK coordinate system
-         */
+		 * @member {number} xLength Width of the volume in the IJK coordinate system
+		 */
 		this.xLength = Number( xLength ) || 1;
 		/**
-         * @member {number} yLength Height of the volume in the IJK coordinate system
-         */
+		 * @member {number} yLength Height of the volume in the IJK coordinate system
+		 */
 		this.yLength = Number( yLength ) || 1;
 		/**
-         * @member {number} zLength Depth of the volume in the IJK coordinate system
-         */
+		 * @member {number} zLength Depth of the volume in the IJK coordinate system
+		 */
 		this.zLength = Number( zLength ) || 1;
 
 		/**
-         * @member {TypedArray} data Data of the volume
-         */
+		 * @member {TypedArray} data Data of the volume
+		 */
 
 		switch ( type ) {
 
@@ -117,25 +117,25 @@ THREE.Volume = function( xLength, yLength, zLength, type, arrayBuffer ) {
 	}
 
 	/**
-     * @member {Array}  spacing Spacing to apply to the volume from IJK to RAS coordinate system
-     */
+	 * @member {Array}  spacing Spacing to apply to the volume from IJK to RAS coordinate system
+	 */
 	this.spacing = [ 1, 1, 1 ];
 	/**
-     * @member {Array}  offset Offset of the volume in the RAS coordinate system
-     */
+	 * @member {Array}  offset Offset of the volume in the RAS coordinate system
+	 */
 	this.offset = [ 0, 0, 0 ];
 	/**
-     * @member {THREE.Martrix3} matrix The IJK to RAS matrix
-     */
+	 * @member {THREE.Martrix3} matrix The IJK to RAS matrix
+	 */
 	this.matrix = new THREE.Matrix3();
 	this.matrix.identity();
 	/**
-     * @member {THREE.Martrix3} inverseMatrix The RAS to IJK matrix
-     */
+	 * @member {THREE.Martrix3} inverseMatrix The RAS to IJK matrix
+	 */
 	/**
 	 * @member {number} lowerThreshold The voxels with values under this threshold won't appear in the slices.
-     *                      If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
-     */
+	 *                      If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
+	 */
 	var lowerThreshold = - Infinity;
 	Object.defineProperty( this, 'lowerThreshold', {
 		get : function() {
@@ -195,13 +195,13 @@ THREE.Volume.prototype = {
 	constructor : THREE.Volume,
 
 	/**
-     * @member {Function} getData Shortcut for data[access(i,j,k)]
-     * @memberof THREE.Volume
-     * @param {number} i    First coordinate
-     * @param {number} j    Second coordinate
-     * @param {number} k    Third coordinate
-     * @returns {number}  value in the data array
-     */
+	 * @member {Function} getData Shortcut for data[access(i,j,k)]
+	 * @memberof THREE.Volume
+	 * @param {number} i    First coordinate
+	 * @param {number} j    Second coordinate
+	 * @param {number} k    Third coordinate
+	 * @returns {number}  value in the data array
+	 */
 	getData : function( i, j, k ) {
 
 		return this.data[ k * this.xLength * this.yLength + j * this.xLength + i ];
@@ -209,13 +209,13 @@ THREE.Volume.prototype = {
 	},
 
 	/**
-     * @member {Function} access compute the index in the data array corresponding to the given coordinates in IJK system
-     * @memberof THREE.Volume
-     * @param {number} i    First coordinate
-     * @param {number} j    Second coordinate
-     * @param {number} k    Third coordinate
-     * @returns {number}  index
-     */
+	 * @member {Function} access compute the index in the data array corresponding to the given coordinates in IJK system
+	 * @memberof THREE.Volume
+	 * @param {number} i    First coordinate
+	 * @param {number} j    Second coordinate
+	 * @param {number} k    Third coordinate
+	 * @returns {number}  index
+	 */
 	access : function( i, j, k ) {
 
 		return k * this.xLength * this.yLength + j * this.xLength + i;
@@ -223,11 +223,11 @@ THREE.Volume.prototype = {
 	},
 
 	/**
-     * @member {Function} reverseAccess Retrieve the IJK coordinates of the voxel corresponding of the given index in the data
-     * @memberof THREE.Volume
-     * @param {number} index index of the voxel
-     * @returns {Array}  [x,y,z]
-     */
+	 * @member {Function} reverseAccess Retrieve the IJK coordinates of the voxel corresponding of the given index in the data
+	 * @memberof THREE.Volume
+	 * @param {number} index index of the voxel
+	 * @returns {Array}  [x,y,z]
+	 */
 	reverseAccess : function( index ) {
 
 		var z = Math.floor( index / ( this.yLength * this.xLength ) );
@@ -238,15 +238,15 @@ THREE.Volume.prototype = {
 	},
 
 	/**
-     * @member {Function} map Apply a function to all the voxels, be careful, the value will be replaced
-     * @memberof THREE.Volume
-     * @param {Function} functionToMap A function to apply to every voxel, will be called with the following parameters :
-     *                                 value of the voxel
-     *                                 index of the voxel
-     *                                 the data (TypedArray)
-     * @param {Object}   context    You can specify a context in which call the function, default if this Volume
-     * @returns {THREE.Volume}   this
-     */
+	 * @member {Function} map Apply a function to all the voxels, be careful, the value will be replaced
+	 * @memberof THREE.Volume
+	 * @param {Function} functionToMap A function to apply to every voxel, will be called with the following parameters :
+	 *                                 value of the voxel
+	 *                                 index of the voxel
+	 *                                 the data (TypedArray)
+	 * @param {Object}   context    You can specify a context in which call the function, default if this Volume
+	 * @returns {THREE.Volume}   this
+	 */
 	map : function( functionToMap, context ) {
 
 		var length = this.data.length;
@@ -263,12 +263,12 @@ THREE.Volume.prototype = {
 	},
 
 	/**
-     * @member {Function} extractPerpendicularPlane Compute the orientation of the slice and returns all the information relative to the geometry such as sliceAccess, the plane matrix (orientation and position in RAS coordinate) and the dimensions of the plane in both coordinate system.
-     * @memberof THREE.Volume
-     * @param {string}            axis  the normal axis to the slice 'x' 'y' or 'z'
-     * @param {number}            index the index of the slice
-     * @returns {Object} an object containing all the usefull information on the geometry of the slice
-     */
+	 * @member {Function} extractPerpendicularPlane Compute the orientation of the slice and returns all the information relative to the geometry such as sliceAccess, the plane matrix (orientation and position in RAS coordinate) and the dimensions of the plane in both coordinate system.
+	 * @memberof THREE.Volume
+	 * @param {string}            axis  the normal axis to the slice 'x' 'y' or 'z'
+	 * @param {number}            index the index of the slice
+	 * @returns {Object} an object containing all the usefull information on the geometry of the slice
+	 */
 	extractPerpendicularPlane : function( axis, RASIndex ) {
 
 		var iLength,
@@ -380,13 +380,13 @@ THREE.Volume.prototype = {
 	},
 
 	/**
-     * @member {Function} extractSlice Returns a slice corresponding to the given axis and index
-     *                        The coordinate are given in the Right Anterior Superior coordinate format
-     * @memberof THREE.Volume
-     * @param {string}            axis  the normal axis to the slice 'x' 'y' or 'z'
-     * @param {number}            index the index of the slice
-     * @returns {THREE.VolumeSlice} the extracted slice
-     */
+	 * @member {Function} extractSlice Returns a slice corresponding to the given axis and index
+	 *                        The coordinate are given in the Right Anterior Superior coordinate format
+	 * @memberof THREE.Volume
+	 * @param {string}            axis  the normal axis to the slice 'x' 'y' or 'z'
+	 * @param {number}            index the index of the slice
+	 * @returns {THREE.VolumeSlice} the extracted slice
+	 */
 	extractSlice : function( axis, index ) {
 
 		var slice = new THREE.VolumeSlice( this, index, axis );
@@ -396,11 +396,11 @@ THREE.Volume.prototype = {
 	},
 
 	/**
-     * @member {Function} repaintAllSlices Call repaint on all the slices extracted from this volume
-     * @see THREE.VolumeSlice.repaint
-     * @memberof THREE.Volume
-     * @returns {THREE.Volume} this
-     */
+	 * @member {Function} repaintAllSlices Call repaint on all the slices extracted from this volume
+	 * @see THREE.VolumeSlice.repaint
+	 * @memberof THREE.Volume
+	 * @returns {THREE.Volume} this
+	 */
 	repaintAllSlices : function() {
 
 		this.sliceList.forEach( function( slice ) {
@@ -414,10 +414,10 @@ THREE.Volume.prototype = {
 	},
 
 	/**
-     * @member {Function} computeMinMax Compute the minimum and the maximum of the data in the volume
-     * @memberof THREE.Volume
-     * @returns {Array} [min,max]
-     */
+	 * @member {Function} computeMinMax Compute the minimum and the maximum of the data in the volume
+	 * @memberof THREE.Volume
+	 * @returns {Array} [min,max]
+	 */
 	computeMinMax : function() {
 
 		var min = Infinity;
