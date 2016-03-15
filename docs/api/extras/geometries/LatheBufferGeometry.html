@@ -8,23 +8,23 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">Class for generating meshes with axial symmetry. Possible uses include donuts, pipes, vases etc. The lathe rotate around the Y axis.</div>
+		<div class="desc">This is the [page:BufferGeometry] port of [page:LatheGeometry].</div>
 
 
 		<h2>Example</h2>
 
-		<iframe src='scenes/geometry-browser.html#LatheGeometry'></iframe>
+		<iframe src='scenes/geometry-browser.html#LatheBufferGeometry'></iframe>
 
 		<code>
 		var points = [];
 		for ( var i = 0; i < 10; i ++ ) {
 			points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 10 + 5, ( i - 5 ) * 2 ) );
 		}
-		var geometry = new THREE.LatheGeometry( points );
+		var geometry = new THREE.LatheBufferGeometry( points );
 		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 		var lathe = new THREE.Mesh( geometry, material );
 		scene.add( lathe );
