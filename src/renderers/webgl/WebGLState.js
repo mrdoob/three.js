@@ -199,7 +199,6 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	};
 
 	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
-
 		if ( blending === THREE.NoBlending ) {
 
 			this.disable( gl.BLEND );
@@ -572,7 +571,6 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	};
 
 	this.bindTexture = function ( webglType, webglTexture ) {
-
 		if ( currentTextureSlot === undefined ) {
 
 			_this.activeTexture();
@@ -589,9 +587,12 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 		}
 
 		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
-
-			gl.bindTexture( webglType, webglTexture || emptyTexture );
-
+			if( webglType === gl.TEXTURE_CUBE_MAP ) {
+				gl.bindTexture( webglType, webglTexture );
+			}
+			else {
+				gl.bindTexture( webglType, webglTexture || emptyTexture );
+			}
 			boundTexture.type = webglType;
 			boundTexture.texture = webglTexture;
 
