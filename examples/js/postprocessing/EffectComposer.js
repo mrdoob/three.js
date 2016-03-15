@@ -112,7 +112,7 @@ THREE.EffectComposer.prototype = {
 			var size = this.renderer.getSize();
 
 			renderTarget = this.renderTarget1.clone();
-			renderTarget.setSize( width, height );
+			renderTarget.setSize( size.width, size.height );
 
 		}
 
