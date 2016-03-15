@@ -24,7 +24,6 @@
 		<script src="js/WebVR.js"></script>
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -36,7 +35,7 @@
 
 			//
 
-			var container, stats;
+			var container;
 			var camera, scene, raycaster, renderer;
 			var effect, controls;
 
@@ -83,7 +82,7 @@
 				);
 				scene.add( mesh );
 
-				scene.add( new THREE.AmbientLight( 0x202040 ) );
+				scene.add( new THREE.HemisphereLight( 0x404020, 0x202040, 0.5 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
@@ -108,9 +107,9 @@
 					object.scale.z = Math.random() + 0.5;
 
 					object.userData.velocity = new THREE.Vector3();
-					object.userData.velocity.x = ( Math.random() - 0.5 ) * 0.1;
-					object.userData.velocity.y = ( Math.random() - 0.5 ) * 0.1;
-					object.userData.velocity.z = ( Math.random() - 0.5 ) * 0.1;
+					object.userData.velocity.x = Math.random() * 0.4 - 0.2;
+					object.userData.velocity.y = Math.random() * 0.4 - 0.2;
+					object.userData.velocity.z = Math.random() * 0.4 - 0.2;
 
 					scene.add( object );
 					cubes.push( object );
@@ -135,11 +134,6 @@
 
 				}
 
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0';
-				container.appendChild( stats.domElement );
-
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -160,9 +154,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
 				render();
-				stats.update();
 
 			}
 
@@ -204,18 +196,21 @@
 
 					if ( cube.position.x < - 100 || cube.position.x > 100 ) {
 
+						cube.position.x = THREE.Math.clamp( cube.position.x, - 100, 100 );
 						cube.userData.velocity.x = - cube.userData.velocity.x;
 
 					}
 
 					if ( cube.position.y < - 100 || cube.position.y > 100 ) {
 
+						cube.position.y = THREE.Math.clamp( cube.position.y, - 100, 100 );
 						cube.userData.velocity.y = - cube.userData.velocity.y;
 
 					}
 
 					if ( cube.position.z < - 100 || cube.position.z > 100 ) {
 
+						cube.position.z = THREE.Math.clamp( cube.position.z, - 100, 100 );
 						cube.userData.velocity.z = - cube.userData.velocity.z;
 
 					}
