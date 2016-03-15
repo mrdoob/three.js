@@ -1,2 +1,1 @@
-var webkitAudioContext;
 var TWEEN;

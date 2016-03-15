@@ -112,9 +112,6 @@ function main() {
 			else {
 					if( args.sourcemaps ) {
 						fs.appendFileSync(output, sourcemapping, 'utf8');
-						var sm = JSON.parse( fs.readFileSync( sourcemap, 'utf8' ) );
-						sm.sources = [ "three.js" ];
-						fs.writeFileSync( sourcemap, JSON.stringify( sm ), 'utf8' );
 					}
 					console.log( '  Compile Time: ' + (Date.now() - startTime)/1000 + 's');
 			}
