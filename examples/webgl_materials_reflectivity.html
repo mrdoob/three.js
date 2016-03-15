@@ -63,7 +63,7 @@
 			var params = {
 				envMap: "HDR",
 				projection: 'normal',
-				reflectance: 0.5,
+				reflectivity: 0.5,
 				background: false,
 				exposure: 1.0,
 			};
@@ -88,13 +88,13 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setClearColor( new THREE.Color( 0x000000 ) );
-				renderer.toneMapping = THREE.LinearToneMapping;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
 					color: 0xff0000,
-					metalness: 0.1,
-					roughness: 0.1,
+					metalness: 1.0,
+					roughness: 0,
 					opacity: 0.15,
 					side: THREE.BackSide,
 					transparent: true,
@@ -105,9 +105,9 @@
 				standardMaterial2 = new THREE.MeshStandardMaterial( {
 					map: null,
 					color: 0xff0000,
-					metalness: 0.1,
-					roughness: 0.1,
-					opacity: 0.25,
+					metalness: 0.0,
+					roughness: 0,
+					opacity: 0.15,
 					side: THREE.FrontSide,
 					transparent: true,
 					shading: THREE.SmoothShading,
@@ -137,13 +137,18 @@
 							child.material = standardMaterial;
 							var second = child.clone();
 							second.material = standardMaterial2;
-							scene.add( second );
+
+							var parent = new THREE.Group();
+							parent.add( second );
+							parent.add( child );
+							scene.add( parent );
+
+							objects.push( parent );
 
 						}
 
 					} );
 
-					scene.add( object );
 
 				} );
 
@@ -153,7 +158,7 @@
 					roughnessMap: null,
 					color: 0x0f0f0f,
 					metalness: 0.0,
-					roughness: 1.0,
+					roughness: 0.1,
 					shading: THREE.SmoothShading,
 				} );
 
@@ -163,18 +168,6 @@
 				planeMesh1.rotation.x = - Math.PI * 0.5;
 				planeMesh1.receiveShadow = true;
 				scene.add( planeMesh1 );
-
-
-				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "./textures/roughness_map.jpg", function( map ) {
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
-					map.anisotropy = 4;
-					map.repeat.set( 9, 2 );
-					standardMaterial.roughnessMap = map;
-					standardMaterial.bumpMap = map;
-					standardMaterial.needsUpdate = true;
-				} );
 
 				var genCubeUrls = function( prefix, postfix ) {
 					return [
@@ -195,8 +188,8 @@
 
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					standardMaterial.envMap = hdrCubeRenderTarget;
-					standardMaterial.needsUpdate = true;
+					standardMaterial2.envMap = standardMaterial.envMap = hdrCubeRenderTarget;
+					standardMaterial2.needsUpdate = standardMaterial.needsUpdate = true;
 				} );
 
 				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
@@ -233,17 +226,21 @@
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
 				var pointLight1 = new THREE.PointLight( 0xffffff );
-				pointLight1.position.set( 50, 100, 50 );
+				pointLight1.position.set( 150, 10, 0 );
 				pointLight1.castShadow = false;
 				scene.add( pointLight1 );
 
 				var pointLight2 = new THREE.PointLight( 0xffffff );
-				pointLight2.position.set( -50, 100, -50 );
+				pointLight2.position.set( -150, 0, 0 );
 				scene.add( pointLight2 );
 
 				var pointLight3 = new THREE.PointLight( 0xffffff );
-				pointLight3.position.set( 50, 100, -50 );
+				pointLight3.position.set( 0, -10, -150 );
 				scene.add( pointLight3 );
+
+				var pointLight4 = new THREE.PointLight( 0xffffff );
+				pointLight4.position.set( 0, 0, 150 );
+				scene.add( pointLight4 );
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -278,7 +275,7 @@
 				var gui = new dat.GUI();
 
 				gui.add( params, 'envMap', [ 'LDR', 'HDR', 'RGBM16' ] );
-				gui.add( params, 'reflectance', 0, 1 );
+				gui.add( params, 'reflectivity', 0, 1 );
 				gui.add( params, 'exposure', 0.1, 2 );
 				gui.open();
 
@@ -311,13 +308,19 @@
 
 			function render() {
 
-				if ( standardMaterial !== undefined ) {
+				if ( standardMaterial !== undefined && standardMaterial2 !== undefined ) {
 
-					standardMaterial.reflectance = params.reflectance;
+					standardMaterial2.reflectivity = standardMaterial.reflectivity = params.reflectivity;
+					var newEnvMap = standardMaterial.envMap;
 					switch( params.envMap ) {
-						case 'LDR': standardMaterial.envMap = ldrCubeRenderTarget; break;
-						case 'HDR': standardMaterial.envMap = hdrCubeRenderTarget; break;
-						case 'RGBM16': standardMaterial.envMap = rgbmCubeRenderTarget; break;
+						case 'LDR': newEnvMap = ldrCubeRenderTarget; break;
+						case 'HDR': newEnvMap = hdrCubeRenderTarget; break;
+						case 'RGBM16': newEnvMap = rgbmCubeRenderTarget; break;
+					}
+					if( newEnvMap !== standardMaterial.envMap ) {
+						standardMaterial2.envMap = standardMaterial.envMap = newEnvMap;
+						standardMaterial2.needsUpdate = true;
+						standardMaterial.needsUpdate = true;
 					}
 
 				}
