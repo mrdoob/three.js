@@ -1,1 +1,1 @@
-python build.py --include common --include extras --output ../../build/three.min.js
+@node build.js --include common --include extras --output ../../build/three.min.js
