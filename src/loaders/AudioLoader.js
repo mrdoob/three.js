@@ -2,7 +2,7 @@
  * @author Reece Aaron Lecrivain / http://reecenotes.com/
  */
 
-THREE.AudioLoader = function ( context, manager ) {
+THREE.AudioLoader = function( context, manager ) {
 
 	this.context = ( context !== undefined ) ? context : new ( window.AudioContext || window.webkitAudioContext )();
 
@@ -20,9 +20,9 @@ THREE.AudioLoader.prototype = {
 
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function ( buffer ) {
+		loader.load( url, function( buffer ) {
 
-			scope.context.decodeAudioData( buffer, function ( audioBuffer ) {
+			scope.context.decodeAudioData( buffer, function( audioBuffer ) {
 
 				onLoad( audioBuffer );
 
