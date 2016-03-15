@@ -89,6 +89,7 @@ var files = {
 		"webgl_loader_msgpack",
 		"webgl_loader_obj",
 		"webgl_loader_obj_mtl",
+		"webgl_loader_nrrd",
 		"webgl_loader_pcd",
 		"webgl_loader_pdb",
 		"webgl_loader_ply",
