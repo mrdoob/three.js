@@ -7,11 +7,19 @@ THREE.AudioBuffer = function( context ) {
 
 	console.warn( 'THREE.AudioBuffer has been deprecated. Please use THREE.AudioLoader.' );
 
+	this.context = context;
+
 };
 
 THREE.AudioBuffer.prototype.load = function( file ) {
 
 	console.warn( 'THREE.AudioBuffer: .load has been deprecated. Please use THREE.AudioLoader.' );
+
+	var audioLoader = new THREE.AudioLoader( this.context );
+
+	audioLoader.load( file, function( buffer ) {
+		return buffer;
+	});
 
 };
 

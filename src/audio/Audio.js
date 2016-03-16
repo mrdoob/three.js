@@ -37,13 +37,13 @@ THREE.Audio.prototype.getOutput = function() {
 
 };
 
-THREE.Audio.prototype.load = function( url ) {
+THREE.Audio.prototype.load = function( file ) {
 
 	console.warn( 'THREE.Audio: .load has been deprecated. Please use THREE.AudioLoader.' );
 
-	var audioLoader = new THREE.AudioLoader(this.context);
+	var audioLoader = new THREE.AudioLoader( this.context );
 
-	audioLoader.load( url, function( buffer ) {
+	audioLoader.load( file, function( buffer ) {
 		this.setBuffer( buffer );
 	});
 
