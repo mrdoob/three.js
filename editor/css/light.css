@@ -17,7 +17,7 @@
 	}
 
 	.Outliner .option.active {
-		background-color: #f8f8f8;
+		background-color: rgba(0,0,0,0.02);
 	}
 
 input.Number {

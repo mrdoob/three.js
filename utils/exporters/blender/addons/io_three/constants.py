@@ -93,11 +93,13 @@ LIGHTS = 'lights'
 HIERARCHY = 'hierarchy'
 FACE_MATERIALS = 'faceMaterials'
 SKINNING = 'skinning'
-COPY_TEXTURES = 'copyTextures'
+EXPORT_TEXTURES = 'exportTextures'
+EMBED_TEXTURES = 'embedTextures'
 TEXTURE_FOLDER = 'textureFolder'
 ENABLE_PRECISION = 'enablePrecision'
 PRECISION = 'precision'
 DEFAULT_PRECISION = 6
+CUSTOM_PROPERTIES = 'customProperties'
 EMBED_GEOMETRY = 'embedGeometry'
 EMBED_ANIMATION = 'embedAnimation'
 OFF = 'off'
@@ -153,11 +155,13 @@ EXPORT_OPTIONS = {
     CAMERAS: False,
     LIGHTS: False,
     HIERARCHY: False,
-    COPY_TEXTURES: True,
+    EXPORT_TEXTURES: True,
+    EMBED_TEXTURES: False,
     TEXTURE_FOLDER: '',
     LOGGING: DEBUG,
     ENABLE_PRECISION: True,
     PRECISION: DEFAULT_PRECISION,
+    CUSTOM_PROPERTIES: False,
     EMBED_GEOMETRY: True,
     EMBED_ANIMATION: True,
     GEOMETRY_TYPE: GEOMETRY,

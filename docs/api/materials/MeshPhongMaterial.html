@@ -21,20 +21,33 @@
 
 		<h3>[name]([page:Object parameters])</h3>
 		<div>
-		parameters -- an object with one or more of the material's properties defining the its appearance.
+		parameters -- an object with one or more of the material's properties defining the material's appearance.
 		</div>
 		<div>
 		color — geometry color in hexadecimal. Default is 0xffffff.<br />
-		map — Set texture map. Default is null <br />
+		specular — Set specular color. Default is 0x111111 .<br />
+		shininess — Set shininess Default is 30.<br />
+		map — Set texture map. Default is null.<br />
 		lightMap — Set light map. Default is null.<br />
+		lightMapIntensity — Set light map intensity. Default is 1.<br />
 		aoMap — Set ao map. Default is null.<br />
+		aoMapIntensity — Set ao map intensity. Default is 1.<br />
+		emissive - Set emissive color. Default is 0x000000.<br />
 		emissiveMap — Set emissive map. Default is null.<br />
-		specularMap — Set specular map. Default is null.<br />
-		alphaMap — Set alpha map. Default is null.<br />
+		emissiveIntensity — Set emissive map intensity. Default is 1.<br />
+		bumpMap — Set bump map. Default is null.<br />
+		bumpMapScale — Set bump map scale. Default is 1.<br />
+		normalMap — Set normal map. Default is null.<br />
+		normalMapScale — Set normal map scale. Default is (1, 1).<br />
 		displacementMap — Set displacement map. Default is null.<br />
 		displacementScale — Set displacement scale. Default is 1.<br />
 		displacementBias — Set displacement offset. Default is 0.<br />
+		specularMap — Set specular map. Default is null.<br />
+		alphaMap — Set alpha map. Default is null.<br />
 		envMap — Set env map. Default is null.<br />
+		combine — Set combine operation. Default is THREE.MultiplyOperation.<br />
+		reflectivity — Set reflectivity. Default is 1.<br />
+		refractionRatio — Set refraction ratio. Default is 0.98.<br />
 		fog — Define whether the material color is affected by global fog settings. Default is true.<br />
 		shading — Define shading type. Default is THREE.SmoothShading.<br />
 		wireframe — render geometry as wireframe. Default is false.<br />
@@ -43,7 +56,8 @@
 		wireframeLinejoin — Define appearance of line joints. Default is 'round'.<br />
 		vertexColors — Define how the vertices gets colored. Default is THREE.NoColors.<br />
 		skinning — Define whether the material uses skinning. Default is false.<br />
-		morphTargets — Define whether the material uses morphTargets. Default is false.
+		morphTargets — Define whether the material uses morphTargets. Default is false.<br />
+		morphNormals — Define whether the material uses morphNormals. Default is false.
 		</div>
 		<div>
 		Example:<br>
@@ -53,20 +67,12 @@
 
 
 		<h2>Properties</h2>
-		<div>See the base [page:Material] class for common parameters.</div>
+		<div>See the base [page:Material] class for common properties.</div>
 
 		<h3>[property:Color color]</h3>
 		<div>
 		Diffuse color of the material. Default is white.<br />
 		</div>
-
-		<h3>[property:Color emissive]</h3>
-		<div>
-		Emissive (light) color of the material, essentially a solid color unaffected by other lighting. Default is black.<br />
-		</div>
-
-		<h3>[property:Float emissiveIntensity]</h3>
-		<div>Intensity of the emissive light. Modulates the emissive color. Default is 1.</div>
 
 		<h3>[property:Color specular]</h3>
 		<div>
@@ -82,11 +88,25 @@
 		<h3>[property:Texture lightMap]</h3>
 		<div>Set light map. Default is null. The lightMap requires a second set of UVs.</div>
 
+		<h3>[property:Float lightMapIntensity]</h3>
+		<div>TODO</div>
+
 		<h3>[property:Texture aoMap]</h3>
 		<div>Set ambient occlusion map. Default is null. The aoMap requires a second set of UVs.</div>
 
+		<h3>[property:Float aoMapIntensity]</h3>
+		<div>TODO</div>
+
+		<h3>[property:Color emissive]</h3>
+		<div>
+		Emissive (light) color of the material, essentially a solid color unaffected by other lighting. Default is black.<br />
+		</div>
+
 		<h3>[property:Texture emissiveMap]</h3>
 		<div>Set emisssive (glow) map. Default is null. The emissive map color is modulated by the emissive color and the emissive intensity. If you have an emissive map, be sure to set the emissive color to something other than black.</div>
+
+		<h3>[property:Float emissiveIntensity]</h3>
+		<div>Intensity of the emissive light. Modulates the emissive color. Default is 1.</div>
 
 		<h3>[property:Texture bumpMap]</h3>
 		<div>
@@ -111,6 +131,22 @@
 			How much the normal map affects the material. Typical ranges are 0-1. Default is (1,1).
 		</div>
 
+		<h3>[property:Texture displacementMap]</h3>
+		<div>
+			The displacement map affects the position of the mesh's vertices. Unlike other maps which only affect the light and shade of the material the displaced vertices can cast shadows, block other objects, and otherwise act as real geometry.
+			The displacement texture is an image where the value of each pixel (white being the highest) is mapped against, and repositions, the vertices of the mesh.
+		</div>
+
+		<h3>[property:Float displacementScale]</h3>
+		<div>
+			How much the displacement map affects the mesh (where black is no displacement, and white is maximum displacement). Without a displacement map set, this value is not applied. Default is 1.
+		</div>
+
+		<h3>[property:Float displacementBias]</h3>
+		<div>
+			The offset of the displacement map's values on the mesh's vertices. Without a displacement map set, this value is not applied. Default is 0.
+		</div>
+
 		<h3>[property:Texture specularMap]</h3>
 		<div>The specular map value affects both how much the specular surface highlight contributes and how much of the environment map affects the surface. Default is null.</div>
 
@@ -118,22 +154,6 @@
 		<div>The alpha map is a grayscale texture that controls the opacity across the surface (black: fully transparent; white: fully opaque). Default is null.</div>
 		<div>Only the color of the texture is used, ignoring the alpha channel if one exists. For RGB and RGBA textures, the [page:WebGLRenderer WebGL] renderer will use the green channel when sampling this texture due to the extra bit of precision provided for green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and luminance/alpha textures will also still work as expected.</div>
 
-		<h3>[property:Texture displacementMap]</h3>
-		<div>
-			The displacement map affects the position of the mesh's vertices. Unlike other maps which only affect the light and shade of the material the displaced vertices can cast shadows, block other objects, and otherwise act as real geometry. 
-			The displacement texture is an image where the value of each pixel (white being the highest) is mapped against, and repositions, the vertices of the mesh.
-		</div>
-		
-		<h3>[property:Float displacementScale]</h3>
-		<div>
-			How much the displacement map affects the mesh (where black is no displacement, and white is maximum displacement). Without a displacement map set, this value is not applied. Default is 1.
-		</div>
-		
-		<h3>[property:Float displacementBias]</h3>
-		<div>
-			The offset of the displacement map's values on the mesh's vertices. Without a displacement map set, this value is not applied. Default is 0.
-		</div>
-		
 		<h3>[property:TextureCube envMap]</h3>
 		<div>Set env map. Default is null.</div>
 

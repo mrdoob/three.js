@@ -60,13 +60,8 @@ scene.add( directionalLight );</code>
 		<h3>[property:Float intensity]</h3>
 		<div>
 			Light's intensity.<br />
+			In "physically correct" mode, the product of intensity * color is interpreted as luminous irradiance measured in lux at the material's surface.<br/>
 			Default — *1.0*.
-		</div>
-
-		<h3>[property:Boolean onlyShadow]</h3>
-		<div>
-			If set to *true* light will only cast shadow but not contribute any lighting (as if *intensity* was 0 but cheaper to compute).<br />
-			Default — *false*.
 		</div>
 
 		<h3>[property:Boolean castShadow]</h3>
