@@ -2,12 +2,14 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Uniform = function ( type, value ) {
+THREE.Uniform = function ( type, value , shared ) {
 
 	this.type = type;
 	this.value = value;
 
 	this.dynamic = false;
+
+	this.shared = !!shared;
 
 };
 

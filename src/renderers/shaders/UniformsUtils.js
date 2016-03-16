@@ -30,6 +30,18 @@ THREE.UniformsUtils = {
 
 		for ( var u in uniforms_src ) {
 
+			// uniforms_dst[ u ] = uniforms_src[ u ].clone();
+
+		
+			if ( uniforms_src[ u ].shared ) {
+
+				uniforms_dst[ u ] = uniforms_src[ u ];
+			
+				continue;
+			}
+		
+
+		
 			uniforms_dst[ u ] = {};
 
 			for ( var p in uniforms_src[ u ] ) {
@@ -57,6 +69,7 @@ THREE.UniformsUtils = {
 				}
 
 			}
+		
 
 		}
 
