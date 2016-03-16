@@ -47,6 +47,8 @@ THREE.Audio.prototype.load = function( url ) {
 		this.setBuffer( buffer );
 	});
 
+	return this;
+
 };
 
 THREE.Audio.prototype.setNodeSource = function( audioNode ) {
