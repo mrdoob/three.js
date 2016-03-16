@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - materials - transparency</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+
+				margin: 0px;
+				overflow: hidden;
+			}
+			a { color: #eee }
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Transparency with Premultiplied Alpha (right) and without (left)<br /> using RGBA8 Buffers by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="../examples/js/controls/OrbitControls.js"></script>
+		<script src="../src/loaders/BinaryTextureLoader.js"></script>
+
+		<script src="../examples/js/Detector.js"></script>
+		<script src="../examples/js/libs/stats.min.js"></script>
+
+		<script src="../examples/js/libs/dat.gui.min.js"></script>
+
+		<script src="../examples/js/postprocessing/EffectComposer.js"></script>
+		<script src="../examples/js/postprocessing/RenderPass.js"></script>
+		<script src="../examples/js/postprocessing/MaskPass.js"></script>
+		<script src="../examples/js/postprocessing/ShaderPass.js"></script>
+		<script src="../examples/js/shaders/CopyShader.js"></script>
+		<script src="../examples/js/shaders/FXAAShader.js"></script>
+		<script src="../examples/js/postprocessing/BloomPass.js"></script>
+		<script src="../examples/js/shaders/ConvolutionShader.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+			var params = {
+				roughness: 1.0,
+				opacity: 0.5
+			};
+			var camera, scene, renderer, controls, objects = [];
+			var composer;
+			var standardMaterial, standardMaterialPremultiplied;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0.0, 40, 40 * 3.5 );
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+
+				standardMaterial = new THREE.MeshStandardMaterial( {
+					map: null,
+					metalness: 0.9,
+					roughness: 1.0,
+					shading: THREE.SmoothShading,
+					blending: THREE.NormalBlending,
+					transparent: true
+				} );
+				var geometry = new THREE.SphereGeometry( 18, 30, 30 );
+				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
+				torusMesh1.position.x = - 20.0;
+				torusMesh1.castShadow = true;
+				scene.add( torusMesh1 );
+				objects.push( torusMesh1 );
+
+				standardMaterialPremultiplied = new THREE.MeshStandardMaterial( {
+					map: null,
+					metalness: 0.9,
+					roughness: 1.0,
+					shading: THREE.SmoothShading,
+					premultipliedAlpha: true,
+					transparent: true
+				} );
+
+				var textureLoader = new THREE.TextureLoader();
+				textureLoader.load( "../examples/textures/roughness_map.jpg", function ( map ) {
+
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 2, 2 );
+					standardMaterial.map = map;
+					standardMaterial.roughnessMap = map;
+					standardMaterial.needsUpdate = true;
+					standardMaterialPremultiplied.map = map;
+					standardMaterialPremultiplied.roughnessMap = map;
+					standardMaterialPremultiplied.needsUpdate = true;
+
+				} );
+
+				var torusMesh2 = new THREE.Mesh( geometry, standardMaterialPremultiplied );
+				torusMesh2.position.x = 20.0;
+				torusMesh2.castShadow = true;
+				scene.add( torusMesh2 );
+				objects.push( torusMesh2 );
+
+				var floorMaterial = new THREE.MeshStandardMaterial( {
+					map: null,
+					roughnessMap: null,
+					color: 0xffffff,
+					metalness: 0.0,
+					roughness: 0.0,
+					shading: THREE.SmoothShading
+				} );
+
+				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
+				planeMesh1.position.y = - 50;
+				planeMesh1.rotation.x = - Math.PI * 0.5;
+				planeMesh1.receiveShadow = true;
+				scene.add( planeMesh1 );
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+				var spotLight = new THREE.SpotLight( 0xffffff );
+				spotLight.position.set( 50, 100, 50 );
+				spotLight.angle = Math.PI / 7;
+				spotLight.penumbra = 0.8;
+				spotLight.intensity = 5;
+				spotLight.castShadow = true;
+				scene.add( spotLight );
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				composer = new THREE.EffectComposer( renderer );
+				composer.setSize( window.innerWidth, window.innerHeight );
+
+				var renderScene = new THREE.RenderPass( scene, camera );
+				composer.addPass( renderScene );
+
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				copyPass.renderToScreen = true;
+				composer.addPass( copyPass );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+
+				container.appendChild( stats.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0, 0 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				var gui = new dat.GUI();
+
+				gui.add( params, 'roughness', 0, 1 );
+				gui.add( params, 'opacity', 0, 1 );
+				gui.open();
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			function render() {
+
+				if ( standardMaterial !== undefined ) {
+
+
+					standardMaterial.roughness = params.roughness;
+					standardMaterialPremultiplied.roughness = params.roughness;
+
+					standardMaterial.opacity = params.opacity;
+					standardMaterialPremultiplied.opacity = params.opacity;
+
+				}
+
+				var timer = Date.now() * 0.00025;
+
+				camera.lookAt( scene.position );
+
+				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+					var object = objects[ i ];
+					object.rotation.y += 0.005;
+
+				}
+
+				composer.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -10,7 +10,13 @@ void RE_Direct_Standard( const in IncidentLight directLight, const in GeometricC
 
 	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
 
-	vec3 irradiance = dotNL * PI * directLight.color; // punctual light
+	vec3 irradiance = dotNL * directLight.color;
+
+	#ifndef PHYSICALLY_CORRECT_LIGHTS
+
+		irradiance *= PI; // punctual light
+
+	#endif
 
 	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
 
@@ -35,3 +41,10 @@ void RE_IndirectSpecular_Standard( const in vec3 radiance, const in GeometricCon
 #define RE_IndirectSpecular		RE_IndirectSpecular_Standard
 
 #define Material_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.specularRoughness )
+
+// ref: http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr_v2.pdf
+float computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {
+
+	return saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );
+
+}

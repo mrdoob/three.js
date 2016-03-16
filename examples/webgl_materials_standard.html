@@ -51,6 +51,12 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/loaders/RGBELoader.js"></script>
+		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
+		<script src="js/Half.js"></script>
+		<script src="js/Encodings.js"></script>
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -87,6 +93,21 @@
 
 				controls = new THREE.TrackballControls( camera );
 
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0x202020 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				renderer.autoClear = false;
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMappingExposure = 3;
+
+
 				scene = new THREE.Scene();
 
 				sceneCube = new THREE.Scene();
@@ -111,7 +132,7 @@
 				var shader = THREE.ShaderLib[ "cube" ];
 				shader.uniforms[ "tCube" ].value = textureCube;
 
-				var material = new THREE.ShaderMaterial( {
+				var materialBG = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
@@ -121,7 +142,7 @@
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), materialBG );
 				sceneCube.add( mesh );
 
 				//
@@ -129,10 +150,10 @@
 				var path = 'models/obj/cerberus/';
 
 				var loader = new THREE.OBJLoader();
+				var material = new THREE.MeshStandardMaterial();
 				loader.load( path + 'Cerberus.obj', function ( group ) {
 
 					// var material = new THREE.MeshBasicMaterial( { wireframe: true } );
-					var material = new THREE.MeshStandardMaterial();
 
 					var loader = new THREE.TextureLoader();
 
@@ -143,7 +164,6 @@
 					material.roughnessMap = loader.load( path + 'Cerberus_R.jpg' );
 					material.metalnessMap = loader.load( path + 'Cerberus_M.jpg' );
 					material.normalMap = loader.load( path + 'Cerberus_N.jpg' );
-					material.envMap = textureCube;
 
 					material.map.wrapS = THREE.RepeatWrapping;
 					material.roughnessMap.wrapS = THREE.RepeatWrapping;
@@ -166,17 +186,28 @@
 
 				} );
 
-				//
+				var genCubeUrls = function( prefix, postfix ) {
+					return [
+						prefix + 'px' + postfix, prefix + 'nx' + postfix,
+						prefix + 'py' + postfix, prefix + 'ny' + postfix,
+						prefix + 'pz' + postfix, prefix + 'nz' + postfix
+					];
+				};
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x202020 );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				var hdrUrls = genCubeUrls( "./textures/cube/pisaHDR/", ".hdr" );
+				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
 
-				renderer.autoClear = false;
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+					material.envMap = hdrCubeRenderTarget;
+					material.needsUpdate = true;
+				} );
 
 				//
 
