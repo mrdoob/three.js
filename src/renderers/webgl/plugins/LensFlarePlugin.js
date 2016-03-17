@@ -45,14 +45,14 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		occlusionTexture = gl.createTexture();
 
 		state.bindTexture( gl.TEXTURE_2D, tempTexture );
-		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, 16, 16, 0, gl.RGB, gl.UNSIGNED_BYTE, new Uint8Array( 16 * 16 * 3 ) );
+		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, 16, 16, 0, gl.RGB, gl.UNSIGNED_BYTE, null );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 
 		state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
-		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, 16, 16, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array( 16 * 16 * 4 ) );
+		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, 16, 16, 0, gl.RGBA, gl.UNSIGNED_BYTE, null );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
@@ -288,6 +288,8 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		var screenPosition = new THREE.Vector3( 1, 1, 0 ),
 			screenPositionPixels = new THREE.Vector2( 1, 1 );
 
+		var areaToCopy = new THREE.Vector2();
+
 		if ( program === undefined ) {
 
 			init();
@@ -337,13 +339,15 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 			screenPositionPixels.x = screenPosition.x * halfViewportWidth + halfViewportWidth;
 			screenPositionPixels.y = screenPosition.y * halfViewportHeight + halfViewportHeight;
 
+			areaToCopy.x = viewport.x + screenPositionPixels.x - 8; // horizontal coordinate of the lower left corner of the pixels to copy
+			areaToCopy.y = viewport.y + screenPositionPixels.y - 8; // vertical coordinate of the lower left corner of the pixels to copy
+
 			// screen cull
 
-			if ( hasVertexTexture || (
-				screenPositionPixels.x > 0 &&
-				screenPositionPixels.x < viewport.z &&
-				screenPositionPixels.y > 0 &&
-				screenPositionPixels.y < viewport.w ) ) {
+			if ( areaToCopy.x > 0 &&
+				areaToCopy.x < ( viewport.z - 16 ) &&
+				areaToCopy.y > 0 &&
+				areaToCopy.y < ( viewport.w - 16 ) ) {
 
 				// save current RGB to temp texture
 
@@ -351,7 +355,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				state.bindTexture( gl.TEXTURE_2D, null );
 				state.activeTexture( gl.TEXTURE1 );
 				state.bindTexture( gl.TEXTURE_2D, tempTexture );
-				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, viewport.x + screenPositionPixels.x - 8, viewport.y + screenPositionPixels.y - 8, 16, 16, 0 );
+				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, areaToCopy.x, areaToCopy.y, 16, 16, 0 );
 
 
 				// render pink quad
@@ -370,7 +374,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 				state.activeTexture( gl.TEXTURE0 );
 				state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
-				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, viewport.x + screenPositionPixels.x - 8, viewport.y + screenPositionPixels.y - 8, 16, 16, 0 );
+				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, areaToCopy.x, areaToCopy.y, 16, 16, 0 );
 
 
 				// restore graphics
