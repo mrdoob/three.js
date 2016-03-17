@@ -139,7 +139,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		pointShadowMatrix: [],
 		hemi: [],
 
-		shadows: [],
+		shadows: 0,
 		shadowsPointLight: 0
 
 	},
@@ -303,7 +303,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// shadow map
 
-	var shadowMap = new THREE.WebGLShadowMap( this, _lights, objects );
+	var shadowMap = new THREE.WebGLShadowMap( this, lights, objects );
 
 	this.shadowMap = shadowMap;
 
@@ -1158,11 +1158,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		setupLights( lights, camera );
-
 		//
 
 		shadowMap.render( scene, camera );
+
+		setupLights( lights, camera );
 
 		//
 
@@ -1625,8 +1625,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( materialProperties.lightsHash !== undefined &&
-			materialProperties.lightsHash !== _lights.hash ) {
+		if ( materialProperties.lightsHash !== _lights.hash ) {
 
 			material.needsUpdate = true;
 
@@ -2602,10 +2601,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		directionalLength = 0,
 		pointLength = 0,
 		spotLength = 0,
-		hemiLength = 0,
+		hemiLength = 0;
 
-		shadowsLength = 0;
-
+		_lights.shadows = 0;
 		_lights.shadowsPointLight = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
@@ -2640,7 +2638,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowRadius = light.shadow.radius;
 					uniforms.shadowMapSize = light.shadow.mapSize;
 
-					_lights.shadows[ shadowsLength ++ ] = light;
+					_lights.shadows ++;
 
 				}
 
@@ -2675,7 +2673,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowRadius = light.shadow.radius;
 					uniforms.shadowMapSize = light.shadow.mapSize;
 
-					_lights.shadows[ shadowsLength ++ ] = light;
+					_lights.shadows ++;
 
 				}
 
@@ -2702,7 +2700,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowRadius = light.shadow.radius;
 					uniforms.shadowMapSize = light.shadow.mapSize;
 
-					_lights.shadows[ shadowsLength ++ ] = light;
+					_lights.shadows ++;
 
 				}
 
@@ -2747,9 +2745,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lights.point.length = pointLength;
 		_lights.hemi.length = hemiLength;
 
-		_lights.shadows.length = shadowsLength;
-
-		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength + ',' + shadowsLength;
+		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength + ',' + _lights.shadows;
 
 	}
 

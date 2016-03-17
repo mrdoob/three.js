@@ -172,7 +172,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			pointLightShadows: lights.shadowsPointLight,
 
-			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows.length > 0,
+			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows > 0,
 			shadowMapType: renderer.shadowMap.type,
 
 			toneMapping: renderer.toneMapping,
