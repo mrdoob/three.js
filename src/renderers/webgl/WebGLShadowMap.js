@@ -10,7 +10,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 
-	_lightShadows = [],
+	_lightShadows = _lights.shadows,
 
 	_shadowMapSize = new THREE.Vector2(),
 
@@ -97,25 +97,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
-		// Collect lights with shadows
-
-		var lightShadowsLength = 0;
-
-		for ( var i = 0, l = _lights.length; i < l; i ++ ) {
-
-			var light = _lights[ i ];
-
-			if ( light.castShadow ) {
-
-				_lightShadows[ lightShadowsLength ++ ] = light;
-
-			}
-
-		}
-
-		if ( lightShadowsLength === 0 ) return;
-
-		_lightShadows.length = lightShadowsLength;
+		if ( _lightShadows.length === 0 ) return;
 
 		// Set GL state for depth map.
 		_state.clearColor( 1, 1, 1, 1 );
