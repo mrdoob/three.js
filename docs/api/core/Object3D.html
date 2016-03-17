@@ -215,6 +215,34 @@
 		Adds *object* as child of this object. An arbitrary number of objects may be added.
 		</div>
 
+		<h3>[method:null replace]( [page:Object3D oldObject], [page:Object3D newObject] )</h3>
+		<div>
+			oldObject - An object.<br />
+		</div>
+		<div>
+			newObject - An object.<br />
+		</div>
+		<div>
+			Replaces the old Object with the new, only if old is found.
+		</div>
+		<div>
+			Returns the old Object that has now been replaced, but nothing if not found.
+		</div>
+
+		<h3>[method:null replaceAt]( [page:Integer index], [page:Object3D object] )</h3>
+		<div>
+			index - index of object.<br />
+		</div>
+		<div>
+			newObject - An object.<br />
+		</div>
+		<div>
+			If object is found at index, it is replaced with newObject.
+		</div>
+		<div>
+			Returns the Old Object that has now been replaced at the index.
+		</div>
+
 		<h3>[method:null remove]( [page:Object3D object], ... )</h3>
 		<div>
 		object - An object.<br />
