@@ -87,19 +87,17 @@
 				overflow: auto;
 			}
 
-			.action-button {
+			#button {
+				position: fixed;
+				bottom: 20px;
+				right: 20px;
 				padding: 8px;
 				color: #fff;
 				background-color: #555;
 				opacity: 0.7;
-				float: left;
-				margin-left: 1px;
-				position: fixed;
-				bottom: 20px;
-				right: 20px;
 			}
-			
-			.action-button:hover {
+
+			#button:hover {
 				cursor: pointer;
 				opacity: 1;
 			}
@@ -274,7 +272,6 @@
 		content.appendChild( container );
 
 		var button = document.createElement( 'div' );
-		button.className = 'action-button';
 		button.id = 'button';
 		button.textContent = 'View source';
 		button.addEventListener( 'click', function ( event ) {
@@ -327,14 +324,14 @@
 
 		}
 
-		var load = function ( file ) {
+		function loadFile( file ) {
 
 			selectFile( file );
 			viewer.src = file + '.html';
 
-		};
+		}
 
-		var selectFile = function( file ) {
+		function selectFile( file ) {
 
 			if ( selected !== null ) links[ selected ].className = 'link';
 
@@ -345,14 +342,14 @@
 
 			button.style.display = '';
 			panel.classList.toggle( 'collapsed' );
-			
+
 			selected = file;
 
 		}
 
 		if ( window.location.hash !== '' ) {
 
-			load( window.location.hash.substring( 1 ) );
+			loadFile( window.location.hash.substring( 1 ) );
 
 		}
 
