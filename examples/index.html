@@ -249,7 +249,7 @@
 			</div>
 			<div id="content"></div>
 		</div>
-		<iframe id="viewer" allowfullscreen onmousewheel=""></iframe>
+		<iframe id="viewer" name="viewer" allowfullscreen onmousewheel=""></iframe>
 
 		<script src="files.js"></script>
 		<script>
@@ -334,14 +334,15 @@
 					link.className = 'link';
 					link.textContent = name;
 					link.href = file + '.html';
+					link.setAttribute( 'target', 'viewer' );
 					link.addEventListener( 'click', function ( event ) {
 
 						if ( event.button === 0 ) {
 
-							event.preventDefault();
+							//event.preventDefault();
 
 							panel.classList.toggle( 'collapsed' );
-							load( file );
+							//load( file );
 
 						}
 
