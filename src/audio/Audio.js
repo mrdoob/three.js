@@ -3,7 +3,7 @@
  * @author Reece Aaron Lecrivain / http://reecenotes.com/
  */
 
-THREE.Audio = function( listener ) {
+THREE.Audio = function ( listener ) {
 
 	THREE.Object3D.call( this );
 
@@ -31,19 +31,19 @@ THREE.Audio = function( listener ) {
 THREE.Audio.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Audio.prototype.constructor = THREE.Audio;
 
-THREE.Audio.prototype.getOutput = function() {
+THREE.Audio.prototype.getOutput = function () {
 
 	return this.gain;
 
 };
 
-THREE.Audio.prototype.load = function( file ) {
+THREE.Audio.prototype.load = function ( file ) {
 
 	console.warn( 'THREE.Audio: .load has been deprecated. Please use THREE.AudioLoader.' );
 
 	var audioLoader = new THREE.AudioLoader( this.context );
 
-	audioLoader.load( file, function( buffer ) {
+	audioLoader.load( file, function ( buffer ) {
 		this.setBuffer( buffer );
 	});
 
@@ -51,7 +51,7 @@ THREE.Audio.prototype.load = function( file ) {
 
 };
 
-THREE.Audio.prototype.setNodeSource = function( audioNode ) {
+THREE.Audio.prototype.setNodeSource = function ( audioNode ) {
 
 	this.hasPlaybackControl = false;
 	this.sourceType = 'audioNode';
@@ -62,7 +62,7 @@ THREE.Audio.prototype.setNodeSource = function( audioNode ) {
 
 };
 
-THREE.Audio.prototype.setBuffer = function( audioBuffer ) {
+THREE.Audio.prototype.setBuffer = function ( audioBuffer ) {
 
 	var scope = this;
 
@@ -74,7 +74,7 @@ THREE.Audio.prototype.setBuffer = function( audioBuffer ) {
 
 };
 
-THREE.Audio.prototype.play = function() {
+THREE.Audio.prototype.play = function () {
 
 	if ( this.isPlaying === true ) {
 
@@ -106,7 +106,7 @@ THREE.Audio.prototype.play = function() {
 
 };
 
-THREE.Audio.prototype.pause = function() {
+THREE.Audio.prototype.pause = function () {
 
 	if ( this.hasPlaybackControl === false ) {
 
@@ -120,7 +120,7 @@ THREE.Audio.prototype.pause = function() {
 
 };
 
-THREE.Audio.prototype.stop = function() {
+THREE.Audio.prototype.stop = function () {
 
 	if ( this.hasPlaybackControl === false ) {
 
@@ -134,7 +134,7 @@ THREE.Audio.prototype.stop = function() {
 
 };
 
-THREE.Audio.prototype.connect = function() {
+THREE.Audio.prototype.connect = function () {
 
 	if ( this.filter !== null ) {
 
@@ -149,7 +149,7 @@ THREE.Audio.prototype.connect = function() {
 
 };
 
-THREE.Audio.prototype.disconnect = function() {
+THREE.Audio.prototype.disconnect = function () {
 
 	if ( this.filter !== null ) {
 
@@ -164,13 +164,13 @@ THREE.Audio.prototype.disconnect = function() {
 
 };
 
-THREE.Audio.prototype.getFilter = function() {
+THREE.Audio.prototype.getFilter = function () {
 
 	return this.filter;
 
 };
 
-THREE.Audio.prototype.setFilter = function( value ) {
+THREE.Audio.prototype.setFilter = function ( value ) {
 
 	if ( value === undefined ) value = null;
 
@@ -188,7 +188,7 @@ THREE.Audio.prototype.setFilter = function( value ) {
 
 };
 
-THREE.Audio.prototype.setPlaybackRate = function( value ) {
+THREE.Audio.prototype.setPlaybackRate = function ( value ) {
 
 	if ( this.hasPlaybackControl === false ) {
 
@@ -207,19 +207,19 @@ THREE.Audio.prototype.setPlaybackRate = function( value ) {
 
 };
 
-THREE.Audio.prototype.getPlaybackRate = function() {
+THREE.Audio.prototype.getPlaybackRate = function () {
 
 	return this.playbackRate;
 
 };
 
-THREE.Audio.prototype.onEnded = function() {
+THREE.Audio.prototype.onEnded = function () {
 
 	this.isPlaying = false;
 
 };
 
-THREE.Audio.prototype.setLoop = function( value ) {
+THREE.Audio.prototype.setLoop = function ( value ) {
 
 	if ( this.hasPlaybackControl === false ) {
 
@@ -232,7 +232,7 @@ THREE.Audio.prototype.setLoop = function( value ) {
 
 };
 
-THREE.Audio.prototype.getLoop = function() {
+THREE.Audio.prototype.getLoop = function () {
 
 	if ( this.hasPlaybackControl === false ) {
 
@@ -246,13 +246,13 @@ THREE.Audio.prototype.getLoop = function() {
 };
 
 
-THREE.Audio.prototype.setVolume = function( value ) {
+THREE.Audio.prototype.setVolume = function ( value ) {
 
 	this.gain.gain.value = value;
 
 };
 
-THREE.Audio.prototype.getVolume = function() {
+THREE.Audio.prototype.getVolume = function () {
 
 	return this.gain.gain.value;
 
