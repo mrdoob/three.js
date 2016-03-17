@@ -63,7 +63,7 @@ THREE.ShaderLib = {
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
 				"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
-				"shininess": { type: "f", value: 30 }
+				"shininess": { type: "1f", value: 30 }
 			}
 
 		] ),
@@ -91,9 +91,9 @@ THREE.ShaderLib = {
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
-				"roughness": { type: "f", value: 0.5 },
-				"metalness": { type: "f", value: 0 },
-				"envMapIntensity" : { type: "f", value: 1 } // temporary
+				"roughness": { type: "1f", value: 0.5 },
+				"metalness": { type: "1f", value: 0 },
+				"envMapIntensity" : { type: "1f", value: 1 } // temporary
 			}
 
 		] ),
@@ -125,9 +125,9 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 
 			{
-				"scale"    : { type: "f", value: 1 },
-				"dashSize" : { type: "f", value: 1 },
-				"totalSize": { type: "f", value: 2 }
+				"scale"    : { type: "1f", value: 1 },
+				"dashSize" : { type: "1f", value: 1 },
+				"totalSize": { type: "1f", value: 2 }
 			}
 
 		] ),
@@ -141,9 +141,9 @@ THREE.ShaderLib = {
 
 		uniforms: {
 
-			"mNear": { type: "f", value: 1.0 },
-			"mFar" : { type: "f", value: 2000.0 },
-			"opacity" : { type: "f", value: 1.0 }
+			"mNear": { type: "1f", value: 1.0 },
+			"mFar" : { type: "1f", value: 2000.0 },
+			"opacity" : { type: "1f", value: 1.0 }
 
 		},
 
@@ -156,7 +156,7 @@ THREE.ShaderLib = {
 
 		uniforms: {
 
-			"opacity" : { type: "f", value: 1.0 }
+			"opacity" : { type: "1f", value: 1.0 }
 
 		},
 
@@ -173,7 +173,7 @@ THREE.ShaderLib = {
 
 		uniforms: {
 			"tCube": { type: "t", value: null },
-			"tFlip": { type: "f", value: - 1 }
+			"tFlip": { type: "1f", value: - 1 }
 		},
 
 		vertexShader: THREE.ShaderChunk['cube_vert'],
@@ -189,7 +189,7 @@ THREE.ShaderLib = {
 
 		uniforms: {
 			"tEquirect": { type: "t", value: null },
-			"tFlip": { type: "f", value: - 1 }
+			"tFlip": { type: "1f", value: - 1 }
 		},
 
 		vertexShader: THREE.ShaderChunk['equirect_vert'],
