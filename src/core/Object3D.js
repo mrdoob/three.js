@@ -319,6 +319,31 @@ THREE.Object3D.prototype = {
 
 	},
 
+	replace: function( oldChild, newChild ) {
+
+		var index = this.children.indexOf(oldChild);
+
+		if (index !== -1) {
+
+			return this.replaceAt( index, newChild );
+
+		}
+
+	},
+
+	replaceAt: function ( index, newChild ) {
+
+		var oldChild = this.children[index];
+
+		if (oldChild !== undefined) {
+
+			this.children[index] = newChild;
+
+			return oldChild;
+
+		}
+	},
+
 	remove: function ( object ) {
 
 		if ( arguments.length > 1 ) {
