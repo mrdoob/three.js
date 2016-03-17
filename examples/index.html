@@ -87,12 +87,6 @@
 				overflow: auto;
 			}
 
-			.action-panel{
-				position: fixed;
-				bottom: 20px;
-				right: 20px;
-			}
-
 			.action-button {
 				padding: 8px;
 				color: #fff;
@@ -100,18 +94,14 @@
 				opacity: 0.7;
 				float: left;
 				margin-left: 1px;
+				position: fixed;
+				bottom: 20px;
+				right: 20px;
 			}
 			
 			.action-button:hover {
 				cursor: pointer;
 				opacity: 1;
-			}
-
-			#open-external-button{
-				background-image: url(files/external.svg);
-				background-size: 50%;
-				background-position: 50% 50%;
-				background-repeat: no-repeat;
 			}
 
 			.filterBlock{
@@ -283,10 +273,6 @@
 		var container = document.createElement( 'div' );
 		content.appendChild( container );
 
-		var actionPanel = document.createElement( 'div' );
-		actionPanel.className = 'action-panel';
-		document.body.appendChild( actionPanel );
-
 		var button = document.createElement( 'div' );
 		button.className = 'action-button';
 		button.id = 'button';
@@ -297,20 +283,7 @@
 
 		}, false );
 		button.style.display = 'none';
-		actionPanel.appendChild( button );
-
-		var button2 = document.createElement( 'a' );
-		button2.className = 'action-button';
-		button2.id = 'open-external-button';
-		button2.innerHTML = '&nbsp;&nbsp;'
-		button2.addEventListener( 'click', function ( event ) {
-
-			window.open( selected + '.html' );
-			event.preventDefault();
-
-		}, false );
-		button2.style.display = 'none';
-		actionPanel.appendChild( button2 );
+		document.body.appendChild( button );
 
 		var links = {};
 		var selected = null;
@@ -339,10 +312,7 @@
 
 						if ( event.button === 0 ) {
 
-							//event.preventDefault();
-
-							panel.classList.toggle( 'collapsed' );
-							//load( file );
+							selectFile( file );
 
 						}
 
@@ -359,22 +329,25 @@
 
 		var load = function ( file ) {
 
+			selectFile( file );
+			viewer.src = file + '.html';
+
+		};
+
+		var selectFile = function( file ) {
+
 			if ( selected !== null ) links[ selected ].className = 'link';
 
 			links[ file ].className = 'link selected';
 
 			window.location.hash = file;
-			viewer.src = file + '.html';
-			viewer.focus();
 
 			button.style.display = '';
-			button2.style.display = '';
-
+			panel.classList.toggle( 'collapsed' );
+			
 			selected = file;
 
-			button2.href = selected + '.html'
-
-		};
+		}
 
 		if ( window.location.hash !== '' ) {
 
