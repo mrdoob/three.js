@@ -6,7 +6,6 @@ THREE.BlendCharacter = function () {
 
 	this.weightSchedule = [];
 	this.warpSchedule = [];
-	this.mixer;
 
 	this.load = function ( url, onLoad ) {
 
