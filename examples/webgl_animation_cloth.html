@@ -126,6 +126,8 @@
 			var object;
 
 			var rotate = true;
+			var cameraDelay = 0;
+			var cameraStopTime = 0;
 
 			init();
 			animate();
@@ -358,6 +360,11 @@
 					camera.position.x = Math.cos( timer ) * 1500;
 					camera.position.z = Math.sin( timer ) * 1500;
 
+					cameraDelay += (cameraStopTime == 0 ? 0 : timer - cameraStopTime);
+					cameraStopTime = 0;
+				} else {
+					
+					cameraStopTime = cameraStopTime || timer;
 				}
 
 				camera.lookAt( scene.position );
