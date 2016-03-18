@@ -38,10 +38,13 @@
 
 				scene = new THREE.Scene();
 
+				var dummy = new THREE.Camera();
+				dummy.position.set( 2, 1, 2 );
+				dummy.lookAt( scene.position );
+				scene.add( dummy );
+
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
-				camera.position.set( 3, 2, 3 );
-				camera.focalLength = camera.position.distanceTo( scene.position );
-				camera.lookAt( scene.position );
+				dummy.add( camera );
 
 				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );;
 				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2 } );
@@ -116,11 +119,7 @@
 			function render() {
 
 				var time = performance.now() * 0.0002;
-				camera.position.x = Math.cos( time ) * 4;
-				camera.position.z = Math.sin( time ) * 4;
-				camera.lookAt( new THREE.Vector3() );
-
-				var mesh = scene.children[ 0 ];
+				var mesh = scene.children[ 1 ];
 				mesh.rotation.x = time * 2;
 				mesh.rotation.y = time * 5;
 
