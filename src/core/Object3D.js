@@ -389,9 +389,9 @@ THREE.Object3D.prototype = {
         return result;
     },
 
-    replace: this.remove,
+    replace: function ( entity, newChild ) { this.remove( entity, newChild ); },
 
-    replaceAt: this.remove,
+    replaceAt: function ( entity, newChild ) { this.remove( entity, newChild ); },
 
     //replaceObjectWith: this.replace,
 
