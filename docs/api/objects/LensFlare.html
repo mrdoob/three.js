@@ -77,5 +77,10 @@
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+
+		<h2>Common pitfalls</h2>
+		<div>
+		When integrating LensFlare to your existing project, make sure that your WebGLRenderer object has the "alpha" property set to TRUE.  If not, then no LensFlare will ever display at all (they will always remain transparent).
+		</div>
 	</body>
 </html>
