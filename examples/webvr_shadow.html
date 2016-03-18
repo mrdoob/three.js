@@ -14,11 +14,22 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
-		<script src="js/effects/CardboardEffect.js"></script>
+
+		<script src="js/WebVR.js"></script>
+		<script src="js/controls/VRControls.js"></script>
+		<script src="js/effects/VREffect.js"></script>
 		<script>
 
+			if ( WEBVR.isLatestAvailable() === false ) {
+
+				document.body.appendChild( WEBVR.getMessage() );
+
+			}
+
+			//
+
 			var camera, scene, renderer;
-			var effect;
+			var effect, controls;
 
 			init();
 			animate();
@@ -27,10 +38,13 @@
 
 				scene = new THREE.Scene();
 
+				var dummy = new THREE.Camera();
+				dummy.position.set( 2, 1, 2 );
+				dummy.lookAt( scene.position );
+				scene.add( dummy );
+
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
-				camera.position.set( 3, 2, 3 );
-				camera.focalLength = camera.position.distanceTo( scene.position );
-				camera.lookAt( scene.position );
+				dummy.add( camera );
 
 				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );;
 				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2 } );
@@ -62,39 +76,23 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0x101010 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
-				renderer.domElement.addEventListener( 'click', function () {
-
-					if ( this.requestFullscreen ) {
-
-						this.requestFullscreen();
-
-					} else if ( this.msRequestFullscreen ) {
-
-						this.msRequestFullscreen();
-
-					} else if ( this.mozRequestFullScreen ) {
-
-						this.mozRequestFullScreen();
-
-					} else if ( this.webkitRequestFullscreen ) {
-
-						this.webkitRequestFullscreen();
-
-					}
-
-				} );
-
 				//
 
-				effect = new THREE.CardboardEffect( renderer );
-				effect.setSize( window.innerWidth, window.innerHeight );
+				controls = new THREE.VRControls( camera );
+				effect = new THREE.VREffect( renderer );
+
+				if ( WEBVR.isAvailable() === true ) {
+
+					document.body.appendChild( WEBVR.getButton( effect ) );
+
+				}
 
 				//
 
@@ -121,13 +119,11 @@
 			function render() {
 
 				var time = performance.now() * 0.0002;
-				camera.position.x = Math.cos( time ) * 4;
-				camera.position.z = Math.sin( time ) * 4;
-				camera.lookAt( new THREE.Vector3() );
-
-				var mesh = scene.children[ 0 ];
+				var mesh = scene.children[ 1 ];
 				mesh.rotation.x = time * 2;
 				mesh.rotation.y = time * 5;
+
+				controls.update();
 
 				effect.render( scene, camera );
 

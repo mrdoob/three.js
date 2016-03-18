@@ -111,16 +111,13 @@
 
 				light.castShadow = true;
 
-				light.shadowCameraNear = 1200;
-				light.shadowCameraFar = 2500;
-				light.shadowCameraFov = 50;
+				light.shadow.camera.near = 1200;
+				light.shadow.camera.far = 2500;
+				light.shadow.camera.fov = 50;
+				light.shadow.bias = 0.0001;
 
-				//light.shadowCameraVisible = true;
-
-				light.shadowBias = 0.0001;
-
-				light.shadowMapWidth = SHADOW_MAP_WIDTH;
-				light.shadowMapHeight = SHADOW_MAP_HEIGHT;
+				light.shadow.mapSize.width = SHADOW_MAP_WIDTH;
+				light.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
 
 				scene.add( light );
 

@@ -76,10 +76,10 @@
 				spotLight.penumbra = 0.3;
 				spotLight.position.set( 10, 10, 5 );
 				spotLight.castShadow = true;
-				spotLight.shadowCameraNear = 8;
-				spotLight.shadowCameraFar = 30;
-				spotLight.shadowMapWidth = 1024;
-				spotLight.shadowMapHeight = 1024;
+				spotLight.shadow.camera.near = 8;
+				spotLight.shadow.camera.far = 30;
+				spotLight.shadow.mapSize.width = 1024;
+				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
 
 				scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
@@ -88,14 +88,14 @@
 				dirLight.name = 'Dir. Light';
 				dirLight.position.set( 0, 10, 0 );
 				dirLight.castShadow = true;
-				dirLight.shadowCameraNear = 1;
-				dirLight.shadowCameraFar = 10;
-				dirLight.shadowCameraRight = 15;
-				dirLight.shadowCameraLeft = - 15;
-				dirLight.shadowCameraTop	= 15;
-				dirLight.shadowCameraBottom = - 15;
-				dirLight.shadowMapWidth = 1024;
-				dirLight.shadowMapHeight = 1024;
+				dirLight.shadow.camera.near = 1;
+				dirLight.shadow.camera.far = 10;
+				dirLight.shadow.camera.right = 15;
+				dirLight.shadow.camera.left = - 15;
+				dirLight.shadow.camera.top	= 15;
+				dirLight.shadow.camera.bottom = - 15;
+				dirLight.shadow.mapSize.width = 1024;
+				dirLight.shadow.mapSize.height = 1024;
 				scene.add( dirLight );
 
 				scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );

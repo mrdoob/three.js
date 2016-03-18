@@ -333,9 +333,9 @@
 
 		function selectFile( file ) {
 
-			if ( selected !== null ) links[ selected ].className = 'link';
+			if ( selected !== null ) links[ selected ].classList.remove( 'selected' );
 
-			links[ file ].className = 'link selected';
+			links[ file ].classList.add( 'selected' );
 
 			window.location.hash = file;
 			viewer.focus();

@@ -111,20 +111,19 @@
 				directionalLight.position.set( 500, 0, 500 );
 
 				directionalLight.castShadow = true;
-				//directionalLight.shadowCameraVisible = true;
 
-				directionalLight.shadowMapWidth = 2048;
-				directionalLight.shadowMapHeight = 2048;
+				directionalLight.shadow.mapSize.width = 2048;
+				directionalLight.shadow.mapSize.height = 2048;
 
-				directionalLight.shadowCameraNear = 200;
-				directionalLight.shadowCameraFar = 1500;
+				directionalLight.shadow.camera.near = 200;
+				directionalLight.shadow.camera.far = 1500;
 
-				directionalLight.shadowCameraLeft = -500;
-				directionalLight.shadowCameraRight = 500;
-				directionalLight.shadowCameraTop = 500;
-				directionalLight.shadowCameraBottom = -500;
+				directionalLight.shadow.camera.left = -500;
+				directionalLight.shadow.camera.right = 500;
+				directionalLight.shadow.camera.top = 500;
+				directionalLight.shadow.camera.bottom = -500;
 
-				directionalLight.shadowBias = -0.005;
+				directionalLight.shadow.bias = -0.005;
 
 				scene.add( directionalLight );
 
