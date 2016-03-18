@@ -42,9 +42,10 @@ THREE.Audio.prototype.load = function ( file ) {
 	console.warn( 'THREE.Audio: .load has been deprecated. Please use THREE.AudioLoader.' );
 
 	var audioLoader = new THREE.AudioLoader( this.context );
+	var scope = this;
 
 	audioLoader.load( file, function ( buffer ) {
-		this.setBuffer( buffer );
+		scope.setBuffer( buffer );
 	});
 
 	return this;
