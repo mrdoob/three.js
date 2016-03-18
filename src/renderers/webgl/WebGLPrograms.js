@@ -189,16 +189,16 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 	this.getProgramCode = function ( material, parameters ) {
 
-		var chunks = [];
+		var array = [];
 
 		if ( parameters.shaderID ) {
 
-			chunks.push( parameters.shaderID );
+			array.push( parameters.shaderID );
 
 		} else {
 
-			chunks.push( material.fragmentShader );
-			chunks.push( material.vertexShader );
+			array.push( material.fragmentShader );
+			array.push( material.vertexShader );
 
 		}
 
@@ -206,8 +206,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			for ( var name in material.defines ) {
 
-				chunks.push( name );
-				chunks.push( material.defines[ name ] );
+				array.push( name );
+				array.push( material.defines[ name ] );
 
 			}
 
@@ -215,11 +215,11 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 		for ( var i = 0; i < parameterNames.length; i ++ ) {
 
-			chunks.push( parameters[ parameterNames[ i ] ] );
+			array.push( parameters[ parameterNames[ i ] ] );
 
 		}
 
-		return chunks.join();
+		return array.join();
 
 	};
 
