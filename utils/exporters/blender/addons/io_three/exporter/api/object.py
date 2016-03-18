@@ -219,8 +219,8 @@ def animated_xform(obj, options):
     use_inverted = options.get(constants.HIERARCHY, False) and obj.parent
 
     if times == None:
-    logger.info("In animated xform: Unable to extract trackable fields from %s", objName)
-    return tracks
+        logger.info("In animated xform: Unable to extract trackable fields from %s", objName)
+        return tracks
 
     # for each frame
     inverted_fallback = mathutils.Matrix() if use_inverted else None
