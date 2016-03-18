@@ -16273,6 +16273,7 @@ THREE.VectorKeyframeTrack.prototype =
 
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author Reece Aaron Lecrivain / http://reecenotes.com/
  */
 
 THREE.Audio = function ( listener ) {
@@ -16311,10 +16312,16 @@ THREE.Audio.prototype.getOutput = function () {
 
 THREE.Audio.prototype.load = function ( file ) {
 
-	var buffer = new THREE.AudioBuffer( this.context );
-	buffer.load( file );
+	console.warn( 'THREE.Audio: .load has been deprecated. Please use THREE.AudioLoader.' );
 
-	this.setBuffer( buffer );
+	var scope = this;
+
+	var audioLoader = new THREE.AudioLoader();
+	audioLoader.load( file, function ( buffer ) {
+
+		scope.setBuffer( buffer );
+
+	} );
 
 	return this;
 
@@ -16335,13 +16342,9 @@ THREE.Audio.prototype.setBuffer = function ( audioBuffer ) {
 
 	var scope = this;
 
-	audioBuffer.onReady( function( buffer ) {
-
-		scope.source.buffer = buffer;
-		scope.sourceType = 'buffer';
-		if ( scope.autoplay ) scope.play();
-
-	} );
+	scope.source.buffer = audioBuffer;
+	scope.sourceType = 'buffer';
+	if ( scope.autoplay ) scope.play();
 
 	return this;
 
@@ -16486,7 +16489,7 @@ THREE.Audio.prototype.getPlaybackRate = function () {
 
 };
 
-THREE.Audio.prototype.onEnded = function() {
+THREE.Audio.prototype.onEnded = function () {
 
 	this.isPlaying = false;
 
@@ -16561,64 +16564,33 @@ THREE.AudioAnalyser.prototype = {
 
 };
 
-// File:src/audio/AudioBuffer.js
+// File:src/audio/AudioContext.js
 
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AudioBuffer = function ( context ) {
+Object.defineProperty( THREE, 'AudioContext', {
 
-	this.context = context;
-	this.ready = false;
-	this.readyCallbacks = [];
+	get: ( function () {
 
-};
+		var context;
 
-THREE.AudioBuffer.prototype.load = function ( file ) {
+		return function () {
 
-	var scope = this;
+			if ( context === undefined ) {
 
-	var request = new XMLHttpRequest();
-	request.open( 'GET', file, true );
-	request.responseType = 'arraybuffer';
-	request.onload = function ( e ) {
-
-		scope.context.decodeAudioData( this.response, function ( buffer ) {
-
-			scope.buffer = buffer;
-			scope.ready = true;
-
-			for ( var i = 0; i < scope.readyCallbacks.length; i ++ ) {
-
-				scope.readyCallbacks[ i ]( scope.buffer );
+				context = new ( window.AudioContext || window.webkitAudioContext )();
 
 			}
 
-			scope.readyCallbacks = [];
+			return context;
 
-		} );
+		};
 
-	};
-	request.send();
+	} )()
 
-	return this;
-
-};
-
-THREE.AudioBuffer.prototype.onReady = function ( callback ) {
-
-	if ( this.ready ) {
-
-		callback( this.buffer );
-
-	} else {
-
-		this.readyCallbacks.push( callback );
-
-	}
-
-};
+} );
 
 // File:src/audio/PositionalAudio.js
 
@@ -16720,7 +16692,7 @@ THREE.AudioListener = function () {
 
 	this.type = 'AudioListener';
 
-	this.context = new ( window.AudioContext || window.webkitAudioContext )();
+	this.context = THREE.AudioContext;
 
 	this.gain = this.context.createGain();
 	this.gain.connect( this.context.destination );
@@ -17605,6 +17577,42 @@ THREE.SpotLight.prototype.copy = function ( source ) {
 	this.shadow = source.shadow.clone();
 
 	return this;
+
+};
+
+// File:src/loaders/AudioLoader.js
+
+/**
+ * @author Reece Aaron Lecrivain / http://reecenotes.com/
+ */
+
+THREE.AudioLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
+
+THREE.AudioLoader.prototype = {
+
+	constructor: THREE.AudioLoader,
+
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		var loader = new THREE.XHRLoader( this.manager );
+		loader.setResponseType( 'arraybuffer' );
+		loader.load( url, function ( buffer ) {
+
+			var context = THREE.AudioContext;
+
+			context.decodeAudioData( buffer, function ( audioBuffer ) {
+
+				onLoad( audioBuffer );
+
+			} );
+
+		}, onProgress, onError );
+
+	}
 
 };
 
