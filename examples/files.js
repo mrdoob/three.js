@@ -8,7 +8,6 @@ var files = {
 		"webgl_camera_logarithmicdepthbuffer",
 		"webgl_decals",
 		"webgl_effects_anaglyph",
-		"webgl_effects_cardboard",
 		"webgl_effects_parallaxbarrier",
 		"webgl_effects_peppersghost",
 		"webgl_effects_stereo",
@@ -239,6 +238,7 @@ var files = {
 		"webvr_cubes",
 		"webvr_panorama",
 		"webvr_rollercoaster",
+		"webvr_shadow",
 		"webvr_video"
 	],
 	"css3d": [

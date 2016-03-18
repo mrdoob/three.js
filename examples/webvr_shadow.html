@@ -14,11 +14,22 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
-		<script src="js/effects/CardboardEffect.js"></script>
+
+		<script src="js/WebVR.js"></script>
+		<script src="js/controls/VRControls.js"></script>
+		<script src="js/effects/VREffect.js"></script>
 		<script>
 
+			if ( WEBVR.isLatestAvailable() === false ) {
+
+				document.body.appendChild( WEBVR.getMessage() );
+
+			}
+
+			//
+
 			var camera, scene, renderer;
-			var effect;
+			var effect, controls;
 
 			init();
 			animate();
@@ -62,39 +73,23 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0x101010 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
-				renderer.domElement.addEventListener( 'click', function () {
-
-					if ( this.requestFullscreen ) {
-
-						this.requestFullscreen();
-
-					} else if ( this.msRequestFullscreen ) {
-
-						this.msRequestFullscreen();
-
-					} else if ( this.mozRequestFullScreen ) {
-
-						this.mozRequestFullScreen();
-
-					} else if ( this.webkitRequestFullscreen ) {
-
-						this.webkitRequestFullscreen();
-
-					}
-
-				} );
-
 				//
 
-				effect = new THREE.CardboardEffect( renderer );
-				effect.setSize( window.innerWidth, window.innerHeight );
+				controls = new THREE.VRControls( camera );
+				effect = new THREE.VREffect( renderer );
+
+				if ( WEBVR.isAvailable() === true ) {
+
+					document.body.appendChild( WEBVR.getButton( effect ) );
+
+				}
 
 				//
 
@@ -128,6 +123,8 @@
 				var mesh = scene.children[ 0 ];
 				mesh.rotation.x = time * 2;
 				mesh.rotation.y = time * 5;
+
+				controls.update();
 
 				effect.render( scene, camera );
 
