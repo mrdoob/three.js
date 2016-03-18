@@ -218,6 +218,10 @@ def animated_xform(obj, options):
     track_loc = track_loc[0]
     use_inverted = options.get(constants.HIERARCHY, False) and obj.parent
 
+    if times == None:
+    logger.info("In animated xform: Unable to extract trackable fields from %s", objName)
+    return tracks
+
     # for each frame
     inverted_fallback = mathutils.Matrix() if use_inverted else None
     convert_matrix = AXIS_CONVERSION    # matrix to convert the exported matrix
@@ -374,7 +378,7 @@ def matrix(obj, options):
         parent_inverted = obj.parent.matrix_world.inverted(mathutils.Matrix())
         return parent_inverted * obj.matrix_world
     else:
-        return AXIS_CONVERSION * obj.matrix_world
+        return obj.matrix_world
 
 
 @_object
