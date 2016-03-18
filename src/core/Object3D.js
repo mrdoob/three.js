@@ -93,41 +93,41 @@ THREE.Object3D.prototype = {
 
 	constructor: THREE.Object3D,
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix: function (matrix) {
 
-		this.matrix.multiplyMatrices( matrix, this.matrix );
+		this.matrix.multiplyMatrices(matrix, this.matrix);
 
-		this.matrix.decompose( this.position, this.quaternion, this.scale );
+		this.matrix.decompose(this.position, this.quaternion, this.scale);
 
 	},
 
-	setRotationFromAxisAngle: function ( axis, angle ) {
+	setRotationFromAxisAngle: function (axis, angle) {
 
 		// assumes axis is normalized
 
-		this.quaternion.setFromAxisAngle( axis, angle );
+		this.quaternion.setFromAxisAngle(axis, angle);
 
 	},
 
-	setRotationFromEuler: function ( euler ) {
+	setRotationFromEuler: function (euler) {
 
-		this.quaternion.setFromEuler( euler, true );
+		this.quaternion.setFromEuler(euler, true);
 
 	},
 
-	setRotationFromMatrix: function ( m ) {
+	setRotationFromMatrix: function (m) {
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
-		this.quaternion.setFromRotationMatrix( m );
+		this.quaternion.setFromRotationMatrix(m);
 
 	},
 
-	setRotationFromQuaternion: function ( q ) {
+	setRotationFromQuaternion: function (q) {
 
 		// assumes q is normalized
 
-		this.quaternion.copy( q );
+		this.quaternion.copy(q);
 
 	},
 
@@ -138,11 +138,11 @@ THREE.Object3D.prototype = {
 
 		var q1 = new THREE.Quaternion();
 
-		return function ( axis, angle ) {
+		return function (axis, angle) {
 
-			q1.setFromAxisAngle( axis, angle );
+			q1.setFromAxisAngle(axis, angle);
 
-			this.quaternion.multiply( q1 );
+			this.quaternion.multiply(q1);
 
 			return this;
 
@@ -152,11 +152,11 @@ THREE.Object3D.prototype = {
 
 	rotateX: function () {
 
-		var v1 = new THREE.Vector3( 1, 0, 0 );
+		var v1 = new THREE.Vector3(1, 0, 0);
 
-		return function ( angle ) {
+		return function (angle) {
 
-			return this.rotateOnAxis( v1, angle );
+			return this.rotateOnAxis(v1, angle);
 
 		};
 
@@ -164,11 +164,11 @@ THREE.Object3D.prototype = {
 
 	rotateY: function () {
 
-		var v1 = new THREE.Vector3( 0, 1, 0 );
+		var v1 = new THREE.Vector3(0, 1, 0);
 
-		return function ( angle ) {
+		return function (angle) {
 
-			return this.rotateOnAxis( v1, angle );
+			return this.rotateOnAxis(v1, angle);
 
 		};
 
@@ -176,11 +176,11 @@ THREE.Object3D.prototype = {
 
 	rotateZ: function () {
 
-		var v1 = new THREE.Vector3( 0, 0, 1 );
+		var v1 = new THREE.Vector3(0, 0, 1);
 
-		return function ( angle ) {
+		return function (angle) {
 
-			return this.rotateOnAxis( v1, angle );
+			return this.rotateOnAxis(v1, angle);
 
 		};
 
@@ -193,11 +193,11 @@ THREE.Object3D.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( axis, distance ) {
+		return function (axis, distance) {
 
-			v1.copy( axis ).applyQuaternion( this.quaternion );
+			v1.copy(axis).applyQuaternion(this.quaternion);
 
-			this.position.add( v1.multiplyScalar( distance ) );
+			this.position.add(v1.multiplyScalar(distance));
 
 			return this;
 
@@ -207,11 +207,11 @@ THREE.Object3D.prototype = {
 
 	translateX: function () {
 
-		var v1 = new THREE.Vector3( 1, 0, 0 );
+		var v1 = new THREE.Vector3(1, 0, 0);
 
-		return function ( distance ) {
+		return function (distance) {
 
-			return this.translateOnAxis( v1, distance );
+			return this.translateOnAxis(v1, distance);
 
 		};
 
@@ -219,11 +219,11 @@ THREE.Object3D.prototype = {
 
 	translateY: function () {
 
-		var v1 = new THREE.Vector3( 0, 1, 0 );
+		var v1 = new THREE.Vector3(0, 1, 0);
 
-		return function ( distance ) {
+		return function (distance) {
 
-			return this.translateOnAxis( v1, distance );
+			return this.translateOnAxis(v1, distance);
 
 		};
 
@@ -231,19 +231,19 @@ THREE.Object3D.prototype = {
 
 	translateZ: function () {
 
-		var v1 = new THREE.Vector3( 0, 0, 1 );
+		var v1 = new THREE.Vector3(0, 0, 1);
 
-		return function ( distance ) {
+		return function (distance) {
 
-			return this.translateOnAxis( v1, distance );
+			return this.translateOnAxis(v1, distance);
 
 		};
 
 	}(),
 
-	localToWorld: function ( vector ) {
+	localToWorld: function (vector) {
 
-		return vector.applyMatrix4( this.matrixWorld );
+		return vector.applyMatrix4(this.matrixWorld);
 
 	},
 
@@ -251,9 +251,9 @@ THREE.Object3D.prototype = {
 
 		var m1 = new THREE.Matrix4();
 
-		return function ( vector ) {
+		return function (vector) {
 
-			return vector.applyMatrix4( m1.getInverse( this.matrixWorld ) );
+			return vector.applyMatrix4(m1.getInverse(this.matrixWorld));
 
 		};
 
@@ -265,53 +265,80 @@ THREE.Object3D.prototype = {
 
 		var m1 = new THREE.Matrix4();
 
-		return function ( vector ) {
+		return function (vector) {
 
-			m1.lookAt( vector, this.position, this.up );
+			m1.lookAt(vector, this.position, this.up);
 
-			this.quaternion.setFromRotationMatrix( m1 );
+			this.quaternion.setFromRotationMatrix(m1);
 
 		};
 
 	}(),
 
-	add: function ( object ) {
+	add: function ( ) {
 
-		if ( arguments.length > 1 ) {
+		var i = 0, l = arguments.length;
 
-			for ( var i = 0; i < arguments.length; i ++ ) {
+		for ( ; i < l; i ++ ) {
 
-				this.add( arguments[ i ] );
+			this.addAt( undefined, arguments[i] );
+		}
+
+		return this;
+
+	},
+
+	addAt: function (index, object) {
+
+		index = index || this.children.length;
+
+		if (object instanceof THREE.Object3D) {
+
+			if (object === this) {
+
+				console.error("THREE.Object3D.add: object can't be added as a child of itself.", object);
+
+				return this;
 
 			}
 
-			return this;
+			if (object.parent != undefined) {
 
-		}
-
-		if ( object === this ) {
-
-			console.error( "THREE.Object3D.add: object can't be added as a child of itself.", object );
-			return this;
-
-		}
-
-		if ( object instanceof THREE.Object3D ) {
-
-			if ( object.parent !== null ) {
-
-				object.parent.remove( object );
+				object.parent.remove(object);
 
 			}
 
 			object.parent = this;
-			object.dispatchEvent( { type: 'added' } );
 
-			this.children.push( object );
+
+			var type, children = this.children;
+
+			if( object !== children[index] ) {
+
+				var search = children.indexOf(object);
+
+				if (search  > -1 ) {
+
+					children.splice(search, 1);
+
+					type = 'moved';
+
+				} else {
+
+					type = 'added';
+
+				}
+
+				children.splice(index, 0, object);
+
+				object.dispatchEvent( { type: type, index:index } );
+
+
+			}
 
 		} else {
 
-			console.error( "THREE.Object3D.add: object not an instance of THREE.Object3D.", object );
+			console.error("THREE.Object3D.add: object not an instance of THREE.Object3D.", object);
 
 		}
 
@@ -319,56 +346,54 @@ THREE.Object3D.prototype = {
 
 	},
 
-	replace: function( oldChild, newChild ) {
+	remove: function ( entity, newChild ) {
 
-		var index = this.children.indexOf(oldChild);
+		/* entity can be either an index or an object */
 
-		if (index !== -1) {
+		var result, object, index, children = this.children;
 
-			return this.replaceAt( index, newChild );
+		if ( typeof( entity ) === 'number' ) {
 
-		}
+			index = entity;
 
-	},
+		} else {
 
-	replaceAt: function ( index, newChild ) {
-
-		var oldChild = this.children[index];
-
-		if (oldChild !== undefined) {
-
-			this.children[index] = newChild;
-
-			return oldChild;
-
-		}
-	},
-
-	remove: function ( object ) {
-
-		if ( arguments.length > 1 ) {
-
-			for ( var i = 0; i < arguments.length; i ++ ) {
-
-				this.remove( arguments[ i ] );
-
-			}
+			index = children.indexOf( entity );
 
 		}
 
-		var index = this.children.indexOf( object );
+		if (index > -1 && index < children.length ) {
 
-		if ( index !== - 1 ) {
+			object = children[index];
+
+		}
+
+		if ( object !== undefined ) {
 
 			object.parent = null;
 
-			object.dispatchEvent( { type: 'removed' } );
+			if(newChild !== undefined) result = children.splice(index, 1, newChild);
 
-			this.children.splice( index, 1 );
+			else result = children.splice(index, 1);
+
+			object.dispatchEvent({type: 'removed', index: index});
 
 		}
 
+		if(Array.isArray(result) === true && result.length === 1) {
+
+			return result[0];
+
+		}
+
+		return result;
 	},
+
+	replace: this.remove,
+
+	replaceAt: this.remove,
+
+	//replaceObjectWith: this.replace,
 
 	getObjectById: function ( id ) {
 
@@ -674,11 +699,14 @@ THREE.Object3D.prototype = {
 		// and return as array
 		function extractFromCache ( cache ) {
 
-			var values = [];
+			var data, values = [];
+
 			for ( var key in cache ) {
 
-				var data = cache[ key ];
+				data = cache[ key ];
+
 				delete data.metadata;
+
 				values.push( data );
 
 			}
