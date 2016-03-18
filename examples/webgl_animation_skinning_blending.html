@@ -61,11 +61,7 @@
 				container = document.getElementById( 'container' );
 
 				scene = new THREE.Scene();
-				scene.add ( new THREE.AmbientLight( 0xaaaaaa ) );
-
-				var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light.position.set( 0, 0, 1000 );
-				scene.add( light );
+				scene.add ( new THREE.AmbientLight( 0xffffff ) );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
 				renderer.setClearColor( 0x777777 );
@@ -98,7 +94,7 @@
 				window.addEventListener( 'toggle-show-model', onShowModel );
 
 				blendMesh = new THREE.BlendCharacter();
-				blendMesh.load( "models/skinned/marine/marine_anims.js", start );
+				blendMesh.load( "models/skinned/marine/marine_anims_core.json", start );
 
 			}
 
