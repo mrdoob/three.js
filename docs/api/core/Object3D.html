@@ -222,7 +222,27 @@
 		<div>
 		Removes *object* as child of this object. An arbitrary number of objects may be removed.
 		</div>
+		
+		<h3>[method:null replace]( [page:Object3D oldChild], [page:Object3D newChild] )</h3>
+		<div>
+		oldChild - An object to replace.<br />
+		newChild - The object that is to replace oldChild.<br />
+		</div>
+		<div>
+		If oldChild is a child of this object *and* newChild is valid as child to this object, 
+		replace oldChild with newChild at the same index and return oldChild.
+		</div>
 
+		<h3>[method:null replaceAt]( [page:number index], [page:Object3D newChild] )</h3>
+		<div>
+		index - The index where newChild is desired to be.<br />
+		newChild - The object that is to replace this.children[index] = oldChild.<br />
+		</div>
+		<div>
+		If newChild is valid as child to this object, 
+		replace oldChild with newChild at the same index and return oldChild.
+		</div>
+		
 		<h3>[method:null traverse]( [page:Function callback] )</h3>
 		<div>
 		callback - A function with as first argument an object3D object.<br />
