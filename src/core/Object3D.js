@@ -351,6 +351,7 @@ THREE.Object3D.prototype = {
  		if (index !== -1) {
 			return this.replaceAt( index, newChild );
   		}
+                console.error("oldChild not found. No replacement done.");
   	},
   	
   	//Replaces child found at given index with newChild, if newChild is a valid child, and returns found oldChild.
@@ -370,6 +371,7 @@ THREE.Object3D.prototype = {
 	oldChild.dispatchEvent({ type: 'removed' });
 	
 	this.children[index] = newChild;
+        if (newChild.parent !== undefined) newChild.parent.remove(newChild);
 	newChild.parent = this;
 	newChild.dispatchEvent({ type: 'added' });
 	
