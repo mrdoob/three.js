@@ -400,7 +400,7 @@ THREE.Object3D.prototype = {
 
 		var result = this.children.indexOf( entity );
 
-		if ( result === undefined ) result = this.children[ entity ];
+		if ( result === -1 ) result = this.children[ entity ];
 
 		return result;
 	},
