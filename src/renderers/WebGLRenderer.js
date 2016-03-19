@@ -1015,8 +1015,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
+						var type = _gl.FLOAT;
+						var normalized = false;
+						var array = geometryAttribute.array;
+
+						if ( array instanceof Uint8Array ) {
+
+							type = _gl.UNSIGNED_BYTE;
+							normalized = true;
+
+						}
+
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, startIndex * size * array.BYTES_PER_ELEMENT );
 
 					}
 
