@@ -209,45 +209,51 @@
 
 		<h3>[method:null add]( [page:Object3D object], ... )</h3>
 		<div>
-			object - An object.<br />
+		object - An object.<br />
 		</div>
 		<div>
-			Adds *object* as child of this object. An arbitrary number of objects may be added.
+		Adds *object* as child of this object. An arbitrary number of objects may be added.
 		</div>
 
 		<h3>[method:null addAt]( [page:Integer index], [page:Object3D object] )</h3>
 		<div>
-			index - An index.<br />
+		index - An index.<br />
 		</div>
 		<div>
-			object - An object.<br />
+		object - An object.<br />
 		</div>
 		<div>
-			Adds *object* as child of this object. An arbitrary number of objects may be added.
+		Adds *object* as child of this object at the given index. When it exists already, it moves it's indices and triggers a 'moved' Event.
 		</div>
 
-		<h3>[method:null remove]( [page:Object3D entity], [page:Object3D newChild] )</h3>
+		<h3>[method:null remove]( [page:Object3D object], ... )</h3>
 		<div>
-			entity - An index or object.<br />
+		object - An object.<br />
 		</div>
 		<div>
-			newChild - An object.<br />
-		</div>
-		<div>
-			Replaces the entity with the new Child, only if old is found. The entity can be an index or Object.
-		</div>
-		<div>
-			Returns the old Object that has now been replaced, but nothing if not found.
+		Removes *object* as child of this object. An arbitrary number of objects may be removed.
 		</div>
 
 		<h3>[method:null replace]( [page:Object3D entity], [page:Object3D newChild] )</h3>
 		<div>
-			Works the same as 'remove', it's just an alias.<br />
+		entity - An index or Object.<br />
+		</div>
+		<div>
+		newChild - An object.<br />
+		</div>
+		<div>
+		Replaces the entity with the new Child, but only if the old one is found. The entity can be an index or Object.
+		</div>
+		<div>
+		Returns the old Object that has now been replaced, but nothing if not found.
 		</div>
 
-		<h3>[method:null replaceAt]( [page:Object3D entity], [page:Object3D newChild] )</h3>
+		<h3>[method:null lookUp]( [page:Object3D entity] )</h3>
 		<div>
-			Works the same as 'remove', it's just an alias.<br />
+		entity - An index or Object.<br />
+		</div>
+		<div>
+		Returns the index of the object found, or the object at the index, and nothing if neither is found.
 		</div>
 
 		<h3>[method:null traverse]( [page:Function callback] )</h3>
@@ -257,7 +263,7 @@
 		<div>
 		Executes the callback on this object and all descendants.
 		</div>
-		
+
 		<h3>[method:null traverseVisible]( [page:Function callback] )</h3>
 		<div>
 		callback - A function with as first argument an object3D object.<br />
@@ -266,7 +272,7 @@
 		Like traverse, but the callback will only be executed for visible objects.
 		Descendants of invisible objects are not traversed.
 		</div>
-		
+
 		<h3>[method:null traverseAncestors]( [page:Function callback] )</h3>
 		<div>
 		callback - A function with as first argument an object3D object.<br />
