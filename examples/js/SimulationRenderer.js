@@ -26,7 +26,7 @@ function SimulationRenderer( WIDTH, renderer ) {
 
 	}
 
-	if ( gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) == 0 ) {
+	if ( gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) === 0 ) {
 
 		alert( "No support for vertex shader textures!" );
 		return;
@@ -102,7 +102,7 @@ function SimulationRenderer( WIDTH, renderer ) {
 
 		rtPosition1 = getRenderTarget( THREE.RGBAFormat );
 		rtPosition2 = rtPosition1.clone();
-		rtVelocity1 = getRenderTarget( THREE.RGBFormat );
+		rtVelocity1 = getRenderTarget( THREE.RGBAFormat );
 		rtVelocity2 = rtVelocity1.clone();
 
 		simulator.renderTexture( dtPosition, rtPosition1 );
