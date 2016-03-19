@@ -518,8 +518,7 @@ THREE.Object3D.prototype = {
 
 	}(),
 
-	raycast: function () {
-	},
+	raycast: function () {},
 
 	traverse: function ( callback ) {
 
@@ -710,14 +709,11 @@ THREE.Object3D.prototype = {
 		// and return as array
 		function extractFromCache ( cache ) {
 
-			var data, values = [];
-
-			for ( var key in cache ) {
+			var data, key, values = [];
+			for ( key in cache ) {
 
 				data = cache[ key ];
-
 				delete data.metadata;
-
 				values.push( data );
 
 			}
