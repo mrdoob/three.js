@@ -346,7 +346,7 @@ THREE.Object3D.prototype = {
 
 	},
 
-	remove: function ( entity ) {
+	remove: function () {
 
 		for ( var i = 0; i < arguments.length; i ++ ) {
 
