@@ -107,9 +107,9 @@
 					object.scale.z = Math.random() + 0.5;
 
 					object.userData.velocity = new THREE.Vector3();
-					object.userData.velocity.x = Math.random() * 0.4 - 0.2;
-					object.userData.velocity.y = Math.random() * 0.4 - 0.2;
-					object.userData.velocity.z = Math.random() * 0.4 - 0.2;
+					object.userData.velocity.x = Math.random() - 0.5;
+					object.userData.velocity.y = Math.random() - 0.5;
+					object.userData.velocity.z = Math.random() - 0.5;
 
 					scene.add( object );
 					cubes.push( object );
@@ -133,6 +133,17 @@
 					document.body.appendChild( WEBVR.getButton( effect ) );
 
 				}
+
+				renderer.domElement.addEventListener( 'click', function ( event ) {
+
+					if ( INTERSECTED ) {
+
+						var object = INTERSECTED;
+						object.userData.velocity.subVectors( object.position, camera.position ).normalize();
+
+					}
+
+				} );
 
 				//
 
@@ -182,7 +193,7 @@
 
 					if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
 
-					INTERSECTED = null;
+					INTERSECTED = undefined;
 
 				}
 
@@ -191,6 +202,8 @@
 				for ( var i = 0; i < cubes.length; i ++ ) {
 
 					var cube = cubes[ i ];
+
+					cube.userData.velocity.multiplyScalar( 0.999 );
 
 					cube.position.add( cube.userData.velocity );
 

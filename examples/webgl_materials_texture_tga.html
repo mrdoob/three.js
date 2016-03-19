@@ -43,7 +43,7 @@
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var container,stats;
+			var container, stats;
 
 			var camera, scene, renderer;
 
@@ -62,12 +62,14 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 
-				camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 25000 );
+				camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 10, 2000 );
 				camera.position.z = 200;
 
 				scene = new THREE.Scene();
 
-				var light = new THREE.DirectionalLight( 0xffffff, 2 );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.4 ) );
+
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
@@ -75,21 +77,21 @@
 
 				// add box 1 - grey8 texture
 				var texture1 = loader.load( 'textures/crate_grey8.tga' );
+
 				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 
 				var geometry = new THREE.BoxGeometry( 50, 50, 50 );
 				var mesh1 = new THREE.Mesh( geometry, material1 );
-				mesh1.rotation.x = -Math.PI / 2;
 				mesh1.position.x = - 50;
 
 				scene.add( mesh1 );
 
 				// add box 2 - tga texture
 				var texture2 = loader.load( 'textures/crate_color8.tga' );
+
 				var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
 
 				var mesh2 = new THREE.Mesh( geometry, material2 );
-				mesh2.rotation.x = -Math.PI / 2;
 				mesh2.position.x = 50;
 
 				scene.add( mesh2 );
@@ -110,7 +112,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );
