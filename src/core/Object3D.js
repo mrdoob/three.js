@@ -345,6 +345,37 @@ THREE.Object3D.prototype = {
 
 	},
 
+	//Replaces oldChild, if found, with newChild, if newChild is av valid child, and returns found oldChild.
+	replace: function( oldChild, newChild ) {
+  		var index = this.children.indexOf(oldChild);
+ 		if (index !== -1) {
+			return this.replaceAt( index, newChild );
+  		}
+  	},
+  	
+  	//Replaces child found at given index with newChild, if newChild is a valid child, and returns found oldChild.
+	replaceAt: function (index, newChild) {
+	if (newChild === this) {
+	    console.error("THREE.Object3D.add: object can't be added as a child of itself.", object);
+	    return undefined;
+	}
+	
+	if (!(newChild instanceof THREE.Object3D)) {
+	    console.error("THREE.Object3D.add: object not an instance of THREE.Object3D.", newChild);
+	    return undefined;
+	}
+	
+	var oldChild = this.children[index];
+	oldChild.parent = null; //null is the default value for new Object3Ds.
+	oldChild.dispatchEvent({ type: 'removed' });
+	
+	this.children[index] = newChild;
+	newChild.parent = this;
+	newChild.dispatchEvent({ type: 'added' });
+	
+	return oldChild; //oldChild returned for easy post-handling
+	},
+
 	getObjectById: function ( id ) {
 
 		return this.getObjectByProperty( 'id', id );
