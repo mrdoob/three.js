@@ -525,8 +525,7 @@ def animation_options():
     """
     anim = [
         (constants.OFF, constants.OFF.title(), constants.OFF),
-        (constants.POSE, constants.POSE.title(), constants.POSE),
-        (constants.REST, constants.REST.title(), constants.REST)
+        (constants.POSE, constants.POSE.title(), constants.POSE)
     ]
 
     return anim
@@ -727,7 +726,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
     option_animation_skeletal = EnumProperty(
         name="",
-        description="Export animation (skeletal)",
+        description="Export animation (skeletal) NOTE: Mesh must be in bind pose",
         items=animation_options(),
         default=constants.OFF)
 
