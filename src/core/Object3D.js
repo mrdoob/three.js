@@ -357,6 +357,12 @@ THREE.Object3D.prototype = {
 
 	},
 
+	removeAt: function ( index ) {
+
+		return this.replace( index );
+
+	},
+
 	replace: function ( entity, newChild ) {
 
 		/* entity can be either an index or an object */
