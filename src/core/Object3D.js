@@ -279,7 +279,7 @@ THREE.Object3D.prototype = {
 
 		var i = 0, l = arguments.length;
 
-		for ( ; i < l ; i ++ ) {
+		for ( ; i < l; i ++ ) {
 
 			this.addAt( undefined, arguments[ i ] );
 		}
@@ -348,7 +348,7 @@ THREE.Object3D.prototype = {
 
 	remove: function ( entity ) {
 
-		for ( var i = 0; i < arguments.length ; i ++ ) {
+		for ( var i = 0; i < arguments.length; i ++ ) {
 
 			this.replace( arguments[ i ] );
 		}
@@ -400,7 +400,7 @@ THREE.Object3D.prototype = {
 
 		var result = this.children.indexOf( entity );
 
-		if( result === undefined ) result =  this.children[entity];
+		if ( result === undefined ) result = this.children[ entity ];
 
 		return result;
 	},
@@ -421,7 +421,7 @@ THREE.Object3D.prototype = {
 
 		if ( this[ name ] === value ) return this;
 
-		for ( var i = 0, l = this.children.length ; i < l ; i ++ ) {
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 			var child = this.children[ i ];
 			var object = child.getObjectByProperty( name, value );
@@ -527,7 +527,7 @@ THREE.Object3D.prototype = {
 
 		var children = this.children;
 
-		for ( var i = 0, l = children.length ; i < l ; i ++ ) {
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
 			children[ i ].traverse( callback );
 
@@ -543,7 +543,7 @@ THREE.Object3D.prototype = {
 
 		var children = this.children;
 
-		for ( var i = 0, l = children.length ; i < l ; i ++ ) {
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
 			children[ i ].traverseVisible( callback );
 
@@ -597,7 +597,7 @@ THREE.Object3D.prototype = {
 
 		// update children
 
-		for ( var i = 0, l = this.children.length ; i < l ; i ++ ) {
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 			this.children[ i ].updateMatrixWorld( force );
 
@@ -679,7 +679,7 @@ THREE.Object3D.prototype = {
 
 			object.children = [];
 
-			for ( var i = 0 ; i < this.children.length ; i ++ ) {
+			for ( var i = 0; i < this.children.length; i ++ ) {
 
 				object.children.push( this.children[ i ].toJSON( meta ).object );
 
@@ -765,7 +765,7 @@ THREE.Object3D.prototype = {
 
 		if ( recursive === true ) {
 
-			for ( var i = 0 ; i < source.children.length ; i ++ ) {
+			for ( var i = 0; i < source.children.length; i ++ ) {
 
 				var child = source.children[ i ];
 				this.add( child.clone() );
