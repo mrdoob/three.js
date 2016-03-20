@@ -73,6 +73,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
+		if ( json.skinning !== undefined ) material.skinning = json.skinning;
 
 		// for PointsMaterial
 		if ( json.size !== undefined ) material.size = json.size;

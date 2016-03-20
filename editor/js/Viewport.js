@@ -47,9 +47,17 @@ var Viewport = function ( editor ) {
 
 			selectionBox.update( object );
 
-			if ( editor.helpers[ object.id ] !== undefined ) {
+			var o = object;
 
-				editor.helpers[ object.id ].update();
+			while ( o !== null ) {
+
+				if ( editor.helpers[ o.id ] !== undefined ) {
+
+					editor.helpers[ o.id ].update();
+
+				}
+
+				o = o.parent;
 
 			}
 
