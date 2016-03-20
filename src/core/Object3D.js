@@ -371,7 +371,13 @@ THREE.Object3D.prototype = {
 	oldChild.dispatchEvent({ type: 'removed' });
 	
 	this.children[index] = newChild;
-        if (newChild.parent !== undefined) newChild.parent.remove(newChild);
+
+        //necessary test? Should this be inn add too?
+        if (newChild.parent) {
+           newChild.parent.remove(newChild);
+           console.warn("newChild stolen from old parent.");
+        }
+
 	newChild.parent = this;
 	newChild.dispatchEvent({ type: 'added' });
 	
