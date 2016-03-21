@@ -986,10 +986,13 @@
 
 			}
 
+			stats.begin();
+
 			controls.update();
-			stats.update();
 
 			render();
+
+			stats.end();
 
 		}
 
