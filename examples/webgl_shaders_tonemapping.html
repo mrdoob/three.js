@@ -138,8 +138,8 @@
 					uniforms: THREE.UniformsUtils.merge( [
 
 						THREE.UniformsLib[ "common" ],
-						THREE.UniformsLib[ "ambient" ],
-						THREE.UniformsLib[ "lights" ],
+						THREE.UniformsLib[ "lights" ]
+
 					] ),
 					vertexShader: [
 						"varying vec3 vViewPosition;",
@@ -161,7 +161,6 @@
 
 						THREE.ShaderChunk[ "common" ],
 						THREE.ShaderChunk[ "bsdfs" ],
-						THREE.ShaderChunk[ "ambient_pars" ],
 						THREE.ShaderChunk[ "lights_pars" ],
 						THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 

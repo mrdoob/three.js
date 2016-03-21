@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '74' };
+var THREE = { REVISION: '75' };
 
 //
 
@@ -208,6 +208,14 @@ THREE.MultiplyOperation = 0;
 THREE.MixOperation = 1;
 THREE.AddOperation = 2;
 
+// Tone Mapping modes
+
+THREE.NoToneMapping = 0; // do not do any tone mapping, not even exposure (required for special purpose passes.)
+THREE.LinearToneMapping = 1; // only apply exposure.
+THREE.ReinhardToneMapping = 2;
+THREE.Uncharted2ToneMapping = 3; // John Hable
+THREE.CineonToneMapping = 4;  // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
+
 // Mapping modes
 
 THREE.UVMapping = 300;
@@ -219,6 +227,8 @@ THREE.EquirectangularReflectionMapping = 303;
 THREE.EquirectangularRefractionMapping = 304;
 
 THREE.SphericalReflectionMapping = 305;
+THREE.CubeUVReflectionMapping = 306;
+THREE.CubeUVRefractionMapping = 307;
 
 // Wrapping modes
 
@@ -305,3 +315,17 @@ THREE.WrapAroundEnding = 2402;
 THREE.TrianglesDrawMode = 0;
 THREE.TriangleStripDrawMode = 1;
 THREE.TriangleFanDrawMode = 2;
+
+// Texture Encodings
+
+THREE.LinearEncoding = 3000; // No encoding at all.
+THREE.sRGBEncoding = 3001;
+THREE.GammaEncoding = 3007; // uses GAMMA_FACTOR, for backwards compatibility with WebGLRenderer.gammaInput/gammaOutput
+
+// The following Texture Encodings are for RGB-only (no alpha) HDR light emission sources.
+// These encodings should not specified as output encodings except in rare situations.
+THREE.RGBEEncoding = 3002; // AKA Radiance.
+THREE.LogLuvEncoding = 3003;
+THREE.RGBM7Encoding = 3004;
+THREE.RGBM16Encoding = 3005;
+THREE.RGBDEncoding = 3006; // MaxRange is 256.

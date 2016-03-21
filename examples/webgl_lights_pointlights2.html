@@ -82,39 +82,22 @@
 
 				// CONTROLS
 
-				var fly = false;
+				controls = new THREE.TrackballControls( camera );
 
-				if ( !fly ) {
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
 
-					controls = new THREE.TrackballControls( camera );
-					controls.target.set( 0, 0, 0 );
+				controls.noZoom = false;
+				controls.noPan = false;
 
-					controls.rotateSpeed = 1.0;
-					controls.zoomSpeed = 1.2;
-					controls.panSpeed = 0.8;
+				controls.staticMoving = false;
+				controls.dynamicDampingFactor = 0.15;
 
-					controls.noZoom = false;
-					controls.noPan = false;
-
-					controls.staticMoving = false;
-					controls.dynamicDampingFactor = 0.15;
-
-					controls.keys = [ 65, 83, 68 ];
-
-				} else {
-
-					controls = new THREE.FirstPersonControls( camera );
-
-					controls.movementSpeed = 25;
-					controls.lookSpeed = 0.05;
-					controls.lookVertical = true;
-
-					controls.lon = -90;
-
-				}
-
+				controls.keys = [ 65, 83, 68 ];
 
 				// TEXTURES
+
 				var textureLoader = new THREE.TextureLoader();
 
 				var texture = textureLoader.load( "textures/disturb.jpg" );
@@ -122,20 +105,15 @@
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.format = THREE.RGBFormat;
 
-				var texture2 = textureLoader.load( "textures/planets/moon_1024.jpg" );
-				texture2.repeat.set( 2, 1 );
-				texture2.wrapS = texture2.wrapT = THREE.RepeatWrapping;
-				texture2.format = THREE.RGBFormat;
-
 				// MATERIALS
 
 				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture } );
-				var objectMaterial = new THREE.MeshStandardMaterial( { color: 0x000000, map: texture2, roughness: 0.2, metalness: 1.0 } );
+				var objectMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0.5, metalness: 1.0 } );
 
 				// GROUND
 
 				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 800, 400, 2, 2 ), groundMaterial );
-				mesh.position.y = -5;
+				mesh.position.y = - 5;
 				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
@@ -164,41 +142,40 @@
 
 				// LIGHTS
 
-				scene.add( new THREE.AmbientLight( 0x111111 ) );
-
 				var intensity = 2.5;
 				var distance = 100;
+				var decay = 2.0;
+
 				var c1 = 0xff0040, c2 = 0x0040ff, c3 = 0x80ff80, c4 = 0xffaa00, c5 = 0x00ffaa, c6 = 0xff1100;
-				//var c1 = 0xffffff, c2 = 0xffffff, c3 = 0xffffff, c4 = 0xffffff, c5 = 0xffffff, c6 = 0xffffff;
 
 				var sphere = new THREE.SphereGeometry( 0.25, 16, 8 );
 
-				light1 = new THREE.PointLight( c1, intensity, distance );
+				light1 = new THREE.PointLight( c1, intensity, distance, decay );
 				light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c1 } ) ) );
 				scene.add( light1 );
 
-				light2 = new THREE.PointLight( c2, intensity, distance );
+				light2 = new THREE.PointLight( c2, intensity, distance, decay );
 				light2.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c2 } ) ) );
 				scene.add( light2 );
 
-				light3 = new THREE.PointLight( c3, intensity, distance );
+				light3 = new THREE.PointLight( c3, intensity, distance, decay );
 				light3.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c3 } ) ) );
 				scene.add( light3 );
 
-				light4 = new THREE.PointLight( c4, intensity, distance );
+				light4 = new THREE.PointLight( c4, intensity, distance, decay );
 				light4.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c4 } ) ) );
 				scene.add( light4 );
 
-				light5 = new THREE.PointLight( c5, intensity, distance );
+				light5 = new THREE.PointLight( c5, intensity, distance, decay );
 				light5.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c5 } ) ) );
 				scene.add( light5 );
 
-				light6 = new THREE.PointLight( c6, intensity, distance );
+				light6 = new THREE.PointLight( c6, intensity, distance, decay );
 				light6.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c6 } ) ) );
 				scene.add( light6 );
 
-				var dlight = new THREE.DirectionalLight( 0xffffff, 0.1 );
-				dlight.position.set( 0.5, -1, 0 ).normalize();
+				var dlight = new THREE.DirectionalLight( 0xffffff, 0.05 );
+				dlight.position.set( 0.5, 1, 0 ).normalize();
 				scene.add( dlight );
 
 				// RENDERER

@@ -55,13 +55,13 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Integer hex], [page:Float intensity], [page:Float distance], [page:Radians angle], [page:Float exponent], [page:Float decay])</h3>
+		<h3>[name]([page:Integer hex], [page:Float intensity], [page:Float distance], [page:Radians angle], [page:Float penumbra], [page:Float decay])</h3>
 		<div>
 		[page:Integer hex] — Numeric value of the RGB component of the color. <br />
 		[page:Float intensity] — Numeric value of the light's strength/intensity. <br />
 		[page:Float distance] -- Maximum distance from origin where light will shine whose intensity is attenuated linearly based on distance from origin. <br />
 		[page:Radians angle] -- Maximum angle of light dispersion from its direction whose upper bound is Math.PI/2.<br />
-		[page:Float exponent] -- Rapidity of the falloff of light from its target direction.<br />
+		[page:Float penumbra] -- Percent of the spotlight cone that is attenuated due to penumbra. Takes values between zero and 1. Default is zero.<br />
 		[page:Float decay] -- The amount the light dims along the distance of the light.
 		</div>
 
@@ -77,7 +77,15 @@
 		<h3>[property:Float intensity]</h3>
 		<div>
 			Light's intensity.<br />
+			In "physically correct" mode, the product of color * intensity is interpreted as luminous intensity measured in candela.<br/>
 			Default — *1.0*.
+		</div>
+
+		<h3>[property:Float power]</h3>
+		<div>
+			Light's power.<br />
+			In "physically correct" mode, the luminous power of the light measured in lumens.<br/>
+			Default - *4PI*.
 		</div>
 
 		<h3>[property:Float distance]</h3>
@@ -92,16 +100,16 @@
 			Default — *Math.PI/3*.
 		</div>
 
-		<h3>[property:Float exponent]</h3>
+		<h3>[property:Float penumbra]</h3>
 		<div>
-			Rapidity of the falloff of light from its target direction. A lower value spreads out the light, while a higher
-			focuses it towards the center.<br />
-			Default — *10.0*.
+			Percent of the spotlight cone that is attenuated due to penumbra. Takes values between zero and 1.<br />
+			Default — *0.0*.
 		</div>
 
 		<h3>[property:Float decay]</h3>
 		<div>
 			The amount the light dims along the distance of the light<br />
+			In "physically correct" mode, decay = 2 leads to physically realistic light falloff.<br/>
 			Default — *1*.
 		</div>
 

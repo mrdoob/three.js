@@ -85,13 +85,9 @@ THREE.UniformsLib = {
 
 	},
 
-	ambient: {
-
-		"ambientLightColor": { type: "fv", value: [] }
-
-	},
-
 	lights: {
+
+		"ambientLightColor": { type: "fv", value: [] },
 
 		"directionalLights": { type: "sa", value: [], properties: {
 			"direction": { type: "v3" },
@@ -111,8 +107,8 @@ THREE.UniformsLib = {
 			"position": { type: "v3" },
 			"direction": { type: "v3" },
 			"distance": { type: "f" },
-			"angleCos": { type: "f" },
-			"penumbra": { type: "f" },
+			"coneCos": { type: "f" },
+			"penumbraCos": { type: "f" },
 			"decay": { type: "f" },
 
 			"shadow": { type: "i" },
