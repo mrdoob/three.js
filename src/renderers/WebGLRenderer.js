@@ -2004,6 +2004,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( uvScaleMap instanceof THREE.WebGLRenderTarget ) {
 
+				console.warn( 'THREE.WebGLRenderTarget: don\'t use render targets as textures. Use their .texture property instead.' );
 				uvScaleMap = uvScaleMap.texture;
 
 			}
@@ -2015,8 +2016,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( material.envMap instanceof THREE.WebGLRenderTargetCube ) {
+
+			console.warn( 'THREE.WebGLRenderTargetCube: don\'t use render targets as textures. Use their .texture property instead.' );
+			material.envMap = material.envMap.texture;
+
+		}
+
 		uniforms.envMap.value = material.envMap;
-		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
+		uniforms.flipEnvMap.value = ( material.envMap && material.envMap.renderTargetCube ) ? 1 : - 1;
 
 		uniforms.reflectivity.value = material.reflectivity;
 		uniforms.refractionRatio.value = material.refractionRatio;
@@ -2508,6 +2516,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( ! texture ) return;
 
+			if ( texture instanceof THREE.WebGLRenderTarget ) {
+
+				console.warn( 'THREE.WebGLRenderTarget: don\'t use render targets as textures. Use their .texture property instead.' );
+				texture = texture.texture;
+
+			} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
+
+				console.warn( 'THREE.WebGLRenderTargetCube: don\'t use render targets as textures. Use their .texture property instead.' );
+				texture = texture.texture;
+
+			}
+
 			if ( texture instanceof THREE.CubeTexture ||
 				 ( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
 
@@ -2515,13 +2535,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setCubeTexture( texture, textureUnit );
 
-			} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
+			} else if ( texture.renderTargetCube ) {
 
-				setCubeTextureDynamic( texture.texture, textureUnit );
-
-			} else if ( texture instanceof THREE.WebGLRenderTarget ) {
-
-				_this.setTexture( texture.texture, textureUnit );
+				setCubeTextureDynamic( texture, textureUnit );
 
 			} else {
 
@@ -2554,6 +2570,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! texture ) continue;
 
+				if ( texture instanceof THREE.WebGLRenderTarget ) {
+
+					console.warn( 'THREE.WebGLRenderTarget: don\'t use render targets as textures. Use their .texture property instead.' );
+					texture = texture.texture;
+
+				} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
+
+					console.warn( 'THREE.WebGLRenderTargetCube: don\'t use render targets as textures. Use their .texture property instead.' );
+					texture = texture.texture;
+
+				}
+
 				if ( texture instanceof THREE.CubeTexture ||
 					 ( texture.image instanceof Array && texture.image.length === 6 ) ) {
 
@@ -2561,13 +2589,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					setCubeTexture( texture, textureUnit );
 
-				} else if ( texture instanceof THREE.WebGLRenderTarget ) {
+				} else if ( texture.renderTargetCube ) {
 
-					_this.setTexture( texture.texture, textureUnit );
-
-				} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
-
-					setCubeTextureDynamic( texture.texture, textureUnit );
+					setCubeTextureDynamic( texture, textureUnit );
 
 				} else {
 
@@ -2631,6 +2655,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		color,
 		intensity,
 		distance,
+		shadowMap,
 
 		viewMatrix = camera.matrixWorldInverse,
 
@@ -2646,6 +2671,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			color = light.color;
 			intensity = light.intensity;
 			distance = light.distance;
+
+			shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
 
 			if ( light instanceof THREE.AmbientLight ) {
 
@@ -2673,7 +2700,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_lights.directionalShadowMap[ directionalLength ] = light.shadow.map;
+				_lights.directionalShadowMap[ directionalLength ] = shadowMap;
 				_lights.directionalShadowMatrix[ directionalLength ] = light.shadow.matrix;
 				_lights.directional[ directionalLength ++ ] = uniforms;
 
@@ -2706,7 +2733,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_lights.spotShadowMap[ spotLength ] = light.shadow.map;
+				_lights.spotShadowMap[ spotLength ] = shadowMap;
 				_lights.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
 				_lights.spot[ spotLength ++ ] = uniforms;
 
@@ -2731,7 +2758,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_lights.pointShadowMap[ pointLength ] = light.shadow.map;
+				_lights.pointShadowMap[ pointLength ] = shadowMap;
 
 				if ( _lights.pointShadowMatrix[ pointLength ] === undefined ) {
 
