@@ -462,7 +462,7 @@ Sidebar.Object = function ( editor ) {
 
 			}
 
-			if ( object.castShadow !== objectCastShadow.getValue() ) {
+			if ( object.castShadow !== undefined && object.castShadow !== objectCastShadow.getValue() ) {
 
 				editor.execute( new SetValueCommand( object, 'castShadow', objectCastShadow.getValue() ) );
 
