@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>three.js webgl - postprocessing</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+      body {
+        color: #fff;
+        font-family:Monospace;
+        font-size:13px;
+        text-align:center;
+        background-color: #000;
+        margin: 0px;
+        overflow: hidden;
+      }
+      a {
+        color: #B2E9FF;
+        font-weight: bold;
+        pointer-events: auto;
+      }
+      
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      #info {
+        pointer-events: none;
+        position: absolute;
+        left: 0;
+        top: 0px; width: 100%;
+        padding: 5px;
+        display: inline-block;
+      }
+      
+      #webgl2-error {
+        margin: auto;
+        margin-top: 40px;
+        display: block;
+        max-width: 400px;
+        padding: 20px;
+        background: #CE0808;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas></canvas>
+    <div id="info">
+      <a href="http://threejs.org" target="_blank">threejs</a> - WebGL2 - 3D Textures<br/>
+      Adobe Cube LUTs for efficient color transformations and film stock emulation.<br/>
+      Press <strong>T</strong> to toggle on / off.<br/>
+      Created by <a href="http://twitter.com/mattdesl" target="_blank">@mattdesl</a>.
+      
+      <div id="webgl2-error" style="display: none;">
+      Your browser does not support WebGL2. Please download <a href="https://nightly.mozilla.org/">Firefox Nightly</a> or <a href="https://www.google.com/chrome/browser/canary.html">Chrome Canary</a> and ensure it is enabled in your <strong>about:config</strong> or <strong>chrome://flags<strong>.
+      </div>  
+    </div>
+
+    <script src="../build/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+
+    <script src="js/shaders/CopyShader.js"></script>
+    <script src="js/shaders/CubeLUTShader.js"></script>
+
+    <script src="js/postprocessing/EffectComposer.js"></script>
+    <script src="js/postprocessing/RenderPass.js"></script>
+    <script src="js/postprocessing/ShaderPass.js"></script>
+    <script src="js/postprocessing/MaskPass.js"></script>
+
+    <script>
+
+      var camera, scene, renderer, composer, controls;
+      var effect;
+
+      init();
+      window.addEventListener( 'keydown', onKeyDown );
+      animate();
+
+      function init() {
+
+        // Pass a WebGL2 canvas and context
+
+        var canvas = document.querySelector( 'canvas' );
+        var gl2;
+        try {
+
+          gl2 = canvas.getContext( 'webgl2' ) || canvas.getContext( 'experimental-webgl2' );
+
+        } catch ( err ) {
+
+          console.error( err );
+
+        }
+
+        if ( !gl2 ) {
+
+          document.querySelector('#webgl2-error').style.display = 'block';
+
+        }
+
+        renderer = new THREE.WebGLRenderer( {
+          canvas: canvas,
+          context: gl2
+        } );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        //
+
+        camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 1000 );
+        camera.position.z = 0.00001;
+
+        controls = new THREE.OrbitControls( camera, renderer.domElement );
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.25;
+        controls.rotateSpeed = 0.35;
+        controls.enableZoom = false;
+
+        scene = new THREE.Scene();
+
+        var skyMaterial = new THREE.MeshBasicMaterial( { 
+          color: 0xffffff,
+          map: new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' ),
+          side: THREE.DoubleSide
+        } );
+        var geometry = new THREE.SphereGeometry( 100, 64, 64 );
+        var skybox = new THREE.Mesh(geometry, skyMaterial);
+        skybox.rotation.y = Math.PI / 2;
+        scene.add(skybox);
+
+        // postprocessing
+
+        composer = new THREE.EffectComposer( renderer );
+        composer.addPass( new THREE.RenderPass( scene, camera ) );
+
+        if ( renderer.isWebGL2 ) {
+
+          // We need to use RawShaderMaterial for WebGL2 GLSL 300 es syntax
+          var shaderMaterial = new THREE.RawShaderMaterial( THREE.CubeLUTShader )
+
+          // We clone so that we can mutate uniforms
+          shaderMaterial = shaderMaterial.clone();
+          var tex3d = loadAdobeLUT( 'lut/ColorTransform.CUBE', function ( texture ) {
+
+            // Set size to the same as our texture depth
+            shaderMaterial.uniforms.lutSize.value = texture.image.depth;
+
+          } );
+
+          // Set our 3D texture
+          shaderMaterial.uniforms.tLookup.value = tex3d;
+
+          // Create a new pass from our shader
+          effect = new THREE.ShaderPass( shaderMaterial );
+
+        } else {
+
+          // Fall back to regular copy shader
+          effect = new THREE.ShaderPass( THREE.CopyShader );
+
+        }
+
+        effect.renderToScreen = true;
+        composer.addPass( effect );
+
+        //
+
+        window.addEventListener( 'resize', onWindowResize, false );
+
+      }
+
+      function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        composer.setSize( window.innerWidth, window.innerHeight );
+
+      }
+
+      function animate() {
+
+        requestAnimationFrame( animate );
+        controls.update();
+        composer.render();
+
+      }
+      
+      function onKeyDown ( event ) {
+
+        switch ( event.keyCode ) {
+          case 84: /*t*/
+
+            if ( effect.uniforms.enabled ) {
+
+              effect.uniforms.enabled.value = !effect.uniforms.enabled.value;
+
+            }
+            break;
+        }
+      }
+
+      function loadAdobeLUT ( src, onComplete, onError ) {
+
+        var texture = new THREE.Texture3D();
+
+        var handleComplete = function ( response ) {
+          
+          var lut = parseCubeLUT( response );
+          if (lut.type !== '3D') throw new Error('expected 3D LUT cube type');
+
+          var lutData = lut.data;
+          var length = lutData.length * 3;
+          var size = lut.size;
+
+          if ( size * size * size !== lutData.length ) {
+            throw new Error('size mismatch with invalid cube LUT');
+          }
+
+          var float32 = new Float32Array( length );
+
+          for ( var k = 0, i = 0; i < lutData.length; i ++ ) {
+
+            for (var j = 0; j < 3; j ++ ) {
+
+              var component = lutData[ i ][ j ];
+              float32[ k ++ ] = component;
+
+            }
+
+          }
+
+          texture.image = {
+            data: float32,
+            width: size,
+            height: size,
+            depth: size
+          };
+
+          texture.format = THREE.RGBFormat;
+          texture.needsUpdate = true;
+          texture.type = THREE.FloatType;
+          texture.wrapS = THREE.RepeatWrapping;
+          texture.wrapT = THREE.RepeatWrapping;
+          texture.wrapR = THREE.RepeatWrapping;
+          texture.minFilter = THREE.LinearFilter;
+          texture.magFilter = THREE.LinearFilter;
+          texture.generateMipmaps = false;
+          if ( onComplete ) onComplete( texture );
+
+        };
+
+        var handleError = function ( event ) {
+
+          console.error( event );
+          if ( onError ) onError( event );
+
+        };
+
+        var loader = new THREE.XHRLoader();
+        loader.load( src, handleComplete, function () {}, handleError );
+        return texture;
+
+      }
+
+      // parse-cube-lut by thibauts
+      // https://github.com/thibauts/parse-cube-lut
+      function parseCubeLUT ( str ) {
+
+        if(typeof str !== 'string') {
+          str = str.toString();
+        }
+
+        var title = null;
+        var type = null;
+        var size = 0;
+        var domain = [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0]];
+        var data = [];
+
+        var lines = str.split('\n');
+
+        for(var i=0; i<lines.length; i++) {
+          var line = lines[i].trim();
+
+          if(line[0] === '#' || line === '') {
+            // Skip comments and empty lines
+            continue;
+          }
+
+          var parts = line.split(/\s+/);
+
+          switch(parts[0]) {
+            case 'TITLE':
+              title = line.slice(7, -1);
+              break;
+            case 'DOMAIN_MIN':
+              domain[0] = parts.slice(1).map(Number);
+              break;
+            case 'DOMAIN_MAX':
+              domain[1] = parts.slice(1).map(Number);
+              break;
+            case 'LUT_1D_SIZE':
+              type = '1D';
+              size = Number(parts[1]);
+              break;
+            case 'LUT_3D_SIZE':
+              type = '3D';
+              size = Number(parts[1]);
+              break;
+            default:
+              data.push(parts.map(Number));
+          }
+        }
+
+        return {
+          title: title,
+          type: type,
+          size: size,
+          domain: domain,
+          data: data
+        };
+      }
+    </script>
+
+  </body>
+</html>

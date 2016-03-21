@@ -1,5 +1,5 @@
 /**
- * @author mattdesl
+ * @author @mattdesl / Matt DesLauriers
  */
 
 THREE.Texture3D = function ( data, width, height, depth, format, type, mapping, wrapS, wrapT, wrapR, magFilter, minFilter, anisotropy ) {

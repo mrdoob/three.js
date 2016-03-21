@@ -296,6 +296,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	setDefaultGLState();
 
 	this.context = _gl;
+	this.isWebGL2 = _isWebGL2;
 	this.capabilities = capabilities;
 	this.extensions = extensions;
 	this.properties = properties;
@@ -2873,14 +2874,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	function getTextureTarget ( texture ) {
-		var textureTarget = _gl.TEXTURE_2D;
+
 		if ( texture instanceof THREE.Texture3D ) {
+
 			if ( !_isWebGL2 ) {
+
 				throw new Error('3D Textures are only supported in WebGL2 contexts.');
+
 			}
-			textureTarget = _gl.TEXTURE_3D;
+
+			return _gl.TEXTURE_3D;
 		}
-		return textureTarget;
+
+		return _gl.TEXTURE_2D;
 	}
 
 	function uploadTexture( textureProperties, texture, slot ) {
