@@ -2049,16 +2049,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.map !== null ) {
 
-			var map = material.map;
-
-			if ( map instanceof THREE.WebGLRenderTarget ) {
-
-				map = map.texture;
-
-			}
-
-			var offset = map.offset;
-			var repeat = map.repeat;
+			var offset = material.map.offset;
+			var repeat = material.map.repeat;
 
 			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
 
