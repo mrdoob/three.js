@@ -105,8 +105,8 @@
 					metalness: 0.9,
 					roughness: 0.8,
 					shading: THREE.SmoothShading,
-					transparent: true,
-					blending: THREE.PremultipliedAlphaBlending
+					premultipliedAlpha: true,
+					transparent: true
 				} );
 
 				var textureLoader = new THREE.TextureLoader();
@@ -252,8 +252,9 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
 				render();
-				stats.update();
+				stats.end();
 
 			}
 

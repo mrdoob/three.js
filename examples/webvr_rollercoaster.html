@@ -1,8 +1,9 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<title>Roller Coaster</title>
+		<title>three.js webvr - roller coaster</title>
 		<style>
 			body {
 				margin: 0px;
@@ -28,7 +29,7 @@
 
 		<script>
 
-			if ( WEBVR.isAvailable() === false ) {
+			if ( WEBVR.isLatestAvailable() === false ) {
 
 				document.body.appendChild( WEBVR.getMessage() );
 
@@ -173,10 +174,14 @@
 
 			//
 
-			var effect = new THREE.VREffect( renderer );
 			var controls = new THREE.VRControls( camera );
+			var effect = new THREE.VREffect( renderer );
 
-			document.body.appendChild( WEBVR.getButton( effect ) );
+			if ( WEBVR.isAvailable() === true ) {
+
+				document.body.appendChild( WEBVR.getButton( effect ) );
+
+			}
 
 			//
 
@@ -199,7 +204,7 @@
 			var velocity = 0;
 			var progress = 0;
 
-			var animate = function ( time ) {
+			function animate( time ) {
 
 				requestAnimationFrame( animate );
 

@@ -93,6 +93,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	this.render = function ( scene, camera ) {
 
 		var faceCount, isPointLight;
+		var shadows = _lights.shadows;
+
+		if ( shadows.length === 0 ) return;
 
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
@@ -107,8 +110,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		_state.setScissorTest( false );
 
 		// render depth map
-
-		var shadows = _lights.shadows;
 
 		for ( var i = 0, il = shadows.length; i < il; i ++ ) {
 
@@ -277,10 +278,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			}
 
-			// We must call _renderer.resetGLState() at the end of each iteration of
-			// the light loop in order to force material updates for each light.
-			_renderer.resetGLState();
-
 		}
 
 		// Restore GL state.
@@ -295,8 +292,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			_gl.cullFace( _gl.BACK );
 
 		}
-
-		_renderer.resetGLState();
 
 		scope.needsUpdate = false;
 

@@ -1,29 +1,20 @@
 /**
  * @author Prashant Sharma / spidersharma03
  * @author Ben Houston / bhouston, https://clara.io
+ *
+ * To avoid cube map seams, I create an extra pixel around each face. This way when the cube map is
+ * sampled by an application later(with a little care by sampling the centre of the texel), the extra 1 border
+ *  of pixels makes sure that there is no seams artifacts present. This works perfectly for cubeUV format as
+ *  well where the 6 faces can be arranged in any manner whatsoever.
+ * Code in the beginning of fragment shader's main function does this job for a given resolution.
+ *  Run Scene_PMREM_Test.html in the examples directory to see the sampling from the cube lods generated
+ *  by this class.
  */
 
- THREE.PMREMGenerator = function( sourceTexture ) {
-	if ( sourceTexture instanceof THREE.CubeTexture ) {
+THREE.PMREMGenerator = function( sourceTexture ) {
 
-		if ( sourceTexture.images[ 0 ] === undefined )
-		  console.error( "sourceTexture Not Initialized" );
-      if(sourceTexture.images[ 0 ] instanceof THREE.DataTexture) {
-          this.resolution = sourceTexture.images[ 0 ].image.width;
-      }
-      else {
-          this.resolution = sourceTexture.images[ 0 ].width;
-      }
-
-	}
-	else if ( sourceTexture instanceof THREE.WebGLRenderTargetCube ) {
-		if ( sourceTexture === undefined ) console.error( "Render Target Not Initialized" );
-		this.resolution = sourceTexture.width;
-	}
-	else {
-		console.error( "Wrong Input to PMREMGenerator" );
-	}
 	this.sourceTexture = sourceTexture;
+  this.resolution = 256; // NODE: 256 is currently hard coded in the glsl code for performance reasons
 
   var monotonicEncoding = ( sourceTexture.encoding === THREE.LinearEncoding ) ||
     ( sourceTexture.encoding === THREE.GammaEncoding ) || ( sourceTexture.encoding === THREE.sRGBEncoding );
@@ -37,6 +28,7 @@
 	var size = this.resolution;
   var params = { format: this.sourceTexture.format, magFilter: this.sourceTexture.magFilter, minFilter: this.sourceTexture.minFilter, type: this.sourceTexture.type };
 
+  // how many LODs fit in the given CubeUV Texture.
 	this.numLods = Math.log2( size ) - 2;
   for ( var i = 0; i < this.numLods; i ++ ) {
 		var renderTarget = new THREE.WebGLRenderTargetCube( size, size, params );
@@ -66,6 +58,19 @@ THREE.PMREMGenerator.prototype = {
 
 	constructor : THREE.PMREMGenerator,
 
+  /*
+   * Prashant Sharma / spidersharma03: More thought and work is needed here.
+   * Right now it's a kind of a hack to use the previously convolved map to convolve the current one.
+   * I tried to use the original map to convolve all the lods, but for many textures(specially the high frequency)
+   * even a high number of samples(1024) dosen't lead to satisfactory results.
+   * By using the previous convolved maps, a lower number of samples are generally sufficient(right now 32, which
+   * gives okay results unless we see the reflection very carefully, or zoom in too much), however the math
+   * goes wrong as the distribution function tries to sample a larger area than what it should be. So I simply scaled
+   * the roughness by 0.9(totally empirical) to try to visually match the original result.
+   * The condition "if(i <5)" is also an attemt to make the result match the original result.
+   * This method requires the most amount of thinking I guess. Here is a paper which we could try to implement in future::
+   * http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
+   */
 	update: function( renderer ) {
 
 		this.shader.uniforms[ "envMap" ].value = this.sourceTexture;
@@ -78,7 +83,7 @@ THREE.PMREMGenerator.prototype = {
 		for ( var i = 0; i < this.numLods; i ++ ) {
 
 			var r = i / ( this.numLods - 1 );
-			this.shader.uniforms[ "roughness" ].value = r * 0.9;
+			this.shader.uniforms[ "roughness" ].value = r * 0.9; // see comment above, pragmatic choice
 			var size = this.cubeLods[ i ].width;
 			this.shader.uniforms[ "mapSize" ].value = size;
 			this.renderToCubeMapTarget( renderer, this.cubeLods[ i ] );

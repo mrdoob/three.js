@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - webvr video</title>
+		<title>three.js webvr - video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -31,10 +31,20 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+
+		<script src="js/WebVR.js"></script>
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
 
 		<script>
+
+			if ( WEBVR.isLatestAvailable() === false ) {
+
+				document.body.appendChild( WEBVR.getMessage() );
+
+			}
+
+			//
 
 			var camera, scene, renderer;
 			var video, texture;
@@ -50,7 +60,6 @@
 				container.addEventListener( 'click', function () {
 
 					video.play();
-					effect.setFullScreen( true );
 
 				} );
 
@@ -135,6 +144,13 @@
 				effect = new THREE.VREffect( renderer );
 				effect.scale = 0; // video doesn't need eye separation
 				effect.setSize( window.innerWidth, window.innerHeight );
+
+				if ( WEBVR.isAvailable() === true ) {
+
+					document.body.appendChild( WEBVR.getButton( effect ) );
+
+				}
+
 
 				//
 

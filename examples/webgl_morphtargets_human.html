@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - morph target - human</title>
@@ -29,7 +29,7 @@
 	</head>
 
 	<body>
-		
+
 		<div id="container"></div>
 
 		<div id="info">
@@ -37,17 +37,17 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
-		
+
 		<script src="js/UCSCharacter.js"></script>
 
 		<script src="js/Detector.js"></script>
-		
+
 		<script src='js/libs/dat.gui.min.js'></script>
-				
+
 		<script src="js/controls/OrbitControls.js"></script>
-		
+
 		<script>
-			
+
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
@@ -55,7 +55,7 @@
 
 			var camera, scene;
 			var renderer;
-			
+
 			var mesh;
 
 			var mouseX = 0, mouseY = 0;
@@ -64,9 +64,9 @@
 			var windowHalfY = window.innerHeight / 2;
 
 			var clock = new THREE.Clock();
-			
+
 			var gui, skinConfig, morphConfig;
-				
+
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
@@ -92,7 +92,7 @@
 				//
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1 );
-				light.position.set( 0, -1, 0 );
+				light.position.set( 0, - 1, 0 );
 				scene.add( light );
 
 				// RENDERER
@@ -106,7 +106,8 @@
 				// CHARACTER
 
 				character = new THREE.UCSCharacter();
-				character.onLoadComplete = function() {
+				character.onLoadComplete = function () {
+
 					console.log( "Load Complete" );
 					console.log( character.numSkins + " skins and " + character.numMorphs + " morphtargets loaded." );
 					gui = new dat.GUI();
@@ -114,10 +115,11 @@
 					setupMorphsGUI();
 					gui.width = 300;
 					gui.open();
+
 				};
-				
+
 				var loader = new THREE.XHRLoader();
-				loader.load("models/skinned/UCS_config.json", function ( text ) {
+				loader.load( 'models/skinned/UCS_config.json', function ( text ) {
 
 					var config = JSON.parse( text );
 					character.loadParts( config );
@@ -126,65 +128,81 @@
 				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				
+
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.center.set( 0, 3000, 0);
+				controls.center.set( 0, 3000, 0 );
 
 				controls.addEventListener( 'change', render );
 
 			}
-			
+
 			function setupSkinsGUI() {
-			
+
 				var skinGui = gui.addFolder( "Skins" );
-				
+
 				skinConfig = {
 					wireframe: false
 				};
-				
-				var skinCallback = function( index ) {
+
+				var skinCallback = function ( index ) {
+
 					return function () {
+
 						character.setSkin( index );
+
 					};
+
 				};
 
-				for ( var i = 0; i < character.numSkins; i++ ) {
+				for ( var i = 0; i < character.numSkins; i ++ ) {
+
 					var name = character.skins[ i ].name;
 					skinConfig[ name ] = skinCallback( i );
+
 				}
-				
-				for ( var i = 0; i < character.numSkins; i++ ) {
-					skinGui.add( skinConfig, character.skins[i].name );
+
+				for ( var i = 0; i < character.numSkins; i ++ ) {
+
+					skinGui.add( skinConfig, character.skins[ i ].name );
+
 				}
-				
+
 				skinGui.open();
 
 			}
-			
+
 			function setupMorphsGUI() {
-				
+
 				var morphGui = gui.addFolder( "Morphs" );
-				
+
 				morphConfig = {
 				};
-				
+
 				var morphCallback = function( index ) {
+
 					return function () {
+
 						character.updateMorphs( morphConfig );
+
 					}
+
 				};
-				
+
 				for ( var i = 0; i < character.numMorphs; i ++ ) {
+
 					var morphName = character.morphs[ i ];
 					morphConfig[ morphName ] = 0;
+
 				}
-				
+
 				for ( var i = 0; i < character.numMorphs; i ++ ) {
+
 					morphGui.add( morphConfig, character.morphs[ i ] ).min( 0 ).max( 100 ).onChange( morphCallback( i ) );
+
 				}
-				
+
 				morphGui.open();
-			
+
 			}
 
 			function onWindowResize() {

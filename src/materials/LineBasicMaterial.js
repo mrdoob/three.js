@@ -10,7 +10,7 @@
  *  linecap: "round",
  *  linejoin: "round",
  *
- *  blending: THREE.PremultipliedAlphaBlending,
+ *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
@@ -32,7 +32,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.linecap = 'round';
 	this.linejoin = 'round';
 
-	this.blending = THREE.PremultipliedAlphaBlending;
+	this.blending = THREE.NormalBlending;
 
 	this.vertexColors = THREE.NoColors;
 

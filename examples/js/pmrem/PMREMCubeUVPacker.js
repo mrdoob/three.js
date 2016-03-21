@@ -1,6 +1,16 @@
 /**
  * @author Prashant Sharma / spidersharma03
  * @author Ben Houston / bhouston, https://clara.io
+ *
+ * This class takes the cube lods(corresponding to different roughness values), and creates a single cubeUV
+ * Texture. The format for a given roughness set of faces is simply::
+ * +X+Y+Z
+ * -X-Y-Z
+ * For every roughness a mip map chain is also saved, which is essential to remove the texture artifacts due to
+ * minification.
+ * Right now for every face a PlaneMesh is drawn, which leads to a lot of geometry draw calls, but can be replaced
+ * later by drawing a single buffer and by sending the appropriate faceIndex via vertex attributes.
+ * The arrangement of the faces is fixed, as assuming this arrangement, the sampling function has been written.
  */
 
 

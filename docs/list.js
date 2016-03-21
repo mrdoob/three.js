@@ -200,6 +200,7 @@ var list = {
 			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
 			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
 			[ "IcosahedronGeometry", "api/extras/geometries/IcosahedronGeometry" ],
+			[ "LatheBufferGeometry", "api/extras/geometries/LatheBufferGeometry" ],
 			[ "LatheGeometry", "api/extras/geometries/LatheGeometry" ],
 			[ "OctahedronGeometry", "api/extras/geometries/OctahedronGeometry" ],
 			[ "ParametricGeometry", "api/extras/geometries/ParametricGeometry" ],
@@ -215,6 +216,7 @@ var list = {
 			[ "TextGeometry", "api/extras/geometries/TextGeometry" ],
 			[ "TorusBufferGeometry", "api/extras/geometries/TorusBufferGeometry" ],
 			[ "TorusGeometry", "api/extras/geometries/TorusGeometry" ],
+			[ "TorusKnotBufferGeometry", "api/extras/geometries/TorusKnotBufferGeometry" ],
 			[ "TorusKnotGeometry", "api/extras/geometries/TorusKnotGeometry" ],
 			[ "TubeGeometry", "api/extras/geometries/TubeGeometry" ]
 		],

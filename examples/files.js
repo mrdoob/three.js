@@ -57,6 +57,7 @@ var files = {
 		"webgl_kinect",
 		"webgl_lensflares",
 		"webgl_lights_hemisphere",
+		"webgl_lights_physical",
 		"webgl_lights_pointlights",
 		"webgl_lights_pointlights2",
 		"webgl_lines_colors",
@@ -88,6 +89,7 @@ var files = {
 		"webgl_loader_msgpack",
 		"webgl_loader_obj",
 		"webgl_loader_obj_mtl",
+		"webgl_loader_nrrd",
 		"webgl_loader_pcd",
 		"webgl_loader_pdb",
 		"webgl_loader_ply",
@@ -235,8 +237,8 @@ var files = {
 	],
 	"webvr": [
 		"webvr_cubes",
+		"webvr_panorama",
 		"webvr_rollercoaster",
-		"webvr_stereo_pano",
 		"webvr_video"
 	],
 	"css3d": [

@@ -365,6 +365,78 @@ var guis = {
 
 	},
 
+	LatheBufferGeometry : function() {
+
+		var points = [];
+
+		for ( var i = 0; i < 10; i ++ ) {
+
+			points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 10 + 5, ( i - 5 ) * 2 ) );
+
+		}
+
+		var data = {
+			segments : 12,
+			phiStart : 0,
+			phiLength : twoPi,
+		};
+
+		function generateGeometry() {
+
+			var geometry = new THREE.LatheBufferGeometry(
+				points, data.segments, data.phiStart, data.phiLength
+			);
+
+			updateGroupGeometry( mesh, geometry );
+
+		}
+
+		var folder = gui.addFolder( 'THREE.LatheBufferGeometry' );
+
+		folder.add( data, 'segments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'phiStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'phiLength', 0, twoPi ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	LatheGeometry : function() {
+
+		var points = [];
+
+		for ( var i = 0; i < 10; i ++ ) {
+
+			points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 10 + 5, ( i - 5 ) * 2 ) );
+
+		}
+
+		var data = {
+			segments : 12,
+			phiStart : 0,
+			phiLength : twoPi,
+		};
+
+		function generateGeometry() {
+
+			var geometry = new THREE.LatheGeometry(
+				points, data.segments, data.phiStart, data.phiLength
+			);
+
+			updateGroupGeometry( mesh, geometry );
+
+		}
+
+		var folder = gui.addFolder( 'THREE.LatheGeometry' );
+
+		folder.add( data, 'segments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'phiStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'phiLength', 0, twoPi ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	OctahedronGeometry : function() {
 
 		var data = {
@@ -747,38 +819,71 @@ var guis = {
 
 	},
 
+	TorusKnotBufferGeometry : function( mesh ) {
+
+		var data = {
+			radius : 10,
+			tube : 3,
+			tubularSegments : 64,
+			radialSegments : 8,
+			p : 2,
+			q : 3
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.TorusKnotBufferGeometry(
+					data.radius, data.tube, data.tubularSegments, data.radialSegments,
+					data.p, data.q
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TorusKnotBufferGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'tube', 0.1, 10 ).onChange( generateGeometry );
+		folder.add( data, 'tubularSegments', 3, 300 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'p', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'q', 1, 20 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	TorusKnotGeometry : function( mesh ) {
 
 		var data = {
 			radius : 10,
 			tube : 3,
-			radialSegments : 64,
-			tubularSegments : 8,
+			tubularSegments : 64,
+			radialSegments : 8,
 			p : 2,
-			q : 3,
-			heightScale : 1
+			q : 3
 		};
 
 		function generateGeometry() {
 
 			updateGroupGeometry( mesh,
 				new THREE.TorusKnotGeometry(
-					data.radius, data.tube, data.radialSegments, data.tubularSegments,
-					data.p, data.q, data.heightScale
+					data.radius, data.tube, data.tubularSegments, data.radialSegments,
+					data.p, data.q
 				)
 			);
 
 		}
 
-		var folder = gui.addFolder( 'THREE.TorusGeometry' );
+		var folder = gui.addFolder( 'THREE.TorusKnotGeometry' );
 
 		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'tube', 0.1, 10 ).onChange( generateGeometry );
-		folder.add( data, 'radialSegments', 3, 300 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'tubularSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'tubularSegments', 3, 300 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'p', 1, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'q', 1, 20 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'heightScale', 1, 20 ).onChange( generateGeometry );
 
 		generateGeometry();
 

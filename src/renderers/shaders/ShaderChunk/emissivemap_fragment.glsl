@@ -4,6 +4,6 @@
 
 	emissiveColor.rgb = emissiveMapTexelToLinear( emissiveColor ).rgb;
 
-	totalEmissiveLight *= emissiveColor.rgb;
+	totalEmissiveRadiance *= emissiveColor.rgb;
 
 #endif

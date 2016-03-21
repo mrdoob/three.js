@@ -91,7 +91,7 @@
 			/* testing cloth simulation */
 
 			var pinsFormation = [];
-			var pins = [6];
+			var pins = [ 6 ];
 
 			pinsFormation.push( pins );
 
@@ -112,7 +112,7 @@
 
 			function togglePins() {
 
-				pins = pinsFormation[ ~~( Math.random() * pinsFormation.length ) ];
+				pins = pinsFormation[ ~~ ( Math.random() * pinsFormation.length ) ];
 
 			}
 
@@ -165,10 +165,10 @@
 
 				var d = 300;
 
-				light.shadow.camera.left = -d;
+				light.shadow.camera.left = - d;
 				light.shadow.camera.right = d;
 				light.shadow.camera.top = d;
-				light.shadow.camera.bottom = -d;
+				light.shadow.camera.bottom = - d;
 
 				light.shadow.camera.far = 1000;
 
@@ -230,7 +230,7 @@
 				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, map: groundTexture } );
 
 				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
-				mesh.position.y = -250;
+				mesh.position.y = - 250;
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
@@ -241,21 +241,21 @@
 				var poleMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 100 } );
 
 				var mesh = new THREE.Mesh( poleGeo, poleMat );
-				mesh.position.x = -125;
-				mesh.position.y = -62;
+				mesh.position.x = - 125;
+				mesh.position.y = - 62;
 				mesh.receiveShadow = true;
 				mesh.castShadow = true;
 				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( poleGeo, poleMat );
 				mesh.position.x = 125;
-				mesh.position.y = -62;
+				mesh.position.y = - 62;
 				mesh.receiveShadow = true;
 				mesh.castShadow = true;
 				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( new THREE.BoxGeometry( 255, 5, 5 ), poleMat );
-				mesh.position.y = -250 + 750/2;
+				mesh.position.y = - 250 + ( 750 / 2 );
 				mesh.position.x = 0;
 				mesh.receiveShadow = true;
 				mesh.castShadow = true;
@@ -263,15 +263,15 @@
 
 				var gg = new THREE.BoxGeometry( 10, 10, 10 );
 				var mesh = new THREE.Mesh( gg, poleMat );
-				mesh.position.y = -250;
+				mesh.position.y = - 250;
 				mesh.position.x = 125;
 				mesh.receiveShadow = true;
 				mesh.castShadow = true;
 				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( gg, poleMat );
-				mesh.position.y = -250;
-				mesh.position.x = -125;
+				mesh.position.y = - 250;
+				mesh.position.x = - 125;
 				mesh.receiveShadow = true;
 				mesh.castShadow = true;
 				scene.add( mesh );
@@ -301,7 +301,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				sphere.visible = !true
+				sphere.visible = ! true
 
 			}
 
@@ -327,7 +327,7 @@
 				windStrength = Math.cos( time / 7000 ) * 20 + 40;
 				windForce.set( Math.sin( time / 2000 ), Math.cos( time / 3000 ), Math.sin( time / 1000 ) ).normalize().multiplyScalar( windStrength );
 
-				simulate(time);
+				simulate( time );
 				render();
 				stats.update();
 

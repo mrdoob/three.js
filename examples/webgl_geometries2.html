@@ -63,19 +63,17 @@
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, side: THREE.DoubleSide } )
 				];
 
-
-				var heightScale = 1;
 				var p = 2;
 				var q = 3;
-				var radius = 150, tube = 10, segmentsR = 50, segmentsT = 20;
+				var radius = 150, tube = 10, segmentsT = 50, segmentsR = 20;
 
 				var GrannyKnot =  new THREE.Curves.GrannyKnot();
 
-				var torus2 = new THREE.ParametricGeometries.TorusKnotGeometry( radius, tube, segmentsR, segmentsT, p , q, heightScale );
+				var torus2 = new THREE.ParametricGeometries.TorusKnotGeometry( radius, tube, segmentsT, segmentsR, p , q );
 				var sphere2 = new THREE.ParametricGeometries.SphereGeometry( 75, 20, 10 );
 				var tube2 = new THREE.ParametricGeometries.TubeGeometry( GrannyKnot, 150, 2, 8, true, false );
 
-				// var torus = new THREE.TorusKnotGeometry( radius, tube, segmentsR, segmentsT, p , q, heightScale );
+				// var torus = new THREE.TorusKnotGeometry( radius, tube, segmentsR, segmentsT, p , q );
 				// var sphere = new THREE.SphereGeometry( 75, 20, 10 );
 				// var tube = new THREE.TubeGeometry( GrannyKnot, 150, 2, 8, true, false );
 
