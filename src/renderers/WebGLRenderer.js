@@ -103,7 +103,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_width = _canvas.width,
 	_height = _canvas.height,
-	_halfClientHeight = _canvas.clientHeight / 2.0,
 
 	_pixelRatio = 1,
 
@@ -397,8 +396,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_canvas.width = width * _pixelRatio;
 		_canvas.height = height * _pixelRatio;
-
-		_halfClientHeight = _canvas.clientHeight / 2.0;
 
 		if ( updateStyle !== false ) {
 
@@ -2051,7 +2048,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size * _pixelRatio;
-		uniforms.scale.value = _halfClientHeight;
+		uniforms.scale.value = _canvas.clientHeight / 2.0; // TODO: Cache this.
 
 		uniforms.map.value = material.map;
 
