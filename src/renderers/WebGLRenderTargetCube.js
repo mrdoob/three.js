@@ -9,6 +9,8 @@ THREE.WebGLRenderTargetCube = function ( width, height, options ) {
 	this.activeCubeFace = 0; // PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5
 	this.activeMipMapLevel = 0;
 
+	this.texture.renderTargetCube = true;
+
 };
 
 THREE.WebGLRenderTargetCube.prototype = Object.create( THREE.WebGLRenderTarget.prototype );
