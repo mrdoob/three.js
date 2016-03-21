@@ -30,7 +30,9 @@ THREE.PMREMGenerator = function( sourceTexture ) {
 
   // how many LODs fit in the given CubeUV Texture.
 	this.numLods = Math.log2( size ) - 2;
+
   for ( var i = 0; i < this.numLods; i ++ ) {
+
 		var renderTarget = new THREE.WebGLRenderTargetCube( size, size, params );
 		renderTarget.texture.generateMipmaps = this.sourceTexture.generateMipmaps;
     renderTarget.texture.anisotropy = this.sourceTexture.anisotropy;
@@ -39,6 +41,7 @@ THREE.PMREMGenerator = function( sourceTexture ) {
     renderTarget.texture.magFilter = this.sourceTexture.magFilter;
 		this.cubeLods.push( renderTarget );
 		size = Math.max( 16, size / 2 );
+
 	}
 
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0.0, 1000 );
@@ -80,6 +83,7 @@ THREE.PMREMGenerator.prototype = {
     var gammaOutput = renderer.gammaOutput;
     renderer.gammaInput = false;
     renderer.gammaOutput = false;
+
 		for ( var i = 0; i < this.numLods; i ++ ) {
 
 			var r = i / ( this.numLods - 1 );
@@ -87,8 +91,8 @@ THREE.PMREMGenerator.prototype = {
 			var size = this.cubeLods[ i ].width;
 			this.shader.uniforms[ "mapSize" ].value = size;
 			this.renderToCubeMapTarget( renderer, this.cubeLods[ i ] );
-			if ( i < 5 )
-			this.shader.uniforms[ "envMap" ].value = this.cubeLods[ i ];
+
+			if ( i < 5 ) this.shader.uniforms[ "envMap" ].value = this.cubeLods[ i ].texture;
 
 		}
 
@@ -100,12 +104,15 @@ THREE.PMREMGenerator.prototype = {
 	renderToCubeMapTarget: function( renderer, renderTarget ) {
 
 		for ( var i = 0; i < 6; i ++ ) {
-		  this.renderToCubeMapTargetFace( renderer, renderTarget, i )
+
+		  this.renderToCubeMapTargetFace( renderer, renderTarget, i );
+
     }
 
 	},
 
 	renderToCubeMapTargetFace: function( renderer, renderTarget, faceIndex ) {
+
 		renderTarget.activeCubeFace = faceIndex;
 		this.shader.uniforms[ "faceIndex" ].value = faceIndex;
 		renderer.render( this.scene, this.camera, renderTarget, true );

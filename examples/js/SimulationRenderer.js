@@ -106,10 +106,10 @@ function SimulationRenderer( WIDTH, renderer ) {
 		rtVelocity2 = rtVelocity1.clone();
 
 		simulator.renderTexture( dtPosition, rtPosition1 );
-		simulator.renderTexture( rtPosition1, rtPosition2 );
+		simulator.renderTexture( rtPosition1.texture, rtPosition2 );
 
 		simulator.renderTexture( dtVelocity, rtVelocity1 );
-		simulator.renderTexture( rtVelocity1, rtVelocity2 );
+		simulator.renderTexture( rtVelocity1.texture, rtVelocity2 );
 
 		simulator.velocityUniforms.testing.value = 10;
 
@@ -146,8 +146,8 @@ function SimulationRenderer( WIDTH, renderer ) {
 	this.renderPosition = function( position, velocity, output, delta ) {
 
 		mesh.material = positionShader;
-		positionShader.uniforms.texturePosition.value = position;
-		positionShader.uniforms.textureVelocity.value = velocity;
+		positionShader.uniforms.texturePosition.value = position.texture;
+		positionShader.uniforms.textureVelocity.value = velocity.texture;
 		positionShader.uniforms.time.value = performance.now();
 		positionShader.uniforms.delta.value = delta;
 		renderer.render( scene, camera, output );
@@ -158,8 +158,8 @@ function SimulationRenderer( WIDTH, renderer ) {
 	this.renderVelocity = function( position, velocity, output, delta ) {
 
 		mesh.material = velocityShader;
-		velocityShader.uniforms.texturePosition.value = position;
-		velocityShader.uniforms.textureVelocity.value = velocity;
+		velocityShader.uniforms.texturePosition.value = position.texture;
+		velocityShader.uniforms.textureVelocity.value = velocity.texture;
 		velocityShader.uniforms.time.value = performance.now();
 		velocityShader.uniforms.delta.value = delta;
 		renderer.render( scene, camera, output );

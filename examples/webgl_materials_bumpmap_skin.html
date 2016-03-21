@@ -221,7 +221,7 @@
 				uniforms[ "enableBump" ].value = true;
 				uniforms[ "enableSpecular" ].value = true;
 
-				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1;
+				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1.texture;
 				uniforms[ "tDiffuse" ].value = mapColor;
 
 				uniforms[ "bumpMap" ].value = mapHeight;

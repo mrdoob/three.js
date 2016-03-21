@@ -101,7 +101,7 @@ THREE.ManualMSAARenderPass.prototype = {
 		renderer.autoClear = false;
 
 		this.compositeUniforms[ "scale" ].value = 1.0 / ( jitterOffsets.length );
-		this.compositeUniforms[ "tForeground" ].value = this.sampleRenderTarget;
+		this.compositeUniforms[ "tForeground" ].value = this.sampleRenderTarget.texture;
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( var i = 0; i < jitterOffsets.length; i ++ ) {
