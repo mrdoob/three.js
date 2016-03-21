@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Class for loading an [page:String AudioBuffer].</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:String context], [page:LoadingManager manager] )</h3>
+		<div>
+		[page:String context] — The [page:String AudioContext] for the loader to use. Default is [page:String window.AudioContext].<br />
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String url] — required<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded text response.<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
+		</div>
+		<div>
+		Begin loading from url and pass the loaded [page:String AudioBuffer] to onLoad.
+		</div>
+
+
+
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a listener
+		var audioListener = new THREE.AudioListener();
+
+		// add the listener to the camera
+		camera.add( audioListener );
+
+		// instantiate audio object
+		var oceanAmbientSound = new THREE.Audio( audioListener );
+
+		// add the audio object to the scene
+		scene.add( oceanAmbientSound );
+
+		// instantiate a loader
+		var loader = new THREE.AudioLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'audio/ambient_ocean.ogg',
+			// Function when resource is loaded
+			function ( audioBuffer ) {
+				// set the audio object buffer to the loaded object
+				oceanAmbientSound.setBuffer( audioBuffer );
+
+				// play the audio
+				oceanAmbientSound.play();
+			},
+			// Function called when download progresses
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+			// Function called when download errors
+			function ( xhr ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

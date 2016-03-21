@@ -13,16 +13,16 @@
 		<h1>[name]</h1>
 
 		<div class="desc">A light source positioned directly above the scene.</div>
-		
+
 		<h2>Example</h2>
-		
+
 		<div>[example:webgl_lights_hemisphere lights / hemisphere ]</div>
 		<div>[example:misc_controls_pointerlock controls / pointerlock ]</div>
 		<div>[example:webgl_decals decals ]</div>
 		<div>[example:webgl_loader_collada_kinematics loader / collada / kinematics ]</div>
 		<div>[example:webgl_materials_lightmap materials / lightmap ]</div>
 		<div>[example:webgl_shaders_ocean shaders / ocean ]</div>
-		
+
 <code>var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
 scene.add( light );</code>
 
@@ -47,17 +47,18 @@ scene.add( light );</code>
 		<h3>[property:Float intensity]</h3>
 		<div>
 			Light's intensity.<br />
+			In "physically correct" mode, the product of intensity * color (or intensity * groundColor) is interpreted as luminous irradiance measured in lux at the material's surface.<br/>
 			Default — *1.0*.
 		</div>
 
 		<h2>Methods</h2>
-		
+
 		<h3>[method:HemisphereLight clone]()</h3>
 		<div>
 		<br />
 		It returns a clone of HemisphereLight.
 		</div>
-		
+
 		<h3>[method:JSON toJSON]()</h3>
 		<div>
 		Return HemisphereLight data in JSON format.

@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-    <script src="../build/three.js"></script>
+	<script src="../build/three.js"></script>
 	<script src="js/Detector.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
@@ -11,7 +11,7 @@
 	<script src='js/libs/dat.gui.min.js'></script>
 	<script src="js/libs/photons.min.js"></script>
 
-    <style>
+	<style>
 		body {
 			font-family: Monospace;
 			background-color: #000;
@@ -29,7 +29,7 @@
 		}
 		#info a { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
 	</style>
-    <title>Three.js Particle System</title>
+	<title>Three.js Particle System</title>
 </head>
 <body>
 
@@ -113,7 +113,7 @@
 
 		smokeType = ParticleSystemIDs.Smoke1;
 
-    var textureLoader = new THREE.TextureLoader();
+		var textureLoader = new THREE.TextureLoader();
 
 		var smoke1Atlas = new PHOTONS.Atlas( textureLoader.load( 'textures/campfire/smokeparticle.png' ), true );
 		var smoke2Atlas = PHOTONS.Atlas.createGridAtlas( textureLoader.load( 'textures/campfire/smokeparticles.png' ), 0.0, 1.0, 1.0, 0.0, 4.0, 4.0, false, true );
@@ -161,7 +161,7 @@
 						"vec3 lightPosition = pointLights[ i ].position;",
 						"vec3 lVector = lightPosition + viewPosition.xyz;",
 						"vec3 lightDir = normalize( lVector );",
-						"float attenuation = calcLightAttenuation( length( lVector ), pointLights[ i ].distance, pointLights[ i ].decay );",
+						"float attenuation = punctualLightIntensityToIrradianceFactor( length( lVector ), pointLights[ i ].distance, pointLights[ i ].decay );",
 						"totalDiffuseLight += lightColor * attenuation;",
 					"}",
 				"#endif",
@@ -489,7 +489,7 @@
 
 		window.addEventListener( 'resize', onWindowResize, false );
 
-	    }
+	}
 
 	function initRenderer() {
 
@@ -511,11 +511,11 @@
 		pointLight = new THREE.PointLight( 0xffffff, 2, 1000, 1 );
 		pointLight.position.set( 0, 40, 0 );
 		pointLight.castShadow = true;
-		pointLight.shadowCameraNear = 1;
-		pointLight.shadowCameraFar = 1000;
-		pointLight.shadowMapWidth = 4096;
-		pointLight.shadowMapHeight = 2048;
-		pointLight.shadowBias = - 0.5;
+		pointLight.shadow.camera.near = 1;
+		pointLight.shadow.camera.far = 1000;
+		pointLight.shadow.mapSize.width = 4096;
+		pointLight.shadow.mapSize.height = 2048;
+		pointLight.shadow.bias = - 0.5;
 		scene.add( pointLight );
 
 	}
@@ -715,7 +715,7 @@
 		controls.target.set( 0, 0, 0 );
 		controls.update();
 
-	    }
+	}
 
 	function onWindowResize() {
 
@@ -860,8 +860,8 @@
 
 	function animate() {
 
-		    requestAnimationFrame( animate );
-		    update();
+		requestAnimationFrame( animate );
+		update();
 		render();
 
 	}

@@ -36,8 +36,8 @@ THREE.WebGLLights = function () {
 					direction: new THREE.Vector3(),
 					color: new THREE.Color(),
 					distance: 0,
-					angleCos: 0,
-					penumbra: 0,
+					coneCos: 0,
+					penumbraCos: 0,
 					decay: 0,
 
 					shadow: false,
