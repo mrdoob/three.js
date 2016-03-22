@@ -233,10 +233,8 @@ var files = {
 		"webgl_custom_attributes_points",
 		"webgl_custom_attributes_points2",
 		"webgl_custom_attributes_points3",
-		"webgl_raymarching_reflect"
-	],
-	"webgl2": [
-		"webgl2_drawbuffers"
+		"webgl_raymarching_reflect",
+		"webgl_mrt"
 	],
 	"webvr": [
 		"webvr_cubes",

@@ -221,7 +221,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	var _isWebGL2 = (typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext);
 	var extensions = new THREE.WebGLExtensions( _gl );
 
 	extensions.get( 'OES_texture_float' );
@@ -300,7 +299,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	setDefaultGLState();
 
 	this.context = _gl;
-	this.isWebGL2 = _isWebGL2;
 	this.capabilities = capabilities;
 	this.extensions = extensions;
 	this.properties = properties;
@@ -3477,22 +3475,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 			_currentFramebuffer = framebuffer;
 
-			if ( _isWebGL2 || DrawBuffersEXT ) {
+			if ( DrawBuffersEXT ) {
 
 				if ( renderTargetProperties && renderTargetProperties.__webglAttachments ) {
 
-					if ( _isWebGL2 ) _gl.drawBuffers( renderTargetProperties.__webglAttachments );
-					else DrawBuffersEXT.drawBuffersWEBGL( renderTargetProperties.__webglAttachments );
+					DrawBuffersEXT.drawBuffersWEBGL( renderTargetProperties.__webglAttachments );
 
 				} else if ( renderTarget ) {
 
-					if ( _isWebGL2 ) _gl.drawBuffers( defaultAttachments );
-					else DrawBuffersEXT.drawBuffersWEBGL( defaultAttachments );
+					DrawBuffersEXT.drawBuffersWEBGL( defaultAttachments );
 
 				} else {
 
-					if ( _isWebGL2 ) _gl.drawBuffers( defaultBackAttachment );
-					else DrawBuffersEXT.drawBuffersWEBGL( defaultBackAttachment );
+					DrawBuffersEXT.drawBuffersWEBGL( defaultBackAttachment );
 
 				}
 

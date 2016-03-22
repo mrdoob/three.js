@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>three.js webgl2 - Multiple Render Targets</title>
+    <title>three.js webgl - Multiple Render Targets</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
@@ -35,7 +35,7 @@
         display: inline-block;
       }
       
-      #webgl2-error {
+      #error {
         margin: auto;
         margin-top: 40px;
         display: block;
@@ -45,8 +45,8 @@
       }
     </style>
 
-    <!-- Emit G-Buffer with WebGL1 -->
-    <script id="gbuffer-vert-100" type="x-shader/x-vertex">
+    <!-- Write to G-Buffer -->
+    <script id="gbuffer-vert" type="x-shader/x-vertex">
       #extension GL_EXT_draw_buffers : require
       uniform mat4 projectionMatrix;
       uniform mat4 modelViewMatrix;
@@ -69,7 +69,7 @@
         gl_Position = projectionMatrix * mvPosition;
       }
     </script>
-    <script id="gbuffer-frag-100" type="x-shader/x-fragment">
+    <script id="gbuffer-frag" type="x-shader/x-fragment">
       #extension GL_EXT_draw_buffers : require
       precision mediump float;
 
@@ -85,53 +85,6 @@
         
         // write normals to G-Buffer
         gl_FragData[1] = vec4(normalize( vNormal ), 0.0);
-      }
-    </script>
-
-    <!-- Emit G-Buffer with WebGL2 -->
-    <script id="gbuffer-vert-300" type="x-shader/x-vertex">
-      #version 300 es
-
-      uniform mat4 projectionMatrix;
-      uniform mat4 modelViewMatrix;
-      uniform mat3 normalMatrix;
-      in vec4 position;
-      in vec3 normal;
-      in vec2 uv;
-      out vec3 vNormal;
-      out vec2 vUv;
-
-      void main() {
-        vUv = uv;
-
-        // get smooth normals
-        vec4 mvPosition = modelViewMatrix * position;
-
-        vec3 transformedNormal = normalMatrix * normal;
-        vNormal = normalize(transformedNormal);
-
-        gl_Position = projectionMatrix * mvPosition;
-      }
-    </script>
-    <script id="gbuffer-frag-300" type="x-shader/x-fragment">
-      #version 300 es
-      precision mediump float;
-
-      uniform sampler2D map;
-      uniform vec2 repeat;
-
-      in vec3 vNormal;
-      in vec2 vUv;
-
-      layout(location = 0) out vec3 diffuse;
-      layout(location = 1) out vec3 normal;
-
-      void main() {
-        // write color to G-Buffer
-        diffuse = texture(map, vUv * repeat).rgb;
-        
-        // write normals to G-Buffer
-        normal = normalize( vNormal );
       }
     </script>
 
@@ -170,13 +123,14 @@
   <body>
     <canvas></canvas>
     <div id="info">
-      <a href="http://threejs.org" target="_blank">threejs</a> - WebGL2 - Multiple Render Targets<br/>
+      <a href="http://threejs.org" target="_blank">threejs</a> - WebGL - Multiple Render Targets<br/>
       Rendering geometry into a G-Buffer.<br/>
       Useful for a deferred shading pipelines.<br/>
       Created by <a href="http://twitter.com/mattdesl" target="_blank">@mattdesl</a>.
       
-      <div id="webgl2-error" style="display: none;">
-      Your browser does not support WebGL2. Please download <a href="https://nightly.mozilla.org/">Firefox Nightly</a> or <a href="https://www.google.com/chrome/browser/canary.html">Chrome Canary</a> and ensure it is enabled in your <strong>about:config</strong> or <strong>chrome://flags<strong>.
+      <div id="error" style="display: none;">
+      Your browser does not support <strong>WEBGL_draw_buffers</strong>.<br/><br/>
+      This demo will not work.
       </div>  
     </div>
 
@@ -188,43 +142,23 @@
       var camera, scene, renderer, controls;
       var target;
       var postScene, postCamera;
-      var supportsMRT = false;
+      var supportsMRT = true;
 
       init();
       animate();
 
       function init() {
 
-        // Pass a WebGL2 canvas and context
-
-        var canvas = document.querySelector( 'canvas' );
-        var gl2;
-        try {
-
-          gl2 = canvas.getContext( 'webgl2' ) || canvas.getContext( 'experimental-webgl2' );
-
-        } catch ( err ) {
-
-          console.error( err );
-
-        }
-
-        // WebGL2 supports MRT, but WebGL1 only supports it with an extension
-        if ( !gl2 ) {
-          
-          var dummyGL = document.createElement('canvas').getContext('webgl');
-          if ( !dummyGL.getExtension('WEBGL_draw_buffers') ) {
-            document.querySelector('#webgl2-error').style.display = 'block';
-            return;            
-          }
-
-        }
-
-        supportsMRT = true;
         renderer = new THREE.WebGLRenderer( {
-          canvas: canvas,
-          context: gl2
+          canvas: document.querySelector('canvas')
         } );
+
+        if ( !renderer.extensions.get('WEBGL_draw_buffers') ) {
+          supportsMRT = false;
+          document.querySelector('#error').style.display = 'block';
+          return;
+        }
+
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -295,14 +229,11 @@
         var diffuse = new THREE.TextureLoader().load('textures/brick_diffuse.jpg');
         diffuse.wrapS = diffuse.wrapT = THREE.RepeatWrapping;
 
-        var idVert = renderer.isWebGL2 ? '#gbuffer-vert-300' : '#gbuffer-vert-100';
-        var idFrag = renderer.isWebGL2 ? '#gbuffer-frag-300' : '#gbuffer-frag-100';
-
         // Setup some geometries
         var geometry = new THREE.TorusKnotGeometry(1, 0.3, 128, 64);
         var material = new THREE.RawShaderMaterial({
-          vertexShader: document.querySelector(idVert).textContent.trim(),
-          fragmentShader: document.querySelector(idFrag).textContent.trim(),
+          vertexShader: document.querySelector('#gbuffer-vert').textContent.trim(),
+          fragmentShader: document.querySelector('#gbuffer-frag').textContent.trim(),
           uniforms: {
             map: { type: 't', value: diffuse },
             repeat: { type: 'v2', value: new THREE.Vector2(5, 0.5) }
@@ -339,6 +270,7 @@
         renderer.render( postScene, postCamera );
 
       }
+
     </script>
 
   </body>
