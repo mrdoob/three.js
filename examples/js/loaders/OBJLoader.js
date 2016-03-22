@@ -469,7 +469,7 @@ THREE.OBJLoader.prototype = {
 			} else {
 
 				// Handle null terminated files without exception
-				if (line === "\0")
+				if (line === '\0')
 					continue;
 
 				throw new Error( "Unexpected line: '" + line  + "'");
