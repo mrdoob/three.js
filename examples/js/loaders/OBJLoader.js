@@ -103,24 +103,24 @@ THREE.OBJLoader.prototype = {
 				this.objects.push(this.object);
 			},
 
-			parseVertexIndex : function( value ) {
+			parseVertexIndex : function( value, len ) {
 
 				var index = parseInt( value, 10 );
-				return ( index >= 0 ? index - 1 : index + this.vertices.length / 3 ) * 3;
+				return ( index >= 0 ? index - 1 : index + len / 3 ) * 3;
 
 			},
 
-			parseNormalIndex : function( value ) {
+			parseNormalIndex : function( value, len ) {
 
 				var index = parseInt( value, 10 );
-				return ( index >= 0 ? index - 1 : index + this.normals.length / 3 ) * 3;
+				return ( index >= 0 ? index - 1 : index + len / 3 ) * 3;
 
 			},
 
-			parseUVIndex : function( value ) {
+			parseUVIndex : function( value, len ) {
 
 				var index = parseInt( value, 10 );
-				return ( index >= 0 ? index - 1 : index + this.uvs.length / 2 ) * 2;
+				return ( index >= 0 ? index - 1 : index + len / 2 ) * 2;
 
 			},
 
@@ -168,9 +168,11 @@ THREE.OBJLoader.prototype = {
 
 			addFace : function( a, b, c, d, ua, ub, uc, ud, na, nb, nc, nd ) {
 
-				var ia = this.parseVertexIndex( a );
-				var ib = this.parseVertexIndex( b );
-				var ic = this.parseVertexIndex( c );
+				var vLen = this.vertices.length;
+
+				var ia = this.parseVertexIndex( a, vLen );
+				var ib = this.parseVertexIndex( b, vLen );
+				var ic = this.parseVertexIndex( c, vLen );
 				var id;
 
 				if ( d === undefined ) {
@@ -179,7 +181,7 @@ THREE.OBJLoader.prototype = {
 
 				} else {
 
-					id = this.parseVertexIndex( d );
+					id = this.parseVertexIndex( d, vLen );
 
 					this.addVertex( ia, ib, id );
 					this.addVertex( ib, ic, id );
@@ -188,9 +190,11 @@ THREE.OBJLoader.prototype = {
 
 				if ( ua !== undefined ) {
 
-					ia = this.parseUVIndex( ua );
-					ib = this.parseUVIndex( ub );
-					ic = this.parseUVIndex( uc );
+					var uvLen = this.uvs.length;
+
+					ia = this.parseUVIndex( ua, uvLen );
+					ib = this.parseUVIndex( ub, uvLen );
+					ic = this.parseUVIndex( uc, uvLen );
 
 					if ( d === undefined ) {
 
@@ -198,7 +202,7 @@ THREE.OBJLoader.prototype = {
 
 					} else {
 
-						id = this.parseUVIndex( ud );
+						id = this.parseUVIndex( ud, uvLen );
 
 						this.addUV( ia, ib, id );
 						this.addUV( ib, ic, id );
@@ -209,9 +213,19 @@ THREE.OBJLoader.prototype = {
 
 				if ( na !== undefined ) {
 
-					ia = this.parseNormalIndex( na );
-					ib = this.parseNormalIndex( nb );
-					ic = this.parseNormalIndex( nc );
+					// Normals are many times the same. If so, skip function call and parseInt.
+					var nLen = this.normals.length;
+					ia = this.parseNormalIndex( na, nLen );
+
+					if (na === nb)
+						ib = ia;
+					else
+						ib = this.parseNormalIndex( nb, nLen );
+
+					if (na === nc)
+						ic = ia;
+					else
+						ic = this.parseNormalIndex( nc, nLen );
 
 					if ( d === undefined ) {
 
@@ -219,7 +233,7 @@ THREE.OBJLoader.prototype = {
 
 					} else {
 
-						id = this.parseNormalIndex( nd );
+						id = this.parseNormalIndex( nd, nLen );
 
 						this.addNormal( ia, ib, id );
 						this.addNormal( ib, ic, id );
@@ -247,33 +261,35 @@ THREE.OBJLoader.prototype = {
 		}
 
 		var lines = text.split( '\n' );
+		var line = '', lineFirstChar = '', lineSecondChar = '';
+		var lineLength = 0;
+		var result = [];
 
 		// Faster to just trim left side of the line. Use if available.
 		var trimLeft = (typeof ''.trimLeft === 'function');
 
-		for ( var i = 0; i < lines.length; i ++ ) {
+		for ( var i = 0, l = lines.length; i < l; i ++ ) {
 
-			var line = lines[ i ];
+			line = lines[ i ];
 			if (trimLeft)
 				line = line.trimLeft();
 			else
 				line = line.trim();
 
-			var lineLength = line.length;
+			lineLength = line.length;
 			if ( lineLength === 0 ) {
 				continue;
 			}
 
-			var lineFirstChar = line.charAt( 0 );
+			lineFirstChar = line.charAt( 0 );
 			if ( lineFirstChar === '#' ) {
 				// @todo invoke passed in handler if any
 				continue;
 			}
 
-			var result = [];
 			if ( lineFirstChar === 'v' ) {
 
-				var lineSecondChar = line.charAt( 1 );
+				lineSecondChar = line.charAt( 1 );
 
 				if ( lineSecondChar === ' ' && ( result = this.regexp.vertex_pattern.exec( line ) ) !== null ) {
 
