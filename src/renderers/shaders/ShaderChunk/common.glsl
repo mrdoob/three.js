@@ -8,7 +8,9 @@
 #define saturate(a) clamp( a, 0.0, 1.0 )
 #define whiteCompliment(a) ( 1.0 - saturate( a ) )
 
-float square( const in float x ) { return x*x; }
+float pow2( const in float x ) { return x*x; }
+float pow3( const in float x ) { return x*x*x; }
+float pow4( const in float x ) { float x2 = x*x; return x2*x2; }
 float average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }
 
 
@@ -62,33 +64,5 @@ float sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {
 vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {
 
 	return lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;
-
-}
-
-vec3 inputToLinear( in vec3 a ) {
-
-	#ifdef GAMMA_INPUT
-
-		return pow( a, vec3( float( GAMMA_FACTOR ) ) );
-
-	#else
-
-		return a;
-
-	#endif
-
-}
-
-vec3 linearToOutput( in vec3 a ) {
-
-	#ifdef GAMMA_OUTPUT
-
-		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );
-
-	#else
-
-		return a;
-
-	#endif
 
 }

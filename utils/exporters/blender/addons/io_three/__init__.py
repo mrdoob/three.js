@@ -362,6 +362,10 @@ def restore_export_settings(properties, settings):
         constants.PRECISION,
         constants.EXPORT_OPTIONS[constants.PRECISION])
 
+    properties.option_custom_properties = settings.get(
+        constants.CUSTOM_PROPERTIES,
+        constants.EXPORT_OPTIONS[constants.CUSTOM_PROPERTIES])
+
     properties.option_logging = settings.get(
         constants.LOGGING,
         constants.EXPORT_OPTIONS[constants.LOGGING])
@@ -468,6 +472,7 @@ def set_settings(properties):
         constants.SCALE: properties.option_scale,
         constants.ENABLE_PRECISION: properties.option_round_off,
         constants.PRECISION: properties.option_round_value,
+        constants.CUSTOM_PROPERTIES: properties.option_custom_properties,
         constants.LOGGING: properties.option_logging,
         constants.COMPRESSION: properties.option_compression,
         constants.INDENT: properties.option_indent,
@@ -520,8 +525,7 @@ def animation_options():
     """
     anim = [
         (constants.OFF, constants.OFF.title(), constants.OFF),
-        (constants.POSE, constants.POSE.title(), constants.POSE),
-        (constants.REST, constants.REST.title(), constants.REST)
+        (constants.POSE, constants.POSE.title(), constants.POSE)
     ]
 
     return anim
@@ -637,6 +641,11 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Floating point precision",
         default=constants.EXPORT_OPTIONS[constants.PRECISION])
 
+    option_custom_properties = BoolProperty(
+        name="Custom Props",
+        description="Export custom properties as userData",
+        default=False)
+
     logging_types = [
         (constants.DISABLED, constants.DISABLED, constants.DISABLED),
         (constants.DEBUG, constants.DEBUG, constants.DEBUG),
@@ -717,7 +726,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
     option_animation_skeletal = EnumProperty(
         name="",
-        description="Export animation (skeletal)",
+        description="Export animation (skeletal) NOTE: Mesh must be in bind pose",
         items=animation_options(),
         default=constants.OFF)
 
@@ -946,6 +955,13 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_round_off')
         row = layout.row()
         row.prop(self.properties, 'option_round_value')
+
+        layout.row()
+        row = layout.row()
+        row.label(text="Custom Properties")
+
+        row = layout.row()
+        row.prop(self.properties, 'option_custom_properties')
 
         layout.row()
         row = layout.row()

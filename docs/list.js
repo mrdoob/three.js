@@ -45,6 +45,7 @@ var list = {
 
 
 		"Loaders": [
+			[ "AudioLoader", "api/loaders/AudioLoader" ],
 			[ "BabylonLoader", "api/loaders/BabylonLoader" ],
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
@@ -191,23 +192,32 @@ var list = {
 		],
 
 		"Extras / Geometries": [
+			[ "BoxBufferGeometry", "api/extras/geometries/BoxBufferGeometry" ],
 			[ "BoxGeometry", "api/extras/geometries/BoxGeometry" ],
+			[ "CircleBufferGeometry", "api/extras/geometries/CircleBufferGeometry" ],
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
+			[ "CylinderBufferGeometry", "api/extras/geometries/CylinderBufferGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
 			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
 			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
 			[ "IcosahedronGeometry", "api/extras/geometries/IcosahedronGeometry" ],
+			[ "LatheBufferGeometry", "api/extras/geometries/LatheBufferGeometry" ],
 			[ "LatheGeometry", "api/extras/geometries/LatheGeometry" ],
 			[ "OctahedronGeometry", "api/extras/geometries/OctahedronGeometry" ],
 			[ "ParametricGeometry", "api/extras/geometries/ParametricGeometry" ],
+			[ "PlaneBufferGeometry", "api/extras/geometries/PlaneBufferGeometry" ],
 			[ "PlaneGeometry", "api/extras/geometries/PlaneGeometry" ],
 			[ "PolyhedronGeometry", "api/extras/geometries/PolyhedronGeometry" ],
+			[ "RingBufferGeometry", "api/extras/geometries/RingBufferGeometry" ],
 			[ "RingGeometry", "api/extras/geometries/RingGeometry" ],
 			[ "ShapeGeometry", "api/extras/geometries/ShapeGeometry" ],
+			[ "SphereBufferGeometry", "api/extras/geometries/SphereBufferGeometry" ],
 			[ "SphereGeometry", "api/extras/geometries/SphereGeometry" ],
 			[ "TetrahedronGeometry", "api/extras/geometries/TetrahedronGeometry" ],
 			[ "TextGeometry", "api/extras/geometries/TextGeometry" ],
+			[ "TorusBufferGeometry", "api/extras/geometries/TorusBufferGeometry" ],
 			[ "TorusGeometry", "api/extras/geometries/TorusGeometry" ],
+			[ "TorusKnotBufferGeometry", "api/extras/geometries/TorusKnotBufferGeometry" ],
 			[ "TorusKnotGeometry", "api/extras/geometries/TorusKnotGeometry" ],
 			[ "TubeGeometry", "api/extras/geometries/TubeGeometry" ]
 		],

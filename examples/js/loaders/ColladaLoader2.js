@@ -420,7 +420,87 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'texture':
-						data[ child.nodeName ] = child.getAttribute( 'texture' );
+						data[ child.nodeName ] = { id: child.getAttribute( 'texture' ), extra: parseEffectParameterTexture( child ) };
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseEffectParameterTexture( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'extra':
+						data = parseEffectParameterTextureExtra( child );
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseEffectParameterTextureExtra( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'technique':
+						data[ child.nodeName ] = parseEffectParameterTextureExtraTechnique( child );
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseEffectParameterTextureExtraTechnique( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'repeatU':
+					case 'repeatV':
+					case 'offsetU':
+					case 'offsetV':
+						data[ child.nodeName ] = parseFloat( child.textContent );
+						break;
+
+					case 'wrapU':
+					case 'wrapV':
+						data[ child.nodeName ] = parseInt( child.textContent );
 						break;
 
 				}
@@ -497,24 +577,37 @@ THREE.ColladaLoader.prototype = {
 
 			material.name = data.name;
 
-			function getTexture( sid ) {
+			function getTexture( textureObject ) {
 
-				var sampler = effect.profile.samplers[ sid ];
+				var sampler = effect.profile.samplers[ textureObject.id ];
 
 				if ( sampler !== undefined ) {
 
 					var surface = effect.profile.surfaces[ sampler.source ];
 
 					var texture = new THREE.Texture( getImage( surface.init_from ) );
-					texture.wrapS = THREE.RepeatWrapping;
-					texture.wrapT = THREE.RepeatWrapping;
+
+					var extra = textureObject.extra;
+
+					if ( extra !== undefined && extra.technique !== undefined ) {
+
+						var technique = extra.technique;
+
+						texture.wrapS = technique.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+						texture.wrapT = technique.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+
+						texture.offset.set( technique.offsetU, technique.offsetV );
+						texture.repeat.set( technique.repeatU, technique.repeatV );
+
+					}
+
 					texture.needsUpdate = true;
 
 					return texture;
 
 				}
 
-				console.error( 'ColladaLoder: Undefined sampler', sid );
+				console.error( 'ColladaLoder: Undefined sampler', textureObject.id );
 
 				return null;
 

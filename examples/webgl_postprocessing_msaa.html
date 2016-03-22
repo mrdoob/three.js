@@ -35,7 +35,7 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
@@ -164,6 +164,8 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				for ( var i = 0; i < scene.children.length; i ++ ) {
 
 					var child = scene.children[ i ];
@@ -174,8 +176,7 @@
 				}
 
 				composer.render();
-
-				stats.update();
+				stats.end();
 
 			}
 
