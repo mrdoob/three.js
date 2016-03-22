@@ -15,14 +15,14 @@ THREE.OBJLoader = function ( manager ) {
 		normal_pattern           : /^vn\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
 		// vt float float
 		uv_pattern               : /^vt\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
-		// f vertex vertex vertex ...
-		face_pattern1            : /^f\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)(?:\s+(-?\d+))?/,
-		// f vertex/uv vertex/uv vertex/uv ...
-		face_pattern2            : /^f\s+((-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+))(?:\s+((-?\d+)\/(-?\d+)))?/,
-		// f vertex/uv/normal vertex/uv/normal vertex/uv/normal ...
-		face_pattern3            : /^f\s+((-?\d+)\/(-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+)\/(-?\d+))(?:\s+((-?\d+)\/(-?\d+)\/(-?\d+)))?/,
-		// f vertex//normal vertex//normal vertex//normal ...
-		face_pattern4            : /^f\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))(?:\s+((-?\d+)\/\/(-?\d+)))?/,
+		// f vertex vertex vertex
+		face_vertex              : /^f\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)(?:\s+(-?\d+))?/,
+		// f vertex/uv vertex/uv vertex/uv
+		face_vertex_uv           : /^f\s+((-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+))(?:\s+((-?\d+)\/(-?\d+)))?/,
+		// f vertex/uv/normal vertex/uv/normal vertex/uv/normal
+		face_vertex_uv_normal    : /^f\s+((-?\d+)\/(-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+)\/(-?\d+))(?:\s+((-?\d+)\/(-?\d+)\/(-?\d+)))?/,
+		// f vertex//normal vertex//normal vertex//normal
+		face_vertex_normal       : /^f\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))(?:\s+((-?\d+)\/\/(-?\d+)))?/,
 		// o object_name | g group_name
 		object_pattern           : /^[og]\s*(.+)?/,
 		// s boolean
@@ -65,161 +65,181 @@ THREE.OBJLoader.prototype = {
 
 	},
 
+	_createParserState : function()
+	{
+		var state = {
+			objects  : [],
+			object   : {},
+
+			vertices : [],
+			normals  : [],
+			uvs      : [],
+
+			materialLibraries : [],
+
+			startObject : function(name, fromDeclaration)
+			{
+				// If the current object (initial from reset) is not from a g/o declaration in the parsed
+				// file. We need to use it for the first parsed g/o to keep things in sync.
+				if ( this.object && this.object.fromDeclaration === false ) {
+					this.object.name = name;
+					this.object.fromDeclaration = (fromDeclaration !== false);
+					return;
+				}
+
+				this.object = {
+					name : name || "",
+					geometry : {
+						vertices : [],
+						normals  : [],
+						uvs      : []
+					},
+					material : {
+						name   : "",
+						smooth : true
+					},
+					fromDeclaration : (fromDeclaration !== false)
+				};
+				this.objects.push(this.object);
+			},
+
+			parseVertexIndex : function( value ) {
+
+				var index = parseInt( value, 10 );
+				return ( index >= 0 ? index - 1 : index + this.vertices.length / 3 ) * 3;
+
+			},
+
+			parseNormalIndex : function( value ) {
+
+				var index = parseInt( value, 10 );
+				return ( index >= 0 ? index - 1 : index + this.normals.length / 3 ) * 3;
+
+			},
+
+			parseUVIndex : function( value ) {
+
+				var index = parseInt( value, 10 );
+				return ( index >= 0 ? index - 1 : index + this.uvs.length / 2 ) * 2;
+
+			},
+
+			addVertex : function( a, b, c ) {
+
+				var src = this.vertices;
+				this.object.geometry.vertices.push(src[ a ]);
+				this.object.geometry.vertices.push(src[ a + 1 ]);
+				this.object.geometry.vertices.push(src[ a + 2 ]);
+				this.object.geometry.vertices.push(src[ b ]);
+				this.object.geometry.vertices.push(src[ b + 1 ]);
+				this.object.geometry.vertices.push(src[ b + 2 ]);
+				this.object.geometry.vertices.push(src[ c ]);
+				this.object.geometry.vertices.push(src[ c + 1 ]);
+				this.object.geometry.vertices.push(src[ c + 2 ]);
+
+			},
+
+			addNormal : function( a, b, c ) {
+
+				var src = this.normals;
+				this.object.geometry.normals.push(src[ a ]);
+				this.object.geometry.normals.push(src[ a + 1 ]);
+				this.object.geometry.normals.push(src[ a + 2 ]);
+				this.object.geometry.normals.push(src[ b ]);
+				this.object.geometry.normals.push(src[ b + 1 ]);
+				this.object.geometry.normals.push(src[ b + 2 ]);
+				this.object.geometry.normals.push(src[ c ]);
+				this.object.geometry.normals.push(src[ c + 1 ]);
+				this.object.geometry.normals.push(src[ c + 2 ]);
+
+			},
+
+			addUV : function( a, b, c ) {
+
+				var src = this.uvs;
+				this.object.geometry.uvs.push(src[ a ]);
+				this.object.geometry.uvs.push(src[ a + 1 ]);
+				this.object.geometry.uvs.push(src[ b ]);
+				this.object.geometry.uvs.push(src[ b + 1 ]);
+				this.object.geometry.uvs.push(src[ c ]);
+				this.object.geometry.uvs.push(src[ c + 1 ]);
+
+			},
+
+			addFace : function( a, b, c, d, ua, ub, uc, ud, na, nb, nc, nd ) {
+
+				var ia = this.parseVertexIndex( a );
+				var ib = this.parseVertexIndex( b );
+				var ic = this.parseVertexIndex( c );
+				var id;
+
+				if ( d === undefined ) {
+
+					this.addVertex( ia, ib, ic );
+
+				} else {
+
+					id = this.parseVertexIndex( d );
+
+					this.addVertex( ia, ib, id );
+					this.addVertex( ib, ic, id );
+
+				}
+
+				if ( ua !== undefined ) {
+
+					ia = this.parseUVIndex( ua );
+					ib = this.parseUVIndex( ub );
+					ic = this.parseUVIndex( uc );
+
+					if ( d === undefined ) {
+
+						this.addUV( ia, ib, ic );
+
+					} else {
+
+						id = this.parseUVIndex( ud );
+
+						this.addUV( ia, ib, id );
+						this.addUV( ib, ic, id );
+
+					}
+
+				}
+
+				if ( na !== undefined ) {
+
+					ia = this.parseNormalIndex( na );
+					ib = this.parseNormalIndex( nb );
+					ic = this.parseNormalIndex( nc );
+
+					if ( d === undefined ) {
+
+						this.addNormal( ia, ib, ic );
+
+					} else {
+
+						id = this.parseNormalIndex( nd );
+
+						this.addNormal( ia, ib, id );
+						this.addNormal( ib, ic, id );
+
+					}
+
+				}
+
+			}
+		};
+
+		state.startObject("", false);
+		return state;
+	},
+
 	parse: function ( text ) {
 
 		console.time( 'OBJLoader' );
 
-		var objects = [];
-		var object;
-		var foundObjects = false;
-		var vertices = [];
-		var normals = [];
-		var uvs = [];
-
-		function addObject( name ) {
-
-			var geometry = {
-				vertices: [],
-				normals: [],
-				uvs: []
-			};
-
-			var material = {
-				name: '',
-				smooth: true
-			};
-
-			object = {
-				name: name,
-				geometry: geometry,
-				material: material
-			};
-
-			objects.push( object );
-
-		}
-
-		function parseVertexIndex( value ) {
-
-			var index = parseInt( value );
-
-			return ( index >= 0 ? index - 1 : index + vertices.length / 3 ) * 3;
-
-		}
-
-		function parseNormalIndex( value ) {
-
-			var index = parseInt( value );
-
-			return ( index >= 0 ? index - 1 : index + normals.length / 3 ) * 3;
-
-		}
-
-		function parseUVIndex( value ) {
-
-			var index = parseInt( value );
-
-			return ( index >= 0 ? index - 1 : index + uvs.length / 2 ) * 2;
-
-		}
-
-		function addVertex( a, b, c ) {
-
-			object.geometry.vertices.push(
-				vertices[ a ], vertices[ a + 1 ], vertices[ a + 2 ],
-				vertices[ b ], vertices[ b + 1 ], vertices[ b + 2 ],
-				vertices[ c ], vertices[ c + 1 ], vertices[ c + 2 ]
-			);
-
-		}
-
-		function addNormal( a, b, c ) {
-
-			object.geometry.normals.push(
-				normals[ a ], normals[ a + 1 ], normals[ a + 2 ],
-				normals[ b ], normals[ b + 1 ], normals[ b + 2 ],
-				normals[ c ], normals[ c + 1 ], normals[ c + 2 ]
-			);
-
-		}
-
-		function addUV( a, b, c ) {
-
-			object.geometry.uvs.push(
-				uvs[ a ], uvs[ a + 1 ],
-				uvs[ b ], uvs[ b + 1 ],
-				uvs[ c ], uvs[ c + 1 ]
-			);
-
-		}
-
-		function addFace( a, b, c, d,  ua, ub, uc, ud, na, nb, nc, nd ) {
-
-			var ia = parseVertexIndex( a );
-			var ib = parseVertexIndex( b );
-			var ic = parseVertexIndex( c );
-			var id;
-
-			if ( d === undefined ) {
-
-				addVertex( ia, ib, ic );
-
-			} else {
-
-				id = parseVertexIndex( d );
-
-				addVertex( ia, ib, id );
-				addVertex( ib, ic, id );
-
-			}
-
-			if ( ua !== undefined ) {
-
-				ia = parseUVIndex( ua );
-				ib = parseUVIndex( ub );
-				ic = parseUVIndex( uc );
-
-				if ( d === undefined ) {
-
-					addUV( ia, ib, ic );
-
-				} else {
-
-					id = parseUVIndex( ud );
-
-					addUV( ia, ib, id );
-					addUV( ib, ic, id );
-
-				}
-
-			}
-
-			if ( na !== undefined ) {
-
-				ia = parseNormalIndex( na );
-				ib = parseNormalIndex( nb );
-				ic = parseNormalIndex( nc );
-
-				if ( d === undefined ) {
-
-					addNormal( ia, ib, ic );
-
-				} else {
-
-					id = parseNormalIndex( nd );
-
-					addNormal( ia, ib, id );
-					addNormal( ib, ic, id );
-
-				}
-
-			}
-
-		}
-
-		addObject( '' );
-
-		//
+		var state = this._createParserState();
 
 		if ( text.indexOf('\r\n') !== -1 ) {
 			// This is faster than String.split with regex that splits on both
@@ -228,9 +248,17 @@ THREE.OBJLoader.prototype = {
 
 		var lines = text.split( '\n' );
 
+		// Faster to just trim left side of the line. Use if available.
+		var trimLeft = (typeof "".trimLeft === "function");
+
 		for ( var i = 0; i < lines.length; i ++ ) {
 
-			var line = lines[ i ].trim();
+			var line = lines[ i ];
+			if (trimLeft)
+				line = line.trimLeft();
+			else
+				line = line.trim();
+
 			if ( line.length === 0 ) {
 				continue;
 			}
@@ -240,15 +268,17 @@ THREE.OBJLoader.prototype = {
 				// @todo invoke passed in handler if any
 				continue;
 			}
-			var lineSecondChar = line.charAt( 1 );
 
 			var result = [];
 			if ( lineFirstChar === "v" ) {
+
+				var lineSecondChar = line.charAt( 1 );
+
 				if ( lineSecondChar === " " && ( result = this.regexp.vertex_pattern.exec( line ) ) !== null ) {
 
 					// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
-					vertices.push(
+					state.vertices.push(
 						parseFloat( result[ 1 ] ),
 						parseFloat( result[ 2 ] ),
 						parseFloat( result[ 3 ] )
@@ -258,7 +288,7 @@ THREE.OBJLoader.prototype = {
 
 					// ["vn 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
-					normals.push(
+					state.normals.push(
 						parseFloat( result[ 1 ] ),
 						parseFloat( result[ 2 ] ),
 						parseFloat( result[ 3 ] )
@@ -268,7 +298,7 @@ THREE.OBJLoader.prototype = {
 
 					// ["vt 0.1 0.2", "0.1", "0.2"]
 
-					uvs.push(
+					state.uvs.push(
 						parseFloat( result[ 1 ] ),
 						parseFloat( result[ 2 ] )
 					);
@@ -276,44 +306,49 @@ THREE.OBJLoader.prototype = {
 				}
 			} else if ( lineFirstChar === "f" ) {
 
-				if ( ( result = this.regexp.face_pattern1.exec( line ) ) !== null ) {
+				if ( ( result = this.regexp.face_vertex_uv_normal.exec( line ) ) !== null ) {
 
-					// ["f 1 2 3", "1", "2", "3", undefined]
-
-					addFace(
-						result[ 1 ], result[ 2 ], result[ 3 ], result[ 4 ]
-					);
-
-				} else if ( ( result = this.regexp.face_pattern2.exec( line ) ) !== null ) {
-
-					// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
-
-					addFace(
-						result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
-						result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
-					);
-
-				} else if ( ( result = this.regexp.face_pattern3.exec( line ) ) !== null ) {
-
+					// f vertex/uv/normal vertex/uv/normal vertex/uv/normal
 					// ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
 
-					addFace(
+					state.addFace(
 						result[ 2 ], result[ 6 ], result[ 10 ], result[ 14 ],
 						result[ 3 ], result[ 7 ], result[ 11 ], result[ 15 ],
 						result[ 4 ], result[ 8 ], result[ 12 ], result[ 16 ]
 					);
 
-				} else if ( ( result = this.regexp.face_pattern4.exec( line ) ) !== null ) {
+				} else if ( ( result = this.regexp.face_vertex_uv.exec( line ) ) !== null ) {
 
+					// f vertex/uv vertex/uv vertex/uv
+					// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
+
+					state.addFace(
+						result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
+						result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
+					);
+
+				} else if ( ( result = this.regexp.face_vertex_normal.exec( line ) ) !== null ) {
+
+					// f vertex//normal vertex//normal vertex//normal
 					// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
 
-					addFace(
+					state.addFace(
 						result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
 						undefined, undefined, undefined, undefined,
 						result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
 					);
 
+				} else if ( ( result = this.regexp.face_vertex.exec( line ) ) !== null ) {
+
+					// f vertex vertex vertex
+					// ["f 1 2 3", "1", "2", "3", undefined]
+
+					state.addFace(
+						result[ 1 ], result[ 2 ], result[ 3 ], result[ 4 ]
+					);
+
 				}
+
 			} else if ( ( result = this.regexp.object_pattern.exec( line ) ) !== null ) {
 
 				// o object_name
@@ -321,33 +356,26 @@ THREE.OBJLoader.prototype = {
 				// g group_name
 
 				var name = result[ 0 ].substr( 1 ).trim();
-
-				if ( foundObjects === false ) {
-
-					foundObjects = true;
-					object.name = name;
-
-				} else {
-
-					addObject( name );
-
-				}
+				state.startObject(name);
 
 			} else if ( this.regexp.material_use_pattern.test( line ) ) {
 
 				// material
 
-				object.material.name = line.substring( 7 ).trim();
+				state.object.material.name = line.substring( 7 ).trim();
 
 			} else if ( this.regexp.material_library_pattern.test( line ) ) {
 
 				// mtl file
 
+				state.materialLibraries.push( line.substring( 7 ).trim() );
+
 			} else if ( ( result = this.regexp.smoothing_pattern.exec( line ) ) !== null ) {
 
 				// smooth shading
 
-				object.material.smooth = result[ 1 ] === "1" || result[ 1 ] === "on";
+				var value = result[ 1 ].trim().toLowerCase();
+				state.object.material.smooth = ( value === "1" || value === "on" );
 
 			} else {
 
@@ -358,10 +386,11 @@ THREE.OBJLoader.prototype = {
 		}
 
 		var container = new THREE.Group();
+		container.materialLibraries = [].concat(state.materialLibraries);
 
-		for ( var i = 0, l = objects.length; i < l; i ++ ) {
+		for ( var i = 0, l = state.objects.length; i < l; i ++ ) {
 
-			object = objects[ i ];
+			var object = state.objects[ i ];
 			var geometry = object.geometry;
 
 			var buffergeometry = new THREE.BufferGeometry();
