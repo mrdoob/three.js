@@ -262,6 +262,7 @@ var files = {
 		"misc_controls_pointerlock",
 		"misc_controls_trackball",
 		"misc_controls_transform",
+		"misc_events_bubbling",
 		"misc_fps",
 		"misc_lights_test",
 		"misc_lookat",

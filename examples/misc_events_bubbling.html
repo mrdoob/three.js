@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js misc - events / bubbling</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+				text-align:center;
+			}
+			#prefs {
+				position: absolute;
+				top: 50px;
+				width: 100%;
+				padding: 5px;
+				text-align:center;
+			}
+			#clickinfo {
+				position: absolute;
+				bottom: 0px;
+				width: 100%;
+				padding: 5px;
+				text-align:center;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="debug" style="position:absolute; left:100px"></canvas>
+
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - events / bubbling</div>
+
+		<div id="prefs"><label for="check_bubbling">bubbling enabled</label>: <input type="checkbox" name="check_bubbling" id="check_bubbling" value="1" checked /></div>
+		<div id="clickinfo">click inside any square to inspect target / currentTarget</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var group, text, plane;
+
+			var mouseXOnMouseDown = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var raycaster = new THREE.Raycaster();
+			var mouse = new THREE.Vector2();
+
+			var bubblingCheckbox = document.getElementById('check_bubbling');
+			var clickInfoElement = document.getElementById('clickinfo');
+			var clickInfoDefaultText = clickInfoElement.innerHTML;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 0, 100 );
+
+				scene = new THREE.Scene();
+
+
+				function createPlane ( size, color, label ) {
+
+					var geometry = new THREE.PlaneGeometry( size, size );
+					var material = new THREE.MeshBasicMaterial( {color: color, side: THREE.DoubleSide} );
+					var plane = new THREE.Mesh( geometry, material );
+
+					plane.userData.label = label;
+
+					plane.addEventListener( 'click', function ( event ) {
+
+							// event.stopPropagation();
+
+							var clickInfo = "target: " + event.target.userData.label + " / " + "currentTarget: " + event.currentTarget.userData.label + "<br />";
+							clickInfoElement.innerHTML = clickInfoElement.innerHTML + clickInfo;
+
+					} );
+
+					plane.position.z = 10;
+
+					return plane
+
+				}
+
+				// build object tree
+				var root = createPlane(50, 0x000000, 'black');
+				scene.add( root );
+
+				var child1 = createPlane(35, 0x00ff00, 'green');
+				root.add(child1);
+
+				var child2 = createPlane(21, 0x0000ff, 'blue');
+				child1.add(child2);
+
+				var child3 = createPlane(10, 0xff0000, 'red');
+				child2.add(child3);
+
+				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortElements = false;
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				document.addEventListener( 'click', onDocumentClick, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function onDocumentClick( event ) {
+
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+				raycaster.setFromCamera( mouse, camera );
+
+				var intersection = raycaster.intersectObject( scene, true );
+
+				if ( intersection.length > 0 ) {
+
+					clickInfoElement.innerHTML = "";
+					intersection[0].object.dispatchEvent({ type: "click", bubbles: bubblingCheckbox.checked });
+
+				} else {
+
+					clickInfoElement.innerHTML = clickInfoDefaultText;
+
+				}
+
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
