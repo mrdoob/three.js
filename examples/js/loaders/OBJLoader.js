@@ -88,14 +88,14 @@ THREE.OBJLoader.prototype = {
 				}
 
 				this.object = {
-					name : name || "",
+					name : name || '',
 					geometry : {
 						vertices : [],
 						normals  : [],
 						uvs      : []
 					},
 					material : {
-						name   : "",
+						name   : '',
 						smooth : true
 					},
 					fromDeclaration : (fromDeclaration !== false)
@@ -231,7 +231,7 @@ THREE.OBJLoader.prototype = {
 			}
 		};
 
-		state.startObject("", false);
+		state.startObject('', false);
 		return state;
 	},
 
@@ -249,7 +249,7 @@ THREE.OBJLoader.prototype = {
 		var lines = text.split( '\n' );
 
 		// Faster to just trim left side of the line. Use if available.
-		var trimLeft = (typeof "".trimLeft === "function");
+		var trimLeft = (typeof ''.trimLeft === 'function');
 
 		for ( var i = 0; i < lines.length; i ++ ) {
 
@@ -271,11 +271,11 @@ THREE.OBJLoader.prototype = {
 			}
 
 			var result = [];
-			if ( lineFirstChar === "v" ) {
+			if ( lineFirstChar === 'v' ) {
 
 				var lineSecondChar = line.charAt( 1 );
 
-				if ( lineSecondChar === " " && ( result = this.regexp.vertex_pattern.exec( line ) ) !== null ) {
+				if ( lineSecondChar === ' ' && ( result = this.regexp.vertex_pattern.exec( line ) ) !== null ) {
 
 					// 0                  1      2      3
 					// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
@@ -286,7 +286,7 @@ THREE.OBJLoader.prototype = {
 						parseFloat( result[ 3 ] )
 					);
 
-				} else if ( lineSecondChar === "n" && ( result = this.regexp.normal_pattern.exec( line ) ) !== null ) {
+				} else if ( lineSecondChar === 'n' && ( result = this.regexp.normal_pattern.exec( line ) ) !== null ) {
 
 					// 0                   1      2      3
 					// ["vn 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
@@ -297,7 +297,7 @@ THREE.OBJLoader.prototype = {
 						parseFloat( result[ 3 ] )
 					);
 
-				} else if ( lineSecondChar === "t" && ( result = this.regexp.uv_pattern.exec( line ) ) !== null ) {
+				} else if ( lineSecondChar === 't' && ( result = this.regexp.uv_pattern.exec( line ) ) !== null ) {
 
 					// 0               1      2
 					// ["vt 0.1 0.2", "0.1", "0.2"]
@@ -392,7 +392,7 @@ THREE.OBJLoader.prototype = {
 				// smooth shading
 
 				var value = result[ 1 ].trim().toLowerCase();
-				state.object.material.smooth = ( value === "1" || value === "on" );
+				state.object.material.smooth = ( value === '1' || value === 'on' );
 
 			} else {
 
