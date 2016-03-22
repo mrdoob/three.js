@@ -211,9 +211,9 @@ function SimulationRenderer( WIDTH, renderer ) {
 
 	function generateVelocityTexture() {
 
-		var a = new Float32Array( PARTICLES * 3 );
+		var a = new Float32Array( PARTICLES * 4 );
 
-		for ( var k = 0, kl = a.length; k < kl; k += 3 ) {
+		for ( var k = 0, kl = a.length; k < kl; k += 4 ) {
 
 			var x = Math.random() - 0.5;
 			var y = Math.random() - 0.5;
@@ -222,10 +222,11 @@ function SimulationRenderer( WIDTH, renderer ) {
 			a[ k + 0 ] = x * 10;
 			a[ k + 1 ] = y * 10;
 			a[ k + 2 ] = z * 10;
+			a[ k + 3 ] = 1;
 
 		}
 
-		var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBFormat, THREE.FloatType );
+		var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBAFormat, THREE.FloatType );
 		texture.needsUpdate = true;
 
 		return texture;
