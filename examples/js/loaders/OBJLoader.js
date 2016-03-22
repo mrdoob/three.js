@@ -487,6 +487,10 @@ THREE.OBJLoader.prototype = {
 			var geometry = object.geometry;
 			var isLine = (geometry.type === 'Line');
 
+			// Skip o/g line declarations that did not follow with any faces
+			if ( geometry.vertices.length === 0 )
+				continue;
+
 			var buffergeometry = new THREE.BufferGeometry();
 
 			buffergeometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( geometry.vertices ), 3 ) );
