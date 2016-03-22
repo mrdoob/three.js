@@ -139,6 +139,16 @@ THREE.OBJLoader.prototype = {
 
 			},
 
+			addVertexLine : function( a )
+			{
+
+				var src = this.vertices;
+				this.object.geometry.vertices.push(src[ a ]);
+				this.object.geometry.vertices.push(src[ a + 1 ]);
+				this.object.geometry.vertices.push(src[ a + 2 ]);
+
+			},
+
 			addNormal : function( a, b, c ) {
 
 				var src = this.normals;
@@ -163,6 +173,14 @@ THREE.OBJLoader.prototype = {
 				this.object.geometry.uvs.push(src[ b + 1 ]);
 				this.object.geometry.uvs.push(src[ c ]);
 				this.object.geometry.uvs.push(src[ c + 1 ]);
+
+			},
+
+			addUVLine : function( a ) {
+
+				var src = this.uvs;
+				this.object.geometry.uvs.push(src[ a ]);
+				this.object.geometry.uvs.push(src[ a + 1 ]);
 
 			},
 
@@ -240,6 +258,22 @@ THREE.OBJLoader.prototype = {
 
 					}
 
+				}
+
+			},
+
+			addLineGeometry : function(vertexes, uvs)
+			{
+				this.object.geometry.type = 'Line';
+
+				var vLen = this.vertices.length;
+				var uvLen = this.uvs.length;
+
+				for (var vi = 0, l = vertexes.length; vi < l; vi++) {
+					this.addVertexLine( this.parseVertexIndex( vertexes[vi], vLen ) );
+				}
+				for (var uvi = 0, l = uvs.length; uvi < l; uvi++) {
+					this.addUVLine( this.parseUVIndex( uvs[uvi], uvLen ) );
 				}
 
 			}
@@ -382,6 +416,28 @@ THREE.OBJLoader.prototype = {
 
 				}
 
+			} else if ( lineFirstChar === "l" ) {
+
+				var lineParts = line.substring(1).trim().split(" ");
+				var lineVertexes = [], lineUVs = [];
+
+				if (line.indexOf("/") === -1) {
+
+					lineVertexes = lineParts;
+
+				} else {
+					for (var li = 0, llen = lineParts.length; li < llen; li++) {
+
+						var parts = lineParts[li].split("/");
+						if (parts[0] !== "")
+							lineVertexes.push(parts[0]);
+						if (parts[1] !== "")
+							lineUVs.push(parts[1])
+
+					}
+				}
+				state.addLineGeometry(lineVertexes, lineUVs);
+
 			} else if ( ( result = this.regexp.object_pattern.exec( line ) ) !== null ) {
 
 				// o object_name
@@ -429,6 +485,7 @@ THREE.OBJLoader.prototype = {
 
 			var object = state.objects[ i ];
 			var geometry = object.geometry;
+			var isLine = (geometry.type === 'Line');
 
 			var buffergeometry = new THREE.BufferGeometry();
 
@@ -456,18 +513,27 @@ THREE.OBJLoader.prototype = {
 
 				material = this.materials.create( object.material.name );
 
+				// mtl etc. loaders probably can't create line materials correctly, copy properties to a line material.
+				if (isLine && material && !(material instanceof THREE.LineBasicMaterial)) {
+
+					var materialLine = new THREE.LineBasicMaterial();
+					materialLine.copy(material);
+					material = materialLine;
+
+				}
+
 			}
 
 			if ( !material ) {
 
-				material = new THREE.MeshPhongMaterial();
+				material = ( !isLine ? new THREE.MeshPhongMaterial() : new THREE.LineBasicMaterial() );
 				material.name = object.material.name;
 
 			}
 
 			material.shading = object.material.smooth ? THREE.SmoothShading : THREE.FlatShading;
 
-			var mesh = new THREE.Mesh( buffergeometry, material );
+			var mesh = ( !isLine ? new THREE.Mesh( buffergeometry, material ) : new THREE.Line( buffergeometry, material ) );
 			mesh.name = object.name;
 
 			container.add( mesh );
