@@ -8,6 +8,31 @@ THREE.OBJLoader = function ( manager ) {
 
 	this.materials = null;
 
+	this.regexp = {
+		// v float float float
+		vertex_pattern           : /^v\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+		// vn float float float
+		normal_pattern           : /^vn\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+		// vt float float
+		uv_pattern               : /^vt\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+		// f vertex vertex vertex ...
+		face_pattern1            : /^f\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)(?:\s+(-?\d+))?/,
+		// f vertex/uv vertex/uv vertex/uv ...
+		face_pattern2            : /^f\s+((-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+))(?:\s+((-?\d+)\/(-?\d+)))?/,
+		// f vertex/uv/normal vertex/uv/normal vertex/uv/normal ...
+		face_pattern3            : /^f\s+((-?\d+)\/(-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+)\/(-?\d+))(?:\s+((-?\d+)\/(-?\d+)\/(-?\d+)))?/,
+		// f vertex//normal vertex//normal vertex//normal ...
+		face_pattern4            : /^f\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))(?:\s+((-?\d+)\/\/(-?\d+)))?/,
+		// o object_name | g group_name
+		object_pattern           : /^[og]\s*(.+)?/,
+		// s boolean
+		smoothing_pattern        : /^s\s+(\d+|on|off)/,
+		// mtllib file_reference
+		material_library_pattern : /^mtllib /,
+		// usemtl material_name
+		material_use_pattern     : /^usemtl /
+	};
+
 };
 
 THREE.OBJLoader.prototype = {
@@ -194,113 +219,102 @@ THREE.OBJLoader.prototype = {
 
 		addObject( '' );
 
-		// v float float float
-		var vertex_pattern = /^v\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/;
-
-		// vn float float float
-		var normal_pattern = /^vn\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/;
-
-		// vt float float
-		var uv_pattern = /^vt\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/;
-
-		// f vertex vertex vertex ...
-		var face_pattern1 = /^f\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)(?:\s+(-?\d+))?/;
-
-		// f vertex/uv vertex/uv vertex/uv ...
-		var face_pattern2 = /^f\s+((-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+))(?:\s+((-?\d+)\/(-?\d+)))?/;
-
-		// f vertex/uv/normal vertex/uv/normal vertex/uv/normal ...
-		var face_pattern3 = /^f\s+((-?\d+)\/(-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+)\/(-?\d+))(?:\s+((-?\d+)\/(-?\d+)\/(-?\d+)))?/;
-
-		// f vertex//normal vertex//normal vertex//normal ...
-		var face_pattern4 = /^f\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))(?:\s+((-?\d+)\/\/(-?\d+)))?/;
-
-		var object_pattern = /^[og]\s*(.+)?/;
-
-		var smoothing_pattern = /^s\s+(\d+|on|off)/;
-
 		//
+
+		if ( text.indexOf('\r\n') !== -1 ) {
+			// This is faster than String.split with regex that splits on both
+			text = text.replace('\r\n', '\n');
+		}
 
 		var lines = text.split( '\n' );
 
 		for ( var i = 0; i < lines.length; i ++ ) {
 
-			var line = lines[ i ];
-			line = line.trim();
-
-			var result;
-
-			if ( line.length === 0 || line.charAt( 0 ) === '#' ) {
-
+			var line = lines[ i ].trim();
+			if ( line.length === 0 ) {
 				continue;
+			}
 
-			} else if ( ( result = vertex_pattern.exec( line ) ) !== null ) {
+			var lineFirstChar = line.charAt( 0 );
+			if ( lineFirstChar === '#' ) {
+				// @todo invoke passed in handler if any
+				continue;
+			}
+			var lineSecondChar = line.charAt( 1 );
 
-				// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
+			var result = [];
+			if ( lineFirstChar === "v" ) {
+				if ( lineSecondChar === " " && ( result = this.regexp.vertex_pattern.exec( line ) ) !== null ) {
 
-				vertices.push(
-					parseFloat( result[ 1 ] ),
-					parseFloat( result[ 2 ] ),
-					parseFloat( result[ 3 ] )
-				);
+					// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
-			} else if ( ( result = normal_pattern.exec( line ) ) !== null ) {
+					vertices.push(
+						parseFloat( result[ 1 ] ),
+						parseFloat( result[ 2 ] ),
+						parseFloat( result[ 3 ] )
+					);
 
-				// ["vn 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
+				} else if ( lineSecondChar === "n" && ( result = this.regexp.normal_pattern.exec( line ) ) !== null ) {
 
-				normals.push(
-					parseFloat( result[ 1 ] ),
-					parseFloat( result[ 2 ] ),
-					parseFloat( result[ 3 ] )
-				);
+					// ["vn 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
-			} else if ( ( result = uv_pattern.exec( line ) ) !== null ) {
+					normals.push(
+						parseFloat( result[ 1 ] ),
+						parseFloat( result[ 2 ] ),
+						parseFloat( result[ 3 ] )
+					);
 
-				// ["vt 0.1 0.2", "0.1", "0.2"]
+				} else if ( lineSecondChar === "t" && ( result = this.regexp.uv_pattern.exec( line ) ) !== null ) {
 
-				uvs.push(
-					parseFloat( result[ 1 ] ),
-					parseFloat( result[ 2 ] )
-				);
+					// ["vt 0.1 0.2", "0.1", "0.2"]
 
-			} else if ( ( result = face_pattern1.exec( line ) ) !== null ) {
+					uvs.push(
+						parseFloat( result[ 1 ] ),
+						parseFloat( result[ 2 ] )
+					);
 
-				// ["f 1 2 3", "1", "2", "3", undefined]
+				}
+			} else if ( lineFirstChar === "f" ) {
 
-				addFace(
-					result[ 1 ], result[ 2 ], result[ 3 ], result[ 4 ]
-				);
+				if ( ( result = this.regexp.face_pattern1.exec( line ) ) !== null ) {
 
-			} else if ( ( result = face_pattern2.exec( line ) ) !== null ) {
+					// ["f 1 2 3", "1", "2", "3", undefined]
 
-				// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
+					addFace(
+						result[ 1 ], result[ 2 ], result[ 3 ], result[ 4 ]
+					);
 
-				addFace(
-					result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
-					result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
-				);
+				} else if ( ( result = this.regexp.face_pattern2.exec( line ) ) !== null ) {
 
-			} else if ( ( result = face_pattern3.exec( line ) ) !== null ) {
+					// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
 
-				// ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
+					addFace(
+						result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
+						result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
+					);
 
-				addFace(
-					result[ 2 ], result[ 6 ], result[ 10 ], result[ 14 ],
-					result[ 3 ], result[ 7 ], result[ 11 ], result[ 15 ],
-					result[ 4 ], result[ 8 ], result[ 12 ], result[ 16 ]
-				);
+				} else if ( ( result = this.regexp.face_pattern3.exec( line ) ) !== null ) {
 
-			} else if ( ( result = face_pattern4.exec( line ) ) !== null ) {
+					// ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
 
-				// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
+					addFace(
+						result[ 2 ], result[ 6 ], result[ 10 ], result[ 14 ],
+						result[ 3 ], result[ 7 ], result[ 11 ], result[ 15 ],
+						result[ 4 ], result[ 8 ], result[ 12 ], result[ 16 ]
+					);
 
-				addFace(
-					result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
-					undefined, undefined, undefined, undefined,
-					result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
-				);
+				} else if ( ( result = this.regexp.face_pattern4.exec( line ) ) !== null ) {
 
-			} else if ( ( result = object_pattern.exec( line ) ) !== null ) {
+					// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
+
+					addFace(
+						result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
+						undefined, undefined, undefined, undefined,
+						result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
+					);
+
+				}
+			} else if ( ( result = this.regexp.object_pattern.exec( line ) ) !== null ) {
 
 				// o object_name
 				// or
@@ -319,17 +333,17 @@ THREE.OBJLoader.prototype = {
 
 				}
 
-			} else if ( /^usemtl /.test( line ) ) {
+			} else if ( this.regexp.material_use_pattern.test( line ) ) {
 
 				// material
 
 				object.material.name = line.substring( 7 ).trim();
 
-			} else if ( /^mtllib /.test( line ) ) {
+			} else if ( this.regexp.material_library_pattern.test( line ) ) {
 
 				// mtl file
 
-			} else if ( ( result = smoothing_pattern.exec( line ) ) !== null ) {
+			} else if ( ( result = this.regexp.smoothing_pattern.exec( line ) ) !== null ) {
 
 				// smooth shading
 
