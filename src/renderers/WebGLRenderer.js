@@ -230,6 +230,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	extensions.get( 'OES_texture_half_float_linear' );
 	extensions.get( 'OES_standard_derivatives' );
 	extensions.get( 'ANGLE_instanced_arrays' );
+	
+	var DrawBuffersEXT = extensions.get( 'WEBGL_draw_buffers' );
 
 	if ( extensions.get( 'OES_element_index_uint' ) ) {
 
@@ -3230,11 +3232,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// Render targets
 
 	// Setup storage for target texture and bind it to correct framebuffer
-	function setupFrameBufferTexture ( framebuffer, width, height, texture, attachment, textureTarget, internalFormat ) {
+	function setupFrameBufferTexture ( framebuffer, width, height, texture, attachment, textureTarget ) {
 
 		var glFormat = paramThreeToGL( texture.format );
 		var glType = paramThreeToGL( texture.type );
-		state.texImage2D( textureTarget, 0, internalFormat || glFormat, width, height, 0, glFormat, glType, null );
+		state.texImage2D( textureTarget, 0, glFormat, width, height, 0, glFormat, glType, null );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( texture ).__webglTexture, 0 );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
@@ -3350,8 +3352,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		var internalFormat; // default undefined, just match format until WebGL2 support lands
-
 		if ( isCube ) {
 
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
@@ -3365,8 +3365,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					renderTarget.height,
 					renderTarget.texture,
 					_gl.COLOR_ATTACHMENT0,
-					_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-					internalFormat );
+					_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
 
 			}
 
@@ -3389,8 +3388,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						renderTarget.height,
 						attachment,
 						_gl.COLOR_ATTACHMENT0 + i,
-						_gl.TEXTURE_2D,
-						internalFormat );
+						_gl.TEXTURE_2D );
 
 					if ( attachment.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
@@ -3405,8 +3403,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					renderTarget.height,
 					renderTarget.texture,
 					_gl.COLOR_ATTACHMENT0,
-					_gl.TEXTURE_2D,
-					internalFormat );
+					_gl.TEXTURE_2D );
 
 				if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
@@ -3480,19 +3477,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 			_currentFramebuffer = framebuffer;
 
-			if ( _isWebGL2 ) {
+			if ( _isWebGL2 || DrawBuffersEXT ) {
 
 				if ( renderTargetProperties && renderTargetProperties.__webglAttachments ) {
 
-					_gl.drawBuffers( renderTargetProperties.__webglAttachments )
+					if ( _isWebGL2 ) _gl.drawBuffers( renderTargetProperties.__webglAttachments );
+					else DrawBuffersEXT.drawBuffersWEBGL( renderTargetProperties.__webglAttachments );
 
 				} else if ( renderTarget ) {
 
-					_gl.drawBuffers( defaultAttachments );
+					if ( _isWebGL2 ) _gl.drawBuffers( defaultAttachments );
+					else DrawBuffersEXT.drawBuffersWEBGL( defaultAttachments );
 
 				} else {
 
-					_gl.drawBuffers( defaultBackAttachment );
+					if ( _isWebGL2 ) _gl.drawBuffers( defaultBackAttachment );
+					else DrawBuffersEXT.drawBuffersWEBGL( defaultBackAttachment );
 
 				}
 

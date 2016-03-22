@@ -235,6 +235,9 @@ var files = {
 		"webgl_custom_attributes_points3",
 		"webgl_raymarching_reflect"
 	],
+	"webgl2": [
+		"webgl2_drawbuffers"
+	],
 	"webvr": [
 		"webvr_cubes",
 		"webvr_panorama",
