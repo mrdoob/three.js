@@ -150,6 +150,29 @@ THREE.Object3D.prototype = {
 
 	}(),
 
+	rotateOnWorldAxis: function () {
+
+		// rotate object on axis in world space
+		// axis is assumed to be normalized
+
+		var m1 = new THREE.Matrix4();
+
+		return function ( axis, angle ) {
+
+			m1.makeRotationAxis( axis, angle);
+
+			m1.multiply( this.matrix );
+
+			this.matrix = m1;
+
+			this.rotation.setFromRotationMatrix( this.matrix );
+
+			return this;
+
+		};
+
+	}(),
+
 	rotateX: function () {
 
 		var v1 = new THREE.Vector3( 1, 0, 0 );
