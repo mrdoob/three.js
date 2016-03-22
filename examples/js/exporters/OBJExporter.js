@@ -20,7 +20,7 @@ THREE.OBJExporter.prototype = {
 		var normal = new THREE.Vector3();
 		var uv = new THREE.Vector2();
 
-		var i, j, m, face = [];
+		var i, j, l, m, face = [];
 
 		var parseMesh = function ( mesh ) {
 
@@ -53,7 +53,7 @@ THREE.OBJExporter.prototype = {
 
 				if( vertices !== undefined ) {
 
-					for ( i = 0; i < vertices.count ; i ++, nbVertex++ ) {
+					for ( i = 0, l = vertices.count; i < l; i ++, nbVertex++ ) {
 
 						vertex.x = vertices.getX( i );
 						vertex.y = vertices.getY( i );
@@ -73,7 +73,7 @@ THREE.OBJExporter.prototype = {
 
 				if( uvs !== undefined ) {
 
-					for ( i = 0; i < uvs.count ; i ++, nbVertexUvs++ ) {
+					for ( i = 0, l = uvs.count; i < l; i ++, nbVertexUvs++ ) {
 
 						uv.x = uvs.getX( i );
 						uv.y = uvs.getY( i );
@@ -91,7 +91,7 @@ THREE.OBJExporter.prototype = {
 
 					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
-					for ( i = 0; i < normals.count ; i ++, nbNormals++ ) {
+					for ( i = 0, l = normals.count; i < l; i ++, nbNormals++ ) {
 
 						normal.x = normals.getX( i );
 						normal.y = normals.getY( i );
@@ -111,7 +111,7 @@ THREE.OBJExporter.prototype = {
 
 				if( indices !== null ) {
 
-					for ( i = 0; i < indices.count ; i += 3 ) {
+					for ( i = 0, l = indices.count; i < l; i += 3 ) {
 
 						for( m = 0; m < 3; m ++ ){
 
@@ -128,7 +128,7 @@ THREE.OBJExporter.prototype = {
 
 				} else {
 
-					for ( i = 0; i < vertices.count ; i += 3 ) {
+					for ( i = 0, l = vertices.count; i < l; i += 3 ) {
 
 						for( m = 0; m < 3; m ++ ){
 
@@ -160,6 +160,8 @@ THREE.OBJExporter.prototype = {
 
 		var parseLine = function( line ) {
 
+			var nbVertex = 0;
+
 			var geometry = line.geometry;
 			var type = line.type;
 
@@ -180,7 +182,7 @@ THREE.OBJExporter.prototype = {
 
 				if( vertices !== undefined ) {
 
-					for ( i = 0; i < vertices.count ; i ++ ) {
+					for ( i = 0, l = vertices.count; i < l; i ++, nbVertex++ ) {
 
 						vertex.x = vertices.getX( i );
 						vertex.y = vertices.getY( i );
@@ -200,9 +202,9 @@ THREE.OBJExporter.prototype = {
 
 					output += 'l ';
 
-					for ( j = 1; j <= vertices.count; j++ ) {
+					for ( j = 1, l = vertices.count; j <= l; j++ ) {
 
-						output += j + ' ';
+						output += ( indexVertex + j ) + ' ';
 
 					}
 
@@ -212,9 +214,9 @@ THREE.OBJExporter.prototype = {
 
 				if ( type === 'LineSegments' ) {
 
-					for ( j = 1, k = j + 1; j < vertices.count; j += 2, k = j + 1 ) {
+					for ( j = 1, k = j + 1, l = vertices.count; j < l; j += 2, k = j + 1 ) {
 
-						output += 'l ' + j + ' ' + k + '\n';
+						output += 'l ' + ( indexVertex + j ) + ' ' + ( indexVertex + k ) + '\n';
 
 					}
 
@@ -225,6 +227,9 @@ THREE.OBJExporter.prototype = {
 				console.warn('THREE.OBJExporter.parseLine(): geometry type unsupported', geometry );
 
 			}
+
+			// update index
+			indexVertex += nbVertex;
 
 		};
 
