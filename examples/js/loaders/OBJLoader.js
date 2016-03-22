@@ -18,11 +18,11 @@ THREE.OBJLoader = function ( manager ) {
 		// f vertex vertex vertex
 		face_vertex              : /^f\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)(?:\s+(-?\d+))?/,
 		// f vertex/uv vertex/uv vertex/uv
-		face_vertex_uv           : /^f\s+((-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+))(?:\s+((-?\d+)\/(-?\d+)))?/,
+		face_vertex_uv           : /^f\s+(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)(?:\s+(-?\d+)\/(-?\d+))?/,
 		// f vertex/uv/normal vertex/uv/normal vertex/uv/normal
-		face_vertex_uv_normal    : /^f\s+((-?\d+)\/(-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+)\/(-?\d+))\s+((-?\d+)\/(-?\d+)\/(-?\d+))(?:\s+((-?\d+)\/(-?\d+)\/(-?\d+)))?/,
+		face_vertex_uv_normal    : /^f\s+(-?\d+)\/(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)\/(-?\d+)(?:\s+(-?\d+)\/(-?\d+)\/(-?\d+))?/,
 		// f vertex//normal vertex//normal vertex//normal
-		face_vertex_normal       : /^f\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))\s+((-?\d+)\/\/(-?\d+))(?:\s+((-?\d+)\/\/(-?\d+)))?/,
+		face_vertex_normal       : /^f\s+(-?\d+)\/\/(-?\d+)\s+(-?\d+)\/\/(-?\d+)\s+(-?\d+)\/\/(-?\d+)(?:\s+(-?\d+)\/\/(-?\d+))?/,
 		// o object_name | g group_name
 		object_pattern           : /^[og]\s*(.+)?/,
 		// s boolean
@@ -259,7 +259,8 @@ THREE.OBJLoader.prototype = {
 			else
 				line = line.trim();
 
-			if ( line.length === 0 ) {
+			var lineLength = line.length;
+			if ( lineLength === 0 ) {
 				continue;
 			}
 
@@ -276,6 +277,7 @@ THREE.OBJLoader.prototype = {
 
 				if ( lineSecondChar === " " && ( result = this.regexp.vertex_pattern.exec( line ) ) !== null ) {
 
+					// 0                  1      2      3
 					// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
 					state.vertices.push(
@@ -286,6 +288,7 @@ THREE.OBJLoader.prototype = {
 
 				} else if ( lineSecondChar === "n" && ( result = this.regexp.normal_pattern.exec( line ) ) !== null ) {
 
+					// 0                   1      2      3
 					// ["vn 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
 					state.normals.push(
@@ -296,6 +299,7 @@ THREE.OBJLoader.prototype = {
 
 				} else if ( lineSecondChar === "t" && ( result = this.regexp.uv_pattern.exec( line ) ) !== null ) {
 
+					// 0               1      2
 					// ["vt 0.1 0.2", "0.1", "0.2"]
 
 					state.uvs.push(
@@ -303,49 +307,62 @@ THREE.OBJLoader.prototype = {
 						parseFloat( result[ 2 ] )
 					);
 
+				} else {
+
+					throw new Error( "Unexpected vertex/normal/uv line: '" + line  + "'");
+
 				}
+
 			} else if ( lineFirstChar === "f" ) {
 
 				if ( ( result = this.regexp.face_vertex_uv_normal.exec( line ) ) !== null ) {
 
 					// f vertex/uv/normal vertex/uv/normal vertex/uv/normal
-					// ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
+					// 0                        1    2    3    4    5    6    7    8    9   10         11         12
+					// ["f 1/1/1 2/2/2 3/3/3", "1", "1", "1", "2", "2", "2", "3", "3", "3", undefined, undefined, undefined]
 
 					state.addFace(
-						result[ 2 ], result[ 6 ], result[ 10 ], result[ 14 ],
-						result[ 3 ], result[ 7 ], result[ 11 ], result[ 15 ],
-						result[ 4 ], result[ 8 ], result[ 12 ], result[ 16 ]
+						result[ 1 ], result[ 4 ], result[ 7 ], result[ 10 ],
+						result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
+						result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
 					);
 
 				} else if ( ( result = this.regexp.face_vertex_uv.exec( line ) ) !== null ) {
 
 					// f vertex/uv vertex/uv vertex/uv
-					// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
+					// 0                  1    2    3    4    5    6   7          8
+					// ["f 1/1 2/2 3/3", "1", "1", "2", "2", "3", "3", undefined, undefined]
 
 					state.addFace(
-						result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
-						result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
+						result[ 1 ], result[ 3 ], result[ 5 ], result[ 7 ],
+						result[ 2 ], result[ 4 ], result[ 6 ], result[ 8 ]
 					);
 
 				} else if ( ( result = this.regexp.face_vertex_normal.exec( line ) ) !== null ) {
 
 					// f vertex//normal vertex//normal vertex//normal
-					// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
+					// 0                     1    2    3    4    5    6   7          8
+					// ["f 1//1 2//2 3//3", "1", "1", "2", "2", "3", "3", undefined, undefined]
 
 					state.addFace(
-						result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
+						result[ 1 ], result[ 3 ], result[ 5 ], result[ 7 ],
 						undefined, undefined, undefined, undefined,
-						result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
+						result[ 2 ], result[ 4 ], result[ 6 ], result[ 8 ]
 					);
 
 				} else if ( ( result = this.regexp.face_vertex.exec( line ) ) !== null ) {
 
 					// f vertex vertex vertex
+					// 0            1    2    3   4
 					// ["f 1 2 3", "1", "2", "3", undefined]
 
 					state.addFace(
 						result[ 1 ], result[ 2 ], result[ 3 ], result[ 4 ]
 					);
+
+				} else {
+
+					throw new Error( "Unexpected face line: '" + line  + "'");
 
 				}
 
@@ -379,7 +396,11 @@ THREE.OBJLoader.prototype = {
 
 			} else {
 
-				throw new Error( "Unexpected line: " + line );
+				// Handle null terminated files without exception
+				if (line === "\0")
+					continue;
+
+				throw new Error( "Unexpected line: '" + line  + "'");
 
 			}
 
