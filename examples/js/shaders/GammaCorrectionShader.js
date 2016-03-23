@@ -28,8 +28,6 @@ THREE.GammaCorrectionShader = {
 
 	fragmentShader: [
 
-		"#define GAMMA_FACTOR 2",
-
 		"uniform sampler2D tDiffuse;",
 
 		"varying vec2 vUv;",
@@ -38,7 +36,7 @@ THREE.GammaCorrectionShader = {
 
 			"vec4 tex = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );",
 
-			"gl_FragColor = LinearToGamma( tex, 2.0 );",
+			"gl_FragColor = LinearToGamma( tex, float( GAMMA_FACTOR ) );",
 
 		"}"
 
