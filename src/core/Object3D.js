@@ -281,16 +281,33 @@ THREE.Object3D.prototype = {
 
 		for ( ; i < l; i ++ ) {
 
-			this.addAt( undefined, arguments[ i ] );
+			this.addAt( undefined, arguments[ i ], false );
 		}
 
 		return this;
 
 	},
 
-	addAt: function ( index, object ) {
+	addAt: function ( entity, object, move, shift ) {
 
-		index = index || this.children.length;
+		var children = this.children;
+
+		if(move === undefined) move = true;
+		if(shift === undefined) shift = true;
+
+		if( entity === undefined ) {
+
+			entity = children.length;
+
+		} else {
+
+			if ( typeof(entity) !== 'number' ) {
+
+				entity = children.indexOf( entity );
+			}
+
+		}
+
 
 		if ( object instanceof THREE.Object3D ) {
 
@@ -302,37 +319,50 @@ THREE.Object3D.prototype = {
 
 			}
 
-			if ( object.parent != undefined ) {
+			var search = children.indexOf( object );
 
-				object.parent.remove( object );
+			if ( search === -1 || move === true ) {
 
-			}
+				if( entity > children.length || entity < 0) entity = children.length;
 
-			object.parent = this;
+					var type;
+
+					if ( object.parent !== this ) {
+
+						if ( object.parent != undefined ) {
+
+							object.parent.replace( object );
+
+						}
+
+						object.parent = this;
+
+					}
+
+					if ( search !== -1 && move === true ) {
+
+						children.splice( search, 1 );
+
+						type = 'moved';
+
+						if( shift === true && search < entity - 1 ) entity = entity - 1;
+
+					} else {
+
+						type = 'added';
+
+					}
+
+					children.splice( entity, 0, object );
+
+					object.dispatchEvent( { type: type, index: entity } );
+
+					return object;
 
 
-			var type, children = this.children;
+			} else {
 
-			if ( object !== children[ index ] ) {
-
-				var search = children.indexOf( object );
-
-				if ( search > - 1 ) {
-
-					children.splice( search, 1 );
-
-					type = 'moved';
-
-				} else {
-
-					type = 'added';
-
-				}
-
-				children.splice( index, 0, object );
-
-				object.dispatchEvent( { type: type, index: index } );
-
+					return object;
 
 			}
 
@@ -341,8 +371,6 @@ THREE.Object3D.prototype = {
 			console.error( "THREE.Object3D.add: object not an instance of THREE.Object3D.", object );
 
 		}
-
-		return this;
 
 	},
 
@@ -367,35 +395,59 @@ THREE.Object3D.prototype = {
 
 		/* entity can be either an index or an object */
 
-		var result, object, index, children = this.children;
+		var children = this.children, index = -1, object, result;
 
-		if ( typeof( entity ) === 'number' ) {
+		if( newChild !== undefined ) index = children.indexOf( newChild );
 
-			index = entity;
+		if( index === -1 ) {
 
-		} else {
+			if( typeof( entity ) === 'number' ) {
 
-			index = children.indexOf( entity );
+				object = children[ entity ];
 
-		}
+				index = entity;
 
-		object = children[ index ];
+			} else {
 
-		if ( object !== undefined ) {
+				index = children.indexOf( entity );
 
-			object.parent = null;
+				if ( index !== - 1 ) object = children[ index ];
 
-			if ( newChild !== undefined ) result = children.splice( index, 1, newChild );
+			}
 
-			else result = children.splice( index, 1 );
+			if( object != undefined ) {
 
-			object.dispatchEvent( { type: 'removed', index: index } );
+				if( object.parent != undefined && object.parent !== this ) {
 
-		}
+					object.parent.remove( object );
 
-		if ( Array.isArray( result ) === true && result.length === 1 ) {
+				}
 
-			return result[ 0 ];
+				object.parent = null;
+
+				if ( newChild !== undefined ) {
+
+					result = children.splice( index, 1, newChild );
+
+					object.dispatchEvent( { type: 'replaced', index: index } );
+
+				}
+
+				else {
+
+					result = children.splice( index, 1 );
+
+					object.dispatchEvent( { type: 'removed', index: index } );
+
+				}
+
+				if ( Array.isArray( result ) === true && result.length === 1 ) {
+
+					return result[ 0 ];
+
+				}
+
+			}
 
 		}
 
