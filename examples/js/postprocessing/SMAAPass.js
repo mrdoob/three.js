@@ -68,7 +68,7 @@ THREE.SMAAPass = function ( width, height ) {
 	this.uniformsWeights = THREE.UniformsUtils.clone( THREE.SMAAShader[1].uniforms );
 
 	this.uniformsWeights[ "resolution" ].value.set( 1 / width, 1 / height );
-	this.uniformsWeights[ "tDiffuse" ].value = this.edgesRT;
+	this.uniformsWeights[ "tDiffuse" ].value = this.edgesRT.texture;
 	this.uniformsWeights[ "tArea" ].value = this.areaTexture;
 	this.uniformsWeights[ "tSearch" ].value = this.searchTexture;
 
@@ -84,7 +84,7 @@ THREE.SMAAPass = function ( width, height ) {
 	this.uniformsBlend = THREE.UniformsUtils.clone( THREE.SMAAShader[2].uniforms );
 
 	this.uniformsBlend[ "resolution" ].value.set( 1 / width, 1 / height );
-	this.uniformsBlend[ "tDiffuse" ].value = this.weightsRT;
+	this.uniformsBlend[ "tDiffuse" ].value = this.weightsRT.texture;
 
 	this.materialBlend = new THREE.ShaderMaterial( {
 		uniforms: this.uniformsBlend,
@@ -114,7 +114,7 @@ THREE.SMAAPass.prototype = {
 
 		// pass 1
 
-		this.uniformsEdges[ "tDiffuse" ].value = readBuffer;
+		this.uniformsEdges[ "tDiffuse" ].value = readBuffer.texture;
 
 		this.quad.material = this.materialEdges;
 
@@ -128,7 +128,7 @@ THREE.SMAAPass.prototype = {
 
 		// pass 3
 
-		this.uniformsBlend[ "tColor" ].value = readBuffer;
+		this.uniformsBlend[ "tColor" ].value = readBuffer.texture;
 
 		this.quad.material = this.materialBlend;
 

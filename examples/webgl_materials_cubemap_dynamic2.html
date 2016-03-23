@@ -78,7 +78,7 @@
 
 				//
 
-				var material = new THREE.MeshBasicMaterial( { envMap: cubeCamera.renderTarget } );
+				var material = new THREE.MeshBasicMaterial( { envMap: cubeCamera.renderTarget.texture } );
 
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 20, 30, 15 ), material );
 				scene.add( sphere );

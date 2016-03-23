@@ -41,7 +41,7 @@ THREE.FilmPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
-		this.uniforms[ "tDiffuse" ].value = readBuffer;
+		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.uniforms[ "time" ].value += delta;
 
 		this.quad.material = this.material;

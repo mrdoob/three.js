@@ -315,7 +315,7 @@
 				var rx = 256, ry = 256;
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 
-				heightMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
+				heightMap = new THREE.WebGLRenderTarget( rx, ry, pars );
 				heightMap.texture.generateMipmaps = false;
 
 				normalMap = new THREE.WebGLRenderTarget( rx, ry, pars );
@@ -333,7 +333,7 @@
 
 				uniformsNormal.height.value = 0.05;
 				uniformsNormal.resolution.value.set( rx, ry );
-				uniformsNormal.heightMap.value = heightMap;
+				uniformsNormal.heightMap.value = heightMap.texture;
 
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 
@@ -365,14 +365,14 @@
 
 				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
 
-				uniformsTerrain[ "tNormal" ].value = normalMap;
+				uniformsTerrain[ "tNormal" ].value = normalMap.texture;
 				uniformsTerrain[ "uNormalScale" ].value = 3.5;
 
-				uniformsTerrain[ "tDisplacement" ].value = heightMap;
+				uniformsTerrain[ "tDisplacement" ].value = heightMap.texture;
 
-				uniformsTerrain[ "tDiffuse1" ].value = diffuseTexture1;
-				uniformsTerrain[ "tDiffuse2" ].value = diffuseTexture2;
-				uniformsTerrain[ "tSpecular" ].value = specularMap;
+				uniformsTerrain[ "tDiffuse1" ].value = diffuseTexture1.texture;
+				uniformsTerrain[ "tDiffuse2" ].value = diffuseTexture2.texture;
+				uniformsTerrain[ "tSpecular" ].value = specularMap.texture;
 				uniformsTerrain[ "tDetail" ].value = detailTexture;
 
 				uniformsTerrain[ "enableDiffuse1" ].value = true;
@@ -389,9 +389,9 @@
 				uniformsTerrain[ "uRepeatOverlay" ].value.set( 6, 6 );
 
 				var params = [
-					[ 'heightmap', 	document.getElementById( 'fragmentShaderNoise' ).textContent, 	vertexShader, uniformsNoise, false ],
-					[ 'normal', 	normalShader.fragmentShader,  normalShader.vertexShader, uniformsNormal, false ],
-					[ 'terrain', 	terrainShader.fragmentShader, terrainShader.vertexShader, uniformsTerrain, true ]
+					[ 'heightmap', document.getElementById( 'fragmentShaderNoise' ).textContent, vertexShader, uniformsNoise, false ],
+					[ 'normal', normalShader.fragmentShader, normalShader.vertexShader, uniformsNormal, false ],
+					[ 'terrain', terrainShader.fragmentShader, terrainShader.vertexShader, uniformsTerrain, true ]
 				 ];
 
 				for( var i = 0; i < params.length; i ++ ) {

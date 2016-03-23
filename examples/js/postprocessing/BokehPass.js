@@ -41,7 +41,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	var bokehShader = THREE.BokehShader;
 	var bokehUniforms = THREE.UniformsUtils.clone( bokehShader.uniforms );
 
-	bokehUniforms[ "tDepth" ].value = this.renderTargetDepth;
+	bokehUniforms[ "tDepth" ].value = this.renderTargetDepth.texture;
 
 	bokehUniforms[ "focus" ].value = focus;
 	bokehUniforms[ "aspect" ].value = aspect;
@@ -82,7 +82,7 @@ THREE.BokehPass.prototype = {
 
 		// Render bokeh composite
 
-		this.uniforms[ "tColor" ].value = readBuffer;
+		this.uniforms[ "tColor" ].value = readBuffer.texture;
 
 		if ( this.renderToScreen ) {
 

@@ -40,7 +40,7 @@ THREE.DotScreenPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
-		this.uniforms[ "tDiffuse" ].value = readBuffer;
+		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.uniforms[ "tSize" ].value.set( readBuffer.width, readBuffer.height );
 
 		this.quad.material = this.material;

@@ -21,8 +21,8 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 		uniforms: {
 
-			"mapLeft": { type: "t", value: _renderTargetL },
-			"mapRight": { type: "t", value: _renderTargetR }
+			"mapLeft": { type: "t", value: _renderTargetL.texture },
+			"mapRight": { type: "t", value: _renderTargetR.texture }
 
 		},
 

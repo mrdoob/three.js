@@ -45,11 +45,13 @@ THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 	var offset2 = 0;
 	var c = 4.0;
 	this.numLods = Math.log2( cubeTextureLods[ 0 ].width ) - 2;
+
 	for ( var i = 0; i < this.numLods; i ++ ) {
 
 		var offset1 = ( textureResolution - textureResolution / c ) * 0.5;
-		if ( size > 16 )
-		c *= 2;
+
+		if ( size > 16 ) c *= 2;
+
 		var nMips = size > 16 ? 6 : 1;
 		var mipOffsetX = 0;
 		var mipOffsetY = 0;
@@ -62,15 +64,13 @@ THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 
 				// 6 Cube Faces
 				var material = this.getShader();
-				material.uniforms[ "envMap" ].value = this.cubeLods[ i ];
-				material.envMap = this.cubeLods[ i ]
+				material.uniforms[ "envMap" ].value = this.cubeLods[ i ].texture;
+				material.envMap = this.cubeLods[ i ].texture;
 				material.uniforms[ "faceIndex" ].value = k;
 				material.uniforms[ "mapSize" ].value = mipSize;
 				var color = material.uniforms[ "testColor" ].value;
 				//color.copy(testColor[j]);
-				var planeMesh = new THREE.Mesh(
-				new THREE.PlaneGeometry( mipSize, mipSize, 0 ),
-				material );
+				var planeMesh = new THREE.Mesh( new THREE.PlaneGeometry( mipSize, mipSize, 0 ), material );
 				planeMesh.position.x = faceOffsets[ k ].x * mipSize - offset1 + mipOffsetX;
 				planeMesh.position.y = faceOffsets[ k ].y * mipSize - offset1 + offset2 + mipOffsetY;
 				planeMesh.material.side = THREE.DoubleSide;
@@ -78,6 +78,7 @@ THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 				this.objects.push( planeMesh );
 
 			}
+
 			mipOffsetY += 1.75 * mipSize;
 			mipOffsetX += 1.25 * mipSize;
 			mipSize /= 2;

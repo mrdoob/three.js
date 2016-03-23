@@ -42,8 +42,8 @@ THREE.GlitchPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
-		this.uniforms[ "tDiffuse" ].value = readBuffer;
-		this.uniforms[ 'seed' ].value = Math.random();//default seeding
+		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
+		this.uniforms[ 'seed' ].value = Math.random(); // default seeding
 		this.uniforms[ 'byp' ].value = 0;
 		
 		if ( this.curF % this.randX == 0 || this.goWild == true ) {
