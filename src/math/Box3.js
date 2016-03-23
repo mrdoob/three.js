@@ -115,7 +115,6 @@ THREE.Box3.prototype = {
 						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
 							v1.copy( vertices[ i ] );
-
 							v1.applyMatrix4( node.matrixWorld );
 
 							scope.expandByPoint( v1 );
@@ -128,8 +127,7 @@ THREE.Box3.prototype = {
 
 						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
 
-							v1.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
-
+							v1.fromArray( positions, i );
 							v1.applyMatrix4( node.matrixWorld );
 
 							scope.expandByPoint( v1 );
