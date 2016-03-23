@@ -215,15 +215,16 @@
 		Adds *object* as child of this object. An arbitrary number of objects may be added.
 		</div>
 
-		<h3>[method:null addAt]( [page:Integer index], [page:Object3D object] )</h3>
+		<h3>[method:null addAt]( [page:Object entity], [page:Object3D object],  [page:Boolean move],  [page:Boolean shift] )</h3>
 		<div>
-		index - An index.<br />
+		entity - An index or an Object3D.<br />
 		</div>
 		<div>
 		object - An object.<br />
 		</div>
 		<div>
-		Adds *object* as child of this object at the given index. When it exists already, it moves it's indices and triggers a 'moved' Event.
+		Adds *object* as child of this object at the given entity location if found. When object exists already, it moves it's indices and triggers a 'moved' Event.
+		Extra Boolean arguments 'move' and 'shift' control if it will reorder and to shift if necessary the insertions target index Before or After when an existing object is moved from before the target index.
 		</div>
 
 		<h3>[method:null remove]( [page:Object3D object], ... )</h3>
@@ -250,13 +251,13 @@
 
 		<h3>[method:null replace]( [page:Object3D entity], [page:Object3D newChild] )</h3>
 		<div>
-		entity - An index or Object.<br />
+		entity - An index or Object3D.<br />
 		</div>
 		<div>
 		newChild - An object.<br />
 		</div>
 		<div>
-		Replaces the entity with the new Child, but only if the old one is found. The entity can be an index or Object.
+		Replaces the entity with the new Child, but only if the old one is found. The search entity can be an index or Object.
 		</div>
 		<div>
 		Returns the old Object that has now been replaced, but nothing if not found.
