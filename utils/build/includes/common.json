@@ -48,6 +48,7 @@
 	"src/animation/PropertyBinding.js",
 	"src/animation/PropertyMixer.js",
 	"src/animation/tracks/BooleanKeyframeTrack.js",
+	"src/animation/tracks/ColorKeyframeTrack.js",
 	"src/animation/tracks/NumberKeyframeTrack.js",
 	"src/animation/tracks/QuaternionKeyframeTrack.js",
 	"src/animation/tracks/StringKeyframeTrack.js",
