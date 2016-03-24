@@ -376,6 +376,7 @@ THREE.Object3D.prototype = {
 			console.error("THREE.Object3D.replaceAt: Index %d out of bounds.", index);
 			return;
 		}
+		
 		var oldChild = this.children[index];
 		
 		if (newChild === oldChild) {
@@ -385,19 +386,19 @@ THREE.Object3D.prototype = {
 		}
 		
 		if (newChild.parent === this) {
-			console.error("THREE.Object3D.replaceAt: newChild is already a child at another index.", newChild);
+			console.error("THREE.Object3D.replaceAt: newChild is already a child at another index: %d.",
+			this.children.indexOf(newChild), newChild);
 			return;
 		}
 		
-		//(This is where index error would fail with the confusing message "Cannot read property 'parent' of undefined.")
 		oldChild.parent = null; //null is the default value for new Object3Ds.
 		this.children[index] = newChild;
 		oldChild.dispatchEvent({ type: 'removed' });
 	
-	        //necessary test? Should this be inn add too?
-	        if (newChild.parent) {
-	           newChild.parent.remove(newChild);
-	           console.warn("THREE.Object3D.replaceAt: newChild stolen from old parent.");
+	        if (newChild.parent !== null) {
+			var oldParent = newChild.parent;
+			oldParent.remove(newChild);
+			console.warn("THREE.Object3D.replaceAt: newChild stolen from old parent:", oldParent);
 	        }
 	
 		newChild.parent = this;
