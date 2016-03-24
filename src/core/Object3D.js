@@ -17,7 +17,8 @@ THREE.Object3D = function () {
 
 	this.parent = null;
 	this.children = [];
-	this.searchOrder = [ 'name', 'uuid', 'id' ];
+	// searchOrder: WARNING! using 'id' here is BAD as it's problematic with index referencing.
+	this.searchOrder = [ 'name', 'uuid' ];
 
 	this.up = THREE.Object3D.DefaultUp.clone();
 
@@ -371,6 +372,12 @@ THREE.Object3D.prototype = {
 		for ( i = 0; i < list.length; i ++ ) this.replace( list[ i ] );
 
 		return this;
+
+	},
+
+	removeAll: function () {
+
+		return this.remove.apply(this, Object.keys(this.children));
 
 	},
 

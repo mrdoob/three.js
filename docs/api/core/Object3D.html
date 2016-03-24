@@ -50,6 +50,13 @@
 		Array with object's children.
 		</div>
 
+		<h3>[property:Object3D searchOrder]</h3>
+		<div>
+		An Array with labels for extending searching of property names on the Objects. { see <a target=_parent href="#Reference/Core/Object3D.findChild">findChild</a> }<br />
+		Before resorting to this properties search list. It first searches for direct matches with Object3D and then for an array index. This final search list defaults to ['name', 'uuid'].<br />
+		<i>Warning: Don't use 'id' in this list as the indexing does not correlate and conflicts.</i><br />
+		</div>
+
 		<h3>[property:Vector3 position]</h3>
 		<div>
 		Object's local position.
@@ -217,26 +224,27 @@
 
 		<h3>[method:null addAt]( [page:Object entity], [page:Object3D object],  [page:Boolean move],  [page:Boolean shift] )</h3>
 		<div>
-		entity - Entity for matching. {see findChild} <br />
+		entity - Entity for matching. { see findChild } <br />
 		</div>
 		<div>
 		object - An object.<br />
 		</div>
 		<div>
-		move - A Boolean to allow moving an object if it is already found.<br />
+		move - A Boolean to allow moving an object if it is already found (default is true).
 		</div>
 		<div>
-		shift - A Boolean that helps when moving to shift the target index.<br />
-		This compensates for moving the existing object if it needs to be moved from below the target location's index.<br />
+		shift - A Boolean that helps when moving to shift the target index (default is true).
 		</div>
 		<div>
 		Adds *object* as child of this object at the given entity location if found. When object exists already, it moves it's indices and triggers a 'moved' Event.
-		Extra Boolean arguments 'move' and 'shift' control if it will reorder and to shift if necessary the insertions target index Before or After when an existing object is moved from before the target index.
+		</div>
+		<div>
+		Dependant on 'move', the 'shift' option compensates for moving the existing object if it needs to be moved from below the target location's index.<br />
 		</div>
 
 		<h3>[method:null remove]( [page:Object3D entity], ... )</h3>
 		<div>
-		entity - Entity for matching. {see findChild} <br />
+		entity - Entity for matching. {see findChild}
 		</div>
 		<div>
 		Removes *entity* as child of this object. the search entity can be either an index of an Object3D. An arbitrary number of entities may be removed.
@@ -245,12 +253,20 @@
 		Returns this object and not the removed items.
 		</div>
 
-		<h3>[method:null replace]( [page:Object3D entity], [page:Object3D newChild] )</h3>
+		<h3>[method:null removeAll]( )</h3>
 		<div>
-		entity - Entity for matching. {see findChild} <br />
+		Removes All the objects from children systematically removing them, one by one.
 		</div>
 		<div>
-		newChild - An object.<br />
+		Returns this object and not the removed items.
+		</div>
+
+		<h3>[method:null replace]( [page:Object3D entity], [page:Object3D newChild] )</h3>
+		<div>
+		entity - Entity for matching. {see findChild}
+		</div>
+		<div>
+		newChild - An object.
 		</div>
 		<div>
 		Replaces the entity with the new Child, but only if the old one is found. The search entity can be an index or Object.
@@ -259,16 +275,16 @@
 		Returns the old Object that has now been replaced, but nothing if not found.
 		</div>
 
-		<h3>[method:null findChild]( [page:Object3D entity], page:Boolean returnIndex] )</h3>
+		<h3>[method:null findChild]( [page:Object3D entity], [page:Boolean returnIndex] )</h3>
 		<div>
-		entity - Entity for matching. <br />
+		entity - Entity for matching.
 		</div>
 		<div>
-		returnIndex - A Boolean.<br />
+		returnIndex - A Boolean.
 		</div>
 		<div>
-		"Entity" is used to find a matching child. First findChild searches for an Object3D match. Then an index key is checked, and finally the list or properties is checked.<br />
-		The properties that are checked is controlled by searchOrder a modifiable array that defaults to check the 'name', 'uuid', and 'id' in that adjustable order.
+		"Entity" is used to find a matching child. First findChild searches for an Object3D match. Then an index key is checked, and finally the <a target=_parent href="#Reference/Core/Object3D.searchOrder">list</a> of properties is checked.<br />
+		The properties that are checked is controlled by <a target=_parent href="#Reference/Core/Object3D.searchOrder">searchOrder</a> a modifiable array that defaults to check the 'name' and 'uuid' in that adjustable order.
 		The returnIndex flag defaults to false but when true it will return the index of the entity not the Object3D.
 		</div>
 		<div>

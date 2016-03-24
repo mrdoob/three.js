@@ -370,24 +370,61 @@ test( "remove many by objects", function() {
 	ok( pBox.children.length === 5, "5 re-added" );
 	ok( pBox.findChild(3) === testWorld.cBox3, "cBox3 at index 3" );
 
+
+	ok( pBox.findChild(0) === testWorld.cBox0, "cBox0 at index 0" );
+	ok( pBox.findChild(1) === testWorld.cBox1, "cBox1 at index 1" );
+	ok( pBox.findChild(2) === testWorld.cBox2, "cBox2 at index 2" );
+	ok( pBox.findChild(3) === testWorld.cBox3, "cBox3 at index 3" );
+	ok( pBox.findChild(4) === testWorld.cBox4, "cBox4 at index 4" );
+
 });
 
 test( "remove many by index", function() {
 	let pBox = testWorld.pBox;
 
 	let out = pBox.remove(0, 1, 3, 4, 5);
-	ok( out === pBox, "returned this" );
+	ok( out === pBox, "returned pBox" );
 	ok( pBox.children.length === 1, "1 left" );
 	ok( pBox.findChild(0) === testWorld.cBox2, "cBox2 at index 0" );
 
 });
 
-test( "remove single exists by object.name", function() {
+test( "removeAll", function() {
 	let pBox = testWorld.pBox;
 
-	let out = pBox.remove('cBox2');
+	let out = pBox.add(testWorld.cBox9, testWorld.cBox8, testWorld.cBox7,
+		testWorld.cBox6, testWorld.cBox5, testWorld.cBox4,
+		testWorld.cBox3, testWorld.cBox1, testWorld.cBox0); // no 2 it's still there
+
+	ok( pBox.children.length === 10, "full up" );
+
+	out = pBox.addAt(7, testWorld.cBox2, true, false);
+	ok( out === testWorld.cBox2, "returns moved object" );
+	ok( pBox.findChild(7) === testWorld.cBox2, "moved cBox2 to index 2" );
+
+	ok( pBox.findChild(0) === testWorld.cBox9, "cBox9 at index 0" );
+	ok( pBox.findChild(1) === testWorld.cBox8, "cBox8 at index 1" );
+	ok( pBox.findChild(2) === testWorld.cBox7, "cBox7 at index 2" );
+	ok( pBox.findChild(3) === testWorld.cBox6, "cBox6 at index 3" );
+	ok( pBox.findChild(4) === testWorld.cBox5, "cBox5 at index 4" );
+	ok( pBox.findChild(5) === testWorld.cBox4, "cBox4 at index 5" );
+	ok( pBox.findChild(6) === testWorld.cBox3, "cBox3 at index 6" );
+	ok( pBox.findChild(7) === testWorld.cBox2, "cBox2 at index 7" );
+	ok( pBox.findChild(8) === testWorld.cBox1, "cBox1 at index 8" );
+	ok( pBox.findChild(9) === testWorld.cBox0, "cBox0 at index 9" );
+
+	out = pBox.removeAll();
+	ok( pBox.children.length === 0, "removeAll emptied it" );
+
+
+});
+
+test( "remove single last remaining by object.name", function() {
+	let pBox = testWorld.pBox;
+
+	let out = pBox.remove('cBox5');
 	ok( out === pBox, "returned this" );
-	ok( pBox.children.length === 0, "cBox2 removed by name" );
+	ok( pBox.children.length === 0, "cBox5 removed by name" );
 
 });
 
