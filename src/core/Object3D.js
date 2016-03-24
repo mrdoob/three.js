@@ -349,7 +349,7 @@ THREE.Object3D.prototype = {
 	replace: function( oldChild, newChild ) {
 		if (newChild === oldChild) {
 			//Warning is issued to remind the user not to do dramatic post-processing of oldChild in this case.
-			console.warn("THREE.Object3D.replaceAt: newChild=oldChild. Returned object is current child.");
+			console.warn("THREE.Object3D.replace: newChild=oldChild. Returned object is current child.");
 			return oldChild;
 		}
 
@@ -380,7 +380,7 @@ THREE.Object3D.prototype = {
 		
 		if (newChild === oldChild) {
 			//Warning is issued to remind the user not to do dramatic post-processing of oldChild in this case.
-			console.warn("THREE.Object3D.replaceAt: newChild=oldChild. Returned object is current child.");
+			console.warn("THREE.Object3D.replaceAt: Child at given index %d equals newChild. Returned object is still a child:", index, oldChild);
 			return oldChild;
 		}
 		
@@ -397,7 +397,7 @@ THREE.Object3D.prototype = {
 	        //necessary test? Should this be inn add too?
 	        if (newChild.parent) {
 	           newChild.parent.remove(newChild);
-	           console.warn("newChild stolen from old parent.");
+	           console.warn("THREE.Object3D.replaceAt: newChild stolen from old parent.");
 	        }
 	
 		newChild.parent = this;
