@@ -350,18 +350,14 @@ THREE.Object3D.prototype = {
 	replace: function(oldChild, newChild) {
 		if (newChild === oldChild) {
 			//Warning is issued to remind the user not to do dramatic post-processing of oldChild in this case.
-			console.warn(
-				"THREE.Object3D.replace: newChild=oldChild. Returned object is still a child:",
-				oldChild);
+			console.warn("THREE.Object3D.replace: newChild=oldChild. Returned object is still a child:", oldChild);
 			return oldChild;
 		}
 
 		var index = this.children.indexOf(oldChild);
 		if (index !== -1) return this.replaceAt(index, newChild);
 
-		console.error(
-			"THREE.Object3D.replace: oldChild not found. No replacement done.",
-			oldChild);
+		console.error("THREE.Object3D.replace: oldChild not found. No replacement done.", oldChild);
 	},
 
 	//Replaces child found at given index with newChild, if newChild is a valid child, and returns found oldChild.
@@ -374,9 +370,7 @@ THREE.Object3D.prototype = {
 		}
 
 		if (newChild === this) {
-			console.error(
-				"THREE.Object3D.replaceAt: newChild can't be added as a child of itself.",
-				newChild);
+			console.error("THREE.Object3D.replaceAt: newChild can't be added as a child of itself.", newChild);
 			return;
 		}
 
@@ -405,21 +399,16 @@ THREE.Object3D.prototype = {
 
 		oldChild.parent = null; //null is the default value for new Object3Ds.
 		this.children[index] = newChild;
-		oldChild.dispatchEvent({
-			type: 'removed'
-		});
+		oldChild.dispatchEvent({ type: 'removed' });
 
 		if (newChild.parent !== null) {
 			var oldParent = newChild.parent;
 			oldParent.remove(newChild);
-			console.warn("THREE.Object3D.replaceAt: newChild stolen from old parent:",
-				oldParent);
+			console.warn("THREE.Object3D.replaceAt: newChild stolen from old parent:", oldParent);
 		}
 
 		newChild.parent = this;
-		newChild.dispatchEvent({
-			type: 'added'
-		});
+		newChild.dispatchEvent({ type: 'added' });
 
 		return oldChild; //oldChild returned for easy post-handling
 	},
