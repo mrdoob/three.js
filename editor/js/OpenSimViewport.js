@@ -21,12 +21,15 @@ var OpenSimViewport = function ( editor ) {
 
 	var grid = new THREE.GridHelper( 500, 25 );
 	sceneHelpers.add( grid );
-        grid.visible = false;
-        
-        var backdrop = createBackdrop('Sky', scene);
-        //backdrop.visible = false;
-	//
+	grid.visible = false;
 
+	var skyboxMesh;
+	createBackdrop('sky');
+	var groundPlane;
+	createGroundPlane('bricks');
+	//
+	createLights();
+	
 	var camera = editor.camera;
 
 	//
@@ -621,31 +624,57 @@ var OpenSimViewport = function ( editor ) {
 		}
 
 	}
-        function createBackdrop(choice, sceneObject) {
-            // load the cube textures
-            var urlPrefix	= "images/sky/";
-            var urls = [ urlPrefix + "px.jpg", urlPrefix + "nx.jpg",
-                            urlPrefix + "py.jpg", urlPrefix + "ny.jpg",
-                            urlPrefix + "pz.jpg", urlPrefix + "nz.jpg" ];
-            var textureCube	=  THREE.ImageUtils.loadTextureCube(urls);
+	function createBackdrop(choice) {
+	    // load the cube textures
+	    var urlPrefix = "images/" + choice + "/";
+	    var urls = [urlPrefix + "px.jpg", urlPrefix + "nx.jpg",
+		urlPrefix + "py.jpg", urlPrefix + "ny.jpg",
+		urlPrefix + "pz.jpg", urlPrefix + "nz.jpg"];
+	    var textureCube = THREE.ImageUtils.loadTextureCube(urls);
 
-            // init the cube shadder
-            var shader	= THREE.ShaderLib['cube'];
-            var uniforms	= THREE.UniformsUtils.clone( shader.uniforms );
-            uniforms['tCube'].value= textureCube;
-            var material = new THREE.ShaderMaterial({
-                    fragmentShader	: shader.fragmentShader,
-                    vertexShader	: shader.vertexShader,
-                    uniforms	: uniforms,
-                    depthWrite: false,
-                    side: THREE.DoubleSide
-            });
+	    // init the cube shadder
+	    var shader = THREE.ShaderLib['cube'];
+	    var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
+	    uniforms['tCube'].value = textureCube;
+	    var material = new THREE.ShaderMaterial({
+		fragmentShader: shader.fragmentShader,
+		vertexShader: shader.vertexShader,
+		uniforms: uniforms,
+		depthWrite: false,
+		side: THREE.DoubleSide
+	    });
 
-            // build the skybox Mesh
-            skyboxMesh	= new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1), material );
-            // add it to the scene
-            this.editor.addObject( skyboxMesh );
-        }
+	    // build the skybox Mesh
+	    skyboxMesh = new THREE.Mesh(new THREE.CubeGeometry(100000, 100000, 100000, 1, 1, 1), material);
+	    skyboxMesh.name = 'Backdrop';
+	    // add it to the scene
+	    this.editor.addObject(skyboxMesh);
+	}
+	function createGroundPlane(choice) {
+		var textureLoader = new THREE.TextureLoader();
+		var texture1 = textureLoader.load( "textures/bricks.jpg" );
+		var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
+		texture1.wrapS = texture1.wrapT = THREE.RepeatWrapping;
+		texture1.repeat.set( 128, 128 );
+		var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+		groundPlane = new THREE.Mesh( geometry, material1 );
+		groundPlane.name = 'GroundPlane';
+		groundPlane.rotation.x = - Math.PI / 2;
+		groundPlane.position.y = -.01;
+		groundPlane.scale.set( 500, 500, 500 );
+		groundPlane.receiveShadow = true;
+		this.editor.addObject(groundPlane);
+
+	}
+	function createLights() {
+		amb = new THREE.AmbientLight(0x000000);
+		amb.name = 'AmbientLight';
+		this.editor.addObject(amb);
+		directionalLight =  new THREE.DirectionalLight( {color: 16777215});
+		directionalLight.castShadow = false;
+		directionalLight.name = 'DirectionalLight';
+		this.editor.addObject(directionalLight);
+	}
 	return container;
 
 }
