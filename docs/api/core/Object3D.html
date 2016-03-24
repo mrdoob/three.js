@@ -47,7 +47,7 @@
 
 		<h3>[property:Object3D children]</h3>
 		<div>
-		Array with object's children.
+		Array with object's children. It is advisable to alter this only through the add, remove, replace and replaceAt methods. The source code of those methods provides examples on how this can be accomplished properly.
 		</div>
 
 		<h3>[property:Vector3 position]</h3>
@@ -225,7 +225,7 @@
 		
 		<h3>[method:null replace]( [page:Object3D oldChild], [page:Object3D newChild] )</h3>
 		<div>
-		oldChild - An object to replace.<br />
+		oldChild - A known child object to be replaced.<br />
 		newChild - The object that is to replace oldChild.<br />
 		</div>
 		<div>
