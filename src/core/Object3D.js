@@ -349,7 +349,7 @@ THREE.Object3D.prototype = {
 	replace: function( oldChild, newChild ) {
 		if (newChild === oldChild) {
 			//Warning is issued to remind the user not to do dramatic post-processing of oldChild in this case.
-			console.warn("THREE.Object3D.replace: newChild=oldChild. Returned object is current child.");
+			console.warn("THREE.Object3D.replace: newChild=oldChild. Returned object is still a child:", oldChild);
 			return oldChild;
 		}
 
@@ -373,7 +373,7 @@ THREE.Object3D.prototype = {
 		
 		//Index check, allows negative indexing.
 		if (index>=this.children.length || -index > this.children.length) {
-			console.error("THREE.Object3D.replaceAt: Index out of bounds.", index);
+			console.error("THREE.Object3D.replaceAt: Index %d out of bounds.", index);
 			return;
 		}
 		var oldChild = this.children[index];
