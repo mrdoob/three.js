@@ -4,6 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author elephantatwork / www.elephantatwork.ch
+ * @author EliasHasle
  */
 
 THREE.Object3D = function () {
