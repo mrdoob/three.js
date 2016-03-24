@@ -347,41 +347,63 @@ THREE.Object3D.prototype = {
 
 	//Replaces oldChild, if found, with newChild, if newChild is av valid child, and returns found oldChild.
 	replace: function( oldChild, newChild ) {
+		if (newChild === oldChild) {
+			//Warning is issued to remind the user not to do dramatic post-processing of oldChild in this case.
+			console.warn("THREE.Object3D.replaceAt: newChild=oldChild. Returned object is current child.");
+			return oldChild;
+		}
+
   		var index = this.children.indexOf(oldChild);
- 		if (index !== -1) {
-			return this.replaceAt( index, newChild );
-  		}
-                console.error("oldChild not found. No replacement done.");
+ 		if (index !== -1) return this.replaceAt( index, newChild );
+ 		
+                console.error("THREE.Object3D.replace: oldChild not found. No replacement done.", oldChild);
   	},
   	
   	//Replaces child found at given index with newChild, if newChild is a valid child, and returns found oldChild.
 	replaceAt: function (index, newChild) {
-	if (newChild === this) {
-	    console.error("THREE.Object3D.add: object can't be added as a child of itself.", object);
-	    return undefined;
-	}
+		if (!(newChild instanceof THREE.Object3D)) {
+			console.error("THREE.Object3D.replaceAt: newChild not an instance of THREE.Object3D.", newChild);
+			return;
+		}
+		
+		if (newChild === this) {
+			console.error("THREE.Object3D.replaceAt: newChild can't be added as a child of itself.", newChild);
+			return;
+		}
+		
+		//Index check, allows negative indexing.
+		if (index>=this.children.length || -index > this.children.length) {
+			console.error("THREE.Object3D.replaceAt: Index out of bounds.", index);
+			return;
+		}
+		var oldChild = this.children[index];
+		
+		if (newChild === oldChild) {
+			//Warning is issued to remind the user not to do dramatic post-processing of oldChild in this case.
+			console.warn("THREE.Object3D.replaceAt: newChild=oldChild. Returned object is current child.");
+			return oldChild;
+		}
+		
+		if (newChild.parent === this) {
+			console.error("THREE.Object3D.replaceAt: newChild is already a child at another index.", newChild);
+			return;
+		}
+		
+		//(This is where index error would fail with the confusing message "Cannot read property 'parent' of undefined.")
+		oldChild.parent = null; //null is the default value for new Object3Ds.
+		this.children[index] = newChild;
+		oldChild.dispatchEvent({ type: 'removed' });
 	
-	if (!(newChild instanceof THREE.Object3D)) {
-	    console.error("THREE.Object3D.add: object not an instance of THREE.Object3D.", newChild);
-	    return undefined;
-	}
+	        //necessary test? Should this be inn add too?
+	        if (newChild.parent) {
+	           newChild.parent.remove(newChild);
+	           console.warn("newChild stolen from old parent.");
+	        }
 	
-	var oldChild = this.children[index];
-	oldChild.parent = null; //null is the default value for new Object3Ds.
-	oldChild.dispatchEvent({ type: 'removed' });
-	
-	this.children[index] = newChild;
-
-        //necessary test? Should this be inn add too?
-        if (newChild.parent) {
-           newChild.parent.remove(newChild);
-           console.warn("newChild stolen from old parent.");
-        }
-
-	newChild.parent = this;
-	newChild.dispatchEvent({ type: 'added' });
-	
-	return oldChild; //oldChild returned for easy post-handling
+		newChild.parent = this;
+		newChild.dispatchEvent({ type: 'added' });
+		
+		return oldChild; //oldChild returned for easy post-handling
 	},
 
 	getObjectById: function ( id ) {
