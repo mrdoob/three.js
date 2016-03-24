@@ -91,6 +91,21 @@ THREE.ShaderTerrain = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 
+			"vec3 inputToLinear( in vec3 a ) {",
+				"#ifdef GAMMA_INPUT",
+				"   return square( a );",
+				"#else",
+				"   return a;",
+				"#endif",
+			"}",
+
+			"float calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {",
+				"if ( decayExponent > 0.0 ) {",
+					"return pow( saturate( - lightDistance / cutoffDistance + 1.0 ), decayExponent );",
+				"}",
+				"return 1.0;",
+			"}",
+
 			"void main() {",
 
 				"vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
