@@ -17,6 +17,7 @@ THREE.Object3D = function () {
 
 	this.parent = null;
 	this.children = [];
+	this.searchOrder = [ 'name', 'uuid', 'id' ];
 
 	this.up = THREE.Object3D.DefaultUp.clone();
 
@@ -292,36 +293,23 @@ THREE.Object3D.prototype = {
 
 		var children = this.children;
 
-		if(move === undefined) move = true;
-		if(shift === undefined) shift = true;
+		entity = this.findChild(entity, true);
 
-		if( entity === undefined ) {
-
-			entity = children.length;
-
-		} else {
-
-			if ( typeof(entity) !== 'number' ) {
-
-				entity = children.indexOf( entity );
-			}
-
-		}
-
+		if( entity === -1 ) entity = children.length;
 
 		if ( object instanceof THREE.Object3D ) {
 
 			if ( object === this ) {
 
-				console.error( "THREE.Object3D.add: object can't be added as a child of itself.", object );
+				console.error( "THREE.Object3D.add/At: object can't be added as a child of itself.", object );
 
-				return this;
+				return;
 
 			}
 
 			var search = children.indexOf( object );
 
-			if ( search === -1 || move === true ) {
+			if ( search === -1 || move !== false ) {
 
 				if( entity > children.length || entity < 0) entity = children.length;
 
@@ -339,13 +327,13 @@ THREE.Object3D.prototype = {
 
 					}
 
-					if ( search !== -1 && move === true ) {
+					if ( search !== -1 && move !== false ) {
 
 						children.splice( search, 1 );
 
 						type = 'moved';
 
-						if( shift === true && search < entity - 1 ) entity = entity - 1;
+						if( shift !== false && search < entity - 1 ) entity = entity - 1;
 
 					} else {
 
@@ -376,18 +364,13 @@ THREE.Object3D.prototype = {
 
 	remove: function () {
 
-		for ( var i = 0; i < arguments.length; i ++ ) {
+		var i, list = [];
 
-			this.replace( arguments[ i ] );
-		}
+		for ( i = 0; i < arguments.length; i ++ ) list.push( this.findChild( arguments[ i ] ) );
+
+		for ( i = 0; i < list.length; i ++ ) this.replace( list[ i ] );
 
 		return this;
-
-	},
-
-	removeAt: function ( index ) {
-
-		return this.replace( index );
 
 	},
 
@@ -397,68 +380,130 @@ THREE.Object3D.prototype = {
 
 		var children = this.children, index = -1, object, result;
 
-		if( newChild !== undefined ) index = children.indexOf( newChild );
+		index = children.indexOf( newChild );
 
-		if( index === -1 ) {
+		if ( index === -1 ) {
 
-			if( typeof( entity ) === 'number' ) {
+			index = this.findChild( entity, true );
 
-				object = children[ entity ];
+			if ( index !== - 1 ) {
 
-				index = entity;
+				object = children[ index ];
 
-			} else {
+				if ( object != undefined ) {
 
-				index = children.indexOf( entity );
+					if ( object.parent != undefined && object.parent !== this ) {
 
-				if ( index !== - 1 ) object = children[ index ];
+						object.parent.remove( object );
 
+					}
+
+					object.parent = null;
+
+					if ( newChild !== undefined ) {
+
+						if ( newChild instanceof THREE.Object3D ) {
+
+							if ( newChild === this ) {
+
+								console.error( "THREE.Object3D.replace: Aborted, newChild can't be added as a child of itself.", newChild );
+
+								return;
+
+							}
+
+							result = children.splice( index, 1, newChild );
+
+							object.dispatchEvent( { type: 'replaced', index: index } );
+
+						}
+
+					}
+
+					else {
+
+						result = children.splice( index, 1 );
+
+						object.dispatchEvent( { type: 'removed', index: index } );
+
+					}
+
+					if ( Array.isArray( result ) === true && result.length === 1 ) {
+
+						return result[ 0 ];
+
+					}
+
+				}
 			}
-
-			if( object != undefined ) {
-
-				if( object.parent != undefined && object.parent !== this ) {
-
-					object.parent.remove( object );
-
-				}
-
-				object.parent = null;
-
-				if ( newChild !== undefined ) {
-
-					result = children.splice( index, 1, newChild );
-
-					object.dispatchEvent( { type: 'replaced', index: index } );
-
-				}
-
-				else {
-
-					result = children.splice( index, 1 );
-
-					object.dispatchEvent( { type: 'removed', index: index } );
-
-				}
-
-				if ( Array.isArray( result ) === true && result.length === 1 ) {
-
-					return result[ 0 ];
-
-				}
-
-			}
-
 		}
 
 		return result;
 	},
 
-	lookUp: function ( entity ) {
+	findChild: function ( entity, returnIndex ) {
 
-		var result = this.children.indexOf( entity );
+		if( entity === undefined ) {
 
-		if ( result === -1 ) result = this.children[ entity ];
+			if( returnIndex === true ) return -1;
+
+			return;
+		}
+
+		var children = this.children;
+
+		var result = children.indexOf( entity );
+
+		if ( result === -1 ) {
+
+			result = children[ entity ];
+
+			if(result === undefined ) {
+
+				var searchOrder = this.searchOrder;
+
+				var item, i, l = children.length;
+
+				var jtem, j, k = searchOrder.length;
+
+				for ( i = 0 ; i < l; i ++ ) {
+
+					item = children[i];
+
+					if ( item !== undefined ) {
+
+						for ( j = 0 ; j < k; j ++ ) {
+
+							jtem = item[ searchOrder[ j ] ];
+
+							if ( jtem === entity ) {
+
+								result = item;
+
+								break;
+
+							}
+
+						}
+
+					}
+
+					if( result !== undefined) break;
+
+				}
+
+			}
+		}
+
+		if( returnIndex === true ) {
+
+			if ( typeof(result) !== 'number' ) return children.indexOf( result );
+
+		} else {
+
+			if ( typeof(result) === 'number' ) return children[ result ];
+
+		}
 
 		return result;
 	},

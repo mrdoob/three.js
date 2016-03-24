@@ -217,41 +217,37 @@
 
 		<h3>[method:null addAt]( [page:Object entity], [page:Object3D object],  [page:Boolean move],  [page:Boolean shift] )</h3>
 		<div>
-		entity - An index or an Object3D.<br />
+		entity - Entity for matching. {see findChild} <br />
 		</div>
 		<div>
 		object - An object.<br />
+		</div>
+		<div>
+		move - A Boolean to allow moving an object if it is already found.<br />
+		</div>
+		<div>
+		shift - A Boolean that helps when moving to shift the target index.<br />
+		This compensates for moving the existing object if it needs to be moved from below the target location's index.<br />
 		</div>
 		<div>
 		Adds *object* as child of this object at the given entity location if found. When object exists already, it moves it's indices and triggers a 'moved' Event.
 		Extra Boolean arguments 'move' and 'shift' control if it will reorder and to shift if necessary the insertions target index Before or After when an existing object is moved from before the target index.
 		</div>
 
-		<h3>[method:null remove]( [page:Object3D object], ... )</h3>
+		<h3>[method:null remove]( [page:Object3D entity], ... )</h3>
 		<div>
-		object - An object.<br />
+		entity - Entity for matching. {see findChild} <br />
 		</div>
 		<div>
-		Removes *object* as child of this object. An arbitrary number of objects may be removed.
+		Removes *entity* as child of this object. the search entity can be either an index of an Object3D. An arbitrary number of entities may be removed.
 		</div>
 		<div>
 		Returns this object and not the removed items.
 		</div>
 
-		<h3>[method:null removeAt]( [page:Object3D entity] )</h3>
-		<div>
-		entity - An index or Object.<br />
-		</div>
-		<div>
-		Removes *object* as child of this object. An 'entity' can be either an index or object.
-		</div>
-		<div>
-		Returns removed item if found, nothing otherwise.
-		</div>
-
 		<h3>[method:null replace]( [page:Object3D entity], [page:Object3D newChild] )</h3>
 		<div>
-		entity - An index or Object3D.<br />
+		entity - Entity for matching. {see findChild} <br />
 		</div>
 		<div>
 		newChild - An object.<br />
@@ -263,12 +259,20 @@
 		Returns the old Object that has now been replaced, but nothing if not found.
 		</div>
 
-		<h3>[method:null lookUp]( [page:Object3D entity] )</h3>
+		<h3>[method:null findChild]( [page:Object3D entity], page:Boolean returnIndex] )</h3>
 		<div>
-		entity - An index or Object.<br />
+		entity - Entity for matching. <br />
 		</div>
 		<div>
-		Returns the index of the object found, or the object at the index, and nothing if neither is found.
+		returnIndex - A Boolean.<br />
+		</div>
+		<div>
+		"Entity" is used to find a matching child. First findChild searches for an Object3D match. Then an index key is checked, and finally the list or properties is checked.<br />
+		The properties that are checked is controlled by searchOrder a modifiable array that defaults to check the 'name', 'uuid', and 'id' in that adjustable order.
+		The returnIndex flag defaults to false but when true it will return the index of the entity not the Object3D.
+		</div>
+		<div>
+		Returns the index of the object found or index (depending of returnIndex flag), and nothing if it is not found.<br />
 		</div>
 
 		<h3>[method:null traverse]( [page:Function callback] )</h3>
