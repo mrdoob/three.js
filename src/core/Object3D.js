@@ -357,9 +357,7 @@ THREE.Object3D.prototype = {
 	//Replaces child found at given index with newChild, if newChild is a valid child, and returns found oldChild.
 	replaceAt: function(index, newChild) {
 		if (!(newChild instanceof THREE.Object3D)) {
-			console.error(
-				"THREE.Object3D.replaceAt: newChild not an instance of THREE.Object3D.",
-				newChild);
+			console.error("THREE.Object3D.replaceAt: newChild not an instance of THREE.Object3D.", newChild);
 			return;
 		}
 
