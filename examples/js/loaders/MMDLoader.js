@@ -3673,7 +3673,6 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.ShaderChunk[ "uv2_pars_vertex" ],
 		THREE.ShaderChunk[ "displacementmap_pars_vertex" ],
 		THREE.ShaderChunk[ "envmap_pars_vertex" ],
-		THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 		THREE.ShaderChunk[ "color_pars_vertex" ],
 		THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 		THREE.ShaderChunk[ "skinning_pars_vertex" ],
@@ -3714,7 +3713,6 @@ THREE.ShaderLib[ 'mmd' ] = {
 
 			THREE.ShaderChunk[ "worldpos_vertex" ],
 			THREE.ShaderChunk[ "envmap_vertex" ],
-			THREE.ShaderChunk[ "lights_phong_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 		// ---- MMD specific for outline drawing
