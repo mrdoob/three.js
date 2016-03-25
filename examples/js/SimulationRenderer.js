@@ -226,7 +226,7 @@ function SimulationRenderer( WIDTH, renderer ) {
 
 		}
 
-		var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBAFormat, THREE.FloatType );
+		var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBAFormat, THREE.FloatType ); // was RGB format. changed to RGBA format. see discussion in #8415 / #8450
 		texture.needsUpdate = true;
 
 		return texture;

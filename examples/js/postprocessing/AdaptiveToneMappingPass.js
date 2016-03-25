@@ -186,7 +186,8 @@ THREE.AdaptiveToneMappingPass.prototype = {
 			this.previousLuminanceRT.dispose();
 
 		}
-		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
+
+		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat }; // was RGB format. changed to RGBA format. see discussion in #8415 / #8450
 
 		this.luminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
 		this.luminanceRT.texture.generateMipmaps = false;
