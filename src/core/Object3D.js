@@ -348,15 +348,9 @@ THREE.Object3D.prototype = {
 
 	//Replaces oldChild, if found, with newChild, if newChild is av valid child, and returns found oldChild.
 	replace: function(oldChild, newChild) {
-		if (newChild === oldChild) {
-			//Warning is issued to remind the user not to do dramatic post-processing of oldChild in this case.
-			console.warn("THREE.Object3D.replace: newChild=oldChild. Returned object is still a child:", oldChild);
-			return oldChild;
-		}
-
 		var index = this.children.indexOf(oldChild);
 		if (index !== -1) return this.replaceAt(index, newChild);
-
+		//else:
 		console.error("THREE.Object3D.replace: oldChild not found. No replacement done.", oldChild);
 	},
 
@@ -397,17 +391,17 @@ THREE.Object3D.prototype = {
 			return;
 		}
 
-		oldChild.parent = null; //null is the default value for new Object3Ds.
-		this.children[index] = newChild;
-		oldChild.dispatchEvent({ type: 'removed' });
-
 		if (newChild.parent !== null) {
 			var oldParent = newChild.parent;
 			oldParent.remove(newChild);
 			console.warn("THREE.Object3D.replaceAt: newChild stolen from old parent:", oldParent);
 		}
-
+		
+		oldChild.parent = null; //null is the default value for new Object3Ds.
 		newChild.parent = this;
+		this.children[index] = newChild;
+		
+		oldChild.dispatchEvent({ type: 'removed' });
 		newChild.dispatchEvent({ type: 'added' });
 
 		return oldChild; //oldChild returned for easy post-handling
