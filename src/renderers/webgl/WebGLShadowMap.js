@@ -60,7 +60,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			vertexShader: depthShader.vertexShader,
 			fragmentShader: depthShader.fragmentShader,
 			morphTargets: useMorphing,
-			skinning: useSkinning
+			skinning: useSkinning,
+			clippingPlanes: true
 		} );
 
 		_depthMaterials[ i ] = depthMaterial;
@@ -73,7 +74,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			vertexShader: distanceShader.vertexShader,
 			fragmentShader: distanceShader.fragmentShader,
 			morphTargets: useMorphing,
-			skinning: useSkinning
+			skinning: useSkinning,
+			clippingPlanes: true
 		} );
 
 		_distanceMaterials[ i ] = distanceMaterial;

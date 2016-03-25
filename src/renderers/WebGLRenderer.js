@@ -49,6 +49,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.sortObjects = true;
 
+	// user-defined clipping
+
+	this.clippingPlanes = [];
+	this.clipShadows = false;
+
 	// physically based shading
 
 	this.gammaFactor = 2.0;	// for backwards compatibility
@@ -142,6 +147,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		shadows: []
 
 	},
+
+	_clippingPlanesUniform = {
+			type: '4fv', value: null, needsUpdate: false },
+	_clipIgnoreCamChanges = false,
+	_numClippingPlanes = 0,
+
+	_matrix3 = new THREE.Matrix3(),
+	_sphere = new THREE.Sphere(),
+	_plane = new THREE.Plane(),
 
 	// info
 
@@ -1156,6 +1170,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		sprites.length = 0;
 		lensFlares.length = 0;
 
+		setupClippingPlanes( camera );
 		projectObject( scene, camera );
 
 		opaqueObjects.length = opaqueObjectsLastIndex + 1;
@@ -1170,11 +1185,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
+		if ( ! this.clipShadows ) {
+
+			setupClippingPlanes( null );
+			_clipIgnoreCamChanges = true;
+
+		}
+
 		setupShadows( lights );
 
 		shadowMap.render( scene, camera );
 
 		setupLights( lights, camera );
+
+
+		//
+
+		_clipIgnoreCamChanges = false;
+
+		// clipping was either disabled or setup for a different
+		// cam rendering shadow maps, so switch back to main cam
+		// skipping the transform
+		setupClippingPlanes( camera, true );
 
 		//
 
@@ -1299,6 +1331,37 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function objectCanBeVisible( object ) {
+
+		var geometry = object.geometry;
+
+		if ( geometry.boundingSphere === null )
+			geometry.computeBoundingSphere();
+
+		var sphere = _sphere.
+				copy( geometry.boundingSphere ).
+				applyMatrix4( object.matrixWorld );
+
+		if ( ! _frustum.intersectsSphere( sphere ) ) return false;
+		if ( _numClippingPlanes === 0 ) return true;
+
+		var planes = _this.clippingPlanes,
+
+			center = sphere.center,
+			negRad = - sphere.radius,
+			i = 0;
+
+		do {
+
+			// out when deeper than radius in the negative halfspace
+			if ( planes[ i ].distanceToPoint( center ) < negRad ) return false;
+
+		} while ( ++ i !== _numClippingPlanes );
+
+		return true;
+
+	}
+
 	function projectObject( object, camera ) {
 
 		if ( object.visible === false ) return;
@@ -1311,7 +1374,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.Sprite ) {
 
-				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+				if ( object.frustumCulled === false || objectCanBeVisible( object ) === true ) {
 
 					sprites.push( object );
 
@@ -1340,7 +1403,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+				if ( object.frustumCulled === false || objectCanBeVisible( object ) === true ) {
 
 					var material = object.material;
 
@@ -1439,7 +1502,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var materialProperties = properties.get( material );
 
-		var parameters = programCache.getParameters( material, _lights, fog, object );
+		var parameters = programCache.getParameters(
+				material, _lights, fog, _numClippingPlanes, object );
+
 		var code = programCache.getProgramCode( material, parameters );
 
 		var program = materialProperties.program;
@@ -1534,10 +1599,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		materialProperties.uniformsList = [];
+		var uniforms = materialProperties.__webglShader.uniforms;
 
-		var uniforms = materialProperties.__webglShader.uniforms,
-			uniformLocations = materialProperties.program.getUniforms();
+		if ( ! ( material instanceof THREE.ShaderMaterial ) &&
+				! ( material instanceof THREE.RawShaderMaterial ) ||
+				material.clippingPlanes === true ) {
+
+			materialProperties.numClippingPlanes = _numClippingPlanes;
+			uniforms.clippingPlanes = _clippingPlanesUniform;
+
+		}
+
+		var uniformLocations = materialProperties.program.getUniforms();
+
+		materialProperties.uniformsList = [];
 
 		for ( var u in uniforms ) {
 
@@ -1644,6 +1719,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( materialProperties.numClippingPlanes !== undefined &&
+			materialProperties.numClippingPlanes !== _numClippingPlanes ) {
+
+			material.needsUpdate = true;
+
+		}
+
 		if ( material.needsUpdate ) {
 
 			initMaterial( material, fog, object );
@@ -1699,6 +1781,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				refreshMaterial = true;		// set to true on material change
 				refreshLights = true;		// remains set until update done
+
+				if ( _clipIgnoreCamChanges === false ) {
+
+					setupClippingPlanes( camera );
+
+				}
 
 			}
 
@@ -2780,6 +2868,53 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lights.hemi.length = hemiLength;
 
 		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength + ',' + _lights.shadows.length;
+
+	}
+
+	function setupClippingPlanes( camera, alreadyTransformed ) {
+
+		var planes = _this.clippingPlanes,
+			nPlanes = camera !== null ? planes.length : 0;
+
+		if ( nPlanes !== 0 ) {
+
+			var camProps = properties.get( camera ),
+				planeUniforms = camProps.clippingPlanes;
+
+			if ( alreadyTransformed !== true ) {
+
+				var flatSize = nPlanes * 4,
+					viewMatrix = camera.matrixWorldInverse;
+
+				if ( planeUniforms === undefined ||
+						planeUniforms.length < flatSize ) {
+
+					planeUniforms = new Float32Array( flatSize );
+					camProps.clippingPlanes = planeUniforms;
+
+				}
+
+				var viewNormalMatrix =
+						_matrix3.getNormalMatrix( viewMatrix );
+
+				for ( var i = 0, i4 = 0; i !== nPlanes; ++ i, i4 += 4 ) {
+
+					var plane = _plane.copy( planes[ i ] ).
+							applyMatrix4( viewMatrix, viewNormalMatrix );
+
+					plane.normal.toArray( planeUniforms, i4 );
+					planeUniforms[ i4 + 3 ] = plane.constant;
+
+				}
+
+			} // else assert( planeUniforms !=== undefined );
+
+			_clippingPlanesUniform.value = planeUniforms;
+			_clippingPlanesUniform.needsUpdate = true;
+
+		}
+
+		_numClippingPlanes = nPlanes;
 
 	}
 
