@@ -367,8 +367,8 @@ THREE.Object3D.prototype = {
 		}
 
 		//Allow negative indexing
-		if (index<0) index = this.children.length+index;
-		if (index >= this.children.length) {
+		if (index < 0) index += this.children.length;
+		if (index < 0 || index >= this.children.length) {
 			console.error("THREE.Object3D.replaceAt: Index %d out of bounds.", index);
 			return;
 		}
