@@ -3,7 +3,7 @@ varying vec3 vNormal;
 #include <common>
 #include <morphtarget_pars_vertex>
 #include <logdepthbuf_pars_vertex>
-#incldue <clipping_planes_pars_vertex>
+#include <clipping_planes_pars_vertex>
 
 void main() {
 
