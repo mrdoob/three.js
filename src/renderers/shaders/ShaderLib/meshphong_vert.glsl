@@ -13,7 +13,6 @@ varying vec3 vViewPosition;
 #include <uv2_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <envmap_pars_vertex>
-#include <lights_phong_pars_vertex>
 #include <color_pars_vertex>
 #include <morphtarget_pars_vertex>
 #include <skinning_pars_vertex>
@@ -49,7 +48,6 @@ void main() {
 
 	#include <worldpos_vertex>
 	#include <envmap_vertex>
-	#include <lights_phong_vertex>
 	#include <shadowmap_vertex>
 
 }
