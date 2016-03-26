@@ -240,12 +240,7 @@ THREE.ObjectLoader.prototype = {
 
 					case 'LatheGeometry':
 
-						geometry = new THREE.LatheGeometry(
-							data.points,
-							data.segments,
-							data.phiStart,
-							data.phiLength
-						);
+						geometry = new THREE.LatheGeometry( data );
 
 						break;
 

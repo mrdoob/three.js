@@ -40,6 +40,17 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 	container.add( phiLengthRow );
 
+	// mapping
+
+	var mappingRow = new UI.Row();
+	var mappingOptions = [ 'index', 'length' ];
+	var mapping = new UI.Select().setOptions( mappingOptions ).setValue( ( parameters.mapping || 'index' ).toLowerCase() === 'length' ? 1 : 0 ).onChange( update );
+
+	mappingRow.add( new UI.Text( 'Mapping' ).setWidth( '90px' ) );
+	mappingRow.add( mapping );
+
+	container.add( mappingRow );
+
 	// points
 
 	var lastPointIdx = 0;
@@ -137,7 +148,8 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 			points,
 			segments.getValue(),
 			phiStart.getValue() / 180 * Math.PI,
-			phiLength.getValue() / 180 * Math.PI
+			phiLength.getValue() / 180 * Math.PI,
+			mappingOptions[ mapping.getValue() ]
 		);
 
 		editor.execute( new SetGeometryCommand( object, geometry ) );
