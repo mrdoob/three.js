@@ -120,29 +120,21 @@ THREE.Math = {
 
 	},
 
-	degToRad: function () {
+	degToRad: function ( degrees ) {
 
-		var degreeToRadiansFactor = Math.PI / 180;
+		// Math.PI / 180 = 0.017453292519943295
 
-		return function ( degrees ) {
+		return degrees * 0.017453292519943295;
 
-			return degrees * degreeToRadiansFactor;
+	},
 
-		};
+	radToDeg: function ( radians ) {
 
-	}(),
+		// 180 / Math.PI = 0.57.29577951308232
 
-	radToDeg: function () {
+		return radians * 57.29577951308232;
 
-		var radianToDegreesFactor = 180 / Math.PI;
-
-		return function ( radians ) {
-
-			return radians * radianToDegreesFactor;
-
-		};
-
-	}(),
+	},
 
 	isPowerOfTwo: function ( value ) {
 
