@@ -18,7 +18,7 @@ THREE.Object3D = function () {
 	this.parent = null;
 	this.children = [];
 	// searchOrder: WARNING! using 'id' here is BAD as it's problematic with index referencing.
-	this.searchOrder = [ 'name', 'uuid' ];
+	this.searchOrder = [ 'object', 'index', 'name', 'uuid' ];
 
 	this.up = THREE.Object3D.DefaultUp.clone();
 
@@ -448,7 +448,7 @@ THREE.Object3D.prototype = {
 		return result;
 	},
 
-	findChild: function ( entity, returnIndex ) {
+	findChild: function ( entity, returnIndex, searchOrder ) {
 
 		if( entity === undefined ) {
 
@@ -459,47 +459,39 @@ THREE.Object3D.prototype = {
 
 		var children = this.children;
 
-		var result = children.indexOf( entity );
+		searchOrder = searchOrder || this.searchOrder;
 
-		if ( result === -1 ) {
+		var searchType, item, i, l = children.length;
 
-			result = children[ entity ];
+		var result, jtem, j, k = searchOrder.length;
 
-			if(result === undefined ) {
+		for ( i = 0 ; i < l; i ++ ) {
 
-				var searchOrder = this.searchOrder;
+			item = children[i];
 
-				var item, i, l = children.length;
+			if ( item !== undefined ) {
 
-				var jtem, j, k = searchOrder.length;
+				for ( j = 0 ; j < k; j ++ ) {
 
-				for ( i = 0 ; i < l; i ++ ) {
+					searchType = searchOrder[ j ];
 
-					item = children[i];
+					if( searchType === 'object' ) jtem = item;
+					else jtem = item[ searchType ];
 
-					if ( item !== undefined ) {
+					if ( jtem === entity  || ( searchType === 'index' && i == entity ) ) {
 
-						for ( j = 0 ; j < k; j ++ ) {
+						result = item;
 
-							jtem = item[ searchOrder[ j ] ];
-
-							if ( jtem === entity ) {
-
-								result = item;
-
-								break;
-
-							}
-
-						}
+						break;
 
 					}
-
-					if( result !== undefined) break;
 
 				}
 
 			}
+
+			if( result !== undefined) break;
+
 		}
 
 		if( returnIndex === true ) {
