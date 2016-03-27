@@ -294,7 +294,7 @@ THREE.Object3D.prototype = {
 
 		var children = this.children;
 
-		entity = this.findChild(entity, true);
+		entity = this.findObject(entity, true);
 
 		if( entity === -1 ) entity = children.length;
 
@@ -367,7 +367,7 @@ THREE.Object3D.prototype = {
 
 		var i, list = [];
 
-		for ( i = 0; i < arguments.length; i ++ ) list.push( this.findChild( arguments[ i ] ) );
+		for ( i = 0; i < arguments.length; i ++ ) list.push( this.findObject( arguments[ i ] ) );
 
 		for ( i = 0; i < list.length; i ++ ) this.replace( list[ i ] );
 
@@ -391,7 +391,7 @@ THREE.Object3D.prototype = {
 
 		if ( index === -1 ) {
 
-			index = this.findChild( entity, true );
+			index = this.findObject( entity, true );
 
 			if ( index !== - 1 ) {
 
@@ -448,7 +448,7 @@ THREE.Object3D.prototype = {
 		return result;
 	},
 
-	findChild: function ( entity, returnIndex, searchOrder ) {
+	findObject: function ( entity, returnIndex, searchOrder ) {
 
 		if( entity === undefined ) {
 
@@ -457,45 +457,28 @@ THREE.Object3D.prototype = {
 			return;
 		}
 
-		var children = this.children;
-
 		if( searchOrder === undefined ) searchOrder = this.searchOrder;
+
 		else {
 
 			if(Array.isArray( searchOrder ) === false) searchOrder = [ searchOrder ];
 
 		}
 
-		var searchType, item, i, l = children.length;
-
-		var result, jtem, j, k = searchOrder.length;
+		var children = this.children;
+		var result, searchType, i, l = searchOrder.length;
 
 		for ( i = 0 ; i < l; i ++ ) {
 
-			item = children[i];
+			searchType = searchOrder[ i ];
 
-			if ( item !== undefined ) {
+			if( searchType === 'object' ) result = children.indexOf( entity );
 
-				for ( j = 0 ; j < k; j ++ ) {
+			else if ( searchType === 'index' ) result = children[ entity ];
 
-					searchType = searchOrder[ j ];
+			else result = this.getObjectByProperty( searchType, entity );
 
-					if( searchType === 'object' ) jtem = item;
-					else jtem = item[ searchType ];
-
-					if ( jtem === entity  || ( searchType === 'index' && i == entity ) ) {
-
-						result = item;
-
-						break;
-
-					}
-
-				}
-
-			}
-
-			if( result !== undefined) break;
+			if ( result !== undefined && result !== -1) break;
 
 		}
 
