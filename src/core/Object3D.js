@@ -459,7 +459,12 @@ THREE.Object3D.prototype = {
 
 		var children = this.children;
 
-		searchOrder = searchOrder || this.searchOrder;
+		if( searchOrder === undefined ) searchOrder = this.searchOrder;
+		else {
+
+			if(Array.isArray( searchOrder ) === false) searchOrder = [ searchOrder ];
+
+		}
 
 		var searchType, item, i, l = children.length;
 
