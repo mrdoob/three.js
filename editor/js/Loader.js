@@ -470,7 +470,7 @@ var Loader = function ( editor ) {
 
 				var mesh;
 
-				if ( geometry.animations && geometry.animations.length > 0 ) {
+				if ( geometry.bones !== undefined ) {
 
 					mesh = new THREE.SkinnedMesh( geometry, material );
 
