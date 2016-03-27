@@ -474,7 +474,7 @@ var Loader = function ( editor ) {
 
 					mesh = new THREE.SkinnedMesh( geometry, material );
 
-					if ( mesh.material.materials !== undefined ) {
+					if ( mesh.material instanceof THREE.MultiMaterial ) {
 
 						for ( var i = 0; i < mesh.material.materials.length; i++ ) {
 

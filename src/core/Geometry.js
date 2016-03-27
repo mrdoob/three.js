@@ -1048,7 +1048,7 @@ THREE.Geometry.prototype = {
 		var skinWeights = [];
 		var influencesPerVertex = 0;
 
-		if ( this.bones !== undefined && this.skinIndices !== undefined && this.skinWeights !== undefined ) {
+		if ( this.bones !== undefined ) {
 
 			for ( var i = 0; i < this.bones.length; i ++ ) {
 
@@ -1056,35 +1056,35 @@ THREE.Geometry.prototype = {
 
 			}
 
-			for ( var i = 0; i < this.skinIndices.length; i ++ ) {
+		}
 
-				var array = this.skinIndices[ i ].toArray();
+		for ( var i = 0; i < this.skinIndices.length; i ++ ) {
 
-				for ( var j = 0; j < array.length; j ++ ) {
+			var array = this.skinIndices[ i ].toArray();
 
-					skinIndices.push( array[ j ] );
+			for ( var j = 0; j < array.length; j ++ ) {
 
-				}
-
-			}
-
-			for ( var i = 0; i < this.skinWeights.length; i ++ ) {
-
-				var array = this.skinWeights[ i ].toArray();
-
-				for ( var j = 0; j < array.length; j ++ ) {
-
-					skinWeights.push( array[ j ] );
-
-				}
+				skinIndices.push( array[ j ] );
 
 			}
 
-			if ( this.skinIndices.length > 0 ) {
+		}
 
-				influencesPerVertex = this.skinIndices[ 0 ].toArray().length;
+		for ( var i = 0; i < this.skinWeights.length; i ++ ) {
+
+			var array = this.skinWeights[ i ].toArray();
+
+			for ( var j = 0; j < array.length; j ++ ) {
+
+				skinWeights.push( array[ j ] );
 
 			}
+
+		}
+
+		if ( this.skinIndices.length > 0 ) {
+
+			influencesPerVertex = this.skinIndices[ 0 ].toArray().length;
 
 		}
 
