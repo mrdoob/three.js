@@ -171,15 +171,11 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				shadow.map = new THREE.WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 
-				//
+			}
 
-				if ( light instanceof THREE.SpotLight ) {
+			if ( shadow instanceof THREE.SpotLightShadow ) {
 
-					shadowCamera.aspect = _shadowMapSize.x / _shadowMapSize.y;
-
-				}
-
-				shadowCamera.updateProjectionMatrix();
+				shadow.update( light );
 
 			}
 
