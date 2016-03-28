@@ -219,7 +219,9 @@ THREE.OBJLoader.prototype = {
 
 		var smoothing_pattern = /^s\s+(\d+|on|off)/;
 
-		//
+		// long lines can be split with a backslash...
+		text = text.replace(/\\(\r\n|\r|\n)/g,'');
+		var lines = text.split( '\n' );        
 
 		var lines = text.split( '\n' );
 
