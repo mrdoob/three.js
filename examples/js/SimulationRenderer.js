@@ -16,17 +16,14 @@ function SimulationRenderer( WIDTH, renderer ) {
 	var camera = new THREE.Camera();
 	camera.position.z = 1;
 
-	// Init RTT stuff
-	gl = renderer.getContext();
-
-	if ( ! gl.getExtension( "OES_texture_float" ) ) {
+	if ( ! renderer.extensions.get( "OES_texture_float" ) ) {
 
 		alert( "No OES_texture_float support for float textures!" );
 		return;
 
 	}
 
-	if ( gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) === 0 ) {
+	if ( renderer.capabilities.maxVertexTextures === 0 ) {
 
 		alert( "No support for vertex shader textures!" );
 		return;
