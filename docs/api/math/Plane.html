@@ -61,7 +61,8 @@
 		optionalNormalMatrix -- (optional) pre-computed normal [Page:Matrix3] of the Matrix4 to apply
 		</div>
 		<div>
-		Apply a Matrix4 to the plane. The second parameter is optional.
+		Apply a Matrix4 to the plane. The matrix must be an affine, homogeneous transform.
+		The second parameter is optional.
 
 		<code>
 		var optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix )
