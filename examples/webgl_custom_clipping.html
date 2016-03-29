@@ -128,6 +128,7 @@
 
 			} )();
 
+
 			// A regular tetrahedron for the clipping volume:
 
 			var Vertices = [
@@ -195,8 +196,6 @@
 
 				// Geometry
 
-
-				var geometry = new THREE.TorusKnotGeometry( 0.3, 0.15, 60, 10 ); //new THREE.BoxGeometry( 0.6, 0.6, 0.6 );
 				clipMaterial = new THREE.MeshPhongMaterial( {
 					color: 0xee0a10,
 					shininess: 100,
@@ -207,7 +206,6 @@
 				} );
 
 				object = new THREE.Group();
-				object.matrixAutoUpdate = false;
 
 				var geometry = new THREE.BoxBufferGeometry( 0.18, 0.18, 0.18 );
 
@@ -252,10 +250,8 @@
 
 					} );
 
-					var mesh = new THREE.Mesh( planeGeometry, material );
-					mesh.matrixAutoUpdate = false;
-
-					volumeVisualization.add( mesh );
+					volumeVisualization.add(
+							new THREE.Mesh( planeGeometry, material ) );
 
 				}
 
@@ -342,6 +338,16 @@
 
 			}
 
+			function setObjectWorldMatrix( object, matrix ) {
+				// set the orientation of an object based on a world matrix
+
+				var parent = object.parent;
+				scene.updateMatrixWorld();
+				object.matrix.getInverse( parent.matrixWorld );
+				object.applyMatrix( matrix );
+
+			}
+
 			var transform = new THREE.Matrix4(),
 				tmpMatrix = new THREE.Matrix4();
 
@@ -352,12 +358,12 @@
 
 				requestAnimationFrame( animate );
 
-				transform.makeTranslation( 0, 1, 0 ).
-						multiply( tmpMatrix.makeRotationX( time * 0.5 ) ).
-						multiply( tmpMatrix.makeRotationY( time * 0.2 ) );
+				object.position.y = 1;
+				object.rotation.x = time * 0.5;
+				object.rotation.y = time * 0.2;
 
-				object.matrix.copy( transform );
-				object.updateMatrixWorld( true );
+				object.updateMatrix();
+				transform.copy( object.matrix );
 
 				var bouncy = Math.cos( time * .5 ) * 0.5 + 0.7;
 				transform.multiply(
@@ -370,14 +376,10 @@
 
 				for ( var i = 0, n = planeMeshes.length; i !== n; ++ i ) {
 
-					var planeMatrix = PlaneMatrices[ i ],
-						planeMesh = planeMeshes[ i ];
-
-					planeMesh.matrix.multiplyMatrices( transform, planeMatrix );
-					planeMesh.updateMatrixWorld( true );
+					tmpMatrix.multiplyMatrices( transform, PlaneMatrices[ i ] );
+					setObjectWorldMatrix( planeMeshes[ i ], tmpMatrix );
 
 				}
-
 
 				transform.makeRotationY( time * 0.1 );
 
