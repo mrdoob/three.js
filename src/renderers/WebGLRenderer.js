@@ -223,6 +223,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var extensions = new THREE.WebGLExtensions( _gl );
 
+	extensions.get( 'WEBGL_depth_texture' );
 	extensions.get( 'OES_texture_float' );
 	extensions.get( 'OES_texture_float_linear' );
 	extensions.get( 'OES_texture_half_float' );
@@ -585,23 +586,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var renderTargetProperties = properties.get( renderTarget );
 		var textureProperties = properties.get( renderTarget.texture );
 
-		if ( ! renderTarget || textureProperties.__webglTexture === undefined ) return;
+		if ( ! renderTarget ) return;
 
-		_gl.deleteTexture( textureProperties.__webglTexture );
+		if ( textureProperties.__webglTexture !== undefined ) {
+
+			_gl.deleteTexture( textureProperties.__webglTexture );
+
+		}
+
+		if ( renderTarget.depthTexture ) {
+
+			renderTarget.depthTexture.dispose();
+
+		}
 
 		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
 
 			for ( var i = 0; i < 6; i ++ ) {
 
 				_gl.deleteFramebuffer( renderTargetProperties.__webglFramebuffer[ i ] );
-				_gl.deleteRenderbuffer( renderTargetProperties.__webglDepthbuffer[ i ] );
+				if ( renderTargetProperties.__webglDepthbuffer ) _gl.deleteRenderbuffer( renderTargetProperties.__webglDepthbuffer[ i ] );
 
 			}
 
 		} else {
 
 			_gl.deleteFramebuffer( renderTargetProperties.__webglFramebuffer );
-			_gl.deleteRenderbuffer( renderTargetProperties.__webglDepthbuffer );
+			if ( renderTargetProperties.__webglDepthbuffer ) _gl.deleteRenderbuffer( renderTargetProperties.__webglDepthbuffer );
 
 		}
 
@@ -3246,6 +3257,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	// Setup resources for a Depth Texture for a FBO (needs an extension)
+	function setupDepthTexture ( framebuffer, renderTarget ) {
+
+		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
+		if ( isCube ) throw new Error('Depth Texture with cube render targets is not supported!');
+
+		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+
+		// upload an empty depth texture with framebuffer size
+		if ( !properties.get( renderTarget.depthTexture ).__webglTexture ||
+				renderTarget.depthTexture.image.width !== renderTarget.width ||
+				renderTarget.depthTexture.image.height !== renderTarget.height ) {
+			renderTarget.depthTexture.image.width = renderTarget.width;
+			renderTarget.depthTexture.image.height = renderTarget.height;
+			renderTarget.depthTexture.needsUpdate = true;
+		}
+
+		_this.setTexture( renderTarget.depthTexture, 0 );
+
+		var webglDepthTexture = properties.get( renderTarget.depthTexture ).__webglTexture;
+		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+	}
+
 	// Setup GL resources for a non-texture depth buffer
 	function setupDepthRenderbuffer( renderTarget ) {
 
@@ -3253,23 +3288,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
 
-		if ( isCube ) {
+		if ( renderTarget.depthTexture ) {
 
-			renderTargetProperties.__webglDepthbuffer = [];
+			if ( isCube ) throw new Error('target.depthTexture not supported in Cube render targets');
 
-			for ( var i = 0; i < 6; i ++ ) {
-
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
-				renderTargetProperties.__webglDepthbuffer[ i ] = _gl.createRenderbuffer();
-				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget );
-
-			}
+			setupDepthTexture( renderTargetProperties.__webglFramebuffer, renderTarget );
 
 		} else {
 
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
-			renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
-			setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget );
+			if ( isCube ) {
+
+				renderTargetProperties.__webglDepthbuffer = [];
+
+				for ( var i = 0; i < 6; i ++ ) {
+
+					_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
+					renderTargetProperties.__webglDepthbuffer[ i ] = _gl.createRenderbuffer();
+					setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget );
+
+				}
+
+			} else {
+
+				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+				renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
+				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget );
+
+			}
 
 		}
 

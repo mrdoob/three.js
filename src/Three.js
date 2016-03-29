@@ -272,6 +272,7 @@ THREE.LuminanceFormat = 1022;
 THREE.LuminanceAlphaFormat = 1023;
 // THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
 THREE.RGBEFormat = THREE.RGBAFormat; //1024;
+THREE.DepthFormat = 1026;
 
 // DDS / ST3C Compressed texture formats
 
