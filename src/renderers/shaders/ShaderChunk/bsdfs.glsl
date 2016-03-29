@@ -60,12 +60,24 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 	float a2 = pow2( alpha );
 
 	float gl = dotNL + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
-
 	float gv = dotNV + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );
 
 	return 1.0 / ( gl * gv );
 
 } // validated
+
+// from page 12, listing 2 of http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr_v2.pdf
+float G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
+
+	float a2 = pow2( alpha );
+
+	// dotNL and dotNV are explicitly swapped. This is not a mistake.
+	float gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );
+	float gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
+
+	return 0.5 / max( gv + gl, EPSILON );
+}
+
 
 
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
@@ -96,7 +108,7 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 
 	vec3 F = F_Schlick( specularColor, dotLH );
 
-	float G = G_GGX_Smith( alpha, dotNL, dotNV );
+	float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
 
 	float D = D_GGX( alpha, dotNH );
 

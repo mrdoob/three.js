@@ -106,9 +106,7 @@
 
 				light.castShadow = true;
 
-				light.shadow.camera.near = 700;
-				light.shadow.camera.far = camera.far;
-				light.shadow.camera.fov = 50;
+				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 700, FAR ) );
 
 				light.shadow.bias = 0.0001;
 

@@ -49,7 +49,7 @@ THREE.StereoCamera.prototype = {
 				var projectionMatrix = camera.projectionMatrix.clone();
 				var eyeSep = 0.064 / 2;
 				var eyeSepOnProjection = eyeSep * near / focalLength;
-				var ymax = near * Math.tan( THREE.Math.degToRad( fov * 0.5 ) );
+				var ymax = near * Math.tan( THREE.Math.DEG2RAD * fov * 0.5 );
 				var xmin, xmax;
 
 				// translate xOffset
