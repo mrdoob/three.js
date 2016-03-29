@@ -124,6 +124,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// clipping
 
 	_clippingEnabled = false,
+	_localClippingEnabled = false,
 	_clipRenderingShadows = false,
 
 	_numClippingPlanes = 0,
@@ -1179,7 +1180,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		sprites.length = 0;
 		lensFlares.length = 0;
 
-		_clippingEnabled = this.clippingPlanes.length !== 0 || this.localClippingEnabled;
 		setupGlobalClippingPlanes( this.clippingPlanes, camera );
 
 		projectObject( scene, camera );
@@ -1717,7 +1717,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _clippingEnabled ) {
 
-			if ( _this.localClippingEnabled || camera !== _currentCamera ) {
+			if ( _localClippingEnabled || camera !== _currentCamera ) {
 
 				var useCache =
 						camera === _currentCamera &&
@@ -2896,6 +2896,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupGlobalClippingPlanes( planes, camera ) {
 
+		_clippingEnabled =
+				_this.clippingPlanes.length !== 0 ||
+				_this.localClippingEnabled ||
+				// enable state of previous frame - the clipping code has to
+				// run another frame in order to reset the state:
+				_numGlobalClippingPlanes !== 0 ||
+				_localClippingEnabled;
+
+		_localClippingEnabled = _this.localClippingEnabled;
+
 		_globalClippingState = setupClippingPlanes( planes, camera, 0 );
 		_numGlobalClippingPlanes = planes !== null ? planes.length : 0;
 
@@ -2959,7 +2969,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setClippingState( planes, clipShadows, camera, cache, fromCache ) {
 
-		if ( planes === null || planes.length === 0 ||
+		if ( ! _localClippingEnabled ||
+				planes === null || planes.length === 0 ||
 				_clipRenderingShadows && ! clipShadows ) {
 			// there's no local clipping
 
