@@ -336,7 +336,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
-		if ( material.clipShadows === true &&
+		if ( _renderer.localClippingEnabled &&
+			 material.clipShadows === true &&
 				material.clippingPlanes.length !== 0 ) {
 
 			// in this case we need a unique material instance reflecting the
