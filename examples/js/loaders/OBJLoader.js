@@ -65,8 +65,8 @@ THREE.OBJLoader.prototype = {
 
 	},
 
-	_createParserState : function()
-	{
+	_createParserState : function () {
+
 		var state = {
 			objects  : [],
 			object   : {},
@@ -77,14 +77,16 @@ THREE.OBJLoader.prototype = {
 
 			materialLibraries : [],
 
-			startObject : function(name, fromDeclaration)
-			{
+			startObject: function ( name, fromDeclaration ) {
+
 				// If the current object (initial from reset) is not from a g/o declaration in the parsed
 				// file. We need to use it for the first parsed g/o to keep things in sync.
 				if ( this.object && this.object.fromDeclaration === false ) {
+
 					this.object.name = name;
-					this.object.fromDeclaration = (fromDeclaration !== false);
+					this.object.fromDeclaration = ( fromDeclaration !== false );
 					return;
+
 				}
 
 				this.object = {
@@ -98,93 +100,104 @@ THREE.OBJLoader.prototype = {
 						name   : '',
 						smooth : true
 					},
-					fromDeclaration : (fromDeclaration !== false)
+					fromDeclaration : ( fromDeclaration !== false )
 				};
-				this.objects.push(this.object);
+
+				this.objects.push( this.object );
+
 			},
 
-			parseVertexIndex : function( value, len ) {
+			parseVertexIndex: function ( value, len ) {
 
 				var index = parseInt( value, 10 );
 				return ( index >= 0 ? index - 1 : index + len / 3 ) * 3;
 
 			},
 
-			parseNormalIndex : function( value, len ) {
+			parseNormalIndex: function ( value, len ) {
 
 				var index = parseInt( value, 10 );
 				return ( index >= 0 ? index - 1 : index + len / 3 ) * 3;
 
 			},
 
-			parseUVIndex : function( value, len ) {
+			parseUVIndex: function ( value, len ) {
 
 				var index = parseInt( value, 10 );
 				return ( index >= 0 ? index - 1 : index + len / 2 ) * 2;
 
 			},
 
-			addVertex : function( a, b, c ) {
+			addVertex: function ( a, b, c ) {
 
 				var src = this.vertices;
-				this.object.geometry.vertices.push(src[ a ]);
-				this.object.geometry.vertices.push(src[ a + 1 ]);
-				this.object.geometry.vertices.push(src[ a + 2 ]);
-				this.object.geometry.vertices.push(src[ b ]);
-				this.object.geometry.vertices.push(src[ b + 1 ]);
-				this.object.geometry.vertices.push(src[ b + 2 ]);
-				this.object.geometry.vertices.push(src[ c ]);
-				this.object.geometry.vertices.push(src[ c + 1 ]);
-				this.object.geometry.vertices.push(src[ c + 2 ]);
+				var dst = this.object.geometry.vertices;
+
+				dst.push( src[ a + 0 ] );
+				dst.push( src[ a + 1 ] );
+				dst.push( src[ a + 2 ] );
+				dst.push( src[ b + 0 ] );
+				dst.push( src[ b + 1 ] );
+				dst.push( src[ b + 2 ] );
+				dst.push( src[ c + 0 ] );
+				dst.push( src[ c + 1 ] );
+				dst.push( src[ c + 2 ] );
 
 			},
 
-			addVertexLine : function( a )
-			{
+			addVertexLine: function ( a ) {
 
 				var src = this.vertices;
-				this.object.geometry.vertices.push(src[ a ]);
-				this.object.geometry.vertices.push(src[ a + 1 ]);
-				this.object.geometry.vertices.push(src[ a + 2 ]);
+				var dst = this.object.geometry.vertices;
+
+				dst.push( src[ a + 0 ] );
+				dst.push( src[ a + 1 ] );
+				dst.push( src[ a + 2 ] );
 
 			},
 
-			addNormal : function( a, b, c ) {
+			addNormal : function ( a, b, c ) {
 
 				var src = this.normals;
-				this.object.geometry.normals.push(src[ a ]);
-				this.object.geometry.normals.push(src[ a + 1 ]);
-				this.object.geometry.normals.push(src[ a + 2 ]);
-				this.object.geometry.normals.push(src[ b ]);
-				this.object.geometry.normals.push(src[ b + 1 ]);
-				this.object.geometry.normals.push(src[ b + 2 ]);
-				this.object.geometry.normals.push(src[ c ]);
-				this.object.geometry.normals.push(src[ c + 1 ]);
-				this.object.geometry.normals.push(src[ c + 2 ]);
+				var dst = this.object.geometry.normals;
+
+				dst.push( src[ a + 0 ] );
+				dst.push( src[ a + 1 ] );
+				dst.push( src[ a + 2 ] );
+				dst.push( src[ b + 0 ] );
+				dst.push( src[ b + 1 ] );
+				dst.push( src[ b + 2 ] );
+				dst.push( src[ c + 0 ] );
+				dst.push( src[ c + 1 ] );
+				dst.push( src[ c + 2 ] );
 
 			},
 
-			addUV : function( a, b, c ) {
+			addUV: function ( a, b, c ) {
 
 				var src = this.uvs;
-				this.object.geometry.uvs.push(src[ a ]);
-				this.object.geometry.uvs.push(src[ a + 1 ]);
-				this.object.geometry.uvs.push(src[ b ]);
-				this.object.geometry.uvs.push(src[ b + 1 ]);
-				this.object.geometry.uvs.push(src[ c ]);
-				this.object.geometry.uvs.push(src[ c + 1 ]);
+				var dst = this.object.geometry.uvs;
+
+				dst.push( src[ a + 0 ] );
+				dst.push( src[ a + 1 ] );
+				dst.push( src[ b + 0 ] );
+				dst.push( src[ b + 1 ] );
+				dst.push( src[ c + 0 ] );
+				dst.push( src[ c + 1 ] );
 
 			},
 
-			addUVLine : function( a ) {
+			addUVLine: function ( a ) {
 
 				var src = this.uvs;
-				this.object.geometry.uvs.push(src[ a ]);
-				this.object.geometry.uvs.push(src[ a + 1 ]);
+				var dst = this.object.geometry.uvs;
+
+				dst.push( src[ a + 0 ] );
+				dst.push( src[ a + 1 ] );
 
 			},
 
-			addFace : function( a, b, c, d, ua, ub, uc, ud, na, nb, nc, nd ) {
+			addFace: function ( a, b, c, d, ua, ub, uc, ud, na, nb, nc, nd ) {
 
 				var vLen = this.vertices.length;
 
@@ -235,15 +248,8 @@ THREE.OBJLoader.prototype = {
 					var nLen = this.normals.length;
 					ia = this.parseNormalIndex( na, nLen );
 
-					if (na === nb)
-						ib = ia;
-					else
-						ib = this.parseNormalIndex( nb, nLen );
-
-					if (na === nc)
-						ic = ia;
-					else
-						ic = this.parseNormalIndex( nc, nLen );
+					ib = na === nb ? ia : this.parseNormalIndex( nb, nLen );
+					ic = na === nc ? ia : this.parseNormalIndex( nc, nLen );
 
 					if ( d === undefined ) {
 
@@ -262,25 +268,33 @@ THREE.OBJLoader.prototype = {
 
 			},
 
-			addLineGeometry : function(vertexes, uvs)
-			{
+			addLineGeometry: function ( vertices, uvs ) {
+
 				this.object.geometry.type = 'Line';
 
 				var vLen = this.vertices.length;
 				var uvLen = this.uvs.length;
 
-				for (var vi = 0, l = vertexes.length; vi < l; vi++) {
-					this.addVertexLine( this.parseVertexIndex( vertexes[vi], vLen ) );
+				for ( var vi = 0, l = vertices.length; vi < l; vi ++ ) {
+
+					this.addVertexLine( this.parseVertexIndex( vertices[ vi ], vLen ) );
+
 				}
-				for (var uvi = 0, l = uvs.length; uvi < l; uvi++) {
-					this.addUVLine( this.parseUVIndex( uvs[uvi], uvLen ) );
+
+				for ( var uvi = 0, l = uvs.length; uvi < l; uvi ++ ) {
+
+					this.addUVLine( this.parseUVIndex( uvs[ uvi ], uvLen ) );
+
 				}
 
 			}
+
 		};
 
-		state.startObject('', false);
+		state.startObject( '', false );
+
 		return state;
+
 	},
 
 	parse: function ( text ) {
@@ -289,9 +303,11 @@ THREE.OBJLoader.prototype = {
 
 		var state = this._createParserState();
 
-		if ( text.indexOf('\r\n') !== -1 ) {
+		if ( text.indexOf( '\r\n' ) !== - 1 ) {
+
 			// This is faster than String.split with regex that splits on both
-			text = text.replace('\r\n', '\n');
+			text = text.replace( '\r\n', '\n' );
+
 		}
 
 		var lines = text.split( '\n' );
@@ -300,26 +316,22 @@ THREE.OBJLoader.prototype = {
 		var result = [];
 
 		// Faster to just trim left side of the line. Use if available.
-		var trimLeft = (typeof ''.trimLeft === 'function');
+		var trimLeft = ( typeof ''.trimLeft === 'function' );
 
 		for ( var i = 0, l = lines.length; i < l; i ++ ) {
 
 			line = lines[ i ];
-			if (trimLeft)
-				line = line.trimLeft();
-			else
-				line = line.trim();
+
+			line = trimLeft ? line.trimLeft() : line.trim();
 
 			lineLength = line.length;
-			if ( lineLength === 0 ) {
-				continue;
-			}
+
+			if ( lineLength === 0 ) continue;
 
 			lineFirstChar = line.charAt( 0 );
-			if ( lineFirstChar === '#' ) {
-				// @todo invoke passed in handler if any
-				continue;
-			}
+
+			// @todo invoke passed in handler if any
+			if ( lineFirstChar === '#' ) continue;
 
 			if ( lineFirstChar === 'v' ) {
 
@@ -359,7 +371,7 @@ THREE.OBJLoader.prototype = {
 
 				} else {
 
-					throw new Error( "Unexpected vertex/normal/uv line: '" + line  + "'");
+					throw new Error( "Unexpected vertex/normal/uv line: '" + line  + "'" );
 
 				}
 
@@ -412,31 +424,32 @@ THREE.OBJLoader.prototype = {
 
 				} else {
 
-					throw new Error( "Unexpected face line: '" + line  + "'");
+					throw new Error( "Unexpected face line: '" + line  + "'" );
 
 				}
 
 			} else if ( lineFirstChar === "l" ) {
 
-				var lineParts = line.substring(1).trim().split(" ");
-				var lineVertexes = [], lineUVs = [];
+				var lineParts = line.substring( 1 ).trim().split( " " );
+				var lineVertices = [], lineUVs = [];
 
-				if (line.indexOf("/") === -1) {
+				if ( line.indexOf( "/" ) === - 1 ) {
 
-					lineVertexes = lineParts;
+					lineVertices = lineParts;
 
 				} else {
-					for (var li = 0, llen = lineParts.length; li < llen; li++) {
 
-						var parts = lineParts[li].split("/");
-						if (parts[0] !== "")
-							lineVertexes.push(parts[0]);
-						if (parts[1] !== "")
-							lineUVs.push(parts[1])
+					for ( var li = 0, llen = lineParts.length; li < llen; li ++ ) {
+
+						var parts = lineParts[ li ].split( "/" );
+
+						if ( parts[ 0 ] !== "" ) lineVertices.push( parts[ 0 ] );
+						if ( parts[ 1 ] !== "" ) lineUVs.push( parts[ 1 ] );
 
 					}
+
 				}
-				state.addLineGeometry(lineVertexes, lineUVs);
+				state.addLineGeometry( lineVertices, lineUVs );
 
 			} else if ( ( result = this.regexp.object_pattern.exec( line ) ) !== null ) {
 
@@ -445,7 +458,7 @@ THREE.OBJLoader.prototype = {
 				// g group_name
 
 				var name = result[ 0 ].substr( 1 ).trim();
-				state.startObject(name);
+				state.startObject( name );
 
 			} else if ( this.regexp.material_use_pattern.test( line ) ) {
 
@@ -469,27 +482,25 @@ THREE.OBJLoader.prototype = {
 			} else {
 
 				// Handle null terminated files without exception
-				if (line === '\0')
-					continue;
+				if ( line === '\0' ) continue;
 
-				throw new Error( "Unexpected line: '" + line  + "'");
+				throw new Error( "Unexpected line: '" + line  + "'" );
 
 			}
 
 		}
 
 		var container = new THREE.Group();
-		container.materialLibraries = [].concat(state.materialLibraries);
+		container.materialLibraries = [].concat( state.materialLibraries );
 
 		for ( var i = 0, l = state.objects.length; i < l; i ++ ) {
 
 			var object = state.objects[ i ];
 			var geometry = object.geometry;
-			var isLine = (geometry.type === 'Line');
+			var isLine = ( geometry.type === 'Line' );
 
 			// Skip o/g line declarations that did not follow with any faces
-			if ( geometry.vertices.length === 0 )
-				continue;
+			if ( geometry.vertices.length === 0 ) continue;
 
 			var buffergeometry = new THREE.BufferGeometry();
 
@@ -518,26 +529,26 @@ THREE.OBJLoader.prototype = {
 				material = this.materials.create( object.material.name );
 
 				// mtl etc. loaders probably can't create line materials correctly, copy properties to a line material.
-				if (isLine && material && !(material instanceof THREE.LineBasicMaterial)) {
+				if ( isLine && material && ! ( material instanceof THREE.LineBasicMaterial ) ) {
 
 					var materialLine = new THREE.LineBasicMaterial();
-					materialLine.copy(material);
+					materialLine.copy( material );
 					material = materialLine;
 
 				}
 
 			}
 
-			if ( !material ) {
+			if ( ! material ) {
 
-				material = ( !isLine ? new THREE.MeshPhongMaterial() : new THREE.LineBasicMaterial() );
+				material = ( ! isLine ? new THREE.MeshPhongMaterial() : new THREE.LineBasicMaterial() );
 				material.name = object.material.name;
 
 			}
 
 			material.shading = object.material.smooth ? THREE.SmoothShading : THREE.FlatShading;
 
-			var mesh = ( !isLine ? new THREE.Mesh( buffergeometry, material ) : new THREE.Line( buffergeometry, material ) );
+			var mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, material ) : new THREE.Line( buffergeometry, material ) );
 			mesh.name = object.name;
 
 			container.add( mesh );
