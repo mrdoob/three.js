@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - spot light</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
+
+			a {
+				color: #ff0080;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #0080ff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - This animates 3 Spot Lights - by <a href="http://master-domain.com" target="_blank">Master James</a><br />
+			Orbit Controls are available to navigate.<br />
+			Where the lights converge to make white light the shadows will appear as R G B from pairs of lights.<br />
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="../examples/js/libs/dat.gui.min.js"></script>
+		<script src="../examples/js/controls/OrbitControls.js"></script>
+		<script src="js/Detector.js"></script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TweenMax.min.js"></script>
+
+		<script>
+			let stats, container = document.getElementById( 'container' );
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			let rnd = new THREE.WebGLRenderer();
+			let cam = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 20000);
+			let orb = new THREE.OrbitControls(cam, document);
+
+			let scn = new THREE.Scene();
+			let matFloor = new THREE.MeshPhongMaterial();
+			let matBox = new THREE.MeshPhongMaterial();
+			let geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000);
+			let geoBox = new THREE.BoxGeometry(Math.PI, Math.sqrt(2), Math.E);
+			let mshFloor = new THREE.Mesh(geoFloor, matFloor);
+			let mshBox = new THREE.Mesh(geoBox, matBox);
+			let amb = new THREE.AmbientLight(0x121422);
+			let spt1 = createSpotlight( { color: 0xFF7F00, angle:0.3 } );
+			let spt2 = createSpotlight( { color: 0x00FF7F, angle:0.3 } );
+			let spt3 = createSpotlight( { color: 0x7F00FF, angle:0.3 } );
+			let lightHelper1, lightHelper2, lightHelper3;
+
+			function init() {
+
+				rnd.shadowMap.enabled = true;
+				rnd.shadowMap.type = THREE.PCFSoftShadowMap;
+				rnd.gammaInput = true;
+				rnd.gammaOutput = true;
+				rnd.antialias = true;
+
+				cam.position.set(38, 20, -32);
+
+				spt1.position.set(15, 40, 45);
+				spt2.position.set(0, 40, 35);
+				spt3.position.set(-15, 40, 45);
+
+				lightHelper1 = new THREE.SpotLightHelper( spt1 );
+				lightHelper2 = new THREE.SpotLightHelper( spt2 );
+				lightHelper3 = new THREE.SpotLightHelper( spt3 );
+
+				matFloor.color.set( 0x808080 );
+				matFloor.color.a = 1.0;
+
+				mshFloor.receiveShadow = true;
+				mshFloor.position.set(0, -0.05, 0);
+
+				matBox.color = { r: Math.random(), g: Math.random(), b: Math.random(), a: 1.0 };
+				matBox.opacity = 0.8;
+				mshBox.castShadow = true;
+				mshBox.receiveShadow = true;
+				mshBox.position.set(0, 5, 0);
+
+				scn.add(cam);
+				scn.add(mshFloor);
+				scn.add(mshBox);
+				scn.add(amb);
+				scn.add( spt1 );
+				scn.add( spt1.shadowCameraHelper );
+				scn.add( spt2 );
+				scn.add( spt2.shadowCameraHelper );
+				scn.add( spt3 );
+				scn.add( spt3.shadowCameraHelper );
+				scn.add( new THREE.AxisHelper( 7 ) );
+				scn.add( lightHelper1, lightHelper2, lightHelper3 );
+
+				document.body.appendChild(rnd.domElement);
+				onResize();
+				window.addEventListener('resize', onResize, false);
+
+				orb.addEventListener('change', render);
+				orb.object.position.set(46, 22, -21);
+				orb.target.set(-6, 7, 2);
+				orb.maxPolarAngle = (Math.PI / 2);
+				orb.update();
+			};
+
+			function createSpotlight( object ) {
+				let newObj = new THREE.SpotLight(object.color || 0xFFFFFF);
+				newObj.castShadow = object.castShadow || true;
+				newObj.angle = object.angle || 0.777;
+				newObj.exponent = object.exponent || 2.0;
+				newObj.penumbra = object.penumbra || 0.2;
+				newObj.decay = object.decay || 10;
+				newObj.distance = object.distance || 0.0;
+				newObj.shadow.mapSize.width = object.shadowWidth || 2048;
+				newObj.shadow.mapSize.height = object.shadowHeight || 2048;
+				// shadow camera helper
+				newObj.shadowCameraHelper = new THREE.CameraHelper( newObj.shadow.camera ); // colored lines
+				newObj.shadow.camera.near = 0.1;
+				newObj.shadow.camera.far = 20000;
+
+				return newObj;
+			};
+
+			function onResize() {
+				rnd.setSize(window.innerWidth, window.innerHeight);
+				cam.aspect = (window.innerWidth / window.innerHeight);
+				cam.updateProjectionMatrix();
+			};
+
+			function animate(rate) {
+				rate = rate || 6;
+				if ( rate < 0.01 ) rate = 0.01;
+				else if ( rate > 1000 ) rate = 1000;
+				let targ1 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
+				spt1.pos_tween = TweenMax.to(spt1.position, rate, targ1);
+				spt1.ang_tween = TweenMax.to(spt1, rate / 2, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ1 } );
+
+				let targ2 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
+				spt2.pos_tween = TweenMax.to(spt2.position, rate, targ2);
+				spt2.ang_tween = TweenMax.to(spt2, rate / 3, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ2 } );
+
+				let targ3 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
+				spt3.pos_tween = TweenMax.to(spt3.position, rate, targ3);
+				spt3.ang_tween = TweenMax.to(spt3, rate, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ3 } );
+
+				setTimeout(function() { animate(rate); }, rate * 1000);
+			};
+
+			function render( /* time */ ) {
+				if ( lightHelper1 ) lightHelper1.update();
+				if ( lightHelper2 ) lightHelper2.update();
+				if ( lightHelper3 ) lightHelper3.update();
+				if ( spt1.shadowCameraHelper ) spt1.shadowCameraHelper.update();
+				if ( spt2.shadowCameraHelper ) spt2.shadowCameraHelper.update();
+				if ( spt3.shadowCameraHelper ) spt3.shadowCameraHelper.update();
+
+				rnd.render(scn, cam);
+
+				window.requestAnimationFrame(render);
+
+			};
+
+			init();
+			render();
+			animate(4.5);
+
+		</script>
+	</body>
+</html>
