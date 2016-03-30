@@ -36,7 +36,8 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - Just to show the spot light and it's edge - by <a href="http://master-domain.com" target="_blank">Master James</a><br />
-			Right click and drag to move OrbitControls,<br /> center across the edge of the shadow.<br />
+			Right click and drag to move OrbitControls, center across the edge of the shadow.<br />
+			Click to set random color CTRL-Click for White.<br />
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -214,22 +215,31 @@
 				if( event.type === 'mousedown' ) {
 
 					mouseDown.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
+					
 					mouseDown.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
 
 				}
 				else {
 
 					mouse.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
+
 					mouse.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
 
-					console.log(mouseDown.distanceTo(mouse));
 					if (mouseDown.distanceTo(mouse) < 0.0075) {
 
 						ray.setFromCamera( mouse, cam );
 
 						var found = ray.intersectObjects( [ mshBox, mshFloor ] );
 
-						if ( found.length > 0 ) randomColor( found[0].object );
+						if ( found.length > 0 ) {
+
+							if( event.ctrlKey === false ) randomColor( found[0].object );
+
+							else found[0].object.material.color.set( 0xffffff );
+
+							render();
+							
+						}
 
 					}
 
@@ -246,8 +256,6 @@
 					if ( target.color !== undefined ) {
 
 						target.color.setHex( 0xffffff * Math.random() );
-
-						render();
 
 					}
 				}
