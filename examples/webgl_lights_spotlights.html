@@ -152,16 +152,16 @@
 				if ( rate < 0.01 ) rate = 0.01;
 				else if ( rate > 1000 ) rate = 1000;
 				let targ1 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
-				spt1.pos_tween = TweenMax.to(spt1.position, rate, targ1);
-				spt1.ang_tween = TweenMax.to(spt1, rate / 2, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ1 } );
+				TweenMax.to(spt1.position, rate, targ1);
+				TweenMax.to(spt1, rate / 2, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ1 } );
 
 				let targ2 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
-				spt2.pos_tween = TweenMax.to(spt2.position, rate, targ2);
-				spt2.ang_tween = TweenMax.to(spt2, rate / 3, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ2 } );
+				TweenMax.to(spt2.position, rate, targ2);
+				TweenMax.to(spt2, rate / 3, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ2 } );
 
 				let targ3 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
-				spt3.pos_tween = TweenMax.to(spt3.position, rate, targ3);
-				spt3.ang_tween = TweenMax.to(spt3, rate, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ3 } );
+				TweenMax.to(spt3.position, rate, targ3);
+				TweenMax.to(spt3, rate, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ3 } );
 
 				setTimeout(function() { animate(rate); }, rate * 1000);
 			};
