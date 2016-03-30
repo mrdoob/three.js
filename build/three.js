@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '75' };
+var THREE = { REVISION: '76dev' };
 
 //
 
@@ -4117,17 +4117,15 @@ THREE.Box3.prototype = {
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
-		var box;
+		var v1 = new THREE.Vector3();
 
 		return function ( object ) {
 
-			if ( box === undefined ) box = new THREE.Box3();
-
 			var scope = this;
 
-			this.makeEmpty();
-
 			object.updateMatrixWorld( true );
+
+			this.makeEmpty();
 
 			object.traverse( function ( node ) {
 
@@ -4135,17 +4133,31 @@ THREE.Box3.prototype = {
 
 				if ( geometry !== undefined ) {
 
-					if ( geometry.boundingBox === null ) {
+					if ( geometry instanceof THREE.Geometry ) {
 
-						geometry.computeBoundingBox();
+						var vertices = geometry.vertices;
 
-					}
+						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
-					if ( geometry.boundingBox.isEmpty() === false ) {
+							v1.copy( vertices[ i ] );
+							v1.applyMatrix4( node.matrixWorld );
 
-						box.copy( geometry.boundingBox );
-						box.applyMatrix4( node.matrixWorld );
-						scope.union( box );
+							scope.expandByPoint( v1 );
+
+						}
+
+					} else if ( geometry instanceof THREE.BufferGeometry && geometry.attributes[ 'position' ] !== undefined ) {
+
+						var positions = geometry.attributes[ 'position' ].array;
+
+						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+							v1.fromArray( positions, i );
+							v1.applyMatrix4( node.matrixWorld );
+
+							scope.expandByPoint( v1 );
+
+						}
 
 					}
 
@@ -16135,6 +16147,41 @@ THREE.BooleanKeyframeTrack.prototype =
 
 } );
 
+// File:src/animation/tracks/ColorKeyframeTrack.js
+
+/**
+ *
+ * A Track of keyframe values that represent color.
+ *
+ *
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ * @author tschw
+ */
+
+THREE.ColorKeyframeTrack = function ( name, times, values, interpolation ) {
+
+	THREE.KeyframeTrack.call( this, name, times, values, interpolation );
+
+};
+
+THREE.ColorKeyframeTrack.prototype =
+		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
+
+	constructor: THREE.ColorKeyframeTrack,
+
+	ValueTypeName: 'color'
+
+	// ValueBufferType is inherited
+
+	// DefaultInterpolation is inherited
+
+
+	// Note: Very basic implementation and nothing special yet.
+	// However, this is the place for color space parameterization.
+
+} );
+
 // File:src/animation/tracks/NumberKeyframeTrack.js
 
 /**
@@ -16273,6 +16320,7 @@ THREE.VectorKeyframeTrack.prototype =
 
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author Reece Aaron Lecrivain / http://reecenotes.com/
  */
 
 THREE.Audio = function ( listener ) {
@@ -16311,10 +16359,16 @@ THREE.Audio.prototype.getOutput = function () {
 
 THREE.Audio.prototype.load = function ( file ) {
 
-	var buffer = new THREE.AudioBuffer( this.context );
-	buffer.load( file );
+	console.warn( 'THREE.Audio: .load has been deprecated. Please use THREE.AudioLoader.' );
 
-	this.setBuffer( buffer );
+	var scope = this;
+
+	var audioLoader = new THREE.AudioLoader();
+	audioLoader.load( file, function ( buffer ) {
+
+		scope.setBuffer( buffer );
+
+	} );
 
 	return this;
 
@@ -16335,13 +16389,9 @@ THREE.Audio.prototype.setBuffer = function ( audioBuffer ) {
 
 	var scope = this;
 
-	audioBuffer.onReady( function( buffer ) {
-
-		scope.source.buffer = buffer;
-		scope.sourceType = 'buffer';
-		if ( scope.autoplay ) scope.play();
-
-	} );
+	scope.source.buffer = audioBuffer;
+	scope.sourceType = 'buffer';
+	if ( scope.autoplay ) scope.play();
 
 	return this;
 
@@ -16486,7 +16536,7 @@ THREE.Audio.prototype.getPlaybackRate = function () {
 
 };
 
-THREE.Audio.prototype.onEnded = function() {
+THREE.Audio.prototype.onEnded = function () {
 
 	this.isPlaying = false;
 
@@ -16561,64 +16611,33 @@ THREE.AudioAnalyser.prototype = {
 
 };
 
-// File:src/audio/AudioBuffer.js
+// File:src/audio/AudioContext.js
 
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AudioBuffer = function ( context ) {
+Object.defineProperty( THREE, 'AudioContext', {
 
-	this.context = context;
-	this.ready = false;
-	this.readyCallbacks = [];
+	get: ( function () {
 
-};
+		var context;
 
-THREE.AudioBuffer.prototype.load = function ( file ) {
+		return function () {
 
-	var scope = this;
+			if ( context === undefined ) {
 
-	var request = new XMLHttpRequest();
-	request.open( 'GET', file, true );
-	request.responseType = 'arraybuffer';
-	request.onload = function ( e ) {
-
-		scope.context.decodeAudioData( this.response, function ( buffer ) {
-
-			scope.buffer = buffer;
-			scope.ready = true;
-
-			for ( var i = 0; i < scope.readyCallbacks.length; i ++ ) {
-
-				scope.readyCallbacks[ i ]( scope.buffer );
+				context = new ( window.AudioContext || window.webkitAudioContext )();
 
 			}
 
-			scope.readyCallbacks = [];
+			return context;
 
-		} );
+		};
 
-	};
-	request.send();
+	} )()
 
-	return this;
-
-};
-
-THREE.AudioBuffer.prototype.onReady = function ( callback ) {
-
-	if ( this.ready ) {
-
-		callback( this.buffer );
-
-	} else {
-
-		this.readyCallbacks.push( callback );
-
-	}
-
-};
+} );
 
 // File:src/audio/PositionalAudio.js
 
@@ -16720,7 +16739,7 @@ THREE.AudioListener = function () {
 
 	this.type = 'AudioListener';
 
-	this.context = new ( window.AudioContext || window.webkitAudioContext )();
+	this.context = THREE.AudioContext;
 
 	this.gain = this.context.createGain();
 	this.gain.connect( this.context.destination );
@@ -17433,7 +17452,7 @@ THREE.DirectionalLight = function ( color, intensity ) {
 
 	this.target = new THREE.Object3D();
 
-	this.shadow = new THREE.LightShadow( new THREE.OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
+	this.shadow = new THREE.DirectionalLightShadow();
 
 };
 
@@ -17449,6 +17468,18 @@ THREE.DirectionalLight.prototype.copy = function ( source ) {
 	this.shadow = source.shadow.clone();
 
 	return this;
+
+};
+
+// File:src/lights/DirectionalLightShadow.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.DirectionalLightShadow = function ( light ) {
+
+	THREE.LightShadow.call( this, new THREE.OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
 };
 
@@ -17564,7 +17595,7 @@ THREE.SpotLight = function ( color, intensity, distance, angle, penumbra, decay 
 	this.penumbra = ( penumbra !== undefined ) ? penumbra : 0;
 	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
 
-	this.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 0.5, 500 ) );
+	this.shadow = new THREE.SpotLightShadow();
 
 };
 
@@ -17605,6 +17636,79 @@ THREE.SpotLight.prototype.copy = function ( source ) {
 	this.shadow = source.shadow.clone();
 
 	return this;
+
+};
+
+// File:src/lights/SpotLightShadow.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.SpotLightShadow = function () {
+
+	THREE.LightShadow.call( this, new THREE.PerspectiveCamera( 50, 1, 0.5, 500 ) );
+
+};
+
+THREE.SpotLightShadow.prototype = {
+
+	constructor: THREE.SpotLightShadow,
+
+	update: function ( light ) {
+
+		var fov = THREE.Math.radToDeg( 2 * light.angle );
+		var aspect = this.mapSize.width / this.mapSize.height;
+		var far = light.distance || 500;
+
+		var camera = this.camera;
+
+		if ( fov !== camera.fov || aspect !== camera.aspect || far !== camera.far ) {
+
+			camera.fov = fov;
+			camera.aspect = aspect;
+			camera.far = far;
+			camera.updateProjectionMatrix();
+
+		}
+
+	}
+
+};
+
+// File:src/loaders/AudioLoader.js
+
+/**
+ * @author Reece Aaron Lecrivain / http://reecenotes.com/
+ */
+
+THREE.AudioLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
+
+THREE.AudioLoader.prototype = {
+
+	constructor: THREE.AudioLoader,
+
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		var loader = new THREE.XHRLoader( this.manager );
+		loader.setResponseType( 'arraybuffer' );
+		loader.load( url, function ( buffer ) {
+
+			var context = THREE.AudioContext;
+
+			context.decodeAudioData( buffer, function ( audioBuffer ) {
+
+				onLoad( audioBuffer );
+
+			} );
+
+		}, onProgress, onError );
+
+	}
 
 };
 
@@ -19345,8 +19449,9 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'LatheGeometry':
+					case 'LatheBufferGeometry':
 
-						geometry = new THREE.LatheGeometry(
+						geometry = new THREE[ data.type ](
 							data.points,
 							data.segments,
 							data.phiStart,
@@ -21384,7 +21489,7 @@ THREE.PointsMaterial.prototype.copy = function ( source ) {
  *
  * parameters = {
  *  defines: { "label" : "value" },
- *  uniforms: { "parameter1": { type: "f", value: 1.0 }, "parameter2": { type: "i" value2: 2 } },
+ *  uniforms: { "parameter1": { type: "1f", value: 1.0 }, "parameter2": { type: "1i" value2: 2 } },
  *
  *  fragmentShader: <string>,
  *  vertexShader: <string>,
@@ -23312,7 +23417,7 @@ THREE.Sprite.prototype.raycast = ( function () {
 		matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
 		var distanceSq = raycaster.ray.distanceSqToPoint( matrixPosition );
-		var guessSizeSq = this.scale.x * this.scale.y;
+		var guessSizeSq = this.scale.x * this.scale.y / 4;
 
 		if ( distanceSq > guessSizeSq ) {
 
@@ -23558,7 +23663,7 @@ THREE.ShaderChunk[ 'beginnormal_vertex' ] = "\nvec3 objectNormal = vec3( normal 
 
 // File:src/renderers/shaders/ShaderChunk/bsdfs.glsl
 
-THREE.ShaderChunk[ 'bsdfs' ] = "bool testLightInRange( const in float lightDistance, const in float cutoffDistance ) {\n	return any( bvec2( cutoffDistance == 0.0, lightDistance < cutoffDistance ) );\n}\nfloat punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {\n		if( decayExponent > 0.0 ) {\n#if defined ( PHYSICALLY_CORRECT_LIGHTS )\n			float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );\n			float maxDistanceCutoffFactor = pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );\n			return distanceFalloff * maxDistanceCutoffFactor;\n#else\n			return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );\n#endif\n		}\n		return 1.0;\n}\nvec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\n	return RECIPROCAL_PI * diffuseColor;\n}\nvec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\n	float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\n	return ( 1.0 - specularColor ) * fresnel + specularColor;\n}\nfloat G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {\n	float a2 = pow2( alpha );\n	float gl = dotNL + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n	float gv = dotNV + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n	return 1.0 / ( gl * gv );\n}\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n	float a2 = pow2( alpha );\n	float denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0;\n	return RECIPROCAL_PI * a2 / pow2( denom );\n}\nvec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n	float alpha = pow2( roughness );\n	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n	float dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );\n	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n	float dotNH = saturate( dot( geometry.normal, halfDir ) );\n	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n	vec3 F = F_Schlick( specularColor, dotLH );\n	float G = G_GGX_Smith( alpha, dotNL, dotNV );\n	float D = D_GGX( alpha, dotNH );\n	return F * ( G * D );\n}\nvec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n	const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );\n	const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );\n	vec4 r = roughness * c0 + c1;\n	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;\n	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;\n	return specularColor * AB.x + AB.y;\n}\nfloat G_BlinnPhong_Implicit( ) {\n	return 0.25;\n}\nfloat D_BlinnPhong( const in float shininess, const in float dotNH ) {\n	return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n}\nvec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\n	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n	float dotNH = saturate( dot( geometry.normal, halfDir ) );\n	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n	vec3 F = F_Schlick( specularColor, dotLH );\n	float G = G_BlinnPhong_Implicit( );\n	float D = D_BlinnPhong( shininess, dotNH );\n	return F * ( G * D );\n}\nfloat GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n	return ( 2.0 / pow2( ggxRoughness + 0.0001 ) - 2.0 );\n}\nfloat BlinnExponentToGGXRoughness( const in float blinnExponent ) {\n	return sqrt( 2.0 / ( blinnExponent + 2.0 ) );\n}\n";
+THREE.ShaderChunk[ 'bsdfs' ] = "bool testLightInRange( const in float lightDistance, const in float cutoffDistance ) {\n	return any( bvec2( cutoffDistance == 0.0, lightDistance < cutoffDistance ) );\n}\nfloat punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {\n		if( decayExponent > 0.0 ) {\n#if defined ( PHYSICALLY_CORRECT_LIGHTS )\n			float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );\n			float maxDistanceCutoffFactor = pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );\n			return distanceFalloff * maxDistanceCutoffFactor;\n#else\n			return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );\n#endif\n		}\n		return 1.0;\n}\nvec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\n	return RECIPROCAL_PI * diffuseColor;\n}\nvec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\n	float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\n	return ( 1.0 - specularColor ) * fresnel + specularColor;\n}\nfloat G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {\n	float a2 = pow2( alpha );\n	float gl = dotNL + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n	float gv = dotNV + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n	return 1.0 / ( gl * gv );\n}\nfloat G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {\n	float a2 = pow2( alpha );\n	float gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n	float gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n	return 0.5 / max( gv + gl, EPSILON );\n}\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n	float a2 = pow2( alpha );\n	float denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0;\n	return RECIPROCAL_PI * a2 / pow2( denom );\n}\nvec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n	float alpha = pow2( roughness );\n	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n	float dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );\n	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n	float dotNH = saturate( dot( geometry.normal, halfDir ) );\n	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n	vec3 F = F_Schlick( specularColor, dotLH );\n	float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n	float D = D_GGX( alpha, dotNH );\n	return F * ( G * D );\n}\nvec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n	const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );\n	const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );\n	vec4 r = roughness * c0 + c1;\n	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;\n	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;\n	return specularColor * AB.x + AB.y;\n}\nfloat G_BlinnPhong_Implicit( ) {\n	return 0.25;\n}\nfloat D_BlinnPhong( const in float shininess, const in float dotNH ) {\n	return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n}\nvec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\n	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n	float dotNH = saturate( dot( geometry.normal, halfDir ) );\n	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n	vec3 F = F_Schlick( specularColor, dotLH );\n	float G = G_BlinnPhong_Implicit( );\n	float D = D_BlinnPhong( shininess, dotNH );\n	return F * ( G * D );\n}\nfloat GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n	return ( 2.0 / pow2( ggxRoughness + 0.0001 ) - 2.0 );\n}\nfloat BlinnExponentToGGXRoughness( const in float blinnExponent ) {\n	return sqrt( 2.0 / ( blinnExponent + 2.0 ) );\n}\n";
 
 // File:src/renderers/shaders/ShaderChunk/bumpmap_pars_fragment.glsl
 
@@ -23586,7 +23691,7 @@ THREE.ShaderChunk[ 'common' ] = "#define PI 3.14159\n#define PI2 6.28318\n#defin
 
 // File:src/renderers/shaders/ShaderChunk/cube_uv_reflection_fragment.glsl
 
-THREE.ShaderChunk[ 'cube_uv_reflection_fragment' ] = "#ifdef ENVMAP_TYPE_CUBE_UV\nconst float cubeUV_textureSize = 1024.0;\nint getFaceFromDirection(vec3 direction) {\n    vec3 absDirection = abs(direction);\n    int face = -1;\n    if( absDirection.x > absDirection.z ) {\n        if(absDirection.x > absDirection.y )\n            face = direction.x > 0.0 ? 0 : 3;\n        else\n            face = direction.y > 0.0 ? 1 : 4;\n    }\n    else {\n        if(absDirection.z > absDirection.y )\n            face = direction.z > 0.0 ? 2 : 5;\n        else\n            face = direction.y > 0.0 ? 1 : 4;\n    }\n    return face;\n}\nconst float cubeUV_maxLods1 = log2(cubeUV_textureSize*0.25) - 1.0;\nconst float cubeUV_rangeClamp = exp2((6.0 - 1.0) * 2.0);\nvec2 MipLevelInfo( vec3 vec, float roughnessLevel, float roughness ) {\n    float scale = exp2(cubeUV_maxLods1 - roughnessLevel);\n    float dxRoughness = dFdx(roughness);\n    float dyRoughness = dFdy(roughness);\n    vec3 dx = dFdx( vec * scale * dxRoughness );\n    vec3 dy = dFdy( vec * scale * dyRoughness );\n    float d = max( dot( dx, dx ), dot( dy, dy ) );\n    d = clamp(d, 1.0, cubeUV_rangeClamp);\n    float mipLevel = 0.5 * log2(d);\n    return vec2(floor(mipLevel), fract(mipLevel));\n}\nconst float cubeUV_maxLods2 = log2(cubeUV_textureSize*0.25) - 2.0;\nconst float cubeUV_rcpTextureSize = 1.0 / cubeUV_textureSize;\nvec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel) {\n    mipLevel = roughnessLevel > cubeUV_maxLods2 - 3.0 ? 0.0 : mipLevel;\n    float a = 16.0 * cubeUV_rcpTextureSize;\n    vec2 exp2_packed = exp2( vec2( roughnessLevel, mipLevel ) );\n    vec2 rcp_exp2_packed = vec2( 1.0 ) / exp2_packed;\n    float powScale = exp2_packed.x * exp2_packed.y;\n    float scale = rcp_exp2_packed.x * rcp_exp2_packed.y * 0.25;\n    float mipOffset = 0.75*(1.0 - rcp_exp2_packed.y) * rcp_exp2_packed.x;\n    bool bRes = mipLevel == 0.0;\n    scale =  bRes && (scale < a) ? a : scale;\n    vec3 r;\n    vec2 offset;\n    int face = getFaceFromDirection(direction);\n    float rcpPowScale = 1.0 / powScale;\n    if( face == 0) {\n        r = vec3(direction.x, -direction.z, direction.y);\n        offset = vec2(0.0+mipOffset,0.75 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  a : offset.y;\n    }\n    else if( face == 1) {\n        r = vec3(direction.y, direction.x, direction.z);\n        offset = vec2(scale+mipOffset, 0.75 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  a : offset.y;\n    }\n    else if( face == 2) {\n        r = vec3(direction.z, direction.x, direction.y);\n        offset = vec2(2.0*scale+mipOffset, 0.75 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  a : offset.y;\n    }\n    else if( face == 3) {\n        r = vec3(direction.x, direction.z, direction.y);\n        offset = vec2(0.0+mipOffset,0.5 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;\n    }\n    else if( face == 4) {\n        r = vec3(direction.y, direction.x, -direction.z);\n        offset = vec2(scale+mipOffset, 0.5 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;\n    }\n    else {\n        r = vec3(direction.z, -direction.x, direction.y);\n        offset = vec2(2.0*scale+mipOffset, 0.5 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;\n    }\n    r = normalize(r);\n    float texelOffset = 0.5 * cubeUV_rcpTextureSize;\n    vec2 s = ( r.yz / abs( r.x ) + vec2( 1.0 ) ) * 0.5;\n    vec2 base = offset + vec2( texelOffset );\n    return base + s * ( scale - 2.0 * texelOffset );\n}\nconst float cubeUV_maxLods3 = log2(cubeUV_textureSize*0.25) - 3.0;\nvec4 textureCubeUV(vec3 reflectedDirection, float roughness ) {\n    float roughnessVal = roughness* cubeUV_maxLods3;\n    float r1 = floor(roughnessVal);\n    float r2 = r1 + 1.0;\n    float t = fract(roughnessVal);\n    vec2 mipInfo = MipLevelInfo(reflectedDirection, r1, roughness);\n    float s = mipInfo.y;\n    float level0 = mipInfo.x;\n    float level1 = level0 + 1.0;\n    level1 = level1 > 5.0 ? 5.0 : level1;\n    level0 += min( floor( s + 0.5 ), 5.0 );\n    vec2 uv_10 = getCubeUV(reflectedDirection, r1, level0);\n    vec4 color10 = envMapTexelToLinear(texture2D(envMap, uv_10));\n    vec2 uv_20 = getCubeUV(reflectedDirection, r2, level0);\n    vec4 color20 = envMapTexelToLinear(texture2D(envMap, uv_20));\n    vec4 result = mix(color10, color20, t);\n    return vec4(result.rgb, 1.0);\n}\n#endif\n";
+THREE.ShaderChunk[ 'cube_uv_reflection_fragment' ] = "#ifdef ENVMAP_TYPE_CUBE_UV\nconst float cubeUV_textureSize = 1024.0;\nint getFaceFromDirection(vec3 direction) {\n    vec3 absDirection = abs(direction);\n    int face = -1;\n    if( absDirection.x > absDirection.z ) {\n        if(absDirection.x > absDirection.y )\n            face = direction.x > 0.0 ? 0 : 3;\n        else\n            face = direction.y > 0.0 ? 1 : 4;\n    }\n    else {\n        if(absDirection.z > absDirection.y )\n            face = direction.z > 0.0 ? 2 : 5;\n        else\n            face = direction.y > 0.0 ? 1 : 4;\n    }\n    return face;\n}\nfloat cubeUV_maxLods1 = log2(cubeUV_textureSize*0.25) - 1.0;\nfloat cubeUV_rangeClamp = exp2((6.0 - 1.0) * 2.0);\nvec2 MipLevelInfo( vec3 vec, float roughnessLevel, float roughness ) {\n    float scale = exp2(cubeUV_maxLods1 - roughnessLevel);\n    float dxRoughness = dFdx(roughness);\n    float dyRoughness = dFdy(roughness);\n    vec3 dx = dFdx( vec * scale * dxRoughness );\n    vec3 dy = dFdy( vec * scale * dyRoughness );\n    float d = max( dot( dx, dx ), dot( dy, dy ) );\n    d = clamp(d, 1.0, cubeUV_rangeClamp);\n    float mipLevel = 0.5 * log2(d);\n    return vec2(floor(mipLevel), fract(mipLevel));\n}\nfloat cubeUV_maxLods2 = log2(cubeUV_textureSize*0.25) - 2.0;\nconst float cubeUV_rcpTextureSize = 1.0 / cubeUV_textureSize;\nvec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel) {\n    mipLevel = roughnessLevel > cubeUV_maxLods2 - 3.0 ? 0.0 : mipLevel;\n    float a = 16.0 * cubeUV_rcpTextureSize;\n    vec2 exp2_packed = exp2( vec2( roughnessLevel, mipLevel ) );\n    vec2 rcp_exp2_packed = vec2( 1.0 ) / exp2_packed;\n    float powScale = exp2_packed.x * exp2_packed.y;\n    float scale = rcp_exp2_packed.x * rcp_exp2_packed.y * 0.25;\n    float mipOffset = 0.75*(1.0 - rcp_exp2_packed.y) * rcp_exp2_packed.x;\n    bool bRes = mipLevel == 0.0;\n    scale =  bRes && (scale < a) ? a : scale;\n    vec3 r;\n    vec2 offset;\n    int face = getFaceFromDirection(direction);\n    float rcpPowScale = 1.0 / powScale;\n    if( face == 0) {\n        r = vec3(direction.x, -direction.z, direction.y);\n        offset = vec2(0.0+mipOffset,0.75 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  a : offset.y;\n    }\n    else if( face == 1) {\n        r = vec3(direction.y, direction.x, direction.z);\n        offset = vec2(scale+mipOffset, 0.75 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  a : offset.y;\n    }\n    else if( face == 2) {\n        r = vec3(direction.z, direction.x, direction.y);\n        offset = vec2(2.0*scale+mipOffset, 0.75 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  a : offset.y;\n    }\n    else if( face == 3) {\n        r = vec3(direction.x, direction.z, direction.y);\n        offset = vec2(0.0+mipOffset,0.5 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;\n    }\n    else if( face == 4) {\n        r = vec3(direction.y, direction.x, -direction.z);\n        offset = vec2(scale+mipOffset, 0.5 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;\n    }\n    else {\n        r = vec3(direction.z, -direction.x, direction.y);\n        offset = vec2(2.0*scale+mipOffset, 0.5 * rcpPowScale);\n        offset.y = bRes && (offset.y < 2.0*a) ?  0.0 : offset.y;\n    }\n    r = normalize(r);\n    float texelOffset = 0.5 * cubeUV_rcpTextureSize;\n    vec2 s = ( r.yz / abs( r.x ) + vec2( 1.0 ) ) * 0.5;\n    vec2 base = offset + vec2( texelOffset );\n    return base + s * ( scale - 2.0 * texelOffset );\n}\nfloat cubeUV_maxLods3 = log2(cubeUV_textureSize*0.25) - 3.0;\nvec4 textureCubeUV(vec3 reflectedDirection, float roughness ) {\n    float roughnessVal = roughness* cubeUV_maxLods3;\n    float r1 = floor(roughnessVal);\n    float r2 = r1 + 1.0;\n    float t = fract(roughnessVal);\n    vec2 mipInfo = MipLevelInfo(reflectedDirection, r1, roughness);\n    float s = mipInfo.y;\n    float level0 = mipInfo.x;\n    float level1 = level0 + 1.0;\n    level1 = level1 > 5.0 ? 5.0 : level1;\n    level0 += min( floor( s + 0.5 ), 5.0 );\n    vec2 uv_10 = getCubeUV(reflectedDirection, r1, level0);\n    vec4 color10 = envMapTexelToLinear(texture2D(envMap, uv_10));\n    vec2 uv_20 = getCubeUV(reflectedDirection, r2, level0);\n    vec4 color20 = envMapTexelToLinear(texture2D(envMap, uv_20));\n    vec4 result = mix(color10, color20, t);\n    return vec4(result.rgb, 1.0);\n}\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/defaultnormal_vertex.glsl
 
@@ -23622,15 +23727,15 @@ THREE.ShaderChunk[ 'envmap_fragment' ] = "#ifdef USE_ENVMAP\n	#if defined( USE_B
 
 // File:src/renderers/shaders/ShaderChunk/envmap_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'envmap_pars_fragment' ] = "#if defined( USE_ENVMAP ) || defined( STANDARD )\n	uniform float reflectivity;\n	uniform float envMapIntenstiy;\n#endif\n#ifdef USE_ENVMAP\n	#ifdef ENVMAP_TYPE_CUBE\n		uniform samplerCube envMap;\n	#else\n		uniform sampler2D envMap;\n	#endif\n	uniform float flipEnvMap;\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( STANDARD )\n		uniform float refractionRatio;\n	#else\n		varying vec3 vReflect;\n	#endif\n#endif\n";
+THREE.ShaderChunk[ 'envmap_pars_fragment' ] = "#if defined( USE_ENVMAP ) || defined( STANDARD )\n	uniform float reflectivity;\n	uniform float envMapIntenstiy;\n#endif\n#ifdef USE_ENVMAP\n	#if ! defined( STANDARD ) && ( defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) )\n		varying vec3 vWorldPosition;\n	#endif\n	#ifdef ENVMAP_TYPE_CUBE\n		uniform samplerCube envMap;\n	#else\n		uniform sampler2D envMap;\n	#endif\n	uniform float flipEnvMap;\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( STANDARD )\n		uniform float refractionRatio;\n	#else\n		varying vec3 vReflect;\n	#endif\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/envmap_pars_vertex.glsl
 
-THREE.ShaderChunk[ 'envmap_pars_vertex' ] = "#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP ) && ! defined( PHONG ) && ! defined( STANDARD )\n	varying vec3 vReflect;\n	uniform float refractionRatio;\n#endif\n";
+THREE.ShaderChunk[ 'envmap_pars_vertex' ] = "#ifdef USE_ENVMAP\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n		varying vec3 vWorldPosition;\n	#else\n		varying vec3 vReflect;\n		uniform float refractionRatio;\n	#endif\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/envmap_vertex.glsl
 
-THREE.ShaderChunk[ 'envmap_vertex' ] = "#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP ) && ! defined( PHONG ) && ! defined( STANDARD )\n	vec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );\n	vec3 worldNormal = inverseTransformDirection( transformedNormal, viewMatrix );\n	#ifdef ENVMAP_MODE_REFLECTION\n		vReflect = reflect( cameraToVertex, worldNormal );\n	#else\n		vReflect = refract( cameraToVertex, worldNormal, refractionRatio );\n	#endif\n#endif\n";
+THREE.ShaderChunk[ 'envmap_vertex' ] = "#ifdef USE_ENVMAP\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n		vWorldPosition = worldPosition.xyz;\n	#else\n		vec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );\n		vec3 worldNormal = inverseTransformDirection( transformedNormal, viewMatrix );\n		#ifdef ENVMAP_MODE_REFLECTION\n			vReflect = reflect( cameraToVertex, worldNormal );\n		#else\n			vReflect = refract( cameraToVertex, worldNormal, refractionRatio );\n		#endif\n	#endif\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/fog_fragment.glsl
 
@@ -23662,15 +23767,7 @@ THREE.ShaderChunk[ 'lights_phong_fragment' ] = "BlinnPhongMaterial material;\nma
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_phong_pars_fragment' ] = "#ifdef USE_ENVMAP\n	varying vec3 vWorldPosition;\n#endif\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\nstruct BlinnPhongMaterial {\n	vec3	diffuseColor;\n	vec3	specularColor;\n	float	specularShininess;\n	float	specularStrength;\n};\nvoid RE_Direct_BlinnPhong( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	vec3 irradiance = dotNL * directLight.color;\n	#ifndef PHYSICALLY_CORRECT_LIGHTS\n		irradiance *= PI;\n	#endif\n	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;\n}\nvoid RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\n#define RE_Direct				RE_Direct_BlinnPhong\n#define RE_IndirectDiffuse		RE_IndirectDiffuse_BlinnPhong\n#define Material_LightProbeLOD( material )	(0)\n";
-
-// File:src/renderers/shaders/ShaderChunk/lights_phong_pars_vertex.glsl
-
-THREE.ShaderChunk[ 'lights_phong_pars_vertex' ] = "#ifdef USE_ENVMAP\n	varying vec3 vWorldPosition;\n#endif\n";
-
-// File:src/renderers/shaders/ShaderChunk/lights_phong_vertex.glsl
-
-THREE.ShaderChunk[ 'lights_phong_vertex' ] = "#ifdef USE_ENVMAP\n	vWorldPosition = worldPosition.xyz;\n#endif\n";
+THREE.ShaderChunk[ 'lights_phong_pars_fragment' ] = "varying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\nstruct BlinnPhongMaterial {\n	vec3	diffuseColor;\n	vec3	specularColor;\n	float	specularShininess;\n	float	specularStrength;\n};\nvoid RE_Direct_BlinnPhong( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n	vec3 irradiance = dotNL * directLight.color;\n	#ifndef PHYSICALLY_CORRECT_LIGHTS\n		irradiance *= PI;\n	#endif\n	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;\n}\nvoid RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n}\n#define RE_Direct				RE_Direct_BlinnPhong\n#define RE_IndirectDiffuse		RE_IndirectDiffuse_BlinnPhong\n#define Material_LightProbeLOD( material )	(0)\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_standard_fragment.glsl
 
@@ -23917,7 +24014,7 @@ THREE.UniformsLib = {
 	common: {
 
 		"diffuse": { type: "c", value: new THREE.Color( 0xeeeeee ) },
-		"opacity": { type: "f", value: 1.0 },
+		"opacity": { type: "1f", value: 1.0 },
 
 		"map": { type: "t", value: null },
 		"offsetRepeat": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
@@ -23926,23 +24023,23 @@ THREE.UniformsLib = {
 		"alphaMap": { type: "t", value: null },
 
 		"envMap": { type: "t", value: null },
-		"flipEnvMap": { type: "f", value: - 1 },
-		"reflectivity": { type: "f", value: 1.0 },
-		"refractionRatio": { type: "f", value: 0.98 }
+		"flipEnvMap": { type: "1f", value: - 1 },
+		"reflectivity": { type: "1f", value: 1.0 },
+		"refractionRatio": { type: "1f", value: 0.98 }
 
 	},
 
 	aomap: {
 
 		"aoMap": { type: "t", value: null },
-		"aoMapIntensity": { type: "f", value: 1 }
+		"aoMapIntensity": { type: "1f", value: 1 }
 
 	},
 
 	lightmap: {
 
 		"lightMap": { type: "t", value: null },
-		"lightMapIntensity": { type: "f", value: 1 }
+		"lightMapIntensity": { type: "1f", value: 1 }
 
 	},
 
@@ -23955,7 +24052,7 @@ THREE.UniformsLib = {
 	bumpmap: {
 
 		"bumpMap": { type: "t", value: null },
-		"bumpScale": { type: "f", value: 1 }
+		"bumpScale": { type: "1f", value: 1 }
 
 	},
 
@@ -23969,8 +24066,8 @@ THREE.UniformsLib = {
 	displacementmap: {
 
 		"displacementMap": { type: "t", value: null },
-		"displacementScale": { type: "f", value: 1 },
-		"displacementBias": { type: "f", value: 0 }
+		"displacementScale": { type: "1f", value: 1 },
+		"displacementBias": { type: "1f", value: 0 }
 
 	},
 
@@ -23988,24 +24085,24 @@ THREE.UniformsLib = {
 
 	fog: {
 
-		"fogDensity": { type: "f", value: 0.00025 },
-		"fogNear": { type: "f", value: 1 },
-		"fogFar": { type: "f", value: 2000 },
+		"fogDensity": { type: "1f", value: 0.00025 },
+		"fogNear": { type: "1f", value: 1 },
+		"fogFar": { type: "1f", value: 2000 },
 		"fogColor": { type: "c", value: new THREE.Color( 0xffffff ) }
 
 	},
 
 	lights: {
 
-		"ambientLightColor": { type: "fv", value: [] },
+		"ambientLightColor": { type: "3fv", value: [] },
 
 		"directionalLights": { type: "sa", value: [], properties: {
 			"direction": { type: "v3" },
 			"color": { type: "c" },
 
-			"shadow": { type: "i" },
-			"shadowBias": { type: "f" },
-			"shadowRadius": { type: "f" },
+			"shadow": { type: "1i" },
+			"shadowBias": { type: "1f" },
+			"shadowRadius": { type: "1f" },
 			"shadowMapSize": { type: "v2" }
 		} },
 
@@ -24016,14 +24113,14 @@ THREE.UniformsLib = {
 			"color": { type: "c" },
 			"position": { type: "v3" },
 			"direction": { type: "v3" },
-			"distance": { type: "f" },
-			"coneCos": { type: "f" },
-			"penumbraCos": { type: "f" },
-			"decay": { type: "f" },
+			"distance": { type: "1f" },
+			"coneCos": { type: "1f" },
+			"penumbraCos": { type: "1f" },
+			"decay": { type: "1f" },
 
-			"shadow": { type: "i" },
-			"shadowBias": { type: "f" },
-			"shadowRadius": { type: "f" },
+			"shadow": { type: "1i" },
+			"shadowBias": { type: "1f" },
+			"shadowRadius": { type: "1f" },
 			"shadowMapSize": { type: "v2" }
 		} },
 
@@ -24033,12 +24130,12 @@ THREE.UniformsLib = {
 		"pointLights": { type: "sa", value: [], properties: {
 			"color": { type: "c" },
 			"position": { type: "v3" },
-			"decay": { type: "f" },
-			"distance": { type: "f" },
+			"decay": { type: "1f" },
+			"distance": { type: "1f" },
 
-			"shadow": { type: "i" },
-			"shadowBias": { type: "f" },
-			"shadowRadius": { type: "f" },
+			"shadow": { type: "1i" },
+			"shadowBias": { type: "1f" },
+			"shadowRadius": { type: "1f" },
 			"shadowMapSize": { type: "v2" }
 		} },
 
@@ -24056,9 +24153,9 @@ THREE.UniformsLib = {
 	points: {
 
 		"diffuse": { type: "c", value: new THREE.Color( 0xeeeeee ) },
-		"opacity": { type: "f", value: 1.0 },
-		"size": { type: "f", value: 1.0 },
-		"scale": { type: "f", value: 1.0 },
+		"opacity": { type: "1f", value: 1.0 },
+		"size": { type: "1f", value: 1.0 },
+		"scale": { type: "1f", value: 1.0 },
 		"map": { type: "t", value: null },
 		"offsetRepeat": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) }
 
@@ -24136,7 +24233,7 @@ THREE.ShaderChunk[ 'meshphong_frag' ] = "#define PHONG\nuniform vec3 diffuse;\nu
 
 // File:src/renderers/shaders/ShaderLib/meshphong_vert.glsl
 
-THREE.ShaderChunk[ 'meshphong_vert' ] = "#define PHONG\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <lights_phong_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <uv_vertex>\n	#include <uv2_vertex>\n	#include <color_vertex>\n	#include <beginnormal_vertex>\n	#include <morphnormal_vertex>\n	#include <skinbase_vertex>\n	#include <skinnormal_vertex>\n	#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n	vNormal = normalize( transformedNormal );\n#endif\n	#include <begin_vertex>\n	#include <displacementmap_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	vViewPosition = - mvPosition.xyz;\n	#include <worldpos_vertex>\n	#include <envmap_vertex>\n	#include <lights_phong_vertex>\n	#include <shadowmap_vertex>\n}\n";
+THREE.ShaderChunk[ 'meshphong_vert' ] = "#define PHONG\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <uv_vertex>\n	#include <uv2_vertex>\n	#include <color_vertex>\n	#include <beginnormal_vertex>\n	#include <morphnormal_vertex>\n	#include <skinbase_vertex>\n	#include <skinnormal_vertex>\n	#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n	vNormal = normalize( transformedNormal );\n#endif\n	#include <begin_vertex>\n	#include <displacementmap_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	vViewPosition = - mvPosition.xyz;\n	#include <worldpos_vertex>\n	#include <envmap_vertex>\n	#include <shadowmap_vertex>\n}\n";
 
 // File:src/renderers/shaders/ShaderLib/meshstandard_frag.glsl
 
@@ -24144,7 +24241,7 @@ THREE.ShaderChunk[ 'meshstandard_frag' ] = "#define STANDARD\nuniform vec3 diffu
 
 // File:src/renderers/shaders/ShaderLib/meshstandard_vert.glsl
 
-THREE.ShaderChunk[ 'meshstandard_vert' ] = "#define STANDARD\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <uv_vertex>\n	#include <uv2_vertex>\n	#include <color_vertex>\n	#include <beginnormal_vertex>\n	#include <morphnormal_vertex>\n	#include <skinbase_vertex>\n	#include <skinnormal_vertex>\n	#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n	vNormal = normalize( transformedNormal );\n#endif\n	#include <begin_vertex>\n	#include <displacementmap_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	vViewPosition = - mvPosition.xyz;\n	#include <worldpos_vertex>\n	#include <envmap_vertex>\n	#include <shadowmap_vertex>\n}\n";
+THREE.ShaderChunk[ 'meshstandard_vert' ] = "#define STANDARD\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n	varying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n	#include <uv_vertex>\n	#include <uv2_vertex>\n	#include <color_vertex>\n	#include <beginnormal_vertex>\n	#include <morphnormal_vertex>\n	#include <skinbase_vertex>\n	#include <skinnormal_vertex>\n	#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n	vNormal = normalize( transformedNormal );\n#endif\n	#include <begin_vertex>\n	#include <displacementmap_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	vViewPosition = - mvPosition.xyz;\n	#include <worldpos_vertex>\n	#include <shadowmap_vertex>\n}\n";
 
 // File:src/renderers/shaders/ShaderLib/normal_frag.glsl
 
@@ -24179,14 +24276,14 @@ THREE.ShaderLib = {
 
 		uniforms: THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ "common" ],
-			THREE.UniformsLib[ "aomap" ],
-			THREE.UniformsLib[ "fog" ]
+			THREE.UniformsLib[ 'common' ],
+			THREE.UniformsLib[ 'aomap' ],
+			THREE.UniformsLib[ 'fog' ]
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk['meshbasic_vert'],
-		fragmentShader: THREE.ShaderChunk['meshbasic_frag']
+		vertexShader: THREE.ShaderChunk[ 'meshbasic_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'meshbasic_frag' ]
 
 	},
 
@@ -24194,12 +24291,12 @@ THREE.ShaderLib = {
 
 		uniforms: THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ "common" ],
-			THREE.UniformsLib[ "aomap" ],
-			THREE.UniformsLib[ "lightmap" ],
-			THREE.UniformsLib[ "emissivemap" ],
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ],
+			THREE.UniformsLib[ 'common' ],
+			THREE.UniformsLib[ 'aomap' ],
+			THREE.UniformsLib[ 'lightmap' ],
+			THREE.UniformsLib[ 'emissivemap' ],
+			THREE.UniformsLib[ 'fog' ],
+			THREE.UniformsLib[ 'lights' ],
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) }
@@ -24207,8 +24304,8 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk['meshlambert_vert'],
-		fragmentShader: THREE.ShaderChunk['meshlambert_frag']
+		vertexShader: THREE.ShaderChunk[ 'meshlambert_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'meshlambert_frag' ]
 
 	},
 
@@ -24216,26 +24313,26 @@ THREE.ShaderLib = {
 
 		uniforms: THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ "common" ],
-			THREE.UniformsLib[ "aomap" ],
-			THREE.UniformsLib[ "lightmap" ],
-			THREE.UniformsLib[ "emissivemap" ],
-			THREE.UniformsLib[ "bumpmap" ],
-			THREE.UniformsLib[ "normalmap" ],
-			THREE.UniformsLib[ "displacementmap" ],
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ],
+			THREE.UniformsLib[ 'common' ],
+			THREE.UniformsLib[ 'aomap' ],
+			THREE.UniformsLib[ 'lightmap' ],
+			THREE.UniformsLib[ 'emissivemap' ],
+			THREE.UniformsLib[ 'bumpmap' ],
+			THREE.UniformsLib[ 'normalmap' ],
+			THREE.UniformsLib[ 'displacementmap' ],
+			THREE.UniformsLib[ 'fog' ],
+			THREE.UniformsLib[ 'lights' ],
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
 				"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
-				"shininess": { type: "f", value: 30 }
+				"shininess": { type: "1f", value: 30 }
 			}
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk['meshphong_vert'],
-		fragmentShader: THREE.ShaderChunk['meshphong_frag']
+		vertexShader: THREE.ShaderChunk[ 'meshphong_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'meshphong_frag' ]
 
 	},
 
@@ -24243,29 +24340,29 @@ THREE.ShaderLib = {
 
 		uniforms: THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ "common" ],
-			THREE.UniformsLib[ "aomap" ],
-			THREE.UniformsLib[ "lightmap" ],
-			THREE.UniformsLib[ "emissivemap" ],
-			THREE.UniformsLib[ "bumpmap" ],
-			THREE.UniformsLib[ "normalmap" ],
-			THREE.UniformsLib[ "displacementmap" ],
-			THREE.UniformsLib[ "roughnessmap" ],
-			THREE.UniformsLib[ "metalnessmap" ],
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ],
+			THREE.UniformsLib[ 'common' ],
+			THREE.UniformsLib[ 'aomap' ],
+			THREE.UniformsLib[ 'lightmap' ],
+			THREE.UniformsLib[ 'emissivemap' ],
+			THREE.UniformsLib[ 'bumpmap' ],
+			THREE.UniformsLib[ 'normalmap' ],
+			THREE.UniformsLib[ 'displacementmap' ],
+			THREE.UniformsLib[ 'roughnessmap' ],
+			THREE.UniformsLib[ 'metalnessmap' ],
+			THREE.UniformsLib[ 'fog' ],
+			THREE.UniformsLib[ 'lights' ],
 
 			{
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
-				"roughness": { type: "f", value: 0.5 },
-				"metalness": { type: "f", value: 0 },
-				"envMapIntensity" : { type: "f", value: 1 } // temporary
+				"roughness": { type: "1f", value: 0.5 },
+				"metalness": { type: "1f", value: 0 },
+				"envMapIntensity" : { type: "1f", value: 1 } // temporary
 			}
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk['meshstandard_vert'],
-		fragmentShader: THREE.ShaderChunk['meshstandard_frag']
+		vertexShader: THREE.ShaderChunk[ 'meshstandard_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'meshstandard_frag' ]
 
 	},
 
@@ -24273,13 +24370,13 @@ THREE.ShaderLib = {
 
 		uniforms: THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ "points" ],
-			THREE.UniformsLib[ "fog" ]
+			THREE.UniformsLib[ 'points' ],
+			THREE.UniformsLib[ 'fog' ]
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk['points_vert'],
-		fragmentShader: THREE.ShaderChunk['points_frag']
+		vertexShader: THREE.ShaderChunk[ 'points_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'points_frag' ]
 
 	},
 
@@ -24287,19 +24384,19 @@ THREE.ShaderLib = {
 
 		uniforms: THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ "common" ],
-			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ 'common' ],
+			THREE.UniformsLib[ 'fog' ],
 
 			{
-				"scale"    : { type: "f", value: 1 },
-				"dashSize" : { type: "f", value: 1 },
-				"totalSize": { type: "f", value: 2 }
+				"scale"    : { type: "1f", value: 1 },
+				"dashSize" : { type: "1f", value: 1 },
+				"totalSize": { type: "1f", value: 2 }
 			}
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk['linedashed_vert'],
-		fragmentShader: THREE.ShaderChunk['linedashed_frag']
+		vertexShader: THREE.ShaderChunk[ 'linedashed_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'linedashed_frag' ]
 
 	},
 
@@ -24307,14 +24404,14 @@ THREE.ShaderLib = {
 
 		uniforms: {
 
-			"mNear": { type: "f", value: 1.0 },
-			"mFar" : { type: "f", value: 2000.0 },
-			"opacity" : { type: "f", value: 1.0 }
+			"mNear": { type: "1f", value: 1.0 },
+			"mFar" : { type: "1f", value: 2000.0 },
+			"opacity" : { type: "1f", value: 1.0 }
 
 		},
 
-		vertexShader: THREE.ShaderChunk['depth_vert'],
-		fragmentShader: THREE.ShaderChunk['depth_frag']
+		vertexShader: THREE.ShaderChunk[ 'depth_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'depth_frag' ]
 
 	},
 
@@ -24322,12 +24419,12 @@ THREE.ShaderLib = {
 
 		uniforms: {
 
-			"opacity" : { type: "f", value: 1.0 }
+			"opacity" : { type: "1f", value: 1.0 }
 
 		},
 
-		vertexShader: THREE.ShaderChunk['normal_vert'],
-		fragmentShader: THREE.ShaderChunk['normal_frag']
+		vertexShader: THREE.ShaderChunk[ 'normal_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'normal_frag' ]
 
 	},
 
@@ -24339,11 +24436,11 @@ THREE.ShaderLib = {
 
 		uniforms: {
 			"tCube": { type: "t", value: null },
-			"tFlip": { type: "f", value: - 1 }
+			"tFlip": { type: "1f", value: - 1 }
 		},
 
-		vertexShader: THREE.ShaderChunk['cube_vert'],
-		fragmentShader: THREE.ShaderChunk['cube_frag']
+		vertexShader: THREE.ShaderChunk[ 'cube_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'cube_frag' ]
 
 	},
 
@@ -24355,11 +24452,11 @@ THREE.ShaderLib = {
 
 		uniforms: {
 			"tEquirect": { type: "t", value: null },
-			"tFlip": { type: "f", value: - 1 }
+			"tFlip": { type: "1f", value: - 1 }
 		},
 
-		vertexShader: THREE.ShaderChunk['equirect_vert'],
-		fragmentShader: THREE.ShaderChunk['equirect_frag']
+		vertexShader: THREE.ShaderChunk[ 'equirect_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'equirect_frag' ]
 
 	},
 
@@ -24379,8 +24476,8 @@ THREE.ShaderLib = {
 
 		uniforms: {},
 
-		vertexShader: THREE.ShaderChunk['depthRGBA_vert'],
-		fragmentShader: THREE.ShaderChunk['depthRGBA_frag']
+		vertexShader: THREE.ShaderChunk[ 'depthRGBA_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'depthRGBA_frag' ]
 
 	},
 
@@ -24389,12 +24486,12 @@ THREE.ShaderLib = {
 
 		uniforms: {
 
-			"lightPos": { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) }
+			"lightPos": { type: "v3", value: new THREE.Vector3() }
 
 		},
 
-		vertexShader: THREE.ShaderChunk['distanceRGBA_vert'],
-		fragmentShader: THREE.ShaderChunk['distanceRGBA_frag']
+		vertexShader: THREE.ShaderChunk[ 'distanceRGBA_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'distanceRGBA_frag' ]
 
 	}
 
@@ -24543,8 +24640,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		pointShadowMatrix: [],
 		hemi: [],
 
-		shadows: [],
-		shadowsPointLight: 0
+		shadows: []
 
 	},
 
@@ -25420,8 +25516,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
+						var type = _gl.FLOAT;
+						var normalized = false;
+						var array = geometryAttribute.array;
+
+						if ( array instanceof Uint8Array ) {
+
+							type = _gl.UNSIGNED_BYTE;
+							normalized = true;
+
+						}
+
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, startIndex * size * array.BYTES_PER_ELEMENT );
 
 					}
 
@@ -25562,11 +25669,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		setupLights( lights, camera );
-
 		//
 
+		setupShadows( lights );
+
 		shadowMap.render( scene, camera );
+
+		setupLights( lights, camera );
 
 		//
 
@@ -26691,13 +26800,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( type === 'i' ) {
 
-			// single integer
+			// console.warn( 'THREE.WebGLRenderer: Uniform "i" is now "1i".' );
 			_gl.uniform1i( location, value );
 
 		} else if ( type === 'f' ) {
 
-			// single float
+			// console.warn( 'THREE.WebGLRenderer: Uniform "f" is now "1f".' );
 			_gl.uniform1f( location, value );
+
+		} else if ( type === 'iv1' ) {
+
+			// console.warn( 'THREE.WebGLRenderer: Uniform "iv1" is now "1iv".' );
+			_gl.uniform1iv( location, value );
+
+		} else if ( type === 'iv' ) {
+
+			// console.warn( 'THREE.WebGLRenderer: Uniform "iv" is now "3iv".' );
+			_gl.uniform3iv( location, value );
+
+		} else if ( type === 'fv1' ) {
+
+			// console.warn( 'THREE.WebGLRenderer: Uniform "fv1" is now "1fv".' );
+			_gl.uniform1fv( location, value );
+
+		} else if ( type === 'fv' ) {
+
+			// console.warn( 'THREE.WebGLRenderer: Uniform "fv" is now "3fv".' );
+			_gl.uniform3fv( location, value );
 
 		} else if ( type === 'v2' ) {
 
@@ -26754,26 +26883,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			}
-
-		} else if ( type === 'iv1' ) {
-
-			// flat array of integers (JS or typed array)
-			_gl.uniform1iv( location, value );
-
-		} else if ( type === 'iv' ) {
-
-			// flat array of integers with 3 x N size (JS or typed array)
-			_gl.uniform3iv( location, value );
-
-		} else if ( type === 'fv1' ) {
-
-			// flat array of floats (JS or typed array)
-			_gl.uniform1fv( location, value );
-
-		} else if ( type === 'fv' ) {
-
-			// flat array of floats with 3 x N size (JS or typed array)
-			_gl.uniform3fv( location, value );
 
 		} else if ( type === 'v2v' ) {
 
@@ -26993,6 +27102,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function setupShadows ( lights ) {
+
+		var lightShadowsLength = 0;
+
+		for ( var i = 0, l = lights.length; i < l; i ++ ) {
+
+			var light = lights[ i ];
+
+			if ( light.castShadow ) {
+
+				_lights.shadows[ lightShadowsLength ++ ] = light;
+
+			}
+
+		}
+
+		_lights.shadows.length = lightShadowsLength;
+
+	}
+
 	function setupLights ( lights, camera ) {
 
 		var l, ll, light,
@@ -27006,11 +27135,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		directionalLength = 0,
 		pointLength = 0,
 		spotLength = 0,
-		hemiLength = 0,
-
-		shadowsLength = 0;
-
-		_lights.shadowsPointLight = 0;
+		hemiLength = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -27043,8 +27168,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowBias = light.shadow.bias;
 					uniforms.shadowRadius = light.shadow.radius;
 					uniforms.shadowMapSize = light.shadow.mapSize;
-
-					_lights.shadows[ shadowsLength ++ ] = light;
 
 				}
 
@@ -27079,8 +27202,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowRadius = light.shadow.radius;
 					uniforms.shadowMapSize = light.shadow.mapSize;
 
-					_lights.shadows[ shadowsLength ++ ] = light;
-
 				}
 
 				_lights.spotShadowMap[ spotLength ] = light.shadow.map;
@@ -27105,8 +27226,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowBias = light.shadow.bias;
 					uniforms.shadowRadius = light.shadow.radius;
 					uniforms.shadowMapSize = light.shadow.mapSize;
-
-					_lights.shadows[ shadowsLength ++ ] = light;
 
 				}
 
@@ -27151,9 +27270,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lights.point.length = pointLength;
 		_lights.hemi.length = hemiLength;
 
-		_lights.shadows.length = shadowsLength;
-
-		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength + ',' + shadowsLength;
+		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength + ',' + _lights.shadows.length;
 
 	}
 
@@ -29249,7 +29366,6 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
 				parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
-				parameters.pointLightShadows > 0 ? '#define POINT_LIGHT_SHADOWS' : '',
 
 				parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
@@ -29351,7 +29467,6 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
 				parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
-				parameters.pointLightShadows > 0 ? '#define POINT_LIGHT_SHADOWS' : '',
 
 				parameters.premultipliedAlpha ? "#define PREMULTIPLIED_ALPHA" : '',
 
@@ -29587,8 +29702,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
-		"shadowMapEnabled", "pointLightShadows", "toneMapping", 'physicallyCorrectLights',
-		"shadowMapType",
+		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
 		"alphaTest", "doubleSided", "flipSided"
 	];
 
@@ -29734,8 +29848,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			numSpotLights: lights.spot.length,
 			numHemiLights: lights.hemi.length,
 
-			pointLightShadows: lights.shadowsPointLight,
-
 			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
 
@@ -29756,16 +29868,16 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 	this.getProgramCode = function ( material, parameters ) {
 
-		var chunks = [];
+		var array = [];
 
 		if ( parameters.shaderID ) {
 
-			chunks.push( parameters.shaderID );
+			array.push( parameters.shaderID );
 
 		} else {
 
-			chunks.push( material.fragmentShader );
-			chunks.push( material.vertexShader );
+			array.push( material.fragmentShader );
+			array.push( material.vertexShader );
 
 		}
 
@@ -29773,8 +29885,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			for ( var name in material.defines ) {
 
-				chunks.push( name );
-				chunks.push( material.defines[ name ] );
+				array.push( name );
+				array.push( material.defines[ name ] );
 
 			}
 
@@ -29782,13 +29894,11 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 		for ( var i = 0; i < parameterNames.length; i ++ ) {
 
-			var parameterName = parameterNames[ i ];
-			chunks.push( parameterName );
-			chunks.push( parameters[ parameterName ] );
+			array.push( parameters[ parameterNames[ i ] ] );
 
 		}
 
-		return chunks.join();
+		return array.join();
 
 	};
 
@@ -29944,6 +30054,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 
+	_lightShadows = _lights.shadows,
+
 	_shadowMapSize = new THREE.Vector2(),
 
 	_lookTarget = new THREE.Vector3(),
@@ -30026,13 +30138,10 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	this.render = function ( scene, camera ) {
 
-		var faceCount, isPointLight;
-		var shadows = _lights.shadows;
-
-		if ( shadows.length === 0 ) return;
-
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
+
+		if ( _lightShadows.length === 0 ) return;
 
 		// Set GL state for depth map.
 		_state.clearColor( 1, 1, 1, 1 );
@@ -30045,9 +30154,11 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		// render depth map
 
-		for ( var i = 0, il = shadows.length; i < il; i ++ ) {
+		var faceCount, isPointLight;
 
-			var light = shadows[ i ];
+		for ( var i = 0, il = _lightShadows.length; i < il; i ++ ) {
+
+			var light = _lightShadows[ i ];
 
 			var shadow = light.shadow;
 			var shadowCamera = shadow.camera;
@@ -30104,15 +30215,13 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				shadow.map = new THREE.WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 
-				//
-
-				if ( light instanceof THREE.SpotLight ) {
-
-					shadowCamera.aspect = _shadowMapSize.x / _shadowMapSize.y;
-
-				}
-
 				shadowCamera.updateProjectionMatrix();
+
+			}
+
+			if ( shadow instanceof THREE.SpotLightShadow ) {
+
+				shadow.update( light );
 
 			}
 
@@ -31053,8 +31162,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 	var state = renderer.state;
 
 	var vertexBuffer, elementBuffer;
-	var program, attributes, uniforms;
-	var hasVertexTexture;
+	var shader, program, attributes, uniforms;
 
 	var tempTexture, occlusionTexture;
 
@@ -31102,193 +31210,99 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 
-		hasVertexTexture = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) > 0;
+		shader = {
 
-		var shader;
+			vertexShader: [
 
-		if ( hasVertexTexture ) {
+				"uniform lowp int renderType;",
 
-			shader = {
+				"uniform vec3 screenPosition;",
+				"uniform vec2 scale;",
+				"uniform float rotation;",
 
-				vertexShader: [
+				"uniform sampler2D occlusionMap;",
 
-					"uniform lowp int renderType;",
+				"attribute vec2 position;",
+				"attribute vec2 uv;",
 
-					"uniform vec3 screenPosition;",
-					"uniform vec2 scale;",
-					"uniform float rotation;",
+				"varying vec2 vUV;",
+				"varying float vVisibility;",
 
-					"uniform sampler2D occlusionMap;",
+				"void main() {",
 
-					"attribute vec2 position;",
-					"attribute vec2 uv;",
+					"vUV = uv;",
 
-					"varying vec2 vUV;",
-					"varying float vVisibility;",
+					"vec2 pos = position;",
 
-					"void main() {",
+					"if ( renderType == 2 ) {",
 
-						"vUV = uv;",
+						"vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.9, 0.1 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.1, 0.9 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.5, 0.5 ) );",
 
-						"vec2 pos = position;",
+						"vVisibility =        visibility.r / 9.0;",
+						"vVisibility *= 1.0 - visibility.g / 9.0;",
+						"vVisibility *=       visibility.b / 9.0;",
+						"vVisibility *= 1.0 - visibility.a / 9.0;",
 
-						"if ( renderType == 2 ) {",
+						"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
+						"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
 
-							"vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.9, 0.1 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.1, 0.9 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.5, 0.5 ) );",
+					"}",
 
-							"vVisibility =        visibility.r / 9.0;",
-							"vVisibility *= 1.0 - visibility.g / 9.0;",
-							"vVisibility *=       visibility.b / 9.0;",
-							"vVisibility *= 1.0 - visibility.a / 9.0;",
+					"gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
 
-							"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
-							"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
+				"}"
 
-						"}",
+			].join( "\n" ),
 
-						"gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
+			fragmentShader: [
 
-					"}"
+				"uniform lowp int renderType;",
 
-				].join( "\n" ),
+				"uniform sampler2D map;",
+				"uniform float opacity;",
+				"uniform vec3 color;",
 
-				fragmentShader: [
+				"varying vec2 vUV;",
+				"varying float vVisibility;",
 
-					"uniform lowp int renderType;",
+				"void main() {",
 
-					"uniform sampler2D map;",
-					"uniform float opacity;",
-					"uniform vec3 color;",
+					// pink square
 
-					"varying vec2 vUV;",
-					"varying float vVisibility;",
+					"if ( renderType == 0 ) {",
 
-					"void main() {",
+						"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
 
-						// pink square
+					// restore
 
-						"if ( renderType == 0 ) {",
+					"} else if ( renderType == 1 ) {",
 
-							"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
+						"gl_FragColor = texture2D( map, vUV );",
 
-						// restore
+					// flare
 
-						"} else if ( renderType == 1 ) {",
+					"} else {",
 
-							"gl_FragColor = texture2D( map, vUV );",
+						"vec4 texture = texture2D( map, vUV );",
+						"texture.a *= opacity * vVisibility;",
+						"gl_FragColor = texture;",
+						"gl_FragColor.rgb *= color;",
 
-						// flare
+					"}",
 
-						"} else {",
+				"}"
 
-							"vec4 texture = texture2D( map, vUV );",
-							"texture.a *= opacity * vVisibility;",
-							"gl_FragColor = texture;",
-							"gl_FragColor.rgb *= color;",
+			].join( "\n" )
 
-						"}",
-
-					"}"
-
-				].join( "\n" )
-
-			};
-
-		} else {
-
-			shader = {
-
-				vertexShader: [
-
-					"uniform lowp int renderType;",
-
-					"uniform vec3 screenPosition;",
-					"uniform vec2 scale;",
-					"uniform float rotation;",
-
-					"attribute vec2 position;",
-					"attribute vec2 uv;",
-
-					"varying vec2 vUV;",
-
-					"void main() {",
-
-						"vUV = uv;",
-
-						"vec2 pos = position;",
-
-						"if ( renderType == 2 ) {",
-
-							"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
-							"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
-
-						"}",
-
-						"gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
-
-					"}"
-
-				].join( "\n" ),
-
-				fragmentShader: [
-
-					"precision mediump float;",
-
-					"uniform lowp int renderType;",
-
-					"uniform sampler2D map;",
-					"uniform sampler2D occlusionMap;",
-					"uniform float opacity;",
-					"uniform vec3 color;",
-
-					"varying vec2 vUV;",
-
-					"void main() {",
-
-						// pink square
-
-						"if ( renderType == 0 ) {",
-
-							"gl_FragColor = vec4( texture2D( map, vUV ).rgb, 0.0 );",
-
-						// restore
-
-						"} else if ( renderType == 1 ) {",
-
-							"gl_FragColor = texture2D( map, vUV );",
-
-						// flare
-
-						"} else {",
-
-							"float visibility = texture2D( occlusionMap, vec2( 0.5, 0.1 ) ).a;",
-							"visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) ).a;",
-							"visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) ).a;",
-							"visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) ).a;",
-							"visibility = ( 1.0 - visibility / 4.0 );",
-
-							"vec4 texture = texture2D( map, vUV );",
-							"texture.a *= opacity * visibility;",
-							"gl_FragColor = texture;",
-							"gl_FragColor.rgb *= color;",
-
-						"}",
-
-					"}"
-
-				].join( "\n" )
-
-			};
-
-		}
+		};
 
 		program = createProgram( shader );
 
@@ -31331,6 +31345,11 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		var screenPosition = new THREE.Vector3( 1, 1, 0 ),
 			screenPositionPixels = new THREE.Vector2( 1, 1 );
+
+		var validArea = new THREE.Box2();
+
+		validArea.min.set( 0, 0 );
+		validArea.max.set( viewport.z - 16, viewport.w - 16 );
 
 		if ( program === undefined ) {
 
@@ -31378,16 +31397,14 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 			screenPosition.copy( tempPosition );
 
-			screenPositionPixels.x = screenPosition.x * halfViewportWidth + halfViewportWidth;
-			screenPositionPixels.y = screenPosition.y * halfViewportHeight + halfViewportHeight;
+			// horizontal and vertical coordinate of the lower left corner of the pixels to copy
+
+			screenPositionPixels.x = viewport.x + ( screenPosition.x * halfViewportWidth ) + halfViewportWidth - 8;
+			screenPositionPixels.y = viewport.y + ( screenPosition.y * halfViewportHeight ) + halfViewportHeight - 8;
 
 			// screen cull
 
-			if ( hasVertexTexture || (
-				screenPositionPixels.x > 0 &&
-				screenPositionPixels.x < viewport.z &&
-				screenPositionPixels.y > 0 &&
-				screenPositionPixels.y < viewport.w ) ) {
+			if ( validArea.containsPoint( screenPositionPixels ) === true ) {
 
 				// save current RGB to temp texture
 
@@ -31395,7 +31412,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				state.bindTexture( gl.TEXTURE_2D, null );
 				state.activeTexture( gl.TEXTURE1 );
 				state.bindTexture( gl.TEXTURE_2D, tempTexture );
-				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, viewport.x + screenPositionPixels.x - 8, viewport.y + screenPositionPixels.y - 8, 16, 16, 0 );
+				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, screenPositionPixels.x, screenPositionPixels.y, 16, 16, 0 );
 
 
 				// render pink quad
@@ -31414,7 +31431,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 				state.activeTexture( gl.TEXTURE0 );
 				state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
-				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, viewport.x + screenPositionPixels.x - 8, viewport.y + screenPositionPixels.y - 8, 16, 16, 0 );
+				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, screenPositionPixels.x, screenPositionPixels.y, 16, 16, 0 );
 
 
 				// restore graphics

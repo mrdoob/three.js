@@ -10,6 +10,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 
+	_lightShadows = _lights.shadows,
+
 	_shadowMapSize = new THREE.Vector2(),
 
 	_lookTarget = new THREE.Vector3(),
@@ -92,13 +94,10 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	this.render = function ( scene, camera ) {
 
-		var faceCount, isPointLight;
-		var shadows = _lights.shadows;
-
-		if ( shadows.length === 0 ) return;
-
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
+
+		if ( _lightShadows.length === 0 ) return;
 
 		// Set GL state for depth map.
 		_state.clearColor( 1, 1, 1, 1 );
@@ -111,9 +110,11 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		// render depth map
 
-		for ( var i = 0, il = shadows.length; i < il; i ++ ) {
+		var faceCount, isPointLight;
 
-			var light = shadows[ i ];
+		for ( var i = 0, il = _lightShadows.length; i < il; i ++ ) {
+
+			var light = _lightShadows[ i ];
 
 			var shadow = light.shadow;
 			var shadowCamera = shadow.camera;
@@ -170,15 +171,13 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				shadow.map = new THREE.WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 
-				//
-
-				if ( light instanceof THREE.SpotLight ) {
-
-					shadowCamera.aspect = _shadowMapSize.x / _shadowMapSize.y;
-
-				}
-
 				shadowCamera.updateProjectionMatrix();
+
+			}
+
+			if ( shadow instanceof THREE.SpotLightShadow ) {
+
+				shadow.update( light );
 
 			}
 

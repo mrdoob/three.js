@@ -5,10 +5,10 @@ var files = {
 		"webgl_animation_skinning_blending",
 		"webgl_animation_skinning_morph",
 		"webgl_camera",
+		"webgl_camera_cinematic",
 		"webgl_camera_logarithmicdepthbuffer",
 		"webgl_decals",
 		"webgl_effects_anaglyph",
-		"webgl_effects_cardboard",
 		"webgl_effects_parallaxbarrier",
 		"webgl_effects_peppersghost",
 		"webgl_effects_stereo",
@@ -60,6 +60,8 @@ var files = {
 		"webgl_lights_physical",
 		"webgl_lights_pointlights",
 		"webgl_lights_pointlights2",
+		"webgl_lights_spotlight",
+		"webgl_lights_spotlights",
 		"webgl_lines_colors",
 		"webgl_lines_cubes",
 		"webgl_lines_dashed",
@@ -239,6 +241,7 @@ var files = {
 		"webvr_cubes",
 		"webvr_panorama",
 		"webvr_rollercoaster",
+		"webvr_shadow",
 		"webvr_video"
 	],
 	"css3d": [
