@@ -48,26 +48,26 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TweenMax.min.js"></script>
 
 		<script>
-			let stats, container = document.getElementById( 'container' );
+			var stats, container = document.getElementById( 'container' );
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			let rnd = new THREE.WebGLRenderer();
-			let cam = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 20000);
-			let orb = new THREE.OrbitControls(cam, document);
+			var rnd = new THREE.WebGLRenderer();
+			var cam = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 20000);
+			var orb = new THREE.OrbitControls(cam, rnd.domElement);
 
-			let scn = new THREE.Scene();
-			let matFloor = new THREE.MeshPhongMaterial();
-			let matBox = new THREE.MeshPhongMaterial();
-			let geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000);
-			let geoBox = new THREE.BoxGeometry(Math.PI, Math.sqrt(2), Math.E);
-			let mshFloor = new THREE.Mesh(geoFloor, matFloor);
-			let mshBox = new THREE.Mesh(geoBox, matBox);
-			let amb = new THREE.AmbientLight(0x121422);
-			let spt1 = createSpotlight( { color: 0xFF7F00, angle:0.3 } );
-			let spt2 = createSpotlight( { color: 0x00FF7F, angle:0.3 } );
-			let spt3 = createSpotlight( { color: 0x7F00FF, angle:0.3 } );
-			let lightHelper1, lightHelper2, lightHelper3;
+			var scn = new THREE.Scene();
+			var matFloor = new THREE.MeshPhongMaterial();
+			var matBox = new THREE.MeshPhongMaterial();
+			var geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000);
+			var geoBox = new THREE.BoxGeometry(Math.PI, Math.sqrt(2), Math.E);
+			var mshFloor = new THREE.Mesh(geoFloor, matFloor);
+			var mshBox = new THREE.Mesh(geoBox, matBox);
+			var amb = new THREE.AmbientLight(0x121422);
+			var spt1 = createSpotlight( { color: 0xFF7F00, angle:0.3 } );
+			var spt2 = createSpotlight( { color: 0x00FF7F, angle:0.3 } );
+			var spt3 = createSpotlight( { color: 0x7F00FF, angle:0.3 } );
+			var lightHelper1, lightHelper2, lightHelper3;
 
 			function init() {
 
@@ -88,12 +88,11 @@
 				lightHelper3 = new THREE.SpotLightHelper( spt3 );
 
 				matFloor.color.set( 0x808080 );
-				matFloor.color.a = 1.0;
 
 				mshFloor.receiveShadow = true;
 				mshFloor.position.set(0, -0.05, 0);
 
-				matBox.color = { r: Math.random(), g: Math.random(), b: Math.random(), a: 1.0 };
+				matBox.color.setHex( 0xffffff * Math.random() );
 				matBox.opacity = 0.8;
 				mshBox.castShadow = true;
 				mshBox.receiveShadow = true;
@@ -124,7 +123,7 @@
 			};
 
 			function createSpotlight( object ) {
-				let newObj = new THREE.SpotLight(object.color || 0xFFFFFF);
+				var newObj = new THREE.SpotLight(object.color || 0xFFFFFF);
 				newObj.castShadow = object.castShadow || true;
 				newObj.angle = object.angle || 0.777;
 				newObj.exponent = object.exponent || 2.0;
@@ -151,15 +150,15 @@
 				rate = rate || 6;
 				if ( rate < 0.01 ) rate = 0.01;
 				else if ( rate > 1000 ) rate = 1000;
-				let targ1 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
+				var targ1 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
 				TweenMax.to(spt1.position, rate / 3, targ1);
 				TweenMax.to(spt1, rate / 2, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ1 } );
 
-				let targ2 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
+				var targ2 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
 				TweenMax.to(spt2.position, rate, targ2);
 				TweenMax.to(spt2, rate / 3, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ2 } );
 
-				let targ3 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
+				var targ3 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
 				TweenMax.to(spt3.position, rate / 2, targ3);
 				TweenMax.to(spt3, rate, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ3 } );
 
