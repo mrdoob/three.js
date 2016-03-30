@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - spot light</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
+
+			a {
+				color: #ff0080;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #0080ff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - Just to show the spot light and it's edge - by <a href="http://master-domain.com" target="_blank">Master James</a><br />
+			Right click and drag to move OrbitControls,<br /> center across the edge of the shadow.<br />
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="../examples/js/libs/dat.gui.min.js"></script>
+		<script src="../examples/js/controls/OrbitControls.js"></script>
+		<script src="js/Detector.js"></script>
+
+		<script>
+			let container = document.getElementById( 'container' );
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			let rnd = new THREE.WebGLRenderer();
+			let cam = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 20000);
+			let orb = new THREE.OrbitControls(cam, document);
+
+			let scn = new THREE.Scene();
+			let matFloor = new THREE.MeshPhongMaterial();
+			let matBox = new THREE.MeshPhongMaterial();
+			let geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000);
+			let geoBox = new THREE.BoxGeometry(Math.PI, Math.sqrt(2), Math.E);
+			let mshFloor = new THREE.Mesh(geoFloor, matFloor);
+			let mshBox = new THREE.Mesh(geoBox, matBox);
+			let amb = new THREE.AmbientLight(0x121422);
+			let spt = new THREE.SpotLight(0xFFFFFF);
+			let lightHelper;
+
+			let gui, guiElements, param = { color: '0xffffff' };
+
+			function init() {
+				rnd.shadowMap.enabled = true;
+				rnd.shadowMap.type = THREE.PCFSoftShadowMap;
+				rnd.gammaInput = true;
+				rnd.gammaOutput = true;
+				rnd.antialias = true;
+
+				cam.position.set(30, 13, -24);
+
+				spt.position.set(15, 40, 35);
+				spt.castShadow = true;
+				spt.angle = 0.777;
+				spt.exponent = 2.0;
+				spt.penumbra = 0.2;
+				spt.decay = 2;
+				spt.distance = 500;
+				spt.shadow.mapSize.width = 8192;
+				spt.shadow.mapSize.height = 8192;
+				// shadow camera helper
+				spt.shadowCameraHelper = new THREE.CameraHelper( spt.shadow.camera ); // colored lines
+				spt.shadow.camera.near = 0.1;
+				spt.shadow.camera.far = 20000;
+				//spt.shadow.camera.fov = (spt.angle * (360 / Math.PI));
+
+				lightHelper = new THREE.SpotLightHelper( spt );
+
+				matFloor.color.set( 0x808080 );
+				matFloor.color.a = 1.0;
+
+				mshFloor.receiveShadow = true;
+				mshFloor.position.set(0, -0.05, 0);
+
+				matBox.color = { r: Math.random(), g: Math.random(), b: Math.random(), a: 1.0 };
+				mshBox.castShadow = true;
+				mshBox.receiveShadow = true;
+				mshBox.position.set(40, 1.8, 0);
+
+
+				scn.add(cam);
+				scn.add(mshFloor);
+				scn.add(mshBox);
+				scn.add(amb);
+				scn.add(spt);
+				scn.add( spt.shadowCameraHelper );
+				scn.add( new THREE.AxisHelper( 10 ) );
+				scn.add( lightHelper );
+
+				document.body.appendChild(rnd.domElement);
+				onResize();
+				window.addEventListener('resize', onResize, false);
+
+				orb.addEventListener('change', render);
+				//orb.maxPolarAngle = (Math.PI / 2);
+				orb.update();
+			}
+
+			function onResize() {
+				rnd.setSize(window.innerWidth, window.innerHeight);
+				cam.aspect = (window.innerWidth / window.innerHeight);
+				cam.updateProjectionMatrix();
+				orb.target = mshBox.position;
+			}
+
+			function render() {
+				lightHelper.update(); // required
+				if ( spt.shadowCameraHelper ) spt.shadowCameraHelper.update();
+
+				rnd.render(scn, cam);
+			}
+
+			function clearGui() {
+				if ( gui ) gui.destroy();
+
+				gui = new dat.GUI();
+
+				gui.open();
+			}
+
+			function buildGui() {
+
+				clearGui();
+
+				addGui( 'color', spt.color.getHex(), function( val ) {
+					spt.color.setHex( val );
+					render();
+				}, true );
+
+				addGui( 'intensity', spt.intensity, function( val ) {
+					spt.intensity = val;
+					render();
+				}, false, 0, 10 );
+
+				addGui( 'distance', spt.distance, function( val ) {
+					spt.distance = val;
+					render();
+				}, false, 0, 1000 );
+
+				addGui( 'angle', spt.angle, function( val ) {
+					spt.angle = val;
+					render();
+				}, false, 0, 1.56 );
+
+				addGui( 'penumbra', spt.penumbra, function( val ) {
+					spt.penumbra = val;
+					render();
+				}, false, 0, 1 );
+
+				addGui( 'decay', spt.decay, function( val ) {
+					spt.decay = val;
+					render();
+				}, false, 0, 100 );
+
+			}
+
+			function addGui( name, value, callback, isColor, min, max ) {
+				var node;
+				param[ name ] = value;
+				if ( isColor ) {
+					node = gui.addColor( param, name ).onChange( function() {
+						callback( param[ name ] );
+					} );
+				}
+				else if ( typeof value == 'object' ) {
+					node = gui.add( param, name, value ).onChange( function() {
+						callback( param[ name ] );
+					} );
+				}
+				else {
+					node = gui.add( param, name, min, max ).onChange( function() {
+						callback( param[ name ] );
+					} );
+				}
+				return node;
+			}
+
+			init();
+
+			buildGui();
+
+			render();
+
+		</script>
+	</body>
+</html>
