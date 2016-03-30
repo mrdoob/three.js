@@ -36,8 +36,8 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - This animates 3 Spot Lights - by <a href="http://master-domain.com" target="_blank">Master James</a><br />
-			Orbit Controls are available to navigate.<br />
-			Where the lights converge to make white light the shadows will appear as R G B from pairs of lights.<br />
+			Orbit Controls are available to navigate. Click to set random color CTRL-Click for White.<br />
+			Where the lights converge to make white light the shadows will appear as R G B from pairs of lights.
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -68,6 +68,9 @@
 			var spt2 = createSpotlight( { color: 0x00FF7F, angle:0.3 } );
 			var spt3 = createSpotlight( { color: 0x7F00FF, angle:0.3 } );
 			var lightHelper1, lightHelper2, lightHelper3;
+			var ray = new THREE.Raycaster();
+			var mouseDown = new THREE.Vector2();
+			var mouse = new THREE.Vector2();
 
 			function init() {
 
@@ -76,6 +79,8 @@
 				rnd.gammaInput = true;
 				rnd.gammaOutput = true;
 				rnd.antialias = true;
+				rnd.domElement.addEventListener('mousedown', onDocumentClick);
+				rnd.domElement.addEventListener('mouseup', onDocumentClick);
 
 				cam.position.set(38, 20, -32);
 
@@ -92,7 +97,7 @@
 				mshFloor.receiveShadow = true;
 				mshFloor.position.set(0, -0.05, 0);
 
-				matBox.color.setHex( 0xffffff * Math.random() );
+				randomColor( matBox );
 				matBox.opacity = 0.8;
 				mshBox.castShadow = true;
 				mshBox.receiveShadow = true;
@@ -179,8 +184,66 @@
 
 			};
 
+			function onDocumentClick( event ) {
+
+				event.preventDefault();
+
+				var rndDom = rnd.domElement;
+
+				if( event.type === 'mousedown' ) {
+
+					mouseDown.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
+
+					mouseDown.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
+
+				}
+				else {
+
+					mouse.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
+
+					mouse.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
+
+					if (mouseDown.distanceTo(mouse) < 0.0075) {
+
+						ray.setFromCamera( mouse, cam );
+
+						var found = ray.intersectObjects( [ mshBox, mshFloor ] );
+
+						if ( found.length > 0 ) {
+
+							if( event.ctrlKey === false ) randomColor( found[0].object );
+
+							else found[0].object.material.color.set( 0xffffff );
+
+							render();
+
+						}
+
+					}
+
+				}
+
+			}
+
+			function randomColor( target ) {
+
+				if ( target !== undefined ) {
+
+					if ( target.material !== undefined ) target = target.material;
+
+					if ( target.color !== undefined ) {
+
+						target.color.setHex( 0xffffff * Math.random() );
+
+					}
+				}
+
+			}
+
 			init();
+
 			render();
+
 			animate(4.5);
 
 		</script>
