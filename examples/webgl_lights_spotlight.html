@@ -63,6 +63,10 @@
 			var amb = new THREE.AmbientLight(0x121422);
 			var spt = new THREE.SpotLight(0xFFFFFF);
 			var lightHelper;
+			var ray = new THREE.Raycaster();
+			var mouseDown = new THREE.Vector2();
+			var mouse = new THREE.Vector2();
+
 
 			var gui, guiElements, param = { color: '0xffffff' };
 
@@ -72,6 +76,8 @@
 				rnd.gammaInput = true;
 				rnd.gammaOutput = true;
 				rnd.antialias = true;
+				rnd.domElement.addEventListener('mousedown', onDocumentClick);
+				rnd.domElement.addEventListener('mouseup', onDocumentClick);
 
 				cam.position.set(30, 13, -24);
 
@@ -93,11 +99,11 @@
 				lightHelper = new THREE.SpotLightHelper( spt );
 
 				matFloor.color.set( 0x808080 );
+				randomColor( matBox );
 
 				mshFloor.receiveShadow = true;
 				mshFloor.position.set(0, -0.05, 0);
 
-				matBox.color.setHex( 0xffffff * Math.random() );
 				mshBox.castShadow = true;
 				mshBox.receiveShadow = true;
 				mshBox.position.set(40, 1.8, 0);
@@ -146,7 +152,7 @@
 
 				clearGui();
 
-				addGui( 'color', spt.color.getHex(), function( val ) {
+				addGui( 'light color', spt.color.getHex(), function( val ) {
 					spt.color.setHex( val );
 					render();
 				}, true );
@@ -197,6 +203,55 @@
 					} );
 				}
 				return node;
+			}
+
+			function onDocumentClick( event ) {
+
+				event.preventDefault();
+
+				var rndDom = rnd.domElement;
+
+				if( event.type === 'mousedown' ) {
+
+					mouseDown.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
+					mouseDown.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
+
+				}
+				else {
+
+					mouse.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
+					mouse.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
+
+					console.log(mouseDown.distanceTo(mouse));
+					if (mouseDown.distanceTo(mouse) < 0.0075) {
+
+						ray.setFromCamera( mouse, cam );
+
+						var found = ray.intersectObjects( [ mshBox, mshFloor ] );
+
+						if ( found.length > 0 ) randomColor( found[0].object );
+
+					}
+
+				}
+
+			}
+
+			function randomColor( target ) {
+
+				if ( target !== undefined ) {
+
+					if ( target.material !== undefined ) target = target.material;
+
+					if ( target.color !== undefined ) {
+
+						target.color.setHex( 0xffffff * Math.random() );
+
+						render();
+
+					}
+				}
+
 			}
 
 			init();
