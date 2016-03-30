@@ -7,6 +7,8 @@ var files = {
 		"webgl_camera",
 		"webgl_camera_cinematic",
 		"webgl_camera_logarithmicdepthbuffer",
+		"webgl_clipping",
+		"webgl_clipping_advanced",
 		"webgl_decals",
 		"webgl_effects_anaglyph",
 		"webgl_effects_parallaxbarrier",
@@ -236,7 +238,6 @@ var files = {
 		"webgl_custom_attributes_points",
 		"webgl_custom_attributes_points2",
 		"webgl_custom_attributes_points3",
-		"webgl_custom_clipping",
 		"webgl_raymarching_reflect"
 	],
 	"webvr": [
