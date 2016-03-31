@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author greggman / http://games.greggman.com/
  * @author zz85 / http://www.lab4games.net/zz85/blog
+ * @author tschw
  */
 
 THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
@@ -10,13 +11,19 @@ THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 
 	this.type = 'PerspectiveCamera';
 
-	this.focalLength = 10;
 	this.zoom = 1;
 
 	this.fov = fov !== undefined ? fov : 50;
 	this.aspect = aspect !== undefined ? aspect : 1;
 	this.near = near !== undefined ? near : 0.1;
 	this.far = far !== undefined ? far : 2000;
+
+	this.view = null;
+
+	this.skewSlopeX = 0;
+	this.skewSlopeY = 0;
+
+	this.focalLength = 10;
 
 	this.updateProjectionMatrix();
 
@@ -80,46 +87,56 @@ THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight 
 
 THREE.PerspectiveCamera.prototype.setViewOffset = function ( fullWidth, fullHeight, x, y, width, height ) {
 
-	this.fullWidth = fullWidth;
-	this.fullHeight = fullHeight;
-	this.x = x;
-	this.y = y;
-	this.width = width;
-	this.height = height;
+	this.aspect = fullWidth / fullHeight;
+
+	this.view = {
+		fullWidth: fullWidth,
+		fullHeight: fullHeight,
+		offsetX: x,
+		offsetY: y,
+		width: width,
+		height: height
+	};
 
 	this.updateProjectionMatrix();
+
+};
+
+THREE.PerspectiveCamera.prototype.getEffectiveFOV = function() {
+
+	return THREE.Math.RAD2DEG * 2 * Math.atan(
+			Math.tan( THREE.Math.DEG2RAD * 0.5 * this.fov ) / this.zoom );
 
 };
 
 
 THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
-	var fov = THREE.Math.RAD2DEG * ( 2 * Math.atan( Math.tan( THREE.Math.DEG2RAD * this.fov * 0.5 ) / this.zoom ) );
+	var near = this.near,
+		top = near * Math.tan(
+				THREE.Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
+		height = 2 * top,
+		width = this.aspect * height,
+		left = -0.5 * width,
+		view = this.view;
 
-	if ( this.fullWidth ) {
+	if ( view !== null ) {
 
-		var aspect = this.fullWidth / this.fullHeight;
-		var top = Math.tan( THREE.Math.DEG2RAD * fov * 0.5 ) * this.near;
-		var bottom = - top;
-		var left = aspect * bottom;
-		var right = aspect * top;
-		var width = Math.abs( right - left );
-		var height = Math.abs( top - bottom );
+		var fullWidth = view.fullWidth,
+			fullHeight = view.fullHeight;
 
-		this.projectionMatrix.makeFrustum(
-			left + this.x * width / this.fullWidth,
-			left + ( this.x + this.width ) * width / this.fullWidth,
-			top - ( this.y + this.height ) * height / this.fullHeight,
-			top - this.y * height / this.fullHeight,
-			this.near,
-			this.far
-		);
-
-	} else {
-
-		this.projectionMatrix.makePerspective( fov, this.aspect, this.near, this.far );
+		left += view.offsetX * width / fullWidth;
+		top -= view.offsetY * height / fullHeight;
+		width *= view.width / fullWidth;
+		height *= view.height / fullHeight;
 
 	}
+
+	left += this.skewSlopeX * near;
+	top -= this.skewSlopeY * near;
+
+	this.projectionMatrix.makeFrustum(
+			left, left + width, top - height, top, near, this.far );
 
 };
 
@@ -127,13 +144,24 @@ THREE.PerspectiveCamera.prototype.copy = function ( source ) {
 
 	THREE.Camera.prototype.copy.call( this, source );
 
-	this.focalLength = source.focalLength;
 	this.zoom = source.zoom;
 
 	this.fov = source.fov;
 	this.aspect = source.aspect;
 	this.near = source.near;
 	this.far = source.far;
+
+	this.zoom = source.zoom;
+	this.focalLength = source.focalLength;
+
+	this.skewSlopeX = source.skewSlopeX;
+	this.skewSlopeY = source.skewSlopeY;
+
+	if ( source.view !== null && source.view !== undefined ) {
+
+		this.view = Object.assign( {}, source.view );
+
+	}
 
 	return this;
 
@@ -143,13 +171,22 @@ THREE.PerspectiveCamera.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
-	data.object.focalLength = this.focalLength;
-	data.object.zoom = this.zoom;
-
 	data.object.fov = this.fov;
 	data.object.aspect = this.aspect;
 	data.object.near = this.near;
 	data.object.far = this.far;
+
+	data.object.zoom = this.zoom;
+	data.object.focalLength = this.focalLength;
+
+	data.object.skewSlopeX = this.skewSlopeX;
+	data.object.skewSlopeY = this.skewSlopeY;
+
+	if ( this.view !== null ) {
+
+		data.object.view = Object.assign( {}, this.view );
+
+	}
 
 	return data;
 
