@@ -189,10 +189,14 @@ THREE.Triangle.prototype = {
 
 		return function closestPointToPoint( point, optionalTarget ) {
 
-			if ( plane === undefined ) plane = new THREE.Plane();
-			if ( edgeList === undefined ) edgeList = [ new THREE.Line3(), new THREE.Line3(), new THREE.Line3() ];
-			if ( projectedPoint === undefined ) projectedPoint = new THREE.Vector3();
-			if ( closestPoint === undefined ) closestPoint = new THREE.Vector3();
+			if ( plane === undefined ) {
+
+				plane = new THREE.Plane();
+				edgeList = [ new THREE.Line3(), new THREE.Line3(), new THREE.Line3() ];
+				projectedPoint = new THREE.Vector3();
+				closestPoint = new THREE.Vector3();
+
+			}
 
 			var result = optionalTarget || new THREE.Vector3();
 			var minDistance = Infinity;
