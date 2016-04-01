@@ -71,7 +71,7 @@
 			var camera, scene, renderer, controls, objects = [];
 			var hdrCubeMap;
 			var composer;
-			var standardMaterial, standardMaterial2, floorMaterial;
+			var gemBackMaterial, gemFrontMaterial, floorMaterial;
 			var ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
 
 			init();
@@ -90,7 +90,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setClearColor( new THREE.Color( 0x000000 ) );
 
-				standardMaterial = new THREE.MeshStandardMaterial( {
+				gemBackMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
 					color: 0x0000ff,
 					metalness: 1.0,
@@ -101,9 +101,10 @@
 					shading: THREE.SmoothShading,
 					envMapIntensity: 5,
 					premultipliedAlpha: true
-
+					// TODO: Add custom blend mode that modulates background color by this materials color.
 				} );
-				standardMaterial2 = new THREE.MeshStandardMaterial( {
+
+				gemFrontMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
 					color: 0x0000ff,
 					metalness: 0.0,
@@ -114,7 +115,6 @@
 					shading: THREE.SmoothShading,
 					envMapIntensity: 5,
 					premultipliedAlpha: true
-
 				} );
 
 				var manager = new THREE.LoadingManager();
@@ -131,9 +131,9 @@
 
 						if ( child instanceof THREE.Mesh ) {
 
-							child.material = standardMaterial;
+							child.material = gemBackMaterial;
 							var second = child.clone();
-							second.material = standardMaterial2;
+							second.material = gemFrontMaterial;
 
 							var parent = new THREE.Group();
 							parent.add( second );
@@ -168,8 +168,8 @@
 
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					standardMaterial2.envMap = standardMaterial.envMap = hdrCubeRenderTarget;
-					standardMaterial2.needsUpdate = standardMaterial.needsUpdate = true;
+					gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget;
+					gemFrontMaterial.needsUpdate = gemBackMaterial.needsUpdate = true;
 				} );
 
 				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
@@ -290,16 +290,16 @@
 
 			function render() {
 
-				if ( standardMaterial !== undefined && standardMaterial2 !== undefined ) {
+				if ( gemBackMaterial !== undefined && gemFrontMaterial !== undefined ) {
 
-					standardMaterial2.reflectivity = standardMaterial.reflectivity = params.reflectivity;
-					var newEnvMap = standardMaterial.envMap;
+					gemFrontMaterial.reflectivity = gemBackMaterial.reflectivity = params.reflectivity;
+					var newEnvMap = gemBackMaterial.envMap;
 					switch( params.envMap ) {
 						case 'LDR': newEnvMap = ldrCubeRenderTarget; break;
 						case 'HDR': newEnvMap = hdrCubeRenderTarget; break;
 						case 'RGBM16': newEnvMap = rgbmCubeRenderTarget; break;
 					}
-					var newColor = standardMaterial.color;
+					var newColor = gemBackMaterial.color;
 					switch( params.gemColor ) {
 						case 'Blue': newColor = new THREE.Color( 0x000088 ); break;
 						case 'Red': newColor = new THREE.Color( 0x880000 ); break;
@@ -307,11 +307,11 @@
 						case 'White': newColor =  new THREE.Color( 0x888888 ); break;
 						case 'Black': newColor =  new THREE.Color( 0x0f0f0f ); break;
 					}
-					standardMaterial.color = standardMaterial2.color = newColor;
-					if( newEnvMap !== standardMaterial.envMap ) {
-						standardMaterial2.envMap = standardMaterial.envMap = newEnvMap;
-						standardMaterial2.needsUpdate = true;
-						standardMaterial.needsUpdate = true;
+					gemBackMaterial.color = gemFrontMaterial.color = newColor;
+					if( newEnvMap !== gemBackMaterial.envMap ) {
+						gemFrontMaterial.envMap = gemBackMaterial.envMap = newEnvMap;
+						gemFrontMaterial.needsUpdate = true;
+						gemBackMaterial.needsUpdate = true;
 					}
 
 				}
