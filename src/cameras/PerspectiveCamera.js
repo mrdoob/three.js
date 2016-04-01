@@ -5,27 +5,43 @@
  * @author tschw
  */
 
-THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
+THREE.PerspectiveCamera = function( fov, aspect, near, far ) {
 
 	THREE.Camera.call( this );
 
 	this.type = 'PerspectiveCamera';
 
+	this.fov = fov !== undefined ? fov : 50;
 	this.zoom = 1;
 
-	this.fov = fov !== undefined ? fov : 50;
-	this.aspect = aspect !== undefined ? aspect : 1;
 	this.near = near !== undefined ? near : 0.1;
 	this.far = far !== undefined ? far : 2000;
+	this.focus = 10;
 
+	this.aspect = aspect !== undefined ? aspect : 1;
 	this.view = null;
 
-	this.skewSlopeX = 0;
-	this.skewSlopeY = 0;
-
-	this.focalLength = 10;
+	this.filmGauge = 35;	// width of the film (default in millimeters)
+	this.filmOffset = 0;	// horizontal film offset (same unit as gauge)
 
 	this.updateProjectionMatrix();
+
+};
+
+THREE.PerspectiveCamera._assignProps = function( dest, source ) {
+
+	dest.fov = source.fov;
+	dest.zoom = source.zoom;
+
+	dest.near = source.near;
+	dest.far = source.far;
+	dest.focs = source.focus;
+
+	dest.aspect = source.aspect;
+	dest.view = ! source.view ? null : Object.assign( {}, source.view );
+
+	dest.filmGauge = source.filmGauge;
+	dest.filmOffset = source.filmOffset;
 
 };
 
@@ -34,19 +50,71 @@ THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
 
 
 /**
- * Uses Focal Length (in mm) to estimate and set FOV
- * 35mm (full-frame) camera is used if frame size is not specified;
- * Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
+ * Sets the FOV by focal length (DEPRECATED).
+ *
+ * Optionally also sets .filmGauge, otherwise uses it. See .setFocalLength.
  */
+THREE.PerspectiveCamera.prototype.setLens = function( focalLength, filmGauge ) {
 
-THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight ) {
+	console.warn( "THREE.PerspectiveCamera.setLens is deprecated. " +
+			"Use .setFocalLength and .filmGauge for a photographic setup." );
 
-	if ( frameHeight === undefined ) frameHeight = 24;
+	if ( filmGauge !== undefined ) this.filmGauge = filmGauge;
+	this.setFocalLength( focalLength );
 
-	this.fov = 2 * THREE.Math.RAD2DEG * Math.atan( frameHeight / ( focalLength * 2 ) );
+};
+
+/**
+ * Sets the FOV by focal length in respect to the current .filmGauge.
+ *
+ * The default film gauge is 35, so that the focal length can be specified for
+ * a 35mm (full frame) camera.
+ *
+ * Values for focal length and film gauge must have the same unit.
+ */
+THREE.PerspectiveCamera.prototype.setFocalLength = function( focalLength ) {
+
+	// see http://www.bobatkins.com/photography/technical/field_of_view.html
+	var vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
+
+	this.fov = THREE.Math.RAD2DEG * 2 * Math.atan( vExtentSlope );
 	this.updateProjectionMatrix();
 
 };
+
+
+/**
+ * Calculates the focal length from the current .fov and .filmGauge.
+ */
+THREE.PerspectiveCamera.prototype.getFocalLength = function() {
+
+	var vExtentSlope = Math.tan( THREE.Math.DEG2RAD * 0.5 * this.fov );
+
+	return 0.5 * this.getFilmHeight() / vExtentSlope;
+
+};
+
+THREE.PerspectiveCamera.prototype.getEffectiveFOV = function() {
+
+	return THREE.Math.RAD2DEG * 2 * Math.atan(
+			Math.tan( THREE.Math.DEG2RAD * 0.5 * this.fov ) / this.zoom );
+
+};
+
+THREE.PerspectiveCamera.prototype.getFilmWidth = function() {
+
+	// film not completely covered in portrait format (aspect < 1)
+	return this.filmGauge * Math.min( this.aspect, 1 );
+
+};
+
+THREE.PerspectiveCamera.prototype.getFilmHeight = function() {
+
+	// film not completely covered in landscape format (aspect > 1)
+	return this.filmGauge / Math.max( this.aspect, 1 );
+
+};
+
 
 
 /**
@@ -84,8 +152,7 @@ THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight 
  *
  *   Note there is no reason monitors have to be the same size or in a grid.
  */
-
-THREE.PerspectiveCamera.prototype.setViewOffset = function ( fullWidth, fullHeight, x, y, width, height ) {
+THREE.PerspectiveCamera.prototype.setViewOffset = function( fullWidth, fullHeight, x, y, width, height ) {
 
 	this.aspect = fullWidth / fullHeight;
 
@@ -102,15 +169,7 @@ THREE.PerspectiveCamera.prototype.setViewOffset = function ( fullWidth, fullHeig
 
 };
 
-THREE.PerspectiveCamera.prototype.getEffectiveFOV = function() {
-
-	return THREE.Math.RAD2DEG * 2 * Math.atan(
-			Math.tan( THREE.Math.DEG2RAD * 0.5 * this.fov ) / this.zoom );
-
-};
-
-
-THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
+THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function() {
 
 	var near = this.near,
 		top = near * Math.tan(
@@ -132,62 +191,26 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
 	}
 
-	left += this.skewSlopeX * near;
-	top -= this.skewSlopeY * near;
+	var skew = this.filmOffset;
+	if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
 
 	this.projectionMatrix.makeFrustum(
 			left, left + width, top - height, top, near, this.far );
 
 };
 
-THREE.PerspectiveCamera.prototype.copy = function ( source ) {
+THREE.PerspectiveCamera.prototype.copy = function( source ) {
 
 	THREE.Camera.prototype.copy.call( this, source );
-
-	this.zoom = source.zoom;
-
-	this.fov = source.fov;
-	this.aspect = source.aspect;
-	this.near = source.near;
-	this.far = source.far;
-
-	this.zoom = source.zoom;
-	this.focalLength = source.focalLength;
-
-	this.skewSlopeX = source.skewSlopeX;
-	this.skewSlopeY = source.skewSlopeY;
-
-	if ( source.view !== null && source.view !== undefined ) {
-
-		this.view = Object.assign( {}, source.view );
-
-	}
-
+	THREE.PerspectiveCamera._assignProps( this, source );
 	return this;
 
 };
 
-THREE.PerspectiveCamera.prototype.toJSON = function ( meta ) {
+THREE.PerspectiveCamera.prototype.toJSON = function( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.fov = this.fov;
-	data.object.aspect = this.aspect;
-	data.object.near = this.near;
-	data.object.far = this.far;
-
-	data.object.zoom = this.zoom;
-	data.object.focalLength = this.focalLength;
-
-	data.object.skewSlopeX = this.skewSlopeX;
-	data.object.skewSlopeY = this.skewSlopeY;
-
-	if ( this.view !== null ) {
-
-		data.object.view = Object.assign( {}, this.view );
-
-	}
-
+	THREE.PerspectiveCamera._assignProps( data.object, this );
 	return data;
 
 };
