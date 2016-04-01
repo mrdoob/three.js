@@ -365,7 +365,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	preMultiply: function ( m ) {
+	premultiply: function ( m ) {
 
 		return this.multiplyMatrices( m, this );
 
