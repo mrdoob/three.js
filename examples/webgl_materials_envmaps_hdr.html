@@ -202,6 +202,7 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
+				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
@@ -269,14 +270,23 @@
 					standardMaterial.roughness = params.roughness;
 					standardMaterial.bumpScale = - 0.05 * params.bumpScale;
 					switch( params.envMap ) {
-						case 'LDR': standardMaterial.envMap = ldrCubeRenderTarget; break;
-						case 'HDR': standardMaterial.envMap = hdrCubeRenderTarget; break;
-						case 'RGBM16': standardMaterial.envMap = rgbmCubeRenderTarget; break;
+						case 'None': newEnvMap = null; break;
+						case 'LDR': newEnvMap = ldrCubeRenderTarget; break;
+						case 'HDR': newEnvMap = hdrCubeRenderTarget; break;
+						case 'RGBM16': newEnvMap = rgbmCubeRenderTarget; break;
+					}
+					if( newEnvMap !== standardMaterial.envMap ) {
+						standardMaterial.envMap = newEnvMap;
+						standardMaterial.needsUpdate = true;
+						floorMaterial.emissive = new THREE.Color( 1, 1, 1 );
+						floorMaterial.emissiveMap = newEnvMap;
+						floorMaterial.needsUpdate = true;
+						//console.log( 'standardMat', standardMaterial );
 					}
 
 				}
 
-				renderer.toneMappingExposure = params.exposure;
+				renderer.toneMappingExposure = Math.pow( params.exposure, 4.0 );
 
 				var timer = Date.now() * 0.00025;
 
