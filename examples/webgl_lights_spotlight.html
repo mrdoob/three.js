@@ -36,7 +36,8 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - Just to show the spot light and it's edge - by <a href="http://master-domain.com" target="_blank">Master James</a><br />
-			Right click and drag to move OrbitControls,<br /> center across the edge of the shadow.<br />
+			Right click and drag to move OrbitControls, center across the edge of the shadow.<br />
+			Click to set random color CTRL-Click for White.<br />
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -45,26 +46,30 @@
 		<script src="js/Detector.js"></script>
 
 		<script>
-			let container = document.getElementById( 'container' );
+			var container = document.getElementById( 'container' );
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			let rnd = new THREE.WebGLRenderer();
-			let cam = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 20000);
-			let orb = new THREE.OrbitControls(cam, document);
+			var rnd = new THREE.WebGLRenderer();
+			var cam = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 20000);
+			var orb = new THREE.OrbitControls(cam, rnd.domElement);
 
-			let scn = new THREE.Scene();
-			let matFloor = new THREE.MeshPhongMaterial();
-			let matBox = new THREE.MeshPhongMaterial();
-			let geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000);
-			let geoBox = new THREE.BoxGeometry(Math.PI, Math.sqrt(2), Math.E);
-			let mshFloor = new THREE.Mesh(geoFloor, matFloor);
-			let mshBox = new THREE.Mesh(geoBox, matBox);
-			let amb = new THREE.AmbientLight(0x121422);
-			let spt = new THREE.SpotLight(0xFFFFFF);
-			let lightHelper;
+			var scn = new THREE.Scene();
+			var matFloor = new THREE.MeshPhongMaterial();
+			var matBox = new THREE.MeshPhongMaterial();
+			var geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000);
+			var geoBox = new THREE.BoxGeometry(Math.PI, Math.sqrt(2), Math.E);
+			var mshFloor = new THREE.Mesh(geoFloor, matFloor);
+			var mshBox = new THREE.Mesh(geoBox, matBox);
+			var amb = new THREE.AmbientLight(0x121422);
+			var spt = new THREE.SpotLight(0xFFFFFF);
+			var lightHelper;
+			var ray = new THREE.Raycaster();
+			var mouseDown = new THREE.Vector2();
+			var mouse = new THREE.Vector2();
 
-			let gui, guiElements, param = { color: '0xffffff' };
+
+			var gui, guiElements, param = { color: '0xffffff' };
 
 			function init() {
 				rnd.shadowMap.enabled = true;
@@ -72,14 +77,16 @@
 				rnd.gammaInput = true;
 				rnd.gammaOutput = true;
 				rnd.antialias = true;
+				rnd.domElement.addEventListener('mousedown', onDocumentClick);
+				rnd.domElement.addEventListener('mouseup', onDocumentClick);
 
-				cam.position.set(30, 13, -24);
+				cam.position.set(65, 8, -10);
 
 				spt.position.set(15, 40, 35);
 				spt.castShadow = true;
-				spt.angle = 0.777;
+				spt.angle = 0.75;
 				spt.exponent = 2.0;
-				spt.penumbra = 0.2;
+				spt.penumbra = 0.05;
 				spt.decay = 2;
 				spt.distance = 500;
 				spt.shadow.mapSize.width = 8192;
@@ -93,16 +100,14 @@
 				lightHelper = new THREE.SpotLightHelper( spt );
 
 				matFloor.color.set( 0x808080 );
-				matFloor.color.a = 1.0;
+				randomColor( matBox );
 
 				mshFloor.receiveShadow = true;
 				mshFloor.position.set(0, -0.05, 0);
 
-				matBox.color = { r: Math.random(), g: Math.random(), b: Math.random(), a: 1.0 };
 				mshBox.castShadow = true;
 				mshBox.receiveShadow = true;
 				mshBox.position.set(40, 1.8, 0);
-
 
 				scn.add(cam);
 				scn.add(mshFloor);
@@ -141,6 +146,12 @@
 
 				gui = new dat.GUI();
 
+				gui.width = 190;
+				var gStyle = gui.domElement.style;
+				gStyle.position = "absolute";
+				gStyle.top = "48px";
+				gStyle.height = "220px";
+
 				gui.open();
 			}
 
@@ -148,7 +159,7 @@
 
 				clearGui();
 
-				addGui( 'color', spt.color.getHex(), function( val ) {
+				addGui( 'light color', spt.color.getHex(), function( val ) {
 					spt.color.setHex( val );
 					render();
 				}, true );
@@ -199,6 +210,62 @@
 					} );
 				}
 				return node;
+			}
+
+			function onDocumentClick( event ) {
+
+				event.preventDefault();
+
+				var rndDom = rnd.domElement;
+
+				if( event.type === 'mousedown' ) {
+
+					mouseDown.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
+
+					mouseDown.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
+
+				}
+				else {
+
+					mouse.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
+
+					mouse.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
+
+					if (mouseDown.distanceTo(mouse) < 0.0075) {
+
+						ray.setFromCamera( mouse, cam );
+
+						var found = ray.intersectObjects( [ mshBox, mshFloor ] );
+
+						if ( found.length > 0 ) {
+
+							if( event.ctrlKey === false ) randomColor( found[0].object );
+
+							else found[0].object.material.color.set( 0xffffff );
+
+							render();
+
+						}
+
+					}
+
+				}
+
+			}
+
+			function randomColor( target ) {
+
+				if ( target !== undefined ) {
+
+					if ( target.material !== undefined ) target = target.material;
+
+					if ( target.color !== undefined ) {
+
+						target.color.setHex( 0xffffff * Math.random() );
+
+					}
+				}
+
 			}
 
 			init();
