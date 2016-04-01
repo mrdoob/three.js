@@ -61,8 +61,6 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.scale = 1;
 
-	this.bufferScale = 1.0;
-
 	var isPresenting = false;
 	var cachedWidth, cachedHeight;
 
@@ -84,7 +82,6 @@ THREE.VREffect = function ( renderer, onError ) {
 	var canvas = renderer.domElement;
 	var fullscreenchange = canvas.mozRequestFullScreen ? 'mozfullscreenchange' : 'webkitfullscreenchange';
 
-	var self = this;
 	document.addEventListener( fullscreenchange, function () {
 
 		if ( vrHMD && deprecatedAPI ) {
@@ -98,7 +95,7 @@ THREE.VREffect = function ( renderer, onError ) {
 				cachedHeight = size.height;
 
 				var eyeParamsL = vrHMD.getEyeParameters( 'left' );
-				renderer.setSize( eyeParamsL.renderRect.width * 2 * self.bufferScale, eyeParamsL.renderRect.height * self.bufferScale );
+				renderer.setSize( eyeParamsL.renderRect.width * 2, eyeParamsL.renderRect.height, false );
 
 			} else {
 
@@ -121,7 +118,7 @@ THREE.VREffect = function ( renderer, onError ) {
 			cachedHeight = size.height;
 
 			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
-			renderer.setSize( eyeParamsL.renderWidth * 2 * self.bufferScale, eyeParamsL.renderHeight * self.bufferScale );
+			renderer.setSize( eyeParamsL.renderWidth * 2, eyeParamsL.renderHeight, false );
 
 		} else {
 
