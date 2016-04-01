@@ -19,11 +19,15 @@ THREE.SpotLight = function ( color, intensity, distance, angle, penumbra, decay,
 	this.penumbra = ( penumbra !== undefined ) ? penumbra : 0;
 	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
 
+<<<<<<< HEAD
 	if( lightShadowClass === undefined ) lightShadowClass = THREE.SpotLightShadow;
 	else if( lightShadowClass !== THREE.LightShadow && lightShadowClass !== THREE.SpotLightShadow &&
 		lightShadowClass !== THREE.DirectionalLightShadow ) lightShadowClass = THREE.SpotLightShadow;
 
 	this.shadow = new lightShadowClass( new THREE.PerspectiveCamera( 50, 1, 0.5, 500 ), this );
+=======
+	this.shadow = new THREE.SpotLightShadow();
+>>>>>>> refs/remotes/mrdoob/dev
 
 };
 

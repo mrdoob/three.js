@@ -1,5 +1,7 @@
+.gitignore
 .DS_Store
 *.swp
 .project
 node_modules
 .idea/
+build
