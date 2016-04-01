@@ -1,10 +1,9 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
- * @author MasterJames / http://master-domain.com/
  */
 
-THREE.DirectionalLight = function ( color, intensity, lightShadowClass ) {
+THREE.DirectionalLight = function ( color, intensity ) {
 
 	THREE.Light.call( this, color, intensity );
 
@@ -14,16 +13,6 @@ THREE.DirectionalLight = function ( color, intensity, lightShadowClass ) {
 	this.updateMatrix();
 
 	this.target = new THREE.Object3D();
-
-<<<<<<< HEAD
-	if( lightShadowClass === undefined ) lightShadowClass = THREE.SpotLightShadow;
-	else if( lightShadowClass !== THREE.LightShadow && lightShadowClass !== THREE.SpotLightShadow &&
-			lightShadowClass !== THREE.DirectionalLightShadow ) lightShadowClass = THREE.DirectionalLightShadow;
-
-	this.shadow = new lightShadowClass( new THREE.OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
-=======
-	this.shadow = new THREE.DirectionalLightShadow();
->>>>>>> refs/remotes/mrdoob/dev
 
 };
 

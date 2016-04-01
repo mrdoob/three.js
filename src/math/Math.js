@@ -5,8 +5,8 @@
 
 THREE.Math = {
 
-	DEG2RAD: Math.PI / 180,
-	RAD2DEG: 180 / Math.PI,
+	DEG2RAD: 0.017453292519943296,
+	RAD2DEG: 57.29577951308232,
 
 	generateUUID: function () {
 
@@ -125,27 +125,13 @@ THREE.Math = {
 
 	degToRad: function ( degrees ) {
 
-<<<<<<< HEAD
-		// Math.PI / 180 = 0.017453292519943295
-
-		return degrees * 0.017453292519943295;
+		return degrees * 0.017453292519943296;
 
 	},
 
 	radToDeg: function ( radians ) {
-
-		// 180 / Math.PI = 0.57.29577951308232
 
 		return radians * 57.29577951308232;
-=======
-		return degrees * THREE.Math.DEG2RAD;
-
-	},
-
-	radToDeg: function ( radians ) {
-
-		return radians * THREE.Math.RAD2DEG;
->>>>>>> refs/remotes/mrdoob/dev
 
 	},
 
