@@ -94,8 +94,8 @@
 					map: null,
 					bumpScale: - 0.05,
 					color: 0xffffff,
-					metalness: 0.1,
-					roughness: 0.3,
+					metalness: 1.0,
+					roughness: 1.0,
 					shading: THREE.SmoothShading
 				} );
 
@@ -199,7 +199,7 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.toneMapping = THREE.ReinhardToneMapping;
+				//renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
