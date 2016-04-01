@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - materials - hdr environment mapping</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+
+				margin: 0px;
+				overflow: hidden;
+			}
+			a { color: #00f }
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
+			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/RGBELoader.js"></script>
+		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script src="js/Half.js"></script>
+		<script src="js/Encodings.js"></script>
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+
+		<script src="js/loaders/OBJLoader.js"></script>
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+			var params = {
+				envMap: "HDR",
+				projection: 'normal',
+				reflectance: 0.5,
+				background: false,
+				exposure: 1.0,
+			};
+			var camera, scene, renderer, controls, objects = [];
+			var hdrCubeMap;
+			var composer;
+			var standardMaterial, standardMaterial2, floorMaterial;
+			var ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0.0, 40, 40 * 3.5 );
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( new THREE.Color( 0x000000 ) );
+				renderer.toneMapping = THREE.LinearToneMapping;
+
+				standardMaterial = new THREE.MeshStandardMaterial( {
+					map: null,
+					color: 0xff0000,
+					metalness: 0.1,
+					roughness: 0.1,
+					opacity: 0.15,
+					side: THREE.BackSide,
+					transparent: true,
+					shading: THREE.SmoothShading,
+					premultipliedAlpha: true
+
+				} );
+				standardMaterial2 = new THREE.MeshStandardMaterial( {
+					map: null,
+					color: 0xff0000,
+					metalness: 0.1,
+					roughness: 0.1,
+					opacity: 0.25,
+					side: THREE.FrontSide,
+					transparent: true,
+					shading: THREE.SmoothShading,
+					premultipliedAlpha: true
+
+				} );
+
+				var manager = new THREE.LoadingManager();
+				manager.onProgress = function ( item, loaded, total ) {
+
+					console.log( item, loaded, total );
+
+				};
+
+				var loader = new THREE.OBJLoader( manager );
+				loader.load( 'models/obj/emerald.obj', function ( object ) {
+
+					object.traverse( function ( child ) {
+
+						if ( child instanceof THREE.Mesh ) {
+
+							child.scale.x = 0.1;
+							child.scale.y = 0.1;
+							child.scale.z = 0.1;
+							child.rotation.y = Math.PI * 0.5;
+							child.rotation.x = Math.PI * 0.5;
+							child.material = standardMaterial;
+							var second = child.clone();
+							second.material = standardMaterial2;
+							scene.add( second );
+
+						}
+
+					} );
+
+					scene.add( object );
+
+				} );
+
+
+				floorMaterial = new THREE.MeshStandardMaterial( {
+					map: null,
+					roughnessMap: null,
+					color: 0x0f0f0f,
+					metalness: 0.0,
+					roughness: 1.0,
+					shading: THREE.SmoothShading,
+				} );
+
+				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
+				planeMesh1.position.y = - 50;
+				planeMesh1.rotation.x = - Math.PI * 0.5;
+				planeMesh1.receiveShadow = true;
+				scene.add( planeMesh1 );
+
+
+				var textureLoader = new THREE.TextureLoader();
+				textureLoader.load( "./textures/roughness_map.jpg", function( map ) {
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 9, 2 );
+					standardMaterial.roughnessMap = map;
+					standardMaterial.bumpMap = map;
+					standardMaterial.needsUpdate = true;
+				} );
+
+				var genCubeUrls = function( prefix, postfix ) {
+					return [
+						prefix + 'px' + postfix, prefix + 'nx' + postfix,
+						prefix + 'py' + postfix, prefix + 'ny' + postfix,
+						prefix + 'pz' + postfix, prefix + 'nz' + postfix
+					];
+				};
+
+				var hdrUrls = genCubeUrls( "./textures/cube/pisaHDR/", ".hdr" );
+				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
+
+					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+					standardMaterial.envMap = hdrCubeRenderTarget;
+					standardMaterial.needsUpdate = true;
+				} );
+
+				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
+				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
+
+					ldrCubeMap.encoding = THREE.GammaEncoding;
+
+					var pmremGenerator = new THREE.PMREMGenerator( ldrCubeMap );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					ldrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+				} );
+
+
+				var rgbmUrls = genCubeUrls( "./textures/cube/pisaRGBM16/", ".png" );
+				new THREE.CubeTextureLoader().load( rgbmUrls, function ( rgbmCubeMap ) {
+
+					rgbmCubeMap.encoding = THREE.RGBM16Encoding;
+
+					var pmremGenerator = new THREE.PMREMGenerator( rgbmCubeMap );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+				} );
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+				var pointLight1 = new THREE.PointLight( 0xffffff );
+				pointLight1.position.set( 50, 100, 50 );
+				pointLight1.castShadow = false;
+				scene.add( pointLight1 );
+
+				var pointLight2 = new THREE.PointLight( 0xffffff );
+				pointLight2.position.set( -50, 100, -50 );
+				scene.add( pointLight2 );
+
+				var pointLight3 = new THREE.PointLight( 0xffffff );
+				pointLight3.position.set( 50, 100, -50 );
+				scene.add( pointLight3 );
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				composer = new THREE.EffectComposer( renderer );
+				composer.setSize( window.innerWidth, window.innerHeight );
+
+				var renderScene = new THREE.RenderPass( scene, camera );
+				composer.addPass( renderScene );
+
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				copyPass.renderToScreen = true;
+				composer.addPass( copyPass );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+
+				container.appendChild( stats.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0, 0 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				var gui = new dat.GUI();
+
+				gui.add( params, 'envMap', [ 'LDR', 'HDR', 'RGBM16' ] );
+				gui.add( params, 'reflectance', 0, 1 );
+				gui.add( params, 'exposure', 0.1, 2 );
+				gui.open();
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			function render() {
+
+				if ( standardMaterial !== undefined ) {
+
+					standardMaterial.reflectance = params.reflectance;
+					switch( params.envMap ) {
+						case 'LDR': standardMaterial.envMap = ldrCubeRenderTarget; break;
+						case 'HDR': standardMaterial.envMap = hdrCubeRenderTarget; break;
+						case 'RGBM16': standardMaterial.envMap = rgbmCubeRenderTarget; break;
+					}
+
+				}
+
+				renderer.toneMappingExposure = params.exposure;
+
+				var timer = Date.now() * 0.00025;
+
+				camera.lookAt( scene.position );
+
+				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+					var object = objects[ i ];
+					object.rotation.y += 0.005;
+
+				}
+
+				composer.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>
