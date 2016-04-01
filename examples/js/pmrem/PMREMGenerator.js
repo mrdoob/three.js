@@ -26,18 +26,21 @@ THREE.PMREMGenerator = function( sourceTexture ) {
 	this.cubeLods = [];
 
 	var size = this.resolution;
-  var params = { format: this.sourceTexture.format, magFilter: this.sourceTexture.magFilter, minFilter: this.sourceTexture.minFilter, type: this.sourceTexture.type };
+  var params = {
+		format: this.sourceTexture.format,
+		magFilter: this.sourceTexture.magFilter,
+		minFilter: this.sourceTexture.minFilter,
+		type: this.sourceTexture.type,
+		generateMipmaps: this.sourceTexture.generateMipmaps,
+    anisotropy: this.sourceTexture.anisotropy,
+    encoding: this.sourceTexture.encoding
+	 };
 
   // how many LODs fit in the given CubeUV Texture.
 	this.numLods = Math.log2( size ) - 2;
   for ( var i = 0; i < this.numLods; i ++ ) {
 		var renderTarget = new THREE.WebGLRenderTargetCube( size, size, params );
-		renderTarget.texture.generateMipmaps = this.sourceTexture.generateMipmaps;
-    renderTarget.texture.anisotropy = this.sourceTexture.anisotropy;
-    renderTarget.texture.encoding = this.sourceTexture.encoding;
-    renderTarget.texture.minFilter = this.sourceTexture.minFilter;
-    renderTarget.texture.magFilter = this.sourceTexture.magFilter;
-		this.cubeLods.push( renderTarget );
+    this.cubeLods.push( renderTarget );
 		size = Math.max( 16, size / 2 );
 	}
 
@@ -78,6 +81,11 @@ THREE.PMREMGenerator.prototype = {
 
     var gammaInput = renderer.gammaInput;
     var gammaOutput = renderer.gammaOutput;
+		var toneMapping = renderer.toneMapping;
+		var toneMappingExposure = renderer.toneMappingExposure;
+
+    renderer.toneMapping = THREE.LinearToneMapping;
+		renderer.toneMappingExposure = 1.0;
     renderer.gammaInput = false;
     renderer.gammaOutput = false;
 		for ( var i = 0; i < this.numLods; i ++ ) {
@@ -92,8 +100,10 @@ THREE.PMREMGenerator.prototype = {
 
 		}
 
-    renderer.gammaInput = renderer.gammaInput;
-    renderer.gammaOutput = renderer.gammaOutput;
+		renderer.toneMapping = toneMapping;
+		renderer.toneMappingExposure = toneMappingExposure;
+    renderer.gammaInput = gammaInput;
+    renderer.gammaOutput = gammaOutput;
 
 	},
 

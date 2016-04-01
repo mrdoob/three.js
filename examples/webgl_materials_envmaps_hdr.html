@@ -94,7 +94,7 @@
 					map: null,
 					bumpScale: - 0.05,
 					color: 0xffffff,
-					metalness: 0.9,
+					metalness: 1.0,
 					roughness: 1.0,
 					shading: THREE.SmoothShading
 				} );
@@ -152,9 +152,6 @@
 					pmremCubeUVPacker.update( renderer );
 
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-					standardMaterial.envMap = hdrCubeRenderTarget;
-					standardMaterial.needsUpdate = true;
 				} );
 
 				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
@@ -202,18 +199,9 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
+				//renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-
-				composer = new THREE.EffectComposer( renderer );
-				composer.setSize( window.innerWidth, window.innerHeight );
-
-				var renderScene = new THREE.RenderPass( scene, camera );
-				composer.addPass( renderScene );
-
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
-				composer.addPass( copyPass );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -229,7 +217,7 @@
 
 				var gui = new dat.GUI();
 
-				gui.add( params, 'envMap', [ 'LDR', 'HDR', 'RGBM16' ] );
+				gui.add( params, 'envMap', [ 'None', 'LDR', 'HDR', 'RGBM16' ] );
 				gui.add( params, 'roughness', 0, 1 );
 				gui.add( params, 'bumpScale', - 1, 1 );
 				gui.add( params, 'exposure', 0.1, 2 );
@@ -246,7 +234,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				composer.setSize( width, height );
 
 			}
 
@@ -268,15 +255,23 @@
 
 					standardMaterial.roughness = params.roughness;
 					standardMaterial.bumpScale = - 0.05 * params.bumpScale;
+					var newEnvMap = standardMaterial.envMap;
 					switch( params.envMap ) {
-						case 'LDR': standardMaterial.envMap = ldrCubeRenderTarget; break;
-						case 'HDR': standardMaterial.envMap = hdrCubeRenderTarget; break;
-						case 'RGBM16': standardMaterial.envMap = rgbmCubeRenderTarget; break;
+						case 'None': newEnvMap = null; break;
+						case 'LDR': newEnvMap = ldrCubeRenderTarget; break;
+						case 'HDR': newEnvMap = hdrCubeRenderTarget; break;
+						case 'RGBM16': newEnvMap = rgbmCubeRenderTarget; break;
 					}
-
+					if( newEnvMap !== standardMaterial.envMap ) {
+						standardMaterial.envMap = newEnvMap;
+						standardMaterial.needsUpdate = true;
+						floorMaterial.emissive = new THREE.Color( 1, 1, 1 );
+						floorMaterial.emissiveMap = newEnvMap;
+						floorMaterial.needsUpdate = true;
+					}
 				}
 
-				renderer.toneMappingExposure = params.exposure;
+				renderer.toneMappingExposure = Math.pow( params.exposure, 4.0 );
 
 				var timer = Date.now() * 0.00025;
 
@@ -289,7 +284,7 @@
 
 				}
 
-				composer.render();
+				renderer.render( scene, camera );
 
 			}
 
