@@ -5,6 +5,7 @@
  *  color: <hex>,
  *  roughness: <float>,
  *  metalness: <float>,
+ *  reflectivity: <float>,
  *  opacity: <float>,
  *
  *  map: new THREE.Texture( <Image> ),
