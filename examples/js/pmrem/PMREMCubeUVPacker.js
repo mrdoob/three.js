@@ -99,13 +99,18 @@ THREE.PMREMCubeUVPacker.prototype = {
 
 		var gammaInput = renderer.gammaInput;
     var gammaOutput = renderer.gammaOutput;
+		var toneMapping = renderer.toneMapping;
+		var toneMappingExposure = renderer.toneMappingExposure;
     renderer.gammaInput = false;
     renderer.gammaOutput = false;
+		renderer.toneMapping = THREE.LinearToneMapping;
+		renderer.toneMappingExposure = 1.0;
+		renderer.render( this.scene, this.camera, this.CubeUVRenderTarget, false );
 
-		renderer.render( this.scene, this.camera, this.CubeUVRenderTarget, true );
-
-    renderer.gammaInput = renderer.gammaInput;
-    renderer.gammaOutput = renderer.gammaOutput;
+		renderer.toneMapping = toneMapping;
+		renderer.toneMappingExposure = toneMappingExposure;
+		renderer.gammaInput = gammaInput;
+    renderer.gammaOutput = gammaOutput;
 	},
 
   getShader: function() {
