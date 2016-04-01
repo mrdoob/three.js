@@ -28,15 +28,11 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
 
-	IncidentLight getDirectionalDirectLightIrradiance( const in DirectionalLight directionalLight, const in GeometricContext geometry ) {
-
-		IncidentLight directLight;
+	void getDirectionalDirectLightIrradiance( const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight ) {
 
 		directLight.color = directionalLight.color;
 		directLight.direction = directionalLight.direction;
 		directLight.visible = true;
-
-		return directLight;
 
 	}
 
@@ -59,9 +55,8 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
 
-	IncidentLight getPointDirectLightIrradiance( const in PointLight pointLight, const in GeometricContext geometry ) {
-
-		IncidentLight directLight;
+	// directLight is an out parameter as having it as a return value caused compiler errors on some devices
+	void getPointDirectLightIrradiance( const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight directLight ) {
 
 		vec3 lVector = pointLight.position - geometry.position;
 		directLight.direction = normalize( lVector );
@@ -81,8 +76,6 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 			directLight.visible = false;
 
 		}
-
-		return directLight;
 
 	}
 
@@ -108,9 +101,8 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
 
-	IncidentLight getSpotDirectLightIrradiance( const in SpotLight spotLight, const in GeometricContext geometry ) {
-
-		IncidentLight directLight;
+	// directLight is an out parameter as having it as a return value caused compiler errors on some devices
+	void getSpotDirectLightIrradiance( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight  ) {
 
 		vec3 lVector = spotLight.position - geometry.position;
 		directLight.direction = normalize( lVector );
@@ -133,8 +125,6 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 			directLight.visible = false;
 
 		}
-
-		return directLight;
 
 	}
 
