@@ -61,24 +61,50 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.scale = 1;
 
+	this.bufferScale = 1.0;
+
+	var isPresenting = false;
+	var cachedWidth, cachedHeight;
+
 	this.setSize = function ( width, height ) {
 
-		renderer.setSize( width, height );
+		cachedWidth = width;
+		cachedHeight = height;
+
+		if ( !isPresenting ) {
+
+			renderer.setSize( width, height );
+
+		}
 
 	};
 
 	// fullscreen
 
-	var isPresenting = false;
-
 	var canvas = renderer.domElement;
 	var fullscreenchange = canvas.mozRequestFullScreen ? 'mozfullscreenchange' : 'webkitfullscreenchange';
 
+	var self = this;
 	document.addEventListener( fullscreenchange, function () {
 
 		if ( vrHMD && deprecatedAPI ) {
 
 			isPresenting = document.mozFullScreenElement || document.webkitFullscreenElement;
+
+			if ( isPresenting ) {
+
+				var size = renderer.getSize();
+				cachedWidth = size.width;
+				cachedHeight = size.height;
+
+				var eyeParamsL = vrHMD.getEyeParameters( 'left' );
+				renderer.setSize( eyeParamsL.renderRect.width * 2 * self.bufferScale, eyeParamsL.renderRect.height * self.bufferScale );
+
+			} else {
+
+				renderer.setSize( cachedWidth, cachedHeight );
+
+			}
 
 		}
 
@@ -87,6 +113,21 @@ THREE.VREffect = function ( renderer, onError ) {
 	window.addEventListener( 'vrdisplaypresentchange', function () {
 
 		isPresenting = vrHMD && vrHMD.isPresenting;
+
+		if ( isPresenting ) {
+
+			var size = renderer.getSize();
+			cachedWidth = size.width;
+			cachedHeight = size.height;
+
+			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
+			renderer.setSize( eyeParamsL.renderWidth * 2 * self.bufferScale, eyeParamsL.renderHeight * self.bufferScale );
+
+		} else {
+
+			renderer.setSize( cachedWidth, cachedHeight );
+
+		}
 
 	}, false );
 
