@@ -199,6 +199,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	};
 
 	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
+
 		if ( blending === THREE.NoBlending ) {
 
 			this.disable( gl.BLEND );
@@ -571,6 +572,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	};
 
 	this.bindTexture = function ( webglType, webglTexture ) {
+
 		if ( currentTextureSlot === undefined ) {
 
 			_this.activeTexture();
