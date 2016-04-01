@@ -94,8 +94,8 @@
 					map: null,
 					bumpScale: - 0.05,
 					color: 0xffffff,
-					metalness: 0.9,
-					roughness: 0.5,
+					metalness: 0.1,
+					roughness: 0.3,
 					shading: THREE.SmoothShading
 				} );
 
@@ -255,6 +255,7 @@
 
 					standardMaterial.roughness = params.roughness;
 					standardMaterial.bumpScale = - 0.05 * params.bumpScale;
+					var newEnvMap = standardMaterial.envMap;
 					switch( params.envMap ) {
 						case 'None': newEnvMap = null; break;
 						case 'LDR': newEnvMap = ldrCubeRenderTarget; break;
@@ -267,9 +268,7 @@
 						floorMaterial.emissive = new THREE.Color( 1, 1, 1 );
 						floorMaterial.emissiveMap = newEnvMap;
 						floorMaterial.needsUpdate = true;
-						//console.log( 'standardMat', standardMaterial );
 					}
-
 				}
 
 				renderer.toneMappingExposure = Math.pow( params.exposure, 4.0 );
