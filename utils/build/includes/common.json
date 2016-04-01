@@ -64,6 +64,8 @@
 	"src/cameras/StereoCamera.js",
 	"src/lights/Light.js",
 	"src/lights/LightShadow.js",
+	"src/lights/DirectionalLightShadow.js",
+	"src/lights/SpotLightShadow.js",
 	"src/lights/AmbientLight.js",
 	"src/lights/DirectionalLight.js",
 	"src/lights/HemisphereLight.js",

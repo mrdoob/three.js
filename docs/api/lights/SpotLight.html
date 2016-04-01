@@ -12,12 +12,18 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">A point light that can cast shadow in one direction.</div>
+		<div class="desc">A point light that can cast a shadow in one direction within a falloff cone.</div>
 
 		<div class="desc">Affects objects using [page:MeshLambertMaterial] or [page:MeshPhongMaterial].</div>
 
 
 		<h2>Example</h2>
+
+		<iframe src='../examples/webgl_lights_spotlight.html'></iframe>
+		<a target="THREE_Examples" href="../examples/#webgl_lights_spotlight">View in Examples</a><br />
+		<h2>Other Examples</h2>
+
+		<div>[example:webgl_lights_spotlights lights / spotlights ]</div><br />
 		<div>[example:webgl_interactive_cubes_gpu interactive / cubes / gpu ]</div>
 		<div>[example:webgl_interactive_draggablecubes interactive / draggablecubes ]</div>
 		<div>[example:webgl_materials_bumpmap_skin materials / bumpmap / skin ]</div>
@@ -25,6 +31,7 @@
 		<div>[example:webgl_morphtargets_md2 morphtargets / md2 ]</div>
 		<div>[example:webgl_shading_physical shading / physical ]</div>
 
+		<h2>Code Example</h2>
 		<code>
 		// white spotlight shining from the side, casting shadow
 
@@ -43,6 +50,7 @@
 		scene.add( spotLight );
 		</code>
 
+		<h2>Extra Examples</h2>
 		<div>
 		[example:webgl_materials_bumpmap materials / bumpmap]<br/>
 		[example:webgl_shading_physical shading / physical]<br/>
