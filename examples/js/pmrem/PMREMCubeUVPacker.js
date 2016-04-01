@@ -30,6 +30,7 @@ THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 		anisotropy: sourceTexture.anisotropy,
 		encoding: sourceTexture.encoding
 	};
+
 	this.CubeUVRenderTarget = new THREE.WebGLRenderTarget( size, size, params );
 	this.CubeUVRenderTarget.mapping = THREE.CubeUVReflectionMapping;
 	this.camera = new THREE.OrthographicCamera( - size * 0.5, size * 0.5, - size * 0.5, size * 0.5, 0.0, 1000 );
@@ -70,11 +71,11 @@ THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 
 				// 6 Cube Faces
 				var material = this.getShader();
-				material.uniforms[ "envMap" ].value = this.cubeLods[ i ];
+				material.uniforms[ 'envMap' ].value = this.cubeLods[ i ];
 				material.envMap = this.cubeLods[ i ]
-				material.uniforms[ "faceIndex" ].value = k;
-				material.uniforms[ "mapSize" ].value = mipSize;
-				var color = material.uniforms[ "testColor" ].value;
+				material.uniforms[ 'faceIndex' ].value = k;
+				material.uniforms[ 'mapSize' ].value = mipSize;
+				var color = material.uniforms[ 'testColor' ].value;
 				//color.copy(testColor[j]);
 				var planeMesh = new THREE.Mesh(
 				new THREE.PlaneGeometry( mipSize, mipSize, 0 ),
@@ -106,11 +107,11 @@ THREE.PMREMCubeUVPacker.prototype = {
 	update: function( renderer ) {
 
 		var gammaInput = renderer.gammaInput;
-    var gammaOutput = renderer.gammaOutput;
+		var gammaOutput = renderer.gammaOutput;
 		var toneMapping = renderer.toneMapping;
 		var toneMappingExposure = renderer.toneMappingExposure;
-    renderer.gammaInput = false;
-    renderer.gammaOutput = false;
+		renderer.gammaInput = false;
+		renderer.gammaOutput = false;
 		renderer.toneMapping = THREE.LinearToneMapping;
 		renderer.toneMappingExposure = 1.0;
 		renderer.render( this.scene, this.camera, this.CubeUVRenderTarget, false );
@@ -118,62 +119,58 @@ THREE.PMREMCubeUVPacker.prototype = {
 		renderer.toneMapping = toneMapping;
 		renderer.toneMappingExposure = toneMappingExposure;
 		renderer.gammaInput = gammaInput;
-    renderer.gammaOutput = gammaOutput;
+		renderer.gammaOutput = gammaOutput;
+
 	},
 
-  getShader: function() {
+	getShader: function() {
 
-    var shaderMaterial = new THREE.ShaderMaterial( {
+		var shaderMaterial = new THREE.ShaderMaterial( {
 
-      uniforms: {
-       	"faceIndex": { type: 'i', value: 0 },
-       	"mapSize": { type: 'f', value: 0 },
-       	"envMap": { type: 't', value: null },
-       	"testColor": { type: 'v3', value: new THREE.Vector3( 1, 1, 1 ) }
-      },
+			uniforms: {
+				"faceIndex": { type: 'i', value: 0 },
+				"mapSize": { type: 'f', value: 0 },
+				"envMap": { type: 't', value: null },
+				"testColor": { type: 'v3', value: new THREE.Vector3( 1, 1, 1 ) }
+			},
 
-      vertexShader:
-        "precision highp float;\
-         varying vec2 vUv;\
-         void main() {\
-            vUv = uv;\
-            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-         }",
+			vertexShader:
+				"precision highp float;\
+				varying vec2 vUv;\
+				void main() {\
+					vUv = uv;\
+					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
+				}",
 
-      fragmentShader:
-       "precision highp float;\
-        varying vec2 vUv;\
-        uniform samplerCube envMap;\
-        uniform float mapSize;\
-        uniform vec3 testColor;\
-        uniform int faceIndex;\
-        \
-        void main() {\
-          vec3 sampleDirection;\
-          vec2 uv = vUv;\
-          uv = uv * 2.0 - 1.0;\
-          uv.y *= -1.0;\
-          if(faceIndex == 0) {\
-              sampleDirection = normalize(vec3(1.0, uv.y, -uv.x));\
-          }\
-          else if(faceIndex == 1) {\
-              sampleDirection = normalize(vec3(uv.x, 1.0, uv.y));\
-          }\
-          else if(faceIndex == 2) {\
-              sampleDirection = normalize(vec3(uv.x, uv.y, 1.0));\
-          }\
-          else if(faceIndex == 3) {\
-              sampleDirection = normalize(vec3(-1.0, uv.y, uv.x));\
-          }\
-          else if(faceIndex == 4) {\
-              sampleDirection = normalize(vec3(uv.x, -1.0, -uv.y));\
-          }\
-          else {\
-              sampleDirection = normalize(vec3(-uv.x, uv.y, -1.0));\
-          }\
-          vec4 color = envMapTexelToLinear( textureCube( envMap, sampleDirection ) );\
-          gl_FragColor = linearToOutputTexel( color );\
-        }",
+			fragmentShader:
+				"precision highp float;\
+				varying vec2 vUv;\
+				uniform samplerCube envMap;\
+				uniform float mapSize;\
+				uniform vec3 testColor;\
+				uniform int faceIndex;\
+				\
+				void main() {\
+					vec3 sampleDirection;\
+					vec2 uv = vUv;\
+					uv = uv * 2.0 - 1.0;\
+					uv.y *= -1.0;\
+					if(faceIndex == 0) {\
+						sampleDirection = normalize(vec3(1.0, uv.y, -uv.x));\
+					} else if(faceIndex == 1) {\
+						sampleDirection = normalize(vec3(uv.x, 1.0, uv.y));\
+					} else if(faceIndex == 2) {\
+						sampleDirection = normalize(vec3(uv.x, uv.y, 1.0));\
+					} else if(faceIndex == 3) {\
+						sampleDirection = normalize(vec3(-1.0, uv.y, uv.x));\
+					} else if(faceIndex == 4) {\
+						sampleDirection = normalize(vec3(uv.x, -1.0, -uv.y));\
+					} else {\
+						sampleDirection = normalize(vec3(-uv.x, uv.y, -1.0));\
+					}\
+					vec4 color = envMapTexelToLinear( textureCube( envMap, sampleDirection ) );\
+					gl_FragColor = linearToOutputTexel( color );\
+				}",
 
 			blending: THREE.CustomBlending,
 			premultipliedAlpha: false,
@@ -182,10 +179,11 @@ THREE.PMREMCubeUVPacker.prototype = {
 			blendSrcAlpha: THREE.OneFactor,
 			blendDstAlpha: THREE.ZeroFactor,
 			blendEquation: THREE.AddEquation
-    });
+
+		} );
 
 		return shaderMaterial;
 
-  }
+	}
 
 };
