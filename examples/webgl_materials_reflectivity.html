@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #000;
+				color: #fff;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
@@ -16,7 +16,7 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			a { color: #00f }
+			a { color: #88f }
 
 			#info {
 				position: absolute;
@@ -28,8 +28,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
-			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Standard Material Reflectivity (reflectance at F0) example by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -63,9 +62,11 @@
 			var params = {
 				envMap: "HDR",
 				projection: 'normal',
-				reflectivity: 0.5,
+				autoRotate: true,
+				reflectivity: 1.0,
 				background: false,
 				exposure: 1.0,
+				gemColor: 'Black'
 			};
 			var camera, scene, renderer, controls, objects = [];
 			var hdrCubeMap;
@@ -82,35 +83,36 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 0.0, 40, 40 * 3.5 );
+				camera.position.set( 0.0, -10, 20 * 3.5 );
 
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setClearColor( new THREE.Color( 0x000000 ) );
-				renderer.toneMapping = THREE.ReinhardToneMapping;
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
-					color: 0xff0000,
+					color: 0x0000ff,
 					metalness: 1.0,
 					roughness: 0,
-					opacity: 0.15,
+					opacity: 0.5,
 					side: THREE.BackSide,
 					transparent: true,
 					shading: THREE.SmoothShading,
+					envMapIntensity: 5,
 					premultipliedAlpha: true
 
 				} );
 				standardMaterial2 = new THREE.MeshStandardMaterial( {
 					map: null,
-					color: 0xff0000,
+					color: 0x0000ff,
 					metalness: 0.0,
 					roughness: 0,
 					opacity: 0.15,
 					side: THREE.FrontSide,
 					transparent: true,
 					shading: THREE.SmoothShading,
+					envMapIntensity: 5,
 					premultipliedAlpha: true
 
 				} );
@@ -129,11 +131,6 @@
 
 						if ( child instanceof THREE.Mesh ) {
 
-							child.scale.x = 0.1;
-							child.scale.y = 0.1;
-							child.scale.z = 0.1;
-							child.rotation.y = Math.PI * 0.5;
-							child.rotation.x = Math.PI * 0.5;
 							child.material = standardMaterial;
 							var second = child.clone();
 							second.material = standardMaterial2;
@@ -151,23 +148,6 @@
 
 
 				} );
-
-
-				floorMaterial = new THREE.MeshStandardMaterial( {
-					map: null,
-					roughnessMap: null,
-					color: 0x0f0f0f,
-					metalness: 0.0,
-					roughness: 0.1,
-					shading: THREE.SmoothShading,
-				} );
-
-				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
-				planeMesh1.position.y = - 50;
-				planeMesh1.rotation.x = - Math.PI * 0.5;
-				planeMesh1.receiveShadow = true;
-				scene.add( planeMesh1 );
 
 				var genCubeUrls = function( prefix, postfix ) {
 					return [
@@ -277,6 +257,8 @@
 				gui.add( params, 'envMap', [ 'LDR', 'HDR', 'RGBM16' ] );
 				gui.add( params, 'reflectivity', 0, 1 );
 				gui.add( params, 'exposure', 0.1, 2 );
+				gui.add( params, 'autoRotate' );
+				gui.add( params, 'gemColor', [ 'Blue', 'Green', 'Red', 'White', 'Black' ] );
 				gui.open();
 
 			}
@@ -317,6 +299,15 @@
 						case 'HDR': newEnvMap = hdrCubeRenderTarget; break;
 						case 'RGBM16': newEnvMap = rgbmCubeRenderTarget; break;
 					}
+					var newColor = standardMaterial.color;
+					switch( params.gemColor ) {
+						case 'Blue': newColor = new THREE.Color( 0x000088 ); break;
+						case 'Red': newColor = new THREE.Color( 0x880000 ); break;
+						case 'Green': newColor = new THREE.Color( 0x008800 ); break;
+						case 'White': newColor =  new THREE.Color( 0x888888 ); break;
+						case 'Black': newColor =  new THREE.Color( 0x0f0f0f ); break;
+					}
+					standardMaterial.color = standardMaterial2.color = newColor;
 					if( newEnvMap !== standardMaterial.envMap ) {
 						standardMaterial2.envMap = standardMaterial.envMap = newEnvMap;
 						standardMaterial2.needsUpdate = true;
@@ -331,11 +322,13 @@
 
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+				if( params.autoRotate ) {
+					for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-					var object = objects[ i ];
-					object.rotation.y += 0.005;
+						var object = objects[ i ];
+						object.rotation.y += 0.005;
 
+					}
 				}
 
 				composer.render();
