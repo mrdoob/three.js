@@ -86,7 +86,7 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( new THREE.Color( 0x000000 ) );
 
 				gemBackMaterial = new THREE.MeshStandardMaterial( {
@@ -201,16 +201,6 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.setSize( window.innerWidth, window.innerHeight );
-
-				var renderScene = new THREE.RenderPass( scene, camera );
-				composer.addPass( renderScene );
-
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
-				composer.addPass( copyPass );
-
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
@@ -242,7 +232,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				composer.setSize( width, height );
 
 			}
 
@@ -292,7 +281,7 @@
 					}
 				}
 
-				composer.render();
+				renderer.render( scene, camera );
 
 			}
 
