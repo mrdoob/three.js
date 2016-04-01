@@ -158,3 +158,34 @@ test( "containsPoint", function() {
 	ok( a.containsPoint( a.midpoint() ), "Passed!" );
 	ok( ! a.containsPoint( new THREE.Vector3( -1, -1, -1 ) ), "Passed!" );
 });
+
+test( "closestPointToPoint", function() {
+
+	var a = new THREE.Triangle( new THREE.Vector3( -1, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
+
+	// point lies inside the triangle
+	var b0 = a.closestPointToPoint( new THREE.Vector3( 0, 0.5, 0 ) );
+	ok( b0.equals( new THREE.Vector3( 0, 0.5, 0 ) ), "Passed!" );
+
+	// point lies on a vertex
+	b0 = a.closestPointToPoint( a.a );
+	ok( b0.equals( a.a ), "Passed!" );
+	b0 = a.closestPointToPoint( a.b );
+	ok( b0.equals( a.b ), "Passed!" );
+	b0 = a.closestPointToPoint( a.c );
+	ok( b0.equals( a.c ), "Passed!" );
+
+	// point lies on an edge
+	b0 = a.closestPointToPoint( zero3.clone() );
+	ok( b0.equals( zero3.clone() ), "Passed!" );
+
+	// point lies outside the triangle
+	b0 = a.closestPointToPoint( new THREE.Vector3( -2, 0, 0 ) );
+	ok( b0.equals( new THREE.Vector3( -1, 0, 0 ) ), "Passed!" );
+	b0 = a.closestPointToPoint( new THREE.Vector3( 2, 0, 0 ) );
+	ok( b0.equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	b0 = a.closestPointToPoint( new THREE.Vector3( 0, 2, 0 ) );
+	ok( b0.equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
+	b0 = a.closestPointToPoint( new THREE.Vector3( 0, -2, 0 ) );
+	ok( b0.equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+});
