@@ -240,7 +240,8 @@ var files = {
 		"webvr_panorama",
 		"webvr_rollercoaster",
 		"webvr_shadow",
-		"webvr_video"
+		"webvr_video",
+		"webvr_vive"
 	],
 	"css3d": [
 		"css3d_molecules",
