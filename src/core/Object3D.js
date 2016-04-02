@@ -546,9 +546,8 @@ THREE.Object3D.prototype = {
 
 	toJSON: function ( meta ) {
 
+		// meta is '' when called from JSON.stringify
 		var isRootObject = ( meta === undefined || meta === '' );
-		// when meta is an empty string, this method has been called from
-		// within JSON.stringify
 
 		var output = {};
 
