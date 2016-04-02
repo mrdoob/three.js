@@ -74,7 +74,8 @@
 				video.play();
 
 				texture = new THREE.VideoTexture( video );
-				texture.minFilter = THREE.LinearFilter;
+				texture.minFilter = THREE.NearestFilter;
+				texture.maxFilter = THREE.NearestFilter;
 				texture.format = THREE.RGBFormat;
 				texture.generateMipmaps = false;
 
