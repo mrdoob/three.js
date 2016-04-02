@@ -605,7 +605,7 @@ THREE.BufferGeometry.prototype = {
 
 				var itemSize = positions.itemSize;
 
-				if ( itemSize === 3 ) {
+				if ( itemSize >= 3 ) {
 
 					vector = new THREE.Vector3();
 					box = new THREE.Box3();
