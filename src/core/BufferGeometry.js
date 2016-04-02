@@ -588,10 +588,7 @@ THREE.BufferGeometry.prototype = {
 	}(),
 
 	computeBoundingSphere: function () {
-
-		var box = new THREE.Box3();
-		var vector = new THREE.Vector3();
-
+		
 		return function () {
 
 			if ( this.boundingSphere === null ) {
@@ -604,17 +601,34 @@ THREE.BufferGeometry.prototype = {
 
 			if ( positions ) {
 
-				var center = this.boundingSphere.center;
+				var vector, box, center;
+
+				var itemSize = positions.itemSize;
+
+				if ( itemSize === 3 ) {
+
+					vector = new THREE.Vector3();
+					box = new THREE.Box3();
+					center = this.boundingSphere.center;
+
+				} else {
+
+					vector = new THREE.Vector2();
+					box = new THREE.Box2();
+					center = new THREE.Vector2( this.boundingSphere.center.x, this.boundingSphere.center.y );
+
+				}
 
 				box.setFromArray( positions );
 				box.center( center );
+
 
 				// hoping to find a boundingSphere with a radius smaller than the
 				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
 
 				var maxRadiusSq = 0;
 
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+				for ( var i = 0, il = positions.length; i < il; i += itemSize ) {
 
 					vector.fromArray( positions, i );
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );

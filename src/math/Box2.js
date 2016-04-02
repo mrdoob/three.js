@@ -36,6 +36,34 @@ THREE.Box2.prototype = {
 
 	},
 
+	setFromArray: function ( array ) {
+
+		this.makeEmpty();
+
+		var minX = + Infinity;
+		var minY = + Infinity;
+
+		var maxX = - Infinity;
+		var maxY = - Infinity;
+
+		for ( var i = 0, il = array.length; i < il; i += 2 ) {
+
+			var x = array[ i ];
+			var y = array[ i + 1 ];
+
+			if ( x < minX ) minX = x;
+			if ( y < minY ) minY = y;
+
+			if ( x > maxX ) maxX = x;
+			if ( y > maxY ) maxY = y;
+
+		}
+
+		this.min.set( minX, minY );
+		this.max.set( maxX, maxY );
+
+	},
+
 	setFromCenterAndSize: function () {
 
 		var v1 = new THREE.Vector2();
