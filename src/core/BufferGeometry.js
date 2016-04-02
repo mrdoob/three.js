@@ -551,9 +551,7 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	computeBoundingBox: function () {
-
-		var vector = new THREE.Vector3();
-
+		
 		return function () {
 
 			if ( this.boundingBox === null ) {
