@@ -4428,7 +4428,7 @@ THREE.MMDHelper.prototype = {
 
 	},
 
-	callRender: function ( scene, camere ) {
+	callRender: function ( scene, camera ) {
 
 		if ( this.effect === null ) {
 
