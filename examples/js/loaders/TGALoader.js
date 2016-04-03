@@ -390,36 +390,36 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 				x_start = 0;
 				x_step = 1;
 				x_end = width;
-				y_start = height - 1;
-				y_step = -1;
-				y_end = -1;
+				y_start = 0;
+				y_step = 1;
+				y_end = height;
 				break;
 
 			case TGA_ORIGIN_BL:
 				x_start = 0;
 				x_step = 1;
 				x_end = width;
-				y_start = 0;
-				y_step = 1;
-				y_end = height;
+				y_start = height - 1;
+				y_step = - 1;
+				y_end = - 1;
 				break;
 
 			case TGA_ORIGIN_UR:
 				x_start = width - 1;
 				x_step = - 1;
 				x_end = - 1;
-				y_start = height - 1;
-				y_step = -1;
-				y_end = -1;
+				y_start = 0;
+				y_step = 1;
+				y_end = height;
 				break;
 
 			case TGA_ORIGIN_BR:
 				x_start = width - 1;
 				x_step = - 1;
 				x_end = - 1;
-				y_start = 0;
-				y_step = 1;
-				y_end = height;
+				y_start = height - 1;
+				y_step = - 1;
+				y_end = - 1;
 				break;
 
 		}
