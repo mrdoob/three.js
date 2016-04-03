@@ -136,29 +136,14 @@ THREE.MMDLoader.prototype.loadAudio = function ( url, callback, onProgress, onEr
 
 	var listener = new THREE.AudioListener();
 	var audio = new THREE.Audio( listener );
+	var loader = new THREE.AudioLoader( this.manager );
 
-	audio.load( url );
+	loader.load( url, function ( buffer ) {
 
-	/*
-	 * Note: THREE.Audio doesn't support onReady callback
-	 *       so doing polling instead.
-	 * TODO: discuss if THREE.Audio.load() should support callback.
-	 */
-	function polling ( buffer ) {
+		audio.setBuffer( buffer );
+		callback( audio, listener );
 
-		if ( audio.source.buffer === null ) {
-
-			setTimeout( polling, 0 );
-
-		} else {
-
-			callback( audio, listener );
-
-		}
-
-	};
-
-	setTimeout( polling, 0 );
+	}, onProgress, onError );
 
 };
 
