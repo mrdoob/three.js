@@ -4022,6 +4022,7 @@ THREE.MMDGrantSolver.prototype = {
 THREE.MMDHelper = function ( renderer ) {
 
 	this.renderer = renderer;
+	this.effect = null;
 
 	this.meshes = [];
 
@@ -4067,6 +4068,17 @@ THREE.MMDHelper.prototype = {
 
 		// workaround until I make IK and Physics Animation plugin
 		this.initBackupBones( mesh );
+
+	},
+
+	/*
+	 * Note: There may be a possibility that Outline wouldn't work well with Effect.
+	 *       In such a case, try to set doOutlineDrawing = false or
+	 *       manually comment out renderer.clear() in *Effect.render().
+	 */
+	setEffect: function ( effect ) {
+
+		this.effect = effect;
 
 	},
 
@@ -4385,7 +4397,7 @@ THREE.MMDHelper.prototype = {
 	renderMain: function ( scene, camera ) {
 
 		this.setupMainRendering();
-		this.renderer.render( scene, camera );
+		this.callRender( scene, camera );
 
 	},
 
@@ -4395,9 +4407,23 @@ THREE.MMDHelper.prototype = {
 		this.renderer.shadowMap.enabled = false;
 
 		this.setupOutlineRendering();
-		this.renderer.render( scene, camera );
+		this.callRender( scene, camera );
 
 		this.renderer.shadowMap.enabled = tmpEnabled;
+
+	},
+
+	callRender: function ( scene, camera ) {
+
+		if ( this.effect === null ) {
+
+			this.renderer.render( scene, camera );
+
+		} else {
+
+			this.effect.render( scene, camera );
+
+		}
 
 	},
 
