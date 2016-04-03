@@ -479,7 +479,8 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 		height: header.height,
 		data: rgbaData,
 		magFilter: THREE.NearestFilter,
-		minFilter: THREE.NearestFilter
+		minFilter: THREE.NearestFilter,
+		flipY: true
 	};
 
 };
