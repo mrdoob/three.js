@@ -28,23 +28,6 @@ THREE.PerspectiveCamera = function( fov, aspect, near, far ) {
 
 };
 
-THREE.PerspectiveCamera._assignProps = function( dest, source ) {
-
-	dest.fov = source.fov;
-	dest.zoom = source.zoom;
-
-	dest.near = source.near;
-	dest.far = source.far;
-	dest.focs = source.focus;
-
-	dest.aspect = source.aspect;
-	dest.view = ! source.view ? null : Object.assign( {}, source.view );
-
-	dest.filmGauge = source.filmGauge;
-	dest.filmOffset = source.filmOffset;
-
-};
-
 THREE.PerspectiveCamera.prototype = Object.create( THREE.Camera.prototype );
 THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
 
@@ -202,7 +185,20 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function() {
 THREE.PerspectiveCamera.prototype.copy = function( source ) {
 
 	THREE.Camera.prototype.copy.call( this, source );
-	THREE.PerspectiveCamera._assignProps( this, source );
+
+	this.fov = source.fov;
+	this.zoom = source.zoom;
+
+	this.near = source.near;
+	this.far = source.far;
+	this.focs = source.focus;
+
+	this.aspect = source.aspect;
+	this.view = source.view === null ? null : Object.assign( {}, source.view );
+
+	this.filmGauge = source.filmGauge;
+	this.filmOffset = source.filmOffset;
+
 	return this;
 
 };
@@ -210,7 +206,20 @@ THREE.PerspectiveCamera.prototype.copy = function( source ) {
 THREE.PerspectiveCamera.prototype.toJSON = function( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-	THREE.PerspectiveCamera._assignProps( data.object, this );
+
+	data.object.fov = this.fov;
+	data.object.zoom = this.zoom;
+
+	data.object.near = this.near;
+	data.object.far = this.far;
+	data.object.focs = this.focus;
+
+	data.object.aspect = this.aspect;
+	data.object.view = this.view === null ? null : Object.assign( {}, this.view );
+
+	data.object.filmGauge = this.filmGauge;
+	data.object.filmOffset = this.filmOffset;
+
 	return data;
 
 };
