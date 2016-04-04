@@ -12,7 +12,7 @@
 THREE.VREffect = function ( renderer, onError ) {
 
 	var vrHMD;
-	var deprecatedAPI = false;
+	var deprecatedAPI = 'getVRDevices' in navigator; // XXX: This assumes webvr-polyfill hasn't polyfilled the `navigator.getVRDisplays`.
 	var eyeTranslationL = new THREE.Vector3();
 	var eyeTranslationR = new THREE.Vector3();
 	var renderRectL, renderRectR;
@@ -25,13 +25,11 @@ THREE.VREffect = function ( renderer, onError ) {
 			if ( 'VRDisplay' in window && devices[ i ] instanceof VRDisplay ) {
 
 				vrHMD = devices[ i ];
-				deprecatedAPI = false;
 				break; // We keep the first we encounter
 
 			} else if ( 'HMDVRDevice' in window && devices[ i ] instanceof HMDVRDevice ) {
 
 				vrHMD = devices[ i ];
-				deprecatedAPI = true;
 				break; // We keep the first we encounter
 
 			}
@@ -43,7 +41,6 @@ THREE.VREffect = function ( renderer, onError ) {
 			if ( onError ) onError( 'HMD not available' );
 
 		}
-
 	}
 
 	if ( navigator.getVRDisplays ) {
@@ -77,16 +74,43 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
-	// fullscreen
+	// fullscreen / VR mode
 
 	var canvas = renderer.domElement;
-	var fullscreenchange = canvas.mozRequestFullScreen ? 'mozfullscreenchange' : 'webkitfullscreenchange';
+	var deprecatedAPIMethod;
+	var fullscreenchange;
+	var fullscreenElement;
 
-	document.addEventListener( fullscreenchange, function () {
+	if ( canvas.requestFullscreen ) {
+
+		deprecatedAPIMethod = 'requestFullscreen';
+		fullscreenchange = 'fullscreenchange';
+		fullscreenElement = 'fullscreenElement';
+
+	} else if ( canvas.mozRequestFullScreen ) {
+
+		deprecatedAPIMethod = 'mozRequestFullScreen';
+		fullscreenchange = 'mozfullscreenchange';
+		fullscreenElement = 'mozFullScreenElement';
+
+	} else if ( canvas.webkitRequestFullscreen ) {
+
+		deprecatedAPIMethod = 'webkitRequestFullscreen';
+		fullscreenchange = 'webkitfullscreenchange';
+		fullscreenElement = 'webkitFullscreenElement';
+
+	} else if ( canvas.msRequestFullscreen ) {
+
+		fullscreenchange = 'msfullscreenchange';
+		fullscreenElement = 'msFullscreenElement';
+
+	}
+
+	document.addEventListener( fullscreenchange, function (e) {
 
 		if ( vrHMD && deprecatedAPI ) {
 
-			isPresenting = document.mozFullScreenElement || document.webkitFullscreenElement;
+			isPresenting = !!document[fullscreenElement];
 
 			if ( isPresenting ) {
 
@@ -106,6 +130,13 @@ THREE.VREffect = function ( renderer, onError ) {
 		}
 
 	}, false );
+
+	if ( fullscreenchange === undefined ) {
+
+		// Assume we are presenting for browsers that don't yet support the Fullscreen API (e.g., Safari/IE10).
+		isPresenting = true;
+
+	}
 
 	window.addEventListener( 'vrdisplaypresentchange', function () {
 
@@ -159,14 +190,9 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			} else {
 
-				if ( canvas.mozRequestFullScreen ) {
+				if ( deprecatedAPIMethod ) {
 
-					canvas.mozRequestFullScreen( { vrDisplay: vrHMD } );
-					resolve();
-
-				} else if ( canvas.webkitRequestFullscreen ) {
-
-					canvas.webkitRequestFullscreen( { vrDisplay: vrHMD } );
+					canvas[deprecatedAPIMethod]( { vrDisplay: vrHMD } );
 					resolve();
 
 				} else {
