@@ -72,7 +72,17 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
 			renderer.setPixelRatio( 1 );
-			renderer.setSize( eyeParamsL.renderRect.width * 2, eyeParamsL.renderRect.height, false );
+
+			if ( isDeprecatedAPI ) {
+
+				renderer.setSize( eyeParamsL.renderRect.width * 2, eyeParamsL.renderRect.height, false );
+
+			} else {
+
+				renderer.setSize( eyeParamsL.renderWidth * 2, eyeParamsL.renderHeight, false );
+
+			}
+
 
 		} else {
 
@@ -123,6 +133,7 @@ THREE.VREffect = function ( renderer, onError ) {
 			rendererSize = renderer.getSize();
 
 			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
+			renderer.setPixelRatio( 1 );
 			renderer.setSize( eyeParamsL.renderWidth * 2, eyeParamsL.renderHeight, false );
 
 		} else {
