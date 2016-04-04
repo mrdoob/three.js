@@ -57,6 +57,13 @@ THREE.BinaryTextureLoader.prototype = {
 				texture.format = texData.format;
 
 			}
+
+			if ( undefined !== texData.flipY ) {
+
+				texture.flipY = texData.flipY;
+
+			}
+
 			if ( undefined !== texData.type ) {
 
 				texture.type = texData.type;
