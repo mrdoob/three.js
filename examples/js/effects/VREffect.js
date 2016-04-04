@@ -62,12 +62,8 @@ THREE.VREffect = function ( renderer, onError ) {
 	this.scale = 1;
 
 	var isPresenting = false;
-	var cachedWidth, cachedHeight;
 
 	this.setSize = function ( width, height ) {
-
-		cachedWidth = width;
-		cachedHeight = height;
 
 		if ( ! isPresenting ) {
 
@@ -82,24 +78,27 @@ THREE.VREffect = function ( renderer, onError ) {
 	var canvas = renderer.domElement;
 	var fullscreenchange = canvas.mozRequestFullScreen ? 'mozfullscreenchange' : 'webkitfullscreenchange';
 
+	var rendererSize, rendererPixelRatio;
+
 	document.addEventListener( fullscreenchange, function () {
 
-		if ( vrHMD && deprecatedAPI ) {
+		if ( vrHMD && isDeprecatedAPI ) {
 
 			isPresenting = document.mozFullScreenElement || document.webkitFullscreenElement;
 
 			if ( isPresenting ) {
 
-				var size = renderer.getSize();
-				cachedWidth = size.width;
-				cachedHeight = size.height;
+				rendererPixelRatio = renderer.getPixelRatio();
+				rendererSize = renderer.getSize();
 
 				var eyeParamsL = vrHMD.getEyeParameters( 'left' );
+				renderer.setPixelRatio( 1 );
 				renderer.setSize( eyeParamsL.renderRect.width * 2, eyeParamsL.renderRect.height, false );
 
 			} else {
 
-				renderer.setSize( cachedWidth, cachedHeight );
+				renderer.setPixelRatio( rendererPixelRatio );
+				renderer.setSize( rendererSize.width, rendererSize.height );
 
 			}
 
@@ -113,16 +112,16 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		if ( isPresenting ) {
 
-			var size = renderer.getSize();
-			cachedWidth = size.width;
-			cachedHeight = size.height;
+			rendererPixelRatio = renderer.getPixelRatio();
+			rendererSize = renderer.getSize();
 
 			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
 			renderer.setSize( eyeParamsL.renderWidth * 2, eyeParamsL.renderHeight, false );
 
 		} else {
 
-			renderer.setSize( cachedWidth, cachedHeight );
+			renderer.setPixelRatio( rendererPixelRatio );
+			renderer.setSize( rendererSize.width, rendererSize.height );
 
 		}
 
