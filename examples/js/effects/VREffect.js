@@ -12,7 +12,7 @@
 THREE.VREffect = function ( renderer, onError ) {
 
 	var vrHMD;
-	var deprecatedAPI = false;
+	var isDeprecatedAPI = false;
 	var eyeTranslationL = new THREE.Vector3();
 	var eyeTranslationR = new THREE.Vector3();
 	var renderRectL, renderRectR;
@@ -25,13 +25,13 @@ THREE.VREffect = function ( renderer, onError ) {
 			if ( 'VRDisplay' in window && devices[ i ] instanceof VRDisplay ) {
 
 				vrHMD = devices[ i ];
-				deprecatedAPI = false;
+				isDeprecatedAPI = false;
 				break; // We keep the first we encounter
 
 			} else if ( 'HMDVRDevice' in window && devices[ i ] instanceof HMDVRDevice ) {
 
 				vrHMD = devices[ i ];
-				deprecatedAPI = true;
+				isDeprecatedAPI = true;
 				break; // We keep the first we encounter
 
 			}
@@ -69,7 +69,7 @@ THREE.VREffect = function ( renderer, onError ) {
 		cachedWidth = width;
 		cachedHeight = height;
 
-		if ( !isPresenting ) {
+		if ( ! isPresenting ) {
 
 			renderer.setSize( width, height );
 
@@ -145,7 +145,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			if ( !deprecatedAPI ) {
+			if ( ! isDeprecatedAPI ) {
 
 				if ( boolean ) {
 
@@ -178,7 +178,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-		});
+		} );
 
 	};
 
@@ -218,7 +218,7 @@ THREE.VREffect = function ( renderer, onError ) {
 			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
 			var eyeParamsR = vrHMD.getEyeParameters( 'right' );
 
-			if ( !deprecatedAPI ) {
+			if ( ! isDeprecatedAPI ) {
 
 				eyeTranslationL.fromArray( eyeParamsL.offset );
 				eyeTranslationR.fromArray( eyeParamsR.offset );
@@ -281,7 +281,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			if ( !deprecatedAPI ) {
+			if ( ! isDeprecatedAPI ) {
 
 				vrHMD.submitFrame();
 
