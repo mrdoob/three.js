@@ -40,6 +40,7 @@
 			var effect, controls;
 
 			var room;
+			var isMouseDown = false;
 
 			var INTERSECTED;
 			var crosshair;
@@ -88,7 +89,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+				var geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
@@ -133,20 +134,26 @@
 
 				}
 
-				renderer.domElement.addEventListener( 'click', function ( event ) {
-
-					if ( INTERSECTED ) {
-
-						var object = INTERSECTED;
-						object.userData.velocity.subVectors( object.position, camera.position ).normalize().multiplyScalar( 0.1 );
-
-					}
-
-				} );
+				document.addEventListener( 'mousedown', onMouseDown, false );
+				document.addEventListener( 'mouseup', onMouseUp, false );
+				document.addEventListener( 'touchstart', onMouseDown, false );
+				document.addEventListener( 'touchend', onMouseUp, false );
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onMouseDown() {
+
+				isMouseDown = true;
+
+			}
+
+			function onMouseUp() {
+
+				isMouseDown = false;
 
 			}
 
@@ -169,6 +176,21 @@
 			}
 
 			function render() {
+
+				if ( isMouseDown === true ) {
+
+					var cube = room.children[ 0 ];
+					room.remove( cube );
+
+					cube.position.set( 0, 0, - 0.75 );
+					cube.position.applyQuaternion( camera.quaternion );
+					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
+					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
+					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 );
+					cube.userData.velocity.applyQuaternion( camera.quaternion );
+					room.add( cube );
+
+				}
 
 				// find intersections
 
@@ -196,7 +218,7 @@
 
 				}
 
-				controls.update();
+				// Keep cubes inside room
 
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
@@ -227,10 +249,13 @@
 
 					}
 
-					cube.rotation.x += 0.01;
+					cube.rotation.x += cube.userData.velocity.x * 2;
+					cube.rotation.y += cube.userData.velocity.y * 2;
+					cube.rotation.z += cube.userData.velocity.z * 2;
 
 				}
 
+				controls.update();
 				effect.render( scene, camera );
 
 			}
