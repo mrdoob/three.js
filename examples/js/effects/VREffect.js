@@ -62,10 +62,19 @@ THREE.VREffect = function ( renderer, onError ) {
 	this.scale = 1;
 
 	var isPresenting = false;
+	var rendererSize, rendererPixelRatio;
 
 	this.setSize = function ( width, height ) {
 
-		if ( ! isPresenting ) {
+		renderSize = { width: width, height: height };
+
+		if ( isPresenting ) {
+
+			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
+			renderer.setPixelRatio( 1 );
+			renderer.setSize( eyeParamsL.renderRect.width * 2, eyeParamsL.renderRect.height, false );
+
+		} else {
 
 			renderer.setSize( width, height );
 
@@ -77,8 +86,6 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	var canvas = renderer.domElement;
 	var fullscreenchange = canvas.mozRequestFullScreen ? 'mozfullscreenchange' : 'webkitfullscreenchange';
-
-	var rendererSize, rendererPixelRatio;
 
 	document.addEventListener( fullscreenchange, function () {
 
