@@ -62,7 +62,9 @@ THREE.VREffect = function ( renderer, onError ) {
 	this.scale = 1;
 
 	var isPresenting = false;
-	var rendererSize, rendererPixelRatio;
+
+	var rendererSize = renderer.getSize();
+	var rendererPixelRatio = renderer.getPixelRatio();
 
 	this.setSize = function ( width, height ) {
 
@@ -86,6 +88,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		} else {
 
+			renderer.setPixelRatio( rendererPixelRatio );
 			renderer.setSize( width, height );
 
 		}
@@ -99,25 +102,21 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	document.addEventListener( fullscreenchange, function () {
 
-		if ( vrHMD && isDeprecatedAPI ) {
+		isPresenting = isDeprecatedAPI && vrHMD && ( document.mozFullScreenElement || document.webkitFullscreenElement ) !== undefined;
 
-			isPresenting = document.mozFullScreenElement || document.webkitFullscreenElement;
+		if ( isPresenting ) {
 
-			if ( isPresenting ) {
+			rendererPixelRatio = renderer.getPixelRatio();
+			rendererSize = renderer.getSize();
 
-				rendererPixelRatio = renderer.getPixelRatio();
-				rendererSize = renderer.getSize();
+			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
+			renderer.setPixelRatio( 1 );
+			renderer.setSize( eyeParamsL.renderRect.width * 2, eyeParamsL.renderRect.height, false );
 
-				var eyeParamsL = vrHMD.getEyeParameters( 'left' );
-				renderer.setPixelRatio( 1 );
-				renderer.setSize( eyeParamsL.renderRect.width * 2, eyeParamsL.renderRect.height, false );
+		} else {
 
-			} else {
-
-				renderer.setPixelRatio( rendererPixelRatio );
-				renderer.setSize( rendererSize.width, rendererSize.height );
-
-			}
+			renderer.setPixelRatio( rendererPixelRatio );
+			renderer.setSize( rendererSize.width, rendererSize.height );
 
 		}
 
