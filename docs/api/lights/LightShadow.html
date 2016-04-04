@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<div class="desc">TODO</div>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Camera camera] )</h3>
+		<div>
+		[page:Camera camera] — The shadow's view of the world.
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Camera camera]</h3>
+		<div>
+			The shadow's view of the world.
+		</div>
+
+		<h3>[property:Float bias]</h3>
+		<div>
+			Shadow map bias, how much to add or subtract from the normalized depth when deciding whether a surface is in shadow.<br />
+			Default — *0*.
+		</div>
+
+		<h3>[property:Float radius]</h3>
+		<div>
+			TODO<br />
+			Default - *0*.
+		</div>
+
+		<h3>[property:Vector2 mapSize]</h3>
+		<div>
+			The width and height of the shadow map stored in a [page:Vector2 Vector2].<br />
+			Default — *( 512, 512 )*.
+		</div>
+
+		<h3>[property:WebGLRenderTarget map]</h3>
+		<div>
+			The depth map generated using the internal camera; a location beyond a pixel's depth is in shadow. Computed internally during rendering.
+		</div>
+
+		<h3>[property:Matrix4 matrix]</h3>
+		<div>
+			Model to shadow camera space, to compute location and depth in shadow map. Stored in a [page:Matrix4 Matrix4]. Computed internally during rendering.
+		</div>
+
+
+		<h2>Methods</h2>
+		<h3>[method:LightShadow copy]( [page:LightShadow source] )</h3>
+		<div>
+		Copies value of *source* to this LightShadow object.
+		</div>
+
+		<h3>[method:LightShadow clone]()</h3>
+		<div>
+		It returns a clone of LightShadow.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
