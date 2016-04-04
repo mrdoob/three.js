@@ -134,10 +134,10 @@
 
 				}
 
-				document.addEventListener( 'mousedown', onMouseDown, false );
-				document.addEventListener( 'mouseup', onMouseUp, false );
-				document.addEventListener( 'touchstart', onMouseDown, false );
-				document.addEventListener( 'touchend', onMouseUp, false );
+				renderer.domElement.addEventListener( 'mousedown', onMouseDown, false );
+				renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );
+				renderer.domElement.addEventListener( 'touchstart', onMouseDown, false );
+				renderer.domElement.addEventListener( 'touchend', onMouseUp, false );
 
 				//
 
