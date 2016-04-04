@@ -2034,7 +2034,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			var texture = loader.load( fullPath, function ( t ) {
 
-				t.flipY = false;
+				t.flipY = t instanceof THREE.DataTexture ? true : false;
 				t.wrapS = THREE.RepeatWrapping;
 				t.wrapT = THREE.RepeatWrapping;
 
@@ -2253,7 +2253,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 						};
 
-						function detectTextureTransparency ( image, uvs ) {
+						function detectTextureTransparency ( image, uvs, flipY ) {
 
 							var width = image.width;
 							var height = image.height;
@@ -2274,7 +2274,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 									var uv = uvs[ i ][ j ];
 
-									if ( getAlphaByUv( image, uv ) < threshold ) {
+									if ( getAlphaByUv( image, uv, flipY ) < threshold ) {
 
 										return true;
 
@@ -2289,7 +2289,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 								centerUV.y /= 3;
 
 
-								if ( getAlphaByUv( image, centerUV ) < threshold ) {
+								if ( getAlphaByUv( image, centerUV, flipY ) < threshold ) {
 
 									return true;
 
@@ -2303,12 +2303,11 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 						/*
 						 * This method expects
-						 *   t.flipY = false
 						 *   t.wrapS = THREE.RepeatWrapping
 						 *   t.wrapT = THREE.RepeatWrapping
 						 * TODO: more precise
 						 */
-						function getAlphaByUv ( image, uv ) {
+						function getAlphaByUv ( image, uv, flipY ) {
 
 							var width = image.width;
 							var height = image.height;
@@ -2328,6 +2327,12 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 							}
 
+							if ( flipY ) {
+
+								y = height - 1 - y;
+
+							}
+
 							var index = y * width + x;
 
 							return image.data[ index * 4 + 3 ];
@@ -2337,7 +2342,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 						var imageData = t.image.data !== undefined ? t.image : createImageData( t.image );
 						var uvs = geometry.faceVertexUvs[ 0 ].slice( m.faceOffset, m.faceOffset + m.faceNum );
 
-						m.textureTransparency = detectTextureTransparency( imageData, uvs );
+						m.textureTransparency = detectTextureTransparency( imageData, uvs, t.flipY );
 
 					} );
 
