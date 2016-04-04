@@ -159,7 +159,7 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function() {
 				THREE.Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
 		height = 2 * top,
 		width = this.aspect * height,
-		left = -0.5 * width,
+		left = - 0.5 * width,
 		view = this.view;
 
 	if ( view !== null ) {
@@ -191,7 +191,7 @@ THREE.PerspectiveCamera.prototype.copy = function( source ) {
 
 	this.near = source.near;
 	this.far = source.far;
-	this.focs = source.focus;
+	this.focus = source.focus;
 
 	this.aspect = source.aspect;
 	this.view = source.view === null ? null : Object.assign( {}, source.view );
@@ -212,7 +212,7 @@ THREE.PerspectiveCamera.prototype.toJSON = function( meta ) {
 
 	data.object.near = this.near;
 	data.object.far = this.far;
-	data.object.focs = this.focus;
+	data.object.focus = this.focus;
 
 	data.object.aspect = this.aspect;
 	data.object.view = this.view === null ? null : Object.assign( {}, this.view );
