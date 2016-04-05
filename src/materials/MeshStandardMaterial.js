@@ -5,6 +5,7 @@
  *  color: <hex>,
  *  roughness: <float>,
  *  metalness: <float>,
+ *  reflectivity: <float>,
  *  opacity: <float>,
  *
  *  map: new THREE.Texture( <Image> ),
@@ -65,8 +66,10 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.type = 'MeshStandardMaterial';
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
+
 	this.roughness = 0.5;
 	this.metalness = 0.5;
+	this.reflectivity = 0.5;
 
 	this.map = null;
 
@@ -129,8 +132,10 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	THREE.Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
+
 	this.roughness = source.roughness;
 	this.metalness = source.metalness;
+	this.reflectivity = source.reflectivity;
 
 	this.map = source.map;
 
