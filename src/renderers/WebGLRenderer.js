@@ -1554,7 +1554,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material instanceof THREE.MeshPhongMaterial ||
 				material instanceof THREE.MeshLambertMaterial ||
 				material instanceof THREE.MeshStandardMaterial ||
-				material instanceof THREE.MeshPhysicalMaterial ||
 				material.lights ) {
 
 			// store the light setup it was created for
@@ -1709,7 +1708,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material instanceof THREE.ShaderMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
-				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material.envMap ) {
 
 				if ( p_uniforms.cameraPosition !== undefined ) {
@@ -1725,7 +1723,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshBasicMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
-				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material instanceof THREE.ShaderMaterial ||
 				 material.skinning ) {
 
@@ -1810,7 +1807,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
-				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material.lights ) {
 
 				// the current material requires lighting info
@@ -1837,8 +1833,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material instanceof THREE.MeshBasicMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshStandardMaterial ||
-				 material instanceof THREE.MeshPhysicalMaterial ) {
+				 material instanceof THREE.MeshStandardMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
 
