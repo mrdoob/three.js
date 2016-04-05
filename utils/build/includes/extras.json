@@ -65,6 +65,5 @@
 	"src/extras/helpers/VertexNormalsHelper.js",
 	"src/extras/helpers/WireframeHelper.js",
 	"src/extras/objects/ImmediateRenderObject.js",
-	"src/extras/objects/MorphBlendMesh.js",
-	"src/extras/postprocessing/Pass.js"
+	"src/extras/objects/MorphBlendMesh.js"
 ]
