@@ -662,7 +662,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 
-			if ( material.type !== 'MeshPhongMaterial' && material.type !== 'MeshStandardMaterial' && material.shading === THREE.FlatShading ) {
+			if ( material.type !== 'MeshPhongMaterial' && material.type !== 'MeshStandardMaterial' && material.type !== 'MeshPhysicalMaterial' && material.shading === THREE.FlatShading ) {
 
 				for ( var i = 0, l = object.count * 3; i < l; i += 9 ) {
 
@@ -1554,6 +1554,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material instanceof THREE.MeshPhongMaterial ||
 				material instanceof THREE.MeshLambertMaterial ||
 				material instanceof THREE.MeshStandardMaterial ||
+				material instanceof THREE.MeshPhysicalMaterial ||
 				material.lights ) {
 
 			// store the light setup it was created for
@@ -1708,6 +1709,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material instanceof THREE.ShaderMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
+				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material.envMap ) {
 
 				if ( p_uniforms.cameraPosition !== undefined ) {
@@ -1723,6 +1725,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshBasicMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
+				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material instanceof THREE.ShaderMaterial ||
 				 material.skinning ) {
 
@@ -1807,6 +1810,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
+				 material instanceof THREE.MeshPhysicalMaterial ||
 				 material.lights ) {
 
 				// the current material requires lighting info
@@ -1833,7 +1837,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material instanceof THREE.MeshBasicMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshStandardMaterial ) {
+				 material instanceof THREE.MeshStandardMaterial ||
+				 material instanceof THREE.MeshPhysicalMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
 
@@ -1861,6 +1866,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( material instanceof THREE.MeshPhongMaterial ) {
 
 				refreshUniformsPhong( m_uniforms, material );
+
+			} else if ( material instanceof THREE.MeshPhysicalMaterial ) {
+
+				refreshUniformsPhysical( m_uniforms, material );
 
 			} else if ( material instanceof THREE.MeshStandardMaterial ) {
 
@@ -2189,6 +2198,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			uniforms.envMapIntensity.value = material.envMapIntensity;
 
 		}
+
+	}
+
+	function refreshUniformsPhysical ( uniforms, material ) {
+
+		refreshUniformsStandard( uniforms, material );
 
 	}
 

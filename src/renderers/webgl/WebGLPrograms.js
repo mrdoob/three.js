@@ -9,6 +9,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		MeshLambertMaterial: 'lambert',
 		MeshPhongMaterial: 'phong',
 		MeshStandardMaterial: 'standard',
+		MeshPhysicalMaterial: 'physical',
 		LineBasicMaterial: 'basic',
 		LineDashedMaterial: 'dashed',
 		PointsMaterial: 'points'
