@@ -70,8 +70,6 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGLRenderer();
-
 				//
 
 				var geometry = new THREE.SphereGeometry( 18, 30, 30 );
@@ -123,33 +121,30 @@
 
 				//
 
-				var floorMaterial = new THREE.MeshStandardMaterial( {
-					color: 0x333333,
-					metalness: 0.0,
-					roughness: 0.0
-				} );
-
-				var planeGeometry = new THREE.PlaneBufferGeometry( 800, 800 );
-				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
-				planeMesh1.position.y = - 50;
-				planeMesh1.rotation.x = - Math.PI * 0.5;
-				scene.add( planeMesh1 );
+				var geometry = new THREE.PlaneBufferGeometry( 800, 800 );
+				var material = new THREE.MeshStandardMaterial( { color: 0x333333 } );
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.y = - 50;
+				mesh.rotation.x = - Math.PI * 0.5;
+				scene.add( mesh );
 
 				// Lights
 
 				var spotLight = new THREE.SpotLight( 0xff8888 );
 				spotLight.position.set( 100, 200, 100 );
-				spotLight.angle = Math.PI / 5;
+				spotLight.angle = Math.PI / 6;
 				spotLight.penumbra = 0.9;
 				scene.add( spotLight );
 
 				var spotLight = new THREE.SpotLight( 0x8888ff );
 				spotLight.position.set( - 100, - 200, - 100 );
-				spotLight.angle = Math.PI / 5;
+				spotLight.angle = Math.PI / 6;
 				spotLight.penumbra = 0.9;
 				scene.add( spotLight );
 
+				//
 
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
