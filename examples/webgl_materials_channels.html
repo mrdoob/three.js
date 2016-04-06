@@ -65,8 +65,11 @@
 
 			var camera, scene, renderer, controls;
 			var params = {
-				material: 'normal'
+				material: 'normal',
+				camera: 'perspective'
 			};
+			var cameraOrtho, cameraPerspective;
+			var controlsOrtho, controlsPerspective;
 
 			var mesh, materialDepth, materialDepthRGBA, materialDepthRGBADebug, materialNormal;
 
@@ -91,6 +94,7 @@
 
 				var gui = new dat.GUI();
 				gui.add( params, 'material', [ 'normal', 'depth', 'depthRGBA', 'depthRGBADebug' ] );
+				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
 
 			}
 
@@ -109,25 +113,25 @@
 				scene = new THREE.Scene();
 
 				var aspect = window.innerWidth / window.innerHeight;
-				camera = new THREE.PerspectiveCamera( 45, aspect, 1000, 2500 );
-				camera.position.z = 1500;
-				scene.add( camera );
+				cameraPerspective = new THREE.PerspectiveCamera( 45, aspect, 1000, 2500 );
+				cameraPerspective.position.z = 1500;
+				scene.add( cameraPerspective );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.enableZoom = true;
-				controls.enableDamping = true;
+				cameraOrtho = new THREE.OrthographicCamera( - height * aspect, height * aspect, height, - height, 1, 10000 );
+				cameraOrtho.position.z = 1500;
+				scene.add( cameraOrtho );
 
-				// env map
+				camera = cameraPerspective;
 
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
+				controlsPerspective = new THREE.OrbitControls( cameraPerspective, renderer.domElement );
+				controlsPerspective.enableZoom = true;
+				controlsPerspective.enableDamping = true;
 
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				controlsOrtho = new THREE.OrbitControls( cameraOrtho, renderer.domElement );
+				controlsOrtho.enableZoom = true;
+				controlsOrtho.enableDamping = true;
+
+				//controls = controlsPerspective;
 
 				// textures
 
@@ -159,8 +163,6 @@
 					scene.add( mesh );
 
 				} );
-
-				//
 
 
 				//
@@ -195,7 +197,8 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				controlsOrtho.update();
+				controlsPerspective.update();
 
 				stats.begin();
 				render();
@@ -214,6 +217,11 @@
 						case 'normal': material = materialNormal; break;
 					}
 					mesh.material = material;
+				}
+
+				switch( params.camera ) {
+					case 'perspective': camera = cameraPerspective; break;
+					case 'ortho': camera = cameraOrtho; break;
 				}
 
 
