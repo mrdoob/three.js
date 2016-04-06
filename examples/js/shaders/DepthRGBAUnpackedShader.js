@@ -5,7 +5,7 @@
  *
  */
 
-THREE.DepthRGBADebugShader = {
+THREE.DepthRGBAUnpackedShader = {
 
 	vertexShader: THREE.ShaderChunk[ 'depth_vert' ],
 

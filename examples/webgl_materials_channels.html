@@ -40,7 +40,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - <span id="description">Depth, DepthRGBA, DepthRGBADebug, Normal Materials</span> by <a href="https://Clara.io">Ben Houston</a>.<br />
+			<a href="http://threejs.org" target="_blank">three.js</a> - <span id="description">Normal, Depth, DepthRGBA, DepthRGBAUnpacked, Materials</span> by <a href="https://Clara.io">Ben Houston</a>.<br />
 			ninja head from <a href="http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/amd-gpu-meshmapper/" target="_blank">AMD GPU MeshMapper</a>
 
 			<div id="vt">displacement mapping requires vertex textures</div>
@@ -51,7 +51,7 @@
 
 
 		<script src="js/loaders/BinaryLoader.js"></script>
-		<script src="js/shaders/DepthRGBADebugShader.js"></script>
+		<script src="js/shaders/DepthRGBAUnpackedShader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -71,7 +71,7 @@
 			var cameraOrtho, cameraPerspective;
 			var controlsOrtho, controlsPerspective;
 
-			var mesh, materialDepth, materialDepthRGBA, materialDepthRGBADebug, materialNormal;
+			var mesh, materialDepth, materialDepthRGBA, materialDepthRGBAUnpacked, materialNormal;
 
 			var pointLight, ambientLight;
 
@@ -93,7 +93,7 @@
 			function initGui() {
 
 				var gui = new dat.GUI();
-				gui.add( params, 'material', [ 'normal', 'depth', 'depthRGBA', 'depthRGBADebug' ] );
+				gui.add( params, 'material', [ 'normal', 'depth', 'depthRGBA', 'depthRGBAUnpacked' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
 
 			}
@@ -147,7 +147,7 @@
 
 				materialDepth = new THREE.MeshDepthMaterial();
 				materialDepthRGBA = new THREE.ShaderMaterial( THREE.ShaderLib.depthRGBA );
-				materialDepthRGBADebug = new THREE.ShaderMaterial( THREE.DepthRGBADebugShader );
+				materialDepthRGBAUnpacked = new THREE.ShaderMaterial( THREE.DepthRGBAUnpackedShader );
 				materialNormal = new THREE.MeshNormalMaterial();
 
 				//
@@ -213,7 +213,7 @@
 					switch( params.material ) {
 						case 'depth': material = materialDepth; break;
 						case 'depthRGBA': material = materialDepthRGBA; break;
-						case 'depthRGBADebug': material = materialDepthRGBADebug; break;
+						case 'depthRGBAUnpacked': material = materialDepthRGBAUnpacked; break;
 						case 'normal': material = materialNormal; break;
 					}
 					mesh.material = material;
