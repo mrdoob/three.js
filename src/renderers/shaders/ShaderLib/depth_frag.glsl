@@ -3,6 +3,7 @@ uniform float mFar;
 uniform float opacity;
 
 #include <common>
+#include <packing>
 #include <logdepthbuf_pars_fragment>
 
 void main() {
