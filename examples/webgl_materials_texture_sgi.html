@@ -1,0 +1,130 @@
+<!--
+@author Andrew H / https://github.com/crimsonFuckr/
+ * Parses the Silicon Graphics Image standard( .rgba .rgb .bw .sgi .int .inta) into an rgba data array
+ * Currently tested 1 BPC with both RLE & uncompressed. 2 BPC should work but not tested.
+ * IMPORTANT: Depends on jDataView (https://github.com/jDataView/jDataView) for reading the buffer
+-->
+<html>
+<head>
+	<title>three.js webgl - SGI texture</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			color: #fff;
+			font-family:Monospace,serif;
+			font-size:13px;
+			text-align:center;
+			font-weight: bold;
+
+			background-color: #000;
+			margin: 0;
+			overflow: hidden;
+		}
+
+		#info {
+			background: #f6fff6;
+			color:#000000;
+			position: absolute;
+			top: 0; width: 100%;
+			padding: 5px;
+
+		}
+
+		a { color: red; }
+
+		#stats { position: absolute; top:0; left: 0; }
+		#stats #fps { background: transparent !important }
+		#stats #fps #fpsText { color: #777 !important }
+		#stats #fps #fpsGraph { display: none }
+	</style>
+</head>
+<body>
+	<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> - SGI texture example -
+		<a href="ftp://ftp.sgi.com/graphics/grafica/sgiimage.html" target="_blank">Silicon Graphics Image Spec</a>
+	</div>
+	<script src="../build/three.js"></script>
+	<script src="js/loaders/SGILoader.js"></script>
+
+	<script src="//jdataview.github.io/dist/jdataview.js "></script>
+	<script src="js/Detector.js"></script>
+	<script src="js/libs/stats.min.js"></script>
+
+	<script>
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+		var SCREEN_WIDTH = window.innerWidth;
+		var SCREEN_HEIGHT = window.innerHeight;
+
+		var container, stats;
+
+		var camera, scene, renderer;
+
+		var mouseX = 0, mouseY = 0;
+
+		var windowHalfX = window.innerWidth / 2;
+		var windowHalfY = window.innerHeight / 2;
+
+		init();
+		animate();
+
+		function init() {
+
+			container = document.createElement( 'div' );
+			document.body.appendChild( container );
+
+			camera = new THREE.PerspectiveCamera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+			camera.position.z = 1000;
+
+			scene = new THREE.Scene();
+			var texture = new THREE.SGILoader().load( "textures/controlpanels.rgb", function (texture, textureData) {
+				texture.anisotropy = 16;
+				console.log(texture);
+				var plane = new THREE.Mesh(
+						new THREE.PlaneBufferGeometry( textureData.width , textureData.height ),
+						new THREE.MeshBasicMaterial( { map: texture } )
+				);
+				scene.add( plane );
+			},function ( xhr ) {
+				console.info( "Texture is " + (xhr.loaded / xhr.total * 100) + '% loaded' );
+			});
+
+			// Lights
+			scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+
+			// renderer
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setClearColor( 0xf0f0f0 );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			container.appendChild( renderer.domElement );
+
+			// stats
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '0px';
+			container.appendChild( stats.domElement );
+
+			// resize
+			window.addEventListener( 'resize', onWindowResize, false );
+		}
+
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+		}
+
+		function animate() {
+			requestAnimationFrame( animate );
+
+			camera.lookAt( scene.position );
+
+			renderer.render( scene, camera );
+			stats.update();
+		}
+	</script>
+</body>
+</html>
