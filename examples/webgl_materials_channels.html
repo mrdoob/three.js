@@ -71,7 +71,7 @@
 			var cameraOrtho, cameraPerspective;
 			var controlsOrtho, controlsPerspective;
 
-			var mesh, materialDepth, materialDepthRGBA, materialDepthRGBAUnpacked, materialNormal;
+			var mesh, materialStandard, materialDepth, materialDepthRGBA, materialDepthRGBAUnpacked, materialNormal;
 
 			var pointLight, ambientLight;
 
@@ -93,7 +93,7 @@
 			function initGui() {
 
 				var gui = new dat.GUI();
-				gui.add( params, 'material', [ 'normal', 'depth', 'depthRGBA', 'depthRGBAUnpacked' ] );
+				gui.add( params, 'material', [ 'standard', 'normal', 'depth', 'depthRGBA', 'depthRGBAUnpacked' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
 
 			}
@@ -131,7 +131,22 @@
 				controlsOrtho.enableZoom = true;
 				controlsOrtho.enableDamping = true;
 
-				//controls = controlsPerspective;
+				// lights
+
+				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.1 );
+				scene.add( ambientLight );
+
+				var pointLight = new THREE.PointLight( 0xff0000, 0.5 );
+				pointLight.position.z = 2500;
+				scene.add( pointLight );
+
+				var pointLight2 = new THREE.PointLight( 0xff6666, 1 );
+				camera.add( pointLight2 );
+
+				var pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
+				pointLight3.position.x = - 1000;
+				pointLight3.position.z = 1000;
+				scene.add( pointLight3 );
 
 				// textures
 
@@ -144,6 +159,15 @@
 				var displacementMap = textureLoader.load( "textures/normal/ninja/displacement.jpg" );
 
 				// material
+
+				materialStandard = new THREE.MeshStandardMaterial( { color: 0xffffff });
+				materialStandard.metalness = 0;
+				materialStandard.roughness = 0.6;
+				materialStandard.displacementMap = displacementMap;
+				materialStandard.displacementScale = 1.5;
+				materialStandard.aoMap = aoMap;
+				materialStandard.normalMap = normalMap;
+				materialStandard.normalScale.set( 1, - 1 );
 
 				materialDepth = new THREE.MeshDepthMaterial();
 				materialDepthRGBA = new THREE.ShaderMaterial( THREE.ShaderLib.depthRGBA );
@@ -211,6 +235,7 @@
 				if( mesh ) {
 					var material = mesh.material;
 					switch( params.material ) {
+						case 'standard': material = materialStandard; break;
 						case 'depth': material = materialDepth; break;
 						case 'depthRGBA': material = materialDepthRGBA; break;
 						case 'depthRGBAUnpacked': material = materialDepthRGBAUnpacked; break;
