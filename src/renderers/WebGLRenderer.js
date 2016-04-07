@@ -2915,7 +2915,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var mipmap, mipmaps = texture.mipmaps;
 
-		if ( texture instanceof THREE.DataTexture ) {
+		if ( texture instanceof THREE.DepthTexture ) {
+
+			// populate depth texture with dummy data
+
+			state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, image.width, image.height, 0, glFormat, glType, image.data );
+
+		} else if ( texture instanceof THREE.DataTexture ) {
 
 			// use manually created mipmaps if available
 			// if there are no manual mipmaps
@@ -3264,6 +3270,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( isCube ) throw new Error('Depth Texture with cube render targets is not supported!');
 
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+
+		if ( !( renderTarget.depthTexture instanceof THREE.DepthTexture ) ) {
+
+			throw new Error('renderTarget.depthTexture must be an instance of THREE.DepthTexture');
+
+		}
 
 		// upload an empty depth texture with framebuffer size
 		if ( !properties.get( renderTarget.depthTexture ).__webglTexture ||

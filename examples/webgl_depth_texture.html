@@ -64,14 +64,13 @@
 
       varying vec2 vUv;
       uniform sampler2D tDiffuse;
-      uniform sampler2D tNormal;
-      uniform int showAttachment;
+      // uniform sampler2D tNormal;
 
       void main() {
         vec3 diffuse = texture2D(tDiffuse, vUv).rgb;
-        vec3 normal = texture2D(tNormal, vUv).rgb;
+        // vec3 normal = texture2D(tNormal, vUv).rgb;
 
-        gl_FragColor.rgb = mix(diffuse, normal, step(0.5, vUv.x));
+        gl_FragColor.rgb = diffuse;
         gl_FragColor.a = 1.0;
       }
     </script>
@@ -136,9 +135,11 @@
         target.texture.generateMipmaps = false;
         target.stencilBuffer = false;
         target.depthBuffer = true;
+        target.depthTexture = new THREE.DepthTexture();
 
         // Our scene
         scene = new THREE.Scene();
+        setupScene();
 
         // Setup post-processing step
         setupPost();
@@ -153,13 +154,10 @@
         // Setup post processing stage
         postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
         var postMaterial = new THREE.RawShaderMaterial({
-          vertexShader: document.querySelector('#render-vert').textContent.trim(),
-          fragmentShader: document.querySelector('#render-frag').textContent.trim(),
+          vertexShader: document.querySelector('#post-vert').textContent.trim(),
+          fragmentShader: document.querySelector('#post-frag').textContent.trim(),
           uniforms: {
-            tDiffuse: { type: 't', value: target.attachments[0] },
-            tNormal: { type: 't', value: target.attachments[1] },
-            tPosition: { type: 't', value: target.attachments[2] },
-            showAttachment: { type: 'i', value: 0 }
+            tDiffuse: { type: 't', value: target }
           }
         });
         var postPlane = new THREE.PlaneGeometry(2, 2);
@@ -175,14 +173,7 @@
 
         // Setup some geometries
         var geometry = new THREE.TorusKnotGeometry(1, 0.3, 128, 64);
-        var material = new THREE.RawShaderMaterial({
-          vertexShader: document.querySelector('#gbuffer-vert').textContent.trim(),
-          fragmentShader: document.querySelector('#gbuffer-frag').textContent.trim(),
-          uniforms: {
-            map: { type: 't', value: diffuse },
-            repeat: { type: 'v2', value: new THREE.Vector2(5, 0.5) }
-          }
-        });
+        var material = new THREE.MeshBasicMaterial({ color: 'blue' })
         
         var torus = new THREE.Mesh(geometry, material);
         scene.add(torus);

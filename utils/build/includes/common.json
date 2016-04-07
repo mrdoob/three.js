@@ -99,6 +99,7 @@
 	"src/materials/RawShaderMaterial.js",
 	"src/materials/SpriteMaterial.js",
 	"src/textures/Texture.js",
+	"src/textures/DepthTexture.js",
 	"src/textures/CanvasTexture.js",
 	"src/textures/CubeTexture.js",
 	"src/textures/CompressedTexture.js",
