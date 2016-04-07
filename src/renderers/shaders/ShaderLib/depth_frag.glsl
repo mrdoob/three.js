@@ -2,7 +2,7 @@ uniform float mNear;
 uniform float mFar;
 uniform float opacity;
 
-varying vec3 vViewPosition;
+varying float viewZDepth;
 
 #include <common>
 #include <packing>
@@ -14,7 +14,7 @@ void main() {
 	#include <clipping_planes_fragment>
 	#include <logdepthbuf_fragment>
 
-	float color = 1.0 - smoothstep( mNear, mFar, vViewPosition.z );
+	float color = 1.0 - smoothstep( mNear, mFar, viewZDepth );
 	gl_FragColor = vec4( vec3( color ), opacity );
 
 }
