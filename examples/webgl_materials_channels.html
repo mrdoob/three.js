@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - displacement map</title>
+		<title>three.js webgl - materials - channels</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -64,10 +64,12 @@
 			var stats, loader;
 
 			var camera, scene, renderer, controls;
+
 			var params = {
 				material: 'normal',
 				camera: 'perspective'
 			};
+
 			var cameraOrtho, cameraPerspective;
 			var controlsOrtho, controlsPerspective;
 
@@ -75,15 +77,7 @@
 
 			var pointLight, ambientLight;
 
-			var mouseX = 0;
-			var mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
 			var height = 500; // of camera frustum
-
-			var r = 0.0;
 
 			init();
 			animate();
@@ -124,11 +118,15 @@
 				camera = cameraPerspective;
 
 				controlsPerspective = new THREE.OrbitControls( cameraPerspective, renderer.domElement );
-				controlsPerspective.enableZoom = true;
+				controlsPerspective.minDistance = 1000;
+				controlsPerspective.maxDistance = 2500;
+				controlsPerspective.enablePan = false;
 				controlsPerspective.enableDamping = true;
 
 				controlsOrtho = new THREE.OrbitControls( cameraOrtho, renderer.domElement );
-				controlsOrtho.enableZoom = true;
+				controlsOrtho.minZoom = 0.5;
+				controlsOrtho.maxZoom = 2;
+				controlsOrtho.enablePan = false;
 				controlsOrtho.enableDamping = true;
 
 				// lights
@@ -160,7 +158,7 @@
 
 				// material
 
-				materialStandard = new THREE.MeshStandardMaterial( { color: 0xffffff });
+				materialStandard = new THREE.MeshStandardMaterial( { color: 0xffffff } );
 				materialStandard.metalness = 0;
 				materialStandard.roughness = 0.6;
 				materialStandard.displacementMap = displacementMap;
@@ -232,25 +230,29 @@
 
 			function render() {
 
-				if( mesh ) {
+				if ( mesh ) {
+
 					var material = mesh.material;
-					switch( params.material ) {
+
+					switch ( params.material ) {
 						case 'standard': material = materialStandard; break;
 						case 'depth': material = materialDepth; break;
 						case 'depthRGBA': material = materialDepthRGBA; break;
 						case 'depthRGBAUnpacked': material = materialDepthRGBAUnpacked; break;
 						case 'normal': material = materialNormal; break;
 					}
+
 					mesh.material = material;
+
 				}
 
-				switch( params.camera ) {
+				switch ( params.camera ) {
+
 					case 'perspective': camera = cameraPerspective; break;
+
 					case 'ortho': camera = cameraOrtho; break;
+
 				}
-
-
-				r += 0.01;
 
 				renderer.render( scene, camera );
 
