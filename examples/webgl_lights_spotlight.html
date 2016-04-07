@@ -203,6 +203,7 @@
 
 				guiMapSize = addGui( 'mapSize', spotLight.shadow.mapSize.width, function ( val, node, min, max, step ) {
 					setMapSize( spotLight, val, undefined, min, max, step );
+					render();
 				}, false, 256, 8192, 256 );
 
 				addGui( 'penumbra', spotLight.penumbra, function ( val ) {
