@@ -466,8 +466,32 @@ THREE.ObjectLoader.prototype = {
 
 				case 'PerspectiveCamera':
 
-					object = Object.assign(
-							new THREE.PerspectiveCamera(), data );
+					if ( data.focalLength !== undefined ) {
+
+						console.warn( "THREE.ObjectLoader: Support for " +
+								"PerspectiveCamera.focalLength (misnomer in r75) " +
+								"will be dropped in the next release. " +
+								"Please re-export or rename to .focus." );
+
+						data.focus = data.focalLength;
+
+					}
+
+					object = new THREE.PerspectiveCamera(
+							data.fov, data.aspect, data.near, data.far );
+
+					if ( data.focus !== undefined ) object.focus = data.focus;
+					if ( data.zoom !== undefined ) object.zoom = data.zoom;
+
+					if ( data.filmGauge !== undefined ) {
+
+						if ( data.view !== null )
+							object.view = Object.assign( {}, data.view );
+
+						object.filmGauge = data.filmGauge;
+						object.filmOffset = data.filmOffset;
+
+					}
 
 					break;
 
