@@ -3,7 +3,7 @@
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
 
-varying float viewZDepth;
+varying float vViewZDepth;
 
 void main() {
 
@@ -13,6 +13,6 @@ void main() {
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>
 
-	viewZDepth = - mvPosition.z;
+	vViewZDepth = - mvPosition.z;
 
 }
