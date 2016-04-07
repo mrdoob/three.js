@@ -228,7 +228,7 @@
 					renderTimeout = undefined;
 				}
 				renderTimeout = setTimeout( function () {
-					render();
+					window.requestAnimationFrame( render );
 				}, ( 1000 / desiredFPS ) );
 
 			}
