@@ -2919,9 +2919,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// populate depth texture with dummy data
 
-			// if ( _isWebGL2 && texture.format === THREE.DepthFormat ) {
-			// if ( texture.type === THREE.FloatType ) return _gl.DEPTH_COMPONENT32F;
-			// else return _gl.DEPTH_COMPONENT16;
 			var internalFormat = _gl.DEPTH_COMPONENT;
 
 			if ( texture.type === THREE.FloatType ) {
