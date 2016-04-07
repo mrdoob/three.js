@@ -64,13 +64,22 @@
 
       varying vec2 vUv;
       uniform sampler2D tDiffuse;
-      // uniform sampler2D tNormal;
+      uniform sampler2D tDepth;
+      uniform float cameraNear;
+      uniform float cameraFar;
+
+      float readDepth (sampler2D depthSampler, vec2 coord) {
+        float cameraFarPlusNear = cameraFar + cameraNear;
+        float cameraFarMinusNear = cameraFar - cameraNear;
+        float cameraCoef = 2.0 * cameraNear;
+        return cameraCoef / (cameraFarPlusNear - texture2D(depthSampler, coord).x * cameraFarMinusNear);
+      }
 
       void main() {
         vec3 diffuse = texture2D(tDiffuse, vUv).rgb;
-        // vec3 normal = texture2D(tNormal, vUv).rgb;
+        float depth = readDepth(tDepth, vUv);
 
-        gl_FragColor.rgb = diffuse;
+        gl_FragColor.rgb = vec3(depth);
         gl_FragColor.a = 1.0;
       }
     </script>
@@ -90,6 +99,7 @@
     </div>
 
     <script src="../build/three.js"></script>
+    <script src="js/shaders/SSAOShader.js"></script>
     <script src="js/controls/OrbitControls.js"></script>
 
     <script>
@@ -97,19 +107,33 @@
       var camera, scene, renderer, controls;
       var target;
       var postScene, postCamera;
-      var supportsMRT = true;
+      var supportsExtension = true;
 
       init();
       animate();
 
       function init() {
 
+        var canvas = document.querySelector('canvas');
+        var gl; 
+        try {
+
+          gl = canvas.getContext('webgl2');
+
+        } catch (err) {
+
+          console.error(err);
+
+        }
+        var isWebGL2 = Boolean(gl);
+        
         renderer = new THREE.WebGLRenderer( {
-          canvas: document.querySelector('canvas')
+          canvas: canvas,
+          context: gl
         } );
 
         if ( !renderer.extensions.get('WEBGL_depth_texture') ) {
-          supportsMRT = false;
+          supportsExtension = false;
           document.querySelector('#error').style.display = 'block';
           return;
         }
@@ -119,7 +143,7 @@
 
         //
 
-        camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.001, 1000 );
+        camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
         camera.position.z = -4;
 
         controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -136,6 +160,7 @@
         target.stencilBuffer = false;
         target.depthBuffer = true;
         target.depthTexture = new THREE.DepthTexture();
+        target.depthTexture.type = isWebGL2 ? THREE.FloatType : THREE.UnsignedShortType;
 
         // Our scene
         scene = new THREE.Scene();
@@ -157,7 +182,10 @@
           vertexShader: document.querySelector('#post-vert').textContent.trim(),
           fragmentShader: document.querySelector('#post-frag').textContent.trim(),
           uniforms: {
-            tDiffuse: { type: 't', value: target }
+            cameraNear: { type: 'f', value: camera.near },
+            cameraFar: { type: 'f', value: camera.far },
+            tDiffuse: { type: 't', value: target },
+            tDepth: { type: 't', value: target.depthTexture }
           }
         });
         var postPlane = new THREE.PlaneGeometry(2, 2);
@@ -174,9 +202,27 @@
         // Setup some geometries
         var geometry = new THREE.TorusKnotGeometry(1, 0.3, 128, 64);
         var material = new THREE.MeshBasicMaterial({ color: 'blue' })
+
+        var count = 50;
+        var scale = 5;
+
+        for ( var i = 0; i < count; i ++ ) {
+
+          var r = Math.random() * 2.0 * Math.PI;
+          var z = (Math.random() * 2.0) - 1.0;
+          var zScale = Math.sqrt(1.0 - z * z) * scale;
+
+          var mesh = new THREE.Mesh(geometry, material);
+          mesh.position.set(
+            Math.cos(r) * zScale,
+            Math.sin(r) * zScale,
+            z * scale
+          );
+          mesh.rotation.set(Math.random(), Math.random(), Math.random());
+          scene.add(mesh);
+
+        }
         
-        var torus = new THREE.Mesh(geometry, material);
-        scene.add(torus);
       }
 
       function onWindowResize() {
@@ -193,9 +239,9 @@
 
       function animate() {
 
-        if ( !supportsMRT ) return;
+        if ( !supportsExtension ) return;
 
-        requestAnimationFrame( animate );
+        // requestAnimationFrame( animate );
         controls.update();
 
         // render scene into target
