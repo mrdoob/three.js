@@ -21889,6 +21889,8 @@ THREE.DepthTexture = function ( width, height, type, mapping, wrapS, wrapT, magF
 
   this.image = { width: width, height: height };
 
+  this.type = type !== undefined ? type : THREE.UnsignedShortType;
+
   this.magFilter = magFilter !== undefined ? magFilter : THREE.NearestFilter;
   this.minFilter = minFilter !== undefined ? minFilter : THREE.NearestFilter;
 
@@ -27355,7 +27357,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// populate depth texture with dummy data
 
-			state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, image.width, image.height, 0, glFormat, glType, image.data );
+			// if ( _isWebGL2 && texture.format === THREE.DepthFormat ) {
+			// if ( texture.type === THREE.FloatType ) return _gl.DEPTH_COMPONENT32F;
+			// else return _gl.DEPTH_COMPONENT16;
+			var internalFormat = _gl.DEPTH_COMPONENT;
+
+			if ( texture.type === THREE.FloatType ) {
+
+				if ( !_isWebGL2 ) throw new Error('Float Depth Texture only supported in WebGL2.0');
+				internalFormat = _gl.DEPTH_COMPONENT32F;
+
+			} else if ( _isWebGL2 ) {
+
+				// WebGL 2.0 requires signed internalformat for glTexImage2D
+				internalFormat = _gl.DEPTH_COMPONENT16;
+
+			}
+
+			glFormat = _gl.DEPTH_COMPONENT;
+			state.texImage2D( _gl.TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, glFormat, glType, image.data );
 
 		} else if ( texture instanceof THREE.DataTexture ) {
 
