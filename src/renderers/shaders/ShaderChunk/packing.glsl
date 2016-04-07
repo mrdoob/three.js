@@ -14,8 +14,25 @@ vec4 packLinearUnitToRGBA( const in float value ) {
 	res -= res.xxyz * bit_mask;
 	return res;
 }
-
 float unpackRGBAToLinearUnit( const in vec4 rgba ) {
 	const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
 	return dot( rgba, bitSh );
+}
+
+vec4 packDepthToRGBA( const in float depth, const in float near, const in float far ) {
+  float unitDepth = ( depth - near ) / ( far - near );
+  return packLinearUnitToRGBA( unitDepth );
+}
+float unpackRGBAToDepth( const in vec4 rgba, const in float near, const in float far ) {
+  float unitDepth = unpackRGBAToLinearUnit( rgba );
+  return unitDepth * ( far - near ) + near;
+}
+
+vec4 packDepthToNearBiasedRGBA( const in float depth, const in float near, const in float far ) {
+  float nearBiasedUnitDepth = (( depth - near ) * far ) / (( far - near ) * depth );
+  return packLinearUnitToRGBA( nearBiasedUnitDepth );
+}
+float unpackNearBiasedRGBAToDepth( const in vec4 rgba, const in float near, const in float far ) {
+  float nearBiasedUnitDepth = unpackRGBAToLinearUnit( rgba );
+  return ( near * far ) / ( ( near - far ) * nearBiasedUnitDepth + far );
 }
