@@ -3,6 +3,8 @@
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
 
+varying float vViewZDepth;
+
 void main() {
 
 	#include <begin_vertex>
@@ -10,5 +12,7 @@ void main() {
 	#include <project_vertex>
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>
+
+	vViewZDepth = - mvPosition.z;
 
 }
