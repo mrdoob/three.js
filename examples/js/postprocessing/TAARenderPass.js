@@ -23,7 +23,7 @@ THREE.TAARenderPass = function ( scene, camera, params ) {
 
 	this.sampleLevel = 0;
 	this.accumulate = false;
-	
+
 };
 
 THREE.TAARenderPass.prototype = Object.create( THREE.ManualMSAARenderPass.prototype );
@@ -90,7 +90,7 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 
 			renderer.render( this.scene, this.camera, writeBuffer, true );
 
-			renderer.render( this.scene2, this.camera2, this.sampleRenderTarget, ( this.accumulateIndex == 0 ) );
+			renderer.render( this.scene2, this.camera2, this.sampleRenderTarget, ( this.accumulateIndex === 0 ) );
 
 			this.accumulateIndex ++;
 			if( this.accumulateIndex >= jitterOffsets.length ) break;

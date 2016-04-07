@@ -37,14 +37,18 @@ var list = {
 		"Lights": [
 			[ "AmbientLight", "api/lights/AmbientLight" ],
 			[ "DirectionalLight", "api/lights/DirectionalLight" ],
+			[ "DirectionalLightShadow", "api/lights/DirectionalLightShadow" ],
 			[ "HemisphereLight", "api/lights/HemisphereLight" ],
 			[ "Light", "api/lights/Light" ],
+			[ "LightShadow", "api/lights/LightShadow" ],
 			[ "PointLight", "api/lights/PointLight" ],
-			[ "SpotLight", "api/lights/SpotLight" ]
+			[ "SpotLight", "api/lights/SpotLight" ],
+			[ "SpotLightShadow", "api/lights/SpotLightShadow" ]
 		],
 
 
 		"Loaders": [
+			[ "AudioLoader", "api/loaders/AudioLoader" ],
 			[ "BabylonLoader", "api/loaders/BabylonLoader" ],
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],

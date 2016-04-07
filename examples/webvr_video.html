@@ -3,7 +3,7 @@
 	<head>
 		<title>three.js webvr - video</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<style>
 			body {
 				font-family: Monospace;
@@ -30,7 +30,7 @@
 			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank">mery project</a>.
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/WebVR.js"></script>
 		<script src="js/effects/VREffect.js"></script>
@@ -74,7 +74,8 @@
 				video.play();
 
 				texture = new THREE.VideoTexture( video );
-				texture.minFilter = THREE.LinearFilter;
+				texture.minFilter = THREE.NearestFilter;
+				texture.maxFilter = THREE.NearestFilter;
 				texture.format = THREE.RGBFormat;
 				texture.generateMipmaps = false;
 

@@ -5,6 +5,7 @@ uniform float scale;
 #include <color_pars_vertex>
 #include <shadowmap_pars_vertex>
 #include <logdepthbuf_pars_vertex>
+#include <clipping_planes_pars_vertex>
 
 void main() {
 
@@ -19,6 +20,7 @@ void main() {
 	#endif
 
 	#include <logdepthbuf_vertex>
+	#include <clipping_planes_vertex>
 	#include <worldpos_vertex>
 	#include <shadowmap_vertex>
 

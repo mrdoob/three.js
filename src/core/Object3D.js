@@ -546,7 +546,8 @@ THREE.Object3D.prototype = {
 
 	toJSON: function ( meta ) {
 
-		var isRootObject = ( meta === undefined );
+		// meta is '' when called from JSON.stringify
+		var isRootObject = ( meta === undefined || meta === '' );
 
 		var output = {};
 

@@ -3,6 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
+ * @author tschw
  */
 
 THREE.WebGLRenderer = function ( parameters ) {
@@ -48,6 +49,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// scene graph
 
 	this.sortObjects = true;
+
+	// user-defined clipping
+
+	this.clippingPlanes = [];
+	this.localClippingEnabled = false;
 
 	// physically based shading
 
@@ -115,6 +121,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_frustum = new THREE.Frustum(),
 
+	// clipping
+
+	_clippingEnabled = false,
+	_localClippingEnabled = false,
+	_clipRenderingShadows = false,
+
+	_numClippingPlanes = 0,
+	_clippingPlanesUniform = {
+			type: '4fv', value: null, needsUpdate: false },
+
+	_globalClippingState = null,
+	_numGlobalClippingPlanes = 0,
+
+	_matrix3 = new THREE.Matrix3(),
+	_sphere = new THREE.Sphere(),
+	_plane = new THREE.Plane(),
+
+
 	// camera matrices cache
 
 	_projScreenMatrix = new THREE.Matrix4(),
@@ -139,8 +163,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		pointShadowMatrix: [],
 		hemi: [],
 
-		shadows: [],
-		shadowsPointLight: 0
+		shadows: []
 
 	},
 
@@ -663,7 +686,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 
-			if ( material.type !== 'MeshPhongMaterial' && material.type !== 'MeshStandardMaterial' && material.shading === THREE.FlatShading ) {
+			if ( material.type !== 'MeshPhongMaterial' && material.type !== 'MeshStandardMaterial' && material.type !== 'MeshPhysicalMaterial' && material.shading === THREE.FlatShading ) {
 
 				for ( var i = 0, l = object.count * 3; i < l; i += 9 ) {
 
@@ -1016,8 +1039,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
+						var type = _gl.FLOAT;
+						var normalized = false;
+						var array = geometryAttribute.array;
+
+						if ( array instanceof Uint8Array ) {
+
+							type = _gl.UNSIGNED_BYTE;
+							normalized = true;
+
+						}
+
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, startIndex * size * array.BYTES_PER_ELEMENT );
 
 					}
 
@@ -1146,7 +1180,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		sprites.length = 0;
 		lensFlares.length = 0;
 
+		setupGlobalClippingPlanes( this.clippingPlanes, camera );
+
 		projectObject( scene, camera );
+
 
 		opaqueObjects.length = opaqueObjectsLastIndex + 1;
 		transparentObjects.length = transparentObjectsLastIndex + 1;
@@ -1158,11 +1195,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		setupLights( lights, camera );
-
 		//
 
+		if ( _clippingEnabled ) {
+
+			_clipRenderingShadows = true;
+			setupClippingPlanes( null );
+
+		}
+
+		setupShadows( lights );
+
 		shadowMap.render( scene, camera );
+
+		setupLights( lights, camera );
+
+		if ( _clippingEnabled ) {
+
+			_clipRenderingShadows = false;
+			resetGlobalClippingState();
+
+		}
 
 		//
 
@@ -1287,6 +1340,37 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function isObjectViewable( object ) {
+
+		var geometry = object.geometry;
+
+		if ( geometry.boundingSphere === null )
+			geometry.computeBoundingSphere();
+
+		var sphere = _sphere.
+				copy( geometry.boundingSphere ).
+				applyMatrix4( object.matrixWorld );
+
+		if ( ! _frustum.intersectsSphere( sphere ) ) return false;
+		if ( _numClippingPlanes === 0 ) return true;
+
+		var planes = _this.clippingPlanes,
+
+			center = sphere.center,
+			negRad = - sphere.radius,
+			i = 0;
+
+		do {
+
+			// out when deeper than radius in the negative halfspace
+			if ( planes[ i ].distanceToPoint( center ) < negRad ) return false;
+
+		} while ( ++ i !== _numClippingPlanes );
+
+		return true;
+
+	}
+
 	function projectObject( object, camera ) {
 
 		if ( object.visible === false ) return;
@@ -1299,7 +1383,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.Sprite ) {
 
-				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+				if ( object.frustumCulled === false || isObjectViewable( object ) === true ) {
 
 					sprites.push( object );
 
@@ -1328,7 +1412,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+				if ( object.frustumCulled === false || isObjectViewable( object ) === true ) {
 
 					var material = object.material;
 
@@ -1427,7 +1511,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var materialProperties = properties.get( material );
 
-		var parameters = programCache.getParameters( material, _lights, fog, object );
+		var parameters = programCache.getParameters(
+				material, _lights, fog, _numClippingPlanes, object );
+
 		var code = programCache.getProgramCode( material, parameters );
 
 		var program = materialProperties.program;
@@ -1522,10 +1608,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		materialProperties.uniformsList = [];
+		var uniforms = materialProperties.__webglShader.uniforms;
 
-		var uniforms = materialProperties.__webglShader.uniforms,
-			uniformLocations = materialProperties.program.getUniforms();
+		if ( ! ( material instanceof THREE.ShaderMaterial ) &&
+				! ( material instanceof THREE.RawShaderMaterial ) ||
+				material.clipping === true ) {
+
+			materialProperties.numClippingPlanes = _numClippingPlanes;
+			uniforms.clippingPlanes = _clippingPlanesUniform;
+
+		}
+
+		var uniformLocations = materialProperties.program.getUniforms();
+
+		materialProperties.uniformsList = [];
 
 		for ( var u in uniforms ) {
 
@@ -1618,6 +1714,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_usedTextureUnits = 0;
 
 		var materialProperties = properties.get( material );
+
+		if ( _clippingEnabled ) {
+
+			if ( _localClippingEnabled || camera !== _currentCamera ) {
+
+				var useCache =
+						camera === _currentCamera &&
+						material.id === _currentMaterialId;
+
+				// we might want to call this function with some ClippingGroup
+				// object instead of the material, once it becomes feasible
+				// (#8465, #8379)
+				setClippingState(
+						material.clippingPlanes, material.clipShadows,
+						camera, materialProperties, useCache );
+
+			}
+
+			if ( materialProperties.numClippingPlanes !== undefined &&
+				materialProperties.numClippingPlanes !== _numClippingPlanes ) {
+
+				material.needsUpdate = true;
+
+			}
+
+		}
 
 		if ( materialProperties.program === undefined ) {
 
@@ -1850,6 +1972,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				refreshUniformsPhong( m_uniforms, material );
 
+			} else if ( material instanceof THREE.MeshPhysicalMaterial ) {
+
+				refreshUniformsPhysical( m_uniforms, material );
+
 			} else if ( material instanceof THREE.MeshStandardMaterial ) {
 
 				refreshUniformsStandard( m_uniforms, material );
@@ -2028,7 +2154,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size * _pixelRatio;
-		uniforms.scale.value = _canvas.clientHeight / 2.0; // TODO: Cache this.
+		uniforms.scale.value = _canvas.clientHeight * 0.5;
 
 		uniforms.map.value = material.map;
 
@@ -2180,6 +2306,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function refreshUniformsPhysical ( uniforms, material ) {
+
+		refreshUniformsStandard( uniforms, material );
+
+	}
+
 	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
 
 	function markUniformsLightsNeedsUpdate ( uniforms, value ) {
@@ -2287,13 +2419,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( type === 'i' ) {
 
-			// single integer
+			// console.warn( 'THREE.WebGLRenderer: Uniform "i" is now "1i".' );
 			_gl.uniform1i( location, value );
 
 		} else if ( type === 'f' ) {
 
-			// single float
+			// console.warn( 'THREE.WebGLRenderer: Uniform "f" is now "1f".' );
 			_gl.uniform1f( location, value );
+
+		} else if ( type === 'iv1' ) {
+
+			// console.warn( 'THREE.WebGLRenderer: Uniform "iv1" is now "1iv".' );
+			_gl.uniform1iv( location, value );
+
+		} else if ( type === 'iv' ) {
+
+			// console.warn( 'THREE.WebGLRenderer: Uniform "iv" is now "3iv".' );
+			_gl.uniform3iv( location, value );
+
+		} else if ( type === 'fv1' ) {
+
+			// console.warn( 'THREE.WebGLRenderer: Uniform "fv1" is now "1fv".' );
+			_gl.uniform1fv( location, value );
+
+		} else if ( type === 'fv' ) {
+
+			// console.warn( 'THREE.WebGLRenderer: Uniform "fv" is now "3fv".' );
+			_gl.uniform3fv( location, value );
 
 		} else if ( type === 'v2' ) {
 
@@ -2350,26 +2502,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			}
-
-		} else if ( type === 'iv1' ) {
-
-			// flat array of integers (JS or typed array)
-			_gl.uniform1iv( location, value );
-
-		} else if ( type === 'iv' ) {
-
-			// flat array of integers with 3 x N size (JS or typed array)
-			_gl.uniform3iv( location, value );
-
-		} else if ( type === 'fv1' ) {
-
-			// flat array of floats (JS or typed array)
-			_gl.uniform1fv( location, value );
-
-		} else if ( type === 'fv' ) {
-
-			// flat array of floats with 3 x N size (JS or typed array)
-			_gl.uniform3fv( location, value );
 
 		} else if ( type === 'v2v' ) {
 
@@ -2589,6 +2721,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function setupShadows ( lights ) {
+
+		var lightShadowsLength = 0;
+
+		for ( var i = 0, l = lights.length; i < l; i ++ ) {
+
+			var light = lights[ i ];
+
+			if ( light.castShadow ) {
+
+				_lights.shadows[ lightShadowsLength ++ ] = light;
+
+			}
+
+		}
+
+		_lights.shadows.length = lightShadowsLength;
+
+	}
+
 	function setupLights ( lights, camera ) {
 
 		var l, ll, light,
@@ -2602,11 +2754,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		directionalLength = 0,
 		pointLength = 0,
 		spotLength = 0,
-		hemiLength = 0,
-
-		shadowsLength = 0;
-
-		_lights.shadowsPointLight = 0;
+		hemiLength = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -2639,8 +2787,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowBias = light.shadow.bias;
 					uniforms.shadowRadius = light.shadow.radius;
 					uniforms.shadowMapSize = light.shadow.mapSize;
-
-					_lights.shadows[ shadowsLength ++ ] = light;
 
 				}
 
@@ -2675,8 +2821,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowRadius = light.shadow.radius;
 					uniforms.shadowMapSize = light.shadow.mapSize;
 
-					_lights.shadows[ shadowsLength ++ ] = light;
-
 				}
 
 				_lights.spotShadowMap[ spotLength ] = light.shadow.map;
@@ -2701,8 +2845,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					uniforms.shadowBias = light.shadow.bias;
 					uniforms.shadowRadius = light.shadow.radius;
 					uniforms.shadowMapSize = light.shadow.mapSize;
-
-					_lights.shadows[ shadowsLength ++ ] = light;
 
 				}
 
@@ -2747,11 +2889,126 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lights.point.length = pointLength;
 		_lights.hemi.length = hemiLength;
 
-		_lights.shadows.length = shadowsLength;
-
-		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength + ',' + shadowsLength;
+		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength + ',' + _lights.shadows.length;
 
 	}
+
+
+	function setupGlobalClippingPlanes( planes, camera ) {
+
+		_clippingEnabled =
+				_this.clippingPlanes.length !== 0 ||
+				_this.localClippingEnabled ||
+				// enable state of previous frame - the clipping code has to
+				// run another frame in order to reset the state:
+				_numGlobalClippingPlanes !== 0 ||
+				_localClippingEnabled;
+
+		_localClippingEnabled = _this.localClippingEnabled;
+
+		_globalClippingState = setupClippingPlanes( planes, camera, 0 );
+		_numGlobalClippingPlanes = planes !== null ? planes.length : 0;
+
+	}
+
+	function setupClippingPlanes( planes, camera, dstOffset, skipTransform ) {
+
+		var nPlanes = planes !== null ? planes.length : 0,
+			dstArray = null;
+
+		if ( nPlanes !== 0 ) {
+
+			dstArray = _clippingPlanesUniform.value;
+
+			if ( skipTransform !== true || dstArray === null ) {
+
+				var flatSize = dstOffset + nPlanes * 4,
+					viewMatrix = camera.matrixWorldInverse,
+					viewNormalMatrix = _matrix3.getNormalMatrix( viewMatrix );
+
+				if ( dstArray === null || dstArray.length < flatSize ) {
+
+					dstArray = new Float32Array( flatSize );
+
+				}
+
+				for ( var i = 0, i4 = dstOffset; i !== nPlanes; ++ i, i4 += 4 ) {
+
+					var plane = _plane.copy( planes[ i ] ).
+							applyMatrix4( viewMatrix, viewNormalMatrix );
+
+					plane.normal.toArray( dstArray, i4 );
+					dstArray[ i4 + 3 ] = plane.constant;
+
+				}
+
+			}
+
+			_clippingPlanesUniform.value = dstArray;
+			_clippingPlanesUniform.needsUpdate = true;
+
+		}
+
+		_numClippingPlanes = nPlanes;
+		return dstArray;
+
+	}
+
+	function resetGlobalClippingState() {
+
+		if ( _clippingPlanesUniform.value !== _globalClippingState ) {
+
+			_clippingPlanesUniform.value = _globalClippingState;
+			_clippingPlanesUniform.needsUpdate = _numGlobalClippingPlanes > 0;
+
+		}
+
+		_numClippingPlanes = _numGlobalClippingPlanes;
+
+	}
+
+	function setClippingState( planes, clipShadows, camera, cache, fromCache ) {
+
+		if ( ! _localClippingEnabled ||
+				planes === null || planes.length === 0 ||
+				_clipRenderingShadows && ! clipShadows ) {
+			// there's no local clipping
+
+			if ( _clipRenderingShadows ) {
+				// there's no global clipping
+
+				setupClippingPlanes( null );
+
+			} else {
+
+				resetGlobalClippingState();
+			}
+
+		} else {
+
+			var nGlobal = _clipRenderingShadows ? 0 : _numGlobalClippingPlanes,
+				lGlobal = nGlobal * 4,
+
+				dstArray = cache.clippingState || null;
+
+			_clippingPlanesUniform.value = dstArray; // ensure unique state
+
+			dstArray = setupClippingPlanes(
+					planes, camera, lGlobal, fromCache );
+
+			for ( var i = 0; i !== lGlobal; ++ i ) {
+
+				dstArray[ i ] = _globalClippingState[ i ];
+
+			}
+
+			cache.clippingState = dstArray;
+			_numClippingPlanes += nGlobal;
+
+		}
+
+	}
+
 
 	// GL state setting
 

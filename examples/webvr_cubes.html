@@ -3,7 +3,7 @@
 	<head>
 		<title>three.js webvr - cubes</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<style>
 			body {
 				font-family: Monospace;
@@ -19,7 +19,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/WebVR.js"></script>
 		<script src="js/effects/VREffect.js"></script>
@@ -39,9 +39,10 @@
 			var camera, scene, raycaster, renderer;
 			var effect, controls;
 
-			var cubes = [];
+			var room;
+			var isMouseDown = false;
+
 			var INTERSECTED;
-			var radius = 100, theta = 0;
 			var crosshair;
 
 			init();
@@ -62,7 +63,7 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				scene.add( camera );
 
 				crosshair = new THREE.Mesh(
@@ -76,11 +77,11 @@
 				crosshair.position.z = - 2;
 				camera.add( crosshair );
 
-				var mesh = new THREE.Mesh(
-					new THREE.BoxGeometry( 200, 200, 200, 10, 10, 10 ),
+				room = new THREE.Mesh(
+					new THREE.BoxGeometry( 6, 6, 6, 10, 10, 10 ),
 					new THREE.MeshBasicMaterial( { color: 0x202020, wireframe: true } )
 				);
-				scene.add( mesh );
+				scene.add( room );
 
 				scene.add( new THREE.HemisphereLight( 0x404020, 0x202040, 0.5 ) );
 
@@ -88,15 +89,15 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 5, 5, 5 );
+				var geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
-					object.position.x = Math.random() * 200 - 100;
-					object.position.y = Math.random() * 200 - 100;
-					object.position.z = Math.random() * 200 - 100;
+					object.position.x = Math.random() * 4 - 2;
+					object.position.y = Math.random() * 4 - 2;
+					object.position.z = Math.random() * 4 - 2;
 
 					object.rotation.x = Math.random() * 2 * Math.PI;
 					object.rotation.y = Math.random() * 2 * Math.PI;
@@ -107,12 +108,11 @@
 					object.scale.z = Math.random() + 0.5;
 
 					object.userData.velocity = new THREE.Vector3();
-					object.userData.velocity.x = Math.random() * 0.4 - 0.2;
-					object.userData.velocity.y = Math.random() * 0.4 - 0.2;
-					object.userData.velocity.z = Math.random() * 0.4 - 0.2;
+					object.userData.velocity.x = Math.random() * 0.01 - 0.005;
+					object.userData.velocity.y = Math.random() * 0.01 - 0.005;
+					object.userData.velocity.z = Math.random() * 0.01 - 0.005;
 
-					scene.add( object );
-					cubes.push( object );
+					room.add( object );
 
 				}
 
@@ -134,9 +134,26 @@
 
 				}
 
+				renderer.domElement.addEventListener( 'mousedown', onMouseDown, false );
+				renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );
+				renderer.domElement.addEventListener( 'touchstart', onMouseDown, false );
+				renderer.domElement.addEventListener( 'touchend', onMouseUp, false );
+
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onMouseDown() {
+
+				isMouseDown = true;
+
+			}
+
+			function onMouseUp() {
+
+				isMouseDown = false;
 
 			}
 
@@ -160,11 +177,26 @@
 
 			function render() {
 
+				if ( isMouseDown === true ) {
+
+					var cube = room.children[ 0 ];
+					room.remove( cube );
+
+					cube.position.set( 0, 0, - 0.75 );
+					cube.position.applyQuaternion( camera.quaternion );
+					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
+					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
+					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 );
+					cube.userData.velocity.applyQuaternion( camera.quaternion );
+					room.add( cube );
+
+				}
+
 				// find intersections
 
 				raycaster.setFromCamera( { x: 0, y: 0 }, camera );
 
-				var intersects = raycaster.intersectObjects( cubes );
+				var intersects = raycaster.intersectObjects( room.children );
 
 				if ( intersects.length > 0 ) {
 
@@ -182,43 +214,48 @@
 
 					if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
 
-					INTERSECTED = null;
+					INTERSECTED = undefined;
 
 				}
 
-				controls.update();
+				// Keep cubes inside room
 
-				for ( var i = 0; i < cubes.length; i ++ ) {
+				for ( var i = 0; i < room.children.length; i ++ ) {
 
-					var cube = cubes[ i ];
+					var cube = room.children[ i ];
+
+					cube.userData.velocity.multiplyScalar( 0.999 );
 
 					cube.position.add( cube.userData.velocity );
 
-					if ( cube.position.x < - 100 || cube.position.x > 100 ) {
+					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
 
-						cube.position.x = THREE.Math.clamp( cube.position.x, - 100, 100 );
+						cube.position.x = THREE.Math.clamp( cube.position.x, - 3, 3 );
 						cube.userData.velocity.x = - cube.userData.velocity.x;
 
 					}
 
-					if ( cube.position.y < - 100 || cube.position.y > 100 ) {
+					if ( cube.position.y < - 3 || cube.position.y > 3 ) {
 
-						cube.position.y = THREE.Math.clamp( cube.position.y, - 100, 100 );
+						cube.position.y = THREE.Math.clamp( cube.position.y, - 3, 3 );
 						cube.userData.velocity.y = - cube.userData.velocity.y;
 
 					}
 
-					if ( cube.position.z < - 100 || cube.position.z > 100 ) {
+					if ( cube.position.z < - 3 || cube.position.z > 3 ) {
 
-						cube.position.z = THREE.Math.clamp( cube.position.z, - 100, 100 );
+						cube.position.z = THREE.Math.clamp( cube.position.z, - 3, 3 );
 						cube.userData.velocity.z = - cube.userData.velocity.z;
 
 					}
 
-					cube.rotation.x += 0.01;
+					cube.rotation.x += cube.userData.velocity.x * 2;
+					cube.rotation.y += cube.userData.velocity.y * 2;
+					cube.rotation.z += cube.userData.velocity.z * 2;
 
 				}
 
+				controls.update();
 				effect.render( scene, camera );
 
 			}

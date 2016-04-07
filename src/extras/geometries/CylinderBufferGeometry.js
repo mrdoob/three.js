@@ -2,7 +2,7 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -19,11 +19,13 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 		thetaLength: thetaLength
 	};
 
+	var scope = this;
+
 	radiusTop = radiusTop !== undefined ? radiusTop : 20;
 	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
 	height = height !== undefined ? height : 100;
 
-	radialSegments = Math.floor( radialSegments )  || 8;
+	radialSegments = Math.floor( radialSegments ) || 8;
 	heightSegments = Math.floor( heightSegments ) || 1;
 
 	openEnded = openEnded !== undefined ? openEnded : false;
@@ -37,7 +39,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 
 	// buffers
 
-	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ), 1 );
 	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
@@ -46,23 +48,17 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 
 	var index = 0, indexOffset = 0, indexArray = [], halfHeight = height / 2;
 
+	// group variables
+	var groupStart = 0;
+
 	// generate geometry
 
 	generateTorso();
 
-	if( openEnded === false ) {
+	if ( openEnded === false ) {
 
-		if( radiusTop > 0 ) {
-
-			generateCap( true );
-
-		}
-
-		if( radiusBottom > 0 ) {
-
-			generateCap( false );
-
-		}
+		if ( radiusTop > 0 ) generateCap( true );
+		if ( radiusBottom > 0 ) generateCap( false );
 
 	}
 
@@ -75,7 +71,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 
 	// helper functions
 
-	function calculateVertexCount () {
+	function calculateVertexCount() {
 
 		var count = ( radialSegments + 1 ) * ( heightSegments + 1 );
 
@@ -89,7 +85,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 
 	}
 
-	function calculateIndexCount () {
+	function calculateIndexCount() {
 
 		var count = radialSegments * heightSegments * 2 * 3;
 
@@ -103,11 +99,13 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 
 	}
 
-	function generateTorso () {
+	function generateTorso() {
 
 		var x, y;
 		var normal = new THREE.Vector3();
 		var vertex = new THREE.Vector3();
+
+		var groupCount = 0;
 
 		// this will be used to calculate the normal
 		var tanTheta = ( radiusBottom - radiusTop ) / height;
@@ -137,7 +135,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 				normal.copy( vertex );
 
 				// handle special case if radiusTop/radiusBottom is zero
-				if( ( radiusTop === 0  && y === 0 ) || ( radiusBottom === 0  && y === heightSegments ) ) {
+				if ( ( radiusTop === 0 && y === 0 ) || ( radiusBottom === 0 && y === heightSegments ) ) {
 
 					normal.x = Math.sin( u * thetaLength + thetaStart );
 					normal.z = Math.cos( u * thetaLength + thetaStart );
@@ -176,26 +174,37 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 				var i4 = indexArray[ y ][ x + 1 ];
 
 				// face one
-				indices.setX( indexOffset, i1 ); indexOffset++;
-				indices.setX( indexOffset, i2 ); indexOffset++;
-				indices.setX( indexOffset, i4 ); indexOffset++;
+				indices.setX( indexOffset, i1 ); indexOffset ++;
+				indices.setX( indexOffset, i2 ); indexOffset ++;
+				indices.setX( indexOffset, i4 ); indexOffset ++;
 
 				// face two
-				indices.setX( indexOffset, i2 ); indexOffset++;
-				indices.setX( indexOffset, i3 ); indexOffset++;
-				indices.setX( indexOffset, i4 ); indexOffset++;
+				indices.setX( indexOffset, i2 ); indexOffset ++;
+				indices.setX( indexOffset, i3 ); indexOffset ++;
+				indices.setX( indexOffset, i4 ); indexOffset ++;
+
+				// update counters
+				groupCount += 6;
 
 			}
 
 		}
 
+		// add a group to the geometry. this will ensure multi material support
+		scope.addGroup( groupStart, groupCount, 0 );
+
+		// calculate new start value for groups
+		groupStart += groupCount;
+
 	}
 
-	function generateCap ( top ) {
+	function generateCap( top ) {
 
 		var x, centerIndexStart, centerIndexEnd;
 		var uv = new THREE.Vector2();
 		var vertex = new THREE.Vector3();
+
+		var groupCount = 0;
 
 		var radius = ( top === true ) ? radiusTop : radiusBottom;
 		var sign = ( top === true ) ? 1 : - 1;
@@ -216,7 +225,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 			normals.setXYZ( index, 0, sign, 0 );
 
 			// uv
-			if( top === true ) {
+			if ( top === true ) {
 
 				uv.x = x / radialSegments;
 				uv.y = 0;
@@ -231,7 +240,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 			uvs.setXY( index, uv.x, uv.y );
 
 			// increase index
-			index++;
+			index ++;
 
 		}
 
@@ -268,23 +277,32 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 			var c = centerIndexStart + x;
 			var i = centerIndexEnd + x;
 
-			if( top === true ) {
+			if ( top === true ) {
 
 				// face top
-				indices.setX( indexOffset, i ); indexOffset++;
-				indices.setX( indexOffset, i + 1 ); indexOffset++;
-				indices.setX( indexOffset, c ); indexOffset++;
+				indices.setX( indexOffset, i ); indexOffset ++;
+				indices.setX( indexOffset, i + 1 ); indexOffset ++;
+				indices.setX( indexOffset, c ); indexOffset ++;
 
 			} else {
 
 				// face bottom
-				indices.setX( indexOffset, i + 1); indexOffset++;
-				indices.setX( indexOffset, i ); indexOffset++;
-				indices.setX( indexOffset, c ); indexOffset++;
+				indices.setX( indexOffset, i + 1 ); indexOffset ++;
+				indices.setX( indexOffset, i ); indexOffset ++;
+				indices.setX( indexOffset, c ); indexOffset ++;
 
 			}
 
+			// update counters
+			groupCount += 3;
+
 		}
+
+		// add a group to the geometry. this will ensure multi material support
+		scope.addGroup( groupStart, groupCount, top === true ? 1 : 2 );
+
+		// calculate new start value for groups
+		groupStart += groupCount;
 
 	}
 
