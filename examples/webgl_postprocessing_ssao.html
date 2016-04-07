@@ -48,7 +48,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
-		
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
@@ -164,7 +164,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				var renderPass = new THREE.RenderPass( scene, camera );
 
 				// Setup depth pass
-				var depthShader = THREE.ShaderLib[ "depthRGBA" ];
+				var depthShader = THREE.ShaderLib[ "clipZRGBA" ];
 				var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
 
 				depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader,

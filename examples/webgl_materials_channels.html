@@ -51,7 +51,7 @@
 
 
 		<script src="js/loaders/BinaryLoader.js"></script>
-		<script src="js/shaders/DepthRGBAUnpackedShader.js"></script>
+		<script src="js/shaders/ClipZRGBAUnpackedShader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -73,7 +73,7 @@
 			var cameraOrtho, cameraPerspective;
 			var controlsOrtho, controlsPerspective;
 
-			var mesh, materialStandard, materialDepth, materialDepthRGBA, materialDepthRGBAUnpacked, materialNormal;
+			var mesh, materialStandard, materialDepthGrayscale, materialDepthRGBAPacked, materialDepthNearBiasedRGBAPacked, materialClipZRGBA, materialClipZRGBAUnpacked, materialNormal;
 
 			var pointLight, ambientLight;
 
@@ -87,7 +87,7 @@
 			function initGui() {
 
 				var gui = new dat.GUI();
-				gui.add( params, 'material', [ 'standard', 'normal', 'depth', 'depthRGBA', 'depthRGBAUnpacked' ] );
+				gui.add( params, 'material', [ 'standard', 'normal', 'depthGrayscale', 'depthRGBA', 'depthNearBiasedRGBA', 'clipZRGBA', 'clipZRGBAUnpacked' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
 
 			}
@@ -167,9 +167,17 @@
 				materialStandard.normalMap = normalMap;
 				materialStandard.normalScale.set( 1, - 1 );
 
-				materialDepth = new THREE.MeshDepthMaterial();
-				materialDepthRGBA = new THREE.ShaderMaterial( THREE.ShaderLib.depthRGBA );
-				materialDepthRGBAUnpacked = new THREE.ShaderMaterial( THREE.DepthRGBAUnpackedShader );
+				materialDepthGrayscale = new THREE.MeshDepthMaterial();
+				materialDepthGrayscale.depthPacking = THREE.GrayscaleDepthPacking;
+
+				materialDepthRGBA = new THREE.MeshDepthMaterial();
+				materialDepthRGBA.depthPacking = THREE.RGBADepthPacking;
+
+				materialDepthNearBiasedRGBA = new THREE.MeshDepthMaterial();
+				materialDepthNearBiasedRGBA.depthPacking = THREE.NearBiasedRGBADepthPacking;
+
+				materialClipZRGBA = new THREE.ShaderMaterial( THREE.ShaderLib.clipZRGBA );
+				materialClipZRGBAUnpacked = new THREE.ShaderMaterial( THREE.ClipZRGBAUnpackedShader );
 				materialNormal = new THREE.MeshNormalMaterial();
 
 				//
@@ -236,9 +244,11 @@
 
 					switch ( params.material ) {
 						case 'standard': material = materialStandard; break;
-						case 'depth': material = materialDepth; break;
+						case 'depthGrayscale': material = materialDepthGrayscale; break;
 						case 'depthRGBA': material = materialDepthRGBA; break;
-						case 'depthRGBAUnpacked': material = materialDepthRGBAUnpacked; break;
+						case 'depthNearBiasedRGBA': material = materialDepthNearBiasedRGBA; break;
+						case 'clipZRGBA': material = materialClipZRGBA; break;
+						case 'clipZRGBAUnpacked': material = materialClipZRGBAUnpacked; break;
 						case 'normal': material = materialNormal; break;
 					}
 

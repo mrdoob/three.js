@@ -329,3 +329,9 @@ THREE.LogLuvEncoding = 3003;
 THREE.RGBM7Encoding = 3004;
 THREE.RGBM16Encoding = 3005;
 THREE.RGBDEncoding = 3006; // MaxRange is 256.
+
+// Depth packing strategies
+
+THREE.GrayscaleDepthPacking = 3100;
+THREE.RGBADepthPacking = 3101;
+THREE.NearBiasedRGBADepthPacking = 3102;
