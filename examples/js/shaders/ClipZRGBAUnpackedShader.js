@@ -1,13 +1,13 @@
 /**
  * @author Ben Houston / bhouston / http://clara.io
  *
- * Test depth pack, unpack and range
+ * Test clipZ pack, unpack and range
  *
  */
 
-THREE.DepthRGBAUnpackedShader = {
+THREE.ClipZRGBAUnpackedShader = {
 
-	vertexShader: THREE.ShaderChunk[ 'depth_vert' ],
+	vertexShader: THREE.ShaderLib[ 'clipZRGBA_vert' ],
 
 	fragmentShader: [
     "#include <common>",

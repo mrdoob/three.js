@@ -51,7 +51,7 @@
 
 
 		<script src="js/loaders/BinaryLoader.js"></script>
-		<script src="js/shaders/DepthRGBAUnpackedShader.js"></script>
+		<script src="js/shaders/ClipZRGBAUnpackedShader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -178,8 +178,8 @@
 				materialDepthNearBiasedRGBA = new THREE.MeshDepthMaterial();
 				materialDepthNearBiasedRGBA.depthPacking = THREE.NearBiasedRGBADepthPacking;
 
-				materialClipZRGBA = new THREE.ShaderMaterial( THREE.ShaderLib.depthRGBA );
-				materialClipZRGBAUnpacked = new THREE.ShaderMaterial( THREE.DepthRGBAUnpackedShader );
+				materialClipZRGBA = new THREE.ShaderMaterial( THREE.ShaderLib.clipZRGBA );
+				materialClipZRGBAUnpacked = new THREE.ShaderMaterial( THREE.ClipZRGBAUnpackedShader );
 				materialNormal = new THREE.MeshNormalMaterial();
 
 				//

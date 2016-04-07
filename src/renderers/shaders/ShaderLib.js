@@ -239,12 +239,12 @@ THREE.ShaderLib = {
 	 * http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
 	 */
 
-	'depthRGBA': {
+	'clipZRGBA': {
 
 		uniforms: {},
 
-		vertexShader: THREE.ShaderChunk[ 'depthRGBA_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'depthRGBA_frag' ]
+		vertexShader: THREE.ShaderChunk[ 'clipZRGBA_vert' ],
+		fragmentShader: THREE.ShaderChunk[ 'clipZRGBA_frag' ]
 
 	},
 
