@@ -16,60 +16,70 @@ THREE.OBJExporter.prototype = {
 		var indexVertexUvs = 0;
 		var indexNormals = 0;
 
-		var faceVertexKeys = [ "a", "b", "c" ];
+		var vertex = new THREE.Vector3();
+		var normal = new THREE.Vector3();
+		var uv = new THREE.Vector2();
+
+		var i, j, l, m, face = [];
 
 		var parseMesh = function ( mesh ) {
 
 			var nbVertex = 0;
-			var nbVertexUvs = 0;
 			var nbNormals = 0;
+			var nbVertexUvs = 0;
 
 			var geometry = mesh.geometry;
 
-			if ( geometry instanceof THREE.BufferGeometry ) {
-
-				geometry = new THREE.Geometry().fromBufferGeometry( geometry );
-
-			}
+			var normalMatrixWorld = new THREE.Matrix3();
 
 			if ( geometry instanceof THREE.Geometry ) {
 
+				geometry = new THREE.BufferGeometry().setFromObject( mesh );
+
+			}
+
+			if ( geometry instanceof THREE.BufferGeometry ) {
+
+				// shortcuts
+				var vertices = geometry.getAttribute( 'position' );
+				var normals = geometry.getAttribute( 'normal' );
+				var uvs = geometry.getAttribute( 'uv' );
+				var indices = geometry.getIndex();
+
+				// name of the mesh object
 				output += 'o ' + mesh.name + '\n';
 
-				var vertices = geometry.vertices;
+				// vertices
 
-				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+				if( vertices !== undefined ) {
 
-					var vertex = vertices[ i ].clone();
-					vertex.applyMatrix4( mesh.matrixWorld );
+					for ( i = 0, l = vertices.count; i < l; i ++, nbVertex++ ) {
 
-					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+						vertex.x = vertices.getX( i );
+						vertex.y = vertices.getY( i );
+						vertex.z = vertices.getZ( i );
 
-					nbVertex ++;
+						// transfrom the vertex to world space
+						vertex.applyMatrix4( mesh.matrixWorld );
+
+						// transform the vertex to export format
+						output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+
+					}
 
 				}
 
 				// uvs
 
-				var faces = geometry.faces;
-				var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
-				var hasVertexUvs = faces.length === faceVertexUvs.length;
+				if( uvs !== undefined ) {
 
-				if ( hasVertexUvs ) {
+					for ( i = 0, l = uvs.count; i < l; i ++, nbVertexUvs++ ) {
 
-					for ( var i = 0, l = faceVertexUvs.length; i < l; i ++ ) {
+						uv.x = uvs.getX( i );
+						uv.y = uvs.getY( i );
 
-						var vertexUvs = faceVertexUvs[ i ];
-
-						for ( var j = 0, jl = vertexUvs.length; j < jl; j ++ ) {
-
-							var uv = vertexUvs[ j ];
-
-							output += 'vt ' + uv.x + ' ' + uv.y + '\n';
-
-							nbVertexUvs ++;
-
-						}
+						// transform the uv to export format
+						output += 'vt ' + uv.x + ' ' + uv.y + '\n';
 
 					}
 
@@ -77,64 +87,67 @@ THREE.OBJExporter.prototype = {
 
 				// normals
 
-				var normalMatrixWorld = new THREE.Matrix3();
-				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
+				if( normals !== undefined ) {
 
-				for ( var i = 0, l = faces.length; i < l; i ++ ) {
+					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
-					var face = faces[ i ];
-					var vertexNormals = face.vertexNormals;
+					for ( i = 0, l = normals.count; i < l; i ++, nbNormals++ ) {
 
-					if ( vertexNormals.length === 3 ) {
+						normal.x = normals.getX( i );
+						normal.y = normals.getY( i );
+						normal.z = normals.getZ( i );
 
-						for ( var j = 0, jl = vertexNormals.length; j < jl; j ++ ) {
-
-							var normal = vertexNormals[ j ].clone();
-							normal.applyMatrix3( normalMatrixWorld );
-
-							output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
-
-							nbNormals ++;
-
-						}
-
-					} else {
-
-						var normal = face.normal.clone();
+						// transfrom the normal to world space
 						normal.applyMatrix3( normalMatrixWorld );
 
-						for ( var j = 0; j < 3; j ++ ) {
-
-							output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
-
-							nbNormals ++;
-
-						}
+						// transform the normal to export format
+						output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
 
 					}
 
 				}
 
 				// faces
-				var indices = [];
 
-				for ( var i = 0, j = 1, l = faces.length; i < l; i ++, j += 3 ) {
+				if( indices !== null ) {
 
-					var face = faces[ i ];
+					for ( i = 0, l = indices.count; i < l; i += 3 ) {
 
-					for ( var m = 0; m < 3; m ++ ) {
+						for( m = 0; m < 3; m ++ ){
 
-					    indices[ m ] = ( indexVertex + face[ faceVertexKeys[ m ] ] + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + m + 1 ) : '' ) + '/' + ( indexNormals + j + m + 1 );
+							j = indices.getX( i + m ) + 1;
+
+							face[ m ] = ( indexVertex + j ) + '/' + ( uvs ? ( indexVertexUvs + j ) : '' ) + '/' + ( indexNormals + j );
+
+						}
+
+						// transform the face to export format
+						output += 'f ' + face.join( ' ' ) + "\n";
 
 					}
 
-					output += 'f ' + indices.join( ' ' ) + "\n";
+				} else {
+
+					for ( i = 0, l = vertices.count; i < l; i += 3 ) {
+
+						for( m = 0; m < 3; m ++ ){
+
+							j = i + m + 1;
+
+							face[ m ] = ( indexVertex + j ) + '/' + ( uvs ? ( indexVertexUvs + j ) : '' ) + '/' + ( indexNormals + j );
+
+						}
+
+						// transform the face to export format
+						output += 'f ' + face.join( ' ' ) + "\n";
+
+					}
 
 				}
 
 			} else {
 
-				console.warn( 'THREE.OBJExporter.parseMesh(): geometry type unsupported', mesh );
+				console.warn( 'THREE.OBJExporter.parseMesh(): geometry type unsupported', geometry );
 
 			}
 
@@ -147,27 +160,41 @@ THREE.OBJExporter.prototype = {
 
 		var parseLine = function( line ) {
 
+			var nbVertex = 0;
+
 			var geometry = line.geometry;
 			var type = line.type;
 
-			if ( geometry instanceof THREE.BufferGeometry ) {
+			if ( geometry instanceof THREE.Geometry ) {
 
-				geometry = new THREE.Geometry().fromBufferGeometry( geometry );
+				geometry = new THREE.BufferGeometry().setFromObject( line );
 
 			}
 
-			if ( geometry instanceof THREE.Geometry ) {
+			if ( geometry instanceof THREE.BufferGeometry ) {
 
+				// shortcuts
+				var vertices = geometry.getAttribute( 'position' );
+				var indices = geometry.getIndex();
+
+				// name of the line object
 				output += 'o ' + line.name + '\n';
 
-				var vertices = geometry.vertices;
+				if( vertices !== undefined ) {
 
-				for ( var i = 0, l = vertices.length; i < l; i++ ) {
+					for ( i = 0, l = vertices.count; i < l; i ++, nbVertex++ ) {
 
-					var vertex = vertices[ i ].clone();
-					vertex.applyMatrix4( line.matrixWorld );
+						vertex.x = vertices.getX( i );
+						vertex.y = vertices.getY( i );
+						vertex.z = vertices.getZ( i );
 
-					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+						// transfrom the vertex to world space
+						vertex.applyMatrix4( line.matrixWorld );
+
+						// transform the vertex to export format
+						output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+
+					}
 
 				}
 
@@ -175,9 +202,9 @@ THREE.OBJExporter.prototype = {
 
 					output += 'l ';
 
-					for ( var j = 1, m = vertices.length; j <= m; j++ ) {
+					for ( j = 1, l = vertices.count; j <= l; j++ ) {
 
-						output += j + ' ';
+						output += ( indexVertex + j ) + ' ';
 
 					}
 
@@ -187,9 +214,9 @@ THREE.OBJExporter.prototype = {
 
 				if ( type === 'LineSegments' ) {
 
-					for ( var j = 1, k = j + 1, m = vertices.length; j < m; j += 2, k = j + 1 ) {
+					for ( j = 1, k = j + 1, l = vertices.count; j < l; j += 2, k = j + 1 ) {
 
-						output += 'l ' + j + ' ' + k + '\n';
+						output += 'l ' + ( indexVertex + j ) + ' ' + ( indexVertex + k ) + '\n';
 
 					}
 
@@ -197,9 +224,13 @@ THREE.OBJExporter.prototype = {
 
 			} else {
 
-				console.warn('THREE.OBJExporter.parseLine(): geometry type unsupported', line);
+				console.warn('THREE.OBJExporter.parseLine(): geometry type unsupported', geometry );
 
 			}
+
+			// update index
+			indexVertex += nbVertex;
+
 		};
 
 		object.traverse( function ( child ) {

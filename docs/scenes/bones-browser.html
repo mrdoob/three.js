@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
@@ -57,7 +57,7 @@
 				camera.position.y = 30;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );				
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -74,7 +74,7 @@
 
 				lights[ 0 ].position.set( 0, 200, 0 );
 				lights[ 1 ].position.set( 100, 200, 100 );
-				lights[ 2 ].position.set( -100, -200, -100 );
+				lights[ 2 ].position.set( - 100, - 200, - 100 );
 
 				scene.add( lights[ 0 ] );
 				scene.add( lights[ 1 ] );
@@ -128,7 +128,7 @@
 
 				var prevBone = new THREE.Bone();
 				bones.push( prevBone );
-				prevBone.position.y = -sizing.halfHeight;
+				prevBone.position.y = - sizing.halfHeight;
 
 				for ( var i = 0; i < sizing.segmentCount; i ++ ) {
 
@@ -187,13 +187,13 @@
 
 					folder = gui.addFolder( "Bone " + i );
 
-					folder.add( bone.position, 'x', -10 + bone.position.x, 10 + bone.position.x );
-					folder.add( bone.position, 'y', -10 + bone.position.y, 10 + bone.position.y );
-					folder.add( bone.position, 'z', -10 + bone.position.z, 10 + bone.position.z );
+					folder.add( bone.position, 'x', - 10 + bone.position.x, 10 + bone.position.x );
+					folder.add( bone.position, 'y', - 10 + bone.position.y, 10 + bone.position.y );
+					folder.add( bone.position, 'z', - 10 + bone.position.z, 10 + bone.position.z );
 
-					folder.add( bone.rotation, 'x', -Math.PI * 0.5, Math.PI * 0.5 );
-					folder.add( bone.rotation, 'y', -Math.PI * 0.5, Math.PI * 0.5 );
-					folder.add( bone.rotation, 'z', -Math.PI * 0.5, Math.PI * 0.5 );
+					folder.add( bone.rotation, 'x', - Math.PI * 0.5, Math.PI * 0.5 );
+					folder.add( bone.rotation, 'y', - Math.PI * 0.5, Math.PI * 0.5 );
+					folder.add( bone.rotation, 'z', - Math.PI * 0.5, Math.PI * 0.5 );
 
 					folder.add( bone.scale, 'x', 0, 2 );
 					folder.add( bone.scale, 'y', 0, 2 );

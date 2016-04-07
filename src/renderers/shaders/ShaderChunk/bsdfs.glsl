@@ -11,11 +11,12 @@ float punctualLightIntensityToIrradianceFactor( const in float lightDistance, co
 #if defined ( PHYSICALLY_CORRECT_LIGHTS )
 
 			// based upon Frostbite 3 Moving to Physically-based Rendering
-			// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+			// page 32, equation 26: E[window1]
+			// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr_v2.pdf
 			// this is intended to be used on spot and point lights who are represented as luminous intensity
 			// but who must be converted to luminous irradiance for surface lighting calculation
 			float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
-			float maxDistanceCutoffFactor = exp2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) ) ;
+			float maxDistanceCutoffFactor = pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );
 			return distanceFalloff * maxDistanceCutoffFactor;
 
 #else
@@ -56,15 +57,27 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 
 	// geometry term = G(l)⋅G(v) / 4(n⋅l)(n⋅v)
 
-	float a2 = alpha * alpha;
+	float a2 = pow2( alpha );
 
-	float gl = dotNL + pow( a2 + ( 1.0 - a2 ) * pow2( dotNL ), 0.5 );
-
-	float gv = dotNV + pow( a2 + ( 1.0 - a2 ) * pow2( dotNV ), 0.5 );
+	float gl = dotNL + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
+	float gv = dotNV + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );
 
 	return 1.0 / ( gl * gv );
 
 } // validated
+
+// from page 12, listing 2 of http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr_v2.pdf
+float G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
+
+	float a2 = pow2( alpha );
+
+	// dotNL and dotNV are explicitly swapped. This is not a mistake.
+	float gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );
+	float gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
+
+	return 0.5 / max( gv + gl, EPSILON );
+}
+
 
 
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
@@ -84,7 +97,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 // GGX Distribution, Schlick Fresnel, GGX-Smith Visibility
 vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {
 
-	float alpha = roughness * roughness; // UE4's roughness
+	float alpha = pow2( roughness ); // UE4's roughness
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 
@@ -95,7 +108,7 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 
 	vec3 F = F_Schlick( specularColor, dotLH );
 
-	float G = G_GGX_Smith( alpha, dotNL, dotNV );
+	float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
 
 	float D = D_GGX( alpha, dotNH );
 

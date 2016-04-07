@@ -49,7 +49,7 @@
 			<div id="meminfo"></div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -121,18 +121,17 @@
 
 				light.castShadow = true;
 
-				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 1024;
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.heigth = 1024;
 
 				var d = 390;
 
-				light.shadowCameraLeft = -d;
-				light.shadowCameraRight = d;
-				light.shadowCameraTop = d * 1.5;
-				light.shadowCameraBottom = -d;
+				light.shadow.camera.left = -d;
+				light.shadow.camera.right = d;
+				light.shadow.camera.top = d * 1.5;
+				light.shadow.camera.bottom = -d;
 
-				light.shadowCameraFar = 3500;
-				//light.shadowCameraVisible = true;
+				light.shadow.camera.far = 3500;
 
 				// RENDERER
 
@@ -159,8 +158,6 @@
 
 				var loader = new THREE.JSONLoader();
 				loader.load( "models/skinned/knight.js", function ( geometry, materials ) {
-
-					console.log( 'materials', materials );
 
 					createScene( geometry, materials, 0, FLOOR, -300, 60 )
 
@@ -635,8 +632,9 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
 				render();
-				stats.update();
+				stats.end();
 
 				if ( showMemInfo ) {
 

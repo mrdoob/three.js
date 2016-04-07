@@ -5,10 +5,10 @@ var files = {
 		"webgl_animation_skinning_blending",
 		"webgl_animation_skinning_morph",
 		"webgl_camera",
+		"webgl_camera_cinematic",
 		"webgl_camera_logarithmicdepthbuffer",
 		"webgl_decals",
 		"webgl_effects_anaglyph",
-		"webgl_effects_cardboard",
 		"webgl_effects_parallaxbarrier",
 		"webgl_effects_peppersghost",
 		"webgl_effects_stereo",
@@ -60,6 +60,8 @@ var files = {
 		"webgl_lights_physical",
 		"webgl_lights_pointlights",
 		"webgl_lights_pointlights2",
+		"webgl_lights_spotlight",
+		"webgl_lights_spotlights",
 		"webgl_lines_colors",
 		"webgl_lines_cubes",
 		"webgl_lines_dashed",
@@ -89,6 +91,7 @@ var files = {
 		"webgl_loader_msgpack",
 		"webgl_loader_obj",
 		"webgl_loader_obj_mtl",
+		"webgl_loader_nrrd",
 		"webgl_loader_pcd",
 		"webgl_loader_pdb",
 		"webgl_loader_ply",
@@ -236,9 +239,11 @@ var files = {
 	],
 	"webvr": [
 		"webvr_cubes",
+		"webvr_panorama",
 		"webvr_rollercoaster",
-		"webvr_stereo_pano",
-		"webvr_video"
+		"webvr_shadow",
+		"webvr_video",
+		"webvr_vive"
 	],
 	"css3d": [
 		"css3d_molecules",

@@ -5,9 +5,15 @@
 
 var WEBVR = {
 
+	isLatestAvailable: function () {
+
+		return navigator.getVRDisplays !== undefined;
+
+	},
+
 	isAvailable: function () {
 
-		return navigator.getVRDisplays;
+		return navigator.getVRDisplays !== undefined || navigator.getVRDevices !== undefined;
 
 	},
 
@@ -51,7 +57,7 @@ var WEBVR = {
 			error.style.backgroundColor = '#fff';
 			error.style.color = '#000';
 			error.style.padding = '10px 20px';
-			error.style.margin = '40px';
+			error.style.margin = '50px';
 			error.style.display = 'inline-block';
 			error.innerHTML = message;
 			container.appendChild( error );
