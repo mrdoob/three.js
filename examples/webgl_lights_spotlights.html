@@ -64,9 +64,9 @@
 			var mshFloor = new THREE.Mesh(geoFloor, matFloor);
 			var mshBox = new THREE.Mesh(geoBox, matBox);
 			var amb = new THREE.AmbientLight(0x121422);
-			var spt1 = createSpotlight( { color: 0xFF7F00, angle:0.3 } );
-			var spt2 = createSpotlight( { color: 0x00FF7F, angle:0.3 } );
-			var spt3 = createSpotlight( { color: 0x7F00FF, angle:0.3 } );
+			var spt1 = createSpotlight( 0xFF7F00 );
+			var spt2 = createSpotlight( 0x00FF7F );
+			var spt3 = createSpotlight( 0x7F00FF );
 			var lightHelper1, lightHelper2, lightHelper3;
 			var ray = new THREE.Raycaster();
 			var mouseDown = new THREE.Vector2();
@@ -127,20 +127,15 @@
 				orb.update();
 			};
 
-			function createSpotlight( object ) {
-				var newObj = new THREE.SpotLight(object.color || 0xFFFFFF);
-				newObj.castShadow = object.castShadow || true;
-				newObj.angle = object.angle || 0.777;
-				newObj.exponent = object.exponent || 2.0;
-				newObj.penumbra = object.penumbra || 0.2;
-				newObj.decay = object.decay || 10;
-				newObj.distance = object.distance || 0.0;
-				newObj.shadow.mapSize.width = object.shadowWidth || 2048;
-				newObj.shadow.mapSize.height = object.shadowHeight || 2048;
-				// shadow camera helper
-				newObj.shadowCameraHelper = new THREE.CameraHelper( newObj.shadow.camera ); // colored lines
-				newObj.shadow.camera.near = 0.1;
-				newObj.shadow.camera.far = 20000;
+			function createSpotlight( color ) {
+				var newObj = new THREE.SpotLight( color, 2 );
+				newObj.castShadow = true;
+				newObj.angle = 0.3;
+				newObj.penumbra = 0.2;
+				newObj.decay = 2;
+				newObj.distance = 50;
+				newObj.shadow.mapSize.width = 1024;
+				newObj.shadow.mapSize.height = 1024;
 
 				return newObj;
 			};
@@ -174,9 +169,6 @@
 				if ( lightHelper1 ) lightHelper1.update();
 				if ( lightHelper2 ) lightHelper2.update();
 				if ( lightHelper3 ) lightHelper3.update();
-				if ( spt1.shadowCameraHelper ) spt1.shadowCameraHelper.update();
-				if ( spt2.shadowCameraHelper ) spt2.shadowCameraHelper.update();
-				if ( spt3.shadowCameraHelper ) spt3.shadowCameraHelper.update();
 
 				rnd.render(scn, cam);
 

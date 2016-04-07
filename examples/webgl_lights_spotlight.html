@@ -89,8 +89,8 @@
 				spt.penumbra = 0.05;
 				spt.decay = 2;
 				spt.distance = 500;
-				spt.shadow.mapSize.width = 8192;
-				spt.shadow.mapSize.height = 8192;
+				spt.shadow.mapSize.width = 1024;
+				spt.shadow.mapSize.height = 1024;
 				// shadow camera helper
 				spt.shadowCameraHelper = new THREE.CameraHelper( spt.shadow.camera ); // colored lines
 				spt.shadow.camera.near = 0.1;
@@ -150,7 +150,7 @@
 				gStyle.position = "absolute";
 				gStyle.top = "48px";
 				gStyle.height = "220px";
-				
+
 				gui.open();
 			}
 
@@ -220,7 +220,7 @@
 				if( event.type === 'mousedown' ) {
 
 					mouseDown.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
-					
+
 					mouseDown.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
 
 				}
@@ -243,7 +243,7 @@
 							else found[0].object.material.color.set( 0xffffff );
 
 							render();
-							
+
 						}
 
 					}
