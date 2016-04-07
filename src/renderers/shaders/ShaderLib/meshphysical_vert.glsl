@@ -19,6 +19,7 @@ varying vec3 vViewPosition;
 #include <shadowmap_pars_vertex>
 #include <specularmap_pars_fragment>
 #include <logdepthbuf_pars_vertex>
+#include <clipping_planes_pars_vertex>
 
 void main() {
 
@@ -44,6 +45,7 @@ void main() {
 	#include <skinning_vertex>
 	#include <project_vertex>
 	#include <logdepthbuf_vertex>
+	#include <clipping_planes_vertex>
 
 	vViewPosition = - mvPosition.xyz;
 
