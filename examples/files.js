@@ -60,6 +60,8 @@ var files = {
 		"webgl_lights_physical",
 		"webgl_lights_pointlights",
 		"webgl_lights_pointlights2",
+		"webgl_lights_spotlight",
+		"webgl_lights_spotlights",
 		"webgl_lines_colors",
 		"webgl_lines_cubes",
 		"webgl_lines_dashed",
@@ -240,7 +242,8 @@ var files = {
 		"webvr_panorama",
 		"webvr_rollercoaster",
 		"webvr_shadow",
-		"webvr_video"
+		"webvr_video",
+		"webvr_vive"
 	],
 	"css3d": [
 		"css3d_molecules",
