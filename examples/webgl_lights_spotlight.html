@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - lights - spot light</title>
+		<title>three.js webgl - lights - single spot light</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
+
 			body {
 				background-color: #000;
 				margin: 0;
@@ -30,15 +31,16 @@
 			a:hover {
 				color: #0080ff;
 			}
+
 		</style>
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Spot Light Demonstration - by
-			<a href="http://master-domain.com" target="_blank">Master James</a><br />
-			<div style="font-size:10px;">The angle, penumbra and other properties are explored. Ctrl-Click sets color White. Right-Click or 3 fingers to drag.</div>
+		<a href="http://threejs.org" target="_blank">three.js</a> - Spot Light Demonstration - by
+		<a href="http://master-domain.com" target="_blank">Master James</a><br />
+		<div style="font-size:10px;">The angle, penumbra and other properties are explored. Ctrl-Click sets color White. Right-Click or 3 fingers to drag.</div>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -62,7 +64,7 @@
 			var geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
 			var geoBox = new THREE.BoxGeometry( Math.PI, Math.sqrt( 2 ), Math.E );
 			var mshFloor = new THREE.Mesh( geoFloor, matFloor );
-			var mshBox = new THREE.Mesh( geoBox, matBox );
+			var meshBox = new THREE.Mesh( geoBox, matBox );
 			var ambientLight = new THREE.AmbientLight( 0x090A1A );
 			var spotLight = new THREE.SpotLight( 0xFFFFFF );
 			var lightHelper;
@@ -70,10 +72,12 @@
 			var mouse = new THREE.Vector2();
 			var mouseTime, mouseDown = new THREE.Vector2();
 
-			var gui, guiHeight = 250, param = { color: '0xffffff' };
-			var guiMapSize, autoMapSize = true;
+			var gui, guiHeight = 310, param = { color: '0xffffff' };
+			var guiDoubleMaxSize, guiAngle, guiMapSize;
+			var doubleMaxSize = false, autoMapSize = true;
 
 			function init () {
+
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.gammaInput = true;
@@ -82,18 +86,19 @@
 				renderer.domElement.addEventListener( 'mousedown', onDocumentClick );
 				renderer.domElement.addEventListener( 'mouseup', onDocumentClick );
 
-				camera.position.set( 52, 18, - 23 );
+				camera.position.set( 52, 28, 31 );
 
 				spotLight.position.set( 15, 40, 35 );
 				spotLight.castShadow = true;
 				spotLight.angle = 0.45;
 				spotLight.exponent = 2.0;
-				spotLight.penumbra = 0.06;
+				spotLight.penumbra = 0.1;
 				spotLight.decay = 2.0;
 				spotLight.distance = 500;
 				var mapSize = spotLight.shadow.mapSize;
-				if ( isMobile === true ) mapSize.width = mapSize.height = maxMapSize / 2;
-				else mapSize.width = mapSize.height = maxMapSize;
+				if ( isMobile === true ) mapSize.width = ( maxMapSize / 2 );
+				else mapSize.width = maxMapSize;
+				mapSize.height = mapSize.width;
 
 				var shadowCamera = spotLight.shadow.camera;
 				spotLight.shadowCameraHelper = new THREE.CameraHelper( shadowCamera ); // colored lines
@@ -108,13 +113,13 @@
 				mshFloor.receiveShadow = true;
 				mshFloor.position.set( 0, - 0.05, 0 );
 
-				mshBox.castShadow = true;
-				mshBox.receiveShadow = true;
-				mshBox.position.set( 23, 3, - 1.0 );
+				meshBox.castShadow = true;
+				meshBox.receiveShadow = true;
+				meshBox.position.set( 21, 8, - 1.0 );
 
 				scene.add( camera );
 				scene.add( mshFloor );
-				scene.add( mshBox );
+				scene.add( meshBox );
 				scene.add( ambientLight );
 				scene.add( spotLight );
 				scene.add( spotLight.shadowCameraHelper );
@@ -134,15 +139,20 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				camera.aspect = ( window.innerWidth / window.innerHeight );
 				camera.updateProjectionMatrix();
-				orbitControls.target = mshBox.position;
+				orbitControls.target = meshBox.position;
 				render();
 			}
 
 			function render () {
-				lightHelper.update(); // required
+
+				lightHelper.update();
+
 				if ( spotLight.shadowCameraHelper ) spotLight.shadowCameraHelper.update();
 
 				renderer.render( scene, camera );
+
+				checkForErrorAndAdjust();
+
 			}
 
 			function clearGui () {
@@ -170,12 +180,13 @@
 
 						var gStyle = gui.domElement.style;
 
-						var nextValue = (window.innerHeight - 36) + "px";
+						var nextValue = ( window.innerHeight - 24 ) + "px";
 
-						if ( gStyle.top === nextValue ) nextValue = (window.innerHeight - 256) + "px";
+						if ( gStyle.top === nextValue ) nextValue = (window.innerHeight - guiHeight) + "px";
 
 						gStyle.top = nextValue;
 					} );
+
 				}
 
 				gStyle.position = "absolute";
@@ -201,21 +212,23 @@
 					render();
 				}, false, 0, 1000 );
 
-				addGui( 'angle', spotLight.angle, function ( val ) {
+				guiAngle = addGui( 'angle', spotLight.angle, function ( val ) {
 					if ( val < 0.001 ) val = 0.001;
 					spotLight.angle = val;
 					if ( autoMapSize === true ) setMapSize( spotLight, val, guiMapSize );
 					render();
-				}, false, 0, 1.56 );
+				}, false, 0, 1.54 );
 
 				addGui( 'autoMapSize', autoMapSize ).onChange( function ( val ) {
 					autoMapSize = ! ! val;
 				}, false );
 
+				guiDoubleMaxSize = addGui( 'doubleMaxSize', doubleMaxSize ).onChange( changeDoubleMaxSize, false );
+
 				guiMapSize = addGui( 'mapSize', spotLight.shadow.mapSize.width, function ( val, node, min, max, step ) {
-					setMapSize( spotLight, val, undefined, min, max, step );
+					setMapSize( spotLight, val, guiMapSize, min, max, step );
 					render();
-				}, false, 128, maxMapSize, 128 );
+				}, false, 256, ( maxMapSize * 2 ), 128 );
 
 				addGui( 'penumbra', spotLight.penumbra, function ( val ) {
 					spotLight.penumbra = val;
@@ -231,11 +244,21 @@
 
 			}
 
+			function changeDoubleMaxSize( val ) {
+
+				doubleMaxSize = ! ! val;
+
+				setMapSize( spotLight, spotLight.angle, guiMapSize );
+
+				render();
+
+			}
+
 			function setGuiHeight() {
 
 				var gStyle = gui.domElement.style;
 
-				guiHeight = ( ( gui.domElement.children[ 1 ].childElementCount + 1 ) * 32 );
+				guiHeight = ( ( gui.domElement.children[ 1 ].childElementCount + 1 ) * 30 );
 
 				gStyle.height = ( guiHeight + "px" );
 
@@ -243,24 +266,98 @@
 
 			}
 
-			function setMapSize ( light, val, node, min, max, step ) {
-				if ( light.shadow.mapSize.width !== val ) {
-					if ( min === undefined ) min = node.object.min || 128;
-					if ( max === undefined ) max = node.object.max || maxMapSize;
-					if ( step === undefined ) step = node.object.step || 128;
-					var mapSize = light.shadow.mapSize;
-					if ( autoMapSize === true ) val = ( ( Math.pow( val, 1.9 ) + 0.04 ) * ( maxMapSize / 2 ) );
+			function setMapSize ( light, val, node, min, max, step, error ) {
+
+				var calcMapSize, mapSize = light.shadow.mapSize;
+
+				if ( mapSize.width !== val ) {
+
+					if ( light.shadow.map !== null ) {
+
+						light.shadow.map.dispose();
+
+						light.shadow.map = null;
+
+					}
+
+					if( node !== undefined ) {
+
+						if ( min === undefined ) min = node.__min || 256;
+
+						if ( max === undefined ) max = node.__max || ( maxMapSize * 2 );
+
+						if ( step === undefined ) step = node.__step || 128;
+
+					}
+
+					if( doubleMaxSize === true ) calcMapSize = ( maxMapSize * 2 );
+					else calcMapSize = maxMapSize;
+
+					if ( val > calcMapSize ) {
+
+						val = calcMapSize;
+
+						if( node !== undefined ) node.setValue( calcMapSize );
+
+					}
+
+					if ( ( autoMapSize === true || error === true ) && val < 2 ) val = (( Math.pow( val, 1.6 ) + 0.02) * ( calcMapSize / 2) );
+
 					if ( min > 1 && val < min ) val = min;
+
 					else if ( max > 1 && val > max ) val = max;
+
 					if ( step > 1 ) val = val - (val % step);
+
 					mapSize.width = mapSize.height = val;
-					if( node !== undefined && autoMapSize === true ) node.setValue( mapSize.width );
+
+					if( node !== undefined && ( autoMapSize === true || error === true ) ) node.setValue( mapSize.width );
+
 				}
+
+			}
+
+			function checkForErrorAndAdjust () {
+
+				var context = renderer.getContext();
+
+				if( context !== undefined ) {
+
+					var error = context.getError();
+
+					if( error > 0 ) {
+
+						if(error === 1281) {
+
+							console.log("checkForErrorAndAdjust - GL Error:1281=GL_INVALID_VALUE Map Size to high, adjusting.");
+
+							alert("GL_INVALID_VALUE: map size too large, adjusting!");
+
+							if( doubleMaxSize === true ) guiDoubleMaxSize.setValue( false );
+							else guiAngle.setValue( spotLight.angle * 0.9 );
+
+							setMapSize( spotLight, spotLight.angle, guiMapSize, undefined, undefined, undefined, true );
+
+						}
+
+						else {
+
+							console.log("checkForErrorAndAdjust - detected GL Context Alert! Error:#" + error );
+
+						}
+
+					}
+
+				}
+
 			}
 
 			function addGui ( name, value, callback, isColor, min, max, step ) {
+
 				var node;
+
 				param[ name ] = value;
+
 				if ( isColor ) {
 					node = gui.addColor( param, name ).onChange( function () {
 
@@ -270,6 +367,7 @@
 
 				}
 				else if ( typeof value == 'object' ) {
+
 					node = gui.add( param, name, min, max, step ).onChange( function () {
 
 						callback( param[ name ], node, min, max, step );
@@ -278,6 +376,7 @@
 
 				}
 				else {
+
 					node = gui.add( param, name, min, max, step ).onChange( function () {
 
 						callback( param[ name ], node, min, max, step );
@@ -309,11 +408,11 @@
 					mouse.y = - ( event.clientY / rendererDom.clientHeight ) * 2 + 1;
 
 					if ( mouseDown.distanceTo( mouse ) < 0.0075 &&
-							( new Date().getTime() - 333 ) < mouseTime.getTime() ) {
+						( new Date().getTime() - 333 ) < mouseTime.getTime() ) {
 
 						raycaster.setFromCamera( mouse, camera );
 
-						var found = raycaster.intersectObjects( [ mshBox, mshFloor ] );
+						var found = raycaster.intersectObjects( [ meshBox, mshFloor ] );
 
 						if ( found.length > 0 ) {
 
