@@ -70,7 +70,7 @@
 			var mouse = new THREE.Vector2();
 			var mouseTime, mouseDown = new THREE.Vector2();
 
-			var gui, param = { color: '0xffffff' };
+			var gui, guiHeight = 250, param = { color: '0xffffff' };
 			var guiMapSize, autoMapSize = true;
 
 			function init () {
@@ -146,23 +146,34 @@
 			}
 
 			function clearGui () {
+
 				if ( gui ) gui.destroy();
 
 				gui = new dat.GUI();
 
 				var gStyle = gui.domElement.style;
 
-				if ( window.innerWidth < 580 ) {
-					gui.width = 172;
-					gStyle.top = "72px";
+				if ( window.innerWidth < 580 || isMobile === true ) {
+
+					gui.width = 185;
+
+					gStyle.top = "70px";
+
+					gui.close();
+
 				}
 				else {
+
 					gui.width = 200;
 
 					gui.__closeButton.addEventListener( 'click', function () {
+
 						var gStyle = gui.domElement.style;
+
 						var nextValue = (window.innerHeight - 36) + "px";
+
 						if ( gStyle.top === nextValue ) nextValue = (window.innerHeight - 256) + "px";
+
 						gStyle.top = nextValue;
 					} );
 				}
@@ -216,12 +227,19 @@
 					render();
 				}, false, 0, 40 );
 
+				setGuiHeight();
+
+			}
+
+			function setGuiHeight() {
+
 				var gStyle = gui.domElement.style;
 
-				var howHigh = ( gui.domElement.children[ 1 ].childElementCount * 32 );
-				gStyle.height = ( howHigh + "px" );
+				guiHeight = ( ( gui.domElement.children[ 1 ].childElementCount + 1 ) * 32 );
 
-				if ( window.innerWidth > 579 ) gStyle.top = (window.innerHeight - howHigh) + "px";
+				gStyle.height = ( guiHeight + "px" );
+
+				if ( window.innerWidth > 579 ) gStyle.top = (window.innerHeight - guiHeight) + "px";
 
 			}
 
