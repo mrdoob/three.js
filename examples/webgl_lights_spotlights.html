@@ -213,34 +213,44 @@
 				renderer.render( scene, camera );
 
 				requestAnimationFrame( render );
-				
+
 			}
 
 			function clearGui () {
+
 				if ( gui ) gui.destroy();
 
 				gui = new dat.GUI();
 
 				var gStyle = gui.domElement.style;
 
-				if ( window.innerWidth < 580 ) {
-					gui.width = 165;
-					gStyle.top = "58px";
+				if ( window.innerWidth < 580 || isMobile === true ) {
+
+					gui.width = 185;
+
+					gStyle.top = "70px";
+
 					gui.close();
+
 				}
 				else {
-					gui.width = 200;
+					gui.width = 215;
 
 					gui.__closeButton.addEventListener( 'click', function () {
+
 						var gStyle = gui.domElement.style;
+
 						var nextValue = ( window.innerHeight - 36 ) + "px";
+
 						if ( gStyle.top === nextValue ) nextValue = ( window.innerHeight - guiHeight ) + "px";
+
 						gStyle.top = nextValue;
 					} );
 				}
 
 				gStyle.position = "absolute";
-				gStyle.height = "220px";
+
+				gStyle.height = "210px";
 
 			}
 
@@ -277,7 +287,7 @@
 
 				var gStyle = gui.domElement.style;
 
-				guiHeight = ( ( gui.domElement.children[ 1 ].childElementCount + 1 ) * 32 );
+				guiHeight = ( ( gui.domElement.children[ 1 ].childElementCount + 1 ) * 34 );
 
 				gStyle.height = ( guiHeight + "px" );
 
@@ -346,6 +356,7 @@
 						callback( param[ name ], node, min, max, step );
 
 					} );
+
 				}
 
 				return node;
