@@ -41,11 +41,6 @@ void main() {
 
 		transformedDepth = viewZToInvClipZ( vViewZDepth, mNear, mFar );
 
-	#else
-
-		gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
-		return;
-
 	#endif
 
 	#if DEPTH_PACKING == 3200
@@ -55,10 +50,6 @@ void main() {
 	#elif DEPTH_PACKING == 3201
 
 		gl_FragColor = packLinearUnitToRGBA( transformedDepth );
-
-	#else
-
-		gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
 
 	#endif
 
