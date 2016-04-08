@@ -164,11 +164,10 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				var renderPass = new THREE.RenderPass( scene, camera );
 
 				// Setup depth pass
-				var depthShader = THREE.ShaderLib[ "clipZRGBA" ];
-				var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
-
-				depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader,
-					uniforms: depthUniforms, blending: THREE.NoBlending } );
+				depthMaterial = new THREE.MeshDepthMaterial();
+				depthMaterial.depthFormat = THREE.AutoDepthFormat;
+				depthMaterial.depthPacking = THREE.RGBADepthPacking;
+				depthMaterial.blending = THREE.NoBlending;
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
 				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
