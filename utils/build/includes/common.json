@@ -207,8 +207,6 @@
 	"src/renderers/shaders/ShaderChunk/worldpos_vertex.glsl",
 	"src/renderers/shaders/UniformsUtils.js",
 	"src/renderers/shaders/UniformsLib.js",
-	"src/renderers/shaders/ShaderLib/clipZRGBA_frag.glsl",
-	"src/renderers/shaders/ShaderLib/clipZRGBA_vert.glsl",
 	"src/renderers/shaders/ShaderLib/cube_frag.glsl",
 	"src/renderers/shaders/ShaderLib/cube_vert.glsl",
 	"src/renderers/shaders/ShaderLib/depth_frag.glsl",

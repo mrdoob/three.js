@@ -227,28 +227,6 @@ THREE.ShaderLib = {
 
 	},
 
-	/* Depth encoding into RGBA texture
-	 *
-	 * based on SpiderGL shadow map example
-	 * http://spidergl.org/example.php?id=6
-	 *
-	 * originally from
-	 * http://www.gamedev.net/topic/442138-packing-a-float-into-a-a8r8g8b8-texture-shader/page__whichpage__1%25EF%25BF%25BD
-	 *
-	 * see also
-	 * http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
-	 */
-
-	'clipZRGBA': {
-
-		uniforms: {},
-
-		vertexShader: THREE.ShaderChunk[ 'clipZRGBA_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'clipZRGBA_frag' ]
-
-	},
-
-
 	'distanceRGBA': {
 
 		uniforms: {
