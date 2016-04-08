@@ -10,26 +10,27 @@ THREE.DepthRGBAUnpackedShader = {
 	vertexShader: THREE.ShaderChunk[ 'depth_vert' ],
 
 	fragmentShader: [
-    "#include <common>",
-    "#include <packing>",
-    "#include <logdepthbuf_pars_fragment>",
+		"#include <common>",
+		"#include <packing>",
+		"#include <logdepthbuf_pars_fragment>",
 
-    "void main() {",
+		"void main() {",
 
-      "#include <logdepthbuf_fragment>",
+			"#include <logdepthbuf_fragment>",
 
-      "#ifdef USE_LOGDEPTHBUF_EXT",
+			"#ifdef USE_LOGDEPTHBUF_EXT",
 
-    		"float depth = gl_FragDepthEXT;",
+				"float depth = gl_FragDepthEXT;",
 
-    	"#else",
+			"#else",
 
-    		"float depth = gl_FragCoord.z;",
+				"float depth = gl_FragCoord.z;",
 
-      "#endif",
+			"#endif",
 
-    	 "gl_FragColor = vec4( vec3( unpackRGBAToLinearUnit( packLinearUnitToRGBA( depth ) ) ), 1.0 );",
+			"gl_FragColor = vec4( vec3( unpackRGBAToLinearUnit( packLinearUnitToRGBA( depth ) ) ), 1.0 );",
 
-      "}" ].join( "\n" )
+		"}"
+		].join( "\n" )
 
 };
