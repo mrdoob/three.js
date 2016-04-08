@@ -46,6 +46,11 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	// init
 
+	var depthMaterialTemplate = new THREE.MeshDepthMaterial();
+	depthMaterialTemplate.depthFormat = THREE.AutoDepthFormat;
+	depthMaterialTemplate.depthPacking = THREE.RGBADepthPacking;
+	depthMaterialTemplate.clipping = true;
+
 	var distanceShader = THREE.ShaderLib[ "distanceRGBA" ];
 	var distanceUniforms = THREE.UniformsUtils.clone( distanceShader.uniforms );
 
@@ -54,12 +59,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var useMorphing = ( i & _MorphingFlag ) !== 0;
 		var useSkinning = ( i & _SkinningFlag ) !== 0;
 
-		var depthMaterial = new THREE.MeshDepthMaterial();
-		depthMaterial.depthPacking = THREE.AutoDepthFormat;
-		depthMaterial.depthFormat = THREE.RGBADepthPacking;
+		var depthMaterial = depthMaterialTemplate.clone();
 		depthMaterial.morphTargets = useMorphing;
 		depthMaterial.skinning = useSkinning;
-		depthMaterial.clipping = true;
 
 		_depthMaterials[ i ] = depthMaterial;
 
