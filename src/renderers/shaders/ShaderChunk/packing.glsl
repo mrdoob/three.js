@@ -20,7 +20,7 @@ float unpackRGBAToLinearUnit( const in vec4 rgba ) {
 }
 
 // NOTE: viewZ/eyeZ is < 0 when in front of the camera per OpenGL conventions
-// this transform is compatible with the built-in z buffer values created by a perspective camera
+
 float viewZToLinearClipZ( const in float viewZ, const in float near, const in float far ) {
   return ( viewZ + near ) / ( near - far );
 }
@@ -28,8 +28,6 @@ float linearClipZToViewZ( const in float linearClipZ, const in float near, const
   return linearClipZ * ( near - far ) - near;
 }
 
-// NOTE: viewZ/eyeZ is < 0 when in front of the camera per OpenGL conventions
-// this transform is compatible with the build-in z-buffer values created by a perspective camera
 float viewZToInvClipZ( const in float viewZ, const in float near, const in float far ) {
   return (( near + viewZ ) * far ) / (( far - near ) * viewZ );
 }
