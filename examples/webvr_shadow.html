@@ -20,7 +20,9 @@
 		<script src="js/effects/VREffect.js"></script>
 		<script>
 
-			if ( WEBVR.isLatestAvailable() === false ) {
+			var vrMsg = WEBVR.getMessage();
+
+			if ( vrMsg ) {
 
 				document.body.appendChild( WEBVR.getMessage() );
 

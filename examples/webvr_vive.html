@@ -29,7 +29,9 @@
 
 		<script>
 
-			if ( WEBVR.isLatestAvailable() === false ) {
+			var vrMsg = WEBVR.getMessage();
+
+			if ( vrMsg ) {
 
 				document.body.appendChild( WEBVR.getMessage() );
 
