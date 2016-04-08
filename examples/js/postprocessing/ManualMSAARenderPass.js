@@ -12,6 +12,8 @@
 
 THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 
+	THREE.Pass.call( this );
+
 	this.scene = scene;
 	this.camera = camera;
 
@@ -20,9 +22,6 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 	this.params = params || { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
 	this.params.minFilter = THREE.NearestFilter;
 	this.params.maxFilter = THREE.NearestFilter;
-	this.enabled = true;
-
-	this.needsSwap = true;
 
 	if ( THREE.CompositeShader === undefined ) {
 
@@ -57,6 +56,8 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 
 };
 
+THREE.ManualMSAARenderPass.prototype = Object.create( THREE.Pass.prototype );
+
 THREE.ManualMSAARenderPass.prototype = {
 
 	constructor: THREE.ManualMSAARenderPass,
@@ -79,7 +80,7 @@ THREE.ManualMSAARenderPass.prototype = {
 
 	},
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		var camera = ( this.camera || this.scene.camera );
 		var jitterOffsets = THREE.ManualMSAARenderPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];

@@ -3,7 +3,7 @@
 	<head>
 		<title>three.js webvr - video</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<style>
 			body {
 				font-family: Monospace;
@@ -74,7 +74,8 @@
 				video.play();
 
 				texture = new THREE.VideoTexture( video );
-				texture.minFilter = THREE.LinearFilter;
+				texture.minFilter = THREE.NearestFilter;
+				texture.maxFilter = THREE.NearestFilter;
 				texture.format = THREE.RGBFormat;
 				texture.generateMipmaps = false;
 
