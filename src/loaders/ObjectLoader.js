@@ -466,8 +466,21 @@ THREE.ObjectLoader.prototype = {
 
 				case 'PerspectiveCamera':
 
-					object = Object.assign(
-							new THREE.PerspectiveCamera(), data );
+					object = new THREE.PerspectiveCamera(
+							data.fov, data.aspect, data.near, data.far );
+
+					if ( data.focus !== undefined ) object.focus = data.focus;
+					if ( data.zoom !== undefined ) object.zoom = data.zoom;
+
+					if ( data.filmGauge !== undefined ) {
+
+						if ( data.view !== null )
+							object.view = Object.assign( {}, data.view );
+
+						object.filmGauge = data.filmGauge;
+						object.filmOffset = data.filmOffset;
+
+					}
 
 					break;
 
