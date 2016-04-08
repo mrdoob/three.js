@@ -21,17 +21,19 @@ var WEBVR = {
 
 		var message;
 
+		function gotDisplays ( displays ) {
+
+			if ( displays.length === 0 ) message = 'WebVR supported, but no displays found.';
+
+		}
+
 		if ( navigator.getVRDisplays ) {
 
-			navigator.getVRDisplays().then( function ( displays ) {
-
-				if ( displays.length === 0 ) message = 'WebVR supported, but no VRDisplays found.';
-
-			} );
+			navigator.getVRDisplays().then( gotDisplays );
 
 		} else if ( navigator.getVRDevices ) {
 
-			message = 'Your browser supports WebVR but not the latest version. See <a href="http://webvr.info">webvr.info</a> for more info.';
+			navigator.getVRDevices().then( gotDisplays );
 
 		} else {
 
