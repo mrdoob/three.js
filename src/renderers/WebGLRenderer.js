@@ -245,6 +245,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	var _isWebGL2 = (typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext);
 	var extensions = new THREE.WebGLExtensions( _gl );
 
 	extensions.get( 'OES_texture_float' );
@@ -627,6 +628,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.deleteFramebuffer( renderTargetProperties.__webglFramebuffer );
 			_gl.deleteRenderbuffer( renderTargetProperties.__webglDepthbuffer );
 
+		}
+		
+		if ( renderTargetProperties.__webglMSAAFramebuffer ) {
+			_gl.deleteFramebuffer( renderTargetProperties.__webglMSAAFramebuffer );
+		}
+
+		if ( renderTargetProperties.__webglMSAAColorbuffer ) {
+			_gl.deleteRenderbuffer( renderTargetProperties.__webglMSAAColorbuffer );
+		}
+
+		if ( renderTargetProperties.__webglMSAADepthbuffer ) {
+			_gl.deleteRenderbuffer( renderTargetProperties.__webglMSAADepthbuffer );
 		}
 
 		properties.delete( renderTarget.texture );
@@ -1276,6 +1289,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 					texture.minFilter !== THREE.LinearFilter ) {
 
 				updateRenderTargetMipmap( renderTarget );
+
+			}
+
+			var msaaSamples = getRenderTargetSamples( renderTarget );
+
+			if ( msaaSamples ) {
+
+				var renderTargetProperties = properties.get( renderTarget );
+				_gl.bindFramebuffer( _gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMSAAFramebuffer );
+				_gl.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+				
+				var width = renderTarget.width;
+				var height = renderTarget.height;
+				var mask = _gl.COLOR_BUFFER_BIT;
+				if ( renderTarget.depthBuffer ) mask |= _gl.DEPTH_BUFFER_BIT;
+				if ( renderTarget.stencilBuffer ) mask |= _gl.STENCIL_BUFFER_BIT;
+				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST );
 
 			}
 
@@ -3446,11 +3476,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// Render targets
 
 	// Setup storage for target texture and bind it to correct framebuffer
-	function setupFrameBufferTexture ( framebuffer, renderTarget, attachment, textureTarget ) {
+	function setupFrameBufferTexture ( framebuffer, renderTarget, attachment, textureTarget, internalFormat ) {
 
 		var glFormat = paramThreeToGL( renderTarget.texture.format );
 		var glType = paramThreeToGL( renderTarget.texture.type );
-		state.texImage2D( textureTarget, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
+		state.texImage2D( textureTarget, 0, internalFormat || glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
@@ -3458,24 +3488,37 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
-	function setupRenderBufferStorage ( renderbuffer, renderTarget ) {
+	function setupRenderBufferStorage ( renderbuffer, renderTarget, samples, internalColorFormat ) {
 
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
 
 		if ( renderTarget.depthBuffer && ! renderTarget.stencilBuffer ) {
 
-			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTarget.width, renderTarget.height );
+			if ( samples ) {
+				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, _gl.DEPTH_COMPONENT16, renderTarget.width, renderTarget.height );
+			} else {
+				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTarget.width, renderTarget.height );
+			}
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
 
 		} else if ( renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
 
-			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
+			if ( samples ) {
+				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
+			} else {
+				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
+			}
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
 
 		} else {
+			internalColorFormat = internalColorFormat || _gl.RGBA4;
 
 			// FIXME: We don't support !depth !stencil
-			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.RGBA4, renderTarget.width, renderTarget.height );
+			if ( samples ) {
+				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, internalColorFormat, renderTarget.width, renderTarget.height );
+			} else {
+				_gl.renderbufferStorage( _gl.RENDERBUFFER, internalColorFormat, renderTarget.width, renderTarget.height );
+			}
 
 		}
 
@@ -3484,7 +3527,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	// Setup GL resources for a non-texture depth buffer
-	function setupDepthRenderbuffer( renderTarget ) {
+	function setupDepthRenderbuffer( renderTarget, samples, internalColorFormat ) {
 
 		var renderTargetProperties = properties.get( renderTarget );
 
@@ -3498,7 +3541,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
 				renderTargetProperties.__webglDepthbuffer[ i ] = _gl.createRenderbuffer();
-				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget );
+				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget, samples, internalColorFormat );
 
 			}
 
@@ -3506,11 +3549,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 			renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
-			setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget );
+			setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget, samples, internalColorFormat );
 
 		}
 
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+
+	}
+
+	function getRenderTargetSamples ( renderTarget ) {
+
+		return ( _isWebGL2 && renderTarget instanceof THREE.WebGLMultisampleRenderTarget )
+			? Math.min( capabilities.maxSamples, renderTarget.samples )
+			: 0;
 
 	}
 
@@ -3519,6 +3570,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var renderTargetProperties = properties.get( renderTarget );
 		var textureProperties = properties.get( renderTarget.texture );
+		var msaaSamples = getRenderTargetSamples( renderTarget );
 
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
@@ -3547,7 +3599,41 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// Setup color buffer
+		var internalFormat; // let it default to glFormat unless MSAA is enabled
+
+		// The WebGLMultisampleRenderTarget internally contains
+		// a color + depth renderbuffer. The render target holds
+		// a 0-sample texture FBO which the MSAA blits to.
+		if ( msaaSamples ) {
+
+			renderTargetProperties.__webglMSAAFramebuffer = _gl.createFramebuffer();
+			renderTargetProperties.__webglMSAAColorbuffer = _gl.createRenderbuffer();
+
+			// Ensure internalFormat is correct
+			if ( renderTarget.texture.format === THREE.RGBAFormat ) internalFormat = _gl.RGBA8;
+			else if ( renderTarget.texture.format === THREE.RGBFormat ) internalFormat = _gl.RGB8;
+			else throw new Error( 'WebGLMultisampleRenderTarget only supports RGBFormat and RGBAFormat' );
+
+			// Our MSAA FBO
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMSAAFramebuffer );
+
+			// Setup MSAA color render buffer
+			_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderTargetProperties.__webglMSAAColorbuffer );
+			_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, msaaSamples, internalFormat, renderTarget.width, renderTarget.height );
+			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.RENDERBUFFER, renderTargetProperties.__webglMSAAColorbuffer );
+
+			// Setup MSAA depth render buffer
+			if ( renderTarget.depthBuffer ) {
+
+				renderTargetProperties.__webglMSAADepthbuffer = _gl.createRenderbuffer();
+				setupRenderBufferStorage( renderTargetProperties.__webglMSAADepthbuffer, renderTarget, msaaSamples, internalFormat );
+
+			}
+
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+		}
+
+		// Setup texture
 
 		if ( isCube ) {
 
@@ -3567,7 +3653,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
 			setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
-			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
+			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, internalFormat );
 
 			if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
 			state.bindTexture( _gl.TEXTURE_2D, null );
@@ -3578,7 +3664,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( renderTarget.depthBuffer ) {
 
-			setupDepthRenderbuffer( renderTarget );
+			// We specify 0 samples here because the MSAA FBO has its own renderbuffers.
+			setupDepthRenderbuffer( renderTarget, 0, internalFormat );
 
 		}
 
@@ -3601,13 +3688,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
+		var msaaSamples = getRenderTargetSamples( renderTarget );
 		var framebuffer;
 
 		if ( renderTarget ) {
 
 			var renderTargetProperties = properties.get( renderTarget );
 
-			if ( isCube ) {
+			if ( msaaSamples ) {
+
+				framebuffer = renderTargetProperties.__webglMSAAFramebuffer;
+
+			} else if ( isCube ) {
 
 				framebuffer = renderTargetProperties.__webglFramebuffer[ renderTarget.activeCubeFace ];
 
