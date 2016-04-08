@@ -14,8 +14,23 @@ vec4 packLinearUnitToRGBA( const in float value ) {
 	res -= res.xxyz * bit_mask;
 	return res;
 }
-
 float unpackRGBAToLinearUnit( const in vec4 rgba ) {
 	const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
 	return dot( rgba, bitSh );
+}
+
+// NOTE: viewZ/eyeZ is < 0 when in front of the camera per OpenGL conventions
+
+float viewZToLinearClipZ( const in float viewZ, const in float near, const in float far ) {
+  return ( viewZ + near ) / ( near - far );
+}
+float linearClipZToViewZ( const in float linearClipZ, const in float near, const in float far ) {
+  return linearClipZ * ( near - far ) - near;
+}
+
+float viewZToInvClipZ( const in float viewZ, const in float near, const in float far ) {
+  return (( near + viewZ ) * far ) / (( far - near ) * viewZ );
+}
+float invClipZToViewZ( const in float invClipZ, const in float near, const in float far ) {
+  return ( near * far ) / ( ( near - far ) * invClipZ - far );
 }
