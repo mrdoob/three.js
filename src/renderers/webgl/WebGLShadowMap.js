@@ -57,14 +57,21 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var useMorphing = ( i & _MorphingFlag ) !== 0;
 		var useSkinning = ( i & _SkinningFlag ) !== 0;
 
-		var depthMaterial = new THREE.ShaderMaterial( {
+		var depthMaterial = new THREE.MeshDepthMaterial();
+		depthMaterial.depthPacking = THREE.AutoDepthFormat;
+		depthMaterial.depthPacking = THREE.RGBADepthPacking;
+		depthMaterial.morphTargets = useMorphing;
+		depthMaterial.skinning = useSkinning;
+		depthMaterial.clipping = true;
+		/*
+		ShaderMaterial( {
 			uniforms: depthUniforms,
 			vertexShader: depthShader.vertexShader,
 			fragmentShader: depthShader.fragmentShader,
 			morphTargets: useMorphing,
 			skinning: useSkinning,
 			clipping: true
-		} );
+		} );*/
 
 		_depthMaterials[ i ] = depthMaterial;
 

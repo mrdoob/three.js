@@ -426,6 +426,8 @@ THREE.WebGLProgram = ( function () {
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
+				parameters.depthFormat ? "#define DEPTH_FORMAT " + material.depthFormat : '',
+
 				'uniform mat4 modelMatrix;',
 				'uniform mat4 modelViewMatrix;',
 				'uniform mat4 projectionMatrix;',

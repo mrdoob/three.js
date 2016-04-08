@@ -16,7 +16,7 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	this.type = 'MeshDepthMaterial';
 
-	this.depthFormat = THREE.LinearClipZDepthFormat;
+	this.depthFormat = THREE.AutoDepthFormat;
 	this.depthPacking = THREE.LinearDepthPacking;
 
 	this.morphTargets = false;

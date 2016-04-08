@@ -1,8 +1,21 @@
-uniform float mNear;
-uniform float mFar;
-uniform float opacity;
+#if DEPTH_FORMAT != 3100
 
-varying float vViewZDepth;
+	uniform float mNear;
+	uniform float mFar;
+
+#endif
+
+#if DEPTH_PACKING == 3200
+
+	uniform float opacity;
+
+#endif
+
+#if DEPTH_FORMAT != 3100
+
+	varying float vViewZDepth;
+
+#endif
 
 #include <common>
 #include <packing>
@@ -16,11 +29,15 @@ void main() {
 
 	float transformedDepth = 0.0;
 
-	#if DEPTH_FORMAT == 3100
+	#if DEPTH_FORMAT == 3100 // AutoDepthFormat
+
+		transformedDepth = gl_FragCoord.z;
+
+	#elif DEPTH_FORMAT == 3101
 
 		transformedDepth = viewZToLinearClipZ( vViewZDepth, mNear, mFar );
 
-	#elif DEPTH_FORMAT == 3101
+	#elif DEPTH_FORMAT == 3102
 
 		transformedDepth = viewZToInvClipZ( vViewZDepth, mNear, mFar );
 

@@ -332,8 +332,9 @@ THREE.RGBDEncoding = 3006; // MaxRange is 256.
 
 // Depth format
 
-THREE.LinearClipZDepthFormat = 3100;	// used by orthographic cameras
-THREE.InvClipZDepthFormat = 3101;  // used by perspective cameras
+THREE.AutoDepthFormat = 3100;  // switches based on camera type, uses gl_FragCoord.z
+THREE.LinearClipZDepthFormat = 3101;	// used by orthographic cameras
+THREE.InvClipZDepthFormat = 3102;  // used by perspective cameras
 
 // Depth packing strategies
 

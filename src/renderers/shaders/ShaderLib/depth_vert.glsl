@@ -3,7 +3,11 @@
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
 
-varying float vViewZDepth;
+#if DEPTH_FORMAT != 3100
+
+	varying float vViewZDepth;
+
+#endif
 
 void main() {
 
@@ -13,6 +17,10 @@ void main() {
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>
 
-	vViewZDepth = mvPosition.z;
+	#if DEPTH_FORMAT != 3100
+
+		vViewZDepth = mvPosition.z;
+
+	#endif
 
 }
