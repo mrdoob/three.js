@@ -1,6 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
+ * @author bhouston / https://clara.io
  *
  * parameters = {
  *  opacity: <float>,
@@ -19,7 +20,9 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 	this.depthFormat = THREE.AutoDepthFormat;
 	this.depthPacking = THREE.LinearDepthPacking;
 
+	this.skinning = false;
 	this.morphTargets = false;
+
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
@@ -36,6 +39,9 @@ THREE.MeshDepthMaterial.prototype.copy = function ( source ) {
 
 	this.depthFormat = source.depthFormat;
 	this.depthPacking = source.depthPacking;
+
+	this.skinning = source.skinning;
+	this.morphTargets = source.morphTargets;
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
