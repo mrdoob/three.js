@@ -212,8 +212,6 @@
 	"src/renderers/shaders/ShaderLib/cube_vert.glsl",
 	"src/renderers/shaders/ShaderLib/depth_frag.glsl",
 	"src/renderers/shaders/ShaderLib/depth_vert.glsl",
-	"src/renderers/shaders/ShaderLib/depthRGBA_frag.glsl",
-	"src/renderers/shaders/ShaderLib/depthRGBA_vert.glsl",
 	"src/renderers/shaders/ShaderLib/distanceRGBA_frag.glsl",
 	"src/renderers/shaders/ShaderLib/distanceRGBA_vert.glsl",
 	"src/renderers/shaders/ShaderLib/equirect_frag.glsl",
