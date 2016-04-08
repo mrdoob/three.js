@@ -10,6 +10,7 @@ var files = {
 		"webgl_clipping",
 		"webgl_clipping_advanced",
 		"webgl_decals",
+		"webgl_depth_texture",
 		"webgl_effects_anaglyph",
 		"webgl_effects_parallaxbarrier",
 		"webgl_effects_peppersghost",
