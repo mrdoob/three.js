@@ -4,6 +4,11 @@
 #endif
 
 #ifdef USE_ENVMAP
+
+	#if ! defined( STANDARD ) && ( defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) )
+		varying vec3 vWorldPosition;
+	#endif
+
 	#ifdef ENVMAP_TYPE_CUBE
 		uniform samplerCube envMap;
 	#else
@@ -12,13 +17,9 @@
 	uniform float flipEnvMap;
 
 	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( STANDARD )
-
 		uniform float refractionRatio;
-
 	#else
-
 		varying vec3 vReflect;
-
 	#endif
 
 #endif

@@ -75,6 +75,8 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 	this.fog = true;
 
+	this.blending = THREE.NormalBlending;
+
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 	this.wireframeLinecap = 'round';

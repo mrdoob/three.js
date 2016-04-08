@@ -218,6 +218,10 @@ def animated_xform(obj, options):
     track_loc = track_loc[0]
     use_inverted = options.get(constants.HIERARCHY, False) and obj.parent
 
+    if times == None:
+        logger.info("In animated xform: Unable to extract trackable fields from %s", objName)
+        return tracks
+
     # for each frame
     inverted_fallback = mathutils.Matrix() if use_inverted else None
     convert_matrix = AXIS_CONVERSION    # matrix to convert the exported matrix
@@ -234,6 +238,19 @@ def animated_xform(obj, options):
 
     # TODO: remove duplicated key frames
     return tracks
+
+@_object
+def custom_properties(obj):
+    """
+
+    :param obj:
+
+    """
+    logger.debug('object.custom_properties(%s)', obj)
+    # Grab any properties except those marked private (by underscore
+    # prefix) or those with types that would be rejected by the JSON
+    # serializer object model.
+    return {kvp[0]: kvp[1] for kvp in obj.data.items() if kvp[0][:1] != '_' and isinstance(kvp[1], constants.VALID_DATA_TYPES)}
 
 @_object
 def mesh(obj, options):
@@ -361,7 +378,7 @@ def matrix(obj, options):
         parent_inverted = obj.parent.matrix_world.inverted(mathutils.Matrix())
         return parent_inverted * obj.matrix_world
     else:
-        return AXIS_CONVERSION * obj.matrix_world
+        return obj.matrix_world
 
 
 @_object
@@ -467,6 +484,19 @@ def extract_mesh(obj, options, recalculate=False):
         obj.data = original_mesh
         obj.select = False
         obj.hide = hidden_state
+
+    # split sharp edges
+    original_mesh = obj.data
+    obj.data = mesh_node
+    obj.select = True
+
+    bpy.ops.object.modifier_add(type='EDGE_SPLIT')
+    bpy.context.object.modifiers['EdgeSplit'].use_edge_angle = False
+    bpy.context.object.modifiers['EdgeSplit'].use_edge_sharp = True
+    bpy.ops.object.modifier_apply(apply_as='DATA', modifier='EdgeSplit')
+
+    obj.select = False
+    obj.data = original_mesh
 
     # recalculate the normals to face outwards, this is usually
     # best after applying a modifiers, especialy for something

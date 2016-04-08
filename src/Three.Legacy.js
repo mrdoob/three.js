@@ -202,6 +202,13 @@ THREE.Face4 = function ( a, b, c, d, normal, color, materialIndex ) {
 
 };
 
+THREE.Vertex = function ( x, y, z ) {
+
+	console.warn( 'THREE.Vertex has been removed. Use THREE.Vector3 instead.' );
+	return new THREE.Vector3( x, y, z );
+
+};
+
 //
 
 Object.defineProperties( THREE.Object3D.prototype, {
@@ -667,6 +674,30 @@ Object.defineProperties( THREE.WebGLRenderTarget.prototype, {
 		set: function ( value ) {
 			console.warn( 'THREE.WebGLRenderTarget: .generateMipmaps is now .texture.generateMipmaps.' );
 			this.texture.generateMipmaps = value;
+		}
+	}
+} );
+
+//
+
+Object.defineProperties( THREE.Audio.prototype, {
+	load: {
+		value: function ( file ) {
+
+			console.warn( 'THREE.Audio: .load has been deprecated. Please use THREE.AudioLoader.' );
+
+			var scope = this;
+
+			var audioLoader = new THREE.AudioLoader();
+
+			audioLoader.load( file, function ( buffer ) {
+
+				scope.setBuffer( buffer );
+
+			} );
+
+			return this;
+
 		}
 	}
 } );

@@ -3,15 +3,12 @@
  *
  * parameters = {
  *  defines: { "label" : "value" },
- *  uniforms: { "parameter1": { type: "f", value: 1.0 }, "parameter2": { type: "i" value2: 2 } },
+ *  uniforms: { "parameter1": { type: "1f", value: 1.0 }, "parameter2": { type: "1i" value2: 2 } },
  *
  *  fragmentShader: <string>,
  *  vertexShader: <string>,
  *
  *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
@@ -50,6 +47,7 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.fog = false; // set to use scene fog
 
 	this.lights = false; // set to use scene lights
+	this.clipping = false; // set to use user-defined clipping planes
 
 	this.vertexColors = THREE.NoColors; // set to use "color" attribute stream
 
@@ -111,6 +109,7 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 	this.fog = source.fog;
 
 	this.lights = source.lights;
+	this.clipping = source.clipping;
 
 	this.vertexColors = source.vertexColors;
 

@@ -118,7 +118,14 @@ UI.Texture.prototype.setValue = function ( texture ) {
 	} else {
 
 		name.value = '';
-		context.clearRect( 0, 0, canvas.width, canvas.height );
+
+		if ( context !== null ) {
+
+			// Seems like context can be null if the canvas is not visible
+
+			context.clearRect( 0, 0, canvas.width, canvas.height );
+
+		}
 
 	}
 

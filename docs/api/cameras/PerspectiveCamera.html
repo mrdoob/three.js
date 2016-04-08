@@ -42,14 +42,11 @@ scene.add( camera );</code>
 
 		<h2>Properties</h2>
 
-		<h3>[property:number zoom]</h3>
-		<div>Gets or sets the zoom factor of the camera. </div>
-
 		<h3>[property:Float fov]</h3>
 		<div>Camera frustum vertical field of view, from bottom to top of view, in degrees.</div>
 
-		<h3>[property:Float aspect]</h3>
-		<div>Camera frustum aspect ratio, window width divided by window height.</div>
+		<h3>[property:number zoom]</h3>
+		<div>Gets or sets the zoom factor of the camera. </div>
 
 		<h3>[property:Float near]</h3>
 		<div>Camera frustum near plane.</div>
@@ -57,18 +54,60 @@ scene.add( camera );</code>
 		<h3>[property:Float far]</h3>
 		<div>Camera frustum far plane.</div>
 
+		<h3>[property:Float focus]</h3>
+		<div>Object distance used for stereoscopy and depth-of-field effects. This parameter does not influence the projection matrix unless a StereoCamera is being used.</div>
+
+		<h3>[property:Float aspect]</h3>
+		<div>Camera frustum aspect ratio, window width divided by window height.</div>
+
+		<h3>[property:Object view]</h3>
+		<div>Frustum window specification or null.</div>
+
+		<h3>[property:Float filmGauge]</h3>
+		<div>Film size used for the larger axis. Default is 35 (millimeters). This parameter does not influence the projection matrix unless .filmOffset is set to a nonzero value.</div>
+
+		<h3>[property:Float filmOffset]</h3>
+		<div>Horizontal off-center offset in the same unit as .filmGauge.</div>
 
 		<h2>Methods</h2>
 
-		<h3>[method:null setLens]( [page:Float focalLength], [page:Float frameSize] )</h3>
+		<h3>[method:Float getEffectiveFOV]()</h3>
+		<div>
+		Returns the current vertical field of view angle in degrees considering .zoom.
+		</div>
+
+		<h3>[method:Float getFocalLength]()</h3>
+		<div>
+		Returns the focal length of the current .fov in respect to .filmGauge.
+		</div>
+
+		<h3>[method:Float getFilmWidth]()</h3>
+		<div>
+		Returns the width of the image on the film. If .aspect is greater than or equal to one (landscape format), the result equals .filmGauge.
+		</div>
+
+		<h3>[method:Float getFilmHeight]()</h3>
+		<div>
+		Returns the height of the image on the film. If .aspect is less than or equal to one (portrait format), the result equals .fimlGauge.
+		</div>
+
+		<h3>[method:null setFocalLength]( [page:Float focalLength] )</h3>
+		<div>
+		Sets the FOV by focal length in respect to the current .filmGauge.
+		</div>
+		<div>
+		By default, the focal length is specified for a 35mm (full frame) camera.
+		</div>
+
+		<h3>[method:null setLens]( [page:Float focalLength], [page:Float filmGauge] )</h3>
 		<div>
 		focalLength — focal length<br />
-		frameSize — frame size
+		frameGauge — film gauge
 		</div>
 
 		<div>
-		Uses focal length (in mm) to estimate and set FOV 35mm (fullframe) camera is used if frame size is not specified.<br />
-		Formula based on [link:http://www.bobatkins.com/photography/technical/field_of_view.html]
+		Sets .fov by focal length. Optionally also sets .filmGauge.
+		This method is deprecated, please use .setFocalLength instead.
 		</div>
 
 		<h3>[method:null setViewOffset]( [page:Float fullWidth], [page:Float fullHeight], [page:Float x], [page:Float y], [page:Float width], [page:Float height] )</h3>
