@@ -7,13 +7,13 @@
 		<style>
 			body {
 				background-color: #000;
-				margin: 0px;
+				margin: 0;
 				overflow: hidden;
 			}
 
 			#info {
 				position: absolute;
-				top: 0px;
+				top: 0;
 				width: 100%;
 				color: #ffffff;
 				padding: 5px;
@@ -30,6 +30,7 @@
 			a:hover {
 				color: #0080ff;
 			}
+
 		</style>
 	</head>
 	<body>
@@ -42,8 +43,8 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="../examples/js/libs/FPS.min.js"></script>
-		<script src="../examples/js/libs/stats.min.js"></script>
+		<!-- <script src="../examples/js/libs/FPS.min.js"></script>
+		<script src="../examples/js/libs/stats.min.js"></script> -->
 		<script src="../examples/js/libs/dat.gui.min.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
@@ -52,14 +53,12 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/plugins/CSSPlugin.min.js"></script>
 
 		<script>
-			var container = document.getElementById( 'container' );
-			var stats = new Stats();
-			var fpsData = {};
-			var fps = new FPS(fpsData);
-			container.appendChild( stats.domElement );
+			//var stats = new Stats();
+			//var fpsData = {};
+			//var fps = new FPS(fpsData);
 
 			var isMobile = /iPhone|iPad|iPod|Android/i.test( navigator.userAgent );
-			var maxMapSize = ( isMobile === false ) ? 8192 : 2048;
+			var maxMapSize = ( isMobile === false ) ? 2048 : 1024;
 			var animRate = ( isMobile === false ) ? 4.7 : 6.7;
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -75,7 +74,7 @@
 			var geoBox = new THREE.BoxGeometry( Math.PI, Math.sqrt( 2 ), Math.E );
 			var mshFloor = new THREE.Mesh( geoFloor, matFloor );
 			var mshBox = new THREE.Mesh( geoBox, matBox );
-			var ambientLight = new THREE.AmbientLight( 0x121422 );
+			var ambientLight = new THREE.AmbientLight( 0x090A1A );
 			var spotLight1 = createSpotlight( { color: 0xFF7F00, angle: 0.3, name: "spotLight1" } );
 			var spotLight2 = createSpotlight( { color: 0x00FF7F, angle: 0.3, name: "spotLight2"  } );
 			var spotLight3 = createSpotlight( { color: 0x7F00FF, angle: 0.3, name: "spotLight3"  } );
@@ -84,10 +83,11 @@
 			var mouse = new THREE.Vector2();
 			var mouseTime, mouseDown = new THREE.Vector2();
 
-			var gui, param = { color: '0xffffff' };
+			var gui, guiHeight = 250, param = { color: '0xffffff' };
 			var guiMapSize1, guiMapSize2, guiMapSize3;
 			var autoMapSize = true;
-			var respectFPS = true, desiredFPS = ( isMobile === false ) ? 60 : 15;
+			//var respectFPS = true;
+			//var desiredFPS = ( isMobile === false ) ? 30 : 15;
 			var renderTimeout, animTimeout;
 
 			function init () {
@@ -137,6 +137,14 @@
 				onResize();
 				window.addEventListener( 'resize', onResize, false );
 
+/*
+				var statsStyle = stats.domElement.style;
+				statsStyle.position = "absolute";
+				statsStyle.left = "10px";
+				statsStyle.top = "10px";
+				document.body.appendChild( stats.domElement );
+*/
+
 				orbitControls.addEventListener( 'change', render );
 				orbitControls.object.position.set( 46, 22, -21 );
 				orbitControls.target.set( -6, 7, 2 );
@@ -154,8 +162,8 @@
 				newObj.angle = object.angle || 0.777;
 				newObj.exponent = object.exponent || 2.0;
 				newObj.penumbra = object.penumbra || 0.2;
-				newObj.decay = object.decay || 10;
-				newObj.distance = object.distance || 0.0;
+				newObj.decay = object.decay || 2.0;
+				newObj.distance = object.distance || 1000.0;
 				mapSize.width = object.shadowWidth || maxMapSize * 0.375;
 				mapSize.height = object.shadowHeight || mapSize.width;
 				if ( isMobile === false ) {
@@ -163,7 +171,7 @@
 					mapSize.height *= 2;
 				}
 				var newShadowCam = newObj.shadow.camera;
-				newObj.shadowCameraHelper = new THREE.CameraHelper( newShadowCam ); // colored lines
+				newObj.shadowCameraHelper = new THREE.CameraHelper( newShadowCam );
 				newShadowCam.near = 1.0;
 				newShadowCam.far = 1000;
 
@@ -218,18 +226,21 @@
 				if ( spotLight2.shadowCameraHelper ) spotLight2.shadowCameraHelper.update();
 				if ( spotLight3.shadowCameraHelper ) spotLight3.shadowCameraHelper.update();
 
-				if( stats !== undefined ) stats.update();
-				if( fps !== undefined ) fps.update();
+				//if( stats !== undefined ) stats.update();
+				//if( fps !== undefined ) fps.update();
 
 				renderer.render( scene, camera );
 
+				requestAnimationFrame( render );
+
+/*
 				if( renderTimeout !== undefined ) {
 					clearTimeout( renderTimeout );
-					renderTimeout = undefined;
 				}
 				renderTimeout = setTimeout( function () {
-					window.requestAnimationFrame( render );
-				}, ( 1000 / desiredFPS ) );
+					requestAnimationFrame( render );
+				}, ( 888 / desiredFPS ) );
+*/
 
 			}
 
@@ -247,12 +258,11 @@
 				}
 				else {
 					gui.width = 200;
-					gStyle.top = ( window.innerHeight - 230 ) + "px";
 
 					gui.__closeButton.addEventListener( 'click', function () {
 						var gStyle = gui.domElement.style;
 						var nextValue = ( window.innerHeight - 36 ) + "px";
-						if ( gStyle.top === nextValue ) nextValue = ( window.innerHeight - 230 ) + "px";
+						if ( gStyle.top === nextValue ) nextValue = ( window.innerHeight - guiHeight ) + "px";
 						gStyle.top = nextValue;
 					} );
 				}
@@ -266,34 +276,50 @@
 
 				clearGui();
 
+/*
 				addGui( 'Respect-FPS', respectFPS ).onChange( function ( val ) {
 					respectFPS = ! ! val;
 				}, false );
 
 				addGui( 'Desired-FPS', desiredFPS, function ( val ) {
 					desiredFPS = val;
-				}, false, 1, 120 );
+				}, false, 1, 60 );
 
+*/
 				addGui( 'Auto Map Size', autoMapSize ).onChange( function ( val ) {
 					autoMapSize = ! ! val;
 				}, false );
 
 				guiMapSize1 = addGui( 'Map Size1', spotLight1.shadow.mapSize.width, function ( val, node, min, max, step ) {
 					setMapSize( spotLight1, val, undefined, min, max, step );
-				}, false, 256, maxMapSize, 256 );
+				}, false, 128, maxMapSize, 128 );
 
 				guiMapSize2 = addGui( 'Map Size2', spotLight2.shadow.mapSize.width, function ( val, node, min, max, step ) {
 					setMapSize( spotLight2, val, undefined, min, max, step );
-				}, false, 256, maxMapSize, 256 );
+				}, false, 128, maxMapSize, 128 );
 
 				guiMapSize3 = addGui( 'Map Size3', spotLight3.shadow.mapSize.width, function ( val, node, min, max, step ) {
 					setMapSize( spotLight3, val, undefined, min, max, step );
-				}, false, 256, maxMapSize, 256 );
+				}, false, 128, maxMapSize, 128 );
 
 				addGui( 'Anim Rate', animRate, function ( val ) {
 					animRate = val;
 					animateAll( animRate );
 				}, false, 3, 45, 1 );
+
+				setGuiHeight();
+
+			}
+
+			function setGuiHeight() {
+
+				var gStyle = gui.domElement.style;
+
+				guiHeight = ( ( gui.domElement.children[ 1 ].childElementCount + 1 ) * 32 );
+
+				gStyle.height = ( guiHeight + "px" );
+
+				if ( window.innerWidth > 579 ) gStyle.top = (window.innerHeight - guiHeight) + "px";
 
 			}
 
@@ -320,7 +346,7 @@
 
 					if ( step > 1 ) val = val - (val % step);
 
-					if ( respectFPS === true && this.fpsData.average >= 1.0 ) val = ( val * Math.min( ( this.fpsData.average / desiredFPS ), 1 ) );
+					//if ( respectFPS === true && this.fpsData.average >= 1.0 ) val = ( val * Math.min( ( this.fpsData.average / desiredFPS ), 1 ) );
 
 					mapSize.width = mapSize.height = val;
 
@@ -422,11 +448,15 @@
 
 			}
 
-			init();
-
 			buildGui();
 
-			render();
+			init();
+
+			if ( autoMapSize === true ) {
+				setMapSize( spotLight1, spotLight1.angle, guiMapSize1 );
+				setMapSize( spotLight2, spotLight2.angle, guiMapSize2 );
+				setMapSize( spotLight3, spotLight3.angle, guiMapSize3 );
+			}
 
 			animateAll( );
 
