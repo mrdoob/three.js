@@ -24364,11 +24364,11 @@ THREE.ShaderChunk[ 'cube_vert' ] = "varying vec3 vWorldPosition;\n#include <comm
 
 // File:src/renderers/shaders/ShaderLib/depth_frag.glsl
 
-THREE.ShaderChunk[ 'depth_frag' ] = "uniform float mNear;\nuniform float mFar;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n	#include <clipping_planes_fragment>\n	#include <logdepthbuf_fragment>\n	#ifdef USE_LOGDEPTHBUF_EXT\n		float depth = gl_FragDepthEXT / gl_FragCoord.w;\n	#else\n		float depth = gl_FragCoord.z / gl_FragCoord.w;\n	#endif\n	float color = 1.0 - smoothstep( mNear, mFar, depth );\n	gl_FragColor = vec4( vec3( color ), opacity );\n}\n";
+THREE.ShaderChunk[ 'depth_frag' ] = "uniform float mNear;\nuniform float mFar;\nuniform float opacity;\nvarying float vViewZDepth;\n#include <common>\n#include <packing>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n	#include <clipping_planes_fragment>\n	#include <logdepthbuf_fragment>\n	float color = 1.0 - smoothstep( mNear, mFar, vViewZDepth );\n	gl_FragColor = vec4( vec3( color ), opacity );\n}\n";
 
 // File:src/renderers/shaders/ShaderLib/depth_vert.glsl
 
-THREE.ShaderChunk[ 'depth_vert' ] = "#include <common>\n#include <morphtarget_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n	#include <begin_vertex>\n	#include <morphtarget_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	#include <clipping_planes_vertex>\n}\n";
+THREE.ShaderChunk[ 'depth_vert' ] = "#include <common>\n#include <morphtarget_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvarying float vViewZDepth;\nvoid main() {\n	#include <begin_vertex>\n	#include <morphtarget_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	#include <clipping_planes_vertex>\n	vViewZDepth = - mvPosition.z;\n}\n";
 
 // File:src/renderers/shaders/ShaderLib/depthRGBA_frag.glsl
 
