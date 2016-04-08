@@ -7,6 +7,8 @@ var files = {
 		"webgl_camera",
 		"webgl_camera_cinematic",
 		"webgl_camera_logarithmicdepthbuffer",
+		"webgl_clipping",
+		"webgl_clipping_advanced",
 		"webgl_decals",
 		"webgl_effects_anaglyph",
 		"webgl_effects_parallaxbarrier",
@@ -60,6 +62,8 @@ var files = {
 		"webgl_lights_physical",
 		"webgl_lights_pointlights",
 		"webgl_lights_pointlights2",
+		"webgl_lights_spotlight",
+		"webgl_lights_spotlights",
 		"webgl_lines_colors",
 		"webgl_lines_cubes",
 		"webgl_lines_dashed",
@@ -112,6 +116,7 @@ var files = {
 		"webgl_materials_bumpmap",
 		"webgl_materials_bumpmap_skin",
 		"webgl_materials_cars",
+		"webgl_materials_channels",
 		"webgl_materials_cubemap",
 		"webgl_materials_cubemap_balls_reflection",
 		"webgl_materials_cubemap_balls_refraction",
@@ -127,6 +132,7 @@ var files = {
 		"webgl_materials_nodes",
 		"webgl_materials_normalmap",
 		"webgl_materials_parallaxmap",
+		"webgl_materials_reflectivity",
 		"webgl_materials_shaders_fresnel",
 		"webgl_materials_skin",
 		"webgl_materials_standard",
@@ -241,7 +247,8 @@ var files = {
 		"webvr_panorama",
 		"webvr_rollercoaster",
 		"webvr_shadow",
-		"webvr_video"
+		"webvr_video",
+		"webvr_vive"
 	],
 	"css3d": [
 		"css3d_molecules",

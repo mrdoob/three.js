@@ -365,6 +365,12 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	premultiply: function ( m ) {
+
+		return this.multiplyMatrices( m, this );
+
+	},
+
 	multiplyMatrices: function ( a, b ) {
 
 		var ae = a.elements;
