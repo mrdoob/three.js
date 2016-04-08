@@ -29,14 +29,16 @@ scene.add( light );</code>
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Integer skyColorHex], [page:Integer groundColorHex], [page:Float intensity])</h3>
+		<h3>[name]( [page:Integer skyColor], [page:Integer groundColor], [page:Float intensity] )</h3>
         <div>
-		[page:Integer skyColorHex] — Numeric value of the RGB sky color.<br />
-		[page:Integer groundColorHex] — Numeric value of the RGB ground color.<br />
+		[page:Integer skyColor] — Numeric value of the RGB sky color.<br />
+		[page:Integer groundColor] — Numeric value of the RGB ground color.<br />
 		[page:Float intensity] — Numeric value of the light's strength/intensity.
 		</div>
 
 		<h2>Properties</h2>
+
+		See the base [page:Light Light] class for common properties.
 
 		<h3>[property:Float groundColor]</h3>
 
@@ -44,24 +46,15 @@ scene.add( light );</code>
 			Light's ground color.<br />
 		</div>
 
-		<h3>[property:Float intensity]</h3>
-		<div>
-			Light's intensity.<br />
-			In "physically correct" mode, the product of intensity * color (or intensity * groundColor) is interpreted as luminous irradiance measured in lux at the material's surface.<br/>
-			Default — *1.0*.
-		</div>
 
 		<h2>Methods</h2>
 
-		<h3>[method:HemisphereLight clone]()</h3>
+		See the base [page:Light Light] class for common methods.
+
+		<h3>[method:HemisphereLight copy]( [page:HemisphereLight source] )</h3>
 		<div>
 		<br />
-		It returns a clone of HemisphereLight.
-		</div>
-
-		<h3>[method:JSON toJSON]()</h3>
-		<div>
-		Return HemisphereLight data in JSON format.
+		Copies value of *source* to this HemisphereLight object.
 		</div>
 
 		<h2>Source</h2>

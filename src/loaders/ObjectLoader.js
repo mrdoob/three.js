@@ -466,7 +466,8 @@ THREE.ObjectLoader.prototype = {
 
 				case 'PerspectiveCamera':
 
-					object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
+					object = Object.assign(
+							new THREE.PerspectiveCamera(), data );
 
 					break;
 
