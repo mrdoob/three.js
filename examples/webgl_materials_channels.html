@@ -157,38 +157,48 @@
 
 				// material
 
-				materialStandard = new THREE.MeshStandardMaterial( { color: 0xffffff } );
-				materialStandard.metalness = 0;
-				materialStandard.roughness = 0.6;
-				materialStandard.displacementMap = displacementMap;
-				materialStandard.displacementScale = 1.5;
-				materialStandard.aoMap = aoMap;
-				materialStandard.normalMap = normalMap;
-				materialStandard.normalScale.set( 1, - 1 );
+				materialStandard = new THREE.MeshStandardMaterial( {
+					color: 0xffffff,
+					metalness: 0.5,
+					roughness: 0.6,
+					displacementMap: displacementMap,
+					displacementScale: 2.436143, // from original model
+					displacementBias: - 0.428408, // from original model
+					aoMap: aoMap,
+					normalMap: normalMap,
+					normalScale: new THREE.Vector2( 1, - 1 ),
+					side: THREE.DoubleSide
+				} );
 
-				materialDepthAuto = new THREE.MeshDepthMaterial();
-				materialDepthAuto.depthFormat = THREE.AutoDepthFormat;
-				materialDepthAuto.depthPacking = THREE.LinearDepthPacking;
+				materialDepthAuto = new THREE.MeshDepthMaterial( {
+					depthFormat: THREE.AutoDepthFormat,
+					depthPacking: THREE.LinearDepthPacking
+				} );
 
-				materialDepthAutoRGBA = new THREE.MeshDepthMaterial();
-				materialDepthAutoRGBA.depthFormat = THREE.AutoDepthFormat;
-				materialDepthAutoRGBA.depthPacking = THREE.RGBADepthPacking;
+				materialDepthAutoRGBA = new THREE.MeshDepthMaterial( {
+					depthFormat: THREE.AutoDepthFormat,
+					depthPacking: THREE.RGBADepthPacking
+				} );
 
-				materialDepthLinearClipZ = new THREE.MeshDepthMaterial();
-				materialDepthLinearClipZ.depthFormat = THREE.LinearClipZDepthFormat;
-				materialDepthLinearClipZ.depthPacking = THREE.LinearDepthPacking;
+				materialDepthLinearClipZ = new THREE.MeshDepthMaterial( {
+					depthFormat: THREE.LinearClipZDepthFormat,
+					depthPacking: THREE.LinearDepthPacking
+				} );
 
-				materialDepthLinearClipZRGBA = new THREE.MeshDepthMaterial();
-				materialDepthLinearClipZRGBA.depthFormat = THREE.LinearClipZDepthFormat;
-				materialDepthLinearClipZRGBA.depthPacking = THREE.RGBADepthPacking;
+				materialDepthLinearClipZRGBA = new THREE.MeshDepthMaterial( {
+					depthFormat: THREE.LinearClipZDepthFormat,
+					depthPacking: THREE.RGBADepthPacking
+				} );
 
-				materialDepthInvClipZ = new THREE.MeshDepthMaterial();
-				materialDepthInvClipZ.depthFormat = THREE.InvClipZDepthFormat;
-				materialDepthInvClipZ.depthPacking = THREE.LinearDepthPacking;
+				materialDepthInvClipZ = new THREE.MeshDepthMaterial( {
+					depthFormat: THREE.InvClipZDepthFormat,
+					depthPacking: THREE.LinearDepthPacking
+				} );
 
-				materialDepthInvClipZRGBA = new THREE.MeshDepthMaterial();
-				materialDepthInvClipZRGBA.depthFormat = THREE.InvClipZDepthFormat;
-				materialDepthInvClipZRGBA.depthPacking = THREE.RGBADepthPacking;
+				materialDepthInvClipZRGBA = new THREE.MeshDepthMaterial( {
+					depthFormat: THREE.InvClipZDepthFormat,
+					depthPacking: THREE.RGBADepthPacking
+				} );
 
 				materialNormal = new THREE.MeshNormalMaterial();
 
@@ -220,7 +230,11 @@
 
 			function onWindowResize() {
 
+				var width = window.innerWidth;
+				var height = window.innerHeight;
 				var aspect = window.innerWidth / window.innerHeight;
+
+				camera.aspect = aspect;
 
 				camera.left = - height * aspect;
 				camera.right = height * aspect;
@@ -229,7 +243,7 @@
 
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( width, height );
 
 			}
 
