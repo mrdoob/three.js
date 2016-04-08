@@ -13,6 +13,6 @@ void main() {
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>
 
-	vViewZDepth = - mvPosition.z;
+	vViewZDepth = mvPosition.z;
 
 }

@@ -330,8 +330,12 @@ THREE.RGBM7Encoding = 3004;
 THREE.RGBM16Encoding = 3005;
 THREE.RGBDEncoding = 3006; // MaxRange is 256.
 
+// Depth format
+
+THREE.LinearClipZDepthFormat = 3100;	// used by orthographic cameras
+THREE.InvClipZDepthFormat = 3101;  // used by perspective cameras
+
 // Depth packing strategies
 
-THREE.GrayscaleDepthPacking = 3100;
-THREE.RGBADepthPacking = 3101;
-THREE.NearBiasedRGBADepthPacking = 3102;
+THREE.LinearDepthPacking = 3200;  // for writing to float textures for high precision or for visualizing results in RGB buffers
+THREE.RGBADepthPacking = 3201; // for packing into RGBA buffers.

@@ -19,20 +19,20 @@ float unpackRGBAToLinearUnit( const in vec4 rgba ) {
 	return dot( rgba, bitSh );
 }
 
-vec4 packDepthToRGBA( const in float depth, const in float near, const in float far ) {
-  float unitDepth = ( depth - near ) / ( far - near );
-  return packLinearUnitToRGBA( unitDepth );
+// NOTE: viewZ/eyeZ is < 0 when in front of the camera per OpenGL conventions
+// this transform is compatible with the built-in z buffer values created by a perspective camera
+float viewZToLinearClipZ( const in float viewZ, const in float near, const in float far ) {
+  return ( viewZ + near ) / ( near - far );
 }
-float unpackRGBAToDepth( const in vec4 rgba, const in float near, const in float far ) {
-  float unitDepth = unpackRGBAToLinearUnit( rgba );
-  return unitDepth * ( far - near ) + near;
+float linearClipZToViewZ( const in float linearClipZ, const in float near, const in float far ) {
+  return linearClipZ * ( near - far ) - near;
 }
 
-vec4 packDepthToNearBiasedRGBA( const in float depth, const in float near, const in float far ) {
-  float nearBiasedUnitDepth = (( depth - near ) * far ) / (( far - near ) * depth );
-  return packLinearUnitToRGBA( nearBiasedUnitDepth );
+// NOTE: viewZ/eyeZ is < 0 when in front of the camera per OpenGL conventions
+// this transform is compatible with the build-in z-buffer values created by a perspective camera
+float viewZToInvClipZ( const in float viewZ, const in float near, const in float far ) {
+  return (( near + viewZ ) * far ) / (( far - near ) * viewZ );
 }
-float unpackNearBiasedRGBAToDepth( const in vec4 rgba, const in float near, const in float far ) {
-  float nearBiasedUnitDepth = unpackRGBAToLinearUnit( rgba );
-  return ( near * far ) / ( ( near - far ) * nearBiasedUnitDepth + far );
+float invClipZToViewZ( const in float invClipZ, const in float near, const in float far ) {
+  return ( near * far ) / ( ( near - far ) * invClipZ - far );
 }

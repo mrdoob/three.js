@@ -546,6 +546,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.outputEncoding ? getTexelEncodingFunction( "linearToOutputTexel", parameters.outputEncoding ) : '',
 
 				parameters.depthPacking ? "#define DEPTH_PACKING " + material.depthPacking : '',
+				parameters.depthFormat ? "#define DEPTH_FORMAT " + material.depthFormat : '',
 
 				'\n'
 

@@ -71,7 +71,7 @@
 			var cameraOrtho, cameraPerspective;
 			var controlsOrtho, controlsPerspective;
 
-			var mesh, materialStandard, materialDepthGrayscale, materialDepthRGBAPacked, materialDepthNearBiasedRGBAPacked, materialClipZRGBA, materialClipZRGBAUnpacked, materialNormal;
+			var mesh, materialStandard, materialDepthLinearClipZ, materialDepthLinearClipZRGBA, materialDepthInvClipZ, materialDepthInvClipZRGBA, materialClipZRGBA, materialClipZRGBAUnpacked, materialNormal;
 
 			var pointLight, ambientLight;
 
@@ -93,7 +93,7 @@
 			function initGui() {
 
 				var gui = new dat.GUI();
-				gui.add( params, 'material', [ 'standard', 'normal', 'depthGrayscale', 'depthRGBA', 'depthNearBiasedRGBA', 'clipZRGBA', 'clipZRGBAUnpacked' ] );
+				gui.add( params, 'material', [ 'standard', 'normal', 'depthLinearClipZ', 'depthLinearClipZRGBA', 'depthInvClipZ', 'depthInvClipZRGBA', 'clipZRGBA', 'clipZRGBAUnpacked' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
 
 			}
@@ -169,14 +169,21 @@
 				materialStandard.normalMap = normalMap;
 				materialStandard.normalScale.set( 1, - 1 );
 
-				materialDepthGrayscale = new THREE.MeshDepthMaterial();
-				materialDepthGrayscale.depthPacking = THREE.GrayscaleDepthPacking;
+				materialDepthLinearClipZ = new THREE.MeshDepthMaterial();
+				materialDepthLinearClipZ.depthFormat = THREE.LinearClipZDepthFormat;
+				materialDepthLinearClipZ.depthPacking = THREE.LinearDepthPacking;
 
-				materialDepthRGBA = new THREE.MeshDepthMaterial();
-				materialDepthRGBA.depthPacking = THREE.RGBADepthPacking;
+				materialDepthLinearClipZRGBA = new THREE.MeshDepthMaterial();
+				materialDepthLinearClipZRGBA.depthFormat = THREE.LinearClipZDepthFormat;
+				materialDepthLinearClipZRGBA.depthPacking = THREE.RGBADepthPacking;
 
-				materialDepthNearBiasedRGBA = new THREE.MeshDepthMaterial();
-				materialDepthNearBiasedRGBA.depthPacking = THREE.NearBiasedRGBADepthPacking;
+				materialDepthInvClipZ = new THREE.MeshDepthMaterial();
+				materialDepthInvClipZ.depthFormat = THREE.InvClipZDepthFormat;
+				materialDepthInvClipZ.depthPacking = THREE.LinearDepthPacking;
+
+				materialDepthInvClipZRGBA = new THREE.MeshDepthMaterial();
+				materialDepthInvClipZRGBA.depthFormat = THREE.InvClipZDepthFormat;
+				materialDepthInvClipZRGBA.depthPacking = THREE.RGBADepthPacking;
 
 				materialClipZRGBA = new THREE.ShaderMaterial( THREE.ShaderLib.clipZRGBA );
 				materialClipZRGBAUnpacked = new THREE.ShaderMaterial( THREE.ClipZRGBAUnpackedShader );
@@ -244,9 +251,10 @@
 					var material = mesh.material;
 					switch( params.material ) {
 						case 'standard': material = materialStandard; break;
-						case 'depthGrayscale': material = materialDepthGrayscale; break;
-						case 'depthRGBA': material = materialDepthRGBA; break;
-						case 'depthNearBiasedRGBA': material = materialDepthNearBiasedRGBA; break;
+						case 'depthLinearClipZ': material = materialDepthLinearClipZ; break;
+						case 'depthLinearClipZRGBA': material = materialDepthLinearClipZRGBA; break;
+						case 'depthInvClipZ': material = materialDepthInvClipZ; break;
+						case 'depthInvClipZRGBA': material = materialDepthInvClipZRGBA; break;
 						case 'clipZRGBA': material = materialClipZRGBA; break;
 						case 'clipZRGBAUnpacked': material = materialClipZRGBAUnpacked; break;
 						case 'normal': material = materialNormal; break;

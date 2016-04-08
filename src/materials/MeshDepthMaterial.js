@@ -16,7 +16,8 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	this.type = 'MeshDepthMaterial';
 
-	this.depthPacking = THREE.GrayscaleDepthPacking;
+	this.depthFormat = THREE.LinearClipZDepthFormat;
+	this.depthPacking = THREE.LinearDepthPacking;
 
 	this.morphTargets = false;
 	this.wireframe = false;
@@ -33,6 +34,7 @@ THREE.MeshDepthMaterial.prototype.copy = function ( source ) {
 
 	THREE.Material.prototype.copy.call( this, source );
 
+	this.depthFormat = source.depthFormat;
 	this.depthPacking = source.depthPacking;
 
 	this.wireframe = source.wireframe;

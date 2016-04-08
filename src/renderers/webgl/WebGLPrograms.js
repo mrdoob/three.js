@@ -25,7 +25,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
-		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "depthPacking"
+		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "depthPacking", "depthFormat"
 	];
 
 
@@ -184,7 +184,8 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide,
 
-			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false
+			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false,
+			depthFormat: ( material.depthFormat !== undefined ) ? material.depthFormat : false
 
 		};
 

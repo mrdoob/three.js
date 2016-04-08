@@ -14,18 +14,30 @@ void main() {
 	#include <clipping_planes_fragment>
 	#include <logdepthbuf_fragment>
 
-	#if DEPTH_PACKING == 3100
+	float transformedDepth = 0.0;
 
-		float color = 1.0 - smoothstep( mNear, mFar, vViewZDepth );
-		gl_FragColor = vec4( vec3( color ), opacity );
+	#if DEPTH_FORMAT == 3100
 
-	#elif DEPTH_PACKING == 3101
+		transformedDepth = viewZToLinearClipZ( vViewZDepth, mNear, mFar );
 
-		gl_FragColor = packDepthToRGBA( vViewZDepth, mNear, mFar );
+	#elif DEPTH_FORMAT == 3101
 
-	#elif DEPTH_PACKING == 3102
+		transformedDepth = viewZToInvClipZ( vViewZDepth, mNear, mFar );
 
-		gl_FragColor = packDepthToNearBiasedRGBA( vViewZDepth, mNear, mFar );
+	#else
+
+		gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+		return;
+
+	#endif
+
+	#if DEPTH_PACKING == 3200
+
+		gl_FragColor = vec4( vec3( transformedDepth ), opacity );
+
+	#elif DEPTH_PACKING == 3201
+
+		gl_FragColor = packLinearUnitToRGBA( transformedDepth );
 
 	#else
 
