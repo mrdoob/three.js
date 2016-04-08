@@ -43,8 +43,6 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<!-- <script src="../examples/js/libs/FPS.min.js"></script>
-		<script src="../examples/js/libs/stats.min.js"></script> -->
 		<script src="../examples/js/libs/dat.gui.min.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
@@ -53,10 +51,6 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/plugins/CSSPlugin.min.js"></script>
 
 		<script>
-			//var stats = new Stats();
-			//var fpsData = {};
-			//var fps = new FPS(fpsData);
-
 			var isMobile = /iPhone|iPad|iPod|Android/i.test( navigator.userAgent );
 			var maxMapSize = ( isMobile === false ) ? 2048 : 1024;
 			var animRate = ( isMobile === false ) ? 4.7 : 6.7;
@@ -86,8 +80,6 @@
 			var gui, guiHeight = 250, param = { color: '0xffffff' };
 			var guiMapSize1, guiMapSize2, guiMapSize3;
 			var autoMapSize = true;
-			//var respectFPS = true;
-			//var desiredFPS = ( isMobile === false ) ? 30 : 15;
 			var renderTimeout, animTimeout;
 
 			function init () {
@@ -136,14 +128,6 @@
 				document.body.appendChild( renderer.domElement );
 				onResize();
 				window.addEventListener( 'resize', onResize, false );
-
-/*
-				var statsStyle = stats.domElement.style;
-				statsStyle.position = "absolute";
-				statsStyle.left = "10px";
-				statsStyle.top = "10px";
-				document.body.appendChild( stats.domElement );
-*/
 
 				orbitControls.addEventListener( 'change', render );
 				orbitControls.object.position.set( 46, 22, -21 );
@@ -226,22 +210,10 @@
 				if ( spotLight2.shadowCameraHelper ) spotLight2.shadowCameraHelper.update();
 				if ( spotLight3.shadowCameraHelper ) spotLight3.shadowCameraHelper.update();
 
-				//if( stats !== undefined ) stats.update();
-				//if( fps !== undefined ) fps.update();
-
 				renderer.render( scene, camera );
 
 				requestAnimationFrame( render );
-
-/*
-				if( renderTimeout !== undefined ) {
-					clearTimeout( renderTimeout );
-				}
-				renderTimeout = setTimeout( function () {
-					requestAnimationFrame( render );
-				}, ( 888 / desiredFPS ) );
-*/
-
+				
 			}
 
 			function clearGui () {
@@ -276,16 +248,6 @@
 
 				clearGui();
 
-/*
-				addGui( 'Respect-FPS', respectFPS ).onChange( function ( val ) {
-					respectFPS = ! ! val;
-				}, false );
-
-				addGui( 'Desired-FPS', desiredFPS, function ( val ) {
-					desiredFPS = val;
-				}, false, 1, 60 );
-
-*/
 				addGui( 'Auto Map Size', autoMapSize ).onChange( function ( val ) {
 					autoMapSize = ! ! val;
 				}, false );
@@ -345,8 +307,6 @@
 					else if ( max > 1 && val > max ) val = max;
 
 					if ( step > 1 ) val = val - (val % step);
-
-					//if ( respectFPS === true && this.fpsData.average >= 1.0 ) val = ( val * Math.min( ( this.fpsData.average / desiredFPS ), 1 ) );
 
 					mapSize.width = mapSize.height = val;
 
