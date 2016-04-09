@@ -108,6 +108,7 @@
 	"src/textures/CompressedTexture.js",
 	"src/textures/DataTexture.js",
 	"src/textures/VideoTexture.js",
+	"src/textures/DepthTexture.js",
 	"src/objects/Group.js",
 	"src/objects/Points.js",
 	"src/objects/Line.js",
