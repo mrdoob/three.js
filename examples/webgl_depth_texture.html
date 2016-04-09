@@ -47,21 +47,16 @@
     </style>
     
     <script id="post-vert" type="x-shader/x-vertex">
-      uniform mat4 projectionMatrix;
-      uniform mat4 modelViewMatrix;
-
-      attribute vec4 position;
-      attribute vec2 uv;
       varying vec2 vUv;
 
       void main() {
         vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * position;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }
     </script>
     <script id="post-frag" type="x-shader/x-fragment">
-      precision mediump float;
-
+      #include <packing>
+    
       varying vec2 vUv;
       uniform sampler2D tDiffuse;
       uniform sampler2D tDepth;
@@ -74,6 +69,10 @@
         float cameraCoef = 2.0 * cameraNear;
         return cameraCoef / (cameraFarPlusNear - texture2D(depthSampler, coord).x * cameraFarMinusNear);
       }
+
+      // float depthTexel = texture2D(tDepth, vUv).x;
+      // float depth = invClipZToViewZ(depthTexel, cameraNear, cameraFar);
+      // float linearClipZ = viewZToLinearClipZ(depth, cameraNear, cameraFar);
 
       void main() {
         vec3 diffuse = texture2D(tDiffuse, vUv).rgb;
@@ -178,7 +177,7 @@
 
         // Setup post processing stage
         postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-        var postMaterial = new THREE.RawShaderMaterial({
+        var postMaterial = new THREE.ShaderMaterial({
           vertexShader: document.querySelector('#post-vert').textContent.trim(),
           fragmentShader: document.querySelector('#post-frag').textContent.trim(),
           uniforms: {
