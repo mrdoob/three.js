@@ -250,7 +250,10 @@
 		Computes face normals.
 		</div>
 
-		<h3>[method:null computeVertexNormals]()</h3>
+		<h3>[method:null computeVertexNormals]( [page:Boolean areaWeighted] )</h3>
+		<div>
+		areaWeighted - If true the contributution of each face normal to the vertex normal is weighted by the area of the face. Default is true.
+		</div>
 		<div>
 		Computes vertex normals by averaging face normals.<br />
 		Face normals must be existing / computed beforehand.
