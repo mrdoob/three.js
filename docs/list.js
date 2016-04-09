@@ -161,7 +161,6 @@ var list = {
 		],
 
 		"Extras": [
-			[ "GeometryUtils", "api/extras/GeometryUtils" ],
 			[ "SceneUtils", "api/extras/SceneUtils" ]
 		],
 
