@@ -169,13 +169,17 @@ THREE.ShaderLib = {
 
 	'depth': {
 
-		uniforms: {
+		uniforms: THREE.UniformsUtils.merge( [
 
-			"mNear": { type: "1f", value: 1.0 },
-			"mFar" : { type: "1f", value: 2000.0 },
-			"opacity" : { type: "1f", value: 1.0 }
+			THREE.UniformsLib[ 'displacementmap' ],
 
-		},
+			{
+				"mNear": { type: "1f", value: 1.0 },
+				"mFar" : { type: "1f", value: 2000.0 },
+				"opacity" : { type: "1f", value: 1.0 }
+			}
+
+		] ),
 
 		vertexShader: THREE.ShaderChunk[ 'depth_vert' ],
 		fragmentShader: THREE.ShaderChunk[ 'depth_frag' ]

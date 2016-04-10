@@ -78,6 +78,9 @@
 
 			var height = 500; // of camera frustum
 
+			var SCALE = 2.436143; // from original model
+			var BIAS = - 0.428408; // from original model
+
 			init();
 			animate();
 			initGui();
@@ -159,45 +162,86 @@
 
 				materialStandard = new THREE.MeshStandardMaterial( {
 					color: 0xffffff,
+
 					metalness: 0.5,
 					roughness: 0.6,
+
 					displacementMap: displacementMap,
-					displacementScale: 2.436143, // from original model
-					displacementBias: - 0.428408, // from original model
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
 					aoMap: aoMap,
+
 					normalMap: normalMap,
 					normalScale: new THREE.Vector2( 1, - 1 ),
+
 					side: THREE.DoubleSide
 				} );
 
 				materialDepthAuto = new THREE.MeshDepthMaterial( {
 					depthFormat: THREE.AutoDepthFormat,
-					depthPacking: THREE.LinearDepthPacking
+					depthPacking: THREE.LinearDepthPacking,
+
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					side: THREE.DoubleSide
 				} );
 
 				materialDepthAutoRGBA = new THREE.MeshDepthMaterial( {
 					depthFormat: THREE.AutoDepthFormat,
-					depthPacking: THREE.RGBADepthPacking
+					depthPacking: THREE.RGBADepthPacking,
+
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					side: THREE.DoubleSide
 				} );
 
 				materialDepthLinearClipZ = new THREE.MeshDepthMaterial( {
 					depthFormat: THREE.LinearClipZDepthFormat,
-					depthPacking: THREE.LinearDepthPacking
+					depthPacking: THREE.LinearDepthPacking,
+
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					side: THREE.DoubleSide
 				} );
 
 				materialDepthLinearClipZRGBA = new THREE.MeshDepthMaterial( {
 					depthFormat: THREE.LinearClipZDepthFormat,
-					depthPacking: THREE.RGBADepthPacking
+					depthPacking: THREE.RGBADepthPacking,
+
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					side: THREE.DoubleSide
 				} );
 
 				materialDepthInvClipZ = new THREE.MeshDepthMaterial( {
 					depthFormat: THREE.InvClipZDepthFormat,
-					depthPacking: THREE.LinearDepthPacking
+					depthPacking: THREE.LinearDepthPacking,
+
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					side: THREE.DoubleSide
 				} );
 
 				materialDepthInvClipZRGBA = new THREE.MeshDepthMaterial( {
 					depthFormat: THREE.InvClipZDepthFormat,
-					depthPacking: THREE.RGBADepthPacking
+					depthPacking: THREE.RGBADepthPacking,
+
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					side: THREE.DoubleSide
 				} );
 
 				materialNormal = new THREE.MeshNormalMaterial();
