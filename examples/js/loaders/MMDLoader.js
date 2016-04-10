@@ -456,7 +456,7 @@ THREE.MMDLoader.prototype.parsePmd = function ( buffer ) {
 			p.toonIndex = dv.getInt8();
 			p.edgeFlag = dv.getUint8();
 			p.faceCount = dv.getUint32() / 3;
-			p.fileName = dv.getChars( 20 );
+			p.fileName = dv.getSjisStringsAsUnicode( 20 );
 			return p;
 
 		};
