@@ -130,7 +130,7 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.center.set( 0, 3000, 0 );
+				controls.target.set( 0, 3000, 0 );
 
 				controls.addEventListener( 'change', render );
 
