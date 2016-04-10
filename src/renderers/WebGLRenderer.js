@@ -2467,39 +2467,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// single THREE.Color
 			_gl.uniform3f( location, value.r, value.g, value.b );
 
-		} else if ( type === 's' ) {
+		} else if ( type === 's' || type === 'sa' ) {
 
-			// TODO: Optimize this
+			var properties = uniform.properties,
+				identifiers = location.ids,
+				nestedInfos = location.infos;
 
-			var properties = uniform.properties;
+			for ( var i = 0, n = identifiers.length; i !== n; ++ i ) {
 
-			for ( var name in properties ) {
+				var id = identifiers[ i ],
+					isArray = typeof id === 'number',
+					nestedUniform = isArray ? uniform : properties[ id ],
+					nestedInfo = nestedInfos[ i ],
+					nestedType = nestedInfo.infos !== undefined ? 's' : nestedUniform.type,
+					nestedValue = value[ id ];
 
-				var property = properties[ name ];
-				var locationProperty = location[ name ];
-				var valueProperty = value[ name ];
-
-				loadUniform( property, property.type, locationProperty, valueProperty );
-
-			}
-
-		} else if ( type === 'sa' ) {
-
-			// TODO: Optimize this
-
-			var properties = uniform.properties;
-
-			for ( var i = 0, l = value.length; i < l; i ++ ) {
-
-				for ( var name in properties ) {
-
-					var property = properties[ name ];
-					var locationProperty =  location[ i ][ name ];
-					var valueProperty = value[ i ][ name ];
-
-					loadUniform( property, property.type, locationProperty, valueProperty );
-
-				}
+				loadUniform( nestedUniform, nestedType, nestedInfo, nestedValue );
 
 			}
 

@@ -106,43 +106,77 @@ THREE.WebGLProgram = ( function () {
 	}
 
 
-	var ReNamePart = /([\w\d_]+)\]?(\[|\.)?/g;
+	var ReNamePart = /([\w\d_]+)(\])?(\[|\.)?/g;
 
-	function attachUniformInfo( name, info, ctx ) {
+	function attachUniformInfo( name, info, root ) {
 		// attaches 'info' at the right spot according to parsed name
 
-		var len = name.length;
+		var ctx = root,
+			len = name.length;
 
 		for (; ;) {
 
-			var match = ReNamePart.exec( name ),
+			var ids = ctx.ids,
+				infos = ctx.infos,
+
+				match = ReNamePart.exec( name ),
 				matchEnd = ReNamePart.lastIndex,
 
 				id = match[ 1 ],
-				subscript = match[ 2 ];
+				idIsIndex = match[ 2 ] === ']',
+				subscript = match[ 3 ];
+
+			if ( idIsIndex ) id = + id; // avoid parsing strings in renderer
 
 			if ( subscript === undefined ||
 					subscript === '[' && matchEnd + 2 === len ) {
 				// bare name or pure bottom-level array with "[0]" suffix
 
-				ctx[ id ] = info;
+				if ( ctx === root ) {
+
+					ctx[ id ] = info;
+
+				} else {
+
+					ids.push( id );
+					infos.push( info );
+
+				}
+
 				break;
 
 			} else {
 				// step into context and create it in case it doesn't exist
 
-				var nextCtx = ctx[ id ];
+				if ( ctx === root ) {
 
-				if ( nextCtx === undefined ) {
+					var nextCtx = ctx[ id ];
 
-					nextCtx = subscript === '[' ? [] : {};
-					ctx[ id ] = nextCtx;
+					if ( nextCtx === undefined ) {
+
+						nextCtx = { ids: [], infos: [] };
+						ctx[ id ] = nextCtx;
+
+					}
+
+					ctx = nextCtx;
+
+				} else {
+
+					var i = ids.indexOf( id );
+
+					if ( i === -1 ) {
+
+						i = ids.length;
+
+						ids.push( id );
+						infos.push( { ids: [], infos: [] } );
+
+					}
+
+					ctx = ctx.infos[ i ];
 
 				}
-
-				ctx = nextCtx;
-
-				// on to the next
 
 			}
 
@@ -167,7 +201,7 @@ THREE.WebGLProgram = ( function () {
 
 				location = gl.getUniformLocation( program, name );
 
-			console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
+			// console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
 
 			attachUniformInfo( name, location, uniforms );
 
