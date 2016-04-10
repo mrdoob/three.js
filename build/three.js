@@ -20906,6 +20906,10 @@ THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
  * parameters = {
  *  opacity: <float>,
  *
+ *  displacementMap: new THREE.Texture( <Image> ),
+ *  displacementScale: <float>,
+ *  displacementBias: <float>,
+ *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
  * }
@@ -20922,6 +20926,10 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	this.skinning = false;
 	this.morphTargets = false;
+
+	this.displacementMap = null;
+	this.displacementScale = 1;
+	this.displacementBias = 0;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -20942,6 +20950,10 @@ THREE.MeshDepthMaterial.prototype.copy = function ( source ) {
 
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
+
+	this.displacementMap = source.displacementMap;
+	this.displacementScale = source.displacementScale;
+	this.displacementBias = source.displacementBias;
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
@@ -24430,7 +24442,7 @@ THREE.ShaderChunk[ 'depth_frag' ] = "#if DEPTH_FORMAT != 3100\n	uniform float mN
 
 // File:src/renderers/shaders/ShaderLib/depth_vert.glsl
 
-THREE.ShaderChunk[ 'depth_vert' ] = "#include <common>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\n#if DEPTH_FORMAT != 3100\n	varying float vViewZDepth;\n#endif\nvoid main() {\n	#include <skinbase_vertex>\n	#include <begin_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	#include <clipping_planes_vertex>\n	#if DEPTH_FORMAT != 3100\n		vViewZDepth = mvPosition.z;\n	#endif\n}\n";
+THREE.ShaderChunk[ 'depth_vert' ] = "#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\n#if DEPTH_FORMAT != 3100\n	varying float vViewZDepth;\n#endif\nvoid main() {\n	#include <uv_vertex>\n	#include <skinbase_vertex>\n	#include <begin_vertex>\n	#include <displacementmap_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	#include <clipping_planes_vertex>\n	#if DEPTH_FORMAT != 3100\n		vViewZDepth = mvPosition.z;\n	#endif\n}\n";
 
 // File:src/renderers/shaders/ShaderLib/distanceRGBA_frag.glsl
 
@@ -24685,13 +24697,17 @@ THREE.ShaderLib = {
 
 	'depth': {
 
-		uniforms: {
+		uniforms: THREE.UniformsUtils.merge( [
 
-			"mNear": { type: "1f", value: 1.0 },
-			"mFar" : { type: "1f", value: 2000.0 },
-			"opacity" : { type: "1f", value: 1.0 }
+			THREE.UniformsLib[ 'displacementmap' ],
 
-		},
+			{
+				"mNear": { type: "1f", value: 1.0 },
+				"mFar" : { type: "1f", value: 2000.0 },
+				"opacity" : { type: "1f", value: 1.0 }
+			}
+
+		] ),
 
 		vertexShader: THREE.ShaderChunk[ 'depth_vert' ],
 		fragmentShader: THREE.ShaderChunk[ 'depth_frag' ]
@@ -26760,6 +26776,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 				m_uniforms.mFar.value = camera.far;
 				m_uniforms.opacity.value = material.opacity;
 
+				if ( material.displacementMap ) {
+
+					m_uniforms.displacementMap.value = material.displacementMap;
+					m_uniforms.displacementScale.value = material.displacementScale;
+					m_uniforms.displacementBias.value = material.displacementBias;
+
+				}
+
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
 				m_uniforms.opacity.value = material.opacity;
@@ -27241,39 +27265,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// single THREE.Color
 			_gl.uniform3f( location, value.r, value.g, value.b );
 
-		} else if ( type === 's' ) {
+		} else if ( type === 's' || type === 'sa' ) {
 
-			// TODO: Optimize this
+			var properties = uniform.properties,
+				identifiers = location.ids,
+				nestedInfos = location.infos;
 
-			var properties = uniform.properties;
+			for ( var i = 0, n = identifiers.length; i !== n; ++ i ) {
 
-			for ( var name in properties ) {
+				var id = identifiers[ i ],
+					isArray = typeof id === 'number',
+					nestedUniform = isArray ? uniform : properties[ id ],
+					nestedInfo = nestedInfos[ i ],
+					nestedType = nestedInfo.infos !== undefined ? 's' : nestedUniform.type,
+					nestedValue = value[ id ];
 
-				var property = properties[ name ];
-				var locationProperty = location[ name ];
-				var valueProperty = value[ name ];
-
-				loadUniform( property, property.type, locationProperty, valueProperty );
-
-			}
-
-		} else if ( type === 'sa' ) {
-
-			// TODO: Optimize this
-
-			var properties = uniform.properties;
-
-			for ( var i = 0, l = value.length; i < l; i ++ ) {
-
-				for ( var name in properties ) {
-
-					var property = properties[ name ];
-					var locationProperty =  location[ i ][ name ];
-					var valueProperty = value[ i ][ name ];
-
-					loadUniform( property, property.type, locationProperty, valueProperty );
-
-				}
+				loadUniform( nestedUniform, nestedType, nestedInfo, nestedValue );
 
 			}
 
@@ -29526,11 +29533,6 @@ THREE.WebGLProgram = ( function () {
 
 	var programIdCount = 0;
 
-	// TODO: Combine the regex
-	var structRe = /^([\w\d_]+)\.([\w\d_]+)$/;
-	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/;
-	var arrayRe = /^([\w\d_]+)\[0\]$/;
-
 	function getEncodingComponents( encoding ) {
 
 		switch ( encoding ) {
@@ -29634,83 +29636,105 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
+
+	var ReNamePart = /([\w\d_]+)(\])?(\[|\.)?/g;
+
+	function attachUniformInfo( name, info, root ) {
+		// attaches 'info' at the right spot according to parsed name
+
+		var ctx = root,
+			len = name.length;
+
+		for (; ;) {
+
+			var ids = ctx.ids,
+				infos = ctx.infos,
+
+				match = ReNamePart.exec( name ),
+				matchEnd = ReNamePart.lastIndex,
+
+				id = match[ 1 ],
+				idIsIndex = match[ 2 ] === ']',
+				subscript = match[ 3 ];
+
+			if ( idIsIndex ) id = + id; // avoid parsing strings in renderer
+
+			if ( subscript === undefined ||
+					subscript === '[' && matchEnd + 2 === len ) {
+				// bare name or pure bottom-level array with "[0]" suffix
+
+				if ( ctx === root ) {
+
+					ctx[ id ] = info;
+
+				} else {
+
+					ids.push( id );
+					infos.push( info );
+
+				}
+
+				break;
+
+			} else {
+				// step into context and create it in case it doesn't exist
+
+				if ( ctx === root ) {
+
+					var nextCtx = ctx[ id ];
+
+					if ( nextCtx === undefined ) {
+
+						nextCtx = { ids: [], infos: [] };
+						ctx[ id ] = nextCtx;
+
+					}
+
+					ctx = nextCtx;
+
+				} else {
+
+					var i = ids.indexOf( id );
+
+					if ( i === -1 ) {
+
+						i = ids.length;
+
+						ids.push( id );
+						infos.push( { ids: [], infos: [] } );
+
+					}
+
+					ctx = ctx.infos[ i ];
+
+				}
+
+			}
+
+		}
+
+		// reset stateful RegExp object, because of early exit
+		ReNamePart.lastIndex = 0;
+
+	}
+
+
 	function fetchUniformLocations( gl, program, identifiers ) {
 
 		var uniforms = {};
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 
-		for ( var i = 0; i < n; i ++ ) {
+		for ( var i = 0; i !== n; ++ i ) {
 
-			var info = gl.getActiveUniform( program, i );
-			var name = info.name;
-			var location = gl.getUniformLocation( program, name );
+			var info = gl.getActiveUniform( program, i ),
+				name = info.name,
 
-			//console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
+				location = gl.getUniformLocation( program, name );
 
-			var matches = structRe.exec( name );
-			if ( matches ) {
+			// console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
 
-				var structName = matches[ 1 ];
-				var structProperty = matches[ 2 ];
-
-				var uniformsStruct = uniforms[ structName ];
-
-				if ( ! uniformsStruct ) {
-
-					uniformsStruct = uniforms[ structName ] = {};
-
-				}
-
-				uniformsStruct[ structProperty ] = location;
-
-				continue;
-
-			}
-
-			matches = arrayStructRe.exec( name );
-
-			if ( matches ) {
-
-				var arrayName = matches[ 1 ];
-				var arrayIndex = matches[ 2 ];
-				var arrayProperty = matches[ 3 ];
-
-				var uniformsArray = uniforms[ arrayName ];
-
-				if ( ! uniformsArray ) {
-
-					uniformsArray = uniforms[ arrayName ] = [];
-
-				}
-
-				var uniformsArrayIndex = uniformsArray[ arrayIndex ];
-
-				if ( ! uniformsArrayIndex ) {
-
-					uniformsArrayIndex = uniformsArray[ arrayIndex ] = {};
-
-				}
-
-				uniformsArrayIndex[ arrayProperty ] = location;
-
-				continue;
-
-			}
-
-			matches = arrayRe.exec( name );
-
-			if ( matches ) {
-
-				var arrayName = matches[ 1 ];
-
-				uniforms[ arrayName ] = location;
-
-				continue;
-
-			}
-
-			uniforms[ name ] = location;
+			attachUniformInfo( name, location, uniforms );
 
 		}
 
