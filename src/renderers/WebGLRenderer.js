@@ -2586,7 +2586,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-				value[ i ].flattenToArrayOffset( uniform._array, i * 9 );
+				value[ i ].toArray( uniform._array, i * 9 );
 
 			}
 
@@ -2609,7 +2609,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-				value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
+				value[ i ].toArray( uniform._array, i * 16 );
 
 			}
 
