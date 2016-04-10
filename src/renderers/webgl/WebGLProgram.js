@@ -2,11 +2,6 @@ THREE.WebGLProgram = ( function () {
 
 	var programIdCount = 0;
 
-	// TODO: Combine the regex
-	var structRe = /^([\w\d_]+)\.([\w\d_]+)$/;
-	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/;
-	var arrayRe = /^([\w\d_]+)\[0\]$/;
-
 	function getEncodingComponents( encoding ) {
 
 		switch ( encoding ) {
@@ -110,83 +105,105 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
+
+	var ReNamePart = /([\w\d_]+)(\])?(\[|\.)?/g;
+
+	function attachUniformInfo( name, info, root ) {
+		// attaches 'info' at the right spot according to parsed name
+
+		var ctx = root,
+			len = name.length;
+
+		for (; ;) {
+
+			var ids = ctx.ids,
+				infos = ctx.infos,
+
+				match = ReNamePart.exec( name ),
+				matchEnd = ReNamePart.lastIndex,
+
+				id = match[ 1 ],
+				idIsIndex = match[ 2 ] === ']',
+				subscript = match[ 3 ];
+
+			if ( idIsIndex ) id = + id; // avoid parsing strings in renderer
+
+			if ( subscript === undefined ||
+					subscript === '[' && matchEnd + 2 === len ) {
+				// bare name or pure bottom-level array with "[0]" suffix
+
+				if ( ctx === root ) {
+
+					ctx[ id ] = info;
+
+				} else {
+
+					ids.push( id );
+					infos.push( info );
+
+				}
+
+				break;
+
+			} else {
+				// step into context and create it in case it doesn't exist
+
+				if ( ctx === root ) {
+
+					var nextCtx = ctx[ id ];
+
+					if ( nextCtx === undefined ) {
+
+						nextCtx = { ids: [], infos: [] };
+						ctx[ id ] = nextCtx;
+
+					}
+
+					ctx = nextCtx;
+
+				} else {
+
+					var i = ids.indexOf( id );
+
+					if ( i === -1 ) {
+
+						i = ids.length;
+
+						ids.push( id );
+						infos.push( { ids: [], infos: [] } );
+
+					}
+
+					ctx = ctx.infos[ i ];
+
+				}
+
+			}
+
+		}
+
+		// reset stateful RegExp object, because of early exit
+		ReNamePart.lastIndex = 0;
+
+	}
+
+
 	function fetchUniformLocations( gl, program, identifiers ) {
 
 		var uniforms = {};
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 
-		for ( var i = 0; i < n; i ++ ) {
+		for ( var i = 0; i !== n; ++ i ) {
 
-			var info = gl.getActiveUniform( program, i );
-			var name = info.name;
-			var location = gl.getUniformLocation( program, name );
+			var info = gl.getActiveUniform( program, i ),
+				name = info.name,
 
-			//console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
+				location = gl.getUniformLocation( program, name );
 
-			var matches = structRe.exec( name );
-			if ( matches ) {
+			// console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
 
-				var structName = matches[ 1 ];
-				var structProperty = matches[ 2 ];
-
-				var uniformsStruct = uniforms[ structName ];
-
-				if ( ! uniformsStruct ) {
-
-					uniformsStruct = uniforms[ structName ] = {};
-
-				}
-
-				uniformsStruct[ structProperty ] = location;
-
-				continue;
-
-			}
-
-			matches = arrayStructRe.exec( name );
-
-			if ( matches ) {
-
-				var arrayName = matches[ 1 ];
-				var arrayIndex = matches[ 2 ];
-				var arrayProperty = matches[ 3 ];
-
-				var uniformsArray = uniforms[ arrayName ];
-
-				if ( ! uniformsArray ) {
-
-					uniformsArray = uniforms[ arrayName ] = [];
-
-				}
-
-				var uniformsArrayIndex = uniformsArray[ arrayIndex ];
-
-				if ( ! uniformsArrayIndex ) {
-
-					uniformsArrayIndex = uniformsArray[ arrayIndex ] = {};
-
-				}
-
-				uniformsArrayIndex[ arrayProperty ] = location;
-
-				continue;
-
-			}
-
-			matches = arrayRe.exec( name );
-
-			if ( matches ) {
-
-				var arrayName = matches[ 1 ];
-
-				uniforms[ arrayName ] = location;
-
-				continue;
-
-			}
-
-			uniforms[ name ] = location;
+			attachUniformInfo( name, location, uniforms );
 
 		}
 
