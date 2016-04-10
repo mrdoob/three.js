@@ -33,25 +33,6 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Matrix3 transpose]()</h3>
-		<div>
-		Transposes this matrix in place.
-		</div>
-
-		<h3>[method:Matrix3 transposeIntoArray]( [page:Array array] )</h3>
-		<div>
-		array -- [page:Array] <br />
-		</div>
-		<div>
-		Transposes this matrix into the supplied array, and returns itself unchanged.
-		</div>
-
-
-		<h3>[method:Float determinant]()</h3>
-		<div>
-		Computes and returns the determinant of this matrix.
-		</div>
-
 		<h3>[method:Matrix3 set]([page:Float n11], [page:Float n12], [page:Float n13], [page:Float n21], [page:Float n22], [page:Float n23], [page:Float n31], [page:Float n32], [page:Float n33]) [page:Matrix3 this]</h3>
 		<div>
 		n11 -- [page:Float] <br />
@@ -66,6 +47,40 @@
 		</div>
 		<div>
 		Sets the 3x3 matrix values to the given row-major sequence of values.
+		</div>
+
+		<h3>[method:Matrix3 copy]([page:Matrix3 m]) [page:Matrix3 this]</h3>
+		<div>
+		m -- [page:Matrix4]
+		</div>
+		<div>
+		Copies the values of matrix *m* into this matrix.
+		</div>
+
+		<h3>[method:Matrix3 fromArray]([page:Array array]) [page:Matrix3 this]</h3>
+		<div>
+		array -- [page:Array] The array to read the elements from.
+		</div>
+		<div>
+		Sets the elements of this matrix based on an array in column-major format.
+		</div>
+
+		<h3>[method:Matrix3 transpose]()</h3>
+		<div>
+		Transposes this matrix in place.
+		</div>
+
+		<h3>[method:Matrix3 transposeIntoArray]( [page:Array array] )</h3>
+		<div>
+		array -- [page:Array] <br />
+		</div>
+		<div>
+		Transposes this matrix into the supplied array, and returns itself unchanged.
+		</div>
+
+		<h3>[method:Float determinant]()</h3>
+		<div>
+		Computes and returns the determinant of this matrix.
 		</div>
 
 		<h3>[method:Matrix3 multiplyScalar]([page:Float s]) [page:Matrix3 this]</h3>
@@ -101,19 +116,6 @@
 		Set this matrix to the inverse of the passed matrix.
 		</div>
 
-		<h3>[method:Matrix3 copy]([page:Matrix3 m]) [page:Matrix3 this]</h3>
-		<div>
-		m -- [page:Matrix4]
-		</div>
-		<div>
-		Copies the values of matrix *m* into this matrix.
-		</div>
-
-		<h3>[method:Matrix3 clone]()</h3>
-		<div>
-		Creates a copy of this matrix.
-		</div>
-
 		<h3>[method:Matrix3 identity]() [page:Matrix3 this]</h3>
 		<div>
 		Resets this matrix to identity.<br/><br/>
@@ -121,6 +123,20 @@
 		1, 0, 0<br/>
 		0, 1, 0<br/>
 		0, 0, 1<br/>
+		</div>
+
+		<h3>[method:Matrix3 clone]()</h3>
+		<div>
+		Creates a copy of this matrix.
+		</div>
+
+		<h3>[method:Array toArray]([page:Array array], [page:Integer offset]) [page:Matrix3 this]</h3>
+		<div>
+		array -- [page:Array] optional array to store the vector <br />
+		offset -- [page:Integer] optional offset into the array
+		</div>
+		<div>
+		Writes the elements of this matrix to an array in column-major format.
 		</div>
 
 		<h2>Source</h2>

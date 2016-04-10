@@ -73,6 +73,15 @@
 		Copies value of *v* to this vector.
 		</div>
 
+		<h3>[method:Vector3 fromArray]([page:Array array], [page:Integer offset]) [page:Vector3 this]</h3>
+		<div>
+		array -- The source array in the form [x, y, z].<br />
+		offset -- An optional offset into the array.
+		</div>
+		<div>
+		Sets the vector's components based on an array formatted like [x, y, z]
+		</div>
+
 		<h3>[method:Vector3 add]( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		Adds *v* to this vector.
@@ -174,17 +183,6 @@
 		<div>
 		Sets this vector extracting scale from matrix transform.
 		</div>
-
-		<h3>[method:Boolean equals]( [page:Vector3 v] )</h3>
-		<div>
-		Checks for strict equality of this vector and *v*.
-		</div>
-
-		<h3>[method:Vector3 clone]()</h3>
-		<div>
-		Clones this vector.
-		</div>
-
 
 		<h3>[method:Vector3 clamp]([page:Vector3 min], [page:Vector3 max]) [page:Vector3 this]</h3>
 		<div>
@@ -394,14 +392,6 @@
 		Reflect incident vector off of plane orthogonal to normal. normal is assumed to have unit length.
 		</div>
 
-		<h3>[method:Vector3 fromArray]([page:Array array]) [page:Vector3 this]</h3>
-		<div>
-		array -- [page:Array] [x, y, z]
-		</div>
-		<div>
-		Sets the vector's components based on an array formatted like [x, y, z]
-		</div>
-
 		<h3>[method:Vector3 multiply]([page:Vector3 v]) [page:Vector3 this]</h3>
 		<div>
 		v -- [page:Vector3] <br />
@@ -416,17 +406,6 @@
 		</div>
 		<div>
 		Multiplies this vector and m, and divides by perspective.
-		</div>
-
-		<h3>[method:Array toArray]( [page:Array array] )</h3>
-		<div>
-		array -- Optional array to store the vector.
-		</div>
-		<div>
-		Assigns this vector's x value to array[0]. <br />
-		Assigns this vector's y value to array[1]. <br />
-		Assigns this vector's z value to array[2]. <br />
-		Returns the created array.
 		</div>
 
 		<h3>[method:Vector3 applyEuler]([page:Euler euler]) [page:Vector3 this]</h3>
@@ -445,7 +424,7 @@
 		Applies a [page:Quaternion] transform to this vector.
 		</div>
 
-		<h3>[method:Vector3 project]( [page:Camera camera] )</h3>
+		<h3>[method:Vector3 project]([page:Camera camera]) [page:Vector3 this]</h3>
 		<div>
 		[page:Camera camera] — camera to use in the projection.<br />
 		</div>
@@ -453,12 +432,34 @@
 		Projects the vector with the camera.
 		</div>
 
-		<h3>[method:Vector3 unproject]( [page:Camera camera] )</h3>
+		<h3>[method:Vector3 unproject]([page:Camera camera]) [page:Vector3 this]</h3>
 		<div>
 		[page:Camera camera] — camera to use in the projection.<br />
 		</div>
 		<div>
 		Unprojects the vector with the camera.
+		</div>
+
+		<h3>[method:Boolean equals]( [page:Vector3 v] ) [page:Vector3 this]</h3>
+		<div>
+		Checks for strict equality of this vector and *v*.
+		</div>
+
+		<h3>[method:Vector3 clone]() [page:Vector3 this]</h3>
+		<div>
+		Clones this vector.
+		</div>
+
+		<h3>[method:Array toArray]([page:Array array], [page:Integer offset]) [page:Vector3 this]</h3>
+		<div>
+		array -- An optional array to store the vector to. <br />
+		offset -- An optional offset into the array.
+		</div>
+		<div>
+		Assigns this vector's x value to array[0]. <br />
+		Assigns this vector's y value to array[1]. <br />
+		Assigns this vector's z value to array[2]. <br />
+		Returns the created array.
 		</div>
 
 		<h2>Source</h2>

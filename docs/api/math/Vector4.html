@@ -43,9 +43,50 @@
 		Sets value of this vector.
 		</div>
 
+		<h3>[method:Vector4 setX]([page:Float x]) [page:Vector4 this]</h3>
+		<div>
+		x -- [page:Float]
+		</div>
+		<div>
+		Sets the x component of the vector.
+		</div>
+
+		<h3>[method:Vector4 setY]([page:Float y]) [page:Vector4 this]</h3>
+		<div>
+		y -- [page:Float]
+		</div>
+		<div>
+		Sets the y component of the vector.
+		</div>
+
+		<h3>[method:Vector4 setZ]([page:Float z]) [page:Vector4 this]</h3>
+		<div>
+		z -- [page:Float]
+		</div>
+		<div>
+		Sets the z component of the vector.
+		</div>
+
+		<h3>[method:Vector4 setW]([page:Float w]) [page:Vector4 this]</h3>
+		<div>
+		w -- [page:Float]
+		</div>
+		<div>
+		Sets the w component of the vector.
+		</div>
+
 		<h3>[method:Vector4 copy]( [page:Vector4 v] ) [page:Vector4 this]</h3>
 		<div>
 		Copies value of *v* to this vector.
+		</div>
+
+		<h3>[method:Vector4 fromArray]([page:Array array]) [page:Vector4 this]</h3>
+		<div>
+		array -- The source array in the form [x, y, z, w]. <br />
+		offset -- An optional offset into the array.
+		</div>
+		<div>
+		Sets the vector's components based on an array formatted like [x, y, z, w]
 		</div>
 
 		<h3>[method:Vector4 add]( [page:Vector4 v] ) [page:Vector4 this]</h3>
@@ -122,11 +163,6 @@
 		<h3>[method:Vector4 lerpVectors]( [page:Vector4 v1], [page:Vector4 v2], [page:Float alpha] ) [page:Vector4 this]</h3>
 		<div>
 		Sets this vector to be the vector linearly interpolated between *v1* and *v2* with *alpha* factor.
-		</div>
-
-		<h3>[method:Vector4 clone]()</h3>
-		<div>
-		Clones this vector.
 		</div>
 
 
@@ -258,60 +294,25 @@
 		Index 3: w<br/>
 		</div>
 
-		<h3>[method:Vector4 fromArray]([page:Array array]) [page:Vector4 this]</h3>
-		<div>
-		array -- [page:Array] An array formatted [x, y, z, w]
-		</div>
-		<div>
-		Sets the vector's components based on an array formatted like [x, y, z, w]
-		</div>
-
-		<h3>[method:Array toArray]( [page:Array array] )</h3>
-		<div>
-		array -- Optional array to store the vector.
-		</div>
-		<div>
-		Returns an array in the format [x, y, z, w]
-		</div>
-
 		<h3>[method:Float lengthManhattan]()</h3>
 		<div>
 		Computes Manhattan length of this vector.<br />
 		[link:http://en.wikipedia.org/wiki/Taxicab_geometry]
 		</div>
 
-
-		<h3>[method:Vector4 setX]([page:Float x]) [page:Vector4 this]</h3>
+		<h3>[method:Vector4 clone]()</h3>
 		<div>
-		x -- [page:Float]
-		</div>
-		<div>
-		Sets the x component of the vector.
+		Clones this vector.
 		</div>
 
-		<h3>[method:Vector4 setY]([page:Float y]) [page:Vector4 this]</h3>
+		<h3>[method:Array toArray]([page:Array array], [page:Integer offset])</h3>
 		<div>
-		y -- [page:Float]
+		array -- An optional array to store the vector.
+		offset -- An optional offset into the array.
 		</div>
 		<div>
-		Sets the y component of the vector.
-		</div>
+		Returns an array in the format [x, y, z, w]
 
-		<h3>[method:Vector4 setZ]([page:Float z]) [page:Vector4 this]</h3>
-		<div>
-		z -- [page:Float]
-		</div>
-		<div>
-		Sets the z component of the vector.
-		</div>
-
-		<h3>[method:Vector4 setW]([page:Float w]) [page:Vector4 this]</h3>
-		<div>
-		w -- [page:Float]
-		</div>
-		<div>
-		Sets the w component of the vector.
-		</div>
 
 		<h2>Source</h2>
 

@@ -48,9 +48,34 @@
 		Sets value of this vector.
 		</div>
 
+		<h3>[method:Vector2 setX]([page:Float x]) [page:Vector2 this]</h3>
+		<div>
+		x -- [page:Float]
+		</div>
+		<div>
+		replace this vector's x value with x.
+		</div>
+
+		<h3>[method:Vector2 setY]([page:Float y]) [page:Vector2 this]</h3>
+		<div>
+		y -- [page:Float]
+		</div>
+		<div>
+		replace this vector's y value with y.
+		</div>
+
 		<h3>[method:Vector2 copy]( [page:Vector2 v] ) [page:Vector2 this]</h3>
 		<div>
 		Copies value of *v* to this vector.
+		</div>
+
+		<h3>[method:Vector2 fromArray]([page:Array array], [page:Integer offset]) [page:Vector2 this]</h3>
+		<div>
+		array -- The source array of length 2 <br />
+		offset -- An optional offset into the array.
+		</div>
+		<div>
+		Sets this vector's x value to be array[0] and y value to be array[1].
 		</div>
 
 		<h3>[method:Vector2 add]( [page:Vector2 v] ) [page:Vector2 this]</h3>
@@ -139,17 +164,6 @@
 		<div>
 		Normalizes this vector and multiplies it by *l*.
 		</div>
-
-		<h3>[method:Boolean equals]( [page:Vector2 v] )</h3>
-		<div>
-		Checks for strict equality of this vector and *v*.
-		</div>
-
-		<h3>[method:Vector2 clone]()</h3>
-		<div>
-		Clones this vector.
-		</div>
-
 
 		<h3>[method:Vector2 clamp]([page:Vector2 min], [page:Vector2 max]) [page:Vector2 this]</h3>
 		<div>
@@ -247,22 +261,6 @@
 		if index equals 1 returns the y value.
 		</div>
 
-		<h3>[method:Vector2 fromArray]([page:Array array]) [page:Vector2 this]</h3>
-		<div>
-		array -- [page:Array] of length 2
-		</div>
-		<div>
-		Sets this vector's x value to be array[0] and y value to be array[1].
-		</div>
-
-		<h3>[method:Array toArray]( [page:Array array] )</h3>
-		<div>
-		array -- Optional array to store the vector.
-		</div>
-		<div>
-		Returns an array [x, y].
-		</div>
-
 		<h3>[method:Vector2 min]([page:Vector2 v]) [page:Vector2 this]</h3>
 		<div>
 		v -- [page:Vector2]
@@ -279,20 +277,23 @@
 		If this vector's x or y value is less than v's x or y value, replace that value with the corresponding max value.
 		</div>
 
-		<h3>[method:Vector2 setX]([page:Float x]) [page:Vector2 this]</h3>
+		<h3>[method:Boolean equals]([page:Vector2 v]) [page:Vector2 this]</h3>
 		<div>
-		x -- [page:Float]
-		</div>
-		<div>
-		replace this vector's x value with x.
+		Checks for strict equality of this vector and *v*.
 		</div>
 
-		<h3>[method:Vector2 setY]([page:Float y]) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 clone]() [page: Vector2 this]</h3>
 		<div>
-		y -- [page:Float]
+		Clones this vector.
+		</div>
+
+		<h3>[method:Array toArray]([page:Array array], [page:Integer offset]) [page:Vector2 this]</h3>
+		<div>
+		array -- An optional array to store the vector to. <br />
+		offset -- An optional offset into the array.
 		</div>
 		<div>
-		replace this vector's y value with y.
+		Returns an array [x, y].
 		</div>
 
 		<h2>Source</h2>
