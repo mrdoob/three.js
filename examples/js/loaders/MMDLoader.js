@@ -928,7 +928,7 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 
 			p.type = dv.getUint8();
 
-			var indexSize = metadata.vertexIndexSize;
+			var indexSize = metadata.boneIndexSize;
 
 			if ( p.type === 0 ) {  // BDEF1
 
