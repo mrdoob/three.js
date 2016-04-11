@@ -471,16 +471,9 @@ THREE.ObjectLoader.prototype = {
 
 					if ( data.focus !== undefined ) object.focus = data.focus;
 					if ( data.zoom !== undefined ) object.zoom = data.zoom;
-
-					if ( data.filmGauge !== undefined ) {
-
-						if ( data.view !== null )
-							object.view = Object.assign( {}, data.view );
-
-						object.filmGauge = data.filmGauge;
-						object.filmOffset = data.filmOffset;
-
-					}
+					if ( data.filmGauge !== undefined ) object.filmGauge = data.filmGauge;
+					if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
+					if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
 
 					break;
 
