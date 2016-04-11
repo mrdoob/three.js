@@ -48,12 +48,12 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Quaternion set]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] )</h3>
+		<h3>[method:Quaternion set]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] ) [page:Quaternion this]</h3>
 		<div>
 		Sets values of this quaternion.
 		</div>
 
-		<h3>[method:Quaternion copy]( [page:Quaternion q] )</h3>
+		<h3>[method:Quaternion copy]( [page:Quaternion q] ) [page:Quaternion this]</h3>
 		<div>
 		Copies values of *q* to this quaternion.
 		</div>
@@ -72,53 +72,53 @@
 		Sets this quaternion from rotation specified by Euler angle.
 		</div>
 
-		<h3>[method:Quaternion setFromAxisAngle]( [page:Vector3 axis], [page:Float angle] )</h3>
+		<h3>[method:Quaternion setFromAxisAngle]( [page:Vector3 axis], [page:Float angle] ) [page:Quaternion this]</h3>
 		<div>
 		Sets this quaternion from rotation specified by axis and angle.<br />
 		Adapted from [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm].<br />
 		*Axis* is asumed to be normalized, *angle* is in radians.
 		</div>
 
-		<h3>[method:Quaternion setFromRotationMatrix]( [page:Matrix4 m] )</h3>
+		<h3>[method:Quaternion setFromRotationMatrix]( [page:Matrix4 m] ) [page:Quaternion this]</h3>
 		<div>
 		Sets this quaternion from rotation component of *m*.<br />
 		Adapted from [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm].
 		</div>
 
-		<h3>[method:Quaternion setFromUnitVectors]( [page:Vector3 vFrom], [page:Vector3 vTo] )</h3>
+		<h3>[method:Quaternion setFromUnitVectors]( [page:Vector3 vFrom], [page:Vector3 vTo] ) [page:Quaternion this]</h3>
 		<div>
 		Sets this quaternion to the rotation required to rotate direction vector *vFrom* to direction vector *vTo*.<br />
 		Adapted from [link:http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors].<br />
 		*vFrom* and *vTo* are assumed to be normalized.
 		</div>
 
-		<h3>[method:Quaternion inverse]()</h3>
+		<h3>[method:Quaternion inverse]() [page:Quaternion this]</h3>
 		<div>
 		Inverts this quaternion.
 		</div>
 
-		<h3>[method:Float length]()</h3>
+		<h3>[method:Float length]() [page:Quaternion this]</h3>
 		<div>
 		Computes length of this quaternion.
 		</div>
 
-		<h3>[method:Quaternion normalize]()</h3>
+		<h3>[method:Quaternion normalize]() [page:Quaternion this]</h3>
 		<div>
 		Normalizes this quaternion.
 		</div>
 
-		<h3>[method:Quaternion multiply]( [page:Quaternion b] )</h3>
+		<h3>[method:Quaternion multiply]( [page:Quaternion b] ) [page:Quaternion this]</h3>
 		<div>
 		Multiplies this quaternion by *b*.
 		</div>
 
-		<h3>[method:Quaternion multiplyQuaternions]( [page:Quaternion a], [page:Quaternion b] )</h3>
+		<h3>[method:Quaternion multiplyQuaternions]( [page:Quaternion a], [page:Quaternion b] ) [page:Quaternion this]</h3>
 		<div>
 		Sets this quaternion to *a x b*<br />
 		Adapted from [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm].
 		</div>
 
-		<h3>[method:Quaternion multiplyVector3]( [page:Vector3 vector], [page:Vector3 dest] )</h3>
+		<h3>[method:Quaternion multiplyVector3]( [page:Vector3 vector], [page:Vector3 dest] ) [page:Quaternion this]</h3>
 		<div>
 		Rotates *vector* by this quaternion into *dest*.<br />
 		If *dest* is not specified, result goes to *vec*.
@@ -135,7 +135,7 @@
 		represents the same rotation in the opposite direction about the rotational axis.
 		</div>
 
-		<h3>[method:Quaternion slerp]([page:Quaternion quaternionB], [page:float t])</h3>
+		<h3>[method:Quaternion slerp]( [page:Quaternion quaternionB], [page:float t] ) [page:Quaternion this]</h3>
 		<div>
 		quaternionB -- The other quaternion rotation<br />
 		t -- Normalized 0 to 1 interpolation factor

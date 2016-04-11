@@ -67,7 +67,7 @@
 		Copies the values of matrix *m* into this matrix.
 		</div>
 
-		<h3>[method:Matrix4 fromArray]([page:Array array]) [page:Matrix4 this]</h3>
+		<h3>[method:Matrix4 fromArray]( [page:Array array] ) [page:Matrix4 this]</h3>
 		<div>
 		array -- [page:Array] The array to read the elements from.
 		</div>
@@ -126,7 +126,7 @@
 		Multiplies every component of the matrix by a scalar value *s*.
 		</div>
 
-		<h3>[method:Float determinant]()</h3>
+		<h3>[method:Float determinant]() [page:Matrix4 this]</h3>
 		<div>
 		Computes and returns the determinant of this matrix.<br />
 		Based on [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm]
@@ -172,7 +172,7 @@
 		Sets this matrix to the transformation composed of *translation*, *quaternion* and *scale*.
 		</div>
 
-		<h3>[method:Array decompose]( [page:Vector3 translation], [page:Quaternion quaternion], [page:Vector3 scale] )</h3>
+		<h3>[method:Array decompose]( [page:Vector3 translation], [page:Quaternion quaternion], [page:Vector3 scale] ) [page:Matrix4 this]</h3>
 		<div>
 		Decomposes this matrix into the *translation*, *quaternion* and *scale* components.
 		</div>
@@ -236,7 +236,7 @@
 		Creates an orthographic projection matrix.
 		</div>
 
-		<h3>[method:Array applyToVector3Array]([page:Array a]) [page:Matrix4 this]</h3>
+		<h3>[method:Array applyToVector3Array]( [page:Array a] ) [page:Matrix4 this]</h3>
 		<div>
 		array -- An array in the form [vector1x, vector1y, vector1z, vector2x, vector2y, vector2z, ...]
 		</div>
@@ -254,7 +254,7 @@
 		Creates a copy of this matrix.
 		</div>
 
-		<h3>[method:Array toArray]([page:Array array], [page:Integer offset]) [page:Matrix4 this]</h3>
+		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] ) [page:Matrix4 this]</h3>
 		<div>
 		array -- [page:Array] optional array to store the vector <br />
 		offset -- [page:Integer] optional offset into the array
