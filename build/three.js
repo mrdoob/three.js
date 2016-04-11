@@ -333,12 +333,6 @@ THREE.RGBM7Encoding = 3004;
 THREE.RGBM16Encoding = 3005;
 THREE.RGBDEncoding = 3006; // MaxRange is 256.
 
-// Depth format
-
-THREE.AutoDepthFormat = 3100;  // switches based on camera type, uses gl_FragCoord.z
-THREE.LinearClipZDepthFormat = 3101;	// used by orthographic cameras
-THREE.InvClipZDepthFormat = 3102;  // used by perspective cameras
-
 // Depth packing strategies
 
 THREE.LinearDepthPacking = 3200;  // for writing to float textures for high precision or for visualizing results in RGB buffers
@@ -20915,7 +20909,6 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	this.type = 'MeshDepthMaterial';
 
-	this.depthFormat = THREE.AutoDepthFormat;
 	this.depthPacking = THREE.LinearDepthPacking;
 
 	this.skinning = false;
@@ -20939,7 +20932,6 @@ THREE.MeshDepthMaterial.prototype.copy = function ( source ) {
 
 	THREE.Material.prototype.copy.call( this, source );
 
-	this.depthFormat = source.depthFormat;
 	this.depthPacking = source.depthPacking;
 
 	this.skinning = source.skinning;
@@ -24098,7 +24090,7 @@ THREE.ShaderChunk[ 'normalmap_pars_fragment' ] = "#ifdef USE_NORMALMAP\n	uniform
 
 // File:src/renderers/shaders/ShaderChunk/packing.glsl
 
-THREE.ShaderChunk[ 'packing' ] = "vec3 packNormalToRGB( const in vec3 normal ) {\n  return normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n  return 1.0 - 2.0 * rgb.xyz;\n}\nvec4 packLinearUnitToRGBA( const in float value ) {\n	const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );\n	const vec4 bit_mask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );\n	vec4 res = mod( value * bit_shift * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );\n	res -= res.xxyz * bit_mask;\n	return res;\n}\nfloat unpackRGBAToLinearUnit( const in vec4 rgba ) {\n	const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );\n	return dot( rgba, bitSh );\n}\nfloat viewZToLinearClipZ( const in float viewZ, const in float near, const in float far ) {\n  return ( viewZ + near ) / ( near - far );\n}\nfloat linearClipZToViewZ( const in float linearClipZ, const in float near, const in float far ) {\n  return linearClipZ * ( near - far ) - near;\n}\nfloat viewZToInvClipZ( const in float viewZ, const in float near, const in float far ) {\n  return (( near + viewZ ) * far ) / (( far - near ) * viewZ );\n}\nfloat invClipZToViewZ( const in float invClipZ, const in float near, const in float far ) {\n  return ( near * far ) / ( ( far - near ) * invClipZ - far );\n}\n";
+THREE.ShaderChunk[ 'packing' ] = "vec3 packNormalToRGB( const in vec3 normal ) {\n  return normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n  return 1.0 - 2.0 * rgb.xyz;\n}\nvec4 packLinearUnitToRGBA( const in float value ) {\n	const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );\n	const vec4 bit_mask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );\n	vec4 res = mod( value * bit_shift * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );\n	res -= res.xxyz * bit_mask;\n	return res;\n}\nfloat unpackRGBAToLinearUnit( const in vec4 rgba ) {\n	const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );\n	return dot( rgba, bitSh );\n}\nfloat viewZToOrthoDepth( const in float viewZ, const in float near, const in float far ) {\n  return ( viewZ + near ) / ( near - far );\n}\nfloat OrthoDepthToViewZ( const in float linearClipZ, const in float near, const in float far ) {\n  return linearClipZ * ( near - far ) - near;\n}\nfloat viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {\n  return (( near + viewZ ) * far ) / (( far - near ) * viewZ );\n}\nfloat perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {\n  return ( near * far ) / ( ( far - near ) * invClipZ - far );\n}\n";
 
 // File:src/renderers/shaders/ShaderChunk/premultiplied_alpha_fragment.glsl
 
@@ -24432,11 +24424,11 @@ THREE.ShaderChunk[ 'cube_vert' ] = "varying vec3 vWorldPosition;\n#include <comm
 
 // File:src/renderers/shaders/ShaderLib/depth_frag.glsl
 
-THREE.ShaderChunk[ 'depth_frag' ] = "#if DEPTH_FORMAT != 3100\n	uniform float mNear;\n	uniform float mFar;\n#endif\n#if DEPTH_PACKING == 3200\n	uniform float opacity;\n#endif\n#if DEPTH_FORMAT != 3100\n	varying float vViewZDepth;\n#endif\n#include <common>\n#include <packing>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n	#include <clipping_planes_fragment>\n	#include <logdepthbuf_fragment>\n	float transformedDepth = 0.0;\n	#if DEPTH_FORMAT == 3100\n		transformedDepth = gl_FragCoord.z;\n	#elif DEPTH_FORMAT == 3101\n		transformedDepth = viewZToLinearClipZ( vViewZDepth, mNear, mFar );\n	#elif DEPTH_FORMAT == 3102\n		transformedDepth = viewZToInvClipZ( vViewZDepth, mNear, mFar );\n	#endif\n	#if DEPTH_PACKING == 3200\n		gl_FragColor = vec4( vec3( transformedDepth ), opacity );\n	#elif DEPTH_PACKING == 3201\n		gl_FragColor = packLinearUnitToRGBA( transformedDepth );\n	#endif\n}\n";
+THREE.ShaderChunk[ 'depth_frag' ] = "#if DEPTH_PACKING == 3200\n	uniform float opacity;\n#endif\n#include <common>\n#include <packing>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n	#include <clipping_planes_fragment>\n	#include <logdepthbuf_fragment>\n	#if DEPTH_PACKING == 3200\n		gl_FragColor = vec4( vec3( gl_FragCoord.z ), opacity );\n	#elif DEPTH_PACKING == 3201\n		gl_FragColor = packLinearUnitToRGBA( gl_FragCoord.z );\n	#endif\n}\n";
 
 // File:src/renderers/shaders/ShaderLib/depth_vert.glsl
 
-THREE.ShaderChunk[ 'depth_vert' ] = "#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\n#if DEPTH_FORMAT != 3100\n	varying float vViewZDepth;\n#endif\nvoid main() {\n	#include <uv_vertex>\n	#include <skinbase_vertex>\n	#include <begin_vertex>\n	#include <displacementmap_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	#include <clipping_planes_vertex>\n	#if DEPTH_FORMAT != 3100\n		vViewZDepth = mvPosition.z;\n	#endif\n}\n";
+THREE.ShaderChunk[ 'depth_vert' ] = "#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n	#include <uv_vertex>\n	#include <skinbase_vertex>\n	#include <begin_vertex>\n	#include <displacementmap_vertex>\n	#include <morphtarget_vertex>\n	#include <skinning_vertex>\n	#include <project_vertex>\n	#include <logdepthbuf_vertex>\n	#include <clipping_planes_vertex>\n}\n";
 
 // File:src/renderers/shaders/ShaderLib/distanceRGBA_frag.glsl
 
@@ -26766,8 +26758,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
-				m_uniforms.mNear.value = camera.near;
-				m_uniforms.mFar.value = camera.far;
 				m_uniforms.opacity.value = material.opacity;
 
 				if ( material.displacementMap ) {
@@ -29968,8 +29958,6 @@ THREE.WebGLProgram = ( function () {
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
-				parameters.depthFormat ? "#define DEPTH_FORMAT " + material.depthFormat : '',
-
 				'uniform mat4 modelMatrix;',
 				'uniform mat4 modelViewMatrix;',
 				'uniform mat4 projectionMatrix;',
@@ -30090,7 +30078,6 @@ THREE.WebGLProgram = ( function () {
 				parameters.outputEncoding ? getTexelEncodingFunction( "linearToOutputTexel", parameters.outputEncoding ) : '',
 
 				parameters.depthPacking ? "#define DEPTH_PACKING " + material.depthPacking : '',
-				parameters.depthFormat ? "#define DEPTH_FORMAT " + material.depthFormat : '',
 
 				'\n'
 
@@ -30306,7 +30293,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
-		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "depthPacking", "depthFormat"
+		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "depthPacking"
 	];
 
 
@@ -30465,8 +30452,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide,
 
-			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false,
-			depthFormat: ( material.depthFormat !== undefined ) ? material.depthFormat : false
+			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false
 
 		};
 
@@ -30699,7 +30685,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	// init
 
 	var depthMaterialTemplate = new THREE.MeshDepthMaterial();
-	depthMaterialTemplate.depthFormat = THREE.AutoDepthFormat;
 	depthMaterialTemplate.depthPacking = THREE.RGBADepthPacking;
 	depthMaterialTemplate.clipping = true;
 
