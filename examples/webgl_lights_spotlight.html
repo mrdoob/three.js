@@ -71,7 +71,8 @@
 			var mouseTime, mouseDown = new THREE.Vector2();
 
 			var gui, guiHeight = 250, param = { color: '0xffffff' };
-			var guiMapSize, autoMapSize = true;
+			var guiDoubleMaxSize, guiAngle, guiMapSize;
+			var doubleMaxSize = false, autoMapSize = true;
 
 			function init () {
 				renderer.shadowMap.enabled = true;
@@ -82,18 +83,19 @@
 				renderer.domElement.addEventListener( 'mousedown', onDocumentClick );
 				renderer.domElement.addEventListener( 'mouseup', onDocumentClick );
 
-				camera.position.set( 52, 18, - 23 );
+				camera.position.set( 52, 28, 31 );
 
 				spotLight.position.set( 15, 40, 35 );
 				spotLight.castShadow = true;
 				spotLight.angle = 0.45;
 				spotLight.exponent = 2.0;
-				spotLight.penumbra = 0.06;
+				spotLight.penumbra = 0.1;
 				spotLight.decay = 2.0;
 				spotLight.distance = 500;
 				var mapSize = spotLight.shadow.mapSize;
-				if ( isMobile === true ) mapSize.width = mapSize.height = maxMapSize / 2;
-				else mapSize.width = mapSize.height = maxMapSize;
+				if ( isMobile === true ) mapSize.width = ( maxMapSize / 2 );
+				else mapSize.width = maxMapSize;
+				mapSize.height = mapSize.width;
 
 				var shadowCamera = spotLight.shadow.camera;
 				spotLight.shadowCameraHelper = new THREE.CameraHelper( shadowCamera ); // colored lines
@@ -110,7 +112,7 @@
 
 				mshBox.castShadow = true;
 				mshBox.receiveShadow = true;
-				mshBox.position.set( 23, 3, - 1.0 );
+				mshBox.position.set( 21, 8, - 1.0 );
 
 				scene.add( camera );
 				scene.add( mshFloor );
@@ -139,10 +141,15 @@
 			}
 
 			function render () {
-				lightHelper.update(); // required
+
+				lightHelper.update();
+
 				if ( spotLight.shadowCameraHelper ) spotLight.shadowCameraHelper.update();
 
 				renderer.render( scene, camera );
+
+				checkForErrorAndAdjust();
+
 			}
 
 			function clearGui () {
@@ -170,12 +177,13 @@
 
 						var gStyle = gui.domElement.style;
 
-						var nextValue = (window.innerHeight - 36) + "px";
+						var nextValue = ( window.innerHeight - 36 ) + "px";
 
 						if ( gStyle.top === nextValue ) nextValue = (window.innerHeight - 256) + "px";
 
 						gStyle.top = nextValue;
 					} );
+
 				}
 
 				gStyle.position = "absolute";
@@ -201,7 +209,7 @@
 					render();
 				}, false, 0, 1000 );
 
-				addGui( 'angle', spotLight.angle, function ( val ) {
+				guiAngle = addGui( 'angle', spotLight.angle, function ( val ) {
 					if ( val < 0.001 ) val = 0.001;
 					spotLight.angle = val;
 					if ( autoMapSize === true ) setMapSize( spotLight, val, guiMapSize );
@@ -212,10 +220,12 @@
 					autoMapSize = ! ! val;
 				}, false );
 
+				guiDoubleMaxSize = addGui( 'doubleMaxSize', doubleMaxSize ).onChange( changeDoubleMaxSize, false );
+
 				guiMapSize = addGui( 'mapSize', spotLight.shadow.mapSize.width, function ( val, node, min, max, step ) {
-					setMapSize( spotLight, val, undefined, min, max, step );
+					setMapSize( spotLight, val, guiMapSize, min, max, step );
 					render();
-				}, false, 128, maxMapSize, 128 );
+				}, false, 256, ( maxMapSize * 2 ), 128 );
 
 				addGui( 'penumbra', spotLight.penumbra, function ( val ) {
 					spotLight.penumbra = val;
@@ -231,6 +241,16 @@
 
 			}
 
+			function changeDoubleMaxSize( val ) {
+
+				doubleMaxSize = ! ! val;
+
+				setMapSize( spotLight, spotLight.angle, guiMapSize );
+
+				render();
+
+			}
+
 			function setGuiHeight() {
 
 				var gStyle = gui.domElement.style;
@@ -243,24 +263,99 @@
 
 			}
 
-			function setMapSize ( light, val, node, min, max, step ) {
-				if ( light.shadow.mapSize.width !== val ) {
-					if ( min === undefined ) min = node.object.min || 128;
-					if ( max === undefined ) max = node.object.max || maxMapSize;
-					if ( step === undefined ) step = node.object.step || 128;
-					var mapSize = light.shadow.mapSize;
-					if ( autoMapSize === true ) val = ( ( Math.pow( val, 1.9 ) + 0.04 ) * ( maxMapSize / 2 ) );
+			function setMapSize ( light, val, node, min, max, step, error ) {
+
+				var calcMapSize, mapSize = light.shadow.mapSize;
+
+				if ( mapSize.width !== val ) {
+
+					if ( light.shadow.map !== null ) {
+
+						light.shadow.map.dispose();
+
+						light.shadow.map = null;
+
+					}
+
+					if( node !== undefined ) {
+
+						if ( min === undefined ) min = node.__min || 256;
+
+						if ( max === undefined ) max = node.__max || ( maxMapSize * 2 );
+
+						if ( step === undefined ) step = node.__step || 128;
+
+					}
+
+					if( doubleMaxSize === true ) calcMapSize = ( maxMapSize * 2 );
+					else calcMapSize = maxMapSize;
+
+					if ( val > calcMapSize ) {
+
+						val = calcMapSize;
+
+						if( node !== undefined ) node.setValue( calcMapSize );
+
+					}
+
+					if ( ( autoMapSize === true || error === true ) && val < 2 ) val = (( Math.pow( val, 1.6 ) + 0.02) * ( calcMapSize / 2) );
+
 					if ( min > 1 && val < min ) val = min;
+
 					else if ( max > 1 && val > max ) val = max;
+
 					if ( step > 1 ) val = val - (val % step);
+
 					mapSize.width = mapSize.height = val;
-					if( node !== undefined && autoMapSize === true ) node.setValue( mapSize.width );
+
+					if( node !== undefined && ( autoMapSize === true || error === true ) ) node.setValue( mapSize.width );
+
 				}
+
+
+			}
+
+			function checkForErrorAndAdjust () {
+
+				var context = renderer.getContext();
+
+				if( context !== undefined ) {
+
+					var error = context.getError();
+
+					if( error > 0 ) {
+
+						if(error === 1281) {
+
+							console.log("checkForErrorAndAdjust - GL Error:1281=GL_INVALID_VALUE Map Size to high, adjusting.");
+
+							alert("GL_INVALID_VALUE: map size too large, adjusting!");
+
+							if( doubleMaxSize === true ) guiDoubleMaxSize.setValue( false );
+							else guiAngle.setValue( spotLight.angle * 0.9 );
+
+							setMapSize( spotLight, spotLight.angle, guiMapSize, undefined, undefined, undefined, true );
+
+						}
+
+						else {
+
+							console.log("checkForErrorAndAdjust - detected GL Context Alert! Error:#" + error );
+
+						}
+
+					}
+
+				}
+
 			}
 
 			function addGui ( name, value, callback, isColor, min, max, step ) {
+
 				var node;
+
 				param[ name ] = value;
+
 				if ( isColor ) {
 					node = gui.addColor( param, name ).onChange( function () {
 
@@ -270,6 +365,7 @@
 
 				}
 				else if ( typeof value == 'object' ) {
+
 					node = gui.add( param, name, min, max, step ).onChange( function () {
 
 						callback( param[ name ], node, min, max, step );
@@ -278,6 +374,7 @@
 
 				}
 				else {
+
 					node = gui.add( param, name, min, max, step ).onChange( function () {
 
 						callback( param[ name ], node, min, max, step );
