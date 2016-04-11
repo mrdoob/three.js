@@ -23,6 +23,7 @@ THREE.SAOShader = {
     "intensity":   { type: "f", value: 1.0 },
     "bias":   { type: "f", value: 0.0 },
 		"sampleRadiusPixels":   { type: "f", value: 45.0 },
+		"projMatrix": { type: "m4", value: new THREE.Matrix4() },
 		"projectionMatrixInv": { type: "m4", value: new THREE.Matrix4() },
 		"randomSeed": { type: "f", value: 0.0 }
 	},
@@ -55,7 +56,7 @@ THREE.SAOShader = {
     "uniform sampler2D tDepth;",
     "uniform sampler2D tDiffuse;",
 
-    "uniform mat4 projectionMatrix;",
+    "uniform mat4 projMatrix;",
     "uniform mat4 projectionMatrixInv;",
 
     "uniform float scale;",
@@ -67,7 +68,6 @@ THREE.SAOShader = {
     "uniform vec2 size;",
 		"uniform float randomSeed;",
 
-
 		// RGBA depth
 
 		"#include <packing>",
@@ -76,7 +76,7 @@ THREE.SAOShader = {
 		"vec3 getViewSpacePosition(vec2 screenSpacePosition ) {",
 		"   float perspectiveDepth = unpackRGBAToLinearUnit( texture2D( tDepth, screenSpacePosition ) );",
 		"   float viewSpaceZ = perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
-		"   float w = projectionMatrix[2][3] * viewSpaceZ + projectionMatrix[3][3];",
+		"   float w = projMatrix[2][3] * viewSpaceZ + projMatrix[3][3];",
 		"   vec3 clipPos = ( vec3( screenSpacePosition, perspectiveDepth ) - 0.5 ) * 2.0;",
 		"   return ( projectionMatrixInv * vec4( w * clipPos.xyz, w ) ).xyz;",
 		"}",
@@ -85,20 +85,16 @@ THREE.SAOShader = {
 		"    return normalize( cross(dFdy(viewSpacePosition), dFdx(viewSpacePosition)) );",
 		"}",
 
-		"float square(float a) {",
-		"    return a*a;",
-		"}",
-
 	 "float getOcclusion( vec3 viewSpacePosition, vec3 viewSpaceNormal, vec3 viewSpacePositionOffset ) {",
 			"vec3 viewSpaceDelta = viewSpacePositionOffset - viewSpacePosition;",
 			"float viewSpaceDistance = length( viewSpaceDelta );",
-
 			"float distance = scale * viewSpaceDistance / cameraFar;",
-			"return intensity * max(0.0, (dot(viewSpaceNormal, viewSpaceDelta) - MIN_RESOLUTION * cameraFar) / viewSpaceDistance - bias) / (1.0 + square( viewSpaceDistance ) );",
+			"return intensity * max(0.0, (dot(viewSpaceNormal, viewSpaceDelta) - MIN_RESOLUTION * cameraFar) / viewSpaceDistance - bias) / (1.0 + pow2( viewSpaceDistance ) );",
 		"}",
 
 
 		"float basicPattern( vec3 viewSpacePosition ) {",
+
 			"vec3 viewSpaceNormal  = getViewSpaceNormalFromDepth( viewSpacePosition );",
 
 			"float random = noiseRandom1D( vUv + randomSeed );",
