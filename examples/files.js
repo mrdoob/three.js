@@ -192,6 +192,7 @@ var files = {
 		"webgl_postprocessing_nodes",
 		"webgl_postprocessing_procedural",
 		"webgl_postprocessing_smaa",
+		"webgl_postprocessing_sao",
 		"webgl_postprocessing_ssao",
 		"webgl_postprocessing_taa",
 		"webgl_raycast_texture",
