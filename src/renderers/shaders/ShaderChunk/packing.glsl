@@ -32,5 +32,5 @@ float viewZToInvClipZ( const in float viewZ, const in float near, const in float
   return (( near + viewZ ) * far ) / (( far - near ) * viewZ );
 }
 float invClipZToViewZ( const in float invClipZ, const in float near, const in float far ) {
-  return ( near * far ) / ( ( near - far ) * invClipZ - far );
+  return ( near * far ) / ( ( far - near ) * invClipZ - far );
 }
