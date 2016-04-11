@@ -63,19 +63,19 @@ https://github.com/creationix/msgpack-js-browser
 			function threePointLight() {
 
 				var directionalLight = new THREE.DirectionalLight( 0xb8b8b8 );
-				directionalLight.position.set(1, 1, 1).normalize();
+				directionalLight.position.set( 1, 1, 1 ).normalize();
 				directionalLight.intensity = 1.0;
 				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xb8b8b8 );
-				directionalLight.position.set(-1, 0.6, 0.5).normalize();
+				directionalLight.position.set( - 1, 0.6, 0.5 ).normalize();
 				directionalLight.intensity = 0.5;
-				scene.add(directionalLight);
+				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight();
-				directionalLight.position.set(-0.3, 0.6, -0.8).normalize( 0xb8b8b8 );
+				directionalLight.position.set( - 0.3, 0.6, - 0.8 ).normalize( 0xb8b8b8 );
 				directionalLight.intensity = 0.45;
-				scene.add(directionalLight);
+				scene.add( directionalLight );
 
 			}
 
@@ -121,7 +121,7 @@ https://github.com/creationix/msgpack-js-browser
 				scene = new THREE.Scene();
 
 				scene.add( new THREE.GridHelper( 10, 2.5 ) );
-				container = document.getElementById('viewport');
+				container = document.getElementById( 'viewport' );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true	} );
 				renderer.setClearColor( 0x000000, 0 );
