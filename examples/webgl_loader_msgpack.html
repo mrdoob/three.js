@@ -38,8 +38,8 @@ https://github.com/creationix/msgpack-js-browser
 		<script src='../build/three.js'></script>
 		<script src='js/controls/OrbitControls.js'></script>
 		<script src='js/Detector.js'></script>
+		<script src='js/libs/msgpack-js.js'></script>
 		<script src='js/libs/stats.min.js'></script>
-		<script src='js/libs/require.js'></script>
 	</head>
 	<body>
 		<div id='info'>
@@ -51,8 +51,6 @@ https://github.com/creationix/msgpack-js-browser
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-			requirejs.config( { baseUrl: 'js/libs' } );
 
 			var container, scene, camera, renderer;
 
@@ -94,23 +92,15 @@ https://github.com/creationix/msgpack-js-browser
 
 			function loadMSGPack() {
 
-				require(['msgpack-js'], function ( msgpack ) {
+				var loader = new THREE.XHRLoader();
+				loader.setResponseType( 'arraybuffer' );
+				loader.load( 'scenes/robo_pigeon.pack', function ( data ) {
 
-						var xhr = new XMLHttpRequest();
-						xhr.open('GET', 'scenes/robo_pigeon.pack', true);
-						xhr.responseType = 'arraybuffer';
+					var decoded = msgpack.decode( data );
 
-						xhr.onload = function( e ) {
+					var loader = new THREE.ObjectLoader();
 
-								var decoded = msgpack.decode( this.response );
-
-								var loader = new THREE.ObjectLoader();
-
-								setupScene( loader.parse( decoded ) );
-
-						};
-
-						xhr.send();
+					setupScene( loader.parse( decoded ) );
 
 				} );
 
