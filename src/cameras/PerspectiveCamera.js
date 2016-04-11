@@ -215,8 +215,8 @@ THREE.PerspectiveCamera.prototype.toJSON = function( meta ) {
 	data.object.focus = this.focus;
 
 	data.object.aspect = this.aspect;
-	
-	if( this.view ) data.object.view = Object.assign( {}, this.view );
+
+	if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
 
 	data.object.filmGauge = this.filmGauge;
 	data.object.filmOffset = this.filmOffset;
