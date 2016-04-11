@@ -58,7 +58,16 @@
 		Copies values of *q* to this quaternion.
 		</div>
 
-		<h3>[method:Quaternion setFromEuler]( [page:Euler euler] )</h3>
+		<h3>[method:Quaternion fromArray]( [page:Array array], [page:Integer offset] ) [page:Quaternion this]</h3>
+		<div>
+		array -- Array of format (x, y, z, w) used to construct the quaternion.<br />
+		offset -- An optional offset into the array.
+		</div>
+		<div>
+		Sets this quaternion's component values from an array.
+		</div>
+
+		<h3>[method:Quaternion setFromEuler]( [page:Euler euler] ) [page:Quaternion this]</h3>
 		<div>
 		Sets this quaternion from rotation specified by Euler angle.
 		</div>
@@ -115,42 +124,12 @@
 		If *dest* is not specified, result goes to *vec*.
 		</div>
 
-		<h3>[method:Quaternion clone]()</h3>
-		<div>
-		Clones this quaternion.
-		</div>
-
-		<h3>[method:Array toArray]( [page:Array array] )</h3>
-		<div>
-		array -- Array to store the quaternion.
-		</div>
-		<div>
-		Returns the numerical elements of this quaternion in an array of format (x, y, z, w).
-		</div>
-
-		<h3>[method:Boolean equals]([page:Quaternion v])</h3>
-		<div>
-		v -- Quaternion that this quaternion will be compared to.
-		</div>
-		<div>
-		Compares each component of *v* to each component of this quaternion to determine if they
-		represent the same rotation.
-		</div>
-
-		<h3>[method:Float lengthSq]()</h3>
+		<h3>[method:Float lengthSq]() [page:Quaternion this]</h3>
 		<div>
 		Calculates the squared length of the quaternion.
 		</div>
 
-		<h3>[method:Quaternion fromArray]([page:Array array])</h3>
-		<div>
-		array -- Array of format (x, y, z, w) used to construct the quaternion.
-		</div>
-		<div>
-		Sets this quaternion's component values from an array.
-		</div>
-
-		<h3>[method:Quaternion conjugate]()</h3>
+		<h3>[method:Quaternion conjugate]() [page:Quaternion this]</h3>
 		<div>
 		Returns the rotational conjugate of this quaternion. The conjugate of a quaternion
 		represents the same rotation in the opposite direction about the rotational axis.
@@ -171,6 +150,28 @@
 		mesh.quaternion.slerp( endQuaternion, 0.01 );
 		</code>
 
+		<h3>[method:Boolean equals]( [page:Quaternion v] ) [page:Quaternion this]</h3>
+		<div>
+		v -- Quaternion that this quaternion will be compared to.
+		</div>
+		<div>
+		Compares each component of *v* to each component of this quaternion to determine if they
+		represent the same rotation.
+		</div>
+
+		<h3>[method:Quaternion clone]() [page:Quaternion this]</h3>
+		<div>
+		Clones this quaternion.
+		</div>
+
+		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] ) [page:Quaternion this]</h3>
+		<div>
+		array -- An optional array to store the quaternion.<br/>
+		offset -- An optional offset into the output array.
+		</div>
+		<div>
+		Returns the numerical elements of this quaternion in an array of format (x, y, z, w).
+		</div>
 
 		<h2>Static Methods</h2>
 
