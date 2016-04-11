@@ -3615,7 +3615,7 @@ THREE.ColladaLoader = function () {
 					var f = child.querySelectorAll('float');
 
 					if ( f.length > 0 )
-						this[ child.nodeName ] = parseFloat( f[ 0 ].textContent );
+						this[ child.nodeName ] = 1.0 - parseFloat( f[ 0 ].textContent );
 
 					break;
 
