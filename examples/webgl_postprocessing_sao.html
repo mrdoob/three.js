@@ -58,7 +58,7 @@
 			var container, stats;
 			var camera, scene, renderer;
 			var depthMaterial, effectComposer, depthRenderTarget;
-			var ssaoPass;
+			var saoPass;
 			var group;
 			var depthScale = 1.0;
 			var postprocessing = { enabled : true, renderMode: 0 }; // renderMode: 0('framebuffer'), 1('onlyAO')
@@ -114,7 +114,7 @@
 				// Init gui
 				var gui = new dat.GUI();
 				gui.add( postprocessing, "enabled" ).onChange();
-				gui.add( postprocessing, "renderMode", { framebuffer: 0, onlyAO: 1 } ).onChange( renderModeChange ).listen();
+			//	gui.add( postprocessing, "renderMode", { framebuffer: 0, onlyAO: 1 } ).onChange( renderModeChange ).listen();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 			}
@@ -122,9 +122,9 @@
 			function renderModeChange( value ) {
 
 				if ( value == 0 ) { // framebuffer
-					ssaoPass.uniforms[ 'onlyAO' ].value = false;
+					saoPass.uniforms[ 'onlyAO' ].value = false;
 				} else if ( value == 1 ) {  // onlyAO
-					ssaoPass.uniforms[ 'onlyAO' ].value = true;
+					saoPass.uniforms[ 'onlyAO' ].value = true;
 				} else {
 					console.error( "Not define renderModeChange type: " + value );
 				}
@@ -140,9 +140,9 @@
 				renderer.setSize( width, height );
 
 				// Resize renderTargets
-				ssaoPass.uniforms[ 'size' ].value.set( width, height );
-//				ssaoPass.uniforms[ 'projectionMatrixInv' ].value.getInverse( camera.projectMatrix );
-				ssaoPass.uniforms[ 'projectionMatrixInv' ].value.getInverse( camera.projectionMatrix );
+				saoPass.uniforms[ 'size' ].value.set( width, height );
+//				saoPass.uniforms[ 'projectionMatrixInv' ].value.getInverse( camera.projectMatrix );
+				saoPass.uniforms[ 'projectionMatrixInv' ].value.getInverse( camera.projectionMatrix );
 
 				var pixelRatio = renderer.getPixelRatio();
 				var newWidth  = Math.floor( width / pixelRatio ) || 1;
@@ -166,18 +166,18 @@
 				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 
 				// Setup SSAO pass
-				ssaoPass = new THREE.ShaderPass( THREE.SAOShader );
-				ssaoPass.renderToScreen = true;
-				//ssaoPass.uniforms[ "tDiffuse" ].value will be set by ShaderPass
-				ssaoPass.uniforms[ "tDepth" ].value = depthRenderTarget;
-				ssaoPass.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
-				ssaoPass.uniforms[ 'cameraNear' ].value = camera.near;
-				ssaoPass.uniforms[ 'cameraFar' ].value = camera.far;
+				saoPass = new THREE.ShaderPass( THREE.SAOShader );
+				saoPass.renderToScreen = true;
+				//saoPass.uniforms[ "tDiffuse" ].value will be set by ShaderPass
+				saoPass.uniforms[ "tDepth" ].value = depthRenderTarget;
+				saoPass.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				saoPass.uniforms[ 'cameraNear' ].value = camera.near;
+				saoPass.uniforms[ 'cameraFar' ].value = camera.far;
 
 				// Add pass to effect composer
 				effectComposer = new THREE.EffectComposer( renderer );
 				effectComposer.addPass( renderPass );
-				effectComposer.addPass( ssaoPass );
+				effectComposer.addPass( saoPass );
 			}
 
 			function animate() {
@@ -195,7 +195,7 @@
 
 				if ( postprocessing.enabled ) {
 
-					ssaoPass.uniforms[ 'randomSeed' ].value = Math.random();
+					saoPass.uniforms[ 'randomSeed' ].value = Math.random();
 
 					// Render depth into depthRenderTarget
 					scene.overrideMaterial = depthMaterial;
