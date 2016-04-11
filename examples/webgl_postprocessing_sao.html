@@ -35,7 +35,7 @@
 	<body>
 		<script src="../build/three.js"></script>
 
-		<script src="js/shaders/SSAOShader.js"></script>
+		<script src="js/shaders/SAOShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
@@ -166,7 +166,7 @@
 				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 
 				// Setup SSAO pass
-				ssaoPass = new THREE.ShaderPass( THREE.SSAOShader );
+				ssaoPass = new THREE.ShaderPass( THREE.SAOShader );
 				ssaoPass.renderToScreen = true;
 				//ssaoPass.uniforms[ "tDiffuse" ].value will be set by ShaderPass
 				ssaoPass.uniforms[ "tDepth" ].value = depthRenderTarget;
