@@ -72,7 +72,7 @@
 				document.body.appendChild( container );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0x000000 );
+				renderer.setClearColor( 0xa0a0a0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -199,10 +199,12 @@
 
 					// Render depth into depthRenderTarget
 					scene.overrideMaterial = depthMaterial;
+					renderer.setClearColor( 0xffffff );
 					renderer.render( scene, camera, depthRenderTarget, true );
 
 					// Render renderPass and SSAO shaderPass
 					scene.overrideMaterial = null;
+					renderer.setClearColor( 0xa0a0a0 );
 					effectComposer.render();
 
 				} else {
