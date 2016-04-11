@@ -66,7 +66,7 @@
 			var cameraOrtho, cameraPerspective;
 			var controlsOrtho, controlsPerspective;
 
-			var mesh, materialStandard, materialDepthAuto, materialDepthAutoRGBA, materialDepthLinearClipZ, materialDepthLinearClipZRGBA, materialDepthInvClipZ, materialDepthInvClipZRGBA, materialNormal;
+			var mesh, materialStandard, materialDepthLinear, materialDepthRGBA, materialNormal;
 
 			var pointLight, ambientLight;
 
@@ -83,7 +83,7 @@
 			function initGui() {
 
 				var gui = new dat.GUI();
-				gui.add( params, 'material', [ 'standard', 'normal', 'depthAuto', 'depthAutoRGBA', 'depthLinearClipZ', 'depthLinearClipZRGBA', 'depthInvClipZ', 'depthInvClipZRGBA' ] );
+				gui.add( params, 'material', [ 'standard', 'normal', 'depthLinear', 'depthRGBA' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
 
 			}
@@ -172,8 +172,7 @@
 					side: THREE.DoubleSide
 				} );
 
-				materialDepthAuto = new THREE.MeshDepthMaterial( {
-					depthFormat: THREE.AutoDepthFormat,
+				materialDepthLinear = new THREE.MeshDepthMaterial( {
 					depthPacking: THREE.LinearDepthPacking,
 
 					displacementMap: displacementMap,
@@ -183,52 +182,7 @@
 					side: THREE.DoubleSide
 				} );
 
-				materialDepthAutoRGBA = new THREE.MeshDepthMaterial( {
-					depthFormat: THREE.AutoDepthFormat,
-					depthPacking: THREE.RGBADepthPacking,
-
-					displacementMap: displacementMap,
-					displacementScale: SCALE,
-					displacementBias: BIAS,
-
-					side: THREE.DoubleSide
-				} );
-
-				materialDepthLinearClipZ = new THREE.MeshDepthMaterial( {
-					depthFormat: THREE.LinearClipZDepthFormat,
-					depthPacking: THREE.LinearDepthPacking,
-
-					displacementMap: displacementMap,
-					displacementScale: SCALE,
-					displacementBias: BIAS,
-
-					side: THREE.DoubleSide
-				} );
-
-				materialDepthLinearClipZRGBA = new THREE.MeshDepthMaterial( {
-					depthFormat: THREE.LinearClipZDepthFormat,
-					depthPacking: THREE.RGBADepthPacking,
-
-					displacementMap: displacementMap,
-					displacementScale: SCALE,
-					displacementBias: BIAS,
-
-					side: THREE.DoubleSide
-				} );
-
-				materialDepthInvClipZ = new THREE.MeshDepthMaterial( {
-					depthFormat: THREE.InvClipZDepthFormat,
-					depthPacking: THREE.LinearDepthPacking,
-
-					displacementMap: displacementMap,
-					displacementScale: SCALE,
-					displacementBias: BIAS,
-
-					side: THREE.DoubleSide
-				} );
-
-				materialDepthInvClipZRGBA = new THREE.MeshDepthMaterial( {
-					depthFormat: THREE.InvClipZDepthFormat,
+				materialDepthRGBA = new THREE.MeshDepthMaterial( {
 					depthPacking: THREE.RGBADepthPacking,
 
 					displacementMap: displacementMap,
@@ -307,14 +261,12 @@
 					var material = mesh.material;
 
 					switch ( params.material ) {
+						
 						case 'standard': material = materialStandard; break;
-						case 'depthAuto': material = materialDepthAuto; break;
-						case 'depthAutoRGBA': material = materialDepthAutoRGBA; break;
-						case 'depthLinearClipZ': material = materialDepthLinearClipZ; break;
-						case 'depthLinearClipZRGBA': material = materialDepthLinearClipZRGBA; break;
-						case 'depthInvClipZ': material = materialDepthInvClipZ; break;
-						case 'depthInvClipZRGBA': material = materialDepthInvClipZRGBA; break;
+						case 'depthLinear': material = materialDepthLinear; break;
+						case 'depthRGBA': material = materialDepthRGBA; break;
 						case 'normal': material = materialNormal; break;
+
 					}
 
 					mesh.material = material;
@@ -324,7 +276,6 @@
 				switch ( params.camera ) {
 
 					case 'perspective': camera = cameraPerspective; break;
-
 					case 'ortho': camera = cameraOrtho; break;
 
 				}

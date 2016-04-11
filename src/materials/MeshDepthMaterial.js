@@ -21,7 +21,6 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	this.type = 'MeshDepthMaterial';
 
-	this.depthFormat = THREE.AutoDepthFormat;
 	this.depthPacking = THREE.LinearDepthPacking;
 
 	this.skinning = false;
@@ -45,7 +44,6 @@ THREE.MeshDepthMaterial.prototype.copy = function ( source ) {
 
 	THREE.Material.prototype.copy.call( this, source );
 
-	this.depthFormat = source.depthFormat;
 	this.depthPacking = source.depthPacking;
 
 	this.skinning = source.skinning;
