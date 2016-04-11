@@ -173,6 +173,8 @@
 				saoPass.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
 				saoPass.uniforms[ 'cameraNear' ].value = camera.near;
 				saoPass.uniforms[ 'cameraFar' ].value = camera.far;
+				saoPass.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( camera.projectionMatrix );
+				saoPass.uniforms[ 'cameraProjectionMatrix' ].value = camera.projectionMatrix;
 
 				// Add pass to effect composer
 				effectComposer = new THREE.EffectComposer( renderer );
