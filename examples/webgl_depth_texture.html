@@ -20,7 +20,7 @@
         font-weight: bold;
         pointer-events: auto;
       }
-      
+
       canvas {
         position: absolute;
         top: 0;
@@ -66,8 +66,8 @@
 
       float readDepth (sampler2D depthSampler, vec2 coord) {
         float fragCoordZ = texture2D(depthSampler, coord).x;
-        float viewZ = invClipZToViewZ( fragCoordZ, cameraNear, cameraFar );
-        return viewZToLinearClipZ( viewZ, cameraNear, cameraFar );
+        float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
+        return viewZToOrthoDepth( viewZ, cameraNear, cameraFar );
       }
 
       void main() {
@@ -86,11 +86,11 @@
       <a href="http://threejs.org" target="_blank">threejs</a> - WebGL - Depth Texture<br/>
       Stores render target depth in a texture attachment.<br/>
       Created by <a href="http://twitter.com/mattdesl" target="_blank">@mattdesl</a>.
-      
+
       <div id="error" style="display: none;">
       Your browser does not support <strong>WEBGL_depth_texture</strong>.<br/><br/>
       This demo will not work.
-      </div>  
+      </div>
     </div>
 
     <script src="../build/three.js"></script>
@@ -110,7 +110,7 @@
       function init() {
 
         var canvas = document.querySelector('canvas');
-        var gl; 
+        var gl;
         try {
 
           gl = canvas.getContext('webgl2');
@@ -121,7 +121,7 @@
 
         }
         var isWebGL2 = Boolean(gl);
-        
+
         renderer = new THREE.WebGLRenderer( {
           canvas: canvas,
           context: gl
@@ -217,7 +217,7 @@
           scene.add(mesh);
 
         }
-        
+
       }
 
       function onWindowResize() {
