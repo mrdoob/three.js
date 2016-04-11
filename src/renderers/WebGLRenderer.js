@@ -3025,6 +3025,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	var setTextureWarned = false;
+	this.setTexture = function( texture, slot ) {
+
+		if ( ! setTextureWarned ) {
+
+			console.warn( "THREE.WebGLRenderer: .setTexture is deprecated, " +
+				"use setTexture2D instead." );
+			setTextureWarned = true;
+
+		}
+
+		setTexture2D( texture, slot );
+
+	};
+
 	this.allocTextureUnit = allocTextureUnit;
 	this.setTexture2D = setTexture2D;
 	this.setTextureCube = function( texture, slot ) {
