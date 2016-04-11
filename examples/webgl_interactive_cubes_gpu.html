@@ -205,7 +205,12 @@
 				var pixelBuffer = new Uint8Array( 4 );
 
 				//read the pixel under the mouse from the texture
-				renderer.readRenderTargetPixels(pickingTexture, mouse.x, pickingTexture.height - mouse.y, 1, 1, pixelBuffer);
+				//mouse coordinates must be greater than zero to prevent WebGL errors with gl.readPixels
+				if( mouse.x > 0 && mouse.y > 0 ) {
+
+					renderer.readRenderTargetPixels(pickingTexture, mouse.x, pickingTexture.height - mouse.y, 1, 1, pixelBuffer);
+
+				}
 
 				//interpret the pixel as an ID
 
