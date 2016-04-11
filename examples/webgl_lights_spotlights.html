@@ -53,7 +53,7 @@
 		<script>
 			var isMobile = /iPhone|iPad|iPod|Android/i.test( navigator.userAgent );
 			var maxMapSize = ( isMobile === false ) ? 2048 : 1024;
-			var animRate = ( isMobile === false ) ? 4.7 : 6.7;
+			var animCycle = ( isMobile === false ) ? 4.7 : 6.7;
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -70,8 +70,8 @@
 			var mshBox = new THREE.Mesh( geoBox, matBox );
 			var ambientLight = new THREE.AmbientLight( 0x090A1A );
 			var spotLight1 = createSpotlight( { color: 0xFF7F00, angle: 0.3, name: "spotLight1" } );
-			var spotLight2 = createSpotlight( { color: 0x00FF7F, angle: 0.3, name: "spotLight2"  } );
-			var spotLight3 = createSpotlight( { color: 0x7F00FF, angle: 0.3, name: "spotLight3"  } );
+			var spotLight2 = createSpotlight( { color: 0x00FF7F, angle: 0.3, name: "spotLight2" } );
+			var spotLight3 = createSpotlight( { color: 0x7F00FF, angle: 0.3, name: "spotLight3" } );
 			var lightHelper1, lightHelper2, lightHelper3;
 			var raycaster = new THREE.Raycaster();
 			var mouse = new THREE.Vector2();
@@ -79,8 +79,9 @@
 
 			var gui, guiHeight = 250, param = { color: '0xffffff' };
 			var guiMapSize1, guiMapSize2, guiMapSize3;
+			var guiDoubleMaxSize, doubleMaxSize = false;
 			var autoMapSize = true;
-			var renderTimeout, animTimeout;
+			var errorTimer, animTimeout;
 
 			function init () {
 				renderer.shadowMap.enabled = true;
@@ -169,7 +170,7 @@
 			}
 
 			function animateAll ( rate ) {
-				rate = rate || animRate || 4.8;
+				rate = rate || animCycle || 4.8;
 
 				animateLight( spotLight1, rate, guiMapSize1 );
 				animateLight( spotLight2, rate, guiMapSize2 );
@@ -212,6 +213,8 @@
 
 				renderer.render( scene, camera );
 
+				checkForErrorAndAdjust();
+
 				requestAnimationFrame( render );
 
 			}
@@ -250,8 +253,6 @@
 
 				gStyle.position = "absolute";
 
-				gStyle.height = "210px";
-
 			}
 
 			function buildGui () {
@@ -262,24 +263,43 @@
 					autoMapSize = ! ! val;
 				}, false );
 
+				guiDoubleMaxSize = addGui( 'Double Max', doubleMaxSize ).onChange( changeDoubleMaxSize, false );
+
 				guiMapSize1 = addGui( 'Map Size1', spotLight1.shadow.mapSize.width, function ( val, node, min, max, step ) {
-					setMapSize( spotLight1, val, undefined, min, max, step );
-				}, false, 128, maxMapSize, 128 );
+					setMapSize( spotLight1, val, guiMapSize1, min, max, step );
+				}, false, 256, ( maxMapSize * 2 ), 128 );
 
 				guiMapSize2 = addGui( 'Map Size2', spotLight2.shadow.mapSize.width, function ( val, node, min, max, step ) {
-					setMapSize( spotLight2, val, undefined, min, max, step );
-				}, false, 128, maxMapSize, 128 );
+					setMapSize( spotLight2, val, guiMapSize2, min, max, step );
+				}, false, 256, ( maxMapSize * 2 ), 128 );
 
 				guiMapSize3 = addGui( 'Map Size3', spotLight3.shadow.mapSize.width, function ( val, node, min, max, step ) {
-					setMapSize( spotLight3, val, undefined, min, max, step );
-				}, false, 128, maxMapSize, 128 );
+					setMapSize( spotLight3, val, guiMapSize3, min, max, step );
+				}, false, 256, ( maxMapSize * 2 ), 128 );
 
-				addGui( 'Anim Rate', animRate, function ( val ) {
-					animRate = val;
-					animateAll( animRate );
+				addGui( 'Anim Cycle', animCycle, function ( val ) {
+					animCycle = val;
+					animateAll( animCycle );
 				}, false, 3, 45, 1 );
 
 				setGuiHeight();
+
+			}
+
+			function changeDoubleMaxSize( val, percent, error ) {
+
+				doubleMaxSize = ! ! val;
+
+				if( percent === undefined ) percent = 1.0;
+
+				spotLight1.angle = (spotLight1.angle * percent);
+				setMapSize( spotLight1, spotLight1.angle, guiMapSize1, undefined, undefined, undefined, error );
+
+				spotLight2.angle = (spotLight2.angle * percent);
+				setMapSize( spotLight2, spotLight2.angle, guiMapSize2, undefined, undefined, undefined, error );
+
+				spotLight3.angle = (spotLight3.angle * percent);
+				setMapSize( spotLight3, (spotLight3.angle * percent), guiMapSize3, undefined, undefined, undefined, error );
 
 			}
 
@@ -295,22 +315,42 @@
 
 			}
 
-			function setMapSize ( light, val, node, min, max, step ) {
+			function setMapSize ( light, val, node, min, max, step, error ) {
 
-				if ( light.shadow.mapSize.width !== val ) {
+				var calcMapSize, mapSize = light.shadow.mapSize;
+
+				if ( mapSize.width !== val ) {
+
+					if ( light.shadow.map !== null ) {
+
+						light.shadow.map.dispose();
+
+						light.shadow.map = null;
+
+					}
 
 					if( node !== undefined ) {
 
 						if ( min === undefined ) min = node.__min || 256;
 
-						if ( max === undefined ) max = node.__max || maxMapSize;
+						if ( max === undefined ) max = node.__max || ( maxMapSize * 2 );
 
-						if ( step === undefined ) step = node.__step || 256;
+						if ( step === undefined ) step = node.__step || 128;
 
 					}
-					var mapSize = light.shadow.mapSize;
 
-					if ( autoMapSize === true ) val = (( Math.pow( val, 1.9 ) + 0.04) * 3460 );
+					if( doubleMaxSize === true ) calcMapSize = ( maxMapSize * 2 );
+					else calcMapSize = maxMapSize;
+
+					if ( val > calcMapSize ) {
+
+						val = calcMapSize;
+
+						if( node !== undefined ) node.setValue( calcMapSize );
+
+					}
+
+					if ( ( autoMapSize === true || error === true ) && val < 2 ) val = (( Math.pow( val, 1.6 ) + 0.02) * ( calcMapSize / 2) );
 
 					if ( min > 1 && val < min ) val = min;
 
@@ -320,9 +360,46 @@
 
 					mapSize.width = mapSize.height = val;
 
-					if( node !== undefined && autoMapSize === true ) node.setValue( mapSize.width );
+					if( node !== undefined && ( autoMapSize === true || error === true ) ) node.setValue( mapSize.width );
 
 				}
+
+			}
+
+			function checkForErrorAndAdjust () {
+
+				var context = renderer.getContext();
+
+				if( context !== undefined ) {
+
+					var error = context.getError();
+
+					if( error > 0 ) {
+
+						console.warn("checkForErrorAndAdjust - detected GL Context Alert!");
+
+						if(error === 1281) {
+
+							console.log("checkForErrorAndAdjust - GL Error:1281=GL_INVALID_VALUE Map Size to high, adjusting.");
+
+							alert("GL_INVALID_VALUE: map size too large, adjusting!");
+
+							if( doubleMaxSize === true ) guiDoubleMaxSize.setValue( false );
+
+							changeDoubleMaxSize( false, 0.75, true );
+
+						}
+
+						else {
+
+							console.log("checkForErrorAndAdjust - detected GL Context Alert! Error:#" + error );
+
+						}
+
+					}
+
+				}
+
 			}
 
 			function addGui ( name, value, callback, isColor, min, max, step ) {
@@ -332,7 +409,6 @@
 				param[ name ] = value;
 
 				if ( isColor ) {
-
 					node = gui.addColor( param, name ).onChange( function () {
 
 						callback( param[ name ] );
@@ -356,10 +432,10 @@
 						callback( param[ name ], node, min, max, step );
 
 					} );
-
 				}
 
 				return node;
+
 			}
 
 			function onDocumentClick ( event ) {
@@ -424,9 +500,13 @@
 			init();
 
 			if ( autoMapSize === true ) {
+
 				setMapSize( spotLight1, spotLight1.angle, guiMapSize1 );
+
 				setMapSize( spotLight2, spotLight2.angle, guiMapSize2 );
+
 				setMapSize( spotLight3, spotLight3.angle, guiMapSize3 );
+
 			}
 
 			animateAll( );
