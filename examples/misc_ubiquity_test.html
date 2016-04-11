@@ -209,9 +209,7 @@
 				document.body.appendChild( webglRenderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				document.body.appendChild( stats.domElement );
+				document.body.appendChild( stats.dom );
 
 				//
 

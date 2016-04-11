@@ -28,11 +28,6 @@
 				z-index:100;
 				display:block;
 			}
-
-			#stats { position: absolute; top:5px; left: 0; z-index: 100 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -166,7 +161,7 @@
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// EVENTS
 

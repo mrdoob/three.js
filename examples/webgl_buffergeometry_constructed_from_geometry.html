@@ -79,9 +79,7 @@
 			controls.dynamicDampingFactor = 0.1;
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '24px';
-			document.body.appendChild( stats.domElement );
+			document.body.appendChild( stats.dom );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 

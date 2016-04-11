@@ -22,7 +22,6 @@
 			#type-status {
 				font-weight: bold;
 			}
-			#stats { position: absolute; top:0; left: 0 }
 		</style>
 	</head>
 	<body>
@@ -41,7 +40,7 @@
 
 		<script>
 			var stats = new Stats();
-			document.body.appendChild( stats.domElement );
+			document.body.appendChild( stats.dom );
 
 			var lastTime = (new Date()).getTime();
 
