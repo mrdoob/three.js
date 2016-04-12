@@ -50,6 +50,13 @@
 		Array with object's children.
 		</div>
 
+		<h3>[property:Object3D searchOrder]</h3>
+		<div>
+		An Array with labels for extending searching of property names on the Objects. { see <a target=_parent href="#Reference/Core/Object3D.findChild">findChild</a> }<br />
+		Before resorting to this properties search list. It first searches for direct matches with Object3D and then for an array index. This final search list defaults to ['name', 'uuid'].<br />
+		<i>Warning: Don't use 'id' in this list as the indexing does not correlate and conflicts.</i><br />
+		</div>
+
 		<h3>[property:Vector3 position]</h3>
 		<div>
 		Object's local position.
@@ -215,12 +222,73 @@
 		Adds *object* as child of this object. An arbitrary number of objects may be added.
 		</div>
 
-		<h3>[method:null remove]( [page:Object3D object], ... )</h3>
+		<h3>[method:null addAt]( [page:Object entity], [page:Object3D object],  [page:Boolean move],  [page:Boolean shift] )</h3>
+		<div>
+		entity - Entity for matching. { see findChild } <br />
+		</div>
 		<div>
 		object - An object.<br />
 		</div>
 		<div>
-		Removes *object* as child of this object. An arbitrary number of objects may be removed.
+		move - A Boolean to allow moving an object if it is already found (default is true).
+		</div>
+		<div>
+		shift - A Boolean that helps when moving to shift the target index (default is true).
+		</div>
+		<div>
+		Adds *object* as child of this object at the given entity location if found. When object exists already, it moves it's indices and triggers a 'moved' Event.
+		</div>
+		<div>
+		Dependant on 'move', the 'shift' option compensates for moving the existing object if it needs to be moved from below the target location's index.<br />
+		</div>
+
+		<h3>[method:null remove]( [page:Object3D entity], ... )</h3>
+		<div>
+		entity - Entity for matching. {see findChild}
+		</div>
+		<div>
+		Removes *entity* as child of this object. the search entity can be either an index of an Object3D. An arbitrary number of entities may be removed.
+		</div>
+		<div>
+		Returns this object and not the removed items.
+		</div>
+
+		<h3>[method:null removeAll]( )</h3>
+		<div>
+		Removes All the objects from children systematically removing them, one by one.
+		</div>
+		<div>
+		Returns this object and not the removed items.
+		</div>
+
+		<h3>[method:null replace]( [page:Object3D entity], [page:Object3D newChild] )</h3>
+		<div>
+		entity - Entity for matching. {see findChild}
+		</div>
+		<div>
+		newChild - An object.
+		</div>
+		<div>
+		Replaces the entity with the new Child, but only if the old one is found. The search entity can be an index or Object.
+		</div>
+		<div>
+		Returns the old Object that has now been replaced, but nothing if not found.
+		</div>
+
+		<h3>[method:null findChild]( [page:Object3D entity], [page:Boolean returnIndex] )</h3>
+		<div>
+		entity - Entity for matching.
+		</div>
+		<div>
+		returnIndex - A Boolean.
+		</div>
+		<div>
+		"Entity" is used to find a matching child. First findChild searches for an Object3D match. Then an index key is checked, and finally the <a target=_parent href="#Reference/Core/Object3D.searchOrder">list</a> of properties is checked.<br />
+		The properties that are checked is controlled by <a target=_parent href="#Reference/Core/Object3D.searchOrder">searchOrder</a> a modifiable array that defaults to check the 'name' and 'uuid' in that adjustable order.
+		The returnIndex flag defaults to false but when true it will return the index of the entity not the Object3D.
+		</div>
+		<div>
+		Returns the index of the object found or index (depending of returnIndex flag), and nothing if it is not found.<br />
 		</div>
 
 		<h3>[method:null traverse]( [page:Function callback] )</h3>
@@ -230,7 +298,7 @@
 		<div>
 		Executes the callback on this object and all descendants.
 		</div>
-		
+
 		<h3>[method:null traverseVisible]( [page:Function callback] )</h3>
 		<div>
 		callback - A function with as first argument an object3D object.<br />
@@ -239,7 +307,7 @@
 		Like traverse, but the callback will only be executed for visible objects.
 		Descendants of invisible objects are not traversed.
 		</div>
-		
+
 		<h3>[method:null traverseAncestors]( [page:Function callback] )</h3>
 		<div>
 		callback - A function with as first argument an object3D object.<br />
