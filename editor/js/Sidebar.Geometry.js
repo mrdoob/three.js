@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry = function ( editor ) {
+Sidebar.Geometry = function( editor ) {
 
 	var signals = editor.signals;
 
@@ -21,12 +21,12 @@ Sidebar.Geometry = function ( editor ) {
 		'Flatten': 'Flatten'
 
 	} );
-	objectActions.onClick( function ( event ) {
+	objectActions.onClick( function( event ) {
 
 		event.stopPropagation(); // Avoid panel collapsing
 
 	} );
-	objectActions.onChange( function ( event ) {
+	objectActions.onChange( function( event ) {
 
 		var action = this.getValue();
 
@@ -95,7 +95,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	var geometryUUIDRow = new UI.Row();
 	var geometryUUID = new UI.Input().setWidth( '115px' ).setFontSize( '12px' ).setDisabled( true );
-	var geometryUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
+	var geometryUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function() {
 
 		geometryUUID.setValue( THREE.Math.generateUUID() );
 
@@ -112,7 +112,7 @@ Sidebar.Geometry = function ( editor ) {
 	// name
 
 	var geometryNameRow = new UI.Row();
-	var geometryName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
+	var geometryName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function() {
 
 		editor.execute( new SetGeometryValueCommand( editor.selected, 'name', geometryName.getValue() ) );
 
@@ -158,13 +158,36 @@ Sidebar.Geometry = function ( editor ) {
 
 			parameters.clear();
 
+			var equivalence = {
+
+				BoxBufferGeometry: "BoxGeometry",
+				BoxGeometry: "BoxGeometry",
+				CirBuffercleGeometry: "CircleGeometry",
+				CircleGeometry: "CircleGeometry",
+				CylinderBufferGeometry: "CylinderGeometry",
+				CylinderGeometry: "CylinderGeometry",
+				IcosahedronGeometry: "IcosahedronGeometry",
+				LatheBufferGeometry: "LatheGeometry",
+				LatheGeometry: "LatheGeometry",
+				PlaneBufferGeometry: "PlaneGeometry",
+				PlaneGeometry: "PlaneGeometry",
+				SphereBufferGeometry: "SphereGeometry",
+				SphereGeometry: "SphereGeometry",
+				TeapotBufferGeometry: "TeapotBufferGeometry",
+				TorusBufferGeometry: "TorusGeometry",
+				TorusGeometry: "TorusGeometry",
+				TorusKnotBufferGeometry: "TorusKnotGeometry",
+				TorusKnotGeometry: "TorusKnotGeometry"
+
+			}
+
 			if ( geometry.type === 'BufferGeometry' || geometry.type === 'Geometry' ) {
 
 				parameters.add( new Sidebar.Geometry.Modifiers( editor, object ) );
 
-			} else if ( Sidebar.Geometry[ geometry.type ] !== undefined ) {
+			} else if ( Sidebar.Geometry[ equivalence[ geometry.type ] ] !== undefined ) {
 
-				parameters.add( new Sidebar.Geometry[ geometry.type ]( editor, object ) );
+				parameters.add( new Sidebar.Geometry[ equivalence[ geometry.type ] ]( editor, object ) );
 
 			}
 

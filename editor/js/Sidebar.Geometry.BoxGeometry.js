@@ -74,7 +74,7 @@ Sidebar.Geometry.BoxGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.BoxGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ object.geometry.type ](
 			width.getValue(),
 			height.getValue(),
 			depth.getValue(),

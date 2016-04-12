@@ -74,7 +74,7 @@ Sidebar.Geometry.CylinderGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.CylinderGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ object.geometry.type ](
 			radiusTop.getValue(),
 			radiusBottom.getValue(),
 			height.getValue(),
