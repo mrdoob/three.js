@@ -150,20 +150,19 @@ THREE.PMREMGenerator.prototype = {
 				}",
 
 			fragmentShader:
-				"varying vec2 vUv;\n\
+				"#include <common>\n\
+				varying vec2 vUv;\n\
 				uniform int faceIndex;\n\
 				uniform float roughness;\n\
 				uniform samplerCube envMap;\n\
 				uniform float mapSize;\n\
 				uniform vec3 testColor;\n\
 				\n\
-				#include <procedural>\n\
 				float GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n\
 					float a = ggxRoughness + 0.0001;\n\
 					a *= a;\n\
 					return ( 2.0 / a - 2.0 );\n\
 				}\n\
-				const float PI = 3.14159265358979;\n\
 				vec3 ImportanceSamplePhong(vec2 uv, mat3 vecSpace, float specPow) {\n\
 					float phi = uv.y * 2.0 * PI;\n\
 					float cosTheta = pow(1.0 - uv.x, 1.0 / (specPow + 1.0));\n\
@@ -236,8 +235,8 @@ THREE.PMREMGenerator.prototype = {
 					for(int i=0; i<NumSamples; i++) {\n\
 						float sini = sin(float(i));\n\
 						float cosi = cos(float(i));\n\
-						float rand = noiseRandom1D(vec2(sini, cosi));\n\
-						vect = ImportanceSampleGGX(vec2(float(i) / float(NumSamples), rand), vecSpace, roughness);\n\
+						float r = rand(vec2(sini, cosi));\n\
+						vect = ImportanceSampleGGX(vec2(float(i) / float(NumSamples), r), vecSpace, roughness);\n\
 						float dotProd = dot(vect, normalize(sampleDirection));\n\
 						weight += dotProd;\n\
 						vec3 color = envMapTexelToLinear(textureCube(envMap,vect)).rgb;\n\

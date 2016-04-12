@@ -34,14 +34,14 @@ THREE.TriangleBlurShader = {
 
 	fragmentShader: [
 
+		"#include <common>",
+
 		"#define ITERATIONS 10.0",
 
 		"uniform sampler2D texture;",
 		"uniform vec2 delta;",
 
 		"varying vec2 vUv;",
-
-		"#include <procedural>",
 
 		"void main() {",
 
@@ -51,7 +51,7 @@ THREE.TriangleBlurShader = {
 
 			// randomize the lookup values to hide the fixed number of samples
 
-			"float offset = noiseRandom1D( vUv );",
+			"float offset = rand( vUv );",
 
 			"for ( float t = -ITERATIONS; t <= ITERATIONS; t ++ ) {",
 
