@@ -39,7 +39,7 @@ THREE.UnpackDepthRGBAShader = {
 
 		"void main() {",
 
-			"float depth = 1.0 - unpackRGBAToLinearUnit( texture2D( tDiffuse, vUv ) );",
+			"float depth = 1.0 - unpackRGBAToDepth( texture2D( tDiffuse, vUv ) );",
 			"gl_FragColor = opacity * vec4( vec3( depth ), 1.0 );",
 
 		"}"
