@@ -155,7 +155,7 @@ THREE.Skeleton.prototype.update = ( function () {
 			var matrix = this.bones[ b ] ? this.bones[ b ].matrixWorld : this.identityMatrix;
 
 			offsetMatrix.multiplyMatrices( matrix, this.boneInverses[ b ] );
-			offsetMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
+			offsetMatrix.toArray( this.boneMatrices, b * 16 );
 
 		}
 
