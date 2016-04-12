@@ -2,7 +2,7 @@
 
 <html lang="en">
 	<head>
-		<title>three.js webgl - postprocessing - Scalable Ambient Occlusion (SAO)</title>
+		<title>three.js webgl - params - Scalable Ambient Occlusion (SAO)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -60,8 +60,12 @@
 			var depthMaterial, effectComposer, depthRenderTarget;
 			var saoPass;
 			var group;
-			var depthScale = 1.0;
-			var postprocessing = { enabled : true, renderMode: 0 }; // renderMode: 0('framebuffer'), 1('onlyAO')
+			var params = {
+				mode: 0,
+				saoBias: 0.5,
+				saoIntensity: 4,
+				saoScale: 1
+			}
 
 			init();
 			animate();
@@ -77,7 +81,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 3, 10 );
 				camera.position.z = 7;
 
 				scene = new THREE.Scene();
@@ -85,17 +89,23 @@
 				group = new THREE.Object3D();
 				scene.add( group );
 
-				var light = new THREE.PointLight( 0xffffff, 1.0 );
+				var light = new THREE.PointLight( 0xddffdd, 0.8 );
 				light.position.z = 70;
 				light.position.y = -70;
 				light.position.x = -70;
 				scene.add( light );
 
-				var light2 = new THREE.PointLight( 0xffffff, 1.0 );
+				var light2 = new THREE.PointLight( 0xffdddd, 0.8 );
 				light2.position.z = 70;
 				light2.position.x = -70;
 				light2.position.y = 70;
 				scene.add( light2 );
+
+				var light3 = new THREE.PointLight( 0xddddff, 0.8 );
+				light3.position.z = 70;
+				light3.position.x = 70;
+				light3.position.y = -70;
+				scene.add( light3 );
 
 				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
 				scene.add( light3 );
@@ -104,9 +114,9 @@
 				for ( var i = 0; i < 200; i ++ ) {
 
 					var material = new THREE.MeshStandardMaterial();
-					material.roughness = 1.0;
+					material.roughness = 0.5 * Math.random() + 0.25;
 					material.metalness = 0;
-					material.color.setHSL( Math.random(), 0.5, 0.5 );
+					material.color.setHSL( Math.random(), 1.0, 0.3 );
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 4 - 2;
@@ -123,26 +133,25 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				// Init postprocessing
+				// Init params
 				initPostprocessing();
 
 				// Init gui
 				var gui = new dat.GUI();
-				gui.add( postprocessing, "enabled" ).onChange();
-			//	gui.add( postprocessing, "renderMode", { framebuffer: 0, onlyAO: 1 } ).onChange( renderModeChange ).listen();
+				gui.add( params, "mode", {
+					'Beauty': 1,
+					'Beauty+SAO': 0,
+					'SAO': 2,
+					'Depth': 4,
+					'Normals': 3,
+				});
+				gui.add( params, "saoBias", -0.5, 0.5 );
+				gui.add( params, "saoIntensity", -0.5, 10 );
+				gui.add( params, "saoScale", -0.5, 100 );
+
+			//	gui.add( params, "renderMode", { framebuffer: 0, onlyAO: 1 } ).onChange( renderModeChange ).listen();
 
 				window.addEventListener( 'resize', onWindowResize, false );
-			}
-
-			function renderModeChange( value ) {
-
-				if ( value == 0 ) { // framebuffer
-					saoPass.uniforms[ 'onlyAO' ].value = false;
-				} else if ( value == 1 ) {  // onlyAO
-					saoPass.uniforms[ 'onlyAO' ].value = true;
-				} else {
-					console.error( "Not define renderModeChange type: " + value );
-				}
 			}
 
 			function onWindowResize() {
@@ -210,23 +219,27 @@
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
 
-				if ( postprocessing.enabled ) {
-
-					saoPass.uniforms[ 'randomSeed' ].value = Math.random();
-
-					// Render depth into depthRenderTarget
-					scene.overrideMaterial = depthMaterial;
-					renderer.setClearColor( 0xffffff );
-					renderer.render( scene, camera, depthRenderTarget, true );
-
-					// Render renderPass and SSAO shaderPass
-					scene.overrideMaterial = null;
-					renderer.setClearColor( 0xa0a0a0 );
-					effectComposer.render();
-
-				} else {
-					renderer.render( scene, camera );
+				if( saoPass.material.defines['MODE'] !== params.mode ) {
+					saoPass.material.defines['MODE'] = params.mode;
+					saoPass.material.needsUpdate = true;
 				}
+
+				saoPass.uniforms['bias'].value = params.saoBias;
+				saoPass.uniforms['intensity'].value = params.saoIntensity;
+				saoPass.uniforms['scale'].value = params.saoScale;
+
+				saoPass.uniforms[ 'randomSeed' ].value = Math.random();
+
+				// Render depth into depthRenderTarget
+				scene.overrideMaterial = depthMaterial;
+				renderer.setClearColor( 0xffffff );
+				renderer.render( scene, camera, depthRenderTarget, true );
+
+				// Render renderPass and SSAO shaderPass
+				scene.overrideMaterial = null;
+				renderer.setClearColor( 0xa0a0a0 );
+				effectComposer.render();
+
 			}
 
 		</script>

@@ -8,8 +8,9 @@
 THREE.SAOShader = {
 
 	defines: {
-		'NUM_SAMPLES': 64,
-		'NUM_RINGS': 5,
+		'NUM_SAMPLES': 14,
+		'NUM_RINGS': 4,
+		"MODE": 0
 	},
 
 	uniforms: {
@@ -23,9 +24,9 @@ THREE.SAOShader = {
 		"cameraProjectionMatrix": { type: "m4", value: new THREE.Matrix4() },
 		"cameraInverseProjectionMatrix": { type: "m4", value: new THREE.Matrix4() },
 
-		"scale":   { type: "f", value: 100.0 },
-		"intensity":   { type: "f", value: 1.5 },
-		"bias":   { type: "f", value: 0.00 },
+		"scale":   { type: "f", value: 10.0 },
+		"intensity":   { type: "f", value: 3.0 },
+		"bias":   { type: "f", value: 0.5 },
 
 		"sampleRadiusPixels":   { type: "f", value: 20.0 },
 		"randomSeed": { type: "f", value: 0.0 }
@@ -99,7 +100,7 @@ THREE.SAOShader = {
 
 			"vec3 viewNormal = getViewNormalFromDepthDerivatives( viewPosition );",
 
-			"float random = 0.0;//rand( vUv + randomSeed );",
+			"float random = rand( vUv + randomSeed );",
 			"vec2 radius = vec2( sampleRadiusPixels ) / size;",
 			"float numSamples = float( NUM_SAMPLES );",
 			"float numRings = float( NUM_RINGS );",
@@ -137,17 +138,34 @@ THREE.SAOShader = {
 
 			"vec4 color = texture2D( tDiffuse, vUv );",
 			"vec3 viewPosition = getViewPosition( vUv );",
-			/*"vec3 viewNormal = getViewNormalFromDepthDerivatives( viewPosition );",
-			"gl_FragColor = vec4( viewNormal * 0.5 + 0.5, 1.0 );",
-			"return;",*/
+
+			"#if MODE == 3", // display normals
+				"vec3 viewNormal = getViewNormalFromDepthDerivatives( viewPosition );",
+				"gl_FragColor = vec4( viewNormal * 0.5 + 0.5, 1.0 );",
+				"return;",
+			"#elif MODE == 4", // display depth
+				"float perspectiveDepth = viewZToPerspectiveDepth( viewPosition.z, cameraNear, cameraFar );",
+				"gl_FragColor = vec4( vec3( perspectiveDepth ), 1.0 );",
+				"return;",
+			"#endif",
+
 			"gl_FragColor = color;",
+
+			"#if MODE == 1", // display original color
+				"return;",
+			"#endif",
 
 			"if( -viewPosition.z >= cameraFar ) {",
 				"return;",
 			"}",
 
 			"float occlusion = basicPattern( viewPosition );",
-			"gl_FragColor.xyz *= 1.0 - occlusion;",
+
+			"#if MODE == 2", // display only ao
+				"gl_FragColor.xyz = vec3( 1.0 - occlusion );",
+			"#elif MODE == 0", // display original color + ao (normal mode)
+				"gl_FragColor.xyz *= 1.0 - occlusion;",
+			"#endif",
 
 		"}"
 
