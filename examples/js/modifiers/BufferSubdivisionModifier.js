@@ -313,15 +313,15 @@ function unIndexIndexedGeometry(geometry) {
         newVertices.push_element(oldVertices.register[0]);
         newVertices.push_element(oldVertices.register[1]);
         newVertices.push_element(oldVertices.register[2]);
+        if (oldUvs.length != 0) {
+            oldUvs.index_to_register((i * 3) + 0, 0);
+            oldUvs.index_to_register((i * 3) + 1, 1);
+            oldUvs.index_to_register((i * 3) + 2, 2);
 
-        oldUvs.index_to_register((i * 3) + 0, 0);
-        oldUvs.index_to_register((i * 3) + 1, 1);
-        oldUvs.index_to_register((i * 3) + 2, 2);
-
-        newUvs.push_element(oldUvs.register[0]);
-        newUvs.push_element(oldUvs.register[1]);
-        newUvs.push_element(oldUvs.register[2]);
-
+            newUvs.push_element(oldUvs.register[0]);
+            newUvs.push_element(oldUvs.register[1]);
+            newUvs.push_element(oldUvs.register[2]);
+        }
         oldNormals.index_to_register(oldFaces.register[0].a, 0);
         oldNormals.index_to_register(oldFaces.register[0].b, 1);
         oldNormals.index_to_register(oldFaces.register[0].c, 2);
@@ -351,7 +351,8 @@ function unIndexIndexedGeometry(geometry) {
     geometry.index = null;
     geometry.addAttribute('position', new THREE.BufferAttribute(newVertices.buffer, 3));
     geometry.addAttribute('normal', new THREE.BufferAttribute(newNormals.buffer, 3));
-    geometry.addAttribute('uv', new THREE.BufferAttribute(newUvs.buffer, 2));
+    if(newUvs.length != 0)
+        geometry.addAttribute('uv', new THREE.BufferAttribute(newUvs.buffer, 2));
   //  geometry.computeVertexNormals();
     return geometry;
 }
