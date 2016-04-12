@@ -48,6 +48,8 @@ THREE.FilmShader = {
 
 	fragmentShader: [
 
+		"#include <common>",
+		
 		// control parameter
 		"uniform float time;",
 
@@ -66,15 +68,13 @@ THREE.FilmShader = {
 
 		"varying vec2 vUv;",
 
-		"#include <procedural>",
-
 		"void main() {",
 
 			// sample the source
 			"vec4 cTextureScreen = texture2D( tDiffuse, vUv );",
 
 			// make some noise
-			"float dx = noiseRandom1D( vUv + time );",
+			"float dx = rand( vUv + time );",
 
 			// add noise
 			"vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx, 0.0, 1.0 );",

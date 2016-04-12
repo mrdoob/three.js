@@ -150,14 +150,14 @@ THREE.PMREMGenerator.prototype = {
 				}",
 
 			fragmentShader:
-				"varying vec2 vUv;\n\
+				"#include <common>\n\
+				varying vec2 vUv;\n\
 				uniform int faceIndex;\n\
 				uniform float roughness;\n\
 				uniform samplerCube envMap;\n\
 				uniform float mapSize;\n\
 				uniform vec3 testColor;\n\
 				\n\
-				#include <procedural>\n\
 				float GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n\
 					float a = ggxRoughness + 0.0001;\n\
 					a *= a;\n\
@@ -236,7 +236,7 @@ THREE.PMREMGenerator.prototype = {
 					for(int i=0; i<NumSamples; i++) {\n\
 						float sini = sin(float(i));\n\
 						float cosi = cos(float(i));\n\
-						float rand = noiseRandom1D(vec2(sini, cosi));\n\
+						float rand = rand(vec2(sini, cosi));\n\
 						vect = ImportanceSampleGGX(vec2(float(i) / float(NumSamples), rand), vecSpace, roughness);\n\
 						float dotProd = dot(vect, normalize(sampleDirection));\n\
 						weight += dotProd;\n\
