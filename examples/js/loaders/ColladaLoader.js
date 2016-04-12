@@ -3792,7 +3792,21 @@ THREE.ColladaLoader = function () {
 		switch ( this.type ) {
 
 			case 'constant':
-
+			
+		                if ( props.emissionMap !== undefined ) {
+		                	
+					props.aoMap = props.emissionMap;
+					delete props.emissionMap;
+		                    
+		                }
+		                
+		                if ( props.lightMap !== undefined ) {
+		                	
+					props.aoMap = props.lightMap;
+					delete props.lightMap;
+		                    
+		                }
+				
 				if (props.emissive != undefined) props.color = props.emissive;
 				this.material = new THREE.MeshBasicMaterial( props );
 				break;
