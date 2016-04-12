@@ -77,31 +77,46 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 100, 700 );
-				camera.position.z = 500;
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.z = 7;
 
 				scene = new THREE.Scene();
 
 				group = new THREE.Object3D();
 				scene.add( group );
 
-				var geometry = new THREE.IcosahedronGeometry( 5, 1 );
+				var light = new THREE.PointLight( 0xffffff, 1.0 );
+				light.position.z = 70;
+				light.position.y = -70;
+				light.position.x = -70;
+				scene.add( light );
+
+				var light2 = new THREE.PointLight( 0xffffff, 1.0 );
+				light2.position.z = 70;
+				light2.position.x = -70;
+				light2.position.y = 70;
+				scene.add( light2 );
+
+				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
+				scene.add( light3 );
+
+				var geometry = new THREE.IcosahedronGeometry( 4, 3 );
 				for ( var i = 0; i < 200; i ++ ) {
 
-					var material = new THREE.MeshBasicMaterial();
-					material.color.r = Math.random();
-					material.color.g = Math.random();
-					material.color.b = Math.random();
+					var material = new THREE.MeshStandardMaterial();
+					material.roughness = 1.0;
+					material.metalness = 0;
+					material.color.setHSL( Math.random(), 0.5, 0.5 );
 
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 400 - 200;
-					mesh.position.y = Math.random() * 400 - 200;
-					mesh.position.z = Math.random() * 400 - 200;
+					mesh.position.x = Math.random() * 4 - 2;
+					mesh.position.y = Math.random() * 4 - 2;
+					mesh.position.z = Math.random() * 4 - 2;
 					mesh.rotation.x = Math.random();
 					mesh.rotation.y = Math.random();
 					mesh.rotation.z = Math.random();
 
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 10 + 1;
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 0.1 + 0.025;
 					group.add( mesh );
 				}
 
@@ -141,8 +156,8 @@
 
 				// Resize renderTargets
 				saoPass.uniforms[ 'size' ].value.set( width, height );
-//				saoPass.uniforms[ 'projectionMatrixInv' ].value.getInverse( camera.projectMatrix );
-				saoPass.uniforms[ 'projectionMatrixInv' ].value.getInverse( camera.projectionMatrix );
+				saoPass.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( camera.projectionMatrix );
+				saoPass.uniforms[ 'cameraProjectionMatrix' ].value = camera.projectionMatrix;
 
 				var pixelRatio = renderer.getPixelRatio();
 				var newWidth  = Math.floor( width / pixelRatio ) || 1;
