@@ -31,49 +31,49 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - Procedural Effects Example by <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
 		</div>
 
-    <script id="procedural-vert" type="x-shader/x-vertex">
-      varying vec2 vUv;
+		<script id="procedural-vert" type="x-shader/x-vertex">
+			varying vec2 vUv;
 
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    </script>
-    <script id="noiseRandom1D-frag" type="x-shader/x-fragment">
+			void main() {
+				vUv = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+			}
+		</script>
+		<script id="noiseRandom1D-frag" type="x-shader/x-fragment">
 		#include <common>
 		#include <packing>
 
-      varying vec2 vUv;
+			varying vec2 vUv;
 
-      void main() {
+			void main() {
 				gl_FragColor.xyz = vec3( rand( vUv ) );
 				gl_FragColor.w = 1.0;
-      }
-    </script>
+			}
+		</script>
 		<script id="noiseRandom2D-frag" type="x-shader/x-fragment">
 			#include <common>
-      #include <packing>
+			#include <packing>
 
-      varying vec2 vUv;
+			varying vec2 vUv;
 
-      void main() {
+			void main() {
 				vec2 rand2 = vec2( rand( vUv ), rand( vUv + vec2( 0.4, 0.6 ) ) );
 				gl_FragColor.xyz = mix( mix( vec3( 1.0, 1.0, 1.0 ), vec3( 0.0, 0.0, 1.0 ), rand2.x ), vec3( 0.0 ), rand2.y );
 				gl_FragColor.w = 1.0;
-      }
-    </script>
+			}
+		</script>
 		<script id="noiseRandom3D-frag" type="x-shader/x-fragment">
 			#include <common>
-      #include <packing>
+			#include <packing>
 
-      varying vec2 vUv;
+			varying vec2 vUv;
 
-      void main() {
+			void main() {
 				vec3 rand3 = vec3( rand( vUv ), rand( vUv + vec2( 0.4, 0.6 ) ), rand( vUv + vec2( 0.6, 0.4 ) ) );
 				gl_FragColor.xyz = rand3;
 				gl_FragColor.w = 1.0;
-      }
-    </script>
+			}
+		</script>
 
 		<div id="container"></div>
 
@@ -113,25 +113,25 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-        // Setup post processing stage
-        postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-        noiseRandom1DMaterial = new THREE.ShaderMaterial({
-          vertexShader: document.querySelector('#procedural-vert').textContent.trim(),
-          fragmentShader: document.querySelector('#noiseRandom1D-frag').textContent.trim(),
-        });
+				// Setup post processing stage
+				postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+				noiseRandom1DMaterial = new THREE.ShaderMaterial({
+					vertexShader: document.querySelector('#procedural-vert').textContent.trim(),
+					fragmentShader: document.querySelector('#noiseRandom1D-frag').textContent.trim(),
+				});
 				noiseRandom2DMaterial = new THREE.ShaderMaterial({
-          vertexShader: document.querySelector('#procedural-vert').textContent.trim(),
-          fragmentShader: document.querySelector('#noiseRandom2D-frag').textContent.trim(),
-        });
+					vertexShader: document.querySelector('#procedural-vert').textContent.trim(),
+					fragmentShader: document.querySelector('#noiseRandom2D-frag').textContent.trim(),
+				});
 				noiseRandom3DMaterial = new THREE.ShaderMaterial({
-          vertexShader: document.querySelector('#procedural-vert').textContent.trim(),
-          fragmentShader: document.querySelector('#noiseRandom3D-frag').textContent.trim(),
-        });
+					vertexShader: document.querySelector('#procedural-vert').textContent.trim(),
+					fragmentShader: document.querySelector('#noiseRandom3D-frag').textContent.trim(),
+				});
 				postMaterial = noiseRandom3DMaterial;
-        var postPlane = new THREE.PlaneGeometry(2, 2);
-        postQuad = new THREE.Mesh(postPlane, postMaterial);
-        postScene = new THREE.Scene();
-        postScene.add(postQuad);
+				var postPlane = new THREE.PlaneGeometry(2, 2);
+				postQuad = new THREE.Mesh(postPlane, postMaterial);
+				postScene = new THREE.Scene();
+				postScene.add(postQuad);
 
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -169,8 +169,8 @@
 				postQuad.material = postMaterial;
 
 
-        // render post FX
-        renderer.render( postScene, postCamera );
+				// render post FX
+				renderer.render( postScene, postCamera );
 
 				stats.update();
 
