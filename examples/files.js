@@ -218,6 +218,7 @@ var files = {
 		"webgl_test_memory2",
 		"webgl_tonemapping",
 		"webgl_trails",
+		"webgl_uniforms_shared",
 		"webgl_video_panorama_equirectangular"
 	],
 	"webgl / advanced": [
