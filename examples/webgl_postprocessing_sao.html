@@ -63,7 +63,7 @@
 			var params = {
 				mode: 0,
 				saoBias: 0.5,
-				saoIntensity: 4,
+				saoIntensity: 0.15,
 				saoScale: 1
 			}
 
@@ -146,8 +146,8 @@
 					'Normals': 3,
 				});
 				gui.add( params, "saoBias", -0.5, 0.5 );
-				gui.add( params, "saoIntensity", -0.5, 10 );
-				gui.add( params, "saoScale", -0.5, 100 );
+				gui.add( params, "saoIntensity", -0.5, 1 );
+				gui.add( params, "saoScale", -0.5, 10 );
 
 			//	gui.add( params, "renderMode", { framebuffer: 0, onlyAO: 1 } ).onChange( renderModeChange ).listen();
 

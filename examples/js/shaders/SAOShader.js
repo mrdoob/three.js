@@ -93,8 +93,8 @@ THREE.SAOShader = {
 	 "float getOcclusion( vec3 viewPosition, vec3 viewNormal, vec3 viewPositionOffset ) {",
 			"vec3 viewDelta = viewPositionOffset - viewPosition;",
 			"float viewDistance = length( viewDelta );",
-			"float distance = scale * viewDistance / cameraFar;",
-			"return intensity * max(0.0, (dot(viewNormal, viewDelta) - MIN_RESOLUTION * cameraFar) / viewDistance - bias) / (1.0 + pow2( viewDistance ) );",
+			"float scaledScreenDistance = scale * viewDistance / cameraFar;",
+			"return intensity * max(0.0, (dot(viewNormal, viewDelta) - MIN_RESOLUTION * cameraFar) / scaledScreenDistance - bias) / (1.0 + pow2( scaledScreenDistance ) );",
 		"}",
 
 		"float basicPattern( vec3 viewPosition ) {",
