@@ -972,40 +972,49 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var dataType = _gl.FLOAT;
 					var normalized = false;
-					if( geometryAttribute.array instanceof Float32Array )
-					{
+					if( geometryAttribute.array instanceof Float32Array ) {
+
 						dataType = _gl.FLOAT;
+
 					}
-					if( geometryAttribute.array instanceof Float64Array )
-					{
+					if( geometryAttribute.array instanceof Float64Array ) {
+
 						console.warn("Unsupported data buffer format: Float64Array");
+
 					}
-					if( geometryAttribute.array instanceof Uint16Array )
-					{
+					if( geometryAttribute.array instanceof Uint16Array ) {
+
 						dataType = _gl.UNSIGNED_SHORT;
+						
 					}
-					if( geometryAttribute.array instanceof Int16Array )
-					{
+					if( geometryAttribute.array instanceof Int16Array ) {
+
 						dataType = _gl.SHORT;
+
 					}
-					if( geometryAttribute.array instanceof Uint32Array )
-					{
-						console.warn("Unsupported data buffer format: Uint32Array");
+					if( geometryAttribute.array instanceof Uint32Array ) {
+
+						dataType = _gl.UNSIGNED_INT;
+
 					}
-					if( geometryAttribute.array instanceof Int32Array )
-					{
+					if( geometryAttribute.array instanceof Int32Array ) {
+
 						dataType = _gl.FIXED;
+
 					}
-					if( geometryAttribute.array instanceof Int8Array )
-					{
+					if( geometryAttribute.array instanceof Int8Array ) {
+
 						dataType = _gl.BYTE;
+
 					}
-					if( geometryAttribute.array instanceof Uint8Array )
-					{
+					if( geometryAttribute.array instanceof Uint8Array ) {
+
 						dataType = _gl.UNSIGNED_BYTE;
+
 					}
-					if( geometryAttribute.array instanceof DataView )
-					{
+					//A dataview can be nice since you can't create a new TypedArray on an existing buffer if the 
+					//data you need is offset, and that offset is not a multiple of the bytes-per-element
+					if( geometryAttribute.array instanceof DataView ) {
 						if(!geometryAttribute.array.glDataType)
 						{
 							console.warn("DataView buffer attributes must set glDataType");
