@@ -970,6 +970,54 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometryAttribute !== undefined ) {
 
+					var dataType = _gl.FLOAT;
+					var normalized = false;
+					if( geometryAttribute.array instanceof Float32Array )
+					{
+						dataType = _gl.FLOAT;
+					}
+					if( geometryAttribute.array instanceof Float64Array )
+					{
+						console.warn("Unsupported data buffer format: Float64Array");
+					}
+					if( geometryAttribute.array instanceof Uint16Array )
+					{
+						dataType = _gl.UNSIGNED_SHORT;
+					}
+					if( geometryAttribute.array instanceof Int16Array )
+					{
+						dataType = _gl.SHORT;
+					}
+					if( geometryAttribute.array instanceof Uint32Array )
+					{
+						console.warn("Unsupported data buffer format: Uint32Array");
+					}
+					if( geometryAttribute.array instanceof Int32Array )
+					{
+						dataType = _gl.FIXED;
+					}
+					if( geometryAttribute.array instanceof Int8Array )
+					{
+						dataType = _gl.BYTE;
+					}
+					if( geometryAttribute.array instanceof Uint8Array )
+					{
+						dataType = _gl.UNSIGNED_BYTE;
+					}
+					if( geometryAttribute.array instanceof DataView )
+					{
+						if(!geometryAttribute.array.glDataType)
+						{
+							console.warn("DataView buffer attributes must set glDataType");
+						}else
+						{
+							dataType = geometryAttribute.array.glDataType;	
+						}
+						
+					}
+					if(geometryAttribute.normalized)
+						normalized = true;
+
 					var size = geometryAttribute.itemSize;
 					var buffer = objects.getAttributeBuffer( geometryAttribute );
 
@@ -996,7 +1044,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
+						_gl.vertexAttribPointer( programAttribute, size, dataType, normalized, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
 
 					} else {
 
@@ -1017,7 +1065,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+						_gl.vertexAttribPointer( programAttribute, size, dataType, normalized, 0, startIndex * size * geometryAttribute.array.BYTES_PER_ELEMENT ); // 4 bytes per Float32
 
 					}
 
