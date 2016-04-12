@@ -71,10 +71,9 @@ THREE.SAOShader = {
 		// RGBA depth
 
 		"#include <packing>",
-		"#include <procedural>",
 
 		"vec3 getViewSpacePosition(vec2 screenSpacePosition ) {",
-		"   float perspectiveDepth = unpackRGBAToLinearUnit( texture2D( tDepth, screenSpacePosition ) );",
+		"   float perspectiveDepth = unpackRGBAToDepth( texture2D( tDepth, screenSpacePosition ) );",
 		"   float viewSpaceZ = perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
 		"   float w = cameraProjectionMatrix[2][3] * viewSpaceZ + cameraProjectionMatrix[3][3];",
 		"   vec3 clipPos = ( vec3( screenSpacePosition, perspectiveDepth ) - 0.5 ) * 2.0;",
@@ -97,7 +96,7 @@ THREE.SAOShader = {
 
 			"vec3 viewSpaceNormal  = -getViewSpaceNormalFromDepth( viewSpacePosition );",
 
-			"float random = noiseRandom1D( vUv + randomSeed );",
+			"float random = rand( vUv + randomSeed );",
 
 			"vec2 radius = vec2( sampleRadiusPixels ) / size;",
 			"float numSamples = float( NUM_SAMPLES );",
