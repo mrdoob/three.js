@@ -333,5 +333,5 @@ THREE.RGBDEncoding = 3006; // MaxRange is 256.
 
 // Depth packing strategies
 
-THREE.LinearDepthPacking = 3200;  // for writing to float textures for high precision or for visualizing results in RGB buffers
+THREE.BasicDepthPacking = 3200;  // for writing to float textures for high precision or for visualizing results in RGB buffers
 THREE.RGBADepthPacking = 3201; // for packing into RGBA buffers.

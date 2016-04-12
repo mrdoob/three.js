@@ -9,6 +9,6 @@ void main () {
 
 	#include <clipping_planes_fragment>
 
-	gl_FragColor = packLinearUnitToRGBA( length( vWorldPosition.xyz - lightPos.xyz ) / 1000.0 );
+	gl_FragColor = packDepthToRGBA( length( vWorldPosition.xyz - lightPos.xyz ) / 1000.0 );
 
 }

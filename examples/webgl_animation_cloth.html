@@ -57,7 +57,7 @@
 
 				if ( pixel.a < 0.5 ) discard;
 
-				gl_FragData[ 0 ] = packLinearUnitToRGBA( gl_FragCoord.z );
+				gl_FragData[ 0 ] = packDepthToRGBA( gl_FragCoord.z );
 
 			}
 		</script>
