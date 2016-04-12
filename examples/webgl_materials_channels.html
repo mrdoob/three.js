@@ -66,7 +66,7 @@
 			var cameraOrtho, cameraPerspective;
 			var controlsOrtho, controlsPerspective;
 
-			var mesh, materialStandard, materialDepthLinear, materialDepthRGBA, materialNormal;
+			var mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialNormal;
 
 			var pointLight, ambientLight;
 
@@ -83,7 +83,7 @@
 			function initGui() {
 
 				var gui = new dat.GUI();
-				gui.add( params, 'material', [ 'standard', 'normal', 'depthLinear', 'depthRGBA' ] );
+				gui.add( params, 'material', [ 'standard', 'normal', 'depthBasic', 'depthRGBA' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
 
 			}
@@ -172,8 +172,8 @@
 					side: THREE.DoubleSide
 				} );
 
-				materialDepthLinear = new THREE.MeshDepthMaterial( {
-					depthPacking: THREE.LinearDepthPacking,
+				materialDepthBasic = new THREE.MeshDepthMaterial( {
+					depthPacking: THREE.BasicDepthPacking,
 
 					displacementMap: displacementMap,
 					displacementScale: SCALE,
@@ -263,7 +263,7 @@
 					switch ( params.material ) {
 						
 						case 'standard': material = materialStandard; break;
-						case 'depthLinear': material = materialDepthLinear; break;
+						case 'depthBasic': material = materialDepthBasic; break;
 						case 'depthRGBA': material = materialDepthRGBA; break;
 						case 'normal': material = materialNormal; break;
 

@@ -21,7 +21,7 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	this.type = 'MeshDepthMaterial';
 
-	this.depthPacking = THREE.LinearDepthPacking;
+	this.depthPacking = THREE.BasicDepthPacking;
 
 	this.skinning = false;
 	this.morphTargets = false;

@@ -20,7 +20,7 @@ void main() {
 
 	#elif DEPTH_PACKING == 3201
 
-		gl_FragColor = packLinearUnitToRGBA( gl_FragCoord.z );
+		gl_FragColor = packDepthToRGBA( gl_FragCoord.z );
 
 	#endif
 
