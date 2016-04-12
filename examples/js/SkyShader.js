@@ -126,7 +126,7 @@ THREE.ShaderLib[ 'sky' ] = {
 
 		"float sunIntensity(float zenithAngleCos)",
 		"{",
-			"return EE * max(0.0, 1.0 - exp(-((cutoffAngle - acos(zenithAngleCos))/steepness)));",
+			"return EE * max(0.0, 1.0 - pow(e, -((cutoffAngle - acos(zenithAngleCos))/steepness)));",
 		"}",
 
 		"// float logLuminance(vec3 c)",
