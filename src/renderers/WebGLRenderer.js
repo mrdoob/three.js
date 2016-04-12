@@ -1012,40 +1012,44 @@ THREE.WebGLRenderer = function ( parameters ) {
 						dataType = _gl.FLOAT;
 
 					}
-					if( geometryAttribute.array instanceof Float64Array ) {
+					else if( geometryAttribute.array instanceof Float64Array ) {
 
 						console.warn("Unsupported data buffer format: Float64Array");
 
 					}
-					if( geometryAttribute.array instanceof Uint16Array ) {
+					else if( geometryAttribute.array instanceof Uint16Array ) {
 
 						dataType = _gl.UNSIGNED_SHORT;
 						
 					}
-					if( geometryAttribute.array instanceof Int16Array ) {
+					else if( geometryAttribute.array instanceof Int16Array ) {
 
 						dataType = _gl.SHORT;
 
 					}
-					if( geometryAttribute.array instanceof Uint32Array ) {
+					else if( geometryAttribute.array instanceof Uint32Array ) {
 
 						dataType = _gl.UNSIGNED_INT;
 
 					}
-					if( geometryAttribute.array instanceof Int32Array ) {
+					else if( geometryAttribute.array instanceof Int32Array ) {
 
-						dataType = _gl.FIXED;
+						dataType = _gl.INT;
 
 					}
-					if( geometryAttribute.array instanceof Int8Array ) {
+					else if( geometryAttribute.array instanceof Int8Array ) {
 
 						dataType = _gl.BYTE;
 
 					}
-					if( geometryAttribute.array instanceof Uint8Array ) {
+					else if( geometryAttribute.array instanceof Uint8Array ) {
 
 						dataType = _gl.UNSIGNED_BYTE;
 
+					}
+					else 
+					{
+						dataType = _gl.FLOAT;
 					}
 					//A dataview can be nice since you can't create a new TypedArray on an existing buffer if the 
 					//data you need is offset, and that offset is not a multiple of the bytes-per-element
