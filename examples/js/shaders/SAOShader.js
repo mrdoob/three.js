@@ -86,6 +86,7 @@ THREE.SAOShader = {
 		"}",
 
 		"vec3 getViewNormalFromDepthDerivatives( vec3 viewPosition ) {",
+			"if( -viewPosition.z >= cameraFar ) return vec3( 0.0, 0.0, 1.0 );",
 			"return normalize( cross( dFdx( viewPosition ), dFdy( viewPosition ) ) );",
 		"}",
 
