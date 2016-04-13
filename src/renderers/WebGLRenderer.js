@@ -1168,7 +1168,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// save original state
 		var originalAutoClear = this.autoClear;
 		var originalClearColor = this.getClearColor();
-		var originalClearAlpha = this.getClearColor();
+		var originalClearAlpha = this.getClearAlpha();
 
 		// setup pass state
 		this.autoClear = false;
