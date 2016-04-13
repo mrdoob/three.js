@@ -33,6 +33,10 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
+	// far clipping plane in both RGBA and Basic encoding
+	this.clearColor = new THREE.Color( 1.0, 1.0, 1.0 );
+	this.clearAlpha = 1.0;
+
 	this.setValues( parameters );
 
 };
@@ -55,6 +59,9 @@ THREE.MeshDepthMaterial.prototype.copy = function ( source ) {
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
+
+	this.clearColor = source.clearColor;
+	this.clearAlpha = source.clearAlpha;
 
 	return this;
 

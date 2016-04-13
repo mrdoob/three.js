@@ -71,7 +71,7 @@ THREE.BokehPass.prototype = {
 
 		// Render depth into texture
 
-		renderer.renderOverride( this.materialDepth, this.scene, this.camera, this.renderTargetDepth, 0xffffff, 1.0 );
+		renderer.renderOverride( this.materialDepth, this.scene, this.camera, this.renderTargetDepth );
 
 		// Render bokeh composite
 
