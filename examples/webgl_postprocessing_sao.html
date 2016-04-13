@@ -109,13 +109,13 @@
 				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
 				scene.add( light3 );
 
-				var material = new THREE.MeshStandardMaterial();
-				material.roughness = 0.8;
-				material.metalness = 0;
-				material.color.set( 0xbbbbbb );
-
 				var geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
 				for ( var i = 0; i < 120; i ++ ) {
+
+					var material = new THREE.MeshStandardMaterial();
+					material.roughness = 0.5 * Math.random() + 0.25;
+					material.metalness = 0;
+					material.color.setHSL( Math.random(), 1.0, 0.3 );
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 4 - 2;
@@ -233,16 +233,8 @@
 				saoMaterial.uniforms['minResolution'].value = params.saoMinResolution;
 				saoMaterial.uniforms['randomSeed'].value = Math.random();
 
-				scene.overrideMaterial = depthMaterial;
-				renderer.setClearColor( 0xffffff );
-				renderer.render( scene, camera, depthRenderTarget, true );
-				scene.overrideMaterial = null;
-
-				scene.overrideMaterial = normalMaterial;
-				renderer.setClearColor( 0xffffff );
-				renderer.render( scene, camera, normalRenderTarget, true );
-				scene.overrideMaterial = null;
-
+				renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget, 0xffffff, 1.0 );
+				renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget, 0xffffff, 1.0 );
 				renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 0.0 );
 
 				renderer.setClearColor( 0x000000 );
