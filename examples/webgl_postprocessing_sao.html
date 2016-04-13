@@ -2,7 +2,7 @@
 
 <html lang="en">
 	<head>
-		<title>three.js webgl - params - Scalable Ambient Occlusion (SAO)</title>
+		<title>three.js webgl - post processing - Scalable Ambient Occlusion (SAO)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -63,8 +63,9 @@
 			var params = {
 				mode: 0,
 				saoBias: 0.5,
-				saoIntensity: 0.15,
-				saoScale: 1
+				saoIntensity: 0.10,
+				saoScale: 1,
+				saoKernelRadius: 100
 			}
 
 			init();
@@ -110,7 +111,7 @@
 				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
 				scene.add( light3 );
 
-				var geometry = new THREE.IcosahedronGeometry( 4, 3 );
+				var geometry = new THREE.IcosahedronGeometry( 4, 4 );
 				for ( var i = 0; i < 200; i ++ ) {
 
 					var material = new THREE.MeshStandardMaterial();
@@ -145,11 +146,10 @@
 					'Depth': 4,
 					'Normals': 3,
 				});
-				gui.add( params, "saoBias", -0.5, 0.5 );
-				gui.add( params, "saoIntensity", -0.5, 1 );
-				gui.add( params, "saoScale", -0.5, 10 );
-
-			//	gui.add( params, "renderMode", { framebuffer: 0, onlyAO: 1 } ).onChange( renderModeChange ).listen();
+				gui.add( params, "saoBias", -1, 1 );
+				gui.add( params, "saoIntensity", 0, 1 );
+				gui.add( params, "saoScale", 0, 10 );
+				gui.add( params, "saoKernelRadius", 1, 100 );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 			}
@@ -192,7 +192,6 @@
 				// Setup SSAO pass
 				saoPass = new THREE.ShaderPass( THREE.SAOShader );
 				saoPass.renderToScreen = true;
-				//saoPass.uniforms[ "tDiffuse" ].value will be set by ShaderPass
 				saoPass.uniforms[ "tDepth" ].value = depthRenderTarget;
 				saoPass.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
 				saoPass.uniforms[ 'cameraNear' ].value = camera.near;
@@ -227,7 +226,7 @@
 				saoPass.uniforms['bias'].value = params.saoBias;
 				saoPass.uniforms['intensity'].value = params.saoIntensity;
 				saoPass.uniforms['scale'].value = params.saoScale;
-
+				saoPass.uniforms['sampleRadiusPixels'].value = params.saoKernelRadius;
 				saoPass.uniforms[ 'randomSeed' ].value = Math.random();
 
 				// Render depth into depthRenderTarget

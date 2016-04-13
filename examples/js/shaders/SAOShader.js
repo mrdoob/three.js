@@ -8,8 +8,8 @@
 THREE.SAOShader = {
 
 	defines: {
-		'NUM_SAMPLES': 14,
-		'NUM_RINGS': 4,
+		'NUM_SAMPLES': 9,
+		'NUM_RINGS': 3,
 		"MODE": 0
 	},
 
@@ -24,11 +24,11 @@ THREE.SAOShader = {
 		"cameraProjectionMatrix": { type: "m4", value: new THREE.Matrix4() },
 		"cameraInverseProjectionMatrix": { type: "m4", value: new THREE.Matrix4() },
 
-		"scale":   { type: "f", value: 10.0 },
-		"intensity":   { type: "f", value: 3.0 },
+		"scale":   { type: "f", value: 1.0 },
+		"intensity":   { type: "f", value: 0.1 },
 		"bias":   { type: "f", value: 0.5 },
 
-		"sampleRadiusPixels":   { type: "f", value: 20.0 },
+		"sampleRadiusPixels":   { type: "f", value: 100.0 },
 		"randomSeed": { type: "f", value: 0.0 }
 	},
 
@@ -86,7 +86,6 @@ THREE.SAOShader = {
 		"}",
 
 		"vec3 getViewNormalFromDepthDerivatives( vec3 viewPosition ) {",
-			"if( -viewPosition.z >= cameraFar ) return vec3( 0.0, 0.0, 1.0 );",
 			"return normalize( cross( dFdx( viewPosition ), dFdy( viewPosition ) ) );",
 		"}",
 
