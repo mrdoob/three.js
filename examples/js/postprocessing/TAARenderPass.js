@@ -90,7 +90,7 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 
 			renderer.render( this.scene, this.camera, writeBuffer, true );
 
-			renderer.render( this.scene2, this.camera2, this.sampleRenderTarget, ( this.accumulateIndex === 0 ) );
+			renderer.renderPass( this.materialComposite, this.sampleRenderTarget, ( this.accumulateIndex === 0 ) ? renderer.getClearColor() : null, ( this.accumulateIndex === 0 ) ? renderer.getClearAlpha() : null );
 
 			this.accumulateIndex ++;
 			if( this.accumulateIndex >= jitterOffsets.length ) break;
@@ -106,13 +106,13 @@ THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuf
 	if( accumulationWeight > 0 ) {
 		this.compositeUniforms[ "scale" ].value = 1.0;
 		this.compositeUniforms[ "tForeground" ].value = this.sampleRenderTarget;
-		renderer.render( this.scene2, this.camera2, writeBuffer, true );
+		renderer.renderPass( this.materialComposite, writeBuffer, renderer.getClearColor(), renderer.getClearAlpha() );
 	}
 
 	if( accumulationWeight < 1.0 ) {
 		this.compositeUniforms[ "scale" ].value = 1.0 - accumulationWeight;
 		this.compositeUniforms[ "tForeground" ].value = this.holdRenderTarget;
-		renderer.render( this.scene2, this.camera2, writeBuffer, ( accumulationWeight === 0 ) );
+		renderer.renderPass( this.materialComposite, writeBuffer, ( this.accumulateIndex === 0 ) ? renderer.getClearColor() : null, ( this.accumulateIndex === 0 ) ? renderer.getClearAlpha() : null );
 	}
 
 	renderer.autoClear = autoClear;

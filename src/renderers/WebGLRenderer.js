@@ -71,6 +71,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.toneMappingExposure = 1.0;
 	this.toneMappingWhitePoint = 1.0;
 
+	this.passCamera = null;
+	this.passQuad = null;
+	this.passScene = null;
+
 	// morphs
 
 	this.maxMorphTargets = 8;
@@ -1149,6 +1153,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 			return a.id - b.id;
 
 		}
+
+	}
+
+	this.renderPass = function ( passMaterial, renderTarget, clearColor, clearAlpha ) {
+
+		if( ! this.passScene ) {
+			this.postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+			this.postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), null);
+			this.postScene = new THREE.Scene();
+			this.postScene.add( this.postQuad );
+		}
+
+		// save original state
+		var originalAutoClear = this.autoClear;
+		var originalClearColor = this.getClearColor();
+		var originalClearAlpha = this.getClearColor();
+
+		// setup pass state
+		this.autoClear = false;
+		if( clearColor !== undefined ) {
+			this.setClearColor( clearColor );
+			this.setClearAlpha( clearAlpha || 0.0 );
+		}
+		this.postQuad.material = passMaterial;
+		
+		// render pass
+		this.render( this.postScene, this.postCamera, renderTarget, clearColor !== undefined );
+
+		// restore original state
+		this.autoClear = originalAutoClear;
+		this.setClearColor( originalClearColor );
+		this.setClearAlpha( originalClearAlpha );
 
 	}
 

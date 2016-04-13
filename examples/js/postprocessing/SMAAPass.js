@@ -96,12 +96,6 @@ THREE.SMAAPass = function ( width, height ) {
 
 	this.needsSwap = false;
 
-	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
-	this.scene  = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.scene.add( this.quad );
-
 };
 
 THREE.SMAAPass.prototype = Object.create( THREE.Pass.prototype );
@@ -116,31 +110,17 @@ THREE.SMAAPass.prototype = {
 
 		this.uniformsEdges[ "tDiffuse" ].value = readBuffer;
 
-		this.quad.material = this.materialEdges;
-
-		renderer.render( this.scene, this.camera, this.edgesRT, this.clear );
+		renderer.renderPass( this.materialEdges, this.edgesRT, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
 
 		// pass 2
 
-		this.quad.material = this.materialWeights;
-
-		renderer.render( this.scene, this.camera, this.weightsRT, this.clear );
+		renderer.renderPass( this.materialWeights, this.weightsRT, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
 
 		// pass 3
 
 		this.uniformsBlend[ "tColor" ].value = readBuffer;
 
-		this.quad.material = this.materialBlend;
-
-		if ( this.renderToScreen ) {
-
-			renderer.render( this.scene, this.camera );
-
-		} else {
-
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
-
-		}
+		renderer.renderPass( this.materialBlend, this.renderToScreen ? null : writeBuffer, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
 
 	},
 
