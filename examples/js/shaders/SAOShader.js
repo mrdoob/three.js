@@ -97,7 +97,7 @@ THREE.SAOShader = {
 
 		"vec3 getViewNormal( vec3 viewPosition, vec2 screenPosition ) {",
 			"#if NORMAL_TEXTURE == 1",
-				"return unpackRGBToNormal( texture2D( tNormal, screenPosition ).xyz );",
+				"return -unpackRGBToNormal( texture2D( tNormal, screenPosition ).xyz );",
 			"#else",
 				"return normalize( cross( dFdx( viewPosition ), dFdy( viewPosition ) ) );",
 			"#endif",
@@ -160,7 +160,7 @@ THREE.SAOShader = {
 
 			"#if MODE == 3", // display normals
 				"vec3 viewNormal = getViewNormal( viewPosition, vUv );",
-				"gl_FragColor = vec4( viewNormal * 0.5 + 0.5, 1.0 );",
+				"gl_FragColor = vec4( packNormalToRGB( viewNormal ), 1.0 );",
 				"return;",
 			"#elif MODE == 4", // display depth
 				"float perspectiveDepth = viewZToPerspectiveDepth( viewPosition.z, cameraNear, cameraFar );",

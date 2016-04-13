@@ -36,12 +36,7 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/shaders/SAOShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/shaders/CompositeShader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -57,7 +52,9 @@
 
 			var container, stats;
 			var camera, scene, renderer;
-			var depthMaterial, effectComposer, depthRenderTarget;
+			var depthMaterial, saoMaterial, saoModulateMaterial, normalMaterial;
+			var depthRenderTarget, normalRenderTarget, saoRenderTarget, beautyRenderTarget;
+			var postScene, postQuad, postCamera;
 			var saoPass;
 			var group;
 			var params = {
@@ -77,7 +74,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0xa0a0a0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -132,12 +129,53 @@
 					group.add( mesh );
 				}
 
+				postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+				postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), null);
+				postScene = new THREE.Scene();
+				postScene.add(postQuad);
+
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				// Init params
-				initPostprocessing();
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
+				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+				normalRenderTarget = depthRenderTarget.clone();
+				saoRenderTarget = depthRenderTarget.clone();
+				beautyRenderTarget = depthRenderTarget.clone();
 
+				depthMaterial = new THREE.MeshDepthMaterial();
+				depthMaterial.depthFormat = THREE.AutoDepthFormat;
+				depthMaterial.depthPacking = THREE.RGBADepthPacking;
+				depthMaterial.blending = THREE.NoBlending;
+
+				normalMaterial = new THREE.MeshNormalMaterial();
+				normalMaterial.blending = THREE.NoBlending;
+
+				saoMaterial = new THREE.ShaderMaterial( THREE.SAOShader );
+				saoMaterial.defines['DIFFUSE_TEXTURE'] = 0;
+				saoMaterial.defines['NORMAL_TEXTURE'] = 1;
+				saoMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
+				saoMaterial.uniforms[ "tNormal" ].value = normalRenderTarget;
+				saoMaterial.uniforms[ "tDiffuse" ].value = beautyRenderTarget;
+				saoMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				saoMaterial.uniforms[ 'cameraNear' ].value = camera.near;
+				saoMaterial.uniforms[ 'cameraFar' ].value = camera.far;
+				saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( camera.projectionMatrix );
+				saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = camera.projectionMatrix;
+				saoMaterial.blending = THREE.NoBlending;
+
+				saoModulateMaterial = new THREE.ShaderMaterial( THREE.CompositeShader );
+				saoModulateMaterial.transparent = true;
+				saoModulateMaterial.blending = THREE.CustomBlending;
+				saoModulateMaterial.blendSrc = THREE.DstColorFactor;
+				saoModulateMaterial.blendDst = THREE.ZeroFactor;
+				saoModulateMaterial.blendEquation = THREE.AddEquation;
+				saoModulateMaterial.blendSrcAlpha = THREE.DstAlphaFactor;
+				saoModulateMaterial.blendDstAlpha = THREE.ZeroFactor;
+				saoModulateMaterial.blendEquationAlpha = THREE.AddEquation;
+				saoModulateMaterial.uniforms[ 'tForeground' ].value = saoRenderTarget;
+				saoModulateMaterial.depthTest = false;
+				saoModulateMaterial.depthWrite = false;
 				// Init gui
 				var gui = new dat.GUI();
 				gui.add( params, "mode", {
@@ -158,53 +196,21 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				var width = window.innerWidth || 1;
+				var height = window.innerHeight || 1;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 				renderer.setSize( width, height );
 
 				// Resize renderTargets
-				saoPass.uniforms[ 'size' ].value.set( width, height );
-				saoPass.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( camera.projectionMatrix );
-				saoPass.uniforms[ 'cameraProjectionMatrix' ].value = camera.projectionMatrix;
+				saoMaterial.uniforms[ 'size' ].value.set( width, height );
+				saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( camera.projectionMatrix );
+				saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = camera.projectionMatrix;
 
-				var pixelRatio = renderer.getPixelRatio();
-				var newWidth  = Math.floor( width / pixelRatio ) || 1;
-				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				depthRenderTarget.setSize( newWidth, newHeight );
-				effectComposer.setSize( newWidth, newHeight );
-			}
-
-			function initPostprocessing() {
-
-				// Setup render pass
-				var renderPass = new THREE.RenderPass( scene, camera );
-
-				// Setup depth pass
-				depthMaterial = new THREE.MeshDepthMaterial();
-				depthMaterial.depthFormat = THREE.AutoDepthFormat;
-				depthMaterial.depthPacking = THREE.RGBADepthPacking;
-				depthMaterial.blending = THREE.NoBlending;
-
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
-				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-
-				// Setup SSAO pass
-				saoPass = new THREE.ShaderPass( THREE.SAOShader );
-				saoPass.renderToScreen = true;
-				saoPass.uniforms[ "tDepth" ].value = depthRenderTarget;
-				saoPass.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
-				saoPass.uniforms[ 'cameraNear' ].value = camera.near;
-				saoPass.uniforms[ 'cameraFar' ].value = camera.far;
-				saoPass.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( camera.projectionMatrix );
-				saoPass.uniforms[ 'cameraProjectionMatrix' ].value = camera.projectionMatrix;
-
-				// Add pass to effect composer
-				effectComposer = new THREE.EffectComposer( renderer );
-				effectComposer.addPass( renderPass );
-				effectComposer.addPass( saoPass );
+				saoRenderTarget.setSize( newWidth, newHeight );
+				beautyRenderTarget.setSize( newWidth, newHeight );
 			}
 
 			function animate() {
@@ -220,28 +226,38 @@
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
 
-				if( saoPass.material.defines['MODE'] !== params.mode ) {
-					saoPass.material.defines['MODE'] = params.mode;
-					saoPass.material.needsUpdate = true;
+				if( saoMaterial.defines['MODE'] !== params.mode ) {
+					saoMaterial.defines['MODE'] = params.mode;
+					saoMaterial.needsUpdate = true;
 				}
 
-				saoPass.uniforms['bias'].value = params.saoBias;
-				saoPass.uniforms['intensity'].value = params.saoIntensity;
-				saoPass.uniforms['scale'].value = params.saoScale;
-				saoPass.uniforms['kernelRadius'].value = params.saoKernelRadius;
-				saoPass.uniforms['minResolution'].value = params.saoMinResolution;
-				saoPass.uniforms['randomSeed'].value = Math.random();
+				saoMaterial.uniforms['bias'].value = params.saoBias;
+				saoMaterial.uniforms['intensity'].value = params.saoIntensity;
+				saoMaterial.uniforms['scale'].value = params.saoScale;
+				saoMaterial.uniforms['kernelRadius'].value = params.saoKernelRadius;
+				saoMaterial.uniforms['minResolution'].value = params.saoMinResolution;
+				saoMaterial.uniforms['randomSeed'].value = Math.random();
 
-				// Render depth into depthRenderTarget
 				scene.overrideMaterial = depthMaterial;
 				renderer.setClearColor( 0xffffff );
 				renderer.render( scene, camera, depthRenderTarget, true );
-
-				// Render renderPass and SSAO shaderPass
 				scene.overrideMaterial = null;
-				renderer.setClearColor( 0xa0a0a0 );
-				effectComposer.render();
 
+				scene.overrideMaterial = normalMaterial;
+				renderer.setClearColor( 0xffffff );
+				renderer.render( scene, camera, normalRenderTarget, true );
+				scene.overrideMaterial = null;
+
+				postQuad.material = saoMaterial;
+				renderer.render( postScene, postCamera, saoRenderTarget );
+
+				renderer.setClearColor( 0xa0a0a0 );
+				renderer.render( scene, camera, null, true );
+
+				postQuad.material = saoModulateMaterial;
+				renderer.autoClear = false;
+				renderer.render( postScene, postCamera, null, false );
+				renderer.autoClear = true;
 			}
 
 		</script>
