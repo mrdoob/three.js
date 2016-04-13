@@ -1156,6 +1156,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	this.renderOverride = function ( overrideMaterial, scene, camera, renderTarget, clearColor, clearAlpha ) {
+
+		// save original state
+		var originalAutoClear = this.autoClear;
+		var originalClearColor = this.getClearColor();
+		var originalClearAlpha = this.getClearColor();
+
+		// setup pass state
+		this.autoClear = false;
+		if( clearColor !== undefined ) {
+			this.setClearColor( clearColor );
+			this.setClearAlpha( clearAlpha || 0.0 );
+		}
+
+		this.overrideMaterial = passMaterial;
+
+		// render pass
+		this.render( this.postScene, this.postCamera, renderTarget, clearColor !== undefined );
+
+		this.overrideMaterial = null;
+
+		// restore original state
+		this.autoClear = originalAutoClear;
+		this.setClearColor( originalClearColor );
+		this.setClearAlpha( originalClearAlpha );
+
+	}
+
+
 	this.renderPass = function ( passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		if( ! this.passScene ) {
@@ -1177,7 +1206,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			this.setClearAlpha( clearAlpha || 0.0 );
 		}
 		this.postQuad.material = passMaterial;
-		
+
 		// render pass
 		this.render( this.postScene, this.postCamera, renderTarget, clearColor !== undefined );
 
