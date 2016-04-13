@@ -1153,8 +1153,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderOverride = function ( overrideMaterial, scene, camera, renderTarget, clearColor, clearAlpha ) {
 
-		var originalClearColor = this.getClearColor(), originalClearAlpha = this.getClearAlpha();
+		var originalClearColor = this.getClearColor(), originalClearAlpha = this.getClearAlpha(), originalAutoClear = this.autoClear;
 
+		this.autoClear = false;
 		var clearNeeded = ( clearColor !== undefined )&&( clearColor !== null );
 		if( clearNeeded ) {
 			this.setClearColor( clearColor );
@@ -1166,6 +1167,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		scene.overrideMaterial = null;
 
 		// restore original state
+		this.autoClear = originalAutoClear;
 		this.setClearColor( originalClearColor );
 		this.setClearAlpha( originalClearAlpha );
 
