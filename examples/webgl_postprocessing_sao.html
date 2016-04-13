@@ -162,13 +162,13 @@
 				saoMaterial.blending = THREE.NoBlending;
 
 				vBlurMaterial = new THREE.ShaderMaterial( THREE.BlurShader );
-				THREE.BlurShaderUtils.configure( vBlurMaterial, 16, new THREE.Vector2( 0, 1 ), 8 );
+				THREE.BlurShaderUtils.configure( vBlurMaterial, 64, new THREE.Vector2( 0, 1 ), 25 );
 				vBlurMaterial.uniforms[ "tDiffuse" ].value = beautyRenderTarget;
 				vBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
 				vBlurMaterial.blending = THREE.NoBlending;
 
 				hBlurMaterial = new THREE.ShaderMaterial( THREE.BlurShader );
-				THREE.BlurShaderUtils.configure( hBlurMaterial, 16, new THREE.Vector2( 1, 0 ), 8 );
+				THREE.BlurShaderUtils.configure( hBlurMaterial, 64, new THREE.Vector2( 1, 0 ), 25 );
 				hBlurMaterial.uniforms[ "tDiffuse" ].value = blurIntermediateRenderTarget;
 				hBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
 				hBlurMaterial.blending = THREE.NoBlending;
