@@ -65,7 +65,8 @@
 				saoBias: 0.5,
 				saoIntensity: 0.10,
 				saoScale: 1,
-				saoKernelRadius: 100
+				saoKernelRadius: 100,
+				saoMinResolution: 0
 			}
 
 			init();
@@ -150,6 +151,7 @@
 				gui.add( params, "saoIntensity", 0, 1 );
 				gui.add( params, "saoScale", 0, 10 );
 				gui.add( params, "saoKernelRadius", 1, 100 );
+				gui.add( params, "saoMinResolution", 0, 1 );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 			}
@@ -226,8 +228,9 @@
 				saoPass.uniforms['bias'].value = params.saoBias;
 				saoPass.uniforms['intensity'].value = params.saoIntensity;
 				saoPass.uniforms['scale'].value = params.saoScale;
-				saoPass.uniforms['sampleRadiusPixels'].value = params.saoKernelRadius;
-				saoPass.uniforms[ 'randomSeed' ].value = Math.random();
+				saoPass.uniforms['kernelRadius'].value = params.saoKernelRadius;
+				saoPass.uniforms['minResolution'].value = params.saoMinResolution;
+				saoPass.uniforms['randomSeed'].value = Math.random();
 
 				// Render depth into depthRenderTarget
 				scene.overrideMaterial = depthMaterial;

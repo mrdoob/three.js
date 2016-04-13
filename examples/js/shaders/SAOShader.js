@@ -10,13 +10,16 @@ THREE.SAOShader = {
 	defines: {
 		'NUM_SAMPLES': 9,
 		'NUM_RINGS': 3,
-		"MODE": 0
+		"MODE": 0,
+		"NORMAL_TEXTURE": 0,
+		"DIFFUSE_TEXTURE": 1
 	},
 
 	uniforms: {
 
-		"tDiffuse":     { type: "t", value: null },
 		"tDepth":       { type: "t", value: null },
+		"tDiffuse":     { type: "t", value: null },
+		"tNormal":      { type: "t", value: null },
 		"size":         { type: "v2", value: new THREE.Vector2( 512, 512 ) },
 
 		"cameraNear":   { type: "f", value: 1 },
@@ -24,12 +27,13 @@ THREE.SAOShader = {
 		"cameraProjectionMatrix": { type: "m4", value: new THREE.Matrix4() },
 		"cameraInverseProjectionMatrix": { type: "m4", value: new THREE.Matrix4() },
 
-		"scale":   { type: "f", value: 1.0 },
-		"intensity":   { type: "f", value: 0.1 },
-		"bias":   { type: "f", value: 0.5 },
+		"scale":        { type: "f", value: 1.0 },
+		"intensity":    { type: "f", value: 0.1 },
+		"bias":         { type: "f", value: 0.5 },
 
-		"sampleRadiusPixels":   { type: "f", value: 100.0 },
-		"randomSeed": { type: "f", value: 0.0 }
+		"minResolution": { type: "f", value: 0.0 },
+		"kernelRadius": { type: "f", value: 100.0 },
+		"randomSeed":   { type: "f", value: 0.0 }
 	},
 
 	vertexShader: [
@@ -53,12 +57,17 @@ THREE.SAOShader = {
 
 		"#include <common>",
 
-		"#define MIN_RESOLUTION      0.000",
-
 		"varying vec2 vUv;",
 
 		"uniform sampler2D tDepth;",
-		"uniform sampler2D tDiffuse;",
+
+		"#if DIFFUSE_TEXTURE == 1",
+			"uniform sampler2D tDiffuse;",
+		"#endif",
+
+		"#if NORMAL_TEXTURE == 1",
+			"uniform sampler2D tNormal;",
+		"#endif",
 
 		"uniform float cameraNear;",
 		"uniform float cameraFar;",
@@ -68,7 +77,8 @@ THREE.SAOShader = {
 		"uniform float scale;",
 		"uniform float intensity;",
 		"uniform float bias;",
-		"uniform float sampleRadiusPixels;",
+		"uniform float kernelRadius;",
+		"uniform float minResolution;",
 		"uniform vec2 size;",
 		"uniform float randomSeed;",
 
@@ -85,23 +95,27 @@ THREE.SAOShader = {
 			"return ( cameraInverseProjectionMatrix * clipPosition ).xyz;",
 		"}",
 
-		"vec3 getViewNormalFromDepthDerivatives( vec3 viewPosition ) {",
-			"return normalize( cross( dFdx( viewPosition ), dFdy( viewPosition ) ) );",
+		"vec3 getViewNormal( vec3 viewPosition, vec2 screenPosition ) {",
+			"#if NORMAL_TEXTURE == 1",
+				"return unpackRGBToNormal( texture2D( tNormal, screenPosition ).xyz );",
+			"#else",
+				"return normalize( cross( dFdx( viewPosition ), dFdy( viewPosition ) ) );",
+			"#endif",
 		"}",
 
 	 "float getOcclusion( vec3 viewPosition, vec3 viewNormal, vec3 viewPositionOffset ) {",
 			"vec3 viewDelta = viewPositionOffset - viewPosition;",
 			"float viewDistance = length( viewDelta );",
 			"float scaledScreenDistance = scale * viewDistance / cameraFar;",
-			"return intensity * max(0.0, (dot(viewNormal, viewDelta) - MIN_RESOLUTION * cameraFar) / scaledScreenDistance - bias) / (1.0 + pow2( scaledScreenDistance ) );",
+			"return intensity * max(0.0, (dot(viewNormal, viewDelta) - minResolution * cameraFar) / scaledScreenDistance - bias) / (1.0 + pow2( scaledScreenDistance ) );",
 		"}",
 
 		"float basicPattern( vec3 viewPosition ) {",
 
-			"vec3 viewNormal = getViewNormalFromDepthDerivatives( viewPosition );",
+			"vec3 viewNormal = getViewNormal( viewPosition, vUv );",
 
 			"float random = rand( vUv + randomSeed );",
-			"vec2 radius = vec2( sampleRadiusPixels ) / size;",
+			"vec2 radius = vec2( kernelRadius ) / size;",
 			"float numSamples = float( NUM_SAMPLES );",
 			"float numRings = float( NUM_RINGS );",
 			"float alphaStep = 1.0 / numSamples;",
@@ -136,11 +150,16 @@ THREE.SAOShader = {
 
 		"void main() {",
 
-			"vec4 color = texture2D( tDiffuse, vUv );",
+			"#if DIFFUSE_TEXTURE == 1",
+				"vec4 color = texture2D( tDiffuse, vUv );",
+			"#else",
+				"vec4 color = vec4( 1.0 );",
+			"#endif",
+
 			"vec3 viewPosition = getViewPosition( vUv );",
 
 			"#if MODE == 3", // display normals
-				"vec3 viewNormal = getViewNormalFromDepthDerivatives( viewPosition );",
+				"vec3 viewNormal = getViewNormal( viewPosition, vUv );",
 				"gl_FragColor = vec4( viewNormal * 0.5 + 0.5, 1.0 );",
 				"return;",
 			"#elif MODE == 4", // display depth
