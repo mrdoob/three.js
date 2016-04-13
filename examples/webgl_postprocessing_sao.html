@@ -109,13 +109,13 @@
 				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
 				scene.add( light3 );
 
-				var geometry = new THREE.IcosahedronGeometry( 4, 4 );
-				for ( var i = 0; i < 200; i ++ ) {
+				var material = new THREE.MeshStandardMaterial();
+				material.roughness = 0.8;
+				material.metalness = 0;
+				material.color.set( 0xbbbbbb );
 
-					var material = new THREE.MeshStandardMaterial();
-					material.roughness = 0.5 * Math.random() + 0.25;
-					material.metalness = 0;
-					material.color.setHSL( Math.random(), 1.0, 0.3 );
+				var geometry = new THREE.SphereBufferGeometry( 3, 24, 24 );
+				for ( var i = 0; i < 120; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 4 - 2;
@@ -125,7 +125,7 @@
 					mesh.rotation.y = Math.random();
 					mesh.rotation.z = Math.random();
 
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 0.1 + 0.025;
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 0.2 + 0.05;
 					group.add( mesh );
 				}
 

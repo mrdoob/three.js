@@ -8,7 +8,7 @@
 THREE.SAOShader = {
 
 	defines: {
-		'NUM_SAMPLES': 9,
+		'NUM_SAMPLES': 7,
 		'NUM_RINGS': 3,
 		"MODE": 0,
 		"NORMAL_TEXTURE": 0,
