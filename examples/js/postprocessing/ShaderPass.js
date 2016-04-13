@@ -46,7 +46,7 @@ THREE.ShaderPass.prototype = {
 
 		}
 
-		renderer.renderPass( this.material, this.renderTarget, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
+		renderer.renderPass( this.material, this.renderToScreen ? null : writeBuffer, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
 
 	}
 
