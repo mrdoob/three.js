@@ -233,8 +233,8 @@
 				saoMaterial.uniforms['minResolution'].value = params.saoMinResolution;
 				saoMaterial.uniforms['randomSeed'].value = Math.random();
 
-				renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget, 0xffffff, 0.0 );
-				renderer.renderOverride( normalMaterial, scene, camera, null, new THREE.Color( 0.5, 0.5, 1.0 ), 1.0 );
+				renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget );
+				renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget );
 				renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 0.0 );
 
 				renderer.setClearColor( 0x000000 );
