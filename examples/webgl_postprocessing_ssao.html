@@ -219,7 +219,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				if ( postprocessing.enabled ) {
 
 					// Render depth into depthRenderTarget
-					renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget, 0xffffff, 1.0 );
+					renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget );
 
 					// Render renderPass and SSAO shaderPass
 					effectComposer.render();

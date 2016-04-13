@@ -1152,6 +1152,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var originalClearColor = this.getClearColor(), originalClearAlpha = this.getClearAlpha(), originalAutoClear = this.autoClear;
 
 		this.autoClear = false;
+		clearColor = overrideMaterial.clearColor || clearColor;
+		clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
 		var clearNeeded = ( clearColor !== undefined )&&( clearColor !== null );
 		if( clearNeeded ) {
 			this.setClearColor( clearColor );
