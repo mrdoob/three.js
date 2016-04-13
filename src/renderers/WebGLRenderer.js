@@ -1890,7 +1890,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material instanceof THREE.MeshBasicMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshStandardMaterial ) {
+				 material instanceof THREE.MeshStandardMaterial ||
+				 material instanceof THREE.MeshDepthMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
 
@@ -1928,8 +1929,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				refreshUniformsStandard( m_uniforms, material );
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-				m_uniforms.opacity.value = material.opacity;
 
 				if ( material.displacementMap ) {
 
