@@ -129,11 +129,6 @@
 					group.add( mesh );
 				}
 
-				postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-				postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), null);
-				postScene = new THREE.Scene();
-				postScene.add(postQuad);
-
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
@@ -248,16 +243,12 @@
 				renderer.render( scene, camera, normalRenderTarget, true );
 				scene.overrideMaterial = null;
 
-				postQuad.material = saoMaterial;
-				renderer.render( postScene, postCamera, saoRenderTarget );
+				renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 0.0 );
 
 				renderer.setClearColor( 0x000000 );
 				renderer.render( scene, camera, null, true );
 
-				postQuad.material = saoModulateMaterial;
-				renderer.autoClear = false;
-				renderer.render( postScene, postCamera, null, false );
-				renderer.autoClear = true;
+				renderer.renderPass( saoModulateMaterial, null );
 			}
 
 		</script>
