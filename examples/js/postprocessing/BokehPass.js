@@ -73,8 +73,6 @@ THREE.BokehPass.prototype = {
 
 		renderer.renderOverride( this.materialDepth, this.scene, this.camera, this.renderTargetDepth, 0xffffff, 1.0 );
 
-		this.scene.overrideMaterial = null;
-
 		// Render bokeh composite
 
 		this.uniforms[ "tColor" ].value = readBuffer;

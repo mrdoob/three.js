@@ -51,12 +51,29 @@
 
 		<h2>Methods</h2>
 
+		<h3>[method:Color set]( value ) [page:Color this]</h3>
+		<div>
+		value -- either an instance of [page:Color], a [page:Integer hexadecimal] value, or a css style [page:String string]
+		</div>
+		<div>
+		Delegates to .copy, .setStyle, or .setHex depending on input type.
+		</div>
+
 		<h3>[method:Color copy]( [page:Color color] ) [page:Color this]</h3>
 		<div>
 		color — Color to copy.
 		</div>
 		<div>
 		Copies given color.
+		</div>
+
+		<h3>[method:Color fromArray]([page:Array array], [page:Integer offset]) [page:Color this]</h3>
+		<div>
+		array -- [page:Array] [r, g, b] <br />
+		offset -- [page:Integer] An optional offset into the array.
+		</div>
+		<div>
+		Sets this color's components based on an array formatted like [r, g, b]
 		</div>
 
 		<h3>[method:Color copyGammaToLinear]( [page:Color color] ) [page:Color this]</h3>
@@ -179,30 +196,23 @@
 		Linear interpolation of this colors rgb values and the rgb values of the first argument. The alpha argument can be thought of as the percent between the two colors, where 0 is this color and 1 is the first argument.
 		</div>
 
-		<h3>[method:Array toArray]( [page:Array array] )</h3>
-		<div>
-		array -- Optional array to store the color.
-		</div>
-		<div>
-		Returns an array [r,g,b]
-		</div>
-
 		<h3>[method:Color equals]( [page:Color c] ) [page:Color this]</h3>
 		<div>
 		Compares this color and c and returns true if they are the same, false otherwise.
 		</div>
 
-		<h3>[method:Color clone]()</h3>
+		<h3>[method:Color clone]() [page:Color this]</h3>
 		<div>
 		Clones this color.
 		</div>
 
-		<h3>[method:Color set]( value ) [page:Color this]</h3>
+		<h3>[method:Array toArray]([page:Array array], [page:Integer offset]) [page:Color this]</h3>
 		<div>
-		value -- either an instance of [page:Color], a [page:Integer hexadecimal] value, or a css style [page:String string]
+		array -- An optional array to store the color to. <br />
+		offset -- An optional offset into the array.
 		</div>
 		<div>
-		Delegates to .copy, .setStyle, or .setHex depending on input type.
+		Returns an array [r,g,b]
 		</div>
 
 		<h2>Source</h2>

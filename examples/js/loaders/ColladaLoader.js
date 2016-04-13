@@ -79,13 +79,25 @@ THREE.ColladaLoader = function () {
 
 							if ( failCallback ) {
 
-								failCallback();
+								failCallback( { type: 'error', url: url } );
 
 							} else {
 
 								console.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
 
 							}
+
+						}
+
+					}else{
+
+						if( failCallback ){
+
+							failCallback( { type: 'error', url: url } );
+
+						}else{
+
+							console.error( 'ColladaLoader: Couldn\'t load "' + url + '" (' + request.status + ')' );
 
 						}
 
