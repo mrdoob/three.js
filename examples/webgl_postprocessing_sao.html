@@ -36,6 +36,8 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/shaders/BlurShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/DepthLimitedBlurShader.js"></script>
 		<script src="js/shaders/SAOShader.js"></script>
 		<script src="js/shaders/CompositeShader.js"></script>
 
@@ -53,7 +55,7 @@
 
 			var container, stats;
 			var camera, scene, renderer;
-			var depthMaterial, saoMaterial, saoModulateMaterial, normalMaterial, vBlurMaterial, hBlurMaterial;
+			var depthMaterial, saoMaterial, saoModulateMaterial, normalMaterial, vBlurMaterial, hBlurMaterial, copyMaterial;
 			var depthRenderTarget, normalRenderTarget, saoRenderTarget, beautyRenderTarget, blurIntermediateRenderTarget;
 			var group;
 			var params = {
@@ -141,6 +143,10 @@
 				saoRenderTarget = depthRenderTarget.clone();
 				beautyRenderTarget = depthRenderTarget.clone();
 				blurIntermediateRenderTarget = depthRenderTarget.clone();
+				depthRenderTarget.texture.minFilter = THREE.NearestFilter;
+				depthRenderTarget.texture.maxFilter = THREE.NearestFilter;
+				normalRenderTarget.texture.maxFilter = THREE.NearestFilter;
+				normalRenderTarget.texture.minFilter = THREE.NearestFilter;
 
 				depthMaterial = new THREE.MeshDepthMaterial();
 				depthMaterial.depthPacking = THREE.RGBADepthPacking;
@@ -149,9 +155,13 @@
 				normalMaterial = new THREE.MeshNormalMaterial();
 				normalMaterial.blending = THREE.NoBlending;
 
+				copyMaterial = new THREE.ShaderMaterial( THREE.CopyShader );
+				copyMaterial.blending = THREE.NoBlending;
+
 				saoMaterial = new THREE.ShaderMaterial( THREE.SAOShader );
 				saoMaterial.defines[ 'DIFFUSE_TEXTURE' ] = 0;
 				saoMaterial.defines[ 'NORMAL_TEXTURE' ] = 1;
+				saoMaterial.defines[ 'MODE' ] = 2;
 				saoMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
 				saoMaterial.uniforms[ "tNormal" ].value = normalRenderTarget;
 				saoMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
@@ -161,15 +171,21 @@
 				saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = camera.projectionMatrix;
 				saoMaterial.blending = THREE.NoBlending;
 
-				vBlurMaterial = new THREE.ShaderMaterial( THREE.BlurShader );
+				vBlurMaterial = new THREE.ShaderMaterial( THREE.DepthLimitedBlurShader );
 				THREE.BlurShaderUtils.configure( vBlurMaterial, 64, new THREE.Vector2( 0, 1 ), 25 );
 				vBlurMaterial.uniforms[ "tDiffuse" ].value = saoRenderTarget;
+				vBlurMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
+				vBlurMaterial.uniforms[ "cameraNear" ].value = camera.near;
+				vBlurMaterial.uniforms[ "cameraFar" ].value = camera.far;
 				vBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
 				vBlurMaterial.blending = THREE.NoBlending;
 
-				hBlurMaterial = new THREE.ShaderMaterial( THREE.BlurShader );
+				hBlurMaterial = new THREE.ShaderMaterial( THREE.DepthLimitedBlurShader );
 				THREE.BlurShaderUtils.configure( hBlurMaterial, 64, new THREE.Vector2( 1, 0 ), 25 );
 				hBlurMaterial.uniforms[ "tDiffuse" ].value = blurIntermediateRenderTarget;
+				hBlurMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
+				hBlurMaterial.uniforms[ "cameraNear" ].value = camera.near;
+				hBlurMaterial.uniforms[ "cameraFar" ].value = camera.far;
 				hBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
 				hBlurMaterial.blending = THREE.NoBlending;
 
@@ -245,10 +261,10 @@
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
 
-				if( saoMaterial.defines['MODE'] !== params.mode ) {
+			/*	if( saoMaterial.defines['MODE'] !== params.mode ) {
 					saoMaterial.defines['MODE'] = params.mode;
 					saoMaterial.needsUpdate = true;
-				}
+				}*/
 
 				saoMaterial.uniforms['bias'].value = params.saoBias;
 				saoMaterial.uniforms['intensity'].value = params.saoIntensity;
@@ -274,9 +290,28 @@
 				renderer.setClearColor( 0x000000 );
 				renderer.render( scene, camera, null, true );
 
+				console.log( "params.mode", params.mode );
+				if( params.mode === 1 ) return;
+
 				if( params.saoBlur ) {
 					renderer.renderPass( vBlurMaterial, blurIntermediateRenderTarget, 0x000000, 0.0 );
 					renderer.renderPass( hBlurMaterial, saoRenderTarget, 0x000000, 0.0 );
+				}
+
+				if( params.mode === 2 ) {
+					copyMaterial.uniforms[ 'tDiffuse' ].value = saoRenderTarget;
+					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
+					return;
+				}
+				if( params.mode === 4 ) {
+					copyMaterial.uniforms[ 'tDiffuse' ].value = depthRenderTarget;
+					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
+					return;
+				}
+				if( params.mode === 3 ) {
+					copyMaterial.uniforms[ 'tDiffuse' ].value = normalRenderTarget;
+					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
+					return;
 				}
 
 				renderer.renderPass( saoModulateMaterial, null );

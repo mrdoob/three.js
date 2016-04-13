@@ -8,7 +8,7 @@
  *
  */
 
-THREE.BlurShader = {
+THREE.DepthLimitedBlurShader = {
 
 	defines: {
 
@@ -22,6 +22,9 @@ THREE.BlurShader = {
 		"size":             { type: "v2", value: new THREE.Vector2( 512, 512 ) },
 		"sampleUvOffsets":  { type: "v2v", value: [ new THREE.Vector2( 0, 0 ) ] },
 		"sampleWeights":    { type: "1fv", value: [ 1.0 ] },
+		"tDepth":           { type: "t", value: null },
+		"cameraNear":       { type: "f", value: 10 },
+		"cameraFar":        { type: "f", value: 1000 },
 
 	},
 
@@ -47,7 +50,14 @@ THREE.BlurShader = {
 
 	fragmentShader: [
 
+		"#include <common>",
+		"#include <packing>",
+
 		"uniform sampler2D tDiffuse;",
+		"uniform sampler2D tDepth;",
+
+		"uniform float cameraNear;",
+		"uniform float cameraFar;",
 
 		"uniform vec2 sampleUvOffsets[ NUM_SAMPLES ];",
 		"uniform float sampleWeights[ NUM_SAMPLES ];",
@@ -60,11 +70,22 @@ THREE.BlurShader = {
 			"vec4 diffuseSum = vec4( 0.0 );",
 			"float weightSum = 0.0;",
 
+			"float perspectiveDepth = unpackRGBAToDepth( texture2D( tDepth, vUv ) );",
+			"float viewZ = -perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
+			"float centerViewZ = viewZ;",
+
 			"for( int i = 0; i < NUM_SAMPLES; i ++ ) {",
 
-				"float weight = sampleWeights[i];",
-				"diffuseSum += texture2D( tDiffuse, vUv + sampleUvOffsets[i] * vInvSize ) * weight;",
-				"weightSum += weight;",
+				"float sampleWeight = sampleWeights[i];",
+				"vec2 sampleUv = vUv + sampleUvOffsets[i] * vInvSize;",
+
+				"perspectiveDepth = unpackRGBAToDepth( texture2D( tDepth, sampleUv ) );",
+				"viewZ = -perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
+
+				"if( abs( viewZ - centerViewZ ) < 0.1 * abs( cameraFar - cameraNear ) ) {",
+					"diffuseSum += texture2D( tDiffuse, sampleUv ) * sampleWeight;",
+					"weightSum += sampleWeight;",
+				"}",
 
 			"}",
 
@@ -108,20 +129,11 @@ THREE.BlurShaderUtils = {
 
 	},
 
-	reorderFromCenter: function( array ) {
-		var centerIndex = Math.floor( array.length / 2 );
-		var element = array[ centerIndex ];
-		array.slice( centerIndex, 1 );
-		array.unshift( element );
-		return array;
-	},
-
 	configure: function( material, numSamples, uvIncrement, stdDev ) {
 
-		var oddNumSamples = Math.floor( numSamples / 2 ) * 2 + 1;
-		material.defines[ 'NUM_SAMPLES' ] = oddNumSamples;
-		material.uniforms[ 'sampleUvOffsets' ].value = reorderFromCenter( THREE.BlurShaderUtils.createSampleOffsets( oddNumSamples, uvIncrement ) );
-		material.uniforms[ 'sampleWeights' ].value = reorderFromCenter( THREE.BlurShaderUtils.createSampleWeights( oddNumSamples, stdDev ) );
+		material.defines[ 'NUM_SAMPLES' ] = numSamples;
+		material.uniforms[ 'sampleUvOffsets' ].value = THREE.BlurShaderUtils.createSampleOffsets( numSamples, uvIncrement );
+		material.uniforms[ 'sampleWeights' ].value = THREE.BlurShaderUtils.createSampleWeights( numSamples, stdDev );
 
 	}
 
