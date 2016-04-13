@@ -48,6 +48,8 @@ THREE.FilmShader = {
 
 	fragmentShader: [
 
+		"#include <common>",
+		
 		// control parameter
 		"uniform float time;",
 
@@ -72,12 +74,10 @@ THREE.FilmShader = {
 			"vec4 cTextureScreen = texture2D( tDiffuse, vUv );",
 
 			// make some noise
-			"float x = vUv.x * vUv.y * time *  1000.0;",
-			"x = mod( x, 13.0 ) * mod( x, 123.0 );",
-			"float dx = mod( x, 0.01 );",
+			"float dx = rand( vUv + time );",
 
 			// add noise
-			"vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx * 100.0, 0.0, 1.0 );",
+			"vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx, 0.0, 1.0 );",
 
 			// get us a sine and cosine
 			"vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );",

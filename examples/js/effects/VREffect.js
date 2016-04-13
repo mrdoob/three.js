@@ -165,7 +165,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 				if ( boolean ) {
 
-					resolve( vrHMD.requestPresent( { source: canvas } ) );
+					resolve( vrHMD.requestPresent( [ { source: canvas } ] ) );
 
 				} else {
 

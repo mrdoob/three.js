@@ -13,7 +13,7 @@ THREE.SpotLightShadow.prototype.constructor = THREE.SpotLightShadow;
 
 THREE.SpotLightShadow.prototype.update = function ( light ) {
 
-	var fov = THREE.Math.radToDeg( 2 * light.angle );
+	var fov = THREE.Math.RAD2DEG * 2 * light.angle;
 	var aspect = this.mapSize.width / this.mapSize.height;
 	var far = light.distance || 500;
 

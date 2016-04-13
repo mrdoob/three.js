@@ -702,10 +702,7 @@
 	function initStats() {
 
 		stats = new Stats();
-		stats.domElement.style.position = 'absolute';
-		stats.domElement.style.bottom = '0px';
-		stats.domElement.style.zIndex = 100;
-		rendererContainer.appendChild( stats.domElement );
+		rendererContainer.appendChild( stats.dom );
 
 	}
 

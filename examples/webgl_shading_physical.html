@@ -25,10 +25,6 @@
 			}
 
 			a { color: skyblue; }
-
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #444 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -299,7 +295,7 @@
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// EVENTS
 
