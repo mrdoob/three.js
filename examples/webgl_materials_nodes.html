@@ -1825,11 +1825,7 @@
 			// render to texture for sss/translucent material only
 			if ( rtTexture ) {
 
-				scene.overrideMaterial = rtMaterial;
-
-				renderer.render( scene, camera, rtTexture, true );
-
-				scene.overrideMaterial = null;
+				renderer.renderOverride( rtMaterial, scene, camera, rtTexture, renderer.getClearColor(), renderer.getClearAlpha() );
 
 			}
 
