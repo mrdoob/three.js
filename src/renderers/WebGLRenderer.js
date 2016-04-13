@@ -1184,9 +1184,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// save original state
-		var originalClearColor = this.getClearColor(), originalClearAlpha = this.getClearAlpha();
+		var originalClearColor = this.getClearColor(), originalClearAlpha = this.getClearAlpha(), originalAutoClear = this.autoClear;
 
 		// setup pass state
+		this.autoClear = false;
 		var clearNeeded = ( clearColor !== undefined )&&( clearColor !== null );
 		if( clearNeeded  ) {
 			this.setClearColor( clearColor );
@@ -1197,6 +1198,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		this.render( this.postScene, this.postCamera, renderTarget, clearNeeded  );
 
 		// restore original state
+		this.autoClear = originalAutoClear;
 		this.setClearColor( originalClearColor );
 		this.setClearAlpha( originalClearAlpha );
 
