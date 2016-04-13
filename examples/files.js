@@ -185,6 +185,7 @@ var files = {
 		"webgl_postprocessing_crossfade",
 		"webgl_postprocessing_dof",
 		"webgl_postprocessing_dof2",
+		"webgl_postprocessing_gaussianblur",
 		"webgl_postprocessing_glitch",
 		"webgl_postprocessing_godrays",
 		"webgl_postprocessing_masking",
