@@ -1149,28 +1149,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderOverride = function ( overrideMaterial, scene, camera, renderTarget, clearColor, clearAlpha ) {
 
-		// save original state
-		var originalAutoClear = this.autoClear;
-		var originalClearColor = this.getClearColor();
-		var originalClearAlpha = this.getClearAlpha();
+		var originalClearColor = this.getClearColor(), originalClearAlpha = this.getClearAlpha();
 
-		// setup pass state
-		scene.overrideMaterial = overrideMaterial;
-
-		this.autoClear = false;
-		var isExplicitClearColor = ( clearColor !== undefined )&&( clearColor !== null );
-		if( isExplicitClearColor ) {
+		var clearNeeded = ( clearColor !== undefined )&&( clearColor !== null );
+		if( clearNeeded ) {
 			this.setClearColor( clearColor );
  	 		this.setClearAlpha( clearAlpha || 0.0 );
 		}
 
-		// render pass
-		this.render( scene, camera, renderTarget, isExplicitClearColor );
-
+		scene.overrideMaterial = overrideMaterial;
+		this.render( scene, camera, renderTarget, clearNeeded );
 		scene.overrideMaterial = null;
 
-		// restore original state
-		this.autoClear = originalAutoClear;
 		this.setClearColor( originalClearColor );
 		this.setClearAlpha( originalClearAlpha );
 
