@@ -114,7 +114,7 @@
 				material.metalness = 0;
 				material.color.set( 0xbbbbbb );
 
-				var geometry = new THREE.SphereBufferGeometry( 3, 24, 24 );
+				var geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
 				for ( var i = 0; i < 120; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
@@ -251,7 +251,7 @@
 				postQuad.material = saoMaterial;
 				renderer.render( postScene, postCamera, saoRenderTarget );
 
-				renderer.setClearColor( 0xa0a0a0 );
+				renderer.setClearColor( 0x000000 );
 				renderer.render( scene, camera, null, true );
 
 				postQuad.material = saoModulateMaterial;
