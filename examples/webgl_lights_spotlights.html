@@ -77,7 +77,7 @@
 			var mouse = new THREE.Vector2();
 			var mouseTime, mouseDown = new THREE.Vector2();
 
-			var gui, guiHeight = 250, param = { color: '0xffffff' };
+			var gui, guiHeight = 230, param = { color: '0xffffff' };
 			var guiMapSize1, guiMapSize2, guiMapSize3;
 			var guiDoubleMaxSize, doubleMaxSize = false;
 			var autoMapSize = true;
@@ -135,8 +135,6 @@
 				orbitControls.target.set( -6, 7, 2 );
 				orbitControls.maxPolarAngle = 1.5707963267948966;
 				orbitControls.update();
-
-
 			}
 
 			function createSpotlight ( object ) {
@@ -164,9 +162,13 @@
 			}
 
 			function onResize () {
+
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
 				camera.aspect = (window.innerWidth / window.innerHeight);
+
 				camera.updateProjectionMatrix();
+
 			}
 
 			function animateAll ( rate ) {
@@ -243,7 +245,7 @@
 
 						var gStyle = gui.domElement.style;
 
-						var nextValue = ( window.innerHeight - 36 ) + "px";
+						var nextValue = ( window.innerHeight - 24 ) + "px";
 
 						if ( gStyle.top === nextValue ) nextValue = ( window.innerHeight - guiHeight ) + "px";
 
@@ -307,7 +309,7 @@
 
 				var gStyle = gui.domElement.style;
 
-				guiHeight = ( ( gui.domElement.children[ 1 ].childElementCount + 1 ) * 34 );
+				guiHeight = ( ( gui.domElement.children[ 1 ].childElementCount + 1 ) * 30 );
 
 				gStyle.height = ( guiHeight + "px" );
 

@@ -70,11 +70,12 @@
 			var mouse = new THREE.Vector2();
 			var mouseTime, mouseDown = new THREE.Vector2();
 
-			var gui, guiHeight = 250, param = { color: '0xffffff' };
+			var gui, guiHeight = 310, param = { color: '0xffffff' };
 			var guiDoubleMaxSize, guiAngle, guiMapSize;
 			var doubleMaxSize = false, autoMapSize = true;
 
 			function init () {
+
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.gammaInput = true;
@@ -177,9 +178,9 @@
 
 						var gStyle = gui.domElement.style;
 
-						var nextValue = ( window.innerHeight - 36 ) + "px";
+						var nextValue = ( window.innerHeight - 24 ) + "px";
 
-						if ( gStyle.top === nextValue ) nextValue = (window.innerHeight - 256) + "px";
+						if ( gStyle.top === nextValue ) nextValue = (window.innerHeight - guiHeight) + "px";
 
 						gStyle.top = nextValue;
 					} );
@@ -214,7 +215,7 @@
 					spotLight.angle = val;
 					if ( autoMapSize === true ) setMapSize( spotLight, val, guiMapSize );
 					render();
-				}, false, 0, 1.56 );
+				}, false, 0, 1.54 );
 
 				addGui( 'autoMapSize', autoMapSize ).onChange( function ( val ) {
 					autoMapSize = ! ! val;
@@ -255,7 +256,7 @@
 
 				var gStyle = gui.domElement.style;
 
-				guiHeight = ( ( gui.domElement.children[ 1 ].childElementCount + 1 ) * 32 );
+				guiHeight = ( ( gui.domElement.children[ 1 ].childElementCount + 1 ) * 30 );
 
 				gStyle.height = ( guiHeight + "px" );
 
