@@ -2,7 +2,7 @@
 
 <html lang="en">
 	<head>
-		<title>three.js webgl - post processing - Scalable Ambient Occlusion (SAO)</title>
+		<title>three.js webgl - post processing - Gaussian Blur Filter</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -44,7 +44,7 @@
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Scalable Ambient Occlusion (SAO) shader by <a href="http://clara.io">Ben Houston</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - Arbitrary Sized Gaussian Blur Filter shader by <a href="http://clara.io">Ben Houston</a>
 		</div>
 
 		<script>
@@ -150,8 +150,8 @@
 				// Init gui
 				var gui = new dat.GUI();
 				gui.add( params, "enabled" );
-				gui.add( params, "numSamples", 1, 200 );
-				gui.add( params, "stdDev", 0.5, 100 );
+				gui.add( params, "numSamples", 1, 400 );
+				gui.add( params, "stdDev", 0.5, 200 );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 			}
