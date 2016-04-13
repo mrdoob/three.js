@@ -17,8 +17,6 @@ THREE.Object3D = function () {
 
 	this.parent = null;
 	this.children = [];
-	// searchOrder: WARNING! using 'id' here is BAD as it's problematic with index referencing.
-	this.searchOrder = [ 'object', 'index', 'name', 'uuid' ];
 
 	this.up = THREE.Object3D.DefaultUp.clone();
 
@@ -27,13 +25,13 @@ THREE.Object3D = function () {
 	var quaternion = new THREE.Quaternion();
 	var scale = new THREE.Vector3( 1, 1, 1 );
 
-	function onRotationChange () {
+	function onRotationChange() {
 
 		quaternion.setFromEuler( rotation, false );
 
 	}
 
-	function onQuaternionChange () {
+	function onQuaternionChange() {
 
 		rotation.setFromQuaternion( quaternion, undefined, false );
 
@@ -277,83 +275,39 @@ THREE.Object3D.prototype = {
 
 	}(),
 
-	add: function () {
+	add: function ( object ) {
 
-		var i = 0, l = arguments.length;
+		if ( arguments.length > 1 ) {
 
-		for ( ; i < l; i ++ ) {
+			for ( var i = 0; i < arguments.length; i ++ ) {
 
-			this.addAt( undefined, arguments[ i ], false );
+				this.add( arguments[ i ] );
+
+			}
+
+			return this;
+
 		}
 
-		return this;
+		if ( object === this ) {
 
-	},
+			console.error( "THREE.Object3D.add: object can't be added as a child of itself.", object );
+			return this;
 
-	addAt: function ( entity, object, move, shift ) {
-
-		var children = this.children;
-
-		entity = this.findObject(entity, true);
-
-		if( entity === -1 ) entity = children.length;
+		}
 
 		if ( object instanceof THREE.Object3D ) {
 
-			if ( object === this ) {
+			if ( object.parent !== null ) {
 
-				console.error( "THREE.Object3D.add/At: object can't be added as a child of itself.", object );
-
-				return;
+				object.parent.remove( object );
 
 			}
 
-			var search = children.indexOf( object );
+			object.parent = this;
+			object.dispatchEvent( { type: 'added' } );
 
-			if ( search === -1 || move !== false ) {
-
-				if( entity > children.length || entity < 0) entity = children.length;
-
-					var type;
-
-					if ( object.parent !== this ) {
-
-						if ( object.parent != undefined ) {
-
-							object.parent.replace( object );
-
-						}
-
-						object.parent = this;
-
-					}
-
-					if ( search !== -1 && move !== false ) {
-
-						children.splice( search, 1 );
-
-						type = 'moved';
-
-						if( shift !== false && search < entity - 1 ) entity = entity - 1;
-
-					} else {
-
-						type = 'added';
-
-					}
-
-					children.splice( entity, 0, object );
-
-					object.dispatchEvent( { type: type, index: entity } );
-
-					return object;
-
-
-			} else {
-
-					return object;
-
-			}
+			this.children.push( object );
 
 		} else {
 
@@ -361,138 +315,34 @@ THREE.Object3D.prototype = {
 
 		}
 
-	},
-
-	remove: function () {
-
-		var i, list = [];
-
-		for ( i = 0; i < arguments.length; i ++ ) list.push( this.findObject( arguments[ i ] ) );
-
-		for ( i = 0; i < list.length; i ++ ) this.replace( list[ i ] );
-
 		return this;
 
 	},
 
-	removeAll: function () {
+	remove: function ( object ) {
 
-		return this.remove.apply(this, Object.keys(this.children));
+		if ( arguments.length > 1 ) {
 
-	},
+			for ( var i = 0; i < arguments.length; i ++ ) {
 
-	replace: function ( entity, newChild ) {
+				this.remove( arguments[ i ] );
 
-		/* entity can be either an index or an object */
-
-		var children = this.children, index = -1, object, result;
-
-		index = children.indexOf( newChild );
-
-		if ( index === -1 ) {
-
-			index = this.findObject( entity, true );
-
-			if ( index !== - 1 ) {
-
-				object = children[ index ];
-
-				if ( object != undefined ) {
-
-					if ( object.parent != undefined && object.parent !== this ) {
-
-						object.parent.remove( object );
-
-					}
-
-					object.parent = null;
-
-					if ( newChild !== undefined ) {
-
-						if ( newChild instanceof THREE.Object3D ) {
-
-							if ( newChild === this ) {
-
-								console.error( "THREE.Object3D.replace: Aborted, newChild can't be added as a child of itself.", newChild );
-
-								return;
-
-							}
-
-							result = children.splice( index, 1, newChild );
-
-							object.dispatchEvent( { type: 'replaced', index: index } );
-
-						}
-
-					}
-
-					else {
-
-						result = children.splice( index, 1 );
-
-						object.dispatchEvent( { type: 'removed', index: index } );
-
-					}
-
-					if ( Array.isArray( result ) === true && result.length === 1 ) {
-
-						return result[ 0 ];
-
-					}
-
-				}
 			}
-		}
-
-		return result;
-	},
-
-	findObject: function ( entity, returnIndex, searchOrder ) {
-
-		if( entity === undefined ) {
-
-			if( returnIndex === true ) return -1;
-
-			return;
-		}
-
-		if( searchOrder === undefined ) searchOrder = this.searchOrder;
-
-		else {
-
-			if(Array.isArray( searchOrder ) === false) searchOrder = [ searchOrder ];
 
 		}
 
-		var children = this.children;
-		var result, searchType, i, l = searchOrder.length;
+		var index = this.children.indexOf( object );
 
-		for ( i = 0 ; i < l; i ++ ) {
+		if ( index !== - 1 ) {
 
-			searchType = searchOrder[ i ];
+			object.parent = null;
 
-			if( searchType === 'object' ) result = children.indexOf( entity );
+			object.dispatchEvent( { type: 'removed' } );
 
-			else if ( searchType === 'index' ) result = children[ entity ];
-
-			else result = this.getObjectByProperty( searchType, entity );
-
-			if ( result !== undefined && result !== -1) break;
+			this.children.splice( index, 1 );
 
 		}
 
-		if( returnIndex === true ) {
-
-			if ( typeof(result) !== 'number' ) return children.indexOf( result );
-
-		} else {
-
-			if ( typeof(result) === 'number' ) return children[ result ];
-
-		}
-
-		return result;
 	},
 
 	getObjectById: function ( id ) {
@@ -800,10 +650,10 @@ THREE.Object3D.prototype = {
 		// and return as array
 		function extractFromCache ( cache ) {
 
-			var data, key, values = [];
-			for ( key in cache ) {
+			var values = [];
+			for ( var key in cache ) {
 
-				data = cache[ key ];
+				var data = cache[ key ];
 				delete data.metadata;
 				values.push( data );
 
