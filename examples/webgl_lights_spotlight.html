@@ -62,7 +62,7 @@
 			var geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
 			var geoBox = new THREE.BoxGeometry( Math.PI, Math.sqrt( 2 ), Math.E );
 			var mshFloor = new THREE.Mesh( geoFloor, matFloor );
-			var mshBox = new THREE.Mesh( geoBox, matBox );
+			var meshBox = new THREE.Mesh( geoBox, matBox );
 			var ambientLight = new THREE.AmbientLight( 0x090A1A );
 			var spotLight = new THREE.SpotLight( 0xFFFFFF );
 			var lightHelper;
@@ -70,11 +70,12 @@
 			var mouse = new THREE.Vector2();
 			var mouseTime, mouseDown = new THREE.Vector2();
 
-			var gui, guiHeight = 250, param = { color: '0xffffff' };
+			var gui, guiHeight = 310, param = { color: '0xffffff' };
 			var guiDoubleMaxSize, guiAngle, guiMapSize;
 			var doubleMaxSize = false, autoMapSize = true;
 
 			function init () {
+
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.gammaInput = true;
@@ -110,13 +111,13 @@
 				mshFloor.receiveShadow = true;
 				mshFloor.position.set( 0, - 0.05, 0 );
 
-				mshBox.castShadow = true;
-				mshBox.receiveShadow = true;
-				mshBox.position.set( 21, 8, - 1.0 );
+				meshBox.castShadow = true;
+				meshBox.receiveShadow = true;
+				meshBox.position.set( 21, 8, - 1.0 );
 
 				scene.add( camera );
 				scene.add( mshFloor );
-				scene.add( mshBox );
+				scene.add( meshBox );
 				scene.add( ambientLight );
 				scene.add( spotLight );
 				scene.add( spotLight.shadowCameraHelper );
@@ -136,7 +137,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				camera.aspect = ( window.innerWidth / window.innerHeight );
 				camera.updateProjectionMatrix();
-				orbitControls.target = mshBox.position;
+				orbitControls.target = meshBox.position;
 				render();
 			}
 
@@ -177,9 +178,9 @@
 
 						var gStyle = gui.domElement.style;
 
-						var nextValue = ( window.innerHeight - 36 ) + "px";
+						var nextValue = ( window.innerHeight - 24 ) + "px";
 
-						if ( gStyle.top === nextValue ) nextValue = (window.innerHeight - 256) + "px";
+						if ( gStyle.top === nextValue ) nextValue = (window.innerHeight - guiHeight) + "px";
 
 						gStyle.top = nextValue;
 					} );
@@ -214,7 +215,7 @@
 					spotLight.angle = val;
 					if ( autoMapSize === true ) setMapSize( spotLight, val, guiMapSize );
 					render();
-				}, false, 0, 1.56 );
+				}, false, 0, 1.54 );
 
 				addGui( 'autoMapSize', autoMapSize ).onChange( function ( val ) {
 					autoMapSize = ! ! val;
@@ -255,7 +256,7 @@
 
 				var gStyle = gui.domElement.style;
 
-				guiHeight = ( ( gui.domElement.children[ 1 ].childElementCount + 1 ) * 32 );
+				guiHeight = ( ( gui.domElement.children[ 1 ].childElementCount + 1 ) * 30 );
 
 				gStyle.height = ( guiHeight + "px" );
 
@@ -311,7 +312,6 @@
 					if( node !== undefined && ( autoMapSize === true || error === true ) ) node.setValue( mapSize.width );
 
 				}
-
 
 			}
 
@@ -410,7 +410,7 @@
 
 						raycaster.setFromCamera( mouse, camera );
 
-						var found = raycaster.intersectObjects( [ mshBox, mshFloor ] );
+						var found = raycaster.intersectObjects( [ meshBox, mshFloor ] );
 
 						if ( found.length > 0 ) {
 
