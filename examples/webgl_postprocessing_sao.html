@@ -233,14 +233,14 @@
 				saoMaterial.uniforms['minResolution'].value = params.saoMinResolution;
 				saoMaterial.uniforms['randomSeed'].value = Math.random();
 
-				renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget, 0xffffff, 1.0 );
-				renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget, 0xffffff, 1.0 );
-				renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 0.0 );
+				renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget, 0xffffff, 0.0 );
+				renderer.renderOverride( normalMaterial, scene, camera, null, 0xffffff, 0.0 );
+				//renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 0.0 );
 
-				renderer.setClearColor( 0x000000 );
-				renderer.render( scene, camera, null, true );
+				//renderer.setClearColor( 0x000000 );
+				//renderer.render( scene, camera, null, true );
 
-				renderer.renderPass( saoModulateMaterial, null );
+				//renderer.renderPass( saoModulateMaterial, null );
 			}
 
 		</script>
