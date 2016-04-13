@@ -53,10 +53,8 @@
 
 			var container, stats;
 			var camera, scene, renderer;
-			var depthMaterial, saoMaterial, saoModulateMaterial, normalMaterial;
+			var depthMaterial, saoMaterial, saoModulateMaterial, normalMaterial, vBlurMaterial, hBlurMaterial;
 			var depthRenderTarget, normalRenderTarget, saoRenderTarget, beautyRenderTarget, blurIntermediateRenderTarget;
-			var postScene, postQuad, postCamera;
-			var saoPass;
 			var group;
 			var params = {
 				mode: 0,
@@ -66,6 +64,8 @@
 				saoKernelRadius: 100,
 				saoMinResolution: 0,
 				saoBlur: true,
+				saoBlurSamples: 8,
+				saoBlurStdDev: 4
 			}
 
 			init();
@@ -163,7 +163,7 @@
 
 				vBlurMaterial = new THREE.ShaderMaterial( THREE.BlurShader );
 				THREE.BlurShaderUtils.configure( vBlurMaterial, 64, new THREE.Vector2( 0, 1 ), 25 );
-				vBlurMaterial.uniforms[ "tDiffuse" ].value = beautyRenderTarget;
+				vBlurMaterial.uniforms[ "tDiffuse" ].value = saoRenderTarget;
 				vBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
 				vBlurMaterial.blending = THREE.NoBlending;
 
@@ -201,6 +201,8 @@
 				gui.add( params, "saoKernelRadius", 1, 100 );
 				gui.add( params, "saoMinResolution", 0, 1 );
 				gui.add( params, "saoBlur" );
+				gui.add( params, "saoBlurSamples", 1, 400 );
+				gui.add( params, "saoBlurStdDev", 0.5, 200 );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 			}
@@ -236,6 +238,8 @@
 				stats.end();
 			}
 
+			var prevStdDev, prevNumSamples;
+
 			function render() {
 				var timer = performance.now();
 				group.rotation.x = timer * 0.0002;
@@ -253,19 +257,29 @@
 				saoMaterial.uniforms['minResolution'].value = params.saoMinResolution;
 				saoMaterial.uniforms['randomSeed'].value = Math.random();
 
+				if(( prevStdDev !== params.saoBlurStdDev )||
+					( prevNumSamples !== Math.floor( params.saoBlurSamples ) )) {
+					THREE.BlurShaderUtils.configure( vBlurMaterial, Math.floor( params.saoBlurSamples ), new THREE.Vector2( 0, 1 ), params.saoBlurStdDev );
+					vBlurMaterial.needsUpdate = true;
+					THREE.BlurShaderUtils.configure( hBlurMaterial, Math.floor( params.saoBlurSamples ), new THREE.Vector2( 1, 0 ), params.saoBlurStdDev );
+					hBlurMaterial.needsUpdate = true;
+					prevStdDev = params.saoBlurStdDev;
+					prevNumSamples = Math.floor( params.saoBlurSamples );
+				}
+
 				renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget );
 				renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget );
 				renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 0.0 );
 
 				renderer.setClearColor( 0x000000 );
-				renderer.render( scene, camera, params.saoBlur ? beautyRenderTarget : null, true );
+				renderer.render( scene, camera, null, true );
 
 				if( params.saoBlur ) {
 					renderer.renderPass( vBlurMaterial, blurIntermediateRenderTarget, 0x000000, 0.0 );
-					renderer.renderPass( hBlurMaterial, null, 0x000000, 0.0 );
+					renderer.renderPass( hBlurMaterial, saoRenderTarget, 0x000000, 0.0 );
 				}
 
-//				renderer.renderPass( saoModulateMaterial, null );
+				renderer.renderPass( saoModulateMaterial, null );
 			}
 
 		</script>
