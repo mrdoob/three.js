@@ -49,11 +49,6 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 
 	} );
 
-	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene2	= new THREE.Scene();
-	this.quad2 = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), this.materialComposite );
-	this.scene2.add( this.quad2 );
-
 };
 
 THREE.ManualMSAARenderPass.prototype = Object.create( THREE.Pass.prototype );
@@ -116,7 +111,8 @@ THREE.ManualMSAARenderPass.prototype = {
 			}
 
 			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
-			renderer.render( this.scene2, this.camera2, writeBuffer, ( i === 0 ) );
+
+			renderer.renderPass( this.materialComposite, writeBuffer, ( i === 0 ) ? renderer.getClearColor() : null, ( i === 0 ) ? renderer.getClearAlpha() : null );
 
 		}
 
