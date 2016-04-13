@@ -88,7 +88,7 @@ THREE.BlurShaderUtils = {
 		var weights = [];
 
 		for( var i = 0; i < numSamples; i ++ ) {
-			var x = ( i / ( numSamples - 1 ) ) * 2.0 - 1.0;
+			var x = i - 0.5 * ( numSamples - 1 );
 			weights.push( gaussian( x, stdDev ) );
 		}
 
