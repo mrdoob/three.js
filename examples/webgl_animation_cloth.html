@@ -46,18 +46,10 @@
 
 		<script type="x-shader/x-fragment" id="fragmentShaderDepth">
 
+			#include <packing>
+
 			uniform sampler2D texture;
 			varying vec2 vUV;
-
-			vec4 pack_depth( const in float depth ) {
-
-				const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );
-				const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );
-				vec4 res = fract( depth * bit_shift );
-				res -= res.xxyz * bit_mask;
-				return res;
-
-			}
 
 			void main() {
 
@@ -65,7 +57,7 @@
 
 				if ( pixel.a < 0.5 ) discard;
 
-				gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );
+				gl_FragData[ 0 ] = packDepthToRGBA( gl_FragCoord.z );
 
 			}
 		</script>
@@ -297,9 +289,7 @@
 				// performance monitor
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

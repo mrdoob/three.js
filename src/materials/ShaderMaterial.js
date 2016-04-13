@@ -47,6 +47,7 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.fog = false; // set to use scene fog
 
 	this.lights = false; // set to use scene lights
+	this.clipping = false; // set to use user-defined clipping planes
 
 	this.vertexColors = THREE.NoColors; // set to use "color" attribute stream
 
@@ -108,6 +109,7 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 	this.fog = source.fog;
 
 	this.lights = source.lights;
+	this.clipping = source.clipping;
 
 	this.vertexColors = source.vertexColors;
 

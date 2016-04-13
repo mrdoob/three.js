@@ -1,25 +1,27 @@
-uniform float mNear;
-uniform float mFar;
-uniform float opacity;
+#if DEPTH_PACKING == 3200
+
+	uniform float opacity;
+
+#endif
 
 #include <common>
+#include <packing>
 #include <logdepthbuf_pars_fragment>
+#include <clipping_planes_pars_fragment>
 
 void main() {
 
+	#include <clipping_planes_fragment>
 	#include <logdepthbuf_fragment>
 
-	#ifdef USE_LOGDEPTHBUF_EXT
+	#if DEPTH_PACKING == 3200
 
-		float depth = gl_FragDepthEXT / gl_FragCoord.w;
+		gl_FragColor = vec4( vec3( gl_FragCoord.z ), opacity );
 
-	#else
+	#elif DEPTH_PACKING == 3201
 
-		float depth = gl_FragCoord.z / gl_FragCoord.w;
+		gl_FragColor = packDepthToRGBA( gl_FragCoord.z );
 
 	#endif
-
-	float color = 1.0 - smoothstep( mNear, mFar, depth );
-	gl_FragColor = vec4( vec3( color ), opacity );
 
 }

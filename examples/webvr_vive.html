@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webvr - cubes</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<style>
 			body {
 				font-family: Monospace;
@@ -25,7 +25,7 @@
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
 
-        <script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
 
 		<script>
 
@@ -41,7 +41,7 @@
 			var camera, scene, raycaster, renderer;
 			var effect, controls;
 
-			var box;
+			var room;
 
 			var INTERSECTED;
 			var crosshair;
@@ -64,7 +64,7 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				scene.add( camera );
 
 				crosshair = new THREE.Mesh(
@@ -78,18 +78,18 @@
 				crosshair.position.z = - 2;
 				camera.add( crosshair );
 
-				box = new THREE.Mesh(
+				room = new THREE.Mesh(
 					new THREE.BoxGeometry( 6, 6, 6, 10, 10, 10 ),
 					new THREE.MeshBasicMaterial( { color: 0x202020, wireframe: true } )
 				);
-				box.position.y = 3;
-				scene.add( box );
+				room.position.y = 3;
+				scene.add( room );
 
 				scene.add( new THREE.HemisphereLight( 0x404020, 0x202040, 0.5 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
-				scene.add(light);
+				scene.add( light );
 
 				var geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
 
@@ -114,7 +114,7 @@
 					object.userData.velocity.y = Math.random() * 0.01 - 0.005;
 					object.userData.velocity.z = Math.random() * 0.01 - 0.005;
 
-					box.add( object );
+					room.add( object );
 
 				}
 
@@ -122,49 +122,49 @@
 
 				var path = 'models/obj/cerberus/';
 				var loader = new THREE.OBJLoader();
-				loader.load(path + 'Cerberus.obj', function (group) {
+				loader.load( path + 'Cerberus.obj', function ( group ) {
 
-				    // var material = new THREE.MeshBasicMaterial( { wireframe: true } );
+					// var material = new THREE.MeshBasicMaterial( { wireframe: true } );
 
-				    var loader = new THREE.TextureLoader();
+					var loader = new THREE.TextureLoader();
 
-				    material.roughness = 1;
-				    material.metalness = 1;
+					material.roughness = 1;
+					material.metalness = 1;
 
-				    material.map = loader.load(path + 'Cerberus_A.jpg');
-				    material.roughnessMap = loader.load(path + 'Cerberus_R.jpg');
-				    material.metalnessMap = loader.load(path + 'Cerberus_M.jpg');
-				    material.normalMap = loader.load(path + 'Cerberus_N.jpg');
+					material.map = loader.load( path + 'Cerberus_A.jpg' );
+					material.roughnessMap = loader.load( path + 'Cerberus_R.jpg' );
+					material.metalnessMap = loader.load( path + 'Cerberus_M.jpg' );
+					material.normalMap = loader.load( path + 'Cerberus_N.jpg' );
 
-				    material.map.wrapS = THREE.RepeatWrapping;
-				    material.roughnessMap.wrapS = THREE.RepeatWrapping;
-				    material.metalnessMap.wrapS = THREE.RepeatWrapping;
-				    material.normalMap.wrapS = THREE.RepeatWrapping;
+					material.map.wrapS = THREE.RepeatWrapping;
+					material.roughnessMap.wrapS = THREE.RepeatWrapping;
+					material.metalnessMap.wrapS = THREE.RepeatWrapping;
+					material.normalMap.wrapS = THREE.RepeatWrapping;
 
-				    group.traverse(function (child) {
+					group.traverse( function ( child ) {
 
-				        if (child instanceof THREE.Mesh) {
+						if ( child instanceof THREE.Mesh ) {
 
-				            child.material = material;
+							child.material = material;
 
-				        }
+						}
 
-				    });
+					} );
 
-				    group.position.y = -2;
-				    group.rotation.y = -Math.PI / 2;
-				    box.add(group);
+					group.position.y = - 2;
+					group.rotation.y = - Math.PI / 2;
+					room.add( group );
 
-				});
+				} );
 
 				var loader = new THREE.CubeTextureLoader();
-				loader.setPath('textures/cube/pisa/');
-				material.envMap = loader.load([
+				loader.setPath( 'textures/cube/pisa/' );
+				material.envMap = loader.load( [
 					"px.png", "nx.png",
 					"py.png", "ny.png",
 					"pz.png", "nz.png"
-				]);
-                
+				] );
+
 
 				raycaster = new THREE.Raycaster();
 
@@ -175,8 +175,9 @@
 				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.VRControls(camera);
+				controls = new THREE.VRControls( camera );
 				controls.standing = true;
+
 				effect = new THREE.VREffect( renderer );
 
 				if ( WEBVR.isAvailable() === true ) {
@@ -215,7 +216,7 @@
 
 				raycaster.setFromCamera( { x: 0, y: 0 }, camera );
 
-				var intersects = raycaster.intersectObjects( box.children );
+				var intersects = raycaster.intersectObjects( room.children );
 
 				if ( intersects.length > 0 ) {
 
@@ -240,11 +241,11 @@
 				controls.update();
 
 
-				for ( var i = 0; i < box.children.length; i ++ ) {
+				for ( var i = 0; i < room.children.length; i ++ ) {
 
-				    var cube = box.children[i];
+					var cube = room.children[ i ];
 
-				    if (cube.geometry instanceof THREE.BoxGeometry === false) continue;
+					if ( cube.geometry instanceof THREE.BoxGeometry === false ) continue;
 
 					// cube.position.add( cube.userData.velocity );
 

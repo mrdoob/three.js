@@ -195,6 +195,8 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 			#endif
 
+			envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
+
 		#elif defined( ENVMAP_TYPE_CUBE_UV )
 
 			vec3 queryVec = flipNormal * vec3( flipEnvMap * worldNormal.x, worldNormal.yz );
@@ -205,8 +207,6 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 			vec4 envMapColor = vec4( 0.0 );
 
 		#endif
-
-		envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
 
 		return PI * envMapColor.rgb * envMapIntensity;
 
@@ -266,6 +266,8 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 			#endif
 
+			envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
+
 		#elif defined( ENVMAP_TYPE_CUBE_UV )
 
 			vec3 queryReflectVec = flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
@@ -287,6 +289,8 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 			#endif
 
+			envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
+
 		#elif defined( ENVMAP_TYPE_SPHERE )
 
 			vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));
@@ -301,9 +305,9 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 			#endif
 
-		#endif
+			envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
 
-		envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
+		#endif
 
 		return envMapColor.rgb * envMapIntensity;
 
