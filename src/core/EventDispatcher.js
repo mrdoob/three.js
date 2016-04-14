@@ -1,34 +1,107 @@
 /**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
+ * https://github.com/mrdoob/eventdispatcher.js/
  */
 
-THREE.DirectionalLight = function ( color, intensity ) {
+THREE.EventDispatcher = function () {};
 
-	THREE.Light.call( this, color, intensity );
+THREE.EventDispatcher.prototype = {
 
-	this.type = 'DirectionalLight';
+	constructor: THREE.EventDispatcher,
 
-	this.position.set( 0, 1, 0 );
-	this.updateMatrix();
+	apply: function ( object ) {
 
-	this.target = new THREE.Object3D();
+		object.addEventListener = THREE.EventDispatcher.prototype.addEventListener;
+		object.hasEventListener = THREE.EventDispatcher.prototype.hasEventListener;
+		object.removeEventListener = THREE.EventDispatcher.prototype.removeEventListener;
+		object.dispatchEvent = THREE.EventDispatcher.prototype.dispatchEvent;
 
-	this.shadow = new THREE.DirectionalLightShadow();
+	},
 
-};
+	addEventListener: function ( type, listener ) {
 
-THREE.DirectionalLight.prototype = Object.create( THREE.Light.prototype );
-THREE.DirectionalLight.prototype.constructor = THREE.DirectionalLight;
+		if ( this._listeners === undefined ) this._listeners = {};
 
-THREE.DirectionalLight.prototype.copy = function ( source ) {
+		var listeners = this._listeners;
 
-	THREE.Light.prototype.copy.call( this, source );
+		if ( listeners[ type ] === undefined ) {
 
-	this.target = source.target.clone();
+			listeners[ type ] = [];
 
-	this.shadow = source.shadow.clone();
+		}
 
-	return this;
+		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
+
+			listeners[ type ].push( listener );
+
+		}
+
+	},
+
+	hasEventListener: function ( type, listener ) {
+
+		if ( this._listeners === undefined ) return false;
+
+		var listeners = this._listeners;
+
+		if ( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1 ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	},
+
+	removeEventListener: function ( type, listener ) {
+
+		if ( this._listeners === undefined ) return;
+
+		var listeners = this._listeners;
+		var listenerArray = listeners[ type ];
+
+		if ( listenerArray !== undefined ) {
+
+			var index = listenerArray.indexOf( listener );
+
+			if ( index !== - 1 ) {
+
+				listenerArray.splice( index, 1 );
+
+			}
+
+		}
+
+	},
+
+	dispatchEvent: function ( event ) {
+
+		if ( this._listeners === undefined ) return;
+
+		var listeners = this._listeners;
+		var listenerArray = listeners[ event.type ];
+
+		if ( listenerArray !== undefined ) {
+
+			event.target = this;
+
+			var array = [];
+			var length = listenerArray.length;
+
+			for ( var i = 0; i < length; i ++ ) {
+
+				array[ i ] = listenerArray[ i ];
+
+			}
+
+			for ( var i = 0; i < length; i ++ ) {
+
+				array[ i ].call( this, event );
+
+			}
+
+		}
+
+	}
 
 };
