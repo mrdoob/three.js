@@ -524,13 +524,11 @@ Use WEBGL Depth buffer support?
 
 					// Render scene into texture
 
-					scene.overrideMaterial = null;
 					renderer.render( scene, camera, postprocessing.rtTextureColor, true );
 
 					// Render depth into texture
 
-					scene.overrideMaterial = material_depth;
-					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
+					renderer.renderOverride( material_depth, scene, camera, postprocessing.rtTextureDepth );
 
 					// Render bokeh composite
 
@@ -538,8 +536,6 @@ Use WEBGL Depth buffer support?
 
 
 				} else {
-
-					scene.overrideMaterial = null;
 
 					renderer.clear();
 					renderer.render( scene, camera );

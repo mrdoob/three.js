@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<title>three.js webgl - post processing - Scalable Ambient Occlusion (SAO)</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+			}
+
+			a {
+				color:#00ff78;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+			}
+			.dg.ac {
+				z-index: 1 !important; /* FIX DAT.GUI */
+			}
+		</style>
+	</head>
+	<body>
+		<script src="../build/three.js"></script>
+
+		<script src="js/shaders/BlurShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/DepthLimitedBlurShader.js"></script>
+		<script src="js/shaders/SAOShader.js"></script>
+		<script src="js/shaders/CompositeShader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src='js/libs/dat.gui.min.js'></script>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - Scalable Ambient Occlusion (SAO) shader by <a href="http://clara.io">Ben Houston</a>
+		</div>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+			var camera, scene, renderer;
+			var depthMaterial, saoMaterial, saoModulateMaterial, normalMaterial, vBlurMaterial, hBlurMaterial, copyMaterial;
+			var depthRenderTarget, normalRenderTarget, saoRenderTarget, beautyRenderTarget, blurIntermediateRenderTarget;
+			var group;
+			var params = {
+				output: 0,
+				saoBias: 0.5,
+				saoIntensity: 0.18,
+				saoScale: 1,
+				saoKernelRadius: 100,
+				saoMinResolution: 0,
+				saoBlur: true,
+				saoBlurRadius: 8,
+				saoBlurStdDev: 4
+			}
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0xa0a0a0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 3, 10 );
+				camera.position.z = 7;
+
+				scene = new THREE.Scene();
+
+				group = new THREE.Object3D();
+				scene.add( group );
+
+				var light = new THREE.PointLight( 0xddffdd, 0.8 );
+				light.position.z = 70;
+				light.position.y = -70;
+				light.position.x = -70;
+				scene.add( light );
+
+				var light2 = new THREE.PointLight( 0xffdddd, 0.8 );
+				light2.position.z = 70;
+				light2.position.x = -70;
+				light2.position.y = 70;
+				scene.add( light2 );
+
+				var light3 = new THREE.PointLight( 0xddddff, 0.8 );
+				light3.position.z = 70;
+				light3.position.x = 70;
+				light3.position.y = -70;
+				scene.add( light3 );
+
+				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
+				scene.add( light3 );
+
+				var geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
+				for ( var i = 0; i < 120; i ++ ) {
+
+					var material = new THREE.MeshStandardMaterial();
+					material.roughness = 0.5 * Math.random() + 0.25;
+					material.metalness = 0;
+					material.color.setHSL( Math.random(), 1.0, 0.3 );
+
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.x = Math.random() * 4 - 2;
+					mesh.position.y = Math.random() * 4 - 2;
+					mesh.position.z = Math.random() * 4 - 2;
+					mesh.rotation.x = Math.random();
+					mesh.rotation.y = Math.random();
+					mesh.rotation.z = Math.random();
+
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 0.2 + 0.05;
+					group.add( mesh );
+				}
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
+
+				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+				normalRenderTarget = depthRenderTarget.clone();
+				saoRenderTarget = depthRenderTarget.clone();
+				beautyRenderTarget = depthRenderTarget.clone();
+				blurIntermediateRenderTarget = depthRenderTarget.clone();
+				depthRenderTarget.texture.minFilter = THREE.NearestFilter;
+				depthRenderTarget.texture.maxFilter = THREE.NearestFilter;
+				normalRenderTarget.texture.maxFilter = THREE.NearestFilter;
+				normalRenderTarget.texture.minFilter = THREE.NearestFilter;
+
+				depthMaterial = new THREE.MeshDepthMaterial();
+				depthMaterial.depthPacking = THREE.RGBADepthPacking;
+				depthMaterial.blending = THREE.NoBlending;
+
+				normalMaterial = new THREE.MeshNormalMaterial();
+				normalMaterial.blending = THREE.NoBlending;
+
+				copyMaterial = new THREE.ShaderMaterial( THREE.CopyShader );
+				copyMaterial.blending = THREE.NoBlending;
+
+				saoMaterial = new THREE.ShaderMaterial( THREE.SAOShader );
+				saoMaterial.defines[ 'DIFFUSE_TEXTURE' ] = 0;
+				saoMaterial.defines[ 'NORMAL_TEXTURE' ] = 1;
+				saoMaterial.defines[ 'MODE' ] = 2;
+				saoMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
+				saoMaterial.uniforms[ "tNormal" ].value = normalRenderTarget;
+				saoMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				saoMaterial.uniforms[ 'cameraNear' ].value = camera.near;
+				saoMaterial.uniforms[ 'cameraFar' ].value = camera.far;
+				saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( camera.projectionMatrix );
+				saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = camera.projectionMatrix;
+				saoMaterial.blending = THREE.NoBlending;
+
+				vBlurMaterial = new THREE.ShaderMaterial( THREE.DepthLimitedBlurShader );
+				THREE.BlurShaderUtils.configure( vBlurMaterial, 64, new THREE.Vector2( 0, 1 ), 25 );
+				vBlurMaterial.uniforms[ "tDiffuse" ].value = saoRenderTarget;
+				vBlurMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
+				vBlurMaterial.uniforms[ "cameraNear" ].value = camera.near;
+				vBlurMaterial.uniforms[ "cameraFar" ].value = camera.far;
+				vBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				vBlurMaterial.blending = THREE.NoBlending;
+
+				hBlurMaterial = new THREE.ShaderMaterial( THREE.DepthLimitedBlurShader );
+				THREE.BlurShaderUtils.configure( hBlurMaterial, 64, new THREE.Vector2( 1, 0 ), 25 );
+				hBlurMaterial.uniforms[ "tDiffuse" ].value = blurIntermediateRenderTarget;
+				hBlurMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
+				hBlurMaterial.uniforms[ "cameraNear" ].value = camera.near;
+				hBlurMaterial.uniforms[ "cameraFar" ].value = camera.far;
+				hBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				hBlurMaterial.blending = THREE.NoBlending;
+
+				saoModulateMaterial = new THREE.ShaderMaterial( THREE.CompositeShader );
+				saoModulateMaterial.transparent = true;
+				saoModulateMaterial.blending = THREE.CustomBlending;
+				saoModulateMaterial.blendSrc = THREE.DstColorFactor;
+				saoModulateMaterial.blendDst = THREE.ZeroFactor;
+				saoModulateMaterial.blendEquation = THREE.AddEquation;
+				saoModulateMaterial.blendSrcAlpha = THREE.DstAlphaFactor;
+				saoModulateMaterial.blendDstAlpha = THREE.ZeroFactor;
+				saoModulateMaterial.blendEquationAlpha = THREE.AddEquation;
+				saoModulateMaterial.uniforms[ 'tForeground' ].value = saoRenderTarget;
+				saoModulateMaterial.depthTest = false;
+				saoModulateMaterial.depthWrite = false;
+
+				// Init gui
+				var gui = new dat.GUI();
+				gui.add( params, "output", {
+					'Beauty': 1,
+					'Beauty+SAO': 0,
+					'SAO': 2,
+					'Depth': 4,
+					'Normals': 3,
+				});
+				gui.add( params, "saoBias", -1, 1 );
+				gui.add( params, "saoIntensity", 0, 1 );
+				gui.add( params, "saoScale", 0, 10 );
+				gui.add( params, "saoKernelRadius", 1, 100 );
+				gui.add( params, "saoMinResolution", 0, 1 );
+				gui.add( params, "saoBlur" );
+				gui.add( params, "saoBlurRadius", 0, 200 );
+				gui.add( params, "saoBlurStdDev", 0.5, 150 );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth || 1;
+				var height = window.innerHeight || 1;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+				renderer.setSize( width, height );
+
+				// Resize renderTargets
+				saoMaterial.uniforms[ 'size' ].value.set( width, height );
+				saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( camera.projectionMatrix );
+				saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = camera.projectionMatrix;
+
+				hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
+				vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
+
+				depthRenderTarget.setSize( width, height );
+				normalRenderTarget.setSize( width, height );
+				saoRenderTarget.setSize( width, height );
+				blurIntermediateRenderTarget.setSize( width, height );
+			}
+
+			function animate() {
+				requestAnimationFrame( animate );
+
+				stats.begin();
+				render();
+				stats.end();
+			}
+
+			var prevStdDev, prevNumSamples;
+
+			function render() {
+				var timer = performance.now();
+				group.rotation.x = timer * 0.0002;
+				group.rotation.y = timer * 0.0001;
+
+			/*	if( saoMaterial.defines['MODE'] !== params.mode ) {
+					saoMaterial.defines['MODE'] = params.mode;
+					saoMaterial.needsUpdate = true;
+				}*/
+
+				saoMaterial.uniforms['bias'].value = params.saoBias;
+				saoMaterial.uniforms['intensity'].value = params.saoIntensity;
+				saoMaterial.uniforms['scale'].value = params.saoScale;
+				saoMaterial.uniforms['kernelRadius'].value = params.saoKernelRadius;
+				saoMaterial.uniforms['minResolution'].value = params.saoMinResolution;
+				saoMaterial.uniforms['randomSeed'].value = Math.random();
+
+				params.saoBlurRadius = Math.floor( params.saoBlurRadius );
+				if(( prevStdDev !== params.saoBlurStdDev )||
+					( prevNumSamples !== params.saoBlurRadius )) {
+					THREE.BlurShaderUtils.configure( vBlurMaterial, params.saoBlurRadius, new THREE.Vector2( 0, 1 ), params.saoBlurStdDev );
+					vBlurMaterial.needsUpdate = true;
+					THREE.BlurShaderUtils.configure( hBlurMaterial, params.saoBlurRadius, new THREE.Vector2( 1, 0 ), params.saoBlurStdDev );
+					hBlurMaterial.needsUpdate = true;
+					prevStdDev = params.saoBlurStdDev;
+					prevNumSamples = params.saoBlurRadius;
+				}
+
+				renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget );
+				renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget );
+				renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 0.0 );
+
+				renderer.setClearColor( 0x000000 );
+				renderer.render( scene, camera, null, true );
+
+				if( params.output == 1 ) return;
+
+				if( params.saoBlur ) {
+					renderer.renderPass( vBlurMaterial, blurIntermediateRenderTarget, 0x000000, 0.0 );
+					renderer.renderPass( hBlurMaterial, saoRenderTarget, 0x000000, 0.0 );
+				}
+
+				if( params.output == 2 ) {
+					copyMaterial.uniforms[ 'tDiffuse' ].value = saoRenderTarget;
+					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
+					return;
+				}
+				if( params.output == 4 ) {
+					copyMaterial.uniforms[ 'tDiffuse' ].value = depthRenderTarget;
+					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
+					return;
+				}
+				if( params.output == 3 ) {
+					copyMaterial.uniforms[ 'tDiffuse' ].value = normalRenderTarget;
+					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
+					return;
+				}
+
+				renderer.renderPass( saoModulateMaterial, null );
+			}
+
+		</script>
+	</body>
+</html>

@@ -90,7 +90,7 @@
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
-		
+
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -198,7 +198,7 @@
 				if ( intersects.length > 0 ) {
 
 					var targetDistance = intersects[ 0 ].distance;
-					
+
 					//Using Cinematic camera focusAt method
 					camera.focusAt(targetDistance);
 
@@ -226,9 +226,7 @@
 				}
 
 				 else {
-
-					scene.overrideMaterial = null;
-
+		
 					renderer.clear();
 					renderer.render( scene, camera );
 

@@ -999,9 +999,7 @@
 
 			if ( singlePickingMaterial ) {
 
-				scene.overrideMaterial = singlePickingMaterial;
-				renderer.render( scene, camera, pickingRenderTarget );
-				scene.overrideMaterial = null;
+				renderer.renderOverride( singlePickingMaterial, scene, camera, pickingRenderTarget );
 
 			}else {
 

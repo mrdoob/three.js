@@ -84,7 +84,7 @@
 
 		<script>
 
-			var camera, postScene, renderer, postMaterial, noiseRandom1DMaterial, noiseRandon2DMaterial, noiseRandom3DMaterial, postQuad;
+			var camera, renderer, postMaterial, noiseRandom1DMaterial, noiseRandon2DMaterial, noiseRandom3DMaterial;
 			var gui, stats, texture;
 
 			var params = { procedure: "noiseRandom3D" };
@@ -128,11 +128,6 @@
 					fragmentShader: document.querySelector('#noiseRandom3D-frag').textContent.trim(),
 				});
 				postMaterial = noiseRandom3DMaterial;
-				var postPlane = new THREE.PlaneGeometry(2, 2);
-				postQuad = new THREE.Mesh(postPlane, postMaterial);
-				postScene = new THREE.Scene();
-				postScene.add(postQuad);
-
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -166,11 +161,8 @@
 
 				}
 
-				postQuad.material = postMaterial;
-
-
 				// render post FX
-				renderer.render( postScene, postCamera );
+				renderer.renderPass( postMaterial );
 
 				stats.update();
 

@@ -71,6 +71,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.toneMappingExposure = 1.0;
 	this.toneMappingWhitePoint = 1.0;
 
+	this.passCamera = null;
+	this.passQuad = null;
+	this.passScene = null;
+
 	// morphs
 
 	this.maxMorphTargets = 8;
@@ -1144,6 +1148,62 @@ THREE.WebGLRenderer = function ( parameters ) {
 			return a.id - b.id;
 
 		}
+
+	}
+
+	this.renderOverride = function ( overrideMaterial, scene, camera, renderTarget, clearColor, clearAlpha ) {
+
+		var originalClearColor = this.getClearColor(), originalClearAlpha = this.getClearAlpha(), originalAutoClear = this.autoClear;
+
+		this.autoClear = false;
+		clearColor = overrideMaterial.clearColor || clearColor;
+		clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
+		var clearNeeded = ( clearColor !== undefined )&&( clearColor !== null );
+		if( clearNeeded ) {
+			this.setClearColor( clearColor );
+ 	 		this.setClearAlpha( clearAlpha || 0.0 );
+		}
+
+		scene.overrideMaterial = overrideMaterial;
+		this.render( scene, camera, renderTarget, clearNeeded );
+		scene.overrideMaterial = null;
+
+		// restore original state
+		this.autoClear = originalAutoClear;
+		this.setClearColor( originalClearColor );
+		this.setClearAlpha( originalClearAlpha );
+
+	}
+
+
+	this.renderPass = function ( passMaterial, renderTarget, clearColor, clearAlpha ) {
+
+		if( ! this.postScene ) {
+			this.postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+			this.postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), null);
+			this.postScene = new THREE.Scene();
+			this.postScene.add( this.postQuad );
+		}
+
+		// save original state
+		var originalClearColor = this.getClearColor(), originalClearAlpha = this.getClearAlpha(), originalAutoClear = this.autoClear;
+
+		// setup pass state
+		this.autoClear = false;
+		var clearNeeded = ( clearColor !== undefined )&&( clearColor !== null );
+		if( clearNeeded  ) {
+			this.setClearColor( clearColor );
+			this.setClearAlpha( clearAlpha || 0.0 );
+		}
+
+		this.postQuad.material = passMaterial;
+		this.render( this.postScene, this.postCamera, renderTarget, clearNeeded  );
+		this.postQuad.material = null;
+
+		// restore original state
+		this.autoClear = originalAutoClear;
+		this.setClearColor( originalClearColor );
+		this.setClearAlpha( originalClearAlpha );
 
 	}
 
