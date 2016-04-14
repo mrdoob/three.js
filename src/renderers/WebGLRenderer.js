@@ -1158,7 +1158,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderPass = function ( passMaterial, renderTarget, clearColor, clearAlpha ) {
 
-		if( ! this.passScene ) {
+		if( ! this.postScene ) {
 			this.postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 			this.postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), null);
 			this.postScene = new THREE.Scene();
