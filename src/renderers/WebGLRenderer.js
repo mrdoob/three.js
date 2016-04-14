@@ -1198,6 +1198,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		this.postQuad.material = passMaterial;
 		this.render( this.postScene, this.postCamera, renderTarget, clearNeeded  );
+		this.postQuad.material = null;
 
 		// restore original state
 		this.autoClear = originalAutoClear;

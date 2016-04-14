@@ -120,8 +120,8 @@ THREE.BlurShaderUtils = {
 
 		var oddNumSamples = Math.floor( numSamples / 2 ) * 2 + 1;
 		material.defines[ 'NUM_SAMPLES' ] = oddNumSamples;
-		material.uniforms[ 'sampleUvOffsets' ].value = reorderFromCenter( THREE.BlurShaderUtils.createSampleOffsets( oddNumSamples, uvIncrement ) );
-		material.uniforms[ 'sampleWeights' ].value = reorderFromCenter( THREE.BlurShaderUtils.createSampleWeights( oddNumSamples, stdDev ) );
+		material.uniforms[ 'sampleUvOffsets' ].value = THREE.BlurShaderUtils.reorderFromCenter( THREE.BlurShaderUtils.createSampleOffsets( oddNumSamples, uvIncrement ) );
+		material.uniforms[ 'sampleWeights' ].value = THREE.BlurShaderUtils.reorderFromCenter( THREE.BlurShaderUtils.createSampleWeights( oddNumSamples, stdDev ) );
 
 	}
 
