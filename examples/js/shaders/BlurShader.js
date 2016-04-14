@@ -107,11 +107,12 @@ THREE.BlurShaderUtils = {
 
 	},
 
-	configure: function( material, kernelRadius, uvIncrement, stdDev ) {
+	configure: function( material, kernelRadius, stdDev, uvIncrement ) {
 
 		material.defines[ 'KERNEL_RADIUS' ] = kernelRadius;
 		material.uniforms[ 'sampleUvOffsets' ].value = THREE.BlurShaderUtils.createSampleOffsets( kernelRadius, uvIncrement );
 		material.uniforms[ 'sampleWeights' ].value = THREE.BlurShaderUtils.createSampleWeights( kernelRadius, stdDev );
+		material.needsUpdate = true;
 
 	}
 

@@ -172,7 +172,6 @@
 				saoMaterial.blending = THREE.NoBlending;
 
 				vBlurMaterial = new THREE.ShaderMaterial( THREE.DepthLimitedBlurShader );
-				THREE.BlurShaderUtils.configure( vBlurMaterial, 64, new THREE.Vector2( 0, 1 ), 25 );
 				vBlurMaterial.uniforms[ "tDiffuse" ].value = saoRenderTarget;
 				vBlurMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
 				vBlurMaterial.uniforms[ "cameraNear" ].value = camera.near;
@@ -181,7 +180,6 @@
 				vBlurMaterial.blending = THREE.NoBlending;
 
 				hBlurMaterial = new THREE.ShaderMaterial( THREE.DepthLimitedBlurShader );
-				THREE.BlurShaderUtils.configure( hBlurMaterial, 64, new THREE.Vector2( 1, 0 ), 25 );
 				hBlurMaterial.uniforms[ "tDiffuse" ].value = blurIntermediateRenderTarget;
 				hBlurMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
 				hBlurMaterial.uniforms[ "cameraNear" ].value = camera.near;
@@ -276,10 +274,8 @@
 				params.saoBlurRadius = Math.floor( params.saoBlurRadius );
 				if(( prevStdDev !== params.saoBlurStdDev )||
 					( prevNumSamples !== params.saoBlurRadius )) {
-					THREE.BlurShaderUtils.configure( vBlurMaterial, params.saoBlurRadius, new THREE.Vector2( 0, 1 ), params.saoBlurStdDev );
-					vBlurMaterial.needsUpdate = true;
-					THREE.BlurShaderUtils.configure( hBlurMaterial, params.saoBlurRadius, new THREE.Vector2( 1, 0 ), params.saoBlurStdDev );
-					hBlurMaterial.needsUpdate = true;
+					THREE.BlurShaderUtils.configure( vBlurMaterial, params.saoBlurRadius, params.saoBlurStdDev, new THREE.Vector2( 0, 1 ) );
+					THREE.BlurShaderUtils.configure( hBlurMaterial, params.saoBlurRadius, params.saoBlurStdDev, new THREE.Vector2( 1, 0 ) );
 					prevStdDev = params.saoBlurStdDev;
 					prevNumSamples = params.saoBlurRadius;
 				}

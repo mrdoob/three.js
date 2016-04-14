@@ -136,13 +136,11 @@
 				blurIntermediateRenderTarget = beautyRenderTarget.clone();
 
 				vBlurMaterial = new THREE.ShaderMaterial( THREE.BlurShader );
-				THREE.BlurShaderUtils.configure( vBlurMaterial, 64, new THREE.Vector2( 0, 1 ), 25 );
 				vBlurMaterial.uniforms[ "tDiffuse" ].value = beautyRenderTarget;
 				vBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
 				vBlurMaterial.blending = THREE.NoBlending;
 
 				hBlurMaterial = new THREE.ShaderMaterial( THREE.BlurShader );
-				THREE.BlurShaderUtils.configure( hBlurMaterial, 64, new THREE.Vector2( 1, 0 ), 25 );
 				hBlurMaterial.uniforms[ "tDiffuse" ].value = blurIntermediateRenderTarget;
 				hBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
 				hBlurMaterial.blending = THREE.NoBlending;
@@ -191,10 +189,8 @@
 
 				if(( prevStdDev !== params.stdDev )||
 					( prevNumSamples !== Math.floor( params.radius ) )) {
-					THREE.BlurShaderUtils.configure( vBlurMaterial, Math.floor( params.radius ), new THREE.Vector2( 0, 1 ), params.stdDev );
-					vBlurMaterial.needsUpdate = true;
-					THREE.BlurShaderUtils.configure( hBlurMaterial, Math.floor( params.radius ), new THREE.Vector2( 1, 0 ), params.stdDev );
-					hBlurMaterial.needsUpdate = true;
+					THREE.BlurShaderUtils.configure( vBlurMaterial, Math.floor( params.radius ), params.stdDev, new THREE.Vector2( 0, 1 ) );
+					THREE.BlurShaderUtils.configure( hBlurMaterial, Math.floor( params.radius ), params.stdDev, new THREE.Vector2( 1, 0 ) );
 					prevStdDev = params.stdDev;
 					prevNumSamples = Math.floor( params.radius );
 				}
