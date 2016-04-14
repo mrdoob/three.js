@@ -25,6 +25,7 @@ THREE.DepthLimitedBlurShader = {
 		"tDepth":           { type: "t", value: null },
 		"cameraNear":       { type: "f", value: 10 },
 		"cameraFar":        { type: "f", value: 1000 },
+		"depthCutoff":      { type: "f", value: 10 },
 
 	},
 
@@ -58,6 +59,7 @@ THREE.DepthLimitedBlurShader = {
 
 		"uniform float cameraNear;",
 		"uniform float cameraFar;",
+		"uniform float depthCutoff;",
 
 		"uniform vec2 sampleUvOffsets[ KERNEL_RADIUS + 1 ];",
 		"uniform float sampleWeights[ KERNEL_RADIUS + 1 ];",
@@ -72,7 +74,7 @@ THREE.DepthLimitedBlurShader = {
 
 			"float perspectiveDepth = unpackRGBAToDepth( texture2D( tDepth, vUv ) );",
 			"float viewZ = -perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
-			"float centerViewZ = viewZ;",
+			"float rViewZ = viewZ, lViewZ = viewZ;",
 
 			"for( int i = 1; i <= KERNEL_RADIUS; i ++ ) {",
 
@@ -83,18 +85,32 @@ THREE.DepthLimitedBlurShader = {
 				"perspectiveDepth = unpackRGBAToDepth( texture2D( tDepth, sampleUv ) );",
 				"viewZ = -perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
 
-				"if( abs( viewZ - centerViewZ ) < 0.01 * abs( cameraFar - cameraNear ) ) {",
+				"if( abs( viewZ - rViewZ ) <= depthCutoff ) {",
 					"diffuseSum += texture2D( tDiffuse, sampleUv ) * sampleWeight;",
 					"weightSum += sampleWeight;",
+					//"rViewZ = viewZ;",
 				"}",
+				"else {",
+					"break;",
+				"}",
+			"}",
 
-				"sampleUv = vUv - sampleUvOffset;",
+			"for( int i = 1; i <= KERNEL_RADIUS; i ++ ) {",
+
+				"float sampleWeight = sampleWeights[i];",
+				"vec2 sampleUvOffset = sampleUvOffsets[i] * vInvSize;",
+
+				"vec2 sampleUv = vUv - sampleUvOffset;",
 				"perspectiveDepth = unpackRGBAToDepth( texture2D( tDepth, sampleUv ) );",
 				"viewZ = -perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
 
-				"if( abs( viewZ - centerViewZ ) < 0.01 * abs( cameraFar - cameraNear ) ) {",
+				"if( abs( viewZ - lViewZ ) <= depthCutoff ) {",
 					"diffuseSum += texture2D( tDiffuse, sampleUv ) * sampleWeight;",
 					"weightSum += sampleWeight;",
+					//"lViewZ = viewZ;",
+				"}",
+				"else {",
+					"break;",
 				"}",
 
 			"}",
