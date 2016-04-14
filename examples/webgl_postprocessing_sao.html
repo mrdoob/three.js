@@ -278,7 +278,6 @@
 				saoMaterial.uniforms['randomSeed'].value = Math.random();
 
 				var depthCutoff = params.saoBlurDepthCutoff * ( camera.far - camera.near );
-				console.log( "depthCutoff", depthCutoff, camera.near, camera.far );
 				vBlurMaterial.uniforms[ 'depthCutoff' ].value = depthCutoff;
 				hBlurMaterial.uniforms[ 'depthCutoff' ].value = depthCutoff;
 
