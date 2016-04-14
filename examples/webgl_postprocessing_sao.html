@@ -79,13 +79,17 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				var width = window.innerWidth || 1;
+				var height = window.innerHeight || 1;
+				var devicePixelRatio = window.devicePixelRatio || 1;
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0xa0a0a0 );
-				renderer.setPixelRatio( 1 );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setPixelRatio( devicePixelRatio );
+				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 3, 10 );
+				camera = new THREE.PerspectiveCamera( 65, width / height, 3, 10 );
 				camera.position.z = 7;
 
 				scene = new THREE.Scene();
@@ -139,12 +143,9 @@
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
 
-				beautyRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth / devicePixelRatio, window.innerHeight / devicePixelRatio, pars );
-
-				var devicePixelRatio = window.devicePixelRatio || 1;
-
-				saoRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth / devicePixelRatio, window.innerHeight / devicePixelRatio, pars );
+				saoRenderTarget = new THREE.WebGLRenderTarget( width, height, pars );
 				blurIntermediateRenderTarget = saoRenderTarget.clone();
+				beautyRenderTarget = saoRenderTarget.clone();
 				depthRenderTarget = saoRenderTarget.clone();
 				normalRenderTarget = saoRenderTarget.clone();
 
@@ -169,7 +170,7 @@
 				saoMaterial.defines[ 'MODE' ] = 2;
 				saoMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
 				saoMaterial.uniforms[ "tNormal" ].value = normalRenderTarget;
-				saoMaterial.uniforms[ 'size' ].value.set( window.innerWidth / devicePixelRatio, window.innerHeight / devicePixelRatio );
+				saoMaterial.uniforms[ 'size' ].value.set( width, height );
 				saoMaterial.uniforms[ 'cameraNear' ].value = camera.near;
 				saoMaterial.uniforms[ 'cameraFar' ].value = camera.far;
 				saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( camera.projectionMatrix );
@@ -181,7 +182,7 @@
 				vBlurMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
 				vBlurMaterial.uniforms[ "cameraNear" ].value = camera.near;
 				vBlurMaterial.uniforms[ "cameraFar" ].value = camera.far;
-				vBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth / devicePixelRatio, window.innerHeight / devicePixelRatio );
+				vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 				vBlurMaterial.blending = THREE.NoBlending;
 
 				hBlurMaterial = new THREE.ShaderMaterial( THREE.DepthLimitedBlurShader );
@@ -189,7 +190,7 @@
 				hBlurMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
 				hBlurMaterial.uniforms[ "cameraNear" ].value = camera.near;
 				hBlurMaterial.uniforms[ "cameraFar" ].value = camera.far;
-				hBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth / devicePixelRatio, window.innerHeight / devicePixelRatio );
+				hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 				hBlurMaterial.blending = THREE.NoBlending;
 
 				saoModulateMaterial = new THREE.ShaderMaterial( THREE.CompositeShader );
@@ -238,17 +239,17 @@
 				renderer.setSize( width, height );
 
 				// Resize renderTargets
-				saoMaterial.uniforms[ 'size' ].value.set( width / devicePixelRatio, height / devicePixelRatio );
+				saoMaterial.uniforms[ 'size' ].value.set( width, height );
 				saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( camera.projectionMatrix );
 				saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = camera.projectionMatrix;
 
-				hBlurMaterial.uniforms[ 'size' ].value.set( width / devicePixelRatio, height / devicePixelRatio );
-				vBlurMaterial.uniforms[ 'size' ].value.set( width / devicePixelRatio, height / devicePixelRatio );
+				hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
+				vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 
-				depthRenderTarget.setSize( width / devicePixelRatio, height / devicePixelRatio );
-				normalRenderTarget.setSize( width / devicePixelRatio, height / devicePixelRatio );
-				saoRenderTarget.setSize( width / devicePixelRatio, height / devicePixelRatio );
-				blurIntermediateRenderTarget.setSize( width / devicePixelRatio, height / devicePixelRatio );
+				depthRenderTarget.setSize( width, height );
+				normalRenderTarget.setSize( width, height );
+				saoRenderTarget.setSize( width, height );
+				blurIntermediateRenderTarget.setSize( width, height );
 			}
 
 			function animate() {
