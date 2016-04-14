@@ -2,9 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author bhouston / https://clara.io
+ * @author WestLangley / http://github.com/WestLangley
  *
  * parameters = {
+ *
  *  opacity: <float>,
+ *
+ *  map: new THREE.Texture( <Image> ),
+ *
+ *  alphaMap: new THREE.Texture( <Image> ),
  *
  *  displacementMap: new THREE.Texture( <Image> ),
  *  displacementScale: <float>,
@@ -25,6 +31,10 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	this.skinning = false;
 	this.morphTargets = false;
+
+	this.map = null;
+
+	this.alphaMap = null;
 
 	this.displacementMap = null;
 	this.displacementScale = 1;
@@ -48,6 +58,10 @@ THREE.MeshDepthMaterial.prototype.copy = function ( source ) {
 
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
+
+	this.map = source.map;
+
+	this.alphaMap = source.alphaMap;
 
 	this.displacementMap = source.displacementMap;
 	this.displacementScale = source.displacementScale;

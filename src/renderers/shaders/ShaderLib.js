@@ -171,11 +171,8 @@ THREE.ShaderLib = {
 
 		uniforms: THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ 'displacementmap' ],
-
-			{
-				"opacity" : { type: "1f", value: 1.0 }
-			}
+			THREE.UniformsLib[ 'common' ],
+			THREE.UniformsLib[ 'displacementmap' ]
 
 		] ),
 
