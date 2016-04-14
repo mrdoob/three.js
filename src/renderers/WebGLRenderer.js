@@ -1178,11 +1178,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderPass = function ( passMaterial, renderTarget, clearColor, clearAlpha ) {
 
-		if( ! this.postScene ) {
-			this.postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-			this.postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), null);
-			this.postScene = new THREE.Scene();
-			this.postScene.add( this.postQuad );
+		if( ! this.passScene ) {
+			this.passCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+			this.passQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), null);
+			this.passScene = new THREE.Scene();
+			this.passScene.add( this.passQuad );
 		}
 
 		// save original state
@@ -1196,9 +1196,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			this.setClearAlpha( clearAlpha || 0.0 );
 		}
 
-		this.postQuad.material = passMaterial;
-		this.render( this.postScene, this.postCamera, renderTarget, clearNeeded  );
-		this.postQuad.material = null;
+		this.passQuad.material = passMaterial;
+		this.render( this.passScene, this.passCamera, renderTarget, clearNeeded );
 
 		// restore original state
 		this.autoClear = originalAutoClear;
