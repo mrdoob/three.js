@@ -188,6 +188,11 @@ THREE.Box3.prototype = {
 	size: function ( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
+
+		if ( this.isEmpty() ) {
+			return result.set( 0, 0, 0 );
+		}
+
 		return result.subVectors( this.max, this.min );
 
 	},
