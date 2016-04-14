@@ -81,7 +81,7 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0xa0a0a0 );
-				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setPixelRatio( 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -139,8 +139,8 @@
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
 
-				beautyRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-		
+				beautyRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth / devicePixelRatio, window.innerHeight / devicePixelRatio, pars );
+
 				var devicePixelRatio = window.devicePixelRatio || 1;
 
 				saoRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth / devicePixelRatio, window.innerHeight / devicePixelRatio, pars );
@@ -169,7 +169,7 @@
 				saoMaterial.defines[ 'MODE' ] = 2;
 				saoMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
 				saoMaterial.uniforms[ "tNormal" ].value = normalRenderTarget;
-				saoMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				saoMaterial.uniforms[ 'size' ].value.set( window.innerWidth / devicePixelRatio, window.innerHeight / devicePixelRatio );
 				saoMaterial.uniforms[ 'cameraNear' ].value = camera.near;
 				saoMaterial.uniforms[ 'cameraFar' ].value = camera.far;
 				saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( camera.projectionMatrix );
@@ -181,7 +181,7 @@
 				vBlurMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
 				vBlurMaterial.uniforms[ "cameraNear" ].value = camera.near;
 				vBlurMaterial.uniforms[ "cameraFar" ].value = camera.far;
-				vBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				vBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth / devicePixelRatio, window.innerHeight / devicePixelRatio );
 				vBlurMaterial.blending = THREE.NoBlending;
 
 				hBlurMaterial = new THREE.ShaderMaterial( THREE.DepthLimitedBlurShader );
@@ -189,7 +189,7 @@
 				hBlurMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
 				hBlurMaterial.uniforms[ "cameraNear" ].value = camera.near;
 				hBlurMaterial.uniforms[ "cameraFar" ].value = camera.far;
-				hBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				hBlurMaterial.uniforms[ 'size' ].value.set( window.innerWidth / devicePixelRatio, window.innerHeight / devicePixelRatio );
 				hBlurMaterial.blending = THREE.NoBlending;
 
 				saoModulateMaterial = new THREE.ShaderMaterial( THREE.CompositeShader );
@@ -238,12 +238,12 @@
 				renderer.setSize( width, height );
 
 				// Resize renderTargets
-				saoMaterial.uniforms[ 'size' ].value.set( width, height );
+				saoMaterial.uniforms[ 'size' ].value.set( width / devicePixelRatio, height / devicePixelRatio );
 				saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( camera.projectionMatrix );
 				saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = camera.projectionMatrix;
 
-				hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
-				vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
+				hBlurMaterial.uniforms[ 'size' ].value.set( width / devicePixelRatio, height / devicePixelRatio );
+				vBlurMaterial.uniforms[ 'size' ].value.set( width / devicePixelRatio, height / devicePixelRatio );
 
 				depthRenderTarget.setSize( width / devicePixelRatio, height / devicePixelRatio );
 				normalRenderTarget.setSize( width / devicePixelRatio, height / devicePixelRatio );
@@ -266,17 +266,12 @@
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
 
-			/*	if( saoMaterial.defines['MODE'] !== params.mode ) {
-					saoMaterial.defines['MODE'] = params.mode;
-					saoMaterial.needsUpdate = true;
-				}*/
-
 				saoMaterial.uniforms['bias'].value = params.saoBias;
 				saoMaterial.uniforms['intensity'].value = params.saoIntensity;
 				saoMaterial.uniforms['scale'].value = params.saoScale;
 				saoMaterial.uniforms['kernelRadius'].value = params.saoKernelRadius;
 				saoMaterial.uniforms['minResolution'].value = params.saoMinResolution;
-				saoMaterial.uniforms['randomSeed'].value = Math.random();
+				//saoMaterial.uniforms['randomSeed'].value = Math.random();
 
 				var depthCutoff = params.saoBlurDepthCutoff * ( camera.far - camera.near );
 				vBlurMaterial.uniforms[ 'depthCutoff' ].value = depthCutoff;
