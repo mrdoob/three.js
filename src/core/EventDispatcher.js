@@ -103,4 +103,5 @@ THREE.EventDispatcher.prototype = {
 		}
 
 	}
+
 };
