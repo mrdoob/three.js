@@ -139,14 +139,15 @@
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
 
-				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-				normalRenderTarget = depthRenderTarget.clone();
-				beautyRenderTarget = depthRenderTarget.clone();
-
+				beautyRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+		
 				var devicePixelRatio = window.devicePixelRatio || 1;
 
 				saoRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth / devicePixelRatio, window.innerHeight / devicePixelRatio, pars );
 				blurIntermediateRenderTarget = saoRenderTarget.clone();
+				depthRenderTarget = saoRenderTarget.clone();
+				normalRenderTarget = saoRenderTarget.clone();
+
 				depthRenderTarget.texture.minFilter = THREE.NearestFilter;
 				depthRenderTarget.texture.maxFilter = THREE.NearestFilter;
 				normalRenderTarget.texture.maxFilter = THREE.NearestFilter;
@@ -244,8 +245,8 @@
 				hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 				vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 
-				depthRenderTarget.setSize( width, height );
-				normalRenderTarget.setSize( width, height );
+				depthRenderTarget.setSize( width / devicePixelRatio, height / devicePixelRatio );
+				normalRenderTarget.setSize( width / devicePixelRatio, height / devicePixelRatio );
 				saoRenderTarget.setSize( width / devicePixelRatio, height / devicePixelRatio );
 				blurIntermediateRenderTarget.setSize( width / devicePixelRatio, height / devicePixelRatio );
 			}
