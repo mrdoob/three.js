@@ -14,6 +14,8 @@ THREE.DirectionalLight = function ( color, intensity ) {
 
 	this.target = new THREE.Object3D();
 
+	this.shadow = new THREE.DirectionalLightShadow();
+
 };
 
 THREE.DirectionalLight.prototype = Object.create( THREE.Light.prototype );
