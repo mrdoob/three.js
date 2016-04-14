@@ -162,7 +162,7 @@ THREE.SAOShader = {
 
 			"vec3 viewPosition = getViewPosition( vUv );",
 			"if( -viewPosition.z >= cameraFar ) {",
-				"return;",
+				"discard;",
 			"}",
 
 			"gl_FragColor.xyz *= 1.0 - getAmbientOcclusion( viewPosition );",

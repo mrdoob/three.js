@@ -74,6 +74,9 @@ THREE.DepthLimitedBlurShader = {
 
 			"float perspectiveDepth = unpackRGBAToDepth( texture2D( tDepth, vUv ) );",
 			"float viewZ = -perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
+			"if( viewZ >= cameraFar ) {",
+				"discard;",
+			"}",
 			"float rViewZ = viewZ, lViewZ = viewZ;",
 
 			"for( int i = 1; i <= KERNEL_RADIUS; i ++ ) {",

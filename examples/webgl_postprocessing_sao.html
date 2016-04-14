@@ -289,7 +289,7 @@
 
 				renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget );
 				renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget );
-				renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 0.0 );
+				renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 1.0 );
 
 				renderer.setClearColor( 0x000000 );
 				renderer.render( scene, camera, null, true );
@@ -297,8 +297,8 @@
 				if( params.output == 1 ) return;
 
 				if( params.saoBlur ) {
-					renderer.renderPass( vBlurMaterial, blurIntermediateRenderTarget, 0x000000, 0.0 );
-					renderer.renderPass( hBlurMaterial, saoRenderTarget, 0x000000, 0.0 );
+					renderer.renderPass( vBlurMaterial, blurIntermediateRenderTarget, 0xffffff, 1.0 );
+					renderer.renderPass( hBlurMaterial, saoRenderTarget, 0xffffff, 1.0 );
 				}
 
 				if( params.output == 2 ) {
