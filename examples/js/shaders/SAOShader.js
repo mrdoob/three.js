@@ -9,7 +9,7 @@ THREE.SAOShader = {
 
 	defines: {
 		'NUM_SAMPLES': 7,
-		'NUM_RINGS': 3,
+		'NUM_RINGS': 4,
 		"MODE": 0,
 		"NORMAL_TEXTURE": 0,
 		"DIFFUSE_TEXTURE": 1
@@ -86,7 +86,7 @@ THREE.SAOShader = {
 
 		"#include <packing>",
 
-		"vec3 getViewPosition( vec2 screenPosition ) {",
+		"vec3 getViewPosition( const in vec2 screenPosition ) {",
 			"float perspectiveDepth = unpackRGBAToDepth( texture2D( tDepth, screenPosition ) );",
 			"float viewZ = perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
 			"float clipW = cameraProjectionMatrix[2][3] * viewZ + cameraProjectionMatrix[3][3];",
@@ -95,7 +95,7 @@ THREE.SAOShader = {
 			"return ( cameraInverseProjectionMatrix * clipPosition ).xyz;",
 		"}",
 
-		"vec3 getViewNormal( vec3 viewPosition, vec2 screenPosition ) {",
+		"vec3 getViewNormal( const in vec3 viewPosition, const in vec2 screenPosition ) {",
 			"#if NORMAL_TEXTURE == 1",
 				"return -unpackRGBToNormal( texture2D( tNormal, screenPosition ).xyz );",
 			"#else",
@@ -103,14 +103,22 @@ THREE.SAOShader = {
 			"#endif",
 		"}",
 
-	 "float getOcclusion( vec3 viewPosition, vec3 viewNormal, vec3 viewPositionOffset ) {",
+		"vec4 getDiffuseColor( const in vec2 screenPosition ) {",
+			"#if DIFFUSE_TEXTURE == 1",
+				"return texture2D( tDiffuse, vUv );",
+			"#else",
+				"return vec4( 1.0 );",
+			"#endif",
+		"}",
+
+	 "float getOcclusion( const in vec3 viewPosition, const in vec3 viewNormal, const in vec3 viewPositionOffset ) {",
 			"vec3 viewDelta = viewPositionOffset - viewPosition;",
 			"float viewDistance = length( viewDelta );",
 			"float scaledScreenDistance = scale * viewDistance / cameraFar;",
 			"return intensity * max(0.0, (dot(viewNormal, viewDelta) - minResolution * cameraFar) / scaledScreenDistance - bias) / (1.0 + pow2( scaledScreenDistance ) );",
 		"}",
 
-		"float basicPattern( vec3 viewPosition ) {",
+		"float getAmbientOcclusion( const in vec3 viewPosition ) {",
 
 			"vec3 viewNormal = getViewNormal( viewPosition, vUv );",
 
@@ -150,41 +158,14 @@ THREE.SAOShader = {
 
 		"void main() {",
 
-			"#if DIFFUSE_TEXTURE == 1",
-				"vec4 color = texture2D( tDiffuse, vUv );",
-			"#else",
-				"vec4 color = vec4( 1.0 );",
-			"#endif",
+			"gl_FragColor = getDiffuseColor( vUv );",
 
 			"vec3 viewPosition = getViewPosition( vUv );",
-
-			"#if MODE == 3", // display normals
-				"vec3 viewNormal = getViewNormal( viewPosition, vUv );",
-				"gl_FragColor = vec4( packNormalToRGB( viewNormal ), 1.0 );",
-				"return;",
-			"#elif MODE == 4", // display depth
-				"float perspectiveDepth = viewZToPerspectiveDepth( viewPosition.z, cameraNear, cameraFar );",
-				"gl_FragColor = vec4( vec3( perspectiveDepth ), 1.0 );",
-				"return;",
-			"#endif",
-
-			"gl_FragColor = color;",
-
-			"#if MODE == 1", // display original color
-				"return;",
-			"#endif",
-
 			"if( -viewPosition.z >= cameraFar ) {",
 				"return;",
 			"}",
 
-			"float occlusion = basicPattern( viewPosition );",
-
-			"#if MODE == 2", // display only ao
-				"gl_FragColor.xyz = vec3( 1.0 - occlusion );",
-			"#elif MODE == 0", // display original color + ao (normal mode)
-				"gl_FragColor.xyz *= 1.0 - occlusion;",
-			"#endif",
+			"gl_FragColor.xyz *= 1.0 - getAmbientOcclusion( viewPosition );",
 
 		"}"
 

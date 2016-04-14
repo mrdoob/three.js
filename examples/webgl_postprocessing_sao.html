@@ -59,14 +59,14 @@
 			var depthRenderTarget, normalRenderTarget, saoRenderTarget, beautyRenderTarget, blurIntermediateRenderTarget;
 			var group;
 			var params = {
-				mode: 0,
+				output: 0,
 				saoBias: 0.5,
-				saoIntensity: 0.10,
+				saoIntensity: 0.18,
 				saoScale: 1,
 				saoKernelRadius: 100,
 				saoMinResolution: 0,
 				saoBlur: true,
-				saoBlurSamples: 8,
+				saoBlurRadius: 8,
 				saoBlurStdDev: 4
 			}
 
@@ -204,7 +204,7 @@
 
 				// Init gui
 				var gui = new dat.GUI();
-				gui.add( params, "mode", {
+				gui.add( params, "output", {
 					'Beauty': 1,
 					'Beauty+SAO': 0,
 					'SAO': 2,
@@ -217,8 +217,8 @@
 				gui.add( params, "saoKernelRadius", 1, 100 );
 				gui.add( params, "saoMinResolution", 0, 1 );
 				gui.add( params, "saoBlur" );
-				gui.add( params, "saoBlurSamples", 1, 400 );
-				gui.add( params, "saoBlurStdDev", 0.5, 200 );
+				gui.add( params, "saoBlurRadius", 0, 200 );
+				gui.add( params, "saoBlurStdDev", 0.5, 150 );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 			}
@@ -240,10 +240,10 @@
 				hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 				vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 
-				depthRenderTarget.setSize( newWidth, newHeight );
-				normalRenderTarget.setSize( newWidth, newHeight );
-				saoRenderTarget.setSize( newWidth, newHeight );
-				blurIntermediateRenderTarget.setSize( newWidth, newHeight );
+				depthRenderTarget.setSize( width, height );
+				normalRenderTarget.setSize( width, height );
+				saoRenderTarget.setSize( width, height );
+				blurIntermediateRenderTarget.setSize( width, height );
 			}
 
 			function animate() {
@@ -273,14 +273,15 @@
 				saoMaterial.uniforms['minResolution'].value = params.saoMinResolution;
 				saoMaterial.uniforms['randomSeed'].value = Math.random();
 
+				params.saoBlurRadius = Math.floor( params.saoBlurRadius );
 				if(( prevStdDev !== params.saoBlurStdDev )||
-					( prevNumSamples !== Math.floor( params.saoBlurSamples ) )) {
-					THREE.BlurShaderUtils.configure( vBlurMaterial, Math.floor( params.saoBlurSamples ), new THREE.Vector2( 0, 1 ), params.saoBlurStdDev );
+					( prevNumSamples !== params.saoBlurRadius )) {
+					THREE.BlurShaderUtils.configure( vBlurMaterial, params.saoBlurRadius, new THREE.Vector2( 0, 1 ), params.saoBlurStdDev );
 					vBlurMaterial.needsUpdate = true;
-					THREE.BlurShaderUtils.configure( hBlurMaterial, Math.floor( params.saoBlurSamples ), new THREE.Vector2( 1, 0 ), params.saoBlurStdDev );
+					THREE.BlurShaderUtils.configure( hBlurMaterial, params.saoBlurRadius, new THREE.Vector2( 1, 0 ), params.saoBlurStdDev );
 					hBlurMaterial.needsUpdate = true;
 					prevStdDev = params.saoBlurStdDev;
-					prevNumSamples = Math.floor( params.saoBlurSamples );
+					prevNumSamples = params.saoBlurRadius;
 				}
 
 				renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget );
@@ -290,25 +291,24 @@
 				renderer.setClearColor( 0x000000 );
 				renderer.render( scene, camera, null, true );
 
-				console.log( "params.mode", params.mode );
-				if( params.mode === 1 ) return;
+				if( params.output == 1 ) return;
 
 				if( params.saoBlur ) {
 					renderer.renderPass( vBlurMaterial, blurIntermediateRenderTarget, 0x000000, 0.0 );
 					renderer.renderPass( hBlurMaterial, saoRenderTarget, 0x000000, 0.0 );
 				}
 
-				if( params.mode === 2 ) {
+				if( params.output == 2 ) {
 					copyMaterial.uniforms[ 'tDiffuse' ].value = saoRenderTarget;
 					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
 					return;
 				}
-				if( params.mode === 4 ) {
+				if( params.output == 4 ) {
 					copyMaterial.uniforms[ 'tDiffuse' ].value = depthRenderTarget;
 					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
 					return;
 				}
-				if( params.mode === 3 ) {
+				if( params.output == 3 ) {
 					copyMaterial.uniforms[ 'tDiffuse' ].value = normalRenderTarget;
 					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
 					return;

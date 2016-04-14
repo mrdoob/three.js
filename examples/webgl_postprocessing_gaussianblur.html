@@ -60,7 +60,7 @@
 			var group;
 			var params = {
 				enabled: true,
-				numSamples: 8,
+				radius: 8,
 				stdDev: 4
 			}
 
@@ -150,8 +150,8 @@
 				// Init gui
 				var gui = new dat.GUI();
 				gui.add( params, "enabled" );
-				gui.add( params, "numSamples", 1, 400 );
-				gui.add( params, "stdDev", 0.5, 200 );
+				gui.add( params, "radius", 0, 200 );
+				gui.add( params, "stdDev", 0.5, 100 );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 			}
@@ -169,8 +169,8 @@
 				hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 				vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 
-				beautyRenderTarget.setSize( newWidth, newHeight );
-				blurIntermediateRenderTarget.setSize( newWidth, newHeight );
+				beautyRenderTarget.setSize( width, height );
+				blurIntermediateRenderTarget.setSize( width, height );
 			}
 
 			function animate() {
@@ -190,13 +190,13 @@
 				group.rotation.y = timer * 0.0001;
 
 				if(( prevStdDev !== params.stdDev )||
-					( prevNumSamples !== Math.floor( params.numSamples ) )) {
-					THREE.BlurShaderUtils.configure( vBlurMaterial, Math.floor( params.numSamples ), new THREE.Vector2( 0, 1 ), params.stdDev );
+					( prevNumSamples !== Math.floor( params.radius ) )) {
+					THREE.BlurShaderUtils.configure( vBlurMaterial, Math.floor( params.radius ), new THREE.Vector2( 0, 1 ), params.stdDev );
 					vBlurMaterial.needsUpdate = true;
-					THREE.BlurShaderUtils.configure( hBlurMaterial, Math.floor( params.numSamples ), new THREE.Vector2( 1, 0 ), params.stdDev );
+					THREE.BlurShaderUtils.configure( hBlurMaterial, Math.floor( params.radius ), new THREE.Vector2( 1, 0 ), params.stdDev );
 					hBlurMaterial.needsUpdate = true;
 					prevStdDev = params.stdDev;
-					prevNumSamples = Math.floor( params.numSamples );
+					prevNumSamples = Math.floor( params.radius );
 				}
 
 				renderer.setClearColor( 0x000000 );
