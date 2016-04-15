@@ -288,14 +288,25 @@
 				}
 
 				renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget );
+				if( params.output == 4 ) {
+					copyMaterial.uniforms[ 'tDiffuse' ].value = depthRenderTarget;
+					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
+					return;
+				}
+
 				renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget );
-				renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 1.0 );
+				if( params.output == 3 ) {
+					copyMaterial.uniforms[ 'tDiffuse' ].value = normalRenderTarget;
+					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
+					return;
+				}
 
 				renderer.setClearColor( 0x000000 );
 				renderer.render( scene, camera, null, true );
 
 				if( params.output == 1 ) return;
 
+				renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 1.0 );
 				if( params.saoBlur ) {
 					renderer.renderPass( vBlurMaterial, blurIntermediateRenderTarget, 0xffffff, 1.0 );
 					renderer.renderPass( hBlurMaterial, saoRenderTarget, 0xffffff, 1.0 );
@@ -303,16 +314,6 @@
 
 				if( params.output == 2 ) {
 					copyMaterial.uniforms[ 'tDiffuse' ].value = saoRenderTarget;
-					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
-					return;
-				}
-				if( params.output == 4 ) {
-					copyMaterial.uniforms[ 'tDiffuse' ].value = depthRenderTarget;
-					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
-					return;
-				}
-				if( params.output == 3 ) {
-					copyMaterial.uniforms[ 'tDiffuse' ].value = normalRenderTarget;
 					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
 					return;
 				}
