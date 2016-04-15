@@ -61,11 +61,11 @@ THREE.SAOShader = {
 
 		"varying vec2 vUv;",
 
-		"uniform sampler2D tDepth;",
-
 		"#if DIFFUSE_TEXTURE == 1",
 			"uniform sampler2D tDiffuse;",
 		"#endif",
+
+		"uniform sampler2D tDepth;",
 
 		"#if NORMAL_TEXTURE == 1",
 			"uniform sampler2D tNormal;",
@@ -88,7 +88,7 @@ THREE.SAOShader = {
 
 		"#include <packing>",
 
-		"vec4 getDiffuseColor( const in vec2 screenPosition ) {",
+		"vec4 getDefaultColor( const in vec2 screenPosition ) {",
 
 			"#if DIFFUSE_TEXTURE == 1",
 				"return texture2D( tDiffuse, vUv );",
@@ -188,7 +188,7 @@ THREE.SAOShader = {
 				"discard;",
 			"}",
 
-			"gl_FragColor = getDiffuseColor( vUv );",
+			"gl_FragColor = getDefaultColor( vUv );",
 			"gl_FragColor.xyz *= 1.0 - getAmbientOcclusion( viewPosition );",
 
 		"}"
