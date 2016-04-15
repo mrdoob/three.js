@@ -177,7 +177,7 @@ THREE.SAOShader = {
 				"angle += ANGLE_STEP;",
 
 				"float sampleDepth = getDepth( sampleUv );",
-				"if( sampleDepth >= 1.0 ) {",
+				"if( sampleDepth >= ( 1.0 - EPSILON ) ) {",
 					"continue;",
 				"}",
 
@@ -196,7 +196,7 @@ THREE.SAOShader = {
 		"void main() {",
 
 			"float centerDepth = getDepth( vUv );",
-			"if( centerDepth >= 1.0 ) {",
+			"if( centerDepth >= ( 1.0 - EPSILON ) ) {",
 				"discard;",
 			"}",
 
