@@ -139,10 +139,10 @@ THREE.SAOShader = {
 
 		"}",
 
-		"float scaleDividedByCameraFar = scale / cameraFar;",
-		"float minResolutionMultipliedByCameraFar = minResolution * cameraFar;",
-
 		"float getOcclusion( const in vec3 centerViewPosition, const in vec3 centerViewNormal, const in vec3 sampleViewPosition ) {",
+			// these two are constants based on uniforms
+			"float scaleDividedByCameraFar = scale / cameraFar;",
+			"float minResolutionMultipliedByCameraFar = minResolution * cameraFar;",
 
 			"vec3 viewDelta = sampleViewPosition - centerViewPosition;",
 			"float viewDistance = length( viewDelta );",
@@ -151,10 +151,9 @@ THREE.SAOShader = {
 
 		"}",
 
-		"const float numSamples = float( NUM_SAMPLES );",
-		"const float numRings = float( NUM_RINGS );",
-		"const float alphaStep = 1.0 / numSamples;",
-		"vec2 radius = vec2( kernelRadius ) / size;",
+		// moving costly divides into consts
+		"const float ANGLE_STEP = PI * float( NUM_RINGS ) / float( NUM_SAMPLES );",
+		"const float INV_NUM_SAMPLES = 1.0 / float( NUM_SAMPLES );",
 
 		"float getAmbientOcclusion( const in vec3 centerViewPosition ) {",
 
@@ -163,15 +162,19 @@ THREE.SAOShader = {
 			"float random = rand( vUv + randomSeed );",
 
 			// jsfiddle that shows sample pattern: https://jsfiddle.net/a16ff1p7/
-			"float alpha = 0.0;",
+			"vec2 scaledKernelRadius = vec2( kernelRadius ) / size;",
+			"vec2 radius = scaledKernelRadius * 0.02;",
+			"vec2 radiusStep = scaledKernelRadius * 0.98 * INV_NUM_SAMPLES;",
+
+			"float angle = random * PI2;",
+
 			"float occlusionSum = 0.0;",
 			"float weightSum = 0.0;",
 
 			"for( int i = 0; i < NUM_SAMPLES; i ++ ) {",
-				"float angle = PI2 * ( numRings * alpha + random );",
-				"vec2 currentRadius = radius * ( 0.02 + alpha * 0.99 );",
-				"vec2 sampleUv = vUv + vec2( cos(angle), sin(angle) ) * currentRadius;",
-				"alpha += alphaStep;",
+				"vec2 sampleUv = vUv + vec2( cos(angle), sin(angle) ) * radius;",
+				"radius += radiusStep;",
+				"angle += ANGLE_STEP;",
 
 				"float sampleDepth = getDepth( sampleUv );",
 				"if( sampleDepth >= 1.0 ) {",
