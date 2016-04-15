@@ -385,6 +385,9 @@ THREE.Box3.prototype = {
 		this.min.max( box.min );
 		this.max.min( box.max );
 
+		// ensure that if there is no overlap, the result is fully empty, not slightly empty with non-inf/+inf values that will cause subsequence intersects to erroneously return valid values.
+		if( this.isEmpty() ) this.makeEmpty();
+
 		return this;
 
 	},
