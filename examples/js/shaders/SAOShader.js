@@ -162,9 +162,8 @@ THREE.SAOShader = {
 			"float random = rand( vUv + randomSeed );",
 
 			// jsfiddle that shows sample pattern: https://jsfiddle.net/a16ff1p7/
-			"vec2 scaledKernelRadius = vec2( kernelRadius ) / size;",
-			"vec2 radius = scaledKernelRadius * 0.02;",
-			"vec2 radiusStep = scaledKernelRadius * 0.98 * INV_NUM_SAMPLES;",
+			"vec2 radiusStep = vec2( kernelRadius * INV_NUM_SAMPLES ) / size;",
+			"vec2 radius = radiusStep;",
 
 			"float angle = random * PI2;",
 
@@ -172,7 +171,7 @@ THREE.SAOShader = {
 			"float weightSum = 0.0;",
 
 			"for( int i = 0; i < NUM_SAMPLES; i ++ ) {",
-				"vec2 sampleUv = vUv + vec2( cos(angle), sin(angle) ) * radius;",
+				"vec2 sampleUv = vUv + vec2( cos( angle ), sin( angle ) ) * radius;",
 				"radius += radiusStep;",
 				"angle += ANGLE_STEP;",
 
