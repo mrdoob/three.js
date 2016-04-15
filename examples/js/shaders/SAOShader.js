@@ -152,7 +152,7 @@ THREE.SAOShader = {
 		"}",
 
 		// moving costly divides into consts
-		"const float ANGLE_STEP = PI * float( NUM_RINGS ) / float( NUM_SAMPLES );",
+		"const float ANGLE_STEP = PI2 * float( NUM_RINGS ) / float( NUM_SAMPLES );",
 		"const float INV_NUM_SAMPLES = 1.0 / float( NUM_SAMPLES );",
 
 		"float getAmbientOcclusion( const in vec3 centerViewPosition ) {",
