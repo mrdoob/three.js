@@ -108,15 +108,19 @@ THREE.SAOShader = {
 
 		"}",
 
-		"vec3 getViewPosition( const in vec2 screenPosition ) {",
-
-			"float depth = getDepth( screenPosition );",
+		"float getViewZ( const in float depth ) {",
 
 			"#if PERSPECTIVE_CAMERA == 1",
 				"float viewZ = perspectiveDepthToViewZ( depth, cameraNear, cameraFar );",
 			"#else",
 				"float viewZ = orthoDepthToViewZ( depth, cameraNear, cameraFar );",
 			"#endif",
+
+			"return viewZ;",
+
+		"}",
+
+		"vec3 getViewPosition( const in vec2 screenPosition, const in float depth, const in float viewZ ) {",
 
 			"float clipW = cameraProjectionMatrix[2][3] * viewZ + cameraProjectionMatrix[3][3];",
 			"vec4 clipPosition = vec4( ( vec3( screenPosition, depth ) - 0.5 ) * 2.0, clipW );",
@@ -135,58 +139,66 @@ THREE.SAOShader = {
 
 		"}",
 
-	 "float getOcclusion( const in vec3 viewPosition, const in vec3 viewNormal, const in vec3 viewPositionOffset ) {",
+		"float scaleDividedByCameraFar = scale / cameraFar;",
+		"float minResolutionMultipliedByCameraFar = minResolution * cameraFar;",
 
-			"vec3 viewDelta = viewPositionOffset - viewPosition;",
+		"float getOcclusion( const in vec3 centerViewPosition, const in vec3 centerViewNormal, const in vec3 sampleViewPosition ) {",
+
+			"vec3 viewDelta = sampleViewPosition - centerViewPosition;",
 			"float viewDistance = length( viewDelta );",
-			"float scaledScreenDistance = scale * viewDistance / cameraFar;",
-			"return intensity * max(0.0, (dot(viewNormal, viewDelta) - minResolution * cameraFar) / scaledScreenDistance - bias) / (1.0 + pow2( scaledScreenDistance ) );",
+			"float scaledScreenDistance = scaleDividedByCameraFar * viewDistance;",
+			"return max(0.0, (dot(centerViewNormal, viewDelta) - minResolutionMultipliedByCameraFar) / scaledScreenDistance - bias) / (1.0 + pow2( scaledScreenDistance ) );",
 
 		"}",
 
-		"float getAmbientOcclusion( const in vec3 viewPosition ) {",
+		"const float numSamples = float( NUM_SAMPLES );",
+		"const float numRings = float( NUM_RINGS );",
+		"const float alphaStep = 1.0 / numSamples;",
+		"vec2 radius = vec2( kernelRadius ) / size;",
 
-			"vec3 viewNormal = getViewNormal( viewPosition, vUv );",
+		"float getAmbientOcclusion( const in vec3 centerViewPosition ) {",
+
+			"vec3 centerViewNormal = getViewNormal( centerViewPosition, vUv );",
 
 			"float random = rand( vUv + randomSeed );",
-			"vec2 radius = vec2( kernelRadius ) / size;",
-			"float numSamples = float( NUM_SAMPLES );",
-			"float numRings = float( NUM_RINGS );",
-			"float alphaStep = 1.0 / numSamples;",
 
 			// jsfiddle that shows sample pattern: https://jsfiddle.net/a16ff1p7/
-
-			"float occlusionSum = 0.0;",
 			"float alpha = 0.0;",
+			"float occlusionSum = 0.0;",
 			"float weightSum = 0.0;",
 
 			"for( int i = 0; i < NUM_SAMPLES; i ++ ) {",
 				"float angle = PI2 * ( numRings * alpha + random );",
 				"vec2 currentRadius = radius * ( 0.02 + alpha * 0.99 );",
-				"vec2 offset = vec2( cos(angle), sin(angle) ) * currentRadius;",
+				"vec2 sampleUv = vUv + vec2( cos(angle), sin(angle) ) * currentRadius;",
 				"alpha += alphaStep;",
 
-				"vec3 viewPositionOffset = getViewPosition( vUv + offset );",
-				"if( -viewPositionOffset.z >= cameraFar ) {",
+				"float sampleDepth = getDepth( sampleUv );",
+				"if( sampleDepth >= 1.0 ) {",
 					"continue;",
 				"}",
 
-				"occlusionSum += getOcclusion( viewPosition, viewNormal, viewPositionOffset );",
+				"float sampleViewZ = getViewZ( sampleDepth );",
+				"vec3 sampleViewPosition = getViewPosition( sampleUv, sampleDepth, sampleViewZ );",
+				"occlusionSum += getOcclusion( centerViewPosition, centerViewNormal, sampleViewPosition );",
 				"weightSum += 1.0;",
 
 			"}",
 
-			"return ( weightSum == 0.0 ) ? occlusionSum : ( occlusionSum / weightSum );",
+			"return ( weightSum == 0.0 ) ? occlusionSum : ( occlusionSum * ( intensity / weightSum ) );",
 
 		"}",
 
 
 		"void main() {",
 
-			"vec3 viewPosition = getViewPosition( vUv );",
-			"if( -viewPosition.z >= cameraFar ) {",
+			"float centerDepth = getDepth( vUv );",
+			"if( centerDepth >= 1.0 ) {",
 				"discard;",
 			"}",
+
+			"float centerViewZ = getViewZ( centerDepth );",
+			"vec3 viewPosition = getViewPosition( vUv, centerDepth, centerViewZ );",
 
 			"gl_FragColor = getDefaultColor( vUv );",
 			"gl_FragColor.xyz *= 1.0 - getAmbientOcclusion( viewPosition );",
