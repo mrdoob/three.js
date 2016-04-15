@@ -12,7 +12,9 @@ THREE.SAOShader = {
 		'NUM_RINGS': 4,
 		"MODE": 0,
 		"NORMAL_TEXTURE": 0,
-		"DIFFUSE_TEXTURE": 1
+		"DIFFUSE_TEXTURE": 1,
+		"DEPTH_PACKING": 1,
+		"PERSPECTIVE_CAMERA": 1
 	},
 
 	uniforms: {
@@ -86,36 +88,60 @@ THREE.SAOShader = {
 
 		"#include <packing>",
 
-		"vec3 getViewPosition( const in vec2 screenPosition ) {",
-			"float perspectiveDepth = unpackRGBAToDepth( texture2D( tDepth, screenPosition ) );",
-			"float viewZ = perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
-			"float clipW = cameraProjectionMatrix[2][3] * viewZ + cameraProjectionMatrix[3][3];",
-			"vec4 clipPosition = vec4( ( vec3( screenPosition, perspectiveDepth ) - 0.5 ) * 2.0, clipW );",
-			"clipPosition.xyz *= clipW;", // unproject to homogeneous coordinates
-			"return ( cameraInverseProjectionMatrix * clipPosition ).xyz;",
-		"}",
-
-		"vec3 getViewNormal( const in vec3 viewPosition, const in vec2 screenPosition ) {",
-			"#if NORMAL_TEXTURE == 1",
-				"return -unpackRGBToNormal( texture2D( tNormal, screenPosition ).xyz );",
-			"#else",
-				"return normalize( cross( dFdx( viewPosition ), dFdy( viewPosition ) ) );",
-			"#endif",
-		"}",
-
 		"vec4 getDiffuseColor( const in vec2 screenPosition ) {",
+
 			"#if DIFFUSE_TEXTURE == 1",
 				"return texture2D( tDiffuse, vUv );",
 			"#else",
 				"return vec4( 1.0 );",
 			"#endif",
+
+		"}",
+
+		"float getDepth( const in vec2 screenPosition ) {",
+
+			"#if DEPTH_PACKING == 1",
+				"return unpackRGBAToDepth( texture2D( tDepth, screenPosition ) );",
+			"#else",
+				"return texture2D( tDepth, screenPosition ).x;",
+			"#endif",
+
+		"}",
+
+		"vec3 getViewPosition( const in vec2 screenPosition ) {",
+
+			"float depth = getDepth( screenPosition );",
+
+			"#if PERSPECTIVE_CAMERA == 1",
+				"float viewZ = perspectiveDepthToViewZ( depth, cameraNear, cameraFar );",
+			"#else",
+				"float viewZ = orthoDepthToViewZ( depth, cameraNear, cameraFar );",
+			"#endif",
+
+			"float clipW = cameraProjectionMatrix[2][3] * viewZ + cameraProjectionMatrix[3][3];",
+			"vec4 clipPosition = vec4( ( vec3( screenPosition, depth ) - 0.5 ) * 2.0, clipW );",
+			"clipPosition.xyz *= clipW;", // unproject to homogeneous coordinates
+			"return ( cameraInverseProjectionMatrix * clipPosition ).xyz;",
+
+		"}",
+
+		"vec3 getViewNormal( const in vec3 viewPosition, const in vec2 screenPosition ) {",
+
+			"#if NORMAL_TEXTURE == 1",
+				"return -unpackRGBToNormal( texture2D( tNormal, screenPosition ).xyz );",
+			"#else",
+				"return normalize( cross( dFdx( viewPosition ), dFdy( viewPosition ) ) );",
+			"#endif",
+
 		"}",
 
 	 "float getOcclusion( const in vec3 viewPosition, const in vec3 viewNormal, const in vec3 viewPositionOffset ) {",
+
 			"vec3 viewDelta = viewPositionOffset - viewPosition;",
 			"float viewDistance = length( viewDelta );",
 			"float scaledScreenDistance = scale * viewDistance / cameraFar;",
 			"return intensity * max(0.0, (dot(viewNormal, viewDelta) - minResolution * cameraFar) / scaledScreenDistance - bias) / (1.0 + pow2( scaledScreenDistance ) );",
+
 		"}",
 
 		"float getAmbientOcclusion( const in vec3 viewPosition ) {",
@@ -132,11 +158,11 @@ THREE.SAOShader = {
 
 			"float occlusionSum = 0.0;",
 			"float alpha = 0.0;",
-			"float weight = 0.0;",
+			"float weightSum = 0.0;",
 
 			"for( int i = 0; i < NUM_SAMPLES; i ++ ) {",
 				"float angle = PI2 * ( numRings * alpha + random );",
-				"vec2 currentRadius = radius * ( 0.01 + alpha * 0.99 );",
+				"vec2 currentRadius = radius * ( 0.02 + alpha * 0.99 );",
 				"vec2 offset = vec2( cos(angle), sin(angle) ) * currentRadius;",
 				"alpha += alphaStep;",
 
@@ -146,25 +172,23 @@ THREE.SAOShader = {
 				"}",
 
 				"occlusionSum += getOcclusion( viewPosition, viewNormal, viewPositionOffset );",
-				"weight += 1.0;",
+				"weightSum += 1.0;",
 
 			"}",
 
-			"if( weight == 0.0 ) return 0.0;",
-			"return occlusionSum / weight;",
+			"return ( weightSum == 0.0 ) ? occlusionSum : ( occlusionSum / weightSum );",
 
 		"}",
 
 
 		"void main() {",
 
-			"gl_FragColor = getDiffuseColor( vUv );",
-
 			"vec3 viewPosition = getViewPosition( vUv );",
 			"if( -viewPosition.z >= cameraFar ) {",
 				"discard;",
 			"}",
 
+			"gl_FragColor = getDiffuseColor( vUv );",
 			"gl_FragColor.xyz *= 1.0 - getAmbientOcclusion( viewPosition );",
 
 		"}"
