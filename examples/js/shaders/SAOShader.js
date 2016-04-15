@@ -159,13 +159,10 @@ THREE.SAOShader = {
 
 			"vec3 centerViewNormal = getViewNormal( centerViewPosition, vUv );",
 
-			"float random = rand( vUv + randomSeed );",
-
 			// jsfiddle that shows sample pattern: https://jsfiddle.net/a16ff1p7/
-			"vec2 radiusStep = vec2( kernelRadius * INV_NUM_SAMPLES ) / size;",
-			"vec2 radius = radiusStep;",
-
-			"float angle = random * PI2;",
+			"float angle = rand( vUv + randomSeed ) * PI2;",
+			"vec2 radius = vec2( kernelRadius * INV_NUM_SAMPLES ) / size;",
+			"vec2 radiusStep = radius;",
 
 			"float occlusionSum = 0.0;",
 			"float weightSum = 0.0;",
