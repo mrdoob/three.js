@@ -287,6 +287,12 @@
 					prevNumSamples = params.saoBlurRadius;
 				}
 
+				if( params.output == 1 ) {
+					renderer.setClearColor( 0x000000 );
+					renderer.render( scene, camera, null, true );
+					return;
+				}
+
 				renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget );
 				if( params.output == 4 ) {
 					copyMaterial.uniforms[ 'tDiffuse' ].value = depthRenderTarget;
@@ -303,8 +309,6 @@
 
 				renderer.setClearColor( 0x000000 );
 				renderer.render( scene, camera, null, true );
-
-				if( params.output == 1 ) return;
 
 				renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 1.0 );
 				if( params.saoBlur ) {
