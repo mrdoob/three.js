@@ -91,9 +91,9 @@
 				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );
 
-				if ( renderer.extensions.get('WEBGL_depth_texture') ) {
-					supportsDepthTextureExtension = true;
-				}
+				//if ( renderer.extensions.get('WEBGL_depth_texture') ) {
+				//	supportsDepthTextureExtension = true;
+				//}
 
 				camera = new THREE.PerspectiveCamera( 65, width / height, 3, 10 );
 				camera.position.z = 7;
