@@ -41,21 +41,10 @@ THREE.SAOShader = {
 	vertexShader: [
 
 		"varying vec2 vUv;",
-		"varying vec2 vInvSize;",
-		"varying float vScaleDividedByCameraFar;",
-		"varying float vMinResolutionMultipliedByCameraFar;",
-
-		"uniform vec2 size;",
-		"uniform float scale;",
-		"uniform float cameraFar;",
-		"uniform float minResolution;",
 
 		"void main() {",
 
 			"vUv = uv;",
-			"vInvSize = 1.0 / size;",
-			"vScaleDividedByCameraFar = scale / cameraFar;",
-			"vMinResolutionMultipliedByCameraFar = minResolution * cameraFar;",
 
 			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
@@ -71,9 +60,6 @@ THREE.SAOShader = {
 		"#include <common>",
 
 		"varying vec2 vUv;",
-		"varying vec2 vInvSize;",
-		"varying float vScaleDividedByCameraFar;",
-		"varying float vMinResolutionMultipliedByCameraFar;",
 
 		"#if DIFFUSE_TEXTURE == 1",
 			"uniform sampler2D tDiffuse;",
@@ -151,12 +137,15 @@ THREE.SAOShader = {
 
 		"}",
 
+		"float scaleDividedByCameraFar;",
+		"float minResolutionMultipliedByCameraFar;",
+
 		"float getOcclusion( const in vec3 centerViewPosition, const in vec3 centerViewNormal, const in vec3 sampleViewPosition ) {",
 
 			"vec3 viewDelta = sampleViewPosition - centerViewPosition;",
 			"float viewDistance = length( viewDelta );",
-			"float scaledScreenDistance = vScaleDividedByCameraFar * viewDistance;",
-			"return max(0.0, (dot(centerViewNormal, viewDelta) - vMinResolutionMultipliedByCameraFar) / scaledScreenDistance - bias) / (1.0 + pow2( scaledScreenDistance ) );",
+			"float scaledScreenDistance = scaleDividedByCameraFar * viewDistance;",
+			"return max(0.0, (dot(centerViewNormal, viewDelta) - minResolutionMultipliedByCameraFar) / scaledScreenDistance - bias) / (1.0 + pow2( scaledScreenDistance ) );",
 
 		"}",
 
@@ -166,11 +155,14 @@ THREE.SAOShader = {
 
 		"float getAmbientOcclusion( const in vec3 centerViewPosition ) {",
 
+			// precompute some variables require in getOcclusion.
+			"scaleDividedByCameraFar = scale / cameraFar;",
+			"minResolutionMultipliedByCameraFar = minResolution * cameraFar;",
 			"vec3 centerViewNormal = getViewNormal( centerViewPosition, vUv );",
 
 			// jsfiddle that shows sample pattern: https://jsfiddle.net/a16ff1p7/
 			"float angle = rand( vUv + randomSeed ) * PI2;",
-			"vec2 radius = vec2( kernelRadius * INV_NUM_SAMPLES ) * vInvSize;",
+			"vec2 radius = vec2( kernelRadius * INV_NUM_SAMPLES ) / size;",
 			"vec2 radiusStep = radius;",
 
 			"float occlusionSum = 0.0;",
