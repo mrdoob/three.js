@@ -1,11 +1,11 @@
-#if defined( USE_ENVMAP ) || defined( STANDARD )
+#if defined( USE_ENVMAP ) || defined( PHYSICAL )
 	uniform float reflectivity;
 	uniform float envMapIntenstiy;
 #endif
 
 #ifdef USE_ENVMAP
 
-	#if ! defined( STANDARD ) && ( defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) )
+	#if ! defined( PHYSICAL ) && ( defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) )
 		varying vec3 vWorldPosition;
 	#endif
 
@@ -16,7 +16,7 @@
 	#endif
 	uniform float flipEnvMap;
 
-	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( STANDARD )
+	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( PHYSICAL )
 		uniform float refractionRatio;
 	#else
 		varying vec3 vReflect;
