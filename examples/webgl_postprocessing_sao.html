@@ -323,18 +323,20 @@
 				else {
 
 					renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget );
-					if( params.output == 4 ) {
-						copyMaterial.uniforms[ 'tDiffuse' ].value = depthRenderTarget;
-						renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
-						return;
-					}
-
 					renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget );
-					if( params.output == 3 ) {
-						copyMaterial.uniforms[ 'tDiffuse' ].value = normalRenderTarget;
-						renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
-						return;
-					}
+
+				}
+
+				if( params.output == 4 ) {
+					copyMaterial.uniforms[ 'tDiffuse' ].value = supportsDepthTextureExtension ? depthTexture : depthRenderTarget;
+					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
+					return;
+				}
+
+				if( params.output == 3 ) {
+					copyMaterial.uniforms[ 'tDiffuse' ].value = normalRenderTarget;
+					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
+					return;
 				}
 
 				renderer.setClearColor( 0x000000 );
