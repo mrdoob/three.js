@@ -111,12 +111,10 @@ THREE.SAOShader = {
 		"float getViewZ( const in float depth ) {",
 
 			"#if PERSPECTIVE_CAMERA == 1",
-				"float viewZ = perspectiveDepthToViewZ( depth, cameraNear, cameraFar );",
+				"return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );",
 			"#else",
-				"float viewZ = orthoDepthToViewZ( depth, cameraNear, cameraFar );",
+				"return orthoDepthToViewZ( depth, cameraNear, cameraFar );",
 			"#endif",
-
-			"return viewZ;",
 
 		"}",
 

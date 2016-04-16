@@ -70,6 +70,8 @@
 				saoBlurStdDev: 6,
 				saoBlurDepthCutoff: 0.01
 			}
+			var supportsDepthTextureExtension = false;
+			var isWebGL2 = false;
 
 			init();
 			animate();
@@ -88,6 +90,10 @@
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );
+
+				if ( renderer.extensions.get('WEBGL_depth_texture') ) {
+					supportsDepthTextureExtension = true;
+				}
 
 				camera = new THREE.PerspectiveCamera( 65, width / height, 3, 10 );
 				camera.position.z = 7;
@@ -146,11 +152,23 @@
 				saoRenderTarget = new THREE.WebGLRenderTarget( width, height, pars );
 				blurIntermediateRenderTarget = saoRenderTarget.clone();
 				beautyRenderTarget = saoRenderTarget.clone();
-				depthRenderTarget = saoRenderTarget.clone();
 				normalRenderTarget = saoRenderTarget.clone();
 
-				depthRenderTarget.texture.minFilter = THREE.NearestFilter;
-				depthRenderTarget.texture.maxFilter = THREE.NearestFilter;
+				if( supportsDepthTextureExtension ) {
+					depthTexture = new THREE.DepthTexture();
+					depthTexture.type = isWebGL2 ? THREE.FloatType : THREE.UnsignedShortType;
+					depthTexture.minFilter = THREE.NearestFilter;
+					depthTexture.maxFilter = THREE.NearestFilter;
+
+					normalRenderTarget.depthBuffer = true;
+					normalRenderTarget.depthTexture = depthTexture;
+				}
+				else {
+					depthRenderTarget = saoRenderTarget.clone();
+					depthRenderTarget.texture.minFilter = THREE.NearestFilter;
+					depthRenderTarget.texture.maxFilter = THREE.NearestFilter;
+				}
+
 				normalRenderTarget.texture.maxFilter = THREE.NearestFilter;
 				normalRenderTarget.texture.minFilter = THREE.NearestFilter;
 
@@ -167,8 +185,9 @@
 				saoMaterial = new THREE.ShaderMaterial( THREE.SAOShader );
 				saoMaterial.defines[ 'DIFFUSE_TEXTURE' ] = 0;
 				saoMaterial.defines[ 'NORMAL_TEXTURE' ] = 1;
+				saoMaterial.defines[ 'DEPTH_PACKING' ] = supportsDepthTextureExtension ? 0 : 1;
 				saoMaterial.defines[ 'MODE' ] = 2;
-				saoMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
+				saoMaterial.uniforms[ "tDepth" ].value = ( supportsDepthTextureExtension ) ? depthTexture : depthRenderTarget;
 				saoMaterial.uniforms[ "tNormal" ].value = normalRenderTarget;
 				saoMaterial.uniforms[ 'size' ].value.set( width, height );
 				saoMaterial.uniforms[ 'cameraNear' ].value = camera.near;
@@ -178,16 +197,18 @@
 				saoMaterial.blending = THREE.NoBlending;
 
 				vBlurMaterial = new THREE.ShaderMaterial( THREE.DepthLimitedBlurShader );
+				vBlurMaterial.defines[ 'DEPTH_PACKING' ] = supportsDepthTextureExtension ? 0 : 1;
 				vBlurMaterial.uniforms[ "tDiffuse" ].value = saoRenderTarget;
-				vBlurMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
+				vBlurMaterial.uniforms[ "tDepth" ].value = ( supportsDepthTextureExtension ) ? depthTexture : depthRenderTarget;
 				vBlurMaterial.uniforms[ "cameraNear" ].value = camera.near;
 				vBlurMaterial.uniforms[ "cameraFar" ].value = camera.far;
 				vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 				vBlurMaterial.blending = THREE.NoBlending;
 
 				hBlurMaterial = new THREE.ShaderMaterial( THREE.DepthLimitedBlurShader );
+				hBlurMaterial.defines[ 'DEPTH_PACKING' ] = supportsDepthTextureExtension ? 0 : 1;
 				hBlurMaterial.uniforms[ "tDiffuse" ].value = blurIntermediateRenderTarget;
-				hBlurMaterial.uniforms[ "tDepth" ].value = depthRenderTarget;
+				hBlurMaterial.uniforms[ "tDepth" ].value = ( supportsDepthTextureExtension ) ? depthTexture : depthRenderTarget;
 				hBlurMaterial.uniforms[ "cameraNear" ].value = camera.near;
 				hBlurMaterial.uniforms[ "cameraFar" ].value = camera.far;
 				hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
@@ -246,7 +267,8 @@
 				hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 				vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 
-				depthRenderTarget.setSize( width, height );
+				if( depthRenderTarget ) depthRenderTarget.setSize( width, height );
+
 				normalRenderTarget.setSize( width, height );
 				saoRenderTarget.setSize( width, height );
 				blurIntermediateRenderTarget.setSize( width, height );
@@ -293,18 +315,26 @@
 					return;
 				}
 
-				renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget );
-				if( params.output == 4 ) {
-					copyMaterial.uniforms[ 'tDiffuse' ].value = depthRenderTarget;
-					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
-					return;
-				}
+				if( supportsDepthTextureExtension ) {
 
-				renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget );
-				if( params.output == 3 ) {
-					copyMaterial.uniforms[ 'tDiffuse' ].value = normalRenderTarget;
-					renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
-					return;
+					renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget );
+
+				}
+				else {
+
+					renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget );
+					if( params.output == 4 ) {
+						copyMaterial.uniforms[ 'tDiffuse' ].value = depthRenderTarget;
+						renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
+						return;
+					}
+
+					renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget );
+					if( params.output == 3 ) {
+						copyMaterial.uniforms[ 'tDiffuse' ].value = normalRenderTarget;
+						renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
+						return;
+					}
 				}
 
 				renderer.setClearColor( 0x000000 );

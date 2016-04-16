@@ -12,7 +12,10 @@ THREE.DepthLimitedBlurShader = {
 
 	defines: {
 
-		"KERNEL_RADIUS": 4
+		"KERNEL_RADIUS": 4,
+		"DEPTH_PACKING": 1,
+		"PERSPECTIVE_CAMERA": 1
+
 
 	},
 
@@ -67,17 +70,38 @@ THREE.DepthLimitedBlurShader = {
 		"varying vec2 vUv;",
 		"varying vec2 vInvSize;",
 
+		"float getDepth( const in vec2 screenPosition ) {",
+
+			"#if DEPTH_PACKING == 1",
+				"return unpackRGBAToDepth( texture2D( tDepth, screenPosition ) );",
+			"#else",
+				"return texture2D( tDepth, screenPosition ).x;",
+			"#endif",
+
+		"}",
+
+		"float getViewZ( const in float depth ) {",
+
+			"#if PERSPECTIVE_CAMERA == 1",
+				"return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );",
+			"#else",
+				"return orthoDepthToViewZ( depth, cameraNear, cameraFar );",
+			"#endif",
+
+		"}",
+
 		"void main() {",
 
 			"float weightSum = sampleWeights[0];",
 			"vec4 diffuseSum = texture2D( tDiffuse, vUv ) * weightSum;",
 
-			"float perspectiveDepth = unpackRGBAToDepth( texture2D( tDepth, vUv ) );",
-			"float viewZ = -perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
-			"if( viewZ >= cameraFar ) {",
+			"float depth = getDepth( vUv );",
+			"if( depth >= ( 1.0 - EPSILON ) ) {",
 				"discard;",
 			"}",
-			"float rViewZ = viewZ, lViewZ = viewZ;",
+
+			"float centerViewZ = -getViewZ( depth );",
+			"bool rBreak = false, lBreak = false;",
 
 			"for( int i = 1; i <= KERNEL_RADIUS; i ++ ) {",
 
@@ -85,35 +109,23 @@ THREE.DepthLimitedBlurShader = {
 				"vec2 sampleUvOffset = sampleUvOffsets[i] * vInvSize;",
 
 				"vec2 sampleUv = vUv + sampleUvOffset;",
-				"perspectiveDepth = unpackRGBAToDepth( texture2D( tDepth, sampleUv ) );",
-				"viewZ = -perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
+				"float viewZ = -getViewZ( getDepth( sampleUv ) );",
 
-				"if( abs( viewZ - rViewZ ) <= depthCutoff ) {",
+				"if( abs( viewZ - centerViewZ ) > depthCutoff ) rBreak = true;",
+
+				"if( ! rBreak ) {",
 					"diffuseSum += texture2D( tDiffuse, sampleUv ) * sampleWeight;",
 					"weightSum += sampleWeight;",
-					//"rViewZ = viewZ;",
 				"}",
-				"else {",
-					"break;",
-				"}",
-			"}",
 
-			"for( int i = 1; i <= KERNEL_RADIUS; i ++ ) {",
+				"sampleUv = vUv - sampleUvOffset;",
+				"viewZ = -getViewZ( getDepth( sampleUv ) );",
 
-				"float sampleWeight = sampleWeights[i];",
-				"vec2 sampleUvOffset = sampleUvOffsets[i] * vInvSize;",
+				"if( abs( viewZ - centerViewZ ) > depthCutoff ) lBreak = true;",
 
-				"vec2 sampleUv = vUv - sampleUvOffset;",
-				"perspectiveDepth = unpackRGBAToDepth( texture2D( tDepth, sampleUv ) );",
-				"viewZ = -perspectiveDepthToViewZ( perspectiveDepth, cameraNear, cameraFar );",
-
-				"if( abs( viewZ - lViewZ ) <= depthCutoff ) {",
+				"if( ! lBreak ) {",
 					"diffuseSum += texture2D( tDiffuse, sampleUv ) * sampleWeight;",
 					"weightSum += sampleWeight;",
-					//"lViewZ = viewZ;",
-				"}",
-				"else {",
-					"break;",
 				"}",
 
 			"}",
