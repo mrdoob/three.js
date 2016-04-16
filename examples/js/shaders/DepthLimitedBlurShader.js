@@ -92,9 +92,6 @@ THREE.DepthLimitedBlurShader = {
 
 		"void main() {",
 
-			"float weightSum = sampleWeights[0];",
-			"vec4 diffuseSum = texture2D( tDiffuse, vUv ) * weightSum;",
-
 			"float depth = getDepth( vUv );",
 			"if( depth >= ( 1.0 - EPSILON ) ) {",
 				"discard;",
@@ -102,6 +99,9 @@ THREE.DepthLimitedBlurShader = {
 
 			"float centerViewZ = -getViewZ( depth );",
 			"bool rBreak = false, lBreak = false;",
+
+			"float weightSum = sampleWeights[0];",
+			"vec4 diffuseSum = texture2D( tDiffuse, vUv ) * weightSum;",
 
 			"for( int i = 1; i <= KERNEL_RADIUS; i ++ ) {",
 
@@ -130,7 +130,7 @@ THREE.DepthLimitedBlurShader = {
 
 			"}",
 
-			"gl_FragColor = ( weightSum > 0.0 ) ? diffuseSum / weightSum : diffuseSum;",
+			"gl_FragColor = diffuseSum / weightSum;",
 
 		"}"
 

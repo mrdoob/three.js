@@ -160,8 +160,8 @@
 					depthTexture.minFilter = THREE.NearestFilter;
 					depthTexture.maxFilter = THREE.NearestFilter;
 
-					normalRenderTarget.depthBuffer = true;
-					normalRenderTarget.depthTexture = depthTexture;
+					beautyRenderTarget.depthBuffer = true;
+					beautyRenderTarget.depthTexture = depthTexture;
 				}
 				else {
 					depthRenderTarget = saoRenderTarget.clone();
@@ -184,7 +184,7 @@
 
 				saoMaterial = new THREE.ShaderMaterial( THREE.SAOShader );
 				saoMaterial.defines[ 'DIFFUSE_TEXTURE' ] = 0;
-				saoMaterial.defines[ 'NORMAL_TEXTURE' ] = 1;
+				saoMaterial.defines[ 'NORMAL_TEXTURE' ] = 0;
 				saoMaterial.defines[ 'DEPTH_PACKING' ] = supportsDepthTextureExtension ? 0 : 1;
 				saoMaterial.defines[ 'MODE' ] = 2;
 				saoMaterial.uniforms[ "tDepth" ].value = ( supportsDepthTextureExtension ) ? depthTexture : depthRenderTarget;
@@ -315,15 +315,12 @@
 					return;
 				}
 
-				if( supportsDepthTextureExtension ) {
+				renderer.setClearColor( 0x000000 );
+				renderer.render( scene, camera, beautyRenderTarget, true );
 
-					renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget );
-
-				}
-				else {
+				if( ! supportsDepthTextureExtension ) {
 
 					renderer.renderOverride( depthMaterial, scene, camera, depthRenderTarget );
-					renderer.renderOverride( normalMaterial, scene, camera, normalRenderTarget );
 
 				}
 
@@ -339,9 +336,6 @@
 					return;
 				}
 
-				renderer.setClearColor( 0x000000 );
-				renderer.render( scene, camera, null, true );
-
 				renderer.renderPass( saoMaterial, saoRenderTarget, 0xffffff, 1.0 );
 				if( params.saoBlur ) {
 					renderer.renderPass( vBlurMaterial, blurIntermediateRenderTarget, 0xffffff, 1.0 );
@@ -354,6 +348,8 @@
 					return;
 				}
 
+				copyMaterial.uniforms[ 'tDiffuse' ].value = beautyRenderTarget;
+				renderer.renderPass( copyMaterial, null, 0x000000, 0.0 );
 				renderer.renderPass( saoModulateMaterial, null );
 			}
 
