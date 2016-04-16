@@ -41,10 +41,21 @@ THREE.SAOShader = {
 	vertexShader: [
 
 		"varying vec2 vUv;",
+		"varying vec2 vInvSize;",
+		"varying float vScaleDividedByCameraFar;",
+		"varying float vMinResolutionMultipliedByCameraFar;",
+
+		"uniform vec2 size;",
+		"uniform float scale;",
+		"uniform float cameraFar;",
+		"uniform float minResolution;",
 
 		"void main() {",
 
 			"vUv = uv;",
+			"vInvSize = 1.0 / size;",
+			"vScaleDividedByCameraFar = scale / cameraFar;",
+			"vMinResolutionMultipliedByCameraFar = minResolution * cameraFar;",
 
 			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
@@ -60,6 +71,9 @@ THREE.SAOShader = {
 		"#include <common>",
 
 		"varying vec2 vUv;",
+		"varying vec2 vInvSize;",
+		"varying float vScaleDividedByCameraFar;",
+		"varying float vMinResolutionMultipliedByCameraFar;",
 
 		"#if DIFFUSE_TEXTURE == 1",
 			"uniform sampler2D tDiffuse;",
@@ -121,8 +135,8 @@ THREE.SAOShader = {
 		"vec3 getViewPosition( const in vec2 screenPosition, const in float depth, const in float viewZ ) {",
 
 			"float clipW = cameraProjectionMatrix[2][3] * viewZ + cameraProjectionMatrix[3][3];",
-			"vec4 clipPosition = vec4( ( vec3( screenPosition, depth ) - 0.5 ) * 2.0, clipW );",
-			"clipPosition.xyz *= clipW;", // unproject to homogeneous coordinates
+			"vec4 clipPosition = vec4( ( vec3( screenPosition, depth ) - 0.5 ) * 2.0, 1.0 );",
+			"clipPosition *= clipW;", // unprojection.
 			"return ( cameraInverseProjectionMatrix * clipPosition ).xyz;",
 
 		"}",
@@ -138,14 +152,11 @@ THREE.SAOShader = {
 		"}",
 
 		"float getOcclusion( const in vec3 centerViewPosition, const in vec3 centerViewNormal, const in vec3 sampleViewPosition ) {",
-			// these two are constants based on uniforms
-			"float scaleDividedByCameraFar = scale / cameraFar;",
-			"float minResolutionMultipliedByCameraFar = minResolution * cameraFar;",
 
 			"vec3 viewDelta = sampleViewPosition - centerViewPosition;",
 			"float viewDistance = length( viewDelta );",
-			"float scaledScreenDistance = scaleDividedByCameraFar * viewDistance;",
-			"return max(0.0, (dot(centerViewNormal, viewDelta) - minResolutionMultipliedByCameraFar) / scaledScreenDistance - bias) / (1.0 + pow2( scaledScreenDistance ) );",
+			"float scaledScreenDistance = vScaleDividedByCameraFar * viewDistance;",
+			"return max(0.0, (dot(centerViewNormal, viewDelta) - vMinResolutionMultipliedByCameraFar) / scaledScreenDistance - bias) / (1.0 + pow2( scaledScreenDistance ) );",
 
 		"}",
 
@@ -159,7 +170,7 @@ THREE.SAOShader = {
 
 			// jsfiddle that shows sample pattern: https://jsfiddle.net/a16ff1p7/
 			"float angle = rand( vUv + randomSeed ) * PI2;",
-			"vec2 radius = vec2( kernelRadius * INV_NUM_SAMPLES ) / size;",
+			"vec2 radius = vec2( kernelRadius * INV_NUM_SAMPLES ) * vInvSize;",
 			"vec2 radiusStep = radius;",
 
 			"float occlusionSum = 0.0;",
@@ -182,7 +193,9 @@ THREE.SAOShader = {
 
 			"}",
 
-			"return ( weightSum == 0.0 ) ? occlusionSum : ( occlusionSum * ( intensity / weightSum ) );",
+			"if( weightSum == 0.0 ) discard;",
+
+			"return occlusionSum * ( intensity / weightSum );",
 
 		"}",
 
@@ -197,8 +210,10 @@ THREE.SAOShader = {
 			"float centerViewZ = getViewZ( centerDepth );",
 			"vec3 viewPosition = getViewPosition( vUv, centerDepth, centerViewZ );",
 
+			"float ambientOcclusion = getAmbientOcclusion( viewPosition );",
+
 			"gl_FragColor = getDefaultColor( vUv );",
-			"gl_FragColor.xyz *= 1.0 - getAmbientOcclusion( viewPosition );",
+			"gl_FragColor.xyz *=  1.0 - ambientOcclusion;",
 
 		"}"
 
