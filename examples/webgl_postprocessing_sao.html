@@ -153,10 +153,11 @@
 				blurIntermediateRenderTarget = saoRenderTarget.clone();
 				beautyRenderTarget = saoRenderTarget.clone();
 				normalRenderTarget = saoRenderTarget.clone();
+				depthRenderTarget = saoRenderTarget.clone();
 
 				if( supportsDepthTextureExtension ) {
 					depthTexture = new THREE.DepthTexture();
-					depthTexture.type = isWebGL2 ? THREE.FloatType : THREE.UnsignedShortType;
+					depthTexture.type = THREE.FloatType;// : THREE.UnsignedShortType;
 					depthTexture.minFilter = THREE.NearestFilter;
 					depthTexture.maxFilter = THREE.NearestFilter;
 
@@ -164,7 +165,6 @@
 					beautyRenderTarget.depthTexture = depthTexture;
 				}
 				else {
-					depthRenderTarget = saoRenderTarget.clone();
 					depthRenderTarget.texture.minFilter = THREE.NearestFilter;
 					depthRenderTarget.texture.maxFilter = THREE.NearestFilter;
 				}
@@ -267,10 +267,7 @@
 				hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 				vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 
-				if( depthRenderTarget ) {
-					depthRenderTarget.setSize( width, height );
-				}
-
+				depthRenderTarget.setSize( width, height );
 				beautyRenderTarget.setSize( width, height );
 				normalRenderTarget.setSize( width, height );
 				saoRenderTarget.setSize( width, height );
