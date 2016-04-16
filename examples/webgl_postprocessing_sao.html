@@ -267,8 +267,11 @@
 				hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 				vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 
-				if( depthRenderTarget ) depthRenderTarget.setSize( width, height );
+				if( depthRenderTarget ) {
+					depthRenderTarget.setSize( width, height );
+				}
 
+				beautyRenderTarget.setSize( width, height );
 				normalRenderTarget.setSize( width, height );
 				saoRenderTarget.setSize( width, height );
 				blurIntermediateRenderTarget.setSize( width, height );
