@@ -157,7 +157,7 @@
 
 				if( supportsDepthTextureExtension ) {
 					depthTexture = new THREE.DepthTexture();
-					depthTexture.type = THREE.FloatType;// : THREE.UnsignedShortType;
+					depthTexture.type = isWebGL2 ? THREE.FloatType : THREE.UnsignedShortType;
 					depthTexture.minFilter = THREE.NearestFilter;
 					depthTexture.maxFilter = THREE.NearestFilter;
 
