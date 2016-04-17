@@ -16,25 +16,23 @@ THREE.SpotLightHelper = function ( light ) {
 
 	var geometry = new THREE.BufferGeometry();
 
-	var positions = [];
-
-	positions.push(
+	var positions = [
 		0, 0, 0,   0,   0,   1,
 		0, 0, 0,   1,   0,   1,
 		0, 0, 0, - 1,   0,   1,
 		0, 0, 0,   0,   1,   1,
 		0, 0, 0,   0, - 1,   1
-	);
+	];
 
-	var length = 32;
+	for ( var i = 0, j = 1, l = 32; i < l; i ++, j ++ ) {
 
-	for ( var i = 0; i < length; i ++ ) {
+		var p1 = ( i / l ) * Math.PI * 2;
+		var p2 = ( j / l ) * Math.PI * 2;
 
-		var p1 = ( i / length ) * Math.PI * 2;
-		var p2 = ( ( i + 1 ) / length ) * Math.PI * 2;
-
-		positions.push( Math.cos( p1 ), Math.sin( p1 ), 1 );
-		positions.push( Math.cos( p2 ), Math.sin( p2 ), 1 );
+		positions.push(
+			Math.cos( p1 ), Math.sin( p1 ), 1,
+			Math.cos( p2 ), Math.sin( p2 ), 1
+		);
 
 	}
 
