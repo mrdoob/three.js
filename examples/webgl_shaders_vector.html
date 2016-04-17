@@ -109,7 +109,7 @@
 				camera.position.set( 0, 100, 500 );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.center.set( 0, 100, 0 );
+				controls.target.set( 0, 100, 0 );
 
 				scene = new THREE.Scene();
 
@@ -325,9 +325,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				document.body.appendChild( stats.domElement );
+				document.body.appendChild( stats.dom );
 
 				document.addEventListener( 'mousedown', toggle, false );
 

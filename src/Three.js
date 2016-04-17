@@ -272,6 +272,7 @@ THREE.LuminanceFormat = 1022;
 THREE.LuminanceAlphaFormat = 1023;
 // THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
 THREE.RGBEFormat = THREE.RGBAFormat; //1024;
+THREE.DepthFormat = 1026;
 
 // DDS / ST3C Compressed texture formats
 
@@ -330,13 +331,7 @@ THREE.RGBM7Encoding = 3004;
 THREE.RGBM16Encoding = 3005;
 THREE.RGBDEncoding = 3006; // MaxRange is 256.
 
-// Depth format
-
-THREE.AutoDepthFormat = 3100;  // switches based on camera type, uses gl_FragCoord.z
-THREE.LinearClipZDepthFormat = 3101;	// used by orthographic cameras
-THREE.InvClipZDepthFormat = 3102;  // used by perspective cameras
-
 // Depth packing strategies
 
-THREE.LinearDepthPacking = 3200;  // for writing to float textures for high precision or for visualizing results in RGB buffers
+THREE.BasicDepthPacking = 3200;  // for writing to float textures for high precision or for visualizing results in RGB buffers
 THREE.RGBADepthPacking = 3201; // for packing into RGBA buffers.

@@ -48,9 +48,7 @@
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
+				container.appendChild(stats.dom);
 
 				groundMaterial = new THREE.MeshPhongMaterial( { emissive: 0xbbbbbb } );
 				planeGeometry = new THREE.PlaneBufferGeometry( 16000, 16000 );

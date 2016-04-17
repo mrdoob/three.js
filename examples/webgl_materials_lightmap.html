@@ -15,11 +15,6 @@
 			}
 			h1 { }
 			a { color:skyblue }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #abc !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -141,7 +136,7 @@
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// MODEL
 

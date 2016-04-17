@@ -110,7 +110,7 @@ THREE.SSAOShader = {
 			"float cameraCoef = 2.0 * cameraNear;",
 
 			// "return ( 2.0 * cameraNear ) / ( cameraFar + cameraNear - unpackDepth( texture2D( tDepth, coord ) ) * ( cameraFar - cameraNear ) );",
-			"return cameraCoef / ( cameraFarPlusNear - unpackRGBAToLinearUnit( texture2D( tDepth, coord ) ) * cameraFarMinusNear );",
+			"return cameraCoef / ( cameraFarPlusNear - unpackRGBAToDepth( texture2D( tDepth, coord ) ) * cameraFarMinusNear );",
 
 
 		"}",

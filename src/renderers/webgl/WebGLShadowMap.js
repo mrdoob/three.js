@@ -47,7 +47,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	// init
 
 	var depthMaterialTemplate = new THREE.MeshDepthMaterial();
-	depthMaterialTemplate.depthFormat = THREE.AutoDepthFormat;
 	depthMaterialTemplate.depthPacking = THREE.RGBADepthPacking;
 	depthMaterialTemplate.clipping = true;
 
@@ -370,6 +369,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		result.clipShadows = material.clipShadows;
 		result.clippingPlanes = material.clippingPlanes;
 		result.wireframeLinewidth = material.wireframeLinewidth;
+		result.linewidth = material.linewidth;
 
 		if ( isPointLight && result.uniforms.lightPos !== undefined ) {
 
