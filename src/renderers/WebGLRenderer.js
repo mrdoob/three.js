@@ -2065,7 +2065,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.envMap.value = material.envMap;
 
-		// don't flip CubeTexture envMaps, flip everything else (WebGLRenderTargetCube)
+		// don't flip CubeTexture envMaps, flip everything else:
+		//  WebGLRenderTargetCube will be flipped for backwards compatibility
+		//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
+		// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
 		uniforms.flipEnvMap.value = ( ! ( material.envMap instanceof THREE.CubeTexture ) ) ? 1 : - 1;
 
 		uniforms.reflectivity.value = material.reflectivity;
@@ -3030,10 +3033,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.allocTextureUnit = allocTextureUnit;
 
+	//this.setTexture2D = setTexture2D;
 	this.setTexture2D = ( function() {
 
 		var warned = false;
 
+		// backwards compatibility: peel texture.texture
 		return function( texture, slot ) {
 
 			if ( texture instanceof THREE.WebGLRenderTarget ) {
@@ -3049,6 +3054,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			// in the future, texture will be expected to be a Texture instance
 			setTexture2D( texture, slot );
 
 		};
@@ -3074,12 +3080,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}() );
 
+	//this.setTextureCube = setTextureCube;
 	this.setTextureCube = ( function() {
 
 		var warned = false;
 
 		return function( texture, slot ) {
 
+			// backwards compatibility: peel texture.texture
 			if ( texture instanceof THREE.WebGLRenderTargetCube ) {
 
 				if ( ! warned ) {
@@ -3093,11 +3101,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			// currently relying on the fact that WebGLRenderTargetCube.texture is a Texture and NOT a CubeTexture
 			if ( texture instanceof THREE.CubeTexture ||
 				 ( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
 
 				// CompressedTexture can have Array in image :/
 
+				// this function alone should take care of cube textures in the future
 				setTextureCube( texture, slot );
 
 			} else {
