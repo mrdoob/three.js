@@ -1,17 +1,17 @@
-THREE.MemoryBlockSize = 32768; // 32K as a wild guess
+THREE.MemoryBlockSize = 1024*16; // 32K as a wild guess
 THREE.BlockAllocator = {
 
-    currentBuffer: new ArrayBuffer( THREE.MemoryBlockSize ),
+    currentBuffer: new Float32Array( THREE.MemoryBlockSize ),
     currentOffset: 0,
 
     getFloat32: function ( length ) {
 
         var buffer = this.currentBuffer,
             start = this.currentOffset,
-            bytes = length * Float32Array.BYTES_PER_ELEMENT,
+            bytes = length,// * Float32Array.BYTES_PER_ELEMENT,
             newOffset = start + bytes;
 
-        if ( newOffset > buffer.byteLength ) {
+        if ( newOffset >= THREE.MemoryBlockSize ) {
             // insufficient free memory in buffer
 
             buffer = new Float32Array( THREE.MemoryBlockSize );
