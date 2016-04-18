@@ -120,7 +120,11 @@ Object.assign( THREE.Vector3, {
 
 	divideScalar: function( r, ro, a, ao, s ) {
 
-		THREE.Vector3.multiplyScalar( r, ro, a, ao, 1.0 / s );
+		s = 1.0 / s;
+
+		if( ! isFinite( s ) ) s = 0;
+
+		THREE.Vector3.multiplyScalar( r, ro, a, ao, s );
 
 	},
 
@@ -157,7 +161,7 @@ Object.assign( THREE.Vector3, {
 
 	},
 
-	ceiling: function( r, ro, v, vo ) {
+	ceil: function( r, ro, v, vo ) {
 
 		r[ro+0] = Math.ceil( v[vo+0] );
 		r[ro+1] = Math.ceil( v[vo+1] );
@@ -187,7 +191,7 @@ Object.assign( THREE.Vector3, {
 
 	},
 
-	lengthSq: function( v,vo ) {
+	lengthSq: function( v, vo ) {
 
 		var x = v[vo+0], y = v[vo+1], z = v[vo+2];
 		return Math.fround( x*x + y*y + z*z );
@@ -226,21 +230,12 @@ Object.assign( THREE.Vector3, {
 	normalize: function( r, ro, v, vo ) {
 
 		var x = v[vo+0], y = v[vo+1], z = v[vo+2];
-		var scalar = x*x + y*y + z*z;
-		if( Math.abs( scalar ) < 0.000001 ) {
+		var scalar = 1.0 / Math.sqrt( x*x + y*y + z*z );
+		if( ! isFinite( scalar ) ) scalar = 0.0;
 
-			r[ro+0] = r[ro+1] = r[ro+2] = 0.0;
-
-		}
-		else {
-
-			scalar = 1.0 / Math.sqrt( scalar );
-
-			r[ro+0] = v[vo+0] * scalar;
-			r[ro+1] = v[vo+1] * scalar;
-			r[ro+2] = v[vo+2] * scalar;
-
-		}
+		r[ro+0] = v[vo+0] * scalar;
+		r[ro+1] = v[vo+1] * scalar;
+		r[ro+2] = v[vo+2] * scalar;
 
 		return this;
 
@@ -248,14 +243,14 @@ Object.assign( THREE.Vector3, {
 
 	distance: function( a, ao, b, bo ) {
 
-		var x = b[bo+0] - a[ao+0], y = b[bo+1] - a[ao+1], z = b[bo+1] - a[ao+0];
+		var x = b[bo+0] - a[ao+0], y = b[bo+1] - a[ao+1], z = b[bo+2] - a[ao+2];
 		return Math.sqrt( x*x + y*y + z*z );
 
 	},
 
 	distanceSq: function( a, ao, b, bo ) {
 
-		var x = b[bo+0] - a[ao+0], y = b[bo+1] - a[ao+1], z = b[bo+1] - a[ao+0];
+		var x = b[bo+0] - a[ao+0], y = b[bo+1] - a[ao+1], z = b[bo+2] - a[ao+2];
 		return x*x + y*y + z*z;
 
 	},
@@ -621,7 +616,7 @@ THREE.Vector3.prototype = {
 
 		// This function assumes min < max, if this assumption isn't true it will not operate correctly
 
-		THREE.Vector3.clamp( this.array, this.offset, this.array, this.offset, min.array, min.offset, max.array, min.offset );
+		THREE.Vector3.clamp( this.array, this.offset, this.array, this.offset, min.array, min.offset, max.array, max.offset );
 
 		return this;
 
@@ -727,21 +722,7 @@ THREE.Vector3.prototype = {
 
 	normalize: function () {
 
-		var a = this.array;
-
-		var scalar = 1.0 / Math.sqrt( a[0] * a[0] + a[1] * a[1] + a[2] * a[2] );
-		if( ! isFinite( scalar ) ) {
-
-			a[0] = a[1] = a[2] = 0.0;
-
-		}
-		else {
-
-			a[0] *= scalar;
-			a[1] *= scalar;
-			a[2] *= scalar;
-
-		}
+		THREE.Vector3.normalize( this.array, this.offset, this.array, this.offset );
 
 		return this;
 
