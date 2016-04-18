@@ -85,6 +85,14 @@ Object.assign( THREE.Vector3, {
 
 	},
 
+	subSelf: function( r, v ) {
+
+		r[0] -= v[0];
+		r[1] -= v[1];
+		r[2] -= v[2];
+
+	},
+
 	subScalar: function( r, a, b ) {
 
 		THREE.Vector3.addScalar( r, a, -b );
@@ -230,9 +238,25 @@ Object.assign( THREE.Vector3, {
 
 	},
 
-	normalize: function( r, v ) {
+	normalize: function( r, a ) {
 
-		THREE.Vector3.divideScalar( r, r, THREE.Vector3.magnitude( v ) );
+		var scalar = a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
+		if( Math.abs( scalar ) < 0.000001 ) {
+
+			r[0] = r[1] = r[2] = 0.0;
+
+		}
+		else {
+
+			scalar = 1.0 / Math.sqrt( scalar );
+
+			r[0] = a[0] * scalar;
+			r[1] = a[1] * scalar;
+			r[2] = a[2] * scalar;
+
+		}
+
+		return this;
 
 	},
 
