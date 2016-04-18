@@ -3100,6 +3100,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			// currently relying on the fact that WebGLRenderTargetCube.texture is a Texture and NOT a CubeTexture
+			// TODO: unify these code paths
 			if ( texture instanceof THREE.CubeTexture ||
 				 ( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
 
