@@ -3054,7 +3054,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			// in the future, texture will be expected to be a Texture instance
 			setTexture2D( texture, slot );
 
 		};
@@ -3080,7 +3079,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}() );
 
-	//this.setTextureCube = setTextureCube;
 	this.setTextureCube = ( function() {
 
 		var warned = false;
@@ -3107,7 +3105,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// CompressedTexture can have Array in image :/
 
-				// this function alone should take care of cube textures in the future
+				// this function alone should take care of cube textures
 				setTextureCube( texture, slot );
 
 			} else {
