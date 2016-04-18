@@ -8,21 +8,23 @@
  * @author Ben Houston / https://clara.io
  */
 
-THREE.Vector3 = function ( array, x, y, z ) {
+ THREE.Vector3 = function ( array, x, y, z ) {
 
-	if( typeof buffer === 'Number' ) {
-		this.array = new Float32Array( 3 );
-		z = y; y = x; x = array;
-	}
-	else {
-		this.array = array;
-	}
+ 	if( !( ( array instanceof Float32Array ) || ( array === undefined ) ) ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
+ 		z = y; y = x; x = array; array = null;
 
-};
+ 	}
+
+	this.array = array || new Float32Array( 3 );
+
+ 	if( x !== undefined ) this.set( x, y, z );
+
+ 	return this;
+
+ };
+
+
 
 THREE.Vector3.set = function( r, x, y, z ) {
 
@@ -183,9 +185,20 @@ THREE.Vector3.lengthSq = function( v ) {
 
 }
 
-THREE.Vector3.length = function( v ) {
+// NOTE: using magnitude because THREE.VEctor3.length is defined as the number of function arguments to the constructor THREE.Vector3(), argh.
+THREE.Vector3.magnitude = function( v ) {
 
 	return Math.sqrt( THREE.Vector3.lengthSq( v ) );
+
+}
+
+THREE.Vector3.lerp = function( r, a, b, alpha ) {
+
+	var oneMinusAlpha = 1.0 - alpha;
+
+	r[0] = a[0] * oneMinusAlpha + b[0] * alpha;
+	r[1] = a[1] * oneMinusAlpha + b[1] * alpha;
+	r[2] = a[2] * oneMinusAlpha + b[2] * alpha;
 
 }
 
@@ -209,6 +222,8 @@ THREE.Vector3.copyArray = function( r, rOffset, v, vOffest ) {
 }
 
 
+
+
 THREE.Vector3.prototype = {
 
 	constructor: THREE.Vector3,
@@ -230,13 +245,16 @@ THREE.Vector3.prototype = {
 	},
 
 	set x( v ) { this.array[0] = v; },
+	set y( v ) { this.array[1] = v; },
+	set z( v ) { this.array[2] = v; },
+
 	get x() { return this.array[0]; },
-
-	set x( v ) { this.array[0] = v; },
 	get y() { return this.array[1]; },
-
-	set x( v ) { this.array[0] = v; },
 	get z() { return this.array[2]; },
+
+	setX: function ( v ) { this.array[0] = v; return this; },
+	setY: function ( v ) { this.array[1] = v; return this; },
+	setZ: function ( v ) { this.array[2] = v; return this; },
 
 	setComponent: function ( index, value ) {
 
@@ -320,7 +338,7 @@ THREE.Vector3.prototype = {
 
 	subScalar: function ( s ) {
 
-		THREE.Vector3.subScalar( this.array, this.array, v.array );
+		THREE.Vector3.subScalar( this.array, this.array, s );
 
 		return this;
 
@@ -541,6 +559,8 @@ THREE.Vector3.prototype = {
 
 		THREE.Vector3.divideScalar( this.array, this.array, scalar );
 
+		return this;
+
 	},
 
 	min: function ( v ) {
@@ -657,7 +677,7 @@ THREE.Vector3.prototype = {
 
 	length: function () {
 
-		return THREE.Vector3.length( this.array );
+		return THREE.Vector3.magnitude( this.array );
 
 	},
 
@@ -681,9 +701,7 @@ THREE.Vector3.prototype = {
 
 	lerp: function ( v, alpha ) {
 
-		this.x += ( v.x - this.x ) * alpha;
-		this.y += ( v.y - this.y ) * alpha;
-		this.z += ( v.z - this.z ) * alpha;
+	 THREE.Vector3.lerp( this.array, this.array, v.array, alpha );
 
 		return this;
 
@@ -783,7 +801,7 @@ THREE.Vector3.prototype = {
 
 	distanceTo: function ( v ) {
 
-		return THREE.Vector3.length( this.array, v.array );
+		return THREE.Vector3.magnitude( this.array, v.array );
 
 	},
 
