@@ -8,30 +8,22 @@
  * @author Ben Houston / https://clara.io
  */
 
- THREE.Vector3 = function ( x, y, z ) {
+ THREE.Vector3 = function ( array, x, y, z ) {
 
-	 /*if( !( ( array instanceof Float32Array ) || ( array === undefined ) ) ) {
+	 if( typeof array === 'number' ) {
 
 		 z = y; y = x; x = array; array = null;
 
-	 }*/
+	 }
 
-	this.array = new Float32Array( 3 );//THREE.DefaultAllocator.getFloat32( 3 );
+	this.array = array || THREE.DefaultAllocator.getFloat32( 3 );
 
 	 if( x !== undefined ) THREE.Vector3.set( this.array, x, y, z );
 
  };
 
 
-
-var h = function( target, methods ) {
-
-	for( var name in methods ) {
-
-		target[name] = methods[name];
-	}
-
-}( THREE.Vector3, {
+Object.assign( THREE.Vector3, {
 
 	set: function( r, x, y, z ) {
 
