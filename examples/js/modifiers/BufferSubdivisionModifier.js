@@ -69,15 +69,19 @@ TypedArrayHelper.prototype = {
     },
     resize: function (new_size) {
         if (new_size == 0) new_size = 8;
-        var nBuffer = new this.array_type(new_size * this.unit_size);
-        nBuffer.set(this.buffer.slice(0, this.length * this.unit_size));
-        this.buffer = nBuffer;
-        this.real_length = new_size;
+        if (new_size < this.length) {
+            this.buffer = this.buffer.subarray(0, this.length * this.unit_size);
+        } else {
+            var nBuffer = new this.array_type(new_size * this.unit_size);
+            nBuffer.set(this.buffer.subarray(0, this.length * this.unit_size));
+            this.buffer = nBuffer;
+            this.real_length = new_size;
+        }
     },
     from_existing: function (oldArray) {
         var new_size = oldArray.length;
         this.buffer = new this.array_type(new_size);//this.resize(oldArray.length);
-        this.buffer.set(oldArray.slice(0, oldArray.length));
+        this.buffer.set(oldArray);//.slice(0, oldArray.length));
         this.length = oldArray.length / this.unit_size;
         this.real_length = this.length;
     },
