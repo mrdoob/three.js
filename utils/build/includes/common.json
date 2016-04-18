@@ -1,5 +1,6 @@
 [
 	"src/Three.js",
+	"src/math/Allocators.js",
 	"src/math/Color.js",
 	"src/math/Quaternion.js",
 	"src/math/Vector2.js",

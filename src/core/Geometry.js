@@ -383,17 +383,14 @@ THREE.Geometry.prototype = {
 
 			var face = this.faces[ f ];
 
-			var vA = this.vertices[ face.a ];
 			var vB = this.vertices[ face.b ];
+			var vA = this.vertices[ face.a ];
 			var vC = this.vertices[ face.c ];
 
-			cb.subVectors( vC, vB );
-			ab.subVectors( vA, vB );
-			cb.cross( ab );
-
-			cb.normalize();
-
-			face.normal.copy( cb );
+			THREE.Vector3.sub( cb.array, vC.array, vB.array );
+			THREE.Vector3.sub( ab.array, vA.array, vB.array );
+			THREE.Vector3.cross( cb.array, cb.array, ab.array );
+			THREE.Vector3.normalize( face.normal.array, cb.array );
 
 		}
 
