@@ -390,14 +390,7 @@ THREE.Geometry.prototype = {
 			THREE.Vector3.sub( cb.array, vC.array, vB.array );
 			THREE.Vector3.sub( ab.array, vA.array, vB.array );
 			THREE.Vector3.cross( cb.array, cb.array, ab.array );
-			THREE.Vector3.normalize( cb.array, cb.array );
-			/*cb.subVectors( vC, vB );
-			ab.subVectors( vA, vB );
-			cb.cross( ab );
-
-			cb.normalize();*/
-
-			THREE.Vector3.copy( face.normal.array, cb.array );
+			THREE.Vector3.normalize( face.normal.array, cb.array );
 
 		}
 
