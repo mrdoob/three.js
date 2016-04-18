@@ -16,11 +16,9 @@
 
 	 }*/
 
-	this.array = THREE.DefaultAllocator.getFloat32( 3 );
+	this.array = new Float32Array( 3 );//THREE.DefaultAllocator.getFloat32( 3 );
 
-	 if( x !== undefined ) this.set( x, y, z );
-
-	 return this;
+	 if( x !== undefined ) THREE.Vector3.set( this.array, x, y, z );
 
  };
 
