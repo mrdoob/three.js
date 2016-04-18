@@ -232,7 +232,7 @@ var h = function( target, methods ) {
 
 	normalize: function( r, v ) {
 
-		THREE.Vector3.divideScalar( r, THREE.Vector3.magnitude( v ) );
+		THREE.Vector3.divideScalar( r, r, THREE.Vector3.magnitude( v ) );
 
 	},
 
@@ -703,8 +703,22 @@ THREE.Vector3.prototype = {
 
 	normalize: function () {
 
-		THREE.Vector3.normalize( this.array, this.array );
-		
+		var a = this.array;
+
+		var scalar = 1.0 / Math.sqrt( a[0] * a[0] + a[1] * a[1] + a[2] * a[2] );
+		if( ! isFinite( scalar ) ) {
+
+			a[0] = a[1] = a[2] = 0.0;
+
+		}
+		else {
+
+			a[0] *= scalar;
+			a[1] *= scalar;
+			a[2] *= scalar;
+
+		}
+
 		return this;
 
 	},
