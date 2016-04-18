@@ -16,7 +16,7 @@
 
 	 }
 
-	this.array = array || new Float32Array( 3 );
+	this.array = array || THREE.DefaultAllocator.getFloat32( 3 );
 
 	 if( x !== undefined ) this.set( x, y, z );
 
@@ -220,8 +220,6 @@ THREE.Vector3.copyArray = function( r, rOffset, v, vOffest ) {
 	r[ rOffset + 2 ] = v[ vOffest + 2 ];
 
 }
-
-
 
 
 THREE.Vector3.prototype = {
