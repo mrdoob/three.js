@@ -5,9 +5,18 @@
  * @author mikael emtinger / http://gomo.se/
  * @author egraether / http://egraether.com/
  * @author WestLangley / http://github.com/WestLangley
+ * @author Ben Houston / https://clara.io
  */
 
-THREE.Vector3 = function ( x, y, z ) {
+THREE.Vector3 = function ( array, x, y, z ) {
+
+	if( typeof buffer === 'Number' ) {
+		this.array = new Float32Array( 3 );
+		z = y; y = x; x = array;
+	}
+	else {
+		this.array = array;
+	}
 
 	this.x = x || 0;
 	this.y = y || 0;
@@ -15,15 +24,198 @@ THREE.Vector3 = function ( x, y, z ) {
 
 };
 
+THREE.Vector3.set = function( r, x, y, z ) {
+
+	r[0] = x;
+	r[1] = y;
+	r[2] = z;
+
+};
+
+THREE.Vector3.setComponent = function( r, index, v ) {
+
+	r[index] = v;
+
+};
+
+THREE.Vector3.getComponent = function( v, index ) {
+
+	return v[index];
+
+};
+
+THREE.Vector3.copy = function( r, v ) {
+
+	r[0] = v[0];
+	r[1] = v[1];
+	r[2] = v[2];
+
+}
+
+THREE.Vector3.add = function( r, a, b ) {
+
+	r[0] = a[0] + b[0];
+	r[1] = a[1] + b[1];
+	r[2] = a[2] + b[2];
+
+}
+
+THREE.Vector3.addScalar = function( r, a, b ) {
+
+	r[0] = a[0] + b;
+	r[1] = a[1] + b;
+	r[2] = a[2] + b;
+
+}
+
+THREE.Vector3.sub = function( r, a, b ) {
+
+	r[0] = a[0] - b[0];
+	r[1] = a[1] - b[1];
+	r[2] = a[2] - b[2];
+
+}
+
+THREE.Vector3.subScalar = function( r, a, b ) {
+
+	THREE.Vector3.addScalar( r, a, -b );
+
+}
+
+THREE.Vector3.multiply = function( r, a, b ) {
+
+	r[0] = a[0] * b[0];
+	r[1] = a[1] * b[1];
+	r[2] = a[2] * b[2];
+
+}
+
+THREE.Vector3.multiplyScalar = function( r, a, scalar ) {
+
+	if( ! isFinite( scalar ) ) scalar = 0.0;
+
+	r[0] = a[0] * scalar;
+	r[1] = a[1] * scalar;
+	r[2] = a[2] * scalar;
+
+}
+
+THREE.Vector3.divide = function( r, a, b ) {
+
+	r[0] = a[0] / b[0];
+	r[1] = a[1] / b[1];
+	r[2] = a[2] / b[2];
+
+}
+
+THREE.Vector3.divideScalar = function( r, a, scalar ) {
+
+	THREE.Vector3.multiplyScalar( r, a, 1.0 / scalar );
+
+}
+
+// TODO: auto-generate min, max, floor, ceiing, round functions?
+THREE.Vector3.min = function( r, a, b ) {
+
+	r[0] = Math.min( a[0], b[0] );
+	r[1] = Math.min( a[1], b[1] );
+	r[2] = Math.min( a[2], b[2] );
+
+}
+
+THREE.Vector3.max = function( r, a, b ) {
+
+	r[0] = Math.max( a[0], b[0] );
+	r[1] = Math.max( a[1], b[1] );
+	r[2] = Math.max( a[2], b[2] );
+
+}
+
+THREE.Vector3.clamp = function( r, v, min, max ) {
+
+	r[0] = Math.min( max[0], Math.max( v[0], min[0] ) );
+	r[1] = Math.min( max[1], Math.max( v[1], min[1] ) );
+	r[2] = Math.min( max[2], Math.max( v[2], min[2] ) );
+
+}
+
+THREE.Vector3.floor = function( r, v ) {
+
+	r[0] = Math.floor( v[0] );
+	r[1] = Math.floor( v[1] );
+	r[2] = Math.floor( v[2] );
+
+}
+
+THREE.Vector3.ceiling = function( r, v ) {
+
+	r[0] = Math.ceiling( v[0] );
+	r[1] = Math.ceiling( v[1] );
+	r[2] = Math.ceiling( v[2] );
+
+}
+
+THREE.Vector3.round = function( r, v ) {
+
+	r[0] = Math.round( v[0] );
+	r[1] = Math.round( v[1] );
+	r[2] = Math.round( v[2] );
+
+}
+
+THREE.Vector3.negate = function( r, v ) {
+
+	r[0] = -v[0];
+	r[1] = -v[1];
+	r[2] = -v[2];
+
+}
+
+THREE.Vector3.dot = function( a, b ) {
+
+	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+
+}
+
+THREE.Vector3.lengthSq = function( v ) {
+
+	return THREE.Vector3.dot( v, v );
+
+}
+
+THREE.Vector3.length = function( v ) {
+
+	return Math.sqrt( THREE.Vector3.lengthSq( v ) );
+
+}
+
+THREE.Vector3.cross = function( r, a, b ) {
+
+	var ax = a[0], ay = a[1], az = a[2];
+	var bx = b[1], by = b[1], bz = b[2];
+
+	r[0] = ay * bz - az * by;
+	r[1] = az * bx - ax * bz;
+	r[2] = ax * by - ay * bx;
+
+}
+
+THREE.Vector3.copyArray = function( r, rOffset, v, vOffest ) {
+
+	r[ rOffset + 0 ] = v[ vOffest + 0 ];
+	r[ rOffset + 1 ] = v[ vOffest + 1 ];
+	r[ rOffset + 2 ] = v[ vOffest + 2 ];
+
+}
+
+
 THREE.Vector3.prototype = {
 
 	constructor: THREE.Vector3,
 
 	set: function ( x, y, z ) {
 
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		THREE.Vector3.set( this.array, x, y, z );
 
 		return this;
 
@@ -31,61 +223,30 @@ THREE.Vector3.prototype = {
 
 	setScalar: function ( scalar ) {
 
-		this.x = scalar;
-		this.y = scalar;
-		this.z = scalar;
+		THREE.Vector3.set( this.array, scalar, scalar, scalar );
 
 		return this;
 
 	},
 
-	setX: function ( x ) {
+	set x( v ) { this.array[0] = v; },
+	get x() { return this.array[0]; },
 
-		this.x = x;
+	set x( v ) { this.array[0] = v; },
+	get y() { return this.array[1]; },
 
-		return this;
-
-	},
-
-	setY: function ( y ) {
-
-		this.y = y;
-
-		return this;
-
-	},
-
-	setZ: function ( z ) {
-
-		this.z = z;
-
-		return this;
-
-	},
+	set x( v ) { this.array[0] = v; },
+	get z() { return this.array[2]; },
 
 	setComponent: function ( index, value ) {
 
-		switch ( index ) {
-
-			case 0: this.x = value; break;
-			case 1: this.y = value; break;
-			case 2: this.z = value; break;
-			default: throw new Error( 'index is out of range: ' + index );
-
-		}
+		THREE.Vector3.setComponent( this.array, index, value );
 
 	},
 
 	getComponent: function ( index ) {
 
-		switch ( index ) {
-
-			case 0: return this.x;
-			case 1: return this.y;
-			case 2: return this.z;
-			default: throw new Error( 'index is out of range: ' + index );
-
-		}
+		return THREE.Vector3.getComponent( this.array, index );
 
 	},
 
@@ -97,9 +258,7 @@ THREE.Vector3.prototype = {
 
 	copy: function ( v ) {
 
-		this.x = v.x;
-		this.y = v.y;
-		this.z = v.z;
+		THREE.Vector3.copy( this.array, v.array );
 
 		return this;
 
@@ -114,9 +273,7 @@ THREE.Vector3.prototype = {
 
 		}
 
-		this.x += v.x;
-		this.y += v.y;
-		this.z += v.z;
+		THREE.Vector3.add( this.array, this.array, v.array );
 
 		return this;
 
@@ -124,9 +281,7 @@ THREE.Vector3.prototype = {
 
 	addScalar: function ( s ) {
 
-		this.x += s;
-		this.y += s;
-		this.z += s;
+		THREE.Vector3.add( this.array, this.array, s );
 
 		return this;
 
@@ -134,9 +289,7 @@ THREE.Vector3.prototype = {
 
 	addVectors: function ( a, b ) {
 
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
-		this.z = a.z + b.z;
+		THREE.Vector3.add( this.array, a.array, b.array );
 
 		return this;
 
@@ -144,9 +297,7 @@ THREE.Vector3.prototype = {
 
 	addScaledVector: function ( v, s ) {
 
-		this.x += v.x * s;
-		this.y += v.y * s;
-		this.z += v.z * s;
+		THREE.Vector3.addScaledVector( this.array, v.array, s );
 
 		return this;
 
@@ -161,9 +312,7 @@ THREE.Vector3.prototype = {
 
 		}
 
-		this.x -= v.x;
-		this.y -= v.y;
-		this.z -= v.z;
+		THREE.Vector3.sub( this.array, this.array, v.array );
 
 		return this;
 
@@ -171,9 +320,7 @@ THREE.Vector3.prototype = {
 
 	subScalar: function ( s ) {
 
-		this.x -= s;
-		this.y -= s;
-		this.z -= s;
+		THREE.Vector3.subScalar( this.array, this.array, v.array );
 
 		return this;
 
@@ -181,9 +328,7 @@ THREE.Vector3.prototype = {
 
 	subVectors: function ( a, b ) {
 
-		this.x = a.x - b.x;
-		this.y = a.y - b.y;
-		this.z = a.z - b.z;
+		THREE.Vector3.sub( this.array, a.array, b.array );
 
 		return this;
 
@@ -198,9 +343,7 @@ THREE.Vector3.prototype = {
 
 		}
 
-		this.x *= v.x;
-		this.y *= v.y;
-		this.z *= v.z;
+		THREE.Vector3.multiply( this.array, this.array, v.array );
 
 		return this;
 
@@ -208,19 +351,7 @@ THREE.Vector3.prototype = {
 
 	multiplyScalar: function ( scalar ) {
 
-		if ( isFinite( scalar ) ) {
-
-			this.x *= scalar;
-			this.y *= scalar;
-			this.z *= scalar;
-
-		} else {
-
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
-
-		}
+		THREE.Vector3.multiplyScalar( this.array, this.array, scalar );
 
 		return this;
 
@@ -228,9 +359,7 @@ THREE.Vector3.prototype = {
 
 	multiplyVectors: function ( a, b ) {
 
-		this.x = a.x * b.x;
-		this.y = a.y * b.y;
-		this.z = a.z * b.z;
+		THREE.Vector3.multiplyScalar( this.array, a.array, b.array );
 
 		return this;
 
@@ -402,9 +531,7 @@ THREE.Vector3.prototype = {
 
 	divide: function ( v ) {
 
-		this.x /= v.x;
-		this.y /= v.y;
-		this.z /= v.z;
+		THREE.Vector3.divide( this.array, this.array, v.array );
 
 		return this;
 
@@ -412,15 +539,13 @@ THREE.Vector3.prototype = {
 
 	divideScalar: function ( scalar ) {
 
-		return this.multiplyScalar( 1 / scalar );
+		THREE.Vector3.divideScalar( this.array, this.array, scalar );
 
 	},
 
 	min: function ( v ) {
 
-		this.x = Math.min( this.x, v.x );
-		this.y = Math.min( this.y, v.y );
-		this.z = Math.min( this.z, v.z );
+		THREE.Vector3.min( this.array, this.array, v.array );
 
 		return this;
 
@@ -428,9 +553,7 @@ THREE.Vector3.prototype = {
 
 	max: function ( v ) {
 
-		this.x = Math.max( this.x, v.x );
-		this.y = Math.max( this.y, v.y );
-		this.z = Math.max( this.z, v.z );
+		THREE.Vector3.max( this.array, this.array, v.array );
 
 		return this;
 
@@ -440,9 +563,7 @@ THREE.Vector3.prototype = {
 
 		// This function assumes min < max, if this assumption isn't true it will not operate correctly
 
-		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
-		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
-		this.z = Math.max( min.z, Math.min( max.z, this.z ) );
+		THREE.Vector3.clamp( this.array, this.array, min.array, max.array );
 
 		return this;
 
@@ -482,9 +603,7 @@ THREE.Vector3.prototype = {
 
 	floor: function () {
 
-		this.x = Math.floor( this.x );
-		this.y = Math.floor( this.y );
-		this.z = Math.floor( this.z );
+		THREE.Vector3.floor( this.array, this.array );
 
 		return this;
 
@@ -492,9 +611,7 @@ THREE.Vector3.prototype = {
 
 	ceil: function () {
 
-		this.x = Math.ceil( this.x );
-		this.y = Math.ceil( this.y );
-		this.z = Math.ceil( this.z );
+		THREE.Vector3.ceil( this.array, this.array );
 
 		return this;
 
@@ -502,9 +619,7 @@ THREE.Vector3.prototype = {
 
 	round: function () {
 
-		this.x = Math.round( this.x );
-		this.y = Math.round( this.y );
-		this.z = Math.round( this.z );
+		THREE.Vector3.round( this.array, this.array );
 
 		return this;
 
@@ -522,9 +637,7 @@ THREE.Vector3.prototype = {
 
 	negate: function () {
 
-		this.x = - this.x;
-		this.y = - this.y;
-		this.z = - this.z;
+		THREE.Vector3.negate( this.array, this.array );
 
 		return this;
 
@@ -532,19 +645,19 @@ THREE.Vector3.prototype = {
 
 	dot: function ( v ) {
 
-		return this.x * v.x + this.y * v.y + this.z * v.z;
+		return THREE.Vector3.dot( this.array, v.array );
 
 	},
 
 	lengthSq: function () {
 
-		return this.x * this.x + this.y * this.y + this.z * this.z;
+		return THREE.Vector3.lengthSq( this.array );
 
 	},
 
 	length: function () {
 
-		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
+		return THREE.Vector3.length( this.array );
 
 	},
 
@@ -593,11 +706,7 @@ THREE.Vector3.prototype = {
 
 		}
 
-		var x = this.x, y = this.y, z = this.z;
-
-		this.x = y * v.z - z * v.y;
-		this.y = z * v.x - x * v.z;
-		this.z = x * v.y - y * v.x;
+		THREE.Vector3.cross( this.array, this.array, v.array );
 
 		return this;
 
@@ -605,12 +714,7 @@ THREE.Vector3.prototype = {
 
 	crossVectors: function ( a, b ) {
 
-		var ax = a.x, ay = a.y, az = a.z;
-		var bx = b.x, by = b.y, bz = b.z;
-
-		this.x = ay * bz - az * by;
-		this.y = az * bx - ax * bz;
-		this.z = ax * by - ay * bx;
+		THREE.Vector3.cross( this.array, a.array, b.array );
 
 		return this;
 
@@ -679,17 +783,13 @@ THREE.Vector3.prototype = {
 
 	distanceTo: function ( v ) {
 
-		return Math.sqrt( this.distanceToSquared( v ) );
+		return THREE.Vector3.length( this.array, v.array );
 
 	},
 
 	distanceToSquared: function ( v ) {
 
-		var dx = this.x - v.x;
-		var dy = this.y - v.y;
-		var dz = this.z - v.z;
-
-		return dx * dx + dy * dy + dz * dz;
+		return THREE.Vector3.lengthSq( this.array, v.array );
 
 	},
 
@@ -748,11 +848,7 @@ THREE.Vector3.prototype = {
 
 	fromArray: function ( array, offset ) {
 
-		if ( offset === undefined ) offset = 0;
-
-		this.x = array[ offset ];
-		this.y = array[ offset + 1 ];
-		this.z = array[ offset + 2 ];
+		THREE.Vector3.copyArray( this.array, 0, array, ( offset === undefined ) ? 0 : offset );
 
 		return this;
 
@@ -760,12 +856,7 @@ THREE.Vector3.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
-
-		array[ offset ] = this.x;
-		array[ offset + 1 ] = this.y;
-		array[ offset + 2 ] = this.z;
+		THREE.Vector3.copyArray( array || [], offset, this.array, 0 );
 
 		return array;
 
@@ -773,13 +864,7 @@ THREE.Vector3.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-		if ( offset === undefined ) offset = 0;
-
-		index = index * attribute.itemSize + offset;
-
-		this.x = attribute.array[ index ];
-		this.y = attribute.array[ index + 1 ];
-		this.z = attribute.array[ index + 2 ];
+		THREE.Vector3.copyArray( this.array, 0, attribute.array, index * attribute.itemSize + offset );
 
 		return this;
 
