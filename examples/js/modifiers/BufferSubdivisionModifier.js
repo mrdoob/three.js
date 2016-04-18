@@ -72,10 +72,17 @@ TypedArrayHelper.prototype = {
         if (new_size < this.length) {
             this.buffer = this.buffer.subarray(0, this.length * this.unit_size);
         } else {
-            var nBuffer = new this.array_type(new_size * this.unit_size);
-            nBuffer.set(this.buffer.subarray(0, this.length * this.unit_size));
-            this.buffer = nBuffer;
-            this.real_length = new_size;
+            if (this.buffer.length < new_size * this.unit_size) {
+                var nBuffer = new this.array_type(new_size * this.unit_size);
+                nBuffer.set(this.buffer);
+                this.buffer = nBuffer;
+                this.real_length = new_size;
+            } else {
+                var nBuffer = new this.array_type(new_size * this.unit_size);
+                nBuffer.set(this.buffer.subarray(0, this.length * this.unit_size));
+                this.buffer = nBuffer;
+                this.real_length = new_size;
+            }
         }
     },
     from_existing: function (oldArray) {
