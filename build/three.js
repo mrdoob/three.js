@@ -3000,18 +3000,18 @@ THREE.Vector4.prototype = {
 			m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ],
 			m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ];
 
-		if ( ( Math.abs( m12 - m21 ) < epsilon )
-		   && ( Math.abs( m13 - m31 ) < epsilon )
-		   && ( Math.abs( m23 - m32 ) < epsilon ) ) {
+		if ( ( Math.abs( m12 - m21 ) < epsilon ) &&
+		     ( Math.abs( m13 - m31 ) < epsilon ) &&
+		     ( Math.abs( m23 - m32 ) < epsilon ) ) {
 
 			// singularity found
 			// first check for identity matrix which must have +1 for all terms
 			// in leading diagonal and zero in other terms
 
-			if ( ( Math.abs( m12 + m21 ) < epsilon2 )
-			   && ( Math.abs( m13 + m31 ) < epsilon2 )
-			   && ( Math.abs( m23 + m32 ) < epsilon2 )
-			   && ( Math.abs( m11 + m22 + m33 - 3 ) < epsilon2 ) ) {
+			if ( ( Math.abs( m12 + m21 ) < epsilon2 ) &&
+			     ( Math.abs( m13 + m31 ) < epsilon2 ) &&
+			     ( Math.abs( m23 + m32 ) < epsilon2 ) &&
+			     ( Math.abs( m11 + m22 + m33 - 3 ) < epsilon2 ) ) {
 
 				// this singularity is identity matrix so angle = 0
 
@@ -3096,9 +3096,9 @@ THREE.Vector4.prototype = {
 
 		// as we have reached here there are no singularities so we can handle normally
 
-		var s = Math.sqrt( ( m32 - m23 ) * ( m32 - m23 )
-						  + ( m13 - m31 ) * ( m13 - m31 )
-						  + ( m21 - m12 ) * ( m21 - m12 ) ); // used to normalize
+		var s = Math.sqrt( ( m32 - m23 ) * ( m32 - m23 ) +
+		                   ( m13 - m31 ) * ( m13 - m31 ) +
+		                   ( m21 - m12 ) * ( m21 - m12 ) ); // used to normalize
 
 		if ( Math.abs( s ) < 0.001 ) s = 1;
 
@@ -6026,7 +6026,7 @@ THREE.Ray.prototype = {
 			// else t0 is in front of the ray, so return the first collision point scaled by t0
 			return this.at( t0, optionalTarget );
 
-		}
+		};
 
 	}(),
 
@@ -23319,7 +23319,8 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 			gbone = this.geometry.bones[ b ];
 
-			if ( gbone.parent !== - 1 && gbone.parent !== null ) {
+			if ( gbone.parent !== - 1 && gbone.parent !== null &&
+					bones[ gbone.parent ] !== undefined ) {
 
 				bones[ gbone.parent ].add( bones[ b ] );
 
@@ -23468,14 +23469,6 @@ THREE.LOD = function () {
 		levels: {
 			enumerable: true,
 			value: []
-		},
-		objects: {
-			get: function () {
-
-				console.warn( 'THREE.LOD: .objects has been renamed to .levels.' );
-				return this.levels;
-
-			}
 		}
 	} );
 
@@ -31339,54 +31332,48 @@ THREE.WebGLUniforms = ( function() { // scope
 
 	// --- Utilities ---
 
-	// Array Cache (provides arrays for temporary use by type and size)
+	// Array Caches (provide typed arrays for temporary by size)
 
-		arrayCaches = [],
-		arrayCacheTypes = [],
-
-		allocTemporaryArray = function( type, size ) {
-
-			var typeIndex = arrayCacheTypes.indexOf( type );
-
-			if ( typeIndex === - 1 ) {
-
-				typeIndex = arrayCacheTypes.length;
-				arrayCacheTypes.push( type );
-				arrayCaches.push( [] );
-
-			}
-
-			var arrayCache = arrayCaches[ typeIndex ],
-				cachedArray = arrayCache[ size ];
-
-			if ( cachedArray === undefined ) {
-
-				cachedArray = new type( size );
-				arrayCache[ size ] = cachedArray;
-
-			}
-
-			return cachedArray;
-
-		},
+		arrayCacheF32 = [],
+		arrayCacheI32 = [],
 
 		uncacheTemporaryArrays = function() {
 
-			arrayCaches.length = 0;
-			arrayCacheTypes.length = 0;
+			arrayCacheF32.length = 0;
+			arrayCacheI32.length = 0;
 
 		},
 
 	// Flattening for arrays of vectors and matrices
 
-		flatten = function( array, stride ) {
+		flatten = function( array, nBlocks, blockSize ) {
 
-			var n = array.length,
-				r = allocTemporaryArray( Float32Array, n * stride );
+			var firstElem = array[ 0 ];
 
-			for ( var i = 0, offset = 0; i !== n; ++ i, offset += stride ) {
+			if ( firstElem <= 0 || firstElem > 0 ) return array;
+			// unoptimized: ! isNaN( firstElem )
+			// see http://jacksondunstan.com/articles/983
 
-				array[ i ].toArray( r, offset );
+			var n = nBlocks * blockSize,
+				r = arrayCacheF32[ n ];
+
+			if ( r === undefined ) {
+
+				r = new Float32Array( n );
+				arrayCacheF32[ n ] = r;
+
+			}
+
+			if ( nBlocks !== 0 ) {
+
+				firstElem.toArray( r, 0 );
+
+				for ( var i = 1, offset = 0; i !== nBlocks; ++ i ) {
+
+					offset += blockSize;
+					array[ i ].toArray( r, offset );
+
+				}
 
 			}
 
@@ -31398,7 +31385,14 @@ THREE.WebGLUniforms = ( function() { // scope
 
 		allocTexUnits = function( renderer, n ) {
 
-			var r = allocTemporaryArray( Int32Array, n );
+			var r = arrayCacheI32[ n ];
+
+			if ( r === undefined ) {
+
+				r = new Int32Array( n );
+				arrayCacheI32[ n ] = r;
+
+			}
 
 			for ( var i = 0; i !== n; ++ i )
 				r[ i ] = renderer.allocTextureUnit();
@@ -31524,22 +31518,19 @@ THREE.WebGLUniforms = ( function() { // scope
 
 		setValueV2a = function( gl, v ) {
 
-			if ( v.length === this.size ) v = flatten( v, 2 );
-			gl.uniform2fv( this.addr, v );
+			gl.uniform2fv( this.addr, flatten( v, this.size, 2 ) );
 
 		},
 
 		setValueV3a = function( gl, v ) {
 
-			if ( v.length === this.size ) v = flatten( v, 3 );
-			gl.uniform3fv( this.addr, v );
+			gl.uniform3fv( this.addr, flatten( v, this.size, 3 ) );
 
 		},
 
 		setValueV4a = function( gl, v ) {
 
-			if ( v.length === this.size ) v = flatten( v, 4 );
-			gl.uniform4fv( this.addr, v );
+			gl.uniform4fv( this.addr, flatten( v, this.size, 4 ) );
 
 		},
 
@@ -31547,22 +31538,19 @@ THREE.WebGLUniforms = ( function() { // scope
 
 		setValueM2a = function( gl, v ) {
 
-			if ( v.length === this.size ) v = flatten( v, 4 );
-			gl.uniformMatrix2fv( this.addr, false, v );
+			gl.uniformMatrix2fv( this.addr, false, flatten( v, this.size, 4 ) );
 
 		},
 
 		setValueM3a = function( gl, v ) {
 
-			if ( v.length === this.size ) v = flatten( v, 9 );
-			gl.uniformMatrix3fv( this.addr, false, v );
+			gl.uniformMatrix3fv( this.addr, false, flatten( v, this.size, 9 ) );
 
 		},
 
 		setValueM4a = function( gl, v ) {
 
-			if ( v.length === this.size ) v = flatten( v, 16 );
-			gl.uniformMatrix4fv( this.addr, false, v );
+			gl.uniformMatrix4fv( this.addr, false, flatten( v, this.size, 16 ) );
 
 		},
 
@@ -33469,6 +33457,19 @@ THREE.CanvasRenderer = function () {
 //
 
 THREE.MeshFaceMaterial = THREE.MultiMaterial;
+
+//
+
+Object.defineProperties( THREE.LOD.prototype, {
+	objects: {
+		get: function () {
+
+			console.warn( 'THREE.LOD: .objects has been renamed to .levels.' );
+			return this.levels;
+
+		}
+	}
+} );
 
 // File:src/extras/CurveUtils.js
 
