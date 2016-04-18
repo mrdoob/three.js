@@ -8,15 +8,15 @@
  * @author Ben Houston / https://clara.io
  */
 
- THREE.Vector3 = function ( array, x, y, z ) {
+ THREE.Vector3 = function ( x, y, z ) {
 
-	 if( !( ( array instanceof Float32Array ) || ( array === undefined ) ) ) {
+	 /*if( !( ( array instanceof Float32Array ) || ( array === undefined ) ) ) {
 
 		 z = y; y = x; x = array; array = null;
 
-	 }
+	 }*/
 
-	this.array = array || THREE.DefaultAllocator.getFloat32( 3 );
+	this.array = THREE.DefaultAllocator.getFloat32( 3 );
 
 	 if( x !== undefined ) this.set( x, y, z );
 
@@ -26,201 +26,217 @@
 
 
 
-THREE.Vector3.set = function( r, x, y, z ) {
+var h = function( target, methods ) {
 
-	r[0] = x;
-	r[1] = y;
-	r[2] = z;
+	for( var name in methods ) {
 
-};
+		target[name] = methods[name];
+	}
 
-THREE.Vector3.setComponent = function( r, index, v ) {
+}( THREE.Vector3, {
 
-	r[index] = v;
+	set: function( r, x, y, z ) {
 
-};
+		r[0] = x;
+		r[1] = y;
+		r[2] = z;
 
-THREE.Vector3.getComponent = function( v, index ) {
+	},
 
-	return v[index];
+	setComponent: function( r, index, v ) {
 
-};
+		r[index] = v;
 
-THREE.Vector3.copy = function( r, v ) {
+	},
 
-	r[0] = v[0];
-	r[1] = v[1];
-	r[2] = v[2];
+	getComponent: function( v, index ) {
 
-}
+		return v[index];
 
-THREE.Vector3.add = function( r, a, b ) {
+	},
 
-	r[0] = a[0] + b[0];
-	r[1] = a[1] + b[1];
-	r[2] = a[2] + b[2];
+	copy: function( r, v ) {
 
-}
+		r[0] = v[0];
+		r[1] = v[1];
+		r[2] = v[2];
 
-THREE.Vector3.addScalar = function( r, a, b ) {
+	},
 
-	r[0] = a[0] + b;
-	r[1] = a[1] + b;
-	r[2] = a[2] + b;
+	add: function( r, a, b ) {
 
-}
+		r[0] = a[0] + b[0];
+		r[1] = a[1] + b[1];
+		r[2] = a[2] + b[2];
 
-THREE.Vector3.sub = function( r, a, b ) {
+	},
 
-	r[0] = a[0] - b[0];
-	r[1] = a[1] - b[1];
-	r[2] = a[2] - b[2];
+	addScalar: function( r, a, b ) {
 
-}
+		r[0] = a[0] + b;
+		r[1] = a[1] + b;
+		r[2] = a[2] + b;
 
-THREE.Vector3.subScalar = function( r, a, b ) {
+	},
 
-	THREE.Vector3.addScalar( r, a, -b );
+	sub: function( r, a, b ) {
 
-}
+		r[0] = a[0] - b[0];
+		r[1] = a[1] - b[1];
+		r[2] = a[2] - b[2];
 
-THREE.Vector3.multiply = function( r, a, b ) {
+	},
 
-	r[0] = a[0] * b[0];
-	r[1] = a[1] * b[1];
-	r[2] = a[2] * b[2];
+	subScalar: function( r, a, b ) {
 
-}
+		THREE.Vector3.addScalar( r, a, -b );
 
-THREE.Vector3.multiplyScalar = function( r, a, scalar ) {
+	},
 
-	if( ! isFinite( scalar ) ) scalar = 0.0;
+	multiply: function( r, a, b ) {
 
-	r[0] = a[0] * scalar;
-	r[1] = a[1] * scalar;
-	r[2] = a[2] * scalar;
+		r[0] = a[0] * b[0];
+		r[1] = a[1] * b[1];
+		r[2] = a[2] * b[2];
 
-}
+	},
 
-THREE.Vector3.divide = function( r, a, b ) {
+	multiplyScalar: function( r, a, scalar ) {
 
-	r[0] = a[0] / b[0];
-	r[1] = a[1] / b[1];
-	r[2] = a[2] / b[2];
+		if( ! isFinite( scalar ) ) scalar = 0.0;
 
-}
+		r[0] = a[0] * scalar;
+		r[1] = a[1] * scalar;
+		r[2] = a[2] * scalar;
 
-THREE.Vector3.divideScalar = function( r, a, scalar ) {
+	},
 
-	THREE.Vector3.multiplyScalar( r, a, 1.0 / scalar );
+	divide: function( r, a, b ) {
 
-}
+		r[0] = a[0] / b[0];
+		r[1] = a[1] / b[1];
+		r[2] = a[2] / b[2];
 
-// TODO: auto-generate min, max, floor, ceiing, round functions?
-THREE.Vector3.min = function( r, a, b ) {
+	},
 
-	r[0] = Math.min( a[0], b[0] );
-	r[1] = Math.min( a[1], b[1] );
-	r[2] = Math.min( a[2], b[2] );
+	divideScalar: function( r, a, scalar ) {
 
-}
+		THREE.Vector3.multiplyScalar( r, a, 1.0 / scalar );
 
-THREE.Vector3.max = function( r, a, b ) {
+	},
 
-	r[0] = Math.max( a[0], b[0] );
-	r[1] = Math.max( a[1], b[1] );
-	r[2] = Math.max( a[2], b[2] );
+	// TODO: auto-generate min, max, floor, ceiing, round functions?
+	min: function( r, a, b ) {
 
-}
+		r[0] = Math.min( a[0], b[0] );
+		r[1] = Math.min( a[1], b[1] );
+		r[2] = Math.min( a[2], b[2] );
 
-THREE.Vector3.clamp = function( r, v, min, max ) {
+	},
 
-	r[0] = Math.min( max[0], Math.max( v[0], min[0] ) );
-	r[1] = Math.min( max[1], Math.max( v[1], min[1] ) );
-	r[2] = Math.min( max[2], Math.max( v[2], min[2] ) );
+	max: function( r, a, b ) {
 
-}
+		r[0] = Math.max( a[0], b[0] );
+		r[1] = Math.max( a[1], b[1] );
+		r[2] = Math.max( a[2], b[2] );
 
-THREE.Vector3.floor = function( r, v ) {
+	},
 
-	r[0] = Math.floor( v[0] );
-	r[1] = Math.floor( v[1] );
-	r[2] = Math.floor( v[2] );
+	clamp: function( r, v, min, max ) {
 
-}
+		r[0] = Math.min( max[0], Math.max( v[0], min[0] ) );
+		r[1] = Math.min( max[1], Math.max( v[1], min[1] ) );
+		r[2] = Math.min( max[2], Math.max( v[2], min[2] ) );
 
-THREE.Vector3.ceiling = function( r, v ) {
+	},
 
-	r[0] = Math.ceiling( v[0] );
-	r[1] = Math.ceiling( v[1] );
-	r[2] = Math.ceiling( v[2] );
+	floor: function( r, v ) {
 
-}
+		r[0] = Math.floor( v[0] );
+		r[1] = Math.floor( v[1] );
+		r[2] = Math.floor( v[2] );
 
-THREE.Vector3.round = function( r, v ) {
+	},
 
-	r[0] = Math.round( v[0] );
-	r[1] = Math.round( v[1] );
-	r[2] = Math.round( v[2] );
+	ceiling: function( r, v ) {
 
-}
+		r[0] = Math.ceiling( v[0] );
+		r[1] = Math.ceiling( v[1] );
+		r[2] = Math.ceiling( v[2] );
 
-THREE.Vector3.negate = function( r, v ) {
+	},
 
-	r[0] = -v[0];
-	r[1] = -v[1];
-	r[2] = -v[2];
+	round: function( r, v ) {
 
-}
+		r[0] = Math.round( v[0] );
+		r[1] = Math.round( v[1] );
+		r[2] = Math.round( v[2] );
 
-THREE.Vector3.dot = function( a, b ) {
+	},
 
-	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+	negate: function( r, v ) {
 
-}
+		r[0] = -v[0];
+		r[1] = -v[1];
+		r[2] = -v[2];
 
-THREE.Vector3.lengthSq = function( v ) {
+	},
 
-	return THREE.Vector3.dot( v, v );
+	dot: function( a, b ) {
 
-}
+		return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 
-// NOTE: using magnitude because THREE.VEctor3.length is defined as the number of function arguments to the constructor THREE.Vector3(), argh.
-THREE.Vector3.magnitude = function( v ) {
+	},
 
-	return Math.sqrt( THREE.Vector3.lengthSq( v ) );
+	lengthSq: function( v ) {
 
-}
+		return v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
 
-THREE.Vector3.lerp = function( r, a, b, alpha ) {
+	},
 
-	var oneMinusAlpha = 1.0 - alpha;
+	// NOTE: using magnitude because THREE.VEctor3.length is defined as the number of function arguments to the constructor THREE.Vector3(), argh.
+	magnitude: function( v ) {
 
-	r[0] = a[0] * oneMinusAlpha + b[0] * alpha;
-	r[1] = a[1] * oneMinusAlpha + b[1] * alpha;
-	r[2] = a[2] * oneMinusAlpha + b[2] * alpha;
+		return Math.sqrt( v[0] * v[0] + v[1] * v[1] + v[2] * v[2] );
 
-}
+	},
 
-THREE.Vector3.cross = function( r, a, b ) {
+	lerp: function( r, a, b, alpha ) {
 
-	var ax = a[0], ay = a[1], az = a[2];
-	var bx = b[1], by = b[1], bz = b[2];
+		var oneMinusAlpha = 1.0 - alpha;
 
-	r[0] = ay * bz - az * by;
-	r[1] = az * bx - ax * bz;
-	r[2] = ax * by - ay * bx;
+		r[0] = a[0] * oneMinusAlpha + b[0] * alpha;
+		r[1] = a[1] * oneMinusAlpha + b[1] * alpha;
+		r[2] = a[2] * oneMinusAlpha + b[2] * alpha;
 
-}
+	},
 
-THREE.Vector3.copyArray = function( r, rOffset, v, vOffest ) {
+	cross: function( r, a, b ) {
 
-	r[ rOffset + 0 ] = v[ vOffest + 0 ];
-	r[ rOffset + 1 ] = v[ vOffest + 1 ];
-	r[ rOffset + 2 ] = v[ vOffest + 2 ];
+		var ax = a[0], ay = a[1], az = a[2];
+		var bx = b[0], by = b[1], bz = b[2];
 
-}
+		r[0] = ay * bz - az * by;
+		r[1] = az * bx - ax * bz;
+		r[2] = ax * by - ay * bx;
 
+	},
+
+	copyArray: function( r, rOffset, v, vOffest ) {
+
+		r[ rOffset + 0 ] = v[ vOffest + 0 ];
+		r[ rOffset + 1 ] = v[ vOffest + 1 ];
+		r[ rOffset + 2 ] = v[ vOffest + 2 ];
+
+	},
+
+	normalize: function( r, v ) {
+
+		THREE.Vector3.divideScalar( r, THREE.Vector3.magnitude( v ) );
+
+	},
+
+});
 
 THREE.Vector3.prototype = {
 
@@ -687,7 +703,9 @@ THREE.Vector3.prototype = {
 
 	normalize: function () {
 
-		return this.divideScalar( this.length() );
+		THREE.Vector3.normalize( this.array, this.array );
+		
+		return this;
 
 	},
 

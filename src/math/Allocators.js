@@ -40,4 +40,4 @@ THREE.SimpleAllocator = {
 };
 
 
-THREE.DefaultAllocator = THREE.BlockAllocator;
+THREE.DefaultAllocator = THREE.SimpleAllocator;
