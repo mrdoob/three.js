@@ -147,13 +147,14 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
-
-				saoRenderTarget = new THREE.WebGLRenderTarget( width, height, pars );
+				saoRenderTarget = new THREE.WebGLRenderTarget( width, height,
+					{ minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
 				blurIntermediateRenderTarget = saoRenderTarget.clone();
 				beautyRenderTarget = saoRenderTarget.clone();
-				normalRenderTarget = saoRenderTarget.clone();
-				depthRenderTarget = saoRenderTarget.clone();
+
+				normalRenderTarget = new THREE.WebGLRenderTarget( width, height,
+					{ minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat } );
+				depthRenderTarget = normalRenderTarget.clone();
 
 				if( supportsDepthTextureExtension ) {
 					depthTexture = new THREE.DepthTexture();
@@ -164,13 +165,6 @@
 					beautyRenderTarget.depthBuffer = true;
 					beautyRenderTarget.depthTexture = depthTexture;
 				}
-				else {
-					depthRenderTarget.texture.minFilter = THREE.NearestFilter;
-					depthRenderTarget.texture.maxFilter = THREE.NearestFilter;
-				}
-
-				normalRenderTarget.texture.maxFilter = THREE.NearestFilter;
-				normalRenderTarget.texture.minFilter = THREE.NearestFilter;
 
 				depthMaterial = new THREE.MeshDepthMaterial();
 				depthMaterial.depthPacking = THREE.RGBADepthPacking;
