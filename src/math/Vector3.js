@@ -10,17 +10,17 @@
 
  THREE.Vector3 = function ( array, x, y, z ) {
 
- 	if( !( ( array instanceof Float32Array ) || ( array === undefined ) ) ) {
+	 if( !( ( array instanceof Float32Array ) || ( array === undefined ) ) ) {
 
- 		z = y; y = x; x = array; array = null;
+		 z = y; y = x; x = array; array = null;
 
- 	}
+	 }
 
 	this.array = array || new Float32Array( 3 );
 
- 	if( x !== undefined ) this.set( x, y, z );
+	 if( x !== undefined ) this.set( x, y, z );
 
- 	return this;
+	 return this;
 
  };
 
