@@ -14,7 +14,7 @@ THREE.BlockAllocator = {
         if ( newOffset > buffer.byteLength ) {
             // insufficient free memory in buffer
 
-            buffer = new ArrayBuffer( THREE.MemoryBlockSize );
+            buffer = new Float32Array( THREE.MemoryBlockSize );
             start = 0;
             newOffset = bytes;
 
