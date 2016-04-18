@@ -23,7 +23,7 @@ THREE.BlockAllocator = {
         }
 
         this.currentOffset = newOffset;
-        return new Float32Array( buffer, start, length );
+        return start;//new Float32Array( buffer, start, length );
 
     }
 

@@ -387,10 +387,10 @@ THREE.Geometry.prototype = {
 			var vA = this.vertices[ face.a ];
 			var vC = this.vertices[ face.c ];
 
-			THREE.Vector3.sub( cb.array, vC.array, vB.array );
-			THREE.Vector3.sub( ab.array, vA.array, vB.array );
-			THREE.Vector3.cross( cb.array, cb.array, ab.array );
-			THREE.Vector3.normalize( face.normal.array, cb.array );
+			THREE.Vector3.sub( cb.array, cb.offset, vC.array, vC.offset, vB.array, vB.offset );
+			THREE.Vector3.sub( ab.array, ab.offset, vA.array, vA.offset, vB.array, vB.offset );
+			THREE.Vector3.cross( cb.array, cb.offset, cb.array, cb.offset, ab.array, ab.offset );
+			THREE.Vector3.normalize( face.normal.array, face.normal.offset, cb.array, cb.offset );
 
 		}
 
