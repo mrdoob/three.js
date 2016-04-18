@@ -69,6 +69,14 @@ Object.assign( THREE.Vector3, {
 
 	},
 
+	addScaledVector: function( r, a, b, scale ) {
+
+		r[0] = a[0] + b[0] * scale;
+		r[1] = a[1] + b[1] * scale;
+		r[2] = a[2] + b[2] * scale;
+
+	},
+
 	sub: function( r, a, b ) {
 
 		r[0] = a[0] - b[0];
@@ -180,14 +188,16 @@ Object.assign( THREE.Vector3, {
 
 	lengthSq: function( v ) {
 
-		return v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+		var x = v[0], y = v[1], z = v[2];
+		return x*x + y*y + z*z;
 
 	},
 
 	// NOTE: using magnitude because THREE.VEctor3.length is defined as the number of function arguments to the constructor THREE.Vector3(), argh.
 	magnitude: function( v ) {
 
-		return Math.sqrt( v[0] * v[0] + v[1] * v[1] + v[2] * v[2] );
+		var x = v[0], y = v[1], z = v[2];
+		return Math.sqrt( x*x + y*y + z*z );
 
 	},
 
@@ -223,6 +233,20 @@ Object.assign( THREE.Vector3, {
 	normalize: function( r, v ) {
 
 		THREE.Vector3.divideScalar( r, r, THREE.Vector3.magnitude( v ) );
+
+	},
+
+	distance: function( a, b ) {
+
+		var x = b[0] - a[0], y = b[1] - a[1], z = b[1] - a[0];
+		return Math.sqrt( x*x + y*y + z*z );
+
+	},
+
+	distanceSq: function( a, b ) {
+
+		var x = b[0] - a[0], y = b[1] - a[1], z = b[1] - a[0];
+		return x*x + y*y + z*z;
 
 	},
 
@@ -319,7 +343,7 @@ THREE.Vector3.prototype = {
 
 	addScaledVector: function ( v, s ) {
 
-		THREE.Vector3.addScaledVector( this.array, v.array, s );
+		THREE.Vector3.addScaledVector( this.array, this.array, v.array, s );
 
 		return this;
 
@@ -729,7 +753,7 @@ THREE.Vector3.prototype = {
 
 	lerpVectors: function ( v1, v2, alpha ) {
 
-		this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+		THREE.Vector3.lerp( this.array, v1.array, v2.array, alpha );
 
 		return this;
 
@@ -821,13 +845,13 @@ THREE.Vector3.prototype = {
 
 	distanceTo: function ( v ) {
 
-		return THREE.Vector3.magnitude( this.array, v.array );
+		return THREE.Vector3.distance( this.array, v.array );
 
 	},
 
 	distanceToSquared: function ( v ) {
 
-		return THREE.Vector3.lengthSq( this.array, v.array );
+		return THREE.Vector3.distanceSq( this.array, v.array );
 
 	},
 
