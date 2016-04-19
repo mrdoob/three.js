@@ -1002,58 +1002,47 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( geometryAttribute !== undefined ) {
 
 					var dataType = _gl.FLOAT;
-					var normalized = false;
+					var normalized = geometryAttribute.normalized;
 					var array = geometryAttribute.array;
-					if ( geometryAttribute.array instanceof Float32Array ) {
+					if ( array instanceof Float32Array ) {
 
 						dataType = _gl.FLOAT;
 
-					}
-					else if ( array instanceof Float64Array ) {
+					} else if ( array instanceof Float64Array ) {
 
 						console.warn("Unsupported data buffer format: Float64Array");
 
-					}
-					else if ( array instanceof Uint16Array ) {
+					} else if ( array instanceof Uint16Array ) {
 
 						dataType = _gl.UNSIGNED_SHORT;
 						
-					}
-					else if ( array instanceof Int16Array ) {
+					} else if ( array instanceof Int16Array ) {
 
 						dataType = _gl.SHORT;
 
-					}
-					else if ( array instanceof Uint32Array ) {
+					} else if ( array instanceof Uint32Array ) {
 
 						dataType = _gl.UNSIGNED_INT;
 
-					}
-					else if ( array instanceof Int32Array ) {
+					} else if ( array instanceof Int32Array ) {
 
 						dataType = _gl.INT;
 
-					}
-					else if ( array instanceof Int8Array ) {
+					} else if ( array instanceof Int8Array ) {
 
 						dataType = _gl.BYTE;
 
-					}
-					else if ( array instanceof Uint8Array ) {
+					} else if ( array instanceof Uint8Array ) {
 
 						dataType = _gl.UNSIGNED_BYTE;
 
-					}
- 					else
+					} else
 					{
 
 						dataType = _gl.FLOAT;
 
 					}
 					
-					if ( geometryAttribute.normalized )
-						normalized = true;
-
 					var size = geometryAttribute.itemSize;
 					var buffer = objects.getAttributeBuffer( geometryAttribute );
 
