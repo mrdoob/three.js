@@ -22,7 +22,7 @@ THREE.BooleanKeyframeTrack.prototype =
 	ValueTypeName: 'bool',
 	ValueBufferType: Array,
 
-	DefaultInterpolation: THREE.IntepolateDiscrete,
+	DefaultInterpolation: THREE.InterpolateDiscrete,
 
 	InterpolantFactoryMethodLinear: undefined,
 	InterpolantFactoryMethodSmooth: undefined
