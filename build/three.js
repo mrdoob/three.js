@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '76dev' };
+var THREE = { REVISION: '76' };
 
 //
 
@@ -16203,7 +16203,7 @@ THREE.BooleanKeyframeTrack.prototype =
 	ValueTypeName: 'bool',
 	ValueBufferType: Array,
 
-	DefaultInterpolation: THREE.IntepolateDiscrete,
+	DefaultInterpolation: THREE.InterpolateDiscrete,
 
 	InterpolantFactoryMethodLinear: undefined,
 	InterpolantFactoryMethodSmooth: undefined
@@ -16344,7 +16344,7 @@ THREE.StringKeyframeTrack.prototype =
 	ValueTypeName: 'string',
 	ValueBufferType: Array,
 
-	DefaultInterpolation: THREE.IntepolateDiscrete,
+	DefaultInterpolation: THREE.InterpolateDiscrete,
 
 	InterpolantFactoryMethodLinear: undefined,
 
