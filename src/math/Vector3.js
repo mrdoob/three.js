@@ -9,15 +9,28 @@
 
 THREE.Vector3 = function ( x, y, z ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
+	this.offset = THREE.BlockAllocator.getFloat32( 3 );
+	this.array = THREE.BlockAllocator.activeBuffer;
+
+	if( x !== undefined ) this.set( x, y, z );
 
 };
 
 THREE.Vector3.prototype = {
 
 	constructor: THREE.Vector3,
+
+	set x( v ) { this.array[ this.offset ] = v; },
+	set y( v ) { this.array[ this.offset + 1 ] = v; },
+	set z( v ) { this.array[ this.offset + 2 ] = v; },
+
+	get x() { return this.array[ this.offset ]; },
+	get y() { return this.array[ this.offset + 1 ]; },
+	get z() { return this.array[ this.offset + 2 ]; },
+
+	setX: function ( v ) { this.array[ this.offset ] = v; return this; },
+	setY: function ( v ) { this.array[ this.offset + 1 ] = v; return this; },
+	setZ: function ( v ) { this.array[ this.offset + 2 ] = v; return this; },
 
 	set: function ( x, y, z ) {
 
@@ -31,33 +44,7 @@ THREE.Vector3.prototype = {
 
 	setScalar: function ( scalar ) {
 
-		this.x = scalar;
-		this.y = scalar;
-		this.z = scalar;
-
-		return this;
-
-	},
-
-	setX: function ( x ) {
-
-		this.x = x;
-
-		return this;
-
-	},
-
-	setY: function ( y ) {
-
-		this.y = y;
-
-		return this;
-
-	},
-
-	setZ: function ( z ) {
-
-		this.z = z;
+		this.set( scalar, scalar, scalar );
 
 		return this;
 
@@ -65,27 +52,15 @@ THREE.Vector3.prototype = {
 
 	setComponent: function ( index, value ) {
 
-		switch ( index ) {
+		this.array[ this.offset + index ] = value;
 
-			case 0: this.x = value; break;
-			case 1: this.y = value; break;
-			case 2: this.z = value; break;
-			default: throw new Error( 'index is out of range: ' + index );
-
-		}
+		return this;
 
 	},
 
 	getComponent: function ( index ) {
 
-		switch ( index ) {
-
-			case 0: return this.x;
-			case 1: return this.y;
-			case 2: return this.z;
-			default: throw new Error( 'index is out of range: ' + index );
-
-		}
+		return this.array[ this.offset + index ];
 
 	},
 
@@ -276,10 +251,7 @@ THREE.Vector3.prototype = {
 
 	applyMatrix3: function ( m ) {
 
-		var x = this.x;
-		var y = this.y;
-		var z = this.z;
-
+		var x = this.x, y = this.y, z = this.z;
 		var e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * z;
@@ -295,7 +267,6 @@ THREE.Vector3.prototype = {
 		// input: THREE.Matrix4 affine matrix
 
 		var x = this.x, y = this.y, z = this.z;
-
 		var e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ];
@@ -311,7 +282,6 @@ THREE.Vector3.prototype = {
 		// input: THREE.Matrix4 projection matrix
 
 		var x = this.x, y = this.y, z = this.z;
-
 		var e = m.elements;
 		var d = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] ); // perspective divide
 
@@ -325,14 +295,8 @@ THREE.Vector3.prototype = {
 
 	applyQuaternion: function ( q ) {
 
-		var x = this.x;
-		var y = this.y;
-		var z = this.z;
-
-		var qx = q.x;
-		var qy = q.y;
-		var qz = q.z;
-		var qw = q.w;
+		var x = this.x, y = this.y, z = this.z;
+		var qx = q.x, qy = q.y, qz = q.z, qw = q.w;
 
 		// calculate quat * vector
 
@@ -387,7 +351,6 @@ THREE.Vector3.prototype = {
 		// vector interpreted as a direction
 
 		var x = this.x, y = this.y, z = this.z;
-
 		var e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z;
@@ -685,9 +648,7 @@ THREE.Vector3.prototype = {
 
 	distanceToSquared: function ( v ) {
 
-		var dx = this.x - v.x;
-		var dy = this.y - v.y;
-		var dz = this.z - v.z;
+		var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
 
 		return dx * dx + dy * dy + dz * dz;
 
@@ -717,9 +678,7 @@ THREE.Vector3.prototype = {
 		var sy = this.setFromMatrixColumn( m, 1 ).length();
 		var sz = this.setFromMatrixColumn( m, 2 ).length();
 
-		this.x = sx;
-		this.y = sy;
-		this.z = sz;
+		this.set( sx, sy, sz );
 
 		return this;
 
@@ -750,9 +709,7 @@ THREE.Vector3.prototype = {
 
 		if ( offset === undefined ) offset = 0;
 
-		this.x = array[ offset ];
-		this.y = array[ offset + 1 ];
-		this.z = array[ offset + 2 ];
+		this.set( array[ offset ], array[ offset + 1 ], array[ offset + 2 ] );
 
 		return this;
 
@@ -775,11 +732,7 @@ THREE.Vector3.prototype = {
 
 		if ( offset === undefined ) offset = 0;
 
-		index = index * attribute.itemSize + offset;
-
-		this.x = attribute.array[ index ];
-		this.y = attribute.array[ index + 1 ];
-		this.z = attribute.array[ index + 2 ];
+		this.fromArray( attribute.array, index * attribute.itemSize + offset );
 
 		return this;
 
