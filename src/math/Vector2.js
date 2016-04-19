@@ -3,18 +3,32 @@
  * @author philogb / http://blog.thejit.org/
  * @author egraether / http://egraether.com/
  * @author zz85 / http://www.lab4games.net/zz85/blog
- */
+ * @author bhouston / http://clara.io
+*/
+
+
 
 THREE.Vector2 = function ( x, y ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
+ this.offset = THREE.BlockAllocator.getFloat32( 2 );
+ this.array = THREE.BlockAllocator.activeBuffer;
+
+ if( x !== undefined ) this.set( x, y );
 
 };
 
 THREE.Vector2.prototype = {
 
 	constructor: THREE.Vector2,
+
+	set x( v ) { this.array[ this.offset ] = v; },
+	set y( v ) { this.array[ this.offset + 1 ] = v; },
+
+	get x() { return this.array[ this.offset ]; },
+	get y() { return this.array[ this.offset + 1 ]; },
+
+	setX: function ( v ) { this.array[ this.offset ] = v; return this; },
+	setY: function ( v ) { this.array[ this.offset + 1 ] = v; return this; },
 
 	get width() {
 
@@ -44,8 +58,8 @@ THREE.Vector2.prototype = {
 
 	set: function ( x, y ) {
 
-		this.x = x;
-		this.y = y;
+		this.array[ this.offset ] = x;
+		this.array[ this.offset + 1 ] = y;
 
 		return this;
 
@@ -53,50 +67,21 @@ THREE.Vector2.prototype = {
 
 	setScalar: function ( scalar ) {
 
-		this.x = scalar;
-		this.y = scalar;
-
-		return this;
-
-	},
-
-	setX: function ( x ) {
-
-		this.x = x;
-
-		return this;
-
-	},
-
-	setY: function ( y ) {
-
-		this.y = y;
-
-		return this;
+		return this.set( scalar, scalar );
 
 	},
 
 	setComponent: function ( index, value ) {
 
-		switch ( index ) {
+		this.array[ this.offset + index ] = value;
 
-			case 0: this.x = value; break;
-			case 1: this.y = value; break;
-			default: throw new Error( 'index is out of range: ' + index );
-
-		}
+		return this;
 
 	},
 
 	getComponent: function ( index ) {
 
-		switch ( index ) {
-
-			case 0: return this.x;
-			case 1: return this.y;
-			default: throw new Error( 'index is out of range: ' + index );
-
-		}
+		return this.array[ this.offset + index ];
 
 	},
 
@@ -108,8 +93,7 @@ THREE.Vector2.prototype = {
 
 	copy: function ( v ) {
 
-		this.x = v.x;
-		this.y = v.y;
+		this.set( v.x, v.y );
 
 		return this;
 
@@ -289,9 +273,7 @@ THREE.Vector2.prototype = {
 
 		var length = this.length();
 
-		this.multiplyScalar( Math.max( min, Math.min( max, length ) ) / length );
-
-		return this;
+		return this.multiplyScalar( Math.max( min, Math.min( max, length ) ) / length );
 
 	},
 
@@ -412,9 +394,7 @@ THREE.Vector2.prototype = {
 
 	lerpVectors: function ( v1, v2, alpha ) {
 
-		this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
-
-		return this;
+		return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
 
 	},
 
@@ -428,10 +408,7 @@ THREE.Vector2.prototype = {
 
 		if ( offset === undefined ) offset = 0;
 
-		this.x = array[ offset ];
-		this.y = array[ offset + 1 ];
-
-		return this;
+		return this.set( array[ offset ], array[ offset + 1 ] );
 
 	},
 
@@ -451,12 +428,9 @@ THREE.Vector2.prototype = {
 
 		if ( offset === undefined ) offset = 0;
 
-		index = index * attribute.itemSize + offset;
+		offset = index * attribute.itemSize + offset;
 
-		this.x = attribute.array[ index ];
-		this.y = attribute.array[ index + 1 ];
-
-		return this;
+		return this.fromArray( attribute.array, offset );
 
 	},
 

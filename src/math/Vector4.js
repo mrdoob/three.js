@@ -4,27 +4,44 @@
  * @author mikael emtinger / http://gomo.se/
  * @author egraether / http://egraether.com/
  * @author WestLangley / http://github.com/WestLangley
+ * @author bhouston / http://clara.io
  */
 
-THREE.Vector4 = function ( x, y, z, w ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
-	this.w = ( w !== undefined ) ? w : 1;
+ THREE.Vector4 = function ( x, y, z, w ) {
 
-};
+ 	this.offset = THREE.BlockAllocator.getFloat32( 4 );
+ 	this.array = THREE.BlockAllocator.activeBuffer;
+
+ 	if( x !== undefined ) this.set( x, y, z, ( w !== undefined ) ? w : 1 );
+
+ };
 
 THREE.Vector4.prototype = {
 
 	constructor: THREE.Vector4,
 
+	set x( v ) { this.array[ this.offset ] = v; },
+	set y( v ) { this.array[ this.offset + 1 ] = v; },
+	set z( v ) { this.array[ this.offset + 2 ] = v; },
+	set w( v ) { this.array[ this.offset + 3 ] = v; },
+
+	get x() { return this.array[ this.offset ]; },
+	get y() { return this.array[ this.offset + 1 ]; },
+	get z() { return this.array[ this.offset + 2 ]; },
+	get w() { return this.array[ this.offset + 3 ]; },
+
+	setX: function ( v ) { this.array[ this.offset ] = v; return this; },
+	setY: function ( v ) { this.array[ this.offset + 1 ] = v; return this; },
+	setZ: function ( v ) { this.array[ this.offset + 2 ] = v; return this; },
+	setW: function ( v ) { this.array[ this.offset + 3 ] = v; return this; },
+
 	set: function ( x, y, z, w ) {
 
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.w = w;
+		this.array[ this.offset ] = x;
+		this.array[ this.offset + 1 ] = y;
+		this.array[ this.offset + 2 ] = z;
+		this.array[ this.offset + 3 ] = w;
 
 		return this;
 
@@ -32,72 +49,21 @@ THREE.Vector4.prototype = {
 
 	setScalar: function ( scalar ) {
 
-		this.x = scalar;
-		this.y = scalar;
-		this.z = scalar;
-		this.w = scalar;
-
-		return this;
-
-	},
-
-	setX: function ( x ) {
-
-		this.x = x;
-
-		return this;
-
-	},
-
-	setY: function ( y ) {
-
-		this.y = y;
-
-		return this;
-
-	},
-
-	setZ: function ( z ) {
-
-		this.z = z;
-
-		return this;
-
-	},
-
-	setW: function ( w ) {
-
-		this.w = w;
-
-		return this;
+		return this.set( scalar, scalar, scalar, scalar );
 
 	},
 
 	setComponent: function ( index, value ) {
 
-		switch ( index ) {
+		this.array[ this.offset + index ] = value;
 
-			case 0: this.x = value; break;
-			case 1: this.y = value; break;
-			case 2: this.z = value; break;
-			case 3: this.w = value; break;
-			default: throw new Error( 'index is out of range: ' + index );
-
-		}
+		return this;
 
 	},
 
 	getComponent: function ( index ) {
 
-		switch ( index ) {
-
-			case 0: return this.x;
-			case 1: return this.y;
-			case 2: return this.z;
-			case 3: return this.w;
-			default: throw new Error( 'index is out of range: ' + index );
-
-		}
+		return this.array[ this.offset + index ];
 
 	},
 
@@ -109,12 +75,7 @@ THREE.Vector4.prototype = {
 
 	copy: function ( v ) {
 
-		this.x = v.x;
-		this.y = v.y;
-		this.z = v.z;
-		this.w = ( v.w !== undefined ) ? v.w : 1;
-
-		return this;
+		return this.set( v.x, v.y, v.z, ( v.w !== undefined ) ? v.w : 1 );
 
 	},
 
@@ -233,11 +194,7 @@ THREE.Vector4.prototype = {
 
 	applyMatrix4: function ( m ) {
 
-		var x = this.x;
-		var y = this.y;
-		var z = this.z;
-		var w = this.w;
-
+		var x = this.x, y = this.y, z = this.z, w = this.w;
 		var e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z + e[ 12 ] * w;
@@ -314,9 +271,7 @@ THREE.Vector4.prototype = {
 
 				// this singularity is identity matrix so angle = 0
 
-				this.set( 1, 0, 0, 0 );
-
-				return this; // zero angle, arbitrary axis
+				return this.set( 1, 0, 0, 0 ); // zero angle, arbitrary axis
 
 			}
 
@@ -387,9 +342,7 @@ THREE.Vector4.prototype = {
 
 			}
 
-			this.set( x, y, z, angle );
-
-			return this; // return 180 deg rotation
+			return this.set( x, y, z, angle ); // return 180 deg rotation
 
 		}
 
@@ -574,9 +527,7 @@ THREE.Vector4.prototype = {
 
 	lerpVectors: function ( v1, v2, alpha ) {
 
-		this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
-
-		return this;
+		return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
 
 	},
 
@@ -590,12 +541,7 @@ THREE.Vector4.prototype = {
 
 		if ( offset === undefined ) offset = 0;
 
-		this.x = array[ offset ];
-		this.y = array[ offset + 1 ];
-		this.z = array[ offset + 2 ];
-		this.w = array[ offset + 3 ];
-
-		return this;
+		return this.set( array[ offset ], array[ offset + 1 ], array[ offset + 2 ], array[ offset + 3 ] );
 
 	},
 
@@ -617,14 +563,9 @@ THREE.Vector4.prototype = {
 
 		if ( offset === undefined ) offset = 0;
 
-		index = index * attribute.itemSize + offset;
+		offset = index * attribute.itemSize + offset;
 
-		this.x = attribute.array[ index ];
-		this.y = attribute.array[ index + 1 ];
-		this.z = attribute.array[ index + 2 ];
-		this.w = attribute.array[ index + 3 ];
-
-		return this;
+		return this.fromArray( attribute.array, offset );
 
 	}
 

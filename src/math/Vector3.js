@@ -34,9 +34,9 @@ THREE.Vector3.prototype = {
 
 	set: function ( x, y, z ) {
 
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.array[ this.offset ] = x;
+		this.array[ this.offset + 1 ] = y;
+		this.array[ this.offset + 2 ] = z;
 
 		return this;
 
@@ -44,9 +44,7 @@ THREE.Vector3.prototype = {
 
 	setScalar: function ( scalar ) {
 
-		this.set( scalar, scalar, scalar );
-
-		return this;
+		return this.set( scalar, scalar, scalar );
 
 	},
 
@@ -225,9 +223,7 @@ THREE.Vector3.prototype = {
 
 			if ( quaternion === undefined ) quaternion = new THREE.Quaternion();
 
-			this.applyQuaternion( quaternion.setFromEuler( euler ) );
-
-			return this;
+			return this.applyQuaternion( quaternion.setFromEuler( euler ) );
 
 		};
 
@@ -241,9 +237,7 @@ THREE.Vector3.prototype = {
 
 			if ( quaternion === undefined ) quaternion = new THREE.Quaternion();
 
-			this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
-
-			return this;
+			return this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
 
 		};
 
@@ -357,9 +351,7 @@ THREE.Vector3.prototype = {
 		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z;
 		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z;
 
-		this.normalize();
-
-		return this;
+		return this.normalize();
 
 	},
 
@@ -437,9 +429,7 @@ THREE.Vector3.prototype = {
 
 		var length = this.length();
 
-		this.multiplyScalar( Math.max( min, Math.min( max, length ) ) / length );
-
-		return this;
+		return this.multiplyScalar( Math.max( min, Math.min( max, length ) ) / length );
 
 	},
 
@@ -541,9 +531,7 @@ THREE.Vector3.prototype = {
 
 	lerpVectors: function ( v1, v2, alpha ) {
 
-		this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
-
-		return this;
+		return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
 
 	},
 
@@ -678,9 +666,7 @@ THREE.Vector3.prototype = {
 		var sy = this.setFromMatrixColumn( m, 1 ).length();
 		var sz = this.setFromMatrixColumn( m, 2 ).length();
 
-		this.set( sx, sy, sz );
-
-		return this;
+		return this.set( sx, sy, sz );
 
 	},
 
@@ -709,9 +695,7 @@ THREE.Vector3.prototype = {
 
 		if ( offset === undefined ) offset = 0;
 
-		this.set( array[ offset ], array[ offset + 1 ], array[ offset + 2 ] );
-
-		return this;
+		return this.set( array[ offset ], array[ offset + 1 ], array[ offset + 2 ] );
 
 	},
 
@@ -732,9 +716,7 @@ THREE.Vector3.prototype = {
 
 		if ( offset === undefined ) offset = 0;
 
-		this.fromArray( attribute.array, index * attribute.itemSize + offset );
-
-		return this;
+		return this.fromArray( attribute.array, index * attribute.itemSize + offset );
 
 	}
 
