@@ -560,13 +560,11 @@ THREE.BufferGeometry.prototype = {
 
 		var positions = this.attributes.position.array;
 
-		if ( positions ) {
+		if ( positions !== undefined ) {
 
 			this.boundingBox.setFromArray( positions );
 
-		}
-
-		if ( positions === undefined || positions.length === 0 ) {
+		} else {
 
 			this.boundingBox.makeEmpty();
 

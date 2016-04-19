@@ -25,8 +25,6 @@ THREE.Box3.prototype = {
 
 	setFromArray: function ( array ) {
 
-		this.makeEmpty();
-
 		var minX = + Infinity;
 		var minY = + Infinity;
 		var minZ = + Infinity;
@@ -35,7 +33,7 @@ THREE.Box3.prototype = {
 		var maxY = - Infinity;
 		var maxZ = - Infinity;
 
-		for ( var i = 0, il = array.length; i < il; i += 3 ) {
+		for ( var i = 0, l = array.length; i < l; i += 3 ) {
 
 			var x = array[ i ];
 			var y = array[ i + 1 ];
