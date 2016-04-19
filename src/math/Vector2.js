@@ -4,7 +4,8 @@
  * @author egraether / http://egraether.com/
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * @author bhouston / http://clara.io
-*/
+ * @author gero3
+ */
 
 
 

@@ -1,6 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author bhouston / http://clara.io
+ * @author gero3
  */
 
 THREE.Color = function ( color ) {

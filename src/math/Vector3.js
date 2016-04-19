@@ -5,6 +5,8 @@
  * @author mikael emtinger / http://gomo.se/
  * @author egraether / http://egraether.com/
  * @author WestLangley / http://github.com/WestLangley
+ * @author bhouston / http://clara.io
+ * @author gero3
  */
 
 THREE.Vector3 = function ( x, y, z ) {
