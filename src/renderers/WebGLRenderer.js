@@ -1101,7 +1101,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, dataType, normalized, 0, startIndex * size * geometryAttribute.array.BYTES_PER_ELEMENT ); // 4 bytes per Float32
+						_gl.vertexAttribPointer( programAttribute, size, dataType, normalized, 0, startIndex * size * geometryAttribute.array.BYTES_PER_ELEMENT ); 
 
 					}
 
