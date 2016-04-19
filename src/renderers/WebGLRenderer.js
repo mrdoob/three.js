@@ -332,6 +332,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.shadowMap = shadowMap;
 
+	// depth prepass
+
+	var depthPrepass = new THREE.WebGLDepthPrepass( this );
+
+	this.depthPrepass = depthPrepass;
 
 	// Plugins
 
@@ -1246,6 +1251,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		//
+
+		depthPrepass.render( opaqueObjects, camera );
 
 		if ( scene.overrideMaterial ) {
 
