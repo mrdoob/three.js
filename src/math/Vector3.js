@@ -89,11 +89,7 @@ THREE.Vector3.prototype = {
 
 	copy: function ( v ) {
 
-		this.x = v.x;
-		this.y = v.y;
-		this.z = v.z;
-
-		return this;
+		return this.set( v.x, v.y, v.z );
 
 	},
 

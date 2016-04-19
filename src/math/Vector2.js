@@ -112,9 +112,7 @@ THREE.Vector2.prototype = {
 
 	copy: function ( v ) {
 
-		this.set( v.x, v.y );
-
-		return this;
+		return this.set( v.x, v.y );
 
 	},
 
