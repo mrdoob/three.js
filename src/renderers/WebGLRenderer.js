@@ -1007,63 +1007,68 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var dataType = _gl.FLOAT;
 					var normalized = false;
+					var array = geometryAttribute.array;
 					if( geometryAttribute.array instanceof Float32Array ) {
 
 						dataType = _gl.FLOAT;
 
 					}
-					else if( geometryAttribute.array instanceof Float64Array ) {
+					else if( array instanceof Float64Array ) {
 
 						console.warn("Unsupported data buffer format: Float64Array");
 
 					}
-					else if( geometryAttribute.array instanceof Uint16Array ) {
+					else if( array instanceof Uint16Array ) {
 
 						dataType = _gl.UNSIGNED_SHORT;
 						
 					}
-					else if( geometryAttribute.array instanceof Int16Array ) {
+					else if( array instanceof Int16Array ) {
 
 						dataType = _gl.SHORT;
 
 					}
-					else if( geometryAttribute.array instanceof Uint32Array ) {
+					else if( array instanceof Uint32Array ) {
 
 						dataType = _gl.UNSIGNED_INT;
 
 					}
-					else if( geometryAttribute.array instanceof Int32Array ) {
+					else if( array instanceof Int32Array ) {
 
 						dataType = _gl.INT;
 
 					}
-					else if( geometryAttribute.array instanceof Int8Array ) {
+					else if( array instanceof Int8Array ) {
 
 						dataType = _gl.BYTE;
 
 					}
-					else if( geometryAttribute.array instanceof Uint8Array ) {
+					else if( array instanceof Uint8Array ) {
 
 						dataType = _gl.UNSIGNED_BYTE;
 
 					}
-					else 
-					{
-						dataType = _gl.FLOAT;
-					}
-
 					//A dataview can be nice since you can't create a new TypedArray on an existing buffer if the 		 					
  					//data you need is offset, and that offset is not a multiple of the bytes-per-element		
- 					if( geometryAttribute.array instanceof DataView ) {		
- 						if(!geometryAttribute.array.glDataType)		
+ 					else if( array instanceof DataView ) {		
+ 						
+ 						if(!array.glDataType)		
  						{		
+
  							console.warn("DataView buffer attributes must set glDataType");		
+
  						}else		
  						{		
- 							dataType = geometryAttribute.array.glDataType;			
+
+ 							dataType = array.glDataType;		
+
  						}		
  								
  					}
+ 					else 
+					{
+						dataType = _gl.FLOAT;
+					}
 					
 					if(geometryAttribute.normalized)
 						normalized = true;
