@@ -22,16 +22,3 @@ THREE.BlockAllocator = {
   }
 
 };
-
-THREE.SimpleAllocator = {
-
-  getFloat32: function( length ) {
-
-    return new Float32Array( length );
-
-  }
-
-};
-
-
-THREE.DefaultAllocator = THREE.BlockAllocator;
