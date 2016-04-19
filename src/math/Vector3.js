@@ -11,7 +11,7 @@
 THREE.Vector3 = function ( x, y, z ) {
 
 	this.offset = THREE.BlockAllocator.getFloat32( 3 );
-	this.array = THREE.BlockAllocator.currentBuffer;
+	this.array = THREE.BlockAllocator.activeBuffer;
 
 	if( x !== undefined ) THREE.Vector3.set( this.array, this.offset, x, y, z );
 };
@@ -65,9 +65,9 @@ Object.assign( THREE.Vector3, {
 
 	addScaledVector: function( r, ro, a, ao, b, bo, scale ) {
 
-		r[ro+0] = a[ao+0] + Math.fround( b[bo+0] * scale );
-		r[ro+1] = a[ao+1] + Math.fround( b[bo+1] * scale );
-		r[ro+2] = a[ao+2] + Math.fround( b[bo+2] * scale );
+		r[ro+0] = a[ao+0] + b[bo+0] * scale;
+		r[ro+1] = a[ao+1] + b[bo+1] * scale;
+		r[ro+2] = a[ao+2] + b[bo+2] * scale;
 
 	},
 
@@ -187,22 +187,21 @@ Object.assign( THREE.Vector3, {
 
 	dot: function( a, ao, b, bo ) {
 
-		return Math.fround( a[ao+0] * b[bo+0] + a[ao+1] * b[bo+1] + a[ao+2] * b[bo+2] );
+		return a[ao+0] * b[bo+0] + a[ao+1] * b[bo+1] + a[ao+2] * b[bo+2];
 
 	},
 
 	lengthSq: function( v, vo ) {
 
 		var x = v[vo+0], y = v[vo+1], z = v[vo+2];
-		return Math.fround( x*x + y*y + z*z );
+		return x*x + y*y + z*z;
 
 	},
 
 	// NOTE: using magnitude because THREE.VEctor3.length is defined as the number of function arguments to the constructor THREE.Vector3(), argh.
 	magnitude: function( v, vo ) {
 
-		var x = v[vo+0], y = v[vo+1], z = v[vo+2];
-		return Math.sqrt( Math.fround( x*x + y*y + z*z ) );
+		return Math.sqrt( THREE.Vector3.lengthSq( v, vo ) );
 
 	},
 
@@ -210,9 +209,9 @@ Object.assign( THREE.Vector3, {
 
 		var oneMinusAlpha = 1.0 - alpha;
 
-		r[ro+0] = Math.fround( a[ao+0] * oneMinusAlpha ) + Math.fround( b[bo+0] * alpha );
-		r[ro+1] = Math.fround( a[ao+1] * oneMinusAlpha ) + Math.fround( b[bo+1] * alpha );
-		r[ro+2] = Math.fround( a[ao+2] * oneMinusAlpha ) + Math.fround( b[bo+2] * alpha );
+		r[ro+0] = a[ao+0] * oneMinusAlpha + b[bo+0] * alpha;
+		r[ro+1] = a[ao+1] * oneMinusAlpha + b[bo+1] * alpha;
+		r[ro+2] = a[ao+2] * oneMinusAlpha + b[bo+2] * alpha;
 
 	},
 
@@ -291,13 +290,13 @@ THREE.Vector3.prototype = {
 
 	setComponent: function ( index, value ) {
 
-		THREE.Vector3.setComponent( this.array, this.offset, index, value );
+		this.array[this.offset+index] = value;
 
 	},
 
 	getComponent: function ( index ) {
 
-		return THREE.Vector3.getComponent( this.array, this.offset, index );
+		return this.array[this.offset+index];
 
 	},
 
@@ -456,10 +455,7 @@ THREE.Vector3.prototype = {
 
 	applyMatrix3: function ( m ) {
 
-		var x = this.x;
-		var y = this.y;
-		var z = this.z;
-
+		var x = this.x, y = this.y, z = this.z;
 		var e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * z;
@@ -475,7 +471,6 @@ THREE.Vector3.prototype = {
 		// input: THREE.Matrix4 affine matrix
 
 		var x = this.x, y = this.y, z = this.z;
-
 		var e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ];
@@ -505,14 +500,8 @@ THREE.Vector3.prototype = {
 
 	applyQuaternion: function ( q ) {
 
-		var x = this.x;
-		var y = this.y;
-		var z = this.z;
-
-		var qx = q.x;
-		var qy = q.y;
-		var qz = q.z;
-		var qw = q.w;
+		var x = this.x, y = this.y, z = this.z;
+		var qx = q.x, qy = q.y, qz = q.z, qw = q.w;
 
 		// calculate quat * vector
 
@@ -782,7 +771,6 @@ THREE.Vector3.prototype = {
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 
 			v1.copy( vector ).normalize();
-
 			dot = this.dot( v1 );
 
 			return this.copy( v1 ).multiplyScalar( dot );
@@ -870,9 +858,7 @@ THREE.Vector3.prototype = {
 		var sy = this.setFromMatrixColumn( m, 1 ).length();
 		var sz = this.setFromMatrixColumn( m, 2 ).length();
 
-		this.x = sx;
-		this.y = sy;
-		this.z = sz;
+		THREE.Vector3.set( this.array, this.offset, sx, sy, sz );
 
 		return this;
 
@@ -889,7 +875,9 @@ THREE.Vector3.prototype = {
 
 		}
 
-		return this.fromArray( m.elements, index * 4 );
+		THREE.Vector3.copy( this.array, this.offset, m.elements, index * 4 );
+
+		return this;
 
 	},
 

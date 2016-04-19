@@ -1,31 +1,25 @@
 THREE.MemoryBlockSize = 1024*16; // 32K as a wild guess
 THREE.BlockAllocator = {
 
-    currentBuffer: new Float32Array( THREE.MemoryBlockSize ),
-    currentOffset: 0,
+  activeBuffer: new Float32Array( THREE.MemoryBlockSize ),
+  nextOffset: 0,
+  //currentIndex: 0,
 
-    getFloat32: function ( length ) {
+  getFloat32: function ( length ) {
 
-        var buffer = this.currentBuffer,
-            start = this.currentOffset,
-            bytes = length,// * Float32Array.BYTES_PER_ELEMENT,
-            newOffset = start + bytes;
+    var offset = this.nextOffset;
+    this.nextOffset += length;
 
-        if ( newOffset >= THREE.MemoryBlockSize ) {
-            // insufficient free memory in buffer
+    if( this.nextOffset >= THREE.MemoryBlockSize ) {
 
-            buffer = new Float32Array( THREE.MemoryBlockSize );
-            start = 0;
-            newOffset = bytes;
-
-            this.currentBuffer = buffer;
-
-        }
-
-        this.currentOffset = newOffset;
-        return start;//new Float32Array( buffer, start, length );
+      this.activeBuffer = new Float32Array( THREE.MemoryBlockSize );
+      this.nextOffset = length;
+      offset = 0;
 
     }
+
+    return offset;
+  }
 
 };
 
