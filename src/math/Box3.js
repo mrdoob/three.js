@@ -27,14 +27,11 @@ THREE.Box3.prototype = {
 
 		this.makeEmpty();
 
-		var vector = new THREE.Vector3( array, 0 );
+		var p = new THREE.Vector3( array, 0 );
 
 		for ( var i = 0, il = array.length; i < il; i += 3 ) {
 
-			vector.offset = i;
-			
-			this.min.min( vector );
-			this.max.max( vector );
+			this.expandByPoint( p.attach( array, i ) );
 
 		}
 
