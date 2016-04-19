@@ -831,6 +831,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		//
+
 		var index = geometry.index;
 		var position = geometry.attributes.position;
 
@@ -864,6 +866,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+		//
 
 		var dataStart = 0;
 		var dataCount = Infinity;
@@ -996,12 +1000,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometryAttribute !== undefined ) {
 
-					var dataType = _gl.FLOAT;
-					var normalized = geometryAttribute.normalized;
+					var type = _gl.FLOAT;
 					var array = geometryAttribute.array;
+					var normalized = geometryAttribute.normalized;
+
 					if ( array instanceof Float32Array ) {
 
-						dataType = _gl.FLOAT;
+						type = _gl.FLOAT;
 
 					} else if ( array instanceof Float64Array ) {
 
@@ -1009,35 +1014,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					} else if ( array instanceof Uint16Array ) {
 
-						dataType = _gl.UNSIGNED_SHORT;
-						
+						type = _gl.UNSIGNED_SHORT;
+
 					} else if ( array instanceof Int16Array ) {
 
-						dataType = _gl.SHORT;
+						type = _gl.SHORT;
 
 					} else if ( array instanceof Uint32Array ) {
 
-						dataType = _gl.UNSIGNED_INT;
+						type = _gl.UNSIGNED_INT;
 
 					} else if ( array instanceof Int32Array ) {
 
-						dataType = _gl.INT;
+						type = _gl.INT;
 
 					} else if ( array instanceof Int8Array ) {
 
-						dataType = _gl.BYTE;
+						type = _gl.BYTE;
 
 					} else if ( array instanceof Uint8Array ) {
 
-						dataType = _gl.UNSIGNED_BYTE;
-
-					} else
-					{
-
-						dataType = _gl.FLOAT;
+						type = _gl.UNSIGNED_BYTE;
 
 					}
-					
+
 					var size = geometryAttribute.itemSize;
 					var buffer = objects.getAttributeBuffer( geometryAttribute );
 
@@ -1064,7 +1064,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, dataType, normalized, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
+						_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
 
 					} else {
 
@@ -1085,7 +1085,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, dataType, normalized, 0, startIndex * size * geometryAttribute.array.BYTES_PER_ELEMENT ); 
+						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, startIndex * size * geometryAttribute.array.BYTES_PER_ELEMENT );
 
 					}
 

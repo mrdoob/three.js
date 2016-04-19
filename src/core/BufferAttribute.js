@@ -13,7 +13,7 @@ THREE.BufferAttribute = function ( array, itemSize, normalized ) {
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
-	this.normalized = normalized ? true : false;
+	this.normalized = normalized === true;
 
 };
 

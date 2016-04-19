@@ -56,8 +56,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 			var attribute = attributes[ key ];
 			var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
-			var normalized = attribute.normalized || false;
-			geometry.addAttribute( key, new THREE.BufferAttribute( typedArray, attribute.itemSize , normalized) );
+			geometry.addAttribute( key, new THREE.BufferAttribute( typedArray, attribute.itemSize , attribute.normalized ) );
 
 		}
 
