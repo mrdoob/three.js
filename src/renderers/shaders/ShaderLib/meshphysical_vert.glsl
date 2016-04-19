@@ -1,4 +1,3 @@
-#define STANDARD
 #define PHYSICAL
 
 varying vec3 vViewPosition;

@@ -1,6 +1,6 @@
 #if NUM_CLIPPING_PLANES > 0
 
-	#if ! defined( STANDARD ) && ! defined( PHONG )
+	#if ! defined( PHYSICAL ) && ! defined( PHONG )
 		varying vec3 vViewPosition;
 	#endif
 
