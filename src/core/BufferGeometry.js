@@ -568,8 +568,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( positions === undefined || positions.length === 0 ) {
 
-			this.boundingBox.min.set( 0, 0, 0 );
-			this.boundingBox.max.set( 0, 0, 0 );
+			this.boundingBox.makeEmpty();
 
 		}
 
