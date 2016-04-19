@@ -836,8 +836,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		//
-
 		var index = geometry.index;
 		var position = geometry.attributes.position;
 
@@ -871,8 +869,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
-
-		//
 
 		var dataStart = 0;
 		var dataCount = Infinity;
@@ -1051,7 +1047,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					//A dataview can be nice since you can't create a new TypedArray on an existing buffer if the 		 					
  					//data you need is offset, and that offset is not a multiple of the bytes-per-element		
  					else if( array instanceof DataView ) {		
- 						
+
  						if(!array.glDataType)		
  						{		
 
