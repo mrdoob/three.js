@@ -25,10 +25,6 @@
 			}
 
 			a { color: skyblue; }
-
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #444 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -37,20 +33,17 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - webgl physically based shading testbed
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/AnimationClipCreator.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/tween.min.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<script>
-
-			var DAY = 0;
 
 			var container, stats;
 
@@ -64,8 +57,6 @@
 
 			var mixer;
 
-			var parameters, tweenDay, tweenNight;
-
 			var clock = new THREE.Clock();
 
 			var gui, shadowCameraHelper, shadowConfig = {
@@ -76,10 +67,6 @@
 				shadowCameraFov: 30,
 				shadowBias: -0.0002
 
-			};
-
-			var lightingConfig = {
-				daylight: false
 			};
 
 			init();
@@ -98,7 +85,7 @@
 				// SCENE
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x00aaff, 1000, 10000 );
+				scene.fog = new THREE.Fog( 0, 1000, 10000 );
 
 				// CUBE CAMERA
 
@@ -248,35 +235,19 @@
 
 				// LIGHTS
 
-				var sunIntensity = 0.3,
-					pointIntensity = 1,
-					pointColor = 0xffaa00;
-
-				if ( DAY ) {
-
-					sunIntensity = 1;
-					pointIntensity = 0.5;
-					pointColor = 0xffffff;
-
-				}
-
 				ambientLight = new THREE.AmbientLight( 0x3f2806 );
 				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xffaa00, pointIntensity, 5000 );
-				pointLight.position.set( 0, 0, 0 );
+				pointLight = new THREE.PointLight( 0xffaa00, 1, 5000 );
 				scene.add( pointLight );
 
-				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity, 0, Math.PI/2 );
+				sunLight = new THREE.SpotLight( 0xffffff, 0.3, 0, Math.PI/2 );
 				sunLight.position.set( 1000, 2000, 1000 );
 
 				sunLight.castShadow = true;
 
+				sunLight.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( shadowConfig.shadowCameraFov, 1, shadowConfig.shadowCameraNear, shadowConfig.shadowCameraFar ) );
 				sunLight.shadow.bias = shadowConfig.shadowBias;
-
-				sunLight.shadow.camera.far = shadowConfig.shadowCameraFar;
-				sunLight.shadow.camera.near = shadowConfig.shadowCameraNear;
-				sunLight.shadow.camera.fov = shadowConfig.shadowCameraFov;
 
 				scene.add( sunLight );
 
@@ -289,7 +260,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -325,18 +295,11 @@
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// EVENTS
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
-				// TWEEN
-
-				parameters = { control: 0 };
-
-				tweenDay = new TWEEN.Tween( parameters ).to( { control: 1 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
-				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
 
 				// GUI
 
@@ -384,30 +347,6 @@
 
 				shadowGUI.open();
 
-				// LIGHTING
-
-				var lightingGUI = gui.addFolder( "Lighting" );
-
-				lightingGUI.add( lightingConfig, 'daylight' ).onChange( function() {
-
-					// change between day and night
-
-					if( lightingConfig.daylight === true ) {
-
-						tweenNight.stop();
-						tweenDay.start();
-
-					} else {
-
-						tweenDay.stop();
-						tweenNight.start();
-
-					};
-
-				});
-
-				lightingGUI.open();
-
 			}
 
 			//
@@ -441,7 +380,6 @@
 
 				var delta = clock.getDelta();
 
-				TWEEN.update();
 				controls.update();
 
 				if ( mixer ) {
@@ -449,14 +387,6 @@
 					mixer.update( delta );
 
 				}
-
-				scene.fog.color.setHSL( 0.63, 0.05, parameters.control );
-				renderer.setClearColor( scene.fog.color );
-
-				sunLight.intensity = parameters.control * 0.7 + 0.3;
-				pointLight.intensity = - parameters.control * 0.5 + 1;
-
-				pointLight.color.setHSL( 0.1, 0.75, parameters.control * 0.5 + 0.5 );
 
 				// render cube map
 

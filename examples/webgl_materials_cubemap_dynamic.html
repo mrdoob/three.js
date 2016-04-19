@@ -23,11 +23,6 @@
 
 			.h { color: skyblue }
 			.c { display: inline; margin-left: 1em }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #888 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -56,7 +51,7 @@
 			</div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/BinaryLoader.js"></script>
 
@@ -169,20 +164,15 @@
 				spotLight.target.position.set( 0, 0, 0 );
 				spotLight.castShadow = true;
 
-				spotLight.shadowCameraNear = 100;
-				spotLight.shadowCameraFar = camera.far;
-				spotLight.shadowCameraFov = 50;
+				spotLight.shadow.camera.near = 100;
+				spotLight.shadow.camera.far = camera.far;
+				spotLight.shadow.camera.fov = 50;
 
-				spotLight.shadowBias = -0.00125;
-				spotLight.shadowMapWidth = SHADOW_MAP_WIDTH;
-				spotLight.shadowMapHeight = SHADOW_MAP_HEIGHT;
+				spotLight.shadow.bias = -0.00125;
+				spotLight.shadow.mapSize.width = SHADOW_MAP_WIDTH;
+				spotLight.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
 
 				scene.add( spotLight );
-
-				directionalLight2 = new THREE.PointLight( 0xff9900, 0.25 );
-				directionalLight2.position.set( 0.5, -1, 0.5 );
-				//directionalLight2.position.normalize();
-				//scene.add( directionalLight2 );
 
 				// RENDERER
 
@@ -200,7 +190,7 @@
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// CUBE CAMERA
 

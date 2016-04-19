@@ -39,13 +39,16 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
+
 		<script src="js/shaders/SSAOShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/EffectComposer.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
@@ -107,12 +110,11 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 10 + 1;
 					group.add( mesh );
+
 				}
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// Init postprocessing
 				initPostprocessing();
@@ -123,17 +125,27 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				gui.add( postprocessing, "renderMode", { framebuffer: 0, onlyAO: 1 } ).onChange( renderModeChange ).listen();
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
 			}
 
 			function renderModeChange( value ) {
 
-				if ( value == 0 ) { // framebuffer
+				if ( value == 0 ) {
+
+					// framebuffer
 					ssaoPass.uniforms[ 'onlyAO' ].value = false;
-				} else if ( value == 1 ) {  // onlyAO
+
+				} else if ( value == 1 ) {
+
+					// onlyAO
 					ssaoPass.uniforms[ 'onlyAO' ].value = true;
+
 				} else {
+
 					console.error( "Not define renderModeChange type: " + value );
+
 				}
+
 			}
 
 			function onWindowResize() {
@@ -153,6 +165,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				depthRenderTarget.setSize( newWidth, newHeight );
 				effectComposer.setSize( newWidth, newHeight );
+
 			}
 
 			function initPostprocessing() {
@@ -161,11 +174,9 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				var renderPass = new THREE.RenderPass( scene, camera );
 
 				// Setup depth pass
-				var depthShader = THREE.ShaderLib[ "depthRGBA" ];
-				var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
-
-				depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader,
-					uniforms: depthUniforms, blending: THREE.NoBlending } );
+				depthMaterial = new THREE.MeshDepthMaterial();
+				depthMaterial.depthPacking = THREE.RGBADepthPacking;
+				depthMaterial.blending = THREE.NoBlending;
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
 				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
@@ -186,17 +197,21 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				effectComposer = new THREE.EffectComposer( renderer );
 				effectComposer.addPass( renderPass );
 				effectComposer.addPass( ssaoPass );
+
 			}
 
 			function animate() {
+
 				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();
 				stats.end();
+
 			}
 
 			function render() {
+
 				var timer = performance.now();
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
@@ -212,8 +227,11 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 					effectComposer.render();
 
 				} else {
+
 					renderer.render( scene, camera );
+
 				}
+
 			}
 
 		</script>

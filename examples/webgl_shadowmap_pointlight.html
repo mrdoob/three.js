@@ -28,7 +28,7 @@
 		<a href="http://threejs.org" target="_blank">three.js</a> - PointLight ShadowMap by <a href="https://github.com/mkkellogg">mkkellogg</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -115,10 +115,7 @@
 				controls.update();
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.right = '0px';
-				stats.domElement.style.top = '0px';
-				document.body.appendChild( stats.domElement );
+				document.body.appendChild( stats.dom );
 
 				//
 

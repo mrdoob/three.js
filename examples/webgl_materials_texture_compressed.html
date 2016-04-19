@@ -24,11 +24,6 @@
 				text-align:center;
 				z-index:1000;
 			}
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
@@ -38,7 +33,7 @@
 			leaf texture by <a href="http://opengameart.org/node/10505">lauris71</a>, explosion texture by <a href="http://opengameart.org/node/7728">bart</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/loaders/DDSLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -179,7 +174,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				document.body.appendChild( stats.domElement );
+				document.body.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

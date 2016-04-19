@@ -30,7 +30,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Transparency with Premultiplied Alpha (right) and without (left)<br /> using RGBA8 Buffers by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
 		<script src="../src/loaders/BinaryTextureLoader.js"></script>
 
@@ -52,14 +52,10 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
+			var params = { opacity: 0.25 };
+
 			var container, stats;
-			var params = {
-				roughness: 1.0,
-				opacity: 0.5
-			};
-			var camera, scene, renderer, controls, objects = [];
-			var composer;
-			var standardMaterial, standardMaterialPremultiplied;
+			var camera, scene, renderer, controls;
 
 			init();
 			animate();
@@ -74,82 +70,81 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				//
 
-				standardMaterial = new THREE.MeshStandardMaterial( {
-					map: null,
-					metalness: 0.9,
-					roughness: 1.0,
-					shading: THREE.SmoothShading,
-					blending: THREE.NormalBlending,
+				var geometry = new THREE.SphereGeometry( 18, 30, 30 );
+
+				var material1 = new THREE.MeshStandardMaterial( {
+					roughness: params.roughness,
+					opacity: params.opacity,
 					transparent: true
 				} );
-				var geometry = new THREE.SphereGeometry( 18, 30, 30 );
-				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
-				torusMesh1.position.x = - 20.0;
-				torusMesh1.castShadow = true;
-				scene.add( torusMesh1 );
-				objects.push( torusMesh1 );
 
-				standardMaterialPremultiplied = new THREE.MeshStandardMaterial( {
-					map: null,
-					metalness: 0.9,
-					roughness: 1.0,
-					shading: THREE.SmoothShading,
+				var material2 = new THREE.MeshStandardMaterial( {
+					roughness: params.roughness,
+					opacity: params.opacity,
 					premultipliedAlpha: true,
 					transparent: true
 				} );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "../examples/textures/roughness_map.jpg", function ( map ) {
+				textureLoader.load( "textures/hardwood2_diffuse.jpg", function ( map ) {
 
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
-					map.anisotropy = 4;
-					map.repeat.set( 2, 2 );
-					standardMaterial.map = map;
-					standardMaterial.roughnessMap = map;
-					standardMaterial.needsUpdate = true;
-					standardMaterialPremultiplied.map = map;
-					standardMaterialPremultiplied.roughnessMap = map;
-					standardMaterialPremultiplied.needsUpdate = true;
+					map.anisotropy = 8;
+
+					material1.map = map;
+					material1.needsUpdate = true;
+					material2.map = map;
+					material2.needsUpdate = true;
 
 				} );
 
-				var torusMesh2 = new THREE.Mesh( geometry, standardMaterialPremultiplied );
-				torusMesh2.position.x = 20.0;
-				torusMesh2.castShadow = true;
-				scene.add( torusMesh2 );
-				objects.push( torusMesh2 );
+				var textureLoader = new THREE.TextureLoader();
+				textureLoader.load( "textures/hardwood2_roughness.jpg", function ( map ) {
 
-				var floorMaterial = new THREE.MeshStandardMaterial( {
-					map: null,
-					roughnessMap: null,
-					color: 0xffffff,
-					metalness: 0.0,
-					roughness: 0.0,
-					shading: THREE.SmoothShading
+					map.anisotropy = 8;
+
+					material1.roughnessMap = map;
+					material1.needsUpdate = true;
+					material2.roughnessMap = map;
+					material2.needsUpdate = true;
+
 				} );
 
-				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
-				planeMesh1.position.y = - 50;
-				planeMesh1.rotation.x = - Math.PI * 0.5;
-				planeMesh1.receiveShadow = true;
-				scene.add( planeMesh1 );
+				var mesh = new THREE.Mesh( geometry, material1 );
+				mesh.position.x = - 25.0;
+				scene.add( mesh );
+
+				var mesh = new THREE.Mesh( geometry, material2 );
+				mesh.position.x = 25.0;
+				scene.add( mesh );
+
+				//
+
+				var geometry = new THREE.PlaneBufferGeometry( 800, 800 );
+				var material = new THREE.MeshStandardMaterial( { color: 0x333333 } );
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.y = - 50;
+				mesh.rotation.x = - Math.PI * 0.5;
+				scene.add( mesh );
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
-
-				var spotLight = new THREE.SpotLight( 0xffffff );
-				spotLight.position.set( 50, 100, 50 );
-				spotLight.angle = Math.PI / 7;
-				spotLight.penumbra = 0.8;
-				spotLight.intensity = 5;
-				spotLight.castShadow = true;
+				var spotLight = new THREE.SpotLight( 0xff8888 );
+				spotLight.position.set( 100, 200, 100 );
+				spotLight.angle = Math.PI / 6;
+				spotLight.penumbra = 0.9;
 				scene.add( spotLight );
 
+				var spotLight = new THREE.SpotLight( 0x8888ff );
+				spotLight.position.set( - 100, - 200, - 100 );
+				spotLight.angle = Math.PI / 6;
+				spotLight.penumbra = 0.9;
+				scene.add( spotLight );
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -158,21 +153,8 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.setSize( window.innerWidth, window.innerHeight );
-
-				var renderScene = new THREE.RenderPass( scene, camera );
-				composer.addPass( renderScene );
-
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
-				composer.addPass( copyPass );
-
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 0, 0 );
@@ -181,9 +163,12 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				var gui = new dat.GUI();
+				gui.add( params, 'opacity', 0, 1 ).onChange( function () {
 
-				gui.add( params, 'roughness', 0, 1 );
-				gui.add( params, 'opacity', 0, 1 );
+					material1.opacity = params.opacity;
+					material2.opacity = params.opacity;
+
+				} );
 				gui.open();
 
 			}
@@ -197,7 +182,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				composer.setSize( width, height );
 
 			}
 
@@ -215,33 +199,23 @@
 
 			function render() {
 
-				if ( standardMaterial !== undefined ) {
+				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
 
+					var object = scene.children[ i ];
 
-					standardMaterial.roughness = params.roughness;
-					standardMaterialPremultiplied.roughness = params.roughness;
+					if ( object.geometry instanceof THREE.SphereGeometry ) {
 
-					standardMaterial.opacity = params.opacity;
-					standardMaterialPremultiplied.opacity = params.opacity;
+						object.rotation.x = performance.now() * 0.0002;
+						object.rotation.y = - performance.now() * 0.0002;
 
-				}
-
-				var timer = Date.now() * 0.00025;
-
-				camera.lookAt( scene.position );
-
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-					var object = objects[ i ];
-					object.rotation.y += 0.005;
+					}
 
 				}
 
-				composer.render();
+				renderer.render( scene, camera );
 
 			}
 
 		</script>
-
 	</body>
 </html>

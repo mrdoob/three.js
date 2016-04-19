@@ -38,7 +38,7 @@
         	background-color: rgba(64,96,64,0.6);
 		}
 	</style>
-	<script type="text/javascript" src="../build/three.min.js"></script>
+	<script type="text/javascript" src="../build/three.js"></script>
 	<script type="text/javascript" src="js/Detector.js"></script>
 	<script type="text/javascript" src="js/libs/stats.min.js"></script>
 
@@ -109,9 +109,7 @@
 			scene.add( new THREE.AmbientLight( 0x444444 ) );
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '40px';
-			document.body.appendChild( stats.domElement );
+			document.body.appendChild( stats.dom );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 

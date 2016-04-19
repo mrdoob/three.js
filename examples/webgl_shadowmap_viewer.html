@@ -28,7 +28,7 @@
 		<a href="http://threejs.org" target="_blank">three.js</a> - ShadowMapViewer example by <a href="https://github.com/arya-s">arya-s</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
 		<script src="js/utils/ShadowMapViewer.js"></script>
@@ -76,10 +76,10 @@
 				spotLight.penumbra = 0.3;
 				spotLight.position.set( 10, 10, 5 );
 				spotLight.castShadow = true;
-				spotLight.shadowCameraNear = 8;
-				spotLight.shadowCameraFar = 30;
-				spotLight.shadowMapWidth = 1024;
-				spotLight.shadowMapHeight = 1024;
+				spotLight.shadow.camera.near = 8;
+				spotLight.shadow.camera.far = 30;
+				spotLight.shadow.mapSize.width = 1024;
+				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
 
 				scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
@@ -88,14 +88,14 @@
 				dirLight.name = 'Dir. Light';
 				dirLight.position.set( 0, 10, 0 );
 				dirLight.castShadow = true;
-				dirLight.shadowCameraNear = 1;
-				dirLight.shadowCameraFar = 10;
-				dirLight.shadowCameraRight = 15;
-				dirLight.shadowCameraLeft = - 15;
-				dirLight.shadowCameraTop	= 15;
-				dirLight.shadowCameraBottom = - 15;
-				dirLight.shadowMapWidth = 1024;
-				dirLight.shadowMapHeight = 1024;
+				dirLight.shadow.camera.near = 1;
+				dirLight.shadow.camera.far = 10;
+				dirLight.shadow.camera.right = 15;
+				dirLight.shadow.camera.left = - 15;
+				dirLight.shadow.camera.top	= 15;
+				dirLight.shadow.camera.bottom = - 15;
+				dirLight.shadow.mapSize.width = 1024;
+				dirLight.shadow.mapSize.height = 1024;
 				scene.add( dirLight );
 
 				scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
@@ -106,7 +106,7 @@
 					color: 0xff0000,
 					shininess: 150,
 					specular: 0x222222,
-					shading: THREE.SmoothShading,
+					shading: THREE.SmoothShading
 				} );
 
 				torusKnot = new THREE.Mesh( geometry, material );
@@ -172,10 +172,7 @@
 				clock = new THREE.Clock();
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.right = '0px';
-				stats.domElement.style.top = '0px';
-				document.body.appendChild( stats.domElement );
+				document.body.appendChild( stats.dom );
 
 			}
 

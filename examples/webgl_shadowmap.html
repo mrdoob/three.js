@@ -32,7 +32,7 @@
 		t: toggle HUD</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/FirstPersonControls.js"></script>
 
@@ -111,16 +111,11 @@
 
 				light.castShadow = true;
 
-				light.shadowCameraNear = 1200;
-				light.shadowCameraFar = 2500;
-				light.shadowCameraFov = 50;
+				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 1200, 2500 ) );
+				light.shadow.bias = 0.0001;
 
-				//light.shadowCameraVisible = true;
-
-				light.shadowBias = 0.0001;
-
-				light.shadowMapWidth = SHADOW_MAP_WIDTH;
-				light.shadowMapHeight = SHADOW_MAP_HEIGHT;
+				light.shadow.mapSize.width = SHADOW_MAP_WIDTH;
+				light.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
 
 				scene.add( light );
 
@@ -145,10 +140,7 @@
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				//container.appendChild( stats.domElement );
+				//container.appendChild( stats.dom );
 
 				//
 

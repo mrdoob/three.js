@@ -29,7 +29,7 @@
  *  - light motion in vmd support.
  *  - SDEF support.
  *  - uv/material/bone morphing support.
- *  - supply skinning support.
+ *  - more precise grant skinning support.
  *  - shadow support.
  */
 
@@ -136,29 +136,14 @@ THREE.MMDLoader.prototype.loadAudio = function ( url, callback, onProgress, onEr
 
 	var listener = new THREE.AudioListener();
 	var audio = new THREE.Audio( listener );
+	var loader = new THREE.AudioLoader( this.manager );
 
-	audio.load( url );
+	loader.load( url, function ( buffer ) {
 
-	/*
-	 * Note: THREE.Audio doesn't support onReady callback
-	 *       so doing polling instead.
-	 * TODO: discuss if THREE.Audio.load() should support callback.
-	 */
-	function polling ( buffer ) {
+		audio.setBuffer( buffer );
+		callback( audio, listener );
 
-		if ( audio.source.buffer === null ) {
-
-			setTimeout( polling, 0 );
-
-		} else {
-
-			callback( audio, listener );
-
-		}
-
-	};
-
-	setTimeout( polling, 0 );
+	}, onProgress, onError );
 
 };
 
@@ -471,7 +456,7 @@ THREE.MMDLoader.prototype.parsePmd = function ( buffer ) {
 			p.toonIndex = dv.getInt8();
 			p.edgeFlag = dv.getUint8();
 			p.faceCount = dv.getUint32() / 3;
-			p.fileName = dv.getChars( 20 );
+			p.fileName = dv.getSjisStringsAsUnicode( 20 );
 			return p;
 
 		};
@@ -943,7 +928,7 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 
 			p.type = dv.getUint8();
 
-			var indexSize = metadata.vertexIndexSize;
+			var indexSize = metadata.boneIndexSize;
 
 			if ( p.type === 0 ) {  // BDEF1
 
@@ -1122,8 +1107,19 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 
 			if ( p.flag & 0x100 || p.flag & 0x200 ) {
 
-				p.supplyParentIndex = dv.getIndex( pmx.metadata.boneIndexSize );
-				p.supplyRatio = dv.getFloat32();
+				// Note: I don't think Grant is an appropriate name
+				//       but I found that some English translated MMD tools use this term
+				//       so I've named it Grant so far.
+				//       I'd rename to more appropriate name from Grant later.
+				var grant = {};
+
+				grant.isLocal = ( p.flag & 0x80 ) !== 0 ? true : false;
+				grant.affectRotation = ( p.flag & 0x100 ) !== 0 ? true : false;
+				grant.affectPosition = ( p.flag & 0x200 ) !== 0 ? true : false;
+				grant.parentIndex = dv.getIndex( pmx.metadata.boneIndexSize );
+				grant.ratio = dv.getFloat32();
+
+				p.grant = grant;
 
 			}
 
@@ -1878,6 +1874,44 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	};
 
+	var initGrants = function () {
+
+		if ( model.metadata.format === 'pmd' ) {
+
+			return;
+
+		}
+
+		var grants = [];
+
+		for ( var i = 0; i < model.metadata.boneCount; i++ ) {
+
+			var b = model.bones[ i ];
+			var grant = b.grant;
+
+			if ( grant === undefined ) {
+
+				continue;
+
+			}
+
+			var param = {};
+
+			param.index = i;
+			param.parentIndex = grant.parentIndex;
+			param.ratio = grant.ratio;
+			param.isLocal = grant.isLocal;
+			param.affectRotation = grant.affectRotation;
+			param.affectPosition = grant.affectPosition;
+
+			grants.push( param );
+
+		}
+
+		geometry.grants = grants;
+
+	};
+
 	var initMorphs = function () {
 
 		function updateVertex ( params, index, v, ratio ) {
@@ -2578,6 +2612,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 	initFaces();
 	initBones();
 	initIKs();
+	initGrants();
 	initMorphs();
 	initMaterials();
 	initPhysics();
@@ -3673,7 +3708,6 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.ShaderChunk[ "uv2_pars_vertex" ],
 		THREE.ShaderChunk[ "displacementmap_pars_vertex" ],
 		THREE.ShaderChunk[ "envmap_pars_vertex" ],
-		THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 		THREE.ShaderChunk[ "color_pars_vertex" ],
 		THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 		THREE.ShaderChunk[ "skinning_pars_vertex" ],
@@ -3714,7 +3748,6 @@ THREE.ShaderLib[ 'mmd' ] = {
 
 			THREE.ShaderChunk[ "worldpos_vertex" ],
 			THREE.ShaderChunk[ "envmap_vertex" ],
-			THREE.ShaderChunk[ "lights_phong_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 		// ---- MMD specific for outline drawing
@@ -3926,14 +3959,76 @@ THREE.MMDAudioManager.prototype = {
 
 };
 
+THREE.MMDGrantSolver = function ( mesh ) {
+
+	this.mesh = mesh;
+
+};
+
+THREE.MMDGrantSolver.prototype = {
+
+	constructor: THREE.MMDGrantSolver,
+
+	update: function () {
+
+		var q = new THREE.Quaternion();
+
+		return function () {
+
+			for ( var i = 0; i < this.mesh.geometry.grants.length; i ++ ) {
+
+				var g = this.mesh.geometry.grants[ i ];
+				var b = this.mesh.skeleton.bones[ g.index ];
+				var pb = this.mesh.skeleton.bones[ g.parentIndex ];
+
+				if ( g.isLocal ) {
+
+					// TODO: implement
+					if ( g.affectPosition ) {
+
+					}
+
+					// TODO: implement
+					if ( g.affectRotation ) {
+
+					}
+
+				} else {
+
+					// TODO: implement
+					if ( g.affectPosition ) {
+
+					}
+
+					if ( g.affectRotation ) {
+
+						q.set( 0, 0, 0, 1 );
+						q.slerp( pb.quaternion, g.ratio );
+						b.quaternion.multiply( q );
+						b.updateMatrixWorld( true );
+
+					}
+
+				}
+
+			}
+
+		};
+
+	}()
+
+};
+
 THREE.MMDHelper = function ( renderer ) {
 
 	this.renderer = renderer;
+	this.effect = null;
 
 	this.meshes = [];
 
 	this.doAnimation = true;
 	this.doIk = true;
+	this.doGrant = true;
 	this.doPhysics = true;
 	this.doOutlineDrawing = true;
 	this.doCameraAnimation = true;
@@ -3967,11 +4062,23 @@ THREE.MMDHelper.prototype = {
 
 		mesh.mixer = null;
 		mesh.ikSolver = null;
+		mesh.grantSolver = null;
 		mesh.physics = null;
 		this.meshes.push( mesh );
 
 		// workaround until I make IK and Physics Animation plugin
 		this.initBackupBones( mesh );
+
+	},
+
+	/*
+	 * Note: There may be a possibility that Outline wouldn't work well with Effect.
+	 *       In such a case, try to set doOutlineDrawing = false or
+	 *       manually comment out renderer.clear() in *Effect.render().
+	 */
+	setEffect: function ( effect ) {
+
+		this.effect = effect;
 
 	},
 
@@ -4037,6 +4144,14 @@ THREE.MMDHelper.prototype = {
 
 			}
 
+			mesh.ikSolver = new THREE.CCDIKSolver( mesh );
+
+			if ( mesh.geometry.grants !== undefined ) {
+
+				mesh.grantSolver = new THREE.MMDGrantSolver( mesh );
+
+			}
+
 		}
 
 		if ( mesh.geometry.morphAnimations !== undefined ) {
@@ -4052,12 +4167,6 @@ THREE.MMDHelper.prototype = {
 				}
 
 			}
-
-		}
-
-		if ( mesh.geometry.animations !== undefined ) {
-
-			mesh.ikSolver = new THREE.CCDIKSolver( mesh );
 
 		}
 
@@ -4207,13 +4316,14 @@ THREE.MMDHelper.prototype = {
 
 		var mixer = mesh.mixer;
 		var ikSolver = mesh.ikSolver;
+		var grantSolver = mesh.grantSolver;
 		var physics = mesh.physics;
 
 		if ( mixer !== null && this.doAnimation === true ) {
 
 			mixer.update( delta );
 
-			// workaround until I make IK and Physics Animation plugin
+			// workaround until I make IK, Grant, and Physics Animation plugin
 			this.backupBones( mesh );
 
 		}
@@ -4221,6 +4331,12 @@ THREE.MMDHelper.prototype = {
 		if ( ikSolver !== null && this.doIk === true ) {
 
 			ikSolver.update();
+
+		}
+
+		if ( grantSolver !== null && this.doGrant === true ) {
+
+			grantSolver.update();
 
 		}
 
@@ -4281,7 +4397,7 @@ THREE.MMDHelper.prototype = {
 	renderMain: function ( scene, camera ) {
 
 		this.setupMainRendering();
-		this.renderer.render( scene, camera );
+		this.callRender( scene, camera );
 
 	},
 
@@ -4291,9 +4407,23 @@ THREE.MMDHelper.prototype = {
 		this.renderer.shadowMap.enabled = false;
 
 		this.setupOutlineRendering();
-		this.renderer.render( scene, camera );
+		this.callRender( scene, camera );
 
 		this.renderer.shadowMap.enabled = tmpEnabled;
+
+	},
+
+	callRender: function ( scene, camera ) {
+
+		if ( this.effect === null ) {
+
+			this.renderer.render( scene, camera );
+
+		} else {
+
+			this.effect.render( scene, camera );
+
+		}
 
 	},
 
@@ -4440,14 +4570,23 @@ THREE.MMDHelper.prototype = {
 
 		}
 
-		if ( params && params.preventIk === true ) {
+		if ( params === undefined || params.preventIk !== true ) {
 
-			return;
+			var solver = new THREE.CCDIKSolver( mesh );
+			solver.update();
 
 		}
 
-		var solver = new THREE.CCDIKSolver( mesh );
-		solver.update();
+		if ( params === undefined || params.preventGrant !== true ) {
+
+			if ( mesh.geometry.grants !== undefined ) {
+
+				var solver = new THREE.MMDGrantSolver( mesh );
+				solver.update();
+
+			}
+
+		}
 
 	},
 

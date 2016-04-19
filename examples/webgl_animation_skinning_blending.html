@@ -31,7 +31,7 @@
 			<br> Cross fades (and warping) blend between 2 animations and end with a single animation.
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -61,11 +61,7 @@
 				container = document.getElementById( 'container' );
 
 				scene = new THREE.Scene();
-				scene.add ( new THREE.AmbientLight( 0xaaaaaa ) );
-
-				var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light.position.set( 0, 0, 1000 );
-				scene.add( light );
+				scene.add ( new THREE.AmbientLight( 0xffffff ) );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
 				renderer.setClearColor( 0x777777 );
@@ -78,9 +74,7 @@
 				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -98,7 +92,7 @@
 				window.addEventListener( 'toggle-show-model', onShowModel );
 
 				blendMesh = new THREE.BlendCharacter();
-				blendMesh.load( "models/skinned/marine/marine_anims.js", start );
+				blendMesh.load( "models/skinned/marine/marine_anims_core.json", start );
 
 			}
 

@@ -17,7 +17,7 @@
 
 <body>
 
-	<script type="text/javascript" src="../build/three.min.js"></script>
+	<script type="text/javascript" src="../build/three.js"></script>
 	<script type="text/javascript" src="js/Octree.js"></script>
 	<script type="text/javascript" src="js/controls/TrackballControls.js"></script>
 	<script type="text/javascript" src="js/libs/stats.min.js"></script>
@@ -153,12 +153,7 @@
 			// stats
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0';
-			stats.domElement.style.left = '0';
-			stats.domElement.style.zIndex = 100;
-
-			document.body.appendChild( stats.domElement );
+			document.body.appendChild( stats.dom );
 
 			// bottom container
 

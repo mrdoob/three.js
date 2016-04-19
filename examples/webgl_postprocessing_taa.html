@@ -36,16 +36,16 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/postprocessing/ManualMSAARenderPass.js"></script>
-		<script src="js/postprocessing/TAARenderPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/CompositeShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/ManualMSAARenderPass.js"></script>
+		<script src="js/postprocessing/TAARenderPass.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
@@ -112,9 +112,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

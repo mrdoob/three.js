@@ -73,6 +73,15 @@
 		Copies value of *v* to this vector.
 		</div>
 
+		<h3>[method:Vector3 fromArray]( [page:Array array], [page:Integer offset] ) [page:Vector3 this]</h3>
+		<div>
+		array -- The source array in the form [x, y, z].<br />
+		offset -- An optional offset into the array.
+		</div>
+		<div>
+		Sets the vector's components based on an array formatted like [x, y, z]
+		</div>
+
 		<h3>[method:Vector3 add]( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		Adds *v* to this vector.
@@ -114,22 +123,22 @@
 		Inverts this vector.
 		</div>
 
-		<h3>[method:Float dot]( [page:Vector3 v] )</h3>
+		<h3>[method:Float dot]( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		Computes dot product of this vector and *v*.
 		</div>
 
-		<h3>[method:Float lengthSq]()</h3>
+		<h3>[method:Float lengthSq]() [page:Vector3 this]</h3>
 		<div>
 		Computes squared length of this vector.
 		</div>
 
-		<h3>[method:Float length]()</h3>
+		<h3>[method:Float length]() [page:Vector3 this]</h3>
 		<div>
 		Computes length of this vector.
 		</div>
 
-		<h3>[method:Float lengthManhattan]()</h3>
+		<h3>[method:Float lengthManhattan]() [page:Vector3 this]</h3>
 		<div>
 		Computes Manhattan length of this vector.<br />
 		[link:http://en.wikipedia.org/wiki/Taxicab_geometry]
@@ -140,12 +149,12 @@
 		Normalizes this vector. Transforms this Vector into a Unit vector by dividing the vector by it's length.
 		</div>
 
-		<h3>[method:Float distanceTo]( [page:Vector3 v] )</h3>
+		<h3>[method:Float distanceTo]( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		Computes distance of this vector to *v*.
 		</div>
 
-		<h3>[method:Float distanceToSquared]( [page:Vector3 v] )</h3>
+		<h3>[method:Float distanceToSquared]( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		Computes squared distance of this vector to *v*.
 		</div>
@@ -175,18 +184,7 @@
 		Sets this vector extracting scale from matrix transform.
 		</div>
 
-		<h3>[method:Boolean equals]( [page:Vector3 v] )</h3>
-		<div>
-		Checks for strict equality of this vector and *v*.
-		</div>
-
-		<h3>[method:Vector3 clone]()</h3>
-		<div>
-		Clones this vector.
-		</div>
-
-
-		<h3>[method:Vector3 clamp]([page:Vector3 min], [page:Vector3 max]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 clamp]( [page:Vector3 min], [page:Vector3 max] ) [page:Vector3 this]</h3>
 		<div>
 		min -- [page:Vector3] <br />
 		max -- [page:Vector3]
@@ -196,7 +194,7 @@
 		If this vector's x, y or z value is less than the min vector's x, y or z value, it is replaced by the corresponding value.
 		</div>
 
-		<h3>[method:Vector3 clampScalar]([page:Float min], [page:Float max]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 clampScalar]( [page:Float min], [page:Float max] ) [page:Vector3 this]</h3>
 		<div>
 		min -- [page:Float] the minimum value the components will be clamped to <br />
 		max -- [page:Float] the maximum value the components will be clamped to
@@ -206,27 +204,37 @@
 		If this vector's x, y or z values are less than the min value, they are replaced by the min value.
 		</div>
 
-		<h3>[method:Vector3 floor]()</h3>
+		<h3>[method:Vector3 clampLength]( [page:Float min], [page:Float max] ) [page:Vector3 this]</h3>
+		<div>
+		min -- [page:Float] the minimum value the length will be clamped to <br />
+		max -- [page:Float] the maximum value the length will be clamped to
+		</div>
+		<div>
+		If this vector's length is greater than the max value, it is replaced by the max value. <br /><br />
+		If this vector's length is less than the min value, it is replaced by the min value.
+		</div>
+
+		<h3>[method:Vector3 floor]() [page:Vector3 this]</h3>
 		<div>
 		The components of the vector are rounded downwards (towards negative infinity) to an integer value.
 		</div>
 
-		<h3>[method:Vector3 ceil]()</h3>
+		<h3>[method:Vector3 ceil]() [page:Vector3 this]</h3>
 		<div>
 		The components of the vector are rounded upwards (towards positive infinity) to an integer value.
 		</div>
 
-		<h3>[method:Vector3 round]()</h3>
+		<h3>[method:Vector3 round]() [page:Vector3 this]</h3>
 		<div>
 		The components of the vector are rounded towards the nearest integer value.
 		</div>
 
-		<h3>[method:Vector3 roundToZero]()</h3>
+		<h3>[method:Vector3 roundToZero]() [page:Vector3 this]</h3>
 		<div>
 		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
 		</div>
 
-		<h3>[method:Vector3 applyMatrix3]([page:Matrix3 m]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 applyMatrix3]( [page:Matrix3 m] ) [page:Vector3 this]</h3>
 		<div>
 		m -- [page:Matrix3]
 		</div>
@@ -234,7 +242,7 @@
 		Multiplies this vector times a 3 x 3 matrix.
 		</div>
 
-		<h3>[method:Vector3 applyMatrix4]([page:Matrix3 m]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 applyMatrix4]( [page:Matrix3 m] ) [page:Vector3 this]</h3>
 		<div>
 		m -- [page:Matrix4]
 		</div>
@@ -242,7 +250,7 @@
 		Multiplies this vector by 4 x 3 subset of a Matrix4.
 		</div>
 
-		<h3>[method:Vector3 projectOnPlane]([page:Vector3 planeNormal]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 projectOnPlane]( [page:Vector3 planeNormal] ) [page:Vector3 this]</h3>
 		<div>
 		planeNormal -- [page:Vector3 planeNormal] A vector representing a plane normal.
 		</div>
@@ -250,7 +258,7 @@
 		Projects this vector onto a plane by subtracting this vector projected onto the plane's normal from this vector.
 		</div>
 
-		<h3>[method:Vector3 projectOnVector]([page:Vector3]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 projectOnVector]( [page:Vector3] ) [page:Vector3 this]</h3>
 		<div>
 		vector -- [page:Vector3]
 		</div>
@@ -258,7 +266,7 @@
 		Projects this vector onto another vector.
 		</div>
 
-		<h3>[method:Vector3 addScalar]([page:Float]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 addScalar]( [page:Float] ) [page:Vector3 this]</h3>
 		<div>
 		s -- [page:Float]
 		</div>
@@ -266,7 +274,7 @@
 		Adds a s to this vector.
 		</div>
 
-		<h3>[method:Vector3 divide]([page:Vector3 v]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 divide]( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		v -- [page:Vector3]
 		</div>
@@ -274,7 +282,7 @@
 		Divides this vector by vector v.
 		</div>
 
-		<h3>[method:Vector3 min]([page:Vector3 v]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 min]( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		v -- [page:Vector3]
 		</div>
@@ -282,7 +290,7 @@
 		If this vector's x, y, or z value is greater than vector v's x, y, or z value, that value is replaced by the corresponding vector v value.
 		</div>
 
-		<h3>[method:Vector3 max]([page:Vector3 v]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 max]( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		v -- [page:Vector3]
 		</div>
@@ -290,7 +298,7 @@
 		If this vector's x, y, or z value is less than vector v's x, y, or z value, that value is replaced by the corresponding vector v value.
 		</div>
 
-		<h3>[method:Vector3 setComponent]([page:Integer index], [page:Float value]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 setComponent]( [page:Integer index], [page:Float value] ) [page:Vector3 this]</h3>
 		<div>
 		index -- 0, 1, or 2 <br />
 		value -- [page:Float]
@@ -301,7 +309,7 @@
 		If index equals 2 the method sets this vector's z value to value
 		</div>
 
-		<h3>[method:Vector3 transformDirection]([page:Matrix4 m]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 transformDirection]( [page:Matrix4 m] ) [page:Vector3 this]</h3>
 		<div>
 		m -- [page:Matrix4]
 		</div>
@@ -309,7 +317,7 @@
 		Transforms the direction of this vector by a matrix (a 3 x 3 subset of a Matrix4) and then normalizes the result.
 		</div>
 
-		<h3>[method:Vector3 multiplyVectors]([page:Vector3 a], [page:Vector3 b]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 multiplyVectors]( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3 this]</h3>
 		<div>
 		a -- [page:Vector3] <br />
 		b -- [page:Vector3]
@@ -318,7 +326,7 @@
 		Sets this vector equal to the result of multiplying vector a by vector b.
 		</div>
 
-		<h3>[method:Float getComponent]([page:Integer index])</h3>
+		<h3>[method:Float getComponent]( [page:Integer index] ) [page:Vector3 this]</h3>
 		<div>
 		index -- [page:Integer] 0, 1, or 2
 		</div>
@@ -331,7 +339,7 @@
 		Index 2: z <br />
 		</div>
 
-		<h3>[method:Vector3 applyAxisAngle]([page:Vector3 axis], [page:Float angle]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 applyAxisAngle]( [page:Vector3 axis], [page:Float angle] ) [page:Vector3 this]</h3>
 		<div>
 		axis -- A normalized [page:Vector3] <br />
 		angle -- An angle in radians
@@ -340,7 +348,7 @@
 		Applies a rotation specified by an axis and an angle to this vector.
 		</div>
 
-		<h3>[method:Vector3 lerp]([page:Vector3 v], [page:Float alpha]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 lerp]( [page:Vector3 v], [page:Float alpha] ) [page:Vector3 this]</h3>
 		<div>
 		v -- [page:Vector3] <br />
 		alpha -- [page:Float] between 0 and 1.
@@ -349,7 +357,7 @@
 		Linear Interpolation between this vector and vector v, where alpha is the percent along the line.
 		</div>
 
-		<h3>[method:Vector3 lerpVectors]([page:Vector3 v1], [page:Vector3 v2], [page:Float alpha]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 lerpVectors]( [page:Vector3 v1], [page:Vector3 v2], [page:Float alpha] ) [page:Vector3 this]</h3>
 		<div>
 		v1 -- [page:Vector3] <br />
 		v2 -- [page:Vector3] <br />
@@ -359,7 +367,7 @@
 		Sets this vector to be the vector linearly interpolated between *v1* and *v2* with *alpha* factor.
 		</div>
 
-		<h3>[method:Float angleTo]([page:Vector3 v])</h3>
+		<h3>[method:Float angleTo]( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		v -- [page:Vector3]
 		</div>
@@ -367,7 +375,7 @@
 		Returns the angle between this vector and vector v in radians.
 		</div>
 
-		<h3>[method:Vector3 setFromMatrixColumn]([page:Integer index], [page:Matrix4 matrix]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 setFromMatrixColumn]( [page:Integer index], [page:Matrix4 matrix] ) [page:Vector3 this]</h3>
 		<div>
 		index -- 0, 1, 2, or 3 <br />
 		matrix -- [page:Matrix4]
@@ -376,7 +384,7 @@
 		Sets this vector's x, y, and z equal to the column of the matrix specified by the index.
 		</div>
 
-		<h3>[method:Vector3 reflect]([page:Vector3 normal]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 reflect]( [page:Vector3 normal] ) [page:Vector3 this]</h3>
 		<div>
 		normal -- [page:Vector3] the normal to the reflecting plane
 		</div>
@@ -384,15 +392,7 @@
 		Reflect incident vector off of plane orthogonal to normal. normal is assumed to have unit length.
 		</div>
 
-		<h3>[method:Vector3 fromArray]([page:Array array]) [page:Vector3 this]</h3>
-		<div>
-		array -- [page:Array] [x, y, z]
-		</div>
-		<div>
-		Sets the vector's components based on an array formatted like [x, y, z]
-		</div>
-
-		<h3>[method:Vector3 multiply]([page:Vector3 v]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 multiply]( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		v -- [page:Vector3] <br />
 		</div>
@@ -400,7 +400,7 @@
 		Multipies this vector by vector v.
 		</div>
 
-		<h3>[method:Vector3 applyProjection]([page:Matrix4 m]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 applyProjection]( [page:Matrix4 m] ) [page:Vector3 this]</h3>
 		<div>
 		m -- [page:Matrix4] projection matrix.
 		</div>
@@ -408,18 +408,7 @@
 		Multiplies this vector and m, and divides by perspective.
 		</div>
 
-		<h3>[method:Array toArray]( [page:Array array] )</h3>
-		<div>
-		array -- Optional array to store the vector.
-		</div>
-		<div>
-		Assigns this vector's x value to array[0]. <br />
-		Assigns this vector's y value to array[1]. <br />
-		Assigns this vector's z value to array[2]. <br />
-		Returns the created array.
-		</div>
-
-		<h3>[method:Vector3 applyEuler]([page:Euler euler]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 applyEuler]( [page:Euler euler] ) [page:Vector3 this]</h3>
 		<div>
 		euler -- [page:Euler]
 		</div>
@@ -427,7 +416,7 @@
 		Applies euler transform to this vector by converting the [page:Euler] obect to a [page:Quaternion] and applying.
 		</div>
 
-		<h3>[method:Vector3 applyQuaternion]([page:Quaternion quaternion]) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 applyQuaternion]( [page:Quaternion quaternion] ) [page:Vector3 this]</h3>
 		<div>
 		quaternion -- [page:Quaternion]
 		</div>
@@ -435,7 +424,7 @@
 		Applies a [page:Quaternion] transform to this vector.
 		</div>
 
-		<h3>[method:Vector3 project]( [page:Camera camera] )</h3>
+		<h3>[method:Vector3 project]( [page:Camera camera] ) [page:Vector3 this]</h3>
 		<div>
 		[page:Camera camera] — camera to use in the projection.<br />
 		</div>
@@ -443,12 +432,34 @@
 		Projects the vector with the camera.
 		</div>
 
-		<h3>[method:Vector3 unproject]( [page:Camera camera] )</h3>
+		<h3>[method:Vector3 unproject]( [page:Camera camera] ) [page:Vector3 this]</h3>
 		<div>
 		[page:Camera camera] — camera to use in the projection.<br />
 		</div>
 		<div>
 		Unprojects the vector with the camera.
+		</div>
+
+		<h3>[method:Boolean equals]( [page:Vector3 v] ) [page:Vector3 this]</h3>
+		<div>
+		Checks for strict equality of this vector and *v*.
+		</div>
+
+		<h3>[method:Vector3 clone]() [page:Vector3 this]</h3>
+		<div>
+		Clones this vector.
+		</div>
+
+		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] ) [page:Vector3 this]</h3>
+		<div>
+		array -- An optional array to store the vector to. <br />
+		offset -- An optional offset into the array.
+		</div>
+		<div>
+		Assigns this vector's x value to array[0]. <br />
+		Assigns this vector's y value to array[1]. <br />
+		Assigns this vector's z value to array[2]. <br />
+		Returns the created array.
 		</div>
 
 		<h2>Source</h2>

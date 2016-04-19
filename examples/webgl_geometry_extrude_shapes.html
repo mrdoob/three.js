@@ -19,7 +19,7 @@
 
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 
 		<script>
@@ -66,13 +66,16 @@
 
 				//
 
-				var closedSpline = new THREE.ClosedSplineCurve3( [
+				var closedSpline = new THREE.CatmullRomCurve3( [
 					new THREE.Vector3( -60, -100,  60 ),
 					new THREE.Vector3( -60,   20,  60 ),
 					new THREE.Vector3( -60,  120,  60 ),
 					new THREE.Vector3(  60,   20, -60 ),
 					new THREE.Vector3(  60, -100, -60 )
 				] );
+
+				closedSpline.type = 'catmullrom';
+				closedSpline.closed = true;
 
 				var extrudeSettings = {
 					steps			: 100,

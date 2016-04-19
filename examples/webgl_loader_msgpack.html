@@ -35,11 +35,11 @@ https://github.com/creationix/msgpack-js-browser
 
 			a { color: orange }
 		</style>
-		<script src='../build/three.min.js'></script>
+		<script src='../build/three.js'></script>
 		<script src='js/controls/OrbitControls.js'></script>
 		<script src='js/Detector.js'></script>
+		<script src='js/libs/msgpack-js.js'></script>
 		<script src='js/libs/stats.min.js'></script>
-		<script src='js/libs/require.js'></script>
 	</head>
 	<body>
 		<div id='info'>
@@ -52,8 +52,6 @@ https://github.com/creationix/msgpack-js-browser
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			requirejs.config( { baseUrl: 'js/libs' } );
-
 			var container, scene, camera, renderer;
 
 			function render() {
@@ -65,19 +63,19 @@ https://github.com/creationix/msgpack-js-browser
 			function threePointLight() {
 
 				var directionalLight = new THREE.DirectionalLight( 0xb8b8b8 );
-				directionalLight.position.set(1, 1, 1).normalize();
+				directionalLight.position.set( 1, 1, 1 ).normalize();
 				directionalLight.intensity = 1.0;
 				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xb8b8b8 );
-				directionalLight.position.set(-1, 0.6, 0.5).normalize();
+				directionalLight.position.set( - 1, 0.6, 0.5 ).normalize();
 				directionalLight.intensity = 0.5;
-				scene.add(directionalLight);
+				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight();
-				directionalLight.position.set(-0.3, 0.6, -0.8).normalize( 0xb8b8b8 );
+				directionalLight.position.set( - 0.3, 0.6, - 0.8 ).normalize( 0xb8b8b8 );
 				directionalLight.intensity = 0.45;
-				scene.add(directionalLight);
+				scene.add( directionalLight );
 
 			}
 
@@ -94,23 +92,15 @@ https://github.com/creationix/msgpack-js-browser
 
 			function loadMSGPack() {
 
-				require(['msgpack-js'], function ( msgpack ) {
+				var loader = new THREE.XHRLoader();
+				loader.setResponseType( 'arraybuffer' );
+				loader.load( 'scenes/robo_pigeon.pack', function ( data ) {
 
-						var xhr = new XMLHttpRequest();
-						xhr.open('GET', 'scenes/robo_pigeon.pack', true);
-						xhr.responseType = 'arraybuffer';
+					var decoded = msgpack.decode( data );
 
-						xhr.onload = function( e ) {
+					var loader = new THREE.ObjectLoader();
 
-								var decoded = msgpack.decode( this.response );
-
-								var loader = new THREE.ObjectLoader();
-
-								setupScene( loader.parse( decoded ) );
-
-						};
-
-						xhr.send();
+					setupScene( loader.parse( decoded ) );
 
 				} );
 
@@ -131,7 +121,7 @@ https://github.com/creationix/msgpack-js-browser
 				scene = new THREE.Scene();
 
 				scene.add( new THREE.GridHelper( 10, 2.5 ) );
-				container = document.getElementById('viewport');
+				container = document.getElementById( 'viewport' );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true	} );
 				renderer.setClearColor( 0x000000, 0 );

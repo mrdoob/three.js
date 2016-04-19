@@ -72,6 +72,16 @@
 		<div>Note: Sorting is used to attempt to properly render objects that have some degree of transparency.  By definition, sorting objects may not work in all cases.  Depending on the needs of application, it may be neccessary to turn off sorting and use other methods to deal with transparency rendering e.g. manually determining the object rendering order.</div>
 
 
+		<h3>[property:Array clippingPlanes]</h3>
+
+		<div>User-defined clipping planes specified as THREE.Plane objects in world space. These planes apply globally. Points in space whose dot product with the plane is negative are cut away. Default is [].</div>
+
+		<h3>[property:Boolean localClippingEnabled]</h3>
+
+		<div>Defines whether the renderer respects object-level clipping planes. Default is false.</div>
+
+
+
 		<h3>[property:Boolean gammaInput]</h3>
 
 		<div>Default is false. If set, then it expects that all textures and colors are premultiplied gamma.</div>
@@ -125,7 +135,6 @@
 		<ul>
 			<li>memory:
 				<ul>
-					<li>programs</li>
 					<li>geometries</li>
 					<li>textures</li>
 				</ul>
@@ -138,12 +147,14 @@
 					<li>points</li>
 				</ul>
 			</li>
+			<li>programs
+			</li>
 		</ul>
 		</div>
 
-		<h3>[property:ShadowMapPlugin shadowMapPlugin]</h3>
+		<h3>[property:WebGLShadowMap shadowMap]</h3>
 		<div>
-		This contains the reference to the shadowMapPlugin.
+		This contains the reference to the component implementing shadow mapping.
 		</div>
 
 
@@ -163,6 +174,9 @@
 		<div>
 		Return a [page:Boolean] true if the context supports vertex textures.
 		</div>
+
+		<h3>[method:Object getSize]()</h3>
+		<div>Returns an object containing the width and height of the renderer's output canvas, in pixels.</div>
 
 		<h3>[method:null setSize]( [page:Integer width], [page:Integer height], [page:Boolean updateStyle] )</h3>
 		<div>Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0). Setting updateStyle to true adds explicit pixel units to the output canvas style.</div>

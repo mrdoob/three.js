@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<title>three.js webvr - roller coaster</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<title>three.js webvr - roller coaster</title>
 		<style>
 			body {
 				margin: 0px;
@@ -19,7 +19,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/RollerCoaster.js"></script>
 
@@ -229,7 +229,7 @@
 				velocity -= tangent.y * 0.0000015;
 				velocity = Math.max( velocity, 0.00004 );
 
-				train.lookAt( lookAt.copy( position ).add( tangent ) );
+				train.lookAt( lookAt.copy( position ).sub( tangent ) );
 
 				//
 

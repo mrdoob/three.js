@@ -33,7 +33,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
 
@@ -128,9 +128,7 @@
 				document.body.appendChild( info );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				// container.appendChild( stats.domElement );
+				// container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 0, 500 );

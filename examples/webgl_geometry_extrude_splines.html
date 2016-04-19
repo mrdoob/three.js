@@ -15,7 +15,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<!-- where curves formulas are defined -->
 		<script src="js/CurveExtras.js"></script>
@@ -46,13 +46,16 @@
 		var pipeSpline = new THREE.CatmullRomCurve3([
 				new THREE.Vector3(0, 10, -10), new THREE.Vector3(10, 0, -10), new THREE.Vector3(20, 0, 0), new THREE.Vector3(30, 0, 10), new THREE.Vector3(30, 0, 20), new THREE.Vector3(20, 0, 30), new THREE.Vector3(10, 0, 30), new THREE.Vector3(0, 0, 30), new THREE.Vector3(-10, 10, 30), new THREE.Vector3(-10, 20, 30), new THREE.Vector3(0, 30, 30), new THREE.Vector3(10, 30, 30), new THREE.Vector3(20, 30, 15), new THREE.Vector3(10, 30, 10), new THREE.Vector3(0, 30, 10), new THREE.Vector3(-10, 20, 10), new THREE.Vector3(-10, 10, 10), new THREE.Vector3(0, 0, 10), new THREE.Vector3(10, -10, 10), new THREE.Vector3(20, -15, 10), new THREE.Vector3(30, -15, 10), new THREE.Vector3(40, -15, 10), new THREE.Vector3(50, -15, 10), new THREE.Vector3(60, 0, 10), new THREE.Vector3(70, 0, 0), new THREE.Vector3(80, 0, 0), new THREE.Vector3(90, 0, 0), new THREE.Vector3(100, 0, 0)]);
 
-		var sampleClosedSpline = new THREE.ClosedSplineCurve3([
+		var sampleClosedSpline = new THREE.CatmullRomCurve3([
 			new THREE.Vector3(0, -40, -40),
 			new THREE.Vector3(0, 40, -40),
 			new THREE.Vector3(0, 140, -40),
 			new THREE.Vector3(0, 40, 40),
 			new THREE.Vector3(0, -40, 40),
 		]);
+
+		sampleClosedSpline.type = 'catmullrom';
+		sampleClosedSpline.closed = true;
 
 		// Keep a dictionary of Curve instances
 		var splines = {
@@ -227,9 +230,7 @@
 			container.appendChild( renderer.domElement );
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0px';
-			container.appendChild( stats.domElement );
+			container.appendChild( stats.dom );
 
 			renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
 			renderer.domElement.addEventListener( 'touchstart', onDocumentTouchStart, false );

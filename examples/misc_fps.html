@@ -30,9 +30,9 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - platformer demo. cubemap by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>.<br />Use arrow keys to look around and WASD to move.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - platformer demo. cubemap by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>.<br />Use arrow keys to look around, WASD to move and SPACE to jump.</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script>
 
@@ -101,6 +101,10 @@
 						if( Math.abs( combined.x ) >= Math.abs( motion.velocity.x ) ) motion.velocity.x = combined.x;
 						if( Math.abs( combined.y ) >= Math.abs( motion.velocity.y ) ) motion.velocity.y = combined.y;
 						if( Math.abs( combined.z ) >= Math.abs( motion.velocity.z ) ) motion.velocity.z = combined.z;
+
+						//jump
+ 						var vy = keysPressed[keys.SP] ? 0.7 : 0;
+ 						motion.velocity.y += vy;
 					}
 				};
 			})();

@@ -599,6 +599,11 @@ THREE.ColladaLoader.prototype = {
 						texture.offset.set( technique.offsetU, technique.offsetV );
 						texture.repeat.set( technique.repeatU, technique.repeatV );
 
+					} else {
+				
+						texture.wrapS = THREE.RepeatWrapping;
+						texture.wrapT = THREE.RepeatWrapping;
+					
 					}
 
 					texture.needsUpdate = true;

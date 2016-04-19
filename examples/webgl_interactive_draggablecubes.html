@@ -15,7 +15,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 
@@ -60,14 +60,11 @@
 				light.position.set( 0, 500, 2000 );
 				light.castShadow = true;
 
-				light.shadowCameraNear = 200;
-				light.shadowCameraFar = camera.far;
-				light.shadowCameraFov = 50;
+				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 200, 10000 ) );
+				light.shadow.bias = - 0.00022;
 
-				light.shadowBias = -0.00022;
-
-				light.shadowMapWidth = 2048;
-				light.shadowMapHeight = 2048;
+				light.shadow.mapSize.width = 2048;
+				light.shadow.mapSize.height = 2048;
 
 				scene.add( light );
 
@@ -124,9 +121,7 @@
 				container.appendChild( info );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );

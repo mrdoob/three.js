@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - effects - cardboard</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<style>
+			body {
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/WebVR.js"></script>
+		<script src="js/controls/VRControls.js"></script>
+		<script src="js/effects/VREffect.js"></script>
+		<script>
+
+			if ( WEBVR.isLatestAvailable() === false ) {
+
+				document.body.appendChild( WEBVR.getMessage() );
+
+			}
+
+			//
+
+			var camera, scene, renderer;
+			var effect, controls;
+
+			init();
+			animate();
+
+			function init() {
+
+				scene = new THREE.Scene();
+
+				var dummy = new THREE.Camera();
+				dummy.position.set( 2, 1, 2 );
+				dummy.lookAt( scene.position );
+				scene.add( dummy );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+				dummy.add( camera );
+
+				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );;
+				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2 } );
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.y = 0.75;
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+				var geometry = new THREE.BoxGeometry( 3, 0.1, 3 );
+				var material = new THREE.MeshStandardMaterial( { roughness: 1.0, metalness: 0.0 } );
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.y = - 0.1;
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+				var light = new THREE.DirectionalLight( 0x8800ff );
+				light.position.set( - 1, 1.5, 0.5 );
+				light.castShadow = true;
+				light.shadow.camera.zoom = 4;
+				scene.add( light );
+
+				var light = new THREE.DirectionalLight( 0xff0000 );
+				light.position.set( 1, 1.5, - 0.5 );
+				light.castShadow = true;
+				light.shadow.camera.zoom = 4;
+				scene.add( light );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0x101010 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				controls = new THREE.VRControls( camera );
+				effect = new THREE.VREffect( renderer );
+
+				if ( WEBVR.isAvailable() === true ) {
+
+					document.body.appendChild( WEBVR.getButton( effect ) );
+
+				}
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				var time = performance.now() * 0.0002;
+				var mesh = scene.children[ 1 ];
+				mesh.rotation.x = time * 2;
+				mesh.rotation.y = time * 5;
+
+				controls.update();
+
+				effect.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

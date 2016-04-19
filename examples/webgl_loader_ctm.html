@@ -24,11 +24,6 @@
 			}
 
 			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -42,7 +37,7 @@
 		<a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/ctm/lzma.js"></script>
 		<script src="js/loaders/ctm/ctm.js"></script>
@@ -108,8 +103,6 @@
 				light.castShadow = true;
 				light.shadow.mapWidth = 1024;
 				light.shadow.mapHeight = 1024;
-				light.shadow.camera.fov = 45;
-				light.shadow.camera.far = 650;
 				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 
 				scene.add( light );
@@ -134,7 +127,7 @@
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// EVENTS
 
