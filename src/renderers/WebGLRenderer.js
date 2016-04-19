@@ -1044,26 +1044,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 						dataType = _gl.UNSIGNED_BYTE;
 
 					}
-					//A dataview can be nice since you can't create a new TypedArray on an existing buffer if the 		 					
- 					//data you need is offset, and that offset is not a multiple of the bytes-per-element		
- 					else if( array instanceof DataView ) {		
-
- 						if(!array.glDataType)		
- 						{		
-
- 							console.warn("DataView buffer attributes must set glDataType");		
-
- 						}else		
- 						{		
-
- 							dataType = array.glDataType;		
-
- 						}		
- 								
- 					}
- 					else 
+ 					else
 					{
+
 						dataType = _gl.FLOAT;
+
 					}
 					
 					if(geometryAttribute.normalized)

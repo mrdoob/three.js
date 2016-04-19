@@ -69,25 +69,6 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	checkForDataViews : function()
-	{
-		var attributes = this.attributes;
-		for ( var key in attributes ) {
-
-			var attribute = attributes[ key ];
-
-			if(attribute.array instanceof DataView)
-			{
-
-				console.error("Cannot access vertex data when a BufferAttribute is backed by a DataView" );
-				return true;
-
-			}
-
-		}
-		return false;
-	},
-
 	getAttribute: function ( name ) {
 
 		return this.attributes[ name ];
@@ -128,8 +109,6 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	applyMatrix: function ( matrix ) {
-
-		if(this.checkForDataViews()) return;
 
 		var position = this.attributes.position;
 		
@@ -346,8 +325,6 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	updateFromObject: function ( object ) {
-
-		if(this.checkForDataViews()) return;
 
 		var geometry = object.geometry;
 
@@ -668,8 +645,7 @@ THREE.BufferGeometry.prototype = {
 
 			var positions = attributes.position.array;
 
-			//since we can't modify a DataView properly, let's just treat it as if it did not exist
-			if ( attributes.normal === undefined || attributes.normal.array instanceof DataView) {
+			if ( attributes.normal === undefined) {
 
 				this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( positions.length ), 3 ) );
 
@@ -794,8 +770,6 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if(this.checkForDataViews() || geometry.checkForDataViews() ) return;
-
 		if ( offset === undefined ) offset = 0;
 
 		var attributes = this.attributes;
@@ -826,8 +800,6 @@ THREE.BufferGeometry.prototype = {
 
 	normalizeNormals: function () {
 
-		if(this.checkForDataViews()) return; 
-
 		var normals = this.attributes.normal.array;
 
 		var x, y, z, n;
@@ -856,8 +828,6 @@ THREE.BufferGeometry.prototype = {
 			return this;
 
 		}
-
-		if(this.checkForDataViews()) return; 
 
 		var geometry2 = new THREE.BufferGeometry();
 
@@ -897,8 +867,6 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	toJSON: function () {
-
-		if(this.checkForDataViews()) return; 
 		
 		var data = {
 			metadata: {
