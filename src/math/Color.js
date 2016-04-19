@@ -39,6 +39,13 @@ THREE.Color.prototype = {
 	get g() { return this.array[ this.offset + 1 ]; },
 	get b() { return this.array[ this.offset + 2 ]; },
 
+	attach: function( array, offset ) {
+
+		this.array = array;
+		this.offset = offset;
+
+	},
+
 	set: function ( value ) {
 
 		if ( value instanceof THREE.Color ) {

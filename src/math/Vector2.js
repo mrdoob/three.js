@@ -36,8 +36,16 @@ THREE.Vector2.prototype = {
 	get x() { return this.array[ this.offset ]; },
 	get y() { return this.array[ this.offset + 1 ]; },
 
+	// why have these when x(), y(), z() are already functions?
 	setX: function ( v ) { this.array[ this.offset ] = v; return this; },
 	setY: function ( v ) { this.array[ this.offset + 1 ] = v; return this; },
+
+	attach: function( array, offset ) {
+
+		this.array = array;
+		this.offset = offset;
+
+	},
 
 	get width() {
 

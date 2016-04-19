@@ -18,7 +18,7 @@ THREE.Vector4 = function ( x, y, z, w ) {
 		return this;
 
 	}
-	
+
  	this.offset = THREE.BlockAllocator.getFloat32( 4 );
  	this.array = THREE.BlockAllocator.activeBuffer;
 
@@ -40,10 +40,18 @@ THREE.Vector4.prototype = {
 	get z() { return this.array[ this.offset + 2 ]; },
 	get w() { return this.array[ this.offset + 3 ]; },
 
+	// why have these when x(), y(), z() are already functions?
 	setX: function ( v ) { this.array[ this.offset ] = v; return this; },
 	setY: function ( v ) { this.array[ this.offset + 1 ] = v; return this; },
 	setZ: function ( v ) { this.array[ this.offset + 2 ] = v; return this; },
 	setW: function ( v ) { this.array[ this.offset + 3 ] = v; return this; },
+
+	attach: function( array, offset ) {
+
+		this.array = array;
+		this.offset = offset;
+
+	},
 
 	set: function ( x, y, z, w ) {
 
