@@ -69,25 +69,6 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	checkForDataViews : function()
-	{
-		var attributes = this.attributes;
-		for ( var key in attributes ) {
-
-			var attribute = attributes[ key ];
-
-			if(attribute.array instanceof DataView)
-			{
-
-				console.error("Cannot access vertex data when a BufferAttribute is backed by a DataView" );
-				return true;
-
-			}
-
-		}
-		return false;
-	},
-
 	getAttribute: function ( name ) {
 
 		return this.attributes[ name ];
@@ -129,18 +110,32 @@ THREE.BufferGeometry.prototype = {
 
 	applyMatrix: function ( matrix ) {
 
-		if(this.checkForDataViews()) return;
-
 		var position = this.attributes.position;
 		
+		if( position !== undefined && position.array instanceof DataView)
+		{
+
+			console.error("THREE.BufferGeometry.applyMatrix: Cannot modify geometry when BufferAttribute.array is a DataView");
+			return;
+
+		}
+
+		var normal = this.attributes.normal;
+
+		if( normal !== undefined && normal.array instanceof DataView)
+		{
+
+			console.error("THREE.BufferGeometry.applyMatrix: Cannot modify geometry when BufferAttribute.array is a DataView");
+			return;
+
+		}
+
 		if ( position !== undefined ) {
 
 			matrix.applyToVector3Array( position.array );
 			position.needsUpdate = true;
 
 		}
-
-		var normal = this.attributes.normal;
 
 		if ( normal !== undefined ) {
 
@@ -347,8 +342,6 @@ THREE.BufferGeometry.prototype = {
 
 	updateFromObject: function ( object ) {
 
-		if(this.checkForDataViews()) return;
-
 		var geometry = object.geometry;
 
 		if ( object instanceof THREE.Mesh ) {
@@ -381,6 +374,13 @@ THREE.BufferGeometry.prototype = {
 
 			var attribute = this.attributes.position;
 
+			if(attribute !== undefined && attribute.array instanceof DataView)
+			{
+
+				console.error("THREE.BufferGeometry.updateFromObject: Cannot modify geometry when BufferAttribute.array is a DataView");
+				return;
+
+			}
 			if ( attribute !== undefined ) {
 
 				attribute.copyVector3sArray( geometry.vertices );
@@ -395,6 +395,14 @@ THREE.BufferGeometry.prototype = {
 		if ( geometry.normalsNeedUpdate === true ) {
 
 			var attribute = this.attributes.normal;
+
+			if(attribute !== undefined && attribute.array instanceof DataView)
+			{
+
+				console.error("THREE.BufferGeometry.updateFromObject: Cannot modify geometry when BufferAttribute.array is a DataView");
+				return;
+
+			}
 
 			if ( attribute !== undefined ) {
 
@@ -411,6 +419,14 @@ THREE.BufferGeometry.prototype = {
 
 			var attribute = this.attributes.color;
 
+			if(attribute !== undefined && attribute.array instanceof DataView)
+			{
+
+				console.error("THREE.BufferGeometry.updateFromObject: Cannot modify geometry when BufferAttribute.array is a DataView");
+				return;
+
+			}
+
 			if ( attribute !== undefined ) {
 
 				attribute.copyColorsArray( geometry.colors );
@@ -426,6 +442,14 @@ THREE.BufferGeometry.prototype = {
 
 			var attribute = this.attributes.uv;
 
+			if(attribute !== undefined && attribute.array instanceof DataView)
+			{
+
+				console.error("THREE.BufferGeometry.updateFromObject: Cannot modify geometry when BufferAttribute.array is a DataView");
+				return;
+
+			}
+
 			if ( attribute !== undefined ) {
 
 				attribute.copyVector2sArray( geometry.uvs );
@@ -440,6 +464,14 @@ THREE.BufferGeometry.prototype = {
 		if ( geometry.lineDistancesNeedUpdate ) {
 
 			var attribute = this.attributes.lineDistance;
+
+			if(attribute !== undefined && attribute.array instanceof DataView)
+			{
+
+				console.error("THREE.BufferGeometry.updateFromObject: Cannot modify geometry when BufferAttribute.array is a DataView");
+				return;
+				
+			}
 
 			if ( attribute !== undefined ) {
 
@@ -583,6 +615,14 @@ THREE.BufferGeometry.prototype = {
 
 		var positions = this.attributes.position.array;
 
+		if(positions !== undefined && positions instanceof DataView)
+		{
+
+			console.error("THREE.BufferGeometry.computeBoundingBox: Cannot compute boundingBox when BufferAttribute.array is a DataView");
+			return;
+			
+		}
+
 		if ( positions ) {
 
 			this.boundingBox.setFromArray( positions );
@@ -618,6 +658,14 @@ THREE.BufferGeometry.prototype = {
 			}
 
 			var positions = this.attributes.position.array;
+
+			if(positions !== undefined && positions instanceof DataView)
+			{
+
+				console.error("THREE.BufferGeometry.computeBoundingSphere(): Cannot compute boundingBox when BufferAttribute.array is a DataView");
+				return;
+				
+			}
 
 			if ( positions ) {
 
@@ -667,6 +715,14 @@ THREE.BufferGeometry.prototype = {
 		if ( attributes.position ) {
 
 			var positions = attributes.position.array;
+
+			if(positions !== undefined && positions instanceof DataView)
+			{
+
+				console.error("THREE.BufferGeometry.computeVertexNormals: Cannot compute boundingBox when BufferAttribute.array is a DataView");
+				return;
+				
+			}
 
 			//since we can't modify a DataView properly, let's just treat it as if it did not exist
 			if ( attributes.normal === undefined || attributes.normal.array instanceof DataView) {
@@ -794,8 +850,6 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if(this.checkForDataViews() || geometry.checkForDataViews() ) return;
-
 		if ( offset === undefined ) offset = 0;
 
 		var attributes = this.attributes;
@@ -814,6 +868,14 @@ THREE.BufferGeometry.prototype = {
 
 			for ( var i = 0, j = attributeSize * offset; i < attributeArray2.length; i ++, j ++ ) {
 
+				if(attributeArray1 instanceof DataView || attributeArray2 instanceof DataView)
+				{
+
+					console.error( 'THREE.BufferGeometry.merge(): Cannot merge attributes when either the source or the destination is a DataView');
+					break;
+
+				}
+
 				attributeArray1[ j ] = attributeArray2[ i ];
 
 			}
@@ -826,9 +888,15 @@ THREE.BufferGeometry.prototype = {
 
 	normalizeNormals: function () {
 
-		if(this.checkForDataViews()) return; 
-
 		var normals = this.attributes.normal.array;
+
+		if(normals instanceof DataView)
+		{
+
+			console.error( 'THREE.BufferGeometry.normalizeNormals(): Cannot generate normals when normal BufferAttribute is a DataView');
+			return;
+
+		}
 
 		var x, y, z, n;
 
@@ -857,8 +925,6 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if(this.checkForDataViews()) return; 
-
 		var geometry2 = new THREE.BufferGeometry();
 
 		var indices = this.index.array;
@@ -869,6 +935,14 @@ THREE.BufferGeometry.prototype = {
 			var attribute = attributes[ name ];
 
 			var array = attribute.array;
+
+			if(array instanceof DataView)
+			{
+
+				console.error( 'THREE.BufferGeometry.toNonIndexed(): Cannot manipulate geometry when BufferAttribute is a DataView');
+				return;
+
+			}
 
 			var itemSize = attribute.itemSize;
 
@@ -898,8 +972,6 @@ THREE.BufferGeometry.prototype = {
 
 	toJSON: function () {
 
-		if(this.checkForDataViews()) return; 
-		
 		var data = {
 			metadata: {
 				version: 4.4,
@@ -949,7 +1021,17 @@ THREE.BufferGeometry.prototype = {
 
 			var attribute = attributes[ key ];
 
+			if(attribute.array instanceof DataView)
+			{
+
+				console.error( 'THREE.BufferGeometry.toJSON(): Cannot serialize when BufferAttribute is a DataView');
+				return;
+
+			}
+
 			var array = Array.prototype.slice.call( attribute.array );
+
+			
 
 			data.data.attributes[ key ] = {
 				itemSize: attribute.itemSize,
