@@ -7,7 +7,7 @@
 THREE.BlockAllocator = {
 
   blockSize: 1024*1,
-  activeBuffer: new Float32Array( THREE.MemoryBlockSize ),
+  activeBuffer: new Float32Array( 0 ),
   nextOffset: 0,
 
   getFloat32: function ( length ) {
@@ -15,7 +15,7 @@ THREE.BlockAllocator = {
     var offset = this.nextOffset;
     this.nextOffset += length;
 
-    if( this.nextOffset >= this.blockSize ) {
+    if( this.nextOffset >= this.activeBuffer.length ) {
 
       this.activeBuffer = new Float32Array( this.blockSize );
       this.nextOffset = length;
