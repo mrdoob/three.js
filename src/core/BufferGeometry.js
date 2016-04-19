@@ -790,7 +790,8 @@ THREE.BufferGeometry.prototype = {
 
 		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
 
-			n.attach( normals, i ).normalize();
+			n.normalize();
+			n.offset += 3;
 
 		}
 

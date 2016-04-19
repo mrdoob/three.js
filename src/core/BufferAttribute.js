@@ -77,6 +77,7 @@ THREE.BufferAttribute.prototype = {
 	copyColorsArray: function ( colors ) {
 
 		var array = this.array, offset = 0;
+		var c = new THREE.Color( array, 0 );
 
 		for ( var i = 0, l = colors.length; i < l; i ++ ) {
 
@@ -85,13 +86,16 @@ THREE.BufferAttribute.prototype = {
 			if ( color === undefined ) {
 
 				console.warn( 'THREE.BufferAttribute.copyColorsArray(): color is undefined', i );
-				color = new THREE.Color();
+				c.set( 0, 0, 0 );
+
+			}
+			else {
+
+				c.copy( color );
 
 			}
 
-			array[ offset ++ ] = color.r;
-			array[ offset ++ ] = color.g;
-			array[ offset ++ ] = color.b;
+			c.offset += 3;
 
 		}
 
@@ -120,6 +124,7 @@ THREE.BufferAttribute.prototype = {
 	copyVector2sArray: function ( vectors ) {
 
 		var array = this.array, offset = 0;
+		var v = new THREE.Vector2( array, 0 );
 
 		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
@@ -128,12 +133,16 @@ THREE.BufferAttribute.prototype = {
 			if ( vector === undefined ) {
 
 				console.warn( 'THREE.BufferAttribute.copyVector2sArray(): vector is undefined', i );
-				vector = new THREE.Vector2();
+				v.set( 0, 0 );
+
+			}
+			else {
+
+				v.copy( vector );
 
 			}
 
-			array[ offset ++ ] = vector.x;
-			array[ offset ++ ] = vector.y;
+			v.offset += 2;
 
 		}
 
@@ -144,6 +153,7 @@ THREE.BufferAttribute.prototype = {
 	copyVector3sArray: function ( vectors ) {
 
 		var array = this.array, offset = 0;
+		var v = new THREE.Vector3( array, 0 );
 
 		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
@@ -152,13 +162,16 @@ THREE.BufferAttribute.prototype = {
 			if ( vector === undefined ) {
 
 				console.warn( 'THREE.BufferAttribute.copyVector3sArray(): vector is undefined', i );
-				vector = new THREE.Vector3();
+				v.set( 0, 0, 0 );
+
+			}
+			else {
+
+				v.copy( vector );
 
 			}
 
-			array[ offset ++ ] = vector.x;
-			array[ offset ++ ] = vector.y;
-			array[ offset ++ ] = vector.z;
+			v.offset += 3;
 
 		}
 
@@ -169,6 +182,7 @@ THREE.BufferAttribute.prototype = {
 	copyVector4sArray: function ( vectors ) {
 
 		var array = this.array, offset = 0;
+		var v = new THREE.Vector4( array, 0 );
 
 		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
@@ -177,14 +191,16 @@ THREE.BufferAttribute.prototype = {
 			if ( vector === undefined ) {
 
 				console.warn( 'THREE.BufferAttribute.copyVector4sArray(): vector is undefined', i );
-				vector = new THREE.Vector4();
+				v.set( 0, 0, 0, 0 );
+
+			}
+			else {
+
+				v.copy( vector );
 
 			}
 
-			array[ offset ++ ] = vector.x;
-			array[ offset ++ ] = vector.y;
-			array[ offset ++ ] = vector.z;
-			array[ offset ++ ] = vector.w;
+			v.offset += 4;
 
 		}
 
