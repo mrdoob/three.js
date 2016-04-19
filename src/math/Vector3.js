@@ -47,6 +47,8 @@ THREE.Vector3.prototype = {
 		this.array = array;
 		this.offset = offset;
 
+		return this;
+
 	},
 
 	set: function ( x, y, z ) {

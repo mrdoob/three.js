@@ -44,6 +44,8 @@ THREE.Color.prototype = {
 		this.array = array;
 		this.offset = offset;
 
+		return this;
+
 	},
 
 	set: function ( value ) {

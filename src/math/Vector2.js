@@ -45,6 +45,8 @@ THREE.Vector2.prototype = {
 		this.array = array;
 		this.offset = offset;
 
+		return this;
+
 	},
 
 	get width() {

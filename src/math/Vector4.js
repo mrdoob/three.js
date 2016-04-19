@@ -51,6 +51,8 @@ THREE.Vector4.prototype = {
 		this.array = array;
 		this.offset = offset;
 
+		return this;
+
 	},
 
 	set: function ( x, y, z, w ) {
