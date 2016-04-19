@@ -9,6 +9,15 @@
 
 THREE.Vector3 = function ( x, y, z ) {
 
+	if( arguments[0] instanceof Float32Array ) {
+
+		this.array = arguments[0];
+		this.offset = arguments[1] || 0;
+
+		return this;
+
+	}
+
 	this.offset = THREE.BlockAllocator.getFloat32( 3 );
 	this.array = THREE.BlockAllocator.activeBuffer;
 

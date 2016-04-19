@@ -1,8 +1,21 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author bhouston / http://clara.io
  */
 
 THREE.Color = function ( color ) {
+
+	if( arguments[0] instanceof Float32Array ) {
+
+		this.array = arguments[0];
+		this.offset = arguments[1] || 0;
+
+		return this;
+
+	}
+
+	this.offset = THREE.BlockAllocator.getFloat32( 3 );
+ 	this.array = THREE.BlockAllocator.activeBuffer;
 
 	if ( arguments.length === 3 ) {
 
@@ -18,7 +31,13 @@ THREE.Color.prototype = {
 
 	constructor: THREE.Color,
 
-	r: 1, g: 1, b: 1,
+	set r( v ) { this.array[ this.offset ] = v; },
+	set g( v ) { this.array[ this.offset + 1 ] = v; },
+	set b( v ) { this.array[ this.offset + 2 ] = v; },
+
+	get r() { return this.array[ this.offset ]; },
+	get g() { return this.array[ this.offset + 1 ]; },
+	get b() { return this.array[ this.offset + 2 ]; },
 
 	set: function ( value ) {
 

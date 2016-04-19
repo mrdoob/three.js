@@ -10,10 +10,19 @@
 
 THREE.Vector2 = function ( x, y ) {
 
- this.offset = THREE.BlockAllocator.getFloat32( 2 );
- this.array = THREE.BlockAllocator.activeBuffer;
+	if( arguments[0] instanceof Float32Array ) {
 
- if( x !== undefined ) this.set( x, y );
+		this.array = arguments[0];
+		this.offset = arguments[1] || 0;
+
+		return this;
+
+	}
+
+	this.offset = THREE.BlockAllocator.getFloat32( 2 );
+	this.array = THREE.BlockAllocator.activeBuffer;
+
+	if( x !== undefined ) this.set( x, y );
 
 };
 

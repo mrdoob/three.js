@@ -8,8 +8,17 @@
  */
 
 
- THREE.Vector4 = function ( x, y, z, w ) {
+THREE.Vector4 = function ( x, y, z, w ) {
 
+	if( arguments[0] instanceof Float32Array ) {
+
+		this.array = arguments[0];
+		this.offset = arguments[1] || 0;
+
+		return this;
+
+	}
+	
  	this.offset = THREE.BlockAllocator.getFloat32( 4 );
  	this.array = THREE.BlockAllocator.activeBuffer;
 
