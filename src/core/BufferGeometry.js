@@ -111,7 +111,7 @@ THREE.BufferGeometry.prototype = {
 	applyMatrix: function ( matrix ) {
 
 		var position = this.attributes.position;
-		
+
 		if ( position !== undefined ) {
 
 			matrix.applyToVector3Array( position.array );
@@ -645,7 +645,7 @@ THREE.BufferGeometry.prototype = {
 
 			var positions = attributes.position.array;
 
-			if ( attributes.normal === undefined) {
+			if ( attributes.normal === undefined ) {
 
 				this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( positions.length ), 3 ) );
 
@@ -839,7 +839,6 @@ THREE.BufferGeometry.prototype = {
 			var attribute = attributes[ name ];
 
 			var array = attribute.array;
-
 			var itemSize = attribute.itemSize;
 
 			var array2 = new array.constructor( indices.length * itemSize );
@@ -867,7 +866,7 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	toJSON: function () {
-		
+
 		var data = {
 			metadata: {
 				version: 4.4,
