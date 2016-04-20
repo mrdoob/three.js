@@ -94,7 +94,7 @@ THREE.MTLLoader.prototype = {
 	 */
 	parse: function ( text, url ) {
 
-		var lines = text.split( "\n" );
+		var lines = text.split( '\n' );
 		var info = {};
 		var delimiter_pattern = /\s+/;
 		var materialsInfo = {};
@@ -116,10 +116,10 @@ THREE.MTLLoader.prototype = {
 			var key = ( pos >= 0 ) ? line.substring( 0, pos ) : line;
 			key = key.toLowerCase();
 
-			var value = ( pos >= 0 ) ? line.substring( pos + 1 ) : "";
+			var value = ( pos >= 0 ) ? line.substring( pos + 1 ) : '';
 			value = value.trim();
 
-			if ( key === "newmtl" ) {
+			if ( key === 'newmtl' ) {
 
 				// New material
 
@@ -128,7 +128,7 @@ THREE.MTLLoader.prototype = {
 
 			} else if ( info ) {
 
-				if ( key === "ka" || key === "kd" || key === "ks" ) {
+				if ( key === 'ka' || key === 'kd' || key === 'ks' ) {
 
 					var ss = value.split( delimiter_pattern, 3 );
 					info[ key ] = [ parseFloat( ss[ 0 ] ), parseFloat( ss[ 1 ] ), parseFloat( ss[ 2 ] ) ];
@@ -355,14 +355,14 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse color (color under white light) using RGB values
 
-					params[ 'color' ] = new THREE.Color().fromArray( value );
+					params.color = new THREE.Color().fromArray( value );
 
 					break;
 
 				case 'ks':
 
 					// Specular color (color when light is reflected from shiny surface) using RGB values
-					params[ 'specular' ] = new THREE.Color().fromArray( value );
+					params.specular = new THREE.Color().fromArray( value );
 
 					break;
 
@@ -370,9 +370,9 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse texture map
 
-					params[ 'map' ] = this.loadTexture( this.baseUrl + value );
-					params[ 'map' ].wrapS = this.wrap;
-					params[ 'map' ].wrapT = this.wrap;
+					params.map = this.loadTexture( this.baseUrl + value );
+					params.map.wrapS = this.wrap;
+					params.map.wrapT = this.wrap;
 
 					break;
 
@@ -381,7 +381,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					// The specular exponent (defines the focus of the specular highlight)
 					// A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
 
-					params[ 'shininess' ] = parseFloat( value );
+					params.shininess = parseFloat( value );
 
 					break;
 
@@ -389,8 +389,8 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					if ( value < 1 ) {
 
-						params[ 'opacity' ] = value;
-						params[ 'transparent' ] = true;
+						params.opacity = value;
+						params.transparent = true;
 
 					}
 
@@ -400,8 +400,8 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					if ( value > 0 ) {
 
-						params[ 'opacity' ] = 1 - value;
-						params[ 'transparent' ] = true;
+						params.opacity = 1 - value;
+						params.transparent = true;
 
 					}
 
@@ -412,11 +412,11 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Bump texture map
 
-					if ( params[ 'bumpMap' ] ) break; // Avoid loading twice.
+					if ( params.bumpMap ) break; // Avoid loading twice.
 
-					params[ 'bumpMap' ] = this.loadTexture( this.baseUrl + value );
-					params[ 'bumpMap' ].wrapS = this.wrap;
-					params[ 'bumpMap' ].wrapT = this.wrap;
+					params.bumpMap = this.loadTexture( this.baseUrl + value );
+					params.bumpMap.wrapS = this.wrap;
+					params.bumpMap.wrapT = this.wrap;
 
 					break;
 
