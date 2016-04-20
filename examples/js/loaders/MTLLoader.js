@@ -28,17 +28,47 @@ THREE.MTLLoader.prototype = {
 
 	},
 
-	setPath: function ( value ) {
+	/**
+	 * Set base path for resolving references.
+	 * If set this path will be prepended to each loaded and found reference.
+	 *
+	 * @see setTexturePath
+	 * @param {String} path
+	 *
+	 * @example
+	 *     mtlLoader.setPath("assets/obj/");
+	 *     mtlLoader.load("my.mtl", ...);
+	 */
+	setPath: function ( path ) {
 
-		this.path = value;
+		this.path = path;
 
 	},
 
-	setBaseUrl: function( value ) {
+	/**
+	 * Set base path for resolving texture references.
+	 * If set this path will be prepended found texture reference.
+	 * If not set and setPath is, it will be used as texture base path.
+	 *
+	 * @see setPath
+	 * @param {String} path
+	 *
+	 * @example
+	 *     mtlLoader.setPath("assets/obj/");
+	 *     mtlLoader.setTexturePath("assets/textures/");
+	 *     mtlLoader.load("my.mtl", ...);
+	 */
+	setTexturePath: function( path ) {
 
-		// TODO: Merge with setPath()? Or rename to setTexturePath?
+		this.texturePath = path;
 
-		this.baseUrl = value;
+	},
+
+	setBaseUrl: function( path ) {
+
+		console.warn( 'THREE.MTLLoader: .setBaseUrl() is deprecated. Use .setTexturePath( path ) for texture path or .setPath( path ) for general base path instead.' );
+
+		this.setTexturePath( path );
 
 	},
 
@@ -110,7 +140,7 @@ THREE.MTLLoader.prototype = {
 
 		}
 
-		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.baseUrl, this.materialOptions );
+		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.texturePath || this.path, this.materialOptions );
 		materialCreator.setCrossOrigin( this.crossOrigin );
 		materialCreator.setManager( this.manager );
 		materialCreator.setMaterials( materialsInfo );
@@ -137,7 +167,7 @@ THREE.MTLLoader.prototype = {
 
 THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
 
-	this.baseUrl = baseUrl;
+	this.baseUrl = baseUrl || "";
 	this.options = options;
 	this.materialsInfo = {};
 	this.materials = {};
