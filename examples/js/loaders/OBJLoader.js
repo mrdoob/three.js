@@ -109,19 +109,19 @@ THREE.OBJLoader.prototype = {
 
 					startMaterial : function( name, libraries ) {
 
-						var previous = this._finalize(false);
+						var previous = this._finalize( false );
 
 						var material = {
 							index      : this.materials.length,
 							name       : name || '',
-							mtllib     : ( Array.isArray(libraries) && libraries.length > 0 ? libraries[libraries.length-1] : ''),
+							mtllib     : ( Array.isArray( libraries ) && libraries.length > 0 ? libraries[ libraries.length - 1 ] : '' ),
 							smooth     : ( previous !== undefined ? previous.smooth : this.smooth ),
 							groupStart : ( previous !== undefined ? previous.groupEnd : 0 ),
 							groupEnd   : -1,
 							groupCount : -1
 						};
 
-						this.materials.push(material);
+						this.materials.push( material );
 
 						return material;
 
@@ -137,13 +137,13 @@ THREE.OBJLoader.prototype = {
 
 					},
 
-					_finalize : function(end) {
+					_finalize : function( end ) {
 
 						var lastMultiMaterial = this.currentMaterial();
 						if ( lastMultiMaterial && lastMultiMaterial.groupEnd === -1 ) {
 
 							lastMultiMaterial.groupEnd = this.geometry.vertices.length / 3;
-							lastMultiMaterial.groupCount = (lastMultiMaterial.groupEnd - lastMultiMaterial.groupStart);
+							lastMultiMaterial.groupCount = lastMultiMaterial.groupEnd - lastMultiMaterial.groupStart;
 
 						}
 
@@ -649,14 +649,10 @@ THREE.OBJLoader.prototype = {
 
 			if ( createdMaterials.length > 1 ) {
 
-				var total = 0;
-
 				for ( var mi = 0, miLen = materials.length; mi < miLen ; mi++ ) {
 
 					var sourceMaterial = materials[mi];
 					buffergeometry.addGroup( sourceMaterial.groupStart, sourceMaterial.groupCount, mi );
-
-					total += sourceMaterial.groupCount;
 
 				}
 
