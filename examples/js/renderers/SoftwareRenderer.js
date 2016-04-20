@@ -107,7 +107,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		canvas.width = canvasWidth;
 		canvas.height = canvasHeight;
 
-		context.fillStyle = alpha ? : "rgba(0, 0, 0, 0)" : clearColor.getStyle();
+		context.fillStyle = alpha ? "rgba(0, 0, 0, 0)" : clearColor.getStyle();
 		context.fillRect( 0, 0, canvasWidth, canvasHeight );
 
 		imagedata = context.getImageData( 0, 0, canvasWidth, canvasHeight );
@@ -374,7 +374,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			data[ i ] = clearColor.r * 255 | 0;
 			data[ i + 1 ] = clearColor.g * 255 | 0;
 			data[ i + 2 ] = clearColor.b * 255 | 0;
-			data[ i + 3 ] = alpha ? : 0 : 255;
+			data[ i + 3 ] = alpha ? 0 : 255;
 
 		}
 
@@ -1480,7 +1480,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				data[ poffset ++ ] = clearColor.r * 255 | 0;
 				data[ poffset ++ ] = clearColor.g * 255 | 0;
 				data[ poffset ++ ] = clearColor.b * 255 | 0;
-				data[ poffset ++ ] = alpha ? : 0 : 255;
+				data[ poffset ++ ] = alpha ? 0 : 255;
 
 			}
 
