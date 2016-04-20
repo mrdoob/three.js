@@ -22,7 +22,7 @@ THREE.MTLLoader.prototype = {
 		loader.setPath( this.path );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			onLoad( scope.parse( text, url ) );
 
 		}, onProgress, onError );
 
@@ -86,10 +86,13 @@ THREE.MTLLoader.prototype = {
 
 	/**
 	 * Parses loaded MTL file
-	 * @param text - Content of MTL file
+	 * @param {String} text - Content of MTL file
+	 * @param {String} [url] - URL where object was loaded.
+	 * Used to detect base path for textures if not explicitly
+	 * set with setPath or setTexturePath.
 	 * @return {THREE.MTLLoader.MaterialCreator}
 	 */
-	parse: function ( text ) {
+	parse: function ( text, url ) {
 
 		var lines = text.split( "\n" );
 		var info = {};
@@ -140,7 +143,16 @@ THREE.MTLLoader.prototype = {
 
 		}
 
-		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.texturePath || this.path, this.materialOptions );
+		// Resolve texture base path from URL if not explicitly set
+		var texturePath = this.texturePath || this.path;
+		if ( url && typeof texturePath !== 'string' ) {
+			var indexDir = url.lastIndexOf( '/' );
+			if ( indexDir !== -1 && url.length > indexDir ) {
+				texturePath = url.substring( 0, indexDir + 1 );
+			}
+		}
+
+		var materialCreator = new THREE.MTLLoader.MaterialCreator( texturePath, this.materialOptions );
 		materialCreator.setCrossOrigin( this.crossOrigin );
 		materialCreator.setManager( this.manager );
 		materialCreator.setMaterials( materialsInfo );
