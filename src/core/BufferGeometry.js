@@ -581,7 +581,6 @@ THREE.BufferGeometry.prototype = {
 	computeBoundingSphere: function () {
 
 		var box = new THREE.Box3();
-		var vector = new THREE.Vector3();
 
 		return function () {
 
@@ -604,11 +603,11 @@ THREE.BufferGeometry.prototype = {
 				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
 
 				var maxRadiusSq = 0;
+				var p = new THREE.Vector3( positions, 0 );
 
 				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
 
-					vector.fromArray( positions, i );
-					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
+					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( p.attach( positions, i ) ) );
 
 				}
 
@@ -664,12 +663,14 @@ THREE.BufferGeometry.prototype = {
 
 			var vA, vB, vC,
 
-			pA = new THREE.Vector3(),
-			pB = new THREE.Vector3(),
-			pC = new THREE.Vector3(),
+			pA = new THREE.Vector3( positions, 0 ),
+			pB = new THREE.Vector3( positions, 0 ),
+			pC = new THREE.Vector3( positions, 0 ),
 
 			cb = new THREE.Vector3(),
-			ab = new THREE.Vector3();
+			ab = new THREE.Vector3(),
+
+			n = new THREE.Vector3( normals, 0 );
 
 			// indexed elements
 
@@ -696,25 +697,17 @@ THREE.BufferGeometry.prototype = {
 						vB = indices[ i + 1 ] * 3;
 						vC = indices[ i + 2 ] * 3;
 
-						pA.fromArray( positions, vA );
-						pB.fromArray( positions, vB );
-						pC.fromArray( positions, vC );
+						pA.attach( positions, vA );
+						pB.attach( positions, vB );
+						pC.attach( positions, vC );
 
 						cb.subVectors( pC, pB );
 						ab.subVectors( pA, pB );
 						cb.cross( ab );
 
-						normals[ vA ] += cb.x;
-						normals[ vA + 1 ] += cb.y;
-						normals[ vA + 2 ] += cb.z;
-
-						normals[ vB ] += cb.x;
-						normals[ vB + 1 ] += cb.y;
-						normals[ vB + 2 ] += cb.z;
-
-						normals[ vC ] += cb.x;
-						normals[ vC + 1 ] += cb.y;
-						normals[ vC + 2 ] += cb.z;
+						n.attach( normals, vA ).add( cb );
+						n.attach( normals, vB ).add( cb );
+						n.attach( normals, vC ).add( cb );
 
 					}
 
@@ -726,25 +719,17 @@ THREE.BufferGeometry.prototype = {
 
 				for ( var i = 0, il = positions.length; i < il; i += 9 ) {
 
-					pA.fromArray( positions, i );
-					pB.fromArray( positions, i + 3 );
-					pC.fromArray( positions, i + 6 );
+					pA.attach( positions, i );
+					pB.attach( positions, i + 3 );
+					pC.attach( positions, i + 6 );
 
 					cb.subVectors( pC, pB );
 					ab.subVectors( pA, pB );
 					cb.cross( ab );
 
-					normals[ i ] = cb.x;
-					normals[ i + 1 ] = cb.y;
-					normals[ i + 2 ] = cb.z;
-
-					normals[ i + 3 ] = cb.x;
-					normals[ i + 4 ] = cb.y;
-					normals[ i + 5 ] = cb.z;
-
-					normals[ i + 6 ] = cb.x;
-					normals[ i + 7 ] = cb.y;
-					normals[ i + 8 ] = cb.z;
+					n.attach( normals, i ).copy( cb );
+					n.attach( normals, i+3 ).copy( cb );
+					n.attach( normals, i+6 ).copy( cb );
 
 				}
 
@@ -798,20 +783,12 @@ THREE.BufferGeometry.prototype = {
 	normalizeNormals: function () {
 
 		var normals = this.attributes.normal.array;
-
-		var x, y, z, n;
+		var n = new THREE.Vector3( normals, 0 );
 
 		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
 
-			x = normals[ i ];
-			y = normals[ i + 1 ];
-			z = normals[ i + 2 ];
-
-			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
-
-			normals[ i ] *= n;
-			normals[ i + 1 ] *= n;
-			normals[ i + 2 ] *= n;
+			n.normalize();
+			n.offset += 3;
 
 		}
 
