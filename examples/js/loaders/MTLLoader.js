@@ -36,8 +36,8 @@ THREE.MTLLoader.prototype = {
 	 * @param {String} path
 	 *
 	 * @example
-	 *     mtlLoader.setPath("assets/obj/");
-	 *     mtlLoader.load("my.mtl", ...);
+	 *     mtlLoader.setPath( 'assets/obj/' );
+	 *     mtlLoader.load( 'my.mtl', ... );
 	 */
 	setPath: function ( path ) {
 
@@ -54,9 +54,9 @@ THREE.MTLLoader.prototype = {
 	 * @param {String} path
 	 *
 	 * @example
-	 *     mtlLoader.setPath("assets/obj/");
-	 *     mtlLoader.setTexturePath("assets/textures/");
-	 *     mtlLoader.load("my.mtl", ...);
+	 *     mtlLoader.setPath( 'assets/obj/' );
+	 *     mtlLoader.setTexturePath( 'assets/textures/' );
+	 *     mtlLoader.load( 'my.mtl', ... );
 	 */
 	setTexturePath: function( path ) {
 
@@ -179,7 +179,7 @@ THREE.MTLLoader.prototype = {
 
 THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
 
-	this.baseUrl = baseUrl || "";
+	this.baseUrl = baseUrl || '';
 	this.options = options;
 	this.materialsInfo = {};
 	this.materials = {};
