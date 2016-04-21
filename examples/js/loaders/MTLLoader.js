@@ -379,7 +379,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					if ( params.map ) break; // Keep the first encountered texture
 
-					params.map = this.loadTexture( this.baseUrl + value );
+					params.map = this.loadTexture( this._resolveURL( value ) );
 					params.map.wrapS = this.wrap;
 					params.map.wrapT = this.wrap;
 
@@ -423,7 +423,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					if ( params.bumpMap ) break; // Keep the first encountered texture
 
-					params.bumpMap = this.loadTexture( this.baseUrl + value );
+					params.bumpMap = this.loadTexture( this._resolveURL( value ) );
 					params.bumpMap.wrapS = this.wrap;
 					params.bumpMap.wrapT = this.wrap;
 
@@ -441,6 +441,18 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 	},
 
+	_resolveURL: function ( url ) {
+
+		if ( typeof url !== 'string' || url === '' )
+			return '';
+
+		// Absolute URL
+		if ( url.toLowerCase().indexOf('http://') === 0 || url.toLowerCase().indexOf('https://') === 0 ) {
+			return url;
+		}
+
+		return this.baseUrl + url;
+	},
 
 	loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
 
