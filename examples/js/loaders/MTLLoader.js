@@ -25,7 +25,7 @@ THREE.MTLLoader.prototype = {
 	 * @see setPath setTexturePath
 	 *
 	 * @note In order for relative texture references to resolve correctly
-	 * you must call setPath and/or setTexturePath explicity prior to load.
+	 * you must call setPath and/or setTexturePath explicitly prior to load.
 	 */
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -106,7 +106,7 @@ THREE.MTLLoader.prototype = {
 	 * @see setPath setTexturePath
 	 *
 	 * @note In order for relative texture references to resolve correctly
-	 * you must call setPath and/or setTexturePath explicity prior to parse.
+	 * you must call setPath and/or setTexturePath explicitly prior to parse.
 	 */
 	parse: function ( text ) {
 
