@@ -68,7 +68,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.setSize = function ( width, height ) {
 
-		renderSize = { width: width, height: height };
+		rendererSize = { width: width, height: height };
 
 		if ( isPresenting ) {
 
