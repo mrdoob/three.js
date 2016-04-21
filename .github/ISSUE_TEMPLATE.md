@@ -5,6 +5,7 @@
 ##### Three.js version
 
 - [ ] Dev
+- [ ] r76
 - [ ] r75
 - [ ] ...
 
