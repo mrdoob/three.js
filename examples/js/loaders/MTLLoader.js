@@ -348,6 +348,19 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		};
 
+		var resolveURL = function ( baseUrl, url ) {
+
+			if ( typeof url !== 'string' || url === '' )
+				return '';
+
+			// Absolute URL
+			if ( url.toLowerCase().indexOf('http://') === 0 || url.toLowerCase().indexOf('https://') === 0 ) {
+				return url;
+			}
+
+			return baseUrl + url;
+		};
+
 		for ( var prop in mat ) {
 
 			var value = mat[ prop ];
@@ -379,7 +392,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					if ( params.map ) break; // Keep the first encountered texture
 
-					params.map = this.loadTexture( this._resolveURL( value ) );
+					params.map = this.loadTexture( resolveURL( this.baseUrl, value ) );
 					params.map.wrapS = this.wrap;
 					params.map.wrapT = this.wrap;
 
@@ -423,7 +436,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					if ( params.bumpMap ) break; // Keep the first encountered texture
 
-					params.bumpMap = this.loadTexture( this._resolveURL( value ) );
+					params.bumpMap = this.loadTexture( resolveURL( this.baseUrl, value ) );
 					params.bumpMap.wrapS = this.wrap;
 					params.bumpMap.wrapT = this.wrap;
 
@@ -439,19 +452,6 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 		this.materials[ materialName ] = new THREE.MeshPhongMaterial( params );
 		return this.materials[ materialName ];
 
-	},
-
-	_resolveURL: function ( url ) {
-
-		if ( typeof url !== 'string' || url === '' )
-			return '';
-
-		// Absolute URL
-		if ( url.toLowerCase().indexOf('http://') === 0 || url.toLowerCase().indexOf('https://') === 0 ) {
-			return url;
-		}
-
-		return this.baseUrl + url;
 	},
 
 	loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
