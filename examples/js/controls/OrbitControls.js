@@ -86,13 +86,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.getPolarAngle = function () {
 
-		return phi;
+		return spherical.phi;
 
 	};
 
 	this.getAzimuthalAngle = function () {
 
-		return theta;
+		return spherical.theta;
 
 	};
 
