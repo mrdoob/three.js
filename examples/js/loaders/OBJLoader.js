@@ -89,21 +89,88 @@ THREE.OBJLoader.prototype = {
 
 				}
 
+				if ( this.object && typeof this.object._finalize === 'function' ) {
+
+					this.object._finalize();
+
+				}
+
 				this.object = {
 					name : name || '',
+					fromDeclaration : ( fromDeclaration !== false ),
+
 					geometry : {
 						vertices : [],
 						normals  : [],
 						uvs      : []
 					},
-					material : {
-						name   : '',
-						smooth : true
+					materials : [],
+					smooth : true,
+
+					startMaterial : function( name, libraries ) {
+
+						var previous = this._finalize( false );
+
+						var material = {
+							index      : this.materials.length,
+							name       : name || '',
+							mtllib     : ( Array.isArray( libraries ) && libraries.length > 0 ? libraries[ libraries.length - 1 ] : '' ),
+							smooth     : ( previous !== undefined ? previous.smooth : this.smooth ),
+							groupStart : ( previous !== undefined ? previous.groupEnd : 0 ),
+							groupEnd   : -1,
+							groupCount : -1
+						};
+
+						this.materials.push( material );
+
+						return material;
+
 					},
-					fromDeclaration : ( fromDeclaration !== false )
+
+					currentMaterial : function() {
+
+						if ( this.materials.length > 0 ) {
+							return this.materials[ this.materials.length - 1 ];
+						}
+
+						return undefined;
+
+					},
+
+					_finalize : function( end ) {
+
+						var lastMultiMaterial = this.currentMaterial();
+						if ( lastMultiMaterial && lastMultiMaterial.groupEnd === -1 ) {
+
+							lastMultiMaterial.groupEnd = this.geometry.vertices.length / 3;
+							lastMultiMaterial.groupCount = lastMultiMaterial.groupEnd - lastMultiMaterial.groupStart;
+
+						}
+
+						// Guarantee at least one empty material, this makes the creation later more straight forward.
+						if ( end !== false && this.materials.length === 0 ) {
+							this.materials.push({
+								name   : '',
+								smooth : this.smooth
+							});
+						}
+
+						return lastMultiMaterial;
+
+					}
 				};
 
 				this.objects.push( this.object );
+
+			},
+
+			finalize : function() {
+
+				if ( this.object && typeof this.object._finalize === 'function' ) {
+
+					this.object._finalize();
+
+				}
 
 			},
 
@@ -464,7 +531,7 @@ THREE.OBJLoader.prototype = {
 
 				// material
 
-				state.object.material.name = line.substring( 7 ).trim();
+				state.object.startMaterial( line.substring( 7 ).trim(), state.materialLibraries );
 
 			} else if ( this.regexp.material_library_pattern.test( line ) ) {
 
@@ -476,8 +543,22 @@ THREE.OBJLoader.prototype = {
 
 				// smooth shading
 
+				// @todo Handle files that have varying smooth values for a set of faces inside one geometry,
+				// but does not define a usemtl for each face set.
+				// This should be detected and a dummy material created (later MultiMaterial and geometry groups).
+				// This requires some care to not create extra material on each smooth value for "normal" obj files.
+				// where explicit usemtl defines geometry groups.
+				// Example asset: examples/models/obj/cerberus/Cerberus.obj
+
 				var value = result[ 1 ].trim().toLowerCase();
-				state.object.material.smooth = ( value === '1' || value === 'on' );
+				state.object.smooth = ( value === '1' || value === 'on' );
+
+				var material = state.object.currentMaterial();
+				if ( material ) {
+
+					material.smooth = state.object.smooth;
+
+				}
 
 			} else {
 
@@ -490,6 +571,8 @@ THREE.OBJLoader.prototype = {
 
 		}
 
+		state.finalize();
+
 		var container = new THREE.Group();
 		container.materialLibraries = [].concat( state.materialLibraries );
 
@@ -497,6 +580,7 @@ THREE.OBJLoader.prototype = {
 
 			var object = state.objects[ i ];
 			var geometry = object.geometry;
+			var materials = object.materials;
 			var isLine = ( geometry.type === 'Line' );
 
 			// Skip o/g line declarations that did not follow with any faces
@@ -522,33 +606,64 @@ THREE.OBJLoader.prototype = {
 
 			}
 
-			var material;
+			// Create materials
 
-			if ( this.materials !== null ) {
+			var createdMaterials = [];
 
-				material = this.materials.create( object.material.name );
+			for ( var mi = 0, miLen = materials.length; mi < miLen ; mi++ ) {
 
-				// mtl etc. loaders probably can't create line materials correctly, copy properties to a line material.
-				if ( isLine && material && ! ( material instanceof THREE.LineBasicMaterial ) ) {
+				var sourceMaterial = materials[mi];
+				var material = undefined;
 
-					var materialLine = new THREE.LineBasicMaterial();
-					materialLine.copy( material );
-					material = materialLine;
+				if ( this.materials !== null ) {
+
+					material = this.materials.create( sourceMaterial.name );
+
+					// mtl etc. loaders probably can't create line materials correctly, copy properties to a line material.
+					if ( isLine && material && ! ( material instanceof THREE.LineBasicMaterial ) ) {
+
+						var materialLine = new THREE.LineBasicMaterial();
+						materialLine.copy( material );
+						material = materialLine;
+
+					}
 
 				}
 
+				if ( ! material ) {
+
+					material = ( ! isLine ? new THREE.MeshPhongMaterial() : new THREE.LineBasicMaterial() );
+					material.name = sourceMaterial.name;
+
+				}
+
+				material.shading = sourceMaterial.smooth ? THREE.SmoothShading : THREE.FlatShading;
+
+				createdMaterials.push(material);
+
 			}
 
-			if ( ! material ) {
+			// Create mesh
 
-				material = ( ! isLine ? new THREE.MeshPhongMaterial() : new THREE.LineBasicMaterial() );
-				material.name = object.material.name;
+			var mesh;
 
+			if ( createdMaterials.length > 1 ) {
+
+				for ( var mi = 0, miLen = materials.length; mi < miLen ; mi++ ) {
+
+					var sourceMaterial = materials[mi];
+					buffergeometry.addGroup( sourceMaterial.groupStart, sourceMaterial.groupCount, mi );
+
+				}
+
+				var multiMaterial = new THREE.MultiMaterial( createdMaterials );
+				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, multiMaterial ) : new THREE.Line( buffergeometry, multiMaterial ) );
+
+			} else {
+
+				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, createdMaterials[ 0 ] ) : new THREE.Line( buffergeometry, createdMaterials[ 0 ] ) );
 			}
 
-			material.shading = object.material.smooth ? THREE.SmoothShading : THREE.FlatShading;
-
-			var mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, material ) : new THREE.Line( buffergeometry, material ) );
 			mesh.name = object.name;
 
 			container.add( mesh );
