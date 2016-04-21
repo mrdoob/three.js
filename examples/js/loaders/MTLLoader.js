@@ -354,7 +354,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 				return '';
 
 			// Absolute URL
-			if ( url.toLowerCase().indexOf('http://') === 0 || url.toLowerCase().indexOf('https://') === 0 ) {
+			if ( /^https?:\/\//i.test( url ) ) {
 				return url;
 			}
 
