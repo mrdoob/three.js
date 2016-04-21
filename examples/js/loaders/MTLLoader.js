@@ -14,6 +14,19 @@ THREE.MTLLoader.prototype = {
 
 	constructor: THREE.MTLLoader,
 
+	/**
+	 * Loads and parses a MTL asset from a URL.
+	 *
+	 * @param {String} url - URL to the MTL file.
+	 * @param {Function} [onLoad] - Callback invoked with the loaded object.
+	 * @param {Function} [onProgress] - Callback for download progress.
+	 * @param {Function} [onError] - Callback for download errors.
+	 *
+	 * @see setPath setTexturePath
+	 *
+	 * @note In order for relative texture references to resolve correctly
+	 * you must call setPath and/or setTexturePath explicity prior to load.
+	 */
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
@@ -22,7 +35,7 @@ THREE.MTLLoader.prototype = {
 		loader.setPath( this.path );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text, url ) );
+			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
 
@@ -85,14 +98,17 @@ THREE.MTLLoader.prototype = {
 	},
 
 	/**
-	 * Parses loaded MTL file
+	 * Parses a MTL file.
+	 *
 	 * @param {String} text - Content of MTL file
-	 * @param {String} [url] - URL where object was loaded.
-	 * Used to detect base path for textures if not explicitly
-	 * set with setPath or setTexturePath.
 	 * @return {THREE.MTLLoader.MaterialCreator}
+	 *
+	 * @see setPath setTexturePath
+	 *
+	 * @note In order for relative texture references to resolve correctly
+	 * you must call setPath and/or setTexturePath explicity prior to parse.
 	 */
-	parse: function ( text, url ) {
+	parse: function ( text ) {
 
 		var lines = text.split( '\n' );
 		var info = {};
@@ -143,16 +159,7 @@ THREE.MTLLoader.prototype = {
 
 		}
 
-		// Resolve texture base path from URL if not explicitly set
-		var texturePath = this.texturePath || this.path;
-		if ( url && typeof texturePath !== 'string' ) {
-			var indexDir = url.lastIndexOf( '/' );
-			if ( indexDir !== -1 && url.length > indexDir ) {
-				texturePath = url.substring( 0, indexDir + 1 );
-			}
-		}
-
-		var materialCreator = new THREE.MTLLoader.MaterialCreator( texturePath, this.materialOptions );
+		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.texturePath || this.path, this.materialOptions );
 		materialCreator.setCrossOrigin( this.crossOrigin );
 		materialCreator.setManager( this.manager );
 		materialCreator.setMaterials( materialsInfo );
