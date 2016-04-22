@@ -71,6 +71,11 @@
 
 					skinnedMesh = new THREE.SkinnedMesh(geometry, new THREE.MultiMaterial(materials));
 					skinnedMesh.scale.set( 1, 1, 1 );
+
+					// Note: We test the corresponding code path with this example -
+					// you shouldn't include the next line into your own code:
+					skinnedMesh.skeleton.useVertexTexture = false;
+
 					scene.add( skinnedMesh );
 
 					mixer = new THREE.AnimationMixer( skinnedMesh );
