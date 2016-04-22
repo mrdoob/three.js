@@ -645,4 +645,4 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 	return null;
 
-}
+};

@@ -291,7 +291,7 @@ THREE.AnimationMixer._Action =
 
 		var interpolant = tracks[ i ].createInterpolant( null );
 		interpolants[ i ] = interpolant;
-		interpolant.settings = interpolantSettings
+		interpolant.settings = interpolantSettings;
 
 	}
 
@@ -377,7 +377,7 @@ THREE.AnimationMixer._Action.prototype = {
 		var start = this._startTime;
 
 		return this.enabled && ! this.paused && this.timeScale !== 0 &&
-				this._startTime === null && this._mixer._isActiveAction( this )
+				this._startTime === null && this._mixer._isActiveAction( this );
 
 	},
 
@@ -1396,4 +1396,3 @@ Object.assign( THREE.AnimationMixer.prototype, {
 	_controlInterpolantsResultBuffer: new Float32Array( 1 )
 
 } );
-
