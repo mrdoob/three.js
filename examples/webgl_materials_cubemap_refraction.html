@@ -138,10 +138,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				loader = new THREE.BinaryLoader();
 				loader.load( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );

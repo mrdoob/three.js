@@ -5,7 +5,7 @@
 ##### Three.js version
 
 - [ ] Dev
-- [ ] r75
+- [ ] r76
 - [ ] ...
 
 ##### Browser

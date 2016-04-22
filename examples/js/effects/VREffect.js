@@ -68,7 +68,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.setSize = function ( width, height ) {
 
-		renderSize = { width: width, height: height };
+		rendererSize = { width: width, height: height };
 
 		if ( isPresenting ) {
 
@@ -165,7 +165,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 				if ( boolean ) {
 
-					resolve( vrHMD.requestPresent( { source: canvas } ) );
+					resolve( vrHMD.requestPresent( [ { source: canvas } ] ) );
 
 				} else {
 

@@ -26,7 +26,7 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 
 	// these are used to calculate buffer length
 	var vertexCount = calculateVertexCount( widthSegments, heightSegments, depthSegments );
-	var indexCount = ( vertexCount / 4 ) * 6;
+	var indexCount = calculateIndexCount( widthSegments, heightSegments, depthSegments );
 
 	// buffers
 	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
@@ -61,14 +61,27 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 
 	function calculateVertexCount ( w, h, d ) {
 
-		var segments = 0;
+		var vertices = 0;
 
-		// calculate the amount of segments for each side
-		segments += w * h * 2; // xy
-		segments += w * d * 2; // xz
-		segments += d * h * 2; // zy
+		// calculate the amount of vertices for each side (plane)
+		vertices += (w + 1) * (h + 1) * 2; // xy
+		vertices += (w + 1) * (d + 1) * 2; // xz
+		vertices += (d + 1) * (h + 1) * 2; // zy
 
-		return segments * 4; // four vertices per segments
+		return vertices;
+
+	}
+
+	function calculateIndexCount ( w, h, d ) {
+
+		var index = 0;
+
+		// calculate the amount of squares for each side
+		index += w * h * 2; // xy
+		index += w * d * 2; // xz
+		index += d * h * 2; // zy
+
+		return index * 6; // two triangles per square => six vertices per square
 
 	}
 

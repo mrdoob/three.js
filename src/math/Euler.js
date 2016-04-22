@@ -216,7 +216,7 @@ THREE.Euler.prototype = {
 
 		} else {
 
-			console.warn( 'THREE.Euler: .setFromRotationMatrix() given unsupported order: ' + order )
+			console.warn( 'THREE.Euler: .setFromRotationMatrix() given unsupported order: ' + order );
 
 		}
 
@@ -235,10 +235,10 @@ THREE.Euler.prototype = {
 		return function ( q, order, update ) {
 
 			if ( matrix === undefined ) matrix = new THREE.Matrix4();
-			matrix.makeRotationFromQuaternion( q );
-			this.setFromRotationMatrix( matrix, order, update );
 
-			return this;
+			matrix.makeRotationFromQuaternion( q );
+
+			return this.setFromRotationMatrix( matrix, order, update );
 
 		};
 
@@ -259,7 +259,8 @@ THREE.Euler.prototype = {
 		return function ( newOrder ) {
 
 			q.setFromEuler( this );
-			this.setFromQuaternion( q, newOrder );
+			
+			return this.setFromQuaternion( q, newOrder );
 
 		};
 

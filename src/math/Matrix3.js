@@ -235,21 +235,10 @@ THREE.Matrix3.prototype = {
 
 	flattenToArrayOffset: function ( array, offset ) {
 
-		var te = this.elements;
+		console.warn( "THREE.Matrix3: .flattenToArrayOffset is deprecated " +
+				"- just use .toArray instead." );
 
-		array[ offset ] = te[ 0 ];
-		array[ offset + 1 ] = te[ 1 ];
-		array[ offset + 2 ] = te[ 2 ];
-
-		array[ offset + 3 ] = te[ 3 ];
-		array[ offset + 4 ] = te[ 4 ];
-		array[ offset + 5 ] = te[ 5 ];
-
-		array[ offset + 6 ] = te[ 6 ];
-		array[ offset + 7 ] = te[ 7 ];
-		array[ offset + 8 ]  = te[ 8 ];
-
-		return array;
+		return this.toArray( array, offset );
 
 	},
 
@@ -285,15 +274,26 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
+
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
 
 		var te = this.elements;
 
-		return [
-			te[ 0 ], te[ 1 ], te[ 2 ],
-			te[ 3 ], te[ 4 ], te[ 5 ],
-			te[ 6 ], te[ 7 ], te[ 8 ]
-		];
+		array[ offset ] = te[ 0 ];
+		array[ offset + 1 ] = te[ 1 ];
+		array[ offset + 2 ] = te[ 2 ];
+
+		array[ offset + 3 ] = te[ 3 ];
+		array[ offset + 4 ] = te[ 4 ];
+		array[ offset + 5 ] = te[ 5 ];
+
+		array[ offset + 6 ] = te[ 6 ];
+		array[ offset + 7 ] = te[ 7 ];
+		array[ offset + 8 ]  = te[ 8 ];
+
+		return array;
 
 	}
 

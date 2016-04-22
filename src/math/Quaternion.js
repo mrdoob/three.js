@@ -292,9 +292,7 @@ THREE.Quaternion.prototype = {
 			this._z = v1.z;
 			this._w = r;
 
-			this.normalize();
-
-			return this;
+			return this.normalize();
 
 		};
 
@@ -302,9 +300,7 @@ THREE.Quaternion.prototype = {
 
 	inverse: function () {
 
-		this.conjugate().normalize();
-
-		return this;
+		return this.conjugate().normalize();
 
 	},
 

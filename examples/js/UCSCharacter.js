@@ -96,7 +96,7 @@ THREE.UCSCharacter = function() {
 
 		for ( var i = 0; i < textureUrls.length; i ++ ) {
 
-			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], scope.checkLoadingComplete );
+			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], scope.checkLoadComplete );
 			textures[ i ].mapping = THREE.UVMapping;
 			textures[ i ].name = textureUrls[ i ];
 

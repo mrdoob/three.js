@@ -135,7 +135,7 @@
 
 				}
 
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 4 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 4, true ) );
 
 				// material
 
@@ -161,9 +161,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

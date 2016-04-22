@@ -34,11 +34,6 @@
 
 			#vt { display:none }
 			#vt, #vt a { color:orange; }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -214,7 +209,7 @@
 				if ( statsEnabled ) {
 
 					stats = new Stats();
-					container.appendChild( stats.domElement );
+					container.appendChild( stats.dom );
 
 				}
 

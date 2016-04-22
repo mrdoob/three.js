@@ -333,7 +333,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 						gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
 
 						state.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
-						renderer.setTexture( sprite.texture, 1 );
+						renderer.setTexture2D( sprite.texture, 1 );
 
 						gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 

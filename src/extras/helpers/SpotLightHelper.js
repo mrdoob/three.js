@@ -14,14 +14,33 @@ THREE.SpotLightHelper = function ( light ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	var geometry = new THREE.CylinderGeometry( 0, 1, 1, 8, 1, true );
+	var geometry = new THREE.BufferGeometry();
 
-	geometry.translate( 0, - 0.5, 0 );
-	geometry.rotateX( - Math.PI / 2 );
+	var positions = [
+		0, 0, 0,   0,   0,   1,
+		0, 0, 0,   1,   0,   1,
+		0, 0, 0, - 1,   0,   1,
+		0, 0, 0,   0,   1,   1,
+		0, 0, 0,   0, - 1,   1
+	];
 
-	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
+	for ( var i = 0, j = 1, l = 32; i < l; i ++, j ++ ) {
 
-	this.cone = new THREE.Mesh( geometry, material );
+		var p1 = ( i / l ) * Math.PI * 2;
+		var p2 = ( j / l ) * Math.PI * 2;
+
+		positions.push(
+			Math.cos( p1 ), Math.sin( p1 ), 1,
+			Math.cos( p2 ), Math.sin( p2 ), 1
+		);
+
+	}
+
+	geometry.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
+
+	var material = new THREE.LineBasicMaterial( { fog: false } );
+
+	this.cone = new THREE.LineSegments( geometry, material );
 	this.add( this.cone );
 
 	this.update();
@@ -45,7 +64,7 @@ THREE.SpotLightHelper.prototype.update = function () {
 
 	return function () {
 
-		var coneLength = this.light.distance ? this.light.distance : 10000;
+		var coneLength = this.light.distance ? this.light.distance : 1000;
 		var coneWidth = coneLength * Math.tan( this.light.angle );
 
 		this.cone.scale.set( coneWidth, coneWidth, coneLength );
