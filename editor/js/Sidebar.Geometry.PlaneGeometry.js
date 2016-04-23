@@ -55,7 +55,7 @@ Sidebar.Geometry.PlaneGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.PlaneGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ object.geometry.type ](
 			width.getValue(),
 			height.getValue(),
 			widthSegments.getValue(),

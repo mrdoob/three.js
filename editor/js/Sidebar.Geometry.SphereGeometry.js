@@ -85,7 +85,7 @@ Sidebar.Geometry.SphereGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.SphereGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ object.geometry.type ](
 			radius.getValue(),
 			widthSegments.getValue(),
 			heightSegments.getValue(),

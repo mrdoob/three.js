@@ -133,7 +133,7 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 		}
 
-		var geometry = new THREE.LatheGeometry(
+		var geometry = new THREE[ object.geometry.type ](
 			points,
 			segments.getValue(),
 			phiStart.getValue() / 180 * Math.PI,

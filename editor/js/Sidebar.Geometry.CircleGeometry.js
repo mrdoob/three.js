@@ -54,7 +54,7 @@ Sidebar.Geometry.CircleGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.CircleGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ object.geometry.type ](
 			radius.getValue(),
 			segments.getValue(),
 			thetaStart.getValue(),
