@@ -706,9 +706,9 @@ THREE.Vector3.prototype = {
 		if ( typeof m === 'number' ) {
 
 			console.warn( 'THREE.Vector3: setFromMatrixColumn now expects ( matrix, index ).' );
-
-			m = arguments[ 1 ];
-			index = arguments[ 0 ];
+			var temp = m
+			m = index;
+			index = temp;
 
 		}
 

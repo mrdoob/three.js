@@ -188,7 +188,7 @@ Object.defineProperties( THREE.Vector3.prototype, {
 	getColumnFromMatrix: {
 		value: function ( index, matrix ) {
 			console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
-			return this.setFromMatrixColumn( index, matrix );
+			return this.setFromMatrixColumn( matrix, index );
 		}
 	}
 } );
