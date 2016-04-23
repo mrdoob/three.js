@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Color = function ( rOrColor, g, b ) {
+THREE.Color = function ( r, g, b ) {
 
     if ( g === undefined && b === undefined ) {
 
