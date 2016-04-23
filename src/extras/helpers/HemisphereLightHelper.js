@@ -14,8 +14,10 @@ THREE.HemisphereLightHelper = function ( light, sphereSize ) {
 	this.matrixAutoUpdate = false;
 
 	this.colors = [ new THREE.Color(), new THREE.Color() ];
+	
+	this.sphereSize = sphereSize;
 
-	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
+	var geometry = new THREE.SphereGeometry( this.sphereSize, 4, 2 );
 	geometry.rotateX( - Math.PI / 2 );
 
 	for ( var i = 0, il = 8; i < il; i ++ ) {
@@ -58,3 +60,9 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 	}
 
 }();
+
+THREE.HemisphereLightHelper.prototype.clone = function () {
+
+	return new this.constructor( this.light, this.sphereSize );
+
+};

@@ -7,8 +7,10 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 
 	this.light = light;
 	this.light.updateMatrixWorld();
+	
+	this.sphereSize = sphereSize;
 
-	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
+	var geometry = new THREE.SphereGeometry( this.sphereSize, 4, 2 );
 	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
@@ -69,5 +71,11 @@ THREE.PointLightHelper.prototype.update = function () {
 
 	}
 	*/
+
+};
+
+THREE.PointLightHelper.prototype.clone = function () {
+
+	return new this.constructor( this.light, this.sphereSize );
 
 };
