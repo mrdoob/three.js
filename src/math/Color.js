@@ -4,14 +4,14 @@
 
 THREE.Color = function ( r, g, b ) {
 
-    if ( g === undefined && b === undefined ) {
+	if ( g === undefined && b === undefined ) {
 
-        // r is THREE.Color, hex or string
-        return this.set( r );
+		// r is THREE.Color, hex or string
+		return this.set( r );
 
-    }
+	}
 
-    return this.setRGB( r, g, b );
+	return this.setRGB( r, g, b );
 
 };
 
