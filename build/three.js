@@ -2608,9 +2608,9 @@ THREE.Vector3.prototype = {
 		if ( typeof m === 'number' ) {
 
 			console.warn( 'THREE.Vector3: setFromMatrixColumn now expects ( matrix, index ).' );
-
-			m = arguments[ 1 ];
-			index = arguments[ 0 ];
+			var temp = m
+			m = index;
+			index = temp;
 
 		}
 
@@ -11964,7 +11964,7 @@ THREE.BufferGeometry.prototype = {
 		var box = new THREE.Box3();
 		var vector = new THREE.Vector3();
 
-		return function () {
+		return function computeBoundingSphere() {
 
 			if ( this.boundingSphere === null ) {
 
@@ -12772,7 +12772,7 @@ Object.assign( THREE.AnimationClip, {
 			var animationKeys = hierarchyTracks[ h ].keys;
 
 			// skip empty tracks
-			if ( ! animationKeys || animationKeys.length == 0 ) continue;
+			if ( ! animationKeys || animationKeys.length === 0 ) continue;
 
 			// process morph targets in a way exactly compatible
 			// with AnimationHandler.init( animation )
@@ -12807,7 +12807,7 @@ Object.assign( THREE.AnimationClip, {
 						var animationKey = animationKeys[k];
 
 						times.push( animationKey.time );
-						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 )
+						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 );
 
 					}
 
@@ -12852,7 +12852,6 @@ Object.assign( THREE.AnimationClip, {
 	}
 
 } );
-
 
 // File:src/animation/AnimationMixer.js
 
@@ -13149,7 +13148,7 @@ THREE.AnimationMixer._Action =
 
 		var interpolant = tracks[ i ].createInterpolant( null );
 		interpolants[ i ] = interpolant;
-		interpolant.settings = interpolantSettings
+		interpolant.settings = interpolantSettings;
 
 	}
 
@@ -13235,7 +13234,7 @@ THREE.AnimationMixer._Action.prototype = {
 		var start = this._startTime;
 
 		return this.enabled && ! this.paused && this.timeScale !== 0 &&
-				this._startTime === null && this._mixer._isActiveAction( this )
+				this._startTime === null && this._mixer._isActiveAction( this );
 
 	},
 
@@ -14255,7 +14254,6 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 } );
 
-
 // File:src/animation/AnimationObjectGroup.js
 
 /**
@@ -14857,7 +14855,7 @@ THREE.KeyframeTrack.prototype = {
 
 	setInterpolation: function( interpolation ) {
 
-		var factoryMethod = undefined;
+		var factoryMethod;
 
 		switch ( interpolation ) {
 
@@ -15281,7 +15279,7 @@ Object.assign( THREE.KeyframeTrack, {
 
 				return THREE.StringKeyframeTrack;
 
-		};
+		}
 
 		throw new Error( "Unsupported typeName: " + typeName );
 
@@ -15938,7 +15936,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 	return null;
 
-}
+};
 
 // File:src/animation/PropertyMixer.js
 
@@ -19461,35 +19459,11 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'DodecahedronGeometry':
-
-						geometry = new THREE.DodecahedronGeometry(
-							data.radius,
-							data.detail
-						);
-
-						break;
-
 					case 'IcosahedronGeometry':
-
-						geometry = new THREE.IcosahedronGeometry(
-							data.radius,
-							data.detail
-						);
-
-						break;
-
 					case 'OctahedronGeometry':
-
-						geometry = new THREE.OctahedronGeometry(
-							data.radius,
-							data.detail
-						);
-
-						break;
-
 					case 'TetrahedronGeometry':
 
-						geometry = new THREE.TetrahedronGeometry(
+						geometry = new THREE[ data.type ](
 							data.radius,
 							data.detail
 						);
@@ -19765,8 +19739,7 @@ THREE.ObjectLoader.prototype = {
 
 				case 'PerspectiveCamera':
 
-					object = new THREE.PerspectiveCamera(
-							data.fov, data.aspect, data.near, data.far );
+					object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
 
 					if ( data.focus !== undefined ) object.focus = data.focus;
 					if ( data.zoom !== undefined ) object.zoom = data.zoom;
@@ -22360,7 +22333,7 @@ THREE.Points = function ( geometry, material ) {
 
 	this.type = 'Points';
 
-	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
+	this.geometry = geometry !== undefined ? geometry : new THREE.BufferGeometry();
 	this.material = material !== undefined ? material : new THREE.PointsMaterial( { color: Math.random() * 0xffffff } );
 
 };
@@ -22500,7 +22473,7 @@ THREE.Line = function ( geometry, material, mode ) {
 
 	this.type = 'Line';
 
-	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
+	this.geometry = geometry !== undefined ? geometry : new THREE.BufferGeometry();
 	this.material = material !== undefined ? material : new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
 
 };
@@ -22700,7 +22673,7 @@ THREE.Mesh = function ( geometry, material ) {
 
 	this.type = 'Mesh';
 
-	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
+	this.geometry = geometry !== undefined ? geometry : new THREE.BufferGeometry();
 	this.material = material !== undefined ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
 	this.drawMode = THREE.TrianglesDrawMode;
@@ -23657,10 +23630,6 @@ THREE.Sprite.prototype.clone = function () {
 	return new this.constructor( this.material ).copy( this );
 
 };
-
-// Backwards compatibility
-
-THREE.Particle = THREE.Sprite;
 
 // File:src/objects/LensFlare.js
 
@@ -32810,7 +32779,7 @@ Object.defineProperties( THREE.Vector3.prototype, {
 	getColumnFromMatrix: {
 		value: function ( index, matrix ) {
 			console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
-			return this.setFromMatrixColumn( index, matrix );
+			return this.setFromMatrixColumn( matrix, index );
 		}
 	}
 } );
@@ -32887,6 +32856,8 @@ Object.defineProperties( THREE, {
 		}
 	}
 } );
+
+THREE.Particle = THREE.Sprite;
 
 //
 
@@ -36387,7 +36358,7 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 
 	// these are used to calculate buffer length
 	var vertexCount = calculateVertexCount( widthSegments, heightSegments, depthSegments );
-	var indexCount = ( vertexCount / 4 ) * 6;
+	var indexCount = calculateIndexCount( widthSegments, heightSegments, depthSegments );
 
 	// buffers
 	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
@@ -36422,14 +36393,27 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 
 	function calculateVertexCount ( w, h, d ) {
 
-		var segments = 0;
+		var vertices = 0;
 
-		// calculate the amount of segments for each side
-		segments += w * h * 2; // xy
-		segments += w * d * 2; // xz
-		segments += d * h * 2; // zy
+		// calculate the amount of vertices for each side (plane)
+		vertices += (w + 1) * (h + 1) * 2; // xy
+		vertices += (w + 1) * (d + 1) * 2; // xz
+		vertices += (d + 1) * (h + 1) * 2; // zy
 
-		return segments * 4; // four vertices per segments
+		return vertices;
+
+	}
+
+	function calculateIndexCount ( w, h, d ) {
+
+		var index = 0;
+
+		// calculate the amount of squares for each side
+		index += w * h * 2; // xy
+		index += w * d * 2; // xz
+		index += d * h * 2; // zy
+
+		return index * 6; // two triangles per square => six vertices per square
 
 	}
 
@@ -36674,6 +36658,14 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
 
 	// used to calculate buffer length
+	
+	var nbCap = 0;
+	if ( openEnded === false ) {
+
+		if ( radiusTop > 0 ) nbCap++;
+		if ( radiusBottom > 0 ) nbCap++;
+
+	}
 
 	var vertexCount = calculateVertexCount();
 	var indexCount = calculateIndexCount();
@@ -36718,7 +36710,7 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 
 		if ( openEnded === false ) {
 
-			count += ( ( radialSegments + 1 ) * 2 ) + ( radialSegments * 2 );
+			count += ( ( radialSegments + 1 ) * nbCap ) + ( radialSegments * nbCap );
 
 		}
 
@@ -36732,7 +36724,7 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 
 		if ( openEnded === false ) {
 
-			count += radialSegments * 2 * 3;
+			count += radialSegments * nbCap * 3;
 
 		}
 
@@ -39977,10 +39969,10 @@ THREE.AxisHelper.prototype.constructor = THREE.AxisHelper;
 
 THREE.ArrowHelper = ( function () {
 
-	var lineGeometry = new THREE.Geometry();
-	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
+	var lineGeometry = new THREE.BufferGeometry();
+	lineGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
-	var coneGeometry = new THREE.CylinderGeometry( 0, 0.5, 1, 5, 1 );
+	var coneGeometry = new THREE.CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
 	coneGeometry.translate( 0, - 0.5, 0 );
 
 	return function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
@@ -39995,7 +39987,7 @@ THREE.ArrowHelper = ( function () {
 		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
 		this.position.copy( origin );
-		
+
 		this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: color } ) );
 		this.line.matrixAutoUpdate = false;
 		this.add( this.line );
@@ -40007,7 +39999,7 @@ THREE.ArrowHelper = ( function () {
 		this.setDirection( dir );
 		this.setLength( length, headLength, headWidth );
 
-	}
+	};
 
 }() );
 
@@ -40061,8 +40053,8 @@ THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth
 
 THREE.ArrowHelper.prototype.setColor = function ( color ) {
 
-	this.line.material.color.set( color );
-	this.cone.material.color.set( color );
+	this.line.material.color.copy( color );
+	this.cone.material.color.copy( color );
 
 };
 
@@ -40394,34 +40386,25 @@ THREE.DirectionalLightHelper = function ( light, size ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	size = size || 1;
+	if ( size === undefined ) size = 1;
 
-	var geometry = new THREE.Geometry();
-	geometry.vertices.push(
-		new THREE.Vector3( - size,   size, 0 ),
-		new THREE.Vector3(   size,   size, 0 ),
-		new THREE.Vector3(   size, - size, 0 ),
-		new THREE.Vector3( - size, - size, 0 ),
-		new THREE.Vector3( - size,   size, 0 )
-	);
+	var geometry = new THREE.BufferGeometry();
+	geometry.addAttribute( 'position', new THREE.Float32Attribute( [
+		- size,   size, 0,
+		  size,   size, 0,
+		  size, - size, 0,
+		- size, - size, 0,
+		- size,   size, 0
+	], 3 ) );
 
 	var material = new THREE.LineBasicMaterial( { fog: false } );
-	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	this.lightPlane = new THREE.Line( geometry, material );
-	this.add( this.lightPlane );
+	this.add( new THREE.Line( geometry, material ) );
 
-	geometry = new THREE.Geometry();
-	geometry.vertices.push(
-		new THREE.Vector3(),
-		new THREE.Vector3()
-	);
+	geometry = new THREE.BufferGeometry();
+	geometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
 
-	material = new THREE.LineBasicMaterial( { fog: false } );
-	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
-
-	this.targetLine = new THREE.Line( geometry, material );
-	this.add( this.targetLine );
+	this.add( new THREE.Line( geometry, material ));
 
 	this.update();
 
@@ -40432,10 +40415,13 @@ THREE.DirectionalLightHelper.prototype.constructor = THREE.DirectionalLightHelpe
 
 THREE.DirectionalLightHelper.prototype.dispose = function () {
 
-	this.lightPlane.geometry.dispose();
-	this.lightPlane.material.dispose();
-	this.targetLine.geometry.dispose();
-	this.targetLine.material.dispose();
+	var lightPlane = this.children[ 0 ];
+	var targetLine = this.children[ 1 ];
+
+	lightPlane.geometry.dispose();
+	lightPlane.material.dispose();
+	targetLine.geometry.dispose();
+	targetLine.material.dispose();
 
 };
 
@@ -40451,12 +40437,14 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 		v2.setFromMatrixPosition( this.light.target.matrixWorld );
 		v3.subVectors( v2, v1 );
 
-		this.lightPlane.lookAt( v3 );
-		this.lightPlane.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+		var lightPlane = this.children[ 0 ];
+		var targetLine = this.children[ 1 ];
 
-		this.targetLine.geometry.vertices[ 1 ].copy( v3 );
-		this.targetLine.geometry.verticesNeedUpdate = true;
-		this.targetLine.material.color.copy( this.lightPlane.material.color );
+		lightPlane.lookAt( v3 );
+		lightPlane.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+
+		targetLine.lookAt( v3 );
+		targetLine.scale.z = v3.length();
 
 	};
 
@@ -40597,7 +40585,7 @@ THREE.FaceNormalsHelper.prototype.update = ( function () {
 
 		return this;
 
-	}
+	};
 
 }() );
 
@@ -40607,26 +40595,33 @@ THREE.FaceNormalsHelper.prototype.update = ( function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GridHelper = function ( size, step ) {
+THREE.GridHelper = function ( size, step, color1, color2 ) {
 
-	var geometry = new THREE.Geometry();
-	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
+	color1 = new THREE.Color( color1 !== undefined ? color1 : 0x444444 );
+	color2 = new THREE.Color( color2 !== undefined ? color2 : 0x888888 );
 
-	this.color1 = new THREE.Color( 0x444444 );
-	this.color2 = new THREE.Color( 0x888888 );
+	var vertices = [];
+	var colors = [];
 
-	for ( var i = - size; i <= size; i += step ) {
+	for ( var i = - size, j = 0; i <= size; i += step ) {
 
-		geometry.vertices.push(
-			new THREE.Vector3( - size, 0, i ), new THREE.Vector3( size, 0, i ),
-			new THREE.Vector3( i, 0, - size ), new THREE.Vector3( i, 0, size )
-		);
+		vertices.push( - size, 0, i, size, 0, i );
+		vertices.push( i, 0, - size, i, 0, size );
 
-		var color = i === 0 ? this.color1 : this.color2;
+		var color = i === 0 ? color1 : color2;
 
-		geometry.colors.push( color, color, color, color );
+		color.toArray( colors, j ); j += 3;
+		color.toArray( colors, j ); j += 3;
+		color.toArray( colors, j ); j += 3;
+		color.toArray( colors, j ); j += 3;
 
 	}
+
+	var geometry = new THREE.BufferGeometry();
+	geometry.addAttribute( 'position', new THREE.Float32Attribute( vertices, 3 ) );
+	geometry.addAttribute( 'color', new THREE.Float32Attribute( colors, 3 ) );
+
+	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
 
 	THREE.LineSegments.call( this, geometry, material );
 
@@ -40635,12 +40630,9 @@ THREE.GridHelper = function ( size, step ) {
 THREE.GridHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREE.GridHelper.prototype.constructor = THREE.GridHelper;
 
-THREE.GridHelper.prototype.setColors = function( colorCenterLine, colorGrid ) {
+THREE.GridHelper.prototype.setColors = function () {
 
-	this.color1.set( colorCenterLine );
-	this.color2.set( colorGrid );
-
-	this.geometry.colorsNeedUpdate = true;
+	console.error( 'THREE.GridHelper: setColors() has been deprecated, pass them in the constructor instead.' );
 
 };
 
@@ -40703,7 +40695,7 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 		this.lightSphere.lookAt( vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 		this.lightSphere.geometry.colorsNeedUpdate = true;
 
-	}
+	};
 
 }();
 
@@ -40719,7 +40711,7 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
+	var geometry = new THREE.SphereBufferGeometry( sphereSize, 4, 2 );
 	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
@@ -40999,7 +40991,7 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	} else if ( objGeometry instanceof THREE.BufferGeometry ) {
 
-		nNormals = objGeometry.attributes.normal.count
+		nNormals = objGeometry.attributes.normal.count;
 
 	}
 
@@ -41114,7 +41106,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 		return this;
 
-	}
+	};
 
 }() );
 
