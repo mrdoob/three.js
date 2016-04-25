@@ -2,9 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var Config = function () {
-
-	var name = 'threejs-editor';
+var Config = function ( name ) {
 
 	var storage = {
 		'autosave': true,
