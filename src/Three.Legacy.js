@@ -266,6 +266,8 @@ Object.defineProperties( THREE, {
 	}
 } );
 
+THREE.Particle = THREE.Sprite;
+
 //
 
 Object.defineProperties( THREE.Light.prototype, {
