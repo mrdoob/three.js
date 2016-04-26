@@ -446,7 +446,7 @@ def blend_shapes(mesh, options):
             morph = []
             for d in key_blocks[key].data:
                 co = d.co
-                morph.append([co.x, co.y, co.z])
+                morph.extend([co.x, co.y, co.z])
             manifest.append({
                 constants.NAME: key,
                 constants.VERTICES: morph
