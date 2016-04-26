@@ -92,6 +92,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	this.type = THREE.PCFShadowMap;
 	this.cullFace = THREE.CullFaceFront;
 
+	this.allowDoubleSided = false;
+
 	this.render = function ( scene, camera ) {
 
 		if ( scope.enabled === false ) return;
@@ -365,7 +367,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		result.visible = material.visible;
 		result.wireframe = material.wireframe;
-		result.side = material.side;
+		result.side = scope.allowDoubleSided ? material.side : THREE.FrontSide;
 		result.clipShadows = material.clipShadows;
 		result.clippingPlanes = material.clippingPlanes;
 		result.wireframeLinewidth = material.wireframeLinewidth;
