@@ -13588,22 +13588,19 @@ THREE.AnimationMixer._Action.prototype = {
 		var duration = this._clip.duration,
 
 			loop = this.loop,
-			loopCount = this._loopCount,
+			loopCount = this._loopCount;
 
-			pingPong = false;
+		if ( loop === THREE.LoopOnce ) {
 
-		switch ( loop ) {
+			if ( loopCount === -1 ) {
+				// just started
 
-			case THREE.LoopOnce:
+				this.loopCount = 0;
+				this._setEndings( true, true, false );
 
-				if ( loopCount === -1 ) {
+			}
 
-					// just started
-
-					this.loopCount = 0;
-					this._setEndings( true, true, false );
-
-				}
+			handle_stop: {
 
 				if ( time >= duration ) {
 
@@ -13613,9 +13610,7 @@ THREE.AnimationMixer._Action.prototype = {
 
 					time = 0;
 
-				} else break;
-
-				// reached the end
+				} else break handle_stop;
 
 				if ( this.clampWhenFinished ) this.pause = true;
 				else this.enabled = false;
@@ -13625,68 +13620,63 @@ THREE.AnimationMixer._Action.prototype = {
 					direction: deltaTime < 0 ? -1 : 1
 				} );
 
-				break;
+			}
 
-			case THREE.LoopPingPong:
+		} else { // repetitive Repeat or PingPong
 
-				pingPong = true;
+			var pingPong = ( loop === THREE.LoopPingPong );
 
-			case THREE.LoopRepeat:
+			if ( loopCount === -1 ) {
+				// just started
 
-				if ( loopCount === -1 ) {
+				if ( deltaTime >= 0 ) {
 
-					// just started
+					loopCount = 0;
 
-					if ( deltaTime > 0 ) {
+					this._setEndings(
+							true, this.repetitions === 0, pingPong );
 
-						loopCount = 0;
+				} else {
 
-						this._setEndings(
-								true, this.repetitions === 0, pingPong );
+					// when looping in reverse direction, the initial
+					// transition through zero counts as a repetition,
+					// so leave loopCount at -1
 
-					} else {
-
-						// when looping in reverse direction, the initial
-						// transition through zero counts as a repetition,
-						// so leave loopCount at -1
-
-						this._setEndings(
-								this.repetitions === 0, true, pingPong );
-
-					}
+					this._setEndings(
+							this.repetitions === 0, true, pingPong );
 
 				}
 
-				if ( time >= duration || time < 0 ) {
+			}
 
-					// wrap around
+			if ( time >= duration || time < 0 ) {
+				// wrap around
 
-					var loopDelta = Math.floor( time / duration ); // signed
-					time -= duration * loopDelta;
+				var loopDelta = Math.floor( time / duration ); // signed
+				time -= duration * loopDelta;
 
-					loopCount += Math.abs( loopDelta );
+				loopCount += Math.abs( loopDelta );
 
-					var pending = this.repetitions - loopCount;
+				var pending = this.repetitions - loopCount;
 
-					if ( pending < 0 ) {
+				if ( pending < 0 ) {
+					// have to stop (switch state, clamp time, fire event)
 
-						// stop (switch state, clamp time, fire event)
+					if ( this.clampWhenFinished ) this.paused = true;
+					else this.enabled = false;
 
-						if ( this.clampWhenFinished ) this.paused = true;
-						else this.enabled = false;
+					time = deltaTime > 0 ? duration : 0;
 
-						time = deltaTime > 0 ? duration : 0;
+					this._mixer.dispatchEvent( {
+						type: 'finished', action: this,
+						direction: deltaTime > 0 ? 1 : -1
+					} );
 
-						this._mixer.dispatchEvent( {
-							type: 'finished', action: this,
-							direction: deltaTime > 0 ? 1 : -1
-						} );
+				} else {
+					// keep running
 
-						break;
-
-					} else if ( pending === 0 ) {
-
-						// transition to last round
+					if ( pending === 0 ) {
+						// entering the last round
 
 						var atStart = deltaTime < 0;
 						this._setEndings( atStart, ! atStart, pingPong );
@@ -13705,22 +13695,19 @@ THREE.AnimationMixer._Action.prototype = {
 
 				}
 
-				if ( loop === THREE.LoopPingPong && ( loopCount & 1 ) === 1 ) {
+			}
 
-					// invert time for the "pong round"
+			if ( pingPong && ( loopCount & 1 ) === 1 ) {
+				// invert time for the "pong round"
 
-					this.time = time;
+				this.time = time;
+				return duration - time;
 
-					return duration - time;
-
-				}
-
-				break;
+			}
 
 		}
 
 		this.time = time;
-
 		return time;
 
 	},
@@ -24042,7 +24029,7 @@ THREE.ShaderChunk[ 'normalmap_pars_fragment' ] = "#ifdef USE_NORMALMAP\n	uniform
 
 // File:src/renderers/shaders/ShaderChunk/packing.glsl
 
-THREE.ShaderChunk[ 'packing' ] = "vec3 packNormalToRGB( const in vec3 normal ) {\n  return normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n  return 1.0 - 2.0 * rgb.xyz;\n}\nvec4 packDepthToRGBA( const in float value ) {\n	const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );\n	const vec4 bit_mask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );\n	vec4 res = mod( value * bit_shift * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );\n	res -= res.xxyz * bit_mask;\n	return res;\n}\nfloat unpackRGBAToDepth( const in vec4 rgba ) {\n	const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );\n	return dot( rgba, bitSh );\n}\nfloat viewZToOrthoDepth( const in float viewZ, const in float near, const in float far ) {\n  return ( viewZ + near ) / ( near - far );\n}\nfloat OrthoDepthToViewZ( const in float linearClipZ, const in float near, const in float far ) {\n  return linearClipZ * ( near - far ) - near;\n}\nfloat viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {\n  return (( near + viewZ ) * far ) / (( far - near ) * viewZ );\n}\nfloat perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {\n  return ( near * far ) / ( ( far - near ) * invClipZ - far );\n}\n";
+THREE.ShaderChunk[ 'packing' ] = "vec3 packNormalToRGB( const in vec3 normal ) {\n  return normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n  return 1.0 - 2.0 * rgb.xyz;\n}\nconst float PackUpscale = 256. / 255.;const float UnpackDownscale = 255. / 256.;\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\nconst vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\nconst float ShiftRight8 = 1. / 256.;\nvec4 packDepthToRGBA( const in float v ) {\n	vec4 r = vec4( fract( v * PackFactors ), v );\n	r.yzw -= r.xyz * ShiftRight8;	return r * PackUpscale;\n}\nfloat unpackRGBAToDepth( const in vec4 v ) {\n	return dot( v, UnpackFactors );\n}\nfloat viewZToOrthoDepth( const in float viewZ, const in float near, const in float far ) {\n  return ( viewZ + near ) / ( near - far );\n}\nfloat OrthoDepthToViewZ( const in float linearClipZ, const in float near, const in float far ) {\n  return linearClipZ * ( near - far ) - near;\n}\nfloat viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {\n  return (( near + viewZ ) * far ) / (( far - near ) * viewZ );\n}\nfloat perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {\n  return ( near * far ) / ( ( far - near ) * invClipZ - far );\n}\n";
 
 // File:src/renderers/shaders/ShaderChunk/premultiplied_alpha_fragment.glsl
 
@@ -28076,7 +28063,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
 
-					if ( ( x > 0 && x <= ( renderTarget.width - width ) ) && ( y > 0 && y <= ( renderTarget.height - height ) ) ) {
+					if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
 						_gl.readPixels( x, y, width, height, paramThreeToGL( texture.format ), paramThreeToGL( texture.type ), buffer );
 
@@ -30179,6 +30166,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	this.type = THREE.PCFShadowMap;
 	this.cullFace = THREE.CullFaceFront;
 
+	this.allowDoubleSided = false;
+
 	this.render = function ( scene, camera ) {
 
 		if ( scope.enabled === false ) return;
@@ -30452,7 +30441,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		result.visible = material.visible;
 		result.wireframe = material.wireframe;
-		result.side = material.side;
+		result.side = scope.allowDoubleSided ? material.side : THREE.FrontSide;
 		result.clipShadows = material.clipShadows;
 		result.clippingPlanes = material.clippingPlanes;
 		result.wireframeLinewidth = material.wireframeLinewidth;
