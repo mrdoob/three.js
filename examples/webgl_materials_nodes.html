@@ -1825,7 +1825,7 @@
 			// render to texture for sss/translucent material only
 			if ( rtTexture ) {
 
-				renderer.renderOverride( rtMaterial, scene, camera, rtTexture, renderer.getClearColor(), renderer.getClearAlpha() );
+				THREE.WebGLRendererUtil.renderOverride( renderer, rtMaterial, scene, camera, rtTexture, renderer.getClearColor(), renderer.getClearAlpha() );
 
 			}
 

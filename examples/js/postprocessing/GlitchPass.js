@@ -68,7 +68,7 @@ THREE.GlitchPass.prototype = {
 
 		this.curF ++;
 
-		renderer.renderPass( this.material, this.renderToScreen ? null : writeBuffer, this.clear ? this.renderer.getClearColor() : null, this.clear ? this.renderer.getClearAlpha() : null );
+		THREE.WebGLRendererUtil.renderPass( renderer, this.material, this.renderToScreen ? null : writeBuffer, this.clear ? this.renderer.getClearColor() : null, this.clear ? this.renderer.getClearAlpha() : null );
 
 	},
 

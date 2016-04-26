@@ -112,7 +112,7 @@ THREE.ManualMSAARenderPass.prototype = {
 
 			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
 
-			renderer.renderPass( this.materialComposite, writeBuffer, ( i === 0 ) ? renderer.getClearColor() : null, ( i === 0 ) ? renderer.getClearAlpha() : null );
+			THREE.WebGLRendererUtil.renderPass( renderer, this.materialComposite, writeBuffer, ( i === 0 ) ? renderer.getClearColor() : null, ( i === 0 ) ? renderer.getClearAlpha() : null );
 
 		}
 

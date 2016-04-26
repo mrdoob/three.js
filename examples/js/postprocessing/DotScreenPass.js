@@ -38,7 +38,7 @@ THREE.DotScreenPass.prototype = {
 		this.uniforms[ "tDiffuse" ].value = readBuffer;
 		this.uniforms[ "tSize" ].value.set( readBuffer.width, readBuffer.height );
 
-		renderer.renderPass( this.material, this.renderToScreen ? null : writeBuffer, this.clear ? 0x000000 : null, this.clear ? 0 : null );
+		THREE.WebGLRendererUtil.renderPass( renderer, this.material, this.renderToScreen ? null : writeBuffer, this.clear ? 0x000000 : null, this.clear ? 0 : null );
 
 	}
 

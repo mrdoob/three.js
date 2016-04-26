@@ -37,6 +37,7 @@ Use WEBGL Depth buffer support?
 -->
 	<body>
 		<script src="../build/three.js"></script>
+		<script src="js/WebGLRendererUtils.js"></script>
 		<script src="js/shaders/BokehShader2.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -528,7 +529,7 @@ Use WEBGL Depth buffer support?
 
 					// Render depth into texture
 
-					renderer.renderOverride( material_depth, scene, camera, postprocessing.rtTextureDepth );
+					THREE.WebGLRendererUtil.renderOverride( renderer, material_depth, scene, camera, postprocessing.rtTextureDepth );
 
 					// Render bokeh composite
 
