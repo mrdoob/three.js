@@ -222,7 +222,7 @@
 						INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
 
 						plane.origin.copy(INTERSECTED.position);
-						plane.direction.set(0, 0, - 1).applyQuaternion( camera.quaternion );
+						plane.direction.copy( camera.getWorldDirection() );
 
 					}
 
