@@ -219,6 +219,11 @@
 						INTERSECTED = intersects[ 0 ].object;
 						INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
 
+            plane = {
+              origin: new THREE.Vector3().copy(INTERSECTED.position),
+              direction: new THREE.Vector3().copy(camera.position).sub(INTERSECTED.position)
+            }
+
 					}
 
 					container.style.cursor = 'pointer';
@@ -248,12 +253,6 @@
 					controls.enabled = false;
 
 					SELECTED = intersects[ 0 ].object;
-
-          // generate plane!
-          plane = {
-          	origin: intersects[ 0 ].point,
-          	direction: raycaster.ray.direction.clone().negate()
-          }
 
           var intersection = rayPlaneIntersection(raycaster.ray, plane);
 
