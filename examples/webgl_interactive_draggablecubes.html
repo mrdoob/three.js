@@ -30,7 +30,6 @@
 				origin: new THREE.Vector3(),
 				direction: new THREE.Vector3()
 			}
-
 			var raycaster = new THREE.Raycaster();
 			var mouse = new THREE.Vector2(),
 			offset = new THREE.Vector3(),
@@ -223,7 +222,7 @@
 						INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
 
 						plane.origin.copy(INTERSECTED.position);
-						plane.direction.copy(camera.position).sub(INTERSECTED.position);
+						plane.direction.copy(camera.position).sub(controls.target);
 
 					}
 
