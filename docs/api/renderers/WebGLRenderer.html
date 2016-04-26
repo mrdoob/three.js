@@ -91,27 +91,28 @@
 
 		<div>Default is false.  If set, then it expects that all textures and colors need to be outputted in premultiplied gamma.</div>
 
+		<h3>[property:WebGLShadowMap shadowMap]</h3>
+		<div>
+		This contains the reference to the component implementing shadow mapping.
+		</div>
 
-		<h3>[property:Boolean shadowMapEnabled]</h3>
+		<h3>[property:Boolean shadowMap.enabled]</h3>
 
 		<div>Default is false. If set, use shadow maps in the scene.</div>
 
-
-		<h3>[property:Integer shadowMapType]</h3>
+		<h3>[property:Integer shadowMap.type]</h3>
 
 		<div>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</div>
 		<div>Options are THREE.BasicShadowMap, THREE.PCFShadowMap, THREE.PCFSoftShadowMap. Default is THREE.PCFShadowMap.</div>
 
 
-		<h3>[property:Integer shadowMapCullFace]</h3>
+		<h3>[property:Integer shadowMap.cullFace]</h3>
 
 		<div>Default is THREE.CullFaceFront. The faces that needed to be culled. Possible values: THREE.CullFaceFront and THREE.CullFaceBack</div>
 
+		<h3>[property:Integer shadowMap.allowDoubleSided]</h3>
 
-		<h3>[property:Boolean shadowMapCascade]</h3>
-
-		<div>Default is false. If Set, use cascaded shadowmaps. See [link:http://developer.download.nvidia.com/SDK/10.5/opengl/src/cascaded_shadow_maps/doc/cascaded_shadow_maps.pdf cascaded shadowmaps] for more information.</div>
-
+		<div>Whether to allow double sided shadow rendering, off by default. When enabled, an appropriate shadow.bias must be set on the light source to keep surfaces from casting a shadow on themselves that will not render properly.</div>
 
 		<h3>[property:Integer maxMorphTargets]</h3>
 
@@ -151,12 +152,6 @@
 			</li>
 		</ul>
 		</div>
-
-		<h3>[property:WebGLShadowMap shadowMap]</h3>
-		<div>
-		This contains the reference to the component implementing shadow mapping.
-		</div>
-
 
 		<h2>Methods</h2>
 

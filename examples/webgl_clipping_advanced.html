@@ -267,6 +267,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.allowDoubleSided = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				window.addEventListener( 'resize', onWindowResize, false );
