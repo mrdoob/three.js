@@ -71,6 +71,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.toneMappingExposure = 1.0;
 	this.toneMappingWhitePoint = 1.0;
 
+	this.passCamera = null;
+	this.passQuad = null;
+	this.passScene = null;
+
 	// morphs
 
 	this.maxMorphTargets = 8;
@@ -1164,6 +1168,36 @@ THREE.WebGLRenderer = function ( parameters ) {
 		this.render( scene, camera, renderTarget, clearNeeded );
 		scene.overrideMaterial = null;
 
+		this.autoClear = originalAutoClear;
+		this.setClearColor( originalClearColor );
+		this.setClearAlpha( originalClearAlpha );
+
+	}
+
+	this.renderPass = function ( passMaterial, renderTarget, clearColor, clearAlpha ) {
+
+		if( ! this.passScene ) {
+			this.passCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+			this.passQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), null);
+			this.passScene = new THREE.Scene();
+			this.passScene.add( this.passQuad );
+		}
+
+		// save original state
+		var originalClearColor = this.getClearColor(), originalClearAlpha = this.getClearAlpha(), originalAutoClear = this.autoClear;
+
+		// setup pass state
+		this.autoClear = false;
+		var clearNeeded = ( clearColor !== undefined )&&( clearColor !== null );
+		if( clearNeeded  ) {
+			this.setClearColor( clearColor );
+			this.setClearAlpha( clearAlpha || 0.0 );
+		}
+
+		this.passQuad.material = passMaterial;
+		this.render( this.passScene, this.passCamera, renderTarget, clearNeeded  );
+
+		// restore original state
 		this.autoClear = originalAutoClear;
 		this.setClearColor( originalClearColor );
 		this.setClearAlpha( originalClearAlpha );

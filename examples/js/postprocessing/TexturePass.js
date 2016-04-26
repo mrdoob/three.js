@@ -26,12 +26,6 @@ THREE.TexturePass = function ( texture, opacity ) {
 
 	this.needsSwap = false;
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene  = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.scene.add( this.quad );
-
 };
 
 THREE.TexturePass.prototype = Object.create( THREE.Pass.prototype );
@@ -41,10 +35,8 @@ THREE.TexturePass.prototype = {
 	constructor: THREE.TexturePass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
-
-		this.quad.material = this.material;
-
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+		
+		renderer.renderPass( this.material, readBuffer, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
 
 	}
 

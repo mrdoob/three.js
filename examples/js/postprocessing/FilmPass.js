@@ -26,12 +26,6 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 	if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
 	if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene  = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.scene.add( this.quad );
-
 };
 
 THREE.FilmPass.prototype = Object.create( THREE.Pass.prototype );
@@ -45,17 +39,7 @@ THREE.FilmPass.prototype = {
 		this.uniforms[ "tDiffuse" ].value = readBuffer;
 		this.uniforms[ "time" ].value += delta;
 
-		this.quad.material = this.material;
-
-		if ( this.renderToScreen ) {
-
-			renderer.render( this.scene, this.camera );
-
-		} else {
-
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
-
-		}
+		renderer.renderPass( this.material, this.renderToScreen ? null : writeBuffer, this.clear ? 0x000000 : null, this.clear ? 0 : null );
 
 	}
 

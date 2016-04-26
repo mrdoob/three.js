@@ -59,12 +59,6 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	this.uniforms = bokehUniforms;
 	this.needsSwap = false;
 
-	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene2  = new THREE.Scene();
-
-	this.quad2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.scene2.add( this.quad2 );
-
 };
 
 THREE.BokehPass.prototype = Object.create( THREE.Pass.prototype );
@@ -75,27 +69,17 @@ THREE.BokehPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		this.quad2.material = this.materialBokeh;
-
 		// Render depth into texture
 
 		renderer.renderOverride( this.materialDepth, this.scene, this.camera, this.renderTargetDepth );
+
+		this.scene.overrideMaterial = null;
 
 		// Render bokeh composite
 
 		this.uniforms[ "tColor" ].value = readBuffer;
 
-		if ( this.renderToScreen ) {
-
-			renderer.render( this.scene2, this.camera2 );
-
-		} else {
-
-			renderer.render( this.scene2, this.camera2, writeBuffer, this.clear );
-
-		}
-
-		this.scene.overrideMaterial = null;
+		renderer.renderPass( this.materialBokeh, this.renderToScreen ? null : writeBuffer, this.clear ? 0x000000 : null, this.clear ? 0 : null );
 
 	}
 
