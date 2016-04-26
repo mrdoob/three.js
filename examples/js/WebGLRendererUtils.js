@@ -29,6 +29,8 @@ THREE.WebGLRendererUtils.setClearState = function( renderer, material, clearColo
     renderer.setClearAlpha( clearAlpha || 0.0 );
   }
 
+  return clearNeeded;
+
 }
 THREE.WebGLRendererUtils.restoreClearState = function ( renderer, target ) {
 
@@ -43,7 +45,7 @@ THREE.WebGLRendererUtils.renderOverride = function ( renderer, overrideMaterial,
   var utils = THREE.WebGLRendererUtils;
 
   utils.saveClearState( renderer, utils );
-  utils.setClearState( renderer, overrideMaterial, clearColor, clearAlpha );
+  var clearNeeded = utils.setClearState( renderer, overrideMaterial, clearColor, clearAlpha );
 
 	scene.overrideMaterial = overrideMaterial;
 	renderer.render( scene, camera, renderTarget, clearNeeded );
@@ -65,10 +67,10 @@ THREE.WebGLRendererUtils.renderPass = function ( renderer, passMaterial, renderT
 	}
 
   utils.saveClearState( renderer, utils );
-  utils.setClearState( renderer, overrideMaterial, clearColor, clearAlpha );
+  var clearNeeded = utils.setClearState( renderer, passMaterial, clearColor, clearAlpha );
 
 	utils.passQuad.material = passMaterial;
-	renderer.render( utils.passScene, utils.passCamera, renderTarget, clearNeeded  );
+	renderer.render( utils.passScene, utils.passCamera, renderTarget, clearNeeded );
 
 	utils.restoreClearState( renderer, utils );
 

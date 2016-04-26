@@ -50,7 +50,7 @@ THREE.SavePass.prototype = {
 
 		}
 
-		THREE.WebGLRendererUtil.renderPass( renderer, this.material, this.renderTarget, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
+		THREE.WebGLRendererUtils.renderPass( renderer, this.material, this.renderTarget, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
 
 	}
 

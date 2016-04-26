@@ -33,6 +33,8 @@
 	<body>
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
+
+		<script src="js/WebGLRendererUtils.js"></script>
 		<script src="js/ShaderGodRays.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -307,7 +309,7 @@
 
 					postprocessing.godraysFakeSunUniforms[ "fAspect" ].value = window.innerWidth / window.innerHeight;
 
-					THREE.WebGLRendererUtil.renderOverride( renderer, postprocessing.materialGodraysFakeSun, postprocessing.scene, postprocessing.camera, postprocessing.rtTextureColors );
+					THREE.WebGLRendererUtils.renderOverride( renderer, postprocessing.materialGodraysFakeSun, postprocessing.scene, postprocessing.camera, postprocessing.rtTextureColors );
 
 					renderer.setScissorTest( false );
 
@@ -319,7 +321,7 @@
 
 					// Depth
 
-					THREE.WebGLRendererUtil.renderOverride( renderer, materialDepth, scene, camera, postprocessing.rtTextureDepth, renderer.getClearColor(), renderer.getClearAlpha() );
+					THREE.WebGLRendererUtils.renderOverride( renderer, materialDepth, scene, camera, postprocessing.rtTextureDepth, renderer.getClearColor(), renderer.getClearAlpha() );
 
 					// -- Render god-rays --
 
@@ -344,7 +346,7 @@
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
 					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureDepth;
 
-					THREE.WebGLRendererUtil.renderOverride( renderer, postprocessing.materialGodraysGenerate, postprocessing.camera, postprocessing.rtTextureGodRays2 );
+					THREE.WebGLRendererUtils.renderOverride( renderer, postprocessing.materialGodraysGenerate, postprocessing.camera, postprocessing.rtTextureGodRays2 );
 
 					// pass 2 - render into second ping-pong target
 
@@ -354,7 +356,7 @@
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
 					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays2;
 
-					THREE.WebGLRendererUtil.renderOverride( renderer, postprocessing.materialGodraysGenerate, postprocessing.scene, postprocessing.camera, postprocessing.rtTextureGodRays1  );
+					THREE.WebGLRendererUtils.renderOverride( renderer, postprocessing.materialGodraysGenerate, postprocessing.scene, postprocessing.camera, postprocessing.rtTextureGodRays1  );
 
 					// pass 3 - 1st RT
 
@@ -364,14 +366,14 @@
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
 					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays1;
 
-					THREE.WebGLRendererUtil.renderOverride( renderer, postprocessing.materialGodraysGenerate, postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays2  );
+					THREE.WebGLRendererUtils.renderOverride( renderer, postprocessing.materialGodraysGenerate, postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays2  );
 
 					// final pass - composite god-rays onto colors
 
 					postprocessing.godrayCombineUniforms["tColors"].value = postprocessing.rtTextureColors;
 					postprocessing.godrayCombineUniforms["tGodRays"].value = postprocessing.rtTextureGodRays2;
 
-					THREE.WebGLRendererUtil.renderOverride( renderer, postprocessing.materialGodraysCombine, postprocessing.scene, postprocessing.camera );
+					THREE.WebGLRendererUtils.renderOverride( renderer, postprocessing.materialGodraysCombine, postprocessing.scene, postprocessing.camera );
 
 				} else {
 

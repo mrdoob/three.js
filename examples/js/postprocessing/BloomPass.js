@@ -82,14 +82,14 @@ THREE.BloomPass.prototype = {
 		this.convolutionUniforms[ "tDiffuse" ].value = readBuffer;
 		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
 
-		THREE.WebGLRendererUtil.renderPass( renderer, this.materialConvolution, this.renderTargetX, 0x000000, 0 );
+		THREE.WebGLRendererUtils.renderPass( renderer, this.materialConvolution, this.renderTargetX, 0x000000, 0 );
 
 		// Render quad with blured scene into texture (convolution pass 2)
 
 		this.convolutionUniforms[ "tDiffuse" ].value = this.renderTargetX;
 		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurY;
 
-		THREE.WebGLRendererUtil.renderPass( renderer, this.materialConvolution, this.renderTargetY, 0x000000, 0 );
+		THREE.WebGLRendererUtils.renderPass( renderer, this.materialConvolution, this.renderTargetY, 0x000000, 0 );
 
 		// Render original scene with superimposed blur to texture
 
@@ -97,7 +97,7 @@ THREE.BloomPass.prototype = {
 
 		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
 
-		THREE.WebGLRendererUtil.renderPass( renderer, this.materialCopy, readBuffer, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
+		THREE.WebGLRendererUtils.renderPass( renderer, this.materialCopy, readBuffer, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
 
 	}
 

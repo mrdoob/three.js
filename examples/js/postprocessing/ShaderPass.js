@@ -46,7 +46,7 @@ THREE.ShaderPass.prototype = {
 
 		}
 
-		THREE.WebGLRendererUtil.renderPass( renderer, this.material, this.renderToScreen ? null : writeBuffer, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
+		THREE.WebGLRendererUtils.renderPass( renderer, this.material, this.renderToScreen ? null : writeBuffer, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
 
 	}
 

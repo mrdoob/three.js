@@ -39,7 +39,7 @@ THREE.FilmPass.prototype = {
 		this.uniforms[ "tDiffuse" ].value = readBuffer;
 		this.uniforms[ "time" ].value += delta;
 
-		THREE.WebGLRendererUtil.renderPass( renderer, this.material, this.renderToScreen ? null : writeBuffer, this.clear ? 0x000000 : null, this.clear ? 0 : null );
+		THREE.WebGLRendererUtils.renderPass( renderer, this.material, this.renderToScreen ? null : writeBuffer, this.clear ? 0x000000 : null, this.clear ? 0 : null );
 
 	}
 

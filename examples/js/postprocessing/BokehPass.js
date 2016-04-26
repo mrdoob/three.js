@@ -71,7 +71,7 @@ THREE.BokehPass.prototype = {
 
 		// Render depth into texture
 
-		THREE.WebGLRendererUtil.renderOverride( renderer, this.materialDepth, this.scene, this.camera, this.renderTargetDepth );
+		THREE.WebGLRendererUtils.renderOverride( renderer, this.materialDepth, this.scene, this.camera, this.renderTargetDepth );
 
 		this.scene.overrideMaterial = null;
 
@@ -79,7 +79,7 @@ THREE.BokehPass.prototype = {
 
 		this.uniforms[ "tColor" ].value = readBuffer;
 
-		THREE.WebGLRendererUtil.renderPass( renderer, this.materialBokeh, this.renderToScreen ? null : writeBuffer, this.clear ? 0x000000 : null, this.clear ? 0 : null );
+		THREE.WebGLRendererUtils.renderPass( renderer, this.materialBokeh, this.renderToScreen ? null : writeBuffer, this.clear ? 0x000000 : null, this.clear ? 0 : null );
 
 	}
 

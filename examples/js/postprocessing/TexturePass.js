@@ -36,7 +36,7 @@ THREE.TexturePass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 		
-		THREE.WebGLRendererUtil.renderPass( renderer, this.material, readBuffer, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
+		THREE.WebGLRendererUtils.renderPass( renderer, this.material, readBuffer, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
 
 	}
 
