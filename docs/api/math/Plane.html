@@ -78,6 +78,15 @@
 		Returns a vector in the same direction as the Plane's normal, but the magnitude is passed point's original distance to the plane.
 		</div>
 
+		<h3>[method:Vector3 intersectRay]([page:Ray ray], [page:Vector3 optionalTarget]) or [page:undefined]</h3>
+		<div>
+		ray -- [page:Ray] <br />
+		optionalTarget -- [page:Vector3]
+		</div>
+		<div>
+		Returns the intersection point of the passed ray and the plane. Returns undefined if the line does not intersect. Returns the ray's starting point if the line is coplanar with the plane.
+		</div>
+
 		<h3>[method:Boolean intersectsLine]([page:Line3 line])</h3>
 		<div>
 		line -- [page:Line3]
