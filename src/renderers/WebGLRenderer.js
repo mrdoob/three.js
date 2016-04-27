@@ -71,9 +71,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.toneMappingExposure = 1.0;
 	this.toneMappingWhitePoint = 1.0;
 
-	this.passCamera = null;
-	this.passQuad = null;
-	this.passScene = null;
 
 	// morphs
 
