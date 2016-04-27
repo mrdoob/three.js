@@ -529,7 +529,7 @@ Use WEBGL Depth buffer support?
 
 					// Render depth into texture
 
-					THREE.WebGLRendererUtils.renderOverride( renderer, material_depth, scene, camera, postprocessing.rtTextureDepth );
+					THREE.EffectRenderer.renderOverride( renderer, material_depth, scene, camera, postprocessing.rtTextureDepth );
 
 					// Render bokeh composite
 

@@ -309,7 +309,7 @@
 
 					postprocessing.godraysFakeSunUniforms[ "fAspect" ].value = window.innerWidth / window.innerHeight;
 
-					THREE.WebGLRendererUtils.renderOverride( renderer, postprocessing.materialGodraysFakeSun, postprocessing.scene, postprocessing.camera, postprocessing.rtTextureColors );
+					THREE.EffectRenderer.renderOverride( renderer, postprocessing.materialGodraysFakeSun, postprocessing.scene, postprocessing.camera, postprocessing.rtTextureColors );
 
 					renderer.setScissorTest( false );
 
@@ -321,7 +321,7 @@
 
 					// Depth
 
-					THREE.WebGLRendererUtils.renderOverride( renderer, materialDepth, scene, camera, postprocessing.rtTextureDepth, renderer.getClearColor(), renderer.getClearAlpha() );
+					THREE.EffectRenderer.renderOverride( renderer, materialDepth, scene, camera, postprocessing.rtTextureDepth, renderer.getClearColor(), renderer.getClearAlpha() );
 
 					// -- Render god-rays --
 
@@ -346,7 +346,7 @@
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
 					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureDepth;
 
-					THREE.WebGLRendererUtils.renderOverride( renderer, postprocessing.materialGodraysGenerate, postprocessing.camera, postprocessing.rtTextureGodRays2 );
+					THREE.EffectRenderer.renderOverride( renderer, postprocessing.materialGodraysGenerate, postprocessing.camera, postprocessing.rtTextureGodRays2 );
 
 					// pass 2 - render into second ping-pong target
 
@@ -356,7 +356,7 @@
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
 					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays2;
 
-					THREE.WebGLRendererUtils.renderOverride( renderer, postprocessing.materialGodraysGenerate, postprocessing.scene, postprocessing.camera, postprocessing.rtTextureGodRays1  );
+					THREE.EffectRenderer.renderOverride( renderer, postprocessing.materialGodraysGenerate, postprocessing.scene, postprocessing.camera, postprocessing.rtTextureGodRays1  );
 
 					// pass 3 - 1st RT
 
@@ -366,14 +366,14 @@
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
 					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays1;
 
-					THREE.WebGLRendererUtils.renderOverride( renderer, postprocessing.materialGodraysGenerate, postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays2  );
+					THREE.EffectRenderer.renderOverride( renderer, postprocessing.materialGodraysGenerate, postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays2  );
 
 					// final pass - composite god-rays onto colors
 
 					postprocessing.godrayCombineUniforms["tColors"].value = postprocessing.rtTextureColors;
 					postprocessing.godrayCombineUniforms["tGodRays"].value = postprocessing.rtTextureGodRays2;
 
-					THREE.WebGLRendererUtils.renderOverride( renderer, postprocessing.materialGodraysCombine, postprocessing.scene, postprocessing.camera );
+					THREE.EffectRenderer.renderOverride( renderer, postprocessing.materialGodraysCombine, postprocessing.scene, postprocessing.camera );
 
 				} else {
 

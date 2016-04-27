@@ -999,7 +999,7 @@
 
 			if ( singlePickingMaterial ) {
 
-				THREE.WebGLRendererUtils.renderOverride( renderer, singlePickingMaterial, scene, camera, pickingRenderTarget );
+				THREE.EffectRenderer.renderOverride( renderer, singlePickingMaterial, scene, camera, pickingRenderTarget );
 
 			}else {
 

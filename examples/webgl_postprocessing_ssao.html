@@ -220,7 +220,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				if ( postprocessing.enabled ) {
 
 					// Render depth into depthRenderTarget
-					THREE.WebGLRendererUtils.renderOverride( renderer, depthMaterial, scene, camera, depthRenderTarget );
+					THREE.EffectRenderer.renderOverride( renderer, depthMaterial, scene, camera, depthRenderTarget );
 
 					// Render renderPass and SSAO shaderPass
 					effectComposer.render();

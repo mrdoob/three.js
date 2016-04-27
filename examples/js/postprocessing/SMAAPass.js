@@ -110,17 +110,17 @@ THREE.SMAAPass.prototype = {
 
 		this.uniformsEdges[ "tDiffuse" ].value = readBuffer;
 
-		THREE.WebGLRendererUtils.renderPass( renderer, this.materialEdges, this.edgesRT, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
+		THREE.EffectRenderer.renderPass( renderer, this.materialEdges, this.edgesRT, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
 
 		// pass 2
 
-		THREE.WebGLRendererUtils.renderPass( renderer, this.materialWeights, this.weightsRT, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
+		THREE.EffectRenderer.renderPass( renderer, this.materialWeights, this.weightsRT, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
 
 		// pass 3
 
 		this.uniformsBlend[ "tColor" ].value = readBuffer;
 
-		THREE.WebGLRendererUtils.renderPass( renderer, this.materialBlend, this.renderToScreen ? null : writeBuffer, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
+		THREE.EffectRenderer.renderPass( renderer, this.materialBlend, this.renderToScreen ? null : writeBuffer, this.clear ? renderer.getClearColor() : null, this.clear ? renderer.getClearAlpha() : null );
 
 	},
 
