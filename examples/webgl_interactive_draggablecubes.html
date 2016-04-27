@@ -26,13 +26,10 @@
 			var container, stats;
 			var camera, controls, scene, renderer;
 			var objects = [];
-			var plane = {
-				origin: new THREE.Vector3(),
-				direction: new THREE.Vector3()
-			}
+			var line = new THREE.Line3();
+			var plane = new THREE.Plane();
 			var raycaster = new THREE.Raycaster();
 			var mouse = new THREE.Vector2(),
-			offset = new THREE.Vector3(),
 			INTERSECTED, SELECTED;
 
 			init();
@@ -139,55 +136,6 @@
 
 			}
 
-			function rayPlaneIntersection(ray, plane) {
-				// ray: {origin, direction}
-				// plane: {origin, direction}
-				//
-				// LOGIC:
-				//
-				// Ray equation: P = P0 + tV
-				// P = <Px, Py, Pz>
-				// P0 = <ray.position.x, ray.position.y, ray.position.z>
-				// V = <ray.direction.x, ray.direction.y, ray.direction.z>
-				//
-				// Therefore:
-				// Px = ray.position.x + t*ray.direction.x
-				// Py = ray.position.y + t*ray.direction.y
-				// Pz = ray.position.z + t*ray.direction.z
-				//
-				//
-				//
-				// Plane equation: ax + by + cz + d = 0
-				// a = plane.direction.x
-				// b = plane.direction.y
-				// c = plane.direction.z
-				// d = -( plane.direction.x*plane.position.x +
-				//				plane.direction.y*plane.position.y +
-				//				plane.direction.z*plane.position.z )
-				//
-				//
-				// 1- in the plane equation, we replace x, y and z by Px, Py and Pz
-				// 2- find t
-				// 3- replace t in Px, Py and Pz to get the coordinate of the intersection
-				//
-
-				if (ray.direction.dot(plane.direction) !== 0) {
-
-					let t = (plane.direction.x * (plane.origin.x - ray.origin.x) + plane.direction.y * (plane.origin.y - ray.origin.y) + plane.direction.z * (plane.origin.z - ray.origin.z)) /
-						(plane.direction.x * ray.direction.x + plane.direction.y * ray.direction.y + plane.direction.z * ray.direction.z);
-
-					let intersection = new THREE.Vector3(
-						ray.origin.x + t * ray.direction.x,
-						ray.origin.y + t * ray.direction.y,
-						ray.origin.z + t * ray.direction.z);
-
-					return intersection;
-
-				}
-
-				return null;
-			}
-
 			function onDocumentMouseMove( event ) {
 
 				event.preventDefault();
@@ -199,10 +147,11 @@
 
 				if ( SELECTED ) {
 
-					var intersection = rayPlaneIntersection(raycaster.ray, plane);
+					var intersection = plane.intersectRay(raycaster.ray);
+
 					if ( intersection != null ) {
 
-						SELECTED.position.copy( intersection.sub( offset ) );
+						SELECTED.position.copy( intersection );
 
 					}
 
@@ -221,8 +170,9 @@
 						INTERSECTED = intersects[ 0 ].object;
 						INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
 
-						plane.origin.copy(INTERSECTED.position);
-						plane.direction.copy( camera.getWorldDirection() );
+						plane.setFromNormalAndCoplanarPoint(
+							camera.getWorldDirection(),
+							INTERSECTED.position);
 
 					}
 
@@ -254,14 +204,6 @@
 
 					SELECTED = intersects[ 0 ].object;
 
-					var intersection = rayPlaneIntersection(raycaster.ray, plane);
-
-					if ( intersection != null ) {
-
-						offset.copy( intersection ).sub( plane.origin );
-
-					}
-
 					container.style.cursor = 'move';
 
 				}
@@ -275,8 +217,6 @@
 				controls.enabled = true;
 
 				if ( INTERSECTED ) {
-
-					plane.origin.copy(INTERSECTED.position);
 
 					SELECTED = null;
 
