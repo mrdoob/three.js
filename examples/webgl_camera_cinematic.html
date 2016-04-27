@@ -17,9 +17,9 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/postprocessing/EffectRenderer.js"></script>
 		<script src="js/shaders/BokehShader2.js"></script>
 
+		<script src="js/postprocessing/EffectRenderer.js"></script>
 		<script src="js/cameras/CinematicCamera.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
@@ -32,8 +32,6 @@
 
 			var mouse = new THREE.Vector2(), INTERSECTED;
 			var radius = 100, theta = 0;
-
-
 
 			init();
 			animate();
@@ -52,7 +50,7 @@
 				container.appendChild( info );
 				camera = new THREE.CinematicCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.setLens(5);
-        		camera.position.set(2, 1, 500);
+						camera.position.set(2, 1, 500);
 
 
 				scene = new THREE.Scene();
@@ -61,7 +59,6 @@
 				var light = new THREE.DirectionalLight( 0xffffff, 0.35 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
-
 
 				var geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
@@ -90,8 +87,6 @@
 				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -135,7 +130,6 @@
 					effectController['focalDepth'] = camera.postprocessing.bokeh_uniforms["focalDepth"].value;
 				};
 
-
 				var gui = new dat.GUI();
 
 				gui.add( effectController, "focalLength", 1, 135, 0.01 ).onChange( matChanger );
@@ -149,8 +143,7 @@
 
 			}
 
-
-		function onWindowResize() {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -168,7 +161,6 @@
 
 			}
 
-
 			function animate() {
 
 				requestAnimationFrame( animate, renderer.domElement );
@@ -177,7 +169,6 @@
 				stats.update();
 
 			}
-
 
 			function render() {
 
