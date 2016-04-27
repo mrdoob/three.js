@@ -15,6 +15,9 @@ THREE.Vector3 = function ( x, y, z ) {
 
 };
 
+THREE.Vector3.TypedArray = Float32Array;
+THREE.Vector3.TypedStride = 3;
+
 THREE.Vector3.prototype = {
 
 	constructor: THREE.Vector3,

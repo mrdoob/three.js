@@ -30,6 +30,9 @@ THREE.Matrix4 = function () {
 
 };
 
+THREE.Matrix4.TypedArray = Float32Array;
+THREE.Matrix4.TypedStride = 16;
+
 THREE.Matrix4.prototype = {
 
 	constructor: THREE.Matrix4,

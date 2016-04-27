@@ -19,6 +19,9 @@ THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 
 };
 
+THREE.Face3.TypedArray = Int32Array;
+THREE.Face3.TypedStride = 3;
+
 THREE.Face3.prototype = {
 
 	constructor: THREE.Face3,
@@ -53,6 +56,31 @@ THREE.Face3.prototype = {
 		}
 
 		return this;
+
+	},
+
+	fromArray: function ( array, offset ) {
+
+		if ( offset === undefined ) offset = 0;
+
+		this.a = array[ offset ];
+		this.b = array[ offset + 1 ];
+		this.c = array[ offset + 2 ];
+
+		return this;
+
+	},
+
+	toArray: function ( array, offset ) {
+
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
+
+		array[ offset ] = this.a;
+		array[ offset + 1 ] = this.b;
+		array[ offset + 2 ] = this.c;
+
+		return array;
 
 	}
 

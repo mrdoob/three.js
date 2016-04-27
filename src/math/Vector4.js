@@ -15,6 +15,9 @@ THREE.Vector4 = function ( x, y, z, w ) {
 
 };
 
+THREE.Vector4.TypedArray = Float32Array;
+THREE.Vector4.TypedStride = 4;
+
 THREE.Vector4.prototype = {
 
 	constructor: THREE.Vector4,

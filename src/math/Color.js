@@ -14,6 +14,9 @@ THREE.Color = function ( color ) {
 
 };
 
+THREE.Color.TypedArray = Float32Array;
+THREE.Color.TypedStride = 3;
+
 THREE.Color.prototype = {
 
 	constructor: THREE.Color,
