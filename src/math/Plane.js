@@ -131,7 +131,7 @@ THREE.Plane.prototype = {
 			direction: this.normal
 		}
 
-		// if not complanar, there is an intersection
+		// if ray and plane not complanar, there is an intersection
 		if (ray.direction.dot(plane.direction) !== 0) {
 
 			var t = (plane.direction.x * (plane.origin.x - ray.origin.x) + plane.direction.y * (plane.origin.y - ray.origin.y) + plane.direction.z * (plane.origin.z - ray.origin.z)) /
@@ -146,18 +146,18 @@ THREE.Plane.prototype = {
 
 		}
 		else{
-			  // ray & plane are coplanar
-				if ( this.distanceToPoint( ray.origin ) === 0 ) {
+			if ( this.distanceToPoint( ray.origin ) === 0 ) {
 
-					return result.copy( ray.origin );
+				// ray & plane are coplanar
+				return result.copy( ray.origin );
 
-				}
+			}
+			else{
+
 				// no intersection
-				else{
+				return undefined;
 
-					return undefined;
-
-				}
+			}
 
 		}
 
