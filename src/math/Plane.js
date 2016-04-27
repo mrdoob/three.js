@@ -122,6 +122,47 @@ THREE.Plane.prototype = {
 
 	},
 
+	intersectRay: function(ray, optionalTarget){
+
+		var result = optionalTarget || new THREE.Vector3();
+
+		var plane = {
+			origin: this.coplanarPoint(),
+			direction: this.normal
+		}
+
+		// if not complanar, there is an intersection
+		if (ray.direction.dot(plane.direction) !== 0) {
+
+			var t = (plane.direction.x * (plane.origin.x - ray.origin.x) + plane.direction.y * (plane.origin.y - ray.origin.y) + plane.direction.z * (plane.origin.z - ray.origin.z)) /
+				(plane.direction.x * ray.direction.x + plane.direction.y * ray.direction.y + plane.direction.z * ray.direction.z);
+
+			var intersection = new THREE.Vector3(
+				ray.origin.x + t * ray.direction.x,
+				ray.origin.y + t * ray.direction.y,
+				ray.origin.z + t * ray.direction.z);
+
+			return result.copy(intersection);
+
+		}
+		else{
+			  // ray & plane are coplanar
+				if ( this.distanceToPoint( ray.origin ) === 0 ) {
+
+					return result.copy( ray.origin );
+
+				}
+				// no intersection
+				else{
+
+					return undefined;
+
+				}
+
+		}
+
+	},
+
 	intersectLine: function () {
 
 		var v1 = new THREE.Vector3();
