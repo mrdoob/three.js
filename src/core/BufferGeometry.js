@@ -288,7 +288,7 @@ THREE.BufferGeometry.prototype = {
 			var colors = new THREE.Float32Attribute( geometry.colors.length * 3, 3 );
 
 			this.addAttribute( 'position', positions.copyPrimitives( geometry.vertices ) );
-			this.addAttribute( 'color', colors.copyColorsArray( geometry.colors ) );
+			this.addAttribute( 'color', colors.copyPrimitives( geometry.colors ) );
 
 			if ( geometry.lineDistances && geometry.lineDistances.length === geometry.vertices.length ) {
 
@@ -390,7 +390,7 @@ THREE.BufferGeometry.prototype = {
 
 			if ( attribute !== undefined ) {
 
-				attribute.copyColorsArray( geometry.colors );
+				attribute.copyPrimitives( geometry.colors );
 				attribute.needsUpdate = true;
 
 			}
@@ -465,7 +465,7 @@ THREE.BufferGeometry.prototype = {
 		if ( geometry.colors.length > 0 ) {
 
 			var colors = new Float32Array( geometry.colors.length * 3 );
-			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
+			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyPrimitives( geometry.colors ) );
 
 		}
 
