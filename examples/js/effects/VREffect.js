@@ -102,7 +102,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	document.addEventListener( fullscreenchange, function () {
 
-		isPresenting = vrHMD && ( vrHMD.isPresenting || isDeprecatedAPI && ( document.mozFullScreenElement || document.webkitFullscreenElement ) !== undefined );
+		isPresenting = !!vrHMD && ( vrHMD.isPresenting || ( isDeprecatedAPI && ( document.mozFullScreenElement || document.webkitFullscreenElement ) !== undefined ) );
 
 		if ( isPresenting ) {
 
@@ -113,11 +113,15 @@ THREE.VREffect = function ( renderer, onError ) {
 			var eyeWidth, eyeHeight;
 
 			if ( isDeprecatedAPI ) {
+
 				eyeWidth = eyeParamsL.renderRect.width;
 				eyeHeight = eyeParamsL.renderRect.height;
+
 			} else {
+
 				eyeWidth = eyeParamsL.renderWidth;
 				eyeHeight = eyeParamsL.renderHeight;
+
 			}
 
 			renderer.setPixelRatio( 1 );
