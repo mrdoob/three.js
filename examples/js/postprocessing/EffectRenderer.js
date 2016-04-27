@@ -51,14 +51,14 @@ THREE.EffectRenderer.renderOverride = function ( renderer, overrideMaterial, sce
 
 	var self = THREE.EffectRenderer;
 
-	var clearState = self.getClearState();
-	var clearNeeded = self.applyCustomClearState( overrideMaterial, clearColor, clearAlpha );
+	var clearState = self.getClearState( renderer );
+	var clearNeeded = self.applyCustomClearState( renderer, overrideMaterial, clearColor, clearAlpha );
 
 	scene.overrideMaterial = overrideMaterial;
 	renderer.render( scene, camera, renderTarget, clearNeeded );
 	scene.overrideMaterial = null;
 
-	self.setClearState( clearState );
+	self.setClearState( renderer, clearState );
 
 };
 
@@ -73,13 +73,13 @@ THREE.EffectRenderer.renderPass = function ( renderer, passMaterial, renderTarge
 		self.passScene.add( self.passQuad );
 	}
 
-	var clearState = self.getClearState();
-	var clearNeeded = self.applyCustomClearState( passMaterial, clearColor, clearAlpha );
+	var clearState = self.getClearState( renderer );
+	var clearNeeded = self.applyCustomClearState( renderer, passMaterial, clearColor, clearAlpha );
 
 	self.passQuad.material = passMaterial;
 	renderer.render( self.passScene, self.passCamera, renderTarget, clearNeeded );
 
-	self.setClearState( clearState );
+	self.setClearState( renderer, clearState );
 
 };
 
@@ -97,6 +97,6 @@ THREE.EffectRenderer.renderCopyPass = function( renderer, source, opacity, rende
 	self.copyShader.tDiffuse = source;
 	self.copyShader.opacity = opacity;
 
-	renderer.renderPass( er.copyShader, renderTarget, clearColor, clearAlpha );
+	self.renderPass( renderer, er.copyShader, renderTarget, clearColor, clearAlpha );
 
 };
