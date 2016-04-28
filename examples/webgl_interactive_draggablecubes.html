@@ -150,7 +150,7 @@
 
 					if ( plane.intersectRay( raycaster.ray, intersection ) ) {
 
-						SELECTED.position.copy( intersection ).sub( offset );
+						SELECTED.position.copy( intersection.sub( offset ) );
 
 					}
 
