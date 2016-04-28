@@ -30,6 +30,7 @@
 			var raycaster = new THREE.Raycaster();
 			var mouse = new THREE.Vector2(),
 			offset = new THREE.Vector3(),
+			intersection = new THREE.Vector3(),
 			INTERSECTED, SELECTED;
 
 			init();
@@ -147,9 +148,7 @@
 
 				if ( SELECTED ) {
 
-					var intersection = plane.intersectRay(raycaster.ray);
-
-					if ( intersection ) {
+					if ( plane.intersectRay( raycaster.ray, intersection ) ) {
 
 						SELECTED.position.copy( intersection ).sub( offset );
 
@@ -171,8 +170,8 @@
 						INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
 
 						plane.setFromNormalAndCoplanarPoint(
-							camera.getWorldDirection(),
-							INTERSECTED.position);
+							camera.getWorldDirection( plane.normal ),
+							INTERSECTED.position );
 
 					}
 
@@ -204,9 +203,7 @@
 
 					SELECTED = intersects[ 0 ].object;
 
-					var intersection = plane.intersectRay(raycaster.ray);
-
-					if ( intersection ) {
+					if ( plane.intersectRay( raycaster.ray, intersection ) ) {
 
 						offset.copy( intersection ).sub( SELECTED.position );
 
