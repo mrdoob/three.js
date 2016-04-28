@@ -386,8 +386,6 @@ Object.assign( THREE.KeyframeTrack, {
 
 		if ( json.times === undefined ) {
 
-			console.warn( "legacy JSON format detected, converting" );
-
 			var times = [], values = [];
 
 			THREE.AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
