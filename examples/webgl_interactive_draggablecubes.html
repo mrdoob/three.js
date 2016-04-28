@@ -29,6 +29,7 @@
 			var plane = new THREE.Plane();
 			var raycaster = new THREE.Raycaster();
 			var mouse = new THREE.Vector2(),
+			offset = new THREE.Vector3(),
 			INTERSECTED, SELECTED;
 
 			init();
@@ -150,7 +151,7 @@
 
 					if ( intersection ) {
 
-						SELECTED.position.copy( intersection );
+						SELECTED.position.copy( intersection ).sub( offset );
 
 					}
 
@@ -202,6 +203,14 @@
 					controls.enabled = false;
 
 					SELECTED = intersects[ 0 ].object;
+
+					var intersection = plane.intersectRay(raycaster.ray);
+
+					if ( intersection ) {
+
+						offset.copy( intersection ).sub( SELECTED.position );
+
+					}
 
 					container.style.cursor = 'move';
 
