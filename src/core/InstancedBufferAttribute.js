@@ -2,9 +2,9 @@
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedBufferAttribute = function ( array, itemSize, meshPerAttribute ) {
+THREE.InstancedBufferAttribute = function ( array, itemSize, meshPerAttribute, normalized ) {
 
-	THREE.BufferAttribute.call( this, array, itemSize );
+	THREE.BufferAttribute.call( this, array, itemSize, normalized );
 
 	this.meshPerAttribute = meshPerAttribute || 1;
 
