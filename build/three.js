@@ -344,15 +344,16 @@ THREE.RGBADepthPacking = 3201; // for packing into RGBA buffers.
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Color = function ( color ) {
+THREE.Color = function ( r, g, b ) {
 
-	if ( arguments.length === 3 ) {
+	if ( g === undefined && b === undefined ) {
 
-		return this.fromArray( arguments );
+		// r is THREE.Color, hex or string
+		return this.set( r );
 
 	}
 
-	return this.set( color );
+	return this.setRGB( r, g, b );
 
 };
 
@@ -15166,8 +15167,6 @@ Object.assign( THREE.KeyframeTrack, {
 
 		if ( json.times === undefined ) {
 
-			console.warn( "legacy JSON format detected, converting" );
-
 			var times = [], values = [];
 
 			THREE.AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
@@ -18793,7 +18792,7 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		function parseSkin() {
 
@@ -18838,7 +18837,7 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		function parseMorphing( scale ) {
 
@@ -18930,7 +18929,7 @@ THREE.JSONLoader.prototype = {
 
 			if ( outputAnimations.length > 0 ) geometry.animations = outputAnimations;
 
-		};
+		}
 
 		if ( json.materials === undefined || json.materials.length === 0 ) {
 
