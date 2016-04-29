@@ -40,6 +40,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	var currentStencilZPass = null;
 
 	var currentFlipSided = null;
+	var currentCullFace = null;
 
 	var currentLineWidth = null;
 
@@ -67,15 +68,14 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 		this.clearStencil( 0 );
 
 		this.enable( gl.DEPTH_TEST );
-		gl.depthFunc( gl.LEQUAL );
+		this.setDepthFunc( THREE.LessEqualDepth );
 
-		gl.frontFace( gl.CCW );
-		gl.cullFace( gl.BACK );
+		this.setFlipSided( false );
+		this.setCullFace( THREE.CullFaceBack );
 		this.enable( gl.CULL_FACE );
 
 		this.enable( gl.BLEND );
-		gl.blendEquation( gl.FUNC_ADD );
-		gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+		this.setBlending( THREE.NormalBlending );
 
 	};
 
@@ -133,7 +133,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.disableUnusedAttributes = function () {
 
-		for ( var i = 0, l = enabledAttributes.length; i < l; i ++ ) {
+		for ( var i = 0, l = enabledAttributes.length; i !== l; ++ i ) {
 
 			if ( enabledAttributes[ i ] !== newAttributes[ i ] ) {
 
@@ -196,13 +196,15 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
-		if ( blending === THREE.NoBlending ) {
+		if ( blending !== THREE.NoBlending ) {
 
-			this.disable( gl.BLEND );
+			this.enable( gl.BLEND );
 
 		} else {
 
-			this.enable( gl.BLEND );
+			this.disable( gl.BLEND );
+			currentBlending = blending; // no blending, that is
+			return;
 
 		}
 
@@ -495,6 +497,40 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
+	this.setCullFace = function ( cullFace ) {
+
+		if ( cullFace !== THREE.CullFaceNone ) {
+
+			this.enable( gl.CULL_FACE );
+
+			if ( cullFace !== currentCullFace ) {
+
+				if ( cullFace === THREE.CullFaceBack ) {
+
+					gl.cullFace( gl.BACK );
+
+				} else if ( cullFace === THREE.CullFaceFront ) {
+
+					gl.cullFace( gl.FRONT );
+
+				} else {
+
+					gl.cullFace( gl.FRONT_AND_BACK );
+
+				}
+
+			}
+
+		} else {
+
+			this.disable( gl.CULL_FACE );
+
+		}
+
+		currentCullFace = cullFace;
+
+	};
+
 	this.setLineWidth = function ( width ) {
 
 		if ( width !== currentLineWidth ) {
@@ -513,18 +549,18 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 			this.enable( gl.POLYGON_OFFSET_FILL );
 
+			if ( currentPolygonOffsetFactor !== factor || currentPolygonOffsetUnits !== units ) {
+
+				gl.polygonOffset( factor, units );
+
+				currentPolygonOffsetFactor = factor;
+				currentPolygonOffsetUnits = units;
+
+			}
+
 		} else {
 
 			this.disable( gl.POLYGON_OFFSET_FILL );
-
-		}
-
-		if ( polygonOffset && ( currentPolygonOffsetFactor !== factor || currentPolygonOffsetUnits !== units ) ) {
-
-			gl.polygonOffset( factor, units );
-
-			currentPolygonOffsetFactor = factor;
-			currentPolygonOffsetUnits = units;
 
 		}
 
@@ -713,6 +749,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 		currentStencilWrite = null;
 
 		currentFlipSided = null;
+		currentCullFace = null;
 
 	};
 
