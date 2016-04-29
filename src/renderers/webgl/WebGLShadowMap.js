@@ -104,8 +104,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		// Set GL state for depth map.
 		_state.clearColor( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
-		_state.enable( _gl.CULL_FACE );
-		_state.setFlipSided( false );
 		_state.setCullFace( scope.cullFace );
 		_state.setDepthTest( true );
 		_state.setScissorTest( false );
