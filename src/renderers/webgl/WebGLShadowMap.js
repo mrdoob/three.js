@@ -105,8 +105,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		_state.clearColor( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
 		_state.enable( _gl.CULL_FACE );
-		_gl.frontFace( _gl.CCW );
-		_gl.cullFace( scope.cullFace === THREE.CullFaceFront ? _gl.FRONT : _gl.BACK );
+		_state.setFlipSided( false );
+		_state.setCullFace( scope.cullFace );
 		_state.setDepthTest( true );
 		_state.setScissorTest( false );
 
@@ -290,7 +290,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
 
-			_gl.cullFace( _gl.BACK );
+			_state.setCullFace( THREE.CullFaceBack );
 
 		}
 
