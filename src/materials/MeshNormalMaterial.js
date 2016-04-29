@@ -20,6 +20,10 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 
 	this.morphTargets = false;
 
+	// default normal is facing the camera.
+	this.clearColor = new THREE.Color( 0.5, 0.5, 1.0 );
+	this.clearAlpha = 1.0;
+
 	this.setValues( parameters );
 
 };

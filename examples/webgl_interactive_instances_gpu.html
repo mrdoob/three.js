@@ -999,9 +999,7 @@
 
 			if ( singlePickingMaterial ) {
 
-				scene.overrideMaterial = singlePickingMaterial;
-				renderer.render( scene, camera, pickingRenderTarget );
-				scene.overrideMaterial = null;
+				THREE.EffectRenderer.renderOverride( renderer, singlePickingMaterial, scene, camera, pickingRenderTarget );
 
 			}else {
 

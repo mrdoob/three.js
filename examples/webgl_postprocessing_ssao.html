@@ -40,10 +40,11 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 	</head>
 	<body>
 		<script src="../build/three.js"></script>
-
+		
 		<script src="js/shaders/SSAOShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 
+		<script src="js/postprocessing/EffectRenderer.js"></script>
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
@@ -219,11 +220,9 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				if ( postprocessing.enabled ) {
 
 					// Render depth into depthRenderTarget
-					scene.overrideMaterial = depthMaterial;
-					renderer.render( scene, camera, depthRenderTarget, true );
+					THREE.EffectRenderer.renderOverride( renderer, depthMaterial, scene, camera, depthRenderTarget );
 
 					// Render renderPass and SSAO shaderPass
-					scene.overrideMaterial = null;
 					effectComposer.render();
 
 				} else {

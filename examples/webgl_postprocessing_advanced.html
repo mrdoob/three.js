@@ -53,6 +53,7 @@
 		<script src="js/shaders/VerticalBlurShader.js"></script>
 		<script src="js/shaders/VignetteShader.js"></script>
 
+		<script src="js/postprocessing/EffectRenderer.js"></script>
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/BloomPass.js"></script>
@@ -282,10 +283,6 @@
 				composer4.addPass( effectBleach );
 				//composer4.addPass( clearMask );
 				composer4.addPass( effectVignette );
-
-				//
-
-				//onWindowResize();
 
 				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2;
 
