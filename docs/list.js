@@ -143,7 +143,6 @@ var list = {
 
 		"Renderers / WebGL / Plugins": [
 			[ "LensFlarePlugin", "api/renderers/webgl/plugins/LensFlarePlugin" ],
-			[ "ShadowMapPlugin", "api/renderers/webgl/plugins/ShadowMapPlugin" ],
 			[ "SpritePlugin", "api/renderers/webgl/plugins/SpritePlugin" ]
 		],
 
