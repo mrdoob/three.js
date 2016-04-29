@@ -90,8 +90,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	this.needsUpdate = false;
 
 	this.type = THREE.PCFShadowMap;
-	this.cullFace = THREE.CullFaceFront;
 
+	this.flipSidedFaces = true;
 	this.allowDoubleSided = false;
 
 	this.render = function ( scene, camera ) {
@@ -104,7 +104,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		// Set GL state for depth map.
 		_state.clearColor( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
-		_state.setCullFace( scope.cullFace );
 		_state.setDepthTest( true );
 		_state.setScissorTest( false );
 
@@ -284,14 +283,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		clearAlpha = _renderer.getClearAlpha();
 		_renderer.setClearColor( clearColor, clearAlpha );
 
-		_state.enable( _gl.BLEND );
-
-		if ( scope.cullFace === THREE.CullFaceFront ) {
-
-			_state.setCullFace( THREE.CullFaceBack );
-
-		}
-
 		scope.needsUpdate = false;
 
 	};
@@ -365,9 +356,15 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		result.visible = material.visible;
 		result.wireframe = material.wireframe;
-		result.side = scope.allowDoubleSided ? material.side : THREE.FrontSide;
+
+		var side = material.side;
+		if ( ! scope.allowDoubleSided ) 		side &= 1;
+		if ( scope.flipSidedFaces && side < 2 ) side ^= 1;
+		result.side = side;
+
 		result.clipShadows = material.clipShadows;
 		result.clippingPlanes = material.clippingPlanes;
+
 		result.wireframeLinewidth = material.wireframeLinewidth;
 		result.linewidth = material.linewidth;
 
@@ -411,5 +408,26 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		}
 
 	}
+
+	Object.defineProperty( this, 'cullFace', {
+
+		set: function( cullFace ) {
+
+			var flipSided = ( cullFace !== THREE.CullFaceBack );
+
+			console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. " +
+					" Set .shadowMap.flipSidedFaces to " + flipSided + "." );
+
+			this.flipSidedFaces = flipSided;
+
+		},
+
+		get: function() {
+
+			return this.flipSidedFaces ? THREE.CullFaceFront : THREE.CullFaceBack;
+
+		}
+
+	} );
 
 };
