@@ -25,6 +25,8 @@ THREE.PointsMaterial = function ( parameters ) {
 	this.size = 1;
 	this.sizeAttenuation = true;
 
+	this.lights = false;
+
 	this.setValues( parameters );
 
 };

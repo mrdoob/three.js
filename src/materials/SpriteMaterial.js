@@ -23,6 +23,7 @@ THREE.SpriteMaterial = function ( parameters ) {
 	this.rotation = 0;
 
 	this.fog = false;
+	this.lights = false;
 
 	this.setValues( parameters );
 

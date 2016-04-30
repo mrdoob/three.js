@@ -27,6 +27,8 @@ THREE.LineDashedMaterial = function ( parameters ) {
 	this.dashSize = 3;
 	this.gapSize = 1;
 
+	this.lights = false;
+
 	this.setValues( parameters );
 
 };

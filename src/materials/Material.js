@@ -13,6 +13,7 @@ THREE.Material = function () {
 	this.type = 'Material';
 
 	this.fog = true;
+	this.lights = true;
 
 	this.blending = THREE.NormalBlending;
 	this.side = THREE.FrontSide;
@@ -249,6 +250,7 @@ THREE.Material.prototype = {
 		this.name = source.name;
 
 		this.fog = source.fog;
+		this.lights = source.lights;
 
 		this.blending = source.blending;
 		this.side = source.side;

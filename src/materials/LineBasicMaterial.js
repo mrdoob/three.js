@@ -24,6 +24,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.linecap = 'round';
 	this.linejoin = 'round';
 
+	this.lights = false;
 
 	this.setValues( parameters );
 

@@ -44,6 +44,7 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 	this.wireframeLinewidth = 1;
 
 	this.fog = false;
+	this.lights = false;
 
 	this.setValues( parameters );
 
