@@ -49,9 +49,7 @@
  *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
- *  morphNormals: <bool>,
- *
- *	fog: <bool>
+ *  morphNormals: <bool>
  * }
  */
 
@@ -99,8 +97,6 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.envMapIntensity = 1.0;
 
 	this.refractionRatio = 0.98;
-
-	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
 
@@ -164,8 +160,6 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.envMapIntensity = source.envMapIntensity;
 
 	this.refractionRatio = source.refractionRatio;
-
-	this.fog = source.fog;
 
 	this.shading = source.shading;
 

@@ -48,9 +48,7 @@
  *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
- *  morphNormals: <bool>,
- *
- *	fog: <bool>
+ *  morphNormals: <bool>
  * }
  */
 
@@ -94,8 +92,6 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.combine = THREE.MultiplyOperation;
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
-
-	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
 
@@ -155,8 +151,6 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.combine = source.combine;
 	this.reflectivity = source.reflectivity;
 	this.refractionRatio = source.refractionRatio;
-
-	this.fog = source.fog;
 
 	this.shading = source.shading;
 

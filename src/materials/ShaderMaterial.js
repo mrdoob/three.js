@@ -19,9 +19,7 @@
  *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
- *  morphNormals: <bool>,
- *
- *	fog: <bool>
+ *  morphNormals: <bool>
  * }
  */
 
@@ -45,7 +43,6 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.wireframeLinewidth = 1;
 
 	this.fog = false; // set to use scene fog
-
 	this.lights = false; // set to use scene lights
 	this.clipping = false; // set to use user-defined clipping planes
 
@@ -105,8 +102,6 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
-
-	this.fog = source.fog;
 
 	this.lights = source.lights;
 	this.clipping = source.clipping;

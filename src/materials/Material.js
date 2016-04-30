@@ -12,6 +12,7 @@ THREE.Material = function () {
 	this.name = '';
 	this.type = 'Material';
 
+	this.fog = true;
 	this.side = THREE.FrontSide;
 
 	this.opacity = 1;
@@ -246,6 +247,7 @@ THREE.Material.prototype = {
 
 		this.name = source.name;
 
+		this.fog = source.fog;
 		this.side = source.side;
 
 		this.opacity = source.opacity;

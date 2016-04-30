@@ -11,8 +11,6 @@
  *  linejoin: "round",
  *
  *  vertexColors: <bool>
- *
- *  fog: <bool>
  * }
  */
 
@@ -30,7 +28,6 @@ THREE.LineBasicMaterial = function ( parameters ) {
 
 	this.vertexColors = THREE.NoColors;
 
-	this.fog = true;
 
 	this.setValues( parameters );
 
@@ -50,8 +47,6 @@ THREE.LineBasicMaterial.prototype.copy = function ( source ) {
 	this.linejoin = source.linejoin;
 
 	this.vertexColors = source.vertexColors;
-
-	this.fog = source.fog;
 
 	return this;
 

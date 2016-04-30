@@ -12,8 +12,6 @@
  *  gapSize: <float>,
  *
  *  vertexColors: THREE.NoColors / THREE.FaceColors / THREE.VertexColors
- *
- *  fog: <bool>
  * }
  */
 
@@ -32,8 +30,6 @@ THREE.LineDashedMaterial = function ( parameters ) {
 	this.gapSize = 1;
 
 	this.vertexColors = THREE.NoColors;
-
-	this.fog = true;
 
 	this.setValues( parameters );
 
@@ -55,8 +51,6 @@ THREE.LineDashedMaterial.prototype.copy = function ( source ) {
 	this.gapSize = source.gapSize;
 
 	this.vertexColors = source.vertexColors;
-
-	this.fog = source.fog;
 
 	return this;
 

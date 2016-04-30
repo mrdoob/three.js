@@ -10,9 +10,7 @@
  *  size: <float>,
  *  sizeAttenuation: <bool>,
  *
- *  vertexColors: <bool>,
- *
- *  fog: <bool>
+ *  vertexColors: <bool>
  * }
  */
 
@@ -30,8 +28,6 @@ THREE.PointsMaterial = function ( parameters ) {
 	this.sizeAttenuation = true;
 
 	this.vertexColors = THREE.NoColors;
-
-	this.fog = true;
 
 	this.setValues( parameters );
 
@@ -52,8 +48,6 @@ THREE.PointsMaterial.prototype.copy = function ( source ) {
 	this.sizeAttenuation = source.sizeAttenuation;
 
 	this.vertexColors = source.vertexColors;
-
-	this.fog = source.fog;
 
 	return this;
 
