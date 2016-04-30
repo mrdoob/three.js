@@ -9,9 +9,7 @@
  *
  *  scale: <float>,
  *  dashSize: <float>,
- *  gapSize: <float>,
- *
- *  vertexColors: THREE.NoColors / THREE.FaceColors / THREE.VertexColors
+ *  gapSize: <float>
  * }
  */
 
@@ -28,8 +26,6 @@ THREE.LineDashedMaterial = function ( parameters ) {
 	this.scale = 1;
 	this.dashSize = 3;
 	this.gapSize = 1;
-
-	this.vertexColors = THREE.NoColors;
 
 	this.setValues( parameters );
 
@@ -49,8 +45,6 @@ THREE.LineDashedMaterial.prototype.copy = function ( source ) {
 	this.scale = source.scale;
 	this.dashSize = source.dashSize;
 	this.gapSize = source.gapSize;
-
-	this.vertexColors = source.vertexColors;
 
 	return this;
 

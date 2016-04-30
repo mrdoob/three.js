@@ -8,9 +8,7 @@
  *
  *  linewidth: <float>,
  *  linecap: "round",
- *  linejoin: "round",
- *
- *  vertexColors: <bool>
+ *  linejoin: "round"
  * }
  */
 
@@ -25,8 +23,6 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.linewidth = 1;
 	this.linecap = 'round';
 	this.linejoin = 'round';
-
-	this.vertexColors = THREE.NoColors;
 
 
 	this.setValues( parameters );
@@ -45,8 +41,6 @@ THREE.LineBasicMaterial.prototype.copy = function ( source ) {
 	this.linewidth = source.linewidth;
 	this.linecap = source.linecap;
 	this.linejoin = source.linejoin;
-
-	this.vertexColors = source.vertexColors;
 
 	return this;
 

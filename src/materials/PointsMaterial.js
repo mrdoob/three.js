@@ -8,9 +8,7 @@
  *  map: new THREE.Texture( <Image> ),
  *
  *  size: <float>,
- *  sizeAttenuation: <bool>,
- *
- *  vertexColors: <bool>
+ *  sizeAttenuation: <bool>
  * }
  */
 
@@ -26,8 +24,6 @@ THREE.PointsMaterial = function ( parameters ) {
 
 	this.size = 1;
 	this.sizeAttenuation = true;
-
-	this.vertexColors = THREE.NoColors;
 
 	this.setValues( parameters );
 
@@ -46,8 +42,6 @@ THREE.PointsMaterial.prototype.copy = function ( source ) {
 
 	this.size = source.size;
 	this.sizeAttenuation = source.sizeAttenuation;
-
-	this.vertexColors = source.vertexColors;
 
 	return this;
 

@@ -15,8 +15,6 @@
  *
  *  lights: <bool>,
  *
- *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
- *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
@@ -45,8 +43,6 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.fog = false; // set to use scene fog
 	this.lights = false; // set to use scene lights
 	this.clipping = false; // set to use user-defined clipping planes
-
-	this.vertexColors = THREE.NoColors; // set to use "color" attribute stream
 
 	this.skinning = false; // set to use skinning attribute streams
 
@@ -105,8 +101,6 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 
 	this.lights = source.lights;
 	this.clipping = source.clipping;
-
-	this.vertexColors = source.vertexColors;
 
 	this.skinning = source.skinning;
 
