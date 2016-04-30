@@ -14,37 +14,25 @@
 
 THREE.PointsMaterial = function ( parameters ) {
 
-	THREE.Material.call( this );
-
-	this.type = 'PointsMaterial';
-
-	this.color = new THREE.Color( 0xffffff );
-
-	this.map = null;
-
-	this.size = 1;
-	this.sizeAttenuation = true;
-
-	this.lights = false;
-
-	this.setValues( parameters );
+	THREE.Material.call( this, parameters );
 
 };
 
-THREE.PointsMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.PointsMaterial.prototype.constructor = THREE.PointsMaterial;
+THREE.Asset.assignPrototype( THREE.PointsMaterial, THREE.Material, {
 
-THREE.PointsMaterial.prototype.copy = function ( source ) {
+	type: 'PointsMaterial',
 
-	THREE.Material.prototype.copy.call( this, source );
+	DefaultState: {
 
-	this.color.copy( source.color );
+		color: new THREE.Color( 0xffffff ),
 
-	this.map = source.map;
+		map: null,
 
-	this.size = source.size;
-	this.sizeAttenuation = source.sizeAttenuation;
+		size: 1,
+		sizeAttenuation: true,
 
-	return this;
+		lights: false
 
-};
+	}
+
+} );

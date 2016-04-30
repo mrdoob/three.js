@@ -5,12 +5,7 @@
 
 THREE.BufferGeometry = function () {
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
-
-	this.uuid = THREE.Math.generateUUID();
-
-	this.name = '';
-	this.type = 'BufferGeometry';
+	THREE.Asset.call( this );
 
 	this.index = null;
 	this.attributes = {};
@@ -26,7 +21,12 @@ THREE.BufferGeometry = function () {
 
 };
 
-Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, {
+THREE.BufferGeometry.prototype =
+		Object.assign( Object.create( THREE.Asset.prototype ), {
+
+	constructor: THREE.BufferGeometry,
+	AssetCategory: 'geometries',
+	type: 'BufferGeometry',
 
 	getIndex: function () {
 
@@ -860,21 +860,9 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 	},
 
-	toJSON: function () {
+	serialize_: function () {
 
-		var data = {
-			metadata: {
-				version: 4.4,
-				type: 'BufferGeometry',
-				generator: 'BufferGeometry.toJSON'
-			}
-		};
-
-		// standard BufferGeometry serialization
-
-		data.uuid = this.uuid;
-		data.type = this.type;
-		if ( this.name !== '' ) data.name = this.name;
+		var data = THREE.Asset.prototype.serialize_.call( this );
 
 		if ( this.parameters !== undefined ) {
 
@@ -1004,12 +992,6 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 		}
 
 		return this;
-
-	},
-
-	dispose: function () {
-
-		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

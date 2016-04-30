@@ -203,9 +203,9 @@ THREE.PerspectiveCamera.prototype.copy = function( source ) {
 
 };
 
-THREE.PerspectiveCamera.prototype.toJSON = function( meta ) {
+THREE.PerspectiveCamera.prototype.serialize_ = function( meta ) {
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	var data = THREE.Object3D.prototype.serialize_.call( this, meta );
 
 	data.object.fov = this.fov;
 	data.object.zoom = this.zoom;

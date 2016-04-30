@@ -52,7 +52,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 THREE.Texture.DEFAULT_IMAGE = undefined;
 THREE.Texture.DEFAULT_MAPPING = THREE.UVMapping;
 
-THREE.Texture.prototype = {
+THREE.Texture.prototype = Object.assign( Object.create( THREE.Asset.prototype, {
 
 	constructor: THREE.Texture,
 
@@ -99,15 +99,9 @@ THREE.Texture.prototype = {
 
 	},
 
-	toJSON: function ( meta ) {
+	serialize_: function () {
 
-		if ( meta.textures[ this.uuid ] !== undefined ) {
-
-			return meta.textures[ this.uuid ];
-
-		}
-
-		function getDataURL( image ) {
+		var getDataURL = function getDataURL( image ) {
 
 			var canvas;
 
@@ -137,15 +131,9 @@ THREE.Texture.prototype = {
 
 		}
 
-		var output = {
-			metadata: {
-				version: 4.4,
-				type: 'Texture',
-				generator: 'Texture.toJSON'
-			},
+		var output = THREE.Asset.prototype.serialize_.call( this );
 
-			uuid: this.uuid,
-			name: this.name,
+		Object.assign( output, {
 
 			mapping: this.mapping,
 
@@ -272,7 +260,7 @@ THREE.Texture.prototype = {
 
 	}
 
-};
+} ) );
 
 Object.assign( THREE.Texture.prototype, THREE.EventDispatcher.prototype );
 

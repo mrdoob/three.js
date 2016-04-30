@@ -8,17 +8,12 @@
 
 THREE.Object3D = function () {
 
-	Object.defineProperty( this, 'id', { value: THREE.Object3DIdCount ++ } );
-
-	this.uuid = THREE.Math.generateUUID();
-
-	this.name = '';
-	this.type = 'Object3D';
+	THREE.Asset.call( this );
 
 	this.parent = null;
 	this.children = [];
 
-	this.up = THREE.Object3D.DefaultUp.clone();
+	// ... see prototype.DefaultState (below) for further properties
 
 	var position = new THREE.Vector3();
 	var rotation = new THREE.Euler();
@@ -65,31 +60,44 @@ THREE.Object3D = function () {
 		}
 	} );
 
-	this.rotationAutoUpdate = true;
-
-	this.matrix = new THREE.Matrix4();
-	this.matrixWorld = new THREE.Matrix4();
-
-	this.matrixAutoUpdate = THREE.Object3D.DefaultMatrixAutoUpdate;
-	this.matrixWorldNeedsUpdate = false;
-
-	this.layers = new THREE.Layers();
-	this.visible = true;
-
-	this.castShadow = false;
-	this.receiveShadow = false;
-
-	this.frustumCulled = true;
-	this.renderOrder = 0;
-
-	this.userData = {};
-
 };
 
+// TODO: deprecation:
 THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 1, 0 );
 THREE.Object3D.DefaultMatrixAutoUpdate = true;
+THREE.Object3DIdCount = 0;
 
-Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
+THREE.Asset.assignPrototype( THREE.Object3D, THREE.Asset, {
+
+	type: 'Object3D',
+	AssetCategory: 'objects',
+
+	DefaultState: {
+
+		up: THREE.Object3D.DefaultUp,
+		rotationAutoUpdate: true,
+
+		matrix: new THREE.Matrix4(),
+		matrixWorld: new THREE.Matrix4(),
+
+		matrixAutoUpdate: true,
+		matrixWorldNeedsUpdate: false,
+
+		layers: new THREE.Layers(),
+		visible: true,
+
+		castShadow: false,
+		receiveShadow: false,
+
+		frustumCulled: true,
+		renderOrder: 0,
+
+		userData: {},
+
+		geometry: undefined,
+		material: undefined
+
+	},
 
 	applyMatrix: function ( matrix ) {
 
@@ -542,43 +550,13 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 	},
 
-	toJSON: function ( meta ) {
-
-		// meta is '' when called from JSON.stringify
-		var isRootObject = ( meta === undefined || meta === '' );
-
-		var output = {};
-
-		// meta is a hash used to collect geometries, materials.
-		// not providing it implies that this is the root object
-		// being serialized.
-		if ( isRootObject ) {
-
-			// initialize meta obj
-			meta = {
-				geometries: {},
-				materials: {},
-				textures: {},
-				images: {}
-			};
-
-			output.metadata = {
-				version: 4.4,
-				type: 'Object',
-				generator: 'Object3D.toJSON'
-			};
-
-		}
+	serialize: function () {
 
 		// standard Object3D serialization
 
-		var object = {};
+		var object = THREE.Asset.prototype.call_( this );
+		object.metadata.type = 'Object'; // != this.type == 'Object3D'
 
-		object.uuid = this.uuid;
-		object.type = this.type;
-
-		if ( this.name !== '' ) object.name = this.name;
-		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
 		if ( this.castShadow === true ) object.castShadow = true;
 		if ( this.receiveShadow === true ) object.receiveShadow = true;
 		if ( this.visible === false ) object.visible = false;
@@ -587,78 +565,21 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		//
 
-		if ( this.geometry !== undefined ) {
+		var children = this.children,
+			nChildren = children.length;
 
-			if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
+		if ( nChildren > 0 ) {
 
-				meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON( meta );
+			var array = [];
 
-			}
+			for ( var i = 0; i !== nChildren; ++ i )
+				array.push( this.children[ i ].serialize_().object );
 
-			object.geometry = this.geometry.uuid;
-
-		}
-
-		if ( this.material !== undefined ) {
-
-			if ( meta.materials[ this.material.uuid ] === undefined ) {
-
-				meta.materials[ this.material.uuid ] = this.material.toJSON( meta );
-
-			}
-
-			object.material = this.material.uuid;
+			object.children = array;
 
 		}
 
-		//
-
-		if ( this.children.length > 0 ) {
-
-			object.children = [];
-
-			for ( var i = 0; i < this.children.length; i ++ ) {
-
-				object.children.push( this.children[ i ].toJSON( meta ).object );
-
-			}
-
-		}
-
-		if ( isRootObject ) {
-
-			var geometries = extractFromCache( meta.geometries );
-			var materials = extractFromCache( meta.materials );
-			var textures = extractFromCache( meta.textures );
-			var images = extractFromCache( meta.images );
-
-			if ( geometries.length > 0 ) output.geometries = geometries;
-			if ( materials.length > 0 ) output.materials = materials;
-			if ( textures.length > 0 ) output.textures = textures;
-			if ( images.length > 0 ) output.images = images;
-
-		}
-
-		output.object = object;
-
-		return output;
-
-		// extract data from the cache hash
-		// remove metadata on each item
-		// and return as array
-		function extractFromCache ( cache ) {
-
-			var values = [];
-			for ( var key in cache ) {
-
-				var data = cache[ key ];
-				delete data.metadata;
-				values.push( data );
-
-			}
-			return values;
-
-		}
+		return { object: object };
 
 	},
 
@@ -670,35 +591,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 	copy: function ( source, recursive ) {
 
-		if ( recursive === undefined ) recursive = true;
-
-		this.name = source.name;
-
-		this.up.copy( source.up );
-
-		this.position.copy( source.position );
-		this.quaternion.copy( source.quaternion );
-		this.scale.copy( source.scale );
-
-		this.rotationAutoUpdate = source.rotationAutoUpdate;
-
-		this.matrix.copy( source.matrix );
-		this.matrixWorld.copy( source.matrixWorld );
-
-		this.matrixAutoUpdate = source.matrixAutoUpdate;
-		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
-
-		this.visible = source.visible;
-
-		this.castShadow = source.castShadow;
-		this.receiveShadow = source.receiveShadow;
-
-		this.frustumCulled = source.frustumCulled;
-		this.renderOrder = source.renderOrder;
-
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
-
-		if ( recursive === true ) {
+		if ( recursive === false ) {
 
 			for ( var i = 0; i < source.children.length; i ++ ) {
 
@@ -714,5 +607,3 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 	}
 
 } );
-
-THREE.Object3DIdCount = 0;

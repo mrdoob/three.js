@@ -8,29 +8,14 @@
 
 THREE.MeshPhysicalMaterial = function ( parameters ) {
 
-	THREE.MeshStandardMaterial.call( this );
-
-	this.defines = { 'PHYSICAL': '' };
-
-	this.type = 'MeshPhysicalMaterial';
-
-	this.reflectivity = 0.5; // maps to F0 = 0.04
-
-	this.setValues( parameters );
+	THREE.MeshStandardMaterial.call( this, parameters );
 
 };
 
-THREE.MeshPhysicalMaterial.prototype = Object.create( THREE.MeshStandardMaterial.prototype );
-THREE.MeshPhysicalMaterial.prototype.constructor = THREE.MeshPhysicalMaterial;
+THREE.Asset.assignPrototype( THREE.MeshPhysicalMaterial, THREE.MeshStandardMaterial, {
 
-THREE.MeshPhysicalMaterial.prototype.copy = function ( source ) {
+	type: 'MeshPhysicalMaterial',
+	defines: { 'PHYSICAL': '' },
+	reflectivity: 0.5 // maps to F0 = 0.04
 
-	THREE.MeshStandardMaterial.prototype.copy.call( this, source );
-
-	this.defines = { 'PHYSICAL': '' };
-
-	this.reflectivity = source.reflectivity;
-
-	return this;
-
-};
+} );
