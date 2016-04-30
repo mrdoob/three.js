@@ -10,10 +10,6 @@
  *  linecap: "round",
  *  linejoin: "round",
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *  vertexColors: <bool>
  *
  *  fog: <bool>
@@ -31,8 +27,6 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.linewidth = 1;
 	this.linecap = 'round';
 	this.linejoin = 'round';
-
-	this.blending = THREE.NormalBlending;
 
 	this.vertexColors = THREE.NoColors;
 
