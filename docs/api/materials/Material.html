@@ -108,6 +108,17 @@
 		Sets the alpha value to be used when running an alpha test. Default is *0*.
 		</div>
 
+		<h3>[property:Array clippingPlanes]</h3>
+
+		<div>
+		User-defined clipping planes specified as THREE.Plane objects in world space. These planes apply to the objects this material is attached to. Points in space whose dot product with the plane is negative are cut away. Default is [].
+		</div>
+
+		<h3>[property:Boolean clipShadows]</h3>
+		<div>
+		Defines whether to clip shadows according to the clipping planes specified on this material. Default is false.
+		</div>
+
 		<h3>[property:Float overdraw]</h3>
 		<div>
 		Amount of triangle expansion at draw time. This is a workaround for cases when gaps appear between triangles when using [page:CanvasRenderer]. *0.5* tends to give good results across browsers. Default is *0*.

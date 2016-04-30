@@ -27,7 +27,14 @@ var APP = {
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
-			if ( json.project.shadows ) renderer.shadowMap.enabled = true;
+
+			if ( json.project.shadows ) {
+
+				renderer.shadowMap.enabled = true;
+				// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+			}
+
 			this.dom = renderer.domElement;
 
 			this.setScene( loader.parse( json.scene ) );
@@ -50,12 +57,15 @@ var APP = {
 
 			var scriptWrapParams = 'player,renderer,scene,camera';
 			var scriptWrapResultObj = {};
+
 			for ( var eventKey in events ) {
+
 				scriptWrapParams += ',' + eventKey;
 				scriptWrapResultObj[ eventKey ] = eventKey;
+
 			}
-			var scriptWrapResult =
-					JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
+
+			var scriptWrapResult = JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
 
 			for ( var uuid in json.scripts ) {
 
@@ -74,8 +84,7 @@ var APP = {
 
 					var script = scripts[ i ];
 
-					var functions = ( new Function( scriptWrapParams,
-							script.source + '\nreturn ' + scriptWrapResult+ ';' ).bind( object ) )( this, renderer, scene, camera );
+					var functions = ( new Function( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( this, renderer, scene, camera );
 
 					for ( var name in functions ) {
 
@@ -148,7 +157,7 @@ var APP = {
 
 			scene = value;
 
-		},
+		};
 
 		this.setSize = function ( width, height ) {
 
@@ -168,15 +177,7 @@ var APP = {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-				try {
-
-					array[ i ]( event );
-
-				} catch (e) {
-
-					console.error( ( e.message || e ), ( e.stack || "" ) );
-
-				}
+				array[ i ]( event );
 
 			}
 
@@ -188,7 +189,15 @@ var APP = {
 
 			request = requestAnimationFrame( animate );
 
-			dispatch( events.update, { time: time, delta: time - prevTime } );
+			try {
+
+				dispatch( events.update, { time: time, delta: time - prevTime } );
+
+			} catch ( e ) {
+
+				console.error( ( e.message || e ), ( e.stack || "" ) );
+
+			}
 
 			if ( vr === true ) {
 
@@ -219,7 +228,8 @@ var APP = {
 			dispatch( events.start, arguments );
 
 			request = requestAnimationFrame( animate );
-			prevTime = ( window.performance || Date ).now();
+			prevTime = performance.now();
+
 		};
 
 		this.stop = function () {
@@ -236,6 +246,7 @@ var APP = {
 			dispatch( events.stop, arguments );
 
 			cancelAnimationFrame( request );
+
 		};
 
 		//

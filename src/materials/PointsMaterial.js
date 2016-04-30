@@ -33,6 +33,8 @@ THREE.PointsMaterial = function ( parameters ) {
 	this.size = 1;
 	this.sizeAttenuation = true;
 
+	this.blending = THREE.NormalBlending;
+
 	this.vertexColors = THREE.NoColors;
 
 	this.fog = true;

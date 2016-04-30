@@ -35,7 +35,7 @@ THREE.Interpolant = function(
 
 THREE.Interpolant.prototype = {
 
-	constructor: THREE.Intepolant,
+	constructor: THREE.Interpolant,
 
 	evaluate: function( t ) {
 

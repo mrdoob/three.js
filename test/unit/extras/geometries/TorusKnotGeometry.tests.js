@@ -5,11 +5,10 @@
 	var parameters = {
 		radius: 10,
 		tube: 20,
-		radialSegments: 30,
-		tubularSegments: 10,
+		tubularSegments: 30,
+		radialSegments: 10,
 		p: 3,
-		q: 2,
-		heightScale: 2.0
+		q: 2
 	};
 
 	var geometries;
@@ -23,9 +22,9 @@
 				new THREE.TorusKnotGeometry(),
 				new THREE.TorusKnotGeometry( parameters.radius ),
 				new THREE.TorusKnotGeometry( parameters.radius, parameters.tube ),
-				new THREE.TorusKnotGeometry( parameters.radius, parameters.tube, parameters.radialSegments ),
-				new THREE.TorusKnotGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments ),
-				new THREE.TorusKnotGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments, parameters.p, parameters.q, parameters.heightScale ),
+				new THREE.TorusKnotGeometry( parameters.radius, parameters.tube, parameters.tubularSegments ),
+				new THREE.TorusKnotGeometry( parameters.radius, parameters.tube, parameters.tubularSegments, parameters.radialSegments ),
+				new THREE.TorusKnotGeometry( parameters.radius, parameters.tube, parameters.tubularSegments, parameters.radialSegments, parameters.p, parameters.q ),
 
 			];
 

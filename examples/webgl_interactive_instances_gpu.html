@@ -134,7 +134,7 @@
 
 	<div id="container"></div>
 
-	<script src="../build/three.min.js"></script>
+	<script src="../build/three.js"></script>
 	<script src="js/controls/TrackballControls.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 
@@ -614,7 +614,7 @@
 				vertexShader: vert,
 				fragmentShader: frag,
 				uniforms: {
-					color: new THREE.Uniform( 'c', new THREE.Color() ).onUpdate( updateColor )
+					color: new THREE.Uniform( new THREE.Color() ).onUpdate( updateColor )
 				}
 			} );
 			materialList.push( material );
@@ -629,7 +629,7 @@
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag,
 				uniforms: {
-					pickingColor: new THREE.Uniform( 'c', new THREE.Color() ).onUpdate( updatePickingColor )
+					pickingColor: new THREE.Uniform( new THREE.Color() ).onUpdate( updatePickingColor )
 				}
 			} );
 			materialList.push( pickingMaterial );
@@ -945,9 +945,7 @@
 			// stats
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0px';
-			container.appendChild( stats.domElement );
+			container.appendChild( stats.dom );
 
 			// listeners
 

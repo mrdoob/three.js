@@ -27,32 +27,22 @@
 		var geometry = new THREE.BufferGeometry();
 		// create a simple square shape. We duplicate the top left and bottom right
 		// vertices because each vertex needs to appear once per triangle.
-		var vertexPositions = [
-			[-1.0, -1.0,  1.0],
-			[ 1.0, -1.0,  1.0],
-			[ 1.0,  1.0,  1.0],
+		var vertices = new Float32Array( [
+			-1.0, -1.0,  1.0,
+			 1.0, -1.0,  1.0,
+			 1.0,  1.0,  1.0,
 
-			[ 1.0,  1.0,  1.0],
-			[-1.0,  1.0,  1.0],
-			[-1.0, -1.0,  1.0]
-		];
-		var vertices = new Float32Array( vertexPositions.length * 3 ); // three components per vertex
-
-		// components of the position vector for each vertex are stored
-		// contiguously in the buffer.
-		for ( var i = 0; i < vertexPositions.length; i++ )
-		{
-			vertices[ i*3 + 0 ] = vertexPositions[i][0];
-			vertices[ i*3 + 1 ] = vertexPositions[i][1];
-			vertices[ i*3 + 2 ] = vertexPositions[i][2];
-		}
+			 1.0,  1.0,  1.0,
+			-1.0,  1.0,  1.0,
+			-1.0, -1.0,  1.0
+		] );
 
 		// itemSize = 3 because there are 3 values (components) per vertex
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		var mesh = new THREE.Mesh( geometry, material );
 		</code>
-		<p>More examples: [example:webgl_buffergeometry Complex mesh with non-indexed faces], [example:webgl_buffergeometry_uint Complex mesh with indexed faces], [example:webgl_buffergeometry_lines Lines], [example:webgl_buffergeometry_lines_indexed Indexed Lines], [example:webgl_buffergeometry_particles Particles], and [example:webgl_buffergeometry_rawshader Raw Shaders].</p>
+		<p>More examples: [example:webgl_buffergeometry Complex mesh with non-indexed faces], [example:webgl_buffergeometry_uint Complex mesh with indexed faces], [example:webgl_buffergeometry_lines Lines], [example:webgl_buffergeometry_lines_indexed Indexed Lines], [example:webgl_buffergeometry_custom_attributes_particles Particles], and [example:webgl_buffergeometry_rawshader Raw Shaders].</p>
 
 
 		<h3>Accessing attributes</h3>
@@ -144,13 +134,6 @@
 		<div>
 		Bounding sphere.
 		<code>{ radius: float }</code>
-		</div>
-
-		<h3>[property:Array morphTargets]</h3>
-		<div>
-		Array of morph targets. Each morph target is a Javascript object:
-		<code>{ name: "targetName", vertices: [ new THREE.Vertex(), ... ] }</code>
-		Morph vertices match number and order of primary vertices.
 		</div>
 
 		<h2>Methods</h2>

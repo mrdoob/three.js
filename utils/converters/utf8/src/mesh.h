@@ -312,9 +312,14 @@ struct Material {
   std::string name;
   float Kd[3];
   std::string map_Kd;
+  std::string d;
+  
 
   void DumpJson(FILE* out = stdout) const {
     fprintf(out, "    \"%s\": { ", name.c_str());
+    if (!d.empty()) {
+      fprintf(out, "\"d\": %s ,", d.c_str());
+    }    
     if (map_Kd.empty()) {
       fprintf(out, "\"Kd\": [%hu, %hu, %hu] }",
               Quantize(Kd[0], 0, 1, 255),
@@ -357,6 +362,9 @@ class WavefrontMtlFile {
       case 'K':
         ParseColor(line + 1, line_num);
         break;
+      case 'd':
+        ParseD(line + 1, line_num);
+        break;
       case 'm':
         if (0 == strncmp(line + 1, "ap_Kd", 5)) {
           ParseMapKd(line + 6, line_num);
@@ -385,6 +393,9 @@ class WavefrontMtlFile {
       default:
         break;
     }
+  }
+  void ParseD(const char* line, unsigned int line_num) {
+      current_->d = StripLeadingWhitespace(line);
   }
 
   void ParseMapKd(const char* line, unsigned int line_num) {

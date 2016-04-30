@@ -243,6 +243,9 @@ def shading(material):
         False: constants.LAMBERT
     }
 
+    if material.use_shadeless:
+        return constants.BASIC
+
     return dispatch[material.specular_intensity > 0.0]
 
 

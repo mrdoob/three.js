@@ -31,7 +31,7 @@
 
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">J&oacute;n Ragnarsson</a>.</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script>
 
@@ -45,14 +45,18 @@
 			lat = 0, onMouseDownLat = 0,
 			phi = 0, theta = 0;
 
-			var texture = THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg', THREE.UVMapping, function () {
+			var textureLoader = new THREE.TextureLoader();
 
-				init();
+			textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg', function ( texture ) {
+
+				texture.mapping = THREE.UVMapping;
+
+				init( texture );
 				animate();
 
 			} );
 
-			function init() {
+			function init( texture ) {
 
 				camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
 
@@ -67,7 +71,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				cubeCamera = new THREE.CubeCamera( 1, 1000, 256 );
-				cubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
 				scene.add( cubeCamera );
 
 				document.body.appendChild( renderer.domElement );

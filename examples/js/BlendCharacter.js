@@ -11,21 +11,40 @@ THREE.BlendCharacter = function () {
 
 		var scope = this;
 
-		var loader = new THREE.JSONLoader();
-		loader.load( url, function( geometry, materials ) {
+		var loader = new THREE.ObjectLoader();
+		loader.load( url, function( loadedObject ) {
 
-			var originalMaterial = materials[ 0 ];
-			originalMaterial.skinning = true;
+			// The exporter does not currently allow exporting a skinned mesh by itself
+			// so we must fish it out of the hierarchy it is embedded in (scene)
+			loadedObject.traverse( function( object ) {
 
-			THREE.SkinnedMesh.call( scope, geometry, originalMaterial );
+				if ( object instanceof THREE.SkinnedMesh ) {
 
-			var mixer = new THREE.AnimationMixer( scope );
-			scope.mixer = mixer;
+					scope.skinnedMesh = object;
+
+				}
+
+			} );
+
+			THREE.SkinnedMesh.call( scope, scope.skinnedMesh.geometry, scope.skinnedMesh.material );
+
+			// If we didn't successfully find the mesh, bail out
+			if ( scope.skinnedMesh == undefined ) {
+
+				console.log( 'unable to find skinned mesh in ' + url );
+				return;
+
+			}
+
+			scope.material.skinning = true;
+
+			scope.mixer = new THREE.AnimationMixer( scope );
+			scope.mixer = scope.mixer;
 
 			// Create the animations
-			for ( var i = 0; i < geometry.animations.length; ++ i ) {
+			for ( var i = 0; i < scope.geometry.animations.length; ++ i ) {
 
-				mixer.clipAction( geometry.animations[ i ] );
+				scope.mixer.clipAction( scope.geometry.animations[ i ] );
 
 			}
 

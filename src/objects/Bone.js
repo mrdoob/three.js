@@ -18,11 +18,11 @@ THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Bone.prototype.constructor = THREE.Bone;
 
 THREE.Bone.prototype.copy = function ( source ) {
-	
+
 	THREE.Object3D.prototype.copy.call( this, source );
-	
+
 	this.skin = source.skin;
-	
+
 	return this;
 
 };

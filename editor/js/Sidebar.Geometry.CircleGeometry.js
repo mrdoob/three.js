@@ -6,13 +6,14 @@ Sidebar.Geometry.CircleGeometry = function ( editor, object ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.Row();
 
-	var parameters = object.geometry.parameters;
+	var geometry = object.geometry;
+	var parameters = geometry.parameters;
 
 	// radius
 
-	var radiusRow = new UI.Panel();
+	var radiusRow = new UI.Row();
 	var radius = new UI.Number( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ) );
@@ -22,7 +23,7 @@ Sidebar.Geometry.CircleGeometry = function ( editor, object ) {
 
 	// segments
 
-	var segmentsRow = new UI.Panel();
+	var segmentsRow = new UI.Row();
 	var segments = new UI.Integer( parameters.segments ).setRange( 3, Infinity ).onChange( update );
 
 	segmentsRow.add( new UI.Text( 'Segments' ).setWidth( '90px' ) );
@@ -32,7 +33,7 @@ Sidebar.Geometry.CircleGeometry = function ( editor, object ) {
 
 	// thetaStart
 
-	var thetaStartRow = new UI.Panel();
+	var thetaStartRow = new UI.Row();
 	var thetaStart = new UI.Number( parameters.thetaStart ).onChange( update );
 
 	thetaStartRow.add( new UI.Text( 'Theta start' ).setWidth( '90px' ) );
@@ -42,7 +43,7 @@ Sidebar.Geometry.CircleGeometry = function ( editor, object ) {
 
 	// thetaLength
 
-	var thetaLengthRow = new UI.Panel();
+	var thetaLengthRow = new UI.Row();
 	var thetaLength = new UI.Number( parameters.thetaLength ).onChange( update );
 
 	thetaLengthRow.add( new UI.Text( 'Theta length' ).setWidth( '90px' ) );
@@ -54,7 +55,7 @@ Sidebar.Geometry.CircleGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.CircleGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			radius.getValue(),
 			segments.getValue(),
 			thetaStart.getValue(),
@@ -65,4 +66,6 @@ Sidebar.Geometry.CircleGeometry = function ( editor, object ) {
 
 	return container;
 
-}
+};
+
+Sidebar.Geometry.CircleBufferGeometry = Sidebar.Geometry.CircleGeometry;

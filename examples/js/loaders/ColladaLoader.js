@@ -79,13 +79,25 @@ THREE.ColladaLoader = function () {
 
 							if ( failCallback ) {
 
-								failCallback();
+								failCallback( { type: 'error', url: url } );
 
 							} else {
 
 								console.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
 
 							}
+
+						}
+
+					}else{
+
+						if( failCallback ){
+
+							failCallback( { type: 'error', url: url } );
+
+						}else{
+
+							console.error( 'ColladaLoader: Couldn\'t load "' + url + '" (' + request.status + ')' );
 
 						}
 
@@ -1169,7 +1181,14 @@ THREE.ColladaLoader = function () {
 
 				if ( num_materials > 1 ) {
 
-					material = new THREE.MeshFaceMaterial( used_materials_array );
+					material = new THREE.MultiMaterial( used_materials_array );
+					
+					for ( j = 0; j < geom.faces.length; j ++ ) {
+
+						var face = geom.faces[ j ];
+						face.materialIndex = used_materials[ face.daeMaterial ]
+
+					}
 
 				}
 
@@ -1258,7 +1277,6 @@ THREE.ColladaLoader = function () {
 				var intensity = lparams.intensity;
 				var distance = lparams.distance;
 				var angle = lparams.falloff_angle;
-				var exponent; // Intentionally undefined, don't know what this is yet
 
 				switch ( lparams.technique ) {
 
@@ -1275,7 +1293,7 @@ THREE.ColladaLoader = function () {
 
 					case 'spot':
 
-						light = new THREE.SpotLight( color, intensity, distance, angle, exponent );
+						light = new THREE.SpotLight( color, intensity, distance, angle );
 						light.position.set(0, 0, 1);
 						break;
 
@@ -3020,9 +3038,9 @@ THREE.ColladaLoader = function () {
 
 				} else if ( vcount === 4 ) {
 
-					faces.push( new THREE.Face3( vs[0], vs[1], vs[3], [ ns[0].clone(), ns[1].clone(), ns[3].clone() ], cs.length ? [ cs[0], cs[1], cs[3] ] : new THREE.Color() ) );
+					faces.push( new THREE.Face3( vs[0], vs[1], vs[3], ns.length ? [ ns[0].clone(), ns[1].clone(), ns[3].clone() ] : [], cs.length ? [ cs[0], cs[1], cs[3] ] : new THREE.Color() ) );
 
-					faces.push( new THREE.Face3( vs[1], vs[2], vs[3], [ ns[1].clone(), ns[2].clone(), ns[3].clone() ], cs.length ? [ cs[1], cs[2], cs[3] ] : new THREE.Color() ) );
+					faces.push( new THREE.Face3( vs[1], vs[2], vs[3], ns.length ? [ ns[1].clone(), ns[2].clone(), ns[3].clone() ] : [], cs.length ? [ cs[1], cs[2], cs[3] ] : new THREE.Color() ) );
 
 				} else if ( vcount > 4 && options.subdivideFaces ) {
 
@@ -3033,7 +3051,7 @@ THREE.ColladaLoader = function () {
 
 					for ( k = 1; k < vcount - 1; ) {
 
-						faces.push( new THREE.Face3( vs[0], vs[k], vs[k + 1], [ ns[0].clone(), ns[k ++].clone(), ns[k].clone() ], clr ) );
+						faces.push( new THREE.Face3( vs[0], vs[k], vs[k + 1], ns.length ? [ ns[0].clone(), ns[k ++].clone(), ns[k].clone() ] : [], clr ) );
 
 					}
 

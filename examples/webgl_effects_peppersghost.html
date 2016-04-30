@@ -37,9 +37,9 @@
 
 <body>
 <div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - <a href="https://en.wikipedia.org/wiki/Pepper%27s_ghost">peppers ghost effect</a> demo <br />
-		<a href="http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS">basic instructions for building the reflective prism</a></div>
+		<a href="http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS" target="_blank">basic instructions for building the reflective prism</a></div>
 
-<script src="../build/three.min.js"></script>
+<script src="../build/three.js"></script>
 
 <script src="js/effects/PeppersGhostEffect.js"></script>
 
@@ -52,10 +52,7 @@
 		var container;
 
 		var camera, scene, renderer, effect;
-		var cube;
-
-		var windowHalfX = window.innerWidth / 2;
-		var windowHalfY = window.innerHeight / 2;
+		var group;
 
 		init();
 		animate();
@@ -68,6 +65,9 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 
 				scene = new THREE.Scene();
+
+				group = new THREE.Group();
+				scene.add( group );
 
 				// Cube
 
@@ -83,13 +83,19 @@
 
 				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, overdraw: 0.5 } );
 
-				cube = new THREE.Mesh( geometry, material );
-				cube.position.y = 1;
-				scene.add( cube );
+				for ( var i = 0; i < 10; i ++ ) {
+
+					var cube = new THREE.Mesh( geometry, material );
+					cube.position.x = Math.random() * 2 - 1;
+					cube.position.y = Math.random() * 2 - 1;
+					cube.position.z = Math.random() * 2 - 1;
+					cube.scale.multiplyScalar( Math.random() + 0.5 );
+					group.add( cube );
+
+				}
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
-
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.PeppersGhostEffect( renderer );
@@ -102,9 +108,7 @@
 
 		function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2,
-								windowHalfY = window.innerHeight / 2,
-								camera.aspect = window.innerWidth / window.innerHeight;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				effect.setSize( window.innerWidth, window.innerHeight );
@@ -123,7 +127,7 @@
 
 				camera.lookAt( scene.position );
 
-				cube.rotation.y += 0.01;
+				group.rotation.y += 0.01;
 
 				effect.render( scene, camera );
 

@@ -478,7 +478,7 @@ THREE.Projector = function () {
 
 					var material = object.material;
 
-					var isFaceMaterial = material instanceof THREE.MeshFaceMaterial;
+					var isFaceMaterial = material instanceof THREE.MultiMaterial;
 					var objectMaterials = isFaceMaterial === true ? object.material : null;
 
 					for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {

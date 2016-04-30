@@ -35,7 +35,7 @@ THREE.PointerLockControls = function ( camera ) {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 
-	}
+	};
 
 	document.addEventListener( 'mousemove', onMouseMove, false );
 
@@ -62,7 +62,7 @@ THREE.PointerLockControls = function ( camera ) {
 
 			return v;
 
-		}
+		};
 
 	}();
 

@@ -14,16 +14,11 @@
 			}
 
 			a { color: #f00 }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #666 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -137,7 +132,7 @@
 				//
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

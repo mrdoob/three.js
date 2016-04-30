@@ -45,7 +45,7 @@
 	"src/materials/MeshPhongMaterial.js",
 	"src/materials/MeshDepthMaterial.js",
 	"src/materials/MeshNormalMaterial.js",
-	"src/materials/MeshFaceMaterial.js",
+	"src/materials/MultiMaterial.js",
 	"src/materials/SpriteMaterial.js",
 	"src/textures/Texture.js",
 	"src/textures/CompressedTexture.js",

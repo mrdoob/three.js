@@ -9,6 +9,8 @@
 
 THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
+	THREE.Pass.call( this );
+
 	this.resolution = ( resolution !== undefined ) ? resolution : 256;
 	this.needsInit = true;
 	this.adaptive = adaptive !== undefined ? !! adaptive : true;
@@ -113,10 +115,6 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 		blending: THREE.NoBlending
 	} );
 
-	this.enabled = true;
-	this.needsSwap = true;
-	this.clear = false;
-
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene  = new THREE.Scene();
 
@@ -125,7 +123,11 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 };
 
+THREE.AdaptiveToneMappingPass.prototype = Object.create( THREE.Pass.prototype );
+
 THREE.AdaptiveToneMappingPass.prototype = {
+
+	constructor: THREE.AdaptiveToneMappingPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -186,7 +188,8 @@ THREE.AdaptiveToneMappingPass.prototype = {
 			this.previousLuminanceRT.dispose();
 
 		}
-		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+
+		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat }; // was RGB format. changed to RGBA format. see discussion in #8415 / #8450
 
 		this.luminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
 		this.luminanceRT.texture.generateMipmaps = false;

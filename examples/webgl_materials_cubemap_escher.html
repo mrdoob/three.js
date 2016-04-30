@@ -30,7 +30,7 @@
 			<p>Texture by <a href="http://brainwagon.org/2002/12/05/fun-with-environment-maps/" target="_blank">Mark VandeWettering</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/loaders/DDSLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -78,17 +78,19 @@
 							 r + "py.jpg", r + "ny.jpg",
 							 r + "pz.jpg", r + "nz.jpg" ];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				*/
 
 				var r = "textures/cube/Escher/dds/";
 
-				var urls = [ r + "px.dds", r + "nx.dds",
-							 r + "py.dds", r + "ny.dds",
-							 r + "pz.dds", r + "nz.dds" ];
+				var urls = [
+					r + "px.dds", r + "nx.dds",
+					r + "py.dds", r + "ny.dds",
+					r + "pz.dds", r + "nz.dds"
+				];
 
 				var loader = new THREE.DDSLoader();
-				
+
 				var textureCube = loader.load( urls );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 				var geometry = new THREE.SphereGeometry( 100, 96, 64 );
@@ -124,10 +126,7 @@
 				if ( statsEnabled ) {
 
 					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-					container.appendChild( stats.domElement );
+					container.appendChild( stats.dom );
 
 				}
 

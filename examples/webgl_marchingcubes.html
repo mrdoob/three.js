@@ -3,6 +3,7 @@
 <head>
 	<title>three.js webgl - marching cubes</title>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<style>
 		body {
 		  color: #fff;
@@ -41,11 +42,6 @@
 
 		  display: none;
 		}
-
-		#stats { position: absolute; top:0; left: 0 }
-		#stats #fps { background: transparent !important }
-		#stats #fps #fpsText { color: #aaa !important }
-		#stats #fps #fpsGraph { display: none }
 	</style>
 </head>
 
@@ -58,7 +54,7 @@
 		[based on greggman's <a href="http://webglsamples.googlecode.com/hg/blob/blob.html">blob</a>, original code by Henrik Rydgård]
 	</div>
 
-	<script src="../build/three.min.js"></script>
+	<script src="../build/three.js"></script>
 
 	<script src="js/controls/OrbitControls.js"></script>
 
@@ -180,7 +176,7 @@
 			// STATS
 
 			stats = new Stats();
-			container.appendChild( stats.domElement );
+			container.appendChild( stats.dom );
 
 			// COMPOSER
 
@@ -261,10 +257,12 @@
 				path + 'pz' + format, path + 'nz' + format
 			];
 
-			var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+			var cubeTextureLoader = new THREE.CubeTextureLoader();
+
+			var reflectionCube = cubeTextureLoader.load( urls );
 			reflectionCube.format = THREE.RGBFormat;
 
-			var refractionCube = THREE.ImageUtils.loadTextureCube( urls );
+			var refractionCube = cubeTextureLoader.load( urls );
 			reflectionCube.format = THREE.RGBFormat;
 			refractionCube.mapping = THREE.CubeRefractionMapping;
 
@@ -286,7 +284,7 @@
 			dottedMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
 			dottedMaterial2.uniforms.uLineColor1.value.setHSL( 0.05, 1.0, 0.5 );
 
-			var texture = THREE.ImageUtils.loadTexture( "textures/UV_Grid_Sm.jpg" );
+			var texture = new THREE.TextureLoader().load( "textures/UV_Grid_Sm.jpg" );
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 			var materials = {
@@ -305,7 +303,7 @@
 
 			"shiny"  :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0x440000, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3, metal: true } ),
+				m: new THREE.MeshStandardMaterial( { color: 0x550000, envMap: reflectionCube, roughness: 0.1, metalness: 1.0 } ),
 				h: 0, s: 0.8, l: 0.2
 			},
 

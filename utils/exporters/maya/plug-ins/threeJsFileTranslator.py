@@ -242,6 +242,7 @@ class ThreeJsWriter(object):
         }
         if isinstance(mat, nodetypes.Phong):
             result["colorSpecular"] = mat.getSpecularColor().rgb
+            result["reflectivity"] = mat.getReflectivity()
             result["specularCoef"] = mat.getCosPower()
             if self.options["specularMaps"]:
                 self._exportSpecularMap(result, mat)
@@ -277,7 +278,7 @@ class ThreeJsWriter(object):
         result["map" + mapType] = fName
         result["map" + mapType + "Repeat"] = [1, 1]
         result["map" + mapType + "Wrap"] = ["repeat", "repeat"]
-        result["map" + mapType + "Anistropy"] = 4
+        result["map" + mapType + "Anisotropy"] = 4
 
     def _exportBones(self):
         for joint in ls(type='joint'):

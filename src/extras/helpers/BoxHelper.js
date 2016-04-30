@@ -30,9 +30,17 @@ THREE.BoxHelper.prototype.update = ( function () {
 
 	return function ( object ) {
 
-		box.setFromObject( object );
+		if ( object instanceof THREE.Box3 ) {
 
-		if ( box.empty() ) return;
+			box.copy( object );
+
+		} else {
+
+			box.setFromObject( object );
+
+		}
+
+		if ( box.isEmpty() ) return;
 
 		var min = box.min;
 		var max = box.max;
@@ -69,6 +77,6 @@ THREE.BoxHelper.prototype.update = ( function () {
 
 		this.geometry.computeBoundingSphere();
 
-	}
+	};
 
 } )();

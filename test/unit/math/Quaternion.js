@@ -334,9 +334,6 @@ function slerpTestSkeleton( doSlerp, maxError ) {
 	result = doSlerp( [ 0, D, 0, D ], [ 0, -D, 0, D ], 0.5 );
 	ok( result.equals( 0, 0, 0, 1 ), "W-Unit from diagonals" );
 	ok( isNormal( result ), "Approximately normal (W-Unit)" );
-
-	console.log( "maxNormError", maxNormError );
-
 }
 
 

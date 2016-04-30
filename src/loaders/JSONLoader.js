@@ -77,7 +77,7 @@ THREE.JSONLoader.prototype = {
 			var object = scope.parse( json, texturePath );
 			onLoad( object.geometry, object.materials );
 
-		} );
+		}, onProgress, onError );
 
 	},
 
@@ -399,7 +399,7 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		function parseSkin() {
 
@@ -444,7 +444,7 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		function parseMorphing( scale ) {
 
@@ -497,20 +497,30 @@ THREE.JSONLoader.prototype = {
 
 			// parse old style Bone/Hierarchy animations
 			var animations = [];
+
 			if ( json.animation !== undefined ) {
+
 				animations.push( json.animation );
+
 			}
+
 			if ( json.animations !== undefined ) {
+
 				if ( json.animations.length ) {
+
 					animations = animations.concat( json.animations );
+
 				} else {
+
 					animations.push( json.animations );
+
 				}
+
 			}
 
 			for ( var i = 0; i < animations.length; i ++ ) {
 
-				var clip = THREE.AnimationClip.parseAnimation( animations[i], geometry.bones );
+				var clip = THREE.AnimationClip.parseAnimation( animations[ i ], geometry.bones );
 				if ( clip ) outputAnimations.push( clip );
 
 			}
@@ -526,7 +536,7 @@ THREE.JSONLoader.prototype = {
 
 			if ( outputAnimations.length > 0 ) geometry.animations = outputAnimations;
 
-		};
+		}
 
 		if ( json.materials === undefined || json.materials.length === 0 ) {
 

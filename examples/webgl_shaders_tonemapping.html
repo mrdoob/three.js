@@ -37,7 +37,7 @@
 			<div class="label" style="position: absolute;left: 80%;bottom: 5%;">Adaptive Tone Mapping</div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -138,12 +138,12 @@
 					uniforms: THREE.UniformsUtils.merge( [
 
 						THREE.UniformsLib[ "common" ],
-						THREE.UniformsLib[ "lights" ],
+						THREE.UniformsLib[ "lights" ]
+
 					] ),
 					vertexShader: [
 						"varying vec3 vViewPosition;",
 						"varying vec3 vNormal;",
-						THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 						"void main() {",
 							THREE.ShaderChunk[ "beginnormal_vertex" ],
 							THREE.ShaderChunk[ "defaultnormal_vertex" ],
@@ -200,16 +200,18 @@
 					shininess: 200
 				} );
 
-				var earthDiffuse = THREE.ImageUtils.loadTexture( 'textures/planets/earth_atmos_4096.jpg', undefined, function( tex ) {
+				var textureLoader = new THREE.TextureLoader();
+
+				var earthDiffuse = textureLoader.load( 'textures/planets/earth_atmos_4096.jpg', function( tex ) {
 					earthMat.map = tex;
 					earthMat.needsUpdate = true;
 				} );
-				var earthSpecular = THREE.ImageUtils.loadTexture( 'textures/planets/earth_specular_2048.jpg', undefined, function( tex ) {
+				var earthSpecular = textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function( tex ) {
 					earthMat.specularMap = tex;
 					earthMat.needsUpdate = true;
 				} );
 
-				// var earthNormal = THREE.ImageUtils.loadTexture( 'textures/planets/earth-new-normal-2048.jpg', undefined, function( tex ) {
+				// var earthNormal = textureLoader.load( 'textures/planets/earth-new-normal-2048.jpg', function( tex ) {
 				// 	earthMat.normalMap = tex;
 				// 	earthMat.needsUpdate = true;
 				// } );
@@ -221,7 +223,7 @@
 					depthTest: false
 				} );
 
-				var earthLights = THREE.ImageUtils.loadTexture( 'textures/planets/earth_lights_2048.png', undefined, function( tex ) {
+				var earthLights = textureLoader.load( 'textures/planets/earth_lights_2048.png', function( tex ) {
 					earthLightsMat.map = tex;
 					earthLightsMat.needsUpdate = true;
 				} );
@@ -233,7 +235,7 @@
 					depthTest: false
 				} );
 
-				var earthClouds = THREE.ImageUtils.loadTexture( 'textures/planets/earth_clouds_2048.png', undefined, function( tex ) {
+				var earthClouds = textureLoader.load( 'textures/planets/earth_clouds_2048.png', function( tex ) {
 					earthCloudsMat.map = tex;
 					earthCloudsMat.needsUpdate = true;
 				} );
@@ -318,7 +320,7 @@
 							 r + "dark-s_py.jpg", r + "dark-s_ny.jpg",
 							 r + "dark-s_pz.jpg", r + "dark-s_nz.jpg" ];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
 				var skyboxShader = THREE.ShaderLib[ "cube" ];
 				skyboxShader.uniforms[ "tCube" ].value = textureCube;

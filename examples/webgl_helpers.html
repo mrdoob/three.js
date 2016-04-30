@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - helpers</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				margin: 0px;
@@ -13,7 +14,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script>
 
@@ -44,8 +45,7 @@
 
 				scene.add( new THREE.PointLightHelper( light, 5 ) );
 
-				var helper = new THREE.GridHelper( 200, 10 );
-				helper.setColors( 0x0000ff, 0x808080 );
+				var helper = new THREE.GridHelper( 200, 10, 0x0000ff, 0x808080 );
 				helper.position.y = - 150;
 				scene.add( helper );
 
@@ -57,7 +57,7 @@
 					var group = new THREE.Group();
 					group.scale.multiplyScalar( 50 );
 					scene.add( group );
-					
+
 					// To make sure that the matrixWorld is up to date for the boxhelpers
 					group.updateMatrixWorld(true);
 
@@ -89,10 +89,10 @@
 					line.position.x = -4;
 					group.add( line );
 					scene.add( new THREE.BoxHelper( line ) );
-					
+
 					scene.add( new THREE.BoxHelper( group ) );
 					scene.add( new THREE.BoxHelper( scene ) );
-					
+
 
 				} );
 

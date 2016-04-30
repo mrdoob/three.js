@@ -10,7 +10,7 @@
 
 THREE.ColorKeyframeTrack = function ( name, times, values, interpolation ) {
 
-	THREE.KeyframeTrack.call( this, name, keys, interpolation );
+	THREE.KeyframeTrack.call( this, name, times, values, interpolation );
 
 };
 

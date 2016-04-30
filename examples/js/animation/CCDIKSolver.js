@@ -22,14 +22,6 @@ THREE.CCDIKSolver = function ( mesh ) {
 
 	this.mesh = mesh;
 
-	var bones = mesh.skeleton.bones;
-	this.orgBones = [];
-	for ( var i = 0; i < bones.length; i++ ) {
-
-		this.orgBones.push( bones[ i ].clone() );
-
-	}
-
 };
 
 THREE.CCDIKSolver.prototype = {
@@ -134,31 +126,6 @@ THREE.CCDIKSolver.prototype = {
 					link.updateMatrixWorld( true );
 
 				}
-
-			}
-
-		}
-
-	},
-
-	resetLinks: function () {
-
-		var bones = this.mesh.skeleton.bones;
-		var iks = this.mesh.geometry.iks;
-
-		for ( var i = 0, il = iks.length; i < il; i++ ) {
-
-			var ik = iks[ i ];
-			var links = ik.links;
-
-			for ( var j = 0; j < links.length; j++ ) {
-
-				var link = links[ j ];
-				var index = link.index;
-				var b = bones[ index ];
-				var b2 = this.orgBones[ index ];
-				//b.position.copy( b2.position );
-				b.quaternion.copy( b2.quaternion );
 
 			}
 

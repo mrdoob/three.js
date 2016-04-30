@@ -142,6 +142,9 @@ class Object(base_classes.BaseNode):
                 else:
                     self[constants.CHILDREN].append(Object(child, parent=self))
 
+        if self.options.get(constants.CUSTOM_PROPERTIES, False):
+            self[constants.USER_DATA] = api.object.custom_properties(self.node)
+
     def _root_setup(self):
         """Applies to a root/scene object"""
         logger.debug("Object()._root_setup()")

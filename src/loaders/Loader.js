@@ -137,7 +137,8 @@ THREE.Loader.prototype = {
 						json.blending = THREE[ value ];
 						break;
 					case 'colorAmbient':
-						console.warn( 'THREE.Loader.createMaterial: colorAmbient is no longer supported' );
+					case 'mapAmbient':
+						console.warn( 'THREE.Loader.createMaterial:', name, 'is no longer supported.' );
 						break;
 					case 'colorDiffuse':
 						json.color = color.fromArray( value ).getHex();
@@ -227,10 +228,11 @@ THREE.Loader.prototype = {
 						console.warn( 'THREE.Loader.createMaterial: transparency has been renamed to opacity' );
 						json.opacity = value;
 						break;
-					case 'opacity':
-					case 'transparent':
 					case 'depthTest':
 					case 'depthWrite':
+					case 'colorWrite':
+					case 'opacity':
+					case 'reflectivity':
 					case 'transparent':
 					case 'visible':
 					case 'wireframe':
@@ -247,7 +249,9 @@ THREE.Loader.prototype = {
 
 			}
 
+			if ( json.type === 'MeshBasicMaterial' ) delete json.emissive;
 			if ( json.type !== 'MeshPhongMaterial' ) delete json.specular;
+
 			if ( json.opacity < 1 ) json.transparent = true;
 
 			materialLoader.setTextures( textures );

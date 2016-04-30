@@ -15,7 +15,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -69,7 +69,7 @@
 				// Spheres
 
 				geometry = new THREE.SphereGeometry( 100, 26, 18 );
-				material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } );
+				material = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } );
 
 				for ( var i = 0; i < 20; i ++ ) {
 
@@ -101,9 +101,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
+				container.appendChild(stats.dom);
 
 				//
 

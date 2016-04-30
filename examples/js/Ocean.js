@@ -12,10 +12,6 @@
 
 	this.scene = new THREE.Scene();
 
-	// Enable necessary extensions
-	this.renderer.context.getExtension( 'OES_texture_float' );
-	this.renderer.context.getExtension( 'OES_texture_float_linear' );
-
 	// Assign optional parameters as variables and object properties
 	function optionalParameter( value, defaultValue ) {
 

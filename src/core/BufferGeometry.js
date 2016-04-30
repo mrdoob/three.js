@@ -30,13 +30,6 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addIndex: function ( index ) {
-
-		console.warn( 'THREE.BufferGeometry: .addIndex() has been renamed to .setIndex().' );
-		this.setIndex( index );
-
-	},
-
 	getIndex: function () {
 
 		return this.index;
@@ -72,6 +65,8 @@ THREE.BufferGeometry.prototype = {
 
 		this.attributes[ name ] = attribute;
 
+		return this;
+
 	},
 
 	getAttribute: function ( name ) {
@@ -84,39 +79,7 @@ THREE.BufferGeometry.prototype = {
 
 		delete this.attributes[ name ];
 
-	},
-
-	get drawcalls() {
-
-		console.error( 'THREE.BufferGeometry: .drawcalls has been renamed to .groups.' );
-		return this.groups;
-
-	},
-
-	get offsets() {
-
-		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .groups.' );
-		return this.groups;
-
-	},
-
-	addDrawCall: function ( start, count, indexOffset ) {
-
-		if ( indexOffset !== undefined ) {
-
-			console.warn( 'THREE.BufferGeometry: .addDrawCall() no longer supports indexOffset.' );
-
-		}
-
-		console.warn( 'THREE.BufferGeometry: .addDrawCall() is now .addGroup().' );
-		this.addGroup( start, count );
-
-	},
-
-	clearDrawCalls: function () {
-
-		console.warn( 'THREE.BufferGeometry: .clearDrawCalls() is now .clearGroups().' );
-		this.clearGroups();
+		return this;
 
 	},
 
@@ -178,6 +141,8 @@ THREE.BufferGeometry.prototype = {
 			this.computeBoundingSphere();
 
 		}
+
+		return this;
 
 	},
 
@@ -587,55 +552,38 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		var vector = new THREE.Vector3();
+		if ( this.boundingBox === null ) {
 
-		return function () {
+			this.boundingBox = new THREE.Box3();
 
-			if ( this.boundingBox === null ) {
+		}
 
-				this.boundingBox = new THREE.Box3();
+		var positions = this.attributes.position.array;
 
-			}
+		if ( positions !== undefined ) {
 
-			var positions = this.attributes.position.array;
+			this.boundingBox.setFromArray( positions );
 
-			if ( positions ) {
+		} else {
 
-				var bb = this.boundingBox;
-				bb.makeEmpty();
+			this.boundingBox.makeEmpty();
 
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+		}
 
-					vector.fromArray( positions, i );
-					bb.expandByPoint( vector );
+		if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
 
-				}
+			console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
 
-			}
+		}
 
-			if ( positions === undefined || positions.length === 0 ) {
-
-				this.boundingBox.min.set( 0, 0, 0 );
-				this.boundingBox.max.set( 0, 0, 0 );
-
-			}
-
-			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
-
-				console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
-
-			}
-
-		};
-
-	}(),
+	},
 
 	computeBoundingSphere: function () {
 
 		var box = new THREE.Box3();
 		var vector = new THREE.Vector3();
 
-		return function () {
+		return function computeBoundingSphere() {
 
 			if ( this.boundingSphere === null ) {
 
@@ -647,17 +595,9 @@ THREE.BufferGeometry.prototype = {
 
 			if ( positions ) {
 
-				box.makeEmpty();
-
 				var center = this.boundingSphere.center;
 
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-					vector.fromArray( positions, i );
-					box.expandByPoint( vector );
-
-				}
-
+				box.setFromArray( positions );
 				box.center( center );
 
 				// hoping to find a boundingSphere with a radius smaller than the
@@ -818,18 +758,6 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	computeTangents: function () {
-
-		console.warn( 'THREE.BufferGeometry: .computeTangents() has been removed.' );
-
-	},
-
-	computeOffsets: function ( size ) {
-
-		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.' );
-
-	},
-
 	merge: function ( geometry, offset ) {
 
 		if ( geometry instanceof THREE.BufferGeometry === false ) {
@@ -889,6 +817,51 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	toNonIndexed: function () {
+
+		if ( this.index === null ) {
+
+			console.warn( 'THREE.BufferGeometry.toNonIndexed(): Geometry is already non-indexed.' );
+			return this;
+
+		}
+
+		var geometry2 = new THREE.BufferGeometry();
+
+		var indices = this.index.array;
+		var attributes = this.attributes;
+
+		for ( var name in attributes ) {
+
+			var attribute = attributes[ name ];
+
+			var array = attribute.array;
+			var itemSize = attribute.itemSize;
+
+			var array2 = new array.constructor( indices.length * itemSize );
+
+			var index = 0, index2 = 0;
+
+			for ( var i = 0, l = indices.length; i < l; i ++ ) {
+
+				index = indices[ i ] * itemSize;
+
+				for ( var j = 0; j < itemSize; j ++ ) {
+
+					array2[ index2 ++ ] = array[ index ++ ];
+
+				}
+
+			}
+
+			geometry2.addAttribute( name, new THREE.BufferAttribute( array2, itemSize ) );
+
+		}
+
+		return geometry2;
+
+	},
+
 	toJSON: function () {
 
 		var data = {
@@ -945,7 +918,8 @@ THREE.BufferGeometry.prototype = {
 			data.data.attributes[ key ] = {
 				itemSize: attribute.itemSize,
 				type: attribute.array.constructor.name,
-				array: array
+				array: array,
+				normalized: attribute.normalized
 			};
 
 		}
@@ -1027,7 +1001,7 @@ THREE.BufferGeometry.prototype = {
 		for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
 			var group = groups[ i ];
-			this.addGroup( group.start, group.count );
+			this.addGroup( group.start, group.count, group.materialIndex );
 
 		}
 

@@ -4,6 +4,8 @@
 
 THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
 
+	THREE.Pass.call( this );
+
 	if ( THREE.FilmShader === undefined )
 		console.error( "THREE.FilmPass relies on THREE.FilmShader" );
 
@@ -24,11 +26,6 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 	if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
 	if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 
-	this.enabled = true;
-	this.renderToScreen = false;
-	this.needsSwap = true;
-
-
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene  = new THREE.Scene();
 
@@ -37,9 +34,13 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 
 };
 
+THREE.FilmPass.prototype = Object.create( THREE.Pass.prototype );
+
 THREE.FilmPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	constructor: THREE.FilmPass,
+
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		this.uniforms[ "tDiffuse" ].value = readBuffer;
 		this.uniforms[ "time" ].value += delta;
@@ -52,7 +53,7 @@ THREE.FilmPass.prototype = {
 
 		} else {
 
-			renderer.render( this.scene, this.camera, writeBuffer, false );
+			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
 
 		}
 

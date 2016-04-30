@@ -61,6 +61,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.fog = true;
 
 	this.shading = THREE.SmoothShading;
+	this.blending = THREE.NormalBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -80,7 +81,7 @@ THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.MeshBasicMaterial.prototype.constructor = THREE.MeshBasicMaterial;
 
 THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
-	
+
 	THREE.Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
@@ -112,7 +113,7 @@ THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
 
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
-	
+
 	return this;
 
 };

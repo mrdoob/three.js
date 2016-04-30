@@ -132,7 +132,7 @@ function loadGeometry( data, url ) {
 
     }
 
-    var material = new THREE.MeshFaceMaterial( data.materials );
+    var material = new THREE.MultiMaterial( data.materials );
     var mesh;
 
     if ( data.geometry.animations !== undefined && data.geometry.animations.length > 0 ) {

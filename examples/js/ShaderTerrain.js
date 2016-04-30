@@ -19,7 +19,6 @@ THREE.ShaderTerrain = {
 
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
-			THREE.UniformsLib[ "shadowmap" ],
 
 			{
 
@@ -84,8 +83,6 @@ THREE.ShaderTerrain = {
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
-			"uniform vec3 ambientLightColor;",
-
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
@@ -93,6 +90,13 @@ THREE.ShaderTerrain = {
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
+
+			"float calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {",
+ 				"if ( decayExponent > 0.0 ) {",
+ 					"return pow( saturate( - lightDistance / cutoffDistance + 1.0 ), decayExponent );",
+ 				"}",
+ 				"return 1.0;",
+ 			"}",
 
 			"void main() {",
 
@@ -113,8 +117,8 @@ THREE.ShaderTerrain = {
 					"vec4 colDiffuse1 = texture2D( tDiffuse1, uvOverlay );",
 					"vec4 colDiffuse2 = texture2D( tDiffuse2, uvOverlay );",
 
-					"colDiffuse1.xyz = inputToLinear( colDiffuse1.xyz );",
-					"colDiffuse2.xyz = inputToLinear( colDiffuse2.xyz );",
+					"colDiffuse1 = GammaToLinear( colDiffuse1, float( GAMMA_FACTOR ) );",
+					"colDiffuse2 = GammaToLinear( colDiffuse2, float( GAMMA_FACTOR ) );",
 
 					"diffuseColor *= mix ( colDiffuse1, colDiffuse2, 1.0 - texture2D( tDisplacement, uvBase ) );",
 
@@ -232,8 +236,6 @@ THREE.ShaderTerrain = {
 
 				"outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor + totalSpecularLight );",
 
-				THREE.ShaderChunk[ "shadowmap_fragment" ],
-				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 				THREE.ShaderChunk[ "fog_fragment" ],
 
 				"gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - masking</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/shaders/CopyShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/ClearPass.js"></script>
+		<script src="js/postprocessing/TexturePass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var composer, renderer;
+			var box, torus;
+
+			init();
+			animate();
+
+			function init() {
+
+				var camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 10;
+
+				var scene1 = new THREE.Scene();
+				var scene2 = new THREE.Scene();
+
+				box = new THREE.Mesh( new THREE.BoxGeometry( 4, 4, 4 ) );
+				scene1.add( box );
+
+				torus = new THREE.Mesh( new THREE.TorusGeometry( 3, 1, 16, 32 ) );
+				scene2.add( torus );
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( 0xe0e0e0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = false;
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				var clearPass = new THREE.ClearPass();
+
+				var clearMaskPass = new THREE.ClearMaskPass();
+
+				var maskPass1 = new THREE.MaskPass( scene1, camera );
+				var maskPass2 = new THREE.MaskPass( scene2, camera );
+
+				var texture1 = new THREE.TextureLoader().load( 'textures/758px-Canestra_di_frutta_(Caravaggio).jpg' );
+				var texture2 = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
+
+				var texturePass1 = new THREE.TexturePass( texture1 );
+				var texturePass2 = new THREE.TexturePass( texture2 );
+
+				var outputPass = new THREE.ShaderPass( THREE.CopyShader );
+				outputPass.renderToScreen = true;
+
+				var parameters = {
+					minFilter: THREE.LinearFilter,
+					magFilter: THREE.LinearFilter,
+					format: THREE.RGBFormat,
+					stencilBuffer: true
+				};
+
+				var renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, parameters );
+
+				composer = new THREE.EffectComposer( renderer, renderTarget );
+				composer.addPass( clearPass );
+				composer.addPass( maskPass1 );
+				composer.addPass( texturePass1 );
+				composer.addPass( clearMaskPass );
+				composer.addPass( maskPass2 );
+				composer.addPass( texturePass2 );
+				composer.addPass( clearMaskPass );
+				composer.addPass( outputPass );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var time = performance.now() * 0.001;
+
+				box.position.x = Math.cos( time / 1.5 ) * 2;
+				box.position.y = Math.sin( time ) * 2;
+				box.rotation.x = time;
+				box.rotation.y = time / 2;
+
+				torus.position.x = Math.cos( time ) * 2;
+				torus.position.y = Math.sin( time / 1.5 ) * 2;
+				torus.rotation.x = time;
+				torus.rotation.y = time / 2;
+
+				renderer.clear();
+				composer.render( time );
+
+			}
+
+		</script>
+	</body>
+</html>

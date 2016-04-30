@@ -26,10 +26,14 @@
 		<div>
 		color — geometry color in hexadecimal. Default is 0xffffff.<br />
 		map — Set texture map. Default is null <br />
-		aoMap — Set ambient occlusion map. Default is null <br />
+		aoMap — Set ao map. Default is null.<br />
+		aoMapIntensity — Set ao map intensity. Default is 1.<br />
 		specularMap — Set specular map. Default is null.<br />
 		alphaMap — Set alpha map. Default is null.<br />
 		envMap — Set env map. Default is null.<br />
+		combine — Set combine operation. Default is THREE.MultiplyOperation.<br />
+		reflectivity — Set reflectivity. Default is 1.<br />
+		refractionRatio — Set refraction ratio. Default is 0.98.<br />
 		fog — Define whether the material color is affected by global fog settings. Default is true.<br />
 		shading — Define shading type. Default is THREE.SmoothShading.<br />
 		wireframe — render geometry as wireframe. Default is false.<br />
@@ -42,6 +46,7 @@
 		</div>
 
 		<h2>Properties</h2>
+		<div>See the base [page:Material] class for common properties.</div>
 
 		<h3>[property:Integer color]</h3>
 		<div>Sets the color of the geometry. Default is 0xffffff.</div>
@@ -54,6 +59,9 @@
 		<h3>[property:Texture aoMap]</h3>
 		<div>Set ambient occlusion map. Default is null.</div>
 
+		<h3>[property:Float aoMapIntensity]</h3>
+		<div>TODO</div>
+
 		<h3>[property:Texture specularMap]</h3>
 		<div>Set specular map. Default is null.</div>
 
@@ -63,6 +71,17 @@
 
 		<h3>[property:TextureCube envMap]</h3>
 		<div>Set env map. Default is null.</div>
+
+		<h3>[property:Integer combine]</h3>
+		<div>How to combine the result of the surface's color with the environment map, if any.</div>
+
+		<div>Options are [page:Textures THREE.Multiply] (default), [page:Textures THREE.MixOperation], [page:Textures THREE.AddOperation]. If mix is chosen, the reflectivity is used to blend between the two colors.</div>
+
+		<h3>[property:Float reflectivity]</h3>
+		<div>How much the environment map affects the surface; also see "combine".</div>
+
+		<h3>[property:Float refractionRatio]</h3>
+		<div>The index of refraction for an environment map using [page:Textures THREE.CubeRefractionMapping]. Default is *0.98*.</div>
 
 		<h3>[property:Boolean fog]</h3>
 		<div>Define whether the material color is affected by global fog settings.</div>
@@ -95,21 +114,6 @@
 
 		<h3>[property:Boolean morphTargets]</h3>
 		<div>Define whether the material uses morphTargets. Default is false.</div>
-
-		<h3>[property:number combine]</h3>
-		<div>
-		How to combine the result of the surface's color with the environment map, if any.
-		</div>
-
-		<h3>[property:number reflectivity]</h3>
-		<div>
-		How much the environment map affects the surface; also see "combine".
-		</div>
-
-		<h3>[property:number refractionRatio]</h3>
-		<div>
-		The index of refraction for an environment map using [page:Textures THREE.CubeRefractionMapping]. Default is *0.98*.
-		</div>
 
 		<h2>Methods</h2>
 

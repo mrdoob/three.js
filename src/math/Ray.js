@@ -45,6 +45,14 @@ THREE.Ray.prototype = {
 
 	},
 
+	lookAt: function ( v ) {
+
+		this.direction.copy( v ).sub( this.origin ).normalize();
+
+		return this;
+		
+	},
+
 	recast: function () {
 
 		var v1 = new THREE.Vector3();
@@ -234,18 +242,13 @@ THREE.Ray.prototype = {
 
 	intersectSphere: function () {
 
-		// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
-
 		var v1 = new THREE.Vector3();
 
 		return function ( sphere, optionalTarget ) {
 
 			v1.subVectors( sphere.center, this.origin );
-
 			var tca = v1.dot( this.direction );
-
 			var d2 = v1.dot( v1 ) - tca * tca;
-
 			var radius2 = sphere.radius * sphere.radius;
 
 			if ( d2 > radius2 ) return null;
@@ -269,7 +272,7 @@ THREE.Ray.prototype = {
 			// else t0 is in front of the ray, so return the first collision point scaled by t0
 			return this.at( t0, optionalTarget );
 
-		}
+		};
 
 	}(),
 
@@ -349,8 +352,6 @@ THREE.Ray.prototype = {
 	},
 
 	intersectBox: function ( box, optionalTarget ) {
-
-		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
 
 		var tmin, tmax, tymin, tymax, tzmin, tzmax;
 

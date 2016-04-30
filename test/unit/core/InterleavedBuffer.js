@@ -4,10 +4,10 @@
 
 module( "InterleavedBuffer" );
 
-function checkInstanceAgainstCopy(instance, copiedInstance) {
+function checkInstanceAgainstCopy( instance, copiedInstance ) {
 	ok( copiedInstance instanceof THREE.InterleavedBuffer, "the clone has the correct type" );
 
-	for (var i = 0; i < instance.array.length; i++) {
+	for ( var i = 0; i < instance.array.length; i++ ) {
 		ok( copiedInstance.array[i] === instance.array[i], "array was copied" );
 	}
 

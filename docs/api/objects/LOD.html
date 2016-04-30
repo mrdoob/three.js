@@ -45,16 +45,23 @@
 
 
 
-		<h3>[property:array objects]</h3>
+		<h3>[property:array levels]</h3>
 		<div>
-		An array of [page:Object3D Object3Ds]
+		An array of [page:object level] objects
+		</div>
+		<div>
+		level is an object with two properties.
+		</div>
+		<div>
+		distance -- The distance at which to display this level of detail<br />
+		object -- The Object3D which will be displayed
 		</div>
 
 		<h2>Methods</h2>
 
 
 
-		<h3>[method:null addLevel]([page:Object3D mesh], [page:Float distance])</h3>
+		<h3>[method:null addLevel]( [page:Object3D mesh], [page:Float distance] )</h3>
 		<div>
 		mesh -- The Object3D to display <br />
 		distance -- The distance at which to display this level of detail
@@ -64,12 +71,12 @@
 		the lower the detail on the mesh.
 		</div>
 
-		<h3>[method:Object3D getObjectForDistance]([page:Float distance])</h3>
+		<h3>[method:Object3D getObjectForDistance]( [page:Float distance] )</h3>
 		<div>
 		Get a reference to the first [page:Object3D] (mesh) that is greater than supplied distance.
 		</div>
 
-		<h3>[method:null update]([page:Camera camera])</h3>
+		<h3>[method:null update]( [page:Camera camera] )</h3>
 		<div>
 		camera -- The current camera
 		</div>
@@ -77,7 +84,7 @@
 		Update the visiblility of the level of detail based on the distance from the camera.
 		</div>
 		
-		<h3>[method:Object3D clone]([page:Object3D object])</h3>
+		<h3>[method:Object3D clone]( [page:Object3D object] )</h3>
 		<div>
 		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned LOD Object.
 		</div>

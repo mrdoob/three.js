@@ -19,15 +19,10 @@
 
 		<iframe src='scenes/geometry-browser.html#CircleGeometry'></iframe>
 
-		<code>var material = new THREE.MeshBasicMaterial({
-			color: 0x0000ff
-		});
-
-		var radius = 5;
-		var segments = 32;
-
-		var circleGeometry = new THREE.CircleGeometry( radius, segments );
-		var circle = new THREE.Mesh( circleGeometry, material );
+		<code>
+		var geometry = new THREE.CircleGeometry( 5, 32 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		var circle = new THREE.Mesh( geometry, material );
 		scene.add( circle );
 		</code>
 

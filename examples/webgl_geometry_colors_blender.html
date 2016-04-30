@@ -34,7 +34,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - io blender - vertex colors</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -81,9 +81,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -109,7 +107,7 @@
 
 				materials[ 0 ].shading = THREE.FlatShading;
 
-				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+				mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
 				mesh.position.x = 400;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 250;
 				scene.add( mesh );
@@ -120,7 +118,7 @@
 
 				materials[ 0 ].shading = THREE.FlatShading;
 
-				mesh2 = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+				mesh2 = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
 				mesh2.position.x = - 400;
 				mesh2.scale.x = mesh2.scale.y = mesh2.scale.z = 250;
 				scene.add( mesh2 );

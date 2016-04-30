@@ -46,7 +46,18 @@ THREE.XHRLoader.prototype = {
 
 			THREE.Cache.add( url, response );
 
-			if ( this.status === 200 && this.readyState === 4 ) {
+			if ( this.status === 200 ) {
+
+				if ( onLoad ) onLoad( response );
+
+				scope.manager.itemEnd( url );
+
+			} else if ( this.status === 0 ) {
+
+				// Some browsers return HTTP Status 0 when using non-http protocol
+				// e.g. 'file://' or 'data://'. Handle as success.
+
+				console.warn( 'THREE.XHRLoader: HTTP Status 0 received.' );
 
 				if ( onLoad ) onLoad( response );
 

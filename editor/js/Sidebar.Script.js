@@ -20,7 +20,7 @@ Sidebar.Script = function ( editor ) {
 
 	//
 
-	var scriptsContainer = new UI.Panel();
+	var scriptsContainer = new UI.Row();
 	container.add( scriptsContainer );
 
 	var newScript = new UI.Button( 'New' );

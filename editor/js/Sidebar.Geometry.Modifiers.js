@@ -6,7 +6,7 @@ Sidebar.Geometry.Modifiers = function ( editor, object ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel().setPaddingLeft( '90px' );
+	var container = new UI.Row().setPaddingLeft( '90px' );
 
 	var geometry = object.geometry;
 
@@ -37,4 +37,4 @@ Sidebar.Geometry.Modifiers = function ( editor, object ) {
 
 	return container;
 
-}
+};

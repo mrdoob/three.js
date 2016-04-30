@@ -29,15 +29,18 @@
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> - MMDLoader test<br />
 		Copyright
-		<a href="http://www.geocities.jp/higuchuu4/index_e.htm">Model Data</a>
-		<a href="http://www.nicovideo.jp/watch/sm13147122">Dance Data</a>
+		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank">Model Data</a>
+		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank">Dance Data</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/libs/charsetencoder.min.js"></script>
+		<script src="js/libs/ammo.js"></script>
+		<script src="js/loaders/TGALoader.js"></script>
 		<script src="js/loaders/MMDLoader.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
+		<script src="js/animation/MMDPhysics.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -46,11 +49,10 @@
 
 			var container, stats;
 
-			var mesh, camera, mixer, scene, renderer;
+			var mesh, camera, scene, renderer;
+			var helper;
 
 			var mouseX = 0, mouseY = 0;
-
-			var ikSolver;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -59,7 +61,6 @@
 
 			init();
 			animate();
-
 
 			function init() {
 
@@ -73,12 +74,20 @@
 
 				scene = new THREE.Scene();
 
-				var ambient = new THREE.AmbientLight( 0x444444 );
+				var ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				var directionalLight = new THREE.DirectionalLight( 0x887766 );
 				directionalLight.position.set( -1, 1, 1 ).normalize();
 				scene.add( directionalLight );
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( new THREE.Color( 0xffffff ) );
+				container.appendChild( renderer.domElement );
 
 				// model
 
@@ -92,28 +101,39 @@
 				var onError = function ( xhr ) {
 				};
 
+				var modelFile = 'models/mmd/miku/miku_v2.pmd';
+				var vmdFiles = [ 'models/mmd/vmd/wavefile_v2.vmd' ];
+
+				helper = new THREE.MMDHelper( renderer );
+
 				var loader = new THREE.MMDLoader();
-				loader.load( 'models/mmd/miku/miku_v2.pmd', 'models/mmd/vmd/wavefile_v2.vmd', function ( object ) {
+				loader.setDefaultTexturePath( './models/mmd/default/' );
+
+				loader.load( modelFile, vmdFiles, function ( object ) {
 
 					mesh = object;
 					mesh.position.y = -10;
+
+					helper.add( mesh );
+					helper.setAnimation( mesh );
+
+					/*
+					 * Note: You must set Physics
+					 *       before you add mesh to scene or any other 3D object.
+					 * Note: Physics calculation is pretty heavy.
+					 *       It may not be acceptable for most mobile devices yet.
+			 		 */
+					if ( ! isMobileDevice() ) {
+
+						helper.setPhysics( mesh );
+
+					}
+
+					helper.unifyAnimationDuration( { afterglow: 2.0 } );
+
 					scene.add( mesh );
 
-					mixer = new THREE.AnimationMixer( mesh );
-					mixer.clipAction( mesh.geometry.animations[ 0 ] ).play();
-					mixer.clipAction( mesh.geometry.morphAnimations[ 0 ] ).play();
-
-					ikSolver = new THREE.CCDIKSolver( mesh );
-
 				}, onProgress, onError );
-
-				//
-
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( new THREE.Color( 0xffffff ) );
-				container.appendChild( renderer.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -158,24 +178,44 @@
 
 				camera.lookAt( scene.position );
 
-				if( mesh ) {
+				if ( mesh ) {
 
-					mixer.update( clock.getDelta() );
+					helper.animate( clock.getDelta() );
+					helper.render( scene, camera );
 
-					/* Note: ikSolver.resetLinks() is workaround for r74dev.
-					 *       THREE.PropertyMixer.apply() seems to have buffer cache
-					 *       when mixer.update() is called.
-					 *       ikSolver.update() change bone position/quaternion
-					 *       without mixer.update() then buffer cache will be inconsistent.
-					 *       ikSolver.resetLinks() explicitly resets IK link bones quaternion and
-					 *       tries to avoid issues caused by this inconsistent.
-					 */
-					ikSolver.resetLinks();
-					ikSolver.update();
+				} else {
+
+					renderer.clear();
+					renderer.render( scene, camera );
 
 				}
 
-				renderer.render( scene, camera );
+			}
+
+			// easy mobile device detection
+			function isMobileDevice () {
+
+				if ( navigator === undefined || navigator.userAgent === undefined ) {
+
+					return true;
+
+				}
+
+				var s = navigator.userAgent;
+
+				if (    s.match( /iPhone/i )
+//				     || s.match( /iPad/i )
+				     || s.match( /iPod/i )
+				     || s.match( /webOS/i )
+				     || s.match( /BlackBerry/i )
+				     || ( s.match( /Windows/i ) && s.match( /Phone/i ) )
+				     || ( s.match( /Android/i ) && s.match( /Mobile/i ) ) ) {
+
+					return true;
+
+				}
+
+				return false;
 
 			}
 

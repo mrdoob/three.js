@@ -36,7 +36,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - shader material demo. featuring lava shader by <a href="http://irrlicht.sourceforge.net/phpBB2/viewtopic.php?t=21057" target="_blank">TheGameMaker</a></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
@@ -149,6 +149,8 @@
 
 				scene = new THREE.Scene();
 
+				var textureLoader = new THREE.TextureLoader();
+
 				uniforms = {
 
 					fogDensity: { type: "f", value: 0.45 },
@@ -156,8 +158,8 @@
 					time: { type: "f", value: 1.0 },
 					resolution: { type: "v2", value: new THREE.Vector2() },
 					uvScale: { type: "v2", value: new THREE.Vector2( 3.0, 1.0 ) },
-					texture1: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/lava/cloud.png" ) },
-					texture2: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" ) }
+					texture1: { type: "t", value: textureLoader.load( "textures/lava/cloud.png" ) },
+					texture2: { type: "t", value: textureLoader.load( "textures/lava/lavatile.jpg" ) }
 
 				};
 
@@ -188,9 +190,7 @@
 				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				//container.appendChild( stats.domElement );
+				//container.appendChild( stats.dom );
 
 				//
 
