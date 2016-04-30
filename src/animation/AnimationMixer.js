@@ -20,9 +20,7 @@ THREE.AnimationMixer = function( root ) {
 
 };
 
-THREE.AnimationMixer.prototype = {
-
-	constructor: THREE.AnimationMixer,
+Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, {
 
 	// return an action for a clip optionally using a custom root target
 	// object (this method allocates a lot of dynamic memory in case a
@@ -267,11 +265,9 @@ THREE.AnimationMixer.prototype = {
 
 	}
 
-};
+} );
 
 THREE.AnimationMixer._Action = THREE.AnimationAction._new;
-
-THREE.EventDispatcher.prototype.apply( THREE.AnimationMixer.prototype );
 
 // Implementation details:
 

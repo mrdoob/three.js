@@ -33,9 +33,7 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 };
 
-THREE.WebGLRenderTarget.prototype = {
-
-	constructor: THREE.WebGLRenderTarget,
+Object.assign( THREE.WebGLRenderTarget.prototype, THREE.EventDispatcher.prototype, {
 
 	setSize: function ( width, height ) {
 
@@ -82,6 +80,4 @@ THREE.WebGLRenderTarget.prototype = {
 
 	}
 
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.WebGLRenderTarget.prototype );
+} );

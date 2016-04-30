@@ -10,9 +10,7 @@ THREE.MTLLoader = function( manager ) {
 
 };
 
-THREE.MTLLoader.prototype = {
-
-	constructor: THREE.MTLLoader,
+Object.assign( THREE.MTLLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	/**
 	 * Loads and parses a MTL asset from a URL.
@@ -167,7 +165,7 @@ THREE.MTLLoader.prototype = {
 
 	}
 
-};
+} );
 
 /**
  * Create a new THREE-MTLLoader.MaterialCreator
@@ -476,5 +474,3 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 	}
 
 };
-
-THREE.EventDispatcher.prototype.apply( THREE.MTLLoader.prototype );
