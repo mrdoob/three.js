@@ -53,8 +53,6 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
 
-	this.shading = THREE.SmoothShading;
-
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 	this.wireframeLinecap = 'round';
@@ -89,8 +87,6 @@ THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
 	this.combine = source.combine;
 	this.reflectivity = source.reflectivity;
 	this.refractionRatio = source.refractionRatio;
-
-	this.shading = source.shading;
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;

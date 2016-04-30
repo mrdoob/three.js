@@ -39,8 +39,6 @@
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *
- *  shading: THREE.SmoothShading,
- *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
@@ -90,8 +88,6 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.combine = THREE.MultiplyOperation;
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
-
-	this.shading = THREE.SmoothShading;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -147,8 +143,6 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.combine = source.combine;
 	this.reflectivity = source.reflectivity;
 	this.refractionRatio = source.refractionRatio;
-
-	this.shading = source.shading;
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;

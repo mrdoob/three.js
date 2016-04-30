@@ -40,8 +40,6 @@
  *
  *  refractionRatio: <float>,
  *
- *  shading: THREE.SmoothShading,
- *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
@@ -95,8 +93,6 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.envMapIntensity = 1.0;
 
 	this.refractionRatio = 0.98;
-
-	this.shading = THREE.SmoothShading;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -156,8 +152,6 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.envMapIntensity = source.envMapIntensity;
 
 	this.refractionRatio = source.refractionRatio;
-
-	this.shading = source.shading;
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;

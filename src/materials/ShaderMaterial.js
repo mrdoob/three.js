@@ -8,8 +8,6 @@
  *  fragmentShader: <string>,
  *  vertexShader: <string>,
  *
- *  shading: THREE.SmoothShading,
- *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
@@ -32,8 +30,6 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
 	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
-
-	this.shading = THREE.SmoothShading;
 
 	this.linewidth = 1;
 
@@ -93,8 +89,6 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 	this.uniforms = THREE.UniformsUtils.clone( source.uniforms );
 
 	this.defines = source.defines;
-
-	this.shading = source.shading;
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;

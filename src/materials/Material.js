@@ -16,6 +16,7 @@ THREE.Material = function () {
 
 	this.blending = THREE.NormalBlending;
 	this.side = THREE.FrontSide;
+	this.shading = THREE.SmoothShading; // THREE.FlatShading, THREE.SmoothShading
 	this.vertexColors = THREE.NoColors; // THREE.NoColors, THREE.VertexColors, THREE.FaceColors
 
 	this.opacity = 1;
@@ -194,7 +195,7 @@ THREE.Material.prototype = {
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
 
 		if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
-		if ( this.shading !== undefined && this.shading !== THREE.SmoothShading ) data.shading = this.shading;
+		if ( this.shading !== THREE.SmoothShading ) data.shading = this.shading;
 		if ( this.side !== THREE.FrontSide ) data.side = this.side;
 		if ( this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
 
