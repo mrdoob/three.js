@@ -78,11 +78,11 @@ function loadObject( data ) {
     var hasLights = false;
 
     var lights = ['AmbientLight', 'DirectionalLight',
-        'PointLight', 'SpotLight', 'HemisphereLight']
+        'PointLight', 'SpotLight', 'HemisphereLight'];
 
     var cameras = ['OrthographicCamera', 'PerspectiveCamera'];
 
-    for ( i = 0; i < scene.children.length; i ++ ) {
+    for ( var i = 0; i < scene.children.length; i ++ ) {
 
         var lightIndex = lights.indexOf( scene.children[ i ].type );
 
@@ -141,7 +141,7 @@ function loadGeometry( data, url ) {
         data.materials[ 0 ].skinning = true;
         mesh = new THREE.SkinnedMesh( data.geometry, material, false );
 
-        mixer = new THREE.AnimationMixer( mesh );;
+        mixer = new THREE.AnimationMixer( mesh );
         animation =  mixer.clipAction( mesh.geometry.animations[ 0 ] );
 
     } else {
