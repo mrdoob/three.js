@@ -507,6 +507,10 @@ def materials(mesh, options):
     """
     logger.debug("mesh.materials(%s, %s)", mesh, options)
 
+    # sanity check
+    if not mesh.materials:
+        return []
+
     indices = []
     for face in mesh.tessfaces:
         if face.material_index not in indices:
