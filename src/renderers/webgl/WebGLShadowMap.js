@@ -91,9 +91,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	this.type = THREE.PCFShadowMap;
 
-	this.flipSidedFaces = true;
-	this.allowDoubleSided = false;
-
 	this.render = function ( scene, camera ) {
 
 		if ( scope.enabled === false ) return;
@@ -357,10 +354,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		result.visible = material.visible;
 		result.wireframe = material.wireframe;
 
-		var side = material.side;
-		if ( ! scope.allowDoubleSided ) 		side &= 1;
-		if ( scope.flipSidedFaces && side < 2 ) side ^= 1;
-		result.side = side;
+		result.side = object.castShadowSide;
 
 		result.clipShadows = material.clipShadows;
 		result.clippingPlanes = material.clippingPlanes;
@@ -408,26 +402,5 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		}
 
 	}
-
-	Object.defineProperty( this, 'cullFace', {
-
-		set: function( cullFace ) {
-
-			var flipSided = ( cullFace !== THREE.CullFaceBack );
-
-			console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. " +
-					" Set .shadowMap.flipSidedFaces to " + flipSided + "." );
-
-			this.flipSidedFaces = flipSided;
-
-		},
-
-		get: function() {
-
-			return this.flipSidedFaces ? THREE.CullFaceFront : THREE.CullFaceBack;
-
-		}
-
-	} );
 
 };

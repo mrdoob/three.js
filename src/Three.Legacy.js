@@ -569,10 +569,22 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 			return this.shadowMap.cullFace;
 		},
 		set: function ( value ) {
-			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
+			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace has been removed.' );
 			this.shadowMap.cullFace = value;
 		}
 	}
+} );
+
+Object.defineProperty( THREE.WebGLShadowMap.prototype, 'cullFace', {
+
+	get: function () {
+		return 1;
+	},
+	set: function ( value ) {
+		console.warn( 'THREE.WebGLRenderer: .shadowMap.cullFace has been removed. ' +
+				'Please use object.castShadowSide instead.' );
+	}
+
 } );
 
 //

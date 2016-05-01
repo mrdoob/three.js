@@ -77,6 +77,7 @@ THREE.Object3D = function () {
 	this.visible = true;
 
 	this.castShadow = false;
+	this.castShadowSide = THREE.BackSide;
 	this.receiveShadow = false;
 
 	this.frustumCulled = true;
@@ -579,7 +580,10 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		if ( this.name !== '' ) object.name = this.name;
 		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
+
 		if ( this.castShadow === true ) object.castShadow = true;
+		if ( this.castShadowSide !== THREE.BackSide ) object.castShadowSide = this.castShadowSide;
+
 		if ( this.receiveShadow === true ) object.receiveShadow = true;
 		if ( this.visible === false ) object.visible = false;
 
@@ -691,6 +695,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 		this.visible = source.visible;
 
 		this.castShadow = source.castShadow;
+		this.castShadowSide = source.castShadowSide;
 		this.receiveShadow = source.receiveShadow;
 
 		this.frustumCulled = source.frustumCulled;

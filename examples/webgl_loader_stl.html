@@ -100,6 +100,7 @@
 					mesh.scale.set( 0.5, 0.5, 0.5 );
 
 					mesh.castShadow = true;
+					mesh.castShadowSide = THREE.FrontSide;
 					mesh.receiveShadow = true;
 
 					scene.add( mesh );
@@ -120,6 +121,7 @@
 					mesh.scale.set( 2, 2, 2 );
 
 					mesh.castShadow = true;
+					mesh.castShadowSide = THREE.FrontSide;
 					mesh.receiveShadow = true;
 
 					scene.add( mesh );
@@ -135,6 +137,7 @@
 					mesh.scale.set( 2, 2, 2 );
 
 					mesh.castShadow = true;
+					mesh.castShadowSide = THREE.FrontSide;
 					mesh.receiveShadow = true;
 
 					scene.add( mesh );
@@ -156,6 +159,7 @@
 					mesh.scale.set( 0.3, 0.3, 0.3 );
 
 					mesh.castShadow = true;
+					mesh.castShadowSide = THREE.FrontSide;
 					mesh.receiveShadow = true;
 
 					scene.add( mesh );
@@ -180,7 +184,6 @@
 				renderer.gammaOutput = true;
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
 
 				container.appendChild( renderer.domElement );
 

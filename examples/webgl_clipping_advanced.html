@@ -211,6 +211,7 @@
 					var mesh = new THREE.Mesh( geometry, clipMaterial );
 					mesh.position.set( x / 5, y / 5, z / 5 );
 					mesh.castShadow = true;
+					mesh.castShadowSide = THREE.DoubleSide;
 					object.add( mesh );
 
 				}
@@ -267,7 +268,6 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.allowDoubleSided = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				window.addEventListener( 'resize', onWindowResize, false );

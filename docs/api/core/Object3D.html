@@ -96,6 +96,19 @@
 		default – false
 		</div>
 
+		<h3>[property:Integer castShadowSide]</h3>
+		<div>
+		Face side used for shadowing.
+		Possible values are THREE.FrontSide, THREE.BackSide, or THREE.DoubleSide.
+		</div>
+		<div>
+		The default value avoids artefacts from self-shadowing on front-facing surfaces.
+		When there are surfaces that both cast and receive shadows, an appropriate shadow.bias must be set on the light source for these surfaces to render properly.
+		</div>
+		<div>
+		default – THREE.BackSide
+		</div>
+
 		<h3>[property:Boolean receiveShadow]</h3>
 		<div>
 		Material gets baked in shadow receiving.

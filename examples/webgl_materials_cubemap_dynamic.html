@@ -184,7 +184,6 @@
 
 				// SHADOW
 
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
 				renderer.shadowMap.enabled = true;
 
 				// STATS
@@ -551,6 +550,7 @@
 				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: color } ) );
 				object.position.set( x, y, z );
 				object.castShadow = true;
+				object.castShadowSide = THREE.FrontSide;
 				object.receiveShadow = true;
 				scene.add( object );
 

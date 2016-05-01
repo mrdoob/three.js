@@ -140,7 +140,6 @@
 				container.appendChild( renderer.domElement );
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
 
 				renderer.autoClear = false;
 
@@ -239,6 +238,7 @@
 				mesh.scale.set( scale, scale, scale );
 
 				mesh.castShadow = true;
+				mesh.castShadowSide = THREE.FrontSide;
 				mesh.receiveShadow = true;
 
 				scene.add( mesh );

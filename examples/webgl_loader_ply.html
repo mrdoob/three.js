@@ -102,6 +102,7 @@
 					mesh.scale.multiplyScalar( 0.001 );
 
 					mesh.castShadow = true;
+					mesh.castShadowSide = THREE.FrontSide;
 					mesh.receiveShadow = true;
 
 					scene.add( mesh );
@@ -126,7 +127,6 @@
 				renderer.gammaOutput = true;
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
 
 				container.appendChild( renderer.domElement );
 
