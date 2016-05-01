@@ -204,6 +204,7 @@
 					mesh.rotation.y = -1;
 
 					mesh.castShadow = true;
+					mesh.castShadowSide = THREE.FrontSide;
 					mesh.receiveShadow = true;
 
 					scene.add( mesh );
@@ -226,7 +227,6 @@
 				renderer.gammaOutput = true;
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
 
 				// STATS
 
