@@ -760,8 +760,8 @@ def vertices(mesh):
     vertices_ = []
 
     for vertex in mesh.vertices:
-        vertices_.extend((vertex.co.x, vertex.co.z, -vertex.co.y))
-        
+        vertices_.extend((vertex.co.x, vertex.co.y, vertex.co.z))
+
     return vertices_
 
 
