@@ -139,7 +139,7 @@
 
 			var buffergeometry = new THREE.BufferGeometry();
 
-			var position = new THREE.Float32Attribute( vertices.length * 3, 3 ).copyVector3sArray( vertices );
+			var position = new THREE.Float32Attribute( vertices.length * 3, 3 ).copyPrimitives( vertices );
 			buffergeometry.addAttribute( 'position', position )
 
 			var displacement = new THREE.Float32Attribute( vertices.length * 3, 3 );

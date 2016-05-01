@@ -287,8 +287,8 @@ THREE.BufferGeometry.prototype = {
 			var positions = new THREE.Float32Attribute( geometry.vertices.length * 3, 3 );
 			var colors = new THREE.Float32Attribute( geometry.colors.length * 3, 3 );
 
-			this.addAttribute( 'position', positions.copyVector3sArray( geometry.vertices ) );
-			this.addAttribute( 'color', colors.copyColorsArray( geometry.colors ) );
+			this.addAttribute( 'position', positions.copyPrimitives( geometry.vertices ) );
+			this.addAttribute( 'color', colors.copyPrimitives( geometry.colors ) );
 
 			if ( geometry.lineDistances && geometry.lineDistances.length === geometry.vertices.length ) {
 
@@ -360,7 +360,7 @@ THREE.BufferGeometry.prototype = {
 
 			if ( attribute !== undefined ) {
 
-				attribute.copyVector3sArray( geometry.vertices );
+				attribute.copyPrimitives( geometry.vertices );
 				attribute.needsUpdate = true;
 
 			}
@@ -375,7 +375,7 @@ THREE.BufferGeometry.prototype = {
 
 			if ( attribute !== undefined ) {
 
-				attribute.copyVector3sArray( geometry.normals );
+				attribute.copyPrimitives( geometry.normals );
 				attribute.needsUpdate = true;
 
 			}
@@ -390,7 +390,7 @@ THREE.BufferGeometry.prototype = {
 
 			if ( attribute !== undefined ) {
 
-				attribute.copyColorsArray( geometry.colors );
+				attribute.copyPrimitives( geometry.colors );
 				attribute.needsUpdate = true;
 
 			}
@@ -405,7 +405,7 @@ THREE.BufferGeometry.prototype = {
 
 			if ( attribute !== undefined ) {
 
-				attribute.copyVector2sArray( geometry.uvs );
+				attribute.copyPrimitives( geometry.uvs );
 				attribute.needsUpdate = true;
 
 			}
@@ -453,33 +453,33 @@ THREE.BufferGeometry.prototype = {
 	fromDirectGeometry: function ( geometry ) {
 
 		var positions = new Float32Array( geometry.vertices.length * 3 );
-		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
+		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyPrimitives( geometry.vertices ) );
 
 		if ( geometry.normals.length > 0 ) {
 
 			var normals = new Float32Array( geometry.normals.length * 3 );
-			this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
+			this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyPrimitives( geometry.normals ) );
 
 		}
 
 		if ( geometry.colors.length > 0 ) {
 
 			var colors = new Float32Array( geometry.colors.length * 3 );
-			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
+			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyPrimitives( geometry.colors ) );
 
 		}
 
 		if ( geometry.uvs.length > 0 ) {
 
 			var uvs = new Float32Array( geometry.uvs.length * 2 );
-			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
+			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).copyPrimitives( geometry.uvs ) );
 
 		}
 
 		if ( geometry.uvs2.length > 0 ) {
 
 			var uvs2 = new Float32Array( geometry.uvs2.length * 2 );
-			this.addAttribute( 'uv2', new THREE.BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 ) );
+			this.addAttribute( 'uv2', new THREE.BufferAttribute( uvs2, 2 ).copyPrimitives( geometry.uvs2 ) );
 
 		}
 
@@ -487,7 +487,7 @@ THREE.BufferGeometry.prototype = {
 
 			var TypeArray = geometry.vertices.length > 65535 ? Uint32Array : Uint16Array;
 			var indices = new TypeArray( geometry.indices.length * 3 );
-			this.setIndex( new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
+			this.setIndex( new THREE.BufferAttribute( indices, 1 ).copyPrimitives( geometry.indices ) );
 
 		}
 
@@ -508,7 +508,7 @@ THREE.BufferGeometry.prototype = {
 
 				var attribute = new THREE.Float32Attribute( morphTarget.length * 3, 3 );
 
-				array.push( attribute.copyVector3sArray( morphTarget ) );
+				array.push( attribute.copyPrimitives( morphTarget ) );
 
 			}
 
@@ -521,14 +521,14 @@ THREE.BufferGeometry.prototype = {
 		if ( geometry.skinIndices.length > 0 ) {
 
 			var skinIndices = new THREE.Float32Attribute( geometry.skinIndices.length * 4, 4 );
-			this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
+			this.addAttribute( 'skinIndex', skinIndices.copyPrimitives( geometry.skinIndices ) );
 
 		}
 
 		if ( geometry.skinWeights.length > 0 ) {
 
 			var skinWeights = new THREE.Float32Attribute( geometry.skinWeights.length * 4, 4 );
-			this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
+			this.addAttribute( 'skinWeight', skinWeights.copyPrimitives( geometry.skinWeights ) );
 
 		}
 

@@ -14,6 +14,9 @@ THREE.Quaternion = function ( x, y, z, w ) {
 
 };
 
+THREE.Quaternion.TypedArray = Float32Array;
+THREE.Quaternion.TypedStride = 4;
+
 THREE.Quaternion.prototype = {
 
 	constructor: THREE.Quaternion,
