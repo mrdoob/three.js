@@ -1033,6 +1033,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_context.globalCompositeOperation = 'darker';
 
+			} else if ( value === THREE.MultiplyBlending ) {
+
+				_context.globalCompositeOperation = 'multiply';
+
 			}
 
 			_contextGlobalCompositeOperation = value;
