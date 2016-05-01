@@ -1,4 +1,4 @@
-var scene, renderer, camera, container, animation;
+var scene, renderer, camera, container, animation ,mixer;
 var hasMorph = false;
 var prevTime = Date.now();
 var clock = new THREE.Clock();
@@ -21,11 +21,11 @@ function render() {
 function animate() {
 
     requestAnimationFrame( animate );
-
-    if ( animation !== null ) {
+    
+    if ( mixer !== null ) {
 
         var delta = clock.getDelta();
-        THREE.AnimationHandler.update( delta );
+        mixer.update(delta);
 
     }
 
@@ -141,8 +141,8 @@ function loadGeometry( data, url ) {
         data.materials[ 0 ].skinning = true;
         mesh = new THREE.SkinnedMesh( data.geometry, material, false );
 
-        var name = data.geometry.animations[0].name;
-        animation = new THREE.Animation( mesh, data.geometry.animations[0] );
+        mixer = new THREE.AnimationMixer( mesh );;
+        animation =  mixer.clipAction( mesh.geometry.animations[ 0 ] );
 
     } else {
 
