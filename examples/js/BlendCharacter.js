@@ -7,7 +7,7 @@ THREE.BlendCharacter = function () {
 	this.weightSchedule = [];
 	this.warpSchedule = [];
 
-	this.loadObject = function ( url, onLoad ) {
+	this.load = function ( url, onLoad ) {
 
 		var scope = this;
 
