@@ -409,25 +409,4 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	}
 
-	Object.defineProperty( this, 'cullFace', {
-
-		set: function( cullFace ) {
-
-			var flipSided = ( cullFace !== THREE.CullFaceBack );
-
-			console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. " +
-					" Set .shadowMap.flipSidedFaces to " + flipSided + "." );
-
-			this.flipSidedFaces = flipSided;
-
-		},
-
-		get: function() {
-
-			return this.flipSidedFaces ? THREE.CullFaceFront : THREE.CullFaceBack;
-
-		}
-
-	} );
-
 };
