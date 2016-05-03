@@ -101,7 +101,7 @@ THREE.PMREMGenerator.prototype = {
 			this.shader.uniforms[ 'mapSize' ].value = size;
 			this.renderToCubeMapTarget( renderer, this.cubeLods[ i ] );
 
-			if ( i < 5 ) this.shader.uniforms[ 'envMap' ].value = this.cubeLods[ i ];
+			if ( i < 5 ) this.shader.uniforms[ 'envMap' ].value = this.cubeLods[ i ].texture;
 
 		}
 

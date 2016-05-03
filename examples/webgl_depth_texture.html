@@ -179,7 +179,7 @@
           uniforms: {
             cameraNear: { type: 'f', value: camera.near },
             cameraFar: { type: 'f', value: camera.far },
-            tDiffuse: { type: 't', value: target },
+            tDiffuse: { type: 't', value: target.texture },
             tDepth: { type: 't', value: target.depthTexture }
           }
         });
