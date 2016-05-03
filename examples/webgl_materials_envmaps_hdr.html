@@ -261,9 +261,9 @@
 					switch( params.envMap ) {
 
 						case 'None': newEnvMap = null; break;
-						case 'LDR': newEnvMap = ldrCubeRenderTarget ? ldrCubeRenderTarget.texture : undefined; break;
-						case 'HDR': newEnvMap = hdrCubeRenderTarget ? hdrCubeRenderTarget.texture : undefined; break;
-						case 'RGBM16': newEnvMap = rgbmCubeRenderTarget ? rgbmCubeRenderTarget.texture : undefined; break;
+						case 'LDR': newEnvMap = ldrCubeRenderTarget ? ldrCubeRenderTarget.texture : null; break;
+						case 'HDR': newEnvMap = hdrCubeRenderTarget ? hdrCubeRenderTarget.texture : null; break;
+						case 'RGBM16': newEnvMap = rgbmCubeRenderTarget ? rgbmCubeRenderTarget.texture : null; break;
 
 					}
 
