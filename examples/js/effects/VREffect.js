@@ -82,6 +82,8 @@ THREE.VREffect = function ( renderer, onError ) {
 			} else {
 
 				renderer.setSize( eyeParamsL.renderWidth * 2, eyeParamsL.renderHeight, false );
+        renderer.domElement.style.width = width + 'px';
+        renderer.domElement.style.height = height + 'px';
 
 			}
 
