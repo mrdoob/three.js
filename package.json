@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "cd ./utils/build && node build.js --include common --include extras",
+    "format": "esformatter -i 'src/**/*.js'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
