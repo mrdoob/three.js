@@ -105,11 +105,11 @@
 		<div>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</div>
 		<div>Options are THREE.BasicShadowMap, THREE.PCFShadowMap, THREE.PCFSoftShadowMap. Default is THREE.PCFShadowMap.</div>
 
-		<h3>[property:Boolean shadowMap.invertFaceCulling]</h3>
+		<h3>[property:Boolean shadowMap.renderReverseSided]</h3>
 
 		<div>Default is true. Whether to render the opposite side as specified by the material into the shadow map. When disabled, an appropriate shadow.bias must be set on the light source for surfaces that can both cast and receive shadows at the same time to render correctly.</div>
 
-		<h3>[property:Boolean shadowMap.forceFaceCulling]</h3>
+		<h3>[property:Boolean shadowMap.renderSingleSided]</h3>
 
 		<div>Default is true. Whether to treat materials specified as double-sided as if they were specified as front-sided when rendering the shadow map. When disabled, an appropriate shadow.bias must be set on the light source for surfaces that can both cast and receive shadows at the same time to render correctly.</div>
 

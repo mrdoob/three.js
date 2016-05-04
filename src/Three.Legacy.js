@@ -597,11 +597,11 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 Object.defineProperty( THREE.WebGLShadowMap.prototype, 'cullFace', {
 	set: function( cullFace ) {
 		var value = ( cullFace !== THREE.CullFaceBack );
-		console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. Set .shadowMap.invertFaceCulling to " + value + "." );
-		this.invertFaceCulling = value;
+		console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. Set .shadowMap.renderReverseSided to " + value + "." );
+		this.renderReverseSided = value;
 	},
 	get: function() {
-		return this.invertFaceCulling ? THREE.CullFaceFront : THREE.CullFaceBack;
+		return this.renderReverseSided ? THREE.CullFaceFront : THREE.CullFaceBack;
 	}
 } );
 
