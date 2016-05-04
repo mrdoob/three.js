@@ -448,15 +448,9 @@ def generate_multi_material_object(node, submaterial_uuids, material_list, mater
 # Find Scene Materials
 # #####################################################
 def extract_multi_materials_from_node(node, material_list, material_dict):
-    material_count = 0
-
     mesh = node.GetNodeAttribute()
-    node = None
-
-    if mesh:
-        node = mesh.GetNode()
-        if node:
-            material_count = node.GetMaterialCount()
+    mesh_node = mesh.GetNode()  # Same as node unless the mesh is instanced
+    material_count = mesh_node.GetMaterialCount()
 
     material_uuids = []
     for l in range(mesh.GetLayerCount()):
@@ -466,11 +460,11 @@ def extract_multi_materials_from_node(node, material_list, material_dict):
                 #Materials are in an undefined external table
                 continue
             for i in range(material_count):
-                material = node.GetMaterial(i)
+                material = mesh_node.GetMaterial(i)
                 material_uuids.append(material_dict[get_material_name(material)])
 
     if material_count > 1:
-        generate_multi_material_object(node, material_uuids, material_list, material_dict)
+        generate_multi_material_object(mesh_node, material_uuids, material_list, material_dict)
 
 def generate_multi_materials_from_hierarchy(node, material_list, material_dict):
     if node.GetNodeAttribute() == None:
@@ -1801,32 +1795,25 @@ def generate_mesh_object(node, geometry_dict, material_dict):
     scale = transform.GetS()
     quaternion = transform.GetQ()
 
-    material_count = node.GetMaterialCount()
+    mesh_node = mesh.GetNode() # Same as node unless the mesh is instanced
+    material_count = mesh_node.GetMaterialCount()
     material_name = ""
 
     if material_count > 0:
         material_names = []
-        for l in range(mesh.GetLayerCount()):
-            materials = mesh.GetLayer(l).GetMaterials()
-            if materials:
-                if materials.GetReferenceMode() == FbxLayerElement.eIndex:
-                    #Materials are in an undefined external table
-                    continue
-                for i in range(material_count):
-                    material = node.GetMaterial(i)
-                    material_names.append(get_material_name(material))
 
-        if not material_count > 1 and not len(material_names) > 0:
-            material_names.append('')
+        for i in range(material_count):
+            material = mesh_node.GetMaterial(i)
+            material_names.append(get_material_name(material))
 
-        material_name = get_multi_material_name(node) if material_count > 1 else material_names[0]
+        material_name = get_multi_material_name(mesh_node) if material_count > 1 else material_names[0]
     else:
         mesh_name = 'Mesh_%s_%s' % (mesh.GetUniqueID(), mesh.GetName()) if len(mesh.GetName()) > 0 else 'Mesh_%s' % mesh.GetUniqueID()
         sys.stderr.write("WARNING: Mesh '%s' has no materials\n" % mesh_name)
 
     output = {
         type_key: 'Mesh',
-        'geometry': geometry_dict[get_geometry_name(node)],
+        'geometry': geometry_dict[get_geometry_name(mesh_node)],
         'position': serialize_vector3(position),
         'quaternion': serialize_vector4(quaternion),
         'scale': serialize_vector3(scale),
