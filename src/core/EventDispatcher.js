@@ -6,9 +6,6 @@ THREE.EventDispatcher = function () {};
 
 Object.assign( THREE.EventDispatcher.prototype, {
 
-	// Note: *No* constructor here, this would clobber that property
-	// of the target class when used as a mixin.
-
 	addEventListener: function ( type, listener ) {
 
 		if ( this._listeners === undefined ) this._listeners = {};
@@ -77,16 +74,16 @@ Object.assign( THREE.EventDispatcher.prototype, {
 
 			event.target = this;
 
-			var array = [];
+			var array = [], i = 0;
 			var length = listenerArray.length;
 
-			for ( var i = 0; i < length; i ++ ) {
+			for ( i = 0; i < length; i ++ ) {
 
 				array[ i ] = listenerArray[ i ];
 
 			}
 
-			for ( var i = 0; i < length; i ++ ) {
+			for ( i = 0; i < length; i ++ ) {
 
 				array[ i ].call( this, event );
 
