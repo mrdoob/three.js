@@ -651,12 +651,6 @@ Sidebar.Material = function ( editor ) {
 
 					}
 
-					if ( material.displacementScale !== materialDisplacementScale.getValue() ) {
-
-						editor.execute( new SetMaterialValueCommand( currentObject, 'displacementScale', materialDisplacementScale.getValue() ) );
-
-					}
-
 				} else {
 
 					if ( roughnessMapEnabled ) textureWarning = true;
@@ -675,12 +669,6 @@ Sidebar.Material = function ( editor ) {
 					if ( material.metalnessMap !== metalnessMap ) {
 
 						editor.execute( new SetMaterialMapCommand( currentObject, 'metalnessMap', metalnessMap ) );
-
-					}
-
-					if ( material.displacementScale !== materialDisplacementScale.getValue() ) {
-
-						editor.execute( new SetMaterialValueCommand( currentObject, 'displacementScale', materialDisplacementScale.getValue() ) );
 
 					}
 
