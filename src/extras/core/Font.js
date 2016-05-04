@@ -150,7 +150,7 @@ THREE.Font.prototype = {
 
 			}
 
-			return { offset: glyph.ha * scale,  path: path };
+			return { offset: glyph.ha * scale, path: path };
 
 		}
 
