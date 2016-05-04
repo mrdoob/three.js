@@ -246,7 +246,10 @@ THREE.Vector4.prototype = {
 
 	applyMatrix4: function ( m ) {
 
-		var x = this.x, y = this.y, z = this.z, w = this.w;
+		var x = this.x,
+			y = this.y,
+			z = this.z,
+			w = this.w;
 		var e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z + e[ 12 ] * w;

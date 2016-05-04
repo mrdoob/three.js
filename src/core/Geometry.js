@@ -9,7 +9,7 @@
 
 THREE.Geometry = function () {
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
+	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount++ } );
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -45,24 +45,23 @@ THREE.Geometry = function () {
 };
 
 Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
-
 	applyMatrix: function ( matrix ) {
 
 		var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
-		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
+		for ( var i = 0, il = this.vertices.length; i < il; i++ ) {
 
 			var vertex = this.vertices[ i ];
 			vertex.applyMatrix4( matrix );
 
 		}
 
-		for ( var i = 0, il = this.faces.length; i < il; i ++ ) {
+		for ( var i = 0, il = this.faces.length; i < il; i++ ) {
 
 			var face = this.faces[ i ];
 			face.normal.applyMatrix3( normalMatrix ).normalize();
 
-			for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
+			for ( var j = 0, jl = face.vertexNormals.length; j < jl; j++ ) {
 
 				face.vertexNormals[ j ].applyMatrix3( normalMatrix ).normalize();
 
@@ -97,7 +96,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		return function rotateX( angle ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined )
+				m1 = new THREE.Matrix4();
 
 			m1.makeRotationX( angle );
 
@@ -117,7 +117,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		return function rotateY( angle ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined )
+				m1 = new THREE.Matrix4();
 
 			m1.makeRotationY( angle );
 
@@ -137,7 +138,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		return function rotateZ( angle ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined )
+				m1 = new THREE.Matrix4();
 
 			m1.makeRotationZ( angle );
 
@@ -157,7 +159,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		return function translate( x, y, z ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined )
+				m1 = new THREE.Matrix4();
 
 			m1.makeTranslation( x, y, z );
 
@@ -177,7 +180,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		return function scale( x, y, z ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined )
+				m1 = new THREE.Matrix4();
 
 			m1.makeScale( x, y, z );
 
@@ -195,7 +199,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		return function lookAt( vector ) {
 
-			if ( obj === undefined ) obj = new THREE.Object3D();
+			if ( obj === undefined )
+				obj = new THREE.Object3D();
 
 			obj.lookAt( vector );
 
@@ -220,7 +225,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
 		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
 
-		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
+		if ( uvs2 !== undefined )
+			this.faceVertexUvs[ 1 ] = [];
 
 		var tempNormals = [];
 		var tempUVs = [];
@@ -285,7 +291,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 			if ( groups.length > 0 ) {
 
-				for ( var i = 0; i < groups.length; i ++ ) {
+				for ( var i = 0; i < groups.length; i++ ) {
 
 					var group = groups[ i ];
 
@@ -294,7 +300,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
-						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex  );
+						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex );
 
 					}
 
@@ -375,9 +381,10 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 	computeFaceNormals: function () {
 
-		var cb = new THREE.Vector3(), ab = new THREE.Vector3();
+		var cb = new THREE.Vector3(),
+			ab = new THREE.Vector3();
 
-		for ( var f = 0, fl = this.faces.length; f < fl; f ++ ) {
+		for ( var f = 0, fl = this.faces.length; f < fl; f++ ) {
 
 			var face = this.faces[ f ];
 
@@ -399,13 +406,19 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 	computeVertexNormals: function ( areaWeighted ) {
 
-		if ( areaWeighted === undefined ) areaWeighted = true;
+		if ( areaWeighted === undefined )
+			areaWeighted = true;
 
-		var v, vl, f, fl, face, vertices;
+		var v,
+			vl,
+			f,
+			fl,
+			face,
+			vertices;
 
 		vertices = new Array( this.vertices.length );
 
-		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
+		for ( v = 0, vl = this.vertices.length; v < vl; v++ ) {
 
 			vertices[ v ] = new THREE.Vector3();
 
@@ -416,10 +429,13 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 			// vertex normals weighted by triangle areas
 			// http://www.iquilezles.org/www/articles/normals/normals.htm
 
-			var vA, vB, vC;
-			var cb = new THREE.Vector3(), ab = new THREE.Vector3();
+			var vA,
+				vB,
+				vC;
+			var cb = new THREE.Vector3(),
+				ab = new THREE.Vector3();
 
-			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+			for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
 
 				face = this.faces[ f ];
 
@@ -439,7 +455,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		} else {
 
-			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+			for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
 
 				face = this.faces[ f ];
 
@@ -451,13 +467,13 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
-		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
+		for ( v = 0, vl = this.vertices.length; v < vl; v++ ) {
 
 			vertices[ v ].normalize();
 
 		}
 
-		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+		for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
 
 			face = this.faces[ f ];
 
@@ -489,13 +505,17 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 	computeMorphNormals: function () {
 
-		var i, il, f, fl, face;
+		var i,
+			il,
+			f,
+			fl,
+			face;
 
 		// save original normals
-		// - create temp variables on first access
-		//   otherwise just copy (for faster repeated calls)
+			// - create temp variables on first access
+			//   otherwise just copy (for faster repeated calls)
 
-		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+		for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
 
 			face = this.faces[ f ];
 
@@ -509,9 +529,10 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 			}
 
-			if ( ! face.__originalVertexNormals ) face.__originalVertexNormals = [];
+			if ( ! face.__originalVertexNormals )
+				face.__originalVertexNormals = [];
 
-			for ( i = 0, il = face.vertexNormals.length; i < il; i ++ ) {
+			for ( i = 0, il = face.vertexNormals.length; i < il; i++ ) {
 
 				if ( ! face.__originalVertexNormals[ i ] ) {
 
@@ -532,7 +553,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 		var tmpGeo = new THREE.Geometry();
 		tmpGeo.faces = this.faces;
 
-		for ( i = 0, il = this.morphTargets.length; i < il; i ++ ) {
+		for ( i = 0, il = this.morphTargets.length; i < il; i++ ) {
 
 			// create on first access
 
@@ -545,9 +566,10 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 				var dstNormalsFace = this.morphNormals[ i ].faceNormals;
 				var dstNormalsVertex = this.morphNormals[ i ].vertexNormals;
 
-				var faceNormal, vertexNormals;
+				var faceNormal,
+					vertexNormals;
 
-				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+				for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
 
 					faceNormal = new THREE.Vector3();
 					vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
@@ -572,9 +594,10 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 			// store morph normals
 
-			var faceNormal, vertexNormals;
+			var faceNormal,
+				vertexNormals;
 
-			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+			for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
 
 				face = this.faces[ f ];
 
@@ -593,7 +616,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		// restore original normals
 
-		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+		for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
 
 			face = this.faces[ f ];
 
@@ -615,7 +638,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 		var d = 0;
 		var vertices = this.vertices;
 
-		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+		for ( var i = 0, il = vertices.length; i < il; i++ ) {
 
 			if ( i > 0 ) {
 
@@ -663,15 +686,16 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 		}
 
 		var normalMatrix,
-		vertexOffset = this.vertices.length,
-		vertices1 = this.vertices,
-		vertices2 = geometry.vertices,
-		faces1 = this.faces,
-		faces2 = geometry.faces,
-		uvs1 = this.faceVertexUvs[ 0 ],
-		uvs2 = geometry.faceVertexUvs[ 0 ];
+			vertexOffset = this.vertices.length,
+			vertices1 = this.vertices,
+			vertices2 = geometry.vertices,
+			faces1 = this.faces,
+			faces2 = geometry.faces,
+			uvs1 = this.faceVertexUvs[ 0 ],
+			uvs2 = geometry.faceVertexUvs[ 0 ];
 
-		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
+		if ( materialIndexOffset === undefined )
+			materialIndexOffset = 0;
 
 		if ( matrix !== undefined ) {
 
@@ -681,7 +705,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		// vertices
 
-		for ( var i = 0, il = vertices2.length; i < il; i ++ ) {
+		for ( var i = 0, il = vertices2.length; i < il; i++ ) {
 
 			var vertex = vertices2[ i ];
 
@@ -695,11 +719,14 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		// faces
 
-		for ( i = 0, il = faces2.length; i < il; i ++ ) {
+		for ( i = 0, il = faces2.length; i < il; i++ ) {
 
-			var face = faces2[ i ], faceCopy, normal, color,
-			faceVertexNormals = face.vertexNormals,
-			faceVertexColors = face.vertexColors;
+			var face = faces2[ i ],
+				faceCopy,
+				normal,
+				color,
+				faceVertexNormals = face.vertexNormals,
+				faceVertexColors = face.vertexColors;
 
 			faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
 			faceCopy.normal.copy( face.normal );
@@ -710,7 +737,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 			}
 
-			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
+			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j++ ) {
 
 				normal = faceVertexNormals[ j ].clone();
 
@@ -726,7 +753,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 			faceCopy.color.copy( face.color );
 
-			for ( var j = 0, jl = faceVertexColors.length; j < jl; j ++ ) {
+			for ( var j = 0, jl = faceVertexColors.length; j < jl; j++ ) {
 
 				color = faceVertexColors[ j ];
 				faceCopy.vertexColors.push( color.clone() );
@@ -741,9 +768,10 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		// uvs
 
-		for ( i = 0, il = uvs2.length; i < il; i ++ ) {
+		for ( i = 0, il = uvs2.length; i < il; i++ ) {
 
-			var uv = uvs2[ i ], uvCopy = [];
+			var uv = uvs2[ i ],
+				uvCopy = [];
 
 			if ( uv === undefined ) {
 
@@ -751,7 +779,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 			}
 
-			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
+			for ( var j = 0, jl = uv.length; j < jl; j++ ) {
 
 				uvCopy.push( uv[ j ].clone() );
 
@@ -787,15 +815,21 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 	mergeVertices: function () {
 
 		var verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
-		var unique = [], changes = [];
+		var unique = [],
+			changes = [];
 
-		var v, key;
+		var v,
+			key;
 		var precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
 		var precision = Math.pow( 10, precisionPoints );
-		var i, il, face;
-		var indices, j, jl;
+		var i,
+			il,
+			face;
+		var indices,
+			j,
+			jl;
 
-		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
+		for ( i = 0, il = this.vertices.length; i < il; i++ ) {
 
 			v = this.vertices[ i ];
 			key = Math.round( v.x * precision ) + '_' + Math.round( v.y * precision ) + '_' + Math.round( v.z * precision );
@@ -808,19 +842,18 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 			} else {
 
-				//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
+				// console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
 				changes[ i ] = changes[ verticesMap[ key ] ];
 
 			}
 
 		}
 
-
 		// if faces are completely degenerate after merging vertices, we
 		// have to remove them from the geometry.
 		var faceIndicesToRemove = [];
 
-		for ( i = 0, il = this.faces.length; i < il; i ++ ) {
+		for ( i = 0, il = this.faces.length; i < il; i++ ) {
 
 			face = this.faces[ i ];
 
@@ -834,7 +867,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 			// if any duplicate vertices are found in a Face3
 			// we have to remove the face as nothing can be saved
-			for ( var n = 0; n < 3; n ++ ) {
+			for ( var n = 0; n < 3; n++ ) {
 
 				if ( indices[ n ] === indices[ ( n + 1 ) % 3 ] ) {
 
@@ -848,13 +881,13 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
-		for ( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
+		for ( i = faceIndicesToRemove.length - 1; i >= 0; i-- ) {
 
 			var idx = faceIndicesToRemove[ i ];
 
 			this.faces.splice( idx, 1 );
 
-			for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
+			for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j++ ) {
 
 				this.faceVertexUvs[ j ].splice( idx, 1 );
 
@@ -877,7 +910,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		// tag faces
 
-		for ( var i = 0; i < length; i ++ ) {
+		for ( var i = 0; i < length; i++ ) {
 
 			faces[ i ]._id = i;
 
@@ -898,12 +931,15 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 		var uvs1 = this.faceVertexUvs[ 0 ];
 		var uvs2 = this.faceVertexUvs[ 1 ];
 
-		var newUvs1, newUvs2;
+		var newUvs1,
+			newUvs2;
 
-		if ( uvs1 && uvs1.length === length ) newUvs1 = [];
-		if ( uvs2 && uvs2.length === length ) newUvs2 = [];
+		if ( uvs1 && uvs1.length === length )
+			newUvs1 = [];
+		if ( uvs2 && uvs2.length === length )
+			newUvs2 = [];
 
-		for ( var i = 0; i < length; i ++ ) {
+		for ( var i = 0; i < length; i++ ) {
 
 			var id = faces[ i ]._id;
 
@@ -912,8 +948,10 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
-		if ( newUvs1 ) this.faceVertexUvs[ 0 ] = newUvs1;
-		if ( newUvs2 ) this.faceVertexUvs[ 1 ] = newUvs2;
+		if ( newUvs1 )
+			this.faceVertexUvs[ 0 ] = newUvs1;
+		if ( newUvs2 )
+			this.faceVertexUvs[ 1 ] = newUvs2;
 
 	},
 
@@ -931,7 +969,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		data.uuid = this.uuid;
 		data.type = this.type;
-		if ( this.name !== '' ) data.name = this.name;
+		if ( this.name !== '' )
+			data.name = this.name;
 
 		if ( this.parameters !== undefined ) {
 
@@ -939,7 +978,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 			for ( var key in parameters ) {
 
-				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
+				if ( parameters[ key ] !== undefined )
+					data[ key ] = parameters[ key ];
 
 			}
 
@@ -949,7 +989,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		var vertices = [];
 
-		for ( var i = 0; i < this.vertices.length; i ++ ) {
+		for ( var i = 0; i < this.vertices.length; i++ ) {
 
 			var vertex = this.vertices[ i ];
 			vertices.push( vertex.x, vertex.y, vertex.z );
@@ -964,7 +1004,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 		var uvs = [];
 		var uvsHash = {};
 
-		for ( var i = 0; i < this.faces.length; i ++ ) {
+		for ( var i = 0; i < this.faces.length; i++ ) {
 
 			var face = this.faces[ i ];
 
@@ -1102,8 +1142,10 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		data.data.vertices = vertices;
 		data.data.normals = normals;
-		if ( colors.length > 0 ) data.data.colors = colors;
-		if ( uvs.length > 0 ) data.data.uvs = [ uvs ]; // temporal backward compatibility
+		if ( colors.length > 0 )
+			data.data.colors = colors;
+		if ( uvs.length > 0 )
+			data.data.uvs = [ uvs ]; // temporal backward compatibility
 		data.data.faces = faces;
 
 		return data;
@@ -1148,7 +1190,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		var vertices = source.vertices;
 
-		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+		for ( var i = 0, il = vertices.length; i < il; i++ ) {
 
 			this.vertices.push( vertices[ i ].clone() );
 
@@ -1156,13 +1198,13 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		var faces = source.faces;
 
-		for ( var i = 0, il = faces.length; i < il; i ++ ) {
+		for ( var i = 0, il = faces.length; i < il; i++ ) {
 
 			this.faces.push( faces[ i ].clone() );
 
 		}
 
-		for ( var i = 0, il = source.faceVertexUvs.length; i < il; i ++ ) {
+		for ( var i = 0, il = source.faceVertexUvs.length; i < il; i++ ) {
 
 			var faceVertexUvs = source.faceVertexUvs[ i ];
 
@@ -1172,11 +1214,12 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 			}
 
-			for ( var j = 0, jl = faceVertexUvs.length; j < jl; j ++ ) {
+			for ( var j = 0, jl = faceVertexUvs.length; j < jl; j++ ) {
 
-				var uvs = faceVertexUvs[ j ], uvsCopy = [];
+				var uvs = faceVertexUvs[ j ],
+					uvsCopy = [];
 
-				for ( var k = 0, kl = uvs.length; k < kl; k ++ ) {
+				for ( var k = 0, kl = uvs.length; k < kl; k++ ) {
 
 					var uv = uvs[ k ];
 
@@ -1199,7 +1242,6 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
-
 } );
 
 THREE.GeometryIdCount = 0;

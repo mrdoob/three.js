@@ -23,7 +23,8 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	options = options || {};
 
-	if ( options.minFilter === undefined ) options.minFilter = THREE.LinearFilter;
+	if ( options.minFilter === undefined )
+		options.minFilter = THREE.LinearFilter;
 
 	this.texture = new THREE.Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
@@ -34,7 +35,6 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 };
 
 Object.assign( THREE.WebGLRenderTarget.prototype, THREE.EventDispatcher.prototype, {
-
 	setSize: function ( width, height ) {
 
 		if ( this.width !== width || this.height !== height ) {
@@ -79,5 +79,4 @@ Object.assign( THREE.WebGLRenderTarget.prototype, THREE.EventDispatcher.prototyp
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
-
 } );

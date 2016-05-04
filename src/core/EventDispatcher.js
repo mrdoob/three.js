@@ -9,13 +9,12 @@ THREE.EventDispatcher = function () {};
 //
 
 THREE.EventDispatcher.prototype = Object.assign( Object.create( {
-
 	constructor: THREE.EventDispatcher,
 
 	apply: function ( object ) {
 
 		console.warn( "THREE.EventDispatcher: .apply is deprecated, " +
-				"just inherit or Object.assign the prototype to mix-in." );
+			"just inherit or Object.assign the prototype to mix-in." );
 
 		object.addEventListener = THREE.EventDispatcher.prototype.addEventListener;
 		object.hasEventListener = THREE.EventDispatcher.prototype.hasEventListener;
@@ -31,16 +30,16 @@ THREE.EventDispatcher.prototype = Object.assign( Object.create( {
 	//   so use the disabled code below so doesn't need to be clobbered.
 
 } ), {
+	//
+	// [/Deprecation]
+	//
 
-//
-// [/Deprecation]
-//
-
-//Object.assign( THREE.EventDispatcher.prototype, {
+	// Object.assign( THREE.EventDispatcher.prototype, {
 
 	addEventListener: function ( type, listener ) {
 
-		if ( this._listeners === undefined ) this._listeners = {};
+		if ( this._listeners === undefined )
+			this._listeners = {};
 
 		var listeners = this._listeners;
 
@@ -109,13 +108,13 @@ THREE.EventDispatcher.prototype = Object.assign( Object.create( {
 			var array = [];
 			var length = listenerArray.length;
 
-			for ( var i = 0; i < length; i ++ ) {
+			for ( var i = 0; i < length; i++ ) {
 
 				array[ i ] = listenerArray[ i ];
 
 			}
 
-			for ( var i = 0; i < length; i ++ ) {
+			for ( var i = 0; i < length; i++ ) {
 
 				array[ i ].call( this, event );
 
@@ -124,5 +123,4 @@ THREE.EventDispatcher.prototype = Object.assign( Object.create( {
 		}
 
 	}
-
 } );

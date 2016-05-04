@@ -10,7 +10,6 @@ THREE.ObjectLoader = function ( manager ) {
 };
 
 THREE.ObjectLoader.prototype = {
-
 	constructor: THREE.ObjectLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
@@ -54,7 +53,7 @@ THREE.ObjectLoader.prototype = {
 
 		} );
 
-		var textures  = this.parseTextures( json.textures, images );
+		var textures = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
 
 		var object = this.parseObject( json.object, geometries, materials );
@@ -84,7 +83,7 @@ THREE.ObjectLoader.prototype = {
 			var geometryLoader = new THREE.JSONLoader();
 			var bufferGeometryLoader = new THREE.BufferGeometryLoader();
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			for ( var i = 0, l = json.length; i < l; i++ ) {
 
 				var geometry;
 				var data = json[ i ];
@@ -248,7 +247,8 @@ THREE.ObjectLoader.prototype = {
 
 				geometry.uuid = data.uuid;
 
-				if ( data.name !== undefined ) geometry.name = data.name;
+				if ( data.name !== undefined )
+					geometry.name = data.name;
 
 				geometries[ data.uuid ] = geometry;
 
@@ -269,7 +269,7 @@ THREE.ObjectLoader.prototype = {
 			var loader = new THREE.MaterialLoader();
 			loader.setTextures( textures );
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			for ( var i = 0, l = json.length; i < l; i++ ) {
 
 				var material = loader.parse( json[ i ] );
 				materials[ material.uuid ] = material;
@@ -286,7 +286,7 @@ THREE.ObjectLoader.prototype = {
 
 		var animations = [];
 
-		for ( var i = 0; i < json.length; i ++ ) {
+		for ( var i = 0; i < json.length; i++ ) {
 
 			var clip = THREE.AnimationClip.parse( json[ i ] );
 
@@ -322,7 +322,7 @@ THREE.ObjectLoader.prototype = {
 			var loader = new THREE.ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			for ( var i = 0, l = json.length; i < l; i++ ) {
 
 				var image = json[ i ];
 				var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
@@ -341,7 +341,7 @@ THREE.ObjectLoader.prototype = {
 
 		function parseConstant( value ) {
 
-			if ( typeof( value ) === 'number' ) return value;
+			if ( typeof ( value ) === 'number' ) return value;
 
 			console.warn( 'THREE.ObjectLoader.parseTexture: Constant should be in numeric form.', value );
 
@@ -353,7 +353,7 @@ THREE.ObjectLoader.prototype = {
 
 		if ( json !== undefined ) {
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			for ( var i = 0, l = json.length; i < l; i++ ) {
 
 				var data = json[ i ];
 
@@ -374,13 +374,20 @@ THREE.ObjectLoader.prototype = {
 
 				texture.uuid = data.uuid;
 
-				if ( data.name !== undefined ) texture.name = data.name;
-				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping );
-				if ( data.offset !== undefined ) texture.offset = new THREE.Vector2( data.offset[ 0 ], data.offset[ 1 ] );
-				if ( data.repeat !== undefined ) texture.repeat = new THREE.Vector2( data.repeat[ 0 ], data.repeat[ 1 ] );
-				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter );
-				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter );
-				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
+				if ( data.name !== undefined )
+					texture.name = data.name;
+				if ( data.mapping !== undefined )
+					texture.mapping = parseConstant( data.mapping );
+				if ( data.offset !== undefined )
+					texture.offset = new THREE.Vector2( data.offset[ 0 ], data.offset[ 1 ] );
+				if ( data.repeat !== undefined )
+					texture.repeat = new THREE.Vector2( data.repeat[ 0 ], data.repeat[ 1 ] );
+				if ( data.minFilter !== undefined )
+					texture.minFilter = parseConstant( data.minFilter );
+				if ( data.magFilter !== undefined )
+					texture.magFilter = parseConstant( data.magFilter );
+				if ( data.anisotropy !== undefined )
+					texture.anisotropy = data.anisotropy;
 				if ( Array.isArray( data.wrap ) ) {
 
 					texture.wrapS = parseConstant( data.wrap[ 0 ] );
@@ -444,11 +451,16 @@ THREE.ObjectLoader.prototype = {
 
 					object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
 
-					if ( data.focus !== undefined ) object.focus = data.focus;
-					if ( data.zoom !== undefined ) object.zoom = data.zoom;
-					if ( data.filmGauge !== undefined ) object.filmGauge = data.filmGauge;
-					if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
-					if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+					if ( data.focus !== undefined )
+						object.focus = data.focus;
+					if ( data.zoom !== undefined )
+						object.zoom = data.zoom;
+					if ( data.filmGauge !== undefined )
+						object.filmGauge = data.filmGauge;
+					if ( data.filmOffset !== undefined )
+						object.filmOffset = data.filmOffset;
+					if ( data.view !== undefined )
+						object.view = Object.assign( {}, data.view );
 
 					break;
 
@@ -544,7 +556,8 @@ THREE.ObjectLoader.prototype = {
 
 			object.uuid = data.uuid;
 
-			if ( data.name !== undefined ) object.name = data.name;
+			if ( data.name !== undefined )
+				object.name = data.name;
 			if ( data.matrix !== undefined ) {
 
 				matrix.fromArray( data.matrix );
@@ -558,11 +571,15 @@ THREE.ObjectLoader.prototype = {
 
 			}
 
-			if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
-			if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
+			if ( data.castShadow !== undefined )
+				object.castShadow = data.castShadow;
+			if ( data.receiveShadow !== undefined )
+				object.receiveShadow = data.receiveShadow;
 
-			if ( data.visible !== undefined ) object.visible = data.visible;
-			if ( data.userData !== undefined ) object.userData = data.userData;
+			if ( data.visible !== undefined )
+				object.visible = data.visible;
+			if ( data.userData !== undefined )
+				object.userData = data.userData;
 
 			if ( data.children !== undefined ) {
 
@@ -578,7 +595,7 @@ THREE.ObjectLoader.prototype = {
 
 				var levels = data.levels;
 
-				for ( var l = 0; l < levels.length; l ++ ) {
+				for ( var l = 0; l < levels.length; l++ ) {
 
 					var level = levels[ l ];
 					var child = object.getObjectByProperty( 'uuid', level.object );
@@ -598,5 +615,4 @@ THREE.ObjectLoader.prototype = {
 		};
 
 	}()
-
 };

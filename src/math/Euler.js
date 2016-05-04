@@ -18,55 +18,54 @@ THREE.Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 THREE.Euler.DefaultOrder = 'XYZ';
 
 THREE.Euler.prototype = {
-
 	constructor: THREE.Euler,
 
-	get x () {
+	get x() {
 
 		return this._x;
 
 	},
 
-	set x ( value ) {
+	set x( value ) {
 
 		this._x = value;
 		this.onChangeCallback();
 
 	},
 
-	get y () {
+	get y() {
 
 		return this._y;
 
 	},
 
-	set y ( value ) {
+	set y( value ) {
 
 		this._y = value;
 		this.onChangeCallback();
 
 	},
 
-	get z () {
+	get z() {
 
 		return this._z;
 
 	},
 
-	set z ( value ) {
+	set z( value ) {
 
 		this._z = value;
 		this.onChangeCallback();
 
 	},
 
-	get order () {
+	get order() {
 
 		return this._order;
 
 	},
 
-	set order ( value ) {
+	set order( value ) {
 
 		this._order = value;
 		this.onChangeCallback();
@@ -112,9 +111,15 @@ THREE.Euler.prototype = {
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
 		var te = m.elements;
-		var m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ];
-		var m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ];
-		var m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ];
+		var m11 = te[ 0 ],
+			m12 = te[ 4 ],
+			m13 = te[ 8 ];
+		var m21 = te[ 1 ],
+			m22 = te[ 5 ],
+			m23 = te[ 9 ];
+		var m31 = te[ 2 ],
+			m32 = te[ 6 ],
+			m33 = te[ 10 ];
 
 		order = order || this._order;
 
@@ -234,7 +239,8 @@ THREE.Euler.prototype = {
 
 		return function ( q, order, update ) {
 
-			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+			if ( matrix === undefined )
+				matrix = new THREE.Matrix4();
 
 			matrix.makeRotationFromQuaternion( q );
 
@@ -259,7 +265,7 @@ THREE.Euler.prototype = {
 		return function ( newOrder ) {
 
 			q.setFromEuler( this );
-			
+
 			return this.setFromQuaternion( q, newOrder );
 
 		};
@@ -277,7 +283,8 @@ THREE.Euler.prototype = {
 		this._x = array[ 0 ];
 		this._y = array[ 1 ];
 		this._z = array[ 2 ];
-		if ( array[ 3 ] !== undefined ) this._order = array[ 3 ];
+		if ( array[ 3 ] !== undefined )
+			this._order = array[ 3 ];
 
 		this.onChangeCallback();
 
@@ -287,8 +294,10 @@ THREE.Euler.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+		if ( array === undefined )
+			array = [];
+		if ( offset === undefined )
+			offset = 0;
 
 		array[ offset ] = this._x;
 		array[ offset + 1 ] = this._y;
@@ -322,5 +331,4 @@ THREE.Euler.prototype = {
 	},
 
 	onChangeCallback: function () {}
-
 };

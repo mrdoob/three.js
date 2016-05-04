@@ -8,7 +8,7 @@
  * @author tschw
  */
 
-THREE.AnimationMixer = function( root ) {
+THREE.AnimationMixer = function ( root ) {
 
 	this._root = root;
 	this._initMemoryManager();
@@ -21,11 +21,10 @@ THREE.AnimationMixer = function( root ) {
 };
 
 Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, {
-
 	// return an action for a clip optionally using a custom root target
 	// object (this method allocates a lot of dynamic memory in case a
 	// previously unknown clip/root combination is specified)
-	clipAction: function( clip, optionalRoot ) {
+	clipAction: function ( clip, optionalRoot ) {
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
@@ -37,8 +36,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 		if ( actionsForClip !== undefined ) {
 
-			var existingAction =
-					actionsForClip.actionByRoot[ rootUuid ];
+			var existingAction = actionsForClip.actionByRoot[ rootUuid ];
 
 			if ( existingAction !== undefined ) {
 
@@ -56,7 +54,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 			if ( clip !== clipName && clip !== clipObject ) {
 
 				throw new Error(
-						"Different clips with the same name detected!" );
+					"Different clips with the same name detected!" );
 
 			}
 
@@ -66,8 +64,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 		if ( clipObject === null ) return null;
 
 		// allocate all resources required to run it
-		var newAction = new THREE.
-				AnimationMixer._Action( this, clipObject, optionalRoot );
+		var newAction = new THREE.AnimationMixer._Action( this, clipObject, optionalRoot );
 
 		this._bindAction( newAction, prototypeAction );
 
@@ -79,7 +76,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 	},
 
 	// get an existing action
-	existingAction: function( clip, optionalRoot ) {
+	existingAction: function ( clip, optionalRoot ) {
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
@@ -97,7 +94,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 	},
 
 	// deactivates all previously scheduled actions
-	stopAllAction: function() {
+	stopAllAction: function () {
 
 		var actions = this._actions,
 			nActions = this._nActiveActions,
@@ -107,13 +104,13 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 		this._nActiveActions = 0;
 		this._nActiveBindings = 0;
 
-		for ( var i = 0; i !== nActions; ++ i ) {
+		for ( var i = 0; i !== nActions; ++i ) {
 
 			actions[ i ].reset();
 
 		}
 
-		for ( var i = 0; i !== nBindings; ++ i ) {
+		for ( var i = 0; i !== nBindings; ++i ) {
 
 			bindings[ i ].useCount = 0;
 
@@ -124,7 +121,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 	},
 
 	// advance the time and update apply the animation
-	update: function( deltaTime ) {
+	update: function ( deltaTime ) {
 
 		deltaTime *= this.timeScale;
 
@@ -138,7 +135,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 		// run active actions
 
-		for ( var i = 0; i !== nActions; ++ i ) {
+		for ( var i = 0; i !== nActions; ++i ) {
 
 			var action = actions[ i ];
 
@@ -155,7 +152,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 		var bindings = this._bindings,
 			nBindings = this._nActiveBindings;
 
-		for ( var i = 0; i !== nBindings; ++ i ) {
+		for ( var i = 0; i !== nBindings; ++i ) {
 
 			bindings[ i ].apply( accuIndex );
 
@@ -166,14 +163,14 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 	},
 
 	// return this mixer's root target object
-	getRoot: function() {
+	getRoot: function () {
 
 		return this._root;
 
 	},
 
 	// free all resources specific to a particular clip
-	uncacheClip: function( clip ) {
+	uncacheClip: function ( clip ) {
 
 		var actions = this._actions,
 			clipName = clip.name,
@@ -188,7 +185,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 			var actionsToRemove = actionsForClip.knownActions;
 
-			for ( var i = 0, n = actionsToRemove.length; i !== n; ++ i ) {
+			for ( var i = 0, n = actionsToRemove.length; i !== n; ++i ) {
 
 				var action = actionsToRemove[ i ];
 
@@ -215,7 +212,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 	},
 
 	// free all resources specific to a particular root target object
-	uncacheRoot: function( root ) {
+	uncacheRoot: function ( root ) {
 
 		var rootUuid = root.uuid,
 			actionsByClip = this._actionsByClip;
@@ -252,7 +249,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 	},
 
 	// remove a targeted clip from the cache
-	uncacheAction: function( clip, optionalRoot ) {
+	uncacheAction: function ( clip, optionalRoot ) {
 
 		var action = this.existingAction( clip, optionalRoot );
 
@@ -264,7 +261,6 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 		}
 
 	}
-
 } );
 
 THREE.AnimationMixer._Action = THREE.AnimationAction._new;
@@ -272,8 +268,7 @@ THREE.AnimationMixer._Action = THREE.AnimationAction._new;
 // Implementation details:
 
 Object.assign( THREE.AnimationMixer.prototype, {
-
-	_bindAction: function( action, prototypeAction ) {
+	_bindAction: function ( action, prototypeAction ) {
 
 		var root = action._localRoot || this._root,
 			tracks = action._clip.tracks,
@@ -291,7 +286,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 		}
 
-		for ( var i = 0; i !== nTracks; ++ i ) {
+		for ( var i = 0; i !== nTracks; ++i ) {
 
 			var track = tracks[ i ],
 				trackName = track.name,
@@ -311,7 +306,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 					if ( binding._cacheIndex === null ) {
 
-						++ binding.referenceCount;
+						++binding.referenceCount;
 						this._addInactiveBinding( binding, rootUuid, trackName );
 
 					}
@@ -320,14 +315,13 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 				}
 
-				var path = prototypeAction && prototypeAction.
-						_propertyBindings[ i ].binding.parsedPath;
+				var path = prototypeAction && prototypeAction._propertyBindings[ i ].binding.parsedPath;
 
 				binding = new THREE.PropertyMixer(
-						THREE.PropertyBinding.create( root, trackName, path ),
-						track.ValueTypeName, track.getValueSize() );
+					THREE.PropertyBinding.create( root, trackName, path ),
+					track.ValueTypeName, track.getValueSize() );
 
-				++ binding.referenceCount;
+				++binding.referenceCount;
 				this._addInactiveBinding( binding, rootUuid, trackName );
 
 				bindings[ i ] = binding;
@@ -340,7 +334,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_activateAction: function( action ) {
+	_activateAction: function ( action ) {
 
 		if ( ! this._isActiveAction( action ) ) {
 
@@ -354,7 +348,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 					actionsForClip = this._actionsByClip[ clipName ];
 
 				this._bindAction( action,
-						actionsForClip && actionsForClip.knownActions[ 0 ] );
+					actionsForClip && actionsForClip.knownActions[ 0 ] );
 
 				this._addInactiveAction( action, clipName, rootUuid );
 
@@ -363,11 +357,11 @@ Object.assign( THREE.AnimationMixer.prototype, {
 			var bindings = action._propertyBindings;
 
 			// increment reference counts / sort out state
-			for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+			for ( var i = 0, n = bindings.length; i !== n; ++i ) {
 
 				var binding = bindings[ i ];
 
-				if ( binding.useCount ++ === 0 ) {
+				if ( binding.useCount++ === 0 ) {
 
 					this._lendBinding( binding );
 					binding.saveOriginalState();
@@ -382,18 +376,18 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_deactivateAction: function( action ) {
+	_deactivateAction: function ( action ) {
 
 		if ( this._isActiveAction( action ) ) {
 
 			var bindings = action._propertyBindings;
 
 			// decrement reference counts / sort out state
-			for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+			for ( var i = 0, n = bindings.length; i !== n; ++i ) {
 
 				var binding = bindings[ i ];
 
-				if ( -- binding.useCount === 0 ) {
+				if ( --binding.useCount === 0 ) {
 
 					binding.restoreOriginalState();
 					this._takeBackBinding( binding );
@@ -410,7 +404,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	// Memory manager
 
-	_initMemoryManager: function() {
+	_initMemoryManager: function () {
 
 		this._actions = []; // 'nActiveActions' followed by inactive ones
 		this._nActiveActions = 0;
@@ -422,12 +416,10 @@ Object.assign( THREE.AnimationMixer.prototype, {
 		// 		actionByRoot: _Action			- lookup
 		// }
 
-
 		this._bindings = []; // 'nActiveBindings' followed by inactive ones
 		this._nActiveBindings = 0;
 
 		this._bindingsByRootAndName = {}; // inside: Map< name, PropertyMixer >
-
 
 		this._controlInterpolants = []; // same game as above
 		this._nActiveControlInterpolants = 0;
@@ -435,34 +427,44 @@ Object.assign( THREE.AnimationMixer.prototype, {
 		var scope = this;
 
 		this.stats = {
-
 			actions: {
-				get total() { return scope._actions.length; },
-				get inUse() { return scope._nActiveActions; }
+				get total() {
+					return scope._actions.length;
+				},
+				get inUse() {
+					return scope._nActiveActions;
+				}
 			},
 			bindings: {
-				get total() { return scope._bindings.length; },
-				get inUse() { return scope._nActiveBindings; }
+				get total() {
+					return scope._bindings.length;
+				},
+				get inUse() {
+					return scope._nActiveBindings;
+				}
 			},
 			controlInterpolants: {
-				get total() { return scope._controlInterpolants.length; },
-				get inUse() { return scope._nActiveControlInterpolants; }
+				get total() {
+					return scope._controlInterpolants.length;
+				},
+				get inUse() {
+					return scope._nActiveControlInterpolants;
+				}
 			}
-
 		};
 
 	},
 
 	// Memory management for _Action objects
 
-	_isActiveAction: function( action ) {
+	_isActiveAction: function ( action ) {
 
 		var index = action._cacheIndex;
 		return index !== null && index < this._nActiveActions;
 
 	},
 
-	_addInactiveAction: function( action, clipName, rootUuid ) {
+	_addInactiveAction: function ( action, clipName, rootUuid ) {
 
 		var actions = this._actions,
 			actionsByClip = this._actionsByClip,
@@ -471,10 +473,8 @@ Object.assign( THREE.AnimationMixer.prototype, {
 		if ( actionsForClip === undefined ) {
 
 			actionsForClip = {
-
 				knownActions: [ action ],
 				actionByRoot: {}
-
 			};
 
 			action._byClipCacheIndex = 0;
@@ -497,7 +497,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_removeInactiveAction: function( action ) {
+	_removeInactiveAction: function ( action ) {
 
 		var actions = this._actions,
 			lastInactiveAction = actions[ actions.length - 1 ],
@@ -509,14 +509,12 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 		action._cacheIndex = null;
 
-
 		var clipName = action._clip.name,
 			actionsByClip = this._actionsByClip,
 			actionsForClip = actionsByClip[ clipName ],
 			knownActionsForClip = actionsForClip.knownActions,
 
-			lastKnownAction =
-				knownActionsForClip[ knownActionsForClip.length - 1 ],
+			lastKnownAction = knownActionsForClip[ knownActionsForClip.length - 1 ],
 
 			byClipCacheIndex = action._byClipCacheIndex;
 
@@ -525,7 +523,6 @@ Object.assign( THREE.AnimationMixer.prototype, {
 		knownActionsForClip.pop();
 
 		action._byClipCacheIndex = null;
-
 
 		var actionByRoot = actionsForClip.actionByRoot,
 			rootUuid = ( actions._localRoot || this._root ).uuid;
@@ -542,14 +539,14 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_removeInactiveBindingsForAction: function( action ) {
+	_removeInactiveBindingsForAction: function ( action ) {
 
 		var bindings = action._propertyBindings;
-		for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+		for ( var i = 0, n = bindings.length; i !== n; ++i ) {
 
 			var binding = bindings[ i ];
 
-			if ( -- binding.referenceCount === 0 ) {
+			if ( --binding.referenceCount === 0 ) {
 
 				this._removeInactiveBinding( binding );
 
@@ -559,7 +556,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_lendAction: function( action ) {
+	_lendAction: function ( action ) {
 
 		// [ active actions |  inactive actions  ]
 		// [  active actions >| inactive actions ]
@@ -570,7 +567,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 		var actions = this._actions,
 			prevIndex = action._cacheIndex,
 
-			lastActiveIndex = this._nActiveActions ++,
+			lastActiveIndex = this._nActiveActions++,
 
 			firstInactiveAction = actions[ lastActiveIndex ];
 
@@ -582,7 +579,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_takeBackAction: function( action ) {
+	_takeBackAction: function ( action ) {
 
 		// [  active actions  | inactive actions ]
 		// [ active actions |< inactive actions  ]
@@ -593,7 +590,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 		var actions = this._actions,
 			prevIndex = action._cacheIndex,
 
-			firstInactiveIndex = -- this._nActiveActions,
+			firstInactiveIndex = --this._nActiveActions,
 
 			lastActiveAction = actions[ firstInactiveIndex ];
 
@@ -607,7 +604,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	// Memory management for PropertyMixer objects
 
-	_addInactiveBinding: function( binding, rootUuid, trackName ) {
+	_addInactiveBinding: function ( binding, rootUuid, trackName ) {
 
 		var bindingsByRoot = this._bindingsByRootAndName,
 			bindingByName = bindingsByRoot[ rootUuid ],
@@ -628,7 +625,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_removeInactiveBinding: function( binding ) {
+	_removeInactiveBinding: function ( binding ) {
 
 		var bindings = this._bindings,
 			propBinding = binding.binding,
@@ -648,20 +645,20 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 		remove_empty_map: {
 
-			for ( var _ in bindingByName ) break remove_empty_map;
+		for ( var _ in bindingByName ) break remove_empty_map;
 
-			delete bindingsByRoot[ rootUuid ];
+		delete bindingsByRoot[ rootUuid ];
 
 		}
 
 	},
 
-	_lendBinding: function( binding ) {
+	_lendBinding: function ( binding ) {
 
 		var bindings = this._bindings,
 			prevIndex = binding._cacheIndex,
 
-			lastActiveIndex = this._nActiveBindings ++,
+			lastActiveIndex = this._nActiveBindings++,
 
 			firstInactiveBinding = bindings[ lastActiveIndex ];
 
@@ -673,12 +670,12 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_takeBackBinding: function( binding ) {
+	_takeBackBinding: function ( binding ) {
 
 		var bindings = this._bindings,
 			prevIndex = binding._cacheIndex,
 
-			firstInactiveIndex = -- this._nActiveBindings,
+			firstInactiveIndex = --this._nActiveBindings,
 
 			lastActiveBinding = bindings[ firstInactiveIndex ];
 
@@ -690,20 +687,19 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-
 	// Memory management of Interpolants for weight and time scale
 
-	_lendControlInterpolant: function() {
+	_lendControlInterpolant: function () {
 
 		var interpolants = this._controlInterpolants,
-			lastActiveIndex = this._nActiveControlInterpolants ++,
+			lastActiveIndex = this._nActiveControlInterpolants++,
 			interpolant = interpolants[ lastActiveIndex ];
 
 		if ( interpolant === undefined ) {
 
 			interpolant = new THREE.LinearInterpolant(
-					new Float32Array( 2 ), new Float32Array( 2 ),
-						1, this._controlInterpolantsResultBuffer );
+				new Float32Array( 2 ), new Float32Array( 2 ),
+				1, this._controlInterpolantsResultBuffer );
 
 			interpolant.__cacheIndex = lastActiveIndex;
 			interpolants[ lastActiveIndex ] = interpolant;
@@ -714,12 +710,12 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_takeBackControlInterpolant: function( interpolant ) {
+	_takeBackControlInterpolant: function ( interpolant ) {
 
 		var interpolants = this._controlInterpolants,
 			prevIndex = interpolant.__cacheIndex,
 
-			firstInactiveIndex = -- this._nActiveControlInterpolants,
+			firstInactiveIndex = --this._nActiveControlInterpolants,
 
 			lastActiveInterpolant = interpolants[ firstInactiveIndex ];
 
@@ -732,5 +728,4 @@ Object.assign( THREE.AnimationMixer.prototype, {
 	},
 
 	_controlInterpolantsResultBuffer: new Float32Array( 1 )
-
 } );
