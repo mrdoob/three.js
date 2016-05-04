@@ -99,12 +99,13 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	var canvas = renderer.domElement;
 	var requestFullscreen;
+	var exitFullscreen;
 	var fullscreenElement;
 
-	function onFullscreenChange() {
+	function onFullscreenChange () {
 
 		var wasPresenting = isPresenting;
-		isPresenting = vrHMD !== undefined && ( vrHMD.isPresenting || ( isDeprecatedAPI && document[fullscreenElement] instanceof window.HTMLElement ) );
+		isPresenting = vrHMD !== undefined && ( vrHMD.isPresenting || ( isDeprecatedAPI && document[ fullscreenElement ] instanceof window.HTMLElement ) );
 
 		if ( wasPresenting === isPresenting ) {
 
@@ -148,22 +149,25 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		requestFullscreen = 'requestFullscreen';
 		fullscreenElement = 'fullscreenElement';
+		exitFullscreen = 'exitFullscreen';
+		document.addEventListener( 'fullscreenchange', onFullscreenChange, false );
 
 	} else if ( canvas.mozRequestFullScreen ) {
 
 		requestFullscreen = 'mozRequestFullScreen';
-		fullscreenElement = 'mozFullScreenElement'
+		fullscreenElement = 'mozFullScreenElement';
+		exitFullscreen = 'mozCancelFullScreen';
 		document.addEventListener( 'mozfullscreenchange', onFullscreenChange, false );
 
 	} else {
 
 		requestFullscreen = 'webkitRequestFullscreen';
 		fullscreenElement = 'webkitFullscreenElement';
+		exitFullscreen = 'webkitExitFullscreen';
 		document.addEventListener( 'webkitfullscreenchange', onFullscreenChange, false );
 
 	}
 
-	document.addEventListener( 'fullscreenchange', onFullscreenChange, false );
 	window.addEventListener( 'vrdisplaypresentchange', onFullscreenChange, false );
 
 	this.setFullScreen = function ( boolean ) {
@@ -197,9 +201,9 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			} else {
 
-				if ( canvas[requestFullscreen] ) {
+				if ( canvas[ requestFullscreen ] ) {
 
-					canvas[requestFullscreen]( { vrDisplay: vrHMD } );
+					canvas[ boolean ? requestFullscreen : exitFullscreen ]( { vrDisplay: vrHMD } );
 					resolve();
 
 				} else {
