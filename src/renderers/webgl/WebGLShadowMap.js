@@ -358,8 +358,20 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		result.wireframe = material.wireframe;
 
 		var side = material.side;
-		if ( scope.forceFaceCulling ) side &= 1;
-		if ( scope.invertFaceCulling && side < 2 ) side ^= 1;
+
+		if ( scope.forceFaceCulling && side == THREE.DoubleSide ) {
+
+			side = THREE.FrontSide;
+
+		}
+
+		if ( scope.invertFaceCulling ) {
+
+			if ( side === THREE.FrontSide ) side = THREE.BackSide;
+			else if ( side === THREE.BackSide ) side = THREE.FrontSide;
+
+		}
+
 		result.side = side;
 
 		result.clipShadows = material.clipShadows;
