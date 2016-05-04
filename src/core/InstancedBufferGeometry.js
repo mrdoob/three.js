@@ -55,5 +55,3 @@ THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
 	return this;
 
 };
-
-THREE.EventDispatcher.prototype.apply( THREE.InstancedBufferGeometry.prototype );

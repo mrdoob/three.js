@@ -188,7 +188,7 @@ Object.defineProperties( THREE.Vector3.prototype, {
 	getColumnFromMatrix: {
 		value: function ( index, matrix ) {
 			console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
-			return this.setFromMatrixColumn( index, matrix );
+			return this.setFromMatrixColumn( matrix, index );
 		}
 	}
 } );
@@ -265,6 +265,8 @@ Object.defineProperties( THREE, {
 		}
 	}
 } );
+
+THREE.Particle = THREE.Sprite;
 
 //
 
@@ -570,6 +572,18 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
 			this.shadowMap.cullFace = value;
 		}
+	}
+} );
+
+Object.defineProperty( THREE.WebGLShadowMap.prototype, 'cullFace', {
+	set: function( cullFace ) {
+		var flipSided = ( cullFace !== THREE.CullFaceBack );
+		console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. " +
+				" Set .shadowMap.flipSidedFaces to " + flipSided + "." );
+		this.flipSidedFaces = flipSided;
+	},
+	get: function() {
+		return this.flipSidedFaces ? THREE.CullFaceFront : THREE.CullFaceBack;
 	}
 } );
 

@@ -63,7 +63,3 @@ THREE.Sprite.prototype.clone = function () {
 	return new this.constructor( this.material ).copy( this );
 
 };
-
-// Backwards compatibility
-
-THREE.Particle = THREE.Sprite;

@@ -4,22 +4,43 @@
 
 THREE.EventDispatcher = function () {};
 
-THREE.EventDispatcher.prototype = {
+//
+// [Deprecation]
+//
+
+THREE.EventDispatcher.prototype = Object.assign( Object.create( {
+
 	constructor: THREE.EventDispatcher,
 
 	apply: function ( object ) {
+
+		console.warn( "THREE.EventDispatcher: .apply is deprecated, " +
+				"just inherit or Object.assign the prototype to mix-in." );
 
 		object.addEventListener = THREE.EventDispatcher.prototype.addEventListener;
 		object.hasEventListener = THREE.EventDispatcher.prototype.hasEventListener;
 		object.removeEventListener = THREE.EventDispatcher.prototype.removeEventListener;
 		object.dispatchEvent = THREE.EventDispatcher.prototype.dispatchEvent;
 
-	},
+	}
+
+	// Notes:
+	// - The prototype chain ensures that Object.assign will not copy the
+	//   properties within this block.
+	// - When .constructor is not explicitly set, it is not copied either,
+	//   so use the disabled code below so doesn't need to be clobbered.
+
+} ), {
+
+//
+// [/Deprecation]
+//
+
+//Object.assign( THREE.EventDispatcher.prototype, {
 
 	addEventListener: function ( type, listener ) {
 
-		if ( this._listeners === undefined )
-			this._listeners = {};
+		if ( this._listeners === undefined ) this._listeners = {};
 
 		var listeners = this._listeners;
 
@@ -88,13 +109,13 @@ THREE.EventDispatcher.prototype = {
 			var array = [];
 			var length = listenerArray.length;
 
-			for ( var i = 0; i < length; i++ ) {
+			for ( var i = 0; i < length; i ++ ) {
 
 				array[ i ] = listenerArray[ i ];
 
 			}
 
-			for ( var i = 0; i < length; i++ ) {
+			for ( var i = 0; i < length; i ++ ) {
 
 				array[ i ].call( this, event );
 
@@ -103,4 +124,5 @@ THREE.EventDispatcher.prototype = {
 		}
 
 	}
-};
+
+} );

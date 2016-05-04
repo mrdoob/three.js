@@ -8,7 +8,8 @@ Sidebar.Geometry.CircleGeometry = function ( editor, object ) {
 
 	var container = new UI.Row();
 
-	var parameters = object.geometry.parameters;
+	var geometry = object.geometry;
+	var parameters = geometry.parameters;
 
 	// radius
 
@@ -54,7 +55,7 @@ Sidebar.Geometry.CircleGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.CircleGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			radius.getValue(),
 			segments.getValue(),
 			thetaStart.getValue(),
@@ -65,4 +66,6 @@ Sidebar.Geometry.CircleGeometry = function ( editor, object ) {
 
 	return container;
 
-}
+};
+
+Sidebar.Geometry.CircleBufferGeometry = Sidebar.Geometry.CircleGeometry;

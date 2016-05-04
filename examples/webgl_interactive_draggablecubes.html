@@ -25,11 +25,12 @@
 
 			var container, stats;
 			var camera, controls, scene, renderer;
-			var objects = [], plane;
-
+			var objects = [];
+			var plane = new THREE.Plane();
 			var raycaster = new THREE.Raycaster();
 			var mouse = new THREE.Vector2(),
 			offset = new THREE.Vector3(),
+			intersection = new THREE.Vector3(),
 			INTERSECTED, SELECTED;
 
 			init();
@@ -95,12 +96,6 @@
 
 				}
 
-				plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 2000, 2000, 8, 8 ),
-					new THREE.MeshBasicMaterial( { visible: false } )
-				);
-				scene.add( plane );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -149,17 +144,13 @@
 				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-				//
-
 				raycaster.setFromCamera( mouse, camera );
 
 				if ( SELECTED ) {
 
-					var intersects = raycaster.intersectObject( plane );
+					if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
 
-					if ( intersects.length > 0 ) {
-
-						SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
+						SELECTED.position.copy( intersection.sub( offset ) );
 
 					}
 
@@ -178,8 +169,9 @@
 						INTERSECTED = intersects[ 0 ].object;
 						INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
 
-						plane.position.copy( INTERSECTED.position );
-						plane.lookAt( camera.position );
+						plane.setFromNormalAndCoplanarPoint(
+							camera.getWorldDirection( plane.normal ),
+							INTERSECTED.position );
 
 					}
 
@@ -211,11 +203,9 @@
 
 					SELECTED = intersects[ 0 ].object;
 
-					var intersects = raycaster.intersectObject( plane );
+					if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
 
-					if ( intersects.length > 0 ) {
-
-						offset.copy( intersects[ 0 ].point ).sub( plane.position );
+						offset.copy( intersection ).sub( SELECTED.position );
 
 					}
 
@@ -232,8 +222,6 @@
 				controls.enabled = true;
 
 				if ( INTERSECTED ) {
-
-					plane.position.copy( INTERSECTED.position );
 
 					SELECTED = null;
 

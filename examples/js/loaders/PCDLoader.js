@@ -13,9 +13,9 @@ THREE.PCDLoader = function( manager ) {
 	this.littleEndian = true;
 
 };
-THREE.PCDLoader.prototype = {
 
-	constructor: THREE.PCDLoader,
+
+Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	load: function( url, onLoad, onProgress, onError ) {
 
@@ -246,6 +246,4 @@ THREE.PCDLoader.prototype = {
 
 	},
 
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.PCDLoader.prototype );
+} );

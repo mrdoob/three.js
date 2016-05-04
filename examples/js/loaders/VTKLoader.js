@@ -9,9 +9,7 @@ THREE.VTKLoader = function( manager ) {
 
 };
 
-THREE.VTKLoader.prototype = {
-
-	constructor: THREE.VTKLoader,
+Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -1108,6 +1106,4 @@ THREE.VTKLoader.prototype = {
 
 	}
 
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.VTKLoader.prototype );
+} );

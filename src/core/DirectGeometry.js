@@ -4,7 +4,7 @@
 
 THREE.DirectGeometry = function () {
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount++ } );
+	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -40,8 +40,7 @@ THREE.DirectGeometry = function () {
 
 };
 
-THREE.DirectGeometry.prototype = {
-	constructor: THREE.DirectGeometry,
+Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, {
 
 	computeBoundingBox: THREE.Geometry.prototype.computeBoundingBox,
 	computeBoundingSphere: THREE.Geometry.prototype.computeBoundingSphere,
@@ -66,7 +65,7 @@ THREE.DirectGeometry.prototype = {
 
 		var faces = geometry.faces;
 
-		for ( var i = 0; i < faces.length; i++ ) {
+		for ( var i = 0; i < faces.length; i ++ ) {
 
 			var face = faces[ i ];
 
@@ -123,7 +122,7 @@ THREE.DirectGeometry.prototype = {
 
 			morphTargetsPosition = [];
 
-			for ( var i = 0; i < morphTargetsLength; i++ ) {
+			for ( var i = 0; i < morphTargetsLength; i ++ ) {
 
 				morphTargetsPosition[ i ] = [];
 
@@ -142,7 +141,7 @@ THREE.DirectGeometry.prototype = {
 
 			morphTargetsNormal = [];
 
-			for ( var i = 0; i < morphNormalsLength; i++ ) {
+			for ( var i = 0; i < morphNormalsLength; i ++ ) {
 
 				morphTargetsNormal[ i ] = [];
 
@@ -162,7 +161,7 @@ THREE.DirectGeometry.prototype = {
 
 		//
 
-		for ( var i = 0; i < faces.length; i++ ) {
+		for ( var i = 0; i < faces.length; i ++ ) {
 
 			var face = faces[ i ];
 
@@ -234,7 +233,7 @@ THREE.DirectGeometry.prototype = {
 
 			// morphs
 
-			for ( var j = 0; j < morphTargetsLength; j++ ) {
+			for ( var j = 0; j < morphTargetsLength; j ++ ) {
 
 				var morphTarget = morphTargets[ j ].vertices;
 
@@ -242,7 +241,7 @@ THREE.DirectGeometry.prototype = {
 
 			}
 
-			for ( var j = 0; j < morphNormalsLength; j++ ) {
+			for ( var j = 0; j < morphNormalsLength; j ++ ) {
 
 				var morphNormal = morphNormals[ j ].vertexNormals[ i ];
 
@@ -283,6 +282,5 @@ THREE.DirectGeometry.prototype = {
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
-};
 
-THREE.EventDispatcher.prototype.apply( THREE.DirectGeometry.prototype );
+} );

@@ -8,7 +8,8 @@ Sidebar.Geometry.BoxGeometry = function ( editor, object ) {
 
 	var container = new UI.Row();
 
-	var parameters = object.geometry.parameters;
+	var geometry = object.geometry;
+	var parameters = geometry.parameters;
 
 	// width
 
@@ -65,7 +66,7 @@ Sidebar.Geometry.BoxGeometry = function ( editor, object ) {
 	var depthSegmentsRow = new UI.Row();
 	var depthSegments = new UI.Integer( parameters.depthSegments ).setRange( 1, Infinity ).onChange( update );
 
-	depthSegmentsRow.add( new UI.Text( 'Height segments' ).setWidth( '90px' ) );
+	depthSegmentsRow.add( new UI.Text( 'Depth segments' ).setWidth( '90px' ) );
 	depthSegmentsRow.add( depthSegments );
 
 	container.add( depthSegmentsRow );
@@ -74,7 +75,7 @@ Sidebar.Geometry.BoxGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.BoxGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			width.getValue(),
 			height.getValue(),
 			depth.getValue(),
@@ -87,4 +88,6 @@ Sidebar.Geometry.BoxGeometry = function ( editor, object ) {
 
 	return container;
 
-}
+};
+
+Sidebar.Geometry.BoxBufferGeometry = Sidebar.Geometry.BoxGeometry;
