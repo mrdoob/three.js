@@ -9,7 +9,6 @@ THREE.BufferGeometryLoader = function ( manager ) {
 };
 
 THREE.BufferGeometryLoader.prototype = {
-
 	constructor: THREE.BufferGeometryLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
@@ -65,7 +64,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 		if ( groups !== undefined ) {
 
-			for ( var i = 0, n = groups.length; i !== n; ++ i ) {
+			for ( var i = 0, n = groups.length; i !== n; ++i ) {
 
 				var group = groups[ i ];
 
@@ -94,5 +93,4 @@ THREE.BufferGeometryLoader.prototype = {
 		return geometry;
 
 	}
-
 };

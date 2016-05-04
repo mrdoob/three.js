@@ -19,19 +19,19 @@ THREE.LOD = function () {
 
 };
 
-
 THREE.LOD.prototype = Object.create( THREE.Object3D.prototype );
 THREE.LOD.prototype.constructor = THREE.LOD;
 
 THREE.LOD.prototype.addLevel = function ( object, distance ) {
 
-	if ( distance === undefined ) distance = 0;
+	if ( distance === undefined )
+		distance = 0;
 
 	distance = Math.abs( distance );
 
 	var levels = this.levels;
 
-	for ( var l = 0; l < levels.length; l ++ ) {
+	for ( var l = 0; l < levels.length; l++ ) {
 
 		if ( distance < levels[ l ].distance ) {
 
@@ -51,7 +51,7 @@ THREE.LOD.prototype.getObjectForDistance = function ( distance ) {
 
 	var levels = this.levels;
 
-	for ( var i = 1, l = levels.length; i < l; i ++ ) {
+	for ( var i = 1, l = levels.length; i < l; i++ ) {
 
 		if ( distance < levels[ i ].distance ) {
 
@@ -65,7 +65,7 @@ THREE.LOD.prototype.getObjectForDistance = function ( distance ) {
 
 };
 
-THREE.LOD.prototype.raycast = ( function () {
+THREE.LOD.prototype.raycast = (function () {
 
 	var matrixPosition = new THREE.Vector3();
 
@@ -79,7 +79,7 @@ THREE.LOD.prototype.raycast = ( function () {
 
 	};
 
-}() );
+}());
 
 THREE.LOD.prototype.update = function () {
 
@@ -99,7 +99,7 @@ THREE.LOD.prototype.update = function () {
 
 			levels[ 0 ].object.visible = true;
 
-			for ( var i = 1, l = levels.length; i < l; i ++ ) {
+			for ( var i = 1, l = levels.length; i < l; i++ ) {
 
 				if ( distance >= levels[ i ].distance ) {
 
@@ -114,7 +114,7 @@ THREE.LOD.prototype.update = function () {
 
 			}
 
-			for ( ; i < l; i ++ ) {
+			for ( ; i < l; i++ ) {
 
 				levels[ i ].object.visible = false;
 
@@ -132,7 +132,7 @@ THREE.LOD.prototype.copy = function ( source ) {
 
 	var levels = source.levels;
 
-	for ( var i = 0, l = levels.length; i < l; i ++ ) {
+	for ( var i = 0, l = levels.length; i < l; i++ ) {
 
 		var level = levels[ i ];
 
@@ -152,7 +152,7 @@ THREE.LOD.prototype.toJSON = function ( meta ) {
 
 	var levels = this.levels;
 
-	for ( var i = 0, l = levels.length; i < l; i ++ ) {
+	for ( var i = 0, l = levels.length; i < l; i++ ) {
 
 		var level = levels[ i ];
 

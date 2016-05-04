@@ -28,7 +28,6 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 		//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
 		//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
 
-		
 		var size = Math.sqrt( this.bones.length * 4 ); // 4 pixels needed for 1 matrix
 		size = THREE.Math.nextPowerOfTwo( Math.ceil( size ) );
 		size = Math.max( size, 4 );
@@ -63,7 +62,7 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 
 			this.boneInverses = [];
 
-			for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+			for ( var b = 0, bl = this.bones.length; b < bl; b++ ) {
 
 				this.boneInverses.push( new THREE.Matrix4() );
 
@@ -79,7 +78,7 @@ THREE.Skeleton.prototype.calculateInverses = function () {
 
 	this.boneInverses = [];
 
-	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+	for ( var b = 0, bl = this.bones.length; b < bl; b++ ) {
 
 		var inverse = new THREE.Matrix4();
 
@@ -101,7 +100,7 @@ THREE.Skeleton.prototype.pose = function () {
 
 	// recover the bind-time world matrices
 
-	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+	for ( var b = 0, bl = this.bones.length; b < bl; b++ ) {
 
 		bone = this.bones[ b ];
 
@@ -115,7 +114,7 @@ THREE.Skeleton.prototype.pose = function () {
 
 	// compute the local matrices, positions, rotations and scales
 
-	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+	for ( var b = 0, bl = this.bones.length; b < bl; b++ ) {
 
 		bone = this.bones[ b ];
 
@@ -140,7 +139,7 @@ THREE.Skeleton.prototype.pose = function () {
 
 };
 
-THREE.Skeleton.prototype.update = ( function () {
+THREE.Skeleton.prototype.update = (function () {
 
 	var offsetMatrix = new THREE.Matrix4();
 
@@ -148,7 +147,7 @@ THREE.Skeleton.prototype.update = ( function () {
 
 		// flatten bone matrices to array
 
-		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+		for ( var b = 0, bl = this.bones.length; b < bl; b++ ) {
 
 			// compute the offset between the current and the original transform
 
@@ -167,7 +166,7 @@ THREE.Skeleton.prototype.update = ( function () {
 
 	};
 
-} )();
+})();
 
 THREE.Skeleton.prototype.clone = function () {
 

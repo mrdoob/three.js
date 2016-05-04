@@ -25,7 +25,7 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	} else if ( objGeometry instanceof THREE.BufferGeometry ) {
 
-		nNormals = objGeometry.attributes.normal.count
+		nNormals = objGeometry.attributes.normal.count;
 
 	}
 
@@ -50,7 +50,7 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 THREE.VertexNormalsHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREE.VertexNormalsHelper.prototype.constructor = THREE.VertexNormalsHelper;
 
-THREE.VertexNormalsHelper.prototype.update = ( function () {
+THREE.VertexNormalsHelper.prototype.update = (function () {
 
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
@@ -80,11 +80,11 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 			var idx = 0;
 
-			for ( var i = 0, l = faces.length; i < l; i ++ ) {
+			for ( var i = 0, l = faces.length; i < l; i++ ) {
 
 				var face = faces[ i ];
 
-				for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
+				for ( var j = 0, jl = face.vertexNormals.length; j < jl; j++ ) {
 
 					var vertex = vertices[ face[ keys[ j ] ] ];
 
@@ -116,7 +116,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 			// for simplicity, ignore index and drawcalls, and render every normal
 
-			for ( var j = 0, jl = objPos.count; j < jl; j ++ ) {
+			for ( var j = 0, jl = objPos.count; j < jl; j++ ) {
 
 				v1.set( objPos.getX( j ), objPos.getY( j ), objPos.getZ( j ) ).applyMatrix4( matrixWorld );
 
@@ -140,6 +140,6 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 		return this;
 
-	}
+	};
 
-}() );
+}());

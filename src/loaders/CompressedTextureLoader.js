@@ -13,9 +13,7 @@ THREE.CompressedTextureLoader = function ( manager ) {
 
 };
 
-
 THREE.CompressedTextureLoader.prototype = {
-
 	constructor: THREE.CompressedTextureLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
@@ -66,7 +64,7 @@ THREE.CompressedTextureLoader.prototype = {
 
 			var loaded = 0;
 
-			for ( var i = 0, il = url.length; i < il; ++ i ) {
+			for ( var i = 0, il = url.length; i < il; ++i ) {
 
 				loadTexture( i );
 
@@ -84,11 +82,11 @@ THREE.CompressedTextureLoader.prototype = {
 
 					var faces = texDatas.mipmaps.length / texDatas.mipmapCount;
 
-					for ( var f = 0; f < faces; f ++ ) {
+					for ( var f = 0; f < faces; f++ ) {
 
-						images[ f ] = { mipmaps : [] };
+						images[ f ] = { mipmaps: [] };
 
-						for ( var i = 0; i < texDatas.mipmapCount; i ++ ) {
+						for ( var i = 0; i < texDatas.mipmapCount; i++ ) {
 
 							images[ f ].mipmaps.push( texDatas.mipmaps[ f * texDatas.mipmapCount + i ] );
 							images[ f ].format = texDatas.format;
@@ -131,5 +129,4 @@ THREE.CompressedTextureLoader.prototype = {
 		this.path = value;
 
 	}
-
 };

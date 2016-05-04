@@ -20,7 +20,8 @@ THREE.ShapeGeometry = function ( shapes, options ) {
 
 	this.type = 'ShapeGeometry';
 
-	if ( Array.isArray( shapes ) === false ) shapes = [ shapes ];
+	if ( Array.isArray( shapes ) === false )
+		shapes = [ shapes ];
 
 	this.addShapeList( shapes, options );
 
@@ -36,7 +37,7 @@ THREE.ShapeGeometry.prototype.constructor = THREE.ShapeGeometry;
  */
 THREE.ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
 
-	for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+	for ( var i = 0, l = shapes.length; i < l; i++ ) {
 
 		this.addShape( shapes[ i ], options );
 
@@ -51,7 +52,8 @@ THREE.ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
  */
 THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
-	if ( options === undefined ) options = {};
+	if ( options === undefined )
+		options = {};
 	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 
 	var material = options.material;
@@ -59,7 +61,9 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	//
 
-	var i, l, hole;
+	var i,
+		l,
+		hole;
 
 	var shapesOffset = this.vertices.length;
 	var shapePoints = shape.extractPoints( curveSegments );
@@ -75,7 +79,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 		// Maybe we should also check if holes are in the opposite direction, just to be safe...
 
-		for ( i = 0, l = holes.length; i < l; i ++ ) {
+		for ( i = 0, l = holes.length; i < l; i++ ) {
 
 			hole = holes[ i ];
 
@@ -95,7 +99,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	// Vertices
 
-	for ( i = 0, l = holes.length; i < l; i ++ ) {
+	for ( i = 0, l = holes.length; i < l; i++ ) {
 
 		hole = holes[ i ];
 		vertices = vertices.concat( hole );
@@ -104,10 +108,12 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	//
 
-	var vert, vlen = vertices.length;
-	var face, flen = faces.length;
+	var vert,
+		vlen = vertices.length;
+	var face,
+		flen = faces.length;
 
-	for ( i = 0; i < vlen; i ++ ) {
+	for ( i = 0; i < vlen; i++ ) {
 
 		vert = vertices[ i ];
 
@@ -115,7 +121,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-	for ( i = 0; i < flen; i ++ ) {
+	for ( i = 0; i < flen; i++ ) {
 
 		face = faces[ i ];
 

@@ -28,8 +28,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "depthPacking"
 	];
 
-
-	function allocateBones ( object ) {
+	function allocateBones( object ) {
 
 		if ( capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
 
@@ -119,29 +118,28 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		}
 
 		var parameters = {
-
 			shaderID: shaderID,
 
 			precision: precision,
 			supportsVertexTextures: capabilities.vertexTextures,
 			outputEncoding: getTextureEncodingFromMap( renderer.getCurrentRenderTarget(), renderer.gammaOutput ),
-			map: !! material.map,
+			map: ! ! material.map,
 			mapEncoding: getTextureEncodingFromMap( material.map, renderer.gammaInput ),
-			envMap: !! material.envMap,
+			envMap: ! ! material.envMap,
 			envMapMode: material.envMap && material.envMap.mapping,
 			envMapEncoding: getTextureEncodingFromMap( material.envMap, renderer.gammaInput ),
-			envMapCubeUV: ( !! material.envMap ) && ( ( material.envMap.mapping === THREE.CubeUVReflectionMapping ) || ( material.envMap.mapping === THREE.CubeUVRefractionMapping ) ),
-			lightMap: !! material.lightMap,
-			aoMap: !! material.aoMap,
-			emissiveMap: !! material.emissiveMap,
+			envMapCubeUV: ( ! ! material.envMap ) && ( ( material.envMap.mapping === THREE.CubeUVReflectionMapping ) || ( material.envMap.mapping === THREE.CubeUVRefractionMapping ) ),
+			lightMap: ! ! material.lightMap,
+			aoMap: ! ! material.aoMap,
+			emissiveMap: ! ! material.emissiveMap,
 			emissiveMapEncoding: getTextureEncodingFromMap( material.emissiveMap, renderer.gammaInput ),
-			bumpMap: !! material.bumpMap,
-			normalMap: !! material.normalMap,
-			displacementMap: !! material.displacementMap,
-			roughnessMap: !! material.roughnessMap,
-			metalnessMap: !! material.metalnessMap,
-			specularMap: !! material.specularMap,
-			alphaMap: !! material.alphaMap,
+			bumpMap: ! ! material.bumpMap,
+			normalMap: ! ! material.normalMap,
+			displacementMap: ! ! material.displacementMap,
+			roughnessMap: ! ! material.roughnessMap,
+			metalnessMap: ! ! material.metalnessMap,
+			specularMap: ! ! material.specularMap,
+			alphaMap: ! ! material.alphaMap,
 
 			combine: material.combine,
 
@@ -185,7 +183,6 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			flipSided: material.side === THREE.BackSide,
 
 			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false
-
 		};
 
 		return parameters;
@@ -218,7 +215,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 		}
 
-		for ( var i = 0; i < parameterNames.length; i ++ ) {
+		for ( var i = 0; i < parameterNames.length; i++ ) {
 
 			array.push( parameters[ parameterNames[ i ] ] );
 
@@ -233,14 +230,14 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		var program;
 
 		// Check if code has been already compiled
-		for ( var p = 0, pl = programs.length; p < pl; p ++ ) {
+		for ( var p = 0, pl = programs.length; p < pl; p++ ) {
 
 			var programInfo = programs[ p ];
 
 			if ( programInfo.code === code ) {
 
 				program = programInfo;
-				++ program.usedTimes;
+				++program.usedTimes;
 
 				break;
 
@@ -259,9 +256,9 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 	};
 
-	this.releaseProgram = function( program ) {
+	this.releaseProgram = function ( program ) {
 
-		if ( -- program.usedTimes === 0 ) {
+		if ( --program.usedTimes === 0 ) {
 
 			// Remove from unordered set
 			var i = programs.indexOf( program );

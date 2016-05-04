@@ -22,8 +22,10 @@ THREE.Scene.prototype.copy = function ( source, recursive ) {
 
 	THREE.Object3D.prototype.copy.call( this, source, recursive );
 
-	if ( source.fog !== null ) this.fog = source.fog.clone();
-	if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
+	if ( source.fog !== null )
+		this.fog = source.fog.clone();
+	if ( source.overrideMaterial !== null )
+		this.overrideMaterial = source.overrideMaterial.clone();
 
 	this.autoUpdate = source.autoUpdate;
 	this.matrixAutoUpdate = source.matrixAutoUpdate;

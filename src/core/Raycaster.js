@@ -4,7 +4,7 @@
  * @author stephomi / http://stephaneginier.com/
  */
 
-( function ( THREE ) {
+(function ( THREE ) {
 
 	THREE.Raycaster = function ( origin, direction, near, far ) {
 
@@ -49,7 +49,7 @@
 
 			var children = object.children;
 
-			for ( var i = 0, l = children.length; i < l; i ++ ) {
+			for ( var i = 0, l = children.length; i < l; i++ ) {
 
 				intersectObject( children[ i ], raycaster, intersects, true );
 
@@ -62,7 +62,6 @@
 	//
 
 	THREE.Raycaster.prototype = {
-
 		constructor: THREE.Raycaster,
 
 		linePrecision: 1,
@@ -118,7 +117,7 @@
 
 			}
 
-			for ( var i = 0, l = objects.length; i < l; i ++ ) {
+			for ( var i = 0, l = objects.length; i < l; i++ ) {
 
 				intersectObject( objects[ i ], this, intersects, recursive );
 
@@ -129,7 +128,6 @@
 			return intersects;
 
 		}
-
 	};
 
-}( THREE ) );
+}( THREE ));

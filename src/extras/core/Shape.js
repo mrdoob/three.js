@@ -42,7 +42,7 @@ THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
 
 	var holesPts = [];
 
-	for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
+	for ( var i = 0, l = this.holes.length; i < l; i++ ) {
 
 		holesPts[ i ] = this.holes[ i ].getPoints( divisions );
 
@@ -52,16 +52,13 @@ THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
 
 };
 
-
 // Get points of shape and holes (keypoints based on segments parameter)
 
 THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
 
 	return {
-
 		shape: this.getPoints( divisions ),
 		holes: this.getPointsHoles( divisions )
-
 	};
 
 };

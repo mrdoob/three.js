@@ -17,7 +17,7 @@ THREE.TorusKnotGeometry = function ( radius, tube, tubularSegments, radialSegmen
 		q: q
 	};
 
-	if( heightScale !== undefined ) console.warn( 'THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.' );
+	if ( heightScale !== undefined ) console.warn( 'THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.' );
 
 	this.fromBufferGeometry( new THREE.TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) );
 	this.mergeVertices();

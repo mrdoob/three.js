@@ -3,11 +3,11 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Sprite = ( function () {
+THREE.Sprite = (function () {
 
-	var indices = new Uint16Array( [ 0, 1, 2,  0, 2, 3 ] );
-	var vertices = new Float32Array( [ - 0.5, - 0.5, 0,   0.5, - 0.5, 0,   0.5, 0.5, 0,   - 0.5, 0.5, 0 ] );
-	var uvs = new Float32Array( [ 0, 0,   1, 0,   1, 1,   0, 1 ] );
+	var indices = new Uint16Array( [ 0, 1, 2, 0, 2, 3 ] );
+	var vertices = new Float32Array( [ - 0.5, - 0.5, 0, 0.5, - 0.5, 0, 0.5, 0.5, 0, - 0.5, 0.5, 0 ] );
+	var uvs = new Float32Array( [ 0, 0, 1, 0, 1, 1, 0, 1 ] );
 
 	var geometry = new THREE.BufferGeometry();
 	geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
@@ -25,12 +25,12 @@ THREE.Sprite = ( function () {
 
 	};
 
-} )();
+})();
 
 THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Sprite.prototype.constructor = THREE.Sprite;
 
-THREE.Sprite.prototype.raycast = ( function () {
+THREE.Sprite.prototype.raycast = (function () {
 
 	var matrixPosition = new THREE.Vector3();
 
@@ -48,17 +48,15 @@ THREE.Sprite.prototype.raycast = ( function () {
 		}
 
 		intersects.push( {
-
 			distance: Math.sqrt( distanceSq ),
 			point: this.position,
 			face: null,
 			object: this
-
 		} );
 
 	};
 
-}() );
+}());
 
 THREE.Sprite.prototype.clone = function () {
 

@@ -5,7 +5,7 @@
 
 THREE.BufferGeometry = function () {
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
+	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount++ } );
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -27,7 +27,6 @@ THREE.BufferGeometry = function () {
 };
 
 THREE.BufferGeometry.prototype = {
-
 	constructor: THREE.BufferGeometry,
 
 	getIndex: function () {
@@ -86,11 +85,9 @@ THREE.BufferGeometry.prototype = {
 	addGroup: function ( start, count, materialIndex ) {
 
 		this.groups.push( {
-
 			start: start,
 			count: count,
 			materialIndex: materialIndex !== undefined ? materialIndex : 0
-
 		} );
 
 	},
@@ -154,7 +151,8 @@ THREE.BufferGeometry.prototype = {
 
 		return function rotateX( angle ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined )
+				m1 = new THREE.Matrix4();
 
 			m1.makeRotationX( angle );
 
@@ -174,7 +172,8 @@ THREE.BufferGeometry.prototype = {
 
 		return function rotateY( angle ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined )
+				m1 = new THREE.Matrix4();
 
 			m1.makeRotationY( angle );
 
@@ -194,7 +193,8 @@ THREE.BufferGeometry.prototype = {
 
 		return function rotateZ( angle ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined )
+				m1 = new THREE.Matrix4();
 
 			m1.makeRotationZ( angle );
 
@@ -214,7 +214,8 @@ THREE.BufferGeometry.prototype = {
 
 		return function translate( x, y, z ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined )
+				m1 = new THREE.Matrix4();
 
 			m1.makeTranslation( x, y, z );
 
@@ -234,7 +235,8 @@ THREE.BufferGeometry.prototype = {
 
 		return function scale( x, y, z ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined )
+				m1 = new THREE.Matrix4();
 
 			m1.makeScale( x, y, z );
 
@@ -252,7 +254,8 @@ THREE.BufferGeometry.prototype = {
 
 		return function lookAt( vector ) {
 
-			if ( obj === undefined ) obj = new THREE.Object3D();
+			if ( obj === undefined )
+				obj = new THREE.Object3D();
 
 			obj.lookAt( vector );
 
@@ -502,7 +505,7 @@ THREE.BufferGeometry.prototype = {
 			var array = [];
 			var morphTargets = geometry.morphTargets[ name ];
 
-			for ( var i = 0, l = morphTargets.length; i < l; i ++ ) {
+			for ( var i = 0, l = morphTargets.length; i < l; i++ ) {
 
 				var morphTarget = morphTargets[ i ];
 
@@ -652,7 +655,7 @@ THREE.BufferGeometry.prototype = {
 
 				var array = attributes.normal.array;
 
-				for ( var i = 0, il = array.length; i < il; i ++ ) {
+				for ( var i = 0, il = array.length; i < il; i++ ) {
 
 					array[ i ] = 0;
 
@@ -662,14 +665,16 @@ THREE.BufferGeometry.prototype = {
 
 			var normals = attributes.normal.array;
 
-			var vA, vB, vC,
+			var vA,
+				vB,
+				vC,
 
-			pA = new THREE.Vector3(),
-			pB = new THREE.Vector3(),
-			pC = new THREE.Vector3(),
+				pA = new THREE.Vector3(),
+				pB = new THREE.Vector3(),
+				pC = new THREE.Vector3(),
 
-			cb = new THREE.Vector3(),
-			ab = new THREE.Vector3();
+				cb = new THREE.Vector3(),
+				ab = new THREE.Vector3();
 
 			// indexed elements
 
@@ -683,7 +688,7 @@ THREE.BufferGeometry.prototype = {
 
 				}
 
-				for ( var j = 0, jl = groups.length; j < jl; ++ j ) {
+				for ( var j = 0, jl = groups.length; j < jl; ++j ) {
 
 					var group = groups[ j ];
 
@@ -767,7 +772,8 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined )
+			offset = 0;
 
 		var attributes = this.attributes;
 
@@ -783,7 +789,7 @@ THREE.BufferGeometry.prototype = {
 
 			var attributeSize = attribute2.itemSize;
 
-			for ( var i = 0, j = attributeSize * offset; i < attributeArray2.length; i ++, j ++ ) {
+			for ( var i = 0, j = attributeSize * offset; i < attributeArray2.length; i++, j++ ) {
 
 				attributeArray1[ j ] = attributeArray2[ i ];
 
@@ -799,7 +805,10 @@ THREE.BufferGeometry.prototype = {
 
 		var normals = this.attributes.normal.array;
 
-		var x, y, z, n;
+		var x,
+			y,
+			z,
+			n;
 
 		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
 
@@ -840,15 +849,16 @@ THREE.BufferGeometry.prototype = {
 
 			var array2 = new array.constructor( indices.length * itemSize );
 
-			var index = 0, index2 = 0;
+			var index = 0,
+				index2 = 0;
 
-			for ( var i = 0, l = indices.length; i < l; i ++ ) {
+			for ( var i = 0, l = indices.length; i < l; i++ ) {
 
 				index = indices[ i ] * itemSize;
 
-				for ( var j = 0; j < itemSize; j ++ ) {
+				for ( var j = 0; j < itemSize; j++ ) {
 
-					array2[ index2 ++ ] = array[ index ++ ];
+					array2[ index2++ ] = array[ index++ ];
 
 				}
 
@@ -876,7 +886,8 @@ THREE.BufferGeometry.prototype = {
 
 		data.uuid = this.uuid;
 		data.type = this.type;
-		if ( this.name !== '' ) data.name = this.name;
+		if ( this.name !== '' )
+			data.name = this.name;
 
 		if ( this.parameters !== undefined ) {
 
@@ -884,7 +895,8 @@ THREE.BufferGeometry.prototype = {
 
 			for ( var key in parameters ) {
 
-				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
+				if ( parameters[ key ] !== undefined )
+					data[ key ] = parameters[ key ];
 
 			}
 
@@ -998,7 +1010,7 @@ THREE.BufferGeometry.prototype = {
 
 		var groups = source.groups;
 
-		for ( var i = 0, l = groups.length; i < l; i ++ ) {
+		for ( var i = 0, l = groups.length; i < l; i++ ) {
 
 			var group = groups[ i ];
 			this.addGroup( group.start, group.count, group.materialIndex );
@@ -1014,7 +1026,6 @@ THREE.BufferGeometry.prototype = {
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
-
 };
 
 THREE.EventDispatcher.prototype.apply( THREE.BufferGeometry.prototype );

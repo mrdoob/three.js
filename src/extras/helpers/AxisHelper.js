@@ -8,15 +8,15 @@ THREE.AxisHelper = function ( size ) {
 	size = size || 1;
 
 	var vertices = new Float32Array( [
-		0, 0, 0,  size, 0, 0,
-		0, 0, 0,  0, size, 0,
-		0, 0, 0,  0, 0, size
+		0, 0, 0, size, 0, 0,
+		0, 0, 0, 0, size, 0,
+		0, 0, 0, 0, 0, size
 	] );
 
 	var colors = new Float32Array( [
-		1, 0, 0,  1, 0.6, 0,
-		0, 1, 0,  0.6, 1, 0,
-		0, 0, 1,  0, 0.6, 1
+		1, 0, 0, 1, 0.6, 0,
+		0, 1, 0, 0.6, 1, 0,
+		0, 0, 1, 0, 0.6, 1
 	] );
 
 	var geometry = new THREE.BufferGeometry();

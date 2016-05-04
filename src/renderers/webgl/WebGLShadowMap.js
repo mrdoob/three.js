@@ -6,28 +6,28 @@
 THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	var _gl = _renderer.context,
-	_state = _renderer.state,
-	_frustum = new THREE.Frustum(),
-	_projScreenMatrix = new THREE.Matrix4(),
+		_state = _renderer.state,
+		_frustum = new THREE.Frustum(),
+		_projScreenMatrix = new THREE.Matrix4(),
 
-	_lightShadows = _lights.shadows,
+		_lightShadows = _lights.shadows,
 
-	_shadowMapSize = new THREE.Vector2(),
+		_shadowMapSize = new THREE.Vector2(),
 
-	_lookTarget = new THREE.Vector3(),
-	_lightPositionWorld = new THREE.Vector3(),
+		_lookTarget = new THREE.Vector3(),
+		_lightPositionWorld = new THREE.Vector3(),
 
-	_renderList = [],
+		_renderList = [],
 
-	_MorphingFlag = 1,
-	_SkinningFlag = 2,
+		_MorphingFlag = 1,
+		_SkinningFlag = 2,
 
-	_NumberOfMaterialVariants = ( _MorphingFlag | _SkinningFlag ) + 1,
+		_NumberOfMaterialVariants = ( _MorphingFlag | _SkinningFlag ) + 1,
 
-	_depthMaterials = new Array( _NumberOfMaterialVariants ),
-	_distanceMaterials = new Array( _NumberOfMaterialVariants ),
+		_depthMaterials = new Array( _NumberOfMaterialVariants ),
+		_distanceMaterials = new Array( _NumberOfMaterialVariants ),
 
-	_materialCache = {};
+		_materialCache = {};
 
 	var cubeDirections = [
 		new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( - 1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ),
@@ -36,7 +36,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	var cubeUps = [
 		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ),
-		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ),	new THREE.Vector3( 0, 0, - 1 )
+		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ), new THREE.Vector3( 0, 0, - 1 )
 	];
 
 	var cube2DViewPorts = [
@@ -53,7 +53,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	var distanceShader = THREE.ShaderLib[ "distanceRGBA" ];
 	var distanceUniforms = THREE.UniformsUtils.clone( distanceShader.uniforms );
 
-	for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
+	for ( var i = 0; i !== _NumberOfMaterialVariants; ++i ) {
 
 		var useMorphing = ( i & _MorphingFlag ) !== 0;
 		var useSkinning = ( i & _SkinningFlag ) !== 0;
@@ -110,9 +110,10 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		// render depth map
 
-		var faceCount, isPointLight;
+		var faceCount,
+			isPointLight;
 
-		for ( var i = 0, il = _lightShadows.length; i < il; i ++ ) {
+		for ( var i = 0, il = _lightShadows.length; i < il; i++ ) {
 
 			var light = _lightShadows[ i ];
 
@@ -193,7 +194,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			// render shadow map for each cube face (if omni-directional) or
 			// run a single pass if not
 
-			for ( var face = 0; face < faceCount; face ++ ) {
+			for ( var face = 0; face < faceCount; face++ ) {
 
 				if ( isPointLight ) {
 
@@ -241,7 +242,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				// render shadow map
 				// render regular objects
 
-				for ( var j = 0, jl = _renderList.length; j < jl; j ++ ) {
+				for ( var j = 0, jl = _renderList.length; j < jl; j++ ) {
 
 					var object = _renderList[ j ];
 					var geometry = _objects.update( object );
@@ -252,7 +253,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 						var groups = geometry.groups;
 						var materials = material.materials;
 
-						for ( var k = 0, kl = groups.length; k < kl; k ++ ) {
+						for ( var k = 0, kl = groups.length; k < kl; k++ ) {
 
 							var group = groups[ k ];
 							var groupMaterial = materials[ group.materialIndex ];
@@ -281,7 +282,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		// Restore GL state.
 		var clearColor = _renderer.getClearColor(),
-		clearAlpha = _renderer.getClearAlpha();
+			clearAlpha = _renderer.getClearAlpha();
 		_renderer.setClearColor( clearColor, clearAlpha );
 
 		_state.enable( _gl.BLEND );
@@ -315,14 +316,16 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		if ( ! customMaterial ) {
 
 			var useMorphing = geometry.morphTargets !== undefined &&
-					geometry.morphTargets.length > 0 && material.morphTargets;
+			geometry.morphTargets.length > 0 && material.morphTargets;
 
 			var useSkinning = object instanceof THREE.SkinnedMesh && material.skinning;
 
 			var variantIndex = 0;
 
-			if ( useMorphing ) variantIndex |= _MorphingFlag;
-			if ( useSkinning ) variantIndex |= _SkinningFlag;
+			if ( useMorphing )
+				variantIndex |= _MorphingFlag;
+			if ( useSkinning )
+				variantIndex |= _SkinningFlag;
 
 			result = materialVariants[ variantIndex ];
 
@@ -333,13 +336,14 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		}
 
 		if ( _renderer.localClippingEnabled &&
-			 material.clipShadows === true &&
-				material.clippingPlanes.length !== 0 ) {
+			material.clipShadows === true &&
+			material.clippingPlanes.length !== 0 ) {
 
 			// in this case we need a unique material instance reflecting the
 			// appropriate state
 
-			var keyA = result.uuid, keyB = material.uuid;
+			var keyA = result.uuid,
+				keyB = material.uuid;
 
 			var materialsForVariant = _materialCache[ keyA ];
 
@@ -404,7 +408,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		var children = object.children;
 
-		for ( var i = 0, l = children.length; i < l; i ++ ) {
+		for ( var i = 0, l = children.length; i < l; i++ ) {
 
 			projectObject( children[ i ], camera, shadowCamera );
 

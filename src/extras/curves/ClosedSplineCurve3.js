@@ -2,7 +2,6 @@
  *	Closed Spline 3D curve
  **************************************************************/
 
-
 THREE.ClosedSplineCurve3 = function ( points ) {
 
 	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Please use THREE.CatmullRomCurve3.' );

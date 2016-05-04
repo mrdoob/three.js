@@ -10,7 +10,6 @@ THREE.Box2 = function ( min, max ) {
 };
 
 THREE.Box2.prototype = {
-
 	constructor: THREE.Box2,
 
 	set: function ( min, max ) {
@@ -26,7 +25,7 @@ THREE.Box2.prototype = {
 
 		this.makeEmpty();
 
-		for ( var i = 0, il = points.length; i < il; i ++ ) {
+		for ( var i = 0, il = points.length; i < il; i++ ) {
 
 			this.expandByPoint( points[ i ] );
 
@@ -128,7 +127,7 @@ THREE.Box2.prototype = {
 	containsPoint: function ( point ) {
 
 		if ( point.x < this.min.x || point.x > this.max.x ||
-		     point.y < this.min.y || point.y > this.max.y ) {
+			point.y < this.min.y || point.y > this.max.y ) {
 
 			return false;
 
@@ -141,7 +140,7 @@ THREE.Box2.prototype = {
 	containsBox: function ( box ) {
 
 		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-		     ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
+			( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
 
 			return true;
 
@@ -170,7 +169,7 @@ THREE.Box2.prototype = {
 		// using 6 splitting planes to rule out intersections.
 
 		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
-		     box.max.y < this.min.y || box.min.y > this.max.y ) {
+			box.max.y < this.min.y || box.min.y > this.max.y ) {
 
 			return false;
 
@@ -232,5 +231,4 @@ THREE.Box2.prototype = {
 		return box.min.equals( this.min ) && box.max.equals( this.max );
 
 	}
-
 };

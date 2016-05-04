@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.MorphBlendMesh = function( geometry, material ) {
+THREE.MorphBlendMesh = function ( geometry, material ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
@@ -32,7 +32,6 @@ THREE.MorphBlendMesh.prototype.constructor = THREE.MorphBlendMesh;
 THREE.MorphBlendMesh.prototype.createAnimation = function ( name, start, end, fps ) {
 
 	var animation = {
-
 		start: start,
 		end: end,
 
@@ -52,7 +51,6 @@ THREE.MorphBlendMesh.prototype.createAnimation = function ( name, start, end, fp
 
 		directionBackwards: false,
 		mirroredLoop: false
-
 	};
 
 	this.animationsMap[ name ] = animation;
@@ -64,11 +62,12 @@ THREE.MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
 
 	var pattern = /([a-z]+)_?(\d+)/i;
 
-	var firstAnimation, frameRanges = {};
+	var firstAnimation,
+		frameRanges = {};
 
 	var geometry = this.geometry;
 
-	for ( var i = 0, il = geometry.morphTargets.length; i < il; i ++ ) {
+	for ( var i = 0, il = geometry.morphTargets.length; i < il; i++ ) {
 
 		var morph = geometry.morphTargets[ i ];
 		var chunks = morph.name.match( pattern );
@@ -77,14 +76,18 @@ THREE.MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
 
 			var name = chunks[ 1 ];
 
-			if ( ! frameRanges[ name ] ) frameRanges[ name ] = { start: Infinity, end: - Infinity };
+			if ( ! frameRanges[ name ] )
+				frameRanges[ name ] = { start: Infinity, end: - Infinity };
 
 			var range = frameRanges[ name ];
 
-			if ( i < range.start ) range.start = i;
-			if ( i > range.end ) range.end = i;
+			if ( i < range.start )
+				range.start = i;
+			if ( i > range.end )
+				range.end = i;
 
-			if ( ! firstAnimation ) firstAnimation = name;
+			if ( ! firstAnimation )
+				firstAnimation = name;
 
 		}
 
@@ -240,7 +243,7 @@ THREE.MorphBlendMesh.prototype.stopAnimation = function ( name ) {
 
 THREE.MorphBlendMesh.prototype.update = function ( delta ) {
 
-	for ( var i = 0, il = this.animationsList.length; i < il; i ++ ) {
+	for ( var i = 0, il = this.animationsList.length; i < il; i++ ) {
 
 		var animation = this.animationsList[ i ];
 
@@ -276,7 +279,8 @@ THREE.MorphBlendMesh.prototype.update = function ( delta ) {
 
 			animation.time = animation.time % animation.duration;
 
-			if ( animation.time < 0 ) animation.time += animation.duration;
+			if ( animation.time < 0 )
+				animation.time += animation.duration;
 
 		}
 
@@ -297,7 +301,8 @@ THREE.MorphBlendMesh.prototype.update = function ( delta ) {
 
 		var mix = ( animation.time % frameTime ) / frameTime;
 
-		if ( animation.directionBackwards ) mix = 1 - mix;
+		if ( animation.directionBackwards )
+			mix = 1 - mix;
 
 		if ( animation.currentFrame !== animation.lastFrame ) {
 

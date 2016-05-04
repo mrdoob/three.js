@@ -11,7 +11,7 @@ THREE.SkeletonHelper = function ( object ) {
 
 	var geometry = new THREE.Geometry();
 
-	for ( var i = 0; i < this.bones.length; i ++ ) {
+	for ( var i = 0; i < this.bones.length; i++ ) {
 
 		var bone = this.bones[ i ];
 
@@ -41,11 +41,10 @@ THREE.SkeletonHelper = function ( object ) {
 
 };
 
-
 THREE.SkeletonHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREE.SkeletonHelper.prototype.constructor = THREE.SkeletonHelper;
 
-THREE.SkeletonHelper.prototype.getBoneList = function( object ) {
+THREE.SkeletonHelper.prototype.getBoneList = function ( object ) {
 
 	var boneList = [];
 
@@ -55,7 +54,7 @@ THREE.SkeletonHelper.prototype.getBoneList = function( object ) {
 
 	}
 
-	for ( var i = 0; i < object.children.length; i ++ ) {
+	for ( var i = 0; i < object.children.length; i++ ) {
 
 		boneList.push.apply( boneList, this.getBoneList( object.children[ i ] ) );
 
@@ -75,7 +74,7 @@ THREE.SkeletonHelper.prototype.update = function () {
 
 	var j = 0;
 
-	for ( var i = 0; i < this.bones.length; i ++ ) {
+	for ( var i = 0; i < this.bones.length; i++ ) {
 
 		var bone = this.bones[ i ];
 

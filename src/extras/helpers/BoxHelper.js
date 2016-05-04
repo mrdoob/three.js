@@ -24,7 +24,7 @@ THREE.BoxHelper = function ( object ) {
 THREE.BoxHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREE.BoxHelper.prototype.constructor = THREE.BoxHelper;
 
-THREE.BoxHelper.prototype.update = ( function () {
+THREE.BoxHelper.prototype.update = (function () {
 
 	var box = new THREE.Box3();
 
@@ -64,14 +64,30 @@ THREE.BoxHelper.prototype.update = ( function () {
 		var position = this.geometry.attributes.position;
 		var array = position.array;
 
-		array[  0 ] = max.x; array[  1 ] = max.y; array[  2 ] = max.z;
-		array[  3 ] = min.x; array[  4 ] = max.y; array[  5 ] = max.z;
-		array[  6 ] = min.x; array[  7 ] = min.y; array[  8 ] = max.z;
-		array[  9 ] = max.x; array[ 10 ] = min.y; array[ 11 ] = max.z;
-		array[ 12 ] = max.x; array[ 13 ] = max.y; array[ 14 ] = min.z;
-		array[ 15 ] = min.x; array[ 16 ] = max.y; array[ 17 ] = min.z;
-		array[ 18 ] = min.x; array[ 19 ] = min.y; array[ 20 ] = min.z;
-		array[ 21 ] = max.x; array[ 22 ] = min.y; array[ 23 ] = min.z;
+		array[ 0 ] = max.x;
+		array[ 1 ] = max.y;
+		array[ 2 ] = max.z;
+		array[ 3 ] = min.x;
+		array[ 4 ] = max.y;
+		array[ 5 ] = max.z;
+		array[ 6 ] = min.x;
+		array[ 7 ] = min.y;
+		array[ 8 ] = max.z;
+		array[ 9 ] = max.x;
+		array[ 10 ] = min.y;
+		array[ 11 ] = max.z;
+		array[ 12 ] = max.x;
+		array[ 13 ] = max.y;
+		array[ 14 ] = min.z;
+		array[ 15 ] = min.x;
+		array[ 16 ] = max.y;
+		array[ 17 ] = min.z;
+		array[ 18 ] = min.x;
+		array[ 19 ] = min.y;
+		array[ 20 ] = min.z;
+		array[ 21 ] = max.x;
+		array[ 22 ] = min.y;
+		array[ 23 ] = min.z;
 
 		position.needsUpdate = true;
 
@@ -79,4 +95,4 @@ THREE.BoxHelper.prototype.update = ( function () {
 
 	};
 
-} )();
+})();

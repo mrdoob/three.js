@@ -26,7 +26,7 @@ THREE.AudioListener.prototype.getInput = function () {
 
 };
 
-THREE.AudioListener.prototype.removeFilter = function ( ) {
+THREE.AudioListener.prototype.removeFilter = function () {
 
 	if ( this.filter !== null ) {
 
@@ -76,8 +76,7 @@ THREE.AudioListener.prototype.getMasterVolume = function () {
 
 };
 
-
-THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
+THREE.AudioListener.prototype.updateMatrixWorld = (function () {
 
 	var position = new THREE.Vector3();
 	var quaternion = new THREE.Quaternion();
@@ -101,4 +100,4 @@ THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 
 	};
 
-} )();
+})();

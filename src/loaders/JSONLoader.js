@@ -19,12 +19,11 @@ THREE.JSONLoader = function ( manager ) {
 };
 
 THREE.JSONLoader.prototype = {
-
 	constructor: THREE.JSONLoader,
 
 	// Deprecated
 
-	get statusDomElement () {
+	get statusDomElement() {
 
 		if ( this._statusDomElement === undefined ) {
 
@@ -37,7 +36,7 @@ THREE.JSONLoader.prototype = {
 
 	},
 
-	load: function( url, onLoad, onProgress, onError ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -90,7 +89,7 @@ THREE.JSONLoader.prototype = {
 	parse: function ( json, texturePath ) {
 
 		var geometry = new THREE.Geometry(),
-		scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
+			scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
 
 		parseModel( scale );
 
@@ -109,41 +108,57 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-			var i, j, fi,
+			var i,
+				j,
+				fi,
 
-			offset, zLength,
+				offset,
+				zLength,
 
-		colorIndex, normalIndex, uvIndex, materialIndex,
+				colorIndex,
+				normalIndex,
+				uvIndex,
+				materialIndex,
 
-			type,
-			isQuad,
-			hasMaterial,
-			hasFaceVertexUv,
-			hasFaceNormal, hasFaceVertexNormal,
-			hasFaceColor, hasFaceVertexColor,
+				type,
+				isQuad,
+				hasMaterial,
+				hasFaceVertexUv,
+				hasFaceNormal,
+				hasFaceVertexNormal,
+				hasFaceColor,
+				hasFaceVertexColor,
 
-		vertex, face, faceA, faceB, hex, normal,
+				vertex,
+				face,
+				faceA,
+				faceB,
+				hex,
+				normal,
 
-			uvLayer, uv, u, v,
+				uvLayer,
+				uv,
+				u,
+				v,
 
-			faces = json.faces,
-			vertices = json.vertices,
-			normals = json.normals,
-			colors = json.colors,
+				faces = json.faces,
+				vertices = json.vertices,
+				normals = json.normals,
+				colors = json.colors,
 
-			nUvLayers = 0;
+				nUvLayers = 0;
 
 			if ( json.uvs !== undefined ) {
 
 				// disregard empty arrays
 
-				for ( i = 0; i < json.uvs.length; i ++ ) {
+				for ( i = 0; i < json.uvs.length; i++ ) {
 
-					if ( json.uvs[ i ].length ) nUvLayers ++;
+					if ( json.uvs[ i ].length ) nUvLayers++;
 
 				}
 
-				for ( i = 0; i < nUvLayers; i ++ ) {
+				for ( i = 0; i < nUvLayers; i++ ) {
 
 					geometry.faceVertexUvs[ i ] = [];
 
@@ -158,9 +173,9 @@ THREE.JSONLoader.prototype = {
 
 				vertex = new THREE.Vector3();
 
-				vertex.x = vertices[ offset ++ ] * scale;
-				vertex.y = vertices[ offset ++ ] * scale;
-				vertex.z = vertices[ offset ++ ] * scale;
+				vertex.x = vertices[ offset++ ] * scale;
+				vertex.y = vertices[ offset++ ] * scale;
+				vertex.z = vertices[ offset++ ] * scale;
 
 				geometry.vertices.push( vertex );
 
@@ -171,16 +186,15 @@ THREE.JSONLoader.prototype = {
 
 			while ( offset < zLength ) {
 
-				type = faces[ offset ++ ];
+				type = faces[ offset++ ];
 
-
-				isQuad              = isBitSet( type, 0 );
-				hasMaterial         = isBitSet( type, 1 );
-				hasFaceVertexUv     = isBitSet( type, 3 );
-				hasFaceNormal       = isBitSet( type, 4 );
+				isQuad = isBitSet( type, 0 );
+				hasMaterial = isBitSet( type, 1 );
+				hasFaceVertexUv = isBitSet( type, 3 );
+				hasFaceNormal = isBitSet( type, 4 );
 				hasFaceVertexNormal = isBitSet( type, 5 );
-				hasFaceColor	     = isBitSet( type, 6 );
-				hasFaceVertexColor  = isBitSet( type, 7 );
+				hasFaceColor = isBitSet( type, 6 );
+				hasFaceVertexColor = isBitSet( type, 7 );
 
 				// console.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
 
@@ -200,7 +214,7 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasMaterial ) {
 
-						materialIndex = faces[ offset ++ ];
+						materialIndex = faces[ offset++ ];
 						faceA.materialIndex = materialIndex;
 						faceB.materialIndex = materialIndex;
 
@@ -212,16 +226,16 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasFaceVertexUv ) {
 
-						for ( i = 0; i < nUvLayers; i ++ ) {
+						for ( i = 0; i < nUvLayers; i++ ) {
 
 							uvLayer = json.uvs[ i ];
 
 							geometry.faceVertexUvs[ i ][ fi ] = [];
 							geometry.faceVertexUvs[ i ][ fi + 1 ] = [];
 
-							for ( j = 0; j < 4; j ++ ) {
+							for ( j = 0; j < 4; j++ ) {
 
-								uvIndex = faces[ offset ++ ];
+								uvIndex = faces[ offset++ ];
 
 								u = uvLayer[ uvIndex * 2 ];
 								v = uvLayer[ uvIndex * 2 + 1 ];
@@ -239,11 +253,11 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasFaceNormal ) {
 
-						normalIndex = faces[ offset ++ ] * 3;
+						normalIndex = faces[ offset++ ] * 3;
 
 						faceA.normal.set(
-							normals[ normalIndex ++ ],
-							normals[ normalIndex ++ ],
+							normals[ normalIndex++ ],
+							normals[ normalIndex++ ],
 							normals[ normalIndex ]
 						);
 
@@ -253,16 +267,15 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasFaceVertexNormal ) {
 
-						for ( i = 0; i < 4; i ++ ) {
+						for ( i = 0; i < 4; i++ ) {
 
-							normalIndex = faces[ offset ++ ] * 3;
+							normalIndex = faces[ offset++ ] * 3;
 
 							normal = new THREE.Vector3(
-								normals[ normalIndex ++ ],
-								normals[ normalIndex ++ ],
+								normals[ normalIndex++ ],
+								normals[ normalIndex++ ],
 								normals[ normalIndex ]
 							);
-
 
 							if ( i !== 2 ) faceA.vertexNormals.push( normal );
 							if ( i !== 0 ) faceB.vertexNormals.push( normal );
@@ -271,10 +284,9 @@ THREE.JSONLoader.prototype = {
 
 					}
 
-
 					if ( hasFaceColor ) {
 
-						colorIndex = faces[ offset ++ ];
+						colorIndex = faces[ offset++ ];
 						hex = colors[ colorIndex ];
 
 						faceA.color.setHex( hex );
@@ -282,12 +294,11 @@ THREE.JSONLoader.prototype = {
 
 					}
 
-
 					if ( hasFaceVertexColor ) {
 
-						for ( i = 0; i < 4; i ++ ) {
+						for ( i = 0; i < 4; i++ ) {
 
-							colorIndex = faces[ offset ++ ];
+							colorIndex = faces[ offset++ ];
 							hex = colors[ colorIndex ];
 
 							if ( i !== 2 ) faceA.vertexColors.push( new THREE.Color( hex ) );
@@ -303,13 +314,13 @@ THREE.JSONLoader.prototype = {
 				} else {
 
 					face = new THREE.Face3();
-					face.a = faces[ offset ++ ];
-					face.b = faces[ offset ++ ];
-					face.c = faces[ offset ++ ];
+					face.a = faces[ offset++ ];
+					face.b = faces[ offset++ ];
+					face.c = faces[ offset++ ];
 
 					if ( hasMaterial ) {
 
-						materialIndex = faces[ offset ++ ];
+						materialIndex = faces[ offset++ ];
 						face.materialIndex = materialIndex;
 
 					}
@@ -320,15 +331,15 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasFaceVertexUv ) {
 
-						for ( i = 0; i < nUvLayers; i ++ ) {
+						for ( i = 0; i < nUvLayers; i++ ) {
 
 							uvLayer = json.uvs[ i ];
 
 							geometry.faceVertexUvs[ i ][ fi ] = [];
 
-							for ( j = 0; j < 3; j ++ ) {
+							for ( j = 0; j < 3; j++ ) {
 
-								uvIndex = faces[ offset ++ ];
+								uvIndex = faces[ offset++ ];
 
 								u = uvLayer[ uvIndex * 2 ];
 								v = uvLayer[ uvIndex * 2 + 1 ];
@@ -345,11 +356,11 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasFaceNormal ) {
 
-						normalIndex = faces[ offset ++ ] * 3;
+						normalIndex = faces[ offset++ ] * 3;
 
 						face.normal.set(
-							normals[ normalIndex ++ ],
-							normals[ normalIndex ++ ],
+							normals[ normalIndex++ ],
+							normals[ normalIndex++ ],
 							normals[ normalIndex ]
 						);
 
@@ -357,13 +368,13 @@ THREE.JSONLoader.prototype = {
 
 					if ( hasFaceVertexNormal ) {
 
-						for ( i = 0; i < 3; i ++ ) {
+						for ( i = 0; i < 3; i++ ) {
 
-							normalIndex = faces[ offset ++ ] * 3;
+							normalIndex = faces[ offset++ ] * 3;
 
 							normal = new THREE.Vector3(
-								normals[ normalIndex ++ ],
-								normals[ normalIndex ++ ],
+								normals[ normalIndex++ ],
+								normals[ normalIndex++ ],
 								normals[ normalIndex ]
 							);
 
@@ -373,20 +384,18 @@ THREE.JSONLoader.prototype = {
 
 					}
 
-
 					if ( hasFaceColor ) {
 
-						colorIndex = faces[ offset ++ ];
+						colorIndex = faces[ offset++ ];
 						face.color.setHex( colors[ colorIndex ] );
 
 					}
 
-
 					if ( hasFaceVertexColor ) {
 
-						for ( i = 0; i < 3; i ++ ) {
+						for ( i = 0; i < 3; i++ ) {
 
-							colorIndex = faces[ offset ++ ];
+							colorIndex = faces[ offset++ ];
 							face.vertexColors.push( new THREE.Color( colors[ colorIndex ] ) );
 
 						}
@@ -399,7 +408,7 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		function parseSkin() {
 
@@ -409,7 +418,7 @@ THREE.JSONLoader.prototype = {
 
 				for ( var i = 0, l = json.skinWeights.length; i < l; i += influencesPerVertex ) {
 
-					var x =                               json.skinWeights[ i ];
+					var x = json.skinWeights[ i ];
 					var y = ( influencesPerVertex > 1 ) ? json.skinWeights[ i + 1 ] : 0;
 					var z = ( influencesPerVertex > 2 ) ? json.skinWeights[ i + 2 ] : 0;
 					var w = ( influencesPerVertex > 3 ) ? json.skinWeights[ i + 3 ] : 0;
@@ -424,7 +433,7 @@ THREE.JSONLoader.prototype = {
 
 				for ( var i = 0, l = json.skinIndices.length; i < l; i += influencesPerVertex ) {
 
-					var a =                               json.skinIndices[ i ];
+					var a = json.skinIndices[ i ];
 					var b = ( influencesPerVertex > 1 ) ? json.skinIndices[ i + 1 ] : 0;
 					var c = ( influencesPerVertex > 2 ) ? json.skinIndices[ i + 2 ] : 0;
 					var d = ( influencesPerVertex > 3 ) ? json.skinIndices[ i + 3 ] : 0;
@@ -444,13 +453,13 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		function parseMorphing( scale ) {
 
 			if ( json.morphTargets !== undefined ) {
 
-				for ( var i = 0, l = json.morphTargets.length; i < l; i ++ ) {
+				for ( var i = 0, l = json.morphTargets.length; i < l; i++ ) {
 
 					geometry.morphTargets[ i ] = {};
 					geometry.morphTargets[ i ].name = json.morphTargets[ i ].name;
@@ -481,7 +490,7 @@ THREE.JSONLoader.prototype = {
 				var faces = geometry.faces;
 				var morphColors = json.morphColors[ 0 ].colors;
 
-				for ( var i = 0, l = faces.length; i < l; i ++ ) {
+				for ( var i = 0, l = faces.length; i < l; i++ ) {
 
 					faces[ i ].color.fromArray( morphColors, i * 3 );
 
@@ -518,7 +527,7 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-			for ( var i = 0; i < animations.length; i ++ ) {
+			for ( var i = 0; i < animations.length; i++ ) {
 
 				var clip = THREE.AnimationClip.parseAnimation( animations[ i ], geometry.bones );
 				if ( clip ) outputAnimations.push( clip );
@@ -534,9 +543,10 @@ THREE.JSONLoader.prototype = {
 
 			}
 
-			if ( outputAnimations.length > 0 ) geometry.animations = outputAnimations;
+			if ( outputAnimations.length > 0 )
+				geometry.animations = outputAnimations;
 
-		};
+		}
 
 		if ( json.materials === undefined || json.materials.length === 0 ) {
 
@@ -551,5 +561,4 @@ THREE.JSONLoader.prototype = {
 		}
 
 	}
-
 };

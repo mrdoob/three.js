@@ -435,7 +435,7 @@ Object.defineProperties( THREE, {
 			return new THREE.PointsMaterial( parameters );
 		}
 	},
-	ParticleSystemMaterial:{
+	ParticleSystemMaterial: {
 		value: function ( parameters ) {
 			console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointsMaterial.' );
 			return new THREE.PointsMaterial( parameters );
@@ -705,7 +705,6 @@ Object.defineProperties( THREE.Audio.prototype, {
 //
 
 THREE.GeometryUtils = {
-
 	merge: function ( geometry1, geometry2, materialIndexOffset ) {
 
 		console.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
@@ -731,11 +730,9 @@ THREE.GeometryUtils = {
 		return geometry.center();
 
 	}
-
 };
 
 THREE.ImageUtils = {
-
 	crossOrigin: undefined,
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
@@ -747,7 +744,8 @@ THREE.ImageUtils = {
 
 		var texture = loader.load( url, onLoad, undefined, onError );
 
-		if ( mapping ) texture.mapping = mapping;
+		if ( mapping )
+			texture.mapping = mapping;
 
 		return texture;
 
@@ -762,7 +760,8 @@ THREE.ImageUtils = {
 
 		var texture = loader.load( urls, onLoad, undefined, onError );
 
-		if ( mapping ) texture.mapping = mapping;
+		if ( mapping )
+			texture.mapping = mapping;
 
 		return texture;
 
@@ -779,7 +778,6 @@ THREE.ImageUtils = {
 		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' );
 
 	}
-
 };
 
 //

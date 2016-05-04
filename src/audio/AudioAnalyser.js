@@ -14,7 +14,6 @@ THREE.AudioAnalyser = function ( audio, fftSize ) {
 };
 
 THREE.AudioAnalyser.prototype = {
-
 	constructor: THREE.AudioAnalyser,
 
 	getData: function () {
@@ -23,5 +22,4 @@ THREE.AudioAnalyser.prototype = {
 		return this.data;
 
 	}
-
 };

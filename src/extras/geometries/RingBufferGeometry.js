@@ -31,26 +31,29 @@ THREE.RingBufferGeometry = function ( innerRadius, outerRadius, thetaSegments, p
 	var indexCount = thetaSegments * phiSegments * 2 * 3;
 
 	// buffers
-	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array) ( indexCount ), 1 );
 	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
 
 	// some helper variables
-	var index = 0, indexOffset = 0, segment;
+	var index = 0,
+		indexOffset = 0,
+		segment;
 	var radius = innerRadius;
 	var radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
 	var vertex = new THREE.Vector3();
 	var uv = new THREE.Vector2();
-	var j, i;
+	var j,
+		i;
 
 	// generate vertices, normals and uvs
 
 	// values are generate from the inside of the ring to the outside
 
-	for ( j = 0; j <= phiSegments; j ++ ) {
+	for ( j = 0; j <= phiSegments; j++ ) {
 
-		for ( i = 0; i <= thetaSegments; i ++ ) {
+		for ( i = 0; i <= thetaSegments; i++ ) {
 
 			segment = thetaStart + i / thetaSegments * thetaLength;
 
@@ -79,11 +82,11 @@ THREE.RingBufferGeometry = function ( innerRadius, outerRadius, thetaSegments, p
 
 	// generate indices
 
-	for ( j = 0; j < phiSegments; j ++ ) {
+	for ( j = 0; j < phiSegments; j++ ) {
 
 		var thetaSegmentLevel = j * ( thetaSegments + 1 );
 
-		for ( i = 0; i < thetaSegments; i ++ ) {
+		for ( i = 0; i < thetaSegments; i++ ) {
 
 			segment = i + thetaSegmentLevel;
 

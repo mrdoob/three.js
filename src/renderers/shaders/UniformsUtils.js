@@ -3,12 +3,11 @@
  */
 
 THREE.UniformsUtils = {
-
 	merge: function ( uniforms ) {
 
 		var merged = {};
 
-		for ( var u = 0; u < uniforms.length; u ++ ) {
+		for ( var u = 0; u < uniforms.length; u++ ) {
 
 			var tmp = this.clone( uniforms[ u ] );
 
@@ -37,12 +36,12 @@ THREE.UniformsUtils = {
 				var parameter_src = uniforms_src[ u ][ p ];
 
 				if ( parameter_src instanceof THREE.Color ||
-					 parameter_src instanceof THREE.Vector2 ||
-					 parameter_src instanceof THREE.Vector3 ||
-					 parameter_src instanceof THREE.Vector4 ||
-					 parameter_src instanceof THREE.Matrix3 ||
-					 parameter_src instanceof THREE.Matrix4 ||
-					 parameter_src instanceof THREE.Texture ) {
+					parameter_src instanceof THREE.Vector2 ||
+					parameter_src instanceof THREE.Vector3 ||
+					parameter_src instanceof THREE.Vector4 ||
+					parameter_src instanceof THREE.Matrix3 ||
+					parameter_src instanceof THREE.Matrix4 ||
+					parameter_src instanceof THREE.Texture ) {
 
 					uniforms_dst[ u ][ p ] = parameter_src.clone();
 
@@ -63,5 +62,4 @@ THREE.UniformsUtils = {
 		return uniforms_dst;
 
 	}
-
 };

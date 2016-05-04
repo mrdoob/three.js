@@ -12,7 +12,8 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	}
 
-	var type, size;
+	var type,
+		size;
 
 	function setIndex( index ) {
 
@@ -34,9 +35,10 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		_gl.drawElements( mode, count, type, start * size );
 
-		_infoRender.calls ++;
+		_infoRender.calls++;
 		_infoRender.vertices += count;
-		if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+		if ( mode === _gl.TRIANGLES )
+			_infoRender.faces += count / 3;
 
 	}
 
@@ -53,9 +55,10 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		extension.drawElementsInstancedANGLE( mode, count, type, start * size, geometry.maxInstancedCount );
 
-		_infoRender.calls ++;
+		_infoRender.calls++;
 		_infoRender.vertices += count * geometry.maxInstancedCount;
-		if ( mode === _gl.TRIANGLES ) _infoRender.faces += geometry.maxInstancedCount * count / 3;
+		if ( mode === _gl.TRIANGLES )
+			_infoRender.faces += geometry.maxInstancedCount * count / 3;
 	}
 
 	this.setMode = setMode;

@@ -16,7 +16,7 @@ THREE.SpotLight = function ( color, intensity, distance, angle, penumbra, decay 
 	this.distance = ( distance !== undefined ) ? distance : 0;
 	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
 	this.penumbra = ( penumbra !== undefined ) ? penumbra : 0;
-	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
+	this.decay = ( decay !== undefined ) ? decay : 1; // for physically correct lights, should be 2.
 
 	this.shadow = new THREE.SpotLightShadow();
 
@@ -26,7 +26,6 @@ THREE.SpotLight.prototype = Object.create( THREE.Light.prototype );
 THREE.SpotLight.prototype.constructor = THREE.SpotLight;
 
 Object.defineProperty( THREE.SpotLight.prototype, "power", {
-
 	get: function () {
 
 		// intensity = power per solid angle.
@@ -42,7 +41,6 @@ Object.defineProperty( THREE.SpotLight.prototype, "power", {
 		this.intensity = power / Math.PI;
 
 	}
-
 } );
 
 THREE.SpotLight.prototype.copy = function ( source ) {
