@@ -29,7 +29,7 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 	var indexCount = ( vertexCount / 4 ) * 6;
 
 	// buffers
-	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array) ( indexCount );
 	var vertices = new Float32Array( vertexCount * 3 );
 	var normals = new Float32Array( vertexCount * 3 );
 	var uvs = new Float32Array( vertexCount * 2 );
@@ -47,7 +47,7 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 	buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height,   width,  depthSegments, heightSegments, 0 ); // px
 	buildPlane( 'z', 'y', 'x',   1, - 1, depth, height, - width,  depthSegments, heightSegments, 1 ); // nx
 	buildPlane( 'x', 'z', 'y',   1,   1, width, depth,    height, widthSegments, depthSegments,  2 ); // py
-	buildPlane( 'x', 'z', 'y',   1, - 1, width, depth,  - height, widthSegments, depthSegments,  3 ); // ny
+	buildPlane( 'x', 'z', 'y',   1, - 1, width, depth, - height, widthSegments, depthSegments,  3 ); // ny
 	buildPlane( 'x', 'y', 'z',   1, - 1, width, height,   depth,  widthSegments, heightSegments, 4 ); // pz
 	buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth,  widthSegments, heightSegments, 5 ); // nz
 
@@ -59,7 +59,7 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 
 	// helper functions
 
-	function calculateVertexCount ( w, h, d ) {
+	function calculateVertexCount( w, h, d ) {
 
 		var segments = 0;
 
@@ -72,9 +72,9 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 
 	}
 
-	function buildPlane ( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
+	function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
 
-		var segmentWidth	= width / gridX;
+		var segmentWidth = width / gridX;
 		var segmentHeight = height / gridY;
 
 		var widthHalf = width / 2;
@@ -91,11 +91,11 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 
 		// generate vertices, normals and uvs
 
-		for ( var iy = 0; iy < gridY1; iy ++ ) {
+		for ( var iy = 0; iy < gridY1; iy++ ) {
 
 			var y = iy * segmentHeight - heightHalf;
 
-			for ( var ix = 0; ix < gridX1; ix ++ ) {
+			for ( var ix = 0; ix < gridX1; ix++ ) {
 
 				var x = ix * segmentWidth - widthHalf;
 
@@ -136,9 +136,9 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 		// 2. a single segment consists of two faces
 		// 3. so we need to generate six (2*3) indices per segment
 
-		for ( iy = 0; iy < gridY; iy ++ ) {
+		for ( iy = 0; iy < gridY; iy++ ) {
 
-			for ( ix = 0; ix < gridX; ix ++ ) {
+			for ( ix = 0; ix < gridX; ix++ ) {
 
 				// indices
 				var a = numberOfVertices + ix + gridX1 * iy;

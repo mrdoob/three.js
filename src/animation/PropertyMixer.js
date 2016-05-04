@@ -18,14 +18,18 @@ THREE.PropertyMixer = function ( binding, typeName, valueSize ) {
 
 	switch ( typeName ) {
 
-		case 'quaternion':			mixFunction = this._slerp;		break;
+		case 'quaternion':
+			mixFunction = this._slerp;
+			break;
 
 		case 'string':
 		case 'bool':
 
-			bufferType = Array,		mixFunction = this._select;		break;
+			bufferType = Array, mixFunction = this._select;
+			break;
 
-		default:					mixFunction = this._lerp;
+		default:
+			mixFunction = this._lerp;
 
 	}
 
@@ -51,11 +55,10 @@ THREE.PropertyMixer = function ( binding, typeName, valueSize ) {
 };
 
 THREE.PropertyMixer.prototype = {
-
 	constructor: THREE.PropertyMixer,
 
 	// accumulate data in the 'incoming' region into 'accu<i>'
-	accumulate: function( accuIndex, weight ) {
+	accumulate: function ( accuIndex, weight ) {
 
 		// note: happily accumulating nothing when weight = 0, the caller knows
 		// the weight and shouldn't have made the call in the first place
@@ -70,7 +73,7 @@ THREE.PropertyMixer.prototype = {
 
 			// accuN := incoming * weight
 
-			for ( var i = 0; i !== stride; ++ i ) {
+			for ( var i = 0; i !== stride; ++i ) {
 
 				buffer[ offset + i ] = buffer[ i ];
 
@@ -93,7 +96,7 @@ THREE.PropertyMixer.prototype = {
 	},
 
 	// apply the state of 'accu<i>' to the binding when accus differ
-	apply: function( accuIndex ) {
+	apply: function ( accuIndex ) {
 
 		var stride = this.valueSize,
 			buffer = this.buffer,
@@ -112,11 +115,11 @@ THREE.PropertyMixer.prototype = {
 			var originalValueOffset = stride * 3;
 
 			this._mixBufferRegion(
-					buffer, offset, originalValueOffset, 1 - weight, stride );
+				buffer, offset, originalValueOffset, 1 - weight, stride );
 
 		}
 
-		for ( var i = stride, e = stride + stride; i !== e; ++ i ) {
+		for ( var i = stride, e = stride + stride; i !== e; ++i ) {
 
 			if ( buffer[ i ] !== buffer[ i + stride ] ) {
 
@@ -132,7 +135,7 @@ THREE.PropertyMixer.prototype = {
 	},
 
 	// remember the state of the bound property and copy it to both accus
-	saveOriginalState: function() {
+	saveOriginalState: function () {
 
 		var binding = this.binding;
 
@@ -144,7 +147,7 @@ THREE.PropertyMixer.prototype = {
 		binding.getValue( buffer, originalValueOffset );
 
 		// accu[0..1] := orig -- initially detect changes against the original
-		for ( var i = stride, e = originalValueOffset; i !== e; ++ i ) {
+		for ( var i = stride, e = originalValueOffset; i !== e; ++i ) {
 
 			buffer[ i ] = buffer[ originalValueOffset + ( i % stride ) ];
 
@@ -155,21 +158,20 @@ THREE.PropertyMixer.prototype = {
 	},
 
 	// apply the state previously taken via 'saveOriginalState' to the binding
-	restoreOriginalState: function() {
+	restoreOriginalState: function () {
 
 		var originalValueOffset = this.valueSize * 3;
 		this.binding.setValue( this.buffer, originalValueOffset );
 
 	},
 
-
 	// mix functions
 
-	_select: function( buffer, dstOffset, srcOffset, t, stride ) {
+	_select: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
 		if ( t >= 0.5 ) {
 
-			for ( var i = 0; i !== stride; ++ i ) {
+			for ( var i = 0; i !== stride; ++i ) {
 
 				buffer[ dstOffset + i ] = buffer[ srcOffset + i ];
 
@@ -179,18 +181,18 @@ THREE.PropertyMixer.prototype = {
 
 	},
 
-	_slerp: function( buffer, dstOffset, srcOffset, t, stride ) {
+	_slerp: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
 		THREE.Quaternion.slerpFlat( buffer, dstOffset,
-				buffer, dstOffset, buffer, srcOffset, t );
+			buffer, dstOffset, buffer, srcOffset, t );
 
 	},
 
-	_lerp: function( buffer, dstOffset, srcOffset, t, stride ) {
+	_lerp: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
 		var s = 1 - t;
 
-		for ( var i = 0; i !== stride; ++ i ) {
+		for ( var i = 0; i !== stride; ++i ) {
 
 			var j = dstOffset + i;
 
@@ -199,5 +201,4 @@ THREE.PropertyMixer.prototype = {
 		}
 
 	}
-
 };

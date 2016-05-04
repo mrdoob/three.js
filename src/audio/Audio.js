@@ -158,7 +158,8 @@ THREE.Audio.prototype.getFilter = function () {
 
 THREE.Audio.prototype.setFilter = function ( value ) {
 
-	if ( value === undefined ) value = null;
+	if ( value === undefined )
+		value = null;
 
 	if ( this.isPlaying === true ) {
 
@@ -230,7 +231,6 @@ THREE.Audio.prototype.getLoop = function () {
 	return this.source.loop;
 
 };
-
 
 THREE.Audio.prototype.setVolume = function ( value ) {
 

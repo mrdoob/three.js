@@ -2,20 +2,18 @@
  * @author tschw
  */
 
-THREE.LinearInterpolant = function(
-		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+THREE.LinearInterpolant = function (
+	parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
 	THREE.Interpolant.call(
-			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+		this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
 };
 
-THREE.LinearInterpolant.prototype =
-		Object.assign( Object.create( THREE.Interpolant.prototype ), {
-
+THREE.LinearInterpolant.prototype = Object.assign( Object.create( THREE.Interpolant.prototype ), {
 	constructor: THREE.LinearInterpolant,
 
-	interpolate_: function( i1, t0, t, t1 ) {
+	interpolate_: function ( i1, t0, t, t1 ) {
 
 		var result = this.resultBuffer,
 			values = this.sampleValues,
@@ -27,16 +25,14 @@ THREE.LinearInterpolant.prototype =
 			weight1 = ( t - t0 ) / ( t1 - t0 ),
 			weight0 = 1 - weight1;
 
-		for ( var i = 0; i !== stride; ++ i ) {
+		for ( var i = 0; i !== stride; ++i ) {
 
-			result[ i ] =
-					values[ offset0 + i ] * weight0 +
-					values[ offset1 + i ] * weight1;
+			result[ i ] = values[ offset0 + i ] * weight0 +
+				values[ offset1 + i ] * weight1;
 
 		}
 
 		return result;
 
 	}
-
 } );

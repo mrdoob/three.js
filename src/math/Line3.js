@@ -10,7 +10,6 @@ THREE.Line3 = function ( start, end ) {
 };
 
 THREE.Line3.prototype = {
-
 	constructor: THREE.Line3,
 
 	set: function ( start, end ) {
@@ -122,5 +121,4 @@ THREE.Line3.prototype = {
 		return line.start.equals( this.start ) && line.end.equals( this.end );
 
 	}
-
 };

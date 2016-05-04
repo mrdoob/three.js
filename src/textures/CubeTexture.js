@@ -17,7 +17,6 @@ THREE.CubeTexture.prototype = Object.create( THREE.Texture.prototype );
 THREE.CubeTexture.prototype.constructor = THREE.CubeTexture;
 
 Object.defineProperty( THREE.CubeTexture.prototype, 'images', {
-
 	get: function () {
 
 		return this.image;
@@ -29,5 +28,4 @@ Object.defineProperty( THREE.CubeTexture.prototype, 'images', {
 		this.image = value;
 
 	}
-
 } );

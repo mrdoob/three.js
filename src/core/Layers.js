@@ -9,7 +9,6 @@ THREE.Layers = function () {
 };
 
 THREE.Layers.prototype = {
-
 	constructor: THREE.Layers,
 
 	set: function ( channel ) {
@@ -41,5 +40,4 @@ THREE.Layers.prototype = {
 		return ( this.mask & layers.mask ) !== 0;
 
 	}
-
 };

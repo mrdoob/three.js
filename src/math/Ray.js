@@ -10,7 +10,6 @@ THREE.Ray = function ( origin, direction ) {
 };
 
 THREE.Ray.prototype = {
-
 	constructor: THREE.Ray,
 
 	set: function ( origin, direction ) {
@@ -136,7 +135,10 @@ THREE.Ray.prototype = {
 			var b1 = - diff.dot( segDir );
 			var c = diff.lengthSq();
 			var det = Math.abs( 1 - a01 * a01 );
-			var s0, s1, sqrDist, extDet;
+			var s0,
+				s1,
+				sqrDist,
+				extDet;
 
 			if ( det > 0 ) {
 
@@ -303,7 +305,7 @@ THREE.Ray.prototype = {
 
 		// Return if the ray never intersects the plane
 
-		return t >= 0 ? t :  null;
+		return t >= 0 ? t : null;
 
 	},
 
@@ -320,8 +322,6 @@ THREE.Ray.prototype = {
 		return this.at( t, optionalTarget );
 
 	},
-
-
 
 	intersectsPlane: function ( plane ) {
 
@@ -351,7 +351,12 @@ THREE.Ray.prototype = {
 
 	intersectBox: function ( box, optionalTarget ) {
 
-		var tmin, tmax, tymin, tymax, tzmin, tzmax;
+		var tmin,
+			tmax,
+			tymin,
+			tymax,
+			tzmin,
+			tzmax;
 
 		var invdirx = 1 / this.direction.x,
 			invdiry = 1 / this.direction.y,
@@ -388,9 +393,11 @@ THREE.Ray.prototype = {
 		// These lines also handle the case where tmin or tmax is NaN
 		// (result of 0 * Infinity). x !== x returns true if x is NaN
 
-		if ( tymin > tmin || tmin !== tmin ) tmin = tymin;
+		if ( tymin > tmin || tmin !== tmin )
+			tmin = tymin;
 
-		if ( tymax < tmax || tmax !== tmax ) tmax = tymax;
+		if ( tymax < tmax || tmax !== tmax )
+			tmax = tymax;
 
 		if ( invdirz >= 0 ) {
 
@@ -406,11 +413,13 @@ THREE.Ray.prototype = {
 
 		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
 
-		if ( tzmin > tmin || tmin !== tmin ) tmin = tzmin;
+		if ( tzmin > tmin || tmin !== tmin )
+			tmin = tzmin;
 
-		if ( tzmax < tmax || tmax !== tmax ) tmax = tzmax;
+		if ( tzmax < tmax || tmax !== tmax )
+			tmax = tzmax;
 
-		//return point closest to the ray (positive side)
+		// return point closest to the ray (positive side)
 
 		if ( tmax < 0 ) return null;
 
@@ -418,7 +427,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	intersectsBox: ( function () {
+	intersectsBox: (function () {
 
 		var v = new THREE.Vector3();
 
@@ -428,7 +437,7 @@ THREE.Ray.prototype = {
 
 		};
 
-	} )(),
+	})(),
 
 	intersectTriangle: function () {
 
@@ -529,5 +538,4 @@ THREE.Ray.prototype = {
 		return ray.origin.equals( this.origin ) && ray.direction.equals( this.direction );
 
 	}
-
 };

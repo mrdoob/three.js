@@ -35,7 +35,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	var currentStencilFunc = null;
 	var currentStencilRef = null;
 	var currentStencilMask = null;
-	var currentStencilFail  = null;
+	var currentStencilFail = null;
 	var currentStencilZFail = null;
 	var currentStencilZPass = null;
 
@@ -81,7 +81,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.initAttributes = function () {
 
-		for ( var i = 0, l = newAttributes.length; i < l; i ++ ) {
+		for ( var i = 0, l = newAttributes.length; i < l; i++ ) {
 
 			newAttributes[ i ] = 0;
 
@@ -133,7 +133,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.disableUnusedAttributes = function () {
 
-		for ( var i = 0, l = enabledAttributes.length; i < l; i ++ ) {
+		for ( var i = 0, l = enabledAttributes.length; i < l; i++ ) {
 
 			if ( enabledAttributes[ i ] !== newAttributes[ i ] ) {
 
@@ -175,12 +175,12 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 			compressedTextureFormats = [];
 
 			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) ||
-			     extensions.get( 'WEBGL_compressed_texture_s3tc' ) ||
-			     extensions.get( 'WEBGL_compressed_texture_etc1' ) ) {
+				extensions.get( 'WEBGL_compressed_texture_s3tc' ) ||
+				extensions.get( 'WEBGL_compressed_texture_etc1' ) ) {
 
 				var formats = gl.getParameter( gl.COMPRESSED_TEXTURE_FORMATS );
 
-				for ( var i = 0; i < formats.length; i ++ ) {
+				for ( var i = 0; i < formats.length; i++ ) {
 
 					compressedTextureFormats.push( formats[ i ] );
 
@@ -419,13 +419,13 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	this.setStencilFunc = function ( stencilFunc, stencilRef, stencilMask ) {
 
 		if ( currentStencilFunc !== stencilFunc ||
-				 currentStencilRef 	!== stencilRef 	||
-				 currentStencilMask !== stencilMask ) {
+			currentStencilRef !== stencilRef ||
+			currentStencilMask !== stencilMask ) {
 
 			gl.stencilFunc( stencilFunc,  stencilRef, stencilMask );
 
 			currentStencilFunc = stencilFunc;
-			currentStencilRef  = stencilRef;
+			currentStencilRef = stencilRef;
 			currentStencilMask = stencilMask;
 
 		}
@@ -434,13 +434,13 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.setStencilOp = function ( stencilFail, stencilZFail, stencilZPass ) {
 
-		if ( currentStencilFail	 !== stencilFail 	||
-				 currentStencilZFail !== stencilZFail ||
-				 currentStencilZPass !== stencilZPass ) {
+		if ( currentStencilFail !== stencilFail ||
+			currentStencilZFail !== stencilZFail ||
+			currentStencilZPass !== stencilZPass ) {
 
 			gl.stencilOp( stencilFail,  stencilZFail, stencilZPass );
 
-			currentStencilFail  = stencilFail;
+			currentStencilFail = stencilFail;
 			currentStencilZFail = stencilZFail;
 			currentStencilZPass = stencilZPass;
 
@@ -556,7 +556,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.activeTexture = function ( webglSlot ) {
 
-		if ( webglSlot === undefined ) webglSlot = gl.TEXTURE0 + maxTextures - 1;
+		if ( webglSlot === undefined )
+			webglSlot = gl.TEXTURE0 + maxTextures - 1;
 
 		if ( currentTextureSlot !== webglSlot ) {
 
@@ -688,7 +689,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.reset = function () {
 
-		for ( var i = 0; i < enabledAttributes.length; i ++ ) {
+		for ( var i = 0; i < enabledAttributes.length; i++ ) {
 
 			if ( enabledAttributes[ i ] === 1 ) {
 

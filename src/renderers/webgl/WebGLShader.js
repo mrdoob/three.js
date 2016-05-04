@@ -1,10 +1,10 @@
-THREE.WebGLShader = ( function () {
+THREE.WebGLShader = (function () {
 
 	function addLineNumbers( string ) {
 
 		var lines = string.split( '\n' );
 
-		for ( var i = 0; i < lines.length; i ++ ) {
+		for ( var i = 0; i < lines.length; i++ ) {
 
 			lines[ i ] = ( i + 1 ) + ': ' + lines[ i ];
 
@@ -40,4 +40,4 @@ THREE.WebGLShader = ( function () {
 
 	};
 
-} )();
+})();

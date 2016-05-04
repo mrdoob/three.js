@@ -30,13 +30,16 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radial
 	var indexCount = radialSegments * tubularSegments * 2 * 3;
 
 	// buffers
-	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array) ( indexCount ), 1 );
 	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
 
 	// helper variables
-	var i, j, index = 0, indexOffset = 0;
+	var i,
+		j,
+		index = 0,
+		indexOffset = 0;
 
 	var vertex = new THREE.Vector3();
 	var normal = new THREE.Vector3();
@@ -51,7 +54,7 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radial
 
 	// generate vertices, normals and uvs
 
-	for ( i = 0; i <= tubularSegments; ++ i ) {
+	for ( i = 0; i <= tubularSegments; ++i ) {
 
 		// the radian "u" is used to calculate the position on the torus curve of the current tubular segement
 
@@ -75,7 +78,7 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radial
 		B.normalize();
 		N.normalize();
 
-		for ( j = 0; j <= radialSegments; ++ j ) {
+		for ( j = 0; j <= radialSegments; ++j ) {
 
 			// now calculate the vertices. they are nothing more than an extrusion of the torus curve.
 			// because we extrude a shape in the xy-plane, there is no need to calculate a z-value.
@@ -104,7 +107,7 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radial
 			uvs.setXY( index, uv.x, uv.y );
 
 			// increase index
-			index ++;
+			index++;
 
 		}
 
@@ -112,9 +115,9 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radial
 
 	// generate indices
 
-	for ( j = 1; j <= tubularSegments; j ++ ) {
+	for ( j = 1; j <= tubularSegments; j++ ) {
 
-		for ( i = 1; i <= radialSegments; i ++ ) {
+		for ( i = 1; i <= radialSegments; i++ ) {
 
 			// indices
 			var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );

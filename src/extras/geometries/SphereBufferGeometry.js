@@ -38,15 +38,17 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
 
-	var index = 0, vertices = [], normal = new THREE.Vector3();
+	var index = 0,
+		vertices = [],
+		normal = new THREE.Vector3();
 
-	for ( var y = 0; y <= heightSegments; y ++ ) {
+	for ( var y = 0; y <= heightSegments; y++ ) {
 
 		var verticesRow = [];
 
 		var v = y / heightSegments;
 
-		for ( var x = 0; x <= widthSegments; x ++ ) {
+		for ( var x = 0; x <= widthSegments; x++ ) {
 
 			var u = x / widthSegments;
 
@@ -62,7 +64,7 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 			verticesRow.push( index );
 
-			index ++;
+			index++;
 
 		}
 
@@ -72,9 +74,9 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 	var indices = [];
 
-	for ( var y = 0; y < heightSegments; y ++ ) {
+	for ( var y = 0; y < heightSegments; y++ ) {
 
-		for ( var x = 0; x < widthSegments; x ++ ) {
+		for ( var x = 0; x < widthSegments; x++ ) {
 
 			var v1 = vertices[ y ][ x + 1 ];
 			var v2 = vertices[ y ][ x ];
@@ -88,7 +90,7 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 	}
 
-	this.setIndex( new ( positions.count > 65535 ? THREE.Uint32Attribute : THREE.Uint16Attribute )( indices, 1 ) );
+	this.setIndex( new ( positions.count > 65535 ? THREE.Uint32Attribute : THREE.Uint16Attribute) ( indices, 1 ) );
 	this.addAttribute( 'position', positions );
 	this.addAttribute( 'normal', normals );
 	this.addAttribute( 'uv', uvs );

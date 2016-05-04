@@ -9,7 +9,6 @@ THREE.CubeTextureLoader = function ( manager ) {
 };
 
 THREE.CubeTextureLoader.prototype = {
-
 	constructor: THREE.CubeTextureLoader,
 
 	load: function ( urls, onLoad, onProgress, onError ) {
@@ -28,7 +27,7 @@ THREE.CubeTextureLoader.prototype = {
 
 				texture.images[ i ] = image;
 
-				loaded ++;
+				loaded++;
 
 				if ( loaded === 6 ) {
 
@@ -42,7 +41,7 @@ THREE.CubeTextureLoader.prototype = {
 
 		}
 
-		for ( var i = 0; i < urls.length; ++ i ) {
+		for ( var i = 0; i < urls.length; ++i ) {
 
 			loadTexture( i );
 
@@ -63,5 +62,4 @@ THREE.CubeTextureLoader.prototype = {
 		this.path = value;
 
 	}
-
 };

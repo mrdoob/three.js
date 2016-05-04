@@ -10,7 +10,6 @@ THREE.Plane = function ( normal, constant ) {
 };
 
 THREE.Plane.prototype = {
-
 	constructor: THREE.Plane,
 
 	set: function ( normal, constant ) {
@@ -34,7 +33,7 @@ THREE.Plane.prototype = {
 	setFromNormalAndCoplanarPoint: function ( normal, point ) {
 
 		this.normal.copy( normal );
-		this.constant = - point.dot( this.normal );	// must be this.normal, not normal, as this.normal is normalized
+		this.constant = - point.dot( this.normal ); // must be this.normal, not normal, as this.normal is normalized
 
 		return this;
 
@@ -228,5 +227,4 @@ THREE.Plane.prototype = {
 		return plane.normal.equals( this.normal ) && ( plane.constant === this.constant );
 
 	}
-
 };

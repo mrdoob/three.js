@@ -8,18 +8,23 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 	var gl = renderer.context;
 	var state = renderer.state;
 
-	var vertexBuffer, elementBuffer;
-	var shader, program, attributes, uniforms;
+	var vertexBuffer,
+		elementBuffer;
+	var shader,
+		program,
+		attributes,
+		uniforms;
 
-	var tempTexture, occlusionTexture;
+	var tempTexture,
+		occlusionTexture;
 
 	function init() {
 
 		var vertices = new Float32Array( [
-			- 1, - 1,  0, 0,
-			 1, - 1,  1, 0,
-			 1,  1,  1, 1,
-			- 1,  1,  0, 1
+			- 1, - 1, 0, 0,
+			1, - 1, 1, 0,
+			1, 1, 1, 1,
+			- 1, 1, 0, 1
 		] );
 
 		var faces = new Uint16Array( [
@@ -29,8 +34,8 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		// buffers
 
-		vertexBuffer     = gl.createBuffer();
-		elementBuffer    = gl.createBuffer();
+		vertexBuffer = gl.createBuffer();
+		elementBuffer = gl.createBuffer();
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
 		gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW );
@@ -40,7 +45,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		// textures
 
-		tempTexture      = gl.createTexture();
+		tempTexture = gl.createTexture();
 		occlusionTexture = gl.createTexture();
 
 		state.bindTexture( gl.TEXTURE_2D, tempTexture );
@@ -58,7 +63,6 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 
 		shader = {
-
 			vertexShader: [
 
 				"uniform lowp int renderType;",
@@ -77,33 +81,33 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 				"void main() {",
 
-					"vUV = uv;",
+				"vUV = uv;",
 
-					"vec2 pos = position;",
+				"vec2 pos = position;",
 
-					"if ( renderType == 2 ) {",
+				"if ( renderType == 2 ) {",
 
-						"vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 ) );",
-						"visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );",
-						"visibility += texture2D( occlusionMap, vec2( 0.9, 0.1 ) );",
-						"visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) );",
-						"visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );",
-						"visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) );",
-						"visibility += texture2D( occlusionMap, vec2( 0.1, 0.9 ) );",
-						"visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) );",
-						"visibility += texture2D( occlusionMap, vec2( 0.5, 0.5 ) );",
+				"vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 ) );",
+				"visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );",
+				"visibility += texture2D( occlusionMap, vec2( 0.9, 0.1 ) );",
+				"visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) );",
+				"visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );",
+				"visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) );",
+				"visibility += texture2D( occlusionMap, vec2( 0.1, 0.9 ) );",
+				"visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) );",
+				"visibility += texture2D( occlusionMap, vec2( 0.5, 0.5 ) );",
 
-						"vVisibility =        visibility.r / 9.0;",
-						"vVisibility *= 1.0 - visibility.g / 9.0;",
-						"vVisibility *=       visibility.b / 9.0;",
-						"vVisibility *= 1.0 - visibility.a / 9.0;",
+				"vVisibility =        visibility.r / 9.0;",
+				"vVisibility *= 1.0 - visibility.g / 9.0;",
+				"vVisibility *=       visibility.b / 9.0;",
+				"vVisibility *= 1.0 - visibility.a / 9.0;",
 
-						"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
-						"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
+				"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
+				"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
 
-					"}",
+				"}",
 
-					"gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
+				"gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
 
 				"}"
 
@@ -122,50 +126,49 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 				"void main() {",
 
-					// pink square
+				// pink square
 
-					"if ( renderType == 0 ) {",
+				"if ( renderType == 0 ) {",
 
-						"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
+				"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
 
-					// restore
+				// restore
 
-					"} else if ( renderType == 1 ) {",
+				"} else if ( renderType == 1 ) {",
 
-						"gl_FragColor = texture2D( map, vUV );",
+				"gl_FragColor = texture2D( map, vUV );",
 
-					// flare
+				// flare
 
-					"} else {",
+				"} else {",
 
-						"vec4 texture = texture2D( map, vUV );",
-						"texture.a *= opacity * vVisibility;",
-						"gl_FragColor = texture;",
-						"gl_FragColor.rgb *= color;",
+				"vec4 texture = texture2D( map, vUV );",
+				"texture.a *= opacity * vVisibility;",
+				"gl_FragColor = texture;",
+				"gl_FragColor.rgb *= color;",
 
-					"}",
+				"}",
 
 				"}"
 
 			].join( "\n" )
-
 		};
 
 		program = createProgram( shader );
 
 		attributes = {
-			vertex: gl.getAttribLocation ( program, "position" ),
-			uv:     gl.getAttribLocation ( program, "uv" )
+			vertex: gl.getAttribLocation( program, "position" ),
+			uv: gl.getAttribLocation( program, "uv" )
 		};
 
 		uniforms = {
-			renderType:     gl.getUniformLocation( program, "renderType" ),
-			map:            gl.getUniformLocation( program, "map" ),
-			occlusionMap:   gl.getUniformLocation( program, "occlusionMap" ),
-			opacity:        gl.getUniformLocation( program, "opacity" ),
-			color:          gl.getUniformLocation( program, "color" ),
-			scale:          gl.getUniformLocation( program, "scale" ),
-			rotation:       gl.getUniformLocation( program, "rotation" ),
+			renderType: gl.getUniformLocation( program, "renderType" ),
+			map: gl.getUniformLocation( program, "map" ),
+			occlusionMap: gl.getUniformLocation( program, "occlusionMap" ),
+			opacity: gl.getUniformLocation( program, "opacity" ),
+			color: gl.getUniformLocation( program, "color" ),
+			scale: gl.getUniformLocation( program, "scale" ),
+			rotation: gl.getUniformLocation( program, "rotation" ),
 			screenPosition: gl.getUniformLocation( program, "screenPosition" )
 		};
 
@@ -226,7 +229,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		state.disable( gl.CULL_FACE );
 		state.setDepthWrite( false );
 
-		for ( var i = 0, l = flares.length; i < l; i ++ ) {
+		for ( var i = 0, l = flares.length; i < l; i++ ) {
 
 			size = 16 / viewport.w;
 			scale.set( size * invAspect, size );
@@ -261,7 +264,6 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				state.bindTexture( gl.TEXTURE_2D, tempTexture );
 				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, screenPositionPixels.x, screenPositionPixels.y, 16, 16, 0 );
 
-
 				// render pink quad
 
 				gl.uniform1i( uniforms.renderType, 0 );
@@ -273,13 +275,11 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
-
 				// copy result to occlusionMap
 
 				state.activeTexture( gl.TEXTURE0 );
 				state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
 				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, screenPositionPixels.x, screenPositionPixels.y, 16, 16, 0 );
-
 
 				// restore graphics
 
@@ -289,7 +289,6 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				state.activeTexture( gl.TEXTURE1 );
 				state.bindTexture( gl.TEXTURE_2D, tempTexture );
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
-
 
 				// update object positions
 
@@ -310,7 +309,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				gl.uniform1i( uniforms.renderType, 2 );
 				state.enable( gl.BLEND );
 
-				for ( var j = 0, jl = flare.lensFlares.length; j < jl; j ++ ) {
+				for ( var j = 0, jl = flare.lensFlares.length; j < jl; j++ ) {
 
 					var sprite = flare.lensFlares[ j ];
 
@@ -355,7 +354,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 	};
 
-	function createProgram ( shader ) {
+	function createProgram( shader ) {
 
 		var program = gl.createProgram();
 

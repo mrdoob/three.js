@@ -43,7 +43,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 			var array = morphAttributes[ name ];
 
-			for ( var i = 0, l = array.length; i < l; i ++ ) {
+			for ( var i = 0, l = array.length; i < l; i++ ) {
 
 				updateAttribute( array[ i ], gl.ARRAY_BUFFER );
 
@@ -103,7 +103,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		} else {
 
 			gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
-							  data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
+				data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
 
 			data.updateRange.count = 0; // reset range
 
@@ -206,7 +206,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 			edges[ a ] = [ b ];
 			return true;
 
-		} else if ( list.indexOf( b ) === -1 ) {
+		} else if ( list.indexOf( b ) === - 1 ) {
 
 			list.push( b );
 			return true;

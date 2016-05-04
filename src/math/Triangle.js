@@ -95,7 +95,6 @@ THREE.Triangle.containsPoint = function () {
 }();
 
 THREE.Triangle.prototype = {
-
 	constructor: THREE.Triangle,
 
 	set: function ( a, b, c ) {
@@ -185,7 +184,10 @@ THREE.Triangle.prototype = {
 
 	closestPointToPoint: function () {
 
-		var plane, edgeList, projectedPoint, closestPoint;
+		var plane,
+			edgeList,
+			projectedPoint,
+			closestPoint;
 
 		return function closestPointToPoint( point, optionalTarget ) {
 
@@ -208,7 +210,7 @@ THREE.Triangle.prototype = {
 
 			// check if the projection lies within the triangle
 
-			if( this.containsPoint( projectedPoint ) === true ) {
+			if ( this.containsPoint( projectedPoint ) === true ) {
 
 				// if so, this is the closest point
 
@@ -222,13 +224,13 @@ THREE.Triangle.prototype = {
 				edgeList[ 1 ].set( this.b, this.c );
 				edgeList[ 2 ].set( this.c, this.a );
 
-				for( var i = 0; i < edgeList.length; i ++ ) {
+				for ( var i = 0; i < edgeList.length; i++ ) {
 
 					edgeList[ i ].closestPointToPoint( projectedPoint, true, closestPoint );
 
 					var distance = projectedPoint.distanceToSquared( closestPoint );
 
-					if( distance < minDistance ) {
+					if ( distance < minDistance ) {
 
 						minDistance = distance;
 
@@ -251,5 +253,4 @@ THREE.Triangle.prototype = {
 		return triangle.a.equals( this.a ) && triangle.b.equals( this.b ) && triangle.c.equals( this.c );
 
 	}
-
 };

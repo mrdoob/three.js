@@ -44,13 +44,11 @@ if ( Function.prototype.name === undefined && Object.defineProperty !== undefine
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
 
 	Object.defineProperty( Function.prototype, 'name', {
-
 		get: function () {
 
 			return this.toString().match( /^\s*function\s*(\S*)\s*\(/ )[ 1 ];
 
 		}
-
 	} );
 
 }
@@ -60,7 +58,6 @@ if ( Object.assign === undefined ) {
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 
 	Object.defineProperty( Object, 'assign', {
-
 		writable: true,
 		configurable: true,
 
@@ -76,7 +73,7 @@ if ( Object.assign === undefined ) {
 
 			var to = Object( target );
 
-			for ( var i = 1, n = arguments.length; i !== n; ++ i ) {
+			for ( var i = 1, n = arguments.length; i !== n; ++i ) {
 
 				var nextSource = arguments[ i ];
 
@@ -86,7 +83,7 @@ if ( Object.assign === undefined ) {
 
 				var keysArray = Object.keys( nextSource );
 
-				for ( var nextIndex = 0, len = keysArray.length; nextIndex !== len; ++ nextIndex ) {
+				for ( var nextIndex = 0, len = keysArray.length; nextIndex !== len; ++nextIndex ) {
 
 					var nextKey = keysArray[ nextIndex ];
 					var desc = Object.getOwnPropertyDescriptor( nextSource, nextKey );
@@ -104,7 +101,6 @@ if ( Object.assign === undefined ) {
 			return to;
 
 		}
-
 	} );
 
 }
@@ -180,12 +176,12 @@ THREE.OneMinusDstAlphaFactor = 207;
 
 // custom blending source factors
 
-//THREE.ZeroFactor = 200;
-//THREE.OneFactor = 201;
-//THREE.SrcAlphaFactor = 204;
-//THREE.OneMinusSrcAlphaFactor = 205;
-//THREE.DstAlphaFactor = 206;
-//THREE.OneMinusDstAlphaFactor = 207;
+// THREE.ZeroFactor = 200;
+// THREE.OneFactor = 201;
+// THREE.SrcAlphaFactor = 204;
+// THREE.OneMinusSrcAlphaFactor = 205;
+// THREE.DstAlphaFactor = 206;
+// THREE.OneMinusDstAlphaFactor = 207;
 THREE.DstColorFactor = 208;
 THREE.OneMinusDstColorFactor = 209;
 THREE.SrcAlphaSaturateFactor = 210;
@@ -201,7 +197,6 @@ THREE.GreaterEqualDepth = 5;
 THREE.GreaterDepth = 6;
 THREE.NotEqualDepth = 7;
 
-
 // TEXTURE CONSTANTS
 
 THREE.MultiplyOperation = 0;
@@ -214,7 +209,7 @@ THREE.NoToneMapping = 0; // do not do any tone mapping, not even exposure (requi
 THREE.LinearToneMapping = 1; // only apply exposure.
 THREE.ReinhardToneMapping = 2;
 THREE.Uncharted2ToneMapping = 3; // John Hable
-THREE.CineonToneMapping = 4;  // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
+THREE.CineonToneMapping = 4; // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
 
 // Mapping modes
 
@@ -258,7 +253,7 @@ THREE.HalfFloatType = 1025;
 
 // Pixel types
 
-//THREE.UnsignedByteType = 1009;
+// THREE.UnsignedByteType = 1009;
 THREE.UnsignedShort4444Type = 1016;
 THREE.UnsignedShort5551Type = 1017;
 THREE.UnsignedShort565Type = 1018;
@@ -271,7 +266,7 @@ THREE.RGBAFormat = 1021;
 THREE.LuminanceFormat = 1022;
 THREE.LuminanceAlphaFormat = 1023;
 // THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
-THREE.RGBEFormat = THREE.RGBAFormat; //1024;
+THREE.RGBEFormat = THREE.RGBAFormat; // 1024;
 THREE.DepthFormat = 1026;
 
 // DDS / ST3C Compressed texture formats
@@ -280,7 +275,6 @@ THREE.RGB_S3TC_DXT1_Format = 2001;
 THREE.RGBA_S3TC_DXT1_Format = 2002;
 THREE.RGBA_S3TC_DXT3_Format = 2003;
 THREE.RGBA_S3TC_DXT5_Format = 2004;
-
 
 // PVRTC compressed texture formats
 
@@ -333,5 +327,5 @@ THREE.RGBDEncoding = 3006; // MaxRange is 256.
 
 // Depth packing strategies
 
-THREE.BasicDepthPacking = 3200;  // for writing to float textures for high precision or for visualizing results in RGB buffers
+THREE.BasicDepthPacking = 3200; // for writing to float textures for high precision or for visualizing results in RGB buffers
 THREE.RGBADepthPacking = 3201; // for packing into RGBA buffers.

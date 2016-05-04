@@ -2,12 +2,12 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
- // points - to create a closed torus, one must use a set of points
- //    like so: [ a, b, c, d, a ], see first is the same as last.
- // segments - the number of circumference segments to create
- // phiStart - the starting radian
- // phiLength - the radian (0 to 2PI) range of the lathed section
- //    2PI is a closed lathe, less than 2PI is a portion.
+// points - to create a closed torus, one must use a set of points
+//    like so: [ a, b, c, d, a ], see first is the same as last.
+// segments - the number of circumference segments to create
+// phiStart - the starting radian
+// phiLength - the radian (0 to 2PI) range of the lathed section
+//    2PI is a closed lathe, less than 2PI is a portion.
 
 THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
 
@@ -34,28 +34,31 @@ THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
 	var indexCount = segments * points.length * 2 * 3;
 
 	// buffers
-	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array) ( indexCount ), 1 );
 	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
 
 	// helper variables
-	var index = 0, indexOffset = 0, base;
+	var index = 0,
+		indexOffset = 0,
+		base;
 	var inversePointLength = 1.0 / ( points.length - 1 );
 	var inverseSegments = 1.0 / segments;
 	var vertex = new THREE.Vector3();
 	var uv = new THREE.Vector2();
-	var i, j;
+	var i,
+		j;
 
 	// generate vertices and uvs
 
-	for ( i = 0; i <= segments; i ++ ) {
+	for ( i = 0; i <= segments; i++ ) {
 
 		var phi = phiStart + i * inverseSegments * phiLength;
 
 		var sin = Math.sin( phi );
 		var cos = Math.cos( phi );
 
-		for ( j = 0; j <= ( points.length - 1 ); j ++ ) {
+		for ( j = 0; j <= ( points.length - 1 ); j++ ) {
 
 			// vertex
 			vertex.x = points[ j ].x * sin;
@@ -69,7 +72,7 @@ THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
 			uvs.setXY( index, uv.x, uv.y );
 
 			// increase index
-			index ++;
+			index++;
 
 		}
 
@@ -77,9 +80,9 @@ THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
 
 	// generate indices
 
-	for ( i = 0; i < segments; i ++ ) {
+	for ( i = 0; i < segments; i++ ) {
 
-		for ( j = 0; j < ( points.length - 1 ); j ++ ) {
+		for ( j = 0; j < ( points.length - 1 ); j++ ) {
 
 			base = j + i * points.length;
 
@@ -116,7 +119,7 @@ THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
 	// if the geometry is closed, we need to average the normals along the seam.
 	// because the corresponding vertices are identical (but still have different UVs).
 
-	if( phiLength === Math.PI * 2 ) {
+	if ( phiLength === Math.PI * 2 ) {
 
 		var normals = this.attributes.normal.array;
 		var n1 = new THREE.Vector3();
@@ -126,7 +129,7 @@ THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
 		// this is the buffer offset for the last line of vertices
 		base = segments * points.length * 3;
 
-		for( i = 0, j = 0; i < points.length; i ++, j += 3 ) {
+		for ( i = 0, j = 0; i < points.length; i++, j += 3 ) {
 
 			// select the normal of the vertex in the first line
 			n1.x = normals[ j + 0 ];

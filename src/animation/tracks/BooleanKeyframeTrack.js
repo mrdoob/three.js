@@ -14,9 +14,7 @@ THREE.BooleanKeyframeTrack = function ( name, times, values ) {
 
 };
 
-THREE.BooleanKeyframeTrack.prototype =
-		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
-
+THREE.BooleanKeyframeTrack.prototype = Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
 	constructor: THREE.BooleanKeyframeTrack,
 
 	ValueTypeName: 'bool',

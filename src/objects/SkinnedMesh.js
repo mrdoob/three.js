@@ -23,9 +23,10 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	if ( this.geometry && this.geometry.bones !== undefined ) {
 
-		var bone, gbone;
+		var bone,
+			gbone;
 
-		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
+		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++b ) {
 
 			gbone = this.geometry.bones[ b ];
 
@@ -39,12 +40,12 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 		}
 
-		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
+		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++b ) {
 
 			gbone = this.geometry.bones[ b ];
 
 			if ( gbone.parent !== - 1 && gbone.parent !== null &&
-					bones[ gbone.parent ] !== undefined ) {
+				bones[ gbone.parent ] !== undefined ) {
 
 				bones[ gbone.parent ].add( bones[ b ] );
 
@@ -65,11 +66,10 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 };
 
-
 THREE.SkinnedMesh.prototype = Object.create( THREE.Mesh.prototype );
 THREE.SkinnedMesh.prototype.constructor = THREE.SkinnedMesh;
 
-THREE.SkinnedMesh.prototype.bind = function( skeleton, bindMatrix ) {
+THREE.SkinnedMesh.prototype.bind = function ( skeleton, bindMatrix ) {
 
 	this.skeleton = skeleton;
 
@@ -98,7 +98,7 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 	if ( this.geometry instanceof THREE.Geometry ) {
 
-		for ( var i = 0; i < this.geometry.skinWeights.length; i ++ ) {
+		for ( var i = 0; i < this.geometry.skinWeights.length; i++ ) {
 
 			var sw = this.geometry.skinWeights[ i ];
 
@@ -122,7 +122,7 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 		var skinWeight = this.geometry.attributes.skinWeight;
 
-		for ( var i = 0; i < skinWeight.count; i ++ ) {
+		for ( var i = 0; i < skinWeight.count; i++ ) {
 
 			vec.x = skinWeight.getX( i );
 			vec.y = skinWeight.getY( i );
@@ -149,7 +149,7 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 };
 
-THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
+THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 
 	THREE.Mesh.prototype.updateMatrixWorld.call( this, true );
 
@@ -169,7 +169,7 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
 
 };
 
-THREE.SkinnedMesh.prototype.clone = function() {
+THREE.SkinnedMesh.prototype.clone = function () {
 
 	return new this.constructor( this.geometry, this.material, this.useVertexTexture ).copy( this );
 

@@ -29,50 +29,53 @@
  * @author tschw
  */
 
-THREE.AnimationObjectGroup = function( var_args ) {
+THREE.AnimationObjectGroup = function ( var_args ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
 	// cached objects followed by the active ones
 	this._objects = Array.prototype.slice.call( arguments );
 
-	this.nCachedObjects_ = 0;			// threshold
+	this.nCachedObjects_ = 0; // threshold
 	// note: read by PropertyBinding.Composite
 
 	var indices = {};
-	this._indicesByUUID = indices;		// for bookkeeping
+	this._indicesByUUID = indices; // for bookkeeping
 
-	for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+	for ( var i = 0, n = arguments.length; i !== n; ++i ) {
 
 		indices[ arguments[ i ].uuid ] = i;
 
 	}
 
-	this._paths = [];					// inside: string
-	this._parsedPaths = [];				// inside: { we don't care, here }
-	this._bindings = []; 				// inside: Array< PropertyBinding >
-	this._bindingsIndicesByPath = {}; 	// inside: indices in these arrays
+	this._paths = []; // inside: string
+	this._parsedPaths = []; // inside: { we don't care, here }
+	this._bindings = []; // inside: Array< PropertyBinding >
+	this._bindingsIndicesByPath = {}; // inside: indices in these arrays
 
 	var scope = this;
 
 	this.stats = {
-
 		objects: {
-			get total() { return scope._objects.length; },
-			get inUse() { return this.total - scope.nCachedObjects_;  }
+			get total() {
+				return scope._objects.length;
+			},
+			get inUse() {
+				return this.total - scope.nCachedObjects_;
+			}
 		},
 
-		get bindingsPerObject() { return scope._bindings.length; }
-
+		get bindingsPerObject() {
+			return scope._bindings.length;
+		}
 	};
 
 };
 
 THREE.AnimationObjectGroup.prototype = {
-
 	constructor: THREE.AnimationObjectGroup,
 
-	add: function( var_args ) {
+	add: function ( var_args ) {
 
 		var objects = this._objects,
 			nObjects = objects.length,
@@ -83,7 +86,7 @@ THREE.AnimationObjectGroup.prototype = {
 			bindings = this._bindings,
 			nBindings = bindings.length;
 
-		for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+		for ( var i = 0, n = arguments.length; i !== n; ++i ) {
 
 			var object = arguments[ i ],
 				uuid = object.uuid,
@@ -93,17 +96,17 @@ THREE.AnimationObjectGroup.prototype = {
 
 				// unknown object -> add it to the ACTIVE region
 
-				index = nObjects ++;
+				index = nObjects++;
 				indicesByUUID[ uuid ] = index;
 				objects.push( object );
 
 				// accounting is done, now do the same for all bindings
 
-				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+				for ( var j = 0, m = nBindings; j !== m; ++j ) {
 
 					bindings[ j ].push(
-							new THREE.PropertyBinding(
-								object, paths[ j ], parsedPaths[ j ] ) );
+						new THREE.PropertyBinding(
+							object, paths[ j ], parsedPaths[ j ] ) );
 
 				}
 
@@ -113,7 +116,7 @@ THREE.AnimationObjectGroup.prototype = {
 
 				// move existing object to the ACTIVE region
 
-				var firstActiveIndex = -- nCachedObjects,
+				var firstActiveIndex = --nCachedObjects,
 					lastCachedObject = objects[ firstActiveIndex ];
 
 				indicesByUUID[ lastCachedObject.uuid ] = index;
@@ -124,7 +127,7 @@ THREE.AnimationObjectGroup.prototype = {
 
 				// accounting is done, now do the same for all bindings
 
-				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+				for ( var j = 0, m = nBindings; j !== m; ++j ) {
 
 					var bindingsForPath = bindings[ j ],
 						lastCached = bindingsForPath[ firstActiveIndex ],
@@ -139,7 +142,7 @@ THREE.AnimationObjectGroup.prototype = {
 						// or may not exist
 
 						binding = new THREE.PropertyBinding(
-								object, paths[ j ], parsedPaths[ j ] );
+							object, paths[ j ], parsedPaths[ j ] );
 
 					}
 
@@ -147,11 +150,11 @@ THREE.AnimationObjectGroup.prototype = {
 
 				}
 
-			} else if ( objects[ index ] !== knownObject) {
+			} else if ( objects[ index ] !== knownObject ) {
 
 				console.error( "Different objects with the same UUID " +
-						"detected. Clean the caches or recreate your " +
-						"infrastructure when reloading scenes..." );
+					"detected. Clean the caches or recreate your " +
+					"infrastructure when reloading scenes..." );
 
 			} // else the object is already where we want it to be
 
@@ -161,7 +164,7 @@ THREE.AnimationObjectGroup.prototype = {
 
 	},
 
-	remove: function( var_args ) {
+	remove: function ( var_args ) {
 
 		var objects = this._objects,
 			nObjects = objects.length,
@@ -170,7 +173,7 @@ THREE.AnimationObjectGroup.prototype = {
 			bindings = this._bindings,
 			nBindings = bindings.length;
 
-		for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+		for ( var i = 0, n = arguments.length; i !== n; ++i ) {
 
 			var object = arguments[ i ],
 				uuid = object.uuid,
@@ -180,7 +183,7 @@ THREE.AnimationObjectGroup.prototype = {
 
 				// move existing object into the CACHED region
 
-				var lastCachedIndex = nCachedObjects ++,
+				var lastCachedIndex = nCachedObjects++,
 					firstActiveObject = objects[ lastCachedIndex ];
 
 				indicesByUUID[ firstActiveObject.uuid ] = index;
@@ -191,7 +194,7 @@ THREE.AnimationObjectGroup.prototype = {
 
 				// accounting is done, now do the same for all bindings
 
-				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+				for ( var j = 0, m = nBindings; j !== m; ++j ) {
 
 					var bindingsForPath = bindings[ j ],
 						firstActive = bindingsForPath[ lastCachedIndex ],
@@ -211,7 +214,7 @@ THREE.AnimationObjectGroup.prototype = {
 	},
 
 	// remove & forget
-	uncache: function( var_args ) {
+	uncache: function ( var_args ) {
 
 		var objects = this._objects,
 			nObjects = objects.length,
@@ -220,7 +223,7 @@ THREE.AnimationObjectGroup.prototype = {
 			bindings = this._bindings,
 			nBindings = bindings.length;
 
-		for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+		for ( var i = 0, n = arguments.length; i !== n; ++i ) {
 
 			var object = arguments[ i ],
 				uuid = object.uuid,
@@ -234,9 +237,9 @@ THREE.AnimationObjectGroup.prototype = {
 
 					// object is cached, shrink the CACHED region
 
-					var firstActiveIndex = -- nCachedObjects,
+					var firstActiveIndex = --nCachedObjects,
 						lastCachedObject = objects[ firstActiveIndex ],
-						lastIndex = -- nObjects,
+						lastIndex = --nObjects,
 						lastObject = objects[ lastIndex ];
 
 					// last cached object takes this object's place
@@ -250,7 +253,7 @@ THREE.AnimationObjectGroup.prototype = {
 
 					// accounting is done, now do the same for all bindings
 
-					for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+					for ( var j = 0, m = nBindings; j !== m; ++j ) {
 
 						var bindingsForPath = bindings[ j ],
 							lastCached = bindingsForPath[ firstActiveIndex ],
@@ -266,7 +269,7 @@ THREE.AnimationObjectGroup.prototype = {
 
 					// object is active, just swap with the last and pop
 
-					var lastIndex = -- nObjects,
+					var lastIndex = --nObjects,
 						lastObject = objects[ lastIndex ];
 
 					indicesByUUID[ lastObject.uuid ] = index;
@@ -275,7 +278,7 @@ THREE.AnimationObjectGroup.prototype = {
 
 					// accounting is done, now do the same for all bindings
 
-					for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+					for ( var j = 0, m = nBindings; j !== m; ++j ) {
 
 						var bindingsForPath = bindings[ j ];
 
@@ -296,7 +299,7 @@ THREE.AnimationObjectGroup.prototype = {
 
 	// Internal interface used by befriended PropertyBinding.Composite:
 
-	subscribe_: function( path, parsedPath ) {
+	subscribe_: function ( path, parsedPath ) {
 		// returns an array of bindings for the given path that is changed
 		// according to the contained objects in the group
 
@@ -322,12 +325,11 @@ THREE.AnimationObjectGroup.prototype = {
 		bindings.push( bindingsForPath );
 
 		for ( var i = nCachedObjects,
-				n = objects.length; i !== n; ++ i ) {
+				n = objects.length; i !== n; ++i ) {
 
 			var object = objects[ i ];
 
-			bindingsForPath[ i ] =
-					new THREE.PropertyBinding( object, path, parsedPath );
+			bindingsForPath[ i ] = new THREE.PropertyBinding( object, path, parsedPath );
 
 		}
 
@@ -335,7 +337,7 @@ THREE.AnimationObjectGroup.prototype = {
 
 	},
 
-	unsubscribe_: function( path ) {
+	unsubscribe_: function ( path ) {
 		// tells the group to forget about a property path and no longer
 		// update the array previously obtained with 'subscribe_'
 
@@ -365,6 +367,5 @@ THREE.AnimationObjectGroup.prototype = {
 		}
 
 	}
-
 };
 

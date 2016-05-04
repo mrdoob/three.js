@@ -11,7 +11,6 @@ THREE.Loader = function () {
 };
 
 THREE.Loader.prototype = {
-
 	constructor: THREE.Loader,
 
 	crossOrigin: undefined,
@@ -32,7 +31,7 @@ THREE.Loader.prototype = {
 
 		var array = [];
 
-		for ( var i = 0; i < materials.length; ++ i ) {
+		for ( var i = 0; i < materials.length; ++i ) {
 
 			array[ i ] = this.createMaterial( materials[ i ], texturePath, crossOrigin );
 
@@ -42,15 +41,20 @@ THREE.Loader.prototype = {
 
 	},
 
-	createMaterial: ( function () {
+	createMaterial: (function () {
 
-		var color, textureLoader, materialLoader;
+		var color,
+			textureLoader,
+			materialLoader;
 
 		return function ( m, texturePath, crossOrigin ) {
 
-			if ( color === undefined ) color = new THREE.Color();
-			if ( textureLoader === undefined ) textureLoader = new THREE.TextureLoader();
-			if ( materialLoader === undefined ) materialLoader = new THREE.MaterialLoader();
+			if ( color === undefined )
+				color = new THREE.Color();
+			if ( textureLoader === undefined )
+				textureLoader = new THREE.TextureLoader();
+			if ( materialLoader === undefined )
+				materialLoader = new THREE.MaterialLoader();
 
 			// convert from old material format
 
@@ -78,8 +82,10 @@ THREE.Loader.prototype = {
 
 					texture.repeat.fromArray( repeat );
 
-					if ( repeat[ 0 ] !== 1 ) texture.wrapS = THREE.RepeatWrapping;
-					if ( repeat[ 1 ] !== 1 ) texture.wrapT = THREE.RepeatWrapping;
+					if ( repeat[ 0 ] !== 1 )
+						texture.wrapS = THREE.RepeatWrapping;
+					if ( repeat[ 1 ] !== 1 )
+						texture.wrapT = THREE.RepeatWrapping;
 
 				}
 
@@ -91,11 +97,15 @@ THREE.Loader.prototype = {
 
 				if ( wrap !== undefined ) {
 
-					if ( wrap[ 0 ] === 'repeat' ) texture.wrapS = THREE.RepeatWrapping;
-					if ( wrap[ 0 ] === 'mirror' ) texture.wrapS = THREE.MirroredRepeatWrapping;
+					if ( wrap[ 0 ] === 'repeat' )
+						texture.wrapS = THREE.RepeatWrapping;
+					if ( wrap[ 0 ] === 'mirror' )
+						texture.wrapS = THREE.MirroredRepeatWrapping;
 
-					if ( wrap[ 1 ] === 'repeat' ) texture.wrapT = THREE.RepeatWrapping;
-					if ( wrap[ 1 ] === 'mirror' ) texture.wrapT = THREE.MirroredRepeatWrapping;
+					if ( wrap[ 1 ] === 'repeat' )
+						texture.wrapT = THREE.RepeatWrapping;
+					if ( wrap[ 1 ] === 'mirror' )
+						texture.wrapT = THREE.MirroredRepeatWrapping;
 
 				}
 
@@ -153,8 +163,10 @@ THREE.Loader.prototype = {
 						json.shininess = value;
 						break;
 					case 'shading':
-						if ( value.toLowerCase() === 'basic' ) json.type = 'MeshBasicMaterial';
-						if ( value.toLowerCase() === 'phong' ) json.type = 'MeshPhongMaterial';
+						if ( value.toLowerCase() === 'basic' )
+							json.type = 'MeshBasicMaterial';
+						if ( value.toLowerCase() === 'phong' )
+							json.type = 'MeshPhongMaterial';
 						break;
 					case 'mapDiffuse':
 						json.map = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
@@ -239,8 +251,10 @@ THREE.Loader.prototype = {
 						json[ name ] = value;
 						break;
 					case 'vertexColors':
-						if ( value === true ) json.vertexColors = THREE.VertexColors;
-						if ( value === 'face' ) json.vertexColors = THREE.FaceColors;
+						if ( value === true )
+							json.vertexColors = THREE.VertexColors;
+						if ( value === 'face' )
+							json.vertexColors = THREE.FaceColors;
 						break;
 					default:
 						console.error( 'THREE.Loader.createMaterial: Unsupported', name, value );
@@ -249,10 +263,13 @@ THREE.Loader.prototype = {
 
 			}
 
-			if ( json.type === 'MeshBasicMaterial' ) delete json.emissive;
-			if ( json.type !== 'MeshPhongMaterial' ) delete json.specular;
+			if ( json.type === 'MeshBasicMaterial' )
+				delete json.emissive;
+			if ( json.type !== 'MeshPhongMaterial' )
+				delete json.specular;
 
-			if ( json.opacity < 1 ) json.transparent = true;
+			if ( json.opacity < 1 )
+				json.transparent = true;
 
 			materialLoader.setTextures( textures );
 
@@ -260,12 +277,10 @@ THREE.Loader.prototype = {
 
 		};
 
-	} )()
-
+	})()
 };
 
 THREE.Loader.Handlers = {
-
 	handlers: [],
 
 	add: function ( regex, loader ) {
@@ -281,7 +296,7 @@ THREE.Loader.Handlers = {
 		for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
 
 			var regex = handlers[ i ];
-			var loader  = handlers[ i + 1 ];
+			var loader = handlers[ i + 1 ];
 
 			if ( regex.test( file ) ) {
 
@@ -294,5 +309,4 @@ THREE.Loader.Handlers = {
 		return null;
 
 	}
-
 };

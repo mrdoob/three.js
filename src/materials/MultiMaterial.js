@@ -15,7 +15,6 @@ THREE.MultiMaterial = function ( materials ) {
 };
 
 THREE.MultiMaterial.prototype = {
-
 	constructor: THREE.MultiMaterial,
 
 	toJSON: function ( meta ) {
@@ -33,7 +32,7 @@ THREE.MultiMaterial.prototype = {
 
 		var materials = this.materials;
 
-		for ( var i = 0, l = materials.length; i < l; i ++ ) {
+		for ( var i = 0, l = materials.length; i < l; i++ ) {
 
 			var material = materials[ i ].toJSON( meta );
 			delete material.metadata;
@@ -52,7 +51,7 @@ THREE.MultiMaterial.prototype = {
 
 		var material = new this.constructor();
 
-		for ( var i = 0; i < this.materials.length; i ++ ) {
+		for ( var i = 0; i < this.materials.length; i++ ) {
 
 			material.materials.push( this.materials[ i ].clone() );
 
@@ -63,5 +62,4 @@ THREE.MultiMaterial.prototype = {
 		return material;
 
 	}
-
 };

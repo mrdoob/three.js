@@ -1,4 +1,4 @@
-THREE.WebGLProgram = ( function () {
+THREE.WebGLProgram = (function () {
 
 	var programIdCount = 0;
 
@@ -7,19 +7,19 @@ THREE.WebGLProgram = ( function () {
 		switch ( encoding ) {
 
 			case THREE.LinearEncoding:
-				return [ 'Linear','( value )' ];
+				return [ 'Linear', '( value )' ];
 			case THREE.sRGBEncoding:
-				return [ 'sRGB','( value )' ];
+				return [ 'sRGB', '( value )' ];
 			case THREE.RGBEEncoding:
-				return [ 'RGBE','( value )' ];
+				return [ 'RGBE', '( value )' ];
 			case THREE.RGBM7Encoding:
-				return [ 'RGBM','( value, 7.0 )' ];
+				return [ 'RGBM', '( value, 7.0 )' ];
 			case THREE.RGBM16Encoding:
-				return [ 'RGBM','( value, 16.0 )' ];
+				return [ 'RGBM', '( value, 16.0 )' ];
 			case THREE.RGBDEncoding:
-				return [ 'RGBD','( value, 256.0 )' ];
+				return [ 'RGBD', '( value, 256.0 )' ];
 			case THREE.GammaEncoding:
-				return [ 'Gamma','( value, float( GAMMA_FACTOR ) )' ];
+				return [ 'Gamma', '( value, float( GAMMA_FACTOR ) )' ];
 			default:
 				throw new Error( 'unsupported encoding: ' + encoding );
 
@@ -111,7 +111,7 @@ THREE.WebGLProgram = ( function () {
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_ATTRIBUTES );
 
-		for ( var i = 0; i < n; i ++ ) {
+		for ( var i = 0; i < n; i++ ) {
 
 			var info = gl.getActiveAttrib( program, i );
 			var name = info.name;
@@ -172,7 +172,7 @@ THREE.WebGLProgram = ( function () {
 
 			var unroll = '';
 
-			for ( var i = parseInt( start ); i < parseInt( end ); i ++ ) {
+			for ( var i = parseInt( start ); i < parseInt( end ); i++ ) {
 
 				unroll += snippet.replace( /\[ i \]/g, '[ ' + i + ' ]' );
 
@@ -278,7 +278,8 @@ THREE.WebGLProgram = ( function () {
 
 		var program = gl.createProgram();
 
-		var prefixVertex, prefixFragment;
+		var prefixVertex,
+			prefixFragment;
 
 		if ( material instanceof THREE.RawShaderMaterial ) {
 
@@ -447,7 +448,7 @@ THREE.WebGLProgram = ( function () {
 				'uniform vec3 cameraPosition;',
 
 				( parameters.toneMapping !== THREE.NoToneMapping ) ? "#define TONE_MAPPING" : '',
-				( parameters.toneMapping !== THREE.NoToneMapping ) ? THREE.ShaderChunk[ 'tonemapping_pars_fragment' ] : '',  // this code is required here because it is used by the toneMapping() function defined below
+				( parameters.toneMapping !== THREE.NoToneMapping ) ? THREE.ShaderChunk[ 'tonemapping_pars_fragment' ] : '', // this code is required here because it is used by the toneMapping() function defined below
 				( parameters.toneMapping !== THREE.NoToneMapping ) ? getToneMappingFunction( "toneMapping", parameters.toneMapping ) : '',
 
 				( parameters.outputEncoding || parameters.mapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ? THREE.ShaderChunk[ 'encodings_pars_fragment' ] : '', // this code is required here because it is used by the various encoding/decoding function defined below
@@ -533,26 +534,20 @@ THREE.WebGLProgram = ( function () {
 		if ( haveDiagnostics ) {
 
 			this.diagnostics = {
-
 				runnable: runnable,
 				material: material,
 
 				programLog: programLog,
 
 				vertexShader: {
-
 					log: vertexLog,
 					prefix: prefixVertex
-
 				},
 
 				fragmentShader: {
-
 					log: fragmentLog,
 					prefix: prefixFragment
-
 				}
-
 			};
 
 		}
@@ -566,12 +561,11 @@ THREE.WebGLProgram = ( function () {
 
 		var cachedUniforms;
 
-		this.getUniforms = function() {
+		this.getUniforms = function () {
 
 			if ( cachedUniforms === undefined ) {
 
-				cachedUniforms =
-						new THREE.WebGLUniforms( gl, program, renderer );
+				cachedUniforms = new THREE.WebGLUniforms( gl, program, renderer );
 
 			}
 
@@ -583,7 +577,7 @@ THREE.WebGLProgram = ( function () {
 
 		var cachedAttributes;
 
-		this.getAttributes = function() {
+		this.getAttributes = function () {
 
 			if ( cachedAttributes === undefined ) {
 
@@ -597,7 +591,7 @@ THREE.WebGLProgram = ( function () {
 
 		// free resource
 
-		this.destroy = function() {
+		this.destroy = function () {
 
 			gl.deleteProgram( program );
 			this.program = undefined;
@@ -607,9 +601,8 @@ THREE.WebGLProgram = ( function () {
 		// DEPRECATED
 
 		Object.defineProperties( this, {
-
 			uniforms: {
-				get: function() {
+				get: function () {
 
 					console.warn( 'THREE.WebGLProgram: .uniforms is now .getUniforms().' );
 					return this.getUniforms();
@@ -618,20 +611,18 @@ THREE.WebGLProgram = ( function () {
 			},
 
 			attributes: {
-				get: function() {
+				get: function () {
 
 					console.warn( 'THREE.WebGLProgram: .attributes is now .getAttributes().' );
 					return this.getAttributes();
 
 				}
 			}
-
 		} );
-
 
 		//
 
-		this.id = programIdCount ++;
+		this.id = programIdCount++;
 		this.code = code;
 		this.usedTimes = 1;
 		this.program = program;
@@ -642,4 +633,4 @@ THREE.WebGLProgram = ( function () {
 
 	};
 
-} )();
+})();

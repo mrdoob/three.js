@@ -29,7 +29,7 @@ THREE.LineCurve.prototype.getPointAt = function ( u ) {
 
 };
 
-THREE.LineCurve.prototype.getTangent = function( t ) {
+THREE.LineCurve.prototype.getTangent = function ( t ) {
 
 	var tangent = this.v2.clone().sub( this.v1 );
 

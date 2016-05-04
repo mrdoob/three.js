@@ -33,7 +33,7 @@ THREE.CurvePath.prototype.checkConnection = function() {
 };
 */
 
-THREE.CurvePath.prototype.closePath = function() {
+THREE.CurvePath.prototype.closePath = function () {
 
 	// TODO Test
 	// and verify for vector3 (needs to implement equals)
@@ -58,7 +58,7 @@ THREE.CurvePath.prototype.closePath = function() {
 // 3. Get t for the curve
 // 4. Return curve.getPointAt(t')
 
-THREE.CurvePath.prototype.getPoint = function( t ) {
+THREE.CurvePath.prototype.getPoint = function ( t ) {
 
 	var d = t * this.getLength();
 	var curveLengths = this.getCurveLengths();
@@ -79,7 +79,7 @@ THREE.CurvePath.prototype.getPoint = function( t ) {
 
 		}
 
-		i ++;
+		i++;
 
 	}
 
@@ -98,7 +98,7 @@ THREE.CurvePath.prototype.getTangent = function( t ) {
 // THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
 // getPoint() depends on getLength
 
-THREE.CurvePath.prototype.getLength = function() {
+THREE.CurvePath.prototype.getLength = function () {
 
 	var lens = this.getCurveLengths();
 	return lens[ lens.length - 1 ];
@@ -108,7 +108,7 @@ THREE.CurvePath.prototype.getLength = function() {
 // Compute lengths and cache them
 // We cannot overwrite getLengths() because UtoT mapping uses it.
 
-THREE.CurvePath.prototype.getCurveLengths = function() {
+THREE.CurvePath.prototype.getCurveLengths = function () {
 
 	// We use cache values if curves and cache array are same length
 
@@ -121,9 +121,10 @@ THREE.CurvePath.prototype.getCurveLengths = function() {
 	// Get length of sub-curve
 	// Push sums into cached array
 
-	var lengths = [], sums = 0;
+	var lengths = [],
+		sums = 0;
 
-	for ( var i = 0, l = this.curves.length; i < l; i ++ ) {
+	for ( var i = 0, l = this.curves.length; i < l; i++ ) {
 
 		sums += this.curves[ i ].getLength();
 		lengths.push( sums );
@@ -136,15 +137,13 @@ THREE.CurvePath.prototype.getCurveLengths = function() {
 
 };
 
-
-
 /**************************************************************
  *	Create Geometries Helpers
  **************************************************************/
 
-/// Generate geometry from path points (for Line or Points objects)
+// / Generate geometry from path points (for Line or Points objects)
 
-THREE.CurvePath.prototype.createPointsGeometry = function( divisions ) {
+THREE.CurvePath.prototype.createPointsGeometry = function ( divisions ) {
 
 	var pts = this.getPoints( divisions );
 	return this.createGeometry( pts );
@@ -153,18 +152,18 @@ THREE.CurvePath.prototype.createPointsGeometry = function( divisions ) {
 
 // Generate geometry from equidistant sampling along the path
 
-THREE.CurvePath.prototype.createSpacedPointsGeometry = function( divisions ) {
+THREE.CurvePath.prototype.createSpacedPointsGeometry = function ( divisions ) {
 
 	var pts = this.getSpacedPoints( divisions );
 	return this.createGeometry( pts );
 
 };
 
-THREE.CurvePath.prototype.createGeometry = function( points ) {
+THREE.CurvePath.prototype.createGeometry = function ( points ) {
 
 	var geometry = new THREE.Geometry();
 
-	for ( var i = 0, l = points.length; i < l; i ++ ) {
+	for ( var i = 0, l = points.length; i < l; i++ ) {
 
 		var point = points[ i ];
 		geometry.vertices.push( new THREE.Vector3( point.x, point.y, point.z || 0 ) );

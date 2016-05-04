@@ -14,7 +14,7 @@ THREE.EllipseCurve = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle
 	this.aEndAngle = aEndAngle;
 
 	this.aClockwise = aClockwise;
-	
+
 	this.aRotation = aRotation || 0;
 
 };
@@ -26,8 +26,10 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 
 	var deltaAngle = this.aEndAngle - this.aStartAngle;
 
-	if ( deltaAngle < 0 ) deltaAngle += Math.PI * 2;
-	if ( deltaAngle > Math.PI * 2 ) deltaAngle -= Math.PI * 2;
+	if ( deltaAngle < 0 )
+		deltaAngle += Math.PI * 2;
+	if ( deltaAngle > Math.PI * 2 )
+		deltaAngle -= Math.PI * 2;
 
 	var angle;
 
@@ -40,7 +42,7 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 		angle = this.aStartAngle + t * deltaAngle;
 
 	}
-	
+
 	var x = this.aX + this.xRadius * Math.cos( angle );
 	var y = this.aY + this.yRadius * Math.sin( angle );
 
@@ -49,7 +51,8 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 		var cos = Math.cos( this.aRotation );
 		var sin = Math.sin( this.aRotation );
 
-		var tx = x, ty = y;
+		var tx = x,
+			ty = y;
 
 		// Rotate the point about the center of the ellipse.
 		x = ( tx - this.aX ) * cos - ( ty - this.aY ) * sin + this.aX;

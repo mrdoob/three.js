@@ -38,7 +38,7 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		geometries[ geometry.id ] = buffergeometry;
 
-		info.memory.geometries ++;
+		info.memory.geometries++;
 
 		return buffergeometry;
 
@@ -85,7 +85,7 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		//
 
-		info.memory.geometries --;
+		info.memory.geometries--;
 
 	}
 

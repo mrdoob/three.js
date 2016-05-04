@@ -14,9 +14,7 @@ THREE.StringKeyframeTrack = function ( name, times, values, interpolation ) {
 
 };
 
-THREE.StringKeyframeTrack.prototype =
-		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
-
+THREE.StringKeyframeTrack.prototype = Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
 	constructor: THREE.StringKeyframeTrack,
 
 	ValueTypeName: 'string',
@@ -27,5 +25,4 @@ THREE.StringKeyframeTrack.prototype =
 	InterpolantFactoryMethodLinear: undefined,
 
 	InterpolantFactoryMethodSmooth: undefined
-
 } );

@@ -23,7 +23,7 @@ THREE.Line = function ( geometry, material, mode ) {
 THREE.Line.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Line.prototype.constructor = THREE.Line;
 
-THREE.Line.prototype.raycast = ( function () {
+THREE.Line.prototype.raycast = (function () {
 
 	var inverseMatrix = new THREE.Matrix4();
 	var ray = new THREE.Ray();
@@ -79,14 +79,13 @@ THREE.Line.prototype.raycast = ( function () {
 
 					if ( distSq > precisionSq ) continue;
 
-					interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
+					interRay.applyMatrix4( this.matrixWorld ); // Move back to world space for distance calculation
 
 					var distance = raycaster.ray.origin.distanceTo( interRay );
 
 					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 					intersects.push( {
-
 						distance: distance,
 						// What do we want? intersection point on the ray or on the segment??
 						// point: raycaster.ray.at( distance ),
@@ -95,7 +94,6 @@ THREE.Line.prototype.raycast = ( function () {
 						face: null,
 						faceIndex: null,
 						object: this
-
 					} );
 
 				}
@@ -111,14 +109,13 @@ THREE.Line.prototype.raycast = ( function () {
 
 					if ( distSq > precisionSq ) continue;
 
-					interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
+					interRay.applyMatrix4( this.matrixWorld ); // Move back to world space for distance calculation
 
 					var distance = raycaster.ray.origin.distanceTo( interRay );
 
 					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 					intersects.push( {
-
 						distance: distance,
 						// What do we want? intersection point on the ray or on the segment??
 						// point: raycaster.ray.at( distance ),
@@ -127,7 +124,6 @@ THREE.Line.prototype.raycast = ( function () {
 						face: null,
 						faceIndex: null,
 						object: this
-
 					} );
 
 				}
@@ -145,14 +141,13 @@ THREE.Line.prototype.raycast = ( function () {
 
 				if ( distSq > precisionSq ) continue;
 
-				interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
+				interRay.applyMatrix4( this.matrixWorld ); // Move back to world space for distance calculation
 
 				var distance = raycaster.ray.origin.distanceTo( interRay );
 
 				if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 				intersects.push( {
-
 					distance: distance,
 					// What do we want? intersection point on the ray or on the segment??
 					// point: raycaster.ray.at( distance ),
@@ -161,7 +156,6 @@ THREE.Line.prototype.raycast = ( function () {
 					face: null,
 					faceIndex: null,
 					object: this
-
 				} );
 
 			}
@@ -170,7 +164,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 	};
 
-}() );
+}());
 
 THREE.Line.prototype.clone = function () {
 

@@ -68,7 +68,7 @@ THREE.PositionalAudio.prototype.getMaxDistance = function () {
 
 };
 
-THREE.PositionalAudio.prototype.updateMatrixWorld = ( function () {
+THREE.PositionalAudio.prototype.updateMatrixWorld = (function () {
 
 	var position = new THREE.Vector3();
 
@@ -82,4 +82,4 @@ THREE.PositionalAudio.prototype.updateMatrixWorld = ( function () {
 
 	};
 
-} )();
+})();

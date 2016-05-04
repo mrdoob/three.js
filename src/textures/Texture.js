@@ -6,7 +6,7 @@
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
-	Object.defineProperty( this, 'id', { value: THREE.TextureIdCount ++ } );
+	Object.defineProperty( this, 'id', { value: THREE.TextureIdCount++ } );
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -35,14 +35,13 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
 	this.flipY = true;
-	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
-
+	this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
 	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
 	//
 	// Also changing the encoding after already used by a Material will not automatically make the Material
 	// update.  You need to explicitly call Material.needsUpdate to trigger it to recompile.
-	this.encoding = encoding !== undefined ? encoding :  THREE.LinearEncoding;
+	this.encoding = encoding !== undefined ? encoding : THREE.LinearEncoding;
 
 	this.version = 0;
 	this.onUpdate = null;
@@ -53,12 +52,11 @@ THREE.Texture.DEFAULT_IMAGE = undefined;
 THREE.Texture.DEFAULT_MAPPING = THREE.UVMapping;
 
 THREE.Texture.prototype = {
-
 	constructor: THREE.Texture,
 
-	set needsUpdate ( value ) {
+	set needsUpdate( value ) {
 
-		if ( value === true ) this.version ++;
+		if ( value === true ) this.version++;
 
 	},
 
@@ -197,7 +195,7 @@ THREE.Texture.prototype = {
 
 	transformUv: function ( uv ) {
 
-		if ( this.mapping !== THREE.UVMapping )  return;
+		if ( this.mapping !== THREE.UVMapping ) return;
 
 		uv.multiply( this.repeat );
 		uv.add( this.offset );
@@ -271,7 +269,6 @@ THREE.Texture.prototype = {
 		}
 
 	}
-
 };
 
 THREE.EventDispatcher.prototype.apply( THREE.Texture.prototype );

@@ -6,7 +6,8 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 	THREE.BufferGeometry.call( this );
 
-	var edge = [ 0, 0 ], hash = {};
+	var edge = [ 0, 0 ],
+		hash = {};
 
 	function sortFunction( a, b ) {
 
@@ -25,11 +26,11 @@ THREE.WireframeGeometry = function ( geometry ) {
 		// allocate maximal size
 		var edges = new Uint32Array( 6 * faces.length );
 
-		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+		for ( var i = 0, l = faces.length; i < l; i++ ) {
 
 			var face = faces[ i ];
 
-			for ( var j = 0; j < 3; j ++ ) {
+			for ( var j = 0; j < 3; j++ ) {
 
 				edge[ 0 ] = face[ keys[ j ] ];
 				edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
@@ -42,7 +43,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 					edges[ 2 * numEdges ] = edge[ 0 ];
 					edges[ 2 * numEdges + 1 ] = edge[ 1 ];
 					hash[ key ] = true;
-					numEdges ++;
+					numEdges++;
 
 				}
 
@@ -52,11 +53,11 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 		var coords = new Float32Array( numEdges * 2 * 3 );
 
-		for ( var i = 0, l = numEdges; i < l; i ++ ) {
+		for ( var i = 0, l = numEdges; i < l; i++ ) {
 
-			for ( var j = 0; j < 2; j ++ ) {
+			for ( var j = 0; j < 2; j++ ) {
 
-				var vertex = vertices[ edges [ 2 * i + j ] ];
+				var vertex = vertices[ edges[ 2 * i + j ] ];
 
 				var index = 6 * i + 3 * j;
 				coords[ index + 0 ] = vertex.x;
@@ -89,7 +90,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 			// allocate maximal size
 			var edges = new Uint32Array( 2 * indices.length );
 
-			for ( var o = 0, ol = groups.length; o < ol; ++ o ) {
+			for ( var o = 0, ol = groups.length; o < ol; ++o ) {
 
 				var group = groups[ o ];
 
@@ -98,7 +99,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 				for ( var i = start, il = start + count; i < il; i += 3 ) {
 
-					for ( var j = 0; j < 3; j ++ ) {
+					for ( var j = 0; j < 3; j++ ) {
 
 						edge[ 0 ] = indices[ i + j ];
 						edge[ 1 ] = indices[ i + ( j + 1 ) % 3 ];
@@ -111,7 +112,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 							edges[ 2 * numEdges ] = edge[ 0 ];
 							edges[ 2 * numEdges + 1 ] = edge[ 1 ];
 							hash[ key ] = true;
-							numEdges ++;
+							numEdges++;
 
 						}
 
@@ -123,9 +124,9 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 			var coords = new Float32Array( numEdges * 2 * 3 );
 
-			for ( var i = 0, l = numEdges; i < l; i ++ ) {
+			for ( var i = 0, l = numEdges; i < l; i++ ) {
 
-				for ( var j = 0; j < 2; j ++ ) {
+				for ( var j = 0; j < 2; j++ ) {
 
 					var index = 6 * i + 3 * j;
 					var index2 = edges[ 2 * i + j ];
@@ -150,9 +151,9 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 			var coords = new Float32Array( numEdges * 2 * 3 );
 
-			for ( var i = 0, l = numTris; i < l; i ++ ) {
+			for ( var i = 0, l = numTris; i < l; i++ ) {
 
-				for ( var j = 0; j < 3; j ++ ) {
+				for ( var j = 0; j < 3; j++ ) {
 
 					var index = 18 * i + 6 * j;
 

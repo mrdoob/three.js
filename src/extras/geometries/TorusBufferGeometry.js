@@ -27,7 +27,7 @@ THREE.TorusBufferGeometry = function ( radius, tube, radialSegments, tubularSegm
 	var indexCount = radialSegments * tubularSegments * 2 * 3;
 
 	// buffers
-	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array) ( indexCount );
 	var vertices = new Float32Array( vertexCount * 3 );
 	var normals = new Float32Array( vertexCount * 3 );
 	var uvs = new Float32Array( vertexCount * 2 );
@@ -42,13 +42,14 @@ THREE.TorusBufferGeometry = function ( radius, tube, radialSegments, tubularSegm
 	var vertex = new THREE.Vector3();
 	var normal = new THREE.Vector3();
 
-	var j, i;
+	var j,
+		i;
 
 	// generate vertices, normals and uvs
 
-	for ( j = 0; j <= radialSegments; j ++ ) {
+	for ( j = 0; j <= radialSegments; j++ ) {
 
-		for ( i = 0; i <= tubularSegments; i ++ ) {
+		for ( i = 0; i <= tubularSegments; i++ ) {
 
 			var u = i / tubularSegments * arc;
 			var v = j / radialSegments * Math.PI * 2;
@@ -87,9 +88,9 @@ THREE.TorusBufferGeometry = function ( radius, tube, radialSegments, tubularSegm
 
 	// generate indices
 
-	for ( j = 1; j <= radialSegments; j ++ ) {
+	for ( j = 1; j <= radialSegments; j++ ) {
 
-		for ( i = 1; i <= tubularSegments; i ++ ) {
+		for ( i = 1; i <= tubularSegments; i++ ) {
 
 			// indices
 			var a = ( tubularSegments + 1 ) * j + i - 1;

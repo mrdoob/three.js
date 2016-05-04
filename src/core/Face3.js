@@ -20,7 +20,6 @@ THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 };
 
 THREE.Face3.prototype = {
-
 	constructor: THREE.Face3,
 
 	clone: function () {
@@ -40,13 +39,13 @@ THREE.Face3.prototype = {
 
 		this.materialIndex = source.materialIndex;
 
-		for ( var i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
+		for ( var i = 0, il = source.vertexNormals.length; i < il; i++ ) {
 
 			this.vertexNormals[ i ] = source.vertexNormals[ i ].clone();
 
 		}
 
-		for ( var i = 0, il = source.vertexColors.length; i < il; i ++ ) {
+		for ( var i = 0, il = source.vertexColors.length; i < il; i++ ) {
 
 			this.vertexColors[ i ] = source.vertexColors[ i ].clone();
 
@@ -55,5 +54,4 @@ THREE.Face3.prototype = {
 		return this;
 
 	}
-
 };

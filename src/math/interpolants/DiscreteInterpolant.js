@@ -6,23 +6,20 @@
  * @author tschw
  */
 
-THREE.DiscreteInterpolant = function(
-		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+THREE.DiscreteInterpolant = function (
+	parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
 	THREE.Interpolant.call(
-			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+		this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
 };
 
-THREE.DiscreteInterpolant.prototype =
-		Object.assign( Object.create( THREE.Interpolant.prototype ), {
-
+THREE.DiscreteInterpolant.prototype = Object.assign( Object.create( THREE.Interpolant.prototype ), {
 	constructor: THREE.DiscreteInterpolant,
 
-	interpolate_: function( i1, t0, t, t1 ) {
+	interpolate_: function ( i1, t0, t, t1 ) {
 
 		return this.copySampleValue_( i1 - 1 );
 
 	}
-
 } );

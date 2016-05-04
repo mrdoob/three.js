@@ -13,7 +13,6 @@ THREE.Vector2 = function ( x, y ) {
 };
 
 THREE.Vector2.prototype = {
-
 	constructor: THREE.Vector2,
 
 	get width() {
@@ -80,9 +79,14 @@ THREE.Vector2.prototype = {
 
 		switch ( index ) {
 
-			case 0: this.x = value; break;
-			case 1: this.y = value; break;
-			default: throw new Error( 'index is out of range: ' + index );
+			case 0:
+				this.x = value;
+				break;
+			case 1:
+				this.y = value;
+				break;
+			default:
+				throw new Error( 'index is out of range: ' + index );
 
 		}
 
@@ -92,9 +96,12 @@ THREE.Vector2.prototype = {
 
 		switch ( index ) {
 
-			case 0: return this.x;
-			case 1: return this.y;
-			default: throw new Error( 'index is out of range: ' + index );
+			case 0:
+				return this.x;
+			case 1:
+				return this.y;
+			default:
+				throw new Error( 'index is out of range: ' + index );
 
 		}
 
@@ -265,7 +272,8 @@ THREE.Vector2.prototype = {
 
 	clampScalar: function () {
 
-		var min, max;
+		var min,
+			max;
 
 		return function clampScalar( minVal, maxVal ) {
 
@@ -358,7 +366,7 @@ THREE.Vector2.prototype = {
 
 	},
 
-	lengthManhattan: function() {
+	lengthManhattan: function () {
 
 		return Math.abs( this.x ) + Math.abs( this.y );
 
@@ -376,7 +384,8 @@ THREE.Vector2.prototype = {
 
 		var angle = Math.atan2( this.y, this.x );
 
-		if ( angle < 0 ) angle += 2 * Math.PI;
+		if ( angle < 0 )
+			angle += 2 * Math.PI;
 
 		return angle;
 
@@ -390,7 +399,8 @@ THREE.Vector2.prototype = {
 
 	distanceToSquared: function ( v ) {
 
-		var dx = this.x - v.x, dy = this.y - v.y;
+		var dx = this.x - v.x,
+			dy = this.y - v.y;
 		return dx * dx + dy * dy;
 
 	},
@@ -426,7 +436,8 @@ THREE.Vector2.prototype = {
 
 	fromArray: function ( array, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined )
+			offset = 0;
 
 		this.x = array[ offset ];
 		this.y = array[ offset + 1 ];
@@ -437,8 +448,10 @@ THREE.Vector2.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+		if ( array === undefined )
+			array = [];
+		if ( offset === undefined )
+			offset = 0;
 
 		array[ offset ] = this.x;
 		array[ offset + 1 ] = this.y;
@@ -449,7 +462,8 @@ THREE.Vector2.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined )
+			offset = 0;
 
 		index = index * attribute.itemSize + offset;
 
@@ -462,7 +476,8 @@ THREE.Vector2.prototype = {
 
 	rotateAround: function ( center, angle ) {
 
-		var c = Math.cos( angle ), s = Math.sin( angle );
+		var c = Math.cos( angle ),
+			s = Math.sin( angle );
 
 		var x = this.x - center.x;
 		var y = this.y - center.y;
@@ -473,5 +488,4 @@ THREE.Vector2.prototype = {
 		return this;
 
 	}
-
 };

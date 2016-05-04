@@ -23,16 +23,19 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 	var faces = this.faces;
 	var uvs = this.faceVertexUvs[ 0 ];
 
-	var i, j, p;
-	var u, v;
+	var i,
+		j,
+		p;
+	var u,
+		v;
 
 	var sliceCount = slices + 1;
 
-	for ( i = 0; i <= stacks; i ++ ) {
+	for ( i = 0; i <= stacks; i++ ) {
 
 		v = i / stacks;
 
-		for ( j = 0; j <= slices; j ++ ) {
+		for ( j = 0; j <= slices; j++ ) {
 
 			u = j / slices;
 
@@ -43,12 +46,18 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 
 	}
 
-	var a, b, c, d;
-	var uva, uvb, uvc, uvd;
+	var a,
+		b,
+		c,
+		d;
+	var uva,
+		uvb,
+		uvc,
+		uvd;
 
-	for ( i = 0; i < stacks; i ++ ) {
+	for ( i = 0; i < stacks; i++ ) {
 
-		for ( j = 0; j < slices; j ++ ) {
+		for ( j = 0; j < slices; j++ ) {
 
 			a = i * sliceCount + j;
 			b = i * sliceCount + j + 1;

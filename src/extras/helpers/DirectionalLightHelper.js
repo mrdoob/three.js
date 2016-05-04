@@ -19,8 +19,8 @@ THREE.DirectionalLightHelper = function ( light, size ) {
 	var geometry = new THREE.Geometry();
 	geometry.vertices.push(
 		new THREE.Vector3( - size,   size, 0 ),
-		new THREE.Vector3(   size,   size, 0 ),
-		new THREE.Vector3(   size, - size, 0 ),
+		new THREE.Vector3( size,   size, 0 ),
+		new THREE.Vector3( size, - size, 0 ),
 		new THREE.Vector3( - size, - size, 0 ),
 		new THREE.Vector3( - size,   size, 0 )
 	);

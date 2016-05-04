@@ -32,28 +32,27 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	var faces = [];
 
-	for ( var i = 0, j = 0, l = indices.length; i < l; i += 3, j ++ ) {
+	for ( var i = 0, j = 0, l = indices.length; i < l; i += 3, j++ ) {
 
 		var v1 = p[ indices[ i ] ];
 		var v2 = p[ indices[ i + 1 ] ];
 		var v3 = p[ indices[ i + 2 ] ];
 
-		faces[ j ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ], undefined, j );
+		faces[ j ] = new THREE.Face3( v1.index, v2.index, v3.index,[ v1.clone(), v2.clone(), v3.clone() ], undefined, j );
 
 	}
 
 	var centroid = new THREE.Vector3();
 
-	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+	for ( var i = 0, l = faces.length; i < l; i++ ) {
 
 		subdivide( faces[ i ], detail );
 
 	}
 
-
 	// Handle case when face straddles the seam
 
-	for ( var i = 0, l = this.faceVertexUvs[ 0 ].length; i < l; i ++ ) {
+	for ( var i = 0, l = this.faceVertexUvs[ 0 ].length; i < l; i++ ) {
 
 		var uvs = this.faceVertexUvs[ 0 ][ i ];
 
@@ -68,23 +67,24 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 			// 0.9 is somewhat arbitrary
 
-			if ( x0 < 0.2 ) uvs[ 0 ].x += 1;
-			if ( x1 < 0.2 ) uvs[ 1 ].x += 1;
-			if ( x2 < 0.2 ) uvs[ 2 ].x += 1;
+			if ( x0 < 0.2 )
+				uvs[ 0 ].x += 1;
+			if ( x1 < 0.2 )
+				uvs[ 1 ].x += 1;
+			if ( x2 < 0.2 )
+				uvs[ 2 ].x += 1;
 
 		}
 
 	}
 
-
 	// Apply radius
 
-	for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
+	for ( var i = 0, l = this.vertices.length; i < l; i++ ) {
 
 		this.vertices[ i ].multiplyScalar( radius );
 
 	}
-
 
 	// Merge vertices
 
@@ -93,7 +93,6 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 	this.computeFaceNormals();
 
 	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
-
 
 	// Project vector onto sphere's surface
 
@@ -112,12 +111,11 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	}
 
-
 	// Approximate a curved face with recursively sub-divided triangles.
 
 	function make( v1, v2, v3, materialIndex ) {
 
-		var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ], undefined, materialIndex );
+		var face = new THREE.Face3( v1.index, v2.index, v3.index,[ v1.clone(), v2.clone(), v3.clone() ], undefined, materialIndex );
 		that.faces.push( face );
 
 		centroid.copy( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
@@ -131,7 +129,6 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 		] );
 
 	}
-
 
 	// Analytically subdivide a face to the required detail level.
 
@@ -147,7 +144,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 		// Construct all of the vertices for this subdivision.
 
-		for ( var i = 0 ; i <= cols; i ++ ) {
+		for ( var i = 0; i <= cols; i++ ) {
 
 			v[ i ] = [];
 
@@ -155,7 +152,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 			var bj = prepare( b.clone().lerp( c, i / cols ) );
 			var rows = cols - i;
 
-			for ( var j = 0; j <= rows; j ++ ) {
+			for ( var j = 0; j <= rows; j++ ) {
 
 				if ( j === 0 && i === cols ) {
 
@@ -173,9 +170,9 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 		// Construct all of the faces.
 
-		for ( var i = 0; i < cols ; i ++ ) {
+		for ( var i = 0; i < cols; i++ ) {
 
-			for ( var j = 0; j < 2 * ( cols - i ) - 1; j ++ ) {
+			for ( var j = 0; j < 2 * ( cols - i ) - 1; j++ ) {
 
 				var k = Math.floor( j / 2 );
 
@@ -205,7 +202,6 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	}
 
-
 	// Angle around the Y axis, counter-clockwise when looking from above.
 
 	function azimuth( vector ) {
@@ -213,7 +209,6 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 		return Math.atan2( vector.z, - vector.x );
 
 	}
-
 
 	// Angle above the XZ plane.
 
@@ -223,17 +218,17 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	}
 
-
 	// Texture fixing helper. Spheres have some odd behaviours.
 
 	function correctUV( uv, vector, azimuth ) {
 
-		if ( ( azimuth < 0 ) && ( uv.x === 1 ) ) uv = new THREE.Vector2( uv.x - 1, uv.y );
-		if ( ( vector.x === 0 ) && ( vector.z === 0 ) ) uv = new THREE.Vector2( azimuth / 2 / Math.PI + 0.5, uv.y );
+		if ( ( azimuth < 0 ) && ( uv.x === 1 ) )
+			uv = new THREE.Vector2( uv.x - 1, uv.y );
+		if ( ( vector.x === 0 ) && ( vector.z === 0 ) )
+			uv = new THREE.Vector2( azimuth / 2 / Math.PI + 0.5, uv.y );
 		return uv.clone();
 
 	}
-
 
 };
 
