@@ -472,6 +472,25 @@ Object.defineProperties( THREE.ShaderMaterial.prototype, {
 
 //
 
+THREE.EventDispatcher.prototype = Object.assign( Object.create( {
+
+    // Note: Extra base ensures these properties are not 'assign'ed.
+
+	constructor: THREE.EventDispatcher,
+
+	apply: function( target ) {
+
+		console.warn( "THREE.EventDispatcher: .apply is deprecated, " +
+				"just inherit or Object.assign the prototype to mix-in." );
+
+		Object.assign( target, this );
+
+	}
+
+} ), THREE.EventDispatcher.prototype );
+
+//
+
 Object.defineProperties( THREE.WebGLRenderer.prototype, {
 	supportsFloatTextures: {
 		value: function () {
@@ -577,13 +596,12 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 
 Object.defineProperty( THREE.WebGLShadowMap.prototype, 'cullFace', {
 	set: function( cullFace ) {
-		var flipSided = ( cullFace !== THREE.CullFaceBack );
-		console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. " +
-				" Set .shadowMap.flipSidedFaces to " + flipSided + "." );
-		this.flipSidedFaces = flipSided;
+		var value = ( cullFace !== THREE.CullFaceBack );
+		console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. Set .shadowMap.renderReverseSided to " + value + "." );
+		this.renderReverseSided = value;
 	},
 	get: function() {
-		return this.flipSidedFaces ? THREE.CullFaceFront : THREE.CullFaceBack;
+		return this.renderReverseSided ? THREE.CullFaceFront : THREE.CullFaceBack;
 	}
 } );
 

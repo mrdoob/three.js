@@ -1220,6 +1220,12 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	premultiply: function ( q ) {
+
+		return this.multiplyQuaternions( q, this );
+
+	},
+
 	multiplyQuaternions: function ( a, b ) {
 
 		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
@@ -8150,39 +8156,7 @@ THREE.Clock.prototype = {
 
 THREE.EventDispatcher = function () {};
 
-//
-// [Deprecation]
-//
-
-THREE.EventDispatcher.prototype = Object.assign( Object.create( {
-
-	constructor: THREE.EventDispatcher,
-
-	apply: function ( object ) {
-
-		console.warn( "THREE.EventDispatcher: .apply is deprecated, " +
-				"just inherit or Object.assign the prototype to mix-in." );
-
-		object.addEventListener = THREE.EventDispatcher.prototype.addEventListener;
-		object.hasEventListener = THREE.EventDispatcher.prototype.hasEventListener;
-		object.removeEventListener = THREE.EventDispatcher.prototype.removeEventListener;
-		object.dispatchEvent = THREE.EventDispatcher.prototype.dispatchEvent;
-
-	}
-
-	// Notes:
-	// - The prototype chain ensures that Object.assign will not copy the
-	//   properties within this block.
-	// - When .constructor is not explicitly set, it is not copied either,
-	//   so use the disabled code below so doesn't need to be clobbered.
-
-} ), {
-
-//
-// [/Deprecation]
-//
-
-//Object.assign( THREE.EventDispatcher.prototype, {
+Object.assign( THREE.EventDispatcher.prototype, {
 
 	addEventListener: function ( type, listener ) {
 
@@ -8252,16 +8226,16 @@ THREE.EventDispatcher.prototype = Object.assign( Object.create( {
 
 			event.target = this;
 
-			var array = [];
+			var array = [], i = 0;
 			var length = listenerArray.length;
 
-			for ( var i = 0; i < length; i ++ ) {
+			for ( i = 0; i < length; i ++ ) {
 
 				array[ i ] = listenerArray[ i ];
 
 			}
 
-			for ( var i = 0; i < length; i ++ ) {
+			for ( i = 0; i < length; i ++ ) {
 
 				array[ i ].call( this, event );
 
@@ -18298,12 +18272,22 @@ THREE.FontLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		var scope = this;
+
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.load( url, function ( text ) {
 
-			onLoad( new THREE.Font( JSON.parse( text.substring( 65, text.length - 2 ) ) ) );
+			var font = scope.parse( JSON.parse( text.substring( 65, text.length - 2 ) ) );
+
+			if ( onLoad ) onLoad( font );
 
 		}, onProgress, onError );
+
+	},
+
+	parse: function ( json ) {
+
+		return new THREE.Font( json );
 
 	}
 
@@ -30133,8 +30117,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	this.type = THREE.PCFShadowMap;
 
-	this.flipSidedFaces = true;
-	this.allowDoubleSided = false;
+	this.renderReverseSided = true;
+	this.renderSingleSided = true;
 
 	this.render = function ( scene, camera ) {
 
@@ -30400,8 +30384,20 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		result.wireframe = material.wireframe;
 
 		var side = material.side;
-		if ( ! scope.allowDoubleSided ) 		side &= 1;
-		if ( scope.flipSidedFaces && side < 2 ) side ^= 1;
+
+		if ( scope.renderSingleSided && side == THREE.DoubleSide ) {
+
+			side = THREE.FrontSide;
+
+		}
+
+		if ( scope.renderReverseSided ) {
+
+			if ( side === THREE.FrontSide ) side = THREE.BackSide;
+			else if ( side === THREE.BackSide ) side = THREE.FrontSide;
+
+		}
+
 		result.side = side;
 
 		result.clipShadows = material.clipShadows;
@@ -30508,7 +30504,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 
-	var currentTextureSlot = undefined;
+	var currentTextureSlot = null;
 	var currentBoundTextures = {};
 
 	var currentClearColor = new THREE.Vector4();
@@ -30517,6 +30513,31 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var currentScissor = new THREE.Vector4();
 	var currentViewport = new THREE.Vector4();
+
+	function createTexture( type, target, count ) {
+
+		var data = new Uint8Array( 3 );
+		var texture = gl.createTexture();
+
+		gl.bindTexture( type, texture );
+		gl.texParameteri( type, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
+		gl.texParameteri( type, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+
+		for ( var i = 0; i < count; i ++ ) {
+
+			gl.texImage2D( target + i, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, data );
+
+		}
+
+		return texture;
+
+	}
+
+	var emptyTextures = {};
+	emptyTextures[ gl.TEXTURE_2D ] = createTexture( gl.TEXTURE_2D, gl.TEXTURE_2D, 1 );
+	emptyTextures[ gl.TEXTURE_CUBE_MAP ] = createTexture( gl.TEXTURE_CUBE_MAP, gl.TEXTURE_CUBE_MAP_POSITIVE_X, 6 );
+
+	//
 
 	this.init = function () {
 
@@ -31062,7 +31083,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.bindTexture = function ( webglType, webglTexture ) {
 
-		if ( currentTextureSlot === undefined ) {
+		if ( currentTextureSlot === null ) {
 
 			_this.activeTexture();
 
@@ -31079,7 +31100,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
 
-			gl.bindTexture( webglType, webglTexture );
+			gl.bindTexture( webglType, webglTexture || emptyTextures[ webglType ] );
 
 			boundTexture.type = webglType;
 			boundTexture.texture = webglTexture;
@@ -31196,7 +31217,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		compressedTextureFormats = null;
 
-		currentTextureSlot = undefined;
+		currentTextureSlot = null;
 		currentBoundTextures = {};
 
 		currentBlending = null;
@@ -33052,6 +33073,25 @@ Object.defineProperties( THREE.ShaderMaterial.prototype, {
 
 //
 
+THREE.EventDispatcher.prototype = Object.assign( Object.create( {
+
+    // Note: Extra base ensures these properties are not 'assign'ed.
+
+	constructor: THREE.EventDispatcher,
+
+	apply: function( target ) {
+
+		console.warn( "THREE.EventDispatcher: .apply is deprecated, " +
+				"just inherit or Object.assign the prototype to mix-in." );
+
+		Object.assign( target, this );
+
+	}
+
+} ), THREE.EventDispatcher.prototype );
+
+//
+
 Object.defineProperties( THREE.WebGLRenderer.prototype, {
 	supportsFloatTextures: {
 		value: function () {
@@ -33157,13 +33197,12 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 
 Object.defineProperty( THREE.WebGLShadowMap.prototype, 'cullFace', {
 	set: function( cullFace ) {
-		var flipSided = ( cullFace !== THREE.CullFaceBack );
-		console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. " +
-				" Set .shadowMap.flipSidedFaces to " + flipSided + "." );
-		this.flipSidedFaces = flipSided;
+		var value = ( cullFace !== THREE.CullFaceBack );
+		console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. Set .shadowMap.renderReverseSided to " + value + "." );
+		this.renderReverseSided = value;
 	},
 	get: function() {
-		return this.flipSidedFaces ? THREE.CullFaceFront : THREE.CullFaceBack;
+		return this.renderReverseSided ? THREE.CullFaceFront : THREE.CullFaceBack;
 	}
 } );
 

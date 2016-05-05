@@ -176,7 +176,7 @@
 					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
 					pmremCubeUVPacker.update( renderer );
 
-					standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget;
+					standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 					standardMaterial.needsUpdate = true;
 
 				} );

@@ -345,7 +345,7 @@
 					var stepLen = filterLen * Math.pow( TAPS_PER_PASS, -pass );
 
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
-					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureDepth;
+					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysGenerate;
 
@@ -357,7 +357,7 @@
 					stepLen = filterLen * Math.pow( TAPS_PER_PASS, -pass );
 
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
-					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays2;
+					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays2.texture;
 
 					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureGodRays1  );
 
@@ -367,14 +367,14 @@
 					stepLen = filterLen * Math.pow( TAPS_PER_PASS, -pass );
 
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
-					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays1;
+					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays1.texture;
 
 					renderer.render( postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays2  );
 
 					// final pass - composite god-rays onto colors
 
-					postprocessing.godrayCombineUniforms["tColors"].value = postprocessing.rtTextureColors;
-					postprocessing.godrayCombineUniforms["tGodRays"].value = postprocessing.rtTextureGodRays2;
+					postprocessing.godrayCombineUniforms["tColors"].value = postprocessing.rtTextureColors.texture;
+					postprocessing.godrayCombineUniforms["tGodRays"].value = postprocessing.rtTextureGodRays2.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysCombine;
 

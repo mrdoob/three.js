@@ -91,8 +91,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	this.type = THREE.PCFShadowMap;
 
-	this.flipSidedFaces = true;
-	this.allowDoubleSided = false;
+	this.renderReverseSided = true;
+	this.renderSingleSided = true;
 
 	this.render = function ( scene, camera ) {
 
@@ -358,8 +358,20 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		result.wireframe = material.wireframe;
 
 		var side = material.side;
-		if ( ! scope.allowDoubleSided ) 		side &= 1;
-		if ( scope.flipSidedFaces && side < 2 ) side ^= 1;
+
+		if ( scope.renderSingleSided && side == THREE.DoubleSide ) {
+
+			side = THREE.FrontSide;
+
+		}
+
+		if ( scope.renderReverseSided ) {
+
+			if ( side === THREE.FrontSide ) side = THREE.BackSide;
+			else if ( side === THREE.BackSide ) side = THREE.FrontSide;
+
+		}
+
 		result.side = side;
 
 		result.clipShadows = material.clipShadows;

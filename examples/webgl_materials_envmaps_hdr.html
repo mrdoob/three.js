@@ -152,6 +152,7 @@
 					pmremCubeUVPacker.update( renderer );
 
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
 				} );
 
 				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
@@ -166,6 +167,7 @@
 					pmremCubeUVPacker.update( renderer );
 
 					ldrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
 				} );
 
 
@@ -181,6 +183,7 @@
 					pmremCubeUVPacker.update( renderer );
 
 					rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
 				} );
 
 				// Lights
@@ -252,20 +255,28 @@
 
 					standardMaterial.roughness = params.roughness;
 					standardMaterial.bumpScale = - 0.05 * params.bumpScale;
+
 					var newEnvMap = standardMaterial.envMap;
+
 					switch( params.envMap ) {
+
 						case 'None': newEnvMap = null; break;
-						case 'LDR': newEnvMap = ldrCubeRenderTarget; break;
-						case 'HDR': newEnvMap = hdrCubeRenderTarget; break;
-						case 'RGBM16': newEnvMap = rgbmCubeRenderTarget; break;
+						case 'LDR': newEnvMap = ldrCubeRenderTarget ? ldrCubeRenderTarget.texture : null; break;
+						case 'HDR': newEnvMap = hdrCubeRenderTarget ? hdrCubeRenderTarget.texture : null; break;
+						case 'RGBM16': newEnvMap = rgbmCubeRenderTarget ? rgbmCubeRenderTarget.texture : null; break;
+
 					}
+
 					if( newEnvMap !== standardMaterial.envMap ) {
+
 						standardMaterial.envMap = newEnvMap;
 						standardMaterial.needsUpdate = true;
 						floorMaterial.emissive = new THREE.Color( 1, 1, 1 );
 						floorMaterial.emissiveMap = newEnvMap;
 						floorMaterial.needsUpdate = true;
+
 					}
+
 				}
 
 				renderer.toneMappingExposure = Math.pow( params.exposure, 4.0 );

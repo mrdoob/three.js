@@ -200,8 +200,9 @@
 
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					material.envMap = hdrCubeRenderTarget;
+					material.envMap = hdrCubeRenderTarget.texture;
 					material.needsUpdate = true;
+
 				} );
 
 				//

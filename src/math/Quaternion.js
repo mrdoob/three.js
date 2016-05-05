@@ -375,6 +375,12 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	premultiply: function ( q ) {
+
+		return this.multiplyQuaternions( q, this );
+
+	},
+
 	multiplyQuaternions: function ( a, b ) {
 
 		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm

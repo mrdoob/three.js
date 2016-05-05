@@ -136,7 +136,7 @@
 
 				var materialScreen = new THREE.ShaderMaterial( {
 
-					uniforms: { tDiffuse: { type: "t", value: rtTexture } },
+					uniforms: { tDiffuse: { type: "t", value: rtTexture.texture } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader_screen' ).textContent,
 
