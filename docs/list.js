@@ -198,6 +198,8 @@ var list = {
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
 			[ "CylinderBufferGeometry", "api/extras/geometries/CylinderBufferGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
+			[ "ConeBufferGeometry", "api/extras/geometries/ConeBufferGeometry" ],
+			[ "ConeGeometry", "api/extras/geometries/ConeGeometry" ],
 			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
 			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
 			[ "IcosahedronGeometry", "api/extras/geometries/IcosahedronGeometry" ],
