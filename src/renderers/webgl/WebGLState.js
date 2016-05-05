@@ -67,7 +67,8 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 		var texture = gl.createTexture();
 
 		gl.bindTexture( type, texture );
-		gl.texParameteri( type, gl.TEXTURE_MIN_FILTER, gl.LINEAR );
+		gl.texParameteri( type, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
+		gl.texParameteri( type, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
 
 		for ( var i = 0; i < count; i ++ ) {
 
