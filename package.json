@@ -10,7 +10,6 @@
   },
   "scripts": {
     "build": "cd ./utils/build && node build.js --include common --include extras",
-    "build-min": "cd ./utils/build && node build.js --include common --include extras --minify --output ../../build/three.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
