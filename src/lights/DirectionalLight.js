@@ -14,7 +14,7 @@ THREE.DirectionalLight = function ( color, intensity ) {
 
 	this.target = new THREE.Object3D();
 
-	this.shadow = new THREE.LightShadow( new THREE.OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
+	this.shadow = new THREE.DirectionalLightShadow();
 
 };
 

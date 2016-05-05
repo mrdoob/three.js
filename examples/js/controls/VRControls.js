@@ -9,6 +9,8 @@ THREE.VRControls = function ( object, onError ) {
 
 	var vrInput;
 
+	var standingMatrix = new THREE.Matrix4();
+
 	function gotVRDevices( devices ) {
 
 		for ( var i = 0; i < devices.length; i ++ ) {
@@ -48,6 +50,14 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.scale = 1;
 
+	// If true will use "standing space" coordinate system where y=0 is the
+	// floor and x=0, z=0 is the center of the room.
+	this.standing = false;
+
+	// Distance from the users eyes to the floor in meters. Used when
+	// standing=true but the VRDisplay doesn't provide stageParameters.
+	this.userHeight = 1.6;
+
 	this.update = function () {
 
 		if ( vrInput ) {
@@ -64,7 +74,11 @@ THREE.VRControls = function ( object, onError ) {
 
 				if ( pose.position !== null ) {
 
-					object.position.fromArray( pose.position ).multiplyScalar( scope.scale );
+					object.position.fromArray( pose.position );
+
+				} else {
+
+					object.position.set( 0, 0, 0 );
 
 				}
 
@@ -81,17 +95,40 @@ THREE.VRControls = function ( object, onError ) {
 
 				if ( state.position !== null ) {
 
-					object.position.copy( state.position ).multiplyScalar( scope.scale );
+					object.position.copy( state.position );
+
+				} else {
+
+					object.position.set( 0, 0, 0 );
 
 				}
 
 			}
 
+			if ( this.standing ) {
+
+				if ( vrInput.stageParameters ) {
+
+					object.updateMatrix();
+
+					standingMatrix.fromArray(vrInput.stageParameters.sittingToStandingTransform);
+					object.applyMatrix( standingMatrix );
+
+				} else {
+
+					object.position.setY( object.position.y + this.userHeight );
+
+				}
+
+			}
+
+			object.position.multiplyScalar( scope.scale );
+
 		}
 
 	};
 
-	this.resetSensor = function () {
+	this.resetPose = function () {
 
 		if ( vrInput ) {
 
@@ -115,10 +152,17 @@ THREE.VRControls = function ( object, onError ) {
 
 	};
 
+	this.resetSensor = function () {
+
+		console.warn( 'THREE.VRControls: .resetSensor() is now .resetPose().' );
+		this.resetPose();
+
+	};
+
 	this.zeroSensor = function () {
 
-		console.warn( 'THREE.VRControls: .zeroSensor() is now .resetSensor().' );
-		this.resetSensor();
+		console.warn( 'THREE.VRControls: .zeroSensor() is now .resetPose().' );
+		this.resetPose();
 
 	};
 

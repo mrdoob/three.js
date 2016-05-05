@@ -22,6 +22,7 @@
 		<ul>
 			<li>A *ShaderMaterial* will only be rendered properly by [page:WebGLRenderer], since the GLSL code in the *vertexShader* and *fragmentShader* properties must be compiled and run on the GPU using WebGL.</li>
 			<li>As of THREE r72, directly assigning attributes in a *ShaderMaterial* is no longer supported. A [page:BufferGeometry] instance (instead of a [page:Geometry] instance) must be used instead, using [page:BufferAttribute] instances to define custom attributes.</li>
+			<li>As of THREE r77, [page:WebGLRenderTarget] or [page:WebGLRenderTargetCube] instances are no longer supposed to be used as uniforms. Their [page:Texture texture] property must be used instead.</li>
 		</ul>
 		</div>
 
@@ -31,11 +32,11 @@
 		var material = new THREE.ShaderMaterial( {
 
 			uniforms: {
-				time: { type: "f", value: 1.0 },
-				resolution: { type: "v2", value: new THREE.Vector2() }
+				time: { value: 1.0 },
+				resolution: { value: new THREE.Vector2() }
 			},
 			attributes: {
-				vertexOpacity: { type: 'f', value: [] }
+				vertexOpacity: { value: [] }
 			},
 			vertexShader: document.getElementById( 'vertexShader' ).textContent,
 			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
@@ -122,81 +123,160 @@
 		To declare a custom uniform, use the *uniforms* property:
 		<code>
 		uniforms: {
-			time: { type: "f", value: 1.0 },
-			resolution: { type: "v2", value: new THREE.Vector2() }
+			time: { value: 1.0 },
+			resolution: { value: new THREE.Vector2() }
 		}
 		</code>
-		Each uniform must have a <a href="#uniform-types">*type*</a> and a *value*:
+		Each uniform must have a *value* property. The type of the value must correspond to the type of the uniform variable in the GLSL code as specified for the primitive GLSL types in the table below. Uniform structures and arrays are also supported. GLSL arrays of primitive type must either be specified as an array of the corresponding THREE objects or as a flat array containing the data of all the objects. In other words; GLSL primitives in arrays must not be represented by arrays. This rule does not apply transitively.  An array of *vec2* arrays, each with a length of five vectors, must be an array of arrays, of either five *THREE.Vector2* objects or ten *number*s.
 		<table>
 			<caption><a id="uniform-types">Uniform types</a></caption>
 			<thead>
 				<tr>
-					<th>Uniform *type* string</th>
 					<th>GLSL type</th>
 					<th>JavaScript type</th>
 				</tr>
 			</thead>
 			<tbody>
+
 				<tr>
-					<td><code>'i', '1i'</code></td>
 					<td>int</td>
 					<td>[page:Number]</td>
 				</tr>
 				<tr>
-					<td><code>'f', '1f'</code></td>
 					<td>float</td>
 					<td>[page:Number]</td>
 				</tr>
 				<tr>
-					<td><code>'v2'</code></td>
+					<td>bool</td>
+					<td>[page:Boolean]</td>
+				</tr>
+				<tr>
+					<td>bool</td>
+					<td>[page:Number]</td>
+				</tr>
+
+				<tr>
 					<td>vec2</td>
 					<td>[page:Vector2 THREE.Vector2]</td>
 				</tr>
 				<tr>
-					<td><code>'v3'</code></td>
+					<td>vec2</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec2</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
 					<td>vec3</td>
 					<td>[page:Vector3 THREE.Vector3]</td>
 				</tr>
 				<tr>
-					<td><code>'c'</code></td>
 					<td>vec3</td>
 					<td>[page:Color THREE.Color]</td>
 				</tr>
-
 				<tr>
-					<td><code>'v4'</code></td>
+					<td>vec3</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec3</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
 					<td>vec4</td>
 					<td>[page:Vector4 THREE.Vector4]</td>
 				</tr>
+				<tr>
+					<td>vec4</td>
+					<td>[page:Quaternion THREE.Quaternion]</td>
+				</tr>
+				<tr>
+					<td>vec4</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec4</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
 
 				<tr>
-					<td><code>'m3'</code></td>
+					<td>mat2</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</td>
+				<tr>
+					<td>mat2</td>
+					<td>[page:Array Array] (*)</td>
+				</td>
+				<tr>
 					<td>mat3</td>
 					<td>[page:Matrix3 THREE.Matrix3]</td>
 				</tr>
-
 				<tr>
-					<td><code>'m4'</code></td>
-					<td>mat4</td>
-					<td>[page:Matrix4 THREE.Matrix4]</td>
+					<td>mat3</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
 				</tr>
 				<tr>
-					<td><code>'t'</code></td>
+					<td>mat3</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>mat4</td>
+					<td>[page:Matrix3 THREE.Matrix4]</td>
+				</tr>
+				<tr>
+					<td>mat4</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>mat4</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+
+				<tr>
+					<td>ivec2, bvec2</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec2, bvec2</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec3, bvec3</td>
+					<td>[page:Int32Array Int32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec3, bvec3</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec4, bvec4</td>
+					<td>[page:Int32Array Int32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec4, bvec4</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+
+				<tr>
 					<td>sampler2D</td>
 					<td>[page:Texture THREE.Texture]</td>
 				</tr>
 				<tr>
-					<td><code>'t'</code></td>
 					<td>samplerCube</td>
-					<td>[page:Texture THREE.CubeTexture]</td>
+					<td>[page:CubeTexture THREE.CubeTexture]</tr>
 				</tr>
+
 			</tbody>
 		</table>
+		</p>
+		<p>
+		(*) Same for an (innermost) array (dimension) of the same GLSL type, containing the components of all vectors or matrices in the array.
 		</p>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([page:Object parameters])</h3>
+		<h3>[name]( [page:Object parameters] )</h3>
 		<div>
 		parameters -- An object containing various parameters setting up shaders and their uniforms.
 		</div>
@@ -217,9 +297,9 @@
 		<div>
 		Object specifying the uniforms to be passed to the shader code; keys are uniform names, values are definitions of the form
 		<code>
-		{ type: 'f', value: 1.0 }
+		{ value: 1.0 }
 		</code>
-		where *type* is a <a href="#uniform-types">uniform type string</a>, and *value* is the value of the uniform. Names must match the name of the uniform, as defined in the GLSL code. Note that uniforms are refreshed on every frame, so updating the value of the uniform will immediately update the value available to the GLSL code.
+		where *value* is the value of the uniform. Names must match the name of the uniform, as defined in the GLSL code. Note that uniforms are refreshed on every frame, so updating the value of the uniform will immediately update the value available to the GLSL code.
 		</div>
 
 		<h3>[property:Object defines]</h3>
@@ -272,7 +352,12 @@
 
 		<h3>[property:Boolean lights]</h3>
 		<div>
-		Defines whether this material uses lighting; true to pass uniform data related to lighting to this shader
+		Defines whether this material uses lighting; true to pass uniform data related to lighting to this shader. Default is false.
+		</div>
+
+		<h3>[property:Boolean clipping]</h3>
+		<div>
+		Defines whether this material supports clipping; true to let the renderer pass the clippingPlanes uniform. Default is false.
 		</div>
 
 		<h3>[property:Number vertexColors]</h3>
@@ -303,7 +388,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:ShaderMaterial clone]()</h3>
+		<h3>[method:ShaderMaterial clone]() [page:ShaderMaterial this]</h3>
 		<div>
 		Generates a shallow copy of this material. Note that the vertexShader and fragmentShader are copied <emph>by reference</emph>, as are the definitions of the *attributes*; this means that clones of the material will share the same compiled [page:WebGLProgram]. However, the *uniforms* are copied <emph>by value</emph>, which allows you to have different sets of uniforms for different copies of the material.
 		</div>

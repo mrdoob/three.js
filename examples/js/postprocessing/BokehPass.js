@@ -5,6 +5,8 @@
 
 THREE.BokehPass = function ( scene, camera, params ) {
 
+	THREE.Pass.call( this );
+
 	this.scene = scene;
 	this.camera = camera;
 
@@ -41,7 +43,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	var bokehShader = THREE.BokehShader;
 	var bokehUniforms = THREE.UniformsUtils.clone( bokehShader.uniforms );
 
-	bokehUniforms[ "tDepth" ].value = this.renderTargetDepth;
+	bokehUniforms[ "tDepth" ].value = this.renderTargetDepth.texture;
 
 	bokehUniforms[ "focus" ].value = focus;
 	bokehUniforms[ "aspect" ].value = aspect;
@@ -55,10 +57,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	} );
 
 	this.uniforms = bokehUniforms;
-	this.enabled = true;
 	this.needsSwap = false;
-	this.renderToScreen = false;
-	this.clear = false;
 
 	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene2  = new THREE.Scene();
@@ -68,7 +67,11 @@ THREE.BokehPass = function ( scene, camera, params ) {
 
 };
 
+THREE.BokehPass.prototype = Object.create( THREE.Pass.prototype );
+
 THREE.BokehPass.prototype = {
+
+	constructor: THREE.BokehPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -82,7 +85,7 @@ THREE.BokehPass.prototype = {
 
 		// Render bokeh composite
 
-		this.uniforms[ "tColor" ].value = readBuffer;
+		this.uniforms[ "tColor" ].value = readBuffer.texture;
 
 		if ( this.renderToScreen ) {
 
@@ -99,4 +102,3 @@ THREE.BokehPass.prototype = {
 	}
 
 };
-

@@ -89,9 +89,7 @@ THREE.Object3D = function () {
 THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 1, 0 );
 THREE.Object3D.DefaultMatrixAutoUpdate = true;
 
-THREE.Object3D.prototype = {
-
-	constructor: THREE.Object3D,
+Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 	applyMatrix: function ( matrix ) {
 
@@ -546,7 +544,8 @@ THREE.Object3D.prototype = {
 
 	toJSON: function ( meta ) {
 
-		var isRootObject = ( meta === undefined );
+		// meta is '' when called from JSON.stringify
+		var isRootObject = ( meta === undefined || meta === '' );
 
 		var output = {};
 
@@ -714,8 +713,6 @@ THREE.Object3D.prototype = {
 
 	}
 
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.Object3D.prototype );
+} );
 
 THREE.Object3DIdCount = 0;

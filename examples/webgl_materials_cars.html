@@ -55,7 +55,7 @@
 			<div id="buttons_materials" class="bwrap"></div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/BinaryLoader.js"></script>
 
@@ -219,10 +219,7 @@
 				if ( STATS_ENABLED ) {
 
 					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-					container.appendChild( stats.domElement );
+					container.appendChild( stats.dom );
 
 				}
 

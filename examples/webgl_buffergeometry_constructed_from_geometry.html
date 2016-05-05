@@ -24,7 +24,7 @@
 		}
 		#title a {color:#ff0;}
 	</style>
-	<script type="text/javascript" src="../build/three.min.js"></script>
+	<script type="text/javascript" src="../build/three.js"></script>
 	<script type="text/javascript" src="js/Detector.js"></script>
 	<script type="text/javascript" src="js/libs/stats.min.js"></script>
 	<script type="text/javascript" src="js/controls/TrackballControls.js"></script>
@@ -79,9 +79,7 @@
 			controls.dynamicDampingFactor = 0.1;
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '24px';
-			document.body.appendChild( stats.domElement );
+			document.body.appendChild( stats.dom );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 

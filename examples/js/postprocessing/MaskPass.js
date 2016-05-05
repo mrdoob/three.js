@@ -4,10 +4,11 @@
 
 THREE.MaskPass = function ( scene, camera ) {
 
+	THREE.Pass.call( this );
+
 	this.scene = scene;
 	this.camera = camera;
 
-	this.enabled = true;
 	this.clear = true;
 	this.needsSwap = false;
 
@@ -15,9 +16,13 @@ THREE.MaskPass = function ( scene, camera ) {
 
 };
 
+THREE.MaskPass.prototype = Object.create( THREE.Pass.prototype );
+
 THREE.MaskPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	constructor: THREE.MaskPass,
+
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		var context = renderer.context;
 
@@ -69,13 +74,19 @@ THREE.MaskPass.prototype = {
 
 THREE.ClearMaskPass = function () {
 
-	this.enabled = true;
+	THREE.Pass.call( this );
+
+	this.needsSwap = false;
 
 };
 
+THREE.ClearMaskPass.prototype = Object.create( THREE.Pass.prototype );
+
 THREE.ClearMaskPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	constructor: THREE.ClearMaskPass,
+
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		var context = renderer.context;
 

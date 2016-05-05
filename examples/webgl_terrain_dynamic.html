@@ -24,12 +24,6 @@
 			.h { color: #fb0 }
 			.c { display: inline; margin-left: 1em }
 
-			#oldie a { color:#da0 }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -39,10 +33,8 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - dynamic procedural terrain using
 			<a href="https://github.com/ashima/webgl-noise" target="_blank">3d simplex noise</a><br/>
-			birds by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">ro.me</a> -
 			textures by <a href="http://opengameart.org/content/dark-grass">qubodup</a> and
-			<a href="http://opengameart.org/content/backgrounds-topdown-games">davis123</a> -
-			music by <a href="http://incompetech.com/m/c/royalty-free/index.html?keywords=00875">Kevin MacLeod</a>
+			<a href="http://opengameart.org/content/backgrounds-topdown-games">davis123</a>
 		</div>
 
 		<div id="footer">
@@ -55,26 +47,13 @@
 			</div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/shaders/BleachBypassShader.js"></script>
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
-		<script src="js/shaders/LuminosityShader.js"></script>
-		<script src="js/shaders/NormalMapShader.js"></script>
-		<script src="js/shaders/VerticalTiltShiftShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/SavePass.js"></script>
-
 		<script src="js/BufferGeometryUtils.js"></script>
+
+		<script src="js/shaders/NormalMapShader.js"></script>
 		<script src="js/ShaderTerrain.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -250,13 +229,9 @@
 
 			var clock = new THREE.Clock();
 
-			var morph, morphs = [];
-
 			var updateNoise = true;
 
 			var animateTerrain = false;
-
-			var textMesh1;
 
 			var mlib = {};
 
@@ -333,26 +308,23 @@
 
 				uniformsNormal.height.value = 0.05;
 				uniformsNormal.resolution.value.set( rx, ry );
-				uniformsNormal.heightMap.value = heightMap;
+				uniformsNormal.heightMap.value = heightMap.texture;
 
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 
 				// TEXTURES
 
-				var textureLoader = new THREE.TextureLoader();
+				var loadingManager = new THREE.LoadingManager( function(){
+					terrain.visible = true;
+				});
+				var textureLoader = new THREE.TextureLoader( loadingManager );
 
 				var specularMap = new THREE.WebGLRenderTarget( 2048, 2048, pars );
 				specularMap.texture.generateMipmaps = false;
 
-				var diffuseTexture1 = textureLoader.load( "textures/terrain/grasslight-big.jpg", function () {
-
-					loadTextures();
-					applyShader( THREE.LuminosityShader, diffuseTexture1, specularMap );
-
-				} );
-
-				var diffuseTexture2 = textureLoader.load( "textures/terrain/backgrounddetailed6.jpg", loadTextures );
-				var detailTexture = textureLoader.load( "textures/terrain/grasslight-big-nm.jpg", loadTextures );
+				var diffuseTexture1 = textureLoader.load( "textures/terrain/grasslight-big.jpg");
+				var diffuseTexture2 = textureLoader.load( "textures/terrain/backgrounddetailed6.jpg" );
+				var detailTexture = textureLoader.load( "textures/terrain/grasslight-big-nm.jpg" );
 
 				diffuseTexture1.wrapS = diffuseTexture1.wrapT = THREE.RepeatWrapping;
 				diffuseTexture2.wrapS = diffuseTexture2.wrapT = THREE.RepeatWrapping;
@@ -365,28 +337,28 @@
 
 				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
 
-				uniformsTerrain[ "tNormal" ].value = normalMap;
-				uniformsTerrain[ "uNormalScale" ].value = 3.5;
+				uniformsTerrain[ 'tNormal' ].value = normalMap.texture;
+				uniformsTerrain[ 'uNormalScale' ].value = 3.5;
 
-				uniformsTerrain[ "tDisplacement" ].value = heightMap;
+				uniformsTerrain[ 'tDisplacement' ].value = heightMap.texture;
 
-				uniformsTerrain[ "tDiffuse1" ].value = diffuseTexture1;
-				uniformsTerrain[ "tDiffuse2" ].value = diffuseTexture2;
-				uniformsTerrain[ "tSpecular" ].value = specularMap;
-				uniformsTerrain[ "tDetail" ].value = detailTexture;
+				uniformsTerrain[ 'tDiffuse1' ].value = diffuseTexture1;
+				uniformsTerrain[ 'tDiffuse2' ].value = diffuseTexture2;
+				uniformsTerrain[ 'tSpecular' ].value = specularMap.texture;
+				uniformsTerrain[ 'tDetail' ].value = detailTexture;
 
-				uniformsTerrain[ "enableDiffuse1" ].value = true;
-				uniformsTerrain[ "enableDiffuse2" ].value = true;
-				uniformsTerrain[ "enableSpecular" ].value = true;
+				uniformsTerrain[ 'enableDiffuse1' ].value = true;
+				uniformsTerrain[ 'enableDiffuse2' ].value = true;
+				uniformsTerrain[ 'enableSpecular' ].value = true;
 
-				uniformsTerrain[ "diffuse" ].value.setHex( 0xffffff );
-				uniformsTerrain[ "specular" ].value.setHex( 0xffffff );
+				uniformsTerrain[ 'diffuse' ].value.setHex( 0xffffff );
+				uniformsTerrain[ 'specular' ].value.setHex( 0xffffff );
 
-				uniformsTerrain[ "shininess" ].value = 30;
+				uniformsTerrain[ 'shininess' ].value = 30;
 
-				uniformsTerrain[ "uDisplacementScale" ].value = 375;
+				uniformsTerrain[ 'uDisplacementScale' ].value = 375;
 
-				uniformsTerrain[ "uRepeatOverlay" ].value.set( 6, 6 );
+				uniformsTerrain[ 'uRepeatOverlay' ].value.set( 6, 6 );
 
 				var params = [
 					[ 'heightmap', 	document.getElementById( 'fragmentShaderNoise' ).textContent, 	vertexShader, uniformsNoise, false ],
@@ -422,7 +394,7 @@
 
 				THREE.BufferGeometryUtils.computeTangents( geometryTerrain );
 
-				terrain = new THREE.Mesh( geometryTerrain, mlib[ "terrain" ] );
+				terrain = new THREE.Mesh( geometryTerrain, mlib[ 'terrain' ] );
 				terrain.position.set( 0, -125, 0 );
 				terrain.rotation.x = -Math.PI / 2;
 				terrain.visible = false;
@@ -436,16 +408,10 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
 
-				//
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
-
-
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// EVENTS
 
@@ -454,97 +420,6 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				document.addEventListener( 'keydown', onKeyDown, false );
-
-				// COMPOSER
-
-				renderer.autoClear = false;
-
-				renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
-
-				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
-				renderTarget.texture.generateMipmaps = false;
-
-				effectBloom = new THREE.BloomPass( 0.6 );
-				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
-
-				hblur = new THREE.ShaderPass( THREE.HorizontalTiltShiftShader );
-				vblur = new THREE.ShaderPass( THREE.VerticalTiltShiftShader );
-
-				var bluriness = 6;
-
-				hblur.uniforms[ 'h' ].value = bluriness / SCREEN_WIDTH;
-				vblur.uniforms[ 'v' ].value = bluriness / SCREEN_HEIGHT;
-
-				hblur.uniforms[ 'r' ].value = vblur.uniforms[ 'r' ].value = 0.5;
-
-				effectBleach.uniforms[ 'opacity' ].value = 0.65;
-
-				composer = new THREE.EffectComposer( renderer, renderTarget );
-
-				var renderModel = new THREE.RenderPass( scene, camera );
-
-				vblur.renderToScreen = true;
-
-				composer = new THREE.EffectComposer( renderer, renderTarget );
-
-				composer.addPass( renderModel );
-
-				composer.addPass( effectBloom );
-				//composer.addPass( effectBleach );
-
-				composer.addPass( hblur );
-				composer.addPass( vblur );
-
-				// MORPHS
-
-				function addMorph( geometry, speed, duration, x, y, z ) {
-
-					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
-
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.speed = speed;
-
-					var mixer = new THREE.AnimationMixer( mesh );
-					mixer.clipAction( geometry.animations[ 0 ] ).setDuration( duration ).play();
-					mixer.update( 600 * Math.random() );
-					mesh.mixer = mixer;
-
-					mesh.position.set( x, y, z );
-					mesh.rotation.y = Math.PI/2;
-
-					mesh.castShadow = true;
-					mesh.receiveShadow = false;
-
-					scene.add( mesh );
-
-					morphs.push( mesh );
-
-				}
-
-				var loader = new THREE.JSONLoader();
-
-				var startX = -3000;
-
-				loader.load( "models/animated/parrot.js", function( geometry ) {
-
-					addMorph( geometry, 250, 0.5, startX -500, 500, 700 );
-					addMorph( geometry, 250, 0.5, startX - Math.random() * 500, 500, -200 );
-					addMorph( geometry, 250, 0.5, startX - Math.random() * 500, 500, 200 );
-					addMorph( geometry, 250, 0.5, startX - Math.random() * 500, 500, 1000 );
-
-				} );
-
-				loader.load( "models/animated/flamingo.js", function( geometry ) {
-
-					addMorph( geometry, 500, 1, startX - Math.random() * 500, 350, 40 );
-
-				} );
-
-				loader.load( "models/animated/stork.js", function( geometry ) {
-
-					addMorph( geometry, 350, 1, startX - Math.random() * 500, 350, 340 );
-
-				} );
 
 			}
 
@@ -570,45 +445,6 @@
 
 					case 78: /*N*/  lightDir *= -1; break;
 					case 77: /*M*/  animDeltaDir *= -1; break;
-
-				}
-
-			}
-
-			//
-
-			function applyShader( shader, texture, target ) {
-
-				var shaderMaterial = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: THREE.UniformsUtils.clone( shader.uniforms )
-
-				} );
-
-				shaderMaterial.uniforms[ "tDiffuse" ].value = texture;
-
-				var sceneTmp = new THREE.Scene();
-
-				var meshTmp = new THREE.Mesh( new THREE.PlaneBufferGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), shaderMaterial );
-				meshTmp.position.z = -500;
-
-				sceneTmp.add( meshTmp );
-
-				renderer.render( sceneTmp, cameraOrtho, target, true );
-
-			}
-
-			//
-
-			function loadTextures() {
-
-				textureCounter += 1;
-
-				if ( textureCounter == 3 )	{
-
-					terrain.visible = true;
 
 				}
 
@@ -648,47 +484,26 @@
 					directionalLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.1, 1.15 );
 					pointLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.9, 1.5 );
 
-					uniformsTerrain[ "uNormalScale" ].value = THREE.Math.mapLinear( valNorm, 0, 1, 0.6, 3.5 );
+					uniformsTerrain[ 'uNormalScale' ].value = THREE.Math.mapLinear( valNorm, 0, 1, 0.6, 3.5 );
 
 					if ( updateNoise ) {
 
 						animDelta = THREE.Math.clamp( animDelta + 0.00075 * animDeltaDir, 0, 0.05 );
-						uniformsNoise[ "time" ].value += delta * animDelta;
+						uniformsNoise[ 'time' ].value += delta * animDelta;
 
-						uniformsNoise[ "offset" ].value.x += delta * 0.05;
+						uniformsNoise[ 'offset' ].value.x += delta * 0.05;
 
-						uniformsTerrain[ "uOffset" ].value.x = 4 * uniformsNoise[ "offset" ].value.x;
+						uniformsTerrain[ 'uOffset' ].value.x = 4 * uniformsNoise[ 'offset' ].value.x;
 
-						quadTarget.material = mlib[ "heightmap" ];
+						quadTarget.material = mlib[ 'heightmap' ];
 						renderer.render( sceneRenderTarget, cameraOrtho, heightMap, true );
 
-						quadTarget.material = mlib[ "normal" ];
+						quadTarget.material = mlib[ 'normal' ];
 						renderer.render( sceneRenderTarget, cameraOrtho, normalMap, true );
 
-						//updateNoise = false;
-
 					}
 
-
-					for ( var i = 0; i < morphs.length; i ++ ) {
-
-						morph = morphs[ i ];
-
-						morph.mixer.update( delta );
-
-						morph.position.x += morph.speed * delta;
-
-						if ( morph.position.x  > 2000 )  {
-
-							morph.position.x = -1500 - Math.random() * 500;
-
-						}
-
-
-					}
-
-					//renderer.render( scene, camera );
-					composer.render( 0.1 );
+					renderer.render( scene, camera );
 
 				}
 

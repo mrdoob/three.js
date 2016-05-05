@@ -32,7 +32,7 @@
 		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank">The Utah 3D Animation Repository</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/UTF8Loader.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
@@ -96,20 +96,19 @@
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
-				// directionalLight.shadowCameraVisible = true;
 
-				directionalLight.shadowMapWidth = 2048;
-				directionalLight.shadowMaHeight = 2048;
+				directionalLight.shadow.mapSize.width = 2048;
+				directionalLight.shadow.mapSize.height = 2048;
 
 				var d = 150;
 
-				directionalLight.shadowCameraLeft = -d * 1.2;
-				directionalLight.shadowCameraRight = d * 1.2;
-				directionalLight.shadowCameraTop = d;
-				directionalLight.shadowCameraBottom = -d;
+				directionalLight.shadow.camera.left = -d * 1.2;
+				directionalLight.shadow.camera.right = d * 1.2;
+				directionalLight.shadow.camera.top = d;
+				directionalLight.shadow.camera.bottom = -d;
 
-				directionalLight.shadowCameraNear = 200;
-				directionalLight.shadowCameraFar = 500;
+				directionalLight.shadow.camera.near = 200;
+				directionalLight.shadow.camera.far = 500;
 
 
 				// RENDERER
@@ -132,10 +131,7 @@
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				var start = Date.now();
 

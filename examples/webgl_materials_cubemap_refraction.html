@@ -34,7 +34,7 @@
 			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/BinaryLoader.js"></script>
 
@@ -138,10 +138,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				loader = new THREE.BinaryLoader();
 				loader.load( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );

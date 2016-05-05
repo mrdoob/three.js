@@ -188,7 +188,7 @@ Object.defineProperties( THREE.Vector3.prototype, {
 	getColumnFromMatrix: {
 		value: function ( index, matrix ) {
 			console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
-			return this.setFromMatrixColumn( index, matrix );
+			return this.setFromMatrixColumn( matrix, index );
 		}
 	}
 } );
@@ -265,6 +265,8 @@ Object.defineProperties( THREE, {
 		}
 	}
 } );
+
+THREE.Particle = THREE.Sprite;
 
 //
 
@@ -470,6 +472,25 @@ Object.defineProperties( THREE.ShaderMaterial.prototype, {
 
 //
 
+THREE.EventDispatcher.prototype = Object.assign( Object.create( {
+
+    // Note: Extra base ensures these properties are not 'assign'ed.
+
+	constructor: THREE.EventDispatcher,
+
+	apply: function( target ) {
+
+		console.warn( "THREE.EventDispatcher: .apply is deprecated, " +
+				"just inherit or Object.assign the prototype to mix-in." );
+
+		Object.assign( target, this );
+
+	}
+
+} ), THREE.EventDispatcher.prototype );
+
+//
+
 Object.defineProperties( THREE.WebGLRenderer.prototype, {
 	supportsFloatTextures: {
 		value: function () {
@@ -570,6 +591,17 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
 			this.shadowMap.cullFace = value;
 		}
+	}
+} );
+
+Object.defineProperty( THREE.WebGLShadowMap.prototype, 'cullFace', {
+	set: function( cullFace ) {
+		var value = ( cullFace !== THREE.CullFaceBack );
+		console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. Set .shadowMap.renderReverseSided to " + value + "." );
+		this.renderReverseSided = value;
+	},
+	get: function() {
+		return this.renderReverseSided ? THREE.CullFaceFront : THREE.CullFaceBack;
 	}
 } );
 
@@ -674,6 +706,30 @@ Object.defineProperties( THREE.WebGLRenderTarget.prototype, {
 		set: function ( value ) {
 			console.warn( 'THREE.WebGLRenderTarget: .generateMipmaps is now .texture.generateMipmaps.' );
 			this.texture.generateMipmaps = value;
+		}
+	}
+} );
+
+//
+
+Object.defineProperties( THREE.Audio.prototype, {
+	load: {
+		value: function ( file ) {
+
+			console.warn( 'THREE.Audio: .load has been deprecated. Please use THREE.AudioLoader.' );
+
+			var scope = this;
+
+			var audioLoader = new THREE.AudioLoader();
+
+			audioLoader.load( file, function ( buffer ) {
+
+				scope.setBuffer( buffer );
+
+			} );
+
+			return this;
+
 		}
 	}
 } );
@@ -803,3 +859,16 @@ THREE.CanvasRenderer = function () {
 //
 
 THREE.MeshFaceMaterial = THREE.MultiMaterial;
+
+//
+
+Object.defineProperties( THREE.LOD.prototype, {
+	objects: {
+		get: function () {
+
+			console.warn( 'THREE.LOD: .objects has been renamed to .levels.' );
+			return this.levels;
+
+		}
+	}
+} );

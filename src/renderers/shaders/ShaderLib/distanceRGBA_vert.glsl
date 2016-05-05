@@ -3,6 +3,7 @@ varying vec4 vWorldPosition;
 #include <common>
 #include <morphtarget_pars_vertex>
 #include <skinning_pars_vertex>
+#include <clipping_planes_pars_vertex>
 
 void main() {
 
@@ -12,6 +13,7 @@ void main() {
 	#include <skinning_vertex>
 	#include <project_vertex>
 	#include <worldpos_vertex>
+	#include <clipping_planes_vertex>
 
 	vWorldPosition = worldPosition;
 

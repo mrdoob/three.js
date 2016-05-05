@@ -24,7 +24,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> webgl - Resolution-Independent Vector Fonts. <a href="https://github.com/mrdoob/three.js/issues/4746">info</a>.
 		</div>
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="./js/controls/OrbitControls.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
@@ -109,7 +109,7 @@
 				camera.position.set( 0, 100, 500 );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.center.set( 0, 100, 0 );
+				controls.target.set( 0, 100, 0 );
 
 				scene = new THREE.Scene();
 
@@ -325,9 +325,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				document.body.appendChild( stats.domElement );
+				document.body.appendChild( stats.dom );
 
 				document.addEventListener( 'mousedown', toggle, false );
 

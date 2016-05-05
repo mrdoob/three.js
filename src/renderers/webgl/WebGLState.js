@@ -8,9 +8,10 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var color = new THREE.Vector4();
 
-	var newAttributes = new Uint8Array( 16 );
-	var enabledAttributes = new Uint8Array( 16 );
-	var attributeDivisors = new Uint8Array( 16 );
+	var maxVertexAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
+	var newAttributes = new Uint8Array( maxVertexAttributes );
+	var enabledAttributes = new Uint8Array( maxVertexAttributes );
+	var attributeDivisors = new Uint8Array( maxVertexAttributes );
 
 	var capabilities = {};
 
@@ -23,6 +24,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	var currentBlendEquationAlpha = null;
 	var currentBlendSrcAlpha = null;
 	var currentBlendDstAlpha = null;
+	var currentPremultipledAlpha = false;
 
 	var currentDepthFunc = null;
 	var currentDepthWrite = null;
@@ -38,6 +40,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	var currentStencilZPass = null;
 
 	var currentFlipSided = null;
+	var currentCullFace = null;
 
 	var currentLineWidth = null;
 
@@ -48,7 +51,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 
-	var currentTextureSlot = undefined;
+	var currentTextureSlot = null;
 	var currentBoundTextures = {};
 
 	var currentClearColor = new THREE.Vector4();
@@ -58,10 +61,30 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	var currentScissor = new THREE.Vector4();
 	var currentViewport = new THREE.Vector4();
 
-	var emptyTexture = gl.createTexture();
-	gl.bindTexture( gl.TEXTURE_2D, emptyTexture );
-	gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR );
-	gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, new Uint8Array( 3 ) );
+	function createTexture( type, target, count ) {
+
+		var data = new Uint8Array( 3 );
+		var texture = gl.createTexture();
+
+		gl.bindTexture( type, texture );
+		gl.texParameteri( type, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
+		gl.texParameteri( type, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+
+		for ( var i = 0; i < count; i ++ ) {
+
+			gl.texImage2D( target + i, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, data );
+
+		}
+
+		return texture;
+
+	}
+
+	var emptyTextures = {};
+	emptyTextures[ gl.TEXTURE_2D ] = createTexture( gl.TEXTURE_2D, gl.TEXTURE_2D, 1 );
+	emptyTextures[ gl.TEXTURE_CUBE_MAP ] = createTexture( gl.TEXTURE_CUBE_MAP, gl.TEXTURE_CUBE_MAP_POSITIVE_X, 6 );
+
+	//
 
 	this.init = function () {
 
@@ -70,15 +93,14 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 		this.clearStencil( 0 );
 
 		this.enable( gl.DEPTH_TEST );
-		gl.depthFunc( gl.LEQUAL );
+		this.setDepthFunc( THREE.LessEqualDepth );
 
-		gl.frontFace( gl.CCW );
-		gl.cullFace( gl.BACK );
+		this.setFlipSided( false );
+		this.setCullFace( THREE.CullFaceBack );
 		this.enable( gl.CULL_FACE );
 
 		this.enable( gl.BLEND );
-		gl.blendEquation( gl.FUNC_ADD );
-		gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+		this.setBlending( THREE.NormalBlending );
 
 	};
 
@@ -136,7 +158,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.disableUnusedAttributes = function () {
 
-		for ( var i = 0, l = enabledAttributes.length; i < l; i ++ ) {
+		for ( var i = 0, l = enabledAttributes.length; i !== l; ++ i ) {
 
 			if ( enabledAttributes[ i ] !== newAttributes[ i ] ) {
 
@@ -197,52 +219,82 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
-	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha ) {
+	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
-		if ( blending === THREE.NoBlending ) {
-
-			this.disable( gl.BLEND );
-
-		} else {
+		if ( blending !== THREE.NoBlending ) {
 
 			this.enable( gl.BLEND );
 
+		} else {
+
+			this.disable( gl.BLEND );
+			currentBlending = blending; // no blending, that is
+			return;
+
 		}
 
-		if ( blending !== currentBlending ) {
+		if ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) {
 
 			if ( blending === THREE.AdditiveBlending ) {
 
-				gl.blendEquation( gl.FUNC_ADD );
-				gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+				if ( premultipliedAlpha ) {
+
+					gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+					gl.blendFuncSeparate( gl.ONE, gl.ONE, gl.ONE, gl.ONE );
+
+				} else {
+
+					gl.blendEquation( gl.FUNC_ADD );
+					gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+
+				}
 
 			} else if ( blending === THREE.SubtractiveBlending ) {
 
-				// TODO: Find blendFuncSeparate() combination
+				if ( premultipliedAlpha ) {
 
-				gl.blendEquation( gl.FUNC_ADD );
-				gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
+					gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+					gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA );
+
+				} else {
+
+					gl.blendEquation( gl.FUNC_ADD );
+					gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
+
+				}
 
 			} else if ( blending === THREE.MultiplyBlending ) {
 
-				// TODO: Find blendFuncSeparate() combination
+				if ( premultipliedAlpha ) {
 
-				gl.blendEquation( gl.FUNC_ADD );
-				gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
+					gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+					gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.SRC_COLOR, gl.SRC_ALPHA );
 
-			} else if ( blending === THREE.PremultipliedAlphaBlending ) {
+				} else {
 
-				gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-				gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+					gl.blendEquation( gl.FUNC_ADD );
+					gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
+
+				}
 
 			} else {
 
-				gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-				gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+				if ( premultipliedAlpha ) {
+
+					gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+					gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+
+				} else {
+
+					gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+					gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+
+				}
 
 			}
 
 			currentBlending = blending;
+			currentPremultipledAlpha = premultipliedAlpha;
 
 		}
 
@@ -470,6 +522,40 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
+	this.setCullFace = function ( cullFace ) {
+
+		if ( cullFace !== THREE.CullFaceNone ) {
+
+			this.enable( gl.CULL_FACE );
+
+			if ( cullFace !== currentCullFace ) {
+
+				if ( cullFace === THREE.CullFaceBack ) {
+
+					gl.cullFace( gl.BACK );
+
+				} else if ( cullFace === THREE.CullFaceFront ) {
+
+					gl.cullFace( gl.FRONT );
+
+				} else {
+
+					gl.cullFace( gl.FRONT_AND_BACK );
+
+				}
+
+			}
+
+		} else {
+
+			this.disable( gl.CULL_FACE );
+
+		}
+
+		currentCullFace = cullFace;
+
+	};
+
 	this.setLineWidth = function ( width ) {
 
 		if ( width !== currentLineWidth ) {
@@ -488,18 +574,18 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 			this.enable( gl.POLYGON_OFFSET_FILL );
 
+			if ( currentPolygonOffsetFactor !== factor || currentPolygonOffsetUnits !== units ) {
+
+				gl.polygonOffset( factor, units );
+
+				currentPolygonOffsetFactor = factor;
+				currentPolygonOffsetUnits = units;
+
+			}
+
 		} else {
 
 			this.disable( gl.POLYGON_OFFSET_FILL );
-
-		}
-
-		if ( polygonOffset && ( currentPolygonOffsetFactor !== factor || currentPolygonOffsetUnits !== units ) ) {
-
-			gl.polygonOffset( factor, units );
-
-			currentPolygonOffsetFactor = factor;
-			currentPolygonOffsetUnits = units;
 
 		}
 
@@ -544,7 +630,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.bindTexture = function ( webglType, webglTexture ) {
 
-		if ( currentTextureSlot === undefined ) {
+		if ( currentTextureSlot === null ) {
 
 			_this.activeTexture();
 
@@ -561,7 +647,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
 
-			gl.bindTexture( webglType, webglTexture || emptyTexture );
+			gl.bindTexture( webglType, webglTexture || emptyTextures[ webglType ] );
 
 			boundTexture.type = webglType;
 			boundTexture.texture = webglTexture;
@@ -678,6 +764,9 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		compressedTextureFormats = null;
 
+		currentTextureSlot = null;
+		currentBoundTextures = {};
+
 		currentBlending = null;
 
 		currentColorWrite = null;
@@ -685,6 +774,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 		currentStencilWrite = null;
 
 		currentFlipSided = null;
+		currentCullFace = null;
 
 	};
 

@@ -218,6 +218,10 @@ def animated_xform(obj, options):
     track_loc = track_loc[0]
     use_inverted = options.get(constants.HIERARCHY, False) and obj.parent
 
+    if times == None:
+        logger.info("In animated xform: Unable to extract trackable fields from %s", objName)
+        return tracks
+
     # for each frame
     inverted_fallback = mathutils.Matrix() if use_inverted else None
     convert_matrix = AXIS_CONVERSION    # matrix to convert the exported matrix
@@ -480,6 +484,19 @@ def extract_mesh(obj, options, recalculate=False):
         obj.data = original_mesh
         obj.select = False
         obj.hide = hidden_state
+
+    # split sharp edges
+    original_mesh = obj.data
+    obj.data = mesh_node
+    obj.select = True
+
+    bpy.ops.object.modifier_add(type='EDGE_SPLIT')
+    bpy.context.object.modifiers['EdgeSplit'].use_edge_angle = False
+    bpy.context.object.modifiers['EdgeSplit'].use_edge_sharp = True
+    bpy.ops.object.modifier_apply(apply_as='DATA', modifier='EdgeSplit')
+
+    obj.select = False
+    obj.data = original_mesh
 
     # recalculate the normals to face outwards, this is usually
     # best after applying a modifiers, especialy for something

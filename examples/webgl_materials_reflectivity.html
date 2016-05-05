@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - materials - hdr environment mapping</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+
+				margin: 0px;
+				overflow: hidden;
+			}
+			a { color: #88f }
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Standard Material Reflectivity (reflectance at F0) example by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/RGBELoader.js"></script>
+		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script src="js/Half.js"></script>
+		<script src="js/Encodings.js"></script>
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+
+		<script src="js/loaders/OBJLoader.js"></script>
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+			var params = {
+				projection: 'normal',
+				autoRotate: true,
+				reflectivity: 1.0,
+				background: false,
+				exposure: 1.0,
+				gemColor: 'Green'
+			};
+			var camera, scene, renderer, controls, objects = [];
+			var hdrCubeMap;
+			var composer;
+			var gemBackMaterial, gemFrontMaterial;
+			var hdrCubeRenderTarget;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0.0, -10, 20 * 3.5 );
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( new THREE.Color( 0x000000 ) );
+
+				gemBackMaterial = new THREE.MeshPhysicalMaterial( {
+					map: null,
+					color: 0x0000ff,
+					metalness: 1.0,
+					roughness: 0,
+					opacity: 0.5,
+					side: THREE.BackSide,
+					transparent: true,
+					shading: THREE.SmoothShading,
+					envMapIntensity: 5,
+					premultipliedAlpha: true
+					// TODO: Add custom blend mode that modulates background color by this materials color.
+				} );
+
+				gemFrontMaterial = new THREE.MeshPhysicalMaterial( {
+					map: null,
+					color: 0x0000ff,
+					metalness: 0.0,
+					roughness: 0,
+					opacity: 0.15,
+					side: THREE.FrontSide,
+					transparent: true,
+					shading: THREE.SmoothShading,
+					envMapIntensity: 5,
+					premultipliedAlpha: true
+				} );
+
+				var manager = new THREE.LoadingManager();
+				manager.onProgress = function ( item, loaded, total ) {
+
+					console.log( item, loaded, total );
+
+				};
+
+				var loader = new THREE.OBJLoader( manager );
+				loader.load( 'models/obj/emerald.obj', function ( object ) {
+
+					object.traverse( function ( child ) {
+
+						if ( child instanceof THREE.Mesh ) {
+
+							child.material = gemBackMaterial;
+							var second = child.clone();
+							second.material = gemFrontMaterial;
+
+							var parent = new THREE.Group();
+							parent.add( second );
+							parent.add( child );
+							scene.add( parent );
+
+							objects.push( parent );
+
+						}
+
+					} );
+
+
+				} );
+
+				var genCubeUrls = function( prefix, postfix ) {
+					return [
+						prefix + 'px' + postfix, prefix + 'nx' + postfix,
+						prefix + 'py' + postfix, prefix + 'ny' + postfix,
+						prefix + 'pz' + postfix, prefix + 'nz' + postfix
+					];
+				};
+
+				var hdrUrls = genCubeUrls( "./textures/cube/pisaHDR/", ".hdr" );
+				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
+
+					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+					gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget.texture;
+					gemFrontMaterial.needsUpdate = gemBackMaterial.needsUpdate = true;
+
+				} );
+
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+				var pointLight1 = new THREE.PointLight( 0xffffff );
+				pointLight1.position.set( 150, 10, 0 );
+				pointLight1.castShadow = false;
+				scene.add( pointLight1 );
+
+				var pointLight2 = new THREE.PointLight( 0xffffff );
+				pointLight2.position.set( -150, 0, 0 );
+				scene.add( pointLight2 );
+
+				var pointLight3 = new THREE.PointLight( 0xffffff );
+				pointLight3.position.set( 0, -10, -150 );
+				scene.add( pointLight3 );
+
+				var pointLight4 = new THREE.PointLight( 0xffffff );
+				pointLight4.position.set( 0, 0, 150 );
+				scene.add( pointLight4 );
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0, 0 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				var gui = new dat.GUI();
+
+				gui.add( params, 'reflectivity', 0, 1 );
+				gui.add( params, 'exposure', 0.1, 2 );
+				gui.add( params, 'autoRotate' );
+				gui.add( params, 'gemColor', [ 'Blue', 'Green', 'Red', 'White', 'Black' ] );
+				gui.open();
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			function render() {
+
+				if ( gemBackMaterial !== undefined && gemFrontMaterial !== undefined ) {
+
+					gemFrontMaterial.reflectivity = gemBackMaterial.reflectivity = params.reflectivity;
+
+					var newColor = gemBackMaterial.color;
+					switch( params.gemColor ) {
+						case 'Blue': newColor = new THREE.Color( 0x000088 ); break;
+						case 'Red': newColor = new THREE.Color( 0x880000 ); break;
+						case 'Green': newColor = new THREE.Color( 0x008800 ); break;
+						case 'White': newColor =  new THREE.Color( 0x888888 ); break;
+						case 'Black': newColor =  new THREE.Color( 0x0f0f0f ); break;
+					}
+					gemBackMaterial.color = gemFrontMaterial.color = newColor;
+
+
+				}
+
+				renderer.toneMappingExposure = params.exposure;
+
+				var timer = Date.now() * 0.00025;
+
+				camera.lookAt( scene.position );
+
+				if( params.autoRotate ) {
+					for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+						var object = objects[ i ];
+						object.rotation.y += 0.005;
+
+					}
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

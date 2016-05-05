@@ -45,7 +45,7 @@
 
 		<pre id="log"></pre>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/BinaryLoader.js"></script>
 
@@ -153,10 +153,7 @@
 
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				bcanvas.addEventListener( "click", toggleCanvas, false );
 				bwebgl.addEventListener( "click", toggleWebGL, false );

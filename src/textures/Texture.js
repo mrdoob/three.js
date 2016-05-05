@@ -4,7 +4,7 @@
  * @author szimek / https://github.com/szimek/
  */
 
-THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
 	Object.defineProperty( this, 'id', { value: THREE.TextureIdCount ++ } );
 
@@ -42,7 +42,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	//
 	// Also changing the encoding after already used by a Material will not automatically make the Material
 	// update.  You need to explicitly call Material.needsUpdate to trigger it to recompile.
-	this.encoding = THREE.LinearEncoding;
+	this.encoding = encoding !== undefined ? encoding :  THREE.LinearEncoding;
 
 	this.version = 0;
 	this.onUpdate = null;
@@ -56,7 +56,7 @@ THREE.Texture.prototype = {
 
 	constructor: THREE.Texture,
 
-	set needsUpdate ( value ) {
+	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
 
@@ -274,6 +274,6 @@ THREE.Texture.prototype = {
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.Texture.prototype );
+Object.assign( THREE.Texture.prototype, THREE.EventDispatcher.prototype );
 
 THREE.TextureIdCount = 0;

@@ -183,6 +183,12 @@ THREE.ColladaLoader.prototype = {
 		// image
 
 		var imageLoader = new THREE.ImageLoader();
+		
+		if ( this.crossOrigin ) {
+			
+			imageLoader.crossOrigin = this.crossOrigin;
+			
+		}
 
 		function parseImage( xml ) {
 
@@ -599,6 +605,11 @@ THREE.ColladaLoader.prototype = {
 						texture.offset.set( technique.offsetU, technique.offsetV );
 						texture.repeat.set( technique.repeatU, technique.repeatV );
 
+					} else {
+				
+						texture.wrapS = THREE.RepeatWrapping;
+						texture.wrapT = THREE.RepeatWrapping;
+					
 					}
 
 					texture.needsUpdate = true;

@@ -365,6 +365,78 @@ var guis = {
 
 	},
 
+	LatheBufferGeometry : function() {
+
+		var points = [];
+
+		for ( var i = 0; i < 10; i ++ ) {
+
+			points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 10 + 5, ( i - 5 ) * 2 ) );
+
+		}
+
+		var data = {
+			segments : 12,
+			phiStart : 0,
+			phiLength : twoPi,
+		};
+
+		function generateGeometry() {
+
+			var geometry = new THREE.LatheBufferGeometry(
+				points, data.segments, data.phiStart, data.phiLength
+			);
+
+			updateGroupGeometry( mesh, geometry );
+
+		}
+
+		var folder = gui.addFolder( 'THREE.LatheBufferGeometry' );
+
+		folder.add( data, 'segments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'phiStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'phiLength', 0, twoPi ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	LatheGeometry : function() {
+
+		var points = [];
+
+		for ( var i = 0; i < 10; i ++ ) {
+
+			points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 10 + 5, ( i - 5 ) * 2 ) );
+
+		}
+
+		var data = {
+			segments : 12,
+			phiStart : 0,
+			phiLength : twoPi,
+		};
+
+		function generateGeometry() {
+
+			var geometry = new THREE.LatheGeometry(
+				points, data.segments, data.phiStart, data.phiLength
+			);
+
+			updateGroupGeometry( mesh, geometry );
+
+		}
+
+		var folder = gui.addFolder( 'THREE.LatheGeometry' );
+
+		folder.add( data, 'segments', 1, 30 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'phiStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'phiLength', 0, twoPi ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	OctahedronGeometry : function() {
 
 		var data = {

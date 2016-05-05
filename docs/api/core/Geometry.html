@@ -150,13 +150,6 @@
 		<code>{ radius: float }</code>
 		</div>
 
-		<h3>[property:Boolean dynamic]</h3>
-		<div>
-		Set to *true* if attribute buffers will need to change in runtime (using "dirty" flags).<br/>
-		Unless set to true internal typed arrays corresponding to buffers will be deleted once sent to GPU.<br/>
-		Defaults to true.
-		</div>
-
 		<h3>[property:Boolean verticesNeedUpdate]</h3>
 		<div>
 		Set to *true* if the vertices array has been updated.
@@ -179,7 +172,12 @@
 
 		<h3>[property:Boolean colorsNeedUpdate]</h3>
 		<div>
-		Set to *true* if the colors array has been updated.
+		Set to *true* if the colors array or a face3 color has been updated.
+		</div>
+
+		<h3>[property:Boolean groupsNeedUpdate]</h3>
+		<div>
+		Set to *true* if a face3 materialIndex has been updated.
 		</div>
 
 		<h3>[property:Boolean lineDistancesNeedUpdate]</h3>
@@ -252,7 +250,10 @@
 		Computes face normals.
 		</div>
 
-		<h3>[method:null computeVertexNormals]()</h3>
+		<h3>[method:null computeVertexNormals]( [page:Boolean areaWeighted] )</h3>
+		<div>
+		areaWeighted - If true the contributution of each face normal to the vertex normal is weighted by the area of the face. Default is true.
+		</div>
 		<div>
 		Computes vertex normals by averaging face normals.<br />
 		Face normals must be existing / computed beforehand.

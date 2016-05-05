@@ -15,11 +15,10 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/controls/TransformControls.js"></script>
 		<script src="js/controls/DragControls.js"></script>
-		<script src="js/materials/ShadowMaterial.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -70,12 +69,10 @@
 				var light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 1500, 200 );
 				light.castShadow = true;
-				light.shadowCameraNear = 200;
-				light.shadowCameraFar = 2000;
-				light.shadowCameraFov = 70;
-				light.shadowBias = -0.000222;
-				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 1024;
+				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 70, 1, 200, 2000 ) );
+				light.shadow.bias = -0.000222;
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 1024;
 				scene.add( light );
 				spotlight = light;
 
@@ -131,9 +128,7 @@
 				container.appendChild( options );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// Controls
 				controls = new THREE.OrbitControls( camera, renderer.domElement );

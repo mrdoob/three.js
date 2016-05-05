@@ -7,8 +7,11 @@ uniform float opacity;
 #include <fog_pars_fragment>
 #include <shadowmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
+#include <clipping_planes_pars_fragment>
 
 void main() {
+
+	#include <clipping_planes_fragment>
 
 	vec3 outgoingLight = vec3( 0.0 );
 	vec4 diffuseColor = vec4( diffuse, opacity );

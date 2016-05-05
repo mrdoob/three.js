@@ -16,17 +16,14 @@ function SimulationRenderer( WIDTH, renderer ) {
 	var camera = new THREE.Camera();
 	camera.position.z = 1;
 
-	// Init RTT stuff
-	gl = renderer.getContext();
-
-	if ( ! gl.getExtension( "OES_texture_float" ) ) {
+	if ( ! renderer.extensions.get( "OES_texture_float" ) ) {
 
 		alert( "No OES_texture_float support for float textures!" );
 		return;
 
 	}
 
-	if ( gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) == 0 ) {
+	if ( renderer.capabilities.maxVertexTextures === 0 ) {
 
 		alert( "No support for vertex shader textures!" );
 		return;
@@ -102,14 +99,14 @@ function SimulationRenderer( WIDTH, renderer ) {
 
 		rtPosition1 = getRenderTarget( THREE.RGBAFormat );
 		rtPosition2 = rtPosition1.clone();
-		rtVelocity1 = getRenderTarget( THREE.RGBFormat );
+		rtVelocity1 = getRenderTarget( THREE.RGBAFormat );
 		rtVelocity2 = rtVelocity1.clone();
 
 		simulator.renderTexture( dtPosition, rtPosition1 );
-		simulator.renderTexture( rtPosition1, rtPosition2 );
+		simulator.renderTexture( rtPosition1.texture, rtPosition2 );
 
 		simulator.renderTexture( dtVelocity, rtVelocity1 );
-		simulator.renderTexture( rtVelocity1, rtVelocity2 );
+		simulator.renderTexture( rtVelocity1.texture, rtVelocity2 );
 
 		simulator.velocityUniforms.testing.value = 10;
 
@@ -171,13 +168,13 @@ function SimulationRenderer( WIDTH, renderer ) {
 
 		if ( flipflop ) {
 
-			simulator.renderVelocity( rtPosition1, rtVelocity1, rtVelocity2, delta );
-			simulator.renderPosition( rtPosition1, rtVelocity2, rtPosition2, delta );
+			simulator.renderVelocity( rtPosition1.texture, rtVelocity1.texture, rtVelocity2, delta );
+			simulator.renderPosition( rtPosition1.texture, rtVelocity2.texture, rtPosition2, delta );
 
 		} else {
 
-			simulator.renderVelocity( rtPosition2, rtVelocity2, rtVelocity1, delta );
-			simulator.renderPosition( rtPosition2, rtVelocity1, rtPosition1, delta );
+			simulator.renderVelocity( rtPosition2.texture, rtVelocity2.texture, rtVelocity1, delta );
+			simulator.renderPosition( rtPosition2.texture, rtVelocity1.texture, rtPosition1, delta );
 
 		}
 
@@ -211,9 +208,9 @@ function SimulationRenderer( WIDTH, renderer ) {
 
 	function generateVelocityTexture() {
 
-		var a = new Float32Array( PARTICLES * 3 );
+		var a = new Float32Array( PARTICLES * 4 );
 
-		for ( var k = 0, kl = a.length; k < kl; k += 3 ) {
+		for ( var k = 0, kl = a.length; k < kl; k += 4 ) {
 
 			var x = Math.random() - 0.5;
 			var y = Math.random() - 0.5;
@@ -222,10 +219,11 @@ function SimulationRenderer( WIDTH, renderer ) {
 			a[ k + 0 ] = x * 10;
 			a[ k + 1 ] = y * 10;
 			a[ k + 2 ] = z * 10;
+			a[ k + 3 ] = 1;
 
 		}
 
-		var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBFormat, THREE.FloatType );
+		var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBAFormat, THREE.FloatType ); // was RGB format. changed to RGBA format. see discussion in #8415 / #8450
 		texture.needsUpdate = true;
 
 		return texture;

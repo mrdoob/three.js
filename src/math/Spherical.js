@@ -28,6 +28,8 @@ THREE.Spherical.prototype = {
 		this.phi = phi;
 		this.theta = theta;
 
+		return this;
+
 	},
 
 	clone: function () {
@@ -51,6 +53,8 @@ THREE.Spherical.prototype = {
 
 		var EPS = 0.000001;
 		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
+
+		return this;
 
 	},
 

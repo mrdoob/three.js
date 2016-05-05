@@ -25,8 +25,6 @@ THREE.Box3.prototype = {
 
 	setFromArray: function ( array ) {
 
-		this.makeEmpty();
-
 		var minX = + Infinity;
 		var minY = + Infinity;
 		var minZ = + Infinity;
@@ -35,7 +33,7 @@ THREE.Box3.prototype = {
 		var maxY = - Infinity;
 		var maxZ = - Infinity;
 
-		for ( var i = 0, il = array.length; i < il; i += 3 ) {
+		for ( var i = 0, l = array.length; i < l; i += 3 ) {
 
 			var x = array[ i ];
 			var y = array[ i + 1 ];
@@ -92,17 +90,15 @@ THREE.Box3.prototype = {
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
-		var box;
+		var v1 = new THREE.Vector3();
 
 		return function ( object ) {
 
-			if ( box === undefined ) box = new THREE.Box3();
-
 			var scope = this;
 
-			this.makeEmpty();
-
 			object.updateMatrixWorld( true );
+
+			this.makeEmpty();
 
 			object.traverse( function ( node ) {
 
@@ -110,17 +106,31 @@ THREE.Box3.prototype = {
 
 				if ( geometry !== undefined ) {
 
-					if ( geometry.boundingBox === null ) {
+					if ( geometry instanceof THREE.Geometry ) {
 
-						geometry.computeBoundingBox();
+						var vertices = geometry.vertices;
 
-					}
+						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
-					if ( geometry.boundingBox.isEmpty() === false ) {
+							v1.copy( vertices[ i ] );
+							v1.applyMatrix4( node.matrixWorld );
 
-						box.copy( geometry.boundingBox );
-						box.applyMatrix4( node.matrixWorld );
-						scope.union( box );
+							scope.expandByPoint( v1 );
+
+						}
+
+					} else if ( geometry instanceof THREE.BufferGeometry && geometry.attributes[ 'position' ] !== undefined ) {
+
+						var positions = geometry.attributes[ 'position' ].array;
+
+						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+							v1.fromArray( positions, i );
+							v1.applyMatrix4( node.matrixWorld );
+
+							scope.expandByPoint( v1 );
+
+						}
 
 					}
 
@@ -373,6 +383,9 @@ THREE.Box3.prototype = {
 		this.min.max( box.min );
 		this.max.min( box.max );
 
+		// ensure that if there is no overlap, the result is fully empty, not slightly empty with non-inf/+inf values that will cause subsequence intersects to erroneously return valid values.
+		if( this.isEmpty() ) this.makeEmpty();
+
 		return this;
 
 	},
@@ -401,6 +414,9 @@ THREE.Box3.prototype = {
 
 		return function ( matrix ) {
 
+			// transform of empty box is an empty box.
+			if( this.isEmpty() ) return this;
+
 			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
 			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
 			points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
@@ -411,7 +427,6 @@ THREE.Box3.prototype = {
 			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
 			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );	// 111
 
-			this.makeEmpty();
 			this.setFromPoints( points );
 
 			return this;

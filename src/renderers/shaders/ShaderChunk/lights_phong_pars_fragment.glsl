@@ -1,9 +1,3 @@
-#ifdef USE_ENVMAP
-
-	varying vec3 vWorldPosition;
-
-#endif
-
 varying vec3 vViewPosition;
 
 #ifndef FLAT_SHADED

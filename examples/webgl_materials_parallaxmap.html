@@ -46,7 +46,7 @@
 			Texture by <a href="http://agf81.deviantart.com/">AGF81</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -94,10 +94,7 @@
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

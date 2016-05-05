@@ -365,6 +365,12 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	premultiply: function ( m ) {
+
+		return this.multiplyMatrices( m, this );
+
+	},
+
 	multiplyMatrices: function ( a, b ) {
 
 		var ae = a.elements;
@@ -554,29 +560,10 @@ THREE.Matrix4.prototype = {
 
 	flattenToArrayOffset: function ( array, offset ) {
 
-		var te = this.elements;
+		console.warn( "THREE.Matrix3: .flattenToArrayOffset is deprecated " +
+				"- just use .toArray instead." );
 
-		array[ offset ] = te[ 0 ];
-		array[ offset + 1 ] = te[ 1 ];
-		array[ offset + 2 ] = te[ 2 ];
-		array[ offset + 3 ] = te[ 3 ];
-
-		array[ offset + 4 ] = te[ 4 ];
-		array[ offset + 5 ] = te[ 5 ];
-		array[ offset + 6 ] = te[ 6 ];
-		array[ offset + 7 ] = te[ 7 ];
-
-		array[ offset + 8 ]  = te[ 8 ];
-		array[ offset + 9 ]  = te[ 9 ];
-		array[ offset + 10 ] = te[ 10 ];
-		array[ offset + 11 ] = te[ 11 ];
-
-		array[ offset + 12 ] = te[ 12 ];
-		array[ offset + 13 ] = te[ 13 ];
-		array[ offset + 14 ] = te[ 14 ];
-		array[ offset + 15 ] = te[ 15 ];
-
-		return array;
+		return this.toArray( array, offset );
 
 	},
 
@@ -888,7 +875,7 @@ THREE.Matrix4.prototype = {
 
 	makePerspective: function ( fov, aspect, near, far ) {
 
-		var ymax = near * Math.tan( THREE.Math.degToRad( fov * 0.5 ) );
+		var ymax = near * Math.tan( THREE.Math.DEG2RAD * fov * 0.5 );
 		var ymin = - ymax;
 		var xmin = ymin * aspect;
 		var xmax = ymax * aspect;
@@ -940,16 +927,34 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
+
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
 
 		var te = this.elements;
 
-		return [
-			te[ 0 ], te[ 1 ], te[ 2 ], te[ 3 ],
-			te[ 4 ], te[ 5 ], te[ 6 ], te[ 7 ],
-			te[ 8 ], te[ 9 ], te[ 10 ], te[ 11 ],
-			te[ 12 ], te[ 13 ], te[ 14 ], te[ 15 ]
-		];
+		array[ offset ] = te[ 0 ];
+		array[ offset + 1 ] = te[ 1 ];
+		array[ offset + 2 ] = te[ 2 ];
+		array[ offset + 3 ] = te[ 3 ];
+
+		array[ offset + 4 ] = te[ 4 ];
+		array[ offset + 5 ] = te[ 5 ];
+		array[ offset + 6 ] = te[ 6 ];
+		array[ offset + 7 ] = te[ 7 ];
+
+		array[ offset + 8 ]  = te[ 8 ];
+		array[ offset + 9 ]  = te[ 9 ];
+		array[ offset + 10 ] = te[ 10 ];
+		array[ offset + 11 ] = te[ 11 ];
+
+		array[ offset + 12 ] = te[ 12 ];
+		array[ offset + 13 ] = te[ 13 ];
+		array[ offset + 14 ] = te[ 14 ];
+		array[ offset + 15 ] = te[ 15 ];
+
+		return array;
 
 	}
 

@@ -33,7 +33,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry - uint</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -90,8 +90,8 @@
 				}
 
 				var positions = new Float32Array( triangles * 3 * 3 );
-				var normals = new Float32Array( triangles * 3 * 3 );
-				var colors = new Float32Array( triangles * 3 * 3 );
+				var normals = new Int16Array( triangles * 3 * 3 );
+				var colors = new Uint8Array( triangles * 3 * 3 );
 
 				var color = new THREE.Color();
 
@@ -153,17 +153,17 @@
 					var ny = cb.y;
 					var nz = cb.z;
 
-					normals[ i ]     = nx;
-					normals[ i + 1 ] = ny;
-					normals[ i + 2 ] = nz;
+					normals[ i ]     = nx * 32767;
+					normals[ i + 1 ] = ny * 32767;
+					normals[ i + 2 ] = nz * 32767;
 
-					normals[ i + 3 ] = nx;
-					normals[ i + 4 ] = ny;
-					normals[ i + 5 ] = nz;
+					normals[ i + 3 ] = nx * 32767;
+					normals[ i + 4 ] = ny * 32767;
+					normals[ i + 5 ] = nz * 32767;
 
-					normals[ i + 6 ] = nx;
-					normals[ i + 7 ] = ny;
-					normals[ i + 8 ] = nz;
+					normals[ i + 6 ] = nx * 32767;
+					normals[ i + 7 ] = ny * 32767;
+					normals[ i + 8 ] = nz * 32767;
 
 					// colors
 
@@ -173,24 +173,24 @@
 
 					color.setRGB( vx, vy, vz );
 
-					colors[ i ]     = color.r;
-					colors[ i + 1 ] = color.g;
-					colors[ i + 2 ] = color.b;
+					colors[ i ]     = color.r * 255;
+					colors[ i + 1 ] = color.g * 255;
+					colors[ i + 2 ] = color.b * 255;
 
-					colors[ i + 3 ] = color.r;
-					colors[ i + 4 ] = color.g;
-					colors[ i + 5 ] = color.b;
+					colors[ i + 3 ] = color.r * 255;
+					colors[ i + 4 ] = color.g * 255;
+					colors[ i + 5 ] = color.b * 255;
 
-					colors[ i + 6 ] = color.r;
-					colors[ i + 7 ] = color.g;
-					colors[ i + 8 ] = color.b;
+					colors[ i + 6 ] = color.r * 255;
+					colors[ i + 7 ] = color.g * 255;
+					colors[ i + 8 ] = color.b * 255;
 
 				}
 
 				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3, true ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3, true ) );
 
 				geometry.computeBoundingSphere();
 
@@ -217,9 +217,7 @@
 				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

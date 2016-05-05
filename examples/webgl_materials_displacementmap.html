@@ -28,12 +28,6 @@
 
 			#vt { display:none }
 			#vt, #vt a { color:orange; }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
-
 		</style>
 	</head>
 
@@ -46,7 +40,7 @@
 			<div id="vt">displacement mapping requires vertex textures</div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 
@@ -236,7 +230,7 @@
 
 				loader.load( "obj/ninja/NinjaLo_bin.js", function( geometry ) {
 
-					geometry.faceVertexUvs[ 1 ] = geometry.faceVertexUvs[ 0 ]; // 2nd set of UVs required for aoMap and displacementMap with MeshPhongMaterial
+					geometry.faceVertexUvs[ 1 ] = geometry.faceVertexUvs[ 0 ]; // 2nd set of UVs required for aoMap
 
 					mesh = new THREE.Mesh( geometry, material );
 					mesh.scale.multiplyScalar( 25 );
@@ -253,7 +247,7 @@
 				//
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -284,9 +278,9 @@
 
 				controls.update();
 
+				stats.begin();
 				render();
-
-				stats.update();
+				stats.end();
 
 			}
 

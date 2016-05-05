@@ -30,7 +30,15 @@ THREE.BoxHelper.prototype.update = ( function () {
 
 	return function ( object ) {
 
-		box.setFromObject( object );
+		if ( object instanceof THREE.Box3 ) {
+
+			box.copy( object );
+
+		} else {
+
+			box.setFromObject( object );
+
+		}
 
 		if ( box.isEmpty() ) return;
 

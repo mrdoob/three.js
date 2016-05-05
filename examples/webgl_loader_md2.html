@@ -26,11 +26,6 @@
 			}
 
 			a { color: skyblue; }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -40,7 +35,7 @@
 			Character by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=368">Brian Collins</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -97,22 +92,24 @@
 
 				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
 				light.position.set( 200, 250, 500 );
+				light.angle = 0.5;
+				light.penumbra = 0.5;
 
 				light.castShadow = true;
 				light.shadow.mapSize.width = 1024;
 				light.shadow.mapSize.height = 1024;
-				light.shadow.camera.far = 2000;
 
 				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 				scene.add( light );
 
 				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
 				light.position.set( -100, 350, 350 );
+				light.angle = 0.5;
+				light.penumbra = 0.5;
 
 				light.castShadow = true;
 				light.shadow.mapSize.width = 1024;
 				light.shadow.mapSize.height = 1024;
-				light.shadow.camera.far = 1000;
 
 				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 				scene.add( light );
@@ -148,7 +145,7 @@
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// EVENTS
 

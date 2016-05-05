@@ -7,7 +7,7 @@ THREE.UniformsLib = {
 	common: {
 
 		"diffuse": { type: "c", value: new THREE.Color( 0xeeeeee ) },
-		"opacity": { type: "f", value: 1.0 },
+		"opacity": { type: "1f", value: 1.0 },
 
 		"map": { type: "t", value: null },
 		"offsetRepeat": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
@@ -16,23 +16,23 @@ THREE.UniformsLib = {
 		"alphaMap": { type: "t", value: null },
 
 		"envMap": { type: "t", value: null },
-		"flipEnvMap": { type: "f", value: - 1 },
-		"reflectivity": { type: "f", value: 1.0 },
-		"refractionRatio": { type: "f", value: 0.98 }
+		"flipEnvMap": { type: "1f", value: - 1 },
+		"reflectivity": { type: "1f", value: 1.0 },
+		"refractionRatio": { type: "1f", value: 0.98 }
 
 	},
 
 	aomap: {
 
 		"aoMap": { type: "t", value: null },
-		"aoMapIntensity": { type: "f", value: 1 }
+		"aoMapIntensity": { type: "1f", value: 1 }
 
 	},
 
 	lightmap: {
 
 		"lightMap": { type: "t", value: null },
-		"lightMapIntensity": { type: "f", value: 1 }
+		"lightMapIntensity": { type: "1f", value: 1 }
 
 	},
 
@@ -45,7 +45,7 @@ THREE.UniformsLib = {
 	bumpmap: {
 
 		"bumpMap": { type: "t", value: null },
-		"bumpScale": { type: "f", value: 1 }
+		"bumpScale": { type: "1f", value: 1 }
 
 	},
 
@@ -59,8 +59,8 @@ THREE.UniformsLib = {
 	displacementmap: {
 
 		"displacementMap": { type: "t", value: null },
-		"displacementScale": { type: "f", value: 1 },
-		"displacementBias": { type: "f", value: 0 }
+		"displacementScale": { type: "1f", value: 1 },
+		"displacementBias": { type: "1f", value: 0 }
 
 	},
 
@@ -78,24 +78,24 @@ THREE.UniformsLib = {
 
 	fog: {
 
-		"fogDensity": { type: "f", value: 0.00025 },
-		"fogNear": { type: "f", value: 1 },
-		"fogFar": { type: "f", value: 2000 },
+		"fogDensity": { type: "1f", value: 0.00025 },
+		"fogNear": { type: "1f", value: 1 },
+		"fogFar": { type: "1f", value: 2000 },
 		"fogColor": { type: "c", value: new THREE.Color( 0xffffff ) }
 
 	},
 
 	lights: {
 
-		"ambientLightColor": { type: "fv", value: [] },
+		"ambientLightColor": { type: "3fv", value: [] },
 
 		"directionalLights": { type: "sa", value: [], properties: {
 			"direction": { type: "v3" },
 			"color": { type: "c" },
 
-			"shadow": { type: "i" },
-			"shadowBias": { type: "f" },
-			"shadowRadius": { type: "f" },
+			"shadow": { type: "1i" },
+			"shadowBias": { type: "1f" },
+			"shadowRadius": { type: "1f" },
 			"shadowMapSize": { type: "v2" }
 		} },
 
@@ -106,14 +106,14 @@ THREE.UniformsLib = {
 			"color": { type: "c" },
 			"position": { type: "v3" },
 			"direction": { type: "v3" },
-			"distance": { type: "f" },
-			"coneCos": { type: "f" },
-			"penumbraCos": { type: "f" },
-			"decay": { type: "f" },
+			"distance": { type: "1f" },
+			"coneCos": { type: "1f" },
+			"penumbraCos": { type: "1f" },
+			"decay": { type: "1f" },
 
-			"shadow": { type: "i" },
-			"shadowBias": { type: "f" },
-			"shadowRadius": { type: "f" },
+			"shadow": { type: "1i" },
+			"shadowBias": { type: "1f" },
+			"shadowRadius": { type: "1f" },
 			"shadowMapSize": { type: "v2" }
 		} },
 
@@ -123,12 +123,12 @@ THREE.UniformsLib = {
 		"pointLights": { type: "sa", value: [], properties: {
 			"color": { type: "c" },
 			"position": { type: "v3" },
-			"decay": { type: "f" },
-			"distance": { type: "f" },
+			"decay": { type: "1f" },
+			"distance": { type: "1f" },
 
-			"shadow": { type: "i" },
-			"shadowBias": { type: "f" },
-			"shadowRadius": { type: "f" },
+			"shadow": { type: "1i" },
+			"shadowBias": { type: "1f" },
+			"shadowRadius": { type: "1f" },
 			"shadowMapSize": { type: "v2" }
 		} },
 
@@ -146,9 +146,9 @@ THREE.UniformsLib = {
 	points: {
 
 		"diffuse": { type: "c", value: new THREE.Color( 0xeeeeee ) },
-		"opacity": { type: "f", value: 1.0 },
-		"size": { type: "f", value: 1.0 },
-		"scale": { type: "f", value: 1.0 },
+		"opacity": { type: "1f", value: 1.0 },
+		"size": { type: "1f", value: 1.0 },
+		"scale": { type: "1f", value: 1.0 },
 		"map": { type: "t", value: null },
 		"offsetRepeat": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) }
 

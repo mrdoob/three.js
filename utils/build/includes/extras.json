@@ -28,6 +28,7 @@
 	"src/extras/geometries/EdgesGeometry.js",
 	"src/extras/geometries/ExtrudeGeometry.js",
 	"src/extras/geometries/ShapeGeometry.js",
+	"src/extras/geometries/LatheBufferGeometry.js",
 	"src/extras/geometries/LatheGeometry.js",
 	"src/extras/geometries/PlaneGeometry.js",
 	"src/extras/geometries/PlaneBufferGeometry.js",

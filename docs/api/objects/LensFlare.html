@@ -9,13 +9,14 @@
 	</head>
 	<body>
 		[page:Object3D] &rarr;
-		
+
 		<h1>[name]</h1>
 
-		<div class="desc">Creates a simulated lens flare that tracks a light</div>
+		<div class="desc">Creates a simulated lens flare that tracks a light.<br /><br />
+		Note: [page:WebGLRenderer] must have *alpha* set to *true* for LensFlare to work.</div>
 
 		<h2>Example</h2>
-		
+
 		<div>[example:webgl_lensflares lensflares]</div>
 
 		<h2>Constructor</h2>
@@ -40,17 +41,17 @@
 		<h3>[property:array lensFlares]</h3>
 		<div>
 		The array of flares as set by [page:LensFlare.add]
-		</div> 
+		</div>
 
 		<h3>[property:Vector3 positionScreen]</h3>
 		<div>
 		The position of the lens flare on the screen.
-		</div> 
+		</div>
 
 		<h3>[property:Function customUpdateCallback]</h3>
 		<div>
 		A custom update callback
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 

@@ -4,10 +4,6 @@
  * parameters = {
  *  opacity: <float>,
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
  * }
@@ -22,6 +18,8 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
+	this.fog = false;
+	this.lights = false;
 	this.morphTargets = false;
 
 	this.setValues( parameters );

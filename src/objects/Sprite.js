@@ -39,7 +39,7 @@ THREE.Sprite.prototype.raycast = ( function () {
 		matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
 		var distanceSq = raycaster.ray.distanceSqToPoint( matrixPosition );
-		var guessSizeSq = this.scale.x * this.scale.y;
+		var guessSizeSq = this.scale.x * this.scale.y / 4;
 
 		if ( distanceSq > guessSizeSq ) {
 
@@ -65,7 +65,3 @@ THREE.Sprite.prototype.clone = function () {
 	return new this.constructor( this.material ).copy( this );
 
 };
-
-// Backwards compatibility
-
-THREE.Particle = THREE.Sprite;

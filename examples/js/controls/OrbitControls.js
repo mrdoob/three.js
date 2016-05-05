@@ -86,13 +86,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.getPolarAngle = function () {
 
-		return phi;
+		return spherical.phi;
 
 	};
 
 	this.getAzimuthalAngle = function () {
 
-		return theta;
+		return spherical.theta;
 
 	};
 
@@ -345,8 +345,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 			} else if ( scope.object instanceof THREE.OrthographicCamera ) {
 
 				// orthographic
-				panLeft( deltaX * ( scope.object.right - scope.object.left ) / element.clientWidth, scope.object.matrix );
-				panUp( deltaY * ( scope.object.top - scope.object.bottom ) / element.clientHeight, scope.object.matrix );
+				panLeft( deltaX * ( scope.object.right - scope.object.left ) / scope.object.zoom / element.clientWidth, scope.object.matrix );
+				panUp( deltaY * ( scope.object.top - scope.object.bottom ) / scope.object.zoom / element.clientHeight, scope.object.matrix );
 
 			} else {
 
@@ -756,7 +756,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseWheel( event ) {
 
-		if ( scope.enabled === false || scope.enableZoom === false || state !== STATE.NONE ) return;
+		if ( scope.enabled === false || scope.enableZoom === false || ( state !== STATE.NONE && state !== STATE.ROTATE ) ) return;
 
 		event.preventDefault();
 		event.stopPropagation();

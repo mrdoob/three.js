@@ -22,7 +22,7 @@ THREE.StringKeyframeTrack.prototype =
 	ValueTypeName: 'string',
 	ValueBufferType: Array,
 
-	DefaultInterpolation: THREE.IntepolateDiscrete,
+	DefaultInterpolation: THREE.InterpolateDiscrete,
 
 	InterpolantFactoryMethodLinear: undefined,
 

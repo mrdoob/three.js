@@ -558,12 +558,13 @@ class Geometry(base_classes.BaseNode):
             logger.info("Parsing %s", constants.SKINNING)
             influences = self.options.get(
                 constants.INFLUENCES_PER_VERTEX, 2)
+            anim_type = self.options.get(constants.ANIMATION)
 
             self[constants.INFLUENCES_PER_VERTEX] = influences
             self[constants.SKIN_INDICES] = api.mesh.skin_indices(
-                self.node, bone_map, influences) or []
+                self.node, bone_map, influences, anim_type) or []
             self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(
-                self.node, bone_map, influences) or []
+                self.node, bone_map, influences, anim_type) or []
 
         if self.options.get(constants.BLEND_SHAPES):
             logger.info("Parsing %s", constants.BLEND_SHAPES)

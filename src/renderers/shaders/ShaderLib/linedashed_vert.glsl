@@ -6,6 +6,7 @@ varying float vLineDistance;
 #include <common>
 #include <color_pars_vertex>
 #include <logdepthbuf_pars_vertex>
+#include <clipping_planes_pars_vertex>
 
 void main() {
 
@@ -17,5 +18,6 @@ void main() {
 	gl_Position = projectionMatrix * mvPosition;
 
 	#include <logdepthbuf_vertex>
+	#include <clipping_planes_vertex>
 
 }

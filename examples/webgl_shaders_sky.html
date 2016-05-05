@@ -42,7 +42,7 @@
 
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/SkyShader.js"></script>
@@ -143,9 +143,7 @@
 
 				scene = new THREE.Scene();
 
-				var helper = new THREE.GridHelper( 5000, 5000 );
-				helper.color1.setHex( 0xffffff );
-				helper.color2.setHex( 0xffffff );
+				var helper = new THREE.GridHelper( 5000, 5000, 0xffffff, 0xffffff );
 				scene.add( helper );
 
 				renderer = new THREE.WebGLRenderer();

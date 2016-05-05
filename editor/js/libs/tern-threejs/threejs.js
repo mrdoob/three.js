@@ -5292,10 +5292,6 @@
           "!type": "boolean",
           "!doc": "Whether to generate mipmaps (if possible) for a texture. True by default."
         },
-        "shareDepthFrom": {
-          "!type": "+THREE.WebGLRenderTarget",
-          "!doc": "Shares the depth from another WebGLRenderTarget. Default is null."
-        },
         "setSize": {
           "!type": "fn(width: number, height: number)",
           "!doc": "Sets the size of the renderTarget."

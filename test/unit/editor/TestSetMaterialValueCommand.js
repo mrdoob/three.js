@@ -29,7 +29,7 @@ test( "Test for SetMaterialValueCommand (Undo and Redo)", function() {
 		blending: [ 'No', 'Normal', 'Additive' ],
 		opacity: [ 0.2, 0.5, 0.8 ],
 		alphaTest: [ 0.1, 0.6, 0.9 ],
-		wirefrimeLinewidth: [ 1.2, 3.4, 5.6 ]
+		wireframeLinewidth: [ 1.2, 3.4, 5.6 ]
 
 	};
 

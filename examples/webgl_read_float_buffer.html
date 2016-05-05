@@ -33,7 +33,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> read float pixels webgl example</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -136,7 +136,7 @@
 
 				var materialScreen = new THREE.ShaderMaterial( {
 
-					uniforms: { tDiffuse: { type: "t", value: rtTexture } },
+					uniforms: { tDiffuse: { type: "t", value: rtTexture.texture } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader_screen' ).textContent,
 
@@ -177,9 +177,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				var valueDiv = document.createElement( 'div' );
 				valueDiv.style.position = 'absolute';

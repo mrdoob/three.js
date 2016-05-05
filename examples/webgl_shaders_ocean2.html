@@ -22,7 +22,6 @@
 			#type-status {
 				font-weight: bold;
 			}
-			#stats { position: absolute; top:0; left: 0 }
 		</style>
 	</head>
 	<body>
@@ -32,7 +31,7 @@
 			change type to <span id="change-type"></span>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -41,7 +40,7 @@
 
 		<script>
 			var stats = new Stats();
-			document.body.appendChild( stats.domElement );
+			document.body.appendChild( stats.dom );
 
 			var lastTime = (new Date()).getTime();
 
@@ -177,10 +176,10 @@
 						this.ms_Ocean.materialOcean.uniforms.u_exposure.value = this.ms_Ocean.exposure;
 						this.ms_Ocean.changed = false;
 					}
-					this.ms_Ocean.materialOcean.uniforms.u_normalMap.value = this.ms_Ocean.normalMapFramebuffer ;
-					this.ms_Ocean.materialOcean.uniforms.u_displacementMap.value = this.ms_Ocean.displacementMapFramebuffer ;
-					this.ms_Ocean.materialOcean.uniforms.u_projectionMatrix.value = this.ms_Camera.projectionMatrix ;
-					this.ms_Ocean.materialOcean.uniforms.u_viewMatrix.value = this.ms_Camera.matrixWorldInverse ;
+					this.ms_Ocean.materialOcean.uniforms.u_normalMap.value = this.ms_Ocean.normalMapFramebuffer.texture;
+					this.ms_Ocean.materialOcean.uniforms.u_displacementMap.value = this.ms_Ocean.displacementMapFramebuffer.texture;
+					this.ms_Ocean.materialOcean.uniforms.u_projectionMatrix.value = this.ms_Camera.projectionMatrix;
+					this.ms_Ocean.materialOcean.uniforms.u_viewMatrix.value = this.ms_Camera.matrixWorldInverse;
 					this.ms_Ocean.materialOcean.uniforms.u_cameraPosition.value = this.ms_Camera.position;
 					this.ms_Ocean.materialOcean.depthTest = true;
 					//this.ms_Scene.__lights[1].position.x = this.ms_Scene.__lights[1].position.x + 0.01;

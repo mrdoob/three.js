@@ -36,7 +36,7 @@ Setup Number Focus Test Plates
 Use WEBGL Depth buffer support?
 -->
 	<body>
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/shaders/BokehShader2.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -261,9 +261,7 @@ Use WEBGL Depth buffer support?
 				renderer.domElement.style.left = "0px";
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -411,8 +409,8 @@ Use WEBGL Depth buffer support?
 
 				postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
-				postprocessing.bokeh_uniforms[ "tColor" ].value = postprocessing.rtTextureColor;
-				postprocessing.bokeh_uniforms[ "tDepth" ].value = postprocessing.rtTextureDepth;
+				postprocessing.bokeh_uniforms[ "tColor" ].value = postprocessing.rtTextureColor.texture;
+				postprocessing.bokeh_uniforms[ "tDepth" ].value = postprocessing.rtTextureDepth.texture;
 
 				postprocessing.bokeh_uniforms[ "textureWidth" ].value = window.innerWidth;
 

@@ -32,11 +32,6 @@
 
 			#footer { width: 100%; margin: 2em auto; text-align: center; position: absolute; bottom: 0 }
 			strong { color: red }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #555 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
@@ -50,7 +45,7 @@
 			press <strong>h</strong> to toggle hemisphere light, <strong>d</strong> to toggle directional light
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 
@@ -231,12 +226,12 @@
 				renderer.gammaOutput = true;
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
+				renderer.shadowMap.renderReverseSided = false;
 
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

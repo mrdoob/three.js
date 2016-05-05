@@ -23,11 +23,6 @@
 
 			.h { color: skyblue }
 			.c { display: inline; margin-left: 1em }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #888 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -56,7 +51,7 @@
 			</div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/BinaryLoader.js"></script>
 
@@ -169,20 +164,15 @@
 				spotLight.target.position.set( 0, 0, 0 );
 				spotLight.castShadow = true;
 
-				spotLight.shadowCameraNear = 100;
-				spotLight.shadowCameraFar = camera.far;
-				spotLight.shadowCameraFov = 50;
+				spotLight.shadow.camera.near = 100;
+				spotLight.shadow.camera.far = camera.far;
+				spotLight.shadow.camera.fov = 50;
 
-				spotLight.shadowBias = -0.00125;
-				spotLight.shadowMapWidth = SHADOW_MAP_WIDTH;
-				spotLight.shadowMapHeight = SHADOW_MAP_HEIGHT;
+				spotLight.shadow.bias = -0.00125;
+				spotLight.shadow.mapSize.width = SHADOW_MAP_WIDTH;
+				spotLight.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
 
 				scene.add( spotLight );
-
-				directionalLight2 = new THREE.PointLight( 0xff9900, 0.25 );
-				directionalLight2.position.set( 0.5, -1, 0.5 );
-				//directionalLight2.position.normalize();
-				//scene.add( directionalLight2 );
 
 				// RENDERER
 
@@ -194,13 +184,13 @@
 
 				// SHADOW
 
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
+				renderer.shadowMap.renderReverseSided = false;
 				renderer.shadowMap.enabled = true;
 
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// CUBE CAMERA
 
@@ -209,37 +199,37 @@
 
 				// MATERIALS
 
-				var cubeTarget = cubeCamera.renderTarget;
+				var cubeTexture = cubeCamera.renderTarget.texture;
 
 				mlib = {
 
 					body: [],
 
-					"Chrome": new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTarget  } ),
+					"Chrome": new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTexture  } ),
 
-					"Dark chrome": new THREE.MeshLambertMaterial( { color: 0x444444, envMap: cubeTarget } ),
+					"Dark chrome": new THREE.MeshLambertMaterial( { color: 0x444444, envMap: cubeTexture } ),
 
 					"Black rough": new THREE.MeshLambertMaterial( { color: 0x050505, } ),
 
-					"Dark glass": new THREE.MeshLambertMaterial( { color: 0x101020, envMap: cubeTarget, opacity: 0.5, transparent: true } ),
+					"Dark glass": new THREE.MeshLambertMaterial( { color: 0x101020, envMap: cubeTexture, opacity: 0.5, transparent: true } ),
 					"Orange glass": new THREE.MeshLambertMaterial( { color: 0xffbb00, opacity: 0.5, transparent: true } ),
 					"Red glass": new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } ),
 
-					"Black metal": new THREE.MeshLambertMaterial( { color: 0x222222, envMap: cubeTarget, combine: THREE.MultiplyOperation } ),
-					"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: cubeTarget, combine: THREE.MultiplyOperation } )
+					"Black metal": new THREE.MeshLambertMaterial( { color: 0x222222, envMap: cubeTexture, combine: THREE.MultiplyOperation } ),
+					"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: cubeTexture, combine: THREE.MultiplyOperation } )
 
 				};
 
-				mlib.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0x883300, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
-				mlib.body.push( [ "Blue", new THREE.MeshLambertMaterial( { color: 0x113355, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
-				mlib.body.push( [ "Red", new THREE.MeshLambertMaterial( { color: 0x660000, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
-				mlib.body.push( [ "Black", new THREE.MeshLambertMaterial( { color: 0x000000, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
-				mlib.body.push( [ "White", new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
+				mlib.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0x883300, envMap: cubeTexture, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
+				mlib.body.push( [ "Blue", new THREE.MeshLambertMaterial( { color: 0x113355, envMap: cubeTexture, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
+				mlib.body.push( [ "Red", new THREE.MeshLambertMaterial( { color: 0x660000, envMap: cubeTexture, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
+				mlib.body.push( [ "Black", new THREE.MeshLambertMaterial( { color: 0x000000, envMap: cubeTexture, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
+				mlib.body.push( [ "White", new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTexture, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
 
-				mlib.body.push( [ "Carmine", new THREE.MeshPhongMaterial( { color: 0x770000, specular: 0xffaaaa, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
-				mlib.body.push( [ "Gold", new THREE.MeshPhongMaterial( { color: 0xaa9944, specular: 0xbbaa99, shininess: 50, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
-				mlib.body.push( [ "Bronze", new THREE.MeshPhongMaterial( { color: 0x150505, specular: 0xee6600, shininess: 10, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
-				mlib.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
+				mlib.body.push( [ "Carmine", new THREE.MeshPhongMaterial( { color: 0x770000, specular: 0xffaaaa, envMap: cubeTexture, combine: THREE.MultiplyOperation } ) ] );
+				mlib.body.push( [ "Gold", new THREE.MeshPhongMaterial( { color: 0xaa9944, specular: 0xbbaa99, shininess: 50, envMap: cubeTexture, combine: THREE.MultiplyOperation } ) ] );
+				mlib.body.push( [ "Bronze", new THREE.MeshPhongMaterial( { color: 0x150505, specular: 0xee6600, shininess: 10, envMap: cubeTexture, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
+				mlib.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, envMap: cubeTexture, combine: THREE.MultiplyOperation } ) ] );
 
 				// FLARES
 				var textureLoader = new THREE.TextureLoader();
@@ -450,7 +440,7 @@
 
 				// motion blur
 
-				effectBlend.uniforms[ 'tDiffuse2' ].value = effectSave.renderTarget;
+				effectBlend.uniforms[ 'tDiffuse2' ].value = effectSave.renderTarget.texture;
 				effectBlend.uniforms[ 'mixRatio' ].value = 0.65;
 
 				var renderModel = new THREE.RenderPass( scene, camera );
@@ -681,7 +671,7 @@
 
 				var shadowPlane = new THREE.PlaneBufferGeometry( shadowWidth, shadowHeight );
 				var shadowMaterial = new THREE.MeshBasicMaterial( {
-					color: 0xffffff, opacity: 0.5, transparent: true, map: shadowTexture,
+					color: 0xffffff, opacity: 0.5, transparent: true, map: shadowTexture.texture,
 					polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
 				} );
 
