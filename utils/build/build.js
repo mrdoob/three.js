@@ -2,6 +2,7 @@ var fs = require("fs");
 var path = require("path");
 var argparse =  require( "argparse" );
 var uglify = require("uglify-js");
+var constify = require("./constifier/constify");
 var spawn = require('child_process').spawn;
 
 // This script can be invoked via:
@@ -88,6 +89,16 @@ function main() {
 	} else {
 
 		var LICENSE = "threejs.org/license";
+
+		// Constant substitution
+
+		var constants = JSON.parse( fs.readFileSync( './constants.json', 'utf8' ) );
+
+		sources.forEach( function( source ) {
+
+			source.contents = constify( source.contents, constants );
+
+		} );
 
 		// Parsing
 
