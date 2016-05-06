@@ -5,7 +5,7 @@
 
 THREE.Material = function () {
 
-	Object.defineProperty( this, 'id', { value: THREE.MaterialIdCount ++ } );
+	Object.defineProperty( this, 'id', { value: THREE.materialIdCount ++ } );
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -321,4 +321,4 @@ THREE.Material.prototype = {
 
 Object.assign( THREE.Material.prototype, THREE.EventDispatcher.prototype );
 
-THREE.MaterialIdCount = 0;
+THREE.materialIdCount = 0;

@@ -6,7 +6,7 @@
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
-	Object.defineProperty( this, 'id', { value: THREE.TextureIdCount ++ } );
+	Object.defineProperty( this, 'id', { value: THREE.texturelIdCount ++ } );
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -276,4 +276,4 @@ THREE.Texture.prototype = {
 
 Object.assign( THREE.Texture.prototype, THREE.EventDispatcher.prototype );
 
-THREE.TextureIdCount = 0;
+THREE.texturelIdCount = 0;

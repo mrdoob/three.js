@@ -8,7 +8,7 @@
 
 THREE.Object3D = function () {
 
-	Object.defineProperty( this, 'id', { value: THREE.Object3DIdCount ++ } );
+	Object.defineProperty( this, 'id', { value: THREE.object3DIdCount ++ } );
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -715,4 +715,4 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 } );
 
-THREE.Object3DIdCount = 0;
+THREE.object3DIdCount = 0;
