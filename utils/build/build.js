@@ -4,6 +4,13 @@ var argparse =  require( "argparse" );
 var uglify = require("uglify-js");
 var spawn = require('child_process').spawn;
 
+// This script can be invoked via:
+//
+//     npm run build
+//     npm run build.min
+//
+// See 'package.json' for the command lines.
+
 function main() {
 
 	"use strict";
