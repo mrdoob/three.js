@@ -71,13 +71,6 @@ THREE.WebGLUniforms = ( function() { // scope
 		arrayCacheF32 = [],
 		arrayCacheI32 = [],
 
-		uncacheTemporaryArrays = function() {
-
-			arrayCacheF32.length = 0;
-			arrayCacheI32.length = 0;
-
-		},
-
 	// Flattening for arrays of vectors and matrices
 
 		flatten = function( array, nBlocks, blockSize ) {
@@ -593,6 +586,13 @@ THREE.WebGLUniforms = ( function() { // scope
 			if ( f !== undefined ) f.call( v, object, camera );
 
 		}
+
+	};
+
+	WebGLUniforms.purgeCache = function() {
+
+		arrayCacheF32.length = 0;
+		arrayCacheI32.length = 0;
 
 	};
 
