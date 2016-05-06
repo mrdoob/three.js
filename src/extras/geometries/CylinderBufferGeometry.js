@@ -20,6 +20,7 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 	};
 
 	var scope = this;
+	var twoPi = 2.0 * Math.PI;
 
 	radiusTop = radiusTop !== undefined ? radiusTop : 20;
 	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
@@ -29,11 +30,11 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 	heightSegments = Math.floor( heightSegments ) || 1;
 
 	openEnded = openEnded !== undefined ? openEnded : false;
-	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
+	thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
+	thetaLength = thetaLength !== undefined ? thetaLength : twoPi;
 
 	// used to calculate buffer length
-	
+
 	var nbCap = 0;
 	if ( openEnded === false ) {
 
@@ -225,25 +226,15 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 		// we must generate a center vertex per face/segment
 
 		for ( x = 1; x <= radialSegments; x ++ ) {
-
 			// vertex
-			vertices.setXYZ( index, 0, halfHeight * sign, 0 );
+			vertices.setXYZ( index, 0.5, halfHeight * sign, 0.5);
 
 			// normal
 			normals.setXYZ( index, 0, sign, 0 );
 
 			// uv
-			if ( top === true ) {
-
-				uv.x = x / radialSegments;
-				uv.y = 0;
-
-			} else {
-
-				uv.x = ( x - 1 ) / radialSegments;
-				uv.y = 1;
-
-			}
+			uv.x = 0.5;
+			uv.y = 0.5;
 
 			uvs.setXY( index, uv.x, uv.y );
 
@@ -260,18 +251,24 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 		for ( x = 0; x <= radialSegments; x ++ ) {
 
 			var u = x / radialSegments;
+			var theta = u * thetaLength + thetaStart;
+
+			var cosTheta = Math.cos( theta );
+			var sinTheta = Math.sin( theta );
 
 			// vertex
-			vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+			vertex.x = radius * sinTheta;
 			vertex.y = halfHeight * sign;
-			vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+			vertex.z = radius * cosTheta;
 			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
 
 			// normal
 			normals.setXYZ( index, 0, sign, 0 );
 
 			// uv
-			uvs.setXY( index, u, ( top === true ) ? 1 : 0 );
+			uv.x = ( cosTheta * 0.5 ) + 0.5;
+			uv.y = ( sinTheta * 0.5 ) + 0.5;
+			uvs.setXY( index, uv.x, uv.y);
 
 			// increase index
 			index ++;
