@@ -323,4 +323,3 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 
 THREE.CylinderBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.CylinderBufferGeometry.prototype.constructor = THREE.CylinderBufferGeometry;
-
