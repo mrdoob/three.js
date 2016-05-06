@@ -3,6 +3,7 @@ var path = require("path");
 var argparse =  require( "argparse" );
 var uglify = require("uglify-js");
 var constify = require("./constifier/constify");
+var generateSpec = require("./constifier/generateThreeSpec.js");
 var spawn = require('child_process').spawn;
 
 // This script can be invoked via:
@@ -24,12 +25,12 @@ function main() {
 	parser.addArgument( ['--output'], { defaultValue: '../../build/three.js' } );
 	parser.addArgument( ['--sourcemaps'], { action: 'storeTrue', defaultValue: true } );
 
-	
+
 	var args = parser.parseArgs();
-	
+
 	var output = args.output;
 	console.log(' * Building ' + output);
-	
+
 	var sourcemap = '';
 	var sourcemapping = '';
 
@@ -46,16 +47,16 @@ function main() {
 	if ( args.amd ){
 		buffer.push('function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n');
 	};
-	
+
 	for ( var i = 0; i < args.include.length; i ++ ){
-		
+
 		var contents = fs.readFileSync( './includes/' + args.include[i] + '.json', 'utf8' );
 		var files = JSON.parse( contents );
 
 		for ( var j = 0; j < files.length; j ++ ){
 
 			var file = '../../' + files[ j ];
-			
+
 			buffer.push('// File:' + files[ j ]);
 			buffer.push('\n\n');
 
@@ -75,28 +76,25 @@ function main() {
 		}
 
 	}
-	
+
 	if ( args.amd ){
 		buffer.push('exports.THREE = THREE;\n\n} ) );');
 	};
-	
+
 	var temp = buffer.join( '' );
-	
-	if ( !args.minify ){
+	fs.writeFileSync( output, temp, 'utf8' );
 
-		fs.writeFileSync( output, temp, 'utf8' );
-
-	} else {
+	if ( args.minify ){
 
 		var LICENSE = "threejs.org/license";
 
 		// Constant substitution
 
-		var constants = JSON.parse( fs.readFileSync( './constants.json', 'utf8' ) );
+		var constifierSpec = generateSpec( path.resolve( __dirname, output ) );
 
 		sources.forEach( function( source ) {
 
-			source.contents = constify( source.contents, constants );
+			source.contents = constify( source.contents, constifierSpec );
 
 		} );
 

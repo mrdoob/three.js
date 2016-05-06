@@ -112,7 +112,23 @@ def main(argv=None):
 			backup=readText(output)
 			os.remove(output)
 
-                writeText( path, constify( readText(path), readJSON('constants.json') ) )
+                # Constifier
+
+                #specTempFile = tempfile.NamedTemporaryFile(delete=False)
+                #specTempFile.close()
+
+                specFile = '../../build/three.constspec.json' # specTempFile.name
+
+                if os.system( 'node -e 0' ) == 0:
+                    os.system( 'node constifier/generateThreeSpec.js ' + path + ' ' + specFile )
+                else:
+                    specFile = '../../build/three.constspec.json'
+                    print( "WARNING: Information for constant compression cannot be updated automatically. Please install node.js" )
+
+                writeText( path, constify( readText(path), readJSON(specFile) ) )
+                #os.remove( specTempFile.name )
+
+                # Closure compiler
 
 		externs = ' --externs '.join(args.externs)
 		source = ' '.join(sources)
