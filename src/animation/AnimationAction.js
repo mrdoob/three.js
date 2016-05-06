@@ -119,8 +119,6 @@ THREE.AnimationAction._new.prototype = {
 
 	isRunning: function() {
 
-		var start = this._startTime;
-
 		return this.enabled && ! this.paused && this.timeScale !== 0 &&
 				this._startTime === null && this._mixer._isActiveAction( this );
 
@@ -186,8 +184,6 @@ THREE.AnimationAction._new.prototype = {
 	},
 
 	crossFadeFrom: function( fadeOutAction, duration, warp ) {
-
-		var mixer = this._mixer;
 
 		fadeOutAction.fadeOut( duration );
 		this.fadeIn( duration );
