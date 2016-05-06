@@ -17,6 +17,9 @@
         "type" : "git",
          "url" : "git://github.com/mrdoob/three.js.git"
     },
+
+	"license": "MIT",
+
     "licenses": [{
         "type": "The MIT License",
         "url": "https://raw.github.com/mrdoob/three.js/master/LICENSE"
