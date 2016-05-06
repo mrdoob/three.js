@@ -40,7 +40,6 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 	if ( openEnded === false ) {
 
 		if ( radiusTop > 0 ) nbCap++;
-
 		if ( radiusBottom > 0 ) nbCap++;
 
 	}
