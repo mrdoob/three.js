@@ -57,9 +57,9 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 	// helper variables
 
 	var index = 0,
-		indexOffset = 0,
-		indexArray = [],
-		halfHeight = height / 2;
+	    indexOffset = 0,
+	    indexArray = [],
+	    halfHeight = height / 2;
 
 	// group variables
 	var groupStart = 0;
@@ -215,8 +215,8 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 	function generateCap( top ) {
 
 		var x,
-			centerIndexStart,
-			centerIndexEnd;
+		    centerIndexStart,
+		    centerIndexEnd;
 		var uv = new THREE.Vector2();
 		var vertex = new THREE.Vector3();
 
