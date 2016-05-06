@@ -135,7 +135,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 
 		this.postprocessing.bokeh_uniforms[ "focalDepth" ].value = 0.1;
 
-		console.log( this.postprocessing.bokeh_uniforms[ "focalDepth" ].value );
+		//console.log( this.postprocessing.bokeh_uniforms[ "focalDepth" ].value );
 
 		this.postprocessing.bokeh_uniforms[ "znear" ].value = this.near;
 		this.postprocessing.bokeh_uniforms[ "zfar" ].value = this.near;
