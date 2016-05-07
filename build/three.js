@@ -36670,6 +36670,7 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 	};
 
 	var scope = this;
+	var twoPi = 2.0 * Math.PI;
 
 	radiusTop = radiusTop !== undefined ? radiusTop : 20;
 	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
@@ -36679,16 +36680,17 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 	heightSegments = Math.floor( heightSegments ) || 1;
 
 	openEnded = openEnded !== undefined ? openEnded : false;
-	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
+	thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
+	thetaLength = thetaLength !== undefined ? thetaLength : twoPi;
 
 	// used to calculate buffer length
-	
+
 	var nbCap = 0;
+
 	if ( openEnded === false ) {
 
-		if ( radiusTop > 0 ) nbCap++;
-		if ( radiusBottom > 0 ) nbCap++;
+		if ( radiusTop > 0 ) nbCap ++;
+		if ( radiusBottom > 0 ) nbCap ++;
 
 	}
 
@@ -36704,7 +36706,10 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 
 	// helper variables
 
-	var index = 0, indexOffset = 0, indexArray = [], halfHeight = height / 2;
+	var index = 0,
+	    indexOffset = 0,
+	    indexArray = [],
+	    halfHeight = height / 2;
 
 	// group variables
 	var groupStart = 0;
@@ -36793,6 +36798,7 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 				normal.copy( vertex );
 
 				// handle special case if radiusTop/radiusBottom is zero
+
 				if ( ( radiusTop === 0 && y === 0 ) || ( radiusBottom === 0 && y === heightSegments ) ) {
 
 					normal.x = Math.sin( u * thetaLength + thetaStart );
@@ -36858,7 +36864,9 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 
 	function generateCap( top ) {
 
-		var x, centerIndexStart, centerIndexEnd;
+		var x,
+		    centerIndexStart,
+		    centerIndexEnd;
 		var uv = new THREE.Vector2();
 		var vertex = new THREE.Vector3();
 
@@ -36883,17 +36891,8 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 			normals.setXYZ( index, 0, sign, 0 );
 
 			// uv
-			if ( top === true ) {
-
-				uv.x = x / radialSegments;
-				uv.y = 0;
-
-			} else {
-
-				uv.x = ( x - 1 ) / radialSegments;
-				uv.y = 1;
-
-			}
+			uv.x = 0.5;
+			uv.y = 0.5;
 
 			uvs.setXY( index, uv.x, uv.y );
 
@@ -36910,18 +36909,24 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 		for ( x = 0; x <= radialSegments; x ++ ) {
 
 			var u = x / radialSegments;
+			var theta = u * thetaLength + thetaStart;
+
+			var cosTheta = Math.cos( theta );
+			var sinTheta = Math.sin( theta );
 
 			// vertex
-			vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+			vertex.x = radius * sinTheta;
 			vertex.y = halfHeight * sign;
-			vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+			vertex.z = radius * cosTheta;
 			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
 
 			// normal
 			normals.setXYZ( index, 0, sign, 0 );
 
 			// uv
-			uvs.setXY( index, u, ( top === true ) ? 1 : 0 );
+			uv.x = ( cosTheta * 0.5 ) + 0.5;
+			uv.y = ( sinTheta * 0.5 ) + 0.5;
+			uvs.setXY( index, uv.x, uv.y );
 
 			// increase index
 			index ++;

@@ -235,7 +235,7 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 		for ( x = 1; x <= radialSegments; x ++ ) {
 
 			// vertex
-			vertices.setXYZ( index, 0.5, halfHeight * sign, 0.5 );
+			vertices.setXYZ( index, 0, halfHeight * sign, 0 );
 
 			// normal
 			normals.setXYZ( index, 0, sign, 0 );
