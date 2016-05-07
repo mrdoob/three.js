@@ -58,6 +58,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ 'normalmap' ],
 			THREE.UniformsLib[ 'displacementmap' ],
 			THREE.UniformsLib[ 'fog' ],
+			THREE.UniformsLib[ 'ltc_brdf' ],
 			THREE.UniformsLib[ 'lights' ],
 
 			{
@@ -88,6 +89,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ 'metalnessmap' ],
 			THREE.UniformsLib[ 'fog' ],
 			THREE.UniformsLib[ 'lights' ],
+			THREE.UniformsLib[ 'ltc_brdf' ],
 
 			{
 				"emissive" : { value: new THREE.Color( 0x000000 ) },
