@@ -107,7 +107,6 @@
         object.rotation.set( -Math.PI / 2.0, 0.0, 0.0 );
 				scene.add( object );
 
-
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -127,8 +126,30 @@
 
       function colorSphereWithDistributionValues(geom, dist) {
 
-        var maxVal = 1.0 / Math.PI;
+        var maxVal = 0.0;
 
+        var values = [];
+
+        // calc dist values, and note max value to map colors
+        for ( var i = 0; i < geom.faces.length; i ++ ) {
+
+          values.push({});
+          var face = geom.faces[ i ];
+
+          for ( var j = 0; j < 3; j ++ ) {
+            var faceIdx = [ 'a', 'b', 'c' ][ j ];
+            var pos = geom.vertices[ face[ faceIdx ] ];
+
+            var distValue = dist.valueAtPosVec3( pos );
+            maxVal = Math.max(maxVal, distValue);
+            values[i][faceIdx] = distValue;
+          }
+
+        }
+
+        console.log(maxVal);
+
+        // set colors using maxValue to interpolate properly
         for ( var i = 0; i < geom.faces.length; i ++ ) {
 
           var face = geom.faces[ i ];
@@ -140,9 +161,7 @@
             var white = new THREE.Color( 'white' );
 
             var faceIdx = [ 'a', 'b', 'c' ][ j ];
-            var pos = geom.vertices[ face[ faceIdx ] ];
-
-            var distValue = dist.valueAtPosVec3( pos ) / maxVal;
+            var distValue = values[i][faceIdx] / maxVal;
 
             var color;
             if (distValue > 0.5) {
@@ -163,8 +182,6 @@
         geom.colorsNeedUpdate = true;
 
       }
-
-
 
 			function onWindowResize() {
 
