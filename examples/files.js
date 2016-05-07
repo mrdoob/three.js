@@ -151,6 +151,7 @@ var files = {
 		"webgl_materials_variations_standard",
 		"webgl_materials_video",
 		"webgl_materials_wireframe",
+		"webgl_math_spherical_distribution",
 		"webgl_mirror",
 		"webgl_modifier_subdivision",
 		"webgl_modifier_tessellation",
