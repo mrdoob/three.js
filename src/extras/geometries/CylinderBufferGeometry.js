@@ -20,7 +20,6 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 	};
 
 	var scope = this;
-	var twoPi = 2.0 * Math.PI;
 
 	radiusTop = radiusTop !== undefined ? radiusTop : 20;
 	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
@@ -31,7 +30,7 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 
 	openEnded = openEnded !== undefined ? openEnded : false;
 	thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
-	thetaLength = thetaLength !== undefined ? thetaLength : twoPi;
+	thetaLength = thetaLength !== undefined ? thetaLength : 2.0 * Math.PI;
 
 	// used to calculate buffer length
 
@@ -214,9 +213,8 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 
 	function generateCap( top ) {
 
-		var x,
-		    centerIndexStart,
-		    centerIndexEnd;
+		var x, centerIndexStart, centerIndexEnd;
+
 		var uv = new THREE.Vector2();
 		var vertex = new THREE.Vector3();
 
