@@ -148,7 +148,7 @@ function SimulationRenderer( WIDTH, renderer ) {
 		positionShader.uniforms.time.value = performance.now();
 		positionShader.uniforms.delta.value = delta;
 		renderer.render( scene, camera, output );
-		this.currentPosition = output;
+		this.currentPosition = output.texture;
 
 	};
 
@@ -160,7 +160,7 @@ function SimulationRenderer( WIDTH, renderer ) {
 		velocityShader.uniforms.time.value = performance.now();
 		velocityShader.uniforms.delta.value = delta;
 		renderer.render( scene, camera, output );
-		this.currentVelocity = output;
+		this.currentVelocity = output.texture;
 
 	};
 
