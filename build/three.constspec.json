@@ -392,6 +392,7 @@
 			"RGBAFormat": 1021,
 			"LuminanceFormat": 1022,
 			"LuminanceAlphaFormat": 1023,
+			"RGBEFormat": 1021,
 			"DepthFormat": 1026,
 			"RGB_S3TC_DXT1_Format": 2001,
 			"RGBA_S3TC_DXT1_Format": 2002,
