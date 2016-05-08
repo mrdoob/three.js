@@ -146,6 +146,21 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'ConeGeometry':
+					case 'ConeBufferGeometry':
+
+						geometry = new THREE [ data.type ](
+							data.radius,
+							data.height,
+							data.radialSegments,
+							data.heightSegments,
+							data.openEnded,
+							data.thetaStart,
+							data.thetaLength
+						);
+
+						break;
+
 					case 'SphereGeometry':
 					case 'SphereBufferGeometry':
 
