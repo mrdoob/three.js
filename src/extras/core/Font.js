@@ -9,9 +9,7 @@ THREE.Font = function ( data ) {
 
 };
 
-THREE.Font.prototype = {
-
-	constructor: THREE.Font,
+Object.assign( THREE.Font.prototype, {
 
 	generateShapes: function ( text, size, divisions ) {
 
@@ -163,4 +161,4 @@ THREE.Font.prototype = {
 
 	}
 
-};
+} );
