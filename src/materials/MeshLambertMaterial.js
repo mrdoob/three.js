@@ -38,85 +38,44 @@
 
 THREE.MeshLambertMaterial = function ( parameters ) {
 
-	THREE.Material.call( this );
-
-	this.type = 'MeshLambertMaterial';
-
-	this.color = new THREE.Color( 0xffffff ); // diffuse
-
-	this.map = null;
-
-	this.lightMap = null;
-	this.lightMapIntensity = 1.0;
-
-	this.aoMap = null;
-	this.aoMapIntensity = 1.0;
-
-	this.emissive = new THREE.Color( 0x000000 );
-	this.emissiveIntensity = 1.0;
-	this.emissiveMap = null;
-
-	this.specularMap = null;
-
-	this.alphaMap = null;
-
-	this.envMap = null;
-	this.combine = THREE.MultiplyOperation;
-	this.reflectivity = 1;
-	this.refractionRatio = 0.98;
-
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
-	this.wireframeLinecap = 'round';
-	this.wireframeLinejoin = 'round';
-
-	this.skinning = false;
-	this.morphTargets = false;
-	this.morphNormals = false;
-
-	this.setValues( parameters );
+	THREE.Material.call( this, parameters );
 
 };
 
-THREE.MeshLambertMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshLambertMaterial.prototype.constructor = THREE.MeshLambertMaterial;
+THREE.Asset.assignPrototype( THREE.MeshLambertMaterial, THREE.Asset, {
 
-THREE.MeshLambertMaterial.prototype.copy = function ( source ) {
+	type: 'MeshLambertMaterial',
 
-	THREE.Material.prototype.copy.call( this, source );
+	color: new THREE.Color( 0xffffff ); // diffuse
 
-	this.color.copy( source.color );
+	map: null,
 
-	this.map = source.map;
+	lightMap: null,
+	lightMapIntensity: 1.0,
 
-	this.lightMap = source.lightMap;
-	this.lightMapIntensity = source.lightMapIntensity;
+	aoMap: null,
+	aoMapIntensity: 1.0,
 
-	this.aoMap = source.aoMap;
-	this.aoMapIntensity = source.aoMapIntensity;
+	emissive: new THREE.Color( 0x000000 ),
+	emissiveIntensity: 1.0,
+	emissiveMap: null,
 
-	this.emissive.copy( source.emissive );
-	this.emissiveMap = source.emissiveMap;
-	this.emissiveIntensity = source.emissiveIntensity;
+	specularMap: null,
 
-	this.specularMap = source.specularMap;
+	alphaMap: null,
 
-	this.alphaMap = source.alphaMap;
+	envMap: null,
+	combine: THREE.MultiplyOperation,
+	reflectivity: 1,
+	refractionRatio: 0.98,
 
-	this.envMap = source.envMap;
-	this.combine = source.combine;
-	this.reflectivity = source.reflectivity;
-	this.refractionRatio = source.refractionRatio;
+	wireframe: false,
+	wireframeLinewidth: 1,
+	wireframeLinecap: 'round',
+	wireframeLinejoin: 'round',
 
-	this.wireframe = source.wireframe;
-	this.wireframeLinewidth = source.wireframeLinewidth;
-	this.wireframeLinecap = source.wireframeLinecap;
-	this.wireframeLinejoin = source.wireframeLinejoin;
+	skinning: false,
+	morphTargets: false,
+	morphNormals: false
 
-	this.skinning = source.skinning;
-	this.morphTargets = source.morphTargets;
-	this.morphNormals = source.morphNormals;
-
-	return this;
-
-};
+} );

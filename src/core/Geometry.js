@@ -9,12 +9,7 @@
 
 THREE.Geometry = function () {
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
-
-	this.uuid = THREE.Math.generateUUID();
-
-	this.name = '';
-	this.type = 'Geometry';
+	THREE.Asset.call( this );
 
 	this.vertices = [];
 	this.colors = [];
@@ -44,7 +39,11 @@ THREE.Geometry = function () {
 
 };
 
-Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
+THREE.Geometry.prototype = Object.assign( Object.create( THREE.Asset ), {
+
+	constructor: THREE.Geometry,
+	AssetCategory: 'geometries',
+	type: 'Geometry',
 
 	applyMatrix: function ( matrix ) {
 
@@ -917,21 +916,11 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 	},
 
-	toJSON: function () {
+	serialize_: function () {
 
-		var data = {
-			metadata: {
-				version: 4.4,
-				type: 'Geometry',
-				generator: 'Geometry.toJSON'
-			}
-		};
+		var data = THREE.Asset.prototype.serialize_.call( this );
 
 		// standard Geometry serialization
-
-		data.uuid = this.uuid;
-		data.type = this.type;
-		if ( this.name !== '' ) data.name = this.name;
 
 		if ( this.parameters !== undefined ) {
 

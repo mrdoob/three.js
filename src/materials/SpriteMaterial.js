@@ -13,34 +13,23 @@
 
 THREE.SpriteMaterial = function ( parameters ) {
 
-	THREE.Material.call( this );
-
-	this.type = 'SpriteMaterial';
-
-	this.color = new THREE.Color( 0xffffff );
-	this.map = null;
-
-	this.rotation = 0;
-
-	this.fog = false;
-	this.lights = false;
-
-	this.setValues( parameters );
+	THREE.Material.call( this, parameters );
 
 };
 
-THREE.SpriteMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.SpriteMaterial.prototype.constructor = THREE.SpriteMaterial;
+THREE.Asset.assignPrototype( THREE.SpriteMaterial, THREE.Material, {
 
-THREE.SpriteMaterial.prototype.copy = function ( source ) {
+	type: 'SpriteMaterial',
 
-	THREE.Material.prototype.copy.call( this, source );
+	DefaultState: {
 
-	this.color.copy( source.color );
-	this.map = source.map;
+		color: new THREE.Color( 0xffffff ),
+		map: null,
 
-	this.rotation = source.rotation;
+		rotation: 0,
 
-	return this;
+		fog: false,
+		lights: false
+	}
 
-};
+} );

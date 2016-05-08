@@ -23,56 +23,35 @@
 
 THREE.MeshDepthMaterial = function ( parameters ) {
 
-	THREE.Material.call( this );
-
-	this.type = 'MeshDepthMaterial';
-
-	this.depthPacking = THREE.BasicDepthPacking;
-
-	this.skinning = false;
-	this.morphTargets = false;
-
-	this.map = null;
-
-	this.alphaMap = null;
-
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
-
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
-
-	this.fog = false;
-	this.lights = false;
-
-	this.setValues( parameters );
+	THREE.Material.call( this, parameters );
 
 };
 
-THREE.MeshDepthMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshDepthMaterial.prototype.constructor = THREE.MeshDepthMaterial;
+Asset.assignPrototype( THREE.MeshDepthMaterial, THREE.Material, {
 
-THREE.MeshDepthMaterial.prototype.copy = function ( source ) {
+	type: 'MeshDepthMaterial',
 
-	THREE.Material.prototype.copy.call( this, source );
+	DefaultState: {
 
-	this.depthPacking = source.depthPacking;
+		depthPacking: THREE.BasicDepthPacking,
 
-	this.skinning = source.skinning;
-	this.morphTargets = source.morphTargets;
+		skinning: false,
+		morphTargets: false,
 
-	this.map = source.map;
+		map: null,
 
-	this.alphaMap = source.alphaMap;
+		alphaMap: null,
 
-	this.displacementMap = source.displacementMap;
-	this.displacementScale = source.displacementScale;
-	this.displacementBias = source.displacementBias;
+		displacementMap: null,
+		displacementScale: 1,
+		displacementBias: 0,
 
-	this.wireframe = source.wireframe;
-	this.wireframeLinewidth = source.wireframeLinewidth;
+		wireframe: false,
+		wireframeLinewidth: 1,
 
-	return this;
+		fog: false,
+		lights: false
 
-};
+	}
+
+} );

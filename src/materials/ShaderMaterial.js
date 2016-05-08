@@ -21,46 +21,6 @@
 
 THREE.ShaderMaterial = function ( parameters ) {
 
-	THREE.Material.call( this );
-
-	this.type = 'ShaderMaterial';
-
-	this.defines = {};
-	this.uniforms = {};
-
-	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
-	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
-
-	this.linewidth = 1;
-
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
-
-	this.fog = false; // set to use scene fog
-	this.lights = false; // set to use scene lights
-	this.clipping = false; // set to use user-defined clipping planes
-
-	this.skinning = false; // set to use skinning attribute streams
-	this.morphTargets = false; // set to use morph targets
-	this.morphNormals = false; // set to use morph normals
-
-	this.extensions = {
-		derivatives: false, // set to use derivatives
-		fragDepth: false, // set to use fragment depth values
-		drawBuffers: false, // set to use draw buffers
-		shaderTextureLOD: false // set to use shader texture LOD
-	};
-
-	// When rendered geometry doesn't include these attributes but the material does,
-	// use these default values in WebGL. This avoids errors when buffer data is missing.
-	this.defaultAttributeValues = {
-		'color': [ 1, 1, 1 ],
-		'uv': [ 0, 0 ],
-		'uv2': [ 0, 0 ]
-	};
-
-	this.index0AttributeName = undefined;
-
 	if ( parameters !== undefined ) {
 
 		if ( parameters.attributes !== undefined ) {
@@ -69,51 +29,60 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 		}
 
-		this.setValues( parameters );
+	}
+
+	THREE.Material.call( this, parameters );
+	this.index0AttributeName: undefined; // TODO: really transient?
+
+};
+
+THREE.Asset.assignPrototype( THREE.ShaderMaterial, THREE.Material, {
+
+	type: 'ShaderMaterial',
+
+	DefaultState: {
+
+		defines: {},
+		uniforms: {},
+
+		this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
+		this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
+
+		linewidth: 1,
+
+		wireframe: false,
+		wireframeLinewidth: 1,
+
+		fog: false, // set to use scene fog
+		lights: false, // set to use scene lights
+		clipping: false, // set to use user-defined clipping planes
+
+		skinning: false, // set to use skinning attribute streams
+		morphTargets: false, // set to use morph targets
+		morphNormals: false, // set to use morph normals
+
+		this.extensions = {
+			derivatives: false, // set to use derivatives
+			fragDepth: false, // set to use fragment depth values
+			drawBuffers: false, // set to use draw buffers
+			shaderTextureLOD: false // set to use shader texture LOD
+		},
+
+		// When rendered geometry doesn't include these attributes but the material does,
+		// use these default values in WebGL. This avoids errors when buffer data is missing.
+		this.defaultAttributeValues = {
+			'color': [ 1, 1, 1 ],
+			'uv': [ 0, 0 ],
+			'uv2': [ 0, 0 ]
+		}
+
+	},
+
+	copy: function ( source ) {
+
+		THREE.Material.prototype.copy.call( this, source );
+		this.uniforms = THREE.UniformsUtils.clone( source.uniforms ); // TODO make this unnecessray
 
 	}
 
-};
-
-THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
-
-THREE.ShaderMaterial.prototype.copy = function ( source ) {
-
-	THREE.Material.prototype.copy.call( this, source );
-
-	this.fragmentShader = source.fragmentShader;
-	this.vertexShader = source.vertexShader;
-
-	this.uniforms = THREE.UniformsUtils.clone( source.uniforms );
-
-	this.defines = source.defines;
-
-	this.wireframe = source.wireframe;
-	this.wireframeLinewidth = source.wireframeLinewidth;
-
-	this.lights = source.lights;
-	this.clipping = source.clipping;
-
-	this.skinning = source.skinning;
-
-	this.morphTargets = source.morphTargets;
-	this.morphNormals = source.morphNormals;
-
-	this.extensions = source.extensions;
-
-	return this;
-
-};
-
-THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
-
-	var data = THREE.Material.prototype.toJSON.call( this, meta );
-
-	data.uniforms = this.uniforms;
-	data.vertexShader = this.vertexShader;
-	data.fragmentShader = this.fragmentShader;
-
-	return data;
-
-};
+} );

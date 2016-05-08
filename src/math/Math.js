@@ -8,6 +8,8 @@ THREE.Math = {
 	DEG2RAD: Math.PI / 180,
 	RAD2DEG: 180 / Math.PI,
 
+	UUIDFORMAT: /^\w{8}-\w{4}-4\w{3}-\w{4}-\w{12}$/,
+
 	generateUUID: function () {
 
 		// http://www.broofa.com/Tools/Math.uuid.htm

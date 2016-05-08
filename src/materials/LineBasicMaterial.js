@@ -14,35 +14,24 @@
 
 THREE.LineBasicMaterial = function ( parameters ) {
 
-	THREE.Material.call( this );
-
-	this.type = 'LineBasicMaterial';
-
-	this.color = new THREE.Color( 0xffffff );
-
-	this.linewidth = 1;
-	this.linecap = 'round';
-	this.linejoin = 'round';
-
-	this.lights = false;
-
-	this.setValues( parameters );
+	THREE.Material.call( this, parameters );
 
 };
 
-THREE.LineBasicMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.LineBasicMaterial.prototype.constructor = THREE.LineBasicMaterial;
+THREE.Asset.assignPrototype( THREE.LineBasicMaterial, THREE.Material, {
 
-THREE.LineBasicMaterial.prototype.copy = function ( source ) {
+	type: 'LineBasicMaterial',
 
-	THREE.Material.prototype.copy.call( this, source );
+	DefaultState: {
 
-	this.color.copy( source.color );
+		color: new THREE.Color( 0xffffff ),
 
-	this.linewidth = source.linewidth;
-	this.linecap = source.linecap;
-	this.linejoin = source.linejoin;
+		linewidth: 1,
+		linecap: 'round',
+		linejoin: 'round',
 
-	return this;
+		lights: false
 
-};
+	}
+
+} );

@@ -6,9 +6,10 @@ THREE.RawShaderMaterial = function ( parameters ) {
 
 	THREE.ShaderMaterial.call( this, parameters );
 
-	this.type = 'RawShaderMaterial';
-
 };
 
-THREE.RawShaderMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
-THREE.RawShaderMaterial.prototype.constructor = THREE.RawShaderMaterial;
+THREE.Asset.assignPrototype( THREE.RawShaderMaterial, THREE.ShaderMaterial, {
+
+	type: 'RawShaderMaterial'
+
+} );

@@ -51,117 +51,63 @@
 
 THREE.MeshStandardMaterial = function ( parameters ) {
 
-	THREE.Material.call( this );
-
-	this.defines = { 'STANDARD': '' };
-
-	this.type = 'MeshStandardMaterial';
-
-	this.color = new THREE.Color( 0xffffff ); // diffuse
-	this.roughness = 0.5;
-	this.metalness = 0.5;
-
-	this.map = null;
-
-	this.lightMap = null;
-	this.lightMapIntensity = 1.0;
-
-	this.aoMap = null;
-	this.aoMapIntensity = 1.0;
-
-	this.emissive = new THREE.Color( 0x000000 );
-	this.emissiveIntensity = 1.0;
-	this.emissiveMap = null;
-
-	this.bumpMap = null;
-	this.bumpScale = 1;
-
-	this.normalMap = null;
-	this.normalScale = new THREE.Vector2( 1, 1 );
-
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
-
-	this.roughnessMap = null;
-
-	this.metalnessMap = null;
-
-	this.alphaMap = null;
-
-	this.envMap = null;
-	this.envMapIntensity = 1.0;
-
-	this.refractionRatio = 0.98;
-
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
-	this.wireframeLinecap = 'round';
-	this.wireframeLinejoin = 'round';
-
-	this.skinning = false;
-	this.morphTargets = false;
-	this.morphNormals = false;
-
-	this.setValues( parameters );
+	THREE.Material.call( this, parameters );
 
 };
 
-THREE.MeshStandardMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshStandardMaterial.prototype.constructor = THREE.MeshStandardMaterial;
+THREE.Asset.assignPrototype( THREE.MeshStandardMaterial, THREE.Material, {
 
-THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
+	type: 'MeshStandardMaterial',
 
-	THREE.Material.prototype.copy.call( this, source );
+	DefaultState: {
 
-	this.defines = { 'STANDARD': '' };
+		defines: { 'STANDARD': '' },
+		color: new THREE.Color( 0xffffff ), // diffuse
+		roughness: 0.5,
+		metalness: 0.5,
 
-	this.color.copy( source.color );
-	this.roughness = source.roughness;
-	this.metalness = source.metalness;
+		map: null,
 
-	this.map = source.map;
+		lightMap: null,
+		lightMapIntensity: 1.0,
 
-	this.lightMap = source.lightMap;
-	this.lightMapIntensity = source.lightMapIntensity;
+		aoMap: null,
+		aoMapIntensity: 1.0,
 
-	this.aoMap = source.aoMap;
-	this.aoMapIntensity = source.aoMapIntensity;
+		emissive: new THREE.Color( 0x000000 ),
+		emissiveIntensity: 1.0,
+		emissiveMap: null,
 
-	this.emissive.copy( source.emissive );
-	this.emissiveMap = source.emissiveMap;
-	this.emissiveIntensity = source.emissiveIntensity;
+		bumpMap: null,
+		bumpScale: 1,
 
-	this.bumpMap = source.bumpMap;
-	this.bumpScale = source.bumpScale;
+		normalMap: null,
+		normalScale: new THREE.Vector2( 1, 1 ),
 
-	this.normalMap = source.normalMap;
-	this.normalScale.copy( source.normalScale );
+		displacementMap: null,
+		displacementScale: 1,
+		displacementBias: 0,
 
-	this.displacementMap = source.displacementMap;
-	this.displacementScale = source.displacementScale;
-	this.displacementBias = source.displacementBias;
+		roughnessMap: null,
 
-	this.roughnessMap = source.roughnessMap;
+		metalnessMap: null,
 
-	this.metalnessMap = source.metalnessMap;
+		alphaMap: null,
 
-	this.alphaMap = source.alphaMap;
+		envMap: null,
+		envMapIntensity: 1.0,
 
-	this.envMap = source.envMap;
-	this.envMapIntensity = source.envMapIntensity;
+		refractionRatio: 0.98,
 
-	this.refractionRatio = source.refractionRatio;
+		wireframe: false,
+		wireframeLinewidth: 1,
+		wireframeLinecap: 'round',
+		wireframeLinejoin: 'round',
 
-	this.wireframe = source.wireframe;
-	this.wireframeLinewidth = source.wireframeLinewidth;
-	this.wireframeLinecap = source.wireframeLinecap;
-	this.wireframeLinejoin = source.wireframeLinejoin;
+		skinning: false,
+		morphTargets: false,
+		morphNormals: false
 
-	this.skinning = source.skinning;
-	this.morphTargets = source.morphTargets;
-	this.morphNormals = source.morphNormals;
+	}
 
-	return this;
-
-};
+} );

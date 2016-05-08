@@ -13,29 +13,21 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 
 	THREE.Material.call( this, parameters );
 
-	this.type = 'MeshNormalMaterial';
-
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
-
-	this.fog = false;
-	this.lights = false;
-	this.morphTargets = false;
-
-	this.setValues( parameters );
-
 };
 
-THREE.MeshNormalMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshNormalMaterial.prototype.constructor = THREE.MeshNormalMaterial;
+THREE.Asset.assignPrototype( THREE.MeshNormalMaterial, THREE.Material, {
 
-THREE.MeshNormalMaterial.prototype.copy = function ( source ) {
+	type: 'MeshNormalMaterial',
 
-	THREE.Material.prototype.copy.call( this, source );
+	DefaultState: {
 
-	this.wireframe = source.wireframe;
-	this.wireframeLinewidth = source.wireframeLinewidth;
+		wireframe: false,
+		wireframeLinewidth: 1,
 
-	return this;
+		fog: false,
+		lights: false,
+		morphTargets: false
 
-};
+	}
+
+} );

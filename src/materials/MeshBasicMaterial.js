@@ -33,71 +33,42 @@
 
 THREE.MeshBasicMaterial = function ( parameters ) {
 
-	THREE.Material.call( this );
-
-	this.type = 'MeshBasicMaterial';
-
-	this.color = new THREE.Color( 0xffffff ); // emissive
-
-	this.map = null;
-
-	this.aoMap = null;
-	this.aoMapIntensity = 1.0;
-
-	this.specularMap = null;
-
-	this.alphaMap = null;
-
-	this.envMap = null;
-	this.combine = THREE.MultiplyOperation;
-	this.reflectivity = 1;
-	this.refractionRatio = 0.98;
-
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
-	this.wireframeLinecap = 'round';
-	this.wireframeLinejoin = 'round';
-
-	this.skinning = false;
-	this.morphTargets = false;
-
-	this.lights = false;
-
-	this.setValues( parameters );
+	THREE.Material.call( this, parameters );
 
 };
 
-THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshBasicMaterial.prototype.constructor = THREE.MeshBasicMaterial;
+THREE.Asset.assignPrototype( THREE.MeshBasicMaterial, THREE.Material, {
 
-THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
+	type: 'MeshBasicMaterial',
 
-	THREE.Material.prototype.copy.call( this, source );
+	DefaultState: {
 
-	this.color.copy( source.color );
+		color: new THREE.Color( 0xffffff ), // emissive
 
-	this.map = source.map;
+		map: null,
 
-	this.aoMap = source.aoMap;
-	this.aoMapIntensity = source.aoMapIntensity;
+		aoMap: null,
+		aoMapIntensity: 1.0,
 
-	this.specularMap = source.specularMap;
+		specularMap: null,
 
-	this.alphaMap = source.alphaMap;
+		alphaMap: null,
 
-	this.envMap = source.envMap;
-	this.combine = source.combine;
-	this.reflectivity = source.reflectivity;
-	this.refractionRatio = source.refractionRatio;
+		envMap: null,
+		combine: THREE.MultiplyOperation,
+		reflectivity: 1,
+		refractionRatio: 0.98,
 
-	this.wireframe = source.wireframe;
-	this.wireframeLinewidth = source.wireframeLinewidth;
-	this.wireframeLinecap = source.wireframeLinecap;
-	this.wireframeLinejoin = source.wireframeLinejoin;
+		wireframe: false,
+		wireframeLinewidth: 1,
+		wireframeLinecap: 'round',
+		wireframeLinejoin: 'round',
 
-	this.skinning = source.skinning;
-	this.morphTargets = source.morphTargets;
+		skinning: false,
+		morphTargets: false,
 
-	return this;
+		lights: false
 
-};
+	}
+
+} );

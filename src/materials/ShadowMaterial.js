@@ -15,9 +15,6 @@ THREE.ShadowMaterial = function () {
 		fragmentShader: THREE.ShaderChunk[ 'shadow_frag' ]
 	} );
 
-	this.lights = true;
-	this.transparent = true;
-
 	Object.defineProperties( this, {
 		opacity: {
 			enumerable: true,
@@ -32,5 +29,17 @@ THREE.ShadowMaterial = function () {
 
 };
 
-THREE.ShadowMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
-THREE.ShadowMaterial.prototype.constructor = THREE.ShadowMaterial;
+THREE.Asset.assignPrototype( THREE.ShadowMaterial, THREE.ShaderMaterial, {
+
+	type: 'ShadowMaterial',
+
+	DefaultState: {
+
+		lights: true,
+		transparent: true,
+		opacity: 1
+
+	}
+
+} );
+
