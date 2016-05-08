@@ -16,7 +16,7 @@ if ( typeof define === 'function' && define.amd ) {
 
 }
 
-//
+// Polyfills
 
 if ( Number.EPSILON === undefined ) {
 
@@ -211,7 +211,7 @@ Object.assign( THREE, {
 	LinearToneMapping: 1, // only apply exposure.
 	ReinhardToneMapping: 2,
 	Uncharted2ToneMapping: 3, // John Hable
-	CineonToneMapping: 4,  // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
+	CineonToneMapping: 4, // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
 
 	// Mapping modes
 
@@ -329,6 +329,7 @@ Object.assign( THREE, {
 
 	// Depth packing strategies
 
-	BasicDepthPacking: 3200,  // for writing to float textures for high precision or for visualizing results in RGB buffers
+	BasicDepthPacking: 3200, // for writing to float textures for high precision or for visualizing results in RGB buffers
 	RGBADepthPacking: 3201 // for packing into RGBA buffers.
+
 } );
