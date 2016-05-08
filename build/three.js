@@ -18,7 +18,7 @@ if ( typeof define === 'function' && define.amd ) {
 
 }
 
-//
+// Polyfills
 
 if ( Number.EPSILON === undefined ) {
 
@@ -40,7 +40,7 @@ if ( Math.sign === undefined ) {
 
 }
 
-if ( Function.prototype.name === undefined && Object.defineProperty !== undefined ) {
+if ( Function.prototype.name === undefined ) {
 
 	// Missing in IE9-11.
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
@@ -59,43 +59,36 @@ if ( Function.prototype.name === undefined && Object.defineProperty !== undefine
 
 if ( Object.assign === undefined ) {
 
+	// Missing in IE.
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 
-	Object.defineProperty( Object, 'assign', {
+	( function () {
 
-		writable: true,
-		configurable: true,
-
-		value: function ( target ) {
+		Object.assign = function ( target ) {
 
 			'use strict';
 
 			if ( target === undefined || target === null ) {
 
-				throw new TypeError( "Cannot convert first argument to object" );
+				throw new TypeError( 'Cannot convert undefined or null to object' );
 
 			}
 
-			var to = Object( target );
+			var output = Object( target );
 
-			for ( var i = 1, n = arguments.length; i !== n; ++ i ) {
+			for ( var index = 1; index < arguments.length; index ++ ) {
 
-				var nextSource = arguments[ i ];
+				var source = arguments[ index ];
 
-				if ( nextSource === undefined || nextSource === null ) continue;
+				if ( source !== undefined && source !== null ) {
 
-				nextSource = Object( nextSource );
+					for ( var nextKey in source ) {
 
-				var keysArray = Object.keys( nextSource );
+						if ( Object.prototype.hasOwnProperty.call( source, nextKey ) ) {
 
-				for ( var nextIndex = 0, len = keysArray.length; nextIndex !== len; ++ nextIndex ) {
+							output[ nextKey ] = source[ nextKey ];
 
-					var nextKey = keysArray[ nextIndex ];
-					var desc = Object.getOwnPropertyDescriptor( nextSource, nextKey );
-
-					if ( desc !== undefined && desc.enumerable ) {
-
-						to[ nextKey ] = nextSource[ nextKey ];
+						}
 
 					}
 
@@ -103,13 +96,15 @@ if ( Object.assign === undefined ) {
 
 			}
 
-			return to;
+			return output;
 
-		}
+		};
 
-	} );
+	} )();
 
 }
+
+//
 
 Object.assign( THREE, {
 
@@ -218,7 +213,7 @@ Object.assign( THREE, {
 	LinearToneMapping: 1, // only apply exposure.
 	ReinhardToneMapping: 2,
 	Uncharted2ToneMapping: 3, // John Hable
-	CineonToneMapping: 4,  // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
+	CineonToneMapping: 4, // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
 
 	// Mapping modes
 
@@ -336,8 +331,9 @@ Object.assign( THREE, {
 
 	// Depth packing strategies
 
-	BasicDepthPacking: 3200,  // for writing to float textures for high precision or for visualizing results in RGB buffers
+	BasicDepthPacking: 3200, // for writing to float textures for high precision or for visualizing results in RGB buffers
 	RGBADepthPacking: 3201 // for packing into RGBA buffers.
+
 } );
 
 // File:src/math/Color.js
