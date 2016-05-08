@@ -57,43 +57,36 @@ if ( Function.prototype.name === undefined && Object.defineProperty !== undefine
 
 if ( Object.assign === undefined ) {
 
+	// Missing in IE.
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 
-	Object.defineProperty( Object, 'assign', {
+	( function () {
 
-		writable: true,
-		configurable: true,
-
-		value: function ( target ) {
+		Object.assign = function ( target ) {
 
 			'use strict';
 
 			if ( target === undefined || target === null ) {
 
-				throw new TypeError( "Cannot convert first argument to object" );
+				throw new TypeError( 'Cannot convert undefined or null to object' );
 
 			}
 
-			var to = Object( target );
+			var output = Object( target );
 
-			for ( var i = 1, n = arguments.length; i !== n; ++ i ) {
+			for ( var index = 1; index < arguments.length; index ++ ) {
 
-				var nextSource = arguments[ i ];
+				var source = arguments[ index ];
 
-				if ( nextSource === undefined || nextSource === null ) continue;
+				if ( source !== undefined && source !== null ) {
 
-				nextSource = Object( nextSource );
+					for ( var nextKey in source ) {
 
-				var keysArray = Object.keys( nextSource );
+						if ( Object.prototype.hasOwnProperty.call( source, nextKey ) ) {
 
-				for ( var nextIndex = 0, len = keysArray.length; nextIndex !== len; ++ nextIndex ) {
+							output[ nextKey ] = source[ nextKey ];
 
-					var nextKey = keysArray[ nextIndex ];
-					var desc = Object.getOwnPropertyDescriptor( nextSource, nextKey );
-
-					if ( desc !== undefined && desc.enumerable ) {
-
-						to[ nextKey ] = nextSource[ nextKey ];
+						}
 
 					}
 
@@ -101,13 +94,15 @@ if ( Object.assign === undefined ) {
 
 			}
 
-			return to;
+			return output;
 
-		}
+		};
 
-	} );
+	} )();
 
 }
+
+//
 
 Object.assign( THREE, {
 
